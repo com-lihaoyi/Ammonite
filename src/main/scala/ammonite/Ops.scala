@@ -1,10 +1,16 @@
 package ammonite
-import java.io.{FileInputStream, FileOutputStream, File}
-import java.nio.file.Files
+import java.io.{InputStream, FileInputStream, FileOutputStream, File}
+import java.nio.ByteBuffer
+import java.nio.file.{StandardOpenOption, StandardCopyOption, Paths, Files}
 import java.nio.file.attribute.{PosixFileAttributes, BasicFileAttributes}
 
-import scala.language.dynamics
 
+import scala.language.dynamics
+object OpError{
+  type IAE = IllegalArgumentException
+  case class ResourceNotFound(src: Path)
+    extends IAE(s"No resource found at path $src")
+}
 trait Op1[T1, R] extends (T1 => R){
   def apply(arg: T1): R
   def !(arg: T1): R = apply(arg)
@@ -46,13 +52,29 @@ trait Mover{
  * Moves a file from one place to another. Creates any necessary directories
  */
 object mv extends Op2[Path, Path, Unit] with Mover{
-  def apply(from: Path, to: Path) = {
-    new File(from.toString).renameTo(new File(to.toString))
-  }
+  def apply(from: Path, to: Path) =
+    java.nio.file.Files.move(from.nio, to.nio)
+
+
   def check = false
 
   object all extends Mover{
     def check = true
+  }
+}
+
+/**
+ * Copies a file from one place to another. Creates any necessary directories
+ */
+object cp extends Op2[Path, Path, Unit] {
+  def apply(from: Path, to: Path) = {
+    def copyOne(p: Path) = {
+      Files.copy(Paths.get(p.toString), Paths.get((to/(p - from)).toString))
+    }
+
+    copyOne(from)
+    ls.rec! from | copyOne
+
   }
 }
 
@@ -70,8 +92,10 @@ object rm extends Op1[Path, Unit]{
 }
 
 object ls extends Op1[Path, Seq[Path]]{
-  def apply(arg: Path) =
-    Option(new File(arg.toString).listFiles).toVector.flatMap(x=>x).map(f => Path(f.getCanonicalPath))
+  def apply(arg: Path) = {
+    import collection.JavaConverters._
+    Files.list(arg.nio).iterator().asScala.map(x => Path(x)).toVector
+  }
 
   object rec extends Op1[Path, Seq[Path]]{
     def recursiveListFiles(f: File): Iterator[File] = {
@@ -84,49 +108,83 @@ object ls extends Op1[Path, Seq[Path]]{
   }
 }
 
-
 class Writable(val writeableData: Array[Byte])
+
 object Writable{
   implicit def WritableString(s: String) = new Writable(s.getBytes)
   implicit def WritableArray(a: Array[Byte]) = new Writable(a)
+  implicit def WritableArray2(a: Array[Array[Byte]]) = new Writable(a.flatten)
   implicit def WritableTraversable(a: Traversable[String]) = new Writable(a.mkString("\n").getBytes)
 }
 
 object write extends Op2[Path, Writable, Unit]{
   def apply(target: Path, data: Writable) = {
     mkdir(target/RelPath.up)
-    val fw = new FileOutputStream(target.toString)
-    fw.write(data.writeableData)
-    fw.flush()
-    fw.close()
+    Files.write(target.nio, data.writeableData, StandardOpenOption.CREATE_NEW)
   }
-}
-
-object read extends Op1[Path, String]{
-  def apply(arg: Path) = io.Source.fromFile(arg.toString).mkString
-  object lines extends Op1[Path, Iterator[String]]{
-    def apply(arg: Path) = io.Source.fromFile(arg.toString).getLines()
+  object append extends Op2[Path, Writable, Unit]{
+    def apply(target: Path, data: Writable) = {
+      mkdir(target/RelPath.up)
+      Files.write(target.nio, data.writeableData, StandardOpenOption.CREATE, StandardOpenOption.APPEND)
+    }
   }
-  object bytes extends Op1[Path, Array[Byte]]{
-    def apply(arg: Path) = {
-      val is = new FileInputStream(arg.toString)
-      val cnt = is.available
-      val bytes = Array.ofDim[Byte](cnt)
-      is.read(bytes)
-      is.close()
-      bytes
+  object over extends Op2[Path, Writable, Unit]{
+    def apply(target: Path, data: Writable) = {
+      mkdir(target/RelPath.up)
+      Files.write(target.nio, data.writeableData)
     }
   }
 }
 
-object meta extends Op1[Path, PosixFileAttributes]{
-  def apply(arg: Path) = {
-    val file = java.nio.file.Paths.get(arg.toString)
-    Files.readAttributes(file, classOf[PosixFileAttributes])
+trait Reader{
+  def readIn(p: Path): InputStream
+  def apply(arg: Path) = io.Source.fromInputStream(readIn(arg)).mkString
 
+  object lines extends Op1[Path, Iterator[String]]{
+    def apply(arg: Path) = io.Source.fromInputStream(readIn(arg)).getLines()
+  }
+  object bytes extends Op1[Path, Array[Byte]]{
+    def apply(arg: Path) = {
+      val is = readIn(arg)
+      val out = new java.io.ByteArrayOutputStream()
+      val buffer = new Array[Byte](1024)
+      var r = 0
+      while (r != -1) {
+        r = is.read(buffer)
+        if (r != -1) out.write(buffer, 0, r)
+      }
+      out.toByteArray
+    }
   }
 }
 
+/**
+ * Reads a file into memory, either as a string,
+ * as a Seq[String] of lines, or as a Array[Byte]
+ */
+object read extends Reader with Op1[Path, String]{
+  def readIn(p: Path) = {
+    java.nio.file.Files.newInputStream(p.nio)
+  }
+
+  /**
+   * Reads a classpath resource into memory, either as a
+   * string, as a Seq[String] of lines, or as a Array[Byte]
+   */
+  object resource extends Reader with Op1[Path, String]{
+    def readIn(p: Path) = {
+      val ret = getClass.getResourceAsStream(p.toString)
+      ret match{
+        case null => throw new java.nio.file.NoSuchFileException(p.toString)
+        case _ => ret
+      }
+    }
+  }
+}
+
+object exists extends Op1[Path, Boolean]{
+  def apply(p: Path) = Files.exists(Paths.get(p.toString))
+}
 
 object chmod extends Op2[Path, Unit, Unit]{
   def apply(arg1: Path, arg2: Unit) = ???
@@ -148,21 +206,15 @@ object kill extends Op1[Unit, Unit]{
 }
 object ln extends Op2[Path, Path, Unit]{
   def apply(src: Path, dest: Path) = {
-    java.nio.file.Files.createLink(
-      java.nio.file.Paths.get(dest.toString),
-      java.nio.file.Paths.get(src.toString)
-    )
+    Files.createLink(Paths.get(dest.toString), Paths.get(src.toString))
   }
   object s extends Op2[Path, Path, Unit]{
     def apply(src: Path, dest: Path) = {
-
-      java.nio.file.Files.createSymbolicLink(
-        java.nio.file.Paths.get(dest.toString),
-        java.nio.file.Paths.get(src.toString)
-      )
+      Files.createSymbolicLink(Paths.get(dest.toString), Paths.get(src.toString))
     }
   }
 }
+
 /*object free{
   def memory: Long = ???
   def disk: Long = ???

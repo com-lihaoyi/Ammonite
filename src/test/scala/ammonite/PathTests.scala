@@ -1,13 +1,34 @@
 package ammonite
 
-import ammonite.BasePath.NoRelativePathException
+import java.nio.file.Paths
+
 import utest._
 import RelPath._
 import Path._
+
 object PathTests extends TestSuite{
   val tests = TestSuite {
     'Basic{
       val rel = 'src/'main/'scala
+      'Transformers{
+        assert(
+          // ammonite.Path to java.nio.file.Path
+          (root/'omg).nio == Paths.get("/omg"),
+          (empty/'omg).nio == Paths.get("omg"),
+
+          // java.nio.file.Path to ammonite.Path
+          root/'omg == Paths.get("/omg").amm,
+          empty/'omg == Paths.get("omg").amm,
+
+          // ammonite.Path to String
+          (root/'omg).toString == "/omg",
+          (empty/'omg).toString == "omg",
+
+          // String to ammonite.Path
+          root/'omg == Path("/omg"),
+          empty/'omg == RelPath("omg")
+        )
+      }
 
       'RelPath{
         'Constructors {
@@ -56,7 +77,7 @@ object PathTests extends TestSuite{
           * - eq('omg/'bbq/'wtf - 'omg/'bbq, empty/'wtf)
           * - eq('omg/'bbq - 'omg/'bbq/'wtf, up)
           * - eq(up/'omg/'bbq - 'omg/'bbq, up/up/up/'omg/'bbq)
-          * - intercept[NoRelativePathException]('omg/'bbq - up/'omg/'bbq)
+          * - intercept[PathError.NoRelativePath]('omg/'bbq - up/'omg/'bbq)
         }
       }
       'Ups{
@@ -81,29 +102,28 @@ object PathTests extends TestSuite{
             i-=1
             assert(abs.segments.length == i)
           }
-          intercept[BasePath.AbsolutePathOutsideRoot.type]{ abs/up }
+          intercept[PathError.AbsolutePathOutsideRoot.type]{ abs/up }
         }
         'RootUpBreak{
-          intercept[BasePath.AbsolutePathOutsideRoot.type]{ root/up }
+          intercept[PathError.AbsolutePathOutsideRoot.type]{ root/up }
           val x = root/"omg"
           val y = x/up
-          intercept[BasePath.AbsolutePathOutsideRoot.type]{ y / up }
+          intercept[PathError.AbsolutePathOutsideRoot.type]{ y / up }
 
         }
       }
     }
     'Errors{
       'InvalidChars {
-        val ex = intercept[BasePath.InvalidCharException]('src / "Main/.scala")
-        val BasePath.InvalidCharException("Main/.scala", chars) = ex
-        assert(chars == Set('/'))
+        val ex = intercept[PathError.InvalidSegment]('src / "Main/.scala")
+        val PathError.InvalidSegment("Main/.scala") = ex
       }
       'InvalidSegments{
-        intercept[BasePath.InvalidSegmentException]{root/".."}
-        intercept[BasePath.InvalidSegmentException]{root/"."}
+        intercept[PathError.InvalidSegment]{root/".."}
+        intercept[PathError.InvalidSegment]{root/"."}
       }
       'EmptySegment {
-        intercept[BasePath.EmptySegmentException.type]('src / "")
+        intercept[PathError.InvalidSegment]('src / "")
       }
       'CannotRelativizeAbsAndRel{
         val abs = processWorkingDir
@@ -126,6 +146,10 @@ object PathTests extends TestSuite{
             """,
             "type mismatch"
           )
+      }
+      'InvalidCasts{
+        intercept[IllegalArgumentException](Path("omg/cow"))
+        intercept[IllegalArgumentException](RelPath("/omg/cow"))
       }
     }
     'Extractors{

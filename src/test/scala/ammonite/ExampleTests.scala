@@ -23,17 +23,19 @@ object ExampleTests extends TestSuite{
       assert(lines == 14)
     }
     'addUpScalaSize{
-      ls.rec! processWorkingDir |? (_.ext == "scala") | meta | (_.size) |& (_ + _)
+      ls.rec! processWorkingDir |? (_.ext == "scala") | (_.size) |& (_ + _)
     }
     'concatAll{
-      ls.rec! wd |? (_.ext == "scala") | read |> write! wd/'target/"omg.txt"
+      ls.rec! wd |? (_.ext == "scala") | read |> write! wd/'target/'test/"omg.txt"
     }
 
     'rename{
-      val d1/"omg"/x1 = wd
-      val d2/"omg"/x2 = wd
+//      val d1/"omg"/x1 = wd
+//      val d2/"omg"/x2 = wd
 //      ls! wd |? (_.ext == "scala") | (x => mv! x ! x.pref)
     }
-
+    'lol{
+      val x = Array(1, 2, 3) || {x => Array(x, x, x)}
+    }
   }
 }

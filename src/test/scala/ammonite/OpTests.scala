@@ -1,10 +1,7 @@
 package ammonite
 
-import ammonite.BasePath.NoRelativePathException
-import ammonite.Path._
-import ammonite.RelPath._
 import utest._
-
+import java.nio.{file => nio}
 object OpTests extends TestSuite{
   val wd = processWorkingDir
   val tests = TestSuite {
@@ -34,7 +31,11 @@ object OpTests extends TestSuite{
         )
       )
     }
-
+    'readResource{
+      assert(read.resource(root/'testdata/"File.txt").contains(
+        "I weigh twice as much as you"
+      ))
+    }
     'rm{
       // shouldn't crash
       rm! wd/'target/'nonexistent
@@ -43,76 +44,107 @@ object OpTests extends TestSuite{
       val test = wd/'target/'test
       rm! test
       mkdir! test
-
+      'cp{
+        val d = test/'copying
+        'basic{
+          assert(
+            !exists(d/'folder),
+            !exists(d/'file)
+          )
+          mkdir! d/'folder
+          write(d/'file, "omg")
+          assert(
+            exists(d/'folder),
+            exists(d/'file),
+            read(d/'file) == "omg"
+          )
+          cp(d/'folder, d/'folder2)
+          cp(d/'file, d/'file2)
+          ls! d | println
+          assert(
+            exists(d/'folder),
+            exists(d/'file),
+            read(d/'file) == "omg",
+            exists(d/'folder2),
+            exists(d/'file2),
+            read(d/'file2) == "omg"
+          )
+        }
+        'deep{
+          write(d/'folderA/'folderB/'file, "Cow")
+          cp(d/'folderA, d/'folderC)
+          assert(read(d/'folderC/'folderB/'file) == "Cow")
+        }
+      }
       'mv{
         'basic{
-          val moving = test/'moving
-          mkdir! moving/'folder
-          assert(ls(moving) == Seq(moving/'folder))
-          mv! moving/'folder ! moving/'folder2
-          assert(ls(moving) == Seq(moving/'folder2))
+          val d = test/'moving
+          mkdir! d/'folder
+          assert(ls(d) == Seq(d/'folder))
+          mv! d/'folder ! d/'folder2
+          assert(ls(d) == Seq(d/'folder2))
         }
         'shallow{
-          val moving = test/'moving2
-          write! moving/"A.scala" ! "AScala"
-          write! moving/"B.scala" ! "BScala"
-          write! moving/"A.py" ! "APy"
-          write! moving/"B.py" ! "BPy"
-          def fileSet = ls(moving).map(_.last).toSet
+          val d = test/'moving2
+          write! d/"A.scala" ! "AScala"
+          write! d/"B.scala" ! "BScala"
+          write! d/"A.py" ! "APy"
+          write! d/"B.py" ! "BPy"
+          def fileSet = ls(d).map(_.last).toSet
           assert(fileSet == Set("A.scala", "B.scala", "A.py", "B.py"))
           'partialMoves{
-            ls! moving | mv{case r"$x.scala" => s"$x.java"}
+            ls! d | mv{case r"$x.scala" => s"$x.java"}
             assert(fileSet == Set("A.java", "B.java", "A.py", "B.py"))
-            ls! moving | mv{case r"A.$x" => s"C.$x"}
+            ls! d | mv{case r"A.$x" => s"C.$x"}
             assert(fileSet == Set("C.java", "B.java", "C.py", "B.py"))
           }
           'fullMoves{
-            ls! moving | mv.all{case r"$x.$y" => s"$y.$x"}
+            ls! d | mv.all{case r"$x.$y" => s"$y.$x"}
             assert(fileSet == Set("scala.A", "scala.B", "py.A", "py.B"))
-            def die = ls! moving | mv.all{case r"A.$x" => s"C.$x"}
+            def die = ls! d | mv.all{case r"A.$x" => s"C.$x"}
             intercept[MatchError]{ die }
           }
         }
         'deep{
-          val moving = test/'moving2
-          write! moving/'scala/'A ! "AScala"
-          write! moving/'scala/'B ! "BScala"
-          write! moving/'py/'A ! "APy"
-          write! moving/'py/'B ! "BPy"
+          val d = test/'moving2
+          write! d/'scala/'A ! "AScala"
+          write! d/'scala/'B ! "BScala"
+          write! d/'py/'A ! "APy"
+          write! d/'py/'B ! "BPy"
           'partialMoves{
-            ls.rec! moving | mv*{case d/"py"/x => d/x }
+            ls.rec! d | mv*{case d/"py"/x => d/x }
             assert(
-              ls.rec(moving).toSet == Set(
-                moving/'py,
-                moving/'scala,
-                moving/'scala/'A,
-                moving/'scala/'B,
-                moving/'A,
-                moving/'B
+              ls.rec(d).toSet == Set(
+                d/'py,
+                d/'scala,
+                d/'scala/'A,
+                d/'scala/'B,
+                d/'A,
+                d/'B
               )
             )
           }
           'fullMoves{
-            def die = ls.rec! moving | mv.all*{case d/"py"/x => d/x }
+            def die = ls.rec! d | mv.all*{case d/"py"/x => d/x }
             intercept[MatchError]{ die }
 
-            ls.rec! moving |? (_.isFile) | mv.all*{
+            ls.rec! d |? (_.isFile) | mv.all*{
               case d/"py"/x => d/'scala/'py/x
               case d/"scala"/x => d/'py/'scala/x
               case d => println("NOT FOUND " + d); d
             }
 
-            ls.rec(moving).toSet.foreach(println)
+            ls.rec(d).toSet.foreach(println)
             assert(
-              ls.rec(moving).toSet == Set(
-                moving/'py,
-                moving/'scala,
-                moving/'py/'scala,
-                moving/'scala/'py,
-                moving/'scala/'py/'A,
-                moving/'scala/'py/'B,
-                moving/'py/'scala/'A,
-                moving/'py/'scala/'B
+              ls.rec(d).toSet == Set(
+                d/'py,
+                d/'scala,
+                d/'py/'scala,
+                d/'scala/'py,
+                d/'scala/'py/'A,
+                d/'scala/'py/'B,
+                d/'py/'scala/'A,
+                d/'py/'scala/'B
               )
             )
           }
@@ -140,20 +172,56 @@ object OpTests extends TestSuite{
         }
       }
       'readWrite{
-        val readWrite = test/'readWrite
-        mkdir! readWrite
+        val d = test/'readWrite
+        mkdir! d
         'simple{
-          write! readWrite/'file ! "i am a cow"
-          assert(read(readWrite/'file) == "i am a cow")
+          write! d/'file ! "i am a cow"
+          assert(read(d/'file) == "i am a cow")
         }
         'autoMkdir{
-          write! readWrite/'folder/'folder/'file ! "i am a cow"
-          assert(read(readWrite/'folder/'folder/'file) == "i am a cow")
+          write! d/'folder/'folder/'file ! "i am a cow"
+          assert(read(d/'folder/'folder/'file) == "i am a cow")
         }
         'binary{
-          write! readWrite/'file ! Array[Byte](1, 2, 3, 4)
-          assert(read(readWrite/'file).toSeq == Array[Byte](1, 2, 3, 4).toSeq)
+          write! d/'file ! Array[Byte](1, 2, 3, 4)
+          assert(read(d/'file).toSeq == Array[Byte](1, 2, 3, 4).toSeq)
         }
+        'concatenating{
+          write(d/'concat1, Seq("a", "b", "c"))
+          assert(read(d/'concat1) == "a\nb\nc")
+          write(d/'concat2, Array(Array[Byte](1, 2), Array[Byte](3, 4)))
+          assert(read.bytes(d/'concat2).toSeq == Array[Byte](1, 2, 3, 4).toSeq)
+        }
+        'writeAppend{
+          write.append(d/"append.txt", "Hello")
+          assert(read(d/"append.txt") == "Hello")
+          write.append(d/"append.txt", " World")
+          assert(read(d/"append.txt") == "Hello World")
+        }
+        'writeOver{
+          write.over(d/"append.txt", "Hello")
+          assert(read(d/"append.txt") == "Hello")
+          write.over(d/"append.txt", " World")
+          assert(read(d/"append.txt") == " World")
+        }
+      }
+      'Failures{
+        val d = test/'failures
+        mkdir! d
+        'nonexistant{
+          * - intercept[nio.NoSuchFileException](ls! d/'nonexistent)
+          * - intercept[nio.NoSuchFileException](read! d/'nonexistent)
+          * - intercept[nio.NoSuchFileException](read.resource! d/'nonexistent)
+          * - intercept[nio.NoSuchFileException](cp! d/'nonexistent ! d/'yolo)
+          * - intercept[nio.NoSuchFileException](mv! d/'nonexistent ! d/'yolo)
+        }
+        'collisions{
+          mkdir! d/'folder
+          write! d/'file! "lolol"
+          * - intercept[nio.FileAlreadyExistsException](mv(d/'file, d/'folder))
+          * - intercept[nio.FileAlreadyExistsException](cp(d/'file, d/'folder))
+          * - intercept[nio.FileAlreadyExistsException](write(d/'file, "lols"))
+         }
       }
     }
   }

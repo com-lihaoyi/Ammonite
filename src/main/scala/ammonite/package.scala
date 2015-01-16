@@ -35,10 +35,11 @@ package object ammonite extends RelPathStuff{
      */
     def |&[A1 >: T](op: (A1, A1) => A1): A1 = i.reduceLeft(op)
   }
-
+  implicit def FMArray[T](a: Array[T]) = FilterMap(a)
   implicit class Pipeable[T](t: T){
     def |>[V](f: T => V) = f(t)
   }
+
   val root = Path.root
 
   def processWorkingDir = Path(new java.io.File("."))
@@ -53,7 +54,14 @@ package object ammonite extends RelPathStuff{
                              (s: SeqFactory[CC]) = {
     (t: Seq[T]) => s(t:_*)
   }
+  implicit class Transformable1(p: java.nio.file.Path){
+    def amm = {
+      val s = p.toString
 
+      if (s.startsWith("/")) Path(s)
+      else RelPath(s)
+    }
+  }
 
   class Interped(parts: Seq[String]){
     def unapplySeq(s: String) = {
@@ -63,6 +71,7 @@ package object ammonite extends RelPathStuff{
       regex.r.unapplySeq(s)
     }
   }
+
   object /{
     def unapply(p: Path): Option[(Path, String)] = {
       Some((p / up, p.last))

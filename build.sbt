@@ -5,6 +5,8 @@ scalaVersion := "2.11.4"
 
 crossScalaVersions := Seq("2.10.4", "2.11.4")
 
+version := "0.1.0"
+
 name := "ammonite"
 
 libraryDependencies += "com.lihaoyi" %% "utest" % "0.2.4"
