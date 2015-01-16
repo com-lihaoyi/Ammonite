@@ -55,6 +55,7 @@ trait BasePath[ThisType <: BasePath[ThisType]]{
     if (!segments.last.contains('.')) ""
     else segments.last.split('.').lastOption.getOrElse("")
   }
+
 }
 object BasePath{
   def invalidChars = Set('/')
@@ -88,6 +89,7 @@ object BasePath{
  */
 class Path(val segments: Seq[String]) extends BasePath[Path]{
   segments.foreach(BasePath.checkSegment)
+  def last = segments.last
   def make(p: Seq[String], ups: Int) = {
     if (ups > 0){
       throw AbsolutePathOutsideRoot
@@ -100,6 +102,7 @@ class Path(val segments: Seq[String]) extends BasePath[Path]{
     case p: Path => segments == p.segments
     case _ => false
   }
+  override def hashCode = segments.hashCode()
   def -(base: Path): RelPath = {
     var newUps = 0
     var s2 = base.segments
@@ -154,6 +157,7 @@ class RelPath(val segments: Seq[String], val ups: Int) extends BasePath[RelPath]
   }
 
   override def toString = (Seq.fill(ups)("..") ++ segments).mkString("/")
+  override def hashCode = segments.hashCode() + ups.hashCode()
   override def equals(o: Any): Boolean = o match {
     case p: RelPath => segments == p.segments && p.ups == ups
     case _ => false
@@ -185,50 +189,22 @@ object FileType{
   case object SymLink extends FileType
   case object Other extends FileType
 }
-object FileData{
-  def make(attrs: PosixFileAttributes) = FileData(
-    attrs.size(),
-    attrs.lastModifiedTime(),
-    attrs.creationTime(),
-    attrs.lastAccessTime(),
-    attrs.group(),
-    attrs.owner(),
-    attrs.permissions(),
+
+class FileData(attrs: PosixFileAttributes){
+  def size = attrs.size()
+  def mtime = attrs.lastModifiedTime()
+  def ctime = attrs.creationTime()
+  def atime = attrs.lastAccessTime()
+  def group = attrs.group()
+  def owner = attrs.owner()
+  def permissions = attrs.permissions()
+  def fileType =
     if (attrs.isRegularFile) FileType.File
     else if (attrs.isDirectory) FileType.Dir
     else if (attrs.isSymbolicLink) FileType.SymLink
     else if (attrs.isOther) FileType.Other
     else ???
-  )
-}
-case class FileData(size: Long,
-                    mtime: FileTime,
-                    ctime: FileTime,
-                    atime: FileTime,
-                    group: GroupPrincipal,
-                    owner: UserPrincipal,
-                    permissions: java.util.Set[PosixFilePermission],
-                    fileType: FileType){
   def isDir = fileType == FileType.Dir
   def isSymLink = fileType == FileType.SymLink
   def isFile = fileType == FileType.File
-}
-
-object CustomTraversable extends TraversableFactory[CustomTraversable] {
-  implicit def canBuildFrom[A]: CanBuildFrom[Coll, A, CustomTraversable[A]] =
-    new GenericCanBuildFrom[A]
-  implicit def fromIterator[A](i: Iterator[A]) = new CustomTraversable[A](i.toStream)
-  def newBuilder[A] = new mutable.LazyBuilder[A, CustomTraversable[A]] {
-    def result(): CustomTraversable[A] = new CustomTraversable(parts.flatten.toStream)
-  }
-}
-
-class CustomTraversable[+A](inner: Stream[A])
-  extends Traversable[A]
-  with GenericTraversableTemplate[A, CustomTraversable]
-  with TraversableLike[A, CustomTraversable[A]] {
-
-  override def companion = CustomTraversable
-  override def toString = mkString("\n")
-  def foreach[U](f: A => U) = inner.foreach(f)
 }

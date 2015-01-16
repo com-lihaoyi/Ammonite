@@ -41,7 +41,7 @@ object PathTests extends TestSuite{
         }
       }
       'AbsPath{
-        val wd = cwd
+        val wd = processWorkingDir
         val abs = wd / rel
         'Constructor {
           assert(
@@ -74,7 +74,7 @@ object PathTests extends TestSuite{
         'AbsoluteUps{
           // Keep applying `up` and verify that the path gets
           // shorter and shorter and eventually errors.
-          var abs = cwd
+          var abs = processWorkingDir
           var i = abs.segments.length
           while(i > 0){
             abs/=up
@@ -106,7 +106,7 @@ object PathTests extends TestSuite{
         intercept[BasePath.EmptySegmentException.type]('src / "")
       }
       'CannotRelativizeAbsAndRel{
-        val abs = cwd
+        val abs = processWorkingDir
         val rel = 'omg/'wtf
         compileError("""
           abs - rel
@@ -126,6 +126,28 @@ object PathTests extends TestSuite{
             """,
             "type mismatch"
           )
+      }
+    }
+    'Extractors{
+      'regex{
+        val r"omg$x" = "omgasd"
+        assert(x == "asd")
+        val r"${y}omg" = "asdomg"
+        assert(y == "asd")
+        val r"omg${z}bbq" = "omgasdbbq"
+        assert(z == "asd")
+        val r"omg${a}b${b}bq" = "omgasdbbq"
+        assert(a == "asd", b == "")
+      }
+      'paths{
+        val wd = processWorkingDir
+        val a/b/c/d/"omg" = wd/'A/'B/'C/'D/"omg"
+        assert(
+          a == wd/'A,
+          b == "B",
+          c == "C",
+          d == "D"
+        )
       }
     }
   }

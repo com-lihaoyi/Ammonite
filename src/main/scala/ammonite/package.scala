@@ -1,5 +1,9 @@
-import scala.collection.{GenTraversableOnce, TraversableLike}
-import scala.collection.generic.{CanBuildFrom => CBF}
+import java.nio.file.Files
+import java.nio.file.attribute.PosixFileAttributes
+
+import scala.collection.{Seq, GenTraversableOnce, TraversableLike}
+import scala.collection.generic.{CanBuildFrom => CBF, GenericTraversableTemplate, SeqFactory}
+import scala.util.matching.Regex
 
 package object ammonite extends RelPathStuff{
   type T[A] = Iterator[A]
@@ -37,8 +41,34 @@ package object ammonite extends RelPathStuff{
   }
   val root = Path.root
 
-  def cwd = Path(new java.io.File("."))
-  implicit def PathFileData(p: Path) = FileData.make(meta! p)
+  def processWorkingDir = Path(new java.io.File("."))
+
+  implicit def PathFileData(p: Path) = new FileData(
+    Files.readAttributes(java.nio.file.Paths.get(p.toString), classOf[PosixFileAttributes])
+  )
 
   implicit def funcWhee[T, T1, V](f: T => V)(implicit i: T1 => T) = i andThen f
+
+  implicit def SeqFactoryFunc[T, CC[X] <: Seq[X] with GenericTraversableTemplate[X, CC]]
+                             (s: SeqFactory[CC]) = {
+    (t: Seq[T]) => s(t:_*)
+  }
+
+
+  class Interped(parts: Seq[String]){
+    def unapplySeq(s: String) = {
+      val Seq(head, tail@_*) = parts.map(java.util.regex.Pattern.quote)
+
+      val regex = head + tail.map("(.*)" + _).mkString
+      regex.r.unapplySeq(s)
+    }
+  }
+  object /{
+    def unapply(p: Path): Option[(Path, String)] = {
+      Some((p / up, p.last))
+    }
+  }
+  implicit class RegexContext(sc: StringContext) {
+    def r = new Interped(sc.parts)
+  }
 }
