@@ -23,9 +23,9 @@ ls.rec! cwd |? (_.ext == "scala") | read.lines | (_.size) sum
 ls! cwd |? (_.ext == "js") | read |> write! wd/'target/"bundle.js"
 ```
 
-Ammonite is a library used to write rock-solid shell scripts using Scala. It provides a very lightweight way to perform common system housekeeping operations in Scala, without having to drop down to sketchy, fragile bash scripts. Ammonite aims to be safe enough to use large programs while concise enough to use from the Scala command-line.
+Ammonite is a library used to write rock-solid [shell scripts](http://en.wikipedia.org/wiki/Shell_script) using Scala. It provides a very lightweight way to perform common system housekeeping operations in Scala, without having to drop down to sketchy, fragile [Bash](http://en.wikipedia.org/wiki/Bash_%28Unix_shell%29) scripts. Ammonite aims to be safe enough to use large programs while concise enough to use from the Scala command-line.
 
-In general, a Ammonite command to do a particular action should be not-much-longer than the equivalent bash command, but it is far safer due to Scala's type-safe nature and design principles (immutability, no-global-state, etc.). Ammonite also can serve as Scala's missing IO library, serving to replace the common mess of boilerplate:
+In general, a Ammonite command to do a particular action should be not-much-longer than the equivalent Bash command, but it is far safer due to Scala's type-safe nature and design principles (immutability, no-global-state, etc.). Ammonite also can serve as Scala's missing IO library, serving to replace the [common mess of boilerplate](http://stackoverflow.com/a/26769030/871202):
 
 ```scala
 def removeAll(path: String) = {
@@ -68,7 +68,7 @@ Paths
 Ammonite uses strongly-typed data-structures to represent filesystem paths. The two basic versions are:
 
 - `Path`: an absolute path, starting from the root
-- `RelPath`: a relative path
+- `RelPath`: a relative path, not rooted anywhere
 
 Generally, almost all commands take absolute `Path`s. Absolute paths can be created in a few ways:
 
@@ -92,7 +92,7 @@ wd/up
 wd/up/up
 ```
 
-Not that there are no in-built operations to change the `cwd`. You can of course do so using Java APIs, but in general you should not need to. Simply defining a new path, e.g.
+Note that there are no in-built operations to change the `cwd`. You can of course do so using Java APIs, but in general you should not need to. Simply defining a new path, e.g.
 
 ```scala
 val target = cwd/'target
@@ -153,7 +153,7 @@ Note that all paths are always expressed in a canonical manner:
 // not "folder/file/.."
 ```
 
-So you don't need to worry about canonicalizing your paths before comparing.
+So you don't need to worry about canonicalizing your paths before comparing them for equality or otherwise manipulating them. 
 
 Extensions
 ==========
@@ -234,7 +234,14 @@ exists! cwd/'folder2/"data.txt"
 
 All of these operations are pre-defined and strongly typed, so feel free to jump to their implementation to look at what they do or what else is available.
 
-In general, each operator has sensible/safe defaults: `rm` and `cp` are recursive, `rm` ignores the file if it doesn't exist, and all operations that create a file or folder (`mkdir`, `write`, `mv`) automatically create any necessary parent directories. `write` also does *not* stomp over existing files by default.
+In general, each operator has sensible/safe defaults: 
+
+- `rm` and `cp` are recursive
+- `rm` ignores the file if it doesn't exist
+- all operations that create a file or folder (`mkdir`, `write`, `mv`) automatically create any necessary parent directories
+- `write` also does *not* stomp over existing files by default. You need to use `write.over`
+
+In general, this should make these operations much easier to use; the defaults should cover the 99% use case without needing any special flags or fiddling.
 
 Chains
 ======
@@ -258,3 +265,15 @@ txt || (_.split("[^a-zA-Z0-9_]")) |> frequencies |> (_.toSeq) sortBy (-_._2)
 ```
 
 Each of these would be a significant amount of ugly filesystem traversals, readings, and other operations. With Ammonite, it is often a single line.
+
+Limitations
+===========
+
+While Ammonite is an excellent filesystem API, and can turn your Scala/SBT console into a usable shell, it has some limitations
+
+- **No process isolation**: the Scala shell runs in-process, so a single infinite loop or bad command can bring it down and make you lose your work.
+- **No streaming**: all actions in Ammonite are eager, and aggregate all results before returning you concrete Vectors. That means a large command could pause for long periods before you see any activity (only when it completes).
+- **Awkward syntax**: while arguably less awkward than Bash, Scala has some annoyances such as mandatory curly-braces for partial functions, or the precedence rules for chaining operators not behaving as you'd like.
+- **An o-k REPL**: Scala's command line interpreter is no-where near as nice as [IPython](http://ipython.org/). We'd need features like Color, pretty-printed output, better multi-line support, and others to compete.
+- **No concurrency story**: None of Ammonite's operations are multi-thread or multi-process safe. For example, recursively deleting a folder could fail if some other process is at the same time writing new files into it. This is not any worse than Bash or other shells, but differs from most idiomatic Scala programs which tend to be safer than this.
+
