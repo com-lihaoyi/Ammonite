@@ -217,7 +217,7 @@ write(cwd/'folder2/"data.txt", "I am a cow")
 write.over(cwd/'folder2/"data.txt", "I am a cow")
 
 // Append to a file
-write.over(cwd/'folder2/"data.txt", "I am a cow")
+write.append(cwd/'folder2/"data.txt", "I am a cow")
 
 // Read a file as a String
 read! cwd/'folder2/"data.txt"
