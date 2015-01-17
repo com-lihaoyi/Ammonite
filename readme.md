@@ -17,7 +17,7 @@ mkdir! d/'folder
 ls! d | mv{case r"$x.scala" => s"$x.java"}
 
 // Line-count of all .scala files recursively in d
-ls.rec! cwd |? (_.ext == "scala") | read || (_.split("\n")) length
+ls.rec! cwd |? (_.ext == "scala") | read.lines | (_.size) sum
 
 // Find and concatenate all .js files directly in the working directory
 ls! cwd |? (_.ext == "js") | read |> write! wd/'target/"bundle.js"
