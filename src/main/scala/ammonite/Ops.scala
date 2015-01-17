@@ -11,6 +11,57 @@ object OpError{
   case class ResourceNotFound(src: Path)
     extends IAE(s"No resource found at path $src")
 }
+
+object Internals{
+
+  trait Mover{
+    def check: Boolean
+    def apply(t: PartialFunction[String, String])(from: Path) = {
+      if (check || t.isDefinedAt(from.last)){
+        val dest = from/up/t(from.last)
+        new File(from.toString).renameTo(new File(dest.toString))
+      }
+    }
+    def *(t: PartialFunction[Path, Path])(from: Path) = {
+      if (check || t.isDefinedAt(from)) {
+        val dest = t(from)
+        mkdir! dest/up
+        new File(from.toString).renameTo(new File(t(from).toString))
+      }
+    }
+  }
+
+  trait Reader{
+    def readIn(p: Path): InputStream
+    def apply(arg: Path) = io.Source.fromInputStream(readIn(arg)).mkString
+
+    object lines extends Op1[Path, Iterator[String]]{
+      def apply(arg: Path) = io.Source.fromInputStream(readIn(arg)).getLines()
+    }
+    object bytes extends Op1[Path, Array[Byte]]{
+      def apply(arg: Path) = {
+        val is = readIn(arg)
+        val out = new java.io.ByteArrayOutputStream()
+        val buffer = new Array[Byte](1024)
+        var r = 0
+        while (r != -1) {
+          r = is.read(buffer)
+          if (r != -1) out.write(buffer, 0, r)
+        }
+        out.toByteArray
+      }
+    }
+  }
+
+  class Writable(val writeableData: Array[Byte])
+
+  object Writable{
+    implicit def WritableString(s: String) = new Writable(s.getBytes)
+    implicit def WritableArray(a: Array[Byte]) = new Writable(a)
+    implicit def WritableArray2(a: Array[Array[Byte]]) = new Writable(a.flatten)
+    implicit def WritableTraversable(a: Traversable[String]) = new Writable(a.mkString("\n").getBytes)
+  }
+}
 trait Op1[T1, R] extends (T1 => R){
   def apply(arg: T1): R
   def !(arg: T1): R = apply(arg)
@@ -31,34 +82,18 @@ object mkdir extends Op1[Path, Unit]{
   def apply(path: Path) = new File(path.toString).mkdirs()
 }
 
-trait Mover{
-  def check: Boolean
-  def apply(t: PartialFunction[String, String])(from: Path) = {
-    if (check || t.isDefinedAt(from.last)){
-      val dest = from/up/t(from.last)
-      new File(from.toString).renameTo(new File(dest.toString))
-    }
-  }
-  def *(t: PartialFunction[Path, Path])(from: Path) = {
-    if (check || t.isDefinedAt(from)) {
-      val dest = t(from)
-      mkdir! dest/up
-      new File(from.toString).renameTo(new File(t(from).toString))
-    }
-  }
-}
 
 /**
  * Moves a file from one place to another. Creates any necessary directories
  */
-object mv extends Op2[Path, Path, Unit] with Mover{
+object mv extends Op2[Path, Path, Unit] with Internals.Mover{
   def apply(from: Path, to: Path) =
     java.nio.file.Files.move(from.nio, to.nio)
 
 
   def check = false
 
-  object all extends Mover{
+  object all extends Internals.Mover{
     def check = true
   }
 }
@@ -108,61 +143,38 @@ object ls extends Op1[Path, Seq[Path]]{
   }
 }
 
-class Writable(val writeableData: Array[Byte])
-
-object Writable{
-  implicit def WritableString(s: String) = new Writable(s.getBytes)
-  implicit def WritableArray(a: Array[Byte]) = new Writable(a)
-  implicit def WritableArray2(a: Array[Array[Byte]]) = new Writable(a.flatten)
-  implicit def WritableTraversable(a: Traversable[String]) = new Writable(a.mkString("\n").getBytes)
-}
-
-object write extends Op2[Path, Writable, Unit]{
-  def apply(target: Path, data: Writable) = {
+/**
+ * Write some data to a file. This can be a String, an Array[Byte], or a
+ * Seq[String] which is treated as consecutive lines. By default, this
+ * fails if a file already exists at the target location. Use [[write.over]]
+ * or [[write.append]] if you want to over-write it or add to what's already
+ * there.
+ */
+object write extends Op2[Path, Internals.Writable, Unit]{
+  def apply(target: Path, data: Internals.Writable) = {
     mkdir(target/RelPath.up)
     Files.write(target.nio, data.writeableData, StandardOpenOption.CREATE_NEW)
   }
-  object append extends Op2[Path, Writable, Unit]{
-    def apply(target: Path, data: Writable) = {
+  object append extends Op2[Path, Internals.Writable, Unit]{
+    def apply(target: Path, data: Internals.Writable) = {
       mkdir(target/RelPath.up)
       Files.write(target.nio, data.writeableData, StandardOpenOption.CREATE, StandardOpenOption.APPEND)
     }
   }
-  object over extends Op2[Path, Writable, Unit]{
-    def apply(target: Path, data: Writable) = {
+  object over extends Op2[Path, Internals.Writable, Unit]{
+    def apply(target: Path, data: Internals.Writable) = {
       mkdir(target/RelPath.up)
       Files.write(target.nio, data.writeableData)
     }
   }
 }
 
-trait Reader{
-  def readIn(p: Path): InputStream
-  def apply(arg: Path) = io.Source.fromInputStream(readIn(arg)).mkString
-
-  object lines extends Op1[Path, Iterator[String]]{
-    def apply(arg: Path) = io.Source.fromInputStream(readIn(arg)).getLines()
-  }
-  object bytes extends Op1[Path, Array[Byte]]{
-    def apply(arg: Path) = {
-      val is = readIn(arg)
-      val out = new java.io.ByteArrayOutputStream()
-      val buffer = new Array[Byte](1024)
-      var r = 0
-      while (r != -1) {
-        r = is.read(buffer)
-        if (r != -1) out.write(buffer, 0, r)
-      }
-      out.toByteArray
-    }
-  }
-}
 
 /**
  * Reads a file into memory, either as a string,
  * as a Seq[String] of lines, or as a Array[Byte]
  */
-object read extends Reader with Op1[Path, String]{
+object read extends Internals.Reader with Op1[Path, String]{
   def readIn(p: Path) = {
     java.nio.file.Files.newInputStream(p.nio)
   }
@@ -171,7 +183,7 @@ object read extends Reader with Op1[Path, String]{
    * Reads a classpath resource into memory, either as a
    * string, as a Seq[String] of lines, or as a Array[Byte]
    */
-  object resource extends Reader with Op1[Path, String]{
+  object resource extends Internals.Reader with Op1[Path, String]{
     def readIn(p: Path) = {
       val ret = getClass.getResourceAsStream(p.toString)
       ret match{
@@ -182,28 +194,31 @@ object read extends Reader with Op1[Path, String]{
   }
 }
 
+/**
+ * Checks if a file or folder exists at the given path.
+ */
 object exists extends Op1[Path, Boolean]{
   def apply(p: Path) = Files.exists(Paths.get(p.toString))
 }
-
-object chmod extends Op2[Path, Unit, Unit]{
-  def apply(arg1: Path, arg2: Unit) = ???
-}
-object chgrp extends Op2[Path, Unit, Unit]{
-  def apply(arg1: Path, arg2: Unit) = ???
-}
-object chown extends Op2[Path, Unit, Unit]{
-  def apply(arg1: Path, arg2: Unit) = ???
-}
-object ps extends Op1[Unit, Unit]{
-  def apply(arg: Unit): Unit = ???
-  object tree extends Op1[Unit, Unit]{
-    def apply(arg: Unit): Unit = ???
-  }
-}
-object kill extends Op1[Unit, Unit]{
-  def apply(arg: Unit): Unit = ???
-}
+//
+//object chmod extends Op2[Path, Unit, Unit]{
+//  def apply(arg1: Path, arg2: Unit) = ???
+//}
+//object chgrp extends Op2[Path, Unit, Unit]{
+//  def apply(arg1: Path, arg2: Unit) = ???
+//}
+//object chown extends Op2[Path, Unit, Unit]{
+//  def apply(arg1: Path, arg2: Unit) = ???
+//}
+//object ps extends Op1[Unit, Unit]{
+//  def apply(arg: Unit): Unit = ???
+//  object tree extends Op1[Unit, Unit]{
+//    def apply(arg: Unit): Unit = ???
+//  }
+//}
+//object kill extends Op1[Unit, Unit]{
+//  def apply(arg: Unit): Unit = ???
+//}
 object ln extends Op2[Path, Path, Unit]{
   def apply(src: Path, dest: Path) = {
     Files.createLink(Paths.get(dest.toString), Paths.get(src.toString))
@@ -233,6 +248,14 @@ object system{
   }
 }*/
 
+/**
+ * Dynamic shell command execution. This allows you to run commands which
+ * are not provided by Ammonite, by shelling out to bash. e.g. try
+ *
+ * %ls
+ * %ls /
+ * %ps "aux"
+ */
 object % extends Dynamic{
   import sys.process._
   def selectDynamic(s: String) = Seq(s).!

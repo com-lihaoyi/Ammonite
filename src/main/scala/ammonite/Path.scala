@@ -50,6 +50,8 @@ trait BasePath[ThisType <: BasePath[ThisType]]{
     else segments.last.split('.').lastOption.getOrElse("")
   }
 
+  def last = segments.last
+
 }
 object BasePath{
   def invalidChars = Set('/')
@@ -85,7 +87,7 @@ object PathError{
  */
 class Path(val segments: Seq[String]) extends BasePath[Path]{
   segments.foreach(BasePath.checkSegment)
-  def last = segments.last
+
   def make(p: Seq[String], ups: Int) = {
     if (ups > 0){
       throw PathError.AbsolutePathOutsideRoot
