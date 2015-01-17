@@ -248,8 +248,7 @@ ls! cwd/"py" | mv.all*{case d/"py"/x => d/x }
 // Find all dot-files in the current folder
 ls! cwd |? (_.last(0) == '.')
 
-// Write the names of the 10 largest files in
-// the current working directory to a file
+// Find the names of the 10 largest files in the current working directory
 ls.rec! cwd | (x => x.size -> x) sortBy (-_._1) take 10
 
 // Sorted list of the most common words in your .scala source files
