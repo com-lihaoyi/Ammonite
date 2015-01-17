@@ -79,6 +79,9 @@ val wd = cwd
 // A path nested inside `wd`
 wd/'folder/'file
 
+// A path starting from the root
+root/'folder/'file
+
 // A path with spaces or other special characters
 wd/"My Folder"/"My File.txt"
 
