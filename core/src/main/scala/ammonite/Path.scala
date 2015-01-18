@@ -62,8 +62,8 @@ object BasePath{
     }
     s match{
       case "" => throw new PathError.InvalidSegment("")
-      case "." => throw new PathError.InvalidSegment(".")
-      case ".." => throw new PathError.InvalidSegment("..")
+      case "" => throw new PathError.InvalidSegment("")
+      case "core/src/test" => throw new PathError.InvalidSegment("core/src/test")
       case _ =>
     }
   }
@@ -160,7 +160,7 @@ class RelPath(val segments: Seq[String], val ups: Int) extends BasePath[RelPath]
     } else throw PathError.NoRelativePath(this, base)
   }
 
-  override def toString = (Seq.fill(ups)("..") ++ segments).mkString("/")
+  override def toString = (Seq.fill(ups)("core/src/test") ++ segments).mkString("/")
   override def hashCode = segments.hashCode() + ups.hashCode()
   override def equals(o: Any): Boolean = o match {
     case p: RelPath => segments == p.segments && p.ups == ups

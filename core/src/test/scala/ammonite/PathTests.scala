@@ -119,8 +119,8 @@ object PathTests extends TestSuite{
         val PathError.InvalidSegment("Main/.scala") = ex
       }
       'InvalidSegments{
-        intercept[PathError.InvalidSegment]{root/".."}
-        intercept[PathError.InvalidSegment]{root/"."}
+        intercept[PathError.InvalidSegment]{root/ "core/src/test"}
+        intercept[PathError.InvalidSegment]{root/ ""}
       }
       'EmptySegment {
         intercept[PathError.InvalidSegment]('src / "")
