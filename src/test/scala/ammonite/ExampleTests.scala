@@ -34,8 +34,12 @@ object ExampleTests extends TestSuite{
 //      val d2/"omg"/x2 = wd
 //      ls! wd |? (_.ext == "scala") | (x => mv! x ! x.pref)
     }
-    'lol{
-      val x = Array(1, 2, 3) || {x => Array(x, x, x)}
+    'allSubpathsResolveCorrectly{
+      for(abs <- ls.rec! wd){
+        val rel = abs - wd
+        assert(rel.ups == 0)
+        assert(wd / rel == abs)
+      }
     }
   }
 }

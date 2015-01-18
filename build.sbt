@@ -1,7 +1,7 @@
 
 organization := "com.lihaoyi"
 
-scalaVersion := "2.11.4"
+scalaVersion := "2.11.5"
 
 crossScalaVersions := Seq("2.10.4", "2.11.4")
 
@@ -20,7 +20,7 @@ testFrameworks += new TestFramework("utest.runner.JvmFramework")
 
 initialCommands in console := """
   import ammonite._
-  var wd = processWorkingDir
+  var wd = cwd
 """
 
 publishTo := Some("releases"  at "https://oss.sonatype.org/service/local/staging/deploy/maven2")
