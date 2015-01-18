@@ -5,22 +5,22 @@ Ammonite 0.1.0
 import ammonite._
 
 // Get the current working directory
-val d = cwd
+val wd = processWorkingDir
 
 // Copy a file or folder
-cp(d/'file, d/'file2)
+cp(wd/'file, wd/'file2)
 
 // Make a folder named "folder"
-mkdir! d/'folder
+mkdir! wd/'folder
 
 // Rename all .scala files inside the folder d into .java files
-ls! d | mv{case r"$x.scala" => s"$x.java"}
+ls! wd | mv{case r"$x.scala" => s"$x.java"}
 
 // Line-count of all .scala files recursively in d
-ls.rec! cwd |? (_.ext == "scala") | read.lines | (_.size) sum
+ls.rec! wd |? (_.ext == "scala") | read.lines | (_.size) sum
 
 // Find and concatenate all .js files directly in the working directory
-ls! cwd |? (_.ext == "js") | read |> write! wd/'target/"bundle.js"
+ls! wd |? (_.ext == "js") | read |> write! wd/'target/"bundle.js"
 ```
 
 Ammonite is a library used to write rock-solid [shell scripts](http://en.wikipedia.org/wiki/Shell_script) using Scala. It provides a very lightweight way to perform common system housekeeping operations in Scala, without having to drop down to sketchy, fragile [Bash](http://en.wikipedia.org/wiki/Bash_%28Unix_shell%29) scripts. Ammonite aims to be safe enough to use large programs while concise enough to use from the Scala command-line.
@@ -74,7 +74,7 @@ Generally, almost all commands take absolute `Path`s. Absolute paths can be crea
 
 ```scala
 // Get the process' working directory
-val wd = cwd
+val wd = processWorkingDir
 
 // A path nested inside `wd`
 wd/'folder/'file
@@ -85,22 +85,22 @@ root/'folder/'file
 // A path with spaces or other special characters
 wd/"My Folder"/"My File.txt"
 
-// Up one level from the cwd
+// Up one level from the wd
 wd/up
 
-// Up two levels from the cwd
+// Up two levels from the wd
 wd/up/up
 ```
 
-Note that there are no in-built operations to change the `cwd`. You can of course do so using Java APIs, but in general you should not need to. Simply defining a new path, e.g.
+Note that there are no in-built operations to change the `processWorkingDir`. You can of course do so using Java APIs, but in general you should not need to. Simply defining a new path, e.g.
 
 ```scala
-val target = cwd/'target
+val target = wd/'target
 ```
 
 Should be sufficient for most needs. Two absolute `Path`s are pre-defined:
 
-- `cwd`: the current working directory of your process. Note this can change over time, and `cwd` always reflects the current value.
+- `processWorkingDir`: the current working directory of your process. Note this can change over time, and `processWorkingDir` always reflects the current value. This is intentionally verbose so you don't use it too much; you should use `val wd = processWorkingDir` once at the start of your program and pass `wd` where ever necessary.
 - `root`: the root of the filesystem, traditionally represented as `/`
 
 
@@ -118,18 +118,18 @@ empty/'folder/'file
 empty/'file
 
 // The relative difference between two paths
-val target = cwd/'target/'file
-(target - cwd) // same as 'target/'file or "target/file"
+val target = wd/'target/'file
+(target - wd) // same as 'target/'file or "target/file"
 
 // `up`s get resolved automatically
-(cwd - target) // same as up/up or "../.."
+(wd - target) // same as up/up or "../.."
 ```
 
 In general, very few APIs take relative paths. Their main purpose is to be combined with absolute paths in order to create new absolute paths. e.g.
 
 ```scala
-val target = cwd/'target/'file
-val rel = target - cwd
+val target = wd/'target/'file
+val rel = target - wd
 val newBase = root/'code/'server
 newBase/rel // root/'code/'server/'target/'file
 ```
@@ -193,43 +193,43 @@ Ammonite comes with a set of built-in operations that mirrors much of what you c
 
 ```scala
 // Make a directory
-mkdir! cwd/'folder
+mkdir! wd/'folder
 
 // Move it
-mv(cwd/'folder, cwd/'folder2)
+mv(wd/'folder, wd/'folder2)
 
 // Copy it; recursive by default
-cp(cwd/'folder2, cwd/'folder3)
+cp(wd/'folder2, wd/'folder3)
 
-// List the files in cwd
-ls! cwd
+// List the files in wd
+ls! wd
 
-// List the files in cwd recursively
-ls.rec! cwd
+// List the files in wd recursively
+ls.rec! wd
 
 // Remove one of them; recursive by default
-rm! cwd/'folder2
+rm! wd/'folder2
 
 // Write a file, if it doesn't exist
-write(cwd/'folder2/"data.txt", "I am a cow")
+write(wd/'folder2/"data.txt", "I am a cow")
 
 // Write to a file, stomping over anything that exists
-write.over(cwd/'folder2/"data.txt", "I am a cow")
+write.over(wd/'folder2/"data.txt", "I am a cow")
 
 // Append to a file
-write.append(cwd/'folder2/"data.txt", "I am a cow")
+write.append(wd/'folder2/"data.txt", "I am a cow")
 
 // Read a file as a String
-read! cwd/'folder2/"data.txt"
+read! wd/'folder2/"data.txt"
 
 // Read a file as an Iterator[String]
-read.lines! cwd/'folder2/"data.txt"
+read.lines! wd/'folder2/"data.txt"
 
 // Read a file as an Array[Byte]
-read.bytes! cwd/'folder2/"data.bin"
+read.bytes! wd/'folder2/"data.bin"
 
 // Check if a file or folder exists
-exists! cwd/'folder2/"data.txt"
+exists! wd/'folder2/"data.txt"
 ```
 
 All of these operations are pre-defined and strongly typed, so feel free to jump to their implementation to look at what they do or what else is available.
@@ -250,16 +250,16 @@ The real value of Ammonite is the fact that you can pipe things together as easi
 
 ```scala
 // Move all files inside the "py" folder out of it
-ls! cwd/"py" | mv.all*{case d/"py"/x => d/x }
+ls! wd/"py" | mv.all*{case d/"py"/x => d/x }
 
 // Find all dot-files in the current folder
-ls! cwd |? (_.last(0) == '.')
+ls! wd |? (_.last(0) == '.')
 
 // Find the names of the 10 largest files in the current working directory
-ls.rec! cwd | (x => x.size -> x) sortBy (-_._1) take 10
+ls.rec! wd | (x => x.size -> x) sortBy (-_._1) take 10
 
 // Sorted list of the most common words in your .scala source files
-def txt = ls.rec! cwd |? (_.ext == "scala") | read
+def txt = ls.rec! wd |? (_.ext == "scala") | read
 def frequencies(s: Seq[String]) = s groupBy (x => x) mapValues (_.length)
 txt || (_.split("[^a-zA-Z0-9_]")) |> frequencies |> (_.toSeq) sortBy (-_._2)
 ```
