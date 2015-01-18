@@ -6,7 +6,19 @@ import javax.script.{CompiledScript, ScriptContext, ScriptEngine, ScriptExceptio
 import scala.tools.nsc.interpreter._
 
 class CustomILoop extends ILoop{
+  val mainThread = Thread.currentThread()
   @volatile var currentlyRunning = false
+  sun.misc.Signal.handle(new sun.misc.Signal("INT"), new sun.misc.SignalHandler () {
+    def handle(sig: sun.misc.Signal) {
+      currentlyRunning match{
+        case true =>
+          mainThread.stop()
+          currentlyRunning = false
+        case false => println("Ctrl-D to exit")
+      }
+    }
+  })
+
   override def createInterpreter() {
     if (addedClasspath != "") settings.classpath append addedClasspath
     intp = new ILoopInterpreter with CustomIMain{
