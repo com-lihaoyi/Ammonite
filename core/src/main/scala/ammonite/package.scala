@@ -56,7 +56,7 @@ package object ammonite extends RelPathStuff{
   /**
    * The current working directory for this process.
    */
-  def cwd = Path(new java.io.File(""))
+  def processWorkingDir = Path(new java.io.File(""))
 
   implicit def PathFileData(p: Path) = new FileData(
     Files.readAttributes(java.nio.file.Paths.get(p.toString), classOf[PosixFileAttributes])

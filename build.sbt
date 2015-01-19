@@ -28,7 +28,7 @@ val sharedSettings = Seq(
       </developers>
 )
 
-lazy val sh = project.settings(sharedSettings:_*).settings(
+lazy val sh = project.dependsOn(core).settings(sharedSettings:_*).settings(
   libraryDependencies ++= Seq(
     "org.scala-lang" % "scala-compiler" % scalaVersion.value,
     "jline" % "jline" % "2.12"

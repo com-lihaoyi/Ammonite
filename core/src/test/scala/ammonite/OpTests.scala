@@ -3,7 +3,7 @@ package ammonite
 import utest._
 import java.nio.{file => nio}
 object OpTests extends TestSuite{
-  val wd = cwd
+  val wd = processWorkingDir
   val tests = TestSuite {
     val res = wd/'target/"scala-2.11"/"test-classes"/'testdata
     'ls - assert(

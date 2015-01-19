@@ -3,36 +3,76 @@ package sh
 
 import javax.script.{CompiledScript, ScriptContext, ScriptEngine, ScriptException}
 
+import sun.misc.{SignalHandler, Signal}
+
 import scala.tools.nsc.interpreter._
+import scala.tools.nsc.util._
+
 
 class CustomILoop extends ILoop{
-  val mainThread = Thread.currentThread()
-  @volatile var currentlyRunning = false
-  sun.misc.Signal.handle(new sun.misc.Signal("INT"), new sun.misc.SignalHandler () {
-    def handle(sig: sun.misc.Signal) {
-      currentlyRunning match{
-        case true =>
-          mainThread.stop()
-          currentlyRunning = false
-        case false => println("Ctrl-D to exit")
+
+
+  private[this] object Signaller{
+
+    val mainThread = Thread.currentThread()
+    val SIGINT = new Signal("INT")
+    var oldSigInt: Any = null
+    @volatile var currentlyRunning = false
+    def handlers = {
+      val handlersField = classOf[Signal].getDeclaredField("handlers")
+      handlersField.setAccessible(true)
+      handlersField.get(null)
+        .asInstanceOf[java.util.Hashtable[Signal, SignalHandler]]
+    }
+    def ifSignalSupported(t: => Unit) = {
+      try {
+        Class.forName("sun.misc.Signal")
+        Class.forName("sun.misc.SignalHandler")
+
+        t
+      } catch {case e: ClassNotFoundException=>
+
       }
     }
-  })
+    def enable() = ifSignalSupported{
+      oldSigInt = handlers.get(SIGINT)
+      sun.misc.Signal.handle(SIGINT, new SignalHandler () {
+        def handle(sig: Signal) {
+          currentlyRunning match{
+            case true =>
+              mainThread.stop()
+              currentlyRunning = false
+            case false => println("Ctrl-D to exit")
+          }
+        }
+      })
+    }
 
-  override def createInterpreter() {
+    def disable() = ifSignalSupported{
+      handlers.put(SIGINT, oldSigInt.asInstanceOf[SignalHandler])
+    }
+  }
+
+  override def closeInterpreter() = {
+    Signaller.disable()
+  }
+
+  override def createInterpreter()  = {
+
+    Signaller.enable()
     if (addedClasspath != "") settings.classpath append addedClasspath
     intp = new ILoopInterpreter with CustomIMain{
       def running[T](t: => T) = {
-        currentlyRunning = true
+        Signaller.currentlyRunning = true
         val res = t
-        currentlyRunning = false
+        Signaller.currentlyRunning = false
         res
       }
     }
   }
 }
 
-trait CustomIMain extends IMain{
+trait CustomIMain extends IMain{ imain =>
   import formatting._
   import reporter.{printMessage, printUntruncatedMessage}
   import global._
@@ -195,12 +235,103 @@ trait CustomIMain extends IMain{
         }
       case _ =>
     }
+
     Right(new RequestX(line, trees))
   }
+
   class RequestX(line: String, trees: List[Tree]) extends Request(line, trees){
     override val lineRep = new ReadEvalPrintX(freshLineId())
+    private class ObjectBasedWrapper extends Wrapper {
+      def preambleHeader = "object %s {"
+
+      def postamble = importsTrailer + "\n}"
+
+      def postwrap = "}\n"
+    }
+
+    private class ClassBasedWrapper extends Wrapper {
+      def preambleHeader = "class %s extends Serializable {"
+
+      /** Adds an object that instantiates the outer wrapping class. */
+      def postamble  = s"""$importsTrailer
+                          |}
+                          |object ${lineRep.readName} extends ${lineRep.readName}
+                          |""".stripMargin
+      import nme.{ INTERPRETER_IMPORT_WRAPPER => iw }
+
+      /** Adds a val that instantiates the wrapping class. */
+      def postwrap = s"}\nval $iw = new $iw\n"
+    }
+
+    private lazy val ObjectSourceCode: Wrapper =
+      if (settings.Yreplclassbased) new ClassBasedWrapper else new ObjectBasedWrapper
+
+    lazy val customMemberHandlers = new {
+      val intp: imain.type = imain
+    } with CustomMemberHandlers
+
+    private object ResultObjectSourceCode extends IMain.CodeAssembler[customMemberHandlers.MemberHandler] {
+      /** We only want to generate this code when the result
+        *  is a value which can be referred to as-is.
+        */
+      val evalResult = RequestX.this.value match {
+        case NoSymbol => ""
+        case sym      => "lazy val %s = %s".format(lineRep.resultName, originalPath(sym))
+      }
+      // first line evaluates object to make sure constructor is run
+      // initial "" so later code can uniformly be: + etc
+
+      val preamble = """
+                       |object %s {
+                       |  %s
+                       |  lazy val %s: String = %s {
+                       |    %s
+                       |    (""
+                     """.stripMargin.format(
+          lineRep.evalName, evalResult, lineRep.printName,
+          executionWrapper, fullAccessPath
+        )
+
+      val postamble = """
+                        |    )
+                        |  }
+                        |}
+                      """.stripMargin
+      override def apply(contributors: List[customMemberHandlers.MemberHandler]): String = stringFromWriter { code =>
+        code println preamble
+        contributors map generate foreach (code println _)
+        code println postamble
+      }
+      val generate = (m: customMemberHandlers.MemberHandler) => m resultExtractionCode RequestX.this
+    }
+    /** Compile the object file.  Returns whether the compilation succeeded.
+      *  If all goes well, the "types" map is computed. */
+    override lazy val compile: Boolean = {
+      // error counting is wrong, hence interpreter may overlook failure - so we reset
+      reporter.reset()
+
+      // compile the object containing the user's code
+      lineRep.compile(ObjectSourceCode(handlers)) && {
+        // extract and remember types
+        typeOf
+        typesOfDefinedTerms
+
+        // Assign symbols to the original trees
+        // TODO - just use the new trees.
+        defHandlers foreach { dh =>
+          val name = dh.member.name
+          definedSymbols get name foreach { sym =>
+            dh.member setSymbol sym
+          }
+        }
+
+        // compile the result-extraction object
+        val handls = if (true) trees.map(customMemberHandlers.chooseHandler) else Nil
+        withoutWarnings(lineRep compile ResultObjectSourceCode(handls))
+      }
+    }
+
   }
-  var runningThread: Thread = null
   def running[T](t: => T): T
 
   class ReadEvalPrintX(lineId: Int) extends ReadEvalPrint(lineId){

@@ -7,12 +7,12 @@ import scala.collection.mutable
 object ExampleTests extends TestSuite{
 
   val tests = TestSuite { 
-    var wd = cwd
+    var wd = processWorkingDir
     'cd{
       // cd /usr/local/bin/
       wd /= 'user/'local/'bin
 
-      assert(wd - cwd == 'user/'local/'bin)
+      assert(wd - processWorkingDir == 'user/'local/'bin)
     }
     'findWc{
       // find . -name '*.txt' | xargs wc -l
@@ -23,7 +23,7 @@ object ExampleTests extends TestSuite{
       assert(lines == 14)
     }
     'addUpScalaSize{
-      ls.rec! cwd |? (_.ext == "scala") | (_.size) |& (_ + _)
+      ls.rec! processWorkingDir |? (_.ext == "scala") | (_.size) |& (_ + _)
     }
     'concatAll{
       ls.rec! wd |? (_.ext == "scala") | read |> write! wd/'target/'test/"omg.txt"
