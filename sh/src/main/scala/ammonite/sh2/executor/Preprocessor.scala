@@ -63,8 +63,6 @@ object Preprocessor {
     )
   )
   def apply(code: String): Option[(String, String)] = {
-
-
     for(proc <- decls.find(_.condition(new Recognizer(code)).isSuccess)) yield {
       //      println(proc.tag)
       wrapperId += 1

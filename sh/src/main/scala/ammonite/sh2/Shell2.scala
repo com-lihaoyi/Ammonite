@@ -34,29 +34,31 @@ class Shell2 {
 
     mainThread.setContextClassLoader(currentClassloader)
 
-    Signaller("INT", println("Ctrl-D to Exit")) {
+    Signaller("INT", println("Ctrl-D to Exit")){
       val term = new jline.UnixTerminal()
       term.init()
       val reader = new ConsoleReader(System.in, System.out, term)
-      def loop(): Unit = {
 
+      def loop(): Unit = {
         val res = reader.readLine(Console.MAGENTA + "scala> " + Console.RESET)
 
         if (res != null){
-          for{
-            (className, wrapped) <- Preprocessor.apply(res)
-            compiled = compiler.compile(wrapped.getBytes, println)
-            classFiles <- compiled
-          }{
-            for(c <- classFiles){
-              val name = c.name.stripSuffix(".class")
-              val output = dynamicClasspath.fileNamed(c.name).output
-              output.write(c.toByteArray)
-              output.close
-              newFileDict(name) = c.toByteArray
+          Signaller("INT", mainThread.stop()) {
+            for {
+              (className, wrapped) <- Preprocessor.apply(res)
+              compiled = compiler.compile(wrapped.getBytes, println)
+              classFiles <- compiled
+            } {
+              for (c <- classFiles) {
+                val name = c.name.stripSuffix(".class")
+                val output = dynamicClasspath.fileNamed(c.name).output
+                output.write(c.toByteArray)
+                output.close()
+                newFileDict(name) = c.toByteArray
+              }
+              Class.forName(className, true, currentClassloader)
+                .getDeclaredMethod("$main").invoke(null)
             }
-            Class.forName(className, true, currentClassloader)
-                 .getDeclaredMethod("$main").invoke(null)
           }
           loop()
         }
