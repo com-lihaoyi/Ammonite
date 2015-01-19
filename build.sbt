@@ -6,6 +6,9 @@ val sharedSettings = Seq(
   version := "0.1.0",
   libraryDependencies += "com.lihaoyi" %% "utest" % "0.2.4" % "test",
   testFrameworks += new TestFramework("utest.runner.JvmFramework"),
+  autoCompilerPlugins := true,
+  addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.2"),
+  libraryDependencies += "com.lihaoyi" %% "acyclic" % "0.1.2" % "provided",
   publishTo := Some("releases"  at "https://oss.sonatype.org/service/local/staging/deploy/maven2"),
   pomExtra :=
     <url>https://github.com/lihaoyi/Ammonite</url>
@@ -31,7 +34,9 @@ val sharedSettings = Seq(
 lazy val sh = project.dependsOn(core).settings(sharedSettings:_*).settings(
   libraryDependencies ++= Seq(
     "org.scala-lang" % "scala-compiler" % scalaVersion.value,
-    "jline" % "jline" % "2.12"
+    "jline" % "jline" % "2.12",
+    "org.scala-lang" % "scala-reflect" % scalaVersion.value,
+    "com.lihaoyi" %% "scala-parser-lite" % "0.1.0"
   )
 )
 

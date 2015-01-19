@@ -8,10 +8,7 @@ import sun.misc.{SignalHandler, Signal}
 import scala.tools.nsc.interpreter._
 import scala.tools.nsc.util._
 
-
 class CustomILoop extends ILoop{
-
-
   private[this] object Signaller{
 
     val mainThread = Thread.currentThread()
@@ -28,7 +25,6 @@ class CustomILoop extends ILoop{
       try {
         Class.forName("sun.misc.Signal")
         Class.forName("sun.misc.SignalHandler")
-
         t
       } catch {case e: ClassNotFoundException=>
 

@@ -67,14 +67,8 @@ object BasePath{
       case _ =>
     }
   }
-  val validIdentifier = "([a-zA-Z_][a-zA-Z_0-9]+)".r
-  def reprSection(s: String) = {
-    if (validIdentifier.findFirstIn(s) == Some(s)){
-      Repr[Symbol](Symbol(s))
-    }else{
-      Repr[String](s)
-    }
-  }
+
+
 }
 object PathError{
   type IAE = IllegalArgumentException
@@ -121,9 +115,7 @@ class Path(val segments: Seq[String]) extends BasePath[Path]{
 }
 
 object Path{
-  implicit val pathRepr = Repr.make[Path]{p =>
-    ("root" +: p.segments.map(BasePath.reprSection)).mkString("/")
-  }
+
   def apply(s: String): Path = {
     require(s.startsWith("/"), "Absolute Paths must start with /")
     root/RelPath.SeqPath(s.split("/").drop(1))
@@ -199,10 +191,7 @@ object RelPath extends RelPathStuff with (String => RelPath){
   implicit class Transformable1(p: RelPath){
     def nio = java.nio.file.Paths.get(p.toString)
   }
-  implicit val relPathRepr = Repr.make[RelPath]{p =>
-    if (p.segments.length == 1 && p.ups == 0) "empty/" + Repr(p.segments(0))
-    else (Seq.fill(p.ups)("up") ++ p.segments.map(BasePath.reprSection)).mkString("/")
-  }
+
 }
 sealed trait FileType
 object FileType{
