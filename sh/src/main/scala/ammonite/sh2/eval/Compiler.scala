@@ -1,7 +1,7 @@
-package ammonite.sh2.executor
+package ammonite.sh2.eval
 
 import java.io._
-
+import acyclic.file
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -33,7 +33,7 @@ object Compiler{
  * scalac/scalajs-tools to compile and optimize code submitted by users.
  */
 class Compiler(dynamicClasspath: VirtualDirectory) {
-  import ammonite.sh2.executor.Compiler._
+  import ammonite.sh2.eval.Compiler._
   val blacklist = Seq("<init>")
 
   /**
@@ -58,7 +58,7 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
   }
 
 
-  def compile(src: Array[Byte], logger: String => Unit = _ => ()): Option[Traversable[AbstractFile]] = {
+  def compile(src: Array[Byte], logger: String => Unit = _ => ()): Option[Traversable[(String, Array[Byte])]] = {
 
     val singleFile = makeFile( src)
 
@@ -77,7 +77,11 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
         x <- vd.iterator.to[collection.immutable.Traversable]
         if x.name.endsWith(".class")
       } yield {
-        x
+        val output = dynamicClasspath.fileNamed(x.name).output
+        output.write(x.toByteArray)
+        output.close()
+        (x.name.stripSuffix(".class"), x.toByteArray)
+
       }
     }
   }

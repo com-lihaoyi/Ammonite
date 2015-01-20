@@ -1,5 +1,5 @@
-package ammonite.sh2.executor
-
+package ammonite.sh2.eval
+import acyclic.file
 
 /**
  * Loads the jars that make up the classpath of the scala-js-fiddle
