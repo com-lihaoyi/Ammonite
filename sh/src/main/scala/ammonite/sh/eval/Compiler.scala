@@ -1,4 +1,4 @@
-package ammonite.sh2.eval
+package ammonite.sh.eval
 
 import java.io._
 import acyclic.file
@@ -38,7 +38,7 @@ object Compiler{
  * classfile per source-string (e.g. inner classes, or lambdas)
  */
 class Compiler(dynamicClasspath: VirtualDirectory) {
-  import ammonite.sh2.eval.Compiler._
+  import ammonite.sh.eval.Compiler._
   val blacklist = Seq("<init>")
 
   /**

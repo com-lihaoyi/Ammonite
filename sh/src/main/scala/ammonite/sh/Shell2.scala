@@ -1,9 +1,9 @@
-package ammonite.sh2
+package ammonite.sh
 
 import java.io.{OutputStream, InputStream, PrintWriter, StringWriter}
 import java.lang.reflect.InvocationTargetException
 
-import ammonite.sh2.eval.{Evaluator, Preprocessor, Compiler}
+import ammonite.sh.eval.{Evaluator, Preprocessor, Compiler}
 import jline.console.ConsoleReader
 import acyclic.file
 

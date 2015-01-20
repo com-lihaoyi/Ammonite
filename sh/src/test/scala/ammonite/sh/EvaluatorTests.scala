@@ -1,7 +1,7 @@
 package ammonite.sh
 
-import ammonite.sh2.eval.{Compiler, Evaluator, Preprocessor}
-import ammonite.sh2.{Result, PConfig, PPrint}
+import ammonite.sh.eval.{Compiler, Evaluator, Preprocessor}
+import ammonite.sh.{Result, PConfig, PPrint}
 import utest._
 
 import scala.collection.{immutable => imm}
@@ -16,7 +16,7 @@ object EvaluatorTests extends TestSuite{
     val preprocess = new Preprocessor{
       override def pprintSignature(ident: String) = s"""
           "$ident" +  ": " +
-          ammonite.sh2.Shell2.typeString($ident)"""
+          ammonite.sh.Shell2.typeString($ident)"""
 
     }
     val dynamicClasspath = new VirtualDirectory("(memory)", None)

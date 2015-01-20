@@ -1,4 +1,4 @@
-package ammonite.sh2
+package ammonite.sh
 import acyclic.file
 import scala.collection.{immutable => imm}
 

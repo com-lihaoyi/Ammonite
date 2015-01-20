@@ -1,4 +1,4 @@
-package ammonite.sh2.eval
+package ammonite.sh.eval
 import acyclic.file
 import org.parboiled2.ParserInput
 
@@ -43,7 +43,7 @@ class Preprocessor{
 
   def pprintSignature(ident: String) = s"""
      Console.CYAN + "$ident" + Console.RESET + ": " +
-     Console.GREEN + ammonite.sh2.Shell2.typeString($ident) + Console.RESET """
+     Console.GREEN + ammonite.sh.Shell2.typeString($ident) + Console.RESET """
 
   def definedStr(name: String, code: String) = '"'+s"defined $name ${getIdent(code)}"+'"'
 
@@ -56,7 +56,7 @@ class Preprocessor{
 
   def pprint(ident: String) = {
     pprintSignature(ident) +
-      s""" + " = " + ammonite.sh2.PPrint($ident) """
+      s""" + " = " + ammonite.sh.PPrint($ident) """
   }
   def DefProcessor(cond: Recognizer => util.Try[_], definitionLabel: String) =
     Processor(cond){ (name, code) => (

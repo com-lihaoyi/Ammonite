@@ -1,4 +1,4 @@
-package ammonite.sh2
+package ammonite.sh
 
 import acyclic.file
 case class Signaller(sigStr: String, f: () => Unit) extends Scoped{

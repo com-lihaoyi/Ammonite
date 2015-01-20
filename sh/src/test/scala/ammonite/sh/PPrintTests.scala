@@ -1,6 +1,6 @@
 package ammonite.sh
 
-import ammonite.sh2.{PConfig, PPrint}
+import ammonite.sh.{PConfig, PPrint}
 import utest._
 
 import scala.collection.{immutable => imm}
@@ -70,7 +70,7 @@ object PPrintTests extends TestSuite{
         """imm.SortedMap("key" -> "v", "key2" -> "v2")""")
     }
     'Vertical{
-      implicit def pc = ammonite.sh2.PConfig(25)
+      implicit def pc = ammonite.sh.PConfig(25)
       'singleNested {
         * - check(
           List("12", "12", "12"),

@@ -1,9 +1,9 @@
-package ammonite.sh2.eval
+package ammonite.sh.eval
 
 import java.lang.reflect.InvocationTargetException
 
 import acyclic.file
-import ammonite.sh2.{Result, Catching}
+import ammonite.sh.{Result, Catching}
 
 import scala.collection.mutable
 import scala.util.Try

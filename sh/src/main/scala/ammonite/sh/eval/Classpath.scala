@@ -1,4 +1,4 @@
-package ammonite.sh2.eval
+package ammonite.sh.eval
 import acyclic.file
 
 /**
