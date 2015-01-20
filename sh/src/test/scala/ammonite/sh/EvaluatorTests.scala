@@ -29,8 +29,8 @@ object EvaluatorTests extends TestSuite{
 
     def check(input: String, expected: String) = {
       val processed = eval.processLine(input)
-      val printed = processed.map{case (out, imports) => out}
-      assert(printed== Result.Success(expected))
+      val printed = processed.map{case (out, importKeys, imports) => out}
+      assert(printed == Result.Success(expected))
       eval.update(processed)
     }
     'simpleExpressions{
@@ -79,6 +79,15 @@ object EvaluatorTests extends TestSuite{
     'import{
       check("import math.abs", "import math.abs")
       check("abs(-10)", "res1: Int = 10")
+    }
+
+    'nesting{
+      check("val x = 1", "x: Int = 1")
+      check("val x = 2", "x: Int = 2")
+      check("x", "res2: Int = 2")
+      check("object X{ val Y = 1 }", "defined object X")
+      check("object X{ val Y = 2 }", "defined object X")
+      check("X.Y", "res5: Int = 2")
     }
   }
 }

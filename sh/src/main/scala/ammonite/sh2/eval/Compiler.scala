@@ -18,6 +18,11 @@ import scala.tools.nsc.util._
 
 object Compiler{
   /**
+   * If the Option is None, it means compilation failed
+   * Otherwise it's a Traversable of (filename, bytes) tuples
+   */
+  type Output = Option[Traversable[(String, Array[Byte])]]
+  /**
    * Converts a bunch of bytes into Scalac's weird VirtualFile class
    */
   def makeFile(src: Array[Byte], name: String = "Main.scala") = {
@@ -29,8 +34,8 @@ object Compiler{
   }
 }
 /**
- * Handles the interaction between scala-js-fiddle and
- * scalac/scalajs-tools to compile and optimize code submitted by users.
+ * Turns source-strings into the bytes of classfiles, possibly more than one
+ * classfile per source-string (e.g. inner classes, or lambdas)
  */
 class Compiler(dynamicClasspath: VirtualDirectory) {
   import ammonite.sh2.eval.Compiler._
@@ -45,7 +50,6 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
     Future { func(r) ; r.get.left.get }
   }
 
-
   trait InMemoryGlobal { g: scala.tools.nsc.Global =>
     def ctx: JavaContext
     def dirs: IndexedSeq[ClassPath[AbstractFile]]
@@ -54,12 +58,9 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
       val global: g.type = g
       override def classPath = new JavaClassPath(dirs, ctx)
     }
-
   }
 
-
-  def compile(src: Array[Byte], logger: String => Unit = _ => ()): Option[Traversable[(String, Array[Byte])]] = {
-
+  def compile(src: Array[Byte], logger: String => Unit = _ => ()): Output = {
     val singleFile = makeFile( src)
 
     val (settings, reporter, vd, jCtx, jDirs) = initGlobalBits(logger)
@@ -81,10 +82,10 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
         output.write(x.toByteArray)
         output.close()
         (x.name.stripSuffix(".class"), x.toByteArray)
-
       }
     }
   }
+
   /**
    * Code to initialize random bits and pieces that are needed
    * for the Scala compiler to function, common between the

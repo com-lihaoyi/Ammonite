@@ -6,20 +6,41 @@ import acyclic.file
 import ammonite.sh2.{Result, Catching}
 
 import scala.collection.mutable
-import scala.tools.nsc.io._
 import scala.util.Try
 
-
+/**
+ * Takes source code and, with the help of a compiler and preprocessor,
+ * evaluates it and returns a `Result[(output: String, imports: String)]`
+ * where `output` is what gets printed and `imports` are any imports that
+ * need to get prepended to subsequent commands.
+ */
 class Evaluator(currentClassloader: ClassLoader,
                 preprocess: (String, Int) => Option[(String, String, String)],
-                compile: (Array[Byte], String => Unit) => Option[Traversable[(String, Array[Byte])]]) {
+                compile: (Array[Byte], String => Unit) => Compiler.Output) {
 
+  /**
+   * Files which have been compiled, stored so that our special 
+   * classloader can get at them.
+   */
   val newFileDict = mutable.Map.empty[String, Array[Byte]]
-  val previousImports = mutable.Buffer.empty[String]
+  /**
+   * Imports which are required by earlier commands to the REPL. Imports
+   * have a specified key, so that later imports of the same name (e.g.
+   * defining a variable twice) can kick the earlier import out of the
+   * map. Otherwise if you import the same name twice you get compile
+   * errors instead of the desired shadowing.
+   */
+  val previousImports = mutable.Map.empty[String, String]
+  /**
+   * The current line number of the REPL, used to make sure every snippet
+   * evaluated can have a distinct name that doesn't collide.
+   */
   var currentLine = 0
-
-  val execClassloader = new ClassLoader(currentClassloader) {
-
+  /**
+   * Performs the conversion of our pre-compiled `Array[Byte]`s into
+   * actual classes with methods we can execute.
+   */
+  val evalClassloader = new ClassLoader(currentClassloader) {
     override def loadClass(name: String) = {
       if (!newFileDict.contains(name))super.loadClass(name)
       else defineClass(name, newFileDict(name), 0, newFileDict(name).length)
@@ -27,12 +48,12 @@ class Evaluator(currentClassloader: ClassLoader,
   }
 
   def processLine(line: String) = for {
-    (imports, wrapped, name) <- Result(
+    (importKey, imports, wrapped) <- Result(
       preprocess(line, currentLine),
       "Don't recognize that input =/"
     )
 
-    wrappedWithImports = previousImports.mkString("\n") + wrapped
+    wrappedWithImports = previousImports.toSeq.sortBy(_._1).map(_._2).mkString("\n") + wrapped
 
     compiled <- Result(Try(
       compile(wrappedWithImports.getBytes, println)
@@ -45,7 +66,7 @@ class Evaluator(currentClassloader: ClassLoader,
         newFileDict(name) = bytes
       }
 
-      val cls = Class.forName("$" + name, true, execClassloader)
+      val cls = Class.forName("$res" + currentLine, true, evalClassloader)
       (cls, cls.getDeclaredMethod("$main"))
     }, e => "Failed to load compiled class " + e)
 
@@ -64,11 +85,11 @@ class Evaluator(currentClassloader: ClassLoader,
         if ex.getCause.isInstanceOf[ThreadDeath]  =>
         "\nInterrupted!"
     }
-  } yield (method.invoke(null) + "", imports)
+  } yield (method.invoke(null) + "", importKey, imports)
 
-  def update(res: Result[(String, String)]) = res match {
-    case Result.Success((msg, imports)) =>
-      previousImports.append(imports)
+  def update(res: Result[(String, String, String)]) = res match {
+    case Result.Success((msg, importKey, imports)) =>
+      previousImports(importKey) = imports
       currentLine += 1
     case Result.Failure(msg) =>
       currentLine += 1

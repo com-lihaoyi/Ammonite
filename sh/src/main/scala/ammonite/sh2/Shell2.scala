@@ -26,7 +26,7 @@ class Shell(){
     compiler.compile
   )
 
-  def action(reader: ConsoleReader): Result[(String, String)] = for {
+  def action(reader: ConsoleReader): Result[(String, String, String)] = for {
     _ <- Signaller("INT", () => println("Ctrl-D to Exit"))
 
     _ <- Catching { case x: Throwable =>
@@ -54,7 +54,7 @@ class Shell(){
       eval.update(r)
       r match{
         case Result.Exit => reader.println("Bye!")
-        case Result.Success((msg, imports)) =>
+        case Result.Success((msg, importKeys, imports)) =>
           reader.println(msg)
           loop()
         case Result.Failure(msg) =>

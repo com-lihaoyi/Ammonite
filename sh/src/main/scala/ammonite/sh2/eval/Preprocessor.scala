@@ -12,12 +12,17 @@ class Recognizer(input: ParserInput) extends scalaParser.ScalaSyntax(input){
   def PatVarDefX = rule{ optional(K.W("lazy")) ~ PatVarDef }
 }
 
-
-
-
-
+object Preprocessor{
+  type Output = (String, String, String)
+}
+/**
+ * Converts REPL-style snippets into full-fledged Scala source files,
+ * ready to feed into the compiler. Each source-string is turned into
+ * three things:
+ */
 class Preprocessor{
-  def Processor(cond: Recognizer => util.Try[_])(render: (String, String) => (String, String)) = {
+  def Processor(cond: Recognizer => util.Try[_])
+               (render: (String, String) => (String, String, String)) = {
     (name: String, code: String) => {
       if (cond(new Recognizer(code)).isFailure) None
       else Some(render(name, code))
@@ -42,47 +47,49 @@ class Preprocessor{
 
   def definedStr(name: String, code: String) = '"'+s"defined $name ${getIdent(code)}"+'"'
 
-  val endOfIdentifier = ":[(="
+  /**
+   * Sketchily used to find the name of the def/object/trait/class that
+   * is being defined. Doesn't work in the general case, and at some point
+   * should be replaced by proper use of parboiled
+   */
+  val endOfIdentifier = ":[(={"
 
   def pprint(ident: String) = {
     pprintSignature(ident) +
       s""" + " = " + ammonite.sh2.PPrint($ident) """
   }
-  val ObjectDef = Processor(_.ObjectDefX.run()){ (name, code) =>
-    s"import $$$name._" -> standardBlob(name, code, definedStr("object", name))
-  }
-  val ClassDef = Processor(_.ClassDefX.run()){ (name, code) =>
-    s"import $$$name._" -> standardBlob(name, code, definedStr("class", name))
-  }
-  val TraitDef = Processor(_.TraitDefX.run()){ (name, code) =>
-    s"import $$$name._" -> standardBlob(name, code, definedStr("trait", name))
-  }
-  val DefDef = Processor(_.DefDef.run()){ (name, code) =>
-    s"import $$$name._" -> standardBlob(name, code, definedStr("function", getIdent(code)))
-  }
+  def DefProcessor(cond: Recognizer => util.Try[_], definitionLabel: String) =
+    Processor(cond){ (name, code) => (
+      getIdent(code),
+      s"import $$$name._",
+      standardBlob(name, code, definedStr(definitionLabel, getIdent(code)))
+    )}
+  val ObjectDef = DefProcessor(_.ObjectDefX.run(), "object")
+  val ClassDef = DefProcessor(_.ClassDefX.run(), "class")
+  val TraitDef = DefProcessor(_.TraitDefX.run(), "trait")
+  val DefDef = DefProcessor(_.DefDef.run(), "function")
   val PatVarDef = Processor(_.PatVarDefX.run()){ (name, code) =>
-    s"import $$$name._" -> standardBlob(name, code,
+    (getIdent(code), s"import $$$name._", standardBlob(name, code,
       if (!code.trim.startsWith("lazy")) pprint(getIdent(code))
       else pprintSignature(getIdent(code)) + s""" + " = <lazy>" """
-    )
+    ))
   }
   val Expr = Processor(_.Expr.run()){ (name, code) =>
-    s"import $$$name._" -> standardBlob(name, s"val $name = " + code, pprint(name))
+    (name, s"import $$$name._", standardBlob(name, s"val $name = " + code, pprint(name)))
   }
   val Import = Processor(_.Import.run()){ (name, code) =>
-    code -> s"""object $$$name{def $$main() = "$code"}"""
+    (code, code, s"""object $$$name{def $$main() = "$code"}""")
   }
 
-  def decls(wrapperId: Int) = Seq[(String, String) => Option[(String, String)]](
+  def decls(wrapperId: Int) = Seq[(String, String) => Option[(String, String, String)]](
     ObjectDef, ClassDef, TraitDef, DefDef, PatVarDef, Expr, Import
   )
 
-  def apply(code: String, wrapperId: Int): Option[(String, String, String)] = {
+  def apply(code: String, wrapperId: Int): Option[Preprocessor.Output] = {
     val name = "res"+wrapperId
     decls(wrapperId)
       .iterator
       .map(_(name, code))
       .reduce(_ orElse _)
-      .map{case (imports, wrappedCode) => (imports, wrappedCode, name)}
   }
 }
