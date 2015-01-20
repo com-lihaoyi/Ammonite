@@ -14,11 +14,20 @@ object Result{
     case util.Failure(t) => Failure(errMsg(t))
   }
 }
-sealed trait Result[+T]{
+
+/**
+ * Represents an
+ * @tparam T
+ */
+sealed abstract class Result[+T]{
   def flatMap[V](f: T => Result[V]): Result[V]
   def map[V](f: T => V): Result[V]
   def filter(f: T => Boolean): Result[T] = this
 }
+
+/**
+ * Successes map and flatmap just like a simple Box[T]
+ */
 case class Success[+T](s: T) extends Result[T] {
   def flatMap[V](f: T => Result[V]): Result[V] = f(s) match {
     case Success(v) => Success(v)
@@ -27,11 +36,13 @@ case class Success[+T](s: T) extends Result[T] {
 
   def map[V](f: T => V): Result[V] = Success(f(s))
 }
-case class Failure(s: String) extends Result[Nothing] {
-  def flatMap[V](f: Nothing => Result[V]): Result[V] = Failure(s)
-  def map[V](f: Nothing => V): Result[V] = Failure(s)
+
+/**
+ * Failing results never call their callbacks, and just remain unchanged
+ */
+sealed abstract class Failing extends Result[Nothing]{
+  def flatMap[V](f: Nothing => Result[V]): Result[V] = this
+  def map[V](f: Nothing => V): Result[V] = this
 }
-case object Exit extends Result[Nothing] {
-  def flatMap[V](f: Nothing => Result[V]): Result[V] = Exit
-  def map[V](f: Nothing => V): Result[V] = Exit
-}
+case class Failure(s: String) extends Failing
+case object Exit extends Failing

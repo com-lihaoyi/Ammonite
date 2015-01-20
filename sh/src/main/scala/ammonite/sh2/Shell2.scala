@@ -12,12 +12,13 @@ import scala.collection.mutable
 import scala.reflect.io.{VirtualDirectory, AbstractFile}
 import scala.util.Try
 
-class Catching[T](handler: PartialFunction[Throwable, T]) {
+case class Catching[T](handler: PartialFunction[Throwable, T]) {
   def apply(t: => T): T = try t catch handler
 
-  def foreach[T1 <: T](t: Unit => T): T = apply(t(()))
-  def flatMap[T1 <: T](t: Unit => Result[T]): Result[T] = t(())
-  def map[T1 <: T](t: Unit => T): Result[T] = Success(t(()))
+//  def foreach(t: Unit => T): T = apply(t(()))
+  def flatMap(t: Unit => Result[T]): Result[T] =
+    try{t(())} catch handler.andThen(x => Failure(x.toString))
+  def map(t: Unit => T): Result[T] = Success(apply(t(())))
 }
 
 class Shell2 {
@@ -49,14 +50,13 @@ class Shell2 {
 
     def action(): Result[String] = for{
       _ <- Signaller("INT", () => println("Ctrl-D to Exit"))
-      _ <- new Catching[String]({ case x: Throwable =>
+      _ <- Catching[String]{ case x: Throwable =>
         val sw = new StringWriter()
         x.printStackTrace(new PrintWriter(sw))
 
         Console.RED + sw.toString + Console.RESET + "\n" +
         "Something unexpected went wrong =("
-
-      })
+      }
       res <- Option(reader.readLine(Console.MAGENTA + "scala> " + Console.RESET))
                   .fold[Result[String]](Exit)(Success(_))
 
@@ -76,7 +76,7 @@ class Shell2 {
         val cls = Class.forName(className, true, currentClassloader)
         (cls, cls.getDeclaredMethod("$main"))
       }, e => "Failed to load compiled class " + e)
-      _ <- new Catching({
+      _ <- Catching{
         case ex: InvocationTargetException
           if ex.getCause.isInstanceOf[ExceptionInInitializerError] =>
         val userEx = ex.getCause .getCause
@@ -87,7 +87,7 @@ class Shell2 {
             .mkString("\n")
 
         Console.RED + userEx.toString + "\n" + trace + Console.RESET
-      })
+      }
     } yield method.invoke(null).toString
 
 
