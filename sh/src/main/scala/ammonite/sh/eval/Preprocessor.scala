@@ -43,7 +43,7 @@ class Preprocessor{
 
   def pprintSignature(ident: String) = s"""
      Console.CYAN + "$ident" + Console.RESET + ": " +
-     Console.GREEN + ammonite.sh.Shell2.typeString($ident) + Console.RESET """
+     Console.GREEN + ammonite.sh.Shell.typeString($ident) + Console.RESET """
 
   def definedStr(name: String, code: String) = '"'+s"defined $name ${getIdent(code)}"+'"'
 

@@ -3,7 +3,7 @@ val sharedSettings = Seq(
   organization := "com.lihaoyi",
   scalaVersion := "2.11.5",
   crossScalaVersions := Seq("2.10.4", "2.11.4"),
-  version := "0.1.0",
+  version := "0.1.1",
   libraryDependencies += "com.lihaoyi" %% "utest" % "0.2.4" % "test",
   testFrameworks += new TestFramework("utest.runner.JvmFramework"),
   autoCompilerPlugins := true,
@@ -32,6 +32,7 @@ val sharedSettings = Seq(
 )
 
 lazy val sh = project.dependsOn(core).settings(sharedSettings:_*).settings(
+  name := "ammonite-sh",
   libraryDependencies ++= Seq(
     "org.scala-lang" % "scala-compiler" % scalaVersion.value,
     "jline" % "jline" % "2.12",

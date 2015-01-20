@@ -66,14 +66,11 @@ class Shell(){
   }
 }
 
-class Shell2 {
-  def run(args: Array[String]) = {
+object Shell{
+  def main(args: Array[String]) = {
     val shell = new Shell()
     shell.run(System.in, System.out)
   }
-}
-
-object Shell2{
   import scala.reflect.runtime.universe._
   def typeString[T: TypeTag](t: => T) = typeOf[T].toString
 

@@ -16,7 +16,7 @@ object EvaluatorTests extends TestSuite{
     val preprocess = new Preprocessor{
       override def pprintSignature(ident: String) = s"""
           "$ident" +  ": " +
-          ammonite.sh.Shell2.typeString($ident)"""
+          ammonite.sh.Shell.typeString($ident)"""
 
     }
     val dynamicClasspath = new VirtualDirectory("(memory)", None)

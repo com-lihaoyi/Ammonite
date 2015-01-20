@@ -48,6 +48,7 @@ object Internals{
           r = is.read(buffer)
           if (r != -1) out.write(buffer, 0, r)
         }
+        is.close()
         out.toByteArray
       }
     }
