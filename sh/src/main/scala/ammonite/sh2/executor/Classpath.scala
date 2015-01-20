@@ -29,7 +29,7 @@ object Classpath {
     "/Users/haoyi/.ivy2/cache/com.lihaoyi/acyclic_2.11/jars/acyclic_2.11-0.1.2.jar"
   ) ++ System.getProperty("sun.boot.class.path").split(":")
 
-  deps.foreach(println)
+//  deps.foreach(println)
   val (jarDeps, dirDeps) =
     deps.map(new java.io.File(_))
         .filter(_.exists)

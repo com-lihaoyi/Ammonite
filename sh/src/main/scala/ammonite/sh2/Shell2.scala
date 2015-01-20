@@ -1,19 +1,32 @@
 package ammonite.sh2
 
+import java.io.{PrintWriter, StringWriter}
+import java.lang.reflect.InvocationTargetException
+
 import ammonite.sh2.executor.{Preprocessor, Compiler}
 import jline.console.ConsoleReader
 import acyclic.file
 
+import scala.annotation.tailrec
 import scala.collection.mutable
-import scala.reflect.internal.util.ScalaClassLoader.URLClassLoader
 import scala.reflect.io.{VirtualDirectory, AbstractFile}
-import scala.reflect.macros.blackbox
-import scala.tools.nsc.backend.JavaPlatform
-import scala.tools.nsc.util.ClassPath.JavaContext
-import scala.tools.nsc.util.{JavaClassPath, DirectoryClassPath}
+import scala.util.Try
+
+class Catching[T](handler: PartialFunction[Throwable, T]) {
+  def apply(t: => T): T = try t catch handler
+
+  def foreach[T1 <: T](t: Unit => T): T = apply(t(()))
+  def flatMap[T1 <: T](t: Unit => Result[T]): Result[T] = t(())
+  def map[T1 <: T](t: Unit => T): Result[T] = Success(t(()))
+}
 
 class Shell2 {
+  implicit class SuperOpt[T](opt: Option[T]){
+    def err[V](v: V) = new OrElse(v)
+    class OrElse[V](v: V){
 
+    }
+  }
   def run(args: Array[String]) = {
 
     println(args.toList)
@@ -24,48 +37,70 @@ class Shell2 {
     val newFileDict = mutable.Map.empty[String, Array[Byte]]
     val currentClassloader = new ClassLoader(mainThread.getContextClassLoader) {
       override def loadClass(name: String) = {
-        if (newFileDict.contains(name)){
-          defineClass(name, newFileDict(name), 0, newFileDict(name).length)
-        }else{
-          super.loadClass(name)
-        }
+        if (!newFileDict.contains(name))super.loadClass(name)
+        else defineClass(name, newFileDict(name), 0, newFileDict(name).length)
       }
     }
 
     mainThread.setContextClassLoader(currentClassloader)
+    val term = new jline.UnixTerminal()
+    term.init()
+    val reader = new ConsoleReader(System.in, System.out, term)
 
-    Signaller("INT", println("Ctrl-D to Exit")){
-      val term = new jline.UnixTerminal()
-      term.init()
-      val reader = new ConsoleReader(System.in, System.out, term)
+    def action(): Result[String] = for{
+      _ <- Signaller("INT", () => println("Ctrl-D to Exit"))
+      _ <- new Catching[String]({ case x: Throwable =>
+        val sw = new StringWriter()
+        x.printStackTrace(new PrintWriter(sw))
 
-      def loop(): Unit = {
-        val res = reader.readLine(Console.MAGENTA + "scala> " + Console.RESET)
+        Console.RED + sw.toString + Console.RESET + "\n" +
+        "Something unexpected went wrong =("
 
-        if (res != null){
-          Signaller("INT", mainThread.stop()) {
-            for {
-              (className, wrapped) <- Preprocessor.apply(res)
-              compiled = compiler.compile(wrapped.getBytes, println)
-              classFiles <- compiled
-            } {
-              for (c <- classFiles) {
-                val name = c.name.stripSuffix(".class")
-                val output = dynamicClasspath.fileNamed(c.name).output
-                output.write(c.toByteArray)
-                output.close()
-                newFileDict(name) = c.toByteArray
-              }
-              Class.forName(className, true, currentClassloader)
-                .getDeclaredMethod("$main").invoke(null)
-            }
-          }
-          loop()
+      })
+      res <- Option(reader.readLine(Console.MAGENTA + "scala> " + Console.RESET))
+                  .fold[Result[String]](Exit)(Success(_))
+
+      (className, wrapped) <- Result(Preprocessor(res), "Don't recognize that input =/")
+      _ <- Signaller("INT", () => mainThread.stop())
+      compiled <- Result(Try(compiler.compile(wrapped.getBytes, println)), e => e.toString)
+      classFiles <- Result(compiled, "Compilation Failed")
+      (cls, method) <- Result(Try {
+        for (c <- classFiles) {
+          val name = c.name.stripSuffix(".class")
+          val output = dynamicClasspath.fileNamed(c.name).output
+          output.write(c.toByteArray)
+          output.close()
+          newFileDict(name) = c.toByteArray
         }
-      }
-      loop()
 
+        val cls = Class.forName(className, true, currentClassloader)
+        (cls, cls.getDeclaredMethod("$main"))
+      }, e => "Failed to load compiled class " + e)
+      _ <- new Catching({
+        case ex: InvocationTargetException
+          if ex.getCause.isInstanceOf[ExceptionInInitializerError] =>
+        val userEx = ex.getCause .getCause
+        val trace =
+          userEx
+            .getStackTrace
+            .takeWhile(x => !(x.getClassName == cls.getName && x.getMethodName == "$main"))
+            .mkString("\n")
+
+        Console.RED + userEx.toString + "\n" + trace + Console.RESET
+      })
+    } yield method.invoke(null).toString
+
+
+    @tailrec def loop(): Unit = action() match{
+      case Exit => reader.println("Bye!")
+      case Success(msg) =>
+        reader.println(msg)
+        loop()
+      case Failure(msg) =>
+        reader.println(msg)
+        loop()
     }
+    loop()
   }
 }
 object Shell2{

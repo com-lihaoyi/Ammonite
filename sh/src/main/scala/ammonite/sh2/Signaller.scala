@@ -1,7 +1,7 @@
 package ammonite.sh2
 
 import acyclic.file
-object Signaller{
+case class Signaller(sigStr: String, f: () => Unit) extends Scoped{
   import sun.misc.{Signal, SignalHandler}
   var oldSigInt = List.empty[SignalHandler]
   def handlers = {
@@ -10,10 +10,11 @@ object Signaller{
     handlersField.get(null)
       .asInstanceOf[java.util.Hashtable[Signal, SignalHandler]]
   }
+  val x = util.Random.nextInt()
+  def apply[T](t: => T): T = {
 
-  def apply[T](sigStr: String, f: => Unit)(t: => T): T = {
     val handler = new SignalHandler () {
-      def handle(sig: Signal) = f
+      def handle(sig: Signal) = f()
     }
     val sig = new Signal(sigStr)
     oldSigInt = handlers.get(sig) :: oldSigInt
@@ -26,3 +27,9 @@ object Signaller{
   }
 }
 
+trait Scoped{
+  def apply[T](t: => T): T
+  def foreach[T](t: Unit => T): T = apply(t(()))
+  def flatMap[T, M[_]](t: Unit => M[T]): M[T] = apply(t(()))
+  def map[T](t: Unit => T): T = apply(t(()))
+}

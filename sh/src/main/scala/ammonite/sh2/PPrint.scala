@@ -100,5 +100,5 @@ trait PPrint[T] { outer =>
 }
 
 trait LowPriPPrint{
-  implicit def defaultRepr[T] = PPrint.make[T](_.toString)
+  implicit def defaultRepr[T] = PPrint.make[T](""+_)
 }

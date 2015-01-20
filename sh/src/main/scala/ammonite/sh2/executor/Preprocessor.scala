@@ -18,23 +18,18 @@ object Preprocessor {
                        condition: Recognizer => util.Try[_],
                        pref: () => String = ()=>"",
                        printer: (String) => String = s=>"")
-  def pprintSignature(ident: String) = {
-    s"""
-         Console.CYAN +
-         "$ident" +
-         Console.RESET +
-         ": " +
-         Console.GREEN +
-         ammonite.sh2.Shell2.typeString($ident) +
-         Console.RESET
-    """
-  }
+  def pprintSignature(ident: String) = s"""
+     Console.CYAN +
+     "$ident" +
+     Console.RESET +
+     ": " +
+     Console.GREEN +
+     ammonite.sh2.Shell2.typeString($ident) +
+     Console.RESET """
+
   def pprint(ident: String) = {
     pprintSignature(ident) +
-      s"""
-       + " = " +
-       ammonite.sh2.PPrint($ident)
-      """
+      s""" + " = " + ammonite.sh2.PPrint($ident) """
   }
   def getIdent(s: String) =
     s.takeWhile(!endOfIdentifier.contains(_))
@@ -72,7 +67,7 @@ object Preprocessor {
           ${imports.mkString("\n")}
           object $$ammWrap$wrapperId{
             ${proc.pref()} $code
-            def $$main() = {println(${proc.printer(code)})}
+            def $$main() = {${proc.printer(code)}}
           }
         """
       (s"$$ammWrap$wrapperId",  txt)
