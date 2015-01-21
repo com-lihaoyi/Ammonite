@@ -1,4 +1,4 @@
-Ammonite 0.1.0
+Ammonite 0.1.3
 ==============
 
 ```scala
@@ -51,7 +51,7 @@ Getting Started
 To begin, add the following to your build.sbt:
 
 ```scala
-"com.lihaoyi" %% "ammonite" % "0.1.0",
+"com.lihaoyi" %% "ammonite-core" % "0.1.3",
 ```
 
 Then at the top of your file,

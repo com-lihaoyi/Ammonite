@@ -33,10 +33,20 @@ object Internals{
 
   trait Reader{
     def readIn(p: Path): InputStream
-    def apply(arg: Path) = io.Source.fromInputStream(readIn(arg)).mkString
+    def apply(arg: Path) = {
+      val is = readIn(arg)
+      val res = io.Source.fromInputStream(is).mkString
+      is.close()
+      res
+    }
 
-    object lines extends Op1[Path, Iterator[String]]{
-      def apply(arg: Path) = io.Source.fromInputStream(readIn(arg)).getLines()
+    object lines extends Op1[Path, Seq[String]]{
+      def apply(arg: Path) = {
+        val is = readIn(arg)
+        val res = io.Source.fromInputStream(is).mkString.split("\n")
+        is.close()
+        res
+      }
     }
     object bytes extends Op1[Path, Array[Byte]]{
       def apply(arg: Path) = {

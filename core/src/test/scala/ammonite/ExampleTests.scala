@@ -16,7 +16,7 @@ object ExampleTests extends TestSuite{
     }
     'findWc{
       // find . -name '*.txt' | xargs wc -l
-      wd /= 'src/'test/'resources/'testdata
+      wd /= 'core/'src/'test/'resources/'testdata
 
       val lines = ls.rec(wd) |? (_.ext == "txt") | read.lines | (_.length) sum
       
