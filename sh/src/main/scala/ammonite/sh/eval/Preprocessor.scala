@@ -9,6 +9,7 @@ class Recognizer(input: ParserInput) extends scalaParser.ScalaSyntax(input){
   def ObjectDefX = rule( K.W("object") ~ ObjectDef )
   def ClassDefX = rule( K.W("class") ~ ClassDef )
   def TraitDefX = rule( K.W("trait") ~ TraitDef )
+  def TypeDefX = rule( K.W("type") ~ TypeDef )
   def PatVarDefX = rule{ optional(K.W("lazy")) ~ PatVarDef }
 }
 
@@ -68,6 +69,7 @@ class Preprocessor{
   val ClassDef = DefProcessor(_.ClassDefX.run(), "class")
   val TraitDef = DefProcessor(_.TraitDefX.run(), "trait")
   val DefDef = DefProcessor(_.DefDef.run(), "function")
+  val TypeDef = DefProcessor(_.TypeDefX.run(), "type")
   val PatVarDef = Processor(_.PatVarDefX.run()){ (name, code) =>
     (getIdent(code), s"import $$$name._", standardBlob(name, code,
       if (!code.trim.startsWith("lazy")) pprint(getIdent(code))
@@ -82,7 +84,7 @@ class Preprocessor{
   }
 
   def decls(wrapperId: Int) = Seq[(String, String) => Option[(String, String, String)]](
-    ObjectDef, ClassDef, TraitDef, DefDef, PatVarDef, Expr, Import
+    ObjectDef, ClassDef, TraitDef, DefDef, TypeDef, PatVarDef, Expr, Import
   )
 
   def apply(code: String, wrapperId: Int): Option[Preprocessor.Output] = {

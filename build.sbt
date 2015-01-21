@@ -32,7 +32,7 @@ val sharedSettings = Seq(
 )
 
 lazy val sh = project.dependsOn(core).settings(sharedSettings:_*).settings(
-  name := "ammonite",
+  name := "ammonite-sh",
   libraryDependencies ++= Seq(
     "org.scala-lang" % "scala-compiler" % scalaVersion.value,
     "jline" % "jline" % "2.12",

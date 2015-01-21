@@ -8,41 +8,19 @@ import scala.collection.{immutable => imm}
 import scala.reflect.io.VirtualDirectory
 
 object EvaluatorTests extends TestSuite{
-  def check[T: PPrint](t: T, expected: String)(implicit pc: PConfig) = {
-    val pprinted = PPrint(t)
-    assert(pprinted == expected.trim)
-  }
+
   val tests = TestSuite{
-    val preprocess = new Preprocessor{
-      override def pprintSignature(ident: String) = s"""
-          "$ident" +  ": " +
-          ammonite.sh.Shell.typeString($ident)"""
-
-    }
-    val dynamicClasspath = new VirtualDirectory("(memory)", None)
-    val compiler = new Compiler(dynamicClasspath)
-    val eval = new Evaluator(
-      Thread.currentThread().getContextClassLoader,
-      preprocess.apply,
-      compiler.compile
-    )
-
-    def check(input: String, expected: String) = {
-      val processed = eval.processLine(input)
-      val printed = processed.map{case (out, importKeys, imports) => out}
-      assert(printed == Result.Success(expected))
-      eval.update(processed)
-    }
+    val check = new Checker()
     'simpleExpressions{
       check("1 + 2", "res0: Int = 3")
       check("res0", "res1: Int = 3")
       check("res0 + res1", "res2: Int = 6")
     }
     'vals{
-      check("val x = 10", "x: Int = 10")
-      check("x", "res1: Int = 10")
-      check("val y = x + 1", "y: Int = 11")
-      check("x * y", "res3: Int = 110")
+      check("val x = 10L", "x: Long = 10L")
+      check("x", "res1: Long = 10L")
+      check("val y = x + 1", "y: Long = 11L")
+      check("x * y", "res3: Long = 110L")
     }
     'lazyvals{
       // It actually appears when I ask for it
@@ -59,7 +37,7 @@ object EvaluatorTests extends TestSuite{
     }
 
     'vars{
-      check("var x = 10", "x: Int = 10")
+      check("var x: Int = 10", "x: Int = 10")
       check("x", "res1: Int = 10")
       check("x = 1", "res2: Unit = ()")
       check("x", "res3: Int = 1")
@@ -69,6 +47,18 @@ object EvaluatorTests extends TestSuite{
       check("def sumItAll[T: Numeric](i: Seq[T]): T = {i.sum}", "defined function sumItAll")
       check("sumItAll(Seq(1, 2, 3, 4, 5))", "res1: Int = 15")
       check("sumItAll(Seq(1L, 2L, 3L, 4L, 5L))", "res2: Long = 15L")
+    }
+    'types{
+      check("type Funky = Array[Array[String]]", "defined type Funky")
+      check(
+        """val arr: Funky = Array(Array("Hello!"))""",
+        """arr: $res0.Funky = Array(Array("Hello!"))"""
+      )
+      check("type Funky2[T] = Array[Array[T]]", "defined type Funky2")
+      check(
+        """val arr: Funky2[Int] = Array(Array(123))""",
+        """arr: $res2.Funky2[Int] = Array(Array(123))"""
+      )
     }
     'library{
       check("val x = Iterator.continually(1)", "x: Iterator[Int] = non-empty iterator")
