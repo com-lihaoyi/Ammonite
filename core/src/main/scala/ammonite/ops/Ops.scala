@@ -2,7 +2,7 @@ package ammonite.ops
 
 import java.io.{File, InputStream}
 import java.nio.file.{Files, Paths, StandardOpenOption}
-
+import acyclic.file
 import RelPath.up
 import scala.language.dynamics
 import scala.util.matching.Regex

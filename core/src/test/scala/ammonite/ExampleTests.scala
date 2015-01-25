@@ -1,14 +1,16 @@
 package ammonite
 
 import ammonite.all._
+import ammonite.ops.{Pipeable, FilterMap}
 
 import utest._
 
-import scala.collection.mutable
+import scala.collection.generic.{SeqFactory, GenericTraversableTemplate}
+import scala.collection.{TraversableLike, mutable}
 
 object ExampleTests extends TestSuite{
 
-  val tests = TestSuite { 
+  val tests = TestSuite {
     var wd = processWorkingDir
     'cd{
       // cd /usr/local/bin/
@@ -21,7 +23,7 @@ object ExampleTests extends TestSuite{
       wd /= 'core/'src/'test/'resources/'testdata
 
       val lines = ls.rec(wd) |? (_.ext == "txt") | read.lines | (_.length) sum
-      
+
       assert(lines == 14)
     }
     'addUpScalaSize{

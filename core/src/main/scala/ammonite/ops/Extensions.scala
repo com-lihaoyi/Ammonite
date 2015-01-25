@@ -1,17 +1,16 @@
 package ammonite.ops
-
+import acyclic.file
 import scala.collection.{Seq, GenTraversableOnce, TraversableLike}
 
 import scala.collection.generic.{CanBuildFrom => CBF, GenericTraversableTemplate, SeqFactory}
 
 trait Extensions{
   implicit def Pipeable[T](t: T) = new Pipeable(t)
-  implicit def FilterMap[T, Repr](i: TraversableLike[T, Repr]) =
-    new FilterMap(i)
+  implicit def FilterMapExt[T, Repr](i: TraversableLike[T, Repr]) = new FilterMap(i)
   /**
-   * Lets you call [[FilterMap]] aliases on Arrays too
+   * Lets you call [[FilterMapExt]] aliases on Arrays too
    */
-  implicit def FMArray[T](a: Array[T]) = FilterMap(a)
+  implicit def FMArray[T](a: Array[T]) = FilterMapExt(a)
 
   /**
    * Allows you to pipe sequences into other sequences to convert them,
@@ -22,8 +21,11 @@ trait Extensions{
     (t: Seq[T]) => s(t:_*)
   }
 
+  implicit def ChainableConversions[T, T1, V](f: T => V)(implicit i: T1 => T) = i andThen f
 }
+
 object Extensions extends Extensions
+
 /**
  * Lets you pipe values through functions
  */
