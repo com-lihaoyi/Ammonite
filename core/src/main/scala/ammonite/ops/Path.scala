@@ -71,7 +71,8 @@ trait BasePath[ThisType <: BasePath[ThisType]]{
    */
   def -(base: ThisType): RelPath
 
-
+  def >(base: ThisType): Boolean = this.segments.startsWith(base.segments)
+  def <(base: ThisType): Boolean = base.segments.startsWith(this.segments)
   /**
    * Gives you the file extension of this path, or the empty
    * string if there is no extension
@@ -85,7 +86,6 @@ trait BasePath[ThisType <: BasePath[ThisType]]{
 
 }
 
-
 object PathError{
   type IAE = IllegalArgumentException
   case class InvalidSegment(segment: String)
@@ -97,10 +97,6 @@ object PathError{
   case class NoRelativePath(src: RelPath, base: RelPath)
     extends IAE(s"Can't relativize relative paths $src from $base")
 }
-
-
-
-
 
 /**
  * An absolute path on the filesystem. Note that the path is

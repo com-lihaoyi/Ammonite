@@ -110,6 +110,30 @@ object PathTests extends TestSuite{
 
         }
       }
+      'Comparison{
+        'Relative - assert(
+          'omg/'wtf == 'omg/'wtf,
+          'omg/'wtf != 'omg/'wtf/'bbq,
+          'omg/'wtf < 'omg/'wtf/'bbq,
+          'omg/'wtf/'bbq > 'omg/'wtf,
+          !('omg/'wtf > 'omg/'wtf/'bbq),
+          !('omg/'wtf/'bbq < 'omg/'wtf)
+        )
+        'Absolute - assert(
+          root/'omg/'wtf == root/'omg/'wtf,
+          root/'omg/'wtf != root/'omg/'wtf/'bbq,
+          root/'omg/'wtf < root/'omg/'wtf/'bbq,
+          root/'omg/'wtf/'bbq > root/'omg/'wtf,
+          !(root/'omg/'wtf > root/'omg/'wtf/'bbq),
+          !(root/'omg/'wtf/'bbq < root/'omg/'wtf)
+        )
+        'Invalid{
+          compileError("""root/'omg/'wtf < 'omg/'wtf""")
+          compileError("""root/'omg/'wtf > 'omg/'wtf""")
+          compileError("""omg/'wtf < root/''omg/'wtf""")
+          compileError("""omg/'wtf > root/''omg/'wtf""")
+        }
+      }
     }
     'Errors{
       'InvalidChars {
