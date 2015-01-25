@@ -2,6 +2,7 @@ package test.ammonite.pprint
 
 import utest._
 
+import scala.annotation.tailrec
 import scala.collection.{immutable => imm}
 import scala.util.matching.Regex
 import ammonite.pprint._
@@ -14,6 +15,7 @@ object PPrintTests extends TestSuite{
   }
 
   val tests = TestSuite{
+
     'Horizontal{
       import ammonite.pprint.Config.Defaults._
       'primitives{
@@ -58,7 +60,7 @@ object PPrintTests extends TestSuite{
       }
 
       'misc{
-        'Nothing - intercept[NotImplementedError](check(???, ""))
+//        'Nothing - intercept[NotImplementedError](check(???, ""))
         'Null{
           check(null, "null")
           check(null: String, "null")
@@ -303,10 +305,18 @@ object PPrintTests extends TestSuite{
     'Color{
       import ammonite.pprint.Config.Colors._
       def count(haystack: String, needles: (String, Int)*) = {
+
         for ((needle, expected) <- needles){
-          val count = Regex.quote(needle).r.findAllMatchIn(haystack).length
+          val count = countSubstring(haystack, needle)
           assert(count == expected)
         }
+      }
+      def countSubstring(str1:String, str2:String):Int={
+        @tailrec def count(pos:Int, c:Int):Int={
+          val idx=str1 indexOf(str2, pos)
+          if(idx == -1) c else count(idx+str2.size, c+1)
+        }
+        count(0,0)
       }
 
       import Console._
@@ -324,4 +334,5 @@ object PPrintTests extends TestSuite{
       compileError(""" "omg".ext """)
     }
   }
+
 }

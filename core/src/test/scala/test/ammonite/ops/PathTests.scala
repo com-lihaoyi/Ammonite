@@ -108,7 +108,6 @@ object PathTests extends TestSuite{
           val x = root/"omg"
           val y = x/up
           intercept[PathError.AbsolutePathOutsideRoot.type]{ y / up }
-
         }
       }
       'Comparison{

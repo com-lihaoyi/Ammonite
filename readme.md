@@ -2,19 +2,29 @@ Ammonite 0.1.3
 ==============
 
 ```scala
-import ammonite._
+import ammonite.ops._
 
 // Get the current working directory
 val wd = processWorkingDir
 
-// Copy a file or folder
-cp(wd/'file, wd/'file2)
+// Make a folder named "folder1"
+mkdir! wd/'folder1
 
-// Make a folder named "folder"
-mkdir! wd/'folder
+// List the current directory
+ls! wd
+
+// Copy a file or folder
+cp(wd/'folder1, wd/'folder2)
+
+// Write to a file without pain!
+write(wd/'folder2/"file1.scala", "Hello")
+write(wd/'folder2/"file2.scala", "Hello")
 
 // Rename all .scala files inside the folder d into .java files
-ls! wd | mv{case r"$x.scala" => s"$x.java"}
+ls! wd/'folder2 | mv{case r"$x.scala" => s"$x.java"}
+
+// List files in a folder
+ls! wd/'folder2
 
 // Line-count of all .scala files recursively in d
 ls.rec! wd |? (_.ext == "scala") | read.lines | (_.size) sum
@@ -57,7 +67,7 @@ To begin, add the following to your build.sbt:
 Then at the top of your file,
 
 ```scala
-import ammonite._
+import ammonite.ops._
 ```
 
 And you're all set!
@@ -111,11 +121,11 @@ Relative `RelPath`s can be created in the following ways:
 
 ```scala
 // The path "folder/file"
-empty/'folder/'file
+'folder/'file
 'folder/'file
 
 // The path "file"
-empty/'file
+rel/'file
 
 // The relative difference between two paths
 val target = wd/'target/'file

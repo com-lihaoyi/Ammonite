@@ -1,9 +1,8 @@
 
 val sharedSettings = Seq(
   organization := "com.lihaoyi",
-  scalaVersion := "2.11.4",
   crossScalaVersions := Seq("2.10.4", "2.11.4"),
-  version := "0.1.3",
+  version := "0.1.4",
   libraryDependencies += "com.lihaoyi" %% "utest" % "0.2.4" % "test",
   testFrameworks += new TestFramework("utest.runner.JvmFramework"),
   autoCompilerPlugins := true,
@@ -40,8 +39,10 @@ val sharedSettings = Seq(
       </developers>
 )
 
-lazy val sh = project.dependsOn(core).settings(sharedSettings:_*).settings(
+
+lazy val sh = project.settings(sharedSettings:_*).settings(
   name := "ammonite-sh",
+  scalaVersion := "2.11.4",
   libraryDependencies ++= Seq(
     "org.scala-lang" % "scala-compiler" % scalaVersion.value,
     "jline" % "jline" % "2.12",
@@ -52,6 +53,7 @@ lazy val sh = project.dependsOn(core).settings(sharedSettings:_*).settings(
 
 lazy val core = project.settings(sharedSettings:_*).settings(
   name := "ammonite",
+  scalaVersion := "2.10.4",
   sourceGenerators in Compile <+= sourceManaged in Compile map { dir =>
     val file = dir/"ammonite"/"pprint"/"PPrintGen.scala"
     val tuples = (1 to 22).map{ i =>
@@ -70,9 +72,7 @@ lazy val core = project.settings(sharedSettings:_*).settings(
     }
     val output = s"""
       package ammonite.pprint
-
       trait PPrinterGen extends GenUtils{
-
         ${tuples.mkString("\n")}
       }
     """.stripMargin
@@ -80,7 +80,7 @@ lazy val core = project.settings(sharedSettings:_*).settings(
     Seq(file)
   },
   initialCommands in console := """
-    import ammonite._
+    import ammonite.all._
     var wd = processWorkingDir
   """
 )

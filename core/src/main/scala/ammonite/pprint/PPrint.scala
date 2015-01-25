@@ -197,7 +197,7 @@ object Internals {
   }
 
   object LowerPriPPrint {
-    def FinalRepr[T: c.WeakTypeTag](c: scala.reflect.macros.blackbox.Context) = c.Expr[PPrint[T]] {
+    def FinalRepr[T: c.WeakTypeTag](c: scala.reflect.macros.Context) = c.Expr[PPrint[T]] {
       import c.universe._
 
       val tpe = c.weakTypeOf[T]
@@ -206,22 +206,18 @@ object Internals {
         case util.Success(f) if f.isCaseClass && !f.isModuleClass =>
 
           val constructor = tpe.member(newTermName("<init>"))
-          val arity =
-            constructor
-              .typeSignature
-              .paramLists
-              .flatten
-              .length
 
-          val companion = tpe.typeSymbol.companion
+
+          val companion = tpe.typeSymbol.companionSymbol
 
           val paramTypes =
             constructor
               .typeSignatureIn(tpe)
-              .paramLists
-              .flatten
+              .asInstanceOf[MethodType]
+              .params
               .map(_.typeSignature)
 
+          val arity = paramTypes.length
 
           import compat._
           val implicits =
