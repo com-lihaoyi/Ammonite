@@ -61,7 +61,7 @@ lazy val core = project.settings(sharedSettings:_*).settings(
       }
       val commaTs = ts.mkString(", ")
       val tupleType = s"Product${i}[${commaTs}]"
-      val boundedTypes = ts.map(_ + ": P").mkString(",")
+      val boundedTypes = ts.map(_ + ": PP").mkString(",")
       s"""
       implicit def Product${i}Repr[${boundedTypes}] = apply[$tupleType] {
         (t: $tupleType, c: Config) => {

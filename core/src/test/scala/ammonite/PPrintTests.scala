@@ -14,9 +14,7 @@ object PPrintTests extends TestSuite{
 
   val tests = TestSuite{
     'primitives{
-
       'Char{
-
         * - check('\n', "'\\n'")(PPrint.Contra, implicitly)
         * - check('a', "'a'")
       }
@@ -54,7 +52,20 @@ object PPrintTests extends TestSuite{
         * - check('I_AM_A_COW, """'I_AM_A_COW""")
        }
     }
+    'misc{
+      'Nothing - intercept[NotImplementedError](check(???, ""))
+      'Null{
+        check(null, "null")
+        check(null: String, "null")
+        check(Seq("look!", null: String, "hi"), """List("look!", null, "hi")""")
+      }
+      'Either{
+        check(Left(123): Either[Int, Int], "Left(123)")
+//        check(Left(123): Left[Int, Int], "Left(123)")
+//        check(Left(123), "Left(123)")
+      }
 
+    }
     'collections{
       'Array - check(Array(1, 2, 3), "Array(1, 2, 3)")
       'Seq - check(Seq(1, 2, 3), "List(1, 2, 3)")
@@ -139,10 +150,7 @@ object PPrintTests extends TestSuite{
           Foo(123, Seq("moo")),
           """Foo(123, List("moo"))""".stripMargin
         )
-//        * - check(
-//          FooG(Foo(321, Nil), Seq("moo")),
-//          """Foo(123, List("moo"))""".stripMargin
-//        )(PPrint., implicitly)
+
       }
       'doubleNested{
 
@@ -197,7 +205,31 @@ object PPrintTests extends TestSuite{
             |  )
             |)""".stripMargin
         )
+        * - check(
+          FooG(Seq(FooG(Seq(Foo(123, Nil)), Nil)), Nil),
+          """FooG(
+            |  List(
+            |    FooG(
+            |      List(Foo(123, List())),
+            |      List()
+            |    )
+            |  ),
+            |  List()
+            |)
+          """.stripMargin
+        )
+        * - check(
+          FooG(FooG(Seq(Foo(123, Nil)), Nil), Nil),
+          """FooG(
+            |  FooG(
+            |    List(Foo(123, List())),
+            |    List()
+            |  ),
+            |  List()
+            |)""".stripMargin
+        )
       }
     }
+
   }
 }

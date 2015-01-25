@@ -40,7 +40,10 @@ object PPrint extends LowPriPPrint{
 }
 
 case class PPrint[A](a: PPrinter[A]){
-  def render(t: A, c: PPrint.Config) = a.render(t, c)
+  def render(t: A, c: PPrint.Config) = {
+    if (t == null) "null"
+    else a.render(t, c)
+  }
   def map(f: String => String) = a.map(f)
 }
 
@@ -55,10 +58,10 @@ trait PPrinter[-A] {
 
 object PPrinter extends PPrinterGen{
   // Things being injected into PPrinterGen to keep it acyclic
-  type P[T] = PPrinter[T]
+  type PPer[T] = PPrinter[T]
   type PP[T] = PPrint[T]
   type Config = PPrint.Config
-  def render[T: P](t: T, c: Config) = implicitly[PPrint[T]].render(t, c)
+  def render[T: PP](t: T, c: Config) = implicitly[PPrint[T]].render(t, c)
   def apply[T](r: (T, PPrint.Config) => String): PPrinter[T] = {
     new PPrinter[T]{def render(t: T, c: PPrint.Config)= r(t, c)}
   }
@@ -171,13 +174,14 @@ trait LowPriPPrint {
 object LowerPriPPrint{
   def FinalRepr[T: c.WeakTypeTag](c: scala.reflect.macros.blackbox.Context) = c.Expr[PPrint[T]]{
     import c.universe._
-    import c._
+
     val tpe = c.weakTypeOf[T]
     util.Try(c.weakTypeOf[T].typeSymbol.asClass) match {
       case util.Success(f) if f.isCaseClass =>
 
+        val constructor = tpe.member(newTermName("<init>"))
         val arity =
-          tpe.member(newTermName("<init>"))
+          constructor
              .typeSignature
              .paramLists
              .flatten
@@ -185,11 +189,33 @@ object LowerPriPPrint{
 
         val companion = tpe.typeSymbol.companion
         println(tpe)
+        val paramTypes =
+          constructor
+            .typeSignatureIn(tpe)
+            .paramLists
+            .flatten
+            .map(_.typeSignature)
+
+
+        import compat._
+        val implicits =
+          paramTypes map (t =>
+            c.inferImplicitValue(
+              typeOf[PPrint[Int]] match {
+                case TypeRef(pre, tpe, args) =>
+                  /*if (t != typeOf[Nothing]) */TypeRef(pre, tpe, List(t))
+//                  else TypeRef(pre, tpe, List(typeOf[Int]))
+              }
+            )
+          )
+        println(paramTypes)
         val tupleName = newTermName(s"Product${arity}Repr")
         q"""
           new PPrint[$tpe](
             ammonite.PPrinter
-                    .preMap((t: $tpe) => $companion.unapply(t).get)(new PPrint(PPrinter.$tupleName))
+                    .preMap((t: $tpe) => $companion.unapply(t).get)(
+                      new PPrint(PPrinter.$tupleName[..$paramTypes])
+                    )
                     .map(${tpe.typeSymbol.name.toString} + _)
           )
         """
