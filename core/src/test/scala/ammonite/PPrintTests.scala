@@ -5,6 +5,7 @@ import utest._
 import scala.collection.{immutable => imm}
 
 case class Foo(integer: Int, sequence: Seq[String])
+case class FooG[T](t: T, sequence: Seq[String])
 object PPrintTests extends TestSuite{
   def check[T: PPrint](t: T, expected: String)(implicit pc: PPrint.Config) = {
     val pprinted = PPrint(t)
@@ -91,6 +92,11 @@ object PPrintTests extends TestSuite{
         Foo(123, Seq("hello world", "moo")),
         """Foo(123, List("hello world", "moo"))"""
       )
+
+      check(
+        Seq(Foo(123, Seq("hello world", "moo"))),
+        """List(Foo(123, List("hello world", "moo")))"""
+      )
     }
     'Vertical{
       implicit def pc = ammonite.PPrint.Config(25)
@@ -119,6 +125,24 @@ object PPrintTests extends TestSuite{
             |  "12345"
             |)""".stripMargin
         )
+        * - check(
+          Foo(123, Seq("hello world", "moo")),
+          """Foo(
+            |  123,
+            |  List(
+            |    "hello world",
+            |    "moo"
+            |  )
+            |)""".stripMargin
+        )
+        * - check(
+          Foo(123, Seq("moo")),
+          """Foo(123, List("moo"))""".stripMargin
+        )
+//        * - check(
+//          FooG(Foo(321, Nil), Seq("moo")),
+//          """Foo(123, List("moo"))""".stripMargin
+//        )(PPrint., implicitly)
       }
       'doubleNested{
 

@@ -15,10 +15,7 @@ object PPrint extends LowPriPPrint{
 
   def apply[T: PPrint](t: T)(implicit c: PPrint.Config): String = {
     implicitly[PPrint[T]].render(t, c)
-  } 
-  trait Covariant[+A] { self: PPrinter[A @uncheckedVariance] => val selff = self }
-  implicit def Cov[A](implicit ca: PPrint.Covariant[A]): PPrint[A] = PPrint(ca.selff)
-
+  }
 
   case class Config(maxDepth: Int = 100,
                      depth: Int = 0,
@@ -38,6 +35,8 @@ object PPrint extends LowPriPPrint{
     //  println(defaultRenames)
     implicit val default = PPrint.Config()
   }
+
+  implicit def Contra[A](implicit ca: PPrinter[A]): PPrint[A] = PPrint(ca)
 }
 
 case class PPrint[A](a: PPrinter[A]){
@@ -46,7 +45,7 @@ case class PPrint[A](a: PPrinter[A]){
 }
 
 
-trait PPrinter[-A] extends PPrint.Covariant[A @uncheckedVariance] {
+trait PPrinter[-A] {
   def render(t: A, c: PPrint.Config): String
 
   def map(f: String => String): (PPrinter[A] @uncheckedVariance) = PPrinter {
@@ -166,14 +165,11 @@ object PPrinter extends PPrinterGen{
 
 
 
-trait LowPriPPrint extends LowerPriPPrint{
-  implicit def Contra[A](implicit ca: PPrinter[A]): PPrint[A] = PPrint(ca)
-}
-trait LowerPriPPrint{
-  implicit def defaultRepr[T]: PPrint[T] = macro LowerPriPPrint.thingy[T]
+trait LowPriPPrint {
+  implicit def FinalRepr[T]: PPrint[T] = macro LowerPriPPrint.FinalRepr[T]
 }
 object LowerPriPPrint{
-  def thingy[T: c.WeakTypeTag](c: scala.reflect.macros.blackbox.Context) = c.Expr[PPrint[T]]{
+  def FinalRepr[T: c.WeakTypeTag](c: scala.reflect.macros.blackbox.Context) = c.Expr[PPrint[T]]{
     import c.universe._
     import c._
     val tpe = c.weakTypeOf[T]
@@ -188,15 +184,18 @@ object LowerPriPPrint{
              .length
 
         val companion = tpe.typeSymbol.companion
-
+        println(tpe)
+        val tupleName = newTermName(s"Product${arity}Repr")
         q"""
-          PPrint(ammonite.PPrinter.preMap((t: $tpe) => $companion.unapply(t).get).map(
-            ${tpe.typeSymbol.name.toString} + _
-          ))
+          new PPrint[$tpe](
+            ammonite.PPrinter
+                    .preMap((t: $tpe) => $companion.unapply(t).get)(new PPrint(PPrinter.$tupleName))
+                    .map(${tpe.typeSymbol.name.toString} + _)
+          )
         """
 
       case _ =>
-        q"""PPrint(ammonite.PPrinter.make[$tpe](""+_))"""
+        q"""new PPrint[$tpe](ammonite.PPrinter.make[$tpe](""+_))"""
     }
   }
 }
