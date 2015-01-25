@@ -1,5 +1,7 @@
 package ammonite
 
+import ammonite.all._
+
 import utest._
 
 import scala.collection.mutable
@@ -41,5 +43,21 @@ object ExampleTests extends TestSuite{
         assert(wd / rel == abs)
       }
     }
+
+    'grep{
+      import ammonite.pprint.Config.Defaults._
+      val items = Seq(123, 456, 789)
+      items |? grep! "45"
+      items |? grep! "^[123456]+$".r
+      assert(
+        (items |? grep! "45") == Seq(456),
+        (items |? grep! "45".r) == Seq(456),
+        (items |? grep! "[123456]+".r) == Seq(123, 456),
+        (items |? grep! "^[123456]+$".r) == Seq(123, 456),
+        (items |? grep! "[123456]".r) == Seq(123, 456),
+        (items |? grep! "^[123456]$".r) == Seq()
+      )
+    }
+
   }
 }

@@ -1,11 +1,9 @@
-package ammonite
+package ammonite.ops
 
 import java.nio.file.Paths
 
+import ammonite.all._
 import utest._
-import RelPath._
-import Path._
-
 object PathTests extends TestSuite{
   val tests = TestSuite {
     'Basic{

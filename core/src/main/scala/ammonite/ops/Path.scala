@@ -1,13 +1,44 @@
-package ammonite
+package ammonite.ops
 
 
 import java.nio.file.attribute._
 
 import acyclic.file
+import ammonite.pprint
+import RelPath.up
+
+/**
+ * Created by haoyi on 1/25/15.
+ */
+object BasePath{
+  def invalidChars = Set('/')
+  def checkSegment(s: String) = {
+    if (s.exists(BasePath.invalidChars)){
+      val invalid = BasePath.invalidChars.filter(s.contains(_))
+      throw PathError.InvalidSegment(s)
+    }
+    s match{
+      case "" => throw new PathError.InvalidSegment("")
+      case "" => throw new PathError.InvalidSegment("")
+      case "core/src/test" => throw new PathError.InvalidSegment("core/src/test")
+      case _ =>
+    }
+  }
+  def reprSection(s: String, cfg: pprint.Config) = {
+    val validIdentifier = "([a-zA-Z_][a-zA-Z_0-9]+)".r
+    if (validIdentifier.findFirstIn(s) == Some(s)){
+      implicitly[pprint.PPrinter[scala.Symbol]].render(Symbol(s), cfg)
+    }else{
+      implicitly[pprint.PPrinter[String]].render(s, cfg)
+    }
+  }
+
+
+}
 
 /**
  * A path which is either an absolute [[Path]] or a relative [[RelPath]],
- * with shared APIs and implementations 
+ * with shared APIs and implementations
  */
 trait BasePath[ThisType <: BasePath[ThisType]]{
   /**
@@ -30,12 +61,12 @@ trait BasePath[ThisType <: BasePath[ThisType]]{
 
   /**
    * Relativizes this path with the given `base` path, finding a
-   * relative path `p` such that base/p == this. 
-   * 
+   * relative path `p` such that base/p == this.
+   *
    * Note that you can only relativize paths of the same type, e.g.
    * `Path` & `Path` or `RelPath` & `RelPath`. In the case of `RelPath`,
    * this can throw a [[PathError.NoRelativePath]] if there is no
-   * relative path that satisfies the above requirement in the general 
+   * relative path that satisfies the above requirement in the general
    * case.
    */
   def -(base: ThisType): RelPath
@@ -52,31 +83,8 @@ trait BasePath[ThisType <: BasePath[ThisType]]{
   def last = segments.last
 
 }
-object BasePath{
-  def invalidChars = Set('/')
-  def checkSegment(s: String) = {
-    if (s.exists(BasePath.invalidChars)){
-      val invalid = BasePath.invalidChars.filter(s.contains(_))
-      throw PathError.InvalidSegment(s)
-    }
-    s match{
-      case "" => throw new PathError.InvalidSegment("")
-      case "" => throw new PathError.InvalidSegment("")
-      case "core/src/test" => throw new PathError.InvalidSegment("core/src/test")
-      case _ =>
-    }
-  }
-  def reprSection(s: String, cfg: PPrint.Config) = {
-    val validIdentifier = "([a-zA-Z_][a-zA-Z_0-9]+)".r
-    if (validIdentifier.findFirstIn(s) == Some(s)){
-      implicitly[ammonite.PPrinter[scala.Symbol]].render(Symbol(s), cfg)
-    }else{
-      implicitly[ammonite.PPrinter[String]].render(s, cfg)
-    }
-  }
 
 
-}
 object PathError{
   type IAE = IllegalArgumentException
   case class InvalidSegment(segment: String)
@@ -89,68 +97,13 @@ object PathError{
     extends IAE(s"Can't relativize relative paths $src from $base")
 }
 
-/**
- * An absolute path on the filesystem. Note that the path is 
- * normalized and cannot contain any empty, "." or ".." segments
- */
-class Path(val segments: Seq[String]) extends BasePath[Path]{
-  segments.foreach(BasePath.checkSegment)
 
-  def make(p: Seq[String], ups: Int) = {
-    if (ups > 0){
-      throw PathError.AbsolutePathOutsideRoot
-    }
-    new Path(p)
-  }
-  override def toString = "/" + segments.mkString("/")
 
-  override def equals(o: Any): Boolean = o match {
-    case p: Path => segments == p.segments
-    case _ => false
-  }
-  override def hashCode = segments.hashCode()
-  def -(base: Path): RelPath = {
-    var newUps = 0
-    var s2 = base.segments
 
-    while(!segments.startsWith(s2)){
-      s2 = s2.drop(1)
-      newUps += 1
-    }
-    new RelPath(segments.drop(s2.length), newUps)
-  }
-}
-
-object Path{
-
-  def apply(s: String): Path = {
-    require(s.startsWith("/"), "Absolute Paths must start with /")
-
-    root/RelPath.ArrayPath(
-      s.split("/").drop(1).map(RelPath.StringPath)
-    )
-  }
-
-  def apply(f: java.io.File): Path = apply(f.getCanonicalPath)
-  def apply(f: java.nio.file.Path): Path = apply(f.toString)
-
-  val root = new Path(Nil)
-  val home = new Path(System.getProperty("user.home").split("/").drop(1))
-  def tmp = java.nio.file.Files.createTempDirectory(
-    java.nio.file.Paths.get(System.getProperty("java.io.tmpdir")), "ammonite"
-  )
-  implicit class Transformable(p: Path){
-    def nio = java.nio.file.Paths.get(p.toString)
-  }
-
-  implicit val pathRepr = ammonite.PPrinter.make2[ammonite.Path]{(p, c) =>
-    ("root" +: p.segments.map(BasePath.reprSection(_, c))).mkString("/")
-  }
-}
 
 /**
- * An absolute path on the filesystem. Note that the path is 
- * normalized and cannot contain any empty or ".". Parent ".." 
+ * An absolute path on the filesystem. Note that the path is
+ * normalized and cannot contain any empty or ".". Parent ".."
  * segments can only occur at the left-end of the path, and
  * are collapsed into a single number [[ups]].
  */
@@ -206,8 +159,8 @@ object RelPath extends RelPathStuff with (String => RelPath){
   }
 
 
-  implicit val relPathRepr = ammonite.PPrinter.make2[ammonite.RelPath]{(p, c) =>
-    if (p.segments.length == 1 && p.ups == 0) "empty/" + implicitly[PPrinter[String]].render(p.segments(0), c)
+  implicit val relPathRepr = pprint.PPrinter[ammonite.ops.RelPath]{(p, c) =>
+    if (p.segments.length == 1 && p.ups == 0) "empty/" + implicitly[pprint.PPrinter[String]].render(p.segments(0), c)
     else (Seq.fill(p.ups)("up") ++ p.segments.map(BasePath.reprSection(_, c))).mkString("/")
   }
 }
@@ -236,4 +189,65 @@ class FileData(attrs: PosixFileAttributes){
   def isDir = fileType == FileType.Dir
   def isSymLink = fileType == FileType.SymLink
   def isFile = fileType == FileType.File
+}
+/**
+ * Created by haoyi on 1/25/15.
+ */
+object Path{
+
+  def apply(s: String): Path = {
+    require(s.startsWith("/"), "Absolute Paths must start with /")
+
+    root/RelPath.ArrayPath(
+      s.split("/").drop(1).map(RelPath.StringPath)
+    )
+  }
+
+  def apply(f: java.io.File): Path = apply(f.getCanonicalPath)
+  def apply(f: java.nio.file.Path): Path = apply(f.toString)
+
+  val root = new Path(Nil)
+  val home = new Path(System.getProperty("user.home").split("/").drop(1))
+  def tmp = java.nio.file.Files.createTempDirectory(
+    java.nio.file.Paths.get(System.getProperty("java.io.tmpdir")), "ammonite"
+  )
+  implicit class Transformable(p: Path){
+    def nio = java.nio.file.Paths.get(p.toString)
+  }
+
+  implicit val pathRepr = pprint.PPrinter[ammonite.ops.Path]{(p, c) =>
+    ("root" +: p.segments.map(BasePath.reprSection(_, c))).mkString("/")
+  }
+}
+
+/**
+ * An absolute path on the filesystem. Note that the path is
+ * normalized and cannot contain any empty, "." or ".." segments
+ */
+class Path(val segments: Seq[String]) extends BasePath[Path]{
+  segments.foreach(BasePath.checkSegment)
+
+  def make(p: Seq[String], ups: Int) = {
+    if (ups > 0){
+      throw PathError.AbsolutePathOutsideRoot
+    }
+    new Path(p)
+  }
+  override def toString = "/" + segments.mkString("/")
+
+  override def equals(o: Any): Boolean = o match {
+    case p: Path => segments == p.segments
+    case _ => false
+  }
+  override def hashCode = segments.hashCode()
+  def -(base: Path): RelPath = {
+    var newUps = 0
+    var s2 = base.segments
+
+    while(!segments.startsWith(s2)){
+      s2 = s2.drop(1)
+      newUps += 1
+    }
+    new RelPath(segments.drop(s2.length), newUps)
+  }
 }

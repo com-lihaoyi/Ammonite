@@ -1,13 +1,12 @@
-package ammonite
-import java.io.{InputStream, FileInputStream, FileOutputStream, File}
-import java.nio.ByteBuffer
-import java.nio.file.{StandardOpenOption, StandardCopyOption, Paths, Files}
-import java.nio.file.attribute.{PosixFileAttributes, BasicFileAttributes}
-import acyclic.file
+package ammonite.ops
 
+import java.io.{File, InputStream}
+import java.nio.file.{Files, Paths, StandardOpenOption}
+
+import RelPath.up
 import scala.language.dynamics
 import scala.util.matching.Regex
-
+import Extensions._
 object OpError{
   type IAE = IllegalArgumentException
   case class ResourceNotFound(src: Path)
@@ -88,15 +87,15 @@ trait Op2[T1, T2, R] extends ((T1, T2) => R){
   }
 }
 trait Grepper[T]{
-  def apply[V: PPrint](t: T, s: V): Boolean
+  def apply[V: ammonite.pprint.PPrint](t: T, s: V): Boolean
 }
 object Grepper{
   implicit object Str extends Grepper[String] {
-    def apply[V: PPrint](t: String, s: V) = PPrint(s).contains(t)
+    def apply[V: ammonite.pprint.PPrint](t: String, s: V) = ammonite.pprint.PPrint(s).contains(t)
   }
 
   implicit object Regex extends Grepper[Regex] {
-    def apply[V: PPrint](t: Regex, s: V) = t.findAllIn(PPrint(s)).length > 0
+    def apply[V: ammonite.pprint.PPrint](t: Regex, s: V) = t.findAllIn(ammonite.pprint.PPrint(s)).length > 0
   }
 }
 
@@ -105,14 +104,14 @@ object Grepper{
  * regex within the pretty-printed contents.
  */
 object grep {
-  def apply[T: Grepper, V: PPrint](pat: T, str: V): Boolean = {
+  def apply[T: Grepper, V: ammonite.pprint.PPrint](pat: T, str: V): Boolean = {
     implicitly[Grepper[T]].apply(pat, str)
   }
   object !{
-    implicit def FunkyFunc[T: PPrint](f: ![_]): T => Boolean = f.apply[T]
+    implicit def FunkyFunc[T: ammonite.pprint.PPrint](f: ![_]): T => Boolean = f.apply[T]
   }
   case class ![T: Grepper](pat: T) {
-    def apply[V: PPrint](str: V) = grep.this.apply(pat, str)
+    def apply[V: ammonite.pprint.PPrint](str: V) = grep.this.apply(pat, str)
   }
 }
 
@@ -167,7 +166,7 @@ object rm extends Op1[Path, Unit]{
 
 object ls extends Op1[Path, Seq[Path]]{
   def apply(arg: Path) = {
-    import collection.JavaConverters._
+    import scala.collection.JavaConverters._
     Files.list(arg.nio).iterator().asScala.map(x => Path(x)).toVector
   }
 
@@ -296,7 +295,7 @@ object system{
  * %ps "aux"
  */
 object % extends Dynamic{
-  import sys.process._
+  import scala.sys.process._
   def selectDynamic(s: String) = Seq(s).!
   def applyDynamic(s: String)(args: String*) = (s +: args).!
 }

@@ -1,7 +1,9 @@
-package ammonite
+package ammonite.ops
 
-import utest._
 import java.nio.{file => nio}
+
+import ammonite.all._
+import utest._
 object OpTests extends TestSuite{
   val wd = processWorkingDir
   val tests = TestSuite {
@@ -223,20 +225,6 @@ object OpTests extends TestSuite{
           * - intercept[nio.FileAlreadyExistsException](write(d/'file, "lols"))
          }
       }
-    }
-    'grep{
-      import Configs.default
-      val items = Seq(123, 456, 789)
-      items |? grep! "45"
-      items |? grep! "^[123456]+$".r
-      assert(
-        (items |? grep! "45") == Seq(456),
-        (items |? grep! "45".r) == Seq(456),
-        (items |? grep! "[123456]+".r) == Seq(123, 456),
-        (items |? grep! "^[123456]+$".r) == Seq(123, 456),
-        (items |? grep! "[123456]".r) == Seq(123, 456),
-        (items |? grep! "^[123456]$".r) == Seq()
-      )
     }
   }
 }

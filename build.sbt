@@ -53,7 +53,7 @@ lazy val sh = project.dependsOn(core).settings(sharedSettings:_*).settings(
 lazy val core = project.settings(sharedSettings:_*).settings(
   name := "ammonite",
   sourceGenerators in Compile <+= sourceManaged in Compile map { dir =>
-    val file = dir / "ammonite" / "PPrintGen.scala"
+    val file = dir/"ammonite"/"pprint"/"PPrintGen.scala"
     val tuples = (1 to 22).map{ i =>
       val ts = (1 to i) map ("T" + _)
       val chunks = 1 to i map { n =>
@@ -64,15 +64,15 @@ lazy val core = project.settings(sharedSettings:_*).settings(
       val boundedTypes = ts.map(_ + ": PP").mkString(",")
       s"""
       implicit def Product${i}Unpacker[${boundedTypes}] = make[$tupleType] {
-        (t: $tupleType, c: Config) => {
-          def chunks(c: Config) = Seq(${chunks.mkString(",")})
+        (t: $tupleType, c: C) => {
+          def chunks(c: C) = Seq(${chunks.mkString(",")})
           (chunks(c), () => chunks(c.deeper))
         }
       }
       """
     }
     val output = s"""
-      package ammonite
+      package ammonite.pprint
 
       trait PPrinterGen extends GenUtils{
 
