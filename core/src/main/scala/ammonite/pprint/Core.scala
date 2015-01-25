@@ -60,9 +60,7 @@ trait GenConfig[T <: GenConfig[T]]{
  * without having any circular dependencies
  */
 trait GenUtils{
-  type UP[T]
   type PP[T]
   type C <: GenConfig[C]
   def render[T: PP](t: T, c: C): String
-  def make[T](r: (T, C) => (Seq[String], () => Seq[String])): UP[T]
 }

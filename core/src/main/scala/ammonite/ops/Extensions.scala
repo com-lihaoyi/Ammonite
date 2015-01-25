@@ -6,11 +6,11 @@ import scala.collection.generic.{CanBuildFrom => CBF, GenericTraversableTemplate
 
 trait Extensions{
   implicit def Pipeable[T](t: T) = new Pipeable(t)
-  implicit def FilterMapExt[T, Repr](i: TraversableLike[T, Repr]) = new FilterMap(i)
+  implicit def FilterMapExt[T, Repr](i: TraversableLike[T, Repr]) = new FilterMapExt(i)
   /**
    * Lets you call [[FilterMapExt]] aliases on Arrays too
    */
-  implicit def FMArray[T](a: Array[T]) = FilterMapExt(a)
+  implicit def FilterMapArrays[T](a: Array[T]) = FilterMapExt(a)
 
   /**
    * Allows you to pipe sequences into other sequences to convert them,
@@ -38,7 +38,7 @@ class Pipeable[T](t: T){
  * used operations, so we can make it easy to use from the
  * command line.
  */
-class FilterMap[+T, Repr](i: TraversableLike[T, Repr]){
+class FilterMapExt[+T, Repr](i: TraversableLike[T, Repr]){
   /**
    * Alias for `map`
    */

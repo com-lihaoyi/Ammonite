@@ -147,7 +147,7 @@ object cp extends Op2[Path, Path, Unit] {
     }
 
     copyOne(from)
-    ls.rec! from | copyOne
+    FilterMapExt(ls.rec! from) | copyOne
   }
 }
 
@@ -164,6 +164,9 @@ object rm extends Op1[Path, Unit]{
   }
 }
 
+/**
+ * List the files in a directory
+ */
 object ls extends Op1[Path, Seq[Path]]{
   def apply(arg: Path) = {
     import scala.collection.JavaConverters._

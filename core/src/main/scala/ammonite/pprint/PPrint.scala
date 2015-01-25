@@ -15,6 +15,9 @@ object PPrint extends Internals.LowPriPPrint{
     pprint.render(t, pprint.cfg)
   }
 
+  /**
+   * Helper to make implicit resolution behave right
+   */
   implicit def Contra[A](implicit ca: PPrinter[A], cfg: Config): PPrint[A] = new PPrint(ca, cfg)
 }
 
@@ -77,8 +80,7 @@ object PPrinter {
 
   def make3[T](prefix: T => String)(f: Internals.Unpacker[T]): PPrinter[T] = PPrinter[T]{
     (t: T, c: Config) =>
-      val (chunks, chunks2) = f.f(t, c)
-      val rendered = Internals.handleChunks(prefix(t), chunks, chunks2, c)
+      val rendered = Internals.handleChunks(prefix(t), f(t, _), c)
       rendered
   }
 
@@ -137,9 +139,7 @@ object Internals {
 
   def collectionRepr[T: PPrint, V <: Traversable[T]](name0: String): PPrinter[V] = PPrinter[V] {
     (i: V, c: Config) => {
-      val chunks = i.map(implicitly[PPrint[T]].render(_, c))
-      lazy val chunks2 = i.map(implicitly[PPrint[T]].render(_, c.copy(depth = c.depth + 1)))
-      handleChunks(i.stringPrefix, chunks, () => chunks2, c)
+      handleChunks(i.stringPrefix, (c: Config) => i.map(implicitly[PPrint[T]].render(_, c)), c)
     }
   }
 
@@ -160,9 +160,9 @@ object Internals {
    * decide whether to go vertical or horiozontal
    */
   def handleChunks(name: String,
-                   chunks: Traversable[String],
-                   chunks2: () => Traversable[String],
+                   chunkFunc: Config => Traversable[String],
                    c: Config): String = {
+    val chunks = chunkFunc(c)
     val renamed = c.rename(name)
     val totalLength = renamed.length + chunks.map(_.length + 2).sum
     val coloredName = c.color.prefix(renamed)
@@ -170,32 +170,24 @@ object Internals {
     if (totalLength <= c.maxDepth - c.depth && !chunks.exists(_.contains('\n'))) {
       coloredName + "(" + chunks.mkString(", ") + ")"
     } else {
+      val chunks2 = chunkFunc(c.deeper)
       val indent = "  " * c.depth
-      coloredName + "(\n" + chunks2().map("  " + indent + _).mkString(",\n") + "\n" + indent + ")"
+      coloredName + "(\n" + chunks2.map("  " + indent + _).mkString(",\n") + "\n" + indent + ")"
     }
   }
 
   def preMap[T, V: PPrint](f: T => V) = PPrinter[T] {
     (t: T, c: Config) => implicitly[PPrint[V]].render(f(t), c)
   }
-  trait Unpacker[T] {
-    def f(t: T, cfg: Config): (Seq[String], () => Seq[String])
-  }
+
+  type Unpacker[T] = (T, Config) => Seq[String]
 
   object Unpacker extends PPrinterGen {
     // Things being injected into PPrinterGen to keep it acyclic
     type UP[T] = Unpacker[T]
     type PP[T] = PPrint[T]
     type C = Config
-
-    def make[T](r: (T, Config) => (Seq[String], () => Seq[String])): Unpacker[T] = {
-      new Unpacker[T] {
-        def f(t: T, cfg: Config) = r(t, cfg)
-      }
-    }
-
     def render[T: PP](t: T, c: Config) = implicitly[PPrint[T]].render(t, c)
-
   }
 
   trait LowPriPPrint {
@@ -252,12 +244,12 @@ object Internals {
           val res = q"""
             new ammonite.pprint.PPrint[$tpe](
               ammonite.pprint.PPrinter.make3[$tpe](_.productPrefix){
-                new ammonite.pprint.Internals.Unpacker[$tpe]{
-                  def f(t: $tpe, cfg: Config) = ammonite.pprint.Internals.Unpacker.$tupleName[..$paramTypes].f(
-                    $thingy,
-                    cfg
-                  )
-                }
+                (t: $tpe, cfg: Config) =>
+                  ammonite.pprint
+                          .Internals
+                          .Unpacker
+                          .$tupleName[..$paramTypes]
+                          .apply($thingy, cfg)
               },
               implicitly[Config]
             )

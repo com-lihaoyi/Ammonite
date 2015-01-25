@@ -1,7 +1,7 @@
-package ammonite
+package test.ammonite
 
 import ammonite.all._
-import ammonite.ops.{Pipeable, FilterMap}
+import ammonite.ops.{Pipeable, FilterMapExt}
 
 import utest._
 

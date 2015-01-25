@@ -1,10 +1,10 @@
-package ammonite.pprint
+package test.ammonite.pprint
 
 import utest._
 
 import scala.collection.{immutable => imm}
 import scala.util.matching.Regex
-
+import ammonite.pprint._
 case class Foo(integer: Int, sequence: Seq[String])
 case class FooG[T](t: T, sequence: Seq[String])
 object PPrintTests extends TestSuite{
@@ -56,6 +56,7 @@ object PPrintTests extends TestSuite{
           * - check('I_AM_A_COW, """'I_AM_A_COW""")
         }
       }
+
       'misc{
         'Nothing - intercept[NotImplementedError](check(???, ""))
         'Null{
@@ -64,20 +65,21 @@ object PPrintTests extends TestSuite{
           check(Seq("look!", null: String, "hi"), """List("look!", null, "hi")""")
         }
         'Either{
-          //        check(Left(123): Either[Int, Int], "Left(123)")
-          //        check(Left(123): Left[Int, Int], "Left(123)")
-          //
-          //        check(Left(123), "Left(123)")
-          //        check(Right((1, "2", 3)), """Right((1, "2", 3))""")
+          check(Left(123): Either[Int, Int], "Left(123)")
+          check(Left(123): Left[Int, Int], "Left(123)")
+
+          check(Left(123), "Left(123)")
+          check(Right((1, "2", 3)), """Right((1, "2", 3))""")
         }
         'Options{
-          //        check(Some(123), "Some(123)")
+          check(Some(123), "Some(123)")
           check(None: Option[Int], "None")
-          //        check(None: Option[Nothing], "None")
-          //        check(None, "None")
-          //        check(Some(None), "Some(None)")
+          check(None: Option[Nothing], "None")
+          check(None, "None")
+          check(Some(None), "Some(None)")
         }
       }
+
       'collections{
         'Array - check(Array(1, 2, 3), "Array(1, 2, 3)")
         'Seq - check(Seq(1, 2, 3), "List(1, 2, 3)")

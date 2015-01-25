@@ -1,4 +1,4 @@
-package ammonite.ops
+package test.ammonite.ops
 
 import java.nio.{file => nio}
 
