@@ -23,22 +23,29 @@ object PConfig{
  * if you don't know what to do with it. Generally used for human-facing
  * output
  */
-object PPrint extends SpecificLow{
+object PPrint extends LowPriPPrint{
 
   def apply[T: PPrint](t: T)(implicit c: PConfig): String = {
     implicitly[PPrint[T]].render(t, c)
-  }
-
-  implicit def Cov[A](implicit ca: PPrintCov[A]): PPrint[A] = PPrint(ca.selff)
+  } 
+  trait Covariant[+A] { self: PPrintContra[A @uncheckedVariance] => val selff = self }
+  implicit def Cov[A](implicit ca: PPrint.Covariant[A]): PPrint[A] = PPrint(ca.selff)
 }
 
-trait PPrintContra[-A] extends PPrintCov[A @uncheckedVariance] {
+case class PPrint[A](a: PPrintContra[A]){
+  def render(t: A, c: PConfig) = a.render(t, c)
+  def map(f: String => String) = a.map(f)
+}
+
+
+trait PPrintContra[-A] extends PPrint.Covariant[A @uncheckedVariance] {
   def render(t: A, c: PConfig): String
 
   def map(f: String => String): (PPrintContra[A] @uncheckedVariance) = PPrintContra {
     (t: A, c: PConfig) => f(render(t, c))
   }
 }
+
 object PPrintContra extends PPrintGen{
   def apply[T](r: (T, PConfig) => String): PPrintContra[T] = {
     new PPrintContra[T]{def render(t: T, c: PConfig)= r(t, c)}
@@ -141,22 +148,13 @@ object PPrintContra extends PPrintGen{
     (t: T, c: PConfig) => implicitly[PPrint[V]].render(f(t), c)
   }
 }
-trait PPrintCov[+A] { self: PPrintContra[A @uncheckedVariance] => val selff = self }
 
-case class PPrint[A](a: PPrintContra[A]){
-  def render(t: A, c: PConfig) = a.render(t, c)
-  def map(f: String => String) = a.map(f)
-} 
 
-trait SpecificLow extends LowPriPPrint{
+
+trait LowPriPPrint extends LowerPriPPrint{
   implicit def Contra[A](implicit ca: PPrintContra[A]): PPrint[A] = PPrint(ca)
 }
-
-
-/**
- * Fall back to toString if you can't find anything else
- */
-trait LowPriPPrint{
+trait LowerPriPPrint{
   implicit def defaultRepr[T]: PPrint[T] = macro LowPriPrint.thingy[T]
 }
 object LowPriPrint{
