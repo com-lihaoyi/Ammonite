@@ -6,7 +6,7 @@ import scala.collection.generic.{CanBuildFrom => CBF, GenericTraversableTemplate
 import scala.util.matching.Regex
 
 package object ammonite extends RelPathStuff{
-  type T[A] = Iterator[A]
+
   /**
    * Extends collections to give short aliases for the commonly
    * used operations, so we can make it easy to use from the

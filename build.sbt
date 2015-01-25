@@ -7,7 +7,16 @@ val sharedSettings = Seq(
   libraryDependencies += "com.lihaoyi" %% "utest" % "0.2.4" % "test",
   testFrameworks += new TestFramework("utest.runner.JvmFramework"),
   autoCompilerPlugins := true,
-  addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.2"),
+  libraryDependencies ++= Seq(
+    "com.lihaoyi" %% "acyclic" % "0.1.2" % "provided",
+    "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided"
+  ) ++ (
+    if (scalaVersion.value startsWith "2.11.") Nil
+    else Seq(
+      "org.scalamacros" %% s"quasiquotes" % "2.0.0" % "provided",
+      compilerPlugin("org.scalamacros" % s"paradise" % "2.0.0" cross CrossVersion.full)
+    )
+  ),
   libraryDependencies += "com.lihaoyi" %% "acyclic" % "0.1.2" % "provided",
   publishTo := Some("releases"  at "https://oss.sonatype.org/service/local/staging/deploy/maven2"),
   pomExtra :=
@@ -51,15 +60,14 @@ lazy val core = project.settings(sharedSettings:_*).settings(
         s"implicitly[PPrint[T$n]].render(t._$n, c)"
       }
       val commaTs = ts.mkString(", ")
-      val tupleType = s"Product$i[$commaTs]"
-
+      val tupleType = s"Product${i}[${commaTs}]"
       s"""
-      implicit def Product${i}Repr[${ts.map(_ + ": PPrint").mkString(",")}] = new PPrint[$tupleType] {
-        def render(t: $tupleType, c: PConfig): String = {
+      implicit def Product${i}Repr[${ts.map(_ + ": PPrint").mkString(",")}] = PPrintContra[$tupleType] {
+        (t: $tupleType, c: PConfig) => {
           def chunks(c: PConfig) = Seq(
             ${chunks.mkString(",")}
           )
-          PPrint.handleChunks(
+          PPrintContra.handleChunks(
             PConfig.defaultRenames.getOrElse(t.productPrefix, t.productPrefix),
             chunks(c),
             chunks(c.copy(depth = c.depth + 1)),
@@ -75,9 +83,7 @@ lazy val core = project.settings(sharedSettings:_*).settings(
         ${tuples.mkString("\n")}
       }
     """.stripMargin
-
     IO.write(file, output)
-
     Seq(file)
   },
   initialCommands in console := """

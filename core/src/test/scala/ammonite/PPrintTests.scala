@@ -4,15 +4,19 @@ import utest._
 
 import scala.collection.{immutable => imm}
 
+case class Foo(integer: Int, sequence: Seq[String])
 object PPrintTests extends TestSuite{
   def check[T: PPrint](t: T, expected: String)(implicit pc: PConfig) = {
     val pprinted = PPrint(t)
     assert(pprinted == expected.trim)
   }
+
   val tests = TestSuite{
     'primitives{
+
       'Char{
-        * - check('\n', "'\\n'")
+
+        * - check('\n', "'\\n'")(PPrint.Contra, implicitly)
         * - check('a', "'a'")
       }
       'Byte{
@@ -83,8 +87,10 @@ object PPrintTests extends TestSuite{
       )
     }
     'products{
-//      case class Foo(integer: Int, sequence: Seq[String])
-//      check(Foo(123, Seq("hello world", "moo")), """Foo(123, Seq("hello world", "moo"))""")
+      check(
+        Foo(123, Seq("hello world", "moo")),
+        """Foo(123, List("hello world", "moo"))"""
+      )
     }
     'Vertical{
       implicit def pc = ammonite.PConfig(25)
