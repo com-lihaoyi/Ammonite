@@ -1,7 +1,7 @@
 package ammonite.sh
 
 import ammonite.sh.eval.{Compiler, Evaluator, Preprocessor}
-import ammonite.sh.{Result, PConfig, PPrint}
+import ammonite.sh.{Result, PPrint.Config, PPrint}
 import utest._
 
 import scala.collection.{immutable => imm}

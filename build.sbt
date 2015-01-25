@@ -7,6 +7,7 @@ val sharedSettings = Seq(
   libraryDependencies += "com.lihaoyi" %% "utest" % "0.2.4" % "test",
   testFrameworks += new TestFramework("utest.runner.JvmFramework"),
   autoCompilerPlugins := true,
+  addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.2"),
   libraryDependencies ++= Seq(
     "com.lihaoyi" %% "acyclic" % "0.1.2" % "provided",
     "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided"
@@ -17,7 +18,6 @@ val sharedSettings = Seq(
       compilerPlugin("org.scalamacros" % s"paradise" % "2.0.0" cross CrossVersion.full)
     )
   ),
-  libraryDependencies += "com.lihaoyi" %% "acyclic" % "0.1.2" % "provided",
   publishTo := Some("releases"  at "https://oss.sonatype.org/service/local/staging/deploy/maven2"),
   pomExtra :=
     <url>https://github.com/lihaoyi/Ammonite</url>
@@ -53,24 +53,25 @@ lazy val sh = project.dependsOn(core).settings(sharedSettings:_*).settings(
 lazy val core = project.settings(sharedSettings:_*).settings(
   name := "ammonite",
   sourceGenerators in Compile <+= sourceManaged in Compile map { dir =>
-    val file = dir / "upickle" / "Generated.scala"
+    val file = dir / "ammonite" / "PPrintGen.scala"
     val tuples = (1 to 22).map{ i =>
       val ts = (1 to i) map ("T" + _)
       val chunks = 1 to i map { n =>
-        s"implicitly[PPrint[T$n]].render(t._$n, c)"
+        s"render(t._$n, c)"
       }
       val commaTs = ts.mkString(", ")
       val tupleType = s"Product${i}[${commaTs}]"
+      val boundedTypes = ts.map(_ + ": P").mkString(",")
       s"""
-      implicit def Product${i}Repr[${ts.map(_ + ": PPrint").mkString(",")}] = PPrintContra[$tupleType] {
-        (t: $tupleType, c: PConfig) => {
-          def chunks(c: PConfig) = Seq(
+      implicit def Product${i}Repr[${boundedTypes}] = apply[$tupleType] {
+        (t: $tupleType, c: Config) => {
+          def chunks(c: Config) = Seq(
             ${chunks.mkString(",")}
           )
-          PPrintContra.handleChunks(
-            PConfig.defaultRenames.getOrElse(t.productPrefix, t.productPrefix),
+          handleChunks(
+            c.rename(t.productPrefix),
             chunks(c),
-            chunks(c.copy(depth = c.depth + 1)),
+            chunks(c.deeper),
             c
           )
         }
@@ -79,7 +80,9 @@ lazy val core = project.settings(sharedSettings:_*).settings(
     }
     val output = s"""
       package ammonite
-      trait PPrintGen{
+
+      trait PPrinterGen extends GenUtils{
+
         ${tuples.mkString("\n")}
       }
     """.stripMargin

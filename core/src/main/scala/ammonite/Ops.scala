@@ -3,7 +3,7 @@ import java.io.{InputStream, FileInputStream, FileOutputStream, File}
 import java.nio.ByteBuffer
 import java.nio.file.{StandardOpenOption, StandardCopyOption, Paths, Files}
 import java.nio.file.attribute.{PosixFileAttributes, BasicFileAttributes}
-
+import acyclic.file
 
 import scala.language.dynamics
 import scala.util.matching.Regex

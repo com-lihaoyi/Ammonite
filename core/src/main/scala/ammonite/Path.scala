@@ -3,7 +3,7 @@ package ammonite
 
 import java.nio.file.attribute._
 
-
+import acyclic.file
 
 /**
  * A path which is either an absolute [[Path]] or a relative [[RelPath]],
@@ -115,7 +115,10 @@ object Path{
 
   def apply(s: String): Path = {
     require(s.startsWith("/"), "Absolute Paths must start with /")
-    s.split("/").drop(1).foldLeft(root)(_/_)
+
+    root/RelPath.ArrayPath(
+      s.split("/").drop(1).map(RelPath.StringPath)
+    )
   }
 
   def apply(f: java.io.File): Path = apply(f.getCanonicalPath)

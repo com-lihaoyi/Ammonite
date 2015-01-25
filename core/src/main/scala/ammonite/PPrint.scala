@@ -4,19 +4,7 @@ import collection.immutable
 import scala.annotation.unchecked.uncheckedVariance
 import scala.language.experimental.macros
 import scala.reflect.ClassTag
-
-case class PConfig(maxDepth: Int = 100,
-                   depth: Int = 0,
-                   color: Boolean = false,
-                   renames: Map[String, String] = PConfig.defaultRenames)
-
-object PConfig{
-  val defaultRenames = Map(
-    "WrappedArray" -> "Array"
-  ) ++ (2 to 22).map(i => s"Tuple$i" -> "")
-//  println(defaultRenames)
-  implicit val default = PConfig()
-}
+import acyclic.file
 
 /**
  * Prettyprint a strongly-typed value, falling back to toString
@@ -25,37 +13,64 @@ object PConfig{
  */
 object PPrint extends LowPriPPrint{
 
-  def apply[T: PPrint](t: T)(implicit c: PConfig): String = {
+  def apply[T: PPrint](t: T)(implicit c: PPrint.Config): String = {
     implicitly[PPrint[T]].render(t, c)
   } 
-  trait Covariant[+A] { self: PPrintContra[A @uncheckedVariance] => val selff = self }
+  trait Covariant[+A] { self: PPrinter[A @uncheckedVariance] => val selff = self }
   implicit def Cov[A](implicit ca: PPrint.Covariant[A]): PPrint[A] = PPrint(ca.selff)
+
+
+  case class Config(maxDepth: Int = 100,
+                     depth: Int = 0,
+                     color: Boolean = false,
+                     renames: Map[String, String] = PPrint.Config.defaultRenames)
+    extends GenConfig[Config]{
+    def deeper = copy(depth = depth + 1)
+    def rename(s: String) = {
+      renames.getOrElse(s, s)
+    }
+  }
+
+  object Config{
+    val defaultRenames = Map(
+      "WrappedArray" -> "Array"
+    ) ++ (2 to 22).map(i => s"Tuple$i" -> "")
+    //  println(defaultRenames)
+    implicit val default = PPrint.Config()
+  }
 }
 
-case class PPrint[A](a: PPrintContra[A]){
-  def render(t: A, c: PConfig) = a.render(t, c)
+case class PPrint[A](a: PPrinter[A]){
+  def render(t: A, c: PPrint.Config) = a.render(t, c)
   def map(f: String => String) = a.map(f)
 }
 
 
-trait PPrintContra[-A] extends PPrint.Covariant[A @uncheckedVariance] {
-  def render(t: A, c: PConfig): String
+trait PPrinter[-A] extends PPrint.Covariant[A @uncheckedVariance] {
+  def render(t: A, c: PPrint.Config): String
 
-  def map(f: String => String): (PPrintContra[A] @uncheckedVariance) = PPrintContra {
-    (t: A, c: PConfig) => f(render(t, c))
+  def map(f: String => String): (PPrinter[A] @uncheckedVariance) = PPrinter {
+    (t: A, c: PPrint.Config) => f(render(t, c))
   }
 }
 
-object PPrintContra extends PPrintGen{
-  def apply[T](r: (T, PConfig) => String): PPrintContra[T] = {
-    new PPrintContra[T]{def render(t: T, c: PConfig)= r(t, c)}
+object PPrinter extends PPrinterGen{
+  // Things being injected into PPrinterGen to keep it acyclic
+  type P[T] = PPrinter[T]
+  type PP[T] = PPrint[T]
+  type Config = PPrint.Config
+  def render[T: P](t: T, c: Config) = implicitly[PPrint[T]].render(t, c)
+  def apply[T](r: (T, PPrint.Config) => String): PPrinter[T] = {
+    new PPrinter[T]{def render(t: T, c: PPrint.Config)= r(t, c)}
   }
-  def defaultColorRepr[T]: PPrintContra[T] = PPrintContra[T]{
+
+
+  def defaultColorRepr[T]: PPrinter[T] = PPrinter[T]{
     def colored(color: Boolean, s: String) = {
       if (!color) s
       else Console.GREEN + s + Console.RESET
     }
-    (t: T, c: PConfig) => colored(c.color, ""+t)
+    (t: T, c: PPrint.Config) => colored(c.color, ""+t)
   }
 
   implicit val ByteRepr = defaultColorRepr[Byte]
@@ -64,13 +79,13 @@ object PPrintContra extends PPrintGen{
   implicit val LongRepr = defaultColorRepr[Long].map(_+"L")
   implicit val FloatRepr = defaultColorRepr[Float].map(_+"F")
   implicit val DoubleRepr = defaultColorRepr[Double]
-  implicit val CharRepr: PPrintContra[Char] = PPrintContra.make[Char](x => "'" + escape(x.toString) + "'", Some(Console.GREEN))
-  implicit val StringRepr = PPrintContra.make[String](x => '"' + escape(x) + '"', Some(Console.GREEN))
-  implicit val SymbolRepr = PPrintContra.make[Symbol]("'" + _.name, Some(Console.GREEN))
+  implicit val CharRepr: PPrinter[Char] = PPrinter.make[Char](x => "'" + escape(x.toString) + "'", Some(Console.GREEN))
+  implicit val StringRepr = PPrinter.make[String](x => '"' + escape(x) + '"', Some(Console.GREEN))
+  implicit val SymbolRepr = PPrinter.make[Symbol]("'" + _.name, Some(Console.GREEN))
 
-  def make[T](f: T => String, color: Option[String] = None): PPrintContra[T] = PPrintContra[T]{
-    val render = (t: T, c: PConfig) => color.filter(_ => c.color).fold(f(t))(_ + f(t) + Console.RESET)
-    def vertical(t: T, c: PConfig) = render(t, c)
+  def make[T](f: T => String, color: Option[String] = None): PPrinter[T] = PPrinter[T]{
+    val render = (t: T, c: PPrint.Config) => color.filter(_ => c.color).fold(f(t))(_ + f(t) + Console.RESET)
+    def vertical(t: T, c: PPrint.Config) = render(t, c)
     render
   }
 
@@ -99,26 +114,26 @@ object PPrintContra extends PPrintGen{
     handle("")
     s.toString()
   }
-  implicit def ArrayRepr[T: PPrint] = PPrintContra[Array[T]]{
+  implicit def ArrayRepr[T: PPrint] = PPrinter[Array[T]]{
     def repr = collectionRepr[T, Seq[T]]("Array")
-    (t: Array[T], c: PConfig) => repr.render(t, c)
+    (t: Array[T], c: PPrint.Config) => repr.render(t, c)
   }
 
   implicit def SeqRepr[T: PPrint] = collectionRepr[T, Seq[T]]("Seq")
   implicit def SetRepr[T: PPrint] = collectionRepr[T, Set[T]]("Set")
   implicit def MapRepr[T: PPrint, V: PPrint]= makeMapRepr[Map, T, V]("Map")
 
-  def makeMapRepr[M[T, V] <: Map[T, V], T: PPrint, V: PPrint](name: String) = PPrintContra[M[T, V]] {
-    def repr(implicit c: PConfig) = collectionRepr[(T, V), Iterable[(T, V)]](name)(
-      PPrint(PPrintContra.make[(T, V)]{case (t, v) => PPrint(t) + " -> " + PPrint(v)})
+  def makeMapRepr[M[T, V] <: Map[T, V], T: PPrint, V: PPrint](name: String) = PPrinter[M[T, V]] {
+    def repr(implicit c: PPrint.Config) = collectionRepr[(T, V), Iterable[(T, V)]](name)(
+      PPrint(PPrinter.make[(T, V)]{case (t, v) => PPrint(t) + " -> " + PPrint(v)})
     )
-    (t: M[T, V], c: PConfig) => {
+    (t: M[T, V], c: PPrint.Config) => {
       val x = t.toIterable
       repr(c).render(x, c)
     }
   }
-  def collectionRepr[T: PPrint, V <: Traversable[T]](name0: String): PPrintContra[V] = PPrintContra[V] {
-    (i: V, c: PConfig) => {
+  def collectionRepr[T: PPrint, V <: Traversable[T]](name0: String): PPrinter[V] = PPrinter[V] {
+    (i: V, c: PPrint.Config) => {
       val chunks = i.map(implicitly[PPrint[T]].render(_, c))
       lazy val chunks2 = i.map(implicitly[PPrint[T]].render(_, c.copy(depth = c.depth + 1)))
       handleChunks(c.renames.getOrElse(i.stringPrefix, i.stringPrefix), chunks, chunks2, c)
@@ -128,7 +143,7 @@ object PPrintContra extends PPrintGen{
   def handleChunks(name0: String,
                    chunks: Traversable[String],
                    chunks2: Traversable[String],
-                   c: PConfig): String = {
+                   c: PPrint.Config): String = {
     val totalLength = name0.length + chunks.map(_.length + 2).sum
 
     val name =
@@ -144,20 +159,20 @@ object PPrintContra extends PPrintGen{
     }
   }
 
-  def preMap[T, V: PPrint](f: T => V) = PPrintContra[T] {
-    (t: T, c: PConfig) => implicitly[PPrint[V]].render(f(t), c)
+  def preMap[T, V: PPrint](f: T => V) = PPrinter[T] {
+    (t: T, c: PPrint.Config) => implicitly[PPrint[V]].render(f(t), c)
   }
 }
 
 
 
 trait LowPriPPrint extends LowerPriPPrint{
-  implicit def Contra[A](implicit ca: PPrintContra[A]): PPrint[A] = PPrint(ca)
+  implicit def Contra[A](implicit ca: PPrinter[A]): PPrint[A] = PPrint(ca)
 }
 trait LowerPriPPrint{
-  implicit def defaultRepr[T]: PPrint[T] = macro LowPriPrint.thingy[T]
+  implicit def defaultRepr[T]: PPrint[T] = macro LowerPriPPrint.thingy[T]
 }
-object LowPriPrint{
+object LowerPriPPrint{
   def thingy[T: c.WeakTypeTag](c: scala.reflect.macros.blackbox.Context) = c.Expr[PPrint[T]]{
     import c.universe._
     import c._
@@ -175,13 +190,13 @@ object LowPriPrint{
         val companion = tpe.typeSymbol.companion
 
         q"""
-          PPrint(ammonite.PPrintContra.preMap((t: $tpe) => $companion.unapply(t).get).map(
+          PPrint(ammonite.PPrinter.preMap((t: $tpe) => $companion.unapply(t).get).map(
             ${tpe.typeSymbol.name.toString} + _
           ))
         """
 
       case _ =>
-        q"""PPrint(ammonite.PPrintContra.make[$tpe](""+_))"""
+        q"""PPrint(ammonite.PPrinter.make[$tpe](""+_))"""
     }
   }
 }

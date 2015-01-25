@@ -6,7 +6,7 @@ import scala.collection.{immutable => imm}
 
 case class Foo(integer: Int, sequence: Seq[String])
 object PPrintTests extends TestSuite{
-  def check[T: PPrint](t: T, expected: String)(implicit pc: PConfig) = {
+  def check[T: PPrint](t: T, expected: String)(implicit pc: PPrint.Config) = {
     val pprinted = PPrint(t)
     assert(pprinted == expected.trim)
   }
@@ -93,7 +93,7 @@ object PPrintTests extends TestSuite{
       )
     }
     'Vertical{
-      implicit def pc = ammonite.PConfig(25)
+      implicit def pc = ammonite.PPrint.Config(25)
       'singleNested {
         * - check(
           List("12", "12", "12"),
