@@ -77,7 +77,7 @@ trait PPrinter[-A] {
   }
 }
 
-object PPrinter extends PPrinterGen{
+object PPrinter {
   // Things being injected into PPrinterGen to keep it acyclic
   type PPer[T] = PPrinter[T]
   type PP[T] = PPrint[T]
@@ -111,6 +111,12 @@ object PPrinter extends PPrinterGen{
   }
   def make2[T](f: (T, PPrint.Config) => String, color: Option[String] = None): PPrinter[T] = PPrinter[T]{
     (t: T, c: PPrint.Config) => color.filter(_ => c.color).fold(f(t, c))(_ + f(t, c) + Console.RESET)
+  }
+  def make3[T](prefix: T => String)(f: Unpacker[T], color: Option[String] = None): PPrinter[T] = PPrinter[T]{
+    (t: T, c: PPrint.Config) =>
+      val (chunks, chunks2) = f.f(t, c)
+      val rendered = handleChunks(prefix(t), chunks, chunks2, c)
+      color.filter(_ => c.color).fold(rendered)(_ + rendered + Console.RESET)
   }
 
   /**
@@ -211,7 +217,23 @@ object PPrinter extends PPrinterGen{
   }
 }
 
+trait Unpacker[T]{
+  def f(t: T, cfg: PPrint.Config): (Seq[String], () => Seq[String])
+}
+object Unpacker extends PPrinterGen{
+  // Things being injected into PPrinterGen to keep it acyclic
+  type UP[T] = Unpacker[T]
+  type PP[T] = PPrint[T]
+  type Config = PPrint.Config
+  def make[T](r: (T, PPrint.Config) => (Seq[String], () => Seq[String])): Unpacker[T] = {
+    new Unpacker[T]{
+      def f(t: T, cfg: PPrint.Config) = r(t, cfg)
+    }
+  }
 
+  def render[T: PP](t: T, c: Config) = implicitly[PPrint[T]].render(t, c)
+
+}
 trait LowPriPPrint {
   implicit def FinalRepr[T]: PPrint[T] = macro LowerPriPPrint.FinalRepr[T]
 }
@@ -253,7 +275,7 @@ object LowerPriPPrint{
             )
           )
 
-        val tupleName = newTermName(s"Product${arity}Repr")
+        val tupleName = newTermName(s"Product${arity}Unpacker")
         val thingy =
           if (arity > 1) q"$companion.unapply(t).get"
           else q"Tuple1($companion.unapply(t).get)"
@@ -264,11 +286,14 @@ object LowerPriPPrint{
         // Need to dropWhile to get rid of any `Tuple1` prefix
         val res = q"""
           new PPrint[$tpe](
-            ammonite.PPrinter
-                    .preMap((t: $tpe) => $thingy)(
-                      new PPrint(PPrinter.$tupleName, implicitly[PPrint.Config])
-                    )
-                    .map(${tpe.typeSymbol.name.toString} + _.dropWhile(_ != '(')),
+            PPrinter.make3[$tpe](_.productPrefix){
+              new Unpacker[$tpe]{
+                def f(t: $tpe, cfg: PPrint.Config) = ammonite.Unpacker.$tupleName[..$paramTypes].f(
+                  $thingy,
+                  cfg
+                )
+              }
+            },
             implicitly[PPrint.Config]
           )
         """
@@ -277,9 +302,9 @@ object LowerPriPPrint{
 
       case _ =>
         q"""new PPrint[$tpe](
-           ammonite.PPrinter.make[$tpe](""+_),
-           implicitly[PPrint.Config]
-         )"""
+          ammonite.PPrinter.make[$tpe](""+_),
+          implicitly[PPrint.Config]
+        )"""
     }
   }
 }

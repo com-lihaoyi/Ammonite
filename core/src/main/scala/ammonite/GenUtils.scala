@@ -11,13 +11,9 @@ trait GenConfig[T <: GenConfig[T]]{
 }
 
 trait GenUtils{
+  type UP[T]
   type PP[T]
-  type PPer[T]
   type Config <: GenConfig[Config]
   def render[T: PP](t: T, c: Config): String
-  def apply[T](r: (T, Config) => String): PPer[T]
-  def handleChunks(name0: String,
-                   chunks: Traversable[String],
-                   chunks2: () => Traversable[String],
-                   c: Config): String
+  def make[T](r: (T, Config) => (Seq[String], () => Seq[String])): UP[T]
 }

@@ -63,15 +63,10 @@ lazy val core = project.settings(sharedSettings:_*).settings(
       val tupleType = s"Product${i}[${commaTs}]"
       val boundedTypes = ts.map(_ + ": PP").mkString(",")
       s"""
-      implicit def Product${i}Repr[${boundedTypes}] = apply[$tupleType] {
+      implicit def Product${i}Unpacker[${boundedTypes}] = make[$tupleType] {
         (t: $tupleType, c: Config) => {
           def chunks(c: Config) = Seq(${chunks.mkString(",")})
-          handleChunks(
-            t.productPrefix,
-            chunks(c),
-            () => chunks(c.deeper),
-            c
-          )
+          (chunks(c), () => chunks(c.deeper))
         }
       }
       """
