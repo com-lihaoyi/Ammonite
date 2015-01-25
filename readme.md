@@ -1,4 +1,4 @@
-Ammonite 0.1.3
+Ammonite 0.1.4
 ==============
 
 ```scala
@@ -61,7 +61,7 @@ Getting Started
 To begin, add the following to your build.sbt:
 
 ```scala
-"com.lihaoyi" %% "ammonite-core" % "0.1.3",
+"com.lihaoyi" %% "ammonite-core" % "0.1.4",
 ```
 
 Then at the top of your file,
@@ -240,6 +240,17 @@ read.bytes! wd/'folder2/"data.bin"
 
 // Check if a file or folder exists
 exists! wd/'folder2/"data.txt"
+
+// Search for all files with the text "Eval" in them
+import ammonite.pprint.Config.Defaults._
+ls.rec! wd | grep! "Eval"
+
+// Search for all lines in .scala files with the text "Eval" in them
+import ammonite.pprint.Config.Defaults._
+ls.rec! wd |? (_.ext == "scala") || read.lines |? grep! "Eval"
+
+// All lines in all scala files which contain symbol literals
+ ls.rec! wd |? grep! ".*scala" || read.lines |? grep! "'[a-zA-Z0-9_]+".r
 ```
 
 All of these operations are pre-defined and strongly typed, so feel free to jump to their implementation to look at what they do or what else is available.
@@ -275,6 +286,44 @@ txt || (_.split("[^a-zA-Z0-9_]")) |> frequencies |> (_.toSeq) sortBy (-_._2)
 ```
 
 Each of these would be a significant amount of ugly filesystem traversals, readings, and other operations. With Ammonite, it is often a single line.
+
+Pretty Printing
+===============
+
+Ammonite comes with a pretty-printing module, which lets you easily print data structures in a readable way:
+
+```scala
+scala> import ammonite.pprint._
+scala> import Config.Defaults._
+
+scala> PPrint(
+  List(Seq(Seq("mgg", "mgg", "lols"), Seq("mgg", "mgg")), Seq(Seq("ggx", "ggx"),Seq("ggx", "ggx", "wtfx")))
+)
+res33: String =
+List(
+  List(List("mgg", "mgg", "lols"), List("mgg", "mgg")),
+  List(List("ggx", "ggx"), List("ggx", "ggx", "wtfx"))
+)
+```
+
+Note how every string is escaped, everything is laid out nicely, and the output is in a state that you can easily copy & paste it back into the REPL to evaluate.
+
+You can also use
+
+```scala
+import Configs.Colors._
+```
+
+Instead of `Defaults` in order to turn on colored pretty-printing.
+
+Pretty-printing is by default defined for most standard library types, as well as case classes and case objects. For other types not supported, it falls back to using `toString`
+
+```scala
+scala> PPrint(new Object())
+res35: String = java.lang.Object@54f880c0
+```
+
+In order to pretty print a type `T`, you need to have a `T: PPrint` context bound present. In order to write your own custom pretty printer for some type `T`, provide a `PPrinter[T]`.
 
 Limitations
 ===========
