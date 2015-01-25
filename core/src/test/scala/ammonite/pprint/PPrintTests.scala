@@ -3,6 +3,7 @@ package ammonite.pprint
 import utest._
 
 import scala.collection.{immutable => imm}
+import scala.util.matching.Regex
 
 case class Foo(integer: Int, sequence: Seq[String])
 case class FooG[T](t: T, sequence: Seq[String])
@@ -243,6 +244,23 @@ object PPrintTests extends TestSuite{
         )
       }
     }
+    'Color{
+      import ammonite.pprint.Config.Colors._
+      def count(haystack: String, needles: (String, Int)*) = {
+        for ((needle, expected) <- needles){
+          val count = Regex.quote(needle).r.findAllMatchIn(haystack).length
+          assert(count == expected)
+        }
+      }
 
+      import Console._
+      * - count(PPrint(123), GREEN -> 1, RESET -> 1)
+      * - count(PPrint(""), GREEN -> 1, RESET -> 1)
+      * - count(PPrint(Seq(1, 2, 3)), GREEN -> 3, YELLOW -> 1, RESET -> 4)
+      * - count(
+        PPrint(Map(1 -> Nil, 2 -> Seq(" "), 3 -> Seq("   "))),
+        GREEN -> 5, YELLOW -> 4, RESET -> 9
+      )
+     }
   }
 }
