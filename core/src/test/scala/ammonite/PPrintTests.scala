@@ -70,6 +70,14 @@ object PPrintTests extends TestSuite{
       )
     }
 
+    'tuples{
+      check(Tuple1("123"), """Tuple1("123")""")
+      check((1, 2, "123"), """(1, 2, "123")""")
+      check(
+        (1, 2, "123", (100L, 200L), 1.5F, 0.1),
+        """(1, 2, "123", (100L, 200L), 1.5F, 0.1)"""
+      )
+    }
     'Vertical{
       implicit def pc = ammonite.PConfig(25)
       'singleNested {

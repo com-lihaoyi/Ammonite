@@ -12,7 +12,7 @@ object PConfig{
  * if you don't know what to do with it. Generally used for human-facing
  * output
  */
-object PPrint extends LowPriPPrint{
+object PPrint extends PPrintGen with LowPriPPrint{
   def defaultColorRepr[T] = new PPrint[T]{
     def colored(color: Boolean, s: String) = {
       if (!color) s
@@ -92,19 +92,26 @@ object PPrint extends LowPriPPrint{
   def collectionRepr[T: PPrint, V <: Traversable[T]](name0: String): PPrint[V] = new PPrint[V] {
     def render(i: V, c: PConfig): String = {
       val chunks = i.map(implicitly[PPrint[T]].render(_, c))
-      val totalLength = name0.length + chunks.map(_.length + 2).sum
+      lazy val chunks2 = i.map(implicitly[PPrint[T]].render(_, c.copy(depth = c.depth + 1)))
+      handleChunks(name0, chunks, chunks2, c)
+    }
+  }
+  def handleChunks(name0: String,
+                   chunks: Traversable[String],
+                   chunks2: Traversable[String],
+                   c: PConfig) = {
+    val totalLength = name0.length + chunks.map(_.length + 2).sum
 
-      val name =
-        if (c.color) Console.YELLOW + name0 + Console.RESET
-        else name0
+    val name =
+      if (c.color) Console.YELLOW + name0 + Console.RESET
+      else name0
 
-      if (totalLength <= c.maxDepth - c.depth && !chunks.exists(_.contains('\n'))){
-        name + "(" + chunks.mkString(", ") + ")"
-      } else {
-        val chunks = i.map(implicitly[PPrint[T]].render(_, c.copy(depth = c.depth + 1)))
-        val indent = "  "*c.depth
-        name + "(\n" + chunks.map("  " + indent + _).mkString(",\n") + "\n" + indent + ")"
-      }
+    if (totalLength <= c.maxDepth - c.depth && !chunks.exists(_.contains('\n'))){
+      name + "(" + chunks.mkString(", ") + ")"
+    } else {
+
+      val indent = "  " * c.depth
+      name + "(\n" + chunks2.map("  " + indent + _).mkString(",\n") + "\n" + indent + ")"
     }
   }
 }

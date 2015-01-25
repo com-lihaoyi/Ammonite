@@ -43,6 +43,43 @@ lazy val sh = project.dependsOn(core).settings(sharedSettings:_*).settings(
 
 lazy val core = project.settings(sharedSettings:_*).settings(
   name := "ammonite",
+  sourceGenerators in Compile <+= sourceManaged in Compile map { dir =>
+    val file = dir / "upickle" / "Generated.scala"
+    val tuples = (1 to 22).map{ i =>
+      val ts = (1 to i) map ("T" + _)
+      val chunks = 1 to i map { n =>
+        s"implicitly[PPrint[T$n]].render(t._$n, c)"
+      }
+      val commaTs = ts.mkString(", ")
+      val tupleType = s"Tuple$i[$commaTs]"
+      val name = if(i == 1) "Tuple1" else ""
+      s"""
+      implicit def Tuple${i}Repr[${ts.map(_ + ": PPrint").mkString(",")}]: PPrint[$tupleType] = new PPrint[$tupleType] {
+        def render(t: $tupleType, c: PConfig): String = {
+          def chunks(c: PConfig) = Seq(
+            ${chunks.mkString(",")}
+          )
+          PPrint.handleChunks(
+            "$name",
+            chunks(c),
+            chunks(c.copy(depth = c.depth + 1)),
+            c
+          )
+        }
+      }
+      """
+    }
+    val output = s"""
+      package ammonite
+      trait PPrintGen{
+        ${tuples.mkString("\n")}
+      }
+    """.stripMargin
+
+    IO.write(file, output)
+
+    Seq(file)
+  },
   initialCommands in console := """
     import ammonite._
     var wd = cwd
