@@ -22,12 +22,11 @@ trait BasePath[ThisType <: BasePath[ThisType]]{
    * a path of the same type as this one (e.g. `Path` returns `Path`,
    * `RelPath` returns `RelPath`
    */
-  def /(subpath: RelPath): ThisType = {
-    make(
-      segments.dropRight(subpath.ups) ++ subpath.segments,
-      math.max(subpath.ups - segments.length, 0)
-    )
-  }
+  def /(subpath: RelPath): ThisType = make(
+    segments.dropRight(subpath.ups) ++ subpath.segments,
+    math.max(subpath.ups - segments.length, 0)
+  )
+
 
   /**
    * Relativizes this path with the given `base` path, finding a
@@ -67,8 +66,6 @@ object BasePath{
       case _ =>
     }
   }
-
-
 }
 object PathError{
   type IAE = IllegalArgumentException
@@ -118,7 +115,7 @@ object Path{
 
   def apply(s: String): Path = {
     require(s.startsWith("/"), "Absolute Paths must start with /")
-    root/RelPath.SeqPath(s.split("/").drop(1))
+    s.split("/").drop(1).foldLeft(root)(_/_)
   }
 
   def apply(f: java.io.File): Path = apply(f.getCanonicalPath)
@@ -149,7 +146,6 @@ class RelPath(val segments: Seq[String], val ups: Int) extends BasePath[RelPath]
     if (base.ups < ups) {
       new RelPath(segments, ups + base.segments.length)
     } else if (base.ups == ups) {
-
       val commonPrefix = {
         val maxSize = scala.math.min(segments.length, base.segments.length)
         var i = 0
@@ -184,9 +180,10 @@ trait RelPathStuff{
   implicit def ArrayPath[T](s: Array[T])(implicit conv: T => RelPath): RelPath = SeqPath(s)
 }
 object RelPath extends RelPathStuff with (String => RelPath){
+  val rel = new RelPath(Nil, 0)
   def apply(s: String) = {
     require(!s.startsWith("/"), "Relative paths cannot start with /")
-    new RelPath(s.split("/").segments, 0)
+    s.split("/").foldLeft(rel)(_/_)
   }
   implicit class Transformable1(p: RelPath){
     def nio = java.nio.file.Paths.get(p.toString)

@@ -77,16 +77,16 @@ object Shell{
   val validIdentifier = "([a-zA-Z_][a-zA-Z_0-9]+)".r
   def reprSection(s: String) = {
     if (validIdentifier.findFirstIn(s) == Some(s)){
-      PPrint[scala.Symbol](Symbol(s))
+      ammonite.PPrint[scala.Symbol](Symbol(s))
     }else{
-      PPrint[String](s)
+      ammonite.PPrint[String](s)
     }
   }
-  implicit val pathRepr = PPrint.make[ammonite.Path]{p =>
+  implicit val pathRepr = ammonite.PPrint.make[ammonite.Path]{p =>
     ("root" +: p.segments.map(reprSection)).mkString("/")
   }
-  implicit val relPathRepr = PPrint.make[ammonite.RelPath]{p =>
-    if (p.segments.length == 1 && p.ups == 0) "empty/" + PPrint(p.segments(0))
+  implicit val relPathRepr = ammonite.PPrint.make[ammonite.RelPath]{p =>
+    if (p.segments.length == 1 && p.ups == 0) "empty/" + ammonite.PPrint(p.segments(0))
     else (Seq.fill(p.ups)("up") ++ p.segments.map(reprSection)).mkString("/")
   }
 }

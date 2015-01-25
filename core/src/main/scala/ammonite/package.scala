@@ -53,6 +53,7 @@ package object ammonite extends RelPathStuff{
    */
   val root = Path.root
 
+  val rel = RelPath.rel
   /**
    * The current working directory for this process.
    */

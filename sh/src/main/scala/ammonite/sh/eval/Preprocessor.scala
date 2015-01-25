@@ -57,7 +57,7 @@ class Preprocessor{
 
   def pprint(ident: String) = {
     pprintSignature(ident) +
-      s""" + " = " + ammonite.sh.PPrint($ident) """
+      s""" + " = " + ammonite.PPrint($ident)(implicitly, ammonite.PConfig(color=true)) """
   }
   def DefProcessor(cond: Recognizer => util.Try[_], definitionLabel: String) =
     Processor(cond){ (name, code) => (

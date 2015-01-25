@@ -1,6 +1,5 @@
-package ammonite.sh
+package ammonite
 
-import ammonite.sh.{PConfig, PPrint}
 import utest._
 
 import scala.collection.{immutable => imm}
@@ -12,40 +11,40 @@ object PPrintTests extends TestSuite{
   }
   val tests = TestSuite{
     'primitives{
-      'Char - {
+      'Char{
         * - check('\n', "'\\n'")
         * - check('a', "'a'")
       }
-      'Byte - {
+      'Byte{
         * - check(123.toByte, "123")
         * - check(-123.toByte, "-123")
       }
-      'Short - {
+      'Short{
         * - check(123.toShort, "123")
         * - check(-12345.toShort, "-12345")
       }
-      'Int - {
+      'Int{
         * - check(123, "123")
         * - check(-1234567, "-1234567")
       }
-      'Long - {
+      'Long{
         * - check(123456789012345L, "123456789012345L")
         * - check(-123456789012345L, "-123456789012345L")
       }
-      'Float- {
+      'Float{
         * - check(0.75F, "0.75F")
         * - check(-13.5F, "-13.5F")
       }
-      'Double - {
+      'Double {
         * - check(0.125, "0.125")
         * - check(-0.125, "-0.125")
       }
-      'String - {
+      'String{
         * - check("i am a cow", """ "i am a cow" """)
         * - check(""" "hello" """.trim, """ "\"hello\"" """)
         * - check("\n\n\n", """ "\n\n\n" """)
       }
-      'Symbols - {
+      'Symbols{
         * - check('hello, """'hello""")
         * - check('I_AM_A_COW, """'I_AM_A_COW""")
        }
@@ -62,15 +61,17 @@ object PPrintTests extends TestSuite{
       'Set - check(Set('omg), """Set('omg)""")
       'SortedSet- check(
         imm.SortedSet("1", "2", "3"),
-        """imm.SortedSet("1", "2", "3")"""
+        """immutable.SortedSet("1", "2", "3")"""
       )
       'Map - check(Map("key" -> "value"), """Map("key" -> "value")""")
       'SortedMap - check(
         imm.SortedMap("key" -> "v", "key2" -> "v2"),
-        """imm.SortedMap("key" -> "v", "key2" -> "v2")""")
+        """immutable.SortedMap("key" -> "v", "key2" -> "v2")"""
+      )
     }
+
     'Vertical{
-      implicit def pc = ammonite.sh.PConfig(25)
+      implicit def pc = ammonite.PConfig(25)
       'singleNested {
         * - check(
           List("12", "12", "12"),

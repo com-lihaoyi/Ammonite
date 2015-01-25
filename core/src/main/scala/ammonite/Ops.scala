@@ -6,6 +6,8 @@ import java.nio.file.attribute.{PosixFileAttributes, BasicFileAttributes}
 
 
 import scala.language.dynamics
+import scala.util.matching.Regex
+
 object OpError{
   type IAE = IllegalArgumentException
   case class ResourceNotFound(src: Path)
@@ -85,6 +87,34 @@ trait Op2[T1, T2, R] extends ((T1, T2) => R){
     def !(arg2: T2): R = Op2.this.apply(arg1, arg2)
   }
 }
+trait Grepper[T]{
+  def apply[V: PPrint](t: T, s: V): Boolean
+}
+object Grepper{
+  implicit object Str extends Grepper[String] {
+    def apply[V: PPrint](t: String, s: V) = PPrint(s).contains(t)
+  }
+
+  implicit object Regex extends Grepper[Regex] {
+    def apply[V: PPrint](t: Regex, s: V) = t.findAllIn(PPrint(s)).length > 0
+  }
+}
+
+/**
+ * Lets you filter a list by searching for a matching string or
+ * regex within the pretty-printed contents.
+ */
+object grep {
+  def apply[T: Grepper, V: PPrint](pat: T, str: V): Boolean = {
+    implicitly[Grepper[T]].apply(pat, str)
+  }
+  object !{
+    implicit def FunkyFunc[T: PPrint](f: ![_]): T => Boolean = f.apply[T]
+  }
+  case class ![T: Grepper](pat: T) {
+    def apply[V: PPrint](str: V) = grep.this.apply(pat, str)
+  }
+}
 
 /**
  * Makes directories up to the specified path.
@@ -100,7 +130,6 @@ object mkdir extends Op1[Path, Unit]{
 object mv extends Op2[Path, Path, Unit] with Internals.Mover{
   def apply(from: Path, to: Path) =
     java.nio.file.Files.move(from.nio, to.nio)
-
 
   def check = false
 
@@ -120,7 +149,6 @@ object cp extends Op2[Path, Path, Unit] {
 
     copyOne(from)
     ls.rec! from | copyOne
-
   }
 }
 
@@ -272,3 +300,4 @@ object % extends Dynamic{
   def selectDynamic(s: String) = Seq(s).!
   def applyDynamic(s: String)(args: String*) = (s +: args).!
 }
+
