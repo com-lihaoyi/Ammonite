@@ -13,14 +13,27 @@ import acyclic.file
  */
 object PPrint extends LowPriPPrint{
 
-  def apply[T: PPrint](t: T)(implicit c: PPrint.Config): String = {
-    implicitly[PPrint[T]].render(t, c)
+  def apply[T: PPrint](t: T): String = {
+    val pprint = implicitly[PPrint[T]]
+    pprint.render(t, pprint.cfg)
   }
 
+  /**
+   * Configuration options to control how prettyprinting occurs, passed
+   * recursively into each prettyprinting callsite.
+   *
+   * @param maxDepth Controls how far to the right a line will go before
+   *                 it tries to wrap
+   * @param depth How much the current item being printed should be indented
+   * @param color Whether or not you want things to be printed with colors
+   * @param renames A map used to rename things to more common names, e.g.
+   *                renamig `WrappedArray` to `Array` or getting rid of
+   *                TupleN *
+   */
   case class Config(maxDepth: Int = 100,
-                     depth: Int = 0,
-                     color: Boolean = false,
-                     renames: Map[String, String] = PPrint.Config.defaultRenames)
+                    depth: Int = 0,
+                    color: Boolean = false,
+                    renames: Map[String, String] = PPrint.Config.defaultRenames)
     extends GenConfig[Config]{
     def deeper = copy(depth = depth + 1)
     def rename(s: String) = {
@@ -29,17 +42,25 @@ object PPrint extends LowPriPPrint{
   }
 
   object Config{
+
     val defaultRenames = Map(
       "WrappedArray" -> "Array"
     ) ++ (2 to 22).map(i => s"Tuple$i" -> "")
     //  println(defaultRenames)
-    implicit val default = PPrint.Config()
+
   }
 
-  implicit def Contra[A](implicit ca: PPrinter[A]): PPrint[A] = PPrint(ca)
+
+  implicit def Contra[A](implicit ca: PPrinter[A], cfg: PPrint.Config): PPrint[A] = PPrint(ca, cfg)
+
+  object Unconfigured{
+    implicit def Contra[A](implicit ca: PPrinter[A]): Unconfigured[A] = Unconfigured(ca)
+  }
+  case class Unconfigured[T](a: PPrinter[T])
 }
 
-case class PPrint[A](a: PPrinter[A]){
+
+case class PPrint[A](a: PPrinter[A], cfg: PPrint.Config){
   def render(t: A, c: PPrint.Config) = {
     if (t == null) "null"
     else a.render(t, c)
@@ -86,11 +107,15 @@ object PPrinter extends PPrinterGen{
   implicit val SymbolRepr = PPrinter.make[Symbol]("'" + _.name, Some(Console.GREEN))
 
   def make[T](f: T => String, color: Option[String] = None): PPrinter[T] = PPrinter[T]{
-    val render = (t: T, c: PPrint.Config) => color.filter(_ => c.color).fold(f(t))(_ + f(t) + Console.RESET)
-    def vertical(t: T, c: PPrint.Config) = render(t, c)
-    render
+    (t: T, c: PPrint.Config) => color.filter(_ => c.color).fold(f(t))(_ + f(t) + Console.RESET)
+  }
+  def make2[T](f: (T, PPrint.Config) => String, color: Option[String] = None): PPrinter[T] = PPrinter[T]{
+    (t: T, c: PPrint.Config) => color.filter(_ => c.color).fold(f(t, c))(_ + f(t, c) + Console.RESET)
   }
 
+  /**
+   * Escapes a string to turn it back into a string literal
+   */
   def escape(text: String): String = {
     val s = new StringBuilder
     val len = text.length
@@ -126,9 +151,12 @@ object PPrinter extends PPrinterGen{
   implicit def MapRepr[T: PPrint, V: PPrint]= makeMapRepr[Map, T, V]("Map")
 
   def makeMapRepr[M[T, V] <: Map[T, V], T: PPrint, V: PPrint](name: String) = PPrinter[M[T, V]] {
-    def repr(implicit c: PPrint.Config) = collectionRepr[(T, V), Iterable[(T, V)]](name)(
-      PPrint(PPrinter.make[(T, V)]{case (t, v) => PPrint(t) + " -> " + PPrint(v)})
-    )
+    def repr(implicit c: PPrint.Config) = collectionRepr[(T, V), Iterable[(T, V)]](name) {
+      val pprinter = PPrinter.make[(T, V)] { case (t, v) =>
+        implicitly[PPrint[T]].render(t, c) + " -> " + implicitly[PPrint[V]].render(v, c)
+      }
+      PPrint(pprinter, c)
+    }
     (t: M[T, V], c: PPrint.Config) => {
       val x = t.toIterable
       repr(c).render(x, c)
@@ -138,14 +166,31 @@ object PPrinter extends PPrinterGen{
     (i: V, c: PPrint.Config) => {
       val chunks = i.map(implicitly[PPrint[T]].render(_, c))
       lazy val chunks2 = i.map(implicitly[PPrint[T]].render(_, c.copy(depth = c.depth + 1)))
-      handleChunks(c.renames.getOrElse(i.stringPrefix, i.stringPrefix), chunks, chunks2, c)
+      handleChunks(i.stringPrefix, chunks, () =>chunks2, c)
     }
   }
 
-  def handleChunks(name0: String,
+  /**
+   * Renders something that looks like
+   *
+   * Prefix(inner, inner, inner)
+   *
+   * or
+   *
+   * Prefix(
+   *   inner,
+   *   inner,
+   *   inner
+   * )
+   *
+   * And deals with the necessary layout considerations to
+   * decide whether to go vertical or horiozontal
+   */
+  def handleChunks(name00: String,
                    chunks: Traversable[String],
-                   chunks2: Traversable[String],
+                   chunks2: () => Traversable[String],
                    c: PPrint.Config): String = {
+    val name0 = c.rename(name00)
     val totalLength = name0.length + chunks.map(_.length + 2).sum
 
     val name =
@@ -157,7 +202,7 @@ object PPrinter extends PPrinterGen{
     } else {
 
       val indent = "  " * c.depth
-      name + "(\n" + chunks2.map("  " + indent + _).mkString(",\n") + "\n" + indent + ")"
+      name + "(\n" + chunks2().map("  " + indent + _).mkString(",\n") + "\n" + indent + ")"
     }
   }
 
@@ -165,7 +210,6 @@ object PPrinter extends PPrinterGen{
     (t: T, c: PPrint.Config) => implicitly[PPrint[V]].render(f(t), c)
   }
 }
-
 
 
 trait LowPriPPrint {
@@ -177,7 +221,8 @@ object LowerPriPPrint{
 
     val tpe = c.weakTypeOf[T]
     util.Try(c.weakTypeOf[T].typeSymbol.asClass) match {
-      case util.Success(f) if f.isCaseClass =>
+
+      case util.Success(f) if f.isCaseClass && !f.isModuleClass =>
 
         val constructor = tpe.member(newTermName("<init>"))
         val arity =
@@ -188,7 +233,7 @@ object LowerPriPPrint{
              .length
 
         val companion = tpe.typeSymbol.companion
-        println(tpe)
+
         val paramTypes =
           constructor
             .typeSignatureIn(tpe)
@@ -203,25 +248,38 @@ object LowerPriPPrint{
             c.inferImplicitValue(
               typeOf[PPrint[Int]] match {
                 case TypeRef(pre, tpe, args) =>
-                  /*if (t != typeOf[Nothing]) */TypeRef(pre, tpe, List(t))
-//                  else TypeRef(pre, tpe, List(typeOf[Int]))
+                  TypeRef(pre, tpe, List(t))
               }
             )
           )
-        println(paramTypes)
+
         val tupleName = newTermName(s"Product${arity}Repr")
-        q"""
+        val thingy =
+          if (arity > 1) q"$companion.unapply(t).get"
+          else q"Tuple1($companion.unapply(t).get)"
+        // We're fleshing this out a lot more than necessary to help
+        // scalac along with its implicit search, otherwise it gets
+        // confused and explodes
+
+        // Need to dropWhile to get rid of any `Tuple1` prefix
+        val res = q"""
           new PPrint[$tpe](
             ammonite.PPrinter
-                    .preMap((t: $tpe) => $companion.unapply(t).get)(
-                      new PPrint(PPrinter.$tupleName[..$paramTypes])
+                    .preMap((t: $tpe) => $thingy)(
+                      new PPrint(PPrinter.$tupleName, implicitly[PPrint.Config])
                     )
-                    .map(${tpe.typeSymbol.name.toString} + _)
+                    .map(${tpe.typeSymbol.name.toString} + _.dropWhile(_ != '(')),
+            implicitly[PPrint.Config]
           )
         """
+//        println(res)
+        res
 
       case _ =>
-        q"""new PPrint[$tpe](ammonite.PPrinter.make[$tpe](""+_))"""
+        q"""new PPrint[$tpe](
+           ammonite.PPrinter.make[$tpe](""+_),
+           implicitly[PPrint.Config]
+         )"""
     }
   }
 }

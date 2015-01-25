@@ -65,13 +65,11 @@ lazy val core = project.settings(sharedSettings:_*).settings(
       s"""
       implicit def Product${i}Repr[${boundedTypes}] = apply[$tupleType] {
         (t: $tupleType, c: Config) => {
-          def chunks(c: Config) = Seq(
-            ${chunks.mkString(",")}
-          )
+          def chunks(c: Config) = Seq(${chunks.mkString(",")})
           handleChunks(
-            c.rename(t.productPrefix),
+            t.productPrefix,
             chunks(c),
-            chunks(c.deeper),
+            () => chunks(c.deeper),
             c
           )
         }
@@ -91,6 +89,6 @@ lazy val core = project.settings(sharedSettings:_*).settings(
   },
   initialCommands in console := """
     import ammonite._
-    var wd = cwd
+    var wd = processWorkingDir
   """
 )

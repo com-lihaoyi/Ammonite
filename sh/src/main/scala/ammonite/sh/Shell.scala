@@ -74,19 +74,4 @@ object Shell{
   import scala.reflect.runtime.universe._
   def typeString[T: TypeTag](t: => T) = typeOf[T].toString
 
-  val validIdentifier = "([a-zA-Z_][a-zA-Z_0-9]+)".r
-  def reprSection(s: String) = {
-    if (validIdentifier.findFirstIn(s) == Some(s)){
-      ammonite.PPrint[scala.Symbol](Symbol(s))
-    }else{
-      ammonite.PPrint[String](s)
-    }
-  }
-  implicit val pathRepr = ammonite.PPrint.make[ammonite.Path]{p =>
-    ("root" +: p.segments.map(reprSection)).mkString("/")
-  }
-  implicit val relPathRepr = ammonite.PPrint.make[ammonite.RelPath]{p =>
-    if (p.segments.length == 1 && p.ups == 0) "empty/" + ammonite.PPrint(p.segments(0))
-    else (Seq.fill(p.ups)("up") ++ p.segments.map(reprSection)).mkString("/")
-  }
 }

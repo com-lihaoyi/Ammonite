@@ -66,6 +66,16 @@ object BasePath{
       case _ =>
     }
   }
+  def reprSection(s: String, cfg: PPrint.Config) = {
+    val validIdentifier = "([a-zA-Z_][a-zA-Z_0-9]+)".r
+    if (validIdentifier.findFirstIn(s) == Some(s)){
+      implicitly[ammonite.PPrinter[scala.Symbol]].render(Symbol(s), cfg)
+    }else{
+      implicitly[ammonite.PPrinter[String]].render(s, cfg)
+    }
+  }
+
+
 }
 object PathError{
   type IAE = IllegalArgumentException
@@ -133,6 +143,9 @@ object Path{
     def nio = java.nio.file.Paths.get(p.toString)
   }
 
+  implicit val pathRepr = ammonite.PPrinter.make2[ammonite.Path]{(p, c) =>
+    ("root" +: p.segments.map(BasePath.reprSection(_, c))).mkString("/")
+  }
 }
 
 /**
@@ -192,6 +205,11 @@ object RelPath extends RelPathStuff with (String => RelPath){
     def nio = java.nio.file.Paths.get(p.toString)
   }
 
+
+  implicit val relPathRepr = ammonite.PPrinter.make2[ammonite.RelPath]{(p, c) =>
+    if (p.segments.length == 1 && p.ups == 0) "empty/" + implicitly[PPrinter[String]].render(p.segments(0), c)
+    else (Seq.fill(p.ups)("up") ++ p.segments.map(BasePath.reprSection(_, c))).mkString("/")
+  }
 }
 sealed trait FileType
 object FileType{

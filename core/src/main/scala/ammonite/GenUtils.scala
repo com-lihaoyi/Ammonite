@@ -18,6 +18,6 @@ trait GenUtils{
   def apply[T](r: (T, Config) => String): PPer[T]
   def handleChunks(name0: String,
                    chunks: Traversable[String],
-                   chunks2: Traversable[String],
+                   chunks2: () => Traversable[String],
                    c: Config): String
 }

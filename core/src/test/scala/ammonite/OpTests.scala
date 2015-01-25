@@ -225,6 +225,7 @@ object OpTests extends TestSuite{
       }
     }
     'grep{
+      import Configs.default
       val items = Seq(123, 456, 789)
       items |? grep! "45"
       items |? grep! "^[123456]+$".r

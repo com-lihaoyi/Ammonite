@@ -7,7 +7,10 @@ import scala.collection.generic.{CanBuildFrom => CBF, GenericTraversableTemplate
 import scala.util.matching.Regex
 
 package object ammonite extends RelPathStuff{
-
+  object Configs{
+    implicit val default = PPrint.Config()
+    implicit val color = PPrint.Config(color=true)
+  }
   /**
    * Extends collections to give short aliases for the commonly
    * used operations, so we can make it easy to use from the

@@ -3,11 +3,11 @@ package ammonite
 import utest._
 
 import scala.collection.{immutable => imm}
-
+import ammonite.Configs.default
 case class Foo(integer: Int, sequence: Seq[String])
 case class FooG[T](t: T, sequence: Seq[String])
 object PPrintTests extends TestSuite{
-  def check[T: PPrint](t: T, expected: String)(implicit pc: PPrint.Config) = {
+  def check[T: PPrint](t: T, expected: String) = {
     val pprinted = PPrint(t)
     assert(pprinted == expected.trim)
   }
@@ -15,7 +15,7 @@ object PPrintTests extends TestSuite{
   val tests = TestSuite{
     'primitives{
       'Char{
-        * - check('\n', "'\\n'")(PPrint.Contra, implicitly)
+        * - check('\n', "'\\n'")
         * - check('a', "'a'")
       }
       'Byte{
@@ -61,10 +61,18 @@ object PPrintTests extends TestSuite{
       }
       'Either{
         check(Left(123): Either[Int, Int], "Left(123)")
-//        check(Left(123): Left[Int, Int], "Left(123)")
-//        check(Left(123), "Left(123)")
-      }
+        check(Left(123): Left[Int, Int], "Left(123)")
 
+        check(Left(123), "Left(123)")
+        check(Right((1, "2", 3)), """Right((1, "2", 3))""")
+      }
+      'Options{
+        check(Some(123), "Some(123)")
+        check(None: Option[Int], "None")
+        check(None: Option[Nothing], "None")
+        check(None, "None")
+        check(Some(None), "Some(None)")
+      }
     }
     'collections{
       'Array - check(Array(1, 2, 3), "Array(1, 2, 3)")
@@ -110,7 +118,8 @@ object PPrintTests extends TestSuite{
       )
     }
     'Vertical{
-      implicit def pc = ammonite.PPrint.Config(25)
+
+      implicit def default = ammonite.PPrint.Config(25)
       'singleNested {
         * - check(
           List("12", "12", "12"),
