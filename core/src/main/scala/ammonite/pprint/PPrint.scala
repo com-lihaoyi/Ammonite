@@ -78,11 +78,7 @@ object PPrinter {
     c.color.literal("'" + x.name)
   )
 
-  def make3[T](prefix: T => String)(f: Internals.Unpacker[T]): PPrinter[T] = PPrinter[T]{
-    (t: T, c: Config) =>
-      val rendered = Internals.handleChunks(prefix(t), f(t, _), c)
-      rendered
-  }
+  
 
   /**
    * Escapes a string to turn it back into a string literal
@@ -124,16 +120,22 @@ object PPrinter {
 }
 
 object Internals {
-  def makeMapRepr[M[T, V] <: Map[T, V], T: PPrint, V: PPrint](name: String) = PPrinter[M[T, V]] {
-    def repr(implicit c: Config) = collectionRepr[(T, V), Iterable[(T, V)]](name) {
-      val pprinter = PPrinter[(T, V)] { case ((t, v), _) =>
-        implicitly[PPrint[T]].render(t, c) + " -> " + implicitly[PPrint[V]].render(v, c)
-      }
-      new PPrint(pprinter, c)
+  def mapEntryPrinter[T: PPrint, V: PPrint] = PPrinter[(T, V)] { case ((t, v), c) =>
+    def chunk(c: Config) =
+      implicitly[PPrint[T]].render(t, c) + " -> " + implicitly[PPrint[V]].render(v, c)
+    val txt = chunk(c)
+    if (txt.length < c.depth) txt
+    else {
+      chunk(c)
     }
-    (t: M[T, V], c: Config) => {
-      val x = t.toIterable
-      repr(c).render(x, c)
+  }
+  def makeMapRepr[M[T, V] <: Map[T, V], T: PPrint, V: PPrint](name: String) = {
+    PPrinter[M[T, V]] { (t: M[T, V], c: Config) =>
+      handleChunks(
+        name,
+        c => t.map(mapEntryPrinter[T, V].render(_, c)),
+        c
+      )
     }
   }
 
@@ -194,6 +196,12 @@ object Internals {
     implicit def FinalRepr[T]: PPrint[T] = macro LowerPriPPrint.FinalRepr[T]
   }
 
+  def fromUnpacker[T](prefix: T => String)(f: Internals.Unpacker[T]): PPrinter[T] = PPrinter[T]{
+    (t: T, c: Config) =>
+      val rendered = Internals.handleChunks(prefix(t), f(t, _), c)
+      rendered
+  }
+
   object LowerPriPPrint {
     def FinalRepr[T: c.WeakTypeTag](c: scala.reflect.macros.blackbox.Context) = c.Expr[PPrint[T]] {
       import c.universe._
@@ -241,9 +249,9 @@ object Internals {
           // confused and explodes
 
           // Need to dropWhile to get rid of any `Tuple1` prefix
-          val res = q"""
+          q"""
             new ammonite.pprint.PPrint[$tpe](
-              ammonite.pprint.PPrinter.make3[$tpe](_.productPrefix){
+              ammonite.pprint.Internals.fromUnpacker[$tpe](_.productPrefix){
                 (t: $tpe, cfg: Config) =>
                   ammonite.pprint
                           .Internals
@@ -251,11 +259,9 @@ object Internals {
                           .$tupleName[..$paramTypes]
                           .apply($thingy, cfg)
               },
-              implicitly[Config]
+              implicitly[ammonite.pprint.Config]
             )
           """
-          //        println(res)
-          res
 
         case _ =>
           q"""new PPrint[$tpe](

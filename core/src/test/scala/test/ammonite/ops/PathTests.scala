@@ -131,8 +131,8 @@ object PathTests extends TestSuite{
         'Invalid{
           compileError("""root/'omg/'wtf < 'omg/'wtf""")
           compileError("""root/'omg/'wtf > 'omg/'wtf""")
-          compileError("""omg/'wtf < root/''omg/'wtf""")
-          compileError("""omg/'wtf > root/''omg/'wtf""")
+          compileError("""'omg/'wtf < root/'omg/'wtf""")
+          compileError("""'omg/'wtf > root/'omg/'wtf""")
         }
       }
     }

@@ -145,6 +145,58 @@ object PPrintTests extends TestSuite{
             |)""".stripMargin
         )
         * - check(
+          Map(1 -> 2, 3 -> 4),
+          """Map(1 -> 2, 3 -> 4)"""
+        )
+        * - check(
+          Map(List(1, 2) -> List(3, 4), List(5, 6) -> List(7, 8)),
+          """Map(
+            |  List(1, 2) -> List(3, 4),
+            |  List(5, 6) -> List(7, 8)
+            |)""".stripMargin
+        )
+
+        * - check(
+          Map(
+            List(123, 456, 789, 123, 456) -> List(3, 4, 3, 4),
+            List(5, 6) -> List(7, 8)
+          ),
+          """Map(
+            |  List(
+            |    123,
+            |    456,
+            |    789,
+            |    123,
+            |    456
+            |  ) -> List(3, 4, 3, 4),
+            |  List(5, 6) -> List(7, 8)
+            |)""".stripMargin
+        )
+
+        * - check(
+          Map(
+            List(5, 6) -> List(7, 8),
+            List(123, 456, 789, 123, 456) -> List(123, 456, 789, 123, 456)
+          ),
+          """Map(
+            |  List(5, 6) -> List(7, 8),
+            |  List(
+            |    123,
+            |    456,
+            |    789,
+            |    123,
+            |    456
+            |  ) -> List(
+            |    123,
+            |    456,
+            |    789,
+            |    123,
+            |    456
+            |  )
+            |)""".stripMargin
+        )
+
+        * - check(
           List("12345", "12345", "12345"),
           """List(
             |  "12345",
