@@ -51,16 +51,16 @@ lazy val core = project.settings(sharedSettings:_*).settings(
         s"implicitly[PPrint[T$n]].render(t._$n, c)"
       }
       val commaTs = ts.mkString(", ")
-      val tupleType = s"Tuple$i[$commaTs]"
-      val name = if(i == 1) "Tuple1" else ""
+      val tupleType = s"Product$i[$commaTs]"
+
       s"""
-      implicit def Tuple${i}Repr[${ts.map(_ + ": PPrint").mkString(",")}]: PPrint[$tupleType] = new PPrint[$tupleType] {
+      implicit def Product${i}Repr[${ts.map(_ + ": PPrint").mkString(",")}] = new PPrint[$tupleType] {
         def render(t: $tupleType, c: PConfig): String = {
           def chunks(c: PConfig) = Seq(
             ${chunks.mkString(",")}
           )
           PPrint.handleChunks(
-            "$name",
+            PConfig.defaultRenames.getOrElse(t.productPrefix, t.productPrefix),
             chunks(c),
             chunks(c.copy(depth = c.depth + 1)),
             c

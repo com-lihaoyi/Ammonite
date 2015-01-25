@@ -52,31 +52,39 @@ object PPrintTests extends TestSuite{
 
     'collections{
       'Array - check(Array(1, 2, 3), "Array(1, 2, 3)")
-      'Seq - check(Seq(1, 2, 3), "Seq(1, 2, 3)")
+      'Seq - check(Seq(1, 2, 3), "List(1, 2, 3)")
       'List - check(List("1", "2", "3"), """List("1", "2", "3")""")
       'Vector - check(Vector('omg, 'wtf, 'bbq), """Vector('omg, 'wtf, 'bbq)""")
       'Stream - check(Stream('omg, 'wtf, 'bbq), """Stream('omg, 'wtf, 'bbq)""")
-      'Iterable - check(Iterable('omg, 'wtf, 'bbq), """Iterable('omg, 'wtf, 'bbq)""")
-      'Traversable - check(Traversable('omg, 'wtf, 'bbq), """Traversable('omg, 'wtf, 'bbq)""")
+      'Iterable - check(Iterable('omg, 'wtf, 'bbq), """List('omg, 'wtf, 'bbq)""")
+      'Traversable - check(Traversable('omg, 'wtf, 'bbq), """List('omg, 'wtf, 'bbq)""")
       'Set - check(Set('omg), """Set('omg)""")
       'SortedSet- check(
         imm.SortedSet("1", "2", "3"),
-        """immutable.SortedSet("1", "2", "3")"""
+        """TreeSet("1", "2", "3")"""
       )
-      'Map - check(Map("key" -> "value"), """Map("key" -> "value")""")
+      'Map{
+        check(Map("key" -> "value"), """Map("key" -> "value")""")
+      }
+
       'SortedMap - check(
         imm.SortedMap("key" -> "v", "key2" -> "v2"),
-        """immutable.SortedMap("key" -> "v", "key2" -> "v2")"""
+        """Map("key" -> "v", "key2" -> "v2")"""
       )
     }
 
     'tuples{
+
       check(Tuple1("123"), """Tuple1("123")""")
       check((1, 2, "123"), """(1, 2, "123")""")
       check(
         (1, 2, "123", (100L, 200L), 1.5F, 0.1),
         """(1, 2, "123", (100L, 200L), 1.5F, 0.1)"""
       )
+    }
+    'products{
+//      case class Foo(integer: Int, sequence: Seq[String])
+//      check(Foo(123, Seq("hello world", "moo")), """Foo(123, Seq("hello world", "moo"))""")
     }
     'Vertical{
       implicit def pc = ammonite.PConfig(25)
@@ -111,22 +119,22 @@ object PPrintTests extends TestSuite{
         * - check(
           List(Seq("omg", "omg"), Seq("mgg", "mgg"), Seq("ggx", "ggx")),
           """List(
-            |  Seq("omg", "omg"),
-            |  Seq("mgg", "mgg"),
-            |  Seq("ggx", "ggx")
+            |  List("omg", "omg"),
+            |  List("mgg", "mgg"),
+            |  List("ggx", "ggx")
             |)""".stripMargin
         )
         * - check(
           List(Seq("omg", "omg", "omg", "omg"), Seq("mgg", "mgg"), Seq("ggx", "ggx")),
           """List(
-            |  Seq(
+            |  List(
             |    "omg",
             |    "omg",
             |    "omg",
             |    "omg"
             |  ),
-            |  Seq("mgg", "mgg"),
-            |  Seq("ggx", "ggx")
+            |  List("mgg", "mgg"),
+            |  List("ggx", "ggx")
             |)""".stripMargin
         )
         * - check(
@@ -141,17 +149,17 @@ object PPrintTests extends TestSuite{
             )
           ),
           """List(
-            |  Seq(
-            |    Seq(
+            |  List(
+            |    List(
             |      "mgg",
             |      "mgg",
             |      "lols"
             |    ),
-            |    Seq("mgg", "mgg")
+            |    List("mgg", "mgg")
             |  ),
-            |  Seq(
-            |    Seq("ggx", "ggx"),
-            |    Seq(
+            |  List(
+            |    List("ggx", "ggx"),
+            |    List(
             |      "ggx",
             |      "ggx",
             |      "wtfx"
