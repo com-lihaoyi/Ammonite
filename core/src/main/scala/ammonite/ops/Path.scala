@@ -71,6 +71,7 @@ trait BasePath[ThisType <: BasePath[ThisType]]{
    */
   def -(base: ThisType): RelPath
 
+
   /**
    * Gives you the file extension of this path, or the empty
    * string if there is no extension
@@ -137,16 +138,12 @@ class RelPath(val segments: Seq[String], val ups: Int) extends BasePath[RelPath]
 trait RelPathStuff{
   val up = new RelPath(Nil, 1)
   val empty = new RelPath(Nil, 0)
-  implicit def SymPath(s: Symbol): RelPath = StringPath(s.name)
-  implicit def StringPath(s: String): RelPath = {
-    BasePath.checkSegment(s)
-    new RelPath(Seq(s), 0)
-
+  implicit class RelPathStart(p1: String){
+    def /(p2: RelPath) = RelPath.rel/p1/p2
   }
-  implicit def SeqPath[T](s: Seq[T])(implicit conv: T => RelPath): RelPath = {
-    s.foldLeft(empty){_ / _}
+  implicit class RelPathStart2(p1: Symbol){
+    def /(p2: RelPath) = RelPath.rel/p1/p2
   }
-  implicit def ArrayPath[T](s: Array[T])(implicit conv: T => RelPath): RelPath = SeqPath(s)
 }
 object RelPath extends RelPathStuff with (String => RelPath){
   val rel = new RelPath(Nil, 0)
@@ -158,6 +155,17 @@ object RelPath extends RelPathStuff with (String => RelPath){
     def nio = java.nio.file.Paths.get(p.toString)
   }
 
+  implicit def SymPath(s: Symbol): RelPath = StringPath(s.name)
+  implicit def StringPath(s: String): RelPath = {
+    BasePath.checkSegment(s)
+    new RelPath(Seq(s), 0)
+
+  }
+  implicit def SeqPath[T](s: Seq[T])(implicit conv: T => RelPath): RelPath = {
+    s.foldLeft(empty){_ / _}
+  }
+
+  implicit def ArrayPath[T](s: Array[T])(implicit conv: T => RelPath): RelPath = SeqPath(s)
 
   implicit val relPathRepr = pprint.PPrinter[ammonite.ops.RelPath]{(p, c) =>
     if (p.segments.length == 1 && p.ups == 0) "empty/" + implicitly[pprint.PPrinter[String]].render(p.segments(0), c)

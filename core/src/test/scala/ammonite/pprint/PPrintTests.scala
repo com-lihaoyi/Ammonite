@@ -261,6 +261,11 @@ object PPrintTests extends TestSuite{
         PPrint(Map(1 -> Nil, 2 -> Seq(" "), 3 -> Seq("   "))),
         GREEN -> 5, YELLOW -> 4, RESET -> 9
       )
-     }
+    }
+    'Negative{
+      // Make sure we're not polluting too much
+      compileError("""'omg.ext""")
+      compileError(""" "omg".ext """)
+    }
   }
 }
