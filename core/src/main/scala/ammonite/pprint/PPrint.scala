@@ -121,27 +121,21 @@ object PPrinter {
 
 object Internals {
   def mapEntryPrinter[T: PPrint, V: PPrint] = PPrinter[(T, V)] { case ((t, v), c) =>
-    def chunk(c: Config) =
-      implicitly[PPrint[T]].render(t, c) + " -> " + implicitly[PPrint[V]].render(v, c)
-    val txt = chunk(c)
-    if (txt.length < c.depth) txt
-    else {
-      chunk(c)
-    }
+    implicitly[PPrint[T]].render(t, c) + " -> " + implicitly[PPrint[V]].render(v, c)
   }
   def makeMapRepr[M[T, V] <: Map[T, V], T: PPrint, V: PPrint](name: String) = {
     PPrinter[M[T, V]] { (t: M[T, V], c: Config) =>
-      handleChunks(
-        name,
-        c => t.map(mapEntryPrinter[T, V].render(_, c)),
-        c
+      handleChunks(name, c, c =>
+        t.map(mapEntryPrinter[T, V].render(_, c))
       )
     }
   }
 
   def collectionRepr[T: PPrint, V <: Traversable[T]](name0: String): PPrinter[V] = PPrinter[V] {
     (i: V, c: Config) => {
-      handleChunks(i.stringPrefix, (c: Config) => i.map(implicitly[PPrint[T]].render(_, c)), c)
+      handleChunks(i.stringPrefix, c,
+        c => i.map(implicitly[PPrint[T]].render(_, c))
+      )
     }
   }
 
@@ -162,14 +156,14 @@ object Internals {
    * decide whether to go vertical or horiozontal
    */
   def handleChunks(name: String,
-                   chunkFunc: Config => Traversable[String],
-                   c: Config): String = {
+                   c: Config,
+                   chunkFunc: Config => Traversable[String]): String = {
     val chunks = chunkFunc(c)
     val renamed = c.rename(name)
     val totalLength = renamed.length + chunks.map(_.length + 2).sum
     val coloredName = c.color.prefix(renamed)
 
-    if (totalLength <= c.maxDepth - c.depth && !chunks.exists(_.contains('\n'))) {
+    if (totalLength <= c.maxWidth - (c.depth * c.indent) && !chunks.exists(_.contains('\n'))) {
       coloredName + "(" + chunks.mkString(", ") + ")"
     } else {
       val chunks2 = chunkFunc(c.deeper)
@@ -198,7 +192,7 @@ object Internals {
 
   def fromUnpacker[T](prefix: T => String)(f: Internals.Unpacker[T]): PPrinter[T] = PPrinter[T]{
     (t: T, c: Config) =>
-      val rendered = Internals.handleChunks(prefix(t), f(t, _), c)
+      val rendered = Internals.handleChunks(prefix(t), c, f(t, _))
       rendered
   }
 

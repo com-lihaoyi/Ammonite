@@ -5,15 +5,16 @@ import acyclic.file
  * Configuration options to control how prettyprinting occurs, passed
  * recursively into each prettyprinting callsite.
  *
- * @param maxDepth Controls how far to the right a line will go before
+ * @param maxWidth Controls how far to the right a line will go before
  *                 it tries to wrap
  * @param depth How much the current item being printed should be indented
  * @param renames A map used to rename things to more common names, e.g.
  *                renamig `WrappedArray` to `Array` or getting rid of
  *                TupleN *
  */
-case class Config(maxDepth: Int = 100,
+case class Config(maxWidth: Int = 100,
                   depth: Int = 0,
+                  indent: Int = 2,
                   literalColor: String = null,
                   prefixColor: String = null,
                   renames: Map[String, String] = Config.defaultRenames)

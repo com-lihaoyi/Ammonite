@@ -278,7 +278,9 @@ object PPrintTests extends TestSuite{
           """FooG(
             |  List(
             |    FooG(
-            |      List(Foo(123, List())),
+            |      List(
+            |        Foo(123, List())
+            |      ),
             |      List()
             |    )
             |  ),
@@ -287,10 +289,10 @@ object PPrintTests extends TestSuite{
           """.stripMargin
         )
         * - check(
-          FooG(FooG(Seq(Foo(123, Nil)), Nil), Nil),
+          FooG(FooG(Seq(Foo(3, Nil)), Nil), Nil),
           """FooG(
             |  FooG(
-            |    List(Foo(123, List())),
+            |    List(Foo(3, List())),
             |    List()
             |  ),
             |  List()
