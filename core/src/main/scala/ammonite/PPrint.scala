@@ -23,7 +23,7 @@ object PConfig{
  * if you don't know what to do with it. Generally used for human-facing
  * output
  */
-object PPrint extends PPrintGen  with SpecificLow{
+object PPrint extends SpecificLow{
 
   def apply[T: PPrint](t: T)(implicit c: PConfig): String = {
     implicitly[PPrint[T]].render(t, c)
@@ -32,14 +32,14 @@ object PPrint extends PPrintGen  with SpecificLow{
   implicit def Cov[A](implicit ca: PPrintCov[A]): PPrint[A] = PPrint(ca.selff)
 }
 
-trait PPrintContra[-A] extends PPrintCov[A @uncheckedVariance] with PPrintInv[A @uncheckedVariance] {
+trait PPrintContra[-A] extends PPrintCov[A @uncheckedVariance] {
   def render(t: A, c: PConfig): String
 
   def map(f: String => String): (PPrintContra[A] @uncheckedVariance) = PPrintContra {
     (t: A, c: PConfig) => f(render(t, c))
   }
 }
-object PPrintContra{
+object PPrintContra extends PPrintGen{
   def apply[T](r: (T, PConfig) => String): PPrintContra[T] = {
     new PPrintContra[T]{def render(t: T, c: PConfig)= r(t, c)}
   }
@@ -141,7 +141,6 @@ object PPrintContra{
     (t: T, c: PConfig) => implicitly[PPrint[V]].render(f(t), c)
   }
 }
-trait PPrintInv[A] { self: PPrintContra[A @uncheckedVariance] => }
 trait PPrintCov[+A] { self: PPrintContra[A @uncheckedVariance] => val selff = self }
 
 case class PPrint[A](a: PPrintContra[A]){
@@ -165,24 +164,23 @@ object LowPriPrint{
     import c.universe._
     import c._
     val tpe = c.weakTypeOf[T]
-//    println(c.weakTypeOf[T].typeSymbol)
     util.Try(c.weakTypeOf[T].typeSymbol.asClass) match {
-//      case util.Success(f) if f.isCaseClass =>
-//
-//        val arity =
-//          tpe.member(newTermName("<init>"))
-//             .typeSignature
-//             .paramLists
-//             .flatten
-//             .length
-//
-//        val companion = tpe.typeSymbol.companion
-//
-//        q"""
-//          ammonite.PPrint.preMap((t: $tpe) => $companion.unapply(t).get).map(
-//            ${tpe.typeSymbol.name.toString} + _
-//          )
-//        """
+      case util.Success(f) if f.isCaseClass =>
+
+        val arity =
+          tpe.member(newTermName("<init>"))
+             .typeSignature
+             .paramLists
+             .flatten
+             .length
+
+        val companion = tpe.typeSymbol.companion
+
+        q"""
+          PPrint(ammonite.PPrintContra.preMap((t: $tpe) => $companion.unapply(t).get).map(
+            ${tpe.typeSymbol.name.toString} + _
+          ))
+        """
 
       case _ =>
         q"""PPrint(ammonite.PPrintContra.make[$tpe](""+_))"""
