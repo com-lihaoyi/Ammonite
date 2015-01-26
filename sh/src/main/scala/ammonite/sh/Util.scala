@@ -59,3 +59,7 @@ case class Catching(handler: PartialFunction[Throwable, String]) {
   def map[T](t: Unit => T): Result[T] =
     try Result.Success(t(())) catch handler.andThen(Result.Failure)
 }
+
+case class Evaluated(msg: String,
+                     wrapper: String,
+                     imports: Seq[(String, String)])

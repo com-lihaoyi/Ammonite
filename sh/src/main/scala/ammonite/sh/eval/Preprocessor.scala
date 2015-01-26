@@ -61,8 +61,8 @@ class Preprocessor{
   }
   def DefProcessor(cond: Recognizer => util.Try[_], definitionLabel: String) =
     Processor(cond){ (name, code) => (
-      getIdent(code),
-      s"import $$$name._",
+      "",
+      "",
       standardBlob(name, code, definedStr(definitionLabel, getIdent(code)))
     )}
   val ObjectDef = DefProcessor(_.ObjectDefX.run(), "object")
@@ -71,13 +71,14 @@ class Preprocessor{
   val DefDef = DefProcessor(_.DefDef.run(), "function")
   val TypeDef = DefProcessor(_.TypeDefX.run(), "type")
   val PatVarDef = Processor(_.PatVarDefX.run()){ (name, code) =>
-    (getIdent(code), s"import $$$name._", standardBlob(name, code,
+    ("", "", standardBlob(name, code,
       if (!code.trim.startsWith("lazy")) pprint(getIdent(code))
       else pprintSignature(getIdent(code)) + s""" + " = <lazy>" """
     ))
   }
+
   val Expr = Processor(_.Expr.run()){ (name, code) =>
-    (name, s"import $$$name._", standardBlob(name, s"val $name = " + code, pprint(name)))
+    ("", "", standardBlob(name, s"val $name = " + code, pprint(name)))
   }
   val Import = Processor(_.Import.run()){ (name, code) =>
     (code, code, s"""object $$$name{def $$main() = "$code"}""")

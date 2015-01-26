@@ -12,7 +12,7 @@ import scala.collection.mutable
 import scala.reflect.io.VirtualDirectory
 import scala.util.Try
 
-class Shell(){
+class Shell() extends ShellAPIs{
   val dynamicClasspath = new VirtualDirectory("(memory)", None)
   val compiler = new Compiler(dynamicClasspath)
   val mainThread = Thread.currentThread()
@@ -26,7 +26,18 @@ class Shell(){
     compiler.compile
   )
 
-  def action(reader: ConsoleReader): Result[(String, String, String)] = for {
+  val cls = eval.evalClass("""
+    object Shell extends ammonite.sh.ShellAPIHolder
+  """, "Shell") match{
+    case Result.Success(e) => e
+  }
+
+  cls.asInstanceOf[Class[ShellAPIHolder]]
+    .getDeclaredMethods
+    .find(_.getName.contains('$'))
+    .get
+    .invoke(null, this)
+  def action(reader: ConsoleReader): Result[Evaluated] = for {
     _ <- Signaller("INT", () => println("Ctrl-D to Exit"))
 
     _ <- Catching { case x: Throwable =>
@@ -54,8 +65,8 @@ class Shell(){
       eval.update(r)
       r match{
         case Result.Exit => reader.println("Bye!")
-        case Result.Success((msg, importKeys, imports)) =>
-          reader.println(msg)
+        case Result.Success(ev) =>
+          reader.println(ev.msg)
           loop()
         case Result.Failure(msg) =>
           reader.println(Console.RED + msg + Console.RESET)
@@ -64,6 +75,12 @@ class Shell(){
     }
     loop()
   }
+
+  override def exit: Unit = ()
+
+  override def help: String = "Hello!"
+
+  override def history: Seq[String] = Seq("1")
 }
 
 object Shell{
@@ -72,6 +89,6 @@ object Shell{
     shell.run(System.in, System.out)
   }
   import scala.reflect.runtime.universe._
-  def typeString[T: TypeTag](t: => T) = typeOf[T].toString
+  def typeString[T: WeakTypeTag](t: => T) = weakTypeOf[T].toString
 
 }

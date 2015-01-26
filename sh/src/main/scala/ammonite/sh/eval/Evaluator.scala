@@ -3,8 +3,8 @@ package ammonite.sh.eval
 import java.lang.reflect.InvocationTargetException
 
 import acyclic.file
-import ammonite.sh.{Result, Catching}
-
+import ammonite.sh.{ShellAPIs, Evaluated, Result, Catching}
+import scala.reflect.runtime.universe._
 import scala.collection.mutable
 import scala.util.Try
 
@@ -17,6 +17,12 @@ import scala.util.Try
 class Evaluator(currentClassloader: ClassLoader,
                 preprocess: (String, Int) => Option[(String, String, String)],
                 compile: (Array[Byte], String => Unit) => Compiler.Output) {
+
+  def namesFor(t: scala.reflect.runtime.universe.Type): Set[String] = {
+    val yours = t.members.map(_.name.toString).toSet
+    val default = typeOf[Object].members.map(_.name.toString)
+    yours -- default
+  }
 
   /**
    * Files which have been compiled, stored so that our special 
@@ -31,8 +37,9 @@ class Evaluator(currentClassloader: ClassLoader,
    * errors instead of the desired shadowing.
    */
   val previousImports = mutable.Map(
-    "PPrintConfig" -> "import ammonite.pprint.Config.Defaults.PPrintConfig"
-  )
+    "PPrintConfig" -> "import ammonite.pprint.Config.Colors.PPrintConfig"
+  ) ++ namesFor(typeOf[ShellAPIs]).map(n => n -> s"import Shell.$n")
+
   /**
    * The current line number of the REPL, used to make sure every snippet
    * evaluated can have a distinct name that doesn't collide.
@@ -49,28 +56,27 @@ class Evaluator(currentClassloader: ClassLoader,
     }
   }
 
-  def processLine(line: String) = for {
-    (importKey, imports, wrapped) <- Result(
-      preprocess(line, currentLine),
-      "Don't recognize that input =/"
-    )
-
-    wrappedWithImports = previousImports.toSeq.sortBy(_._1).map(_._2).mkString("\n") + "\n\n" + wrapped
-
+  def evalClass(code: String, wrapperName: String): Result[Class[_]] = for{
     compiled <- Result(Try(
-      compile(wrappedWithImports.getBytes, println)
+      compile(code.getBytes, println)
     ), e => {println("!!!! " + e.printStackTrace()); e.toString})
 
-    classFiles <- Result(compiled, "Compilation Failed")
+    classFiles <- Result[Traversable[(String, Array[Byte])]](compiled, "Compilation Failed")
 
-    (cls, method) <- Result(Try {
+    cls <- Result[Class[_]](Try {
       for ((name, bytes) <- classFiles) {
         newFileDict(name) = bytes
       }
 
-      val cls = Class.forName("$res" + currentLine, true, evalClassloader)
-      (cls, cls.getDeclaredMethod("$main"))
+      Class.forName(wrapperName , true, evalClassloader)
     }, e => "Failed to load compiled class " + e)
+  } yield cls
+
+  def evalMain(code: String, wrapperName: String) = for{
+
+    cls <- evalClass(code, wrapperName)
+
+    method = cls.getDeclaredMethod("$main")
 
     _ <- Catching{
       case ex: InvocationTargetException
@@ -87,13 +93,49 @@ class Evaluator(currentClassloader: ClassLoader,
         if ex.getCause.isInstanceOf[ThreadDeath]  =>
         "\nInterrupted!"
     }
-  } yield (method.invoke(null) + "", importKey, imports)
+  } yield method.invoke(null)
 
-  def update(res: Result[(String, String, String)]) = res match {
-    case Result.Success((msg, importKey, imports)) =>
-      previousImports(importKey) = imports
+  var evalId = 0
+
+  def evalExpr(code: String) = {
+    val wrapperId = "$eval" + evalId
+    evalId += 1
+    evalMain(s"""
+      object $wrapperId{
+        def $$main() = {
+          $code
+        }
+      }""",
+      wrapperId
+    )
+  }
+
+  def processLine(line: String) = for {
+    (importKey, imports, wrapped) <- Result(
+      preprocess(line, currentLine),
+      "Don't recognize that input =/"
+    )
+
+    wrapperName = "$res" + currentLine
+
+    wrappedWithImports = previousImports.toSeq.sortBy(_._1).map(_._2).mkString("\n") + "\n\n" + wrapped
+    evaled <- evalMain(wrappedWithImports, wrapperName)
+
+  } yield Evaluated(evaled + "", wrapperName , Seq(importKey -> imports))
+
+  def update(res: Result[Evaluated]) = res match {
+    case Result.Success(ev) =>
+      val names = evalExpr(
+        s"scala.reflect.runtime.universe.typeOf[${ev.wrapper}.type]"
+      ) match{
+        case Result.Success(e: Type) => namesFor(e)
+      }
+      for(name <- names){
+        previousImports(name) = s"import ${ev.wrapper}.${name}"
+      }
       currentLine += 1
     case Result.Failure(msg) =>
       currentLine += 1
   }
 }
+

@@ -4,6 +4,7 @@ import ammonite.sh.eval
 import ammonite.sh.eval.{Evaluator, Compiler, Preprocessor}
 import utest._
 
+import scala.collection.mutable
 import scala.reflect.io.VirtualDirectory
 
 /**
@@ -22,10 +23,14 @@ class Checker {
     Thread.currentThread().getContextClassLoader,
     preprocess.apply,
     compiler.compile
-  )
+  ){
+    override val previousImports = mutable.Map(
+      "PPrintConfig" -> "import ammonite.pprint.Config.Defaults.PPrintConfig"
+    )
+  }
   def apply(input: String, expected: String = null) = {
     val processed = eval.processLine(input)
-    val printed = processed.map{case (out, importKeys, imports) => out}
+    val printed = processed.map(_.msg)
     if (expected != null)
       assert(printed == Result.Success(expected.trim))
     eval.update(processed)

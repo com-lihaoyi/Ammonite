@@ -197,7 +197,6 @@ object Internals {
   object LowerPriPPrint {
     def FinalRepr[T: c.WeakTypeTag](c: scala.reflect.macros.blackbox.Context) = c.Expr[PPrint[T]] {
       import c.universe._
-      println("LowerPriPPrint.FinalRepr " + weakTypeOf[T])
 
       val tpe = c.weakTypeOf[T]
       util.Try(c.weakTypeOf[T].typeSymbol.asClass) match {

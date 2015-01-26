@@ -5,6 +5,7 @@ import acyclic.file
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.reflect.internal.util.Position
 import scala.reflect.io
 import scala.reflect.io._
 import scala.tools.nsc
@@ -12,9 +13,10 @@ import scala.tools.nsc.Settings
 import scala.tools.nsc.backend.JavaPlatform
 import scala.tools.nsc.interactive.{InteractiveAnalyzer, Response}
 import scala.tools.nsc.io.AbstractFile
-import scala.tools.nsc.reporters.ConsoleReporter
+import scala.tools.nsc.reporters.{AbstractReporter, Reporter, ConsoleReporter}
 import scala.tools.nsc.typechecker.Analyzer
 import scala.tools.nsc.util.ClassPath.JavaContext
+import scala.tools.nsc.util.Position
 import scala.tools.nsc.util._
 
 object Compiler{
@@ -77,13 +79,14 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
   }
 
   def compile(src: Array[Byte], logger: String => Unit = _ => ()): Output = {
+    compiler.reporter.reset()
     currentLogger = logger
     val singleFile = makeFile( src)
 
     val run = new compiler.Run()
+    vd.clear()
     run.compileFiles(List(singleFile))
-
-    if (vd.iterator.isEmpty) None
+    if (reporter.hasErrors) None
     else Some{
       for{
         x <- vd.iterator.to[collection.immutable.Traversable]
@@ -105,6 +108,7 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
   def initGlobalBits(logger: => String => Unit)= {
     val vd = new io.VirtualDirectory("(memory)", None)
     lazy val settings = new Settings
+    val settingsX = settings
     val jCtx = new JavaContext()
     val jDirs = Classpath.jarDeps.map(x =>
       new DirectoryClassPath(new FileZipArchive(x), jCtx)
@@ -113,18 +117,21 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
     ) ++ Seq(new DirectoryClassPath(dynamicClasspath, jCtx))
 
     settings.outputDirs.setSingleOutput(vd)
-    val writer = new Writer{
-      var inner = mutable.Buffer[Array[Char]]()
-      def write(cbuf: Array[Char], off: Int, len: Int): Unit = {
-        inner += cbuf.slice(off, off + len)
+
+    val reporter = new AbstractReporter {
+      def displayPrompt(): Unit = ???
+
+      def display(pos: Position, msg: String, severity: Severity) = {
+        severity match{
+          case ERROR => logger(
+            scala.Console.RED + Position.formatMessage(pos, msg, false) + scala.Console.RESET
+          )
+          case _ => logger(msg)
+        }
       }
-      def flush(): Unit = {
-        logger(inner.flatten.mkString)
-        inner = mutable.Buffer[Array[Char]]()
-      }
-      def close(): Unit = ()
+
+      val settings = settingsX
     }
-    val reporter = new ConsoleReporter(settings, scala.Console.in, new PrintWriter(writer))
     (settings, reporter, vd, jCtx, jDirs)
   }
 //
