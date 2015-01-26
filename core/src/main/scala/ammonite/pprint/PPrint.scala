@@ -78,8 +78,6 @@ object PPrinter {
     c.color.literal("'" + x.name)
   )
 
-  
-
   /**
    * Escapes a string to turn it back into a string literal
    */
@@ -197,8 +195,9 @@ object Internals {
   }
 
   object LowerPriPPrint {
-    def FinalRepr[T: c.WeakTypeTag](c: scala.reflect.macros.Context) = c.Expr[PPrint[T]] {
+    def FinalRepr[T: c.WeakTypeTag](c: scala.reflect.macros.blackbox.Context) = c.Expr[PPrint[T]] {
       import c.universe._
+      println("LowerPriPPrint.FinalRepr " + weakTypeOf[T])
 
       val tpe = c.weakTypeOf[T]
       util.Try(c.weakTypeOf[T].typeSymbol.asClass) match {
@@ -221,7 +220,7 @@ object Internals {
 
           import compat._
           val implicits =
-            paramTypes map (t =>
+            paramTypes.map(t =>
               c.inferImplicitValue(
                 typeOf[PPrint[Int]] match {
                   case TypeRef(pre, tpe, args) =>
@@ -231,9 +230,10 @@ object Internals {
             )
 
           val tupleName = newTermName(s"Product${arity}Unpacker")
-          val thingy =
-            if (arity > 1) q"$companion.unapply(t).get"
-            else q"Tuple1($companion.unapply(t).get)"
+          val thingy ={
+            val get = q"$companion.unapply(t).get"
+            if (arity > 1) get else q"Tuple1($get)"
+          }
           // We're fleshing this out a lot more than necessary to help
           // scalac along with its implicit search, otherwise it gets
           // confused and explodes
@@ -254,7 +254,7 @@ object Internals {
           """
 
         case _ =>
-          q"""new PPrint[$tpe](
+          q"""new ammonite.pprint.PPrint[$tpe](
             ammonite.pprint.PPrinter.Literal,
             implicitly[ammonite.pprint.Config]
           )"""

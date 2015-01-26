@@ -1,8 +1,9 @@
 package ammonite.sh
 
-import ammonite.sh.eval.{Compiler, Evaluator, Preprocessor}
-import ammonite.sh.{Result, PPrint.Config, PPrint}
+import ammonite.pprint.Config.Defaults._
+import ammonite.pprint.PPrint
 import utest._
+
 
 import scala.collection.{immutable => imm}
 import scala.reflect.io.VirtualDirectory

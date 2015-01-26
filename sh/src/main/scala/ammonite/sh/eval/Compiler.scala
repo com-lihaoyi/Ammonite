@@ -10,9 +10,10 @@ import scala.reflect.io._
 import scala.tools.nsc
 import scala.tools.nsc.Settings
 import scala.tools.nsc.backend.JavaPlatform
-import scala.tools.nsc.interactive.Response
+import scala.tools.nsc.interactive.{InteractiveAnalyzer, Response}
 import scala.tools.nsc.io.AbstractFile
 import scala.tools.nsc.reporters.ConsoleReporter
+import scala.tools.nsc.typechecker.Analyzer
 import scala.tools.nsc.util.ClassPath.JavaContext
 import scala.tools.nsc.util._
 
@@ -50,24 +51,34 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
     Future { func(r) ; r.get.left.get }
   }
 
-  trait InMemoryGlobal { g: scala.tools.nsc.Global =>
-    def ctx: JavaContext
-    def dirs: IndexedSeq[ClassPath[AbstractFile]]
-    override def classPath = new JavaClassPath(dirs, ctx)
+  var currentLogger: String => Unit = s => ()
+  val (settings, reporter, vd, jCtx, jDirs) = initGlobalBits(currentLogger)
+
+  val compiler = new nsc.Global(settings, reporter) { g =>
+
+    val jcp = new JavaClassPath(jDirs, jCtx)
     override lazy val platform: ThisPlatform = new JavaPlatform{
       val global: g.type = g
-      override def classPath = new JavaClassPath(dirs, ctx)
+      override def classPath = jcp
+    }
+    override lazy val analyzer = new { val global: g.type = g } with Analyzer {
+
+      override def findMacroClassLoader() = new ClassLoader(this.getClass.getClassLoader){
+        //          override def findClass(name: String): Class[_] = {
+        //            jcp.findClassFile(name) match{
+        //              case None => throw new ClassNotFoundException()
+        //              case Some(file) =>
+        //                val data = file.toByteArray
+        //                this.defineClass(name, data, 0, data.length)
+        //            }
+        //          }
+      }
     }
   }
 
   def compile(src: Array[Byte], logger: String => Unit = _ => ()): Output = {
+    currentLogger = logger
     val singleFile = makeFile( src)
-
-    val (settings, reporter, vd, jCtx, jDirs) = initGlobalBits(logger)
-    val compiler = new nsc.Global(settings, reporter) with InMemoryGlobal{ g =>
-      def ctx = jCtx
-      def dirs = jDirs
-    }
 
     val run = new compiler.Run()
     run.compileFiles(List(singleFile))
@@ -91,7 +102,7 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
    * for the Scala compiler to function, common between the
    * normal and presentation compiler
    */
-  def initGlobalBits(logger: String => Unit)= {
+  def initGlobalBits(logger: => String => Unit)= {
     val vd = new io.VirtualDirectory("(memory)", None)
     lazy val settings = new Settings
     val jCtx = new JavaContext()
@@ -115,7 +126,6 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
     }
     val reporter = new ConsoleReporter(settings, scala.Console.in, new PrintWriter(writer))
     (settings, reporter, vd, jCtx, jDirs)
-
   }
 //
 //  def autocomplete(code: String, flag: String, pos: Int): Future[List[(String, String)]] = async {

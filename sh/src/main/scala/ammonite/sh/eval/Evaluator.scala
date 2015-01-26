@@ -30,7 +30,9 @@ class Evaluator(currentClassloader: ClassLoader,
    * map. Otherwise if you import the same name twice you get compile
    * errors instead of the desired shadowing.
    */
-  val previousImports = mutable.Map.empty[String, String]
+  val previousImports = mutable.Map(
+    "PPrintConfig" -> "import ammonite.pprint.Config.Defaults.PPrintConfig"
+  )
   /**
    * The current line number of the REPL, used to make sure every snippet
    * evaluated can have a distinct name that doesn't collide.
@@ -53,11 +55,11 @@ class Evaluator(currentClassloader: ClassLoader,
       "Don't recognize that input =/"
     )
 
-    wrappedWithImports = previousImports.toSeq.sortBy(_._1).map(_._2).mkString("\n") + wrapped
+    wrappedWithImports = previousImports.toSeq.sortBy(_._1).map(_._2).mkString("\n") + "\n\n" + wrapped
 
     compiled <- Result(Try(
       compile(wrappedWithImports.getBytes, println)
-    ), e => e.toString)
+    ), e => {println("!!!! " + e.printStackTrace()); e.toString})
 
     classFiles <- Result(compiled, "Compilation Failed")
 

@@ -14,14 +14,13 @@ object Classpath {
    */
 
   val deps = Seq(
+    "/Users/haoyi/.ivy2/cache/com.lihaoyi/ammonite_2.11/jars/ammonite_2.11-0.1.4.jar",
     "/Users/haoyi/Dropbox (Personal)/Workspace/ammonite/sh/target/scala-2.11/classes",
     "/Users/haoyi/Dropbox (Personal)/Workspace/ammonite/core/target/scala-2.11/classes",
-    "/Users/haoyi/.ivy2/cache/org.scala-lang/scala-compiler/jars/scala-compiler-2.11.5.jar",
-    "/Users/haoyi/.ivy2/cache/org.scala-lang/scala-library/jars/scala-library-2.11.5.jar",
-    "/Users/haoyi/.ivy2/cache/org.scala-lang/scala-reflect/jars/scala-reflect-2.11.5.jar",
-    "/Users/haoyi/.ivy2/cache/org.scala-lang.modules/scala-xml_2.11/bundles/scala-xml_2.11-1.0.3.jar",
+    "/Users/haoyi/.ivy2/cache/org.scala-lang/scala-compiler/jars/scala-compiler-2.11.4.jar",
+    "/Users/haoyi/.ivy2/cache/org.scala-lang/scala-library/jars/scala-library-2.11.4.jar",
+    "/Users/haoyi/.ivy2/cache/org.scala-lang/scala-reflect/jars/scala-reflect-2.11.4.jar",
     "/Users/haoyi/.ivy2/cache/org.scala-lang.modules/scala-parser-combinators_2.11/bundles/scala-parser-combinators_2.11-1.0.3.jar",
-    "/Users/haoyi/.ivy2/local/com.lihaoyi/ammonite_2.11/0.1.0/jars/ammonite_2.11.jar",
     "/Users/haoyi/.ivy2/cache/com.lihaoyi/utest_2.11/jars/utest_2.11-0.2.4.jar",
     "/Users/haoyi/.ivy2/cache/com.lihaoyi/utest-runner_2.11/jars/utest-runner_2.11-0.2.4.jar",
     "/Users/haoyi/.ivy2/cache/org.scala-sbt/test-interface/jars/test-interface-1.0.jar",
@@ -30,6 +29,8 @@ object Classpath {
   ) ++ System.getProperty("sun.boot.class.path").split(":")
 
 //  deps.foreach(println)
+//  deps.filter(x => !new java.io.File(x).exists()).foreach(println)
+//  assert(nonexistent.length == 0, "\n"+nonexistent.mkString("\n"))
   val (jarDeps, dirDeps) =
     deps.map(new java.io.File(_))
         .filter(_.exists)

@@ -40,7 +40,7 @@ val sharedSettings = Seq(
 )
 
 
-lazy val sh = project.settings(sharedSettings:_*).settings(
+lazy val sh = project.dependsOn(core).settings(sharedSettings:_*).settings(
   name := "ammonite-sh",
   scalaVersion := "2.11.4",
   libraryDependencies ++= Seq(
@@ -53,7 +53,7 @@ lazy val sh = project.settings(sharedSettings:_*).settings(
 
 lazy val core = project.settings(sharedSettings:_*).settings(
   name := "ammonite",
-  scalaVersion := "2.10.4",
+  scalaVersion := "2.11.4",
   sourceGenerators in Compile <+= sourceManaged in Compile map { dir =>
     val file = dir/"ammonite"/"pprint"/"PPrintGen.scala"
     val tuples = (1 to 22).map{ i =>

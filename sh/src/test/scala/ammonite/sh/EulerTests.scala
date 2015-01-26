@@ -6,6 +6,9 @@ import utest._
 import scala.collection.{immutable => imm}
 import scala.reflect.io.VirtualDirectory
 
+import ammonite.pprint.Config.Defaults._
+import ammonite.pprint.PPrint
+
 object EulerTests extends TestSuite{
 
   val tests = TestSuite{
@@ -67,7 +70,7 @@ object EulerTests extends TestSuite{
     'p6{
       // What is the difference between the sum of the squares and the
       // square of the sums?*
-      check("val numbers = 1 to 100", "numbers: scala.collection.immutable.Range.Inclusive = " + (1 to 100 toString))
+      check("val numbers = 1 to 100")
       check("def square(n: Int) = n * n", "defined function square")
       check("square(numbers.sum) - numbers.map(square).sum", "res2: Int = 25164150")
     }

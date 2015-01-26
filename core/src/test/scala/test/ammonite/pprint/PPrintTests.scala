@@ -19,7 +19,9 @@ object PPrintTests extends TestSuite{
     'Horizontal{
       import ammonite.pprint.Config.Defaults._
       'primitives{
-
+        'Unit{
+          * - check((), "()")
+        }
         'Char{
           * - check('\n', "'\\n'")
           * - check('a', "'a'")
@@ -83,6 +85,9 @@ object PPrintTests extends TestSuite{
       }
 
       'collections{
+        // Fallback to toString
+        'Iterator - check(Iterator(1, 2, 3), "non-empty iterator")
+
         'Array - check(Array(1, 2, 3), "Array(1, 2, 3)")
         'Seq - check(Seq(1, 2, 3), "List(1, 2, 3)")
         'List - check(List("1", "2", "3"), """List("1", "2", "3")""")
