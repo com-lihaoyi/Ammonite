@@ -20,6 +20,10 @@ class Shell() extends ShellAPIs{
   val term = new jline.UnixTerminal()
   term.init()
 
+  val defaultImports = compiler.askCustomImports("", """
+    object Shell extends ammonite.sh.ShellAPIHolder{}
+  """)
+
   val eval = new Evaluator(
     mainThread.getContextClassLoader,
     preprocess.apply,
@@ -34,6 +38,7 @@ class Shell() extends ShellAPIs{
       println("EVALED CLS " + e)
       e
   }
+
 
   cls.asInstanceOf[Class[ShellAPIHolder]]
     .getDeclaredMethods

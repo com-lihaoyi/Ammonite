@@ -17,7 +17,7 @@ import scala.util.Try
 class Evaluator(currentClassloader: ClassLoader,
                 preprocess: (String, Int) => Option[Preprocessor.Output],
                 compile: (Array[Byte], String => Unit) => Compiler.Output,
-                importsFor: String => Seq[(String, String)]) {
+                importsFor: (String, String) => Seq[(String, String)]) {
 
   def namesFor(t: scala.reflect.runtime.universe.Type): Set[String] = {
     val yours = t.members.map(_.name.toString).toSet
@@ -39,7 +39,11 @@ class Evaluator(currentClassloader: ClassLoader,
    */
   val previousImports = mutable.Map(
     "PPrintConfig" -> "import ammonite.pprint.Config.Colors.PPrintConfig"
-  ) ++ namesFor(typeOf[ShellAPIs]).map(n => n -> s"import ammonite.sh.Shell.$n")
+  ) ++ namesFor(typeOf[ShellAPIs]).map(n => n -> s"import Shell.$n")
+
+  val defaultImports = importsFor("", """
+    object Foo{}
+  """).toMap
 
   /**
    * The current line number of the REPL, used to make sure every snippet
@@ -119,31 +123,34 @@ class Evaluator(currentClassloader: ClassLoader,
 
     wrapperName = "$res" + currentLine
     wrapped = s"""
+      object Foo$wrapperName{   }
       object $wrapperName{
         $code
         def $$main() = {$printer}
       }
     """
-    wrappedWithImports = previousImports.toSeq.sortBy(_._1).map(_._2).mkString("\n") + "\n\n" + wrapped
+    wrappedWithImports =
+      previousImports.toSeq
+                     .sortBy(_._1)
+                     .map(_._2)
+                     .mkString("\n") + "\n\n" + wrapped
 
-    newImports = importsFor(wrappedWithImports)
+    newImports = importsFor(wrapperName, wrappedWithImports)
     evaled <- evalMain(wrappedWithImports, wrapperName)
 
   } yield Evaluated(evaled + "", wrapperName , newImports)
 
   def update(res: Result[Evaluated]) = res match {
     case Result.Success(ev) =>
-      val names = evalExpr(
-        s"scala.reflect.runtime.universe.typeOf[${ev.wrapper}.type]"
-      ) match{
-        case Result.Success(e: Type) => namesFor(e)
-      }
-      for(name <- names){
-        previousImports(name) = s"import ${ev.wrapper}.${name}"
+
+
+      for{
+        (name, base) <- ev.imports
+      }{
+        previousImports(name.trim()) = s"${base}.${name}"
       }
       currentLine += 1
     case Result.Failure(msg) =>
       currentLine += 1
   }
 }
-

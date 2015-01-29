@@ -78,7 +78,7 @@ class Preprocessor{
     Preprocessor.Output(s"val $name = " + code, pprint(name))
   }
   val Import = Processor(_.Import.run()){ (code, name) =>
-    Preprocessor.Output(code, code)
+    Preprocessor.Output(code, '"'+code+'"')
   }
 
   def decls(wrapperId: Int) = Seq[(String, String) => Option[(Int, Preprocessor.Output)]](
