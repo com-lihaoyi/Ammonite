@@ -54,7 +54,6 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
   }
 
   var currentLogger: String => Unit = s => ()
-
 //
 //  trait InMemGlobal{ g: nsc.Global =>
 //
@@ -90,27 +89,35 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
     (vd, reporter, scalac)
   }
 
-  def askCustomImports(allCode: String) = {
+  def askCustomImports(allCode: String): Seq[(String, String)] = {
     import concurrent.duration._
+    println("---askCustomImports---")
+    println(allCode)
     val file = new BatchSourceFile(makeFile(allCode.getBytes), allCode)
     Await.result(toFuture[Unit](pressy.askReload(List(file), _)), 20 seconds)
     def askAt(index: Int) = {
       println(s"askAt($index)")
       val position = new OffsetPosition(file, index)
 
-
       Await.result(
         toFuture[List[pressy.Member]](pressy.askScopeCompletion(position, _)),
         20 seconds
-      ).map(_.sym.name.toString).toSet
-
+      ).toSet
     }
-    val end = askAt(allCode.lastIndexOf('}') - 1)
-    val start = askAt(0)
+    val end = askAt(allCode.lastIndexOf('}') - 2).map(n => n.sym.name.toString -> n).toMap
+    val start = askAt(allCode.indexOf('{') + 1).map(_.sym.name.toString)
+    val stuff = end.filterKeys(!start(_))
     println(end.size)
     println(start.size)
-    println(end -- start)
-    (end -- start).toList
+    println(end.keySet.contains("res0"))
+    println(start.contains("res0"))
+    for(i <- 0 until allCode.length){
+      println(i + "\t" + askAt(allCode.indexOf('{') + 1).map(_.sym.name.toString).contains("res0"))
+    }
+    println(stuff.size)
+    println(stuff.values.map(_.sym.name.toString))
+    println(stuff.values.map(_.tpe))
+    stuff.values.toList.map("" -> _.toString)
   }
 
   def compile(src: Array[Byte], logger: String => Unit = _ => ()): Output = {

@@ -30,7 +30,9 @@ class Shell() extends ShellAPIs{
   val cls = eval.evalClass("""
     object Shell extends ammonite.sh.ShellAPIHolder
   """, "Shell") match{
-    case Result.Success(e) => e
+    case Result.Success(e) =>
+      println("EVALED CLS " + e)
+      e
   }
 
   cls.asInstanceOf[Class[ShellAPIHolder]]

@@ -15,9 +15,9 @@ import scala.util.Try
  * need to get prepended to subsequent commands.
  */
 class Evaluator(currentClassloader: ClassLoader,
-                preprocess: (String, Int) => Option[(String, String, String)],
+                preprocess: (String, Int) => Option[Preprocessor.Output],
                 compile: (Array[Byte], String => Unit) => Compiler.Output,
-                importsFor: String => Seq[String]) {
+                importsFor: String => Seq[(String, String)]) {
 
   def namesFor(t: scala.reflect.runtime.universe.Type): Set[String] = {
     val yours = t.members.map(_.name.toString).toSet
@@ -39,7 +39,7 @@ class Evaluator(currentClassloader: ClassLoader,
    */
   val previousImports = mutable.Map(
     "PPrintConfig" -> "import ammonite.pprint.Config.Colors.PPrintConfig"
-  ) ++ namesFor(typeOf[ShellAPIs]).map(n => n -> s"import Shell.$n")
+  ) ++ namesFor(typeOf[ShellAPIs]).map(n => n -> s"import ammonite.sh.Shell.$n")
 
   /**
    * The current line number of the REPL, used to make sure every snippet
@@ -112,19 +112,24 @@ class Evaluator(currentClassloader: ClassLoader,
   }
 
   def processLine(line: String) = for {
-    (importKey, imports, wrapped) <- Result(
+    Preprocessor.Output(code, printer) <- Result(
       preprocess(line, currentLine),
       "Don't recognize that input =/"
     )
 
     wrapperName = "$res" + currentLine
-
+    wrapped = s"""
+      object $wrapperName{
+        $code
+        def $$main() = {$printer}
+      }
+    """
     wrappedWithImports = previousImports.toSeq.sortBy(_._1).map(_._2).mkString("\n") + "\n\n" + wrapped
-    _ = println(wrappedWithImports)
-    _ = println(importsFor(wrappedWithImports))
+
+    newImports = importsFor(wrappedWithImports)
     evaled <- evalMain(wrappedWithImports, wrapperName)
 
-  } yield Evaluated(evaled + "", wrapperName , Seq(importKey -> imports))
+  } yield Evaluated(evaled + "", wrapperName , newImports)
 
   def update(res: Result[Evaluated]) = res match {
     case Result.Success(ev) =>

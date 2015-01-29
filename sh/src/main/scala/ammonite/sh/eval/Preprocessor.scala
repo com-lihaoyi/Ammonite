@@ -1,5 +1,6 @@
 package ammonite.sh.eval
 import acyclic.file
+import ammonite.sh.eval.Preprocessor.Output
 import org.parboiled2.ParserInput
 
 
@@ -14,7 +15,8 @@ class Recognizer(input: ParserInput) extends scalaParser.ScalaSyntax(input){
 }
 
 object Preprocessor{
-  type Output = (String, String, String)
+  case class Output(code: String, printer: String)
+
 }
 /**
  * Converts REPL-style snippets into full-fledged Scala source files,
@@ -23,18 +25,14 @@ object Preprocessor{
  */
 class Preprocessor{
   def Processor(cond: Recognizer => util.Try[_])
-               (render: (String, String) => (String, String, String)) = {
-    (name: String, code: String) => {
-      if (cond(new Recognizer(code)).isFailure) None
-      else Some(render(name, code))
+               (render: (String, String) => Preprocessor.Output) = {
+    (code: String, name: String) => {
+      val rec = new Recognizer(code)
+      if (cond(rec).isFailure) None
+      else Some(rec.cursor -> render(code, name))
     }
   }
-  def standardBlob(name: String, code: String, printer: String): String = s"""
-    object $$$name{
-      $code
-      def $$main() = {$printer}
-    }
-  """
+
   def getIdent(s: String) =
     s.takeWhile(!endOfIdentifier.contains(_))
       .trim()
@@ -60,39 +58,43 @@ class Preprocessor{
       s""" + " = " + ammonite.pprint.PPrint($ident) """
   }
   def DefProcessor(cond: Recognizer => util.Try[_], definitionLabel: String) =
-    Processor(cond){ (name, code) => (
-      "",
-      "",
-      standardBlob(name, code, definedStr(definitionLabel, getIdent(code)))
-    )}
+    Processor(cond){ (code, name) =>
+      Preprocessor.Output(code, definedStr(definitionLabel, getIdent(code)))
+    }
   val ObjectDef = DefProcessor(_.ObjectDefX.run(), "object")
   val ClassDef = DefProcessor(_.ClassDefX.run(), "class")
   val TraitDef = DefProcessor(_.TraitDefX.run(), "trait")
   val DefDef = DefProcessor(_.DefDef.run(), "function")
   val TypeDef = DefProcessor(_.TypeDefX.run(), "type")
-  val PatVarDef = Processor(_.PatVarDefX.run()){ (name, code) =>
-    ("", "", standardBlob(name, code,
+  val PatVarDef = Processor(_.PatVarDefX.run()){ (code, name) =>
+    Preprocessor.Output(
+      code,
       if (!code.trim.startsWith("lazy")) pprint(getIdent(code))
       else pprintSignature(getIdent(code)) + s""" + " = <lazy>" """
-    ))
+    )
   }
 
-  val Expr = Processor(_.Expr.run()){ (name, code) =>
-    ("", "", standardBlob(name, s"val $name = " + code, pprint(name)))
+  val Expr = Processor(_.Expr.run()){ (code, name) =>
+    Preprocessor.Output(s"val $name = " + code, pprint(name))
   }
-  val Import = Processor(_.Import.run()){ (name, code) =>
-    (code, code, s"""object $$$name{def $$main() = "$code"}""")
+  val Import = Processor(_.Import.run()){ (code, name) =>
+    Preprocessor.Output(code, code)
   }
 
-  def decls(wrapperId: Int) = Seq[(String, String) => Option[(String, String, String)]](
+  def decls(wrapperId: Int) = Seq[(String, String) => Option[(Int, Preprocessor.Output)]](
     ObjectDef, ClassDef, TraitDef, DefDef, TypeDef, PatVarDef, Expr, Import
   )
 
   def apply(code: String, wrapperId: Int): Option[Preprocessor.Output] = {
     val name = "res"+wrapperId
-    decls(wrapperId)
-      .iterator
-      .map(_(name, code))
-      .reduce(_ orElse _)
+    def rec(current: String): List[Output] = {
+      if(current == "") Nil
+      else {
+        val (offset, output) = decls(wrapperId).iterator.flatMap(_.apply(current, name)).next()
+        output :: rec(current.drop(offset))
+      }
+    }
+    val allDecls = rec(code)
+    allDecls.reduceOption((a, b) => Output(a.code+b.code, a.printer+b.printer))
   }
 }
