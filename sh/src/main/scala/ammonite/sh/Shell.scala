@@ -23,7 +23,8 @@ class Shell() extends ShellAPIs{
   val eval = new Evaluator(
     mainThread.getContextClassLoader,
     preprocess.apply,
-    compiler.compile
+    compiler.compile,
+    compiler.askCustomImports
   )
 
   val cls = eval.evalClass("""

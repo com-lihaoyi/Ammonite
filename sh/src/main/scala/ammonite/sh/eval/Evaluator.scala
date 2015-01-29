@@ -16,7 +16,8 @@ import scala.util.Try
  */
 class Evaluator(currentClassloader: ClassLoader,
                 preprocess: (String, Int) => Option[(String, String, String)],
-                compile: (Array[Byte], String => Unit) => Compiler.Output) {
+                compile: (Array[Byte], String => Unit) => Compiler.Output,
+                importsFor: String => Seq[String]) {
 
   def namesFor(t: scala.reflect.runtime.universe.Type): Set[String] = {
     val yours = t.members.map(_.name.toString).toSet
@@ -119,6 +120,8 @@ class Evaluator(currentClassloader: ClassLoader,
     wrapperName = "$res" + currentLine
 
     wrappedWithImports = previousImports.toSeq.sortBy(_._1).map(_._2).mkString("\n") + "\n\n" + wrapped
+    _ = println(wrappedWithImports)
+    _ = println(importsFor(wrappedWithImports))
     evaled <- evalMain(wrappedWithImports, wrapperName)
 
   } yield Evaluated(evaled + "", wrapperName , Seq(importKey -> imports))

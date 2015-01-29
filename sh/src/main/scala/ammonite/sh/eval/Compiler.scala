@@ -54,21 +54,63 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
   }
 
   var currentLogger: String => Unit = s => ()
-  val (settings, reporter, vd, jCtx, jDirs) = initGlobalBits(currentLogger)
 
-  trait InMemGlobal{ g: nsc.Global =>
-    override lazy val platform: ThisPlatform = new JavaPlatform{
-      val global: g.type = g
-      override def classPath = new JavaClassPath(jDirs, jCtx)
+//
+//  trait InMemGlobal{ g: nsc.Global =>
+//
+//  }
+//
+  val pressy = {
+    val (settings, reporter, vd, jCtx, jDirs) = initGlobalBits(currentLogger)
+    new nsc.interactive.Global(settings, reporter) { g =>
+      override def onCompilerThread = true
+      lazy val jcp = new JavaClassPath(jDirs, jCtx)
+      override lazy val platform: ThisPlatform = new JavaPlatform{
+        val global: g.type = g
+        override def classPath = jcp
+      }
     }
+
+  }
+  val (vd, reporter, compiler) = {
+    val (settings, reporter, vd, jCtx, jDirs) = initGlobalBits(currentLogger)
+    val scalac = new nsc.Global(settings, reporter) { g =>
+
+      val jcp = new JavaClassPath(jDirs, jCtx)
+      override lazy val platform: ThisPlatform = new JavaPlatform{
+        val global: g.type = g
+        override def classPath = jcp
+      }
+      override lazy val analyzer = new { val global: g.type = g } with Analyzer {
+
+        override def findMacroClassLoader() = new ClassLoader(this.getClass.getClassLoader){
+        }
+      }
+    }
+    (vd, reporter, scalac)
   }
 
-  val pressy = new nsc.interactive.Global(settings, reporter) with InMemGlobal
+  def askCustomImports(allCode: String) = {
+    import concurrent.duration._
+    val file = new BatchSourceFile(makeFile(allCode.getBytes), allCode)
+    Await.result(toFuture[Unit](pressy.askReload(List(file), _)), 20 seconds)
+    def askAt(index: Int) = {
+      println(s"askAt($index)")
+      val position = new OffsetPosition(file, index)
 
-  val compiler = new nsc.Global(settings, reporter) with InMemGlobal { g =>
-    override lazy val analyzer = new { val global: g.type = g } with Analyzer {
-      override def findMacroClassLoader() = new ClassLoader(this.getClass.getClassLoader) {}
+
+      Await.result(
+        toFuture[List[pressy.Member]](pressy.askScopeCompletion(position, _)),
+        20 seconds
+      ).map(_.sym.name.toString).toSet
+
     }
+    val end = askAt(allCode.lastIndexOf('}') - 1)
+    val start = askAt(0)
+    println(end.size)
+    println(start.size)
+    println(end -- start)
+    (end -- start).toList
   }
 
   def compile(src: Array[Byte], logger: String => Unit = _ => ()): Output = {
