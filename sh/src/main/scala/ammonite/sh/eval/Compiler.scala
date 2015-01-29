@@ -4,8 +4,8 @@ import java.io._
 import acyclic.file
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
-import scala.reflect.internal.util.Position
+import scala.concurrent.{Await, Future}
+import scala.reflect.internal.util.{OffsetPosition, Position}
 import scala.reflect.io
 import scala.reflect.io._
 import scala.tools.nsc
@@ -56,25 +56,18 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
   var currentLogger: String => Unit = s => ()
   val (settings, reporter, vd, jCtx, jDirs) = initGlobalBits(currentLogger)
 
-  val compiler = new nsc.Global(settings, reporter) { g =>
-
-    val jcp = new JavaClassPath(jDirs, jCtx)
+  trait InMemGlobal{ g: nsc.Global =>
     override lazy val platform: ThisPlatform = new JavaPlatform{
       val global: g.type = g
-      override def classPath = jcp
+      override def classPath = new JavaClassPath(jDirs, jCtx)
     }
-    override lazy val analyzer = new { val global: g.type = g } with Analyzer {
+  }
 
-      override def findMacroClassLoader() = new ClassLoader(this.getClass.getClassLoader){
-        //          override def findClass(name: String): Class[_] = {
-        //            jcp.findClassFile(name) match{
-        //              case None => throw new ClassNotFoundException()
-        //              case Some(file) =>
-        //                val data = file.toByteArray
-        //                this.defineClass(name, data, 0, data.length)
-        //            }
-        //          }
-      }
+  val pressy = new nsc.interactive.Global(settings, reporter) with InMemGlobal
+
+  val compiler = new nsc.Global(settings, reporter) with InMemGlobal { g =>
+    override lazy val analyzer = new { val global: g.type = g } with Analyzer {
+      override def findMacroClassLoader() = new ClassLoader(this.getClass.getClassLoader) {}
     }
   }
 
