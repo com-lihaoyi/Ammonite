@@ -81,6 +81,8 @@ object EvaluatorTests extends TestSuite{
       check("abs(-10)", "res5: Int = 10")
       check("val abs = 123L", "abs: Long = 123L")
       check("abs", "res7: Long = 123L")
+      check("import java.lang.Math._", "import java.lang.Math._")
+      check("abs(-4)", "res9: Int = 4")
     }
 
     'nesting{

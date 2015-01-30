@@ -16,8 +16,8 @@ class Recognizer(input: ParserInput) extends scalaParser.ScalaSyntax(input){
 
 object Preprocessor{
   case class Output(code: String, printer: String)
-
 }
+
 /**
  * Converts REPL-style snippets into full-fledged Scala source files,
  * ready to feed into the compiler. Each source-string is turned into
@@ -55,7 +55,7 @@ class Preprocessor{
 
   def pprint(ident: String) = {
     pprintSignature(ident) +
-      s""" + " = " + ammonite.pprint.PPrint($ident) """
+      s""" + " = " + ammonite.pprint.PPrint($ident)(ammonite.pprint.PPrint.FinalRepr) """
   }
   def DefProcessor(cond: Recognizer => util.Try[_], definitionLabel: String) =
     Processor(cond){ (code, name) =>

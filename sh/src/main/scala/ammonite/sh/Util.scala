@@ -48,9 +48,10 @@ sealed abstract class Result[+T]{
   def filter(f: T => Boolean): Result[T] = this
 }
 
-
-
-
+/**
+ * Fake for-comprehension generator to catch errors and turn
+ * them into [[Result.Failure]]s
+ */
 case class Catching(handler: PartialFunction[Throwable, String]) {
 
   def foreach[T](t: Unit => T): T = t(())

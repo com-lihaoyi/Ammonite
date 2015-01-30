@@ -20,7 +20,7 @@ class Shell() extends ShellAPIs{
   val term = new jline.UnixTerminal()
   term.init()
 
-  val defaultImports = compiler.askCustomImports("", """
+  val defaultImports = compiler.importsFor("", """
     object Shell extends ammonite.sh.ShellAPIHolder{}
   """)
 
@@ -28,7 +28,7 @@ class Shell() extends ShellAPIs{
     mainThread.getContextClassLoader,
     preprocess.apply,
     compiler.compile,
-    compiler.askCustomImports
+    compiler.importsFor
   )
 
   val cls = eval.evalClass("""

@@ -1,10 +1,7 @@
 package ammonite.sh.eval
 
-import java.io._
+
 import acyclic.file
-import scala.collection.mutable
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{Await, Future}
 import scala.reflect.internal.util.{OffsetPosition, Position}
 import scala.reflect.io
 import scala.reflect.io._
@@ -12,13 +9,13 @@ import scala.tools.nsc
 import scala.tools.nsc.Settings
 import scala.tools.nsc.backend.JavaPlatform
 import scala.tools.nsc.interactive.{InteractiveAnalyzer, Response}
-import scala.tools.nsc.io.AbstractFile
-import scala.tools.nsc.reporters.{AbstractReporter, Reporter, ConsoleReporter}
+
+import scala.tools.nsc.reporters.AbstractReporter
 import scala.tools.nsc.typechecker.Analyzer
 import scala.tools.nsc.util.ClassPath.JavaContext
 import scala.tools.nsc.util.Position
 import scala.tools.nsc.util._
-import concurrent.duration._
+
 object Compiler{
   /**
    * If the Option is None, it means compilation failed
@@ -42,7 +39,6 @@ object Compiler{
  */
 class Compiler(dynamicClasspath: VirtualDirectory) {
   import ammonite.sh.eval.Compiler._
-  val blacklist = Seq("<init>")
 
   /**
    * Converts Scalac's weird Future type
@@ -67,9 +63,13 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
         val global: g.type = g
         override def classPath = jcp
       }
+      override lazy val analyzer = new { val global: g.type = g } with InteractiveAnalyzer {
+        override def findMacroClassLoader() = new ClassLoader(this.getClass.getClassLoader){}
+      }
     }
 
   }
+
   val (vd, reporter, compiler) = {
     val (settings, reporter, vd, jcp) = initGlobalBits(currentLogger)
     val scalac = new nsc.Global(settings, reporter) { g =>
@@ -85,20 +85,13 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
     (vd, reporter, scalac)
   }
 
-  var i = 0
-  def askCustomImports(wrapperName: String, allCode: String): Seq[(String, String)] = {
-    i+=1
-    val filename = "asd" + i + ".scala"
+  def importsFor(wrapperName: String, allCode: String): Seq[(String, String)] = {
+    val filename = wrapperName + ".scala"
     val file = new BatchSourceFile(
-      makeFile(
-        allCode.getBytes,
-        name=filename
-      ),
+      makeFile(allCode.getBytes, name = filename),
       allCode
     )
-
     awaitResponse[Unit](pressy.askReload(List(file), _))
-
     def askAt(index: Int) = {
       val position = new OffsetPosition(file, index)
       val scopes = awaitResponse[List[pressy.Member]](
@@ -107,47 +100,22 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
       scopes.filter(_.accessible)
     }
 
-
     def process(members: Seq[pressy.Member]) = pressy.ask { () =>
-      members.map(n => n.sym.name.toString -> n).collect{
-        case (k, x: pressy.ScopeMember)
-          if x.sym.owner.toString != "class Object"
-            && x.sym.owner.toString != "class Any"
-            && x.sym.owner.toString != "package <root>"
-            && x.sym.owner.toString != "package <empty>"
-            && k != "<init>"
-            && k != "_root_"
-            && k != "<repeated...>"
-            && k != "<repeated>"
-            && k != "<byname>"
-            && k != "package"
-            && !(
-            x.viaImport.toString == "import <empty>" &&
-              x.sym.owner.toString == "package <empty>"
-            ) =>
-          val importTxt =
-            x.viaImport
-              .toString
-              .padTo(30, ' ')
-              .replace(".this.", ".")
-              .replace("<empty>", wrapperName)
+      members.collect { case x: pressy.ScopeMember =>
+        val importTxt =
+          x.viaImport
+            .toString
+            .padTo(30, ' ')
+            .replace(".this.", ".")
+            .replace("<empty>", wrapperName)
 
-          k.trim() -> s"/*$wrapperName*/ import $importTxt"
+        x.sym.name.toString.trim() -> s"/*$wrapperName*/ import $importTxt"
       }
     }
-    val end = process(
-      askAt(allCode.lastIndexOf('}') - 1)
-    )
-    val start = process(
-      askAt(allCode.indexOf('{') + 1)
-    )
-
-    val out = (end.toSet -- start.toSet).toSeq
-
-
-    out
+    val end = process(askAt(allCode.lastIndexOf('}') - 1))
+    val start = process(askAt(allCode.indexOf('{') + 1))
+    (end.toSet -- start.toSet).toSeq
   }
-
 
   def compile(src: Array[Byte], logger: String => Unit = _ => ()): Output = {
     compiler.reporter.reset()
@@ -170,7 +138,6 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
       }
     }
   }
-
 
   /**
    * Code to initialize random bits and pieces that are needed

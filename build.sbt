@@ -48,7 +48,8 @@ lazy val sh = project.dependsOn(core).settings(sharedSettings:_*).settings(
     "jline" % "jline" % "2.12",
     "org.scala-lang" % "scala-reflect" % scalaVersion.value,
     "com.lihaoyi" %% "scala-parser-lite" % "0.1.0"
-  )
+  ),
+  fork in (Test, testOnly) := true
 )
 
 lazy val core = project.settings(sharedSettings:_*).settings(

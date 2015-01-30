@@ -23,7 +23,7 @@ class Checker {
     Thread.currentThread().getContextClassLoader,
     preprocess.apply,
     compiler.compile,
-    compiler.askCustomImports
+    compiler.importsFor
   ){
     override val previousImports = mutable.Map(
       "PPrintConfig" -> "import ammonite.pprint.Config.Defaults.PPrintConfig"
