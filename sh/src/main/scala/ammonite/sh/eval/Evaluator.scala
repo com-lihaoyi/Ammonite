@@ -142,12 +142,8 @@ class Evaluator(currentClassloader: ClassLoader,
 
   def update(res: Result[Evaluated]) = res match {
     case Result.Success(ev) =>
-
-
-      for{
-        (name, base) <- ev.imports
-      }{
-        previousImports(name.trim()) = s"${base}.${name}"
+      for((name, proposedImport) <- ev.imports){
+        previousImports(name) = proposedImport + "." + name
       }
       currentLine += 1
     case Result.Failure(msg) =>

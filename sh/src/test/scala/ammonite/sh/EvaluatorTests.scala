@@ -67,6 +67,11 @@ object EvaluatorTests extends TestSuite{
       check("val z = y.foldLeft(0)(_ + _)", "z: Int = 15")
     }
 
+    'import0 {
+      check("import math.abs", "import math.abs")
+      check("val abs = 123L", "abs: Long = 123L")
+      check("abs", "res2: Long = 123L")
+    }
     'import{
       check("val abs = 'a'", "abs: Char = 'a'")
       check("abs", "res1: Char = 'a'")
@@ -74,6 +79,8 @@ object EvaluatorTests extends TestSuite{
       check("abs", "res3: Long = 123L")
       check("import math.abs", "import math.abs")
       check("abs(-10)", "res5: Int = 10")
+      check("val abs = 123L", "abs: Long = 123L")
+      check("abs", "res7: Long = 123L")
     }
 
     'nesting{

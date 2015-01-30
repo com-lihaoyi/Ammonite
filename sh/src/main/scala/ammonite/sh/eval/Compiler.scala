@@ -87,8 +87,6 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
 
   var i = 0
   def askCustomImports(wrapperName: String, allCode: String): Seq[(String, String)] = {
-    println("---askCustomImports---")
-    println(allCode)
     i+=1
     val filename = "asd" + i + ".scala"
     val file = new BatchSourceFile(
@@ -99,48 +97,55 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
       allCode
     )
 
-    println("---askReload---")
     awaitResponse[Unit](pressy.askReload(List(file), _))
 
     def askAt(index: Int) = {
-      println(s"askAt($index)")
       val position = new OffsetPosition(file, index)
-      val scopes = awaitResponse[List[pressy.Member]](pressy.askScopeCompletion(position, _)).toSet
-//      val types = awaitResponse[List[pressy.Member]](pressy.askTypeCompletion(position, _)).toSet
+      val scopes = awaitResponse[List[pressy.Member]](
+        pressy.askScopeCompletion(position, _)
+      )
       scopes.filter(_.accessible)
     }
 
-    val end = askAt(allCode.lastIndexOf('}') - 1).map(n => n.sym.name.toString -> n).toMap
 
-    val res = pressy.ask { () =>
-      end.collect{
+    def process(members: Seq[pressy.Member]) = pressy.ask { () =>
+      members.map(n => n.sym.name.toString -> n).collect{
         case (k, x: pressy.ScopeMember)
-        if x.sym.owner.toString != "class Object"
-        && x.sym.owner.toString != "class Any"
-        && x.sym.owner.toString != "package <root>"
-        && x.sym.owner.toString != "package <empty>"
-        && k != "<init>"
-        && k != "_root_"
-        && k != "<repeated...>"
-        && k != "<repeated>"
-        && k != "<byname>"
-        && k != "package"
-        && !(
-          x.viaImport.toString == "import <empty>" &&
-          x.sym.owner.toString == "package <empty>"
-        ) =>
+          if x.sym.owner.toString != "class Object"
+            && x.sym.owner.toString != "class Any"
+            && x.sym.owner.toString != "package <root>"
+            && x.sym.owner.toString != "package <empty>"
+            && k != "<init>"
+            && k != "_root_"
+            && k != "<repeated...>"
+            && k != "<repeated>"
+            && k != "<byname>"
+            && k != "package"
+            && !(
+            x.viaImport.toString == "import <empty>" &&
+              x.sym.owner.toString == "package <empty>"
+            ) =>
           val importTxt =
             x.viaImport
-             .toString
-             .padTo(30, ' ')
-             .replace(".this.", ".")
-             .replace("<empty>", wrapperName)
+              .toString
+              .padTo(30, ' ')
+              .replace(".this.", ".")
+              .replace("<empty>", wrapperName)
 
-          k -> ("import " + importTxt)
+          k.trim() -> s"/*$wrapperName*/ import $importTxt"
       }
-    }.toSeq
-    val (first, last) = res.partition(_._2 != "import " + wrapperName)
-    first ++ last
+    }
+    val end = process(
+      askAt(allCode.lastIndexOf('}') - 1)
+    )
+    val start = process(
+      askAt(allCode.indexOf('{') + 1)
+    )
+
+    val out = (end.toSet -- start.toSet).toSeq
+
+
+    out
   }
 
 
@@ -201,43 +206,4 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
     }
     (settings, reporter, vd, jcp)
   }
-//
-//  def autocomplete(code: String, flag: String, pos: Int): Future[List[(String, String)]] = async {
-//    // global can be reused, just create new runs for new compiler invocations
-//    val (settings, reporter, vd, jCtx, jDirs) = initGlobalBits(_ => ())
-//    val compiler = new nsc.interactive.Global(settings, reporter) with InMemoryGlobal { g =>
-//      def ctx = jCtx
-//      def dirs = jDirs
-//      override lazy val analyzer = new {
-//        val global: g.type = g
-//      } with InteractiveAnalyzer {
-//        override def findMacroClassLoader() = inMemClassloader
-//      }
-//    }
-//
-//    val file      = new BatchSourceFile(makeFile(code.getBytes), code)
-//    val position  = new OffsetPosition(file, pos + Shared.prelude.length)
-//
-//    await(toFuture[Unit](compiler.askReload(List(file), _)))
-//
-//    val maybeMems = await(toFuture[List[compiler.Member]](flag match{
-//      case "scope" => compiler.askScopeCompletion(position, _: compiler.Response[List[compiler.Member]])
-//      case "member" => compiler.askTypeCompletion(position, _: compiler.Response[List[compiler.Member]])
-//    }))
-//
-//    val res = compiler.ask{() =>
-//      def sig(x: compiler.Member) = {
-//        Seq(
-//          x.sym.signatureString,
-//          s" (${x.sym.kindString})"
-//        ).find(_ != "").getOrElse("--Unknown--")
-//      }
-//      maybeMems.map((x: compiler.Member) => sig(x) -> x.sym.decodedName)
-//        .filter(!blacklist.contains(_))
-//        .distinct
-//    }
-//    compiler.askShutdown()
-//    res
-//  }
-
 }
