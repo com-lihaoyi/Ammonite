@@ -61,7 +61,7 @@ Getting Started
 To begin, add the following to your build.sbt:
 
 ```scala
-"com.lihaoyi" %% "ammonite-core" % "0.1.4",
+"com.lihaoyi" %% "ammonite" % "0.1.4",
 ```
 
 Then at the top of your file,
