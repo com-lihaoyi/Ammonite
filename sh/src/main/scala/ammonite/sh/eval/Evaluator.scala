@@ -39,8 +39,11 @@ class Evaluator(currentClassloader: ClassLoader,
    */
   val previousImports = mutable.Map(
     "PPrintConfig" -> "import ammonite.pprint.Config.Colors.PPrintConfig"
-  ) ++ namesFor(typeOf[ShellAPIs]).map(n => n -> s"import Shell.$n")
+  ) ++ namesFor(typeOf[ShellAPIs]).map(n => n -> s"import ShellBridge.shell.$n")
 
+
+  val shellBridgeCode =
+    "object ShellBridge extends ammonite.sh.ShellAPIHolder{}"
   /**
    * The current line number of the REPL, used to make sure every snippet
    * evaluated can have a distinct name that doesn't collide.

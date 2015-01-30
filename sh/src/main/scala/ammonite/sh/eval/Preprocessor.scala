@@ -40,9 +40,7 @@ class Preprocessor{
       .last
 
 
-  def pprintSignature(ident: String) = s"""
-     Console.CYAN + "$ident" + Console.RESET + ": " +
-     Console.GREEN + ammonite.sh.Shell.typeString($ident) + Console.RESET """
+  def pprintSignature(ident: String) = s"""ShellBridge.shell.shellPPrint($ident, "$ident")"""
 
   def definedStr(name: String, code: String) = '"'+s"defined $name ${getIdent(code)}"+'"'
 
@@ -55,7 +53,7 @@ class Preprocessor{
 
   def pprint(ident: String) = {
     pprintSignature(ident) +
-      s""" + " = " + ammonite.pprint.PPrint($ident)(ammonite.pprint.PPrint.FinalRepr) """
+      s""" + " = " + ammonite.pprint.PPrint($ident)"""
   }
   def DefProcessor(cond: Recognizer => util.Try[_], definitionLabel: String) =
     Processor(cond){ (code, name) =>
