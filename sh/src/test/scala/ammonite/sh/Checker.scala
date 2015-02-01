@@ -31,12 +31,13 @@ class Checker {
   Shell.initShellBridge(
     cls.asInstanceOf[Result.Success[Class[ShellAPIHolder]]].s,
     new ShellAPIs {
-      def exit: Unit = ()
       def help: String = "Hello!"
       def history: Seq[String] = Seq("1")
       def shellPPrint[T: WeakTypeTag](value: => T, ident: String) = {
         ident + ": " + weakTypeOf[T].toString
       }
+
+      var shellPrompt = "scala>"
     }
   )
   def apply(input: String, expected: String = null) = {
@@ -46,4 +47,5 @@ class Checker {
       assert(printed == Result.Success(expected.trim))
     eval.update(processed)
   }
+
 }

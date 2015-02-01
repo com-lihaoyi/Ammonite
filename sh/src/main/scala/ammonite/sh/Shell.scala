@@ -1,17 +1,16 @@
 package ammonite.sh
 
 import java.io.{OutputStream, InputStream, PrintWriter, StringWriter}
-import java.lang.reflect.InvocationTargetException
-
 import ammonite.sh.eval.{Evaluator, Preprocessor, Compiler}
 import jline.console.ConsoleReader
 import acyclic.file
+import jline.console.completer.Completer
 
 import scala.annotation.tailrec
-import scala.collection.mutable
 import scala.reflect.runtime.universe._
 import scala.reflect.io.VirtualDirectory
-import scala.util.Try
+import scala.tools.nsc.interpreter.Completion.Candidates
+import scala.tools.nsc.interpreter._
 
 class Shell() {
   val dynamicClasspath = new VirtualDirectory("(memory)", None)
@@ -19,6 +18,7 @@ class Shell() {
   val mainThread = Thread.currentThread()
   val preprocess = new Preprocessor
   val term = new jline.UnixTerminal()
+
   term.init()
 
   val eval = new Evaluator(
@@ -30,18 +30,21 @@ class Shell() {
   compiler.importsFor("", eval.shellBridgeCode)
   val cls = eval.evalClass(eval.shellBridgeCode, "ShellBridge")
 
+  object Apis extends ShellAPIs {
+    var shellPrompt: String = Console.MAGENTA + "scala>" + Console.RESET
+    def help = "Hello!"
+    def history: Seq[String] = Seq("1")
+    def shellPPrint[T: WeakTypeTag](value: => T, ident: String) = {
+      Console.CYAN + ident + Console.RESET + ": " +
+      Console.GREEN + weakTypeOf[T].toString + Console.RESET
+    }
+  }
+
   Shell.initShellBridge(
     cls.asInstanceOf[Result.Success[Class[ShellAPIHolder]]].s,
-    new ShellAPIs {
-      def exit: Unit = ()
-      def help: String = "Hello!"
-      def history: Seq[String] = Seq("1")
-      def shellPPrint[T: WeakTypeTag](value: => T, ident: String) = {
-        Console.CYAN + ident + Console.RESET + ": " +
-        Console.GREEN + weakTypeOf[T].toString + Console.RESET
-      }
-    }
+    Apis
   )
+
   def action(reader: ConsoleReader): Result[Evaluated] = for {
     _ <- Signaller("INT", () => println("Ctrl-D to Exit"))
 
@@ -49,11 +52,10 @@ class Shell() {
       val sw = new StringWriter()
       x.printStackTrace(new PrintWriter(sw))
 
-      sw.toString + "\n" +
-        "Something unexpected went wrong =("
+      sw.toString + "\nSomething unexpected went wrong =("
     }
 
-    res <- Option(reader.readLine(Console.MAGENTA + "scala> " + Console.RESET))
+    res <- Option(reader.readLine(Apis.shellPrompt + " "))
                           .map(Result.Success(_)).getOrElse(Result.Exit)
     out <- processLine(res)
   } yield out
@@ -64,6 +66,20 @@ class Shell() {
 
   def run(input: InputStream, output: OutputStream) = {
     val reader = new ConsoleReader(input, output, term)
+    reader.setHistoryEnabled(true)
+    reader.addCompleter(new Completer {
+      def complete(_buf: String, cursor: Int, candidates: JList[CharSequence]): Int = {
+        val buf   = if (_buf == null) "" else _buf
+        val prevImports = eval.previousImportBlock
+        val prev = prevImports + "\n" + "object Foo{\n"
+        import collection.JavaConversions._
+        candidates.addAll(compiler.complete(
+          cursor + prev.length,
+          prev + buf + "\n}"
+        ))
+        cursor
+      }
+    })
     @tailrec def loop(): Unit = {
       val r = action(reader)
 

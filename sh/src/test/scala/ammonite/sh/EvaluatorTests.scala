@@ -72,6 +72,7 @@ object EvaluatorTests extends TestSuite{
       check("val abs = 123L", "abs: Long = 123L")
       check("abs", "res2: Long = 123L")
     }
+
     'import{
       check("val abs = 'a'", "abs: Char = 'a'")
       check("abs", "res1: Char = 'a'")
@@ -83,6 +84,11 @@ object EvaluatorTests extends TestSuite{
       check("abs", "res7: Long = 123L")
       check("import java.lang.Math._", "import java.lang.Math._")
       check("abs(-4)", "res9: Int = 4")
+    }
+
+    'packageImport{
+      check("import ammonite.pprint._")
+      check("import Config.Defaults._")
     }
 
     'nesting{

@@ -84,21 +84,27 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
     (vd, reporter, scalac)
   }
 
-  def importsFor(wrapperName: String, allCode: String): Seq[(String, String)] = {
+  def complete(index: Int, allCode: String): Seq[String] = {
+    for(member <- askAt(index, "Current", allCode)) yield {
+      member.sym.name.toString
+    }
+  }
+  def askAt(index: Int, wrapperName: String, allCode: String) = {
     val filename = wrapperName + ".scala"
     val file = new BatchSourceFile(
       makeFile(allCode.getBytes, name = filename),
       allCode
     )
     awaitResponse[Unit](pressy.askReload(List(file), _))
-    def askAt(index: Int) = {
-      val position = new OffsetPosition(file, index)
-      val scopes = awaitResponse[List[pressy.Member]](
-        pressy.askScopeCompletion(position, _)
-      )
-      scopes.filter(_.accessible)
-    }
 
+    val position = new OffsetPosition(file, index)
+    val scopes = awaitResponse[List[pressy.Member]](
+      pressy.askScopeCompletion(position, _)
+    )
+    scopes.filter(_.accessible)
+
+  }
+  def importsFor(wrapperName: String, allCode: String): Seq[(String, String)] = {
     def process(members: Seq[pressy.Member]) = pressy.ask { () =>
       members.collect { case x: pressy.ScopeMember =>
         val importTxt =
@@ -111,8 +117,8 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
         x.sym.name.toString.trim() -> s"/*$wrapperName*/ import $importTxt"
       }
     }
-    val end = process(askAt(allCode.lastIndexOf('}') - 1))
-    val start = process(askAt(allCode.indexOf('{') + 1))
+    val end = process(askAt(allCode.lastIndexOf('}') - 1, wrapperName, allCode))
+    val start = process(askAt(allCode.indexOf('{') + 1, wrapperName, allCode))
     (end.toSet -- start.toSet).toSeq
   }
 

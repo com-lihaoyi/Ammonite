@@ -111,6 +111,12 @@ class Evaluator(currentClassloader: ClassLoader,
     )
   }
 
+  def previousImportBlock = {
+    previousImports.toSeq
+      .sortBy(_._1)
+      .map(_._2)
+      .mkString("\n")
+  }
   def processLine(line: String) = for {
     Preprocessor.Output(code, printer) <- Result(
       preprocess(line, currentLine),
@@ -125,20 +131,19 @@ class Evaluator(currentClassloader: ClassLoader,
         def $$main() = {$printer}
       }
     """
-    wrappedWithImports =
-      previousImports.toSeq
-                     .sortBy(_._1)
-                     .map(_._2)
-                     .mkString("\n") + "\n\n" + wrapped
+
+    wrappedWithImports = previousImportBlock + "\n\n" + wrapped
 
     newImports = importsFor(wrapperName, wrappedWithImports)
     evaled <- evalMain(wrappedWithImports, wrapperName)
-
   } yield Evaluated(evaled + "", wrapperName , newImports)
 
   def update(res: Result[Evaluated]) = res match {
     case Result.Success(ev) =>
-      for((name, proposedImport) <- ev.imports){
+      for{
+        (name, proposedImport) <- ev.imports
+        if name != "package"
+      }{
         previousImports(name) = proposedImport + "." + name
       }
       currentLine += 1
