@@ -2,7 +2,7 @@ Ammonite 0.1.4
 ==============
 
 ```scala
-import ammonite.ops._
+import ammonite.all._
 
 // Get the current working directory
 val wd = processWorkingDir
@@ -67,7 +67,7 @@ To begin, add the following to your build.sbt:
 Then at the top of your file,
 
 ```scala
-import ammonite.ops._
+import ammonite.all._
 ```
 
 And you're all set!
