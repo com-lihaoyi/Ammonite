@@ -2,7 +2,8 @@ package ammonite.sh
 import scala.reflect.runtime.universe._
 
 class ShellAPIHolder {
-  var shell: ShellAPIs = null
+  var shell0: ShellAPIs = null
+  lazy val shell = shell0
 }
 abstract class ShellAPIs {
   def exit: Unit

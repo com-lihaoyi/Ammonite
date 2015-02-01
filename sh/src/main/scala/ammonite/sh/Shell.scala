@@ -62,7 +62,6 @@ class Shell() {
     _ <- Signaller("INT", () => mainThread.stop())
   } yield eval.processLine(line)
 
-
   def run(input: InputStream, output: OutputStream) = {
     val reader = new ConsoleReader(input, output, term)
     @tailrec def loop(): Unit = {
@@ -84,8 +83,6 @@ class Shell() {
     }
     loop()
   }
-
-
 }
 
 object Shell{
@@ -100,6 +97,4 @@ object Shell{
     val shell = new Shell()
     shell.run(System.in, System.out)
   }
-
-
 }

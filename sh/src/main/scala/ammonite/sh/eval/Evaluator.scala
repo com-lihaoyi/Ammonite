@@ -77,11 +77,8 @@ class Evaluator(currentClassloader: ClassLoader,
   } yield cls
 
   def evalMain(code: String, wrapperName: String) = for{
-
     cls <- evalClass(code, wrapperName)
-
     method = cls.getDeclaredMethod("$main")
-
     _ <- Catching{
       case ex: InvocationTargetException
         if ex.getCause.isInstanceOf[ExceptionInInitializerError]  =>

@@ -67,7 +67,6 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
         override def findMacroClassLoader() = new ClassLoader(this.getClass.getClassLoader){}
       }
     }
-
   }
 
   val (vd, reporter, compiler) = {
