@@ -37,9 +37,21 @@ object AutocompleteTests extends TestSuite{
       "+", "formatted", "ensuring",
       "→", "->"
     )
+
     def ^[T](s1: Set[T], s2: Set[T]) = (s1 diff s2) | (s2 diff s1)
-    'simpleExpressions{
-      complete("""""", anyCompletion ++ Set("clone", "finalize"), ^)
+
+    'scope{
+      complete("""<caret>""", Set("scala"), _ -- _)
+
+      complete("""Seq(1, 2, 3).map(argNameLol => <caret>)""", Set("argNameLol"), _ -- _)
+
+      complete("""object Zomg{ <caret> }""", Set("Zomg"), _ -- _)
+    }
+    'scopePrefix{
+      complete("""scal<prefix>""", Set("scala"), ^)
+    }
+    'dot{
+
 
       complete("""java.math.<caret>""",
         Set("MathContext", "BigDecimal", "BigInteger", "RoundingMode"),
@@ -53,6 +65,21 @@ object AutocompleteTests extends TestSuite{
 
       complete("""Seq(1, 2, 3).map(_.<caret>)""",
         anyCompletion ++ Set("+", "-", "*", "/", "to", "until"),
+        _ -- _
+      )
+    }
+
+    'dotPrefix{
+      complete("""java.math.Big<caret>""",
+        Set("BigDecimal", "BigInteger"),
+        ^
+      )
+      complete("""scala.Option.option2<caret>""",
+        Set("option2Iterable"),
+        ^
+      )
+      complete("""Seq(1, 2, 3).map(_.compa<caret>)""",
+        Set("compare", "compareTo"),
         _ -- _
       )
     }

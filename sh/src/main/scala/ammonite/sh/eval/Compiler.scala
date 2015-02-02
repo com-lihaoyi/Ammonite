@@ -85,20 +85,26 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
   }
 
   def complete(index: Int, allCode: String): Seq[String] = {
+//    println("Compiler.complete")
+//    println(allCode)
     val file = new BatchSourceFile(
       Compiler.makeFile(allCode.getBytes, name = "Hello.scala"),
       allCode
     )
 
     def found = pressy.parseTree(file).collect{
-      case t @ pressy.Select(qualifier, name) =>
+      case t @ pressy.Select(qualifier, name)
+        if qualifier.pos.end < index && index <= t.pos.end =>
+//        println(qualifier.pos.end + "\t" + index + "\t" + t.pos.end)
         val r = askAt(
           index,
           "Current",
           allCode,
           pressy.askTypeCompletion(_, _)
         )
-      pressy.ask(() => r.map(_.sym.name.decoded))
+      val prefix = if(name.decoded == "<error>") "" else name.decoded
+
+      pressy.ask(() => r.map(_.sym.name.decoded).filter(_.startsWith(prefix)))
     }
 
     def scoped =
