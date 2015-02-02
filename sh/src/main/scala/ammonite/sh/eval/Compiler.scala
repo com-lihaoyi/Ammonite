@@ -2,7 +2,7 @@ package ammonite.sh.eval
 
 
 import acyclic.file
-import scala.reflect.internal.util.{OffsetPosition, Position}
+import scala.reflect.internal.util.{BatchSourceFile, OffsetPosition, Position}
 import scala.reflect.io
 import scala.reflect.io._
 import scala.tools.nsc
@@ -85,24 +85,42 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
   }
 
   def complete(index: Int, allCode: String): Seq[String] = {
-    for(member <- askAt(index, "Current", allCode)) yield {
-      member.sym.name.toString
+    val file = new BatchSourceFile(
+      Compiler.makeFile(allCode.getBytes, name = "Hello.scala"),
+      allCode
+    )
+
+    def found = pressy.parseTree(file).collect{
+      case t @ pressy.Select(qualifier, name) =>
+        val r = askAt(
+          index,
+          "Current",
+          allCode,
+          pressy.askTypeCompletion(_, _)
+        )
+      pressy.ask(() => r.map(_.sym.name.decoded))
     }
+
+    def scoped =
+      askAt(index, "Current", allCode, pressy.askScopeCompletion(_, _))
+        .map(s => pressy.ask(() => s.sym.name.decoded))
+
+    found.headOption.getOrElse(scoped)
   }
-  def askAt(index: Int, wrapperName: String, allCode: String) = {
+
+  def askAt(index: Int,
+            wrapperName: String,
+            allCode: String,
+            query: (Position, Response[List[pressy.Member]]) => Unit) = {
     val filename = wrapperName + ".scala"
     val file = new BatchSourceFile(
       makeFile(allCode.getBytes, name = filename),
       allCode
     )
     awaitResponse[Unit](pressy.askReload(List(file), _))
-
     val position = new OffsetPosition(file, index)
-    val scopes = awaitResponse[List[pressy.Member]](
-      pressy.askScopeCompletion(position, _)
-    )
+    val scopes = awaitResponse[List[pressy.Member]](query(position, _))
     scopes.filter(_.accessible)
-
   }
   def importsFor(wrapperName: String, allCode: String): Seq[(String, String)] = {
     def process(members: Seq[pressy.Member]) = pressy.ask { () =>
@@ -117,8 +135,8 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
         x.sym.name.toString.trim() -> s"/*$wrapperName*/ import $importTxt"
       }
     }
-    val end = process(askAt(allCode.lastIndexOf('}') - 1, wrapperName, allCode))
-    val start = process(askAt(allCode.indexOf('{') + 1, wrapperName, allCode))
+    val end = process(askAt(allCode.lastIndexOf('}') - 1, wrapperName, allCode, pressy.askScopeCompletion(_, _)))
+    val start = process(askAt(allCode.indexOf('{') + 1, wrapperName, allCode, pressy.askScopeCompletion(_, _)))
     (end.toSet -- start.toSet).toSeq
   }
 
