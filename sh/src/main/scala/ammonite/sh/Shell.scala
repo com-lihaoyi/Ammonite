@@ -70,7 +70,13 @@ class Shell() {
     reader.addCompleter(new Completer {
       def complete(_buf: String, cursor: Int, candidates: JList[CharSequence]): Int = {
         val buf   = if (_buf == null) "" else _buf
-
+        val prevImports = eval.previousImportBlock
+        val prev = prevImports + "\n" + "object Foo{\n"
+        import collection.JavaConversions._
+        candidates.addAll(compiler.complete(
+          cursor + prev.length,
+          prev + buf + "\n}"
+        ))
         cursor
       }
     })

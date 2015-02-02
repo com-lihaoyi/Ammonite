@@ -20,7 +20,7 @@ object AutocompleteTests extends TestSuite{
       val completions = check.compiler.complete(
         cursor + prev.length,
         prev + buf + "\n}"
-      ).filter(_ != "<init>")
+      )
        .toSet
       val left = cmp(expected, completions)
       assert(left == Set())
@@ -53,11 +53,8 @@ object AutocompleteTests extends TestSuite{
       complete("""Seq(1, 2, 3).map(argNameLol => argNam<caret>)""", Set("argNameLol"), ^)
 
       complete("""object Zomg{ Zom<caret> }""", Set("Zomg"), ^)
-
       complete("""object Zomg{ Zo<caret>m }""", Set("Zomg"), ^)
-
       complete("""object Zomg{ Z<caret>om }""", Set("Zomg"), ^)
-
       complete("""object Zomg{ <caret>Zom }""", Set("Zomg"), ^)
     }
     'dot{
@@ -88,19 +85,11 @@ object AutocompleteTests extends TestSuite{
         Set("option2Iterable"),
         ^
       )
-      complete("""Seq(1, 2, 3).map(_.compa<caret>)""",
-        Set("compare", "compareTo"),
-        ^
-      )
-      complete("""Seq(1, 2, 3).map(_.co<caret>mpa)""",
-        Set("compare", "compareTo"),
-        ^
-      )
 
-      complete("""Seq(1, 2, 3).map(_.<caret>compa)""",
-        Set("compare", "compareTo"),
-        ^
-      )
+      val compares = Set("compare", "compareTo")
+      complete("""Seq(1, 2, 3).map(_.compa<caret>)""", compares, ^)
+      complete("""Seq(1, 2, 3).map(_.co<caret>mpa)""", compares, ^)
+      complete("""Seq(1, 2, 3).map(_.<caret>compa)""", compares, ^)
     }
   }
 }

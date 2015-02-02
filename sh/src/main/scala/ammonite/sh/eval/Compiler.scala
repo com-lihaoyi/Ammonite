@@ -95,7 +95,6 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
     def dotted = tree.collect{
       case t @ pressy.Select(qualifier, name)
         if qualifier.pos.end <= index && index <= t.pos.end =>
-//        println(qualifier.pos.end + "\t" + index + "\t" + t.pos.end)
         val r = askAt(
           index,
           "Current",
@@ -110,8 +109,6 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
     def prefixed = tree.collect{
       case t @ pressy.Ident(name)
         if t.pos.start <= index && index <= t.pos.end =>
-        println(t.pos.start + "\t" + index + "\t" + t.pos.end)
-        println(allCode.slice(t.pos.start, t.pos.end))
         val r = askAt(
           index,
           "Current",
@@ -126,7 +123,7 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
       askAt(index, "Current", allCode, pressy.askScopeCompletion(_, _))
         .map(s => pressy.ask(() => s.sym.name.decoded))
 
-    dotted.headOption orElse prefixed.headOption getOrElse scoped
+    dotted.headOption orElse prefixed.headOption getOrElse scoped filter (_ != "<init>")
   }
 
   def askAt(index: Int,
