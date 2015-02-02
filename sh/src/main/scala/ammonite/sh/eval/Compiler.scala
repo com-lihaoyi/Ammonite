@@ -91,10 +91,10 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
       Compiler.makeFile(allCode.getBytes, name = "Hello.scala"),
       allCode
     )
-
-    def found = pressy.parseTree(file).collect{
+    val tree = pressy.parseTree(file)
+    def dotted = tree.collect{
       case t @ pressy.Select(qualifier, name)
-        if qualifier.pos.end < index && index <= t.pos.end =>
+        if qualifier.pos.end <= index && index <= t.pos.end =>
 //        println(qualifier.pos.end + "\t" + index + "\t" + t.pos.end)
         val r = askAt(
           index,
@@ -107,11 +107,26 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
       pressy.ask(() => r.map(_.sym.name.decoded).filter(_.startsWith(prefix)))
     }
 
+    def prefixed = tree.collect{
+      case t @ pressy.Ident(name)
+        if t.pos.start <= index && index <= t.pos.end =>
+        println(t.pos.start + "\t" + index + "\t" + t.pos.end)
+        println(allCode.slice(t.pos.start, t.pos.end))
+        val r = askAt(
+          index,
+          "Current",
+          allCode,
+          pressy.askScopeCompletion(_, _)
+        )
+
+        pressy.ask(() => r.map(_.sym.name.decoded).filter(_.startsWith(name.decoded)))
+    }
+
     def scoped =
       askAt(index, "Current", allCode, pressy.askScopeCompletion(_, _))
         .map(s => pressy.ask(() => s.sym.name.decoded))
 
-    found.headOption.getOrElse(scoped)
+    dotted.headOption orElse prefixed.headOption getOrElse scoped
   }
 
   def askAt(index: Int,

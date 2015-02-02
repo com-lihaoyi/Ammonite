@@ -48,7 +48,17 @@ object AutocompleteTests extends TestSuite{
       complete("""object Zomg{ <caret> }""", Set("Zomg"), _ -- _)
     }
     'scopePrefix{
-      complete("""scal<prefix>""", Set("scala"), ^)
+      complete("""scal<caret>""", Set("scala"), ^)
+
+      complete("""Seq(1, 2, 3).map(argNameLol => argNam<caret>)""", Set("argNameLol"), ^)
+
+      complete("""object Zomg{ Zom<caret> }""", Set("Zomg"), ^)
+
+      complete("""object Zomg{ Zo<caret>m }""", Set("Zomg"), ^)
+
+      complete("""object Zomg{ Z<caret>om }""", Set("Zomg"), ^)
+
+      complete("""object Zomg{ <caret>Zom }""", Set("Zomg"), ^)
     }
     'dot{
 
@@ -80,7 +90,16 @@ object AutocompleteTests extends TestSuite{
       )
       complete("""Seq(1, 2, 3).map(_.compa<caret>)""",
         Set("compare", "compareTo"),
-        _ -- _
+        ^
+      )
+      complete("""Seq(1, 2, 3).map(_.co<caret>mpa)""",
+        Set("compare", "compareTo"),
+        ^
+      )
+
+      complete("""Seq(1, 2, 3).map(_.<caret>compa)""",
+        Set("compare", "compareTo"),
+        ^
       )
     }
   }
