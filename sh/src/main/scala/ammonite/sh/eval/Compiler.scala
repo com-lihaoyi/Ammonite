@@ -56,7 +56,7 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
   var currentLogger: String => Unit = s => ()
 
   val pressy = {
-    val (settings, reporter, vd, jcp) = initGlobalBits(currentLogger)
+    val (settings, reporter, vd, jcp) = initGlobalBits(currentLogger, scala.Console.YELLOW)
     new nsc.interactive.Global(settings, reporter) { g =>
       override def classPath = jcp
       override lazy val platform: ThisPlatform = new JavaPlatform{
@@ -70,7 +70,7 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
   }
 
   val (vd, reporter, compiler) = {
-    val (settings, reporter, vd, jcp) = initGlobalBits(currentLogger)
+    val (settings, reporter, vd, jcp) = initGlobalBits(currentLogger, scala.Console.RED)
     val scalac = new nsc.Global(settings, reporter) { g =>
       override def classPath = jcp
       override lazy val platform: ThisPlatform = new JavaPlatform{
@@ -149,7 +149,7 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
    * for the Scala compiler to function, common between the
    * normal and presentation compiler
    */
-  def initGlobalBits(logger: => String => Unit)= {
+  def initGlobalBits(logger: => String => Unit, errorColor: String)= {
     val vd = new io.VirtualDirectory("(memory)", None)
     lazy val settings = new Settings
     val settingsX = settings
@@ -168,7 +168,7 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
       def display(pos: Position, msg: String, severity: Severity) = {
         severity match{
           case ERROR => logger(
-            scala.Console.RED + Position.formatMessage(pos, msg, false) + scala.Console.RESET
+            errorColor + Position.formatMessage(pos, msg, false) + scala.Console.RESET
           )
           case _ => logger(msg)
         }

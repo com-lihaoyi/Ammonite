@@ -133,9 +133,9 @@ class Evaluator(currentClassloader: ClassLoader,
     """
 
     wrappedWithImports = previousImportBlock + "\n\n" + wrapped
-
-    newImports = importsFor(wrapperName, wrappedWithImports)
     evaled <- evalMain(wrappedWithImports, wrapperName)
+    newImports = importsFor(wrapperName, wrappedWithImports)
+
   } yield Evaluated(evaled + "", wrapperName , newImports)
 
   def update(res: Result[Evaluated]) = res match {
