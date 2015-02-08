@@ -2,6 +2,7 @@ package ammonite.repl
 
 import ammonite.repl.eval
 import ammonite.repl.eval.{Evaluator, Compiler, Preprocessor}
+import ammonite.repl.frontend.{ReplAPI, ReplAPIHolder}
 import utest._
 
 import scala.collection.mutable
@@ -25,12 +26,12 @@ class Checker {
       "PPrintConfig" -> "import ammonite.pprint.Config.Defaults.PPrintConfig"
     )
   }
-  compiler.importsFor("", eval.shellBridgeCode)
-  val cls = eval.evalClass(eval.shellBridgeCode, "ShellBridge")
+  compiler.importsFor("", eval.replBridgeCode)
+  val cls = eval.evalClass(eval.replBridgeCode, "ReplBridge")
 
-  Shell.initShellBridge(
-    cls.asInstanceOf[Result.Success[Class[ShellAPIHolder]]].s,
-    new ShellAPIs {
+  Repl.initReplBridge(
+    cls.asInstanceOf[Result.Success[Class[ReplAPIHolder]]].s,
+    new ReplAPI {
       def help: String = "Hello!"
       def history: Seq[String] = Seq("1")
       def shellPPrint[T: WeakTypeTag](value: => T, ident: String) = {

@@ -1,14 +1,15 @@
-package ammonite.repl
+package ammonite.repl.frontend
+
 import scala.reflect.runtime.universe._
 
-class ShellAPIHolder {
-  var shell0: ShellAPIs = null
+class ReplAPIHolder {
+  var shell0: ReplAPI = null
   lazy val shell = shell0
 }
-class ShellExit
+class ReplExit
 
-abstract class ShellAPIs {
-  def exit = new ShellExit
+abstract class ReplAPI {
+  def exit = new ReplExit
 
   /**
    * Read/writable prompt for the shell
@@ -31,4 +32,14 @@ abstract class ShellAPIs {
    * Get the `Type` object representing the type of `t`
    */
   def typeOf[T: WeakTypeTag](t: => T) = scala.reflect.runtime.universe.weakTypeOf[T]
+}
+
+class DefaultReplAPI(history0: => Seq[String]) extends ReplAPI {
+  var shellPrompt: String = Console.MAGENTA + "scala>" + Console.RESET
+  def help = "Hello!"
+  def history: Seq[String] = history0
+  def shellPPrint[T: WeakTypeTag](value: => T, ident: String) = {
+    Console.CYAN + ident + Console.RESET + ": " +
+    Console.GREEN + weakTypeOf[T].toString + Console.RESET
+  }
 }

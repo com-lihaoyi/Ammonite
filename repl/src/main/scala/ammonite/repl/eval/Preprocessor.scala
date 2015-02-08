@@ -36,7 +36,7 @@ class Preprocessor{
       .last
 
 
-  def pprintSignature(ident: String) = s"""ShellBridge.shell.shellPPrint($ident, "$ident")"""
+  def pprintSignature(ident: String) = s"""ReplBridge.shell.shellPPrint($ident, "$ident")"""
 
   def definedStr(name: String, code: String) = '"'+s"defined $name ${getIdent(code)}"+'"'
 
