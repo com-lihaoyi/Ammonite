@@ -1,8 +1,10 @@
 package ammonite.sh.eval
 import acyclic.file
+import ammonite.sh.Result
 import ammonite.sh.eval.Preprocessor.Output
 
 import scala.reflect.runtime._
+import scala.util.Try
 
 
 object Preprocessor{
@@ -77,21 +79,31 @@ class Preprocessor{
     ObjectDef, ClassDef, /*TraitDef, */DefDef, TypeDef, PatVarDef, Import, Expr
   )
 
-  def apply(code: String, wrapperId: Int): Option[Preprocessor.Output] = {
+  def apply(code: String, wrapperId: Int): Result[Preprocessor.Output] = {
     val name = "res"+wrapperId
-    val parsed = tb.parse(code)
-    def handleTree(t: tb.u.Tree, c: String) = {
-      decls(wrapperId).iterator.flatMap(_.apply(c, name)).next()
-    }
-    val allDecls = tb.parse(code) match{
-      case b: tb.u.Block =>
-        val indices = b.children.map(_.pos.start) :+ code.length
-        for(((i, j), c) <- indices.zip(indices.tail).zip(b.children)) yield {
-          handleTree(c, code.substring(i, j))
-        }
-      case t => Seq(handleTree(t, code))
 
-    }
-    allDecls.reduceOption((a, b) => Output(a.code+b.code, a.printer+b.printer))
+    util.Try(tb.parse(code)) match {
+      case util.Failure(e) if e.getMessage.contains("expected but eof found") =>
+        Result.Buffer(code)
+      case util.Failure(e) =>
+        Result.Failure(e.toString)
+      case util.Success(parsed) =>
+        def handleTree(t: tb.u.Tree, c: String) = {
+          decls(wrapperId).iterator.flatMap(_.apply(c, name)).next()
+        }
+        val allDecls = tb.parse(code) match{
+          case b: tb.u.Block =>
+            val indices = b.children.map(_.pos.start) :+ code.length
+            for(((i, j), c) <- indices.zip(indices.tail).zip(b.children)) yield {
+              handleTree(c, code.substring(i, j))
+            }
+          case t => Seq(handleTree(t, code))
+
+        }
+        Result(
+          allDecls.reduceOption((a, b) => Output(a.code+b.code, a.printer+b.printer)),
+          "Don't know how to handle " + code
+        )
+      }
   }
 }

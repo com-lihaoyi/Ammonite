@@ -7,6 +7,7 @@ import acyclic.file
 import jline.console.completer.Completer
 
 import scala.annotation.tailrec
+import scala.collection.mutable
 import scala.reflect.runtime.universe._
 import scala.reflect.io.VirtualDirectory
 import scala.tools.nsc.interpreter.Completion.Candidates
@@ -27,6 +28,7 @@ class Shell() {
     compiler.compile,
     compiler.importsFor
   )
+  var buffered = ""
   compiler.importsFor("", eval.shellBridgeCode)
   val cls = eval.evalClass(eval.shellBridgeCode, "ShellBridge")
 
@@ -55,9 +57,14 @@ class Shell() {
       sw.toString + "\nSomething unexpected went wrong =("
     }
 
-    res <- Option(reader.readLine(Apis.shellPrompt + " "))
-                          .map(Result.Success(_)).getOrElse(Result.Exit)
-    out <- processLine(res)
+    res <- Option(
+      reader.readLine(
+        if (buffered == "") Apis.shellPrompt + " "
+        else " " * "scala> ".length
+      )
+    ).map(Result.Success(_))
+     .getOrElse(Result.Exit)
+    out <- processLine(buffered + "\n" + res)
   } yield out
 
   def processLine(line: String) = for {
@@ -82,17 +89,23 @@ class Shell() {
       }
     })
     @tailrec def loop(): Unit = {
+
       val r = action(reader)
 
       r match{
         case Result.Exit =>
           compiler.pressy.askShutdown()
           reader.println("Bye!")
+        case Result.Buffer(line) =>
+          buffered = line
+          loop()
         case Result.Success(ev) =>
+          buffered = ""
           eval.update(r)
           reader.println(ev.msg)
           loop()
         case Result.Failure(msg) =>
+          buffered = ""
           eval.update(r)
           reader.println(Console.RED + msg + Console.RESET)
           loop()

@@ -27,6 +27,8 @@ object Result{
     def map[V](f: T => V): Result[V] = Success(f(s))
   }
 
+
+
   /**
    * Failing results never call their callbacks, and just remain unchanged
    */
@@ -36,6 +38,7 @@ object Result{
   }
   case class Failure(s: String) extends Failing
   case object Exit extends Failing
+  case class Buffer(s: String) extends Failing
 }
 
 /**

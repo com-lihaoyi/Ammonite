@@ -15,7 +15,7 @@ import scala.util.Try
  * need to get prepended to subsequent commands.
  */
 class Evaluator(currentClassloader: ClassLoader,
-                preprocess: (String, Int) => Option[Preprocessor.Output],
+                preprocess: (String, Int) => Result[Preprocessor.Output],
                 compile: (Array[Byte], String => Unit) => Compiler.Output,
                 importsFor: (String, String) => Seq[(String, String)]) {
 
@@ -118,11 +118,7 @@ class Evaluator(currentClassloader: ClassLoader,
       .mkString("\n")
   }
   def processLine(line: String) = for {
-    Preprocessor.Output(code, printer) <- Result(
-      preprocess(line, currentLine),
-      "Don't recognize that input =/"
-    )
-
+    Preprocessor.Output(code, printer) <- preprocess(line, currentLine)
 
     wrapperName = "$res" + currentLine
     wrapped = s"""
