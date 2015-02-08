@@ -27,8 +27,6 @@ object Result{
     def map[V](f: T => V): Result[V] = Success(f(s))
   }
 
-
-
   /**
    * Failing results never call their callbacks, and just remain unchanged
    */
@@ -42,8 +40,7 @@ object Result{
 }
 
 /**
- * Represents an
- * @tparam T
+ * Represents the output of a single pass through the ammonite REPL.
  */
 sealed abstract class Result[+T]{
   def flatMap[V](f: T => Result[V]): Result[V]

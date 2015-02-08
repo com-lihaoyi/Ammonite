@@ -87,6 +87,8 @@ class Preprocessor{
         Result.Buffer(code)
       case util.Failure(e) =>
         Result.Failure(e.toString)
+      case util.Success(parsed) if parsed.toString == "<empty>" =>
+        Result.Failure("")
       case util.Success(parsed) =>
         def handleTree(t: tb.u.Tree, c: String) = {
           decls(wrapperId).iterator.flatMap(_.apply(c, name)).next()
