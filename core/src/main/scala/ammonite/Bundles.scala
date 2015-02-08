@@ -20,6 +20,10 @@ object shell extends Bundle{
 }
 trait Bundle extends ops.RelPathStuff with ops.Extensions{
 
+  type BasePath[ThisType <: BasePath[ThisType]] = ops.BasePath[ThisType]
+  val BasePath = ops.BasePath
+  val PathError = ops.PathError
+
   type Path = ops.Path
   val Path = ops.Path
 
@@ -54,6 +58,9 @@ trait Bundle extends ops.RelPathStuff with ops.Extensions{
    */
   object /{
     def unapply(p: ops.Path): Option[(ops.Path, String)] = {
+      Some((p / up, p.last))
+    }
+    def unapply(p: ops.RelPath): Option[(ops.RelPath, String)] = {
       Some((p / up, p.last))
     }
   }

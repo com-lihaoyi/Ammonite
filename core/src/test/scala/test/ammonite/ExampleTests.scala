@@ -24,7 +24,7 @@ object ExampleTests extends TestSuite{
 
       val lines = ls.rec(wd) |? (_.ext == "txt") | read.lines | (_.length) sum
 
-      assert(lines == 14)
+      assert(lines == 20)
     }
     'addUpScalaSize{
       ls.rec! processWorkingDir |? (_.ext == "scala") | (_.size) |& (_ + _)

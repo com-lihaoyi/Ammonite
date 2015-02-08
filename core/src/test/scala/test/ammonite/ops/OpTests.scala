@@ -9,18 +9,24 @@ object OpTests extends TestSuite{
   val tests = TestSuite {
     val res = wd/'core/'target/"scala-2.11"/"test-classes"/'testdata
     'ls - assert(
-//      ls(res).toSet == Set(res/'folder1, res/'folder2, res/"File.txt"),
-//      ls(res/'folder2).toSet == Set(res/'folder2/'folder2a, res/'folder2/'folder2b),
-      ls(res/'folder2/'folder2b) == Seq()
+      ls(res).toSet == Set(res/'folder1, res/'folder2, res/"File.txt"),
+      ls(res/'folder2).toSet == Set(
+        res/'folder2/'folder2a,
+        res/'folder2/'folder2b
+      )
+
+//      ls(res/'folder2/'folder2b) == Seq()
     )
     'lsR{
+      ls.rec(res).foreach(println)
       assert(
         ls.rec(wd/'target/'nonexistent) == Seq(),
-        ls.rec(res/'folder2/'folder2b) == Seq(),
+        ls.rec(res/'folder2/'folder2b) == Seq(res/'folder2/'folder2b/"b.txt"),
         ls.rec(res/'folder2) == Seq(
           res/'folder2/'folder2a,
           res/'folder2/'folder2b,
-          res/'folder2/'folder2a/"I am.txt"
+          res/'folder2/'folder2a/"I am.txt",
+          res/'folder2/'folder2b/"b.txt"
         ),
         ls.rec(res) == Seq(
           res/"File.txt",
@@ -29,7 +35,8 @@ object OpTests extends TestSuite{
           res/'folder1/"Yoghurt Curds Cream Cheese.txt",
           res/'folder2/'folder2a,
           res/'folder2/'folder2b,
-          res/'folder2/'folder2a/"I am.txt"
+          res/'folder2/'folder2a/"I am.txt",
+          res/'folder2/'folder2b/"b.txt"
         )
       )
     }
