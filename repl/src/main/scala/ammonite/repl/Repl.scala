@@ -26,8 +26,7 @@ class Repl(input: InputStream, output: OutputStream) {
     output,
     replAPI.shellPrompt,
     eval.previousImportBlock,
-    compiler.complete,
-    () => mainThread.stop()
+    compiler.complete
   )
 
   lazy val replAPI: ReplAPI = new DefaultReplAPI(frontEnd.history)
