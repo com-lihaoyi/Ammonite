@@ -27,10 +27,8 @@ case class Signaller(sigStr: String)(f: => Unit) extends Scoped{
     val sig = new Signal(sigStr)
     oldSigInt = handlers.get(sig) :: oldSigInt
     sun.misc.Signal.handle(sig, handler)
-    println("Signalling " + sigStr)
     try t
     finally{
-      println("Un Signalling " + sigStr)
       handlers.put(sig, oldSigInt.head)
       oldSigInt = oldSigInt.tail
     }

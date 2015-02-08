@@ -12,13 +12,13 @@ import collection.JavaConversions._
 /**
  * All the mucky JLine interfacing code
  */
-class JLineThings(input: InputStream,
-                  output: OutputStream,
-                  shellPrompt: => String,
-                  previousImportBlock: => String,
-                  compilerComplete: (Int, String) => (Int, Seq[String]),
-                  stop: () => Unit)
-                  extends jline.console.completer.Completer {
+class JLineFrontend(input: InputStream,
+                    output: OutputStream,
+                    shellPrompt: => String,
+                    previousImportBlock: => String,
+                    compilerComplete: (Int, String) => (Int, Seq[String]),
+                    stop: () => Unit)
+                    extends jline.console.completer.Completer {
   val term = new jline.UnixTerminal()
   var buffered = ""
   term.init()
@@ -55,13 +55,6 @@ class JLineThings(input: InputStream,
         reader.setCursorPosition(0)
         reader.killLine()
       }
-    }
-
-    _ <- Catching { case x: Throwable =>
-      val sw = new StringWriter()
-      x.printStackTrace(new PrintWriter(sw))
-
-      sw.toString + "\nSomething unexpected went wrong =("
     }
 
     res <- Option(

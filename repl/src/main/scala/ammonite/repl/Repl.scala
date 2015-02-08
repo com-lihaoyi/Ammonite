@@ -9,12 +9,11 @@ import scala.annotation.tailrec
 import scala.reflect.io.VirtualDirectory
 
 class Repl(input: InputStream, output: OutputStream) {
-  
+
   val dynamicClasspath = new VirtualDirectory("(memory)", None)
   val compiler = new Compiler(dynamicClasspath)
   val mainThread = Thread.currentThread()
   val preprocess = new Preprocessor
-
 
   val eval = new Evaluator(
     mainThread.getContextClassLoader,
@@ -22,7 +21,7 @@ class Repl(input: InputStream, output: OutputStream) {
     compiler.compile,
     compiler.importsFor
   )
-  val jlineThings = new frontend.JLineThings(
+  val frontEnd = new frontend.JLineFrontend(
     input,
     output,
     replAPI.shellPrompt,
@@ -31,32 +30,37 @@ class Repl(input: InputStream, output: OutputStream) {
     () => mainThread.stop()
   )
 
+  lazy val replAPI: ReplAPI = new DefaultReplAPI({
+    frontEnd.history
+  })
 
   compiler.importsFor("", eval.replBridgeCode)
   val cls = eval.evalClass(eval.replBridgeCode, "ReplBridge")
 
-  lazy val replAPI: ReplAPI = new DefaultReplAPI({
-    jlineThings.history
-  })
 
   Repl.initReplBridge(
     cls.asInstanceOf[Result.Success[Class[ReplAPIHolder]]].s,
     replAPI
   )
 
+  def action() = for{
+    _ <- Catching { case x: Throwable =>
+      x + "\n" +
+      x.getStackTrace.map("  "+_).mkString("\n") +
+      "\nSomething unexpected went wrong =("
+    }
+    res <- frontEnd.action()
+    _ <- Signaller("INT") { mainThread.stop() }
+    out <- eval.processLine(res)
+  } yield out
 
   def run() = {
     @tailrec def loop(): Unit = {
+      val res = action()
 
-      val r = for{
-        res <- jlineThings.action()
-        _ <- Signaller("INT") { mainThread.stop() }
-        out <- eval.processLine(res)
-      } yield out
-
-      jlineThings.update(r)
-      eval.update(r)
-      r match{
+      frontEnd.update(res)
+      eval.update(res)
+      res match{
         case Result.Exit =>
           compiler.pressy.askShutdown()
           println("Bye!")
