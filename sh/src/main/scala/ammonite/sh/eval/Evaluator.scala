@@ -92,7 +92,10 @@ class Evaluator(currentClassloader: ClassLoader,
         userEx.toString + "\n" + trace
       case ex: InvocationTargetException
         if ex.getCause.isInstanceOf[ThreadDeath]  =>
+        // Clear the interrupted status
+        Thread.interrupted()
         "\nInterrupted!"
+
     }
   } yield method.invoke(null)
 

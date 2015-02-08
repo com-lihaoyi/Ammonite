@@ -58,13 +58,13 @@ class Shell(input: InputStream, output: OutputStream) {
   )
 
   def action(reader: ConsoleReader): Result[Evaluated] = for {
-    _ <- Signaller("INT", () => {
+    _ <- Signaller("INT"){
       if (reader.getCursorBuffer.length() == 0) {
         println("Ctrl-D to exit")
       }else{
         reader.setCursorPosition(0); reader.killLine()
       }
-    })
+    }
 
     _ <- Catching { case x: Throwable =>
       val sw = new StringWriter()
@@ -85,11 +85,12 @@ class Shell(input: InputStream, output: OutputStream) {
   } yield out
 
   def processLine(line: String) = for {
-    _ <- Signaller("INT", () => mainThread.stop())
+    _ <- Signaller("INT"){
+      mainThread.stop()
+    }
   } yield eval.processLine(line)
 
   def run() = {
-
     @tailrec def loop(): Unit = {
       val r = action(reader)
       r match{
@@ -113,8 +114,6 @@ class Shell(input: InputStream, output: OutputStream) {
           reader.println(ev.msg)
           loop()
         case Result.Failure(msg) =>
-
-          reader.getHistory.removeLast()
           buffered = ""
           eval.update(r)
           reader.println(Console.RED + msg + Console.RESET)

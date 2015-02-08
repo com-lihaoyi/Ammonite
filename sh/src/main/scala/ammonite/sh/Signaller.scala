@@ -1,7 +1,7 @@
 package ammonite.sh
 
 import acyclic.file
-case class Signaller(sigStr: String, f: () => Unit) extends Scoped{
+case class Signaller(sigStr: String)(f: => Unit) extends Scoped{
   import sun.misc.{Signal, SignalHandler}
   var oldSigInt = List.empty[SignalHandler]
   def handlers = {
@@ -14,7 +14,7 @@ case class Signaller(sigStr: String, f: () => Unit) extends Scoped{
   def apply[T](t: => T): T = {
 
     val handler = new SignalHandler () {
-      def handle(sig: Signal) = f()
+      def handle(sig: Signal) = f
     }
     val sig = new Signal(sigStr)
     oldSigInt = handlers.get(sig) :: oldSigInt
