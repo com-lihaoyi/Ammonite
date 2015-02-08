@@ -1,4 +1,4 @@
-package ammonite.sh.eval
+package ammonite.repl.eval
 
 
 import acyclic.file
@@ -38,7 +38,7 @@ object Compiler{
  * classfile per source-string (e.g. inner classes, or lambdas)
  */
 class Compiler(dynamicClasspath: VirtualDirectory) {
-  import ammonite.sh.eval.Compiler._
+  import ammonite.repl.eval.Compiler._
 
   /**
    * Converts Scalac's weird Future type
@@ -119,10 +119,11 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
     def scoped = {
       index -> ask(pressy.askScopeCompletion)
         .map(s => pressy.ask(() => s.sym.name.decoded))
-        .filter(_ != "<init>")
+
     }
 
-    dotted.headOption orElse prefixed.headOption getOrElse scoped
+    val (i, all) = dotted.headOption orElse prefixed.headOption getOrElse scoped
+    (i, all.filter(_ != "<init>"))
   }
 
   /**

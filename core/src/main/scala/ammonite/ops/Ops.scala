@@ -180,7 +180,6 @@ object ls extends Op1[Path, Seq[Path]]{
     }
     def apply(arg: Path) =
       recursiveListFiles(new File(arg.toString)).map(f => Path(f.getCanonicalPath)).toVector
-
   }
 }
 

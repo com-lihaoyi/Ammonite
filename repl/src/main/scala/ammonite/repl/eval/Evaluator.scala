@@ -1,9 +1,9 @@
-package ammonite.sh.eval
+package ammonite.repl.eval
 
 import java.lang.reflect.InvocationTargetException
 
 import acyclic.file
-import ammonite.sh.{ShellAPIs, Evaluated, Result, Catching}
+import ammonite.repl.{ShellAPIs, Evaluated, Result, Catching}
 import scala.reflect.runtime.universe._
 import scala.collection.mutable
 import scala.util.Try
@@ -43,7 +43,7 @@ class Evaluator(currentClassloader: ClassLoader,
 
 
   val shellBridgeCode =
-    "object ShellBridge extends ammonite.sh.ShellAPIHolder{}"
+    "object ShellBridge extends ammonite.repl.ShellAPIHolder{}"
   /**
    * The current line number of the REPL, used to make sure every snippet
    * evaluated can have a distinct name that doesn't collide.

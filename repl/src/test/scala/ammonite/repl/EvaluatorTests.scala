@@ -1,4 +1,4 @@
-package ammonite.sh
+package ammonite.repl
 
 import ammonite.pprint.Config.Defaults._
 import ammonite.pprint.PPrint

@@ -1,4 +1,4 @@
-package ammonite.sh.eval
+package ammonite.repl.eval
 import acyclic.file
 
 /**
@@ -15,7 +15,7 @@ object Classpath {
 
   val deps = Seq(
     "/Users/haoyi/.ivy2/cache/com.lihaoyi/ammonite_2.11/jars/ammonite_2.11-0.1.4.jar",
-    "/Users/haoyi/Dropbox (Personal)/Workspace/ammonite/sh/target/scala-2.11/classes",
+    "/Users/haoyi/Dropbox (Personal)/Workspace/ammonite/repl/target/scala-2.11/classes",
     "/Users/haoyi/Dropbox (Personal)/Workspace/ammonite/core/target/scala-2.11/classes",
     "/Users/haoyi/.ivy2/cache/org.scala-lang/scala-compiler/jars/scala-compiler-2.11.4.jar",
     "/Users/haoyi/.ivy2/cache/org.scala-lang/scala-library/jars/scala-library-2.11.4.jar",

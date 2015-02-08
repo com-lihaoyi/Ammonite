@@ -1,9 +1,9 @@
-package ammonite.sh
+package ammonite.repl
 
 import java.io.{OutputStream, InputStream, PrintWriter, StringWriter}
 import ammonite.pprint
 import ammonite.pprint.PPrint
-import ammonite.sh.eval.{Evaluator, Preprocessor, Compiler}
+import ammonite.repl.eval.{Evaluator, Preprocessor, Compiler}
 import jline.console.ConsoleReader
 import acyclic.file
 import jline.console.completer.Completer

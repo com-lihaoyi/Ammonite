@@ -40,7 +40,7 @@ val sharedSettings = Seq(
 )
 
 
-lazy val sh = project.dependsOn(core).settings(sharedSettings:_*).settings(
+lazy val repl = project.dependsOn(core).settings(sharedSettings:_*).settings(
   name := "ammonite-sh",
   scalaVersion := "2.11.4",
   libraryDependencies ++= Seq(

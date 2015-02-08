@@ -1,7 +1,7 @@
-package ammonite.sh
+package ammonite.repl
 
-import ammonite.sh.eval
-import ammonite.sh.eval.{Evaluator, Compiler, Preprocessor}
+import ammonite.repl.eval
+import ammonite.repl.eval.{Evaluator, Compiler, Preprocessor}
 import utest._
 
 import scala.collection.mutable

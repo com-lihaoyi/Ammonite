@@ -1,7 +1,7 @@
-package ammonite.sh.eval
+package ammonite.repl.eval
 import acyclic.file
-import ammonite.sh.Result
-import ammonite.sh.eval.Preprocessor.Output
+import ammonite.repl.Result
+import ammonite.repl.eval.Preprocessor.Output
 
 import scala.reflect.runtime._
 import scala.util.Try

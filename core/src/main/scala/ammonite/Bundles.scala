@@ -3,11 +3,22 @@ import acyclic.file
 import java.nio.file.Files
 import java.nio.file.attribute.PosixFileAttributes
 
+import ammonite.ops.{RelPath, Path, Op1}
+
 import scala.collection.{Seq, GenTraversableOnce, TraversableLike}
 
 import scala.util.matching.Regex
-
-object all extends ops.RelPathStuff with ops.Extensions{
+object all extends Bundle
+object shell extends Bundle{
+  implicit var wd = processWorkingDir
+  object cd extends Op1[RelPath, Path]{
+    def apply(p: RelPath) = {
+      wd /= p
+      wd
+    }
+  }
+}
+trait Bundle extends ops.RelPathStuff with ops.Extensions{
 
   /**
    * The root of the filesystem
@@ -22,8 +33,6 @@ object all extends ops.RelPathStuff with ops.Extensions{
   implicit def PathFileData(p: ops.Path) = new ops.FileData(
     Files.readAttributes(java.nio.file.Paths.get(p.toString), classOf[PosixFileAttributes])
   )
-
-
 
   implicit class Transformable1(p: java.nio.file.Path){
     def amm = {
