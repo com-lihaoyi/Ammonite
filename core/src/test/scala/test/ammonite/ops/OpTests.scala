@@ -69,7 +69,7 @@ object OpTests extends TestSuite{
           )
           cp(d/'folder, d/'folder2)
           cp(d/'file, d/'file2)
-          ls! d | println
+
           assert(
             exists(d/'folder),
             exists(d/'file),
@@ -143,7 +143,6 @@ object OpTests extends TestSuite{
               case d => println("NOT FOUND " + d); d
             }
 
-            ls.rec(d).toSet.foreach(println)
             assert(
               ls.rec(d).toSet == Set(
                 d/'py,

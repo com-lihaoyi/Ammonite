@@ -194,6 +194,28 @@ object PathTests extends TestSuite{
           c == "C",
           d == "D"
         )
+
+
+        val relative = 'omg/'wtf/'bbq
+        val a2/b2/c2 = relative
+        assert(
+          a2 == empty/'omg,
+          b2 == "wtf",
+          c2 == "bbq"
+        )
+
+        // If the paths aren't deep enough, it
+        // just doesn't match but doesn't blow up
+        root/'omg match {
+          case a3/b3/c3/d3/e3 => assert(false)
+          case _ =>
+        }
+
+        relative match {
+          case a3/b3/c3/d3/e3 => assert(false)
+          case _ =>
+        }
+
       }
     }
   }

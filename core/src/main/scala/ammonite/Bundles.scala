@@ -57,11 +57,10 @@ trait Bundle extends ops.RelPathStuff with ops.Extensions{
    * Extractor to let you easily pattern match on [[ops.Path]]s
    */
   object /{
-    def unapply(p: ops.Path): Option[(ops.Path, String)] = {
-      Some((p / up, p.last))
-    }
-    def unapply(p: ops.RelPath): Option[(ops.RelPath, String)] = {
-      Some((p / up, p.last))
+    def unapply[T <: BasePath[T]](p: ops.BasePath[T]): Option[(ops.BasePath[T], String)] = {
+      if (p.segments.length > 0)
+        Some((p / up, p.last))
+      else None
     }
   }
   object RegexContext{
