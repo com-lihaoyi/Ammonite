@@ -1,6 +1,14 @@
 package ammonite.repl
 
 import acyclic.file
+
+/**
+ * Lets you turn on signal handling within a certain block,
+ * attaching a callback to the handler and then turning it
+ * properly off again when the block exits. Does sketchy
+ * `unsafe` stuff because that's the only way you can make
+ * it properly reset when you're finished.
+ */
 case class Signaller(sigStr: String)(f: => Unit) extends Scoped{
   import sun.misc.{Signal, SignalHandler}
   var oldSigInt = List.empty[SignalHandler]
@@ -27,6 +35,10 @@ case class Signaller(sigStr: String)(f: => Unit) extends Scoped{
   }
 }
 
+/**
+ * Converts something with a scoped `apply` method into
+ * something which can be similarly used in a for-comprehension
+ */
 trait Scoped{
   def apply[T](t: => T): T
   def foreach[T](t: Unit => T): T = apply(t(()))
