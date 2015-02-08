@@ -150,5 +150,6 @@ class Evaluator(currentClassloader: ClassLoader,
       currentLine += 1
     case Result.Failure(msg) =>
       currentLine += 1
+    case _ =>
   }
 }
