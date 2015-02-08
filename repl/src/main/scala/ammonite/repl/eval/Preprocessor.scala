@@ -17,62 +17,51 @@ class Preprocessor{
   import scala.reflect.runtime.{currentMirror => m}
   val tb = m.mkToolBox()
 
-  def Processor(cond: tb.u.Tree => Boolean)
-               (render: (String, String) => Preprocessor.Output) = {
-    (code: String, name: String) => {
-      if (cond(tb.parse(code))) Some(render(code, name))
-      else None
-    }
+  def Processor(cond: PartialFunction[(String, String, tb.u.Tree), Preprocessor.Output]) = {
+    (code: String, name: String) => cond.lift(name, code, tb.parse(code))
   }
-
-  def getIdent(s: String) =
-    s.takeWhile(!endOfIdentifier.contains(_))
-      .trim()
-      .split("\\s")
-      .last
-
 
   def pprintSignature(ident: String) = s"""ReplBridge.shell.shellPPrint($ident, "$ident")"""
 
-  def definedStr(name: String, code: String) = '"'+s"defined $name ${getIdent(code)}"+'"'
-
-  /**
-   * Sketchily used to find the name of the def/object/trait/class that
-   * is being defined. Doesn't work in the general case, and at some point
-   * should be replaced by proper use of parboiled
-   */
-  val endOfIdentifier = ":[(={"
+  def definedStr(definitionLabel: String, name: String) =
+    s"""ReplBridge.shell.shellPrintDef("$definitionLabel", "$name") """
 
   def pprint(ident: String) = {
     pprintSignature(ident) +
       s""" + " = " + ammonite.pprint.PPrint($ident)"""
   }
-  def DefProcessor(cond: tb.u.Tree => Boolean, definitionLabel: String) =
-    Processor(cond){ (code, name) =>
-      Preprocessor.Output(code, definedStr(definitionLabel, getIdent(code)))
-    }
-  val ObjectDef = DefProcessor(_.isInstanceOf[tb.u.ModuleDef], "object")
-  val ClassDef = DefProcessor(_.isInstanceOf[tb.u.ClassDef], "class")
-//  val TraitDef = DefProcessor(_.isInstanceOf[tb.u.TraitDef], "trait")
-  val DefDef = DefProcessor(_.isInstanceOf[tb.u.DefDef], "function")
-  val TypeDef = DefProcessor(_.isInstanceOf[tb.u.TypeDef], "type")
-  val PatVarDef = Processor(_.isInstanceOf[tb.u.ValDef]){ (code, name) =>
+  def DefProcessor(definitionLabel: String)(cond: PartialFunction[tb.u.Tree, String]) =
+    (code: String, name: String) =>
+      cond.lift(tb.parse(code)).map{
+        name => Preprocessor.Output(code, definedStr(definitionLabel, name))
+      }
+
+  val ObjectDef = DefProcessor("object"){case m: tb.u.ModuleDef => m.name.toString}
+  val ClassDef = DefProcessor("class"){
+    case m: tb.u.ClassDef if !m.mods.hasFlag(tb.u.Flag.TRAIT)=> m.name.toString
+  }
+  val TraitDef =  DefProcessor("trait"){
+    case m: tb.u.ClassDef if m.mods.hasFlag(tb.u.Flag.TRAIT) => m.name.toString
+  }
+  val DefDef = DefProcessor("function"){case m: tb.u.DefDef => m.name.toString}
+  val TypeDef = DefProcessor("type"){case m: tb.u.TypeDef => m.name.toString}
+
+  val PatVarDef = Processor { case (name, code, t: tb.u.ValDef) =>
     Preprocessor.Output(
       code,
-      if (!code.trim.startsWith("lazy")) pprint(getIdent(code))
-      else pprintSignature(getIdent(code)) + s""" + " = <lazy>" """
+      if (!t.mods.hasFlag(tb.u.Flag.LAZY)) pprint(t.name.toString)
+      else pprintSignature(t.name.toString) + s""" + " = <lazy>" """
     )
   }
-
-  val Expr = Processor(_ => true){ (code, name) =>
+  val Expr = Processor{ case (name, code, tree) =>
     Preprocessor.Output(s"val $name = " + code, pprint(name))
   }
-  val Import = Processor(_.isInstanceOf[tb.u.Import]){ (code, name) =>
+  val Import = Processor{ case (name, code, tree: tb.u.Import) =>
     Preprocessor.Output(code, '"'+code+'"')
   }
 
-  def decls(wrapperId: Int) = Seq[(String, String) => Option[Preprocessor.Output]](
-    ObjectDef, ClassDef, /*TraitDef, */DefDef, TypeDef, PatVarDef, Import, Expr
+  val decls = Seq[(String, String) => Option[Preprocessor.Output]](
+    ObjectDef, ClassDef, TraitDef, DefDef, TypeDef, PatVarDef, Import, Expr
   )
 
   def apply(code: String, wrapperId: Int): Result[Preprocessor.Output] = {
@@ -81,13 +70,12 @@ class Preprocessor{
     util.Try(tb.parse(code)) match {
       case util.Failure(e) if e.getMessage.contains("expected but eof found") =>
         Result.Buffer(code)
-      case util.Failure(e) =>
-        Result.Failure(e.toString)
+      case util.Failure(e) => Result.Failure(e.toString)
       case util.Success(parsed) if parsed.toString == "<empty>" =>
         Result.Failure("")
       case util.Success(parsed) =>
         def handleTree(t: tb.u.Tree, c: String, name: String) = {
-          decls(wrapperId).iterator.flatMap(_.apply(c, name)).next()
+          decls.iterator.flatMap(_.apply(c, name)).next()
         }
         val allDecls = tb.parse(code) match{
           case b: tb.u.Block =>
@@ -105,6 +93,5 @@ class Preprocessor{
           "Don't know how to handle " + code
         )
       }
-
   }
 }

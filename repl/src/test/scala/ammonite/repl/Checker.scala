@@ -29,7 +29,7 @@ class Checker {
   compiler.importsFor("", eval.replBridgeCode)
   val cls = eval.evalClass(eval.replBridgeCode, "ReplBridge")
 
-  Repl.initReplBridge(
+  ReplAPI.initReplBridge(
     cls.asInstanceOf[Result.Success[Class[ReplAPIHolder]]].s,
     new ReplAPI {
       def help: String = "Hello!"
@@ -37,7 +37,9 @@ class Checker {
       def shellPPrint[T: WeakTypeTag](value: => T, ident: String) = {
         ident + ": " + weakTypeOf[T].toString
       }
-
+      def shellPrintDef(definitionLabel: String, ident: String) = {
+        s"defined $definitionLabel $ident"
+      }
       var shellPrompt = "scala>"
     }
   )

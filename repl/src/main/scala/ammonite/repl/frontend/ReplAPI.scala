@@ -21,7 +21,9 @@ abstract class ReplAPI {
    * History of commands that have been entered into the shell
    */
   def history: Seq[String]
+
   def shellPPrint[T: WeakTypeTag](value: => T, ident: String): String
+  def shellPrintDef(definitionLabel: String, ident: String): String
 
   /**
    * Get the `Type` object of [[T]]
@@ -50,5 +52,8 @@ class DefaultReplAPI(history0: => Seq[String]) extends ReplAPI {
   def shellPPrint[T: WeakTypeTag](value: => T, ident: String) = {
     Console.CYAN + ident + Console.RESET + ": " +
     Console.GREEN + weakTypeOf[T].toString + Console.RESET
+  }
+  def shellPrintDef(definitionLabel: String, ident: String) = {
+    s"defined ${Console.GREEN}$definitionLabel ${Console.CYAN}$ident${Console.RESET}"
   }
 }
