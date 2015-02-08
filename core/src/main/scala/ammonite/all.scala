@@ -14,7 +14,6 @@ object all extends ops.RelPathStuff with ops.Extensions{
    */
   val root = ops.Path.root
 
-  val rel = ops.RelPath.rel
   /**
    * The current working directory for this process.
    */

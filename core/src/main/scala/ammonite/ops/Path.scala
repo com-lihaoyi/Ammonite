@@ -135,17 +135,16 @@ trait RelPathStuff{
   val up = new RelPath(Nil, 1)
   val empty = new RelPath(Nil, 0)
   implicit class RelPathStart(p1: String){
-    def /(p2: RelPath) = RelPath.rel/p1/p2
+    def /(p2: RelPath) = empty/p1/p2
   }
   implicit class RelPathStart2(p1: Symbol){
-    def /(p2: RelPath) = RelPath.rel/p1/p2
+    def /(p2: RelPath) = empty/p1/p2
   }
 }
 object RelPath extends RelPathStuff with (String => RelPath){
-  val rel = new RelPath(Nil, 0)
   def apply(s: String) = {
     require(!s.startsWith("/"), "Relative paths cannot start with /")
-    s.split("/").foldLeft(rel)(_/_)
+    s.split("/").foldLeft(empty)(_/_)
   }
   implicit class Transformable1(p: RelPath){
     def nio = java.nio.file.Paths.get(p.toString)
@@ -164,7 +163,7 @@ object RelPath extends RelPathStuff with (String => RelPath){
   implicit def ArrayPath[T](s: Array[T])(implicit conv: T => RelPath): RelPath = SeqPath(s)
 
   implicit val relPathRepr = pprint.PPrinter[ammonite.ops.RelPath]{(p, c) =>
-    if (p.segments.length == 1 && p.ups == 0) "empty/" + implicitly[pprint.PPrinter[String]].render(p.segments(0), c)
+    if (p.segments.length == 1 && p.ups == 0) "empty/" + BasePath.reprSection(p.segments(0), c)
     else (Seq.fill(p.ups)("up") ++ p.segments.map(BasePath.reprSection(_, c))).mkString("/")
   }
 }
@@ -219,8 +218,13 @@ object Path{
     def nio = java.nio.file.Paths.get(p.toString)
   }
 
-  implicit val pathRepr = pprint.PPrinter[ammonite.ops.Path]{(p, c) =>
-    ("root" +: p.segments.map(BasePath.reprSection(_, c))).mkString("/")
+  implicit def pathRepr(implicit wd: Path = root) = pprint.PPrinter[ammonite.ops.Path]{(p, c) =>
+    if (wd == root)
+      ("root" +: p.segments.map(BasePath.reprSection(_, c))).mkString("/")
+    else{
+      val p2 = p - wd
+      (Seq("wd") ++ Seq.fill(p2.ups)("up") ++ p2.segments.map(BasePath.reprSection(_, c))).mkString("/")
+    }
   }
 }
 

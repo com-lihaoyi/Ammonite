@@ -60,6 +60,24 @@ object ExampleTests extends TestSuite{
         (items |? grep! "^[123456]$".r) == Seq()
       )
     }
+    'pprint{
+      import ammonite.pprint.Config.Defaults._
 
+      assert(
+        ammonite.pprint.PPrint(root/'hello/'world) == "root/'hello/'world",
+        ammonite.pprint.PPrint('hello/'world) == "'hello/'world",
+        ammonite.pprint.PPrint(empty/'world) == "empty/'world",
+        ammonite.pprint.PPrint(empty/'hello/'world) == "'hello/'world",
+        ammonite.pprint.PPrint(empty/"hello world") == "empty/\"hello world\""
+      )
+      implicit val wd = root/'hello
+
+      assert(
+        ammonite.pprint.PPrint(root/'hello/'world/"whee.txt") == "wd/'world/\"whee.txt\"",
+        ammonite.pprint.PPrint(root/'hello/'world) == "wd/'world",
+        ammonite.pprint.PPrint(root/'hello) == "wd",
+        ammonite.pprint.PPrint(root) == "wd/up"
+      )
+    }
   }
 }
