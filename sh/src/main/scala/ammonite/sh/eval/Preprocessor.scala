@@ -90,22 +90,25 @@ class Preprocessor{
       case util.Success(parsed) if parsed.toString == "<empty>" =>
         Result.Failure("")
       case util.Success(parsed) =>
-        def handleTree(t: tb.u.Tree, c: String) = {
+        def handleTree(t: tb.u.Tree, c: String, name: String) = {
           decls(wrapperId).iterator.flatMap(_.apply(c, name)).next()
         }
         val allDecls = tb.parse(code) match{
           case b: tb.u.Block =>
-            val indices = b.children.map(_.pos.start) :+ code.length
-            for(((i, j), c) <- indices.zip(indices.tail).zip(b.children)) yield {
-              handleTree(c, code.substring(i, j))
+            // _.pos.start doesn't work, we need to recurse into the trees
+            // to find the position we want, which _.collect does for us
+            val indices = b.children.map(_.collect{case t => t.pos.start}.min) :+ code.length
+            val zipped = indices.zip(indices.tail).zip(b.children).zipWithIndex
+            for((((start, end), tree), i) <- zipped) yield {
+              handleTree(tree, code.substring(start, end), name + "_" + i)
             }
-          case t => Seq(handleTree(t, code))
-
+          case t => Seq(handleTree(t, code, name))
         }
         Result(
-          allDecls.reduceOption((a, b) => Output(a.code+b.code, a.printer+b.printer)),
+          allDecls.reduceOption((a, b) => Output(a.code+b.code, a.printer+ "+'\n'+" + b.printer)),
           "Don't know how to handle " + code
         )
       }
+
   }
 }

@@ -17,12 +17,11 @@ object AutocompleteTests extends TestSuite{
       val prevImports = check.eval.previousImportBlock
       val prev = prevImports + "\n" + "object Foo{\n"
       import collection.JavaConversions._
-      val completions = check.compiler.complete(
+      val (index, completions) = check.compiler.complete(
         cursor + prev.length,
         prev + buf + "\n}"
       )
-       .toSet
-      val left = cmp(expected, completions)
+      val left = cmp(expected, completions.toSet)
       assert(left == Set())
     }
 

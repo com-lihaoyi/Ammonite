@@ -70,14 +70,7 @@ object ExampleTests extends TestSuite{
         ammonite.pprint.PPrint(empty/'hello/'world) == "'hello/'world",
         ammonite.pprint.PPrint(empty/"hello world") == "empty/\"hello world\""
       )
-      implicit val wd = root/'hello
 
-      assert(
-        ammonite.pprint.PPrint(root/'hello/'world/"whee.txt") == "wd/'world/\"whee.txt\"",
-        ammonite.pprint.PPrint(root/'hello/'world) == "wd/'world",
-        ammonite.pprint.PPrint(root/'hello) == "wd",
-        ammonite.pprint.PPrint(root) == "wd/up"
-      )
     }
   }
 }

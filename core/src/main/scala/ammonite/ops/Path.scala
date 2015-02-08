@@ -218,13 +218,8 @@ object Path{
     def nio = java.nio.file.Paths.get(p.toString)
   }
 
-  implicit def pathRepr(implicit wd: Path = root) = pprint.PPrinter[ammonite.ops.Path]{(p, c) =>
-    if (wd == root)
-      ("root" +: p.segments.map(BasePath.reprSection(_, c))).mkString("/")
-    else{
-      val p2 = p - wd
-      (Seq("wd") ++ Seq.fill(p2.ups)("up") ++ p2.segments.map(BasePath.reprSection(_, c))).mkString("/")
-    }
+  implicit def pathRepr = pprint.PPrinter[ammonite.ops.Path]{(p, c) =>
+    ("root" +: p.segments.map(BasePath.reprSection(_, c))).mkString("/")
   }
 }
 

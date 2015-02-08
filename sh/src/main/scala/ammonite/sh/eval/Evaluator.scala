@@ -131,7 +131,7 @@ class Evaluator(currentClassloader: ClassLoader,
         def $$main() = {$printer}
       }
     """
-
+    _ = println(wrapped)
     wrappedWithImports = previousImportBlock + "\n\n" + wrapped
     evaled <- evalMain(wrappedWithImports, wrapperName)
     newImports = importsFor(wrapperName, wrappedWithImports)
