@@ -11,9 +11,9 @@ import scala.reflect.io.VirtualDirectory
 
 
 class Checker {
-  val preprocess = new Preprocessor
   val dynamicClasspath = new VirtualDirectory("(memory)", None)
   val compiler = new Compiler(dynamicClasspath, println)
+  val preprocess = new Preprocessor(compiler.parse)
   val eval = new Evaluator(
     Thread.currentThread().getContextClassLoader,
     preprocess.apply,

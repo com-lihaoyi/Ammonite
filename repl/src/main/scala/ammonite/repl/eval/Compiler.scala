@@ -2,6 +2,7 @@ package ammonite.repl.eval
 
 
 import acyclic.file
+import ammonite.repl.Parsed
 import scala.reflect.internal.util.{BatchSourceFile, OffsetPosition, Position}
 import scala.reflect.io
 import scala.reflect.io._
@@ -197,6 +198,22 @@ class Compiler(dynamicClasspath: VirtualDirectory, logger: String => Unit) {
   }
 
   /**
+   * Weird hack, stolen from ILoop, used to parse snippets of code while
+   * letting us know if it's incomplete (vs just blowing up)
+   */
+  def parse(line: String): Parsed = {
+    var isIncomplete = false
+
+    compiler.currentRun.parsing.withIncompleteHandler((_, _) => isIncomplete = true) {
+      reporter.reset()
+      val trees = compiler.newUnitParser(line).parseStats()
+      if (reporter.hasErrors) Parsed.Error
+      else if (isIncomplete) Parsed.Incomplete
+      else Parsed.Success(trees)
+    }
+  }
+
+  /**
    * Code to initialize random bits and pieces that are needed
    * for the Scala compiler to function, common between the
    * normal and presentation compiler
@@ -205,6 +222,7 @@ class Compiler(dynamicClasspath: VirtualDirectory, logger: String => Unit) {
     val vd = new io.VirtualDirectory("(memory)", None)
     lazy val settings = new Settings
     val settingsX = settings
+    settingsX.Yrangepos.value = true
     val jCtx = new JavaContext()
     val jDirs = Classpath.jarDeps.map(x =>
       new DirectoryClassPath(new FileZipArchive(x), jCtx)

@@ -2,6 +2,7 @@ package ammonite.repl
 
 import acyclic.file
 
+import scala.tools.nsc.Global
 import scala.util.Try
 
 object Result{
@@ -35,6 +36,7 @@ object Result{
     def map[V](f: Nothing => V): Result[V] = this
   }
   case class Failure(s: String) extends Failing
+  case object Skip extends Failing
   case object Exit extends Failing
   case class Buffer(s: String) extends Failing
 }
@@ -64,3 +66,17 @@ case class Catching(handler: PartialFunction[Throwable, String]) {
 case class Evaluated(msg: String,
                      wrapper: String,
                      imports: Seq[(String, String)])
+
+/**
+ * The results of parsing a string into code.
+ *
+ * Note that error cases don't convey any additional information;
+ * any debugging would already have been printed by the compiler
+ * to stdout.
+ */
+abstract sealed class Parsed
+object Parsed{
+  case object Error extends Parsed
+  case object Incomplete extends Parsed
+  case class Success(trees: List[Global#Tree]) extends Parsed
+}
