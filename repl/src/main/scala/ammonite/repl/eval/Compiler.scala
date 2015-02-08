@@ -41,7 +41,7 @@ object Compiler{
  * classfile per source-string (e.g. inner classes, or lambdas). Also lets
  * you query source strings using an in-built presentation compiler
  */
-class Compiler(dynamicClasspath: VirtualDirectory) {
+class Compiler(dynamicClasspath: VirtualDirectory, logger: String => Unit) {
   import ammonite.repl.eval.Compiler._
 
   /**
@@ -56,8 +56,6 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
       e => throw e
     )
   }
-
-  var currentLogger: String => Unit = s => ()
 
   val pressy = {
     val (settings, reporter, vd, jcp) = initGlobalBits(_ => (), scala.Console.YELLOW)
@@ -74,7 +72,7 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
   }
 
   val (vd, reporter, compiler) = {
-    val (settings, reporter, vd, jcp) = initGlobalBits(currentLogger, scala.Console.RED)
+    val (settings, reporter, vd, jcp) = initGlobalBits(logger, scala.Console.RED)
     val scalac = new nsc.Global(settings, reporter) { g =>
       override def classPath = jcp
       override lazy val platform: ThisPlatform = new JavaPlatform{
@@ -95,8 +93,6 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
    * the outside caller probably doesn't care.
    */
   def complete(index: Int, allCode: String): (Int, Seq[String]) = {
-//    println("Compiler.complete")
-//    println(allCode)
     val file = new BatchSourceFile(
       Compiler.makeFile(allCode.getBytes, name = "Hello.scala"),
       allCode
@@ -147,6 +143,15 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
     val scopes = awaitResponse[List[pressy.Member]](query(position, _))
     scopes.filter(_.accessible)
   }
+
+  /**
+   * Asks the presentation compiler for a list of imports that will be
+   * needed after this block of code has executed.
+   *
+   * We query the presentation compiler for the things needed at the
+   * end of the block, minus the things needed at the start, to
+   * figure out what additional things we need to import next time.
+   */
   def importsFor(wrapperName: String, allCode: String): Seq[(String, String)] = {
     def process(members: Seq[pressy.Member]) = pressy.ask { () =>
       members.collect { case x: pressy.ScopeMember =>
@@ -160,14 +165,18 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
         x.sym.name.toString.trim() -> s"/*$wrapperName*/ import $importTxt"
       }
     }
-    val end = process(askPressy(allCode.lastIndexOf('}') - 1, wrapperName, allCode, pressy.askScopeCompletion))
-    val start = process(askPressy(allCode.indexOf('{') + 1, wrapperName, allCode, pressy.askScopeCompletion))
+    def ask(i: Int) = process(askPressy(i, wrapperName, allCode, pressy.askScopeCompletion))
+    val end = ask(allCode.lastIndexOf('}') - 1)
+    val start = ask(allCode.indexOf('{') + 1)
     (end.toSet -- start.toSet).toSeq
   }
 
-  def compile(src: Array[Byte], logger: String => Unit = _ => ()): Output = {
+  /**
+   * Compiles a blob of bytes and spits of a list of classfiles
+   */
+  def compile(src: Array[Byte]): Output = {
     compiler.reporter.reset()
-    currentLogger = logger
+
     val singleFile = makeFile( src)
 
     val run = new compiler.Run()

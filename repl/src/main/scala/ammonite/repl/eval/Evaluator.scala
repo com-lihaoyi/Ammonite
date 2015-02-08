@@ -17,7 +17,7 @@ import scala.util.Try
  */
 class Evaluator(currentClassloader: ClassLoader,
                 preprocess: (String, Int) => Result[Preprocessor.Output],
-                compile: (Array[Byte], String => Unit) => Compiler.Output,
+                compile: Array[Byte] => Compiler.Output,
                 importsFor: (String, String) => Seq[(String, String)]) {
 
   def namesFor(t: scala.reflect.runtime.universe.Type): Set[String] = {
@@ -63,7 +63,7 @@ class Evaluator(currentClassloader: ClassLoader,
 
   def evalClass(code: String, wrapperName: String): Result[Class[_]] = for{
     compiled <- Result(Try(
-      compile(code.getBytes, println)
+      compile(code.getBytes)
     ), e => {println("!!!! " + e.printStackTrace()); e.toString})
 
     classFiles <- Result[Traversable[(String, Array[Byte])]](compiled, "Compilation Failed")

@@ -11,7 +11,7 @@ import scala.reflect.io.VirtualDirectory
 class Repl(input: InputStream, output: OutputStream) {
 
   val dynamicClasspath = new VirtualDirectory("(memory)", None)
-  val compiler = new Compiler(dynamicClasspath)
+  val compiler = new Compiler(dynamicClasspath, println)
   val mainThread = Thread.currentThread()
   val preprocess = new Preprocessor
 
