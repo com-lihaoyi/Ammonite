@@ -2,20 +2,18 @@ package ammonite.repl
 
 import ammonite.repl.eval
 import ammonite.repl.eval.{Evaluator, Compiler, Preprocessor}
-import ammonite.repl.frontend.{ReplAPI, ReplAPIHolder}
+import ammonite.repl.frontend.{FullReplAPI, ReplAPI, ReplAPIHolder}
 import utest._
 
 import scala.collection.mutable
 import scala.reflect.runtime.universe._
 import scala.reflect.io.VirtualDirectory
 
-/**
- * Created by haoyi on 1/20/15.
- */
+
 class Checker {
   val preprocess = new Preprocessor
   val dynamicClasspath = new VirtualDirectory("(memory)", None)
-  val compiler = new Compiler(dynamicClasspath)
+  val compiler = new Compiler(dynamicClasspath, println)
   val eval = new Evaluator(
     Thread.currentThread().getContextClassLoader,
     preprocess.apply,
@@ -31,7 +29,7 @@ class Checker {
 
   ReplAPI.initReplBridge(
     cls.asInstanceOf[Result.Success[Class[ReplAPIHolder]]].s,
-    new ReplAPI {
+    new FullReplAPI {
       def help: String = "Hello!"
       def history: Seq[String] = Seq("1")
       def shellPPrint[T: WeakTypeTag](value: => T, ident: String) = {

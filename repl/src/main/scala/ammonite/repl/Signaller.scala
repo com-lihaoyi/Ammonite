@@ -18,7 +18,7 @@ case class Signaller(sigStr: String)(f: => Unit) extends Scoped{
     handlersField.get(null)
       .asInstanceOf[java.util.Hashtable[Signal, SignalHandler]]
   }
-  val x = util.Random.nextInt()
+
   def apply[T](t: => T): T = {
 
     val handler = new SignalHandler () {
