@@ -60,7 +60,8 @@ class Shell() {
     res <- Option(
       reader.readLine(
         if (buffered == "") Apis.shellPrompt + " "
-        else " " * "scala> ".length
+        // Strip ANSI color codes, as described http://stackoverflow.com/a/14652763/871202
+        else " " * (Apis.shellPrompt.replaceAll("\u001B\\[[;\\d]*m", "").length + 1)
       )
     ).map(Result.Success(_))
      .getOrElse(Result.Exit)
