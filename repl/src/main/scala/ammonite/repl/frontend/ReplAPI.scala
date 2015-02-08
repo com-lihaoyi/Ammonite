@@ -34,12 +34,12 @@ trait ReplAPI {
   /**
    * Get the `Type` object of [[T]]
    */
-  def typeOf[T: WeakTypeTag]
+  def typeOf[T: WeakTypeTag]: Type
 
   /**
    * Get the `Type` object representing the type of `t`
    */
-  def typeOf[T: WeakTypeTag](t: => T)
+  def typeOf[T: WeakTypeTag](t: => T): Type
 }
 
 /**

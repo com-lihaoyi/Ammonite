@@ -81,8 +81,7 @@ class JLineFrontend(input: InputStream,
       val last = reader.getHistory.size()-1
       reader.getHistory.set(last, buffered + reader.getHistory.get(last))
       buffered = ""
-    case Result.Failure(msg) =>
-      buffered = ""
+    case Result.Failure(msg) => buffered = ""
     case _ =>
   }
 }

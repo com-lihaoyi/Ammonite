@@ -73,6 +73,11 @@ lazy val core = project.settings(sharedSettings:_*).settings(
     val output = s"""
       package ammonite.pprint
       trait PPrinterGen extends GenUtils{
+        /**
+          * Special, because `Product0` doesn't exist
+          */
+        implicit def Product0Unpacker = (t: Unit, c: C) => Seq()
+
         ${tuples.mkString("\n")}
       }
     """.stripMargin

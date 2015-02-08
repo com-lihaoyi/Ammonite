@@ -100,9 +100,30 @@ object EvaluatorTests extends TestSuite{
       check("X.Y", "res5: Int = 2")
     }
     'multistatement{
-      check("1; 2L; '3';", "res0_0: Int = 1\nres0_1: Long = 2L\nres0_2: Char = '3'")
-      check("val x = 1; x;", "x: Int = 1\nres1_1: Int = 1")
-      check("var x = 1; x = 2; x", "x: Int = 2\nres2_1: Unit = ()\nres2_2: Int = 2")
+      check(
+        "1; 2L; '3';",
+        """res0_0: Int = 1
+          |res0_1: Long = 2L
+          |res0_2: Char = '3'""".stripMargin
+      )
+      check(
+        "val x = 1; x;",
+        """x: Int = 1
+          |res1_1: Int = 1""".stripMargin
+      )
+      check(
+        "var x = 1; x = 2; x",
+        """x: Int = 2
+          |res2_1: Unit = ()
+          |res2_2: Int = 2""".stripMargin
+      )
+      check(
+        "var y = 1; case class C(i: Int = 0){ def foo = x + y }; new C().foo",
+        """y: Int = 1
+          |defined class C
+          |res3_2: Int = 3""".stripMargin
+      )
+      check("ammonite.pprint.PPrint(C())(ammonite.pprint.PPrint.Contra)", "res4: C = C")
     }
   }
 }

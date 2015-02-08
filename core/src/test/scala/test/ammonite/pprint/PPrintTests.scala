@@ -8,6 +8,7 @@ import scala.util.matching.Regex
 import ammonite.pprint._
 case class Foo(integer: Int, sequence: Seq[String])
 case class FooG[T](t: T, sequence: Seq[String])
+case class FooNoArgs()
 object PPrintTests extends TestSuite{
   def check[T: PPrint](t: T, expected: String) = {
     val pprinted = PPrint(t)
@@ -16,33 +17,33 @@ object PPrintTests extends TestSuite{
 
   val tests = TestSuite{
 
-    'Horizontal{
+    'Horizontal {
       import ammonite.pprint.Config.Defaults._
-      'primitives{
-        'Unit{
+      'primitives {
+        'Unit {
           * - check((), "()")
         }
-        'Char{
+        'Char {
           * - check('\n', "'\\n'")
           * - check('a', "'a'")
         }
-        'Byte{
+        'Byte {
           * - check(123.toByte, "123")
           * - check(-123.toByte, "-123")
         }
-        'Short{
+        'Short {
           * - check(123.toShort, "123")
           * - check(-12345.toShort, "-12345")
         }
-        'Int{
+        'Int {
           * - check(123, "123")
           * - check(-1234567, "-1234567")
         }
-        'Long{
+        'Long {
           * - check(123456789012345L, "123456789012345L")
           * - check(-123456789012345L, "-123456789012345L")
         }
-        'Float{
+        'Float {
           * - check(0.75F, "0.75F")
           * - check(-13.5F, "-13.5F")
         }
@@ -50,32 +51,32 @@ object PPrintTests extends TestSuite{
           * - check(0.125, "0.125")
           * - check(-0.125, "-0.125")
         }
-        'String{
+        'String {
           * - check("i am a cow", """ "i am a cow" """)
-          * - check(""" "hello" """.trim, """ "\"hello\"" """)
+          * - check( """ "hello" """.trim, """ "\"hello\"" """)
           * - check("\n\n\n", """ "\n\n\n" """)
         }
-        'Symbols{
+        'Symbols {
           * - check('hello, """'hello""")
           * - check('I_AM_A_COW, """'I_AM_A_COW""")
         }
       }
 
-      'misc{
-//        'Nothing - intercept[NotImplementedError](check(???, ""))
-        'Null{
+      'misc {
+        //        'Nothing - intercept[NotImplementedError](check(???, ""))
+        'Null {
           check(null, "null")
           check(null: String, "null")
           check(Seq("look!", null: String, "hi"), """List("look!", null, "hi")""")
         }
-        'Either{
+        'Either {
           check(Left(123): Either[Int, Int], "Left(123)")
           check(Left(123): Left[Int, Int], "Left(123)")
 
           check(Left(123), "Left(123)")
           check(Right((1, "2", 3)), """Right((1, "2", 3))""")
         }
-        'Options{
+        'Options {
           check(Some(123), "Some(123)")
           check(None: Option[Int], "None")
           check(None: Option[Nothing], "None")
@@ -84,7 +85,7 @@ object PPrintTests extends TestSuite{
         }
       }
 
-      'collections{
+      'collections {
         // Fallback to toString
         'Iterator - check(Iterator(1, 2, 3), "non-empty iterator")
 
@@ -96,11 +97,11 @@ object PPrintTests extends TestSuite{
         'Iterable - check(Iterable('omg, 'wtf, 'bbq), """List('omg, 'wtf, 'bbq)""")
         'Traversable - check(Traversable('omg, 'wtf, 'bbq), """List('omg, 'wtf, 'bbq)""")
         'Set - check(Set('omg), """Set('omg)""")
-        'SortedSet- check(
+        'SortedSet - check(
           imm.SortedSet("1", "2", "3"),
           """TreeSet("1", "2", "3")"""
         )
-        'Map{
+        'Map {
           check(Map("key" -> "value"), """Map("key" -> "value")""")
         }
 
@@ -110,7 +111,7 @@ object PPrintTests extends TestSuite{
         )
       }
 
-      'tuples{
+      'tuples {
 
         check(Tuple1("123"), """Tuple1("123")""")
         check((1, 2, "123"), """(1, 2, "123")""")
@@ -119,17 +120,20 @@ object PPrintTests extends TestSuite{
           """(1, 2, "123", (100L, 200L), 1.5F, 0.1)"""
         )
       }
-      'products{
-      }
-      check(
-        Foo(123, Seq("hello world", "moo")),
-        """Foo(123, List("hello world", "moo"))"""
-      )
+      'products {
 
-      check(
-        Seq(Foo(123, Seq("hello world", "moo"))),
-        """List(Foo(123, List("hello world", "moo")))"""
-      )
+        check(
+          Foo(123, Seq("hello world", "moo")),
+          """Foo(123, List("hello world", "moo"))"""
+        )
+
+        check(
+          Seq(Foo(123, Seq("hello world", "moo"))),
+          """List(Foo(123, List("hello world", "moo")))"""
+        )
+
+        check(FooNoArgs(), "FooNoArgs()")
+      }
     }
     'Vertical{
 

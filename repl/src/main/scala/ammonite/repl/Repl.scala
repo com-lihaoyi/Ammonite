@@ -13,7 +13,7 @@ class Repl(input: InputStream, output: OutputStream) {
   val dynamicClasspath = new VirtualDirectory("(memory)", None)
   val compiler = new Compiler(dynamicClasspath, println)
   val mainThread = Thread.currentThread()
-  val preprocess = new Preprocessor(compiler.parse(_))
+  val preprocess = new Preprocessor(compiler.parse)
 
   val eval = new Evaluator(
     mainThread.getContextClassLoader,
@@ -56,13 +56,11 @@ class Repl(input: InputStream, output: OutputStream) {
       frontEnd.update(res)
       eval.update(res)
       res match{
-        case Result.Skip =>
-          loop()
+        case Result.Skip => loop()
+        case Result.Buffer(line) => loop()
         case Result.Exit =>
           compiler.pressy.askShutdown()
           println("Bye!")
-        case Result.Buffer(line) =>
-          loop()
         case Result.Success(ev) =>
           println(ev.msg)
           loop()

@@ -181,6 +181,9 @@ object Internals {
     type UP[T] = Unpacker[T]
     type PP[T] = PPrint[T]
     type C = Config
+
+
+
     def render[T: PP](t: T, c: Config) = implicitly[PPrint[T]].render(t, c)
   }
 
@@ -231,7 +234,11 @@ object Internals {
           val tupleName = newTermName(s"Product${arity}Unpacker")
           val thingy ={
             val get = q"$companion.unapply(t).get"
-            if (arity > 1) get else q"Tuple1($get)"
+            arity match{
+              case 0 => q"()"
+              case 1 => q"Tuple1($get)"
+              case n => q"$companion.unapply(t).get"
+            }
           }
           // We're fleshing this out a lot more than necessary to help
           // scalac along with its implicit search, otherwise it gets
@@ -241,7 +248,7 @@ object Internals {
           q"""
             new ammonite.pprint.PPrint[$tpe](
               ammonite.pprint.Internals.fromUnpacker[$tpe](_.productPrefix){
-                (t: $tpe, cfg: Config) =>
+                (t: $tpe, cfg: ammonite.pprint.Config) =>
                   ammonite.pprint
                           .Internals
                           .Unpacker
