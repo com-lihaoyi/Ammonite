@@ -30,9 +30,7 @@ class Repl(input: InputStream, output: OutputStream) {
     () => mainThread.stop()
   )
 
-  lazy val replAPI: ReplAPI = new DefaultReplAPI({
-    frontEnd.history
-  })
+  lazy val replAPI: ReplAPI = new DefaultReplAPI(frontEnd.history)
 
   compiler.importsFor("", eval.replBridgeCode)
   val cls = eval.evalClass(eval.replBridgeCode, "ReplBridge")
