@@ -173,6 +173,11 @@ object PathTests extends TestSuite{
         intercept[IllegalArgumentException](Path("omg/cow"))
         intercept[IllegalArgumentException](RelPath("/omg/cow"))
       }
+      'Pollution{
+        // Make sure we're not polluting too much
+        compileError("""'omg.ext""")
+        compileError(""" "omg".ext """)
+      }
     }
     'Extractors{
       'regex{

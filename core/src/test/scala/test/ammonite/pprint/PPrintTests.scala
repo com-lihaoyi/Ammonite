@@ -83,6 +83,10 @@ object PPrintTests extends TestSuite{
           check(None, "None")
           check(Some(None), "Some(None)")
         }
+        'Default{
+          check(() => (), "<function0>")
+          check((i: Int) => (), "<function1>")
+        }
       }
 
       'collections {
@@ -337,11 +341,7 @@ object PPrintTests extends TestSuite{
         GREEN -> 5, YELLOW -> 4, RESET -> 9
       )
     }
-    'Negative{
-      // Make sure we're not polluting too much
-      compileError("""'omg.ext""")
-      compileError(""" "omg".ext """)
-    }
+
   }
 
 }

@@ -123,7 +123,10 @@ object EvaluatorTests extends TestSuite{
           |defined class C
           |res3_2: Int = 3""".stripMargin
       )
-      check("ammonite.pprint.PPrint(C())(ammonite.pprint.PPrint.Contra)", "res4: C = C")
+      check(
+        "C()",
+        "res4: $res3.C = C(0)"
+      )
     }
   }
 }
