@@ -102,7 +102,7 @@ object EvaluatorTests extends TestSuite{
     'multistatement{
       check("1; 2L; '3';", "res0_0: Int = 1\nres0_1: Long = 2L\nres0_2: Char = '3'")
       check("val x = 1; x;", "x: Int = 1\nres1_1: Int = 1")
-      check("var x = 1; x = 2;", "x: Int = 2\nres2_1: Unit = ()")
+      check("var x = 1; x = 2; x", "x: Int = 2\nres2_1: Unit = ()\nres2_2: Int = 2")
     }
   }
 }
