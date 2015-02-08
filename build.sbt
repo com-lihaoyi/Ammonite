@@ -3,8 +3,8 @@ val sharedSettings = Seq(
   organization := "com.lihaoyi",
   crossScalaVersions := Seq("2.10.4", "2.11.4"),
   version := "0.1.4",
-  libraryDependencies += "com.lihaoyi" %% "utest" % "0.2.4" % "test",
-  testFrameworks += new TestFramework("utest.runner.JvmFramework"),
+  libraryDependencies += "com.lihaoyi" %% "utest" % "0.3.0" % "test",
+  testFrameworks += new TestFramework("utest.runner.Framework"),
   autoCompilerPlugins := true,
   addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.2"),
   libraryDependencies ++= Seq(
@@ -17,7 +17,7 @@ val sharedSettings = Seq(
       compilerPlugin("org.scalamacros" % s"paradise" % "2.0.0" cross CrossVersion.full)
     )
   ),
-  publishTo := Some("releases"  at "https://oss.sonatype.org/service/local/staging/deploy/maven2"),
+  publishTo := Some("releases" at "https://oss.sonatype.org/service/local/staging/deploy/maven2"),
   pomExtra :=
     <url>https://github.com/lihaoyi/Ammonite</url>
       <licenses>
@@ -46,8 +46,7 @@ lazy val sh = project.dependsOn(core).settings(sharedSettings:_*).settings(
   libraryDependencies ++= Seq(
     "org.scala-lang" % "scala-compiler" % scalaVersion.value,
     "jline" % "jline" % "2.12",
-    "org.scala-lang" % "scala-reflect" % scalaVersion.value,
-    "com.lihaoyi" %% "scala-parser-lite" % "0.1.0"
+    "org.scala-lang" % "scala-reflect" % scalaVersion.value
   ),
   fork in (Test, testOnly) := true
 )

@@ -84,6 +84,12 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
     (vd, reporter, scalac)
   }
 
+  /**
+   * Ask for autocompletion at a particular spot in the code, returning
+   * possible things that can be completed at that location. May try various
+   * different completions depending on where the `index` is placed, but
+   * the outside caller probably doesn't care.
+   */
   def complete(index: Int, allCode: String): Seq[String] = {
 //    println("Compiler.complete")
 //    println(allCode)
@@ -91,45 +97,41 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
       Compiler.makeFile(allCode.getBytes, name = "Hello.scala"),
       allCode
     )
+    def ask(query: (Position, Response[List[pressy.Member]]) => Unit) = {
+      askPressy(index, "Current", allCode, query)
+    }
     val tree = pressy.parseTree(file)
     def dotted = tree.collect{
       case t @ pressy.Select(qualifier, name)
         if qualifier.pos.end <= index && index <= t.pos.end =>
-        val r = askAt(
-          index,
-          "Current",
-          allCode,
-          pressy.askTypeCompletion(_, _)
-        )
-      val prefix = if(name.decoded == "<error>") "" else name.decoded
+        val r = ask(pressy.askTypeCompletion)
+        val prefix = if(name.decoded == "<error>") "" else name.decoded
 
-      pressy.ask(() => r.map(_.sym.name.decoded).filter(_.startsWith(prefix)))
+        pressy.ask(() => r.map(_.sym.name.decoded).filter(_.startsWith(prefix)))
     }
 
     def prefixed = tree.collect{
       case t @ pressy.Ident(name)
         if t.pos.start <= index && index <= t.pos.end =>
-        val r = askAt(
-          index,
-          "Current",
-          allCode,
-          pressy.askScopeCompletion(_, _)
-        )
+        val r = ask(pressy.askScopeCompletion)
 
         pressy.ask(() => r.map(_.sym.name.decoded).filter(_.startsWith(name.decoded)))
     }
 
     def scoped =
-      askAt(index, "Current", allCode, pressy.askScopeCompletion(_, _))
+      ask(pressy.askScopeCompletion)
         .map(s => pressy.ask(() => s.sym.name.decoded))
 
     dotted.headOption orElse prefixed.headOption getOrElse scoped filter (_ != "<init>")
   }
 
-  def askAt(index: Int,
-            wrapperName: String,
-            allCode: String,
-            query: (Position, Response[List[pressy.Member]]) => Unit) = {
+  /**
+   * Queries the presentation compiler for a list of members
+   */
+  def askPressy(index: Int,
+                wrapperName: String,
+                allCode: String,
+                query: (Position, Response[List[pressy.Member]]) => Unit) = {
     val filename = wrapperName + ".scala"
     val file = new BatchSourceFile(
       makeFile(allCode.getBytes, name = filename),
@@ -153,8 +155,8 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
         x.sym.name.toString.trim() -> s"/*$wrapperName*/ import $importTxt"
       }
     }
-    val end = process(askAt(allCode.lastIndexOf('}') - 1, wrapperName, allCode, pressy.askScopeCompletion(_, _)))
-    val start = process(askAt(allCode.indexOf('{') + 1, wrapperName, allCode, pressy.askScopeCompletion(_, _)))
+    val end = process(askPressy(allCode.lastIndexOf('}') - 1, wrapperName, allCode, pressy.askScopeCompletion))
+    val start = process(askPressy(allCode.indexOf('{') + 1, wrapperName, allCode, pressy.askScopeCompletion))
     (end.toSet -- start.toSet).toSeq
   }
 

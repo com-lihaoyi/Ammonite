@@ -41,6 +41,7 @@ class Checker {
     }
   )
   def apply(input: String, expected: String = null) = {
+    print(".")
     val processed = eval.processLine(input)
     val printed = processed.map(_.msg)
     if (expected != null)

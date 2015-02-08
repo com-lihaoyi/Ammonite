@@ -123,6 +123,7 @@ class Evaluator(currentClassloader: ClassLoader,
       "Don't recognize that input =/"
     )
 
+
     wrapperName = "$res" + currentLine
     wrapped = s"""
       object Foo$wrapperName{   }
