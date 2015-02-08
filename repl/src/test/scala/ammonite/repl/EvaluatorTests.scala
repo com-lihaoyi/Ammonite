@@ -86,6 +86,19 @@ object EvaluatorTests extends TestSuite{
       check("abs(-4)", "res9: Int = 4")
     }
 
+    'classes{
+      check("""class C{override def toString() = "Ceee"}""", "defined class C")
+      check("new C", "res1: $res0.C = Ceee")
+      check("""case object CO""", "defined object CO")
+      check("CO", "res3: $res2.CO.type = CO")
+      check("""case class CC()""", "defined class CC")
+      check("CC()", "res5: $res4.CC = CC()")
+      check("CO", "res6: $res2.CO.type = CO")
+      check("""case class CO()""", "defined class CO")
+      check("CO", "res8: $res7.CO.type = CO")
+      check("CO()", "res9: $res7.CO = CO()")
+    }
+
     'packageImport{
       check("import ammonite.pprint._")
       check("import Config.Defaults._")

@@ -116,8 +116,23 @@ object PPrinter {
   implicit def MapRepr[T: PPrint, V: PPrint] = Internals.makeMapRepr[Map, T, V]("Map")
 
 }
+object Unpacker extends PPrinterGen {
+  // Things being injected into PPrinterGen to keep it acyclic
+  type UP[T] = Internals.Unpacker[T]
+  type PP[T] = PPrint[T]
+  type C = Config
+
+  /**
+   * Special, because `Product0` doesn't exist
+   */
+  implicit def Product0Unpacker = (t: Unit, c: C) => Seq()
+  val foo = 1
+  def render[T: PP](t: T, c: Config) = implicitly[PPrint[T]].render(t, c)
+}
+
 
 object Internals {
+
   def mapEntryPrinter[T: PPrint, V: PPrint] = PPrinter[(T, V)] { case ((t, v), c) =>
     implicitly[PPrint[T]].render(t, c) + " -> " + implicitly[PPrint[V]].render(v, c)
   }
@@ -176,16 +191,6 @@ object Internals {
 
   type Unpacker[T] = (T, Config) => Seq[String]
 
-  object Unpacker extends PPrinterGen {
-    // Things being injected into PPrinterGen to keep it acyclic
-    type UP[T] = Unpacker[T]
-    type PP[T] = PPrint[T]
-    type C = Config
-
-
-
-    def render[T: PP](t: T, c: Config) = implicitly[PPrint[T]].render(t, c)
-  }
 
   trait LowPriPPrint {
     implicit def FinalRepr[T]: PPrint[T] = macro LowerPriPPrint.FinalRepr[T]
@@ -207,7 +212,6 @@ object Internals {
         case util.Success(f) if f.isCaseClass && !f.isModuleClass =>
 
           val constructor = tpe.member(newTermName("<init>"))
-
 
           val companion = tpe.typeSymbol.companionSymbol
 
@@ -250,7 +254,6 @@ object Internals {
               ammonite.pprint.Internals.fromUnpacker[$tpe](_.productPrefix){
                 (t: $tpe, cfg: ammonite.pprint.Config) =>
                   ammonite.pprint
-                          .Internals
                           .Unpacker
                           .$tupleName[..$paramTypes]
                           .apply($thingy, cfg)
