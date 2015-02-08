@@ -57,7 +57,7 @@ class Preprocessor(parse: String => Parsed){
   }
 
   val Expr = Processor{ case (name, code, tree) =>
-    Preprocessor.Output(s"val $name = ($code)", pprint(name))
+    Preprocessor.Output(s"val $name = $code", pprint(name))
   }
   val Import = Processor{ case (name, code, tree: Global#Import) =>
     Preprocessor.Output(code, '"'+code+'"')

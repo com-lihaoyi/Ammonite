@@ -124,7 +124,7 @@ class Evaluator(currentClassloader: ClassLoader,
   def processLine(line: String) = for {
     Preprocessor.Output(code, printer) <- preprocess(line, currentLine)
 
-    wrapperName = "$res" + currentLine
+    wrapperName = "cmd" + currentLine
     wrapped = s"""
       object Foo$wrapperName{   }
       object $wrapperName{

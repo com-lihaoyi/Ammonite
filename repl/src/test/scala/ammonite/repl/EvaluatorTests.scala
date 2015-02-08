@@ -53,12 +53,12 @@ object EvaluatorTests extends TestSuite{
       check("type Funky = Array[Array[String]]", "defined type Funky")
       check(
         """val arr: Funky = Array(Array("Hello!"))""",
-        """arr: $res0.Funky = Array(Array("Hello!"))"""
+        """arr: cmd0.Funky = Array(Array("Hello!"))"""
       )
       check("type Funky2[T] = Array[Array[T]]", "defined type Funky2")
       check(
         """val arr: Funky2[Int] = Array(Array(123))""",
-        """arr: $res2.Funky2[Int] = Array(Array(123))"""
+        """arr: cmd2.Funky2[Int] = Array(Array(123))"""
       )
     }
     'library{
@@ -88,15 +88,15 @@ object EvaluatorTests extends TestSuite{
 
     'classes{
       check("""class C{override def toString() = "Ceee"}""", "defined class C")
-      check("new C", "res1: $res0.C = Ceee")
+      check("new C", "res1: cmd0.C = Ceee")
       check("""case object CO""", "defined object CO")
-      check("CO", "res3: $res2.CO.type = CO")
+      check("CO", "res3: cmd2.CO.type = CO")
       check("""case class CC()""", "defined class CC")
-      check("CC()", "res5: $res4.CC = CC()")
-      check("CO", "res6: $res2.CO.type = CO")
+      check("CC()", "res5: cmd4.CC = CC()")
+      check("CO", "res6: cmd2.CO.type = CO")
       check("""case class CO()""", "defined class CO")
-      check("CO", "res8: $res7.CO.type = CO")
-      check("CO()", "res9: $res7.CO = CO()")
+      check("CO", "res8: cmd7.CO.type = CO")
+      check("CO()", "res9: cmd7.CO = CO()")
     }
 
     'packageImport{
@@ -138,7 +138,7 @@ object EvaluatorTests extends TestSuite{
       )
       check(
         "C()",
-        "res4: $res3.C = C(0)"
+        "res4: cmd3.C = C(0)"
       )
     }
   }
