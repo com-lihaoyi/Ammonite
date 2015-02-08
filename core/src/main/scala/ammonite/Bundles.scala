@@ -20,11 +20,17 @@ object shell extends Bundle{
 }
 trait Bundle extends ops.RelPathStuff with ops.Extensions{
 
+  type Path = ops.Path
+  val Path = ops.Path
+
+  type RelPath = ops.RelPath
+  val RelPath = ops.RelPath
   /**
    * The root of the filesystem
    */
   val root = ops.Path.root
 
+  val home = Path(System.getProperty("user.home"))
   /**
    * The current working directory for this process.
    */
