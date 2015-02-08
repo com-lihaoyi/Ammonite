@@ -1,10 +1,10 @@
 package ammonite.repl.frontend
 
-import java.io.{OutputStream, InputStream, PrintWriter, StringWriter}
+import java.io.{OutputStream, InputStream}
 
-import ammonite.repl.{Evaluated, Result, Catching, Signaller}
+import ammonite.repl.{Evaluated, Result, Signaller}
 import jline.console.ConsoleReader
-import jline.console.completer.Completer
+import acyclic.file
 
 import scala.tools.nsc.interpreter._
 import collection.JavaConversions._

@@ -3,10 +3,6 @@ import acyclic.file
 import ammonite.repl.Result
 import ammonite.repl.eval.Preprocessor.Output
 
-import scala.reflect.runtime._
-import scala.util.Try
-
-
 object Preprocessor{
   case class Output(code: String, printer: String)
 }

@@ -34,8 +34,12 @@ object Compiler{
   }
 }
 /**
+ * Encapsulates (almost) all the ickiness of Scalac so it doesn't leak into
+ * the rest of the codebase.
+ *
  * Turns source-strings into the bytes of classfiles, possibly more than one
- * classfile per source-string (e.g. inner classes, or lambdas)
+ * classfile per source-string (e.g. inner classes, or lambdas). Also lets
+ * you query source strings using an in-built presentation compiler
  */
 class Compiler(dynamicClasspath: VirtualDirectory) {
   import ammonite.repl.eval.Compiler._

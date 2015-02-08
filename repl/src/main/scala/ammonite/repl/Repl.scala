@@ -33,9 +33,7 @@ class Repl(input: InputStream, output: OutputStream) {
 
   compiler.importsFor("", eval.replBridgeCode)
   val cls = eval.evalClass(eval.replBridgeCode, "ReplBridge")
-
-
-  Repl.initReplBridge(
+  ReplAPI.initReplBridge(
     cls.asInstanceOf[Result.Success[Class[ReplAPIHolder]]].s,
     replAPI
   )
@@ -76,13 +74,7 @@ class Repl(input: InputStream, output: OutputStream) {
 }
 
 object Repl{
-  def initReplBridge(holder: Class[ReplAPIHolder], api: ReplAPI) = {
-    holder
-      .getDeclaredMethods
-      .find(_.getName.contains('$'))
-      .get
-      .invoke(null, api)
-  }
+
   def main(args: Array[String]) = {
     val shell = new Repl(System.in, System.out)
     shell.run()

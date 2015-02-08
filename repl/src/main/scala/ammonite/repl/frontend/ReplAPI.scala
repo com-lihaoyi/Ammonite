@@ -1,7 +1,7 @@
 package ammonite.repl.frontend
 
 import scala.reflect.runtime.universe._
-
+import acyclic.file
 class ReplAPIHolder {
   var shell0: ReplAPI = null
   lazy val shell = shell0
@@ -33,8 +33,17 @@ abstract class ReplAPI {
    */
   def typeOf[T: WeakTypeTag](t: => T) = scala.reflect.runtime.universe.weakTypeOf[T]
 }
-
+object ReplAPI{
+  def initReplBridge(holder: Class[ReplAPIHolder], api: ReplAPI) = {
+    holder
+      .getDeclaredMethods
+      .find(_.getName.contains('$'))
+      .get
+      .invoke(null, api)
+  }
+}
 class DefaultReplAPI(history0: => Seq[String]) extends ReplAPI {
+
   var shellPrompt: String = Console.MAGENTA + "scala>" + Console.RESET
   def help = "Hello!"
   def history: Seq[String] = history0
