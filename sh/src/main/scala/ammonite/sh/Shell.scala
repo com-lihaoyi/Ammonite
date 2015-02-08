@@ -73,11 +73,12 @@ class Shell() {
         val prevImports = eval.previousImportBlock
         val prev = prevImports + "\n" + "object Foo{\n"
         import collection.JavaConversions._
-        candidates.addAll(compiler.complete(
+        val (newCursor, completions) = compiler.complete(
           cursor + prev.length,
           prev + buf + "\n}"
-        ))
-        cursor
+        )
+        candidates.addAll(completions)
+        newCursor - prev.length
       }
     })
     @tailrec def loop(): Unit = {

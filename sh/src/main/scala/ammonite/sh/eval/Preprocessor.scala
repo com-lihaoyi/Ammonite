@@ -1,7 +1,6 @@
 package ammonite.sh.eval
 import acyclic.file
 import ammonite.sh.eval.Preprocessor.Output
-import org.parboiled2.ParserInput
 
 import scala.reflect.runtime._
 

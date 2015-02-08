@@ -56,7 +56,7 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
   var currentLogger: String => Unit = s => ()
 
   val pressy = {
-    val (settings, reporter, vd, jcp) = initGlobalBits(currentLogger, scala.Console.YELLOW)
+    val (settings, reporter, vd, jcp) = initGlobalBits(_ => (), scala.Console.YELLOW)
     new nsc.interactive.Global(settings, reporter) { g =>
       override def classPath = jcp
       override lazy val platform: ThisPlatform = new JavaPlatform{
@@ -90,7 +90,7 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
    * different completions depending on where the `index` is placed, but
    * the outside caller probably doesn't care.
    */
-  def complete(index: Int, allCode: String): Seq[String] = {
+  def complete(index: Int, allCode: String): (Int, Seq[String]) = {
 //    println("Compiler.complete")
 //    println(allCode)
     val file = new BatchSourceFile(
@@ -106,23 +106,23 @@ class Compiler(dynamicClasspath: VirtualDirectory) {
         if qualifier.pos.end <= index && index <= t.pos.end =>
         val r = ask(pressy.askTypeCompletion)
         val prefix = if(name.decoded == "<error>") "" else name.decoded
-
-        pressy.ask(() => r.map(_.sym.name.decoded).filter(_.startsWith(prefix)))
+        (qualifier.pos.end + 1, pressy.ask(() => r.map(_.sym.name.decoded).filter(_.startsWith(prefix))))
     }
 
     def prefixed = tree.collect{
       case t @ pressy.Ident(name)
         if t.pos.start <= index && index <= t.pos.end =>
         val r = ask(pressy.askScopeCompletion)
-
-        pressy.ask(() => r.map(_.sym.name.decoded).filter(_.startsWith(name.decoded)))
+        (t.pos.start, pressy.ask(() => r.map(_.sym.name.decoded).filter(_.startsWith(name.decoded))))
     }
 
-    def scoped =
-      ask(pressy.askScopeCompletion)
+    def scoped = {
+      index -> ask(pressy.askScopeCompletion)
         .map(s => pressy.ask(() => s.sym.name.decoded))
+        .filter(_ != "<init>")
+    }
 
-    dotted.headOption orElse prefixed.headOption getOrElse scoped filter (_ != "<init>")
+    dotted.headOption orElse prefixed.headOption getOrElse scoped
   }
 
   /**
