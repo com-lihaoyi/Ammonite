@@ -34,6 +34,17 @@ object Compiler{
     singleFile
   }
 }
+
+trait Compiler {
+  import ammonite.repl.eval.Compiler._
+
+  def parse(line: String): Parsed
+  def complete(index: Int, allCode: String): (Int, Seq[String])
+  def compile(src: Array[Byte]): Output
+  def importsFor(wrapperName: String, allCode: String): Seq[(String, String)]
+  def askShutdown(): Unit
+}
+
 /**
  * Encapsulates (almost) all the ickiness of Scalac so it doesn't leak into
  * the rest of the codebase.
@@ -42,10 +53,10 @@ object Compiler{
  * classfile per source-string (e.g. inner classes, or lambdas). Also lets
  * you query source strings using an in-built presentation compiler
  */
-class Compiler(jarDeps: Seq[java.io.File],
+class ScalaCompiler(jarDeps: Seq[java.io.File],
                dirDeps: Seq[java.io.File],
                dynamicClasspath: VirtualDirectory,
-               logger: String => Unit) {
+               logger: String => Unit) extends Compiler {
   import ammonite.repl.eval.Compiler._
 
   /**
@@ -74,6 +85,9 @@ class Compiler(jarDeps: Seq[java.io.File],
       }
     }
   }
+
+  def askShutdown(): Unit =
+    pressy.askShutdown()
 
   val (vd, reporter, compiler) = {
     val (settings, reporter, vd, jcp) = initGlobalBits(logger, scala.Console.RED)

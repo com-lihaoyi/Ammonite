@@ -17,7 +17,7 @@ object AutocompleteTests extends TestSuite{
       val prevImports = check.eval.previousImportBlock
       val prev = prevImports + "\n" + "object Foo{\n"
       import collection.JavaConversions._
-      val (index, completions) = check.compiler.complete(
+      val (index, completions) = check.eval.complete(
         cursor + prev.length,
         prev + buf + "\n}"
       )

@@ -3,8 +3,8 @@ package ammonite.repl
 import java.io.{OutputStream, InputStream}
 import java.net.URLClassLoader
 import ammonite.IvyThing
-import ammonite.repl.eval.{Classpath, Evaluator, Preprocessor, Compiler}
-import ammonite.repl.frontend.{DefaultReplAPI, ReplAPIHolder, ReplAPI}
+import ammonite.repl.eval._
+import ammonite.repl.frontend.{DefaultReplAPI, ReplAPI}
 import acyclic.file
 import org.apache.ivy.Ivy
 
@@ -18,53 +18,39 @@ class Repl(input: InputStream, output: OutputStream) {
   var extraJars = Seq[java.io.File]()
   var extraJarClassloaders = Seq[ClassLoader]()
 
-  var compiler: Compiler = _
+  val mainThread = Thread.currentThread()
+
+  val eval: Evaluator = new ScalaEvaluator(
+    mainThread.getContextClassLoader,
+    extraJarClassloaders
+  )
+
   def initCompiler() = {
-    compiler = new Compiler(
+    eval.setJars(
       Classpath.jarDeps ++ extraJars,
       Classpath.dirDeps,
-      dynamicClasspath,
-      println
+      dynamicClasspath
     )
   }
 
   initCompiler()
-
-  def initCompiler2() = {
-    compiler.importsFor("", eval.replBridgeCode)
-    val cls = eval.evalClass(eval.replBridgeCode, "ReplBridge")
-    ReplAPI.initReplBridge(
-      cls.asInstanceOf[Result.Success[Class[ReplAPIHolder]]].s,
-      replAPI
-    )
-  }
-  val mainThread = Thread.currentThread()
-  val preprocess = new Preprocessor((s) => compiler.parse(s))
-
-  val eval = new Evaluator(
-    mainThread.getContextClassLoader,
-    extraJarClassloaders,
-    preprocess.apply,
-    (b) => compiler.compile(b),
-    (w, c) => compiler.importsFor(w, c)
-  )
 
   val frontEnd = new frontend.JLineFrontend(
     input,
     output,
     replAPI.shellPrompt,
     eval.previousImportBlock,
-    (i, c) => compiler.complete(i, c)
+    (i, c) => eval.complete(i, c)
   )
 
-  def loadJar(jar: java.io.File) = {
+  def loadJar(jar: java.io.File): Unit = {
     extraJars = extraJars ++ Seq(jar)
     extraJarClassloaders ++= Seq(new URLClassLoader(
       Array(jar.toURI.toURL),
       getClass.getClassLoader
     ))
     initCompiler()
-    initCompiler2()
+    eval.initReplBridge(replAPI)
   }
   lazy val replAPI: ReplAPI = new DefaultReplAPI(
     frontEnd.history,
@@ -74,11 +60,11 @@ class Repl(input: InputStream, output: OutputStream) {
     },
     () => {
       initCompiler()
-      initCompiler2()
+      eval.initReplBridge(replAPI)
     }
   )
 
-  initCompiler2()
+  eval.initReplBridge(replAPI)
 
 
   def action() = for{
@@ -105,7 +91,7 @@ class Repl(input: InputStream, output: OutputStream) {
         case Result.Skip => loop()
         case Result.Buffer(line) => loop()
         case Result.Exit =>
-          compiler.pressy.askShutdown()
+          eval.askShutdown()
           println("Bye!")
         case Result.Success(ev) =>
           println(ev.msg)

@@ -10,12 +10,16 @@ object Preprocessor{
   case class Output(code: String, printer: String)
 }
 
+trait Preprocessor {
+  def apply(code: String, wrapperId: Int): Result[Preprocessor.Output]
+}
+
 /**
  * Converts REPL-style snippets into full-fledged Scala source files,
  * ready to feed into the compiler. Each source-string is turned into
  * three things:
  */
-class Preprocessor(parse: String => Parsed){
+class ScalaPreprocessor(parse: String => Parsed) extends Preprocessor {
   
 
   def Processor(cond: PartialFunction[(String, String, Global#Tree), Preprocessor.Output]) = {

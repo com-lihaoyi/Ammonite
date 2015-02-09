@@ -3,8 +3,9 @@ package ammonite.repl.eval
 import java.lang.reflect.InvocationTargetException
 
 import acyclic.file
-import ammonite.repl.frontend.ReplAPI
+import ammonite.repl.frontend.{ReplAPI, ReplAPIHolder}
 import ammonite.repl.{Evaluated, Result, Catching}
+import scala.reflect.io.VirtualDirectory
 import scala.reflect.runtime.universe._
 import scala.collection.mutable
 import scala.util.Try
@@ -15,16 +16,64 @@ import scala.util.Try
  * where `output` is what gets printed and `imports` are any imports that
  * need to get prepended to subsequent commands.
  */
-class Evaluator(currentClassloader: ClassLoader,
-                extraClassLoaders: => Seq[ClassLoader],
-                preprocess: (String, Int) => Result[Preprocessor.Output],
-                compile: => Array[Byte] => Compiler.Output,
-                importsFor: => (String, String) => Seq[(String, String)]) {
+trait Evaluator {
+  def initReplBridge(replAPI: ReplAPI): Unit
+  def previousImportBlock: String
+  def processLine(line: String): Result[Evaluated]
+  def update(res: Result[Evaluated]): Unit
+  def setJars(jarDeps: Seq[java.io.File],
+              dirDeps: Seq[java.io.File],
+              dynamicClasspath: VirtualDirectory): Unit
+  def complete(index: Int, allCode: String): (Int, Seq[String])
+  def askShutdown(): Unit
+}
 
+object ScalaEvaluator {
   def namesFor(t: scala.reflect.runtime.universe.Type): Set[String] = {
     val yours = t.members.map(_.name.toString).toSet
     val default = typeOf[Object].members.map(_.name.toString)
     yours -- default
+  }
+
+  val defaultInitImports = Seq(
+    "PPrintConfig" -> "import ammonite.pprint.Config.Colors.PPrintConfig"
+  ) ++ {
+    namesFor(typeOf[ReplAPI]).map(n => n -> s"import ReplBridge.shell.$n")
+  }
+}
+
+class ScalaEvaluator(currentClassloader: ClassLoader,
+                extraClassLoaders: => Seq[ClassLoader],
+                initImports: Seq[(String, String)] = ScalaEvaluator.defaultInitImports) extends Evaluator {
+
+  private var compiler: Compiler = _
+  private var preprocess: Preprocessor = _
+  def setJars(jarDeps: Seq[java.io.File],
+                      dirDeps: Seq[java.io.File],
+                      dynamicClasspath: VirtualDirectory) = {
+    compiler = new ScalaCompiler(
+      jarDeps,
+      dirDeps,
+      dynamicClasspath,
+      println
+    )
+    preprocess = new ScalaPreprocessor(compiler.parse)
+  }
+
+  def askShutdown(): Unit = {
+    if (compiler != null)
+      compiler.askShutdown()
+  }
+
+  def complete(index: Int, allCode: String): (Int, Seq[String]) = compiler.complete(index, allCode)
+
+  def initReplBridge(replAPI: ReplAPI): Unit = {
+    compiler.importsFor("", replBridgeCode)
+    val cls = evalClass(replBridgeCode, "ReplBridge")
+    ReplAPI.initReplBridge(
+      cls.asInstanceOf[Result.Success[Class[ReplAPIHolder]]].s,
+      replAPI
+    )
   }
 
   /**
@@ -39,9 +88,7 @@ class Evaluator(currentClassloader: ClassLoader,
    * map. Otherwise if you import the same name twice you get compile
    * errors instead of the desired shadowing.
    */
-  val previousImports = mutable.Map(
-    "PPrintConfig" -> "import ammonite.pprint.Config.Colors.PPrintConfig"
-  ) ++ namesFor(typeOf[ReplAPI]).map(n => n -> s"import ReplBridge.shell.$n")
+  val previousImports = mutable.Map(initImports: _*)
 
 
   val replBridgeCode =
@@ -77,7 +124,7 @@ class Evaluator(currentClassloader: ClassLoader,
 
   def evalClass(code: String, wrapperName: String): Result[Class[_]] = for{
     compiled <- Result(Try(
-      compile(code.getBytes)
+      compiler.compile(code.getBytes)
     ), e => {println("!!!! " + e.printStackTrace()); e.toString})
 
     classFiles <- Result[Traversable[(String, Array[Byte])]](compiled, "Compilation Failed")
@@ -149,7 +196,7 @@ class Evaluator(currentClassloader: ClassLoader,
 
     wrappedWithImports = previousImportBlock + "\n\n" + wrapped
     evaled <- evalMain(wrappedWithImports, wrapperName)
-    newImports = importsFor(wrapperName, wrappedWithImports)
+    newImports = compiler.importsFor(wrapperName, wrappedWithImports)
 
   } yield Evaluated(evaled + "", wrapperName , newImports)
 
