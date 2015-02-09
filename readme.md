@@ -336,3 +336,47 @@ While Ammonite is an excellent filesystem API, and can turn your Scala/SBT conso
 - **An o-k REPL**: Scala's command line interpreter is no-where near as nice as [IPython](http://ipython.org/). We'd need features like Color, pretty-printed output, better multi-line support, and others to compete.
 - **No concurrency story**: None of Ammonite's operations are multi-thread or multi-process safe. For example, recursively deleting a folder could fail if some other process is at the same time writing new files into it. This is not any worse than Bash or other shells, but differs from most idiomatic Scala programs which tend to be safer than this.
 
+Ammonite REPL
+=============
+
+The Ammonite REPL is a work-in-progress, cleanroom re-implementation of the Scala REPL from first principles. It aims create a codebase much more structured than that of `scala.tools.nsc.interpreter`, and thus being able to move faster and support more features.
+
+To test it out, run
+
+```
+sbt repl/run
+```
+
+Ammonite already supports many more features than the default Scala REPL, including:
+
+- Colored, customizable prompts
+
+![CustomizablePrompts](media/CustomizablePrompts.png)
+
+- Pretty-printed, *colored*, valid-scala C&P-able output for commands
+
+![ColorPrettyPrinting](media/ColorPrettyPrinting.png)
+
+- Loading jar files or ivy-coordinates directly into the REPL
+
+![MavenLoading](media/MavenLoading.png)
+
+- Replaceable compilers: throw-away/crash your copy of the compiler and get a new one without missing a beat.
+
+- Interruptable commands using `Ctrl-C`
+
+Ammonite is able to support many more features due to its architecture, which eschews complex cake in favor of good old object-composition and monad composition. In particular:
+
+- Sub-components of the REPL (compiler, jline, repl APIs, etc.) are plain-old-classes, and wired together manually using their constructors. This makes it much easier to see what depends on what:
+
+![StructuredInternals](media/StructuredInternals.png)
+
+- Everything is [acyclic](https://github.com/lihaoyi/acyclic)
+
+- The actual evaluation happens in a `ammonite.Result` monad, which encapsulates much out of the short-circuiting nature of the computation, without throwing exceptions.
+
+- No exceptions at all except what is thrown from underlying APIs, and those are caught and wrapped as quickly as possible.
+
+In general, the source code of the Ammonite REPL should be really easy to work with, much more so than that of the default Scala compiler, and with a bit of time should become much more robust and featureful.
+
+Contributions welcome!
