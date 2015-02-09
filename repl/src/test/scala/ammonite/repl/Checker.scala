@@ -18,6 +18,7 @@ class Checker {
   val preprocess = new Preprocessor(compiler.parse)
   val eval = new Evaluator(
     Thread.currentThread().getContextClassLoader,
+    Nil,
     preprocess.apply,
     compiler.compile,
     compiler.importsFor
@@ -42,8 +43,10 @@ class Checker {
       }
       var shellPrompt = "scala>"
 
+      // Not needed for tests
       def load(jar: File) = ()
       def newCompiler() = ()
+      def loadIvy(groupId: String, artifactId: String, version: String) = ()
     }
   )
   def apply(input: String, expected: String = null) = {

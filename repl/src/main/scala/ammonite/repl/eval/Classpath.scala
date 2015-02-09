@@ -13,28 +13,22 @@ object Classpath {
    * want to do something.
    */
 
-  val deps = Seq(
-//    "/Users/haoyi/.ivy2/cache/com.lihaoyi/scalatags_2.11/jars/scalatags_2.11-0.4.4.jar",
-    "/Users/haoyi/.ivy2/cache/com.lihaoyi/ammonite_2.11/jars/ammonite_2.11-0.1.4.jar",
-    "/Users/haoyi/Dropbox (Personal)/Workspace/ammonite/repl/target/scala-2.11/classes",
-    "/Users/haoyi/Dropbox (Personal)/Workspace/ammonite/core/target/scala-2.11/classes",
-    "/Users/haoyi/.ivy2/cache/org.scala-lang/scala-compiler/jars/scala-compiler-2.11.4.jar",
-    "/Users/haoyi/.ivy2/cache/org.scala-lang/scala-library/jars/scala-library-2.11.4.jar",
-    "/Users/haoyi/.ivy2/cache/org.scala-lang/scala-reflect/jars/scala-reflect-2.11.4.jar",
-    "/Users/haoyi/.ivy2/cache/org.scala-lang.modules/scala-parser-combinators_2.11/bundles/scala-parser-combinators_2.11-1.0.3.jar",
-    "/Users/haoyi/.ivy2/cache/com.lihaoyi/utest_2.11/jars/utest_2.11-0.2.4.jar",
-    "/Users/haoyi/.ivy2/cache/com.lihaoyi/utest-runner_2.11/jars/utest-runner_2.11-0.2.4.jar",
-    "/Users/haoyi/.ivy2/cache/org.scala-sbt/test-interface/jars/test-interface-1.0.jar",
-    "/Users/haoyi/.ivy2/cache/jline/jline/jars/jline-2.12.jar",
-    "/Users/haoyi/.ivy2/cache/org.apache.ivy/ivy/jars/ivy-2.4.0.jar",
-    "/Users/haoyi/.ivy2/cache/com.lihaoyi/acyclic_2.11/jars/acyclic_2.11-0.1.2.jar"
-  ) ++ System.getProperty("sun.boot.class.path").split(":")
+  var current = getClass.getClassLoader
+  val urls = collection.mutable.Buffer.empty[java.io.File]
+  urls.appendAll(
+    System.getProperty("sun.boot.class.path")
+          .split(":")
+          .map(new java.io.File(_))
+  )
+  while(current != null){
+    current match{
+      case t: java.net.URLClassLoader =>
+        urls.appendAll(t.getURLs.map(u => new java.io.File(u.toURI)))
+      case _ =>
+    }
+    current = current.getParent
+  }
+  println("Loaded\n" + urls)
 
-//  deps.foreach(println)
-//  deps.filter(x => !new java.io.File(x).exists()).foreach(println)
-//  assert(nonexistent.length == 0, "\n"+nonexistent.mkString("\n"))
-  val (jarDeps, dirDeps) =
-    deps.map(new java.io.File(_))
-        .filter(_.exists)
-        .partition(_.toString.endsWith(".jar"))
+  val (jarDeps, dirDeps) = urls.filter(_.exists).partition(_.toString.endsWith(".jar"))
 }
