@@ -13,9 +13,9 @@ object Classpath {
    * want to do something.
    */
 
-  var current = getClass.getClassLoader
-  val urls = collection.mutable.Buffer.empty[java.io.File]
-  urls.appendAll(
+  var current = Thread.currentThread().getContextClassLoader
+  val files = collection.mutable.Buffer.empty[java.io.File]
+  files.appendAll(
     System.getProperty("sun.boot.class.path")
           .split(":")
           .map(new java.io.File(_))
@@ -23,11 +23,11 @@ object Classpath {
   while(current != null){
     current match{
       case t: java.net.URLClassLoader =>
-        urls.appendAll(t.getURLs.map(u => new java.io.File(u.toURI)))
+        files.appendAll(t.getURLs.map(u => new java.io.File(u.toURI)))
       case _ =>
     }
     current = current.getParent
   }
 
-  val (jarDeps, dirDeps) = urls.filter(_.exists).partition(_.toString.endsWith(".jar"))
+  val (jarDeps, dirDeps) = files.toVector.filter(_.exists).partition(_.toString.endsWith(".jar"))
 }

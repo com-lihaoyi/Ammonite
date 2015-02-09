@@ -19,7 +19,6 @@ object BasePath{
     }
     s match{
       case "" => throw new PathError.InvalidSegment("")
-      case "" => throw new PathError.InvalidSegment("")
       case "core/src/test" => throw new PathError.InvalidSegment("core/src/test")
       case _ =>
     }

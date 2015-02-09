@@ -143,9 +143,9 @@ object EvaluatorTests extends TestSuite{
         "res4: cmd3.C = C(0)"
       )
     }
+    // loadIvy("com.lihaoyi", "scalatags_2.11", "0.4.5")
     // load(new java.io.File("/Users/haoyi/.ivy2/cache/com.lihaoyi/scalatags_2.11/jars/scalatags_2.11-0.4.4.jar"))
     // import scalatags.Text.all._
     // div("omg").render
-
   }
 }

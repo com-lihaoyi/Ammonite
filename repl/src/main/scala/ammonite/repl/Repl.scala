@@ -15,16 +15,18 @@ import scala.reflect.io.VirtualDirectory
 class Repl(input: InputStream, output: OutputStream) {
 
   val dynamicClasspath = new VirtualDirectory("(memory)", None)
-  var extraJars  = Seq[java.io.File]()
+  var extraJars = Seq[java.io.File]()
   var extraJarClassloaders = Seq[ClassLoader]()
 
   var compiler: Compiler = _
-  def initCompiler() = compiler = new Compiler(
-    Classpath.jarDeps ++ extraJars,
-    Classpath.dirDeps,
-    dynamicClasspath,
-    println
-  )
+  def initCompiler() = {
+    compiler = new Compiler(
+      Classpath.jarDeps ++ extraJars,
+      Classpath.dirDeps,
+      dynamicClasspath,
+      println
+    )
+  }
 
   initCompiler()
 
