@@ -28,7 +28,6 @@ object Classpath {
     }
     current = current.getParent
   }
-  println("Loaded\n" + urls)
 
   val (jarDeps, dirDeps) = urls.filter(_.exists).partition(_.toString.endsWith(".jar"))
 }
