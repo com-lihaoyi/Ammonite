@@ -180,7 +180,6 @@ class Compiler(jarDeps: Seq[java.io.File],
    * Compiles a blob of bytes and spits of a list of classfiles
    */
   def compile(src: Array[Byte]): Output = {
-    println("COMPILING WITH " + compiler)
     compiler.reporter.reset()
 
     val singleFile = makeFile( src)

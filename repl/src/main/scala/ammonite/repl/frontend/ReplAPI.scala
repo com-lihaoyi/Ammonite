@@ -46,6 +46,8 @@ trait ReplAPI {
    */
   def load(jar: java.io.File): Unit
 
+  def loadIvy(groupId: String, artifactId: String, version: String): Unit
+
   /**
    * Throw away the current scala.tools.nsc.Global and get a new one
    */
@@ -74,6 +76,7 @@ object ReplAPI{
 
 class DefaultReplAPI(history0: => Seq[String],
                      load0: java.io.File => Unit,
+                     loadIvy0: (String, String, String) => Unit,
                      newCompiler0: () => Unit)
                      extends FullReplAPI {
 
@@ -88,7 +91,8 @@ class DefaultReplAPI(history0: => Seq[String],
     s"defined ${Console.GREEN}$definitionLabel ${Console.CYAN}$ident${Console.RESET}"
   }
   def load(jar: java.io.File) = load0(jar)
-
+  def loadIvy(groupId: String, artifactId: String, version: String) =
+    loadIvy0(groupId, artifactId, version)
 
   def newCompiler(): Unit = newCompiler0()
 }

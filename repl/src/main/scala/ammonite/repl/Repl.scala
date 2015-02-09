@@ -2,6 +2,7 @@ package ammonite.repl
 
 import java.io.{OutputStream, InputStream}
 import java.net.URLClassLoader
+import ammonite.IvyThing
 import ammonite.repl.eval.{Classpath, Evaluator, Preprocessor, Compiler}
 import ammonite.repl.frontend.{DefaultReplAPI, ReplAPIHolder, ReplAPI}
 import acyclic.file
@@ -54,16 +55,20 @@ class Repl(input: InputStream, output: OutputStream) {
     (i, c) => compiler.complete(i, c)
   )
 
+  def loadJar(jar: java.io.File) = {
+    extraJars = extraJars ++ Seq(jar)
+    extraJarClassloaders ++= Seq(new URLClassLoader(
+      Array(jar.toURI.toURL),
+      getClass.getClassLoader
+    ))
+    initCompiler()
+    initCompiler2()
+  }
   lazy val replAPI: ReplAPI = new DefaultReplAPI(
     frontEnd.history,
-    jar => {
-      extraJars = extraJars ++ Seq(jar)
-      extraJarClassloaders ++= Seq(new URLClassLoader(
-        Array(jar.toURI.toURL),
-        getClass.getClassLoader
-      ))
-      initCompiler()
-      initCompiler2()
+    loadJar(_),
+    (groupId, artifactId, version) => {
+      loadJar(IvyThing.resolveArtifact(groupId, artifactId, version))
     },
     () => {
       initCompiler()
@@ -92,7 +97,6 @@ class Repl(input: InputStream, output: OutputStream) {
   def run() = {
     @tailrec def loop(): Unit = {
       val res = action()
-
       frontEnd.update(res)
       eval.update(res)
       res match{
