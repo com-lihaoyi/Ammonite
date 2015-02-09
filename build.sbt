@@ -46,7 +46,8 @@ lazy val repl = project.dependsOn(core).settings(sharedSettings:_*).settings(
   libraryDependencies ++= Seq(
     "org.scala-lang" % "scala-compiler" % scalaVersion.value,
     "jline" % "jline" % "2.12",
-    "org.scala-lang" % "scala-reflect" % scalaVersion.value
+    "org.scala-lang" % "scala-reflect" % scalaVersion.value,
+    "org.apache.ivy" % "ivy" % "2.4.0"
   ),
   fork in (Test, testOnly) := true
 )

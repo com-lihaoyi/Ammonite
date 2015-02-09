@@ -42,7 +42,10 @@ object Compiler{
  * classfile per source-string (e.g. inner classes, or lambdas). Also lets
  * you query source strings using an in-built presentation compiler
  */
-class Compiler(dynamicClasspath: VirtualDirectory, logger: String => Unit) {
+class Compiler(jarDeps: Seq[java.io.File],
+               dirDeps: Seq[java.io.File],
+               dynamicClasspath: VirtualDirectory,
+               logger: String => Unit) {
   import ammonite.repl.eval.Compiler._
 
   /**
@@ -86,6 +89,7 @@ class Compiler(dynamicClasspath: VirtualDirectory, logger: String => Unit) {
     }
     (vd, reporter, scalac)
   }
+
 
   /**
    * Ask for autocompletion at a particular spot in the code, returning
@@ -176,6 +180,7 @@ class Compiler(dynamicClasspath: VirtualDirectory, logger: String => Unit) {
    * Compiles a blob of bytes and spits of a list of classfiles
    */
   def compile(src: Array[Byte]): Output = {
+    println("COMPILING WITH " + compiler)
     compiler.reporter.reset()
 
     val singleFile = makeFile( src)
@@ -204,7 +209,10 @@ class Compiler(dynamicClasspath: VirtualDirectory, logger: String => Unit) {
   def parse(line: String): Parsed = {
     var isIncomplete = false
 
-    compiler.currentRun.parsing.withIncompleteHandler((_, _) => isIncomplete = true) {
+    val r = compiler.currentRun
+
+    val p = r.parsing
+    p.withIncompleteHandler((_, _) => isIncomplete = true) {
       reporter.reset()
       val trees = compiler.newUnitParser(line).parseStats()
       if (reporter.hasErrors) Parsed.Error
@@ -224,9 +232,9 @@ class Compiler(dynamicClasspath: VirtualDirectory, logger: String => Unit) {
     val settingsX = settings
     settingsX.Yrangepos.value = true
     val jCtx = new JavaContext()
-    val jDirs = Classpath.jarDeps.map(x =>
+    val jDirs = jarDeps.map(x =>
       new DirectoryClassPath(new FileZipArchive(x), jCtx)
-    ).toVector ++ Classpath.dirDeps.map(x =>
+    ).toVector ++ dirDeps.map(x =>
       new DirectoryClassPath(new PlainDirectory(new Directory(x)), jCtx)
     ) ++ Seq(new DirectoryClassPath(dynamicClasspath, jCtx))
     val jcp = new JavaClassPath(jDirs, jCtx)

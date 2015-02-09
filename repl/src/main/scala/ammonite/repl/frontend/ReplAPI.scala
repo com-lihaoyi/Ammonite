@@ -40,6 +40,16 @@ trait ReplAPI {
    * Get the `Type` object representing the type of `t`
    */
   def typeOf[T: WeakTypeTag](t: => T): Type
+
+  /**
+   * Load a new `.jar` file into the classpath
+   */
+  def load(jar: java.io.File): Unit
+
+  /**
+   * Throw away the current scala.tools.nsc.Global and get a new one
+   */
+  def newCompiler(): Unit
 }
 
 /**
@@ -62,7 +72,10 @@ object ReplAPI{
   }
 }
 
-class DefaultReplAPI(history0: => Seq[String]) extends FullReplAPI {
+class DefaultReplAPI(history0: => Seq[String],
+                     load0: java.io.File => Unit,
+                     newCompiler0: () => Unit)
+                     extends FullReplAPI {
 
   var shellPrompt: String = Console.MAGENTA + "scala>" + Console.RESET
   def help = "Hello!"
@@ -74,4 +87,8 @@ class DefaultReplAPI(history0: => Seq[String]) extends FullReplAPI {
   def shellPrintDef(definitionLabel: String, ident: String) = {
     s"defined ${Console.GREEN}$definitionLabel ${Console.CYAN}$ident${Console.RESET}"
   }
+  def load(jar: java.io.File) = load0(jar)
+
+
+  def newCompiler(): Unit = newCompiler0()
 }

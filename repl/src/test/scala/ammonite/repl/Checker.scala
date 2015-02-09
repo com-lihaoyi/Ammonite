@@ -1,7 +1,9 @@
 package ammonite.repl
 
+import java.io.File
+
 import ammonite.repl.eval
-import ammonite.repl.eval.{Evaluator, Compiler, Preprocessor}
+import ammonite.repl.eval.{Classpath, Evaluator, Compiler, Preprocessor}
 import ammonite.repl.frontend.{FullReplAPI, ReplAPI, ReplAPIHolder}
 import utest._
 
@@ -12,7 +14,7 @@ import scala.reflect.io.VirtualDirectory
 
 class Checker {
   val dynamicClasspath = new VirtualDirectory("(memory)", None)
-  val compiler = new Compiler(dynamicClasspath, println)
+  val compiler = new Compiler(Classpath.jarDeps, Classpath.dirDeps, dynamicClasspath, println)
   val preprocess = new Preprocessor(compiler.parse)
   val eval = new Evaluator(
     Thread.currentThread().getContextClassLoader,
@@ -39,6 +41,9 @@ class Checker {
         s"defined $definitionLabel $ident"
       }
       var shellPrompt = "scala>"
+
+      def load(jar: File) = ()
+      def newCompiler() = ()
     }
   )
   def apply(input: String, expected: String = null) = {

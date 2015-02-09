@@ -22,6 +22,8 @@ object EvaluatorTests extends TestSuite{
       check("x", "res1: Long = 10L")
       check("val y = x + 1", "y: Long = 11L")
       check("x * y", "res3: Long = 110L")
+      check("val `class` = \"class\"", "class: java.lang.String = \"class\"")
+      check("`class`", "res5: java.lang.String = \"class\"")
     }
     'lazyvals{
       // It actually appears when I ask for it
@@ -141,5 +143,9 @@ object EvaluatorTests extends TestSuite{
         "res4: cmd3.C = C(0)"
       )
     }
+    // load(new java.io.File("/Users/haoyi/.ivy2/cache/com.lihaoyi/scalatags_2.11/jars/scalatags_2.11-0.4.4.jar"))
+    // import scalatags.Text.all._
+    // div("omg").render
+
   }
 }

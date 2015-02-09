@@ -14,6 +14,7 @@ object Classpath {
    */
 
   val deps = Seq(
+//    "/Users/haoyi/.ivy2/cache/com.lihaoyi/scalatags_2.11/jars/scalatags_2.11-0.4.4.jar",
     "/Users/haoyi/.ivy2/cache/com.lihaoyi/ammonite_2.11/jars/ammonite_2.11-0.1.4.jar",
     "/Users/haoyi/Dropbox (Personal)/Workspace/ammonite/repl/target/scala-2.11/classes",
     "/Users/haoyi/Dropbox (Personal)/Workspace/ammonite/core/target/scala-2.11/classes",
@@ -25,6 +26,7 @@ object Classpath {
     "/Users/haoyi/.ivy2/cache/com.lihaoyi/utest-runner_2.11/jars/utest-runner_2.11-0.2.4.jar",
     "/Users/haoyi/.ivy2/cache/org.scala-sbt/test-interface/jars/test-interface-1.0.jar",
     "/Users/haoyi/.ivy2/cache/jline/jline/jars/jline-2.12.jar",
+    "/Users/haoyi/.ivy2/cache/org.apache.ivy/ivy/jars/ivy-2.4.0.jar",
     "/Users/haoyi/.ivy2/cache/com.lihaoyi/acyclic_2.11/jars/acyclic_2.11-0.1.2.jar"
   ) ++ System.getProperty("sun.boot.class.path").split(":")
 

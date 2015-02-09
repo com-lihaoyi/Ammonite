@@ -16,7 +16,7 @@ class JLineFrontend(input: InputStream,
                     output: OutputStream,
                     shellPrompt: => String,
                     previousImportBlock: => String,
-                    compilerComplete: (Int, String) => (Int, Seq[String]))
+                    compilerComplete: => (Int, String) => (Int, Seq[String]))
                     extends jline.console.completer.Completer {
   val term = new jline.UnixTerminal()
   var buffered = ""

@@ -22,14 +22,14 @@ class Preprocessor(parse: String => Parsed){
     (code: String, name: String, tree: Global#Tree) => cond.lift(name, code, tree)
   }
 
-  def pprintSignature(ident: String) = s"""ReplBridge.shell.shellPPrint($ident, "$ident")"""
+  def pprintSignature(ident: String) = s"""ReplBridge.shell.shellPPrint(`$ident`, "$ident")"""
 
   def definedStr(definitionLabel: String, name: String) =
     s"""ReplBridge.shell.shellPrintDef("$definitionLabel", "$name") """
 
   def pprint(ident: String) = {
     pprintSignature(ident) +
-      s""" + " = " + ammonite.pprint.PPrint($ident)"""
+      s""" + " = " + ammonite.pprint.PPrint(`$ident`)"""
   }
   def DefProcessor(definitionLabel: String)(cond: PartialFunction[Global#Tree, String]) =
     (code: String, name: String, tree: Global#Tree) =>

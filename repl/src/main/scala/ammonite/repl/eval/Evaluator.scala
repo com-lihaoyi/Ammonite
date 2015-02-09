@@ -16,9 +16,10 @@ import scala.util.Try
  * need to get prepended to subsequent commands.
  */
 class Evaluator(currentClassloader: ClassLoader,
+                extraClassLoaders: => Seq[ClassLoader],
                 preprocess: (String, Int) => Result[Preprocessor.Output],
-                compile: Array[Byte] => Compiler.Output,
-                importsFor: (String, String) => Seq[(String, String)]) {
+                compile: => Array[Byte] => Compiler.Output,
+                importsFor: => (String, String) => Seq[(String, String)]) {
 
   def namesFor(t: scala.reflect.runtime.universe.Type): Set[String] = {
     val yours = t.members.map(_.name.toString).toSet
@@ -55,9 +56,22 @@ class Evaluator(currentClassloader: ClassLoader,
    * actual classes with methods we can execute.
    */
   val evalClassloader = new ClassLoader(currentClassloader) {
-    override def loadClass(name: String) = {
-      if (!newFileDict.contains(name))super.loadClass(name)
-      else defineClass(name, newFileDict(name), 0, newFileDict(name).length)
+    override def loadClass(name: String): Class[_] = {
+      if (newFileDict.contains(name)) {
+        defineClass(name, newFileDict(name), 0, newFileDict(name).length)
+      }else{
+        try{
+          super.loadClass(name)
+        }catch{ case e: ClassNotFoundException =>
+          val classes = for(cl <- extraClassLoaders.iterator) yield {
+            try Some(cl.loadClass(name))
+            catch{ case e: ClassNotFoundException => None}
+          }
+          classes.collectFirst{ case Some(cls) => cls}
+                 .headOption
+                 .getOrElse{ throw new ClassNotFoundException(name) }
+        }
+      }
     }
   }
 
@@ -145,7 +159,7 @@ class Evaluator(currentClassloader: ClassLoader,
         (name, proposedImport) <- ev.imports
         if name != "package"
       }{
-        previousImports(name) = proposedImport + "." + name
+        previousImports(name) = s"$proposedImport.`$name`"
       }
       currentLine += 1
     case Result.Failure(msg) =>
