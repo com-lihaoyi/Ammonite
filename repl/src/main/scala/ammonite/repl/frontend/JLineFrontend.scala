@@ -25,6 +25,7 @@ class JLineFrontend(input: InputStream,
 
   reader.setHistoryEnabled(true)
   reader.addCompleter(this)
+  reader.setExpandEvents(false)
 
   def complete(_buf: String, cursor: Int, candidates: JList[CharSequence]): Int = {
     val buf   = if (_buf == null) "" else _buf
