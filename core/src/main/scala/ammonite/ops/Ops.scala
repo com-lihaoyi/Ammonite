@@ -4,6 +4,7 @@ import java.io.{File, InputStream}
 import java.nio.file.{Files, Paths, StandardOpenOption}
 import acyclic.file
 import RelPath.up
+import ammonite.pprint.PPrint
 import scala.language.dynamics
 import scala.util.matching.Regex
 import Extensions._
@@ -86,16 +87,25 @@ trait Op2[T1, T2, R] extends ((T1, T2) => R){
     def !(arg2: T2): R = Op2.this.apply(arg1, arg2)
   }
 }
+
 trait Grepper[T]{
   def apply[V: ammonite.pprint.PPrint](t: T, s: V): Boolean
 }
 object Grepper{
+  def BlackWhite[V: PPrint] = {
+    val pp = implicitly[PPrint[V]]
+    new ammonite.pprint.PPrint(pp.a, pp.cfg.copy(literalColor=null, prefixColor=null))
+  }
   implicit object Str extends Grepper[String] {
-    def apply[V: ammonite.pprint.PPrint](t: String, s: V) = ammonite.pprint.PPrint(s).contains(t)
+    def apply[V: ammonite.pprint.PPrint](t: String, s: V) = {
+      ammonite.pprint.PPrint(s)(BlackWhite).contains(t)
+    }
   }
 
   implicit object Regex extends Grepper[Regex] {
-    def apply[V: ammonite.pprint.PPrint](t: Regex, s: V) = t.findAllIn(ammonite.pprint.PPrint(s)).length > 0
+    def apply[V: ammonite.pprint.PPrint](t: Regex, s: V) = {
+      t.findAllIn(ammonite.pprint.PPrint(s)(BlackWhite)).length > 0
+    }
   }
 }
 
