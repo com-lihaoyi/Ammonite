@@ -49,6 +49,7 @@ lazy val repl = project.dependsOn(core).settings(sharedSettings:_*).settings(
     "org.scala-lang" % "scala-reflect" % scalaVersion.value,
     "org.apache.ivy" % "ivy" % "2.4.0"
   ),
+  javaOptions += "-Xmx2G",
   fork in (Test, testOnly) := true
 )
 

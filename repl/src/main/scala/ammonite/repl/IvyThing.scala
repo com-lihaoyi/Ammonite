@@ -1,4 +1,4 @@
-package ammonite
+package ammonite.repl
 
 import java.io.File
 

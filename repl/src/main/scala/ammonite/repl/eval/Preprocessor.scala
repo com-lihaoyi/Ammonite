@@ -15,7 +15,7 @@ object Preprocessor{
  * ready to feed into the compiler. Each source-string is turned into
  * three things:
  */
-class Preprocessor(parse: String => Parsed){
+class Preprocessor(parse: => String => Parsed){
   
 
   def Processor(cond: PartialFunction[(String, String, Global#Tree), Preprocessor.Output]) = {

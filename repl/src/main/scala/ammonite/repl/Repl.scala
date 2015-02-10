@@ -1,49 +1,31 @@
 package ammonite.repl
 
 import java.io.{OutputStream, InputStream}
-import java.net.URLClassLoader
-import ammonite.IvyThing
-import ammonite.repl.eval.{Classpath, Evaluator, Preprocessor, Compiler}
 import ammonite.repl.frontend.{ColorSet, DefaultReplAPI, ReplAPIHolder, ReplAPI}
 import acyclic.file
-import org.apache.ivy.Ivy
 
 import scala.annotation.tailrec
-import scala.reflect.io.VirtualDirectory
 
 class Repl(input: InputStream, output: OutputStream) {
-  val interp: Interpreter = new Interpreter(() => initReplBridge())
-  def initReplBridge() = {
-    interp.compiler.importsFor("", interp.eval.replBridgeCode)
-    val cls = interp.eval.evalClass(interp.eval.replBridgeCode, "ReplBridge")
-    ReplAPI.initReplBridge(
-      cls.asInstanceOf[Result.Success[Class[ReplAPIHolder]]].s,
-      replAPI
-    )
-  }
+  val interp: Interpreter = new Interpreter(replApi)
 
-  lazy val replAPI: ReplAPI = new DefaultReplAPI(
+  lazy val replApi: ReplAPI = new DefaultReplAPI(
     frontEnd.history,
     interp.loadJar,
     (groupId, artifactId, version) => {
       interp.loadJar(IvyThing.resolveArtifact(groupId, artifactId, version))
     },
-    () => {
-      interp.initCompiler()
-      initReplBridge()
-    },
+    () => interp.init(),
     ColorSet.Default,
     ammonite.pprint.Config.Colors.PPrintConfig
   )
 
-  initReplBridge()
-
   val frontEnd = new frontend.JLineFrontend(
     input,
     output,
-    replAPI.shellPrompt,
+    replApi.shellPrompt,
     interp.eval.previousImportBlock,
-    (i, c) => interp.compiler.complete(i, c)
+    interp.compiler.complete
   )
 
   def action() = for{

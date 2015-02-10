@@ -3,28 +3,30 @@ package ammonite.repl
 import java.net.URLClassLoader
 
 import ammonite.repl.eval.{Evaluator, Preprocessor, Classpath, Compiler}
+import ammonite.repl.frontend.{ReplAPIHolder, ReplAPI}
 
 import scala.reflect.io.VirtualDirectory
 
-/**
- * Created by haoyi on 2/9/15.
- */
-class Interpreter(initReplBridge: () => Unit){
+class Interpreter(replApi: ReplAPI){
   val dynamicClasspath = new VirtualDirectory("(memory)", None)
   var extraJars = Seq[java.io.File]()
   var extraJarClassloaders = Seq[ClassLoader]()
 
   var compiler: Compiler = _
-  def initCompiler() = {
+
+  def init() = {
     compiler = new Compiler(
       Classpath.jarDeps ++ extraJars,
       Classpath.dirDeps,
       dynamicClasspath
     )
+    compiler.importsFor("", eval.replBridgeCode)
+    val cls = eval.evalClass(eval.replBridgeCode, "ReplBridge")
+    ReplAPI.initReplBridge(
+      cls.asInstanceOf[Result.Success[Class[ReplAPIHolder]]].s,
+      replApi
+    )
   }
-
-  initCompiler()
-
 
   def loadJar(jar: java.io.File) = {
     extraJars = extraJars ++ Seq(jar)
@@ -32,18 +34,18 @@ class Interpreter(initReplBridge: () => Unit){
       Array(jar.toURI.toURL),
       getClass.getClassLoader
     ))
-    initCompiler()
-    initReplBridge()
+    init()
   }
 
   val mainThread = Thread.currentThread()
-  val preprocess = new Preprocessor((s) => compiler.parse(s))
+  val preprocess = new Preprocessor(compiler.parse)
 
   val eval = new Evaluator(
     mainThread.getContextClassLoader,
     extraJarClassloaders,
     preprocess.apply,
-    (b, o) => compiler.compile(b, o),
-    (w, c) => compiler.importsFor(w, c)
+    compiler.compile,
+    compiler.importsFor
   )
+  init()
 }

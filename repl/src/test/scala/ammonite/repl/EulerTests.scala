@@ -9,7 +9,7 @@ import scala.reflect.io.VirtualDirectory
 import ammonite.pprint.Config.Defaults._
 import ammonite.pprint.PPrint
 
-object EulerTests extends TestSuite{
+object EulerTests{
 
   val tests = TestSuite{
 

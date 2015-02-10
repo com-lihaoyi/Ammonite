@@ -54,6 +54,10 @@ trait ReplAPI {
    */
   def newCompiler(): Unit
 
+  /**
+   * Controls how things are pretty-printed in the REPL. Feel free
+   * to shadow this with your own definition to change how things look
+   */
   implicit def pprintConfig: ammonite.pprint.Config
 }
 trait Load{
@@ -87,12 +91,15 @@ object ReplAPI{
   }
 }
 
-
+/**
+ * A set of colors used to highlight the miscellanious bits of the REPL.
+ */
 case class ColorSet(prompt: String, ident: String, `type`: String, reset: String)
 object ColorSet{
   val Default = ColorSet(Console.MAGENTA, Console.CYAN, Console.GREEN, Console.RESET)
   val BlackWhite = ColorSet("", "", "", "")
 }
+
 class DefaultReplAPI(history0: => Seq[String],
                      load0: java.io.File => Unit,
                      loadIvy0: (String, String, String) => Unit,
@@ -116,7 +123,6 @@ class DefaultReplAPI(history0: => Seq[String],
     def ivy(groupId: String, artifactId: String, version: String): Unit =
       loadIvy0(groupId, artifactId, version)
   }
-
 
   def newCompiler(): Unit = newCompiler0()
 }

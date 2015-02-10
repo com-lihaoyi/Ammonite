@@ -1,46 +1,22 @@
 package ammonite.repl
 
-import java.io.File
-import java.net.URLClassLoader
-
-import ammonite.IvyThing
-import ammonite.repl.eval
-import ammonite.repl.eval.{Classpath, Evaluator, Compiler, Preprocessor}
 import ammonite.repl.frontend._
 import utest._
 
-import scala.collection.mutable
-import scala.reflect.runtime.universe._
-import scala.reflect.io.VirtualDirectory
-
 
 class Checker {
-  val interp: Interpreter = new Interpreter(() => initReplBridge())
-  def initReplBridge() = {
-    interp.compiler.importsFor("", interp.eval.replBridgeCode)
-    val cls = interp.eval.evalClass(interp.eval.replBridgeCode, "ReplBridge")
-    ReplAPI.initReplBridge(
-      cls.asInstanceOf[Result.Success[Class[ReplAPIHolder]]].s,
-      replAPI
-    )
-  }
-
-
-  lazy val replAPI: ReplAPI = new DefaultReplAPI(
+  lazy val replApi: ReplAPI = new DefaultReplAPI(
     Nil,
     interp.loadJar,
     (groupId, artifactId, version) => {
       interp.loadJar(IvyThing.resolveArtifact(groupId, artifactId, version))
     },
-    () => {
-      interp.initCompiler()
-      initReplBridge()
-    },
+    () => interp.init(),
     ColorSet.BlackWhite,
     ammonite.pprint.Config.Defaults.PPrintConfig
   )
 
-  initReplBridge()
+  val interp: Interpreter = new Interpreter(replApi)
 
   def apply(input: String,
             expected: String = null) = {
