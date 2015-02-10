@@ -18,7 +18,7 @@ import scala.util.Try
 class Evaluator(currentClassloader: ClassLoader,
                 extraClassLoaders: => Seq[ClassLoader],
                 preprocess: (String, Int) => Result[Preprocessor.Output],
-                compile: => Array[Byte] => Compiler.Output,
+                compile: => (Array[Byte], String => Unit) => Compiler.Output,
                 importsFor: => (String, String) => Seq[(String, String)]) {
 
   def namesFor(t: scala.reflect.runtime.universe.Type): Set[String] = {
@@ -40,8 +40,8 @@ class Evaluator(currentClassloader: ClassLoader,
    * errors instead of the desired shadowing.
    */
   val previousImports = mutable.Map(
-    "PPrintConfig" -> "import ammonite.pprint.Config.Colors.PPrintConfig"
-  ) ++ namesFor(typeOf[ReplAPI]).map(n => n -> s"import ReplBridge.shell.$n")
+    namesFor(typeOf[ReplAPI]).map(n => n -> s"import ReplBridge.shell.$n").toSeq:_*
+  )
 
 
   val replBridgeCode =
@@ -76,11 +76,18 @@ class Evaluator(currentClassloader: ClassLoader,
   }
 
   def evalClass(code: String, wrapperName: String): Result[Class[_]] = for{
-    compiled <- Result(Try(
-      compile(code.getBytes)
-    ), e => {println("!!!! " + e.printStackTrace()); e.toString})
+    (output, compiled) <- Result(
+      Try{
+        val output = mutable.Buffer.empty[String]
+        val c = compile(code.getBytes, output.append(_))
+        (output, c)
+      },
+      e => {println("!!!! " + e.printStackTrace()); e.toString}
+    )
 
-    classFiles <- Result[Traversable[(String, Array[Byte])]](compiled, "Compilation Failed")
+    classFiles <- Result[Traversable[(String, Array[Byte])]](
+      compiled, "Compilation Failed\n" + output.mkString("\n")
+    )
 
     cls <- Result[Class[_]](Try {
       for ((name, bytes) <- classFiles) {

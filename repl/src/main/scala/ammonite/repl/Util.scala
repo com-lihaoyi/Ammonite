@@ -80,3 +80,8 @@ object Parsed{
   case object Incomplete extends Parsed
   case class Success(trees: List[Global#Tree]) extends Parsed
 }
+
+trait Streaming[Chunk, Value]{
+  def iterator: Iterator[Chunk]
+  def value: Value
+}

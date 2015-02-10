@@ -1,11 +1,14 @@
 package ammonite.repl.frontend
 
+import java.io.File
+
 import scala.reflect.runtime.universe._
 import acyclic.file
 class ReplAPIHolder {
   var shell0: FullReplAPI = null
   lazy val shell = shell0
 }
+
 class ReplExit
 
 
@@ -40,18 +43,28 @@ trait ReplAPI {
    * Get the `Type` object representing the type of `t`
    */
   def typeOf[T: WeakTypeTag](t: => T): Type
-
+  
   /**
-   * Load a new `.jar` file into the classpath
+   * Tools related to loading external scripts and code into the REPL
    */
-  def load(jar: java.io.File): Unit
-
-  def loadIvy(groupId: String, artifactId: String, version: String): Unit
+  def load: Load
 
   /**
    * Throw away the current scala.tools.nsc.Global and get a new one
    */
   def newCompiler(): Unit
+
+  implicit def pprintConfig: ammonite.pprint.Config
+}
+trait Load{
+  /**
+   * Load a `.jar` file
+   */
+  def jar(jar: java.io.File): Unit
+  /**
+   * Load a library from its maven/ivy coordinates
+   */
+  def ivy(groupId: String, artifactId: String, version: String): Unit
 }
 
 /**
@@ -74,25 +87,36 @@ object ReplAPI{
   }
 }
 
+
+case class ColorSet(prompt: String, ident: String, `type`: String, reset: String)
+object ColorSet{
+  val Default = ColorSet(Console.MAGENTA, Console.CYAN, Console.GREEN, Console.RESET)
+  val BlackWhite = ColorSet("", "", "", "")
+}
 class DefaultReplAPI(history0: => Seq[String],
                      load0: java.io.File => Unit,
                      loadIvy0: (String, String, String) => Unit,
-                     newCompiler0: () => Unit)
+                     newCompiler0: () => Unit,
+                     colors: ColorSet,
+                     val pprintConfig: ammonite.pprint.Config)
                      extends FullReplAPI {
 
-  var shellPrompt: String = Console.MAGENTA + "scala>" + Console.RESET
+  var shellPrompt: String = colors.prompt + "@" + colors.reset
   def help = "Hello!"
   def history: Seq[String] = history0
   def shellPPrint[T: WeakTypeTag](value: => T, ident: String) = {
-    Console.CYAN + ident + Console.RESET + ": " +
-    Console.GREEN + weakTypeOf[T].toString + Console.RESET
+    colors.ident + ident + colors.reset + ": " +
+    colors.`type` + weakTypeOf[T].toString + colors.reset
   }
   def shellPrintDef(definitionLabel: String, ident: String) = {
-    s"defined ${Console.GREEN}$definitionLabel ${Console.CYAN}$ident${Console.RESET}"
+    s"defined ${colors.`type`}$definitionLabel ${colors.ident}$ident${colors.reset}"
   }
-  def load(jar: java.io.File) = load0(jar)
-  def loadIvy(groupId: String, artifactId: String, version: String) =
-    loadIvy0(groupId, artifactId, version)
+  object load extends Load{
+    def jar(jar: File): Unit = load0(jar)
+    def ivy(groupId: String, artifactId: String, version: String): Unit =
+      loadIvy0(groupId, artifactId, version)
+  }
+
 
   def newCompiler(): Unit = newCompiler0()
 }

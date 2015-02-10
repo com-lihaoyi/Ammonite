@@ -2,7 +2,7 @@ package ammonite.repl.eval
 
 
 import acyclic.file
-import ammonite.repl.Parsed
+import ammonite.repl.{Streaming, Parsed}
 import scala.reflect.internal.util.{BatchSourceFile, OffsetPosition, Position}
 import scala.reflect.io
 import scala.reflect.io._
@@ -44,10 +44,10 @@ object Compiler{
  */
 class Compiler(jarDeps: Seq[java.io.File],
                dirDeps: Seq[java.io.File],
-               dynamicClasspath: VirtualDirectory,
-               logger: String => Unit) {
+               dynamicClasspath: VirtualDirectory) {
   import ammonite.repl.eval.Compiler._
 
+  var logger: String => Unit = s => ()
   /**
    * Converts Scalac's weird Future type
    * into a standard scala.concurrent.Future
@@ -179,9 +179,9 @@ class Compiler(jarDeps: Seq[java.io.File],
   /**
    * Compiles a blob of bytes and spits of a list of classfiles
    */
-  def compile(src: Array[Byte]): Output = {
+  def compile(src: Array[Byte], runLogger: String => Unit): Output = {
     compiler.reporter.reset()
-
+    this.logger = runLogger
     val singleFile = makeFile( src)
 
     val run = new compiler.Run()
