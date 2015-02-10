@@ -70,10 +70,10 @@ class Preprocessor(parse: => String => Parsed){
   def apply(code: String, wrapperId: Int): Result[Preprocessor.Output] = {
     parse(code) match {
       case Parsed.Incomplete => Result.Buffer(code)
-      case Parsed.Error => Result.Skip
+      case Parsed.Error(msg) =>
+        Result.Failure(msg)
       case Parsed.Success(Nil) => Result.Skip
       case Parsed.Success(parsed) =>
-
         def handleTree(t: Global#Tree, c: String, name: String) = {
           decls.iterator.flatMap(_.apply(c, name, t)).next()
         }
@@ -92,7 +92,7 @@ class Preprocessor(parse: => String => Parsed){
           allDecls.reduceOption((a, b) =>
             Output(a.code+";"+b.code, a.printer+ "+'\n'+" + b.printer)
           ),
-          "Don't know how to handle " + code
+        "Don't know how to handle " + code
         )
       }
   }

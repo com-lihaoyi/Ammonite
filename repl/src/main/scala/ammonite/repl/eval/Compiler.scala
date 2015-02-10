@@ -2,7 +2,8 @@ package ammonite.repl.eval
 
 
 import acyclic.file
-import ammonite.repl.{Streaming, Parsed}
+import ammonite.repl.Parsed
+import scala.collection.mutable
 import scala.reflect.internal.util.{BatchSourceFile, OffsetPosition, Position}
 import scala.reflect.io
 import scala.reflect.io._
@@ -208,13 +209,15 @@ class Compiler(jarDeps: Seq[java.io.File],
   def parse(line: String): Parsed = {
     var isIncomplete = false
 
+    val out = mutable.Buffer.empty[String]
+    logger = out.append(_)
     val r = compiler.currentRun
 
     val p = r.parsing
     p.withIncompleteHandler((_, _) => isIncomplete = true) {
       reporter.reset()
       val trees = compiler.newUnitParser(line).parseStats()
-      if (reporter.hasErrors) Parsed.Error
+      if (reporter.hasErrors) Parsed.Error(out.mkString("\n"))
       else if (isIncomplete) Parsed.Incomplete
       else Parsed.Success(trees)
     }

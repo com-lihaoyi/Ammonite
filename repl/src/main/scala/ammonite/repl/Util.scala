@@ -76,12 +76,7 @@ case class Evaluated(msg: String,
  */
 abstract sealed class Parsed
 object Parsed{
-  case object Error extends Parsed
+  case class Error(msg: String) extends Parsed
   case object Incomplete extends Parsed
   case class Success(trees: List[Global#Tree]) extends Parsed
-}
-
-trait Streaming[Chunk, Value]{
-  def iterator: Iterator[Chunk]
-  def value: Value
 }
