@@ -30,7 +30,7 @@ class JLineFrontend(input: InputStream,
   def complete(_buf: String, cursor: Int, candidates: JList[CharSequence]): Int = {
     val buf   = if (_buf == null) "" else _buf
     val prevImports = previousImportBlock
-    val prev = prevImports + "\n" + "object Foo{\n"
+    val prev = prevImports + "\nobject Foo{\n"
     import collection.JavaConversions._
     val (completionBase, completions) = compilerComplete(
       cursor + prev.length,
