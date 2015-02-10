@@ -1,4 +1,4 @@
-package ammonite.repl.eval
+package ammonite.repl.interp
 
 
 import acyclic.file
@@ -46,7 +46,7 @@ object Compiler{
 class Compiler(jarDeps: Seq[java.io.File],
                dirDeps: Seq[java.io.File],
                dynamicClasspath: VirtualDirectory) {
-  import ammonite.repl.eval.Compiler._
+  import ammonite.repl.interp.Compiler._
 
   var logger: String => Unit = s => ()
   /**

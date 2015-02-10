@@ -1,9 +1,9 @@
-package ammonite.repl
+package ammonite.repl.interp
 
 import java.net.URLClassLoader
 
-import ammonite.repl.eval.{Evaluator, Preprocessor, Classpath, Compiler}
-import ammonite.repl.frontend.{ReplAPIHolder, ReplAPI}
+import ammonite.repl.Result
+import ammonite.repl.frontend.{ReplAPI, ReplAPIHolder}
 
 import scala.reflect.io.VirtualDirectory
 
@@ -28,7 +28,7 @@ class Interpreter(replApi: ReplAPI){
     )
   }
 
-  def loadJar(jar: java.io.File) = {
+  def loadJar(jar: java.io.File): Unit = {
     extraJars = extraJars ++ Seq(jar)
     extraJarClassloaders ++= Seq(new URLClassLoader(
       Array(jar.toURI.toURL),

@@ -1,7 +1,7 @@
-package ammonite.repl.eval
+package ammonite.repl.interp
 import acyclic.file
 import ammonite.repl.{Parsed, Result}
-import ammonite.repl.eval.Preprocessor.Output
+import ammonite.repl.interp.Preprocessor.Output
 import scala.reflect.internal.Flags
 import scala.reflect.internal.util.NoPosition
 import scala.tools.nsc.Global

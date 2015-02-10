@@ -2,7 +2,7 @@ package ammonite.repl.frontend
 
 import java.io.{OutputStream, InputStream}
 
-import ammonite.repl.{Evaluated, Result, Signaller}
+import ammonite.repl.{Evaluated, Result}
 import jline.console.ConsoleReader
 import acyclic.file
 
@@ -21,7 +21,6 @@ class JLineFrontend(input: InputStream,
   val term = new jline.UnixTerminal()
   var buffered = ""
   term.init()
-
   val reader = new ConsoleReader(input, output, term)
 
   reader.setHistoryEnabled(true)

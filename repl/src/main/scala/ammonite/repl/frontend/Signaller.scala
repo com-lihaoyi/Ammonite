@@ -1,6 +1,4 @@
-package ammonite.repl
-
-import acyclic.file
+package ammonite.repl.frontend
 
 /**
  * Lets you turn on signal handling within a certain block,

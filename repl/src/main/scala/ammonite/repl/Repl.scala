@@ -1,8 +1,9 @@
 package ammonite.repl
 
 import java.io.{OutputStream, InputStream}
-import ammonite.repl.frontend.{ColorSet, DefaultReplAPI, ReplAPIHolder, ReplAPI}
+import ammonite.repl.frontend._
 import acyclic.file
+import ammonite.repl.interp.Interpreter
 
 import scala.annotation.tailrec
 

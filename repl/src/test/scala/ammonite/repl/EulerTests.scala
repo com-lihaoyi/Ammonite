@@ -1,6 +1,6 @@
 package ammonite.repl
 
-import ammonite.repl.eval.{Compiler, Evaluator, Preprocessor}
+import ammonite.repl.interp.{Compiler, Evaluator, Preprocessor}
 import utest._
 
 import scala.collection.{immutable => imm}

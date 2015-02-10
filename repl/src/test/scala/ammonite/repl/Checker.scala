@@ -1,6 +1,7 @@
 package ammonite.repl
 
 import ammonite.repl.frontend._
+import ammonite.repl.interp.Interpreter
 import utest._
 
 
