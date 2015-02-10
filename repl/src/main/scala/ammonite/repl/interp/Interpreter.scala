@@ -7,6 +7,11 @@ import ammonite.repl.frontend.{ReplAPI, ReplAPIHolder}
 
 import scala.reflect.io.VirtualDirectory
 
+/**
+ * A convenient bundle of all the functionality necessary
+ * to interpret Scala code. Doesn't attempt to provide any
+ * real encapsulation for now.
+ */
 class Interpreter(replApi: ReplAPI){
   val dynamicClasspath = new VirtualDirectory("(memory)", None)
   var extraJars = Seq[java.io.File]()
