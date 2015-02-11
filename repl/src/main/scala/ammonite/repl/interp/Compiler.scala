@@ -104,8 +104,9 @@ class Compiler(jarDeps: Seq[java.io.File],
       Compiler.makeFile(allCode.getBytes, name = "Hello.scala"),
       allCode
     )
+    prepPressy(allCode)
     def ask(query: (Position, Response[List[pressy.Member]]) => Unit) = {
-      askPressy(index, "Current", allCode, query)
+      askPressy(index, query)
     }
     val tree = pressy.parseTree(file)
     def dotted = tree.collect{
@@ -133,20 +134,30 @@ class Compiler(jarDeps: Seq[java.io.File],
     (i, all.filter(_ != "<init>"))
   }
 
+  var currentFile: BatchSourceFile = null
+  def primePressy(allCode: String) = {
+    currentFile = new BatchSourceFile(
+      makeFile(allCode.getBytes, name = "Current.scala"),
+      allCode
+    )
+    val r = new Response[Unit]
+
+    pressy.askReload(List(currentFile), r)
+    r
+  }
+  def prepPressy(allCode: String) = {
+    primePressy(allCode).get.fold(
+      x => x,
+      e => throw e
+    )
+  }
   /**
    * Queries the presentation compiler for a list of members
    */
   def askPressy(index: Int,
-                wrapperName: String,
-                allCode: String,
                 query: (Position, Response[List[pressy.Member]]) => Unit) = {
-    val filename = wrapperName + ".scala"
-    val file = new BatchSourceFile(
-      makeFile(allCode.getBytes, name = filename),
-      allCode
-    )
-    awaitResponse[Unit](pressy.askReload(List(file), _))
-    val position = new OffsetPosition(file, index)
+
+    val position = new OffsetPosition(currentFile, index)
     val scopes = awaitResponse[List[pressy.Member]](query(position, _))
     scopes.filter(_.accessible)
   }
@@ -181,7 +192,8 @@ class Compiler(jarDeps: Seq[java.io.File],
         ImportData(x.sym.name.toString.trim(), wrapperName, importTxt)
       }
     }
-    def ask(i: Int) = process(askPressy(i, wrapperName, allCode, pressy.askScopeCompletion))
+    prepPressy(allCode)
+    def ask(i: Int) = process(askPressy(i, pressy.askScopeCompletion))
     val end = ask(allCode.lastIndexOf("}") - 1)
     val start = ask(allCode.indexOf(s"$wrapperName{") + 1)
     (end.toSet -- start.toSet).toSeq
