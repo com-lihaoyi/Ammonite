@@ -2,7 +2,7 @@ package ammonite.repl.interp
 
 
 import acyclic.file
-import ammonite.repl.Parsed
+import ammonite.repl.{ImportData, Parsed}
 import scala.collection.mutable
 import scala.reflect.internal.util.{BatchSourceFile, OffsetPosition, Position}
 import scala.reflect.io
@@ -34,6 +34,7 @@ object Compiler{
     output.close()
     singleFile
   }
+
 }
 /**
  * Encapsulates (almost) all the ickiness of Scalac so it doesn't leak into
@@ -158,9 +159,18 @@ class Compiler(jarDeps: Seq[java.io.File],
    * end of the block, minus the things needed at the start, to
    * figure out what additional things we need to import next time.
    */
-  def importsFor(wrapperName: String, allCode: String): Seq[(String, String)] = {
+  def importsFor(wrapperName: String, allCode: String): Seq[ImportData] = {
     def process(members: Seq[pressy.Member]) = pressy.ask { () =>
-      members.collect { case x: pressy.ScopeMember =>
+      members.collect {
+        case x: pressy.ScopeMember
+          // LOL there is probably a better way but
+          // I can't think of it right now so YOLO
+          if x.sym.owner.toString != "class Object"
+          && x.sym.owner.toString != "class Any"
+          && x.sym.name.toString != "<init>" =>
+
+        // This is very gross but I don't
+        // know what else I can do here either
         val importTxt =
           x.viaImport
             .toString
@@ -168,12 +178,12 @@ class Compiler(jarDeps: Seq[java.io.File],
             .replace(".this.", ".")
             .replace("<empty>", wrapperName)
 
-        x.sym.name.toString.trim() -> s"/*$wrapperName*/ import $importTxt"
+        ImportData(x.sym.name.toString.trim(), wrapperName, importTxt)
       }
     }
     def ask(i: Int) = process(askPressy(i, wrapperName, allCode, pressy.askScopeCompletion))
-    val end = ask(allCode.lastIndexOf('}') - 1)
-    val start = ask(allCode.indexOf('{') + 1)
+    val end = ask(allCode.lastIndexOf("}") - 1)
+    val start = ask(allCode.indexOf(s"$wrapperName{") + 1)
     (end.toSet -- start.toSet).toSeq
   }
 

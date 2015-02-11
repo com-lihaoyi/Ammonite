@@ -4,7 +4,7 @@ import java.lang.reflect.InvocationTargetException
 
 import acyclic.file
 import ammonite.repl.frontend.ReplAPI
-import ammonite.repl.{Evaluated, Result, Catching}
+import ammonite.repl.{ImportData, Evaluated, Result, Catching}
 import scala.reflect.runtime.universe._
 import scala.collection.mutable
 import scala.util.Try
@@ -19,7 +19,7 @@ class Evaluator(currentClassloader: ClassLoader,
                 extraClassLoaders: => Seq[ClassLoader],
                 preprocess: (String, Int) => Result[Preprocessor.Output],
                 compile: => (Array[Byte], String => Unit) => Compiler.Output,
-                importsFor: => (String, String) => Seq[(String, String)]) {
+                importsFor: => (String, String) => Seq[ImportData]) {
 
   def namesFor(t: scala.reflect.runtime.universe.Type): Set[String] = {
     val yours = t.members.map(_.name.toString).toSet
@@ -40,7 +40,7 @@ class Evaluator(currentClassloader: ClassLoader,
    * errors instead of the desired shadowing.
    */
   val previousImports = mutable.Map(
-    namesFor(typeOf[ReplAPI]).map(n => n -> s"import ReplBridge.shell.$n").toSeq:_*
+    namesFor(typeOf[ReplAPI]).map(n => n -> ImportData(n, "", "ReplBridge.shell")).toSeq:_*
   )
 
 
@@ -68,7 +68,6 @@ class Evaluator(currentClassloader: ClassLoader,
             catch{ case e: ClassNotFoundException => None}
           }
           classes.collectFirst{ case Some(cls) => cls}
-                 .headOption
                  .getOrElse{ throw new ClassNotFoundException(name) }
         }
       }
@@ -137,9 +136,12 @@ class Evaluator(currentClassloader: ClassLoader,
   }
 
   def previousImportBlock = {
-    previousImports.toSeq
-      .sortBy(_._1)
-      .map(_._2)
+    previousImports
+      .values
+      .groupBy(_.prefix)
+      .map{case (prefix, imports) =>
+        s"import $prefix.{${imports.map("`"+_.imported+"`").mkString(",")}}"
+      }
       .mkString("\n")
   }
   def processLine(line: String) = for {
@@ -147,7 +149,6 @@ class Evaluator(currentClassloader: ClassLoader,
 
     wrapperName = "cmd" + currentLine
     wrapped = s"""
-      object Foo$wrapperName{   }
       object $wrapperName{
         $code
         def $$main() = {$printer}
@@ -155,19 +156,14 @@ class Evaluator(currentClassloader: ClassLoader,
     """
 
     wrappedWithImports = previousImportBlock + "\n\n" + wrapped
+
     evaled <- evalMain(wrappedWithImports, wrapperName)
     newImports = importsFor(wrapperName, wrappedWithImports)
-
   } yield Evaluated(evaled + "", wrapperName , newImports)
 
   def update(res: Result[Evaluated]) = res match {
     case Result.Success(ev) =>
-      for{
-        (name, proposedImport) <- ev.imports
-        if name != "package"
-      }{
-        previousImports(name) = s"$proposedImport.`$name`"
-      }
+      for(i <- ev.imports) previousImports(i.imported) = i
       currentLine += 1
     case Result.Failure(msg) =>
       currentLine += 1

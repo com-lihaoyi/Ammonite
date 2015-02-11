@@ -65,7 +65,9 @@ case class Catching(handler: PartialFunction[Throwable, String]) {
 
 case class Evaluated(msg: String,
                      wrapper: String,
-                     imports: Seq[(String, String)])
+                     imports: Seq[ImportData])
+
+case class ImportData(imported: String, wrapperName: String, prefix: String)
 
 /**
  * The results of parsing a string into code.
