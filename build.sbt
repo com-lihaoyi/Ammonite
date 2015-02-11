@@ -2,7 +2,7 @@
 val sharedSettings = Seq(
   organization := "com.lihaoyi",
   crossScalaVersions := Seq("2.10.4", "2.11.4"),
-  version := "0.1.5",
+  version := "0.1.6",
   libraryDependencies += "com.lihaoyi" %% "utest" % "0.3.0" % "test",
   testFrameworks += new TestFramework("utest.runner.Framework"),
   autoCompilerPlugins := true,
