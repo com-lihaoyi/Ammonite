@@ -41,7 +41,7 @@ val sharedSettings = Seq(
 
 
 lazy val repl = project.dependsOn(core).settings(sharedSettings:_*).settings(
-  name := "ammonite-sh",
+  name := "ammonite-repl",
   scalaVersion := "2.11.4",
   libraryDependencies ++= Seq(
     "org.scala-lang" % "scala-compiler" % scalaVersion.value,

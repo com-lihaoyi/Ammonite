@@ -1,4 +1,4 @@
-Ammonite 0.1.4
+Ammonite 0.1.5
 ==============
 
 ```scala
@@ -61,7 +61,7 @@ Getting Started
 To begin, add the following to your build.sbt:
 
 ```scala
-"com.lihaoyi" %% "ammonite" % "0.1.4",
+"com.lihaoyi" %% "ammonite" % "0.1.5",
 ```
 
 Then at the top of your file,
@@ -341,13 +341,21 @@ Ammonite REPL
 
 The Ammonite REPL is a work-in-progress, cleanroom re-implementation of the Scala REPL from first principles. It aims create a codebase much more structured than that of `scala.tools.nsc.interpreter`, and thus being able to move faster and support more features.
 
-To test it out, run
+To try out the REPL, add the following to your build.sbt
 
 ```
-sbt repl/run
+libraryDependencies += "com.lihaoyi" %% "ammonite-repl" % "0.1.5" % "test"
+
+initialCommands in console := "ammonite.repl.Repl.main(null)"
 ```
 
-Ammonite already supports many more features than the default Scala REPL, including:
+After that, simple hit
+
+```
+sbt projectName/test:console
+```
+
+To activate the Ammonite REPL. The REPL is a work-in-progress, so expect to find a few rough edges. Ammonite already supports many more features than the default Scala REPL, including:
 
 - Colored, customizable prompts
 
