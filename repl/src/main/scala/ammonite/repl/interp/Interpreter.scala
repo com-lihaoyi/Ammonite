@@ -25,8 +25,8 @@ class Interpreter(replApi: ReplAPI){
       Classpath.dirDeps,
       dynamicClasspath
     )
-    compiler.importsFor("", eval.replBridgeCode)
     val cls = eval.evalClass(eval.replBridgeCode, "ReplBridge")
+    compiler.importsFor("", eval.replBridgeCode)
     ReplAPI.initReplBridge(
       cls.asInstanceOf[Result.Success[Class[ReplAPIHolder]]].s,
       replApi

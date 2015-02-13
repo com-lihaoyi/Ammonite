@@ -8,9 +8,10 @@ import scala.reflect.internal.util.{BatchSourceFile, OffsetPosition, Position}
 import scala.reflect.io
 import scala.reflect.io._
 import scala.tools.nsc
-import scala.tools.nsc.Settings
+import scala.tools.nsc.{Phase, Global, Settings}
 import scala.tools.nsc.backend.JavaPlatform
 import scala.tools.nsc.interactive.{InteractiveAnalyzer, Response}
+import scala.tools.nsc.plugins.{PluginComponent, Plugin}
 
 import scala.tools.nsc.reporters.AbstractReporter
 import scala.tools.nsc.typechecker.Analyzer
@@ -66,9 +67,11 @@ class Compiler(jarDeps: Seq[java.io.File],
   val pressy = {
     val (settings, reporter, vd, jcp) = initGlobalBits(_ => (), scala.Console.YELLOW)
     new nsc.interactive.Global(settings, reporter) { g =>
+
       override def classPath = jcp
       override lazy val platform: ThisPlatform = new JavaPlatform{
         val global: g.type = g
+
         override def classPath = jcp
       }
       override lazy val analyzer = new { val global: g.type = g } with InteractiveAnalyzer {
@@ -77,9 +80,51 @@ class Compiler(jarDeps: Seq[java.io.File],
     }
   }
 
+  var lastImports = Seq.empty[ImportData]
   val (vd, reporter, compiler) = {
     val (settings, reporter, vd, jcp) = initGlobalBits(logger, scala.Console.RED)
     val scalac = new nsc.Global(settings, reporter) { g =>
+      override lazy val plugins = List(
+        new Plugin{
+          val name: String = "HelloPlugin"
+          val global: Global = g
+          val components: List[PluginComponent] = List(
+            new PluginComponent {
+              def newPhase(prev: Phase): Phase = new GlobalPhase(prev) {
+                def apply(unit: g.CompilationUnit): Unit = {
+                  val stats = unit.body.children.last.asInstanceOf[g.ModuleDef].impl.body
+                  val symbols = stats.foldLeft(List.empty[(g.Symbol, String)]){
+                    case (ctx, t @ g.Import(expr, _)) =>
+                      val syms = new g.analyzer.ImportInfo(t, 0).allImportedSymbols
+                      syms.map(_ -> expr.toString).toList ::: ctx
+                    case (ctx, t @ g.DefDef(_, _, _, _, _, _))  => (t.symbol, "") :: ctx
+                    case (ctx, t @ g.ValDef(_, _, _, _))        => (t.symbol, "") :: ctx
+                    case (ctx, t @ g.ClassDef(_, _, _, _))      => (t.symbol, "") :: ctx
+                    case (ctx, t @ g.ModuleDef(_, _, _))        => (t.symbol, "") :: ctx
+                    case (ctx, t @ g.TypeDef(_, _, _, _))       => (t.symbol, "") :: ctx
+                    case (ctx, _) => ctx
+                  }
+                  lastImports = for {
+                    (sym, importString) <- symbols
+                    name = sym.encodedName.trim
+                    if name != "<init>"
+                    if name != "<clinit>"
+                    if name != "$main"
+                  } yield {
+                    ImportData(sym.encodedName.trim, "", importString)
+                  }
+                }
+                def name: String = "Hello"
+              }
+              val global = g
+              val runsAfter = List("typer")
+              override val runsRightAfter = Some("typer")
+              val phaseName = "Hello"
+            }
+          )
+          val description: String = "Extracts the scope"
+        }
+      )
       override def classPath = jcp
       override lazy val platform: ThisPlatform = new JavaPlatform{
         val global: g.type = g
@@ -171,32 +216,39 @@ class Compiler(jarDeps: Seq[java.io.File],
    * figure out what additional things we need to import next time.
    */
   def importsFor(wrapperName: String, allCode: String): Seq[ImportData] = {
-    def process(members: Seq[pressy.Member]) = pressy.ask { () =>
-      members.collect {
-        case x: pressy.ScopeMember
-          // LOL there is probably a better way but
-          // I can't think of it right now so YOLO
-          if x.sym.owner.toString != "class Object"
-          && x.sym.owner.toString != "class Any"
-          && x.sym.name.toString != "<init>" =>
+    lastImports
+      .map(id => id.copy(
+        wrapperName = wrapperName,
+        prefix = if (id.prefix == "") wrapperName else id.prefix)
+      )
+      .toList
 
-        // This is very gross but I don't
-        // know what else I can do here either
-        val importTxt =
-          x.viaImport
-            .toString
-            .padTo(30, ' ')
-            .replace(".this.", ".")
-            .replace("<empty>", wrapperName)
+//    def process(members: Seq[pressy.Member]) = pressy.ask { () =>
+//      members.collect {
+//        case x: pressy.ScopeMember
+//          // LOL there is probably a better way but
+//          // I can't think of it right now so YOLO
+//          if x.sym.owner.toString != "class Object"
+//          && x.sym.owner.toString != "class Any"
+//          && x.sym.name.toString != "<init>" =>
+//
+//        // This is very gross but I don't
+//        // know what else I can do here either
+//        val importTxt =
+//          x.viaImport
+//            .toString
+//            .padTo(30, ' ')
+//            .replace(".this.", ".")
+//            .replace("<empty>", wrapperName)
+//
+//        ImportData(x.sym.name.toString.trim(), wrapperName, importTxt)
+//      }
+//    }
+//    prepPressy(allCode)
+//    def ask(i: Int) = process(askPressy(i, pressy.askScopeCompletion))
+//    val end = ask(allCode.lastIndexOf("}") - 1)
+//    val start = ask(allCode.indexOf(s"$wrapperName{") + 1)
 
-        ImportData(x.sym.name.toString.trim(), wrapperName, importTxt)
-      }
-    }
-    prepPressy(allCode)
-    def ask(i: Int) = process(askPressy(i, pressy.askScopeCompletion))
-    val end = ask(allCode.lastIndexOf("}") - 1)
-    val start = ask(allCode.indexOf(s"$wrapperName{") + 1)
-    (end.toSet -- start.toSet).toSeq
   }
 
   /**
