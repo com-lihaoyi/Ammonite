@@ -67,21 +67,7 @@ class Compiler(jarDeps: Seq[java.io.File],
     )
   }
 
-  val pressy = {
-    val (settings, reporter, vd, jcp) = initGlobalBits(_ => (), scala.Console.YELLOW)
-    new nsc.interactive.Global(settings, reporter) { g =>
 
-      override def classPath = jcp
-      override lazy val platform: ThisPlatform = new JavaPlatform{
-        val global: g.type = g
-
-        override def classPath = jcp
-      }
-      override lazy val analyzer = new { val global: g.type = g } with InteractiveAnalyzer {
-        override def findMacroClassLoader() = new ClassLoader(this.getClass.getClassLoader){}
-      }
-    }
-  }
 
   var lastImports = Seq.empty[ImportData]
   val (vd, reporter, compiler) = {
@@ -101,6 +87,8 @@ class Compiler(jarDeps: Seq[java.io.File],
   }
 
 
+  var cachedPressy: nsc.interactive.Global = null
+  
   /**
    * Ask for autocompletion at a particular spot in the code, returning
    * possible things that can be completed at that location. May try various
@@ -108,6 +96,51 @@ class Compiler(jarDeps: Seq[java.io.File],
    * the outside caller probably doesn't care.
    */
   def complete(index: Int, allCode: String): (Int, Seq[String]) = {
+    if (cachedPressy == null){
+      cachedPressy = {
+        val (settings, reporter, vd, jcp) = initGlobalBits(println, scala.Console.YELLOW)
+        new nsc.interactive.Global(settings, reporter) { g =>
+
+          override def classPath = jcp
+          override lazy val platform: ThisPlatform = new JavaPlatform{
+            val global: g.type = g
+
+            override def classPath = jcp
+          }
+          override lazy val analyzer = new { val global: g.type = g } with InteractiveAnalyzer {
+            override def findMacroClassLoader() = new ClassLoader(this.getClass.getClassLoader){}
+          }
+        }
+      }
+    }
+    val pressy = cachedPressy
+    var currentFile: BatchSourceFile = null
+    def primePressy(allCode: String) = {
+      currentFile = new BatchSourceFile(
+        makeFile(allCode.getBytes, name = "Current.scala"),
+        allCode
+      )
+      val r = new Response[Unit]
+      pressy.askReload(List(currentFile), r)
+      r
+    }
+    def prepPressy(allCode: String) = {
+      primePressy(allCode).get.fold(
+        x => x,
+        e => throw e
+      )
+    }
+    /**
+     * Queries the presentation compiler for a list of members
+     */
+    def askPressy(index: Int,
+                  query: (Position, Response[List[pressy.Member]]) => Unit) = {
+
+      val position = new OffsetPosition(currentFile, index)
+      val scopes = awaitResponse[List[pressy.Member]](query(position, _))
+      scopes.filter(_.accessible)
+    }
+
     val file = new BatchSourceFile(
       Compiler.makeFile(allCode.getBytes, name = "Hello.scala"),
       allCode
@@ -139,36 +172,11 @@ class Compiler(jarDeps: Seq[java.io.File],
     }
 
     val (i, all) = dotted.headOption orElse prefixed.headOption getOrElse scoped
+    println(all.length)
     (i, all.filter(_ != "<init>"))
   }
 
-  var currentFile: BatchSourceFile = null
-  def primePressy(allCode: String) = {
-    currentFile = new BatchSourceFile(
-      makeFile(allCode.getBytes, name = "Current.scala"),
-      allCode
-    )
-    val r = new Response[Unit]
 
-    pressy.askReload(List(currentFile), r)
-    r
-  }
-  def prepPressy(allCode: String) = {
-    primePressy(allCode).get.fold(
-      x => x,
-      e => throw e
-    )
-  }
-  /**
-   * Queries the presentation compiler for a list of members
-   */
-  def askPressy(index: Int,
-                query: (Position, Response[List[pressy.Member]]) => Unit) = {
-
-    val position = new OffsetPosition(currentFile, index)
-    val scopes = awaitResponse[List[pressy.Member]](query(position, _))
-    scopes.filter(_.accessible)
-  }
 
   /**
    * Compiles a blob of bytes and spits of a list of classfiles
@@ -183,6 +191,8 @@ class Compiler(jarDeps: Seq[java.io.File],
     run.compileFiles(List(singleFile))
     if (reporter.hasErrors) None
     else Some{
+      Option(cachedPressy).foreach(_.askShutdown())
+      cachedPressy = null
       val files = for{
         x <- vd.iterator.to[collection.immutable.Traversable]
         if x.name.endsWith(".class")

@@ -53,7 +53,6 @@ class Repl(input: InputStream, output: OutputStream) {
         case Result.Skip => loop()
         case Result.Buffer(line) => loop()
         case Result.Exit =>
-          interp.compiler.pressy.askShutdown()
           println("Bye!")
         case Result.Success(ev) =>
           println(ev.msg)
