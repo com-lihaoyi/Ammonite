@@ -32,7 +32,7 @@ class AmmonitePlugin(g: scala.tools.nsc.Global, output: Seq[ImportData] => Unit)
             // resolve the imported names
             case (ctx, t @ g.Import(expr, _)) =>
               val syms = new g.analyzer.ImportInfo(t, 0).allImportedSymbols
-              syms.map(_ -> expr.toString).toList ::: ctx
+              syms.filter(_.isPublic).map(_ -> expr.toString).toList ::: ctx
             case (ctx, t @ g.DefDef(_, _, _, _, _, _))  => (t.symbol, "") :: ctx
             case (ctx, t @ g.ValDef(_, _, _, _))        => (t.symbol, "") :: ctx
             case (ctx, t @ g.ClassDef(_, _, _, _))      => (t.symbol, "") :: ctx
