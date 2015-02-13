@@ -18,8 +18,7 @@ import scala.util.Try
 class Evaluator(currentClassloader: ClassLoader,
                 extraClassLoaders: => Seq[ClassLoader],
                 preprocess: (String, Int) => Result[Preprocessor.Output],
-                compile: => (Array[Byte], String => Unit) => Compiler.Output,
-                importsFor: => (String, String) => Seq[ImportData]) {
+                compile: => (Array[Byte], String => Unit) => Compiler.Output) {
 
   def namesFor(t: scala.reflect.runtime.universe.Type): Set[String] = {
     val yours = t.members.map(_.name.toString).toSet
@@ -74,7 +73,7 @@ class Evaluator(currentClassloader: ClassLoader,
     }
   }
 
-  def evalClass(code: String, wrapperName: String): Result[Class[_]] = for{
+  def evalClass(code: String, wrapperName: String): Result[(Class[_], Seq[ImportData])] = for{
     (output, compiled) <- Result(
       Try{
         val output = mutable.Buffer.empty[String]
@@ -84,7 +83,7 @@ class Evaluator(currentClassloader: ClassLoader,
       e => {println("!!!! " + e.printStackTrace()); e.toString}
     )
 
-    classFiles <- Result[Traversable[(String, Array[Byte])]](
+    (classFiles, importData) <- Result[(Traversable[(String, Array[Byte])], Seq[ImportData])](
       compiled, "Compilation Failed\n" + output.mkString("\n")
     )
 
@@ -95,10 +94,10 @@ class Evaluator(currentClassloader: ClassLoader,
 
       Class.forName(wrapperName , true, evalClassloader)
     }, e => "Failed to load compiled class " + e)
-  } yield cls
+  } yield (cls, importData)
 
   def evalMain(code: String, wrapperName: String) = for{
-    cls <- evalClass(code, wrapperName)
+    (cls, importData) <- evalClass(code, wrapperName)
     method = cls.getDeclaredMethod("$main")
     _ <- Catching{
       case ex: InvocationTargetException
@@ -118,7 +117,7 @@ class Evaluator(currentClassloader: ClassLoader,
         "\nInterrupted!"
 
     }
-  } yield method.invoke(null)
+  } yield (method.invoke(null), importData)
 
   var evalId = 0
 
@@ -157,9 +156,14 @@ class Evaluator(currentClassloader: ClassLoader,
 
     wrappedWithImports = previousImportBlock + "\n\n" + wrapped
 
-    evaled <- evalMain(wrappedWithImports, wrapperName)
-    newImports = importsFor(wrapperName, wrappedWithImports)
-  } yield Evaluated(evaled + "", wrapperName , newImports)
+    (evaled, newImports) <- evalMain(wrappedWithImports, wrapperName)
+  } yield Evaluated(
+      evaled + "", wrapperName ,
+      newImports.map(id => id.copy(
+        wrapperName = wrapperName,
+        prefix = if (id.prefix == "") wrapperName else id.prefix)
+      )
+    )
 
   def update(res: Result[Evaluated]) = res match {
     case Result.Success(ev) =>

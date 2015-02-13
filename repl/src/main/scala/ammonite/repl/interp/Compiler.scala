@@ -24,7 +24,7 @@ object Compiler{
    * If the Option is None, it means compilation failed
    * Otherwise it's a Traversable of (filename, bytes) tuples
    */
-  type Output = Option[Traversable[(String, Array[Byte])]]
+  type Output = Option[(Traversable[(String, Array[Byte])], Seq[ImportData])]
   /**
    * Converts a bunch of bytes into Scalac's weird VirtualFile class
    */
@@ -39,7 +39,10 @@ object Compiler{
 }
 /**
  * Encapsulates (almost) all the ickiness of Scalac so it doesn't leak into
- * the rest of the codebase.
+ * the rest of the codebase. Makes use of a good amount of mutable state
+ * for things like the log-output-forwarder or compiler-plugin-output because
+ * These things are hard-coded into Scalac and can't be passed in from run to
+ * run.
  *
  * Turns source-strings into the bytes of classfiles, possibly more than one
  * classfile per source-string (e.g. inner classes, or lambdas). Also lets
@@ -84,47 +87,7 @@ class Compiler(jarDeps: Seq[java.io.File],
   val (vd, reporter, compiler) = {
     val (settings, reporter, vd, jcp) = initGlobalBits(logger, scala.Console.RED)
     val scalac = new nsc.Global(settings, reporter) { g =>
-      override lazy val plugins = List(
-        new Plugin{
-          val name: String = "HelloPlugin"
-          val global: Global = g
-          val components: List[PluginComponent] = List(
-            new PluginComponent {
-              def newPhase(prev: Phase): Phase = new GlobalPhase(prev) {
-                def apply(unit: g.CompilationUnit): Unit = {
-                  val stats = unit.body.children.last.asInstanceOf[g.ModuleDef].impl.body
-                  val symbols = stats.foldLeft(List.empty[(g.Symbol, String)]){
-                    case (ctx, t @ g.Import(expr, _)) =>
-                      val syms = new g.analyzer.ImportInfo(t, 0).allImportedSymbols
-                      syms.map(_ -> expr.toString).toList ::: ctx
-                    case (ctx, t @ g.DefDef(_, _, _, _, _, _))  => (t.symbol, "") :: ctx
-                    case (ctx, t @ g.ValDef(_, _, _, _))        => (t.symbol, "") :: ctx
-                    case (ctx, t @ g.ClassDef(_, _, _, _))      => (t.symbol, "") :: ctx
-                    case (ctx, t @ g.ModuleDef(_, _, _))        => (t.symbol, "") :: ctx
-                    case (ctx, t @ g.TypeDef(_, _, _, _))       => (t.symbol, "") :: ctx
-                    case (ctx, _) => ctx
-                  }
-                  lastImports = for {
-                    (sym, importString) <- symbols
-                    name = sym.encodedName.trim
-                    if name != "<init>"
-                    if name != "<clinit>"
-                    if name != "$main"
-                  } yield {
-                    ImportData(sym.encodedName.trim, "", importString)
-                  }
-                }
-                def name: String = "Hello"
-              }
-              val global = g
-              val runsAfter = List("typer")
-              override val runsRightAfter = Some("typer")
-              val phaseName = "Hello"
-            }
-          )
-          val description: String = "Extracts the scope"
-        }
-      )
+      override lazy val plugins = List(new AmmonitePlugin(g, lastImports = _))
       override def classPath = jcp
       override lazy val platform: ThisPlatform = new JavaPlatform{
         val global: g.type = g
@@ -208,50 +171,6 @@ class Compiler(jarDeps: Seq[java.io.File],
   }
 
   /**
-   * Asks the presentation compiler for a list of imports that will be
-   * needed after this block of code has executed.
-   *
-   * We query the presentation compiler for the things needed at the
-   * end of the block, minus the things needed at the start, to
-   * figure out what additional things we need to import next time.
-   */
-  def importsFor(wrapperName: String, allCode: String): Seq[ImportData] = {
-    lastImports
-      .map(id => id.copy(
-        wrapperName = wrapperName,
-        prefix = if (id.prefix == "") wrapperName else id.prefix)
-      )
-      .toList
-
-//    def process(members: Seq[pressy.Member]) = pressy.ask { () =>
-//      members.collect {
-//        case x: pressy.ScopeMember
-//          // LOL there is probably a better way but
-//          // I can't think of it right now so YOLO
-//          if x.sym.owner.toString != "class Object"
-//          && x.sym.owner.toString != "class Any"
-//          && x.sym.name.toString != "<init>" =>
-//
-//        // This is very gross but I don't
-//        // know what else I can do here either
-//        val importTxt =
-//          x.viaImport
-//            .toString
-//            .padTo(30, ' ')
-//            .replace(".this.", ".")
-//            .replace("<empty>", wrapperName)
-//
-//        ImportData(x.sym.name.toString.trim(), wrapperName, importTxt)
-//      }
-//    }
-//    prepPressy(allCode)
-//    def ask(i: Int) = process(askPressy(i, pressy.askScopeCompletion))
-//    val end = ask(allCode.lastIndexOf("}") - 1)
-//    val start = ask(allCode.indexOf(s"$wrapperName{") + 1)
-
-  }
-
-  /**
    * Compiles a blob of bytes and spits of a list of classfiles
    */
   def compile(src: Array[Byte], runLogger: String => Unit): Output = {
@@ -264,7 +183,7 @@ class Compiler(jarDeps: Seq[java.io.File],
     run.compileFiles(List(singleFile))
     if (reporter.hasErrors) None
     else Some{
-      for{
+      val files = for{
         x <- vd.iterator.to[collection.immutable.Traversable]
         if x.name.endsWith(".class")
       } yield {
@@ -273,6 +192,8 @@ class Compiler(jarDeps: Seq[java.io.File],
         output.close()
         (x.name.stripSuffix(".class"), x.toByteArray)
       }
+      val imports = lastImports.toList
+      (files, imports)
     }
   }
 
