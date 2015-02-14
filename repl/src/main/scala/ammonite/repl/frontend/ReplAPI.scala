@@ -4,19 +4,20 @@ import java.io.File
 
 import scala.reflect.runtime.universe._
 import acyclic.file
+
+
 class ReplAPIHolder {
   var shell0: FullReplAPI = null
   lazy val shell = shell0
 }
 
-class ReplExit
-
+case object ReplExit extends Exception
 
 trait ReplAPI {
   /**
    * Exit the Ammonite REPL. You can also use Ctrl-D to exit
    */
-  def exit = new ReplExit
+  def exit = throw ReplExit
 
   /**
    * Read/writable prompt for the shell. Use this to change the
@@ -70,6 +71,10 @@ trait Load{
    */
   def ivy(groupId: String, artifactId: String, version: String): Unit
 
+  /**
+   * Loads a sequence of command-lines into the
+   * REPL and evaluates them one after another
+   */
   def lines(lines: Seq[String]): Unit
 }
 

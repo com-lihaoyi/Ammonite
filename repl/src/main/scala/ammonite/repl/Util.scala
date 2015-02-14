@@ -54,13 +54,13 @@ sealed abstract class Result[+T]{
  * Fake for-comprehension generator to catch errors and turn
  * them into [[Result.Failure]]s
  */
-case class Catching(handler: PartialFunction[Throwable, String]) {
+case class Catching(handler: PartialFunction[Throwable, Result.Failing]) {
 
   def foreach[T](t: Unit => T): T = t(())
   def flatMap[T](t: Unit => Result[T]): Result[T] =
-    try{t(())} catch handler.andThen(Result.Failure)
+    try{t(())} catch handler
   def map[T](t: Unit => T): Result[T] =
-    try Result.Success(t(())) catch handler.andThen(Result.Failure)
+    try Result.Success(t(())) catch handler
 }
 
 case class Evaluated(msg: String,

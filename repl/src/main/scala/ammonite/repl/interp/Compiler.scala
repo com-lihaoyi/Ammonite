@@ -67,9 +67,8 @@ class Compiler(jarDeps: Seq[java.io.File],
     )
   }
 
-
-
   var lastImports = Seq.empty[ImportData]
+
   val (vd, reporter, compiler) = {
     val (settings, reporter, vd, jcp) = initGlobalBits(logger, scala.Console.RED)
     val scalac = new nsc.Global(settings, reporter) { g =>
@@ -113,6 +112,7 @@ class Compiler(jarDeps: Seq[java.io.File],
         }
       }
     }
+
     val pressy = cachedPressy
     var currentFile: BatchSourceFile = null
     def primePressy(allCode: String) = {
@@ -175,8 +175,6 @@ class Compiler(jarDeps: Seq[java.io.File],
 
     (i, all.filter(_ != "<init>"))
   }
-
-
 
   def shutdownPressy() = {
     Option(cachedPressy).foreach(_.askShutdown())

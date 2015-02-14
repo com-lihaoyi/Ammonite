@@ -3,7 +3,7 @@ package ammonite.repl.interp
 import java.lang.reflect.InvocationTargetException
 
 import acyclic.file
-import ammonite.repl.frontend.ReplAPI
+import ammonite.repl.frontend.{ReplExit, ReplAPI}
 import ammonite.repl.{ImportData, Evaluated, Result, Catching}
 import scala.reflect.runtime.universe._
 import scala.collection.mutable
@@ -101,21 +101,24 @@ class Evaluator(currentClassloader: ClassLoader,
     method = cls.getDeclaredMethod("$main")
     _ <- Catching{
       case ex: InvocationTargetException
+        if ex.getCause.getCause.isInstanceOf[ReplExit.type]  =>
+        Result.Exit
+      case ex: InvocationTargetException
         if ex.getCause.isInstanceOf[ExceptionInInitializerError]  =>
-        val userEx = ex.getCause .getCause
+        val userEx = ex.getCause.getCause
         val trace =
           userEx
             .getStackTrace
             .takeWhile(x => !(x.getClassName == cls.getName && x.getMethodName == "$main"))
             .mkString("\n")
 
-        userEx.toString + "\n" + trace
+        Result.Failure(userEx.toString + "\n" + trace)
       case ex: InvocationTargetException
         if ex.getCause.isInstanceOf[ThreadDeath]  =>
+        println("D")
         // Clear the interrupted status
         Thread.interrupted()
-        "\nInterrupted!"
-
+        Result.Failure("\nInterrupted!")
     }
   } yield method.invoke(null)
 

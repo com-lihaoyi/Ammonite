@@ -56,7 +56,7 @@ class Repl(input: InputStream, output: OutputStream) {
         output += current + "\n" + current.getStackTrace.map("  " + _).mkString("\n") + "\n"
         current = current.getCause
       }
-      output + "\nSomething unexpected went wrong =("
+      Result.Failure(output + "\nSomething unexpected went wrong =(")
     }
     res <- frontEnd.action()
     _ <- Signaller("INT") { interp.mainThread.stop() }
