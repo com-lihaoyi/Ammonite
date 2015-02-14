@@ -9,6 +9,9 @@ class Checker {
   lazy val replApi: ReplAPI = new DefaultReplAPI(
     Nil,
     interp.loadJar,
+    _.foreach{line =>
+      handleResult(interp.eval.processLine(line))
+    },
     (groupId, artifactId, version) => {
       interp.loadJar(IvyThing.resolveArtifact(groupId, artifactId, version))
     },
@@ -19,6 +22,9 @@ class Checker {
 
   val interp: Interpreter = new Interpreter(replApi)
 
+  def handleResult(res: Result[Evaluated]) = {
+    interp.eval.update(res.asInstanceOf[Result.Success[Evaluated]].s.imports)
+  }
   def apply(input: String,
             expected: String = null) = {
     print(".")
@@ -28,7 +34,7 @@ class Checker {
     if (expected != null)
       assert(printed == Result.Success(expected.trim))
 
-    interp.eval.update(processed)
+    handleResult(processed)
   }
   def fail(input: String,
            failureCheck: String => Boolean = _ => true) = {
@@ -40,6 +46,5 @@ class Checker {
       case Result.Failure(s) => assert(failureCheck(s))
     }
 
-    interp.eval.update(processed)
   }
 }

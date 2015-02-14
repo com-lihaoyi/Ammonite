@@ -98,7 +98,7 @@ class Compiler(jarDeps: Seq[java.io.File],
   def complete(index: Int, allCode: String): (Int, Seq[String]) = {
     if (cachedPressy == null){
       cachedPressy = {
-        val (settings, reporter, vd, jcp) = initGlobalBits(println, scala.Console.YELLOW)
+        val (settings, reporter, vd, jcp) = initGlobalBits(_ => (), scala.Console.YELLOW)
         new nsc.interactive.Global(settings, reporter) { g =>
 
           override def classPath = jcp
@@ -172,7 +172,7 @@ class Compiler(jarDeps: Seq[java.io.File],
     }
 
     val (i, all) = dotted.headOption orElse prefixed.headOption getOrElse scoped
-    println(all.length)
+
     (i, all.filter(_ != "<init>"))
   }
 

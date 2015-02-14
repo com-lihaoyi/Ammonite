@@ -13,7 +13,7 @@ object AdvancedTests extends TestSuite{
       check("import scalatags.Text.all._", "import scalatags.Text.all._")
       check(
         """a("omg", href:="www.google.com").render""",
-        """res3: String = "<a href=\"www.google.com\">omg</a>""""
+        """res2: String = "<a href=\"www.google.com\">omg</a>""""
       )
     }
   }

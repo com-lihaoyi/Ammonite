@@ -11,7 +11,7 @@ class Repl(input: InputStream, output: OutputStream) {
   val interp: Interpreter = new Interpreter(replApi)
 
   lazy val replApi: ReplAPI = new DefaultReplAPI(
-    frontEnd.history,
+    frontEnd.history.dropRight(1),
     interp.loadJar,
     lines => for(line <- lines) handleOutput(interp.eval.processLine(line)),
     (groupId, artifactId, version) => {
