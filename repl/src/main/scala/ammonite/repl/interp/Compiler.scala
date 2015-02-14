@@ -178,6 +178,10 @@ class Compiler(jarDeps: Seq[java.io.File],
 
 
 
+  def shutdownPressy() = {
+    Option(cachedPressy).foreach(_.askShutdown())
+    cachedPressy = null
+  }
   /**
    * Compiles a blob of bytes and spits of a list of classfiles
    */
@@ -191,8 +195,8 @@ class Compiler(jarDeps: Seq[java.io.File],
     run.compileFiles(List(singleFile))
     if (reporter.hasErrors) None
     else Some{
-      Option(cachedPressy).foreach(_.askShutdown())
-      cachedPressy = null
+      shutdownPressy()
+
       val files = for{
         x <- vd.iterator.to[collection.immutable.Traversable]
         if x.name.endsWith(".class")

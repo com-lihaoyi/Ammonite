@@ -37,6 +37,7 @@ class Repl(input: InputStream, output: OutputStream) {
       case Result.Buffer(line) => true
       case Result.Exit =>
         println("Bye!")
+        interp.compiler.shutdownPressy()
         false
       case Result.Success(ev) =>
         interp.eval.update(ev.imports)
