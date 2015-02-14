@@ -13,6 +13,7 @@ class Repl(input: InputStream, output: OutputStream) {
   lazy val replApi: ReplAPI = new DefaultReplAPI(
     frontEnd.history,
     interp.loadJar,
+    lines => for(line <- lines) handleOutput(interp.eval.processLine(line)),
     (groupId, artifactId, version) => {
       interp.loadJar(IvyThing.resolveArtifact(groupId, artifactId, version))
     },
@@ -28,7 +29,24 @@ class Repl(input: InputStream, output: OutputStream) {
     interp.eval.previousImportBlock,
     interp.compiler.complete
   )
+  def handleOutput(res: Result[Evaluated]) = {
+    frontEnd.update(res)
 
+    res match{
+      case Result.Skip => true
+      case Result.Buffer(line) => true
+      case Result.Exit =>
+        println("Bye!")
+        false
+      case Result.Success(ev) =>
+        interp.eval.update(ev.imports)
+        println(ev.msg)
+        true
+      case Result.Failure(msg) =>
+        println(Console.RED + msg + Console.RESET)
+        true
+    }
+  }
   def action() = for{
     _ <- Catching { case x: Throwable =>
       var current = x
@@ -47,20 +65,7 @@ class Repl(input: InputStream, output: OutputStream) {
   def run() = {
     @tailrec def loop(): Unit = {
       val res = action()
-      frontEnd.update(res)
-      interp.eval.update(res)
-      res match{
-        case Result.Skip => loop()
-        case Result.Buffer(line) => loop()
-        case Result.Exit =>
-          println("Bye!")
-        case Result.Success(ev) =>
-          println(ev.msg)
-          loop()
-        case Result.Failure(msg) =>
-          println(Console.RED + msg + Console.RESET)
-          loop()
-      }
+      if (handleOutput(res)) loop()
     }
     loop()
   }

@@ -96,8 +96,8 @@ class Evaluator(currentClassloader: ClassLoader,
     }, e => "Failed to load compiled class " + e)
   } yield (cls, importData)
 
-  def evalMain(code: String, wrapperName: String) = for{
-    (cls, importData) <- evalClass(code, wrapperName)
+  def evalMain(cls: Class[_]) = for{
+    _ <- Result.Success(())
     method = cls.getDeclaredMethod("$main")
     _ <- Catching{
       case ex: InvocationTargetException
@@ -117,21 +117,25 @@ class Evaluator(currentClassloader: ClassLoader,
         "\nInterrupted!"
 
     }
-  } yield (method.invoke(null), importData)
+  } yield method.invoke(null)
 
   var evalId = 0
 
   def evalExpr(code: String) = {
     val wrapperId = "$eval" + evalId
     evalId += 1
-    evalMain(s"""
+    for{
+      (cls, imports) <- evalClass(s"""
       object $wrapperId{
         def $$main() = {
           $code
         }
       }""",
-      wrapperId
-    )
+        wrapperId
+      )
+      evaled <- evalMain(cls)
+    } yield evaled
+
   }
 
   def previousImportBlock = {
@@ -153,10 +157,10 @@ class Evaluator(currentClassloader: ClassLoader,
         def $$main() = {$printer}
       }
     """
-
     wrappedWithImports = previousImportBlock + "\n\n" + wrapped
-
-    (evaled, newImports) <- evalMain(wrappedWithImports, wrapperName)
+    (cls, newImports) <- evalClass(wrappedWithImports, wrapperName)
+    _ = currentLine += 1
+    evaled <- evalMain(cls)
   } yield Evaluated(
       evaled + "", wrapperName ,
       newImports.map(id => id.copy(
@@ -165,12 +169,7 @@ class Evaluator(currentClassloader: ClassLoader,
       )
     )
 
-  def update(res: Result[Evaluated]) = res match {
-    case Result.Success(ev) =>
-      for(i <- ev.imports) previousImports(i.imported) = i
-      currentLine += 1
-    case Result.Failure(msg) =>
-      currentLine += 1
-    case _ =>
+  def update(newImports: Seq[ImportData]) = {
+    for(i <- newImports) previousImports(i.imported) = i
   }
 }

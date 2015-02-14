@@ -69,6 +69,8 @@ trait Load{
    * Load a library from its maven/ivy coordinates
    */
   def ivy(groupId: String, artifactId: String, version: String): Unit
+
+  def lines(lines: Seq[String]): Unit
 }
 
 /**
@@ -102,6 +104,7 @@ object ColorSet{
 
 class DefaultReplAPI(history0: => Seq[String],
                      load0: java.io.File => Unit,
+                     loadLines0: Seq[String] => Unit,
                      loadIvy0: (String, String, String) => Unit,
                      newCompiler0: () => Unit,
                      colors: ColorSet,
@@ -119,6 +122,7 @@ class DefaultReplAPI(history0: => Seq[String],
     s"defined ${colors.`type`}$definitionLabel ${colors.ident}$ident${colors.reset}"
   }
   object load extends Load{
+    def lines(lines: Seq[String]) = loadLines0(lines)
     def jar(jar: File): Unit = load0(jar)
     def ivy(groupId: String, artifactId: String, version: String): Unit =
       loadIvy0(groupId, artifactId, version)
