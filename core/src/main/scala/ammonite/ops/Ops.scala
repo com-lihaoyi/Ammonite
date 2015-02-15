@@ -4,7 +4,7 @@ import java.io.{File, InputStream}
 import java.nio.file.{Files, Paths, StandardOpenOption}
 import acyclic.file
 import RelPath.up
-import ammonite.pprint.PPrint
+import ammonite.pprint.{PPrinterator, PPrint}
 import scala.language.dynamics
 import scala.util.matching.Regex
 import Extensions._
@@ -42,12 +42,11 @@ object Internals{
       res
     }
 
-    object lines extends Op1[Path, Seq[String]]{
-      def apply(arg: Path) = {
+    object lines extends StreamableOp1[Path, String]{
+      def !!(arg: Path) = {
         val is = readIn(arg)
-        val res = io.Source.fromInputStream(is).mkString.split("\n")
-        is.close()
-        res
+        val source = io.Source.fromInputStream(is).getLines()
+        PPrinterator(source)
       }
     }
     object bytes extends Op1[Path, Array[Byte]]{
@@ -75,9 +74,15 @@ object Internals{
     implicit def WritableTraversable(a: Traversable[String]) = new Writable(a.mkString("\n").getBytes)
   }
 }
+
 trait Op1[T1, R] extends (T1 => R){
   def apply(arg: T1): R
   def !(arg: T1): R = apply(arg)
+}
+
+trait StreamableOp1[T1, R] extends Op1[T1, Vector[R]]{
+  def apply(arg: T1) = !!(arg).toVector
+  def !!(arg: T1): PPrinterator[R]
 }
 
 trait Op2[T1, T2, R] extends ((T1, T2) => R){
@@ -98,13 +103,13 @@ object Grepper{
   }
   implicit object Str extends Grepper[String] {
     def apply[V: ammonite.pprint.PPrint](t: String, s: V) = {
-      ammonite.pprint.PPrint(s)(BlackWhite).contains(t)
+      ammonite.pprint.PPrint(s)(BlackWhite).mkString.contains(t)
     }
   }
 
   implicit object Regex extends Grepper[Regex] {
     def apply[V: ammonite.pprint.PPrint](t: Regex, s: V) = {
-      t.findAllIn(ammonite.pprint.PPrint(s)(BlackWhite)).length > 0
+      t.findAllIn(ammonite.pprint.PPrint(s)(BlackWhite).mkString).length > 0
     }
   }
 }
@@ -177,19 +182,19 @@ object rm extends Op1[Path, Unit]{
 /**
  * List the files in a directory
  */
-object ls extends Op1[Path, Seq[Path]]{
-  def apply(arg: Path) = {
+object ls extends StreamableOp1[Path, Path]{
+  def !!(arg: Path) = {
     import scala.collection.JavaConverters._
-    Files.list(arg.nio).iterator().asScala.map(x => Path(x)).toVector
+    PPrinterator(Files.list(arg.nio).iterator().asScala.map(x => Path(x)))
   }
 
-  object rec extends Op1[Path, Seq[Path]]{
+  object rec extends StreamableOp1[Path, Path]{
     def recursiveListFiles(f: File): Iterator[File] = {
       def these = Option(f.listFiles).iterator.flatMap(x=>x)
       these ++ these.filter(_.isDirectory).flatMap(recursiveListFiles)
     }
-    def apply(arg: Path) =
-      recursiveListFiles(new File(arg.toString)).map(f => Path(f.getCanonicalPath)).toVector
+    def !!(arg: Path) =
+      PPrinterator(recursiveListFiles(new File(arg.toString)).map(f => Path(f.getCanonicalPath)))
   }
 }
 

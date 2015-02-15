@@ -64,11 +64,11 @@ object ExampleTests extends TestSuite{
       import ammonite.pprint.Config.Defaults._
 
       assert(
-        ammonite.pprint.PPrint(root/'hello/'world) == "root/'hello/'world",
-        ammonite.pprint.PPrint('hello/'world) == "'hello/'world",
-        ammonite.pprint.PPrint(empty/'world) == "empty/'world",
-        ammonite.pprint.PPrint(empty/'hello/'world) == "'hello/'world",
-        ammonite.pprint.PPrint(empty/"hello world") == "empty/\"hello world\""
+        ammonite.pprint.PPrint(root/'hello/'world).mkString == "root/'hello/'world",
+        ammonite.pprint.PPrint('hello/'world).mkString == "'hello/'world",
+        ammonite.pprint.PPrint(empty/'world).mkString == "empty/'world",
+        ammonite.pprint.PPrint(empty/'hello/'world).mkString == "'hello/'world",
+        ammonite.pprint.PPrint(empty/"hello world").mkString == "empty/\"hello world\""
       )
 
     }

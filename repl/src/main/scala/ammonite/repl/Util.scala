@@ -63,7 +63,7 @@ case class Catching(handler: PartialFunction[Throwable, Result.Failing]) {
     try Result.Success(t(())) catch handler
 }
 
-case class Evaluated(msg: String,
+case class Evaluated(msg: Iterator[String],
                      wrapper: String,
                      imports: Seq[ImportData])
 

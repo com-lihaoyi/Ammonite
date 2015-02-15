@@ -29,7 +29,7 @@ class Checker {
             expected: String = null) = {
     print(".")
     val processed = interp.eval.processLine(input)
-    val printed = processed.map(_.msg)
+    val printed = processed.map(_.msg.mkString)
 
     if (expected != null)
       assert(printed == Result.Success(expected.trim))
@@ -40,7 +40,8 @@ class Checker {
            failureCheck: String => Boolean = _ => true) = {
     print(".")
     val processed = interp.eval.processLine(input)
-    val printed = processed.map(_.msg)
+    val printed = processed.map(_.msg.mkString)
+
     printed match{
       case Result.Success(v) => assert({v; false})
       case Result.Failure(s) => assert(failureCheck(s))

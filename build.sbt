@@ -68,7 +68,7 @@ lazy val core = project.settings(sharedSettings:_*).settings(
       val boundedTypes = ts.map(_ + ": PP").mkString(",")
       s"""
       implicit def Product${i}Unpacker[${boundedTypes}] = {
-        (t: $tupleType, c: C) => Seq(${chunks.mkString(",")})
+        (t: $tupleType, c: C) => Iterator(${chunks.mkString(",")})
       }
       """
     }

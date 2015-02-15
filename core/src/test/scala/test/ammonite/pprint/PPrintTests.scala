@@ -11,7 +11,7 @@ case class FooG[T](t: T, sequence: Seq[String])
 case class FooNoArgs()
 object PPrintTests extends TestSuite{
   def check[T: PPrint](t: T, expected: String) = {
-    val pprinted = PPrint(t)
+    val pprinted = PPrint(t).mkString
     assert(pprinted == expected.trim)
   }
 
@@ -317,10 +317,10 @@ object PPrintTests extends TestSuite{
     }
     'Color{
       import ammonite.pprint.Config.Colors._
-      def count(haystack: String, needles: (String, Int)*) = {
-
+      def count(haystack: Iterator[String], needles: (String, Int)*) = {
+        val str = haystack.mkString
         for ((needle, expected) <- needles){
-          val count = countSubstring(haystack, needle)
+          val count = countSubstring(str, needle)
           assert(count == expected)
         }
       }
@@ -343,5 +343,4 @@ object PPrintTests extends TestSuite{
     }
 
   }
-
 }

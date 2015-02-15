@@ -99,28 +99,11 @@ class Evaluator(currentClassloader: ClassLoader,
   def evalMain(cls: Class[_]) = for{
     _ <- Result.Success(())
     method = cls.getDeclaredMethod("$main")
-    _ <- Catching{
-      case ex: InvocationTargetException
-        if ex.getCause.getCause.isInstanceOf[ReplExit.type]  =>
-        Result.Exit
-      case ex: InvocationTargetException
-        if ex.getCause.isInstanceOf[ExceptionInInitializerError]  =>
-        val userEx = ex.getCause.getCause
-        val trace =
-          userEx
-            .getStackTrace
-            .takeWhile(x => !(x.getClassName == cls.getName && x.getMethodName == "$main"))
-            .mkString("\n")
 
-        Result.Failure(userEx.toString + "\n" + trace)
-      case ex: InvocationTargetException
-        if ex.getCause.isInstanceOf[ThreadDeath]  =>
-        println("D")
-        // Clear the interrupted status
-        Thread.interrupted()
-        Result.Failure("\nInterrupted!")
-    }
-  } yield method.invoke(null)
+  } yield {
+    val res = method.invoke(null)
+    res
+  }
 
   var evalId = 0
 
@@ -154,18 +137,20 @@ class Evaluator(currentClassloader: ClassLoader,
     Preprocessor.Output(code, printer) <- preprocess(line, currentLine)
 
     wrapperName = "cmd" + currentLine
+
     wrapped = s"""
       object $wrapperName{
         $code
         def $$main() = {$printer}
       }
     """
+//    _ = println(wrapped)
     wrappedWithImports = previousImportBlock + "\n\n" + wrapped
     (cls, newImports) <- evalClass(wrappedWithImports, wrapperName)
     _ = currentLine += 1
     evaled <- evalMain(cls)
   } yield Evaluated(
-      evaled + "", wrapperName ,
+      evaled.asInstanceOf[Iterator[String]], wrapperName ,
       newImports.map(id => id.copy(
         wrapperName = wrapperName,
         prefix = if (id.prefix == "") wrapperName else id.prefix)

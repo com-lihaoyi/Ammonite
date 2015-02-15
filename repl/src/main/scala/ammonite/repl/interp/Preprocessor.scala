@@ -22,14 +22,14 @@ class Preprocessor(parse: => String => Parsed){
     (code: String, name: String, tree: Global#Tree) => cond.lift(name, code, tree)
   }
 
-  def pprintSignature(ident: String) = s"""ReplBridge.shell.shellPPrint(`$ident`, "$ident")"""
+  def pprintSignature(ident: String) = s"""Iterator(ReplBridge.shell.shellPPrint(`$ident`, "$ident"))"""
 
   def definedStr(definitionLabel: String, name: String) =
-    s"""ReplBridge.shell.shellPrintDef("$definitionLabel", "$name") """
+    s"""Iterator(ReplBridge.shell.shellPrintDef("$definitionLabel", "$name"))"""
 
   def pprint(ident: String) = {
     pprintSignature(ident) +
-      s""" + " = " + ammonite.pprint.PPrint(`$ident`)"""
+      s""" ++ Iterator(" = ") ++ ammonite.pprint.PPrint(`$ident`)"""
   }
   def DefProcessor(definitionLabel: String)(cond: PartialFunction[Global#Tree, String]) =
     (code: String, name: String, tree: Global#Tree) =>
@@ -52,7 +52,7 @@ class Preprocessor(parse: => String => Parsed){
     Preprocessor.Output(
       code,
       if (!t.mods.hasFlag(Flags.LAZY)) pprint(t.name.toString)
-      else pprintSignature(t.name.toString) + s""" + " = <lazy>" """
+      else  s"""${pprintSignature(t.name.toString)} ++ Iterator(" = <lazy>")"""
     )
   }
 
@@ -60,7 +60,7 @@ class Preprocessor(parse: => String => Parsed){
     Preprocessor.Output(s"val $name = $code", pprint(name))
   }
   val Import = Processor{ case (name, code, tree: Global#Import) =>
-    Preprocessor.Output(code, '"'+code+'"')
+    Preprocessor.Output(code, s"""Iterator("$code")""")
   }
 
   val decls = Seq[(String, String, Global#Tree) => Option[Preprocessor.Output]](
@@ -90,7 +90,7 @@ class Preprocessor(parse: => String => Parsed){
 
         Result(
           allDecls.reduceOption((a, b) =>
-            Output(a.code+";"+b.code, a.printer+ "+'\n'+" + b.printer)
+            Output(a.code+";"+b.code, a.printer+ "++ Iterator(\"\\n\") ++" + b.printer)
           ),
         "Don't know how to handle " + code
         )
