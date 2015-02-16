@@ -65,7 +65,6 @@ class JLineFrontend(input: InputStream,
     ).map(Result.Success(_))
       .getOrElse(Result.Exit)
 
-//    _ <- Result.Success[String]("")
   } yield buffered + "\n" + res
 
   def update(r: Result[Evaluated]) = r match{

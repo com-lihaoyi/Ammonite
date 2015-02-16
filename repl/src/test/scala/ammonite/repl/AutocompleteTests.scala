@@ -78,18 +78,19 @@ object AutocompleteTests extends TestSuite{
       )
     }
 
-    'blargh{
-      complete("""val x = 1; x + x.><caret>""",
-        Set(">>", ">>>"),
+    'deep{
+      complete("""fromN<caret>""",
+        Set("scala.concurrent.duration.fromNow"),
+        ^
+      )
+      complete("""Fut<caret>""",
+        Set("scala.concurrent.Future", "java.util.concurrent.Future"),
         _ -- _
       )
-
-// https://issues.scala-lang.org/browse/SI-9153
-//
-//      complete("""val x = 123; x + x.m<caret>""",
-//        Set("max"),
-//        _ -- _
-//      )
+      complete("""SECO<caret>""",
+        Set("scala.concurrent.duration.SECONDS"),
+        ^
+      )
     }
     'dotPrefix{
       complete("""java.math.Big<caret>""",
@@ -100,6 +101,16 @@ object AutocompleteTests extends TestSuite{
         Set("option2Iterable"),
         ^
       )
+      complete("""val x = 1; x + x.><caret>""",
+        Set(">>", ">>>"),
+        _ -- _
+      )
+      // https://issues.scala-lang.org/browse/SI-9153
+      //
+      //      complete("""val x = 123; x + x.m<caret>""",
+      //        Set("max"),
+      //        _ -- _
+      //      )
 
       val compares = Set("compare", "compareTo")
       complete("""Seq(1, 2, 3).map(_.compa<caret>)""", compares, ^)

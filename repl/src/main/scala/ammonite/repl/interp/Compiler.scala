@@ -161,13 +161,47 @@ class Compiler(jarDeps: Seq[java.io.File],
       case t @ pressy.Ident(name)
         if t.pos.start <= index && index <= t.pos.end =>
         val r = ask(index, pressy.askScopeCompletion)
-        (t.pos.start, pressy.ask(() => r.map(_.sym.name.decoded).filter(_.startsWith(name.decoded))))
+
+        lazy val shallow = {
+          pressy.ask(() => r.map(_.sym.name.decoded).filter(_.startsWith(name.decoded)))
+        }
+
+        /**
+         * Search for terms to autocomplete not just from the local scope,
+         * but from any packages and package objects accessible from the
+         * local scope
+         */
+        def rec(t: compiler.Symbol): Seq[compiler.Symbol] = {
+          val children =
+            if (t.hasPackageFlag || t.isPackageObject){
+              t.typeSignature.members.filter(_ != t).flatMap(rec)
+            } else Nil
+
+          t +: children.toSeq
+        }
+
+        lazy val allDeep = for{
+          member <- compiler.RootClass.typeSignature.members.toSeq
+          sym <- rec(member)
+          // sketchy name munging because I don't know how to do this properly
+          strippedName = sym.nameString.stripPrefix("package$").stripSuffix("$")
+          if strippedName.startsWith(name.decoded)
+          (pref, suf) = sym.fullNameString.splitAt(sym.fullNameString.lastIndexOf('.') + 1)
+          out = pref + strippedName
+          if out != ""
+        } yield out
+
+        lazy val deep = allDeep.distinct
+
+        if (shallow.length > 0) (t.pos.start, shallow)
+        else if (deep.length == 1) (t.pos.start, deep)
+        else (t.pos.end, deep :+ "")
     }
 
     def scoped = {
-      index -> ask(index, pressy.askScopeCompletion)
-        .map(s => pressy.ask(() => s.sym.name.decoded))
-
+      index -> ask(index, pressy.askScopeCompletion).map(s =>
+        pressy.ask(() => s.sym.name.decoded)
+      )
     }
 
     val (i, all) = dotted.headOption orElse prefixed.headOption getOrElse scoped
