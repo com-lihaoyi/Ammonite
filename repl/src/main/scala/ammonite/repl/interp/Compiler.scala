@@ -36,6 +36,57 @@ object Compiler{
     singleFile
   }
 
+  /**
+   * Converts Scalac's weird Future type
+   * into a standard scala.concurrent.Future
+   */
+  def awaitResponse[T](func: Response[T] => Unit): T = {
+    val r = new Response[T]
+    func(r)
+    r.get.fold(
+      x => x,
+      e => throw e
+    )
+  }
+  /**
+   * Code to initialize random bits and pieces that are needed
+   * for the Scala compiler to function, common between the
+   * normal and presentation compiler
+   */
+  def initGlobalBits(jarDeps: Seq[java.io.File],
+                     dirDeps: Seq[java.io.File],
+                     dynamicClasspath: VirtualDirectory,
+                     logger: => String => Unit,
+                     errorColor: String)= {
+    val vd = new io.VirtualDirectory("(memory)", None)
+    lazy val settings = new Settings
+    val settingsX = settings
+    settingsX.Yrangepos.value = true
+    val jCtx = new JavaContext()
+    val jDirs = jarDeps.map(x =>
+      new DirectoryClassPath(new FileZipArchive(x), jCtx)
+    ).toVector ++ dirDeps.map(x =>
+      new DirectoryClassPath(new PlainDirectory(new Directory(x)), jCtx)
+    ) ++ Seq(new DirectoryClassPath(dynamicClasspath, jCtx))
+    val jcp = new JavaClassPath(jDirs, jCtx)
+    settings.outputDirs.setSingleOutput(vd)
+
+    val reporter = new AbstractReporter {
+      def displayPrompt(): Unit = ???
+
+      def display(pos: Position, msg: String, severity: Severity) = {
+        severity match{
+          case ERROR => logger(
+            errorColor + Position.formatMessage(pos, msg, false) + scala.Console.RESET
+          )
+          case _ => logger(msg)
+        }
+      }
+
+      val settings = settingsX
+    }
+    (settings, reporter, vd, jcp)
+  }
 }
 /**
  * Encapsulates (almost) all the ickiness of Scalac so it doesn't leak into
@@ -50,27 +101,20 @@ object Compiler{
  */
 class Compiler(jarDeps: Seq[java.io.File],
                dirDeps: Seq[java.io.File],
-               dynamicClasspath: VirtualDirectory) {
+               dynamicClasspath: VirtualDirectory,
+               shutdownPressy: () => Unit) {
   import ammonite.repl.interp.Compiler._
 
   var logger: String => Unit = s => ()
-  /**
-   * Converts Scalac's weird Future type
-   * into a standard scala.concurrent.Future
-   */
-  def awaitResponse[T](func: Response[T] => Unit): T = {
-    val r = new Response[T]
-    func(r)
-    r.get.fold(
-      x => x,
-      e => throw e
-    )
-  }
+
 
   var lastImports = Seq.empty[ImportData]
 
   val (vd, reporter, compiler) = {
-    val (settings, reporter, vd, jcp) = initGlobalBits(logger, scala.Console.RED)
+    val (settings, reporter, vd, jcp) = initGlobalBits(
+      jarDeps, dirDeps, dynamicClasspath,
+      logger, scala.Console.RED
+    )
     val scalac = new nsc.Global(settings, reporter) { g =>
       override lazy val plugins = List(new AmmonitePlugin(g, lastImports = _))
       override def classPath = jcp
@@ -86,133 +130,7 @@ class Compiler(jarDeps: Seq[java.io.File],
   }
 
 
-  var cachedPressy: nsc.interactive.Global = null
-  
-  /**
-   * Ask for autocompletion at a particular spot in the code, returning
-   * possible things that can be completed at that location. May try various
-   * different completions depending on where the `index` is placed, but
-   * the outside caller probably doesn't care.
-   */
-  def complete(index: Int, allCode: String): (Int, Seq[String]) = {
-    if (cachedPressy == null){
-      cachedPressy = {
-        val (settings, reporter, vd, jcp) = initGlobalBits(_ => (), scala.Console.YELLOW)
-        new nsc.interactive.Global(settings, reporter) { g =>
 
-          override def classPath = jcp
-          override lazy val platform: ThisPlatform = new JavaPlatform{
-            val global: g.type = g
-
-            override def classPath = jcp
-          }
-          override lazy val analyzer = new { val global: g.type = g } with InteractiveAnalyzer {
-            override def findMacroClassLoader() = new ClassLoader(this.getClass.getClassLoader){}
-          }
-        }
-      }
-    }
-
-    val pressy = cachedPressy
-    var currentFile: BatchSourceFile = null
-    /**
-     * Queries the presentation compiler for a list of members
-     */
-    def askPressy(index: Int,
-                  query: (Position, Response[List[pressy.Member]]) => Unit) = {
-
-      val position = new OffsetPosition(currentFile, index)
-      val scopes = awaitResponse[List[pressy.Member]](query(position, _))
-      scopes.filter(_.accessible)
-    }
-
-    val file = new BatchSourceFile(
-      Compiler.makeFile(allCode.getBytes, name = "Hello.scala"),
-      allCode
-    )
-
-    currentFile = new BatchSourceFile(
-      makeFile(allCode.getBytes, name = "Current.scala"),
-      allCode
-    )
-    val r = new Response[Unit]
-    pressy.askReload(List(currentFile), r)
-
-    r.get.fold(
-      x => x,
-      e => throw e
-    )
-
-    def ask(index: Int, query: (Position, Response[List[pressy.Member]]) => Unit) = {
-      val (first, last) = allCode.splitAt(index)
-      askPressy(index, query)
-    }
-    val tree = pressy.parseTree(file)
-
-    def dotted = tree.collect{
-      case t @ pressy.Select(qualifier, name)
-        if qualifier.pos.end <= index && index <= t.pos.end =>
-        val r = ask(qualifier.pos.end, pressy.askTypeCompletion)
-        val prefix = if(name.decoded == "<error>") "" else name.decoded
-        (qualifier.pos.end + 1, pressy.ask(() => r.map(_.sym.name.decoded).filter(_.startsWith(prefix))))
-    }
-
-    def prefixed = tree.collect{
-      case t @ pressy.Ident(name)
-        if t.pos.start <= index && index <= t.pos.end =>
-        val r = ask(index, pressy.askScopeCompletion)
-
-        lazy val shallow = {
-          pressy.ask(() => r.map(_.sym.name.decoded).filter(_.startsWith(name.decoded)))
-        }
-
-        /**
-         * Search for terms to autocomplete not just from the local scope,
-         * but from any packages and package objects accessible from the
-         * local scope
-         */
-        def rec(t: compiler.Symbol): Seq[compiler.Symbol] = {
-          val children =
-            if (t.hasPackageFlag || t.isPackageObject){
-              t.typeSignature.members.filter(_ != t).flatMap(rec)
-            } else Nil
-
-          t +: children.toSeq
-        }
-
-        lazy val allDeep = for{
-          member <- compiler.RootClass.typeSignature.members.toSeq
-          sym <- rec(member)
-          // sketchy name munging because I don't know how to do this properly
-          strippedName = sym.nameString.stripPrefix("package$").stripSuffix("$")
-          if strippedName.startsWith(name.decoded)
-          (pref, suf) = sym.fullNameString.splitAt(sym.fullNameString.lastIndexOf('.') + 1)
-          out = pref + strippedName
-          if out != ""
-        } yield out
-
-        lazy val deep = allDeep.distinct
-
-        if (shallow.length > 0) (t.pos.start, shallow)
-        else if (deep.length == 1) (t.pos.start, deep)
-        else (t.pos.end, deep :+ "")
-    }
-
-    def scoped = {
-      index -> ask(index, pressy.askScopeCompletion).map(s =>
-        pressy.ask(() => s.sym.name.decoded)
-      )
-    }
-
-    val (i, all) = dotted.headOption orElse prefixed.headOption getOrElse scoped
-
-    (i, all.filter(_ != "<init>"))
-  }
-
-  def shutdownPressy() = {
-    Option(cachedPressy).foreach(_.askShutdown())
-    cachedPressy = null
-  }
   /**
    * Compiles a blob of bytes and spits of a list of classfiles
    */
@@ -263,39 +181,5 @@ class Compiler(jarDeps: Seq[java.io.File],
     }
   }
 
-  /**
-   * Code to initialize random bits and pieces that are needed
-   * for the Scala compiler to function, common between the
-   * normal and presentation compiler
-   */
-  def initGlobalBits(logger: => String => Unit, errorColor: String)= {
-    val vd = new io.VirtualDirectory("(memory)", None)
-    lazy val settings = new Settings
-    val settingsX = settings
-    settingsX.Yrangepos.value = true
-    val jCtx = new JavaContext()
-    val jDirs = jarDeps.map(x =>
-      new DirectoryClassPath(new FileZipArchive(x), jCtx)
-    ).toVector ++ dirDeps.map(x =>
-      new DirectoryClassPath(new PlainDirectory(new Directory(x)), jCtx)
-    ) ++ Seq(new DirectoryClassPath(dynamicClasspath, jCtx))
-    val jcp = new JavaClassPath(jDirs, jCtx)
-    settings.outputDirs.setSingleOutput(vd)
 
-    val reporter = new AbstractReporter {
-      def displayPrompt(): Unit = ???
-
-      def display(pos: Position, msg: String, severity: Severity) = {
-        severity match{
-          case ERROR => logger(
-            errorColor + Position.formatMessage(pos, msg, false) + scala.Console.RESET
-          )
-          case _ => logger(msg)
-        }
-      }
-
-      val settings = settingsX
-    }
-    (settings, reporter, vd, jcp)
-  }
 }

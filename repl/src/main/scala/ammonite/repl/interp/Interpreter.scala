@@ -18,9 +18,15 @@ class Interpreter(replApi: ReplAPI){
   var extraJarClassloaders = Seq[ClassLoader]()
 
   var compiler: Compiler = _
-
+  var pressy: Pressy = _
   def init() = {
     compiler = new Compiler(
+      Classpath.jarDeps ++ extraJars,
+      Classpath.dirDeps,
+      dynamicClasspath,
+      () => pressy.shutdownPressy()
+    )
+    pressy = new Pressy(
       Classpath.jarDeps ++ extraJars,
       Classpath.dirDeps,
       dynamicClasspath

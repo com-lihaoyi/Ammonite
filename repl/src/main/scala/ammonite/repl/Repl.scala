@@ -4,7 +4,7 @@ import java.io.{OutputStream, InputStream}
 import java.lang.reflect.InvocationTargetException
 import ammonite.repl.frontend._
 import acyclic.file
-import ammonite.repl.interp.Interpreter
+import ammonite.repl.interp.{Pressy, Interpreter}
 
 import scala.annotation.tailrec
 
@@ -29,7 +29,7 @@ class Repl(input: InputStream, output: OutputStream) {
     output,
     replApi.shellPrompt,
     interp.eval.previousImportBlock,
-    interp.compiler.complete
+    interp.pressy.complete
   )
   def handleOutput(res: Result[Evaluated]) = {
     frontEnd.update(res)
@@ -39,7 +39,7 @@ class Repl(input: InputStream, output: OutputStream) {
       case Result.Buffer(line) => true
       case Result.Exit =>
         println("Bye!")
-        interp.compiler.shutdownPressy()
+        interp.pressy.shutdownPressy()
         false
       case Result.Success(ev) =>
         interp.eval.update(ev.imports)
