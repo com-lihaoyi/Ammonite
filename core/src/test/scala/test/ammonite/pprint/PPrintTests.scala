@@ -96,7 +96,17 @@ object PPrintTests extends TestSuite{
         'Seq - check(Seq(1, 2, 3), "List(1, 2, 3)")
         'List - check(List("1", "2", "3"), """List("1", "2", "3")""")
         'Vector - check(Vector('omg, 'wtf, 'bbq), """Vector('omg, 'wtf, 'bbq)""")
-        'Stream - check(Stream('omg, 'wtf, 'bbq), """Stream('omg, 'wtf, 'bbq)""")
+
+        // Streams are hard-coded to always display vertically, in order
+        // to make streaming pretty-printing sane
+        'Stream - check(
+          Stream('omg, 'wtf, 'bbq),
+          """Stream(
+            |  'omg,
+            |  'wtf,
+            |  'bbq
+            |)""".stripMargin
+        )
         'Iterable - check(Iterable('omg, 'wtf, 'bbq), """List('omg, 'wtf, 'bbq)""")
         'Traversable - check(Traversable('omg, 'wtf, 'bbq), """List('omg, 'wtf, 'bbq)""")
         'Set - check(Set('omg), """Set('omg)""")

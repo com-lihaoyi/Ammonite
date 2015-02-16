@@ -115,21 +115,6 @@ class Compiler(jarDeps: Seq[java.io.File],
 
     val pressy = cachedPressy
     var currentFile: BatchSourceFile = null
-    def primePressy(allCode: String) = {
-      currentFile = new BatchSourceFile(
-        makeFile(allCode.getBytes, name = "Current.scala"),
-        allCode
-      )
-      val r = new Response[Unit]
-      pressy.askReload(List(currentFile), r)
-      r
-    }
-    def prepPressy(allCode: String) = {
-      primePressy(allCode).get.fold(
-        x => x,
-        e => throw e
-      )
-    }
     /**
      * Queries the presentation compiler for a list of members
      */
@@ -145,15 +130,29 @@ class Compiler(jarDeps: Seq[java.io.File],
       Compiler.makeFile(allCode.getBytes, name = "Hello.scala"),
       allCode
     )
-    prepPressy(allCode)
-    def ask(query: (Position, Response[List[pressy.Member]]) => Unit) = {
+
+    currentFile = new BatchSourceFile(
+      makeFile(allCode.getBytes, name = "Current.scala"),
+      allCode
+    )
+    val r = new Response[Unit]
+    pressy.askReload(List(currentFile), r)
+
+    r.get.fold(
+      x => x,
+      e => throw e
+    )
+
+    def ask(index: Int, query: (Position, Response[List[pressy.Member]]) => Unit) = {
+      val (first, last) = allCode.splitAt(index)
       askPressy(index, query)
     }
     val tree = pressy.parseTree(file)
+
     def dotted = tree.collect{
       case t @ pressy.Select(qualifier, name)
         if qualifier.pos.end <= index && index <= t.pos.end =>
-        val r = ask(pressy.askTypeCompletion)
+        val r = ask(qualifier.pos.end, pressy.askTypeCompletion)
         val prefix = if(name.decoded == "<error>") "" else name.decoded
         (qualifier.pos.end + 1, pressy.ask(() => r.map(_.sym.name.decoded).filter(_.startsWith(prefix))))
     }
@@ -161,12 +160,12 @@ class Compiler(jarDeps: Seq[java.io.File],
     def prefixed = tree.collect{
       case t @ pressy.Ident(name)
         if t.pos.start <= index && index <= t.pos.end =>
-        val r = ask(pressy.askScopeCompletion)
+        val r = ask(index, pressy.askScopeCompletion)
         (t.pos.start, pressy.ask(() => r.map(_.sym.name.decoded).filter(_.startsWith(name.decoded))))
     }
 
     def scoped = {
-      index -> ask(pressy.askScopeCompletion)
+      index -> ask(index, pressy.askScopeCompletion)
         .map(s => pressy.ask(() => s.sym.name.decoded))
 
     }

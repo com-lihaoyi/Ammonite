@@ -15,6 +15,7 @@ class Checker {
     (groupId, artifactId, version) => {
       interp.loadJar(IvyThing.resolveArtifact(groupId, artifactId, version))
     },
+    () => (),
     () => interp.init(),
     ColorSet.BlackWhite,
     ammonite.pprint.Config.Defaults.PPrintConfig

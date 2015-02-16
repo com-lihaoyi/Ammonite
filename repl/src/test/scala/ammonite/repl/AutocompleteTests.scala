@@ -15,11 +15,11 @@ object AutocompleteTests extends TestSuite{
       val cursor = caretCode.indexOf("<caret>")
       val buf = caretCode.replace("<caret>", "")
       val prevImports = check.interp.eval.previousImportBlock
-      val prev = prevImports + "\n" + "object Foo{\n"
+      val prev = prevImports + "\n" + "object Foo{"
       import collection.JavaConversions._
       val (index, completions) = check.interp.compiler.complete(
         cursor + prev.length,
-        prev + buf + "\n}"
+        prev + buf + "}"
       )
       val left = cmp(expected, completions.toSet)
       assert(left == Set())
@@ -57,8 +57,6 @@ object AutocompleteTests extends TestSuite{
       complete("""object Zomg{ <caret>Zom }""", Set("Zomg"), ^)
     }
     'dot{
-
-
       complete("""java.math.<caret>""",
         Set("MathContext", "BigDecimal", "BigInteger", "RoundingMode"),
         ^
@@ -73,8 +71,26 @@ object AutocompleteTests extends TestSuite{
         anyCompletion ++ Set("+", "-", "*", "/", "to", "until"),
         _ -- _
       )
+
+      complete("""val x = 1; x + (x.<caret>)""",
+        Set("to", "max", "-", "+", "*", "/"),
+        _ -- _
+      )
     }
 
+    'blargh{
+      complete("""val x = 1; x + x.><caret>""",
+        Set(">>", ">>>"),
+        _ -- _
+      )
+
+// https://issues.scala-lang.org/browse/SI-9153
+//
+//      complete("""val x = 123; x + x.m<caret>""",
+//        Set("max"),
+//        _ -- _
+//      )
+    }
     'dotPrefix{
       complete("""java.math.Big<caret>""",
         Set("BigDecimal", "BigInteger"),
