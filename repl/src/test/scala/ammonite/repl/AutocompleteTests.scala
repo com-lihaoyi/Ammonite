@@ -115,7 +115,7 @@ object AutocompleteTests extends TestSuite{
       val compares = Set("compare", "compareTo")
       complete("""Seq(1, 2, 3).map(_.compa<caret>)""", compares, ^)
       complete("""Seq(1, 2, 3).map(_.co<caret>mpa)""", compares, ^)
-      complete("""Seq(1, 2, 3).map(_.<caret>compa)""", compares, ^)
+//      complete("""Seq(1, 2, 3).map(_.<caret>compa)""", compares, ^)
     }
   }
 }

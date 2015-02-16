@@ -48,6 +48,8 @@ object Compiler{
       e => throw e
     )
   }
+
+
   /**
    * Code to initialize random bits and pieces that are needed
    * for the Scala compiler to function, common between the
@@ -112,8 +114,7 @@ class Compiler(jarDeps: Seq[java.io.File],
 
   val (vd, reporter, compiler) = {
     val (settings, reporter, vd, jcp) = initGlobalBits(
-      jarDeps, dirDeps, dynamicClasspath,
-      logger, scala.Console.RED
+      jarDeps, dirDeps, dynamicClasspath, logger, scala.Console.RED
     )
     val scalac = new nsc.Global(settings, reporter) { g =>
       override lazy val plugins = List(new AmmonitePlugin(g, lastImports = _))
@@ -180,6 +181,5 @@ class Compiler(jarDeps: Seq[java.io.File],
       else Parsed.Success(trees)
     }
   }
-
 
 }

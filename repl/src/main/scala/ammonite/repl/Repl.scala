@@ -4,12 +4,12 @@ import java.io.{OutputStream, InputStream}
 import java.lang.reflect.InvocationTargetException
 import ammonite.repl.frontend._
 import acyclic.file
-import ammonite.repl.interp.{Pressy, Interpreter}
+import ammonite.repl.interp.Interpreter
 
 import scala.annotation.tailrec
 
 class Repl(input: InputStream, output: OutputStream) {
-  val interp: Interpreter = new Interpreter(replApi)
+  val interp = new Interpreter(replApi)
 
   lazy val replApi: ReplAPI = new DefaultReplAPI(
     frontEnd.history.dropRight(1),
