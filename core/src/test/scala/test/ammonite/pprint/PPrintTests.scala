@@ -16,7 +16,6 @@ object PPrintTests extends TestSuite{
   }
 
   val tests = TestSuite{
-
     'Horizontal {
       import ammonite.pprint.Config.Defaults._
       'primitives {

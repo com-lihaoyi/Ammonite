@@ -5,19 +5,26 @@ import java.io.File
 import scala.reflect.runtime.universe._
 import acyclic.file
 
+import scala.util.control.ControlThrowable
+
 
 class ReplAPIHolder {
   var shell0: FullReplAPI = null
   lazy val shell = shell0
 }
 
-case object ReplExit extends Exception
+case object ReplExit extends ControlThrowable
 
 trait ReplAPI {
   /**
    * Exit the Ammonite REPL. You can also use Ctrl-D to exit
    */
   def exit = throw ReplExit
+
+  /**
+   * Clears the screen of the REPL
+   */
+  def clear: Unit
 
   /**
    * Read/writable prompt for the shell. Use this to change the
@@ -111,6 +118,7 @@ class DefaultReplAPI(history0: => Seq[String],
                      load0: java.io.File => Unit,
                      loadLines0: Seq[String] => Unit,
                      loadIvy0: (String, String, String) => Unit,
+                     clear0: () => Unit,
                      newCompiler0: () => Unit,
                      colors: ColorSet,
                      val pprintConfig: ammonite.pprint.Config)
@@ -134,4 +142,6 @@ class DefaultReplAPI(history0: => Seq[String],
   }
 
   def newCompiler(): Unit = newCompiler0()
+
+  def clear = clear0()
 }

@@ -103,7 +103,7 @@ object PathError{
  * segments can only occur at the left-end of the path, and
  * are collapsed into a single number [[ups]].
  */
-class RelPath(val segments: Seq[String], val ups: Int) extends BasePath[RelPath]{
+case class RelPath(segments: Seq[String], ups: Int) extends BasePath[RelPath]{
   require(ups >= 0)
   segments.foreach(BasePath.checkSegment)
   def make(p: Seq[String], ups: Int) = new RelPath(p, ups + this.ups)
@@ -196,7 +196,7 @@ class FileData(attrs: PosixFileAttributes){
 /**
  * Created by haoyi on 1/25/15.
  */
-object Path{
+object Path extends (String => Path){
 
   def apply(s: String): Path = {
     require(s.startsWith("/"), "Absolute Paths must start with /")
@@ -227,7 +227,7 @@ object Path{
  * An absolute path on the filesystem. Note that the path is
  * normalized and cannot contain any empty, "." or ".." segments
  */
-class Path(val segments: Seq[String]) extends BasePath[Path]{
+case class Path(segments: Seq[String]) extends BasePath[Path]{
   segments.foreach(BasePath.checkSegment)
 
   def make(p: Seq[String], ups: Int) = {

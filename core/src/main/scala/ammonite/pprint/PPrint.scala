@@ -110,13 +110,13 @@ object PPrinter {
   }
 
   implicit def ArrayRepr[T: PPrint] = PPrinter[Array[T]]{
-    def repr = Internals.collectionRepr[T, Seq[T]]("Array")
+    def repr = Internals.collectionRepr[T, Seq[T]]
     (t: Array[T], c: Config) => repr.render(t, c)
   }
 
-  implicit def SeqRepr[T: PPrint] = Internals.collectionRepr[T, Seq[T]]("Seq")
-  implicit def SetRepr[T: PPrint] = Internals.collectionRepr[T, Set[T]]("Set")
-  implicit def MapRepr[T: PPrint, V: PPrint] = Internals.makeMapRepr[Map, T, V]("Map")
+  implicit def SeqRepr[T: PPrint] = Internals.collectionRepr[T, Seq[T]]
+  implicit def SetRepr[T: PPrint] = Internals.collectionRepr[T, Set[T]]
+  implicit def MapRepr[T: PPrint, V: PPrint] = Internals.makeMapRepr[Map, T, V]
 
 }
 object Unpacker extends PPrinterGen {
@@ -133,38 +133,25 @@ object Unpacker extends PPrinterGen {
   def render[T: PP](t: T, c: Config) = implicitly[PPrint[T]].render(t, c)
 }
 
-case class PPrinterator[T](iterator: Iterator[T]) extends Iterator[T]{
-  def hasNext = iterator.hasNext
-  def next() = iterator.next()
-}
-object PPrinterator{
-  implicit def PPrinteratorRepr[T: PPrint] = PPrinter[PPrinterator[T]]{
-    (i: PPrinterator[T], c: Config) => {
-      Internals.handleChunksVertical("Iterator", c,
-        c => i.map(k => Iterator(implicitly[PPrint[T]].render(k, c).mkString))
-      )
-    }
-  }
-}
 
 object Internals {
 
   def mapEntryPrinter[T: PPrint, V: PPrint] = PPrinter[(T, V)] { case ((t, v), c) =>
     implicitly[PPrint[T]].render(t, c) ++ Iterator(" -> ") ++ implicitly[PPrint[V]].render(v, c)
   }
-  def makeMapRepr[M[T, V] <: Map[T, V], T: PPrint, V: PPrint](name: String) = {
+  def makeMapRepr[M[T, V] <: Map[T, V], T: PPrint, V: PPrint] = {
     PPrinter[M[T, V]] { (t: M[T, V], c: Config) =>
-      handleChunks(name, c, c =>
+      handleChunks(t.stringPrefix, c, c =>
         t.iterator.map(k => mapEntryPrinter[T, V].render(k, c))
       )
     }
   }
 
-  def collectionRepr[T: PPrint, V <: Traversable[T]](name0: String): PPrinter[V] = PPrinter[V] {
+  def collectionRepr[T: PPrint, V <: Traversable[T]]: PPrinter[V] = PPrinter[V] {
     (i: V, c: Config) => {
-      handleChunks(i.stringPrefix, c,
-        c => i.toIterator.map(implicitly[PPrint[T]].render(_, c))
-      )
+      def cFunc = (c: Config) => i.toIterator.map(implicitly[PPrint[T]].render(_, c))
+      if (!i.isInstanceOf[Stream[T]]) handleChunks(i.stringPrefix, c, cFunc)
+      else handleChunksVertical(i.stringPrefix, c, cFunc)
     }
   }
 
@@ -187,16 +174,14 @@ object Internals {
   def handleChunks(name: String,
                    c: Config,
                    chunkFunc: Config => Iterator[Iterator[String]]): Iterator[String] = {
-    val chunks = chunkFunc(c).map(_.toVector).toVector
+    val chunks = chunkFunc(c).map(_.toStream).toStream
     val renamed = c.rename(name)
     val coloredName = c.color.prefix(renamed)
     // Prefix, contents, and all the extra ", " "(" ")" characters
     val totalLength = renamed.length + chunks.flatten.map(_.length).sum + chunks.length * 2
     if (totalLength <= c.maxWidth - (c.depth * c.indent) && !chunks.exists(_.contains('\n'))) {
       Iterator(coloredName, "(") ++ mkIterator(chunks.iterator, Seq(", ")).flatten ++ Iterator(")")
-    } else {
-      handleChunksVertical(name, c, chunkFunc)
-    }
+    } else handleChunksVertical(name, c, chunkFunc)
   }
 
   def mkIterator[T](iter: Iterator[T], inbetween: T): Iterator[T] = {

@@ -18,6 +18,7 @@ class Repl(input: InputStream, output: OutputStream) {
     (groupId, artifactId, version) => {
       interp.loadJar(IvyThing.resolveArtifact(groupId, artifactId, version))
     },
+    () => frontEnd.reader.clearScreen(),
     () => interp.init(),
     ColorSet.Default,
     ammonite.pprint.Config.Colors.PPrintConfig
