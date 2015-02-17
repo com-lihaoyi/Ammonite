@@ -19,6 +19,22 @@ import scala.tools.nsc.util.ClassPath.JavaContext
 import scala.tools.nsc.util.Position
 import scala.tools.nsc.util._
 
+
+/**
+ * Encapsulates (almost) all the ickiness of Scalac so it doesn't leak into
+ * the rest of the codebase. Makes use of a good amount of mutable state
+ * for things like the log-output-forwarder or compiler-plugin-output because
+ * These things are hard-coded into Scalac and can't be passed in from run to
+ * run.
+ *
+ * Turns source-strings into the bytes of classfiles, possibly more than one
+ * classfile per source-string (e.g. inner classes, or lambdas). Also lets
+ * you query source strings using an in-built presentation compiler
+ */
+trait Compiler{
+  def compile(src: Array[Byte], runLogger: String => Unit): Compiler.Output
+  def parse(line: String): Parsed
+}
 object Compiler{
   /**
    * If the Option is None, it means compilation failed
@@ -89,97 +105,87 @@ object Compiler{
     }
     (settings, reporter, vd, jcp)
   }
-}
-/**
- * Encapsulates (almost) all the ickiness of Scalac so it doesn't leak into
- * the rest of the codebase. Makes use of a good amount of mutable state
- * for things like the log-output-forwarder or compiler-plugin-output because
- * These things are hard-coded into Scalac and can't be passed in from run to
- * run.
- *
- * Turns source-strings into the bytes of classfiles, possibly more than one
- * classfile per source-string (e.g. inner classes, or lambdas). Also lets
- * you query source strings using an in-built presentation compiler
- */
-class Compiler(jarDeps: Seq[java.io.File],
-               dirDeps: Seq[java.io.File],
-               dynamicClasspath: VirtualDirectory,
-               shutdownPressy: () => Unit) {
-  import ammonite.repl.interp.Compiler._
 
-  var logger: String => Unit = s => ()
+  def apply(jarDeps: Seq[java.io.File],
+            dirDeps: Seq[java.io.File],
+            dynamicClasspath: VirtualDirectory,
+            shutdownPressy: () => Unit): Compiler = new Compiler{
+
+    var logger: String => Unit = s => ()
 
 
-  var lastImports = Seq.empty[ImportData]
+    var lastImports = Seq.empty[ImportData]
 
-  val (vd, reporter, compiler) = {
-    val (settings, reporter, vd, jcp) = initGlobalBits(
-      jarDeps, dirDeps, dynamicClasspath, logger, scala.Console.RED
-    )
-    val scalac = new nsc.Global(settings, reporter) { g =>
-      override lazy val plugins = List(new AmmonitePlugin(g, lastImports = _))
-      override def classPath = jcp
-      override lazy val platform: ThisPlatform = new JavaPlatform{
-        val global: g.type = g
+    val (vd, reporter, compiler) = {
+      val (settings, reporter, vd, jcp) = initGlobalBits(
+        jarDeps, dirDeps, dynamicClasspath, logger, scala.Console.RED
+      )
+      val scalac = new nsc.Global(settings, reporter) { g =>
+        override lazy val plugins = List(new AmmonitePlugin(g, lastImports = _))
         override def classPath = jcp
+        override lazy val platform: ThisPlatform = new JavaPlatform{
+          val global: g.type = g
+          override def classPath = jcp
+        }
+        override lazy val analyzer = new { val global: g.type = g } with Analyzer {
+          override def findMacroClassLoader() = new ClassLoader(this.getClass.getClassLoader){}
+        }
       }
-      override lazy val analyzer = new { val global: g.type = g } with Analyzer {
-        override def findMacroClassLoader() = new ClassLoader(this.getClass.getClassLoader){}
+      (vd, reporter, scalac)
+    }
+
+
+
+    /**
+     * Compiles a blob of bytes and spits of a list of classfiles
+     */
+    def compile(src: Array[Byte], runLogger: String => Unit): Output = {
+      compiler.reporter.reset()
+      this.logger = runLogger
+      val singleFile = makeFile( src)
+
+      val run = new compiler.Run()
+      vd.clear()
+      run.compileFiles(List(singleFile))
+      if (reporter.hasErrors) None
+      else Some{
+        shutdownPressy()
+
+        val files = for{
+          x <- vd.iterator.to[collection.immutable.Traversable]
+          if x.name.endsWith(".class")
+        } yield {
+          val output = dynamicClasspath.fileNamed(x.name).output
+          output.write(x.toByteArray)
+          output.close()
+          (x.name.stripSuffix(".class"), x.toByteArray)
+        }
+        val imports = lastImports.toList
+        (files, imports)
       }
     }
-    (vd, reporter, scalac)
-  }
 
+    /**
+     * Weird hack, stolen from ILoop, used to parse snippets of code while
+     * letting us know if it's incomplete (vs just blowing up)
+     */
+    def parse(line: String): Parsed = {
+      var isIncomplete = false
 
+      val out = mutable.Buffer.empty[String]
+      logger = out.append(_)
+      val r = compiler.currentRun
 
-  /**
-   * Compiles a blob of bytes and spits of a list of classfiles
-   */
-  def compile(src: Array[Byte], runLogger: String => Unit): Output = {
-    compiler.reporter.reset()
-    this.logger = runLogger
-    val singleFile = makeFile( src)
-
-    val run = new compiler.Run()
-    vd.clear()
-    run.compileFiles(List(singleFile))
-    if (reporter.hasErrors) None
-    else Some{
-      shutdownPressy()
-
-      val files = for{
-        x <- vd.iterator.to[collection.immutable.Traversable]
-        if x.name.endsWith(".class")
-      } yield {
-        val output = dynamicClasspath.fileNamed(x.name).output
-        output.write(x.toByteArray)
-        output.close()
-        (x.name.stripSuffix(".class"), x.toByteArray)
+      val p = r.parsing
+      p.withIncompleteHandler((_, _) => isIncomplete = true) {
+        reporter.reset()
+        val trees = compiler.newUnitParser(line).parseStats()
+        if (reporter.hasErrors) Parsed.Error(out.mkString("\n"))
+        else if (isIncomplete) Parsed.Incomplete
+        else Parsed.Success(trees)
       }
-      val imports = lastImports.toList
-      (files, imports)
     }
-  }
 
-  /**
-   * Weird hack, stolen from ILoop, used to parse snippets of code while
-   * letting us know if it's incomplete (vs just blowing up)
-   */
-  def parse(line: String): Parsed = {
-    var isIncomplete = false
-
-    val out = mutable.Buffer.empty[String]
-    logger = out.append(_)
-    val r = compiler.currentRun
-
-    val p = r.parsing
-    p.withIncompleteHandler((_, _) => isIncomplete = true) {
-      reporter.reset()
-      val trees = compiler.newUnitParser(line).parseStats()
-      if (reporter.hasErrors) Parsed.Error(out.mkString("\n"))
-      else if (isIncomplete) Parsed.Incomplete
-      else Parsed.Success(trees)
-    }
   }
 
 }

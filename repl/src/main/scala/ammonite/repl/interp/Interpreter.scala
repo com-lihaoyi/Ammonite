@@ -20,18 +20,21 @@ class Interpreter(replApi: ReplAPI){
   var compiler: Compiler = _
   var pressy: Pressy = _
   def init() = {
-    compiler = new Compiler(
+    compiler = Compiler(
       Classpath.jarDeps ++ extraJars,
       Classpath.dirDeps,
       dynamicClasspath,
       () => pressy.shutdownPressy()
     )
-    pressy = new Pressy(
+    pressy = Pressy(
       Classpath.jarDeps ++ extraJars,
       Classpath.dirDeps,
       dynamicClasspath
     )
-    val cls = eval.evalClass(eval.replBridgeCode, "ReplBridge")
+    val cls = eval.evalClass(
+      "object ReplBridge extends ammonite.repl.frontend.ReplAPIHolder{}",
+      "ReplBridge"
+    )
     ReplAPI.initReplBridge(
       cls.map(_._1).asInstanceOf[Result.Success[Class[ReplAPIHolder]]].s,
       replApi
@@ -48,9 +51,9 @@ class Interpreter(replApi: ReplAPI){
   }
 
   val mainThread = Thread.currentThread()
-  val preprocess = new Preprocessor(compiler.parse)
+  val preprocess = Preprocessor(compiler.parse)
 
-  val eval = new Evaluator(
+  val eval = Evaluator(
     mainThread.getContextClassLoader,
     extraJarClassloaders,
     preprocess.apply,
