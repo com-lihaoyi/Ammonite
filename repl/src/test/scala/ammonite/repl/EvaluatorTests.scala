@@ -143,6 +143,16 @@ object EvaluatorTests extends TestSuite{
         "res4: cmd3.C = C(0)"
       )
     }
-
+    'parsingProblems{
+      check(
+        "(1 + 1)",
+        "res0: Int = 2"
+      )
+//      https://issues.scala-lang.org/browse/SI-8859
+//      check(
+//        "Seq(0) map {_ + 1}",
+//        "res0: Seq[Int] = List(1)"
+//      )
+    }
   }
 }
