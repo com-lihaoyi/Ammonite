@@ -14,9 +14,11 @@ import scala.reflect.io.VirtualDirectory
  * real encapsulation for now.
  */
 class Interpreter(handleResult: Result[Evaluated] => Unit,
-                  shellPrompt: Ref[String],
+                  shellPrompt0: Ref[String],
                   historyFunc: () => Seq[String],
-                  colors0: ColorSet){
+                  colors0: ColorSet = ColorSet.BlackWhite,
+                  stdout: String => Unit = println){
+
   val dynamicClasspath = new VirtualDirectory("(memory)", None)
   var extraJars = Seq[java.io.File]()
   var extraJarClassloaders = Seq[ClassLoader]()
@@ -28,22 +30,25 @@ class Interpreter(handleResult: Result[Evaluated] => Unit,
       case Result.Skip => true
       case Result.Buffer(line) => true
       case Result.Exit =>
-        println("Bye!")
+        stdout("Bye!")
         pressy.shutdownPressy()
         false
       case Result.Success(ev) =>
         eval.update(ev.imports)
         true
       case Result.Failure(msg) =>
-        println(Console.RED + msg + Console.RESET)
+        stdout(Console.RED + msg + Console.RESET)
         true
     }
   }
 
   lazy val replApi: ReplAPI = new DefaultReplAPI {
     def colors = colors0
+    def shellPrompt: String = shellPrompt0()
+    def shellPrompt_=(s: String) = shellPrompt0() = s
     object load extends Load{
-      def apply(line: String) = handleResult(eval.processLine(line))
+      def apply(line: String) = handleOutput(eval.processLine(line))
+
       def jar(jar: File): Unit = {
         extraJars = extraJars ++ Seq(jar)
         extraJarClassloaders ++= Seq(new URLClassLoader(
@@ -93,7 +98,8 @@ class Interpreter(handleResult: Result[Evaluated] => Unit,
     mainThread.getContextClassLoader,
     extraJarClassloaders,
     preprocess.apply,
-    compiler.compile
+    compiler.compile,
+    stdout
   )
   init()
 }

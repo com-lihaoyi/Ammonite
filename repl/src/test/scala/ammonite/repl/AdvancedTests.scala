@@ -16,5 +16,9 @@ object AdvancedTests extends TestSuite{
         """res2: String = "<a href=\"www.google.com\">omg</a>""""
       )
     }
+    'load{
+      check("""load("val x = 1")""")
+      check("""x""", "res2: Int = 1")
+    }
   }
 }

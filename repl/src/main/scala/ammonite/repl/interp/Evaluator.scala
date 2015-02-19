@@ -26,7 +26,8 @@ object Evaluator{
   def apply(currentClassloader: ClassLoader,
             extraClassLoaders: => Seq[ClassLoader],
             preprocess: (String, Int) => Result[Preprocessor.Output],
-            compile: => (Array[Byte], String => Unit) => Compiler.Output): Evaluator = new Evaluator{
+            compile: => (Array[Byte], String => Unit) => Compiler.Output,
+            stdout: String => Unit): Evaluator = new Evaluator{
 
     def namesFor(t: scala.reflect.runtime.universe.Type): Set[String] = {
       val yours = t.members.map(_.name.toString).toSet
@@ -85,7 +86,7 @@ object Evaluator{
           val c = compile(code.getBytes, output.append(_))
           (output, c)
         },
-        e => {println("!!!! " + e.printStackTrace()); e.toString}
+        e => {stdout("!!!! " + e.printStackTrace()); e.toString}
       )
 
       (classFiles, importData) <- Result[(Traversable[(String, Array[Byte])], Seq[ImportData])](

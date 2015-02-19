@@ -116,7 +116,6 @@ object ColorSet{
 
 trait DefaultReplAPI extends FullReplAPI {
   def colors: ColorSet
-  var shellPrompt: String = colors.prompt + "@" + colors.reset
   def help = "Hello!"
   def shellPPrint[T: WeakTypeTag](value: => T, ident: String) = {
     colors.ident + ident + colors.reset + ": " +
