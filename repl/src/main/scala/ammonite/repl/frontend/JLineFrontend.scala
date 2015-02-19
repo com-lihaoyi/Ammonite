@@ -19,7 +19,7 @@ class JLineFrontend(input: InputStream,
                     compilerComplete: => (Int, String) => (Int, Seq[String]))
                     extends jline.console.completer.Completer {
   val term = new jline.UnixTerminal()
-  var buffered = ""
+  val buffered = collection.mutable.Buffer.empty[String]
   term.init()
   val reader = new ConsoleReader(input, output, term)
 
@@ -57,14 +57,14 @@ class JLineFrontend(input: InputStream,
 
     res <- Option(
       reader.readLine(
-        if (buffered == "") shellPrompt + " "
+        if (buffered.isEmpty) shellPrompt + " "
         // Strip ANSI color codes, as described http://stackoverflow.com/a/14652763/871202
         else " " * (shellPrompt.replaceAll("\u001B\\[[;\\d]*m", "").length + 1)
       )
     ).map(Result.Success(_))
       .getOrElse(Result.Exit)
 
-  } yield buffered + "\n" + res
+  } yield (buffered :+ res).mkString("\n")
 
   def update(r: Result[Evaluated]) = r match{
 
@@ -73,13 +73,14 @@ class JLineFrontend(input: InputStream,
        * Hack to work around the fact that if nothing got entered into
        * the prompt, the `ConsoleReader`'s history wouldn't increase
        */
-      if(line != buffered + "\n") reader.getHistory.removeLast()
-      buffered = line + "\n"
+      if(line != buffered.mkString("\n") + "\n") reader.getHistory.removeLast()
+      buffered += line
     case Result.Success(ev) =>
       val last = reader.getHistory.size()-1
-      reader.getHistory.set(last, buffered + reader.getHistory.get(last))
-      buffered = ""
-    case Result.Failure(msg) => buffered = ""
+      buffered += reader.getHistory.get(last).toString
+      reader.getHistory.set(last, buffered.mkString("\n"))
+      buffered.clear()
+    case Result.Failure(msg) => buffered.clear()
     case _ =>
   }
 }

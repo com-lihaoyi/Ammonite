@@ -20,5 +20,11 @@ object AdvancedTests extends TestSuite{
       check("""load("val x = 1")""")
       check("""x""", "res2: Int = 1")
     }
+    'history{
+      check("""val x = 1""")
+      check("x")
+      check("history", """res2: scala.Seq[String] = Vector("val x = 1", "x")""")
+    }
+
   }
 }

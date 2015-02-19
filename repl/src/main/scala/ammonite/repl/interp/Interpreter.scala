@@ -3,6 +3,7 @@ package ammonite.repl.interp
 import java.io.File
 import java.net.URLClassLoader
 
+import ammonite.pprint
 import ammonite.repl.{Ref, Evaluated, IvyThing, Result}
 import ammonite.repl.frontend._
 
@@ -15,13 +16,21 @@ import scala.reflect.io.VirtualDirectory
  */
 class Interpreter(handleResult: Result[Evaluated] => Unit,
                   shellPrompt0: Ref[String],
-                  historyFunc: () => Seq[String],
+                  pprintConfig: pprint.Config = pprint.Config.Defaults.PPrintConfig,
                   colors0: ColorSet = ColorSet.BlackWhite,
-                  stdout: String => Unit = println){
+                  stdout: String => Unit = println){ interp =>
 
   val dynamicClasspath = new VirtualDirectory("(memory)", None)
   var extraJars = Seq[java.io.File]()
   var extraJarClassloaders = Seq[ClassLoader]()
+
+  val history = collection.mutable.Buffer.empty[String]
+
+  def processLine(line: String) = for{
+    Preprocessor.Output(code, printer) <- preprocess(line, eval.getCurrentLine)
+    _ = history.append(line)
+    out <- eval.processLine(code, printer)
+  } yield out
 
   def handleOutput(res: Result[Evaluated]) = {
     handleResult(res)
@@ -47,7 +56,7 @@ class Interpreter(handleResult: Result[Evaluated] => Unit,
     def shellPrompt: String = shellPrompt0()
     def shellPrompt_=(s: String) = shellPrompt0() = s
     object load extends Load{
-      def apply(line: String) = handleOutput(eval.processLine(line))
+      def apply(line: String) = handleOutput(processLine(line))
 
       def jar(jar: File): Unit = {
         extraJars = extraJars ++ Seq(jar)
@@ -60,10 +69,10 @@ class Interpreter(handleResult: Result[Evaluated] => Unit,
       def ivy(groupId: String, artifactId: String, version: String): Unit =
         jar(IvyThing.resolveArtifact(groupId, artifactId, version))
     }
-    implicit def pprintConfig = ammonite.pprint.Config.Defaults.PPrintConfig
+    implicit def pprintConfig = interp.pprintConfig
     def clear() = ()
     def newCompiler() = init()
-    def history = historyFunc()
+    def history = interp.history.toVector.dropRight(1)
   }
 
   var compiler: Compiler = _

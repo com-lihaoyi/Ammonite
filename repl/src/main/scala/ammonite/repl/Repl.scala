@@ -2,6 +2,7 @@ package ammonite.repl
 
 import java.io.{OutputStream, InputStream}
 import java.lang.reflect.InvocationTargetException
+import ammonite.pprint
 import ammonite.repl.frontend._
 import acyclic.file
 import ammonite.repl.interp.Interpreter
@@ -11,6 +12,7 @@ import scala.annotation.tailrec
 class Repl(input: InputStream,
            output: OutputStream,
            colorSet: ColorSet = ColorSet.Default,
+           pprintConfig: pprint.Config = pprint.Config.Colors.PPrintConfig,
            shellPrompt0: String = "@") {
 
   var shellPrompt = Ref(shellPrompt0)
@@ -26,8 +28,8 @@ class Repl(input: InputStream,
   lazy val interp: Interpreter = new Interpreter(
     frontEnd.update,
     shellPrompt,
-    () => frontEnd.history,
-    ColorSet.Default
+    pprintConfig,
+    colorSet
   )
 
   def action() = for{
@@ -62,7 +64,7 @@ class Repl(input: InputStream,
         Thread.interrupted()
         Result.Failure("\nInterrupted!")
     }
-    out <- interp.eval.processLine(res)
+    out <- interp.processLine(res)
   } yield {
     out.msg.foreach(print)
     println()

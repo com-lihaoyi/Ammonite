@@ -17,8 +17,9 @@ import scala.util.Try
  */
 trait Evaluator{
   def evalClass(code: String, wrapperName: String): Result[(Class[_], Seq[ImportData])]
+  def getCurrentLine: Int
   def update(newImports: Seq[ImportData]): Unit
-  def processLine(line: String): Result[Evaluated]
+  def processLine(code: String, printer: String): Result[Evaluated]
   def previousImportBlock: String
 }
 
@@ -56,6 +57,13 @@ object Evaluator{
      * evaluated can have a distinct name that doesn't collide.
      */
     var currentLine = 0
+
+    /**
+     * Weird indirection only necessary because of
+     * https://issues.scala-lang.org/browse/SI-7085
+     */
+    def getCurrentLine = currentLine
+
     /**
      * Performs the conversion of our pre-compiled `Array[Byte]`s into
      * actual classes with methods we can execute.
@@ -139,28 +147,29 @@ object Evaluator{
       }
         .mkString("\n")
     }
-    def processLine(line: String) = for {
-      Preprocessor.Output(code, printer) <- preprocess(line, currentLine)
+    def processLine(code: String, printer: String) = for {
+      wrapperName <- Result.Success("cmd" + currentLine)
 
-      wrapperName = "cmd" + currentLine
+      (cls, newImports) <- evalClass(
+        s"""
+        $previousImportBlock
 
-      wrapped = s"""
-      object $wrapperName{
-        $code
-        def $$main() = {$printer}
-      }
-    """
-      //    _ = println(wrapped)
-      wrappedWithImports = previousImportBlock + "\n\n" + wrapped
-      (cls, newImports) <- evalClass(wrappedWithImports, wrapperName)
+          object $wrapperName{
+            $code
+            def $$main() = {$printer}
+          }
+        """,
+        wrapperName
+      )
       _ = currentLine += 1
       evaled <- evalMain(cls)
     } yield Evaluated(
-        evaled.asInstanceOf[Iterator[String]], wrapperName ,
+        evaled.asInstanceOf[Iterator[String]],
+        wrapperName,
         newImports.map(id => id.copy(
           wrapperName = wrapperName,
-          prefix = if (id.prefix == "") wrapperName else id.prefix)
-        )
+          prefix = if (id.prefix == "") wrapperName else id.prefix
+        ))
       )
 
     def update(newImports: Seq[ImportData]) = {
