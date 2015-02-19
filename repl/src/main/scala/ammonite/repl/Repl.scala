@@ -20,7 +20,7 @@ class Repl(input: InputStream,
 
   var shellPrompt = Ref(shellPrompt0)
 
-  lazy val frontEnd: JLineFrontend = new frontend.JLineFrontend(
+  lazy val frontEnd = JLineFrontend(
     input,
     output,
     colorSet.prompt + shellPrompt() + Console.RESET,
