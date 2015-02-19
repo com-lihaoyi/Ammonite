@@ -26,9 +26,10 @@ class Interpreter(handleResult: Result[Evaluated] => Unit,
 
   val history = collection.mutable.Buffer.empty[String]
 
-  def processLine(line: String) = for{
+  def processLine(line: String, saveHistory: String => Unit) = for{
     Preprocessor.Output(code, printer) <- preprocess(line, eval.getCurrentLine)
     _ = history.append(line)
+    _ = saveHistory(line)
     out <- eval.processLine(code, printer)
   } yield out
 
@@ -56,7 +57,11 @@ class Interpreter(handleResult: Result[Evaluated] => Unit,
     def shellPrompt: String = shellPrompt0()
     def shellPrompt_=(s: String) = shellPrompt0() = s
     object load extends Load{
-      def apply(line: String) = handleOutput(processLine(line))
+
+      def apply(line: String) = handleOutput(processLine(
+        line,
+        _ => () // Discard history of load-ed lines
+      ))
 
       def jar(jar: File): Unit = {
         extraJars = extraJars ++ Seq(jar)

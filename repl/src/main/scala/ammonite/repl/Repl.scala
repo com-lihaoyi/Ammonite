@@ -8,12 +8,15 @@ import acyclic.file
 import ammonite.repl.interp.Interpreter
 
 import scala.annotation.tailrec
+import scala.util.Try
 
 class Repl(input: InputStream,
            output: OutputStream,
            colorSet: ColorSet = ColorSet.Default,
            pprintConfig: pprint.Config = pprint.Config.Colors.PPrintConfig,
-           shellPrompt0: String = "@") {
+           shellPrompt0: String = "@",
+           initialHistory: Seq[String] = Nil,
+           saveHistory: String => Unit = _ => ()) {
 
   var shellPrompt = Ref(shellPrompt0)
 
@@ -22,7 +25,8 @@ class Repl(input: InputStream,
     output,
     colorSet.prompt + shellPrompt() + Console.RESET,
     interp.eval.previousImportBlock,
-    interp.pressy.complete
+    interp.pressy.complete,
+    initialHistory
   )
 
   lazy val interp: Interpreter = new Interpreter(
@@ -64,7 +68,7 @@ class Repl(input: InputStream,
         Thread.interrupted()
         Result.Failure("\nInterrupted!")
     }
-    out <- interp.processLine(line)
+    out <- interp.processLine(line, saveHistory)
   } yield {
     out.msg.foreach(print)
     println()
@@ -83,7 +87,14 @@ class Repl(input: InputStream,
 object Repl{
 
   def main(args: Array[String]) = {
-    val shell = new Repl(System.in, System.out)
+    import ammonite.shell._
+    val saveFile = home/".amm"
+    val delimiter = "\n\n\n"
+    val shell = new Repl(
+      System.in, System.out,
+      initialHistory = Try{read! saveFile}.getOrElse("").split(delimiter),
+      saveHistory = s => write.append(home/".amm", s + delimiter)
+    )
     shell.run()
   }
 }

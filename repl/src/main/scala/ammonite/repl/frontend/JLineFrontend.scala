@@ -16,7 +16,8 @@ class JLineFrontend(input: InputStream,
                     output: OutputStream,
                     shellPrompt: => String,
                     previousImportBlock: => String,
-                    compilerComplete: => (Int, String) => (Int, Seq[String]))
+                    compilerComplete: => (Int, String) => (Int, Seq[String]),
+                    initialHistory: Seq[String])
                     extends jline.console.completer.Completer {
   val term = new jline.UnixTerminal()
   var buffered = ""
@@ -26,6 +27,8 @@ class JLineFrontend(input: InputStream,
   reader.setHistoryEnabled(true)
   reader.addCompleter(this)
   reader.setExpandEvents(false)
+
+  initialHistory.foreach(reader.getHistory.add)
 
   def complete(_buf: String, cursor: Int, candidates: JList[CharSequence]): Int = {
     val buf   = if (_buf == null) "" else _buf
