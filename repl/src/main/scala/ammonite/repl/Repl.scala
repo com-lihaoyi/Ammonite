@@ -42,7 +42,7 @@ class Repl(input: InputStream,
       }
       Result.Failure(output + "\nSomething unexpected went wrong =(")
     }
-    res <- frontEnd.action()
+    line <- frontEnd.action()
     _ <- Signaller("INT") { interp.mainThread.stop() }
     _ <- Catching{
       case ex: InvocationTargetException
@@ -64,7 +64,7 @@ class Repl(input: InputStream,
         Thread.interrupted()
         Result.Failure("\nInterrupted!")
     }
-    out <- interp.processLine(res)
+    out <- interp.processLine(line)
   } yield {
     out.msg.foreach(print)
     println()

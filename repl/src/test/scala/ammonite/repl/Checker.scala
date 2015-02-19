@@ -8,8 +8,7 @@ import utest._
 class Checker {
   val interp: Interpreter = new Interpreter(
     _ => (),
-    Ref[String](""),
-    ColorSet.BlackWhite
+    Ref[String]("")
   )
 
   def handleResult(res: Result[Evaluated]) = {
