@@ -148,6 +148,15 @@ object EvaluatorTests extends TestSuite{
         "(1 + 1)",
         "res0: Int = 2"
       )
+      check(
+        """
+         (
+          1
+          +
+          1
+          )""".stripMargin,
+        "res1: Int = 2"
+      )
 //      https://issues.scala-lang.org/browse/SI-8859
 //      check(
 //        "Seq(0) map {_ + 1}",

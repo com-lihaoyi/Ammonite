@@ -57,7 +57,7 @@ object Preprocessor{
     }
 
     val Expr = Processor{ case (name, code, tree) =>
-      Preprocessor.Output(s"val $name = $code", pprint(name))
+      Preprocessor.Output(s"val $name = ($code)", pprint(name))
     }
     val Import = Processor{ case (name, code, tree: Global#Import) =>
       Preprocessor.Output(code, s"""Iterator("$code")""")
@@ -87,7 +87,6 @@ object Preprocessor{
             val suffix = if(parsed.length > 1) "_" + i else ""
             handleTree(tree, code.substring(start, end), "res" + wrapperId + suffix)
           }
-
           Result(
             allDecls.reduceOption((a, b) =>
               Output(a.code+";"+b.code, a.printer+ "++ Iterator(\"\\n\") ++" + b.printer)

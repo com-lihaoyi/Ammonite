@@ -36,6 +36,5 @@ class Checker {
       case Result.Success(v) => assert({v; false})
       case Result.Failure(s) => assert(failureCheck(s))
     }
-
   }
 }
