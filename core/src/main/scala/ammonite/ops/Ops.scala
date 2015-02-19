@@ -190,7 +190,6 @@ object ls extends StreamableOp1[Path, Path]{
 
   object rec extends StreamableOp1[Path, Path]{
     def recursiveListFiles(f: File): Iterator[File] = {
-      print(".")
       def these = Option(f.listFiles).iterator.flatMap(x=>x)
       these ++ these.filter(_.isDirectory).flatMap(recursiveListFiles)
     }

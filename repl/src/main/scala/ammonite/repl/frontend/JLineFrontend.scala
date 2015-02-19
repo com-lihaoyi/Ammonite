@@ -29,8 +29,7 @@ class JLineFrontend(input: InputStream,
 
   def complete(_buf: String, cursor: Int, candidates: JList[CharSequence]): Int = {
     val buf   = if (_buf == null) "" else _buf
-    val prevImports = previousImportBlock
-    val prev = prevImports + "\nobject Foo{\n"
+    val prev = previousImportBlock + "\nobject AutocompleteWrapper{\n"
     import collection.JavaConversions._
     val (completionBase, completions) = compilerComplete(
       cursor + prev.length,

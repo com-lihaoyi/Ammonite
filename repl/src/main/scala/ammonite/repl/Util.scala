@@ -82,3 +82,21 @@ object Parsed{
   case object Incomplete extends Parsed
   case class Success(trees: List[Global#Tree]) extends Parsed
 }
+
+trait Ref[T]{
+  def apply(): T
+  def update(t: T): Unit
+}
+object Ref{
+  def apply[T](value0: T) = {
+    var value = value0
+    new Ref[T]{
+      def apply() = value
+      def update(t: T) = value = t
+    }
+  }
+  def apply[T](value: T, update0: T => Unit) = new Ref[T]{
+    def apply() = value
+    def update(t: T) = update0(t)
+  }
+}

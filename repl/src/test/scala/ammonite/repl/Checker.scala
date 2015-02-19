@@ -6,26 +6,17 @@ import utest._
 
 
 class Checker {
-  lazy val replApi: ReplAPI = new DefaultReplAPI(
-    Nil,
-    interp.loadJar,
-    _.foreach{line =>
-      handleResult(interp.eval.processLine(line))
-    },
-    (groupId, artifactId, version) => {
-      interp.loadJar(IvyThing.resolveArtifact(groupId, artifactId, version))
-    },
-    () => (),
-    () => interp.init(),
-    ColorSet.BlackWhite,
-    ammonite.pprint.Config.Defaults.PPrintConfig
+  val interp: Interpreter = new Interpreter(
+    _ => (),
+    Ref[String](""),
+    () => Nil,
+    ColorSet.BlackWhite
   )
-
-  val interp: Interpreter = new Interpreter(replApi)
 
   def handleResult(res: Result[Evaluated]) = {
     interp.eval.update(res.asInstanceOf[Result.Success[Evaluated]].s.imports)
   }
+
   def apply(input: String,
             expected: String = null) = {
     print(".")

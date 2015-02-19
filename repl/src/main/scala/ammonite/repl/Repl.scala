@@ -8,47 +8,28 @@ import ammonite.repl.interp.Interpreter
 
 import scala.annotation.tailrec
 
-class Repl(input: InputStream, output: OutputStream) {
-  val interp = new Interpreter(replApi)
+class Repl(input: InputStream,
+           output: OutputStream,
+           colorSet: ColorSet = ColorSet.Default,
+           shellPrompt0: String = "@") {
 
-  lazy val replApi: ReplAPI = new DefaultReplAPI(
-    frontEnd.history.dropRight(1),
-    interp.loadJar,
-    lines => for(line <- lines) handleOutput(interp.eval.processLine(line)),
-    (groupId, artifactId, version) => {
-      interp.loadJar(IvyThing.resolveArtifact(groupId, artifactId, version))
-    },
-    () => frontEnd.reader.clearScreen(),
-    () => interp.init(),
-    ColorSet.Default,
-    ammonite.pprint.Config.Colors.PPrintConfig
-  )
+  var shellPrompt = Ref(shellPrompt0)
 
-  val frontEnd = new frontend.JLineFrontend(
+  lazy val frontEnd: JLineFrontend = new frontend.JLineFrontend(
     input,
     output,
-    replApi.shellPrompt,
+    colorSet.prompt + shellPrompt() + Console.RESET,
     interp.eval.previousImportBlock,
     interp.pressy.complete
   )
-  def handleOutput(res: Result[Evaluated]) = {
-    frontEnd.update(res)
 
-    res match{
-      case Result.Skip => true
-      case Result.Buffer(line) => true
-      case Result.Exit =>
-        println("Bye!")
-        interp.pressy.shutdownPressy()
-        false
-      case Result.Success(ev) =>
-        interp.eval.update(ev.imports)
-        true
-      case Result.Failure(msg) =>
-        println(Console.RED + msg + Console.RESET)
-        true
-    }
-  }
+  lazy val interp: Interpreter = new Interpreter(
+    frontEnd.update,
+    shellPrompt,
+    () => frontEnd.history,
+    ColorSet.Default
+  )
+
   def action() = for{
     _ <- Catching { case x: Throwable =>
       var current = x
@@ -91,7 +72,7 @@ class Repl(input: InputStream, output: OutputStream) {
   def run() = {
     @tailrec def loop(): Unit = {
       val res = action()
-      if (handleOutput(res)) loop()
+      if (interp.handleOutput(res)) loop()
     }
     loop()
   }

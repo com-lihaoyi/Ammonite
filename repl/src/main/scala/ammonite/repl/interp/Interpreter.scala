@@ -1,9 +1,10 @@
 package ammonite.repl.interp
 
+import java.io.File
 import java.net.URLClassLoader
 
-import ammonite.repl.Result
-import ammonite.repl.frontend.{ReplAPI, ReplAPIHolder}
+import ammonite.repl.{Ref, Evaluated, IvyThing, Result}
+import ammonite.repl.frontend._
 
 import scala.reflect.io.VirtualDirectory
 
@@ -12,10 +13,53 @@ import scala.reflect.io.VirtualDirectory
  * to interpret Scala code. Doesn't attempt to provide any
  * real encapsulation for now.
  */
-class Interpreter(replApi: ReplAPI){
+class Interpreter(handleResult: Result[Evaluated] => Unit,
+                  shellPrompt: Ref[String],
+                  historyFunc: () => Seq[String],
+                  colors0: ColorSet){
   val dynamicClasspath = new VirtualDirectory("(memory)", None)
   var extraJars = Seq[java.io.File]()
   var extraJarClassloaders = Seq[ClassLoader]()
+
+  def handleOutput(res: Result[Evaluated]) = {
+    handleResult(res)
+
+    res match{
+      case Result.Skip => true
+      case Result.Buffer(line) => true
+      case Result.Exit =>
+        println("Bye!")
+        pressy.shutdownPressy()
+        false
+      case Result.Success(ev) =>
+        eval.update(ev.imports)
+        true
+      case Result.Failure(msg) =>
+        println(Console.RED + msg + Console.RESET)
+        true
+    }
+  }
+
+  lazy val replApi: ReplAPI = new DefaultReplAPI {
+    def colors = colors0
+    object load extends Load{
+      def apply(line: String) = handleResult(eval.processLine(line))
+      def jar(jar: File): Unit = {
+        extraJars = extraJars ++ Seq(jar)
+        extraJarClassloaders ++= Seq(new URLClassLoader(
+          Array(jar.toURI.toURL),
+          getClass.getClassLoader
+        ))
+        init()
+      }
+      def ivy(groupId: String, artifactId: String, version: String): Unit =
+        jar(IvyThing.resolveArtifact(groupId, artifactId, version))
+    }
+    implicit def pprintConfig = ammonite.pprint.Config.Defaults.PPrintConfig
+    def clear() = ()
+    def newCompiler() = init()
+    def history = historyFunc()
+  }
 
   var compiler: Compiler = _
   var pressy: Pressy = _
@@ -41,14 +85,6 @@ class Interpreter(replApi: ReplAPI){
     )
   }
 
-  def loadJar(jar: java.io.File): Unit = {
-    extraJars = extraJars ++ Seq(jar)
-    extraJarClassloaders ++= Seq(new URLClassLoader(
-      Array(jar.toURI.toURL),
-      getClass.getClassLoader
-    ))
-    init()
-  }
 
   val mainThread = Thread.currentThread()
   val preprocess = Preprocessor(compiler.parse)

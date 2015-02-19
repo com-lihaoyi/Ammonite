@@ -68,7 +68,7 @@ trait ReplAPI {
    */
   implicit def pprintConfig: ammonite.pprint.Config
 }
-trait Load{
+trait Load extends (String => Unit){
   /**
    * Load a `.jar` file
    */
@@ -79,10 +79,10 @@ trait Load{
   def ivy(groupId: String, artifactId: String, version: String): Unit
 
   /**
-   * Loads a sequence of command-lines into the
-   * REPL and evaluates them one after another
+   * Loads a command into the REPL and
+   * evaluates them one after another
    */
-  def lines(lines: Seq[String]): Unit
+  def apply(line: String): Unit
 }
 
 /**
@@ -114,19 +114,10 @@ object ColorSet{
   val BlackWhite = ColorSet("", "", "", "")
 }
 
-class DefaultReplAPI(history0: => Seq[String],
-                     load0: java.io.File => Unit,
-                     loadLines0: Seq[String] => Unit,
-                     loadIvy0: (String, String, String) => Unit,
-                     clear0: () => Unit,
-                     newCompiler0: () => Unit,
-                     colors: ColorSet,
-                     val pprintConfig: ammonite.pprint.Config)
-                     extends FullReplAPI {
-
+trait DefaultReplAPI extends FullReplAPI {
+  def colors: ColorSet
   var shellPrompt: String = colors.prompt + "@" + colors.reset
   def help = "Hello!"
-  def history: Seq[String] = history0
   def shellPPrint[T: WeakTypeTag](value: => T, ident: String) = {
     colors.ident + ident + colors.reset + ": " +
     colors.`type` + weakTypeOf[T].toString + colors.reset
@@ -134,14 +125,4 @@ class DefaultReplAPI(history0: => Seq[String],
   def shellPrintDef(definitionLabel: String, ident: String) = {
     s"defined ${colors.`type`}$definitionLabel ${colors.ident}$ident${colors.reset}"
   }
-  object load extends Load{
-    def lines(lines: Seq[String]) = loadLines0(lines)
-    def jar(jar: File): Unit = load0(jar)
-    def ivy(groupId: String, artifactId: String, version: String): Unit =
-      loadIvy0(groupId, artifactId, version)
-  }
-
-  def newCompiler(): Unit = newCompiler0()
-
-  def clear = clear0()
 }
