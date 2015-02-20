@@ -63,7 +63,8 @@ class Repl(input: InputStream,
 
         Result.Failure(userEx.toString + "\n" + trace)
       case ex: InvocationTargetException
-        if ex.getCause.isInstanceOf[ThreadDeath]  =>
+        if ex.getCause.isInstanceOf[ThreadDeath]
+        || ex.isInstanceOf[ThreadDeath]=>
         // Clear the interrupted status
         Thread.interrupted()
         Result.Failure("\nInterrupted!")

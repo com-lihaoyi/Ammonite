@@ -18,12 +18,12 @@ trait JLineFrontend{
 }
 object JLineFrontend{
   def apply(input: InputStream,
-                    output: OutputStream,
-                    shellPrompt: => String,
-                    previousImportBlock: => String,
-                    compilerComplete: => (Int, String) => (Int, Seq[String]),
-                    initialHistory: Seq[String]): JLineFrontend
-                    = new JLineFrontend with jline.console.completer.Completer {
+            output: OutputStream,
+            shellPrompt: => String,
+            previousImportBlock: => String,
+            compilerComplete: => (Int, String) => (Int, Seq[String]),
+            initialHistory: Seq[String]): JLineFrontend
+            = new JLineFrontend with jline.console.completer.Completer {
     val term = new jline.UnixTerminal()
     var buffered = ""
     term.init()
