@@ -85,7 +85,7 @@ object JLineFrontend{
         buffered = line + "\n"
       case Result.Success(ev) =>
         val last = reader.getHistory.size()-1
-        reader.getHistory.set(last, buffered + "\n" + reader.getHistory.get(last))
+        reader.getHistory.set(last, buffered + reader.getHistory.get(last))
         buffered = ""
       case Result.Failure(msg) => buffered = ""
       case _ =>

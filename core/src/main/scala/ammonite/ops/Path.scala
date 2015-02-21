@@ -164,7 +164,6 @@ object RelPath extends RelPathStuff with (String => RelPath){
   implicit val relPathRepr = pprint.PPrinter[ammonite.ops.RelPath]{(p, c) =>
     if (p.segments.length == 1 && p.ups == 0) Iterator("empty/") ++ BasePath.reprSection(p.segments(0), c)
     else Iterator((Seq.fill(p.ups)("up") ++ p.segments.map(BasePath.reprSection(_, c).mkString)).mkString("/"))
-
   }
 }
 sealed trait FileType
@@ -193,9 +192,7 @@ class FileData(attrs: PosixFileAttributes){
   def isSymLink = fileType == FileType.SymLink
   def isFile = fileType == FileType.File
 }
-/**
- * Created by haoyi on 1/25/15.
- */
+
 object Path extends (String => Path){
 
   def apply(s: String): Path = {

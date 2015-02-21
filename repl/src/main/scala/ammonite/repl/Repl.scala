@@ -16,7 +16,8 @@ class Repl(input: InputStream,
            pprintConfig: pprint.Config = pprint.Config.Colors.PPrintConfig,
            shellPrompt0: String = "@",
            initialHistory: Seq[String] = Nil,
-           saveHistory: String => Unit = _ => ()) {
+           saveHistory: String => Unit = _ => (),
+           predef: String = Repl.defaultPredef) {
 
   var shellPrompt = Ref(shellPrompt0)
 
@@ -94,7 +95,7 @@ class Repl(input: InputStream,
 }
 
 object Repl{
-
+  val defaultPredef = """"""
   def main(args: Array[String]) = {
     import ammonite.shell._
     val saveFile = home/".amm"

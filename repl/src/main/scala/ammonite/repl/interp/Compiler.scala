@@ -41,6 +41,7 @@ object Compiler{
    * Otherwise it's a Traversable of (filename, bytes) tuples
    */
   type Output = Option[(Traversable[(String, Array[Byte])], Seq[ImportData])]
+
   /**
    * Converts a bunch of bytes into Scalac's weird VirtualFile class
    */
