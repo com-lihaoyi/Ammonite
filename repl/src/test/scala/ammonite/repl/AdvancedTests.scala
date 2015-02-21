@@ -26,17 +26,23 @@ object AdvancedTests extends TestSuite{
         }
 
         'reloading{
+          // Make sure earlier-loaded things indeed continue working
+          check("""load.ivy("com.lihaoyi", "scalarx_2.11", "0.2.7")""")
           check("""load.ivy("com.scalatags", "scalatags_2.11", "0.2.5")""")
           check(
             """scalatags.all.div("omg").toString""",
-            """res1: java.lang.String = "<div>omg</div>""""
+            """res2: java.lang.String = "<div>omg</div>""""
           )
           check("""load.ivy("com.lihaoyi", "scalatags_2.11", "0.4.5")""")
           check(
             """import scalatags.Text.all._; scalatags.Text.all.div("omg").toString""",
             """import scalatags.Text.all._
-              |res3_1: java.lang.String = "<div>omg</div>"""".stripMargin
+              |res4_1: java.lang.String = "<div>omg</div>"""".stripMargin
           )
+          check("""import rx._; val x = Var(1); val y = Rx(x() + 1)""")
+          check("""x(); y()""", "res6_0: Int = 1\nres6_1: Int = 2")
+          check("""x() = 2""")
+          check("""x(); y()""", "res8_0: Int = 2\nres8_1: Int = 3")
         }
       }
       'code{
