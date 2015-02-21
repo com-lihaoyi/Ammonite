@@ -15,6 +15,13 @@ object AdvancedTests extends TestSuite{
         """a("omg", href:="www.google.com").render""",
         """res2: String = "<a href=\"www.google.com\">omg</a>""""
       )
+
+    }
+    'loadIvy2{
+      check("""load.ivy("com.lihaoyi", "upickle_2.11", "0.2.6")""")
+      check("""load.ivy("org.spire-math", "jawn-parser_2.11", "0.7.0")""")
+      check("import upickle._")
+      check("upickle.write(Seq(1, 2, 3))", """res3: String = "[1,2,3]"""")
     }
     'load{
       check("""load("val x = 1")""")
@@ -25,6 +32,5 @@ object AdvancedTests extends TestSuite{
       check("x")
       check("history", """res2: scala.Seq[String] = Vector("val x = 1", "x")""")
     }
-
   }
 }

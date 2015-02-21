@@ -6,7 +6,7 @@ import utest._
 
 
 class Checker {
-  val interp: Interpreter = new Interpreter(
+  val interp = new Interpreter(
     _ => (),
     Ref[String]("")
   )
@@ -18,7 +18,7 @@ class Checker {
   def apply(input: String,
             expected: String = null) = {
     print(".")
-    val processed = interp.processLine(input)
+    val processed = interp.processLine(input, _ =>())
     val printed = processed.map(_.msg.mkString)
 
     if (expected != null)
@@ -29,7 +29,7 @@ class Checker {
   def fail(input: String,
            failureCheck: String => Boolean = _ => true) = {
     print(".")
-    val processed = interp.processLine(input)
+    val processed = interp.processLine(input, _ => ())
     val printed = processed.map(_.msg.mkString)
 
     printed match{

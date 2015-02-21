@@ -65,7 +65,6 @@ object Compiler{
     )
   }
 
-
   /**
    * Code to initialize random bits and pieces that are needed
    * for the Scala compiler to function, common between the
@@ -113,7 +112,6 @@ object Compiler{
 
     var logger: String => Unit = s => ()
 
-
     var lastImports = Seq.empty[ImportData]
 
     val (vd, reporter, compiler) = {
@@ -133,8 +131,6 @@ object Compiler{
       }
       (vd, reporter, scalac)
     }
-
-
 
     /**
      * Compiles a blob of bytes and spits of a list of classfiles

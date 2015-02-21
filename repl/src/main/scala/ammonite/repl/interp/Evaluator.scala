@@ -1,10 +1,12 @@
 package ammonite.repl.interp
 
 import java.lang.reflect.InvocationTargetException
+import java.net.URL
 
 import acyclic.file
 import ammonite.repl.frontend.{ReplExit, ReplAPI}
 import ammonite.repl.{ImportData, Evaluated, Result, Catching}
+import scala.reflect.internal.util.ScalaClassLoader.URLClassLoader
 import scala.reflect.runtime.universe._
 import scala.collection.mutable
 import scala.util.Try
@@ -21,11 +23,11 @@ trait Evaluator{
   def update(newImports: Seq[ImportData]): Unit
   def processLine(code: String, printer: String): Result[Evaluated]
   def previousImportBlock: String
+  def addJar(url: URL): Unit
 }
 
 object Evaluator{
   def apply(currentClassloader: ClassLoader,
-            extraClassLoaders: => Seq[ClassLoader],
             preprocess: (String, Int) => Result[Preprocessor.Output],
             compile: => (Array[Byte], String => Unit) => Compiler.Output,
             stdout: String => Unit): Evaluator = new Evaluator{
@@ -68,24 +70,15 @@ object Evaluator{
      * Performs the conversion of our pre-compiled `Array[Byte]`s into
      * actual classes with methods we can execute.
      */
-    val evalClassloader = new ClassLoader(currentClassloader) {
+    val evalClassloader = new URLClassLoader(Nil, currentClassloader) {
       override def loadClass(name: String): Class[_] = {
         if (newFileDict.contains(name)) {
           defineClass(name, newFileDict(name), 0, newFileDict(name).length)
-        }else{
-          try{
-            super.loadClass(name)
-          }catch{ case e: ClassNotFoundException =>
-            val classes = for(cl <- extraClassLoaders.iterator) yield {
-              try Some(cl.loadClass(name))
-              catch{ case e: ClassNotFoundException => None}
-            }
-            classes.collectFirst{ case Some(cls) => cls}
-              .getOrElse{ throw new ClassNotFoundException(name) }
-          }
-        }
+        }else super.loadClass(name)
       }
     }
+
+    def addJar(url: URL) = evalClassloader.addURL(url)
 
     def evalClass(code: String, wrapperName: String) = for{
       (output, compiled) <- Result(

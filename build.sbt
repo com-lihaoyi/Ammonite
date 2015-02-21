@@ -7,7 +7,7 @@ libraryDependencies ++= Seq(
 val sharedSettings = Seq(
   organization := "com.lihaoyi",
   crossScalaVersions := Seq("2.10.4", "2.11.4"),
-  version := "0.1.8",
+  version := "0.1.9",
   libraryDependencies += "com.lihaoyi" %% "utest" % "0.3.0" % "test",
   testFrameworks += new TestFramework("utest.runner.Framework"),
   autoCompilerPlugins := true,
@@ -15,12 +15,6 @@ val sharedSettings = Seq(
   libraryDependencies ++= Seq(
     "com.lihaoyi" %% "acyclic" % "0.1.2" % "provided",
     "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided"
-  ) ++ (
-    if (scalaVersion.value startsWith "2.11.") Nil
-    else Seq(
-      "org.scalamacros" %% s"quasiquotes" % "2.0.0" % "provided",
-      compilerPlugin("org.scalamacros" % s"paradise" % "2.0.0" cross CrossVersion.full)
-    )
   ),
   publishTo := Some("releases" at "https://oss.sonatype.org/service/local/staging/deploy/maven2"),
   pomExtra :=

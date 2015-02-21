@@ -22,7 +22,6 @@ class Interpreter(handleResult: Result[Evaluated] => Unit,
 
   val dynamicClasspath = new VirtualDirectory("(memory)", None)
   var extraJars = Seq[java.io.File]()
-  var extraJarClassloaders = Seq[ClassLoader]()
 
   val history = collection.mutable.Buffer.empty[String]
 
@@ -65,10 +64,7 @@ class Interpreter(handleResult: Result[Evaluated] => Unit,
 
       def jar(jar: File): Unit = {
         extraJars = extraJars ++ Seq(jar)
-        extraJarClassloaders ++= Seq(new URLClassLoader(
-          Array(jar.toURI.toURL),
-          getClass.getClassLoader
-        ))
+        eval.addJar(jar.toURI.toURL)
         init()
       }
       def ivy(groupId: String, artifactId: String, version: String): Unit =
@@ -110,7 +106,6 @@ class Interpreter(handleResult: Result[Evaluated] => Unit,
 
   val eval = Evaluator(
     mainThread.getContextClassLoader,
-    extraJarClassloaders,
     preprocess.apply,
     compiler.compile,
     stdout
