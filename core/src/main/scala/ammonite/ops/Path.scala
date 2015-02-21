@@ -162,8 +162,7 @@ object RelPath extends RelPathStuff with (String => RelPath){
   implicit def ArrayPath[T](s: Array[T])(implicit conv: T => RelPath): RelPath = SeqPath(s)
 
   implicit val relPathRepr = pprint.PPrinter[ammonite.ops.RelPath]{(p, c) =>
-    if (p.segments.length == 1 && p.ups == 0) Iterator("empty/") ++ BasePath.reprSection(p.segments(0), c)
-    else Iterator((Seq.fill(p.ups)("up") ++ p.segments.map(BasePath.reprSection(_, c).mkString)).mkString("/"))
+    Iterator((Seq.fill(p.ups)("up") ++ p.segments.map(BasePath.reprSection(_, c).mkString)).mkString("/"))
   }
 }
 sealed trait FileType

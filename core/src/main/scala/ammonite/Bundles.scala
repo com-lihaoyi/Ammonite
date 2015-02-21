@@ -11,11 +11,7 @@ import scala.util.matching.Regex
 object all extends Bundle
 object shell extends Bundle{
   implicit var wd = processWorkingDir
-  implicit val pathRepr = pprint.PPrinter[ammonite.ops.Path]{ (p, c) =>
-    def munge(s: Iterator[String]) = s.flatMap(Iterator("/") ++ BasePath.reprSection(_, c))
-    if (p > wd) Iterator("wd") ++ munge((p - wd).segments.iterator)
-    else Iterator("root") ++ munge(p.segments.iterator)
-  }
+
   object cd extends Op1[RelPath, Path]{
     def apply(p: RelPath) = {
       wd /= p

@@ -4,6 +4,7 @@ import java.io.{File, InputStream}
 import java.nio.file.{Files, Paths, StandardOpenOption}
 import acyclic.file
 import RelPath.up
+import ammonite.pprint
 import ammonite.pprint.PPrint
 
 import scala.util.matching.Regex
@@ -42,7 +43,8 @@ object Internals{
       res
     }
 
-    object lines extends StreamableOp1[Path, String]{
+    object lines extends StreamableOp1[Path, String, Vector[String]]{
+      def munge(i: Iterator[String]) = i.toVector
       def !!(arg: Path) = {
         val is = readIn(arg)
         io.Source.fromInputStream(is).getLines()
@@ -80,8 +82,9 @@ trait Op1[T1, R] extends (T1 => R){
 }
 
 
-trait StreamableOp1[T1, R] extends Op1[T1, Vector[R]]{
-  def apply(arg: T1) = !!(arg).toVector
+trait StreamableOp1[T1, R, C <: Seq[R]] extends Op1[T1, C]{
+  def munge(i: Iterator[R]): C
+  def apply(arg: T1) = munge(!!(arg))
   def !!(arg: T1): Iterator[R]
 }
 
@@ -179,16 +182,35 @@ object rm extends Op1[Path, Unit]{
   }
 }
 
+object LsSeq{
+  implicit def lsSeqRepr(implicit wd: Path, cfg: pprint.Config): PPrint[LsSeq] =
+    new PPrint[LsSeq](
+      pprint.PPrinter[LsSeq] { (p, c) =>
+        implicit val cfg = c
+        implicitly[PPrint[Seq[RelPath]]].render(p.toSeq.map(_ - wd), c)
+      },
+      implicitly
+    )
+}
+
+class LsSeq(s: Stream[Path]) extends Seq[Path]{
+  def length = s.length
+  def apply(idx: Int) = s.apply(idx)
+  def iterator = s.iterator
+}
+
 /**
  * List the files in a directory
  */
-object ls extends StreamableOp1[Path, Path]{
+object ls extends StreamableOp1[Path, Path, LsSeq]{
+  def munge(i: Iterator[Path]) = new LsSeq(i.toStream)
   def !!(arg: Path) = {
     import scala.collection.JavaConverters._
     Files.list(arg.nio).iterator().asScala.map(x => Path(x))
   }
 
-  object rec extends StreamableOp1[Path, Path]{
+  object rec extends StreamableOp1[Path, Path, LsSeq]{
+    def munge(i: Iterator[Path]) = new LsSeq(i.toStream)
     def recursiveListFiles(f: File): Iterator[File] = {
       def these = Option(f.listFiles).iterator.flatMap(x=>x)
       these ++ these.filter(_.isDirectory).flatMap(recursiveListFiles)
