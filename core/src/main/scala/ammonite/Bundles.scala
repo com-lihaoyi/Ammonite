@@ -8,8 +8,13 @@ import ammonite.ops.{RelPath, Path, Op1}
 import scala.collection.{Seq, GenTraversableOnce, TraversableLike}
 
 import scala.util.matching.Regex
-object all extends Bundle
+object all extends Bundle{
+  val % = ops.%
+  type % = ops.%
+}
 object shell extends Bundle{
+  val % = ops.%
+  type % = ops.%
   implicit var wd = processWorkingDir
   object cd extends Op1[RelPath, Path]{
     def apply(p: RelPath) = {
@@ -34,7 +39,11 @@ trait Bundle extends ops.RelPathStuff with ops.Extensions{
    */
   val root = ops.Path.root
 
+  /**
+   * The user's home directory
+   */
   val home = Path(System.getProperty("user.home"))
+
   /**
    * The current working directory for this process.
    */
@@ -92,4 +101,5 @@ trait Bundle extends ops.RelPathStuff with ops.Extensions{
   val read = ops.read
   val rm = ops.rm
   val write = ops.write
+
 }

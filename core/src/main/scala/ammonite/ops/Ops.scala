@@ -5,7 +5,7 @@ import java.nio.file.{Files, Paths, StandardOpenOption}
 import acyclic.file
 import RelPath.up
 import ammonite.pprint.PPrint
-import scala.language.dynamics
+
 import scala.util.matching.Regex
 import Extensions._
 object OpError{
@@ -52,7 +52,7 @@ object Internals{
       def apply(arg: Path) = {
         val is = readIn(arg)
         val out = new java.io.ByteArrayOutputStream()
-        val buffer = new Array[Byte](1024)
+        val buffer = new Array[Byte](8192)
         var r = 0
         while (r != -1) {
           r = is.read(buffer)
@@ -302,18 +302,3 @@ object system{
     def machine: String = ???
   }
 }*/
-
-/**
- * Dynamic shell command execution. This allows you to run commands which
- * are not provided by Ammonite, by shelling out to bash. e.g. try
- *
- * %ls
- * %ls /
- * %ps "aux"
- */
-object % extends Dynamic{
-  import scala.sys.process._
-  def selectDynamic(s: String) = Seq(s).!
-  def applyDynamic(s: String)(args: String*) = (s +: args).!
-}
-
