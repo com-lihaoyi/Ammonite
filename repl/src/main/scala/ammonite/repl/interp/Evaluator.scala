@@ -24,6 +24,7 @@ trait Evaluator{
   def processLine(code: String, printer: String): Result[Evaluated]
   def previousImportBlock: String
   def addJar(url: URL): Unit
+  def newClassloader(): Unit
 }
 
 object Evaluator{
@@ -70,13 +71,20 @@ object Evaluator{
      * Performs the conversion of our pre-compiled `Array[Byte]`s into
      * actual classes with methods we can execute.
      */
-    val evalClassloader = new URLClassLoader(Nil, currentClassloader) {
+    var evalClassloader = new URLClassLoader(Nil, currentClassloader)
+
+    def newClassloader() = evalClassloader = new URLClassLoader(Nil, evalClassloader){
       override def loadClass(name: String): Class[_] = {
         if (newFileDict.contains(name)) {
           defineClass(name, newFileDict(name), 0, newFileDict(name).length)
-        }else super.loadClass(name)
+        }else try{
+          this.findClass(name)
+        } catch{ case e: ClassNotFoundException =>
+          super.loadClass(name)
+        }
       }
     }
+    newClassloader()
 
     def addJar(url: URL) = evalClassloader.addURL(url)
 

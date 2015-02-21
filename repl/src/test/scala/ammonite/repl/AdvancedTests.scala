@@ -34,7 +34,8 @@ object AdvancedTests extends TestSuite{
           check("""load.ivy("com.lihaoyi", "scalatags_2.11", "0.4.5")""")
           check(
             """import scalatags.Text.all._; scalatags.Text.all.div("omg").toString""",
-            """res1: java.lang.String = "<div>omg</div>""""
+            """import scalatags.Text.all._
+              |res3_1: java.lang.String = "<div>omg</div>"""".stripMargin
           )
         }
       }

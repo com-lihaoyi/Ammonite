@@ -63,6 +63,7 @@ class Interpreter(handleResult: Result[Evaluated] => Unit,
       ))
 
       def jar(jar: File): Unit = {
+        eval.newClassloader()
         extraJars = extraJars ++ Seq(jar)
         eval.addJar(jar.toURI.toURL)
         init()
