@@ -69,8 +69,6 @@ object IvyThing {
     val report = ivy.resolve(ivyfile.toURL(), resolveOptions)
 
     //so you can get the jar library
-    val jarArtifactFile = report.getAllArtifactsReports()(0).getLocalFile()
-
-    jarArtifactFile
+    report.getAllArtifactsReports.map(_.getLocalFile)
   }
 }

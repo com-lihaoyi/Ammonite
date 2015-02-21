@@ -68,7 +68,8 @@ class Interpreter(handleResult: Result[Evaluated] => Unit,
         init()
       }
       def ivy(groupId: String, artifactId: String, version: String): Unit =
-        jar(IvyThing.resolveArtifact(groupId, artifactId, version))
+        IvyThing.resolveArtifact(groupId, artifactId, version)
+                .map(jar)
     }
     implicit def pprintConfig = interp.pprintConfig
     def clear() = ()
