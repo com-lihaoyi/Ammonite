@@ -62,15 +62,21 @@ class Interpreter(handleResult: Result[Evaluated] => Unit,
         _ => () // Discard history of load-ed lines
       ))
 
-      def jar(jar: File): Unit = {
-        eval.newClassloader()
+      def handleJar(jar: File): Unit = {
         extraJars = extraJars ++ Seq(jar)
         eval.addJar(jar.toURI.toURL)
+      }
+      def jar(jar: File): Unit = {
+        eval.newClassloader()
+        handleJar(jar)
         init()
       }
-      def ivy(groupId: String, artifactId: String, version: String): Unit =
+      def ivy(groupId: String, artifactId: String, version: String): Unit ={
+        eval.newClassloader()
         IvyThing.resolveArtifact(groupId, artifactId, version)
-                .map(jar)
+          .map(handleJar)
+        init()
+      }
     }
     implicit def pprintConfig = interp.pprintConfig
     def clear() = ()

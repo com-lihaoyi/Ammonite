@@ -19,7 +19,7 @@ object AdvancedTests extends TestSuite{
           )
         }
         'dependent{
-          // Make sure it automatically picks up jawn-parser
+          // Make sure it automatically picks up jawn-parser since upickle depends on it,
           check("""load.ivy("com.lihaoyi", "upickle_2.11", "0.2.6")""")
           check("import upickle._")
           check("upickle.write(Seq(1, 2, 3))", """res2: String = "[1,2,3]"""")

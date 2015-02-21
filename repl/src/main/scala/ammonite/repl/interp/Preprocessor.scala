@@ -70,8 +70,7 @@ object Preprocessor{
     def apply(code: String, wrapperId: Int): Result[Preprocessor.Output] = {
       parse(code) match {
         case Parsed.Incomplete => Result.Buffer(code)
-        case Parsed.Error(msg) =>
-          Result.Failure(msg)
+        case Parsed.Error(msg) => Result.Failure(msg)
         case Parsed.Success(Nil) => Result.Skip
         case Parsed.Success(parsed) =>
           def handleTree(t: Global#Tree, c: String, name: String) = {

@@ -38,6 +38,7 @@ class Repl(input: InputStream,
 
   def action() = for{
     _ <- Catching { case x: Throwable =>
+      println("THROWN")
       var current = x
       var output = ""
       while(current != null) {
@@ -52,8 +53,14 @@ class Repl(input: InputStream,
       case ex: InvocationTargetException
         if ex.getCause.getCause.isInstanceOf[ReplExit.type]  =>
         Result.Exit
+
       case ex: InvocationTargetException
-        if ex.getCause.isInstanceOf[ExceptionInInitializerError]  =>
+        if ex.getCause.isInstanceOf[ThreadDeath] =>
+        // Clear the interrupted status
+        Thread.interrupted()
+        Result.Failure("\nInterrupted!")
+
+      case ex: InvocationTargetException  =>
         val userEx = ex.getCause.getCause
         val trace =
           userEx
@@ -62,14 +69,13 @@ class Repl(input: InputStream,
             .mkString("\n")
 
         Result.Failure(userEx.toString + "\n" + trace)
-      case ex: InvocationTargetException
-        if ex.getCause.isInstanceOf[ThreadDeath] =>
-        // Clear the interrupted status
-        Thread.interrupted()
-        Result.Failure("\nInterrupted!")
+
       case ex: ThreadDeath =>
         Thread.interrupted()
         Result.Failure("\nInterrupted!")
+      case e =>
+        println(e)
+        throw e
     }
     out <- interp.processLine(line, saveHistory)
   } yield {
