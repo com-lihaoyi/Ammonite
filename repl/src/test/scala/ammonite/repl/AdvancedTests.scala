@@ -24,6 +24,19 @@ object AdvancedTests extends TestSuite{
           check("import upickle._")
           check("upickle.write(Seq(1, 2, 3))", """res2: String = "[1,2,3]"""")
         }
+
+        'reloading{
+          check("""load.ivy("com.scalatags", "scalatags_2.11", "0.2.5")""")
+          check(
+            """scalatags.all.div("omg").toString""",
+            """res1: java.lang.String = "<div>omg</div>""""
+          )
+          check("""load.ivy("com.lihaoyi", "scalatags_2.11", "0.4.5")""")
+          check(
+            """import scalatags.Text.all._; scalatags.Text.all.div("omg").toString""",
+            """res1: java.lang.String = "<div>omg</div>""""
+          )
+        }
       }
       'code{
         check("""load("val x = 1")""")
