@@ -373,6 +373,79 @@ To activate the Ammonite REPL. The REPL is a work-in-progress, so expect to find
 
 - Interruptable commands using `Ctrl-C`
 
+Ammonite contains a range of useful built-ins implemented as normal functions. Everything inside the `ReplAPI` trait is imported by default and can be accessed directly by default to control the console.
+
+```scala
+trait ReplAPI {
+  /**
+   * Exit the Ammonite REPL. You can also use Ctrl-D to exit
+   */
+  def exit = throw ReplExit
+
+  /**
+   * Clears the screen of the REPL
+   */
+  def clear: Unit
+
+  /**
+   * Read/writable prompt for the shell. Use this to change the
+   * REPL prompt at any time!
+   */
+  var shellPrompt: String
+
+  /**
+   * Display this help text
+   */
+  def help: String
+
+  /**
+   * History of commands that have been entered into the shell
+   */
+  def history: Seq[String]
+
+  /**
+   * Get the `Type` object of [[T]]
+   */
+  def typeOf[T: WeakTypeTag]: Type
+
+  /**
+   * Get the `Type` object representing the type of `t`
+   */
+  def typeOf[T: WeakTypeTag](t: => T): Type
+
+  /**
+   * Tools related to loading external scripts and code into the REPL
+   */
+  def load: Load
+
+  /**
+   * Throw away the current scala.tools.nsc.Global and get a new one
+   */
+  def newCompiler(): Unit
+
+  /**
+   * Controls how things are pretty-printed in the REPL. Feel free
+   * to shadow this with your own definition to change how things look
+   */
+  implicit def pprintConfig: ammonite.pprint.Config
+}
+trait Load extends (String => Unit){
+  /**
+   * Load a `.jar` file
+   */
+  def jar(jar: java.io.File): Unit
+  /**
+   * Load a library from its maven/ivy coordinates
+   */
+  def ivy(groupId: String, artifactId: String, version: String): Unit
+
+  /**
+   * Loads a command into the REPL and
+   * evaluates them one after another
+   */
+  def apply(line: String): Unit
+}
+```
 Ammonite is able to support many more features due to its architecture, which eschews complex cake in favor of good old object-composition and monad composition. In particular:
 
 - Sub-components of the REPL (compiler, jline, repl APIs, etc.) are plain-old-classes, and wired together manually using their constructors. This makes it much easier to see what depends on what:
