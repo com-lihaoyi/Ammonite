@@ -373,6 +373,9 @@ To activate the Ammonite REPL. The REPL is a work-in-progress, so expect to find
 
 - Interruptable commands using `Ctrl-C`
 
+Builtins
+--------
+
 Ammonite contains a range of useful built-ins implemented as normal functions. Everything inside the `ReplAPI` trait is imported by default and can be accessed directly by default to control the console.
 
 ```scala
@@ -446,6 +449,10 @@ trait Load extends (String => Unit){
   def apply(line: String): Unit
 }
 ```
+
+Internals
+---------
+
 Ammonite is able to support many more features due to its architecture, which eschews complex cake in favor of good old object-composition and monad composition. In particular:
 
 - Sub-components of the REPL (compiler, jline, repl APIs, etc.) are plain-old-classes, and wired together manually using their constructors. This makes it much easier to see what depends on what:
