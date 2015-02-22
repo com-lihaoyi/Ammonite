@@ -1,4 +1,4 @@
-Ammonite 0.1.8
+Ammonite 0.2.0
 ==============
 
 ```scala
@@ -61,7 +61,7 @@ Getting Started
 To begin, add the following to your build.sbt:
 
 ```scala
-"com.lihaoyi" %% "ammonite" % "0.1.8",
+"com.lihaoyi" %% "ammonite" % "0.2.0",
 ```
 
 Then at the top of your file,
@@ -344,7 +344,7 @@ The Ammonite REPL is a work-in-progress, cleanroom re-implementation of the Scal
 To try out the REPL, add the following to your build.sbt
 
 ```scala
-libraryDependencies += "com.lihaoyi" %% "ammonite-repl" % "0.1.8" % "test"
+libraryDependencies += "com.lihaoyi" %% "ammonite-repl" % "0.2.0" % "test"
 
 initialCommands in console := "ammonite.repl.Repl.main(null)"
 ```
