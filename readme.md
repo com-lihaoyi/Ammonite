@@ -347,6 +347,8 @@ To try out the REPL, add the following to your build.sbt
 libraryDependencies += "com.lihaoyi" %% "ammonite-repl" % "0.2.0" % "test"
 
 initialCommands in console := "ammonite.repl.Repl.main(null)"
+
+scalaVersion := "2.11.4"
 ```
 
 After that, simple hit
