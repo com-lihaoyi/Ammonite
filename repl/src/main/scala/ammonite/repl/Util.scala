@@ -37,13 +37,16 @@ object Result{
   }
   case class Failure(s: String) extends Failing
   object Failure{
-    def apply(exception: Throwable): Failure = {
-      val trace = exception
-        .getStackTrace
-        .takeWhile(x => !(x.getMethodName == "$main"))
-        .mkString("\n")
-
-      Result.Failure(exception.toString + "\n" + trace)
+    def apply(exceptions: Seq[Throwable], stop: String = null): Failure = {
+      val traces = exceptions.map(exception =>
+        exception.toString + "\n" +
+        exception
+          .getStackTrace
+          .takeWhile(x => !(x.getMethodName == stop))
+          .map("\t" + _)
+          .mkString("\n")
+      )
+      Result.Failure(traces.mkString("\n"))
     }
   }
   case object Skip extends Failing

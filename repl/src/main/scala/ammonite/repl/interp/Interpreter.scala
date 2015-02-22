@@ -28,15 +28,9 @@ class Interpreter(handleResult: Result[Evaluated] => Unit,
 
 
   def processLine(line: String, saveHistory: String => Unit, printer: Iterator[String] => Unit) = for{
-    _ <- Catching { case x: Throwable =>
-      println("THROWN")
-      var current = x
-      var output = ""
-      while(current != null) {
-        output += current + "\n" + current.getStackTrace.map("  " + _).mkString("\n") + "\n"
-        current = current.getCause
-      }
-      Result.Failure(output + "\nSomething unexpected went wrong =(")
+    _ <- Catching { case Ex(x@_*) =>
+      val Result.Failure(trace) = Result.Failure(x)
+      Result.Failure(trace + "\nSomething unexpected went wrong =(")
     }
     Preprocessor.Output(code, printSnippet) <- preprocess(line, eval.getCurrentLine)
     _ = history.append(line)

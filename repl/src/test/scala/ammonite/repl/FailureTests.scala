@@ -20,5 +20,15 @@ object FailureTests extends TestSuite{
       )
       check("1 + 1", "res0: Int = 2")
     }
+    'exceptionHandling{
+      check.fail("""throw new Exception("lol", new Exception("hoho"))""", x =>
+        // It contains the things we want
+        x.contains("java.lang.Exception: lol") &&
+        x.contains("java.lang.Exception: hoho") &&
+        // and none of the stuff we don't want
+        x.lines.length == 6 &&
+        !x.contains("Something unexpected went wrong =(")
+      )
+    }
   }
 }

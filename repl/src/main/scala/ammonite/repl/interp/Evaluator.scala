@@ -169,7 +169,7 @@ object Evaluator{
         case Ex(ex: InvEx, _, ReplExit) => Result.Exit
         case Ex(ex: ThreadDeath) => interrupted()
         case Ex(ex: InvEx, e: ThreadDeath) => interrupted()
-        case Ex(ex: InvEx, _, userEx)  => Result.Failure(userEx)
+        case Ex(ex: InvEx, _, userEx@_*)  => Result.Failure(userEx, stop = "$main")
       }
     } yield {
       printer(evalMain(cls).asInstanceOf[Iterator[String]])
