@@ -140,8 +140,8 @@ object Evaluator{
         .values
         .groupBy(_.prefix)
         .map{case (prefix, imports) =>
-        s"import $prefix.{${imports.map("`"+_.imported+"`").mkString(",")}}"
-      }
+          s"import $prefix.{${imports.map("`"+_.imported+"`").mkString(",")}}"
+        }
         .mkString("\n")
     }
     def interrupted() = {
@@ -150,26 +150,26 @@ object Evaluator{
     }
 
     type InvEx = InvocationTargetException
-
+    type InitEx = ExceptionInInitializerError
     def processLine(code: String, printCode: String, printer: Iterator[String] => Unit) = for {
       wrapperName <- Result.Success("cmd" + currentLine)
       (cls, newImports) <- evalClass(
         s"""
         $previousImportBlock
 
-          object $wrapperName{
-            $code
-            def $$main() = {$printCode}
-          }
+        object $wrapperName{
+          $code
+          def $$main() = {$printCode}
+        }
         """,
         wrapperName
       )
       _ = currentLine += 1
       _ <- Catching{
-        case Ex(ex: InvEx, _, ReplExit) => Result.Exit
-        case Ex(ex: ThreadDeath) => interrupted()
-        case Ex(ex: InvEx, e: ThreadDeath) => interrupted()
-        case Ex(ex: InvEx, _, userEx@_*)  => Result.Failure(userEx, stop = "$main")
+        case Ex(_: InvEx, _: InitEx, ReplExit) => Result.Exit
+        case Ex(_: ThreadDeath) => interrupted()
+        case Ex(_: InvEx, _: ThreadDeath) => interrupted()
+        case Ex(_: InvEx, _: InitEx, userEx@_*)  => Result.Failure(userEx, stop = "$main")
       }
     } yield {
       printer(evalMain(cls).asInstanceOf[Iterator[String]])

@@ -15,7 +15,7 @@ import scala.reflect.io.VirtualDirectory
  * to interpret Scala code. Doesn't attempt to provide any
  * real encapsulation for now.
  */
-class Interpreter(handleResult: Result[Evaluated] => Unit,
+class Interpreter(handleResult: (String, Result[Evaluated]) => Unit,
                   shellPrompt0: Ref[String],
                   pprintConfig: pprint.Config = pprint.Config.Defaults.PPrintConfig,
                   colors0: ColorSet = ColorSet.BlackWhite,
@@ -25,7 +25,7 @@ class Interpreter(handleResult: Result[Evaluated] => Unit,
   var extraJars = Seq[java.io.File]()
 
   val history = collection.mutable.Buffer.empty[String]
-
+  var buffered = ""
 
   def processLine(line: String, saveHistory: String => Unit, printer: Iterator[String] => Unit) = for{
     _ <- Catching { case Ex(x@_*) =>
@@ -39,19 +39,28 @@ class Interpreter(handleResult: Result[Evaluated] => Unit,
   } yield out
 
   def handleOutput(res: Result[Evaluated]) = {
-    handleResult(res)
+    handleResult(buffered, res)
 
     res match{
       case Result.Skip => true
-      case Result.Buffer(line) => true
+      case Result.Buffer(line) =>
+        /**
+         * Hack to work around the fact that if nothing got entered into
+         * the prompt, the `ConsoleReader`'s history wouldn't increase
+         */
+
+        buffered = line + "\n"
+        true
       case Result.Exit =>
         stdout("Bye!")
         pressy.shutdownPressy()
         false
       case Result.Success(ev) =>
+        buffered = ""
         eval.update(ev.imports)
         true
       case Result.Failure(msg) =>
+        buffered = ""
         stdout(Console.RED + msg + Console.RESET)
         true
     }

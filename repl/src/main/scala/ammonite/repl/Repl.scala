@@ -38,7 +38,7 @@ class Repl(input: InputStream,
   )
 
   def action() = for{
-    line <- frontEnd.action()
+    line <- frontEnd.action(interp.buffered)
     _ <- Signaller("INT") { interp.mainThread.stop() }
     out <- interp.processLine(line, saveHistory, _.foreach(print))
   } yield {

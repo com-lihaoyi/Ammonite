@@ -6,7 +6,7 @@ import ammonite.all._
 import utest._
 object OpTests extends TestSuite{
   val wd = processWorkingDir
-  val tests = TestSuite {
+    val tests = TestSuite {
     val res = wd/'core/'target/"scala-2.11"/"test-classes"/'testdata
     'ls - assert(
       ls(res).toSet == Set(res/'folder1, res/'folder2, res/"File.txt"),

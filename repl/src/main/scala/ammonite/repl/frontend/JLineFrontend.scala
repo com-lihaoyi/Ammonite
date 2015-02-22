@@ -13,8 +13,8 @@ import collection.JavaConversions._
  * All the mucky JLine interfacing code
  */
 trait JLineFrontend{
-  def action(): Result[String]
-  def update(r: Result[Evaluated]): Unit
+  def action(buffered: String): Result[String]
+  def update(buffered: String, r: Result[Evaluated]): Unit
 }
 object JLineFrontend{
   def apply(input: InputStream,
@@ -25,7 +25,7 @@ object JLineFrontend{
             initialHistory: Seq[String]): JLineFrontend
             = new JLineFrontend with jline.console.completer.Completer {
     val term = new jline.UnixTerminal()
-    var buffered = ""
+
     term.init()
     val reader = new ConsoleReader(input, output, term)
 
@@ -53,7 +53,7 @@ object JLineFrontend{
             .map(_.value().toString)
             .toVector
 
-    def action(): Result[String] = for {
+    def action(buffered: String): Result[String] = for {
       _ <- Signaller("INT") {
         if (reader.getCursorBuffer.length() == 0) {
           println("Ctrl-D to exit")
@@ -74,7 +74,7 @@ object JLineFrontend{
 
     } yield buffered + res
 
-    def update(r: Result[Evaluated]) = r match{
+    def update(buffered: String, r: Result[Evaluated]) = r match{
 
       case Result.Buffer(line) =>
         /**
@@ -82,12 +82,12 @@ object JLineFrontend{
          * the prompt, the `ConsoleReader`'s history wouldn't increase
          */
         if(line != buffered + "\n") reader.getHistory.removeLast()
-        buffered = line + "\n"
+
       case Result.Success(ev) =>
         val last = reader.getHistory.size()-1
         reader.getHistory.set(last, buffered + reader.getHistory.get(last))
-        buffered = ""
-      case Result.Failure(msg) => buffered = ""
+
+
       case _ =>
     }
   }

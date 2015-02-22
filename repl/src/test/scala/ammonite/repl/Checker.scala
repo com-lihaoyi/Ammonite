@@ -7,19 +7,18 @@ import utest._
 
 class Checker {
   val interp = new Interpreter(
-    _ => (),
+    (_, _) => (),
     Ref[String]("")
   )
 
-  def handleResult(res: Result[Evaluated]) = {
-    interp.eval.update(res.asInstanceOf[Result.Success[Evaluated]].s.imports)
-  }
+
 
   def run(input: String) = {
     print(".")
     val msg = collection.mutable.Buffer.empty[String]
-    val processed = interp.processLine(input, _ => (), _.foreach(msg.append(_)))
+    val processed = interp.processLine(interp.buffered + input, _ => (), _.foreach(msg.append(_)))
     val printed = processed.map(_ => msg.mkString)
+    interp.handleOutput(processed)
     (processed, printed)
   }
   def apply(input: String,
@@ -28,8 +27,6 @@ class Checker {
 
     if (expected != null)
       assert(printed == Result.Success(expected.trim))
-
-    handleResult(processed)
   }
   def fail(input: String,
            failureCheck: String => Boolean = _ => true) = {
@@ -39,5 +36,9 @@ class Checker {
       case Result.Success(v) => assert({v; false})
       case Result.Failure(s) => assert(failureCheck(s))
     }
+  }
+  def result(input: String, expected: Result[Evaluated]) = {
+    val (processed, printed) = run(input)
+    assert(processed == expected)
   }
 }
