@@ -5,7 +5,7 @@ import java.net.URL
 
 import acyclic.file
 import ammonite.repl.frontend.{ReplExit, ReplAPI}
-import ammonite.repl.{ImportData, Evaluated, Result, Catching}
+import ammonite.repl._
 import scala.reflect.internal.util.ScalaClassLoader.URLClassLoader
 import scala.reflect.runtime.universe._
 import scala.collection.mutable
@@ -21,7 +21,16 @@ trait Evaluator{
   def evalClass(code: String, wrapperName: String): Result[(Class[_], Seq[ImportData])]
   def getCurrentLine: Int
   def update(newImports: Seq[ImportData]): Unit
-  def processLine(code: String, printer: String): Result[Evaluated]
+
+  /**
+   * Takes the preprocessed `code` and `printCode` and compiles/evals/runs/etc.
+   * it to provide a result. Takes `printer` as a callback, instead of returning
+   * the `Iterator` as part of the output, because printing can cause side effects
+   * (e.g. for Streams which are lazily printed) and can fail with an exception!
+   * passing in the callback ensures the printing is still done lazily, but within
+   * the exception-handling block of the `Evaluator`
+   */
+  def processLine(code: String, printCode: String, printer: Iterator[String] => Unit): Result[Evaluated]
   def previousImportBlock: String
   def addJar(url: URL): Unit
   def newClassloader(): Unit
@@ -104,14 +113,11 @@ object Evaluator{
     def addJar(url: URL) = evalClassloader.addURL(url)
 
     def evalClass(code: String, wrapperName: String) = for{
-      (output, compiled) <- Result(
-        Try{
-          val output = mutable.Buffer.empty[String]
-          val c = compile(code.getBytes, output.append(_))
-          (output, c)
-        },
-        e => {stdout("!!!! " + e.printStackTrace()); e.toString}
-      )
+      (output, compiled) <- Result.Success{
+        val output = mutable.Buffer.empty[String]
+        val c = compile(code.getBytes, output.append(_))
+        (output, c)
+      }
 
       (classFiles, importData) <- Result[(Traversable[(String, Array[Byte])], Seq[ImportData])](
         compiled, "Compilation Failed\n" + output.mkString("\n")
@@ -126,17 +132,8 @@ object Evaluator{
       }, e => "Failed to load compiled class " + e)
     } yield (cls, importData)
 
-    def evalMain(cls: Class[_]) = for{
-      _ <- Result.Success(())
-      method = cls.getDeclaredMethod("$main")
-
-    } yield try{
-      val res = method.invoke(null)
-      res
-    }catch{case e =>
-      e.printStackTrace()
-      throw e
-    }
+    def evalMain(cls: Class[_]) =
+      cls.getDeclaredMethod("$main").invoke(null)
 
     def previousImportBlock = {
       previousImports
@@ -147,30 +144,43 @@ object Evaluator{
       }
         .mkString("\n")
     }
-    def processLine(code: String, printer: String) = for {
-      wrapperName <- Result.Success("cmd" + currentLine)
+    def interrupted() = {
+      Thread.interrupted()
+      Result.Failure("\nInterrupted!")
+    }
 
+    type InvEx = InvocationTargetException
+
+    def processLine(code: String, printCode: String, printer: Iterator[String] => Unit) = for {
+      wrapperName <- Result.Success("cmd" + currentLine)
       (cls, newImports) <- evalClass(
         s"""
         $previousImportBlock
 
           object $wrapperName{
             $code
-            def $$main() = {$printer}
+            def $$main() = {$printCode}
           }
         """,
         wrapperName
       )
       _ = currentLine += 1
-      evaled <- evalMain(cls)
-    } yield Evaluated(
-        evaled.asInstanceOf[Iterator[String]],
+      _ <- Catching{
+        case Ex(ex: InvEx, _, ReplExit) => Result.Exit
+        case Ex(ex: ThreadDeath) => interrupted()
+        case Ex(ex: InvEx, e: ThreadDeath) => interrupted()
+        case Ex(ex: InvEx, _, userEx)  => Result.Failure(userEx)
+      }
+    } yield {
+      printer(evalMain(cls).asInstanceOf[Iterator[String]])
+      Evaluated(
         wrapperName,
         newImports.map(id => id.copy(
           wrapperName = wrapperName,
           prefix = if (id.prefix == "") wrapperName else id.prefix
         ))
       )
+    }
 
     def update(newImports: Seq[ImportData]) = {
       for(i <- newImports) previousImports(i.imported) = i

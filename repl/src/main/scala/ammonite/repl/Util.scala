@@ -36,6 +36,16 @@ object Result{
     def map[V](f: Nothing => V): Result[V] = this
   }
   case class Failure(s: String) extends Failing
+  object Failure{
+    def apply(exception: Throwable): Failure = {
+      val trace = exception
+        .getStackTrace
+        .takeWhile(x => !(x.getMethodName == "$main"))
+        .mkString("\n")
+
+      Result.Failure(exception.toString + "\n" + trace)
+    }
+  }
   case object Skip extends Failing
   case object Exit extends Failing
   case class Buffer(s: String) extends Failing
@@ -63,8 +73,7 @@ case class Catching(handler: PartialFunction[Throwable, Result.Failing]) {
     try Result.Success(t(())) catch handler
 }
 
-case class Evaluated(msg: Iterator[String],
-                     wrapper: String,
+case class Evaluated(wrapper: String,
                      imports: Seq[ImportData])
 
 case class ImportData(imported: String, wrapperName: String, prefix: String)
@@ -98,5 +107,17 @@ object Ref{
   def apply[T](value: T, update0: T => Unit) = new Ref[T]{
     def apply() = value
     def update(t: T) = update0(t)
+  }
+}
+
+object Ex{
+  def unapplySeq(t: Throwable): Option[Seq[Throwable]] = {
+    def rec(t: Throwable): List[Throwable] = {
+      t match {
+        case null => Nil
+        case t => t :: rec(t.getCause)
+      }
+    }
+    Some(rec(t))
   }
 }

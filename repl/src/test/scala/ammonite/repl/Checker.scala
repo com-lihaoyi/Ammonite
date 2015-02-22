@@ -15,11 +15,16 @@ class Checker {
     interp.eval.update(res.asInstanceOf[Result.Success[Evaluated]].s.imports)
   }
 
+  def run(input: String) = {
+    print(".")
+    val msg = collection.mutable.Buffer.empty[String]
+    val processed = interp.processLine(input, _ => (), _.foreach(msg.append(_)))
+    val printed = processed.map(_ => msg.mkString)
+    (processed, printed)
+  }
   def apply(input: String,
             expected: String = null) = {
-    print(".")
-    val processed = interp.processLine(input, _ =>())
-    val printed = processed.map(_.msg.mkString)
+    val (processed, printed) = run(input)
 
     if (expected != null)
       assert(printed == Result.Success(expected.trim))
@@ -28,9 +33,7 @@ class Checker {
   }
   def fail(input: String,
            failureCheck: String => Boolean = _ => true) = {
-    print(".")
-    val processed = interp.processLine(input, _ => ())
-    val printed = processed.map(_.msg.mkString)
+    val (processed, printed) = run(input)
 
     printed match{
       case Result.Success(v) => assert({v; false})

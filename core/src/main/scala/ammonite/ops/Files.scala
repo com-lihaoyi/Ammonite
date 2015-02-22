@@ -7,6 +7,8 @@ import RelPath.up
 import ammonite.pprint
 import ammonite.pprint.PPrint
 
+import scala.collection.GenTraversableOnce
+import scala.collection.mutable
 import scala.util.matching.Regex
 import Extensions._
 object OpError{
@@ -96,42 +98,7 @@ trait Op2[T1, T2, R] extends ((T1, T2) => R){
   }
 }
 
-trait Grepper[T]{
-  def apply[V: ammonite.pprint.PPrint](t: T, s: V): Boolean
-}
-object Grepper{
-  def BlackWhite[V: PPrint] = {
-    val pp = implicitly[PPrint[V]]
-    new ammonite.pprint.PPrint(pp.a, pp.cfg.copy(literalColor=null, prefixColor=null))
-  }
-  implicit object Str extends Grepper[String] {
-    def apply[V: ammonite.pprint.PPrint](t: String, s: V) = {
-      ammonite.pprint.PPrint(s)(BlackWhite).mkString.contains(t)
-    }
-  }
 
-  implicit object Regex extends Grepper[Regex] {
-    def apply[V: ammonite.pprint.PPrint](t: Regex, s: V) = {
-      t.findAllIn(ammonite.pprint.PPrint(s)(BlackWhite).mkString).length > 0
-    }
-  }
-}
-
-/**
- * Lets you filter a list by searching for a matching string or
- * regex within the pretty-printed contents.
- */
-object grep {
-  def apply[T: Grepper, V: ammonite.pprint.PPrint](pat: T, str: V): Boolean = {
-    implicitly[Grepper[T]].apply(pat, str)
-  }
-  object !{
-    implicit def FunkyFunc[T: ammonite.pprint.PPrint](f: ![_]): T => Boolean = f.apply[T]
-  }
-  case class ![T: Grepper](pat: T) {
-    def apply[V: ammonite.pprint.PPrint](str: V) = grep.this.apply(pat, str)
-  }
-}
 
 /**
  * Makes directories up to the specified path.

@@ -1,10 +1,11 @@
 package ammonite.repl.interp
 
 import java.io.File
+import java.lang.reflect.InvocationTargetException
 import java.net.URLClassLoader
 
 import ammonite.pprint
-import ammonite.repl.{Ref, Evaluated, IvyThing, Result}
+import ammonite.repl._
 import ammonite.repl.frontend._
 
 import scala.reflect.io.VirtualDirectory
@@ -25,11 +26,22 @@ class Interpreter(handleResult: Result[Evaluated] => Unit,
 
   val history = collection.mutable.Buffer.empty[String]
 
-  def processLine(line: String, saveHistory: String => Unit) = for{
-    Preprocessor.Output(code, printer) <- preprocess(line, eval.getCurrentLine)
+
+  def processLine(line: String, saveHistory: String => Unit, printer: Iterator[String] => Unit) = for{
+    _ <- Catching { case x: Throwable =>
+      println("THROWN")
+      var current = x
+      var output = ""
+      while(current != null) {
+        output += current + "\n" + current.getStackTrace.map("  " + _).mkString("\n") + "\n"
+        current = current.getCause
+      }
+      Result.Failure(output + "\nSomething unexpected went wrong =(")
+    }
+    Preprocessor.Output(code, printSnippet) <- preprocess(line, eval.getCurrentLine)
     _ = history.append(line)
     _ = saveHistory(line)
-    out <- eval.processLine(code, printer)
+    out <- eval.processLine(code, printSnippet, printer)
   } yield out
 
   def handleOutput(res: Result[Evaluated]) = {
@@ -59,7 +71,8 @@ class Interpreter(handleResult: Result[Evaluated] => Unit,
 
       def apply(line: String) = handleOutput(processLine(
         line,
-        _ => () // Discard history of load-ed lines
+        _ => (), // Discard history of load-ed lines,
+        _.foreach(print)
       ))
 
       def handleJar(jar: File): Unit = {
