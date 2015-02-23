@@ -60,14 +60,14 @@ lazy val core = project.settings(sharedSettings:_*).settings(
     val tuples = (1 to 22).map{ i =>
       val ts = (1 to i) map ("T" + _)
       val chunks = 1 to i map { n =>
-        s"render(t._$n, c)"
+        s"render(t._$n)"
       }
       val commaTs = ts.mkString(", ")
       val tupleType = s"Product$i[$commaTs]"
       val boundedTypes = ts.map(_ + ": PP").mkString(",")
       s"""
       implicit def Product${i}Unpacker[$boundedTypes] = {
-        (t: $tupleType, c: C) => Iterator(${chunks.mkString(",")})
+        (t: $tupleType) => Iterator(${chunks.mkString(",")})
       }
       """
     }

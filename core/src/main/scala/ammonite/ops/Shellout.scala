@@ -1,6 +1,6 @@
 package ammonite.ops
 
-import ammonite.pprint.PPrinter
+import ammonite.pprint.{PPrint, Config, PPrinter}
 
 import scala.language.dynamics
 
@@ -47,10 +47,16 @@ object CommandExtender{
   }
 }
 object CommandResult{
-  implicit val commandResultRepr = PPrinter[CommandResult]((x, c) =>
-    x.output.iterator.flatMap(Iterator("\n", _))
+  implicit def commandResultRepr(implicit c: Config) =
+    new PPrint(
+      PPrinter[CommandResult]((x, c) =>
+      x.output.iterator.flatMap(Iterator("\n", _))
+    ),
+    c
   )
 }
-case class CommandResult(output: Stream[String]) extends Iterable[String]{
+case class CommandResult(output: Stream[String]) extends Seq[String]{
   def iterator = output.iterator
+  def apply(idx: Int) = output(idx)
+  def length: Int = output.length
 }

@@ -13,7 +13,7 @@ object PPrint extends Internals.LowPriPPrint{
    */
   def apply[T: PPrint](t: T): Iterator[String] = {
     val pprint = implicitly[PPrint[T]]
-    pprint.render(t, pprint.cfg)
+    pprint.render(t)
   }
 
   /**
@@ -27,10 +27,10 @@ object PPrint extends Internals.LowPriPPrint{
  * A typeclass necessary to prettyprint something. Separate from [[PPrinter]]
  * in order to make contravariant implicit resolution behave right.
  */
-class PPrint[A](val a: PPrinter[A], val cfg: Config){
-  def render(t: A, c: Config): Iterator[String] = {
+case class PPrint[A](a: PPrinter[A], cfg: Config){
+  def render(t: A): Iterator[String] = {
     if (t == null) Iterator("null")
-    else a.render(t, c)
+    else a.render(t, cfg)
   }
   def map(f: String => String) = a.map(f)
 }
@@ -128,16 +128,16 @@ object Unpacker extends PPrinterGen {
   /**
    * Special, because `Product0` doesn't exist
    */
-  implicit def Product0Unpacker = (t: Unit, c: C) => Iterator[Iterator[String]]()
+  implicit def Product0Unpacker = (t: Unit) => Iterator[Iterator[String]]()
   val foo = 1
-  def render[T: PP](t: T, c: Config) = implicitly[PPrint[T]].render(t, c)
+  def render[T: PP](t: T) = implicitly[PPrint[T]].render(t)
 }
 
 
 object Internals {
 
   def mapEntryPrinter[T: PPrint, V: PPrint] = PPrinter[(T, V)] { case ((t, v), c) =>
-    implicitly[PPrint[T]].render(t, c) ++ Iterator(" -> ") ++ implicitly[PPrint[V]].render(v, c)
+    implicitly[PPrint[T]].render(t) ++ Iterator(" -> ") ++ implicitly[PPrint[V]].render(v)
   }
   def makeMapRepr[M[T, V] <: Map[T, V], T: PPrint, V: PPrint] = {
     PPrinter[M[T, V]] { (t: M[T, V], c: Config) =>
@@ -149,9 +149,12 @@ object Internals {
 
   def collectionRepr[T: PPrint, V <: Traversable[T]]: PPrinter[V] = PPrinter[V] {
     (i: V, c: Config) => {
-      def cFunc = (c: Config) => i.toIterator.map(implicitly[PPrint[T]].render(_, c))
-      if (!i.isInstanceOf[Stream[T]]) handleChunks(i.stringPrefix, c, cFunc)
-      else handleChunksVertical(i.stringPrefix, c, cFunc)
+      val pp = implicitly[PPrint[T]]
+      val newCfg = pp.cfg.copy(depth = pp.cfg.depth + 1)
+      val newPP = pp.copy(cfg = newCfg)
+      def cFunc = (c: Config) => i.toIterator.map(newPP.render)
+      if (!i.isInstanceOf[Stream[T]]) handleChunks(i.stringPrefix, newCfg, cFunc)
+      else handleChunksVertical(i.stringPrefix, newCfg, cFunc)
     }
   }
 
@@ -174,12 +177,13 @@ object Internals {
   def handleChunks(name: String,
                    c: Config,
                    chunkFunc: Config => Iterator[Iterator[String]]): Iterator[String] = {
+    println(c.depth)
     val chunks = chunkFunc(c).map(_.toStream).toStream
     val renamed = c.rename(name)
     val coloredName = c.color.prefix(renamed)
     // Prefix, contents, and all the extra ", " "(" ")" characters
     val totalLength = renamed.length + chunks.flatten.map(_.length).sum + chunks.length * 2
-    if (totalLength <= c.maxWidth - (c.depth * c.indent) && !chunks.exists(_.contains('\n'))) {
+    if (totalLength <= c.maxWidth - (c.depth * c.indent) && !chunks.flatten.exists(_.contains('\n'))) {
       Iterator(coloredName, "(") ++ mkIterator(chunks.iterator, Seq(", ")).flatten ++ Iterator(")")
     } else handleChunksVertical(name, c, chunkFunc)
   }
@@ -200,7 +204,7 @@ object Internals {
   }
 
   def preMap[T, V: PPrint](f: T => V) = PPrinter[T] {
-    (t: T, c: Config) => implicitly[PPrint[V]].render(f(t), c)
+    (t: T, c: Config) => implicitly[PPrint[V]].render(f(t))
   }
 
   type Unpacker[T] = (T, Config) => Iterator[Iterator[String]]
@@ -269,7 +273,7 @@ object Internals {
                   ammonite.pprint
                           .Unpacker
                           .$tupleName[..$paramTypes]
-                          .apply($thingy, cfg)
+                          .apply($thingy)
               },
               implicitly[ammonite.pprint.Config]
             )

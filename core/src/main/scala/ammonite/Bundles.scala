@@ -99,7 +99,7 @@ trait Bundle extends ops.RelPathStuff with ops.Extensions{
   val tail = ops.tail
 
   val kill = ops.kill
-  val stat = ops.stat
+  implicit val stat = ops.stat
   val tee = ops.tee
 
   val % = ops.%

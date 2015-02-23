@@ -49,19 +49,20 @@ object GrepResult{
       if(i % 2 == 1) Console.RESET + cfg.literalColor
       else Console.YELLOW_B + Console.BLUE
 
+    val width = cfg.maxWidth - cfg.depth * 2
     // String: |        S   E       S    E      |
     // Cuts:   0       1 2 3 4     5 6  7 8     9
     while(!remaining.isEmpty){
       val (firstStart, firstEnd) = remaining.head
       val (included, excluded) = remaining.partition{
-        case (_, end) => end - firstStart < cfg.maxWidth
+        case (_, end) => end - firstStart < width
       }
       remaining = excluded
       val lastEnd = included.last._2
       val middle = (lastEnd + firstStart) / 2
       val showStart = middle - cfg.maxWidth / 2
       val allIndices = included.flatMap{case (a, b) => Seq(a, b)}
-      val pairs = (showStart +: allIndices) zip (allIndices :+ (showStart + cfg.maxWidth))
+      val pairs = (showStart +: allIndices) zip (allIndices :+ (showStart + width))
 
       val snippets = for(((a, b), i) <- pairs.zipWithIndex) yield {
         gr.txt.slice(a, b) + color(i)
@@ -69,7 +70,7 @@ object GrepResult{
       spans.append(color(1) + snippets.mkString + Console.RESET)
     }
 
-    Iterator(spans.mkString("\n"), "\n")
+    Iterator(spans.mkString("\n"))
   }
 }
 

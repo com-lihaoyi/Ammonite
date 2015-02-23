@@ -142,7 +142,7 @@ object LsSeq{
     new PPrint[LsSeq](
       pprint.PPrinter[LsSeq] { (p, c) =>
         implicit val cfg = c
-        implicitly[PPrint[Seq[RelPath]]].render(p.toSeq.map(_ - wd), c)
+        implicitly[PPrint[Seq[RelPath]]].render(p.toSeq.map(_ - wd))
       },
       implicitly
     )
@@ -187,12 +187,14 @@ object write extends Op2[Path, Internals.Writable, Unit]{
     mkdir(target/RelPath.up)
     Files.write(target.nio, data.writeableData, StandardOpenOption.CREATE_NEW)
   }
+
   object append extends Op2[Path, Internals.Writable, Unit]{
     def apply(target: Path, data: Internals.Writable) = {
       mkdir(target/RelPath.up)
       Files.write(target.nio, data.writeableData, StandardOpenOption.CREATE, StandardOpenOption.APPEND)
     }
   }
+
   object over extends Op2[Path, Internals.Writable, Unit]{
     def apply(target: Path, data: Internals.Writable) = {
       mkdir(target/RelPath.up)
