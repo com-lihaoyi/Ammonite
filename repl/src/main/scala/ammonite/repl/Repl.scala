@@ -33,7 +33,7 @@ class Repl(input: InputStream,
   lazy val interp: Interpreter = new Interpreter(
     frontEnd.update,
     shellPrompt,
-    pprintConfig,
+    pprintConfig.copy(maxWidth = frontEnd.width),
     colorSet
   )
 

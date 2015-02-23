@@ -45,10 +45,6 @@ trait Bundle extends ops.RelPathStuff with ops.Extensions{
    */
   def processWorkingDir = ops.Path(new java.io.File(""))
 
-  implicit def PathFileData(p: ops.Path) = new ops.FileData(
-    Files.readAttributes(java.nio.file.Paths.get(p.toString), classOf[PosixFileAttributes])
-  )
-
   implicit class Transformable1(p: java.nio.file.Path){
     def amm = {
       val s = p.toString
@@ -87,6 +83,8 @@ trait Bundle extends ops.RelPathStuff with ops.Extensions{
     def r = new RegexContext.Interped(sc.parts)
   }
 
+  implicit def fileData(p: Path) = stat.full
+
   val cp = ops.cp
   val exists = ops.exists
   val ln = ops.ln
@@ -99,6 +97,10 @@ trait Bundle extends ops.RelPathStuff with ops.Extensions{
 
   val grep = ops.grep
   val tail = ops.tail
+
+  val kill = ops.kill
+  val stat = ops.stat
+  val tee = ops.tee
 
   val % = ops.%
   type % = ops.%

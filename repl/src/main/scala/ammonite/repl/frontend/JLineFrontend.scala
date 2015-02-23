@@ -13,6 +13,7 @@ import collection.JavaConversions._
  * All the mucky JLine interfacing code
  */
 trait JLineFrontend{
+  def width: Int
   def action(buffered: String): Result[String]
   def update(buffered: String, r: Result[Evaluated]): Unit
 }
@@ -28,7 +29,7 @@ object JLineFrontend{
 
     term.init()
     val reader = new ConsoleReader(input, output, term)
-
+    def width = term.getWidth
     reader.setHistoryEnabled(true)
     reader.addCompleter(this)
     reader.setExpandEvents(false)

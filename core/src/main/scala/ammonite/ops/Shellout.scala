@@ -51,4 +51,6 @@ object CommandResult{
     x.output.iterator.flatMap(Iterator("\n", _))
   )
 }
-case class CommandResult(output: Stream[String])
+case class CommandResult(output: Stream[String]) extends Iterable[String]{
+  def iterator = output.iterator
+}

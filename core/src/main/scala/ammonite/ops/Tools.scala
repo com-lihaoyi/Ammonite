@@ -97,6 +97,15 @@ object grep {
   }
 }
 
+/**
+ * Used to split a stream down two or three different path, e.g. to
+ * print out intermediate values in the middle of a longer pipeline
+ */
+object tee {
+  def apply[T, R1, R2](f1: T => R1, f2: T => R2) = (v: T) => (f1(v), f2(v))
+  def apply[T, R1, R2, R3](f1: T => R1, f2: T => R2, f3: T => R3) = (v: T) => (f1(v), f2(v), f3(v))
+}
+
 case class tail(interval: Int, prefix: Int) extends Op1[Path, Iterator[String]]{
   def apply(arg: Path): Iterator[String] = {
     val is = java.nio.file.Files.newInputStream(arg.nio)
@@ -109,4 +118,10 @@ case class tail(interval: Int, prefix: Int) extends Op1[Path, Iterator[String]]{
 
   }
 }
+
+/**
+ * Follows a file as it is written, handy e.g. for log files.
+ * Returns an iterator which you can then print to standard out
+ * or use for other things.
+ */
 object tail extends tail(100, 50)

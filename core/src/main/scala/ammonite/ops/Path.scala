@@ -165,33 +165,6 @@ object RelPath extends RelPathStuff with (String => RelPath){
     Iterator((Seq.fill(p.ups)("up") ++ p.segments.map(BasePath.reprSection(_, c).mkString)).mkString("/"))
   }
 }
-sealed trait FileType
-object FileType{
-  case object File extends FileType
-  case object Dir extends FileType
-  case object SymLink extends FileType
-  case object Other extends FileType
-}
-
-class FileData(attrs: PosixFileAttributes){
-  def size = attrs.size()
-  def mtime = attrs.lastModifiedTime()
-  def ctime = attrs.creationTime()
-  def atime = attrs.lastAccessTime()
-  def group = attrs.group()
-  def owner = attrs.owner()
-  def permissions = attrs.permissions()
-  def fileType =
-    if (attrs.isRegularFile) FileType.File
-    else if (attrs.isDirectory) FileType.Dir
-    else if (attrs.isSymbolicLink) FileType.SymLink
-    else if (attrs.isOther) FileType.Other
-    else ???
-  def isDir = fileType == FileType.Dir
-  def isSymLink = fileType == FileType.SymLink
-  def isFile = fileType == FileType.File
-}
-
 object Path extends (String => Path){
 
   def apply(s: String): Path = {

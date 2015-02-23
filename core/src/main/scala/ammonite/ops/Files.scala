@@ -226,13 +226,14 @@ object read extends Internals.Reader with Op1[Path, String]{
   }
 }
 
+
 /**
  * Checks if a file or folder exists at the given path.
  */
 object exists extends Op1[Path, Boolean]{
   def apply(p: Path) = Files.exists(Paths.get(p.toString))
 }
-//
+
 //object chmod extends Op2[Path, Unit, Unit]{
 //  def apply(arg1: Path, arg2: Unit) = ???
 //}
@@ -248,9 +249,14 @@ object exists extends Op1[Path, Boolean]{
 //    def apply(arg: Unit): Unit = ???
 //  }
 //}
-//object kill extends Op1[Unit, Unit]{
-//  def apply(arg: Unit): Unit = ???
-//}
+
+//object kill extends kill(9)
+
+case class kill(signal: Int) extends Op1[Int, CommandResult]{
+  def apply(pid: Int): CommandResult = {
+    %kill("-" + signal, pid.toString)
+  }
+}
 object ln extends Op2[Path, Path, Unit]{
   def apply(src: Path, dest: Path) = {
     Files.createLink(Paths.get(dest.toString), Paths.get(src.toString))
