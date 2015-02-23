@@ -1,3 +1,9 @@
+/**
+ * Basic operations that take place on files. Intended to be
+ * both light enough to use from the command line as well as
+ * powerful and flexible enough to use in real applications to
+ * perform filesystem operations
+ */
 package ammonite.ops
 
 import java.io.{File, InputStream}
@@ -7,9 +13,6 @@ import RelPath.up
 import ammonite.pprint
 import ammonite.pprint.PPrint
 
-import scala.collection.GenTraversableOnce
-import scala.collection.mutable
-import scala.util.matching.Regex
 import Extensions._
 object OpError{
   type IAE = IllegalArgumentException
@@ -46,7 +49,7 @@ object Internals{
     }
 
     object lines extends StreamableOp1[Path, String, Vector[String]]{
-      def munge(i: Iterator[String]) = i.toVector
+      def materialize(i: Iterator[String]) = i.toVector
       def !!(arg: Path) = {
         val is = readIn(arg)
         io.Source.fromInputStream(is).getLines()
@@ -78,26 +81,11 @@ object Internals{
   }
 }
 
-trait Op1[T1, R] extends (T1 => R){
-  def apply(arg: T1): R
-  def !(arg: T1): R = apply(arg)
-}
-
-
 trait StreamableOp1[T1, R, C <: Seq[R]] extends Op1[T1, C]{
-  def munge(i: Iterator[R]): C
-  def apply(arg: T1) = munge(!!(arg))
+  def materialize(i: Iterator[R]): C
+  def apply(arg: T1) = materialize(!!(arg))
   def !!(arg: T1): Iterator[R]
 }
-
-trait Op2[T1, T2, R] extends ((T1, T2) => R){
-  def apply(arg1: T1, arg2: T2): R
-  case class !(arg1: T1) extends (T2 => R){
-    def apply(arg2: T2) = Op2.this.apply(arg1, arg2)
-    def !(arg2: T2): R = Op2.this.apply(arg1, arg2)
-  }
-}
-
 
 
 /**
@@ -170,14 +158,14 @@ class LsSeq(s: Stream[Path]) extends Seq[Path]{
  * List the files in a directory
  */
 object ls extends StreamableOp1[Path, Path, LsSeq]{
-  def munge(i: Iterator[Path]) = new LsSeq(i.toStream)
+  def materialize(i: Iterator[Path]) = new LsSeq(i.toStream)
   def !!(arg: Path) = {
     import scala.collection.JavaConverters._
     Files.list(arg.nio).iterator().asScala.map(x => Path(x))
   }
 
   object rec extends StreamableOp1[Path, Path, LsSeq]{
-    def munge(i: Iterator[Path]) = new LsSeq(i.toStream)
+    def materialize(i: Iterator[Path]) = new LsSeq(i.toStream)
     def recursiveListFiles(f: File): Iterator[File] = {
       def these = Option(f.listFiles).iterator.flatMap(x=>x)
       these ++ these.filter(_.isDirectory).flatMap(recursiveListFiles)

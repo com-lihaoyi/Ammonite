@@ -1,4 +1,10 @@
+/**
+ * User-facing tools. Rather specific, and although they could
+ * be built upon as part of a larger program, they're
+ */
 package ammonite.ops
+
+import java.io.{InputStreamReader, BufferedReader}
 
 import ammonite.pprint
 import ammonite.pprint.PPrint
@@ -90,3 +96,17 @@ object grep {
     def apply[V: ammonite.pprint.PPrint](str: V) = grep.this.apply(pat, str)
   }
 }
+
+case class tail(interval: Int, prefix: Int) extends Op1[Path, Iterator[String]]{
+  def apply(arg: Path): Iterator[String] = {
+    val is = java.nio.file.Files.newInputStream(arg.nio)
+    val br = new BufferedReader(new InputStreamReader(is))
+    Iterator.continually{
+      val line = br.readLine()
+      if (line == null) Thread.sleep(interval)
+      Option(line)
+    }.flatten
+
+  }
+}
+object tail extends tail(100, 50)

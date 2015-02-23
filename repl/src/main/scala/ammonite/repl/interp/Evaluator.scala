@@ -170,9 +170,10 @@ object Evaluator{
         case Ex(_: ThreadDeath) => interrupted()
         case Ex(_: InvEx, _: ThreadDeath) => interrupted()
         case Ex(_: InvEx, _: InitEx, userEx@_*)  => Result.Failure(userEx, stop = "$main")
+        case Ex(userEx@_*)  => Result.Failure(userEx, stop = "evaluatorRunPrinter")
       }
     } yield {
-      printer(evalMain(cls).asInstanceOf[Iterator[String]])
+      evaluatorRunPrinter(printer(evalMain(cls).asInstanceOf[Iterator[String]]))
       Evaluated(
         wrapperName,
         newImports.map(id => id.copy(
@@ -186,5 +187,12 @@ object Evaluator{
       for(i <- newImports) previousImports(i.imported) = i
     }
   }
+
+  /**
+   * Dummy function used to mark this method call in the stack trace,
+   * so we can easily cut out the irrelevant part of the trace when
+   * showing it to the user.
+   */
+  def evaluatorRunPrinter(f: => Unit) = f
 
 }

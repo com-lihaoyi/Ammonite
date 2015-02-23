@@ -89,7 +89,6 @@ trait Bundle extends ops.RelPathStuff with ops.Extensions{
 
   val cp = ops.cp
   val exists = ops.exists
-  val grep = ops.grep
   val ln = ops.ln
   val ls = ops.ls
   val mkdir = ops.mkdir
@@ -98,6 +97,10 @@ trait Bundle extends ops.RelPathStuff with ops.Extensions{
   val rm = ops.rm
   val write = ops.write
 
+  val grep = ops.grep
+  val tail = ops.tail
+
   val % = ops.%
   type % = ops.%
+
 }

@@ -1,5 +1,6 @@
 package ammonite.ops
 import acyclic.file
+import ammonite.pprint.{PPrint, PPrinter}
 import scala.collection.{Seq, GenTraversableOnce, TraversableLike}
 
 import scala.collection.generic.{CanBuildFrom => CBF, GenericTraversableTemplate, SeqFactory}
@@ -23,6 +24,10 @@ trait Extensions{
   }
 
   implicit def ChainableConversions[T, T1, V](f: T => V)(implicit i: T1 => T) = i andThen f
+
+  implicit class iterShow[T](t: Iterator[T]){
+    def !! = t.foreach(println)
+  }
 }
 
 object Extensions extends Extensions

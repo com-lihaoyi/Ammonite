@@ -25,7 +25,6 @@ object % extends %(Vector.empty){
   }
 }
 
-
 class %(val cmd: Vector[String]) extends Dynamic{
   def selectDynamic(s: String) = %.execute(cmd ++ Seq(s))
   def applyDynamic[T, V](op: String)(args: T*)(implicit ce: CommandExtender[T, V]): V = {
