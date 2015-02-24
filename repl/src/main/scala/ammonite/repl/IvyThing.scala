@@ -8,7 +8,7 @@ import org.apache.ivy.core.module.id.ModuleRevisionId
 import org.apache.ivy.core.resolve.ResolveOptions
 import org.apache.ivy.core.settings.IvySettings
 import org.apache.ivy.plugins.parser.xml.XmlModuleDescriptorWriter
-import org.apache.ivy.plugins.resolver.URLResolver
+import org.apache.ivy.plugins.resolver.{IBiblioResolver, URLResolver}
 
 /**
  * Resolve artifacts from Ivy. Originally taken from
@@ -21,14 +21,12 @@ object IvyThing {
   def resolveArtifact(groupId: String, artifactId: String, version: String) = {
     //url resolver for configuration of maven repo
     val resolver = {
-      val res = new URLResolver()
+      val res = new IBiblioResolver()
+      res.setUsepoms(true)
+//      res.setUseMavenMetadata(true)
       res.setM2compatible(true)
       res.setName("central")
-      //you can specify the url resolution pattern strategy
-      res.addArtifactPattern(
-        "http://repo1.maven.org/maven2/[organisation]/" +
-        "[module]/[revision]/[artifact](-[revision]).[ext]"
-      )
+      res.setRoot("http://repo1.maven.org/maven2/")
       res
     }
 
@@ -70,16 +68,9 @@ object IvyThing {
     //init resolve report
     val report = ivy.resolve(
       ivyfile.toURI.toURL,
-      new ResolveOptions().setConfs(Array("default"))
+      new ResolveOptions().setConfs(Array("default")).setRefresh(true)
     )
-    println("----IVY THING----")
-    println(ivyfile)
-    println(report)
-    import collection.JavaConversions._
-    println(report.getDependencies.toSeq)
-    println(report.getUnresolvedDependencies.toSeq)
-    println(report.getAllArtifactsReports.toSeq)
-    //so you can get the jar library
+    //so you can get the jar libraries
     report.getAllArtifactsReports.map(_.getLocalFile)
   }
 }
