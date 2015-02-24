@@ -29,7 +29,6 @@ object PPrint extends Internals.LowPriPPrint{
  */
 case class PPrint[A](a: PPrinter[A], cfg: Config){
   def render(t: A): Iterator[String] = {
-    println("PPrint.render " + cfg.depth + "\t" + t)
     if (t == null) Iterator("null")
     else a.render(t, cfg)
   }
@@ -156,9 +155,7 @@ object Internals {
   def collectionRepr[T: PPrint, V <: Traversable[T]]: PPrinter[V] = PPrinter[V] {
     (i: V, c: Config) => {
       val pp = implicitly[PPrint[T]].copy(cfg = c)
-      println("pp.depth " + pp.cfg.depth)
       def cFunc = (cfg: Config) => {
-        println("cFunc " + cfg.depth)
         i.toIterator.map(pp.copy(cfg = cfg).render)
       }
       if (!i.isInstanceOf[Stream[T]]) handleChunks(i.stringPrefix, pp.cfg, cFunc)
@@ -185,7 +182,6 @@ object Internals {
   def handleChunks(name: String,
                    c: Config,
                    chunkFunc: Config => Iterator[Iterator[String]]): Iterator[String] = {
-    println(c.depth)
     val chunks = chunkFunc(c).map(_.toStream).toStream
     val renamed = c.rename(name)
     val coloredName = c.color.prefix(renamed)
@@ -202,7 +198,6 @@ object Internals {
   def handleChunksVertical(name: String,
                            c: Config,
                            chunkFunc: Config => Iterator[Iterator[String]]): Iterator[String] = {
-    println(c.depth)
     val renamed = c.rename(name)
     val coloredName = c.color.prefix(renamed)
     val chunks2 = chunkFunc(c.deeper)
@@ -273,8 +268,6 @@ object Internals {
           // We're fleshing this out a lot more than necessary to help
           // scalac along with its implicit search, otherwise it gets
           // confused and explodes
-
-          // Need to dropWhile to get rid of any `Tuple1` prefix
           q"""
             new ammonite.pprint.PPrint[$tpe](
               ammonite.pprint.Internals.fromUnpacker[$tpe](_.productPrefix){

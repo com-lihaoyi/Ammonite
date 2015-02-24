@@ -1,10 +1,5 @@
-scalaVersion := "2.11.4"
-
-libraryDependencies ++= Seq(
-  "org.scala-lang" % "scala-compiler" % scalaVersion.value
-)
-
 val sharedSettings = Seq(
+  scalaVersion := "2.11.4",
   organization := "com.lihaoyi",
   crossScalaVersions := Seq("2.10.4", "2.11.4"),
   version := "0.2.1-2",
@@ -38,23 +33,8 @@ val sharedSettings = Seq(
       </developers>
 )
 
-
-lazy val repl = project.dependsOn(core).settings(sharedSettings:_*).settings(
-  name := "ammonite-repl",
-  scalaVersion := "2.11.4",
-  libraryDependencies ++= Seq(
-    "org.scala-lang" % "scala-compiler" % scalaVersion.value,
-    "jline" % "jline" % "2.12",
-    "org.scala-lang" % "scala-reflect" % scalaVersion.value,
-    "org.apache.ivy" % "ivy" % "2.4.0"
-  ),
-  javaOptions += "-Xmx2G",
-  fork in (Test, testOnly) := true
-)
-
-lazy val core = project.settings(sharedSettings:_*).settings(
-  name := "ammonite",
-  scalaVersion := "2.11.4",
+lazy val pprint = project.settings(sharedSettings:_*).settings(
+  name := "ammonite-pprint",
   sourceGenerators in Compile <+= sourceManaged in Compile map { dir =>
     val file = dir/"ammonite"/"pprint"/"PPrintGen.scala"
     val tuples = (1 to 22).map{ i =>
@@ -80,4 +60,30 @@ lazy val core = project.settings(sharedSettings:_*).settings(
     IO.write(file, output)
     Seq(file)
   }
+)
+
+lazy val ops = project
+  .dependsOn(pprint)
+  .settings(sharedSettings:_*)
+  .settings(
+    name := "ammonite-ops"
+  )
+
+lazy val tools = project
+  .dependsOn(ops, pprint)
+  .settings(sharedSettings:_*)
+  .settings(
+    name := "ammonite-tools"
+  )
+
+lazy val repl = project.dependsOn(ops).settings(sharedSettings:_*).settings(
+  name := "ammonite-repl",
+  libraryDependencies ++= Seq(
+    "org.scala-lang" % "scala-compiler" % scalaVersion.value,
+    "jline" % "jline" % "2.12",
+    "org.scala-lang" % "scala-reflect" % scalaVersion.value,
+    "org.apache.ivy" % "ivy" % "2.4.0"
+  ),
+  javaOptions += "-Xmx2G",
+  fork in (Test, testOnly) := true
 )

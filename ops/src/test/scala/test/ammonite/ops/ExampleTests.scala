@@ -1,12 +1,7 @@
-package test.ammonite
+package test.ammonite.ops
 
-import ammonite.all._
-import ammonite.ops.{Pipeable, FilterMapExt}
-
+import ammonite.ops._
 import utest._
-
-import scala.collection.generic.{SeqFactory, GenericTraversableTemplate}
-import scala.collection.{TraversableLike, mutable}
 
 object ExampleTests extends TestSuite{
 
@@ -20,7 +15,7 @@ object ExampleTests extends TestSuite{
     }
     'findWc{
       // find . -name '*.txt' | xargs wc -l
-      wd /= 'core/'src/'test/'resources/'testdata
+      wd /= 'ops/'src/'test/'resources/'testdata
 
       val lines = ls.rec(wd) |? (_.ext == "txt") | read.lines | (_.length) sum
 
@@ -46,29 +41,15 @@ object ExampleTests extends TestSuite{
       }
     }
 
-    'grep{
-      import ammonite.pprint.Config.Defaults._
-      val items = Seq(123, 456, 789)
-      items |? grep! "45"
-      items |? grep! "^[123456]+$".r
-      assert(
-        (items |? grep! "45") == Seq(456),
-        (items |? grep! "45".r) == Seq(456),
-        (items |? grep! "[123456]+".r) == Seq(123, 456),
-        (items |? grep! "^[123456]+$".r) == Seq(123, 456),
-        (items |? grep! "[123456]".r) == Seq(123, 456),
-        (items |? grep! "^[123456]$".r) == Seq()
-      )
-    }
     'pprint{
       import ammonite.pprint.Config.Defaults._
 
       assert(
         ammonite.pprint.PPrint(root/'hello/'world).mkString == "root/'hello/'world",
         ammonite.pprint.PPrint('hello/'world).mkString == "'hello/'world",
-        ammonite.pprint.PPrint(empty/'world).mkString == "empty/'world",
+        ammonite.pprint.PPrint(empty/'world).mkString == "'world",
         ammonite.pprint.PPrint(empty/'hello/'world).mkString == "'hello/'world",
-        ammonite.pprint.PPrint(empty/"hello world").mkString == "empty/\"hello world\""
+        ammonite.pprint.PPrint(empty/"hello world").mkString == "\"hello world\""
       )
 
     }

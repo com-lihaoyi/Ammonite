@@ -2,7 +2,7 @@ package test.ammonite.ops
 
 import java.nio.file.Paths
 
-import ammonite.all._
+import ammonite.ops._
 
 import utest._
 object PathTests extends TestSuite{

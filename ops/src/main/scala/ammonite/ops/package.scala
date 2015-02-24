@@ -1,35 +1,8 @@
 package ammonite
-import acyclic.file
-import java.nio.file.Files
-import java.nio.file.attribute.PosixFileAttributes
 
-import ammonite.ops.{RelPath, Path, Op1}
+import scala.collection.Seq
 
-import scala.collection.{Seq, GenTraversableOnce, TraversableLike}
-
-import scala.util.matching.Regex
-object all extends Bundle
-object shell extends Bundle{
-  implicit var wd = processWorkingDir
-
-  object cd extends Op1[RelPath, Path]{
-    def apply(p: RelPath) = {
-      wd /= p
-      wd
-    }
-  }
-}
-trait Bundle extends ops.RelPathStuff with ops.Extensions{
-
-  type BasePath[ThisType <: BasePath[ThisType]] = ops.BasePath[ThisType]
-  val BasePath = ops.BasePath
-  val PathError = ops.PathError
-
-  type Path = ops.Path
-  val Path = ops.Path
-
-  type RelPath = ops.RelPath
-  val RelPath = ops.RelPath
+package object ops extends Extensions with RelPathStuff{
   /**
    * The root of the filesystem
    */
@@ -83,26 +56,5 @@ trait Bundle extends ops.RelPathStuff with ops.Extensions{
     def r = new RegexContext.Interped(sc.parts)
   }
 
-  implicit def fileData(p: Path) = stat.full
-
-  val cp = ops.cp
-  val exists = ops.exists
-  val ln = ops.ln
-  val ls = ops.ls
-  val mkdir = ops.mkdir
-  val mv = ops.mv
-  val read = ops.read
-  val rm = ops.rm
-  val write = ops.write
-
-  val grep = ops.grep
-  val tail = ops.tail
-
-  val kill = ops.kill
-  implicit val stat = ops.stat
-  val tee = ops.tee
-
-  val % = ops.%
-  type % = ops.%
-
+  implicit def fileData(p: Path) = stat.full(p)
 }

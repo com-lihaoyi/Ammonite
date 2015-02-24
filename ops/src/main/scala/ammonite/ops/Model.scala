@@ -89,6 +89,9 @@ object stat extends Op1[ops.Path, ops.stat]{
                   permissions: PermSet,
                   fileType: FileType){
     override def productPrefix = "stat.full"
+    def isDir = fileType == FileType.Dir
+    def isSymLink = fileType == FileType.SymLink
+    def isFile = fileType == FileType.File
   }
 }
 

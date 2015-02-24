@@ -2,7 +2,7 @@ package ammonite.repl
 
 import java.io.{OutputStream, InputStream}
 import java.lang.reflect.InvocationTargetException
-import ammonite.pprint
+import ammonite.{ops, pprint}
 import ammonite.repl.frontend._
 import acyclic.file
 import ammonite.repl.interp.Interpreter
@@ -58,7 +58,7 @@ class Repl(input: InputStream,
 object Repl{
   val defaultPredef = """"""
   def main(args: Array[String]) = {
-    import ammonite.shell._
+    import ammonite.ops._
     val saveFile = home/".amm"
     val delimiter = "\n\n\n"
     val shell = new Repl(

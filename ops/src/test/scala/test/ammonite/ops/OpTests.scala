@@ -2,12 +2,15 @@ package test.ammonite.ops
 
 import java.nio.{file => nio}
 
-import ammonite.all._
+import ammonite.ops._
+
 import utest._
 object OpTests extends TestSuite{
+
   val wd = processWorkingDir
-    val tests = TestSuite {
-    val res = wd/'core/'target/"scala-2.11"/"test-classes"/'testdata
+
+  val tests = TestSuite {
+    val res = wd/'ops/'target/"scala-2.11"/"test-classes"/'testdata
     'ls - assert(
       ls(res).toSet == Set(res/'folder1, res/'folder2, res/"File.txt"),
       ls(res/'folder2).toSet == Set(
