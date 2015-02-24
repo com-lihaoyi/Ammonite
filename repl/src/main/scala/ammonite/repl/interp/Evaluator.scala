@@ -93,20 +93,23 @@ object Evaluator{
      */
     var evalClassloader = new URLClassLoader(Nil, currentClassloader)
 
-    def newClassloader() = evalClassloader = new URLClassLoader(Nil, evalClassloader){
-      override def loadClass(name: String): Class[_] = {
-        if(newFileDict.contains(name)) {
-          val bytes = newFileDict(name)
-          defineClass(name, bytes, 0, bytes.length)
-        }
-        else try currentClassloader.loadClass(name)
-        catch{ case e: ClassNotFoundException =>
-          try this.findClass(name)
+    def newClassloader() = {
+      evalClassloader = new URLClassLoader(Nil, evalClassloader){
+        override def loadClass(name: String): Class[_] = {
+          if(newFileDict.contains(name)) {
+            val bytes = newFileDict(name)
+            defineClass(name, bytes, 0, bytes.length)
+          }
+          else try currentClassloader.loadClass(name)
           catch{ case e: ClassNotFoundException =>
-            super.loadClass(name)
+            try this.findClass(name)
+            catch{ case e: ClassNotFoundException =>
+              super.loadClass(name)
+            }
           }
         }
       }
+      Thread.currentThread().setContextClassLoader(evalClassloader)
     }
     newClassloader()
 
