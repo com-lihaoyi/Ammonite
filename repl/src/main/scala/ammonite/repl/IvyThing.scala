@@ -19,55 +19,66 @@ import org.apache.ivy.plugins.resolver.URLResolver
  */
 object IvyThing {
   def resolveArtifact(groupId: String, artifactId: String, version: String) = {
-    //creates clear ivy settings
-    val ivySettings = new IvySettings()
-
     //url resolver for configuration of maven repo
-    val resolver = new URLResolver()
+    val resolver = {
+      val res = new URLResolver()
+      res.setM2compatible(true)
+      res.setName("central")
+      //you can specify the url resolution pattern strategy
+      res.addArtifactPattern(
+        "http://repo1.maven.org/maven2/[organisation]/" +
+        "[module]/[revision]/[artifact](-[revision]).[ext]"
+      )
+      res
+    }
 
-    resolver.setM2compatible(true)
-    resolver.setName("central")
-    //you can specify the url resolution pattern strategy
-    resolver.addArtifactPattern(
-      "http://repo1.maven.org/maven2/[organisation]/[module]/[revision]/[artifact](-[revision]).[ext]"
-    )
-    //adding maven repo resolver
-    ivySettings.addResolver(resolver)
-    //set to the default resolver
-    ivySettings.setDefaultResolver(resolver.getName())
-    //creates an Ivy instance with settings
-    val ivy = Ivy.newInstance(ivySettings)
+    val ivy = Ivy.newInstance{
+      //creates clear ivy settings
+      val ivySettings = new IvySettings()
+      //adding maven repo resolver
+      ivySettings.addResolver(resolver)
+      //set to the default resolver
+      ivySettings.setDefaultResolver(resolver.getName)
+      //creates an Ivy instance with settings
+      ivySettings
+    }
 
     val ivyfile = File.createTempFile("ivy", ".xml")
     ivyfile.deleteOnExit()
 
-    val dep = Array(groupId, artifactId, version)
-
-    val md =
-      DefaultModuleDescriptor.newDefaultInstance(
-        ModuleRevisionId.newInstance(groupId,
-        artifactId + "-caller", "working")
+    val md = DefaultModuleDescriptor.newDefaultInstance(
+      ModuleRevisionId.newInstance(
+        groupId,
+        artifactId + "-caller",
+        "working"
+      )
     )
 
-    val dd = new DefaultDependencyDescriptor(
-      md,
-      ModuleRevisionId.newInstance(groupId, artifactId, version),
-      false,
-      false,
-      true
+    md.addDependency(
+      new DefaultDependencyDescriptor(
+        md,
+        ModuleRevisionId.newInstance(groupId, artifactId, version),
+        false,
+        false,
+        true
+      )
     )
-
-    md.addDependency(dd)
 
     //creates an ivy configuration file
     XmlModuleDescriptorWriter.write(md, ivyfile)
 
-    val confs = Array("default")
-    val resolveOptions = new ResolveOptions().setConfs(confs).setOutputReport(false)
-
     //init resolve report
-    val report = ivy.resolve(ivyfile.toURL(), resolveOptions)
-
+    val report = ivy.resolve(
+      ivyfile.toURI.toURL,
+      new ResolveOptions().setConfs(Array("default"))
+    )
+    println("----IVY THING----")
+    println(ivyfile)
+    println(report)
+    import collection.JavaConversions._
+    println(report.getDependencies.toSeq)
+    println(report.getUnresolvedDependencies.toSeq)
+    println(report.getAllArtifactsReports.toSeq)
     //so you can get the jar library
     report.getAllArtifactsReports.map(_.getLocalFile)
   }
