@@ -29,6 +29,7 @@ object PPrint extends Internals.LowPriPPrint{
  */
 case class PPrint[A](a: PPrinter[A], cfg: Config){
   def render(t: A): Iterator[String] = {
+    println("PPrint.render " + cfg.depth + "\t" + t)
     if (t == null) Iterator("null")
     else a.render(t, cfg)
   }
@@ -130,7 +131,7 @@ object Unpacker extends PPrinterGen {
    */
   implicit def Product0Unpacker = (t: Unit) => Iterator[Iterator[String]]()
   val foo = 1
-  def render[T: PP](t: T) = implicitly[PPrint[T]].render(t)
+  def render[T: PP](t: T, c: Config) = implicitly[PPrint[T]].copy(cfg=c).render(t)
 }
 
 
@@ -142,19 +143,26 @@ object Internals {
   def makeMapRepr[M[T, V] <: Map[T, V], T: PPrint, V: PPrint] = {
     PPrinter[M[T, V]] { (t: M[T, V], c: Config) =>
       handleChunks(t.stringPrefix, c, c =>
-        t.iterator.map(k => mapEntryPrinter[T, V].render(k, c))
+        t.iterator.map(k =>
+          mapEntryPrinter[T, V](
+            implicitly[PPrint[T]].copy(cfg = c),
+            implicitly[PPrint[V]].copy(cfg = c)
+          ).render(k, c)
+        )
       )
     }
   }
 
   def collectionRepr[T: PPrint, V <: Traversable[T]]: PPrinter[V] = PPrinter[V] {
     (i: V, c: Config) => {
-      val pp = implicitly[PPrint[T]]
-      val newCfg = pp.cfg.copy(depth = pp.cfg.depth + 1)
-      val newPP = pp.copy(cfg = newCfg)
-      def cFunc = (c: Config) => i.toIterator.map(newPP.render)
-      if (!i.isInstanceOf[Stream[T]]) handleChunks(i.stringPrefix, newCfg, cFunc)
-      else handleChunksVertical(i.stringPrefix, newCfg, cFunc)
+      val pp = implicitly[PPrint[T]].copy(cfg = c)
+      println("pp.depth " + pp.cfg.depth)
+      def cFunc = (cfg: Config) => {
+        println("cFunc " + cfg.depth)
+        i.toIterator.map(pp.copy(cfg = cfg).render)
+      }
+      if (!i.isInstanceOf[Stream[T]]) handleChunks(i.stringPrefix, pp.cfg, cFunc)
+      else handleChunksVertical(i.stringPrefix, pp.cfg, cFunc)
     }
   }
 
@@ -194,6 +202,7 @@ object Internals {
   def handleChunksVertical(name: String,
                            c: Config,
                            chunkFunc: Config => Iterator[Iterator[String]]): Iterator[String] = {
+    println(c.depth)
     val renamed = c.rename(name)
     val coloredName = c.color.prefix(renamed)
     val chunks2 = chunkFunc(c.deeper)
@@ -273,7 +282,7 @@ object Internals {
                   ammonite.pprint
                           .Unpacker
                           .$tupleName[..$paramTypes]
-                          .apply($thingy)
+                          .apply($thingy, cfg)
               },
               implicitly[ammonite.pprint.Config]
             )
