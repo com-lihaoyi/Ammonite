@@ -54,6 +54,7 @@ object Evaluator{
      * classloader can get at them.
      */
     val newFileDict = mutable.Map.empty[String, Array[Byte]]
+
     /**
      * Imports which are required by earlier commands to the REPL. Imports
      * have a specified key, so that later imports of the same name (e.g.
@@ -61,17 +62,18 @@ object Evaluator{
      * map. Otherwise if you import the same name twice you get compile
      * errors instead of the desired shadowing.
      */
-    val previousImports = mutable.Map(
+    lazy val previousImports = mutable.Map(
       namesFor(typeOf[ReplAPI]).map(n => n -> ImportData(n, "", "ReplBridge.shell")).toSeq ++
       namesFor(typeOf[ammonite.repl.IvyConstructor]).map(n => n -> ImportData(n, "", "ammonite.repl.IvyConstructor")).toSeq
       :_*
     )
 
+
     /**
      * The current line number of the REPL, used to make sure every snippet
      * evaluated can have a distinct name that doesn't collide.
      */
-    var currentLine = 0
+    var currentLine = -1
 
     /**
      * Weird indirection only necessary because of
@@ -96,6 +98,7 @@ object Evaluator{
      */
     var evalClassloader = new URLClassLoader(Nil, currentClassloader)
 
+
     def newClassloader() = {
       evalClassloader = new URLClassLoader(Nil, evalClassloader){
         override def loadClass(name: String): Class[_] = {
@@ -118,6 +121,7 @@ object Evaluator{
     def addJar(url: URL) = evalClassloader.addURL(url)
 
     def evalClass(code: String, wrapperName: String) = for{
+
       (output, compiled) <- Result.Success{
         val output = mutable.Buffer.empty[String]
         val c = compile(code.getBytes, output.append(_))
@@ -157,7 +161,7 @@ object Evaluator{
     type InvEx = InvocationTargetException
     type InitEx = ExceptionInInitializerError
     def processLine(code: String, printCode: String, printer: Iterator[String] => Unit) = for {
-      wrapperName <- Result.Success("cmd" + currentLine)
+      wrapperName <- Result.Success("cmd" + currentLine.toString.replace('-', '_'))
       (cls, newImports) <- evalClass(
         s"""
         $previousImportBlock

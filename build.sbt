@@ -80,7 +80,9 @@ lazy val tools = project
 
 lazy val repl = project
   .dependsOn(ops)
-  .settings(sharedSettings:_*).settings(
+  .settings(sharedSettings:_*)
+  .settings(
+    test in assembly := {},
     name := "ammonite-repl",
     libraryDependencies ++= Seq(
       "org.scala-lang" % "scala-compiler" % scalaVersion.value,

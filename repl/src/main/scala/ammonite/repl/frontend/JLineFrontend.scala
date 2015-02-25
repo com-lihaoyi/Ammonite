@@ -2,7 +2,7 @@ package ammonite.repl.frontend
 
 import java.io.{OutputStream, InputStream}
 
-import ammonite.repl.{Evaluated, Result}
+import ammonite.repl.{Timer, Evaluated, Result}
 import jline.console.ConsoleReader
 import acyclic.file
 
@@ -25,6 +25,7 @@ object JLineFrontend{
             compilerComplete: => (Int, String) => (Int, Seq[String]),
             initialHistory: Seq[String]): JLineFrontend
             = new JLineFrontend with jline.console.completer.Completer {
+
     val term = new jline.UnixTerminal()
 
     term.init()

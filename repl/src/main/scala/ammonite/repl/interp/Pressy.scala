@@ -1,5 +1,7 @@
 package ammonite.repl.interp
 
+import ammonite.repl.Timer
+
 import scala.reflect.internal.util.{OffsetPosition, BatchSourceFile}
 import scala.reflect.io.VirtualDirectory
 import scala.tools.nsc
@@ -15,6 +17,7 @@ object Pressy {
   def apply(jarDeps: Seq[java.io.File],
             dirDeps: Seq[java.io.File],
             dynamicClasspath: VirtualDirectory): Pressy = new Pressy {
+
     var cachedPressy: nsc.interactive.Global = null
 
     /**

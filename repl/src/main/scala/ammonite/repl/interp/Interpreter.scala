@@ -27,14 +27,15 @@ class Interpreter(handleResult: (String, Result[Evaluated]) => Unit,
   val history = collection.mutable.Buffer.empty[String]
   var buffered = ""
 
-  def processLine(line: String, saveHistory: String => Unit, printer: Iterator[String] => Unit) = for{
+  def processLine(line: String,
+                  saveHistory: (String => Unit, String) => Unit,
+                  printer: Iterator[String] => Unit) = for{
     _ <- Catching { case Ex(x@_*) =>
       val Result.Failure(trace) = Result.Failure(x)
       Result.Failure(trace + "\nSomething unexpected went wrong =(")
     }
     Preprocessor.Output(code, printSnippet) <- preprocess(line, eval.getCurrentLine)
-    _ = history.append(line)
-    _ = saveHistory(line)
+    _ = saveHistory(history.append(_), line)
     oldClassloader = Thread.currentThread().getContextClassLoader
     out <- try{
       Thread.currentThread().setContextClassLoader(eval.evalClassloader)
@@ -78,7 +79,7 @@ class Interpreter(handleResult: (String, Result[Evaluated]) => Unit,
 
       def apply(line: String) = handleOutput(processLine(
         line,
-        _ => (), // Discard history of load-ed lines,
+        (_, _) => (), // Discard history of load-ed lines,
         _.foreach(print)
       ))
 
@@ -119,6 +120,7 @@ class Interpreter(handleResult: (String, Result[Evaluated]) => Unit,
       Classpath.dirDeps,
       dynamicClasspath
     )
+
     val cls = eval.evalClass(
       "object ReplBridge extends ammonite.repl.frontend.ReplAPIHolder{}",
       "ReplBridge"
@@ -139,5 +141,13 @@ class Interpreter(handleResult: (String, Result[Evaluated]) => Unit,
     compiler.compile,
     stdout
   )
+
   init()
+  // Power-On-Self-Test
+  assert(
+    processLine("Seq(123) ++ Seq(456)", (_, _) => (), _ => ()) ==
+    Result.Success(Evaluated("cmd_1",List(
+      ImportData("res_1","cmd_1","cmd_1"), ImportData("res_1","cmd_1","cmd_1")
+    )))
+  )
 }

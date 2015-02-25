@@ -14,7 +14,7 @@ class Checker {
   def run(input: String) = {
     print(".")
     val msg = collection.mutable.Buffer.empty[String]
-    val processed = interp.processLine(interp.buffered + input, _ => (), _.foreach(msg.append(_)))
+    val processed = interp.processLine(interp.buffered + input, _(_), _.foreach(msg.append(_)))
     val printed = processed.map(_ => msg.mkString)
     interp.handleOutput(processed)
     (processed, printed)

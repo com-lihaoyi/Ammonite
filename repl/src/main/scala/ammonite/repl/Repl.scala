@@ -8,6 +8,8 @@ import acyclic.file
 import ammonite.repl.interp.Interpreter
 
 import scala.annotation.tailrec
+import scala.concurrent.{Future, Await}
+import scala.concurrent.duration.Duration
 import scala.util.Try
 
 class Repl(input: InputStream,
@@ -19,9 +21,23 @@ class Repl(input: InputStream,
            saveHistory: String => Unit = _ => (),
            predef: String = Repl.defaultPredef) {
 
-  var shellPrompt = Ref(shellPrompt0)
+  val shellPrompt = Ref(shellPrompt0)
 
-  lazy val frontEnd = JLineFrontend(
+  import concurrent.ExecutionContext.Implicits.global
+
+  // Do this asynchronously and wait on it in the main loop,
+  // so the user can begin entering input even before all this
+  // stuff has finished loading.
+  lazy val interp0: Future[Interpreter] = concurrent.Future(new Interpreter(
+    frontEnd.update,
+    shellPrompt,
+    pprintConfig.copy(maxWidth = frontEnd.width),
+    colorSet
+  ))
+
+  def interp: Interpreter = Await.result(interp0, Duration.Inf)
+
+  val frontEnd = JLineFrontend(
     input,
     output,
     colorSet.prompt + shellPrompt() + Console.RESET,
@@ -30,17 +46,12 @@ class Repl(input: InputStream,
     initialHistory
   )
 
-  lazy val interp: Interpreter = new Interpreter(
-    frontEnd.update,
-    shellPrompt,
-    pprintConfig.copy(maxWidth = frontEnd.width),
-    colorSet
-  )
-
   def action() = for{
-    line <- frontEnd.action(interp.buffered)
+    // Condition to short circuit early if `interp` hasn't finished evaluating
+    line <- frontEnd.action(if (interp0.isCompleted) interp.buffered else "")
+    _ = interp
     _ <- Signaller("INT") { interp.mainThread.stop() }
-    out <- interp.processLine(line, saveHistory, _.foreach(print))
+    out <- interp.processLine(line, (f, x) => {saveHistory(x); f(x)}, _.foreach(print))
   } yield {
     println()
     out
@@ -67,5 +78,6 @@ object Repl{
       saveHistory = s => write.append(home/".amm", s + delimiter)
     )
     shell.run()
+
   }
 }

@@ -2,7 +2,7 @@ package ammonite.repl.interp
 
 
 import acyclic.file
-import ammonite.repl.{ImportData, Parsed}
+import ammonite.repl.{Timer, ImportData, Parsed}
 import scala.collection.mutable
 import scala.reflect.internal.util.{BatchSourceFile, OffsetPosition, Position}
 import scala.reflect.io
@@ -182,7 +182,6 @@ object Compiler{
         else Parsed.Success(trees)
       }
     }
-
   }
 
 }

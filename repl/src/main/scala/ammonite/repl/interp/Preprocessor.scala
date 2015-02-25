@@ -84,7 +84,7 @@ object Preprocessor{
             val start = positions.map(_.start).min
             val end = positions.map(_.end).max
             val suffix = if(parsed.length > 1) "_" + i else ""
-            handleTree(tree, code.substring(start, end), "res" + wrapperId + suffix)
+            handleTree(tree, code.substring(start, end), "res" + wrapperId.toString.replace('-', '_') + suffix)
           }
           Result(
             allDecls.reduceOption((a, b) =>

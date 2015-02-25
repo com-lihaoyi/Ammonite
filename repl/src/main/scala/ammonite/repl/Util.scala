@@ -124,3 +124,11 @@ object Ex{
     Some(rec(t))
   }
 }
+class Timer{
+  var current = System.nanoTime()
+  def apply(s: String) = {
+    val now = System.nanoTime()
+    println(s + ": " + (now - current) / 1000000.0)
+    current = now
+  }
+}
