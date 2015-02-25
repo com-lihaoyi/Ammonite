@@ -33,34 +33,36 @@ val sharedSettings = Seq(
       </developers>
 )
 
-lazy val pprint = project.settings(sharedSettings:_*).settings(
-  name := "ammonite-pprint",
-  sourceGenerators in Compile <+= sourceManaged in Compile map { dir =>
-    val file = dir/"ammonite"/"pprint"/"PPrintGen.scala"
-    val tuples = (1 to 22).map{ i =>
-      val ts = (1 to i) map ("T" + _)
-      val chunks = 1 to i map { n =>
-        s"render(t._$n, cfg)"
+lazy val pprint = project
+  .settings(sharedSettings:_*)
+  .settings(
+    name := "ammonite-pprint",
+    sourceGenerators in Compile <+= sourceManaged in Compile map { dir =>
+      val file = dir/"ammonite"/"pprint"/"PPrintGen.scala"
+      val tuples = (1 to 22).map{ i =>
+        val ts = (1 to i) map ("T" + _)
+        val chunks = 1 to i map { n =>
+          s"render(t._$n, cfg)"
+        }
+        val commaTs = ts.mkString(", ")
+        val tupleType = s"Product$i[$commaTs]"
+        val boundedTypes = ts.map(_ + ": PP").mkString(",")
+        s"""
+        implicit def Product${i}Unpacker[$boundedTypes] = {
+          (t: $tupleType, cfg: C) => Iterator(${chunks.mkString(",")})
+        }
+        """
       }
-      val commaTs = ts.mkString(", ")
-      val tupleType = s"Product$i[$commaTs]"
-      val boundedTypes = ts.map(_ + ": PP").mkString(",")
-      s"""
-      implicit def Product${i}Unpacker[$boundedTypes] = {
-        (t: $tupleType, cfg: C) => Iterator(${chunks.mkString(",")})
-      }
-      """
+      val output = s"""
+        package ammonite.pprint
+        trait PPrinterGen extends GenUtils{
+          ${tuples.mkString("\n")}
+        }
+      """.stripMargin
+      IO.write(file, output)
+      Seq(file)
     }
-    val output = s"""
-      package ammonite.pprint
-      trait PPrinterGen extends GenUtils{
-        ${tuples.mkString("\n")}
-      }
-    """.stripMargin
-    IO.write(file, output)
-    Seq(file)
-  }
-)
+  )
 
 lazy val ops = project
   .dependsOn(pprint)
@@ -76,14 +78,16 @@ lazy val tools = project
     name := "ammonite-tools"
   )
 
-lazy val repl = project.dependsOn(ops).settings(sharedSettings:_*).settings(
-  name := "ammonite-repl",
-  libraryDependencies ++= Seq(
-    "org.scala-lang" % "scala-compiler" % scalaVersion.value,
-    "jline" % "jline" % "2.12",
-    "org.scala-lang" % "scala-reflect" % scalaVersion.value,
-    "org.apache.ivy" % "ivy" % "2.4.0"
-  ),
-  javaOptions += "-Xmx2G",
-  fork in (Test, testOnly) := true
-)
+lazy val repl = project
+  .dependsOn(ops)
+  .settings(sharedSettings:_*).settings(
+    name := "ammonite-repl",
+    libraryDependencies ++= Seq(
+      "org.scala-lang" % "scala-compiler" % scalaVersion.value,
+      "jline" % "jline" % "2.12",
+      "org.scala-lang" % "scala-reflect" % scalaVersion.value,
+      "org.apache.ivy" % "ivy" % "2.4.0"
+    ),
+    javaOptions += "-Xmx2G",
+    fork in (Test, testOnly) := true
+  )

@@ -76,7 +76,7 @@ trait Load extends (String => Unit){
   /**
    * Load a library from its maven/ivy coordinates
    */
-  def ivy(groupId: String, artifactId: String, version: String): Unit
+  def ivy(coordinates: (String, String, String)): Unit
 
   /**
    * Loads a command into the REPL and

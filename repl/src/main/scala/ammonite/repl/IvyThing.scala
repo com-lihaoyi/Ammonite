@@ -10,6 +10,17 @@ import org.apache.ivy.core.settings.IvySettings
 import org.apache.ivy.plugins.parser.xml.XmlModuleDescriptorWriter
 import org.apache.ivy.plugins.resolver.{IBiblioResolver, URLResolver}
 
+object IvyConstructor extends IvyConstructor
+trait IvyConstructor{
+  implicit class GroupIdExt(groupId: String){
+    def %(artifactId: String) = (groupId, artifactId)
+    def %%(artifactId: String) = (groupId, artifactId + "_2.11")
+  }
+  implicit class ArtifactIdExt(t: (String, String)){
+    def %(version: String) = (t._1, t._2, version)
+  }
+}
+
 /**
  * Resolve artifacts from Ivy. Originally taken from
  *

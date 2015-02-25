@@ -62,7 +62,9 @@ object Evaluator{
      * errors instead of the desired shadowing.
      */
     val previousImports = mutable.Map(
-      namesFor(typeOf[ReplAPI]).map(n => n -> ImportData(n, "", "ReplBridge.shell")).toSeq:_*
+      namesFor(typeOf[ReplAPI]).map(n => n -> ImportData(n, "", "ReplBridge.shell")).toSeq ++
+      namesFor(typeOf[ammonite.repl.IvyConstructor]).map(n => n -> ImportData(n, "", "ammonite.repl.IvyConstructor")).toSeq
+      :_*
     )
 
     /**

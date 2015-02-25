@@ -11,7 +11,7 @@ object AdvancedTests extends TestSuite{
       'ivy{
         'standalone{
           check.fail("import scalatags.Text.all._", _.contains("not found: value scalatags"))
-          check("""load.ivy("com.lihaoyi", "scalatags_2.11", "0.4.5")""")
+          check("""load.ivy("com.lihaoyi" %% "scalatags" % "0.4.5")""")
           check("import scalatags.Text.all._", "import scalatags.Text.all._")
           check(
             """a("omg", href:="www.google.com").render""",
@@ -27,13 +27,13 @@ object AdvancedTests extends TestSuite{
 
         'reloading{
           // Make sure earlier-loaded things indeed continue working
-          check("""load.ivy("com.lihaoyi", "scalarx_2.11", "0.2.7")""")
-          check("""load.ivy("com.scalatags", "scalatags_2.11", "0.2.5")""")
+          check("""load.ivy("com.lihaoyi" %%"scalarx" % "0.2.7")""")
+          check("""load.ivy("com.scalatags" %% "scalatags" % "0.2.5")""")
           check(
             """scalatags.all.div("omg").toString""",
             """res2: java.lang.String = "<div>omg</div>""""
           )
-          check("""load.ivy("com.lihaoyi", "scalatags_2.11", "0.4.5")""")
+          check("""load.ivy("com.lihaoyi" %% "scalatags" % "0.4.5")""")
           check(
             """import scalatags.Text.all._; scalatags.Text.all.div("omg").toString""",
             """import scalatags.Text.all._
@@ -45,7 +45,7 @@ object AdvancedTests extends TestSuite{
           check("""x(); y()""", "res8_0: Int = 2\nres8_1: Int = 3")
         }
         'complex{
-          check("""load.ivy("com.typesafe.akka", "akka-http-experimental_2.11", "1.0-M3")""")
+          check("""load.ivy("com.typesafe.akka" %% "akka-http-experimental" % "1.0-M3")""")
           check("""implicit val system = akka.actor.ActorSystem()""")
           check("""val serverBinding = akka.http.Http(system).bind(interface = "localhost", port = 31337)""")
           check("""implicit val materializer = akka.stream.ActorFlowMaterializer()""")
