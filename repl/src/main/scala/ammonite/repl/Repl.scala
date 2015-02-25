@@ -28,7 +28,8 @@ class Repl(input: InputStream,
   // Do this asynchronously and wait on it in the main loop,
   // so the user can begin entering input even before all this
   // stuff has finished loading.
-  lazy val interp0: Future[Interpreter] = concurrent.Future(new Interpreter(
+
+  lazy val interp0: Future[Interpreter] = Future(new Interpreter(
     frontEnd.update,
     shellPrompt,
     pprintConfig.copy(maxWidth = frontEnd.width),
@@ -36,6 +37,16 @@ class Repl(input: InputStream,
   ))
 
   def interp: Interpreter = Await.result(interp0, Duration.Inf)
+
+  def action() = for{
+    // Condition to short circuit early if `interp` hasn't finished evaluating
+    line <- frontEnd.action(if (interp0.isCompleted) interp.buffered else "")
+    _ <- Signaller("INT") { interp.mainThread.stop() }
+    out <- interp.processLine(line, (f, x) => {saveHistory(x); f(x)}, _.foreach(print))
+  } yield {
+    println()
+    out
+  }
 
   val frontEnd = JLineFrontend(
     input,
@@ -45,17 +56,6 @@ class Repl(input: InputStream,
     interp.pressy.complete,
     initialHistory
   )
-
-  def action() = for{
-    // Condition to short circuit early if `interp` hasn't finished evaluating
-    line <- frontEnd.action(if (interp0.isCompleted) interp.buffered else "")
-    _ = interp
-    _ <- Signaller("INT") { interp.mainThread.stop() }
-    out <- interp.processLine(line, (f, x) => {saveHistory(x); f(x)}, _.foreach(print))
-  } yield {
-    println()
-    out
-  }
 
   def run() = {
     @tailrec def loop(): Unit = {
