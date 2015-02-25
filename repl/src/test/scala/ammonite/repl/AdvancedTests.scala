@@ -44,6 +44,28 @@ object AdvancedTests extends TestSuite{
           check("""x() = 2""")
           check("""x(); y()""", "res8_0: Int = 2\nres8_1: Int = 3")
         }
+        'complex{
+          check("""load.ivy("com.typesafe.akka", "akka-http-experimental_2.11", "1.0-M3")""")
+          check("""implicit val system = akka.actor.ActorSystem()""")
+          check("""val serverBinding = akka.http.Http(system).bind(interface = "localhost", port = 31337)""")
+          check("""implicit val materializer = akka.stream.ActorFlowMaterializer()""")
+          check("""var set = false""")
+          check("""
+            serverBinding.connections.runForeach { connection =>
+              set = true
+            }
+          """)
+          check("""set""", "res6: Boolean = false")
+          check("""
+            akka.stream.scaladsl.Source(
+              List(akka.http.model.HttpRequest(uri="/"))
+            ).via(
+              akka.http.Http().outgoingConnection("localhost", port=31337).flow
+            ).runForeach(println)
+          """)
+          check("""system.shutdown()""")
+          check("""set""", "res9: Boolean = true")
+        }
       }
       'code{
         check("""load("val x = 1")""")

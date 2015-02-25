@@ -34,6 +34,7 @@ trait Evaluator{
   def previousImportBlock: String
   def addJar(url: URL): Unit
   def newClassloader(): Unit
+  def evalClassloader: ClassLoader
 }
 
 object Evaluator{
@@ -109,7 +110,6 @@ object Evaluator{
           }
         }
       }
-      Thread.currentThread().setContextClassLoader(evalClassloader)
     }
     newClassloader()
 

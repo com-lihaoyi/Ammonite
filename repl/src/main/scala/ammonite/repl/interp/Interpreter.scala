@@ -35,7 +35,11 @@ class Interpreter(handleResult: (String, Result[Evaluated]) => Unit,
     Preprocessor.Output(code, printSnippet) <- preprocess(line, eval.getCurrentLine)
     _ = history.append(line)
     _ = saveHistory(line)
-    out <- eval.processLine(code, printSnippet, printer)
+    oldClassloader = Thread.currentThread().getContextClassLoader
+    out <- try{
+      Thread.currentThread().setContextClassLoader(eval.evalClassloader)
+      eval.processLine(code, printSnippet, printer)
+    } finally Thread.currentThread().setContextClassLoader(oldClassloader)
   } yield out
 
   def handleOutput(res: Result[Evaluated]) = {

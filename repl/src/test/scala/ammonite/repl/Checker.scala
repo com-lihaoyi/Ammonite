@@ -11,8 +11,6 @@ class Checker {
     Ref[String]("")
   )
 
-
-
   def run(input: String) = {
     print(".")
     val msg = collection.mutable.Buffer.empty[String]
