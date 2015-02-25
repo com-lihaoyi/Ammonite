@@ -28,6 +28,8 @@ trait Extensions{
   implicit class iterShow[T](t: Iterator[T]){
     def !! = t.foreach(println)
   }
+
+  implicit def RegexContextMaker(s: StringContext) = new RegexContext(s)
 }
 
 object Extensions extends Extensions
@@ -93,4 +95,22 @@ class FilterMapExt2[+T](i: Iterator[T]){
    * Alias for `reduce`
    */
   def |&[A1 >: T](op: (A1, A1) => A1): A1 = i.reduceLeft(op)
+}
+
+object RegexContext{
+  class Interped(parts: Seq[String]){
+    def unapplySeq(s: String) = {
+      val Seq(head, tail@_*) = parts.map(java.util.regex.Pattern.quote)
+
+      val regex = head + tail.map("(.*)" + _).mkString
+      regex.r.unapplySeq(s)
+    }
+  }
+}
+
+/**
+ * Lets you pattern match strings with interpolated glob-variables
+ */
+class RegexContext(sc: StringContext) {
+  def r = new RegexContext.Interped(sc.parts)
 }

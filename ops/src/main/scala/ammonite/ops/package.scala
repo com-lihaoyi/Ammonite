@@ -38,23 +38,7 @@ package object ops extends Extensions with RelPathStuff{
       else None
     }
   }
-  object RegexContext{
-    class Interped(parts: Seq[String]){
-      def unapplySeq(s: String) = {
-        val Seq(head, tail@_*) = parts.map(java.util.regex.Pattern.quote)
 
-        val regex = head + tail.map("(.*)" + _).mkString
-        regex.r.unapplySeq(s)
-      }
-    }
-  }
-
-  /**
-   * Lets you pattern match strings with interpolated glob-variables
-   */
-  implicit class RegexContext(sc: StringContext) {
-    def r = new RegexContext.Interped(sc.parts)
-  }
 
   implicit def fileData(p: Path) = stat.full(p)
 }
