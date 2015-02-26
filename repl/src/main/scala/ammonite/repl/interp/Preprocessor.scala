@@ -81,6 +81,7 @@ object Preprocessor{
     )
 
     def apply(code: String, wrapperId: Int): Result[Preprocessor.Output] = {
+
       parse(code) match {
         case Parsed.Incomplete => Result.Buffer(code)
         case Parsed.Error(msg) => Result.Failure(msg)
@@ -89,20 +90,22 @@ object Preprocessor{
           def handleTree(t: Global#Tree, c: String, name: String) = {
             decls.iterator.flatMap(_.apply(c, name, t)).next()
           }
-          val zipped = parsed.zipWithIndex
-          val allDecls = for((tree, i) <- zipped) yield {
-            // _.pos.start doesn't work, we need to recurse into the trees
-            // to find the position we want, which _.collect does for us
-            val positions = tree.collect{case x => x.pos}.filter(_ != NoPosition)
-            val start = positions.map(_.start).min
-            val end = positions.map(_.end).max
+          val splitted = new scalaParser.Scala(code){
+            def Split = {
+              def Prelude = rule( Annot.* ~ `implicit`.? ~ `lazy`.? ~ LocalMod.* )
+              rule( capture(Import | Prelude ~ BlockDef | StatCtx.Expr).+(Semis) )
+            }
+          }
+          val postSplit = splitted.Split.run().get
+          val zipped = parsed.zipAll(postSplit, null, "").zipWithIndex
+          val allDecls = for(((tree, code), i) <- zipped) yield {
             val suffix = if(parsed.length > 1) "_" + i else ""
-            handleTree(tree, code.substring(start, end), "res" + wrapperId + suffix)
+            handleTree(tree, code, "res" + wrapperId + suffix)
           }
           Result(
-            allDecls.reduceOption((a, b) =>
+            allDecls.reduceOption { (a, b) =>
               Output(
-                a.code+";"+b.code,
+                a.code + ";" + b.code,
                 (a.printer, b.printer) match {
                   case (None, None) => None
                   case (None, b) => b
@@ -110,7 +113,7 @@ object Preprocessor{
                   case (Some(a), Some(b)) => Some(a + "++ Iterator(\"\\n\") ++" + b)
                 }
               )
-            ),
+            },
             "Don't know how to handle " + code
           )
       }

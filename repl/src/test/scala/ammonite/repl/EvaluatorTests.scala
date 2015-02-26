@@ -288,22 +288,16 @@ object EvaluatorTests extends TestSuite{
         @ 1
         @ )
         res1: Int = 2
-      """)
 
-      // Parsing problems =/ range positions
-      // dont give the right places
-//      check.session("""
-//      | @ (
-//      |        @ (123.0).round
-//      |        @        .toChar
-//      |        @ )
-//      |        res0: Int = 906609
-//      """)
-//      https://issues.scala-lang.org/browse/SI-8859
-//      check(
-//        "Seq(0) map {_ + 1}",
-//        "res0: Seq[Int] = List(1)"
-//      )
+        @ (
+        @ (123.0).round
+        @        .toChar
+        @ )
+        res2: Char = '{'
+
+        @ Seq(0) map {_ + 1}
+        res3: Seq[Int] = List(1)
+      """)
     }
   }
 }

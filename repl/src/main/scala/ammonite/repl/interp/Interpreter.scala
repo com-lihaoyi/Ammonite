@@ -39,7 +39,7 @@ class Interpreter(handleResult: (String, Result[Evaluated]) => Unit,
     oldClassloader = Thread.currentThread().getContextClassLoader
     out <- try{
       Thread.currentThread().setContextClassLoader(eval.evalClassloader)
-      eval.processLine(code, printSnippet.getOrElse(""), printer)
+      eval.processLine(code, printSnippet.getOrElse("Iterator()"), printer)
     } finally Thread.currentThread().setContextClassLoader(oldClassloader)
   } yield out
 
