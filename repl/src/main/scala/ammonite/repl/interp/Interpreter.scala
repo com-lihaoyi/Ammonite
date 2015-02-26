@@ -144,8 +144,11 @@ class Interpreter(handleResult: (String, Result[Evaluated]) => Unit,
 
   init()
   // Power-On-Self-Test
+  //
+  // Also serves to warm up the cache (asynchronously!) so if the user
+  // takes some time to enter the first command, things will be fast
   assert(
-    processLine("Seq(123) ++ Seq(456)", (_, _) => (), _ => ()) ==
+    processLine("123", (_, _) => (), _ => ()) ==
     Result.Success(Evaluated("cmd_1",List(
       ImportData("res_1","cmd_1","cmd_1"), ImportData("res_1","cmd_1","cmd_1")
     )))
