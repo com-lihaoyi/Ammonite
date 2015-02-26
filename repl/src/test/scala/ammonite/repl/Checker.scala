@@ -22,7 +22,7 @@ class Checker {
 
       val expected = resultLines.mkString("\n").trim
       for(line <- commandText.init) {
-        allOutput += "@ " + line
+        allOutput += "\n@ " + line
         val (processed, printed) = run(line)
         failLoudly(assert(processed.isInstanceOf[Result.Buffer]))
         interp.handleOutput(processed)
@@ -36,12 +36,14 @@ class Checker {
   }
 
   def run(input: String) = {
-    allOutput += "@ " + input
+    println("RUNNING")
+    println(input)
     print(".")
     val msg = collection.mutable.Buffer.empty[String]
     val processed = interp.processLine(interp.buffered + input, _(_), _.foreach(msg.append(_)))
     val printed = processed.map(_ => msg.mkString)
-    allOutput += "\n" + printed
+    if (!printed.isInstanceOf[Result.Buffer])
+      allOutput += "\n" + printed
     interp.handleOutput(processed)
     (processed, printed)
   }

@@ -268,8 +268,15 @@ object EvaluatorTests extends TestSuite{
 
 
     }
+
     'parsingProblems{
       check.session("""
+        @ (
+        @ (123.0).round
+        @        .toChar
+        @ )
+        res0: Int = 906609
+
         @ (1 + 1)
         res0: Int = 2
 
