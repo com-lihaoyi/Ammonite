@@ -73,7 +73,7 @@ object Evaluator{
      * The current line number of the REPL, used to make sure every snippet
      * evaluated can have a distinct name that doesn't collide.
      */
-    var currentLine = -1
+    var currentLine = 0
 
     /**
      * Weird indirection only necessary because of
@@ -161,7 +161,7 @@ object Evaluator{
     type InvEx = InvocationTargetException
     type InitEx = ExceptionInInitializerError
     def processLine(code: String, printCode: String, printer: Iterator[String] => Unit) = for {
-      wrapperName <- Result.Success("cmd" + currentLine.toString.replace('-', '_'))
+      wrapperName <- Result.Success("cmd" + currentLine)
       (cls, newImports) <- evalClass(
         s"""
         $previousImportBlock
