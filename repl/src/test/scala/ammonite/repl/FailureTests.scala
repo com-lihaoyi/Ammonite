@@ -8,9 +8,16 @@ object FailureTests extends TestSuite{
   val tests = TestSuite{
     val check = new Checker()
     'compileFailure {
-      check.fail("doesnt_exist", _.contains("not found: value doesnt_exist"))
-      check.fail("java", _.contains("package java is not a value"))
-      check.fail("def def", _.contains("identifier expected but 'def' found"))
+      check.session("""
+        @ doesnt_exist
+        error: not found: value doesnt_exist
+
+        @ java
+        error: package java is not a value
+
+        @ def def
+        error: identifier expected but 'def' found
+      """)
     }
     'compilerCrash{
       // Make sure compiler crashes provide the appropiate error
