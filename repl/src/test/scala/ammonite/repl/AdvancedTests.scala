@@ -63,8 +63,9 @@ object AdvancedTests extends TestSuite{
               akka.http.Http().outgoingConnection("localhost", port=31337).flow
             ).runForeach(println)
           """)
+          check("""Thread.sleep(200)""")
           check("""system.shutdown()""")
-          check("""set""", "res9: Boolean = true")
+          check("""set""", "res10: Boolean = true")
         }
       }
       'code{
