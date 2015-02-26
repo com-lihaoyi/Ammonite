@@ -176,7 +176,8 @@ object Compiler{
       val p = r.parsing
       p.withIncompleteHandler((_, _) => isIncomplete = true) {
         reporter.reset()
-        val trees = compiler.newUnitParser(line).parseStats()
+        val parser = compiler.newUnitParser(line)
+        val trees = parser.parseStats()
         if (reporter.hasErrors) Parsed.Error(out.mkString("\n"))
         else if (isIncomplete) Parsed.Incomplete
         else Parsed.Success(trees)

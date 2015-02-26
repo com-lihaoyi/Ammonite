@@ -16,7 +16,16 @@ trait Preprocessor{
   def apply(code: String, wrapperId: Int): Result[Preprocessor.Output]
 }
 object Preprocessor{
+
   case class Output(code: String, printer: Option[String])
+
+  class ScalaParserX(x: org.parboiled2.ParserInput) extends scalaParser.Scala(x){
+    def Body = rule( `=` ~ `macro`.? ~ StatCtx.Expr | OneNLMax ~ '{' ~ Block ~ "}" )
+    def FunDef = rule( `def` ~ FunSig ~ (`:` ~ Type).? ~ Body )
+    def DefId = rule(
+      `object` | `def` | `type`
+    )
+  }
   def apply(parse: => String => Parsed): Preprocessor = new Preprocessor{
     def Processor(cond: PartialFunction[(String, String, Global#Tree), Preprocessor.Output]) = {
       (code: String, name: String, tree: Global#Tree) => cond.lift(name, code, tree)
