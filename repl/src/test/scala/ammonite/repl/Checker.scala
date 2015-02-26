@@ -36,9 +36,9 @@ class Checker {
   }
 
   def run(input: String) = {
-    println("RUNNING")
-    println(input)
-    print(".")
+//    println("RUNNING")
+//    println(input)
+//    print(".")
     val msg = collection.mutable.Buffer.empty[String]
     val processed = interp.processLine(interp.buffered + input, _(_), _.foreach(msg.append(_)))
     val printed = processed.map(_ => msg.mkString)
