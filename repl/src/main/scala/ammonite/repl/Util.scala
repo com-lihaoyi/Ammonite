@@ -95,6 +95,9 @@ object Parsed{
   case class Success(trees: List[Global#Tree]) extends Parsed
 }
 
+/**
+ * Encapsulates a read-write cell that can be passed around
+ */
 trait Ref[T]{
   def apply(): T
   def update(t: T): Unit
