@@ -16,7 +16,7 @@ trait Preprocessor{
   def apply(code: String, wrapperId: Int): Result[Preprocessor.Output]
 }
 object Preprocessor{
-  case class Output(code: String, printer: String)
+  case class Output(code: String, printer: Option[String])
   def apply(parse: => String => Parsed): Preprocessor = new Preprocessor{
     def Processor(cond: PartialFunction[(String, String, Global#Tree), Preprocessor.Output]) = {
       (code: String, name: String, tree: Global#Tree) => cond.lift(name, code, tree)
@@ -34,7 +34,7 @@ object Preprocessor{
     def DefProcessor(definitionLabel: String)(cond: PartialFunction[Global#Tree, String]) =
       (code: String, name: String, tree: Global#Tree) =>
         cond.lift(tree).map{
-          name => Preprocessor.Output(code, definedStr(definitionLabel, name))
+          name => Preprocessor.Output(code, Some(definedStr(definitionLabel, name)))
         }
 
     val ObjectDef = DefProcessor("object"){case m: Global#ModuleDef => m.name.toString}
@@ -51,16 +51,20 @@ object Preprocessor{
     val PatVarDef = Processor { case (name, code, t: Global#ValDef) =>
       Preprocessor.Output(
         code,
-        if (!t.mods.hasFlag(Flags.LAZY)) pprint(t.name.toString)
-        else  s"""${pprintSignature(t.name.toString)} ++ Iterator(" = <lazy>")"""
+        // Try to leave out all synthetics; we don't actually have proper
+        // synthetic flags right now, because we're dumb-parsing it and not putting
+        // it through a full compilation
+        if (t.name.decoded.contains("$")) None
+        else if (!t.mods.hasFlag(Flags.LAZY)) Some(pprint(t.name.toString))
+        else Some(s"""${pprintSignature(t.name.toString)} ++ Iterator(" = <lazy>")""")
       )
     }
 
     val Expr = Processor{ case (name, code, tree) =>
-      Preprocessor.Output(s"val $name = ($code)", pprint(name))
+      Preprocessor.Output(s"val $name = ($code)", Some(pprint(name)))
     }
     val Import = Processor{ case (name, code, tree: Global#Import) =>
-      Preprocessor.Output(code, s"""Iterator("$code")""")
+      Preprocessor.Output(code, Some(s"""Iterator("$code")"""))
     }
 
     val decls = Seq[(String, String, Global#Tree) => Option[Preprocessor.Output]](
@@ -88,7 +92,15 @@ object Preprocessor{
           }
           Result(
             allDecls.reduceOption((a, b) =>
-              Output(a.code+";"+b.code, a.printer+ "++ Iterator(\"\\n\") ++" + b.printer)
+              Output(
+                a.code+";"+b.code,
+                (a.printer, b.printer) match {
+                  case (None, None) => None
+                  case (None, b) => b
+                  case (a, None) => a
+                  case (Some(a), Some(b)) => Some(a + "++ Iterator(\"\\n\") ++" + b)
+                }
+              )
             ),
             "Don't know how to handle " + code
           )

@@ -40,9 +40,11 @@ class AmmonitePlugin(g: scala.tools.nsc.Global, output: Seq[ImportData] => Unit)
             case (ctx, t @ g.TypeDef(_, _, _, _))       => (t.symbol, "") :: ctx
             case (ctx, _) => ctx
           }
+
           output(
             for {
               (sym, importString) <- symbols
+              if !sym.isSynthetic
               name = sym.encodedName.trim
               if name != "<init>"
               if name != "<clinit>"

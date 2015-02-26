@@ -265,18 +265,20 @@ object EvaluatorTests extends TestSuite{
         @ C()
         res4: cmd3.C = C(0)
       """)
-
-
     }
 
+    'multiassign{
+      check.session("""
+        @ val (a, b) = (1, 2)
+        a: Int = 1
+        b: Int = 2
+
+        @ a
+        res1: Int = 1
+      """)
+    }
     'parsingProblems{
       check.session("""
-        @ (
-        @ (123.0).round
-        @        .toChar
-        @ )
-        res0: Int = 906609
-
         @ (1 + 1)
         res0: Int = 2
 
@@ -287,6 +289,16 @@ object EvaluatorTests extends TestSuite{
         @ )
         res1: Int = 2
       """)
+
+      // Parsing problems =/ range positions
+      // dont give the right places
+//      check.session("""
+//      | @ (
+//      |        @ (123.0).round
+//      |        @        .toChar
+//      |        @ )
+//      |        res0: Int = 906609
+//      """)
 //      https://issues.scala-lang.org/browse/SI-8859
 //      check(
 //        "Seq(0) map {_ + 1}",
