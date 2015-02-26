@@ -90,6 +90,6 @@ lazy val repl = project
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
       "org.apache.ivy" % "ivy" % "2.4.0"
     ),
-    javaOptions += "-Xmx2G"/*,
-    fork in (Test, testOnly) := true*/
+    javaOptions += "-Xmx2G",
+    fork in (Test, testOnly) := true
   )

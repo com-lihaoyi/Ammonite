@@ -6,7 +6,12 @@ import utest._
 
 
 class Checker {
-  val interp = new Interpreter((_, _) => (), Ref[String](""))
+  var allOutput = ""
+  val interp = new Interpreter(
+    (_, _) => (),
+    Ref[String](""),
+    stdout = allOutput += _
+  )
 
   def session(sess: String): Unit ={
     val margin = sess.lines.filter(_.trim != "").map(_.takeWhile(_ == ' ').length).max
@@ -17,8 +22,9 @@ class Checker {
 
       val expected = resultLines.mkString("\n").trim
       for(line <- commandText.init) {
+        allOutput += "@ " + line
         val (processed, printed) = run(line)
-        assert(processed.isInstanceOf[Result.Buffer])
+        failLoudly(assert(processed.isInstanceOf[Result.Buffer]))
         interp.handleOutput(processed)
       }
       if (expected.startsWith("error: ")){
@@ -30,33 +36,46 @@ class Checker {
   }
 
   def run(input: String) = {
+    allOutput += "@ " + input
     print(".")
     val msg = collection.mutable.Buffer.empty[String]
     val processed = interp.processLine(interp.buffered + input, _(_), _.foreach(msg.append(_)))
     val printed = processed.map(_ => msg.mkString)
+    allOutput += "\n" + printed
     interp.handleOutput(processed)
     (processed, printed)
   }
+
   def apply(input: String,
             expected: String = null) = {
     val (processed, printed) = run(input)
-
     if (expected != null){
       val expectedRes = Result.Success(expected.trim)
-      assert(printed == expectedRes)
+      failLoudly(assert(printed == expectedRes))
     }
   }
+
   def fail(input: String,
            failureCheck: String => Boolean = _ => true) = {
     val (processed, printed) = run(input)
 
     printed match{
-      case Result.Success(v) => assert({v; false})
-      case Result.Failure(s) => assert(failureCheck(s))
+      case Result.Success(v) => assert({v; allOutput; false})
+      case Result.Failure(s) =>
+
+        failLoudly(assert(failureCheck(s)))
     }
   }
+
   def result(input: String, expected: Result[Evaluated]) = {
     val (processed, printed) = run(input)
     assert(processed == expected)
   }
+  def failLoudly[T](t: => T) = try{
+      t
+  } catch{ case e: utest.AssertionError =>
+    println("FAILURE TRACE\n" + allOutput)
+    throw e
+  }
+
 }
