@@ -1,3 +1,4 @@
+scalaVersion := "2.11.4"
 val sharedSettings = Seq(
   scalaVersion := "2.11.5",
   organization := "com.lihaoyi",

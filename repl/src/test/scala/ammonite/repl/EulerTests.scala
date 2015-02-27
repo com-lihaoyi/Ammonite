@@ -388,26 +388,41 @@ object EulerTests extends TestSuite{
       """)
     }
 
-  // Need to download data
-//    'p18 {
-//      // Find the maximum sum travelling from the top of the triangle to the base.*
-//      val data = ""
-//      check.session(s"""
-//        @ val s = "$data"
-//
-//        @ val grid = s.trim.split("\n").map(_.split("{"""\\s+"""}").map(_.toInt))
-//
-//        @ def f(rows: Array[Array[Int]], bottom: Seq[Int]): Int = {
-//        @  val ms = bottom.zip(bottom.tail).map(p => p._1 max p._2)
-//        @  val ss = rows.last.zip(ms).map(p => p._1 + p._2)
-//        @  if (ss.size == 1) ss.head else f(rows.init, ss)
-//        @ }
-//
-//        @ val r = f(grid.init, grid.last)
-//
-//        @ assert(r == 1074) // 2 ms
-//      """)
-//    }
+
+    'p18 {
+      // Find the maximum sum travelling from the top of the triangle to the base.*
+      val data = """75
+                   |95 64
+                   |17 47 82
+                   |18 35 87 10
+                   |20 04 82 47 65
+                   |19 01 23 75 03 34
+                   |88 02 77 73 07 63 67
+                   |99 65 04 28 06 16 70 92
+                   |41 41 26 56 83 40 80 70 33
+                   |41 48 72 33 47 32 37 16 94 29
+                   |53 71 44 65 25 43 91 52 97 51 14
+                   |70 11 33 28 77 73 17 78 39 68 17 57
+                   |91 71 52 38 17 14 91 43 58 50 27 29 48
+                   |63 66 04 68 89 53 67 30 73 16 69 87 40 31
+                   |04 62 98 27 23 09 70 98 73 93 38 53 60 04 23""".stripMargin.replace("\n", "|")
+
+      check.session(s"""
+        @ val s = "$data"
+
+        @ val grid = s.trim.split("|").map(_.split(" ").map(_.toInt))
+
+        @ def f(rows: Array[Array[Int]], bottom: Seq[Int]): Int = {
+        @  val ms = bottom.zip(bottom.tail).map(p => p._1 max p._2)
+        @  val ss = rows.last.zip(ms).map(p => p._1 + p._2)
+        @  if (ss.size == 1) ss.head else f(rows.init, ss)
+        @ }
+
+        @ val r = f(grid.init, grid.last)
+
+        @ assert(r == 1074) // 2 ms
+      """)
+    }
     'p19 {
       //How many Sundays fell on the first of the month during the twentieth century?*
       check.session("""
@@ -450,43 +465,80 @@ object EulerTests extends TestSuite{
         r: Int = 31626
       """)
     }
-    // Need to download data file
-//    'p22{
-//      // What is the total of all the name scores in the file of first names?*
-//      check.session("""
-//        @ val r = {
-//        @  io.Source
-//        @    .fromFile("names.txt")
-//        @    .mkString
-//        @    .split(",")
-//        @    .map(_.init.tail).sorted.map(_.map(_ - 64).sum)
-//        @    .zipWithIndex.map(p => p._1 * (p._2 + 1)).sum
-//        @ }
-//        r: Int = 871198282
-//      """)
-//    }
+    'p22{
+      // Smaller than the real dataset, because the real dataset
+      // is too big to copy & paste into the unit test code.
+      val data = "\"\"\"" + """
+        "MARY","PATRICIA","LINDA","BARBARA","ELIZABETH","JENNIFER","MARIA",
+        "SUSAN","MARGARET","DOROTHY","LISA","NANCY","KAREN","BETTY","HELEN",
+        "SANDRA","DONNA","CAROL","RUTH","SHARON","MICHELLE","LAURA","SARAH",
+        "KIMBERLY","DEBORAH","JESSICA","SHIRLEY","CYNTHIA","ANGELA","MELISSA",
+        "BRENDA","AMY","ANNA","REBECCA","VIRGINIA","KATHLEEN","PAMELA",
+        "MARTHA","DEBRA","AMANDA","STEPHANIE","CAROLYN","CHRISTINE","MARIE",
+        "JANET","CATHERINE","FRANCES","ANN","JOYCE","DIANE","ALICE","JULIE",
+        "HEATHER","TERESA","DORIS","GLORIA","EVELYN","JEAN","CHERYL","MILDRED",
+        "KATHERINE","JOAN","ASHLEY","JUDITH","ROSE","JANICE","KELLY","NICOLE",
+        "JUDY","CHRISTINA","KATHY","THERESA","BEVERLY","DENISE","TAMMY",
+        "IRENE","JANE","LORI","RACHEL","MARILYN","ANDREA","KATHRYN","LOUISE",
+        "SARA","ANNE","JACQUELINE","WANDA","BONNIE","JULIA","RUBY","LOIS",
+        "TINA","PHYLLIS","NORMA","PAULA","DIANA","ANNIE","LILLIAN","EMILY",
+        "ROBIN","PEGGY","CRYSTAL","GLADYS","RITA","DAWN","CONNIE","FLORENCE",
+        "TRACY","EDNA","TIFFANY","CARMEN","ROSA","CINDY","GRACE","WENDY",
+        "VICTORIA","EDITH","KIM","SHERRY","SYLVIA","JOSEPHINE","THELMA",
+        "SHANNON","SHEILA","ETHEL","ELLEN","ELAINE","MARJORIE","CARRIE",
+        "CHARLOTTE","MONICA","ESTHER","PAULINE","EMMA","JUANITA","ANITA",
+        "RHONDA","HAZEL","AMBER","EVA","DEBBIE","APRIL","LESLIE","CLARA",
+        "LUCILLE","JAMIE","JOANNE","ELEANOR","VALERIE","DANIELLE","MEGAN",
+        "ALICIA","SUZANNE","MICHELE","GAIL","BERTHA","DARLENE","VERONICA",
+        "JILL","ERIN","GERALDINE","LAUREN","CATHY","JOANN","LORRAINE","LYNN",
+        "SALLY","REGINA","ERICA","BEATRICE","DOLORES","BERNICE","AUDREY",
+        "YVONNE","ANNETTE","JUNE","SAMANTHA","MARION","DANA","STACY","ANA",
+        "RENEE","IDA","VIVIAN","ROBERTA","HOLLY","BRITTANY","MELANIE",
+        "LORETTA","YOLANDA","JEANETTE","LAURIE","KATIE","KRISTEN","VANESSA",
+        "ALMA","SUE","ELSIE","BETH","JEANNE","VICKI","CARLA","TARA","ROSEMARY",
+        "EILEEN","TERRI","GERTRUDE","LUCY","TONYA","ELLA","STACEY","WILMA",
+        "GINA","KRISTIN","JESSIE","NATALIE","AGNES","VERA","WILLIE","CHARLENE",
+        "BESSIE","DELORES","MELINDA","PEARL","ARLENE","MAUREEN","COLLEEN",
+        "ALLISON","TAMARA","JOY","GEORGIA","CONSTANCE","LILLIE","CLAUDIA",
+        "JACKIE","MARCIA","TANYA","NELLIE","MINNIE","MARLENE","HEIDI","GLENDA",
+        "LYDIA","VIOLA","COURTNEY","MARIAN","STELLA","CAROLINE","DORA","JO",
+        "VICKIE","MATTIE","TERRY","MAXINE","IRMA","MABEL","MARSHA","MYRTLE",
+        "LENA","CHRISTY","DEANNA","PATSY","HILDA","GWENDOLYN","JENNIE"
+      """.replaceAll(" |\\n", "") + "\"\"\""
+      // What is the total of all the name scores in the file of first names?*
+      check.session(s"""
+        @ val r = {
+        @  $data
+        @    .mkString
+        @    .split(",")
+        @    .map(_.init.tail).sorted.map(_.map(_ - 64).sum)
+        @    .zipWithIndex.map(p => p._1 * (p._2 + 1)).sum
+        @ }
+        r: Int = 2260261
+      """)
+    }
 
-    // Seems to loop forever
-//    'p23{
-//      // Find the sum of all the positive integers which cannot
-//      // be written as the sum of two abundant numbers.*
-//      check.session("""
-//        @ val as = {
-//        @ (0 to 28123).map(n => (1 to (n / 2))
-//        @             .filter(n % _ == 0).sum)
-//        @             .zipWithIndex
-//        @             .filter(p => p._1 > p._2)
-//        @             .map(_._2)
-//        @ }
-//
-//        @ val exc = as.view.flatMap { a =>
-//        @   as.takeWhile(_ <= (28123 - a)).map(a +)
-//        @ }
-//
-//        @ val r = (1 to 28123 diff exc).sum
-//        r: Int = 4179871
-//      """)
-//    }
+    'p23{
+      // Find the sum of all the positive integers which cannot
+      // be written as the sum of two abundant numbers.*
+      check.session("""
+        @ val as = {
+        @ (0 to 28123).map(n => (1 to (n / 2))
+        @             .filter(n % _ == 0).sum)
+        @             .zipWithIndex
+        @             .filter(p => p._1 > p._2)
+        @             .map(_._2)
+        @ }
+
+        @ val r = {
+        @   val exc = as.flatMap { a =>
+        @     as.takeWhile(_ <= (28123 - a)).map(a +)
+        @   }
+        @   (1 to 28123 diff exc).sum
+        @ }
+        r: Int = 4179871
+      """)
+    }
 
     'p24{
       // What is the millionth lexicographic permutation of the digits
@@ -524,27 +576,24 @@ object EulerTests extends TestSuite{
         r: Int = 983
       """)
     }
-    // Seems to take forever
-//    'p27{
-//      // Find a quadratic formula that produces the maximum number of
-//      // primes for consecutive values of n.*
-//      check.session("""
-//        @ lazy val ps: Stream[Int] = 2 #:: Stream.from(3).filter(i =>
-//        @   ps.takeWhile(j => j * j <= i).forall(i % _ > 0))
-//
-//        @ def isPrime(n: Int) = ps.view.takeWhile(_ <= n).contains(n)
-//
-//        @ val ns = (-999 until 1000).flatMap { a =>
-//        @   (-999 until 1000).map(b => (a, b, (0 to 1000).view
-//        @     .takeWhile(n => isPrime(n * n + a * n + b)).size))
-//        @ }
-//
-//        @ val t = ns.reduceLeft((a, b) => if(a._3 > b._3) a else b)
-//
-//        @ val r = t._1 * t._2
-//        r: Int = -59231
-//      """)
-//    }
+    'p27{
+      // Find a quadratic formula that produces the maximum number of
+      // primes for consecutive values of n.*
+      check.session("""
+        @ val r = {
+        @   lazy val ps: Stream[Int] = 2 #:: Stream.from(3).filter(i =>
+        @     ps.takeWhile(j => j * j <= i).forall(i % _ > 0))
+        @   def isPrime(n: Int) = ps.view.takeWhile(_ <= n).contains(n)
+        @   val ns = (-999 until 1000).flatMap { a =>
+        @     (-999 until 1000).map(b => (a, b, (0 to 1000).view
+        @       .takeWhile(n => isPrime(n * n + a * n + b)).size))
+        @   }
+        @   val t = ns.reduceLeft((a, b) => if(a._3 > b._3) a else b)
+        @   t._1 * t._2
+        @ }
+        r: Int = -59231
+      """)
+    }
 
     'p28{
       // What is the sum of both diagonals in a 1001 by 1001 spiral?*
