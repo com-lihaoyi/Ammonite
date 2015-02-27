@@ -2,7 +2,7 @@ package ammonite.repl.interp
 
 
 import acyclic.file
-import ammonite.repl.{Timer, ImportData, Parsed}
+import ammonite.repl.{Timer, ImportData}
 import scala.collection.mutable
 import scala.reflect.internal.util.{BatchSourceFile, OffsetPosition, Position}
 import scala.reflect.io
@@ -33,7 +33,7 @@ import scala.tools.nsc.util._
  */
 trait Compiler{
   def compile(src: Array[Byte], runLogger: String => Unit): Compiler.Output
-  def parse(line: String): Parsed
+  def parse(line: String): Either[String, Seq[Global#Tree]]
 }
 object Compiler{
   /**
@@ -162,26 +162,18 @@ object Compiler{
       }
     }
 
-    /**
-     * Weird hack, stolen from ILoop, used to parse snippets of code while
-     * letting us know if it's incomplete (vs just blowing up)
-     */
-    def parse(line: String): Parsed = {
+    def parse(line: String): Either[String, Seq[Global#Tree]]= {
       var isIncomplete = false
 
       val out = mutable.Buffer.empty[String]
       logger = out.append(_)
       val r = compiler.currentRun
-
       val p = r.parsing
-      p.withIncompleteHandler((_, _) => isIncomplete = true) {
-        reporter.reset()
-        val parser = compiler.newUnitParser(line)
-        val trees = parser.parseStats()
-        if (reporter.hasErrors) Parsed.Error(out.mkString("\n"))
-        else if (isIncomplete) Parsed.Incomplete
-        else Parsed.Success(trees)
-      }
+      reporter.reset()
+      val parser = compiler.newUnitParser(line)
+      val trees = parser.parseStatsOrPackages()
+      if (reporter.hasErrors) Left(out.mkString("\n"))
+      else Right(trees)
     }
   }
 

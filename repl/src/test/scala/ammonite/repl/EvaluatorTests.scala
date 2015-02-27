@@ -243,7 +243,7 @@ object EvaluatorTests extends TestSuite{
     }
     'multistatement{
       check.session("""
-        @ 1; 2L; '3';
+        @ ;1; 2L; '3';
         res0_0: Int = 1
         res0_1: Long = 2L
         res0_2: Char = '3'

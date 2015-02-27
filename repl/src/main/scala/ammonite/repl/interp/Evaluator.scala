@@ -160,6 +160,7 @@ object Evaluator{
 
     type InvEx = InvocationTargetException
     type InitEx = ExceptionInInitializerError
+
     def processLine(code: String, printCode: String, printer: Iterator[String] => Unit) = for {
       wrapperName <- Result.Success("cmd" + currentLine)
       (cls, newImports) <- evalClass(

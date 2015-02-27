@@ -82,20 +82,6 @@ case class Evaluated(wrapper: String,
 case class ImportData(imported: String, wrapperName: String, prefix: String)
 
 /**
- * The results of parsing a string into code.
- *
- * Note that error cases don't convey any additional information;
- * any debugging would already have been printed by the compiler
- * to stdout.
- */
-abstract sealed class Parsed
-object Parsed{
-  case class Error(msg: String) extends Parsed
-  case object Incomplete extends Parsed
-  case class Success(trees: List[Global#Tree]) extends Parsed
-}
-
-/**
  * Encapsulates a read-write cell that can be passed around
  */
 trait Ref[T]{

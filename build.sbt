@@ -1,6 +1,8 @@
 scalaVersion := "2.11.4"
 val sharedSettings = Seq(
-  scalaVersion := "2.11.5",
+  resolvers += "staging1" at "https://oss.sonatype.org/content/repositories/orgscala-lang-1184/",
+  resolvers += "staging2" at "https://oss.sonatype.org/content/repositories/orgscala-lang-1185/",
+  scalaVersion := "2.11.6",
   organization := "com.lihaoyi",
   version := "0.2.1-2",
   libraryDependencies += "com.lihaoyi" %% "utest" % "0.3.0" % "test",

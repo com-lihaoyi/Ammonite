@@ -80,7 +80,6 @@ object EulerTests extends TestSuite{
       // Find the 10001st prime.*
       check.session("""
         @ lazy val ps: Stream[Int] = 2 #:: Stream.from(3).filter(i =>
-
         @ ps.takeWhile(j => j * j <= i).forall(i % _ > 0))
         ps: scala.Stream[Int] = <lazy>
 
