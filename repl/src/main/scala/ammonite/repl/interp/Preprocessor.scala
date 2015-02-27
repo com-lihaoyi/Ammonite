@@ -17,7 +17,7 @@ trait Preprocessor{
 }
 object Preprocessor{
 
-  case class Output(code: String, printer: Option[String])
+  case class Output(code: String, printer: Seq[String])
 
   class ScalaParserX(x: org.parboiled2.ParserInput) extends scalaParser.Scala(x){
     def Body = rule( `=` ~ `macro`.? ~ StatCtx.Expr | OneNLMax ~ '{' ~ Block ~ "}" )
@@ -43,7 +43,7 @@ object Preprocessor{
     def DefProcessor(definitionLabel: String)(cond: PartialFunction[Global#Tree, String]) =
       (code: String, name: String, tree: Global#Tree) =>
         cond.lift(tree).map{
-          name => Preprocessor.Output(code, Some(definedStr(definitionLabel, name)))
+          name => Preprocessor.Output(code, Seq(definedStr(definitionLabel, name)))
         }
 
     val ObjectDef = DefProcessor("object"){case m: Global#ModuleDef => m.name.toString}
@@ -63,17 +63,17 @@ object Preprocessor{
         // Try to leave out all synthetics; we don't actually have proper
         // synthetic flags right now, because we're dumb-parsing it and not putting
         // it through a full compilation
-        if (t.name.decoded.contains("$")) None
-        else if (!t.mods.hasFlag(Flags.LAZY)) Some(pprint(t.name.toString))
-        else Some(s"""${pprintSignature(t.name.toString)} ++ Iterator(" = <lazy>")""")
+        if (t.name.decoded.contains("$")) Nil
+        else if (!t.mods.hasFlag(Flags.LAZY)) Seq(pprint(t.name.toString))
+        else Seq(s"""${pprintSignature(t.name.toString)} ++ Iterator(" = <lazy>")""")
       )
     }
 
     val Expr = Processor{ case (name, code, tree) =>
-      Preprocessor.Output(s"val $name = ($code)", Some(pprint(name)))
+      Preprocessor.Output(s"val $name = ($code)", Seq(pprint(name)))
     }
     val Import = Processor{ case (name, code, tree: Global#Import) =>
-      Preprocessor.Output(code, Some(s"""Iterator("$code")"""))
+      Preprocessor.Output(code, Seq(s"""Iterator("$code")"""))
     }
 
     val decls = Seq[(String, String, Global#Tree) => Option[Preprocessor.Output]](
@@ -86,32 +86,44 @@ object Preprocessor{
         case Parsed.Incomplete => Result.Buffer(code)
         case Parsed.Error(msg) => Result.Failure(msg)
         case Parsed.Success(Nil) => Result.Skip
-        case Parsed.Success(parsed) =>
-          def handleTree(t: Global#Tree, c: String, name: String) = {
-            decls.iterator.flatMap(_.apply(c, name, t)).next()
-          }
+        case Parsed.Success(_) =>
+
           val splitted = new scalaParser.Scala(code){
             def Split = {
               def Prelude = rule( Annot.* ~ `implicit`.? ~ `lazy`.? ~ LocalMod.* )
               rule( capture(Import | Prelude ~ BlockDef | StatCtx.Expr).+(Semis) )
             }
           }
-          val postSplit = splitted.Split.run().get
-          val zipped = parsed.zipAll(postSplit, null, "").zipWithIndex
-          val allDecls = for(((tree, code), i) <- zipped) yield {
-            val suffix = if(parsed.length > 1) "_" + i else ""
-            handleTree(tree, code, "res" + wrapperId + suffix)
+          val postSplit: Seq[String] = splitted.Split.run().get
+          val zipped = postSplit.map(p => (parse(p), p)).zipWithIndex
+
+          val allDecls = for (((Parsed.Success(trees), code), i) <- zipped) yield {
+            // Suffix the name of the result variable with the index of
+            // the tree if there is more than one statement in this command
+            val suffix = if(zipped.length > 1) "_" + i else ""
+            def handleTree(t: Global#Tree) = {
+              decls.iterator.flatMap(_.apply(code, "res" + wrapperId + suffix, t)).next()
+            }
+            trees match{
+              case Seq(tree) => handleTree(tree)
+              // AFAIK this can only happen for pattern-matching multi-assignment,
+              // which for some reason parse into a list of statements. In such a
+              // scenario, aggregate all their printers, but only output the code once
+              case trees =>
+                val printers = for{
+                  tree <- trees
+                  Preprocessor.Output(_, printers) = handleTree(tree)
+                  printer <- printers
+                } yield printer
+                Preprocessor.Output(code, printers)
+            }
           }
+
           Result(
             allDecls.reduceOption { (a, b) =>
               Output(
                 a.code + ";" + b.code,
-                (a.printer, b.printer) match {
-                  case (None, None) => None
-                  case (None, b) => b
-                  case (a, None) => a
-                  case (Some(a), Some(b)) => Some(a + "++ Iterator(\"\\n\") ++" + b)
-                }
+                a.printer ++ b.printer
               )
             },
             "Don't know how to handle " + code

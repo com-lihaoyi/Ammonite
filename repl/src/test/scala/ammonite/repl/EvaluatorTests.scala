@@ -275,6 +275,12 @@ object EvaluatorTests extends TestSuite{
 
         @ a
         res1: Int = 1
+
+        @ val (a, b) = (1, 2); val (c, d) = (3, 4)
+        a: Int = 1
+        b: Int = 2
+        c: Int = 3
+        d: Int = 4
       """)
     }
     'parsingProblems{

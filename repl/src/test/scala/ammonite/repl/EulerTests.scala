@@ -146,7 +146,7 @@ object EulerTests extends TestSuite{
         ps: scala.Stream[Int] = <lazy>
 
         @ ps.view.takeWhile(_ < 2000000).foldLeft(0L)(_ + _)
-        ! res1: Long = 142913828922L
+        res1: Long = 142913828922L
         """
       )
     }
@@ -179,7 +179,7 @@ object EulerTests extends TestSuite{
         @ val s = "$data"
         s: java.lang.String = "$data"
 
-        @ val ns = s.split("\\s+").map(_.toInt)
+        @ val ns = s.split("${"""\\s+"""}").map(_.toInt)
         ns: scala.Array[Int] = ${PPrint(data.split("\\s+").map(_.toInt))}
 
         @ def m(i: Int, p: Int, c: Int): Int = if(c > 0) ns(i) * m(i + p, p, c - 1) else 1
@@ -203,9 +203,11 @@ object EulerTests extends TestSuite{
         @ lazy val ts: Stream[Int] = 0 #:: ts.zipWithIndex.map(p => p._1 + p._2 + 1)
         ts: scala.Stream[Int] = <lazy>
 
-        @ def p(t: Int) = Range(1, Int.MaxValue)
-        @         .takeWhile(n => n * n <= t)
-        @         .foldLeft(0)((s, n) => if(t % n == 0) s + 2 else s)
+        @ def p(t: Int) = {
+        @   Range(1, Int.MaxValue)
+        @     .takeWhile(n => n * n <= t)
+        @     .foldLeft(0)((s, n) => if(t % n == 0) s + 2 else s)
+        @ }
         defined function p
 
         @ ts.find(p(_) > 500).get
@@ -318,9 +320,10 @@ object EulerTests extends TestSuite{
         @ val s = "$data"
         s: java.lang.String = "$data"
 
-        @ s.split("\\s+").map(_.take(11).toLong).sum.toString.take(10).toLong
+        @ s.split("${"""\\s+"""}").map(_.take(11).toLong).sum.toString.take(10).toLong
         res1: Long = 5537376230L
       """)
+
     }
     'p14{
       // Find the longest sequence using a starting number under one million.*
@@ -360,203 +363,266 @@ object EulerTests extends TestSuite{
         res0: Int = 1366
       """)
     }
-//    'p17{
-//      // How many letters would be needed to write all
-//      // the numbers in words from 1 to 1000?*
-//      check(
-//        "val units = Array(0, 3, 3, 5, 4, 4, 3, 5, 5, 4, 3, 6, 6, 8, 8, 7, 7, 9, 8, 8)",
-//        "units: scala.Array[Int] = Array(0, 3, 3, 5, 4, 4, 3, 5, 5, 4, 3, 6, 6, 8, 8, 7, 7, 9, 8, 8)"
-//      )
-//      check(
-//        "val tens = Array(0, 0, 6, 6, 5, 5, 5, 7, 6, 6)",
-//        "tens: scala.Array[Int] = Array(0, 0, 6, 6, 5, 5, 5, 7, 6, 6)"
-//      )
-//      check(
-//        """lazy val name: Int => Int = {
-//          |      case n if(n < 20) => units(n)
-//          |      case n if(n < 100) =>
-//          |        tens(n / 10) + (if(n % 10 > 0) units(n % 10) else 0)
-//          |      case n if(n < 1000) =>
-//          |        name(n / 100) + 7 + (if(n % 100 > 0) 3 + name(n % 100) else 0)
-//          |      case 1000 => 11
-//          |    }""".stripMargin,
-//        "name: Int => Int = <lazy>"
-//      )
-//      check("(1 to 1000).map(name).sum", "res3: Int = 21124")
+    'p17{
+      // How many letters would be needed to write all
+      // the numbers in words from 1 to 1000?*
+      check.session("""
+        @ val units = Array(0, 3, 3, 5, 4, 4, 3, 5, 5, 4, 3, 6, 6, 8, 8, 7, 7, 9, 8, 8)
+        units: scala.Array[Int] = Array(0, 3, 3, 5, 4, 4, 3, 5, 5, 4, 3, 6, 6, 8, 8, 7, 7, 9, 8, 8)
+
+        @ val tens = Array(0, 0, 6, 6, 5, 5, 5, 7, 6, 6)
+        tens: scala.Array[Int] = Array(0, 0, 6, 6, 5, 5, 5, 7, 6, 6)
+
+        @ lazy val name: Int => Int = {
+        @   case n if(n < 20) => units(n)
+        @   case n if(n < 100) =>
+        @   tens(n / 10) + (if(n % 10 > 0) units(n % 10) else 0)
+        @   case n if(n < 1000) =>
+        @   name(n / 100) + 7 + (if(n % 100 > 0) 3 + name(n % 100) else 0)
+        @   case 1000 => 11
+        @ }
+        name: Int => Int = <lazy>
+
+        @ (1 to 1000).map(name).sum
+        res3: Int = 21124
+      """)
+    }
+
+
+//    'p18 {
+//      // Find the maximum sum travelling from the top of the triangle to the base.*
+//      val data = ""
+//      check.session(s"""
+//        @ val s = "$data"
+//
+//        @ val grid = s.trim.split("\n").map(_.split("{"""\\s+"""}").map(_.toInt))
+//
+//        @ def f(rows: Array[Array[Int]], bottom: Seq[Int]): Int = {
+//        @  val ms = bottom.zip(bottom.tail).map(p => p._1 max p._2)
+//        @  val ss = rows.last.zip(ms).map(p => p._1 + p._2)
+//        @  if (ss.size == 1) ss.head else f(rows.init, ss)
+//        @ }
+//
+//        @ val r = f(grid.init, grid.last)
+//
+//        @ assert(r == 1074) // 2 ms
+//      """)
 //    }
-    /*
+    'p19 {
+      //How many Sundays fell on the first of the month during the twentieth century?*
+      check.session("""
+        @ val lengths = Array(31, 0, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
 
-    Problem 18
-    Find the maximum sum travelling from the top of the triangle to the base.*
-    val s = """<raw input data"""
+        @ val ls = for(y <- 1900 to 2000; m <- 1 to 12) yield
+        @  if(m == 2)
+        @    if (y % 4 == 0 && (y % 100 != 0 || y % 400 == 0)) 29 else 28
+        @  else
+        @    lengths(m - 1)
 
-    val grid = s.trim.split("\n").map(_.split("\\s+").map(_.toInt))
+        @ val fs = ls.scanLeft(1)((ws, l) => (ws + l) % 7)
 
-    def f(rows: Array[Array[Int]], bottom:Seq[Int]): Int = {
-      val ms = bottom.zip(bottom.tail).map(p => p._1 max p._2)
-      val ss = rows.last.zip(ms).map(p => p._1 + p._2)
-      if(ss.size == 1) ss.head else f(rows.init, ss)
+        @ val r = fs.drop(12).take(1200).count(_ == 0)
+        r: Int = 171
+      """)
+    }
+    'p20 {
+      // Find the sum of digits in 100!*
+      check.session("""
+        @ def f(n: BigInt): BigInt = if(n < 2) 1 else n * f(n - 1)
+
+        @ val r = f(100).toString.view.map(_.asDigit).sum
+        r: Int = 648
+      """)
+    }
+    'p21{
+      // Evaluate the sum of all amicable pairs under 10000.*
+      check.session("""
+        @ val ds = (0 until 10000).view.map(
+        @  n => (1 to (n / 2)).filter(n % _ == 0).sum
+        @ )
+
+        @ val as = ds.zipWithIndex.collect {
+        @   case (n, i) if n < 10000 && ds(n) != n && ds(n) == i => i
+        @ }
+
+        @ val r = as.sum
+        // r: Int = 31626
+      """)
     }
 
-    val r = f(grid.init, grid.last)
-
-    assert(r == 1074) // 2 ms
-    Problem 19
-    How many Sundays fell on the first of the month during the twentieth century?*
-    val lengths = Array(31, 0, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
-
-    val ls = for(y <- 1900 to 2000; m <- 1 to 12) yield
-      if(m == 2)
-        if (y % 4 == 0 && (y % 100 != 0 || y % 400 == 0)) 29 else 28
-      else
-        lengths(m - 1)
-
-    val fs = ls.scanLeft(1)((ws, l) => (ws + l) % 7)
-
-    val r = fs.drop(12).take(1200).count(_ == 0)
-
-    assert(r == 171) // 2 ms
-    Problem 20
-    Find the sum of digits in 100!*
-    def f(n: BigInt): BigInt = if(n < 2) 1 else n * f(n - 1)
-
-    val r = f(100).toString.view.map(_.asDigit).sum
-
-    assert(r == 648) // 1 ms
-    Problem 21
-    Evaluate the sum of all amicable pairs under 10000.*
-    val ds = (0 until 10000).view
-      .map(n => (1 to (n / 2)).filter(n % _ == 0).sum)
-
-    val as = ds.zipWithIndex.collect {
-      case (n, i) if n < 10000 && ds(n) != n && ds(n) == i => i
+    'p22{
+      // What is the total of all the name scores in the file of first names?*
+      check.session("""
+        @ val r = {
+        @  io.Source
+        @    .fromFile("names.txt")
+        @    .mkString
+        @    .split(",")
+        @    .map(_.init.tail).sorted.map(_.map(_ - 64).sum)
+        @    .zipWithIndex.map(p => p._1 * (p._2 + 1)).sum
+        @ }
+        r: Int = 871198282
+      """)
     }
 
-    val r = as.sum
+    'p23{
+      // Find the sum of all the positive integers which cannot
+      // be written as the sum of two abundant numbers.*
+      check.session("""
+        @ val as = {
+        @ (0 to 28123).map(n => (1 to (n / 2))
+        @             .filter(n % _ == 0).sum)
+        @             .zipWithIndex
+        @             .filter(p => p._1 > p._2).map(_._2)
 
-    assert(r == 31626) // 658 ms
-    Problem 22
-    What is the total of all the name scores in the file of first names?*
-    val r = io.Source.fromFile("names.txt").mkString.split(",")
-      .map(_.init.tail).sorted.map(_.map(_ - 64).sum)
-      .zipWithIndex.map(p => p._1 * (p._2 + 1)).sum
+        @ val exc = as.view.flatMap { a =>
+        @   as.takeWhile(_ <= (28123 - a)).map(a +)
+        @ }
 
-    assert(r == 871198282) // 38 ms
-    Problem 23
-    Find the sum of all the positive integers which cannot be written as the sum of two abundant numbers.*
-    val as = (0 to 28123).map(n => (1 to (n / 2)).filter(n % _ == 0).sum)
-      .zipWithIndex.filter(p => p._1 > p._2).map(_._2)
-
-    val exc = as.view.flatMap { a =>
-      as.takeWhile(_ <= (28123 - a)).map(a +)
+        @ val r = (1 to 28123 diff exc).sum
+        r: Int = 4179871
+      """)
     }
 
-    val r = (1 to 28123 diff exc).sum
+    'p24{
+      // What is the millionth lexicographic permutation of the digits
+      // 0, 1, 2, 3, 4, 5, 6, 7, 8 and 9?*
+      check.session("""
+        @ def ps(s: String): Iterator[String] = if (s.length == 1) Iterator(s)
+        @ else s.toIterator.flatMap(c => ps(s.filter(c !=)).map(c +))
 
-    assert(r == 4179871) // 5 s
-    Problem 24
-    What is the millionth lexicographic permutation of the digits 0, 1, 2, 3, 4, 5, 6, 7, 8 and 9?*
-    def ps(s: String): Iterator[String] = if (s.length == 1) Iterator(s)
-    else s.toIterator.flatMap(c => ps(s.filter(c !=)).map(c +))
+        @ val r = ps("0123456789").drop(999999).next().toLong
+        r: Int = 2783915460L
 
-    val r = ps("0123456789").drop(999999).next().toLong
+      """)
+    }
+    'p25{
+      // What is the first term in the Fibonacci sequence to contain 1000 digits?*
+      check.session("""
 
-    assert(r == 2783915460L) // 712 ms
-    Problem 25
-    What is the first term in the Fibonacci sequence to contain 1000 digits?*
-    lazy val fs: Stream[BigInt] =
-      0 #:: 1 #:: fs.zip(fs.tail).map(p => p._1 + p._2)
+        @ lazy val fs: Stream[BigInt] =
+        @  0 #:: 1 #:: fs.zip(fs.tail).map(p => p._1 + p._2)
 
-    val r = fs.view.takeWhile(_.toString.length < 1000).size
-
-    assert(r == 4782) // 468 ms
-    Problem 26
-    Find the value of d < 1000 for which 1/d contains the longest recurring cycle.*
-    val ps = (2 until 1000).map(i => (1 to 2000)
-      .find(BigInt(10).modPow(_, i) == 1))
-
-    val r = 2 + ps.indexOf(Some(ps.flatten.max))
-
-    assert(r == 983) // 2 s
-    Problem 27
-    Find a quadratic formula that produces the maximum number of primes for consecutive values of n.*
-    lazy val ps: Stream[Int] = 2 #:: Stream.from(3).filter(i =>
-      ps.takeWhile(j => j * j <= i).forall(i % _ > 0))
-
-    def isPrime(n: Int) = ps.view.takeWhile(_ <= n).contains(n)
-
-    val ns = (-999 until 1000).flatMap { a =>
-      (-999 until 1000).map(b => (a, b, (0 to 1000).view
-        .takeWhile(n => isPrime(n * n + a * n + b)).size))
+        @ val r = fs.view.takeWhile(_.toString.length < 1000).size
+        r: Int = 4782
+      """)
     }
 
-    val t = ns.reduceLeft((a, b) => if(a._3 > b._3) a else b)
+    'p26{
+      // Find the value of d < 1000 for which 1/d contains the longest recurring cycle.*
+      check.session("""
+        @ val ps = {
+        @   (2 until 1000).map(i => (1 to 2000)
+        @                 .find(BigInt(10).modPow(_, i) == 1))
+        @ }
 
-    val r = t._1 * t._2
+        @ val r = 2 + ps.indexOf(Some(ps.flatten.max))
+        r: Int = 982
+      """)
+    }
+    'p27{
+      // Find a quadratic formula that produces the maximum number of
+      // primes for consecutive values of n.*
+      check.session("""
+        @ lazy val ps: Stream[Int] = 2 #:: Stream.from(3).filter(i =>
+        @   ps.takeWhile(j => j * j <= i).forall(i % _ > 0))
 
-    assert(r == -59231) // 6 s
-    Problem 28
-    What is the sum of both diagonals in a 1001 by 1001 spiral?*
-    def cs(n: Int, p: Int): Stream[Int] =
-      (n * 4 + p * 10) #:: cs(n + p * 4, p + 2)
+        @ def isPrime(n: Int) = ps.view.takeWhile(_ <= n).contains(n)
 
-    val r = 1 + cs(1, 2).take(500).sum
+        @ val ns = (-999 until 1000).flatMap { a =>
+        @   (-999 until 1000).map(b => (a, b, (0 to 1000).view
+        @     .takeWhile(n => isPrime(n * n + a * n + b)).size))
+        @ }
 
-    assert(r == 669171001) // 1 ms
-    Problem 29
-    How many distinct terms are in the sequence generated by ab for 2 ≤ a ≤ 100 and
-      2 ≤ b ≤ 100?*
-    val r = (2 to 100).flatMap(a => (2 to 100)
-      .map(b => BigInt(a).pow(b))).distinct.size
+        @ val t = ns.reduceLeft((a, b) => if(a._3 > b._3) a else b)
 
-    assert(r == 9183) // 17 ms
-    Problem 30
-    Find the sum of all the numbers that can be written as the sum of fifth powers of their digits.*
-    def max(d: Int) = math.pow(10, d).toInt - 1
-
-    def sum(n: Int) = n.toString.map(_.asDigit)
-      .map(math.pow(_, 5).toInt).sum
-
-    val limit = Stream.from(1).find(d => max(d) > sum(max(d))).get
-
-    val r = (2 to max(limit)).view.filter(n => n == sum(n)).sum
-
-    assert(r == 443839) // 2 s
-    Problem 31
-    Investigating combinations of English currency denominations.*
-    def f(ms: List[Int], n: Int): Int = ms match {
-      case h :: t =>
-        if (h > n) 0 else if (n == h) 1 else f(ms, n - h) + f(t, n)
-      case _ => 0
+        @ val r = t._1 * t._2
+        r: Int = -59231
+      """)
     }
 
-    val r = f(List(1, 2, 5, 10, 20, 50, 100, 200), 200)
+    'p28{
+      // What is the sum of both diagonals in a 1001 by 1001 spiral?*
+      check.session("""
 
-    assert(r == 73682) // 15 ms
-    Problem 32
-    Find the sum of all numbers that can be written as pandigital products.*
-    val ms = for {
-      a <- 2 to 10000; b <- 2 to 10000 / a
-      m = a * b; s = a.toString + b + m
-      if s.length == 9 && (1 to 9).mkString.forall(s.contains(_))
-    } yield m
+        @ def cs(n: Int, p: Int): Stream[Int] =
+        @ (n * 4 + p * 10) #:: cs(n + p * 4, p + 2)
 
-    val r = ms.distinct.sum
+        @ val r = 1 + cs(1, 2).take(500).sum
+        r: Int = 669171001
+      """)
+    }
 
-    assert(r == 45228) // 73 ms
-    Problem 33
-    Discover all the fractions with an unorthodox cancelling method.*
-    val rs = for(i <- 1 to 9; j <- (i + 1) to 9; k <- 1 to 9;
-                 if k * (9 * i + j) == 10 * i * j) yield (10 * i + j, 10 * j + k)
+    'p29{
+      // How many distinct terms are in the sequence generated by ab
+      // for 2 ≤ a ≤ 100 and 2 ≤ b ≤ 100?*
+      check.session("""
 
-    val p = rs.reduceLeft((n, d) => (n._1 * d._1, n._2 * d._2))
 
-    def gcd(n: Int, d: Int): Int = if (d == 0) n else gcd(d, n % d)
+        @ val r = {
+        @   (2 to 100).flatMap(a => (2 to 100)
+        @             .map(b => BigInt(a).pow(b)))
+        @             .distinct
+        @             .size
+        @ }
+        r: Int = 983
+      """)
+    }
 
-    val r = p._2 / gcd(p._1, p._2)
+    'p30{
+      // Find the sum of all the numbers that can be written as
+      // the sum of fifth powers of their digits.*
+      check.session("""
 
-    assert(r == 100) // 5 ms
-*/
+        @ def max(d: Int) = math.pow(10, d).toInt - 1
 
+        @ def sum(n: Int) = n.toString.map(_.asDigit).map(math.pow(_, 5).toInt).sum
+
+        @ val limit = Stream.from(1).find(d => max(d) > sum(max(d))).get
+
+        @ val r = (2 to max(limit)).view.filter(n => n == sum(n)).sum
+        r: Int = 443839
+      """)
+    }
+    'p31{
+      // Investigating combinations of English currency denominations.*
+      check.session("""
+        @ def f(ms: List[Int], n: Int): Int = ms match {
+        @   case h :: t =>
+        @     if (h > n) 0 else if (n == h) 1 else f(ms, n - h) + f(t, n)
+        @   case _ => 0
+        @ }
+
+        @ val r = f(List(1, 2, 5, 10, 20, 50, 100, 200), 200)
+        r: Int = 73682
+      """)
+    }
+    'p30{
+      // Find the sum of all numbers that can be written as pandigital products.*
+      check.session("""
+        @ val ms = for {
+        @   a <- 2 to 10000; b <- 2 to 10000 / a
+        @   m = a * b; s = a.toString + b + m
+        @   if s.length == 9 && (1 to 9).mkString.forall(s.contains(_))
+        @ } yield m
+
+        @ val r = ms.distinct.sum
+        r: Int = 45228
+      """)
+    }
+    'p30{
+      // Discover all the fractions with an unorthodox cancelling method.*
+      check.session("""
+        @ val rs = for(i <- 1 to 9; j <- (i + 1) to 9; k <- 1 to 9;
+        @              if k * (9 * i + j) == 10 * i * j) yield (10 * i + j, 10 * j + k)
+
+        @ val p = rs.reduceLeft((n, d) => (n._1 * d._1, n._2 * d._2))
+
+        @ def gcd(n: Int, d: Int): Int = if (d == 0) n else gcd(d, n % d)
+
+        @ val r = p._2 / gcd(p._1, p._2)
+        r: Int = 100
+    """)
+    }
   }
 }

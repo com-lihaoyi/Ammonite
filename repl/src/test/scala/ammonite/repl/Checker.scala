@@ -14,6 +14,8 @@ class Checker {
   )
 
   def session(sess: String): Unit ={
+//    println("SESSION")
+//    println(sess)
     val margin = sess.lines.filter(_.trim != "").map(_.takeWhile(_ == ' ').length).max
     val steps = sess.replace("\n" + margin, "\n").split("\n\n")
     for(step <- steps){
