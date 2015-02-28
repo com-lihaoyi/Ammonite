@@ -348,7 +348,7 @@ libraryDependencies += "com.lihaoyi" %% "ammonite-repl" % "0.2.2" % "test"
 
 initialCommands in console := "ammonite.repl.Repl.main(null)"
 
-scalaVersion := "2.11.4"
+scalaVersion := "2.11.5"
 ```
 
 After that, simple hit

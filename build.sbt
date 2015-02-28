@@ -1,8 +1,11 @@
 scalaVersion := "2.11.4"
+
+publishArtifact := false
+
+publishTo := Some(Resolver.file("Unused transient repository", file("target/unusedrepo")))
+
 val sharedSettings = Seq(
-  resolvers += "staging1" at "https://oss.sonatype.org/content/repositories/orgscala-lang-1184/",
-  resolvers += "staging2" at "https://oss.sonatype.org/content/repositories/orgscala-lang-1185/",
-  scalaVersion := "2.11.6",
+  scalaVersion := "2.11.5",
   organization := "com.lihaoyi",
   version := "0.2.2",
   libraryDependencies += "com.lihaoyi" %% "utest" % "0.3.0" % "test",
