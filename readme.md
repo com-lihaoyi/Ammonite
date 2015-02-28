@@ -359,6 +359,10 @@ sbt projectName/test:console
 
 To activate the Ammonite REPL. The REPL is a work-in-progress, so expect to find a few rough edges. Ammonite already supports many more features than the default Scala REPL, including:
 
+- Loading jars directly from Maven Central into the REPL
+
+![Ivy](media/Ivy.png)
+
 - Colored, customizable prompts
 
 ![CustomizablePrompts](media/CustomizablePrompts.png)
