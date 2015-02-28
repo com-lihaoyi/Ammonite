@@ -79,7 +79,7 @@ object IvyThing {
     //init resolve report
     val report = ivy.resolve(
       ivyfile.toURI.toURL,
-      new ResolveOptions().setConfs(Array("default")).setRefresh(true)
+      new ResolveOptions().setConfs(Array("default")).setRefresh(true).setOutputReport(false)
     )
     //so you can get the jar libraries
     report.getAllArtifactsReports.map(_.getLocalFile)
