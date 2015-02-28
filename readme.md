@@ -382,7 +382,7 @@ To activate the Ammonite REPL. The REPL is a work-in-progress, so expect to find
 Builtins
 --------
 
-Ammonite contains a range of useful built-ins implemented as normal functions. Everything inside the `ReplAPI` trait is imported by default and can be accessed directly by default to control the console.
+Ammonite contains a rNange of useful built-ins implemented as normal functions. Everything inside the `ReplAPI` trait is imported by default and can be accessed directly by default to control the console.
 
 ```scala
 trait ReplAPI {
@@ -446,7 +446,7 @@ trait Load extends (String => Unit){
   /**
    * Load a library from its maven/ivy coordinates
    */
-  def ivy(groupId: String, artifactId: String, version: String): Unit
+  def ivy(coordinates: (String, String, String)): Unit
 
   /**
    * Loads a command into the REPL and
