@@ -4,7 +4,7 @@ val sharedSettings = Seq(
   resolvers += "staging2" at "https://oss.sonatype.org/content/repositories/orgscala-lang-1185/",
   scalaVersion := "2.11.6",
   organization := "com.lihaoyi",
-  version := "0.2.1-2",
+  version := "0.2.2",
   libraryDependencies += "com.lihaoyi" %% "utest" % "0.3.0" % "test",
   testFrameworks += new TestFramework("utest.runner.Framework"),
   autoCompilerPlugins := true,
@@ -81,7 +81,7 @@ lazy val tools = project
   )
 
 lazy val repl = project
-  .dependsOn(ops)
+  .dependsOn(ops, tools, pprint)
   .settings(sharedSettings:_*)
   .settings(
     test in assembly := {},

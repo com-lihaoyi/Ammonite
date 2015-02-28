@@ -97,14 +97,14 @@ abstract class FullReplAPI extends ReplAPI{
 
 object ReplAPI{
   def initReplBridge(holder: Class[ReplAPIHolder], api: ReplAPI) = {
-    holder
+    val method = holder
       .getDeclaredMethods
-      .find(_.getName.contains('$'))
+      .find(_.getName == "shell0_$eq")
       .get
-      .invoke(null, api)
+    method.invoke(null, api)
   }
 }
-
+ 
 /**
  * A set of colors used to highlight the miscellanious bits of the REPL.
  */

@@ -15,11 +15,11 @@ import scala.reflect.io.VirtualDirectory
  * to interpret Scala code. Doesn't attempt to provide any
  * real encapsulation for now.
  */
-class Interpreter(handleResult: (String, Result[Evaluated]) => Unit,
-                  shellPrompt0: Ref[String],
+class Interpreter(handleResult: => (String, Result[Evaluated]) => Unit,
+                  shellPrompt0: => Ref[String],
                   pprintConfig: pprint.Config = pprint.Config.Defaults.PPrintConfig,
                   colors0: ColorSet = ColorSet.BlackWhite,
-                  stdout: String => Unit = println){ interp =>
+                  stdout: String => Unit){ interp =>
 
   val dynamicClasspath = new VirtualDirectory("(memory)", None)
   var extraJars = Seq[java.io.File]()

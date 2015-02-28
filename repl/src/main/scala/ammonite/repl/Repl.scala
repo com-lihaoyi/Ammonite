@@ -1,6 +1,6 @@
 package ammonite.repl
 
-import java.io.{OutputStream, InputStream}
+import java.io.{PrintStream, BufferedOutputStream, OutputStream, InputStream}
 import java.lang.reflect.InvocationTargetException
 import ammonite.{ops, pprint}
 import ammonite.repl.frontend._
@@ -25,29 +25,6 @@ class Repl(input: InputStream,
 
   import concurrent.ExecutionContext.Implicits.global
 
-  // Do this asynchronously and wait on it in the main loop,
-  // so the user can begin entering input even before all this
-  // stuff has finished loading.
-
-  lazy val interp0: Future[Interpreter] = Future(new Interpreter(
-    frontEnd.update,
-    shellPrompt,
-    pprintConfig.copy(maxWidth = frontEnd.width),
-    colorSet
-  ))
-
-  def interp: Interpreter = Await.result(interp0, Duration.Inf)
-
-  def action() = for{
-    // Condition to short circuit early if `interp` hasn't finished evaluating
-    line <- frontEnd.action(if (interp0.isCompleted) interp.buffered else "")
-    _ <- Signaller("INT") { interp.mainThread.stop() }
-    out <- interp.processLine(line, (f, x) => {saveHistory(x); f(x)}, _.foreach(print))
-  } yield {
-    println()
-    out
-  }
-
   val frontEnd = JLineFrontend(
     input,
     output,
@@ -56,6 +33,31 @@ class Repl(input: InputStream,
     interp.pressy.complete,
     initialHistory
   )
+
+  // Do this asynchronously and wait on it in the main loop,
+  // so the user can begin entering input even before all this
+  // stuff has finished loading.
+
+  val interp: Interpreter = new Interpreter(
+    frontEnd.update,
+    shellPrompt,
+    pprintConfig.copy(maxWidth = frontEnd.width),
+    colorSet,
+    stdout = new PrintStream(output).println
+  )
+
+//  def interp: Interpreter = Await.result(interp0, Duration.Inf)
+
+  def action() = for{
+    // Condition to short circuit early if `interp` hasn't finished evaluating
+    line <- frontEnd.action(interp.buffered)
+    _ <- Signaller("INT") { interp.mainThread.stop() }
+    out <- interp.processLine(line, (f, x) => {saveHistory(x); f(x)}, _.foreach(print))
+  } yield {
+    println()
+    out
+  }
+
 
   def run() = {
     @tailrec def loop(): Unit = {
@@ -69,6 +71,7 @@ class Repl(input: InputStream,
 object Repl{
   val defaultPredef = """"""
   def main(args: Array[String]) = {
+    println("Loading Ammonite Repl...")
     import ammonite.ops._
     val saveFile = home/".amm"
     val delimiter = "\n\n\n"

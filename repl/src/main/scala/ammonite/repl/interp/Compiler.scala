@@ -176,5 +176,4 @@ object Compiler{
       else Right(trees)
     }
   }
-
 }
