@@ -371,10 +371,6 @@ To activate the Ammonite REPL. The REPL is a work-in-progress, so expect to find
 
 ![ColorPrettyPrinting](media/ColorPrettyPrinting.png)
 
-- Loading jar files or ivy-coordinates directly into the REPL
-
-![MavenLoading](media/MavenLoading.png)
-
 - Replaceable compilers: throw-away/crash your copy of the compiler and get a new one without missing a beat.
 
 - Interruptable commands using `Ctrl-C`
