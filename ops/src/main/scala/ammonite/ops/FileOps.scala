@@ -81,6 +81,11 @@ object Internals{
   }
 }
 
+/**
+ * An [[Op1]] that returns a Seq[R], but can also do so
+ * lazily (Iterator[R]) via `op.!! arg`. You can then use
+ * the iterator however you wish
+ */
 trait StreamableOp1[T1, R, C <: Seq[R]] extends Op1[T1, C]{
   def materialize(i: Iterator[R]): C
   def apply(arg: T1) = materialize(!!(arg))
@@ -89,7 +94,8 @@ trait StreamableOp1[T1, R, C <: Seq[R]] extends Op1[T1, C]{
 
 
 /**
- * Makes directories up to the specified path.
+ * Makes directories up to the specified path. Equivalent
+ * to `mkdir -p` in bash
  */
 object mkdir extends Op1[Path, Unit]{
   def apply(path: Path) = new File(path.toString).mkdirs()
@@ -97,7 +103,8 @@ object mkdir extends Op1[Path, Unit]{
 
 
 /**
- * Moves a file from one place to another. Creates any necessary directories
+ * Moves a file from one place to another.
+ * Creates any necessary directories
  */
 object mv extends Op2[Path, Path, Unit] with Internals.Mover{
   def apply(from: Path, to: Path) =
@@ -111,7 +118,9 @@ object mv extends Op2[Path, Path, Unit] with Internals.Mover{
 }
 
 /**
- * Copies a file from one place to another. Creates any necessary directories
+ * Copies a file or folder from one place to another.
+ * Creates any necessary directories, and copies folders
+ * recursively.
  */
 object cp extends Op2[Path, Path, Unit] {
   def apply(from: Path, to: Path) = {
@@ -125,8 +134,9 @@ object cp extends Op2[Path, Path, Unit] {
 }
 
 /**
- * Roughly equivalent to bash's `rm -rf`. Deletes any files or folders in the
- * target path, or does nothing if there aren't any
+ * Roughly equivalent to bash's `rm -rf`. Deletes
+ * any files or folders in the target path, or
+ * does nothing if there aren't any
  */
 object rm extends Op1[Path, Unit]{
   def apply(target: Path) = {
@@ -155,7 +165,7 @@ class LsSeq(s: Stream[Path]) extends Seq[Path]{
 }
 
 /**
- * List the files in a directory
+ * List the files and folders in a directory
  */
 object ls extends StreamableOp1[Path, Path, LsSeq]{
   def materialize(i: Iterator[Path]) = new LsSeq(i.toStream)
@@ -164,6 +174,10 @@ object ls extends StreamableOp1[Path, Path, LsSeq]{
     Files.list(arg.nio).iterator().asScala.map(x => Path(x))
   }
 
+  /**
+   * Reads a classpath resource into memory, either as a
+   * string, as a Seq[String] of lines, or as a Array[Byte]
+   */
   object rec extends StreamableOp1[Path, Path, LsSeq]{
     def materialize(i: Iterator[Path]) = new LsSeq(i.toStream)
     def recursiveListFiles(f: File): Iterator[File] = {
@@ -188,13 +202,20 @@ object write extends Op2[Path, Internals.Writable, Unit]{
     Files.write(target.nio, data.writeableData, StandardOpenOption.CREATE_NEW)
   }
 
+  /**
+   * Identical to [[write]], except if the file already exists,
+   * appends to the file instead of error-ing out
+   */
   object append extends Op2[Path, Internals.Writable, Unit]{
     def apply(target: Path, data: Internals.Writable) = {
       mkdir(target/RelPath.up)
       Files.write(target.nio, data.writeableData, StandardOpenOption.CREATE, StandardOpenOption.APPEND)
     }
   }
-
+  /**
+   * Identical to [[write]], except if the file already exists,
+   * replaces the file instead of error-ing out
+   */
   object over extends Op2[Path, Internals.Writable, Unit]{
     def apply(target: Path, data: Internals.Writable) = {
       mkdir(target/RelPath.up)
@@ -205,8 +226,8 @@ object write extends Op2[Path, Internals.Writable, Unit]{
 
 
 /**
- * Reads a file into memory, either as a string,
- * as a Seq[String] of lines, or as a Array[Byte]
+ * Reads a file into memory, either as a String,
+ * as (read.lines(...): Seq[String]), or as (read.bytes(...): Array[Byte]).
  */
 object read extends Internals.Reader with Op1[Path, String]{
   def readIn(p: Path) = {
@@ -227,7 +248,6 @@ object read extends Internals.Reader with Op1[Path, String]{
     }
   }
 }
-
 
 /**
  * Checks if a file or folder exists at the given path.
@@ -252,8 +272,12 @@ object exists extends Op1[Path, Boolean]{
 //  }
 //}
 
-//object kill extends kill(9)
 
+
+/**
+ * Kills the given process with the given signal, e.g.
+ * `kill(9)! pid`
+ */
 case class kill(signal: Int) extends Op1[Int, CommandResult]{
   def apply(pid: Int): CommandResult = {
     %kill("-" + signal, pid.toString)

@@ -16,7 +16,7 @@ package object ops extends Extensions with RelPathStuff{
   /**
    * The current working directory for this process.
    */
-  def processWorkingDir = ops.Path(new java.io.File(""))
+  lazy val cwd = ops.Path(new java.io.File(""))
 
   implicit class Transformable1(p: java.nio.file.Path){
     def amm = {

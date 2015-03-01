@@ -85,6 +85,7 @@ trait Load extends (String => Unit){
   def apply(line: String): Unit
 }
 
+// End of ReplAPI
 /**
  * Things that are part of the ReplAPI that aren't really "public"
  */

@@ -99,3 +99,10 @@ lazy val repl = project
     javaOptions += "-Xmx2G",
     fork in (Test, testOnly) := true
   )
+
+lazy val readme = project
+  .settings(scalatex.SbtPlugin.projectSettings:_*)
+  .settings(
+    libraryDependencies += "com.lihaoyi" %% "scalatex-site" % "0.1.1",
+    scalaVersion := "2.11.4"
+)

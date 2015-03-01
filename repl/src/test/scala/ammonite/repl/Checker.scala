@@ -26,7 +26,10 @@ class Checker {
       for(line <- commandText.init) {
         allOutput += "\n@ " + line
         val (processed, printed) = run(line)
-        failLoudly(assert(processed.isInstanceOf[Result.Buffer]))
+        if (!line.startsWith("//")) {
+          failLoudly(assert(processed.isInstanceOf[Result.Buffer]))
+        }
+
         interp.handleOutput(processed)
       }
       if (expected.startsWith("error: ")){

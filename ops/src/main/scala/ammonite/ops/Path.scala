@@ -31,13 +31,11 @@ object BasePath{
       implicitly[pprint.PPrinter[String]].render(s, cfg)
     }
   }
-
-
 }
 
 /**
  * A path which is either an absolute [[Path]] or a relative [[RelPath]],
- * with shared APIs and implementations
+ * with shared APIs and implementations.
  */
 trait BasePath[ThisType <: BasePath[ThisType]]{
   /**
@@ -45,18 +43,12 @@ trait BasePath[ThisType <: BasePath[ThisType]]{
    */
   def segments: Seq[String]
 
-  def make(p: Seq[String], ups: Int): ThisType
-
   /**
    * Combines this path with the given relative path, returning
    * a path of the same type as this one (e.g. `Path` returns `Path`,
    * `RelPath` returns `RelPath`
    */
-  def /(subpath: RelPath): ThisType = make(
-    segments.dropRight(subpath.ups) ++ subpath.segments,
-    math.max(subpath.ups - segments.length, 0)
-  )
-
+  def /(subpath: RelPath): ThisType
 
   /**
    * Relativizes this path with the given `base` path, finding a
@@ -68,10 +60,46 @@ trait BasePath[ThisType <: BasePath[ThisType]]{
    * relative path that satisfies the above requirement in the general
    * case.
    */
-  def -(base: ThisType): RelPath
+  def -(target: ThisType): RelPath
 
-  def >(base: ThisType): Boolean = this.segments.startsWith(base.segments)
-  def <(base: ThisType): Boolean = base.segments.startsWith(this.segments)
+  /**
+   * This path starts with the target path, including if it's identical
+   */
+  def >=(target: ThisType): Boolean
+  /**
+   * This path starts with the target path and is strictly longer than it
+   */
+  def >(target: ThisType): Boolean
+  /**
+   * The target path starts with this path, including if it's identical
+   */
+  def <=(target: ThisType): Boolean
+  /**
+   * The target path starts with this path and is strictly longer than it
+   */
+  def <(target: ThisType): Boolean
+
+  /**
+   * The last segment in this path. Very commonly used, e.g. it
+   * represents the name of the file/folder in filesystem paths
+   */
+  def last: String
+}
+
+trait BasePathImpl[ThisType <: BasePath[ThisType]] extends BasePath[ThisType]{
+  def segments: Seq[String]
+
+  def make(p: Seq[String], ups: Int): ThisType
+
+  def /(subpath: RelPath) = make(
+    segments.dropRight(subpath.ups) ++ subpath.segments,
+    math.max(subpath.ups - segments.length, 0)
+  )
+
+  def >=(target: ThisType) = this.segments.startsWith(target.segments)
+  def >(target: ThisType) = this >= target && this != target
+  def <=(target: ThisType) = target.segments.startsWith(this.segments)
+  def <(target: ThisType) = this <= target && this != target
   /**
    * Gives you the file extension of this path, or the empty
    * string if there is no extension
@@ -82,7 +110,6 @@ trait BasePath[ThisType <: BasePath[ThisType]]{
   }
 
   def last = segments.last
-
 }
 
 object PathError{
@@ -103,7 +130,7 @@ object PathError{
  * segments can only occur at the left-end of the path, and
  * are collapsed into a single number [[ups]].
  */
-case class RelPath(segments: Seq[String], ups: Int) extends BasePath[RelPath]{
+case class RelPath(segments: Seq[String], ups: Int) extends BasePathImpl[RelPath]{
   require(ups >= 0)
   segments.foreach(BasePath.checkSegment)
   def make(p: Seq[String], ups: Int) = new RelPath(p, ups + this.ups)
@@ -180,7 +207,7 @@ object Path extends (String => Path){
 
   val root = new Path(Nil)
   val home = new Path(System.getProperty("user.home").split("/").drop(1))
-  def tmp = java.nio.file.Files.createTempDirectory(
+  def makeTmp = java.nio.file.Files.createTempDirectory(
     java.nio.file.Paths.get(System.getProperty("java.io.tmpdir")), "ammonite"
   )
   implicit class Transformable(p: Path){
@@ -196,7 +223,7 @@ object Path extends (String => Path){
  * An absolute path on the filesystem. Note that the path is
  * normalized and cannot contain any empty, "." or ".." segments
  */
-case class Path(segments: Seq[String]) extends BasePath[Path]{
+case class Path(segments: Seq[String]) extends BasePathImpl[Path]{
   segments.foreach(BasePath.checkSegment)
 
   def make(p: Seq[String], ups: Int) = {

@@ -1,0 +1,306 @@
+@import Main._
+@import ammonite.all._
+
+@sect{Ammonite}
+  @p
+    Ammonite is a collection of Scala libraries intended to improve the experience of using Scala as an system shell. It includes two independent modules that are each usable on their own:
+
+  @ul
+    @li
+      @hl.scala{"com.lihaoyi" %% "ammonite-ops" % "0.2.3"}: A library for performing filesystem operations (reading, writing, copying, deleting, etc.) concisely in Scala.
+
+    @li
+      @hl.scala{"com.lihaoyi" %% "ammonite-repl" % "0.2.3"}: A drop-in replacement for the standard Scala REPL (usable in any SBT project) with many new features and better usability.
+
+
+
+@sect{Ammonite-Ops}
+  @val opsExamples = 'ops/'src/'test/'scala/'test/'ammonite/'ops/"ExampleTests.scala"
+  @val pathsScala = 'ops/'src/'main/'scala/'ammonite/'ops/"Path.scala"
+  @hl.ref(opsExamples, Seq("longExample", "import"), "assert(")
+
+  @p
+    Ammonite-Ops is a collection of tools intended to make common filesystem operations in Scala as concise and easy-to-use as from the Bash shell, while being robust enough to use in large applications without getting messy. 
+
+  @p
+    As you can see, Ammonite-Ops replaces the common mess of boilerplate:
+
+  @hl.ref('ops/'src/'test/'scala/'test/'ammonite/'ops/"ExampleTests.scala", Seq("comparison", "def removeAll"), "assert(")  
+
+  @p
+    With a single, sleek expression:
+
+  @hl.ref(opsExamples, Seq("comparison", "assert", "rm!"), "assert(")
+
+  @p 
+    That handles the common case for you: recursively deleting folders, not-failing if the file doesn't exist, etc.
+
+  @p
+    To get started, add this to your @code{build.sbt}:
+
+  @hl.scala{"com.lihaoyi" %% "ammonite-ops" % "0.2.3"}
+
+  @p 
+    And this at the top of the file you want to use Ammonite:
+
+  @hl.scala{import ammonite.ops._}
+
+  @p
+    And you're all set!    
+
+  @sect{Paths}
+    @p
+      Ammonite uses strongly-typed data-structures to represent filesystem paths. The two basic versions are:
+
+    @ul
+      @li
+        @code{Path}: an absolute path, starting from the root
+
+      @li
+        @code{RelPath}: a relative path, not rooted anywhere
+
+    @p
+      Generally, almost all commands take absolute @code{Path}s. These are basically defined as:
+
+    @hl.ref(pathsScala, "class Path", "") 
+
+    @p
+      With a number of useful operations taht can be performed on them. Absolute paths can be created in a few ways:
+
+    @hl.ref(opsExamples, Seq("constructingPaths", "//"), "}") 
+
+    @p
+      Note that there are no in-built operations to change the `cwd`. In general you should not need to: simply defining a new path, e.g.
+
+    @hl.ref(opsExamples, Seq("newPath", "val"), "}") 
+
+    @p
+      Should be sufficient for most needs. 
+
+    @p
+      Above, we made use of the @hl.scala{cwd} built-in path. There are a number of @hl.scala{Path}s built into Ammonite:
+
+    @ul
+      @li
+        @hl.scala{cwd}: The current working directory of the process. This can't be changed in Java, so if you need another path to work with the convention is to define a @hl.scala{wd} variable.
+      @li
+        @hl.scala{root}: The root of the filesystem.
+      @li
+        @hl.scala{home}: The home directory of the current user.
+      @li
+        @hl.scala{makeTmp}: Creates a temporary folder and returns the path.
+
+  @sect{RelPaths}
+    @p
+      @hl.scala{RelPath}s represent relative paths. These are basically defined as:
+
+    @hl.ref(pathsScala, "class RelPath", "") 
+
+    @p
+      The same data structure as @hl.scala{Path}s, except that they can represent a number of @hl.scala{up}s before the relative path is applied. They can be created in the following ways:
+
+    @hl.ref(opsExamples, Seq("relPaths", "//"), ":")   
+
+    @p
+      In general, very few APIs take relative paths. Their main purpose is to be combined with absolute paths in order to create new absolute paths. e.g.
+
+    @hl.ref(opsExamples, Seq("relPathCombine", "val"), "}")   
+
+    @p
+      @hl.scala{up} is a relative path that comes in-built:
+
+    @hl.ref(opsExamples, Seq("relPathUp", "val"), "}")       
+
+    @p
+      Note that all paths, both relative and absolute, are always expressed in a canonical manner:
+
+    @hl.ref(opsExamples, Seq("canonical", "assert"), "}")       
+
+    @p
+      So you don't need to worry about canonicalizing your paths before comparing them for equality or otherwise manipulating them.
+
+  @sect{Path Operations}
+
+    @p
+      Ammonite's paths are transparent data-structures, and you can always access the @hl.scala{segments} and @hl.scala{ups} directly. Nevertheless, Ammonite defines a number of useful operations that handle the common cases of dealing with these paths:
+
+    @hl.ref(pathsScala, "trait BasePath", "trait") 
+
+    @p
+      In this definition, @hl.scala{ThisType} represents the same type as the current path; e.g. a @hl.scala{Path}'s @hl.scala{/} returns a @hl.scala{Path} while a @hl.scala{RelPath}'s @hl.scala{/} returns a @hl.scala{RelPath}. Similarly, you can only compare or subtract paths of the same type.
+
+    @p
+      Apart from @hl.scala{RelPath}s themselves, a number of other data structures are convertible into @hl.scala{RelPath}s when spliced into a path using @hl.scala{/}:
+
+    @ul 
+      @li
+        @hl.scala{String}s
+      @li
+        @hl.scala{Symbols}s
+      @li
+        @hl.scala{Array[T]}s where @hl.scala{T} is convertible into a @hl.scala{RelPath}
+      @li
+        @hl.scala{Seq[T]}s where @hl.scala{T} is convertible into a @hl.scala{RelPath}
+
+  @sect{Extensions}
+    @p
+      Ammonite-Ops contains a set of extension methods on common types, which serve no purpose other than to make things more concise. These turn Scala from a "relatively-concise" language into one as tight as Bash scripts, while still maintaining the high level of type-safety and maintainability that comes with Scala code.
+
+    @sect{Traversable}
+      @p
+        These extensions apply to any @hl.scala{Traversable}: @hl.scala{Seq}s, @hl.scala{List}s, @hl.scala{Array}s, and others.
+      @ul
+        @li
+          @hl.scala{things | f} is an alias for @hl.scala{things map f}
+          @hl.scala{things || f} is an alias for @hl.scala{things flatMap f}
+          @hl.scala{things |? f} is an alias for @hl.scala{things filter f}
+          @hl.scala{things |& f} is an alias for @hl.scala{things reduce f}
+      @p
+        These should behave exactly the same as their implementations; their sole purpose is to make things more concise at the command-line.
+
+    @sect{Pipeable}
+      @ul
+        @li
+          @hl.scala{thing |> f} is an alias for @hl.scala{f(thing)}
+
+      @p
+        This lets you flip around the function and argument, and fits nicely into the Ammonite's @hl.scala{|} pipelines.
+ 
+  @sect{Operations}
+    @p
+      All these @hl.scala{Path}s and Extensions and what-not aren't interesting on their own, but serve as a base to use to perform filesystem operations in a concise and easy to use way. Here is a smattering of those operations:
+
+    @hl.scala(found)
+    
+    @p
+      In these definitions, @hl.scala{Op1} and @hl.scala{Op2} are isomorphic to @hl.scala{Function1} and @hl.scala{Function2}. The main difference is that ops can be called in two ways:
+
+    @hl.scala
+      rm(filepath)
+      rm! filepath  
+
+    @p
+      The latter syntax allows you to use it more easily from the command line, where remembering to close all your parenthesis is a hassle. Indentation signifies nesting, e.g. in addition to @hl.scala{write!} you also have @hl.scala{write.append!} and @hl.scala{write.over!}
+
+    @p
+      All of these operations are pre-defined and strongly typed, so feel free to jump to their implementation to look at what they do or what else is available.
+
+    @p
+      In general, each operator has sensible/safe defaults: 
+
+    @ul
+      @li
+        @hl.scala{rm} and @hl.scala{cp} are recursive
+      @li
+        @hl.scala{rm} ignores the file if it doesn't exist
+      @li
+        all operations that create a file or folder (@hl.scala{mkdir}, @hl.scala{write}, @hl.scala{mv}) automatically create any necessary parent directories
+      @li
+        @hl.scala{write} also does @i{not} stomp over existing files by default. You need to use @hl.scala{write.over}
+    @p
+      In general, this should make these operations much easier to use; the defaults should cover the 99% use case without needing any special flags or fiddling.
+
+  @sect{Chaining}
+    @p
+      The real value of Ammonite is the fact that you can pipe things together as easily as you could in Bash. No longer do you need to write reams of boilerplate. to accomplish simple tasks. Some of these chains are listed at the top of this readme, here are a few more fun examples:
+
+    @hl.ref(opsExamples, Seq("longExample", "// Chains", "// Move all files"), "assert(")
+ 
+    @p
+      As you can see, you can often compose elaborate operations entirely naturally using the available pipes, without needing to remember any special flags or techniques.
+
+  @sect{Ammonite-PPrint}
+    @p
+      Ammonite comes with a pretty-printing module, which lets you easily print data structures in a readable way. This is most often used in Ammonite-Repl, but can also be used standalone if desired:
+
+    @hl.scala
+      scala> import ammonite.pprint._
+      scala> import Config.Defaults._
+
+      scala> PPrint(
+        List(Seq(Seq("mgg", "mgg", "lols"), Seq("mgg", "mgg")), Seq(Seq("ggx", "ggx"),Seq("ggx", "ggx", "wtfx")))
+      )
+      res33: String =
+      List(
+        List(List("mgg", "mgg", "lols"), List("mgg", "mgg")),
+        List(List("ggx", "ggx"), List("ggx", "ggx", "wtfx"))
+      )
+
+    @p
+      Note how every string is escaped, everything is laid out nicely, and the output is in a state that you can easily copy & paste it back into the REPL to evaluate.
+    @p
+      You can also use
+    @hl.scala
+      import Configs.Colors._
+    @p
+      Instead of @hl.scala{Defaults} in order to turn on colored pretty-printing.
+    @p
+      Pretty-printing is by default defined for most standard library types, as well as case classes and case objects. For other types not supported, it falls back to using @hl.scala{toString}
+
+    @hl.scala("""
+      scala> PPrint(new Object())
+      res35: String = java.lang.Object@54f880c0
+    """)  
+    @p
+      In order to pretty print a type @hl.scala{T}, you need to have a @hl.scala{T: PPrint} context bound present. In order to write your own custom pretty printer for some type @hl.scala{T}, provide a @hl.scala{PPrinter[T]}.
+
+  @sect{Ammonite-REPL}
+    @p
+      Ammonite-REPL is a cleanroom re-implementation of the Scala REPL from first principles. It is much more featureful than the default REPL and comes with a lot of ergonomic improvements that may be familiar to people coming from IDEs or other REPLs such as IPython or Zsh.
+    @p
+      To try out Ammonite-REPL in an existing project, add the following to your @code{build.sbt}
+
+    @hl.scala
+      libraryDependencies += "com.lihaoyi" %% "ammonite-repl" % "0.2.3" % "test"
+
+      initialCommands in console := "ammonite.repl.Repl.main(null)"
+
+      scalaVersion := "2.11.5"
+    @p
+      After that, simple hit
+    @code
+      sbt projectName/test:console
+    @p
+      To activate the Ammonite REPL
+
+    @sect{Features}
+      @p
+        Ammonite-REPL supports many more features than the defualt REPL, including:
+
+      @sect{Artifact Loading}
+
+        @hl.ref('repl/'src/'test/'scala/'ammonite/'repl/"AdvancedTests.scala", Seq("standalone", "@"), "\"\"\"")
+
+        @p
+          Ammonite allows you to load artifacts directly from maven central by copy & pasting their SBT ivy-coordinate-snippet. In addition, you can also load in jars as @hl.scala{java.io.File}s to be included in the session or simple @hl.scala{String}s to be executed using the @hl.scala{load} command
+      @sect{Pretty-printed output}
+        @p
+          Ammonite-REPL uses Ammonite-PPrint to display its output by default. That means that everything is nicely formatted and copy&paste-able!
+
+      @sect{Superior Autocomplete}
+        @p
+          The original Scala REPL provides no autocomplete except for the most basic scenarios of @hl.scala{value.<complete>}. In the Ammonite-REPL, you get the same autocomplete-anywhere support that you get in a modern IDE.
+
+      @sect{Interrupting run-away execution with Ctrl-C}
+        @hl.scala("""
+          @ while(true) ()
+          ... hangs ...
+          ^Ctrl-C 
+          Interrupted!
+
+          @
+        """)
+        @p
+          The traditional Scala REPL doesn't handle runaway code, and gives you no option but to kill the process, losing all your work. Ammonite-REPL lets you interrupt the thread, stop the runaway-command and keep going.
+
+      @sect{Compiler-crash Robustness}
+        @hl.ref('repl/'src/'test/'scala/'ammonite/'repl/"FailureTests.scala", Seq("compilerCrash", "@"), "\"\"\"")
+
+        @p
+          The default Scala REPL throws away all your work if the compiler crashes. This doesn't make any sense, because all the compiler is is a dumb @hl.scala{String => Array[Byte]} pipe. In the Ammonite, we simply swap out the broken compiler for a new one and let you continue your work.
+
+    @sect{Builtins}
+      @p
+        Ammonite contains a rNange of useful built-ins implemented as normal functions. Everything inside the @hl.scala{ReplAPI} trait is imported by default and can be accessed directly by default to control the console.
+
+      @hl.ref('repl/'src/'main/'scala/'ammonite/'repl/'frontend/"ReplAPI.scala", "trait ReplAPI", "// End of ReplAPI")

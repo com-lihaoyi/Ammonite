@@ -61,12 +61,12 @@ object PathTests extends TestSuite{
         }
       }
       'AbsPath{
-        val wd = processWorkingDir
-        val abs = wd / rel
+        val d = cwd
+        val abs = d / rel
         'Constructor {
           assert(
-            abs.toString.drop(wd.toString.length) == "/src/main/scala",
-            abs.toString.length > wd.toString.length
+            abs.toString.drop(d.toString.length) == "/src/main/scala",
+            abs.toString.length > d.toString.length
           )
         }
         'Relativize{
@@ -94,7 +94,7 @@ object PathTests extends TestSuite{
         'AbsoluteUps{
           // Keep applying `up` and verify that the path gets
           // shorter and shorter and eventually errors.
-          var abs = processWorkingDir
+          var abs = cwd
           var i = abs.segments.length
           while(i > 0){
             abs/=up
@@ -148,7 +148,7 @@ object PathTests extends TestSuite{
         intercept[PathError.InvalidSegment]('src / "")
       }
       'CannotRelativizeAbsAndRel{
-        val abs = processWorkingDir
+        val abs = cwd
         val rel = 'omg/'wtf
         compileError("""
           abs - rel
@@ -191,10 +191,9 @@ object PathTests extends TestSuite{
         assert(a == "asd", b == "")
       }
       'paths{
-        val wd = processWorkingDir
-        val a/b/c/d/"omg" = wd/'A/'B/'C/'D/"omg"
+        val a/b/c/d/"omg" = cwd/'A/'B/'C/'D/"omg"
         assert(
-          a == wd/'A,
+          a == cwd/'A,
           b == "B",
           c == "C",
           d == "D"

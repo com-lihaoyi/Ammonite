@@ -2,35 +2,7 @@ Ammonite 0.2.3
 ==============
 
 ```scala
-import ammonite.all._
 
-// Get the current working directory
-val wd = processWorkingDir
-
-// Make a folder named "folder1"
-mkdir! wd/'folder1
-
-// List the current directory
-ls! wd
-
-// Copy a file or folder
-cp(wd/'folder1, wd/'folder2)
-
-// Write to a file without pain!
-write(wd/'folder2/"file1.scala", "Hello")
-write(wd/'folder2/"file2.scala", "Hello")
-
-// Rename all .scala files inside the folder d into .java files
-ls! wd/'folder2 | mv{case r"$x.scala" => s"$x.java"}
-
-// List files in a folder
-ls! wd/'folder2
-
-// Line-count of all .scala files recursively in d
-ls.rec! wd |? (_.ext == "scala") | read.lines | (_.size) sum
-
-// Find and concatenate all .js files directly in the working directory
-ls! wd |? (_.ext == "js") | read |> write! wd/'target/"bundle.js"
 ```
 
 Ammonite is a library used to write rock-solid [shell scripts](http://en.wikipedia.org/wiki/Shell_script) using Scala. It provides a very lightweight way to perform common system housekeeping operations in Scala, without having to drop down to sketchy, fragile [Bash](http://en.wikipedia.org/wiki/Bash_%28Unix_shell%29) scripts. Ammonite aims to be safe enough to use large programs while concise enough to use from the Scala command-line.
@@ -38,14 +10,7 @@ Ammonite is a library used to write rock-solid [shell scripts](http://en.wikiped
 In general, a Ammonite command to do a particular action should be not-much-longer than the equivalent Bash command, but it is far safer due to Scala's type-safe nature and design principles (immutability, no-global-state, etc.). Ammonite also can serve as Scala's missing IO library, serving to replace the [common mess of boilerplate](http://stackoverflow.com/a/26769030/871202):
 
 ```scala
-def removeAll(path: String) = {
-  def getRecursively(f: File): Seq[File] =
-    f.listFiles.filter(_.isDirectory).flatMap(getRecursively) ++ f.listFiles
-  getRecursively(new File(path)).foreach{f =>
-    if (!f.delete())
-      throw new RuntimeException("Failed to delete " + f.getAbsolutePath)}
-  }
-removeAll("target/thing")
+
 ```
 
 With single, sleek command:
@@ -290,40 +255,26 @@ Each of these would be a significant amount of ugly filesystem traversals, readi
 Pretty Printing
 ===============
 
-Ammonite comes with a pretty-printing module, which lets you easily print data structures in a readable way:
+
+
+
+
+
+
 
 ```scala
-scala> import ammonite.pprint._
-scala> import Config.Defaults._
 
-scala> PPrint(
-  List(Seq(Seq("mgg", "mgg", "lols"), Seq("mgg", "mgg")), Seq(Seq("ggx", "ggx"),Seq("ggx", "ggx", "wtfx")))
-)
-res33: String =
-List(
-  List(List("mgg", "mgg", "lols"), List("mgg", "mgg")),
-  List(List("ggx", "ggx"), List("ggx", "ggx", "wtfx"))
-)
 ```
 
-Note how every string is escaped, everything is laid out nicely, and the output is in a state that you can easily copy & paste it back into the REPL to evaluate.
 
-You can also use
+
+
 
 ```scala
-import Configs.Colors._
+
 ```
 
-Instead of `Defaults` in order to turn on colored pretty-printing.
 
-Pretty-printing is by default defined for most standard library types, as well as case classes and case objects. For other types not supported, it falls back to using `toString`
-
-```scala
-scala> PPrint(new Object())
-res35: String = java.lang.Object@54f880c0
-```
-
-In order to pretty print a type `T`, you need to have a `T: PPrint` context bound present. In order to write your own custom pretty printer for some type `T`, provide a `PPrinter[T]`.
 
 Limitations
 ===========
@@ -339,25 +290,20 @@ While Ammonite is an excellent filesystem API, and can turn your Scala/SBT conso
 Ammonite REPL
 =============
 
-The Ammonite REPL is a work-in-progress, cleanroom re-implementation of the Scala REPL from first principles. It aims create a codebase much more structured than that of `scala.tools.nsc.interpreter`, and thus being able to move faster and support more features.
+
 
 To try out the REPL, add the following to your build.sbt
 
 ```scala
-libraryDependencies += "com.lihaoyi" %% "ammonite-repl" % "0.2.3" % "test"
-
-initialCommands in console := "ammonite.repl.Repl.main(null)"
-
-scalaVersion := "2.11.5"
 ```
 
-After that, simple hit
+
 
 ```
-sbt projectName/test:console
+
 ```
 
-To activate the Ammonite REPL. The REPL is a work-in-progress, so expect to find a few rough edges. Ammonite already supports many more features than the default Scala REPL, including:
+. The REPL is a work-in-progress, so expect to find a few rough edges. Ammonite already supports many more features than the default Scala REPL, including:
 
 - Loading jars directly from Maven Central into the REPL
 
@@ -378,7 +324,7 @@ To activate the Ammonite REPL. The REPL is a work-in-progress, so expect to find
 Builtins
 --------
 
-Ammonite contains a rNange of useful built-ins implemented as normal functions. Everything inside the `ReplAPI` trait is imported by default and can be accessed directly by default to control the console.
+
 
 ```scala
 trait ReplAPI {

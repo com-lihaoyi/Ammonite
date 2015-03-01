@@ -7,10 +7,8 @@ import ammonite.ops._
 import utest._
 object OpTests extends TestSuite{
 
-  val wd = processWorkingDir
-
   val tests = TestSuite {
-    val res = wd/'ops/'target/"scala-2.11"/"test-classes"/'testdata
+    val res = cwd/'ops/'target/"scala-2.11"/"test-classes"/'testdata
     'ls - assert(
       ls(res).toSet == Set(res/'folder1, res/'folder2, res/"File.txt"),
       ls(res/'folder2).toSet == Set(
@@ -23,7 +21,7 @@ object OpTests extends TestSuite{
     'lsR{
       ls.rec(res).foreach(println)
       assert(
-        ls.rec(wd/'target/'nonexistent) == Seq(),
+        ls.rec(cwd/'target/'nonexistent) == Seq(),
         ls.rec(res/'folder2/'folder2b) == Seq(res/'folder2/'folder2b/"b.txt"),
         ls.rec(res/'folder2) == Seq(
           res/'folder2/'folder2a,
@@ -50,10 +48,10 @@ object OpTests extends TestSuite{
     }
     'rm{
       // shouldn't crash
-      rm! wd/'target/'nonexistent
+      rm! cwd/'target/'nonexistent
     }
     'Mutating{
-      val test = wd/'target/'test
+      val test = cwd/'target/'test
       rm! test
       mkdir! test
       'cp{
