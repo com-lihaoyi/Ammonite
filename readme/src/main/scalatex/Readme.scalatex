@@ -7,12 +7,12 @@
 
   @ul
     @li
-      @hl.scala{"com.lihaoyi" %% "ammonite-ops" % "0.2.3"}: A library for performing filesystem operations (reading, writing, copying, deleting, etc.) concisely in Scala.
+      @hl.scala{"com.lihaoyi" %% "ammonite-ops" % "0.2.4"}: A library for performing filesystem operations (reading, writing, copying, deleting, etc.) concisely in Scala.
 
     @li
-      @hl.scala{"com.lihaoyi" %% "ammonite-repl" % "0.2.3"}: A drop-in replacement for the standard Scala REPL (usable in any SBT project) with many new features and better usability.
+      @hl.scala{"com.lihaoyi" %% "ammonite-repl" % "0.2.4"}: A drop-in replacement for the standard Scala REPL (usable in any SBT project) with many new features and better usability.
     @li
-      @hl.scala{"com.lihaoyi" %% "ammonite-pprint" % "0.2.3"}: The pretty-printing library being used for ammonite-repl, also available standalone.
+      @hl.scala{"com.lihaoyi" %% "ammonite-pprint" % "0.2.4"}: The pretty-printing library being used for ammonite-repl, also available standalone.
 
 
 @sect{Ammonite-Ops}
@@ -39,7 +39,7 @@
   @p
     To get started, add this to your @code{build.sbt}:
 
-  @hl.scala{"com.lihaoyi" %% "ammonite-ops" % "0.2.3"}
+  @hl.scala{"com.lihaoyi" %% "ammonite-ops" % "0.2.4"}
 
   @p 
     And this at the top of the file you want to use Ammonite:
@@ -220,7 +220,7 @@
       To try out Ammonite-REPL in an existing project, add the following to your @code{build.sbt}
 
     @hl.scala
-      libraryDependencies += "com.lihaoyi" %% "ammonite-repl" % "0.2.3" % "test"
+      libraryDependencies += "com.lihaoyi" %% "ammonite-repl" % "0.2.4" % "test"
 
       initialCommands in console := "ammonite.repl.Repl.main(null)"
 
