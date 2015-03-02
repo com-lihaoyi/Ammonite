@@ -2,10 +2,9 @@ package ammonite.repl
 
 import acyclic.file
 
-import scala.tools.nsc.Global
 import scala.util.Try
 
-object Result{
+object Res{
   def apply[T](o: Option[T], errMsg: => String) = o match{
     case Some(s) => Success(s)
     case None => Failure(errMsg)
@@ -19,21 +18,21 @@ object Result{
   /**
    * Successes map and flatmap just like a simple Box[T]
    */
-  case class Success[+T](s: T) extends Result[T] {
-    def flatMap[V](f: T => Result[V]): Result[V] = f(s) match {
+  case class Success[+T](s: T) extends Res[T] {
+    def flatMap[V](f: T => Res[V]): Res[V] = f(s) match {
       case Success(v) => Success(v)
       case other => other
     }
 
-    def map[V](f: T => V): Result[V] = Success(f(s))
+    def map[V](f: T => V): Res[V] = Success(f(s))
   }
 
   /**
    * Failing results never call their callbacks, and just remain unchanged
    */
-  sealed abstract class Failing extends Result[Nothing]{
-    def flatMap[V](f: Nothing => Result[V]): Result[V] = this
-    def map[V](f: Nothing => V): Result[V] = this
+  sealed abstract class Failing extends Res[Nothing]{
+    def flatMap[V](f: Nothing => Res[V]): Res[V] = this
+    def map[V](f: Nothing => V): Res[V] = this
   }
   case class Failure(s: String) extends Failing
   object Failure{
@@ -46,7 +45,7 @@ object Result{
           .map("\t" + _)
           .mkString("\n")
       )
-      Result.Failure(traces.mkString("\n"))
+      Res.Failure(traces.mkString("\n"))
     }
   }
   case object Skip extends Failing
@@ -55,25 +54,25 @@ object Result{
 }
 
 /**
- * Represents the output of a single pass through the ammonite REPL.
+ * The result of a single pass through the ammonite REPL.
  */
-sealed abstract class Result[+T]{
-  def flatMap[V](f: T => Result[V]): Result[V]
-  def map[V](f: T => V): Result[V]
-  def filter(f: T => Boolean): Result[T] = this
+sealed abstract class Res[+T]{
+  def flatMap[V](f: T => Res[V]): Res[V]
+  def map[V](f: T => V): Res[V]
+  def filter(f: T => Boolean): Res[T] = this
 }
 
 /**
  * Fake for-comprehension generator to catch errors and turn
- * them into [[Result.Failure]]s
+ * them into [[Res.Failure]]s
  */
-case class Catching(handler: PartialFunction[Throwable, Result.Failing]) {
+case class Catching(handler: PartialFunction[Throwable, Res.Failing]) {
 
   def foreach[T](t: Unit => T): T = t(())
-  def flatMap[T](t: Unit => Result[T]): Result[T] =
+  def flatMap[T](t: Unit => Res[T]): Res[T] =
     try{t(())} catch handler
-  def map[T](t: Unit => T): Result[T] =
-    try Result.Success(t(())) catch handler
+  def map[T](t: Unit => T): Res[T] =
+    try Res.Success(t(())) catch handler
 }
 
 case class Evaluated(wrapper: String,
@@ -102,6 +101,9 @@ object Ref{
   }
 }
 
+/**
+ * Nice pattern matching for chained exceptions
+ */
 object Ex{
   def unapplySeq(t: Throwable): Option[Seq[Throwable]] = {
     def rec(t: Throwable): List[Throwable] = {

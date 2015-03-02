@@ -167,8 +167,6 @@ object Compiler{
     }
 
     def parse(line: String): Either[String, Seq[Global#Tree]]= {
-      var isIncomplete = false
-
       val out = mutable.Buffer.empty[String]
       logger = out.append(_)
       val r = compiler.currentRun

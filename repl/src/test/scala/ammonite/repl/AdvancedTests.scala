@@ -109,20 +109,20 @@ object AdvancedTests extends TestSuite{
       }
     }
     'multiline{
-      check.result("{ 1 +", Result.Buffer("{ 1 +"))
+      check.result("{ 1 +", Res.Buffer("{ 1 +"))
       check("1 }", "res0: Int = 2")
-      check.result("(", Result.Buffer("("))
-      check.result("1", Result.Buffer("(\n1"))
-      check.result("+", Result.Buffer("(\n1\n+"))
-      check.result("2", Result.Buffer("(\n1\n+\n2"))
+      check.result("(", Res.Buffer("("))
+      check.result("1", Res.Buffer("(\n1"))
+      check.result("+", Res.Buffer("(\n1\n+"))
+      check.result("2", Res.Buffer("(\n1\n+\n2"))
       check(")", "res1: Int = 3")
     }
     'exit{
-      check.result("exit", Result.Exit)
+      check.result("exit", Res.Exit)
     }
     'skip{
       check("1", "res0: Int = 1")
-      check.result("", Result.Skip)
+      check.result("", Res.Skip)
       check("2", "res1: Int = 2")
     }
     'history{

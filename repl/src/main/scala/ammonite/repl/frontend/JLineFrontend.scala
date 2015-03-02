@@ -2,7 +2,7 @@ package ammonite.repl.frontend
 
 import java.io.{OutputStream, InputStream}
 
-import ammonite.repl.{Timer, Evaluated, Result}
+import ammonite.repl.{Timer, Evaluated, Res}
 import jline.console.ConsoleReader
 import acyclic.file
 
@@ -13,9 +13,12 @@ import collection.JavaConversions._
  * All the mucky JLine interfacing code
  */
 trait JLineFrontend{
+  /**
+   * The width of the terminal
+   */
   def width: Int
-  def action(buffered: String): Result[String]
-  def update(buffered: String, r: Result[Evaluated]): Unit
+  def action(buffered: String): Res[String]
+  def update(buffered: String, r: Res[Evaluated]): Unit
 }
 object JLineFrontend{
   def apply(input: InputStream,
@@ -53,7 +56,7 @@ object JLineFrontend{
             .map(_.value().toString)
             .toVector
 
-    def action(buffered: String): Result[String] = for {
+    def action(buffered: String): Res[String] = for {
       _ <- Signaller("INT") {
         if (reader.getCursorBuffer.length() == 0) {
           println("Ctrl-D to exit")
@@ -69,21 +72,21 @@ object JLineFrontend{
           // Strip ANSI color codes, as described http://stackoverflow.com/a/14652763/871202
           else " " * (shellPrompt.replaceAll("\u001B\\[[;\\d]*m", "").length + 1)
         )
-      ).map(Result.Success(_))
-        .getOrElse(Result.Exit)
+      ).map(Res.Success(_))
+        .getOrElse(Res.Exit)
 
     } yield buffered + res
 
-    def update(buffered: String, r: Result[Evaluated]) = r match{
+    def update(buffered: String, r: Res[Evaluated]) = r match{
 
-      case Result.Buffer(line) =>
+      case Res.Buffer(line) =>
         /**
          * Hack to work around the fact that if nothing got entered into
          * the prompt, the `ConsoleReader`'s history wouldn't increase
          */
         if(line != buffered + "\n") reader.getHistory.removeLast()
 
-      case Result.Success(ev) =>
+      case Res.Success(ev) =>
         val last = reader.getHistory.size()-1
         reader.getHistory.set(last, buffered + reader.getHistory.get(last))
 

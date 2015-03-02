@@ -18,7 +18,7 @@ import scala.util.Try
  * need to get prepended to subsequent commands.
  */
 trait Evaluator{
-  def evalClass(code: String, wrapperName: String): Result[(Class[_], Seq[ImportData])]
+  def evalClass(code: String, wrapperName: String): Res[(Class[_], Seq[ImportData])]
   def getCurrentLine: Int
   def update(newImports: Seq[ImportData]): Unit
 
@@ -30,7 +30,7 @@ trait Evaluator{
    * passing in the callback ensures the printing is still done lazily, but within
    * the exception-handling block of the `Evaluator`
    */
-  def processLine(code: String, printCode: String, printer: Iterator[String] => Unit): Result[Evaluated]
+  def processLine(code: String, printCode: String, printer: Iterator[String] => Unit): Res[Evaluated]
 
   def previousImportBlock: String
   def addJar(url: URL): Unit
@@ -40,7 +40,7 @@ trait Evaluator{
 
 object Evaluator{
   def apply(currentClassloader: ClassLoader,
-            preprocess: (String, Int) => Result[Preprocessor.Output],
+            preprocess: (String, Int) => Res[Preprocessor.Output],
             compile: => (Array[Byte], String => Unit) => Compiler.Output,
             stdout: String => Unit): Evaluator = new Evaluator{
 
@@ -123,21 +123,18 @@ object Evaluator{
 
     def evalClass(code: String, wrapperName: String) = for{
 
-      (output, compiled) <- Result.Success{
+      (output, compiled) <- Res.Success{
         val output = mutable.Buffer.empty[String]
         val c = compile(code.getBytes, output.append(_))
         (output, c)
       }
 
-      (classFiles, importData) <- Result[(Traversable[(String, Array[Byte])], Seq[ImportData])](
+      (classFiles, importData) <- Res[(Traversable[(String, Array[Byte])], Seq[ImportData])](
         compiled, "Compilation Failed\n" + output.mkString("\n")
       )
 
-      cls <- Result[Class[_]](Try {
-        for ((name, bytes) <- classFiles) {
-          newFileDict(name) = bytes
-        }
-
+      cls <- Res[Class[_]](Try {
+        for ((name, bytes) <- classFiles) newFileDict(name) = bytes
         Class.forName(wrapperName , true, evalClassloader)
       }, e => "Failed to load compiled class " + e)
     } yield (cls, importData)
@@ -156,14 +153,14 @@ object Evaluator{
     }
     def interrupted() = {
       Thread.interrupted()
-      Result.Failure("\nInterrupted!")
+      Res.Failure("\nInterrupted!")
     }
 
     type InvEx = InvocationTargetException
     type InitEx = ExceptionInInitializerError
 
     def processLine(code: String, printCode: String, printer: Iterator[String] => Unit) = for {
-      wrapperName <- Result.Success("cmd" + currentLine)
+      wrapperName <- Res.Success("cmd" + currentLine)
       (cls, newImports) <- evalClass(
         s"""
         $previousImportBlock
@@ -177,13 +174,15 @@ object Evaluator{
       )
       _ = currentLine += 1
       _ <- Catching{
-        case Ex(_: InvEx, _: InitEx, ReplExit) => Result.Exit
-        case Ex(_: ThreadDeath) => interrupted()
-        case Ex(_: InvEx, _: ThreadDeath) => interrupted()
-        case Ex(_: InvEx, _: InitEx, userEx@_*)  => Result.Failure(userEx, stop = "$main")
-        case Ex(userEx@_*)  => Result.Failure(userEx, stop = "evaluatorRunPrinter")
+        case Ex(_: InvEx, _: InitEx, ReplExit)  => Res.Exit
+        case Ex(_: ThreadDeath)                 => interrupted()
+        case Ex(_: InvEx, _: ThreadDeath)       => interrupted()
+        case Ex(_: InvEx, _: InitEx, userEx@_*) => Res.Failure(userEx, stop = "$main")
+        case Ex(userEx@_*)                      => Res.Failure(userEx, stop = "evaluatorRunPrinter")
       }
     } yield {
+      // Exhaust the printer iterator now, before exiting the `Catching`
+      // block, so any exceptions thrown get properly caught and handled
       evaluatorRunPrinter(printer(evalMain(cls).asInstanceOf[Iterator[String]]))
       Evaluated(
         wrapperName,

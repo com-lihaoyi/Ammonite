@@ -1,9 +1,7 @@
 package ammonite.repl.interp
 
 import java.io.File
-import java.lang.reflect.InvocationTargetException
-import java.net.URLClassLoader
-
+import acyclic.file
 import ammonite.pprint
 import ammonite.repl._
 import ammonite.repl.frontend._
@@ -15,7 +13,7 @@ import scala.reflect.io.VirtualDirectory
  * to interpret Scala code. Doesn't attempt to provide any
  * real encapsulation for now.
  */
-class Interpreter(handleResult: => (String, Result[Evaluated]) => Unit,
+class Interpreter(handleResult: => (String, Res[Evaluated]) => Unit,
                   shellPrompt0: => Ref[String],
                   pprintConfig: pprint.Config = pprint.Config.Defaults.PPrintConfig,
                   colors0: ColorSet = ColorSet.BlackWhite,
@@ -31,8 +29,8 @@ class Interpreter(handleResult: => (String, Result[Evaluated]) => Unit,
                   saveHistory: (String => Unit, String) => Unit,
                   printer: Iterator[String] => Unit) = for{
     _ <- Catching { case Ex(x@_*) =>
-      val Result.Failure(trace) = Result.Failure(x)
-      Result.Failure(trace + "\nSomething unexpected went wrong =(")
+      val Res.Failure(trace) = Res.Failure(x)
+      Res.Failure(trace + "\nSomething unexpected went wrong =(")
     }
     Preprocessor.Output(code, printSnippet) <- preprocess(line, eval.getCurrentLine)
     _ = saveHistory(history.append(_), line)
@@ -43,28 +41,27 @@ class Interpreter(handleResult: => (String, Result[Evaluated]) => Unit,
     } finally Thread.currentThread().setContextClassLoader(oldClassloader)
   } yield out
 
-  def handleOutput(res: Result[Evaluated]) = {
+  def handleOutput(res: Res[Evaluated]) = {
     handleResult(buffered, res)
 
     res match{
-      case Result.Skip => true
-      case Result.Buffer(line) =>
+      case Res.Skip => true
+      case Res.Buffer(line) =>
         /**
          * Hack to work around the fact that if nothing got entered into
          * the prompt, the `ConsoleReader`'s history wouldn't increase
          */
-
         buffered = line + "\n"
         true
-      case Result.Exit =>
+      case Res.Exit =>
         stdout("Bye!")
         pressy.shutdownPressy()
         false
-      case Result.Success(ev) =>
+      case Res.Success(ev) =>
         buffered = ""
         eval.update(ev.imports)
         true
-      case Result.Failure(msg) =>
+      case Res.Failure(msg) =>
         buffered = ""
         stdout(Console.RED + msg + Console.RESET)
         true
@@ -126,7 +123,7 @@ class Interpreter(handleResult: => (String, Result[Evaluated]) => Unit,
       "ReplBridge"
     )
     ReplAPI.initReplBridge(
-      cls.map(_._1).asInstanceOf[Result.Success[Class[ReplAPIHolder]]].s,
+      cls.map(_._1).asInstanceOf[Res.Success[Class[ReplAPIHolder]]].s,
       replApi
     )
   }

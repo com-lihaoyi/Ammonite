@@ -1,7 +1,6 @@
 package ammonite.repl.interp
 import acyclic.file
-import ammonite.repl.Result
-import ammonite.repl.interp.Preprocessor.Output
+import ammonite.repl.Res
 import org.parboiled2.ParseError
 
 import scala.reflect.internal.Flags
@@ -13,7 +12,7 @@ import scala.tools.nsc.Global
  * three things:
  */
 trait Preprocessor{
-  def apply(code: String, wrapperId: Int): Result[Preprocessor.Output]
+  def apply(code: String, wrapperId: Int): Res[Preprocessor.Output]
 }
 object Preprocessor{
 
@@ -73,7 +72,7 @@ object Preprocessor{
       ObjectDef, ClassDef, TraitDef, DefDef, TypeDef, PatVarDef, Import, Expr
     )
 
-    def apply(code: String, wrapperId: Int): Result[Preprocessor.Output] = {
+    def apply(code: String, wrapperId: Int): Res[Preprocessor.Output] = {
       val splitted = new scalaParser.Scala(code){
         def Split = {
           def Prelude = rule( Annot.* ~ `implicit`.? ~ `lazy`.? ~ LocalMod.* )
@@ -82,14 +81,14 @@ object Preprocessor{
       }
 
       splitted.Split.run() match {
-        case util.Failure(ParseError(p, pp, t)) if p.index == code.length => Result.Buffer(code)
-        case util.Failure(e) => Result.Failure(parse(code).left.get)
-        case util.Success(Nil) => Result.Skip
+        case util.Failure(ParseError(p, pp, t)) if p.index == code.length => Res.Buffer(code)
+        case util.Failure(e) => Res.Failure(parse(code).left.get)
+        case util.Success(Nil) => Res.Skip
         case util.Success(postSplit: Seq[String]) =>
 
           val reParsed = postSplit.map(p => (parse(p), p))
           val errors = reParsed.collect{case (Left(e), _) => e }
-          if (errors.length != 0) Result.Failure(errors.mkString("\n"))
+          if (errors.length != 0) Res.Failure(errors.mkString("\n"))
           else {
             val allDecls = for (((Right(trees), code), i) <- reParsed.zipWithIndex) yield {
               // Suffix the name of the result variable with the index of
@@ -114,7 +113,7 @@ object Preprocessor{
               }
             }
 
-            Result(
+            Res(
               allDecls.reduceOption { (a, b) =>
                 Output(
                   a.code + ";" + b.code,

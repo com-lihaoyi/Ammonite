@@ -1,7 +1,7 @@
 package ammonite.repl.interp
 
 import ammonite.repl.ImportData
-
+import acyclic.file
 
 import scala.tools.nsc._
 import scala.tools.nsc.plugins.{PluginComponent, Plugin}

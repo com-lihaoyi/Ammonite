@@ -27,7 +27,7 @@ class Checker {
         allOutput += "\n@ " + line
         val (processed, printed) = run(line)
         if (!line.startsWith("//")) {
-          failLoudly(assert(processed.isInstanceOf[Result.Buffer]))
+          failLoudly(assert(processed.isInstanceOf[Res.Buffer]))
         }
 
         interp.handleOutput(processed)
@@ -47,7 +47,7 @@ class Checker {
     val msg = collection.mutable.Buffer.empty[String]
     val processed = interp.processLine(interp.buffered + input, _(_), _.foreach(msg.append(_)))
     val printed = processed.map(_ => msg.mkString)
-    if (!printed.isInstanceOf[Result.Buffer])
+    if (!printed.isInstanceOf[Res.Buffer])
       allOutput += "\n" + printed
     interp.handleOutput(processed)
     (processed, printed)
@@ -57,7 +57,7 @@ class Checker {
             expected: String = null) = {
     val (processed, printed) = run(input)
     if (expected != null){
-      val expectedRes = Result.Success(expected.trim)
+      val expectedRes = Res.Success(expected.trim)
       failLoudly(assert(printed == expectedRes))
     }
   }
@@ -67,14 +67,14 @@ class Checker {
     val (processed, printed) = run(input)
 
     printed match{
-      case Result.Success(v) => assert({v; allOutput; false})
-      case Result.Failure(s) =>
+      case Res.Success(v) => assert({v; allOutput; false})
+      case Res.Failure(s) =>
 
         failLoudly(assert(failureCheck(s)))
     }
   }
 
-  def result(input: String, expected: Result[Evaluated]) = {
+  def result(input: String, expected: Res[Evaluated]) = {
     val (processed, printed) = run(input)
     assert(processed == expected)
   }

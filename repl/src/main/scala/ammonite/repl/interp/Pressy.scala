@@ -1,6 +1,6 @@
 package ammonite.repl.interp
 
-import ammonite.repl.Timer
+import acyclic.file
 
 import scala.reflect.internal.util.{OffsetPosition, BatchSourceFile}
 import scala.reflect.io.VirtualDirectory
@@ -9,6 +9,9 @@ import scala.tools.nsc.backend.JavaPlatform
 import scala.tools.nsc.interactive.{Response, InteractiveAnalyzer}
 import scala.tools.nsc.util._
 
+/**
+ * Nice wrapper for the presentation compiler.
+ */
 trait Pressy{
   def complete(snippetIndex: Int, previousImports: String, snippet: String): (Int, Seq[String])
   def shutdownPressy(): Unit

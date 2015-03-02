@@ -9,7 +9,7 @@ import org.apache.ivy.core.resolve.ResolveOptions
 import org.apache.ivy.core.settings.IvySettings
 import org.apache.ivy.plugins.parser.xml.XmlModuleDescriptorWriter
 import org.apache.ivy.plugins.resolver.{IBiblioResolver, URLResolver}
-
+import acyclic.file
 object IvyConstructor extends IvyConstructor
 trait IvyConstructor{
   implicit class GroupIdExt(groupId: String){

@@ -1,15 +1,12 @@
 package ammonite.repl
 
-import java.io.{PrintStream, BufferedOutputStream, OutputStream, InputStream}
-import java.lang.reflect.InvocationTargetException
-import ammonite.{ops, pprint}
+import java.io.{PrintStream, OutputStream, InputStream}
+import ammonite.{pprint}
 import ammonite.repl.frontend._
 import acyclic.file
 import ammonite.repl.interp.Interpreter
 
 import scala.annotation.tailrec
-import scala.concurrent.{Future, Await}
-import scala.concurrent.duration.Duration
 import scala.util.Try
 
 class Repl(input: InputStream,

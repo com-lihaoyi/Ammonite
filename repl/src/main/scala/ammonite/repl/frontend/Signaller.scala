@@ -1,5 +1,5 @@
 package ammonite.repl.frontend
-
+import acyclic.file
 /**
  * Lets you turn on signal handling within a certain block,
  * attaching a callback to the handler and then turning it
