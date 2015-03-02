@@ -1,6 +1,7 @@
 import ammonite.all._
 
 import scala.util.matching.Regex
+import scalatags.Text.all._
 import scalatex.site.Highlighter.RefPath
 
 object Main{
@@ -21,6 +22,11 @@ object Main{
     )
     def scala(s: String) = this.highlight(s, "scala")
   }
+  def late(frags: => Frag) = new Late(() => frags)
+  class Late(frags: () => Frag) extends scalatags.text.Frag{
+    def render: String = frags().render
+    def writeTo(strb: StringBuilder): Unit = strb.append(render)
+  }
   val fileOps = read! wd/'ops/'src/'main/'scala/'ammonite/'ops/"FileOps.scala"
   val found = ".*/\\*\\*(\n\\s*\\*.*)+\n.*?extends.*?Op[^{]*".r
     .findAllIn(fileOps)
@@ -28,4 +34,6 @@ object Main{
     .lines
     .map(" "+_)
     .mkString("\n")
+
+
 }

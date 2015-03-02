@@ -3,25 +3,44 @@
 
 @sect{Ammonite}
   @p
-    Ammonite is a collection of Scala libraries intended to improve the experience of using Scala as an system shell. It includes two independent modules that are each usable on their own:
+    @a("Ammonite", href:="https://github.com/lihaoyi/Ammonite") is a collection of Scala libraries intended to improve the experience of using Scala as an system shell. It includes two independent modules that are each usable on their own:
 
   @ul
     @li
-      @hl.scala{"com.lihaoyi" %% "ammonite-ops" % "0.2.4"}: A library for performing filesystem operations (reading, writing, copying, deleting, etc.) concisely in Scala.
+      @sect.ref{Ammonite-Ops}: A library for performing filesystem operations (reading, writing, copying, deleting, etc.) concisely in Scala.
 
     @li
-      @hl.scala{"com.lihaoyi" %% "ammonite-repl" % "0.2.4"}: A drop-in replacement for the standard Scala REPL (usable in any SBT project) with many new features and better usability.
+      @sect.ref{Ammonite-REPL}: A drop-in replacement for the standard Scala REPL (usable in any SBT project) with many @sect.ref("Features", "new features") and better usability.
+
     @li
-      @hl.scala{"com.lihaoyi" %% "ammonite-pprint" % "0.2.4"}: The pretty-printing library being used for ammonite-repl, also available standalone.
+      @sect.ref{Ammonite-PPrint}: The pretty-printing library being used for ammonite-repl, also available standalone.
 
-
+  @{
+    late{
+      val ul2 = ul(marginTop:=0, marginBottom:=0)
+      def rec(t: scalatex.site.Section.Tree[String]): Frag = {
+        div(
+          a(t.value, href:=s"#${sect.munge(t.value)}"),
+          ul2(t.children.map(
+            c => li(rec(c))
+          ))
+        )
+      }
+      val res = ul2(
+        sect.structure.children.drop(1).map(
+          c => li(rec(c))
+        )
+      )
+      res
+    }
+  }
 @sect{Ammonite-Ops}
   @val opsExamples = 'ops/'src/'test/'scala/'test/'ammonite/'ops/"ExampleTests.scala"
   @val pathsScala = 'ops/'src/'main/'scala/'ammonite/'ops/"Path.scala"
   @hl.ref(opsExamples, Seq("longExample", "import"), "assert(")
 
   @p
-    Ammonite-Ops is a collection of tools intended to make common filesystem operations in Scala as concise and easy-to-use as from the Bash shell, while being robust enough to use in large applications without getting messy. 
+    Ammonite-Ops is a collection of tools intended to make common filesystem operations in Scala as concise and easy-to-use as from the @a("Bash shell", href:="http://en.wikipedia.org/wiki/Bash_%28Unix_shell%29"), while being robust enough to use in large applications without getting messy.
 
   @p
     As you can see, Ammonite-Ops replaces the common mess of boilerplate:
@@ -172,7 +191,7 @@
  
   @sect{Operations}
     @p
-      All these @hl.scala{Path}s and Extensions and what-not aren't interesting on their own, but serve as a base to use to perform filesystem operations in a concise and easy to use way. Here is a smattering of those operations:
+      All these @sect.ref{Paths} and @sect.ref{Extensions} and what-not aren't interesting on their own, but serve as a base to use to perform filesystem operations in a concise and easy to use way. Here is a smattering of those operations:
 
     @hl.scala(found)
     
@@ -215,7 +234,7 @@
 
 @sect{Ammonite-REPL}
   @p
-    Ammonite-REPL is a cleanroom re-implementation of the Scala REPL from first principles. It is much more featureful than the default REPL and comes with a lot of ergonomic improvements that may be familiar to people coming from IDEs or other REPLs such as IPython or Zsh.
+    Ammonite-REPL is a cleanroom re-implementation of the Scala REPL from first principles. It is much more featureful than the default REPL and comes with a lot of ergonomic improvements that may be familiar to people coming from IDEs or other REPLs such as @a("IPython", href:="ipython.org") or @a("Zsh", href:="http://www.zsh.org/").
   @p
     To try out Ammonite-REPL in an existing project, add the following to your @code{build.sbt}
 
@@ -245,7 +264,7 @@
     @sect{Pretty-printed output}
       @hl.ref('repl/'src/'test/'scala/'ammonite/'repl/"AdvancedTests.scala", Seq("'pprint", "@"), "\"\"\"")
       @p
-        Ammonite-REPL uses Ammonite-PPrint to display its output by default. That means that everything is nicely formatted to fit within the width of the terminal, and is copy-paste-able!
+        Ammonite-REPL uses @sect.ref{Ammonite-PPrint} to display its output by default. That means that everything is nicely formatted to fit within the width of the terminal, and is copy-paste-able!
 
     @sect{Superior Autocomplete}
       @p
