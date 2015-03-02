@@ -108,6 +108,36 @@ object AdvancedTests extends TestSuite{
         """)
       }
     }
+    'pprint{
+      check.session("""
+        @ Seq.fill(10)(Seq.fill(3)("Foo"))
+        res0: Seq[Seq[java.lang.String]] = List(
+          List("Foo", "Foo", "Foo"),
+          List("Foo", "Foo", "Foo"),
+          List("Foo", "Foo", "Foo"),
+          List("Foo", "Foo", "Foo"),
+          List("Foo", "Foo", "Foo"),
+          List("Foo", "Foo", "Foo"),
+          List("Foo", "Foo", "Foo"),
+          List("Foo", "Foo", "Foo"),
+          List("Foo", "Foo", "Foo"),
+          List("Foo", "Foo", "Foo")
+        )
+
+        @ case class Foo(i: Int, s0: String, s1: Seq[String])
+        defined class Foo
+
+        @ Foo(1, "", Nil)
+        res2: cmd1.Foo = Foo(1, "", List())
+
+        @ Foo(1234567, "I am a cow, hear me moo", Seq("I weigh twice as much as you", "and I look good on the barbecue"))
+        res3: cmd1.Foo = Foo(
+          1234567,
+          "I am a cow, hear me moo",
+          List("I weigh twice as much as you", "and I look good on the barbecue")
+        )
+      """)
+    }
     'multiline{
       check.result("{ 1 +", Res.Buffer("{ 1 +"))
       check("1 }", "res0: Int = 2")

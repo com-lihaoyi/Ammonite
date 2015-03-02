@@ -16,9 +16,10 @@ class Checker {
   def session(sess: String): Unit ={
 //    println("SESSION")
 //    println(sess)
-    val margin = sess.lines.filter(_.trim != "").map(_.takeWhile(_ == ' ').length).max
+    val margin = sess.lines.filter(_.trim != "").map(_.takeWhile(_ == ' ').length).min
     val steps = sess.replace("\n" + margin, "\n").split("\n\n")
     for(step <- steps){
+
       val (cmdLines, resultLines) = step.lines.map(_.drop(margin)).partition(_.startsWith("@"))
       val commandText = cmdLines.map(_.stripPrefix("@ ")).toVector
 
