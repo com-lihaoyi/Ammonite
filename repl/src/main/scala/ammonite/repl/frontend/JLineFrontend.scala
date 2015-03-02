@@ -21,7 +21,6 @@ object JLineFrontend{
   def apply(input: InputStream,
             output: OutputStream,
             shellPrompt: => String,
-            previousImportBlock: => String,
             compilerComplete: => (Int, String) => (Int, Seq[String]),
             initialHistory: Seq[String]): JLineFrontend
             = new JLineFrontend with jline.console.completer.Completer {
@@ -39,14 +38,13 @@ object JLineFrontend{
 
     def complete(_buf: String, cursor: Int, candidates: JList[CharSequence]): Int = {
       val buf   = if (_buf == null) "" else _buf
-      val prev = previousImportBlock + "\nobject AutocompleteWrapper{\n"
       import collection.JavaConversions._
       val (completionBase, completions) = compilerComplete(
-        cursor + prev.length,
-        prev + buf + "\n}"
+        cursor,
+        buf
       )
       candidates.addAll(completions)
-      completionBase - prev.length
+      completionBase
     }
 
     def history =

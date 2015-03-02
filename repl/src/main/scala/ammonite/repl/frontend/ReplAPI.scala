@@ -13,6 +13,9 @@ class ReplAPIHolder {
   lazy val shell = shell0
 }
 
+/**
+ * Thrown to exit the REPL cleanly
+ */
 case object ReplExit extends ControlThrowable
 
 trait ReplAPI {

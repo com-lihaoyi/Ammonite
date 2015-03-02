@@ -14,12 +14,11 @@ object AutocompleteTests extends TestSuite{
                  cmp: (Set[String], Set[String]) => Set[String]) = {
       val cursor = caretCode.indexOf("<caret>")
       val buf = caretCode.replace("<caret>", "")
-      val prevImports = check.interp.eval.previousImportBlock
-      val prev = prevImports + "\n" + "object Foo{"
-      import collection.JavaConversions._
+
       val (index, completions) = check.interp.pressy.complete(
-        cursor + prev.length,
-        prev + buf + "}"
+        cursor,
+        check.interp.eval.previousImportBlock,
+        buf
       )
       val left = cmp(expected, completions.toSet)
       assert(left == Set())

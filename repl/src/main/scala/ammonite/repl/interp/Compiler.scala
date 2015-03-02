@@ -33,6 +33,10 @@ import scala.tools.nsc.util._
  */
 trait Compiler{
   def compile(src: Array[Byte], runLogger: String => Unit): Compiler.Output
+
+  /**
+   * Either the statements that were parsed or the error message
+   */
   def parse(line: String): Either[String, Seq[Global#Tree]]
 }
 object Compiler{

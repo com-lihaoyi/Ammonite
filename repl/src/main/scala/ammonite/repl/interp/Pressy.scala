@@ -10,7 +10,7 @@ import scala.tools.nsc.interactive.{Response, InteractiveAnalyzer}
 import scala.tools.nsc.util._
 
 trait Pressy{
-  def complete(index: Int, allCode: String): (Int, Seq[String])
+  def complete(snippetIndex: Int, previousImports: String, snippet: String): (Int, Seq[String])
   def shutdownPressy(): Unit
 }
 object Pressy {
@@ -20,36 +20,40 @@ object Pressy {
 
     var cachedPressy: nsc.interactive.Global = null
 
+    def initPressy = {
+      val (settings, reporter, vd, jcp) = Compiler.initGlobalBits(
+        jarDeps, dirDeps, dynamicClasspath, _ => (), scala.Console.YELLOW
+      )
+      new nsc.interactive.Global(settings, reporter) {
+        g =>
+
+        override def classPath = jcp
+
+        override lazy val platform: ThisPlatform = new JavaPlatform {
+          val global: g.type = g
+
+          override def classPath = jcp
+        }
+        override lazy val analyzer = new {
+          val global: g.type = g
+        } with InteractiveAnalyzer {
+          override def findMacroClassLoader() = new ClassLoader(this.getClass.getClassLoader) {}
+        }
+      }
+    }
+
     /**
      * Ask for autocompletion at a particular spot in the code, returning
      * possible things that can be completed at that location. May try various
      * different completions depending on where the `index` is placed, but
      * the outside caller probably doesn't care.
      */
-    def complete(index: Int, allCode: String): (Int, Seq[String]) = {
-      if (cachedPressy == null) {
-        cachedPressy = {
-          val (settings, reporter, vd, jcp) = Compiler.initGlobalBits(
-            jarDeps, dirDeps, dynamicClasspath, _ => (), scala.Console.YELLOW
-          )
-          new nsc.interactive.Global(settings, reporter) {
-            g =>
-
-            override def classPath = jcp
-
-            override lazy val platform: ThisPlatform = new JavaPlatform {
-              val global: g.type = g
-
-              override def classPath = jcp
-            }
-            override lazy val analyzer = new {
-              val global: g.type = g
-            } with InteractiveAnalyzer {
-              override def findMacroClassLoader() = new ClassLoader(this.getClass.getClassLoader) {}
-            }
-          }
-        }
-      }
+    def complete(snippetIndex: Int, previousImports: String, snippet: String): (Int, Seq[String]) = {
+      val prefix = previousImports + "\nobject AutocompleteWrapper{\n"
+      val suffix = "\n}"
+      val allCode =  prefix + snippet + suffix
+      val index = snippetIndex + prefix.length
+      if (cachedPressy == null) cachedPressy = initPressy
 
       val pressy = cachedPressy
       val currentFile = new BatchSourceFile(
@@ -146,7 +150,7 @@ object Pressy {
 
       val (i, all) = dotted.headOption orElse prefixed.headOption getOrElse scoped
 
-      (i, all.filter(_ != "<init>"))
+      (i - prefix.length, all.filter(_ != "<init>"))
     }
 
     def shutdownPressy() = {

@@ -29,8 +29,7 @@ class Repl(input: InputStream,
     input,
     output,
     colorSet.prompt + shellPrompt() + Console.RESET,
-    interp.eval.previousImportBlock,
-    interp.pressy.complete,
+    interp.pressy.complete(_, interp.eval.previousImportBlock, _),
     initialHistory
   )
 

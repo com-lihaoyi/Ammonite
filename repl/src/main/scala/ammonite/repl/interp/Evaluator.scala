@@ -31,6 +31,7 @@ trait Evaluator{
    * the exception-handling block of the `Evaluator`
    */
   def processLine(code: String, printCode: String, printer: Iterator[String] => Unit): Result[Evaluated]
+
   def previousImportBlock: String
   def addJar(url: URL): Unit
   def newClassloader(): Unit
