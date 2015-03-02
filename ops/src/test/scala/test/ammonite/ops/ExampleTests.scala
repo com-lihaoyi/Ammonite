@@ -27,20 +27,20 @@ object ExampleTests extends TestSuite{
 
       // Write to a file without pain! Necessary
       // enclosing directories are created automatically
-      write(wd/'folder2/"file1.scala", "package example\nclass Foo{}")
-      write(wd/'folder2/"file2.scala", "package example\nclass Bar{}")
+      write(wd/'dir2/"file1.scala", "package example\nclass Foo{}")
+      write(wd/'dir2/"file2.scala", "package example\nclass Bar{}")
 
       // Rename all .scala files inside the folder d into .java files
-      ls! wd/'folder2 | mv{case r"$x.scala" => s"$x.java"}
+      ls! wd/'dir2 | mv{case r"$x.scala" => s"$x.java"}
 
       // List files in a folder
-      val renamed = ls! wd/'folder2
+      val renamed = ls! wd/'dir2
 
       // Line-count of all .java files recursively in wd
       val lineCount = ls.rec! wd |? (_.ext == "java") | read.lines | (_.size) sum
 
-      // Find and concatenate all .js files directly in the working directory
-      ls! wd/'folder2 |? (_.ext == "java") | read |> write! wd/'target/"bundled.java"
+      // Find and concatenate all .java files directly in the working directory
+      ls! wd/'dir2|? (_.ext == "java") | read |> write! wd/'target/"bundled.java"
 
       assert(
         listed == Seq(wd/"folder1"),
