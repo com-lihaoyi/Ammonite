@@ -33,7 +33,8 @@ class Repl(input: InputStream,
     shellPrompt,
     pprintConfig.copy(maxWidth = frontEnd.width),
     colorSet,
-    stdout = new PrintStream(output).println
+    stdout = new PrintStream(output).println,
+    initialHistory = initialHistory
   )
 
   def action() = for{

@@ -17,12 +17,13 @@ class Interpreter(handleResult: => (String, Res[Evaluated]) => Unit,
                   shellPrompt0: => Ref[String],
                   pprintConfig: pprint.Config = pprint.Config.Defaults.PPrintConfig,
                   colors0: ColorSet = ColorSet.BlackWhite,
-                  stdout: String => Unit){ interp =>
+                  stdout: String => Unit,
+                  initialHistory: Seq[String]){ interp =>
 
   val dynamicClasspath = new VirtualDirectory("(memory)", None)
   var extraJars = Seq[java.io.File]()
 
-  val history = collection.mutable.Buffer.empty[String]
+  val history = initialHistory.to[collection.mutable.Buffer]
   var buffered = ""
 
   def processLine(line: String,
