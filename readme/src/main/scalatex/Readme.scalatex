@@ -3,17 +3,17 @@
 
 @sect{Ammonite}
   @p
-    @a("Ammonite", href:="https://github.com/lihaoyi/Ammonite") is a collection of Scala libraries intended to improve the experience of using Scala as an system shell. It includes two independent modules that are each usable on their own:
+    @a("Ammonite", href:="https://github.com/lihaoyi/Ammonite") is a collection of Scala libraries intended to improve the experience of using Scala as an system shell. It includes two independent modules:
 
   @ul
     @li
-      @sect.ref{Ammonite-Ops}: A library for performing filesystem operations (reading, writing, copying, deleting, etc.) concisely in Scala.
+      @sect.ref{Ammonite-Ops}: A library for performing filesystem operations (reading, writing, copying, deleting, etc.) concisely in Scala. Much easier than doing things manually using @hl.scala{java.io}, while statically-typed and much safer than shelling out to Bash scripts.
 
     @li
-      @sect.ref{Ammonite-REPL}: A drop-in replacement for the standard Scala REPL (usable in any SBT project) with many @sect.ref("Features", "new features") and better usability.
+      @sect.ref{Ammonite-REPL}: A modern, drop-in replacement for the standard Scala REPL (usable in any SBT project) with many @sect.ref("Features", "new features") and better usability to make your shell usage a pleasant experience.
 
-    @li
-      @sect.ref{Ammonite-PPrint}: The pretty-printing library being used for ammonite-repl, also available standalone.
+  @p
+    Each of these are independent modules that are each usable on their own. Together, they form the basis of a systems shell that can be used as a replacement for the @a("Bash shell", href:="http://en.wikipedia.org/wiki/Bash_%28Unix_shell%29") for performing common system housekeeping tasks.
 
   @{
     late{
@@ -40,7 +40,7 @@
   @hl.ref(opsExamples, Seq("longExample", "import"), "assert(")
 
   @p
-    Ammonite-Ops is a collection of tools intended to make common filesystem operations in Scala as concise and easy-to-use as from the @a("Bash shell", href:="http://en.wikipedia.org/wiki/Bash_%28Unix_shell%29"), while being robust enough to use in large applications without getting messy.
+    Ammonite-Ops is a collection of tools intended to make common filesystem operations in Scala as concise and easy-to-use as from the Bash shell, while being robust enough to use in large applications without getting messy.
 
   @p
     As you can see, Ammonite-Ops replaces the common mess of boilerplate:
