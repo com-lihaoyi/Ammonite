@@ -20,8 +20,6 @@ class Repl(input: InputStream,
 
   val shellPrompt = Ref(shellPrompt0)
 
-  import concurrent.ExecutionContext.Implicits.global
-
   val frontEnd = JLineFrontend(
     input,
     output,
@@ -30,10 +28,6 @@ class Repl(input: InputStream,
     initialHistory
   )
 
-  // Do this asynchronously and wait on it in the main loop,
-  // so the user can begin entering input even before all this
-  // stuff has finished loading.
-
   val interp: Interpreter = new Interpreter(
     frontEnd.update,
     shellPrompt,
@@ -41,8 +35,6 @@ class Repl(input: InputStream,
     colorSet,
     stdout = new PrintStream(output).println
   )
-
-//  def interp: Interpreter = Await.result(interp0, Duration.Inf)
 
   def action() = for{
     // Condition to short circuit early if `interp` hasn't finished evaluating
