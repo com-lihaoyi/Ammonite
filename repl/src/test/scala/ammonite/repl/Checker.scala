@@ -10,7 +10,8 @@ class Checker {
   val interp = new Interpreter(
     (_, _) => (),
     Ref[String](""),
-    stdout = allOutput += _
+    stdout = allOutput += _,
+    initialHistory = Nil
   )
 
   def session(sess: String): Unit ={
