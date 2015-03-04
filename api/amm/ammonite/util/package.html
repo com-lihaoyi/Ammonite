@@ -1,0 +1,530 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <title>util - ammonite.util</title>
+          <meta name="description" content="util - ammonite.util" />
+          <meta name="keywords" content="util ammonite.util" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../lib/template.js"></script>
+      <script type="text/javascript" src="../../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../index.html';
+            var hash = 'ammonite.util.package';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <img alt="Package" src="../../lib/package_big.png" />
+        <p id="owner"><a href="../package.html" class="extype" name="ammonite">ammonite</a></p>
+        <h1>util</h1><span class="permalink">
+      <a href="../../index.html#ammonite.util.package" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <span class="name">util</span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        
+        
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="ammonite.util.Bind" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Bind[T]extendsProductwithSerializable"></a>
+      <a id="Bind[T]:Bind[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Bind.html"><span class="name">Bind</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="value">value: <span class="extype" name="ammonite.util.Bind.T">T</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="typeTag">typeTag: <span class="extype" name="scala.reflect.api.TypeTags.TypeTag">scala.reflect.api.JavaUniverse.TypeTag</span>[<span class="extype" name="ammonite.util.Bind.T">T</span>]</span>)</span><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.util.package@Bind[T]extendsProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Models a binding of a value to a typed name, and is passed into the
+REPL so it can re-create the bindings inside the REPL's scope
+</p>
+    </li><li name="ammonite.util.Catching" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="CatchingextendsProductwithSerializable"></a>
+      <a id="Catching:Catching"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Catching.html"><span class="name">Catching</span></a><span class="params">(<span name="handler">handler: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.PartialFunction" class="extype" target="_top">PartialFunction</a>[<a href="../../scala/package.html#Throwable=Throwable" class="extmbr" name="scala.Throwable">Throwable</a>, <a href="Res$$Failing.html" class="extype" name="ammonite.util.Res.Failing">Failing</a>]</span>)</span><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.util.package@CatchingextendsProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Fake for-comprehension generator to catch errors and turn
+them into <a href="Res$$Failure.html" class="extype" name="ammonite.util.Res.Failure">Res.Failure</a>s
+</p>
+    </li><li name="ammonite.util.CodeColors" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="CodeColorsextendsAnyRef"></a>
+      <a id="CodeColors:CodeColors"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="CodeColors.html"><span class="name">CodeColors</span></a><span class="result"> extends <a href="../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.util.package@CodeColorsextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="ammonite.util.Colors" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ColorsextendsProductwithSerializable"></a>
+      <a id="Colors:Colors"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Colors.html"><span class="name">Colors</span></a><span class="params">(<span name="prompt">prompt: <a href="Ref.html" class="extype" name="ammonite.util.Ref">Ref</a>[<a href="https://oss.sonatype.org/service/local/repositories/releases/archive/com/lihaoyi/fansi_2.11/0.1.3/fansi_2.11-0.1.3-javadoc.jar/!/index.html#fansi.Attrs" class="extype" target="_top">Attrs</a>]</span>, <span name="ident">ident: <a href="Ref.html" class="extype" name="ammonite.util.Ref">Ref</a>[<a href="https://oss.sonatype.org/service/local/repositories/releases/archive/com/lihaoyi/fansi_2.11/0.1.3/fansi_2.11-0.1.3-javadoc.jar/!/index.html#fansi.Attrs" class="extype" target="_top">Attrs</a>]</span>, <span name="type">type: <a href="Ref.html" class="extype" name="ammonite.util.Ref">Ref</a>[<a href="https://oss.sonatype.org/service/local/repositories/releases/archive/com/lihaoyi/fansi_2.11/0.1.3/fansi_2.11-0.1.3-javadoc.jar/!/index.html#fansi.Attrs" class="extype" target="_top">Attrs</a>]</span>, <span name="literal">literal: <a href="Ref.html" class="extype" name="ammonite.util.Ref">Ref</a>[<a href="https://oss.sonatype.org/service/local/repositories/releases/archive/com/lihaoyi/fansi_2.11/0.1.3/fansi_2.11-0.1.3-javadoc.jar/!/index.html#fansi.Attrs" class="extype" target="_top">Attrs</a>]</span>, <span name="prefix">prefix: <a href="Ref.html" class="extype" name="ammonite.util.Ref">Ref</a>[<a href="https://oss.sonatype.org/service/local/repositories/releases/archive/com/lihaoyi/fansi_2.11/0.1.3/fansi_2.11-0.1.3-javadoc.jar/!/index.html#fansi.Attrs" class="extype" target="_top">Attrs</a>]</span>, <span name="comment">comment: <a href="Ref.html" class="extype" name="ammonite.util.Ref">Ref</a>[<a href="https://oss.sonatype.org/service/local/repositories/releases/archive/com/lihaoyi/fansi_2.11/0.1.3/fansi_2.11-0.1.3-javadoc.jar/!/index.html#fansi.Attrs" class="extype" target="_top">Attrs</a>]</span>, <span name="keyword">keyword: <a href="Ref.html" class="extype" name="ammonite.util.Ref">Ref</a>[<a href="https://oss.sonatype.org/service/local/repositories/releases/archive/com/lihaoyi/fansi_2.11/0.1.3/fansi_2.11-0.1.3-javadoc.jar/!/index.html#fansi.Attrs" class="extype" target="_top">Attrs</a>]</span>, <span name="selected">selected: <a href="Ref.html" class="extype" name="ammonite.util.Ref">Ref</a>[<a href="https://oss.sonatype.org/service/local/repositories/releases/archive/com/lihaoyi/fansi_2.11/0.1.3/fansi_2.11-0.1.3-javadoc.jar/!/index.html#fansi.Attrs" class="extype" target="_top">Attrs</a>]</span>, <span name="error">error: <a href="Ref.html" class="extype" name="ammonite.util.Ref">Ref</a>[<a href="https://oss.sonatype.org/service/local/repositories/releases/archive/com/lihaoyi/fansi_2.11/0.1.3/fansi_2.11-0.1.3-javadoc.jar/!/index.html#fansi.Attrs" class="extype" target="_top">Attrs</a>]</span>, <span name="warning">warning: <a href="Ref.html" class="extype" name="ammonite.util.Ref">Ref</a>[<a href="https://oss.sonatype.org/service/local/repositories/releases/archive/com/lihaoyi/fansi_2.11/0.1.3/fansi_2.11-0.1.3-javadoc.jar/!/index.html#fansi.Attrs" class="extype" target="_top">Attrs</a>]</span>)</span><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.util.package@ColorsextendsProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">A set of colors used to highlight the miscellanious bits of the REPL.</p><div class="fullcomment"><div class="comment cmt"><p>A set of colors used to highlight the miscellanious bits of the REPL.
+Re-used all over the place in PPrint, TPrint, syntax highlighting,
+command-echoes, etc. in order to keep things consistent
+</p></div><dl class="paramcmts block"><dt class="param">prompt</dt><dd class="cmt"><p>The command prompt</p></dd><dt class="param">ident</dt><dd class="cmt"><p>Definition of top-level identifiers</p></dd><dt class="param">literal</dt><dd class="cmt"><p>Strings, integers and other literal expressions</p></dd><dt class="param">prefix</dt><dd class="cmt"><p>The Seq/Foo when printing a Seq(...) or case class Foo(...)</p></dd><dt class="param">selected</dt><dd class="cmt"><p>The color of text selected in the line-editor</p></dd><dt class="param">error</dt><dd class="cmt"><p>The color used to print error messages of all kinds</p></dd></dl></div>
+    </li><li name="ammonite.util.CompilationError" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="CompilationErrorextendsException"></a>
+      <a id="CompilationError:CompilationError"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="CompilationError.html"><span class="name">CompilationError</span></a><span class="result"> extends <a href="../../scala/package.html#Exception=Exception" class="extmbr" name="scala.Exception">Exception</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.util.package@CompilationErrorextendsException" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Exception for reporting script compilation failures
+</p>
+    </li><li name="ammonite.util.Evaluated" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="EvaluatedextendsProductwithSerializable"></a>
+      <a id="Evaluated:Evaluated"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Evaluated.html"><span class="name">Evaluated</span></a><span class="params">(<span name="wrapper">wrapper: <a href="../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="Name.html" class="extype" name="ammonite.util.Name">Name</a>]</span>, <span name="imports">imports: <a href="Imports.html" class="extype" name="ammonite.util.Imports">Imports</a></span>, <span name="tag">tag: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.util.package@EvaluatedextendsProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="ammonite.util.ImportData" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ImportDataextendsProductwithSerializable"></a>
+      <a id="ImportData:ImportData"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="ImportData.html"><span class="name">ImportData</span></a><span class="params">(<span name="fromName">fromName: <a href="Name.html" class="extype" name="ammonite.util.Name">Name</a></span>, <span name="toName">toName: <a href="Name.html" class="extype" name="ammonite.util.Name">Name</a></span>, <span name="prefix">prefix: <a href="../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="Name.html" class="extype" name="ammonite.util.Name">Name</a>]</span>, <span name="importType">importType: <a href="ImportData$$ImportType.html" class="extype" name="ammonite.util.ImportData.ImportType">ImportType</a></span>)</span><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.util.package@ImportDataextendsProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Represents the importing of a single name in the Ammonite REPL, of the
+form</p><div class="fullcomment"><div class="comment cmt"><p>Represents the importing of a single name in the Ammonite REPL, of the
+form</p><pre><span class="kw">import</span> $prefix.{$fromName <span class="kw">=&gt;</span> $toName}</pre><p>All imports are reduced to this form; <code>import $prefix.$name</code> is results in
+the <code>fromName</code> and <code>toName</code> being the same, while <code>import $prefix._</code> or
+<code>import $prefix.{foo, bar, baz}</code> are split into multiple distinct
+<a href="ImportData.html" class="extype" name="ammonite.util.ImportData">ImportData</a> objects.</p><p>Note that imports can be of one of three distinct <code>ImportType</code>s: importing
+a type, a term, or both. This lets us properly deal with shadowing correctly
+if we import the type and term of the same name from different places
+</p></div></div>
+    </li><li name="ammonite.util.Imports" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ImportsextendsAnyRef"></a>
+      <a id="Imports:Imports"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Imports.html"><span class="name">Imports</span></a><span class="result"> extends <a href="../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.util.package@ImportsextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Represents the imports that occur before a piece of user code in the
+Ammonite REPL.</p><div class="fullcomment"><div class="comment cmt"><p>Represents the imports that occur before a piece of user code in the
+Ammonite REPL. It's basically a <code>Seq[ImportData]</code>, except we really want
+it to be always in a &quot;canonical&quot; form without shadowed/duplicate imports.</p><p>Thus we only expose an <code>apply</code> method which performs this de-duplication,
+and a <code>++</code> operator that combines two sets of imports while performing
+de-duplication.
+</p></div></div>
+    </li><li name="ammonite.util.Name" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="NameextendsProductwithSerializable"></a>
+      <a id="Name:Name"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Name.html"><span class="name">Name</span></a><span class="params">(<span name="raw">raw: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.util.package@NameextendsProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Represents a single identifier in Scala source code, e.g.</p><div class="fullcomment"><div class="comment cmt"><p>Represents a single identifier in Scala source code, e.g. &quot;scala&quot; or
+&quot;println&quot; or &quot;<code>Hello-World</code>&quot;.</p><p>Holds the value &quot;raw&quot;, with all special characters intact, e.g.
+&quot;Hello-World&quot;. Can be used <a href="Name.html#backticked:String" class="extmbr" name="ammonite.util.Name#backticked">backticked</a> e.g. &quot;<code>Hello-World</code>&quot;, useful for
+embedding in Scala source code, or <a href="Name.html#encoded:String" class="extmbr" name="ammonite.util.Name#encoded">encoded</a> e.g. &quot;Hello$minusWorld&quot;,
+useful for accessing names as-seen-from the Java/JVM side of thigns
+</p></div></div>
+    </li><li name="ammonite.util.Printer" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="PrinterextendsProductwithSerializable"></a>
+      <a id="Printer:Printer"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Printer.html"><span class="name">Printer</span></a><span class="params">(<span name="out">out: (<span class="extype" name="scala.Predef.String">String</span>) ⇒ <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>, <span name="warning">warning: (<span class="extype" name="scala.Predef.String">String</span>) ⇒ <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>, <span name="error">error: (<span class="extype" name="scala.Predef.String">String</span>) ⇒ <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>, <span name="info">info: (<span class="extype" name="scala.Predef.String">String</span>) ⇒ <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>)</span><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.util.package@PrinterextendsProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Encapsulates the ways the Ammonite REPL prints things.</p><div class="fullcomment"><div class="comment cmt"><p>Encapsulates the ways the Ammonite REPL prints things. Does not print
+a trailing newline by default; you have to add one yourself.
+</p></div><dl class="paramcmts block"><dt class="param">out</dt><dd class="cmt"><p>How you want it to print streaming fragments of stdout</p></dd><dt class="param">warning</dt><dd class="cmt"><p>How you want it to print a compile warning</p></dd><dt class="param">error</dt><dd class="cmt"><p>How you want it to print a compile error</p></dd><dt class="param">info</dt><dd class="cmt"><p>How you want to print compile info logging. *Not* the same
+            as <code>out</code>, which is used to print runtime output.</p></dd></dl></div>
+    </li><li name="ammonite.util.Ref" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="Ref[T]extendsStableRef[T]"></a>
+      <a id="Ref[T]:Ref[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Ref.html"><span class="name">Ref</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends <a href="StableRef.html" class="extype" name="ammonite.util.StableRef">StableRef</a>[<span class="extype" name="ammonite.util.Ref.T">T</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.util.package@Ref[T]extendsStableRef[T]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="ammonite.util.Res" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="Res[+T]extendsAnyRef"></a>
+      <a id="Res[+T]:Res[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed abstract </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Res.html"><span class="name">Res</span></a><span class="tparams">[<span name="T">+T</span>]</span><span class="result"> extends <a href="../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.util.package@Res[+T]extendsAnyRef" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The result of a single pass through the ammonite REPL.</p><div class="fullcomment"><div class="comment cmt"><p>The result of a single pass through the ammonite REPL. Results in a single
+<span class="extype" name="T">T</span>, or of one of a fixed number of failures that are common for anyone
+who is evaluating code via the REPL.
+</p></div></div>
+    </li><li name="ammonite.util.StableRef" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="StableRef[T]extendsAnyRef"></a>
+      <a id="StableRef[T]:StableRef[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="StableRef.html"><span class="name">StableRef</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends <a href="../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.util.package@StableRef[T]extendsAnyRef" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Encapsulates a read-write cell that can be passed around
+</p>
+    </li></ol>
+            </div>
+
+        
+
+        <div id="values" class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="ammonite.util.Bind" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Bind"></a>
+      <a id="Bind:Bind"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Bind$.html"><span class="name">Bind</span></a><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.util.package@Bind" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="ammonite.util.Colors" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Colors"></a>
+      <a id="Colors:Colors"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Colors$.html"><span class="name">Colors</span></a><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.util.package@Colors" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="ammonite.util.Ex" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Ex"></a>
+      <a id="Ex:Ex"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Ex$.html"><span class="name">Ex</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.util.package@Ex" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Nice pattern matching for chained exceptions
+</p>
+    </li><li name="ammonite.util.ImportData" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ImportData"></a>
+      <a id="ImportData:ImportData"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="ImportData$.html"><span class="name">ImportData</span></a><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.util.package@ImportData" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="ammonite.util.Imports" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Imports"></a>
+      <a id="Imports:Imports"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Imports$.html"><span class="name">Imports</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.util.package@Imports" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="ammonite.util.Name" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Name"></a>
+      <a id="Name:Name"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Name$.html"><span class="name">Name</span></a><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.util.package@Name" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="ammonite.util.Parsers" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Parsers"></a>
+      <a id="Parsers:Parsers"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Parsers$.html"><span class="name">Parsers</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.util.package@Parsers" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="ammonite.util.Ref" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Ref"></a>
+      <a id="Ref:Ref"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Ref$.html"><span class="name">Ref</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.util.package@Ref" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="ammonite.util.Res" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Res"></a>
+      <a id="Res:Res"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Res$.html"><span class="name">Res</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.util.package@Res" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="ammonite.util.Util" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Util"></a>
+      <a id="Util:Util"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Util$.html"><span class="name">Util</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.util.package@Util" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>

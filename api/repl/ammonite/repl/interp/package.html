@@ -1,0 +1,473 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <title>interp - ammonite.repl.interp</title>
+          <meta name="description" content="interp - ammonite.repl.interp" />
+          <meta name="keywords" content="interp ammonite.repl.interp" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../../lib/template.js"></script>
+      <script type="text/javascript" src="../../../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../../index.html';
+            var hash = 'ammonite.repl.interp.package';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <img alt="Package" src="../../../lib/package_big.png" />
+        <p id="owner"><a href="../../package.html" class="extype" name="ammonite">ammonite</a>.<a href="../package.html" class="extype" name="ammonite.repl">repl</a></p>
+        <h1>interp</h1><span class="permalink">
+      <a href="../../../index.html#ammonite.repl.interp.package" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <span class="name">interp</span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>What actually lets us compile and execute code in the Ammonite REPL; deals
+with the Scala compiler, preprocessing the strings, JVM classloaders, etc.
+</p></div><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><a href="../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a>, <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Any" class="extype" target="_top">Any</a></div>
+        </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By Inheritance</span></li>
+              </ol>
+            </div>
+        <div id="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="ammonite.repl.interp"><span>interp</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div id="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show All</span></li>
+            </ol>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="ammonite.repl.interp.AmmonitePlugin" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="AmmonitePluginextendsPlugin"></a>
+      <a id="AmmonitePlugin:AmmonitePlugin"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="AmmonitePlugin.html"><span class="name">AmmonitePlugin</span></a><span class="result"> extends <a href="https://oss.sonatype.org/service/local/repositories/releases/archive/org/scala-lang/scala-compiler/2.11.8/scala-compiler-2.11.8-javadoc.jar/!/index.html#scala.tools.nsc.plugins.Plugin" class="extype" target="_top">Plugin</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.repl.interp.package@AmmonitePluginextendsPlugin" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Used to capture the names in scope after every execution, reporting them
+to the <code>output</code> function.</p><div class="fullcomment"><div class="comment cmt"><p>Used to capture the names in scope after every execution, reporting them
+to the <code>output</code> function. Needs to be a compiler plugin so we can hook in
+immediately after the <code>typer</code>
+</p></div></div>
+    </li><li name="ammonite.repl.interp.Compiler" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="CompilerextendsAnyRef"></a>
+      <a id="Compiler:Compiler"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Compiler.html"><span class="name">Compiler</span></a><span class="result"> extends <a href="../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.repl.interp.package@CompilerextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Encapsulates (almost) all the ickiness of Scalac so it doesn't leak into
+the rest of the codebase.</p><div class="fullcomment"><div class="comment cmt"><p>Encapsulates (almost) all the ickiness of Scalac so it doesn't leak into
+the rest of the codebase. Makes use of a good amount of mutable state
+for things like the log-output-forwarder or compiler-plugin-output because
+These things are hard-coded into Scalac and can't be passed in from run to
+run.</p><p>Turns source-strings into the bytes of classfiles, possibly more than one
+classfile per source-string (e.g. inner classes, or lambdas). Also lets
+you query source strings using an in-built presentation compiler
+</p></div></div>
+    </li><li name="ammonite.repl.interp.Evaluator" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="EvaluatorextendsAnyRef"></a>
+      <a id="Evaluator:Evaluator"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Evaluator.html"><span class="name">Evaluator</span></a><span class="result"> extends <a href="../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.repl.interp.package@EvaluatorextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Evaluates already-compiled Bytecode.</p><div class="fullcomment"><div class="comment cmt"><p>Evaluates already-compiled Bytecode.</p><p>Deals with all the munging of <code>Classloader</code>s, <code>Class[_]</code> objects,
+and <code>Array[Byte]</code>s representing class files, and reflection necessary
+to take the already-compile Scala bytecode and execute it in our process.
+</p></div></div>
+    </li><li name="ammonite.repl.interp.Frame" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="FrameextendsAnyRef"></a>
+      <a id="Frame:Frame"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Frame.html"><span class="name">Frame</span></a><span class="result"> extends <a href="../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.repl.interp.package@FrameextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Represents a single &quot;frame&quot; of the <code>sess.save</code>/<code>sess.load</code> stack/tree.</p><div class="fullcomment"><div class="comment cmt"><p>Represents a single &quot;frame&quot; of the <code>sess.save</code>/<code>sess.load</code> stack/tree.</p><p>Exposes <code>imports</code> and <code>classpath</code> as readable but only writable
+in particular ways: <code>imports</code> can only be updated via <code>mergeImports</code>,
+while <code>classpath</code> can only be added to.
+</p></div></div>
+    </li><li name="ammonite.repl.interp.Interpreter" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="InterpreterextendsAnyRef"></a>
+      <a id="Interpreter:Interpreter"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Interpreter.html"><span class="name">Interpreter</span></a><span class="result"> extends <a href="../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.repl.interp.package@InterpreterextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">A convenient bundle of all the functionality necessary
+to interpret Scala code.</p><div class="fullcomment"><div class="comment cmt"><p>A convenient bundle of all the functionality necessary
+to interpret Scala code. Doesn't attempt to provide any
+real encapsulation for now.
+</p></div></div>
+    </li><li name="ammonite.repl.interp.Preprocessor" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="PreprocessorextendsAnyRef"></a>
+      <a id="Preprocessor:Preprocessor"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Preprocessor.html"><span class="name">Preprocessor</span></a><span class="result"> extends <a href="../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.repl.interp.package@PreprocessorextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Responsible for all scala-source-code-munging that happens within the
+Ammonite REPL.</p><div class="fullcomment"><div class="comment cmt"><p>Responsible for all scala-source-code-munging that happens within the
+Ammonite REPL.</p><p>Performs several tasks:</p><p>- Takes top-level Scala expressions and assigns them to <code>res{1, 2, 3, ...}</code>
+  values so they can be accessed later in the REPL</p><p>- Wraps the code snippet with an wrapper <code>object</code> since Scala doesn't allow
+  top-level expressions</p><p>- Mangles imports from our <a href="../ImportData.html" class="extype" name="ammonite.repl.ImportData">ImportData</a> data structure into a source
+  String</p><p>- Combines all of these into a complete compilation unit ready to feed into
+  the Scala compiler
+</p></div></div>
+    </li><li name="ammonite.repl.interp.Pressy" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="PressyextendsAnyRef"></a>
+      <a id="Pressy:Pressy"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Pressy.html"><span class="name">Pressy</span></a><span class="result"> extends <a href="../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.repl.interp.package@PressyextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Nice wrapper for the presentation compiler.</p>
+    </li><li name="ammonite.repl.interp.SpecialClassLoader" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="SpecialClassLoaderextendsURLClassLoader"></a>
+      <a id="SpecialClassLoader:SpecialClassLoader"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="SpecialClassLoader.html"><span class="name">SpecialClassLoader</span></a><span class="result"> extends <span class="extype" name="java.net.URLClassLoader">URLClassLoader</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.repl.interp.package@SpecialClassLoaderextendsURLClassLoader" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Classloader used to implement the jar-downloading
+command-evaluating logic in Ammonite.</p><div class="fullcomment"><div class="comment cmt"><p>Classloader used to implement the jar-downloading
+command-evaluating logic in Ammonite.</p><p>http://stackoverflow.com/questions/3544614/how-is-the-control-flow-to-findclass-of
+</p></div></div>
+    </li></ol>
+            </div>
+
+        
+
+        <div id="values" class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="ammonite.repl.interp.AmmonitePlugin" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="AmmonitePlugin"></a>
+      <a id="AmmonitePlugin:AmmonitePlugin"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="AmmonitePlugin$.html"><span class="name">AmmonitePlugin</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.repl.interp.package@AmmonitePlugin" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="ammonite.repl.interp.Classpath" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Classpath"></a>
+      <a id="Classpath:Classpath"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Classpath$.html"><span class="name">Classpath</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.repl.interp.package@Classpath" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Loads the jars that make up the classpath of the scala-js-fiddle
+compiler and re-shapes it into the correct structure to satisfy
+scala-compile and scalajs-tools
+</p>
+    </li><li name="ammonite.repl.interp.Compiler" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Compiler"></a>
+      <a id="Compiler:Compiler"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Compiler$.html"><span class="name">Compiler</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.repl.interp.package@Compiler" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="ammonite.repl.interp.CompilerCompatibility" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="CompilerCompatibility"></a>
+      <a id="CompilerCompatibility:CompilerCompatibility"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="CompilerCompatibility$.html"><span class="name">CompilerCompatibility</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.repl.interp.package@CompilerCompatibility" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="ammonite.repl.interp.Evaluator" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Evaluator"></a>
+      <a id="Evaluator:Evaluator"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Evaluator$.html"><span class="name">Evaluator</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.repl.interp.package@Evaluator" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="ammonite.repl.interp.Interpreter" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Interpreter"></a>
+      <a id="Interpreter:Interpreter"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Interpreter$.html"><span class="name">Interpreter</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.repl.interp.package@Interpreter" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="ammonite.repl.interp.LineNumberModifier" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="LineNumberModifier"></a>
+      <a id="LineNumberModifier:LineNumberModifier"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="LineNumberModifier$.html"><span class="name">LineNumberModifier</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.repl.interp.package@LineNumberModifier" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="ammonite.repl.interp.Preprocessor" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Preprocessor"></a>
+      <a id="Preprocessor:Preprocessor"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Preprocessor$.html"><span class="name">Preprocessor</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.repl.interp.package@Preprocessor" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="ammonite.repl.interp.Pressy" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Pressy"></a>
+      <a id="Pressy:Pressy"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Pressy$.html"><span class="name">Pressy</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.repl.interp.package@Pressy" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="ammonite.repl.interp.SpecialClassLoader" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="SpecialClassLoader"></a>
+      <a id="SpecialClassLoader:SpecialClassLoader"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="SpecialClassLoader$.html"><span class="name">SpecialClassLoader</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.repl.interp.package@SpecialClassLoader" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <a href="../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Any" class="extype" target="_top">Any</a></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>
