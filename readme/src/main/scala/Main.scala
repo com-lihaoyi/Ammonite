@@ -21,6 +21,9 @@ object Main{
       "sbt" -> "scala"
     )
     def scala(s: String) = this.highlight(s, "scala")
+    override def pathMappings = Seq(
+      wd -> "https://github.com/lihaoyi/ammonite/tree/master"
+    )
   }
   def late(frags: => Frag) = new Late(() => frags)
   class Late(frags: () => Frag) extends scalatags.text.Frag{
