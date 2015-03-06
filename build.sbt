@@ -10,6 +10,7 @@ val sharedSettings = Seq(
   version := "0.2.4",
   libraryDependencies += "com.lihaoyi" %% "utest" % "0.3.0" % "test",
   testFrameworks += new TestFramework("utest.runner.Framework"),
+  scalacOptions += "-target:jvm-1.7",
   autoCompilerPlugins := true,
   addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.2"),
   libraryDependencies ++= Seq(
