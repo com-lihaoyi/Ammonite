@@ -171,7 +171,7 @@ object ls extends StreamableOp1[Path, Path, LsSeq]{
   def materialize(i: Iterator[Path]) = new LsSeq(i.toStream)
   def !!(arg: Path) = {
     import scala.collection.JavaConverters._
-    Files.list(arg.nio).iterator().asScala.map(x => Path(x))
+    Files.newDirectoryStream(arg.nio).iterator().asScala.map(x => Path(x))
   }
 
   /**
