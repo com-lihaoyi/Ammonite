@@ -4,19 +4,18 @@ publishArtifact := false
 
 publishTo := Some(Resolver.file("Unused transient repository", file("target/unusedrepo")))
 
-val sharedSettings = Seq(
-  scalaVersion := "2.11.5",
-  organization := "com.lihaoyi",
-  version := "0.2.4",
-  libraryDependencies += "com.lihaoyi" %% "utest" % "0.3.0" % "test",
-  testFrameworks += new TestFramework("utest.runner.Framework"),
-  scalacOptions += "-target:jvm-1.7",
+val acyclicSettings = Seq(
   autoCompilerPlugins := true,
   addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.2"),
   libraryDependencies ++= Seq(
-    "com.lihaoyi" %% "acyclic" % "0.1.2" % "provided",
-    "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided"
-  ),
+    "com.lihaoyi" %% "acyclic" % "0.1.2" % "provided"
+  )
+)
+
+val publishingSettings = Seq(
+  organization := "com.lihaoyi",
+  version := "0.2.4",
+  scalacOptions += "-target:jvm-1.7",
   publishTo := Some("releases" at "https://oss.sonatype.org/service/local/staging/deploy/maven2"),
   pomExtra :=
     <url>https://github.com/lihaoyi/Ammonite</url>
@@ -38,6 +37,15 @@ val sharedSettings = Seq(
         </developer>
       </developers>
 )
+
+val sharedSettings = Seq(
+  scalaVersion := "2.11.5",
+  libraryDependencies += "com.lihaoyi" %% "utest" % "0.3.0" % "test",
+  testFrameworks += new TestFramework("utest.runner.Framework"),
+  libraryDependencies ++= Seq(
+    "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided"
+  )
+) ++ acyclicSettings ++ publishingSettings
 
 lazy val pprint = project
   .settings(sharedSettings:_*)
@@ -107,3 +115,10 @@ lazy val readme = project
     libraryDependencies += "com.lihaoyi" %% "scalatex-site" % "0.1.1",
     scalaVersion := "2.11.4"
 )
+
+lazy val plugin = project.in(file("sbt-plugin")).copy(id = "sbt-plugin")
+  .settings(acyclicSettings ++ publishingSettings: _*)
+  .settings(
+    name := "ammonite-sbt",
+    sbtPlugin := true
+  )
