@@ -6,6 +6,7 @@ publishTo := Some(Resolver.file("Unused transient repository", file("target/unus
 
 val sharedSettings = Seq(
   scalaVersion := "2.11.5",
+  crossScalaVersions := Seq("2.11.5", "2.10.5"),
   organization := "com.lihaoyi",
   version := "0.2.4",
   libraryDependencies += "com.lihaoyi" %% "utest" % "0.3.0" % "test",
@@ -43,6 +44,15 @@ lazy val pprint = project
   .settings(sharedSettings:_*)
   .settings(
     name := "ammonite-pprint",
+    libraryDependencies ++= {
+      if (scalaVersion.value startsWith "2.10.")
+        Seq(
+          "org.scalamacros" %% "quasiquotes" % "2.0.1",
+          compilerPlugin("org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full)
+        )
+      else
+        Seq()
+    },
     sourceGenerators in Compile <+= sourceManaged in Compile map { dir =>
       val file = dir/"ammonite"/"pprint"/"PPrintGen.scala"
       val tuples = (1 to 22).map{ i =>
@@ -98,7 +108,9 @@ lazy val repl = project
       "com.lihaoyi" %% "scala-parser" % "0.1.1"
     ),
     javaOptions += "-Xmx2G",
-    fork in (Test, testOnly) := true
+    fork in (Test, testOnly) := true,
+    // Will not be necessary with sbt 0.13.8
+    unmanagedSourceDirectories in Compile += (sourceDirectory in Compile).value / s"scala-${scalaBinaryVersion.value}"
   )
 
 lazy val readme = project

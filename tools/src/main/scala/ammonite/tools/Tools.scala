@@ -22,7 +22,7 @@ object Grepper{
   }
   implicit object Str extends Grepper[String] {
     def apply[V: ammonite.pprint.PPrint](t: String, s: V) = {
-      Regex.apply(scala.util.matching.Regex.quote(t).r, s)
+      Regex.apply(java.util.regex.Pattern.quote(t).r, s)
     }
   }
 

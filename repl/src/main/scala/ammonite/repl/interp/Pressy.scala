@@ -6,7 +6,7 @@ import scala.reflect.internal.util.{OffsetPosition, BatchSourceFile}
 import scala.reflect.io.VirtualDirectory
 import scala.tools.nsc
 import scala.tools.nsc.backend.JavaPlatform
-import scala.tools.nsc.interactive.{Response, InteractiveAnalyzer}
+import scala.tools.nsc.interactive.Response
 import scala.tools.nsc.util._
 
 /**
@@ -30,18 +30,14 @@ object Pressy {
       new nsc.interactive.Global(settings, reporter) {
         g =>
 
-        override def classPath = jcp
+        override def classPath = platform.classPath // Actually jcp, avoiding a path-dependent type issue in 2.10 here
 
         override lazy val platform: ThisPlatform = new JavaPlatform {
           val global: g.type = g
 
           override def classPath = jcp
         }
-        override lazy val analyzer = new {
-          val global: g.type = g
-        } with InteractiveAnalyzer {
-          override def findMacroClassLoader() = new ClassLoader(this.getClass.getClassLoader) {}
-        }
+        override lazy val analyzer = CompilerCompatibility.interactiveAnalyzer(g)
       }
     }
 
@@ -96,15 +92,15 @@ object Pressy {
 
       def dotted = tree.collect {
         case t@pressy.Select(qualifier, name)
-          if qualifier.pos.end <= index && index <= t.pos.end =>
-          val r = ask(qualifier.pos.end, pressy.askTypeCompletion)
+          if qualifier.pos.endOrPoint <= index && index <= t.pos.endOrPoint =>
+          val r = ask(qualifier.pos.endOrPoint, pressy.askTypeCompletion)
           val prefix = if (name.decoded == "<error>") "" else name.decoded
-          (qualifier.pos.end + 1, pressy.ask(() => r.map(_.sym.name.decoded).filter(_.startsWith(prefix))))
+          (qualifier.pos.endOrPoint + 1, pressy.ask(() => r.map(_.sym.name.decoded).filter(_.startsWith(prefix))))
       }
 
       def prefixed = tree.collect {
         case t@pressy.Ident(name)
-          if t.pos.start <= index && index <= t.pos.end =>
+          if t.pos.startOrPoint <= index && index <= t.pos.endOrPoint =>
           val r = ask(index, pressy.askScopeCompletion)
 
           lazy val shallow = {
@@ -140,9 +136,9 @@ object Pressy {
 
           lazy val deep = allDeep.distinct
 
-          if (shallow.length > 0) (t.pos.start, shallow)
-          else if (deep.length == 1) (t.pos.start, deep)
-          else (t.pos.end, deep :+ "")
+          if (shallow.length > 0) (t.pos.startOrPoint, shallow)
+          else if (deep.length == 1) (t.pos.startOrPoint, deep)
+          else (t.pos.endOrPoint, deep :+ "")
       }
 
       def scoped = {
