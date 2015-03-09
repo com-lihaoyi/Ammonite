@@ -1,4 +1,6 @@
-scalaVersion := "2.11.4"
+scalaVersion := "2.11.5"
+
+crossScalaVersions := Seq("2.11.5", "2.10.5")
 
 publishArtifact := false
 
@@ -8,7 +10,7 @@ val sharedSettings = Seq(
   scalaVersion := "2.11.5",
   crossScalaVersions := Seq("2.11.5", "2.10.5"),
   organization := "com.lihaoyi",
-  version := "0.2.4",
+  version := "0.2.5",
   libraryDependencies += "com.lihaoyi" %% "utest" % "0.3.0" % "test",
   testFrameworks += new TestFramework("utest.runner.Framework"),
   scalacOptions += "-target:jvm-1.7",
@@ -120,3 +122,5 @@ lazy val readme = project
     libraryDependencies += "com.lihaoyi" %% "ammonite-ops" % "0.2.4",
     scalaVersion := "2.11.4"
 )
+
+lazy val root = project.in(file(".")).aggregate(pprint,  ops, tools, repl)

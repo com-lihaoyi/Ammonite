@@ -58,7 +58,7 @@
   @p
     To get started, add this to your @code{build.sbt}:
 
-  @hl.scala{"com.lihaoyi" %% "ammonite-ops" % "0.2.4"}
+  @hl.scala{"com.lihaoyi" %% "ammonite-ops" % "0.2.5"}
 
   @p 
     And this at the top of the file you want to use Ammonite:
@@ -239,11 +239,10 @@
     To try out Ammonite-REPL in an existing project, add the following to your @code{build.sbt}
 
   @hl.scala
-    libraryDependencies += "com.lihaoyi" %% "ammonite-repl" % "0.2.4" % "test"
+    libraryDependencies += "com.lihaoyi" %% "ammonite-repl" % "0.2.5" % "test"
 
     initialCommands in console := "ammonite.repl.Repl.main(null)"
 
-    scalaVersion := "2.11.5"
   @p
     After that, simple hit
   @code
