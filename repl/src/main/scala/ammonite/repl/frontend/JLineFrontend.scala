@@ -95,6 +95,8 @@ object JLineFrontend{
         // Otherwise the terminal gets left in a funny
         // state after you exit the ammonite REPL
         term.restore()
+
+      case _ =>
     }
   }
 }
