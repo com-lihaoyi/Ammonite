@@ -46,7 +46,7 @@ object AutocompleteTests extends TestSuite{
       complete("""object Zomg{ <caret> }""", Set("Zomg"), _ -- _)
     }
     'scopePrefix{
-      complete("""scal<caret>""", Set("scala"), ^)
+      complete("""ammon<caret>""", Set("ammonite"), ^)
 
       complete("""Seq(1, 2, 3).map(argNameLol => argNam<caret>)""", Set("argNameLol"), ^)
 

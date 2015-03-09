@@ -10,7 +10,7 @@ import scala.collection.{TraversableLike, mutable}
 object ToolsTests extends TestSuite{
 
   val tests = TestSuite {
-    var wd = processWorkingDir
+    var wd = cwd
 
 
     'grep{
