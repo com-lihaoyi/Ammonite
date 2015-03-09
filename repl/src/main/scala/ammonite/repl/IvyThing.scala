@@ -14,7 +14,7 @@ object IvyConstructor extends IvyConstructor
 trait IvyConstructor{
   implicit class GroupIdExt(groupId: String){
     def %(artifactId: String) = (groupId, artifactId)
-    def %%(artifactId: String) = (groupId, artifactId + "_2.11")
+    def %%(artifactId: String) = (groupId, artifactId + "_" + IvyThing.scalaBinaryVersion)
   }
   implicit class ArtifactIdExt(t: (String, String)){
     def %(version: String) = (t._1, t._2, version)
@@ -29,6 +29,9 @@ trait IvyConstructor{
  * And transliterated into Scala. I have no idea how or why it works.
  */
 object IvyThing {
+  val scalaBinaryVersion = scala.util.Properties.versionString
+    .stripPrefix("version ").split('.').take(2).mkString(".")
+
   def resolveArtifact(groupId: String, artifactId: String, version: String) = {
     //url resolver for configuration of maven repo
     val resolver = {

@@ -15,7 +15,7 @@ import scala.language.dynamics
 object % extends %(Vector.empty){
   def execute(cmd: Seq[String]): CommandResult = {
     import scala.sys.process._
-    CommandResult(cmd.lineStream)
+    CommandResult(cmd.lines) // Should be lineStream instead of lines in 2.11, doing this for 2.10 compatibility
 //    %git                    %.git
 //    %git %diff              %.git(%).diff
 //    %git "clean"            %.git("clean")

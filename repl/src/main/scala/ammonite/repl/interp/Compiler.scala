@@ -10,13 +10,12 @@ import scala.reflect.io._
 import scala.tools.nsc
 import scala.tools.nsc.{Phase, Global, Settings}
 import scala.tools.nsc.backend.JavaPlatform
-import scala.tools.nsc.interactive.{InteractiveAnalyzer, Response}
+import scala.tools.nsc.interactive.Response
 import scala.tools.nsc.plugins.{PluginComponent, Plugin}
 
 import scala.tools.nsc.reporters.AbstractReporter
 import scala.tools.nsc.typechecker.Analyzer
 import scala.tools.nsc.util.ClassPath.JavaContext
-import scala.tools.nsc.util.Position
 import scala.tools.nsc.util._
 
 
@@ -125,14 +124,12 @@ object Compiler{
       )
       val scalac = new nsc.Global(settings, reporter) { g =>
         override lazy val plugins = List(new AmmonitePlugin(g, lastImports = _))
-        override def classPath = jcp
+        override def classPath = platform.classPath // Actually jcp, avoiding a path-dependent type issue in 2.10 here
         override lazy val platform: ThisPlatform = new JavaPlatform{
           val global: g.type = g
           override def classPath = jcp
         }
-        override lazy val analyzer = new { val global: g.type = g } with Analyzer {
-          override def findMacroClassLoader() = new ClassLoader(this.getClass.getClassLoader){}
-        }
+        override lazy val analyzer = CompilerCompatibility.analyzer(g)
       }
       (vd, reporter, scalac)
     }
@@ -169,11 +166,9 @@ object Compiler{
     def parse(line: String): Either[String, Seq[Global#Tree]]= {
       val out = mutable.Buffer.empty[String]
       logger = out.append(_)
-      val r = compiler.currentRun
-      val p = r.parsing
       reporter.reset()
       val parser = compiler.newUnitParser(line)
-      val trees = parser.parseStatsOrPackages()
+      val trees = CompilerCompatibility.trees(compiler)(parser)
       if (reporter.hasErrors) Left(out.mkString("\n"))
       else Right(trees)
     }

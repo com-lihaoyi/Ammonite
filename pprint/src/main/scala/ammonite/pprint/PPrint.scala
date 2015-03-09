@@ -224,7 +224,8 @@ object Internals {
   }
 
   object LowerPriPPrint {
-    def FinalRepr[T: c.WeakTypeTag](c: scala.reflect.macros.blackbox.Context) = c.Expr[PPrint[T]] {
+    // Should use blackbox.Context in 2.11, doing this for 2.10 compatibility
+    def FinalRepr[T: c.WeakTypeTag](c: scala.reflect.macros.Context) = c.Expr[PPrint[T]] {
       import c.universe._
 
       val tpe = c.weakTypeOf[T]

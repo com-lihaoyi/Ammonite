@@ -6,7 +6,7 @@ import java.net.URL
 import acyclic.file
 import ammonite.repl.frontend.{ReplExit, ReplAPI}
 import ammonite.repl._
-import scala.reflect.internal.util.ScalaClassLoader.URLClassLoader
+import java.net.URLClassLoader
 import scala.reflect.runtime.universe._
 import scala.collection.mutable
 import scala.util.Try
@@ -97,11 +97,16 @@ object Evaluator{
      * re-defining the core (pre-REPL) classes. I'm still not sure
      * where those come from.
      */
-    var evalClassloader = new URLClassLoader(Nil, currentClassloader)
+    var evalClassloader =
+      new URLClassLoader(Array(), currentClassloader) {
+        // Public access to addURL - a visibility-changing override fails here
+        def add(url: URL) = addURL(url)
+      }
 
 
     def newClassloader() = {
-      evalClassloader = new URLClassLoader(Nil, evalClassloader){
+      evalClassloader = new URLClassLoader(Array(), evalClassloader){
+        def add(url: URL) = addURL(url)
         override def loadClass(name: String): Class[_] = {
           if(newFileDict.contains(name)) {
             val bytes = newFileDict(name)
@@ -119,7 +124,7 @@ object Evaluator{
     }
     newClassloader()
 
-    def addJar(url: URL) = evalClassloader.addURL(url)
+    def addJar(url: URL) = evalClassloader.add(url)
 
     def evalClass(code: String, wrapperName: String) = for{
 
