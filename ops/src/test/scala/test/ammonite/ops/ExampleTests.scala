@@ -16,11 +16,11 @@ object ExampleTests extends TestSuite{
       // Delete a file or folder, if it exists
       rm! wd
 
-      // Copy a file or folder
-      cp(wd/up/'example, wd)
+      // Make a folder named "folder"
+      mkdir! wd/'folder
 
-      // Make a folder named "folder1"
-      mkdir! wd/'folder1
+      // Copy a file or folder
+      cp(wd/'folder, wd/'folder1)
 
       // List the current directory
       val listed = ls! wd
@@ -43,9 +43,9 @@ object ExampleTests extends TestSuite{
       ls! wd/'dir2|? (_.ext == "java") | read |> write! wd/'target/"bundled.java"
 
       assert(
-        listed == Seq(wd/"folder1"),
+        listed == Seq(wd/"folder", wd/"folder1"),
         lineCount == 4,
-        renamed == Seq(wd/'folder2/"file1.java", wd/'folder2/"file2.java"),
+        renamed == Seq(wd/'dir2/"file1.java", wd/'dir2/"file2.java"),
         read(wd/'target/"bundled.java") == "package example\nclass Foo{}\npackage example\nclass Bar{}"
       )
 

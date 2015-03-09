@@ -5,7 +5,6 @@ import java.nio.file.attribute._
 
 import acyclic.file
 import ammonite.pprint
-import RelPath.up
 
 /**
  * Created by haoyi on 1/25/15.
@@ -150,7 +149,7 @@ case class RelPath(segments: Seq[String], ups: Int) extends BasePathImpl[RelPath
     } else throw PathError.NoRelativePath(this, base)
   }
 
-  override def toString = (Seq.fill(ups)("core/src/test") ++ segments).mkString("/")
+  override def toString = (Seq.fill(ups)("..") ++ segments).mkString("/")
   override def hashCode = segments.hashCode() + ups.hashCode()
   override def equals(o: Any): Boolean = o match {
     case p: RelPath => segments == p.segments && p.ups == ups
@@ -244,7 +243,7 @@ case class Path(segments: Seq[String]) extends BasePathImpl[Path]{
     var s2 = base.segments
 
     while(!segments.startsWith(s2)){
-      s2 = s2.drop(1)
+      s2 = s2.dropRight(1)
       newUps += 1
     }
     new RelPath(segments.drop(s2.length), newUps)

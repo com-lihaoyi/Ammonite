@@ -59,6 +59,15 @@ object PathTests extends TestSuite{
             )
           }
         }
+        'Relativize{
+          def eq[T](p: T, q: T) = assert(p == q)
+          * - eq('omg/'bbq/'wtf - 'omg/'bbq/'wtf, empty)
+          * - eq('omg/'bbq - 'omg/'bbq/'wtf, up)
+          * - eq('omg/'bbq/'wtf - 'omg/'bbq, empty/'wtf)
+          * - eq('omg/'bbq - 'omg/'bbq/'wtf, up)
+          * - eq(up/'omg/'bbq - 'omg/'bbq, up/up/up/'omg/'bbq)
+          * - intercept[PathError.NoRelativePath]('omg/'bbq - up/'omg/'bbq)
+        }
       }
       'AbsPath{
         val d = cwd
@@ -71,11 +80,10 @@ object PathTests extends TestSuite{
         }
         'Relativize{
           def eq[T](p: T, q: T) = assert(p == q)
-          * - eq('omg/'bbq/'wtf - 'omg/'bbq/'wtf, empty)
-          * - eq('omg/'bbq - 'omg/'bbq/'wtf, up)
-          * - eq('omg/'bbq/'wtf - 'omg/'bbq, empty/'wtf)
-          * - eq('omg/'bbq - 'omg/'bbq/'wtf, up)
-          * - eq(up/'omg/'bbq - 'omg/'bbq, up/up/up/'omg/'bbq)
+          * - eq(root/'omg/'bbq/'wtf - root/'omg/'bbq/'wtf, empty)
+          * - eq(root/'omg/'bbq - root/'omg/'bbq/'wtf, up)
+          * - eq(root/'omg/'bbq/'wtf - root/'omg/'bbq, empty/'wtf)
+          * - eq(root/'omg/'bbq - root/'omg/'bbq/'wtf, up)
           * - intercept[PathError.NoRelativePath]('omg/'bbq - up/'omg/'bbq)
         }
       }

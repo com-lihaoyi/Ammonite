@@ -1,5 +1,5 @@
 @import Main._
-@import ammonite.all._
+@import ammonite.ops._
 
 @sect{Ammonite}
   @p

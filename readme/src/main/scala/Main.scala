@@ -1,19 +1,19 @@
-import ammonite.all._
+import ammonite.ops._
 
 import scala.util.matching.Regex
 import scalatags.Text.all._
 import scalatex.site.Highlighter.RefPath
-
+import ammonite.ops.cwd
 object Main{
-  val wd = processWorkingDir
   def main(args: Array[String]): Unit = {
     val site = new scalatex.site.Site {
       def content = Map(
         "index.html" -> Readme()
       )
     }
-    site.renderTo(wd/'readme/'target/'output2)
+    site.renderTo(cwd/'readme/'target/'output2)
   }
+
   object sect extends scalatex.site.Section
   object hl extends scalatex.site.Highlighter{
     def suffixMappings = Map(
@@ -22,7 +22,7 @@ object Main{
     )
     def scala(s: String) = this.highlight(s, "scala")
     override def pathMappings = Seq(
-      wd -> "https://github.com/lihaoyi/ammonite/tree/master"
+      cwd -> "https://github.com/lihaoyi/ammonite/tree/master"
     )
   }
   def late(frags: => Frag) = new Late(() => frags)
@@ -30,7 +30,7 @@ object Main{
     def render: String = frags().render
     def writeTo(strb: StringBuilder): Unit = strb.append(render)
   }
-  val fileOps = read! wd/'ops/'src/'main/'scala/'ammonite/'ops/"FileOps.scala"
+  val fileOps = read! cwd/'ops/'src/'main/'scala/'ammonite/'ops/"FileOps.scala"
   val found = ".*/\\*\\*(\n\\s*\\*.*)+\n.*?extends.*?Op[^{]*".r
     .findAllIn(fileOps)
     .mkString("\n")
