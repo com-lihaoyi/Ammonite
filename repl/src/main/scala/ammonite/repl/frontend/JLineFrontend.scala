@@ -56,6 +56,7 @@ object JLineFrontend{
             .map(_.value().toString)
             .toVector
 
+
     def action(buffered: String): Res[String] = for {
       _ <- Signaller("INT") {
         if (reader.getCursorBuffer.length() == 0) {
@@ -90,8 +91,10 @@ object JLineFrontend{
         val last = reader.getHistory.size()-1
         reader.getHistory.set(last, buffered + reader.getHistory.get(last))
 
-
-      case _ =>
+      case Res.Exit =>
+        // Otherwise the terminal gets left in a funny
+        // state after you exit the ammonite REPL
+        term.restore()
     }
   }
 }

@@ -50,8 +50,14 @@ object PathTests extends TestSuite{
               rel1.segments == Seq("src", "main", "scala", "sub1", "sub2"),
               rel1.toString == "src/main/scala/sub1/sub2"
             )
-            'ArrayString - check(rel / Array("sub1", "sub2"))
-            'ArraySymbol - check(rel / Array('sub1, 'sub2))
+            'ArrayString - {
+              val arr = Array("sub1", "sub2")
+              check(rel / arr)
+            }
+            'ArraySymbol - {
+              val arr = Array('sub1, 'sub2)
+              check(rel / arr)
+            }
             'SeqString - check(rel / Seq("sub1", "sub2"))
             'SeqSymbol - check(rel / Seq('sub1, 'sub2))
             'SeqSeqSeqSymbol - check(

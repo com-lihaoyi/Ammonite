@@ -8,7 +8,7 @@ import utest._
 object OpTests extends TestSuite{
 
   val tests = TestSuite {
-    val res = cwd/'ops/'target/"scala-2.11"/"test-classes"/'testdata
+    val res = cwd/'ops/'src/'test/'resources/'testdata
     'ls - assert(
       ls(res).toSet == Set(res/'folder1, res/'folder2, res/"File.txt"),
       ls(res/'folder2).toSet == Set(

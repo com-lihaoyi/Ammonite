@@ -26,7 +26,7 @@ object AdvancedTests extends TestSuite{
         'dependent{
           // Make sure it automatically picks up jawn-parser since upickle depends on it,
           check.session("""
-            @ load.ivy("com.lihaoyi", "upickle_2.11", "0.2.6")
+            @ load.ivy("com.lihaoyi" %% "upickle" % "0.2.6")
 
             @ import upickle._
             import upickle._

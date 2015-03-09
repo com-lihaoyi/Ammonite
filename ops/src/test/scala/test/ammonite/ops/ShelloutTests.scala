@@ -15,7 +15,7 @@ object ShelloutTests extends TestSuite{
       )
       assert(
         listed == expected,
-        (%ls "ops/target/scala-2.11/test-classes/testdata").output.toSet ==
+        (%ls "ops/src/test/resources/testdata").output.toSet ==
         Set("folder1", "folder2", "File.txt")
       )
     }
