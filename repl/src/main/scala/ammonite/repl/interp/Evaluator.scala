@@ -147,12 +147,16 @@ object Evaluator{
     def evalMain(cls: Class[_]) =
       cls.getDeclaredMethod("$main").invoke(null)
 
+
     def previousImportBlock = {
       previousImports
         .values
         .groupBy(_.prefix)
-        .map{case (prefix, imports) =>
-          s"import $prefix.{${imports.map("`"+_.imported+"`").mkString(",")}}"
+        .map{
+        case (prefix, Seq(imp)) =>
+          s"import $prefix.${Misc.backtickWrap(imp.imported)}"
+        case (prefix, imports) =>
+          s"import $prefix.{${imports.map(x => "\n  " + Misc.backtickWrap(x.imported)).mkString(",")}\n}"
         }
         .mkString("\n")
     }

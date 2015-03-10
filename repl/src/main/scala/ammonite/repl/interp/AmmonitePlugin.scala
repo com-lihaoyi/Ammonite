@@ -45,11 +45,12 @@ class AmmonitePlugin(g: scala.tools.nsc.Global, output: Seq[ImportData] => Unit)
             for {
               (sym, importString) <- symbols
               if !sym.isSynthetic
-              name = sym.encodedName.trim
+              if !sym.isPrivate
+              name = sym.decodedName
               if name != "<init>"
               if name != "<clinit>"
               if name != "$main"
-            } yield ImportData(sym.encodedName.trim, "", importString)
+            } yield ImportData(name, "", importString)
           )
         }
       }

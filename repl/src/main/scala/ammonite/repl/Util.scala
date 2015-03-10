@@ -123,3 +123,13 @@ class Timer{
     current = now
   }
 }
+object Misc{
+  def backtickWrap(s: String) = {
+    val splitter = new scalaParser.Scala(s){
+      def Id2 = rule( Identifiers.Id ~ EOI )
+    }
+
+    if (splitter.Id2.run().isSuccess) s
+    else "`" + s + "`"
+  }
+}

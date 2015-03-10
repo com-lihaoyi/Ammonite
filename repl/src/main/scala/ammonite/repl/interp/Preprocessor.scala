@@ -1,6 +1,6 @@
 package ammonite.repl.interp
 import acyclic.file
-import ammonite.repl.Res
+import ammonite.repl.{Misc, Res}
 import org.parboiled2.ParseError
 
 import scala.reflect.internal.Flags
@@ -23,31 +23,34 @@ object Preprocessor{
       (code: String, name: String, tree: Global#Tree) => cond.lift(name, code, tree)
     }
 
-    def pprintSignature(ident: String) = s"""Iterator(ReplBridge.shell.shellPPrint(`$ident`, "$ident"))"""
+    def pprintSignature(ident: String) = s"""Iterator(ReplBridge.shell.shellPPrint($ident, "$ident"))"""
 
     def definedStr(definitionLabel: String, name: String) =
       s"""Iterator(ReplBridge.shell.shellPrintDef("$definitionLabel", "$name"))"""
 
     def pprint(ident: String) = {
       pprintSignature(ident) +
-        s""" ++ Iterator(" = ") ++ ammonite.pprint.PPrint(`$ident`)"""
+        s""" ++ Iterator(" = ") ++ ammonite.pprint.PPrint($ident)"""
     }
     def DefProcessor(definitionLabel: String)(cond: PartialFunction[Global#Tree, String]) =
       (code: String, name: String, tree: Global#Tree) =>
-        cond.lift(tree).map{
-          name => Preprocessor.Output(code, Seq(definedStr(definitionLabel, name)))
+        cond.lift(tree).map{ name =>
+          Preprocessor.Output(
+            code,
+            Seq(definedStr(definitionLabel, Misc.backtickWrap(name)))
+          )
         }
 
-    val ObjectDef = DefProcessor("object"){case m: Global#ModuleDef => m.name.toString}
+    val ObjectDef = DefProcessor("object"){case m: Global#ModuleDef => m.name.decoded}
     val ClassDef = DefProcessor("class"){
-      case m: Global#ClassDef if !m.mods.hasFlag(Flags.TRAIT)=> m.name.toString
+      case m: Global#ClassDef if !m.mods.hasFlag(Flags.TRAIT)=> m.name.decoded
     }
     val TraitDef =  DefProcessor("trait"){
-      case m: Global#ClassDef if m.mods.hasFlag(Flags.TRAIT) => m.name.toString
+      case m: Global#ClassDef if m.mods.hasFlag(Flags.TRAIT) => m.name.decoded
     }
 
-    val DefDef = DefProcessor("function"){case m: Global#DefDef => m.name.toString}
-    val TypeDef = DefProcessor("type"){case m: Global#TypeDef => m.name.toString}
+    val DefDef = DefProcessor("function"){case m: Global#DefDef => m.name.decoded}
+    val TypeDef = DefProcessor("type"){case m: Global#TypeDef => m.name.decoded}
 
     val PatVarDef = Processor { case (name, code, t: Global#ValDef) =>
       Preprocessor.Output(
@@ -56,8 +59,8 @@ object Preprocessor{
         // synthetic flags right now, because we're dumb-parsing it and not putting
         // it through a full compilation
         if (t.name.decoded.contains("$")) Nil
-        else if (!t.mods.hasFlag(Flags.LAZY)) Seq(pprint(t.name.toString))
-        else Seq(s"""${pprintSignature(t.name.toString)} ++ Iterator(" = <lazy>")""")
+        else if (!t.mods.hasFlag(Flags.LAZY)) Seq(pprint(Misc.backtickWrap(t.name.decoded)))
+        else Seq(s"""${pprintSignature(Misc.backtickWrap(t.name.decoded))} ++ Iterator(" = <lazy>")""")
       )
     }
 
@@ -73,14 +76,14 @@ object Preprocessor{
     )
 
     def apply(code: String, wrapperId: Int): Res[Preprocessor.Output] = {
-      val splitted = new scalaParser.Scala(code){
+      val splitter = new scalaParser.Scala(code){
         def Split = {
           def Prelude = rule( Annot.* ~ `implicit`.? ~ `lazy`.? ~ LocalMod.* )
           rule( Semis.? ~ capture(Import | Prelude ~ BlockDef | StatCtx.Expr).*(Semis) ~ Semis.? ~ EOI )
         }
       }
 
-      splitted.Split.run() match {
+      splitter.Split.run() match {
         case util.Failure(ParseError(p, pp, t)) if p.index == code.length => Res.Buffer(code)
         case util.Failure(e) => Res.Failure(parse(code).left.get)
         case util.Success(Nil) => Res.Skip

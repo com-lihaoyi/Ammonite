@@ -39,7 +39,7 @@ object EvaluatorTests extends TestSuite{
         res3: Long = 110L
 
         @ val `class` = "class"
-        class: java.lang.String = "class"
+        `class`: java.lang.String = "class"
 
         @ `class`
         res5: java.lang.String = "class"
@@ -303,6 +303,25 @@ object EvaluatorTests extends TestSuite{
 
         @ Seq(0) map {_ + 1}
         res3: Seq[Int] = List(1)
+      """)
+    }
+    'backticks{
+      check.session("""
+        @ val `1+1` = 1
+        `1+1`: Int = 1
+
+        @ val ++ = 1
+        ++: Int = 1
+
+        @ object `+1+`
+        defined object `+1+`
+
+        @ val ` ` = 1; type ` ` = Int
+        ` `: Int = 1
+        defined type ` `
+
+        @ ((` ` + `1+1`): ` `): Int
+        res4: Int = 2
       """)
     }
   }
