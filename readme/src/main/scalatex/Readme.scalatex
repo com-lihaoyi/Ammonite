@@ -13,7 +13,10 @@
       @sect.ref{Ammonite-REPL}: A modern, drop-in replacement for the standard Scala REPL (usable in any SBT project) with many @sect.ref("Features", "new features") and better usability to make your shell usage a pleasant experience.
 
   @p
-    Each of these are independent modules that are each usable on their own. Together, they form the basis of a systems shell that can be used as a replacement for the @a("Bash shell", href:="http://en.wikipedia.org/wiki/Bash_%28Unix_shell%29") for performing common system housekeeping tasks.
+    Each of these are independent modules that are each usable on their own. Together, they form the basis of a systems shell that can be used as a replacement for the @a("Bash shell", href:="http://en.wikipedia.org/wiki/Bash_%28Unix_shell%29") for performing common system housekeeping tasks. Separately, @sect.ref{Ammonite-Ops} is a best-in-class file-system IO library and @sect.ref{Ammonite-REPL} is a best-in-class Scala REPL.
+
+  @p
+    Ammonite for now only works on Unix/OS-X/Linux (i.e. no @a("Windows support", href:="https://github.com/lihaoyi/Ammonite/issues/18")) and Java 7 and above. 
 
   @{
     late{

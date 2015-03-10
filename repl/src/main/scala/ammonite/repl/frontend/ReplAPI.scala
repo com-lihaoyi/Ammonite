@@ -69,6 +69,10 @@ trait ReplAPI {
   def newCompiler(): Unit
 
   /**
+   *
+   */
+  def imports: String
+  /**
    * Controls how things are pretty-printed in the REPL. Feel free
    * to shadow this with your own definition to change how things look
    */

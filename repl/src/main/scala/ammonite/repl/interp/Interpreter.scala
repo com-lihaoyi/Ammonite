@@ -70,6 +70,7 @@ class Interpreter(handleResult: => (String, Res[Evaluated]) => Unit,
   }
 
   lazy val replApi: ReplAPI = new DefaultReplAPI {
+    def imports = interp.eval.previousImportBlock
     def colors = colors0
     def shellPrompt: String = shellPrompt0()
     def shellPrompt_=(s: String) = shellPrompt0() = s

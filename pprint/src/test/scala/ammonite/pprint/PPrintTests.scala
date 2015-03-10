@@ -51,9 +51,22 @@ object PPrintTests extends TestSuite{
           * - check(-0.125, "-0.125")
         }
         'String {
+          val tq = "\"\"\""
           * - check("i am a cow", """ "i am a cow" """)
-          * - check( """ "hello" """.trim, """ "\"hello\"" """)
-          * - check("\n\n\n", """ "\n\n\n" """)
+          * - check( """ "hello" """.trim, s"""
+          |$tq
+          |"hello"
+          |$tq
+          """.stripMargin
+          )
+
+          * - check("\n\n\n", s"""
+          |$tq
+          |
+          |
+          |
+          |$tq
+          """.stripMargin)
         }
         'Symbols {
           * - check('hello, """'hello""")

@@ -73,9 +73,18 @@ object PPrinter {
   implicit val CharRepr = PPrinter[Char]((x, c) =>
     Iterator(c.color.literal("'" + escape(x.toString) + "'"))
   )
-  implicit val StringRepr = PPrinter[String]((x, c) =>
-    Iterator(c.color.literal('"' + escape(x) + '"'))
-  )
+
+  implicit val StringRepr = PPrinter[String] { (x, c) =>
+    val escaped = escape(x)
+    Iterator(c.color.literal(
+      if (escaped.length - x.length < 1) '"' + escaped +'"'
+      else {
+        val indent = "  " * c.depth
+        val indented = x.lines.map(indent  + _).mkString("\n")
+        "\"\"\"\n" + indented + "\n" + indent  + "\"\"\""
+      }
+    ))
+  }
   implicit val SymbolRepr = PPrinter[Symbol]((x, c) =>
     Iterator(c.color.literal("'" + x.name))
   )

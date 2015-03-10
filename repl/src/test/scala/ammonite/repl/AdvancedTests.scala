@@ -10,7 +10,8 @@ object AdvancedTests extends TestSuite{
     'load{
       'ivy{
         'standalone{
-          check.session("""
+          val tq = "\"\"\""
+          check.session(s"""
             @ import scalatags.Text.all._
             error: not found: value scalatags
 
@@ -20,7 +21,9 @@ object AdvancedTests extends TestSuite{
             import scalatags.Text.all._
 
             @ a("omg", href:="www.google.com").render
-            res2: String = "<a href=\"www.google.com\">omg</a>"
+            res2: String = $tq
+            <a href="www.google.com">omg</a>
+            $tq
           """)
         }
         'dependent{
