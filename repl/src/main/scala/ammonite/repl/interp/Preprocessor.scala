@@ -1,10 +1,10 @@
 package ammonite.repl.interp
 import acyclic.file
-import ammonite.repl.{Misc, Res}
+import ammonite.repl.{BacktickWrap, Res}
 import org.parboiled2.ParseError
 
 import scala.reflect.internal.Flags
-import scala.tools.nsc.Global
+import scala.tools.nsc.{Global => G}
 
 /**
  * Converts REPL-style snippets into full-fledged Scala source files,
@@ -18,9 +18,10 @@ object Preprocessor{
 
   case class Output(code: String, printer: Seq[String])
 
-  def apply(parse: => String => Either[String, Seq[Global#Tree]]): Preprocessor = new Preprocessor{
-    def Processor(cond: PartialFunction[(String, String, Global#Tree), Preprocessor.Output]) = {
-      (code: String, name: String, tree: Global#Tree) => cond.lift(name, code, tree)
+  def apply(parse: => String => Either[String, Seq[G#Tree]]): Preprocessor = new Preprocessor{
+
+    def Processor(cond: PartialFunction[(String, String, G#Tree), Preprocessor.Output]) = {
+      (code: String, name: String, tree: G#Tree) => cond.lift(name, code, tree)
     }
 
     def pprintSignature(ident: String) = s"""Iterator(ReplBridge.shell.shellPPrint($ident, "$ident"))"""
@@ -32,46 +33,46 @@ object Preprocessor{
       pprintSignature(ident) +
         s""" ++ Iterator(" = ") ++ ammonite.pprint.PPrint($ident)"""
     }
-    def DefProcessor(definitionLabel: String)(cond: PartialFunction[Global#Tree, String]) =
-      (code: String, name: String, tree: Global#Tree) =>
+
+    /**
+     * Processors for declarations which all have the same shape
+     */
+    def DefProc(definitionLabel: String)(cond: PartialFunction[G#Tree, G#Name]) =
+      (code: String, name: String, tree: G#Tree) =>
         cond.lift(tree).map{ name =>
           Preprocessor.Output(
             code,
-            Seq(definedStr(definitionLabel, Misc.backtickWrap(name)))
+            Seq(definedStr(definitionLabel, BacktickWrap(name.decoded)))
           )
         }
 
-    val ObjectDef = DefProcessor("object"){case m: Global#ModuleDef => m.name.decoded}
-    val ClassDef = DefProcessor("class"){
-      case m: Global#ClassDef if !m.mods.hasFlag(Flags.TRAIT)=> m.name.decoded
-    }
-    val TraitDef =  DefProcessor("trait"){
-      case m: Global#ClassDef if m.mods.hasFlag(Flags.TRAIT) => m.name.decoded
-    }
+    val ObjectDef = DefProc("object"){case m: G#ModuleDef => m.name}
+    val ClassDef = DefProc("class"){ case m: G#ClassDef if !m.mods.isTrait => m.name }
+    val TraitDef =  DefProc("trait"){ case m: G#ClassDef if m.mods.isTrait => m.name }
+    val DefDef = DefProc("function"){ case m: G#DefDef => m.name }
+    val TypeDef = DefProc("type"){ case m: G#TypeDef => m.name }
 
-    val DefDef = DefProcessor("function"){case m: Global#DefDef => m.name.decoded}
-    val TypeDef = DefProcessor("type"){case m: Global#TypeDef => m.name.decoded}
-
-    val PatVarDef = Processor { case (name, code, t: Global#ValDef) =>
-      Preprocessor.Output(
+    val PatVarDef = Processor { case (name, code, t: G#ValDef) =>
+      Output(
         code,
         // Try to leave out all synthetics; we don't actually have proper
         // synthetic flags right now, because we're dumb-parsing it and not putting
         // it through a full compilation
         if (t.name.decoded.contains("$")) Nil
-        else if (!t.mods.hasFlag(Flags.LAZY)) Seq(pprint(Misc.backtickWrap(t.name.decoded)))
-        else Seq(s"""${pprintSignature(Misc.backtickWrap(t.name.decoded))} ++ Iterator(" = <lazy>")""")
+        else if (!t.mods.hasFlag(Flags.LAZY)) Seq(pprint(BacktickWrap.apply(t.name.decoded)))
+        else Seq(s"""${pprintSignature(BacktickWrap.apply(t.name.decoded))} ++ Iterator(" = <lazy>")""")
       )
     }
 
-    val Expr = Processor{ case (name, code, tree) =>
-      Preprocessor.Output(s"val $name = ($code)", Seq(pprint(name)))
-    }
-    val Import = Processor{ case (name, code, tree: Global#Import) =>
-      Preprocessor.Output(code, Seq(s"""Iterator("$code")"""))
+    val Import = Processor{
+      case (name, code, tree: G#Import) => Output(code, Seq(s"""Iterator("$code")"""))
     }
 
-    val decls = Seq[(String, String, Global#Tree) => Option[Preprocessor.Output]](
+    val Expr = Processor{
+      case (name, code, tree) => Output(s"val $name = ($code)", Seq(pprint(name)))
+    }
+
+    val decls = Seq[(String, String, G#Tree) => Option[Preprocessor.Output]](
       ObjectDef, ClassDef, TraitDef, DefDef, TypeDef, PatVarDef, Import, Expr
     )
 
@@ -87,46 +88,49 @@ object Preprocessor{
         case util.Failure(ParseError(p, pp, t)) if p.index == code.length => Res.Buffer(code)
         case util.Failure(e) => Res.Failure(parse(code).left.get)
         case util.Success(Nil) => Res.Skip
-        case util.Success(postSplit: Seq[String]) =>
-
-          val reParsed = postSplit.map(p => (parse(p), p))
-          val errors = reParsed.collect{case (Left(e), _) => e }
-          if (errors.length != 0) Res.Failure(errors.mkString("\n"))
-          else {
-            val allDecls = for (((Right(trees), code), i) <- reParsed.zipWithIndex) yield {
-              // Suffix the name of the result variable with the index of
-              // the tree if there is more than one statement in this command
-              val suffix = if (reParsed.length > 1) "_" + i else ""
-              def handleTree(t: Global#Tree) = {
-                decls.iterator.flatMap(_.apply(code, "res" + wrapperId + suffix, t)).next()
-              }
-              trees match {
-                // AFAIK this can only happen for pattern-matching multi-assignment,
-                // which for some reason parse into a list of statements. In such a
-                // scenario, aggregate all their printers, but only output the code once
-                case Seq(tree) => handleTree(tree)
-                case trees =>
-                  val printers = for {
-                    tree <- trees
-                    if tree.isInstanceOf[Global#ValDef]
-                    Preprocessor.Output(_, printers) = handleTree(tree)
-                    printer <- printers
-                  } yield printer
-                  Preprocessor.Output(code, printers)
-              }
-            }
-
-            Res(
-              allDecls.reduceOption { (a, b) =>
-                Output(
-                  a.code + ";" + b.code,
-                  a.printer ++ b.printer
-                )
-              },
-              "Don't know how to handle " + code
-            )
-          }
+        case util.Success(postSplit: Seq[String]) => complete(code, wrapperId, postSplit)
       }
+    }
+    
+    def complete(code: String, wrapperId: Int, postSplit: Seq[String]) = {
+      val reParsed = postSplit.map(p => (parse(p), p))
+      val errors = reParsed.collect{case (Left(e), _) => e }
+      if (errors.length != 0) Res.Failure(errors.mkString("\n"))
+      else {
+        val allDecls = for (((Right(trees), code), i) <- reParsed.zipWithIndex) yield {
+          // Suffix the name of the result variable with the index of
+          // the tree if there is more than one statement in this command
+          val suffix = if (reParsed.length > 1) "_" + i else ""
+          def handleTree(t: G#Tree) = {
+            decls.iterator.flatMap(_.apply(code, "res" + wrapperId + suffix, t)).next()
+          }
+          trees match {
+            // AFAIK this can only happen for pattern-matching multi-assignment,
+            // which for some reason parse into a list of statements. In such a
+            // scenario, aggregate all their printers, but only output the code once
+            case Seq(tree) => handleTree(tree)
+            case trees =>
+              val printers = for {
+                tree <- trees
+                if tree.isInstanceOf[G#ValDef]
+                Preprocessor.Output(_, printers) = handleTree(tree)
+                printer <- printers
+              } yield printer
+              Preprocessor.Output(code, printers)
+          }
+        }
+
+        Res(
+          allDecls.reduceOption { (a, b) =>
+            Output(
+              a.code + ";" + b.code,
+              a.printer ++ b.printer
+            )
+          },
+          "Don't know how to handle " + code
+        )
+      }
+
     }
   }
 }

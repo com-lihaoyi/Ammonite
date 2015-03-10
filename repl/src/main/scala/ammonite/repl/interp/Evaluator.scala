@@ -154,9 +154,9 @@ object Evaluator{
         .groupBy(_.prefix)
         .map{
         case (prefix, Seq(imp)) =>
-          s"import $prefix.${Misc.backtickWrap(imp.imported)}"
+          s"import $prefix.${BacktickWrap(imp.imported)}"
         case (prefix, imports) =>
-          s"import $prefix.{${imports.map(x => "\n  " + Misc.backtickWrap(x.imported)).mkString(",")}\n}"
+          s"import $prefix.{${imports.map(x => "\n  " + BacktickWrap(x.imported)).mkString(",")}\n}"
         }
         .mkString("\n")
     }

@@ -1,6 +1,6 @@
 package ammonite.repl.interp
 
-import ammonite.repl.ImportData
+import ammonite.repl.{BacktickWrap, ImportData}
 import acyclic.file
 
 import scala.tools.nsc._
@@ -39,7 +39,7 @@ class AmmonitePlugin(g: scala.tools.nsc.Global, output: Seq[ImportData] => Unit)
                 }
               }
               val prefix = rec(expr).reverse
-                                    .map(x => ammonite.repl.Misc.backtickWrap(x.decoded))
+                                    .map(x => BacktickWrap(x.decoded))
                                     .mkString(".")
 
               syms.filter(_.isPublic).map(_ -> prefix).toList ::: ctx
