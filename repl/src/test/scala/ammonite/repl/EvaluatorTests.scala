@@ -322,6 +322,13 @@ object EvaluatorTests extends TestSuite{
 
         @ ((` ` + `1+1`): ` `): Int
         res4: Int = 2
+
+        @ object ` `{ val ` ` = 333 }
+
+        @ import ` `.` `
+
+        @ ` `
+        res7: Int = 333
       """)
     }
   }
