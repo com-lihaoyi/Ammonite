@@ -50,7 +50,9 @@ object CommandResult{
   implicit def commandResultRepr(implicit c: Config) =
     new PPrint(
       PPrinter[CommandResult]((x, c) =>
-      x.output.iterator.flatMap(Iterator("\n", _))
+      x.output.iterator.flatMap(line =>
+        Iterator("\n", c.color.literal(line))
+      )
     ),
     c
   )
