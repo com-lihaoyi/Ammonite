@@ -64,8 +64,8 @@ object Evaluator{
      * errors instead of the desired shadowing.
      */
     lazy val previousImports = mutable.Map(
-      namesFor(typeOf[ReplAPI]).map(n => n -> ImportData(n, "", "ReplBridge.shell")).toSeq ++
-      namesFor(typeOf[ammonite.repl.IvyConstructor]).map(n => n -> ImportData(n, "", "ammonite.repl.IvyConstructor")).toSeq
+      namesFor(typeOf[ReplAPI]).map(n => n -> ImportData(n, None, "", "ReplBridge.shell")).toSeq ++
+      namesFor(typeOf[ammonite.repl.IvyConstructor]).map(n => n -> ImportData(n, None, "", "ammonite.repl.IvyConstructor")).toSeq
       :_*
     )
 
@@ -153,10 +153,17 @@ object Evaluator{
         .values
         .groupBy(_.prefix)
         .map{
-        case (prefix, Seq(imp)) =>
-          s"import $prefix.${BacktickWrap(imp.imported)}"
+        case (prefix, Seq(imp)) if imp.fromName == imp.toName=>
+          s"import $prefix.${BacktickWrap(imp.fromName)}"
         case (prefix, imports) =>
-          s"import $prefix.{${imports.map(x => "\n  " + BacktickWrap(x.imported)).mkString(",")}\n}"
+          val lines = for(x <- imports) yield {
+            x.toName match{
+              case None => "\n  " + BacktickWrap(x.fromName)
+              case Some(toName) => "\n  " + BacktickWrap(x.fromName) + " => " + BacktickWrap(toName)
+            }
+          }
+          val block = lines.mkString(",")
+          s"import $prefix.{$block\n}"
         }
         .mkString("\n")
     }
@@ -203,7 +210,7 @@ object Evaluator{
     }
 
     def update(newImports: Seq[ImportData]) = {
-      for(i <- newImports) previousImports(i.imported) = i
+      for(i <- newImports) previousImports(i.toName.getOrElse(i.fromName)) = i
     }
   }
 

@@ -23,15 +23,15 @@ class AmmonitePlugin(g: scala.tools.nsc.Global, output: Seq[ImportData] => Unit)
       val phaseName = "AmmonitePhase"
       def newPhase(prev: Phase): Phase = new g.GlobalPhase(prev) {
         def name = phaseName
+        def decode(t: g.Tree) = (t.symbol, t.symbol.decodedName, None, "")
         def apply(unit: g.CompilationUnit): Unit = {
           val stats = unit.body.children.last.asInstanceOf[g.ModuleDef].impl.body
-          val symbols = stats.foldLeft(List.empty[(g.Symbol, String)]){
+          val symbols = stats.foldLeft(List.empty[(g.Symbol, String, Option[String], String)]){
             // These are all the ways we want to import names from previous
             // executions into the current one. Most are straightforward, except
             // `import` statements for which we make use of the typechecker to
             // resolve the imported names
-            case (ctx, t @ g.Import(expr, _)) =>
-              val syms = new g.analyzer.ImportInfo(t, 0).allImportedSymbols
+            case (ctx, t @ g.Import(expr, selectors)) =>
               def rec(expr: g.Tree): List[g.Name] = {
                 expr match {
                   case g.Select(lhs, name) => name :: rec(lhs)
@@ -39,28 +39,38 @@ class AmmonitePlugin(g: scala.tools.nsc.Global, output: Seq[ImportData] => Unit)
                 }
               }
               val prefix = rec(expr).reverse
-                                    .map(x => BacktickWrap(x.decoded))
-                                    .mkString(".")
+                .map(x => BacktickWrap(x.decoded))
+                .mkString(".")
 
-              syms.filter(_.isPublic).map(_ -> prefix).toList ::: ctx
-            case (ctx, t @ g.DefDef(_, _, _, _, _, _))  => (t.symbol, "") :: ctx
-            case (ctx, t @ g.ValDef(_, _, _, _))        => (t.symbol, "") :: ctx
-            case (ctx, t @ g.ClassDef(_, _, _, _))      => (t.symbol, "") :: ctx
-            case (ctx, t @ g.ModuleDef(_, _, _))        => (t.symbol, "") :: ctx
-            case (ctx, t @ g.TypeDef(_, _, _, _))       => (t.symbol, "") :: ctx
+              val renamings =
+                for(t @ g.ImportSelector(name, _, rename, _) <- selectors) yield {
+                  Option(rename).map(name.decoded -> _.decoded)
+                }
+              val renameMap = renamings.flatten.map(_.swap).toMap
+              val info = new g.analyzer.ImportInfo(t, 0)
+              val syms = info.allImportedSymbols
+                             .filter(_.isPublic)
+                             .map(s => (s, renameMap.getOrElse(s.decodedName, s.decodedName), Some(s.decodedName), prefix))
+                             .toList
+              syms ::: ctx
+            case (ctx, t @ g.DefDef(_, _, _, _, _, _))  => decode(t) :: ctx
+            case (ctx, t @ g.ValDef(_, _, _, _))        => decode(t) :: ctx
+            case (ctx, t @ g.ClassDef(_, _, _, _))      => decode(t) :: ctx
+            case (ctx, t @ g.ModuleDef(_, _, _))        => decode(t) :: ctx
+            case (ctx, t @ g.TypeDef(_, _, _, _))       => decode(t) :: ctx
             case (ctx, _) => ctx
           }
 
           output(
             for {
-              (sym, importString) <- symbols
+              (sym, fromName, toName, importString) <- symbols
               if !sym.isSynthetic
               if !sym.isPrivate
-              name = sym.decodedName
-              if name != "<init>"
-              if name != "<clinit>"
-              if name != "$main"
-            } yield ImportData(name, "", importString)
+
+              if fromName != "<init>"
+              if fromName != "<clinit>"
+              if fromName != "$main"
+            } yield ImportData(fromName, toName, "", importString)
           )
         }
       }

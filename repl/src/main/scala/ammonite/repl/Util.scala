@@ -78,7 +78,10 @@ case class Catching(handler: PartialFunction[Throwable, Res.Failing]) {
 case class Evaluated(wrapper: String,
                      imports: Seq[ImportData])
 
-case class ImportData(imported: String, wrapperName: String, prefix: String)
+case class ImportData(fromName: String,
+                      toName: Option[String],
+                      wrapperName: String,
+                      prefix: String)
 
 /**
  * Encapsulates a read-write cell that can be passed around

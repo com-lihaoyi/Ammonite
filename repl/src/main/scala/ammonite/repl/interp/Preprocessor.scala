@@ -65,7 +65,9 @@ object Preprocessor{
     }
 
     val Import = Processor{
-      case (name, code, tree: G#Import) => Output(code, Seq(s"""Iterator("$code")"""))
+      case (name, code, tree: G#Import) =>
+        val Array(keyword, body) = code.split(" ", 2)
+        Output(code, Seq(s"""Iterator(ReplBridge.shell.shellPrintImport("$body"))"""))
     }
 
     val Expr = Processor{

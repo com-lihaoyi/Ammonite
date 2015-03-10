@@ -131,52 +131,82 @@ object EvaluatorTests extends TestSuite{
       """)
     }
 
-    'import0 {
-      check.session("""
-        @ import math.abs
-        import math.abs
-
-        @ val abs = 123L
-        abs: Long = 123L
-
-        @ abs
-        res2: Long = 123L
-      """)
-    }
-
     'import{
-      check.session("""
-        @ val abs = 'a'
-        abs: Char = 'a'
 
-        @ abs
-        res1: Char = 'a'
+      'basic {
+        check.session("""
+          @ import math.abs
+          import math.abs
 
-        @ val abs = 123L
-        abs: Long = 123L
+          @ val abs = 123L
+          abs: Long = 123L
 
-        @ abs
-        res3: Long = 123L
+          @ abs
+          res2: Long = 123L
+        """)
+      }
+      'shadowing{
+        check.session("""
+          @ val abs = 'a'
+          abs: Char = 'a'
 
-        @ import math.abs
-        import math.abs
+          @ abs
+          res1: Char = 'a'
 
-        @ abs(-10)
-        res5: Int = 10
+          @ val abs = 123L
+          abs: Long = 123L
 
-        @ val abs = 123L
-        abs: Long = 123L
+          @ abs
+          res3: Long = 123L
 
-        @ abs
-        res7: Long = 123L
+          @ import math.abs
+          import math.abs
 
-        @ import java.lang.Math._
-        import java.lang.Math._
+          @ abs(-10)
+          res5: Int = 10
 
-        @ abs(-4)
-        res9: Int = 4
-      """)
+          @ val abs = 123L
+          abs: Long = 123L
+
+          @ abs
+          res7: Long = 123L
+
+          @ import java.lang.Math._
+          import java.lang.Math._
+
+          @ abs(-4)
+          res9: Int = 4
+        """)
+      }
+      'renaming{
+        check.session("""
+          @ import math.{abs => sba}
+
+          @ sba(-123)
+          res1: Int = 123
+
+          @ abs
+          error: not found: value abs
+
+          @ import math.{abs, max => xam}
+
+          @ abs(-234)
+          res4: Int = 234
+
+          @ xam(1, 2)
+          res5: Int = 2
+
+          @ import math.{_, min => _}
+
+          @ max(2, 3)
+          res7: Int = 3
+
+          @min
+          error: not found: value min
+        """)
+      }
     }
+
 
     'classes{
       check.session("""
@@ -329,6 +359,14 @@ object EvaluatorTests extends TestSuite{
 
         @ ` `
         res7: Int = 333
+
+        @ object ` `{ val ` ` = 123};
+        defined object ` `
+
+        @ import ` `.{` ` => `l o l`}
+
+        @ `l o l`
+        res10: Int = 123
       """)
     }
   }

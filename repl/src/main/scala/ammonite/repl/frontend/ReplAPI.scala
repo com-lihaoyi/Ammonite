@@ -102,6 +102,7 @@ trait Load extends (String => Unit){
 abstract class FullReplAPI extends ReplAPI{
   def shellPPrint[T: WeakTypeTag](value: => T, ident: String): String
   def shellPrintDef(definitionLabel: String, ident: String): String
+  def shellPrintImport(imported: String): String
   def typeOf[T: WeakTypeTag] = scala.reflect.runtime.universe.weakTypeOf[T]
   def typeOf[T: WeakTypeTag](t: => T) = scala.reflect.runtime.universe.weakTypeOf[T]
 }
@@ -134,5 +135,8 @@ trait DefaultReplAPI extends FullReplAPI {
   }
   def shellPrintDef(definitionLabel: String, ident: String) = {
     s"defined ${colors.`type`}$definitionLabel ${colors.ident}$ident${colors.reset}"
+  }
+  def shellPrintImport(imported: String) = {
+    s"${colors.`type`}import ${colors.ident}$imported${colors.reset}"
   }
 }
