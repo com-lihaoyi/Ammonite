@@ -168,15 +168,16 @@ object AdvancedTests extends TestSuite{
         res2: scala.Seq[String] = Vector("val x = 1", "x")
       """)
     }
-    'pprint{
+    'customPPrint{
       check.session("""
         @ class C
         defined class C
 
-        @ implicit def pprint = ammonite.pprint.PPrinter((t, c) => Iterator("INSTANCE OF CLASS C"))
+        @ implicit def pprint = ammonite.pprint.PPrinter[C]((t, c) => Iterator("INSTANCE OF CLASS C"))
+        defined function pprint
 
         @ new C
-        INSTANCE OF CLASS C
+        res2: cmd0.C = INSTANCE OF CLASS C
       """)
     }
 
