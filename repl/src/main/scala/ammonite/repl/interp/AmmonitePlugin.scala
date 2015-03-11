@@ -23,10 +23,13 @@ class AmmonitePlugin(g: scala.tools.nsc.Global, output: Seq[ImportData] => Unit)
       val phaseName = "AmmonitePhase"
       def newPhase(prev: Phase): Phase = new g.GlobalPhase(prev) {
         def name = phaseName
-        def decode(t: g.Tree) = (t.symbol, t.symbol.decodedName, None, "")
+        def decode(t: g.Tree) = {
+          val sym = t.symbol
+          (sym, sym.decodedName, sym.decodedName, "")
+        }
         def apply(unit: g.CompilationUnit): Unit = {
           val stats = unit.body.children.last.asInstanceOf[g.ModuleDef].impl.body
-          val symbols = stats.foldLeft(List.empty[(g.Symbol, String, Option[String], String)]){
+          val symbols = stats.foldLeft(List.empty[(g.Symbol, String, String, String)]){
             // These are all the ways we want to import names from previous
             // executions into the current one. Most are straightforward, except
             // `import` statements for which we make use of the typechecker to
@@ -48,10 +51,15 @@ class AmmonitePlugin(g: scala.tools.nsc.Global, output: Seq[ImportData] => Unit)
                 }
               val renameMap = renamings.flatten.map(_.swap).toMap
               val info = new g.analyzer.ImportInfo(t, 0)
-              val syms = info.allImportedSymbols
-                             .filter(_.isPublic)
-                             .map(s => (s, renameMap.getOrElse(s.decodedName, s.decodedName), Some(s.decodedName), prefix))
-                             .toList
+
+              val syms = for{
+                sym <- info.allImportedSymbols.toList
+                if sym.isPublic
+              } yield {
+                val name = sym.decodedName
+                (sym, renameMap.getOrElse(name, name), name, prefix)
+              }
+
               syms ::: ctx
             case (ctx, t @ g.DefDef(_, _, _, _, _, _))  => decode(t) :: ctx
             case (ctx, t @ g.ValDef(_, _, _, _))        => decode(t) :: ctx
@@ -64,9 +72,10 @@ class AmmonitePlugin(g: scala.tools.nsc.Global, output: Seq[ImportData] => Unit)
           output(
             for {
               (sym, fromName, toName, importString) <- symbols
+//              _ = println(fromName + "\t"+ toName)
               if !sym.isSynthetic
               if !sym.isPrivate
-
+              if !fromName.contains("$")
               if fromName != "<init>"
               if fromName != "<clinit>"
               if fromName != "$main"

@@ -167,7 +167,43 @@ object AdvancedTests extends TestSuite{
         @ history
         res2: scala.Seq[String] = Vector("val x = 1", "x")
       """)
+    }
+    'pprint{
+      check.session("""
+        @ class C
+        defined class C
 
+        @ implicit def pprint = ammonite.pprint.PPrinter((t, c) => Iterator("INSTANCE OF CLASS C"))
+
+        @ new C
+        INSTANCE OF CLASS C
+      """)
+    }
+
+    'shapeless{
+      check.session("""
+        @ load.ivy("com.chuusai" %% "shapeless" % "2.1.0")
+
+        @ import shapeless._
+
+        @ (1 :: "lol" :: List(1, 2, 3) :: HNil)(1)
+        res2: java.lang.String = "lol"
+      """)
+    }
+
+    'scalaz{
+      check.session("""
+        @ load.ivy("org.scalaz" %% "scalaz-core" % "7.1.1")
+
+        @ import scalaz._
+        import scalaz._
+
+        @ import Scalaz._
+        import Scalaz._
+
+        @ (Option(1) |@| Option(2))(_ + _)
+        res3: scala.Option[Int] = Some(3)
+      """)
     }
   }
 }

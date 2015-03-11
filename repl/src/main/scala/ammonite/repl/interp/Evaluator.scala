@@ -64,8 +64,8 @@ object Evaluator{
      * errors instead of the desired shadowing.
      */
     lazy val previousImports = mutable.Map(
-      namesFor(typeOf[ReplAPI]).map(n => n -> ImportData(n, None, "", "ReplBridge.shell")).toSeq ++
-      namesFor(typeOf[ammonite.repl.IvyConstructor]).map(n => n -> ImportData(n, None, "", "ammonite.repl.IvyConstructor")).toSeq
+      namesFor(typeOf[ReplAPI]).map(n => n -> ImportData(n, n, "", "ReplBridge.shell")).toSeq ++
+      namesFor(typeOf[ammonite.repl.IvyConstructor]).map(n => n -> ImportData(n, n, "", "ammonite.repl.IvyConstructor")).toSeq
       :_*
     )
 
@@ -147,25 +147,31 @@ object Evaluator{
     def evalMain(cls: Class[_]) =
       cls.getDeclaredMethod("$main").invoke(null)
 
-
+    def transpose[A](xs: List[List[A]]): List[List[A]] = xs.filter(_.nonEmpty) match {
+      case Nil    =>  Nil
+      case ys: List[List[A]] => ys.map{ _.head }::transpose(ys.map{ _.tail })
+    }
     def previousImportBlock = {
-      previousImports
-        .values
-        .groupBy(_.prefix)
-        .map{
-        case (prefix, Seq(imp)) if imp.fromName == imp.toName=>
-          s"import $prefix.${BacktickWrap(imp.fromName)}"
-        case (prefix, imports) =>
-          val lines = for(x <- imports) yield {
-            x.toName match{
-              case None => "\n  " + BacktickWrap(x.fromName)
-              case Some(toName) => "\n  " + BacktickWrap(x.fromName) + " => " + BacktickWrap(toName)
+      val snippets = for {
+        (prefix, allImports) <- previousImports.values.toList.groupBy(_.prefix)
+        imports <- transpose(allImports.groupBy(_.fromName).values.toList)
+      } yield {
+        imports match{
+          case Seq(imp) if imp.fromName == imp.toName =>
+            s"import $prefix.${BacktickWrap(imp.fromName)}"
+          case imports =>
+            val lines = for (x <- imports) yield {
+              if (x.fromName == x.toName)
+                "\n  " + BacktickWrap(x.fromName)
+              else
+                "\n  " + BacktickWrap(x.fromName) + " => " + BacktickWrap(x.toName)
+
             }
-          }
-          val block = lines.mkString(",")
-          s"import $prefix.{$block\n}"
+            val block = lines.mkString(",")
+            s"import $prefix.{$block\n}"
         }
-        .mkString("\n")
+      }
+      snippets.mkString("\n")
     }
     def interrupted() = {
       Thread.interrupted()
@@ -210,7 +216,7 @@ object Evaluator{
     }
 
     def update(newImports: Seq[ImportData]) = {
-      for(i <- newImports) previousImports(i.toName.getOrElse(i.fromName)) = i
+      for(i <- newImports) previousImports(i.toName) = i
     }
   }
 

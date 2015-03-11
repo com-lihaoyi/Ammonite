@@ -79,7 +79,7 @@ case class Evaluated(wrapper: String,
                      imports: Seq[ImportData])
 
 case class ImportData(fromName: String,
-                      toName: Option[String],
+                      toName: String,
                       wrapperName: String,
                       prefix: String)
 
@@ -128,11 +128,12 @@ class Timer{
 }
 object BacktickWrap{
   def apply(s: String) = {
+
     val splitter = new scalaParser.Scala(s){
       def Id2 = rule( Identifiers.Id ~ EOI )
     }
 
     if (splitter.Id2.run().isSuccess) s
-    else "`" + s + "`"
+    else "`" + ammonite.pprint.PPrinter.escape(s) + "`"
   }
 }

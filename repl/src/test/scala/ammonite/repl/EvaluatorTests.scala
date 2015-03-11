@@ -191,17 +191,17 @@ object EvaluatorTests extends TestSuite{
           @ import math.{abs, max => xam}
 
           @ abs(-234)
-          res4: Int = 234
+          res3: Int = 234
 
           @ xam(1, 2)
-          res5: Int = 2
+          res4: Int = 2
 
-          @ import math.{_, min => _}
+          @ import math.{min => _, _}
 
           @ max(2, 3)
-          res7: Int = 3
+          res6: Int = 3
 
-          @min
+          @ min
           error: not found: value min
         """)
       }
