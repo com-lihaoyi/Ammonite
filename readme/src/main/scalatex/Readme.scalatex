@@ -61,7 +61,7 @@
   @p
     To get started, add this to your @code{build.sbt}:
 
-  @hl.scala{"com.lihaoyi" %% "ammonite-ops" % "0.2.6"}
+  @hl.scala{"com.lihaoyi" %% "ammonite-ops" % "0.2.7"}
 
   @p 
     And this at the top of the file you want to use Ammonite:
@@ -88,7 +88,7 @@
     @hl.ref(pathsScala, "class Path", "") 
 
     @p
-      With a number of useful operations taht can be performed on them. Absolute paths can be created in a few ways:
+      With a number of useful operations that can be performed on them. Absolute paths can be created in a few ways:
 
     @hl.ref(opsExamples, Seq("constructingPaths", "//"), "}") 
 
@@ -236,13 +236,14 @@
       As you can see, you can often compose elaborate operations entirely naturally using the available pipes, without needing to remember any special flags or techniques.
 
 @sect{Ammonite-REPL}
+  @val advancedTests = 'repl/'src/'test/'scala/'ammonite/'repl/"AdvancedTests.scala"
   @p
     Ammonite-REPL is a cleanroom re-implementation of the Scala REPL from first principles. It is much more featureful than the default REPL and comes with a lot of ergonomic improvements that may be familiar to people coming from IDEs or other REPLs such as @a("IPython", href:="ipython.org") or @a("Zsh", href:="http://www.zsh.org/").
   @p
     To try out Ammonite-REPL in an existing project, add the following to your @code{build.sbt}
 
   @hl.scala
-    libraryDependencies += "com.lihaoyi" %% "ammonite-repl" % "0.2.6" % "test"
+    libraryDependencies += "com.lihaoyi" %% "ammonite-repl" % "0.2.7" % "test"
 
     initialCommands in console := "ammonite.repl.Repl.main(null)"
 
@@ -259,12 +260,22 @@
 
     @sect{Artifact Loading}
 
-      @hl.ref('repl/'src/'test/'scala/'ammonite/'repl/"AdvancedTests.scala", Seq("standalone", "@"), "\"\"\"")
+      @hl.ref(advancedTests, Seq("standalone", "@"), "\"\"\"")
 
       @p
-        Ammonite allows you to load artifacts directly from maven central by copy & pasting their SBT ivy-coordinate-snippet. In addition, you can also load in jars as @hl.scala{java.io.File}s to be included in the session or simple @hl.scala{String}s to be executed using the @hl.scala{load} command
+        Ammonite allows you to load artifacts directly from maven central by copy & pasting their SBT ivy-coordinate-snippet. In addition, you can also load in jars as @hl.scala{java.io.File}s to be included in the session or simple @hl.scala{String}s to be executed using the @hl.scala{load} command.
+
+      @p
+        This makes Ammonite ideal for trying out new libraries or tools. You can pull down projects like @a("Scalaz", href:="https://github.com/scalaz/scalaz") or @a("Shapeless", href:="https://github.com/milessabin/shapeless") and immediately start working with them in the REPL:
+
+      @hl.ref(advancedTests, Seq("scalaz", "@"), "\"\"\"")
+
+      @hl.ref(advancedTests, Seq("shapeless", "@"), "\"\"\"")
+
     @sect{Pretty-printed output}
-      @hl.ref('repl/'src/'test/'scala/'ammonite/'repl/"AdvancedTests.scala", Seq("'pprint", "@"), "\"\"\"")
+
+      @hl.ref(advancedTests, Seq("'pprint", "@"), "\"\"\"")
+
       @p
         Ammonite-REPL uses @sect.ref{Ammonite-PPrint} to display its output by default. That means that everything is nicely formatted to fit within the width of the terminal, and is copy-paste-able!
 
