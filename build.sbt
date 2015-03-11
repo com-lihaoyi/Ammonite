@@ -107,7 +107,7 @@ lazy val repl = project
       "jline" % "jline" % "2.12",
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
       "org.apache.ivy" % "ivy" % "2.4.0",
-      "com.lihaoyi" %% "scala-parser" % "0.1.2"
+      "com.lihaoyi" %% "scala-parser" % "0.1.3"
     ),
     javaOptions += "-Xmx2G",
     fork in (Test, testOnly) := true,
