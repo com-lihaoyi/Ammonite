@@ -21,7 +21,7 @@ import scala.util.control.ControlThrowable
  * @tparam B: wrapper $main method return type
  */
 trait Evaluator[-A, +B] {
-  def evalClass(code: String, wrapperName: String): Res[(Class[_], Seq[ImportData])]
+  def evalClass(code: String, wrapperName: String, useClassWrapper: Boolean = false): Res[(Class[_], Class[_], Seq[ImportData])]
   def getCurrentLine: Int
   def update(newImports: Seq[ImportData]): Unit
 
@@ -33,7 +33,7 @@ trait Evaluator[-A, +B] {
    * passing in the callback ensures the printing is still done lazily, but within
    * the exception-handling block of the `Evaluator`
    */
-  def processLine[C](input: A, process: B => C): Res[Evaluated[C]]
+  def processLine[C](input: A, process: B => C, useClassWrapper: Boolean = false): Res[Evaluated[C]]
 
   def previousImportBlock: String
   def addJar(url: URL): Unit
@@ -134,7 +134,7 @@ object Evaluator{
 
     def addJar(url: URL) = evalClassloader.add(url)
 
-    def evalClass(code: String, wrapperName: String) = for{
+    def evalClass(code: String, wrapperName: String, useClassWrapper: Boolean = false) = for{
 
       (output, compiled) <- Res.Success{
         val output = mutable.Buffer.empty[String]
@@ -146,14 +146,16 @@ object Evaluator{
         compiled, "Compilation Failed\n" + output.mkString("\n")
       )
 
-      cls <- Res[Class[_]](Try {
+      (cls, objCls) <- Res[(Class[_], Class[_])](Try {
         for ((name, bytes) <- classFiles) newFileDict(name) = bytes
-        Class.forName(wrapperName , true, evalClassloader)
+        val cls = Class.forName(wrapperName, true, evalClassloader)
+        val objCls = if (useClassWrapper) Class.forName(wrapperName + "$", true, evalClassloader) else null
+        (cls, objCls)
       }, e => "Failed to load compiled class " + e)
-    } yield (cls, importData)
+    } yield (cls, objCls, importData)
 
-    def evalMain(cls: Class[_]) =
-      cls.getDeclaredMethod("$main").invoke(null)
+    def evalMain(cls: Class[_], instance: AnyRef) =
+      cls.getDeclaredMethod("$main").invoke(instance)
 
     def transpose[A](xs: List[List[A]]): List[List[A]] = xs.filter(_.nonEmpty) match {
       case Nil    =>  Nil
@@ -189,9 +191,9 @@ object Evaluator{
     type InvEx = InvocationTargetException
     type InitEx = ExceptionInInitializerError
 
-    def processLine[C](input: A, process: B => C) = for {
+    def processLine[C](input: A, process: B => C, useClassWrapper: Boolean = false) = for {
       wrapperName <- Res.Success("cmd" + currentLine)
-      (cls, newImports) <- evalClass(wrap(input, previousImportBlock, wrapperName), wrapperName)
+      (cls, objClass, newImports) <- evalClass(wrap(input, previousImportBlock, wrapperName), wrapperName, useClassWrapper)
       _ = currentLine += 1
       _ <- Catching{
         case Ex(_: InvEx, _: InitEx, Exit)  => Res.Exit
@@ -203,7 +205,15 @@ object Evaluator{
     } yield {
       // Exhaust the printer iterator now, before exiting the `Catching`
       // block, so any exceptions thrown get properly caught and handled
-      val value = evaluatorRunPrinter(process(evalMain(cls).asInstanceOf[B]))
+      val value = evaluatorRunPrinter(process {
+        val instance =
+          if (useClassWrapper)
+            objClass getField "MODULE$" get null
+          else
+            null
+
+        evalMain(cls, instance).asInstanceOf[B]
+      })
       Evaluated(
         wrapperName,
         newImports.map(id => id.copy(

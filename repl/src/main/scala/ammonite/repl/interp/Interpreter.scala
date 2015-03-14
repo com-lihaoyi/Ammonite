@@ -34,7 +34,8 @@ class Interpreter[A,B](handleResult: => (String, Res[Evaluated[_]]) => Unit,
 
   def processLine[C](line: String,
                      saveHistory: (String => Unit, String) => Unit,
-                     printer: B => C) = for{
+                     printer: B => C,
+                     useClassWrapper: Boolean = false) = for{
     _ <- Catching { case Ex(x@_*) =>
       val Res.Failure(trace) = Res.Failure(x)
       Res.Failure(trace + "\nSomething unexpected went wrong =(")
@@ -44,7 +45,7 @@ class Interpreter[A,B](handleResult: => (String, Res[Evaluated[_]]) => Unit,
     oldClassloader = Thread.currentThread().getContextClassLoader
     out <- try{
       Thread.currentThread().setContextClassLoader(eval.evalClassloader)
-      eval.processLine(p, printer)
+      eval.processLine(p, printer, useClassWrapper)
     } finally Thread.currentThread().setContextClassLoader(oldClassloader)
   } yield out
 

@@ -28,7 +28,11 @@ class AmmonitePlugin(g: scala.tools.nsc.Global, output: Seq[ImportData] => Unit)
           (sym, sym.decodedName, sym.decodedName, "")
         }
         def apply(unit: g.CompilationUnit): Unit = {
-          val stats = unit.body.children.last.asInstanceOf[g.ModuleDef].impl.body
+          val stats = unit.body.children.last match {
+            case m: g.ModuleDef => m.impl.body
+            case c: g.ClassDef => c.impl.body
+            case other => throw new IllegalArgumentException(s"Unsupported wrapper definition: $other")
+          }
           val symbols = stats.foldLeft(List.empty[(g.Symbol, String, String, String)]){
             // These are all the ways we want to import names from previous
             // executions into the current one. Most are straightforward, except
