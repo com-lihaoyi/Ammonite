@@ -1,7 +1,9 @@
 package ammonite.repl.interp
 
+import java.io.{File, FileOutputStream}
 import java.lang.reflect.InvocationTargetException
 import java.net.URL
+import java.util.UUID
 
 import acyclic.file
 import ammonite.repl._
@@ -111,10 +113,29 @@ object Evaluator{
         def add(url: URL) = addURL(url)
       }
 
+    lazy val tmpClassDir = {
+      val d = new File(new File(System.getProperty("java.io.tmpdir")), s"ammonite-${UUID.randomUUID()}")
+      d.mkdirs()
+      d.deleteOnExit()
+      d
+    }
 
     def newClassloader() = {
       evalClassloader = new URLClassLoader(Array(), evalClassloader){
         def add(url: URL) = addURL(url)
+        override def getResource(name: String): URL = {
+          if (name.endsWith(".class") && newFileDict.contains(name.stripSuffix(".class"))) {
+            val f = new File(tmpClassDir, name)
+            if (!f.exists()) {
+              val w = new FileOutputStream(f)
+              w.write(newFileDict(name.stripSuffix(".class")))
+              w.close()
+            }
+
+            f.toURI.toURL
+          } else
+            super.getResource(name)
+        }
         override def loadClass(name: String): Class[_] = {
           if(newFileDict.contains(name)) {
             val bytes = newFileDict(name)
