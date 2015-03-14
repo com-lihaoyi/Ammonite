@@ -41,6 +41,7 @@ trait Evaluator[-A, +B] {
   def addJar(url: URL): Unit
   def newClassloader(): Unit
   def evalClassloader: ClassLoader
+  def classes: Map[String, Array[Byte]]
 }
 
 object Evaluator{
@@ -69,6 +70,7 @@ object Evaluator{
      * classloader can get at them.
      */
     val newFileDict = mutable.Map.empty[String, Array[Byte]]
+    def classes = newFileDict.toMap
 
     /**
      * Imports which are required by earlier commands to the REPL. Imports
