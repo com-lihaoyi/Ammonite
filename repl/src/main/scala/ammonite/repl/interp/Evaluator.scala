@@ -4,12 +4,12 @@ import java.lang.reflect.InvocationTargetException
 import java.net.URL
 
 import acyclic.file
-import ammonite.repl.frontend.ReplExit
 import ammonite.repl._
 import java.net.URLClassLoader
 import scala.reflect.runtime.universe._
 import scala.collection.mutable
 import scala.util.Try
+import scala.util.control.ControlThrowable
 
 /**
  * Takes source code and, with the help of a compiler and preprocessor,
@@ -42,6 +42,11 @@ trait Evaluator[-A, +B] {
 }
 
 object Evaluator{
+  /**
+   * Thrown to exit the Evaluator cleanly
+   */
+  case object Exit extends ControlThrowable
+
   def namesFor(t: scala.reflect.runtime.universe.Type): Set[String] = {
     val yours = t.members.map(_.name.toString).toSet
     val default = typeOf[Object].members.map(_.name.toString)
@@ -189,7 +194,7 @@ object Evaluator{
       (cls, newImports) <- evalClass(wrap(input, previousImportBlock, wrapperName), wrapperName)
       _ = currentLine += 1
       _ <- Catching{
-        case Ex(_: InvEx, _: InitEx, ReplExit)  => Res.Exit
+        case Ex(_: InvEx, _: InitEx, Exit)  => Res.Exit
         case Ex(_: ThreadDeath)                 => interrupted()
         case Ex(_: InvEx, _: ThreadDeath)       => interrupted()
         case Ex(_: InvEx, _: InitEx, userEx@_*) => Res.Failure(userEx, stop = "$main")

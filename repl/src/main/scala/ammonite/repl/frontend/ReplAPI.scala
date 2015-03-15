@@ -5,7 +5,7 @@ import java.io.File
 import scala.reflect.runtime.universe._
 import acyclic.file
 
-import scala.util.control.ControlThrowable
+import ammonite.repl.interp.Evaluator.Exit
 
 
 class ReplAPIHolder {
@@ -13,16 +13,11 @@ class ReplAPIHolder {
   lazy val shell = shell0
 }
 
-/**
- * Thrown to exit the REPL cleanly
- */
-case object ReplExit extends ControlThrowable
-
 trait ReplAPI {
   /**
    * Exit the Ammonite REPL. You can also use Ctrl-D to exit
    */
-  def exit = throw ReplExit
+  def exit = throw Exit
 
   /**
    * Clears the screen of the REPL
