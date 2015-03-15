@@ -11,14 +11,14 @@ import scala.tools.nsc.{Global => G}
  * ready to feed into the compiler. Each source-string is turned into
  * three things:
  */
-trait Preprocessor{
-  def apply(code: String, wrapperId: Int): Res[Preprocessor.Output]
+trait Preprocessor[T] {
+  def apply(code: String, wrapperId: Int): Res[T]
 }
 object Preprocessor{
 
   case class Output(code: String, printer: Seq[String])
 
-  def apply(parse: => String => Either[String, Seq[G#Tree]]): Preprocessor = new Preprocessor{
+  def apply(parse: => String => Either[String, Seq[G#Tree]]): Preprocessor[Output] = new Preprocessor[Output] {
 
     def Processor(cond: PartialFunction[(String, String, G#Tree), Preprocessor.Output]) = {
       (code: String, name: String, tree: G#Tree) => cond.lift(name, code, tree)
