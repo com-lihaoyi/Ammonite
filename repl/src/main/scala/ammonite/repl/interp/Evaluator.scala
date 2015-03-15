@@ -16,8 +16,11 @@ import scala.util.Try
  * evaluates it and returns a `Result[(output: String, imports: String)]`
  * where `output` is what gets printed and `imports` are any imports that
  * need to get prepended to subsequent commands.
+ *
+ * @tparam A: preprocessor output type
+ * @tparam B: wrapper $main method return type
  */
-trait Evaluator{
+trait Evaluator[-A, +B] {
   def evalClass(code: String, wrapperName: String): Res[(Class[_], Seq[ImportData])]
   def getCurrentLine: Int
   def update(newImports: Seq[ImportData]): Unit
@@ -30,7 +33,7 @@ trait Evaluator{
    * passing in the callback ensures the printing is still done lazily, but within
    * the exception-handling block of the `Evaluator`
    */
-  def processLine[C](code: String, printCode: String, printer: Iterator[String] => C): Res[Evaluated[C]]
+  def processLine[C](input: A, process: B => C): Res[Evaluated[C]]
 
   def previousImportBlock: String
   def addJar(url: URL): Unit
@@ -39,10 +42,11 @@ trait Evaluator{
 }
 
 object Evaluator{
-  def apply(currentClassloader: ClassLoader,
-            preprocess: (String, Int) => Res[Preprocessor.Output],
-            compile: => (Array[Byte], String => Unit) => Compiler.Output,
-            stdout: String => Unit): Evaluator = new Evaluator{
+  def apply[A, B](currentClassloader: ClassLoader,
+                  preprocess: (String, Int) => Res[A],
+                  wrap: (A, String, String) => String,
+                  compile: => (Array[Byte], String => Unit) => Compiler.Output,
+                  stdout: String => Unit): Evaluator[A, B] = new Evaluator[A, B] {
 
     def namesFor(t: scala.reflect.runtime.universe.Type): Set[String] = {
       val yours = t.members.map(_.name.toString).toSet
@@ -181,19 +185,9 @@ object Evaluator{
     type InvEx = InvocationTargetException
     type InitEx = ExceptionInInitializerError
 
-    def processLine[C](code: String, printCode: String, printer: Iterator[String] => C) = for {
+    def processLine[C](input: A, process: B => C) = for {
       wrapperName <- Res.Success("cmd" + currentLine)
-      (cls, newImports) <- evalClass(
-        s"""
-        $previousImportBlock
-
-        object $wrapperName{
-          $code
-          def $$main() = {$printCode}
-        }
-        """,
-        wrapperName
-      )
+      (cls, newImports) <- evalClass(wrap(input, previousImportBlock, wrapperName), wrapperName)
       _ = currentLine += 1
       _ <- Catching{
         case Ex(_: InvEx, _: InitEx, ReplExit)  => Res.Exit
@@ -205,7 +199,7 @@ object Evaluator{
     } yield {
       // Exhaust the printer iterator now, before exiting the `Catching`
       // block, so any exceptions thrown get properly caught and handled
-      val value = evaluatorRunPrinter(printer(evalMain(cls).asInstanceOf[Iterator[String]]))
+      val value = evaluatorRunPrinter(process(evalMain(cls).asInstanceOf[B]))
       Evaluated(
         wrapperName,
         newImports.map(id => id.copy(

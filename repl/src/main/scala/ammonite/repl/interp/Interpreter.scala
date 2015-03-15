@@ -33,12 +33,12 @@ class Interpreter(handleResult: => (String, Res[Evaluated[_]]) => Unit,
       val Res.Failure(trace) = Res.Failure(x)
       Res.Failure(trace + "\nSomething unexpected went wrong =(")
     }
-    Preprocessor.Output(code, printSnippet) <- preprocess(line, eval.getCurrentLine)
+    output <- preprocess(line, eval.getCurrentLine)
     _ = saveHistory(history.append(_), line)
     oldClassloader = Thread.currentThread().getContextClassLoader
     out <- try{
       Thread.currentThread().setContextClassLoader(eval.evalClassloader)
-      eval.processLine(code, printSnippet.reduceOption(_ + "++ Iterator(\"\\n\") ++" + _).getOrElse("Iterator()"), printer)
+      eval.processLine(output, printer)
     } finally Thread.currentThread().setContextClassLoader(oldClassloader)
   } yield out
 
@@ -133,9 +133,19 @@ class Interpreter(handleResult: => (String, Res[Evaluated[_]]) => Unit,
   val mainThread = Thread.currentThread()
   val preprocess = Preprocessor(compiler.parse)
 
-  val eval = Evaluator(
+  val eval = Evaluator[Preprocessor.Output, Iterator[String]](
     mainThread.getContextClassLoader,
     preprocess.apply,
+    {
+      (p: Preprocessor.Output, previousImportBlock: String, wrapperName: String) =>
+        s"""$previousImportBlock
+
+            object $wrapperName{
+              ${p.code}
+              def $$main() = {${p.printer.reduceOption(_ + "++ Iterator(\"\\n\") ++" + _).getOrElse("Iterator()")}}
+            }
+         """
+    },
     compiler.compile,
     stdout
   )
