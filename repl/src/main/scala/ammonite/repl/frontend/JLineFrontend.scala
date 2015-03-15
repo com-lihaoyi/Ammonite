@@ -18,7 +18,7 @@ trait JLineFrontend{
    */
   def width: Int
   def action(buffered: String): Res[String]
-  def update(buffered: String, r: Res[Evaluated]): Unit
+  def update(buffered: String, r: Res[Evaluated[_]]): Unit
 }
 object JLineFrontend{
   def apply(input: InputStream,
@@ -78,7 +78,7 @@ object JLineFrontend{
 
     } yield buffered + res
 
-    def update(buffered: String, r: Res[Evaluated]) = r match{
+    def update(buffered: String, r: Res[Evaluated[_]]) = r match{
 
       case Res.Buffer(line) =>
         /**

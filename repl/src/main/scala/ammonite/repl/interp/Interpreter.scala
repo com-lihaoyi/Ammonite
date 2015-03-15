@@ -13,7 +13,7 @@ import scala.reflect.io.VirtualDirectory
  * to interpret Scala code. Doesn't attempt to provide any
  * real encapsulation for now.
  */
-class Interpreter(handleResult: => (String, Res[Evaluated]) => Unit,
+class Interpreter(handleResult: => (String, Res[Evaluated[_]]) => Unit,
                   shellPrompt0: => Ref[String],
                   pprintConfig: pprint.Config = pprint.Config.Defaults.PPrintConfig,
                   colors0: ColorSet = ColorSet.BlackWhite,
@@ -42,7 +42,7 @@ class Interpreter(handleResult: => (String, Res[Evaluated]) => Unit,
     } finally Thread.currentThread().setContextClassLoader(oldClassloader)
   } yield out
 
-  def handleOutput(res: Res[Evaluated]) = {
+  def handleOutput(res: Res[Evaluated[_]]) = {
     handleResult(buffered, res)
 
     res match{

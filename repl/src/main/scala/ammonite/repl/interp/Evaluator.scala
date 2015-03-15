@@ -30,7 +30,7 @@ trait Evaluator{
    * passing in the callback ensures the printing is still done lazily, but within
    * the exception-handling block of the `Evaluator`
    */
-  def processLine(code: String, printCode: String, printer: Iterator[String] => Unit): Res[Evaluated]
+  def processLine[C](code: String, printCode: String, printer: Iterator[String] => C): Res[Evaluated[C]]
 
   def previousImportBlock: String
   def addJar(url: URL): Unit
@@ -181,7 +181,7 @@ object Evaluator{
     type InvEx = InvocationTargetException
     type InitEx = ExceptionInInitializerError
 
-    def processLine(code: String, printCode: String, printer: Iterator[String] => Unit) = for {
+    def processLine[C](code: String, printCode: String, printer: Iterator[String] => C) = for {
       wrapperName <- Res.Success("cmd" + currentLine)
       (cls, newImports) <- evalClass(
         s"""
@@ -205,13 +205,14 @@ object Evaluator{
     } yield {
       // Exhaust the printer iterator now, before exiting the `Catching`
       // block, so any exceptions thrown get properly caught and handled
-      evaluatorRunPrinter(printer(evalMain(cls).asInstanceOf[Iterator[String]]))
+      val value = evaluatorRunPrinter(printer(evalMain(cls).asInstanceOf[Iterator[String]]))
       Evaluated(
         wrapperName,
         newImports.map(id => id.copy(
           wrapperName = wrapperName,
           prefix = if (id.prefix == "") wrapperName else id.prefix
-        ))
+        )),
+        value
       )
     }
 
@@ -225,6 +226,6 @@ object Evaluator{
    * so we can easily cut out the irrelevant part of the trace when
    * showing it to the user.
    */
-  def evaluatorRunPrinter(f: => Unit) = f
+  def evaluatorRunPrinter[T](f: => T): T = f
 
 }

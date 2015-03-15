@@ -75,8 +75,9 @@ case class Catching(handler: PartialFunction[Throwable, Res.Failing]) {
     try Res.Success(t(())) catch handler
 }
 
-case class Evaluated(wrapper: String,
-                     imports: Seq[ImportData])
+case class Evaluated[T](wrapper: String,
+                        imports: Seq[ImportData],
+                        value: T)
 
 case class ImportData(fromName: String,
                       toName: String,
