@@ -4,7 +4,7 @@ import java.lang.reflect.InvocationTargetException
 import java.net.URL
 
 import acyclic.file
-import ammonite.repl.frontend.{ReplExit, ReplAPI}
+import ammonite.repl.frontend.ReplExit
 import ammonite.repl._
 import java.net.URLClassLoader
 import scala.reflect.runtime.universe._
@@ -42,17 +42,20 @@ trait Evaluator[-A, +B] {
 }
 
 object Evaluator{
+  def namesFor(t: scala.reflect.runtime.universe.Type): Set[String] = {
+    val yours = t.members.map(_.name.toString).toSet
+    val default = typeOf[Object].members.map(_.name.toString)
+    yours -- default
+  }
+
+  def namesFor[T: TypeTag]: Set[String] = namesFor(typeOf[T])
+
   def apply[A, B](currentClassloader: ClassLoader,
+                  initialImports: Seq[(String, ImportData)],
                   preprocess: (String, Int) => Res[A],
                   wrap: (A, String, String) => String,
                   compile: => (Array[Byte], String => Unit) => Compiler.Output,
                   stdout: String => Unit): Evaluator[A, B] = new Evaluator[A, B] {
-
-    def namesFor(t: scala.reflect.runtime.universe.Type): Set[String] = {
-      val yours = t.members.map(_.name.toString).toSet
-      val default = typeOf[Object].members.map(_.name.toString)
-      yours -- default
-    }
 
     /**
      * Files which have been compiled, stored so that our special
@@ -67,11 +70,7 @@ object Evaluator{
      * map. Otherwise if you import the same name twice you get compile
      * errors instead of the desired shadowing.
      */
-    lazy val previousImports = mutable.Map(
-      namesFor(typeOf[ReplAPI]).map(n => n -> ImportData(n, n, "", "ReplBridge.shell")).toSeq ++
-      namesFor(typeOf[ammonite.repl.IvyConstructor]).map(n => n -> ImportData(n, n, "", "ammonite.repl.IvyConstructor")).toSeq
-      :_*
-    )
+    lazy val previousImports = mutable.Map(initialImports: _*)
 
 
     /**

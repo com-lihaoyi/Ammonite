@@ -135,6 +135,8 @@ class Interpreter(handleResult: => (String, Res[Evaluated[_]]) => Unit,
 
   val eval = Evaluator[Preprocessor.Output, Iterator[String]](
     mainThread.getContextClassLoader,
+    Evaluator.namesFor[ReplAPI].map(n => n -> ImportData(n, n, "", "ReplBridge.shell")).toSeq ++
+      Evaluator.namesFor[ammonite.repl.IvyConstructor].map(n => n -> ImportData(n, n, "", "ammonite.repl.IvyConstructor")).toSeq,
     preprocess.apply,
     {
       (p: Preprocessor.Output, previousImportBlock: String, wrapperName: String) =>
