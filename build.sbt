@@ -118,8 +118,11 @@ lazy val repl = project
 lazy val readme = project
   .settings(scalatex.SbtPlugin.projectSettings:_*)
   .settings(
-    libraryDependencies += "com.lihaoyi" %% "scalatex-site" % "0.1.4",
-    libraryDependencies += "com.lihaoyi" %% "ammonite-ops" % "0.2.4",
+    libraryDependencies ++= Seq(
+      "com.lihaoyi" %% "scalatex-site" % "0.1.5",
+      "com.lihaoyi" %% "upickle" % "0.2.7",
+      "com.lihaoyi" %% "ammonite-ops" % "0.2.4"
+    ),
     scalaVersion := "2.11.4"
 )
 
