@@ -1,9 +1,4 @@
 var hljs=new function(){function j(v){return v.replace(/&/gm,"&amp;").replace(/</gm,"&lt;").replace(/>/gm,"&gt;")}function t(v){return v.nodeName.toLowerCase()}function h(w,x){var v=w&&w.exec(x);return v&&v.index==0}function r(w){var v=(w.className+" "+(w.parentNode?w.parentNode.className:"")).split(/\s+/);v=v.map(function(x){return x.replace(/^lang(uage)?-/,"")});return v.filter(function(x){return i(x)||/no(-?)highlight/.test(x)})[0]}function o(x,y){var v={};for(var w in x){v[w]=x[w]}if(y){for(var w in y){v[w]=y[w]}}return v}function u(x){var v=[];(function w(y,z){for(var A=y.firstChild;A;A=A.nextSibling){if(A.nodeType==3){z+=A.nodeValue.length}else{if(A.nodeType==1){v.push({event:"start",offset:z,node:A});z=w(A,z);if(!t(A).match(/br|hr|img|input/)){v.push({event:"stop",offset:z,node:A})}}}}return z})(x,0);return v}function q(w,y,C){var x=0;var F="";var z=[];function B(){if(!w.length||!y.length){return w.length?w:y}if(w[0].offset!=y[0].offset){return(w[0].offset<y[0].offset)?w:y}return y[0].event=="start"?w:y}function A(H){function G(I){return" "+I.nodeName+'="'+j(I.value)+'"'}F+="<"+t(H)+Array.prototype.map.call(H.attributes,G).join("")+">"}function E(G){F+="</"+t(G)+">"}function v(G){(G.event=="start"?A:E)(G.node)}while(w.length||y.length){var D=B();F+=j(C.substr(x,D[0].offset-x));x=D[0].offset;if(D==w){z.reverse().forEach(E);do{v(D.splice(0,1)[0]);D=B()}while(D==w&&D.length&&D[0].offset==x);z.reverse().forEach(A)}else{if(D[0].event=="start"){z.push(D[0].node)}else{z.pop()}v(D.splice(0,1)[0])}}return F+j(C.substr(x))}function m(y){function v(z){return(z&&z.source)||z}function w(A,z){return RegExp(v(A),"m"+(y.cI?"i":"")+(z?"g":""))}function x(D,C){if(D.compiled){return}D.compiled=true;D.k=D.k||D.bK;if(D.k){var z={};var E=function(G,F){if(y.cI){F=F.toLowerCase()}F.split(" ").forEach(function(H){var I=H.split("|");z[I[0]]=[G,I[1]?Number(I[1]):1]})};if(typeof D.k=="string"){E("keyword",D.k)}else{Object.keys(D.k).forEach(function(F){E(F,D.k[F])})}D.k=z}D.lR=w(D.l||/\b[A-Za-z0-9_]+\b/,true);if(C){if(D.bK){D.b="\\b("+D.bK.split(" ").join("|")+")\\b"}if(!D.b){D.b=/\B|\b/}D.bR=w(D.b);if(!D.e&&!D.eW){D.e=/\B|\b/}if(D.e){D.eR=w(D.e)}D.tE=v(D.e)||"";if(D.eW&&C.tE){D.tE+=(D.e?"|":"")+C.tE}}if(D.i){D.iR=w(D.i)}if(D.r===undefined){D.r=1}if(!D.c){D.c=[]}var B=[];D.c.forEach(function(F){if(F.v){F.v.forEach(function(G){B.push(o(F,G))})}else{B.push(F=="self"?D:F)}});D.c=B;D.c.forEach(function(F){x(F,D)});if(D.starts){x(D.starts,C)}var A=D.c.map(function(F){return F.bK?"\\.?("+F.b+")\\.?":F.b}).concat([D.tE,D.i]).map(v).filter(Boolean);D.t=A.length?w(A.join("|"),true):{exec:function(F){return null}}}x(y)}function c(T,L,J,R){function v(V,W){for(var U=0;U<W.c.length;U++){if(h(W.c[U].bR,V)){return W.c[U]}}}function z(V,U){if(h(V.eR,U)){return V}if(V.eW){return z(V.parent,U)}}function A(U,V){return !J&&h(V.iR,U)}function E(W,U){var V=M.cI?U[0].toLowerCase():U[0];return W.k.hasOwnProperty(V)&&W.k[V]}function w(aa,Y,X,W){var U=W?"":b.classPrefix,V='<span class="'+U,Z=X?"":"</span>";V+=aa+'">';return V+Y+Z}function N(){if(!I.k){return j(C)}var U="";var X=0;I.lR.lastIndex=0;var V=I.lR.exec(C);while(V){U+=j(C.substr(X,V.index-X));var W=E(I,V);if(W){H+=W[1];U+=w(W[0],j(V[0]))}else{U+=j(V[0])}X=I.lR.lastIndex;V=I.lR.exec(C)}return U+j(C.substr(X))}function F(){if(I.sL&&!f[I.sL]){return j(C)}var U=I.sL?c(I.sL,C,true,S):e(C);if(I.r>0){H+=U.r}if(I.subLanguageMode=="continuous"){S=U.top}return w(U.language,U.value,false,true)}function Q(){return I.sL!==undefined?F():N()}function P(W,V){var U=W.cN?w(W.cN,"",true):"";if(W.rB){D+=U;C=""}else{if(W.eB){D+=j(V)+U;C=""}else{D+=U;C=V}}I=Object.create(W,{parent:{value:I}})}function G(U,Y){C+=U;if(Y===undefined){D+=Q();return 0}var W=v(Y,I);if(W){D+=Q();P(W,Y);return W.rB?0:Y.length}var X=z(I,Y);if(X){var V=I;if(!(V.rE||V.eE)){C+=Y}D+=Q();do{if(I.cN){D+="</span>"}H+=I.r;I=I.parent}while(I!=X.parent);if(V.eE){D+=j(Y)}C="";if(X.starts){P(X.starts,"")}return V.rE?0:Y.length}if(A(Y,I)){throw new Error('Illegal lexeme "'+Y+'" for mode "'+(I.cN||"<unnamed>")+'"')}C+=Y;return Y.length||1}var M=i(T);if(!M){throw new Error('Unknown language: "'+T+'"')}m(M);var I=R||M;var S;var D="";for(var K=I;K!=M;K=K.parent){if(K.cN){D=w(K.cN,"",true)+D}}var C="";var H=0;try{var B,y,x=0;while(true){I.t.lastIndex=x;B=I.t.exec(L);if(!B){break}y=G(L.substr(x,B.index-x),B[0]);x=B.index+y}G(L.substr(x));for(var K=I;K.parent;K=K.parent){if(K.cN){D+="</span>"}}return{r:H,value:D,language:T,top:I}}catch(O){if(O.message.indexOf("Illegal")!=-1){return{r:0,value:j(L)}}else{throw O}}}function e(y,x){x=x||b.languages||Object.keys(f);var v={r:0,value:j(y)};var w=v;x.forEach(function(z){if(!i(z)){return}var A=c(z,y,false);A.language=z;if(A.r>w.r){w=A}if(A.r>v.r){w=v;v=A}});if(w.language){v.second_best=w}return v}function g(v){if(b.tabReplace){v=v.replace(/^((<[^>]+>|\t)+)/gm,function(w,z,y,x){return z.replace(/\t/g,b.tabReplace)})}if(b.useBR){v=v.replace(/\n/g,"<br>")}return v}function p(A){var B=r(A);if(/no(-?)highlight/.test(B)){return}var y;if(b.useBR){y=document.createElementNS("http://www.w3.org/1999/xhtml","div");y.innerHTML=A.innerHTML.replace(/\n/g,"").replace(/<br[ \/]*>/g,"\n")}else{y=A}var z=y.textContent;var v=B?c(B,z,true):e(z);var x=u(y);if(x.length){var w=document.createElementNS("http://www.w3.org/1999/xhtml","div");w.innerHTML=v.value;v.value=q(x,u(w),z)}v.value=g(v.value);A.innerHTML=v.value;A.className+=" hljs "+(!B&&v.language||"");A.result={language:v.language,re:v.r};if(v.second_best){A.second_best={language:v.second_best.language,re:v.second_best.r}}}var b={classPrefix:"hljs-",tabReplace:null,useBR:false,languages:undefined};function s(v){b=o(b,v)}function l(){if(l.called){return}l.called=true;var v=document.querySelectorAll("pre code");Array.prototype.forEach.call(v,p)}function a(){addEventListener("DOMContentLoaded",l,false);addEventListener("load",l,false)}var f={};var n={};function d(v,x){var w=f[v]=x(this);if(w.aliases){w.aliases.forEach(function(y){n[y]=v})}}function k(){return Object.keys(f)}function i(v){return f[v]||f[n[v]]}this.highlight=c;this.highlightAuto=e;this.fixMarkup=g;this.highlightBlock=p;this.configure=s;this.initHighlighting=l;this.initHighlightingOnLoad=a;this.registerLanguage=d;this.listLanguages=k;this.getLanguage=i;this.inherit=o;this.IR="[a-zA-Z][a-zA-Z0-9_]*";this.UIR="[a-zA-Z_][a-zA-Z0-9_]*";this.NR="\\b\\d+(\\.\\d+)?";this.CNR="(\\b0[xX][a-fA-F0-9]+|(\\b\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)";this.BNR="\\b(0b[01]+)";this.RSR="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|-|-=|/=|/|:|;|<<|<<=|<=|<|===|==|=|>>>=|>>=|>=|>>>|>>|>|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~";this.BE={b:"\\\\[\\s\\S]",r:0};this.ASM={cN:"string",b:"'",e:"'",i:"\\n",c:[this.BE]};this.QSM={cN:"string",b:'"',e:'"',i:"\\n",c:[this.BE]};this.PWM={b:/\b(a|an|the|are|I|I'm|isn't|don't|doesn't|won't|but|just|should|pretty|simply|enough|gonna|going|wtf|so|such)\b/};this.CLCM={cN:"comment",b:"//",e:"$",c:[this.PWM]};this.CBCM={cN:"comment",b:"/\\*",e:"\\*/",c:[this.PWM]};this.HCM={cN:"comment",b:"#",e:"$",c:[this.PWM]};this.NM={cN:"number",b:this.NR,r:0};this.CNM={cN:"number",b:this.CNR,r:0};this.BNM={cN:"number",b:this.BNR,r:0};this.CSSNM={cN:"number",b:this.NR+"(%|em|ex|ch|rem|vw|vh|vmin|vmax|cm|mm|in|pt|pc|px|deg|grad|rad|turn|s|ms|Hz|kHz|dpi|dpcm|dppx)?",r:0};this.RM={cN:"regexp",b:/\//,e:/\/[gim]*/,i:/\n/,c:[this.BE,{b:/\[/,e:/\]/,r:0,c:[this.BE]}]};this.TM={cN:"title",b:this.IR,r:0};this.UTM={cN:"title",b:this.UIR,r:0}}();hljs.registerLanguage("coffeescript",function(c){var b={keyword:"in if for while finally new do return else break catch instanceof throw try this switch continue typeof delete debugger super then unless until loop of by when and or is isnt not",literal:"true false null undefined yes no on off",reserved:"case default function var void with const let enum export import native __hasProp __extends __slice __bind __indexOf",built_in:"npm require console print module global window document"};var a="[A-Za-z$_][0-9A-Za-z$_]*";var f=c.inherit(c.TM,{b:a});var e={cN:"subst",b:/#\{/,e:/}/,k:b};var d=[c.BNM,c.inherit(c.CNM,{starts:{e:"(\\s*/)?",r:0}}),{cN:"string",v:[{b:/'''/,e:/'''/,c:[c.BE]},{b:/'/,e:/'/,c:[c.BE]},{b:/"""/,e:/"""/,c:[c.BE,e]},{b:/"/,e:/"/,c:[c.BE,e]}]},{cN:"regexp",v:[{b:"///",e:"///",c:[e,c.HCM]},{b:"//[gim]*",r:0},{b:/\/(?![ *])(\\\/|.)*?\/[gim]*(?=\W|$)/}]},{cN:"property",b:"@"+a},{b:"`",e:"`",eB:true,eE:true,sL:"javascript"}];e.c=d;return{aliases:["coffee","cson","iced"],k:b,i:/\/\*/,c:d.concat([{cN:"comment",b:"###",e:"###"},c.HCM,{cN:"function",b:"(^\\s*|\\B)("+a+"\\s*=\\s*)?(\\(.*\\))?\\s*\\B[-=]>",e:"[-=]>",rB:true,c:[f,{cN:"params",b:"\\([^\\(]",rB:true,c:[{b:/\(/,e:/\)/,k:b,c:["self"].concat(d)}]}]},{cN:"class",bK:"class",e:"$",i:/[:="\[\]]/,c:[{bK:"extends",eW:true,i:/[:="\[\]]/,c:[f]},f]},{cN:"attribute",b:a+":",e:":",rB:true,eE:true,r:0}])}});hljs.registerLanguage("nginx",function(c){var b={cN:"variable",v:[{b:/\$\d+/},{b:/\$\{/,e:/}/},{b:"[\\$\\@]"+c.UIR}]};var a={eW:true,l:"[a-z/_]+",k:{built_in:"on off yes no true false none blocked debug info notice warn error crit select break last permanent redirect kqueue rtsig epoll poll /dev/poll"},r:0,i:"=>",c:[c.HCM,{cN:"string",c:[c.BE,b],v:[{b:/"/,e:/"/},{b:/'/,e:/'/}]},{cN:"url",b:"([a-z]+):/",e:"\\s",eW:true,eE:true,c:[b]},{cN:"regexp",c:[c.BE,b],v:[{b:"\\s\\^",e:"\\s|{|;",rE:true},{b:"~\\*?\\s+",e:"\\s|{|;",rE:true},{b:"\\*(\\.[a-z\\-]+)+"},{b:"([a-z\\-]+\\.)+\\*"}]},{cN:"number",b:"\\b\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}(:\\d{1,5})?\\b"},{cN:"number",b:"\\b\\d+[kKmMgGdshdwy]*\\b",r:0},b]};return{aliases:["nginxconf"],c:[c.HCM,{b:c.UIR+"\\s",e:";|{",rB:true,c:[{cN:"title",b:c.UIR,starts:a}],r:0}],i:"[^\\s\\}]"}});hljs.registerLanguage("json",function(a){var e={literal:"true false null"};var d=[a.QSM,a.CNM];var c={cN:"value",e:",",eW:true,eE:true,c:d,k:e};var b={b:"{",e:"}",c:[{cN:"attribute",b:'\\s*"',e:'"\\s*:\\s*',eB:true,eE:true,c:[a.BE],i:"\\n",starts:c}],i:"\\S"};var f={b:"\\[",e:"\\]",c:[a.inherit(c,{cN:null})],i:"\\S"};d.splice(d.length,0,b,f);return{c:d,k:e,i:"\\S"}});hljs.registerLanguage("http",function(a){return{i:"\\S",c:[{cN:"status",b:"^HTTP/[0-9\\.]+",e:"$",c:[{cN:"number",b:"\\b\\d{3}\\b"}]},{cN:"request",b:"^[A-Z]+ (.*?) HTTP/[0-9\\.]+$",rB:true,e:"$",c:[{cN:"string",b:" ",e:" ",eB:true,eE:true}]},{cN:"attribute",b:"^\\w",e:": ",eE:true,i:"\\n|\\s|=",starts:{cN:"string",e:"$"}},{b:"\\n\\n",starts:{sL:"",eW:true}}]}});hljs.registerLanguage("javascript",function(a){return{aliases:["js"],k:{keyword:"in if for while finally var new function do return void else break catch instanceof with throw case default try this switch continue typeof delete let yield const class",literal:"true false null undefined NaN Infinity",built_in:"eval isFinite isNaN parseFloat parseInt decodeURI decodeURIComponent encodeURI encodeURIComponent escape unescape Object Function Boolean Error EvalError InternalError RangeError ReferenceError StopIteration SyntaxError TypeError URIError Number Math Date String RegExp Array Float32Array Float64Array Int16Array Int32Array Int8Array Uint16Array Uint32Array Uint8Array Uint8ClampedArray ArrayBuffer DataView JSON Intl arguments require module console window document"},c:[{cN:"pi",b:/^\s*('|")use strict('|")/,r:10},a.ASM,a.QSM,a.CLCM,a.CBCM,a.CNM,{b:"("+a.RSR+"|\\b(case|return|throw)\\b)\\s*",k:"return throw case",c:[a.CLCM,a.CBCM,a.RM,{b:/</,e:/>;/,r:0,sL:"xml"}],r:0},{cN:"function",bK:"function",e:/\{/,eE:true,c:[a.inherit(a.TM,{b:/[A-Za-z$_][0-9A-Za-z$_]*/}),{cN:"params",b:/\(/,e:/\)/,c:[a.CLCM,a.CBCM],i:/["'\(]/}],i:/\[|%/},{b:/\$[(.]/},{b:"\\."+a.IR,r:0}]}});hljs.registerLanguage("sql",function(a){var b={cN:"comment",b:"--",e:"$"};return{cI:true,i:/[<>]/,c:[{cN:"operator",bK:"begin end start commit rollback savepoint lock alter create drop rename call delete do handler insert load replace select truncate update set show pragma grant merge describe use explain help declare prepare execute deallocate savepoint release unlock purge reset change stop analyze cache flush optimize repair kill install uninstall checksum restore check backup",e:/;/,eW:true,k:{keyword:"abs absolute acos action add adddate addtime aes_decrypt aes_encrypt after aggregate all allocate alter analyze and any are as asc ascii asin assertion at atan atan2 atn2 authorization authors avg backup before begin benchmark between bin binlog bit_and bit_count bit_length bit_or bit_xor both by cache call cascade cascaded case cast catalog ceil ceiling chain change changed char_length character_length charindex charset check checksum checksum_agg choose close coalesce coercibility collate collation collationproperty column columns columns_updated commit compress concat concat_ws concurrent connect connection connection_id consistent constraint constraints continue contributors conv convert convert_tz corresponding cos cot count count_big crc32 create cross cume_dist curdate current current_date current_time current_timestamp current_user cursor curtime data database databases datalength date_add date_format date_sub dateadd datediff datefromparts datename datepart datetime2fromparts datetimeoffsetfromparts day dayname dayofmonth dayofweek dayofyear deallocate declare decode default deferrable deferred degrees delayed delete des_decrypt des_encrypt des_key_file desc describe descriptor diagnostics difference disconnect distinct distinctrow div do domain double drop dumpfile each else elt enclosed encode encrypt end end-exec engine engines eomonth errors escape escaped event eventdata events except exception exec execute exists exp explain export_set extended external extract fast fetch field fields find_in_set first first_value floor flush for force foreign format found found_rows from from_base64 from_days from_unixtime full function get get_format get_lock getdate getutcdate global go goto grant grants greatest group group_concat grouping grouping_id gtid_subset gtid_subtract handler having help hex high_priority hosts hour ident_current ident_incr ident_seed identified identity if ifnull ignore iif ilike immediate in index indicator inet6_aton inet6_ntoa inet_aton inet_ntoa infile initially inner innodb input insert install instr intersect into is is_free_lock is_ipv4 is_ipv4_compat is_ipv4_mapped is_not is_not_null is_used_lock isdate isnull isolation join key kill language last last_day last_insert_id last_value lcase lead leading least leaves left len lenght level like limit lines ln load load_file local localtime localtimestamp locate lock log log10 log2 logfile logs low_priority lower lpad ltrim make_set makedate maketime master master_pos_wait match matched max md5 medium merge microsecond mid min minute mod mode module month monthname mutex name_const names national natural nchar next no no_write_to_binlog not now nullif nvarchar oct octet_length of old_password on only open optimize option optionally or ord order outer outfile output pad parse partial partition password patindex percent_rank percentile_cont percentile_disc period_add period_diff pi plugin position pow power pragma precision prepare preserve primary prior privileges procedure procedure_analyze processlist profile profiles public publishingservername purge quarter query quick quote quotename radians rand read references regexp relative relaylog release release_lock rename repair repeat replace replicate reset restore restrict return returns reverse revoke right rlike rollback rollup round row row_count rows rpad rtrim savepoint schema scroll sec_to_time second section select serializable server session session_user set sha sha1 sha2 share show sign sin size slave sleep smalldatetimefromparts snapshot some soname soundex sounds_like space sql sql_big_result sql_buffer_result sql_cache sql_calc_found_rows sql_no_cache sql_small_result sql_variant_property sqlstate sqrt square start starting status std stddev stddev_pop stddev_samp stdev stdevp stop str str_to_date straight_join strcmp string stuff subdate substr substring subtime subtring_index sum switchoffset sysdate sysdatetime sysdatetimeoffset system_user sysutcdatetime table tables tablespace tan temporary terminated tertiary_weights then time time_format time_to_sec timediff timefromparts timestamp timestampadd timestampdiff timezone_hour timezone_minute to to_base64 to_days to_seconds todatetimeoffset trailing transaction translation trigger trigger_nestlevel triggers trim truncate try_cast try_convert try_parse ucase uncompress uncompressed_length unhex unicode uninstall union unique unix_timestamp unknown unlock update upgrade upped upper usage use user user_resources using utc_date utc_time utc_timestamp uuid uuid_short validate_password_strength value values var var_pop var_samp variables variance varp version view warnings week weekday weekofyear weight_string when whenever where with work write xml xor year yearweek zon",literal:"true false null",built_in:"array bigint binary bit blob boolean char character date dec decimal float int integer interval number numeric real serial smallint varchar varying int8 serial8 text"},c:[{cN:"string",b:"'",e:"'",c:[a.BE,{b:"''"}]},{cN:"string",b:'"',e:'"',c:[a.BE,{b:'""'}]},{cN:"string",b:"`",e:"`",c:[a.BE]},a.CNM,a.CBCM,b]},a.CBCM,b]}});hljs.registerLanguage("php",function(b){var e={cN:"variable",b:"(\\$|->)+[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*"};var a={cN:"preprocessor",b:/<\?(php)?|\?>/};var c={cN:"string",c:[b.BE,a],v:[{b:'b"',e:'"'},{b:"b'",e:"'"},b.inherit(b.ASM,{i:null}),b.inherit(b.QSM,{i:null})]};var d={v:[b.BNM,b.CNM]};return{aliases:["php3","php4","php5","php6"],cI:true,k:"and include_once list abstract global private echo interface as static endswitch array null if endwhile or const for endforeach self var while isset public protected exit foreach throw elseif include __FILE__ empty require_once do xor return parent clone use __CLASS__ __LINE__ else break print eval new catch __METHOD__ case exception default die require __FUNCTION__ enddeclare final try switch continue endfor endif declare unset true false trait goto instanceof insteadof __DIR__ __NAMESPACE__ yield finally",c:[b.CLCM,b.HCM,{cN:"comment",b:"/\\*",e:"\\*/",c:[{cN:"phpdoc",b:"\\s@[A-Za-z]+"},a]},{cN:"comment",b:"__halt_compiler.+?;",eW:true,k:"__halt_compiler",l:b.UIR},{cN:"string",b:"<<<['\"]?\\w+['\"]?$",e:"^\\w+;",c:[b.BE]},a,e,{cN:"function",bK:"function",e:/[;{]/,eE:true,i:"\\$|\\[|%",c:[b.UTM,{cN:"params",b:"\\(",e:"\\)",c:["self",e,b.CBCM,c,d]}]},{cN:"class",bK:"class interface",e:"{",eE:true,i:/[:\(\$"]/,c:[{bK:"extends implements"},b.UTM]},{bK:"namespace",e:";",i:/[\.']/,c:[b.UTM]},{bK:"use",e:";",c:[b.UTM]},{b:"=>"},c,d]}});hljs.registerLanguage("makefile",function(a){var b={cN:"variable",b:/\$\(/,e:/\)/,c:[a.BE]};return{aliases:["mk","mak"],c:[a.HCM,{b:/^\w+\s*\W*=/,rB:true,r:0,starts:{cN:"constant",e:/\s*\W*=/,eE:true,starts:{e:/$/,r:0,c:[b]}}},{cN:"title",b:/^[\w]+:\s*$/},{cN:"phony",b:/^\.PHONY:/,e:/$/,k:".PHONY",l:/[\.\w]+/},{b:/^\t+/,e:/$/,r:0,c:[a.QSM,b]}]}});hljs.registerLanguage("bash",function(b){var a={cN:"variable",v:[{b:/\$[\w\d#@][\w\d_]*/},{b:/\$\{(.*?)\}/}]};var d={cN:"string",b:/"/,e:/"/,c:[b.BE,a,{cN:"variable",b:/\$\(/,e:/\)/,c:[b.BE]}]};var c={cN:"string",b:/'/,e:/'/};return{aliases:["sh","zsh"],l:/-?[a-z\.]+/,k:{keyword:"if then else elif fi for break continue while in do done exit return set declare case esac export exec",literal:"true false",built_in:"printf echo read cd pwd pushd popd dirs let eval unset typeset readonly getopts source shopt caller type hash bind help sudo",operator:"-ne -eq -lt -gt -f -d -e -s -l -a"},c:[{cN:"shebang",b:/^#![^\n]+sh\s*$/,r:10},{cN:"function",b:/\w[\w\d_]*\s*\(\s*\)\s*\{/,rB:true,c:[b.inherit(b.TM,{b:/\w[\w\d_]*/})],r:0},b.HCM,b.NM,d,c,a]}});hljs.registerLanguage("cpp",function(a){var b={keyword:"false int float while private char catch export virtual operator sizeof dynamic_cast|10 typedef const_cast|10 const struct for static_cast|10 union namespace unsigned long throw volatile static protected bool template mutable if public friend do return goto auto void enum else break new extern using true class asm case typeid short reinterpret_cast|10 default double register explicit signed typename try this switch continue wchar_t inline delete alignof char16_t char32_t constexpr decltype noexcept nullptr static_assert thread_local restrict _Bool complex _Complex _Imaginary",built_in:"std string cin cout cerr clog stringstream istringstream ostringstream auto_ptr deque list queue stack vector map set bitset multiset multimap unordered_set unordered_map unordered_multiset unordered_multimap array shared_ptr abort abs acos asin atan2 atan calloc ceil cosh cos exit exp fabs floor fmod fprintf fputs free frexp fscanf isalnum isalpha iscntrl isdigit isgraph islower isprint ispunct isspace isupper isxdigit tolower toupper labs ldexp log10 log malloc memchr memcmp memcpy memset modf pow printf putchar puts scanf sinh sin snprintf sprintf sqrt sscanf strcat strchr strcmp strcpy strcspn strlen strncat strncmp strncpy strpbrk strrchr strspn strstr tanh tan vfprintf vprintf vsprintf"};return{aliases:["c","h","c++","h++"],k:b,i:"</",c:[a.CLCM,a.CBCM,a.QSM,{cN:"string",b:"'\\\\?.",e:"'",i:"."},{cN:"number",b:"\\b(\\d+(\\.\\d*)?|\\.\\d+)(u|U|l|L|ul|UL|f|F)"},a.CNM,{cN:"preprocessor",b:"#",e:"$",k:"if else elif endif define undef warning error line pragma",c:[{b:'include\\s*[<"]',e:'[>"]',k:"include",i:"\\n"},a.CLCM]},{cN:"stl_container",b:"\\b(deque|list|queue|stack|vector|map|set|bitset|multiset|multimap|unordered_map|unordered_set|unordered_multiset|unordered_multimap|array)\\s*<",e:">",k:b,c:["self"]},{b:a.IR+"::"}]}});hljs.registerLanguage("perl",function(c){var d="getpwent getservent quotemeta msgrcv scalar kill dbmclose undef lc ma syswrite tr send umask sysopen shmwrite vec qx utime local oct semctl localtime readpipe do return format read sprintf dbmopen pop getpgrp not getpwnam rewinddir qqfileno qw endprotoent wait sethostent bless s|0 opendir continue each sleep endgrent shutdown dump chomp connect getsockname die socketpair close flock exists index shmgetsub for endpwent redo lstat msgctl setpgrp abs exit select print ref gethostbyaddr unshift fcntl syscall goto getnetbyaddr join gmtime symlink semget splice x|0 getpeername recv log setsockopt cos last reverse gethostbyname getgrnam study formline endhostent times chop length gethostent getnetent pack getprotoent getservbyname rand mkdir pos chmod y|0 substr endnetent printf next open msgsnd readdir use unlink getsockopt getpriority rindex wantarray hex system getservbyport endservent int chr untie rmdir prototype tell listen fork shmread ucfirst setprotoent else sysseek link getgrgid shmctl waitpid unpack getnetbyname reset chdir grep split require caller lcfirst until warn while values shift telldir getpwuid my getprotobynumber delete and sort uc defined srand accept package seekdir getprotobyname semop our rename seek if q|0 chroot sysread setpwent no crypt getc chown sqrt write setnetent setpriority foreach tie sin msgget map stat getlogin unless elsif truncate exec keys glob tied closedirioctl socket readlink eval xor readline binmode setservent eof ord bind alarm pipe atan2 getgrent exp time push setgrent gt lt or ne m|0 break given say state when";var f={cN:"subst",b:"[$@]\\{",e:"\\}",k:d};var g={b:"->{",e:"}"};var a={cN:"variable",v:[{b:/\$\d/},{b:/[\$\%\@](\^\w\b|#\w+(\:\:\w+)*|{\w+}|\w+(\:\:\w*)*)/},{b:/[\$\%\@][^\s\w{]/,r:0}]};var e={cN:"comment",b:"^(__END__|__DATA__)",e:"\\n$",r:5};var h=[c.BE,f,a];var b=[a,c.HCM,e,{cN:"comment",b:"^\\=\\w",e:"\\=cut",eW:true},g,{cN:"string",c:h,v:[{b:"q[qwxr]?\\s*\\(",e:"\\)",r:5},{b:"q[qwxr]?\\s*\\[",e:"\\]",r:5},{b:"q[qwxr]?\\s*\\{",e:"\\}",r:5},{b:"q[qwxr]?\\s*\\|",e:"\\|",r:5},{b:"q[qwxr]?\\s*\\<",e:"\\>",r:5},{b:"qw\\s+q",e:"q",r:5},{b:"'",e:"'",c:[c.BE]},{b:'"',e:'"'},{b:"`",e:"`",c:[c.BE]},{b:"{\\w+}",c:[],r:0},{b:"-?\\w+\\s*\\=\\>",c:[],r:0}]},{cN:"number",b:"(\\b0[0-7_]+)|(\\b0x[0-9a-fA-F_]+)|(\\b[1-9][0-9_]*(\\.[0-9_]+)?)|[0_]\\b",r:0},{b:"(\\/\\/|"+c.RSR+"|\\b(split|return|print|reverse|grep)\\b)\\s*",k:"split return print reverse grep",r:0,c:[c.HCM,e,{cN:"regexp",b:"(s|tr|y)/(\\\\.|[^/])*/(\\\\.|[^/])*/[a-z]*",r:10},{cN:"regexp",b:"(m|qr)?/",e:"/[a-z]*",c:[c.BE],r:0}]},{cN:"sub",bK:"sub",e:"(\\s*\\(.*?\\))?[;{]",r:5},{cN:"operator",b:"-\\w\\b",r:0}];f.c=b;g.c=b;return{aliases:["pl"],k:d,c:b}});hljs.registerLanguage("ini",function(a){return{cI:true,i:/\S/,c:[{cN:"comment",b:";",e:"$"},{cN:"title",b:"^\\[",e:"\\]"},{cN:"setting",b:"^[a-z0-9\\[\\]_-]+[ \\t]*=[ \\t]*",e:"$",c:[{cN:"value",eW:true,k:"on off true false yes no",c:[a.QSM,a.NM],r:0}]}]}});hljs.registerLanguage("apache",function(a){var b={cN:"number",b:"[\\$%]\\d+"};return{aliases:["apacheconf"],cI:true,c:[a.HCM,{cN:"tag",b:"</?",e:">"},{cN:"keyword",b:/\w+/,r:0,k:{common:"order deny allow setenv rewriterule rewriteengine rewritecond documentroot sethandler errordocument loadmodule options header listen serverroot servername"},starts:{e:/$/,r:0,k:{literal:"on off all"},c:[{cN:"sqbracket",b:"\\s\\[",e:"\\]$"},{cN:"cbracket",b:"[\\$%]\\{",e:"\\}",c:["self",b]},b,a.QSM]}}],i:/\S/}});hljs.registerLanguage("java",function(c){var b=c.UIR+"(<"+c.UIR+">)?";var a="false synchronized int abstract float private char boolean static null if const for true while long throw strictfp finally protected import native final return void enum else break transient new catch instanceof byte super volatile case assert short package default double public try this switch continue throws protected public private";return{aliases:["jsp"],k:a,i:/<\//,c:[{cN:"javadoc",b:"/\\*\\*",e:"\\*/",r:0,c:[{cN:"javadoctag",b:"(^|\\s)@[A-Za-z]+"}]},c.CLCM,c.CBCM,c.ASM,c.QSM,{cN:"class",bK:"class interface",e:/[{;=]/,eE:true,k:"class interface",i:/[:"\[\]]/,c:[{bK:"extends implements"},c.UTM]},{bK:"new",e:/\s/,r:0},{cN:"function",b:"("+b+"\\s+)+"+c.UIR+"\\s*\\(",rB:true,e:/[{;=]/,eE:true,k:a,c:[{b:c.UIR+"\\s*\\(",rB:true,c:[c.UTM]},{cN:"params",b:/\(/,e:/\)/,k:a,c:[c.ASM,c.QSM,c.CNM,c.CBCM]},c.CLCM,c.CBCM]},c.CNM,{cN:"annotation",b:"@[A-Za-z]+"}]}});hljs.registerLanguage("xml",function(a){var c="[A-Za-z0-9\\._:-]+";var d={b:/<\?(php)?(?!\w)/,e:/\?>/,sL:"php",subLanguageMode:"continuous"};var b={eW:true,i:/</,r:0,c:[d,{cN:"attribute",b:c,r:0},{b:"=",r:0,c:[{cN:"value",v:[{b:/"/,e:/"/},{b:/'/,e:/'/},{b:/[^\s\/>]+/}]}]}]};return{aliases:["html","xhtml","rss","atom","xsl","plist"],cI:true,c:[{cN:"doctype",b:"<!DOCTYPE",e:">",r:10,c:[{b:"\\[",e:"\\]"}]},{cN:"comment",b:"<!--",e:"-->",r:10},{cN:"cdata",b:"<\\!\\[CDATA\\[",e:"\\]\\]>",r:10},{cN:"tag",b:"<style(?=\\s|>|$)",e:">",k:{title:"style"},c:[b],starts:{e:"</style>",rE:true,sL:"css"}},{cN:"tag",b:"<script(?=\\s|>|$)",e:">",k:{title:"script"},c:[b],starts:{e:"<\/script>",rE:true,sL:"javascript"}},{b:"<%",e:"%>",sL:"vbscript"},d,{cN:"pi",b:/<\?\w+/,e:/\?>/,r:10},{cN:"tag",b:"</?",e:"/?>",c:[{cN:"title",b:/[^ \/><\n\t]+/,r:0},b]}]}});hljs.registerLanguage("markdown",function(a){return{aliases:["md","mkdown","mkd"],c:[{cN:"header",v:[{b:"^#{1,6}",e:"$"},{b:"^.+?\\n[=-]{2,}$"}]},{b:"<",e:">",sL:"xml",r:0},{cN:"bullet",b:"^([*+-]|(\\d+\\.))\\s+"},{cN:"strong",b:"[*_]{2}.+?[*_]{2}"},{cN:"emphasis",v:[{b:"\\*.+?\\*"},{b:"_.+?_",r:0}]},{cN:"blockquote",b:"^>\\s+",e:"$"},{cN:"code",v:[{b:"`.+?`"},{b:"^( {4}|\t)",e:"$",r:0}]},{cN:"horizontal_rule",b:"^[-\\*]{3,}",e:"$"},{b:"\\[.+?\\][\\(\\[].*?[\\)\\]]",rB:true,c:[{cN:"link_label",b:"\\[",e:"\\]",eB:true,rE:true,r:0},{cN:"link_url",b:"\\]\\(",e:"\\)",eB:true,eE:true},{cN:"link_reference",b:"\\]\\[",e:"\\]",eB:true,eE:true}],r:10},{b:"^\\[.+\\]:",rB:true,c:[{cN:"link_reference",b:"\\[",e:"\\]:",eB:true,eE:true,starts:{cN:"link_url",e:"$"}}]}]}});hljs.registerLanguage("cs",function(c){var b="abstract as base bool break byte case catch char checked const continue decimal default delegate do double else enum event explicit extern false finally fixed float for foreach goto if implicit in int interface internal is lock long new null object operator out override params private protected public readonly ref return sbyte sealed short sizeof stackalloc static string struct switch this throw true try typeof uint ulong unchecked unsafe ushort using virtual volatile void while async await protected public private internal ascending descending from get group into join let orderby partial select set value var where yield";var a=c.IR+"(<"+c.IR+">)?";return{aliases:["csharp"],k:b,i:/::/,c:[{cN:"comment",b:"///",e:"$",rB:true,c:[{cN:"xmlDocTag",v:[{b:"///",r:0},{b:"<!--|-->"},{b:"</?",e:">"}]}]},c.CLCM,c.CBCM,{cN:"preprocessor",b:"#",e:"$",k:"if else elif endif define undef warning error line region endregion pragma checksum"},{cN:"string",b:'@"',e:'"',c:[{b:'""'}]},c.ASM,c.QSM,c.CNM,{bK:"class namespace interface",e:/[{;=]/,i:/[^\s:]/,c:[c.TM,c.CLCM,c.CBCM]},{bK:"new",e:/\s/,r:0},{cN:"function",b:"("+a+"\\s+)+"+c.IR+"\\s*\\(",rB:true,e:/[{;=]/,eE:true,k:b,c:[{b:c.IR+"\\s*\\(",rB:true,c:[c.TM]},{cN:"params",b:/\(/,e:/\)/,k:b,c:[c.ASM,c.QSM,c.CNM,c.CBCM]},c.CLCM,c.CBCM]}]}});hljs.registerLanguage("ruby",function(f){var j="[a-zA-Z_]\\w*[!?=]?|[-+~]\\@|<<|>>|=~|===?|<=>|[<>]=?|\\*\\*|[-/+%^&*~`|]|\\[\\]=?";var i="and false then defined module in return redo if BEGIN retry end for true self when next until do begin unless END rescue nil else break undef not super class case require yield alias while ensure elsif or include attr_reader attr_writer attr_accessor";var b={cN:"yardoctag",b:"@[A-Za-z]+"};var c={cN:"value",b:"#<",e:">"};var k={cN:"comment",v:[{b:"#",e:"$",c:[b]},{b:"^\\=begin",e:"^\\=end",c:[b],r:10},{b:"^__END__",e:"\\n$"}]};var d={cN:"subst",b:"#\\{",e:"}",k:i};var e={cN:"string",c:[f.BE,d],v:[{b:/'/,e:/'/},{b:/"/,e:/"/},{b:"%[qw]?\\(",e:"\\)"},{b:"%[qw]?\\[",e:"\\]"},{b:"%[qw]?{",e:"}"},{b:"%[qw]?<",e:">"},{b:"%[qw]?/",e:"/"},{b:"%[qw]?%",e:"%"},{b:"%[qw]?-",e:"-"},{b:"%[qw]?\\|",e:"\\|"},{b:/\B\?(\\\d{1,3}|\\x[A-Fa-f0-9]{1,2}|\\u[A-Fa-f0-9]{4}|\\?\S)\b/}]};var a={cN:"params",b:"\\(",e:"\\)",k:i};var h=[e,c,k,{cN:"class",bK:"class module",e:"$|;",i:/=/,c:[f.inherit(f.TM,{b:"[A-Za-z_]\\w*(::\\w+)*(\\?|\\!)?"}),{cN:"inheritance",b:"<\\s*",c:[{cN:"parent",b:"("+f.IR+"::)?"+f.IR}]},k]},{cN:"function",bK:"def",e:" |$|;",r:0,c:[f.inherit(f.TM,{b:j}),a,k]},{cN:"constant",b:"(::)?(\\b[A-Z]\\w*(::)?)+",r:0},{cN:"symbol",b:f.UIR+"(\\!|\\?)?:",r:0},{cN:"symbol",b:":",c:[e,{b:j}],r:0},{cN:"number",b:"(\\b0[0-7_]+)|(\\b0x[0-9a-fA-F_]+)|(\\b[1-9][0-9_]*(\\.[0-9_]+)?)|[0_]\\b",r:0},{cN:"variable",b:"(\\$\\W)|((\\$|\\@\\@?)(\\w+))"},{b:"("+f.RSR+")\\s*",c:[c,k,{cN:"regexp",c:[f.BE,d],i:/\n/,v:[{b:"/",e:"/[a-z]*"},{b:"%r{",e:"}[a-z]*"},{b:"%r\\(",e:"\\)[a-z]*"},{b:"%r!",e:"![a-z]*"},{b:"%r\\[",e:"\\][a-z]*"}]}],r:0}];d.c=h;a.c=h;var g=[{b:/^\s*=>/,cN:"status",starts:{e:"$",c:h}},{cN:"prompt",b:/^\S[^=>\n]*>+/,starts:{e:"$",c:h}}];return{aliases:["rb","gemspec","podspec","thor","irb"],k:i,c:[k].concat(g).concat(h)}});hljs.registerLanguage("diff",function(a){return{aliases:["patch"],c:[{cN:"chunk",r:10,v:[{b:/^\@\@ +\-\d+,\d+ +\+\d+,\d+ +\@\@$/},{b:/^\*\*\* +\d+,\d+ +\*\*\*\*$/},{b:/^\-\-\- +\d+,\d+ +\-\-\-\-$/}]},{cN:"header",v:[{b:/Index: /,e:/$/},{b:/=====/,e:/=====$/},{b:/^\-\-\-/,e:/$/},{b:/^\*{3} /,e:/$/},{b:/^\+\+\+/,e:/$/},{b:/\*{5}/,e:/\*{5}$/}]},{cN:"addition",b:"^\\+",e:"$"},{cN:"deletion",b:"^\\-",e:"$"},{cN:"change",b:"^\\!",e:"$"}]}});hljs.registerLanguage("objectivec",function(a){var d={keyword:"int float while char export sizeof typedef const struct for union unsigned long volatile static bool mutable if do return goto void enum else break extern asm case short default double register explicit signed typename this switch continue wchar_t inline readonly assign readwrite self @synchronized id typeof nonatomic super unichar IBOutlet IBAction strong weak copy in out inout bycopy byref oneway __strong __weak __block __autoreleasing @private @protected @public @try @property @end @throw @catch @finally @autoreleasepool @synthesize @dynamic @selector @optional @required",literal:"false true FALSE TRUE nil YES NO NULL",built_in:"NSString NSData NSDictionary CGRect CGPoint UIButton UILabel UITextView UIWebView MKMapView NSView NSViewController NSWindow NSWindowController NSSet NSUUID NSIndexSet UISegmentedControl NSObject UITableViewDelegate UITableViewDataSource NSThread UIActivityIndicator UITabbar UIToolBar UIBarButtonItem UIImageView NSAutoreleasePool UITableView BOOL NSInteger CGFloat NSException NSLog NSMutableString NSMutableArray NSMutableDictionary NSURL NSIndexPath CGSize UITableViewCell UIView UIViewController UINavigationBar UINavigationController UITabBarController UIPopoverController UIPopoverControllerDelegate UIImage NSNumber UISearchBar NSFetchedResultsController NSFetchedResultsChangeType UIScrollView UIScrollViewDelegate UIEdgeInsets UIColor UIFont UIApplication NSNotFound NSNotificationCenter NSNotification UILocalNotification NSBundle NSFileManager NSTimeInterval NSDate NSCalendar NSUserDefaults UIWindow NSRange NSArray NSError NSURLRequest NSURLConnection NSURLSession NSURLSessionDataTask NSURLSessionDownloadTask NSURLSessionUploadTask NSURLResponseUIInterfaceOrientation MPMoviePlayerController dispatch_once_t dispatch_queue_t dispatch_sync dispatch_async dispatch_once"};var c=/[a-zA-Z@][a-zA-Z0-9_]*/;var b="@interface @class @protocol @implementation";return{aliases:["m","mm","objc","obj-c"],k:d,l:c,i:"</",c:[a.CLCM,a.CBCM,a.CNM,a.QSM,{cN:"string",v:[{b:'@"',e:'"',i:"\\n",c:[a.BE]},{b:"'",e:"[^\\\\]'",i:"[^\\\\][^']"}]},{cN:"preprocessor",b:"#",e:"$",c:[{cN:"title",v:[{b:'"',e:'"'},{b:"<",e:">"}]}]},{cN:"class",b:"("+b.split(" ").join("|")+")\\b",e:"({|$)",eE:true,k:b,l:c,c:[a.UTM]},{cN:"variable",b:"\\."+a.UIR,r:0}]}});hljs.registerLanguage("css",function(a){var b="[a-zA-Z-][a-zA-Z0-9_-]*";var c={cN:"function",b:b+"\\(",rB:true,eE:true,e:"\\("};return{cI:true,i:"[=/|']",c:[a.CBCM,{cN:"id",b:"\\#[A-Za-z0-9_-]+"},{cN:"class",b:"\\.[A-Za-z0-9_-]+",r:0},{cN:"attr_selector",b:"\\[",e:"\\]",i:"$"},{cN:"pseudo",b:":(:)?[a-zA-Z0-9\\_\\-\\+\\(\\)\\\"\\']+"},{cN:"at_rule",b:"@(font-face|page)",l:"[a-z-]+",k:"font-face page"},{cN:"at_rule",b:"@",e:"[{;]",c:[{cN:"keyword",b:/\S+/},{b:/\s/,eW:true,eE:true,r:0,c:[c,a.ASM,a.QSM,a.CSSNM]}]},{cN:"tag",b:b,r:0},{cN:"rules",b:"{",e:"}",i:"[^\\s]",r:0,c:[a.CBCM,{cN:"rule",b:"[^\\s]",rB:true,e:";",eW:true,c:[{cN:"attribute",b:"[A-Z\\_\\.\\-]+",e:":",eE:true,i:"[^\\s]",starts:{cN:"value",eW:true,eE:true,c:[c,a.CSSNM,a.QSM,a.ASM,a.CBCM,{cN:"hexcolor",b:"#[0-9A-Fa-f]+"},{cN:"important",b:"!important"}]}}]}]}]}});hljs.registerLanguage("python",function(a){var f={cN:"prompt",b:/^(>>>|\.\.\.) /};var b={cN:"string",c:[a.BE],v:[{b:/(u|b)?r?'''/,e:/'''/,c:[f],r:10},{b:/(u|b)?r?"""/,e:/"""/,c:[f],r:10},{b:/(u|r|ur)'/,e:/'/,r:10},{b:/(u|r|ur)"/,e:/"/,r:10},{b:/(b|br)'/,e:/'/},{b:/(b|br)"/,e:/"/},a.ASM,a.QSM]};var d={cN:"number",r:0,v:[{b:a.BNR+"[lLjJ]?"},{b:"\\b(0o[0-7]+)[lLjJ]?"},{b:a.CNR+"[lLjJ]?"}]};var e={cN:"params",b:/\(/,e:/\)/,c:["self",f,d,b]};var c={e:/:/,i:/[${=;\n]/,c:[a.UTM,e]};return{aliases:["py","gyp"],k:{keyword:"and elif is global as in if from raise for except finally print import pass return exec else break not with class assert yield try while continue del or def lambda nonlocal|10 None True False",built_in:"Ellipsis NotImplemented"},i:/(<\/|->|\?)/,c:[f,d,b,a.HCM,a.inherit(c,{cN:"function",bK:"def",r:10}),a.inherit(c,{cN:"class",bK:"class"}),{cN:"decorator",b:/@/,e:/$/},{b:/\b(print|exec)\(/}]}});
-hljs.registerLanguage("scala",function(d){var b={cN:"annotation",b:"@[A-Za-z]+"};var c={cN:"string",b:'u?r?"""',e:'"""',r:10};var a={cN:"symbol",b:"'\\w[\\w\\d_]*(?!')"};var e={cN:"type",b:"\\b[A-Z][A-Za-z0-9_]*",r:0};var h={cN:"title",b:/[^0-9\n\t "'(),.`{}\[\]:;][^\n\t "'(),.`{}\[\]:;]+|[^0-9\n\t "'(),.`{}\[\]:;=]/,r:0};var i={cN:"class",bK:"class object trait type",e:/[:={\[(\n;]/,c:[{cN:"keyword",bK:"extends with",r:10},h]};var g={cN:"function",bK:"def val",e:/[:={\[(\n;]/,c:[h]};var f={cN:"javadoc",b:"/\\*\\*",e:"\\*/",c:[{cN:"javadoctag",b:"@[A-Za-z]+"}],r:10};return{k:{literal:"true false null",keyword:"type yield lazy override def with val var sealed abstract private trait object if forSome for while throw finally protected extends import final return else break new catch super class case package default try this match continue throws implicit"},c:[d.CLCM,d.CBCM,c,d.QSM,a,e,g,i,d.CNM,b]}});
-hljs.registerLanguage("javascript",function(a){return{aliases:["js"],k:{keyword:"in if for while finally var new function do return void else break catch instanceof with throw case default try this switch continue typeof delete let yield const class",literal:"true false null undefined NaN Infinity",built_in:"eval isFinite isNaN parseFloat parseInt decodeURI decodeURIComponent encodeURI encodeURIComponent escape unescape Object Function Boolean Error EvalError InternalError RangeError ReferenceError StopIteration SyntaxError TypeError URIError Number Math Date String RegExp Array Float32Array Float64Array Int16Array Int32Array Int8Array Uint16Array Uint32Array Uint8Array Uint8ClampedArray ArrayBuffer DataView JSON Intl arguments require module console window document"},c:[{cN:"pi",b:/^\s*('|")use strict('|")/,r:10},a.ASM,a.QSM,a.CLCM,a.CBCM,a.CNM,{b:"("+a.RSR+"|\\b(case|return|throw)\\b)\\s*",k:"return throw case",c:[a.CLCM,a.CBCM,a.RM,{b:/</,e:/>;/,r:0,sL:"xml"}],r:0},{cN:"function",bK:"function",e:/\{/,eE:true,c:[a.inherit(a.TM,{b:/[A-Za-z$_][0-9A-Za-z$_]*/}),{cN:"params",b:/\(/,e:/\)/,c:[a.CLCM,a.CBCM],i:/["'\(]/}],i:/\[|%/},{b:/\$[(.]/},{b:"\\."+a.IR,r:0}]}});
-hljs.registerLanguage("bash",function(b){var a={cN:"variable",v:[{b:/\$[\w\d#@][\w\d_]*/},{b:/\$\{(.*?)\}/}]};var d={cN:"string",b:/"/,e:/"/,c:[b.BE,a,{cN:"variable",b:/\$\(/,e:/\)/,c:[b.BE]}]};var c={cN:"string",b:/'/,e:/'/};return{aliases:["sh","zsh"],l:/-?[a-z\.]+/,k:{keyword:"if then else elif fi for break continue while in do done exit return set declare case esac export exec",literal:"true false",built_in:"printf echo read cd pwd pushd popd dirs let eval unset typeset readonly getopts source shopt caller type hash bind help sudo",operator:"-ne -eq -lt -gt -f -d -e -s -l -a"},c:[{cN:"shebang",b:/^#![^\n]+sh\s*$/,r:10},{cN:"function",b:/\w[\w\d_]*\s*\(\s*\)\s*\{/,rB:true,c:[b.inherit(b.TM,{b:/\w[\w\d_]*/})],r:0},b.HCM,b.NM,d,c,a]}});
-hljs.registerLanguage("diff",function(a){return{aliases:["patch"],c:[{cN:"chunk",r:10,v:[{b:/^\@\@ +\-\d+,\d+ +\+\d+,\d+ +\@\@$/},{b:/^\*\*\* +\d+,\d+ +\*\*\*\*$/},{b:/^\-\-\- +\d+,\d+ +\-\-\-\-$/}]},{cN:"header",v:[{b:/Index: /,e:/$/},{b:/=====/,e:/=====$/},{b:/^\-\-\-/,e:/$/},{b:/^\*{3} /,e:/$/},{b:/^\+\+\+/,e:/$/},{b:/\*{5}/,e:/\*{5}$/}]},{cN:"addition",b:"^\\+",e:"$"},{cN:"deletion",b:"^\\-",e:"$"},{cN:"change",b:"^\\!",e:"$"}]}});
-hljs.registerLanguage("xml",function(a){var c="[A-Za-z0-9\\._:-]+";var d={b:/<\?(php)?(?!\w)/,e:/\?>/,sL:"php",subLanguageMode:"continuous"};var b={eW:true,i:/</,r:0,c:[d,{cN:"attribute",b:c,r:0},{b:"=",r:0,c:[{cN:"value",v:[{b:/"/,e:/"/},{b:/'/,e:/'/},{b:/[^\s\/>]+/}]}]}]};return{aliases:["html","xhtml","rss","atom","xsl","plist"],cI:true,c:[{cN:"doctype",b:"<!DOCTYPE",e:">",r:10,c:[{b:"\\[",e:"\\]"}]},{cN:"comment",b:"<!--",e:"-->",r:10},{cN:"cdata",b:"<\\!\\[CDATA\\[",e:"\\]\\]>",r:10},{cN:"tag",b:"<style(?=\\s|>|$)",e:">",k:{title:"style"},c:[b],starts:{e:"</style>",rE:true,sL:"css"}},{cN:"tag",b:"<script(?=\\s|>|$)",e:">",k:{title:"script"},c:[b],starts:{e:"<\/script>",rE:true,sL:"javascript"}},{b:"<%",e:"%>",sL:"vbscript"},d,{cN:"pi",b:/<\?\w+/,e:/\?>/,r:10},{cN:"tag",b:"</?",e:"/?>",c:[{cN:"title",b:/[^ \/><\n\t]+/,r:0},b]}]}});
 'use strict';
 /* Scala.js runtime support
  * Copyright 2013 LAMP/EPFL
@@ -1316,6 +1311,7 @@ ScalaJS.s.Lscalatags_generic_Styles$class__$$init$__Lscalatags_generic_Styles__V
   $$this.textAlign$1 = new ScalaJS.c.Lscalatags_generic_Styles$$anon$5().init___Lscalatags_generic_Styles($$this);
   $$this.textIndent$1 = new ScalaJS.c.Lscalatags_generic_Style().init___T__T("textIndent", "text-indent");
   $$this.textShadow$1 = new ScalaJS.c.Lscalatags_generic_StyleMisc$NoneOpenStyle().init___Lscalatags_generic_StyleMisc__T__T($$this, "textShadow", "text-shadow");
+  $$this.transition$1 = new ScalaJS.c.Lscalatags_generic_Style().init___T__T("transition", "transition");
   $$this.wordSpacing$1 = new ScalaJS.c.Lscalatags_generic_StyleMisc$NormalOpenStyle().init___Lscalatags_generic_StyleMisc__T__T($$this, "wordSpacing", "word-spacing");
   $$this.zIndex$1 = new ScalaJS.c.Lscalatags_generic_StyleMisc$AutoStyle().init___Lscalatags_generic_StyleMisc__T__T($$this, "zIndex", "z-index")
 });
@@ -1637,6 +1633,221 @@ ScalaJS.s.Lscalatags_stylesheet_StyleSheet$class__nameFor__Lscalatags_stylesheet
   return (((ScalaJS.as.T("scalatex.scrollspy.Styles"["split"](".")["join"]("-")) + "-") + memberName) + pseudoSelectors)
 });
 /** @constructor */
+ScalaJS.c.Lscalatex_scrollspy_Controller = (function() {
+  ScalaJS.c.O.call(this);
+  this.scrollSpy$1 = null;
+  this.list$1 = null;
+  this.expandLink$1 = null;
+  this.initiallyOpen$1 = false;
+  this.toggler$1 = null;
+  this.openLink$1 = null;
+  this.footer$1 = null;
+  this.all$1 = null;
+  this.menu$1 = null
+});
+ScalaJS.c.Lscalatex_scrollspy_Controller.prototype = new ScalaJS.h.O();
+ScalaJS.c.Lscalatex_scrollspy_Controller.prototype.constructor = ScalaJS.c.Lscalatex_scrollspy_Controller;
+/** @constructor */
+ScalaJS.h.Lscalatex_scrollspy_Controller = (function() {
+  /*<skip>*/
+});
+ScalaJS.h.Lscalatex_scrollspy_Controller.prototype = ScalaJS.c.Lscalatex_scrollspy_Controller.prototype;
+ScalaJS.c.Lscalatex_scrollspy_Controller.prototype.init__V = (function() {
+  var nodes = ScalaJS.g["document"]["getElementsByClassName"]("highlight-me");
+  var this$2 = new ScalaJS.c.Lorg_scalajs_dom_ext_package$PimpedNodeList().init___Lorg_scalajs_dom_raw_NodeList(nodes);
+  var this$3 = new ScalaJS.c.Lorg_scalajs_dom_ext_EasySeq$$anon$1().init___Lorg_scalajs_dom_ext_EasySeq(this$2);
+  while (this$3.hasNext__Z()) {
+    var arg1 = this$3.next__O();
+    ScalaJS.g["hljs"]["highlightBlock"](arg1)
+  };
+  var this$5 = this.scrollSpy$1;
+  this$5.start__p1__Z__V(false);
+  this.toggler$1.apply__V();
+  ScalaJS.g["document"]["body"]["appendChild"](this.menu$1);
+  ScalaJS.g["addEventListener"]("scroll", (function(arg$outer) {
+    return (function(e$2) {
+      var this$6 = arg$outer.scrollSpy$1;
+      this$6.start__p1__Z__V(false)
+    })
+  })(this))
+});
+ScalaJS.c.Lscalatex_scrollspy_Controller.prototype.init___sjs_js_Any = (function(data) {
+  var this$5 = ScalaJS.m.Lupickle_package$();
+  var expr = ScalaJS.m.Lupickle_json_package$().readJs__O__Lupickle_Js$Value(data);
+  var jsx$1 = ScalaJS.m.Lupickle_Internal$();
+  var v1 = new ScalaJS.c.Lupickle_Knot$R().init___s_PartialFunction(null);
+  var this$4 = ScalaJS.m.Lupickle_Internal$();
+  var f = new ScalaJS.c.sjsr_AnonFunction2().init___sjs_js_Function2((function(value$2, children$2) {
+    var value = ScalaJS.as.T(value$2);
+    var children = ScalaJS.as.sci_Vector(children$2);
+    return new ScalaJS.c.Lscalatex_scrollspy_Tree().init___O__sci_Vector(value, children)
+  }));
+  var names = ScalaJS.asArrayOf.T(ScalaJS.m.s_Array$().apply__sc_Seq__s_reflect_ClassTag__O(new ScalaJS.c.sjs_js_WrappedArray().init___sjs_js_Array(["value", "children"]), ScalaJS.m.s_reflect_ClassTag$().apply__jl_Class__s_reflect_ClassTag(ScalaJS.d.T.getClassOf())), 1);
+  var defaults = ScalaJS.asArrayOf.Lupickle_Js$Value(ScalaJS.m.s_Array$().apply__sc_Seq__s_reflect_ClassTag__O(new ScalaJS.c.sjs_js_WrappedArray().init___sjs_js_Array([null, null]), ScalaJS.m.s_reflect_ClassTag$().apply__jl_Class__s_reflect_ClassTag(ScalaJS.d.Lupickle_Js$Value.getClassOf())), 1);
+  var evidence$509 = ScalaJS.as.Lupickle_Reader(ScalaJS.m.Lupickle_package$().StringRW$1);
+  var this$3 = ScalaJS.m.Lupickle_package$();
+  ScalaJS.m.sci_Vector$();
+  var cbf = ScalaJS.m.sc_IndexedSeq$().ReusableCBF$6;
+  var evidence$510 = ScalaJS.s.Lupickle_Implicits$class__SeqishR__Lupickle_Implicits__Lupickle_Reader__scg_CanBuildFrom__Lupickle_Reader(this$3, v1, cbf);
+  var x$macro$2 = ScalaJS.s.Lupickle_GeneratedInternal$class__Case2R__Lupickle_GeneratedInternal__F2__AT__ALupickle_Js$Value__Lupickle_Reader__Lupickle_Reader__Lupickle_Reader(this$4, f, names, defaults, evidence$509, evidence$510);
+  v1.$$undread$1 = ScalaJS.s.Lupickle_Reader$class__read__Lupickle_Reader__s_PartialFunction(x$macro$2);
+  var evidence$4 = jsx$1.validateReader__T__Lupickle_Reader__Lupickle_Reader("Tagged Object scalatex.scrollspy.Tree", x$macro$2);
+  this.scrollSpy$1 = new ScalaJS.c.Lscalatex_scrollspy_ScrollSpy().init___Lscalatex_scrollspy_Tree(ScalaJS.as.Lscalatex_scrollspy_Tree(ScalaJS.s.Lupickle_Types$class__readJs__Lupickle_Types__Lupickle_Js$Value__Lupickle_Reader__O(this$5, expr, evidence$4)));
+  var jsx$6 = ScalaJS.as.Lscalatags_JsDom$TypedTag(ScalaJS.m.Lscalatags_JsDom$all$().ul$1);
+  var this$6 = ScalaJS.m.Lscalatags_JsDom$all$().cls$1;
+  var ev = ScalaJS.m.Lscalatags_JsDom$all$().stringAttr$1;
+  var jsx$5 = new ScalaJS.c.Lscalatags_generic_AttrPair().init___Lscalatags_generic_Attr__O__Lscalatags_generic_AttrValue(this$6, "menu-item-list", ev);
+  var this$7 = ScalaJS.m.Lscalatags_JsDom$all$().margin__Lscalatags_generic_Styles$margin$();
+  var ev$1 = ScalaJS.m.Lscalatags_JsDom$all$().intPixelStyle$1;
+  var jsx$4 = ev$1.apply__Lscalatags_generic_Style__O__Lscalatags_generic_StylePair(this$7.realStyle$1, 0);
+  var this$8 = ScalaJS.m.Lscalatags_JsDom$all$().padding$1;
+  var ev$2 = ScalaJS.m.Lscalatags_JsDom$all$().intPixelStyle$1;
+  var jsx$3 = ev$2.apply__Lscalatags_generic_Style__O__Lscalatags_generic_StylePair(this$8.realStyle$1, 0);
+  var this$9 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var this$10 = new ScalaJS.c.Lscalatags_generic_Util$ExtendedString().init___Lscalatags_generic_Util__T(this$9, "flex").style__Lscalatags_generic_Style();
+  var ev$3 = ScalaJS.m.Lscalatags_JsDom$all$().intStyle$1;
+  var jsx$2 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this$10, 10000, ev$3);
+  var this$11 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var e = ScalaJS.as.Lscalatex_scrollspy_MenuNode(this.scrollSpy$1.domTrees__Lscalatex_scrollspy_Tree().value$1).frag$1;
+  this.list$1 = jsx$6.apply__sc_Seq__Lscalatags_JsDom$TypedTag(new ScalaJS.c.sjs_js_WrappedArray().init___sjs_js_Array([jsx$5, jsx$4, jsx$3, jsx$2, new ScalaJS.c.Lscalatags_LowPriorityImplicits$bindNode().init___Lscalatags_LowPriorityImplicits__Lorg_scalajs_dom_raw_Node(this$11, e)])).render__Lorg_scalajs_dom_raw_Element();
+  var jsx$7 = new ScalaJS.c.sjsr_AnonFunction0().init___sjs_js_Function0((function(arg$outer) {
+    return (function() {
+      arg$outer.scrollSpy$1.toggleOpen__V()
+    })
+  })(this));
+  var this$12 = ScalaJS.m.Lscalatags_JsDom$all$().right$1;
+  var v = ScalaJS.m.Lscalatex_scrollspy_Styles$().itemHeight$1;
+  var ev$4 = ScalaJS.m.Lscalatags_JsDom$all$().intPixelStyle$1;
+  this.expandLink$1 = this.toggleButton__T__T__F0__sc_Seq__Lscalatags_JsDom$TypedTag("fa-caret-down", "fa-caret-up", jsx$7, new ScalaJS.c.sjs_js_WrappedArray().init___sjs_js_Array([ev$4.apply__Lscalatags_generic_Style__O__Lscalatags_generic_StylePair(this$12.realStyle$1, v)])).render__Lorg_scalajs_dom_raw_Element();
+  this.initiallyOpen$1 = (ScalaJS.uI(ScalaJS.g["innerWidth"]) > 800);
+  this.toggler$1 = new ScalaJS.c.Lscalatex_scrollspy_Toggler().init___Z__F0__F0__F0(this.initiallyOpen$1, new ScalaJS.c.sjsr_AnonFunction0().init___sjs_js_Function0((function(arg$outer$1) {
+    return (function() {
+      return arg$outer$1.menu$1
+    })
+  })(this)), new ScalaJS.c.sjsr_AnonFunction0().init___sjs_js_Function0((function() {
+    return ScalaJS.g["document"]["body"]
+  })), new ScalaJS.c.sjsr_AnonFunction0().init___sjs_js_Function0((function(arg$outer$2) {
+    return (function() {
+      return arg$outer$2.all$1
+    })
+  })(this)));
+  if (this.initiallyOpen$1) {
+    var x1_$_$$und1$f = "fa-caret-left";
+    var x1_$_$$und2$f = "fa-caret-right"
+  } else {
+    var x1_$_$$und1$f = "fa-caret-right";
+    var x1_$_$$und2$f = "fa-caret-left"
+  };
+  var startCls = ScalaJS.as.T(x1_$_$$und1$f);
+  var altCls = ScalaJS.as.T(x1_$_$$und2$f);
+  var x$1_$_$$und1$f = startCls;
+  var x$1_$_$$und2$f = altCls;
+  var startCls$2 = ScalaJS.as.T(x$1_$_$$und1$f);
+  var altCls$2 = ScalaJS.as.T(x$1_$_$$und2$f);
+  var jsx$8 = this.toggleButton__T__T__F0__sc_Seq__Lscalatags_JsDom$TypedTag(startCls$2, altCls$2, new ScalaJS.c.sjsr_AnonFunction0().init___sjs_js_Function0((function(arg$outer$3) {
+    return (function() {
+      arg$outer$3.toggler$1.toggle__V();
+      arg$outer$3.toggler$1.apply__V()
+    })
+  })(this)), new ScalaJS.c.sjs_js_WrappedArray().init___sjs_js_Array([]));
+  var this$13 = ScalaJS.m.Lscalatags_JsDom$all$().right$1;
+  var ev$5 = ScalaJS.m.Lscalatags_JsDom$all$().stringPixelStyle$1;
+  this.openLink$1 = jsx$8.apply__sc_Seq__Lscalatags_JsDom$TypedTag(new ScalaJS.c.sjs_js_WrappedArray().init___sjs_js_Array([ev$5.apply__Lscalatags_generic_Style__O__Lscalatags_generic_StylePair(this$13.realStyle$1, "0px")])).render__Lorg_scalajs_dom_raw_Element();
+  var jsx$13 = ScalaJS.as.Lscalatags_JsDom$TypedTag(ScalaJS.m.Lscalatags_JsDom$all$().div$1);
+  var this$14 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var s = ScalaJS.m.Lscalatex_scrollspy_Styles$().css$1.noteBox__Lscalatags_stylesheet_Cls();
+  var jsx$12 = new ScalaJS.c.Lscalatags_JsDom$Aggregate$$anon$1().init___Lscalatags_JsDom$Aggregate__Lscalatags_stylesheet_Cls(this$14, s);
+  var jsx$11 = ScalaJS.as.Lscalatags_JsDom$TypedTag(ScalaJS.m.Lscalatags_JsDom$all$().a$1);
+  ScalaJS.m.Lscalatags_JsDom$all$();
+  var jsx$10 = new ScalaJS.c.Lscalatags_JsDom$StringFrag().init___T("Published using Scalatex");
+  var this$16 = ScalaJS.m.Lscalatags_JsDom$all$().href$1;
+  var ev$6 = ScalaJS.m.Lscalatags_JsDom$all$().stringAttr$1;
+  var jsx$9 = new ScalaJS.c.Lscalatags_generic_AttrPair().init___Lscalatags_generic_Attr__O__Lscalatags_generic_AttrValue(this$16, "https://lihaoyi.github.io/Scalatex", ev$6);
+  var this$17 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var s$1 = ScalaJS.m.Lscalatex_scrollspy_Styles$().css$1.note__Lscalatags_stylesheet_Cls();
+  this.footer$1 = jsx$13.apply__sc_Seq__Lscalatags_JsDom$TypedTag(new ScalaJS.c.sjs_js_WrappedArray().init___sjs_js_Array([jsx$12, jsx$11.apply__sc_Seq__Lscalatags_JsDom$TypedTag(new ScalaJS.c.sjs_js_WrappedArray().init___sjs_js_Array([jsx$10, jsx$9, new ScalaJS.c.Lscalatags_JsDom$Aggregate$$anon$1().init___Lscalatags_JsDom$Aggregate__Lscalatags_stylesheet_Cls(this$17, s$1)]))]));
+  var jsx$19 = ScalaJS.as.Lscalatags_JsDom$TypedTag(ScalaJS.m.Lscalatags_JsDom$all$().div$1);
+  var this$18 = ScalaJS.m.Lscalatags_JsDom$all$().display__Lscalatags_generic_Styles$display$();
+  var ev$7 = ScalaJS.m.Lscalatags_JsDom$all$().stringStyle$1;
+  var jsx$18 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this$18, "flex", ev$7);
+  var this$19 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var this$20 = new ScalaJS.c.Lscalatags_generic_Util$ExtendedString().init___Lscalatags_generic_Util__T(this$19, "flex-direction").style__Lscalatags_generic_Style();
+  var ev$8 = ScalaJS.m.Lscalatags_JsDom$all$().stringStyle$1;
+  var jsx$17 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this$20, "column", ev$8);
+  var this$21 = ScalaJS.m.Lscalatags_JsDom$all$().minHeight$1;
+  var ev$9 = ScalaJS.m.Lscalatags_JsDom$all$().stringStyle$1;
+  var jsx$16 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this$21, "100%", ev$9);
+  var this$22 = ScalaJS.m.Lscalatags_JsDom$all$().transition$1;
+  var ev$10 = ScalaJS.m.Lscalatags_JsDom$all$().stringStyle$1;
+  var jsx$15 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this$22, "opacity 0.2s ease-out", ev$10);
+  var this$23 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var e$1 = this.list$1;
+  var jsx$14 = new ScalaJS.c.Lscalatags_LowPriorityImplicits$bindNode().init___Lscalatags_LowPriorityImplicits__Lorg_scalajs_dom_raw_Node(this$23, e$1);
+  var this$24 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var e$2 = this.expandLink$1;
+  this.all$1 = jsx$19.apply__sc_Seq__Lscalatags_JsDom$TypedTag(new ScalaJS.c.sjs_js_WrappedArray().init___sjs_js_Array([jsx$18, jsx$17, jsx$16, jsx$15, jsx$14, new ScalaJS.c.Lscalatags_LowPriorityImplicits$bindNode().init___Lscalatags_LowPriorityImplicits__Lorg_scalajs_dom_raw_Node(this$24, e$2), this.footer$1])).render__Lorg_scalajs_dom_raw_Element();
+  var jsx$22 = ScalaJS.as.Lscalatags_JsDom$TypedTag(ScalaJS.m.Lscalatags_JsDom$all$().div$1);
+  var this$25 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var s$2 = ScalaJS.m.Lscalatex_scrollspy_Styles$().css$1.menu__Lscalatags_stylesheet_Cls();
+  var jsx$21 = new ScalaJS.c.Lscalatags_JsDom$Aggregate$$anon$1().init___Lscalatags_JsDom$Aggregate__Lscalatags_stylesheet_Cls(this$25, s$2);
+  var this$26 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var e$3 = this.all$1;
+  var jsx$20 = new ScalaJS.c.Lscalatags_LowPriorityImplicits$bindNode().init___Lscalatags_LowPriorityImplicits__Lorg_scalajs_dom_raw_Node(this$26, e$3);
+  var this$27 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var e$4 = this.openLink$1;
+  this.menu$1 = jsx$22.apply__sc_Seq__Lscalatags_JsDom$TypedTag(new ScalaJS.c.sjs_js_WrappedArray().init___sjs_js_Array([jsx$21, jsx$20, new ScalaJS.c.Lscalatags_LowPriorityImplicits$bindNode().init___Lscalatags_LowPriorityImplicits__Lorg_scalajs_dom_raw_Node(this$27, e$4)])).render__Lorg_scalajs_dom_raw_Element();
+  return this
+});
+ScalaJS.c.Lscalatex_scrollspy_Controller.prototype.toggleButton__T__T__F0__sc_Seq__Lscalatags_JsDom$TypedTag = (function(clsA, clsB, action, mods) {
+  var jsx$2 = ScalaJS.as.Lscalatags_JsDom$TypedTag(ScalaJS.m.Lscalatags_JsDom$all$().i$1);
+  var this$1 = ScalaJS.m.Lscalatags_JsDom$all$().cls$1;
+  var v = ("fa " + clsA);
+  var ev = ScalaJS.m.Lscalatags_JsDom$all$().stringAttr$1;
+  var jsx$1 = new ScalaJS.c.Lscalatags_generic_AttrPair().init___Lscalatags_generic_Attr__O__Lscalatags_generic_AttrValue(this$1, v, ev);
+  var this$2 = ScalaJS.m.Lscalatags_JsDom$all$().color__Lscalatags_generic_Styles$color$();
+  var ev$1 = ScalaJS.m.Lscalatags_JsDom$all$().stringStyle$1;
+  var icon = jsx$2.apply__sc_Seq__Lscalatags_JsDom$TypedTag(new ScalaJS.c.sjs_js_WrappedArray().init___sjs_js_Array([jsx$1, new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this$2, "white", ev$1)])).render__Lorg_scalajs_dom_raw_Element();
+  var jsx$7 = ScalaJS.as.Lscalatags_JsDom$TypedTag(ScalaJS.m.Lscalatags_JsDom$all$().a$1);
+  var this$3 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var jsx$6 = new ScalaJS.c.Lscalatags_LowPriorityImplicits$bindNode().init___Lscalatags_LowPriorityImplicits__Lorg_scalajs_dom_raw_Node(this$3, icon);
+  var this$4 = ScalaJS.m.Lscalatags_JsDom$all$().href$1;
+  var ev$2 = ScalaJS.m.Lscalatags_JsDom$all$().stringAttr$1;
+  var jsx$5 = new ScalaJS.c.Lscalatags_generic_AttrPair().init___Lscalatags_generic_Attr__O__Lscalatags_generic_AttrValue(this$4, "javascript:", ev$2);
+  var this$5 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var s = ScalaJS.m.Lscalatex_scrollspy_Styles$().css$1.menuLink__Lscalatags_stylesheet_Cls();
+  var jsx$4 = new ScalaJS.c.Lscalatags_JsDom$Aggregate$$anon$1().init___Lscalatags_JsDom$Aggregate__Lscalatags_stylesheet_Cls(this$5, s);
+  var this$7 = ScalaJS.m.Lscalatags_JsDom$all$().onclick$1;
+  var v$1 = new ScalaJS.c.sjsr_AnonFunction1().init___sjs_js_Function1((function(clsA$1, clsB$1, action$1, icon$1) {
+    return (function(e$2) {
+      icon$1["classList"]["toggle"](clsA$1);
+      icon$1["classList"]["toggle"](clsB$1);
+      action$1.apply__O()
+    })
+  })(clsA, clsB, action, icon));
+  var this$6 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var evidence$2 = new ScalaJS.c.sjsr_AnonFunction1().init___sjs_js_Function1((function(f$2) {
+    var f = ScalaJS.as.F1(f$2);
+    return (function(f$1) {
+      return (function(arg1) {
+        return f$1.apply__O__O(arg1)
+      })
+    })(f)
+  }));
+  var ev$3 = new ScalaJS.c.Lscalatags_LowPriorityImplicits$$anon$2().init___Lscalatags_LowPriorityImplicits__F1(this$6, evidence$2);
+  var jsx$3 = new ScalaJS.c.Lscalatags_generic_AttrPair().init___Lscalatags_generic_Attr__O__Lscalatags_generic_AttrValue(this$7, v$1, ev$3);
+  var this$8 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var evidence$1 = ScalaJS.m.s_Predef$().singleton$und$less$colon$less$2;
+  var link = jsx$7.apply__sc_Seq__Lscalatags_JsDom$TypedTag(new ScalaJS.c.sjs_js_WrappedArray().init___sjs_js_Array([jsx$6, jsx$5, jsx$4, jsx$3, new ScalaJS.c.Lscalatags_generic_Util$SeqNode().init___Lscalatags_generic_Util__sc_Seq__F1(this$8, mods, evidence$1)]));
+  return link
+});
+ScalaJS.d.Lscalatex_scrollspy_Controller = new ScalaJS.ClassTypeData({
+  Lscalatex_scrollspy_Controller: 0
+}, false, "scalatex.scrollspy.Controller", {
+  Lscalatex_scrollspy_Controller: 1,
+  O: 1
+});
+ScalaJS.c.Lscalatex_scrollspy_Controller.prototype.$classData = ScalaJS.d.Lscalatex_scrollspy_Controller;
+/** @constructor */
 ScalaJS.c.Lscalatex_scrollspy_Controller$ = (function() {
   ScalaJS.c.O.call(this);
   this.styleTag$1 = null;
@@ -1658,6 +1869,9 @@ ScalaJS.c.Lscalatex_scrollspy_Controller$.prototype.init___ = (function() {
   jsx$2["textContent"] = (("" + jsx$1) + ScalaJS.s.Lscalatags_stylesheet_StyleSheet$class__styleSheetText__Lscalatags_stylesheet_StyleSheet__T(this$1));
   return this
 });
+ScalaJS.c.Lscalatex_scrollspy_Controller$.prototype.$$js$exported$meth$main__sjs_js_Any__O = (function(data) {
+  this.main__sjs_js_Any__V(data)
+});
 ScalaJS.c.Lscalatex_scrollspy_Controller$.prototype.styleTag$lzycompute__p1__Lorg_scalajs_dom_raw_HTMLStyleElement = (function() {
   if ((!this.bitmap$0$1)) {
     this.styleTag$1 = ScalaJS.as.Lscalatags_JsDom$TypedTag(ScalaJS.m.Lscalatags_JsDom$tags2$().style$1).render__Lorg_scalajs_dom_raw_Element();
@@ -1665,127 +1879,15 @@ ScalaJS.c.Lscalatex_scrollspy_Controller$.prototype.styleTag$lzycompute__p1__Lor
   };
   return this.styleTag$1
 });
-ScalaJS.c.Lscalatex_scrollspy_Controller$.prototype.$$js$exported$meth$main__sjs_js_Any__Lorg_scalajs_dom_raw_HTMLElement__Lorg_scalajs_dom_raw_HTMLElement__O = (function(data, menu, menuLink) {
-  this.main__sjs_js_Any__Lorg_scalajs_dom_raw_HTMLElement__Lorg_scalajs_dom_raw_HTMLElement__V(data, menu, menuLink)
-});
-ScalaJS.c.Lscalatex_scrollspy_Controller$.prototype.main__sjs_js_Any__Lorg_scalajs_dom_raw_HTMLElement__Lorg_scalajs_dom_raw_HTMLElement__V = (function(data, menu, menuLink) {
-  var this$5 = ScalaJS.m.Lupickle_package$();
-  var expr = ScalaJS.m.Lupickle_json_package$().readJs__O__Lupickle_Js$Value(data);
-  var jsx$1 = ScalaJS.m.Lupickle_Internal$();
-  var v1 = new ScalaJS.c.Lupickle_Knot$R().init___s_PartialFunction(null);
-  var this$4 = ScalaJS.m.Lupickle_Internal$();
-  var f = new ScalaJS.c.sjsr_AnonFunction2().init___sjs_js_Function2((function(value$2, children$2) {
-    var value = ScalaJS.as.T(value$2);
-    var children = ScalaJS.as.sci_Vector(children$2);
-    return new ScalaJS.c.Lscalatex_scrollspy_Tree().init___O__sci_Vector(value, children)
-  }));
-  var names = ScalaJS.asArrayOf.T(ScalaJS.m.s_Array$().apply__sc_Seq__s_reflect_ClassTag__O(new ScalaJS.c.sjs_js_WrappedArray().init___sjs_js_Array(["value", "children"]), ScalaJS.m.s_reflect_ClassTag$().apply__jl_Class__s_reflect_ClassTag(ScalaJS.d.T.getClassOf())), 1);
-  var defaults = ScalaJS.asArrayOf.Lupickle_Js$Value(ScalaJS.m.s_Array$().apply__sc_Seq__s_reflect_ClassTag__O(new ScalaJS.c.sjs_js_WrappedArray().init___sjs_js_Array([null, null]), ScalaJS.m.s_reflect_ClassTag$().apply__jl_Class__s_reflect_ClassTag(ScalaJS.d.Lupickle_Js$Value.getClassOf())), 1);
-  var evidence$509 = ScalaJS.as.Lupickle_Reader(ScalaJS.m.Lupickle_package$().StringRW$1);
-  var this$3 = ScalaJS.m.Lupickle_package$();
-  ScalaJS.m.sci_Vector$();
-  var cbf = ScalaJS.m.sc_IndexedSeq$().ReusableCBF$6;
-  var evidence$510 = ScalaJS.s.Lupickle_Implicits$class__SeqishR__Lupickle_Implicits__Lupickle_Reader__scg_CanBuildFrom__Lupickle_Reader(this$3, v1, cbf);
-  var x$macro$2 = ScalaJS.s.Lupickle_GeneratedInternal$class__Case2R__Lupickle_GeneratedInternal__F2__AT__ALupickle_Js$Value__Lupickle_Reader__Lupickle_Reader__Lupickle_Reader(this$4, f, names, defaults, evidence$509, evidence$510);
-  v1.$$undread$1 = ScalaJS.s.Lupickle_Reader$class__read__Lupickle_Reader__s_PartialFunction(x$macro$2);
-  var evidence$4 = jsx$1.validateReader__T__Lupickle_Reader__Lupickle_Reader("Tagged Object scalatex.scrollspy.Tree", x$macro$2);
-  var structure = ScalaJS.as.Lscalatex_scrollspy_Tree(ScalaJS.s.Lupickle_Types$class__readJs__Lupickle_Types__Lupickle_Js$Value__Lupickle_Reader__O(this$5, expr, evidence$4));
-  var snippets = ScalaJS.g["document"]["getElementsByClassName"]("highlight-me");
-  var this$7 = new ScalaJS.c.Lorg_scalajs_dom_ext_package$PimpedNodeList().init___Lorg_scalajs_dom_raw_NodeList(snippets);
-  var this$8 = new ScalaJS.c.Lorg_scalajs_dom_ext_EasySeq$$anon$1().init___Lorg_scalajs_dom_ext_EasySeq(this$7);
-  while (this$8.hasNext__Z()) {
-    var arg1 = this$8.next__O();
-    ScalaJS.g["hljs"]["highlightBlock"](arg1)
-  };
-  var scrollSpy = new ScalaJS.c.Lscalatex_scrollspy_ScrollSpy().init___Lscalatex_scrollspy_Tree(structure);
-  var jsx$5 = ScalaJS.as.Lscalatags_JsDom$TypedTag(ScalaJS.m.Lscalatags_JsDom$all$().ul$1);
-  var this$10 = ScalaJS.m.Lscalatags_JsDom$all$().cls$1;
-  var ev = ScalaJS.m.Lscalatags_JsDom$all$().stringAttr$1;
-  var jsx$4 = new ScalaJS.c.Lscalatags_generic_AttrPair().init___Lscalatags_generic_Attr__O__Lscalatags_generic_AttrValue(this$10, "menu-item-list", ev);
-  var this$11 = ScalaJS.m.Lscalatags_JsDom$all$().margin__Lscalatags_generic_Styles$margin$();
-  var ev$1 = ScalaJS.m.Lscalatags_JsDom$all$().intPixelStyle$1;
-  var jsx$3 = ev$1.apply__Lscalatags_generic_Style__O__Lscalatags_generic_StylePair(this$11.realStyle$1, 0);
-  var this$12 = ScalaJS.m.Lscalatags_JsDom$all$().padding$1;
-  var ev$2 = ScalaJS.m.Lscalatags_JsDom$all$().intPixelStyle$1;
-  var jsx$2 = ev$2.apply__Lscalatags_generic_Style__O__Lscalatags_generic_StylePair(this$12.realStyle$1, 0);
-  var this$13 = ScalaJS.m.Lscalatags_JsDom$all$();
-  var e = ScalaJS.as.Lscalatex_scrollspy_MenuNode(scrollSpy.domTrees__Lscalatex_scrollspy_Tree().value$1).frag$1;
-  var list = jsx$5.apply__sc_Seq__Lscalatags_JsDom$TypedTag(new ScalaJS.c.sjs_js_WrappedArray().init___sjs_js_Array([jsx$4, jsx$3, jsx$2, new ScalaJS.c.Lscalatags_LowPriorityImplicits$bindNode().init___Lscalatags_LowPriorityImplicits__Lorg_scalajs_dom_raw_Node(this$13, e)])).render__Lorg_scalajs_dom_raw_Element();
-  var jsx$8 = ScalaJS.as.Lscalatags_JsDom$TypedTag(ScalaJS.m.Lscalatags_JsDom$all$().i$1);
-  var this$14 = ScalaJS.m.Lscalatags_JsDom$all$().cls$1;
-  var ev$3 = ScalaJS.m.Lscalatags_JsDom$all$().stringAttr$1;
-  var jsx$7 = new ScalaJS.c.Lscalatags_generic_AttrPair().init___Lscalatags_generic_Attr__O__Lscalatags_generic_AttrValue(this$14, "fa fa-caret-down", ev$3);
-  var this$15 = ScalaJS.m.Lscalatags_JsDom$all$().color__Lscalatags_generic_Styles$color$();
-  var ev$4 = ScalaJS.m.Lscalatags_JsDom$all$().stringStyle$1;
-  var jsx$6 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this$15, "white", ev$4);
-  var this$16 = ScalaJS.m.Lscalatags_JsDom$all$().padding$1;
-  var ev$5 = ScalaJS.m.Lscalatags_JsDom$all$().stringPixelStyle$1;
-  var expandIcon = jsx$8.apply__sc_Seq__Lscalatags_JsDom$TypedTag(new ScalaJS.c.sjs_js_WrappedArray().init___sjs_js_Array([jsx$7, jsx$6, ev$5.apply__Lscalatags_generic_Style__O__Lscalatags_generic_StylePair(this$16.realStyle$1, "15px 10px")])).render__Lorg_scalajs_dom_raw_Element();
-  var jsx$18 = ScalaJS.as.Lscalatags_JsDom$TypedTag(ScalaJS.m.Lscalatags_JsDom$all$().a$1);
-  var this$17 = ScalaJS.m.Lscalatags_JsDom$all$();
-  var jsx$17 = new ScalaJS.c.Lscalatags_LowPriorityImplicits$bindNode().init___Lscalatags_LowPriorityImplicits__Lorg_scalajs_dom_raw_Node(this$17, expandIcon);
-  var this$18 = ScalaJS.m.Lscalatags_JsDom$all$().href$1;
-  var ev$6 = ScalaJS.m.Lscalatags_JsDom$all$().stringAttr$1;
-  var jsx$16 = new ScalaJS.c.Lscalatags_generic_AttrPair().init___Lscalatags_generic_Attr__O__Lscalatags_generic_AttrValue(this$18, "javascript:", ev$6);
-  var this$19 = ScalaJS.as.Lscalatags_generic_PixelStyle(ScalaJS.m.Lscalatags_JsDom$all$().marginLeft$1);
-  var ev$7 = ScalaJS.m.Lscalatags_JsDom$all$().stringPixelStyle$1;
-  var jsx$15 = ev$7.apply__Lscalatags_generic_Style__O__Lscalatags_generic_StylePair(this$19.realStyle$1, "0px");
-  var this$20 = ScalaJS.m.Lscalatags_JsDom$all$().paddingLeft$1;
-  var ev$8 = ScalaJS.m.Lscalatags_JsDom$all$().stringPixelStyle$1;
-  var jsx$14 = ev$8.apply__Lscalatags_generic_Style__O__Lscalatags_generic_StylePair(this$20.realStyle$1, "15px");
-  var this$21 = ScalaJS.m.Lscalatags_JsDom$all$().paddingRight$1;
-  var ev$9 = ScalaJS.m.Lscalatags_JsDom$all$().stringPixelStyle$1;
-  var jsx$13 = ev$9.apply__Lscalatags_generic_Style__O__Lscalatags_generic_StylePair(this$21.realStyle$1, "15px");
-  var jsx$12 = ScalaJS.m.Lscalatags_JsDom$all$().position__Lscalatags_generic_Styles$position$().absolute$2;
-  var this$22 = ScalaJS.m.Lscalatags_JsDom$all$().top$1;
-  var ev$10 = ScalaJS.m.Lscalatags_JsDom$all$().stringPixelStyle$1;
-  var jsx$11 = ev$10.apply__Lscalatags_generic_Style__O__Lscalatags_generic_StylePair(this$22.realStyle$1, "0px");
-  var this$23 = ScalaJS.m.Lscalatags_JsDom$all$().right$1;
-  var ev$11 = ScalaJS.m.Lscalatags_JsDom$all$().stringPixelStyle$1;
-  var jsx$10 = ev$11.apply__Lscalatags_generic_Style__O__Lscalatags_generic_StylePair(this$23.realStyle$1, "0px");
-  var this$24 = ScalaJS.m.Lscalatags_JsDom$all$().cls$1;
-  var ev$12 = ScalaJS.m.Lscalatags_JsDom$all$().stringAttr$1;
-  var jsx$9 = new ScalaJS.c.Lscalatags_generic_AttrPair().init___Lscalatags_generic_Attr__O__Lscalatags_generic_AttrValue(this$24, "pure-menu-selected", ev$12);
-  var this$26 = ScalaJS.m.Lscalatags_JsDom$all$().onclick$1;
-  var v = new ScalaJS.c.sjsr_AnonFunction1().init___sjs_js_Function1((function(scrollSpy$1, expandIcon$1) {
-    return (function(e$2) {
-      expandIcon$1["classList"]["toggle"]("fa-caret-down");
-      expandIcon$1["classList"]["toggle"]("fa-caret-up");
-      scrollSpy$1.toggleOpen__V()
-    })
-  })(scrollSpy, expandIcon));
-  var this$25 = ScalaJS.m.Lscalatags_JsDom$all$();
-  var evidence$2 = new ScalaJS.c.sjsr_AnonFunction1().init___sjs_js_Function1((function(f$2) {
-    var f$1 = ScalaJS.as.F1(f$2);
-    return (function(f$3) {
-      return (function(arg1$1) {
-        return f$3.apply__O__O(arg1$1)
-      })
-    })(f$1)
-  }));
-  var ev$13 = new ScalaJS.c.Lscalatags_LowPriorityImplicits$$anon$2().init___Lscalatags_LowPriorityImplicits__F1(this$25, evidence$2);
-  var expandLink = jsx$18.apply__sc_Seq__Lscalatags_JsDom$TypedTag(new ScalaJS.c.sjs_js_WrappedArray().init___sjs_js_Array([jsx$17, jsx$16, jsx$15, jsx$14, jsx$13, jsx$12, jsx$11, jsx$10, jsx$9, new ScalaJS.c.Lscalatags_generic_AttrPair().init___Lscalatags_generic_Attr__O__Lscalatags_generic_AttrValue(this$26, v, ev$13)])).render__Lorg_scalajs_dom_raw_Element();
-  var jsx$20 = ScalaJS.as.Lscalatags_JsDom$TypedTag(ScalaJS.m.Lscalatags_JsDom$all$().div$1);
-  var this$27 = ScalaJS.m.Lscalatags_JsDom$all$();
-  var jsx$19 = new ScalaJS.c.Lscalatags_LowPriorityImplicits$bindNode().init___Lscalatags_LowPriorityImplicits__Lorg_scalajs_dom_raw_Node(this$27, list);
-  var this$28 = ScalaJS.m.Lscalatags_JsDom$all$();
-  menu["appendChild"](jsx$20.apply__sc_Seq__Lscalatags_JsDom$TypedTag(new ScalaJS.c.sjs_js_WrappedArray().init___sjs_js_Array([jsx$19, new ScalaJS.c.Lscalatags_LowPriorityImplicits$bindNode().init___Lscalatags_LowPriorityImplicits__Lorg_scalajs_dom_raw_Node(this$28, expandLink)])).render__Lorg_scalajs_dom_raw_Element());
-  ScalaJS.g["addEventListener"]("scroll", (function(scrollSpy$1$1) {
-    return (function(e$2$1) {
-      ScalaJS.m.Lscalatex_scrollspy_Controller$();
-      scrollSpy$1$1.start__p1__Z__V(false)
-    })
-  })(scrollSpy));
-  scrollSpy.start__p1__Z__V(false)
+ScalaJS.c.Lscalatex_scrollspy_Controller$.prototype.main__sjs_js_Any__V = (function(data) {
+  new ScalaJS.c.Lscalatex_scrollspy_Controller().init___sjs_js_Any(data).init__V()
 });
 ScalaJS.c.Lscalatex_scrollspy_Controller$.prototype.styleTag__Lorg_scalajs_dom_raw_HTMLStyleElement = (function() {
   return ((!this.bitmap$0$1) ? this.styleTag$lzycompute__p1__Lorg_scalajs_dom_raw_HTMLStyleElement() : this.styleTag$1)
 });
-ScalaJS.c.Lscalatex_scrollspy_Controller$.prototype["main"] = (function(arg$1, arg$2, arg$3) {
+ScalaJS.c.Lscalatex_scrollspy_Controller$.prototype["main"] = (function(arg$1) {
   var preparg$1 = arg$1;
-  var preparg$2 = arg$2;
-  var preparg$3 = arg$3;
-  return this.$$js$exported$meth$main__sjs_js_Any__Lorg_scalajs_dom_raw_HTMLElement__Lorg_scalajs_dom_raw_HTMLElement__O(preparg$1, preparg$2, preparg$3)
+  return this.$$js$exported$meth$main__sjs_js_Any__O(preparg$1)
 });
 ScalaJS.d.Lscalatex_scrollspy_Controller$ = new ScalaJS.ClassTypeData({
   Lscalatex_scrollspy_Controller$: 0
@@ -1980,7 +2082,7 @@ ScalaJS.c.Lscalatex_scrollspy_ScrollSpy.prototype.scalatex$scrollspy$ScrollSpy$$
   ScalaJS.as.Lscalatex_scrollspy_MenuNode(tree.value$1).link$1["classList"]["remove"](ScalaJS.m.Lscalatex_scrollspy_Styles$().css$1.selected__Lscalatags_stylesheet_Cls().name$1)
 });
 ScalaJS.c.Lscalatex_scrollspy_ScrollSpy.prototype.setFullHeight__Lscalatex_scrollspy_MenuNode__V = (function(mn) {
-  mn.list$1["style"]["maxHeight"] = (ScalaJS.imul(44, ((1 + ((mn.end$1 - mn.start$1) | 0)) | 0)) + "px")
+  mn.list$1["style"]["maxHeight"] = (ScalaJS.imul(((1 + ((mn.end$1 - mn.start$1) | 0)) | 0), ((1 + ScalaJS.m.Lscalatex_scrollspy_Styles$().itemHeight$1) | 0)) + "px")
 });
 ScalaJS.c.Lscalatex_scrollspy_ScrollSpy.prototype.scalatex$scrollspy$ScrollSpy$$rec$1__Lscalatex_scrollspy_Tree__F1__V = (function(tree, f) {
   f.apply__O__O(tree.value$1);
@@ -2011,7 +2113,10 @@ ScalaJS.c.Lscalatex_scrollspy_ScrollSpy.prototype.$classData = ScalaJS.d.Lscalat
 /** @constructor */
 ScalaJS.c.Lscalatex_scrollspy_Styles$ = (function() {
   ScalaJS.c.O.call(this);
-  this.css$1 = null
+  this.itemHeight$1 = 0;
+  this.selectedColor$1 = null;
+  this.css$1 = null;
+  this.menuBackground$1 = null
 });
 ScalaJS.c.Lscalatex_scrollspy_Styles$.prototype = new ScalaJS.h.O();
 ScalaJS.c.Lscalatex_scrollspy_Styles$.prototype.constructor = ScalaJS.c.Lscalatex_scrollspy_Styles$;
@@ -2022,7 +2127,10 @@ ScalaJS.h.Lscalatex_scrollspy_Styles$ = (function() {
 ScalaJS.h.Lscalatex_scrollspy_Styles$.prototype = ScalaJS.c.Lscalatex_scrollspy_Styles$.prototype;
 ScalaJS.c.Lscalatex_scrollspy_Styles$.prototype.init___ = (function() {
   ScalaJS.n.Lscalatex_scrollspy_Styles$ = this;
+  this.itemHeight$1 = 44;
+  this.selectedColor$1 = "#1f8dd6";
   this.css$1 = new ScalaJS.c.Lscalatex_scrollspy_Styles$$anon$1().init___();
+  this.menuBackground$1 = "#191818";
   return this
 });
 ScalaJS.d.Lscalatex_scrollspy_Styles$ = new ScalaJS.ClassTypeData({
@@ -2040,17 +2148,187 @@ ScalaJS.m.Lscalatex_scrollspy_Styles$ = (function() {
   return ScalaJS.n.Lscalatex_scrollspy_Styles$
 });
 ScalaJS.s.Lscalatex_scrollspy_Styles$class__selected__Lscalatex_scrollspy_Styles__Lscalatags_stylesheet_Cls = (function($$this) {
-  var jsx$2 = $$this.cls__Lscalatags_stylesheet_StyleSheet$cls$();
+  var jsx$8 = $$this.cls__Lscalatags_stylesheet_StyleSheet$cls$();
   var this$2 = ScalaJS.m.Lscalatags_JsDom$all$();
   var this$1 = ScalaJS.m.Lscalatags_JsDom$all$().backgroundColor$1;
+  var v = ScalaJS.m.Lscalatex_scrollspy_Styles$().selectedColor$1;
   var ev = ScalaJS.m.Lscalatags_JsDom$all$().stringStyle$1;
-  var s = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this$1, "#1f8dd6", ev);
-  var jsx$1 = new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$2, s);
+  var s = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this$1, v, ev);
+  var jsx$7 = new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$2, s);
+  var this$3 = $$this.$$amp$1;
+  var this$8 = this$3.pseudoExtend__T__Lscalatags_stylesheet_Selector("hover");
+  var this$5 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var this$4 = ScalaJS.m.Lscalatags_JsDom$all$().backgroundColor$1;
+  var ev$1 = ScalaJS.m.Lscalatags_JsDom$all$().stringStyle$1;
+  var s$1 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this$4, "#369FE2", ev$1);
+  var jsx$4 = new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$5, s$1);
+  var this$7 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var this$6 = ScalaJS.m.Lscalatags_JsDom$all$().color__Lscalatags_generic_Styles$color$();
+  var ev$2 = ScalaJS.m.Lscalatags_JsDom$all$().stringStyle$1;
+  var s$2 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this$6, "white", ev$2);
+  var array = [jsx$4, new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$7, s$2)];
+  var start = this$8.built$1;
+  var ord = ScalaJS.m.s_math_Ordering$String$();
+  var z = new ScalaJS.c.Lscalatags_stylesheet_StyleTree().init___sc_Seq__sc_SortedMap__sc_Seq(start, new ScalaJS.c.sci_TreeMap().init___s_math_Ordering(ord), ScalaJS.m.sci_Nil$());
+  var start$1 = 0;
+  var end = ScalaJS.uI(array["length"]);
+  var z$1 = z;
+  x: {
+    var jsx$5;
+    _foldl: while (true) {
+      if ((start$1 === end)) {
+        var jsx$5 = z$1;
+        break x
+      } else {
+        var temp$start = ((1 + start$1) | 0);
+        var arg1 = z$1;
+        var index = start$1;
+        var arg2 = array[index];
+        var c = ScalaJS.as.Lscalatags_stylesheet_StyleTree(arg1);
+        var f = ScalaJS.as.Lscalatags_stylesheet_StyleSheetFrag(arg2);
+        var temp$z = f.applyTo__Lscalatags_stylesheet_StyleTree__Lscalatags_stylesheet_StyleTree(c);
+        start$1 = temp$start;
+        z$1 = temp$z;
+        continue _foldl
+      }
+    }
+  };
+  var st = ScalaJS.as.Lscalatags_stylesheet_StyleTree(jsx$5);
+  var jsx$6 = new ScalaJS.c.Lscalatags_stylesheet_StyleSheetFrag$StyleTreeFrag().init___Lscalatags_stylesheet_StyleTree(st);
+  var this$14 = $$this.$$amp$1;
+  var this$19 = this$14.pseudoExtend__T__Lscalatags_stylesheet_Selector("active");
+  var this$16 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var this$15 = ScalaJS.m.Lscalatags_JsDom$all$().backgroundColor$1;
+  var ev$3 = ScalaJS.m.Lscalatags_JsDom$all$().stringStyle$1;
+  var s$3 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this$15, "#62b4e8", ev$3);
+  var jsx$1 = new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$16, s$3);
+  var this$18 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var this$17 = ScalaJS.m.Lscalatags_JsDom$all$().color__Lscalatags_generic_Styles$color$();
+  var ev$4 = ScalaJS.m.Lscalatags_JsDom$all$().stringStyle$1;
+  var s$4 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this$17, "white", ev$4);
+  var array$1 = [jsx$1, new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$18, s$4)];
+  var start$2 = this$19.built$1;
+  var ord$1 = ScalaJS.m.s_math_Ordering$String$();
+  var z$2 = new ScalaJS.c.Lscalatags_stylesheet_StyleTree().init___sc_Seq__sc_SortedMap__sc_Seq(start$2, new ScalaJS.c.sci_TreeMap().init___s_math_Ordering(ord$1), ScalaJS.m.sci_Nil$());
+  var start$3 = 0;
+  var end$1 = ScalaJS.uI(array$1["length"]);
+  var z$3 = z$2;
+  x$1: {
+    var jsx$2;
+    _foldl$1: while (true) {
+      if ((start$3 === end$1)) {
+        var jsx$2 = z$3;
+        break x$1
+      } else {
+        var temp$start$1 = ((1 + start$3) | 0);
+        var arg1$1 = z$3;
+        var index$1 = start$3;
+        var arg2$1 = array$1[index$1];
+        var c$1 = ScalaJS.as.Lscalatags_stylesheet_StyleTree(arg1$1);
+        var f$1 = ScalaJS.as.Lscalatags_stylesheet_StyleSheetFrag(arg2$1);
+        var temp$z$1 = f$1.applyTo__Lscalatags_stylesheet_StyleTree__Lscalatags_stylesheet_StyleTree(c$1);
+        start$3 = temp$start$1;
+        z$3 = temp$z$1;
+        continue _foldl$1
+      }
+    }
+  };
+  var st$1 = ScalaJS.as.Lscalatags_stylesheet_StyleTree(jsx$2);
+  var jsx$3 = new ScalaJS.c.Lscalatags_stylesheet_StyleSheetFrag$StyleTreeFrag().init___Lscalatags_stylesheet_StyleTree(st$1);
+  var this$26 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var this$25 = ScalaJS.m.Lscalatags_JsDom$all$().color__Lscalatags_generic_Styles$color$();
+  var ev$5 = ScalaJS.m.Lscalatags_JsDom$all$().stringStyle$1;
+  var s$5 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this$25, "white", ev$5);
+  return jsx$8.apply__sc_Seq__Lscalatags_stylesheet_Cls(new ScalaJS.c.sjs_js_WrappedArray().init___sjs_js_Array([jsx$7, jsx$6, jsx$3, new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$26, s$5)]))
+});
+ScalaJS.s.Lscalatex_scrollspy_Styles$class__note__Lscalatex_scrollspy_Styles__Lscalatags_stylesheet_Cls = (function($$this) {
+  var jsx$8 = $$this.cls__Lscalatags_stylesheet_StyleSheet$cls$();
+  var this$2 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var this$1 = ScalaJS.m.Lscalatags_JsDom$all$().fontSize__Lscalatags_generic_Styles$fontSize$();
+  var ev = ScalaJS.m.Lscalatags_JsDom$all$().stringStyle$1;
+  var s = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this$1, "12px", ev);
+  var jsx$7 = new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$2, s);
   var this$4 = ScalaJS.m.Lscalatags_JsDom$all$();
   var this$3 = ScalaJS.m.Lscalatags_JsDom$all$().color__Lscalatags_generic_Styles$color$();
   var ev$1 = ScalaJS.m.Lscalatags_JsDom$all$().stringStyle$1;
-  var s$1 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this$3, "white", ev$1);
-  return jsx$2.apply__sc_Seq__Lscalatags_stylesheet_Cls(new ScalaJS.c.sjs_js_WrappedArray().init___sjs_js_Array([jsx$1, new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$4, s$1)]))
+  var s$1 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this$3, "#555", ev$1);
+  var jsx$6 = new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$4, s$1);
+  var this$5 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var s$2 = ScalaJS.m.Lscalatags_JsDom$all$().textDecoration__Lscalatags_generic_Styles$textDecoration$().none$2;
+  var jsx$5 = new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$5, s$2);
+  var this$6 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var s$3 = ScalaJS.m.Lscalatags_JsDom$all$().fontStyle__Lscalatags_generic_Styles$fontStyle$().italic$2;
+  var jsx$4 = new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$6, s$3);
+  var this$7 = $$this.$$amp$1;
+  var this$10 = this$7.pseudoExtend__T__Lscalatags_stylesheet_Selector("hover");
+  var this$9 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var this$8 = ScalaJS.m.Lscalatags_JsDom$all$().color__Lscalatags_generic_Styles$color$();
+  var ev$2 = ScalaJS.m.Lscalatags_JsDom$all$().stringStyle$1;
+  var s$4 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this$8, "#777", ev$2);
+  var array = [new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$9, s$4)];
+  var start = this$10.built$1;
+  var ord = ScalaJS.m.s_math_Ordering$String$();
+  var z = new ScalaJS.c.Lscalatags_stylesheet_StyleTree().init___sc_Seq__sc_SortedMap__sc_Seq(start, new ScalaJS.c.sci_TreeMap().init___s_math_Ordering(ord), ScalaJS.m.sci_Nil$());
+  var start$1 = 0;
+  var end = ScalaJS.uI(array["length"]);
+  var z$1 = z;
+  x: {
+    var jsx$2;
+    _foldl: while (true) {
+      if ((start$1 === end)) {
+        var jsx$2 = z$1;
+        break x
+      } else {
+        var temp$start = ((1 + start$1) | 0);
+        var arg1 = z$1;
+        var index = start$1;
+        var arg2 = array[index];
+        var c = ScalaJS.as.Lscalatags_stylesheet_StyleTree(arg1);
+        var f = ScalaJS.as.Lscalatags_stylesheet_StyleSheetFrag(arg2);
+        var temp$z = f.applyTo__Lscalatags_stylesheet_StyleTree__Lscalatags_stylesheet_StyleTree(c);
+        start$1 = temp$start;
+        z$1 = temp$z;
+        continue _foldl
+      }
+    }
+  };
+  var st = ScalaJS.as.Lscalatags_stylesheet_StyleTree(jsx$2);
+  var jsx$3 = new ScalaJS.c.Lscalatags_stylesheet_StyleSheetFrag$StyleTreeFrag().init___Lscalatags_stylesheet_StyleTree(st);
+  var this$16 = $$this.$$amp$1;
+  var this$19 = this$16.pseudoExtend__T__Lscalatags_stylesheet_Selector("active");
+  var this$18 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var this$17 = ScalaJS.m.Lscalatags_JsDom$all$().color__Lscalatags_generic_Styles$color$();
+  var ev$3 = ScalaJS.m.Lscalatags_JsDom$all$().stringStyle$1;
+  var s$5 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this$17, "#999", ev$3);
+  var array$1 = [new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$18, s$5)];
+  var start$2 = this$19.built$1;
+  var ord$1 = ScalaJS.m.s_math_Ordering$String$();
+  var z$2 = new ScalaJS.c.Lscalatags_stylesheet_StyleTree().init___sc_Seq__sc_SortedMap__sc_Seq(start$2, new ScalaJS.c.sci_TreeMap().init___s_math_Ordering(ord$1), ScalaJS.m.sci_Nil$());
+  var start$3 = 0;
+  var end$1 = ScalaJS.uI(array$1["length"]);
+  var z$3 = z$2;
+  x$1: {
+    var jsx$1;
+    _foldl$1: while (true) {
+      if ((start$3 === end$1)) {
+        var jsx$1 = z$3;
+        break x$1
+      } else {
+        var temp$start$1 = ((1 + start$3) | 0);
+        var arg1$1 = z$3;
+        var index$1 = start$3;
+        var arg2$1 = array$1[index$1];
+        var c$1 = ScalaJS.as.Lscalatags_stylesheet_StyleTree(arg1$1);
+        var f$1 = ScalaJS.as.Lscalatags_stylesheet_StyleSheetFrag(arg2$1);
+        var temp$z$1 = f$1.applyTo__Lscalatags_stylesheet_StyleTree__Lscalatags_stylesheet_StyleTree(c$1);
+        start$3 = temp$start$1;
+        z$3 = temp$z$1;
+        continue _foldl$1
+      }
+    }
+  };
+  var st$1 = ScalaJS.as.Lscalatags_stylesheet_StyleTree(jsx$1);
+  return jsx$8.apply__sc_Seq__Lscalatags_stylesheet_Cls(new ScalaJS.c.sjs_js_WrappedArray().init___sjs_js_Array([jsx$7, jsx$6, jsx$5, jsx$4, jsx$3, new ScalaJS.c.Lscalatags_stylesheet_StyleSheetFrag$StyleTreeFrag().init___Lscalatags_stylesheet_StyleTree(st$1)]))
 });
 ScalaJS.s.Lscalatex_scrollspy_Styles$class__menuList__Lscalatex_scrollspy_Styles__Lscalatags_stylesheet_Cls = (function($$this) {
   var jsx$8 = $$this.cls__Lscalatags_stylesheet_StyleSheet$cls$();
@@ -2083,12 +2361,11 @@ ScalaJS.s.Lscalatex_scrollspy_Styles$class__menuList__Lscalatex_scrollspy_Styles
   var ev$3 = ScalaJS.m.Lscalatags_JsDom$all$().intPixelStyle$1;
   var s$6 = ev$3.apply__Lscalatags_generic_Style__O__Lscalatags_generic_StylePair(this$10.realStyle$1, 0);
   var jsx$1 = new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$11, s$6);
-  var this$14 = ScalaJS.m.Lscalatags_JsDom$all$();
-  var this$12 = ScalaJS.m.Lscalatags_JsDom$all$();
-  var this$13 = new ScalaJS.c.Lscalatags_generic_Util$ExtendedString().init___Lscalatags_generic_Util__T(this$12, "transition").style__Lscalatags_generic_Style();
+  var this$13 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var this$12 = ScalaJS.m.Lscalatags_JsDom$all$().transition$1;
   var ev$4 = ScalaJS.m.Lscalatags_JsDom$all$().stringStyle$1;
-  var s$7 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this$13, "maxHeight 0.2s ease-out", ev$4);
-  return jsx$8.apply__sc_Seq__Lscalatags_stylesheet_Cls(new ScalaJS.c.sjs_js_WrappedArray().init___sjs_js_Array([jsx$7, jsx$6, jsx$5, jsx$4, jsx$3, jsx$2, jsx$1, new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$14, s$7)]))
+  var s$7 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this$12, "max-height 0.2s ease-out", ev$4);
+  return jsx$8.apply__sc_Seq__Lscalatags_stylesheet_Cls(new ScalaJS.c.sjs_js_WrappedArray().init___sjs_js_Array([jsx$7, jsx$6, jsx$5, jsx$4, jsx$3, jsx$2, jsx$1, new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$13, s$7)]))
 });
 ScalaJS.s.Lscalatex_scrollspy_Styles$class__closed__Lscalatex_scrollspy_Styles__Lscalatags_stylesheet_Cls = (function($$this) {
   var jsx$1 = $$this.cls__Lscalatags_stylesheet_StyleSheet$cls$();
@@ -2098,26 +2375,76 @@ ScalaJS.s.Lscalatex_scrollspy_Styles$class__closed__Lscalatex_scrollspy_Styles__
   var s = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this$1, "#999", ev);
   return jsx$1.apply__sc_Seq__Lscalatags_stylesheet_Cls(new ScalaJS.c.sjs_js_WrappedArray().init___sjs_js_Array([new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$2, s)]))
 });
-ScalaJS.s.Lscalatex_scrollspy_Styles$class__menuItem__Lscalatex_scrollspy_Styles__Lscalatags_stylesheet_Cls = (function($$this) {
-  var jsx$10 = $$this.cls__Lscalatags_stylesheet_StyleSheet$cls$();
-  var this$1 = $$this.$$amp$1;
-  var this$4 = this$1.pseudoExtend__T__Lscalatags_stylesheet_Selector("hover");
+ScalaJS.s.Lscalatex_scrollspy_Styles$class__menuLink__Lscalatex_scrollspy_Styles__Lscalatags_stylesheet_Cls = (function($$this) {
+  var jsx$9 = $$this.cls__Lscalatags_stylesheet_StyleSheet$cls$();
+  var this$1 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var s = ScalaJS.m.Lscalatags_JsDom$all$().position__Lscalatags_generic_Styles$position$().absolute$2;
+  var jsx$8 = new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$1, s);
   var this$3 = ScalaJS.m.Lscalatags_JsDom$all$();
-  var this$2 = ScalaJS.m.Lscalatags_JsDom$all$().opacity$1;
-  var ev = ScalaJS.m.Lscalatags_JsDom$all$().doubleStyle$1;
-  var s = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this$2, 0.9, ev);
-  var array = [new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$3, s)];
-  var start = this$4.built$1;
+  var this$2 = ScalaJS.m.Lscalatags_JsDom$all$().top$1;
+  var ev = ScalaJS.m.Lscalatags_JsDom$all$().stringPixelStyle$1;
+  var s$1 = ev.apply__Lscalatags_generic_Style__O__Lscalatags_generic_StylePair(this$2.realStyle$1, "0px");
+  var jsx$7 = new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$3, s$1);
+  var this$5 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var this$4 = ScalaJS.m.Lscalatags_JsDom$all$().height$1;
+  var v = ScalaJS.m.Lscalatex_scrollspy_Styles$().itemHeight$1;
+  var ev$1 = ScalaJS.m.Lscalatags_JsDom$all$().intPixelStyle$1;
+  var s$2 = ev$1.apply__Lscalatags_generic_Style__O__Lscalatags_generic_StylePair(this$4.realStyle$1, v);
+  var jsx$6 = new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$5, s$2);
+  var this$7 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var this$6 = ScalaJS.m.Lscalatags_JsDom$all$().width$1;
+  var v$1 = ScalaJS.m.Lscalatex_scrollspy_Styles$().itemHeight$1;
+  var ev$2 = ScalaJS.m.Lscalatags_JsDom$all$().intPixelStyle$1;
+  var s$3 = ev$2.apply__Lscalatags_generic_Style__O__Lscalatags_generic_StylePair(this$6.realStyle$1, v$1);
+  var jsx$5 = new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$7, s$3);
+  var this$9 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var this$8 = ScalaJS.m.Lscalatags_JsDom$all$().display__Lscalatags_generic_Styles$display$();
+  var ev$3 = ScalaJS.m.Lscalatags_JsDom$all$().stringStyle$1;
+  var s$4 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this$8, "flex", ev$3);
+  var jsx$4 = new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$9, s$4);
+  var this$12 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var this$10 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var this$11 = new ScalaJS.c.Lscalatags_generic_Util$ExtendedString().init___Lscalatags_generic_Util__T(this$10, "align-items").style__Lscalatags_generic_Style();
+  var ev$4 = ScalaJS.m.Lscalatags_JsDom$all$().stringStyle$1;
+  var s$5 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this$11, "center", ev$4);
+  var jsx$3 = new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$12, s$5);
+  var this$15 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var this$13 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var this$14 = new ScalaJS.c.Lscalatags_generic_Util$ExtendedString().init___Lscalatags_generic_Util__T(this$13, "justify-content").style__Lscalatags_generic_Style();
+  var ev$5 = ScalaJS.m.Lscalatags_JsDom$all$().stringStyle$1;
+  var s$6 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this$14, "center", ev$5);
+  var jsx$2 = new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$15, s$6);
+  var this$16 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var s$7 = ScalaJS.m.Lscalatags_JsDom$all$().textDecoration__Lscalatags_generic_Styles$textDecoration$().none$2;
+  var jsx$1 = new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$16, s$7);
+  var this$17 = $$this.selected__Lscalatags_stylesheet_Cls();
+  return jsx$9.apply__sc_Seq__Lscalatags_stylesheet_Cls(new ScalaJS.c.sjs_js_WrappedArray().init___sjs_js_Array([jsx$8, jsx$7, jsx$6, jsx$5, jsx$4, jsx$3, jsx$2, jsx$1, new ScalaJS.c.Lscalatags_stylesheet_Cls$$anon$1().init___Lscalatags_stylesheet_Cls(this$17)]))
+});
+ScalaJS.s.Lscalatex_scrollspy_Styles$class__menuItem__Lscalatex_scrollspy_Styles__Lscalatags_stylesheet_Cls = (function($$this) {
+  var jsx$12 = $$this.cls__Lscalatags_stylesheet_StyleSheet$cls$();
+  var this$1 = $$this.$$amp$1;
+  var this$6 = this$1.pseudoExtend__T__Lscalatags_stylesheet_Selector("hover");
+  var this$3 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var this$2 = ScalaJS.m.Lscalatags_JsDom$all$().color__Lscalatags_generic_Styles$color$();
+  var ev = ScalaJS.m.Lscalatags_JsDom$all$().stringStyle$1;
+  var s = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this$2, "#bbb", ev);
+  var jsx$9 = new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$3, s);
+  var this$5 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var this$4 = ScalaJS.m.Lscalatags_JsDom$all$().backgroundColor$1;
+  var ev$1 = ScalaJS.m.Lscalatags_JsDom$all$().stringStyle$1;
+  var s$1 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this$4, "#292828", ev$1);
+  var array = [jsx$9, new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$5, s$1)];
+  var start = this$6.built$1;
   var ord = ScalaJS.m.s_math_Ordering$String$();
   var z = new ScalaJS.c.Lscalatags_stylesheet_StyleTree().init___sc_Seq__sc_SortedMap__sc_Seq(start, new ScalaJS.c.sci_TreeMap().init___s_math_Ordering(ord), ScalaJS.m.sci_Nil$());
   var start$1 = 0;
   var end = ScalaJS.uI(array["length"]);
   var z$1 = z;
   x: {
-    var jsx$8;
+    var jsx$10;
     _foldl: while (true) {
       if ((start$1 === end)) {
-        var jsx$8 = z$1;
+        var jsx$10 = z$1;
         break x
       } else {
         var temp$start = ((1 + start$1) | 0);
@@ -2133,26 +2460,31 @@ ScalaJS.s.Lscalatex_scrollspy_Styles$class__menuItem__Lscalatex_scrollspy_Styles
       }
     }
   };
-  var st = ScalaJS.as.Lscalatags_stylesheet_StyleTree(jsx$8);
-  var jsx$9 = new ScalaJS.c.Lscalatags_stylesheet_StyleSheetFrag$StyleTreeFrag().init___Lscalatags_stylesheet_StyleTree(st);
-  var this$10 = $$this.$$amp$1;
-  var this$13 = this$10.pseudoExtend__T__Lscalatags_stylesheet_Selector("active");
-  var this$12 = ScalaJS.m.Lscalatags_JsDom$all$();
-  var this$11 = ScalaJS.m.Lscalatags_JsDom$all$().opacity$1;
-  var ev$1 = ScalaJS.m.Lscalatags_JsDom$all$().doubleStyle$1;
-  var s$1 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this$11, 0.7, ev$1);
-  var array$1 = [new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$12, s$1)];
-  var start$2 = this$13.built$1;
+  var st = ScalaJS.as.Lscalatags_stylesheet_StyleTree(jsx$10);
+  var jsx$11 = new ScalaJS.c.Lscalatags_stylesheet_StyleSheetFrag$StyleTreeFrag().init___Lscalatags_stylesheet_StyleTree(st);
+  var this$12 = $$this.$$amp$1;
+  var this$17 = this$12.pseudoExtend__T__Lscalatags_stylesheet_Selector("active");
+  var this$14 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var this$13 = ScalaJS.m.Lscalatags_JsDom$all$().color__Lscalatags_generic_Styles$color$();
+  var ev$2 = ScalaJS.m.Lscalatags_JsDom$all$().stringStyle$1;
+  var s$2 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this$13, "#ddd", ev$2);
+  var jsx$6 = new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$14, s$2);
+  var this$16 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var this$15 = ScalaJS.m.Lscalatags_JsDom$all$().backgroundColor$1;
+  var ev$3 = ScalaJS.m.Lscalatags_JsDom$all$().stringStyle$1;
+  var s$3 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this$15, "#393838", ev$3);
+  var array$1 = [jsx$6, new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$16, s$3)];
+  var start$2 = this$17.built$1;
   var ord$1 = ScalaJS.m.s_math_Ordering$String$();
   var z$2 = new ScalaJS.c.Lscalatags_stylesheet_StyleTree().init___sc_Seq__sc_SortedMap__sc_Seq(start$2, new ScalaJS.c.sci_TreeMap().init___s_math_Ordering(ord$1), ScalaJS.m.sci_Nil$());
   var start$3 = 0;
   var end$1 = ScalaJS.uI(array$1["length"]);
   var z$3 = z$2;
   x$1: {
-    var jsx$6;
+    var jsx$7;
     _foldl$1: while (true) {
       if ((start$3 === end$1)) {
-        var jsx$6 = z$3;
+        var jsx$7 = z$3;
         break x$1
       } else {
         var temp$start$1 = ((1 + start$3) | 0);
@@ -2168,34 +2500,110 @@ ScalaJS.s.Lscalatex_scrollspy_Styles$class__menuItem__Lscalatex_scrollspy_Styles
       }
     }
   };
-  var st$1 = ScalaJS.as.Lscalatags_stylesheet_StyleTree(jsx$6);
-  var jsx$7 = new ScalaJS.c.Lscalatags_stylesheet_StyleSheetFrag$StyleTreeFrag().init___Lscalatags_stylesheet_StyleTree(st$1);
-  var this$19 = ScalaJS.m.Lscalatags_JsDom$all$();
-  var s$2 = ScalaJS.m.Lscalatags_JsDom$all$().display__Lscalatags_generic_Styles$display$().block$2;
-  var jsx$5 = new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$19, s$2);
-  var this$20 = ScalaJS.m.Lscalatags_JsDom$all$();
-  var s$3 = ScalaJS.m.Lscalatags_JsDom$all$().textDecoration__Lscalatags_generic_Styles$textDecoration$().none$2;
-  var jsx$4 = new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$20, s$3);
-  var this$22 = ScalaJS.m.Lscalatags_JsDom$all$();
-  var this$21 = ScalaJS.m.Lscalatags_JsDom$all$().paddingLeft$1;
-  var ev$2 = ScalaJS.m.Lscalatags_JsDom$all$().intPixelStyle$1;
-  var s$4 = ev$2.apply__Lscalatags_generic_Style__O__Lscalatags_generic_StylePair(this$21.realStyle$1, 15);
-  var jsx$3 = new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$22, s$4);
+  var st$1 = ScalaJS.as.Lscalatags_stylesheet_StyleTree(jsx$7);
+  var jsx$8 = new ScalaJS.c.Lscalatags_stylesheet_StyleSheetFrag$StyleTreeFrag().init___Lscalatags_stylesheet_StyleTree(st$1);
+  var this$23 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var s$4 = ScalaJS.m.Lscalatags_JsDom$all$().display__Lscalatags_generic_Styles$display$().block$2;
+  var jsx$5 = new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$23, s$4);
   var this$24 = ScalaJS.m.Lscalatags_JsDom$all$();
-  var this$23 = ScalaJS.m.Lscalatags_JsDom$all$().height$1;
-  var ev$3 = ScalaJS.m.Lscalatags_JsDom$all$().intPixelStyle$1;
-  var s$5 = ev$3.apply__Lscalatags_generic_Style__O__Lscalatags_generic_StylePair(this$23.realStyle$1, 44);
-  var jsx$2 = new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$24, s$5);
+  var s$5 = ScalaJS.m.Lscalatags_JsDom$all$().textDecoration__Lscalatags_generic_Styles$textDecoration$().none$2;
+  var jsx$4 = new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$24, s$5);
   var this$26 = ScalaJS.m.Lscalatags_JsDom$all$();
-  var this$25 = ScalaJS.m.Lscalatags_JsDom$all$().lineHeight$1;
-  var ev$4 = ScalaJS.m.Lscalatags_JsDom$all$().stringStyle$1;
-  var s$6 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this$25, "44px", ev$4);
-  var jsx$1 = new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$26, s$6);
+  var this$25 = ScalaJS.m.Lscalatags_JsDom$all$().paddingLeft$1;
+  var ev$4 = ScalaJS.m.Lscalatags_JsDom$all$().intPixelStyle$1;
+  var s$6 = ev$4.apply__Lscalatags_generic_Style__O__Lscalatags_generic_StylePair(this$25.realStyle$1, 15);
+  var jsx$3 = new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$26, s$6);
   var this$28 = ScalaJS.m.Lscalatags_JsDom$all$();
-  var this$27 = ScalaJS.m.Lscalatags_JsDom$all$().borderBottom$1;
+  var this$27 = ScalaJS.m.Lscalatags_JsDom$all$().height$1;
+  var v = ScalaJS.m.Lscalatex_scrollspy_Styles$().itemHeight$1;
+  var ev$5 = ScalaJS.m.Lscalatags_JsDom$all$().intPixelStyle$1;
+  var s$7 = ev$5.apply__Lscalatags_generic_Style__O__Lscalatags_generic_StylePair(this$27.realStyle$1, v);
+  var jsx$2 = new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$28, s$7);
+  var this$30 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var this$29 = ScalaJS.m.Lscalatags_JsDom$all$().lineHeight$1;
+  var ev$6 = ScalaJS.m.Lscalatags_JsDom$all$().stringStyle$1;
+  var s$8 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this$29, "44px", ev$6);
+  var jsx$1 = new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$30, s$8);
+  var this$32 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var this$31 = ScalaJS.m.Lscalatags_JsDom$all$().borderBottom$1;
+  var ev$7 = ScalaJS.m.Lscalatags_JsDom$all$().stringStyle$1;
+  var s$9 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this$31, "1px solid #444", ev$7);
+  return jsx$12.apply__sc_Seq__Lscalatags_stylesheet_Cls(new ScalaJS.c.sjs_js_WrappedArray().init___sjs_js_Array([jsx$11, jsx$8, jsx$5, jsx$4, jsx$3, jsx$2, jsx$1, new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$32, s$9)]))
+});
+ScalaJS.s.Lscalatex_scrollspy_Styles$class__noteBox__Lscalatex_scrollspy_Styles__Lscalatags_stylesheet_Cls = (function($$this) {
+  var jsx$7 = $$this.cls__Lscalatags_stylesheet_StyleSheet$cls$();
+  var this$2 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var this$1 = ScalaJS.m.Lscalatags_JsDom$all$().height$1;
+  var ev = ScalaJS.m.Lscalatags_JsDom$all$().stringPixelStyle$1;
+  var s = ev.apply__Lscalatags_generic_Style__O__Lscalatags_generic_StylePair(this$1.realStyle$1, "14px");
+  var jsx$6 = new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$2, s);
+  var this$3 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var s$1 = ScalaJS.m.Lscalatags_JsDom$all$().textAlign$1.right__Lscalatags_generic_StylePair();
+  var jsx$5 = new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$3, s$1);
+  var this$5 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var this$4 = ScalaJS.m.Lscalatags_JsDom$all$().bottom$1;
+  var ev$1 = ScalaJS.m.Lscalatags_JsDom$all$().intPixelStyle$1;
+  var s$2 = ev$1.apply__Lscalatags_generic_Style__O__Lscalatags_generic_StylePair(this$4.realStyle$1, 0);
+  var jsx$4 = new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$5, s$2);
+  var this$7 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var this$6 = ScalaJS.m.Lscalatags_JsDom$all$().paddingTop$1;
+  var ev$2 = ScalaJS.m.Lscalatags_JsDom$all$().intPixelStyle$1;
+  var s$3 = ev$2.apply__Lscalatags_generic_Style__O__Lscalatags_generic_StylePair(this$6.realStyle$1, 5);
+  var jsx$3 = new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$7, s$3);
+  var this$9 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var this$8 = ScalaJS.m.Lscalatags_JsDom$all$().paddingRight$1;
+  var ev$3 = ScalaJS.m.Lscalatags_JsDom$all$().intPixelStyle$1;
+  var s$4 = ev$3.apply__Lscalatags_generic_Style__O__Lscalatags_generic_StylePair(this$8.realStyle$1, 5);
+  var jsx$2 = new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$9, s$4);
+  var this$11 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var this$10 = ScalaJS.m.Lscalatags_JsDom$all$().paddingBottom$1;
+  var ev$4 = ScalaJS.m.Lscalatags_JsDom$all$().intPixelStyle$1;
+  var s$5 = ev$4.apply__Lscalatags_generic_Style__O__Lscalatags_generic_StylePair(this$10.realStyle$1, 2);
+  var jsx$1 = new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$11, s$5);
+  var this$13 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var this$12 = ScalaJS.m.Lscalatags_JsDom$all$().backgroundColor$1;
+  var v = ScalaJS.m.Lscalatex_scrollspy_Styles$().menuBackground$1;
   var ev$5 = ScalaJS.m.Lscalatags_JsDom$all$().stringStyle$1;
-  var s$7 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this$27, "1px solid #444", ev$5);
-  return jsx$10.apply__sc_Seq__Lscalatags_stylesheet_Cls(new ScalaJS.c.sjs_js_WrappedArray().init___sjs_js_Array([jsx$9, jsx$7, jsx$5, jsx$4, jsx$3, jsx$2, jsx$1, new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$28, s$7)]))
+  var s$6 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this$12, v, ev$5);
+  return jsx$7.apply__sc_Seq__Lscalatags_stylesheet_Cls(new ScalaJS.c.sjs_js_WrappedArray().init___sjs_js_Array([jsx$6, jsx$5, jsx$4, jsx$3, jsx$2, jsx$1, new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$13, s$6)]))
+});
+ScalaJS.s.Lscalatex_scrollspy_Styles$class__menu__Lscalatex_scrollspy_Styles__Lscalatags_stylesheet_Cls = (function($$this) {
+  var jsx$8 = $$this.cls__Lscalatags_stylesheet_StyleSheet$cls$();
+  var this$1 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var s = ScalaJS.m.Lscalatags_JsDom$all$().position__Lscalatags_generic_Styles$position$().fixed$2;
+  var jsx$7 = new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$1, s);
+  var this$2 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var s$1 = ScalaJS.m.Lscalatags_JsDom$all$().overflow__Lscalatags_generic_Styles$overflow$().scroll$2;
+  var jsx$6 = new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$2, s$1);
+  var this$3 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var s$2 = ScalaJS.m.Lscalatags_JsDom$all$().whiteSpace__Lscalatags_generic_Styles$whiteSpace$().nowrap$2;
+  var jsx$5 = new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$3, s$2);
+  var this$5 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var this$4 = ScalaJS.m.Lscalatags_JsDom$all$().backgroundColor$1;
+  var v = ScalaJS.m.Lscalatex_scrollspy_Styles$().menuBackground$1;
+  var ev = ScalaJS.m.Lscalatags_JsDom$all$().stringStyle$1;
+  var s$3 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this$4, v, ev);
+  var jsx$4 = new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$5, s$3);
+  var this$7 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var this$6 = ScalaJS.m.Lscalatags_JsDom$all$().transition$1;
+  var ev$1 = ScalaJS.m.Lscalatags_JsDom$all$().stringStyle$1;
+  var s$4 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this$6, "width 0.2s ease-out", ev$1);
+  var jsx$3 = new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$7, s$4);
+  var this$9 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var this$8 = ScalaJS.m.Lscalatags_JsDom$all$().height$1;
+  var ev$2 = ScalaJS.m.Lscalatags_JsDom$all$().stringPixelStyle$1;
+  var s$5 = ev$2.apply__Lscalatags_generic_Style__O__Lscalatags_generic_StylePair(this$8.realStyle$1, "100%");
+  var jsx$2 = new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$9, s$5);
+  var this$11 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var this$10 = ScalaJS.m.Lscalatags_JsDom$all$().left$1;
+  var ev$3 = ScalaJS.m.Lscalatags_JsDom$all$().intPixelStyle$1;
+  var s$6 = ev$3.apply__Lscalatags_generic_Style__O__Lscalatags_generic_StylePair(this$10.realStyle$1, 0);
+  var jsx$1 = new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$11, s$6);
+  var this$13 = ScalaJS.m.Lscalatags_JsDom$all$();
+  var this$12 = ScalaJS.m.Lscalatags_JsDom$all$().top$1;
+  var ev$4 = ScalaJS.m.Lscalatags_JsDom$all$().intPixelStyle$1;
+  var s$7 = ev$4.apply__Lscalatags_generic_Style__O__Lscalatags_generic_StylePair(this$12.realStyle$1, 0);
+  return jsx$8.apply__sc_Seq__Lscalatags_stylesheet_Cls(new ScalaJS.c.sjs_js_WrappedArray().init___sjs_js_Array([jsx$7, jsx$6, jsx$5, jsx$4, jsx$3, jsx$2, jsx$1, new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$13, s$7)]))
 });
 ScalaJS.s.Lscalatex_scrollspy_Styles$class__pathed__Lscalatex_scrollspy_Styles__Lscalatags_stylesheet_Cls = (function($$this) {
   var jsx$1 = $$this.cls__Lscalatags_stylesheet_StyleSheet$cls$();
@@ -2205,6 +2613,45 @@ ScalaJS.s.Lscalatex_scrollspy_Styles$class__pathed__Lscalatex_scrollspy_Styles__
   var s = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this$1, "2px solid white", ev);
   return jsx$1.apply__sc_Seq__Lscalatags_stylesheet_Cls(new ScalaJS.c.sjs_js_WrappedArray().init___sjs_js_Array([new ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag().init___Lscalatags_JsDom$Aggregate__Lscalatags_generic_StylePair(this$2, s)]))
 });
+/** @constructor */
+ScalaJS.c.Lscalatex_scrollspy_Toggler = (function() {
+  ScalaJS.c.O.call(this);
+  this.open$1 = false;
+  this.menu$1 = null;
+  this.body$1 = null;
+  this.all$1 = null
+});
+ScalaJS.c.Lscalatex_scrollspy_Toggler.prototype = new ScalaJS.h.O();
+ScalaJS.c.Lscalatex_scrollspy_Toggler.prototype.constructor = ScalaJS.c.Lscalatex_scrollspy_Toggler;
+/** @constructor */
+ScalaJS.h.Lscalatex_scrollspy_Toggler = (function() {
+  /*<skip>*/
+});
+ScalaJS.h.Lscalatex_scrollspy_Toggler.prototype = ScalaJS.c.Lscalatex_scrollspy_Toggler.prototype;
+ScalaJS.c.Lscalatex_scrollspy_Toggler.prototype.init___Z__F0__F0__F0 = (function(open, menu, body, all) {
+  this.open$1 = open;
+  this.menu$1 = menu;
+  this.body$1 = body;
+  this.all$1 = all;
+  return this
+});
+ScalaJS.c.Lscalatex_scrollspy_Toggler.prototype.apply__V = (function() {
+  this.body$1.apply__O()["style"]["transition"] = "margin-left 0.2s ease-out";
+  var width = (this.open$1 ? "250px" : new ScalaJS.c.s_StringContext().init___sc_Seq(new ScalaJS.c.sjs_js_WrappedArray().init___sjs_js_Array(["", "px"])).s__sc_Seq__T(new ScalaJS.c.sjs_js_WrappedArray().init___sjs_js_Array([ScalaJS.m.Lscalatex_scrollspy_Styles$().itemHeight$1])));
+  this.all$1.apply__O()["style"]["opacity"] = (this.open$1 ? "1.0" : "0.0");
+  this.menu$1.apply__O()["style"]["width"] = width;
+  this.body$1.apply__O()["style"]["marginLeft"] = width
+});
+ScalaJS.c.Lscalatex_scrollspy_Toggler.prototype.toggle__V = (function() {
+  this.open$1 = (!this.open$1)
+});
+ScalaJS.d.Lscalatex_scrollspy_Toggler = new ScalaJS.ClassTypeData({
+  Lscalatex_scrollspy_Toggler: 0
+}, false, "scalatex.scrollspy.Toggler", {
+  Lscalatex_scrollspy_Toggler: 1,
+  O: 1
+});
+ScalaJS.c.Lscalatex_scrollspy_Toggler.prototype.$classData = ScalaJS.d.Lscalatex_scrollspy_Toggler;
 /** @constructor */
 ScalaJS.c.Lupickle_Aliases$ = (function() {
   ScalaJS.c.O.call(this);
@@ -5337,6 +5784,15 @@ ScalaJS.s.sci_SortedMap$Default$class__$$plus__sci_SortedMap$Default__T2__sci_So
   b.$$plus$eq__O__scm_Builder(new ScalaJS.c.T2().init___O__O(kv.$$und1$f, kv.$$und2$f));
   return ScalaJS.as.sci_SortedMap(b.result__O())
 });
+ScalaJS.s.sci_SortedMap$class__$$plus$plus__sci_SortedMap__sc_GenTraversableOnce__sci_SortedMap = (function($$this, xs) {
+  return ScalaJS.as.sci_SortedMap(xs.seq__sc_TraversableOnce().$$div$colon__O__F2__O($$this, new ScalaJS.c.sjsr_AnonFunction2().init___sjs_js_Function2((function($$this$1) {
+    return (function(x$2$2, x$3$2) {
+      var x$2 = ScalaJS.as.sci_SortedMap(x$2$2);
+      var x$3 = ScalaJS.as.T2(x$3$2);
+      return x$2.$$plus__T2__sci_SortedMap(x$3)
+    })
+  })($$this))))
+});
 ScalaJS.s.sci_SortedMap$class__updated__sci_SortedMap__O__O__sci_SortedMap = (function($$this, key, value) {
   return $$this.$$plus__T2__sci_SortedMap(new ScalaJS.c.T2().init___O__O(key, value))
 });
@@ -7674,25 +8130,25 @@ ScalaJS.c.Lscalatags_JsDom$Aggregate$StyleFrag.prototype.applyTo__Lscalatags_sty
   this$2.apply__Lorg_scalajs_dom_raw_Element__Lscalatags_generic_Style__O__V(b, s, v);
   var x1 = ScalaJS.m.sjsr_RuntimeString$().split__T__T__I__AT(ScalaJS.as.T(b["getAttribute"]("style")), ":", 2);
   matchEnd4: {
-    var x$1;
+    var x$2;
     var o7 = ScalaJS.m.s_Array$().unapplySeq__O__s_Option(x1);
     if ((!o7.isEmpty__Z())) {
       if (((o7.get__O() !== null) && (ScalaJS.as.sc_SeqLike(o7.get__O()).lengthCompare__I__I(2) === 0))) {
         var style = ScalaJS.as.T(ScalaJS.as.sc_SeqLike(o7.get__O()).apply__I__O(0));
         var value = ScalaJS.as.T(ScalaJS.as.sc_SeqLike(o7.get__O()).apply__I__O(1));
-        var x$1_$_$$und1$f = style;
-        var x$1_$_$$und2$f = value;
+        var x$2_$_$$und1$f = style;
+        var x$2_$_$$und2$f = value;
         break matchEnd4
       }
     };
     throw new ScalaJS.c.s_MatchError().init___O(x1)
   };
-  var style$2 = ScalaJS.as.T(x$1_$_$$und1$f);
-  var value$2 = ScalaJS.as.T(x$1_$_$$und2$f);
-  var x$5 = c.styles$1.updated__O__O__sc_SortedMap(style$2, value$2);
-  var x$6 = c.selectors$1;
-  var x$7 = c.children$1;
-  return new ScalaJS.c.Lscalatags_stylesheet_StyleTree().init___sc_Seq__sc_SortedMap__sc_Seq(x$6, x$5, x$7)
+  var style$2 = ScalaJS.as.T(x$2_$_$$und1$f);
+  var value$2 = ScalaJS.as.T(x$2_$_$$und2$f);
+  var x$6 = c.styles$1.updated__O__O__sc_SortedMap(style$2, value$2);
+  var x$7 = c.selectors$1;
+  var x$8 = c.children$1;
+  return new ScalaJS.c.Lscalatags_stylesheet_StyleTree().init___sc_Seq__sc_SortedMap__sc_Seq(x$7, x$6, x$8)
 });
 ScalaJS.d.Lscalatags_JsDom$Aggregate$StyleFrag = new ScalaJS.ClassTypeData({
   Lscalatags_JsDom$Aggregate$StyleFrag: 0
@@ -7791,9 +8247,9 @@ ScalaJS.h.Lscalatags_JsDom$GenericStyle = (function() {
 ScalaJS.h.Lscalatags_JsDom$GenericStyle.prototype = ScalaJS.c.Lscalatags_JsDom$GenericStyle.prototype;
 ScalaJS.c.Lscalatags_JsDom$GenericStyle.prototype.apply__Lorg_scalajs_dom_raw_Element__Lscalatags_generic_Style__O__V = (function(t, s, v) {
   var qual$1 = t["style"];
-  var x$8 = s.cssName$1;
-  var x$9 = ScalaJS.objectToString(v);
-  qual$1["setProperty"](x$8, x$9)
+  var x$9 = s.cssName$1;
+  var x$10 = ScalaJS.objectToString(v);
+  qual$1["setProperty"](x$9, x$10)
 });
 ScalaJS.d.Lscalatags_JsDom$GenericStyle = new ScalaJS.ClassTypeData({
   Lscalatags_JsDom$GenericStyle: 0
@@ -7874,6 +8330,81 @@ ScalaJS.d.Lscalatags_generic_Namespace$$anon$2 = new ScalaJS.ClassTypeData({
   Lscalatags_generic_Namespace: 1
 });
 ScalaJS.c.Lscalatags_generic_Namespace$$anon$2.prototype.$classData = ScalaJS.d.Lscalatags_generic_Namespace$$anon$2;
+/** @constructor */
+ScalaJS.c.Lscalatags_generic_Util$SeqNode = (function() {
+  ScalaJS.c.O.call(this);
+  this.xs$1 = null;
+  this.scalatags$generic$Util$SeqNode$$evidence$1$f = null;
+  this.$$outer$f = null
+});
+ScalaJS.c.Lscalatags_generic_Util$SeqNode.prototype = new ScalaJS.h.O();
+ScalaJS.c.Lscalatags_generic_Util$SeqNode.prototype.constructor = ScalaJS.c.Lscalatags_generic_Util$SeqNode;
+/** @constructor */
+ScalaJS.h.Lscalatags_generic_Util$SeqNode = (function() {
+  /*<skip>*/
+});
+ScalaJS.h.Lscalatags_generic_Util$SeqNode.prototype = ScalaJS.c.Lscalatags_generic_Util$SeqNode.prototype;
+ScalaJS.c.Lscalatags_generic_Util$SeqNode.prototype.init___Lscalatags_generic_Util__sc_Seq__F1 = (function($$outer, xs, evidence$1) {
+  this.xs$1 = xs;
+  this.scalatags$generic$Util$SeqNode$$evidence$1$f = evidence$1;
+  if (($$outer === null)) {
+    throw ScalaJS.m.sjsr_package$().unwrapJavaScriptException__jl_Throwable__O(null)
+  } else {
+    this.$$outer$f = $$outer
+  };
+  return this
+});
+ScalaJS.c.Lscalatags_generic_Util$SeqNode.prototype.applyTo__O__V = (function(t) {
+  this.xs$1.foreach__F1__V(new ScalaJS.c.sjsr_AnonFunction1().init___sjs_js_Function1((function(arg$outer, t$1) {
+    return (function(x$1$2) {
+      ScalaJS.as.Lscalatags_generic_Modifier(arg$outer.scalatags$generic$Util$SeqNode$$evidence$1$f.apply__O__O(x$1$2)).applyTo__O__V(t$1)
+    })
+  })(this, t)))
+});
+ScalaJS.d.Lscalatags_generic_Util$SeqNode = new ScalaJS.ClassTypeData({
+  Lscalatags_generic_Util$SeqNode: 0
+}, false, "scalatags.generic.Util$SeqNode", {
+  Lscalatags_generic_Util$SeqNode: 1,
+  O: 1,
+  Lscalatags_generic_Modifier: 1
+});
+ScalaJS.c.Lscalatags_generic_Util$SeqNode.prototype.$classData = ScalaJS.d.Lscalatags_generic_Util$SeqNode;
+/** @constructor */
+ScalaJS.c.Lscalatags_stylesheet_Cls$$anon$1 = (function() {
+  ScalaJS.c.O.call(this);
+  this.$$outer$1 = null
+});
+ScalaJS.c.Lscalatags_stylesheet_Cls$$anon$1.prototype = new ScalaJS.h.O();
+ScalaJS.c.Lscalatags_stylesheet_Cls$$anon$1.prototype.constructor = ScalaJS.c.Lscalatags_stylesheet_Cls$$anon$1;
+/** @constructor */
+ScalaJS.h.Lscalatags_stylesheet_Cls$$anon$1 = (function() {
+  /*<skip>*/
+});
+ScalaJS.h.Lscalatags_stylesheet_Cls$$anon$1.prototype = ScalaJS.c.Lscalatags_stylesheet_Cls$$anon$1.prototype;
+ScalaJS.c.Lscalatags_stylesheet_Cls$$anon$1.prototype.applyTo__Lscalatags_stylesheet_StyleTree__Lscalatags_stylesheet_StyleTree = (function(st) {
+  var jsx$4 = st.selectors$1;
+  var jsx$3 = this.$$outer$1.structure__Lscalatags_stylesheet_StyleTree().styles$1.$$plus$plus__sc_GenTraversableOnce__sc_SortedMap(st.styles$1);
+  var jsx$2 = this.$$outer$1.structure__Lscalatags_stylesheet_StyleTree().children$1;
+  var jsx$1 = st.children$1;
+  var this$1 = ScalaJS.m.sc_Seq$();
+  return new ScalaJS.c.Lscalatags_stylesheet_StyleTree().init___sc_Seq__sc_SortedMap__sc_Seq(jsx$4, jsx$3, ScalaJS.as.sc_Seq(jsx$2.$$plus$plus__sc_GenTraversableOnce__scg_CanBuildFrom__O(jsx$1, this$1.ReusableCBFInstance$2)))
+});
+ScalaJS.c.Lscalatags_stylesheet_Cls$$anon$1.prototype.init___Lscalatags_stylesheet_Cls = (function($$outer) {
+  if (($$outer === null)) {
+    throw ScalaJS.m.sjsr_package$().unwrapJavaScriptException__jl_Throwable__O(null)
+  } else {
+    this.$$outer$1 = $$outer
+  };
+  return this
+});
+ScalaJS.d.Lscalatags_stylesheet_Cls$$anon$1 = new ScalaJS.ClassTypeData({
+  Lscalatags_stylesheet_Cls$$anon$1: 0
+}, false, "scalatags.stylesheet.Cls$$anon$1", {
+  Lscalatags_stylesheet_Cls$$anon$1: 1,
+  O: 1,
+  Lscalatags_stylesheet_StyleSheetFrag: 1
+});
+ScalaJS.c.Lscalatags_stylesheet_Cls$$anon$1.prototype.$classData = ScalaJS.d.Lscalatags_stylesheet_Cls$$anon$1;
 /** @constructor */
 ScalaJS.c.Lscalatags_stylesheet_Selector = (function() {
   ScalaJS.c.O.call(this);
@@ -8909,8 +9440,8 @@ ScalaJS.h.Lscalatags_JsDom$Cap$SeqFrag = (function() {
 ScalaJS.h.Lscalatags_JsDom$Cap$SeqFrag.prototype = ScalaJS.c.Lscalatags_JsDom$Cap$SeqFrag.prototype;
 ScalaJS.c.Lscalatags_JsDom$Cap$SeqFrag.prototype.applyTo__Lorg_scalajs_dom_raw_Element__V = (function(t) {
   this.xs$1.foreach__F1__V(new ScalaJS.c.sjsr_AnonFunction1().init___sjs_js_Function1((function(arg$outer, t$1) {
-    return (function(x$2$2) {
-      ScalaJS.as.Lscalatags_generic_Modifier(arg$outer.scalatags$JsDom$Cap$SeqFrag$$evidence$1$f.apply__O__O(x$2$2)).applyTo__O__V(t$1)
+    return (function(x$3$2) {
+      ScalaJS.as.Lscalatags_generic_Modifier(arg$outer.scalatags$JsDom$Cap$SeqFrag$$evidence$1$f.apply__O__O(x$3$2)).applyTo__O__V(t$1)
     })
   })(this, t)))
 });
@@ -9030,6 +9561,10 @@ ScalaJS.c.Lscalatags_stylesheet_StyleSheet$cls$.prototype.$classData = ScalaJS.d
 /** @constructor */
 ScalaJS.c.Lscalatex_scrollspy_Styles$$anon$1 = (function() {
   ScalaJS.c.O.call(this);
+  this.noteBox$1 = null;
+  this.note$1 = null;
+  this.menu$1 = null;
+  this.menuLink$1 = null;
   this.menuItem$1 = null;
   this.menuList$1 = null;
   this.selected$1 = null;
@@ -9052,38 +9587,98 @@ ScalaJS.c.Lscalatex_scrollspy_Styles$$anon$1.prototype.init___ = (function() {
   ScalaJS.s.Lscalatags_stylesheet_StyleSheet$class__$$init$__Lscalatags_stylesheet_StyleSheet__V(this);
   return this
 });
+ScalaJS.c.Lscalatex_scrollspy_Styles$$anon$1.prototype.noteBox$lzycompute__p1__Lscalatags_stylesheet_Cls = (function() {
+  if (((1 & this.bitmap$0$1) === 0)) {
+    var qual$1 = ScalaJS.s.Lscalatex_scrollspy_Styles$class__noteBox__Lscalatex_scrollspy_Styles__Lscalatags_stylesheet_Cls(this);
+    var pseudoSelectors = ScalaJS.s.Lscalatex_scrollspy_Styles$class__noteBox__Lscalatex_scrollspy_Styles__Lscalatags_stylesheet_Cls(this).name$1;
+    var x$1 = ScalaJS.s.Lscalatags_stylesheet_StyleSheet$class__nameFor__Lscalatags_stylesheet_StyleSheet__T__T__T(this, "noteBox", pseudoSelectors);
+    var x$2 = qual$1.pseudoSelectors$1;
+    var x$3 = qual$1.args$1;
+    this.noteBox$1 = new ScalaJS.c.Lscalatags_stylesheet_Cls().init___T__sc_Seq__sc_Seq(x$1, x$2, x$3);
+    this.bitmap$0$1 = (1 | this.bitmap$0$1)
+  };
+  return this.noteBox$1
+});
 ScalaJS.c.Lscalatex_scrollspy_Styles$$anon$1.prototype.closed__Lscalatags_stylesheet_Cls = (function() {
-  return (((8 & this.bitmap$0$1) === 0) ? this.closed$lzycompute__p1__Lscalatags_stylesheet_Cls() : this.closed$1)
+  return (((128 & this.bitmap$0$1) === 0) ? this.closed$lzycompute__p1__Lscalatags_stylesheet_Cls() : this.closed$1)
 });
 ScalaJS.c.Lscalatex_scrollspy_Styles$$anon$1.prototype.closed$lzycompute__p1__Lscalatags_stylesheet_Cls = (function() {
-  if (((8 & this.bitmap$0$1) === 0)) {
-    var qual$4 = ScalaJS.s.Lscalatex_scrollspy_Styles$class__closed__Lscalatex_scrollspy_Styles__Lscalatags_stylesheet_Cls(this);
+  if (((128 & this.bitmap$0$1) === 0)) {
+    var qual$8 = ScalaJS.s.Lscalatex_scrollspy_Styles$class__closed__Lscalatex_scrollspy_Styles__Lscalatags_stylesheet_Cls(this);
     var pseudoSelectors = ScalaJS.s.Lscalatex_scrollspy_Styles$class__closed__Lscalatex_scrollspy_Styles__Lscalatags_stylesheet_Cls(this).name$1;
-    var x$10 = ScalaJS.s.Lscalatags_stylesheet_StyleSheet$class__nameFor__Lscalatags_stylesheet_StyleSheet__T__T__T(this, "closed", pseudoSelectors);
-    var x$11 = qual$4.pseudoSelectors$1;
-    var x$12 = qual$4.args$1;
-    this.closed$1 = new ScalaJS.c.Lscalatags_stylesheet_Cls().init___T__sc_Seq__sc_Seq(x$10, x$11, x$12);
-    this.bitmap$0$1 = (8 | this.bitmap$0$1)
+    var x$22 = ScalaJS.s.Lscalatags_stylesheet_StyleSheet$class__nameFor__Lscalatags_stylesheet_StyleSheet__T__T__T(this, "closed", pseudoSelectors);
+    var x$23 = qual$8.pseudoSelectors$1;
+    var x$24 = qual$8.args$1;
+    this.closed$1 = new ScalaJS.c.Lscalatags_stylesheet_Cls().init___T__sc_Seq__sc_Seq(x$22, x$23, x$24);
+    this.bitmap$0$1 = (128 | this.bitmap$0$1)
   };
   return this.closed$1
 });
+ScalaJS.c.Lscalatex_scrollspy_Styles$$anon$1.prototype.menu__Lscalatags_stylesheet_Cls = (function() {
+  return (((4 & this.bitmap$0$1) === 0) ? this.menu$lzycompute__p1__Lscalatags_stylesheet_Cls() : this.menu$1)
+});
+ScalaJS.c.Lscalatex_scrollspy_Styles$$anon$1.prototype.menu$lzycompute__p1__Lscalatags_stylesheet_Cls = (function() {
+  if (((4 & this.bitmap$0$1) === 0)) {
+    var qual$3 = ScalaJS.s.Lscalatex_scrollspy_Styles$class__menu__Lscalatex_scrollspy_Styles__Lscalatags_stylesheet_Cls(this);
+    var pseudoSelectors = ScalaJS.s.Lscalatex_scrollspy_Styles$class__menu__Lscalatex_scrollspy_Styles__Lscalatags_stylesheet_Cls(this).name$1;
+    var x$7 = ScalaJS.s.Lscalatags_stylesheet_StyleSheet$class__nameFor__Lscalatags_stylesheet_StyleSheet__T__T__T(this, "menu", pseudoSelectors);
+    var x$8 = qual$3.pseudoSelectors$1;
+    var x$9 = qual$3.args$1;
+    this.menu$1 = new ScalaJS.c.Lscalatags_stylesheet_Cls().init___T__sc_Seq__sc_Seq(x$7, x$8, x$9);
+    this.bitmap$0$1 = (4 | this.bitmap$0$1)
+  };
+  return this.menu$1
+});
 ScalaJS.c.Lscalatex_scrollspy_Styles$$anon$1.prototype.menuItem__Lscalatags_stylesheet_Cls = (function() {
-  return (((1 & this.bitmap$0$1) === 0) ? this.menuItem$lzycompute__p1__Lscalatags_stylesheet_Cls() : this.menuItem$1)
+  return (((16 & this.bitmap$0$1) === 0) ? this.menuItem$lzycompute__p1__Lscalatags_stylesheet_Cls() : this.menuItem$1)
+});
+ScalaJS.c.Lscalatex_scrollspy_Styles$$anon$1.prototype.menuLink$lzycompute__p1__Lscalatags_stylesheet_Cls = (function() {
+  if (((8 & this.bitmap$0$1) === 0)) {
+    var qual$4 = ScalaJS.s.Lscalatex_scrollspy_Styles$class__menuLink__Lscalatex_scrollspy_Styles__Lscalatags_stylesheet_Cls(this);
+    var pseudoSelectors = ScalaJS.s.Lscalatex_scrollspy_Styles$class__menuLink__Lscalatex_scrollspy_Styles__Lscalatags_stylesheet_Cls(this).name$1;
+    var x$10 = ScalaJS.s.Lscalatags_stylesheet_StyleSheet$class__nameFor__Lscalatags_stylesheet_StyleSheet__T__T__T(this, "menuLink", pseudoSelectors);
+    var x$11 = qual$4.pseudoSelectors$1;
+    var x$12 = qual$4.args$1;
+    this.menuLink$1 = new ScalaJS.c.Lscalatags_stylesheet_Cls().init___T__sc_Seq__sc_Seq(x$10, x$11, x$12);
+    this.bitmap$0$1 = (8 | this.bitmap$0$1)
+  };
+  return this.menuLink$1
 });
 ScalaJS.c.Lscalatex_scrollspy_Styles$$anon$1.prototype.selected__Lscalatags_stylesheet_Cls = (function() {
-  return (((4 & this.bitmap$0$1) === 0) ? this.selected$lzycompute__p1__Lscalatags_stylesheet_Cls() : this.selected$1)
+  return (((64 & this.bitmap$0$1) === 0) ? this.selected$lzycompute__p1__Lscalatags_stylesheet_Cls() : this.selected$1)
 });
 ScalaJS.c.Lscalatex_scrollspy_Styles$$anon$1.prototype.menuItem$lzycompute__p1__Lscalatags_stylesheet_Cls = (function() {
-  if (((1 & this.bitmap$0$1) === 0)) {
-    var qual$1 = ScalaJS.s.Lscalatex_scrollspy_Styles$class__menuItem__Lscalatex_scrollspy_Styles__Lscalatags_stylesheet_Cls(this);
+  if (((16 & this.bitmap$0$1) === 0)) {
+    var qual$5 = ScalaJS.s.Lscalatex_scrollspy_Styles$class__menuItem__Lscalatex_scrollspy_Styles__Lscalatags_stylesheet_Cls(this);
     var pseudoSelectors = ScalaJS.s.Lscalatex_scrollspy_Styles$class__menuItem__Lscalatex_scrollspy_Styles__Lscalatags_stylesheet_Cls(this).name$1;
-    var x$1 = ScalaJS.s.Lscalatags_stylesheet_StyleSheet$class__nameFor__Lscalatags_stylesheet_StyleSheet__T__T__T(this, "menuItem", pseudoSelectors);
-    var x$2 = qual$1.pseudoSelectors$1;
-    var x$3 = qual$1.args$1;
-    this.menuItem$1 = new ScalaJS.c.Lscalatags_stylesheet_Cls().init___T__sc_Seq__sc_Seq(x$1, x$2, x$3);
-    this.bitmap$0$1 = (1 | this.bitmap$0$1)
+    var x$13 = ScalaJS.s.Lscalatags_stylesheet_StyleSheet$class__nameFor__Lscalatags_stylesheet_StyleSheet__T__T__T(this, "menuItem", pseudoSelectors);
+    var x$14 = qual$5.pseudoSelectors$1;
+    var x$15 = qual$5.args$1;
+    this.menuItem$1 = new ScalaJS.c.Lscalatags_stylesheet_Cls().init___T__sc_Seq__sc_Seq(x$13, x$14, x$15);
+    this.bitmap$0$1 = (16 | this.bitmap$0$1)
   };
   return this.menuItem$1
+});
+ScalaJS.c.Lscalatex_scrollspy_Styles$$anon$1.prototype.note$lzycompute__p1__Lscalatags_stylesheet_Cls = (function() {
+  if (((2 & this.bitmap$0$1) === 0)) {
+    var qual$2 = ScalaJS.s.Lscalatex_scrollspy_Styles$class__note__Lscalatex_scrollspy_Styles__Lscalatags_stylesheet_Cls(this);
+    var pseudoSelectors = ScalaJS.s.Lscalatex_scrollspy_Styles$class__note__Lscalatex_scrollspy_Styles__Lscalatags_stylesheet_Cls(this).name$1;
+    var x$4 = ScalaJS.s.Lscalatags_stylesheet_StyleSheet$class__nameFor__Lscalatags_stylesheet_StyleSheet__T__T__T(this, "note", pseudoSelectors);
+    var x$5 = qual$2.pseudoSelectors$1;
+    var x$6 = qual$2.args$1;
+    this.note$1 = new ScalaJS.c.Lscalatags_stylesheet_Cls().init___T__sc_Seq__sc_Seq(x$4, x$5, x$6);
+    this.bitmap$0$1 = (2 | this.bitmap$0$1)
+  };
+  return this.note$1
+});
+ScalaJS.c.Lscalatex_scrollspy_Styles$$anon$1.prototype.noteBox__Lscalatags_stylesheet_Cls = (function() {
+  return (((1 & this.bitmap$0$1) === 0) ? this.noteBox$lzycompute__p1__Lscalatags_stylesheet_Cls() : this.noteBox$1)
+});
+ScalaJS.c.Lscalatex_scrollspy_Styles$$anon$1.prototype.note__Lscalatags_stylesheet_Cls = (function() {
+  return (((2 & this.bitmap$0$1) === 0) ? this.note$lzycompute__p1__Lscalatags_stylesheet_Cls() : this.note$1)
+});
+ScalaJS.c.Lscalatex_scrollspy_Styles$$anon$1.prototype.menuLink__Lscalatags_stylesheet_Cls = (function() {
+  return (((8 & this.bitmap$0$1) === 0) ? this.menuLink$lzycompute__p1__Lscalatags_stylesheet_Cls() : this.menuLink$1)
 });
 ScalaJS.c.Lscalatex_scrollspy_Styles$$anon$1.prototype.cls$lzycompute__p1__Lscalatags_stylesheet_StyleSheet$cls$ = (function() {
   if ((this.cls$module$1 === null)) {
@@ -9092,59 +9687,59 @@ ScalaJS.c.Lscalatex_scrollspy_Styles$$anon$1.prototype.cls$lzycompute__p1__Lscal
   return this.cls$module$1
 });
 ScalaJS.c.Lscalatex_scrollspy_Styles$$anon$1.prototype.pathed$lzycompute__p1__Lscalatags_stylesheet_Cls = (function() {
-  if (((16 & this.bitmap$0$1) === 0)) {
-    var qual$5 = ScalaJS.s.Lscalatex_scrollspy_Styles$class__pathed__Lscalatex_scrollspy_Styles__Lscalatags_stylesheet_Cls(this);
+  if (((256 & this.bitmap$0$1) === 0)) {
+    var qual$9 = ScalaJS.s.Lscalatex_scrollspy_Styles$class__pathed__Lscalatex_scrollspy_Styles__Lscalatags_stylesheet_Cls(this);
     var pseudoSelectors = ScalaJS.s.Lscalatex_scrollspy_Styles$class__pathed__Lscalatex_scrollspy_Styles__Lscalatags_stylesheet_Cls(this).name$1;
-    var x$13 = ScalaJS.s.Lscalatags_stylesheet_StyleSheet$class__nameFor__Lscalatags_stylesheet_StyleSheet__T__T__T(this, "pathed", pseudoSelectors);
-    var x$14 = qual$5.pseudoSelectors$1;
-    var x$15 = qual$5.args$1;
-    this.pathed$1 = new ScalaJS.c.Lscalatags_stylesheet_Cls().init___T__sc_Seq__sc_Seq(x$13, x$14, x$15);
-    this.bitmap$0$1 = (16 | this.bitmap$0$1)
+    var x$25 = ScalaJS.s.Lscalatags_stylesheet_StyleSheet$class__nameFor__Lscalatags_stylesheet_StyleSheet__T__T__T(this, "pathed", pseudoSelectors);
+    var x$26 = qual$9.pseudoSelectors$1;
+    var x$27 = qual$9.args$1;
+    this.pathed$1 = new ScalaJS.c.Lscalatags_stylesheet_Cls().init___T__sc_Seq__sc_Seq(x$25, x$26, x$27);
+    this.bitmap$0$1 = (256 | this.bitmap$0$1)
   };
   return this.pathed$1
 });
-ScalaJS.c.Lscalatex_scrollspy_Styles$$anon$1.prototype.pathed__Lscalatags_stylesheet_Cls = (function() {
-  return (((16 & this.bitmap$0$1) === 0) ? this.pathed$lzycompute__p1__Lscalatags_stylesheet_Cls() : this.pathed$1)
-});
 ScalaJS.c.Lscalatex_scrollspy_Styles$$anon$1.prototype.menuList$lzycompute__p1__Lscalatags_stylesheet_Cls = (function() {
-  if (((2 & this.bitmap$0$1) === 0)) {
-    var qual$2 = ScalaJS.s.Lscalatex_scrollspy_Styles$class__menuList__Lscalatex_scrollspy_Styles__Lscalatags_stylesheet_Cls(this);
+  if (((32 & this.bitmap$0$1) === 0)) {
+    var qual$6 = ScalaJS.s.Lscalatex_scrollspy_Styles$class__menuList__Lscalatex_scrollspy_Styles__Lscalatags_stylesheet_Cls(this);
     var pseudoSelectors = ScalaJS.s.Lscalatex_scrollspy_Styles$class__menuList__Lscalatex_scrollspy_Styles__Lscalatags_stylesheet_Cls(this).name$1;
-    var x$4 = ScalaJS.s.Lscalatags_stylesheet_StyleSheet$class__nameFor__Lscalatags_stylesheet_StyleSheet__T__T__T(this, "menuList", pseudoSelectors);
-    var x$5 = qual$2.pseudoSelectors$1;
-    var x$6 = qual$2.args$1;
-    this.menuList$1 = new ScalaJS.c.Lscalatags_stylesheet_Cls().init___T__sc_Seq__sc_Seq(x$4, x$5, x$6);
-    this.bitmap$0$1 = (2 | this.bitmap$0$1)
+    var x$16 = ScalaJS.s.Lscalatags_stylesheet_StyleSheet$class__nameFor__Lscalatags_stylesheet_StyleSheet__T__T__T(this, "menuList", pseudoSelectors);
+    var x$17 = qual$6.pseudoSelectors$1;
+    var x$18 = qual$6.args$1;
+    this.menuList$1 = new ScalaJS.c.Lscalatags_stylesheet_Cls().init___T__sc_Seq__sc_Seq(x$16, x$17, x$18);
+    this.bitmap$0$1 = (32 | this.bitmap$0$1)
   };
   return this.menuList$1
 });
 ScalaJS.c.Lscalatex_scrollspy_Styles$$anon$1.prototype.cls__Lscalatags_stylesheet_StyleSheet$cls$ = (function() {
   return ((this.cls$module$1 === null) ? this.cls$lzycompute__p1__Lscalatags_stylesheet_StyleSheet$cls$() : this.cls$module$1)
 });
+ScalaJS.c.Lscalatex_scrollspy_Styles$$anon$1.prototype.pathed__Lscalatags_stylesheet_Cls = (function() {
+  return (((256 & this.bitmap$0$1) === 0) ? this.pathed$lzycompute__p1__Lscalatags_stylesheet_Cls() : this.pathed$1)
+});
 ScalaJS.c.Lscalatex_scrollspy_Styles$$anon$1.prototype.selected$lzycompute__p1__Lscalatags_stylesheet_Cls = (function() {
-  if (((4 & this.bitmap$0$1) === 0)) {
-    var qual$3 = ScalaJS.s.Lscalatex_scrollspy_Styles$class__selected__Lscalatex_scrollspy_Styles__Lscalatags_stylesheet_Cls(this);
+  if (((64 & this.bitmap$0$1) === 0)) {
+    var qual$7 = ScalaJS.s.Lscalatex_scrollspy_Styles$class__selected__Lscalatex_scrollspy_Styles__Lscalatags_stylesheet_Cls(this);
     var pseudoSelectors = ScalaJS.s.Lscalatex_scrollspy_Styles$class__selected__Lscalatex_scrollspy_Styles__Lscalatags_stylesheet_Cls(this).name$1;
-    var x$7 = ScalaJS.s.Lscalatags_stylesheet_StyleSheet$class__nameFor__Lscalatags_stylesheet_StyleSheet__T__T__T(this, "selected", pseudoSelectors);
-    var x$8 = qual$3.pseudoSelectors$1;
-    var x$9 = qual$3.args$1;
-    this.selected$1 = new ScalaJS.c.Lscalatags_stylesheet_Cls().init___T__sc_Seq__sc_Seq(x$7, x$8, x$9);
-    this.bitmap$0$1 = (4 | this.bitmap$0$1)
+    var x$19 = ScalaJS.s.Lscalatags_stylesheet_StyleSheet$class__nameFor__Lscalatags_stylesheet_StyleSheet__T__T__T(this, "selected", pseudoSelectors);
+    var x$20 = qual$7.pseudoSelectors$1;
+    var x$21 = qual$7.args$1;
+    this.selected$1 = new ScalaJS.c.Lscalatags_stylesheet_Cls().init___T__sc_Seq__sc_Seq(x$19, x$20, x$21);
+    this.bitmap$0$1 = (64 | this.bitmap$0$1)
   };
   return this.selected$1
 });
 ScalaJS.c.Lscalatex_scrollspy_Styles$$anon$1.prototype.allClasses$lzycompute__p1__sc_Seq = (function() {
-  if (((32 & this.bitmap$0$1) === 0)) {
-    this.allClasses$1 = ScalaJS.as.sc_Seq(ScalaJS.m.sc_Seq$().apply__sc_Seq__sc_GenTraversable(new ScalaJS.c.sjs_js_WrappedArray().init___sjs_js_Array([this.menuItem__Lscalatags_stylesheet_Cls(), this.menuList__Lscalatags_stylesheet_Cls(), this.selected__Lscalatags_stylesheet_Cls(), this.closed__Lscalatags_stylesheet_Cls(), this.pathed__Lscalatags_stylesheet_Cls()])));
-    this.bitmap$0$1 = (32 | this.bitmap$0$1)
+  if (((512 & this.bitmap$0$1) === 0)) {
+    this.allClasses$1 = ScalaJS.as.sc_Seq(ScalaJS.m.sc_Seq$().apply__sc_Seq__sc_GenTraversable(new ScalaJS.c.sjs_js_WrappedArray().init___sjs_js_Array([this.noteBox__Lscalatags_stylesheet_Cls(), this.note__Lscalatags_stylesheet_Cls(), this.menu__Lscalatags_stylesheet_Cls(), this.menuLink__Lscalatags_stylesheet_Cls(), this.menuItem__Lscalatags_stylesheet_Cls(), this.menuList__Lscalatags_stylesheet_Cls(), this.selected__Lscalatags_stylesheet_Cls(), this.closed__Lscalatags_stylesheet_Cls(), this.pathed__Lscalatags_stylesheet_Cls()])));
+    this.bitmap$0$1 = (512 | this.bitmap$0$1)
   };
   return this.allClasses$1
 });
-ScalaJS.c.Lscalatex_scrollspy_Styles$$anon$1.prototype.allClasses__sc_Seq = (function() {
-  return (((32 & this.bitmap$0$1) === 0) ? this.allClasses$lzycompute__p1__sc_Seq() : this.allClasses$1)
-});
 ScalaJS.c.Lscalatex_scrollspy_Styles$$anon$1.prototype.menuList__Lscalatags_stylesheet_Cls = (function() {
-  return (((2 & this.bitmap$0$1) === 0) ? this.menuList$lzycompute__p1__Lscalatags_stylesheet_Cls() : this.menuList$1)
+  return (((32 & this.bitmap$0$1) === 0) ? this.menuList$lzycompute__p1__Lscalatags_stylesheet_Cls() : this.menuList$1)
+});
+ScalaJS.c.Lscalatex_scrollspy_Styles$$anon$1.prototype.allClasses__sc_Seq = (function() {
+  return (((512 & this.bitmap$0$1) === 0) ? this.allClasses$lzycompute__p1__sc_Seq() : this.allClasses$1)
 });
 ScalaJS.d.Lscalatex_scrollspy_Styles$$anon$1 = new ScalaJS.ClassTypeData({
   Lscalatex_scrollspy_Styles$$anon$1: 0
@@ -12811,6 +13406,9 @@ ScalaJS.c.Lorg_scalajs_dom_ext_EasySeq$$anon$1.prototype.addString__scm_StringBu
 ScalaJS.c.Lorg_scalajs_dom_ext_EasySeq$$anon$1.prototype.max__s_math_Ordering__O = (function(cmp) {
   return ScalaJS.s.sc_TraversableOnce$class__max__sc_TraversableOnce__s_math_Ordering__O(this, cmp)
 });
+ScalaJS.c.Lorg_scalajs_dom_ext_EasySeq$$anon$1.prototype.$$div$colon__O__F2__O = (function(z, op) {
+  return ScalaJS.s.sc_TraversableOnce$class__foldLeft__sc_TraversableOnce__O__F2__O(this, z, op)
+});
 ScalaJS.c.Lorg_scalajs_dom_ext_EasySeq$$anon$1.prototype.isTraversableAgain__Z = (function() {
   return false
 });
@@ -13345,6 +13943,9 @@ ScalaJS.c.sc_AbstractIterator.prototype.addString__scm_StringBuilder__T__T__T__s
 ScalaJS.c.sc_AbstractIterator.prototype.max__s_math_Ordering__O = (function(cmp) {
   return ScalaJS.s.sc_TraversableOnce$class__max__sc_TraversableOnce__s_math_Ordering__O(this, cmp)
 });
+ScalaJS.c.sc_AbstractIterator.prototype.$$div$colon__O__F2__O = (function(z, op) {
+  return ScalaJS.s.sc_TraversableOnce$class__foldLeft__sc_TraversableOnce__O__F2__O(this, z, op)
+});
 ScalaJS.c.sc_AbstractIterator.prototype.isTraversableAgain__Z = (function() {
   return false
 });
@@ -13663,6 +14264,9 @@ ScalaJS.c.sci_RedBlackTree$TreeIterator.prototype.addString__scm_StringBuilder__
 });
 ScalaJS.c.sci_RedBlackTree$TreeIterator.prototype.max__s_math_Ordering__O = (function(cmp) {
   return ScalaJS.s.sc_TraversableOnce$class__max__sc_TraversableOnce__s_math_Ordering__O(this, cmp)
+});
+ScalaJS.c.sci_RedBlackTree$TreeIterator.prototype.$$div$colon__O__F2__O = (function(z, op) {
+  return ScalaJS.s.sc_TraversableOnce$class__foldLeft__sc_TraversableOnce__O__F2__O(this, z, op)
 });
 ScalaJS.c.sci_RedBlackTree$TreeIterator.prototype.isTraversableAgain__Z = (function() {
   return false
@@ -14072,6 +14676,9 @@ ScalaJS.c.sjs_js_WrappedDictionary$DictionaryIterator.prototype.addString__scm_S
 });
 ScalaJS.c.sjs_js_WrappedDictionary$DictionaryIterator.prototype.max__s_math_Ordering__O = (function(cmp) {
   return ScalaJS.s.sc_TraversableOnce$class__max__sc_TraversableOnce__s_math_Ordering__O(this, cmp)
+});
+ScalaJS.c.sjs_js_WrappedDictionary$DictionaryIterator.prototype.$$div$colon__O__F2__O = (function(z, op) {
+  return ScalaJS.s.sc_TraversableOnce$class__foldLeft__sc_TraversableOnce__O__F2__O(this, z, op)
 });
 ScalaJS.c.sjs_js_WrappedDictionary$DictionaryIterator.prototype.isTraversableAgain__Z = (function() {
   return false
@@ -17774,6 +18381,108 @@ ScalaJS.d.Lscalatags_generic_Styles$display$ = new ScalaJS.ClassTypeData({
 });
 ScalaJS.c.Lscalatags_generic_Styles$display$.prototype.$classData = ScalaJS.d.Lscalatags_generic_Styles$display$;
 /** @constructor */
+ScalaJS.c.Lscalatags_generic_Styles$fontSize$ = (function() {
+  ScalaJS.c.Lscalatags_generic_Style.call(this);
+  this.xx$minussmall$2 = null;
+  this.x$minussmall$2 = null;
+  this.small$2 = null;
+  this.medium$2 = null;
+  this.large$2 = null;
+  this.x$minuslarge$2 = null;
+  this.xx$minuslarge$2 = null;
+  this.larger$2 = null;
+  this.smaller$2 = null;
+  this.$$outer$2 = null
+});
+ScalaJS.c.Lscalatags_generic_Styles$fontSize$.prototype = new ScalaJS.h.Lscalatags_generic_Style();
+ScalaJS.c.Lscalatags_generic_Styles$fontSize$.prototype.constructor = ScalaJS.c.Lscalatags_generic_Styles$fontSize$;
+/** @constructor */
+ScalaJS.h.Lscalatags_generic_Styles$fontSize$ = (function() {
+  /*<skip>*/
+});
+ScalaJS.h.Lscalatags_generic_Styles$fontSize$.prototype = ScalaJS.c.Lscalatags_generic_Styles$fontSize$.prototype;
+ScalaJS.c.Lscalatags_generic_Styles$fontSize$.prototype.init___Lscalatags_generic_Styles = (function($$outer) {
+  if (($$outer === null)) {
+    throw ScalaJS.m.sjsr_package$().unwrapJavaScriptException__jl_Throwable__O(null)
+  } else {
+    this.$$outer$2 = $$outer
+  };
+  ScalaJS.c.Lscalatags_generic_Style.prototype.init___T__T.call(this, "fontSize", "font-size");
+  var ev = new ScalaJS.c.Lscalatags_JsDom$GenericStyle().init___();
+  this.xx$minussmall$2 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this, "xx-small", ev);
+  var ev$1 = new ScalaJS.c.Lscalatags_JsDom$GenericStyle().init___();
+  this.x$minussmall$2 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this, "x-small", ev$1);
+  var ev$2 = new ScalaJS.c.Lscalatags_JsDom$GenericStyle().init___();
+  this.small$2 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this, "small", ev$2);
+  var ev$3 = new ScalaJS.c.Lscalatags_JsDom$GenericStyle().init___();
+  this.medium$2 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this, "medium", ev$3);
+  var ev$4 = new ScalaJS.c.Lscalatags_JsDom$GenericStyle().init___();
+  this.large$2 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this, "large", ev$4);
+  var ev$5 = new ScalaJS.c.Lscalatags_JsDom$GenericStyle().init___();
+  this.x$minuslarge$2 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this, "x-large", ev$5);
+  var ev$6 = new ScalaJS.c.Lscalatags_JsDom$GenericStyle().init___();
+  this.xx$minuslarge$2 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this, "xx-large", ev$6);
+  var ev$7 = new ScalaJS.c.Lscalatags_JsDom$GenericStyle().init___();
+  this.larger$2 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this, "larger", ev$7);
+  var ev$8 = new ScalaJS.c.Lscalatags_JsDom$GenericStyle().init___();
+  this.smaller$2 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this, "smaller", ev$8);
+  return this
+});
+ScalaJS.d.Lscalatags_generic_Styles$fontSize$ = new ScalaJS.ClassTypeData({
+  Lscalatags_generic_Styles$fontSize$: 0
+}, false, "scalatags.generic.Styles$fontSize$", {
+  Lscalatags_generic_Styles$fontSize$: 1,
+  Lscalatags_generic_Style: 1,
+  O: 1,
+  s_Product: 1,
+  s_Equals: 1,
+  s_Serializable: 1,
+  Ljava_io_Serializable: 1
+});
+ScalaJS.c.Lscalatags_generic_Styles$fontSize$.prototype.$classData = ScalaJS.d.Lscalatags_generic_Styles$fontSize$;
+/** @constructor */
+ScalaJS.c.Lscalatags_generic_Styles$fontStyle$ = (function() {
+  ScalaJS.c.Lscalatags_generic_Style.call(this);
+  this.normal$2 = null;
+  this.italic$2 = null;
+  this.oblique$2 = null;
+  this.$$outer$2 = null
+});
+ScalaJS.c.Lscalatags_generic_Styles$fontStyle$.prototype = new ScalaJS.h.Lscalatags_generic_Style();
+ScalaJS.c.Lscalatags_generic_Styles$fontStyle$.prototype.constructor = ScalaJS.c.Lscalatags_generic_Styles$fontStyle$;
+/** @constructor */
+ScalaJS.h.Lscalatags_generic_Styles$fontStyle$ = (function() {
+  /*<skip>*/
+});
+ScalaJS.h.Lscalatags_generic_Styles$fontStyle$.prototype = ScalaJS.c.Lscalatags_generic_Styles$fontStyle$.prototype;
+ScalaJS.c.Lscalatags_generic_Styles$fontStyle$.prototype.init___Lscalatags_generic_Styles = (function($$outer) {
+  if (($$outer === null)) {
+    throw ScalaJS.m.sjsr_package$().unwrapJavaScriptException__jl_Throwable__O(null)
+  } else {
+    this.$$outer$2 = $$outer
+  };
+  ScalaJS.c.Lscalatags_generic_Style.prototype.init___T__T.call(this, "fontStyle", "font-style");
+  var ev = new ScalaJS.c.Lscalatags_JsDom$GenericStyle().init___();
+  this.normal$2 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this, "normal", ev);
+  var ev$1 = new ScalaJS.c.Lscalatags_JsDom$GenericStyle().init___();
+  this.italic$2 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this, "italic", ev$1);
+  var ev$2 = new ScalaJS.c.Lscalatags_JsDom$GenericStyle().init___();
+  this.oblique$2 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this, "oblique", ev$2);
+  return this
+});
+ScalaJS.d.Lscalatags_generic_Styles$fontStyle$ = new ScalaJS.ClassTypeData({
+  Lscalatags_generic_Styles$fontStyle$: 0
+}, false, "scalatags.generic.Styles$fontStyle$", {
+  Lscalatags_generic_Styles$fontStyle$: 1,
+  Lscalatags_generic_Style: 1,
+  O: 1,
+  s_Product: 1,
+  s_Equals: 1,
+  s_Serializable: 1,
+  Ljava_io_Serializable: 1
+});
+ScalaJS.c.Lscalatags_generic_Styles$fontStyle$.prototype.$classData = ScalaJS.d.Lscalatags_generic_Styles$fontStyle$;
+/** @constructor */
 ScalaJS.c.Lscalatags_generic_Styles$margin$ = (function() {
   ScalaJS.c.Lscalatags_generic_PixelStyle.call(this);
   this.auto$2 = null;
@@ -17899,6 +18608,54 @@ ScalaJS.d.Lscalatags_generic_Styles$textDecoration$ = new ScalaJS.ClassTypeData(
   Ljava_io_Serializable: 1
 });
 ScalaJS.c.Lscalatags_generic_Styles$textDecoration$.prototype.$classData = ScalaJS.d.Lscalatags_generic_Styles$textDecoration$;
+/** @constructor */
+ScalaJS.c.Lscalatags_generic_Styles$whiteSpace$ = (function() {
+  ScalaJS.c.Lscalatags_generic_Style.call(this);
+  this.normal$2 = null;
+  this.nowrap$2 = null;
+  this.pre$2 = null;
+  this.pre$minuswrap$2 = null;
+  this.pre$minusline$2 = null;
+  this.$$outer$2 = null
+});
+ScalaJS.c.Lscalatags_generic_Styles$whiteSpace$.prototype = new ScalaJS.h.Lscalatags_generic_Style();
+ScalaJS.c.Lscalatags_generic_Styles$whiteSpace$.prototype.constructor = ScalaJS.c.Lscalatags_generic_Styles$whiteSpace$;
+/** @constructor */
+ScalaJS.h.Lscalatags_generic_Styles$whiteSpace$ = (function() {
+  /*<skip>*/
+});
+ScalaJS.h.Lscalatags_generic_Styles$whiteSpace$.prototype = ScalaJS.c.Lscalatags_generic_Styles$whiteSpace$.prototype;
+ScalaJS.c.Lscalatags_generic_Styles$whiteSpace$.prototype.init___Lscalatags_generic_Styles = (function($$outer) {
+  if (($$outer === null)) {
+    throw ScalaJS.m.sjsr_package$().unwrapJavaScriptException__jl_Throwable__O(null)
+  } else {
+    this.$$outer$2 = $$outer
+  };
+  ScalaJS.c.Lscalatags_generic_Style.prototype.init___T__T.call(this, "whiteSpace", "white-space");
+  var ev = new ScalaJS.c.Lscalatags_JsDom$GenericStyle().init___();
+  this.normal$2 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this, "normal", ev);
+  var ev$1 = new ScalaJS.c.Lscalatags_JsDom$GenericStyle().init___();
+  this.nowrap$2 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this, "nowrap", ev$1);
+  var ev$2 = new ScalaJS.c.Lscalatags_JsDom$GenericStyle().init___();
+  this.pre$2 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this, "pre", ev$2);
+  var ev$3 = new ScalaJS.c.Lscalatags_JsDom$GenericStyle().init___();
+  this.pre$minuswrap$2 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this, "pre-wrap", ev$3);
+  var ev$4 = new ScalaJS.c.Lscalatags_JsDom$GenericStyle().init___();
+  this.pre$minusline$2 = new ScalaJS.c.Lscalatags_generic_StylePair().init___Lscalatags_generic_Style__O__Lscalatags_generic_StyleValue(this, "pre-line", ev$4);
+  return this
+});
+ScalaJS.d.Lscalatags_generic_Styles$whiteSpace$ = new ScalaJS.ClassTypeData({
+  Lscalatags_generic_Styles$whiteSpace$: 0
+}, false, "scalatags.generic.Styles$whiteSpace$", {
+  Lscalatags_generic_Styles$whiteSpace$: 1,
+  Lscalatags_generic_Style: 1,
+  O: 1,
+  s_Product: 1,
+  s_Equals: 1,
+  s_Serializable: 1,
+  Ljava_io_Serializable: 1
+});
+ScalaJS.c.Lscalatags_generic_Styles$whiteSpace$.prototype.$classData = ScalaJS.d.Lscalatags_generic_Styles$whiteSpace$;
 /** @constructor */
 ScalaJS.c.Lupickle_Generated$$anonfun$Tuple2R$1 = (function() {
   ScalaJS.c.sr_AbstractPartialFunction.call(this);
@@ -20163,6 +20920,9 @@ ScalaJS.h.Lscalatags_generic_Styles$$anon$4 = (function() {
   /*<skip>*/
 });
 ScalaJS.h.Lscalatags_generic_Styles$$anon$4.prototype = ScalaJS.c.Lscalatags_generic_Styles$$anon$4.prototype;
+ScalaJS.c.Lscalatags_generic_Styles$$anon$4.prototype.right__Lscalatags_generic_StylePair = (function() {
+  return this.right$2
+});
 ScalaJS.c.Lscalatags_generic_Styles$$anon$4.prototype.scalatags$generic$Styles$TextAlign$$undsetter$und$start$und$eq__Lscalatags_generic_StylePair__V = (function(x$1) {
   this.start$2 = x$1
 });
@@ -20225,6 +20985,9 @@ ScalaJS.h.Lscalatags_generic_Styles$$anon$5 = (function() {
   /*<skip>*/
 });
 ScalaJS.h.Lscalatags_generic_Styles$$anon$5.prototype = ScalaJS.c.Lscalatags_generic_Styles$$anon$5.prototype;
+ScalaJS.c.Lscalatags_generic_Styles$$anon$5.prototype.right__Lscalatags_generic_StylePair = (function() {
+  return this.right$2
+});
 ScalaJS.c.Lscalatags_generic_Styles$$anon$5.prototype.scalatags$generic$Styles$TextAlign$$undsetter$und$start$und$eq__Lscalatags_generic_StylePair__V = (function(x$1) {
   this.start$2 = x$1
 });
@@ -22806,12 +23569,12 @@ ScalaJS.c.Lscalatags_JsDom$TypedTag.prototype.render__Lorg_scalajs_dom_raw_Node 
   return this.render__Lorg_scalajs_dom_raw_Element()
 });
 ScalaJS.c.Lscalatags_JsDom$TypedTag.prototype.apply__sc_Seq__Lscalatags_JsDom$TypedTag = (function(xs) {
-  var x$11 = this.tag$1;
-  var x$12 = this.void$1;
+  var x$12 = this.tag$1;
+  var x$13 = this.void$1;
   var this$1 = this.modifiers$1;
-  var x$13 = new ScalaJS.c.sci_$colon$colon().init___O__sci_List(xs, this$1);
-  var x$14 = this.namespace$1;
-  return new ScalaJS.c.Lscalatags_JsDom$TypedTag().init___T__sci_List__Z__Lscalatags_generic_Namespace(x$11, x$13, x$12, x$14)
+  var x$14 = new ScalaJS.c.sci_$colon$colon().init___O__sci_List(xs, this$1);
+  var x$15 = this.namespace$1;
+  return new ScalaJS.c.Lscalatags_JsDom$TypedTag().init___T__sci_List__Z__Lscalatags_generic_Namespace(x$12, x$14, x$13, x$15)
 });
 ScalaJS.c.Lscalatags_JsDom$TypedTag.prototype.init___T__sci_List__Z__Lscalatags_generic_Namespace = (function(tag, modifiers, void$2, namespace) {
   this.tag$1 = tag;
@@ -23876,6 +24639,9 @@ ScalaJS.c.sc_AbstractTraversable.prototype.max__s_math_Ordering__O = (function(c
 ScalaJS.c.sc_AbstractTraversable.prototype.repr__O = (function() {
   return this
 });
+ScalaJS.c.sc_AbstractTraversable.prototype.$$div$colon__O__F2__O = (function(z, op) {
+  return this.foldLeft__O__F2__O(z, op)
+});
 ScalaJS.c.sc_AbstractTraversable.prototype.isTraversableAgain__Z = (function() {
   return true
 });
@@ -24263,6 +25029,10 @@ ScalaJS.c.sci_StringOps.prototype.max__s_math_Ordering__O = (function(cmp) {
 ScalaJS.c.sci_StringOps.prototype.repr__O = (function() {
   return this.repr$1
 });
+ScalaJS.c.sci_StringOps.prototype.$$div$colon__O__F2__O = (function(z, op) {
+  var $$this = this.repr$1;
+  return ScalaJS.s.sc_IndexedSeqOptimized$class__foldl__p0__sc_IndexedSeqOptimized__I__I__O__F2__O(this, 0, ScalaJS.uI($$this["length"]), z, op)
+});
 ScalaJS.c.sci_StringOps.prototype.copyToArray__O__I__I__V = (function(xs, start, len) {
   ScalaJS.s.sc_IndexedSeqOptimized$class__copyToArray__sc_IndexedSeqOptimized__O__I__I__V(this, xs, start, len)
 });
@@ -24489,6 +25259,10 @@ ScalaJS.c.scm_ArrayOps$ofBoolean.prototype.init___AZ = (function(repr) {
 ScalaJS.c.scm_ArrayOps$ofBoolean.prototype.repr__O = (function() {
   return this.repr$1
 });
+ScalaJS.c.scm_ArrayOps$ofBoolean.prototype.$$div$colon__O__F2__O = (function(z, op) {
+  var $$this = this.repr$1;
+  return ScalaJS.s.sc_IndexedSeqOptimized$class__foldl__p0__sc_IndexedSeqOptimized__I__I__O__F2__O(this, 0, $$this.u["length"], z, op)
+});
 ScalaJS.c.scm_ArrayOps$ofBoolean.prototype.copyToArray__O__I__I__V = (function(xs, start, len) {
   ScalaJS.s.scm_ArrayOps$class__copyToArray__scm_ArrayOps__O__I__I__V(this, xs, start, len)
 });
@@ -24671,6 +25445,10 @@ ScalaJS.c.scm_ArrayOps$ofByte.prototype.max__s_math_Ordering__O = (function(cmp)
 });
 ScalaJS.c.scm_ArrayOps$ofByte.prototype.repr__O = (function() {
   return this.repr$1
+});
+ScalaJS.c.scm_ArrayOps$ofByte.prototype.$$div$colon__O__F2__O = (function(z, op) {
+  var $$this = this.repr$1;
+  return ScalaJS.s.sc_IndexedSeqOptimized$class__foldl__p0__sc_IndexedSeqOptimized__I__I__O__F2__O(this, 0, $$this.u["length"], z, op)
 });
 ScalaJS.c.scm_ArrayOps$ofByte.prototype.copyToArray__O__I__I__V = (function(xs, start, len) {
   ScalaJS.s.scm_ArrayOps$class__copyToArray__scm_ArrayOps__O__I__I__V(this, xs, start, len)
@@ -24864,6 +25642,10 @@ ScalaJS.c.scm_ArrayOps$ofChar.prototype.max__s_math_Ordering__O = (function(cmp)
 ScalaJS.c.scm_ArrayOps$ofChar.prototype.repr__O = (function() {
   return this.repr$1
 });
+ScalaJS.c.scm_ArrayOps$ofChar.prototype.$$div$colon__O__F2__O = (function(z, op) {
+  var $$this = this.repr$1;
+  return ScalaJS.s.sc_IndexedSeqOptimized$class__foldl__p0__sc_IndexedSeqOptimized__I__I__O__F2__O(this, 0, $$this.u["length"], z, op)
+});
 ScalaJS.c.scm_ArrayOps$ofChar.prototype.copyToArray__O__I__I__V = (function(xs, start, len) {
   ScalaJS.s.scm_ArrayOps$class__copyToArray__scm_ArrayOps__O__I__I__V(this, xs, start, len)
 });
@@ -25050,6 +25832,10 @@ ScalaJS.c.scm_ArrayOps$ofDouble.prototype.max__s_math_Ordering__O = (function(cm
 });
 ScalaJS.c.scm_ArrayOps$ofDouble.prototype.repr__O = (function() {
   return this.repr$1
+});
+ScalaJS.c.scm_ArrayOps$ofDouble.prototype.$$div$colon__O__F2__O = (function(z, op) {
+  var $$this = this.repr$1;
+  return ScalaJS.s.sc_IndexedSeqOptimized$class__foldl__p0__sc_IndexedSeqOptimized__I__I__O__F2__O(this, 0, $$this.u["length"], z, op)
 });
 ScalaJS.c.scm_ArrayOps$ofDouble.prototype.copyToArray__O__I__I__V = (function(xs, start, len) {
   ScalaJS.s.scm_ArrayOps$class__copyToArray__scm_ArrayOps__O__I__I__V(this, xs, start, len)
@@ -25238,6 +26024,10 @@ ScalaJS.c.scm_ArrayOps$ofFloat.prototype.max__s_math_Ordering__O = (function(cmp
 ScalaJS.c.scm_ArrayOps$ofFloat.prototype.repr__O = (function() {
   return this.repr$1
 });
+ScalaJS.c.scm_ArrayOps$ofFloat.prototype.$$div$colon__O__F2__O = (function(z, op) {
+  var $$this = this.repr$1;
+  return ScalaJS.s.sc_IndexedSeqOptimized$class__foldl__p0__sc_IndexedSeqOptimized__I__I__O__F2__O(this, 0, $$this.u["length"], z, op)
+});
 ScalaJS.c.scm_ArrayOps$ofFloat.prototype.copyToArray__O__I__I__V = (function(xs, start, len) {
   ScalaJS.s.scm_ArrayOps$class__copyToArray__scm_ArrayOps__O__I__I__V(this, xs, start, len)
 });
@@ -25424,6 +26214,10 @@ ScalaJS.c.scm_ArrayOps$ofInt.prototype.max__s_math_Ordering__O = (function(cmp) 
 });
 ScalaJS.c.scm_ArrayOps$ofInt.prototype.repr__O = (function() {
   return this.repr$1
+});
+ScalaJS.c.scm_ArrayOps$ofInt.prototype.$$div$colon__O__F2__O = (function(z, op) {
+  var $$this = this.repr$1;
+  return ScalaJS.s.sc_IndexedSeqOptimized$class__foldl__p0__sc_IndexedSeqOptimized__I__I__O__F2__O(this, 0, $$this.u["length"], z, op)
 });
 ScalaJS.c.scm_ArrayOps$ofInt.prototype.copyToArray__O__I__I__V = (function(xs, start, len) {
   ScalaJS.s.scm_ArrayOps$class__copyToArray__scm_ArrayOps__O__I__I__V(this, xs, start, len)
@@ -25612,6 +26406,10 @@ ScalaJS.c.scm_ArrayOps$ofLong.prototype.max__s_math_Ordering__O = (function(cmp)
 ScalaJS.c.scm_ArrayOps$ofLong.prototype.repr__O = (function() {
   return this.repr$1
 });
+ScalaJS.c.scm_ArrayOps$ofLong.prototype.$$div$colon__O__F2__O = (function(z, op) {
+  var $$this = this.repr$1;
+  return ScalaJS.s.sc_IndexedSeqOptimized$class__foldl__p0__sc_IndexedSeqOptimized__I__I__O__F2__O(this, 0, $$this.u["length"], z, op)
+});
 ScalaJS.c.scm_ArrayOps$ofLong.prototype.copyToArray__O__I__I__V = (function(xs, start, len) {
   ScalaJS.s.scm_ArrayOps$class__copyToArray__scm_ArrayOps__O__I__I__V(this, xs, start, len)
 });
@@ -25799,6 +26597,10 @@ ScalaJS.c.scm_ArrayOps$ofRef.prototype.max__s_math_Ordering__O = (function(cmp) 
 ScalaJS.c.scm_ArrayOps$ofRef.prototype.repr__O = (function() {
   return this.repr$1
 });
+ScalaJS.c.scm_ArrayOps$ofRef.prototype.$$div$colon__O__F2__O = (function(z, op) {
+  var $$this = this.repr$1;
+  return ScalaJS.s.sc_IndexedSeqOptimized$class__foldl__p0__sc_IndexedSeqOptimized__I__I__O__F2__O(this, 0, $$this.u["length"], z, op)
+});
 ScalaJS.c.scm_ArrayOps$ofRef.prototype.copyToArray__O__I__I__V = (function(xs, start, len) {
   ScalaJS.s.scm_ArrayOps$class__copyToArray__scm_ArrayOps__O__I__I__V(this, xs, start, len)
 });
@@ -25985,6 +26787,10 @@ ScalaJS.c.scm_ArrayOps$ofShort.prototype.max__s_math_Ordering__O = (function(cmp
 ScalaJS.c.scm_ArrayOps$ofShort.prototype.repr__O = (function() {
   return this.repr$1
 });
+ScalaJS.c.scm_ArrayOps$ofShort.prototype.$$div$colon__O__F2__O = (function(z, op) {
+  var $$this = this.repr$1;
+  return ScalaJS.s.sc_IndexedSeqOptimized$class__foldl__p0__sc_IndexedSeqOptimized__I__I__O__F2__O(this, 0, $$this.u["length"], z, op)
+});
 ScalaJS.c.scm_ArrayOps$ofShort.prototype.copyToArray__O__I__I__V = (function(xs, start, len) {
   ScalaJS.s.scm_ArrayOps$class__copyToArray__scm_ArrayOps__O__I__I__V(this, xs, start, len)
 });
@@ -26170,6 +26976,10 @@ ScalaJS.c.scm_ArrayOps$ofUnit.prototype.max__s_math_Ordering__O = (function(cmp)
 });
 ScalaJS.c.scm_ArrayOps$ofUnit.prototype.repr__O = (function() {
   return this.repr$1
+});
+ScalaJS.c.scm_ArrayOps$ofUnit.prototype.$$div$colon__O__F2__O = (function(z, op) {
+  var $$this = this.repr$1;
+  return ScalaJS.s.sc_IndexedSeqOptimized$class__foldl__p0__sc_IndexedSeqOptimized__I__I__O__F2__O(this, 0, $$this.u["length"], z, op)
 });
 ScalaJS.c.scm_ArrayOps$ofUnit.prototype.copyToArray__O__I__I__V = (function(xs, start, len) {
   ScalaJS.s.scm_ArrayOps$class__copyToArray__scm_ArrayOps__O__I__I__V(this, xs, start, len)
@@ -26407,6 +27217,9 @@ ScalaJS.c.Lorg_scalajs_dom_ext_EasySeq.prototype.isDefinedAt__O__Z = (function(x
 });
 ScalaJS.c.Lorg_scalajs_dom_ext_EasySeq.prototype.repr__O = (function() {
   return this
+});
+ScalaJS.c.Lorg_scalajs_dom_ext_EasySeq.prototype.$$div$colon__O__F2__O = (function(z, op) {
+  return ScalaJS.s.sc_TraversableOnce$class__foldLeft__sc_TraversableOnce__O__F2__O(this, z, op)
 });
 ScalaJS.c.Lorg_scalajs_dom_ext_EasySeq.prototype.applyOrElse__O__F1__O = (function(x, default$2) {
   return ScalaJS.s.s_PartialFunction$class__applyOrElse__s_PartialFunction__O__F1__O(this, x, default$2)
@@ -26686,6 +27499,7 @@ ScalaJS.c.Lscalatags_JsDom$all$ = (function() {
   this.textAlign$1 = null;
   this.textIndent$1 = null;
   this.textShadow$1 = null;
+  this.transition$1 = null;
   this.wordSpacing$1 = null;
   this.zIndex$1 = null;
   this.href$1 = null;
@@ -26906,6 +27720,18 @@ ScalaJS.c.Lscalatags_JsDom$all$.prototype.margin$lzycompute__p1__Lscalatags_gene
   };
   return this.margin$module$1
 });
+ScalaJS.c.Lscalatags_JsDom$all$.prototype.fontStyle$lzycompute__p1__Lscalatags_generic_Styles$fontStyle$ = (function() {
+  if ((this.fontStyle$module$1 === null)) {
+    this.fontStyle$module$1 = new ScalaJS.c.Lscalatags_generic_Styles$fontStyle$().init___Lscalatags_generic_Styles(this)
+  };
+  return this.fontStyle$module$1
+});
+ScalaJS.c.Lscalatags_JsDom$all$.prototype.fontSize$lzycompute__p1__Lscalatags_generic_Styles$fontSize$ = (function() {
+  if ((this.fontSize$module$1 === null)) {
+    this.fontSize$module$1 = new ScalaJS.c.Lscalatags_generic_Styles$fontSize$().init___Lscalatags_generic_Styles(this)
+  };
+  return this.fontSize$module$1
+});
 ScalaJS.c.Lscalatags_JsDom$all$.prototype.textDecoration$lzycompute__p1__Lscalatags_generic_Styles$textDecoration$ = (function() {
   if ((this.textDecoration$module$1 === null)) {
     this.textDecoration$module$1 = new ScalaJS.c.Lscalatags_generic_Styles$textDecoration$().init___Lscalatags_generic_Styles(this)
@@ -26921,6 +27747,9 @@ ScalaJS.c.Lscalatags_JsDom$all$.prototype.display$lzycompute__p1__Lscalatags_gen
 ScalaJS.c.Lscalatags_JsDom$all$.prototype.display__Lscalatags_generic_Styles$display$ = (function() {
   return ((this.display$module$1 === null) ? this.display$lzycompute__p1__Lscalatags_generic_Styles$display$() : this.display$module$1)
 });
+ScalaJS.c.Lscalatags_JsDom$all$.prototype.whiteSpace__Lscalatags_generic_Styles$whiteSpace$ = (function() {
+  return ((this.whiteSpace$module$1 === null) ? this.whiteSpace$lzycompute__p1__Lscalatags_generic_Styles$whiteSpace$() : this.whiteSpace$module$1)
+});
 ScalaJS.c.Lscalatags_JsDom$all$.prototype.overflow$lzycompute__p1__Lscalatags_generic_Styles$overflow$ = (function() {
   if ((this.overflow$module$1 === null)) {
     this.overflow$module$1 = new ScalaJS.c.Lscalatags_generic_Styles$overflow$().init___Lscalatags_generic_Styles(this)
@@ -26932,6 +27761,18 @@ ScalaJS.c.Lscalatags_JsDom$all$.prototype.position$lzycompute__p1__Lscalatags_ge
     this.position$module$1 = new ScalaJS.c.Lscalatags_generic_Styles$position$().init___Lscalatags_generic_Styles(this)
   };
   return this.position$module$1
+});
+ScalaJS.c.Lscalatags_JsDom$all$.prototype.whiteSpace$lzycompute__p1__Lscalatags_generic_Styles$whiteSpace$ = (function() {
+  if ((this.whiteSpace$module$1 === null)) {
+    this.whiteSpace$module$1 = new ScalaJS.c.Lscalatags_generic_Styles$whiteSpace$().init___Lscalatags_generic_Styles(this)
+  };
+  return this.whiteSpace$module$1
+});
+ScalaJS.c.Lscalatags_JsDom$all$.prototype.fontStyle__Lscalatags_generic_Styles$fontStyle$ = (function() {
+  return ((this.fontStyle$module$1 === null) ? this.fontStyle$lzycompute__p1__Lscalatags_generic_Styles$fontStyle$() : this.fontStyle$module$1)
+});
+ScalaJS.c.Lscalatags_JsDom$all$.prototype.fontSize__Lscalatags_generic_Styles$fontSize$ = (function() {
+  return ((this.fontSize$module$1 === null) ? this.fontSize$lzycompute__p1__Lscalatags_generic_Styles$fontSize$() : this.fontSize$module$1)
 });
 ScalaJS.c.Lscalatags_JsDom$all$.prototype.position__Lscalatags_generic_Styles$position$ = (function() {
   return ((this.position$module$1 === null) ? this.position$lzycompute__p1__Lscalatags_generic_Styles$position$() : this.position$module$1)
@@ -29154,6 +29995,15 @@ ScalaJS.c.sci_TreeMap.prototype.get__O__s_Option = (function(key) {
 ScalaJS.c.sci_TreeMap.prototype.toStream__sci_Stream = (function() {
   return this.iterator__sc_Iterator().toStream__sci_Stream()
 });
+ScalaJS.c.sci_TreeMap.prototype.$$plus$plus__sc_GenTraversableOnce__sci_TreeMap = (function(xs) {
+  return ScalaJS.as.sci_TreeMap(xs.seq__sc_TraversableOnce().$$div$colon__O__F2__O(this, new ScalaJS.c.sjsr_AnonFunction2().init___sjs_js_Function2((function(this$2) {
+    return (function(x$2$2, x$3$2) {
+      var x$2 = ScalaJS.as.sci_TreeMap(x$2$2);
+      var x$3 = ScalaJS.as.T2(x$3$2);
+      return x$2.updated__O__O__sci_TreeMap(x$3.$$und1$f, x$3.$$und2$f)
+    })
+  })(this))))
+});
 ScalaJS.c.sci_TreeMap.prototype.drop__I__O = (function(n) {
   return this.drop__I__sci_TreeMap(n)
 });
@@ -29175,6 +30025,9 @@ ScalaJS.c.sci_TreeMap.prototype.isDefinedAt__O__Z = (function(key) {
 ScalaJS.c.sci_TreeMap.prototype.repr__O = (function() {
   return this
 });
+ScalaJS.c.sci_TreeMap.prototype.$$div$colon__O__F2__O = (function(z, op) {
+  return ScalaJS.s.sc_TraversableOnce$class__foldLeft__sc_TraversableOnce__O__F2__O(this, z, op)
+});
 ScalaJS.c.sci_TreeMap.prototype.applyOrElse__O__F1__O = (function(x, default$2) {
   return ScalaJS.s.s_PartialFunction$class__applyOrElse__s_PartialFunction__O__F1__O(this, x, default$2)
 });
@@ -29191,6 +30044,9 @@ ScalaJS.c.sci_TreeMap.prototype.toMap__s_Predef$$less$colon$less__sci_Map = (fun
 ScalaJS.c.sci_TreeMap.prototype.$$plus__T2__sci_SortedMap = (function(kv) {
   return this.updated__O__O__sci_TreeMap(kv.$$und1$f, kv.$$und2$f)
 });
+ScalaJS.c.sci_TreeMap.prototype.$$plus$plus__sc_GenTraversableOnce__sc_SortedMap = (function(xs) {
+  return this.$$plus$plus__sc_GenTraversableOnce__sci_TreeMap(xs)
+});
 ScalaJS.c.sci_TreeMap.prototype.mapValues__F1__sci_Map = (function(f) {
   return new ScalaJS.c.sci_SortedMap$$anon$2().init___sci_SortedMap__F1(this, f)
 });
@@ -29205,6 +30061,18 @@ ScalaJS.c.sci_TreeMap.prototype.newBuilder__scm_Builder = (function() {
 });
 ScalaJS.c.sci_TreeMap.prototype.stringPrefix__T = (function() {
   return "Map"
+});
+ScalaJS.is.sci_TreeMap = (function(obj) {
+  return (!(!((obj && obj.$classData) && obj.$classData.ancestors.sci_TreeMap)))
+});
+ScalaJS.as.sci_TreeMap = (function(obj) {
+  return ((ScalaJS.is.sci_TreeMap(obj) || (obj === null)) ? obj : ScalaJS.throwClassCastException(obj, "scala.collection.immutable.TreeMap"))
+});
+ScalaJS.isArrayOf.sci_TreeMap = (function(obj, depth) {
+  return (!(!(((obj && obj.$classData) && (obj.$classData.arrayDepth === depth)) && obj.$classData.arrayBase.ancestors.sci_TreeMap)))
+});
+ScalaJS.asArrayOf.sci_TreeMap = (function(obj, depth) {
+  return ((ScalaJS.isArrayOf.sci_TreeMap(obj, depth) || (obj === null)) ? obj : ScalaJS.throwArrayCastException(obj, "Lscala.collection.immutable.TreeMap;", depth))
 });
 ScalaJS.d.sci_TreeMap = new ScalaJS.ClassTypeData({
   sci_TreeMap: 0
@@ -32432,6 +33300,9 @@ ScalaJS.c.sci_SortedMap$$anon$2.prototype.toMap__s_Predef$$less$colon$less__sci_
 ScalaJS.c.sci_SortedMap$$anon$2.prototype.$$plus__T2__sci_SortedMap = (function(kv) {
   return ScalaJS.s.sci_SortedMap$Default$class__$$plus__sci_SortedMap$Default__T2__sci_SortedMap(this, kv)
 });
+ScalaJS.c.sci_SortedMap$$anon$2.prototype.$$plus$plus__sc_GenTraversableOnce__sc_SortedMap = (function(xs) {
+  return ScalaJS.s.sci_SortedMap$class__$$plus$plus__sci_SortedMap__sc_GenTraversableOnce__sci_SortedMap(this, xs)
+});
 ScalaJS.c.sci_SortedMap$$anon$2.prototype.mapValues__F1__sci_Map = (function(f) {
   return new ScalaJS.c.sci_SortedMap$$anon$2().init___sci_SortedMap__F1(this, f)
 });
@@ -34115,6 +34986,10 @@ ScalaJS.c.scm_ListBuffer.prototype.isDefinedAt__O__Z = (function(x) {
   var x$1 = ScalaJS.uI(x);
   var this$1 = this.scala$collection$mutable$ListBuffer$$start$6;
   return ScalaJS.s.sc_LinearSeqOptimized$class__isDefinedAt__sc_LinearSeqOptimized__I__Z(this$1, x$1)
+});
+ScalaJS.c.scm_ListBuffer.prototype.$$div$colon__O__F2__O = (function(z, op) {
+  var this$1 = this.scala$collection$mutable$ListBuffer$$start$6;
+  return ScalaJS.s.sc_LinearSeqOptimized$class__foldLeft__sc_LinearSeqOptimized__O__F2__O(this$1, z, op)
 });
 ScalaJS.c.scm_ListBuffer.prototype.$$plus$eq__O__scm_Builder = (function(elem) {
   return this.$$plus$eq__O__scm_ListBuffer(elem)
