@@ -1,6 +1,24 @@
 @import Main._
 @import ammonite.ops._
 
+@val fileOps = read! cwd/'ops/'src/'main/'scala/'ammonite/'ops/"FileOps.scala"
+@val found = (
+  ".*/\\*\\*(\n\\s*\\*.*)+\n.*?extends.*?Op[^{]*".r
+    .findAllIn(fileOps)
+    .mkString("\n")
+    .lines
+    .map(" "+_)
+    .mkString("\n")
+)
+@a(
+  href:="https://github.com/lihaoyi/ammonite",
+  position.absolute,
+  top:=0,right:=0,border:=0,
+  img(
+    src:="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67",
+    alt:="Fork me on GitHub"
+  )
+)
 @sect{Ammonite}
   @p
     @a("Ammonite", href:="https://github.com/lihaoyi/Ammonite") is a collection of Scala libraries intended to improve the experience of using Scala as an system shell. It includes two independent modules:
@@ -19,7 +37,7 @@
     Ammonite for now only works on Unix/OS-X/Linux (i.e. no @a("Windows support", href:="https://github.com/lihaoyi/Ammonite/issues/18")) and Java 7 and above. 
 
 
-    @sect{Ammonite-Ops}
+    @sect("Ammonite-Ops", "Rock-solid Filesystem Operations")
       @val opsExamples = 'ops/'src/'test/'scala/'test/'ammonite/'ops/"ExampleTests.scala"
       @val pathsScala = 'ops/'src/'main/'scala/'ammonite/'ops/"Path.scala"
       @hl.ref(opsExamples, Seq("longExample", "import"), "assert(")
@@ -217,7 +235,7 @@
         @p
           As you can see, you can often compose elaborate operations entirely naturally using the available pipes, without needing to remember any special flags or techniques.
 
-    @sect{Ammonite-REPL}
+    @sect("Ammonite-REPL", "A Modernized Scala REPL")
       @val advancedTests = 'repl/'src/'test/'scala/'ammonite/'repl/"AdvancedTests.scala"
       @p
         Ammonite-REPL is a cleanroom re-implementation of the Scala REPL from first principles. It is much more featureful than the default REPL and comes with a lot of ergonomic improvements that may be familiar to people coming from IDEs or other REPLs such as @a("IPython", href:="ipython.org") or @a("Zsh", href:="http://www.zsh.org/").
