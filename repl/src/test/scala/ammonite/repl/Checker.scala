@@ -7,7 +7,7 @@ import utest._
 
 class Checker {
   var allOutput = ""
-  val interp = new Interpreter(
+  val interp = Interpreter.console(
     (_, _) => (),
     Ref[String](""),
     stdout = allOutput += _,
@@ -76,7 +76,7 @@ class Checker {
     }
   }
 
-  def result(input: String, expected: Res[Evaluated]) = {
+  def result(input: String, expected: Res[Evaluated[_]]) = {
     val (processed, printed) = run(input)
     assert(processed == expected)
   }

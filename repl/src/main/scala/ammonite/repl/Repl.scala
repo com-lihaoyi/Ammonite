@@ -28,7 +28,7 @@ class Repl(input: InputStream,
     initialHistory
   )
 
-  val interp: Interpreter = new Interpreter(
+  val interp: Interpreter.Console = Interpreter.console(
     frontEnd.update,
     shellPrompt,
     pprintConfig.copy(maxWidth = frontEnd.width),

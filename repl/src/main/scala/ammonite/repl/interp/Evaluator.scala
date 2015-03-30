@@ -1,24 +1,29 @@
 package ammonite.repl.interp
 
+import java.io.{File, FileOutputStream}
 import java.lang.reflect.InvocationTargetException
 import java.net.URL
+import java.util.UUID
 
 import acyclic.file
-import ammonite.repl.frontend.{ReplExit, ReplAPI}
 import ammonite.repl._
 import java.net.URLClassLoader
 import scala.reflect.runtime.universe._
 import scala.collection.mutable
 import scala.util.Try
+import scala.util.control.ControlThrowable
 
 /**
  * Takes source code and, with the help of a compiler and preprocessor,
  * evaluates it and returns a `Result[(output: String, imports: String)]`
  * where `output` is what gets printed and `imports` are any imports that
  * need to get prepended to subsequent commands.
+ *
+ * @tparam A: preprocessor output type
+ * @tparam B: wrapper $main method return type
  */
-trait Evaluator{
-  def evalClass(code: String, wrapperName: String): Res[(Class[_], Seq[ImportData])]
+trait Evaluator[-A, +B] {
+  def evalClass(code: String, wrapperName: String, useClassWrapper: Boolean = false): Res[(Class[_], Class[_], Seq[ImportData])]
   def getCurrentLine: Int
   def update(newImports: Seq[ImportData]): Unit
 
@@ -30,31 +35,42 @@ trait Evaluator{
    * passing in the callback ensures the printing is still done lazily, but within
    * the exception-handling block of the `Evaluator`
    */
-  def processLine(code: String, printCode: String, printer: Iterator[String] => Unit): Res[Evaluated]
+  def processLine[C](input: A, process: B => C, useClassWrapper: Boolean = false): Res[Evaluated[C]]
 
   def previousImportBlock: String
   def addJar(url: URL): Unit
   def newClassloader(): Unit
   def evalClassloader: ClassLoader
+  def classes: Map[String, Array[Byte]]
 }
 
 object Evaluator{
-  def apply(currentClassloader: ClassLoader,
-            preprocess: (String, Int) => Res[Preprocessor.Output],
-            compile: => (Array[Byte], String => Unit) => Compiler.Output,
-            stdout: String => Unit): Evaluator = new Evaluator{
+  /**
+   * Thrown to exit the Evaluator cleanly
+   */
+  case object Exit extends ControlThrowable
 
-    def namesFor(t: scala.reflect.runtime.universe.Type): Set[String] = {
-      val yours = t.members.map(_.name.toString).toSet
-      val default = typeOf[Object].members.map(_.name.toString)
-      yours -- default
-    }
+  def namesFor(t: scala.reflect.runtime.universe.Type): Set[String] = {
+    val yours = t.members.map(_.name.toString).toSet
+    val default = typeOf[Object].members.map(_.name.toString)
+    yours -- default
+  }
+
+  def namesFor[T: TypeTag]: Set[String] = namesFor(typeOf[T])
+
+  def apply[A, B](currentClassloader: ClassLoader,
+                  initialImports: Seq[(String, ImportData)],
+                  preprocess: (String, Int) => Res[A],
+                  wrap: (A, String, String) => String,
+                  compile: => (Array[Byte], String => Unit) => Compiler.Output,
+                  stdout: String => Unit): Evaluator[A, B] = new Evaluator[A, B] {
 
     /**
      * Files which have been compiled, stored so that our special
      * classloader can get at them.
      */
     val newFileDict = mutable.Map.empty[String, Array[Byte]]
+    def classes = newFileDict.toMap
 
     /**
      * Imports which are required by earlier commands to the REPL. Imports
@@ -63,11 +79,7 @@ object Evaluator{
      * map. Otherwise if you import the same name twice you get compile
      * errors instead of the desired shadowing.
      */
-    lazy val previousImports = mutable.Map(
-      namesFor(typeOf[ReplAPI]).map(n => n -> ImportData(n, n, "", "ReplBridge.shell")).toSeq ++
-      namesFor(typeOf[ammonite.repl.IvyConstructor]).map(n => n -> ImportData(n, n, "", "ammonite.repl.IvyConstructor")).toSeq
-      :_*
-    )
+    lazy val previousImports = mutable.Map(initialImports: _*)
 
 
     /**
@@ -103,10 +115,29 @@ object Evaluator{
         def add(url: URL) = addURL(url)
       }
 
+    lazy val tmpClassDir = {
+      val d = new File(new File(System.getProperty("java.io.tmpdir")), s"ammonite-${UUID.randomUUID()}")
+      d.mkdirs()
+      d.deleteOnExit()
+      d
+    }
 
     def newClassloader() = {
       evalClassloader = new URLClassLoader(Array(), evalClassloader){
         def add(url: URL) = addURL(url)
+        override def getResource(name: String): URL = {
+          if (name.endsWith(".class") && newFileDict.contains(name.stripSuffix(".class"))) {
+            val f = new File(tmpClassDir, name)
+            if (!f.exists()) {
+              val w = new FileOutputStream(f)
+              w.write(newFileDict(name.stripSuffix(".class")))
+              w.close()
+            }
+
+            f.toURI.toURL
+          } else
+            super.getResource(name)
+        }
         override def loadClass(name: String): Class[_] = {
           if(newFileDict.contains(name)) {
             val bytes = newFileDict(name)
@@ -126,7 +157,7 @@ object Evaluator{
 
     def addJar(url: URL) = evalClassloader.add(url)
 
-    def evalClass(code: String, wrapperName: String) = for{
+    def evalClass(code: String, wrapperName: String, useClassWrapper: Boolean = false) = for{
 
       (output, compiled) <- Res.Success{
         val output = mutable.Buffer.empty[String]
@@ -138,14 +169,16 @@ object Evaluator{
         compiled, "Compilation Failed\n" + output.mkString("\n")
       )
 
-      cls <- Res[Class[_]](Try {
+      (cls, objCls) <- Res[(Class[_], Class[_])](Try {
         for ((name, bytes) <- classFiles) newFileDict(name) = bytes
-        Class.forName(wrapperName , true, evalClassloader)
+        val cls = Class.forName(wrapperName, true, evalClassloader)
+        val objCls = if (useClassWrapper) Class.forName(wrapperName + "$", true, evalClassloader) else null
+        (cls, objCls)
       }, e => "Failed to load compiled class " + e)
-    } yield (cls, importData)
+    } yield (cls, objCls, importData)
 
-    def evalMain(cls: Class[_]) =
-      cls.getDeclaredMethod("$main").invoke(null)
+    def evalMain(cls: Class[_], instance: AnyRef) =
+      cls.getDeclaredMethod("$main").invoke(instance)
 
     def transpose[A](xs: List[List[A]]): List[List[A]] = xs.filter(_.nonEmpty) match {
       case Nil    =>  Nil
@@ -181,22 +214,12 @@ object Evaluator{
     type InvEx = InvocationTargetException
     type InitEx = ExceptionInInitializerError
 
-    def processLine(code: String, printCode: String, printer: Iterator[String] => Unit) = for {
+    def processLine[C](input: A, process: B => C, useClassWrapper: Boolean = false) = for {
       wrapperName <- Res.Success("cmd" + currentLine)
-      (cls, newImports) <- evalClass(
-        s"""
-        $previousImportBlock
-
-        object $wrapperName{
-          $code
-          def $$main() = {$printCode}
-        }
-        """,
-        wrapperName
-      )
+      (cls, objClass, newImports) <- evalClass(wrap(input, previousImportBlock, wrapperName), wrapperName, useClassWrapper)
       _ = currentLine += 1
       _ <- Catching{
-        case Ex(_: InvEx, _: InitEx, ReplExit)  => Res.Exit
+        case Ex(_: InvEx, _: InitEx, Exit)  => Res.Exit
         case Ex(_: ThreadDeath)                 => interrupted()
         case Ex(_: InvEx, _: ThreadDeath)       => interrupted()
         case Ex(_: InvEx, _: InitEx, userEx@_*) => Res.Failure(userEx, stop = "$main")
@@ -205,13 +228,22 @@ object Evaluator{
     } yield {
       // Exhaust the printer iterator now, before exiting the `Catching`
       // block, so any exceptions thrown get properly caught and handled
-      evaluatorRunPrinter(printer(evalMain(cls).asInstanceOf[Iterator[String]]))
+      val value = evaluatorRunPrinter(process {
+        val instance =
+          if (useClassWrapper)
+            objClass getField "MODULE$" get null
+          else
+            null
+
+        evalMain(cls, instance).asInstanceOf[B]
+      })
       Evaluated(
         wrapperName,
         newImports.map(id => id.copy(
           wrapperName = wrapperName,
           prefix = if (id.prefix == "") wrapperName else id.prefix
-        ))
+        )),
+        value
       )
     }
 
@@ -225,6 +257,6 @@ object Evaluator{
    * so we can easily cut out the irrelevant part of the trace when
    * showing it to the user.
    */
-  def evaluatorRunPrinter(f: => Unit) = f
+  def evaluatorRunPrinter[T](f: => T): T = f
 
 }
