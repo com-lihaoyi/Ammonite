@@ -2,16 +2,8 @@ language: scala
 scala:
 - 2.11.4
 jdk:
-- oraclejdk6
 - oraclejdk7
 - oraclejdk8
-env:
-- CMD=repl/test
-- CMD=test
 script:
-- sbt ++$TRAVIS_SCALA_VERSION $CMD
+- sbt ++$TRAVIS_SCALA_VERSION
 sudo: false
-matrix:
-  exclude:
-    - jdk: oraclejdk6
-      env: CMD=test
