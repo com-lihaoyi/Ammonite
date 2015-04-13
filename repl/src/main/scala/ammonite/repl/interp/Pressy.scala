@@ -49,7 +49,7 @@ object Pressy {
         def rec(t: pressy.Symbol): Seq[pressy.Symbol] = {
           val children =
             if (t.hasPackageFlag || t.isPackageObject) {
-              t.typeSignature.members.filter(_ != t).flatMap(rec)
+              pressy.ask(() => t.typeSignature.members.filter(_ != t).flatMap(rec))
             } else Nil
 
           t +: children.toSeq
