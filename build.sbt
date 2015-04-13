@@ -100,7 +100,7 @@ lazy val tools = project
   )
 
 lazy val repl = project
-  .dependsOn(ops, tools, pprint)
+  .dependsOn(pprint)
   .settings(sharedSettings:_*)
   .settings(
     test in assembly := {},

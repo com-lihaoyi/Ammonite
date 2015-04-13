@@ -1,6 +1,6 @@
 package ammonite.repl
 
-import java.io.{PrintStream, OutputStream, InputStream}
+import java.io._
 import ammonite.{pprint}
 import ammonite.repl.frontend._
 import acyclic.file
@@ -23,7 +23,7 @@ class Repl(input: InputStream,
   val frontEnd = JLineFrontend(
     input,
     output,
-    colorSet.prompt + shellPrompt() + Console.RESET,
+    colorSet.prompt + shellPrompt() + scala.Console.RESET,
     interp.pressy.complete(_, interp.eval.previousImportBlock, _),
     initialHistory
   )
@@ -61,13 +61,21 @@ object Repl{
   val defaultPredef = """"""
   def main(args: Array[String]) = {
     println("Loading Ammonite Repl...")
-    import ammonite.ops._
-    val saveFile = home/".amm"
+
+    val saveFile = new java.io.File(System.getProperty("user.home")) + "/.amm"
     val delimiter = "\n\n\n"
     val shell = new Repl(
       System.in, System.out,
-      initialHistory = Try{read! saveFile}.getOrElse("").split(delimiter),
-      saveHistory = s => write.append(home/".amm", s + delimiter)
+      initialHistory = try{
+        io.Source.fromFile(saveFile).mkString.split(delimiter)
+      }catch{case e: FileNotFoundException =>
+        Nil
+      },
+      saveHistory = { s =>
+        val fw = new FileWriter(saveFile, true)
+        try fw.write(s)
+        finally fw.close()
+      }
     )
     shell.run()
 
