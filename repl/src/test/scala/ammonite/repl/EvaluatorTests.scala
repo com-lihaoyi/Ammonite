@@ -147,20 +147,32 @@ object EvaluatorTests extends TestSuite{
       }
       'java {
         check.session("""
-        @ import Thread._
-        import Thread._
+          @ import Thread._
+          import Thread._
 
-        @ currentThread.isAlive
-        res1: Boolean = true
+          @ currentThread.isAlive
+          res1: Boolean = true
 
-        @ import java.lang.Runtime.getRuntime
-        import java.lang.Runtime.getRuntime
+          @ import java.lang.Runtime.getRuntime
+          import java.lang.Runtime.getRuntime
 
-        @ getRuntime.isInstanceOf[Boolean]
-        res3: Boolean = false
+          @ getRuntime.isInstanceOf[Boolean]
+          res3: Boolean = false
 
-        @ getRuntime.isInstanceOf[java.lang.Runtime]
-        res4: Boolean = true
+          @ getRuntime.isInstanceOf[java.lang.Runtime]
+          res4: Boolean = true
+        """)
+      }
+      'multi{
+        check.session("""
+          @ import math._, Thread._
+          import math._, Thread._
+
+          @ abs(-1)
+          res1: Int = 1
+
+          @ currentThread.isAlive
+          res2: Boolean = true
         """)
       }
       'shadowing{

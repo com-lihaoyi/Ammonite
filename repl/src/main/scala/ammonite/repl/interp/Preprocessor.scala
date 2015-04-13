@@ -107,10 +107,14 @@ object Preprocessor{
             decls.iterator.flatMap(_.apply(code, "res" + wrapperId + suffix, t)).next()
           }
           trees match {
+            case Seq(tree) => handleTree(tree)
+
+            // This handles the multi-import case `import a.b, c.d`
+            case trees if trees.forall(_.isInstanceOf[G#Import]) => handleTree(trees(0))
+
             // AFAIK this can only happen for pattern-matching multi-assignment,
             // which for some reason parse into a list of statements. In such a
             // scenario, aggregate all their printers, but only output the code once
-            case Seq(tree) => handleTree(tree)
             case trees =>
               val printers = for {
                 tree <- trees
@@ -121,7 +125,6 @@ object Preprocessor{
               Preprocessor.Output(code, printers)
           }
         }
-
         Res(
           allDecls.reduceOption { (a, b) =>
             Output(

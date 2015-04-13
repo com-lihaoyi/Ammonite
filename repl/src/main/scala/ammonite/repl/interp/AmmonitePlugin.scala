@@ -43,8 +43,8 @@ class AmmonitePlugin(g: scala.tools.nsc.Global, output: Seq[ImportData] => Unit)
                 }
               }
               val prefix = rec(expr).reverse
-                .map(x => BacktickWrap(x.decoded))
-                .mkString(".")
+                                    .map(x => BacktickWrap(x.decoded))
+                                    .mkString(".")
 
               val renamings =
                 for(t @ g.ImportSelector(name, _, rename, _) <- selectors) yield {
