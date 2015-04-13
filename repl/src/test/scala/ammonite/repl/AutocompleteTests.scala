@@ -10,7 +10,8 @@ object AutocompleteTests extends TestSuite{
   val tests = TestSuite{
     val check = new Checker()
     def complete(caretCode: String,
-                 cmp: (Set[String]) => Set[String]) = {
+                 cmp: (Set[String]) => Set[String],
+                 sigs: (Set[String]) => Set[String] = _ => Set()) = {
       val cursor = caretCode.indexOf("<caret>")
       val buf = caretCode.replace("<caret>", "")
 
@@ -21,6 +22,8 @@ object AutocompleteTests extends TestSuite{
       )
       val left = cmp(completions.toSet)
       assert(left == Set())
+      val sigLeft = sigs(signatures.toSet)
+      assert(sigLeft == Set())
     }
 
     // Not sure why clone and finalize don't appear in this list
@@ -41,6 +44,11 @@ object AutocompleteTests extends TestSuite{
       complete("""<caret>""", Set("scala") -- _)
       complete("""Seq(1, 2, 3).map(argNameLol => <caret>)""", Set("argNameLol") -- _)
       complete("""object Zomg{ <caret> }""", Set("Zomg") -- _)
+      complete(
+        "println<caret>",
+        Set("println") ^,
+        Set("def println(x: Any): Unit", "def println(): Unit") ^
+      )
     }
     'scopePrefix{
       complete("""ammon<caret>""", Set("ammonite") ^ _)
@@ -89,7 +97,16 @@ object AutocompleteTests extends TestSuite{
         Set("option2Iterable") ^
       )
       complete("""val x = 1; x + x.><caret>""",
-        Set(">>", ">>>") -- _
+        Set(">>", ">>>") -- _,
+        Set(
+          "def >(x: Double): Boolean",
+          "def >(x: Float): Boolean",
+          "def >(x: Int): Boolean",
+          "def >(x: Short): Boolean",
+          "def >(x: Long): Boolean",
+          "def >(x: Char): Boolean",
+          "def >(x: Byte): Boolean"
+        ) ^
       )
       // https://issues.scala-lang.org/browse/SI-9153
       //
