@@ -5,6 +5,13 @@ jdk:
 - oraclejdk6
 - oraclejdk7
 - oraclejdk8
+env:
+- CMD=repl/test
+- CMD=test
 script:
-- sbt ++$TRAVIS_SCALA_VERSION repl/test
+- sbt ++$TRAVIS_SCALA_VERSION $CMD
 sudo: false
+matrix:
+  exclude:
+    - jdk: oraclejdk6
+      env: CMD=test
