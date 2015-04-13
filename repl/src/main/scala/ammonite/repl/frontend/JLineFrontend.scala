@@ -1,10 +1,12 @@
 package ammonite.repl.frontend
 
 import java.io.{OutputStream, InputStream}
+import java.nio.channels.CompletionHandler
 
 import ammonite.repl.{Timer, Evaluated, Res}
-import jline.console.ConsoleReader
+import jline.console.{completer, ConsoleReader}
 import acyclic.file
+import jline.console.completer.Completer
 
 import scala.tools.nsc.interpreter._
 import collection.JavaConversions._
@@ -24,7 +26,7 @@ object JLineFrontend{
   def apply(input: InputStream,
             output: OutputStream,
             shellPrompt: => String,
-            compilerComplete: => (Int, String) => (Int, Seq[String]),
+            compilerComplete: => (Int, String) => (Int, Seq[String], Seq[String]),
             initialHistory: Seq[String]): JLineFrontend
             = new JLineFrontend with jline.console.completer.Completer {
 
@@ -36,17 +38,29 @@ object JLineFrontend{
     reader.setHistoryEnabled(true)
     reader.addCompleter(this)
     reader.setExpandEvents(false)
-
+    val defaultHandler = reader.getCompletionHandler
+    reader.setCompletionHandler(new completer.CompletionHandler {
+      def complete(reader: ConsoleReader, candidates: JList[CharSequence], position: Int): Boolean = {
+        if (!signatures.isEmpty){
+          println()
+          signatures.foreach(reader.println)
+          reader.drawLine()
+        }
+        defaultHandler.complete(reader, candidates, position)
+      }
+    })
     initialHistory.foreach(reader.getHistory.add)
 
+    var signatures = Seq.empty[String]
     def complete(_buf: String, cursor: Int, candidates: JList[CharSequence]): Int = {
       val buf   = if (_buf == null) "" else _buf
       import collection.JavaConversions._
-      val (completionBase, completions) = compilerComplete(
+      val (completionBase, completions, sigs) = compilerComplete(
         cursor,
         buf
       )
       candidates.addAll(completions)
+      signatures = sigs
       completionBase
     }
 

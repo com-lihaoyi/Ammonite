@@ -10,17 +10,16 @@ object AutocompleteTests extends TestSuite{
   val tests = TestSuite{
     val check = new Checker()
     def complete(caretCode: String,
-                 expected: Set[String],
-                 cmp: (Set[String], Set[String]) => Set[String]) = {
+                 cmp: (Set[String]) => Set[String]) = {
       val cursor = caretCode.indexOf("<caret>")
       val buf = caretCode.replace("<caret>", "")
 
-      val (index, completions) = check.interp.pressy.complete(
+      val (index, completions, signatures) = check.interp.pressy.complete(
         cursor,
         check.interp.eval.previousImportBlock,
         buf
       )
-      val left = cmp(expected, completions.toSet)
+      val left = cmp(completions.toSet)
       assert(left == Set())
     }
 
@@ -35,74 +34,62 @@ object AutocompleteTests extends TestSuite{
       "+", "formatted", "ensuring",
       "→", "->"
     )
-
-    def ^[T](s1: Set[T], s2: Set[T]) = (s1 diff s2) | (s2 diff s1)
-
+    implicit class SetExt[T](s1: Set[T]) {
+      def ^(s2: Set[T]): Set[T] = (s1 diff s2) | (s2 diff s1)
+    }
     'scope{
-      complete("""<caret>""", Set("scala"), _ -- _)
-
-      complete("""Seq(1, 2, 3).map(argNameLol => <caret>)""", Set("argNameLol"), _ -- _)
-
-      complete("""object Zomg{ <caret> }""", Set("Zomg"), _ -- _)
+      complete("""<caret>""", Set("scala") -- _)
+      complete("""Seq(1, 2, 3).map(argNameLol => <caret>)""", Set("argNameLol") -- _)
+      complete("""object Zomg{ <caret> }""", Set("Zomg") -- _)
     }
     'scopePrefix{
-      complete("""ammon<caret>""", Set("ammonite"), ^)
+      complete("""ammon<caret>""", Set("ammonite") ^ _)
 
-      complete("""Seq(1, 2, 3).map(argNameLol => argNam<caret>)""", Set("argNameLol"), ^)
+      complete("""Seq(1, 2, 3).map(argNameLol => argNam<caret>)""", Set("argNameLol") ^)
 
-      complete("""object Zomg{ Zom<caret> }""", Set("Zomg"), ^)
-      complete("""object Zomg{ Zo<caret>m }""", Set("Zomg"), ^)
-      complete("""object Zomg{ Z<caret>om }""", Set("Zomg"), ^)
-      complete("""object Zomg{ <caret>Zom }""", Set("Zomg"), ^)
+      complete("""object Zomg{ Zom<caret> }""", Set("Zomg") ^)
+      complete("""object Zomg{ Zo<caret>m }""", Set("Zomg") ^)
+      complete("""object Zomg{ Z<caret>om }""", Set("Zomg") ^)
+      complete("""object Zomg{ <caret>Zom }""", Set("Zomg") ^)
     }
     'dot{
       complete("""java.math.<caret>""",
-        Set("MathContext", "BigDecimal", "BigInteger", "RoundingMode"),
-        ^
+        Set("MathContext", "BigDecimal", "BigInteger", "RoundingMode") ^
       )
 
       complete("""scala.Option.<caret>""",
-        anyCompletion ++ Set("apply", "empty", "option2Iterable"),
-        ^
+        (anyCompletion ++ Set("apply", "empty", "option2Iterable")) ^
       )
 
       complete("""Seq(1, 2, 3).map(_.<caret>)""",
-        anyCompletion ++ Set("+", "-", "*", "/", "to", "until"),
-        _ -- _
+        (anyCompletion ++ Set("+", "-", "*", "/", "to", "until")) -- _
       )
 
       complete("""val x = 1; x + (x.<caret>)""",
-        Set("to", "max", "-", "+", "*", "/"),
-        _ -- _
+        Set("to", "max", "-", "+", "*", "/") -- _
       )
     }
 
     'deep{
       complete("""fromN<caret>""",
-        Set("scala.concurrent.duration.fromNow"),
-        ^
+        Set("scala.concurrent.duration.fromNow") ^
       )
       complete("""Fut<caret>""",
-        Set("scala.concurrent.Future", "java.util.concurrent.Future"),
-        _ -- _
+        Set("scala.concurrent.Future", "java.util.concurrent.Future") -- _
       )
       complete("""SECO<caret>""",
-        Set("scala.concurrent.duration.SECONDS"),
-        ^
+        Set("scala.concurrent.duration.SECONDS") ^
       )
     }
     'dotPrefix{
       complete("""java.math.Big<caret>""",
-        Set("BigDecimal", "BigInteger"),
-        ^
+        Set("BigDecimal", "BigInteger") ^
       )
       complete("""scala.Option.option2<caret>""",
-        Set("option2Iterable"),
-        ^
+        Set("option2Iterable") ^
       )
       complete("""val x = 1; x + x.><caret>""",
-        Set(">>", ">>>"),
-        _ -- _
+        Set(">>", ">>>") -- _
       )
       // https://issues.scala-lang.org/browse/SI-9153
       //
@@ -112,8 +99,8 @@ object AutocompleteTests extends TestSuite{
       //      )
 
       val compares = Set("compare", "compareTo")
-      complete("""Seq(1, 2, 3).map(_.compa<caret>)""", compares, ^)
-      complete("""Seq(1, 2, 3).map(_.co<caret>mpa)""", compares, ^)
+      complete("""Seq(1, 2, 3).map(_.compa<caret>)""", compares ^)
+      complete("""Seq(1, 2, 3).map(_.co<caret>mpa)""", compares ^)
 //      complete("""Seq(1, 2, 3).map(_.<caret>compa)""", compares, ^)
     }
   }

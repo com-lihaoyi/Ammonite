@@ -13,13 +13,14 @@ import scala.tools.nsc.util._
  * Nice wrapper for the presentation compiler.
  */
 trait Pressy{
-  def complete(snippetIndex: Int, previousImports: String, snippet: String): (Int, Seq[String])
+  def complete(snippetIndex: Int, previousImports: String, snippet: String): (Int, Seq[String], Seq[String])
   def shutdownPressy(): Unit
 }
 object Pressy {
   def apply(jarDeps: Seq[java.io.File],
             dirDeps: Seq[java.io.File],
             dynamicClasspath: VirtualDirectory): Pressy = new Pressy {
+
 
     var cachedPressy: nsc.interactive.Global = null
 
@@ -47,7 +48,8 @@ object Pressy {
      * different completions depending on where the `index` is placed, but
      * the outside caller probably doesn't care.
      */
-    def complete(snippetIndex: Int, previousImports: String, snippet: String): (Int, Seq[String]) = {
+    def complete(snippetIndex: Int, previousImports: String, snippet: String): (Int, Seq[String], Seq[String]) = {
+
       val prefix = previousImports + "\nobject AutocompleteWrapper{\n"
       val suffix = "\n}"
       val allCode =  prefix + snippet + suffix
@@ -90,21 +92,34 @@ object Pressy {
       }
       val tree = pressy.parseTree(file)
 
-      def dotted = tree.collect {
+      def dotted: Seq[(Int, Seq[(String, Option[String])])] = tree.collect {
         case t@pressy.Select(qualifier, name)
           if qualifier.pos.endOrPoint <= index && index <= t.pos.endOrPoint =>
           val r = ask(qualifier.pos.endOrPoint, pressy.askTypeCompletion)
           val prefix = if (name.decoded == "<error>") "" else name.decoded
-          (qualifier.pos.endOrPoint + 1, pressy.ask(() => r.map(_.sym.name.decoded).filter(_.startsWith(prefix))))
+          (
+            qualifier.pos.endOrPoint + 1,
+            pressy.ask(() => r.filter(_.sym.name.decoded.startsWith(prefix)).map{
+              case x if x.sym.name.decoded == prefix =>
+                (x.sym.name.decoded, Some(x.sym.defString))
+              case x =>
+                (x.sym.name.decoded, None)
+            })
+          )
       }
 
-      def prefixed = tree.collect {
+      def prefixed: Seq[(Int, Seq[(String, Option[String])])] = tree.collect {
         case t@pressy.Ident(name)
           if t.pos.startOrPoint <= index && index <= t.pos.endOrPoint =>
           val r = ask(index, pressy.askScopeCompletion)
 
           lazy val shallow = {
-            pressy.ask(() => r.map(_.sym.name.decoded).filter(_.startsWith(name.decoded)))
+            pressy.ask(() => r.filter(_.sym.name.decoded.startsWith(name.decoded)).map{
+              case x if x.sym.name.decoded == prefix =>
+                (x.sym.name.decoded, Some(x.sym.defString))
+              case x =>
+                (x.sym.name.decoded, None)
+            })
           }
 
           /**
@@ -131,25 +146,28 @@ object Pressy {
               (pref, suf) = sym.fullNameString.splitAt(sym.fullNameString.lastIndexOf('.') + 1)
               out = pref + strippedName
               if out != ""
-            } yield out
+            } yield (out, None)
           )
 
           lazy val deep = allDeep.distinct
 
           if (shallow.length > 0) (t.pos.startOrPoint, shallow)
           else if (deep.length == 1) (t.pos.startOrPoint, deep)
-          else (t.pos.endOrPoint, deep :+ "")
+          else (t.pos.endOrPoint, deep :+ ("", None))
       }
 
-      def scoped = {
+      def scoped: (Int, List[(String, Option[String])]) = {
         index -> ask(index, pressy.askScopeCompletion).map(s =>
-          pressy.ask(() => s.sym.name.decoded)
+          pressy.ask(() => (s.sym.name.decoded, None))
         )
       }
 
       val (i, all) = dotted.headOption orElse prefixed.headOption getOrElse scoped
 
-      (i - prefix.length, all.filter(_ != "<init>"))
+      val allNames = all.map(_._1).filter(_ != "<init>")
+      val signatures = all.collect{ case (name, Some(defn)) => defn }
+
+      (i - prefix.length, allNames, signatures)
     }
 
     def shutdownPressy() = {
