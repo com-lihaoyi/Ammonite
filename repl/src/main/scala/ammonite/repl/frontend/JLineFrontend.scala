@@ -59,8 +59,15 @@ object JLineFrontend{
         cursor,
         buf
       )
-      candidates.addAll(completions)
-      signatures = sigs
+      if (!completions.isEmpty) {
+        candidates.addAll(completions.sorted)
+        signatures = sigs.sorted
+      } else if (!sigs.isEmpty){
+        println()
+        sigs.foreach(reader.println)
+        reader.drawLine()
+      }
+
       completionBase
     }
 

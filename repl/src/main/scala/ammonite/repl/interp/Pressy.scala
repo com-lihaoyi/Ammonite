@@ -159,9 +159,10 @@ object Pressy {
 
       val run = new Run(pressy, currentFile, allCode, index)
 
-      val (i, all) = run.dotted.headOption orElse run.prefixed.headOption getOrElse run.scoped(index)
+      val (i, all) =
+        run.dotted.headOption orElse run.prefixed.headOption getOrElse run.scoped(index)
 
-      val allNames = all.map(_._1).filter(_ != "<init>")
+      val allNames = all.collect{ case (name, None) => name}.filter(_ != "<init>")
       val signatures = all.collect{ case (name, Some(defn)) => defn }
 
       (i - prefix.length, allNames, signatures)
