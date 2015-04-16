@@ -221,8 +221,8 @@ object Internals {
   def takeFirstLines(lines: Int, iter: Iterator[String]):Iterator[String]={
     @tailrec
     def inner(lines: Int, iter: Iterator[String], begin: Iterator[String]): Iterator[String]={
-      if(lines==0) return begin ++ Iterator("...")
       if(!iter.hasNext || lines < 0) return begin
+      if(lines==0) return begin ++ Iterator("...")
       val head = iter.next()
       val remainingLines = if(head.contains('\n')) lines-1 else lines
       inner(remainingLines,iter,begin ++ Iterator(head))
