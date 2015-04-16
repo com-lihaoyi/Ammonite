@@ -13,6 +13,7 @@ import acyclic.file
  *                TupleN *
  */
 case class Config(maxWidth: Int = 100,
+                  maxHeight: Int = 15,
                   depth: Int = 0,
                   indent: Int = 2,
                   literalColor: String = null,

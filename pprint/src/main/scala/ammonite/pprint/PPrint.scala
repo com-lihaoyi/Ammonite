@@ -2,6 +2,7 @@ package ammonite.pprint
 
 import scala.annotation.unchecked.uncheckedVariance
 import scala.language.experimental.macros
+import annotation.tailrec
 import acyclic.file
 
 
@@ -211,9 +212,22 @@ object Internals {
     val coloredName = c.color.prefix(renamed)
     val chunks2 = chunkFunc(c.deeper)
     val indent = "  " * c.depth
-    Iterator(coloredName + "(\n") ++
+    val full = Iterator(coloredName + "(\n") ++
     mkIterator(chunks2.map(Seq("  " + indent) ++ _), Seq(",\n")).flatten ++
     Iterator("\n" + indent + ")")
+    takeFirstLines(c.maxHeight,full)
+  }
+
+  def takeFirstLines(lines: Int, iter: Iterator[String]):Iterator[String]={
+    @tailrec
+    def inner(lines: Int, iter: Iterator[String], begin: Iterator[String]): Iterator[String]={
+      if(lines==0) return begin ++ Iterator("...")
+      if(!iter.hasNext || lines < 0) return begin
+      val head = iter.next()
+      val remainingLines = if(head.contains('\n')) lines-1 else lines
+      inner(remainingLines,iter,begin ++ Iterator(head))
+    }
+    inner(lines,iter,Iterator.empty)
   }
 
   def preMap[T, V: PPrint](f: T => V) = PPrinter[T] {
