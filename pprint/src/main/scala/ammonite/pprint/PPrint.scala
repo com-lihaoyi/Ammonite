@@ -31,9 +31,25 @@ object PPrint extends Internals.LowPriPPrint{
 case class PPrint[A](a: PPrinter[A], cfg: Config){
   def render(t: A): Iterator[String] = {
     if (t == null) Iterator("null")
-    else a.render(t, cfg)
+    else takeFirstLines(cfg,a.render(t, cfg))
   }
   def map(f: String => String) = a.map(f)
+
+  private def takeFirstLines(cfg: Config, iter: Iterator[String]):Iterator[String]={
+    @tailrec
+    def inner(lines: Int, iter: Iterator[String], begin: Iterator[String]): Iterator[String]={
+      if(!iter.hasNext || lines < 0) return begin
+      if(lines==0) return begin ++ Iterator(cfg.color.prefix("..."))
+      val head = iter.next()
+      if(lines < head.length/cfg.maxWidth){
+        return begin ++ Iterator(head.substring(0,lines*cfg.maxWidth),cfg.color.prefix("..."))
+      }
+      val remainingLines = if(head.contains('\n')) lines-1 else lines - head.length/cfg.maxWidth
+      inner(remainingLines,iter,begin ++ Iterator(head))
+    }
+    inner(cfg.maxHeight,iter,Iterator.empty)
+  }
+
 }
 
 /**
@@ -212,22 +228,9 @@ object Internals {
     val coloredName = c.color.prefix(renamed)
     val chunks2 = chunkFunc(c.deeper)
     val indent = "  " * c.depth
-    val full = Iterator(coloredName + "(\n") ++
+    Iterator(coloredName + "(\n") ++
     mkIterator(chunks2.map(Seq("  " + indent) ++ _), Seq(",\n")).flatten ++
     Iterator("\n" + indent + ")")
-    takeFirstLines(c.maxHeight,full)
-  }
-
-  def takeFirstLines(lines: Int, iter: Iterator[String]):Iterator[String]={
-    @tailrec
-    def inner(lines: Int, iter: Iterator[String], begin: Iterator[String]): Iterator[String]={
-      if(!iter.hasNext || lines < 0) return begin
-      if(lines==0) return begin ++ Iterator("...")
-      val head = iter.next()
-      val remainingLines = if(head.contains('\n')) lines-1 else lines
-      inner(remainingLines,iter,begin ++ Iterator(head))
-    }
-    inner(lines,iter,Iterator.empty)
   }
 
   def preMap[T, V: PPrint](f: T => V) = PPrinter[T] {
