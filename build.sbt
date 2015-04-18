@@ -3,7 +3,10 @@ import scalatex.ScalatexReadme
 
 scalaVersion := "2.11.6"
 
-crossScalaVersions := Seq("2.11.5", "2.10.5")
+crossScalaVersions := Seq(
+  "2.10.3", "2.10.4", "2.10.5",
+  "2.11.3", "2.11.4", "2.11.5", "2.11.6"
+)
 
 publishArtifact := false
 
@@ -11,9 +14,8 @@ publishTo := Some(Resolver.file("Unused transient repository", file("target/unus
 
 val sharedSettings = Seq(
   scalaVersion := "2.11.5",
-  crossScalaVersions := Seq("2.11.5", "2.10.5"),
   organization := "com.lihaoyi",
-  version := "0.2.7",
+  version := "0.2.8",
   libraryDependencies += "com.lihaoyi" %% "utest" % "0.3.0" % "test",
   testFrameworks += new TestFramework("utest.runner.Framework"),
   scalacOptions += "-target:jvm-1.7",
@@ -103,6 +105,7 @@ lazy val repl = project
   .dependsOn(pprint)
   .settings(sharedSettings:_*)
   .settings(
+    crossVersion := CrossVersion.full,
     test in assembly := {},
     name := "ammonite-repl",
     libraryDependencies ++= Seq(

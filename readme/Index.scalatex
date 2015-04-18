@@ -61,7 +61,7 @@
       @p
         To get started, add this to your @code{build.sbt}:
 
-      @hl.scala{"com.lihaoyi" %% "ammonite-ops" % "0.2.7"}
+      @hl.scala{"com.lihaoyi" %% "ammonite-ops" % "0.2.8"}
 
       @p
         And this at the top of the file you want to use Ammonite:
@@ -243,7 +243,7 @@
         To try out Ammonite-REPL in an existing project, add the following to your @code{build.sbt}
 
       @hl.scala
-        libraryDependencies += "com.lihaoyi" %% "ammonite-repl" % "0.2.7" % "test"
+        libraryDependencies += "com.lihaoyi" % "ammonite-repl" % "0.2.8" % "test" cross CrossVersion.full
 
         initialCommands in console := "ammonite.repl.Repl.main(null)"
 
@@ -253,6 +253,8 @@
         sbt projectName/test:console
       @p
         To activate the Ammonite REPL
+      @p
+        If you want the AmmoniteREPL to be available in all projects, simply add the above snippet to a new file @code{~/.sbt/0.13/global.sbt}.
 
       @sect{Features}
         @p
