@@ -233,18 +233,37 @@ object Internals {
   }
 
   object LowerPriPPrint {
+    def companionTree(c: MacroContext.Context)(tpe: c.Type) = {
+      import c.universe._
+      val companionSymbol = tpe.typeSymbol.companionSymbol
+
+      if (companionSymbol == NoSymbol) {
+        val clsSymbol = tpe.typeSymbol.asClass
+        val msg = "[error] The companion symbol could not be determined for " +
+          s"[[${clsSymbol.name}]]. This may be due to a bug in scalac (SI-7567) " +
+          "that arises when a case class within a function is pickled. As a " +
+          "workaround, move the declaration to the module-level."
+        Console.err.println(msg)
+        c.abort(c.enclosingPosition, msg) /* TODO Does not show message. */
+      }
+
+      val symTab = c.universe.asInstanceOf[reflect.internal.SymbolTable]
+      val pre = tpe.asInstanceOf[symTab.Type].prefix.asInstanceOf[Type]
+      c.universe.treeBuild.mkAttributedRef(pre, companionSymbol)
+    }
     // Should use blackbox.Context in 2.11, doing this for 2.10 compatibility
-    def FinalRepr[T: c.WeakTypeTag](c: scala.reflect.macros.Context) = c.Expr[PPrint[T]] {
+    def FinalRepr[T: c.WeakTypeTag](c: MacroContext.Context) = c.Expr[PPrint[T]] {
       import c.universe._
 
       val tpe = c.weakTypeOf[T]
-      util.Try(c.weakTypeOf[T].typeSymbol.asClass) match {
+
+      util.Try(tpe.typeSymbol.asClass) match {
 
         case util.Success(f) if f.isCaseClass && !f.isModuleClass =>
 
           val constructor = tpe.member(newTermName("<init>"))
 
-          val companion = tpe.typeSymbol.companionSymbol
+          val companion = companionTree(c)(tpe)
 
           val paramTypes =
             constructor
@@ -278,7 +297,7 @@ object Internals {
           // We're fleshing this out a lot more than necessary to help
           // scalac along with its implicit search, otherwise it gets
           // confused and explodes
-          q"""
+          val res = q"""
             new ammonite.pprint.PPrint[$tpe](
               ammonite.pprint.Internals.fromUnpacker[$tpe](_.productPrefix){
                 (t: $tpe, cfg: ammonite.pprint.Config) =>
@@ -290,7 +309,8 @@ object Internals {
               implicitly[ammonite.pprint.Config]
             )
           """
-
+//          println(res)
+          res
         case _ =>
           q"""new ammonite.pprint.PPrint[$tpe](
             ammonite.pprint.PPrinter.Literal,

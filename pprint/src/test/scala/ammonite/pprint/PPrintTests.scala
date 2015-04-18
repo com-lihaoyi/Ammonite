@@ -6,6 +6,14 @@ import scala.annotation.tailrec
 import scala.collection.{immutable => imm}
 import scala.util.matching.Regex
 import ammonite.pprint._
+
+object Nested{
+  object ODef { case class Foo(i: Int, s: String) }
+
+  class CDef { case class Foo(i: Int, s: String) }
+  object CDef extends CDef
+
+}
 case class Foo(integer: Int, sequence: Seq[String])
 case class FooG[T](t: T, sequence: Seq[String])
 case class FooNoArgs()
@@ -18,6 +26,7 @@ object PPrintTests extends TestSuite{
   val tests = TestSuite{
     'Horizontal {
       import ammonite.pprint.Config.Defaults._
+
       'primitives {
         'Unit {
           * - check((), "()")
@@ -336,6 +345,11 @@ object PPrintTests extends TestSuite{
             |)""".stripMargin
         )
       }
+    }
+    'traited {
+      import ammonite.pprint.Config.Defaults._
+      check(Nested.ODef.Foo(2, "ba"), "Foo(2, \"ba\")")
+      check(Nested.CDef.Foo(2, "ba"), "Foo(2, \"ba\")")
     }
     'Color{
       import ammonite.pprint.Config.Colors._

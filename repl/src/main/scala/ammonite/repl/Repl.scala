@@ -73,7 +73,7 @@ object Repl{
       },
       saveHistory = { s =>
         val fw = new FileWriter(saveFile, true)
-        try fw.write(s)
+        try fw.write(delimiter + s)
         finally fw.close()
       }
     )

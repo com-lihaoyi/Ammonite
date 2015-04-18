@@ -1,7 +1,7 @@
 
 import scalatex.ScalatexReadme
 
-scalaVersion := "2.11.5"
+scalaVersion := "2.11.6"
 
 crossScalaVersions := Seq("2.11.5", "2.10.5")
 
@@ -113,9 +113,7 @@ lazy val repl = project
       "com.lihaoyi" %% "scala-parser" % "0.1.3"
     ),
     javaOptions += "-Xmx2G",
-    fork in (Test, testOnly) := true,
-    // Will not be necessary with sbt 0.13.8
-    unmanagedSourceDirectories in Compile += (sourceDirectory in Compile).value / s"scala-${scalaBinaryVersion.value}"
+    fork in (Test, testOnly) := true
   )
 
 lazy val readme = ScalatexReadme(
