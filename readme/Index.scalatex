@@ -245,7 +245,7 @@
       @hl.scala
         libraryDependencies += "com.lihaoyi" % "ammonite-repl" % "0.2.8" % "test" cross CrossVersion.full
 
-        initialCommands in console := "ammonite.repl.Repl.main(null)"
+        initialCommands in (Test, console) := "ammonite.repl.Repl.main(null)"
 
       @p
         After that, simple hit
@@ -333,7 +333,14 @@
 
           @p
             The default Scala REPL throws away all your work if the compiler crashes. This doesn't make any sense, because all the compiler is is a dumb @hl.scala{String => Array[Byte]} pipe. In the Ammonite, we simply swap out the broken compiler for a new one and let you continue your work.
-
+        @sect{Other Fixes}
+          @p
+            Apart from the above features, the Ammonite REPL fixes a large number of bugs in the default Scala REPL, including but not limited to:
+          @ul
+            @val bugs = Seq("6302", "8971", "9249", "4438", "8603", "6660", "7953", "6659", "8456", "1067", "8307")
+            @for(bug <- bugs){
+              @li(a("SI-"+bug, href:="https://issues.scala-lang.org/browse/SI-"+bug))
+            }
       @sect{Builtins}
         @p
           Ammonite contains a range of useful built-ins implemented as normal functions. Everything inside the @hl.scala{ReplAPI} trait is imported by default and can be accessed directly by default to control the console.
@@ -374,3 +381,16 @@
       """.stripMargin)
       @p
         In order to pretty print a type @hl.scala{T}, you need to have a @hl.scala{T: PPrint} context bound present. In order to write your own custom pretty printer for some type @hl.scala{T}, provide a @hl.scala{PPrinter[T]}.
+  @sect{Changelog}
+    @sect{0.2.8}
+      @ul
+        @li
+          Fix #47: PPrint derivation fails with nested case class
+        @li
+          Fix #14: Exception when trying to use Ammonite REPL #15 by cross building against Scala 2.10.{3,4,5} and 2.11.{3,4,5,6}
+        @li
+          Autocomplete results are sorted alphabetically (Fixed #42)
+        @li
+          Fix #39: nothing echoed on multiple import
+        @li
+          Importing things from Java packages now works properly
