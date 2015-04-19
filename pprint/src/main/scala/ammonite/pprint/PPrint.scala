@@ -17,6 +17,12 @@ object PPrint extends Internals.LowPriPPrint{
     pprint.render(t)
   }
 
+  def long[T: PPrint](t: T): Iterator[String] = {
+    val pprint = implicitly[PPrint[T]]
+    pprint.renderLong(t)
+  }
+
+
   /**
    * Helper to make implicit resolution behave right
    */
@@ -31,7 +37,16 @@ object PPrint extends Internals.LowPriPPrint{
 case class PPrint[A](a: PPrinter[A], cfg: Config){
   def render(t: A): Iterator[String] = {
     if (t == null) Iterator("null")
-    else takeFirstLines(cfg,a.render(t, cfg))
+    else {
+      if(cfg.maxHeight > 0) takeFirstLines(cfg, a.render(t, cfg))
+      else a.render(t, cfg)
+    }
+  }
+  def renderLong(t: A): Iterator[String] = {
+    if (t == null) Iterator("null")
+    else {
+      a.render(t, cfg)
+    }
   }
   def map(f: String => String) = a.map(f)
 
@@ -42,12 +57,12 @@ case class PPrint[A](a: PPrinter[A], cfg: Config){
       if(lines==0) return begin ++ Iterator(cfg.color.prefix("..."))
       val head = iter.next()
       if(lines < head.length/cfg.maxWidth){
-        return begin ++ Iterator(head.substring(0,lines*cfg.maxWidth),cfg.color.prefix("..."))
+        return begin ++ Iterator(head.substring(0, lines*cfg.maxWidth), cfg.color.prefix("..."))
       }
       val remainingLines = if(head.contains('\n')) lines-1 else lines - head.length/cfg.maxWidth
-      inner(remainingLines,iter,begin ++ Iterator(head))
+      inner(remainingLines, iter, begin ++ Iterator(head))
     }
-    inner(cfg.maxHeight,iter,Iterator.empty)
+    inner(cfg.maxHeight, iter, Iterator.empty)
   }
 
 }

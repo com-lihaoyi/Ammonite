@@ -7,6 +7,8 @@ import acyclic.file
  *
  * @param maxWidth Controls how far to the right a line will go before
  *                 it tries to wrap
+ * @param maxHeight Controls how many lines can be printed at once. 
+ *                  Will print all lines if set to 0
  * @param depth How much the current item being printed should be indented
  * @param renames A map used to rename things to more common names, e.g.
  *                renamig `WrappedArray` to `Array` or getting rid of
@@ -21,6 +23,7 @@ case class Config(maxWidth: Int = 100,
                   renames: Map[String, String] = Config.defaultRenames)
   extends GenConfig[Config]{
   def deeper = copy(depth = depth + 1)
+  def long = copy(maxHeight = 0)
   def rename(s: String) = renames.getOrElse(s, s)
   object color{
     def apply(s: String, c: String) = {
