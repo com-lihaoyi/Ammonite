@@ -144,7 +144,7 @@ removeAll(&quot;target/folder/thing&quot;)</code><a class=" scalatex-site-Styles
       <p>
         To get started, add this to your <code>build.sbt</code>:
 </p>
-      <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">&quot;com.lihaoyi&quot; %% &quot;ammonite-ops&quot; % &quot;0.2.7&quot;</code>
+      <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">&quot;com.lihaoyi&quot; %% &quot;ammonite-ops&quot; % &quot;0.2.8&quot;</code>
 
       <p>
         And this at the top of the file you want to use Ammonite:
@@ -496,16 +496,18 @@ val map = txt || (_.split(&quot;[^a-zA-Z0-9_]&quot;)) |&gt; freq sortBy (-_._2)<
       <p>
         To try out Ammonite-REPL in an existing project, add the following to your <code>build.sbt</code>
 </p>
-      <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; %% &quot;ammonite-repl&quot; % &quot;0.2.7&quot; % &quot;test&quot;
+      <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite-repl&quot; % &quot;0.2.8&quot; % &quot;test&quot; cross CrossVersion.full
 
-initialCommands in console := &quot;ammonite.repl.Repl.main(null)&quot;
+initialCommands in (Test, console) := &quot;ammonite.repl.Repl.main(null)&quot;
 </code></pre>
       <p>
         After that, simple hit</p>
       <code>
         sbt projectName/test:console</code>
       <p>
-        To activate the Ammonite REPL
+        To activate the Ammonite REPL</p>
+      <p>
+        If you want the AmmoniteREPL to be available in all projects, simply add the above snippet to a new file <code>~/.sbt/0.13/global.sbt</code>.
 </p>
       <h1 id="Features" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#Features" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Features</h1>
         <p>
@@ -638,8 +640,35 @@ error: java.lang.AssertionError: assertion failed
 res1: Int = 2</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/test/scala/ammonite/repl/FailureTests.scala#L25-L33" target="_blank"><i class="fa fa-link "></i></a></pre>
 
           <p>
-            The default Scala REPL throws away all your work if the compiler crashes. This doesn't make any sense, because all the compiler is is a dumb <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">String =&gt; Array[Byte]</code> pipe. In the Ammonite, we simply swap out the broken compiler for a new one and let you continue your work.
-</p>
+            The default Scala REPL throws away all your work if the compiler crashes. This doesn't make any sense, because all the compiler is is a dumb <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">String =&gt; Array[Byte]</code> pipe. In the Ammonite, we simply swap out the broken compiler for a new one and let you continue your work.</p>
+        <h2 id="OtherFixes" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#OtherFixes" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Other Fixes</h2>
+          <p>
+            Apart from the above features, the Ammonite REPL fixes a large number of bugs in the default Scala REPL, including but not limited to:</p>
+          <ul>
+            
+            
+              <li><a href="https://issues.scala-lang.org/browse/SI-6302">SI-6302</a></li>
+            
+              <li><a href="https://issues.scala-lang.org/browse/SI-8971">SI-8971</a></li>
+            
+              <li><a href="https://issues.scala-lang.org/browse/SI-9249">SI-9249</a></li>
+            
+              <li><a href="https://issues.scala-lang.org/browse/SI-4438">SI-4438</a></li>
+            
+              <li><a href="https://issues.scala-lang.org/browse/SI-8603">SI-8603</a></li>
+            
+              <li><a href="https://issues.scala-lang.org/browse/SI-6660">SI-6660</a></li>
+            
+              <li><a href="https://issues.scala-lang.org/browse/SI-7953">SI-7953</a></li>
+            
+              <li><a href="https://issues.scala-lang.org/browse/SI-6659">SI-6659</a></li>
+            
+              <li><a href="https://issues.scala-lang.org/browse/SI-8456">SI-8456</a></li>
+            
+              <li><a href="https://issues.scala-lang.org/browse/SI-1067">SI-1067</a></li>
+            
+              <li><a href="https://issues.scala-lang.org/browse/SI-8307">SI-8307</a></li>
+            </ul>
       <h1 id="Builtins" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#Builtins" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Builtins</h1>
         <p>
           Ammonite contains a range of useful built-ins implemented as normal functions. Everything inside the <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">ReplAPI</code> trait is imported by default and can be accessed directly by default to control the console.
@@ -751,10 +780,22 @@ List(
   res35: String = java.lang.Object@54f880c0
 </code></pre>
       <p>
-        In order to pretty print a type <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">T</code>, you need to have a <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">T: PPrint</code> context bound present. In order to write your own custom pretty printer for some type <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">T</code>, provide a <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">PPrinter[T]</code>.</p></p></div>
-</div><script>
+        In order to pretty print a type <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">T</code>, you need to have a <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">T: PPrint</code> context bound present. In order to write your own custom pretty printer for some type <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">T</code>, provide a <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">PPrinter[T]</code>.</p></p>
+  <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="Changelog" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;" id="Changelog">Changelog<a class=" scalatex-site-Styles-headerLink" href="#Changelog" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
+    <h1 id="0.2.8" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#0.2.8" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>0.2.8</h1>
+      <ul>
+        <li>
+          Fix #47: PPrint derivation fails with nested case class</li>
+        <li>
+          Fix #14: Exception when trying to use Ammonite REPL #15 by cross building against Scala 2.10.{3,4,5} and 2.11.{3,4,5,6}</li>
+        <li>
+          Autocomplete results are sorted alphabetically (Fixed #42)</li>
+        <li>
+          Fix #39: nothing echoed on multiple import</li>
+        <li>
+          Importing things from Java packages now works properly</li></ul></div></div><script>
     scalatex.scrollspy.Controller().main(
-      [{"value":"Ammonite","children":[{"value":"Ammonite-Ops","children":[{"value":"Paths","children":[]},{"value":"RelPaths","children":[]},{"value":"Path Operations","children":[]},{"value":"Extensions","children":[{"value":"Traversable","children":[]},{"value":"Pipeable","children":[]}]},{"value":"Operations","children":[]},{"value":"Chaining","children":[]}]},{"value":"Ammonite-REPL","children":[{"value":"Features","children":[{"value":"Artifact Loading","children":[]},{"value":"Pretty-printed output","children":[]},{"value":"Superior Autocomplete","children":[]},{"value":"Interrupting run-away execution with Ctrl-C","children":[]},{"value":"Compiler-crash Robustness","children":[]}]},{"value":"Builtins","children":[]}]},{"value":"Ammonite-PPrint","children":[]}]}]
+      [{"value":"Ammonite","children":[{"value":"Ammonite-Ops","children":[{"value":"Paths","children":[]},{"value":"RelPaths","children":[]},{"value":"Path Operations","children":[]},{"value":"Extensions","children":[{"value":"Traversable","children":[]},{"value":"Pipeable","children":[]}]},{"value":"Operations","children":[]},{"value":"Chaining","children":[]}]},{"value":"Ammonite-REPL","children":[{"value":"Features","children":[{"value":"Artifact Loading","children":[]},{"value":"Pretty-printed output","children":[]},{"value":"Superior Autocomplete","children":[]},{"value":"Interrupting run-away execution with Ctrl-C","children":[]},{"value":"Compiler-crash Robustness","children":[]},{"value":"Other Fixes","children":[]}]},{"value":"Builtins","children":[]}]},{"value":"Ammonite-PPrint","children":[]},{"value":"Changelog","children":[{"value":"0.2.8","children":[]}]}]}]
   )</script><script>
     ['DOMContentLoaded', 'load'].forEach(function(ev){
       addEventListener(ev, function(){
