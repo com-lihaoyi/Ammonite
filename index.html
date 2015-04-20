@@ -144,7 +144,7 @@ removeAll(&quot;target/folder/thing&quot;)</code><a class=" scalatex-site-Styles
       <p>
         To get started, add this to your <code>build.sbt</code>:
 </p>
-      <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">&quot;com.lihaoyi&quot; %% &quot;ammonite-ops&quot; % &quot;0.2.8&quot;</code>
+      <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">&quot;com.lihaoyi&quot; %% &quot;ammonite-ops&quot; % &quot;0.2.9&quot;</code>
 
       <p>
         And this at the top of the file you want to use Ammonite:
@@ -496,7 +496,7 @@ val map = txt || (_.split(&quot;[^a-zA-Z0-9_]&quot;)) |&gt; freq sortBy (-_._2)<
       <p>
         To try out Ammonite-REPL in an existing project, add the following to your <code>build.sbt</code>
 </p>
-      <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite-repl&quot; % &quot;0.2.8&quot; % &quot;test&quot; cross CrossVersion.full
+      <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite-repl&quot; % &quot;0.2.9&quot; % &quot;test&quot; cross CrossVersion.full
 
 initialCommands in (Test, console) := &quot;ammonite.repl.Repl.main(null)&quot;
 </code></pre>
@@ -782,6 +782,11 @@ List(
       <p>
         In order to pretty print a type <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">T</code>, you need to have a <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">T: PPrint</code> context bound present. In order to write your own custom pretty printer for some type <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">T</code>, provide a <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">PPrinter[T]</code>.</p></p>
   <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="Changelog" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;" id="Changelog">Changelog<a class=" scalatex-site-Styles-headerLink" href="#Changelog" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
+    <h1 id="0.2.9" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#0.2.9" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>0.2.9</h1>
+        <ul>
+          <li>
+            Lots of improvements to <code>Ctrl-C</code> and <code>Ctrl-D</code> handling, to make it behave more like other REPLs
+</li></ul>
     <h1 id="0.2.8" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#0.2.8" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>0.2.8</h1>
       <ul>
         <li>
@@ -795,7 +800,7 @@ List(
         <li>
           Importing things from Java packages now works properly</li></ul></div></div><script>
     scalatex.scrollspy.Controller().main(
-      [{"value":"Ammonite","children":[{"value":"Ammonite-Ops","children":[{"value":"Paths","children":[]},{"value":"RelPaths","children":[]},{"value":"Path Operations","children":[]},{"value":"Extensions","children":[{"value":"Traversable","children":[]},{"value":"Pipeable","children":[]}]},{"value":"Operations","children":[]},{"value":"Chaining","children":[]}]},{"value":"Ammonite-REPL","children":[{"value":"Features","children":[{"value":"Artifact Loading","children":[]},{"value":"Pretty-printed output","children":[]},{"value":"Superior Autocomplete","children":[]},{"value":"Interrupting run-away execution with Ctrl-C","children":[]},{"value":"Compiler-crash Robustness","children":[]},{"value":"Other Fixes","children":[]}]},{"value":"Builtins","children":[]}]},{"value":"Ammonite-PPrint","children":[]},{"value":"Changelog","children":[{"value":"0.2.8","children":[]}]}]}]
+      [{"value":"Ammonite","children":[{"value":"Ammonite-Ops","children":[{"value":"Paths","children":[]},{"value":"RelPaths","children":[]},{"value":"Path Operations","children":[]},{"value":"Extensions","children":[{"value":"Traversable","children":[]},{"value":"Pipeable","children":[]}]},{"value":"Operations","children":[]},{"value":"Chaining","children":[]}]},{"value":"Ammonite-REPL","children":[{"value":"Features","children":[{"value":"Artifact Loading","children":[]},{"value":"Pretty-printed output","children":[]},{"value":"Superior Autocomplete","children":[]},{"value":"Interrupting run-away execution with Ctrl-C","children":[]},{"value":"Compiler-crash Robustness","children":[]},{"value":"Other Fixes","children":[]}]},{"value":"Builtins","children":[]}]},{"value":"Ammonite-PPrint","children":[]},{"value":"Changelog","children":[{"value":"0.2.9","children":[]},{"value":"0.2.8","children":[]}]}]}]
   )</script><script>
     ['DOMContentLoaded', 'load'].forEach(function(ev){
       addEventListener(ev, function(){
