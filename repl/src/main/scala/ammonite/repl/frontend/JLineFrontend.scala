@@ -1,12 +1,10 @@
 package ammonite.repl.frontend
 
 import java.io.{OutputStream, InputStream}
-import java.nio.channels.CompletionHandler
 
-import ammonite.repl.{Timer, Evaluated, Res}
+import ammonite.repl.{Catching, Evaluated, Res}
 import jline.console.{completer, ConsoleReader}
 import acyclic.file
-import jline.console.completer.Completer
 
 import scala.tools.nsc.interpreter._
 import collection.JavaConversions._
@@ -38,6 +36,7 @@ object JLineFrontend{
     reader.setHistoryEnabled(true)
     reader.addCompleter(this)
     reader.setExpandEvents(false)
+    reader.setHandleUserInterrupt(true)
     val defaultHandler = reader.getCompletionHandler
     reader.setCompletionHandler(new completer.CompletionHandler {
       def complete(reader: ConsoleReader, candidates: JList[CharSequence], position: Int): Boolean = {
@@ -79,17 +78,11 @@ object JLineFrontend{
 
 
     def action(buffered: String): Res[String] = for {
-      _ <- Signaller("INT") {
-        if (reader.getCursorBuffer.length() == 0) {
+      _ <- Catching{ case e: jline.console.UserInterruptException =>
+        if (reader.getCursorBuffer.length() == 0 && buffered == "") {
           reader.println("Ctrl-D to exit")
-          reader.drawLine()
-          reader.flush()
-        } else {
-          reader.setCursorPosition(0)
-          reader.println()
-          reader.drawLine()
-          reader.killLine()
         }
+        Res.Skip
       }
 
       res <- Option(

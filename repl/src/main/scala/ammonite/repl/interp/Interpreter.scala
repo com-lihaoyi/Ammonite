@@ -50,7 +50,9 @@ class Interpreter(handleResult: => (String, Res[Evaluated]) => Unit,
     handleResult(buffered, res)
 
     res match{
-      case Res.Skip => true
+      case Res.Skip =>
+        buffered = ""
+        true
       case Res.Buffer(line) =>
         /**
          * Hack to work around the fact that if nothing got entered into

@@ -182,6 +182,7 @@ object Evaluator{
 
     def processLine(code: String, printCode: String, printer: Iterator[String] => Unit) = for {
       wrapperName <- Res.Success("cmd" + currentLine)
+      _ <- Catching{ case e: ThreadDeath => interrupted() }
       (cls, newImports) <- evalClass(
         s"""
         $previousImportBlock
