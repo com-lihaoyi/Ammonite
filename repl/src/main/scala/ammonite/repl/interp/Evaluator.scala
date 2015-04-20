@@ -40,7 +40,6 @@ trait Evaluator{
 
 object Evaluator{
   def apply(currentClassloader: ClassLoader,
-            preprocess: (String, Int) => Res[Preprocessor.Output],
             compile: => (Array[Byte], String => Unit) => Compiler.Output,
             stdout: String => Unit): Evaluator = new Evaluator{
 

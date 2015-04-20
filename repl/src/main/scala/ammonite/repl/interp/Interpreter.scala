@@ -38,7 +38,11 @@ class Interpreter(handleResult: => (String, Res[Evaluated]) => Unit,
     oldClassloader = Thread.currentThread().getContextClassLoader
     out <- try{
       Thread.currentThread().setContextClassLoader(eval.evalClassloader)
-      eval.processLine(code, printSnippet.reduceOption(_ + "++ Iterator(\"\\n\") ++" + _).getOrElse("Iterator()"), printer)
+      eval.processLine(
+        code,
+        printSnippet.reduceOption(_ + "++ Iterator(\"\\n\") ++" + _).getOrElse("Iterator()"),
+        printer
+      )
     } finally Thread.currentThread().setContextClassLoader(oldClassloader)
   } yield out
 
@@ -135,7 +139,6 @@ class Interpreter(handleResult: => (String, Res[Evaluated]) => Unit,
 
   val eval = Evaluator(
     mainThread.getContextClassLoader,
-    preprocess.apply,
     compiler.compile,
     stdout
   )

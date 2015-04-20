@@ -118,8 +118,15 @@ object Ex{
     Some(rec(t))
   }
 }
-class Timer{
-  var current = System.nanoTime()
+
+
+object Timer{
+  var current = 0L
+  def reset() = current = System.nanoTime()
+  /**
+   * Prints the time, in millis, that has passed
+   * since the last time `reset` or `apply` was called
+   */
   def apply(s: String) = {
     val now = System.nanoTime()
     println(s + ": " + (now - current) / 1000000.0)
