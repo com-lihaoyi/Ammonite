@@ -86,6 +86,8 @@ object JLineFrontend{
           reader.flush()
         } else {
           reader.setCursorPosition(0)
+          reader.println()
+          reader.drawLine()
           reader.killLine()
         }
       }
