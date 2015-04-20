@@ -317,8 +317,6 @@ object EulerTests extends TestSuite{
                    |53503534226472524250874054075591789781264330331690""".stripMargin.replace("\n", " ")
       check.session(s"""
         @ val s = "$data"
-        s: java.lang.String = "$data"
-
         @ s.split("${"""\\s+"""}").map(_.take(11).toLong).sum.toString.take(10).toLong
         res1: Long = 5537376230L
       """)
