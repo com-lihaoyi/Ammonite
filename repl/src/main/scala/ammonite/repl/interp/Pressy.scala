@@ -98,7 +98,7 @@ object Pressy {
           )
     }
 
-    def scoped(index: Int): (Int, List[(String, Option[String])]) = {
+    def scoped: (Int, List[(String, Option[String])]) = {
       index -> ask(index, pressy.askScopeCompletion).map(s =>
         pressy.ask(() => (s.sym.name.decoded, None))
       )
@@ -160,7 +160,7 @@ object Pressy {
       val run = new Run(pressy, currentFile, allCode, index)
 
       val (i, all) =
-        run.dotted.headOption orElse run.prefixed.headOption getOrElse run.scoped(index)
+        run.dotted.headOption orElse run.prefixed.headOption getOrElse run.scoped
 
       val allNames = all.collect{ case (name, None) => name}.filter(_ != "<init>")
       val signatures = all.collect{ case (name, Some(defn)) => defn }
