@@ -23,7 +23,7 @@ case class Config(maxWidth: Int = 100,
                   renames: Map[String, String] = Config.defaultRenames)
   extends GenConfig[Config]{
   def deeper = copy(depth = depth + 1)
-  def long = copy(maxHeight = 0)
+  def full = copy(maxHeight = 0)
   def rename(s: String) = renames.getOrElse(s, s)
   object color{
     def apply(s: String, c: String) = {

@@ -17,10 +17,6 @@ object PPrint extends Internals.LowPriPPrint{
     pprint.render(t)
   }
 
-  def long[T: PPrint](t: T): Iterator[String] = {
-    val pprint = implicitly[PPrint[T]]
-    pprint.renderLong(t)
-  }
 
 
   /**
@@ -38,34 +34,13 @@ case class PPrint[A](a: PPrinter[A], cfg: Config){
   def render(t: A): Iterator[String] = {
     if (t == null) Iterator("null")
     else {
-      if(cfg.maxHeight > 0) takeFirstLines(cfg, a.render(t, cfg))
-      else a.render(t, cfg)
-    }
-  }
-  def renderLong(t: A): Iterator[String] = {
-    if (t == null) Iterator("null")
-    else {
       a.render(t, cfg)
     }
   }
   def map(f: String => String) = a.map(f)
-
-  private def takeFirstLines(cfg: Config, iter: Iterator[String]):Iterator[String]={
-    @tailrec
-    def inner(lines: Int, iter: Iterator[String], begin: Iterator[String]): Iterator[String]={
-      if(!iter.hasNext || lines < 0) return begin
-      if(lines==0) return begin ++ Iterator(cfg.color.prefix("..."))
-      val head = iter.next()
-      if(lines < head.length/cfg.maxWidth){
-        return begin ++ Iterator(head.substring(0, lines*cfg.maxWidth), cfg.color.prefix("..."))
-      }
-      val remainingLines = if(head.contains('\n')) lines-1 else lines - head.length/cfg.maxWidth
-      inner(remainingLines, iter, begin ++ Iterator(head))
-    }
-    inner(cfg.maxHeight, iter, Iterator.empty)
-  }
-
 }
+
+case class Full[A](a: A)
 
 /**
  * A typeclass you define to prettyprint values of type [[A]]
@@ -80,7 +55,13 @@ trait PPrinter[-A] {
 
 object PPrinter {
   def apply[T](r: (T, Config) => Iterator[String]): PPrinter[T] = {
-    new PPrinter[T]{def render(t: T, c: Config)= r(t, c)}
+    new PPrinter[T]{ 
+      def render(t: T, c: Config) = {
+        if(c.maxHeight > 0)
+          takeFirstLines(c, r(t, c))
+        else r(t, c)
+      }
+    }
   }
 
   /**
@@ -150,6 +131,21 @@ object PPrinter {
     s.toString()
   }
 
+  private def takeFirstLines(cfg: Config, iter: Iterator[String]):Iterator[String]={
+    @tailrec
+    def inner(lines: Int, iter: Iterator[String], begin: Iterator[String]): Iterator[String]={
+      if(!iter.hasNext || lines < 0) return begin
+      if(lines==0) return begin ++ Iterator(cfg.color.prefix("..."))
+      val head = iter.next()
+      if(lines < head.length/cfg.maxWidth){
+        return begin ++ Iterator(head.substring(0, lines*cfg.maxWidth), cfg.color.prefix("..."))
+      }
+      val remainingLines = if(head.contains('\n')) lines-1 else lines - head.length/cfg.maxWidth
+      inner(remainingLines, iter, begin ++ Iterator(head))
+    }
+    inner(cfg.maxHeight, iter, Iterator.empty)
+  }
+
   implicit def ArrayRepr[T: PPrint] = PPrinter[Array[T]]{
     def repr = Internals.collectionRepr[T, Seq[T]]
     (t: Array[T], c: Config) => repr.render(t, c)
@@ -158,6 +154,15 @@ object PPrinter {
   implicit def SeqRepr[T: PPrint] = Internals.collectionRepr[T, Seq[T]]
   implicit def SetRepr[T: PPrint] = Internals.collectionRepr[T, Set[T]]
   implicit def MapRepr[T: PPrint, V: PPrint] = Internals.makeMapRepr[Map, T, V]
+  
+  implicit def fullPPrinter[A: PPrint]: PPrinter[Full[A]] = {
+    new PPrinter[Full[A]]{ 
+      def render(wrapper: Full[A], c: Config) = {
+        val pprint = implicitly[PPrint[A]]
+        Iterator("asd") ++  pprint.copy(cfg = c.full).render(wrapper.a)
+      }
+    }
+  }
 
 }
 object Unpacker extends PPrinterGen {
