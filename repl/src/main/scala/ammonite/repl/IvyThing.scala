@@ -1,14 +1,12 @@
 package ammonite.repl
 
-import java.io.File
-
 import org.apache.ivy.Ivy
 import org.apache.ivy.core.module.descriptor.{DefaultDependencyDescriptor, DefaultModuleDescriptor}
 import org.apache.ivy.core.module.id.ModuleRevisionId
 import org.apache.ivy.core.resolve.ResolveOptions
 import org.apache.ivy.core.settings.IvySettings
-import org.apache.ivy.plugins.parser.xml.XmlModuleDescriptorWriter
-import org.apache.ivy.plugins.resolver.{IBiblioResolver, URLResolver}
+
+import org.apache.ivy.plugins.resolver.IBiblioResolver
 import acyclic.file
 object IvyConstructor extends IvyConstructor
 trait IvyConstructor{
@@ -57,9 +55,6 @@ object IvyThing {
       ivySettings
     }
 
-    val ivyfile = File.createTempFile("ivy", ".xml")
-    ivyfile.deleteOnExit()
-
     val md = DefaultModuleDescriptor.newDefaultInstance(
       ModuleRevisionId.newInstance(
         groupId,
@@ -68,27 +63,26 @@ object IvyThing {
       )
     )
 
-    md.addDependency(
-      new DefaultDependencyDescriptor(
+    md.addDependency{
+      val desc = new DefaultDependencyDescriptor(
         md,
         ModuleRevisionId.newInstance(groupId, artifactId, version),
         false,
         false,
         true
       )
-    )
+      // No idea wtf this is
+      desc.addDependencyConfiguration("*", "*")
+      desc
+    }
 
-    //creates an ivy configuration file
-    XmlModuleDescriptorWriter.write(md, ivyfile)
+    val options = new ResolveOptions()
+      .setConfs(Array("default"))
+      .setRefresh(true)
+      .setOutputReport(false)
 
     //init resolve report
-    val report = ivy.resolve(
-      ivyfile.toURI.toURL,
-      new ResolveOptions()
-        .setConfs(Array("default"))
-        .setRefresh(true)
-        .setOutputReport(false)
-    )
+    val report = ivy.resolve(md, options)
     //so you can get the jar libraries
     report.getAllArtifactsReports.map(_.getLocalFile)
   }
