@@ -33,22 +33,24 @@ object IvyThing {
     .stripPrefix("version ").split('.').take(2).mkString(".")
 
   def resolveArtifact(groupId: String, artifactId: String, version: String) = {
-    //url resolver for configuration of maven repo
-    val resolver = {
-      val res = new IBiblioResolver()
-      res.setUsepoms(true)
-//      res.setUseMavenMetadata(true)
-      res.setM2compatible(true)
-      res.setName("central")
-      res.setRoot("http://repo1.maven.org/maven2/")
-      res
-    }
 
     val ivy = Ivy.newInstance{
+      val resolver = {
+        val res = new IBiblioResolver()
+        res.setUsepoms(true)
+        //      res.setUseMavenMetadata(true)
+        res.setM2compatible(true)
+        res.setName("central")
+        res.setRoot("http://repo1.maven.org/maven2/")
+        res
+      }
+
       //creates clear ivy settings
       val ivySettings = new IvySettings()
       //adding maven repo resolver
       ivySettings.addResolver(resolver)
+
+      println("ivySettings.getResolverNames " + ivySettings.getResolverNames)
       //set to the default resolver
       ivySettings.setDefaultResolver(resolver.getName)
       //creates an Ivy instance with settings
@@ -82,7 +84,10 @@ object IvyThing {
     //init resolve report
     val report = ivy.resolve(
       ivyfile.toURI.toURL,
-      new ResolveOptions().setConfs(Array("default")).setRefresh(true).setOutputReport(false)
+      new ResolveOptions()
+        .setConfs(Array("default"))
+        .setRefresh(true)
+        .setOutputReport(false)
     )
     //so you can get the jar libraries
     report.getAllArtifactsReports.map(_.getLocalFile)

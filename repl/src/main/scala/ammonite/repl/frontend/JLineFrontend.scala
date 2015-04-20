@@ -81,7 +81,9 @@ object JLineFrontend{
     def action(buffered: String): Res[String] = for {
       _ <- Signaller("INT") {
         if (reader.getCursorBuffer.length() == 0) {
-          println("Ctrl-D to exit")
+          reader.println("Ctrl-D to exit")
+          reader.drawLine()
+          reader.flush()
         } else {
           reader.setCursorPosition(0)
           reader.killLine()
