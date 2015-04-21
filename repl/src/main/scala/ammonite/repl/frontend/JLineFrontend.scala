@@ -107,7 +107,8 @@ object JLineFrontend{
 
       case Res.Success(ev) =>
         val last = reader.getHistory.size()-1
-        reader.getHistory.set(last, buffered + reader.getHistory.get(last))
+        if (last >= 0)
+          reader.getHistory.set(last, buffered + reader.getHistory.get(last))
 
       case Res.Exit =>
         // Otherwise the terminal gets left in a funny

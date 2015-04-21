@@ -37,21 +37,26 @@ class Repl(input: InputStream,
     initialHistory = initialHistory
   )
 
-  def action() = for{
+  def action(input: Res[String], save: Boolean) = for{
     // Condition to short circuit early if `interp` hasn't finished evaluating
-    line <- frontEnd.action(interp.buffered)
+    line <- input
     _ <- Signaller("INT") { interp.mainThread.stop() }
-    out <- interp.processLine(line, (f, x) => {saveHistory(x); f(x)}, _.foreach(print))
+    out <- interp.processLine(line, (f, x) => if (save) {saveHistory(x); f(x)}, _.foreach(print))
   } yield {
     println()
     out
   }
 
-
   def run() = {
-    @tailrec def loop(): Unit = {
-      val res = action()
+    @tailrec
+    def loop(): Unit = {
+      val res = action(frontEnd.action(interp.buffered), true)
       if (interp.handleOutput(res)) loop()
+    }
+
+    for (line <- predef.lines map (_.trim) if !line.isEmpty) {
+      val res = action(Res.Success(line), false)
+      interp.handleOutput(res)
     }
     loop()
   }
