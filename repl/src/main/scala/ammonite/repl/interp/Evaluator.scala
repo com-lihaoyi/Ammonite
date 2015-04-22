@@ -52,7 +52,9 @@ object Evaluator{
     def namesFor(t: scala.reflect.runtime.universe.Type): Set[String] = {
       val yours = t.members.map(_.name.toString).toSet
       val default = typeOf[Object].members.map(_.name.toString)
-      yours -- default
+      // About nme.LOCAL_SUFFIX_STRING, see http://stackoverflow.com/a/17248174/3714539
+      // Using nme instead of termNames for 2.10 compatibility
+      (yours -- default).filterNot(_ endsWith nme.LOCAL_SUFFIX_STRING)
     }
 
     /**
