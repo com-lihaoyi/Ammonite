@@ -68,6 +68,9 @@ trait ReplAPI {
    */
   def newCompiler(): Unit
 
+  def search(target: scala.reflect.runtime.universe.Type): Option[String]
+
+  def compiler: scala.tools.nsc.Global
   /**
    * Prettyprint the given `value` with no truncation. Optionally takes
    * a number of lines to print.

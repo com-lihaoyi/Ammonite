@@ -77,10 +77,12 @@ class Interpreter(handleResult: => (String, Res[Evaluated]) => Unit,
   }
 
   lazy val replApi: ReplAPI = new DefaultReplAPI {
+
     def imports = interp.eval.previousImportBlock
     def colors = colors0
     def shellPrompt: String = shellPrompt0()
     def shellPrompt_=(s: String) = shellPrompt0() = s
+
     object load extends Load{
 
       def apply(line: String) = handleOutput(processLine(
@@ -108,6 +110,8 @@ class Interpreter(handleResult: => (String, Res[Evaluated]) => Unit,
     }
     implicit var pprintConfig = interp.pprintConfig
     def clear() = ()
+    def search(target: scala.reflect.runtime.universe.Type) = Interpreter.this.compiler.search(target)
+    def compiler = Interpreter.this.compiler.compiler
     def newCompiler() = init()
     def history = interp.history.toVector.dropRight(1)
     def show[T](a: T, lines: Int = 0) = ammonite.pprint.Show(a, lines)
