@@ -19,7 +19,13 @@ import scala.util.Try
  */
 trait Evaluator{
   def evalClass(code: String, wrapperName: String): Res[(Class[_], Seq[ImportData])]
-  def getCurrentLine: Int
+
+  /**
+   * _2, _1, 0, 1, 2, 3...
+   *
+   * Numbers starting from _ are used to represent predefined commands
+   */
+  def getCurrentLine: String
   def update(newImports: Seq[ImportData]): Unit
 
   /**
@@ -41,7 +47,7 @@ trait Evaluator{
 object Evaluator{
   def apply(currentClassloader: ClassLoader,
             compile: => (Array[Byte], String => Unit) => Compiler.Output,
-            stdout: String => Unit): Evaluator = new Evaluator{
+            startingLine: Int): Evaluator = new Evaluator{
 
     def namesFor(t: scala.reflect.runtime.universe.Type): Set[String] = {
       val yours = t.members.map(_.name.toString).toSet
@@ -73,13 +79,13 @@ object Evaluator{
      * The current line number of the REPL, used to make sure every snippet
      * evaluated can have a distinct name that doesn't collide.
      */
-    var currentLine = 0
+    var currentLine = startingLine
 
     /**
      * Weird indirection only necessary because of
      * https://issues.scala-lang.org/browse/SI-7085
      */
-    def getCurrentLine = currentLine
+    def getCurrentLine = currentLine.toString.replace("-", "_")
 
     /**
      * Performs the conversion of our pre-compiled `Array[Byte]`s into
@@ -181,7 +187,7 @@ object Evaluator{
     type InitEx = ExceptionInInitializerError
 
     def processLine(code: String, printCode: String, printer: Iterator[String] => Unit) = for {
-      wrapperName <- Res.Success("cmd" + currentLine)
+      wrapperName <- Res.Success("cmd" + getCurrentLine)
       _ <- Catching{ case e: ThreadDeath => interrupted() }
       (cls, newImports) <- evalClass(
         s"""

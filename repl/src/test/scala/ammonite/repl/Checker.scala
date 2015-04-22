@@ -6,12 +6,14 @@ import utest._
 
 
 class Checker {
+  def predef = ""
   var allOutput = ""
   val interp = new Interpreter(
     (_, _) => (),
     Ref[String](""),
     stdout = allOutput += _,
-    initialHistory = Nil
+    initialHistory = Nil,
+    predef = predef
   )
 
   def session(sess: String): Unit ={

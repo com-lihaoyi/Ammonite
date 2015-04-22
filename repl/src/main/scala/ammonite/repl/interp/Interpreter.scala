@@ -18,7 +18,8 @@ class Interpreter(handleResult: => (String, Res[Evaluated]) => Unit,
                   pprintConfig: pprint.Config = pprint.Config.Defaults.PPrintConfig,
                   colors0: ColorSet = ColorSet.BlackWhite,
                   stdout: String => Unit,
-                  initialHistory: Seq[String]){ interp =>
+                  initialHistory: Seq[String],
+                  predef: String){ interp =>
 
   val dynamicClasspath = new VirtualDirectory("(memory)", None)
   var extraJars = Seq[java.io.File]()
@@ -61,7 +62,7 @@ class Interpreter(handleResult: => (String, Res[Evaluated]) => Unit,
         buffered = line + "\n"
         true
       case Res.Exit =>
-        stdout("Bye!")
+        stdout("Bye!\n")
         pressy.shutdownPressy()
         false
       case Res.Success(ev) =>
@@ -70,7 +71,7 @@ class Interpreter(handleResult: => (String, Res[Evaluated]) => Unit,
         true
       case Res.Failure(msg) =>
         buffered = ""
-        stdout(Console.RED + msg + Console.RESET)
+        stdout(Console.RED + msg + Console.RESET + "\n")
         true
     }
   }
@@ -85,7 +86,7 @@ class Interpreter(handleResult: => (String, Res[Evaluated]) => Unit,
       def apply(line: String) = handleOutput(processLine(
         line,
         (_, _) => (), // Discard history of load-ed lines,
-        _.foreach(print)
+        _.foreach(stdout)
       ))
 
       def handleJar(jar: File): Unit = {
@@ -142,8 +143,13 @@ class Interpreter(handleResult: => (String, Res[Evaluated]) => Unit,
   val eval = Evaluator(
     mainThread.getContextClassLoader,
     compiler.compile,
-    stdout
+    if (predef != "") -1 else 0
   )
 
   init()
+
+  if (predef != "") {
+    val res1 = processLine(predef, (_, _) => (), _.foreach(stdout))
+    val res2 = handleOutput(res1)
+  }
 }

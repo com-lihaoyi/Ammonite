@@ -12,7 +12,7 @@ import scala.tools.nsc.{Global => G}
  * three things:
  */
 trait Preprocessor{
-  def apply(code: String, wrapperId: Int): Res[Preprocessor.Output]
+  def apply(code: String, wrapperId: String): Res[Preprocessor.Output]
 }
 object Preprocessor{
 
@@ -78,23 +78,22 @@ object Preprocessor{
       ObjectDef, ClassDef, TraitDef, DefDef, TypeDef, PatVarDef, Import, Expr
     )
 
-    def apply(code: String, wrapperId: Int): Res[Preprocessor.Output] = {
+    def apply(code: String, wrapperId: String): Res[Preprocessor.Output] = {
       val splitter = new scalaParser.Scala(code){
         def Split = {
           def Prelude = rule( Annot.* ~ `implicit`.? ~ `lazy`.? ~ LocalMod.* )
-          rule( Semis.? ~ capture(Import | Prelude ~ BlockDef | StatCtx.Expr).*(Semis) ~ Semis.? ~ EOI )
+          rule( Semis.? ~ capture(Import | Prelude ~ BlockDef | StatCtx.Expr).*(Semis) ~ Semis.? ~ WL ~ EOI)
         }
       }
-
       splitter.Split.run() match {
-        case util.Failure(ParseError(p, pp, t)) if p.index == code.length => Res.Buffer(code)
+        case util.Failure(e @ ParseError(p, pp, t)) if p.index == code.length => Res.Buffer(code)
         case util.Failure(e) => Res.Failure(parse(code).left.get)
         case util.Success(Nil) => Res.Skip
-        case util.Success(postSplit: Seq[String]) => complete(code, wrapperId, postSplit)
+        case util.Success(postSplit: Seq[String]) => complete(code, wrapperId, postSplit.map(_.trim))
       }
     }
     
-    def complete(code: String, wrapperId: Int, postSplit: Seq[String]) = {
+    def complete(code: String, wrapperId: String, postSplit: Seq[String]) = {
       val reParsed = postSplit.map(p => (parse(p), p))
       val errors = reParsed.collect{case (Left(e), _) => e }
       if (errors.length != 0) Res.Failure(errors.mkString("\n"))

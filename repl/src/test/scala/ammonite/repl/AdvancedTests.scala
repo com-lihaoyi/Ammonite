@@ -206,5 +206,28 @@ object AdvancedTests extends TestSuite{
         res3: scala.Option[Int] = Some(3)
       """)
     }
+    'predef{
+      val check2 = new Checker{
+        override def predef = """
+          import math.abs
+          val x = 1
+          val y = "2"
+        """
+      }
+      check2.session("""
+        @ -x
+        res0: Int = -1
+
+        @ y
+        res1: java.lang.String = "2"
+
+        @ x + y
+        res2: String = "12"
+
+        @ abs(-x)
+        res3: Int = 1
+      """)
+
+    }
   }
 }

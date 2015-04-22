@@ -33,8 +33,9 @@ class Repl(input: InputStream,
     shellPrompt,
     pprintConfig.copy(maxWidth = frontEnd.width),
     colorSet,
-    stdout = new PrintStream(output).println,
-    initialHistory = initialHistory
+    stdout = new PrintStream(output).print,
+    initialHistory = initialHistory,
+    predef = predef
   )
 
   def action() = for{
@@ -59,7 +60,8 @@ class Repl(input: InputStream,
 
 object Repl{
   val defaultPredef = """"""
-  def main(args: Array[String]) = {
+  def main(args: Array[String]) = run()
+  def run(predef: String = "") = {
     println("Loading Ammonite Repl...")
 
     val saveFile = new java.io.File(System.getProperty("user.home")) + "/.amm"
@@ -75,7 +77,8 @@ object Repl{
         val fw = new FileWriter(saveFile, true)
         try fw.write(delimiter + s)
         finally fw.close()
-      }
+      },
+      predef = predef
     )
     shell.run()
 
