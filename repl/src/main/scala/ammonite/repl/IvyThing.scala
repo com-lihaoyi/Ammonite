@@ -25,6 +25,10 @@ trait IvyConstructor{
   implicit class ArtifactIdExt(t: (String, String)){
     def %(version: String) = (t._1, t._2, version)
   }
+  implicit class ResolverNameExt(name: String){
+    def at(location: String) = Resolver.mavenResolver(name, location)
+  }
+  val Resolver = ammonite.repl.Resolver
 }
 
 /**
@@ -38,27 +42,16 @@ object IvyThing {
   val scalaBinaryVersion = scala.util.Properties.versionString
     .stripPrefix("version ").split('.').take(2).mkString(".")
 
-  def resolveArtifact(groupId: String, artifactId: String, version: String) = {
+  def resolveArtifact(groupId: String, artifactId: String, version: String, resolvers: Seq[DependencyResolver]) = {
 
     val ivy = Ivy.newInstance{
-      val resolver = {
-        val res = new IBiblioResolver()
-        res.setUsepoms(true)
-        //      res.setUseMavenMetadata(true)
-        res.setM2compatible(true)
-        res.setName("central")
-        res.setRoot("http://repo1.maven.org/maven2/")
-        res
-      }
-
       //creates clear ivy settings
       val ivySettings = new IvySettings()
-      //adding maven repo resolver
-      ivySettings.addResolver(resolver)
+      ivySettings.setBaseDir(ResolverHelpers.ivyHome)
 
-      println("ivySettings.getResolverNames " + ivySettings.getResolverNames)
-      //set to the default resolver
-      ivySettings.setDefaultResolver(resolver.getName)
+      val chain = new SbtChainResolver("resolver-chain", resolvers, ivySettings)
+      ivySettings.addResolver(chain)
+      ivySettings.setDefaultResolver(chain.getName)
       //creates an Ivy instance with settings
       ivySettings
     }
