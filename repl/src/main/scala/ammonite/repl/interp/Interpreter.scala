@@ -151,5 +151,6 @@ class Interpreter(handleResult: => (String, Res[Evaluated]) => Unit,
   if (predef != "") {
     val res1 = processLine(predef, (_, _) => (), _.foreach(stdout))
     val res2 = handleOutput(res1)
+    stdout("\n")
   }
 }
