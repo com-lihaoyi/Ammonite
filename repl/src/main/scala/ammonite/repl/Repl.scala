@@ -48,15 +48,14 @@ class Repl(input: InputStream,
   }
 
   def run() = {
-    @tailrec
-    def loop(): Unit = {
-      val res = action(frontEnd.action(interp.buffered), true)
-      if (interp.handleOutput(res)) loop()
-    }
-
     for (line <- predef.lines map (_.trim) if !line.isEmpty) {
       val res = action(Res.Success(line), false)
       interp.handleOutput(res)
+    }
+
+    @tailrec def loop(): Unit = {
+      val res = action(frontEnd.action(interp.buffered), true)
+      if (interp.handleOutput(res)) loop()
     }
     loop()
   }
