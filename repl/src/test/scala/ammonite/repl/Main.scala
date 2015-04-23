@@ -63,49 +63,4 @@ object Main {
     case ExistentialType(tparams, result) => rec0(result)
     case AnnotatedType(annots, tp) => rec0(tp) + annots.map(x => " @" + rec0(x.tpe)).mkString
   }
-  def rec1(tpe: Type): String = tpe match {
-    case WildcardType => "WildCard"
-    case BoundedWildcardType(bounds) => "BoundedWildcard"
-    case NoType => "NoType"
-    case NoPrefix => "NoPrefix"
-    case ThisType(sym) => "ThisType" // sym.this.type
-    case SuperType(thistpe, supertpe) => "SuperType" // super references
-    case SingleType(pre, sym) => "SingleType" // pre.sym.type
-    case ConstantType(value) => "ConstantType" // Int(2)
-    case TypeRef(pre, sym, args) =>
-      "TypeRef"
-    // pre.sym[targs]
-    // Outer.this.C would be represented as TypeRef(ThisType(Outer), C, List())
-    case RefinedType(parents, defs) =>
-      "RefinedType"
-    // parent1 with ... with parentn { defs }
-    case ExistentialType(tparams, result) =>
-      "ExistentialType"
-    // result forSome { tparams }
-    case AnnotatedType(annots, tp) =>
-      "AnnotatedType"
-    // tp @annots
-
-    // the following are non-value types; you cannot write them down in Scala source.
-
-    case TypeBounds(lo, hi) =>
-      "TypeBounds"
-    // >: lo <: hi
-    case ClassInfoType(parents, defs, clazz) =>
-      "ClassInfoType"
-    // same as RefinedType except as body of class
-    case MethodType(paramtypes, result) =>
-      "MethodType"
-    // (paramtypes)result
-    // For instance def m(): T is represented as MethodType(List(), T)
-    case NullaryMethodType(result) => // eliminated by uncurry
-      "NullaryMethodType"
-    // an eval-by-name type
-    // For instance def m: T is represented as NullaryMethodType(T)
-    case PolyType(tparams, result) =>
-      "PolyType"
-    // [tparams]result where result is a (Nullary)MethodType or ClassInfoType
-
-
-  }
 }
