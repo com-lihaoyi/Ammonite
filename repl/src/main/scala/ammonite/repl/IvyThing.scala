@@ -28,43 +28,52 @@ trait IvyConstructor{
  * And transliterated into Scala. I have no idea how or why it works.
  */
 object IvyThing {
-  val scalaBinaryVersion = scala.util.Properties.versionString
-    .stripPrefix("version ").split('.').take(2).mkString(".")
+  val scalaBinaryVersion =
+    scala.util.Properties
+              .versionString
+              .stripPrefix("version ")
+              .split('.')
+              .take(2)
+              .mkString(".")
 
+  var maxLevel = 2
   Message.setDefaultLogger(new AbstractMessageLogger {
-    val maxLevel = 1
     def doEndProgress(msg: String) = Console.err.println("Done")
-    def doProgress()               = Console.err.print(".")
-    def log(msg: String, level: Int)    =
-      if (level <= maxLevel &&
-          msg != ":: problems summary ::" &&
-          msg.trim.nonEmpty &&
-          !msg.trim.startsWith("unknown resolver "))
-        Console.err.println(msg)
+    def doProgress() = Console.err.print(".")
+    def log(msg: String, level: Int) =  if (level <= maxLevel) Console.err.println(msg)
     def rawlog(msg: String, level: Int) = log(msg, level)
   })
 
-  def resolveArtifact(groupId: String, artifactId: String, version: String) = {
-
+  def resolveArtifact(groupId: String,
+                      artifactId: String,
+                      version: String,
+                      verbosity: Int = 2) = {
+    maxLevel = verbosity
     val ivy = Ivy.newInstance{
-      val resolver = {
+
+      def resolver(name: String) = {
         val res = new IBiblioResolver()
         res.setUsepoms(true)
-        //      res.setUseMavenMetadata(true)
         res.setM2compatible(true)
-        res.setName("central")
+        res.setName(name)
         res.setRoot("http://repo1.maven.org/maven2/")
         res
       }
-
+      //add duplicate resolvers with different name to make Ivy shut up
+      //and stop giving `unknown resolver null` or `unknown resolver sbt-chain`
+      //errors
+      val resolvers = Seq(
+        resolver("central"),
+        resolver("sbt-chain"),
+        resolver("null")
+      )
       //creates clear ivy settings
       val ivySettings = new IvySettings()
       //adding maven repo resolver
-      ivySettings.addResolver(resolver)
+      resolvers.foreach(ivySettings.addResolver)
 
-      println("ivySettings.getResolverNames " + ivySettings.getResolverNames)
       //set to the default resolver
-      ivySettings.setDefaultResolver(resolver.getName)
+      ivySettings.setDefaultResolver(resolvers(0).getName)
       //creates an Ivy instance with settings
       ivySettings
     }

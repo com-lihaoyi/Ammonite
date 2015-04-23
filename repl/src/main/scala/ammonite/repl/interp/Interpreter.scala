@@ -98,11 +98,11 @@ class Interpreter(handleResult: => (String, Res[Evaluated]) => Unit,
         handleJar(jar)
         init()
       }
-      def ivy(coordinates: (String, String, String)): Unit ={
+      def ivy(coordinates: (String, String, String), verbose: Boolean = true): Unit ={
         val (groupId, artifactId, version) = coordinates
         eval.newClassloader()
-        IvyThing.resolveArtifact(groupId, artifactId, version)
-          .map(handleJar)
+        IvyThing.resolveArtifact(groupId, artifactId, version, if (verbose) 2 else 1)
+                .map(handleJar)
         init()
       }
     }
