@@ -31,7 +31,7 @@ class Repl(input: InputStream,
   val interp: Interpreter = new Interpreter(
     frontEnd.update,
     shellPrompt,
-    pprintConfig.copy(maxWidth = frontEnd.width),
+    pprintConfig.copy(maxWidth = frontEnd.width, maxHeight = 15),
     colorSet,
     stdout = new PrintStream(output).print,
     initialHistory = initialHistory,

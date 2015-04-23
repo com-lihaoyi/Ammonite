@@ -33,13 +33,15 @@ object PPrint extends Internals.LowPriPPrint{
 case class PPrint[A](a: PPrinter[A], cfg: Config){
   def render(t: A): Iterator[String] = {
     if (t == null) Iterator("null")
-    else {
-      a.render(t, cfg)
-    }
+    else a.render(t, cfg)
   }
   def map(f: String => String) = a.map(f)
 }
 
+/**
+ * Wrapper type for disabling output truncation.
+ * PPrint(Full(value)) will always return the full output.
+ */
 case class Full[A](a: A)
 
 /**
@@ -134,14 +136,17 @@ object PPrinter {
   private def takeFirstLines(cfg: Config, iter: Iterator[String]):Iterator[String]={
     @tailrec
     def inner(lines: Int, iter: Iterator[String], begin: Iterator[String]): Iterator[String]={
-      if(!iter.hasNext || lines < 0) return begin
-      if(lines==0) return begin ++ Iterator(cfg.color.prefix("..."))
-      val head = iter.next()
-      if(lines < head.length/cfg.maxWidth){
-        return begin ++ Iterator(head.substring(0, lines*cfg.maxWidth), cfg.color.prefix("..."))
+      if(!iter.hasNext || lines < 0)  begin
+      else if(lines==0)  begin ++ Iterator(cfg.color.prefix("..."))
+      else {
+        val head = iter.next()
+        if(lines < head.length/cfg.maxWidth){
+          begin ++ Iterator(head.substring(0, lines*cfg.maxWidth), cfg.color.prefix("..."))
+        } else {
+          val remainingLines = if(head.contains('\n')) lines-1 else lines - head.length/cfg.maxWidth
+          inner(remainingLines, iter, begin ++ Iterator(head))
+        }
       }
-      val remainingLines = if(head.contains('\n')) lines-1 else lines - head.length/cfg.maxWidth
-      inner(remainingLines, iter, begin ++ Iterator(head))
     }
     inner(cfg.maxHeight, iter, Iterator.empty)
   }
@@ -159,7 +164,7 @@ object PPrinter {
     new PPrinter[Full[A]]{ 
       def render(wrapper: Full[A], c: Config) = {
         val pprint = implicitly[PPrint[A]]
-        Iterator("asd") ++  pprint.copy(cfg = c.full).render(wrapper.a)
+        pprint.copy(cfg = c.full).render(wrapper.a)
       }
     }
   }
