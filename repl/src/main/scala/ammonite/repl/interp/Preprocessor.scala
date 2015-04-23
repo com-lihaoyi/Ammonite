@@ -71,7 +71,7 @@ object Preprocessor{
     }
 
     val Expr = Processor{
-      case (name, code, tree) => Output(s"val $name = ($code)", Seq(pprint(name)))
+      case (name, code, tree) => Output(s"val $name = (\n$code\n)", Seq(pprint(name)))
     }
 
     val decls = Seq[(String, String, G#Tree) => Option[Preprocessor.Output]](
