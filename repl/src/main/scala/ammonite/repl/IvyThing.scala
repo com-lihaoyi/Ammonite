@@ -5,6 +5,7 @@ import org.apache.ivy.core.module.descriptor.{DefaultDependencyDescriptor, Defau
 import org.apache.ivy.core.module.id.ModuleRevisionId
 import org.apache.ivy.core.resolve.ResolveOptions
 import org.apache.ivy.core.settings.IvySettings
+import org.apache.ivy.util._
 
 import org.apache.ivy.plugins.resolver.IBiblioResolver
 import acyclic.file
@@ -29,6 +30,19 @@ trait IvyConstructor{
 object IvyThing {
   val scalaBinaryVersion = scala.util.Properties.versionString
     .stripPrefix("version ").split('.').take(2).mkString(".")
+
+  Message.setDefaultLogger(new AbstractMessageLogger {
+    val maxLevel = 1
+    def doEndProgress(msg: String) = Console.err.println("Done")
+    def doProgress()               = Console.err.print(".")
+    def log(msg: String, level: Int)    =
+      if (level <= maxLevel &&
+          msg != ":: problems summary ::" &&
+          msg.trim.nonEmpty &&
+          !msg.trim.startsWith("unknown resolver "))
+        Console.err.println(msg)
+    def rawlog(msg: String, level: Int) = log(msg, level)
+  })
 
   def resolveArtifact(groupId: String, artifactId: String, version: String) = {
 
