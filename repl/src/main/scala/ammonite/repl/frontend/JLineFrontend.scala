@@ -79,7 +79,7 @@ object JLineFrontend{
 
     def action(buffered: String): Res[String] = for {
       _ <- Catching{ case e: jline.console.UserInterruptException =>
-        if (reader.getCursorBuffer.length() == 0 && buffered == "") {
+        if (e.getPartialLine == "" && buffered == "") {
           reader.println("Ctrl-D to exit")
         }
         Res.Skip
