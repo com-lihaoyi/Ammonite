@@ -101,9 +101,17 @@ class Interpreter(handleResult: => (String, Res[Evaluated]) => Unit,
       def ivy(coordinates: (String, String, String)): Unit ={
         val (groupId, artifactId, version) = coordinates
         eval.newClassloader()
-        IvyThing.resolveArtifact(groupId, artifactId, version)
+        IvyThing.resolveArtifact(groupId, artifactId, version, resolvers)
           .map(handleJar)
         init()
+      }
+
+      var resolvers = Seq(
+        Resolver.localRepo,
+        Resolver.defaultMaven
+      )
+      def resolver(resolver: org.apache.ivy.plugins.resolver.DependencyResolver) = {
+        resolvers = resolvers :+ resolver
       }
     }
     implicit def pprintConfig = interp.pprintConfig

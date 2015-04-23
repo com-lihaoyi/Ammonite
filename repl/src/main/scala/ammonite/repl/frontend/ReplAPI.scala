@@ -89,6 +89,11 @@ trait Load extends (String => Unit){
   def ivy(coordinates: (String, String, String)): Unit
 
   /**
+   * Add a resolver for Ivy
+   */
+  def resolver(resolver: org.apache.ivy.plugins.resolver.DependencyResolver): Unit
+
+  /**
    * Loads a command into the REPL and
    * evaluates them one after another
    */

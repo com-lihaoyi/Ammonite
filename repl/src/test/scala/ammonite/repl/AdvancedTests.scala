@@ -38,6 +38,25 @@ object AdvancedTests extends TestSuite{
             res2: String = "[1,2,3]"
           """)
         }
+        'resolvers{
+          // Actually tests that the Resolver._ methods can be called, does not try to fetch artifacts from them
+          check.session("""
+            @ load.resolver(Resolver.sonatypeRepo("snapshots"))
+            res0: Unit = ()
+
+            @ load.resolver(Resolver.mavenResolver("Scalaz Bintray Repo", "https://dl.bintray.com/scalaz/releases"))
+            res1: Unit = ()
+
+            @ load.resolver(Resolver.mavenLocal)
+            res2: Unit = ()
+
+            @ load.resolver(Resolver.defaultMaven)
+            res3: Unit = ()
+
+            @ load.resolver(Resolver.localRepo)
+            res4: Unit = ()
+                        """)
+        }
 
         'reloading{
           // Make sure earlier-loaded things indeed continue working
@@ -204,6 +223,29 @@ object AdvancedTests extends TestSuite{
 
         @ (Option(1) |@| Option(2))(_ + _)
         res3: scala.Option[Int] = Some(3)
+      """)
+    }
+
+    'scalazstream{
+      check.session("""
+        @ load.resolver("Scalaz Bintray Repo" at "https://dl.bintray.com/scalaz/releases")
+
+        @ load.ivy("org.scalaz.stream" %% "scalaz-stream" % "0.7a")
+
+        @ import scalaz.stream._
+        import scalaz.stream._
+
+        @ import scalaz.concurrent.Task
+        import scalaz.concurrent.Task
+
+        @ val p1 = Process.constant(1).toSource
+        p1: scalaz.stream.Process[scalaz.concurrent.Task,Int] = Append(Emit(Vector(1)),Vector(<function1>))
+
+        @ val pch = Process.constant((i:Int) => Task.now(())).take(3)
+        pch: scalaz.stream.Process[Nothing,Int => scalaz.concurrent.Task[Unit]] = Append(Halt(End),Vector(<function1>))
+
+        @ p1.to(pch).runLog.run.size == 3
+        res6: Boolean = true
       """)
     }
     'predef{
