@@ -169,7 +169,7 @@ object Evaluator{
               if (x.fromName == x.toName)
                 "\n  " + BacktickWrap(x.fromName)
               else
-                "\n  " + BacktickWrap(x.fromName) + " => " + BacktickWrap(x.toName)
+                "\n  " + BacktickWrap(x.fromName) + " => " + (if (x.toName == "_") "_" else BacktickWrap(x.toName))
 
             }
             val block = lines.mkString(",")
