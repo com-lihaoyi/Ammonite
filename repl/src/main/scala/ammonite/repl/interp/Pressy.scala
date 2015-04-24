@@ -62,7 +62,7 @@ object Pressy {
             // sketchy name munging because I don't know how to do this properly
             strippedName = sym.nameString.stripPrefix("package$").stripSuffix("$")
             if strippedName.startsWith(name.decoded)
-            (pref, suf) = sym.fullNameString.splitAt(sym.fullNameString.lastIndexOf('.') + 1)
+            (pref, _) = sym.fullNameString.splitAt(sym.fullNameString.lastIndexOf('.') + 1)
             out = pref + strippedName
             if out != ""
           } yield (out, None)
@@ -72,11 +72,9 @@ object Pressy {
 
         if (shallow.length > 0) (t.pos.startOrPoint, shallow)
         else if (deep.length == 1) (t.pos.startOrPoint, deep)
-        else (t.pos.endOrPoint, deep :+ ("", None))
+        else (t.pos.endOrPoint, deep :+ ("" -> None))
     }
     def ask(index: Int, query: (Position, Response[List[pressy.Member]]) => Unit) = {
-      val (first, last) = allCode.splitAt(index)
-
       val position = new OffsetPosition(currentFile, index)
       val scopes = Compiler.awaitResponse[List[pressy.Member]](query(position, _))
       scopes.filter(_.accessible)
@@ -109,11 +107,10 @@ object Pressy {
             dynamicClasspath: VirtualDirectory,
             evalClassloader: => ClassLoader): Pressy = new Pressy {
 
-
     var cachedPressy: nsc.interactive.Global = null
 
     def initPressy = {
-      val (settings, reporter, vd, jcp) = Compiler.initGlobalBits(
+      val (settings, reporter, _, jcp) = Compiler.initGlobalBits(
         jarDeps, dirDeps, dynamicClasspath, _ => (), scala.Console.YELLOW
       )
       new nsc.interactive.Global(settings, reporter) {
