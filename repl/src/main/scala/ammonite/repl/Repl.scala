@@ -59,9 +59,11 @@ class Repl(input: InputStream,
 }
 
 object Repl{
-  val defaultPredef = """"""
+  val defaultPredef = """
+    def full[A](a: A) = ammonite.pprint.Full(a)
+  """
   def main(args: Array[String]) = run()
-  def run(predef: String = "") = {
+  def run(predef: String = defaultPredef) = {
     println("Loading Ammonite Repl...")
 
     val saveFile = new java.io.File(System.getProperty("user.home")) + "/.amm"
