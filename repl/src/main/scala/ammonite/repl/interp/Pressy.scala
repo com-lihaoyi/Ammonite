@@ -57,7 +57,7 @@ object Pressy {
 
         lazy val allDeep = pressy.ask(() =>
           for {
-            member <- pressy.RootClass.typeSignature.members.toSeq
+            member <- pressy.RootClass.typeSignature.members.toList
             sym <- rec(member)
             // sketchy name munging because I don't know how to do this properly
             strippedName = sym.nameString.stripPrefix("package$").stripSuffix("$")
