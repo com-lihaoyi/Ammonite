@@ -13,7 +13,7 @@ publishArtifact := false
 publishTo := Some(Resolver.file("Unused transient repository", file("target/unusedrepo")))
 
 val sharedSettings = Seq(
-  scalaVersion := "2.11.5",
+  scalaVersion := "2.11.6",
   organization := "com.lihaoyi",
   version := "0.3.0-SNAPSHOT",
   libraryDependencies += "com.lihaoyi" %% "utest" % "0.3.0" % "test",
