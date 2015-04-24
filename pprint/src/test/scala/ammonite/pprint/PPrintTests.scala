@@ -378,5 +378,127 @@ object PPrintTests extends TestSuite{
       )
     }
 
+    'Truncation{
+      'long_no_truncation{
+        implicit val cfg = Config.Defaults.PPrintConfig
+          * - check("a" * 10000,"\""+"a" * 10000+"\"")
+          * - check(
+            List.fill(30)(100),
+            """List(
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100
+              |)""".stripMargin
+            )
+      }
+
+      'short_non_truncated{
+        implicit val cfg = Config.Defaults.PPrintConfig.copy(maxHeight = 15)
+        * - check("a"*1000, "\"" + "a"*1000 + "\"")
+        * - check(List(1,2,3,4), "List(1, 2, 3, 4)")
+        * - check(
+          List.fill(14)("asdfghjklqwertz"),
+          """List(
+            |  "asdfghjklqwertz",
+            |  "asdfghjklqwertz",
+            |  "asdfghjklqwertz",
+            |  "asdfghjklqwertz",
+            |  "asdfghjklqwertz",
+            |  "asdfghjklqwertz",
+            |  "asdfghjklqwertz",
+            |  "asdfghjklqwertz",
+            |  "asdfghjklqwertz",
+            |  "asdfghjklqwertz",
+            |  "asdfghjklqwertz",
+            |  "asdfghjklqwertz",
+            |  "asdfghjklqwertz",
+            |  "asdfghjklqwertz"
+            |)
+          """.stripMargin
+        )
+      }
+
+      'short_lines_truncated{
+        implicit val cfg = Config.Defaults.PPrintConfig.copy(maxHeight = 15)
+        * - check(
+          List.fill(15)("foobarbaz"),
+          """List(
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |...""".stripMargin
+        )
+        * - check(
+        List.fill(150)("foobarbaz"),
+          """List(
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |...""".stripMargin
+        )
+      }
+
+      'long_line_truncated{
+        implicit val cfg = Config.Defaults.PPrintConfig.copy(
+          maxWidth = 100,
+          maxHeight = 1
+        )
+        check(
+          "a" * 1000,
+          """"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa..."""
+        )
+      }
+    }
   }
+
+  
 }
