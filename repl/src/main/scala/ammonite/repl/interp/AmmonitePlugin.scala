@@ -15,6 +15,7 @@ class AmmonitePlugin(g: scala.tools.nsc.Global, output: Seq[ImportData] => Unit)
   val name: String = "AmmonitePlugin"
   val global: Global = g
   val description: String = "Extracts the names in scope for the Ammonite REPL to use"
+
   val components: List[PluginComponent] = List(
     new PluginComponent {
       val global = g

@@ -112,6 +112,7 @@ object Compiler{
   def apply(jarDeps: Seq[java.io.File],
             dirDeps: Seq[java.io.File],
             dynamicClasspath: VirtualDirectory,
+            evalClassloader: => ClassLoader,
             shutdownPressy: () => Unit): Compiler = new Compiler{
 
     var logger: String => Unit = s => ()
@@ -129,7 +130,7 @@ object Compiler{
           val global: g.type = g
           override def classPath = jcp
         }
-        override lazy val analyzer = CompilerCompatibility.analyzer(g)
+        override lazy val analyzer = CompilerCompatibility.analyzer(g, evalClassloader)
       }
       (vd, reporter, scalac)
     }

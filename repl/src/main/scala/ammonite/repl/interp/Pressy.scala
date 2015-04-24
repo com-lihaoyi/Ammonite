@@ -106,7 +106,8 @@ object Pressy {
   }
   def apply(jarDeps: Seq[java.io.File],
             dirDeps: Seq[java.io.File],
-            dynamicClasspath: VirtualDirectory): Pressy = new Pressy {
+            dynamicClasspath: VirtualDirectory,
+            evalClassloader: => ClassLoader): Pressy = new Pressy {
 
 
     var cachedPressy: nsc.interactive.Global = null
@@ -125,7 +126,7 @@ object Pressy {
 
           override def classPath = jcp
         }
-        override lazy val analyzer = CompilerCompatibility.interactiveAnalyzer(g)
+        override lazy val analyzer = CompilerCompatibility.interactiveAnalyzer(g, evalClassloader)
       }
     }
 

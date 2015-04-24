@@ -229,5 +229,24 @@ object AdvancedTests extends TestSuite{
       """)
 
     }
+    'macros{
+      check.session("""
+        @ import language.experimental.macros
+
+        @ import reflect.macros.Context
+
+        @ def impl(c: Context): c.Expr[String] = {
+        @  import c.universe._
+        @  c.Expr[String](Literal(Constant("Hello!")))
+        @ }
+        defined function impl
+
+        @ def m: String = macro impl
+        defined function m
+
+        @ m
+        res3: java.lang.String = "Hello!"
+      """)
+    }
   }
 }

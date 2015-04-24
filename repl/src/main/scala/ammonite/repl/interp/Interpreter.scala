@@ -119,12 +119,14 @@ class Interpreter(handleResult: => (String, Res[Evaluated]) => Unit,
       Classpath.jarDeps ++ extraJars,
       Classpath.dirDeps,
       dynamicClasspath,
+      eval.evalClassloader,
       () => pressy.shutdownPressy()
     )
     pressy = Pressy(
       Classpath.jarDeps ++ extraJars,
       Classpath.dirDeps,
-      dynamicClasspath
+      dynamicClasspath,
+      eval.evalClassloader
     )
 
     val cls = eval.evalClass(
