@@ -1,3 +1,10 @@
 target/
 *.iml
 .idea
+.settings
+.classpath
+.project
+.cache
+.sbtserver
+project/.sbtserver
+tags
