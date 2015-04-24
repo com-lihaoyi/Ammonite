@@ -245,7 +245,7 @@ object AdvancedTests extends TestSuite{
         defined function m
 
         @ m
-        res3: java.lang.String = "Hello!"
+        res4: java.lang.String = "Hello!"
       """)
     }
   }
