@@ -1,6 +1,7 @@
 package ammonite.repl.interp
 
 import acyclic.file
+import ammonite.repl.Res
 
 import scala.reflect.internal.util.{OffsetPosition, BatchSourceFile}
 import scala.reflect.io.VirtualDirectory
@@ -18,6 +19,7 @@ trait Pressy{
 }
 object Pressy {
 
+  private val suggestionNumber = new java.util.concurrent.atomic.AtomicInteger
   /**
    * Encapsulates all the logic around a single instance of
    * `nsc.interactive.Global` and other data specific to a single completion
@@ -25,8 +27,13 @@ object Pressy {
   class Run(val pressy: nsc.interactive.Global,
             currentFile: BatchSourceFile,
             allCode: String,
-            index: Int){
-    val tree = pressy.parseTree(currentFile)
+            index: Int,
+            eval: Evaluator,
+            previousImports: String){
+    import pressy.Quasiquote
+    val tree: pressy.Tree = pressy.parseTree(currentFile).collect {
+      case t@q"object AutocompleteWrapper {..$stats}" => stats.last
+    }.head
     def prefixed: Seq[(Int, Seq[(String, Option[String])])] = tree.collect {
       case t@pressy.Ident(name)
         if t.pos.startOrPoint <= index && index <= t.pos.endOrPoint =>
@@ -34,11 +41,11 @@ object Pressy {
 
         lazy val shallow = {
           pressy.ask(() => r.filter(_.sym.name.decoded.startsWith(name.decoded)).map{
-            case x if x.sym.name.decoded == name.decoded =>
-              (x.sym.name.decoded, Some(x.sym.defString))
-            case x =>
-              (x.sym.name.decoded, None)
-          })
+              case x if x.sym.name.decoded == name.decoded =>
+                (x.sym.name.decoded, Some(x.sym.defString))
+              case x =>
+                (x.sym.name.decoded, None)
+            })
         }
 
         /**
@@ -88,24 +95,48 @@ object Pressy {
         (
           qualifier.pos.endOrPoint + 1,
           pressy.ask(() => r.filter(_.sym.name.decoded.startsWith(prefix)).map{
-            case x if x.sym.name.decoded == prefix =>
-              (x.sym.name.decoded, Some(x.sym.defString))
-            case x =>
-              (x.sym.name.decoded, None)
-          })
-          )
+              case x if x.sym.name.decoded == prefix =>
+                (x.sym.name.decoded, Some(x.sym.defString))
+              case x =>
+                (x.sym.name.decoded, None)
+            })
+        )
     }
 
     def scoped: (Int, List[(String, Option[String])]) = {
-      index -> ask(index, pressy.askScopeCompletion).map(s =>
-        pressy.ask(() => (s.sym.name.decoded, None))
-      )
+      pressy.ask { () =>
+        val prefix = tree.collect { case q"$prex.$last" => prex }.head
+//        println(s"Scoped completion $index \n$prefix\n ${prefix.pos}")
+        val typeCompletion = Compiler.awaitResponse[List[pressy.Member]](pressy.askTypeCompletion(tree.pos.focusEnd, _))
+        val prefixTpe = Compiler.awaitResponse[pressy.Tree](pressy.askTypeAt(prefix.pos, _))
+        val selectedMethodDefiningType = prefixTpe.tpe
+//        println(s"Type to test for CompletionHook: $selectedMethodDefiningType @${prefix.pos.lineContent}")
+        val suggestionsMethod = selectedMethodDefiningType.member(pressy.TermName("suggestions"))
+//        println(s"Possible suggestion method $suggestionsMethod")
+        val suggestions = if (suggestionsMethod != pressy.NoSymbol && suggestionsMethod.asMethod.returnType <:< pressy.typeOf[Seq[String]]) {
+//          println("Briiliant candidate found!!")
+          val completionPrefix = new String(prefix.pos.source.content.slice(prefix.pos.start, prefix.pos.end))
+          val wrapperName = "SuggesterWrapper" + eval.getCurrentLine + suggestionNumber.incrementAndGet
+          val code = s"""$previousImports
+                        |object $wrapperName {
+                        |def suggestions = ($completionPrefix).suggestions
+                        |}""".stripMargin
+          eval.evalClass(code, wrapperName) match {
+            case Res.Success((cls, imports)) =>
+              val suggestions = cls.getMethod("suggestions").invoke(null).asInstanceOf[Seq[String]]
+              Some(index -> suggestions.map(s => s -> None).toList)
+            case _ => None
+          }
+        } else None
+        suggestions getOrElse (index -> ask(index, pressy.askScopeCompletion).map(s => (s.sym.name.decoded, None)))
+      }
     }
   }
   def apply(jarDeps: Seq[java.io.File],
             dirDeps: Seq[java.io.File],
             dynamicClasspath: VirtualDirectory,
-            evalClassloader: => ClassLoader): Pressy = new Pressy {
+            evalClassloader: => ClassLoader,
+            eval: => Evaluator): Pressy = new Pressy {
 
     var cachedPressy: nsc.interactive.Global = null
 
@@ -155,7 +186,7 @@ object Pressy {
         e => throw e
       )
 
-      val run = new Run(pressy, currentFile, allCode, index)
+      val run = new Run(pressy, currentFile, allCode, index, eval, previousImports)
 
       val (i, all) =
         run.dotted.headOption orElse run.prefixed.headOption getOrElse run.scoped

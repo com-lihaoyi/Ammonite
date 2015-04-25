@@ -126,7 +126,8 @@ class Interpreter(handleResult: => (String, Res[Evaluated]) => Unit,
       Classpath.jarDeps ++ extraJars,
       Classpath.dirDeps,
       dynamicClasspath,
-      eval.evalClassloader
+      eval.evalClassloader,
+      eval
     )
 
     val cls = eval.evalClass(
