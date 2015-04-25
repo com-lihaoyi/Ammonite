@@ -249,8 +249,13 @@ case class Path(segments: Seq[String]) extends BasePathImpl[Path]{
     new RelPath(segments.drop(s2.length), newUps)
   }
   
-  def suggestions: Seq[String] = {
+  def suggestions(userArg: Any): Seq[String] = {
     import scala.collection.JavaConverters._
-    java.nio.file.Files.list(this.nio).iterator.asScala.map(_.getFileName.toString).toVector
+    val prefix = userArg match {
+      case s: Symbol => s.name
+      case s: String => s
+      case _ => ""
+    }
+    java.nio.file.Files.list(this.nio).iterator.asScala.map(_.getFileName.toString).filter(_ startsWith prefix).map(_ stripPrefix prefix).toVector
   }
 }

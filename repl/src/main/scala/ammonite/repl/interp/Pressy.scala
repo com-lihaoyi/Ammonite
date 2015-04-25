@@ -105,30 +105,25 @@ object Pressy {
 
     def scoped: (Int, List[(String, Option[String])]) = {
       pressy.ask { () =>
-        val prefix = tree.collect { case q"$prex.$last" => prex }.head
-//        println(s"Scoped completion $index \n$prefix\n ${prefix.pos}")
-        val typeCompletion = Compiler.awaitResponse[List[pressy.Member]](pressy.askTypeCompletion(tree.pos.focusEnd, _))
-        val prefixTpe = Compiler.awaitResponse[pressy.Tree](pressy.askTypeAt(prefix.pos, _))
-        val selectedMethodDefiningType = prefixTpe.tpe
-//        println(s"Type to test for CompletionHook: $selectedMethodDefiningType @${prefix.pos.lineContent}")
-        val suggestionsMethod = selectedMethodDefiningType.member(pressy.TermName("suggestions"))
-//        println(s"Possible suggestion method $suggestionsMethod")
-        val suggestions = if (suggestionsMethod != pressy.NoSymbol && suggestionsMethod.asMethod.returnType <:< pressy.typeOf[Seq[String]]) {
-//          println("Briiliant candidate found!!")
-          val completionPrefix = new String(prefix.pos.source.content.slice(prefix.pos.start, prefix.pos.end))
-          val wrapperName = "SuggesterWrapper" + eval.getCurrentLine + suggestionNumber.incrementAndGet
-          val code = s"""$previousImports
+        def isNotPackage(target: pressy.Tree) = target.symbol == null || target.symbol == pressy.NoSymbol || !target.symbol.hasPackageFlag
+        
+        val (operationTarget, argument: Option[pressy.Tree]) = tree.collect { 
+          case q"$target.$last" if target.pos.end <= index && isNotPackage(target) => target -> None
+          case q"$target.$last($argument)" if target.pos.end <= index && isNotPackage(target) => target -> Some(argument)
+        }.sortBy(index - _._1.pos.end).head
+        val completionInvocation = new String(operationTarget.pos.source.content.slice(operationTarget.pos.start, operationTarget.pos.end))
+        val completionIncovationArguments = argument.map(a => new String(a.pos.source.content.slice(a.pos.start, a.pos.end))).getOrElse("()")
+        val wrapperName = "SuggesterWrapper" + eval.getCurrentLine + suggestionNumber.incrementAndGet
+        val code = s"""$previousImports
                         |object $wrapperName {
-                        |def suggestions = ($completionPrefix).suggestions
+                        |def suggestions = ($completionInvocation).suggestions($completionIncovationArguments)
                         |}""".stripMargin
-          eval.evalClass(code, wrapperName) match {
-            case Res.Success((cls, imports)) =>
-              val suggestions = cls.getMethod("suggestions").invoke(null).asInstanceOf[Seq[String]]
-              Some(index -> suggestions.map(s => s -> None).toList)
-            case _ => None
-          }
-        } else None
-        suggestions getOrElse (index -> ask(index, pressy.askScopeCompletion).map(s => (s.sym.name.decoded, None)))
+        eval.evalClass(code, wrapperName) match {
+          case Res.Success((cls, imports)) =>
+            val suggestions = cls.getMethod("suggestions").invoke(null).asInstanceOf[Seq[String]]
+            index -> suggestions.map(s => s -> None).toList
+          case _ => index -> ask(index, pressy.askScopeCompletion).map(s => (s.sym.name.decoded, None))
+        }
       }
     }
   }

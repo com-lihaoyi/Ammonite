@@ -102,7 +102,7 @@ lazy val tools = project
   )
 
 lazy val repl = project
-  .dependsOn(pprint)
+  .dependsOn(pprint,tools)
   .settings(sharedSettings:_*)
   .settings(
     crossVersion := CrossVersion.full,
