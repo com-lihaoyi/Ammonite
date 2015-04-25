@@ -118,12 +118,15 @@ object Pressy {
                         |object $wrapperName {
                         |def suggestions = ($completionInvocation).suggestions($completionIncovationArguments)
                         |}""".stripMargin
-        eval.evalClass(code, wrapperName) match {
+        val suggestions = eval.evalClass(code, wrapperName) match {
           case Res.Success((cls, imports)) =>
-            val suggestions = cls.getMethod("suggestions").invoke(null).asInstanceOf[Seq[String]]
-            index -> suggestions.map(s => s -> None).toList
-          case _ => index -> ask(index, pressy.askScopeCompletion).map(s => (s.sym.name.decoded, None))
+            try {
+              val suggestions = cls.getMethod("suggestions").invoke(null).asInstanceOf[Seq[String]]
+              Some(index -> suggestions.map(s => s -> None).toList)
+            } catch { case ce: ClassCastException => None }
+          case _ => None
         }
+        suggestions getOrElse (index -> ask(index, pressy.askScopeCompletion).map(s => (s.sym.name.decoded, None)))
       }
     }
   }
