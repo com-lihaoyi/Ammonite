@@ -149,7 +149,10 @@ class Interpreter(handleResult: => (String, Res[Evaluated]) => Unit,
   )
 
   init()
-
+  // Run the predef. For now we assume that the whole thing is a single
+  // command, and will get compiled & run at once. We hard-code the
+  // line number to -1 if the predef exists so the first user-entered
+  // line becomes 0
   if (predef != "") {
     val res1 = processLine(predef, (_, _) => (), _.foreach(stdout))
     val res2 = handleOutput(res1)

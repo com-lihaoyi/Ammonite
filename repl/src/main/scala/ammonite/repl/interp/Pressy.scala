@@ -160,7 +160,9 @@ object Pressy {
       val (i, all) =
         run.dotted.headOption orElse run.prefixed.headOption getOrElse run.scoped
 
-      val allNames = all.collect{ case (name, None) => name}.filter(_ != "<init>")
+      val allNames = all.collect{ case (name, None) => name}
+                        .filter(_ != "<init>")
+                        .filter(!_.contains('$'))
       val signatures = all.collect{ case (name, Some(defn)) => defn }
 
       (i - prefix.length, allNames, signatures)

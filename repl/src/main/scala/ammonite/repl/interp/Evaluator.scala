@@ -49,11 +49,6 @@ object Evaluator{
             compile: => (Array[Byte], String => Unit) => Compiler.Output,
             startingLine: Int): Evaluator = new Evaluator{
 
-    def namesFor(t: scala.reflect.runtime.universe.Type): Set[String] = {
-      val yours = t.members.map(_.name.toString).toSet
-      val default = typeOf[Object].members.map(_.name.toString)
-      yours -- default
-    }
 
     /**
      * Files which have been compiled, stored so that our special
@@ -68,12 +63,22 @@ object Evaluator{
      * map. Otherwise if you import the same name twice you get compile
      * errors instead of the desired shadowing.
      */
-    lazy val previousImports = mutable.Map(
-      namesFor(typeOf[ReplAPI]).map(n => n -> ImportData(n, n, "", "ReplBridge.shell")).toSeq ++
-      namesFor(typeOf[ammonite.repl.IvyConstructor]).map(n => n -> ImportData(n, n, "", "ammonite.repl.IvyConstructor")).toSeq
-      :_*
-    )
+    lazy val previousImports = {
+      def namesFor(t: scala.reflect.runtime.universe.Type): Set[String] = {
+        val yours = t.members.map(_.name.toString).toSet
+        val default = typeOf[Object].members.map(_.name.toString)
+        yours -- default
+      }
 
+      def importsFor[T: TypeTag](name: String) = {
+        namesFor(typeOf[T]).map(n => n -> ImportData(n, n, "", name)).toSeq
+      }
+      mutable.Map(
+        importsFor[ReplAPI]("ReplBridge.shell") ++
+        importsFor[ammonite.repl.IvyConstructor]("ammonite.repl.IvyConstructor")
+        :_*
+      )
+    }
 
     /**
      * The current line number of the REPL, used to make sure every snippet
@@ -152,14 +157,11 @@ object Evaluator{
     def evalMain(cls: Class[_]) =
       cls.getDeclaredMethod("$main").invoke(null)
 
-    def transpose[A](xs: List[List[A]]): List[List[A]] = xs.filter(_.nonEmpty) match {
-      case Nil    =>  Nil
-      case ys: List[List[A]] => ys.map{ _.head }::transpose(ys.map{ _.tail })
-    }
+
     def previousImportBlock = {
       val snippets = for {
         (prefix, allImports) <- previousImports.values.toList.groupBy(_.prefix)
-        imports <- transpose(allImports.groupBy(_.fromName).values.toList)
+        imports <- Util.transpose(allImports.groupBy(_.fromName).values.toList)
       } yield {
         imports match{
           case Seq(imp) if imp.fromName == imp.toName =>

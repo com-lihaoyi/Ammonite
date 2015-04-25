@@ -119,6 +119,12 @@ object Ex{
   }
 }
 
+object Util{
+  def transpose[A](xs: List[List[A]]): List[List[A]] = xs.filter(_.nonEmpty) match {
+    case Nil    =>  Nil
+    case ys: List[List[A]] => ys.map{ _.head }::transpose(ys.map{ _.tail })
+  }
+}
 
 object Timer{
   var current = 0L
