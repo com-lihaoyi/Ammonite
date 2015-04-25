@@ -114,13 +114,13 @@ trait BasePathImpl[ThisType <: BasePath[ThisType]] extends BasePath[ThisType]{
 object PathError{
   type IAE = IllegalArgumentException
   case class InvalidSegment(segment: String)
-  extends IAE(s"Path segment [$segment] not allowed")
+    extends IAE(s"Path segment [$segment] not allowed")
 
   case object AbsolutePathOutsideRoot
-  extends IAE("The path created has enough ..s that it would start outside the root directory")
+    extends IAE("The path created has enough ..s that it would start outside the root directory")
 
   case class NoRelativePath(src: RelPath, base: RelPath)
-  extends IAE(s"Can't relativize relative paths $src from $base")
+    extends IAE(s"Can't relativize relative paths $src from $base")
 }
 
 /**

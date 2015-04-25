@@ -41,11 +41,11 @@ object Pressy {
 
         lazy val shallow = {
           pressy.ask(() => r.filter(_.sym.name.decoded.startsWith(name.decoded)).map{
-              case x if x.sym.name.decoded == name.decoded =>
-                (x.sym.name.decoded, Some(x.sym.defString))
-              case x =>
-                (x.sym.name.decoded, None)
-            })
+            case x if x.sym.name.decoded == name.decoded =>
+              (x.sym.name.decoded, Some(x.sym.defString))
+            case x =>
+              (x.sym.name.decoded, None)
+          })
         }
 
         /**
@@ -95,12 +95,12 @@ object Pressy {
         (
           qualifier.pos.endOrPoint + 1,
           pressy.ask(() => r.filter(_.sym.name.decoded.startsWith(prefix)).map{
-              case x if x.sym.name.decoded == prefix =>
-                (x.sym.name.decoded, Some(x.sym.defString))
-              case x =>
-                (x.sym.name.decoded, None)
-            })
-        )
+            case x if x.sym.name.decoded == prefix =>
+              (x.sym.name.decoded, Some(x.sym.defString))
+            case x =>
+              (x.sym.name.decoded, None)
+          })
+          )
     }
 
     def scoped: (Int, List[(String, Option[String])]) = {
