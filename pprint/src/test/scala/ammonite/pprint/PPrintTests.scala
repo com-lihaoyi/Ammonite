@@ -490,11 +490,27 @@ object PPrintTests extends TestSuite{
       'long_line_truncated{
         implicit val cfg = Config.Defaults.PPrintConfig.copy(
           maxWidth = 100,
-          maxHeight = 1
+          maxHeight = 3
         )
         check(
           "a" * 1000,
-          """"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa..."""
+          """"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa..."""
+        )
+      }
+
+      'stream{
+        implicit val cfg = Config.Defaults.PPrintConfig.copy(
+          maxHeight = 5
+        )
+        check(
+          Stream.continually("foo"),
+          """Stream(
+            |  "foo",
+            |  "foo",
+            |  "foo",
+            |  "foo",
+            |...
+          """.stripMargin
         )
       }
     }
