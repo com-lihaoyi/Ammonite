@@ -514,6 +514,17 @@ object PPrintTests extends TestSuite{
         )
       }
     }
+
+    'wrapped_lines{
+      implicit val cfg = Config.Defaults.PPrintConfig.copy(
+        maxWidth = 8,
+        maxHeight = 5
+      )
+      check(
+        "1234567890\n"*10,
+        "\"\"\"\n1234567890\n1234567890\n..."
+      )
+    }
   }
 
   
