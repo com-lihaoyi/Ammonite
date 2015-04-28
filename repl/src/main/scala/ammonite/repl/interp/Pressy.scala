@@ -119,6 +119,7 @@ object Pressy {
                         |object $wrapperName {
                         |def suggestions = ($completionInvocation).suggestions($completionIncovationArguments)
                         |}""".stripMargin
+            println(s"($completionInvocation).suggestions($completionIncovationArguments)")
             eval.evalClass(code, wrapperName) match {
               case Res.Success((cls, imports)) =>
                 try {
@@ -127,6 +128,22 @@ object Pressy {
                 } catch { case ce: ClassCastException => None }
               case _ => None
             }
+        }.orElse {
+          tree.collect {
+            case q"StringContext(..$text).$op(..$args)" =>
+              val wrapperName = pressy.TermName("SuggesterWrapper" + eval.getCurrentLine + suggestionNumber.incrementAndGet)
+              val codeTree = q"""object $wrapperName { def suggestions = StringContext(..$text).$op.suggestions(..$args) }"""
+              val code = previousImports + "\n" + pressy.showCode(codeTree)
+              println(code)
+              eval.evalClass(code, wrapperName.toString) match {
+                case Res.Success((cls, imports)) =>
+                  try {
+                    val suggestions = cls.getMethod("suggestions").invoke(null).asInstanceOf[Seq[String]]
+                    Some(index -> suggestions.map(s => s -> None).toList)
+                  } catch { case ce: ClassCastException => None }
+                case _ => None
+              }
+          }.headOption.flatten
         }
         suggestions getOrElse (index -> ask(index, pressy.askScopeCompletion).map(s => (s.sym.name.decoded, None)))
       }
