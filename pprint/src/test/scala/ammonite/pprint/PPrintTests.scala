@@ -424,9 +424,8 @@ object PPrintTests extends TestSuite{
         * - check("a"*1000, "\"" + "a"*1000 + "\"")
         * - check(List(1,2,3,4), "List(1, 2, 3, 4)")
         * - check(
-          List.fill(14)("asdfghjklqwertz"),
+          List.fill(13)("asdfghjklqwertz"),
           """List(
-            |  "asdfghjklqwertz",
             |  "asdfghjklqwertz",
             |  "asdfghjklqwertz",
             |  "asdfghjklqwertz",
