@@ -108,18 +108,17 @@ object Pressy {
         def isNotPackage(target: pressy.Tree) = target.symbol == null || target.symbol == pressy.NoSymbol || !target.symbol.hasPackageFlag
         
         val suggestions = tree.collect { 
-          case q"$target.$last" if target.pos.end <= index && isNotPackage(target) => target -> None
-          case q"$target.$last($argument)" if target.pos.end <= index && isNotPackage(target) => target -> Some(argument)
+          case q"$target.$op" if target.pos.end <= index && isNotPackage(target) => (target, op, None)
+          case q"$target.$op($argument)" if target.pos.end <= index && isNotPackage(target) => (target, op, Some(argument))
         }.sortBy(index - _._1.pos.end).headOption.flatMap {
-          case (operationTarget, argument: Option[pressy.Tree]) =>
+          case (operationTarget, operator, argument) =>
             val completionInvocation = new String(operationTarget.pos.source.content.slice(operationTarget.pos.start, operationTarget.pos.end))
-            val completionIncovationArguments = argument.map(a => new String(a.pos.source.content.slice(a.pos.start, a.pos.end))).getOrElse("()")
+            val completionIncovationArguments = Seq('"' + operator.decoded + '"', argument.map(a => new String(a.pos.source.content.slice(a.pos.start, a.pos.end))).getOrElse("()")).mkString(", ")
             val wrapperName = "SuggesterWrapper" + eval.getCurrentLine + suggestionNumber.incrementAndGet
             val code = s"""$previousImports
                         |object $wrapperName {
                         |def suggestions = ($completionInvocation).suggestions($completionIncovationArguments)
                         |}""".stripMargin
-            
             eval.evalClass(code, wrapperName) match {
               case Res.Success((cls, imports)) =>
                 try {
