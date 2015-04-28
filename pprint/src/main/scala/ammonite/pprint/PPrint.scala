@@ -134,21 +134,44 @@ object PPrinter {
   }
 
   private def takeFirstLines(cfg: Config, iter: Iterator[String]):Iterator[String]={
+   
+    //Calculates how many lines and characters are remaining after printing the given string.
+    //Also returns how much of thsi string can be printed if the space runs out
     @tailrec
-    def inner(lines: Int, iter: Iterator[String], begin: Iterator[String]): Iterator[String]={
-      if(!iter.hasNext || lines < 0)  begin
-      else if(lines==0)  begin ++ Iterator(cfg.color.prefix("..."))
-      else {
-        val head = iter.next()
-        if(lines < head.length/cfg.maxWidth){
-          begin ++ Iterator(head.substring(0, lines*cfg.maxWidth), cfg.color.prefix("..."))
-        } else {
-          val remainingLines = if(head.contains('\n')) lines-1 else lines - head.length/cfg.maxWidth
-          inner(remainingLines, iter, begin ++ Iterator(head))
-        }
+    def charIter(str: String, pos: Int, lines: Int, chars: Int): (Int,Int,Option[Int])={
+      if(pos>=str.length) (lines,chars,None)
+      else if(lines==1 && chars == 0){
+        //this would be the first character wrapping into the first line not printed
+        (0,0,Some(pos))
+      }
+      else{
+
+        val (remainingLines,remainingChars) = 
+          if(str(pos)=='\n') (lines-1, cfg.maxWidth) //starting a new line
+          else if(chars==0) (lines-1,cfg.maxWidth-1) //wrapping around and printing a character
+          else (lines, chars-1) //simply printing a character
+        if(remainingLines==0) (lines,chars,Some(pos+1))
+        else charIter(str, pos+1, remainingLines, remainingChars)
       }
     }
-    inner(cfg.maxHeight, iter, Iterator.empty)
+   
+    @tailrec
+    def strIter(lines: Int, chars: Int, begin: Iterator[String]): Iterator[String]={ 
+      if(!iter.hasNext)  begin
+      else if(lines==0)  begin ++ Iterator(cfg.color.prefix("..."))
+      else{
+        val head = iter.next
+        val (remainingLines,remainingChars,substringLength) = charIter(head,0,lines,chars)
+        if(!substringLength.isEmpty){
+          begin ++ Iterator(
+            head.substring(0,substringLength.get),
+            cfg.color.prefix("...")
+          )
+        }
+        else strIter(remainingLines, remainingChars, begin ++ Iterator(head))
+      }
+    }
+    strIter(cfg.maxHeight, cfg.maxWidth, Iterator.empty)
   }
 
   implicit def ArrayRepr[T: PPrint] = PPrinter[Array[T]]{
