@@ -85,7 +85,8 @@ object Preprocessor{
           rule( Semis.? ~ capture(Import | Prelude ~ BlockDef | StatCtx.Expr).*(Semis) ~ Semis.? ~ WL ~ EOI)
         }
       }
-      splitter.Split.run() match {
+      val parsed = splitter.Split.run()
+      parsed match {
         case util.Failure(e @ ParseError(p, pp, t)) if p.index == code.length => Res.Buffer(code)
         case util.Failure(e) => Res.Failure(parsed.left.get)
         case util.Success(Nil) => Res.Skip
