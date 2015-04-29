@@ -523,6 +523,8 @@ object PPrintTests extends TestSuite{
         "1234567890\n"*10,
         "\"\"\"\n1234567890\n1234567890\n..."
       )
+      // The result looks like 10 wide 3 deep, but because of the wrapping
+      // (maxWidth = 8) it is actually 8 wide and 5 deep.
     }
   }
 
