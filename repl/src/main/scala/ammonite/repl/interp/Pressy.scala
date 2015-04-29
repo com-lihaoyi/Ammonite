@@ -119,7 +119,7 @@ object Pressy {
                         |object $wrapperName {
                         |def suggestions = ($completionInvocation).suggestions($completionIncovationArguments)
                         |}""".stripMargin
-            println(s"($completionInvocation).suggestions($completionIncovationArguments)")
+//            println(s"($completionInvocation).suggestions($completionIncovationArguments)")
             eval.evalClass(code, wrapperName) match {
               case Res.Success((cls, imports)) =>
                 try {
@@ -134,7 +134,7 @@ object Pressy {
               val wrapperName = pressy.TermName("SuggesterWrapper" + eval.getCurrentLine + suggestionNumber.incrementAndGet)
               val codeTree = q"""object $wrapperName { def suggestions = StringContext(..$text).$op.suggestions(..$args) }"""
               val code = previousImports + "\n" + pressy.showCode(codeTree)
-              println(code)
+//              println(code)
               eval.evalClass(code, wrapperName.toString) match {
                 case Res.Success((cls, imports)) =>
                   try {
