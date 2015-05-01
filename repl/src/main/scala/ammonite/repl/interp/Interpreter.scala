@@ -15,7 +15,7 @@ import scala.reflect.io.VirtualDirectory
  */
 class Interpreter(handleResult: => (String, Res[Evaluated]) => Unit,
                   shellPrompt0: => Ref[String],
-                  pprintConfig: pprint.Config = pprint.Config.Defaults.PPrintConfig,
+                  pprintConfig: pprint.Config,
                   colors0: ColorSet = ColorSet.BlackWhite,
                   stdout: String => Unit,
                   initialHistory: Seq[String],
@@ -106,10 +106,11 @@ class Interpreter(handleResult: => (String, Res[Evaluated]) => Unit,
         init()
       }
     }
-    implicit def pprintConfig = interp.pprintConfig
+    implicit var pprintConfig = interp.pprintConfig
     def clear() = ()
     def newCompiler() = init()
     def history = interp.history.toVector.dropRight(1)
+    def full[T](a: T, lines: Int = 0) = ammonite.pprint.Full(a, lines)
   }
 
   var compiler: Compiler = _

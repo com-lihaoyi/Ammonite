@@ -378,5 +378,155 @@ object PPrintTests extends TestSuite{
       )
     }
 
+    'Truncation{
+      'long_no_truncation{
+        implicit val cfg = Config.Defaults.PPrintConfig
+          * - check("a" * 10000,"\""+"a" * 10000+"\"")
+          * - check(
+            List.fill(30)(100),
+            """List(
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100,
+              |  100
+              |)""".stripMargin
+            )
+      }
+
+      'short_non_truncated{
+        implicit val cfg = Config.Defaults.PPrintConfig.copy(lines = 15)
+        * - check("a"*1000, "\"" + "a"*1000 + "\"")
+        * - check(List(1,2,3,4), "List(1, 2, 3, 4)")
+        * - check(
+          List.fill(13)("asdfghjklqwertz"),
+          """List(
+            |  "asdfghjklqwertz",
+            |  "asdfghjklqwertz",
+            |  "asdfghjklqwertz",
+            |  "asdfghjklqwertz",
+            |  "asdfghjklqwertz",
+            |  "asdfghjklqwertz",
+            |  "asdfghjklqwertz",
+            |  "asdfghjklqwertz",
+            |  "asdfghjklqwertz",
+            |  "asdfghjklqwertz",
+            |  "asdfghjklqwertz",
+            |  "asdfghjklqwertz",
+            |  "asdfghjklqwertz"
+            |)
+          """.stripMargin
+        )
+      }
+
+      'short_lines_truncated{
+        implicit val cfg = Config.Defaults.PPrintConfig.copy(lines = 15)
+        * - check(
+          List.fill(15)("foobarbaz"),
+          """List(
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |...""".stripMargin
+        )
+        * - check(
+        List.fill(150)("foobarbaz"),
+          """List(
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |  "foobarbaz",
+            |...""".stripMargin
+        )
+      }
+
+      'long_line_truncated{
+        implicit val cfg = Config.Defaults.PPrintConfig.copy(
+          maxWidth = 100,
+          lines = 3
+        )
+        check(
+          "a" * 1000,
+          """"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa..."""
+        )
+      }
+
+      'stream{
+        implicit val cfg = Config.Defaults.PPrintConfig.copy(
+          lines = 5
+        )
+        check(
+          Stream.continually("foo"),
+          """Stream(
+            |  "foo",
+            |  "foo",
+            |  "foo",
+            |  "foo",
+            |...
+          """.stripMargin
+        )
+      }
+    }
+
+    'wrapped_lines{
+      implicit val cfg = Config.Defaults.PPrintConfig.copy(
+        maxWidth = 8,
+        lines = 5
+      )
+      check(
+        "1234567890\n"*10,
+        "\"\"\"\n1234567890\n1234567890\n..."
+      )
+      // The result looks like 10 wide 3 deep, but because of the wrapping
+      // (maxWidth = 8) it is actually 8 wide and 5 deep.
+    }
   }
+
+  
 }

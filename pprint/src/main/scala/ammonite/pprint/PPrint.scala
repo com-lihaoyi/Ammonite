@@ -2,6 +2,7 @@ package ammonite.pprint
 
 import scala.annotation.unchecked.uncheckedVariance
 import scala.language.experimental.macros
+import annotation.tailrec
 import acyclic.file
 
 
@@ -15,6 +16,8 @@ object PPrint extends Internals.LowPriPPrint{
     val pprint = implicitly[PPrint[T]]
     pprint.render(t)
   }
+
+
 
   /**
    * Helper to make implicit resolution behave right
@@ -36,6 +39,12 @@ case class PPrint[A](a: PPrinter[A], cfg: Config){
 }
 
 /**
+ * Wrapper type for disabling output truncation.
+ * PPrint(Full(value)) will always return the full output.
+ */
+case class Full[A](a: A, lines: Int)
+
+/**
  * A typeclass you define to prettyprint values of type [[A]]
  */
 trait PPrinter[-A] {
@@ -48,7 +57,13 @@ trait PPrinter[-A] {
 
 object PPrinter {
   def apply[T](r: (T, Config) => Iterator[String]): PPrinter[T] = {
-    new PPrinter[T]{def render(t: T, c: Config)= r(t, c)}
+    new PPrinter[T]{ 
+      def render(t: T, c: Config) = {
+        if(c.lines > 0)
+          takeFirstLines(c, r(t, c))
+        else r(t, c)
+      }
+    }
   }
 
   /**
@@ -118,6 +133,47 @@ object PPrinter {
     s.toString()
   }
 
+  private def takeFirstLines(cfg: Config, iter: Iterator[String]):Iterator[String]={
+   
+    //Calculates how many lines and characters are remaining after printing the given string.
+    //Also returns how much of thsi string can be printed if the space runs out
+    @tailrec
+    def charIter(str: String, pos: Int, lines: Int, chars: Int): (Int,Int,Option[Int])={
+      if(pos >= str.length) (lines, chars, None)
+      else if(lines == 1 && chars == 0){
+        //this would be the first character wrapping into the first line not printed
+        (0, 0, Some(pos))
+      }
+      else{
+
+        val (remainingLines, remainingChars) =
+          if(str(pos) == '\n') (lines - 1, cfg.maxWidth) //starting a new line
+          else if(chars == 0) (lines - 1, cfg.maxWidth - 1) //wrapping around and printing a character
+          else (lines, chars - 1) //simply printing a character
+        if(remainingLines == 0) (lines, chars, Some(pos + 1))
+        else charIter(str, pos + 1, remainingLines, remainingChars)
+      }
+    }
+   
+    @tailrec
+    def strIter(lines: Int, chars: Int, begin: Iterator[String]): Iterator[String]={ 
+      if(!iter.hasNext) begin
+      else if(lines == 0) begin ++ Iterator(cfg.color.prefix("..."))
+      else{
+        val head = iter.next
+        val (remainingLines,remainingChars,substringLength) = charIter(head, 0, lines, chars)
+        if(!substringLength.isEmpty){
+          begin ++ Iterator(
+            head.substring(0, substringLength.get),
+            cfg.color.prefix("...")
+          )
+        }
+        else strIter(remainingLines, remainingChars, begin ++ Iterator(head))
+      }
+    }
+    strIter(cfg.lines, cfg.maxWidth, Iterator.empty)
+  }
+
   implicit def ArrayRepr[T: PPrint] = PPrinter[Array[T]]{
     def repr = Internals.collectionRepr[T, Seq[T]]
     (t: Array[T], c: Config) => repr.render(t, c)
@@ -126,6 +182,15 @@ object PPrinter {
   implicit def SeqRepr[T: PPrint] = Internals.collectionRepr[T, Seq[T]]
   implicit def SetRepr[T: PPrint] = Internals.collectionRepr[T, Set[T]]
   implicit def MapRepr[T: PPrint, V: PPrint] = Internals.makeMapRepr[Map, T, V]
+  
+  implicit def fullPPrinter[A: PPrint]: PPrinter[Full[A]] = {
+    new PPrinter[Full[A]]{ 
+      def render(wrapper: Full[A], c: Config) = {
+        val pprint = implicitly[PPrint[A]]
+        pprint.copy(cfg = c.copy(lines = wrapper.lines)).render(wrapper.a)
+      }
+    }
+  }
 
 }
 object Unpacker extends PPrinterGen {
