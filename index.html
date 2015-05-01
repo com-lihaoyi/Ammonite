@@ -144,7 +144,7 @@ removeAll(&quot;target/folder/thing&quot;)</code><a class=" scalatex-site-Styles
       <p>
         To get started, add this to your <code>build.sbt</code>:
 </p>
-      <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">&quot;com.lihaoyi&quot; %% &quot;ammonite-ops&quot; % &quot;0.2.9&quot;</code>
+      <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">&quot;com.lihaoyi&quot; %% &quot;ammonite-ops&quot; % &quot;0.3.0&quot;</code>
 
       <p>
         And this at the top of the file you want to use Ammonite:
@@ -496,9 +496,9 @@ val map = txt || (_.split(&quot;[^a-zA-Z0-9_]&quot;)) |&gt; freq sortBy (-_._2)<
       <p>
         To try out Ammonite-REPL in an existing project, add the following to your <code>build.sbt</code>
 </p>
-      <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite-repl&quot; % &quot;0.2.9&quot; % &quot;test&quot; cross CrossVersion.full
+      <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite-repl&quot; % &quot;0.3.0&quot; % &quot;test&quot; cross CrossVersion.full
 
-initialCommands in (Test, console) := &quot;ammonite.repl.Repl.main(null)&quot;
+initialCommands in (Test, console) := &quot;&quot;&quot;ammonite.repl.Repl.run(&quot;&quot;)&quot;&quot;&quot;
 </code></pre>
       <p>
         After that, simple hit</p>
@@ -582,7 +582,69 @@ res3: cmd1.Foo = Foo(
 )</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/test/scala/ammonite/repl/AdvancedTests.scala#L115-L141" target="_blank"><i class="fa fa-link "></i></a></pre>
 
           <p>
-            Ammonite-REPL uses <a href="#Ammonite-PPrint">Ammonite-PPrint</a> to display its output by default. That means that everything is nicely formatted to fit within the width of the terminal, and is copy-paste-able!
+            Ammonite-REPL uses <a href="#Ammonite-PPrint">Ammonite-PPrint</a> to display its output by default. That means that everything is nicely formatted to fit within the width of the terminal, and is copy-paste-able!</p>
+        <h2 id="ConfigurableTruncation" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#ConfigurableTruncation" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Configurable Truncation</h2>
+          <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">@ Seq.fill(20)(100)
+res0: Seq[Int] = List(
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+...
+
+@ show(Seq.fill(20)(100))
+res1: ammonite.pprint.Show[Seq[Int]] = List(
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100
+)
+
+@ show(Seq.fill(20)(100), lines = 3)
+res2: ammonite.pprint.Show[Seq[Int]] = List(
+  100,
+  100,
+...
+
+@ pprintConfig = pprintConfig.copy(lines = 5)
+
+@ Seq.fill(20)(100)
+res4: Seq[Int] = List(
+  100,
+  100,
+  100,
+  100,
+...</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/test/scala/ammonite/repl/AdvancedTests.scala#L252-L309" target="_blank"><i class="fa fa-link "></i></a></pre>
+
+          <p>
+            Ammonite-REPL intelligently truncates your output when it's beyond a certain size. You can request for the full output to be printed on-demand, print a certain number of lines, or even change the implicit <code>pprintConfig</code> so subsequent lines all use your new configuration.
+
 </p>
         <h2 id="SuperiorAutocomplete" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#SuperiorAutocomplete" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Superior Autocomplete</h2>
           <p>
@@ -724,14 +786,19 @@ res1: Int = 2</code><a class=" scalatex-site-Styles-headerLink" style="position:
   def newCompiler(): Unit
 
   /**
-   *
+   * Prettyprint the given `value` with no truncation. Optionally takes
+   * a number of lines to print.
+   */
+  def show[T](value: T, lines: Int = 0): ammonite.pprint.Show[T]
+  /**
+   * Show all the imports that are used to execute commands going forward
    */
   def imports: String
   /**
    * Controls how things are pretty-printed in the REPL. Feel free
    * to shadow this with your own definition to change how things look
    */
-  implicit def pprintConfig: ammonite.pprint.Config
+  implicit var pprintConfig: ammonite.pprint.Config
 }
 trait Load extends (String =&gt; Unit){
   /**
@@ -741,14 +808,14 @@ trait Load extends (String =&gt; Unit){
   /**
    * Load a library from its maven/ivy coordinates
    */
-  def ivy(coordinates: (String, String, String)): Unit
+  def ivy(coordinates: (String, String, String), verbose: Boolean = true): Unit
 
   /**
    * Loads a command into the REPL and
    * evaluates them one after another
    */
   def apply(line: String): Unit
-}</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/main/scala/ammonite/repl/frontend/ReplAPI.scala#L20-L97" target="_blank"><i class="fa fa-link "></i></a></pre>
+}</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/main/scala/ammonite/repl/frontend/ReplAPI.scala#L20-L102" target="_blank"><i class="fa fa-link "></i></a></pre>
 
     <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="Ammonite-PPrint" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;" id="Ammonite-PPrint">Ammonite-PPrint<a class=" scalatex-site-Styles-headerLink" href="#Ammonite-PPrint" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
       <p>
@@ -782,10 +849,23 @@ List(
       <p>
         In order to pretty print a type <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">T</code>, you need to have a <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">T: PPrint</code> context bound present. In order to write your own custom pretty printer for some type <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">T</code>, provide a <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">PPrinter[T]</code>.</p></p>
   <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="Changelog" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;" id="Changelog">Changelog<a class=" scalatex-site-Styles-headerLink" href="#Changelog" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
+    <h1 id="0.3.0" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#0.3.0" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>0.3.0</h1>
+      <ul>
+        <li>
+          allow <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">predef</code> parameter to be passed into <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Repl.run()</code> call, letting you configure initialization commands or imports</li>
+        <li>
+          Compilation errors in expressions no longer show synthetic code in the message</li>
+        <li>
+          Ivy module loading now lets you configure verbosity level</li>
+        <li>
+          Defining macros in the REPL and using them in subsequent lines now works</li>
+        <li>
+          Output lines are now truncated past a certain length, which is configurable
+</li></ul>
     <h1 id="0.2.9" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#0.2.9" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>0.2.9</h1>
-        <ul>
-          <li>
-            Lots of improvements to <code>Ctrl-C</code> and <code>Ctrl-D</code> handling, to make it behave more like other REPLs
+      <ul>
+        <li>
+          Lots of improvements to <code>Ctrl-C</code> and <code>Ctrl-D</code> handling, to make it behave more like other REPLs
 </li></ul>
     <h1 id="0.2.8" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#0.2.8" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>0.2.8</h1>
       <ul>
@@ -800,7 +880,7 @@ List(
         <li>
           Importing things from Java packages now works properly</li></ul></div></div><script>
     scalatex.scrollspy.Controller().main(
-      [{"value":"Ammonite","children":[{"value":"Ammonite-Ops","children":[{"value":"Paths","children":[]},{"value":"RelPaths","children":[]},{"value":"Path Operations","children":[]},{"value":"Extensions","children":[{"value":"Traversable","children":[]},{"value":"Pipeable","children":[]}]},{"value":"Operations","children":[]},{"value":"Chaining","children":[]}]},{"value":"Ammonite-REPL","children":[{"value":"Features","children":[{"value":"Artifact Loading","children":[]},{"value":"Pretty-printed output","children":[]},{"value":"Superior Autocomplete","children":[]},{"value":"Interrupting run-away execution with Ctrl-C","children":[]},{"value":"Compiler-crash Robustness","children":[]},{"value":"Other Fixes","children":[]}]},{"value":"Builtins","children":[]}]},{"value":"Ammonite-PPrint","children":[]},{"value":"Changelog","children":[{"value":"0.2.9","children":[]},{"value":"0.2.8","children":[]}]}]}]
+      [{"value":"Ammonite","children":[{"value":"Ammonite-Ops","children":[{"value":"Paths","children":[]},{"value":"RelPaths","children":[]},{"value":"Path Operations","children":[]},{"value":"Extensions","children":[{"value":"Traversable","children":[]},{"value":"Pipeable","children":[]}]},{"value":"Operations","children":[]},{"value":"Chaining","children":[]}]},{"value":"Ammonite-REPL","children":[{"value":"Features","children":[{"value":"Artifact Loading","children":[]},{"value":"Pretty-printed output","children":[]},{"value":"Configurable Truncation","children":[]},{"value":"Superior Autocomplete","children":[]},{"value":"Interrupting run-away execution with Ctrl-C","children":[]},{"value":"Compiler-crash Robustness","children":[]},{"value":"Other Fixes","children":[]}]},{"value":"Builtins","children":[]}]},{"value":"Ammonite-PPrint","children":[]},{"value":"Changelog","children":[{"value":"0.3.0","children":[]},{"value":"0.2.9","children":[]},{"value":"0.2.8","children":[]}]}]}]
   )</script><script>
     ['DOMContentLoaded', 'load'].forEach(function(ev){
       addEventListener(ev, function(){
