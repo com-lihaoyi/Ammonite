@@ -388,10 +388,10 @@
       @p
         In order to pretty print a type @hl.scala{T}, you need to have a @hl.scala{T: PPrint} context bound present. In order to write your own custom pretty printer for some type @hl.scala{T}, provide a @hl.scala{PPrinter[T]}.
   @sect{Changelog}
-    @sect{0.2.9}
+    @sect{0.3.0}
       @ul
         @li
-          allow predef parameter to be passed into Repl.run() call, letting you configure initialization commands or imports
+          allow @hl.scala{predef} parameter to be passed into @hl.scala{Repl.run()} call, letting you configure initialization commands or imports
         @li
           Compilation errors in expressions no longer show synthetic code in the message
         @li
@@ -399,7 +399,7 @@
         @li
           Defining macros in the REPL and using them in subsequent lines now works
         @li
-          Output lines are now truncated past a certain length
+          Output lines are now truncated past a certain length, which is configurable
 
     @sect{0.2.9}
       @ul
