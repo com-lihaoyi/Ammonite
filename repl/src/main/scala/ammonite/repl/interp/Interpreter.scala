@@ -110,7 +110,7 @@ class Interpreter(handleResult: => (String, Res[Evaluated]) => Unit,
     def clear() = ()
     def newCompiler() = init()
     def history = interp.history.toVector.dropRight(1)
-    def full[T](a: T, lines: Int = 0) = ammonite.pprint.Full(a, lines)
+    def show[T](a: T, lines: Int = 0) = ammonite.pprint.Show(a, lines)
   }
 
   var compiler: Compiler = _

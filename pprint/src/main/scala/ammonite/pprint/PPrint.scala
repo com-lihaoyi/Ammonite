@@ -42,7 +42,7 @@ case class PPrint[A](a: PPrinter[A], cfg: Config){
  * Wrapper type for disabling output truncation.
  * PPrint(Full(value)) will always return the full output.
  */
-case class Full[A](a: A, lines: Int)
+case class Show[A](a: A, lines: Int)
 
 /**
  * A typeclass you define to prettyprint values of type [[A]]
@@ -183,9 +183,9 @@ object PPrinter {
   implicit def SetRepr[T: PPrint] = Internals.collectionRepr[T, Set[T]]
   implicit def MapRepr[T: PPrint, V: PPrint] = Internals.makeMapRepr[Map, T, V]
   
-  implicit def fullPPrinter[A: PPrint]: PPrinter[Full[A]] = {
-    new PPrinter[Full[A]]{ 
-      def render(wrapper: Full[A], c: Config) = {
+  implicit def showPPrinter[A: PPrint]: PPrinter[Show[A]] = {
+    new PPrinter[Show[A]]{
+      def render(wrapper: Show[A], c: Config) = {
         val pprint = implicitly[PPrint[A]]
         pprint.copy(cfg = c.copy(lines = wrapper.lines)).render(wrapper.a)
       }

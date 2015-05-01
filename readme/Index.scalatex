@@ -61,7 +61,7 @@
       @p
         To get started, add this to your @code{build.sbt}:
 
-      @hl.scala{"com.lihaoyi" %% "ammonite-ops" % "0.2.9"}
+      @hl.scala{"com.lihaoyi" %% "ammonite-ops" % "0.3.0"}
 
       @p
         And this at the top of the file you want to use Ammonite:
@@ -243,9 +243,9 @@
         To try out Ammonite-REPL in an existing project, add the following to your @code{build.sbt}
 
       @hl.scala
-        libraryDependencies += "com.lihaoyi" % "ammonite-repl" % "0.2.9" % "test" cross CrossVersion.full
+        libraryDependencies += "com.lihaoyi" % "ammonite-repl" % "0.3.0" % "test" cross CrossVersion.full
 
-        initialCommands in (Test, console) := "ammonite.repl.Repl.main(null)"
+        initialCommands in (Test, console) := """ammonite.repl.Repl.run("")"""
 
       @p
         After that, simple hit
@@ -280,6 +280,12 @@
 
           @p
             Ammonite-REPL uses @sect.ref{Ammonite-PPrint} to display its output by default. That means that everything is nicely formatted to fit within the width of the terminal, and is copy-paste-able!
+        @sect{Configurable Truncation}
+          @hl.ref(advancedTests, Seq("'truncation", "@"), "\"\"\"")
+
+          @p
+            Ammonite-REPL intelligently truncates your output when it's beyond a certain size. You can request for the full output to be printed on-demand, print a certain number of lines, or even change the implicit @code{pprintConfig} so subsequent lines all use your new configuration.
+
 
         @sect{Superior Autocomplete}
           @p
@@ -383,9 +389,22 @@
         In order to pretty print a type @hl.scala{T}, you need to have a @hl.scala{T: PPrint} context bound present. In order to write your own custom pretty printer for some type @hl.scala{T}, provide a @hl.scala{PPrinter[T]}.
   @sect{Changelog}
     @sect{0.2.9}
-        @ul
-          @li
-            Lots of improvements to @code{Ctrl-C} and @code{Ctrl-D} handling, to make it behave more like other REPLs
+      @ul
+        @li
+          allow predef parameter to be passed into Repl.run() call, letting you configure initialization commands or imports
+        @li
+          Compilation errors in expressions no longer show synthetic code in the message
+        @li
+          Ivy module loading now lets you configure verbosity level
+        @li
+          Defining macros in the REPL and using them in subsequent lines now works
+        @li
+          Output lines are now truncated past a certain length
+
+    @sect{0.2.9}
+      @ul
+        @li
+          Lots of improvements to @code{Ctrl-C} and @code{Ctrl-D} handling, to make it behave more like other REPLs
 
     @sect{0.2.8}
       @ul

@@ -72,7 +72,7 @@ trait ReplAPI {
    * Prettyprint the given `value` with no truncation. Optionally takes
    * a number of lines to print.
    */
-  def full[T](value: T, lines: Int = 0): ammonite.pprint.Full[T]
+  def show[T](value: T, lines: Int = 0): ammonite.pprint.Show[T]
   /**
    * Show all the imports that are used to execute commands going forward
    */
