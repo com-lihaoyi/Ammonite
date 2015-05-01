@@ -69,14 +69,19 @@ trait ReplAPI {
   def newCompiler(): Unit
 
   /**
-   *
+   * Prettyprint the given `value` with no truncation. Optionally takes
+   * a number of lines to print.
+   */
+  def full[T](value: T, lines: Int = 0): ammonite.pprint.Full[T]
+  /**
+   * Show all the imports that are used to execute commands going forward
    */
   def imports: String
   /**
    * Controls how things are pretty-printed in the REPL. Feel free
    * to shadow this with your own definition to change how things look
    */
-  implicit def pprintConfig: ammonite.pprint.Config
+  implicit var pprintConfig: ammonite.pprint.Config
 }
 trait Load extends (String => Unit){
   /**

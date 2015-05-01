@@ -248,5 +248,66 @@ object AdvancedTests extends TestSuite{
         res4: java.lang.String = "Hello!"
       """)
     }
+    'truncation{
+      check.session("""
+      @ Seq.fill(20)(100)
+      res0: Seq[Int] = List(
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+      ...
+
+      @ full(Seq.fill(20)(100))
+      res1: ammonite.pprint.Full[Seq[Int]] = List(
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      )
+
+      @ full(Seq.fill(20)(100), lines = 3)
+      res2: ammonite.pprint.Full[Seq[Int]] = List(
+        100,
+        100,
+      ...
+
+      @ pprintConfig = pprintConfig.copy(lines = 5)
+
+      @ Seq.fill(20)(100)
+      res4: Seq[Int] = List(
+        100,
+        100,
+        100,
+        100,
+      ...
+      """)
+    }
   }
 }

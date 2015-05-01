@@ -420,7 +420,7 @@ object PPrintTests extends TestSuite{
       }
 
       'short_non_truncated{
-        implicit val cfg = Config.Defaults.PPrintConfig.copy(maxHeight = 15)
+        implicit val cfg = Config.Defaults.PPrintConfig.copy(lines = 15)
         * - check("a"*1000, "\"" + "a"*1000 + "\"")
         * - check(List(1,2,3,4), "List(1, 2, 3, 4)")
         * - check(
@@ -445,7 +445,7 @@ object PPrintTests extends TestSuite{
       }
 
       'short_lines_truncated{
-        implicit val cfg = Config.Defaults.PPrintConfig.copy(maxHeight = 15)
+        implicit val cfg = Config.Defaults.PPrintConfig.copy(lines = 15)
         * - check(
           List.fill(15)("foobarbaz"),
           """List(
@@ -489,7 +489,7 @@ object PPrintTests extends TestSuite{
       'long_line_truncated{
         implicit val cfg = Config.Defaults.PPrintConfig.copy(
           maxWidth = 100,
-          maxHeight = 3
+          lines = 3
         )
         check(
           "a" * 1000,
@@ -499,7 +499,7 @@ object PPrintTests extends TestSuite{
 
       'stream{
         implicit val cfg = Config.Defaults.PPrintConfig.copy(
-          maxHeight = 5
+          lines = 5
         )
         check(
           Stream.continually("foo"),
@@ -517,7 +517,7 @@ object PPrintTests extends TestSuite{
     'wrapped_lines{
       implicit val cfg = Config.Defaults.PPrintConfig.copy(
         maxWidth = 8,
-        maxHeight = 5
+        lines = 5
       )
       check(
         "1234567890\n"*10,

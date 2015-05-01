@@ -31,7 +31,7 @@ class Repl(input: InputStream,
   val interp: Interpreter = new Interpreter(
     frontEnd.update,
     shellPrompt,
-    pprintConfig.copy(maxWidth = frontEnd.width, maxHeight = 15),
+    pprintConfig.copy(maxWidth = frontEnd.width, lines = 15),
     colorSet,
     stdout = new PrintStream(output).print,
     initialHistory = initialHistory,
@@ -59,9 +59,7 @@ class Repl(input: InputStream,
 }
 
 object Repl{
-  val defaultPredef = """
-    def full[A](a: A) = ammonite.pprint.Full(a)
-  """
+  val defaultPredef = ""
   def main(args: Array[String]) = run()
   def run(predef: String = defaultPredef) = {
     println("Loading Ammonite Repl...")

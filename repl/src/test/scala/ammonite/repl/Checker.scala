@@ -11,6 +11,7 @@ class Checker {
   val interp = new Interpreter(
     (_, _) => (),
     Ref[String](""),
+    ammonite.pprint.Config.Defaults.PPrintConfig.copy(lines = 15),
     stdout = allOutput += _,
     initialHistory = Nil,
     predef = predef
