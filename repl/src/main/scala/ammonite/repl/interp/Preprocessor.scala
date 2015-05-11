@@ -87,8 +87,7 @@ object Preprocessor{
       Splitter.parse(code) match {
         case Result.Failure(_, index) if index == code.length => Res.Buffer(code)
         case f @ Result.Failure(p, index) =>
-          println(s"|$code|\nFAILURE $p $index ${code.length}")
-          println(f)
+
           Res.Failure(parse(code).left.get)
         case Result.Success(Nil, _) => Res.Skip
         case Result.Success(postSplit: Seq[String], _) => complete(code, wrapperId, postSplit.map(_.trim))
