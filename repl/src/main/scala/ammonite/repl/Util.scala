@@ -141,12 +141,13 @@ object Timer{
 }
 object BacktickWrap{
   def apply(s: String) = {
+    import fastparse._
+    import scalaparse.Scala._
 
-    val splitter = new scalaParser.Scala(s){
-      def Id2 = rule( Identifiers.Id ~ EOI )
+    val Id2 = P( Id ~ End )
+    Id2.parse(s) match{
+      case _: Result.Success[_] => s
+      case _ => "`" + ammonite.pprint.PPrinter.escape(s) + "`"
     }
-
-    if (splitter.Id2.run().isSuccess) s
-    else "`" + ammonite.pprint.PPrinter.escape(s) + "`"
   }
 }
