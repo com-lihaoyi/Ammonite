@@ -52,8 +52,24 @@ object Preprocessor{
     val TypeDef = DefProc("type"){ case m: G#TypeDef => m.name }
 
     val PatVarDef = Processor { case (name, code, t: G#ValDef) =>
+      //Function to lift lhs expressions into anonymous functions so they will be JITed
+      def wrap(code: String)={
+        import fastparse._
+        import scalaparse.Scala._
+        val par = P( ( `implicit`.? ~ `lazy`.? ~ ( `var` | `val` ) ~! BindPattern.rep1("," ~! Pass) ~ (`:` ~! Type).?).! ~ (`=` ~! StatCtx.Expr.!) )
+        val Result.Success((lhs, rhs), _) = par.parse(code)
+        //Rebuilding definition from parsed data to lift rhs to anon function
+        s"$lhs = { () =>\n $rhs \n}.apply"
+      }
+
       Output(
-        code,
+        //Only wrap rhs in function if it is not a function
+        //Wrapping functions causes type inference errors.
+        t.rhs match {
+          case _: G#Function => code //simple anon function
+          case _: G#Match => code   //anon partial function
+          case _ => wrap(code)
+        },
         // Try to leave out all synthetics; we don't actually have proper
         // synthetic flags right now, because we're dumb-parsing it and not putting
         // it through a full compilation
@@ -70,7 +86,8 @@ object Preprocessor{
     }
 
     val Expr = Processor{
-      case (name, code, tree) => Output(s"val $name = (\n$code\n)", Seq(pprint(name)))
+      //Expressions are lifted to anon function applications so they will be JITed
+      case (name, code, tree) => Output(s"val $name = { () =>\n$code\n}.apply", Seq(pprint(name)))
     }
 
     val decls = Seq[(String, String, G#Tree) => Option[Preprocessor.Output]](
