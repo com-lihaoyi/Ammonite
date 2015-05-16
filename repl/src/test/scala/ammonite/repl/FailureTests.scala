@@ -39,7 +39,7 @@ object FailureTests extends TestSuite{
         x.contains("java.lang.Exception: lol") &&
         x.contains("java.lang.Exception: hoho") &&
         // and none of the stuff we don't want
-        x.lines.length == 6 &&
+        x.lines.length == 10 &&
         !x.contains("Something unexpected went wrong =(")
       )
     }
