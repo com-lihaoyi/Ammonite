@@ -1,6 +1,7 @@
 package ammonite.pprint
 
 import scala.annotation.unchecked.uncheckedVariance
+import scala.collection.generic.CanBuildFrom
 import scala.language.experimental.macros
 import annotation.tailrec
 import acyclic.file
@@ -55,7 +56,7 @@ trait PPrinter[-A] {
   }  
 }
 
-object PPrinter {
+object PPrinter extends LowPriPPrinter{
   def apply[T](r: (T, Config) => Iterator[String]): PPrinter[T] = {
     new PPrinter[T]{ 
       def render(t: T, c: Config) = {
@@ -179,10 +180,10 @@ object PPrinter {
     (t: Array[T], c: Config) => repr.render(t, c)
   }
 
-  implicit def SeqRepr[T: PPrint] = Internals.collectionRepr[T, Seq[T]]
-  implicit def SetRepr[T: PPrint] = Internals.collectionRepr[T, Set[T]]
-  implicit def MapRepr[T: PPrint, V: PPrint] = Internals.makeMapRepr[Map, T, V]
-  
+
+
+  implicit def MapRepr[T: PPrint, V: PPrint] = Internals.makeMapRepr[collection.Map, T, V]
+
   implicit def showPPrinter[A: PPrint]: PPrinter[Show[A]] = {
     new PPrinter[Show[A]]{
       def render(wrapper: Show[A], c: Config) = {
@@ -191,7 +192,10 @@ object PPrinter {
       }
     }
   }
-
+}
+trait LowPriPPrinter{
+  implicit def SeqRepr[T: PPrint, V[T] <: Traversable[T]]  =
+    Internals.collectionRepr[T, V[T]]
 }
 object Unpacker extends PPrinterGen {
   // Things being injected into PPrinterGen to keep it acyclic
@@ -213,7 +217,7 @@ object Internals {
   def mapEntryPrinter[T: PPrint, V: PPrint] = PPrinter[(T, V)] { case ((t, v), c) =>
     implicitly[PPrint[T]].render(t) ++ Iterator(" -> ") ++ implicitly[PPrint[V]].render(v)
   }
-  def makeMapRepr[M[T, V] <: Map[T, V], T: PPrint, V: PPrint] = {
+  def makeMapRepr[M[T, V] <: collection.Map[T, V], T: PPrint, V: PPrint] = {
     PPrinter[M[T, V]] { (t: M[T, V], c: Config) =>
       handleChunks(t.stringPrefix, c, c =>
         t.iterator.map(k =>
