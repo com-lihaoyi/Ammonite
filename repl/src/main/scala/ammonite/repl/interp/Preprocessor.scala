@@ -56,7 +56,7 @@ object Preprocessor{
       def wrap(code: String)={
         import fastparse._
         import scalaparse.Scala._
-        val par = P( ( `implicit`.? ~ `lazy`.? ~ ( `var` | `val` ) ~! BindPattern.rep1("," ~! Pass) ~ (`:` ~! Type).?).! ~ (`=` ~! StatCtx.Expr.!) )
+        val par = P( ( `implicit`.? ~ `lazy`.? ~ ( `var` | `val` ) ~! BindPattern.rep(1, "," ~! Pass) ~ (`:` ~! Type).?).! ~ (`=` ~! StatCtx.Expr.!) )
         val Result.Success((lhs, rhs), _) = par.parse(code)
         //Rebuilding definition from parsed data to lift rhs to anon function
         s"$lhs = { () =>\n $rhs \n}.apply"
@@ -98,7 +98,7 @@ object Preprocessor{
       import fastparse._
       import scalaparse.Scala._
       val Prelude = P( Annot.rep ~ `implicit`.? ~ `lazy`.? ~ LocalMod.rep )
-      val Splitter = P( Semis.? ~ (scalaparse.Scala.Import | Prelude ~ BlockDef | StatCtx.Expr).!.rep(Semis) ~ Semis.? ~ WL ~ End)
+      val Splitter = P( Semis.? ~ (scalaparse.Scala.Import | Prelude ~ BlockDef | StatCtx.Expr).!.rep(sep=Semis) ~ Semis.? ~ WL ~ End)
 
 
       Splitter.parse(code) match {

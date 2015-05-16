@@ -206,6 +206,21 @@ object AdvancedTests extends TestSuite{
         res3: scala.Option[Int] = Some(3)
       """)
     }
+    'scalaparse{
+      // Prevent regressions when wildcard-importing things called `macro` or `_`
+      check.session("""
+        @ import scalaparse.Scala._
+
+        @ 1
+        res1: Int = 1
+
+        @ ExprCtx.Parened.parse("1 + 1")
+        res2: fastparse.core.Result[Unit] = Failure(Parened:0 / "(":0 / "(":0 ..."1 + 1", false)
+
+        @ ExprCtx.Parened.parse("(1 + 1)")
+        res3: fastparse.core.Result[Unit] = Success((), 7)
+      """)
+    }
     'predef{
       val check2 = new Checker{
         override def predef = """

@@ -163,7 +163,9 @@ object Evaluator{
         (prefix, allImports) <- previousImports.values.toList.groupBy(_.prefix)
         imports <- Util.transpose(allImports.groupBy(_.fromName).values.toList)
       } yield {
-        imports match{
+        // Don't import importable variables called `_`. They seem to
+        // confuse Scala into thinking it's a wildcard even when it isn't
+        imports.filter(_.fromName != "_") match{
           case Seq(imp) if imp.fromName == imp.toName =>
             s"import $prefix.${BacktickWrap(imp.fromName)}"
           case imports =>
