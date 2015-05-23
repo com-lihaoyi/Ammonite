@@ -60,6 +60,7 @@ lazy val pprint = project
       else
         Seq()
     },
+    libraryDependencies += "org.scala-lang" % "scala-compiler" % scalaVersion.value % "provided",
     sourceGenerators in Compile <+= sourceManaged in Compile map { dir =>
       val file = dir/"ammonite"/"pprint"/"PPrintGen.scala"
       val tuples = (1 to 22).map{ i =>
