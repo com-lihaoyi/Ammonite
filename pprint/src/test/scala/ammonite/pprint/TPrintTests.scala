@@ -11,7 +11,7 @@ object TPrintTests extends TestSuite{
     assert(tprinted == expected)
   }
   val tests = TestSuite{
-
+//
     type X = scala.Int with scala.Predef.String{}
     val x = ""
 
@@ -32,8 +32,8 @@ object TPrintTests extends TestSuite{
     }
 
     'java {
-      check[java.util.Set[_]]("util.Set[_$1]")
-      check[java.util.Set[_ <: String]]("util.Set[_$2] forSome { type _$2 <: String }")
+      check[java.util.Set[_]]("util.Set[_]")
+      check[java.util.Set[_ <: String]]("util.Set[_] forSome { type _ <: String }")
       check[java.util.Set[String]]("util.Set[String]")
     }
 
@@ -53,7 +53,7 @@ object TPrintTests extends TestSuite{
     'existential{
       check[{type T = Int}]("{type T = Int}")
 
-      check[Map[_, _]]("Map[_$3, _$4]")
+      check[Map[_, _]]("Map[_, _]")
       check[Map[K, Int] forSome { type K }](
         "Map[K, Int] forSome { type K }"
       )
@@ -65,6 +65,21 @@ object TPrintTests extends TestSuite{
       )
       check[Map[K, V] forSome { type K <: Int; val x: Float; type V >: String }](
            "Map[K, V] forSome { type K <: Int; val x: Float; type V >: String }"
+      )
+      class C{
+        type T
+      }
+      check[x.T forSome { val x: Int with C} ](
+        "x.T forSome { val x: Int with C }"
+      )
+      check[List[_]](
+           "Int forSome { type T[X] }"
+      )
+      check[K[Int] forSome { type K[_] <: Seq[_]}](
+        "K[Int] forSome { type K[_] <: Seq[_] }"
+      )
+      check[List[K[V]] forSome { type K[_] >: Seq[_]; type V <: Int}](
+        "List[K[V]] forSome { type K[_] >: Seq[_]; type V <: Int}"
       )
     }
 
