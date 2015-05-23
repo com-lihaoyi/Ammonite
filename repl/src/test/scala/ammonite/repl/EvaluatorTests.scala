@@ -10,6 +10,7 @@ import scala.reflect.io.VirtualDirectory
 
 object EvaluatorTests extends TestSuite{
 
+
   val tests = TestSuite{
     val check = new Checker()
     'simpleExpressions{
@@ -39,10 +40,10 @@ object EvaluatorTests extends TestSuite{
         res3: Long = 110L
 
         @ val `class` = "class"
-        `class`: java.lang.String = "class"
+        `class`: String = "class"
 
         @ `class`
-        res5: java.lang.String = "class"
+        res5: String = "class"
       """)
     }
     'lazyvals{
@@ -109,13 +110,13 @@ object EvaluatorTests extends TestSuite{
         defined type Funky
 
         @ val arr: Funky = Array(Array("Hello!"))
-        arr: cmd0.Funky = Array(Array("Hello!"))
+        arr: Funky = Array(Array("Hello!"))
 
         @ type Funky2[T] = Array[Array[T]]
         defined type Funky2
 
         @ val arr: Funky2[Int] = Array(Array(123))
-        arr: cmd2.Funky2[Int] = Array(Array(123))
+        arr: Funky2[Int] = Array(Array(123))
       """)
     }
     'library{
@@ -244,31 +245,31 @@ object EvaluatorTests extends TestSuite{
         defined class C
 
         @ new C
-        res1: cmd0.C = Ceee
+        res1: C = Ceee
 
         @ case object CO
         defined object CO
 
         @ CO
-        res3: cmd2.CO.type = CO
+        res3: CO.type = CO
 
         @ case class CC()
         defined class CC
 
         @ CC()
-        res5: cmd4.CC = CC()
+        res5: CC = CC()
 
         @ CO
-        res6: cmd2.CO.type = CO
+        res6: CO.type = CO
 
         @ case class CO()
         defined class CO
 
         @ CO
-        res8: cmd7.CO.type = CO
+        res8: CO.type = CO
 
         @ CO()
-        res9: cmd7.CO = CO()
+        res9: CO = CO()
       """)
     }
 
@@ -323,7 +324,7 @@ object EvaluatorTests extends TestSuite{
         res3_2: Int = 3
 
         @ C()
-        res4: cmd3.C = C(0)
+        res4: C = C(0)
       """)
     }
 
