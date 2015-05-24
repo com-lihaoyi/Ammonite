@@ -48,7 +48,12 @@ object TPrintTests extends TestSuite{
     }
     'compound{
       check[Map[Int, List[String]]]("Map[Int, List[String]]")
-      check[Int => String]("Function1[Int, String]")
+      check[Int => String]("Int => String")
+      check[(Int, Float) => String]("(Int, Float) => String")
+      check[(Int, Float, Double, Char, Byte, Short, Long) => String]("(Int, Float, Double, Char, Byte, Short, Long) => String")
+      check[(Int, Float) => (String, String)]("(Int, Float) => (String, String)")
+      check[(Int, String)]("(Int, String)")
+      check[(Int, String, (Int, String), Double)]("(Int, String, (Int, String), Double)")
       check[Int {val x: Int}]("Int{val x: Int}")
       check[Int with String]("Int with String")
     }

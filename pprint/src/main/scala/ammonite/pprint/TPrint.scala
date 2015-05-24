@@ -15,8 +15,15 @@ import reflect.macros.blackbox.Context
  */
 case class TPrint[T](value: String)
 
-object TPrint extends TPrintLowPri{
-
+object TPrint extends TPrintGen[TPrint] with TPrintLowPri{
+  def make[T](s: String) = TPrint[T](s)
+  def get[T](implicit t: TPrint[T]) = t.value
+  def implicitly[T](implicit t: TPrint[T]): TPrint[T] = t
+}
+trait TPrintLowPri{
+  implicit def default[T]: TPrint[T] = macro TPrintLowPri.typePrintImpl[T]
+}
+object TPrintLowPri{
   def typePrintImpl[T: c.WeakTypeTag](c: Context): c.Expr[TPrint[T]] = {
     import c.universe._
     // Used to provide "empty string" values in quasiquotes
@@ -150,8 +157,4 @@ object TPrint extends TPrintLowPri{
     c.Expr[TPrint[T]](q"new ammonite.pprint.TPrint(${rec0(tpe, end = true)})")
   }
 
-  def implicitly[T](implicit t: TPrint[T]): TPrint[T] = t
-}
-trait TPrintLowPri{
-  implicit def default[T]: TPrint[T] = macro TPrint.typePrintImpl[T]
 }
