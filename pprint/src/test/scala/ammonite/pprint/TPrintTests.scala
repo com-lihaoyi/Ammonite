@@ -32,14 +32,16 @@ object TPrintTests extends TestSuite{
     }
 
     'java {
-      check[java.util.Set[_]]("util.Set[_]")
-      check[java.util.Set[_ <: String]]("util.Set[_] forSome { type _ <: String }")
-      check[java.util.Set[String]]("util.Set[String]")
+      check[java.util.Set[_]]("java.util.Set[_]")
+      check[java.util.Set[_ <: String]]("java.util.Set[_] forSome { type _ <: String }")
+      check[java.util.Set[String]]("java.util.Set[String]")
     }
 
     'mutable{
+
+      check[collection.mutable.Buffer[Int]]("collection.mutable.Buffer[Int]")
       import collection.mutable
-      check[mutable.Buffer[Int]]("mutable.Buffer[Int]")
+      check[collection.mutable.Buffer[Int]]("mutable.Buffer[Int]")
       check[Seq[Int]]("Seq[Int]")
       check[collection.Seq[Int]]("Seq[Int]")
 
@@ -72,15 +74,21 @@ object TPrintTests extends TestSuite{
       check[x.T forSome { val x: Int with C} ](
         "x.T forSome { val x: Int with C }"
       )
-      check[List[_]](
-           "Int forSome { type T[X] }"
+      check[K[Int] forSome { type K[_ <: Int] <: Seq[Int] }](
+           "K[Int] forSome { type K[_ <: Int] <: Seq[Int] }"
+      )
+      check[K[Int] forSome { type K[X <: Int] <: Seq[X] }](
+        "K[Int] forSome { type K[X <: Int] <: Seq[X] }"
+      )
+      check[K[Int] forSome { type K[X] }](
+        "K[Int] forSome { type K[X] }"
       )
       check[K[Int] forSome { type K[_] <: Seq[_]}](
         "K[Int] forSome { type K[_] <: Seq[_] }"
       )
-      check[List[K[V]] forSome { type K[_] >: Seq[_]; type V <: Int}](
-        "List[K[V]] forSome { type K[_] >: Seq[_]; type V <: Int}"
-      )
+//      check[K[Int] forSome { type K[_] >: C }](
+//        "K[Int] forSome { type K[_] >: Int }"
+//      )
     }
 
 
