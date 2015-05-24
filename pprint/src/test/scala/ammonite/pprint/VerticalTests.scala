@@ -32,33 +32,64 @@ object VerticalTests extends TestSuite{
   }
   val tests = TestSuite{
     'Laziness{
-      implicit def default = ammonite.pprint.Config(maxWidth = 10, lines = 5)
+      implicit def default = ammonite.pprint.Config(maxWidth = 20, lines = 5)
       'list{
-        val C = new C
-        check(
-          List.fill(100)(C),
-          """List(
-            |  C,
-            |  C,
-            |  C,
-            |  C,
-            |...""".stripMargin
-        )
-        C.counter
-      }
-      'map{
-        val C = new C
-        check(
-          List.tabulate(100)(_ -> C).toMap,
-          """Map(
-            |  69 -> C,
-            |  0 -> C,
-            |  88 -> C,
-            |  5 -> C,
-            |...""".stripMargin
-        )
+        'Horizontal{
+          val C = new C
+          check(
+            List.fill(4)(C),
+            """List(C, C, C, C)"""
+          )
+          assert(C.counter == 4)
+        }
+        'Vertical{
+          val C = new C
+          check(
+            List.fill(100)(C),
+            """List(
+              |  C,
+              |  C,
+              |  C,
+              |  C,
+              |...""".stripMargin
+          )
+          //          10        20
+          //List(C, C, C, C, C, C, C ....
 
-        C.counter
+          // 6 horizontal renders before deciding it can't fit
+          // 5 vertical renders before overshooting, discarding 1
+          assert(C.counter == 6 + 5)
+        }
+      }
+
+      'map{
+        'Horizontal{
+          val C = new C
+          check(
+            SortedMap(List.tabulate(2)(_ -> C):_*),
+            """Map(0 -> C, 1 -> C)"""
+          )
+
+          assert(C.counter == 2)
+        }
+        'Vertical{
+          val C = new C
+          check(
+            SortedMap(List.tabulate(100)(_ -> C):_*),
+            """Map(
+              |  0 -> C,
+              |  1 -> C,
+              |  2 -> C,
+              |  3 -> C,
+              |...""".stripMargin
+          )
+          //          10        20
+          //Map(0 -> C, 1 -> C, 2 -> C
+
+          // 3 horizontal renders before deciding it can't fit
+          // 5 vertical renders before overshooting, discarding 1
+          assert(C.counter == 3 + 5)
+        }
       }
     }
     'Vertical{

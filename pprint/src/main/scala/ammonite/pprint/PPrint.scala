@@ -267,7 +267,6 @@ object Internals {
     // Prefix, contents, and all the extra ", " "(" ")" characters
     val horizontalChunks = chunks.flatMap(Seq(Seq(", "), _)).drop(1).flatten
 
-
     var overflow = false
     var currentWidth = renamed.length + 2
     var current = horizontalChunks
@@ -275,14 +274,12 @@ object Internals {
 
       if (current.head.contains("\n")) overflow = true
       else {
-//        println("current.head" + current.head.length)
         currentWidth = currentWidth + current.head.length
         if (currentWidth > c.maxWidth - (c.depth * c.indent)) overflow = true
       }
       current = current.tail
     }
 
-//    println("handleChunks " + currentWidth)
     if (!overflow) Iterator(coloredName, "(") ++ horizontalChunks ++ Iterator(")")
     else handleChunksVertical(name, c, chunkFunc)
   }
