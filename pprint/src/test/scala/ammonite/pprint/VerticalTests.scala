@@ -3,7 +3,7 @@ package test.ammonite.pprint
 import utest._
 
 import scala.annotation.tailrec
-import scala.collection.{immutable => imm}
+import scala.collection.{immutable => imm, SortedMap}
 import scala.util.matching.Regex
 import ammonite.pprint._
 
@@ -17,14 +17,50 @@ object Nested{
 case class Foo(integer: Int, sequence: Seq[String])
 case class FooG[T](t: T, sequence: Seq[String])
 case class FooNoArgs()
-object PPrintTests extends TestSuite{
+object VerticalTests extends TestSuite{
 
   def check[T: PPrint](t: T, expected: String) = {
     val pprinted = PPrint(t).mkString
     assert(pprinted == expected.trim)
   }
-
+  class C(){
+    var counter = 0
+    override def toString = {
+      counter += 1
+      "C"
+    }
+  }
   val tests = TestSuite{
+    'Laziness{
+      implicit def default = ammonite.pprint.Config(maxWidth = 10, lines = 5)
+      'list{
+        val C = new C
+        check(
+          List.fill(100)(C),
+          """List(
+            |  C,
+            |  C,
+            |  C,
+            |  C,
+            |...""".stripMargin
+        )
+        C.counter
+      }
+      'map{
+        val C = new C
+        check(
+          List.tabulate(100)(_ -> C).toMap,
+          """Map(
+            |  69 -> C,
+            |  0 -> C,
+            |  88 -> C,
+            |  5 -> C,
+            |...""".stripMargin
+        )
+
+        C.counter
+      }
+    }
     'Vertical{
 
       implicit def default = ammonite.pprint.Config(25)
@@ -234,7 +270,7 @@ object PPrintTests extends TestSuite{
     }
 
     'Truncation{
-      'long_no_truncation{
+      'longNoTruncation{
         implicit val cfg = Config.Defaults.PPrintConfig
           * - check("a" * 10000,"\""+"a" * 10000+"\"")
           * - check(
@@ -274,7 +310,7 @@ object PPrintTests extends TestSuite{
             )
       }
 
-      'short_non_truncated{
+      'shortNonTruncated{
         implicit val cfg = Config.Defaults.PPrintConfig.copy(lines = 15)
         * - check("a"*1000, "\"" + "a"*1000 + "\"")
         * - check(List(1,2,3,4), "List(1, 2, 3, 4)")
@@ -299,7 +335,7 @@ object PPrintTests extends TestSuite{
         )
       }
 
-      'short_lines_truncated{
+      'shortLinesTruncated{
         implicit val cfg = Config.Defaults.PPrintConfig.copy(lines = 15)
         * - check(
           List.fill(15)("foobarbaz"),
@@ -341,7 +377,7 @@ object PPrintTests extends TestSuite{
         )
       }
 
-      'long_line_truncated{
+      'longLineTruncated{
         implicit val cfg = Config.Defaults.PPrintConfig.copy(
           maxWidth = 100,
           lines = 3
@@ -369,7 +405,7 @@ object PPrintTests extends TestSuite{
       }
     }
 
-    'wrapped_lines{
+    'wrappedLines{
       implicit val cfg = Config.Defaults.PPrintConfig.copy(
         maxWidth = 8,
         lines = 5

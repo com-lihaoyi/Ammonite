@@ -91,6 +91,7 @@ object TPrintTests extends TestSuite{
       check[K[Int] forSome { type K[_] <: Seq[_]}](
         "K[Int] forSome { type K[_] <: Seq[_] }"
       )
+      // https://issues.scala-lang.org/browse/SI-9325
 //      check[K[Int] forSome { type K[_] >: C }](
 //        "K[Int] forSome { type K[_] >: Int }"
 //      )

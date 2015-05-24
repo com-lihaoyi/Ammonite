@@ -219,14 +219,15 @@ object Internals {
   }
   def makeMapRepr[M[T, V] <: collection.Map[T, V], T: PPrint, V: PPrint] = {
     PPrinter[M[T, V]] { (t: M[T, V], c: Config) =>
-      handleChunks(t.stringPrefix, c, c =>
-        t.iterator.map(k =>
-          mapEntryPrinter[T, V](
-            implicitly[PPrint[T]].copy(cfg = c),
-            implicitly[PPrint[V]].copy(cfg = c)
-          ).render(k, c)
+      handleChunks(t.stringPrefix, c, { c =>
+        val entryPrinter = mapEntryPrinter[T, V](
+          implicitly[PPrint[T]].copy(cfg = c),
+          implicitly[PPrint[V]].copy(cfg = c)
         )
-      )
+        t.iterator.map(k =>
+          entryPrinter.render(k, c)
+        )
+      })
     }
   }
 
@@ -264,10 +265,26 @@ object Internals {
     val renamed = c.rename(name)
     val coloredName = c.color.prefix(renamed)
     // Prefix, contents, and all the extra ", " "(" ")" characters
-    val totalLength = renamed.length + chunks.flatten.map(_.length).sum + chunks.length * 2
-    if (totalLength <= c.maxWidth - (c.depth * c.indent) && !chunks.flatten.exists(_.contains('\n'))) {
-      Iterator(coloredName, "(") ++ mkIterator(chunks.iterator, Seq(", ")).flatten ++ Iterator(")")
-    } else handleChunksVertical(name, c, chunkFunc)
+    val horizontalChunks = chunks.flatMap(Seq(Seq(", "), _)).drop(1).flatten
+
+
+    var overflow = false
+    var currentWidth = renamed.length + 2
+    var current = horizontalChunks
+    while(overflow == false && !current.isEmpty){
+
+      if (current.head.contains("\n")) overflow = true
+      else {
+//        println("current.head" + current.head.length)
+        currentWidth = currentWidth + current.head.length
+        if (currentWidth > c.maxWidth - (c.depth * c.indent)) overflow = true
+      }
+      current = current.tail
+    }
+
+//    println("handleChunks " + currentWidth)
+    if (!overflow) Iterator(coloredName, "(") ++ horizontalChunks ++ Iterator(")")
+    else handleChunksVertical(name, c, chunkFunc)
   }
 
   def mkIterator[T](iter: Iterator[T], inbetween: T): Iterator[T] = {
