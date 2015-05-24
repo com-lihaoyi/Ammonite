@@ -40,9 +40,9 @@ class Repl(input: InputStream,
 
   def action() = for{
     // Condition to short circuit early if `interp` hasn't finished evaluating
-    line <- frontEnd.action(interp.buffered)
+    stmts <- frontEnd.action()
     _ <- Signaller("INT") { interp.mainThread.stop() }
-    out <- interp.processLine(line, (f, x) => {saveHistory(x); f(x)}, _.foreach(print))
+    out <- interp.processLine(stmts, (f, x) => {saveHistory(x); f(x)}, _.foreach(print))
   } yield {
     println()
     out

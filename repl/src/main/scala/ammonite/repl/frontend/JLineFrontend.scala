@@ -2,10 +2,12 @@ package ammonite.repl.frontend
 
 import java.io.{OutputStream, InputStream}
 
-import ammonite.repl.{Catching, Evaluated, Res}
+import ammonite.repl._
+import fastparse.core.Result
 import jline.console.{completer, ConsoleReader}
 import acyclic.file
 
+import scala.annotation.tailrec
 import scala.tools.nsc.interpreter._
 import collection.JavaConversions._
 
@@ -17,8 +19,8 @@ trait JLineFrontend{
    * The width of the terminal
    */
   def width: Int
-  def action(buffered: String): Res[String]
-  def update(buffered: String, r: Res[Evaluated]): Unit
+  def action(): Res[Seq[String]]
+  def update(r: Res[Evaluated]): Unit
 }
 object JLineFrontend{
   def apply(input: InputStream,
@@ -77,37 +79,37 @@ object JLineFrontend{
             .toVector
 
 
-    def action(buffered: String): Res[String] = for {
+    def action(): Res[Seq[String]] = for {
       _ <- Catching{ case e: jline.console.UserInterruptException =>
-        if (e.getPartialLine == "" && buffered == "") {
-          reader.println("Ctrl-D to exit")
-        }
+        if (e.getPartialLine == "") reader.println("Ctrl-D to exit")
         Res.Skip
       }
+      res <- readCode("")
+    } yield res
 
-      res <- Option(
-        reader.readLine(
-          if (buffered.isEmpty) shellPrompt + " "
-          // Strip ANSI color codes, as described http://stackoverflow.com/a/14652763/871202
-          else " " * (shellPrompt.replaceAll("\u001B\\[[;\\d]*m", "").length + 1)
-        )
-      ).map(Res.Success(_))
-        .getOrElse(Res.Exit)
+    @tailrec def readCode(buffered: String): Res[Seq[String]] = {
+      Option(reader.readLine(
+        if (buffered.isEmpty) shellPrompt + " "
+        // Strip ANSI color codes, as described http://stackoverflow.com/a/14652763/871202
+        else " " * (shellPrompt.replaceAll("\u001B\\[[;\\d]*m", "").length + 1)
+      )) match {
+        case None => Res.Exit
+        case Some(newCode) =>
+          val code = buffered + "\n" + newCode
+          Parsers.Splitter.parse(code) match {
+            case Result.Failure(_, index) if index == code.length => readCode(code)
+            case f: Result.Failure => Res.Failure(SyntaxError.msg(f.input, f.parser, f.index))
+            case Result.Success(split, idx) =>
+              Res.Success(split)
+          }
+      }
+    }
 
-    } yield buffered + res
-
-    def update(buffered: String, r: Res[Evaluated]) = r match{
-
-      case Res.Buffer(line) =>
-        /**
-         * Hack to work around the fact that if nothing got entered into
-         * the prompt, the `ConsoleReader`'s history wouldn't increase
-         */
-        if(line != buffered + "\n") reader.getHistory.removeLast()
+    def update(r: Res[Evaluated]) = r match{
 
       case Res.Success(ev) =>
         val last = reader.getHistory.size()-1
-        reader.getHistory.set(last, buffered + reader.getHistory.get(last))
+        reader.getHistory.set(last, reader.getHistory.get(last))
 
       case Res.Exit =>
         // Otherwise the terminal gets left in a funny

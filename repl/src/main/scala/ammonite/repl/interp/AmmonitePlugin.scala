@@ -1,6 +1,6 @@
 package ammonite.repl.interp
 
-import ammonite.repl.{BacktickWrap, ImportData}
+import ammonite.repl.{Parsers, ImportData}
 import acyclic.file
 import scala.tools.nsc._
 import scala.tools.nsc.plugins.{PluginComponent, Plugin}
@@ -51,7 +51,7 @@ object AmmonitePlugin{
             case g.This(pkg) => List(pkg)
           }
         }
-        val prefix = rec(expr).reverseMap(x => BacktickWrap(x.decoded)).mkString(".")
+        val prefix = rec(expr).reverseMap(x => Parsers.backtickWrap(x.decoded)).mkString(".")
         val renamings =
           for(t @ g.ImportSelector(name, _, rename, _) <- selectors) yield {
             Option(rename).map(name.decoded -> _.decoded)

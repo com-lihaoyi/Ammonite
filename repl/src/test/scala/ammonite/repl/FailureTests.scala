@@ -15,9 +15,6 @@ object FailureTests extends TestSuite{
 
         @ java
         error: package java is not a value
-
-        @ def def
-        error: identifier expected but 'def' found
       """)
     }
     'compilerCrash{

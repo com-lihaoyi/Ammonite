@@ -1,8 +1,10 @@
 package ammonite.repl
 
 import acyclic.file
+import fastparse._
 
 import scala.util.Try
+import scalaparse.Scala._
 
 object Res{
   def apply[T](o: Option[T], errMsg: => String) = o match{
@@ -50,7 +52,6 @@ object Res{
   }
   case object Skip extends Failing
   case object Exit extends Failing
-  case class Buffer(s: String) extends Failing
 }
 
 /**
@@ -139,15 +140,40 @@ object Timer{
     current = now
   }
 }
-object BacktickWrap{
-  def apply(s: String) = {
+object Parsers{
+  val Id2 = P( Id ~ End )
+  def backtickWrap(s: String) = {
     import fastparse._
     import scalaparse.Scala._
 
-    val Id2 = P( Id ~ End )
+
     Id2.parse(s) match{
       case _: Result.Success[_] => s
       case _ => "`" + ammonite.pprint.PPrinter.escape(s) + "`"
     }
   }
+
+  val Prelude = P( Annot.rep ~ `implicit`.? ~ `lazy`.? ~ LocalMod.rep )
+  val Splitter = P( Semis.? ~ (scalaparse.Scala.Import | Prelude ~ BlockDef | StatCtx.Expr).!.rep(sep=Semis) ~ Semis.? ~ WL ~ End)
+  def split(code: String) = {
+    Splitter.parse(code) match{
+      case Result.Success(value, idx) => value
+      case f: Result.Failure => throw new SyntaxError(code, f.parser, f.index)
+    }
+  }
+}
+object SyntaxError{
+  def msg(code: String, p: fastparse.core.Parser[_], idx: Int) = {
+    val locationString = {
+      val (first, last) = code.splitAt(idx)
+      val lastSnippet = last.split('\n')(0)
+      val firstSnippet = first.reverse.split('\n').lift(0).getOrElse("").reverse
+      firstSnippet + lastSnippet + "\n" + (" " * firstSnippet.length) + "^"
+    }
+    val literal = fastparse.Utils.literalize(code.slice(idx, idx + 20))
+    s"SyntaxError: found $literal, expected $p in\n$locationString"
+  }
+}
+class SyntaxError(code: String, p: fastparse.core.Parser[_], idx: Int) extends Exception{
+  override def toString() = SyntaxError.msg(code, p, idx)
 }

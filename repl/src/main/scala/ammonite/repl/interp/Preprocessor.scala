@@ -1,6 +1,6 @@
 package ammonite.repl.interp
 import acyclic.file
-import ammonite.repl.{BacktickWrap, Res}
+import ammonite.repl.{Parsers, Res}
 
 import scala.reflect.internal.Flags
 import scala.tools.nsc.{Global => G}
@@ -11,7 +11,7 @@ import scala.tools.nsc.{Global => G}
  * three things:
  */
 trait Preprocessor{
-  def apply(code: String, wrapperId: String): Res[Preprocessor.Output]
+  def apply(stmts: Seq[String], wrapperId: String): Res[Preprocessor.Output]
 }
 object Preprocessor{
 
@@ -41,7 +41,7 @@ object Preprocessor{
         cond.lift(tree).map{ name =>
           Preprocessor.Output(
             code,
-            Seq(definedStr(definitionLabel, BacktickWrap(name.decoded)))
+            Seq(definedStr(definitionLabel, Parsers.backtickWrap(name.decoded)))
           )
         }
 
@@ -74,8 +74,8 @@ object Preprocessor{
         // synthetic flags right now, because we're dumb-parsing it and not putting
         // it through a full compilation
         if (t.name.decoded.contains("$")) Nil
-        else if (!t.mods.hasFlag(Flags.LAZY)) Seq(pprint(BacktickWrap.apply(t.name.decoded)))
-        else Seq(s"""${pprintSignature(BacktickWrap.apply(t.name.decoded))} ++ Iterator(" = <lazy>")""")
+        else if (!t.mods.hasFlag(Flags.LAZY)) Seq(pprint(Parsers.backtickWrap(t.name.decoded)))
+        else Seq(s"""${pprintSignature(Parsers.backtickWrap(t.name.decoded))} ++ Iterator(" = <lazy>")""")
       )
     }
 
@@ -94,20 +94,10 @@ object Preprocessor{
       ObjectDef, ClassDef, TraitDef, DefDef, TypeDef, PatVarDef, Import, Expr
     )
 
-    def apply(code: String, wrapperId: String): Res[Preprocessor.Output] = {
-      import fastparse._
-      import scalaparse.Scala._
-      val Prelude = P( Annot.rep ~ `implicit`.? ~ `lazy`.? ~ LocalMod.rep )
-      val Splitter = P( Semis.? ~ (scalaparse.Scala.Import | Prelude ~ BlockDef | StatCtx.Expr).!.rep(sep=Semis) ~ Semis.? ~ WL ~ End)
-
-
-      Splitter.parse(code) match {
-        case Result.Failure(_, index) if index == code.length => Res.Buffer(code)
-        case f @ Result.Failure(p, index) =>
-
-          Res.Failure(parse(code).left.get)
-        case Result.Success(Nil, _) => Res.Skip
-        case Result.Success(postSplit: Seq[String], _) => complete(code, wrapperId, postSplit.map(_.trim))
+    def apply(stmts: Seq[String], wrapperId: String): Res[Preprocessor.Output] = {
+      stmts match{
+        case Nil => Res.Skip
+        case postSplit => complete(stmts.mkString, wrapperId, postSplit.map(_.trim))
       }
     }
     

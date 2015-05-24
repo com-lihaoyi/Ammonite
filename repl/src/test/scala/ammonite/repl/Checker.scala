@@ -9,7 +9,7 @@ class Checker {
   def predef = ""
   var allOutput = ""
   val interp = new Interpreter(
-    (_, _) => (),
+    (_) => (),
     Ref[String](""),
     ammonite.pprint.Config.Defaults.PPrintConfig.copy(lines = 15),
     stdout = allOutput += _,
@@ -26,21 +26,21 @@ class Checker {
 
       val (cmdLines, resultLines) = step.lines.map(_.drop(margin)).partition(_.startsWith("@"))
       val commandText = cmdLines.map(_.stripPrefix("@ ")).toVector
-
       val expected = resultLines.mkString("\n").trim
-      for(line <- commandText.init) {
-        allOutput += "\n@ " + line
-        val (processed, printed) = run(line)
-        if (!line.startsWith("//")) {
-          failLoudly(assert(processed.isInstanceOf[Res.Buffer]))
-        }
+      allOutput += commandText.map("\n@ " + _).mkString("\n")
 
-        interp.handleOutput(processed)
-      }
+      val (processed, printed) = run(commandText.mkString("\n"))
+      interp.handleOutput(processed)
       if (expected.startsWith("error: ")){
-        fail(commandText.last, _.contains(expected.drop("error: ".length)))
+        printed match{
+          case Res.Success(v) => assert({v; allOutput; false})
+          case Res.Failure(s) =>
+            val expectedStripped = expected.stripPrefix("error: ")
+            failLoudly(assert(s.contains(expectedStripped)))
+        }
       }else{
-        apply(commandText.last, if (expected == "") null else expected)
+        if (expected != "")
+          failLoudly(assert(printed == Res.Success(expected)))
       }
     }
   }
@@ -50,10 +50,9 @@ class Checker {
 //    println(input)
 //    print(".")
     val msg = collection.mutable.Buffer.empty[String]
-    val processed = interp.processLine(interp.buffered + input, _(_), _.foreach(msg.append(_)))
+    val processed = interp.processLine(Parsers.split(input), _(_), _.foreach(msg.append(_)))
     val printed = processed.map(_ => msg.mkString)
-    if (!printed.isInstanceOf[Res.Buffer])
-      allOutput += "\n" + printed
+
     interp.handleOutput(processed)
     (processed, printed)
   }

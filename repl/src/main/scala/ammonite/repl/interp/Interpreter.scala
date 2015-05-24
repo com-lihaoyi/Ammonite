@@ -5,6 +5,7 @@ import acyclic.file
 import ammonite.pprint
 import ammonite.repl._
 import ammonite.repl.frontend._
+import fastparse.core.Result
 
 import scala.reflect.io.VirtualDirectory
 
@@ -13,7 +14,7 @@ import scala.reflect.io.VirtualDirectory
  * to interpret Scala code. Doesn't attempt to provide any
  * real encapsulation for now.
  */
-class Interpreter(handleResult: => (String, Res[Evaluated]) => Unit,
+class Interpreter(handleResult: => Res[Evaluated] => Unit,
                   shellPrompt0: => Ref[String],
                   pprintConfig: pprint.Config,
                   colors0: ColorSet = ColorSet.BlackWhite,
@@ -25,17 +26,16 @@ class Interpreter(handleResult: => (String, Res[Evaluated]) => Unit,
   var extraJars = Seq[java.io.File]()
 
   val history = initialHistory.to[collection.mutable.Buffer]
-  var buffered = ""
 
-  def processLine(line: String,
+  def processLine(stmts: Seq[String],
                   saveHistory: (String => Unit, String) => Unit,
                   printer: Iterator[String] => Unit) = for{
     _ <- Catching { case Ex(x@_*) =>
       val Res.Failure(trace) = Res.Failure(x)
       Res.Failure(trace + "\nSomething unexpected went wrong =(")
     }
-    Preprocessor.Output(code, printSnippet) <- preprocess(line, eval.getCurrentLine)
-    _ = saveHistory(history.append(_), line)
+    Preprocessor.Output(code, printSnippet) <- preprocess(stmts, eval.getCurrentLine)
+    _ = saveHistory(history.append(_), stmts.mkString)
     oldClassloader = Thread.currentThread().getContextClassLoader
     out <- try{
       Thread.currentThread().setContextClassLoader(eval.evalClassloader)
@@ -48,29 +48,19 @@ class Interpreter(handleResult: => (String, Res[Evaluated]) => Unit,
   } yield out
 
   def handleOutput(res: Res[Evaluated]) = {
-    handleResult(buffered, res)
+    handleResult(res)
 
     res match{
       case Res.Skip =>
-        buffered = ""
-        true
-      case Res.Buffer(line) =>
-        /**
-         * Hack to work around the fact that if nothing got entered into
-         * the prompt, the `ConsoleReader`'s history wouldn't increase
-         */
-        buffered = line + "\n"
         true
       case Res.Exit =>
         stdout("Bye!\n")
         pressy.shutdownPressy()
         false
       case Res.Success(ev) =>
-        buffered = ""
         eval.update(ev.imports)
         true
       case Res.Failure(msg) =>
-        buffered = ""
         stdout(Console.RED + msg + Console.RESET + "\n")
         true
     }
@@ -86,7 +76,7 @@ class Interpreter(handleResult: => (String, Res[Evaluated]) => Unit,
     object load extends Load{
 
       def apply(line: String) = handleOutput(processLine(
-        line,
+        Parsers.split(line),
         (_, _) => (), // Discard history of load-ed lines,
         _.foreach(stdout)
       ))
@@ -159,7 +149,7 @@ class Interpreter(handleResult: => (String, Res[Evaluated]) => Unit,
   // line number to -1 if the predef exists so the first user-entered
   // line becomes 0
   if (predef != "") {
-    val res1 = processLine(predef, (_, _) => (), _.foreach(stdout))
+    val res1 = processLine(Parsers.split(predef), (_, _) => (), _.foreach(stdout))
     val res2 = handleOutput(res1)
     stdout("\n")
   }
