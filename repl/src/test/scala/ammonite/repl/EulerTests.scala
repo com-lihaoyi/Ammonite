@@ -135,7 +135,7 @@ object EulerTests extends TestSuite{
         @   c = 1000 - a - b
         @   if a * a + b * b  == c * c
         @ } yield a * b * c
-        rs: immutable.IndexedSeq[Int] = Vector(31875000)
+        rs: collection.immutable.IndexedSeq[Int] = Vector(31875000)
       """)
     }
     'p10{
