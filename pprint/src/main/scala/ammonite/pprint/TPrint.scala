@@ -19,6 +19,7 @@ object TPrint extends TPrintGen[TPrint] with TPrintLowPri{
   def make[T](s: String) = TPrint[T](s)
   def get[T](implicit t: TPrint[T]) = t.value
   def implicitly[T](implicit t: TPrint[T]): TPrint[T] = t
+  implicit val NothingTPrint: TPrint[Nothing] = TPrint("Nothing")
 }
 trait TPrintLowPri{
   implicit def default[T]: TPrint[T] = macro TPrintLowPri.typePrintImpl[T]
@@ -29,7 +30,6 @@ object TPrintLowPri{
     // Used to provide "empty string" values in quasiquotes
     val s = ""
     val tpe = weakTypeOf[T]
-
     def printSym(s: Symbol): String = {
       if (s.name.toString.startsWith("_$")) "_"
       else s.name.toString.stripSuffix(".type")
@@ -154,7 +154,9 @@ object TPrintLowPri{
         }"
     }
 
-    c.Expr[TPrint[T]](q"new ammonite.pprint.TPrint(${rec0(tpe, end = true)})")
+    val res = c.Expr[TPrint[T]](q"new ammonite.pprint.TPrint(${rec0(tpe, end = true)})")
+//    println("RES " + res)
+    res
   }
 
 }

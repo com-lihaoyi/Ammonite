@@ -137,8 +137,8 @@ lazy val repl = project
       "org.apache.ivy" % "ivy" % "2.4.0",
       "com.lihaoyi" %% "scalaparse" % "0.1.5"
     ),
-    javaOptions += "-Xmx4G",
-    fork in (Test, testOnly) := true
+    javaOptions += "-Xmx4G"//,
+//    fork in (Test, testOnly) := true
   )
 
 lazy val readme = ScalatexReadme(

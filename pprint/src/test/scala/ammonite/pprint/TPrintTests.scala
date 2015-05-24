@@ -6,6 +6,8 @@ import ammonite.pprint.TPrint
 object TPrintTests extends TestSuite{
 
   class M
+  def checkVal[T](expected: String, expr: => T)(implicit tprint: TPrint[T]) = check[T](expected)(tprint)
+
   def check[T](expected: String)(implicit tprint: TPrint[T]) = {
     val tprinted = tprint.value
     assert(tprinted == expected)
@@ -20,9 +22,18 @@ object TPrintTests extends TestSuite{
       check[String]("String")
       check[java.lang.String]("String")
       check[Int]("Int")
+
       check[scala.Int]("Int")
       def t[T] = check[T]("T")
       t
+    }
+
+    'nothing{
+      check[Nothing]("Nothing")
+      // Inferred nothings behave weirdly, make sure it works!
+      check("Nothing")
+      checkVal("Nothing", throw new Exception())
+      checkVal("Some[Nothing]", Some(???))
     }
 
     'singleton{
