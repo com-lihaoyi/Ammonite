@@ -10,8 +10,8 @@ import scala.reflect.io.VirtualDirectory
 
 object EvaluatorTests extends TestSuite{
 
-
   val tests = TestSuite{
+    println("EvaluatorTests")
     val check = new Checker()
     'simpleExpressions{
       check.session("""

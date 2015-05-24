@@ -6,6 +6,7 @@ import scala.collection.{immutable => imm}
 
 object FailureTests extends TestSuite{
   val tests = TestSuite{
+    println("FailureTests")
     val check = new Checker()
     'compileFailure {
       check.session("""

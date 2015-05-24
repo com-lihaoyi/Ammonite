@@ -6,6 +6,7 @@ import scala.collection.{immutable => imm}
 
 object AdvancedTests extends TestSuite{
   val tests = TestSuite{
+    println("AdvancedTests")
     val check = new Checker()
     'load{
       'ivy{

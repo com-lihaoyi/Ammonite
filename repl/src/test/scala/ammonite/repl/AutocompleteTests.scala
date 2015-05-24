@@ -6,8 +6,8 @@ import scala.collection.{immutable => imm}
 import scala.reflect.internal.util.BatchSourceFile
 
 object AutocompleteTests extends TestSuite{
-
   val tests = TestSuite{
+    println("AutocompleteTests")
     val check = new Checker()
     def complete(caretCode: String,
                  cmp: (Set[String]) => Set[String],

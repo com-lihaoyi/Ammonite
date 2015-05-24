@@ -5,6 +5,7 @@ import ammonite.pprint.PPrint
 import ammonite.pprint.Config.Defaults._
 object EulerTests extends TestSuite{
   val tests = TestSuite{
+    println("EulerTests")
     val check = new Checker()
 
 
