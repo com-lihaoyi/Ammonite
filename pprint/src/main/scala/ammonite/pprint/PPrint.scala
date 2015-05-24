@@ -267,26 +267,25 @@ object Internals {
     // Prefix, contents, and all the extra ", " "(" ")" characters
     val horizontalChunks = chunks.flatMap(Seq(Seq(", "), _)).drop(1).flatten
 
-    // Some icky imperative code to make sure we don't read more from the
-    // `chunks` stream that we have to before deciding to go vertically.
+    // Make sure we don't read more from the `chunks` stream that we
+    // have to before deciding to go vertically.
     //
     // This keeps the pprinting lazy, ensuring you can pprint arbitrarily
     // collections only ever traversing approximately the amount you need
     // before truncation, and never the whole thing
-    var overflow = false
-    var currentWidth = renamed.length + 2
-    var current = horizontalChunks
-    while(overflow == false && !current.isEmpty){
-      if (current.head.contains("\n")) overflow = true
-      else {
-        currentWidth = currentWidth + current.head.length
-        if (currentWidth > c.maxWidth - (c.depth * c.indent)) overflow = true
-      }
-      current = current.tail
+    @tailrec def checkOverflow(chunks: Stream[String], currentWidth: Int): Boolean = chunks match{
+      case Stream.Empty => false
+      case head #:: rest =>
+        if (head.contains("\n")) true
+        else {
+          val nextWidth = currentWidth + head.length
+          if (nextWidth > c.maxWidth - (c.depth * c.indent)) true
+          else checkOverflow(rest, nextWidth)
+        }
     }
 
-    if (!overflow) Iterator(coloredName, "(") ++ horizontalChunks ++ Iterator(")")
-    else handleChunksVertical(name, c, chunkFunc)
+    if (checkOverflow(horizontalChunks, renamed.length + 2)) handleChunksVertical(name, c, chunkFunc)
+    else Iterator(coloredName, "(") ++ horizontalChunks ++ Iterator(")")
   }
 
   def mkIterator[T](iter: Iterator[T], inbetween: T): Iterator[T] = {
