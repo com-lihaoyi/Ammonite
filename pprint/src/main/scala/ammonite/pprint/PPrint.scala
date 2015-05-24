@@ -208,7 +208,7 @@ object Unpacker extends PPrinterGen {
    * Special, because `Product0` doesn't exist
    */
   implicit def Product0Unpacker = (t: Unit) => Iter[Iter[String]]()
-  val foo = 1
+
   def render[T: PP](t: T, c: Config) = implicitly[PPrint[T]].copy(cfg=c).render(t)
 }
 
@@ -216,7 +216,7 @@ object Unpacker extends PPrinterGen {
 object Internals {
 
   def mapEntryPrinter[T: PPrint, V: PPrint] = PPrinter[(T, V)] { case ((t, v), c) =>
-    implicitly[PPrint[T]].render(t) ++ Iter(" -> ") ++ implicitly[PPrint[V]].render(v)
+    PPrint(t) ++ Iter(" -> ") ++ PPrint(v)
   }
   def makeMapRepr[M[T, V] <: collection.Map[T, V], T: PPrint, V: PPrint] = {
     PPrinter[M[T, V]] { (t: M[T, V], c: Config) =>
@@ -234,12 +234,12 @@ object Internals {
 
   def collectionRepr[T: PPrint, V <: Traversable[T]]: PPrinter[V] = PPrinter[V] {
     (i: V, c: Config) => {
-      val pp = implicitly[PPrint[T]].copy(cfg = c)
-      def cFunc = (cfg: Config) => {
-        i.toIterator.map(pp.copy(cfg = cfg).render)
-      }
-      if (!i.isInstanceOf[Stream[T]]) handleChunks(i.stringPrefix, pp.cfg, cFunc)
-      else handleChunksVertical(i.stringPrefix, pp.cfg, cFunc)
+      def cFunc = (cfg: Config) => i.toIterator.map(implicitly[PPrint[T]].copy(cfg = cfg).render)
+
+      // Streams we always print vertically, because they're lazy and
+      // we don't know how long they will end up being.
+      if (!i.isInstanceOf[Stream[T]]) handleChunks(i.stringPrefix, c, cFunc)
+      else handleChunksVertical(i.stringPrefix, c, cFunc)
     }
   }
 
@@ -292,6 +292,11 @@ object Internals {
     else Iter(coloredName, "(") ++ horizontalChunks ++ Iter(")")
   }
 
+  /**
+   * Same as `handleChunks`, but lays things out vertically instead of trying
+   * to make a choice. Apart from being delegated to in `handleChunks`, the
+   * `Stream` printer uses this directly.
+   */
   def handleChunksVertical(name: String,
                            c: Config,
                            chunkFunc: Config => Iter[Iter[String]]): Iter[String] = {
@@ -304,9 +309,7 @@ object Internals {
 
     Iter(coloredName, "(\n") ++
     chunks2.flatMap(Iter(",\n", "  ") ++ indent ++ _).drop(1) ++
-    Iter("\n") ++
-    indent ++
-    Iter(")")
+    Iter("\n") ++ indent ++ Iter(")")
   }
 
   type Unpacker[T] = (T, Config) => Iter[Iter[String]]
@@ -317,8 +320,7 @@ object Internals {
   }
 
   def fromUnpacker[T](prefix: T => String)(f: Internals.Unpacker[T]): PPrinter[T] = PPrinter[T]{
-    (t: T, c: Config) =>
-      Internals.handleChunks(prefix(t), c, f(t, _))
+    (t: T, c: Config) => Internals.handleChunks(prefix(t), c, f(t, _))
   }
 
   object LowerPriPPrint {
