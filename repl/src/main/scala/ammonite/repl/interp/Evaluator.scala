@@ -197,7 +197,7 @@ object Evaluator{
         s"""
         $previousImportBlock
 
-        object $wrapperName{
+        case object $wrapperName{
           $code
           def $$main() = {$printCode}
         }
