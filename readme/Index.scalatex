@@ -243,6 +243,9 @@
         To try out Ammonite-REPL in an existing project, add the following to your @code{build.sbt}
 
       @hl.scala
+        // Any version from 2.11.{3-6} works
+        scalaVersion := "2.11.6"
+
         libraryDependencies += "com.lihaoyi" % "ammonite-repl" % "@ammonite.Constants.version" % "test" cross CrossVersion.full
 
         initialCommands in (Test, console) := """ammonite.repl.Repl.run("")"""
@@ -408,6 +411,8 @@
       @ul
         @li
           Fix pretty-printing of higher-kinded types.
+        @li
+          Drop support for 2.10.x; ammonite is 2.11.x-only now
 
     @sect{0.3.1}
       @ul
