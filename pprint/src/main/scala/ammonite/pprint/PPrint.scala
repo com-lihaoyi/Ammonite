@@ -23,7 +23,8 @@ object PPrint extends Internals.LowPriPPrint{
   /**
    * Helper to make implicit resolution behave right
    */
-  implicit def Contra[A](implicit ca: PPrinter[A], cfg: Config): PPrint[A] = new PPrint(ca, cfg)
+  implicit def Contra[A](implicit ca: PPrinter[A], cfg: Config): PPrint[A] =
+    new PPrint(ca, cfg)
 }
 
 
@@ -31,19 +32,19 @@ object PPrint extends Internals.LowPriPPrint{
  * A typeclass necessary to prettyprint something. Separate from [[PPrinter]]
  * in order to make contravariant implicit resolution behave right.
  */
-case class PPrint[A](a: PPrinter[A], cfg: Config){
+case class PPrint[A](pprinter: PPrinter[A], cfg: Config){
   def render(t: A): Iter[String] = {
     if (t == null) Iter("null")
-    else a.render(t, cfg)
+    else pprinter.render(t, cfg)
   }
-  def map(f: String => String) = a.map(f)
+  def map(f: String => String) = pprinter.map(f)
 }
 
 /**
  * Wrapper type for disabling output truncation.
  * PPrint(Full(value)) will always return the full output.
  */
-case class Show[A](a: A, lines: Int)
+case class Show[A](value: A, lines: Int)
 
 /**
  * A typeclass you define to prettyprint values of type [[A]]
@@ -208,8 +209,10 @@ object PPrinter extends LowPriPPrinter{
   implicit def showPPrinter[A: PPrint]: PPrinter[Show[A]] = {
     new PPrinter[Show[A]]{
       def render(wrapper: Show[A], c: Config) = {
-        val pprint = implicitly[PPrint[A]]
-        pprint.copy(cfg = c.copy(lines = wrapper.lines)).render(wrapper.a)
+        implicitly[PPrint[A]].pprinter.render(
+          wrapper.value,
+          c.copy(lines = wrapper.lines)
+        )
       }
     }
   }
@@ -229,23 +232,20 @@ object Unpacker extends PPrinterGen {
    */
   implicit def Product0Unpacker = (t: Unit) => Iter[Iter[String]]()
 
-  def render[T: PP](t: T, c: Config) = implicitly[PPrint[T]].copy(cfg=c).render(t)
+  def render[T: PP](t: T, c: Config) = implicitly[PPrint[T]].pprinter.render(t, c)
 }
 
 
 object Internals {
 
-  def mapEntryPrinter[T: PPrint, V: PPrint] = PPrinter[(T, V)] { case ((t, v), c) =>
-    PPrint(t) ++ Iter(" -> ") ++ PPrint(v)
-  }
   def makeMapRepr[M[T, V] <: collection.Map[T, V], T: PPrint, V: PPrint] = {
     PPrinter[M[T, V]] { (t: M[T, V], c: Config) =>
       handleChunks(t.stringPrefix, c, { c =>
-        val entryPrinter = mapEntryPrinter[T, V](
-          implicitly[PPrint[T]].copy(cfg = c),
-          implicitly[PPrint[V]].copy(cfg = c)
-        )
-        t.iterator.map(entryPrinter.render(_, c))
+        t.iterator.map{ case (t, v) =>
+          implicitly[PPrint[T]].pprinter.render(t, c) ++
+          Iter(" -> ") ++
+          implicitly[PPrint[V]].pprinter.render(v, c)
+        }
       })
     }
   }
@@ -275,7 +275,7 @@ object Internals {
    * )
    *
    * And deals with the necessary layout considerations to
-   * decide whether to go vertical or horiozontal
+   * decide whether to go vertical or horizontal
    */
   def handleChunks(name: String,
                    c: Config,
@@ -305,8 +305,9 @@ object Internals {
           else checkOverflow(rest, nextWidth)
         }
     }
+    val overflow = checkOverflow(horizontalChunks, renamed.length + 2)
 
-    if (checkOverflow(horizontalChunks, renamed.length + 2)) handleChunksVertical(name, c, chunkFunc)
+    if (overflow) handleChunksVertical(name, c, chunkFunc)
     else Iter(coloredName, "(") ++ horizontalChunks ++ Iter(")")
   }
 

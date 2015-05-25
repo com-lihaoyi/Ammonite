@@ -85,10 +85,12 @@ object VerticalTests extends TestSuite{
           )
           //          10        20
           //Map(0 -> C, 1 -> C, 2 -> C
+          //                    ^ break
 
-          // 3 horizontal renders before deciding it can't fit
-          // 5 vertical renders before overshooting, discarding 1
-          assert(C.counter == 3 + 5)
+          // 2 horizontal renders (and change) before deciding it can't fit
+          // 4 vertical renders before overshooting
+          val count = C.counter
+          assert(count == 2 + 4)
         }
       }
     }

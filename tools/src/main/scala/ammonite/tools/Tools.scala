@@ -18,7 +18,7 @@ trait Grepper[T]{
 object Grepper{
   def BlackWhite[V: PPrint] = {
     val pp = implicitly[PPrint[V]]
-    new ammonite.pprint.PPrint(pp.a, pp.cfg.copy(literalColor=null, prefixColor=null))
+    new ammonite.pprint.PPrint(pp.pprinter, pp.cfg.copy(literalColor=null, prefixColor=null))
   }
   implicit object Str extends Grepper[String] {
     def apply[V: ammonite.pprint.PPrint](t: String, s: V) = {
