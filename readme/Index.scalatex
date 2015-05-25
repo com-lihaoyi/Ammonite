@@ -240,12 +240,9 @@
       @p
         Ammonite-REPL is a cleanroom re-implementation of the Scala REPL from first principles. It is much more featureful than the default REPL and comes with a lot of ergonomic improvements that may be familiar to people coming from IDEs or other REPLs such as @a("IPython", href:="ipython.org") or @a("Zsh", href:="http://www.zsh.org/").
       @p
-        To try out Ammonite-REPL in an existing project, add the following to your @code{build.sbt}
+        To try out Ammonite-REPL in an existing Scala 2.11.x project, add the following to your @code{build.sbt}
 
       @hl.scala
-        // Any version from 2.11.{3-6} works
-        scalaVersion := "2.11.6"
-
         libraryDependencies += "com.lihaoyi" % "ammonite-repl" % "@ammonite.Constants.version" % "test" cross CrossVersion.full
 
         initialCommands in (Test, console) := """ammonite.repl.Repl.run("")"""
