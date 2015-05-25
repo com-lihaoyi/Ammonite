@@ -86,20 +86,40 @@ object PPrinter extends LowPriPPrinter{
   implicit val LongRepr = literalColorPPrinter[Long].map(_+"L")
   implicit val FloatRepr = literalColorPPrinter[Float].map(_+"F")
   implicit val DoubleRepr = literalColorPPrinter[Double]
-  implicit val CharRepr = PPrinter[Char]((x, c) =>
-    Iter(c.color.literal("'" + escape(x.toString) + "'"))
-  )
+  implicit val CharRepr = PPrinter[Char] { (x, c) =>
+    val body = Iter("'", escape(x.toString), "'")
+    if (c.literalColor == null) body
+    else Iter(c.literalColor) ++ body ++ Iter(Console.RESET)
+  }
+
+  val escapeSet = "\"\n\r\t\\".toSet
 
   implicit val StringRepr = PPrinter[String] { (x, c) =>
-    val escaped = escape(x)
-    Iter(c.color.literal(
-      if (escaped.length - x.length < 1) '"' + escaped +'"'
+    // We break up the string into chunks and only lazily
+    // encode (escape or indent) it for display. This ensures
+    // that extra-large strings can start streaming immediately
+    // without encoding the whole string.
+    //
+    // We are forced to check the whole string for special escapes
+    // before deciding on which way to encode/display it, but
+    // that's unavoidable, doesn't allocate any memory, and
+    // hopefully fast
+    val chunkSize = 128
+
+    val chunks =
+      for(i <- (0 until x.length by chunkSize).iterator)
+      yield x.slice(i, i + chunkSize)
+
+    val body =
+      if (!x.exists(escapeSet)) Iter("\"") ++ chunks.map(escape) ++ Iter("\"")
       else {
-        val indent = "  " * c.depth
-        val indented = x.lines.map(indent  + _).mkString("\n")
-        "\"\"\"\n" + indented + "\n" + indent  + "\"\"\""
+        val indent =tr "  " * c.depth
+        val indented = chunks.map(_.replace("\n", indent.mkString + "\n"))
+        Iter("\"\"\"\n") ++ indented ++ Iter("\n", indent.mkString, "\"\"\"")
       }
-    ))
+
+    if (c.literalColor == null) body
+    else Iter(c.literalColor) ++ body ++ Iter(Console.RESET)
   }
   implicit val SymbolRepr = PPrinter[Symbol]((x, c) =>
     Iter(c.color.literal("'" + x.name))
@@ -225,9 +245,7 @@ object Internals {
           implicitly[PPrint[T]].copy(cfg = c),
           implicitly[PPrint[V]].copy(cfg = c)
         )
-        t.iterator.map(k =>
-          entryPrinter.render(k, c)
-        )
+        t.iterator.map(entryPrinter.render(_, c))
       })
     }
   }

@@ -60,13 +60,25 @@ object HorizontalTests extends TestSuite{
           """.stripMargin
           )
 
+          * - check("\n", s"""
+          |$tq
+          |
+          |
+          |$tq
+          """.stripMargin)
           * - check("\n\n\n", s"""
           |$tq
           |
           |
           |
+          |
           |$tq
           """.stripMargin)
+          val n = 1000
+          * - check(
+            "\n" + "ABCDEFG" * n,
+            "\"\"\"\n\n" + "ABCDEFG" * n + "\n\"\"\""
+          )
         }
         'Symbols {
           * - check('hello, """'hello""")
