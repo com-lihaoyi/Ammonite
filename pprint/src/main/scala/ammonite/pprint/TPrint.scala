@@ -13,13 +13,21 @@ import reflect.macros.blackbox.Context
  * - Prefixed Types are printed un-qualified, according to
  *   what's currently in scope
  */
-case class TPrint[T](value: String)
+trait TPrint[T]{
+  def render(implicit cfg: Config): String
+}
 
-object TPrint extends TPrintGen[TPrint] with TPrintLowPri{
-  def make[T](s: String) = TPrint[T](s)
-  def get[T](implicit t: TPrint[T]) = t.value
+object TPrint extends TPrintGen[TPrint, Config] with TPrintLowPri{
+  def literal[T](s: String) = new TPrint[T]{
+    def render(implicit cfg: Config) = cfg.color.literal(s)
+  }
+  def lambda[T](f: Config => String) = new TPrint[T]{
+    def render(implicit cfg: Config) = f(cfg)
+  }
+  def make[T](f: Config => String) = TPrint.lambda[T](f)
+  def get[T](cfg: Config)(implicit t: TPrint[T]) = t.render(cfg)
   def implicitly[T](implicit t: TPrint[T]): TPrint[T] = t
-  implicit val NothingTPrint: TPrint[Nothing] = TPrint("Nothing")
+  implicit val NothingTPrint: TPrint[Nothing] = TPrint.literal("Nothing")
 }
 trait TPrintLowPri{
   implicit def default[T]: TPrint[T] = macro TPrintLowPri.typePrintImpl[T]
@@ -30,16 +38,17 @@ object TPrintLowPri{
     // Used to provide "empty string" values in quasiquotes
     val s = ""
     val tpe = weakTypeOf[T]
-    def printSym(s: Symbol): String = {
+    def printSymString(s: Symbol) =
       if (s.name.toString.startsWith("_$")) "_"
       else s.name.toString.stripSuffix(".type")
+
+    def printSym(s: Symbol): Tree = {
+      q"""$cfgSym.color.literal(${printSymString(s)})"""
     }
-    def printSymFull(s: Symbol): String = {
-      val curr =
-        if (s.name.toString.startsWith("_$")) "_"
-        else s.name.toString.stripSuffix(".type")
-      if (lookup(s)) curr
-      else printSymFull(s.owner) + "." + curr
+
+    def printSymFull(s: Symbol): Tree = {
+      if (lookup(s)) printSym(s)
+      else q"""${printSymFull(s.owner)} + "." + ${printSym(s)}"""
 
     }
     /**
@@ -74,9 +83,9 @@ object TPrintLowPri{
       // or even need to wrap the prefix in parentheses
       val sep = pre match{
         case x if x.toString.endsWith(".type") => q""" ${rec0(pre)} + "." """
-        case x: TypeRef => q""" ${implicitRec(pre)} + "#" """
-        case x: SingleType => q""" ${rec0(pre)} + "." """
-        case x: ThisType => q""" ${rec0(pre)} + "." """
+        case x: TypeRef => q""" $cfgSym.color.literal(${implicitRec(pre)}) + "#" """
+        case x: SingleType => q""" $cfgSym.color.literal(${rec0(pre)}) + "." """
+        case x: ThisType => q""" $cfgSym.color.literal(${rec0(pre)}) + "." """
         case x => q""" "(" + ${implicitRec(pre)} + ")#" """
       }
 
@@ -100,11 +109,38 @@ object TPrintLowPri{
     }
 
 
-    def implicitRec(tpe: Type) = q""" ammonite.pprint.TPrint.implicitly[$tpe].value """
+    def implicitRec(tpe: Type) = q""" ammonite.pprint.TPrint.implicitly[$tpe].render($cfgSym) """
     def printBounds(lo: Type, hi: Type) = {
       val loTree = if (lo =:= typeOf[Nothing]) q"$s" else q""" " >: " + ${implicitRec(lo)} """
       val hiTree = if (hi =:= typeOf[Any]) q"$s" else q""" " <: " + ${implicitRec(hi)} """
       q"$loTree + $hiTree"
+    }
+
+    def showRefinement(quantified: List[Symbol]) = {
+      def stmts = for{
+        t <- quantified
+        suffix <- t.info match {
+          case PolyType(typeParams, resultType) =>
+            val paramTree = printArgSyms(t.asInstanceOf[TypeSymbol].typeParams)
+            val resultBounds = if (resultType =:= typeOf[Any]) q"$s" else q""" " <: " + ${implicitRec(resultType)} """
+            Some(q""" $paramTree + $resultBounds""")
+          case TypeBounds(lo, hi) if t.toString.contains("$") && lo =:= typeOf[Nothing] && hi =:= typeOf[Any] =>
+            None
+          case TypeBounds(lo, hi) =>
+            Some( printBounds(lo, hi) )
+        }
+      } yield {
+          if (t.toString.endsWith(".type")) {
+            val TypeBounds(lo, hi) = t.info
+            val RefinedType(parents, defs) = hi
+            val filtered = internal.refinedType(parents.filter(x => !(x =:= typeOf[scala.Singleton])), defs)
+            q""" "val " + $cfgSym.color.literal(${t.name.toString.stripSuffix(".type")}) + ": " + ${implicitRec(filtered)}"""
+          }else {
+            q""" "type " + ${printSym(t)} + $suffix """
+          }
+        }
+      if (stmts.length == 0) None
+      else Some(stmts.reduceLeft((l, r) => q""" $l + "; " + $r """))
     }
     def rec0(tpe: Type, end: Boolean = false) = tpe match {
       case TypeBounds(lo, hi) =>
@@ -118,31 +154,10 @@ object TPrintLowPri{
       case TypeRef(NoPrefix, sym, args) => q"${printSym(sym)} + ${printArgs(args)}"
       case TypeRef(pre, sym, args)      => q"${prefixFor(pre, sym)} + ${printArgs(args)}"
       case et @ ExistentialType(quantified, underlying) =>
-        def stmts = for{
-          t <- quantified
-          suffix <- t.info match {
-            case PolyType(typeParams, resultType) =>
-              val paramTree = printArgSyms(t.asInstanceOf[TypeSymbol].typeParams)
-              val resultBounds = if (resultType =:= typeOf[Any]) q"$s" else q""" " <: " + ${implicitRec(resultType)} """
-              Some(q""" $paramTree + $resultBounds""")
-            case TypeBounds(lo, hi) if t.toString.contains("$") && lo =:= typeOf[Nothing] && hi =:= typeOf[Any] =>
-              None
-            case TypeBounds(lo, hi) =>
-              Some( printBounds(lo, hi) )
-          }
-        } yield {
-            if (t.toString.endsWith(".type")) {
-              val TypeBounds(lo, hi) = t.info
-              val RefinedType(parents, defs) = hi
-              val filtered = internal.refinedType(parents.filter(x => !(x =:= typeOf[scala.Singleton])), defs)
-              q""" "val " + ${t.name.toString.stripSuffix(".type")} + ": " + ${implicitRec(filtered)}"""
-            }else {
-              q""" "type " + ${printSym(t)} + $suffix """
-            }
-          }
-        def stmtBlock = stmts.reduceLeft((l, r) => q""" $l + "; " + $r """)
-        if (stmts.length == 0) implicitRec(underlying)
-        else q"""${implicitRec(underlying)} + " forSome { " + $stmtBlock +  " }" """
+        showRefinement(quantified) match{
+          case None => implicitRec(underlying)
+          case Some(block) => q"""${implicitRec(underlying)} + " forSome { " + $block +  " }" """
+        }
       case AnnotatedType(annots, tp)    =>
         q"${implicitRec(tp)} + ${annots.map(x => q""" " @" + ${implicitRec(x.tpe)}""").reduceLeft((x, y) => q"$x + $y")}"
       case RefinedType(parents, defs) =>
@@ -153,8 +168,11 @@ object TPrintLowPri{
           if (defs.isEmpty) "" else "{" + defs.mkString(";") + "}"
         }"
     }
-
-    val res = c.Expr[TPrint[T]](q"new ammonite.pprint.TPrint(${rec0(tpe, end = true)})")
+    lazy val cfgSym = c.freshName[TermName]("cfg")
+    val res = c.Expr[TPrint[T]](q"""ammonite.pprint.TPrint.lambda{
+      ($cfgSym: ammonite.pprint.Config) =>
+        ${rec0(tpe, end = true)}
+    }""")
 //    println("RES " + res)
     res
   }

@@ -80,12 +80,12 @@ lazy val pprint = project
       val typeGen = for(i <- 2 to 22) yield {
         val ts = (1 to i).map("T" + _).mkString(", ")
         val tsBounded = (1 to i).map("T" + _ + ": Type").mkString(", ")
-        val tsGet = (1 to i).map("get[T" + _ + "]").mkString(" + \", \" + ")
+        val tsGet = (1 to i).map("get[T" + _ + "](cfg)").mkString(" + \", \" + ")
         s"""
-          implicit def F${i}TPrint[$tsBounded, R: Type] = make[($ts) => R](
-            "(" + $tsGet + ") => " + get[R]
+          implicit def F${i}TPrint[$tsBounded, R: Type] = make[($ts) => R](cfg =>
+            "(" + $tsGet + ") => " + get[R](cfg)
           )
-          implicit def T${i}TPrint[$tsBounded] = make[($ts)](
+          implicit def T${i}TPrint[$tsBounded] = make[($ts)](cfg =>
             "(" + $tsGet + ")"
           )
 
@@ -96,11 +96,11 @@ lazy val pprint = project
         trait PPrinterGen extends GenUtils{
           ${tuples.mkString("\n")}
         }
-        trait TPrintGen[Type[_]]{
-          def make[T](s: String): Type[T]
-          def get[T: Type]: String
-          implicit def F0TPrint[R: Type] = make[() => R]("() => " + get[R])
-          implicit def F1TPrint[T1: Type, R: Type] = make[T1 => R](get[T1] + " => " + get[R])
+        trait TPrintGen[Type[_], Cfg]{
+          def make[T](f: Cfg => String): Type[T]
+          def get[T: Type](cfg: Cfg): String
+          implicit def F0TPrint[R: Type] = make[() => R](cfg => "() => " + get[R](cfg))
+          implicit def F1TPrint[T1: Type, R: Type] = make[T1 => R](cfg => get[T1](cfg) + " => " + get[R](cfg))
           ${typeGen.mkString("\n")}
         }
       """.stripMargin

@@ -2,7 +2,7 @@ package ammonite.repl.frontend
 
 import java.io.File
 
-import ammonite.pprint.TPrint
+import ammonite.pprint.{Config, TPrint}
 
 import scala.reflect.runtime.universe._
 import acyclic.file
@@ -110,7 +110,7 @@ trait Load extends (String => Unit){
  * Things that are part of the ReplAPI that aren't really "public"
  */
 abstract class FullReplAPI extends ReplAPI{
-  def shellPPrint[T: TPrint](value: => T, ident: String): String
+  def shellPPrint[T: TPrint](value: => T, ident: String)(implicit cfg: Config): String
   def shellPrintDef(definitionLabel: String, ident: String): String
   def shellPrintImport(imported: String): String
   def typeOf[T: WeakTypeTag] = scala.reflect.runtime.universe.weakTypeOf[T]
@@ -139,9 +139,9 @@ object ColorSet{
 trait DefaultReplAPI extends FullReplAPI {
   def colors: ColorSet
   def help = "Hello!"
-  def shellPPrint[T: TPrint](value: => T, ident: String) = {
+  def shellPPrint[T: TPrint](value: => T, ident: String)(implicit cfg: Config) = {
     colors.ident + ident + colors.reset + ": " +
-    colors.`type` + implicitly[TPrint[T]].value + colors.reset
+    implicitly[TPrint[T]].render(cfg)
   }
   def shellPrintDef(definitionLabel: String, ident: String) = {
     s"defined ${colors.`type`}$definitionLabel ${colors.ident}$ident${colors.reset}"
