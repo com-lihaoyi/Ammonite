@@ -404,6 +404,11 @@
         @hl.ref(advancedTests, Seq("'customTypePrinter", "@"))
 
   @sect{Changelog}
+    @sect{0.3.2}
+      @ul
+        @li
+          Fix pretty-printing of higher-kinded types.
+
     @sect{0.3.1}
       @ul
         @li

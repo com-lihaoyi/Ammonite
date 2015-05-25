@@ -179,6 +179,10 @@ object TPrintTests extends TestSuite{
         check[(Custom with B)#C]("(+++Custom+++ with B)#C")
 
       }
+      'higherKinded{
+        class C[T[_]]
+        check[C[List]]("C[List]")
+      }
     }
     'colored{
       import ammonite.pprint.Config.Colors._

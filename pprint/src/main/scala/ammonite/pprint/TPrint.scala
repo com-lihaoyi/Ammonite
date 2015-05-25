@@ -3,6 +3,7 @@ package ammonite.pprint
 
 import language.experimental.macros
 import reflect.macros.blackbox.Context
+import scala.reflect.macros.TypecheckException
 
 /**
  * Summoning an implicit `TPrint[T]` provides a pretty-printed
@@ -66,16 +67,11 @@ object TPrintLowPri{
           .symbol
       }
 
-
-      val res = {
-        if (!s.isType) lookedUps.contains(s)
-        else {
-          // Try to resolve aliases for types
-          lookedUps.exists(x => x == s || x.tpe.typeSymbol == s.asInstanceOf[g.Symbol].tpe.typeSymbol)
-        }
+      if (!s.isType) lookedUps.contains(s)
+      else {
+        // Try to resolve aliases for types
+        lookedUps.exists(x => x == s || x.tpe.typeSymbol == s.asInstanceOf[g.Symbol].tpe.typeSymbol)
       }
-
-      res
     }
 
     def prefixFor(pre: Type, sym: Symbol): Tree = {
@@ -109,7 +105,16 @@ object TPrintLowPri{
     }
 
 
-    def implicitRec(tpe: Type) = q""" ammonite.pprint.TPrint.implicitly[$tpe].render($cfgSym) """
+    def implicitRec(tpe: Type) = {
+      try {
+        // Make sure the type isn't higher-kinded or some other weird
+        // thing, and actually can fit inside the square brackets
+        c.typecheck(q"null.asInstanceOf[$tpe]")
+        q""" ammonite.pprint.TPrint.implicitly[$tpe].render($cfgSym) """
+      }catch{case e: TypecheckException =>
+        rec0(tpe)
+      }
+    }
     def printBounds(lo: Type, hi: Type) = {
       val loTree = if (lo =:= typeOf[Nothing]) q"$s" else q""" " >: " + ${implicitRec(lo)} """
       val hiTree = if (hi =:= typeOf[Any]) q"$s" else q""" " <: " + ${implicitRec(hi)} """
@@ -149,7 +154,7 @@ object TPrintLowPri{
      * often, we'll use `implicitRec`, which goes through the normal
      * implicit search channel and can thus
      */
-    def rec0(tpe: Type, end: Boolean = false) = tpe match {
+    def rec0(tpe: Type, end: Boolean = false): Tree = tpe match {
       case TypeBounds(lo, hi) =>
         val res = printBounds(lo, hi)
         q""" "_" + $res """
