@@ -143,10 +143,6 @@ object Timer{
 object Parsers{
   val Id2 = P( Id ~ End )
   def backtickWrap(s: String) = {
-    import fastparse._
-    import scalaparse.Scala._
-
-
     Id2.parse(s) match{
       case _: Result.Success[_] => s
       case _ => "`" + ammonite.pprint.PPrinter.escape(s) + "`"

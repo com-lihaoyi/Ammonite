@@ -1,6 +1,6 @@
 @import Main._
 @import ammonite.ops._
-
+@val advancedTests = 'repl/'src/'test/'scala/'ammonite/'repl/"AdvancedTests.scala"
 @val fileOps = read! cwd/'ops/'src/'main/'scala/'ammonite/'ops/"FileOps.scala"
 @val found = (
   ".*/\\*\\*(\n\\s*\\*.*)+\n.*?extends.*?Op[^{]*".r
@@ -19,7 +19,7 @@
     alt:="Fork me on GitHub"
   )
 )
-@sect{Ammonite}
+@sect("Ammonite " + ammonite.Constants.version)
   @p
     @a("Ammonite", href:="https://github.com/lihaoyi/Ammonite") is a collection of Scala libraries intended to improve the experience of using Scala as an system shell. It includes two independent modules:
 
@@ -61,7 +61,7 @@
       @p
         To get started, add this to your @code{build.sbt}:
 
-      @hl.scala{"com.lihaoyi" %% "ammonite-ops" % "0.3.0"}
+      @hl.scala{"com.lihaoyi" %% "ammonite-ops" % "@ammonite.Constants.version"}
 
       @p
         And this at the top of the file you want to use Ammonite:
@@ -236,14 +236,14 @@
           As you can see, you can often compose elaborate operations entirely naturally using the available pipes, without needing to remember any special flags or techniques.
 
     @sect("Ammonite-REPL", "A Modernized Scala REPL")
-      @val advancedTests = 'repl/'src/'test/'scala/'ammonite/'repl/"AdvancedTests.scala"
+
       @p
         Ammonite-REPL is a cleanroom re-implementation of the Scala REPL from first principles. It is much more featureful than the default REPL and comes with a lot of ergonomic improvements that may be familiar to people coming from IDEs or other REPLs such as @a("IPython", href:="ipython.org") or @a("Zsh", href:="http://www.zsh.org/").
       @p
         To try out Ammonite-REPL in an existing project, add the following to your @code{build.sbt}
 
       @hl.scala
-        libraryDependencies += "com.lihaoyi" % "ammonite-repl" % "0.3.0" % "test" cross CrossVersion.full
+        libraryDependencies += "com.lihaoyi" % "ammonite-repl" % "@ammonite.Constants.version" % "test" cross CrossVersion.full
 
         initialCommands in (Test, console) := """ammonite.repl.Repl.run("")"""
 
@@ -387,7 +387,34 @@
       """.stripMargin)
       @p
         In order to pretty print a type @hl.scala{T}, you need to have a @hl.scala{T: PPrint} context bound present. In order to write your own custom pretty printer for some type @hl.scala{T}, provide a @hl.scala{PPrinter[T]}.
+      @sect{Type Printing}
+        @p
+          Ammonite also provides colored, customized and customizable printing for types, through a @hl.scala{TPrint[T]} typeclass. This has some advantages over the default printing: For example, two-argument operator-named types like Shapeless HLists are printed infix by default:
+
+        @hl.ref(advancedTests, Seq("'shapeless'", "@"))
+
+        @p
+          Types are only printed as qualified as necessary: if you import types into local scope, they are shown un-qualified the same way you'd access them in code:
+
+        @hl.ref(advancedTests, Seq("'typeScope", "@"))
+
+        @p
+          And you can customize the printing for any types you own or don't own by providing an implicit, which will display it however you want:
+
+        @hl.ref(advancedTests, Seq("'customTypePrinter", "@"))
+
   @sect{Changelog}
+    @sect{0.3.1}
+      @ul
+        @li
+          Many of the collection @hl.scala{PPrint}s are much lazier and will avoid stringifying the whole collection if its going to get truncated anyway.
+        @li
+          Types now get printed semi-qualified (depending on what's in scope), with simple highlighting.
+        @li
+          You can define custom @hl.scala{TPrint[T]}s to provide custom printing for any type.
+        @li
+          Operator-named two-param generic types are now printed infix by default.
+
     @sect{0.3.0}
       @ul
         @li

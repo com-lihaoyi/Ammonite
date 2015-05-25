@@ -15,7 +15,7 @@ publishTo := Some(Resolver.file("Unused transient repository", file("target/unus
 val sharedSettings = Seq(
   scalaVersion := "2.11.6",
   organization := "com.lihaoyi",
-  version := "0.3.0",
+  version := _root_.ammonite.Constants.version,
   libraryDependencies += "com.lihaoyi" %% "utest" % "0.3.0" % "test",
   testFrameworks += new TestFramework("utest.runner.Framework"),
   scalacOptions += "-target:jvm-1.7",
@@ -149,6 +149,10 @@ lazy val readme = ScalatexReadme(
   wd = file(""),
   url = "https://github.com/lihaoyi/ammonite/tree/master",
   source = "Index"
+).settings(
+  publishArtifact := false,
+  publishTo := Some(Resolver.file("Unused transient repository", file("target/unusedrepo"))),
+  (unmanagedSources in Compile) += baseDirectory.value/".."/"project"/"Constants.scala"
 )
 
 

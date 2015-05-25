@@ -142,6 +142,13 @@ object TPrintLowPri{
       if (stmts.length == 0) None
       else Some(stmts.reduceLeft((l, r) => q""" $l + "; " + $r """))
     }
+    /**
+     * Decide how to pretty-print, based on the type.
+     *
+     * This is recursive, but we only rarely use direct recursion: more
+     * often, we'll use `implicitRec`, which goes through the normal
+     * implicit search channel and can thus
+     */
     def rec0(tpe: Type, end: Boolean = false) = tpe match {
       case TypeBounds(lo, hi) =>
         val res = printBounds(lo, hi)

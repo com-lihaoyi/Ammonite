@@ -258,6 +258,40 @@ object AdvancedTests extends TestSuite{
         res4: String = "Hello!"
       """)
     }
+    'typeScope{
+      check.session("""
+        @ collection.mutable.Buffer(1)
+        res0: collection.mutable.Buffer[Int] = ArrayBuffer(1)
+
+        @ import collection.mutable
+
+        @ collection.mutable.Buffer(1)
+        res2: mutable.Buffer[Int] = ArrayBuffer(1)
+
+        @ mutable.Buffer(1)
+        res3: mutable.Buffer[Int] = ArrayBuffer(1)
+
+        @ import collection.mutable.Buffer
+
+        @ mutable.Buffer(1)
+        res5: Buffer[Int] = ArrayBuffer(1)
+      """)
+    }
+    'customTypePrinter{
+      check.session("""
+        @ Array(1)
+        res0: Array[Int] = Array(1)
+
+        @ import ammonite.pprint.TPrint
+
+        @ implicit def ArrayTPrint[T: TPrint]: TPrint[Array[T]] = TPrint.lambda(
+        @   c => implicitly[TPrint[T]].render(c) + c.color.literal(" Array")
+        @ )
+
+        @ Array(1)
+        res3: Int Array = Array(1)
+      """)
+    }
     'truncation{
       check.session("""
       @ Seq.fill(20)(100)
