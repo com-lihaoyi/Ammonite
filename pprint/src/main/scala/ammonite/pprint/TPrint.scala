@@ -39,8 +39,8 @@ object TPrintLowPri{
     val s = ""
     val tpe = weakTypeOf[T]
     def printSymString(s: Symbol) =
-      if (s.name.toString.startsWith("_$")) "_"
-      else s.name.toString.stripSuffix(".type")
+      if (s.name.decodedName.toString.startsWith("_$")) "_"
+      else s.name.decodedName.toString.stripSuffix(".type")
 
     def printSym(s: Symbol): Tree = {
       q"""$cfgSym.color.literal(${printSymString(s)})"""
@@ -151,6 +151,12 @@ object TPrintLowPri{
 
       case SingleType(NoPrefix, sym)    => q"${printSym(sym)} + ${if (end) ".type" else ""}"
       case SingleType(pre, sym)         => q"${prefixFor(pre, sym)} + ${if (end) ".type" else ""}"
+        // Special-case operator two-parameter types as infix
+      case TypeRef(pre, sym, List(left, right))
+        if lookup(sym) && sym.name.encodedName.toString != sym.name.decodedName.toString =>
+
+        q"""${implicitRec(left)} + " " + ${printSym(sym)} + " " +${implicitRec(right)}"""
+
       case TypeRef(NoPrefix, sym, args) => q"${printSym(sym)} + ${printArgs(args)}"
       case TypeRef(pre, sym, args)      => q"${prefixFor(pre, sym)} + ${printArgs(args)}"
       case et @ ExistentialType(quantified, underlying) =>

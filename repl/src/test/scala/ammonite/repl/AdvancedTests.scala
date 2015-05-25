@@ -179,8 +179,11 @@ object AdvancedTests extends TestSuite{
 
         @ import shapeless._
 
-        @ (1 :: "lol" :: List(1, 2, 3) :: HNil)(1)
-        res2: String = "lol"
+        @ (1 :: "lol" :: List(1, 2, 3) :: HNil)
+        res2: Int :: String :: List[Int] :: HNil = ::(1, ::("lol", ::(List(1, 2, 3), HNil)))
+
+        @ res2(1)
+        res3: String = "lol"
       """)
     }
 

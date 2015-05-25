@@ -70,6 +70,26 @@ object TPrintTests extends TestSuite{
         check[Int {val x: Int}]("Int{val x: Int}")
         check[Int with String]("Int with String")
       }
+
+      'infix {
+        object X {
+          class ++[Int, String]
+        }
+
+        check[X.++[Int, String]]("X.++[Int, String]")
+        check[Either[Int, String]]("Either[Int, String]")
+
+        import X.++
+        check[Int ++ String]("Int ++ String")
+        check[++[Int, String]]("Int ++ String")
+
+        import shapeless._
+
+        check[Int :: String :: (Char, Seq[Float]) :: HNil](
+             "Int :: String :: (Char, Seq[Float]) :: HNil"
+        )
+
+      }
       'existential{
         check[{type T = Int}]("{type T = Int}")
 
@@ -132,13 +152,20 @@ object TPrintTests extends TestSuite{
       }
 
       class Custom
-      object Custom{
-        implicit def customTPrint: TPrint[Custom] = TPrint.lambda(cfg => "+++Custom+++")
-      }
       'custom{
-
+        // Maybe we want to add some extra decoration
+        implicit def customTPrint: TPrint[Custom] = TPrint.lambda(cfg => "+++Custom+++")
         check[Custom]("+++Custom+++")
         check[List[Custom]]("List[+++Custom+++]")
+
+        // Or make it look like F#
+        implicit def StreamTPrint[T: TPrint]: TPrint[Stream[T]] = TPrint.lambda(
+          c => implicitly[TPrint[T]].render(c) + " Stream"
+        )
+        check[Stream[Int]]("Int Stream")
+
+        // Note how it works recursively
+        check[Stream[Custom]]("+++Custom+++ Stream")
       }
 
       'complex{
@@ -148,6 +175,7 @@ object TPrintTests extends TestSuite{
         }
         check[(A with B)#C]("(A with B)#C")
         check[({type T = Int})#T]("Int")
+        implicit def customTPrint: TPrint[Custom] = TPrint.lambda(cfg => "+++Custom+++")
         check[(Custom with B)#C]("(+++Custom+++ with B)#C")
 
       }
