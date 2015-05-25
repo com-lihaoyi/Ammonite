@@ -113,9 +113,9 @@ object PPrinter extends LowPriPPrinter{
     val body =
       if (!x.exists(escapeSet)) Iter("\"") ++ chunks.map(escape) ++ Iter("\"")
       else {
-        val indent =tr "  " * c.depth
-        val indented = chunks.map(_.replace("\n", indent.mkString + "\n"))
-        Iter("\"\"\"\n") ++ indented ++ Iter("\n", indent.mkString, "\"\"\"")
+        val indent = "  " * c.depth
+        val indented = chunks.map(_.replace("\n", indent + "\n"))
+        Iter("\"\"\"\n") ++ indented ++ Iter("\n", indent, "\"\"\"")
       }
 
     if (c.literalColor == null) body
