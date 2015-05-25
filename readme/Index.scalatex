@@ -353,6 +353,20 @@
 
         @hl.ref('repl/'src/'main/'scala/'ammonite/'repl/'frontend/"ReplAPI.scala", "trait ReplAPI", "// End of ReplAPI")
 
+      @sect{Multiline Input}
+        @p
+          To enter multiline input into the Ammonite-REPL, simply wrap the multiple lines in curly braces @hl.scala("{ ... }"), and Ammonite will wait until you close it before evaluating the contents:
+
+        @hl.ref(advancedTests, Seq("'unwrapping", "@"))
+
+        @p
+          As you can see, the contents of the @hl.scala("{ ... }") block are unwrapped and evaluated as top-level statements. You can use this to e.g. declare mutually recursive functions or classes & companion-objects without being forced to squeeze everything onto a single line.
+
+        @p
+          If you don't want this un-wrapping behavior, simply add another set of curlies and the block will be evaluated as a normal block, to a single expression:
+
+        @hl.ref(advancedTests, Seq("'forceWrapping", "@"))
+
     @sect{Ammonite-PPrint}
       @p
         Ammonite comes with a pretty-printing module, which lets you easily print data structures in a readable way. This is most often used in Ammonite-Repl, but can also be used standalone if desired:

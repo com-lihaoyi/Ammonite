@@ -53,8 +53,8 @@ object Preprocessor{
 
     val PatVarDef = Processor { case (name, code, t: G#ValDef) =>
       //Function to RHS expressions into anonymous functions so they will be JITed
-      def wrap(code: String)={
-        val (lhs, rhs) = Parsers.parVarSplit(code)
+      def wrap(code: String) = {
+        val (lhs, rhs) = Parsers.patVarSplit(code)
         //Rebuilding definition from parsed data to lift rhs to anon function
         s"$lhs = { () =>\n$rhs \n}.apply\n"
       }
@@ -92,7 +92,11 @@ object Preprocessor{
     )
 
     def apply(stmts: Seq[String], wrapperId: String): Res[Preprocessor.Output] = {
-      stmts match{
+      val unwrapped = stmts.flatMap{x => Parsers.unwrapBlock(x) match {
+        case Some(contents) => Parsers.split(contents)
+        case None => Seq(x)
+      }}
+      unwrapped match{
         case Nil => Res.Skip
         case postSplit => complete(stmts.mkString, wrapperId, postSplit.map(_.trim))
       }

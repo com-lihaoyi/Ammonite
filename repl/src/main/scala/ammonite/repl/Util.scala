@@ -144,15 +144,17 @@ object Parsers {
 
   import fastparse._
   import scalaparse.Scala._
+  private implicit def wspStr(s: String) = P(WL ~ s)(Utils.literalize(s).toString)
 
-  val PatVarSplitter = P((`implicit`.? ~ `lazy`.? ~ (`var` | `val`) ~! BindPattern.rep(1, "," ~! Pass) ~ (`:` ~! Type).?).! ~ (`=` ~! WL ~ StatCtx.Expr.!))
-
-  def parVarSplit(code: String) = {
-
+  val PatVarSplitter = {
+    val Prefixes = P(`implicit`.? ~ `lazy`.? ~ (`var` | `val`))
+    val Lhs = P( Prefixes ~! BindPattern.rep(1, "," ~! Pass) ~ (`:` ~! Type).? )
+    P( Lhs.! ~ (`=` ~! WL ~ StatCtx.Expr.!) ~ End )
+  }
+  def patVarSplit(code: String) = {
     val Result.Success((lhs, rhs), _) = PatVarSplitter.parse(code)
     (lhs, rhs)
   }
-
   val Id2 = P( Id ~ End )
   def backtickWrap(s: String) = {
     Id2.parse(s) match{
@@ -167,6 +169,14 @@ object Parsers {
     Splitter.parse(code) match{
       case Result.Success(value, idx) => value
       case f: Result.Failure => throw new SyntaxError(code, f.parser, f.index)
+    }
+  }
+
+  val BlockUnwrapper = P( "{" ~ Block.! ~ "}" ~ End)
+  def unwrapBlock(code: String) = {
+    BlockUnwrapper.parse(code) match{
+      case Result.Success(contents, _) => Some(contents)
+      case _ => None
     }
   }
 }
