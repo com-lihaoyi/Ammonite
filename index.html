@@ -1,4 +1,4 @@
-<html><head><link href="META-INF/resources/webjars/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" /><link href="styles.css" rel="stylesheet" /><style>
+<!DOCTYPE html><html><head><link href="META-INF/resources/webjars/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" /><link href="styles.css" rel="stylesheet" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><style>
 .scalatex-site-Styles-headerLink{
   color: #777;
   opacity: 0.05;
@@ -24,7 +24,7 @@
   margin: 0 auto;
   margin-left: auto;
   margin-right: auto;
-  max-width: 800;
+  max-width: 800px;
   padding: 0 1em;
   padding-bottom: 50px;
 }
@@ -59,7 +59,7 @@ span.hljs-tag, span.hljs-symbol{
 }
     </style><script src="scripts.js"></script></head><body><div>
 <a href="https://github.com/lihaoyi/ammonite" style="position: absolute;top: 0px;right: 0px;border: 0;"><img src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" /></a>
-<div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="Ammonite" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Ammonite<a class=" scalatex-site-Styles-headerLink" href="#Ammonite" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div><div class=" scalatex-site-Styles-content">
+<div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="Ammonite0.3.1" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Ammonite 0.3.1<a class=" scalatex-site-Styles-headerLink" href="#Ammonite0.3.1" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div><div class=" scalatex-site-Styles-content">
   <p>
     <a href="https://github.com/lihaoyi/Ammonite">Ammonite</a> is a collection of Scala libraries intended to improve the experience of using Scala as an system shell. It includes two independent modules:
 </p>
@@ -77,7 +77,7 @@ span.hljs-tag, span.hljs-symbol{
     Ammonite for now only works on Unix/OS-X/Linux (i.e. no <a href="https://github.com/lihaoyi/Ammonite/issues/18">Windows support</a>) and Java 7 and above.
 
 
-    <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="Ammonite-Ops" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;" id="Ammonite-Ops">Ammonite-Ops<a class=" scalatex-site-Styles-headerLink" href="#Ammonite-Ops" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /><h2 style="font-weight: 300;color: #ccc;padding: 0px;margin-top: 0px;">Rock-solid Filesystem Operations</h2></div>
+    <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="Ammonite-Ops" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Ammonite-Ops<a class=" scalatex-site-Styles-headerLink" href="#Ammonite-Ops" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /><h2 style="font-weight: 300;color: #ccc;padding: 0px;margin-top: 0px;">Rock-solid Filesystem Operations</h2></div>
       
       <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">import ammonite.ops._
 
@@ -144,7 +144,7 @@ removeAll(&quot;target/folder/thing&quot;)</code><a class=" scalatex-site-Styles
       <p>
         To get started, add this to your <code>build.sbt</code>:
 </p>
-      <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">&quot;com.lihaoyi&quot; %% &quot;ammonite-ops&quot; % &quot;0.3.0&quot;</code>
+      <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">&quot;com.lihaoyi&quot; %% &quot;ammonite-ops&quot; % &quot;0.3.1&quot;</code>
 
       <p>
         And this at the top of the file you want to use Ammonite:
@@ -489,14 +489,14 @@ val map = txt || (_.split(&quot;[^a-zA-Z0-9_]&quot;)) |&gt; freq sortBy (-_._2)<
         <p>
           As you can see, you can often compose elaborate operations entirely naturally using the available pipes, without needing to remember any special flags or techniques.
 </p>
-    <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="Ammonite-REPL" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;" id="Ammonite-REPL">Ammonite-REPL<a class=" scalatex-site-Styles-headerLink" href="#Ammonite-REPL" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /><h2 style="font-weight: 300;color: #ccc;padding: 0px;margin-top: 0px;">A Modernized Scala REPL</h2></div>
-      
+    <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="Ammonite-REPL" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Ammonite-REPL<a class=" scalatex-site-Styles-headerLink" href="#Ammonite-REPL" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /><h2 style="font-weight: 300;color: #ccc;padding: 0px;margin-top: 0px;">A Modernized Scala REPL</h2></div>
+
       <p>
         Ammonite-REPL is a cleanroom re-implementation of the Scala REPL from first principles. It is much more featureful than the default REPL and comes with a lot of ergonomic improvements that may be familiar to people coming from IDEs or other REPLs such as <a href="ipython.org">IPython</a> or <a href="http://www.zsh.org/">Zsh</a>.</p>
       <p>
         To try out Ammonite-REPL in an existing project, add the following to your <code>build.sbt</code>
 </p>
-      <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite-repl&quot; % &quot;0.3.0&quot; % &quot;test&quot; cross CrossVersion.full
+      <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite-repl&quot; % &quot;0.3.1&quot; % &quot;test&quot; cross CrossVersion.full
 
 initialCommands in (Test, console) := &quot;&quot;&quot;ammonite.repl.Repl.run(&quot;&quot;)&quot;&quot;&quot;
 </code></pre>
@@ -526,7 +526,7 @@ import scalatags.Text.all._
 @ a(&quot;omg&quot;, href:=&quot;www.google.com&quot;).render
 res2: String = $tq
 &lt;a href=&quot;www.google.com&quot;&gt;omg&lt;/a&gt;
-$tq</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/test/scala/ammonite/repl/AdvancedTests.scala#L14-L26" target="_blank"><i class="fa fa-link "></i></a></pre>
+$tq</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/test/scala/ammonite/repl/AdvancedTests.scala#L15-L27" target="_blank"><i class="fa fa-link "></i></a></pre>
 
           <p>
             Ammonite allows you to load artifacts directly from maven central by copy &amp; pasting their SBT ivy-coordinate-snippet. In addition, you can also load in jars as <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">java.io.File</code>s to be included in the session or simple <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">String</code>s to be executed using the <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">load</code> command.
@@ -543,19 +543,22 @@ import scalaz._
 import Scalaz._
 
 @ (Option(1) |@| Option(2))(_ + _)
-res3: scala.Option[Int] = Some(3)</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/test/scala/ammonite/repl/AdvancedTests.scala#L196-L206" target="_blank"><i class="fa fa-link "></i></a></pre>
+res3: Option[Int] = Some(3)</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/test/scala/ammonite/repl/AdvancedTests.scala#L191-L201" target="_blank"><i class="fa fa-link "></i></a></pre>
 
           <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">@ load.ivy(&quot;com.chuusai&quot; %% &quot;shapeless&quot; % &quot;2.1.0&quot;)
 
 @ import shapeless._
 
-@ (1 :: &quot;lol&quot; :: List(1, 2, 3) :: HNil)(1)
-res2: java.lang.String = &quot;lol&quot;</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/test/scala/ammonite/repl/AdvancedTests.scala#L185-L191" target="_blank"><i class="fa fa-link "></i></a></pre>
+@ (1 :: &quot;lol&quot; :: List(1, 2, 3) :: HNil)
+res2: Int :: String :: List[Int] :: HNil = ::(1, ::(&quot;lol&quot;, ::(List(1, 2, 3), HNil)))
+
+@ res2(1)
+res3: String = &quot;lol&quot;</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/test/scala/ammonite/repl/AdvancedTests.scala#L177-L186" target="_blank"><i class="fa fa-link "></i></a></pre>
 
         <h2 id="Pretty-printedoutput" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#Pretty-printedoutput" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Pretty-printed output</h2>
 
           <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">@ Seq.fill(10)(Seq.fill(3)(&quot;Foo&quot;))
-res0: Seq[Seq[java.lang.String]] = List(
+res0: Seq[Seq[String]] = List(
   List(&quot;Foo&quot;, &quot;Foo&quot;, &quot;Foo&quot;),
   List(&quot;Foo&quot;, &quot;Foo&quot;, &quot;Foo&quot;),
   List(&quot;Foo&quot;, &quot;Foo&quot;, &quot;Foo&quot;),
@@ -572,14 +575,14 @@ res0: Seq[Seq[java.lang.String]] = List(
 defined class Foo
 
 @ Foo(1, &quot;&quot;, Nil)
-res2: cmd1.Foo = Foo(1, &quot;&quot;, List())
+res2: Foo = Foo(1, &quot;&quot;, List())
 
 @ Foo(1234567, &quot;I am a cow, hear me moo&quot;, Seq(&quot;I weigh twice as much as you&quot;, &quot;and I look good on the barbecue&quot;))
-res3: cmd1.Foo = Foo(
+res3: Foo = Foo(
   1234567,
   &quot;I am a cow, hear me moo&quot;,
   List(&quot;I weigh twice as much as you&quot;, &quot;and I look good on the barbecue&quot;)
-)</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/test/scala/ammonite/repl/AdvancedTests.scala#L115-L141" target="_blank"><i class="fa fa-link "></i></a></pre>
+)</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/test/scala/ammonite/repl/AdvancedTests.scala#L116-L142" target="_blank"><i class="fa fa-link "></i></a></pre>
 
           <p>
             Ammonite-REPL uses <a href="#Ammonite-PPrint">Ammonite-PPrint</a> to display its output by default. That means that everything is nicely formatted to fit within the width of the terminal, and is copy-paste-able!</p>
@@ -640,7 +643,7 @@ res4: Seq[Int] = List(
   100,
   100,
   100,
-...</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/test/scala/ammonite/repl/AdvancedTests.scala#L252-L309" target="_blank"><i class="fa fa-link "></i></a></pre>
+...</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/test/scala/ammonite/repl/AdvancedTests.scala#L296-L353" target="_blank"><i class="fa fa-link "></i></a></pre>
 
           <p>
             Ammonite-REPL intelligently truncates your output when it's beyond a certain size. You can request for the full output to be printed on-demand, print a certain number of lines, or even change the implicit <code>pprintConfig</code> so subsequent lines all use your new configuration.
@@ -699,7 +702,7 @@ x: Int = 1
 error: java.lang.AssertionError: assertion failed
 
 @ 1 + x
-res1: Int = 2</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/test/scala/ammonite/repl/FailureTests.scala#L25-L33" target="_blank"><i class="fa fa-link "></i></a></pre>
+res1: Int = 2</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/test/scala/ammonite/repl/FailureTests.scala#L23-L31" target="_blank"><i class="fa fa-link "></i></a></pre>
 
           <p>
             The default Scala REPL throws away all your work if the compiler crashes. This doesn't make any sense, because all the compiler is is a dumb <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">String =&gt; Array[Byte]</code> pipe. In the Ammonite, we simply swap out the broken compiler for a new one and let you continue your work.</p>
@@ -785,6 +788,9 @@ res1: Int = 2</code><a class=" scalatex-site-Styles-headerLink" style="position:
    */
   def newCompiler(): Unit
 
+  def search(target: scala.reflect.runtime.universe.Type): Option[String]
+
+  def compiler: scala.tools.nsc.Global
   /**
    * Prettyprint the given `value` with no truncation. Optionally takes
    * a number of lines to print.
@@ -815,9 +821,9 @@ trait Load extends (String =&gt; Unit){
    * evaluates them one after another
    */
   def apply(line: String): Unit
-}</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/main/scala/ammonite/repl/frontend/ReplAPI.scala#L20-L102" target="_blank"><i class="fa fa-link "></i></a></pre>
+}</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/main/scala/ammonite/repl/frontend/ReplAPI.scala#L22-L107" target="_blank"><i class="fa fa-link "></i></a></pre>
 
-    <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="Ammonite-PPrint" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;" id="Ammonite-PPrint">Ammonite-PPrint<a class=" scalatex-site-Styles-headerLink" href="#Ammonite-PPrint" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
+    <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="Ammonite-PPrint" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Ammonite-PPrint<a class=" scalatex-site-Styles-headerLink" href="#Ammonite-PPrint" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
       <p>
         Ammonite comes with a pretty-printing module, which lets you easily print data structures in a readable way. This is most often used in Ammonite-Repl, but can also be used standalone if desired:
 </p>
@@ -847,8 +853,70 @@ List(
   res35: String = java.lang.Object@54f880c0
 </code></pre>
       <p>
-        In order to pretty print a type <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">T</code>, you need to have a <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">T: PPrint</code> context bound present. In order to write your own custom pretty printer for some type <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">T</code>, provide a <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">PPrinter[T]</code>.</p></p>
-  <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="Changelog" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;" id="Changelog">Changelog<a class=" scalatex-site-Styles-headerLink" href="#Changelog" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
+        In order to pretty print a type <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">T</code>, you need to have a <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">T: PPrint</code> context bound present. In order to write your own custom pretty printer for some type <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">T</code>, provide a <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">PPrinter[T]</code>.</p>
+      <h1 id="TypePrinting" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#TypePrinting" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Type Printing</h1>
+        <p>
+          Ammonite also provides colored, customized and customizable printing for types, through a <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">TPrint[T]</code> typeclass. This has some advantages over the default printing: For example, two-argument operator-named types like Shapeless HLists are printed infix by default:
+</p>
+        <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">@ import scalatags.Text.all._
+error: not found: value scalatags
+
+@ load.ivy(&quot;com.lihaoyi&quot; %% &quot;scalatags&quot; % &quot;0.4.5&quot;)
+
+@ import scalatags.Text.all._
+import scalatags.Text.all._
+
+@ a(&quot;omg&quot;, href:=&quot;www.google.com&quot;).render
+res2: String = $tq
+&lt;a href=&quot;www.google.com&quot;&gt;omg&lt;/a&gt;
+$tq</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/test/scala/ammonite/repl/AdvancedTests.scala#L15-L27" target="_blank"><i class="fa fa-link "></i></a></pre>
+
+        <p>
+          Types are only printed as qualified as necessary: if you import types into local scope, they are shown un-qualified the same way you'd access them in code:
+</p>
+        <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">@ collection.mutable.Buffer(1)
+res0: collection.mutable.Buffer[Int] = ArrayBuffer(1)
+
+@ import collection.mutable
+
+@ collection.mutable.Buffer(1)
+res2: mutable.Buffer[Int] = ArrayBuffer(1)
+
+@ mutable.Buffer(1)
+res3: mutable.Buffer[Int] = ArrayBuffer(1)
+
+@ import collection.mutable.Buffer
+
+@ mutable.Buffer(1)
+res5: Buffer[Int] = ArrayBuffer(1)</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/test/scala/ammonite/repl/AdvancedTests.scala#L262-L277" target="_blank"><i class="fa fa-link "></i></a></pre>
+
+        <p>
+          And you can customize the printing for any types you own or don't own by providing an implicit, which will display it however you want:
+</p>
+        <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">@ Array(1)
+res0: Array[Int] = Array(1)
+
+@ import ammonite.pprint.TPrint
+
+@ implicit def ArrayTPrint[T: TPrint]: TPrint[Array[T]] = TPrint.lambda(
+@   c =&gt; implicitly[TPrint[T]].render(c) + c.color.literal(&quot; Array&quot;)
+@ )
+
+@ Array(1)
+res3: Int Array = Array(1)</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/test/scala/ammonite/repl/AdvancedTests.scala#L281-L292" target="_blank"><i class="fa fa-link "></i></a></pre>
+</p>
+  <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="Changelog" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Changelog<a class=" scalatex-site-Styles-headerLink" href="#Changelog" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
+    <h1 id="0.3.1" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#0.3.1" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>0.3.1</h1>
+      <ul>
+        <li>
+          Many of the collection <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">PPrint</code>s are much lazier and will avoid stringifying the whole collection if its going to get truncated anyway.</li>
+        <li>
+          Types now get printed semi-qualified (depending on what's in scope), with simple highlighting.</li>
+        <li>
+          You can define custom <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">TPrint[T]</code>s to provide custom printing for any type.</li>
+        <li>
+          Operator-named two-param generic types are now printed infix by default.
+</li></ul>
     <h1 id="0.3.0" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#0.3.0" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>0.3.0</h1>
       <ul>
         <li>
@@ -880,7 +948,7 @@ List(
         <li>
           Importing things from Java packages now works properly</li></ul></div></div><script>
     scalatex.scrollspy.Controller().main(
-      [{"value":"Ammonite","children":[{"value":"Ammonite-Ops","children":[{"value":"Paths","children":[]},{"value":"RelPaths","children":[]},{"value":"Path Operations","children":[]},{"value":"Extensions","children":[{"value":"Traversable","children":[]},{"value":"Pipeable","children":[]}]},{"value":"Operations","children":[]},{"value":"Chaining","children":[]}]},{"value":"Ammonite-REPL","children":[{"value":"Features","children":[{"value":"Artifact Loading","children":[]},{"value":"Pretty-printed output","children":[]},{"value":"Configurable Truncation","children":[]},{"value":"Superior Autocomplete","children":[]},{"value":"Interrupting run-away execution with Ctrl-C","children":[]},{"value":"Compiler-crash Robustness","children":[]},{"value":"Other Fixes","children":[]}]},{"value":"Builtins","children":[]}]},{"value":"Ammonite-PPrint","children":[]},{"value":"Changelog","children":[{"value":"0.3.0","children":[]},{"value":"0.2.9","children":[]},{"value":"0.2.8","children":[]}]}]}]
+      [{"value":"Ammonite 0.3.1","children":[{"value":"Ammonite-Ops","children":[{"value":"Paths","children":[]},{"value":"RelPaths","children":[]},{"value":"Path Operations","children":[]},{"value":"Extensions","children":[{"value":"Traversable","children":[]},{"value":"Pipeable","children":[]}]},{"value":"Operations","children":[]},{"value":"Chaining","children":[]}]},{"value":"Ammonite-REPL","children":[{"value":"Features","children":[{"value":"Artifact Loading","children":[]},{"value":"Pretty-printed output","children":[]},{"value":"Configurable Truncation","children":[]},{"value":"Superior Autocomplete","children":[]},{"value":"Interrupting run-away execution with Ctrl-C","children":[]},{"value":"Compiler-crash Robustness","children":[]},{"value":"Other Fixes","children":[]}]},{"value":"Builtins","children":[]}]},{"value":"Ammonite-PPrint","children":[{"value":"Type Printing","children":[]}]},{"value":"Changelog","children":[{"value":"0.3.1","children":[]},{"value":"0.3.0","children":[]},{"value":"0.2.9","children":[]},{"value":"0.2.8","children":[]}]}]}]
   )</script><script>
     ['DOMContentLoaded', 'load'].forEach(function(ev){
       addEventListener(ev, function(){
@@ -890,4 +958,4 @@ List(
         );
       })
     })
-  </script></body></html>
+  </script></body></html>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
