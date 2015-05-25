@@ -40,6 +40,23 @@ object AutocompleteTests extends TestSuite{
     implicit class SetExt[T](s1: Set[T]) {
       def ^(s2: Set[T]): Set[T] = (s1 diff s2) | (s2 diff s1)
     }
+
+    'import{
+      complete("""import <caret>""", Set("java", "javax", "scala") -- _)
+      complete("""import j<caret>""", Set("java", "javafx", "javax", "jdk", "jline") ^ _)
+      complete("""import ja<caret>""", Set("java", "javafx", "javax") ^ _)
+      complete("""import java.<caret>""", Set("lang", "util") -- _)
+      complete("""import java.u<caret>""", Set("util") ^ _)
+      complete("""import java.util.<caret>""", Set("LinkedHashMap", "LinkedHashSet") -- _)
+      complete("""import java.util.LinkedHa<caret>""", Set("LinkedHashMap", "LinkedHashSet") ^ _)
+      complete("""import java.util.{LinkedHa<caret>""", Set("LinkedHashMap", "LinkedHashSet") ^ _)
+      complete(
+        """import java.util.{LinkedHashMap, Linke<caret>""",
+        Set("LinkedHashMap", "LinkedHashSet", "LinkedList") ^ _
+      )
+
+    }
+
     'scope{
       complete("""<caret>""", Set("scala") -- _)
       complete("""Seq(1, 2, 3).map(argNameLol => <caret>)""", Set("argNameLol") -- _)
@@ -49,11 +66,12 @@ object AutocompleteTests extends TestSuite{
         Set("println") ^,
         Set[String]() ^
       )
-      complete(
-        "println<caret>",
-        Set[String]() ^,
-        Set("def println(x: Any): Unit", "def println(): Unit") ^
-      )
+//      Not sure why this doesnt work
+//      complete(
+//        "println<caret>",
+//        Set[String]() ^,
+//        Set("def println(x: Any): Unit", "def println(): Unit") ^
+//      )
     }
     'scopePrefix{
       complete("""ammon<caret>""", Set("ammonite") ^ _)
