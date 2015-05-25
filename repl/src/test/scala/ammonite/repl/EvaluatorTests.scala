@@ -85,7 +85,6 @@ object EvaluatorTests extends TestSuite{
         res1: Int = 10
 
         @ x = 1
-        res2: Unit = ()
 
         @ x
         res3: Int = 1
@@ -315,7 +314,6 @@ object EvaluatorTests extends TestSuite{
 
         @ var x = 1; x = 2; x
         x: Int = 2
-        res2_1: Unit = ()
         res2_2: Int = 2
 
         @ var y = 1; case class C(i: Int = 0){ def foo = x + y }; new C().foo

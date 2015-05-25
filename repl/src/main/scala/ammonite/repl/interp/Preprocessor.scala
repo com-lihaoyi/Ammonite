@@ -23,15 +23,15 @@ object Preprocessor{
       (code: String, name: String, tree: G#Tree) => cond.lift(name, code, tree)
     }
 
-    def pprintSignature(ident: String) = s"""Iterator(ReplBridge.shell.shellPPrint($ident, "$ident"))"""
-
-    def definedStr(definitionLabel: String, name: String) =
-      s"""Iterator(ReplBridge.shell.shellPrintDef("$definitionLabel", "$name"))"""
-
-    def pprint(ident: String) = {
-      pprintSignature(ident) +
-        s""" ++ Iterator(" = ") ++ ammonite.pprint.PPrint($ident)"""
+    def pprintSignature(ident: String, customMsg: Option[String]) = {
+      val customCode = customMsg.fold("None")(x => s"""Some("$x")""")
+      s"""ReplBridge.shell.Internal.print($ident, "$ident", $customCode)"""
     }
+    def definedStr(definitionLabel: String, name: String) =
+      s"""ReplBridge.shell.Internal.printDef("$definitionLabel", "$name")"""
+
+    def pprint(ident: String) = pprintSignature(ident, None)
+
 
     /**
      * Processors for declarations which all have the same shape
@@ -52,14 +52,11 @@ object Preprocessor{
     val TypeDef = DefProc("type"){ case m: G#TypeDef => m.name }
 
     val PatVarDef = Processor { case (name, code, t: G#ValDef) =>
-      //Function to lift lhs expressions into anonymous functions so they will be JITed
+      //Function to RHS expressions into anonymous functions so they will be JITed
       def wrap(code: String)={
-        import fastparse._
-        import scalaparse.Scala._
-        val par = P( ( `implicit`.? ~ `lazy`.? ~ ( `var` | `val` ) ~! BindPattern.rep(1, "," ~! Pass) ~ (`:` ~! Type).?).! ~ (`=` ~! StatCtx.Expr.!) )
-        val Result.Success((lhs, rhs), _) = par.parse(code)
+        val (lhs, rhs) = Parsers.parVarSplit(code)
         //Rebuilding definition from parsed data to lift rhs to anon function
-        s"$lhs = { () =>\n $rhs \n}.apply"
+        s"$lhs = { () =>\n$rhs \n}.apply\n"
       }
 
       Output(
@@ -75,19 +72,19 @@ object Preprocessor{
         // it through a full compilation
         if (t.name.decoded.contains("$")) Nil
         else if (!t.mods.hasFlag(Flags.LAZY)) Seq(pprint(Parsers.backtickWrap(t.name.decoded)))
-        else Seq(s"""${pprintSignature(Parsers.backtickWrap(t.name.decoded))} ++ Iterator(" = <lazy>")""")
+        else Seq(s"""${pprintSignature(Parsers.backtickWrap(t.name.decoded), Some("<lazy>"))}""")
       )
     }
 
     val Import = Processor{
       case (name, code, tree: G#Import) =>
         val Array(keyword, body) = code.split(" ", 2)
-        Output(code, Seq(s"""Iterator(ReplBridge.shell.shellPrintImport("$body"))"""))
+        Output(code, Seq(s"""ReplBridge.shell.Internal.printImport("$body")"""))
     }
 
     val Expr = Processor{
       //Expressions are lifted to anon function applications so they will be JITed
-      case (name, code, tree) => Output(s"val $name = { () =>\n$code\n}.apply", Seq(pprint(name)))
+      case (name, code, tree) => Output(s"val $name = { () =>\n$code\n}.apply\n", Seq(pprint(name)))
     }
 
     val decls = Seq[(String, String, G#Tree) => Option[Preprocessor.Output]](

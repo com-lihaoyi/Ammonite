@@ -28,12 +28,13 @@ class Repl(input: InputStream,
     initialHistory
   )
 
+  val printer = new PrintStream(output, true)
   val interp: Interpreter = new Interpreter(
     frontEnd.update,
     shellPrompt,
     pprintConfig.copy(maxWidth = frontEnd.width, lines = 15),
     colorSet,
-    stdout = new PrintStream(output).print,
+    stdout = printer.print,
     initialHistory = initialHistory,
     predef = predef
   )
@@ -42,9 +43,9 @@ class Repl(input: InputStream,
     // Condition to short circuit early if `interp` hasn't finished evaluating
     stmts <- frontEnd.action()
     _ <- Signaller("INT") { interp.mainThread.stop() }
-    out <- interp.processLine(stmts, (f, x) => {saveHistory(x); f(x)}, _.foreach(print))
+    out <- interp.processLine(stmts, (f, x) => {saveHistory(x); f(x)}, _.foreach(printer.print))
   } yield {
-    println()
+    printer.println()
     out
   }
 

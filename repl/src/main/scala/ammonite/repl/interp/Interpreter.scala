@@ -35,13 +35,13 @@ class Interpreter(handleResult: => Res[Evaluated] => Unit,
       Res.Failure(trace + "\nSomething unexpected went wrong =(")
     }
     Preprocessor.Output(code, printSnippet) <- preprocess(stmts, eval.getCurrentLine)
-    _ = saveHistory(history.append(_), stmts.mkString)
+    _ = saveHistory(history.append(_), stmts.mkString("; "))
     oldClassloader = Thread.currentThread().getContextClassLoader
     out <- try{
       Thread.currentThread().setContextClassLoader(eval.evalClassloader)
       eval.processLine(
         code,
-        printSnippet.reduceOption(_ + "++ Iterator(\"\\n\") ++" + _).getOrElse("Iterator()"),
+        s"ReplBridge.shell.Internal.combinePrints(${printSnippet.mkString(", ")})",
         printer
       )
     } finally Thread.currentThread().setContextClassLoader(oldClassloader)

@@ -2,7 +2,7 @@ package ammonite.repl.frontend
 
 import java.io.File
 
-import ammonite.pprint.{Config, TPrint}
+import ammonite.pprint.{PPrinter, PPrint, Config, TPrint}
 
 import scala.reflect.runtime.universe._
 import acyclic.file
@@ -110,9 +110,13 @@ trait Load extends (String => Unit){
  * Things that are part of the ReplAPI that aren't really "public"
  */
 abstract class FullReplAPI extends ReplAPI{
-  def shellPPrint[T: TPrint](value: => T, ident: String)(implicit cfg: Config): String
-  def shellPrintDef(definitionLabel: String, ident: String): String
-  def shellPrintImport(imported: String): String
+  val Internal: Internal
+  trait Internal{
+    def combinePrints(iters: Iterator[String]*): Iterator[String]
+    def print[T: TPrint: PPrint: WeakTypeTag](value: => T, ident: String, custom: Option[String])(implicit cfg: Config): Iterator[String]
+    def printDef(definitionLabel: String, ident: String): Iterator[String]
+    def printImport(imported: String): Iterator[String]
+  }
   def typeOf[T: WeakTypeTag] = scala.reflect.runtime.universe.weakTypeOf[T]
   def typeOf[T: WeakTypeTag](t: => T) = scala.reflect.runtime.universe.weakTypeOf[T]
 }
@@ -139,14 +143,32 @@ object ColorSet{
 trait DefaultReplAPI extends FullReplAPI {
   def colors: ColorSet
   def help = "Hello!"
-  def shellPPrint[T: TPrint](value: => T, ident: String)(implicit cfg: Config) = {
-    colors.ident + ident + colors.reset + ": " +
-    implicitly[TPrint[T]].render(cfg)
-  }
-  def shellPrintDef(definitionLabel: String, ident: String) = {
-    s"defined ${colors.`type`}$definitionLabel ${colors.ident}$ident${colors.reset}"
-  }
-  def shellPrintImport(imported: String) = {
-    s"${colors.`type`}import ${colors.ident}$imported${colors.reset}"
+  object Internal extends Internal{
+    def combinePrints(iters: Iterator[String]*) = {
+      iters.toIterator
+           .filter(!_.isEmpty)
+           .flatMap(Iterator("\n") ++ _)
+           .drop(1)
+    }
+    def print[T: TPrint: PPrint: WeakTypeTag](value: => T, ident: String, custom: Option[String])(implicit cfg: Config) = {
+      if (typeOf[T] =:= typeOf[Unit]) Iterator()
+      else {
+        val pprint = implicitly[PPrint[T]]
+        val rhs = custom match {
+          case None => pprint.render(value)
+          case Some(s) => Iterator(pprint.cfg.color.literal(s))
+        }
+        Iterator(
+          colors.ident, ident, colors.reset, ": ",
+          implicitly[TPrint[T]].render(cfg), " = "
+        ) ++ rhs
+      }
+    }
+    def printDef(definitionLabel: String, ident: String) = {
+      Iterator("defined ", colors.`type`, definitionLabel, " ", colors.ident, ident, colors.reset)
+    }
+    def printImport(imported: String) = {
+      Iterator(colors.`type`, "import ", colors.ident, imported, colors.reset)
+    }
   }
 }
