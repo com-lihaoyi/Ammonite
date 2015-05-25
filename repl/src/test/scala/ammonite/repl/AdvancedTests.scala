@@ -311,7 +311,7 @@ object AdvancedTests extends TestSuite{
         @   val y = 2
         @   x + y
         @ }}
-        res1: Int = 3 
+        res0: Int = 3
       """)
     }
     'truncation{
