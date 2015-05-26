@@ -7,6 +7,9 @@ import acyclic.file
 import ammonite.repl.frontend.{ReplExit, ReplAPI}
 import ammonite.repl._
 import java.net.URLClassLoader
+
+import ammonite.repl.interp.Evaluator.SpecialClassloader
+
 import scala.reflect.runtime.universe._
 import scala.collection.mutable
 import scala.util.Try
@@ -41,7 +44,7 @@ trait Evaluator{
   def previousImportBlock: String
   def addJar(url: URL): Unit
   def newClassloader(): Unit
-  def evalClassloader: ClassLoader
+  def evalClassloader: SpecialClassloader
 }
 
 object Evaluator{
@@ -50,11 +53,7 @@ object Evaluator{
             startingLine: Int): Evaluator = new Evaluator{
 
 
-    /**
-     * Files which have been compiled, stored so that our special
-     * classloader can get at them.
-     */
-    val newFileDict = mutable.Map.empty[String, Array[Byte]]
+
 
     /**
      * Imports which are required by earlier commands to the REPL. Imports
@@ -107,30 +106,14 @@ object Evaluator{
      * re-defining the core (pre-REPL) classes. I'm still not sure
      * where those come from.
      */
-    var evalClassloader =
-      new URLClassLoader(Array(), currentClassloader) {
-        // Public access to addURL - a visibility-changing override fails here
-        def add(url: URL) = addURL(url)
-      }
+    var evalClassloader: SpecialClassloader = null
 
 
     def newClassloader() = {
-      evalClassloader = new URLClassLoader(Array(), evalClassloader){
-        def add(url: URL) = addURL(url)
-        override def loadClass(name: String): Class[_] = {
-          if(newFileDict.contains(name)) {
-            val bytes = newFileDict(name)
-            defineClass(name, bytes, 0, bytes.length)
-          }
-          else try currentClassloader.loadClass(name)
-          catch{ case e: ClassNotFoundException =>
-            try this.findClass(name)
-            catch{ case e: ClassNotFoundException =>
-              super.loadClass(name)
-            }
-          }
-        }
-      }
+      evalClassloader = new SpecialClassloader(
+        Option(evalClassloader).getOrElse(currentClassloader),
+        currentClassloader
+      )
     }
     newClassloader()
 
@@ -149,7 +132,7 @@ object Evaluator{
       )
 
       cls <- Res[Class[_]](Try {
-        for ((name, bytes) <- classFiles) newFileDict(name) = bytes
+        for ((name, bytes) <- classFiles) evalClassloader.newFileDict(name) = bytes
         Class.forName(wrapperName , true, evalClassloader)
       }, e => "Failed to load compiled class " + e)
     } yield (cls, importData)
@@ -237,4 +220,34 @@ object Evaluator{
    */
   def evaluatorRunPrinter(f: => Unit) = f
 
+  /**
+   * Classloader used to implement the jar-downloading
+   * command-evaluating logic in Ammonite.
+   */
+  class SpecialClassloader(parent: ClassLoader, base: ClassLoader) extends URLClassLoader(Array(), parent){
+    /**
+     * Files which have been compiled, stored so that our special
+     * classloader can get at them.
+     */
+    val newFileDict = mutable.Map.empty[String, Array[Byte]]
+    override def loadClass(name: String): Class[_] = {
+
+      val baseLoad = try Some(base.loadClass(name)) catch {case _: ClassNotFoundException=> None}
+      def alreadyLoaded = Option(this.findLoadedClass(name))
+      def loadedFromBytes =
+        for(bytes <- newFileDict.get(name))
+        yield defineClass(name, bytes, 0, bytes.length)
+
+      def jars = try Some(super.findClass(name)) catch{case _:ClassNotFoundException => None}
+      def fallback = super.loadClass(name)
+
+
+      baseLoad orElse
+      alreadyLoaded orElse
+      loadedFromBytes orElse
+      jars getOrElse
+      fallback
+    }
+    def add(url: URL) = addURL(url)
+  }
 }
