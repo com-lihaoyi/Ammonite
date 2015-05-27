@@ -125,8 +125,16 @@ lazy val tools = project
     name := "ammonite-tools"
   )
 
+
+lazy val terminal = project
+  .settings(sharedSettings:_*)
+  .settings(
+    name := "ammonite-terminal"
+  )
+
+
 lazy val repl = project
-  .dependsOn(pprint)
+  .dependsOn(pprint, terminal)
   .settings(sharedSettings:_*)
   .settings(
     crossVersion := CrossVersion.full,
