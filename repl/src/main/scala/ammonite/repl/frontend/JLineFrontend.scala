@@ -40,62 +40,15 @@ object JLineFrontend{
         }
     }
     def width = 80
-    def highlight(buffer: Vector[Char], cursor: Int) = {
-      val indices = {
-        var indices = collection.SortedSet.empty[(Int, Vector[Char])](Ordering.by(_._1))
-        ammonite.repl.Parsers.Splitter.parse(buffer.mkString, instrumenter = (name, idx, res) => {
-          val resIndex = res() match {
-            case s: Result.Success[_] => s.index
-            case f: Result.Failure if f.index == buffer.length => f.index
-            case _ => -1
-          }
-          if (resIndex != -1) {
-            def doThing(color: String, endColor: String = Console.RESET) = {
-              if (resIndex > idx) {
-                ammonite.terminal.Debug(name, idx)
-                indices = indices.filter(_._1 < resIndex) ++ Seq((idx, color.toVector), (resIndex, endColor.toVector))
-              }
-            }
-            if (name == scalaparse.Scala.Literals.Comment) doThing(Console.BLUE)
-            if (name == scalaparse.Scala.ExprLiteral) doThing(Console.GREEN)
-            if (name == scalaparse.Scala.IdBinding) doThing(Console.CYAN)
-            if (name == scalaparse.Scala.VarId) doThing(Console.CYAN)
-            if (name.toString.head == '`' && name.toString.last == '`') {
-              import scalaparse.syntax.Identifiers._
-              val shortened = name.toString.drop(1).dropRight(1)
-              if (alphaKeywords.contains(shortened) || symbolKeywords.contains(shortened))
-                doThing(Console.YELLOW)
-              else
-                doThing(Console.WHITE)
-            }
-            if (name == scalaparse.Scala.Type) doThing(Console.GREEN)
-            //            Debug("NAME " + name.toString)
 
-            if (name.toString == "Interp") doThing(Console.RESET, Console.GREEN)
-          }
-        })
-        indices.toSeq
-      }
-      // Make sure there's an index right at the start and right at the end! This
-      // resets the colors at the snippet's end so they don't bleed into later output
-      val boundedIndices = Seq((0, Console.RESET.toVector)) ++ indices ++ Seq((9999, Console.RESET.toVector))
-
-      val buffer2 =
-        boundedIndices
-          .sliding(2)
-          .flatMap{case Seq((s, c1), (e, c2)) => c1 ++ buffer.slice(s, e) }
-          .toVector
-
-      (buffer2 , cursor)
-    }
-    def action(): Res[String] = {
+    def action(): Res[Seq[String]] = {
       TermCore.readLine(
         shellPrompt,
         System.in,
         System.out,
         multilineFilter orElse Term.defaultFilter,
-        displayTransform = highlight
-      )
+        displayTransform = (buffer, cursor) => (Highlighter.defaultHighlight(buffer), cursor)
+      ).map(Parsers.split)
         .map(Res.Success(_))
         .getOrElse(Res.Exit)
     }
@@ -169,9 +122,9 @@ object JLineFrontend{
 
     @tailrec def readCode(buffered: String): Res[Seq[String]] = {
       Option(reader.readLine(
-        if (buffered.isEmpty) shellPrompt + " "
+        if (buffered.isEmpty) shellPrompt
         // Strip ANSI color codes, as described http://stackoverflow.com/a/14652763/871202
-        else " " * (shellPrompt.replaceAll("\u001B\\[[;\\d]*m", "").length + 1)
+        else " " * shellPrompt.replaceAll("\u001B\\[[;\\d]*m", "").length
       )) match {
         case None => Res.Exit
         case Some(newCode) =>
