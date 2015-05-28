@@ -162,5 +162,3 @@ lazy val readme = ScalatexReadme(
   (unmanagedSources in Compile) += baseDirectory.value/".."/"project"/"Constants.scala"
 )
 
-
-lazy val root = project.in(file(".")).aggregate(pprint,  ops, tools, repl)

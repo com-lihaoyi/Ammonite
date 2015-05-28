@@ -136,11 +136,11 @@ object TermCore {
 
         ansiRegex.findPrefixMatchOf(transformedBuffer.drop(i)) match{
           case Some(m) =>
-            Debug("Some(m) " + m.source + " | " + m.source.length)
+//            Debug("Some(m) " + m.source + " | " + m.source.length)
             writer.write(transformedBuffer.slice(i, i + m.end).toArray)
             i += m.end
           case None =>
-            Debug("None")
+//            Debug("None")
             writer.write(transformedBuffer(i))
             if (transformedBuffer(i) == '\n') currWidth += 9999
             currWidth += 1
@@ -160,7 +160,7 @@ object TermCore {
 
 
     @tailrec def rec(lastState: TermState, areaHeight: Int): Option[String] = {
-      redrawLine(lastState.buffer, lastState.cursor)
+      if (!reader.ready())redrawLine(lastState.buffer, lastState.cursor)
       filters(TermInfo(lastState, width - prompt.length)) match {
         case TermState(s, b, c) =>
           val newCursor = math.max(math.min(c, b.length), 0)
@@ -212,7 +212,9 @@ object TermCore {
 case class TermInfo(ts: TermState, width: Int)
 
 sealed trait TermAction
-case class TermState(inputs: LazyList[Int], buffer: Vector[Char], cursor: Int) extends TermAction
+case class TermState(inputs: LazyList[Int],
+                     buffer: Vector[Char],
+                     cursor: Int) extends TermAction
 object TermState{
   def unapply(ti: TermInfo): Option[(LazyList[Int], Vector[Char], Int)] = {
     TermState.unapply(ti.ts)

@@ -9,7 +9,7 @@ import scala.collection.mutable
 object Debug{
   val debugOutput= new FileOutputStream(new java.io.File("log"))
   def apply(s: Any) = {
-//    debugOutput.write((System.currentTimeMillis() + "\t\t" + s + "\n").getBytes)
+    debugOutput.write((System.currentTimeMillis() + "\t\t" + s + "\n").getBytes)
   }
 }
 class Ansi(output: Writer){
