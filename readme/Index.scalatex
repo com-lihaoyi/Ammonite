@@ -343,7 +343,7 @@
           @p
             Apart from the above features, the Ammonite REPL fixes a large number of bugs in the default Scala REPL, including but not limited to:
           @ul
-            @val bugs = Seq("6302", "8971", "9249", "4438", "8603", "6660", "7953", "6659", "8456", "1067", "8307")
+            @val bugs = Seq("6302", "8971", "9249", "4438", "8603", "6660", "7953", "6659", "8456", "1067", "8307", "9335")
             @for(bug <- bugs){
               @li(a("SI-"+bug, href:="https://issues.scala-lang.org/browse/SI-"+bug))
             }
