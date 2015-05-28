@@ -15,10 +15,11 @@ object Highlighter {
   buffer,
   {
     case Literals.Expr.Interp | Literals.Pat.Interp => Console.RESET
-    //      case Literals.Comment => "<B|"
+    case Literals.Comment => Console.BLUE
     case ExprLiteral => Console.GREEN
-    case Type => Console.GREEN
-    case Stringy(BackTicked(body)) if alphaKeywords.contains(body) => Console.YELLOW
+    case SimpleType => Console.GREEN
+    case Stringy(BackTicked(body))
+      if alphaKeywords.contains(body) => Console.YELLOW
   },
   endColor = Console.RESET
   )
@@ -30,26 +31,26 @@ object Highlighter {
       var done = false
       val input = buffer.mkString
       ammonite.repl.Parsers.Splitter.parse(input, instrumenter = (rule, idx, res) => {
-
-        for(color <- ruleColors.lift(rule.asInstanceOf[Rule[_]]) if !done){
+        for{
+          color <- ruleColors.lift(rule.asInstanceOf[Rule[_]])
+          if !done // If we're done, do nothing
+          if idx >= indices.last._1 // If this is a re-parse, ignore it
+          if color != indices.last._2 // If it does't change the color, why bother?
+        } {
           val closeColor = indices.last._2
+          val startIndex = indices.length
           indices += ((idx, color, true))
-          println("Attempt" + indices)
           val resIndex = res() match {
-//            case x if x.index == idx =>
-//              // Didn't parse anything, ignore
-//              println("Ignore " + indices)
-//              indices.remove(indices.length - 1)
-            case s: Result.Success[_] if s.index > idx =>
+            case s: Result.Success[_] =>
               indices += ((s.index, closeColor, false))
+              if (s.index == buffer.length) done = true
             case f: Result.Failure
               if f.index == buffer.length
               && (WL ~ End).parse(input, idx).isInstanceOf[Result.Failure] =>
               // EOF, stop all further parsing
               done = true
-            case f =>  // hard failure, discard all progress
-              while(indices.last._1 >= idx && indices.last._3)
-                indices.remove(indices.length - 1)
+            case _ =>  // hard failure, or parsed nothing. Discard all progress
+              indices.remove(startIndex, indices.length - startIndex)
           }
         }
       })
@@ -58,7 +59,7 @@ object Highlighter {
     // Make sure there's an index right at the start and right at the end! This
     // resets the colors at the snippet's end so they don't bleed into later output
     val boundedIndices = indices ++ Seq((9999, endColor, false))
-    println(boundedIndices)
+//    println(boundedIndices)
     val buffer2 =
       boundedIndices
         .sliding(2)
