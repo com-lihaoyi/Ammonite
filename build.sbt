@@ -1,6 +1,6 @@
 
 import scalatex.ScalatexReadme
-
+import sbtassembly.AssemblyPlugin.defaultShellScript
 scalaVersion := "2.11.6"
 
 crossScalaVersions := Seq(
@@ -147,7 +147,11 @@ lazy val repl = project
       "org.apache.ivy" % "ivy" % "2.4.0",
       "com.lihaoyi" %% "scalaparse" % "0.1.6-SNAPSHOT"
     ),
-    javaOptions += "-Xmx4G"//,
+    javaOptions += "-Xmx4G",
+    assemblyOption in assembly := (assemblyOption in assembly).value.copy(
+      prependShellScript = Some(defaultShellScript)
+    ),
+    assemblyJarName in assembly := s"${name.value}-${version.value}"
 //    fork in (Test, testOnly) := true
   )
 

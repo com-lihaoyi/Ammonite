@@ -38,25 +38,23 @@ object Pressy {
     def deepCompletion(name: String) = {
       def rec(t: pressy.Symbol): Seq[pressy.Symbol] = {
         val children =
-          if (t.hasPackageFlag || t.isPackageObject) {
-            pressy.ask(() => t.typeSignature.members.filter(_ != t).flatMap(rec))
-          } else Nil
+          if (!t.hasPackageFlag && !t.isPackageObject) Nil
+          else t.typeSignature.members.filter(_ != t).flatMap(rec)
 
         t +: children.toSeq
       }
 
-      pressy.ask(() =>
-        for {
-          member <- pressy.RootClass.typeSignature.members.toList
-          sym <- rec(member)
-          // sketchy name munging because I don't know how to do this properly
-          strippedName = sym.nameString.stripPrefix("package$").stripSuffix("$")
-          if strippedName.startsWith(name)
-          (pref, _) = sym.fullNameString.splitAt(sym.fullNameString.lastIndexOf('.') + 1)
-          out = pref + strippedName
-          if out != ""
-        } yield (out, None)
-      )
+      for {
+        member <- pressy.RootClass.typeSignature.members.toList
+        sym <- rec(member)
+        // sketchy name munging because I don't know how to do this properly
+        strippedName = sym.nameString.stripPrefix("package$").stripSuffix("$")
+        if strippedName.startsWith(name)
+        (pref, _) = sym.fullNameString.splitAt(sym.fullNameString.lastIndexOf('.') + 1)
+        out = pref + strippedName
+        if out != ""
+      } yield (out, None)
+
     }
     def handleTypeCompletion(position: Int, decoded: String, offset: Int) = {
 
@@ -65,14 +63,40 @@ object Pressy {
       (position + offset, handleCompletion(r, prefix))
     }
 
-    def handleCompletion(r: List[pressy.Member], prefix: String) = {
-      pressy.ask{() => r.filter(_.sym.name.decoded.startsWith(prefix)).map{
-        case x if x.sym.name.decoded == prefix =>
-          (x.sym.name.decoded, Some(x.sym.defString))
-        case x =>
-          (x.sym.name.decoded, None)
-      }}
+    def blacklisted(s: pressy.Symbol) = {
+      val blacklist = Set(
+        "scala.Predef.any2stringadd.+",
+        "scala.Any.##",
+        "scala.<byname>",
+        "scala.<empty>",
+        "scala.<repeated>",
+        "scala.<repeated...>",
+        "scala.Predef.StringFormat.formatted",
+        "scala.Predef.Ensuring.ensuring",
+        "scala.Predef.ArrowAssoc.->",
+        "scala.Predef.ArrowAssoc.→",
+        "java.lang.Object.synchronized",
+        "java.lang.Object.ne",
+        "java.lang.Object.eq",
+        "java.lang.Object.wait",
+        "java.lang.Object.wait",
+        "java.lang.Object.wait",
+        "java.lang.Object.notifyAll",
+        "java.lang.Object.notify"
+      )
+      blacklist(s.fullNameAsName('.').decoded) ||
+      s.isImplicit ||
+      s.isDeprecated
     }
+    def handleCompletion(r: List[pressy.Member], prefix: String) = for {
+      m <- r
+      if m.sym.name.decoded.startsWith(prefix)
+      if !blacklisted(m.sym)
+    } yield (
+      m.sym.name.decoded,
+      if (m.sym.name.decoded != prefix) None
+      else Some(m.sym.defString)
+    )
 
     def prefixed: (Int, Seq[(String, Option[String])]) = tree match {
       case t @ pressy.Select(qualifier, name) =>
@@ -110,10 +134,15 @@ object Pressy {
         else (t.pos.end, deep :+ ("" -> None))
 
       case t =>
-        index -> ask(index, pressy.askScopeCompletion).map { s =>
-          pressy.ask(() => (s.sym.name.decoded, None))
-        }
+        index -> (for {
+          s <- ask(index, pressy.askScopeCompletion)
+          if !blacklisted(s.sym)
+        }yield (s.sym.name.decoded, None)
+        )
+
     }
+
+    optManifest
     def ask(index: Int, query: (Position, Response[List[pressy.Member]]) => Unit) = {
       val position = new OffsetPosition(currentFile, index)
       val scopes = Compiler.awaitResponse[List[pressy.Member]](query(position, _))
@@ -172,7 +201,7 @@ object Pressy {
 
       val run = new Run(pressy, currentFile, allCode, index)
 
-      val (i, all) = run.prefixed
+      val (i, all) = pressy.ask(() => run.prefixed)
 
       val allNames = all.collect{ case (name, None) => name}
                         .filter(_ != "<init>")

@@ -29,5 +29,8 @@ object Classpath {
     current = current.getParent
   }
 
-  val (jarDeps, dirDeps) = files.toVector.filter(_.exists).partition(_.toString.endsWith(".jar"))
+  val (jarDeps, dirDeps) = files.toVector.filter(_.exists).partition(
+    // dunno why we need to filter out jnilib files but seems to make it work
+    x => x.isFile && !x.toString.endsWith(".jnilib")
+  )
 }
