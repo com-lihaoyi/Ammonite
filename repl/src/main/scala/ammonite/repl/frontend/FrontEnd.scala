@@ -1,6 +1,6 @@
 package ammonite.repl.frontend
 
-import java.io.{OutputStream, InputStream}
+import java.io.{Writer, OutputStream, InputStream}
 
 import ammonite.repl._
 import ammonite.terminal.Term.HistoryFilter
@@ -32,6 +32,27 @@ object FrontEnd{
                shellPrompt: String,
                compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
                history: Seq[String]) = {
+      val autocompleteFilter: TermCore.Filter = {
+        case TermState(9 ~: rest, b, c) => // Enter
+          val (newCursor, completions, details) = compilerComplete(c, b.mkString)
+          if
+          println()
+          details.foreach(println)
+          completions.foreach(println)
+          val sorted = completions.sorted
+          @tailrec def prefix(left: String, right: String, out: String): String = {
+            if (left.length > 0 && right.length > 0 && left(0) == right(0)) out
+            else prefix(left.substring(1), right.substring(1), out + left(0))
+          }
+          var common = prefix(sorted.first, sorted.last)
+
+
+          val prefix = b.take(newCursor) ++ common ++ b.drop(c)
+
+
+          TermState(rest, b, newCursor)
+      }
+
       val multilineFilter: TermCore.Filter = {
         case TermState(13 ~: rest, b, c) => // Enter
           val code = b.mkString
@@ -50,7 +71,7 @@ object FrontEnd{
         shellPrompt,
         System.in,
         System.out,
-        historyFilter.filter orElse multilineFilter orElse Term.defaultFilter,
+        autocompleteFilter orElse historyFilter.filter orElse multilineFilter orElse Term.defaultFilter,
         displayTransform = (buffer, cursor) => (Highlighter.defaultHighlight(buffer), cursor)
       )
       code match{
