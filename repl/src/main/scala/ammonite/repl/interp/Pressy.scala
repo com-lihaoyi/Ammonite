@@ -27,42 +27,6 @@ object Pressy {
             currentFile: BatchSourceFile,
             allCode: String,
             index: Int){
-    val r = new Response[pressy.Tree]
-    pressy.askTypeAt(Position.offset(currentFile, index), r)
-    val tree = r.get.fold(x => x, e => throw e)
-    /**
-     * Search for terms to autocomplete not just from the local scope,
-     * but from any packages and package objects accessible from the
-     * local scope
-     */
-    def deepCompletion(name: String) = {
-      def rec(t: pressy.Symbol): Seq[pressy.Symbol] = {
-        val children =
-          if (!t.hasPackageFlag && !t.isPackageObject) Nil
-          else t.typeSignature.members.filter(_ != t).flatMap(rec)
-
-        t +: children.toSeq
-      }
-
-      for {
-        member <- pressy.RootClass.typeSignature.members.toList
-        sym <- rec(member)
-        // sketchy name munging because I don't know how to do this properly
-        strippedName = sym.nameString.stripPrefix("package$").stripSuffix("$")
-        if strippedName.startsWith(name)
-        (pref, _) = sym.fullNameString.splitAt(sym.fullNameString.lastIndexOf('.') + 1)
-        out = pref + strippedName
-        if out != ""
-      } yield (out, None)
-
-    }
-    def handleTypeCompletion(position: Int, decoded: String, offset: Int) = {
-
-      val r = ask(position,  pressy.askTypeCompletion)
-      val prefix = if (decoded == "<error>") "" else decoded
-      (position + offset, handleCompletion(r, prefix))
-    }
-
     def blacklisted(s: pressy.Symbol) = {
       val blacklist = Set(
         "scala.Predef.any2stringadd.+",
@@ -79,8 +43,6 @@ object Pressy {
         "java.lang.Object.ne",
         "java.lang.Object.eq",
         "java.lang.Object.wait",
-        "java.lang.Object.wait",
-        "java.lang.Object.wait",
         "java.lang.Object.notifyAll",
         "java.lang.Object.notify"
       )
@@ -88,15 +50,58 @@ object Pressy {
       s.isImplicit ||
       s.isDeprecated
     }
-    def handleCompletion(r: List[pressy.Member], prefix: String) = for {
-      m <- r
-      if m.sym.name.decoded.startsWith(prefix)
-      if !blacklisted(m.sym)
-    } yield (
-      m.sym.name.decoded,
-      if (m.sym.name.decoded != prefix) None
-      else Some(m.sym.defString)
-    )
+    val r = new Response[pressy.Tree]
+    pressy.askTypeAt(Position.offset(currentFile, index), r)
+    val tree = r.get.fold(x => x, e => throw e)
+    /**
+     * Search for terms to autocomplete not just from the local scope,
+     * but from any packages and package objects accessible from the
+     * local scope
+     */
+    def deepCompletion(name: String) = {
+      def rec(t: pressy.Symbol): Seq[pressy.Symbol] = {
+        val children =
+          if (t.hasPackageFlag || t.isPackageObject) {
+            pressy.ask(() => t.typeSignature.members.filter(_ != t).flatMap(rec))
+          } else Nil
+
+        t +: children.toSeq
+      }
+
+
+      pressy.ask(() =>
+        for {
+          member <- pressy.RootClass.typeSignature.members.toList
+          sym <- rec(member)
+          // sketchy name munging because I don't know how to do this properly
+          strippedName = sym.nameString.stripPrefix("package$").stripSuffix("$")
+          if strippedName.startsWith(name)
+          (pref, _) = sym.fullNameString.splitAt(sym.fullNameString.lastIndexOf('.') + 1)
+          out = pref + strippedName
+          if out != ""
+        } yield (out, None)
+      )
+    }
+    def handleTypeCompletion(position: Int, decoded: String, offset: Int) = {
+
+      val r = ask(position,  pressy.askTypeCompletion)
+      val prefix = if (decoded == "<error>") "" else decoded
+      (position + offset, handleCompletion(r, prefix))
+    }
+
+    def handleCompletion(r: List[pressy.Member], prefix: String) = {
+      pressy.ask{() =>
+        r.filter(_.sym.name.decoded.startsWith(prefix))
+          .filter(s => !blacklisted(s.sym))
+          .map{ x  =>
+            (
+              x.sym.name.decoded,
+              if (x.sym.name.decoded != prefix) None
+              else Some(x.sym.defString)
+            )
+          }
+      }
+    }
 
     def prefixed: (Int, Seq[(String, Option[String])]) = tree match {
       case t @ pressy.Select(qualifier, name) =>
@@ -134,15 +139,10 @@ object Pressy {
         else (t.pos.end, deep :+ ("" -> None))
 
       case t =>
-        index -> (for {
-          s <- ask(index, pressy.askScopeCompletion)
-          if !blacklisted(s.sym)
-        }yield (s.sym.name.decoded, None)
-        )
-
+        index -> ask(index, pressy.askScopeCompletion).map { s =>
+          pressy.ask(() => (s.sym.name.decoded, None))
+        }
     }
-
-    optManifest
     def ask(index: Int, query: (Position, Response[List[pressy.Member]]) => Unit) = {
       val position = new OffsetPosition(currentFile, index)
       val scopes = Compiler.awaitResponse[List[pressy.Member]](query(position, _))
@@ -201,7 +201,7 @@ object Pressy {
 
       val run = new Run(pressy, currentFile, allCode, index)
 
-      val (i, all) = pressy.ask(() => run.prefixed)
+      val (i, all) = run.prefixed
 
       val allNames = all.collect{ case (name, None) => name}
                         .filter(_ != "<init>")
