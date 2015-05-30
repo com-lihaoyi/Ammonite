@@ -28,14 +28,15 @@ class Repl(input: InputStream,
     import sys.process._
     Seq("bash", "-c", s"tput $s 2> /dev/tty").!!.trim.toInt
   }
-
+  val cols = Cell(consoleDim("cols"))
+  val lines = Cell(consoleDim("lines"))
   val printer = new PrintStream(output, true)
   val interp: Interpreter = new Interpreter(
     shellPrompt,
     frontEnd,
     pprintConfig.copy(
-      maxWidth = () => consoleDim("cols"),
-      lines = () => consoleDim("lines") / 2
+      maxWidth = () => cols(),
+      lines = () => lines() / 2
     ),
     colorSet,
     printer.print,
@@ -51,7 +52,12 @@ class Repl(input: InputStream,
       interp.pressy.complete(_, interp.eval.previousImportBlock, _),
       initialHistory ++ history
     )
-    _ = {history = history :+ code}
+    _ = {
+      history = history :+ code
+      saveHistory(code)
+      cols.update()
+      lines.update()
+    }
     _ <- Signaller("INT") { interp.mainThread.stop() }
     out <- interp.processLine(stmts, _.foreach(printer.print))
   } yield {

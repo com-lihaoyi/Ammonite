@@ -28,14 +28,9 @@ object AutocompleteTests extends TestSuite{
 
     // Not sure why clone and finalize don't appear in this list
     val anyCompletion = Set(
-      "synchronized",
-      "##", "!=", "==",
-      "ne", "eq",
-      "wait", "notifyAll", "notify",
+      "!=", "==",
       "toString", "equals", "hashCode",
-      "getClass", "asInstanceOf", "isInstanceOf",
-      "+", "formatted", "ensuring",
-      "→", "->"
+      "getClass", "asInstanceOf", "isInstanceOf"
     )
     implicit class SetExt[T](s1: Set[T]) {
       def ^(s2: Set[T]): Set[T] = (s1 diff s2) | (s2 diff s1)
@@ -89,7 +84,7 @@ object AutocompleteTests extends TestSuite{
       )
 
       complete("""scala.Option.<caret>""",
-        (anyCompletion ++ Set("apply", "empty", "option2Iterable")) ^
+        (anyCompletion ++ Set("apply", "empty")) ^
       )
 
       complete("""Seq(1, 2, 3).map(_.<caret>)""",
@@ -117,7 +112,7 @@ object AutocompleteTests extends TestSuite{
         Set("BigDecimal", "BigInteger") ^
       )
       complete("""scala.Option.option2<caret>""",
-        Set("option2Iterable") ^
+        Set() ^
       )
       complete("""val x = 1; x + x.><caret>""",
         Set(">>", ">>>") -- _,

@@ -9,11 +9,12 @@ class Checker {
   def predef = ""
   var allOutput = ""
   val interp = new Interpreter(
-    (_) => (),
     Ref[String](""),
-    ammonite.pprint.Config.Defaults.PPrintConfig.copy(lines = 15),
+    Ref(null),
+    ammonite.pprint.Config.Defaults.PPrintConfig.copy(lines = () => 15),
+    Ref(ColorSet.BlackWhite),
     stdout = allOutput += _,
-    initialHistory = Nil,
+    history0 = Nil,
     predef = predef
   )
 
@@ -52,7 +53,7 @@ class Checker {
 //    println(input)
 //    print(".")
     val msg = collection.mutable.Buffer.empty[String]
-    val processed = interp.processLine(Parsers.split(input), _(_), _.foreach(msg.append(_)))
+    val processed = interp.processLine(Parsers.split(input), _.foreach(msg.append(_)))
     val printed = processed.map(_ => msg.mkString)
 
     interp.handleOutput(processed)

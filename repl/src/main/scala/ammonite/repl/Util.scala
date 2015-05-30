@@ -110,7 +110,20 @@ object Ref{
     def update(t: T) = update0(t)
   }
 }
-
+trait Cell[T]{
+  def apply(): T
+  def update(): Unit
+}
+object Cell{
+  class LazyHolder[T](t: => T){
+    lazy val value = t
+  }
+  def apply[T](t: => T) = new Cell[T] {
+    var inner: LazyHolder[T] = new LazyHolder(t)
+    def update() = inner = new LazyHolder(t)
+    def apply() = inner.value
+  }
+}
 /**
  * Nice pattern matching for chained exceptions
  */

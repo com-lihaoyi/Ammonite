@@ -150,16 +150,6 @@ object AdvancedTests extends TestSuite{
       check.result("", Res.Skip)
       check("2", "res1: Int = 2")
     }
-    'history{
-      check.session("""
-        @ val x = 1
-
-        @ x
-
-        @ history
-        res2: Seq[String] = Vector("val x = 1", "x")
-      """)
-    }
     'customPPrint{
       check.session("""
         @ class C
@@ -364,7 +354,7 @@ object AdvancedTests extends TestSuite{
         100,
       ...
 
-      @ pprintConfig = pprintConfig.copy(lines = 5)
+      @ pprintConfig = pprintConfig.copy(lines = () => 5)
 
       @ Seq.fill(20)(100)
       res4: Seq[Int] = List(

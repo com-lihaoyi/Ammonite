@@ -10,7 +10,7 @@ object ShelloutTests extends TestSuite{
     'basic{
       val listed = (%ls).output.toSet
       val expected = Set(
-        "build.sbt", "ops", "pprint", "tools",
+        "build.sbt", "ops", "pprint", "tools", "terminal",
         "project", "readme", "readme.md", "repl", "target"
       )
       assert(

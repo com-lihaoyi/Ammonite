@@ -300,7 +300,7 @@ object Internals {
       case head #:: rest =>
         if (head.contains("\n")) true
         else {
-          val nextWidth = currentWidth + head.length
+          val nextWidth = currentWidth + head.replaceAll(ansiRegex, "").length
           if (nextWidth > effectiveWidth) true
           else checkOverflow(rest, nextWidth)
         }
@@ -310,6 +310,7 @@ object Internals {
     if (overflow) handleChunksVertical(name, c, chunkFunc)
     else Iter(coloredName, "(") ++ horizontalChunks ++ Iter(")")
   }
+  val ansiRegex = "\u001B\\[[;\\d]*m"
 
   /**
    * Same as `handleChunks`, but lays things out vertically instead of trying
