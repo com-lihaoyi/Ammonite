@@ -19,23 +19,19 @@ class Interpreter(shellPrompt0: => Ref[String],
                   pprintConfig: pprint.Config,
                   colors0: ColorSet = ColorSet.BlackWhite,
                   stdout: String => Unit,
-                  initialHistory: Seq[String],
+                  history0: => Seq[String],
                   predef: String){ interp =>
 
   val dynamicClasspath = new VirtualDirectory("(memory)", None)
   var extraJars = Seq[java.io.File]()
 
-  val history = initialHistory.to[collection.mutable.Buffer]
-
   def processLine(stmts: Seq[String],
-                  saveHistory: (String => Unit, String) => Unit,
                   printer: Iterator[String] => Unit) = for{
     _ <- Catching { case Ex(x@_*) =>
       val Res.Failure(trace) = Res.Failure(x)
       Res.Failure(trace + "\nSomething unexpected went wrong =(")
     }
     Preprocessor.Output(code, printSnippet) <- preprocess(stmts, eval.getCurrentLine)
-    _ = saveHistory(history.append(_), stmts.mkString("; "))
     oldClassloader = Thread.currentThread().getContextClassLoader
     out <- try{
       Thread.currentThread().setContextClassLoader(eval.evalClassloader)
@@ -75,7 +71,6 @@ class Interpreter(shellPrompt0: => Ref[String],
 
       def apply(line: String) = handleOutput(processLine(
         Parsers.split(line),
-        (_, _) => (), // Discard history of load-ed lines,
         _.foreach(stdout)
       ))
 
@@ -101,7 +96,7 @@ class Interpreter(shellPrompt0: => Ref[String],
     def search(target: scala.reflect.runtime.universe.Type) = Interpreter.this.compiler.search(target)
     def compiler = Interpreter.this.compiler.compiler
     def newCompiler() = init()
-    def history = interp.history.toVector.dropRight(1)
+    def history = history0.toVector.dropRight(1)
     def show[T](a: T, lines: Int = 0) = ammonite.pprint.Show(a, lines)
   }
 
@@ -147,7 +142,7 @@ class Interpreter(shellPrompt0: => Ref[String],
   // line number to -1 if the predef exists so the first user-entered
   // line becomes 0
   if (predef != "") {
-    val res1 = processLine(Parsers.split(predef), (_, _) => (), _.foreach(stdout))
+    val res1 = processLine(Parsers.split(predef), _.foreach(stdout))
     val res2 = handleOutput(res1)
     stdout("\n")
   }

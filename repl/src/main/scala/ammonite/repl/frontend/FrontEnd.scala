@@ -20,18 +20,18 @@ import ammonite.terminal.LazyList._
 trait FrontEnd{
   def action(input: InputStream,
              output: OutputStream,
-             shellPrompt: => String,
-             compilerComplete: => (Int, String) => (Int, Seq[String], Seq[String]),
-             initialHistory: Seq[String]): Res[Seq[String]]
+             shellPrompt: String,
+             compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
+             history: Seq[String]): Res[(String, Seq[String])]
 }
 
 object FrontEnd{
   object Ammonite extends FrontEnd{
     def action(input: InputStream,
                output: OutputStream,
-               shellPrompt: => String,
-               compilerComplete: => (Int, String) => (Int, Seq[String], Seq[String]),
-               initialHistory: Seq[String]): Res[Seq[String]] = {
+               shellPrompt: String,
+               compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
+               history: Seq[String]) = {
       val multilineFilter: TermCore.Filter = {
         case TermState(13 ~: rest, b, c) => // Enter
           val code = b.mkString
@@ -43,8 +43,8 @@ object FrontEnd{
               ammonite.terminal.Result(code)
           }
       }
-      var history = List.empty[String]
-      val historyFilter = new HistoryFilter(history ++ initialHistory.reverse)
+      
+      val historyFilter = new HistoryFilter(history.reverse)
 
       val code = TermCore.readLine(
         shellPrompt,
@@ -56,9 +56,8 @@ object FrontEnd{
       code match{
         case None => Res.Exit
         case Some(code) =>
-          history = code :: history
           Parsers.Splitter.parse(code) match{
-            case Result.Success(value, idx) => Res.Success(value)
+            case Result.Success(value, idx) => Res.Success((code, value))
             case f: Result.Failure => Res.Failure(SyntaxError.msg(code, f.parser, f.index))
           }
       }
@@ -71,9 +70,9 @@ object FrontEnd{
   object JLine extends FrontEnd{
     def action(input: InputStream,
                output: OutputStream,
-               shellPrompt: => String,
-               compilerComplete: => (Int, String) => (Int, Seq[String], Seq[String]),
-               initialHistory: Seq[String]): Res[Seq[String]] = {
+               shellPrompt: String,
+               compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
+               history: Seq[String]) = {
       val term = new jline.UnixTerminal()
       term.init()
       val reader = new ConsoleReader(input, output, term)
@@ -114,17 +113,10 @@ object FrontEnd{
           defaultHandler.complete(reader, candidates, position)
         }
       })
-      initialHistory.foreach(reader.getHistory.add)
 
+      history.foreach(reader.getHistory.add)
 
-
-      def history =
-        reader.getHistory
-          .entries()
-          .map(_.value().toString)
-          .toVector
-
-      @tailrec def readCode(buffered: String): Res[Seq[String]] = {
+      @tailrec def readCode(buffered: String): Res[(String, Seq[String])] = {
         Option(reader.readLine(
           if (buffered.isEmpty) shellPrompt
           // Strip ANSI color codes, as described http://stackoverflow.com/a/14652763/871202
@@ -137,7 +129,7 @@ object FrontEnd{
               case Result.Failure(_, index) if code.drop(index).trim() == "" => readCode(code)
               case f: Result.Failure => Res.Failure(SyntaxError.msg(f.input, f.parser, f.index))
               case Result.Success(split, idx) =>
-                Res.Success(split)
+                Res.Success(code -> split)
             }
         }
       }

@@ -7,6 +7,7 @@ import acyclic.file
 import ammonite.repl.interp.Interpreter
 
 import scala.annotation.tailrec
+import scala.collection.mutable
 import scala.util.Try
 
 class Repl(input: InputStream,
@@ -20,7 +21,7 @@ class Repl(input: InputStream,
 
   val shellPrompt = Ref(shellPrompt0)
 
-
+  var history = Vector.empty[String]
 
   val frontEnd = Ref[FrontEnd](FrontEnd.JLine)
   def consoleDim(s: String) = {
@@ -37,22 +38,23 @@ class Repl(input: InputStream,
       lines = () => consoleDim("lines") / 2
     ),
     colorSet,
-    stdout = printer.print,
-    initialHistory = initialHistory,
-    predef = predef
+    printer.print,
+    initialHistory ++ history,
+    predef
   )
 
   def action() = for{
     // Condition to short circuit early if `interp` hasn't finished evaluating
-    stmts <- frontEnd().action(
+    (code, stmts) <- frontEnd().action(
       input,
       output,
       colorSet.prompt + shellPrompt() + scala.Console.RESET,
       interp.pressy.complete(_, interp.eval.previousImportBlock, _),
-      initialHistory
+      initialHistory ++ history
     )
+    _ = {history = history :+ code}
     _ <- Signaller("INT") { interp.mainThread.stop() }
-    out <- interp.processLine(stmts, (f, x) => {saveHistory(x); f(x)}, _.foreach(printer.print))
+    out <- interp.processLine(stmts, _.foreach(printer.print))
   } yield {
     printer.println()
     out
