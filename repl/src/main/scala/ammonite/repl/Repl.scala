@@ -12,7 +12,6 @@ import scala.util.Try
 
 class Repl(input: InputStream,
            output: OutputStream,
-           colorSet: ColorSet = ColorSet.Default,
            pprintConfig: pprint.Config = pprint.Config.Colors.PPrintConfig,
            shellPrompt0: String = "@ ",
            initialHistory: Seq[String] = Nil,
@@ -23,6 +22,7 @@ class Repl(input: InputStream,
 
   var history = Vector.empty[String]
 
+  val colorSet = Ref[ColorSet](ColorSet.Default)
   val frontEnd = Ref[FrontEnd](FrontEnd.JLine)
   def consoleDim(s: String) = {
     import sys.process._
@@ -44,11 +44,10 @@ class Repl(input: InputStream,
   )
 
   def action() = for{
-    // Condition to short circuit early if `interp` hasn't finished evaluating
     (code, stmts) <- frontEnd().action(
       input,
       output,
-      colorSet.prompt + shellPrompt() + scala.Console.RESET,
+      colorSet().prompt + shellPrompt() + scala.Console.RESET,
       interp.pressy.complete(_, interp.eval.previousImportBlock, _),
       initialHistory ++ history
     )

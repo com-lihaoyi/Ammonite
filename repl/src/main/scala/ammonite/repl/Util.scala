@@ -1,6 +1,7 @@
 package ammonite.repl
 
 import acyclic.file
+import ammonite.pprint.{PPrinter, PPrint}
 import fastparse._
 
 import scala.util.Try
@@ -92,6 +93,11 @@ trait Ref[T]{
   def update(t: T): Unit
 }
 object Ref{
+  implicit def refPPrint[T: PPrint]: PPrinter[Ref[T]] = PPrinter{ (ref, cfg) =>
+    Iterator(cfg.color.prefix("Ref"), "(") ++
+    implicitly[PPrint[T]].pprinter.render(ref(), cfg) ++
+    Iterator(")")
+  }
   def apply[T](value0: T) = {
     var value = value0
     new Ref[T]{

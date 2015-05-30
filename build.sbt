@@ -162,3 +162,4 @@ lazy val readme = ScalatexReadme(
   (unmanagedSources in Compile) += baseDirectory.value/".."/"project"/"Constants.scala"
 )
 
+

@@ -14,10 +14,10 @@ import scala.reflect.io.VirtualDirectory
  * to interpret Scala code. Doesn't attempt to provide any
  * real encapsulation for now.
  */
-class Interpreter(shellPrompt0: => Ref[String],
-                  frontEnd0: => Ref[FrontEnd],
+class Interpreter(shellPrompt0: Ref[String],
+                  frontEnd0: Ref[FrontEnd],
                   pprintConfig: pprint.Config,
-                  colors0: ColorSet = ColorSet.BlackWhite,
+                  colors0: Ref[ColorSet],
                   stdout: String => Unit,
                   history0: => Seq[String],
                   predef: String){ interp =>

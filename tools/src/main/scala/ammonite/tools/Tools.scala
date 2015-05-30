@@ -49,7 +49,7 @@ object GrepResult{
       if(i % 2 == 1) Console.RESET + cfg.literalColor
       else Console.YELLOW_B + Console.BLUE
 
-    val width = cfg.maxWidth - cfg.depth * 2
+    val width = cfg.maxWidth() - cfg.depth * 2
     // String: |        S   E       S    E      |
     // Cuts:   0       1 2 3 4     5 6  7 8     9
     while(!remaining.isEmpty){
@@ -60,7 +60,7 @@ object GrepResult{
       remaining = excluded
       val lastEnd = included.last._2
       val middle = (lastEnd + firstStart) / 2
-      val showStart = middle - cfg.maxWidth / 2
+      val showStart = middle - cfg.maxWidth() / 2
       val allIndices = included.flatMap{case (a, b) => Seq(a, b)}
       val pairs = (showStart +: allIndices) zip (allIndices :+ (showStart + width))
 
