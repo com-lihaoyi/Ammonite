@@ -12,59 +12,71 @@ import scala.language.dynamics
  * %ls "/"
  * %ps "aux"
  */
-object % extends %(Vector.empty){
-  def execute(cmd: Seq[String]): CommandResult = {
+object % extends %(Vector.empty)
+case class %(cmd: Vector[String]) extends Dynamic with CommandBuilder[CommandResult, %]{
+  def extend(cmd2: Vector[String]) = new %(cmd ++ cmd2)
+  def execute(): CommandResult = {
     import scala.sys.process._
-    CommandResult(cmd.lines) // Should be lineStream instead of lines in 2.11, doing this for 2.10 compatibility
-
-    // We need this if we want editors like vim/emacs to work
-    //
-    // val exitCode =  new ProcessBuilder().command("vim", "/tmp/hello3").inheritIO().start().waitFor()
+    CommandResult(cmd.lineStream)
 
     // This should work some day too
-//    %git                    %.git
-//    %git %diff              %.git(%).diff
-//    %git "clean"            %.git("clean")
-//    %git("clean", "-fdx")   %.git("clean", "-fdx")
-//    %git %clean %`-fdx`     %.git(%).clean(%).`-fdx`
-//    %git %clean "-fdx"      %.git(%).clean "-fdx"
+    //    %git                    %.git
+    //    %git %diff              %.git(%).diff
+    //    %git "clean"            %.git("clean")
+    //    %git("clean", "-fdx")   %.git("clean", "-fdx")
+    //    %git %clean %`-fdx`     %.git(%).clean(%).`-fdx`
+    //    %git %clean "-fdx"      %.git(%).clean "-fdx"
   }
 }
 
-class %(val cmd: Vector[String]) extends Dynamic{
-  def selectDynamic(s: String) = %.execute(cmd ++ Seq(s))
-  def applyDynamic[T, V](op: String)(args: T*)(implicit ce: CommandExtender[T, V]): V = {
-    ce.extend(cmd, op, args)
-  }
-}
-
-trait CommandExtender[T, V]{
-  def extend(cmd: Vector[String], op: String, args: Seq[T]): V
-}
-
-object CommandExtender{
-  implicit object Str extends CommandExtender[String, CommandResult]{
-    def extend(cmd: Vector[String], op: String, args: Seq[String]) =
-      %.execute(cmd ++ Seq(op) ++ args)
-  }
-  implicit object Chain extends CommandExtender[%.type, %]{
-    def extend(cmd: Vector[String], op: String, args: Seq[%.type]) =
-      new %(cmd ++ Seq(op))
-  }
-}
-object CommandResult{
-  implicit def commandResultRepr(implicit c: Config) =
-    new PPrint(
-      PPrinter[CommandResult]((x, c) =>
-      x.output.iterator.flatMap(line =>
-        Iterator("\n", c.color.literal(line))
-      )
-    ),
-    c
-  )
-}
 case class CommandResult(output: Stream[String]) extends Seq[String]{
   def iterator = output.iterator
   def apply(idx: Int) = output(idx)
   def length: Int = output.length
+}
+
+object CommandResult{
+  implicit def commandResultRepr(implicit c: Config) =
+    new PPrint(
+      PPrinter[CommandResult]((x, c) =>
+        x.output.iterator.flatMap(line =>
+          Iterator("\n", c.color.literal(line))
+        )
+      ),
+      c
+    )
+}
+
+object %% extends %%(Vector.empty)
+case class %%(cmd: Vector[String]) extends Dynamic with CommandBuilder[Int, %%]{
+
+  def extend(cmd2: Vector[String]) = new %%(cmd ++ cmd2)
+  def execute() = {
+    new java.lang.ProcessBuilder().command(cmd:_*).inheritIO().start().waitFor()
+  }
+}
+
+
+trait CommandBuilder[R, B <: CommandBuilder[R, B]]{
+  def selectDynamic(s: String) = extend(Vector(s)).execute()
+  def applyDynamic[T, V](op: String)(args: T*)(implicit ce: CommandExtender[R, B, T, V]): V = {
+    ce.extend(this, op, args)
+  }
+  def extend(cmd2: Vector[String]): B
+  def execute(): R
+}
+
+trait CommandExtender[R, B <: CommandBuilder[R, B], T, V]{
+  def extend(cmd: CommandBuilder[R, B], op: String, args: Seq[T]): V
+}
+
+object CommandExtender{
+  implicit def Str[R, B <: CommandBuilder[R, B]] = new CommandExtender[R, B, String, R]{
+    def extend(cmd: CommandBuilder[R, B], op: String, args: Seq[String]) =
+      cmd.extend(Vector(op) ++ args).execute()
+  }
+  implicit def Chain[R, B <: CommandBuilder[R, B]] = new CommandExtender[R, B, %.type, B]{
+    def extend(cmd: CommandBuilder[R, B], op: String, args: Seq[%.type]) =
+      cmd.extend(Vector(op))
+  }
 }
