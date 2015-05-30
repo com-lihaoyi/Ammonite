@@ -14,8 +14,8 @@ import scala.reflect.io.VirtualDirectory
  * to interpret Scala code. Doesn't attempt to provide any
  * real encapsulation for now.
  */
-class Interpreter(handleResult: => Res[Evaluated] => Unit,
-                  shellPrompt0: => Ref[String],
+class Interpreter(shellPrompt0: => Ref[String],
+                  frontEnd0: => Ref[FrontEnd],
                   pprintConfig: pprint.Config,
                   colors0: ColorSet = ColorSet.BlackWhite,
                   stdout: String => Unit,
@@ -48,8 +48,6 @@ class Interpreter(handleResult: => Res[Evaluated] => Unit,
   } yield out
 
   def handleOutput(res: Res[Evaluated]) = {
-    handleResult(res)
-
     res match{
       case Res.Skip =>
         true
@@ -70,8 +68,8 @@ class Interpreter(handleResult: => Res[Evaluated] => Unit,
 
     def imports = interp.eval.previousImportBlock
     def colors = colors0
-    def shellPrompt: String = shellPrompt0()
-    def shellPrompt_=(s: String) = shellPrompt0() = s
+    def shellPrompt = shellPrompt0
+    def frontEnd = frontEnd0
 
     object load extends Load{
 

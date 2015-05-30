@@ -20,25 +20,22 @@ class Repl(input: InputStream,
 
   val shellPrompt = Ref(shellPrompt0)
 
-//  val frontEnd = JLineFrontend(
-//    input,
-//    output,
-//    colorSet.prompt + shellPrompt() + scala.Console.RESET,
-//    interp.pressy.complete(_, interp.eval.previousImportBlock, _),
-//    initialHistory
-//  )
-  val frontEnd = JLineFrontend.special(
-    input,
-    output,
-    colorSet.prompt + shellPrompt() + scala.Console.RESET,
-    interp.pressy.complete(_, interp.eval.previousImportBlock, _)
-  )
+
+
+  val frontEnd = Ref[FrontEnd](FrontEnd.JLine)
+  def consoleDim(s: String) = {
+    import sys.process._
+    Seq("bash", "-c", s"tput $s 2> /dev/tty").!!.trim.toInt
+  }
 
   val printer = new PrintStream(output, true)
   val interp: Interpreter = new Interpreter(
-    frontEnd.update,
     shellPrompt,
-    pprintConfig.copy(maxWidth = frontEnd.width, lines = 15),
+    frontEnd,
+    pprintConfig.copy(
+      maxWidth = () => consoleDim("cols"),
+      lines = () => consoleDim("lines") / 2
+    ),
     colorSet,
     stdout = printer.print,
     initialHistory = initialHistory,
@@ -47,7 +44,13 @@ class Repl(input: InputStream,
 
   def action() = for{
     // Condition to short circuit early if `interp` hasn't finished evaluating
-    stmts <- frontEnd.action()
+    stmts <- frontEnd().action(
+      input,
+      output,
+      colorSet.prompt + shellPrompt() + scala.Console.RESET,
+      interp.pressy.complete(_, interp.eval.previousImportBlock, _),
+      initialHistory
+    )
     _ <- Signaller("INT") { interp.mainThread.stop() }
     out <- interp.processLine(stmts, (f, x) => {saveHistory(x); f(x)}, _.foreach(printer.print))
   } yield {
@@ -91,3 +94,4 @@ object Repl{
 
   }
 }
+

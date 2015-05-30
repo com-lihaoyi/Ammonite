@@ -13,8 +13,8 @@ object Debug{
   }
 }
 class Ansi(output: Writer){
-  def save() = output.write(s"\033[s")
-  def restore() = output.write(s"\033[u")
+  def save() = output.write(s"\0337")
+  def restore() = output.write(s"\0338")
   def control(n: Int, c: Char) = output.write(s"\033[" + n + c)
 
   /**

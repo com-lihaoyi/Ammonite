@@ -3,6 +3,7 @@ package ammonite.repl.frontend
 import java.io.File
 
 import ammonite.pprint.{PPrinter, PPrint, Config, TPrint}
+import ammonite.repl.Ref
 
 import scala.reflect.runtime.universe._
 import acyclic.file
@@ -35,7 +36,11 @@ trait ReplAPI {
    * Read/writable prompt for the shell. Use this to change the
    * REPL prompt at any time!
    */
-  var shellPrompt: String
+  def shellPrompt: Ref[String]
+  /**
+   * The front-end REPL used to take user input. Modifiable!
+   */
+  def frontEnd: Ref[FrontEnd]
 
   /**
    * Display this help text

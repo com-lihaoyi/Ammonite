@@ -9,6 +9,7 @@ import ammonite.terminal.LazyList._
 // Test Unicode:  漢語;𩶘da
 object Term{
   def main(args: Array[String]): Unit = {
+    var history = List.empty[String]
     rec()
     @tailrec def rec(): Unit = {
       TermCore.readLine(
@@ -16,7 +17,9 @@ object Term{
         System.in,
         System.out,
         // Example multiline support by intercepting Enter key
-        multilineFilter orElse defaultFilter,
+        new HistoryFilter(history) orElse
+        multilineFilter orElse
+        defaultFilter,
         // Example displayTransform: underline all non-spaces
         displayTransform = (buffer, cursor) => {
           val buffer2 = buffer.flatMap{
@@ -29,12 +32,42 @@ object Term{
       ) match {
         case None => println("Bye!")
         case Some(s) =>
+          history = s :: history
           println(s)
           rec()
       }
     }
   }
 
+  def firstRow(cursor: Int, buffer: Vector[Char], width: Int) = {
+    cursor < width && (buffer.indexOf('\n') >= cursor || buffer.indexOf('\n') == -1)
+  }
+  def lastRow(cursor: Int, buffer: Vector[Char], width: Int) = {
+    (buffer.length - cursor) < width && (buffer.lastIndexOf('\n') < cursor || buffer.lastIndexOf('\n') == -1)
+  }
+  class HistoryFilter(history: => Seq[String]) extends TermCore.Filter{
+    var index = -1
+    var currentHistory = Vector[Char]()
+
+    def continue(b: Vector[Char], newIndex: Int, rest: LazyList[Int], c: Int) = {
+      if (index == -1 && newIndex != -1) currentHistory = b
+
+      index = newIndex
+
+      if (index == -1) TS(rest, currentHistory, c)
+      else TS(rest, history(index).toVector, c)
+    }
+    def filter: TermCore.Filter = {
+      case TI(TS(pref"\u001b[A$rest", b, c), w) if firstRow(c, b, w) =>
+        continue(b, (index + 1) min (history.length - 1), rest, 99999)
+      case TI(TS(pref"\u001b[B$rest", b, c), w) if lastRow(c, b, w) =>
+        continue(b, (index - 1) max -1, rest, 0)
+    }
+
+    def isDefinedAt(x: TermInfo) = filter.isDefinedAt(x)
+
+    def apply(v1: TermInfo) = filter.apply(v1)
+  }
   val TS = TermState
   val TI = TermInfo
   val multilineFilter: TermCore.Filter = {
