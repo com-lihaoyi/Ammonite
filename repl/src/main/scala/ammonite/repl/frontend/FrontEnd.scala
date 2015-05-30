@@ -124,9 +124,9 @@ object FrontEnd{
         )) match {
           case None => Res.Exit
           case Some(newCode) =>
-            val code = buffered + "\n" + newCode
+            val code = buffered + newCode
             Parsers.Splitter.parse(code) match {
-              case Result.Failure(_, index) if code.drop(index).trim() == "" => readCode(code)
+              case Result.Failure(_, index) if code.drop(index).trim() == "" => readCode(code + "\n")
               case f: Result.Failure => Res.Failure(SyntaxError.msg(f.input, f.parser, f.index))
               case Result.Success(split, idx) =>
                 Res.Success(code -> split)
