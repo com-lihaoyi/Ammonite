@@ -1,7 +1,9 @@
 package ammonite.repl.interp
 
 import java.io.File
+import java.nio.file.Files
 import acyclic.file
+import annotation.tailrec
 import ammonite.pprint
 import ammonite.repl._
 import ammonite.repl.frontend._
@@ -32,8 +34,12 @@ class Interpreter(shellPrompt0: Ref[String],
       Res.Failure(trace + "\nSomething unexpected went wrong =(")
     }
     Preprocessor.Output(code, printSnippet) <- preprocess(stmts, eval.getCurrentLine)
-    oldClassloader = Thread.currentThread().getContextClassLoader
-    out <- try{
+    out <- evaluateLine(code, printSnippet, printer)
+  } yield out
+
+  def evaluateLine(code: String, printSnippet: Seq[String], printer: Iterator[String] => Unit) = {
+    val oldClassloader = Thread.currentThread().getContextClassLoader
+    try{
       Thread.currentThread().setContextClassLoader(eval.evalClassloader)
       eval.processLine(
         code,
@@ -41,7 +47,31 @@ class Interpreter(shellPrompt0: Ref[String],
         printer
       )
     } finally Thread.currentThread().setContextClassLoader(oldClassloader)
-  } yield out
+  }
+
+  def processScript(code: String): Unit = {
+    val blocks = Parsers.splitScript(code).map(preprocess(_, eval.getCurrentLine))
+    val errors = blocks.collect{ case Res.Failure(err) => err }
+    if(!errors.isEmpty) 
+      stdout(Console.RED + errors.mkString("\n") + Console.RESET + "\n")
+    else
+      loop(blocks.collect{ case Res.Success(o) => o })
+
+    @tailrec def loop(blocks: Seq[Preprocessor.Output]): Unit = {
+      if(!blocks.isEmpty){
+        val Preprocessor.Output(code, _) = blocks.head //pretty printing results is disabled for scripts
+        val ev = evaluateLine(code, Seq(), _ => ())
+        ev match {
+          case Res.Failure(msg) =>
+            stdout(Console.RED + msg + Console.RESET + "\n")
+          case Res.Success(ev) =>
+            eval.update(ev.imports)
+            loop(blocks.tail)
+          case _ => loop(blocks.tail)
+        }
+      }
+    }
+  }
 
   def handleOutput(res: Res[Evaluated]) = {
     res match{
@@ -73,6 +103,15 @@ class Interpreter(shellPrompt0: Ref[String],
         Parsers.split(line),
         _.foreach(stdout)
       ))
+
+      def script(file: File): Unit = {
+        val content = Files.readAllBytes(file.toPath)
+        processScript(new String(content))
+      }
+
+      def script(path: String): Unit = {
+        script(new File(path))
+      }
 
       def handleJar(jar: File): Unit = {
         extraJars = extraJars ++ Seq(jar)
