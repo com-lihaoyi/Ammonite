@@ -211,9 +211,9 @@ object Pressy {
 
       val (i, all) = run.prefixed
 
-      val allNames = all.collect{ case (name, None) => name}
+      val allNames = all.collect{ case (name, None) => name}.sorted.distinct
                         
-      val signatures = all.collect{ case (name, Some(defn)) => defn }
+      val signatures = all.collect{ case (name, Some(defn)) => defn }.sorted.distinct
 
       (i - prefix.length, allNames, signatures)
     }

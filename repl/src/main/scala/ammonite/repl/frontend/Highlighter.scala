@@ -12,16 +12,16 @@ object Highlighter {
   object Stringy{ def unapply(s: Any): Option[String] = Some(s.toString)}
 
   def defaultHighlight(buffer: Vector[Char]) = Highlighter.highlight(
-  buffer,
-  {
-    case Literals.Expr.Interp | Literals.Pat.Interp => Console.RESET
-    case Literals.Comment => Console.BLUE
-    case ExprLiteral => Console.GREEN
-    case SimpleType => Console.GREEN
-    case Stringy(BackTicked(body))
-      if alphaKeywords.contains(body) => Console.YELLOW
-  },
-  endColor = Console.RESET
+    buffer,
+    {
+      case Literals.Expr.Interp | Literals.Pat.Interp => Console.RESET
+      case Literals.Comment => Console.BLUE
+      case ExprLiteral => Console.GREEN
+      case Stringy("BasicType") => Console.GREEN
+      case Stringy(BackTicked(body))
+        if alphaKeywords.contains(body) => Console.YELLOW
+    },
+    endColor = Console.RESET
   )
   def highlight(buffer: Vector[Char],
                 ruleColors: PartialFunction[Rule[_], String],
@@ -40,7 +40,7 @@ object Highlighter {
           val closeColor = indices.last._2
           val startIndex = indices.length
           indices += ((idx, color, true))
-          val resIndex = res() match {
+          res() match {
             case s: Result.Success[_] =>
               indices += ((s.index, closeColor, false))
               if (s.index == buffer.length) done = true

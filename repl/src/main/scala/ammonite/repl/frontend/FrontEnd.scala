@@ -1,6 +1,6 @@
 package ammonite.repl.frontend
 
-import java.io.{Writer, OutputStream, InputStream}
+import java.io.{OutputStreamWriter, Writer, OutputStream, InputStream}
 
 import ammonite.repl._
 import ammonite.terminal.Term.HistoryFilter
@@ -27,30 +27,51 @@ trait FrontEnd{
 
 object FrontEnd{
   object Ammonite extends FrontEnd{
+    def tabulate(snippets: Seq[String], width: Int) = {
+      val gap =   2
+      val maxLength = snippets.maxBy(_.replaceAll("\u001B\\[[;\\d]*m", "").length).length + gap
+      val columns = width / maxLength
+      snippets.grouped(columns).flatMap{
+        case first :+ last => first.map(_.padTo(width / columns, ' ')) :+ last :+ "\n"
+      }
+    }
+    @tailrec def findPrefix(a: String, b: String, index: Int): String = {
+      if (index >= a.length || index >= b.length || a(index) != b(index)) b.take(index)
+      else findPrefix(a, b, index + 1)
+    }
+
     def action(input: InputStream,
                output: OutputStream,
                shellPrompt: String,
                compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
                history: Seq[String]) = {
+      val writer = new OutputStreamWriter(output)
       val autocompleteFilter: TermCore.Filter = {
-        case TermState(9 ~: rest, b, c) => // Enter
+        case TermInfo(TermState(9 ~: rest, b, c), width) => // Enter
           val (newCursor, completions, details) = compilerComplete(c, b.mkString)
-          if
-          println()
-          details.foreach(println)
-          completions.foreach(println)
-          val sorted = completions.sorted
-          @tailrec def prefix(left: String, right: String, out: String): String = {
-            if (left.length > 0 && right.length > 0 && left(0) == right(0)) out
-            else prefix(left.substring(1), right.substring(1), out + left(0))
+          if (completions.length == 0 && details.length == 0) TermState(rest, b, c)
+          else {
+            writer.write("\n")
+            for (d <- details){
+              writer.write(Highlighter.defaultHighlight(d.toVector).mkString)
+              writer.write("\n")
+            }
+
+            writer.flush()
+
+            if (completions.length == 0) TermState(rest, b, c)
+            else {
+              val common = findPrefix(completions.head, completions.last, 0)
+              val colored = for(comp <- completions) yield {
+                val (left, right) = comp.splitAt(common.length)
+                left + Console.BLUE + right + Console.RESET
+              }
+              tabulate(colored, width).foreach(writer.write)
+              writer.flush()
+              val newBuffer = b.take(newCursor) ++ common ++ b.drop(c)
+              TermState(rest, newBuffer, newCursor + common.length)
+            }
           }
-          var common = prefix(sorted.first, sorted.last)
-
-
-          val prefix = b.take(newCursor) ++ common ++ b.drop(c)
-
-
-          TermState(rest, b, newCursor)
       }
 
       val multilineFilter: TermCore.Filter = {

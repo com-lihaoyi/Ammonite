@@ -17,7 +17,6 @@ object Res{
     case util.Failure(t) => Failure(errMsg(t))
   }
 
-
   /**
    * Successes map and flatmap just like a simple Box[T]
    */
@@ -182,7 +181,7 @@ object Parsers {
     }
   }
 
-  val Prelude = P( Annot.rep ~ `implicit`.? ~ `lazy`.? ~ LocalMod.rep )
+  val Prelude = P( (Annot ~ OneNLMax).rep ~ (Mod ~! Pass).rep )
   val Splitter = P( Semis.? ~ (scalaparse.Scala.Import | Prelude ~ BlockDef | StatCtx.Expr).!.rep(sep=Semis) ~ Semis.? ~ WL ~ End)
   def split(code: String) = {
     Splitter.parse(code) match{
@@ -213,4 +212,6 @@ object SyntaxError{
 }
 class SyntaxError(code: String, p: fastparse.core.Parser[_], idx: Int) extends Exception{
   override def toString() = SyntaxError.msg(code, p, idx)
+//  override def to[Col[_]](implicit cbf: scala.collection.generic.CanBuildFrom[Nothing,A,Col[A @scala.annotation.unchecked.uncheckedVariance]])
+//  : Col[A @scala.annotation.unchecked.uncheckedVariance]
 }
