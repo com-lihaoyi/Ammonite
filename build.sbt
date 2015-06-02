@@ -145,7 +145,7 @@ lazy val repl = project
       "jline" % "jline" % "2.12",
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
       "org.apache.ivy" % "ivy" % "2.4.0",
-      "com.lihaoyi" %% "scalaparse" % "0.1.6-SNAPSHOT"
+      "com.lihaoyi" %% "scalaparse" % "0.1.7"
     ),
     javaOptions += "-Xmx4G",
     assemblyOption in assembly := (assemblyOption in assembly).value.copy(

@@ -30,7 +30,7 @@ object Highlighter {
       var indices = collection.mutable.Buffer((0, endColor, false))
       var done = false
       val input = buffer.mkString
-      ammonite.repl.Parsers.Splitter.parse(input, instrumenter = (rule, idx, res) => {
+      ammonite.repl.Parsers.Splitter.parse(input, instrument = (rule, idx, res) => {
         for{
           color <- ruleColors.lift(rule.asInstanceOf[Rule[_]])
           if !done // If we're done, do nothing
