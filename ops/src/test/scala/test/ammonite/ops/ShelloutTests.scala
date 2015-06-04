@@ -20,7 +20,7 @@ object ShelloutTests extends TestSuite{
       )
     }
     'chained{
-      assert((%git %branch).output.mkString.contains("master"))
+      assert((%git %init).output.mkString.contains("Reinitialized existing Git repository"))
     }
     'failures{
       intercept[RuntimeException]{ %ls "does-not-exist" }
