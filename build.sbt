@@ -1,6 +1,6 @@
 
 import scalatex.ScalatexReadme
-
+import sbtassembly.AssemblyPlugin.defaultShellScript
 scalaVersion := "2.11.6"
 
 crossScalaVersions := Seq(
@@ -125,8 +125,16 @@ lazy val tools = project
     name := "ammonite-tools"
   )
 
+
+lazy val terminal = project
+  .settings(sharedSettings:_*)
+  .settings(
+    name := "ammonite-terminal"
+  )
+
+
 lazy val repl = project
-  .dependsOn(pprint)
+  .dependsOn(pprint, terminal)
   .settings(sharedSettings:_*)
   .settings(
     crossVersion := CrossVersion.full,
@@ -137,9 +145,13 @@ lazy val repl = project
       "jline" % "jline" % "2.12",
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
       "org.apache.ivy" % "ivy" % "2.4.0",
-      "com.lihaoyi" %% "scalaparse" % "0.1.5"
+      "com.lihaoyi" %% "scalaparse" % "0.1.7"
     ),
-    javaOptions += "-Xmx4G"//,
+    javaOptions += "-Xmx4G",
+    assemblyOption in assembly := (assemblyOption in assembly).value.copy(
+      prependShellScript = Some(defaultShellScript)
+    ),
+    assemblyJarName in assembly := s"${name.value}-${version.value}"
 //    fork in (Test, testOnly) := true
   )
 
@@ -155,4 +167,3 @@ lazy val readme = ScalatexReadme(
 )
 
 
-lazy val root = project.in(file(".")).aggregate(pprint,  ops, tools, repl)

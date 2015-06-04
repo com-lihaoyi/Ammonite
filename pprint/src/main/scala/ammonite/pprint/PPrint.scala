@@ -61,7 +61,7 @@ object PPrinter extends LowPriPPrinter{
   def apply[T](r: (T, Config) => Iter[String]): PPrinter[T] = {
     new PPrinter[T]{ 
       def render(t: T, c: Config) = {
-        if(c.lines > 0)
+        if(c.lines() > 0)
           takeFirstLines(c, r(t, c))
         else r(t, c)
       }
@@ -169,8 +169,8 @@ object PPrinter extends LowPriPPrinter{
       else{
 
         val (remainingLines, remainingChars) =
-          if(str(pos) == '\n') (lines - 1, cfg.maxWidth) //starting a new line
-          else if(chars == 0) (lines - 1, cfg.maxWidth - 1) //wrapping around and printing a character
+          if(str(pos) == '\n') (lines - 1, cfg.maxWidth()) //starting a new line
+          else if(chars == 0) (lines - 1, cfg.maxWidth() - 1) //wrapping around and printing a character
           else (lines, chars - 1) //simply printing a character
         if(remainingLines == 0) (lines, chars, Some(pos + 1))
         else charIter(str, pos + 1, remainingLines, remainingChars)
@@ -194,7 +194,7 @@ object PPrinter extends LowPriPPrinter{
         }
       }
     }
-    strIter(cfg.lines, cfg.maxWidth, Iter.empty)
+    strIter(cfg.lines(), cfg.maxWidth(), Iter.empty)
   }
 
   implicit def ArrayRepr[T: PPrint] = PPrinter[Array[T]]{
@@ -211,7 +211,7 @@ object PPrinter extends LowPriPPrinter{
       def render(wrapper: Show[A], c: Config) = {
         implicitly[PPrint[A]].pprinter.render(
           wrapper.value,
-          c.copy(lines = wrapper.lines)
+          c.copy(lines = () => wrapper.lines)
         )
       }
     }
@@ -288,7 +288,7 @@ object Internals {
       chunkFunc(c).flatMap(", " +: _.toStream)
                   .toStream
                   .drop(1)
-    val effectiveWidth = c.maxWidth - (c.depth * c.indent)
+    val effectiveWidth = c.maxWidth() - (c.depth * c.indent)
     // Make sure we don't read more from the `chunks` stream that we
     // have to before deciding to go vertically.
     //
@@ -300,7 +300,7 @@ object Internals {
       case head #:: rest =>
         if (head.contains("\n")) true
         else {
-          val nextWidth = currentWidth + head.length
+          val nextWidth = currentWidth + head.replaceAll(ansiRegex, "").length
           if (nextWidth > effectiveWidth) true
           else checkOverflow(rest, nextWidth)
         }
@@ -310,6 +310,7 @@ object Internals {
     if (overflow) handleChunksVertical(name, c, chunkFunc)
     else Iter(coloredName, "(") ++ horizontalChunks ++ Iter(")")
   }
+  val ansiRegex = "\u001B\\[[;\\d]*m"
 
   /**
    * Same as `handleChunks`, but lays things out vertically instead of trying

@@ -10,7 +10,7 @@ object ShelloutTests extends TestSuite{
     'basic{
       val listed = (%ls).output.toSet
       val expected = Set(
-        "build.sbt", "ops", "pprint", "tools",
+        "build.sbt", "ops", "pprint", "tools", "terminal",
         "project", "readme", "readme.md", "repl", "target"
       )
       assert(
@@ -20,7 +20,7 @@ object ShelloutTests extends TestSuite{
       )
     }
     'chained{
-      assert((%git %branch).output.mkString.contains("master"))
+      assert((%git %init).output.mkString.contains("Reinitialized existing Git repository"))
     }
     'failures{
       intercept[RuntimeException]{ %ls "does-not-exist" }

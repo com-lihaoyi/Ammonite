@@ -1,6 +1,7 @@
 package ammonite.repl
 
 import acyclic.file
+import ammonite.pprint.{PPrinter, PPrint}
 import fastparse._
 
 import scala.util.Try
@@ -15,7 +16,6 @@ object Res{
     case util.Success(s) => Success(s)
     case util.Failure(t) => Failure(errMsg(t))
   }
-
 
   /**
    * Successes map and flatmap just like a simple Box[T]
@@ -92,6 +92,11 @@ trait Ref[T]{
   def update(t: T): Unit
 }
 object Ref{
+  implicit def refPPrint[T: PPrint]: PPrinter[Ref[T]] = PPrinter{ (ref, cfg) =>
+    Iterator(cfg.color.prefix("Ref"), "(") ++
+    implicitly[PPrint[T]].pprinter.render(ref(), cfg) ++
+    Iterator(")")
+  }
   def apply[T](value0: T) = {
     var value = value0
     new Ref[T]{
@@ -104,7 +109,20 @@ object Ref{
     def update(t: T) = update0(t)
   }
 }
-
+trait Cell[T]{
+  def apply(): T
+  def update(): Unit
+}
+object Cell{
+  class LazyHolder[T](t: => T){
+    lazy val value = t
+  }
+  def apply[T](t: => T) = new Cell[T] {
+    var inner: LazyHolder[T] = new LazyHolder(t)
+    def update() = inner = new LazyHolder(t)
+    def apply() = inner.value
+  }
+}
 /**
  * Nice pattern matching for chained exceptions
  */
@@ -163,7 +181,7 @@ object Parsers {
     }
   }
 
-  val Prelude = P( Annot.rep ~ `implicit`.? ~ `lazy`.? ~ LocalMod.rep )
+  val Prelude = P( (Annot ~ OneNLMax).rep ~ (Mod ~! Pass).rep )
   val Splitter = P( Semis.? ~ (scalaparse.Scala.Import | Prelude ~ BlockDef | StatCtx.Expr).!.rep(sep=Semis) ~ Semis.? ~ WL ~ End)
   def split(code: String) = {
     Splitter.parse(code) match{

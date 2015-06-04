@@ -3,6 +3,7 @@ package ammonite.repl.frontend
 import java.io.File
 
 import ammonite.pprint.{PPrinter, PPrint, Config, TPrint}
+import ammonite.repl.Ref
 
 import scala.reflect.runtime.universe._
 import acyclic.file
@@ -35,7 +36,11 @@ trait ReplAPI {
    * Read/writable prompt for the shell. Use this to change the
    * REPL prompt at any time!
    */
-  var shellPrompt: String
+  def shellPrompt: Ref[String]
+  /**
+   * The front-end REPL used to take user input. Modifiable!
+   */
+  def frontEnd: Ref[FrontEnd]
 
   /**
    * Display this help text
@@ -64,6 +69,8 @@ trait ReplAPI {
    * Tools related to loading external scripts and code into the REPL
    */
   def load: Load
+
+  def colors: Ref[ColorSet]
 
   /**
    * Throw away the current scala.tools.nsc.Global and get a new one
@@ -141,7 +148,7 @@ object ColorSet{
 }
 
 trait DefaultReplAPI extends FullReplAPI {
-  def colors: ColorSet
+
   def help = "Hello!"
   object Internal extends Internal{
     def combinePrints(iters: Iterator[String]*) = {
@@ -159,16 +166,16 @@ trait DefaultReplAPI extends FullReplAPI {
           case Some(s) => Iterator(pprint.cfg.color.literal(s))
         }
         Iterator(
-          colors.ident, ident, colors.reset, ": ",
+          colors().ident, ident, colors().reset, ": ",
           implicitly[TPrint[T]].render(cfg), " = "
         ) ++ rhs
       }
     }
     def printDef(definitionLabel: String, ident: String) = {
-      Iterator("defined ", colors.`type`, definitionLabel, " ", colors.ident, ident, colors.reset)
+      Iterator("defined ", colors().`type`, definitionLabel, " ", colors().ident, ident, colors().reset)
     }
     def printImport(imported: String) = {
-      Iterator(colors.`type`, "import ", colors.ident, imported, colors.reset)
+      Iterator(colors().`type`, "import ", colors().ident, imported, colors().reset)
     }
   }
 }

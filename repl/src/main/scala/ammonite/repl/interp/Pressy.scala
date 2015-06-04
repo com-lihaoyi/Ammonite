@@ -27,6 +27,37 @@ object Pressy {
             currentFile: BatchSourceFile,
             allCode: String,
             index: Int){
+
+    /**
+     * Dumb things that turn up in the autocomplete that nobody needs or wants
+     */
+    def blacklisted(s: pressy.Symbol) = {
+      val blacklist = Set(
+        "scala.Predef.any2stringadd.+",
+        "scala.Any.##",
+        "java.lang.Object.##",
+        "scala.<byname>",
+        "scala.<empty>",
+        "scala.<repeated>",
+        "scala.<repeated...>",
+        "scala.Predef.StringFormat.formatted",
+        "scala.Predef.Ensuring.ensuring",
+        "scala.Predef.ArrowAssoc.->",
+        "scala.Predef.ArrowAssoc.→",
+        "java.lang.Object.synchronized",
+        "java.lang.Object.ne",
+        "java.lang.Object.eq",
+        "java.lang.Object.wait",
+        "java.lang.Object.notifyAll",
+        "java.lang.Object.notify"
+      )
+
+      blacklist(s.fullNameAsName('.').decoded) ||
+      s.isImplicit ||
+      s.isDeprecated ||
+      s.decodedName == "<init>" ||
+      s.decodedName.contains('$')
+    }
     val r = new Response[pressy.Tree]
     pressy.askTypeAt(Position.offset(currentFile, index), r)
     val tree = r.get.fold(x => x, e => throw e)
@@ -45,18 +76,16 @@ object Pressy {
         t +: children.toSeq
       }
 
-      pressy.ask(() =>
-        for {
-          member <- pressy.RootClass.typeSignature.members.toList
-          sym <- rec(member)
-          // sketchy name munging because I don't know how to do this properly
-          strippedName = sym.nameString.stripPrefix("package$").stripSuffix("$")
-          if strippedName.startsWith(name)
-          (pref, _) = sym.fullNameString.splitAt(sym.fullNameString.lastIndexOf('.') + 1)
-          out = pref + strippedName
-          if out != ""
-        } yield (out, None)
-      )
+      for {
+        member <- pressy.RootClass.typeSignature.members.toList
+        sym <- rec(member)
+        // sketchy name munging because I don't know how to do this properly
+        strippedName = sym.nameString.stripPrefix("package$").stripSuffix("$")
+        if strippedName.startsWith(name)
+        (pref, _) = sym.fullNameString.splitAt(sym.fullNameString.lastIndexOf('.') + 1)
+        out = pref + strippedName
+        if out != ""
+      } yield (out, None)
     }
     def handleTypeCompletion(position: Int, decoded: String, offset: Int) = {
 
@@ -65,18 +94,23 @@ object Pressy {
       (position + offset, handleCompletion(r, prefix))
     }
 
-    def handleCompletion(r: List[pressy.Member], prefix: String) = {
-      pressy.ask{() => r.filter(_.sym.name.decoded.startsWith(prefix)).map{
-        case x if x.sym.name.decoded == prefix =>
-          (x.sym.name.decoded, Some(x.sym.defString))
-        case x =>
-          (x.sym.name.decoded, None)
-      }}
+    def handleCompletion(r: List[pressy.Member], prefix: String) = pressy.ask{ () =>
+      r.filter(_.sym.name.decoded.startsWith(prefix))
+        .filter(m => !blacklisted(m.sym))
+        .map{ x  =>
+          (
+            x.sym.name.decoded,
+            if (x.sym.name.decoded != prefix) None
+            else Some(x.sym.defString)
+          )
+        }
     }
 
     def prefixed: (Int, Seq[(String, Option[String])]) = tree match {
       case t @ pressy.Select(qualifier, name) =>
+
         val dotOffset = if (qualifier.pos.point == t.pos.point) 0 else 1
+
         handleTypeCompletion(qualifier.pos.end, name.decoded, dotOffset)
 
       case t @ pressy.Import(expr, selectors)  =>
@@ -110,9 +144,12 @@ object Pressy {
         else (t.pos.end, deep :+ ("" -> None))
 
       case t =>
-        index -> ask(index, pressy.askScopeCompletion).map { s =>
-          pressy.ask(() => (s.sym.name.decoded, None))
-        }
+        val comps = ask(index, pressy.askScopeCompletion)
+
+        index -> pressy.ask(() =>
+          comps.filter(m => !blacklisted(m.sym))
+               .map { s => (s.sym.name.decoded, None) }
+        )
     }
     def ask(index: Int, query: (Position, Response[List[pressy.Member]]) => Unit) = {
       val position = new OffsetPosition(currentFile, index)
@@ -174,10 +211,9 @@ object Pressy {
 
       val (i, all) = run.prefixed
 
-      val allNames = all.collect{ case (name, None) => name}
-                        .filter(_ != "<init>")
-                        .filter(!_.contains('$'))
-      val signatures = all.collect{ case (name, Some(defn)) => defn }
+      val allNames = all.collect{ case (name, None) => name}.sorted.distinct
+                        
+      val signatures = all.collect{ case (name, Some(defn)) => defn }.sorted.distinct
 
       (i - prefix.length, allNames, signatures)
     }

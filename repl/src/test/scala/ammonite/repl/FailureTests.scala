@@ -18,13 +18,13 @@ object FailureTests extends TestSuite{
 
         @ 1 + vale
         error: Compilation Failed
-        Main.scala:28: not found: value vale
+        Main.scala:29: not found: value vale
         1 + vale
             ^
 
         @ val x = 1 + vale
         error: Compilation Failed
-        Main.scala:28: not found: value vale
+        Main.scala:29: not found: value vale
         1 + vale
             ^
       """)

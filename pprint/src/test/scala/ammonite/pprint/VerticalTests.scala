@@ -32,7 +32,7 @@ object VerticalTests extends TestSuite{
   }
   val tests = TestSuite{
     'Laziness{
-      implicit def default = ammonite.pprint.Config(maxWidth = 20, lines = 5)
+      implicit def default = ammonite.pprint.Config(maxWidth = () => 20, lines = () => 5)
       'list{
         'Horizontal{
           val C = new C
@@ -96,7 +96,7 @@ object VerticalTests extends TestSuite{
     }
     'Vertical{
 
-      implicit def default = ammonite.pprint.Config(25)
+      implicit def default = ammonite.pprint.Config(maxWidth = () => 25)
       'singleNested {
         * - check(
           List("12", "12", "12"),
@@ -344,7 +344,7 @@ object VerticalTests extends TestSuite{
       }
 
       'shortNonTruncated{
-        implicit val cfg = Config.Defaults.PPrintConfig.copy(lines = 15)
+        implicit val cfg = Config.Defaults.PPrintConfig.copy(lines = () => 15)
         * - check("a"*1000, "\"" + "a"*1000 + "\"")
         * - check(List(1,2,3,4), "List(1, 2, 3, 4)")
         * - check(
@@ -369,7 +369,7 @@ object VerticalTests extends TestSuite{
       }
 
       'shortLinesTruncated{
-        implicit val cfg = Config.Defaults.PPrintConfig.copy(lines = 15)
+        implicit val cfg = Config.Defaults.PPrintConfig.copy(lines = () => 15)
         * - check(
           List.fill(15)("foobarbaz"),
           """List(
@@ -412,8 +412,8 @@ object VerticalTests extends TestSuite{
 
       'longLineTruncated{
         implicit val cfg = Config.Defaults.PPrintConfig.copy(
-          maxWidth = 100,
-          lines = 3
+          maxWidth = () => 100,
+          lines = () => 3
         )
         check(
           "a" * 1000,
@@ -423,7 +423,7 @@ object VerticalTests extends TestSuite{
 
       'stream{
         implicit val cfg = Config.Defaults.PPrintConfig.copy(
-          lines = 5
+          lines = () => 5
         )
         check(
           Stream.continually("foo"),
@@ -440,8 +440,8 @@ object VerticalTests extends TestSuite{
 
     'wrappedLines{
       implicit val cfg = Config.Defaults.PPrintConfig.copy(
-        maxWidth = 8,
-        lines = 5
+        maxWidth = () => 8,
+        lines = () => 5
       )
       check(
         "1234567890\n"*10,

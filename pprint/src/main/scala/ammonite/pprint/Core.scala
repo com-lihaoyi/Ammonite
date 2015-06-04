@@ -14,8 +14,8 @@ import acyclic.file
  *                renamig `WrappedArray` to `Array` or getting rid of
  *                TupleN *
  */
-case class Config(maxWidth: Int = 100,
-                  lines: Int = 0,
+case class Config(maxWidth: () => Int = () => 100,
+                  lines: () => Int = () => 0,
                   depth: Int = 0,
                   indent: Int = 2,
                   literalColor: String = null,
