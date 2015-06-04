@@ -184,7 +184,7 @@ object SyntaxError{
   def msg(code: String, p: fastparse.core.Parser[_], idx: Int) = {
     val locationString = {
       val (first, last) = code.splitAt(idx)
-      val lastSnippet = last.split('\n')(0)
+      val lastSnippet = last.split('\n').headOption.getOrElse("")
       val firstSnippet = first.reverse.split('\n').lift(0).getOrElse("").reverse
       firstSnippet + lastSnippet + "\n" + (" " * firstSnippet.length) + "^"
     }
