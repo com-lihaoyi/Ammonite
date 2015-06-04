@@ -31,7 +31,7 @@ object UnitTests extends TestSuite{
 
     'comment - test("//a", "><B|//a>")
     'literal - test("1", "><G|1>")
-    'expressions - test("val (x, y) = 1 + 2 + 3", "><Y|val> (x, y) =<G| 1> + <G|2> + <G|3>")
+    'expressions - test("val (x, y) = 1 + 2 + 3", "><Y|val> (x, y) = <G|1> + <G|2> + <G|3>")
     'interpolation - test(
       """(s"hello ${world + 1}")""",
       """>(<G|s"hello >${world + <G|1>}<G|">)"""
@@ -42,7 +42,7 @@ object UnitTests extends TestSuite{
     )
     'underscore - test(
       """val _ = 1""",
-      """><Y|val><Y| _> =<G| 1>"""
+      """><Y|val><Y| _> = <G|1>"""
     )
     'nonTrivial - test(
       """def processLine(stmts: Seq[String],
@@ -67,19 +67,19 @@ object UnitTests extends TestSuite{
       """,
       """><Y|def> processLine(stmts:<G| Seq[String]>,
                           saveHistory:<G| (String => Unit, String) => Unit>,
-                          printer:<G| Iterator[String] => Unit>) =<Y| for>{<Y|
+                          printer:<G| Iterator[String] => Unit>) = <Y|for>{<Y|
             _> <- Catching {<Y| case> Ex(x@<Y|_>*) =>
-<Y|              val> Res.Failure(trace) = Res.Failure(x)
+              <Y|val> Res.Failure(trace) = Res.Failure(x)
               Res.Failure(trace +<G| "\nSomething unexpected went wrong =(">)
             }
             Preprocessor.Output(code, printSnippet) <- preprocess(stmts, eval.getCurrentLine)
 <Y|            _> = saveHistory(history.append(<Y|_>), stmts.mkString(<G|"; ">))
             oldClassloader = Thread.currentThread().getContextClassLoader
-            out <-<Y| try>{
+            out <- <Y|try>{
               Thread.currentThread().setContextClassLoader(eval.evalClassloader)
               eval.processLine(
-                code,<G|
-                s"ReplBridge.shell.Internal.combinePrints(>${printSnippet.mkString(<G|", ">)}<G|)">,
+                code,
+                <G|s"ReplBridge.shell.Internal.combinePrints(>${printSnippet.mkString(<G|", ">)}<G|)">,
                 printer
               )
             }<Y| finally> Thread.currentThread().setContextClassLoader(oldClassloader)
