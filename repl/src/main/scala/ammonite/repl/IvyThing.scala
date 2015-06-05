@@ -47,7 +47,7 @@ object IvyThing {
   def resolveArtifact(groupId: String,
                       artifactId: String,
                       version: String,
-                      verbosity: Int = 2) = {
+                      verbosity: Int = 2) = synchronized {
     maxLevel = verbosity
     val ivy = Ivy.newInstance{
 
