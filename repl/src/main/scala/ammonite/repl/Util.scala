@@ -182,9 +182,20 @@ object Parsers {
   }
 
   val Prelude = P( (Annot ~ OneNLMax).rep ~ (Mod ~! Pass).rep )
-  val Splitter = P( Semis.? ~ (scalaparse.Scala.Import | Prelude ~ BlockDef | StatCtx.Expr).!.rep(sep=Semis) ~ Semis.? ~ WL ~ End)
+  val Statement = P ( scalaparse.Scala.Import | Prelude ~ BlockDef | StatCtx.Expr )
+  def StatementBlock(blockSep: P0) = P ( Semis.? ~ (!blockSep ~ Statement).!.rep(sep=Semis) ~ Semis.? )
+  val Splitter = P( StatementBlock(Fail) ~ WL ~ End)
   def split(code: String) = {
     Splitter.parse(code) match{
+      case Result.Success(value, idx) => value
+      case f: Result.Failure => throw new SyntaxError(code, f.parser, f.index)
+    }
+  }
+
+  val CompilationUnit = P( WL ~ StatementBlock("@\n") ~ WL )
+  val ScriptSplitter = P( CompilationUnit.rep(1, "@\n") ~ End)
+  def splitScript(code: String) = {
+    ScriptSplitter.parse(code) match{
       case Result.Success(value, idx) => value
       case f: Result.Failure => throw new SyntaxError(code, f.parser, f.index)
     }

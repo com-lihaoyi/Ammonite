@@ -110,6 +110,15 @@ trait Load extends (String => Unit){
    * evaluates them one after another
    */
   def apply(line: String): Unit
+
+  /**
+   * Loads and executes the scriptfile on the specified path.
+   * Compilation units separated by `@\n` are evaluated sequentially.
+   * If an error happens it prints an error message to the console.
+   */ 
+  def script(path: String): Unit
+
+  def script(file: File): Unit
 }
 
 // End of ReplAPI
