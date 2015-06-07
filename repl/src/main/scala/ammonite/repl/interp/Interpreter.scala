@@ -99,14 +99,13 @@ class Interpreter(shellPrompt0: Ref[String],
 
     object load extends Load{
 
-      def apply(line: String) = handleOutput(processLine(
-        Parsers.split(line),
-        _.foreach(stdout)
-      ))
+      def apply(line: String) = {
+        processScript(line)
+      }
 
       def script(file: File): Unit = {
         val content = Files.readAllBytes(file.toPath)
-        processScript(new String(content))
+        apply(new String(content))
       }
 
       def script(path: String): Unit = {
