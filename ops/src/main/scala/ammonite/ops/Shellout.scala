@@ -13,12 +13,10 @@ import scala.language.dynamics
  * %ps "aux"
  */
 object % extends %(Vector.empty)
-case class %(cmd: Vector[String]) extends Dynamic with CommandBuilder[CommandResult, %]{
+case class %(cmd: Vector[String]) extends Dynamic with CommandBuilder[Int, %]{
   def extend(cmd2: Vector[String]) = new %(cmd ++ cmd2)
-  def execute(): CommandResult = {
-    import scala.sys.process._
-    CommandResult(cmd.lineStream)
-
+  def execute() = {
+    new java.lang.ProcessBuilder().command(cmd:_*).inheritIO().start().waitFor()
     // This should work some day too
     //    %git                    %.git
     //    %git %diff              %.git(%).diff
@@ -36,19 +34,22 @@ case class CommandResult(output: Stream[String]) extends Seq[String]{
 }
 
 object CommandResult{
-  implicit def commandResultRepr(implicit c: Config) =
-      PPrinter[CommandResult]((x, c) =>
-        x.output.iterator.flatMap(line =>
-          Iterator("\n", c.color.literal(line))
-        )
+  implicit def commandResultRepr(implicit c: Config) = new PPrint(
+    PPrinter[CommandResult]((x, c) =>
+      x.output.iterator.flatMap(line =>
+        Iterator("\n", c.color.literal(line))
       )
+    ),
+    c
+  )
 }
 
 object %% extends %%(Vector.empty)
-case class %%(cmd: Vector[String]) extends Dynamic with CommandBuilder[Int, %%]{
+case class %%(cmd: Vector[String]) extends Dynamic with CommandBuilder[CommandResult, %%]{
   def extend(cmd2: Vector[String]) = new %%(cmd ++ cmd2)
   def execute() = {
-    new java.lang.ProcessBuilder().command(cmd:_*).inheritIO().start().waitFor()
+    import scala.sys.process._
+    CommandResult(cmd.lineStream)
   }
 }
 

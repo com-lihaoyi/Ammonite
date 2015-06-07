@@ -165,7 +165,7 @@ object Parsers {
   private implicit def wspStr(s: String) = P(WL ~ s)(Utils.literalize(s).toString)
 
   val PatVarSplitter = {
-    val Prefixes = P(`implicit`.? ~ `lazy`.? ~ (`var` | `val`))
+    val Prefixes = P(Prelude ~ (`var` | `val`))
     val Lhs = P( Prefixes ~! BindPattern.rep(1, "," ~! Pass) ~ (`:` ~! Type).? )
     P( Lhs.! ~ (`=` ~! WL ~ StatCtx.Expr.!) ~ End )
   }

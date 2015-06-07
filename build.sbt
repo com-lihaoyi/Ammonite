@@ -111,6 +111,10 @@ lazy val pprint = project
     }
   )
 
+/**
+ * Concise, type-safe operating-system operations in Scala: filesystem,
+ * subprocesses, and other such things.
+ */
 lazy val ops = project
   .dependsOn(pprint)
   .settings(sharedSettings:_*)
@@ -125,14 +129,22 @@ lazy val tools = project
     name := "ammonite-tools"
   )
 
-
+/**
+ * A standalone re-implementation of a composable readline-style REPL,
+ * without any behavior associated with it. Contains an echo-repl that
+ * can be run to test the REPL interactions
+ */
 lazy val terminal = project
   .settings(sharedSettings:_*)
   .settings(
     name := "ammonite-terminal"
   )
 
-
+/**
+ * A better Scala REPL, which can be dropped in into any project or run
+ * standalone in a Scala project to provide a better interactive experience
+ * for Scala
+ */
 lazy val repl = project
   .dependsOn(pprint, terminal)
   .settings(sharedSettings:_*)
@@ -155,6 +167,22 @@ lazy val repl = project
 //    fork in (Test, testOnly) := true
   )
 
+/**
+ * A batteries-included version of [[repl]]. This contains the necessary
+ * dependencies and configuration to be used comfortably as an system-shell
+ */
+lazy val shell = project
+  .dependsOn(repl, ops)
+  .settings(sharedSettings:_*)
+  .settings(
+    crossVersion := CrossVersion.full,
+    test in assembly := {},
+    name := "ammonite-shell",
+    assemblyOption in assembly := (assemblyOption in assembly).value.copy(
+      prependShellScript = Some(defaultShellScript)
+    ),
+    assemblyJarName in assembly := s"${name.value}-${version.value}"
+  )
 lazy val readme = ScalatexReadme(
   projectId = "readme",
   wd = file(""),

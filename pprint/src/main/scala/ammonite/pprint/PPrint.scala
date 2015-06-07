@@ -6,8 +6,9 @@ import scala.language.experimental.macros
 import annotation.tailrec
 import acyclic.file
 import scala.{Iterator => Iter}
-
+import compat._
 object PPrint extends Internals.LowPriPPrint{
+
   /**
    * Prettyprint a strongly-typed value, falling back to toString
    * if you don't know what to do with it. Generally used for human-facing
@@ -365,10 +366,9 @@ object Internals {
     // Should use blackbox.Context in 2.11, doing this for 2.10 compatibility
     def FinalRepr[T: c.WeakTypeTag](c: MacroContext.Context) = c.Expr[PPrint[T]] {
       import c.universe._
-
       val tpe = c.weakTypeOf[T]
 
-      util.Try(tpe.typeSymbol.asClass) match {
+      val res = util.Try(tpe.typeSymbol.asClass) match {
 
         case util.Success(f) if f.isCaseClass && !f.isModuleClass =>
 
@@ -382,6 +382,13 @@ object Internals {
               .asInstanceOf[MethodType]
               .params
               .map(_.typeSignature)
+              .map{
+              case TypeRef(pre, sym, args)  if sym == definitions.RepeatedParamClass =>
+                val TypeRef(_, b2, _) = typeOf[Seq[String]]
+                internal.typeRef(pre, b2, args)
+
+              case x => x
+            }
 
           val arity = paramTypes.length
 
@@ -397,12 +404,17 @@ object Internals {
             )
 
           val tupleName = newTermName(s"Product${arity}Unpacker")
+          val actionName = Seq("unapply", "unapplySeq")
+            .map(newTermName(_))
+            .find(companion.tpe.member(_) != NoSymbol)
+            .getOrElse(c.abort(c.enclosingPosition, "None of the following methods " +
+            "were defined: unapply, unapplySeq))"))
           val thingy ={
-            def get = q"$companion.unapply(t).get"
+            def get = q"$companion.$actionName(t).get"
             arity match{
               case 0 => q"()"
               case 1 => q"Tuple1($get)"
-              case n => q"$companion.unapply(t).get"
+              case n => q"$companion.$actionName(t).get"
             }
           }
           // We're fleshing this out a lot more than necessary to help
@@ -428,6 +440,7 @@ object Internals {
             implicitly[ammonite.pprint.Config]
           )"""
       }
+      res
     }
   }
 

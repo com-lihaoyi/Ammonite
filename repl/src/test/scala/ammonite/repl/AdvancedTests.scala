@@ -304,6 +304,19 @@ object AdvancedTests extends TestSuite{
         res0: Int = 3
       """)
     }
+    'private{
+      check.session("""
+        @ private val x = 1; y = x + 1
+        x: Int = 1
+        y: Int = 2
+
+        @ y
+        res1: Int = 2
+
+        @ x
+        error: not found: value x
+      """)
+    }
     'truncation{
       check.session("""
       @ Seq.fill(20)(100)

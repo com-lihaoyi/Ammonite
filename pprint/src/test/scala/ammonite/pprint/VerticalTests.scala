@@ -15,6 +15,7 @@ object Nested{
 
 }
 case class Foo(integer: Int, sequence: Seq[String])
+
 case class FooG[T](t: T, sequence: Seq[String])
 case class FooNoArgs()
 object VerticalTests extends TestSuite{
@@ -452,5 +453,5 @@ object VerticalTests extends TestSuite{
     }
   }
 
-  
+
 }

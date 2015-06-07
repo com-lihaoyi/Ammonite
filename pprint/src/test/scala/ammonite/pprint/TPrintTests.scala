@@ -199,7 +199,7 @@ object TPrintTests extends TestSuite{
       * - checkColor[Map[Int, String]]("<Map>[<Int>, <String>]")
       * - checkColor[collection.mutable.Seq[Int]]("<collection>.<mutable>.<Seq>[<Int>]")
 //      Not going to bother coloring these for now, since they're quite uncommon
- //      * - checkColor[{type T = Int; val x: String; def y: Char; var z: Double}](
+//      * - checkColor[{type T = Int; val x: String; def y: Char; var z: Double}](
 //                    "{type <T> = <Int>; val <x>: <String>; def <y>: <Char>; var <z>: <Double>}"
 //      )
       * - checkColor[Map[K, V] forSome { type K <: Int; val x: Float; type V >: (String, Float with Double) }](

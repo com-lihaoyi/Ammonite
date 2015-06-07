@@ -8,22 +8,17 @@ import utest.framework.TestSuite
 object ShelloutTests extends TestSuite{
   val tests = TestSuite {
     'basic{
-      val listed = (%ls).output.toSet
+      val listed = (%%ls "ops/src/test/resources/testdata").output.toSet
       val expected = Set(
-        "build.sbt", "ops", "pprint", "tools", "terminal",
-        "project", "readme", "readme.md", "repl", "target"
+        "folder1", "folder2", "File.txt"
       )
-      assert(
-        listed == expected,
-        (%ls "ops/src/test/resources/testdata").output.toSet ==
-        Set("folder1", "folder2", "File.txt")
-      )
+      assert(listed == expected)
     }
     'chained{
-      assert((%git %init).output.mkString.contains("Reinitialized existing Git repository"))
+      assert((%%git %init).output.mkString.contains("Reinitialized existing Git repository"))
     }
     'failures{
-      intercept[RuntimeException]{ %ls "does-not-exist" }
+      intercept[RuntimeException]{ %%ls "does-not-exist" }
     }
   }
 }
