@@ -6,7 +6,7 @@ import scala.annotation.tailrec
 import scala.collection.{immutable => imm, mutable}
 import scala.util.matching.Regex
 import ammonite.pprint._
-
+case class FooStar(integer: Int, sequence: String*)
 object HorizontalTests extends TestSuite{
 
   def check[T: PPrint](t: T, expected: String) = {
@@ -183,6 +183,8 @@ object HorizontalTests extends TestSuite{
         )
 
         check(FooNoArgs(), "FooNoArgs()")
+        check(FooStar(1, "2", "3"), """FooStar(1, Array("2", "3"))""")
+
       }
     }
 

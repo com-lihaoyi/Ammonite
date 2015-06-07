@@ -10,8 +10,7 @@ import java.io.{File, InputStream}
 import java.nio.file.{Files, Paths, StandardOpenOption}
 import acyclic.file
 
-import ammonite.pprint
-import ammonite.pprint.PPrint
+import ammonite.pprint.{Config, PPrinter, PPrint}
 
 import Extensions._
 object OpError{
@@ -49,7 +48,7 @@ object Internals{
     }
 
     object lines extends StreamableOp1[Path, String, Vector[String]]{
-      def materialize(i: Iterator[String]) = i.toVector
+      def materialize(src: Path, i: Iterator[String]) = i.toVector
       def !!(arg: Path) = {
         val is = readIn(arg)
         io.Source.fromInputStream(is).getLines()
@@ -87,8 +86,8 @@ object Internals{
  * the iterator however you wish
  */
 trait StreamableOp1[T1, R, C <: Seq[R]] extends Op1[T1, C]{
-  def materialize(i: Iterator[R]): C
-  def apply(arg: T1) = materialize(!!(arg))
+  def materialize(src: T1, i: Iterator[R]): C
+  def apply(arg: T1) = materialize(arg, !!(arg))
   def !!(arg: T1): Iterator[R]
 }
 
@@ -148,38 +147,54 @@ object rm extends Op1[Path, Unit]{
 }
 
 object LsSeq{
-  implicit def lsSeqRepr(implicit wd: Path, cfg: pprint.Config): PPrint[LsSeq] =
-    new PPrint[LsSeq](
-      pprint.PPrinter[LsSeq] { (p, c) =>
-        implicit val cfg = c
-        implicitly[PPrint[Seq[RelPath]]].render(p.toSeq.map(_ - wd))
-      },
-      implicitly
-    )
-}
+  import language.experimental.macros
+  implicit def lsSeqRepr(implicit cfg: Config): PPrint[LsSeq] = new PPrint(
+    PPrinter(
+      (t: LsSeq, c: Config) =>
+        ammonite.pprint.Internals.handleChunksVertical("LsSeq", c, (c) =>
+          t.listed.iterator.map(PPrint(_))
+        )
 
-class LsSeq(s: Stream[Path]) extends Seq[Path]{
-  def length = s.length
-  def apply(idx: Int) = s.apply(idx)
-  def iterator = s.iterator
+    ),
+    cfg
+  )
+
 }
 
 /**
+ * A specialized Seq[Path] used to provide better a better pretty-printed
+ * experience
+ */
+case class LsSeq(base: Path, listed: RelPath*) extends Seq[Path]{
+  def length = listed.length
+  def apply(idx: Int) = base/listed.apply(idx)
+  def iterator = listed.iterator.map(base/)
+}
+
+trait ImplicitOp[V] extends Op1[Path, V]{
+  /**
+   * Make the common case of looking around the current directory fast by
+   * letting the user omit the argument if there's one in scope
+   */
+  def !(implicit arg: Path): V = apply(arg)
+}
+/**
  * List the files and folders in a directory
  */
-object ls extends StreamableOp1[Path, Path, LsSeq]{
-  def materialize(i: Iterator[Path]) = new LsSeq(i.toStream)
+object ls extends StreamableOp1[Path, Path, LsSeq] with ImplicitOp[LsSeq]{
+  def materialize(src: Path, i: Iterator[Path]) = new LsSeq(src, i.toStream.map(_-src):_*)
   def !!(arg: Path) = {
     import scala.collection.JavaConverters._
     Files.newDirectoryStream(arg.nio).iterator().asScala.map(x => Path(x))
   }
 
+
   /**
    * Reads a classpath resource into memory, either as a
    * string, as a Seq[String] of lines, or as a Array[Byte]
    */
-  object rec extends StreamableOp1[Path, Path, LsSeq]{
-    def materialize(i: Iterator[Path]) = new LsSeq(i.toStream)
+  object rec extends StreamableOp1[Path, Path, LsSeq]with ImplicitOp[LsSeq]{
+    def materialize(src: Path, i: Iterator[Path]) = new LsSeq(src, i.toStream.map(_-src):_*)
     def recursiveListFiles(f: File): Iterator[File] = {
       def these = Option(f.listFiles).iterator.flatMap(x=>x)
       these ++ these.filter(_.isDirectory).flatMap(recursiveListFiles)
@@ -280,7 +295,8 @@ object exists extends Op1[Path, Boolean]{
  */
 case class kill(signal: Int) extends Op1[Int, CommandResult]{
   def apply(pid: Int): CommandResult = {
-    %kill("-" + signal, pid.toString)
+
+    %%kill("-" + signal, pid.toString)
   }
 }
 object ln extends Op2[Path, Path, Unit]{

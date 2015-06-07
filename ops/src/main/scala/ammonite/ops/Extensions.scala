@@ -60,6 +60,11 @@ class FilterMapExt[+T, Repr](i: TraversableLike[T, Repr]){
   }
 
   /**
+   * Alias for `foreach`
+   */
+  def |![B, That](f: T => Unit) = i.foreach(f)
+
+  /**
    * Alias for `filter`
    */
   def |?(p: T => Boolean): Repr = i.filter(p)
@@ -85,6 +90,10 @@ class FilterMapExt2[+T](i: Iterator[T]){
    */
   def ||[B, That](f: T => GenTraversableOnce[B]) = i.flatMap(f)
 
+  /**
+   * Alias for `foreach`
+   */
+  def |![B, That](f: T => Unit) = i.foreach(f)
 
   /**
    * Alias for `filter`
