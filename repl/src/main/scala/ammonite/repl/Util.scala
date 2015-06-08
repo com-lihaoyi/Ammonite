@@ -38,13 +38,25 @@ object Res{
   }
   case class Failure(s: String) extends Failing
   object Failure{
+    def highlightFrame(f: StackTraceElement) = {
+      import Console._
+      val src =
+        if (f.isNativeMethod) GREEN + "Native Method" + RED
+        else s"$GREEN${f.getFileName}$RED:$GREEN${f.getLineNumber}$RED"
+
+      val prefix :+ clsName = f.getClassName.split('.').toSeq
+      val prefixString = prefix.map(_+'.').mkString("")
+      val clsNameString = clsName.replace("$", RED+"$"+YELLOW)
+      val method = s"$RED$prefixString$YELLOW$clsNameString$RED.${f.getMethodName}"
+      s"\t$method($src)"
+    }
     def apply(exceptions: Seq[Throwable], stop: String = null): Failure = {
       val traces = exceptions.map(exception =>
         exception.toString + "\n" +
         exception
           .getStackTrace
           .takeWhile(x => !(x.getMethodName == stop))
-          .map("\t" + _)
+          .map(highlightFrame)
           .mkString("\n")
       )
       Res.Failure(traces.mkString("\n"))

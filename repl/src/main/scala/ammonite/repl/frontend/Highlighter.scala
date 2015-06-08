@@ -12,6 +12,7 @@ object Highlighter {
   object Stringy{ def unapply(s: Any): Option[String] = Some(s.toString)}
 
   def defaultHighlight(buffer: Vector[Char]) = Highlighter.highlight(
+    ammonite.repl.Parsers.Splitter,
     buffer,
     {
       case Literals.Expr.Interp | Literals.Pat.Interp => Console.RESET
@@ -23,14 +24,15 @@ object Highlighter {
     },
     endColor = Console.RESET
   )
-  def highlight(buffer: Vector[Char],
+  def highlight(parser: fastparse.P[_],
+                buffer: Vector[Char],
                 ruleColors: PartialFunction[Rule[_], String],
                 endColor: String = Console.RESET) = {
     val indices = {
       var indices = collection.mutable.Buffer((0, endColor, false))
       var done = false
       val input = buffer.mkString
-      ammonite.repl.Parsers.Splitter.parse(input, instrument = (rule, idx, res) => {
+      parser.parse(input, instrument = (rule, idx, res) => {
         for{
           color <- ruleColors.lift(rule.asInstanceOf[Rule[_]])
           if !done // If we're done, do nothing
