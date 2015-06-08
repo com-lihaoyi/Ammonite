@@ -30,8 +30,11 @@ object ShelloutTests extends TestSuite{
     'workingDirectory{
       implicit var wd = cwd
       val listed1 = %%ls
+
       wd /= up
+
       val listed2 = %%ls
+
       assert(listed2 != listed1)
     }
   }
