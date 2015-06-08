@@ -20,6 +20,10 @@ package object ops extends Extensions with RelPathStuff{
    */
   lazy val cwd = ops.Path(new java.io.File(""))
 
+  object ImplicitWd{
+    implicit lazy val cwd = ops.cwd
+  }
+
   implicit class Transformable1(p: java.nio.file.Path){
     def amm = {
       val s = p.toString
@@ -43,4 +47,15 @@ package object ops extends Extensions with RelPathStuff{
 
 
   implicit def fileData(p: Path) = stat.full(p)
+
+  /**
+   * Dynamic shell command execution. This allows you to run commands which
+   * are not provided by Ammonite, by shelling out to bash. e.g. try
+   *
+   * %ls
+   * %ls "/"
+   * %ps 'aux
+   */
+  def %(implicit wd: Path) = new Command(wd, Vector.empty, Shellout.executeInteractive)
+  def %%(implicit wd: Path) = new Command(wd, Vector.empty, Shellout.executeStream)
 }

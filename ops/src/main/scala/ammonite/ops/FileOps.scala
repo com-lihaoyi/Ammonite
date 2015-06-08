@@ -296,7 +296,7 @@ object exists extends Op1[Path, Boolean]{
 case class kill(signal: Int) extends Op1[Int, CommandResult]{
   def apply(pid: Int): CommandResult = {
 
-    %%kill("-" + signal, pid.toString)
+    %%(wd = Path(new java.io.File(""))).kill("-" + signal, pid.toString)
   }
 }
 object ln extends Op2[Path, Path, Unit]{
