@@ -15,7 +15,9 @@ object ShelloutTests extends TestSuite{
       assert(listed == expected)
     }
     'chained{
-      assert((%%git %init).output.mkString.contains("Reinitialized existing Git repository"))
+      assert((%%git 'init).output.mkString.contains("Reinitialized existing Git repository"))
+      assert((%%git "init").output.mkString.contains("Reinitialized existing Git repository"))
+      assert((%%ls cwd).output.mkString.contains("readme.md"))
     }
     'failures{
       intercept[RuntimeException]{ %%ls "does-not-exist" }

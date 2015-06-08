@@ -52,50 +52,18 @@ case class %%(cmd: Vector[String]) extends Dynamic with CommandBuilder[CommandRe
     CommandResult(cmd.lineStream)
   }
 }
-
-
+object Shellable{
+  implicit def StringShellable(s: String): Shellable = Shellable(s)
+  implicit def SymbolShellable(s: Symbol): Shellable = Shellable(s.name)
+  implicit def BasePathShellable(s: BasePath[_]): Shellable = Shellable(s.toString)
+  implicit def NumericShellable[T: Numeric](s: T): Shellable = Shellable(s.toString)
+}
+case class Shellable(s: String)
 trait CommandBuilder[R, B <: CommandBuilder[R, B]]{
   def selectDynamic(s: String) = extend(Vector(s)).execute()
-  def applyDynamic[T, V](op: String)(args: T*)(implicit ce: CommandExtender[R, B, T, V]): V = {
-    ce.extend(this, op, args)
+  def applyDynamic(op: String)(args: Shellable*): R = {
+    this.extend(Vector(op) ++ args.map(_.s)).execute()
   }
   def extend(cmd2: Vector[String]): B
   def execute(): R
-}
-
-trait CommandExtender[R, B <: CommandBuilder[R, B], T, V]{
-  def extend(cmd: CommandBuilder[R, B], op: String, args: Seq[T]): V
-}
-
-object CommandExtender{
-  /**
-   * You can call a command with strings, e.g.
-   *
-   * %git("reset", "--hard", "head")
-   *
-   * And we'll execute it as
-   *
-   * Seq("git", "reset", "--hard", "head")
-   */
-  implicit def Str[R, B <: CommandBuilder[R, B]] = new CommandExtender[R, B, String, R]{
-    def extend(cmd: CommandBuilder[R, B], op: String, args: Seq[String]) =
-      cmd.extend(Vector(op) ++ args).execute()
-  }
-
-
-  /**
-   * You can always interleave a command e.g.
-   *
-   * %git %diff or %.git(%).diff
-   *
-   * And we'll treat it as executing the command
-   *
-   * Seq("git", "diff")
-   *
-   * immediately and returning the result
-   */
-  implicit def Chain[R, B <: CommandBuilder[R, B]] = new CommandExtender[R, B, %.type, B]{
-    def extend(cmd: CommandBuilder[R, B], op: String, args: Seq[%.type]) =
-      cmd.extend(Vector(op))
-  }
 }
