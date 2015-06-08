@@ -11,6 +11,7 @@ import scalaparse.syntax.Identifiers._
 object UnitTests extends TestSuite{
 
   def testHighlight(buffer: Vector[Char]) = Highlighter.highlight(
+    Parsers.Splitter,
     buffer,
     {
       case Literals.Expr.Interp | Literals.Pat.Interp => ">"

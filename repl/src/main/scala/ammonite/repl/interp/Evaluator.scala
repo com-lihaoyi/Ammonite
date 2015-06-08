@@ -189,10 +189,15 @@ object Evaluator{
       )
       _ = currentLine += 1
       _ <- Catching{
+        // Exit
         case Ex(_: InvEx, _: InitEx, ReplExit)  => Res.Exit
+        // Interrupted during pretty-printing
         case Ex(_: ThreadDeath)                 => interrupted()
+        // Interrupted during evaluation
         case Ex(_: InvEx, _: ThreadDeath)       => interrupted()
+
         case Ex(_: InvEx, _: InitEx, userEx@_*) => Res.Failure(userEx, stop = "$main")
+        case Ex(_: InvEx, userEx@_*)            => Res.Failure(userEx, stop = "$main")
         case Ex(userEx@_*)                      => Res.Failure(userEx, stop = "evaluatorRunPrinter")
       }
     } yield {
