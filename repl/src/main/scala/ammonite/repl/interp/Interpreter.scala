@@ -136,6 +136,7 @@ class Interpreter(shellPrompt0: Ref[String],
     def compiler = Interpreter.this.compiler.compiler
     def newCompiler() = init()
     def history = history0.toVector.dropRight(1)
+    def historyS = history0
     def show[T](a: T, lines: Int = 0) = ammonite.pprint.Show(a, lines)
   }
 

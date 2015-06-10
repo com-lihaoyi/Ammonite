@@ -14,13 +14,13 @@ class Repl(input: InputStream,
            output: OutputStream,
            pprintConfig: pprint.Config = pprint.Config.Colors.PPrintConfig,
            shellPrompt0: String = "@ ",
-           initialHistory: Seq[String] = Nil,
-           saveHistory: String => Unit = _ => (),
+           initialHistory: History = new History,
+           saveHistory: History => Unit = _ => (),
            predef: String = Repl.defaultPredef) {
 
   val shellPrompt = Ref(shellPrompt0)
 
-  var history = Vector.empty[String]
+  val history = initialHistory
 
   val colorSet = Ref[ColorSet](ColorSet.Default)
   val frontEnd = Ref[FrontEnd](FrontEnd.JLine)
@@ -40,7 +40,7 @@ class Repl(input: InputStream,
     ),
     colorSet,
     printer.print,
-    initialHistory ++ history,
+    history,
     predef
   )
 
@@ -53,8 +53,8 @@ class Repl(input: InputStream,
       initialHistory ++ history
     )
     _ = {
-      history = history :+ code
-      saveHistory(code)
+      history += code
+      saveHistory(history)
       cols.update()
       lines.update()
     }
@@ -85,15 +85,9 @@ object Repl{
     val delimiter = "\n\n\n"
     val shell = new Repl(
       System.in, System.out,
-      initialHistory = try{
-        io.Source.fromFile(saveFile).mkString.split(delimiter)
-      }catch{case e: FileNotFoundException =>
-        Nil
-      },
+      initialHistory = Storage.loadHistory,
       saveHistory = { s =>
-        val fw = new FileWriter(saveFile, true)
-        try fw.write(delimiter + s)
-        finally fw.close()
+        Storage.saveHistory(s)
       },
       predef = predef
     )
