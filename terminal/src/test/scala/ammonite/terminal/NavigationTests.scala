@@ -45,8 +45,8 @@ object NavigationTests extends TestSuite{
     }
     val down = Term.moveDown(gridv, _: Int, width)
     val up = Term.moveUp(gridv, _: Int, width)
-    val home = Term.moveStartEnd(gridv, _: Int, 0)
-    val end = Term.moveStartEnd(gridv, _: Int, 1)
+    val home = Term.moveStartEnd(gridv, _: Int, width, 0, -1)
+    val end = Term.moveStartEnd(gridv, _: Int, width, 1, 1)
   }
   val tests = TestSuite{
     'simple{
@@ -291,10 +291,40 @@ object NavigationTests extends TestSuite{
           abcdefg\
           hijk
           lmnopqr\
-          s
-          t_vwxyz
+          _
+          tuvwxyz
           """,
-          down, down
+          end
+        )
+        check(
+          """
+          abcdefg\
+          hijk
+          _mnopqr\
+          s
+          tuvwxyz
+          """,
+          home
+        )
+//        check(
+//          """
+//          abcdefg\
+//          _ijk
+//          lmnopqr\
+//          s
+//          tuvwxyz
+//          """,
+//          up, home
+//        )
+        check(
+          """
+          abcdefg\
+          _ijk
+          lmnopqr\
+          s
+          tuvwxyz
+          """,
+          up, up, end
         )
       }
     }

@@ -139,10 +139,25 @@ object Term{
     (chunks, chunkStarts, chunkIndex)
   }
 
-  def moveStartEnd(b: Vector[Char], c: Int, boundaryOffset: Int) = {
+  def moveStartEnd(b: Vector[Char],
+                   c: Int,
+                   w: Int,
+                   boundaryOffset: Int,
+                   nextChunkOffset: Int) = {
     val (chunks, chunkStarts, chunkIndex) = findChunks(b, c)
-    val offset = chunkStarts(chunkIndex + boundaryOffset)
-    offset - boundaryOffset
+    val currentColumn = (c - chunkStarts(chunkIndex)) % w
+    chunks.lift(chunkIndex + nextChunkOffset) match{
+      case Some(next) =>
+        val boundary = chunkStarts(chunkIndex + boundaryOffset) - boundaryOffset
+        if ((boundary - c) > (w - currentColumn)) {
+          val delta= w - currentColumn
+          c + delta
+        }
+        else boundary
+      case None =>
+        c + nextChunkOffset * 9999
+    }
+
   }
 
   def moveUpDown(b: Vector[Char],
@@ -181,8 +196,8 @@ object Term{
 
     case TS(pref"\u001b[5~$rest", b, c) => Debug("fn-up"); TS(rest, b, c - 9999)
     case TS(pref"\u001b[6~$rest", b, c) => Debug("fn-down"); TS(rest, b, c + 9999)
-    case TS(pref"\u001b[F$rest", b, c) => Debug("fn-right"); TS(rest, b, moveStartEnd(b, c, 1))
-    case TS(pref"\u001b[H$rest", b, c) => Debug("fn-left"); TS(rest, b, moveStartEnd(b, c, 0))
+    case TI(TS(pref"\u001b[F$rest", b, c), w) => Debug("fn-right"); TS(rest, b, moveStartEnd(b, c, w, 1, 1))
+    case TI(TS(pref"\u001b[H$rest", b, c), w) => Debug("fn-left"); TS(rest, b, moveStartEnd(b, c, w, 0, -1))
 
   }
   lazy val advancedNavFilter: TermCore.Filter = {
