@@ -50,7 +50,7 @@ class Repl(input: InputStream,
       output,
       colorSet().prompt + shellPrompt() + scala.Console.RESET,
       interp.pressy.complete(_, interp.eval.previousImportBlock, _),
-      initialHistory ++ history
+      history
     )
     _ = {
       history += code
