@@ -21,7 +21,7 @@ class Interpreter(shellPrompt0: Ref[String],
                   pprintConfig: pprint.Config,
                   colors0: Ref[ColorSet],
                   stdout: String => Unit,
-                  history0: => Seq[String],
+                  history0: => History,
                   predef: String){ interp =>
 
   val dynamicClasspath = new VirtualDirectory("(memory)", None)
@@ -135,9 +135,16 @@ class Interpreter(shellPrompt0: Ref[String],
     def search(target: scala.reflect.runtime.universe.Type) = Interpreter.this.compiler.search(target)
     def compiler = Interpreter.this.compiler.compiler
     def newCompiler() = init()
-    def history = history0.toVector.dropRight(1)
-    def historyS = history0
+    def history = history0
     def show[T](a: T, lines: Int = 0) = ammonite.pprint.Show(a, lines)
+
+    implicit val historyPPrinter: pprint.PPrinter[History] = 
+      new pprint.PPrinter[History]{
+        def render(t: History, c: pprint.Config)={
+          val seq = "\n" +: t.flatMap{ code => Seq("@ ", code, "\n") }
+          seq.iterator
+      }
+    }
   }
 
   var compiler: Compiler = _

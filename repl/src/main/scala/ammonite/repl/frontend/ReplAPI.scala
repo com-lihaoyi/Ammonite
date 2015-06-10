@@ -3,7 +3,7 @@ package ammonite.repl.frontend
 import java.io.File
 
 import ammonite.pprint.{PPrinter, PPrint, Config, TPrint}
-import ammonite.repl.Ref
+import ammonite.repl.{Ref, History}
 
 import scala.reflect.runtime.universe._
 import acyclic.file
@@ -50,7 +50,7 @@ trait ReplAPI {
   /**
    * History of commands that have been entered into the shell
    */
-  def history: Seq[String]
+  def history: History
 
   /**
    * Get the `Type` object of [[T]]. Useful for finding
@@ -94,6 +94,8 @@ trait ReplAPI {
    * to shadow this with your own definition to change how things look
    */
   implicit var pprintConfig: ammonite.pprint.Config
+
+  implicit val historyPPrinter: ammonite.pprint.PPrinter[History]
 }
 trait Load extends (String => Unit){
   /**
