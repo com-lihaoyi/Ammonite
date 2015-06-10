@@ -138,14 +138,21 @@ object Term{
     }
     (chunks, chunkStarts, chunkIndex)
   }
-  def move(b: Vector[Char],
-           c: Int,
-           w: Int,
-           boundaryOffset: Int,
-           nextChunkOffset: Int,
-           checkRes: Int,
-           check: (Int, Int) => Boolean,
-           isDown: Boolean) = {
+
+  def moveStartEnd(b: Vector[Char], c: Int, boundaryOffset: Int) = {
+    val (chunks, chunkStarts, chunkIndex) = findChunks(b, c)
+    val offset = chunkStarts(chunkIndex + boundaryOffset)
+    offset - boundaryOffset
+  }
+
+  def moveUpDown(b: Vector[Char],
+                 c: Int,
+                 w: Int,
+                 boundaryOffset: Int,
+                 nextChunkOffset: Int,
+                 checkRes: Int,
+                 check: (Int, Int) => Boolean,
+                 isDown: Boolean) = {
     val (chunks, chunkStarts, chunkIndex) = findChunks(b, c)
     val offset = chunkStarts(chunkIndex + boundaryOffset)
     if (check(checkRes, offset)) checkRes
@@ -160,10 +167,10 @@ object Term{
     }
   }
   def moveUp(b: Vector[Char], c: Int, w: Int) = {
-    move(b, c, w, 0, -1, c - w, _ > _, false)
+    moveUpDown(b, c, w, 0, -1, c - w, _ > _, false)
   }
   def moveDown(b: Vector[Char], c: Int, w: Int) = {
-    move(b, c, w, 1, 1, c + w, _ <= _, true)
+    moveUpDown(b, c, w, 1, 1, c + w, _ <= _, true)
   }
 
   lazy val basicNavFilter : TermCore.Filter = {
@@ -172,10 +179,10 @@ object Term{
     case TS(pref"\u001b[C$rest", b, c) => Debug("right"); TS(rest, b, c + 1)
     case TS(pref"\u001b[D$rest", b, c) => Debug("left"); TS(rest, b, c - 1)
 
-    case TS(pref"\u001b[5~$rest", b, c) => Debug("fn-up"); TS(rest, b, c)
-    case TS(pref"\u001b[6~$rest", b, c) => Debug("fn-down"); TS(rest, b, c)
-    case TS(pref"\u001b[F$rest", b, c) => Debug("fn-right"); TS(rest, b, c + 9999)
-    case TS(pref"\u001b[H$rest", b, c) => Debug("fn-left"); TS(rest, b, c - 9999)
+    case TS(pref"\u001b[5~$rest", b, c) => Debug("fn-up"); TS(rest, b, c - 9999)
+    case TS(pref"\u001b[6~$rest", b, c) => Debug("fn-down"); TS(rest, b, c + 9999)
+    case TS(pref"\u001b[F$rest", b, c) => Debug("fn-right"); TS(rest, b, moveStartEnd(b, c, 1))
+    case TS(pref"\u001b[H$rest", b, c) => Debug("fn-left"); TS(rest, b, moveStartEnd(b, c, 0))
 
   }
   lazy val advancedNavFilter: TermCore.Filter = {
