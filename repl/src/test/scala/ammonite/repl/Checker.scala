@@ -14,7 +14,7 @@ class Checker {
     ammonite.pprint.Config.Defaults.PPrintConfig.copy(lines = () => 15),
     Ref(ColorSet.BlackWhite),
     stdout = allOutput += _,
-    history0 = Nil,
+    history0 = new History,
     predef = predef
   )
 
