@@ -2,7 +2,6 @@ package ammonite.terminal
 
 import utest._
 
-import scala.collection.{immutable => imm}
 
 object NavigationTests extends TestSuite{
   def normalize(s: String) = {
@@ -10,10 +9,10 @@ object NavigationTests extends TestSuite{
     val min = lines.map(_.indexWhere(_ != ' '))
       .filter(_ != -1)
       .min
-    lines.drop(1).dropRight(1).map(_.drop(min)).mkString("\n")
+    lines.drop(1).dropRight(1).map(_.drop(min)).mkString("\n").replace("\\\n", "")
 
   }
-  def check(grid0: String,
+  def check0(grid0: String,
             start0: String,
             end0: String,
             actions: (Int => Int)*) = {
@@ -39,29 +38,37 @@ object NavigationTests extends TestSuite{
     println(startCursor + " -> " + endCursor)
     assert(end == endState)
   }
+  class Checker(width: Int, grid: String, start: String){
+    val gridv = normalize(grid).toVector
+    def apply(end: String, actions: (Int => Int)*) = {
+      NavigationTests.check0(grid, start, end, actions:_*)
+    }
+    val down = Term.moveDown(gridv, _: Int, width)
+    val up = Term.moveUp(gridv, _: Int, width)
+    val home = Term.moveStartEnd(gridv, _: Int, 0)
+    val end = Term.moveStartEnd(gridv, _: Int, 1)
+  }
   val tests = TestSuite{
     'simple{
       // Tests for a simple, not-wrap-around
       // grid of characters
-      val width = 5
-      val grid =
-        """
-        abcd
-        efgh
-        ijkl
-        """
-      val gridv = normalize(grid).toVector
-
-      val start =
-        """
-        abcd
-        e_gh
-        ijkl
+      val check = new Checker(
+        width = 5,
+        grid = """
+          abcd
+          efgh
+          ijkl
+        """ ,
+        start = """
+          abcd
+          e_gh
+          ijkl
         """
 
-      def check(end: String, actions: (Int => Int)*) = {
-        NavigationTests.check(grid, start, end, actions:_*)
-      }
+      )
+
+      import check._
+
       'noop - check(
         """
         abcd
@@ -70,8 +77,7 @@ object NavigationTests extends TestSuite{
         """,
         x => x
       )
-      val down = Term.moveDown(gridv, _: Int, width)
-      val up = Term.moveUp(gridv, _: Int, width)
+
       'upsAndDowns{
 
         'down - check(
@@ -138,7 +144,7 @@ object NavigationTests extends TestSuite{
           efgh_
           ijkl
           """,
-          Term.moveStartEnd(gridv, _, 1)
+          end
         )
         'start - check(
           """
@@ -146,39 +152,33 @@ object NavigationTests extends TestSuite{
           _fgh
           ijkl
           """,
-          Term.moveStartEnd(gridv, _, 0)
+          home
         )
       }
     }
     'jagged{
       // tests where the lines of characters
       // are of uneven lengths
-      val width = 10
-      val grid =
+      val check = new Checker(
+        width = 10,
+        grid = """
+          abcdefg
+          hijk
+          lmnopqr
+          s
+          tuvwxyz
+        """,
+        start = """
+          abcdefg
+          hijk
+          lm_opqr
+          s
+          tuvwxyz
         """
-        abcdefg
-        hijk
-        lmnopqr
-        s
-        tuvwxyz
-        """
-      val gridv = normalize(grid).toVector
+      )
 
-      val start =
-        """
-        abcdefg
-        hijk
-        lm_opqr
-        s
-        tuvwxyz
-        """
+      import check._
 
-      val down = Term.moveDown(gridv, _: Int, width)
-      val up = Term.moveUp(gridv, _: Int, width)
-
-      def check(end: String, actions: (Int => Int)*) = {
-        NavigationTests.check(grid, start, end, actions:_*)
-      }
       'truncate - check(
         """
         abcdefg
@@ -217,8 +217,86 @@ object NavigationTests extends TestSuite{
         s
         tuvwxyz
         """,
-        Term.moveStartEnd(gridv, _, 1), up
+        end, up
       )
+    }
+    'wrapping{
+      // tests where some lines are so long that they start
+      // wrapping onto the next ones. Navigating around they
+      // should behave like separate lines
+      val check = new Checker(
+        width = 7,
+        grid = """
+          abcdefg\
+          hijk
+          lmnopqr\
+          s
+          tuvwxyz
+        """,
+        start = """
+          abcdefg\
+          hijk
+          l_nopqr\
+          s
+          tuvwxyz
+        """
+      )
+      import check._
+      'updown{
+        check(
+          """
+          abcdefg\
+          h_jk
+          lmnopqr\
+          s
+          tuvwxyz
+          """,
+          up
+        )
+        check(
+          """
+          a_cdefg\
+          hijk
+          lmnopqr\
+          s
+          tuvwxyz
+          """,
+          up, up
+        )
+        check(
+          """
+          abcdefg\
+          hijk
+          lmnopqr\
+          s_
+          tuvwxyz
+          """,
+          down
+        )
+        check(
+          """
+          abcdefg\
+          hijk
+          lmnopqr\
+          s
+          t_vwxyz
+          """,
+          down, down
+        )
+      }
+      'startend{
+
+        check(
+          """
+          abcdefg\
+          hijk
+          lmnopqr\
+          s
+          t_vwxyz
+          """,
+          down, down
+        )
+      }
     }
   }
 }
