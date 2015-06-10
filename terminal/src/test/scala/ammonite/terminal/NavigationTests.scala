@@ -41,6 +41,8 @@ object NavigationTests extends TestSuite{
   }
   val tests = TestSuite{
     'simple{
+      // Tests for a simple, not-wrap-around
+      // grid of characters
       val width = 5
       val grid =
         """
@@ -68,6 +70,8 @@ object NavigationTests extends TestSuite{
         """,
         x => x
       )
+      val down = Term.moveDown(gridv, _: Int, width)
+      val up = Term.moveUp(gridv, _: Int, width)
       'upsAndDowns{
 
         'down - check(
@@ -76,7 +80,7 @@ object NavigationTests extends TestSuite{
           efgh
           i_kl
           """,
-          Term.moveDown(gridv, _, width)
+          down
         )
         'up - check(
           """
@@ -84,7 +88,7 @@ object NavigationTests extends TestSuite{
           efgh
           ijkl
           """,
-          Term.moveUp(gridv, _, width)
+          up
         )
         'updown - check(
           """
@@ -92,8 +96,7 @@ object NavigationTests extends TestSuite{
           e_gh
           ijkl
           """,
-          Term.moveUp(gridv, _, width),
-          Term.moveDown(gridv, _, width)
+          up, down
         )
         'upup - check(
           """
@@ -101,8 +104,7 @@ object NavigationTests extends TestSuite{
           efgh
           ijkl
           """,
-          Term.moveUp(gridv, _, width),
-          Term.moveUp(gridv, _, width)
+          up, up
         )
         'downdown- check(
           """
@@ -110,8 +112,7 @@ object NavigationTests extends TestSuite{
           efgh
           ijkl_
           """,
-          Term.moveDown(gridv, _, width),
-          Term.moveDown(gridv, _, width)
+          down, down
         )
         'upupdown - check(
           """
@@ -119,9 +120,7 @@ object NavigationTests extends TestSuite{
           _fgh
           ijkl
           """,
-          Term.moveUp(gridv, _, width),
-          Term.moveUp(gridv, _, width),
-          Term.moveDown(gridv, _, width)
+          up, up, down
         )
         'downdownup - check(
           """
@@ -129,9 +128,7 @@ object NavigationTests extends TestSuite{
           efgh_
           ijkl
           """,
-          Term.moveDown(gridv, _, width),
-          Term.moveDown(gridv, _, width),
-          Term.moveUp(gridv, _, width)
+          down, down, up
         )
       }
       'startEnd{
@@ -152,6 +149,76 @@ object NavigationTests extends TestSuite{
           Term.moveStartEnd(gridv, _, 0)
         )
       }
+    }
+    'jagged{
+      // tests where the lines of characters
+      // are of uneven lengths
+      val width = 10
+      val grid =
+        """
+        abcdefg
+        hijk
+        lmnopqr
+        s
+        tuvwxyz
+        """
+      val gridv = normalize(grid).toVector
+
+      val start =
+        """
+        abcdefg
+        hijk
+        lm_opqr
+        s
+        tuvwxyz
+        """
+
+      val down = Term.moveDown(gridv, _: Int, width)
+      val up = Term.moveUp(gridv, _: Int, width)
+
+      def check(end: String, actions: (Int => Int)*) = {
+        NavigationTests.check(grid, start, end, actions:_*)
+      }
+      'truncate - check(
+        """
+        abcdefg
+        hijk
+        lmnopqr
+        s
+        t_vwxyz
+        """,
+        down, down
+      )
+      'truncateBackUp - check(
+        """
+        abcdefg
+        hijk
+        l_nopqr
+        s
+        tuvwxyz
+        """,
+        down, down, up, up
+      )
+      'upup- check(
+        """
+        ab_defg
+        hijk
+        lmnopqr
+        s
+        tuvwxyz
+        """,
+        up, up
+      )
+      'endup- check(
+        """
+        abcdefg
+        hijk_
+        lmnopqr
+        s
+        tuvwxyz
+        """,
+        Term.moveStartEnd(gridv, _, 1), up
+      )
     }
   }
 }
