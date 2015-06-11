@@ -4,60 +4,12 @@ import utest._
 
 
 object NavigationTests extends TestSuite{
-  def normalize(s: String) = {
-    val lines = s.lines.toVector
-    val min = lines.map(_.indexWhere(_ != ' '))
-      .filter(_ != -1)
-      .min
-    lines.drop(1).dropRight(1).map(_.drop(min)).mkString("\n").replace("\\\n", "")
 
-  }
-  def check0(grid0: String,
-            start0: String,
-            end0: String,
-            actions: TermCore.Action*) = {
-
-
-    val grid = normalize(grid0)
-    val start = normalize(start0)
-    val end = normalize(end0)
-
-    val startCursor = start.indexOf('_')
-    val (endGrid, endCursor) = actions.foldLeft((grid.toVector, startCursor)) {
-      case ((g, c), f) =>
-        val (g1, c1) = f(g, c)
-        (g1, math.min(grid.length, math.max(0, c1)))
-    }
-
-    val endState =
-      if (endCursor == grid.length) grid + '_'
-      else if (grid(endCursor) != '\n') grid.updated(endCursor, '_')
-      else{
-        val (a, b) = grid.splitAt(endCursor)
-        a + '_' + b
-      }
-
-    println(startCursor + " -> " + endCursor)
-    assert(end == endState)
-  }
-  class Checker(width: Int, grid: String, start: String){
-    val gridv = normalize(grid).toVector
-    def apply(end: String, actions: TermCore.Action*) = {
-      NavigationTests.check0(grid, start, end, actions:_*)
-    }
-    val edit = new Term.ReadlineEditFilter()
-    val down: TermCore.Action = Term.moveDown(_, _, width)
-    val up: TermCore.Action = Term.moveUp(_, _, width)
-    val home: TermCore.Action = Term.moveStart(_, _, width)
-    val end: TermCore.Action = Term.moveEnd(_, _, width)
-    val wordLeft: TermCore.Action = Term.wordLeft
-    val wordRight: TermCore.Action = Term.wordRight
-  }
   val tests = TestSuite{
     'simple{
       // Tests for a simple, not-wrap-around
       // grid of characters
-      val check = new Checker(
+      val check = Checker(
         width = 5,
         grid = """
           abcd
@@ -164,7 +116,7 @@ object NavigationTests extends TestSuite{
     'jagged{
       // tests where the lines of characters
       // are of uneven lengths
-      val check = new Checker(
+      val check = Checker(
         width = 10,
         grid = """
           abcdefg
@@ -229,7 +181,7 @@ object NavigationTests extends TestSuite{
       // tests where some lines are so long that they start
       // wrapping onto the next ones. Navigating around they
       // should behave like separate lines
-      val check = new Checker(
+      val check = Checker(
         width = 7,
         grid = """
           abcdefg\
@@ -345,7 +297,7 @@ object NavigationTests extends TestSuite{
     }
     'wordnav{
       // Tests of word-by-word navigation
-      val check = new Checker(
+      val check = Checker(
         width = 10,
         grid = """
           s.dropPref\

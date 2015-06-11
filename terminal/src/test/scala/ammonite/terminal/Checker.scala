@@ -1,0 +1,48 @@
+package ammonite.terminal
+
+object Checker{
+  def normalize(s: String) = {
+    val lines = s.lines.toVector
+    val min = lines.map(_.indexWhere(_ != ' '))
+      .filter(_ != -1)
+      .min
+    lines.drop(1).dropRight(1).map(_.drop(min)).mkString("\n").replace("\\\n", "")
+
+  }
+
+  def apply(width: Int, grid: String, start: String) =
+    new Checker(width, normalize(grid), normalize(start))
+}
+
+class Checker(width: Int, grid: String, start: String){
+
+  def apply(end0: String, actions: TermCore.Action*) = {
+
+    val end = Checker.normalize(end0)
+    val gridv = grid.toVector
+    val startCursor = start.indexOf('_')
+    val (endGrid, endCursor) = actions.foldLeft((gridv, startCursor)) {
+      case ((g, c), f) =>
+        val (g1, c1) = f(g, c)
+        (g1, math.min(gridv.length, math.max(0, c1)))
+    }
+
+    val endState =
+      if (endCursor == grid.length) grid + '_'
+      else if (grid(endCursor) != '\n') grid.updated(endCursor, '_')
+      else{
+        val (a, b) = grid.splitAt(endCursor)
+        a + '_' + b
+      }
+
+    println(startCursor + " -> " + endCursor)
+    assert(end == endState)
+  }
+  val edit = new Term.ReadlineEditFilter()
+  val down: TermCore.Action = Term.moveDown(_, _, width)
+  val up: TermCore.Action = Term.moveUp(_, _, width)
+  val home: TermCore.Action = Term.moveStart(_, _, width)
+  val end: TermCore.Action = Term.moveEnd(_, _, width)
+  val wordLeft: TermCore.Action = Term.wordLeft
+  val wordRight: TermCore.Action = Term.wordRight
+}
