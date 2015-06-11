@@ -98,6 +98,11 @@ object TermCore {
 
   type Filter = PartialFunction[TermInfo, TermAction]
 
+  trait DelegateFilter extends Filter{
+    def filter: Filter
+    def isDefinedAt(x: TermInfo) = filter.isDefinedAt(x)
+    def apply(v1: TermInfo) = filter(v1)
+  }
   /**
    * Blockingly reads a line from the given input stream and returns it.
    *

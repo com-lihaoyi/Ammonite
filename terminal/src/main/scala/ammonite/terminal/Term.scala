@@ -16,7 +16,8 @@ object Term{
         "@ ",
         System.in,
         System.out,
-        readlineFilters orElse
+        readlineNavFilter orElse
+        new ReadlineEditFilter() orElse
         // Example multiline support by intercepting Enter key
         new HistoryFilter(history) orElse
         multilineFilter orElse
@@ -46,7 +47,7 @@ object Term{
   def lastRow(cursor: Int, buffer: Vector[Char], width: Int) = {
     (buffer.length - cursor) < width && (buffer.lastIndexOf('\n') < cursor || buffer.lastIndexOf('\n') == -1)
   }
-  class HistoryFilter(history: => Seq[String]) extends TermCore.Filter{
+  class HistoryFilter(history: => Seq[String]) extends TermCore.DelegateFilter{
     var index = -1
     var currentHistory = Vector[Char]()
 
@@ -58,16 +59,12 @@ object Term{
       if (index == -1) TS(rest, currentHistory, c)
       else TS(rest, history(index).toVector, c)
     }
-    def filter: TermCore.Filter = {
+    def filter = {
       case TI(TS(p"\u001b[A$rest", b, c), w) if firstRow(c, b, w) =>
         continue(b, (index + 1) min (history.length - 1), rest, 99999)
       case TI(TS(p"\u001b[B$rest", b, c), w) if lastRow(c, b, w) =>
         continue(b, (index - 1) max -1, rest, 0)
     }
-
-    def isDefinedAt(x: TermInfo) = filter.isDefinedAt(x)
-
-    def apply(v1: TermInfo) = filter.apply(v1)
   }
   val TS = TermState
   val TI = TermInfo
@@ -160,21 +157,55 @@ object Term{
     def unapply(i: Int): Option[Int] = Some(i + 96)
   }
 
-  lazy val readlineFilters: TermCore.Filter = {
+  def readlineNavFilter: TermCore.Filter = {
     case TS(Ctrl('b') ~: rest, b, c) => TS(rest, b, c - 1) // <- one char
     case TS(Ctrl('f') ~: rest, b, c) => TS(rest, b, c + 1) // -> one char
     case TS(p"\u001bb$rest", b, c) => TS(rest, b, consumeWord(b, c, -1, 1)) // Alt-b <- one word
     case TS(p"\u001bf$rest", b, c) => TS(rest, b, consumeWord(b, c, 1, 0)) // Alt-f -> one word
     case TI(TS(Ctrl('a') ~: rest, b, c), w) => TS(rest, b, moveStart(b, c, w)) // Ctrl-a <- one line
     case TI(TS(Ctrl('e') ~: rest, b, c), w) => TS(rest, b, moveEnd(b, c, w)) // Ctrl-e -> one line
-    case TS(Ctrl('u') ~: rest, b, c) => TS(rest, b.drop(c), 0) // <- delete all
-    case TS(Ctrl('k') ~: rest, b, c) => TS(rest, b.take(c), c) // -> delete all
-    case TS(p"\u001bd$rest", b, c) => // -> delete word
+  }
+
+  class ReadlineEditFilter() extends TermCore.DelegateFilter{
+    var currentCut = Vector.empty[Char]
+    def cutAllLeft(b: Vector[Char], c: Int) = {
+      currentCut = b.take(c)
+      (b.drop(c), 0)
+    }
+    def cutAllRight(b: Vector[Char], c: Int) = {
+      currentCut = b.drop(c)
+      (b.take(c), c)
+    }
+
+    def cutWordRight(b: Vector[Char], c: Int) = {
       val start = consumeWord(b, c, 1, 0)
-      TS(rest, b.take(c) ++ b.drop(start), c)
-    case TS(Ctrl('w') ~: rest, b, c) => // <- delete word
+      currentCut = b.slice(c, start)
+      (b.take(c) ++ b.drop(start), c)
+    }
+
+    def cutWordLeft(b: Vector[Char], c: Int) = {
       val start = consumeWord(b, c, -1, 1)
-      TS(rest, b.take(start) ++ b.drop(c), start)
+      currentCut = b.slice(start, c)
+      (b.take(start) ++ b.drop(c), start)
+    }
+
+
+    def filter = {
+      case TS(Ctrl('u') ~: rest, b, c) => // <- delete all
+        val (b1, c1) = cutAllLeft(b, c)
+        TS(rest, b1, c1)
+      case TS(Ctrl('k') ~: rest, b, c) => // -> delete all
+        val (b1, c1) = cutAllRight(b, c)
+        TS(rest, b1, c1)
+      case TS(p"\u001bd$rest", b, c) => // -> delete word
+        val (b1, c1) = cutWordRight(b, c)
+        TS(rest, b1, c1)
+      case TS(Ctrl('w') ~: rest, b, c) => // <- delete word
+        val (b1, c1) = cutWordLeft(b, c)
+        TS(rest, b1, c1)
+      case TS(Ctrl('y') ~: rest, b, c) => // paste last cut
+        TS(rest, b.take(c) ++ currentCut ++ b.drop(c), c + currentCut.length)
+    }
 
   }
   def consumeWord(b: Vector[Char], c: Int, delta: Int, offset: Int) = {
