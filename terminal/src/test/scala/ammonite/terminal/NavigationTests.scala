@@ -45,8 +45,10 @@ object NavigationTests extends TestSuite{
     }
     val down = Term.moveDown(gridv, _: Int, width)
     val up = Term.moveUp(gridv, _: Int, width)
-    val home = Term.moveStartEnd(gridv, _: Int, width, 0, -1)
-    val end = Term.moveStartEnd(gridv, _: Int, width, 1, 1)
+    val home = Term.moveStart(gridv, _: Int, width)
+    val end = Term.moveEnd(gridv, _: Int, width)
+    val wordLeft = Term.consumeWord(gridv, _: Int, -1, 1)
+    val wordRight = Term.consumeWord(gridv, _: Int, 1, 0)
   }
   val tests = TestSuite{
     'simple{
@@ -286,7 +288,7 @@ object NavigationTests extends TestSuite{
       }
       'startend{
 
-        check(
+        * - check(
           """
           abcdefg\
           hijk
@@ -296,7 +298,7 @@ object NavigationTests extends TestSuite{
           """,
           end
         )
-        check(
+        * - check(
           """
           abcdefg\
           hijk
@@ -306,17 +308,27 @@ object NavigationTests extends TestSuite{
           """,
           home
         )
-//        check(
-//          """
-//          abcdefg\
-//          _ijk
-//          lmnopqr\
-//          s
-//          tuvwxyz
-//          """,
-//          up, home
-//        )
-        check(
+        * - check(
+          """
+          abcdefg\
+          _ijk
+          lmnopqr\
+          s
+          tuvwxyz
+          """,
+          up, home
+        )
+        * - check(
+          """
+          abcdefg\
+          _ijk
+          lmnopqr\
+          s
+          tuvwxyz
+          """,
+          up, home, home, home
+        )
+        * - check(
           """
           abcdefg\
           _ijk
@@ -328,5 +340,79 @@ object NavigationTests extends TestSuite{
         )
       }
     }
+    'wordnav{
+      // Tests of word-by-word navigation
+      val check = new Checker(
+        width = 10,
+        grid = """
+          s.dropPref\
+          ix(
+            base.map\
+          (x.toInt)
+          )
+        """,
+        start = """
+          s.dropPref\
+          ix(
+            b_se.map\
+          (x.toInt)
+          )
+        """
+      )
+      import check._
+
+      * - check(
+        """
+          s.dropPref\
+          ix(
+            _ase.map\
+          (x.toInt)
+          )
+        """,
+        wordLeft
+      )
+      * - check(
+        """
+          s.dropPref\
+          ix(
+            base_map\
+          (x.toInt)
+          )
+        """,
+        wordLeft, wordRight
+      )
+      * - check(
+        """
+          s._ropPref\
+          ix(
+            base.map\
+          (x.toInt)
+          )
+        """,
+        wordLeft, wordLeft
+      )
+      * - check(
+        """
+          s.dropPref\
+          ix(
+            base_map\
+          (x.toInt)
+          )
+        """,
+        wordRight
+      )
+      * - check(
+        """
+          s.dropPref\
+          ix(
+            base.map\
+          _x.toInt)
+          )
+        """,
+        wordRight, wordRight
+      )
+
+    }
+
   }
 }

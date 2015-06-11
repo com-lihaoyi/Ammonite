@@ -16,6 +16,7 @@ object Term{
         "@ ",
         System.in,
         System.out,
+        readlineFilters orElse
         // Example multiline support by intercepting Enter key
         new HistoryFilter(history) orElse
         multilineFilter orElse
@@ -127,6 +128,54 @@ object Term{
     case TS(4 ~: rest, b, c) => Exit // Ctrl-D
   }
 
+  // TODO: implement all the readline shortcuts
+  // www.bigsmoke.us/readline/shortcuts
+  // Ctrl-b     <- one char
+  // Ctrl-f     -> one char
+  // Alt-b      <- one word
+  // Alt-f      -> one word
+  // Ctrl-a     <- start of line
+  // Ctrl-e     -> end of line
+  // Ctrl-x-x   Toggle start/end
+
+  // Backspace  <- delete char
+  // Del/Ctr-d  -> delete char
+  // Ctrl-u     <- delete all
+  // Ctrl-k     -> delete all
+  // Alt-d      -> delete word
+  // Ctrl-w     <- delete word
+
+  // Ctrl-u/-   Undo
+  // Ctrl-l     clear screen
+
+  // Ctrl-k     -> cut all
+  // Alt-d      -> cut word
+  // Alt-Backspace  <- cut word
+  // Ctrl-y     paste last cut
+  lazy val readlineFilters: TermCore.Filter = {
+    case TS(2 ~: rest, b, c) => // Ctrl-B <- one char
+      TS(rest, b, c - 1)
+    case TS(6 ~: rest, b, c) => // Ctrl-f -> one char
+      TS(rest, b, c + 1)
+    case TS(pref"\u001bb$rest", b, c) => // Alt-b <- one word
+      TS(rest, b, consumeWord(b, c, -1, 1))
+    case TS(pref"\u001bf$rest", b, c) => // Alt-f -> one word
+      TS(rest, b, consumeWord(b, c, 1, 0))
+    case TI(TS(1 ~: rest, b, c), w) => // Ctrl-a <- one line
+      TS(rest, b, moveStart(b, c, w))
+    case TI(TS(5 ~: rest, b, c), w) => // Ctrl-e -> one line
+      TS(rest, b, moveEnd(b, c, w))
+  }
+  def consumeWord(b: Vector[Char], c: Int, delta: Int, offset: Int) = {
+    var current = c
+    // Move at least one character! Otherwise
+    // you get stuck at the end of a word.
+    current += delta
+    while(b.isDefinedAt(current) && !b(current).isLetterOrDigit) current += delta
+    while(b.isDefinedAt(current) && b(current).isLetterOrDigit) current += delta
+    current + offset
+  }
+
   def findChunks(b: Vector[Char], c: Int) = {
     val chunks = TermCore.splitBuffer(b)
     // The index of the first character in each chunk
@@ -139,24 +188,30 @@ object Term{
     (chunks, chunkStarts, chunkIndex)
   }
 
-  def moveStartEnd(b: Vector[Char],
+  def moveEnd(b: Vector[Char],
                    c: Int,
-                   w: Int,
-                   boundaryOffset: Int,
-                   nextChunkOffset: Int) = {
+                   w: Int) = {
     val (chunks, chunkStarts, chunkIndex) = findChunks(b, c)
     val currentColumn = (c - chunkStarts(chunkIndex)) % w
-    chunks.lift(chunkIndex + nextChunkOffset) match{
+    chunks.lift(chunkIndex + 1) match{
       case Some(next) =>
-        val boundary = chunkStarts(chunkIndex + boundaryOffset) - boundaryOffset
+        val boundary = chunkStarts(chunkIndex + 1) - 1
         if ((boundary - c) > (w - currentColumn)) {
           val delta= w - currentColumn
           c + delta
         }
         else boundary
       case None =>
-        c + nextChunkOffset * 9999
+        c + 1 * 9999
     }
+
+  }
+  def moveStart(b: Vector[Char],
+                   c: Int,
+                   w: Int) = {
+    val (chunks, chunkStarts, chunkIndex) = findChunks(b, c)
+    val currentColumn = (c - chunkStarts(chunkIndex)) % w
+    c - currentColumn
 
   }
 
@@ -196,8 +251,8 @@ object Term{
 
     case TS(pref"\u001b[5~$rest", b, c) => Debug("fn-up"); TS(rest, b, c - 9999)
     case TS(pref"\u001b[6~$rest", b, c) => Debug("fn-down"); TS(rest, b, c + 9999)
-    case TI(TS(pref"\u001b[F$rest", b, c), w) => Debug("fn-right"); TS(rest, b, moveStartEnd(b, c, w, 1, 1))
-    case TI(TS(pref"\u001b[H$rest", b, c), w) => Debug("fn-left"); TS(rest, b, moveStartEnd(b, c, w, 0, -1))
+    case TI(TS(pref"\u001b[F$rest", b, c), w) => Debug("fn-right"); TS(rest, b, moveEnd(b, c, w))
+    case TI(TS(pref"\u001b[H$rest", b, c), w) => Debug("fn-left"); TS(rest, b, moveStart(b, c, w))
 
   }
   lazy val advancedNavFilter: TermCore.Filter = {

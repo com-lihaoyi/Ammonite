@@ -63,7 +63,7 @@ class Ansi(output: Writer){
    * n=1: clear from cursor to start of screen
    * n=2: clear entire screen
    */
-  def   clearScreen(n: Int) = control(n, 'J')
+  def clearScreen(n: Int) = control(n, 'J')
   /**
    * Clear the current line
    *
