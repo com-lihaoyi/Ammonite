@@ -59,9 +59,9 @@ object Term{
       else TS(rest, history(index).toVector, c)
     }
     def filter: TermCore.Filter = {
-      case TI(TS(pref"\u001b[A$rest", b, c), w) if firstRow(c, b, w) =>
+      case TI(TS(p"\u001b[A$rest", b, c), w) if firstRow(c, b, w) =>
         continue(b, (index + 1) min (history.length - 1), rest, 99999)
-      case TI(TS(pref"\u001b[B$rest", b, c), w) if lastRow(c, b, w) =>
+      case TI(TS(p"\u001b[B$rest", b, c), w) if lastRow(c, b, w) =>
         continue(b, (index - 1) max -1, rest, 0)
     }
 
@@ -103,7 +103,7 @@ object Term{
       TS(curr, b, c)
   }
   lazy val typingFilter: TermCore.Filter = {
-    case TS(pref"\u001b[3~$rest", b, c) =>
+    case TS(p"\u001b[3~$rest", b, c) =>
       Debug("fn-delete")
       val (first, last) = b.splitAt(c)
       TS(rest, first ++ last.drop(1), c)
@@ -139,7 +139,7 @@ object Term{
   // Ctrl-x-x   Toggle start/end
 
   // Backspace  <- delete char
-  // Del/Ctr-d  -> delete char
+  // Del        -> delete char
   // Ctrl-u     <- delete all
   // Ctrl-k     -> delete all
   // Alt-d      -> delete word
@@ -161,18 +161,21 @@ object Term{
   }
 
   lazy val readlineFilters: TermCore.Filter = {
-    case TS(Ctrl('b') ~: rest, b, c) => // <- one char
-      TS(rest, b, c - 1)
-    case TS(Ctrl('f') ~: rest, b, c) => // -> one char
-      TS(rest, b, c + 1)
-    case TS(pref"\u001bb$rest", b, c) => // Alt-b <- one word
-      TS(rest, b, consumeWord(b, c, -1, 1))
-    case TS(pref"\u001bf$rest", b, c) => // Alt-f -> one word
-      TS(rest, b, consumeWord(b, c, 1, 0))
-    case TI(TS(Ctrl('a') ~: rest, b, c), w) => // Ctrl-a <- one line
-      TS(rest, b, moveStart(b, c, w))
-    case TI(TS(Ctrl('e') ~: rest, b, c), w) => // Ctrl-e -> one line
-      TS(rest, b, moveEnd(b, c, w))
+    case TS(Ctrl('b') ~: rest, b, c) => TS(rest, b, c - 1) // <- one char
+    case TS(Ctrl('f') ~: rest, b, c) => TS(rest, b, c + 1) // -> one char
+    case TS(p"\u001bb$rest", b, c) => TS(rest, b, consumeWord(b, c, -1, 1)) // Alt-b <- one word
+    case TS(p"\u001bf$rest", b, c) => TS(rest, b, consumeWord(b, c, 1, 0)) // Alt-f -> one word
+    case TI(TS(Ctrl('a') ~: rest, b, c), w) => TS(rest, b, moveStart(b, c, w)) // Ctrl-a <- one line
+    case TI(TS(Ctrl('e') ~: rest, b, c), w) => TS(rest, b, moveEnd(b, c, w)) // Ctrl-e -> one line
+    case TS(Ctrl('u') ~: rest, b, c) => TS(rest, b.drop(c), 0) // <- delete all
+    case TS(Ctrl('k') ~: rest, b, c) => TS(rest, b.take(c), c) // -> delete all
+    case TS(p"\u001bd$rest", b, c) => // -> delete word
+      val start = consumeWord(b, c, 1, 0)
+      TS(rest, b.take(c) ++ b.drop(start), c)
+    case TS(Ctrl('w') ~: rest, b, c) => // <- delete word
+      val start = consumeWord(b, c, -1, 1)
+      TS(rest, b.take(start) ++ b.drop(c), start)
+
   }
   def consumeWord(b: Vector[Char], c: Int, delta: Int, offset: Int) = {
     var current = c
@@ -252,49 +255,48 @@ object Term{
   }
 
   lazy val basicNavFilter : TermCore.Filter = {
-    case TI(TS(pref"\u001b[A$rest", b, c), w) => Debug("up"); TS(rest, b, moveUp(b, c, w))
-    case TI(TS(pref"\u001b[B$rest", b, c), w) => Debug("down"); TS(rest, b, moveDown(b, c, w))
-    case TS(pref"\u001b[C$rest", b, c) => Debug("right"); TS(rest, b, c + 1)
-    case TS(pref"\u001b[D$rest", b, c) => Debug("left"); TS(rest, b, c - 1)
-
-    case TS(pref"\u001b[5~$rest", b, c) => Debug("fn-up"); TS(rest, b, c - 9999)
-    case TS(pref"\u001b[6~$rest", b, c) => Debug("fn-down"); TS(rest, b, c + 9999)
-    case TI(TS(pref"\u001b[F$rest", b, c), w) => Debug("fn-right"); TS(rest, b, moveEnd(b, c, w))
-    case TI(TS(pref"\u001b[H$rest", b, c), w) => Debug("fn-left"); TS(rest, b, moveStart(b, c, w))
+    case TI(TS(p"\u001b[A$rest", b, c), w) => Debug("up"); TS(rest, b, moveUp(b, c, w))
+    case TI(TS(p"\u001b[B$rest", b, c), w) => Debug("down"); TS(rest, b, moveDown(b, c, w))
+    case TS(p"\u001b[C$rest", b, c) => Debug("right"); TS(rest, b, c + 1)
+    case TS(p"\u001b[D$rest", b, c) => Debug("left"); TS(rest, b, c - 1)
+    case TS(p"\u001b[5~$rest", b, c) => Debug("fn-up"); TS(rest, b, c - 9999)
+    case TS(p"\u001b[6~$rest", b, c) => Debug("fn-down"); TS(rest, b, c + 9999)
+    case TI(TS(p"\u001b[F$rest", b, c), w) => Debug("fn-right"); TS(rest, b, moveEnd(b, c, w))
+    case TI(TS(p"\u001b[H$rest", b, c), w) => Debug("fn-left"); TS(rest, b, moveStart(b, c, w))
 
   }
   lazy val advancedNavFilter: TermCore.Filter = {
-    case TS(pref"\u001b\u001b[A$rest", b, c) => Debug("alt-up"); TS(rest, b, c)
-    case TS(pref"\u001b\u001b[B$rest", b, c) => Debug("alt-down"); TS(rest, b, c)
-    case TS(pref"\u001b\u001b[C$rest", b, c) => Debug("alt-right"); TS(rest, b, c)
-    case TS(pref"\u001b\u001b[D$rest", b, c) => Debug("alt-left"); TS(rest, b, c)
+    case TS(p"\u001b\u001b[A$rest", b, c) => Debug("alt-up"); TS(rest, b, c)
+    case TS(p"\u001b\u001b[B$rest", b, c) => Debug("alt-down"); TS(rest, b, c)
+    case TS(p"\u001b\u001b[C$rest", b, c) => Debug("alt-right"); TS(rest, b, c)
+    case TS(p"\u001b\u001b[D$rest", b, c) => Debug("alt-left"); TS(rest, b, c)
 
-    case TS(pref"\u001b[1;2A$rest", b, c) => Debug("shift-up"); TS(rest, b, c)
-    case TS(pref"\u001b[1;2B$rest", b, c) => Debug("shift-down"); TS(rest, b, c)
-    case TS(pref"\u001b[1;2C$rest", b, c) => Debug("shift-right"); TS(rest, b, c)
-    case TS(pref"\u001b[1;2D$rest", b, c) => Debug("shift-left"); TS(rest, b, c)
+    case TS(p"\u001b[1;2A$rest", b, c) => Debug("shift-up"); TS(rest, b, c)
+    case TS(p"\u001b[1;2B$rest", b, c) => Debug("shift-down"); TS(rest, b, c)
+    case TS(p"\u001b[1;2C$rest", b, c) => Debug("shift-right"); TS(rest, b, c)
+    case TS(p"\u001b[1;2D$rest", b, c) => Debug("shift-left"); TS(rest, b, c)
 
-    case TS(pref"\u001b\u001b[5~$rest", b, c) => Debug("fn-alt-up"); TS(rest, b, c)
-    case TS(pref"\u001b\u001b[6~$rest", b, c) => Debug("fn-alt-down"); TS(rest, b, c)
-    case TS(pref"\u001b[1;9F$rest", b, c) => Debug("fn-alt-right"); TS(rest, b, c)
-    case TS(pref"\u001b[1;9H$rest", b, c) => Debug("fn-alt-left"); TS(rest, b, c)
+    case TS(p"\u001b\u001b[5~$rest", b, c) => Debug("fn-alt-up"); TS(rest, b, c)
+    case TS(p"\u001b\u001b[6~$rest", b, c) => Debug("fn-alt-down"); TS(rest, b, c)
+    case TS(p"\u001b[1;9F$rest", b, c) => Debug("fn-alt-right"); TS(rest, b, c)
+    case TS(p"\u001b[1;9H$rest", b, c) => Debug("fn-alt-left"); TS(rest, b, c)
 
     // Conflicts with iTerm hotkeys, same as fn-{up, down}
     // case TS(pref"\u001b[5~$rest", b, c) => TS(rest, b, c) //fn-shift-up
     // case TS(pref"\u001b[6~$rest", b, c) => TS(rest, b, c) //fn-shift-down
-    case TS(pref"\u001b[1;2F$rest", b, c) => Debug("fn-shift-right"); TS(rest, b, c)
-    case TS(pref"\u001b[1;2H$rest", b, c) => Debug("fn-shift-left"); TS(rest, b, c)
+    case TS(p"\u001b[1;2F$rest", b, c) => Debug("fn-shift-right"); TS(rest, b, c)
+    case TS(p"\u001b[1;2H$rest", b, c) => Debug("fn-shift-left"); TS(rest, b, c)
 
-    case TS(pref"\u001b[1;10A$rest", b, c) => Debug("alt-shift-up"); TS(rest, b, c)
-    case TS(pref"\u001b[1;10B$rest", b, c) => Debug("alt-shift-down"); TS(rest, b, c)
-    case TS(pref"\u001b[1;10C$rest", b, c) => Debug("alt-shift-right"); TS(rest, b, c)
-    case TS(pref"\u001b[1;10D$rest", b, c) => Debug("alt-shift-left"); TS(rest, b, c)
+    case TS(p"\u001b[1;10A$rest", b, c) => Debug("alt-shift-up"); TS(rest, b, c)
+    case TS(p"\u001b[1;10B$rest", b, c) => Debug("alt-shift-down"); TS(rest, b, c)
+    case TS(p"\u001b[1;10C$rest", b, c) => Debug("alt-shift-right"); TS(rest, b, c)
+    case TS(p"\u001b[1;10D$rest", b, c) => Debug("alt-shift-left"); TS(rest, b, c)
 
     // Same as the case fn-alt-{up,down} without the shift
     // case TS(pref"\u001b\u001b[5~$rest", b, c) => TS(rest, b, c) //fn-alt-shift-up
     // case TS(pref"\u001b\u001b[6~$rest", b, c) => TS(rest, b, c) //fn-alt-shift-down
-    case TS(pref"\u001b[1;10F$rest", b, c) => Debug("fn-alt-shift-right"); TS(rest, b, c)
-    case TS(pref"\u001b[1;10H$rest", b, c) => Debug("fn-alt-shift-left"); TS(rest, b, c)
+    case TS(p"\u001b[1;10F$rest", b, c) => Debug("fn-alt-shift-right"); TS(rest, b, c)
+    case TS(p"\u001b[1;10H$rest", b, c) => Debug("fn-alt-shift-left"); TS(rest, b, c)
   }
 }
 

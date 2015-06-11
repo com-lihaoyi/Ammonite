@@ -134,7 +134,7 @@ object LazyList{
 
   implicit class CS(ctx: StringContext){
     val base = ctx.parts.mkString
-    object pref{
+    object p{
       def unapply(s: LazyList[Int]): Option[LazyList[Int]] = {
         s.dropPrefix(base.map(_.toInt))
       }
