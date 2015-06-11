@@ -157,13 +157,18 @@ object Term{
     def unapply(i: Int): Option[Int] = Some(i + 96)
   }
 
+  def TSX(rest: LazyList[Int], args: (Vector[Char], Int)) = {
+    TS(rest, args._1, args._2)
+  }
+  def wordLeft(b: Vector[Char], c: Int) = b -> consumeWord(b, c, -1, 1)
+  def wordRight(b: Vector[Char], c: Int) = b -> consumeWord(b, c, 1, 0)
   def readlineNavFilter: TermCore.Filter = {
     case TS(Ctrl('b') ~: rest, b, c) => TS(rest, b, c - 1) // <- one char
     case TS(Ctrl('f') ~: rest, b, c) => TS(rest, b, c + 1) // -> one char
-    case TS(p"\u001bb$rest", b, c) => TS(rest, b, consumeWord(b, c, -1, 1)) // Alt-b <- one word
-    case TS(p"\u001bf$rest", b, c) => TS(rest, b, consumeWord(b, c, 1, 0)) // Alt-f -> one word
-    case TI(TS(Ctrl('a') ~: rest, b, c), w) => TS(rest, b, moveStart(b, c, w)) // Ctrl-a <- one line
-    case TI(TS(Ctrl('e') ~: rest, b, c), w) => TS(rest, b, moveEnd(b, c, w)) // Ctrl-e -> one line
+    case TS(p"\u001bb$rest", b, c) => TSX(rest, wordLeft(b, c)) // Alt-b <- one word
+    case TS(p"\u001bf$rest", b, c) => TSX(rest, wordRight(b, c)) // Alt-f -> one word
+    case TI(TS(Ctrl('a') ~: rest, b, c), w) => TSX(rest, moveStart(b, c, w)) // Ctrl-a <- one line
+    case TI(TS(Ctrl('e') ~: rest, b, c), w) => TSX(rest, moveEnd(b, c, w)) // Ctrl-e -> one line
   }
 
   class ReadlineEditFilter() extends TermCore.DelegateFilter{
@@ -189,24 +194,17 @@ object Term{
       (b.take(start) ++ b.drop(c), start)
     }
 
-
-    def filter = {
-      case TS(Ctrl('u') ~: rest, b, c) => // <- delete all
-        val (b1, c1) = cutAllLeft(b, c)
-        TS(rest, b1, c1)
-      case TS(Ctrl('k') ~: rest, b, c) => // -> delete all
-        val (b1, c1) = cutAllRight(b, c)
-        TS(rest, b1, c1)
-      case TS(p"\u001bd$rest", b, c) => // -> delete word
-        val (b1, c1) = cutWordRight(b, c)
-        TS(rest, b1, c1)
-      case TS(Ctrl('w') ~: rest, b, c) => // <- delete word
-        val (b1, c1) = cutWordLeft(b, c)
-        TS(rest, b1, c1)
-      case TS(Ctrl('y') ~: rest, b, c) => // paste last cut
-        TS(rest, b.take(c) ++ currentCut ++ b.drop(c), c + currentCut.length)
+    def paste(b: Vector[Char], c: Int) = {
+      (b.take(c) ++ currentCut ++ b.drop(c), c + currentCut.length)
     }
 
+    def filter = {
+      case TS(Ctrl('u') ~: rest, b, c) => TSX(rest, cutAllLeft(b, c))
+      case TS(Ctrl('k') ~: rest, b, c) => TSX(rest, cutAllRight(b, c))
+      case TS(p"\u001bd$rest", b, c) => TSX(rest, cutWordRight(b, c))
+      case TS(Ctrl('w') ~: rest, b, c) => TSX(rest, cutWordLeft(b, c))
+      case TS(Ctrl('y') ~: rest, b, c) => TSX(rest, paste(b, c))
+    }
   }
   def consumeWord(b: Vector[Char], c: Int, delta: Int, offset: Int) = {
     var current = c
@@ -235,7 +233,7 @@ object Term{
                    w: Int) = {
     val (chunks, chunkStarts, chunkIndex) = findChunks(b, c)
     val currentColumn = (c - chunkStarts(chunkIndex)) % w
-    chunks.lift(chunkIndex + 1) match{
+    val c1 = chunks.lift(chunkIndex + 1) match{
       case Some(next) =>
         val boundary = chunkStarts(chunkIndex + 1) - 1
         if ((boundary - c) > (w - currentColumn)) {
@@ -246,14 +244,14 @@ object Term{
       case None =>
         c + 1 * 9999
     }
-
+    b -> c1
   }
   def moveStart(b: Vector[Char],
                    c: Int,
                    w: Int) = {
     val (chunks, chunkStarts, chunkIndex) = findChunks(b, c)
     val currentColumn = (c - chunkStarts(chunkIndex)) % w
-    c - currentColumn
+    b -> (c - currentColumn)
 
   }
 
@@ -279,21 +277,21 @@ object Term{
     }
   }
   def moveUp(b: Vector[Char], c: Int, w: Int) = {
-    moveUpDown(b, c, w, 0, -1, c - w, _ > _, false)
+    b -> moveUpDown(b, c, w, 0, -1, c - w, _ > _, false)
   }
   def moveDown(b: Vector[Char], c: Int, w: Int) = {
-    moveUpDown(b, c, w, 1, 1, c + w, _ <= _, true)
+    b -> moveUpDown(b, c, w, 1, 1, c + w, _ <= _, true)
   }
 
   lazy val basicNavFilter : TermCore.Filter = {
-    case TI(TS(p"\u001b[A$rest", b, c), w) => Debug("up"); TS(rest, b, moveUp(b, c, w))
-    case TI(TS(p"\u001b[B$rest", b, c), w) => Debug("down"); TS(rest, b, moveDown(b, c, w))
+    case TI(TS(p"\u001b[A$rest", b, c), w) => Debug("up"); TSX(rest, moveUp(b, c, w))
+    case TI(TS(p"\u001b[B$rest", b, c), w) => Debug("down"); TSX(rest, moveDown(b, c, w))
     case TS(p"\u001b[C$rest", b, c) => Debug("right"); TS(rest, b, c + 1)
     case TS(p"\u001b[D$rest", b, c) => Debug("left"); TS(rest, b, c - 1)
     case TS(p"\u001b[5~$rest", b, c) => Debug("fn-up"); TS(rest, b, c - 9999)
     case TS(p"\u001b[6~$rest", b, c) => Debug("fn-down"); TS(rest, b, c + 9999)
-    case TI(TS(p"\u001b[F$rest", b, c), w) => Debug("fn-right"); TS(rest, b, moveEnd(b, c, w))
-    case TI(TS(p"\u001b[H$rest", b, c), w) => Debug("fn-left"); TS(rest, b, moveStart(b, c, w))
+    case TI(TS(p"\u001b[F$rest", b, c), w) => Debug("fn-right"); TSX(rest, moveEnd(b, c, w))
+    case TI(TS(p"\u001b[H$rest", b, c), w) => Debug("fn-left"); TSX(rest, moveStart(b, c, w))
 
   }
   lazy val advancedNavFilter: TermCore.Filter = {

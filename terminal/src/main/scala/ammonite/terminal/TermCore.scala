@@ -96,8 +96,9 @@ object TermCore {
     (totalHeight, cursorY, cursorX)
   }
 
-  type Filter = PartialFunction[TermInfo, TermAction]
 
+  type Filter = PartialFunction[TermInfo, TermAction]
+  type Action = (Vector[Char], Int) => (Vector[Char], Int)
   trait DelegateFilter extends Filter{
     def filter: Filter
     def isDefinedAt(x: TermInfo) = filter.isDefinedAt(x)

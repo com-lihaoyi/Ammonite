@@ -139,5 +139,15 @@ object LazyList{
         s.dropPrefix(base.map(_.toInt))
       }
     }
+    object px{
+      def unapply(s: TermInfo): Option[(Vector[Char], Int)] = {
+        def rec(i: Int, c: LazyList[Int]): Option[(Vector[Char], Int)] = {
+          if (i >= base.length) Some((s.ts.buffer, s.ts.cursor))
+          else if (c.head == base(i)) rec(i + 1, c.tail)
+          else None
+        }
+        rec(0, s.ts.inputs)
+      }
+    }
   }
 }

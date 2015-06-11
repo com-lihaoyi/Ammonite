@@ -15,7 +15,7 @@ object NavigationTests extends TestSuite{
   def check0(grid0: String,
             start0: String,
             end0: String,
-            actions: (Int => Int)*) = {
+            actions: TermCore.Action*) = {
 
 
     val grid = normalize(grid0)
@@ -23,9 +23,11 @@ object NavigationTests extends TestSuite{
     val end = normalize(end0)
 
     val startCursor = start.indexOf('_')
-    val endCursor = actions.foldLeft(startCursor)(
-      (a, f) => math.min(grid.length, math.max(0, f(a)))
-    )
+    val (endGrid, endCursor) = actions.foldLeft((grid.toVector, startCursor)) {
+      case ((g, c), f) =>
+        val (g1, c1) = f(g, c)
+        (g1, math.min(grid.length, math.max(0, c1)))
+    }
 
     val endState =
       if (endCursor == grid.length) grid + '_'
@@ -40,15 +42,16 @@ object NavigationTests extends TestSuite{
   }
   class Checker(width: Int, grid: String, start: String){
     val gridv = normalize(grid).toVector
-    def apply(end: String, actions: (Int => Int)*) = {
+    def apply(end: String, actions: TermCore.Action*) = {
       NavigationTests.check0(grid, start, end, actions:_*)
     }
-    val down = Term.moveDown(gridv, _: Int, width)
-    val up = Term.moveUp(gridv, _: Int, width)
-    val home = Term.moveStart(gridv, _: Int, width)
-    val end = Term.moveEnd(gridv, _: Int, width)
-    val wordLeft = Term.consumeWord(gridv, _: Int, -1, 1)
-    val wordRight = Term.consumeWord(gridv, _: Int, 1, 0)
+    val edit = new Term.ReadlineEditFilter()
+    val down: TermCore.Action = Term.moveDown(_, _, width)
+    val up: TermCore.Action = Term.moveUp(_, _, width)
+    val home: TermCore.Action = Term.moveStart(_, _, width)
+    val end: TermCore.Action = Term.moveEnd(_, _, width)
+    val wordLeft: TermCore.Action = Term.wordLeft
+    val wordRight: TermCore.Action = Term.wordRight
   }
   val tests = TestSuite{
     'simple{
@@ -77,7 +80,7 @@ object NavigationTests extends TestSuite{
         e_gh
         ijkl
         """,
-        x => x
+        (g, v) => (g, v)
       )
 
       'upsAndDowns{
