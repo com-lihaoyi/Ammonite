@@ -393,6 +393,27 @@ object NavigationTests extends TestSuite{
       )
       * - check(
         """
+          _.dropPref\
+          ix(
+            base.map\
+          (x.toInt)
+          )
+        """,
+        wordLeft, wordLeft, wordLeft
+      )
+      // Overshooting
+      * - check(
+        """
+          _.dropPref\
+          ix(
+            base.map\
+          (x.toInt)
+          )
+        """,
+        wordLeft, wordLeft, wordLeft, wordLeft
+      )
+      * - check(
+        """
           s.dropPref\
           ix(
             base_map\
@@ -412,6 +433,48 @@ object NavigationTests extends TestSuite{
         wordRight, wordRight
       )
 
+      * - check(
+        """
+          s.dropPref\
+          ix(
+            base.map\
+          (x_toInt)
+          )
+        """,
+        wordRight, wordRight, wordRight
+      )
+      * - check(
+        """
+          s.dropPref\
+          ix(
+            base.map\
+          (x.toInt_
+          )
+        """,
+        wordRight, wordRight, wordRight, wordRight
+      )
+
+      * - check(
+        """
+          s.dropPref\
+          ix(
+            base.map\
+          (x.toInt)
+          )_
+        """,
+        wordRight, wordRight, wordRight, wordRight, wordRight
+      )
+      // Overshooting
+      * - check(
+        """
+          s.dropPref\
+          ix(
+            base.map\
+          (x.toInt)
+          )_
+        """,
+        wordRight, wordRight, wordRight, wordRight, wordRight
+      )
     }
 
   }

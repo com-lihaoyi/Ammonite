@@ -93,7 +93,7 @@ object Term{
 
 
   lazy val loggingFilter: TermCore.Filter = {
-    case TS(5 ~: rest, b, c) => // Ctrl-E
+    case TS(Ctrl('t') ~: rest, b, c) =>
       println("Char Display Mode Enabled! Ctrl-C to exit")
       var curr = rest
       while (curr.head != 3) {
@@ -123,9 +123,9 @@ object Term{
       Result(b.mkString)
   }
   lazy val exitFilter: TermCore.Filter = {
-    case TS(3 ~: rest, b, c) => // Ctrl-C
+    case TS(Ctrl('c') ~: rest, b, c) =>
       TS(rest, Vector.empty, 0)
-    case TS(4 ~: rest, b, c) => Exit // Ctrl-D
+    case TS(Ctrl('d') ~: rest, b, c) => Exit
   }
 
   // TODO: implement all the readline shortcuts
@@ -152,18 +152,26 @@ object Term{
   // Alt-d      -> cut word
   // Alt-Backspace  <- cut word
   // Ctrl-y     paste last cut
+
+  /**
+   * Lets you easily pattern match on characters modified by ctrl
+   */
+  object Ctrl{
+    def unapply(i: Int): Option[Int] = Some(i + 96)
+  }
+
   lazy val readlineFilters: TermCore.Filter = {
-    case TS(2 ~: rest, b, c) => // Ctrl-B <- one char
+    case TS(Ctrl('b') ~: rest, b, c) => // <- one char
       TS(rest, b, c - 1)
-    case TS(6 ~: rest, b, c) => // Ctrl-f -> one char
+    case TS(Ctrl('f') ~: rest, b, c) => // -> one char
       TS(rest, b, c + 1)
     case TS(pref"\u001bb$rest", b, c) => // Alt-b <- one word
       TS(rest, b, consumeWord(b, c, -1, 1))
     case TS(pref"\u001bf$rest", b, c) => // Alt-f -> one word
       TS(rest, b, consumeWord(b, c, 1, 0))
-    case TI(TS(1 ~: rest, b, c), w) => // Ctrl-a <- one line
+    case TI(TS(Ctrl('a') ~: rest, b, c), w) => // Ctrl-a <- one line
       TS(rest, b, moveStart(b, c, w))
-    case TI(TS(5 ~: rest, b, c), w) => // Ctrl-e -> one line
+    case TI(TS(Ctrl('e') ~: rest, b, c), w) => // Ctrl-e -> one line
       TS(rest, b, moveEnd(b, c, w))
   }
   def consumeWord(b: Vector[Char], c: Int, delta: Int, offset: Int) = {
