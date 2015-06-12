@@ -125,7 +125,6 @@ object Term{
     case TS(Ctrl('d') ~: rest, b, c) => Exit
   }
 
-  // TODO: implement all the readline shortcuts
   // www.bigsmoke.us/readline/shortcuts
   // Ctrl-b     <- one char
   // Ctrl-f     -> one char

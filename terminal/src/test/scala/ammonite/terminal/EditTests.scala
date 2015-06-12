@@ -1,0 +1,119 @@
+package ammonite.terminal
+
+import utest._
+
+
+object EditTests extends TestSuite{
+
+  val tests = TestSuite{
+    val check = Checker(
+      width = 5,
+      grid = """
+        abcd
+        efgh
+        ijkl
+      """ ,
+      start = """
+        abcd
+        e_gh
+        ijkl
+      """
+    )
+
+    import check._
+    'cutting{
+
+      * - check(
+        """
+        abcd
+        _gh
+        ijkl
+        """,
+        edit.cutWordLeft
+      )
+      * - check(
+        """
+        abcd
+        e_
+        ijkl
+        """,
+        edit.cutWordRight
+      )
+      * - check(
+        """
+        abcd
+        _
+        ijkl
+        """,
+        edit.cutWordRight,
+        wordLeft
+      )
+      * - check(
+        """
+        _gh
+        ijkl
+        """,
+        edit.cutAllLeft
+      )
+      * - check(
+        """
+        abcd
+        e_
+        """,
+        edit.cutAllRight
+      )
+
+      * - check(
+        """
+        abcd
+        _
+        """,
+        edit.cutAllRight,
+        wordLeft
+      )
+    }
+    'pasting{
+
+      * - check(
+        """
+        abcd
+        e_gh
+        ijkl
+        """,
+        edit.cutWordLeft,
+        edit.paste
+      )
+      * - check(
+        """
+        abcd
+        ee_gh
+        ijkl
+        """,
+        edit.cutWordLeft,
+        edit.paste,
+        edit.paste
+      )
+      * - check(
+        """
+        abcd
+        efghfgh_
+        ijkl
+        """,
+        edit.cutWordRight,
+        edit.paste,
+        edit.paste
+      )
+      * - check(
+        """
+        abcd
+        fghfgh_
+        ijkl
+        """,
+        edit.cutWordLeft,
+        edit.cutWordRight,
+        edit.paste,
+        edit.paste
+      )
+    }
+  }
+}

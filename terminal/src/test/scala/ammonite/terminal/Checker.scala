@@ -1,5 +1,5 @@
 package ammonite.terminal
-
+import utest._
 object Checker{
   def normalize(s: String) = {
     val lines = s.lines.toVector
@@ -14,6 +14,11 @@ object Checker{
     new Checker(width, normalize(grid), normalize(start))
 }
 
+/**
+ * A shell emulator that you can use to test out sequences of various
+ * [[TermCore.Action]]s against an in-memory (Vector[Char], Int) and
+ * verify that they do the right thing.
+ */
 class Checker(width: Int, grid: String, start: String){
 
   def apply(end0: String, actions: TermCore.Action*) = {
@@ -28,15 +33,16 @@ class Checker(width: Int, grid: String, start: String){
     }
 
     val endState =
-      if (endCursor == grid.length) grid + '_'
-      else if (grid(endCursor) != '\n') grid.updated(endCursor, '_')
+      if (endCursor == endGrid.length) endGrid ++ "_"
+      else if (endGrid(endCursor) != '\n') endGrid.updated(endCursor, '_')
       else{
-        val (a, b) = grid.splitAt(endCursor)
-        a + '_' + b
+        val (a, b) = endGrid.splitAt(endCursor)
+        a ++ "_" ++ b
       }
 
-    println(startCursor + " -> " + endCursor)
-    assert(end == endState)
+
+    val endString = endState.mkString
+    assert(end == endString)
   }
   val edit = new Term.ReadlineEditFilter()
   val down: TermCore.Action = Term.moveDown(_, _, width)
