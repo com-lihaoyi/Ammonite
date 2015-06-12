@@ -44,7 +44,7 @@ class Checker(width: Int, grid: String, start: String){
     val endString = endState.mkString
     assert(end == endString)
   }
-  val edit = new ReadlineFilters.cutPasteFilter()
+  val edit = new ReadlineFilters.CutPasteFilter()
   val down: TermCore.Action = BasicFilters.moveDown(_, _, width)
   val up: TermCore.Action = BasicFilters.moveUp(_, _, width)
   val home: TermCore.Action = BasicFilters.moveStart(_, _, width)

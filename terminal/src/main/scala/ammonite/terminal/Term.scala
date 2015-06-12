@@ -9,7 +9,7 @@ import scala.annotation.tailrec
 object Term{
   def main(args: Array[String]): Unit = {
     var history = List.empty[String]
-    val selection = new AdvancedFilters.SelectionFilter
+    val selection = AdvancedFilters.SelectionFilter()
     rec()
     @tailrec def rec(): Unit = {
       TermCore.readLine(
@@ -17,13 +17,13 @@ object Term{
         System.in,
         System.out,
         selection orElse
-        AdvancedFilters.advancedNavFilter orElse
+        AdvancedFilters.altFilter orElse
+        AdvancedFilters.fnFilter orElse
         ReadlineFilters.navFilter orElse
-        new ReadlineFilters.cutPasteFilter() orElse
+        ReadlineFilters.CutPasteFilter() orElse
 //        Example multiline support by intercepting Enter key
-        new ReadlineFilters.HistoryFilter(history) orElse
-        BasicFilters.multilineFilter orElse
-        BasicFilters.default,
+        ReadlineFilters.HistoryFilter(() => history) orElse
+        BasicFilters.all,
         // Example displayTransform: underline all non-spaces
         displayTransform = (buffer, cursor) => {
           // underline all non-blank lines

@@ -8,7 +8,6 @@ import SpecialKeys._
  * are available in bash, python and most other interactive command-lines
  */
 object ReadlineFilters {
-
   // www.bigsmoke.us/readline/shortcuts
   // Ctrl-b     <- one char
   // Ctrl-f     -> one char
@@ -42,7 +41,7 @@ object ReadlineFilters {
     Case(Ctrl('e'))((b, c, m) => BasicFilters.moveEnd(b, c, m.width)) // -> one line
   )
 
-  class cutPasteFilter() extends TermCore.DelegateFilter{
+  case class CutPasteFilter() extends TermCore.DelegateFilter{
     var currentCut = Vector.empty[Char]
     def cutAllLeft(b: Vector[Char], c: Int) = {
       currentCut = b.take(c)
@@ -85,7 +84,7 @@ object ReadlineFilters {
   def lastRow(cursor: Int, buffer: Vector[Char], width: Int) = {
     (buffer.length - cursor) < width && (buffer.lastIndexOf('\n') < cursor || buffer.lastIndexOf('\n') == -1)
   }
-  class HistoryFilter(history: => Seq[String]) extends TermCore.DelegateFilter{
+  case class HistoryFilter(history: () => Seq[String]) extends TermCore.DelegateFilter{
     var index = -1
     var currentHistory = Vector[Char]()
 
@@ -95,11 +94,11 @@ object ReadlineFilters {
       index = newIndex
 
       if (index == -1) TS(rest, currentHistory, c)
-      else TS(rest, history(index).toVector, c)
+      else TS(rest, history()(index).toVector, c)
     }
     def filter = {
       case TermInfo(TS(p"\u001b[A$rest", b, c), w) if firstRow(c, b, w) =>
-        swapInHistory(b, (index + 1) min (history.length - 1), rest, 99999)
+        swapInHistory(b, (index + 1) min (history().length - 1), rest, 99999)
       case TermInfo(TS(p"\u001b[B$rest", b, c), w) if lastRow(c, b, w) =>
         swapInHistory(b, (index - 1) max -1, rest, 0)
     }

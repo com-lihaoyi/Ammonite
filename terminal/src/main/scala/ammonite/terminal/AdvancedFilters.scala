@@ -8,7 +8,7 @@ import SpecialKeys._
  * Created by haoyi on 6/11/15.
  */
 object AdvancedFilters {
-  class SelectionFilter extends DelegateFilter{
+  case class SelectionFilter() extends DelegateFilter{
     var mark: Option[Int] = None
     def setMark(c: Int) = {
       if (mark == None) mark = Some(c)
@@ -18,6 +18,12 @@ object AdvancedFilters {
       Case(ShiftDown){(b, c, m) => setMark(c); BasicFilters.moveDown(b, c, m.width)},
       Case(ShiftRight){(b, c, m) => setMark(c); (b, c + 1)},
       Case(ShiftLeft){(b, c, m) => setMark(c); (b, c - 1)},
+      Case(AltShiftUp){(b, c, m) => setMark(c); BasicFilters.moveUp(b, c, m.width)},
+      Case(AltShiftDown){(b, c, m) => setMark(c); BasicFilters.moveDown(b, c, m.width)},
+      Case(AltShiftRight){(b, c, m) => setMark(c); wordRight(b, c)},
+      Case(AltShiftLeft){(b, c, m) => setMark(c); wordLeft(b, c)},
+      Case(FnShiftRight){(b, c, m) => setMark(c); BasicFilters.moveEnd(b, c, m.width)},
+      Case(FnShiftLeft){(b, c, m) => setMark(c); BasicFilters.moveStart(b, c, m.width)},
       {
         // Intercept every other character. If it's a  printable character,
         // delete the current selection and write the printable character.
@@ -39,15 +45,15 @@ object AdvancedFilters {
     )
   }
 
-  lazy val fnFilter = orElseAll(
+  val fnFilter = orElseAll(
     Case(FnUp)((b, c, m) => (b, c - 9999)),
     Case(FnDown)((b, c, m) => (b, c + 9999)),
     Case(FnRight)((b, c, m) => BasicFilters.moveEnd(b, c, m.width)),
     Case(FnLeft)((b, c, m) => BasicFilters.moveStart(b, c, m.width))
   )
   val altFilter = orElseAll(
-    Case(AltUp){(b, c, m) => (b, c)},
-    Case(AltDown){(b, c, m) => (b, c)},
+    Case(AltUp){(b, c, m) => BasicFilters.moveUp(b, c, m.width)},
+    Case(AltDown){(b, c, m) => BasicFilters.moveDown(b, c, m.width)},
     Case(AltRight){(b, c, m) => wordRight(b, c)},
     Case(AltLeft){(b, c, m) => wordLeft(b, c)}
   )
@@ -58,23 +64,9 @@ object AdvancedFilters {
     Case(FnAltRight){(b, c, m) => (b, c)},
     Case(FnAltLeft){(b, c, m) => (b, c)}
   )
-  val fnShiftFilter = orElseAll(
-    Case(FnShiftRight){(b, c, m) => (b, c)},
-    Case(FnShiftLeft){(b, c, m) => (b, c)}
-  )
-  val altShiftFilter = orElseAll(
-    Case(AltShiftUp){(b, c, m) => (b, c)},
-    Case(AltShiftDown){(b, c, m) => (b, c)},
-    Case(AltShiftRight){(b, c, m) => (b, c)},
-    Case(AltShiftLeft){(b, c, m) => (b, c)}
-  )
   val fnAltShiftFilter = orElseAll(
     Case(FnAltShiftRight){(b, c, m) => (b, c)},
     Case(FnAltShiftLeft){(b, c, m) => (b, c)}
-  )
-  lazy val advancedNavFilter = orElseAll(
-    fnFilter, altFilter, fnAltFilter,
-    fnShiftFilter, altShiftFilter, fnAltShiftFilter
   )
 
 

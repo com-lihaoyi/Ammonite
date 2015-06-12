@@ -1,10 +1,9 @@
 package ammonite.repl.frontend
 
-import java.io.{OutputStreamWriter, Writer, OutputStream, InputStream}
+import java.io.{OutputStreamWriter, OutputStream, InputStream}
 
 import ammonite.repl._
 import ammonite.repl.frontend.Highlighter.Stringy
-import fastparse._
 import fastparse.core.Result
 import jline.console.{completer, ConsoleReader}
 import acyclic.file
@@ -14,7 +13,6 @@ import scala.tools.nsc.interpreter._
 import ammonite.terminal._
 import ammonite.terminal.LazyList._
 
-import scala.util.matching.Regex
 import scalaparse.Scala._
 import scalaparse.syntax.Identifiers._
 
@@ -90,21 +88,22 @@ object FrontEnd{
           }
       }
       
-      val historyFilter = new ReadlineFilters.HistoryFilter(history.reverse)
-      val cutPasteFilter = new ReadlineFilters.cutPasteFilter()
-      val selectionFilter = new AdvancedFilters.SelectionFilter
+      val historyFilter = ReadlineFilters.HistoryFilter(() => history.reverse)
+      val cutPasteFilter = ReadlineFilters.CutPasteFilter()
+      val selectionFilter = AdvancedFilters.SelectionFilter()
       val code = TermCore.readLine(
         shellPrompt,
         System.in,
         System.out,
         selectionFilter orElse
-        AdvancedFilters.advancedNavFilter orElse
+        AdvancedFilters.altFilter orElse
+        AdvancedFilters.fnFilter orElse
         ReadlineFilters.navFilter orElse
         autocompleteFilter orElse
         historyFilter.filter orElse
         cutPasteFilter orElse
         multilineFilter orElse
-        BasicFilters.default,
+        BasicFilters.all,
         displayTransform = { (buffer, cursor) =>
           val indices = Highlighter.highlightIndices(
             ammonite.repl.Parsers.Splitter,

@@ -8,7 +8,8 @@ import SpecialKeys._
  * (including with all the modifier keys), enter/ctrl-c-exit, etc.
  */
 object BasicFilters {
-  val default = {
+  def all = {
+    multilineFilter orElse
     navFilter orElse
     exitFilter orElse
     enterFilter orElse
