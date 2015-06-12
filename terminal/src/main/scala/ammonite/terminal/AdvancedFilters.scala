@@ -33,7 +33,7 @@ object AdvancedFilters {
             val newInputs =
               if (char == 127) inputs
               else char ~: inputs
-            TS(newInputs, newBuffer, cursor)
+            TS(newInputs, newBuffer, min)
           }
       }
     )

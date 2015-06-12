@@ -5,14 +5,6 @@ import acyclic.file
  */
 object FilterTools {
 
-  /**
-   * Lets you easily pattern match on characters modified by ctrl,
-   * or convert a character into its ctrl-ed version
-   */
-  object Ctrl{
-    def apply(c: Char) = (c - 96).toChar.toString
-    def unapply(i: Int): Option[Int] = Some(i + 96)
-  }
 
   /**
    * `orElse`-s together each partial function passed to it
@@ -21,11 +13,6 @@ object FilterTools {
     def isDefinedAt(x: T) = pfs.exists(_.isDefinedAt(x))
     def apply(v1: T) = pfs.find(_.isDefinedAt(v1)).map(_(v1)).getOrElse(throw new MatchError(v1))
   }
-
-  /**
-   * The string value you get when you hit the alt key
-   */
-  def Alt = "\u001b"
 
   /**
    * Shorthand to construct a filter in the common case where you're

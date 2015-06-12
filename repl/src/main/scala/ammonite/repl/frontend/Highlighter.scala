@@ -24,7 +24,7 @@ object Highlighter {
     },
     endColor = Console.RESET
   )
-  def highlight(parser: fastparse.P[_],
+  def highlightIndices(parser: fastparse.P[_],
                 buffer: Vector[Char],
                 ruleColors: PartialFunction[Rule[_], String],
                 endColor: String = Console.RESET) = {
@@ -60,15 +60,21 @@ object Highlighter {
     }
     // Make sure there's an index right at the start and right at the end! This
     // resets the colors at the snippet's end so they don't bleed into later output
-    val boundedIndices = indices ++ Seq((9999, endColor, false))
-//    println(boundedIndices)
-    val buffer2 =
-      boundedIndices
-        .sliding(2)
-        .flatMap{case Seq((s, c1, _), (e, c2, _)) => c1 ++ buffer.slice(s, e) }
-        .toVector
-
-    buffer2
+    indices ++ Seq((9999, endColor, false))
+  }
+  def flattenIndices(boundedIndices: Seq[(Int, String, Boolean)],
+                     buffer: Vector[Char]) = {
+    boundedIndices
+      .sliding(2)
+      .flatMap{case Seq((s, c1, _), (e, c2, _)) => c1 ++ buffer.slice(s, e) }
+      .toVector
+  }
+  def highlight(parser: fastparse.P[_],
+                buffer: Vector[Char],
+                ruleColors: PartialFunction[Rule[_], String],
+                endColor: String = Console.RESET) = {
+    val boundedIndices = highlightIndices(parser, buffer, ruleColors, endColor)
+    flattenIndices(boundedIndices, buffer)
   }
 
 }

@@ -3,7 +3,7 @@ package ammonite.repl.frontend
 import java.io.{OutputStreamWriter, Writer, OutputStream, InputStream}
 
 import ammonite.repl._
-import ammonite.terminal.Term.HistoryFilter
+import ammonite.repl.frontend.Highlighter.Stringy
 import fastparse._
 import fastparse.core.Result
 import jline.console.{completer, ConsoleReader}
@@ -11,9 +11,13 @@ import acyclic.file
 
 import scala.annotation.tailrec
 import scala.tools.nsc.interpreter._
-import collection.JavaConversions._
 import ammonite.terminal._
 import ammonite.terminal.LazyList._
+
+import scala.util.matching.Regex
+import scalaparse.Scala._
+import scalaparse.syntax.Identifiers._
+
 /**
  * All the mucky JLine interfacing code
  */
@@ -86,14 +90,55 @@ object FrontEnd{
           }
       }
       
-      val historyFilter = new HistoryFilter(history.reverse)
-
+      val historyFilter = new ReadlineFilters.HistoryFilter(history.reverse)
+      val cutPasteFilter = new ReadlineFilters.cutPasteFilter()
+      val selectionFilter = new AdvancedFilters.SelectionFilter
       val code = TermCore.readLine(
         shellPrompt,
         System.in,
         System.out,
-        autocompleteFilter orElse historyFilter.filter orElse multilineFilter orElse Term.defaultFilter,
-        displayTransform = (buffer, cursor) => (Highlighter.defaultHighlight(buffer), cursor)
+        selectionFilter orElse
+        AdvancedFilters.advancedNavFilter orElse
+        ReadlineFilters.navFilter orElse
+        autocompleteFilter orElse
+        historyFilter.filter orElse
+        cutPasteFilter orElse
+        multilineFilter orElse
+        BasicFilters.default,
+        displayTransform = { (buffer, cursor) =>
+          val indices = Highlighter.highlightIndices(
+            ammonite.repl.Parsers.Splitter,
+            buffer,
+            {
+              case Literals.Expr.Interp | Literals.Pat.Interp => Console.RESET
+              case Literals.Comment => Console.BLUE
+              case ExprLiteral => Console.GREEN
+              case Stringy("BasicType") => Console.GREEN
+              case Stringy(Highlighter.BackTicked(body))
+                if alphaKeywords.contains(body) => Console.YELLOW
+            },
+            endColor = Console.RESET
+          )
+          selectionFilter.mark match{
+            case Some(mark) if mark != cursor =>
+              val Seq(min, max) = Seq(cursor, mark).sorted
+              val before = indices.filter(_._1 <= min)
+              val after = indices.filter(_._1 > max)
+              val lastBeforeAfter =
+                indices.filter(_._1 <= max)
+                       .lastOption
+                       .map(_._2)
+                       .getOrElse("")
+              val middle = Seq(
+                (min, Console.RESET + Console.REVERSED, true),
+                (max, Console.RESET + lastBeforeAfter, true)
+              )
+              val newIndices = before ++ middle ++ after
+              val displayOffset = if (cursor < mark) 0 else -1
+              (Highlighter.flattenIndices(newIndices, buffer), cursor + displayOffset)
+            case _ => (Highlighter.flattenIndices(indices, buffer), cursor)
+          }
+        }
       )
       code match{
         case None => Res.Exit

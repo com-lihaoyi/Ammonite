@@ -26,22 +26,26 @@ object Term{
         BasicFilters.default,
         // Example displayTransform: underline all non-spaces
         displayTransform = (buffer, cursor) => {
-
+          // underline all non-blank lines
           def hl(b: Vector[Char]): Vector[Char] = b.flatMap{
             case ' ' => " "
             case '\n' => "\n"
             case c => Console.UNDERLINED + c + Console.RESET
-
           }
-          val buffer2 = selection.mark match{
-            case None => hl(buffer)
-            case Some(mark) =>
+          // and highlight the selection
+          selection.mark match{
+            case Some(mark) if mark != cursor =>
               val Seq(min, max) = Seq(mark, cursor).sorted
               val (a, b0) = buffer.splitAt(min)
               val (b, c) = b0.splitAt(max - min)
-              hl(a) ++ Console.REVERSED ++ b ++ Console.RESET ++ hl(c)
+              val displayOffset = if (cursor < mark) 0 else -1
+              (
+                hl(a) ++ Console.REVERSED ++ b ++ Console.RESET ++ hl(c),
+                cursor + displayOffset
+              )
+            case _ => (hl(buffer), cursor)
           }
-          (buffer2, cursor)
+
         }
       ) match {
         case None => println("Bye!")

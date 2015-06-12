@@ -2,7 +2,7 @@ package ammonite.terminal
 import acyclic.file
 import FilterTools._
 import ammonite.terminal.LazyList._
-
+import SpecialKeys._
 /**
  * Filters for injection of readline-specific hotkeys, the sort that
  * are available in bash, python and most other interactive command-lines
@@ -104,7 +104,4 @@ object ReadlineFilters {
         swapInHistory(b, (index - 1) max -1, rest, 0)
     }
   }
-
-
-
 }

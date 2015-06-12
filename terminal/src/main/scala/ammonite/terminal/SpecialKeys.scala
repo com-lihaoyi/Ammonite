@@ -6,6 +6,23 @@ import ammonite.terminal.FilterTools._
  * Created by haoyi on 6/11/15.
  */
 object SpecialKeys {
+
+
+  /**
+   * Lets you easily pattern match on characters modified by ctrl,
+   * or convert a character into its ctrl-ed version
+   */
+  object Ctrl{
+    def apply(c: Char) = (c - 96).toChar.toString
+    def unapply(i: Int): Option[Int] = Some(i + 96)
+  }
+
+  /**
+   * The string value you get when you hit the alt key
+   */
+  def Alt = "\u001b"
+
+
   val Up = Alt+"[A"
   val Down = Alt+"[B"
   val Right = Alt+"[C"

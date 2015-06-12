@@ -155,7 +155,7 @@ object TermCore {
       }
 
       ansi.restore()
-      val (nextHeight, cursorY, cursorX) = calculateHeight(buffer, cursor, width, noAnsiPrompt)
+      val (nextHeight, cursorY, cursorX) = calculateHeight(buffer, transformedCursor, width, noAnsiPrompt)
 //      Debug("DOWN " + cursorY)
 //      Debug("RIGHT " + cursorX)
       ansi.down(cursorY)
