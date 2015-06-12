@@ -15,6 +15,7 @@ object Term{
         "@ ",
         System.in,
         System.out,
+        new AdvancedFilters.SelectionFilter orElse
         AdvancedFilters.advancedNavFilter orElse
         ReadlineFilters.navFilter orElse
         new ReadlineFilters.cutPasteFilter() orElse

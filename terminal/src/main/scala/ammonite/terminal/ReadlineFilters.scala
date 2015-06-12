@@ -34,8 +34,8 @@ object ReadlineFilters {
   // Ctrl-y     paste last cut
 
   lazy val navFilter = orElseAll(
-    Case("b")((b, c, m) => (b, c-1)), // <- one char
-    Case("f")((b, c, m) => (b, c-1)), // -> one char
+    Case(Ctrl('b'))((b, c, m) => (b, c-1)), // <- one char
+    Case(Ctrl('f'))((b, c, m) => (b, c-1)), // -> one char
     Case(Alt+"b")((b, c, m) => AdvancedFilters.wordLeft(b, c)), // <- one word
     Case(Alt+"f")((b, c, m) => AdvancedFilters.wordRight(b, c)), // -> one  word
     Case(Ctrl('a'))((b, c, m) => BasicFilters.moveStart(b, c, m.width)), // <- one line

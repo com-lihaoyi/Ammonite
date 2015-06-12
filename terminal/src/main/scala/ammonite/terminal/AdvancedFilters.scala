@@ -1,57 +1,79 @@
 package ammonite.terminal
 
-import ammonite.terminal.FilterTools._
-
+import FilterTools._
+import TermCore.{Filter, DelegateFilter}
+import LazyList._
+import SpecialKeys._
 /**
  * Created by haoyi on 6/11/15.
  */
 object AdvancedFilters {
+  class SelectionFilter extends DelegateFilter{
+    var mark: Option[Int] = None
+    def setMark(c: Int) = {
+      if (mark == None) mark = Some(c)
+    }
+    def filter = orElseAll(
+      Case(ShiftUp){(b, c, m) => setMark(c); BasicFilters.moveUp(b, c, m.width)},
+      Case(ShiftDown){(b, c, m) => setMark(c); BasicFilters.moveDown(b, c, m.width)},
+      Case(ShiftRight){(b, c, m) => setMark(c); (b, c + 1)},
+      Case(ShiftLeft){(b, c, m) => setMark(c); (b, c - 1)},
+      {
+        // Intercept every other character. If it's a  printable character,
+        // delete the current selection and write the printable character.
+        // If it's a special command, just cancel the current selection.
+        case TS(char ~: inputs, buffer, cursor) if mark != None =>
+          if (char == Alt(0) || char < 'a') {
+            mark = None
+            TS(char ~: inputs, buffer, cursor)
+          }else{
+            val Seq(min, max) = Seq(mark.get, cursor).sorted
+            mark = None
+            val newBuffer = buffer.take(min) ++ buffer.drop(max)
+            val newInputs =
+              if (char == 127) inputs
+              else char ~: inputs
+            TS(newInputs, newBuffer, cursor)
+          }
+      }
+    )
+  }
+
   lazy val fnFilter = orElseAll(
-    Case(Alt+"[5~")((b, c, m) => (b, c - 9999)),
-    Case(Alt+"[6~")((b, c, m) => (b, c + 9999)),
-    Case(Alt+"[F")((b, c, m) => BasicFilters.moveEnd(b, c, m.width)),
-    Case(Alt+"[H")((b, c, m) => BasicFilters.moveStart(b, c, m.width))
+    Case(FnUp)((b, c, m) => (b, c - 9999)),
+    Case(FnDown)((b, c, m) => (b, c + 9999)),
+    Case(FnRight)((b, c, m) => BasicFilters.moveEnd(b, c, m.width)),
+    Case(FnLeft)((b, c, m) => BasicFilters.moveStart(b, c, m.width))
   )
   val altFilter = orElseAll(
-    Case(Alt*2+"[A"){(b, c, m) => Debug("alt-up"); (b, c)},
-    Case(Alt*2+"[B"){(b, c, m) => Debug("alt-down"); (b, c)},
-    Case(Alt*2+"[C"){(b, c, m) => wordRight(b, c)},
-    Case(Alt*2+"[D"){(b, c, m) => wordLeft(b, c)}
+    Case(AltUp){(b, c, m) => (b, c)},
+    Case(AltDown){(b, c, m) => (b, c)},
+    Case(AltRight){(b, c, m) => wordRight(b, c)},
+    Case(AltLeft){(b, c, m) => wordLeft(b, c)}
   )
-  val shiftFilter = orElseAll(
-    Case(Alt+"[1;2A"){(b, c, m) => Debug("shift-up"); (b, c)},
-    Case(Alt+"[1;2B"){(b, c, m) => Debug("shift-down"); (b, c)},
-    Case(Alt+"[1;2C"){(b, c, m) => Debug("shift-right"); (b, c)},
-    Case(Alt+"[1;2D"){(b, c, m) => Debug("shift-left"); (b, c)}
-  )
+
   val fnAltFilter = orElseAll(
-    Case(Alt*2+"[5~"){(b, c, m) => Debug("fn-alt-up"); (b, c)},
-    Case(Alt*2+"[6~"){(b, c, m) => Debug("fn-alt-down"); (b, c)},
-    Case(Alt+"[1;9F"){(b, c, m) => Debug("fn-alt-right"); (b, c)},
-    Case(Alt+"[1;9H"){(b, c, m) => Debug("fn-alt-left"); (b, c)}
+    Case(FnAltUp){(b, c, m) => (b, c)},
+    Case(FnAltDown){(b, c, m) => (b, c)},
+    Case(FnAltRight){(b, c, m) => (b, c)},
+    Case(FnAltLeft){(b, c, m) => (b, c)}
   )
   val fnShiftFilter = orElseAll(
-  // Same as fn-alt-{up, down}
-    //    Case(Alt*2+"[5~"){(b, c, m) => Debug("fn-alt-up"); (b, c)},
-    //    Case(Alt*2+"[6~"){(b, c, m) => Debug("fn-alt-down"); (b, c)},
-    Case(Alt+"[1;2F"){(b, c, m) => Debug("fn-shift-right"); (b, c)},
-    Case(Alt+"[1;2H"){(b, c, m) => Debug("fn-shift-left"); (b, c)}
+    Case(FnShiftRight){(b, c, m) => (b, c)},
+    Case(FnShiftLeft){(b, c, m) => (b, c)}
   )
   val altShiftFilter = orElseAll(
-    Case(Alt+"[1;10A"){(b, c, m) => Debug("alt-shift-up"); (b, c)},
-    Case(Alt+"[1;10B"){(b, c, m) => Debug("alt-shift-down"); (b, c)},
-    Case(Alt+"[1;10C"){(b, c, m) => Debug("alt-shift-right"); (b, c)},
-    Case(Alt+"[1;10D"){(b, c, m) => Debug("alt-shift-left"); (b, c)}
+    Case(AltShiftUp){(b, c, m) => (b, c)},
+    Case(AltShiftDown){(b, c, m) => (b, c)},
+    Case(AltShiftRight){(b, c, m) => (b, c)},
+    Case(AltShiftLeft){(b, c, m) => (b, c)}
   )
   val fnAltShiftFilter = orElseAll(
-    // Same as the case fn-alt-{up,down} without the shift
-    //    Case(Alt*2+"[5~"){(b, c, m) => Debug("fn-alt-shift-up"); (b, c)},
-    //    Case(Alt*2+"[6~"){(b, c, m) => Debug("fn-alt-shift-down"); (b, c)},
-    Case(Alt+"[1;10F"){(b, c, m) => Debug("fn-alt-shift-right"); (b, c)},
-    Case(Alt+"[1;10H"){(b, c, m) => Debug("fn-alt-shift-left"); (b, c)}
+    Case(FnAltShiftRight){(b, c, m) => (b, c)},
+    Case(FnAltShiftLeft){(b, c, m) => (b, c)}
   )
   lazy val advancedNavFilter = orElseAll(
-    fnFilter, altFilter, shiftFilter, fnAltFilter,
+    fnFilter, altFilter, fnAltFilter,
     fnShiftFilter, altShiftFilter, fnAltShiftFilter
   )
 

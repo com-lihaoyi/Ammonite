@@ -2,7 +2,7 @@ package ammonite.terminal
 import acyclic.file
 import ammonite.terminal.LazyList._
 import FilterTools._
-
+import SpecialKeys._
 /**
  * Filters for simple operation of a terminal: cursor-navigation
  * (including with all the modifier keys), enter/ctrl-c-exit, etc.
@@ -29,10 +29,10 @@ object BasicFilters {
   }
 
   lazy val navFilter = orElseAll(
-    Case(Alt+"[A")((b, c, m) => moveUp(b, c, m.width)),
-    Case(Alt+"[B")((b, c, m) => moveDown(b, c, m.width)),
-    Case(Alt+"[C")((b, c, m) => (b, c + 1)),
-    Case(Alt+"[D")((b, c, m) => (b, c - 1))
+    Case(Up)((b, c, m) => moveUp(b, c, m.width)),
+    Case(Down)((b, c, m) => moveDown(b, c, m.width)),
+    Case(Right)((b, c, m) => (b, c + 1)),
+    Case(Left)((b, c, m) => (b, c - 1))
   )
 
 
