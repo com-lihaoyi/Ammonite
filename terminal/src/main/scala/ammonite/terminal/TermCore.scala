@@ -1,5 +1,5 @@
 package ammonite.terminal
-
+import acyclic.file
 import java.io.{OutputStreamWriter, InputStreamReader, OutputStream, InputStream}
 
 import scala.annotation.tailrec

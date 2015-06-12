@@ -44,11 +44,11 @@ class Checker(width: Int, grid: String, start: String){
     val endString = endState.mkString
     assert(end == endString)
   }
-  val edit = new Term.ReadlineEditFilter()
-  val down: TermCore.Action = Term.moveDown(_, _, width)
-  val up: TermCore.Action = Term.moveUp(_, _, width)
-  val home: TermCore.Action = Term.moveStart(_, _, width)
-  val end: TermCore.Action = Term.moveEnd(_, _, width)
-  val wordLeft: TermCore.Action = Term.wordLeft
-  val wordRight: TermCore.Action = Term.wordRight
+  val edit = new ReadlineFilters.cutPasteFilter()
+  val down: TermCore.Action = BasicFilters.moveDown(_, _, width)
+  val up: TermCore.Action = BasicFilters.moveUp(_, _, width)
+  val home: TermCore.Action = BasicFilters.moveStart(_, _, width)
+  val end: TermCore.Action = BasicFilters.moveEnd(_, _, width)
+  val wordLeft: TermCore.Action = ReadlineFilters.wordLeft
+  val wordRight: TermCore.Action = ReadlineFilters.wordRight
 }
