@@ -3,7 +3,6 @@ package ammonite.terminal
 import acyclic.file
 import scala.annotation.tailrec
 
-import ammonite.terminal.LazyList._
 
 
 // Test Unicode:  漢語;𩶘da
@@ -21,7 +20,7 @@ object Term{
         // Example multiline support by intercepting Enter key
         new ReadlineFilters.HistoryFilter(history) orElse
         BasicFilters.multilineFilter orElse
-        BasicFilters.defaultFilter,
+        BasicFilters.default,
         // Example displayTransform: underline all non-spaces
         displayTransform = (buffer, cursor) => {
           val buffer2 = buffer.flatMap{

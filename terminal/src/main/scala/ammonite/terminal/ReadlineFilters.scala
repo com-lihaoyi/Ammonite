@@ -3,6 +3,10 @@ import acyclic.file
 import FilterTools._
 import ammonite.terminal.LazyList._
 
+/**
+ * Filters for injection of readline-specific hotkeys, the sort that
+ * are available in bash, python and most other interactive command-lines
+ */
 object ReadlineFilters {
 
   // www.bigsmoke.us/readline/shortcuts
@@ -29,7 +33,7 @@ object ReadlineFilters {
   // Alt-Backspace  <- cut word
   // Ctrl-y     paste last cut
 
-  def navFilter = Filters(
+  lazy val navFilter = orElseAll(
     Case("b")((b, c, m) => (b, c-1)), // <- one char
     Case("f")((b, c, m) => (b, c-1)), // -> one char
     Case(Alt+"b")((b, c, m) => wordLeft(b, c)), // <- one word
@@ -65,7 +69,7 @@ object ReadlineFilters {
       (b.take(c) ++ currentCut ++ b.drop(c), c + currentCut.length)
     }
 
-    def filter = Filters(
+    def filter = orElseAll(
       Case(Ctrl('u'))((b, c, m) => cutAllLeft(b, c)),
       Case(Ctrl('k'))((b, c, m) => cutAllRight(b, c)),
       Case(Alt + "d")((b, c, m) => cutWordRight(b, c)),

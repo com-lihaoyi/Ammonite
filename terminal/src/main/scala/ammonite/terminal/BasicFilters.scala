@@ -1,11 +1,14 @@
 package ammonite.terminal
 import acyclic.file
 import ammonite.terminal.LazyList._
-import ammonite.terminal.TermState
 import FilterTools._
 
+/**
+ * Filters for simple operation of a terminal: cursor-navigation
+ * (including with all the modifier keys), enter/ctrl-c-exit, etc.
+ */
 object BasicFilters {
-  val defaultFilter = {
+  val default = {
     advancedNavFilter orElse
     navFilter orElse
     exitFilter orElse
@@ -26,7 +29,7 @@ object BasicFilters {
       }
   }
 
-  lazy val navFilter = Filters(
+  lazy val navFilter = orElseAll(
     Case(Alt+"[A")((b, c, m) => moveUp(b, c, m.width)),
     Case(Alt+"[B")((b, c, m) => moveDown(b, c, m.width)),
     Case(Alt+"[C")((b, c, m) => (b, c + 1)),
@@ -37,7 +40,7 @@ object BasicFilters {
     Case(Alt+"[H")((b, c, m) => moveStart(b, c, m.width))
   )
 
-  lazy val advancedNavFilter = Filters(
+  lazy val advancedNavFilter = orElseAll(
     Case(Alt*2+"[A"){(b, c, m) => Debug("alt-up"); (b, c)},
     Case(Alt*2+"[B"){(b, c, m) => Debug("alt-down"); (b, c)},
     Case(Alt*2+"[C"){(b, c, m) => Debug("alt-right"); (b, c)},
@@ -53,9 +56,8 @@ object BasicFilters {
     Case(Alt+"[1;9F"){(b, c, m) => Debug("fn-alt-right"); (b, c)},
     Case(Alt+"[1;9H"){(b, c, m) => Debug("fn-alt-left"); (b, c)},
 
-    // Conflicts with iTerm hotkeys, same as fn-{up, down}
-    //    Case(Alt*2+"[5~"){(b, c, m) => Debug("fn-alt-up"); (b, c)},
-    //    Case(Alt*2+"[6~"){(b, c, m) => Debug("fn-alt-down"); (b, c)},
+    Case(Alt*2+"[5~"){(b, c, m) => Debug("fn-alt-up"); (b, c)},
+    Case(Alt*2+"[6~"){(b, c, m) => Debug("fn-alt-down"); (b, c)},
     Case(Alt+"[1;2F"){(b, c, m) => Debug("fn-shift-right"); (b, c)},
     Case(Alt+"[1;2H"){(b, c, m) => Debug("fn-shift-left"); (b, c)},
 

@@ -1,49 +1,63 @@
 package ammonite.terminal
 import acyclic.file
 /**
- * Created by haoyi on 6/11/15.
+ * A collection of helpers that to simpify the common case of building filters
  */
 object FilterTools {
 
   /**
-   * Lets you easily pattern match on characters modified by ctrl
+   * Lets you easily pattern match on characters modified by ctrl,
+   * or convert a character into its ctrl-ed version
    */
   object Ctrl{
     def apply(c: Char) = (c - 96).toString
     def unapply(i: Int): Option[Int] = Some(i + 96)
   }
-  def Filters[K, V](pfs: PartialFunction[K, V]*) = new PartialFunction[K, V]{
-    def isDefinedAt(x: K) = pfs.exists(_.isDefinedAt(x))
 
-    def apply(v1: K) = pfs.find(_.isDefinedAt(v1)).map(_(v1)).getOrElse(throw new MatchError(v1))
+  /**
+   * `orElse`-s together each partial function passed to it
+   */
+  def orElseAll[T, V](pfs: PartialFunction[T, V]*) = new PartialFunction[T, V]{
+    def isDefinedAt(x: T) = pfs.exists(_.isDefinedAt(x))
+    def apply(v1: T) = pfs.find(_.isDefinedAt(v1)).map(_(v1)).getOrElse(throw new MatchError(v1))
   }
+
+  /**
+   * The string value you get when you hit the alt key
+   */
   def Alt = "\u001b"
-  def Case(s: String)(f: (Vector[Char], Int, TermInfo) => (Vector[Char], Int)) = new PartialFunction[TermInfo, TermAction] {
-    def isDefinedAt(x: TermInfo) = {
 
-      def rec(i: Int, c: LazyList[Int]): Boolean = {
-        if (i >= s.length) true
-        else if (c.head == s(i)) rec(i+1, c.tail)
-        else false
+  /**
+   * Shorthand to construct a filter in the common case where you're
+   * switching on the prefix of the input stream and want to run some
+   * transformation on the buffer/cursor
+   */
+  def Case(s: String)(f: (Vector[Char], Int, TermInfo) => (Vector[Char], Int)) =
+    new PartialFunction[TermInfo, TermAction] {
+      def isDefinedAt(x: TermInfo) = {
+
+        def rec(i: Int, c: LazyList[Int]): Boolean = {
+          if (i >= s.length) true
+          else if (c.head == s(i)) rec(i+1, c.tail)
+          else false
+        }
+        rec(0, x.ts.inputs)
       }
-      rec(0, x.ts.inputs)
+
+      def apply(v1: TermInfo) = {
+        val (buffer1, cursor1) = f(v1.ts.buffer, v1.ts.cursor, v1)
+        TermState(
+          v1.ts.inputs.dropPrefix(s.map(_.toInt)).get,
+          buffer1,
+          cursor1
+        )
+      }
     }
 
-    def apply(v1: TermInfo) = {
-      val (buffer1, cursor1) = f(v1.ts.buffer, v1.ts.cursor, v1)
-      TermState(
-        v1.ts.inputs.dropPrefix(s.map(_.toInt)).get,
-        buffer1,
-        cursor1
-      )
-    }
-  }
-  def TSX(rest: LazyList[Int], args: (Vector[Char], Int)) = {
-    TS(rest, args._1, args._2)
-  }
-
+  /**
+   * Shorthand for pattern matching on [[TermState]]
+   */
   val TS = TermState
-  val TI = TermInfo
 
 
   def findChunks(b: Vector[Char], c: Int) = {

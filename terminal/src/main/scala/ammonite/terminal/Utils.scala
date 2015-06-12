@@ -1,9 +1,8 @@
 package ammonite.terminal
 
-import java.io.{Writer, FileOutputStream, OutputStream}
+import java.io.{Writer, FileOutputStream}
 import acyclic.file
 import scala.annotation.tailrec
-import scala.collection.mutable
 
 
 object Debug{
