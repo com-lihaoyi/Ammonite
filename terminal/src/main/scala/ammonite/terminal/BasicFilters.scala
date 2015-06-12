@@ -32,11 +32,7 @@ object BasicFilters {
     Case(Alt+"[A")((b, c, m) => moveUp(b, c, m.width)),
     Case(Alt+"[B")((b, c, m) => moveDown(b, c, m.width)),
     Case(Alt+"[C")((b, c, m) => (b, c + 1)),
-    Case(Alt+"[D")((b, c, m) => (b, c - 1)),
-    Case(Alt+"[5~")((b, c, m) => (b, c - 9999)),
-    Case(Alt+"[6~")((b, c, m) => (b, c + 9999)),
-    Case(Alt+"[F")((b, c, m) => moveEnd(b, c, m.width)),
-    Case(Alt+"[H")((b, c, m) => moveStart(b, c, m.width))
+    Case(Alt+"[D")((b, c, m) => (b, c - 1))
   )
 
 
