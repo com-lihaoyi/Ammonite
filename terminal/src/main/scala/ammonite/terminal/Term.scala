@@ -15,6 +15,7 @@ object Term{
         "@ ",
         System.in,
         System.out,
+        AdvancedFilters.advancedNavFilter orElse
         ReadlineFilters.navFilter orElse
         new ReadlineFilters.cutPasteFilter() orElse
         // Example multiline support by intercepting Enter key

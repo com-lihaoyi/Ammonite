@@ -36,8 +36,8 @@ object ReadlineFilters {
   lazy val navFilter = orElseAll(
     Case("b")((b, c, m) => (b, c-1)), // <- one char
     Case("f")((b, c, m) => (b, c-1)), // -> one char
-    Case(Alt+"b")((b, c, m) => wordLeft(b, c)), // <- one word
-    Case(Alt+"f")((b, c, m) => wordRight(b, c)), // -> one  word
+    Case(Alt+"b")((b, c, m) => AdvancedFilters.wordLeft(b, c)), // <- one word
+    Case(Alt+"f")((b, c, m) => AdvancedFilters.wordRight(b, c)), // -> one  word
     Case(Ctrl('a'))((b, c, m) => BasicFilters.moveStart(b, c, m.width)), // <- one line
     Case(Ctrl('e'))((b, c, m) => BasicFilters.moveEnd(b, c, m.width)) // -> one line
   )
@@ -54,13 +54,13 @@ object ReadlineFilters {
     }
 
     def cutWordRight(b: Vector[Char], c: Int) = {
-      val start = consumeWord(b, c, 1, 0)
+      val start = AdvancedFilters.consumeWord(b, c, 1, 0)
       currentCut = b.slice(c, start)
       (b.take(c) ++ b.drop(start), c)
     }
 
     def cutWordLeft(b: Vector[Char], c: Int) = {
-      val start = consumeWord(b, c, -1, 1)
+      val start = AdvancedFilters.consumeWord(b, c, -1, 1)
       currentCut = b.slice(start, c)
       (b.take(start) ++ b.drop(c), start)
     }
@@ -77,15 +77,6 @@ object ReadlineFilters {
       Case(Ctrl('y'))((b, c, m) => paste(b, c))
     )
   }
-  def consumeWord(b: Vector[Char], c: Int, delta: Int, offset: Int) = {
-    var current = c
-    // Move at least one character! Otherwise
-    // you get stuck at the end of a word.
-    current += delta
-    while(b.isDefinedAt(current) && !b(current).isLetterOrDigit) current += delta
-    while(b.isDefinedAt(current) && b(current).isLetterOrDigit) current += delta
-    current + offset
-  }
 
 
   def firstRow(cursor: Int, buffer: Vector[Char], width: Int) = {
@@ -98,7 +89,7 @@ object ReadlineFilters {
     var index = -1
     var currentHistory = Vector[Char]()
 
-    def continue(b: Vector[Char], newIndex: Int, rest: LazyList[Int], c: Int) = {
+    def swapInHistory(b: Vector[Char], newIndex: Int, rest: LazyList[Int], c: Int) = {
       if (index == -1 && newIndex != -1) currentHistory = b
 
       index = newIndex
@@ -107,16 +98,13 @@ object ReadlineFilters {
       else TS(rest, history(index).toVector, c)
     }
     def filter = {
-      case TI(TS(p"\u001b[A$rest", b, c), w) if firstRow(c, b, w) =>
-        continue(b, (index + 1) min (history.length - 1), rest, 99999)
-      case TI(TS(p"\u001b[B$rest", b, c), w) if lastRow(c, b, w) =>
-        continue(b, (index - 1) max -1, rest, 0)
+      case TermInfo(TS(p"\u001b[A$rest", b, c), w) if firstRow(c, b, w) =>
+        swapInHistory(b, (index + 1) min (history.length - 1), rest, 99999)
+      case TermInfo(TS(p"\u001b[B$rest", b, c), w) if lastRow(c, b, w) =>
+        swapInHistory(b, (index - 1) max -1, rest, 0)
     }
   }
 
-
-  def wordLeft(b: Vector[Char], c: Int) = b -> consumeWord(b, c, -1, 1)
-  def wordRight(b: Vector[Char], c: Int) = b -> consumeWord(b, c, 1, 0)
 
 
 }
