@@ -10,7 +10,7 @@ object FilterTools {
    * or convert a character into its ctrl-ed version
    */
   object Ctrl{
-    def apply(c: Char) = (c - 96).toString
+    def apply(c: Char) = (c - 96).toChar.toString
     def unapply(i: Int): Option[Int] = Some(i + 96)
   }
 

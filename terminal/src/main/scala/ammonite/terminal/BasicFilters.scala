@@ -65,6 +65,12 @@ object BasicFilters {
   lazy val enterFilter: TermCore.Filter = {
     case TS(13 ~: rest, b, c) => // Enter
       Result(b.mkString)
+    case TS(10 ~: rest, b, c) => // Enter
+      Result(b.mkString)
+    case TS(10 ~: 13 ~:rest, b, c) => // Enter
+      Result(b.mkString)
+    case TS(13 ~: 10 ~:rest, b, c) => // Enter
+      Result(b.mkString)
   }
   lazy val exitFilter: TermCore.Filter = {
     case TS(Ctrl('c') ~: rest, b, c) =>
