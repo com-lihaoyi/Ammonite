@@ -45,7 +45,7 @@ object Storage{
 }
 
 class History extends ArrayBuffer[String]{
-  def last(lines: Int){
+  def last(lines: Int) = {
     drop(length - lines)
   }
 }
