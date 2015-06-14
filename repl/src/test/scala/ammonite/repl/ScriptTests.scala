@@ -35,6 +35,14 @@ object ScriptTests extends TestSuite{
           r: Int = 24
           """)
       }
+      'syntax{
+        check.session(s"""
+          @ load.script("$scriptPath/BlockSepSyntax.scala")
+
+          @ val r = res
+          r: Int = 24
+          """)
+      }
     }
     'failures{
       'syntaxError{
@@ -43,7 +51,7 @@ object ScriptTests extends TestSuite{
 
           @ val r = res
           error: Compilation Failed
-          Main.scala:29: not found: value res
+          Main.scala:30: not found: value res
           res
           ^
           """)
@@ -54,7 +62,7 @@ object ScriptTests extends TestSuite{
 
           @ val r = res
           error: Compilation Failed
-          Main.scala:39: not found: value res
+          Main.scala:40: not found: value res
           res
           ^
 
@@ -76,7 +84,7 @@ object ScriptTests extends TestSuite{
 
           @ val r2 = res2
           error: Compilation Failed
-          Main.scala:41: not found: value res2
+          Main.scala:42: not found: value res2
           res2 
           ^
           """)
