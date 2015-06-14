@@ -14,13 +14,14 @@ class Repl(input: InputStream,
            output: OutputStream,
            pprintConfig: pprint.Config = pprint.Config.Colors.PPrintConfig,
            shellPrompt0: String = "@ ",
-           initialHistory: History = new History,
+           initialHistory: Seq[String] = Nil,
            saveHistory: History => Unit = _ => (),
            predef: String = Repl.defaultPredef) {
 
   val shellPrompt = Ref(shellPrompt0)
 
-  val history = initialHistory
+  val history = new History
+  history ++= initialHistory
 
   val colorSet = Ref[ColorSet](ColorSet.Default)
   val frontEnd = Ref[FrontEnd](FrontEnd.JLine)
@@ -81,8 +82,6 @@ object Repl{
   def run(predef: String = defaultPredef) = {
     println("Loading Ammonite Repl...")
 
-    val saveFile = new java.io.File(System.getProperty("user.home")) + "/.amm"
-    val delimiter = "\n\n\n"
     val shell = new Repl(
       System.in, System.out,
       initialHistory = Storage.loadHistory,

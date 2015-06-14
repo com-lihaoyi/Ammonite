@@ -38,7 +38,7 @@ object Storage{
   def saveHistory(h: History): Unit = {
     val fw = new FileWriter(dir + "/history")
     yaml.synchronized{
-      yaml.dump(h.toArray,fw)
+      yaml.dump(h.toArray, fw)
     }
   }
 
