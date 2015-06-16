@@ -81,12 +81,12 @@ object Repl{
   def main(args: Array[String]) = run()
   def run(predef: String = defaultPredef) = {
     println("Loading Ammonite Repl...")
-
+    val storage = Storage()
     val shell = new Repl(
       System.in, System.out,
-      initialHistory = Storage.loadHistory,
+      initialHistory = storage.loadHistory,
       saveHistory = { s =>
-        Storage.saveHistory(s)
+        storage.saveHistory(s)
       },
       predef = predef
     )
