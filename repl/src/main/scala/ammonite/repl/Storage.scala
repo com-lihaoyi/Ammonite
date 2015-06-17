@@ -62,8 +62,10 @@ object History{
   implicit def historyPPrint(implicit c: Config): PPrint[History] = new PPrint(
     new PPrinter[History]{
       def render(t: History, c: Config)={
-        val seq = "\n...\n" +: t.last(c.lines()).flatMap{ code => Seq("@ ", code, "\n") }
-        seq.iterator
+        val lines = if(c.lines() > 0) c.lines() else t.length
+        val seq = "\n" +: t.last(lines).flatMap{ code => Seq("@ ", code, "\n") }
+        if(t.length > lines) ("\n..." +: seq).iterator
+        else seq.iterator
       }
     },
     c
