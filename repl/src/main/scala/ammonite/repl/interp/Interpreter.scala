@@ -137,14 +137,6 @@ class Interpreter(shellPrompt0: Ref[String],
     def newCompiler() = init()
     def history = history0
     def show[T](a: T, lines: Int = 0) = ammonite.pprint.Show(a, lines)
-
-    implicit val historyPPrinter: pprint.PPrinter[History] = 
-      new pprint.PPrinter[History]{
-        def render(t: History, c: pprint.Config)={
-          val seq = "\n" +: t.flatMap{ code => Seq("@ ", code, "\n") }
-          seq.iterator
-      }
-    }
   }
 
   var compiler: Compiler = _

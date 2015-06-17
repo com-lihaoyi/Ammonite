@@ -5,6 +5,7 @@ import java.io.{File, FileInputStream, IOException, FileWriter}
 import org.yaml.snakeyaml.Yaml
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.JavaConversions.asScalaBuffer
+import ammonite.pprint
 
 trait Storage{
   
@@ -56,4 +57,16 @@ class History extends ArrayBuffer[String]{
   }
 }
 
+object History{
+  import pprint._
+  implicit def historyPPrint(implicit c: Config): PPrint[History] = new PPrint(
+    new PPrinter[History]{
+      def render(t: History, c: Config)={
+        val seq = "\n...\n" +: t.last(c.lines()).flatMap{ code => Seq("@ ", code, "\n") }
+        seq.iterator
+      }
+    },
+    c
+  )
+}
 

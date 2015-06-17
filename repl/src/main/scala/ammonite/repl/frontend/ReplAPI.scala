@@ -94,8 +94,6 @@ trait ReplAPI {
    * to shadow this with your own definition to change how things look
    */
   implicit var pprintConfig: ammonite.pprint.Config
-
-  implicit val historyPPrinter: ammonite.pprint.PPrinter[History]
 }
 trait Load extends (String => Unit){
   /**
