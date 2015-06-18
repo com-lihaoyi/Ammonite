@@ -7,6 +7,11 @@ import scala.collection.mutable.ArrayBuffer
 import scala.collection.JavaConversions.asScalaBuffer
 import ammonite.pprint
 
+/**Trait for the interface of common persistent storage. 
+ * This handles history and persistent caches.
+ * Right now it is not threadsafe nor does it handle the mutual exclusion of files between processes. 
+ * Mutexes should be added to be able to run multiple Ammonite processes on the same system.
+ */ 
 trait Storage{
   
   def loadHistory: History
