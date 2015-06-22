@@ -35,6 +35,14 @@ object ScriptTests extends TestSuite{
           r: Int = 24
           """)
       }
+      'syntax{
+        check.session(s"""
+          @ load.script("$scriptPath/BlockSepSyntax.scala")
+
+          @ val r = res
+          r: Int = 24
+          """)
+      }
     }
     'failures{
       'syntaxError{

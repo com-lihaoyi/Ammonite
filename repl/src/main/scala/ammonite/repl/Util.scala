@@ -3,6 +3,7 @@ package ammonite.repl
 import acyclic.file
 import ammonite.pprint.{PPrinter, PPrint}
 import fastparse._
+import parsers.Terminals.Literal
 
 import scala.util.Try
 import scalaparse.Scala._
@@ -204,8 +205,9 @@ object Parsers {
     }
   }
 
-  val CompilationUnit = P( WL ~ StatementBlock("@\n") ~ WL )
-  val ScriptSplitter = P( CompilationUnit.rep(1, "@\n") ~ End)
+  val Separator = P( Literal("@") ~ CharIn(" \n").rep(1) )
+  val CompilationUnit = P( WL ~ StatementBlock(Separator) ~ WL )
+  val ScriptSplitter = P( CompilationUnit.rep(1, Separator) ~ End)
   def splitScript(code: String) = {
     ScriptSplitter.parse(code) match{
       case Result.Success(value, idx) => value

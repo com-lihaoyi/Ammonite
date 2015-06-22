@@ -15,12 +15,13 @@ class Repl(input: InputStream,
            pprintConfig: pprint.Config = pprint.Config.Colors.PPrintConfig,
            shellPrompt0: String = "@ ",
            initialHistory: Seq[String] = Nil,
-           saveHistory: String => Unit = _ => (),
+           saveHistory: History => Unit = _ => (),
            predef: String = Repl.defaultPredef) {
 
   val shellPrompt = Ref(shellPrompt0)
 
-  var history = Vector.empty[String]
+  val history = new History
+  history ++= initialHistory
 
   val colorSet = Ref[ColorSet](ColorSet.Default)
   val frontEnd = Ref[FrontEnd](FrontEnd.JLine)
@@ -40,7 +41,7 @@ class Repl(input: InputStream,
     ),
     colorSet,
     printer.print,
-    initialHistory ++ history,
+    history,
     predef
   )
 
@@ -50,11 +51,11 @@ class Repl(input: InputStream,
       output,
       colorSet().prompt + shellPrompt() + scala.Console.RESET,
       interp.pressy.complete(_, interp.eval.previousImportBlock, _),
-      initialHistory ++ history
+      history
     )
     _ = {
-      history = history :+ code
-      saveHistory(code)
+      history += code
+      saveHistory(history)
       cols.update()
       lines.update()
     }
@@ -80,20 +81,12 @@ object Repl{
   def main(args: Array[String]) = run()
   def run(predef: String = defaultPredef) = {
     println("Loading Ammonite Repl...")
-
-    val saveFile = new java.io.File(System.getProperty("user.home")) + "/.amm"
-    val delimiter = "\n\n\n"
+    val storage = Storage()
     val shell = new Repl(
       System.in, System.out,
-      initialHistory = try{
-        io.Source.fromFile(saveFile).mkString.split(delimiter)
-      }catch{case e: FileNotFoundException =>
-        Nil
-      },
+      initialHistory = storage.loadHistory,
       saveHistory = { s =>
-        val fw = new FileWriter(saveFile, true)
-        try fw.write(delimiter + s)
-        finally fw.close()
+        storage.saveHistory(s)
       },
       predef = predef
     )
