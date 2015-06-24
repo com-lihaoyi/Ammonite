@@ -4,7 +4,7 @@ import sbtassembly.AssemblyPlugin.defaultShellScript
 scalaVersion := "2.11.6"
 
 crossScalaVersions := Seq(
-  "2.11.3", "2.11.4", "2.11.5", "2.11.6"
+  "2.11.3", "2.11.4", "2.11.5", "2.11.6", "2.11.7"
 )
 
 publishArtifact := false
@@ -12,7 +12,7 @@ publishArtifact := false
 publishTo := Some(Resolver.file("Unused transient repository", file("target/unusedrepo")))
 
 val sharedSettings = Seq(
-  scalaVersion := "2.11.6",
+  scalaVersion := "2.11.7",
   organization := "com.lihaoyi",
   version := _root_.ammonite.Constants.version,
   libraryDependencies += "com.lihaoyi" %% "utest" % "0.3.0" % "test",
