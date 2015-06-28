@@ -30,6 +30,14 @@ object UnitTests extends TestSuite{
   val tests = TestSuite{
     println("UnitTests")
 
+    'historyPPrint{
+      import ammonite.pprint._
+      val hist = new History
+      hist ++= Seq("1","2","{\nblock\n}")
+      implicit val cfg = new Config
+      val pprinted = implicitly[PPrint[History]].render(hist).mkString
+      assert(pprinted == "\n@ 1\n@ 2\n@ {\nblock\n}\n")
+    }
     'comment - test("//a", "><B|//a>")
     'literal - test("1", "><G|1>")
     'expressions - test("val (x, y) = 1 + 2 + 3", "><Y|val> (x, y) = <G|1> + <G|2> + <G|3>")
