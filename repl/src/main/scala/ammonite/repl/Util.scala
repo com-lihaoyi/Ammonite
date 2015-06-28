@@ -2,8 +2,6 @@ package ammonite.repl
 
 import acyclic.file
 import ammonite.pprint.{PPrinter, PPrint}
-import fastparse._
-import parsers.Terminals.Literal
 
 import scala.util.Try
 import scalaparse.Scala._
@@ -173,9 +171,10 @@ object Timer{
 }
 object Parsers {
 
-  import fastparse._
+  import fastparse.noApi._
+
   import scalaparse.Scala._
-  private implicit def wspStr(s: String) = P(WL ~ s)(Utils.literalize(s).toString)
+  import WhitespaceApi._
 
   val PatVarSplitter = {
     val Prefixes = P(Prelude ~ (`var` | `val`))
@@ -198,22 +197,12 @@ object Parsers {
   val Statement = P ( scalaparse.Scala.Import | Prelude ~ BlockDef | StatCtx.Expr )
   def StatementBlock(blockSep: P0) = P ( Semis.? ~ (!blockSep ~ Statement).!.rep(sep=Semis) ~ Semis.? )
   val Splitter = P( StatementBlock(Fail) ~ WL ~ End)
-  def split(code: String) = {
-    Splitter.parse(code) match{
-      case Result.Success(value, idx) => value
-      case f: Result.Failure => throw new SyntaxError(code, f.parser, f.index)
-    }
-  }
+  def split(code: String) = Splitter.parse(code).get.value
 
-  val Separator = P( Literal("@") ~ CharIn(" \n").rep(1) )
+  val Separator = P( "@" ~ CharIn(" \n").rep(1) )
   val CompilationUnit = P( WL ~ StatementBlock(Separator) ~ WL )
   val ScriptSplitter = P( CompilationUnit.rep(1, Separator) ~ End)
-  def splitScript(code: String) = {
-    ScriptSplitter.parse(code) match{
-      case Result.Success(value, idx) => value
-      case f: Result.Failure => throw new SyntaxError(code, f.parser, f.index)
-    }
-  }
+  def splitScript(code: String) = ScriptSplitter.parse(code).get.value
 
   val BlockUnwrapper = P( "{" ~ Block.! ~ "}" ~ End)
   def unwrapBlock(code: String) = {
@@ -222,19 +211,4 @@ object Parsers {
       case _ => None
     }
   }
-}
-object SyntaxError{
-  def msg(code: String, p: fastparse.core.Parser[_], idx: Int) = {
-    val locationString = {
-      val (first, last) = code.splitAt(idx)
-      val lastSnippet = last.split('\n').headOption.getOrElse("")
-      val firstSnippet = first.reverse.split('\n').lift(0).getOrElse("").reverse
-      firstSnippet + lastSnippet + "\n" + (" " * firstSnippet.length) + "^"
-    }
-    val literal = fastparse.Utils.literalize(code.slice(idx, idx + 20))
-    s"SyntaxError: found $literal, expected $p in\n$locationString"
-  }
-}
-class SyntaxError(code: String, p: fastparse.core.Parser[_], idx: Int) extends Exception{
-  override def toString() = SyntaxError.msg(code, p, idx)
 }

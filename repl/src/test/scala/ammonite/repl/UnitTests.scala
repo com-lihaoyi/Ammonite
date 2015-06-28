@@ -17,7 +17,7 @@ object UnitTests extends TestSuite{
       case Literals.Expr.Interp | Literals.Pat.Interp => ">"
       case ExprLiteral => "<G|"
       case Type => "<G|"
-      case Stringy(BackTicked(body)) if alphaKeywords.contains(body) => "<Y|"
+      case BackTicked(body) if alphaKeywords.contains(body) => "<Y|"
       case Literals.Comment => "<B|"
     },
     endColor = ">"
@@ -47,11 +47,11 @@ object UnitTests extends TestSuite{
     )
     'runOff - test(
       """(1 + "Hello...""",
-      """>(<G|1> +<G| "Hello..."""
+      """>(<G|1> + <G|"Hello..."""
     )
     'underscore - test(
       """val _ = 1""",
-      """><Y|val><Y| _> = <G|1>"""
+      """><Y|val> <Y|_> = <G|1>"""
     )
     'nonTrivial - test(
       """def processLine(stmts: Seq[String],
@@ -74,15 +74,15 @@ object UnitTests extends TestSuite{
             } finally Thread.currentThread().setContextClassLoader(oldClassloader)
           } yield out
       """,
-      """><Y|def> processLine(stmts:<G| Seq[String]>,
-                          saveHistory:<G| (String => Unit, String) => Unit>,
-                          printer:<G| Iterator[String] => Unit>) = <Y|for>{<Y|
-            _> <- Catching {<Y| case> Ex(x@<Y|_>*) =>
+      """><Y|def> processLine(stmts: <G|Seq[String]>,
+                          saveHistory: <G|(String => Unit, String) => Unit>,
+                          printer: <G|Iterator[String] => Unit>) = <Y|for>{
+            <Y|_> <- Catching { <Y|case> Ex(x@<Y|_>*) =>
               <Y|val> Res.Failure(trace) = Res.Failure(x)
-              Res.Failure(trace +<G| "\nSomething unexpected went wrong =(">)
+              Res.Failure(trace + <G|"\nSomething unexpected went wrong =(">)
             }
             Preprocessor.Output(code, printSnippet) <- preprocess(stmts, eval.getCurrentLine)
-<Y|            _> = saveHistory(history.append(<Y|_>), stmts.mkString(<G|"; ">))
+            <Y|_> = saveHistory(history.append(<Y|_>), stmts.mkString(<G|"; ">))
             oldClassloader = Thread.currentThread().getContextClassLoader
             out <- <Y|try>{
               Thread.currentThread().setContextClassLoader(eval.evalClassloader)
@@ -91,8 +91,8 @@ object UnitTests extends TestSuite{
                 <G|s"ReplBridge.shell.Internal.combinePrints(>${printSnippet.mkString(<G|", ">)}<G|)">,
                 printer
               )
-            }<Y| finally> Thread.currentThread().setContextClassLoader(oldClassloader)
-          }<Y| yield> out
+            } <Y|finally> Thread.currentThread().setContextClassLoader(oldClassloader)
+          } <Y|yield> out
       """
     )
   }

@@ -3,7 +3,6 @@ package ammonite.repl.frontend
 import java.io.{OutputStreamWriter, OutputStream, InputStream}
 
 import ammonite.repl._
-import ammonite.repl.frontend.Highlighter.Stringy
 import fastparse.core.Result
 import jline.console.{completer, ConsoleReader}
 import acyclic.file
@@ -112,8 +111,8 @@ object FrontEnd{
               case Literals.Expr.Interp | Literals.Pat.Interp => Console.RESET
               case Literals.Comment => Console.BLUE
               case ExprLiteral => Console.GREEN
-              case Stringy("BasicType") => Console.GREEN
-              case Stringy(Highlighter.BackTicked(body))
+              case TypeId => Console.GREEN
+              case Highlighter.BackTicked(body)
                 if alphaKeywords.contains(body) => Console.YELLOW
             },
             endColor = Console.RESET
@@ -144,7 +143,9 @@ object FrontEnd{
         case Some(code) =>
           Parsers.Splitter.parse(code) match{
             case Result.Success(value, idx) => Res.Success((code, value))
-            case f: Result.Failure => Res.Failure(SyntaxError.msg(code, f.parser, f.index))
+            case f: Result.Failure => Res.Failure(
+              fastparse.core.SyntaxError.msg(f.input, f.traced.expected, f.index)
+            )
           }
       }
     }
@@ -211,11 +212,12 @@ object FrontEnd{
           case None => Res.Exit
           case Some(newCode) =>
             val code = buffered + newCode
-            Parsers.Splitter.parse(code) match {
+            Parsers.Splitter.parse(code) match{
+              case Result.Success(value, idx) => Res.Success(code -> value)
               case Result.Failure(_, index) if code.drop(index).trim() == "" => readCode(code + "\n")
-              case f: Result.Failure => Res.Failure(SyntaxError.msg(f.input, f.parser, f.index))
-              case Result.Success(split, idx) =>
-                Res.Success(code -> split)
+              case f: Result.Failure => Res.Failure(
+                fastparse.core.SyntaxError.msg(f.input, f.traced.expected, f.index)
+              )
             }
         }
       }

@@ -1,15 +1,16 @@
 package ammonite.repl.frontend
 import acyclic.file
-import fastparse.core.Result
+import fastparse.all._
 import fastparse.parsers.Combinators.Rule
-import fastparse.parsers.Terminals.End
-
-import scala.util.matching.Regex
 import scalaparse.Scala._
 import scalaparse.syntax.Identifiers._
 object Highlighter {
-  val BackTicked = "`([^`]+)`".r
-  object Stringy{ def unapply(s: Any): Option[String] = Some(s.toString)}
+
+  object BackTicked{
+    def unapplySeq(s: Any): Option[List[String]] = {
+      "`([^`]+)`".r.unapplySeq(s.toString)
+    }
+  }
 
   def defaultHighlight(buffer: Vector[Char]) = Highlighter.highlight(
     ammonite.repl.Parsers.Splitter,
@@ -18,13 +19,13 @@ object Highlighter {
       case Literals.Expr.Interp | Literals.Pat.Interp => Console.RESET
       case Literals.Comment => Console.BLUE
       case ExprLiteral => Console.GREEN
-      case Stringy("BasicType") => Console.GREEN
-      case Stringy(BackTicked(body))
+      case TypeId => Console.GREEN
+      case BackTicked(body)
         if alphaKeywords.contains(body) => Console.YELLOW
     },
     endColor = Console.RESET
   )
-  def highlightIndices(parser: fastparse.P[_],
+  def highlightIndices(parser: fastparse.core.Parser[_],
                 buffer: Vector[Char],
                 ruleColors: PartialFunction[Rule[_], String],
                 endColor: String = Console.RESET) = {
@@ -42,6 +43,7 @@ object Highlighter {
           val closeColor = indices.last._2
           val startIndex = indices.length
           indices += ((idx, color, true))
+
           res() match {
             case s: Result.Success[_] =>
               indices += ((s.index, closeColor, false))
@@ -69,7 +71,7 @@ object Highlighter {
       .flatMap{case Seq((s, c1, _), (e, c2, _)) => c1 ++ buffer.slice(s, e) }
       .toVector
   }
-  def highlight(parser: fastparse.P[_],
+  def highlight(parser: Parser[_],
                 buffer: Vector[Char],
                 ruleColors: PartialFunction[Rule[_], String],
                 endColor: String = Console.RESET) = {
