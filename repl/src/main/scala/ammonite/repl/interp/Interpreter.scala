@@ -10,6 +10,8 @@ import ammonite.repl.frontend._
 import fastparse.core.Result
 
 import scala.reflect.io.VirtualDirectory
+import scalaz.{\/, \/-, -\/}
+import scalaz.concurrent.Task
 
 /**
  * A convenient bundle of all the functionality necessary
@@ -120,11 +122,123 @@ class Interpreter(shellPrompt0: Ref[String],
         handleJar(jar)
         init()
       }
-      def ivy(coordinates: (String, String, String), verbose: Boolean = true): Unit ={
-        val (groupId, artifactId, version) = coordinates
-        IvyThing.resolveArtifact(groupId, artifactId, version, if (verbose) 2 else 1)
-                .map(handleJar)
-        init()
+
+      import coursier._
+      var dependencies = Set.empty[Dependency]
+      val cache = new File(sys.props("user.home") + "/.coursier/cache")
+      val centralMetadataCache = new File(cache, "metadata/central")
+      val centralArtifactCache = new File(cache, "files/central")
+      var repositories = Seq(
+        Repository.ivy2Local,
+        Repository.mavenCentral
+          .copy(fetch = Repository.mavenCentral.fetch.copy(cache = Some(centralMetadataCache)))
+      )
+      var cachePolicy: Repository.CachePolicy =
+        Repository.CachePolicy.Default
+      def ivy(coordinates: (String, String, String), verbose: Boolean, force: Boolean): Unit = {
+        val (org, name, version) = coordinates
+        val dependencies0 = dependencies + Dependency(Module(org, name), version)
+
+        val resolution: Resolution = Resolution(dependencies0)
+          .process
+          .run(repositories, maxIterations = 100)
+          .run
+
+        def checkIsDone(resolution: Resolution) = {
+          val done = resolution.isDone
+          if (!done)
+            println(s"Resolution did not converge =|")
+
+          if (done || force)
+            Some(resolution)
+          else
+            None
+        }
+
+        def checkMetadataErrors(resolution: Resolution) = {
+          // Print resolution errors
+          val sortedErrors = resolution
+            .errors
+            .sortBy(t => (t._1.module.organization, t._1.module.name))
+          if (sortedErrors.nonEmpty) {
+            println(s"${sortedErrors.size} error(s) found")
+            for ((dep, perRepoErrors) <- sortedErrors) {
+              println(s"  ${dep.module.organization} % ${dep.module.name} % ${dep.version}:")
+              for (error <- perRepoErrors)
+                println(s"    $error")
+            }
+            println()
+          }
+
+          if (sortedErrors.isEmpty || force)
+            Some(resolution)
+          else
+            None
+        }
+
+        def results(resolution: Resolution) = {
+          val artifacts = resolution
+            .artifacts
+            .sortBy(_.url)
+
+          def logger: FilesLogger = new FilesLogger {
+            def foundLocally(f: File) =
+              println(s"Found $f")
+            def downloadingArtifact(url: String) =
+              println(s"Downloading $url")
+            def downloadedArtifact(url: String, success: Boolean) =
+              println(s"$url: ${if (success) "done" else "error"}")
+          }
+
+          val files0 = coursier.Files(
+            Seq(
+              Repository.mavenCentral.fetch.root -> centralArtifactCache
+            ),
+            () => ???,
+            logger = if (verbose) Some(logger) else None
+          )
+
+          val tasks = artifacts
+            .map(a => files0.file(a, cachePolicy).run.map(a -> _))
+
+          Task.gatherUnordered(tasks)
+            .run
+        }
+
+        def checkDownloadResults(results: List[(Artifact, String \/ File)]) = {
+          val downloadErrors = results
+            .collect{case (a, -\/(err)) => a -> err}
+            .sortBy(_._1.url)
+
+          if (downloadErrors.nonEmpty) {
+            println(s"${downloadErrors.size} download errors")
+            for ((a, err) <- downloadErrors)
+              println(s"  ${a.url}: $err")
+            println()
+          }
+
+          def files = results.collect{case (_, \/-(f)) => f}
+
+          if (downloadErrors.isEmpty || force)
+            Some(files)
+          else
+            None
+        }
+
+        val filesOption =
+          Some(resolution)
+            .flatMap(checkIsDone)
+            .flatMap(checkMetadataErrors)
+            .map(results)
+            .flatMap(checkDownloadResults)
+
+        for (files <- filesOption) {
+          dependencies = dependencies0
+          if (files.nonEmpty) {
+            files.foreach(handleJar)
+            init()
+          }
+        }
       }
     }
     implicit var pprintConfig = interp.pprintConfig

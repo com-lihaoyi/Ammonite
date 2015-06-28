@@ -103,7 +103,7 @@ trait Load extends (String => Unit){
   /**
    * Load a library from its maven/ivy coordinates
    */
-  def ivy(coordinates: (String, String, String), verbose: Boolean = true): Unit
+  def ivy(coordinates: (String, String, String), verbose: Boolean = false, force: Boolean = false): Unit
 
   /**
    * Loads a command into the REPL and
