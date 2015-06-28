@@ -195,13 +195,13 @@ object Parsers {
 
   val Prelude = P( (Annot ~ OneNLMax).rep ~ (Mod ~! Pass).rep )
   val Statement = P ( scalaparse.Scala.Import | Prelude ~ BlockDef | StatCtx.Expr )
-  def StatementBlock(blockSep: P0) = P ( Semis.? ~ (!blockSep ~ Statement).!.rep(sep=Semis) ~ Semis.? )
+  def StatementBlock(blockSep: P0) = P ( Semis.? ~ (!blockSep ~ Statement).!.repX(sep=Semis) ~ Semis.? )
   val Splitter = P( StatementBlock(Fail) ~ WL ~ End)
   def split(code: String) = Splitter.parse(code).get.value
 
-  val Separator = P( "@" ~ CharIn(" \n").rep(1) )
+  val Separator = P( WL ~ "@" ~~ CharIn(" \n").rep(1) )
   val CompilationUnit = P( WL ~ StatementBlock(Separator) ~ WL )
-  val ScriptSplitter = P( CompilationUnit.rep(1, Separator) ~ End)
+  val ScriptSplitter = P( CompilationUnit.repX(1, Separator) ~ End)
   def splitScript(code: String) = ScriptSplitter.parse(code).get.value
 
   val BlockUnwrapper = P( "{" ~ Block.! ~ "}" ~ End)
