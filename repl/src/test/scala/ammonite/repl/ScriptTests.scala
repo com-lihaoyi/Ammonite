@@ -11,7 +11,7 @@ object ScriptTests extends TestSuite{
     'compilationBlocks{
       'loadIvy{
         check.session(s"""
-          @ load.script("$scriptPath/LoadIvy.scala")
+          @ load.exec("$scriptPath/LoadIvy.scala")
 
           @ val r = res
           r: String = ${"\"\"\""}
@@ -26,7 +26,7 @@ object ScriptTests extends TestSuite{
           else
             """util.Left[String,Nothing]"""
         check.session(s"""
-          @ load.script("$scriptPath/PreserveImports.scala")
+          @ load.exec("$scriptPath/PreserveImports.scala")
 
           @ val r = res
           r: $typeString = Left("asd")
@@ -34,7 +34,7 @@ object ScriptTests extends TestSuite{
       }
       'annotation{
         check.session(s"""
-          @ load.script("$scriptPath/Annotation.scala")
+          @ load.exec("$scriptPath/Annotation.scala")
 
           @ val r = res
           r: Int = 24
@@ -42,7 +42,7 @@ object ScriptTests extends TestSuite{
       }
       'syntax{
         check.session(s"""
-          @ load.script("$scriptPath/BlockSepSyntax.scala")
+          @ load.exec("$scriptPath/BlockSepSyntax.scala")
 
           @ val r = res
           r: Int = 24
@@ -52,7 +52,7 @@ object ScriptTests extends TestSuite{
     'failures{
       'syntaxError{
         check.session(s"""
-          @ load.script("$scriptPath/SyntaxError.scala")
+          @ load.exec("$scriptPath/SyntaxError.scala")
           error: SyntaxError
 
           @ val r = res
@@ -64,7 +64,7 @@ object ScriptTests extends TestSuite{
       }
       'compilationError{
         check.session(s"""
-          @ load.script("$scriptPath/CompilationError.scala")
+          @ load.exec("$scriptPath/CompilationError.scala")
 
           @ val r = res
           error: Compilation Failed
@@ -76,14 +76,14 @@ object ScriptTests extends TestSuite{
       }
       'nofile{
         check.session(s"""
-          @ load.script("$scriptPath/notHere")
+          @ load.exec("$scriptPath/notHere")
           error: java.nio.file.NoSuchFileException: $scriptPath/notHere
           """
         )
       }
       'multiBlockError{
         check.session(s"""
-          @ load.script("$scriptPath/MultiBlockError.scala")
+          @ load.exec("$scriptPath/MultiBlockError.scala")
 
           @ val r1 = res1
           r1: Int = 1

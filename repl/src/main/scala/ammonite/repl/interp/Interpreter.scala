@@ -79,6 +79,29 @@ class Interpreter(prompt0: Ref[String],
       }
     }
   }
+  
+  def processModule(code: String): Unit = {
+    val blocks = Parsers.splitScript(code).map(preprocess(_, eval.getCurrentLine))
+    val errors = blocks.collect{ case Res.Failure(err) => err }
+    if(!errors.isEmpty) 
+      stdout(Console.RED + errors.mkString("\n") + Console.RESET + "\n")
+    else
+      loop(blocks.collect{ case Res.Success(o) => o }, Seq())
+
+    @tailrec def loop(blocks: Seq[Preprocessor.Output], imports: Seq[ImportData]): Unit = {
+      if(!blocks.isEmpty){
+        val Preprocessor.Output(code, _) = blocks.head //pretty printing results is disabled for scripts
+        val ev = eval.processScriptBlock(code, imports)
+        ev match {
+          case Res.Failure(msg) =>
+            stdout(Console.RED + msg + Console.RESET + "\n")
+          case Res.Success(ev) =>
+            loop(blocks.tail, imports ++ ev.imports)
+          case _ => loop(blocks.tail, imports)
+        }
+      }
+    }
+  }
 
   def handleOutput(res: Res[Evaluated]) = {
     res match{
@@ -107,13 +130,22 @@ class Interpreter(prompt0: Ref[String],
         processScript(line)
       }
 
-      def script(file: File): Unit = {
+      def exec(file: File): Unit = {
         val content = Files.readAllBytes(file.toPath)
         apply(new String(content))
       }
 
-      def script(path: String): Unit = {
-        script(new File(path))
+      def exec(path: String): Unit = {
+        exec(new File(path))
+      }
+
+      def module(file: File): Unit = {
+        val content = Files.readAllBytes(file.toPath)
+        processModule(new String(content))
+      }
+
+      def module(path: String): Unit = {
+        module(new File(path))
       }
 
       def handleJar(jar: File): Unit = {
