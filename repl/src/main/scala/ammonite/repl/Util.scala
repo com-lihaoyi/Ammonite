@@ -115,7 +115,7 @@ object Ref{
       def update(t: T) = value = t
     }
   }
-  def apply[T](value: T, update0: T => Unit) = new Ref[T]{
+  def apply[T](value: => T, update0: T => Unit) = new Ref[T]{
     def apply() = value
     def update(t: T) = update0(t)
   }
@@ -150,6 +150,7 @@ object Ex{
 }
 
 object Util{
+  type IvyMap = Map[(String, String, String), Set[String]]
   def transpose[A](xs: List[List[A]]): List[List[A]] = xs.filter(_.nonEmpty) match {
     case Nil    =>  Nil
     case ys: List[List[A]] => ys.map{ _.head }::transpose(ys.map{ _.tail })

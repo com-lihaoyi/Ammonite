@@ -3,6 +3,7 @@ package ammonite.repl.interp
 import java.io.File
 import java.nio.file.Files
 import acyclic.file
+import ammonite.repl.Util.IvyMap
 import annotation.tailrec
 import ammonite.pprint
 import ammonite.repl._
@@ -22,6 +23,7 @@ class Interpreter(shellPrompt0: Ref[String],
                   colors0: Ref[ColorSet],
                   stdout: String => Unit,
                   history0: => History,
+                  ivyCache: Ref[IvyMap],
                   predef: String){ interp =>
 
   val dynamicClasspath = new VirtualDirectory("(memory)", None)
@@ -122,11 +124,22 @@ class Interpreter(shellPrompt0: Ref[String],
       }
       def ivy(coordinates: (String, String, String), verbose: Boolean = true): Unit ={
         val (groupId, artifactId, version) = coordinates
-        IvyThing.resolveArtifact(groupId, artifactId, version, if (verbose) 2 else 1)
-                .map(handleJar)
+        ivyCache().get((groupId, artifactId, version)) match{
+          case Some(ps) => ps.map(new java.io.File(_)).map(handleJar)
+          case None =>
+            val resolved = IvyThing.resolveArtifact(groupId, artifactId, version, if (verbose) 2 else 1)
+            ivyCache() = ivyCache().updated(
+              (groupId, artifactId, version),
+              resolved.map(_.getAbsolutePath).toSet
+            )
+
+            resolved.map(handleJar)
+        }
+
         init()
       }
     }
+
     implicit var pprintConfig = interp.pprintConfig
     def clear() = ()
     def search(target: scala.reflect.runtime.universe.Type) = Interpreter.this.compiler.search(target)

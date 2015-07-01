@@ -1,6 +1,7 @@
 package ammonite.repl
 
 import java.io._
+import ammonite.repl.Util.IvyMap
 import ammonite.{pprint}
 import ammonite.repl.frontend._
 import acyclic.file
@@ -14,14 +15,11 @@ class Repl(input: InputStream,
            output: OutputStream,
            pprintConfig: pprint.Config = pprint.Config.Colors.PPrintConfig,
            shellPrompt0: String = "@ ",
-           initialHistory: Seq[String] = Nil,
-           saveHistory: History => Unit = _ => (),
+           history0: Ref[History],
+           ivyCache0: Ref[IvyMap],
            predef: String = "") {
 
   val shellPrompt = Ref(shellPrompt0)
-
-  val history = new History
-  history ++= initialHistory
 
   val colorSet = Ref[ColorSet](ColorSet.Default)
   val frontEnd = Ref[FrontEnd](FrontEnd.JLine)
@@ -40,7 +38,8 @@ class Repl(input: InputStream,
     ),
     colorSet,
     printer.print,
-    history,
+    history0(),
+    ivyCache0,
     predef
   )
 
@@ -50,11 +49,10 @@ class Repl(input: InputStream,
       output,
       colorSet().prompt + shellPrompt() + scala.Console.RESET,
       interp.pressy.complete(_, interp.eval.previousImportBlock, _),
-      history
+      history0()
     )
     _ = {
-      history += code
-      saveHistory(history)
+      history0() = history0() :+ code
     }
     _ <- Signaller("INT") { interp.mainThread.stop() }
     out <- interp.processLine(stmts, _.foreach(printer.print))
@@ -81,10 +79,8 @@ object Repl{
     val storage = Storage(new java.io.File(ammoniteHome))
     val shell = new Repl(
       System.in, System.out,
-      initialHistory = storage.loadHistory,
-      saveHistory = { s =>
-        storage.saveHistory(s)
-      },
+      history0 = Ref(storage.loadHistory, storage.saveHistory),
+      ivyCache0 = Ref(storage.loadIvyCache, storage.saveIvyCache),
       predef = storage.loadPredef
     )
     shell.run()
