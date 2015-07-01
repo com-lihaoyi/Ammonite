@@ -43,7 +43,6 @@ trait Evaluator{
 
   def previousImportBlock: String
   def addJar(url: URL): Unit
-  def newClassloader(): Unit
   def evalClassloader: SpecialClassloader
 }
 
@@ -109,13 +108,7 @@ object Evaluator{
     var evalClassloader: SpecialClassloader = null
 
 
-    def newClassloader() = {
-      evalClassloader = new SpecialClassloader(
-        Option(evalClassloader).getOrElse(currentClassloader),
-        currentClassloader
-      )
-    }
-    newClassloader()
+    evalClassloader = new SpecialClassloader(currentClassloader)
 
     def addJar(url: URL) = evalClassloader.add(url)
 
@@ -228,30 +221,21 @@ object Evaluator{
   /**
    * Classloader used to implement the jar-downloading
    * command-evaluating logic in Ammonite.
+   *
+   * http://stackoverflow.com/questions/3544614/how-is-the-control-flow-to-findclass-of
    */
-  class SpecialClassloader(parent: ClassLoader, base: ClassLoader) extends URLClassLoader(Array(), parent){
+  class SpecialClassloader(parent: ClassLoader) extends URLClassLoader(Array(), parent){
     /**
      * Files which have been compiled, stored so that our special
      * classloader can get at them.
      */
     val newFileDict = mutable.Map.empty[String, Array[Byte]]
-    override def loadClass(name: String): Class[_] = {
-
-      val baseLoad = try Some(base.loadClass(name)) catch {case _: ClassNotFoundException=> None}
-      def alreadyLoaded = Option(this.findLoadedClass(name))
+    override def findClass(name: String): Class[_] = {
       def loadedFromBytes =
         for(bytes <- newFileDict.get(name))
         yield defineClass(name, bytes, 0, bytes.length)
 
-      def jars = try Some(super.findClass(name)) catch{case _:ClassNotFoundException => None}
-      def fallback = super.loadClass(name)
-
-
-      baseLoad orElse
-      alreadyLoaded orElse
-      loadedFromBytes orElse
-      jars getOrElse
-      fallback
+      loadedFromBytes.getOrElse(super.findClass(name))
     }
     def add(url: URL) = addURL(url)
   }

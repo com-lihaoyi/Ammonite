@@ -39,36 +39,38 @@ object AdvancedTests extends TestSuite{
             res2: String = "[1,2,3]"
           """)
         }
+//        Disable this for now; things are simpler if we don't support it, and
+//        we can re-implement it later if it proves neccessary
 
-        'reloading{
-          // Make sure earlier-loaded things indeed continue working
-          check.session("""
-            @ load.ivy("com.lihaoyi" %%"scalarx" % "0.2.7")
-
-            @ load.ivy("com.scalatags" %% "scalatags" % "0.2.5")
-
-            @ scalatags.all.div("omg").toString
-            res2: String = "<div>omg</div>"
-
-            @ load.ivy("com.lihaoyi" %% "scalatags" % "0.4.5")
-
-            @ import scalatags.Text.all._; scalatags.Text.all.div("omg").toString
-            import scalatags.Text.all._
-            res4_1: String = "<div>omg</div>"
-
-            @ import rx._; val x = Var(1); val y = Rx(x() + 1)
-
-            @ x(); y()
-            res6_0: Int = 1
-            res6_1: Int = 2
-
-            @ x() = 2
-
-            @ x(); y()
-            res8_0: Int = 2
-            res8_1: Int = 3
-          """)
-        }
+//        'reloading{
+//          // Make sure earlier-loaded things indeed continue working
+//          check.session("""
+//            @ load.ivy("com.lihaoyi" %%"scalarx" % "0.2.7")
+//
+//            @ load.ivy("com.scalatags" %% "scalatags" % "0.2.5")
+//
+//            @ scalatags.all.div("omg").toString
+//            res2: String = "<div>omg</div>"
+//
+//            @ load.ivy("com.lihaoyi" %% "scalatags" % "0.4.5")
+//
+//            @ import scalatags.Text.all._; scalatags.Text.all.div("omg").toString
+//            import scalatags.Text.all._
+//            res4_1: String = "<div>omg</div>"
+//
+//            @ import rx._; val x = Var(1); val y = Rx(x() + 1)
+//
+//            @ x(); y()
+//            res6_0: Int = 1
+//            res6_1: Int = 2
+//
+//            @ x() = 2
+//
+//            @ x(); y()
+//            res8_0: Int = 2
+//            res8_1: Int = 3
+//          """)
+//        }
         'complex{
           check.session("""
             @ load.ivy("com.typesafe.akka" %% "akka-http-experimental" % "1.0-M3")

@@ -117,13 +117,11 @@ class Interpreter(shellPrompt0: Ref[String],
         eval.addJar(jar.toURI.toURL)
       }
       def jar(jar: File): Unit = {
-        eval.newClassloader()
         handleJar(jar)
         init()
       }
       def ivy(coordinates: (String, String, String), verbose: Boolean = true): Unit ={
         val (groupId, artifactId, version) = coordinates
-        eval.newClassloader()
         IvyThing.resolveArtifact(groupId, artifactId, version, if (verbose) 2 else 1)
                 .map(handleJar)
         init()
