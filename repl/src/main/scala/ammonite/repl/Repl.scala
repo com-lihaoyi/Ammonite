@@ -16,7 +16,7 @@ class Repl(input: InputStream,
            shellPrompt0: String = "@ ",
            initialHistory: Seq[String] = Nil,
            saveHistory: History => Unit = _ => (),
-           predef: String = Repl.defaultPredef) {
+           predef: String = "") {
 
   val shellPrompt = Ref(shellPrompt0)
 
@@ -29,15 +29,14 @@ class Repl(input: InputStream,
     import sys.process._
     Seq("bash", "-c", s"tput $s 2> /dev/tty").!!.trim.toInt
   }
-  val cols = Cell(consoleDim("cols"))
-  val lines = Cell(consoleDim("lines"))
+
   val printer = new PrintStream(output, true)
   val interp: Interpreter = new Interpreter(
     shellPrompt,
     frontEnd,
     pprintConfig.copy(
-      maxWidth = () => cols(),
-      lines = () => lines() / 2
+      maxWidth = () => frontEnd().width,
+      lines = () => frontEnd().height / 2
     ),
     colorSet,
     printer.print,
@@ -56,8 +55,6 @@ class Repl(input: InputStream,
     _ = {
       history += code
       saveHistory(history)
-      cols.update()
-      lines.update()
     }
     _ <- Signaller("INT") { interp.mainThread.stop() }
     out <- interp.processLine(stmts, _.foreach(printer.print))
@@ -77,18 +74,18 @@ class Repl(input: InputStream,
 }
 
 object Repl{
-  val defaultPredef = ""
-  def main(args: Array[String]) = run()
-  def run(predef: String = defaultPredef) = {
+  def defaultAmmoniteHome = System.getProperty("user.home") + "/.ammonite"
+  def main(args: Array[String]) = run(args.lift(0).getOrElse(defaultAmmoniteHome))
+  def run(ammoniteHome: String = defaultAmmoniteHome) = {
     println("Loading Ammonite Repl...")
-    val storage = Storage()
+    val storage = Storage(new java.io.File(ammoniteHome))
     val shell = new Repl(
       System.in, System.out,
       initialHistory = storage.loadHistory,
       saveHistory = { s =>
         storage.saveHistory(s)
       },
-      predef = predef
+      predef = storage.loadPredef
     )
     shell.run()
 

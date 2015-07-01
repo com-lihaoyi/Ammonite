@@ -167,7 +167,7 @@ object TermCore {
 
     @tailrec def rec(lastState: TermState, areaHeight: Int): Option[String] = {
       if (!reader.ready())redrawLine(lastState.buffer, lastState.cursor)
-      filters(TermInfo(lastState, width - prompt.length)) match {
+      filters(TermInfo(lastState, width - noAnsiPrompt.length)) match {
         case TermState(s, b, c) =>
           val newCursor = math.max(math.min(c, b.length), 0)
 
