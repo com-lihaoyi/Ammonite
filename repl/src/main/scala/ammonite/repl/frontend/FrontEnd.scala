@@ -19,6 +19,8 @@ import scalaparse.syntax.Identifiers._
  * All the mucky JLine interfacing code
  */
 trait FrontEnd{
+  def width: Int
+  def height: Int
   def action(input: InputStream,
              output: OutputStream,
              shellPrompt: String,
@@ -28,6 +30,9 @@ trait FrontEnd{
 
 object FrontEnd{
   object Ammonite extends FrontEnd{
+
+    def width = Term.consoleDim("cols")
+    def height = Term.consoleDim("lines")
     def tabulate(snippets: Seq[String], width: Int) = {
       val gap =   2
       val maxLength = snippets.maxBy(_.replaceAll("\u001B\\[[;\\d]*m", "").length).length + gap
@@ -153,14 +158,19 @@ object FrontEnd{
 
     }
   }
+  object JLine extends JLineTerm(() => new jline.UnixTerminal())
+  object JLineWindows extends JLineTerm(() => new jline.WindowsTerminal())
+  class JLineTerm(makeTerm: () => jline.Terminal) extends FrontEnd{
+    def width = makeTerm().getWidth
+    def height = makeTerm().getHeight
 
-  object JLine extends FrontEnd{
     def action(input: InputStream,
                output: OutputStream,
                shellPrompt: String,
                compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
                history: Seq[String]) = {
-      val term = new jline.UnixTerminal()
+
+      val term = makeTerm()
       term.init()
       val reader = new ConsoleReader(input, output, term)
 
@@ -169,7 +179,7 @@ object FrontEnd{
       reader.addCompleter(new jline.console.completer.Completer {
 
         def complete(_buf: String, cursor: Int, candidates: JList[CharSequence]): Int = {
-          val buf   = if (_buf == null) "" else _buf
+          val buf = if (_buf == null) "" else _buf
           import collection.JavaConversions._
           val (completionBase, completions, sigs) = compilerComplete(
             cursor,

@@ -13,15 +13,16 @@ import ammonite.pprint
  * Mutexes should be added to be able to run multiple Ammonite processes on the same system.
  */ 
 trait Storage{
-  
+  def loadPredef: String
+
   def loadHistory: History
 
   def saveHistory(h: History): Unit
 }
 
 object Storage{
-  val defaultPath = new java.io.File(System.getProperty("user.home") + "/.ammonite") 
-  def apply(dir: File = defaultPath) = new Storage{
+
+  def apply(dir: File) = new Storage{
   
     if(dir.exists){
       if(!dir.isDirectory){
@@ -51,6 +52,12 @@ object Storage{
       val yaml = new Yaml
       val fw = new FileWriter(dir + "/history")
       yaml.dump(h.toArray, fw)
+    }
+
+    def loadPredef = try{
+      io.Source.fromFile(dir + "/predef.scala").mkString
+    }catch{
+      case e: java.io.FileNotFoundException => ""
     }
   }
 

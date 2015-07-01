@@ -180,8 +180,6 @@ class Interpreter(shellPrompt0: Ref[String],
   // line number to -1 if the predef exists so the first user-entered
   // line becomes 0
   if (predef != "") {
-    val res1 = processLine(Parsers.split(predef), _.foreach(stdout))
-    val res2 = handleOutput(res1)
-    stdout("\n")
+    processScript(predef)
   }
 }
