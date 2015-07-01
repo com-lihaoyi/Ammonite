@@ -168,22 +168,6 @@ lazy val repl = project
 //    fork in (Test, testOnly) := true
   )
 
-/**
- * A batteries-included version of [[repl]]. This contains the necessary
- * dependencies and configuration to be used comfortably as an system-shell
- */
-lazy val shell = project
-  .dependsOn(repl, ops)
-  .settings(sharedSettings:_*)
-  .settings(
-    crossVersion := CrossVersion.full,
-    test in assembly := {},
-    name := "ammonite-shell",
-    assemblyOption in assembly := (assemblyOption in assembly).value.copy(
-      prependShellScript = Some(defaultShellScript)
-    ),
-    assemblyJarName in assembly := s"${name.value}-${version.value}"
-  )
 lazy val readme = ScalatexReadme(
   projectId = "readme",
   wd = file(""),

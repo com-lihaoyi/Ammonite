@@ -8,10 +8,11 @@ import jline.console.{completer, ConsoleReader}
 import acyclic.file
 
 import scala.annotation.tailrec
-import scala.tools.nsc.interpreter._
+import scala.tools.nsc.interpreter
 import ammonite.terminal._
 import ammonite.terminal.LazyList._
 
+import scala.tools.nsc.interpreter.JList
 import scalaparse.Scala._
 import scalaparse.syntax.Identifiers._
 
