@@ -156,7 +156,8 @@ lazy val repl = project
       "org.scala-lang" % "scala-compiler" % scalaVersion.value,
       "jline" % "jline" % "2.12",
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
-      "org.apache.ivy" % "ivy" % "2.4.0",
+      "com.github.alexarchambault" %% "coursier" % "0.1.0-M1",
+      "com.github.alexarchambault" %% "coursier-files" % "0.1.0-M1",
       "com.lihaoyi" %% "scalaparse" % "0.2.1",
       "org.yaml" % "snakeyaml" % "1.15"
     ),
