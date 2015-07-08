@@ -132,6 +132,7 @@ object Ex{
 
 object Util{
   type IvyMap = Map[(String, String, String), Set[String]]
+  type CompileCache = (Traversable[(String, Array[Byte])], Seq[ImportData])
   def transpose[A](xs: List[List[A]]): List[List[A]] = xs.filter(_.nonEmpty) match {
     case Nil    =>  Nil
     case ys: List[List[A]] => ys.map{ _.head }::transpose(ys.map{ _.tail })

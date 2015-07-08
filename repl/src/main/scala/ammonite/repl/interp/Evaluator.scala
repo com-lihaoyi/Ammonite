@@ -10,6 +10,7 @@ import java.net.URLClassLoader
 import java.security.MessageDigest
 
 import ammonite.repl.interp.Evaluator.SpecialClassloader
+import Util.CompileCache
 
 import scala.reflect.runtime.universe._
 import scala.collection.mutable
@@ -51,7 +52,9 @@ trait Evaluator{
 object Evaluator{
   def apply(currentClassloader: ClassLoader,
             compile: => (Array[Byte], String => Unit) => Compiler.Output,
-            startingLine: Int): Evaluator = new Evaluator{
+            startingLine: Int,
+            cacheLoad: String => Option[CompileCache],
+            cacheSave: (String, CompileCache) => Unit): Evaluator = new Evaluator{
     
     /**
      * Imports which are required by earlier commands to the REPL. Imports
@@ -105,7 +108,6 @@ object Evaluator{
      * actual classes with methods we can execute.
      */
     var evalClassloader: SpecialClassloader = null
-
 
     evalClassloader = new SpecialClassloader(currentClassloader)
 
@@ -214,7 +216,6 @@ object Evaluator{
 
     def compileCacheBlock(wrapperName: String, code: String, scriptImports: Seq[ImportData]): Res[(Class[_],Seq[ImportData])] = for {
       _ <- Catching{ case e: ThreadDeath => interrupted() }
-      
       (classFiles, importData) <- compileClass(
         s"""
         ${importBlock(scriptImports)}
@@ -228,13 +229,13 @@ object Evaluator{
         """
       )
       
-      _ = cacheStore(wrapperName,classFiles,importData)
+      _ = cacheSave(wrapperName,(classFiles,importData))
       cls <- loadClass(wrapperName,classFiles) 
     } yield (cls, importData)
 
     def processScriptBlock(code: String, scriptImports: Seq[ImportData]) = {
       val wrapperName = cacheTag(code, scriptImports)
-      cacheLoad(wrapperName) match {
+      loadCachedClass(wrapperName) match {
         case Some((cls,importData)) => {
           evalMain(cls)
           Res.Success(
@@ -269,13 +270,13 @@ object Evaluator{
       "cache" + bytes.map("%02x".format(_)).mkString //add prefix to make sure it begins with a letter
     }
 
-    def cacheStore(tag: String, classFiles: Traversable[(String, Array[Byte])], imports: Seq[ImportData]): Unit = {
-      //TODO
-    }
-
-    def cacheLoad(tag: String): Option[(Class[_],Seq[ImportData])] = {
-      //TODO
-      None
+    def loadCachedClass(tag: String): Option[(Class[_],Seq[ImportData])] = {
+      cacheLoad(tag).flatMap{ case (classFiles, importData) =>
+        loadClass(tag,classFiles) match {
+          case Res.Success(cls) => Some((cls,importData))
+          case _ => None
+        }
+      }
     }
 
     def update(newImports: Seq[ImportData]) = {

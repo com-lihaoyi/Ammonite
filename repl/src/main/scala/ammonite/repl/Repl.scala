@@ -5,6 +5,7 @@ import ammonite.repl.Util.IvyMap
 import ammonite.repl.frontend._
 import acyclic.file
 import ammonite.repl.interp.Interpreter
+import Util.CompileCache
 
 import scala.annotation.tailrec
 import scala.collection.mutable

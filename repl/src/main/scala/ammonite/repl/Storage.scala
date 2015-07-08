@@ -17,9 +17,10 @@ import scala.collection.JavaConversions.asScalaBuffer
  */ 
 trait Storage{
   def loadPredef: String
-
   val history: StableRef[History]
   val ivyCache: StableRef[IvyMap]
+  def saveCacheBlock(tag: String, classFiles: Traversable[(String, Array[Byte])], imports: Seq[ImportData]): Unit
+  def loadCacheBlock(tag: String): Option[(Traversable[(String, Array[Byte])], Seq[ImportData])]
 }
 
 object Storage{
@@ -53,6 +54,57 @@ object Storage{
         val yaml = new Yaml
         val fw = new FileWriter(dir + "/history")
         yaml.dump(t.toArray, fw)
+      }
+    }
+
+    def saveCacheBlock(tag: String, classFiles: Traversable[(String, Array[Byte])], imports: Seq[ImportData]): Unit = {
+      val cacheDir = new File(dir + s"/compileCache/$tag")
+      if(!cacheDir.exists){
+        cacheDir.mkdirs()
+        val metadata= upickle.write(imports)
+        val metadataFw = new FileWriter(cacheDir + "/metadata.json")
+        metadataFw.write(metadata)
+        metadataFw.flush()
+        classFiles.foreach{ case (name, bytes) =>
+          val fos = new java.io.FileOutputStream(cacheDir + s"/$name.class")
+          fos.write(bytes)
+          fos.flush()
+        }
+      }
+    }
+
+    def loadCacheBlock(tag: String): Option[(Traversable[(String, Array[Byte])], Seq[ImportData])] = {
+      val cacheDir = new File(dir + s"/compileCache/$tag")
+      if(!cacheDir.exists) None
+      else for{
+        metadataJson <- try{
+          Some(io.Source.fromFile(cacheDir + "/metadata.json").mkString)
+        } catch {
+          case e: java.io.FileNotFoundException => None
+        }
+        metadata <- try{
+          Some(upickle.read[Seq[ImportData]](metadataJson))
+        } catch {
+          case e: Exception => None
+        }
+        classFiles <- loadClassFiles(cacheDir)
+      } yield (classFiles, metadata)
+    }
+
+    def loadClassFiles(cacheDir: File): Option[Traversable[(String, Array[Byte])]] = {
+      val classFiles = cacheDir.listFiles().filter(_.getName.endsWith(".class"))
+      try{
+        val data = classFiles.map{ file =>
+          val fis = new java.io.FileInputStream(file)
+          val bytes = new Array[Byte](file.length.toInt)
+          var c = 0
+          while(c < bytes.length) c += fis.read(bytes, c, bytes.length-c)
+          val className = file.getName.replaceAll("\\.class$","")
+          (className,bytes)
+        }
+        Some(data)
+      } catch {
+        case e: Exception => None
       }
     }
 

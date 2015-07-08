@@ -9,6 +9,7 @@ import pprint.{Config, PPrint}
 import annotation.tailrec
 import ammonite.repl._
 import ammonite.repl.frontend._
+import Util.CompileCache
 import fastparse.core.Result
 
 import scala.reflect.io.VirtualDirectory
@@ -232,7 +233,12 @@ class Interpreter(prompt0: Ref[String],
   val eval = Evaluator(
     mainThread.getContextClassLoader,
     compiler.compile,
-    if (predef != "") -1 else 0
+    if (predef != "") -1 else 0,
+    storage.compileCacheLoad,
+    { (tag, cb) => 
+      val (classFiles, imports) = cb 
+      storage.saveCacheBlock(tag,classFiles,imports) 
+    }
   )
 
   init()
