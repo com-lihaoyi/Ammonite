@@ -230,21 +230,35 @@ object Evaluator{
       
       _ = cacheStore(wrapperName,classFiles,importData)
       cls <- loadClass(wrapperName,classFiles) 
-    } yield (cls,importData)
+    } yield (cls, importData)
 
     def processScriptBlock(code: String, scriptImports: Seq[ImportData]) = {
       val wrapperName = cacheTag(code, scriptImports)
       cacheLoad(wrapperName) match {
         case Some((cls,importData)) => {
           evalMain(cls)
-          Res.Success(Evaluated(wrapperName,importData))
+          Res.Success(
+            Evaluated(
+              wrapperName,
+              importData.map(id => id.copy(
+                wrapperName = wrapperName,
+                prefix = if (id.prefix == "") wrapperName else id.prefix
+              ))
+            )
+          )
         }
         case None =>
           for {
             (cls, newImports) <- compileCacheBlock(wrapperName, code, scriptImports)
           } yield {
             evalMain(cls)
-            Evaluated(wrapperName,newImports)
+            Evaluated(
+              wrapperName,
+              newImports.map(id => id.copy(
+                wrapperName = wrapperName,
+                prefix = if (id.prefix == "") wrapperName else id.prefix
+              ))
+            )
           }
       }
     }
