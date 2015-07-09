@@ -5,7 +5,6 @@ import java.nio.file.Files
 import acyclic.file
 import ammonite.repl.Util.IvyMap
 import annotation.tailrec
-import ammonite.pprint
 import ammonite.repl._
 import ammonite.repl.frontend._
 import fastparse.core.Result
@@ -146,7 +145,7 @@ class Interpreter(shellPrompt0: Ref[String],
     def compiler = Interpreter.this.compiler.compiler
     def newCompiler() = init()
     def history = history0
-    def show[T](a: T, lines: Int = 0) = ammonite.pprint.Show(a, lines)
+
   }
 
   var compiler: Compiler = _

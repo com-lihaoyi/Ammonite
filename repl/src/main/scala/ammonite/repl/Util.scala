@@ -1,7 +1,7 @@
 package ammonite.repl
 
 import acyclic.file
-import ammonite.pprint.{PPrinter, PPrint}
+import pprint.{PPrinter, PPrint}
 
 import scala.util.Try
 import scalaparse.Scala._
@@ -104,7 +104,7 @@ trait Ref[T]{
 }
 object Ref{
   implicit def refPPrint[T: PPrint]: PPrinter[Ref[T]] = PPrinter{ (ref, cfg) =>
-    Iterator(cfg.color.prefix("Ref"), "(") ++
+    Iterator(cfg.colors.prefixColor, "Ref", cfg.colors.endColor, "(") ++
     implicitly[PPrint[T]].pprinter.render(ref(), cfg) ++
     Iterator(")")
   }
@@ -190,7 +190,7 @@ object Parsers {
   def backtickWrap(s: String) = {
     Id2.parse(s) match{
       case _: Result.Success[_] => s
-      case _ => "`" + ammonite.pprint.PPrinter.escape(s) + "`"
+      case _ => "`" + pprint.PPrinter.escape(s) + "`"
     }
   }
 

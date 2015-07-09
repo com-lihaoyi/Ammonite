@@ -8,7 +8,7 @@ import scala.collection.generic.{GenericCompanion, GenericTraversableTemplate, C
 import scala.collection.{IterableLike, mutable, IndexedSeqLike}
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.JavaConversions.asScalaBuffer
-import ammonite.pprint
+
 
 /**Trait for the interface of common persistent storage. 
  * This handles history and persistent caches.
@@ -112,16 +112,15 @@ object History{
   implicit def toHistory(s: Seq[String]): History = new History(s.toVector)
 
   import pprint._
-  implicit def historyPPrint(implicit c: Config): PPrint[History] = new PPrint(
-    new PPrinter[History]{
-      def render(t: History, c: Config)={
-        val lines = if(c.lines() > 0) c.lines() else t.length
+  implicit def historyPPrint(implicit c: pprint.Config): pprint.PPrint[History] = pprint.PPrint(
+    new pprint.PPrinter[History]{
+      def render0(t: History, c: pprint.Config)={
+        val lines = if(c.height > 0) c.height else t.length
         val seq = "\n" +: t.dropRight(lines).flatMap{ code => Seq("@ ", code, "\n") }
         if(t.length > lines) ("\n..." +: seq).iterator
         else seq.iterator
       }
-    },
-    c
+    }
   )
 }
 

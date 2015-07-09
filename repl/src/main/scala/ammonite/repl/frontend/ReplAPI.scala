@@ -2,7 +2,7 @@ package ammonite.repl.frontend
 
 import java.io.File
 
-import ammonite.pprint.{PPrinter, PPrint, Config, TPrint}
+import pprint.{PPrinter, PPrint, Config}
 import ammonite.repl.{Ref, History}
 
 import scala.reflect.runtime.universe._
@@ -80,11 +80,7 @@ trait ReplAPI {
   def search(target: scala.reflect.runtime.universe.Type): Option[String]
 
   def compiler: scala.tools.nsc.Global
-  /**
-   * Prettyprint the given `value` with no truncation. Optionally takes
-   * a number of lines to print.
-   */
-  def show[T](value: T, lines: Int = 0): ammonite.pprint.Show[T]
+
   /**
    * Show all the imports that are used to execute commands going forward
    */
@@ -93,7 +89,7 @@ trait ReplAPI {
    * Controls how things are pretty-printed in the REPL. Feel free
    * to shadow this with your own definition to change how things look
    */
-  implicit var pprintConfig: ammonite.pprint.Config
+  implicit var pprintConfig: pprint.Config
 }
 trait Load extends (String => Unit){
   /**
@@ -146,11 +142,21 @@ object ReplAPI{
     method.invoke(null, api)
   }
 }
- 
+
 /**
  * A set of colors used to highlight the miscellanious bits of the REPL.
+ * Re-used all over the place in PPrint, TPrint, syntax highlighting,
+ * command-echoes, etc. in order to keep things consistent
+ *
+ * @param prompt The command prompt
+ * @param ident Definition of top-level identifiers
+ * @param `type` Definition of types
+ * @param reset Whatever is necessary to get rid of residual coloring
  */
-case class ColorSet(prompt: String, ident: String, `type`: String, reset: String)
+case class ColorSet(prompt: String,
+                    ident: String,
+                    `type`: String,
+                    reset: String)
 object ColorSet{
   val Default = ColorSet(Console.MAGENTA, Console.CYAN, Console.GREEN, Console.RESET)
   val BlackWhite = ColorSet("", "", "", "")
@@ -171,8 +177,8 @@ trait DefaultReplAPI extends FullReplAPI {
       else {
         val pprint = implicitly[PPrint[T]]
         val rhs = custom match {
-          case None => pprint.render(value)
-          case Some(s) => Iterator(pprint.cfg.color.literal(s))
+          case None => pprint.render(value, cfg)
+          case Some(s) => Iterator(cfg.colors.literalColor, s, cfg.colors.endColor)
         }
         Iterator(
           colors().ident, ident, colors().reset, ": ",

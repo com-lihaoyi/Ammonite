@@ -1,10 +1,10 @@
-package ammonite.pprint
+package ammonite.repl.frontend
 
 
 import language.experimental.macros
 import reflect.macros.blackbox.Context
 import scala.reflect.macros.TypecheckException
-
+import pprint._
 /**
  * Summoning an implicit `TPrint[T]` provides a pretty-printed
  * string representation of the type `T`, much better than is
@@ -20,7 +20,7 @@ trait TPrint[T]{
 
 object TPrint extends TPrintGen[TPrint, Config] with TPrintLowPri{
   def literal[T](s: String) = new TPrint[T]{
-    def render(implicit cfg: Config) = cfg.color.literal(s)
+    def render(implicit cfg: Config) = cfg.colors.literalColor + s + cfg.colors.endColor
   }
   def lambda[T](f: Config => String) = new TPrint[T]{
     def render(implicit cfg: Config) = f(cfg)
@@ -43,8 +43,11 @@ object TPrintLowPri{
       if (s.name.decodedName.toString.startsWith("_$")) "_"
       else s.name.decodedName.toString.stripSuffix(".type")
 
+    def literalColor(s: Tree) = {
+      q"$cfgSym.colors.literalColor + ($s) + $cfgSym.colors.endColor"
+    }
     def printSym(s: Symbol): Tree = {
-      q"""$cfgSym.color.literal(${printSymString(s)})"""
+      literalColor(q"${printSymString(s)}")
     }
 
     def printSymFull(s: Symbol): Tree = {
@@ -79,9 +82,9 @@ object TPrintLowPri{
       // or even need to wrap the prefix in parentheses
       val sep = pre match{
         case x if x.toString.endsWith(".type") => q""" ${rec0(pre)} + "." """
-        case x: TypeRef => q""" $cfgSym.color.literal(${implicitRec(pre)}) + "#" """
-        case x: SingleType => q""" $cfgSym.color.literal(${rec0(pre)}) + "." """
-        case x: ThisType => q""" $cfgSym.color.literal(${rec0(pre)}) + "." """
+        case x: TypeRef => q""" ${literalColor(implicitRec(pre))} + "#" """
+        case x: SingleType => q""" ${literalColor(rec0(pre))} + "." """
+        case x: ThisType => q""" ${literalColor(rec0(pre))} + "." """
         case x => q""" "(" + ${implicitRec(pre)} + ")#" """
       }
 
@@ -110,7 +113,7 @@ object TPrintLowPri{
         // Make sure the type isn't higher-kinded or some other weird
         // thing, and actually can fit inside the square brackets
         c.typecheck(q"null.asInstanceOf[$tpe]")
-        q""" ammonite.pprint.TPrint.implicitly[$tpe].render($cfgSym) """
+        q""" ammonite.repl.frontend.TPrint.implicitly[$tpe].render($cfgSym) """
       }catch{case e: TypecheckException =>
         rec0(tpe)
       }
@@ -139,7 +142,7 @@ object TPrintLowPri{
             val TypeBounds(lo, hi) = t.info
             val RefinedType(parents, defs) = hi
             val filtered = internal.refinedType(parents.filter(x => !(x =:= typeOf[scala.Singleton])), defs)
-            q""" "val " + $cfgSym.color.literal(${t.name.toString.stripSuffix(".type")}) + ": " + ${implicitRec(filtered)}"""
+            q""" "val " + ${literalColor(q"${t.name.toString.stripSuffix(".type")}")} + ": " + ${implicitRec(filtered)}"""
           }else {
             q""" "type " + ${printSym(t)} + $suffix """
           }
@@ -187,8 +190,8 @@ object TPrintLowPri{
         }"
     }
     lazy val cfgSym = c.freshName[TermName]("cfg")
-    val res = c.Expr[TPrint[T]](q"""ammonite.pprint.TPrint.lambda{
-      ($cfgSym: ammonite.pprint.Config) =>
+    val res = c.Expr[TPrint[T]](q"""ammonite.repl.frontend.TPrint.lambda{
+      ($cfgSym: pprint.Config) =>
         ${rec0(tpe, end = true)}
     }""")
 //    println("RES " + res)

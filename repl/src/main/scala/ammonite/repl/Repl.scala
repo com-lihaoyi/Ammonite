@@ -2,7 +2,6 @@ package ammonite.repl
 
 import java.io._
 import ammonite.repl.Util.IvyMap
-import ammonite.{pprint}
 import ammonite.repl.frontend._
 import acyclic.file
 import ammonite.repl.interp.Interpreter
@@ -33,8 +32,8 @@ class Repl(input: InputStream,
     shellPrompt,
     frontEnd,
     pprintConfig.copy(
-      maxWidth = () => frontEnd().width,
-      lines = () => frontEnd().height / 2
+      width = frontEnd().width,
+      height = frontEnd().height / 2
     ),
     colorSet,
     printer.print,
