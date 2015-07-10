@@ -96,8 +96,10 @@ class Interpreter(prompt0: Ref[String],
         ev match {
           case Res.Failure(msg) =>
             stdout(Console.RED + msg + Console.RESET + "\n")
-          case Res.Success(ev) =>
+          case Res.Success(ev) =>{
+            eval.update(ev.imports)
             loop(blocks.tail, imports ++ ev.imports)
+          }
           case _ => loop(blocks.tail, imports)
         }
       }
