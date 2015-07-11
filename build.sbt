@@ -61,7 +61,8 @@ lazy val tools = project
   .dependsOn(ops)
   .settings(sharedSettings:_*)
   .settings(
-    name := "ammonite-tools"
+    name := "ammonite-tools",
+    libraryDependencies += "com.lihaoyi" %% "pprint" % "0.3.2"
   )
 
 /**

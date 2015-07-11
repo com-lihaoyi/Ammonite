@@ -6,29 +6,24 @@ package ammonite.ops
 
 import java.io.{InputStreamReader, BufferedReader}
 
-import pprint
 import pprint.PPrint
 
 import scala.collection.{GenTraversableOnce, mutable}
 import scala.util.matching.Regex
 
 trait Grepper[T]{
-  def apply[V: pprint.PPrint](t: T, s: V): Option[GrepResult]
+  def apply[V: pprint.PPrint](t: T, s: V)(implicit c: pprint.Config): Option[GrepResult]
 }
 object Grepper{
-  def BlackWhite[V: PPrint] = {
-    val pp = implicitly[PPrint[V]]
-    new pprint.PPrint(pp.pprinter, pp.cfg.copy(literalColor=null, prefixColor=null))
-  }
   implicit object Str extends Grepper[String] {
-    def apply[V: pprint.PPrint](t: String, s: V) = {
+    def apply[V: pprint.PPrint](t: String, s: V)(implicit c: pprint.Config) = {
       Regex.apply(java.util.regex.Pattern.quote(t).r, s)
     }
   }
 
   implicit object Regex extends Grepper[Regex] {
-    def apply[V: pprint.PPrint](t: Regex, s: V) = {
-      val txt = pprint.PPrint(s)(BlackWhite).mkString
+    def apply[V: pprint.PPrint](t: Regex, s: V)(implicit c: pprint.Config) = {
+      val txt = pprint.tokenize(s).mkString
       val items = t.findAllIn(txt).matchData.toSeq
       if (items.length == 0) None
       else{
@@ -46,10 +41,10 @@ object GrepResult{
     var remaining = gr.spans.toList
 
     def color(i: Int) =
-      if(i % 2 == 1) Console.RESET + cfg.literalColor
+      if(i % 2 == 1) Console.RESET + cfg.colors.literalColor
       else Console.YELLOW_B + Console.BLUE
 
-    val width = cfg.maxWidth() - cfg.depth * 2
+    val width = cfg.width - cfg.depth * 2
     // String: |        S   E       S    E      |
     // Cuts:   0       1 2 3 4     5 6  7 8     9
     while(!remaining.isEmpty){
@@ -60,7 +55,7 @@ object GrepResult{
       remaining = excluded
       val lastEnd = included.last._2
       val middle = (lastEnd + firstStart) / 2
-      val showStart = middle - cfg.maxWidth() / 2
+      val showStart = middle - cfg.width / 2
       val allIndices = included.flatMap{case (a, b) => Seq(a, b)}
       val pairs = (showStart +: allIndices) zip (allIndices :+ (showStart + width))
 
@@ -80,7 +75,7 @@ case class GrepResult(spans: Seq[(Int, Int)], txt: String)
  * regex within the pretty-printed contents.
  */
 object grep {
-  def apply[T: Grepper, V: pprint.PPrint](pat: T, str: V): Option[GrepResult] = {
+  def apply[T: Grepper, V: pprint.PPrint](pat: T, str: V)(implicit c: pprint.Config): Option[GrepResult] = {
     implicitly[Grepper[T]].apply(pat, str)
   }
 
@@ -89,12 +84,12 @@ object grep {
    * into a real T => Option[T] by materializing PPrint[T] for various values of T
    */
   object !{
-    implicit def FunkyFunc1[T: pprint.PPrint](f: ![_]): T => GenTraversableOnce[GrepResult] = f.apply[T]
-    implicit def FunkyFunc2[T: pprint.PPrint](f: ![_]): T => Boolean = x => f.apply[T](x).isDefined
+    implicit def FunkyFunc1[T: pprint.PPrint](f: ![_])(implicit c: pprint.Config): T => GenTraversableOnce[GrepResult] = f.apply[T]
+    implicit def FunkyFunc2[T: pprint.PPrint](f: ![_])(implicit c: pprint.Config): T => Boolean = x => f.apply[T](x).isDefined
   }
 
   case class ![T: Grepper](pat: T){
-    def apply[V: pprint.PPrint](str: V) = grep.this.apply(pat, str)
+    def apply[V: pprint.PPrint](str: V)(implicit c: pprint.Config) = grep.this.apply(pat, str)
   }
 }
 
