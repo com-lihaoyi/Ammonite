@@ -1,8 +1,6 @@
 package ammonite.repl
 
 import utest._
-import ammonite.pprint.PPrint
-import ammonite.pprint.Config.Defaults._
 object EulerTests extends TestSuite{
   val tests = TestSuite{
     println("EulerTests")

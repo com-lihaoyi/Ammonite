@@ -1,7 +1,7 @@
-package test.ammonite.pprint
+package test.ammonite.frontend
 
 import utest._
-import ammonite.pprint.TPrint
+
 
 object TPrintTests extends TestSuite{
 

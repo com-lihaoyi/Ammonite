@@ -42,7 +42,6 @@ object Storage{
 
     def loadHistory: History = {
       val yaml = new Yaml
-      println("loadHistory")
       try{
         val list = yaml.load(new FileInputStream(dir + "/history"))
         list match {
@@ -74,14 +73,14 @@ object Storage{
       }
 
       try{
-        upickle.read[IvyMap](json)
+        upickle.default.read[IvyMap](json)
       }catch{ case e =>
         Map.empty
       }
     }
     def saveIvyCache(map: IvyMap) = {
       val fw = new FileWriter(dir + "/ivycache.json")
-      fw.write(upickle.write(map))
+      fw.write(upickle.default.write(map))
       fw.flush()
     }
   }
