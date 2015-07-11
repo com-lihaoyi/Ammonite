@@ -92,9 +92,9 @@ lazy val repl = project
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
       "org.apache.ivy" % "ivy" % "2.4.0",
       "com.lihaoyi" %% "scalaparse" % "0.2.1",
-      "com.lihaoyi" %% "upickle" % "0.3.1",
+      "com.lihaoyi" %% "upickle" % "0.3.2",
       "org.yaml" % "snakeyaml" % "1.15",
-      "com.lihaoyi" %% "pprint" % "0.3.1"
+      "com.lihaoyi" %% "pprint" % "0.3.2"
     ),
     javaOptions += "-Xmx4G",
     assemblyOption in assembly := (assemblyOption in assembly).value.copy(

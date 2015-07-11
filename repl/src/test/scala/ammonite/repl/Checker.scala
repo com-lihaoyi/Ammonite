@@ -11,10 +11,11 @@ class Checker {
   val interp = new Interpreter(
     Ref[String](""),
     Ref(null),
-    ammonite.pprint.Config.Defaults.PPrintConfig.copy(lines = () => 15),
+    pprint.Config.Defaults.PPrintConfig.copy(height = 15),
     Ref(ColorSet.BlackWhite),
     stdout = allOutput += _,
-    history0 = new History,
+    history0 = new History(Vector()),
+    Ref(Map()),
     predef = predef
   )
 

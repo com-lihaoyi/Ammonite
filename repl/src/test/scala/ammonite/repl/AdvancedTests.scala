@@ -27,50 +27,6 @@ object AdvancedTests extends TestSuite{
             $tq
           """)
         }
-        'dependent{
-          // Make sure it automatically picks up jawn-parser since upickle depends on it,
-          check.session("""
-            @ load.ivy("com.lihaoyi" %% "upickle" % "0.2.6")
-
-            @ import upickle._
-            import upickle._
-
-            @ upickle.write(Seq(1, 2, 3))
-            res2: String = "[1,2,3]"
-          """)
-        }
-//        Disable this for now; things are simpler if we don't support it, and
-//        we can re-implement it later if it proves neccessary
-
-//        'reloading{
-//          // Make sure earlier-loaded things indeed continue working
-//          check.session("""
-//            @ load.ivy("com.lihaoyi" %%"scalarx" % "0.2.7")
-//
-//            @ load.ivy("com.scalatags" %% "scalatags" % "0.2.5")
-//
-//            @ scalatags.all.div("omg").toString
-//            res2: String = "<div>omg</div>"
-//
-//            @ load.ivy("com.lihaoyi" %% "scalatags" % "0.4.5")
-//
-//            @ import scalatags.Text.all._; scalatags.Text.all.div("omg").toString
-//            import scalatags.Text.all._
-//            res4_1: String = "<div>omg</div>"
-//
-//            @ import rx._; val x = Var(1); val y = Rx(x() + 1)
-//
-//            @ x(); y()
-//            res6_0: Int = 1
-//            res6_1: Int = 2
-//
-//            @ x() = 2
-//
-//            @ x(); y()
-//            res8_0: Int = 2
-//            res8_1: Int = 3
-//          """)
-//        }
         'complex{
           check.session("""
             @ load.ivy("com.typesafe.akka" %% "akka-http-experimental" % "1.0-M3")
@@ -152,18 +108,6 @@ object AdvancedTests extends TestSuite{
       check.result("", Res.Skip)
       check("2", "res1: Int = 2")
     }
-    'customPPrint{
-      check.session("""
-        @ class C
-        defined class C
-
-        @ implicit def pprint = ammonite.pprint.PPrinter[C]((t, c) => Iterator("INSTANCE OF CLASS C"))
-        defined function pprint
-
-        @ new C
-        res2: C = INSTANCE OF CLASS C
-      """)
-    }
 
     'shapeless{
       check.session("""
@@ -202,10 +146,10 @@ object AdvancedTests extends TestSuite{
         res1: Int = 1
 
         @ ExprCtx.Parened.parse("1 + 1")
-        res2: fastparse.core.Result[Unit] = Failure("(":0 ..."1 + 1")
+        res2: fastparse.core.Result[Unit] = Failure("1 + 1", 0, "(", (0, Parened))
 
         @ ExprCtx.Parened.parse("(1 + 1)")
-        res3: fastparse.core.Result[Unit] = Success((),7)
+        res3: fastparse.core.Result[Unit] = Success((), 7)
       """)
     }
     'predef{
@@ -274,10 +218,14 @@ object AdvancedTests extends TestSuite{
         @ Array(1)
         res0: Array[Int] = Array(1)
 
-        @ import ammonite.pprint.TPrint
+        @ import ammonite.repl.frontend.TPrint
 
-        @ implicit def ArrayTPrint[T: TPrint]: TPrint[Array[T]] = TPrint.lambda(
-        @   c => implicitly[TPrint[T]].render(c) + c.color.literal(" Array")
+        @ implicit def ArrayTPrint[T: TPrint]: TPrint[Array[T]] = TPrint.lambda( c =>
+        @   implicitly[TPrint[T]].render(c) +
+        @   " " +
+        @   c.colors.literalColor +
+        @   "Array" +
+        @   c.colors.endColor
         @ )
 
         @ Array(1)
@@ -317,67 +265,6 @@ object AdvancedTests extends TestSuite{
 
         @ x
         error: not found: value x
-      """)
-    }
-    'truncation{
-      check.session("""
-      @ Seq.fill(20)(100)
-      res0: Seq[Int] = List(
-        100,
-        100,
-        100,
-        100,
-        100,
-        100,
-        100,
-        100,
-        100,
-        100,
-        100,
-        100,
-        100,
-        100,
-      ...
-
-      @ show(Seq.fill(20)(100))
-      res1: ammonite.pprint.Show[Seq[Int]] = List(
-        100,
-        100,
-        100,
-        100,
-        100,
-        100,
-        100,
-        100,
-        100,
-        100,
-        100,
-        100,
-        100,
-        100,
-        100,
-        100,
-        100,
-        100,
-        100,
-        100
-      )
-
-      @ show(Seq.fill(20)(100), lines = 3)
-      res2: ammonite.pprint.Show[Seq[Int]] = List(
-        100,
-        100,
-      ...
-
-      @ pprintConfig = pprintConfig.copy(lines = () => 5)
-
-      @ Seq.fill(20)(100)
-      res4: Seq[Int] = List(
-        100,
-        100,
-        100,
-        100,
-      ...
       """)
     }
   }

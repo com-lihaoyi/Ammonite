@@ -25,7 +25,7 @@ object Preprocessor{
 
     def pprintSignature(ident: String, customMsg: Option[String]) = {
       val customCode = customMsg.fold("None")(x => s"""Some("$x")""")
-      s"""ReplBridge.shell.Internal.print($ident, "$ident", $customCode)"""
+      s"""ReplBridge.shell.Internal.print($ident, $ident, "$ident", $customCode)"""
     }
     def definedStr(definitionLabel: String, name: String) =
       s"""ReplBridge.shell.Internal.printDef("$definitionLabel", "$name")"""

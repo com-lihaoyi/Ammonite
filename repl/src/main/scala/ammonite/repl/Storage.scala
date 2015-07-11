@@ -89,7 +89,6 @@ object Storage{
 class History(s: Vector[String])
 extends IndexedSeq[String]
 with IndexedSeqLike[String, History] {
-  def ? = this :+ "asd"
   def length: Int = s.length
   def apply(idx: Int): String = s.apply(idx)
   override def newBuilder = History.builder
@@ -111,9 +110,9 @@ object History{
   implicit def toHistory(s: Seq[String]): History = new History(s.toVector)
 
   import pprint._
-  implicit def historyPPrint(implicit c: pprint.Config): pprint.PPrint[History] = pprint.PPrint(
+  implicit val historyPPrint: pprint.PPrint[History] = pprint.PPrint(
     new pprint.PPrinter[History]{
-      def render0(t: History, c: pprint.Config)={
+      def render0(t: History, c: pprint.Config) = {
         val lines = if(c.height > 0) c.height else t.length
         val seq = "\n" +: t.dropRight(lines).flatMap{ code => Seq("@ ", code, "\n") }
         if(t.length > lines) ("\n..." +: seq).iterator
@@ -121,5 +120,6 @@ object History{
       }
     }
   )
+
 }
 

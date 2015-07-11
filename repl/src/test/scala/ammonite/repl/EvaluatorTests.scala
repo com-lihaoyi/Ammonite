@@ -1,7 +1,6 @@
 package ammonite.repl
 
-import ammonite.pprint.Config.Defaults._
-import ammonite.pprint.PPrint
+
 import utest._
 
 
@@ -274,7 +273,7 @@ object EvaluatorTests extends TestSuite{
 
     'packageImport{
       check.session("""
-        @ import ammonite.pprint._
+        @ import pprint._
 
         @ import Config.Defaults._
       """)

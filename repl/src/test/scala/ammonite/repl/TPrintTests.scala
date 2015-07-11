@@ -2,7 +2,7 @@ package test.ammonite.frontend
 
 import utest._
 
-
+import ammonite.repl.frontend.TPrint
 object TPrintTests extends TestSuite{
 
   class M
@@ -12,7 +12,7 @@ object TPrintTests extends TestSuite{
     type X = scala.Int with scala.Predef.String{}
     val x = ""
     'plain{
-      import ammonite.pprint.Config.Defaults._
+      import pprint.Config.Defaults._
       def checkVal[T](expected: String, expr: => T)(implicit tprint: TPrint[T]) = check[T](expected)(tprint)
 
       def check[T](expected: String)(implicit tprint: TPrint[T]) = {
@@ -185,12 +185,12 @@ object TPrintTests extends TestSuite{
       }
     }
     'colored{
-      import ammonite.pprint.Config.Colors._
+      import pprint.Config.Colors._
       def checkColor[T](expected: String)(implicit tprint: TPrint[T]) = {
         val tprinted = tprint.render.replace(
-          implicitly[ammonite.pprint.Config].literalColor, "<"
+          implicitly[pprint.Config].colors.literalColor, "<"
         ).replace(
-          Console.RESET, ">"
+            implicitly[pprint.Config].colors.endColor, ">"
         )
         assert(tprinted == expected)
       }

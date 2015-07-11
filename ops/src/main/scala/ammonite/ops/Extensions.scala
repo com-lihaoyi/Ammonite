@@ -1,6 +1,5 @@
 package ammonite.ops
 import acyclic.file
-import ammonite.pprint.{PPrint, PPrinter}
 import scala.collection.{Seq, GenTraversableOnce, TraversableLike}
 
 import scala.collection.generic.{CanBuildFrom => CBF, GenericTraversableTemplate, SeqFactory}
