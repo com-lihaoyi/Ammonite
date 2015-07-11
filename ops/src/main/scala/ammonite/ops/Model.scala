@@ -4,7 +4,7 @@ import java.nio.file.Files
 import java.nio.file.attribute._
 
 import ammonite.ops
-import ammonite.pprint.{PPrinter, Config, PPrint}
+import pprint.{PPrinter, Config, PPrint}
 
 import scala.collection.SortedSet
 
@@ -18,14 +18,13 @@ object FileType{
   case object Other extends FileType
 }
 object PermSet{
-  implicit def pprintConfig(implicit c: Config) = new PPrint(
+  implicit def pprintConfig(implicit c: Config) = PPrint(
     PPrinter[PermSet]{ (p, c) =>
       Iterator(
         "rwxrwxrwx".zip(PosixFilePermission.values()).map{ case (k, v) =>
           if(p.contains(v)) k else '-'
         }.mkString)
-    },
-    c
+    }
   )
 }
 class PermSet(s: Set[PosixFilePermission]) extends Set[PosixFilePermission]{

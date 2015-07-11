@@ -6,29 +6,29 @@ package ammonite.ops
 
 import java.io.{InputStreamReader, BufferedReader}
 
-import ammonite.pprint
-import ammonite.pprint.PPrint
+import pprint
+import pprint.PPrint
 
 import scala.collection.{GenTraversableOnce, mutable}
 import scala.util.matching.Regex
 
 trait Grepper[T]{
-  def apply[V: ammonite.pprint.PPrint](t: T, s: V): Option[GrepResult]
+  def apply[V: pprint.PPrint](t: T, s: V): Option[GrepResult]
 }
 object Grepper{
   def BlackWhite[V: PPrint] = {
     val pp = implicitly[PPrint[V]]
-    new ammonite.pprint.PPrint(pp.pprinter, pp.cfg.copy(literalColor=null, prefixColor=null))
+    new pprint.PPrint(pp.pprinter, pp.cfg.copy(literalColor=null, prefixColor=null))
   }
   implicit object Str extends Grepper[String] {
-    def apply[V: ammonite.pprint.PPrint](t: String, s: V) = {
+    def apply[V: pprint.PPrint](t: String, s: V) = {
       Regex.apply(java.util.regex.Pattern.quote(t).r, s)
     }
   }
 
   implicit object Regex extends Grepper[Regex] {
-    def apply[V: ammonite.pprint.PPrint](t: Regex, s: V) = {
-      val txt = ammonite.pprint.PPrint(s)(BlackWhite).mkString
+    def apply[V: pprint.PPrint](t: Regex, s: V) = {
+      val txt = pprint.PPrint(s)(BlackWhite).mkString
       val items = t.findAllIn(txt).matchData.toSeq
       if (items.length == 0) None
       else{
@@ -94,7 +94,7 @@ object grep {
   }
 
   case class ![T: Grepper](pat: T){
-    def apply[V: ammonite.pprint.PPrint](str: V) = grep.this.apply(pat, str)
+    def apply[V: pprint.PPrint](str: V) = grep.this.apply(pat, str)
   }
 }
 

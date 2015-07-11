@@ -372,7 +372,7 @@
         Ammonite comes with a pretty-printing module, which lets you easily print data structures in a readable way. This is most often used in Ammonite-Repl, but can also be used standalone if desired:
 
       @hl.scala
-        scala> import ammonite.pprint._
+        scala> import pprint._
         scala> import Config.Defaults._
 
         scala> PPrint(

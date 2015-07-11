@@ -189,14 +189,14 @@ object ExampleTests extends TestSuite{
     }
 
     'pprint{
-      import ammonite.pprint.Config.Defaults._
+      import pprint.Config.Defaults._
 
       assert(
-        ammonite.pprint.PPrint(root/'hello/'world).mkString == "root/'hello/'world",
-        ammonite.pprint.PPrint('hello/'world).mkString == "'hello/'world",
-        ammonite.pprint.PPrint(empty/'world).mkString == "'world",
-        ammonite.pprint.PPrint(empty/'hello/'world).mkString == "'hello/'world",
-        ammonite.pprint.PPrint(empty/"hello world").mkString == "\"hello world\""
+        pprint.tokenize(root/'hello/'world).mkString == "root/'hello/'world",
+        pprint.tokenize('hello/'world).mkString == "'hello/'world",
+        pprint.tokenize(empty/'world).mkString == "'world",
+        pprint.tokenize(empty/'hello/'world).mkString == "'hello/'world",
+        pprint.tokenize(empty/"hello world").mkString == "\"hello world\""
       )
 
     }

@@ -14,7 +14,7 @@ object ToolsTests extends TestSuite{
 
 
     'grep{
-      import ammonite.pprint.Config.Defaults._
+      import pprint.Config.Defaults._
       val items = Seq(123, 456, 789)
       items |? grep! "45"
       items |? grep! "^[123456]+$".r

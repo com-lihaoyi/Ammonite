@@ -53,7 +53,8 @@ val sharedSettings = Seq(
 lazy val ops = project
   .settings(sharedSettings:_*)
   .settings(
-    name := "ammonite-ops"
+    name := "ammonite-ops",
+    libraryDependencies += "com.lihaoyi" %% "pprint" % "0.3.2"
   )
 
 lazy val tools = project

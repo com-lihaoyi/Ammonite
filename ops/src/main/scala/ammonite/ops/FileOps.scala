@@ -10,7 +10,7 @@ import java.io.{File, InputStream}
 import java.nio.file.{Files, Paths, StandardOpenOption}
 import acyclic.file
 
-import ammonite.pprint.{Config, PPrinter, PPrint}
+import pprint.{Config, PPrinter, PPrint}
 
 import Extensions._
 object OpError{
@@ -148,15 +148,14 @@ object rm extends Op1[Path, Unit]{
 
 object LsSeq{
   import language.experimental.macros
-  implicit def lsSeqRepr(implicit cfg: Config): PPrint[LsSeq] = new PPrint(
+  implicit def lsSeqRepr: PPrint[LsSeq] = PPrint(
     PPrinter(
       (t: LsSeq, c: Config) =>
-        ammonite.pprint.Internals.handleChunksVertical("LsSeq", c, (c) =>
-          t.listed.iterator.map(PPrint(_))
+        pprint.Internals.handleChunksVertical("LsSeq", c, (c) =>
+          t.listed.iterator.map(implicitly[PPrint[RelPath]].pprinter.render(_, c))
         )
 
-    ),
-    cfg
+    )
   )
 
 }

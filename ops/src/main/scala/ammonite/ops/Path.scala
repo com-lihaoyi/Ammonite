@@ -4,7 +4,7 @@ package ammonite.ops
 import java.nio.file.attribute._
 
 import acyclic.file
-import ammonite.pprint
+
 
 /**
  * Created by haoyi on 1/25/15.
