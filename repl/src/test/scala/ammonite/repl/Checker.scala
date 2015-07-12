@@ -25,15 +25,30 @@ class Checker {
     predef = predef
   )
 
-  def session(sess: String): Unit ={
-//    println("SESSION")
-//    println(sess)
+  def session(sess: String): Unit = {
+    // Remove the margin from the block and break
+    // it into blank-line-delimited steps
     val margin = sess.lines.filter(_.trim != "").map(_.takeWhile(_ == ' ').length).min
     val steps = sess.replace("\n" + margin, "\n").split("\n\n")
-    for(step <- steps){
 
-      val (cmdLines, resultLines) = step.lines.map(_.drop(margin)).partition(_.startsWith("@"))
+    for(step <- steps){
+      // Break the step into the command lines, starting with @,
+      // and the result lines
+      val (cmdLines, resultLines) =
+        step.lines
+            .map(_.drop(margin))
+            .partition(_.startsWith("@"))
+
       val commandText = cmdLines.map(_.stripPrefix("@ ")).toVector
+
+      // Make sure all non-empty, non-complete command-line-fragments
+      // are considered incomplete during the parse
+      for (incomplete <- commandText.inits.toSeq.drop(1).dropRight(1)){
+        assert(Parsers.split(incomplete.mkString("\n")) == None)
+      }
+
+      // Finally, actually run the complete command text through the
+      // interpreter and make sure the output is what we expect
       val expected = resultLines.mkString("\n").trim
       allOutput += commandText.map("\n@ " + _).mkString("\n")
 
@@ -84,11 +99,11 @@ class Checker {
     val (processed, printed) = run(input)
     assert(processed == expected)
   }
-  def failLoudly[T](t: => T) = try{
-      t
-  } catch{ case e: utest.AssertionError =>
-    println("FAILURE TRACE\n" + allOutput)
-    throw e
-  }
+  def failLoudly[T](t: => T) =
+    try t
+    catch{ case e: utest.AssertionError =>
+      println("FAILURE TRACE\n" + allOutput)
+      throw e
+    }
 
 }
