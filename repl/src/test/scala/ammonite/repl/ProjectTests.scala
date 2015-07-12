@@ -114,5 +114,89 @@ object ProjectTests extends TestSuite{
         res3: fastparse.core.Result[Unit] = Success((), 7)
       """)
     }
+
+    'finagle{
+      // Prevent regressions when wildcard-importing things called `macro` or `_`
+      check.session("""
+        @ load.ivy("com.twitter" %% "finagle-httpx" % "6.26.0")
+
+        @ import com.twitter.finagle.{Httpx, Service}
+
+        @ import com.twitter.finagle.httpx
+
+        @ import com.twitter.util.{Await, Future}
+
+        @ var serverCount = 0
+
+        @ var clientResponse = 0
+
+        @ val service = new Service[httpx.Request, httpx.Response] {
+        @   def apply(req: httpx.Request): Future[httpx.Response] = {
+        @     serverCount += 1
+        @     Future.value(
+        @       httpx.Response(req.version, httpx.Status.Ok)
+        @     )
+        @   }
+        @ }
+
+        @ val server = Httpx.serve(":8080", service)
+
+        @ val client: Service[httpx.Request, httpx.Response] = Httpx.newService(":8080")
+
+        @ val request = httpx.Request(httpx.Method.Get, "/")
+
+        @ request.host = "www.scala-lang.org"
+
+        @ val response: Future[httpx.Response] = client(request)
+
+        @ response.onSuccess { resp: httpx.Response =>
+        @   clientResponse = resp.getStatusCode
+        @ }
+
+        @ Await.ready(response)
+
+        @ serverCount
+        res14: Int = 1
+
+        @ clientResponse
+        res15: Int = 200
+
+        @ server.close()
+      """)
+    }
+    'spire{
+      // Prevent regressions when wildcard-importing things called `macro` or `_`
+      check.session("""
+        @ load.ivy("org.spire-math" %% "spire" % "0.10.1")
+
+        @ import spire.implicits._
+
+        @ import spire.math._
+
+        @ def euclidGcd[A: Integral](x: A, y: A): A = {
+        @   if (y == 0) x
+        @   else euclidGcd(y, x % y)
+        @ }
+
+        @ euclidGcd(42, 96)
+        res4: Int = 6
+
+        @ euclidGcd(42L, 96L)
+        res5: Long = 6L
+
+        @ euclidGcd(BigInt(42), BigInt(96))
+        res6: BigInt = 6
+
+        @ def mean[A: Fractional](xs: A*): A = xs.reduceLeft(_ + _) / xs.size
+
+        @ mean(0.5, 1.5, 0.0, -0.5)
+        res8: Double = 0.375
+
+        @ mean(Rational(1, 2), Rational(3, 2), Rational(0))
+        Res9: Rational = Rational(2, 3)
+      """)
+    }
+
   }
 }
+
