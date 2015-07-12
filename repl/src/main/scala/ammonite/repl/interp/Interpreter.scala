@@ -30,7 +30,7 @@ class Interpreter(shellPrompt0: Ref[String],
   def processLine(code: String,
                   stmts: Seq[String],
                   printer: Iterator[String] => Unit) = {
-    storage().history() = storage().history() :+ code
+    if (code != "") storage().history() = storage().history() :+ code
     for{
       _ <- Catching { case Ex(x@_*) =>
         val Res.Failure(trace) = Res.Failure(x)

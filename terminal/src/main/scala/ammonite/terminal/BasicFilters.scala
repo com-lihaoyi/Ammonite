@@ -74,8 +74,7 @@ object BasicFilters {
       Result(b.mkString)
   }
   lazy val exitFilter: TermCore.Filter = {
-    case TS(Ctrl('c') ~: rest, b, c) =>
-      TS(rest, Vector.empty, 0)
+    case TS(Ctrl('c') ~: rest, b, c) => Result("")
     case TS(Ctrl('d') ~: rest, b, c) => Exit
   }
 
