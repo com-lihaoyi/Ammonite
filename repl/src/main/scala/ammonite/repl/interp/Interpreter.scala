@@ -82,7 +82,7 @@ class Interpreter(prompt0: Ref[String],
   }
   
   def processModule(code: String): Unit = {
-    val blocks = Parsers.splitScript(code).map(preprocess(_, eval.getCurrentLine))
+    val blocks = Parsers.splitScript(code).map(preprocess(_, ""))
     val errors = blocks.collect{ case Res.Failure(err) => err }
     if(!errors.isEmpty) 
       stdout(Console.RED + errors.mkString("\n") + Console.RESET + "\n")
@@ -145,6 +145,7 @@ class Interpreter(prompt0: Ref[String],
       def module(file: File): Unit = {
         val content = Files.readAllBytes(file.toPath)
         processModule(new String(content))
+        init()
       }
 
       def module(path: String): Unit = {
@@ -241,6 +242,9 @@ class Interpreter(prompt0: Ref[String],
       val (classFiles, imports) = cb 
       storage.saveCacheBlock(tag,classFiles,imports) 
     }
+    //compiler.addToClasspath
+    //Why do I need this lambda? Without the null check a NullReferenceExcpetion is thrown
+    { x => if(compiler == null) println("wtf") else { println("adding classPath"); compiler.addToClasspath(x)} }
   )
 
   init()

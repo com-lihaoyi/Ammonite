@@ -54,8 +54,9 @@ object Evaluator{
             compile: => (Array[Byte], String => Unit) => Compiler.Output,
             startingLine: Int,
             cacheLoad: String => Option[CompileCache],
-            cacheSave: (String, CompileCache) => Unit): Evaluator = new Evaluator{
-    
+            cacheSave: (String, CompileCache) => Unit,
+            addToCompilerClasspath: Traversable[(String,Array[Byte])] => Unit): Evaluator = new Evaluator{
+
     /**
      * Imports which are required by earlier commands to the REPL. Imports
      * have a specified key, so that later imports of the same name (e.g.
@@ -214,7 +215,7 @@ object Evaluator{
       )
     }
 
-    def compileCacheBlock(wrapperName: String, code: String, scriptImports: Seq[ImportData]): Res[(Class[_],Seq[ImportData])] = for {
+    def compileCacheBlock(wrapperName: String, code: String, scriptImports: Seq[ImportData]): Res[(Class[_], Seq[ImportData])] = for {
       _ <- Catching{ case e: ThreadDeath => interrupted() }
       (classFiles, importData) <- compileClass(
         s"""
@@ -248,7 +249,8 @@ object Evaluator{
             )
           )
         }
-        case None =>
+        case None => {
+          println("cache miss")
           for {
             (cls, newImports) <- compileCacheBlock(wrapperName, code, scriptImports)
           } yield {
@@ -261,17 +263,21 @@ object Evaluator{
               ))
             )
           }
+        }
       }
     }
 
     def cacheTag(code: String, imports: Seq[ImportData]): String = {
       val idString = code + imports.mkString(" ") + evalClassloader.getURLs.mkString(" ") 
+      println(s"idString:\n$idString")
       val bytes = MessageDigest.getInstance("MD5").digest(idString.getBytes)
       "cache" + bytes.map("%02x".format(_)).mkString //add prefix to make sure it begins with a letter
     }
 
     def loadCachedClass(tag: String): Option[(Class[_],Seq[ImportData])] = {
       cacheLoad(tag).flatMap{ case (classFiles, importData) =>
+        println("cache hit")
+        addToCompilerClasspath(classFiles)
         loadClass(tag,classFiles) match {
           case Res.Success(cls) => Some((cls,importData))
           case _ => None

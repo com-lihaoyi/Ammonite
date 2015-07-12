@@ -38,6 +38,11 @@ trait Compiler{
    * Either the statements that were parsed or the error message
    */
   def parse(line: String): Either[String, Seq[Global#Tree]]
+
+  /**
+   * Writes files to dynamicClasspath. Needed for loading cached classes.
+   */ 
+  def addToClasspath(classFiles: Traversable[(String, Array[Byte])]): Unit
 }
 object Compiler{
   /**
@@ -192,6 +197,14 @@ object Compiler{
         }
         val imports = lastImports.toList
         (files, imports)
+      }
+    }
+
+    def addToClasspath(classFiles: Traversable[(String, Array[Byte])]): Unit = {
+      for((name, bytes) <- classFiles){
+        val output = dynamicClasspath.fileNamed(s"$name.class").output
+        output.write(bytes)
+        output.close()
       }
     }
 
