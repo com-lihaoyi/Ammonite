@@ -23,6 +23,7 @@ trait FrontEnd{
   def width: Int
   def height: Int
   def action(input: InputStream,
+             reader: java.io.Reader,
              output: OutputStream,
              shellPrompt: String,
              compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
@@ -48,12 +49,13 @@ object FrontEnd{
     }
 
     def action(input: InputStream,
+               reader: java.io.Reader,
                output: OutputStream,
                shellPrompt: String,
                compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
                history: Seq[String]) = {
 
-      readLine(input, output, shellPrompt, compilerComplete, history) match{
+      readLine(reader, output, shellPrompt, compilerComplete, history) match{
         case None => Res.Exit
         case Some(code) =>
           Parsers.Splitter.parse(code) match{
@@ -64,7 +66,7 @@ object FrontEnd{
           }
       }
     }
-    def readLine(input: InputStream,
+    def readLine(reader: java.io.Reader,
                  output: OutputStream,
                  shellPrompt: String,
                  compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
@@ -115,17 +117,17 @@ object FrontEnd{
       val selectionFilter = AdvancedFilters.SelectionFilter()
       TermCore.readLine(
         shellPrompt,
-        System.in,
-        System.out,
+        reader,
+        writer,
         selectionFilter orElse
-          AdvancedFilters.altFilter orElse
-          AdvancedFilters.fnFilter orElse
-          ReadlineFilters.navFilter orElse
-          autocompleteFilter orElse
-          historyFilter.filter orElse
-          cutPasteFilter orElse
-          multilineFilter orElse
-          BasicFilters.all,
+        AdvancedFilters.altFilter orElse
+        AdvancedFilters.fnFilter orElse
+        ReadlineFilters.navFilter orElse
+        autocompleteFilter orElse
+        historyFilter.filter orElse
+        cutPasteFilter orElse
+        multilineFilter orElse
+        BasicFilters.all,
         displayTransform = { (buffer, cursor) =>
           val indices = Highlighter.defaultHighlightIndices(buffer)
           selectionFilter.mark match{
@@ -159,6 +161,7 @@ object FrontEnd{
     def height = makeTerm().getHeight
 
     def action(input: InputStream,
+               reader: java.io.Reader,
                output: OutputStream,
                shellPrompt: String,
                compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
@@ -166,7 +169,7 @@ object FrontEnd{
 
       val term = makeTerm()
       term.init()
-      val reader = new ConsoleReader(input, output, term)
+      val reader = new ConsoleReader(???, output, term)
 
       reader.setHistoryEnabled(true)
       var signatures = Seq.empty[String]

@@ -35,10 +35,11 @@ class Repl(input: InputStream,
     storage,
     predef
   )
-
+  val reader = new InputStreamReader(input)
   def action() = for{
     (code, stmts) <- frontEnd().action(
       input,
+      reader,
       output,
       colorSet().prompt + shellPrompt() + scala.Console.RESET,
       interp.pressy.complete(_, interp.eval.previousImportBlock, _),

@@ -1,5 +1,7 @@
 package ammonite.terminal
 
+import java.io.OutputStreamWriter
+
 import acyclic.file
 import scala.annotation.tailrec
 
@@ -14,12 +16,14 @@ object Term{
   def main(args: Array[String]): Unit = {
     var history = List.empty[String]
     val selection = AdvancedFilters.SelectionFilter()
+
+    val reader = new java.io.InputStreamReader(System.in)
     rec()
     @tailrec def rec(): Unit = {
       TermCore.readLine(
         Console.MAGENTA + "@ " + Console.RESET,
-        System.in,
-        System.out,
+        reader,
+        new OutputStreamWriter(System.out),
         selection orElse
         AdvancedFilters.altFilter orElse
         AdvancedFilters.fnFilter orElse

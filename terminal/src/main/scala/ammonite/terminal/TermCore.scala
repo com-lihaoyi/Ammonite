@@ -1,6 +1,7 @@
 package ammonite.terminal
+
+
 import acyclic.file
-import java.io.{OutputStreamWriter, InputStreamReader, OutputStream, InputStream}
 
 import scala.annotation.tailrec
 import scala.collection.mutable
@@ -108,8 +109,8 @@ object TermCore {
    * Blockingly reads a line from the given input stream and returns it.
    *
    * @param prompt The prompt to display when requesting input
-   * @param input The input-stream where characters come in, e.g. System.in
-   * @param output The output-stream where print-outs go, e.g. System.out
+   * @param reader The input-stream where characters come in, e.g. System.in
+   * @param writer The output-stream where print-outs go, e.g. System.out
    * @param filters A set of actions that can be taken depending on the input,
    *                to manipulate the internal state of the terminal.
    * @param displayTransform code to manipulate the display of the buffer and
@@ -117,8 +118,8 @@ object TermCore {
    *                         values inside them.
    */
   def readLine(prompt: String,
-               input: InputStream,
-               output: OutputStream,
+               reader: java.io.Reader,
+               writer: java.io.Writer,
                filters: PartialFunction[TermInfo, TermAction] = PartialFunction.empty,
                displayTransform: (Vector[Char], Int) => (Vector[Char], Int) = (x, i) => (x, i))
                : Option[String] = {
@@ -197,8 +198,7 @@ object TermCore {
           None
       }
     }
-    lazy val reader = new InputStreamReader(input)
-    lazy val writer = new OutputStreamWriter(output)
+
     lazy val ansi = new Ansi(writer)
     lazy val (width, height, initialConfig) = TTY.init()
     try {
