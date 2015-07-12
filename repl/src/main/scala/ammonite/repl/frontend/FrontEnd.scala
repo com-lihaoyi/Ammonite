@@ -155,9 +155,7 @@ object FrontEnd{
           }
       }
     }
-    def update(r: Res[Evaluated]) = {
 
-    }
   }
   object JLine extends JLineTerm(() => new jline.UnixTerminal())
   object JLineWindows extends JLineTerm(() => new jline.WindowsTerminal())

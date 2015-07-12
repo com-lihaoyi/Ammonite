@@ -4,18 +4,24 @@ import ammonite.repl.frontend._
 import ammonite.repl.interp.Interpreter
 import utest._
 
-
+/**
+ * A test REPL which does not read from stdin or stdout files, but instead lets
+ * you feed in lines or sessions programmatically and have it execute them.
+ */
 class Checker {
   def predef = ""
   var allOutput = ""
+
+
+  val tempDir = java.nio.file.Files.createTempDirectory("ammonite-tester").toFile
+
   val interp = new Interpreter(
     Ref[String](""),
     Ref(null),
     pprint.Config.Defaults.PPrintConfig.copy(height = 15),
     Ref(ColorSet.BlackWhite),
     stdout = allOutput += _,
-    history0 = new History(Vector()),
-    Ref(Map()),
+    storage = Ref(Storage(tempDir)),
     predef = predef
   )
 
@@ -54,21 +60,13 @@ class Checker {
 //    println(input)
 //    print(".")
     val msg = collection.mutable.Buffer.empty[String]
-    val processed = interp.processLine(Parsers.split(input), _.foreach(msg.append(_)))
+    val processed = interp.processLine(input, Parsers.split(input), _.foreach(msg.append(_)))
     val printed = processed.map(_ => msg.mkString)
 
     interp.handleOutput(processed)
     (processed, printed)
   }
 
-  def apply(input: String,
-            expected: String = null) = {
-    val (processed, printed) = run(input)
-    if (expected != null){
-      val expectedRes = Res.Success(expected.trim)
-      failLoudly(assert(printed == expectedRes))
-    }
-  }
 
   def fail(input: String,
            failureCheck: String => Boolean = _ => true) = {

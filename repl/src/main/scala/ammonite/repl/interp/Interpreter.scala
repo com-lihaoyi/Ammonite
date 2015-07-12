@@ -21,19 +21,20 @@ class Interpreter(shellPrompt0: Ref[String],
                   pprintConfig: pprint.Config,
                   colors0: Ref[ColorSet],
                   stdout: String => Unit,
-                  history0: => History,
-                  ivyCache: Ref[IvyMap],
+                  storage: Ref[Storage],
                   predef: String){ interp =>
 
   val dynamicClasspath = new VirtualDirectory("(memory)", None)
   var extraJars = Seq[java.io.File]()
 
-  def processLine(stmts: Seq[String],
+  def processLine(code: String,
+                  stmts: Seq[String],
                   printer: Iterator[String] => Unit) = for{
     _ <- Catching { case Ex(x@_*) =>
       val Res.Failure(trace) = Res.Failure(x)
       Res.Failure(trace + "\nSomething unexpected went wrong =(")
     }
+    _ = {storage().history() = storage().history() :+ code}
     Preprocessor.Output(code, printSnippet) <- preprocess(stmts, eval.getCurrentLine)
     out <- evaluateLine(code, printSnippet, printer)
   } yield out
@@ -123,11 +124,11 @@ class Interpreter(shellPrompt0: Ref[String],
       }
       def ivy(coordinates: (String, String, String), verbose: Boolean = true): Unit ={
         val (groupId, artifactId, version) = coordinates
-        ivyCache().get((groupId, artifactId, version)) match{
+        storage().ivyCache().get((groupId, artifactId, version)) match{
           case Some(ps) => ps.map(new java.io.File(_)).map(handleJar)
           case None =>
             val resolved = IvyThing.resolveArtifact(groupId, artifactId, version, if (verbose) 2 else 1)
-            ivyCache() = ivyCache().updated(
+            storage().ivyCache() = storage().ivyCache().updated(
               (groupId, artifactId, version),
               resolved.map(_.getAbsolutePath).toSet
             )
@@ -144,7 +145,7 @@ class Interpreter(shellPrompt0: Ref[String],
     def search(target: scala.reflect.runtime.universe.Type) = Interpreter.this.compiler.search(target)
     def compiler = Interpreter.this.compiler.compiler
     def newCompiler() = init()
-    def history = history0
+    def history = storage().history()
 
   }
 

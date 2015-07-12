@@ -14,18 +14,13 @@ class Repl(input: InputStream,
            output: OutputStream,
            pprintConfig: pprint.Config = pprint.Config.Colors.PPrintConfig,
            shellPrompt0: String = "@ ",
-           history0: Ref[History],
-           ivyCache0: Ref[IvyMap],
+           storage: Ref[Storage],
            predef: String = "") {
 
   val shellPrompt = Ref(shellPrompt0)
 
   val colorSet = Ref[ColorSet](ColorSet.Default)
   val frontEnd = Ref[FrontEnd](FrontEnd.JLine)
-  def consoleDim(s: String) = {
-    import sys.process._
-    Seq("bash", "-c", s"tput $s 2> /dev/tty").!!.trim.toInt
-  }
 
   val printer = new PrintStream(output, true)
   val interp: Interpreter = new Interpreter(
@@ -37,8 +32,7 @@ class Repl(input: InputStream,
     ),
     colorSet,
     printer.print,
-    history0(),
-    ivyCache0,
+    storage,
     predef
   )
 
@@ -48,13 +42,10 @@ class Repl(input: InputStream,
       output,
       colorSet().prompt + shellPrompt() + scala.Console.RESET,
       interp.pressy.complete(_, interp.eval.previousImportBlock, _),
-      history0()
+      storage().history()
     )
-    _ = {
-      history0() = history0() :+ code
-    }
     _ <- Signaller("INT") { interp.mainThread.stop() }
-    out <- interp.processLine(stmts, _.foreach(printer.print))
+    out <- interp.processLine(code, stmts, _.foreach(printer.print))
   } yield {
     printer.println()
     out
@@ -78,8 +69,7 @@ object Repl{
     val storage = Storage(new java.io.File(ammoniteHome))
     val shell = new Repl(
       System.in, System.out,
-      history0 = Ref(storage.loadHistory, storage.saveHistory),
-      ivyCache0 = Ref(storage.loadIvyCache, storage.saveIvyCache),
+      storage = Ref(storage),
       predef = storage.loadPredef
     )
     shell.run()

@@ -18,18 +18,13 @@ import scala.collection.JavaConversions.asScalaBuffer
 trait Storage{
   def loadPredef: String
 
-  def loadHistory: History
-
-  def saveHistory(h: History): Unit
-
-  def loadIvyCache: IvyMap
-
-  def saveIvyCache(map: IvyMap)
+  val history: Ref[History]
+  val ivyCache: Ref[IvyMap]
 }
 
 object Storage{
 
-  def apply(dir: File) = new Storage{
+  def apply(dir: File): Storage = new Storage{
   
     if(dir.exists){
       if(!dir.isDirectory){
@@ -40,48 +35,52 @@ object Storage{
       dir.mkdir()
     }
 
-    def loadHistory: History = {
-      val yaml = new Yaml
-      try{
-        val list = yaml.load(new FileInputStream(dir + "/history"))
-        list match {
-          case a: java.util.List[String] => new History(a.toVector)
-          case _ => new History(Vector())
+    val history = new Ref[History]{
+      def apply(): History = {
+        val yaml = new Yaml
+        try{
+          val list = yaml.load(new FileInputStream(dir + "/history"))
+          list match {
+            case a: java.util.List[String] => new History(a.toVector)
+            case _ => new History(Vector())
+          }
+        } catch {
+          case e: IOException => new History(Vector())
         }
-      } catch {
-        case e: IOException => new History(Vector())
+      }
+
+
+      def update(t: History): Unit = {
+        val yaml = new Yaml
+        val fw = new FileWriter(dir + "/history")
+        yaml.dump(t.toArray, fw)
       }
     }
 
-    def saveHistory(h: History): Unit = {
-      val yaml = new Yaml
-      val fw = new FileWriter(dir + "/history")
-      yaml.dump(h.toArray, fw)
-    }
+    val ivyCache = new Ref[IvyMap]{
+      def apply() = {
+        val json = try{
+          io.Source.fromFile(dir + "/ivycache.json").mkString
+        }catch{
+          case e: java.io.FileNotFoundException => "[]"
+        }
 
+        try{
+          upickle.default.read[IvyMap](json)
+        }catch{ case e: Exception =>
+          Map.empty
+        }
+      }
+      def update(map: IvyMap) = {
+        val fw = new FileWriter(dir + "/ivycache.json")
+        fw.write(upickle.default.write(map))
+        fw.flush()
+      }
+    }
     def loadPredef = try{
       io.Source.fromFile(dir + "/predef.scala").mkString
     }catch{
       case e: java.io.FileNotFoundException => ""
-    }
-
-    def loadIvyCache = {
-      val json = try{
-        io.Source.fromFile(dir + "/ivycache.json").mkString
-      }catch{
-        case e: java.io.FileNotFoundException => "[]"
-      }
-
-      try{
-        upickle.default.read[IvyMap](json)
-      }catch{ case e =>
-        Map.empty
-      }
-    }
-    def saveIvyCache(map: IvyMap) = {
-      val fw = new FileWriter(dir + "/ivycache.json")
-      fw.write(upickle.default.write(map))
-      fw.flush()
     }
   }
 }
