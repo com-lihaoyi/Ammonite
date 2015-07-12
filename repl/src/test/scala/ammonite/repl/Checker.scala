@@ -60,7 +60,7 @@ class Checker {
 //    println(input)
 //    print(".")
     val msg = collection.mutable.Buffer.empty[String]
-    val processed = interp.processLine(input, Parsers.split(input), _.foreach(msg.append(_)))
+    val processed = interp.processLine(input, Parsers.split(input).get.get.value, _.foreach(msg.append(_)))
     val printed = processed.map(_ => msg.mkString)
 
     interp.handleOutput(processed)

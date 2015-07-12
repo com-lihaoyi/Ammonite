@@ -42,9 +42,7 @@ object AdvancedTests extends TestSuite{
       check.result("exit", Res.Exit)
     }
     'skip{
-      check("1", "res0: Int = 1")
       check.result("", Res.Skip)
-      check("2", "res1: Int = 2")
     }
 
     'predef{

@@ -12,7 +12,11 @@ object Highlighter {
     }
   }
 
-  def defaultHighlight(buffer: Vector[Char]) = Highlighter.highlight(
+  def defaultHighlight(buffer: Vector[Char]) = {
+    val boundedIndices = defaultHighlightIndices(buffer)
+    flattenIndices(boundedIndices, buffer)
+  }
+  def defaultHighlightIndices(buffer: Vector[Char]) = Highlighter.highlightIndices(
     ammonite.repl.Parsers.Splitter,
     buffer,
     {

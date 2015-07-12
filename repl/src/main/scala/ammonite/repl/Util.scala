@@ -198,7 +198,15 @@ object Parsers {
   val Statement = P ( scalaparse.Scala.Import | Prelude ~ BlockDef | StatCtx.Expr )
   def StatementBlock(blockSep: P0) = P ( Semis.? ~ (!blockSep ~ Statement).!.repX(sep=Semis) ~ Semis.? )
   val Splitter = P( StatementBlock(Fail) ~ WL ~ End)
-  def split(code: String) = Splitter.parse(code).get.value
+
+  /**
+   * Attempts to break a code blob into multiple statements. Returns `None` if
+   * it thinks the code blob is "incomplete" and requires more input
+   */
+  def split(code: String) = Splitter.parse(code) match{
+    case Result.Failure(_, index) if code.drop(index).trim() == "" => None
+    case x => Some(x)
+  }
 
   val Separator = P( WL ~ "@" ~~ CharIn(" \n").rep(1) )
   val CompilationUnit = P( WL ~ StatementBlock(Separator) ~ WL )

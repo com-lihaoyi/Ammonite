@@ -52,6 +52,23 @@ object FrontEnd{
                shellPrompt: String,
                compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
                history: Seq[String]) = {
+
+      readLine(input, output, shellPrompt, compilerComplete, history) match{
+        case None => Res.Exit
+        case Some(code) =>
+          Parsers.Splitter.parse(code) match{
+            case Result.Success(value, idx) => Res.Success((code, value))
+            case f: Result.Failure => Res.Failure(
+              fastparse.core.SyntaxError.msg(f.input, f.traced.expected, f.index)
+            )
+          }
+      }
+    }
+    def readLine(input: InputStream,
+                 output: OutputStream,
+                 shellPrompt: String,
+                 compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
+                 history: Seq[String]) = {
       val writer = new OutputStreamWriter(output)
       val autocompleteFilter: TermCore.Filter = {
         case TermInfo(TermState(9 ~: rest, b, c), width) => // Enter
@@ -84,45 +101,33 @@ object FrontEnd{
       val multilineFilter: TermCore.Filter = {
         case TermState(13 ~: rest, b, c) => // Enter
           val code = b.mkString
-          ammonite.repl.Parsers.Splitter.parse(code) match {
-            case Result.Failure(_, index) if code.drop(index).trim() == "" =>
+          ammonite.repl.Parsers.split(code) match {
+            case None =>
               val (first, last) = b.splitAt(c)
               TermState(rest, (first :+ '\n') ++ last, c + 1)
-            case _ =>
+            case Some(_)  =>
               ammonite.terminal.Result(code)
           }
       }
-      
+
       val historyFilter = ReadlineFilters.HistoryFilter(() => history.reverse)
       val cutPasteFilter = ReadlineFilters.CutPasteFilter()
       val selectionFilter = AdvancedFilters.SelectionFilter()
-      val code = TermCore.readLine(
+      TermCore.readLine(
         shellPrompt,
         System.in,
         System.out,
         selectionFilter orElse
-        AdvancedFilters.altFilter orElse
-        AdvancedFilters.fnFilter orElse
-        ReadlineFilters.navFilter orElse
-        autocompleteFilter orElse
-        historyFilter.filter orElse
-        cutPasteFilter orElse
-        multilineFilter orElse
-        BasicFilters.all,
+          AdvancedFilters.altFilter orElse
+          AdvancedFilters.fnFilter orElse
+          ReadlineFilters.navFilter orElse
+          autocompleteFilter orElse
+          historyFilter.filter orElse
+          cutPasteFilter orElse
+          multilineFilter orElse
+          BasicFilters.all,
         displayTransform = { (buffer, cursor) =>
-          val indices = Highlighter.highlightIndices(
-            ammonite.repl.Parsers.Splitter,
-            buffer,
-            {
-              case Literals.Expr.Interp | Literals.Pat.Interp => Console.RESET
-              case Literals.Comment => Console.BLUE
-              case ExprLiteral => Console.GREEN
-              case TypeId => Console.GREEN
-              case Highlighter.BackTicked(body)
-                if alphaKeywords.contains(body) => Console.YELLOW
-            },
-            endColor = Console.RESET
-          )
+          val indices = Highlighter.defaultHighlightIndices(buffer)
           selectionFilter.mark match{
             case Some(mark) if mark != cursor =>
               val Seq(min, max) = Seq(cursor, mark).sorted
@@ -130,9 +135,9 @@ object FrontEnd{
               val after = indices.filter(_._1 > max)
               val lastBeforeAfter =
                 indices.filter(_._1 <= max)
-                       .lastOption
-                       .map(_._2)
-                       .getOrElse("")
+                  .lastOption
+                  .map(_._2)
+                  .getOrElse("")
               val middle = Seq(
                 (min, Console.RESET + Console.REVERSED, true),
                 (max, Console.RESET + lastBeforeAfter, true)
@@ -144,18 +149,8 @@ object FrontEnd{
           }
         }
       )
-      code match{
-        case None => Res.Exit
-        case Some(code) =>
-          Parsers.Splitter.parse(code) match{
-            case Result.Success(value, idx) => Res.Success((code, value))
-            case f: Result.Failure => Res.Failure(
-              fastparse.core.SyntaxError.msg(f.input, f.traced.expected, f.index)
-            )
-          }
-      }
-    }
 
+    }
   }
   object JLine extends JLineTerm(() => new jline.UnixTerminal())
   object JLineWindows extends JLineTerm(() => new jline.WindowsTerminal())
@@ -221,12 +216,12 @@ object FrontEnd{
           case None => Res.Exit
           case Some(newCode) =>
             val code = buffered + newCode
-            Parsers.Splitter.parse(code) match{
-              case Result.Success(value, idx) => Res.Success(code -> value)
-              case Result.Failure(_, index) if code.drop(index).trim() == "" => readCode(code + "\n")
-              case f: Result.Failure => Res.Failure(
+            Parsers.split(code) match{
+              case Some(Result.Success(value, idx)) => Res.Success(code -> value)
+              case Some(f: Result.Failure) => Res.Failure(
                 fastparse.core.SyntaxError.msg(f.input, f.traced.expected, f.index)
               )
+              case None => readCode(code + "\n")
             }
         }
       }

@@ -93,7 +93,7 @@ object Preprocessor{
 
     def apply(stmts: Seq[String], wrapperId: String): Res[Preprocessor.Output] = {
       val unwrapped = stmts.flatMap{x => Parsers.unwrapBlock(x) match {
-        case Some(contents) => Parsers.split(contents)
+        case Some(contents) => Parsers.split(contents).get.get.value
         case None => Seq(x)
       }}
       unwrapped match{
