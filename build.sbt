@@ -54,7 +54,7 @@ lazy val ops = project
   .settings(sharedSettings:_*)
   .settings(
     name := "ammonite-ops",
-    libraryDependencies += "com.lihaoyi" %% "pprint" % "0.3.3-SNAPSHOT"
+    libraryDependencies += "com.lihaoyi" %% "pprint" % "0.3.3"
   )
 
 lazy val tools = project
@@ -62,7 +62,7 @@ lazy val tools = project
   .settings(sharedSettings:_*)
   .settings(
     name := "ammonite-tools",
-    libraryDependencies += "com.lihaoyi" %% "pprint" % "0.3.3-SNAPSHOT"
+    libraryDependencies += "com.lihaoyi" %% "pprint" % "0.3.3"
   )
 
 /**
@@ -94,9 +94,9 @@ lazy val repl = project
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
       "org.apache.ivy" % "ivy" % "2.4.0",
       "com.lihaoyi" %% "scalaparse" % "0.2.1",
-      "com.lihaoyi" %% "upickle" % "0.3.3-SNAPSHOT",
+      "com.lihaoyi" %% "upickle" % "0.3.3",
       "org.yaml" % "snakeyaml" % "1.15",
-      "com.lihaoyi" %% "pprint" % "0.3.3-SNAPSHOT"
+      "com.lihaoyi" %% "pprint" % "0.3.3"
     ),
     javaOptions += "-Xmx4G",
     assemblyOption in assembly := (assemblyOption in assembly).value.copy(

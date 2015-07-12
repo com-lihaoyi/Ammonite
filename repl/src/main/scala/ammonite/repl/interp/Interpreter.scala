@@ -29,15 +29,18 @@ class Interpreter(shellPrompt0: Ref[String],
 
   def processLine(code: String,
                   stmts: Seq[String],
-                  printer: Iterator[String] => Unit) = for{
-    _ <- Catching { case Ex(x@_*) =>
-      val Res.Failure(trace) = Res.Failure(x)
-      Res.Failure(trace + "\nSomething unexpected went wrong =(")
-    }
-    _ = {storage().history() = storage().history() :+ code}
-    Preprocessor.Output(code, printSnippet) <- preprocess(stmts, eval.getCurrentLine)
-    out <- evaluateLine(code, printSnippet, printer)
-  } yield out
+                  printer: Iterator[String] => Unit) = {
+    storage().history() = storage().history() :+ code
+    for{
+      _ <- Catching { case Ex(x@_*) =>
+        val Res.Failure(trace) = Res.Failure(x)
+        Res.Failure(trace + "\nSomething unexpected went wrong =(")
+
+      }
+      Preprocessor.Output(code, printSnippet) <- preprocess(stmts, eval.getCurrentLine)
+      out <- evaluateLine(code, printSnippet, printer)
+    } yield out
+  }
 
   def evaluateLine(code: String, printSnippet: Seq[String], printer: Iterator[String] => Unit) = {
     val oldClassloader = Thread.currentThread().getContextClassLoader

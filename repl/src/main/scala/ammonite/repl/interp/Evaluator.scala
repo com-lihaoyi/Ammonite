@@ -73,7 +73,10 @@ object Evaluator{
       }
       mutable.Map(
         importsFor[ReplAPI]("ReplBridge.shell") ++
-        importsFor[ammonite.repl.IvyConstructor]("ammonite.repl.IvyConstructor")
+        importsFor[ammonite.repl.IvyConstructor]("ammonite.repl.IvyConstructor") ++
+        // For some reason this is neccessary for implicit resolution to work properly
+        Seq("pprint.PPrint" -> ImportData("FinalRepr", "FinalRepr", "", "pprint.PPrint")) ++
+        Seq("pprint" -> ImportData("pprintln", "pprintln", "", "pprint"))
         :_*
       )
     }

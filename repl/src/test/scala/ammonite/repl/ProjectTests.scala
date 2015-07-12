@@ -6,7 +6,7 @@ import scala.collection.{immutable => imm}
 
 object ProjectTests extends TestSuite{
   val tests = TestSuite{
-    println("AdvancedTests")
+    println("ProjectTests")
     val check = new Checker()
     'load{
       'ivy{
@@ -107,8 +107,8 @@ object ProjectTests extends TestSuite{
         @ 1
         res1: Int = 1
 
-        @ ExprCtx.Parened.parse("1 + 1")
-        res2: fastparse.core.Result[Unit] = Failure("1 + 1", 0, "(", (0, Parened))
+        @ ExprCtx.Parened.parse("1 + 1") // for some reason the tuple isn't pprinted
+        res2: fastparse.core.Result[Unit] = Failure("1 + 1", 0, "(", (0,Parened))
 
         @ ExprCtx.Parened.parse("(1 + 1)")
         res3: fastparse.core.Result[Unit] = Success((), 7)
@@ -193,7 +193,7 @@ object ProjectTests extends TestSuite{
         res8: Double = 0.375
 
         @ mean(Rational(1, 2), Rational(3, 2), Rational(0))
-        Res9: Rational = Rational(2, 3)
+        res9: Rational = 2/3
       """)
     }
 
