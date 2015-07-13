@@ -50,10 +50,7 @@ object Evaluator{
   def apply(currentClassloader: ClassLoader,
             compile: => (Array[Byte], String => Unit) => Compiler.Output,
             startingLine: Int): Evaluator = new Evaluator{
-
-
-
-
+    
     /**
      * Imports which are required by earlier commands to the REPL. Imports
      * have a specified key, so that later imports of the same name (e.g.

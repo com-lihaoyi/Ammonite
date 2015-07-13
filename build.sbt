@@ -20,6 +20,7 @@ val sharedSettings = Seq(
   scalacOptions += "-target:jvm-1.7",
   autoCompilerPlugins := true,
   addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.2"),
+  parallelExecution in Test := !scalaVersion.value.contains("2.10"),
   libraryDependencies ++= Seq(
     "com.lihaoyi" %% "acyclic" % "0.1.2" % "provided",
     "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided"

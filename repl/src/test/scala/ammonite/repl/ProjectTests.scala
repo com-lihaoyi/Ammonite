@@ -91,7 +91,7 @@ object ProjectTests extends TestSuite{
           @ import shapeless._
 
           @ (1 :: "lol" :: List(1, 2, 3) :: HNil)
-          res2: shapeless.::[Int,shapeless.::[String,shapeless.::[List[Int],shapeless.HNil]]] = ::(1, ::("lol", ::(List(1, 2, 3), HNil))))
+          res2: shapeless.::[Int,shapeless.::[String,shapeless.::[List[Int],shapeless.HNil]]] = ::(1, ::("lol", ::(List(1, 2, 3), HNil)))
 
           @ res2(1)
           res3: String = "lol"
@@ -135,10 +135,10 @@ object ProjectTests extends TestSuite{
           res1: Int = 1
 
           @ ExprCtx.Parened.parse("1 + 1") // for some reason the tuple isn't pprinted
-          res2: fastparse.core.Result[Unit] = Failure("(":0 ..."1 + 1"))
+          res2: fastparse.core.Result[Unit] = Failure("(":0 ..."1 + 1")
 
           @ ExprCtx.Parened.parse("(1 + 1)")
-          res3: fastparse.core.Result[Unit] = Success((), 7)
+          res3: fastparse.core.Result[Unit] = Success((),7)
         """)
     }
 

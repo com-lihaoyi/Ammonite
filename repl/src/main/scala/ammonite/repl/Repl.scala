@@ -12,12 +12,10 @@ import scala.util.Try
 
 class Repl(input: InputStream,
            output: OutputStream,
-           pprintConfig: pprint.Config = pprint.Config.Colors.PPrintConfig,
-           shellPrompt0: String = "@ ",
            storage: Ref[Storage],
            predef: String = "") {
 
-  val shellPrompt = Ref(shellPrompt0)
+  val shellPrompt = Ref("@ ")
 
   val colorSet = Ref[ColorSet](ColorSet.Default)
   val frontEnd = Ref[FrontEnd](FrontEnd.JLine)
@@ -26,7 +24,7 @@ class Repl(input: InputStream,
   val interp: Interpreter = new Interpreter(
     shellPrompt,
     frontEnd,
-    pprintConfig.copy(
+    pprint.Config.Colors.PPrintConfig.copy(
       width = frontEnd().width,
       height = frontEnd().height / 2
     ),

@@ -20,11 +20,16 @@ object ScriptTests extends TestSuite{
           """)
       }
       'preserveImports{
+        val typeString =
+          if (!scala.util.Properties.versionString.contains("2.10"))
+            """Left[String, Nothing]"""
+          else
+            """util.Left[String,Nothing]"""
         check.session(s"""
           @ load.script("$scriptPath/PreserveImports.scala")
 
           @ val r = res
-          r: Left[String, Nothing] = Left("asd")
+          r: $typeString = Left("asd")
           """)
       }
       'annotation{
