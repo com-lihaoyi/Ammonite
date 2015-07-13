@@ -423,6 +423,8 @@
         @li
           Re-added support for 2.10.x, minus features that don't work in it (e.g. scope-aware type-printing)
         @li
+          Added a Standalone distribution that comes bundled with Scala 2.11.7, letting you quickly load and experiment with libraries without SBT
+        @li
           Exception stack traces are now highlighted to make them easier to read
         @li
           Pretty-printing has been extracted into a separate project, and aside from that is greatly improved. Many more common cases (e.g. sealed trait hierarchies) are now pretty-printed rather than falling back to toString
@@ -435,6 +437,8 @@
         @li
           You can now define a @code{~/.ammonite/predef.scala} file which will be executed the first thing when the Ammonite REPL is loaded. This is useful for common imports, @hl.scala{load.ivy}ing libraries, or configuration for your REPL
         @li
+          Added the ability to load arbitrary Ammonite scripts via @hl.scala{load.script}
+        @li
           Much more configuration that was previously passed into the @hl.scala{REPL}s constructor is now done in-REPL,
         @li
           Added the Ammonite Terminal, as an alternative to JLine, enabled via @hl.scala{frontEnd() = ammonite.repl.frontend.FrontEnd.Ammonite} in your @code{predef.scala}
@@ -442,6 +446,7 @@
           Removed the ability to reload classes; using @hl.scala{load.ivy} no longer causes all existing values to be lazily recomputed.
         @li
           Evaluated values of type @hl.scala{Unit} are no longer echo-ed to the user
+
 
     @sect{0.3.2}
       @ul

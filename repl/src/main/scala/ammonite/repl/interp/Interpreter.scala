@@ -125,7 +125,7 @@ class Interpreter(shellPrompt0: Ref[String],
         handleJar(jar)
         init()
       }
-      def ivy(coordinates: (String, String, String), verbose: Boolean = true): Unit ={
+      def ivy(coordinates: (String, String, String), verbose: Boolean = true): Unit = {
         val (groupId, artifactId, version) = coordinates
         storage().ivyCache().get((groupId, artifactId, version)) match{
           case Some(ps) => ps.map(new java.io.File(_)).map(handleJar)

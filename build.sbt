@@ -158,3 +158,9 @@ lazy val readme = ScalatexReadme(
 )
 
 
+lazy val modules = project.aggregate(
+  ops, tools, terminal, repl
+).settings(
+  publishArtifact := false,
+  publishTo := Some(Resolver.file("Unused transient repository", file("target/unusedrepo")))
+)

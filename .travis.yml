@@ -10,5 +10,5 @@ jdk:
 - oraclejdk7
 - oraclejdk8
 script:
-- sbt ++$TRAVIS_SCALA_VERSION test
+- sbt ++$TRAVIS_SCALA_VERSION modules/test
 sudo: false
