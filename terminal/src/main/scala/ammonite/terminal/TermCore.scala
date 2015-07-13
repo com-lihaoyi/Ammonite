@@ -125,7 +125,7 @@ object TermCore {
                : Option[String] = {
 
     val ansiRegex = "\u001B\\[[;\\d]*m".r
-    val noAnsiPrompt = prompt.replaceAll(ansiRegex.regex, "")
+    val noAnsiPrompt = prompt.replaceAll("\u001B\\[[;\\d]*m", "")
     def redrawLine(buffer: Vector[Char], cursor: Int) = {
       ansi.restore()
       ansi.clearScreen(0)

@@ -7,7 +7,6 @@ import scala.reflect.io.VirtualDirectory
 import scala.tools.nsc
 import scala.tools.nsc.backend.JavaPlatform
 import scala.tools.nsc.interactive.Response
-import scala.tools.nsc.util.Position
 import scala.tools.nsc.util._
 
 /**
