@@ -20,7 +20,7 @@ object Shellout{
   def executeStream(executed: Command[_]) = {
     import scala.sys.process._
     val p = Process(executed.cmd, new java.io.File(executed.wd.toString))
-    CommandResult(p.lineStream)
+    CommandResult(p.lines)
   }
 }
 
