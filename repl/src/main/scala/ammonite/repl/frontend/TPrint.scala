@@ -1,9 +1,5 @@
 package ammonite.repl.frontend
 
-
-import language.experimental.macros
-import reflect.macros.blackbox.Context
-import scala.reflect.macros.TypecheckException
 import pprint._
 /**
  * Summoning an implicit `TPrint[T]` provides a pretty-printed

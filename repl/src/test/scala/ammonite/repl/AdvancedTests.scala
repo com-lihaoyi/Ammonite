@@ -88,7 +88,8 @@ object AdvancedTests extends TestSuite{
       """)
     }
     'typeScope{
-      check.session("""
+      // Fancy type-printing isn't implemented at all in 2.10.x
+      if (!scala.util.Properties.versionString.contains("2.10")) check.session("""
         @ collection.mutable.Buffer(1)
         res0: collection.mutable.Buffer[Int] = ArrayBuffer(1)
 

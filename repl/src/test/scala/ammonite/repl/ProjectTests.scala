@@ -72,17 +72,30 @@ object ProjectTests extends TestSuite{
     }
 
     'shapeless{
-      check.session("""
-        @ load.ivy("com.chuusai" %% "shapeless" % "2.1.0")
+      if (!scala.util.Properties.versionString.contains("2.10"))
+        check.session("""
+          @ load.ivy("com.chuusai" %% "shapeless" % "2.1.0")
 
-        @ import shapeless._
+          @ import shapeless._
 
-        @ (1 :: "lol" :: List(1, 2, 3) :: HNil)
-        res2: Int :: String :: List[Int] :: HNil = ::(1, ::("lol", ::(List(1, 2, 3), HNil)))
+          @ (1 :: "lol" :: List(1, 2, 3) :: HNil)
+          res2: Int :: String :: List[Int] :: HNil = ::(1, ::("lol", ::(List(1, 2, 3), HNil)))
 
-        @ res2(1)
-        res3: String = "lol"
-      """)
+          @ res2(1)
+          res3: String = "lol"
+        """)
+      else
+        check.session("""
+          @ load.ivy("com.chuusai" %% "shapeless" % "2.1.0")
+
+          @ import shapeless._
+
+          @ (1 :: "lol" :: List(1, 2, 3) :: HNil)
+          res2: shapeless.::[Int,shapeless.::[String,shapeless.::[List[Int],shapeless.HNil]]] = ::(1, ::("lol", ::(List(1, 2, 3), HNil))))
+
+          @ res2(1)
+          res3: String = "lol"
+        """)
     }
 
     'scalaz{
@@ -101,18 +114,32 @@ object ProjectTests extends TestSuite{
     }
     'scalaparse{
       // Prevent regressions when wildcard-importing things called `macro` or `_`
-      check.session("""
-        @ import scalaparse.Scala._
+      if (!scala.util.Properties.versionString.contains("2.10"))
+        check.session(s"""
+          @ import scalaparse.Scala._
 
-        @ 1
-        res1: Int = 1
+          @ 1
+          res1: Int = 1
 
-        @ ExprCtx.Parened.parse("1 + 1") // for some reason the tuple isn't pprinted
-        res2: fastparse.core.Result[Unit] = Failure("1 + 1", 0, "(", (0,Parened))
+          @ ExprCtx.Parened.parse("1 + 1") // for some reason the tuple isn't pprinted
+          res2: fastparse.core.Result[Unit] = Failure("1 + 1", 0, "(", (0,Parened))
 
-        @ ExprCtx.Parened.parse("(1 + 1)")
-        res3: fastparse.core.Result[Unit] = Success((), 7)
-      """)
+          @ ExprCtx.Parened.parse("(1 + 1)")
+          res3: fastparse.core.Result[Unit] = Success((), 7)
+        """)
+      else
+        check.session(s"""
+          @ import scalaparse.Scala._
+
+          @ 1
+          res1: Int = 1
+
+          @ ExprCtx.Parened.parse("1 + 1") // for some reason the tuple isn't pprinted
+          res2: fastparse.core.Result[Unit] = Failure("(":0 ..."1 + 1"))
+
+          @ ExprCtx.Parened.parse("(1 + 1)")
+          res3: fastparse.core.Result[Unit] = Success((), 7)
+        """)
     }
 
     'finagle{
@@ -166,35 +193,68 @@ object ProjectTests extends TestSuite{
     }
     'spire{
       // Prevent regressions when wildcard-importing things called `macro` or `_`
-      check.session("""
-        @ load.ivy("org.spire-math" %% "spire" % "0.10.1")
+      if (!scala.util.Properties.versionString.contains("2.10"))
+        check.session(s"""
+          @ load.ivy("org.spire-math" %% "spire" % "0.10.1")
 
-        @ import spire.implicits._
+          @ import spire.implicits._
 
-        @ import spire.math._
+          @ import spire.math._
 
-        @ def euclidGcd[A: Integral](x: A, y: A): A = {
-        @   if (y == 0) x
-        @   else euclidGcd(y, x % y)
-        @ }
+          @ def euclidGcd[A: Integral](x: A, y: A): A = {
+          @   if (y == 0) x
+          @   else euclidGcd(y, x % y)
+          @ }
 
-        @ euclidGcd(42, 96)
-        res4: Int = 6
+          @ euclidGcd(42, 96)
+          res4: Int = 6
 
-        @ euclidGcd(42L, 96L)
-        res5: Long = 6L
+          @ euclidGcd(42L, 96L)
+          res5: Long = 6L
 
-        @ euclidGcd(BigInt(42), BigInt(96))
-        res6: BigInt = 6
+          @ euclidGcd(BigInt(42), BigInt(96))
+          res6: BigInt = 6
 
-        @ def mean[A: Fractional](xs: A*): A = xs.reduceLeft(_ + _) / xs.size
+          @ def mean[A: Fractional](xs: A*): A = xs.reduceLeft(_ + _) / xs.size
 
-        @ mean(0.5, 1.5, 0.0, -0.5)
-        res8: Double = 0.375
+          @ mean(0.5, 1.5, 0.0, -0.5)
+          res8: Double = 0.375
 
-        @ mean(Rational(1, 2), Rational(3, 2), Rational(0))
-        res9: Rational = 2/3
-      """)
+          @ mean(Rational(1, 2), Rational(3, 2), Rational(0))
+          res9: Rational = 2/3
+        """)
+      else
+        check.session(s"""
+          @ load.ivy("org.spire-math" %% "spire" % "0.10.1")
+
+          @ import spire.implicits._
+
+          @ import spire.math._
+
+          @ def euclidGcd[A: Integral](x: A, y: A): A = {
+          @   if (y == 0) x
+          @   else euclidGcd(y, x % y)
+          @ }
+
+          @ euclidGcd(42, 96)
+          res4: Int = 6
+
+          @ euclidGcd(42L, 96L)
+          res5: Long = 6L
+
+          @ euclidGcd(BigInt(42), BigInt(96))
+          res6: math.BigInt = 6
+
+          @ def mean[A: Fractional](xs: A*): A = xs.reduceLeft(_ + _) / xs.size
+
+          @ mean(0.5, 1.5, 0.0, -0.5)
+          res8: Double = 0.375
+
+          @ mean(Rational(1, 2), Rational(3, 2), Rational(0))
+          res9: spire.math.Rational = 2/3
+        """)
+
+
     }
 
   }

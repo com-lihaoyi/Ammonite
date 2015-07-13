@@ -20,7 +20,7 @@ object Parsers {
   def backtickWrap(s: String) = {
     Id2.parse(s) match{
       case _: Result.Success[_] => s
-      case _ => ""//`" + pprint.PPrinter.escape(s) + "`"
+      case _ => "`" + pprint.PPrinter.escape(s) + "`"
     }
   }
   val Prelude = P( (Annot ~ OneNLMax).rep ~ (Mod ~! Pass).rep )

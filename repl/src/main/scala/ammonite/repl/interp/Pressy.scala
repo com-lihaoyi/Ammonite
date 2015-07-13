@@ -58,7 +58,7 @@ object Pressy {
       s.decodedName.contains('$')
     }
     val r = new Response[pressy.Tree]
-    pressy.askTypeAt(Position.offset(currentFile, index), r)
+    pressy.askTypeAt(new OffsetPosition(currentFile, index), r)
     val tree = r.get.fold(x => x, e => throw e)
     /**
      * Search for terms to autocomplete not just from the local scope,
