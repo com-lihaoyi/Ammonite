@@ -55,7 +55,7 @@ object Evaluator{
             startingLine: Int,
             cacheLoad: String => Option[CompileCache],
             cacheSave: (String, CompileCache) => Unit,
-            addToCompilerClasspath: Traversable[(String,Array[Byte])] => Unit): Evaluator = new Evaluator{
+            addToCompilerClasspath:  => Traversable[(String,Array[Byte])] => Unit): Evaluator = new Evaluator{
 
     /**
      * Imports which are required by earlier commands to the REPL. Imports

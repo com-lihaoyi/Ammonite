@@ -242,9 +242,7 @@ class Interpreter(prompt0: Ref[String],
       val (classFiles, imports) = cb 
       storage.saveCacheBlock(tag,classFiles,imports) 
     }
-    //compiler.addToClasspath
-    //Why do I need this lambda? Without the null check a NullReferenceExcpetion is thrown
-    { x => if(compiler == null) println("wtf") else { println("adding classPath"); compiler.addToClasspath(x)} }
+    compiler.addToClasspath
   )
 
   init()
