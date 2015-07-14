@@ -250,7 +250,6 @@ object Evaluator{
           )
         }
         case None => {
-          println("cache miss")
           for {
             (cls, newImports) <- compileCacheBlock(wrapperName, code, scriptImports)
           } yield {
@@ -269,14 +268,12 @@ object Evaluator{
 
     def cacheTag(code: String, imports: Seq[ImportData]): String = {
       val idString = code + imports.mkString(" ") + evalClassloader.getURLs.mkString(" ") 
-      println(s"idString:\n$idString")
       val bytes = MessageDigest.getInstance("MD5").digest(idString.getBytes)
       "cache" + bytes.map("%02x".format(_)).mkString //add prefix to make sure it begins with a letter
     }
 
     def loadCachedClass(tag: String): Option[(Class[_],Seq[ImportData])] = {
       cacheLoad(tag).flatMap{ case (classFiles, importData) =>
-        println("cache hit")
         addToCompilerClasspath(classFiles)
         loadClass(tag,classFiles) match {
           case Res.Success(cls) => Some((cls,importData))
