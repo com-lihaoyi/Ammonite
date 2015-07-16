@@ -19,8 +19,8 @@ trait Storage{
   def loadPredef: String
   val history: StableRef[History]
   val ivyCache: StableRef[IvyMap]
-  def saveCacheBlock(tag: String, classFiles: Traversable[(String, Array[Byte])], imports: Seq[ImportData]): Unit
-  def loadCacheBlock(tag: String): Option[(Traversable[(String, Array[Byte])], Seq[ImportData])]
+  def compileCacheSave(tag: String, classFiles: Traversable[(String, Array[Byte])], imports: Seq[ImportData]): Unit
+  def compileCacheLoad(tag: String): Option[(Traversable[(String, Array[Byte])], Seq[ImportData])]
 }
 
 object Storage{
@@ -57,11 +57,11 @@ object Storage{
       }
     }
 
-    def saveCacheBlock(tag: String, classFiles: Traversable[(String, Array[Byte])], imports: Seq[ImportData]): Unit = {
+    def compileCacheSave(tag: String, classFiles: Traversable[(String, Array[Byte])], imports: Seq[ImportData]): Unit = {
       val cacheDir = new File(dir + s"/compileCache/$tag")
       if(!cacheDir.exists){
         cacheDir.mkdirs()
-        val metadata= upickle.write(imports)
+        val metadata = upickle.default.write(imports)
         val metadataFw = new FileWriter(cacheDir + "/metadata.json")
         metadataFw.write(metadata)
         metadataFw.flush()
@@ -73,7 +73,7 @@ object Storage{
       }
     }
 
-    def loadCacheBlock(tag: String): Option[(Traversable[(String, Array[Byte])], Seq[ImportData])] = {
+    def compileCacheLoad(tag: String): Option[(Traversable[(String, Array[Byte])], Seq[ImportData])] = {
       val cacheDir = new File(dir + s"/compileCache/$tag")
       if(!cacheDir.exists) None
       else for{
@@ -83,7 +83,7 @@ object Storage{
           case e: java.io.FileNotFoundException => None
         }
         metadata <- try{
-          Some(upickle.read[Seq[ImportData]](metadataJson))
+          Some(upickle.default.read[Seq[ImportData]](metadataJson))
         } catch {
           case e: Exception => None
         }

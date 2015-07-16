@@ -237,11 +237,11 @@ class Interpreter(prompt0: Ref[String],
     mainThread.getContextClassLoader,
     compiler.compile,
     if (predef != "") -1 else 0,
-    storage.compileCacheLoad,
+    storage().compileCacheLoad,
     { (tag, cb) => 
       val (classFiles, imports) = cb 
-      storage.saveCacheBlock(tag,classFiles,imports) 
-    }
+      storage().compileCacheSave(tag,classFiles,imports) 
+    },
     compiler.addToClasspath
   )
 
