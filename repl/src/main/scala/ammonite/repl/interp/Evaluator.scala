@@ -92,6 +92,8 @@ object Evaluator{
       )
     }
 
+    lazy val defaultImportBlock = importBlock(defaultImports.values.toSeq)
+
     /**
      * The current line number of the REPL, used to make sure every snippet
      * evaluated can have a distinct name that doesn't collide.
@@ -219,7 +221,8 @@ object Evaluator{
       _ <- Catching{ case e: ThreadDeath => interrupted() }
       (classFiles, importData) <- compileClass(
         s"""
-        ${importBlock(scriptImports)}
+        $defaultImportBlock
+        ${importBlock(scriptImports )}
 
         case object $wrapperName{
 
