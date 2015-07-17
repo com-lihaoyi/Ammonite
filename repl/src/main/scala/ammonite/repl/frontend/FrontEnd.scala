@@ -188,7 +188,6 @@ object FrontEnd{
       val term = makeTerm()
       term.init()
       val reader = new ConsoleReader(input, output, term)
-
       reader.setHistoryEnabled(true)
       var signatures = Seq.empty[String]
       reader.addCompleter(new jline.console.completer.Completer {
