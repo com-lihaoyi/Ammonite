@@ -60,14 +60,33 @@ class Checker {
           case Res.Failure(failureMsg) =>
             val expectedStripped =
               expected.stripPrefix("error: ").replaceAll(" *\n", "\n")
+            val expectedRegex = createRegex(expectedStripped).r //using scala Regex here
             val failureStripped = failureMsg.replaceAll("\u001B\\[[;\\d]*m", "").replaceAll(" *\n", "\n")
-            failLoudly(assert(failureStripped.contains(expectedStripped)))
+            failLoudly(assert(!expectedRegex.findFirstIn(failureStripped).isEmpty))
         }
       }else{
-        if (expected != "")
-          failLoudly(assert(printed == Res.Success(expected)))
+        if (expected != ""){
+          val regex = createRegex(expected)
+          printed match {
+            case Res.Success(str) => failLoudly(assert(str.matches(regex)))
+            case _ => assert({printed; regex; false})
+          }
+        }
       }
     }
+  }
+
+  /* This method creates a regex from the expected string escaping all specials, so you don't have to bother with
+   * escaping the in tests, if they are not needed. Special meanings can be activated by inserting a backslash
+   * before the special character. This is essentially vim's nomagic mode.
+   */
+  def createRegex(expected: String) = {
+    val specialChars=".|+*?[](){}^$" //these characters need to be escaped to use them as regex specials.
+    //idk why do i need 4 backsalshes in the replacement
+    val escape = specialChars.map{ c => (s"\\$c", s"\\\\$c") } //first part is handled as a regex, so we need the escape to match the literal character.
+    val escapedExpected = escape.foldLeft(expected){ case (exp, (pattern, replacement)) => exp.replaceAll(pattern, replacement) } // We insert a backslash so special chars are handled as literals
+    val unescape = specialChars.map{ c => (s"\\\\\\\\\\$c", c.toString) } // special chars that had a backslash before them now have two.
+    unescape.foldLeft(escapedExpected){ case (exp, (pattern, replacement)) => exp.replaceAll(pattern, replacement) } // we replace double backslashed stuff with regex specials
   }
 
   def run(input: String) = {

@@ -56,7 +56,7 @@ object ScriptTests extends TestSuite{
 
           @ val r = res
           error: Compilation Failed
-          Main.scala:29: not found: value res
+          Main.scala:\\d\\+: not found: value res
           res
           ^
           """)
@@ -67,7 +67,7 @@ object ScriptTests extends TestSuite{
 
           @ val r = res
           error: Compilation Failed
-          Main.scala:39: not found: value res
+          Main.scala:\\d\\+: not found: value res
           res
           ^
 
@@ -89,7 +89,7 @@ object ScriptTests extends TestSuite{
 
           @ val r2 = res2
           error: Compilation Failed
-          Main.scala:41: not found: value res2
+          Main.scala:\\d\\+: not found: value res2
           res2 
           ^
           """)
