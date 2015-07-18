@@ -105,7 +105,8 @@ lazy val repl = project
       "org.yaml" % "snakeyaml" % "1.15",
       "com.lihaoyi" %% "pprint" % "0.3.4",
       "com.github.scopt" %% "scopt" % "3.3.0",
-      "com.chuusai" %% "shapeless" % "2.1.0" % "test"
+      if (scalaVersion.value startsWith "2.10.") Nil
+      else Seq("com.chuusai" %% "shapeless" % "2.1.0" % "test")
     ),
     (unmanagedSources in Compile) += baseDirectory.value/".."/"project"/"Constants.scala",
     javaOptions += "-Xmx4G",
