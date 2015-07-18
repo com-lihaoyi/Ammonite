@@ -73,6 +73,7 @@ object Evaluator{
         importsFor[ammonite.repl.IvyConstructor]("ammonite.repl.IvyConstructor") ++
         // For some reason this is neccessary for implicit resolution to work properly
         Seq("pprint.PPrint" -> ImportData("FinalRepr", "FinalRepr", "", "pprint.PPrint")) ++
+        Seq("pprint.PPrint" -> ImportData("Contra", "Contra", "", "pprint.PPrint")) ++
         Seq("pprint" -> ImportData("pprintln", "pprintln", "", "pprint"))
         :_*
       )

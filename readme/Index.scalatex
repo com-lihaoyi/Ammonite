@@ -39,7 +39,19 @@
     res1: List[Seq[Seq[String]]] = List(
       List(List("mgg", "mgg", "lols"), List("mgg", "mgg")),
       List(List("ggx", "ggx"), List("ggx", "ggx", "wtfx"))
-    ) 
+    )
+
+    @ case class Foo(s: String, list: List[Int])
+    defined class Foo
+
+    @ pprint.pprintln(List(Foo("hello", List(1, 2, 3)), Foo("    world", List())), width=25)
+    List(
+      Foo(
+        "hello",
+        List(1, 2, 3)
+      ),
+      Foo("  world", List())
+    )
   """)
   @p
     If you want some initialization code available to the REPL, you can add it to your @code{~/.ammonite/predef.scala}.

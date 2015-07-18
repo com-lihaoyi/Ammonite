@@ -84,18 +84,7 @@ object ProjectTests extends TestSuite{
           @ res2(1)
           res3: String = "lol"
         """)
-      else
-        check.session("""
-          @ load.ivy("com.chuusai" %% "shapeless" % "2.1.0")
 
-          @ import shapeless._
-
-          @ (1 :: "lol" :: List(1, 2, 3) :: HNil)
-          res2: shapeless.::[Int,shapeless.::[String,shapeless.::[List[Int],shapeless.HNil]]] = ::(1, ::("lol", ::(List(1, 2, 3), HNil)))
-
-          @ res2(1)
-          res3: String = "lol"
-        """)
     }
 
     'scalaz{
