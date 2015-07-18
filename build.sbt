@@ -104,7 +104,9 @@ lazy val repl = project
       "com.lihaoyi" %% "upickle" % "0.3.4",
       "org.yaml" % "snakeyaml" % "1.15",
       "com.lihaoyi" %% "pprint" % "0.3.4",
-      "com.github.scopt" %% "scopt" % "3.3.0",
+      "com.github.scopt" %% "scopt" % "3.3.0"
+    ),
+    libraryDependencies ++= (
       if (scalaVersion.value startsWith "2.10.") Nil
       else Seq("com.chuusai" %% "shapeless" % "2.1.0" % "test")
     ),
