@@ -61,15 +61,29 @@ class Repl(input: InputStream,
 }
 
 object Repl{
-  def defaultAmmoniteHome = System.getProperty("user.home") + "/.ammonite"
-  def main(args: Array[String]) = run("", args.lift(0).getOrElse(defaultAmmoniteHome))
-  def run(customPredef: String = "", ammoniteHome: String = defaultAmmoniteHome) = {
+  case class Config(predef: String = "", ammoniteHome: java.io.File = defaultAmmoniteHome)
+
+  def defaultAmmoniteHome = new java.io.File(System.getProperty("user.home") + "/.ammonite")
+  def main(args: Array[String]) = {
+    val parser = new scopt.OptionParser[Config]("ammonite") {
+      head("ammonite", ammonite.Constants.version)
+      opt[String]('p', "predef")
+        .action((x, c) => c.copy(predef = x))
+        .text("Any commands you want to execute at the start of the REPL session")
+      opt[File]('h', "home")
+        .valueName("<file>")
+        .action((x, c) => c.copy(ammoniteHome = x))
+        .text("The home directory of the REPL; where it looks for config and caches")
+    }
+    parser.parse(args, Config()).foreach(c => run(c.predef, c.ammoniteHome))
+  }
+  def run(predef: String = "", ammoniteHome: java.io.File = defaultAmmoniteHome) = {
     println("Loading Ammonite Repl...")
-    val storage = Storage(new java.io.File(ammoniteHome))
+    val storage = Storage(ammoniteHome)
     val shell = new Repl(
       System.in, System.out,
       storage = Ref(storage),
-      predef = customPredef + "\n" + storage.loadPredef
+      predef = predef + "\n" + storage.loadPredef
     )
     shell.run()
 

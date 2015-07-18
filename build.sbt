@@ -103,8 +103,11 @@ lazy val repl = project
       "com.lihaoyi" %% "scalaparse" % "0.2.1",
       "com.lihaoyi" %% "upickle" % "0.3.4",
       "org.yaml" % "snakeyaml" % "1.15",
-      "com.lihaoyi" %% "pprint" % "0.3.4"
+      "com.lihaoyi" %% "pprint" % "0.3.4",
+      "com.github.scopt" %% "scopt" % "3.3.0",
+      "com.chuusai" %% "shapeless" % "2.1.0" % "test"
     ),
+    (unmanagedSources in Compile) += baseDirectory.value/".."/"project"/"Constants.scala",
     javaOptions += "-Xmx4G",
     assemblyOption in assembly := (assemblyOption in assembly).value.copy(
       prependShellScript = Some(defaultShellScript)
