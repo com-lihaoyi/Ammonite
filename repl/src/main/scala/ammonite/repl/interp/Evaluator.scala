@@ -68,12 +68,23 @@ object Evaluator{
       def importsFor[T: TypeTag](name: String) = {
         namesFor(typeOf[T]).map(n => n -> ImportData(n, n, "", name)).toSeq
       }
+
+      // Having these fails in 2.10.x; not having them fails in 2.11.x, both
+      // with obscure implicit-type-inference problems =( So just hard-code it
+      // for now
+      val pprintImports =
+        if (!scala.util.Properties.versionString.contains("2.10"))
+          Seq(
+            "pprint.PPrint" -> ImportData("FinalRepr", "FinalRepr", "", "pprint.PPrint"),
+            "pprint.PPrint" -> ImportData("Contra", "Contra", "", "pprint.PPrint")
+          )
+        else
+          Nil
+
       mutable.Map(
         importsFor[ReplAPI]("ReplBridge.shell") ++
         importsFor[ammonite.repl.IvyConstructor]("ammonite.repl.IvyConstructor") ++
-        // For some reason this is neccessary for implicit resolution to work properly
-        Seq("pprint.PPrint" -> ImportData("FinalRepr", "FinalRepr", "", "pprint.PPrint")) ++
-        Seq("pprint.PPrint" -> ImportData("Contra", "Contra", "", "pprint.PPrint")) ++
+        pprintImports ++
         Seq("pprint" -> ImportData("pprintln", "pprintln", "", "pprint"))
         :_*
       )
