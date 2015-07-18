@@ -62,14 +62,14 @@ class Repl(input: InputStream,
 
 object Repl{
   def defaultAmmoniteHome = System.getProperty("user.home") + "/.ammonite"
-  def main(args: Array[String]) = run(args.lift(0).getOrElse(defaultAmmoniteHome))
-  def run(ammoniteHome: String = defaultAmmoniteHome) = {
+  def main(args: Array[String]) = run("", args.lift(0).getOrElse(defaultAmmoniteHome))
+  def run(customPredef: String = "", ammoniteHome: String = defaultAmmoniteHome) = {
     println("Loading Ammonite Repl...")
     val storage = Storage(new java.io.File(ammoniteHome))
     val shell = new Repl(
       System.in, System.out,
       storage = Ref(storage),
-      predef = storage.loadPredef
+      predef = customPredef + "\n" + storage.loadPredef
     )
     shell.run()
 
