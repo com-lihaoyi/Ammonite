@@ -111,7 +111,7 @@ object ProjectTests extends TestSuite{
           res1: Int = 1
 
           @ ExprCtx.Parened.parse("1 + 1") // for some reason the tuple isn't pprinted
-          res2: fastparse.core.Result[Unit] = Failure("1 + 1", 0, "(", (0,Parened))
+          res2: fastparse.core.Result[Unit] = Failure("1 + 1", 0, "(", (0, Parened))
 
           @ ExprCtx.Parened.parse("(1 + 1)")
           res3: fastparse.core.Result[Unit] = Success((), 7)
