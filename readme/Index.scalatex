@@ -60,7 +60,7 @@
     You can also try out Ammonite-REPL in an existing Scala 2.11.x project, add the following to your @code{build.sbt}
 
   @hl.scala
-    libraryDependencies += "com.lihaoyi" % "ammonite-repl" % "@ammonite.Constants.version" % "test" cross CrossVersion.full
+    libraryDependencies += "com.lihaoyi" %% "ammonite-repl" % "@ammonite.Constants.version" % "test" cross CrossVersion.full
 
     initialCommands in (Test, console) := """ammonite.repl.Repl.run("")"""
 
