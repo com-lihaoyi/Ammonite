@@ -161,6 +161,10 @@ object Timer{
  * @param prompt The command prompt
  * @param ident Definition of top-level identifiers
  * @param `type` Definition of types
+ * @param literal Strings, integers and other literal expressions
+ * @param prefix The Seq/Foo when printing a Seq(...) or case class Foo(...)
+ * @param selected The color of text selected in the line-editor
+ * @param error The color used to print error messages of all kinds
  * @param reset Whatever is necessary to get rid of residual coloring
  */
 case class ColorSet(prompt: Ref[String],

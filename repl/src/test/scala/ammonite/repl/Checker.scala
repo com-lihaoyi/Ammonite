@@ -80,6 +80,10 @@ class Checker {
               val trace = Repl.showException(ex, "", "", "") + "\n" +  failureMsg
               assert({trace; regex; false})
           }
+        }else{
+          assert(
+            printed.isInstanceOf[Res.Success[_]] || printed.isInstanceOf[Res.Skip.type]
+          )
         }
       }
     }

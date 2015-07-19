@@ -55,10 +55,8 @@ class Repl(input: InputStream,
     @tailrec def loop(): Unit = {
       val res = action()
       res match{
-        case Res.Exit =>
-          printer.println("Bye!")
-        case Res.Failure(msg) =>
-          printer.println(colors().error() + msg + colors().reset())
+        case Res.Exit => printer.println("Bye!")
+        case Res.Failure(msg) => printer.println(colors().error() + msg + colors().reset())
         case Res.Exception(ex, msg) =>
           printer.println(
             Repl.showException(ex, colors().error(), colors().reset(), colors().literal())

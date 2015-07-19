@@ -1,6 +1,8 @@
 @import Main._
 @import ammonite.ops._
-@val advancedTests = 'repl/'src/'test/'scala/'ammonite/'repl/"AdvancedTests.scala"
+@val ammoniteTests = 'repl/'src/'test/'scala/'ammonite/'repl
+
+@val advancedTests = ammoniteTests/"AdvancedTests.scala"
 @val fileOps = read! cwd/'ops/'src/'main/'scala/'ammonite/'ops/"FileOps.scala"
 @val found = (
   ".*/\\*\\*(\n\\s*\\*.*)+\n.*?extends.*?Op[^{]*".r
@@ -68,7 +70,7 @@
 
     @sect{Artifact Loading}
 
-      @hl.ref(advancedTests, Seq("standalone", "@"), "\"\"\"")
+      @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("standalone", "@"), "\"\"\"")
 
       @p
         Ammonite allows you to load artifacts directly from maven central by copy & pasting their SBT ivy-coordinate-snippet. In addition, you can also load in jars as @hl.scala{java.io.File}s to be included in the session or simple @hl.scala{String}s to be executed using the @hl.scala{load} command.
@@ -76,9 +78,9 @@
       @p
         This makes Ammonite ideal for trying out new libraries or tools. You can pull down projects like @a("Scalaz", href:="https://github.com/scalaz/scalaz") or @a("Shapeless", href:="https://github.com/milessabin/shapeless") and immediately start working with them in the REPL:
 
-      @hl.ref(advancedTests, Seq("scalaz", "@"), "\"\"\"")
+      @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("scalaz", "@"), "\"\"\"")
 
-      @hl.ref(advancedTests, Seq("shapeless", "@"), "\"\"\"")
+      @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("shapeless", "@"), "\"\"\"")
 
     @sect{Pretty-printed output}
 
@@ -210,26 +212,7 @@
   @sect{Configuration}
     @p
       Ammonite is configured via Scala code, that can live in the @code{~/.ammonite/predef.scala} file, passed in through SBT's @hl.scala{initialCommands}, or passed to the command-line executable as @code{--predef='...'}. Some examples of things you can configure:
-    @hl.scala
-      @@ // Set the shell prompt to be something else
-      @@ shellPrompt() = ">"
-
-      @@ // Change the terminal front end; the default is
-      @@ // Ammonite on Linux/OSX and JLineWindows on Windows
-      @@ frontEnd() = ammonite.repl.frontend.FrontEnd.JLineUnix
-      @@ frontEnd() = ammonite.repl.frontend.FrontEnd.JLineWindows
-      @@ frontEnd() = ammonite.repl.frontend.FrontEnd.Ammonite
-
-      @@ // Changing the colors used by Ammonite; all at once:
-      @@ colors() = ammonite.repl.frontend.ColorSet.BlackWhite
-      @@ colors() = ammonite.repl.frontend.ColorSet.Default
-
-      @@ // or one at a time:
-      @@ colors().prompt() = Console.RED
-      @@ colors().ident() = Console.GREEN
-      @@ colors().`type`() = Console.YELLOW
-      @@ colors().literal() = Console.MAGENTA
-      @@ colors().prefix() = Console.CYAN
+    @hl.ref(ammoniteTests/"ConfigurationTests.scala", Seq("basicConfig", "@"))
 
 @sect("Ammonite-Ops", "Rock-solid Filesystem Operations")
   @val opsExamples = 'ops/'src/'test/'scala/'test/'ammonite/'ops/"ExampleTests.scala"
