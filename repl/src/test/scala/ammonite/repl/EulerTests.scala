@@ -407,7 +407,7 @@ object EulerTests extends TestSuite{
       check.session(s"""
         @ val s = "$data"
 
-        @ val grid = s.trim.split("|").map(_.split(" ").map(_.toInt))
+        @ val grid = s.trim.split("\\\\|").map(_.split(" ").map(_.toInt))
 
         @ def f(rows: Array[Array[Int]], bottom: Seq[Int]): Int = {
         @  val ms = bottom.zip(bottom.tail).map(p => p._1 max p._2)

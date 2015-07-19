@@ -53,6 +53,7 @@ object ScriptTests extends TestSuite{
       'syntaxError{
         check.session(s"""
           @ load.script("$scriptPath/SyntaxError.scala")
+          error: SyntaxError
 
           @ val r = res
           error: Compilation Failed
