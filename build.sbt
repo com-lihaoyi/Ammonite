@@ -89,7 +89,7 @@ lazy val terminal = project
  * for Scala
  */
 lazy val repl = project
-  .dependsOn(terminal)
+  .dependsOn(terminal, ops)
   .settings(sharedSettings:_*)
   .settings(
     crossVersion := CrossVersion.full,
