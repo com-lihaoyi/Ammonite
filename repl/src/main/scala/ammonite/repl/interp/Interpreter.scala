@@ -19,6 +19,8 @@ import scala.reflect.io.VirtualDirectory
  */
 class Interpreter(shellPrompt0: Ref[String],
                   frontEnd0: Ref[FrontEnd],
+                  width: => Int,
+                  height: => Int,
                   pprintConfig: pprint.Config,
                   colors0: Ref[ColorSet],
                   stdout: String => Unit,
@@ -139,12 +141,14 @@ class Interpreter(shellPrompt0: Ref[String],
       }
     }
 
-    implicit def pprintConfig: Ref[pprint.Config] = Ref.live[pprint.Config](
-      () => interp.pprintConfig.copy(
-        width = frontEnd().width,
-        height = frontEnd().height / 2
+    implicit lazy val pprintConfig: Ref[pprint.Config] = {
+      Ref.live[pprint.Config](
+        () => interp.pprintConfig.copy(
+          width = width,
+          height = height
+        )
       )
-    )
+    }
 
     def clear() = ()
     def search(target: scala.reflect.runtime.universe.Type) = Interpreter.this.compiler.search(target)

@@ -18,6 +18,8 @@ class Checker {
   val interp = new Interpreter(
     Ref[String](""),
     Ref(null),
+    80,
+    80,
     pprint.Config.Defaults.PPrintConfig.copy(height = 15),
     Ref(ColorSet.BlackWhite),
     stdout = allOutput += _,
@@ -55,21 +57,28 @@ class Checker {
       val (processed, printed) = run(commandText.mkString("\n"))
       interp.handleOutput(processed)
       if (expected.startsWith("error: ")){
+        def handleFailure(failureMsg: String) = {
+          val expectedStripped =
+            expected.stripPrefix("error: ").replaceAll(" *\n", "\n")
+          val expectedRegex = createRegex(expectedStripped).r //using scala Regex here
+          val failureStripped = failureMsg.replaceAll("\u001B\\[[;\\d]*m", "").replaceAll(" *\n", "\n")
+          failLoudly(assert(!expectedRegex.findFirstIn(failureStripped).isEmpty))
+        }
         printed match{
           case Res.Success(v) => assert({v; allOutput; false})
-          case Res.Failure(failureMsg) =>
-            val expectedStripped =
-              expected.stripPrefix("error: ").replaceAll(" *\n", "\n")
-            val expectedRegex = createRegex(expectedStripped).r //using scala Regex here
-            val failureStripped = failureMsg.replaceAll("\u001B\\[[;\\d]*m", "").replaceAll(" *\n", "\n")
-            failLoudly(assert(!expectedRegex.findFirstIn(failureStripped).isEmpty))
+          case Res.Failure(failureMsg) => handleFailure(failureMsg)
+          case Res.Exception(ex, failureMsg) =>
+            handleFailure(Repl.showException(ex, "", "", "") + "\n" +  failureMsg)
         }
       }else{
         if (expected != ""){
           val regex = createRegex(expected)
           printed match {
             case Res.Success(str) => failLoudly(assert(str.matches(regex)))
-            case _ => assert({printed; regex; false})
+            case Res.Failure(failureMsg) => assert({printed; regex; false})
+            case Res.Exception(ex, failureMsg) =>
+              val trace = Repl.showException(ex, "", "", "") + "\n" +  failureMsg
+              assert({trace; regex; false})
           }
         }
       }
@@ -109,8 +118,10 @@ class Checker {
     printed match{
       case Res.Success(v) => assert({v; allOutput; false})
       case Res.Failure(s) =>
-
         failLoudly(assert(failureCheck(s)))
+      case Res.Exception(ex, s) =>
+        val msg = Repl.showException(ex, "", "", "") + "\n" + s
+        failLoudly(assert(failureCheck(msg)))
     }
   }
 

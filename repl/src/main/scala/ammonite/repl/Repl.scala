@@ -24,6 +24,8 @@ class Repl(input: InputStream,
   val interp: Interpreter = new Interpreter(
     shellPrompt,
     frontEnd,
+    frontEnd().width,
+    frontEnd().height,
     pprint.Config.Colors.PPrintConfig,
     colors,
     printer.print,
@@ -58,8 +60,9 @@ class Repl(input: InputStream,
         case Res.Failure(msg) =>
           printer.println(colors().error() + msg + colors().reset())
         case Res.Exception(ex, msg) =>
-          Repl.showException(ex, colors().error(), colors().reset(), colors().literal())
-              .foreach(printer.println)
+          printer.println(
+            Repl.showException(ex, colors().error(), colors().reset(), colors().literal())
+          )
           printer.println(colors().error() + msg + colors().reset())
         case _ =>
       }
@@ -91,7 +94,7 @@ object Repl{
           .map(highlightFrame(_, error, highlightError, source))
           .mkString("\n")
     )
-    traces
+    traces.mkString("\n")
   }
   case class Config(predef: String = "", ammoniteHome: java.io.File = defaultAmmoniteHome)
 
