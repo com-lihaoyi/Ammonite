@@ -17,18 +17,15 @@ class Repl(input: InputStream,
 
   val shellPrompt = Ref("@ ")
 
-  val colorSet = Ref[ColorSet](ColorSet.Default)
-  val frontEnd = Ref[FrontEnd](FrontEnd.JLine)
+  val colors = Ref[ColorSet](ColorSet.Default)
+  val frontEnd = Ref[FrontEnd](FrontEnd.JLineUnix)
 
   val printer = new PrintStream(output, true)
   val interp: Interpreter = new Interpreter(
     shellPrompt,
     frontEnd,
-    pprint.Config.Colors.PPrintConfig.copy(
-      width = frontEnd().width,
-      height = frontEnd().height / 2
-    ),
-    colorSet,
+    pprint.Config.Colors.PPrintConfig,
+    colors,
     printer.print,
     storage,
     predef
@@ -39,7 +36,8 @@ class Repl(input: InputStream,
       input,
       reader,
       output,
-      colorSet().prompt + shellPrompt() + scala.Console.RESET,
+      colors().prompt() + shellPrompt() + colors().reset(),
+      colors(),
       interp.pressy.complete(_, interp.eval.previousImportBlock, _),
       storage().history()
     )
@@ -54,6 +52,17 @@ class Repl(input: InputStream,
   def run() = {
     @tailrec def loop(): Unit = {
       val res = action()
+      res match{
+        case Res.Exit =>
+          printer.println("Bye!")
+        case Res.Failure(msg) =>
+          printer.println(colors().error() + msg + colors().reset())
+        case Res.Exception(ex, msg) =>
+          Repl.showException(ex, colors().error(), colors().reset(), colors().literal())
+              .foreach(printer.println)
+          printer.println(colors().error() + msg + colors().reset())
+        case _ =>
+      }
       if (interp.handleOutput(res)) loop()
     }
     loop()
@@ -61,6 +70,29 @@ class Repl(input: InputStream,
 }
 
 object Repl{
+  def highlightFrame(f: StackTraceElement, error: String, highlightError: String, source: String) = {
+    val src =
+      if (f.isNativeMethod) source + "Native Method" + error
+      else s"$source${f.getFileName}$error:$source${f.getLineNumber}$error"
+
+    val prefix :+ clsName = f.getClassName.split('.').toSeq
+    val prefixString = prefix.map(_+'.').mkString("")
+    val clsNameString = clsName.replace("$", error+"$"+highlightError)
+    val method = s"$error$prefixString$highlightError$clsNameString$error.$highlightError${f.getMethodName}$error"
+    s"\t$method($src)"
+  }
+  def showException(ex: Throwable, error: String, highlightError: String, source: String) = {
+    val cutoff = Set("$main", "evaluatorRunPrinter")
+    val traces = Ex.unapplySeq(ex).get.map(exception =>
+      error + exception.toString + "\n" +
+        exception
+          .getStackTrace
+          .takeWhile(x => !cutoff(x.getMethodName))
+          .map(highlightFrame(_, error, highlightError, source))
+          .mkString("\n")
+    )
+    traces
+  }
   case class Config(predef: String = "", ammoniteHome: java.io.File = defaultAmmoniteHome)
 
   def defaultAmmoniteHome = new java.io.File(System.getProperty("user.home") + "/.ammonite")

@@ -35,31 +35,8 @@ object Res{
     def map[V](f: Nothing => V): Res[V] = this
   }
   case class Failure(s: String) extends Failing
-  object Failure{
-    def highlightFrame(f: StackTraceElement) = {
-      import Console._
-      val src =
-        if (f.isNativeMethod) GREEN + "Native Method" + RED
-        else s"$GREEN${f.getFileName}$RED:$GREEN${f.getLineNumber}$RED"
+  case class Exception(t: Throwable, s: String) extends Failing
 
-      val prefix :+ clsName = f.getClassName.split('.').toSeq
-      val prefixString = prefix.map(_+'.').mkString("")
-      val clsNameString = clsName.replace("$", RED+"$"+YELLOW)
-      val method = s"$RED$prefixString$YELLOW$clsNameString$RED.${f.getMethodName}"
-      s"\t$method($src)"
-    }
-    def apply(exceptions: Seq[Throwable], stop: String = null): Failure = {
-      val traces = exceptions.map(exception =>
-        exception.toString + "\n" +
-        exception
-          .getStackTrace
-          .takeWhile(x => !(x.getMethodName == stop))
-          .map(highlightFrame)
-          .mkString("\n")
-      )
-      Res.Failure(traces.mkString("\n"))
-    }
-  }
   case object Skip extends Failing
   case object Exit extends Failing
 }
@@ -97,27 +74,32 @@ case class ImportData(fromName: String,
 /**
  * Encapsulates a read-write cell that can be passed around
  */
-trait Ref[T]{
+trait StableRef[T]{
+
   def apply(): T
   def update(t: T): Unit
 }
+
+trait Ref[T] extends StableRef[T]{
+  def live(): () => T
+  def bind(t: => T): Unit
+}
 object Ref{
+  implicit def refer[T](t: T): Ref[T] = Ref(t)
   implicit def refPPrint[T: PPrint]: PPrinter[Ref[T]] = PPrinter{ (ref, cfg) =>
     Iterator(cfg.colors.prefixColor, "Ref", cfg.colors.endColor, "(") ++
     implicitly[PPrint[T]].pprinter.render(ref(), cfg) ++
     Iterator(")")
   }
-  def apply[T](value0: T) = {
-    var value = value0
-    new Ref[T]{
-      def apply() = value
-      def update(t: T) = value = t
-    }
+  def live[T](value0: () => T) = new Ref[T]{
+    var value: () => T = value0
+    def live() = value
+    def apply() = value()
+    def update(t: T) = value = () => t
+    def bind(t: => T): Unit = value = () => t
+    override def toString = s"Ref($value)"
   }
-  def apply[T](value: => T, update0: T => Unit) = new Ref[T]{
-    def apply() = value
-    def update(t: T) = update0(t)
-  }
+  def apply[T](value0: T) = live(() => value0)
 }
 trait Cell[T]{
   def apply(): T
@@ -168,4 +150,42 @@ object Timer{
     println(s + ": " + (now - current) / 1000000.0)
     current = now
   }
+}
+
+
+/**
+ * A set of colors used to highlight the miscellanious bits of the REPL.
+ * Re-used all over the place in PPrint, TPrint, syntax highlighting,
+ * command-echoes, etc. in order to keep things consistent
+ *
+ * @param prompt The command prompt
+ * @param ident Definition of top-level identifiers
+ * @param `type` Definition of types
+ * @param reset Whatever is necessary to get rid of residual coloring
+ */
+case class ColorSet(prompt: Ref[String],
+                    ident: Ref[String],
+                    `type`: Ref[String],
+                    literal: Ref[String],
+                    prefix: Ref[String],
+                    comment: Ref[String],
+                    keyword: Ref[String],
+                    selected: Ref[String],
+                    error: Ref[String],
+                    reset: Ref[String])
+object ColorSet{
+
+  def Default = ColorSet(
+    Console.MAGENTA,
+    Console.CYAN,
+    Console.GREEN,
+    pprint.Config.Colors.PPrintConfig.colors.literalColor,
+    pprint.Config.Colors.PPrintConfig.colors.prefixColor,
+    Console.BLUE,
+    Console.YELLOW,
+    Console.REVERSED,
+    Console.RED,
+    Console.RESET
+  )
+  def BlackWhite = ColorSet("", "", "", "", "", "", "", "", "", "")
 }

@@ -69,14 +69,17 @@ object Evaluator{
         namesFor(typeOf[T]).map(n => n -> ImportData(n, n, "", name)).toSeq
       }
 
+      def importFrom(src: String, name: String) = {
+        src -> ImportData(name, name, "", src)
+      }
       // Having these fails in 2.10.x; not having them fails in 2.11.x, both
       // with obscure implicit-type-inference problems =( So just hard-code it
       // for now
       val pprintImports =
         if (!scala.util.Properties.versionString.contains("2.10"))
           Seq(
-            "pprint.PPrint" -> ImportData("FinalRepr", "FinalRepr", "", "pprint.PPrint"),
-            "pprint.PPrint" -> ImportData("Contra", "Contra", "", "pprint.PPrint")
+            importFrom("pprint.PPrint", "FinalRepr"),
+            importFrom("pprint.PPrint", "Contra")
           )
         else
           Nil
@@ -85,7 +88,7 @@ object Evaluator{
         importsFor[ReplAPI]("ReplBridge.shell") ++
         importsFor[ammonite.repl.IvyConstructor]("ammonite.repl.IvyConstructor") ++
         pprintImports ++
-        Seq("pprint" -> ImportData("pprintln", "pprintln", "", "pprint"))
+        Seq(importFrom("pprint", "pprintln"))
         :_*
       )
     }
@@ -201,9 +204,9 @@ object Evaluator{
         // Interrupted during evaluation
         case Ex(_: InvEx, _: ThreadDeath)       => interrupted()
 
-        case Ex(_: InvEx, _: InitEx, userEx@_*) => Res.Failure(userEx, stop = "$main")
-        case Ex(_: InvEx, userEx@_*)            => Res.Failure(userEx, stop = "$main")
-        case Ex(userEx@_*)                      => Res.Failure(userEx, stop = "evaluatorRunPrinter")
+        case Ex(_: InvEx, _: InitEx, userEx@_*) => Res.Exception(userEx(0), ""/*, stop = "$main"*/)
+        case Ex(_: InvEx, userEx@_*)            => Res.Exception(userEx(0), ""/*, stop = "$main"*/)
+        case Ex(userEx@_*)                      => Res.Exception(userEx(0), ""/*, stop = "evaluatorRunPrinter"*/)
       }
     } yield {
       // Exhaust the printer iterator now, before exiting the `Catching`

@@ -4,6 +4,7 @@ import java.io.File
 import java.nio.file.Files
 import acyclic.file
 import ammonite.repl.Util.IvyMap
+import pprint.{Config, PPrint}
 import annotation.tailrec
 import ammonite.repl._
 import ammonite.repl.frontend._
@@ -32,10 +33,8 @@ class Interpreter(shellPrompt0: Ref[String],
                   printer: Iterator[String] => Unit) = {
     if (code != "") storage().history() = storage().history() :+ code
     for{
-      _ <- Catching { case Ex(x@_*) =>
-        val Res.Failure(trace) = Res.Failure(x)
-        Res.Failure(trace + "\nSomething unexpected went wrong =(")
-
+      _ <- Catching { case ex =>
+        Res.Exception(ex, "Something unexpected went wrong =(")
       }
       Preprocessor.Output(code, printSnippet) <- preprocess(stmts, eval.getCurrentLine)
       out <- evaluateLine(code, printSnippet, printer)
@@ -58,7 +57,7 @@ class Interpreter(shellPrompt0: Ref[String],
     val blocks = Parsers.splitScript(code).map(preprocess(_, eval.getCurrentLine))
     val errors = blocks.collect{ case Res.Failure(err) => err }
     if(!errors.isEmpty) 
-      stdout(Console.RED + errors.mkString("\n") + Console.RESET + "\n")
+      stdout(colors0().error() + errors.mkString("\n") + colors0().reset() + "\n")
     else
       loop(blocks.collect{ case Res.Success(o) => o })
 
@@ -68,7 +67,7 @@ class Interpreter(shellPrompt0: Ref[String],
         val ev = evaluateLine(code, Seq(), _ => ())
         ev match {
           case Res.Failure(msg) =>
-            stdout(Console.RED + msg + Console.RESET + "\n")
+            stdout(colors0().error() + msg + colors0().reset() + "\n")
           case Res.Success(ev) =>
             eval.update(ev.imports)
             loop(blocks.tail)
@@ -80,18 +79,15 @@ class Interpreter(shellPrompt0: Ref[String],
 
   def handleOutput(res: Res[Evaluated]) = {
     res match{
-      case Res.Skip =>
-        true
+      case Res.Skip => true
       case Res.Exit =>
-        stdout("Bye!\n")
         pressy.shutdownPressy()
         false
       case Res.Success(ev) =>
         eval.update(ev.imports)
         true
-      case Res.Failure(msg) =>
-        stdout(Console.RED + msg + Console.RESET + "\n")
-        true
+      case Res.Failure(msg) => true
+      case Res.Exception(ex, msg) => true
     }
   }
 
@@ -143,7 +139,13 @@ class Interpreter(shellPrompt0: Ref[String],
       }
     }
 
-    implicit var pprintConfig = interp.pprintConfig
+    implicit def pprintConfig: Ref[pprint.Config] = Ref.live[pprint.Config](
+      () => interp.pprintConfig.copy(
+        width = frontEnd().width,
+        height = frontEnd().height / 2
+      )
+    )
+
     def clear() = ()
     def search(target: scala.reflect.runtime.universe.Type) = Interpreter.this.compiler.search(target)
     def compiler = Interpreter.this.compiler.compiler

@@ -28,31 +28,19 @@
   @p
     One way to get started with Ammonite is to download the standalone executable:
 
-  @hl.scala("""
+  @hl.scala
     $ curl -o amm https://dl.dropboxusercontent.com/u/7997532/ammonite-repl-0.3.3-SNAPSHOT
 
     $ chmod +x amm; ./amm
     Loading Ammonite Repl...
 
-    @ List(Seq(Seq("mgg", "mgg", "lols"), Seq("mgg", "mgg")), Seq(Seq("ggx", "ggx"),Seq("ggx", "ggx", "wt  fx")))
+    @@ List(Seq(Seq("mgg", "mgg", "lols"), Seq("mgg", "mgg")), Seq(Seq("ggx", "ggx"),Seq("ggx", "ggx", "wt  fx")))
 
     res1: List[Seq[Seq[String]]] = List(
       List(List("mgg", "mgg", "lols"), List("mgg", "mgg")),
       List(List("ggx", "ggx"), List("ggx", "ggx", "wtfx"))
     )
 
-    @ case class Foo(s: String, list: List[Int])
-    defined class Foo
-
-    @ pprint.pprintln(List(Foo("hello", List(1, 2, 3)), Foo("    world", List())), width=25)
-    List(
-      Foo(
-        "hello",
-        List(1, 2, 3)
-      ),
-      Foo("  world", List())
-    )
-  """)
   @p
     If you want some initialization code available to the REPL, you can add it to your @code{~/.ammonite/predef.scala}.
 
@@ -60,7 +48,7 @@
     You can also try out Ammonite-REPL in an existing Scala 2.11.x project, add the following to your @code{build.sbt}
 
   @hl.scala
-    libraryDependencies += "com.lihaoyi" %% "ammonite-repl" % "@ammonite.Constants.version" % "test" cross CrossVersion.full
+    libraryDependencies += "com.lihaoyi" % "ammonite-repl" % "@ammonite.Constants.version" % "test" cross CrossVersion.full
 
     initialCommands in (Test, console) := """ammonite.repl.Repl.run("")"""
 
@@ -186,6 +174,62 @@
 
     @hl.ref(advancedTests, Seq("'forceWrapping", "@"))
 
+  @sect{Script Files}
+    @p
+      Ammonite defines a format that allows you to load external scripts into the REPL; this can be used to save common functionality so it can be used at a later date. In the simplest case, a script file is simply a sequence of Scala statements, e.g.
+
+    @hl.scala
+      // print banner
+      println("Welcome to the XYZ custom REPL!!")
+
+      // common imports
+      import sys.process._
+      import collection.mutable
+
+      // common initialization code
+      ...
+
+    @p
+      By default, everything in a script is compiled and executed as a single block. That means that if you want to perform classpath-modifying operations, such as @hl.scala{load.jar} or @hl.scala{load.ivy}, its results will not be available within the same script if you want to use methods, values or packages defined in the loaded code. To make this work, break the script up into multiple compilation units, e.g.
+
+    @hl.scala
+      // print banner
+      println("Welcome to the XYZ custom REPL!!")
+
+      load.ivy("org.scalaz" %% "scalaz-core" % "7.1.1")
+
+      @@
+
+      // common imports
+      import scalaz._
+      import Scalaz._
+
+      // common initialization code
+      ...
+
+  @sect{Configuration}
+    @p
+      Ammonite is configured via Scala code, that can live in the @code{~/.ammonite/predef.scala} file, passed in through SBT's @hl.scala{initialCommands}, or passed to the command-line executable as @code{--predef='...'}. Some examples of things you can configure:
+    @hl.scala
+      @@ // Set the shell prompt to be something else
+      @@ shellPrompt() = ">"
+
+      @@ // Change the terminal front end; the default is
+      @@ // Ammonite on Linux/OSX and JLineWindows on Windows
+      @@ frontEnd() = ammonite.repl.frontend.FrontEnd.JLineUnix
+      @@ frontEnd() = ammonite.repl.frontend.FrontEnd.JLineWindows
+      @@ frontEnd() = ammonite.repl.frontend.FrontEnd.Ammonite
+
+      @@ // Changing the colors used by Ammonite; all at once:
+      @@ colors() = ammonite.repl.frontend.ColorSet.BlackWhite
+      @@ colors() = ammonite.repl.frontend.ColorSet.Default
+
+      @@ // or one at a time:
+      @@ colors().prompt() = Console.RED
+      @@ colors().ident() = Console.GREEN
+      @@ colors().`type`() = Console.YELLOW
+      @@ colors().literal() = Console.MAGENTA
+      @@ colors().prefix() = Console.CYAN
 
 @sect("Ammonite-Ops", "Rock-solid Filesystem Operations")
   @val opsExamples = 'ops/'src/'test/'scala/'test/'ammonite/'ops/"ExampleTests.scala"

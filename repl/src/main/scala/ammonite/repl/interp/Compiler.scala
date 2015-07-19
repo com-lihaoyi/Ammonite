@@ -78,8 +78,7 @@ object Compiler{
   def initGlobalBits(jarDeps: Seq[java.io.File],
                      dirDeps: Seq[java.io.File],
                      dynamicClasspath: VirtualDirectory,
-                     logger: => String => Unit,
-                     errorColor: String)= {
+                     logger: => String => Unit)= {
     val vd = new io.VirtualDirectory("(memory)", None)
     lazy val settings = new Settings
     val settingsX = settings
@@ -98,9 +97,7 @@ object Compiler{
 
       def display(pos: Position, msg: String, severity: Severity) = {
         severity match{
-          case ERROR => logger(
-            errorColor + Position.formatMessage(pos, msg, false) + scala.Console.RESET
-          )
+          case ERROR => logger(Position.formatMessage(pos, msg, false))
           case _ => logger(msg)
         }
       }
@@ -122,7 +119,7 @@ object Compiler{
 
     val (vd, reporter, compiler) = {
       val (settings, reporter, vd, jcp) = initGlobalBits(
-        jarDeps, dirDeps, dynamicClasspath, logger, scala.Console.RED
+        jarDeps, dirDeps, dynamicClasspath, logger
       )
       val scalac = new nsc.Global(settings, reporter) { g =>
         override lazy val plugins = List(new AmmonitePlugin(g, lastImports = _))
@@ -171,7 +168,8 @@ object Compiler{
     /**
      * Compiles a blob of bytes and spits of a list of classfiles
      */
-    def compile(src: Array[Byte], runLogger: String => Unit): Output = {
+    def compile(src: Array[Byte],
+                runLogger: String => Unit): Output = {
       compiler.reporter.reset()
       this.logger = runLogger
       val singleFile = makeFile( src)

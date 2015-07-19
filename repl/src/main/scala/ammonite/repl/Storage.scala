@@ -18,8 +18,8 @@ import scala.collection.JavaConversions.asScalaBuffer
 trait Storage{
   def loadPredef: String
 
-  val history: Ref[History]
-  val ivyCache: Ref[IvyMap]
+  val history: StableRef[History]
+  val ivyCache: StableRef[IvyMap]
 }
 
 object Storage{
@@ -35,7 +35,7 @@ object Storage{
       dir.mkdir()
     }
 
-    val history = new Ref[History]{
+    val history = new StableRef[History]{
       def apply(): History = {
         val yaml = new Yaml
         try{
@@ -49,7 +49,6 @@ object Storage{
         }
       }
 
-
       def update(t: History): Unit = {
         val yaml = new Yaml
         val fw = new FileWriter(dir + "/history")
@@ -57,7 +56,7 @@ object Storage{
       }
     }
 
-    val ivyCache = new Ref[IvyMap]{
+    val ivyCache = new StableRef[IvyMap]{
       def apply() = {
         val json = try{
           io.Source.fromFile(dir + "/ivycache.json").mkString

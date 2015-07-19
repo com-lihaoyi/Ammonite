@@ -3,7 +3,7 @@ package ammonite.repl.frontend
 import java.io.File
 
 import pprint.{PPrinter, PPrint, Config}
-import ammonite.repl.{Ref, History}
+import ammonite.repl.{ColorSet, Ref, History}
 
 import scala.reflect.runtime.universe._
 import acyclic.file
@@ -70,6 +70,9 @@ trait ReplAPI {
    */
   def load: Load
 
+  /**
+   * The colors that will be used to render the Ammonite REPL in the terminal
+   */
   def colors: Ref[ColorSet]
 
   /**
@@ -79,6 +82,9 @@ trait ReplAPI {
 
   def search(target: scala.reflect.runtime.universe.Type): Option[String]
 
+  /**
+   * Access the compiler to do crazy things if you really want to!
+   */
   def compiler: scala.tools.nsc.Global
 
   /**
@@ -89,7 +95,9 @@ trait ReplAPI {
    * Controls how things are pretty-printed in the REPL. Feel free
    * to shadow this with your own definition to change how things look
    */
-  implicit var pprintConfig: pprint.Config
+  implicit def pprintConfig: Ref[pprint.Config]
+
+  implicit def deref(implicit t: Ref[pprint.Config]): pprint.Config = t()
 }
 trait Load extends (String => Unit){
   /**
@@ -150,24 +158,6 @@ object ReplAPI{
   }
 }
 
-/**
- * A set of colors used to highlight the miscellanious bits of the REPL.
- * Re-used all over the place in PPrint, TPrint, syntax highlighting,
- * command-echoes, etc. in order to keep things consistent
- *
- * @param prompt The command prompt
- * @param ident Definition of top-level identifiers
- * @param `type` Definition of types
- * @param reset Whatever is necessary to get rid of residual coloring
- */
-case class ColorSet(prompt: String,
-                    ident: String,
-                    `type`: String,
-                    reset: String)
-object ColorSet{
-  val Default = ColorSet(Console.MAGENTA, Console.CYAN, Console.GREEN, Console.RESET)
-  val BlackWhite = ColorSet("", "", "", "")
-}
 
 trait DefaultReplAPI extends FullReplAPI {
 
@@ -193,16 +183,16 @@ trait DefaultReplAPI extends FullReplAPI {
           case Some(s) => Iterator(cfg.colors.literalColor, s, cfg.colors.endColor)
         }
         Iterator(
-          colors().ident, ident, colors().reset, ": ",
+          colors().ident(), ident, colors().reset(), ": ",
           implicitly[TPrint[T]].render(cfg), " = "
         ) ++ rhs
       }
     }
     def printDef(definitionLabel: String, ident: String) = {
-      Iterator("defined ", colors().`type`, definitionLabel, " ", colors().ident, ident, colors().reset)
+      Iterator("defined ", colors().`type`(), definitionLabel, " ", colors().ident(), ident, colors().reset())
     }
     def printImport(imported: String) = {
-      Iterator(colors().`type`, "import ", colors().ident, imported, colors().reset)
+      Iterator(colors().`type`(), "import ", colors().ident(), imported, colors().reset())
     }
   }
 }

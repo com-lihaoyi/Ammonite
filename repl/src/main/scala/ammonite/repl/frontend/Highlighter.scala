@@ -12,27 +12,37 @@ object Highlighter {
     }
   }
 
-  def defaultHighlight(buffer: Vector[Char]) = {
-    val boundedIndices = defaultHighlightIndices(buffer)
+  def defaultHighlight(buffer: Vector[Char],
+                       comment: String,
+                       `type`: String,
+                       literal: String,
+                       keyword: String,
+                       reset: String) = {
+    val boundedIndices = defaultHighlightIndices(buffer, comment, `type`, literal, keyword, reset)
     flattenIndices(boundedIndices, buffer)
   }
-  def defaultHighlightIndices(buffer: Vector[Char]) = Highlighter.highlightIndices(
+  def defaultHighlightIndices(buffer: Vector[Char],
+                              comment: String,
+                              `type`: String,
+                              literal: String,
+                              keyword: String,
+                              reset: String) = Highlighter.highlightIndices(
     ammonite.repl.Parsers.Splitter,
     buffer,
     {
-      case Literals.Expr.Interp | Literals.Pat.Interp => Console.RESET
-      case Literals.Comment => Console.BLUE
-      case ExprLiteral => Console.GREEN
-      case TypeId => Console.GREEN
+      case Literals.Expr.Interp | Literals.Pat.Interp => reset
+      case Literals.Comment => comment
+      case ExprLiteral => literal
+      case TypeId => `type`
       case BackTicked(body)
-        if alphaKeywords.contains(body) => Console.YELLOW
+        if alphaKeywords.contains(body) => keyword
     },
-    endColor = Console.RESET
+    endColor = reset
   )
   def highlightIndices(parser: fastparse.core.Parser[_],
                 buffer: Vector[Char],
                 ruleColors: PartialFunction[Rule[_], String],
-                endColor: String = Console.RESET) = {
+                endColor: String) = {
     val indices = {
       var indices = collection.mutable.Buffer((0, endColor, false))
       var done = false
@@ -78,7 +88,7 @@ object Highlighter {
   def highlight(parser: Parser[_],
                 buffer: Vector[Char],
                 ruleColors: PartialFunction[Rule[_], String],
-                endColor: String = Console.RESET) = {
+                endColor: String) = {
     val boundedIndices = highlightIndices(parser, buffer, ruleColors, endColor)
     flattenIndices(boundedIndices, buffer)
   }

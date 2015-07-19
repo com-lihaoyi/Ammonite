@@ -26,6 +26,7 @@ trait FrontEnd{
              reader: java.io.Reader,
              output: OutputStream,
              shellPrompt: String,
+             colors: ColorSet,
              compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
              history: Seq[String]): Res[(String, Seq[String])]
 }
@@ -52,10 +53,11 @@ object FrontEnd{
                reader: java.io.Reader,
                output: OutputStream,
                shellPrompt: String,
+               colors: ColorSet,
                compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
                history: Seq[String]) = {
 
-      readLine(reader, output, shellPrompt, compilerComplete, history) match{
+      readLine(reader, output, shellPrompt, colors, compilerComplete, history) match{
         case None => Res.Exit
         case Some(code) =>
           Parsers.Splitter.parse(code) match{
@@ -69,6 +71,7 @@ object FrontEnd{
     def readLine(reader: java.io.Reader,
                  output: OutputStream,
                  shellPrompt: String,
+                 colors: ColorSet,
                  compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
                  history: Seq[String]) = {
       val writer = new OutputStreamWriter(output)
@@ -79,7 +82,14 @@ object FrontEnd{
           else {
             writer.write("\n")
             for (d <- details){
-              writer.write(Highlighter.defaultHighlight(d.toVector).mkString)
+              writer.write(Highlighter.defaultHighlight(
+                d.toVector,
+                colors.comment(),
+                colors.`type`(),
+                colors.literal(),
+                colors.keyword(),
+                colors.reset()
+              ).mkString)
               writer.write("\n")
             }
 
@@ -90,7 +100,7 @@ object FrontEnd{
               val common = findPrefix(completions.head, completions.last, 0)
               val colored = for(comp <- completions) yield {
                 val (left, right) = comp.splitAt(common.length)
-                left + Console.BLUE + right + Console.RESET
+                left + colors.comment() + right + colors.reset()
               }
               tabulate(colored, width).foreach(writer.write)
               writer.flush()
@@ -129,7 +139,14 @@ object FrontEnd{
         multilineFilter orElse
         BasicFilters.all,
         displayTransform = { (buffer, cursor) =>
-          val indices = Highlighter.defaultHighlightIndices(buffer)
+          val indices = Highlighter.defaultHighlightIndices(
+            buffer,
+            colors.comment(),
+            colors.`type`(),
+            colors.literal(),
+            colors.keyword(),
+            colors.reset()
+          )
           selectionFilter.mark match{
             case Some(mark) if mark != cursor =>
               val Seq(min, max) = Seq(cursor, mark).sorted
@@ -141,8 +158,8 @@ object FrontEnd{
                   .map(_._2)
                   .getOrElse("")
               val middle = Seq(
-                (min, Console.RESET + Console.REVERSED, true),
-                (max, Console.RESET + lastBeforeAfter, true)
+                (min, colors.reset() + colors.selected(), true),
+                (max, colors.reset() + lastBeforeAfter, true)
               )
               val newIndices = before ++ middle ++ after
               val displayOffset = if (cursor < mark) 0 else -1
@@ -154,7 +171,7 @@ object FrontEnd{
 
     }
   }
-  object JLine extends JLineTerm(() => new jline.UnixTerminal())
+  object JLineUnix extends JLineTerm(() => new jline.UnixTerminal())
   object JLineWindows extends JLineTerm(() => new jline.WindowsTerminal())
   class JLineTerm(makeTerm: () => jline.Terminal) extends FrontEnd{
     def width = makeTerm().getWidth
@@ -164,6 +181,7 @@ object FrontEnd{
                reader: java.io.Reader,
                output: OutputStream,
                shellPrompt: String,
+               colors: ColorSet,
                compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
                history: Seq[String]) = {
 
