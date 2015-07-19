@@ -17,12 +17,12 @@ import scala.reflect.io.VirtualDirectory
  * to interpret Scala code. Doesn't attempt to provide any
  * real encapsulation for now.
  */
-class Interpreter(shellPrompt0: Ref[String],
+class Interpreter(prompt0: Ref[String],
                   frontEnd0: Ref[FrontEnd],
                   width: => Int,
                   height: => Int,
                   pprintConfig: pprint.Config,
-                  colors0: Ref[ColorSet],
+                  colors0: Ref[Colors],
                   stdout: String => Unit,
                   storage: Ref[Storage],
                   predef: String){ interp =>
@@ -49,7 +49,7 @@ class Interpreter(shellPrompt0: Ref[String],
       Thread.currentThread().setContextClassLoader(eval.evalClassloader)
       eval.processLine(
         code,
-        s"ReplBridge.shell.Internal.combinePrints(${printSnippet.mkString(", ")})",
+        s"ReplBridge.repl.Internal.combinePrints(${printSnippet.mkString(", ")})",
         printer
       )
     } finally Thread.currentThread().setContextClassLoader(oldClassloader)
@@ -97,7 +97,7 @@ class Interpreter(shellPrompt0: Ref[String],
 
     def imports = interp.eval.previousImportBlock
     def colors = colors0
-    def shellPrompt = shellPrompt0
+    def prompt = prompt0
     def frontEnd = frontEnd0
 
     object load extends Load{
@@ -150,7 +150,6 @@ class Interpreter(shellPrompt0: Ref[String],
       )
     }
 
-    def clear() = ()
     def search(target: scala.reflect.runtime.universe.Type) = Interpreter.this.compiler.search(target)
     def compiler = Interpreter.this.compiler.compiler
     def newCompiler() = init()

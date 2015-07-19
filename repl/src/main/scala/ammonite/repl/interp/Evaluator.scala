@@ -85,10 +85,13 @@ object Evaluator{
           Nil
 
       mutable.Map(
-        importsFor[ReplAPI]("ReplBridge.shell") ++
+        importsFor[ReplAPI]("ReplBridge.repl") ++
         importsFor[ammonite.repl.IvyConstructor]("ammonite.repl.IvyConstructor") ++
         pprintImports ++
-        Seq(importFrom("pprint", "pprintln"))
+        Seq(
+          importFrom("pprint", "pprintln"),
+          importFrom("ReplBridge", "repl")
+        )
         :_*
       )
     }

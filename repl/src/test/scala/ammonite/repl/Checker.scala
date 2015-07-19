@@ -21,7 +21,7 @@ class Checker {
     80,
     80,
     pprint.Config.Defaults.PPrintConfig.copy(height = 15),
-    Ref(ColorSet.BlackWhite),
+    Ref(Colors.BlackWhite),
     stdout = allOutput += _,
     storage = Ref(Storage(tempDir)),
     predef = predef

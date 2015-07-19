@@ -3,7 +3,7 @@ package ammonite.repl.frontend
 import java.io.File
 
 import pprint.{PPrinter, PPrint, Config}
-import ammonite.repl.{ColorSet, Ref, History}
+import ammonite.repl.{Colors, Ref, History}
 
 import scala.reflect.runtime.universe._
 import acyclic.file
@@ -12,8 +12,8 @@ import scala.util.control.ControlThrowable
 
 
 class ReplAPIHolder {
-  var shell0: FullReplAPI = null
-  lazy val shell = shell0
+  var repl0: FullReplAPI = null
+  lazy val repl = repl0
 }
 
 /**
@@ -28,22 +28,17 @@ trait ReplAPI {
   def exit = throw ReplExit
 
   /**
-   * Clears the screen of the REPL
-   */
-  def clear: Unit
-
-  /**
    * Read/writable prompt for the shell. Use this to change the
    * REPL prompt at any time!
    */
-  def shellPrompt: Ref[String]
+  def prompt: Ref[String]
   /**
    * The front-end REPL used to take user input. Modifiable!
    */
   def frontEnd: Ref[FrontEnd]
 
   /**
-   * Display this help text
+   * Display help text if you don't know how to use the REPL
    */
   def help: String
 
@@ -73,7 +68,7 @@ trait ReplAPI {
   /**
    * The colors that will be used to render the Ammonite REPL in the terminal
    */
-  def colors: Ref[ColorSet]
+  def colors: Ref[Colors]
 
   /**
    * Throw away the current scala.tools.nsc.Global and get a new one
@@ -152,7 +147,7 @@ object ReplAPI{
   def initReplBridge(holder: Class[ReplAPIHolder], api: ReplAPI) = {
     val method = holder
       .getDeclaredMethods
-      .find(_.getName == "shell0_$eq")
+      .find(_.getName == "repl0_$eq")
       .get
     method.invoke(null, api)
   }
@@ -161,7 +156,15 @@ object ReplAPI{
 
 trait DefaultReplAPI extends FullReplAPI {
 
-  def help = "Hello!"
+  def help =
+    """Welcome to the Ammonite Scala REPL! Enter a Scala expression and it will be evaluated.
+      |All your standard Bash hotkeys should work for navigating around or editing the line
+      |being entered, as well as some GUI hotkeys like alt-shift-left/right to select words
+      |to replace. Hit <tab> to autocomplete possible names.
+      |
+      |For a list of REPL built-ins and configuration, use `repl.<tab>`. For a more detailed
+      |description of how to use the REPL, check out http://lihaoyi.github.io/Ammonite
+    """.stripMargin.trim
   object Internal extends Internal{
     def combinePrints(iters: Iterator[String]*) = {
       iters.toIterator

@@ -15,14 +15,14 @@ class Repl(input: InputStream,
            storage: Ref[Storage],
            predef: String = "") {
 
-  val shellPrompt = Ref("@ ")
+  val prompt = Ref("@ ")
 
-  val colors = Ref[ColorSet](ColorSet.Default)
+  val colors = Ref[Colors](Colors.Default)
   val frontEnd = Ref[FrontEnd](FrontEnd.JLineUnix)
 
   val printer = new PrintStream(output, true)
   val interp: Interpreter = new Interpreter(
-    shellPrompt,
+    prompt,
     frontEnd,
     frontEnd().width,
     frontEnd().height,
@@ -38,7 +38,7 @@ class Repl(input: InputStream,
       input,
       reader,
       output,
-      colors().prompt() + shellPrompt() + colors().reset(),
+      colors().prompt() + prompt() + colors().reset(),
       colors(),
       interp.pressy.complete(_, interp.eval.previousImportBlock, _),
       storage().history()
@@ -113,12 +113,12 @@ object Repl{
   def run(predef: String = "", ammoniteHome: java.io.File = defaultAmmoniteHome) = {
     println("Loading Ammonite Repl...")
     val storage = Storage(ammoniteHome)
-    val shell = new Repl(
+    val repl = new Repl(
       System.in, System.out,
       storage = Ref(storage),
       predef = predef + "\n" + storage.loadPredef
     )
-    shell.run()
+    repl.run()
 
   }
 }

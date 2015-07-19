@@ -25,8 +25,8 @@ trait FrontEnd{
   def action(input: InputStream,
              reader: java.io.Reader,
              output: OutputStream,
-             shellPrompt: String,
-             colors: ColorSet,
+             prompt: String,
+             colors: Colors,
              compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
              history: Seq[String]): Res[(String, Seq[String])]
 }
@@ -52,12 +52,12 @@ object FrontEnd{
     def action(input: InputStream,
                reader: java.io.Reader,
                output: OutputStream,
-               shellPrompt: String,
-               colors: ColorSet,
+               prompt: String,
+               colors: Colors,
                compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
                history: Seq[String]) = {
 
-      readLine(reader, output, shellPrompt, colors, compilerComplete, history) match{
+      readLine(reader, output, prompt, colors, compilerComplete, history) match{
         case None => Res.Exit
         case Some(code) =>
           Parsers.Splitter.parse(code) match{
@@ -70,8 +70,8 @@ object FrontEnd{
     }
     def readLine(reader: java.io.Reader,
                  output: OutputStream,
-                 shellPrompt: String,
-                 colors: ColorSet,
+                 prompt: String,
+                 colors: Colors,
                  compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
                  history: Seq[String]) = {
       val writer = new OutputStreamWriter(output)
@@ -126,7 +126,7 @@ object FrontEnd{
       val cutPasteFilter = ReadlineFilters.CutPasteFilter()
       val selectionFilter = AdvancedFilters.SelectionFilter()
       TermCore.readLine(
-        shellPrompt,
+        prompt,
         reader,
         writer,
         selectionFilter orElse
@@ -180,8 +180,8 @@ object FrontEnd{
     def action(input: InputStream,
                reader: java.io.Reader,
                output: OutputStream,
-               shellPrompt: String,
-               colors: ColorSet,
+               prompt: String,
+               colors: Colors,
                compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
                history: Seq[String]) = {
 
@@ -230,9 +230,9 @@ object FrontEnd{
 
       @tailrec def readCode(buffered: String): Res[(String, Seq[String])] = {
         Option(reader.readLine(
-          if (buffered.isEmpty) shellPrompt
+          if (buffered.isEmpty) prompt
           // Strip ANSI color codes, as described http://stackoverflow.com/a/14652763/871202
-          else " " * shellPrompt.replaceAll("\u001B\\[[;\\d]*m", "").length
+          else " " * prompt.replaceAll("\u001B\\[[;\\d]*m", "").length
         )) match {
           case None => Res.Exit
           case Some(newCode) =>

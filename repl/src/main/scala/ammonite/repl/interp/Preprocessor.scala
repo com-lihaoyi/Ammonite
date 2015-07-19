@@ -25,10 +25,10 @@ object Preprocessor{
 
     def pprintSignature(ident: String, customMsg: Option[String]) = {
       val customCode = customMsg.fold("None")(x => s"""Some("$x")""")
-      s"""ReplBridge.shell.Internal.print($ident, $ident, "$ident", $customCode)"""
+      s"""ReplBridge.repl.Internal.print($ident, $ident, "$ident", $customCode)"""
     }
     def definedStr(definitionLabel: String, name: String) =
-      s"""ReplBridge.shell.Internal.printDef("$definitionLabel", "$name")"""
+      s"""ReplBridge.repl.Internal.printDef("$definitionLabel", "$name")"""
 
     def pprint(ident: String) = pprintSignature(ident, None)
 
@@ -79,7 +79,7 @@ object Preprocessor{
     val Import = Processor{
       case (name, code, tree: G#Import) =>
         val Array(keyword, body) = code.split(" ", 2)
-        Output(code, Seq(s"""ReplBridge.shell.Internal.printImport("$body")"""))
+        Output(code, Seq(s"""ReplBridge.repl.Internal.printImport("$body")"""))
     }
 
     val Expr = Processor{

@@ -13,43 +13,43 @@ object ConfigurationTests extends TestSuite{
       check.session("""
         @ // Set the shell prompt to be something else
 
-        @ shellPrompt() = ">"
+        @ repl.prompt() = ">"
 
         @ // Change the terminal front end; the default is
 
         @ // Ammonite on Linux/OSX and JLineWindows on Windows
 
-        @ frontEnd() = ammonite.repl.frontend.FrontEnd.JLineUnix
+        @ repl.frontEnd() = ammonite.repl.frontend.FrontEnd.JLineUnix
 
-        @ frontEnd() = ammonite.repl.frontend.FrontEnd.JLineWindows
+        @ repl.frontEnd() = ammonite.repl.frontend.FrontEnd.JLineWindows
 
-        @ frontEnd() = ammonite.repl.frontend.FrontEnd.Ammonite
+        @ repl.frontEnd() = ammonite.repl.frontend.FrontEnd.Ammonite
 
         @ // Changing the colors used by Ammonite; all at once:
 
-        @ colors() = ammonite.repl.ColorSet.BlackWhite
+        @ repl.colors() = ammonite.repl.Colors.BlackWhite
 
-        @ colors() = ammonite.repl.ColorSet.Default
+        @ repl.colors() = ammonite.repl.Colors.Default
 
         @ // or one at a time:
 
-        @ colors().prompt() = Console.RED
+        @ repl.colors().prompt() = Console.RED
 
-        @ colors().ident() = Console.GREEN
+        @ repl.colors().ident() = Console.GREEN
 
-        @ colors().`type`() = Console.YELLOW
+        @ repl.colors().`type`() = Console.YELLOW
 
-        @ colors().literal() = Console.MAGENTA
+        @ repl.colors().literal() = Console.MAGENTA
 
-        @ colors().prefix() = Console.CYAN
+        @ repl.colors().prefix() = Console.CYAN
 
-        @ colors().comment() = Console.RED
+        @ repl.colors().comment() = Console.RED
 
-        @ colors().keyword() = Console.BOLD
+        @ repl.colors().keyword() = Console.BOLD
 
-        @ colors().selected() = Console.UNDERLINED
+        @ repl.colors().selected() = Console.UNDERLINED
 
-        @ colors().error() = Console.YELLOW
+        @ repl.colors().error() = Console.YELLOW
       """)
 
     }

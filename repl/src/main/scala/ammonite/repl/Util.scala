@@ -167,19 +167,19 @@ object Timer{
  * @param error The color used to print error messages of all kinds
  * @param reset Whatever is necessary to get rid of residual coloring
  */
-case class ColorSet(prompt: Ref[String],
-                    ident: Ref[String],
-                    `type`: Ref[String],
-                    literal: Ref[String],
-                    prefix: Ref[String],
-                    comment: Ref[String],
-                    keyword: Ref[String],
-                    selected: Ref[String],
-                    error: Ref[String],
-                    reset: Ref[String])
-object ColorSet{
+case class Colors(prompt: Ref[String],
+                  ident: Ref[String],
+                  `type`: Ref[String],
+                  literal: Ref[String],
+                  prefix: Ref[String],
+                  comment: Ref[String],
+                  keyword: Ref[String],
+                  selected: Ref[String],
+                  error: Ref[String],
+                  reset: Ref[String])
+object Colors{
 
-  def Default = ColorSet(
+  def Default = Colors(
     Console.MAGENTA,
     Console.CYAN,
     Console.GREEN,
@@ -191,5 +191,5 @@ object ColorSet{
     Console.RED,
     Console.RESET
   )
-  def BlackWhite = ColorSet("", "", "", "", "", "", "", "", "", "")
+  def BlackWhite = Colors("", "", "", "", "", "", "", "", "", "")
 }
