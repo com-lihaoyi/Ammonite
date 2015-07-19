@@ -238,10 +238,7 @@ class Interpreter(prompt0: Ref[String],
     compiler.compile,
     if (predef != "") -1 else 0,
     storage().compileCacheLoad,
-    { (tag, cb) => 
-      val (classFiles, imports) = cb 
-      storage().compileCacheSave(tag,classFiles,imports) 
-    },
+    storage().compileCacheSave,
     compiler.addToClasspath
   )
 
