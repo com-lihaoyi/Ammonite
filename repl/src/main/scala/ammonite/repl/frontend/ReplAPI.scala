@@ -31,11 +31,11 @@ trait ReplAPI {
    * Read/writable prompt for the shell. Use this to change the
    * REPL prompt at any time!
    */
-  def prompt: Ref[String]
+  val prompt: Ref[String]
   /**
    * The front-end REPL used to take user input. Modifiable!
    */
-  def frontEnd: Ref[FrontEnd]
+  val frontEnd: Ref[FrontEnd]
 
   /**
    * Display help text if you don't know how to use the REPL
@@ -68,14 +68,12 @@ trait ReplAPI {
   /**
    * The colors that will be used to render the Ammonite REPL in the terminal
    */
-  def colors: Ref[Colors]
+  val colors: Ref[Colors]
 
   /**
    * Throw away the current scala.tools.nsc.Global and get a new one
    */
   def newCompiler(): Unit
-
-  def search(target: scala.reflect.runtime.universe.Type): Option[String]
 
   /**
    * Access the compiler to do crazy things if you really want to!
@@ -90,9 +88,21 @@ trait ReplAPI {
    * Controls how things are pretty-printed in the REPL. Feel free
    * to shadow this with your own definition to change how things look
    */
-  implicit def pprintConfig: Ref[pprint.Config]
+  implicit val pprintConfig: Ref[pprint.Config]
 
-  implicit def deref(implicit t: Ref[pprint.Config]): pprint.Config = t()
+  implicit def derefPPrint(implicit t: Ref[pprint.Config]): pprint.Config = t()
+
+  /**
+   * The current working directory of the shell, that will get picked up by
+   * any ammonite.ops commands you use
+   */
+  implicit def wd: ammonite.ops.Path
+
+  /**
+   * Change the working directory `wd`; if the provided path is relative it
+   * gets appended on to the current `wd`, if it's absolute it replaces.
+   */
+  val cd: ammonite.ops.Op1[ammonite.ops.BasePath[_], ammonite.ops.Path]
 }
 trait Load extends (String => Unit){
   /**

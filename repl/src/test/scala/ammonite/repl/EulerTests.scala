@@ -1,6 +1,7 @@
 package ammonite.repl
 
 import utest._
+import acyclic.file
 object EulerTests extends TestSuite{
   val tests = TestSuite{
     println("EulerTests")

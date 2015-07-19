@@ -3,6 +3,7 @@ package ammonite.repl.interp
 import java.io.File
 import java.nio.file.Files
 import acyclic.file
+import ammonite.ops.BasePath
 import ammonite.repl.Util.IvyMap
 import pprint.{Config, PPrint}
 import annotation.tailrec
@@ -92,13 +93,13 @@ class Interpreter(prompt0: Ref[String],
       case Res.Exception(ex, msg) => true
     }
   }
-
+  val wdRef: Ref[ammonite.ops.Path] = Ref(ammonite.ops.cwd)
   lazy val replApi: ReplAPI = new DefaultReplAPI {
 
     def imports = interp.eval.previousImportBlock
-    def colors = colors0
-    def prompt = prompt0
-    def frontEnd = frontEnd0
+    val colors = colors0
+    val prompt = prompt0
+    val frontEnd = frontEnd0
 
     object load extends Load{
 
@@ -154,7 +155,16 @@ class Interpreter(prompt0: Ref[String],
     def compiler = Interpreter.this.compiler.compiler
     def newCompiler() = init()
     def history = storage().history()
-
+    implicit def wd = wdRef()
+    val cd = new ammonite.ops.Op1[ammonite.ops.BasePath[_], ammonite.ops.Path]{
+      def apply(arg: BasePath[_]) = {
+        wdRef() = arg match{
+          case p: ammonite.ops.Path => p
+          case p: ammonite.ops.RelPath => wd / p
+        }
+        wdRef()
+      }
+    }
   }
 
   var compiler: Compiler = _

@@ -3,7 +3,7 @@ package ammonite.repl
 import utest._
 
 import scala.collection.{immutable => imm}
-
+import acyclic.file
 object ProjectTests extends TestSuite{
   val tests = TestSuite{
     println("ProjectTests")

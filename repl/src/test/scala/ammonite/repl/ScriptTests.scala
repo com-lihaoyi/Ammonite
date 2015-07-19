@@ -1,7 +1,7 @@
 package ammonite.repl
 
 import utest._
-
+import acyclic.file
 object ScriptTests extends TestSuite{
   val tests = TestSuite{
     println("ScriptTests")

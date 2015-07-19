@@ -3,8 +3,8 @@ package ammonite.repl
 import utest._
 
 import scala.collection.{immutable => imm}
-
-object ConfigurationTests extends TestSuite{
+import acyclic.file
+object BuiltinTests extends TestSuite{
 
   val tests = TestSuite{
     println("EvaluatorTests")
@@ -51,7 +51,29 @@ object ConfigurationTests extends TestSuite{
 
         @ repl.colors().error() = Console.YELLOW
       """)
+    }
+    'workingDir{
+      check.session("""
+        @ val originalWd = wd
 
+        @ import ammonite.ops._
+
+        @ val originalLs1 = %%ls
+
+        @ val originalLs2 = ls!
+
+        @ cd! up
+
+        @ assert(wd == originalWd/up)
+
+        @ cd! root
+
+        @ assert(wd == root)
+
+        @ assert(originalLs1 != (%%ls))
+
+        @ assert(originalLs2 != (ls!))
+      """)
     }
   }
 }

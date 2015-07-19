@@ -7,7 +7,7 @@ import utest._
 import scala.collection.{immutable => imm}
 import scalaparse.Scala._
 import scalaparse.syntax.Identifiers._
-
+import acyclic.file
 object UnitTests extends TestSuite{
 
   def testHighlight(buffer: Vector[Char]) = Highlighter.highlight(

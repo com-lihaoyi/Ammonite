@@ -3,7 +3,7 @@ package ammonite.repl
 import ammonite.repl.frontend._
 import ammonite.repl.interp.Interpreter
 import utest._
-
+import acyclic.file
 /**
  * A test REPL which does not read from stdin or stdout files, but instead lets
  * you feed in lines or sessions programmatically and have it execute them.

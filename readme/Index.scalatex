@@ -212,7 +212,7 @@
   @sect{Configuration}
     @p
       Ammonite is configured via Scala code, that can live in the @code{~/.ammonite/predef.scala} file, passed in through SBT's @hl.scala{initialCommands}, or passed to the command-line executable as @code{--predef='...'}. Some examples of things you can configure:
-    @hl.ref(ammoniteTests/"ConfigurationTests.scala", Seq("basicConfig", "@"))
+    @hl.ref(ammoniteTests/"BuiltinTests.scala", Seq("basicConfig", "@"))
 
 @sect("Ammonite-Ops", "Rock-solid Filesystem Operations")
   @val opsExamples = 'ops/'src/'test/'scala/'test/'ammonite/'ops/"ExampleTests.scala"

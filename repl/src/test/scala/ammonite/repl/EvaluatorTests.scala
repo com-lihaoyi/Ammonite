@@ -2,7 +2,7 @@ package ammonite.repl
 
 
 import utest._
-
+import acyclic.file
 
 import scala.collection.{immutable => imm}
 import scala.reflect.io.VirtualDirectory

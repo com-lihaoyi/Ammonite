@@ -111,17 +111,6 @@ object Evaluator{
     /**
      * Performs the conversion of our pre-compiled `Array[Byte]`s into
      * actual classes with methods we can execute.
-     *
-     * Structured such that when a class is desired:
-     *
-     * - First we try to load it with the REPL's "root" classloader
-     * - If we can't find it there, we slowly start making our way
-     *   up from the current classloader back up to the root
-     *
-     * This has the property that if you import something, later imports
-     * take precedence, although you don't end up with weird bugs
-     * re-defining the core (pre-REPL) classes. I'm still not sure
-     * where those come from.
      */
     var evalClassloader: SpecialClassloader = null
 
