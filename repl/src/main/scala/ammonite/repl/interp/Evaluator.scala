@@ -208,13 +208,7 @@ object Evaluator{
       // Exhaust the printer iterator now, before exiting the `Catching`
       // block, so any exceptions thrown get properly caught and handled
       evaluatorRunPrinter(printer(evalMain(cls).asInstanceOf[Iterator[String]]))
-      Evaluated(
-        wrapperName,
-        newImports.map(id => id.copy(
-          wrapperName = wrapperName,
-          prefix = if (id.prefix == "") wrapperName else id.prefix
-        ))
-      )
+      evaluationResult(wrapperName, newImports)
     }
 
     def compileCacheBlock(wrapperName: String, code: String, scriptImports: Seq[ImportData]): Res[(Class[_], Seq[ImportData])] = for {
@@ -240,32 +234,16 @@ object Evaluator{
     def processScriptBlock(code: String, scriptImports: Seq[ImportData]) = {
       val wrapperName = cacheTag(code, scriptImports)
       loadCachedClass(wrapperName) match {
-        case Some((cls,importData)) => {
+        case Some((cls,importData)) => 
           evalMain(cls)
-          Res.Success(
-            Evaluated(
-              wrapperName,
-              importData.map(id => id.copy(
-                wrapperName = wrapperName,
-                prefix = if (id.prefix == "") wrapperName else id.prefix
-              ))
-            )
-          )
-        }
-        case None => {
+          Res.Success(evaluationResult(wrapperName, importData))
+        case None => 
           for {
             (cls, newImports) <- compileCacheBlock(wrapperName, code, scriptImports)
           } yield {
             evalMain(cls)
-            Evaluated(
-              wrapperName,
-              newImports.map(id => id.copy(
-                wrapperName = wrapperName,
-                prefix = if (id.prefix == "") wrapperName else id.prefix
-              ))
-            )
+            evaluationResult(wrapperName, newImports)
           }
-        }
       }
     }
 
@@ -287,6 +265,16 @@ object Evaluator{
 
     def update(newImports: Seq[ImportData]) = {
       for(i <- newImports) previousImports(i.toName) = i
+    }
+
+    def evaluationResult(wrapperName: String, imports: Seq[ImportData]) = {
+      Evaluated(
+        wrapperName,
+        imports.map(id => id.copy(
+          wrapperName = wrapperName,
+          prefix = if (id.prefix == "") wrapperName else id.prefix
+        ))
+      )
     }
   }
 

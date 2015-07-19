@@ -57,49 +57,29 @@ class Interpreter(prompt0: Ref[String],
     } finally Thread.currentThread().setContextClassLoader(oldClassloader)
   }
 
-  def processScript(code: String): Unit = {
-    val blocks = Parsers.splitScript(code).map(preprocess(_, eval.getCurrentLine))
-    val errors = blocks.collect{ case Res.Failure(err) => err }
-    if(!errors.isEmpty) 
-      stdout(colors0().error() + errors.mkString("\n") + colors0().reset() + "\n")
-    else
-      loop(blocks.collect{ case Res.Success(o) => o })
+  def processModule(code: String) = processScript(code, eval.processScriptBlock)
 
-    @tailrec def loop(blocks: Seq[Preprocessor.Output]): Unit = {
-      if(!blocks.isEmpty){
-        val Preprocessor.Output(code, _) = blocks.head //pretty printing results is disabled for scripts
-        val ev = evaluateLine(code, Seq(), _ => ())
-        ev match {
-          case Res.Failure(msg) =>
-            stdout(colors0().error() + msg + colors0().reset() + "\n")
-          case Res.Success(ev) =>
-            eval.update(ev.imports)
-            loop(blocks.tail)
-          case _ => loop(blocks.tail)
-        }
-      }
-    }
-  }
-  
-  def processModule(code: String): Unit = {
+  def processExec(code: String) = processScript(code, { (c, _) => evaluateLine(c, Seq(), _ => ()) })
+ 
+  //common stuff in proccessModule and processExec
+  def processScript(code: String, evaluate: (String, Seq[ImportData]) => Res[Evaluated]): Unit = {
     val blocks = Parsers.splitScript(code).map(preprocess(_, ""))
     val errors = blocks.collect{ case Res.Failure(err) => err }
     if(!errors.isEmpty) 
-      stdout(Console.RED + errors.mkString("\n") + Console.RESET + "\n")
+      stdout(colors0().error() + errors.mkString("\n") + colors0().reset() + "\n")
     else
       loop(blocks.collect{ case Res.Success(o) => o }, Seq())
 
     @tailrec def loop(blocks: Seq[Preprocessor.Output], imports: Seq[ImportData]): Unit = {
       if(!blocks.isEmpty){
         val Preprocessor.Output(code, _) = blocks.head //pretty printing results is disabled for scripts
-        val ev = eval.processScriptBlock(code, imports)
+        val ev = evaluate(code, imports)
         ev match {
           case Res.Failure(msg) =>
             stdout(Console.RED + msg + Console.RESET + "\n")
-          case Res.Success(ev) =>{
+          case Res.Success(ev) =>
             eval.update(ev.imports)
             loop(blocks.tail, imports ++ ev.imports)
-          }
           case _ => loop(blocks.tail, imports)
         }
       }
@@ -130,7 +110,7 @@ class Interpreter(prompt0: Ref[String],
     object load extends Load{
 
       def apply(line: String) = {
-        processScript(line)
+        processExec(line)
       }
 
       def exec(file: File): Unit = {
@@ -248,6 +228,6 @@ class Interpreter(prompt0: Ref[String],
   // line number to -1 if the predef exists so the first user-entered
   // line becomes 0
   if (predef != "") {
-    processScript(predef)
+    processExec(predef)
   }
 }
