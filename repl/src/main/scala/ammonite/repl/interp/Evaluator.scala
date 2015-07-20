@@ -118,7 +118,7 @@ object Evaluator{
 
     def evalClass(code: String, wrapperName: String) = for{
       (classFiles, importData) <- compileClass(code)
-      cls <- loadClass(wrapperName, classFiles) 
+      cls <- loadClass(wrapperName, classFiles)
     } yield (cls, importData)
 
     def compileClass(code: String): Res[(Traversable[(String, Array[Byte])], Seq[ImportData])] = for {
@@ -174,6 +174,17 @@ object Evaluator{
       Res.Failure("\nInterrupted!")
     }
 
+    def generateWrapper(wrapperName: String, imports: String, init: String, main: String) = {
+      s"""
+        $imports
+
+        case object $wrapperName{
+          $init
+          def $$main() = { $main }
+        }
+        """
+    }
+
     type InvEx = InvocationTargetException
     type InitEx = ExceptionInInitializerError
 
@@ -181,14 +192,12 @@ object Evaluator{
       wrapperName <- Res.Success("cmd" + getCurrentLine)
       _ <- Catching{ case e: ThreadDeath => interrupted() }
       (cls, newImports) <- evalClass(
-        s"""
-        $previousImportBlock
-
-        case object $wrapperName{
-          $code
-          def $$main() = {$printCode}
-        }
-        """,
+        generateWrapper(
+          wrapperName,
+          previousImportBlock,
+          code,
+          printCode
+        ),
         wrapperName
       )
       _ = currentLine += 1
@@ -214,30 +223,24 @@ object Evaluator{
     def compileCacheBlock(wrapperName: String, code: String, scriptImports: Seq[ImportData]): Res[(Class[_], Seq[ImportData])] = for {
       _ <- Catching{ case e: ThreadDeath => interrupted() }
       (classFiles, importData) <- compileClass(
-        s"""
-        $defaultImportBlock
-        ${importBlock(scriptImports )}
-
-        case object $wrapperName{
-
-          $code
-
-          def $$main() = {}
-        }
-        """
+        generateWrapper(
+          wrapperName,
+          defaultImportBlock + "\n" + importBlock(scriptImports),
+          code,
+          ""
+        )
       )
-      
       _ = cacheSave(wrapperName,(classFiles,importData))
-      cls <- loadClass(wrapperName,classFiles) 
+      cls <- loadClass(wrapperName,classFiles)
     } yield (cls, importData)
 
     def processScriptBlock(code: String, scriptImports: Seq[ImportData]) = {
-      val wrapperName = cacheTag(code, scriptImports)
+      val wrapperName = cacheTag(code, scriptImports, evalClassloader.getURLs.mkString(" "))
       loadCachedClass(wrapperName) match {
-        case Some((cls,importData)) => 
+        case Some((cls,importData)) =>
           evalMain(cls)
           Res.Success(evaluationResult(wrapperName, importData))
-        case None => 
+        case None =>
           for {
             (cls, newImports) <- compileCacheBlock(wrapperName, code, scriptImports)
           } yield {
@@ -245,12 +248,6 @@ object Evaluator{
             evaluationResult(wrapperName, newImports)
           }
       }
-    }
-
-    def cacheTag(code: String, imports: Seq[ImportData]): String = {
-      val idString = code + imports.mkString(" ") + evalClassloader.getURLs.mkString(" ") 
-      val bytes = MessageDigest.getInstance("MD5").digest(idString.getBytes)
-      "cache" + bytes.map("%02x".format(_)).mkString //add prefix to make sure it begins with a letter
     }
 
     def loadCachedClass(tag: String): Option[(Class[_],Seq[ImportData])] = {
@@ -284,6 +281,15 @@ object Evaluator{
    * showing it to the user.
    */
   def evaluatorRunPrinter(f: => Unit) = f
+
+  /**
+   * This gives our cache tags for compile caching.
+   */
+  def cacheTag(code: String, imports: Seq[ImportData], classpath: String): String = {
+    val idString = code + imports.mkString(" ") + classpath
+    val bytes = MessageDigest.getInstance("MD5").digest(idString.getBytes)
+    "cache" + bytes.map("%02x".format(_)).mkString //add prefix to make sure it begins with a letter
+  }
 
   /**
    * Classloader used to implement the jar-downloading
