@@ -1,5 +1,8 @@
 package ammonite.repl
 
+import ammonite.repl.frontend._
+import ammonite.repl.interp.Interpreter
+import ammonite.repl.IvyConstructor._
 import utest._
 import acyclic.file
 object ScriptTests extends TestSuite{
@@ -183,6 +186,123 @@ object ScriptTests extends TestSuite{
             res2 
             ^
             """)
+        }
+      }
+      'caching{
+        'blocks{
+          'one{
+            val storage = new MemoryStorage
+            val interp = new Interpreter(
+              Ref[String](""),
+              Ref(null),
+              pprint.Config.Defaults.PPrintConfig.copy(height = 15),
+              Ref(ColorSet.BlackWhite),
+              stdout = _ => (),
+              storage = Ref(storage),
+              predef = ""
+            )
+            interp.replApi.load.module(s"$scriptPath/OneBlock.scala")
+            assert(storage.compileCache.size==1)
+          }
+          'two{
+            val storage = new MemoryStorage
+            val interp = new Interpreter(
+              Ref[String](""),
+              Ref(null),
+              pprint.Config.Defaults.PPrintConfig.copy(height = 15),
+              Ref(ColorSet.BlackWhite),
+              stdout = _ => (),
+              storage = Ref(storage),
+              predef = ""
+            )
+            interp.replApi.load.module(s"$scriptPath/TwoBlocks.scala")
+            assert(storage.compileCache.size==2)
+          }
+          'three{
+            val storage = new MemoryStorage
+            val interp = new Interpreter(
+              Ref[String](""),
+              Ref(null),
+              pprint.Config.Defaults.PPrintConfig.copy(height = 15),
+              Ref(ColorSet.BlackWhite),
+              stdout = _ => (),
+              storage = Ref(storage),
+              predef = ""
+            )
+            interp.replApi.load.module(s"$scriptPath/ThreeBlocks.scala")
+            assert(storage.compileCache.size==3)
+          }
+        }
+        'persistence{
+          val tempDir = java.nio.file.Files.createTempDirectory("ammonite-tester").toFile
+          val interp1 = new Interpreter(
+            Ref[String](""),
+            Ref(null),
+            pprint.Config.Defaults.PPrintConfig.copy(height = 15),
+            Ref(ColorSet.BlackWhite),
+            stdout = _ => (),
+            storage = Ref(Storage(tempDir)),
+            predef = ""
+          )
+          val interp2 = new Interpreter(
+            Ref[String](""),
+            Ref(null),
+            pprint.Config.Defaults.PPrintConfig.copy(height = 15),
+            Ref(ColorSet.BlackWhite),
+            stdout = _ => (),
+            storage = Ref(Storage(tempDir)),
+            predef = ""
+          )
+          interp1.replApi.load.module(s"$scriptPath/OneBlock.scala")
+          interp2.replApi.load.module(s"$scriptPath/OneBlock.scala")
+          assert(interp1.eval.compilationCount == 3) //each reintialization adds a compilation
+          assert(interp2.eval.compilationCount == 2)
+        }
+        'tags{
+          val storage = new MemoryStorage
+          val interp = new Interpreter(
+            Ref[String](""),
+            Ref(null),
+            pprint.Config.Defaults.PPrintConfig.copy(height = 15),
+            Ref(ColorSet.BlackWhite),
+            stdout = _ => (),
+            storage = Ref(storage),
+            predef = ""
+          )
+          interp.replApi.load.module(s"$scriptPath/TagBase.scala")
+          interp.replApi.load.module(s"$scriptPath/TagPrevCommand.scala")
+          interp.replApi.load.ivy("com.lihaoyi" %% "scalatags" % "0.4.5")
+          interp.replApi.load.module(s"$scriptPath/TagBase.scala")
+          assert(storage.compileCache.size == 6) //two blocks for each loading
+        }
+        'encapsulation{
+          check.session(s"""
+            @ val asd = "asd"
+
+            @ load.module("$scriptPath/Encapsulation.scala")
+            error: not found: value asd
+            """
+            )
+        }
+        'noAutoIncrementWrapper{
+          val storage = new MemoryStorage
+          val interp = new Interpreter(
+            Ref[String](""),
+            Ref(null),
+            pprint.Config.Defaults.PPrintConfig.copy(height = 15),
+            Ref(ColorSet.BlackWhite),
+            stdout = _ => (),
+            storage = Ref(storage),
+            predef = ""
+          )
+          interp.replApi.load.module(s"$scriptPath/ThreeBlocks.scala")
+          try{
+            Class.forName("cmd0") 
+            assert(false)
+          } catch {
+            case e: ClassNotFoundException => assert(true)
+            case e: Exception => assert(false)
+          }
         }
       }
     }
