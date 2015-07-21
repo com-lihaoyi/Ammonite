@@ -76,7 +76,7 @@ class Interpreter(prompt0: Ref[String],
         val ev = evaluate(code, imports)
         ev match {
           case Res.Failure(msg) =>
-            stdout(Console.RED + msg + Console.RESET + "\n")
+            throw new CompilationError(msg)
           case Res.Success(ev) =>
             eval.update(ev.imports)
             loop(blocks.tail, imports ++ ev.imports)

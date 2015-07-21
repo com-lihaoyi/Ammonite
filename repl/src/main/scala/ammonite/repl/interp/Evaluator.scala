@@ -47,6 +47,11 @@ trait Evaluator{
   def previousImportBlock: String
   def addJar(url: URL): Unit
   def evalClassloader: SpecialClassloader
+
+  /*
+   * How many wrappers has this instance compiled
+   */ 
+  def compilationCount: Int
 }
 
 object Evaluator{
@@ -121,13 +126,16 @@ object Evaluator{
       cls <- loadClass(wrapperName, classFiles)
     } yield (cls, importData)
 
+    private var _compilationCount = 0
+    def compilationCount = _compilationCount
+
     def compileClass(code: String): Res[(Traversable[(String, Array[Byte])], Seq[ImportData])] = for {
       (output, compiled) <- Res.Success{
         val output = mutable.Buffer.empty[String]
         val c = compile(code.getBytes, output.append(_))
         (output, c)
       }
-
+      _ = _compilationCount += 1
       result <- Res[(Traversable[(String, Array[Byte])], Seq[ImportData])](
         compiled, "Compilation Failed\n" + output.mkString("\n")
       )

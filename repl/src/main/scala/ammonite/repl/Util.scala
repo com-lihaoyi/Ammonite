@@ -51,6 +51,11 @@ sealed abstract class Res[+T]{
 }
 
 /**
+ * Exception for reporting script compilation failures
+ */ 
+class CompilationError(message: String) extends Exception(message)
+
+/**
  * Fake for-comprehension generator to catch errors and turn
  * them into [[Res.Failure]]s
  */
