@@ -2,7 +2,7 @@ package ammonite.repl
 
 import acyclic.file
 import java.io.{File, FileInputStream, IOException, FileWriter}
-import ammonite.repl.Util.{IvyMap, CompileCache}
+import ammonite.repl.Util.{IvyMap, CompileCache, Classfiles}
 import org.yaml.snakeyaml.Yaml
 import scala.util.Try
 import scala.collection.generic.{GenericCompanion, GenericTraversableTemplate, CanBuildFrom, SeqFactory}
@@ -76,7 +76,7 @@ object Storage{
       if(!cacheDir.exists) None
       else for{
         metadataJson <- Try{
-          io.Source.fromFile(cacheDir + "/metadata.json").mkString
+          new String(readFile(cacheDir + "/metadata.json"))
         }.toOption
         metadata <- Try{
           upickle.default.read[Seq[ImportData]](metadataJson)
@@ -85,7 +85,7 @@ object Storage{
       } yield (classFiles, metadata)
     }
 
-    def loadClassFiles(cacheDir: File): Option[Traversable[(String, Array[Byte])]] = {
+    def loadClassFiles(cacheDir: File): Option[Classfiles] = {
       val classFiles = cacheDir.listFiles().filter(_.getName.endsWith(".class"))
       Try{
         val data = classFiles.map{ file =>

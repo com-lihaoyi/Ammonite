@@ -189,70 +189,41 @@ object ScriptTests extends TestSuite{
         }
       }
       'caching{
+        
+        def createTestInterp(storage: Storage) = new Interpreter(
+          Ref[String](""),
+          Ref(null),
+          pprint.Config.Defaults.PPrintConfig.copy(height = 15),
+          Ref(ColorSet.BlackWhite),
+          stdout = _ => (),
+          storage = Ref(storage),
+          predef = ""
+        )
+
         'blocks{
           'one{
             val storage = new MemoryStorage
-            val interp = new Interpreter(
-              Ref[String](""),
-              Ref(null),
-              pprint.Config.Defaults.PPrintConfig.copy(height = 15),
-              Ref(ColorSet.BlackWhite),
-              stdout = _ => (),
-              storage = Ref(storage),
-              predef = ""
-            )
+            val interp = createTestInterp(storage)
             interp.replApi.load.module(s"$scriptPath/OneBlock.scala")
             assert(storage.compileCache.size==1)
           }
           'two{
             val storage = new MemoryStorage
-            val interp = new Interpreter(
-              Ref[String](""),
-              Ref(null),
-              pprint.Config.Defaults.PPrintConfig.copy(height = 15),
-              Ref(ColorSet.BlackWhite),
-              stdout = _ => (),
-              storage = Ref(storage),
-              predef = ""
-            )
+            val interp = createTestInterp(storage)
             interp.replApi.load.module(s"$scriptPath/TwoBlocks.scala")
             assert(storage.compileCache.size==2)
           }
           'three{
             val storage = new MemoryStorage
-            val interp = new Interpreter(
-              Ref[String](""),
-              Ref(null),
-              pprint.Config.Defaults.PPrintConfig.copy(height = 15),
-              Ref(ColorSet.BlackWhite),
-              stdout = _ => (),
-              storage = Ref(storage),
-              predef = ""
-            )
+            val interp = createTestInterp(storage)
             interp.replApi.load.module(s"$scriptPath/ThreeBlocks.scala")
             assert(storage.compileCache.size==3)
           }
         }
         'persistence{
           val tempDir = java.nio.file.Files.createTempDirectory("ammonite-tester").toFile
-          val interp1 = new Interpreter(
-            Ref[String](""),
-            Ref(null),
-            pprint.Config.Defaults.PPrintConfig.copy(height = 15),
-            Ref(ColorSet.BlackWhite),
-            stdout = _ => (),
-            storage = Ref(Storage(tempDir)),
-            predef = ""
-          )
-          val interp2 = new Interpreter(
-            Ref[String](""),
-            Ref(null),
-            pprint.Config.Defaults.PPrintConfig.copy(height = 15),
-            Ref(ColorSet.BlackWhite),
-            stdout = _ => (),
-            storage = Ref(Storage(tempDir)),
-            predef = ""
-          )
+          val interp1 = createTestInterp(Storage(tempDir))
+          val interp2 = createTestInterp(Storage(tempDir))
           interp1.replApi.load.module(s"$scriptPath/OneBlock.scala")
           interp2.replApi.load.module(s"$scriptPath/OneBlock.scala")
           assert(interp1.eval.compilationCount == 3) //each reintialization adds a compilation
@@ -260,15 +231,7 @@ object ScriptTests extends TestSuite{
         }
         'tags{
           val storage = new MemoryStorage
-          val interp = new Interpreter(
-            Ref[String](""),
-            Ref(null),
-            pprint.Config.Defaults.PPrintConfig.copy(height = 15),
-            Ref(ColorSet.BlackWhite),
-            stdout = _ => (),
-            storage = Ref(storage),
-            predef = ""
-          )
+          val interp = createTestInterp(storage)
           interp.replApi.load.module(s"$scriptPath/TagBase.scala")
           interp.replApi.load.module(s"$scriptPath/TagPrevCommand.scala")
           interp.replApi.load.ivy("com.lihaoyi" %% "scalatags" % "0.4.5")
@@ -286,15 +249,7 @@ object ScriptTests extends TestSuite{
         }
         'noAutoIncrementWrapper{
           val storage = new MemoryStorage
-          val interp = new Interpreter(
-            Ref[String](""),
-            Ref(null),
-            pprint.Config.Defaults.PPrintConfig.copy(height = 15),
-            Ref(ColorSet.BlackWhite),
-            stdout = _ => (),
-            storage = Ref(storage),
-            predef = ""
-          )
+          val interp = createTestInterp(storage)
           interp.replApi.load.module(s"$scriptPath/ThreeBlocks.scala")
           try{
             Class.forName("cmd0") 

@@ -10,7 +10,7 @@ import java.net.URLClassLoader
 import java.security.MessageDigest
 
 import ammonite.repl.interp.Evaluator.SpecialClassloader
-import Util.CompileCache
+import Util.{CompileCache, Classfiles}
 
 import scala.reflect.runtime.universe._
 import scala.collection.mutable
@@ -60,7 +60,7 @@ object Evaluator{
             startingLine: Int,
             cacheLoad: String => Option[CompileCache],
             cacheSave: (String, CompileCache) => Unit,
-            addToCompilerClasspath:  => Traversable[(String,Array[Byte])] => Unit): Evaluator = new Evaluator{
+            addToCompilerClasspath:  => Classfiles => Unit): Evaluator = new Evaluator{
 
     /**
      * Imports which are required by earlier commands to the REPL. Imports
@@ -129,19 +129,19 @@ object Evaluator{
     private var _compilationCount = 0
     def compilationCount = _compilationCount
 
-    def compileClass(code: String): Res[(Traversable[(String, Array[Byte])], Seq[ImportData])] = for {
+    def compileClass(code: String): Res[(Classfiles, Seq[ImportData])] = for {
       (output, compiled) <- Res.Success{
         val output = mutable.Buffer.empty[String]
         val c = compile(code.getBytes, output.append(_))
         (output, c)
       }
       _ = _compilationCount += 1
-      result <- Res[(Traversable[(String, Array[Byte])], Seq[ImportData])](
+      result <- Res[(Classfiles, Seq[ImportData])](
         compiled, "Compilation Failed\n" + output.mkString("\n")
       )
     } yield result
 
-    def loadClass(wrapperName: String, classFiles: Traversable[(String, Array[Byte])]): Res[Class[_]] = {
+    def loadClass(wrapperName: String, classFiles: Classfiles): Res[Class[_]] = {
       Res[Class[_]](Try {
         for ((name, bytes) <- classFiles) evalClassloader.newFileDict(name) = bytes
         Class.forName(wrapperName , true, evalClassloader)
