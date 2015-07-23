@@ -243,7 +243,7 @@ object Evaluator{
     } yield (cls, importData)
 
     def processScriptBlock(code: String, scriptImports: Seq[ImportData]) = {
-      val wrapperName = cacheTag(code, scriptImports, evalClassloader.getURLs.mkString(" "))
+      val wrapperName = cacheTag(code, scriptImports, evalClassloader.classpathHash)
       loadCachedClass(wrapperName) match {
         case Some((cls,importData)) =>
           evalMain(cls)
@@ -293,11 +293,13 @@ object Evaluator{
   /**
    * This gives our cache tags for compile caching.
    */
-  def cacheTag(code: String, imports: Seq[ImportData], classpath: String): String = {
-    val idString = code + imports.mkString(" ") + classpath
-    val bytes = MessageDigest.getInstance("MD5").digest(idString.getBytes)
+  def cacheTag(code: String, imports: Seq[ImportData], classpathHash: Array[Byte]): String = {
+    val bytes = md5Hash(md5Hash(code.getBytes) ++ md5Hash(imports.mkString.getBytes) ++ classpathHash)
     "cache" + bytes.map("%02x".format(_)).mkString //add prefix to make sure it begins with a letter
   }
+
+  def md5Hash(data: Array[Byte]) = MessageDigest.getInstance("MD5").digest(data)
+  def hexString(data: Array[Byte]) = data.map("%02x".format(_)).mkString
 
   /**
    * Classloader used to implement the jar-downloading
@@ -318,6 +320,36 @@ object Evaluator{
 
       loadedFromBytes.getOrElse(super.findClass(name))
     }
-    def add(url: URL) = addURL(url)
+    def add(url: URL) = {
+      _classpathHash = md5Hash(_classpathHash ++ jarHash(url))
+      addURL(url)
+    }
+
+    private def jarHash(url: URL) = {
+      val is = url.openStream
+      val baos = new java.io.ByteArrayOutputStream
+      try {
+        val byteChunk = new Array[Byte](4096) // Or whatever size you want to read in at a time
+        var n = 0
+        n = is.read(byteChunk)
+        while (n > 0) {
+          baos.write(byteChunk, 0, n)
+          n = is.read(byteChunk)
+        }
+      } finally {
+        if (is != null) is.close()
+      }  
+      md5Hash(baos.toByteArray())
+    }
+
+    private var _classpathHash = {
+      val urls = getURLs
+      if(!urls.isEmpty){
+        urls.tail.foldLeft(jarHash(urls.head)){ (oldHash,jarURL) =>
+          md5Hash(oldHash ++ jarHash(jarURL))
+        }
+      } else md5Hash(Array.empty)
+    }
+    def classpathHash: Array[Byte] = _classpathHash
   }
 }
