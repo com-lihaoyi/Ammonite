@@ -3,7 +3,7 @@ package ammonite.repl.interp
 
 import acyclic.file
 import ammonite.repl.{Timer, ImportData}
-import ammonite.repl.Util.Classfiles
+import ammonite.repl.Util.ClassFiles
 import scala.collection.mutable
 import scala.reflect.internal.util.{BatchSourceFile, OffsetPosition, Position}
 import scala.reflect.io
@@ -43,7 +43,7 @@ trait Compiler{
   /**
    * Writes files to dynamicClasspath. Needed for loading cached classes.
    */ 
-  def addToClasspath(classFiles: Classfiles): Unit
+  def addToClasspath(classFiles: ClassFiles): Unit
 }
 object Compiler{
   /**

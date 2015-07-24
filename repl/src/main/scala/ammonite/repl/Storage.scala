@@ -2,7 +2,7 @@ package ammonite.repl
 
 import acyclic.file
 import java.io.{File, FileInputStream, IOException, FileWriter}
-import ammonite.repl.Util.{IvyMap, CompileCache, Classfiles}
+import ammonite.repl.Util.{IvyMap, CompileCache, ClassFiles}
 import org.yaml.snakeyaml.Yaml
 import scala.util.Try
 import scala.collection.generic.{GenericCompanion, GenericTraversableTemplate, CanBuildFrom, SeqFactory}
@@ -85,7 +85,7 @@ object Storage{
       } yield (classFiles, metadata)
     }
 
-    def loadClassFiles(cacheDir: File): Option[Classfiles] = {
+    def loadClassFiles(cacheDir: File): Option[ClassFiles] = {
       val classFiles = cacheDir.listFiles().filter(_.getName.endsWith(".class"))
       Try{
         val data = classFiles.map{ file =>

@@ -10,7 +10,7 @@ import java.net.URLClassLoader
 import java.security.MessageDigest
 
 import ammonite.repl.interp.Evaluator.SpecialClassloader
-import Util.{CompileCache, Classfiles}
+import Util.{CompileCache, ClassFiles}
 
 import scala.reflect.runtime.universe._
 import scala.collection.mutable
@@ -60,7 +60,7 @@ object Evaluator{
             startingLine: Int,
             cacheLoad: String => Option[CompileCache],
             cacheSave: (String, CompileCache) => Unit,
-            addToCompilerClasspath:  => Classfiles => Unit): Evaluator = new Evaluator{
+            addToCompilerClasspath:  => ClassFiles => Unit): Evaluator = new Evaluator{
 
     /**
      * Imports which are required by earlier commands to the REPL. Imports
@@ -126,9 +126,9 @@ object Evaluator{
         case Some((cls, newImports)) =>
           Res.Success((cls, newImports))
         case None => for {
-          compileCache @ (classfiles, imports) <- compileClass(code)
+          compileCache @ (classFiles, imports) <- compileClass(code)
           _ = cacheSave(name, compileCache)
-          cls <- loadClass(name, classfiles)
+          cls <- loadClass(name, classFiles)
         } yield (cls, imports)
       }
     }
@@ -136,19 +136,19 @@ object Evaluator{
     private var _compilationCount = 0
     def compilationCount = _compilationCount
 
-    def compileClass(code: String): Res[(Classfiles, Seq[ImportData])] = for {
+    def compileClass(code: String): Res[(ClassFiles, Seq[ImportData])] = for {
       (output, compiled) <- Res.Success{
         val output = mutable.Buffer.empty[String]
         val c = compile(code.getBytes, output.append(_))
         (output, c)
       }
       _ = _compilationCount += 1
-      result <- Res[(Classfiles, Seq[ImportData])](
+      result <- Res[(ClassFiles, Seq[ImportData])](
         compiled, "Compilation Failed\n" + output.mkString("\n")
       )
     } yield result
 
-    def loadClass(wrapperName: String, classFiles: Classfiles): Res[Class[_]] = {
+    def loadClass(wrapperName: String, classFiles: ClassFiles): Res[Class[_]] = {
       Res[Class[_]](Try {
         for ((name, bytes) <- classFiles) evalClassloader.newFileDict(name) = bytes
         Class.forName(wrapperName , true, evalClassloader)
