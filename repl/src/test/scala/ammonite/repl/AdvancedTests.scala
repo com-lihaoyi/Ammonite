@@ -9,6 +9,7 @@ object AdvancedTests extends TestSuite{
     println("AdvancedTests")
     val check = new Checker()
     'pprint{
+      if (!scala.util.Properties.versionString.contains("2.10")) //buggy in 2.10
       check.session("""
         @ Seq.fill(10)(Seq.fill(3)("Foo"))
         res0: Seq[Seq[String]] = List(

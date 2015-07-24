@@ -103,6 +103,7 @@ object ScriptTests extends TestSuite{
     'module{
       'compilationBlocks{
         'loadIvy{
+          if (!scala.util.Properties.versionString.contains("2.10")) //buggy in 2.10
           check.session(s"""
             @ load.module("$scriptPath/LoadIvy.scala")
 
@@ -113,19 +114,22 @@ object ScriptTests extends TestSuite{
             """)
         }
         'preserveImports{
-          val typeString =
-            if (!scala.util.Properties.versionString.contains("2.10"))
-              """Left[String, Nothing]"""
-            else
-              """util.Left[String,Nothing]"""
-          check.session(s"""
-            @ load.module("$scriptPath/PreserveImports.scala")
+          if (!scala.util.Properties.versionString.contains("2.10")) { //buggy in 2.10
+            val typeString =
+              if (!scala.util.Properties.versionString.contains("2.10"))
+                """Left[String, Nothing]"""
+              else
+                """util.Left[String,Nothing]"""
+            check.session(s"""
+              @ load.module("$scriptPath/PreserveImports.scala")
 
-            @ val r = res
-            r: $typeString = Left("asd")
-            """)
+              @ val r = res
+              r: $typeString = Left("asd")
+              """)
+          }
         }
         'annotation{
+          if (!scala.util.Properties.versionString.contains("2.10")) //buggy in 2.10
           check.session(s"""
             @ load.module("$scriptPath/Annotation.scala")
 
@@ -134,6 +138,7 @@ object ScriptTests extends TestSuite{
             """)
         }
         'syntax{
+          if (!scala.util.Properties.versionString.contains("2.10")) //buggy in 2.10
           check.session(s"""
             @ load.module("$scriptPath/BlockSepSyntax.scala")
 
@@ -221,22 +226,26 @@ object ScriptTests extends TestSuite{
           }
         }
         'persistence{
-          val tempDir = java.nio.file.Files.createTempDirectory("ammonite-tester").toFile
-          val interp1 = createTestInterp(Storage(tempDir))
-          val interp2 = createTestInterp(Storage(tempDir))
-          interp1.replApi.load.module(s"$scriptPath/OneBlock.scala")
-          interp2.replApi.load.module(s"$scriptPath/OneBlock.scala")
-          assert(interp1.eval.compilationCount == 2) //first init adds a compilation because of ReplBridge
-          assert(interp2.eval.compilationCount == 0)
+          if (!scala.util.Properties.versionString.contains("2.10")) {//buggy in 2.10
+            val tempDir = java.nio.file.Files.createTempDirectory("ammonite-tester").toFile
+            val interp1 = createTestInterp(Storage(tempDir))
+            val interp2 = createTestInterp(Storage(tempDir))
+            interp1.replApi.load.module(s"$scriptPath/OneBlock.scala")
+            interp2.replApi.load.module(s"$scriptPath/OneBlock.scala")
+            assert(interp1.eval.compilationCount == 2) //first init adds a compilation because of ReplBridge
+            assert(interp2.eval.compilationCount == 0)
+          }
         }
         'tags{
-          val storage = new MemoryStorage
-          val interp = createTestInterp(storage)
-          interp.replApi.load.module(s"$scriptPath/TagBase.scala")
-          interp.replApi.load.module(s"$scriptPath/TagPrevCommand.scala")
-          interp.replApi.load.ivy("com.lihaoyi" %% "scalatags" % "0.4.5")
-          interp.replApi.load.module(s"$scriptPath/TagBase.scala")
-          assert(storage.compileCache.size == 7) //two blocks for each loading + ReplBridge
+          if (!scala.util.Properties.versionString.contains("2.10")) {//buggy in 2.10
+            val storage = new MemoryStorage
+            val interp = createTestInterp(storage)
+            interp.replApi.load.module(s"$scriptPath/TagBase.scala")
+            interp.replApi.load.module(s"$scriptPath/TagPrevCommand.scala")
+            interp.replApi.load.ivy("com.lihaoyi" %% "scalatags" % "0.4.5")
+            interp.replApi.load.module(s"$scriptPath/TagBase.scala")
+            assert(storage.compileCache.size == 7) //two blocks for each loading + ReplBridge
+          }
         }
         'encapsulation{
           check.session(s"""

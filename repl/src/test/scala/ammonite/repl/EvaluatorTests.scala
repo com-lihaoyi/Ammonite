@@ -103,6 +103,7 @@ object EvaluatorTests extends TestSuite{
       """)
     }
     'types{
+      if (!scala.util.Properties.versionString.contains("2.10")) //buggy in 2.10
       check.session("""
         @ type Funky = Array[Array[String]]
         defined type Funky
@@ -238,6 +239,7 @@ object EvaluatorTests extends TestSuite{
 
 
     'classes{
+      if (!scala.util.Properties.versionString.contains("2.10")) //buggy in 2.10
       check.session("""
         @ class C{override def toString() = "Ceee"}
         defined class C
@@ -301,6 +303,7 @@ object EvaluatorTests extends TestSuite{
       """)
     }
     'multistatement{
+      if (!scala.util.Properties.versionString.contains("2.10")) //buggy in 2.10
       check.session("""
         @ ;1; 2L; '3';
         res0_0: Int = 1
