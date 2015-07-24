@@ -37,16 +37,17 @@ class PermSet(s: Set[PosixFilePermission]) extends Set[PosixFilePermission]{
 object stat extends Op1[ops.Path, ops.stat]{
   def apply(p: ops.Path) = ops.stat.make(
     p.last,
+    Files.readAttributes(java.nio.file.Paths.get(p.toString), classOf[BasicFileAttributes]),
     Files.readAttributes(java.nio.file.Paths.get(p.toString), classOf[PosixFileAttributes])
   )
-  def make(name: String, attrs: PosixFileAttributes) = {
+  def make(name: String, attrs: BasicFileAttributes, posixAttrs: => PosixFileAttributes) = {
     import collection.JavaConversions._
     new stat(
       name,
       attrs.size(),
       attrs.lastModifiedTime(),
-      attrs.owner,
-      new PermSet(attrs.permissions.toSet),
+      () => posixAttrs.owner,
+      () => new PermSet(posixAttrs.permissions.toSet),
       if (attrs.isRegularFile) FileType.File
       else if (attrs.isDirectory) FileType.Dir
       else if (attrs.isSymbolicLink) FileType.SymLink
@@ -57,9 +58,10 @@ object stat extends Op1[ops.Path, ops.stat]{
   object full extends Op1[ops.Path, ops.stat.full] {
     def apply(p: ops.Path) = ops.stat.full.make(
       p.last,
+      Files.readAttributes(java.nio.file.Paths.get(p.toString), classOf[BasicFileAttributes]),
       Files.readAttributes(java.nio.file.Paths.get(p.toString), classOf[PosixFileAttributes])
     )
-    def  make(name: String, attrs: PosixFileAttributes) = {
+    def  make(name: String, attrs: BasicFileAttributes, posixAttrs: => PosixFileAttributes) = {
       import collection.JavaConversions._
       new full(
         name,
@@ -67,9 +69,9 @@ object stat extends Op1[ops.Path, ops.stat]{
         attrs.lastModifiedTime(),
         attrs.lastAccessTime(),
         attrs.creationTime(),
-        attrs.group(),
-        attrs.owner,
-        new PermSet(attrs.permissions.toSet),
+        () => posixAttrs.group(),
+        () => posixAttrs.owner,
+        () => new PermSet(posixAttrs.permissions.toSet),
         if (attrs.isRegularFile) FileType.File
         else if (attrs.isDirectory) FileType.Dir
         else if (attrs.isSymbolicLink) FileType.SymLink
@@ -83,9 +85,9 @@ object stat extends Op1[ops.Path, ops.stat]{
                   mtime: FileTime,
                   ctime: FileTime,
                   atime: FileTime,
-                  group: GroupPrincipal,
-                  owner: UserPrincipal,
-                  permissions: PermSet,
+                  group: () => GroupPrincipal,
+                  owner: () => UserPrincipal,
+                  permissions: () => PermSet,
                   fileType: FileType){
     override def productPrefix = "stat.full"
     def isDir = fileType == FileType.Dir
@@ -98,8 +100,8 @@ object stat extends Op1[ops.Path, ops.stat]{
 case class stat(name: String,
                 size: Long,
                 mtime: FileTime,
-                owner: UserPrincipal,
-                permissions: PermSet,
+                owner: () => UserPrincipal,
+                permissions: () => PermSet,
                 fileType: FileType){
   def isDir = fileType == FileType.Dir
   def isSymLink = fileType == FileType.SymLink

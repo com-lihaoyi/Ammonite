@@ -168,8 +168,15 @@ trait RelPathStuff{
 }
 object RelPath extends RelPathStuff with (String => RelPath){
   def apply(s: String) = {
-    require(!s.startsWith("/"), "Relative paths cannot start with /")
-    s.split("/").foldLeft(empty)(_/_)
+    apply(java.nio.file.Paths.get(s))
+  }
+  def apply(s: java.nio.file.Path) = {
+    import collection.JavaConversions._
+    require(
+      s.toAbsolutePath.iterator().size != s.iterator().size,
+      s + " is not an relative path"
+    )
+    empty/s.iterator.toArray.map(_.toString)
   }
   implicit class Transformable1(p: RelPath){
     def nio = java.nio.file.Paths.get(p.toString)
@@ -192,17 +199,21 @@ object RelPath extends RelPathStuff with (String => RelPath){
   }
 }
 object Path extends (String => Path){
-
   def apply(s: String): Path = {
-    require(s.startsWith("/"), "Absolute Paths must start with /")
-
-    root/RelPath.ArrayPath(
-      s.split("/").drop(1).map(RelPath.StringPath)
-    )
+    apply(java.nio.file.Paths.get(s))
   }
 
   def apply(f: java.io.File): Path = apply(f.getCanonicalPath)
-  def apply(f: java.nio.file.Path): Path = apply(f.toString)
+  def apply(f: java.nio.file.Path): Path = {
+    import collection.JavaConversions._
+    require(
+      f.toAbsolutePath.iterator().size == f.iterator().size,
+      f + " is not an absolute path"
+    )
+    root/RelPath.ArrayPath(
+      f.toAbsolutePath.iterator.toArray.map(_.toString)
+    )
+  }
 
   val root = new Path(Nil)
   val home = new Path(System.getProperty("user.home").split("/").drop(1))

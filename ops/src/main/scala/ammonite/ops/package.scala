@@ -26,10 +26,9 @@ package object ops extends Extensions with RelPathStuff{
 
   implicit class Transformable1(p: java.nio.file.Path){
     def amm = {
-      val s = p.toString
-
-      if (s.startsWith("/")) ops.Path(s)
-      else ops.RelPath(s)
+      import collection.JavaConversions._
+      if (p.toAbsolutePath.iterator().size == p.iterator().size) ops.Path(p)
+      else ops.RelPath(p)
     }
   }
 
