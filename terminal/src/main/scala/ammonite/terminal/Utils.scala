@@ -75,13 +75,14 @@ class Ansi(output: Writer){
 object TTY{
   def init() = {
     val raw = stty("-a")
-
-    val width = "(\\d+) columns;".r.findFirstMatchIn(raw).get.group(1).toInt
-    val height = "(\\d+) rows;".r.findFirstMatchIn(raw).get.group(1).toInt
+    import sys.process._
+    val width = Seq("tput", "cols").!!.trim.toInt
+    val height = Seq("tput", "lines").!!.trim.toInt
     Debug("Initializing, Width " + width)
     val initialConfig = stty("-g").trim
     stty("-icanon min 1 -icrnl -inlcr -ixon")
-    stty("dsusp undef")
+    // blows up on ubuntu
+//    stty("dsusp undef")
     stty("-echo")
     stty("intr undef")
     (width, height, initialConfig)
