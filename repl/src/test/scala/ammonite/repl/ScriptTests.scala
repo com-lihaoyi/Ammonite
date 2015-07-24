@@ -205,19 +205,19 @@ object ScriptTests extends TestSuite{
             val storage = new MemoryStorage
             val interp = createTestInterp(storage)
             interp.replApi.load.module(s"$scriptPath/OneBlock.scala")
-            assert(storage.compileCache.size==1)
+            assert(storage.compileCache.size==2) //ReplBridge adds an object to cache
           }
           'two{
             val storage = new MemoryStorage
             val interp = createTestInterp(storage)
             interp.replApi.load.module(s"$scriptPath/TwoBlocks.scala")
-            assert(storage.compileCache.size==2)
+            assert(storage.compileCache.size==3)
           }
           'three{
             val storage = new MemoryStorage
             val interp = createTestInterp(storage)
             interp.replApi.load.module(s"$scriptPath/ThreeBlocks.scala")
-            assert(storage.compileCache.size==3)
+            assert(storage.compileCache.size==4)
           }
         }
         'persistence{
@@ -226,8 +226,8 @@ object ScriptTests extends TestSuite{
           val interp2 = createTestInterp(Storage(tempDir))
           interp1.replApi.load.module(s"$scriptPath/OneBlock.scala")
           interp2.replApi.load.module(s"$scriptPath/OneBlock.scala")
-          assert(interp1.eval.compilationCount == 3) //each reintialization adds a compilation
-          assert(interp2.eval.compilationCount == 2)
+          assert(interp1.eval.compilationCount == 2) //first init adds a compilation because of ReplBridge
+          assert(interp2.eval.compilationCount == 0)
         }
         'tags{
           val storage = new MemoryStorage
@@ -236,7 +236,7 @@ object ScriptTests extends TestSuite{
           interp.replApi.load.module(s"$scriptPath/TagPrevCommand.scala")
           interp.replApi.load.ivy("com.lihaoyi" %% "scalatags" % "0.4.5")
           interp.replApi.load.module(s"$scriptPath/TagBase.scala")
-          assert(storage.compileCache.size == 6) //two blocks for each loading
+          assert(storage.compileCache.size == 7) //two blocks for each loading + ReplBridge
         }
         'encapsulation{
           check.session(s"""

@@ -200,7 +200,7 @@ class Interpreter(prompt0: Ref[String],
       eval.evalClassloader
     )
 
-    val cls = eval.evalClass(
+    val cls = eval.getCachedClass(
       "object ReplBridge extends ammonite.repl.frontend.ReplAPIHolder{}",
       "ReplBridge"
     )
