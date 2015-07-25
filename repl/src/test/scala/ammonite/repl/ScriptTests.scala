@@ -3,6 +3,7 @@ package ammonite.repl
 import ammonite.repl.frontend._
 import ammonite.repl.interp.Interpreter
 import ammonite.repl.IvyConstructor._
+import TestUtils.scala2_10
 import utest._
 import acyclic.file
 object ScriptTests extends TestSuite{
@@ -24,7 +25,7 @@ object ScriptTests extends TestSuite{
         }
         'preserveImports{
           val typeString =
-            if (!scala.util.Properties.versionString.contains("2.10"))
+            if (!scala2_10)
               """Left[String, Nothing]"""
             else
               """util.Left[String,Nothing]"""
@@ -103,7 +104,7 @@ object ScriptTests extends TestSuite{
     'module{
       'compilationBlocks{
         'loadIvy{
-          if (!scala.util.Properties.versionString.contains("2.10")) //buggy in 2.10
+          if (!scala2_10) //buggy in 2.10
           check.session(s"""
             @ load.module("$scriptPath/LoadIvy.scala")
 
@@ -114,7 +115,7 @@ object ScriptTests extends TestSuite{
             """)
         }
         'preserveImports{
-          if (!scala.util.Properties.versionString.contains("2.10")) { //buggy in 2.10
+          if (!scala2_10) { //buggy in 2.10
             val typeString =
               if (!scala.util.Properties.versionString.contains("2.10"))
                 """Left[String, Nothing]"""
@@ -129,7 +130,7 @@ object ScriptTests extends TestSuite{
           }
         }
         'annotation{
-          if (!scala.util.Properties.versionString.contains("2.10")) //buggy in 2.10
+          if (!scala2_10) //buggy in 2.10
           check.session(s"""
             @ load.module("$scriptPath/Annotation.scala")
 
@@ -138,7 +139,7 @@ object ScriptTests extends TestSuite{
             """)
         }
         'syntax{
-          if (!scala.util.Properties.versionString.contains("2.10")) //buggy in 2.10
+          if (!scala2_10) //buggy in 2.10
           check.session(s"""
             @ load.module("$scriptPath/BlockSepSyntax.scala")
 
@@ -226,7 +227,7 @@ object ScriptTests extends TestSuite{
           }
         }
         'persistence{
-          if (!scala.util.Properties.versionString.contains("2.10")) {//buggy in 2.10
+          if (!scala2_10) {//buggy in 2.10
             val tempDir = java.nio.file.Files.createTempDirectory("ammonite-tester").toFile
             val interp1 = createTestInterp(Storage(tempDir))
             val interp2 = createTestInterp(Storage(tempDir))
@@ -237,7 +238,7 @@ object ScriptTests extends TestSuite{
           }
         }
         'tags{
-          if (!scala.util.Properties.versionString.contains("2.10")) {//buggy in 2.10
+          if (!scala2_10) {//buggy in 2.10
             val storage = new MemoryStorage
             val interp = createTestInterp(storage)
             interp.replApi.load.module(s"$scriptPath/TagBase.scala")

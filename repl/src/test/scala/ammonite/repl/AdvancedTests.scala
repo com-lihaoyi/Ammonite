@@ -4,12 +4,14 @@ import utest._
 
 import scala.collection.{immutable => imm}
 import acyclic.file
+import TestUtils.scala2_10
+
 object AdvancedTests extends TestSuite{
   val tests = TestSuite{
     println("AdvancedTests")
     val check = new Checker()
     'pprint{
-      if (!scala.util.Properties.versionString.contains("2.10")) //buggy in 2.10
+      if (!scala2_10) //buggy in 2.10
       check.session("""
         @ Seq.fill(10)(Seq.fill(3)("Foo"))
         res0: Seq[Seq[String]] = List(
@@ -125,7 +127,7 @@ object AdvancedTests extends TestSuite{
     }
     'typeScope{
       // Fancy type-printing isn't implemented at all in 2.10.x
-      if (!scala.util.Properties.versionString.contains("2.10")) check.session("""
+      if (!scala2_10) check.session("""
         @ collection.mutable.Buffer(1)
         res0: collection.mutable.Buffer[Int] = ArrayBuffer(1)
 
