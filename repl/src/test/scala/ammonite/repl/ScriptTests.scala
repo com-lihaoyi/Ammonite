@@ -199,8 +199,10 @@ object ScriptTests extends TestSuite{
         def createTestInterp(storage: Storage) = new Interpreter(
           Ref[String](""),
           Ref(null),
+          80,
+          80,
           pprint.Config.Defaults.PPrintConfig.copy(height = 15),
-          Ref(ColorSet.BlackWhite),
+          Ref(Colors.BlackWhite),
           stdout = _ => (),
           storage = Ref(storage),
           predef = ""

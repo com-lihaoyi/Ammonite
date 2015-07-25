@@ -7,13 +7,13 @@ class MemoryStorage extends Storage{
   def loadPredef = predef
 
   var _history = new History(Vector())
-  val history = new Ref[History]{
+  val history = new StableRef[History]{
     def apply() = _history
     def update(h: History): Unit = _history = h
   }
 
   var _ivyCache: IvyMap = Map.empty
-  val ivyCache = new Ref[IvyMap]{
+  val ivyCache = new StableRef[IvyMap]{
     def apply() = _ivyCache
     def update(value: IvyMap): Unit = _ivyCache = value
   }
