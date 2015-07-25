@@ -275,7 +275,10 @@ object Evaluator{
   def evaluatorRunPrinter(f: => Unit) = f
 
   /**
-   * This gives our cache tags for compile caching.
+   * This gives our cache tags for compile caching. The cache tags are a hash
+   * of classpath, previous commands (in-same-script), and the block-code.
+   * Previous commands are hashed in the wrapper names, which are contained 
+   * in imports, so we don't need to pass them explicitly.
    */
   def cacheTag(code: String, imports: Seq[ImportData], classpathHash: Array[Byte]): String = {
     val bytes = md5Hash(md5Hash(code.getBytes) ++ md5Hash(imports.mkString.getBytes) ++ classpathHash)
@@ -283,7 +286,6 @@ object Evaluator{
   }
 
   def md5Hash(data: Array[Byte]) = MessageDigest.getInstance("MD5").digest(data)
-  def hexString(data: Array[Byte]) = data.map("%02x".format(_)).mkString
 
   /**
    * Classloader used to implement the jar-downloading
@@ -313,7 +315,7 @@ object Evaluator{
       val is = url.openStream
       val baos = new java.io.ByteArrayOutputStream
       try {
-        val byteChunk = new Array[Byte](4096) // Or whatever size you want to read in at a time
+        val byteChunk = new Array[Byte](4096) 
         var n = 0
         n = is.read(byteChunk)
         while (n > 0) {
@@ -326,6 +328,8 @@ object Evaluator{
       md5Hash(baos.toByteArray())
     }
 
+    //we don't need to hash in classes from newFileDict, because cache tag depend on 
+    //them implicitly throgh having their hash in the imports.
     private var _classpathHash = {
       val urls = getURLs
       if(!urls.isEmpty){
