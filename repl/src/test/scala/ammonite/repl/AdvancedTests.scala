@@ -38,6 +38,17 @@ object AdvancedTests extends TestSuite{
         )
       """)
     }
+    'specialPPrint{
+      check.session("""
+        @ import ammonite.ops._
+
+        @ ls! wd/'ops
+        res1: LsSeq = LsSeq(
+          'src,
+          'target
+        )
+      """)
+    }
     'exit{
       check.result("exit", Res.Exit)
     }

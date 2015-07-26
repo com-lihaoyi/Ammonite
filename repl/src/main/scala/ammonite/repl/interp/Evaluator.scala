@@ -87,7 +87,7 @@ object Evaluator{
       mutable.Map(
         importsFor[ReplAPI]("ReplBridge.repl") ++
         importsFor[ammonite.repl.IvyConstructor]("ammonite.repl.IvyConstructor") ++
-        pprintImports ++
+//        pprintImports ++
         Seq(
           importFrom("pprint", "pprintln"),
           importFrom("ReplBridge", "repl")
