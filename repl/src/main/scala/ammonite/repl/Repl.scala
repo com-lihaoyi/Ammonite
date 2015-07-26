@@ -18,7 +18,7 @@ class Repl(input: InputStream,
   val prompt = Ref("@ ")
 
   val colors = Ref[Colors](Colors.Default)
-  val frontEnd = Ref[FrontEnd](FrontEnd.JLineUnix)
+  val frontEnd = Ref[FrontEnd](FrontEnd.Ammonite)
 
   val printer = new PrintStream(output, true)
   val interp: Interpreter = new Interpreter(
