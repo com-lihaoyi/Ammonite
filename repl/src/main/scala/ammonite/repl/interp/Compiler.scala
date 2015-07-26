@@ -3,6 +3,7 @@ package ammonite.repl.interp
 
 import acyclic.file
 import ammonite.repl.{Timer, ImportData}
+import ammonite.repl.Util.ClassFiles
 import scala.collection.mutable
 import scala.reflect.internal.util.{BatchSourceFile, OffsetPosition, Position}
 import scala.reflect.io
@@ -38,6 +39,11 @@ trait Compiler{
    * Either the statements that were parsed or the error message
    */
   def parse(line: String): Either[String, Seq[Global#Tree]]
+
+  /**
+   * Writes files to dynamicClasspath. Needed for loading cached classes.
+   */ 
+  def addToClasspath(classFiles: ClassFiles): Unit
 }
 object Compiler{
   /**
@@ -192,6 +198,14 @@ object Compiler{
         }
         val imports = lastImports.toList
         (files, imports)
+      }
+    }
+
+    def addToClasspath(classFiles: Traversable[(String, Array[Byte])]): Unit = {
+      for((name, bytes) <- classFiles){
+        val output = dynamicClasspath.fileNamed(s"$name.class").output
+        output.write(bytes)
+        output.close()
       }
     }
 

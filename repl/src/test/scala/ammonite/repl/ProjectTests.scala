@@ -4,6 +4,8 @@ import utest._
 
 import scala.collection.{immutable => imm}
 import acyclic.file
+import TestUtils.scala2_10
+
 object ProjectTests extends TestSuite{
   val tests = TestSuite{
     println("ProjectTests")
@@ -12,6 +14,7 @@ object ProjectTests extends TestSuite{
       'ivy{
         'standalone{
           val tq = "\"\"\""
+          if (!scala2_10) //buggy in 2.10
           check.session(s"""
             @ import scalatags.Text.all._
             error: not found: value scalatags
@@ -28,6 +31,7 @@ object ProjectTests extends TestSuite{
           """)
         }
         'complex{
+          if (!scala2_10) //buggy in 2.10
           check.session("""
             @ load.ivy("com.typesafe.akka" %% "akka-http-experimental" % "1.0-M3")
 
@@ -72,7 +76,7 @@ object ProjectTests extends TestSuite{
     }
 
     'shapeless{
-      if (!scala.util.Properties.versionString.contains("2.10"))
+      if (!scala2_10)
         check.session("""
           @ load.ivy("com.chuusai" %% "shapeless" % "2.1.0")
 
@@ -84,10 +88,10 @@ object ProjectTests extends TestSuite{
           @ res2(1)
           res3: String = "lol"
         """)
-
     }
 
     'scalaz{
+      if (!scala2_10) //buggy in 2.10
       check.session("""
         @ load.ivy("org.scalaz" %% "scalaz-core" % "7.1.1")
 
@@ -103,7 +107,8 @@ object ProjectTests extends TestSuite{
     }
     'scalaparse{
       // For some reason this blows up in 2.11.x
-      if (!scala.util.Properties.versionString.contains("2.10")) ()
+      // Prevent regressions when wildcard-importing things called `macro` or `_`
+      if (!scala2_10) ()
       else
         check.session(s"""
           @ import scalaparse.Scala._
@@ -121,6 +126,7 @@ object ProjectTests extends TestSuite{
 
     'finagle{
       // Prevent regressions when wildcard-importing things called `macro` or `_`
+      if (!scala2_10) //buggy in 2.10
       check.session("""
         @ load.ivy("com.twitter" %% "finagle-httpx" % "6.26.0")
 
@@ -170,7 +176,7 @@ object ProjectTests extends TestSuite{
     }
     'spire{
       // Prevent regressions when wildcard-importing things called `macro` or `_`
-      if (!scala.util.Properties.versionString.contains("2.10"))
+      if (!scala2_10) //buggy in 2.10
         check.session(s"""
           @ load.ivy("org.spire-math" %% "spire" % "0.10.1")
 
@@ -200,38 +206,6 @@ object ProjectTests extends TestSuite{
           @ mean(Rational(1, 2), Rational(3, 2), Rational(0))
           res9: Rational = 2/3
         """)
-      else
-        check.session(s"""
-          @ load.ivy("org.spire-math" %% "spire" % "0.10.1")
-
-          @ import spire.implicits._
-
-          @ import spire.math._
-
-          @ def euclidGcd[A: Integral](x: A, y: A): A = {
-          @   if (y == 0) x
-          @   else euclidGcd(y, x % y)
-          @ }
-
-          @ euclidGcd(42, 96)
-          res4: Int = 6
-
-          @ euclidGcd(42L, 96L)
-          res5: Long = 6L
-
-          @ euclidGcd(BigInt(42), BigInt(96))
-          res6: math.BigInt = 6
-
-          @ def mean[A: Fractional](xs: A*): A = xs.reduceLeft(_ + _) / xs.size
-
-          @ mean(0.5, 1.5, 0.0, -0.5)
-          res8: Double = 0.375
-
-          @ mean(Rational(1, 2), Rational(3, 2), Rational(0))
-          res9: spire.math.Rational = 2/3
-        """)
-
-
     }
 
   }

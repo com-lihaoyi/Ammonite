@@ -192,7 +192,7 @@
       ...
 
     @p
-      By default, everything in a script is compiled and executed as a single block. That means that if you want to perform classpath-modifying operations, such as @hl.scala{load.jar} or @hl.scala{load.ivy}, its results will not be available within the same script if you want to use methods, values or packages defined in the loaded code. To make this work, break the script up into multiple compilation units, e.g.
+      By default, everything in a script is compiled and executed as a single block. That means that if you want to perform classpath-modifying operations, such as @hl.scala{load.jar} or @hl.scala{load.ivy}, its results will not be available within the same script if you want to use methods, values or packages defined in the loaded code. To make this work, break the script up into multiple compilation units with an @ sign, e.g.
 
     @hl.scala
       // print banner
@@ -208,6 +208,10 @@
 
       // common initialization code
       ...
+    @p
+      Ammonite provides two ways to load scripts, @hl.scala{load.exec} and @hl.scala{load.module}. With @hl.scala{load.exec} the script is executed like it was pasted in the REPL. Exec scripts can access all values previously defined in the REPL, and all sideeffects are guaranteed to be applied. Scripts loaded via @hl.scala{load.module} can't access values previously defined in the REPL, and sideeffects are applied only the once each session. However @hl.scala{load.module} offers better caching, because scripts loaded this way are guaranteed to compile only once, if the code and classpath is not modified. Scripts that are contain common intialization, or define types and values to be used in later commands should be loaded with @hl.scala{load.module}. Scripts that perform sideeffects, that should be repeated more than once in a single session, like filesystem access and printing to the shell should be loaded with @hl.scala{load.exec}. Methods defined in scripts loaded with @hl.scala{load.module} do not have this limitation.
+    @p
+      All types, values and imports defined in scripts are available to commands entered in REPL after loading the script.
 
   @sect{Configuration}
     @p
@@ -432,7 +436,7 @@
         @li
           You can now define a @code{~/.ammonite/predef.scala} file which will be executed the first thing when the Ammonite REPL is loaded. This is useful for common imports, @hl.scala{load.ivy}ing libraries, or configuration for your REPL
         @li
-          Added the ability to load arbitrary Ammonite scripts via @hl.scala{load.script}
+          Added the ability to load arbitrary Ammonite scripts via @hl.scala{load.exec} and @hl.scala{load.module}
         @li
           Much more configuration that was previously passed into the @hl.scala{REPL}s constructor is now done in-REPL,
         @li

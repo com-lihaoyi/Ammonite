@@ -9,6 +9,7 @@ import pprint.{Config, PPrint}
 import annotation.tailrec
 import ammonite.repl._
 import ammonite.repl.frontend._
+import Util.CompileCache
 import fastparse.core.Result
 
 import scala.reflect.io.VirtualDirectory
@@ -56,25 +57,30 @@ class Interpreter(prompt0: Ref[String],
     } finally Thread.currentThread().setContextClassLoader(oldClassloader)
   }
 
-  def processScript(code: String): Unit = {
-    val blocks = Parsers.splitScript(code).map(preprocess(_, eval.getCurrentLine))
+  def processModule(code: String) = processScript(code, eval.processScriptBlock)
+
+  def processExec(code: String) = processScript(code, { (c, _) => evaluateLine(c, Seq(), _ => ()) })
+ 
+  //common stuff in proccessModule and processExec
+  def processScript(code: String, evaluate: (String, Seq[ImportData]) => Res[Evaluated]): Unit = {
+    val blocks = Parsers.splitScript(code).map(preprocess(_, ""))
     val errors = blocks.collect{ case Res.Failure(err) => err }
     if(!errors.isEmpty) 
       stdout(colors0().error() + errors.mkString("\n") + colors0().reset() + "\n")
     else
-      loop(blocks.collect{ case Res.Success(o) => o })
+      loop(blocks.collect{ case Res.Success(o) => o }, Seq())
 
-    @tailrec def loop(blocks: Seq[Preprocessor.Output]): Unit = {
+    @tailrec def loop(blocks: Seq[Preprocessor.Output], imports: Seq[ImportData]): Unit = {
       if(!blocks.isEmpty){
         val Preprocessor.Output(code, _) = blocks.head //pretty printing results is disabled for scripts
-        val ev = evaluateLine(code, Seq(), _ => ())
+        val ev = evaluate(code, imports)
         ev match {
           case Res.Failure(msg) =>
-            stdout(colors0().error() + msg + colors0().reset() + "\n")
+            throw new CompilationError(msg)
           case Res.Success(ev) =>
             eval.update(ev.imports)
-            loop(blocks.tail)
-          case _ => loop(blocks.tail)
+            loop(blocks.tail, imports ++ ev.imports)
+          case _ => loop(blocks.tail, imports)
         }
       }
     }
@@ -104,16 +110,26 @@ class Interpreter(prompt0: Ref[String],
     object load extends Load{
 
       def apply(line: String) = {
-        processScript(line)
+        processExec(line)
       }
 
-      def script(file: File): Unit = {
+      def exec(file: File): Unit = {
         val content = Files.readAllBytes(file.toPath)
         apply(new String(content))
       }
 
-      def script(path: String): Unit = {
-        script(new File(path))
+      def exec(path: String): Unit = {
+        exec(new File(path))
+      }
+
+      def module(file: File): Unit = {
+        val content = Files.readAllBytes(file.toPath)
+        processModule(new String(content))
+        init()
+      }
+
+      def module(path: String): Unit = {
+        module(new File(path))
       }
 
       def handleJar(jar: File): Unit = {
@@ -184,7 +200,7 @@ class Interpreter(prompt0: Ref[String],
       eval.evalClassloader
     )
 
-    val cls = eval.evalClass(
+    val cls = eval.getCachedClass(
       "object ReplBridge extends ammonite.repl.frontend.ReplAPIHolder{}",
       "ReplBridge"
     )
@@ -200,7 +216,10 @@ class Interpreter(prompt0: Ref[String],
   val eval = Evaluator(
     mainThread.getContextClassLoader,
     compiler.compile,
-    if (predef != "") -1 else 0
+    if (predef != "") -1 else 0,
+    storage().compileCacheLoad,
+    storage().compileCacheSave,
+    compiler.addToClasspath
   )
 
   init()
@@ -209,6 +228,6 @@ class Interpreter(prompt0: Ref[String],
   // line number to -1 if the predef exists so the first user-entered
   // line becomes 0
   if (predef != "") {
-    processScript(predef)
+    processExec(predef)
   }
 }

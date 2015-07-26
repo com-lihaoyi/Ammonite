@@ -51,6 +51,11 @@ sealed abstract class Res[+T]{
 }
 
 /**
+ * Exception for reporting script compilation failures
+ */ 
+class CompilationError(message: String) extends Exception(message)
+
+/**
  * Fake for-comprehension generator to catch errors and turn
  * them into [[Res.Failure]]s
  */
@@ -132,6 +137,8 @@ object Ex{
 
 object Util{
   type IvyMap = Map[(String, String, String), Set[String]]
+  type ClassFiles = Traversable[(String, Array[Byte])]
+  type CompileCache = (ClassFiles, Seq[ImportData])
   def transpose[A](xs: List[List[A]]): List[List[A]] = xs.filter(_.nonEmpty) match {
     case Nil    =>  Nil
     case ys: List[List[A]] => ys.map{ _.head }::transpose(ys.map{ _.tail })

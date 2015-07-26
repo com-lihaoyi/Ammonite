@@ -2,8 +2,9 @@ package ammonite.repl
 
 import acyclic.file
 import java.io.{File, FileInputStream, IOException, FileWriter}
-import ammonite.repl.Util.IvyMap
+import ammonite.repl.Util.{IvyMap, CompileCache, ClassFiles}
 import org.yaml.snakeyaml.Yaml
+import scala.util.Try
 import scala.collection.generic.{GenericCompanion, GenericTraversableTemplate, CanBuildFrom, SeqFactory}
 import scala.collection.{IterableLike, mutable, IndexedSeqLike}
 import scala.collection.mutable.ArrayBuffer
@@ -17,9 +18,10 @@ import scala.collection.JavaConversions.asScalaBuffer
  */ 
 trait Storage{
   def loadPredef: String
-
   val history: StableRef[History]
   val ivyCache: StableRef[IvyMap]
+  def compileCacheSave(tag: String, data: CompileCache): Unit
+  def compileCacheLoad(tag: String): Option[CompileCache]
 }
 
 object Storage{
@@ -56,10 +58,48 @@ object Storage{
       }
     }
 
+    def compileCacheSave(tag: String, data: CompileCache): Unit = {
+      val (classFiles, imports) = data
+      val cacheDir = new File(dir + s"/compileCache/$tag")
+      if(!cacheDir.exists){
+        cacheDir.mkdirs()
+        val metadata = upickle.default.write(imports)
+        writeFile(cacheDir + "/metadata.json", metadata.getBytes)
+        classFiles.foreach{ case (name, bytes) =>
+          writeFile(cacheDir + s"/$name.class", bytes)
+        }
+      }
+    }
+
+    def compileCacheLoad(tag: String): Option[CompileCache] = {
+      val cacheDir = new File(dir + s"/compileCache/$tag")
+      if(!cacheDir.exists) None
+      else for{
+        metadataJson <- Try{
+          new String(readFile(cacheDir + "/metadata.json"))
+        }.toOption
+        metadata <- Try{
+          upickle.default.read[Seq[ImportData]](metadataJson)
+        }.toOption
+        classFiles <- loadClassFiles(cacheDir)
+      } yield (classFiles, metadata)
+    }
+
+    def loadClassFiles(cacheDir: File): Option[ClassFiles] = {
+      val classFiles = cacheDir.listFiles().filter(_.getName.endsWith(".class"))
+      Try{
+        val data = classFiles.map{ file =>
+          val className = file.getName.replaceAll("\\.class$","")
+          (className, readFile(file))
+        }
+        data
+      }.toOption.map(_.toSeq)
+    }
+
     val ivyCache = new StableRef[IvyMap]{
       def apply() = {
         val json = try{
-          io.Source.fromFile(dir + "/ivycache.json").mkString
+          new String(readFile(dir + "/ivycache.json"))
         }catch{
           case e: java.io.FileNotFoundException => "[]"
         }
@@ -71,15 +111,33 @@ object Storage{
         }
       }
       def update(map: IvyMap) = {
-        val fw = new FileWriter(dir + "/ivycache.json")
-        fw.write(upickle.default.write(map))
-        fw.flush()
+        writeFile(dir + "/ivycache.json", upickle.default.write(map).getBytes)
       }
     }
+
     def loadPredef = try{
-      io.Source.fromFile(dir + "/predef.scala").mkString
-    }catch{
+      new String(readFile(dir + "/predef.scala"))
+    } catch {
       case e: java.io.FileNotFoundException => ""
+    }
+
+    def writeFile(filename: String, data: Array[Byte]): Unit = {
+      val fos = new java.io.FileOutputStream(filename)
+      fos.write(data)
+      fos.flush()
+    }
+
+    def readFile(filename: String): Array[Byte] = {
+      val file = new File(filename)
+      readFile(file)
+    }
+
+    def readFile(file: File): Array[Byte] = {
+      val fis = new java.io.FileInputStream(file)
+      val bytes = new Array[Byte](file.length.toInt)
+      var c = 0
+      while(c < bytes.length) c += fis.read(bytes, c, bytes.length-c)
+      bytes
     }
   }
 }

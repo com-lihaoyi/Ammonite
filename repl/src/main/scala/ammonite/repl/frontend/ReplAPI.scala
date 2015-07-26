@@ -125,9 +125,13 @@ trait Load extends (String => Unit){
    * Compilation units separated by `@\n` are evaluated sequentially.
    * If an error happens it prints an error message to the console.
    */ 
-  def script(path: String): Unit
+  def exec(path: String): Unit
 
-  def script(file: File): Unit
+  def exec(file: File): Unit
+
+  def module(path: String): Unit
+
+  def module(file: File): Unit
 }
 
 // End of ReplAPI

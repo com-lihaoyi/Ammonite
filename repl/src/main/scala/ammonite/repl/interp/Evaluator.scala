@@ -7,8 +7,10 @@ import acyclic.file
 import ammonite.repl.frontend.{ReplExit, ReplAPI}
 import ammonite.repl._
 import java.net.URLClassLoader
+import java.security.MessageDigest
 
 import ammonite.repl.interp.Evaluator.SpecialClassloader
+import Util.{CompileCache, ClassFiles}
 
 import scala.reflect.runtime.universe._
 import scala.collection.mutable
@@ -21,7 +23,7 @@ import scala.util.Try
  * need to get prepended to subsequent commands.
  */
 trait Evaluator{
-  def evalClass(code: String, wrapperName: String): Res[(Class[_], Seq[ImportData])]
+  def getCachedClass(code: String, wrapperName: String): Res[(Class[_], Seq[ImportData])]
 
   /**
    * _2, _1, 0, 1, 2, 3...
@@ -40,17 +42,26 @@ trait Evaluator{
    * the exception-handling block of the `Evaluator`
    */
   def processLine(code: String, printCode: String, printer: Iterator[String] => Unit): Res[Evaluated]
+  def processScriptBlock(code: String, scriptImports: Seq[ImportData]): Res[Evaluated]
 
   def previousImportBlock: String
   def addJar(url: URL): Unit
   def evalClassloader: SpecialClassloader
+
+  /*
+   * How many wrappers has this instance compiled
+   */ 
+  def compilationCount: Int
 }
 
 object Evaluator{
   def apply(currentClassloader: ClassLoader,
             compile: => (Array[Byte], String => Unit) => Compiler.Output,
-            startingLine: Int): Evaluator = new Evaluator{
-    
+            startingLine: Int,
+            cacheLoad: String => Option[CompileCache],
+            cacheSave: (String, CompileCache) => Unit,
+            addToCompilerClasspath:  => ClassFiles => Unit): Evaluator = new Evaluator{
+
     /**
      * Imports which are required by earlier commands to the REPL. Imports
      * have a specified key, so that later imports of the same name (e.g.
@@ -58,7 +69,9 @@ object Evaluator{
      * map. Otherwise if you import the same name twice you get compile
      * errors instead of the desired shadowing.
      */
-    lazy val previousImports = {
+    lazy val previousImports = mutable.Map(defaultImports.toSeq :_*)
+
+    lazy val defaultImports = {
       def namesFor(t: scala.reflect.runtime.universe.Type): Set[String] = {
         val yours = t.members.map(_.name.toString).toSet
         val default = typeOf[Object].members.map(_.name.toString)
@@ -84,6 +97,8 @@ object Evaluator{
       )
     }
 
+    lazy val defaultImportBlock = importBlock(defaultImports.values.toSeq)
+
     /**
      * The current line number of the REPL, used to make sure every snippet
      * evaluated can have a distinct name that doesn't collide.
@@ -102,36 +117,62 @@ object Evaluator{
      */
     var evalClassloader: SpecialClassloader = null
 
-
     evalClassloader = new SpecialClassloader(currentClassloader)
 
     def addJar(url: URL) = evalClassloader.add(url)
 
-    def evalClass(code: String, wrapperName: String) = for{
+    def getCachedClass(code: String, name: String) = {
+      loadCachedClass(name) match {
+        case Some((cls, newImports)) =>
+          Res.Success((cls, newImports))
+        case None => for {
+          compileCache @ (classFiles, imports) <- compileClass(code)
+          _ = cacheSave(name, compileCache)
+          cls <- loadClass(name, classFiles)
+        } yield (cls, imports)
+      }
+    }
 
+    private var _compilationCount = 0
+    def compilationCount = _compilationCount
+
+    def compileClass(code: String): Res[(ClassFiles, Seq[ImportData])] = for {
       (output, compiled) <- Res.Success{
         val output = mutable.Buffer.empty[String]
         val c = compile(code.getBytes, output.append(_))
         (output, c)
       }
-
-      (classFiles, importData) <- Res[(Traversable[(String, Array[Byte])], Seq[ImportData])](
+      _ = _compilationCount += 1
+      result <- Res[(ClassFiles, Seq[ImportData])](
         compiled, "Compilation Failed\n" + output.mkString("\n")
       )
+    } yield result
 
-      cls <- Res[Class[_]](Try {
+    def loadClass(wrapperName: String, classFiles: ClassFiles): Res[Class[_]] = {
+      Res[Class[_]](Try {
         for ((name, bytes) <- classFiles) evalClassloader.newFileDict(name) = bytes
         Class.forName(wrapperName , true, evalClassloader)
       }, e => "Failed to load compiled class " + e)
-    } yield (cls, importData)
+    }
+
+    def loadCachedClass(tag: String): Option[(Class[_],Seq[ImportData])] = {
+      cacheLoad(tag).flatMap{ case (classFiles, importData) =>
+        addToCompilerClasspath(classFiles)
+        loadClass(tag,classFiles) match {
+          case Res.Success(cls) => Some((cls,importData))
+          case _ => None
+        }
+      }
+    }
 
     def evalMain(cls: Class[_]) =
       cls.getDeclaredMethod("$main").invoke(null)
 
+    def previousImportBlock = importBlock(previousImports.values.toSeq)
 
-    def previousImportBlock = {
+    def importBlock(importData: Seq[ImportData]) = {
       val snippets = for {
-        (prefix, allImports) <- previousImports.values.toList.groupBy(_.prefix)
+        (prefix, allImports) <- importData.toList.groupBy(_.prefix)
         imports <- Util.transpose(allImports.groupBy(_.fromName).values.toList)
       } yield {
         // Don't import importable variables called `_`. They seem to
@@ -153,6 +194,7 @@ object Evaluator{
       }
       snippets.mkString("\n")
     }
+  
     def interrupted() = {
       Thread.interrupted()
       Res.Failure("\nInterrupted!")
@@ -162,18 +204,11 @@ object Evaluator{
     type InitEx = ExceptionInInitializerError
 
     def processLine(code: String, printCode: String, printer: Iterator[String] => Unit) = for {
-      wrapperName <- Res.Success("cmd" + getCurrentLine)
       _ <- Catching{ case e: ThreadDeath => interrupted() }
-      (cls, newImports) <- evalClass(
-        s"""
-        $previousImportBlock
-
-        case object $wrapperName{
-          $code
-          def $$main() = {$printCode}
-        }
-        """,
-        wrapperName
+      (wrapperName, cls, newImports) <- getCacheBlock(
+        code,
+        previousImports.values.toSeq,
+        printCode
       )
       _ = currentLine += 1
       _ <- Catching{
@@ -192,17 +227,43 @@ object Evaluator{
       // Exhaust the printer iterator now, before exiting the `Catching`
       // block, so any exceptions thrown get properly caught and handled
       evaluatorRunPrinter(printer(evalMain(cls).asInstanceOf[Iterator[String]]))
-      Evaluated(
-        wrapperName,
-        newImports.map(id => id.copy(
-          wrapperName = wrapperName,
-          prefix = if (id.prefix == "") wrapperName else id.prefix
-        ))
-      )
+      evaluationResult(wrapperName, newImports)
+    }
+
+    def getCacheBlock(code: String, imports: Seq[ImportData], printCode: String = ""): Res[(String, Class[_], Seq[ImportData])] = {
+      val wrapperName = cacheTag(code, imports, evalClassloader.classpathHash)
+      val wrapperCode = s"""
+        $defaultImportBlock
+        ${importBlock(imports)}
+
+        case object $wrapperName{
+          $code
+          def $$main() = { $printCode }
+        }
+        """
+      for ((cls, imports) <- getCachedClass(wrapperCode,wrapperName))
+      yield (wrapperName, cls, imports)
+    }
+
+    def processScriptBlock(code: String, scriptImports: Seq[ImportData]) = for {
+      (wrapperName, cls, newImports) <- getCacheBlock(code, scriptImports)
+    } yield {
+      evalMain(cls)
+      evaluationResult(wrapperName, newImports)
     }
 
     def update(newImports: Seq[ImportData]) = {
       for(i <- newImports) previousImports(i.toName) = i
+    }
+
+    def evaluationResult(wrapperName: String, imports: Seq[ImportData]) = {
+      Evaluated(
+        wrapperName,
+        imports.map(id => id.copy(
+          wrapperName = wrapperName,
+          prefix = if (id.prefix == "") wrapperName else id.prefix
+        ))
+      )
     }
   }
 
@@ -212,6 +273,19 @@ object Evaluator{
    * showing it to the user.
    */
   def evaluatorRunPrinter(f: => Unit) = f
+
+  /**
+   * This gives our cache tags for compile caching. The cache tags are a hash
+   * of classpath, previous commands (in-same-script), and the block-code.
+   * Previous commands are hashed in the wrapper names, which are contained 
+   * in imports, so we don't need to pass them explicitly.
+   */
+  def cacheTag(code: String, imports: Seq[ImportData], classpathHash: Array[Byte]): String = {
+    val bytes = md5Hash(md5Hash(code.getBytes) ++ md5Hash(imports.mkString.getBytes) ++ classpathHash)
+    "cache" + bytes.map("%02x".format(_)).mkString //add prefix to make sure it begins with a letter
+  }
+
+  def md5Hash(data: Array[Byte]) = MessageDigest.getInstance("MD5").digest(data)
 
   /**
    * Classloader used to implement the jar-downloading
@@ -232,6 +306,38 @@ object Evaluator{
 
       loadedFromBytes.getOrElse(super.findClass(name))
     }
-    def add(url: URL) = addURL(url)
+    def add(url: URL) = {
+      _classpathHash = md5Hash(_classpathHash ++ jarHash(url))
+      addURL(url)
+    }
+
+    private def jarHash(url: URL) = {
+      val is = url.openStream
+      val baos = new java.io.ByteArrayOutputStream
+      try {
+        val byteChunk = new Array[Byte](4096) 
+        var n = 0
+        n = is.read(byteChunk)
+        while (n > 0) {
+          baos.write(byteChunk, 0, n)
+          n = is.read(byteChunk)
+        }
+      } finally {
+        if (is != null) is.close()
+      }  
+      md5Hash(baos.toByteArray())
+    }
+
+    //we don't need to hash in classes from newFileDict, because cache tag depend on 
+    //them implicitly throgh having their hash in the imports.
+    private var _classpathHash = {
+      val urls = getURLs
+      if(!urls.isEmpty){
+        urls.tail.foldLeft(jarHash(urls.head)){ (oldHash,jarURL) =>
+          md5Hash(oldHash ++ jarHash(jarURL))
+        }
+      } else md5Hash(Array.empty)
+    }
+    def classpathHash: Array[Byte] = _classpathHash
   }
 }
