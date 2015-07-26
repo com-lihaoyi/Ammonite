@@ -72,22 +72,10 @@ object Evaluator{
       def importFrom(src: String, name: String) = {
         src -> ImportData(name, name, "", src)
       }
-      // Having these fails in 2.10.x; not having them fails in 2.11.x, both
-      // with obscure implicit-type-inference problems =( So just hard-code it
-      // for now
-      val pprintImports =
-        if (!scala.util.Properties.versionString.contains("2.10"))
-          Seq(
-            importFrom("pprint.PPrint", "FinalRepr"),
-            importFrom("pprint.PPrint", "Contra")
-          )
-        else
-          Nil
 
       mutable.Map(
         importsFor[ReplAPI]("ReplBridge.repl") ++
         importsFor[ammonite.repl.IvyConstructor]("ammonite.repl.IvyConstructor") ++
-//        pprintImports ++
         Seq(
           importFrom("pprint", "pprintln"),
           importFrom("ReplBridge", "repl")

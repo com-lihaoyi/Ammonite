@@ -100,7 +100,7 @@ object FrontEnd{
               val common = findPrefix(completions.head, completions.last, 0)
               val colored = for(comp <- completions) yield {
                 val (left, right) = comp.splitAt(common.length)
-                left + colors.comment() + right + colors.reset()
+                colors.comment() + left + colors.reset() + right
               }
               tabulate(colored, width).foreach(writer.write)
               writer.flush()
