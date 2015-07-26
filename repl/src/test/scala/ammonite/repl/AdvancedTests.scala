@@ -42,20 +42,36 @@ object AdvancedTests extends TestSuite{
       // Make sure these various "special" data structures get pretty-printed
       // correctly, i.e. not as their underlying type but as something more
       // pleasantly human-readable
-      check.session("""
-        @ import ammonite.ops._
+      if (!scala.util.Properties.versionString.contains("2.10"))
+        check.session("""
+          @ import ammonite.ops._
 
-        @ ls! wd/'ops
-        res1: LsSeq = LsSeq(
-          'src,
-          'target
-        )
+          @ ls! wd/'ops
+          res1: LsSeq = LsSeq(
+            'src,
+            'target
+          )
 
-        @ %%ls 'ops
-        res2: CommandResult =
-        src
-        target
-      """)
+          @ %%ls 'ops
+          res2: CommandResult =
+          src
+          target
+        """)
+      else
+        check.session("""
+          @ import ammonite.ops._
+
+          @ ls! wd/'ops
+          res1: ammonite.ops.LsSeq = LsSeq(
+            'src,
+            'target
+          )
+
+          @ %%ls 'ops
+          res2: ammonite.ops.CommandResult =
+          src
+          target
+        """)
     }
     'exit{
       check.result("exit", Res.Exit)
