@@ -57,6 +57,7 @@ object ScriptTests extends TestSuite{
         'syntaxError{
           check.session(s"""
             @ load.exec("$scriptPath/SyntaxError.scala")
+            error: SyntaxError
 
             @ val r = res
             error: Compilation Failed
@@ -68,6 +69,7 @@ object ScriptTests extends TestSuite{
         'compilationError{
           check.session(s"""
             @ load.exec("$scriptPath/CompilationError.scala")
+            error: Compilation Failed
 
             @ val r = res
             error: Compilation Failed
@@ -87,6 +89,7 @@ object ScriptTests extends TestSuite{
         'multiBlockError{
           check.session(s"""
             @ load.exec("$scriptPath/MultiBlockError.scala")
+            error: Compilation Failed
 
             @ val r1 = res1
             r1: Int = 1
@@ -152,6 +155,7 @@ object ScriptTests extends TestSuite{
         'syntaxError{
           check.session(s"""
             @ load.exec("$scriptPath/SyntaxError.scala")
+            error: SyntaxError
 
             @ val r = res
             error: Compilation Failed
@@ -163,6 +167,7 @@ object ScriptTests extends TestSuite{
         'compilationError{
           check.session(s"""
             @ load.module("$scriptPath/CompilationError.scala")
+            error: Compilation Failed
 
             @ val r = res
             error: Compilation Failed
@@ -182,6 +187,7 @@ object ScriptTests extends TestSuite{
         'multiBlockError{
           check.session(s"""
             @ load.module("$scriptPath/MultiBlockError.scala")
+            error: Compilation Failed
 
             @ val r1 = res1
             r1: Int = 1
