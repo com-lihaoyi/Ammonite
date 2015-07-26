@@ -31,7 +31,8 @@ class Checker {
     // Remove the margin from the block and break
     // it into blank-line-delimited steps
     val margin = sess.lines.filter(_.trim != "").map(_.takeWhile(_ == ' ').length).min
-    val steps = sess.replace("\n" + margin, "\n").split("\n\n")
+    // Strip margin & whitespace
+    val steps = sess.replace("\n" + margin, "\n").replaceAll(" *\n", "\n").split("\n\n")
 
     for(step <- steps){
       // Break the step into the command lines, starting with @,
@@ -74,7 +75,7 @@ class Checker {
         if (expected != ""){
           val regex = createRegex(expected)
           printed match {
-            case Res.Success(str) => failLoudly(assert(str.matches(regex)))
+            case Res.Success(str) => failLoudly(assert(str.replaceAll(" *\n", "\n").matches(regex)))
             case Res.Failure(failureMsg) => assert({printed; regex; false})
             case Res.Exception(ex, failureMsg) =>
               val trace = Repl.showException(ex, "", "", "") + "\n" +  failureMsg

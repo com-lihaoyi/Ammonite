@@ -39,6 +39,9 @@ object AdvancedTests extends TestSuite{
       """)
     }
     'specialPPrint{
+      // Make sure these various "special" data structures get pretty-printed
+      // correctly, i.e. not as their underlying type but as something more
+      // pleasantly human-readable
       check.session("""
         @ import ammonite.ops._
 
@@ -47,6 +50,11 @@ object AdvancedTests extends TestSuite{
           'src,
           'target
         )
+
+        @ %%ls 'ops
+        res2: CommandResult =
+        src
+        target
       """)
     }
     'exit{
