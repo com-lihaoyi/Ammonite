@@ -217,7 +217,7 @@ object ScriptTests extends TestSuite{
             val interp = createTestInterp(storage)
             interp.replApi.load.module(s"$scriptPath/OneBlock.scala")
             val n = storage.compileCache.size
-            assert(n == 1) //ReplBridge adds an object to cache
+            assert(n == 1) // ReplBridge doesn't get counted
           }
           'two{
             val storage = new MemoryStorage
@@ -235,17 +235,16 @@ object ScriptTests extends TestSuite{
           }
         }
         'persistence{
-          if (!scala2_10) {//buggy in 2.10
-            val tempDir = java.nio.file.Files.createTempDirectory("ammonite-tester").toFile
-            val interp1 = createTestInterp(Storage(tempDir))
-            val interp2 = createTestInterp(Storage(tempDir))
-            interp1.replApi.load.module(s"$scriptPath/OneBlock.scala")
-            interp2.replApi.load.module(s"$scriptPath/OneBlock.scala")
-            val n1 = interp1.eval.compilationCount
-            val n2 = interp2.eval.compilationCount
-            assert(n1 == 1) //first init adds a compilation because of ReplBridge
-            assert(n2 == 0)
-          }
+
+          val tempDir = java.nio.file.Files.createTempDirectory("ammonite-tester").toFile
+          val interp1 = createTestInterp(Storage(tempDir))
+          val interp2 = createTestInterp(Storage(tempDir))
+          interp1.replApi.load.module(s"$scriptPath/OneBlock.scala")
+          interp2.replApi.load.module(s"$scriptPath/OneBlock.scala")
+          val n1 = interp1.eval.compilationCount
+          val n2 = interp2.eval.compilationCount
+          assert(n1 == 1) // first init
+          assert(n2 == 0) // no need for further compilations
         }
         'tags{
           val storage = new MemoryStorage
@@ -255,7 +254,7 @@ object ScriptTests extends TestSuite{
           interp.replApi.load.ivy("com.lihaoyi" %% "scalatags" % "0.4.5")
           interp.replApi.load.module(s"$scriptPath/TagBase.scala")
           val n = storage.compileCache.size
-          assert(n == 6) //two blocks for each loading + ReplBridge
+          assert(n == 6) // two blocks for each loading
         }
         'encapsulation{
           check.session(s"""
