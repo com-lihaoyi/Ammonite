@@ -25,11 +25,6 @@ import scala.util.Try
 trait Evaluator{
 
   def loadClass(wrapperName: String, classFiles: ClassFiles): Res[Class[_]]
-  /**
-   * _2, _1, 0, 1, 2, 3...
-   *
-   * Numbers starting from _ are used to represent predefined commands
-   */
   def getCurrentLine: String
   def update(newImports: Seq[ImportData]): Unit
 
@@ -121,18 +116,6 @@ object Evaluator{
 
     def addJar(url: URL) = evalClassloader.add(url)
 
-    def getCachedClass(code: String, name: String) = {
-      loadCachedClass(name) match {
-        case Some((cls, newImports)) =>
-          Res.Success((cls, newImports))
-        case None => for {
-          compileCache @ (classFiles, imports) <- compileClass(code)
-          _ = cacheSave(name, compileCache)
-          cls <- loadClass(name, classFiles)
-        } yield (cls, imports)
-      }
-    }
-
     private var _compilationCount = 0
     def compilationCount = _compilationCount
 
@@ -155,15 +138,6 @@ object Evaluator{
       }, e => "Failed to load compiled class " + e)
     }
 
-    def loadCachedClass(tag: String): Option[(Class[_],Seq[ImportData])] = {
-      cacheLoad(tag).flatMap{ case (classFiles, importData) =>
-        addToCompilerClasspath(classFiles)
-        loadClass(tag,classFiles) match {
-          case Res.Success(cls) => Some((cls,importData))
-          case _ => None
-        }
-      }
-    }
 
     def evalMain(cls: Class[_]) =
       cls.getDeclaredMethod("$main").invoke(null)
@@ -206,7 +180,7 @@ object Evaluator{
     def processLine(code: String, printCode: String, printer: Iterator[String] => Unit) = for {
       wrapperName <- Res.Success("cmd" + getCurrentLine)
       _ <- Catching{ case e: ThreadDeath => interrupted() }
-      (classFiles, newImports) <- compileClass(getBlock(
+      (classFiles, newImports) <- compileClass(wrapCode(
         wrapperName,
         code,
         printCode,
@@ -234,29 +208,45 @@ object Evaluator{
       evaluatorRunPrinter(printer(evalMain(cls).asInstanceOf[Iterator[String]]))
       evaluationResult(wrapperName, newImports)
     }
-    def getBlock(wrapperName: String,
+    
+    def wrapCode(wrapperName: String,
                  code: String,
                  printCode: String,
                  imports: Seq[ImportData]) = s"""
       $defaultImportBlock
       ${importBlock(imports)}
 
-      case object $wrapperName{
+      object $wrapperName{
         $code
         def $$main() = { $printCode }
+        override def toString = "$wrapperName"
       }
     """
-    def getCacheBlock(code: String,
-                      imports: Seq[ImportData],
-                      printCode: String = ""): Res[(String, Class[_], Seq[ImportData])] = {
+
+    def cachedCompileBlock(code: String,
+                           imports: Seq[ImportData],
+                           printCode: String = ""): Res[(String, Class[_], Seq[ImportData])] = {
       val wrapperName = cacheTag(code, imports, evalClassloader.classpathHash)
-      val wrapperCode = getBlock(wrapperName, code, printCode, imports)
-      for ((cls, imports) <- getCachedClass(wrapperCode,wrapperName))
-      yield (wrapperName, cls, imports)
+      val wrappedCode = wrapCode(wrapperName, code, printCode, imports)
+
+      val compiled = cacheLoad(wrapperName) match {
+        case Some((classFiles, newImports)) =>
+          addToCompilerClasspath(classFiles)
+          Res.Success((classFiles, newImports))
+        case None => for {
+          (classFiles, newImports) <- compileClass(wrappedCode)
+          _ = cacheSave(wrapperName, (classFiles, imports))
+        } yield (classFiles, newImports)
+      }
+
+      for {
+        (classFiles, newImports) <- compiled
+        cls <- loadClass(wrapperName, classFiles)
+      } yield (wrapperName, cls, newImports)
     }
 
     def processScriptBlock(code: String, scriptImports: Seq[ImportData]) = for {
-      (wrapperName, cls, newImports) <- getCacheBlock(code, scriptImports)
+      (wrapperName, cls, newImports) <- cachedCompileBlock(code, scriptImports)
     } yield {
       evalMain(cls)
       evaluationResult(wrapperName, newImports)
