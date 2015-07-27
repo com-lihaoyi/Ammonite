@@ -200,12 +200,14 @@ class Interpreter(prompt0: Ref[String],
       eval.evalClassloader
     )
 
-    val cls = eval.getCachedClass(
-      "object ReplBridge extends ammonite.repl.frontend.ReplAPIHolder{}",
-      "ReplBridge"
-    )
+    val cls = for {
+      (classFiles, imports) <- compiler.compile(
+        "object ReplBridge extends ammonite.repl.frontend.ReplAPIHolder{}".getBytes,
+        _ => ()
+      )
+    } yield eval.loadClass("ReplBridge", classFiles)
     ReplAPI.initReplBridge(
-      cls.map(_._1).asInstanceOf[Res.Success[Class[ReplAPIHolder]]].s,
+      cls.asInstanceOf[Some[Res.Success[Class[ReplAPIHolder]]]].get.s,
       replApi
     )
   }
@@ -216,7 +218,7 @@ class Interpreter(prompt0: Ref[String],
   val eval = Evaluator(
     mainThread.getContextClassLoader,
     compiler.compile,
-    if (predef != "") -1 else 0,
+    0,
     storage().compileCacheLoad,
     storage().compileCacheSave,
     compiler.addToClasspath

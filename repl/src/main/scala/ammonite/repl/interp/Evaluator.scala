@@ -23,8 +23,8 @@ import scala.util.Try
  * need to get prepended to subsequent commands.
  */
 trait Evaluator{
-  def getCachedClass(code: String, wrapperName: String): Res[(Class[_], Seq[ImportData])]
 
+  def loadClass(wrapperName: String, classFiles: ClassFiles): Res[Class[_]]
   /**
    * _2, _1, 0, 1, 2, 3...
    *
@@ -204,12 +204,17 @@ object Evaluator{
     type InitEx = ExceptionInInitializerError
 
     def processLine(code: String, printCode: String, printer: Iterator[String] => Unit) = for {
+      wrapperName <- Res.Success("cmd" + getCurrentLine)
       _ <- Catching{ case e: ThreadDeath => interrupted() }
-      (wrapperName, cls, newImports) <- getCacheBlock(
+      (classFiles, newImports) <- compileClass(getBlock(
+        wrapperName,
         code,
-        previousImports.values.toSeq,
-        printCode
-      )
+        printCode,
+        previousImports.values.toSeq
+      ))
+
+      cls <- loadClass(wrapperName, classFiles)
+
       _ = currentLine += 1
       _ <- Catching{
         // Exit
@@ -219,9 +224,9 @@ object Evaluator{
         // Interrupted during evaluation
         case Ex(_: InvEx, _: ThreadDeath)       => interrupted()
 
-        case Ex(_: InvEx, _: InitEx, userEx@_*) => Res.Exception(userEx(0), ""/*, stop = "$main"*/)
-        case Ex(_: InvEx, userEx@_*)            => Res.Exception(userEx(0), ""/*, stop = "$main"*/)
-        case Ex(userEx@_*)                      => Res.Exception(userEx(0), ""/*, stop = "evaluatorRunPrinter"*/)
+        case Ex(_: InvEx, _: InitEx, userEx@_*) => Res.Exception(userEx(0), "")
+        case Ex(_: InvEx, userEx@_*)            => Res.Exception(userEx(0), "")
+        case Ex(userEx@_*)                      => Res.Exception(userEx(0), "")
       }
     } yield {
       // Exhaust the printer iterator now, before exiting the `Catching`
@@ -229,18 +234,23 @@ object Evaluator{
       evaluatorRunPrinter(printer(evalMain(cls).asInstanceOf[Iterator[String]]))
       evaluationResult(wrapperName, newImports)
     }
+    def getBlock(wrapperName: String,
+                 code: String,
+                 printCode: String,
+                 imports: Seq[ImportData]) = s"""
+      $defaultImportBlock
+      ${importBlock(imports)}
 
-    def getCacheBlock(code: String, imports: Seq[ImportData], printCode: String = ""): Res[(String, Class[_], Seq[ImportData])] = {
+      case object $wrapperName{
+        $code
+        def $$main() = { $printCode }
+      }
+    """
+    def getCacheBlock(code: String,
+                      imports: Seq[ImportData],
+                      printCode: String = ""): Res[(String, Class[_], Seq[ImportData])] = {
       val wrapperName = cacheTag(code, imports, evalClassloader.classpathHash)
-      val wrapperCode = s"""
-        $defaultImportBlock
-        ${importBlock(imports)}
-
-        case object $wrapperName{
-          $code
-          def $$main() = { $printCode }
-        }
-        """
+      val wrapperCode = getBlock(wrapperName, code, printCode, imports)
       for ((cls, imports) <- getCachedClass(wrapperCode,wrapperName))
       yield (wrapperName, cls, imports)
     }

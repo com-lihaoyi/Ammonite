@@ -11,7 +11,6 @@ object AdvancedTests extends TestSuite{
     println("AdvancedTests")
     val check = new Checker()
     'pprint{
-      if (!scala2_10) //buggy in 2.10
       check.session("""
         @ Seq.fill(10)(Seq.fill(3)("Foo"))
         res0: Seq[Seq[String]] = List(
@@ -45,7 +44,7 @@ object AdvancedTests extends TestSuite{
       // Make sure these various "special" data structures get pretty-printed
       // correctly, i.e. not as their underlying type but as something more
       // pleasantly human-readable
-      if (!scala.util.Properties.versionString.contains("2.10"))
+      if (!scala2_10)
         check.session("""
           @ import ammonite.ops._
 
@@ -93,16 +92,16 @@ object AdvancedTests extends TestSuite{
       }
       check2.session("""
         @ -x
-        res0: Int = -1
+        res1: Int = -1
 
         @ y
-        res1: String = "2"
+        res2: String = "2"
 
         @ x + y
-        res2: String = "12"
+        res3: String = "12"
 
         @ abs(-x)
-        res3: Int = 1
+        res4: Int = 1
       """)
 
     }
