@@ -89,12 +89,31 @@
       @p
         Ammonite-REPL uses @sect.ref{PPrint} to display its output by default. That means that everything is nicely formatted to fit within the width of the terminal, and is copy-paste-able!
 
+    @sect{Syntax Highlighting}
+      @img(src:="Highlighting.png", width:="100%")
+      @p
+        Ammonite syntax highlights both the code you're entering as well as any output being echoed in response. This should make it much easier to work with larger snippets of input.
+      @p
+        All colors are configurable, and you can easily turn off colors entirely via the @sect.ref{Configuration}.
+
+    @sect{Improved Editing}
+      @p
+        Ammonite by default ships with a custom implementation of readline, which provides...
+
+     @ul
+       @li
+         Multi-line editing! You can use the @b{Up} and @b{Down} arrows to navigate between lines within your snippet. This makes dealing with larger snippets of code much easier.
+       @li
+         Desktop key-bindings! You can use @b{Alt-Left}/@b{Right} to move forward/backwards by one word at a time or hold down @b{Shift} to select text to delete. These compose as you'd be used to: e.g. @b{Shift-Up} selects all the text between your current cursor and the same column one row up.
+       @li
+         Console key-bindings! All the readline-style navigation hotkeys like @b{Ctrl-W} to delete a word or @b{Esc-Left}/@b{Right} to navigate one word left/right still work.
+
+
     @sect{Configurable Truncation}
       @hl.ref(advancedTests, Seq("'truncation", "@"), "\"\"\"")
 
       @p
         Ammonite-REPL intelligently truncates your output when it's beyond a certain size. You can request for the full output to be printed on-demand, print a certain number of lines, or even change the implicit @code{pprintConfig} so subsequent lines all use your new configuration.
-
 
     @sect{Superior Autocomplete}
       @p
@@ -192,7 +211,7 @@
       ...
 
     @p
-      By default, everything in a script is compiled and executed as a single block. That means that if you want to perform classpath-modifying operations, such as @hl.scala{load.jar} or @hl.scala{load.ivy}, its results will not be available within the same script if you want to use methods, values or packages defined in the loaded code. To make this work, break the script up into multiple compilation units with an @ sign, e.g.
+      By default, everything in a script is compiled and executed as a single block. That means that if you want to perform classpath-modifying operations, such as @hl.scala{load.jar} or @hl.scala{load.ivy}, its results will not be available within the same script if you want to use methods, values or packages defined in the loaded code. To make this work, break the script up into multiple compilation units with an @@ sign, e.g.
 
     @hl.scala
       // print banner
