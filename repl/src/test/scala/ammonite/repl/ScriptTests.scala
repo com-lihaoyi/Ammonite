@@ -107,7 +107,6 @@ object ScriptTests extends TestSuite{
     'module{
       'compilationBlocks{
         'loadIvy{
-          if (!scala2_10) //buggy in 2.10
           check.session(s"""
             @ load.module("$scriptPath/LoadIvy.scala")
 
@@ -118,9 +117,8 @@ object ScriptTests extends TestSuite{
             """)
         }
         'preserveImports{
-          if (!scala2_10) { //buggy in 2.10
             val typeString =
-              if (!scala.util.Properties.versionString.contains("2.10"))
+              if (!scala2_10)
                 """Left[String, Nothing]"""
               else
                 """util.Left[String,Nothing]"""
@@ -130,7 +128,7 @@ object ScriptTests extends TestSuite{
               @ val r = res
               r: $typeString = Left("asd")
               """)
-          }
+
         }
         'annotation{
           if (!scala2_10) //buggy in 2.10
@@ -142,13 +140,12 @@ object ScriptTests extends TestSuite{
             """)
         }
         'syntax{
-          if (!scala2_10) //buggy in 2.10
           check.session(s"""
             @ load.module("$scriptPath/BlockSepSyntax.scala")
 
             @ val r = res
             r: Int = 24
-            """)
+          """)
         }
       }
       'failures{
@@ -219,42 +216,45 @@ object ScriptTests extends TestSuite{
             val storage = new MemoryStorage
             val interp = createTestInterp(storage)
             interp.replApi.load.module(s"$scriptPath/OneBlock.scala")
-            assert(storage.compileCache.size==2) //ReplBridge adds an object to cache
+            val n = storage.compileCache.size
+            assert(n == 1) // ReplBridge doesn't get counted
           }
           'two{
             val storage = new MemoryStorage
             val interp = createTestInterp(storage)
             interp.replApi.load.module(s"$scriptPath/TwoBlocks.scala")
-            assert(storage.compileCache.size==3)
+            val n = storage.compileCache.size
+            assert(n == 2)
           }
           'three{
             val storage = new MemoryStorage
             val interp = createTestInterp(storage)
             interp.replApi.load.module(s"$scriptPath/ThreeBlocks.scala")
-            assert(storage.compileCache.size==4)
+            val n = storage.compileCache.size
+            assert(n == 3)
           }
         }
         'persistence{
-          if (!scala2_10) {//buggy in 2.10
-            val tempDir = java.nio.file.Files.createTempDirectory("ammonite-tester").toFile
-            val interp1 = createTestInterp(Storage(tempDir))
-            val interp2 = createTestInterp(Storage(tempDir))
-            interp1.replApi.load.module(s"$scriptPath/OneBlock.scala")
-            interp2.replApi.load.module(s"$scriptPath/OneBlock.scala")
-            assert(interp1.eval.compilationCount == 2) //first init adds a compilation because of ReplBridge
-            assert(interp2.eval.compilationCount == 0)
-          }
+
+          val tempDir = java.nio.file.Files.createTempDirectory("ammonite-tester").toFile
+          val interp1 = createTestInterp(Storage(tempDir))
+          val interp2 = createTestInterp(Storage(tempDir))
+          interp1.replApi.load.module(s"$scriptPath/OneBlock.scala")
+          interp2.replApi.load.module(s"$scriptPath/OneBlock.scala")
+          val n1 = interp1.eval.compilationCount
+          val n2 = interp2.eval.compilationCount
+          assert(n1 == 1) // first init
+          assert(n2 == 0) // no need for further compilations
         }
         'tags{
-          if (!scala2_10) {//buggy in 2.10
-            val storage = new MemoryStorage
-            val interp = createTestInterp(storage)
-            interp.replApi.load.module(s"$scriptPath/TagBase.scala")
-            interp.replApi.load.module(s"$scriptPath/TagPrevCommand.scala")
-            interp.replApi.load.ivy("com.lihaoyi" %% "scalatags" % "0.4.5")
-            interp.replApi.load.module(s"$scriptPath/TagBase.scala")
-            assert(storage.compileCache.size == 7) //two blocks for each loading + ReplBridge
-          }
+          val storage = new MemoryStorage
+          val interp = createTestInterp(storage)
+          interp.replApi.load.module(s"$scriptPath/TagBase.scala")
+          interp.replApi.load.module(s"$scriptPath/TagPrevCommand.scala")
+          interp.replApi.load.ivy("com.lihaoyi" %% "scalatags" % "0.4.5")
+          interp.replApi.load.module(s"$scriptPath/TagBase.scala")
+          val n = storage.compileCache.size
+          assert(n == 6) // two blocks for each loading
         }
         'encapsulation{
           check.session(s"""

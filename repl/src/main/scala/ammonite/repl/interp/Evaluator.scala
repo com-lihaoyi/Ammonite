@@ -23,13 +23,8 @@ import scala.util.Try
  * need to get prepended to subsequent commands.
  */
 trait Evaluator{
-  def getCachedClass(code: String, wrapperName: String): Res[(Class[_], Seq[ImportData])]
 
-  /**
-   * _2, _1, 0, 1, 2, 3...
-   *
-   * Numbers starting from _ are used to represent predefined commands
-   */
+  def loadClass(wrapperName: String, classFiles: ClassFiles): Res[Class[_]]
   def getCurrentLine: String
   def update(newImports: Seq[ImportData]): Unit
 
@@ -121,18 +116,6 @@ object Evaluator{
 
     def addJar(url: URL) = evalClassloader.add(url)
 
-    def getCachedClass(code: String, name: String) = {
-      loadCachedClass(name) match {
-        case Some((cls, newImports)) =>
-          Res.Success((cls, newImports))
-        case None => for {
-          compileCache @ (classFiles, imports) <- compileClass(code)
-          _ = cacheSave(name, compileCache)
-          cls <- loadClass(name, classFiles)
-        } yield (cls, imports)
-      }
-    }
-
     private var _compilationCount = 0
     def compilationCount = _compilationCount
 
@@ -155,15 +138,6 @@ object Evaluator{
       }, e => "Failed to load compiled class " + e)
     }
 
-    def loadCachedClass(tag: String): Option[(Class[_],Seq[ImportData])] = {
-      cacheLoad(tag).flatMap{ case (classFiles, importData) =>
-        addToCompilerClasspath(classFiles)
-        loadClass(tag,classFiles) match {
-          case Res.Success(cls) => Some((cls,importData))
-          case _ => None
-        }
-      }
-    }
 
     def evalMain(cls: Class[_]) =
       cls.getDeclaredMethod("$main").invoke(null)
@@ -204,12 +178,17 @@ object Evaluator{
     type InitEx = ExceptionInInitializerError
 
     def processLine(code: String, printCode: String, printer: Iterator[String] => Unit) = for {
+      wrapperName <- Res.Success("cmd" + getCurrentLine)
       _ <- Catching{ case e: ThreadDeath => interrupted() }
-      (wrapperName, cls, newImports) <- getCacheBlock(
+      (classFiles, newImports) <- compileClass(wrapCode(
+        wrapperName,
         code,
-        previousImports.values.toSeq,
-        printCode
-      )
+        printCode,
+        previousImports.values.toSeq
+      ))
+
+      cls <- loadClass(wrapperName, classFiles)
+
       _ = currentLine += 1
       _ <- Catching{
         // Exit
@@ -219,9 +198,9 @@ object Evaluator{
         // Interrupted during evaluation
         case Ex(_: InvEx, _: ThreadDeath)       => interrupted()
 
-        case Ex(_: InvEx, _: InitEx, userEx@_*) => Res.Exception(userEx(0), ""/*, stop = "$main"*/)
-        case Ex(_: InvEx, userEx@_*)            => Res.Exception(userEx(0), ""/*, stop = "$main"*/)
-        case Ex(userEx@_*)                      => Res.Exception(userEx(0), ""/*, stop = "evaluatorRunPrinter"*/)
+        case Ex(_: InvEx, _: InitEx, userEx@_*) => Res.Exception(userEx(0), "")
+        case Ex(_: InvEx, userEx@_*)            => Res.Exception(userEx(0), "")
+        case Ex(userEx@_*)                      => Res.Exception(userEx(0), "")
       }
     } yield {
       // Exhaust the printer iterator now, before exiting the `Catching`
@@ -229,24 +208,45 @@ object Evaluator{
       evaluatorRunPrinter(printer(evalMain(cls).asInstanceOf[Iterator[String]]))
       evaluationResult(wrapperName, newImports)
     }
+    
+    def wrapCode(wrapperName: String,
+                 code: String,
+                 printCode: String,
+                 imports: Seq[ImportData]) = s"""
+      $defaultImportBlock
+      ${importBlock(imports)}
 
-    def getCacheBlock(code: String, imports: Seq[ImportData], printCode: String = ""): Res[(String, Class[_], Seq[ImportData])] = {
+      object $wrapperName{
+        $code
+        def $$main() = { $printCode }
+        override def toString = "$wrapperName"
+      }
+    """
+
+    def cachedCompileBlock(code: String,
+                           imports: Seq[ImportData],
+                           printCode: String = ""): Res[(String, Class[_], Seq[ImportData])] = {
       val wrapperName = cacheTag(code, imports, evalClassloader.classpathHash)
-      val wrapperCode = s"""
-        $defaultImportBlock
-        ${importBlock(imports)}
+      val wrappedCode = wrapCode(wrapperName, code, printCode, imports)
 
-        case object $wrapperName{
-          $code
-          def $$main() = { $printCode }
-        }
-        """
-      for ((cls, imports) <- getCachedClass(wrapperCode,wrapperName))
-      yield (wrapperName, cls, imports)
+      val compiled = cacheLoad(wrapperName) match {
+        case Some((classFiles, newImports)) =>
+          addToCompilerClasspath(classFiles)
+          Res.Success((classFiles, newImports))
+        case None => for {
+          (classFiles, newImports) <- compileClass(wrappedCode)
+          _ = cacheSave(wrapperName, (classFiles, imports))
+        } yield (classFiles, newImports)
+      }
+
+      for {
+        (classFiles, newImports) <- compiled
+        cls <- loadClass(wrapperName, classFiles)
+      } yield (wrapperName, cls, newImports)
     }
 
     def processScriptBlock(code: String, scriptImports: Seq[ImportData]) = for {
-      (wrapperName, cls, newImports) <- getCacheBlock(code, scriptImports)
+      (wrapperName, cls, newImports) <- cachedCompileBlock(code, scriptImports)
     } yield {
       evalMain(cls)
       evaluationResult(wrapperName, newImports)

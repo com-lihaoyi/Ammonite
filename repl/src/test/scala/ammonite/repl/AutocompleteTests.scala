@@ -1,5 +1,6 @@
 package ammonite.repl
 
+import ammonite.repl.TestUtils._
 import utest._
 import acyclic.file
 import scala.collection.{immutable => imm}
@@ -79,7 +80,7 @@ object AutocompleteTests extends TestSuite{
       complete("""object Zomg{ <caret>Zom }""", Set("Zomg") ^)
     }
     'dot{
-      if (!scala.util.Properties.versionString.contains("2.10")) {
+      if (!scala2_10) {
         complete( """java.math.<caret>""",
           Set("MathContext", "BigDecimal", "BigInteger", "RoundingMode") ^
         )
