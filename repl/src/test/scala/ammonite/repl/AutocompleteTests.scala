@@ -94,7 +94,7 @@ object AutocompleteTests extends TestSuite{
         )
 
         complete( """val x = 1; x + (x.<caret>)""",
-          Set("to", "max", "-", "+", "*", "/") -- _
+          Set("-", "+", "*", "/") -- _
         )
       }
     }
