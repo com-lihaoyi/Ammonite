@@ -2,6 +2,7 @@ package ammonite.repl.frontend
 
 import java.io.File
 
+import ammonite.ops._
 import pprint.{PPrinter, PPrint, Config}
 import ammonite.repl.{Colors, Ref, History}
 
@@ -96,19 +97,20 @@ trait ReplAPI {
    * The current working directory of the shell, that will get picked up by
    * any ammonite.ops commands you use
    */
-  implicit def wd: ammonite.ops.Path
-
+  implicit def wd: Path
   /**
    * Change the working directory `wd`; if the provided path is relative it
    * gets appended on to the current `wd`, if it's absolute it replaces.
    */
-  val cd: ammonite.ops.Op1[ammonite.ops.BasePath[_], ammonite.ops.Path]
+  val cd: ammonite.ops.Op1[ammonite.ops.Path, ammonite.ops.Path]
+
+  implicit def Relativizer[T](p: T)(implicit b: Path, f: T => RelPath): Path
 }
 trait Load extends (String => Unit){
   /**
    * Load a `.jar` file
    */
-  def jar(jar: java.io.File): Unit
+  def jar(jar: Path): Unit
   /**
    * Load a library from its maven/ivy coordinates
    */
@@ -125,13 +127,10 @@ trait Load extends (String => Unit){
    * Compilation units separated by `@\n` are evaluated sequentially.
    * If an error happens it prints an error message to the console.
    */ 
-  def exec(path: String): Unit
+  def exec(path: Path): Unit
 
-  def exec(file: File): Unit
+  def module(path: Path): Unit
 
-  def module(path: String): Unit
-
-  def module(file: File): Unit
 }
 
 // End of ReplAPI

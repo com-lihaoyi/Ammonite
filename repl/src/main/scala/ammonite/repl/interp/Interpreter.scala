@@ -3,7 +3,7 @@ package ammonite.repl.interp
 import java.io.File
 import java.nio.file.Files
 import acyclic.file
-import ammonite.ops.BasePath
+import ammonite.ops._
 import ammonite.repl.Util.IvyMap
 import pprint.{Config, PPrint}
 import annotation.tailrec
@@ -99,7 +99,7 @@ class Interpreter(prompt0: Ref[String],
       case Res.Exception(ex, msg) => true
     }
   }
-  val wdRef: Ref[ammonite.ops.Path] = Ref(ammonite.ops.cwd)
+
   lazy val replApi: ReplAPI = new DefaultReplAPI {
 
     def imports = interp.eval.previousImportBlock
@@ -113,31 +113,22 @@ class Interpreter(prompt0: Ref[String],
         processExec(line)
       }
 
-      def exec(file: File): Unit = {
-        val content = Files.readAllBytes(file.toPath)
-        apply(new String(content))
+      def exec(file: Path): Unit = {
+
+        apply(read(file))
       }
 
-      def exec(path: String): Unit = {
-        exec(new File(path))
-      }
-
-      def module(file: File): Unit = {
-        val content = Files.readAllBytes(file.toPath)
-        processModule(new String(content))
+      def module(file: Path): Unit = {
+        processModule(read(file))
         init()
-      }
-
-      def module(path: String): Unit = {
-        module(new File(path))
       }
 
       def handleJar(jar: File): Unit = {
         extraJars = extraJars ++ Seq(jar)
         eval.addJar(jar.toURI.toURL)
       }
-      def jar(jar: File): Unit = {
-        handleJar(jar)
+      def jar(jar: Path): Unit = {
+        handleJar(new java.io.File(jar.toString))
         init()
       }
       def ivy(coordinates: (String, String, String), verbose: Boolean = true): Unit = {
@@ -171,16 +162,24 @@ class Interpreter(prompt0: Ref[String],
     def compiler = Interpreter.this.compiler.compiler
     def newCompiler() = init()
     def history = storage().history()
-    implicit def wd = wdRef()
-    val cd = new ammonite.ops.Op1[ammonite.ops.BasePath[_], ammonite.ops.Path]{
-      def apply(arg: BasePath[_]) = {
-        wdRef() = arg match{
-          case p: ammonite.ops.Path => p
-          case p: ammonite.ops.RelPath => wd / p
-        }
-        wdRef()
+
+    var wd0 = cwd
+    /**
+     * The current working directory of the shell, that will get picked up by
+     * any ammonite.ops commands you use
+     */
+    implicit def wd = wd0
+    /**
+     * Change the working directory `wd`; if the provided path is relative it
+     * gets appended on to the current `wd`, if it's absolute it replaces.
+     */
+    val cd = new ammonite.ops.Op1[ammonite.ops.Path, ammonite.ops.Path]{
+      def apply(arg: Path) = {
+        wd0 = arg
+        wd0
       }
     }
+    implicit def Relativizer[T](p: T)(implicit b: Path, f: T => RelPath): Path = b/f(p)
   }
 
   var compiler: Compiler = _
