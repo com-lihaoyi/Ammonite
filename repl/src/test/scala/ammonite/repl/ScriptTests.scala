@@ -1,5 +1,6 @@
 package ammonite.repl
 
+import ammonite.ops._
 import ammonite.repl.frontend._
 import ammonite.repl.interp.Interpreter
 import ammonite.repl.IvyConstructor._
@@ -10,12 +11,20 @@ object ScriptTests extends TestSuite{
   val tests = TestSuite{
     println("ScriptTests")
     val check = new Checker()
-    val scriptPath = "repl/src/test/resource/scripts"
+
+    val scriptPath = cwd/RelPath("repl/src/test/resource/scripts")
+    val printedScriptPath = {
+      import pprint.Config.Defaults.PPrintConfig
+      pprint.tokenize(scriptPath)
+            .mkString
+    }
     'exec{
       'compilationBlocks{
         'loadIvy{
           check.session(s"""
-            @ load.exec("$scriptPath/LoadIvy.scala")
+            @ import ammonite.ops._
+
+            @ load.exec($printedScriptPath/"LoadIvy.scala")
 
             @ val r = res
             r: String = ${"\"\"\""}
@@ -30,7 +39,9 @@ object ScriptTests extends TestSuite{
             else
               """util.Left[String,Nothing]"""
           check.session(s"""
-            @ load.exec("$scriptPath/PreserveImports.scala")
+            @ import ammonite.ops._
+
+            @ load.exec($printedScriptPath/"PreserveImports.scala")
 
             @ val r = res
             r: $typeString = Left("asd")
@@ -38,7 +49,9 @@ object ScriptTests extends TestSuite{
         }
         'annotation{
           check.session(s"""
-            @ load.exec("$scriptPath/Annotation.scala")
+            @ import ammonite.ops._
+
+            @ load.exec($printedScriptPath/"Annotation.scala")
 
             @ val r = res
             r: Int = 24
@@ -46,7 +59,9 @@ object ScriptTests extends TestSuite{
         }
         'syntax{
           check.session(s"""
-            @ load.exec("$scriptPath/BlockSepSyntax.scala")
+            @ import ammonite.ops._
+
+            @ load.exec($printedScriptPath/"BlockSepSyntax.scala")
 
             @ val r = res
             r: Int = 24
@@ -56,7 +71,9 @@ object ScriptTests extends TestSuite{
       'failures{
         'syntaxError{
           check.session(s"""
-            @ load.exec("$scriptPath/SyntaxError.scala")
+            @ import ammonite.ops._
+
+            @ load.exec($printedScriptPath/"SyntaxError.scala")
             error: SyntaxError
 
             @ val r = res
@@ -68,7 +85,9 @@ object ScriptTests extends TestSuite{
         }
         'compilationError{
           check.session(s"""
-            @ load.exec("$scriptPath/CompilationError.scala")
+            @  import ammonite.ops._
+
+            @ load.exec($printedScriptPath/"CompilationError.scala")
             error: Compilation Failed
 
             @ val r = res
@@ -81,14 +100,18 @@ object ScriptTests extends TestSuite{
         }
         'nofile{
           check.session(s"""
-            @ load.exec("$scriptPath/notHere")
-            error: java.nio.file.NoSuchFileException: $scriptPath/notHere
+            @ import ammonite.ops._
+
+            @ load.exec($printedScriptPath/"notHere")
+            error: java.nio.file.NoSuchFileException
             """
           )
         }
         'multiBlockError{
           check.session(s"""
-            @ load.exec("$scriptPath/MultiBlockError.scala")
+            @ import ammonite.ops._
+
+            @ load.exec($printedScriptPath/"MultiBlockError.scala")
             error: Compilation Failed
 
             @ val r1 = res1
@@ -108,7 +131,9 @@ object ScriptTests extends TestSuite{
       'compilationBlocks{
         'loadIvy{
           check.session(s"""
-            @ load.module("$scriptPath/LoadIvy.scala")
+            @ import ammonite.ops._
+
+            @ load.module($printedScriptPath/"LoadIvy.scala")
 
             @ val r = res
             r: String = ${"\"\"\""}
@@ -123,7 +148,9 @@ object ScriptTests extends TestSuite{
               else
                 """util.Left[String,Nothing]"""
             check.session(s"""
-              @ load.module("$scriptPath/PreserveImports.scala")
+              @ import ammonite.ops._
+
+              @ load.module($printedScriptPath/"PreserveImports.scala")
 
               @ val r = res
               r: $typeString = Left("asd")
@@ -133,7 +160,9 @@ object ScriptTests extends TestSuite{
         'annotation{
           if (!scala2_10) //buggy in 2.10
           check.session(s"""
-            @ load.module("$scriptPath/Annotation.scala")
+            @ import ammonite.ops._
+
+            @ load.module($printedScriptPath/"Annotation.scala")
 
             @ val r = res
             r: Int = 24
@@ -141,7 +170,9 @@ object ScriptTests extends TestSuite{
         }
         'syntax{
           check.session(s"""
-            @ load.module("$scriptPath/BlockSepSyntax.scala")
+            @ import ammonite.ops._
+
+            @ load.module($printedScriptPath/"BlockSepSyntax.scala")
 
             @ val r = res
             r: Int = 24
@@ -151,7 +182,9 @@ object ScriptTests extends TestSuite{
       'failures{
         'syntaxError{
           check.session(s"""
-            @ load.exec("$scriptPath/SyntaxError.scala")
+            @ import ammonite.ops._
+
+            @ load.exec($printedScriptPath/"SyntaxError.scala")
             error: SyntaxError
 
             @ val r = res
@@ -163,7 +196,9 @@ object ScriptTests extends TestSuite{
         }
         'compilationError{
           check.session(s"""
-            @ load.module("$scriptPath/CompilationError.scala")
+            @ import ammonite.ops._
+
+            @ load.module($printedScriptPath/"CompilationError.scala")
             error: Compilation Failed
 
             @ val r = res
@@ -176,14 +211,18 @@ object ScriptTests extends TestSuite{
         }
         'nofile{
           check.session(s"""
-            @ load.exec("$scriptPath/notHere")
-            error: java.nio.file.NoSuchFileException: $scriptPath/notHere
+            @ import ammonite.ops._
+
+            @ load.exec($printedScriptPath/"notHere")
+            error: java.nio.file.NoSuchFileException
             """
             )
         }
         'multiBlockError{
           check.session(s"""
-            @ load.module("$scriptPath/MultiBlockError.scala")
+            @ import ammonite.ops._
+
+            @ load.module($printedScriptPath/"MultiBlockError.scala")
             error: Compilation Failed
 
             @ val r1 = res1
@@ -215,21 +254,21 @@ object ScriptTests extends TestSuite{
           'one{
             val storage = new MemoryStorage
             val interp = createTestInterp(storage)
-            interp.replApi.load.module(s"$scriptPath/OneBlock.scala")
+            interp.replApi.load.module(scriptPath/"OneBlock.scala")
             val n = storage.compileCache.size
             assert(n == 1) // ReplBridge doesn't get counted
           }
           'two{
             val storage = new MemoryStorage
             val interp = createTestInterp(storage)
-            interp.replApi.load.module(s"$scriptPath/TwoBlocks.scala")
+            interp.replApi.load.module(scriptPath/"TwoBlocks.scala")
             val n = storage.compileCache.size
             assert(n == 2)
           }
           'three{
             val storage = new MemoryStorage
             val interp = createTestInterp(storage)
-            interp.replApi.load.module(s"$scriptPath/ThreeBlocks.scala")
+            interp.replApi.load.module(scriptPath/"ThreeBlocks.scala")
             val n = storage.compileCache.size
             assert(n == 3)
           }
@@ -239,8 +278,8 @@ object ScriptTests extends TestSuite{
           val tempDir = java.nio.file.Files.createTempDirectory("ammonite-tester").toFile
           val interp1 = createTestInterp(Storage(tempDir))
           val interp2 = createTestInterp(Storage(tempDir))
-          interp1.replApi.load.module(s"$scriptPath/OneBlock.scala")
-          interp2.replApi.load.module(s"$scriptPath/OneBlock.scala")
+          interp1.replApi.load.module(scriptPath/"OneBlock.scala")
+          interp2.replApi.load.module(scriptPath/"OneBlock.scala")
           val n1 = interp1.eval.compilationCount
           val n2 = interp2.eval.compilationCount
           assert(n1 == 1) // first init
@@ -249,18 +288,20 @@ object ScriptTests extends TestSuite{
         'tags{
           val storage = new MemoryStorage
           val interp = createTestInterp(storage)
-          interp.replApi.load.module(s"$scriptPath/TagBase.scala")
-          interp.replApi.load.module(s"$scriptPath/TagPrevCommand.scala")
+          interp.replApi.load.module(scriptPath/"TagBase.scala")
+          interp.replApi.load.module(scriptPath/"TagPrevCommand.scala")
           interp.replApi.load.ivy("com.lihaoyi" %% "scalatags" % "0.4.5")
-          interp.replApi.load.module(s"$scriptPath/TagBase.scala")
+          interp.replApi.load.module(scriptPath/"TagBase.scala")
           val n = storage.compileCache.size
           assert(n == 6) // two blocks for each loading
         }
         'encapsulation{
           check.session(s"""
+            @ import ammonite.ops._
+
             @ val asd = "asd"
 
-            @ load.module("$scriptPath/Encapsulation.scala")
+            @ load.module($printedScriptPath/"Encapsulation.scala")
             error: not found: value asd
             """
             )
@@ -268,7 +309,7 @@ object ScriptTests extends TestSuite{
         'noAutoIncrementWrapper{
           val storage = new MemoryStorage
           val interp = createTestInterp(storage)
-          interp.replApi.load.module(s"$scriptPath/ThreeBlocks.scala")
+          interp.replApi.load.module(scriptPath/"ThreeBlocks.scala")
           try{
             Class.forName("cmd0") 
             assert(false)
