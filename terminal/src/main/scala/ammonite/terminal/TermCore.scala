@@ -127,6 +127,7 @@ object TermCore {
     val ansiRegex = "\u001B\\[[;\\d]*m".r
     val noAnsiPrompt = prompt.replaceAll("\u001B\\[[;\\d]*m", "")
     def redrawLine(buffer: Vector[Char], cursor: Int) = {
+      lazy val (width, _, _) = TTY.init()
       ansi.restore()
       ansi.clearScreen(0)
 //      Debug("CURSOR " + cursor)
@@ -167,6 +168,7 @@ object TermCore {
 
 
     @tailrec def rec(lastState: TermState, areaHeight: Int): Option[String] = {
+      lazy val (width, _, _) = TTY.init()
       if (!reader.ready()) redrawLine(lastState.buffer, lastState.cursor)
       filters(TermInfo(lastState, width - noAnsiPrompt.length)) match {
         case TermState(s, b, c) =>
@@ -200,11 +202,12 @@ object TermCore {
     }
 
     lazy val ansi = new Ansi(writer)
-    lazy val (width, height, initialConfig) = TTY.init()
+    lazy val (_, _, initialConfig) = TTY.init()
     try {
       ansi.save()
       rec(TermState(LazyList.continually(reader.read()), Vector.empty, 0), 1)
     }finally{
+
       // Don't close these! Closing these closes stdin/stdout,
       // which seems to kill the entire program
 
