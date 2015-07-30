@@ -180,6 +180,10 @@ class Interpreter(prompt0: Ref[String],
       }
     }
     implicit def Relativizer[T](p: T)(implicit b: Path, f: T => RelPath): Path = b/f(p)
+
+    def width = interp.width
+
+    def height = interp.height
   }
 
   var compiler: Compiler = _

@@ -105,6 +105,10 @@ trait ReplAPI {
   val cd: ammonite.ops.Op1[ammonite.ops.Path, ammonite.ops.Path]
 
   implicit def Relativizer[T](p: T)(implicit b: Path, f: T => RelPath): Path
+
+  def width: Int
+
+  def height: Int
 }
 trait Load extends (String => Unit){
   /**

@@ -9,10 +9,7 @@ import scala.annotation.tailrec
 
 // Test Unicode:  漢語;𩶘da
 object Term{
-  def consoleDim(s: String) = {
-    import sys.process._
-    Seq("bash", "-c", s"tput $s 2> /dev/tty").!!.trim.toInt
-  }
+
   def main(args: Array[String]): Unit = {
     var history = List.empty[String]
     val selection = AdvancedFilters.SelectionFilter()

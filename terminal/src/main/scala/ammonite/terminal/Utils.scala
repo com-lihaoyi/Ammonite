@@ -73,18 +73,25 @@ class Ansi(output: Writer){
   def clearLine(n: Int) = control(n, 'K')
 }
 object TTY{
+  def consoleDim(s: String) = {
+    import sys.process._
+    Seq("bash", "-c", s"tput $s 2> /dev/tty").!!.trim.toInt
+  }
   def init() = {
     val raw = stty("-a")
     import sys.process._
-    val width = Seq("tput", "cols").!!.trim.toInt
-    val height = Seq("tput", "lines").!!.trim.toInt
-    Debug("Initializing, Width " + width)
+
+    val width = consoleDim("cols")
+    val height = consoleDim("lines")
+//    Debug("Initializing, Width " + width)
+//    Debug("Initializing, Height " + height)
     val initialConfig = stty("-g").trim
     stty("-icanon min 1 -icrnl -inlcr -ixon")
     // blows up on ubuntu
 //    stty("dsusp undef")
     stty("-echo")
     stty("intr undef")
+//    Debug("")
     (width, height, initialConfig)
   }
   def stty(s: String) = {
