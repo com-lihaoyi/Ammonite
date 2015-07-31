@@ -126,10 +126,9 @@ object TermCore {
 
     val ansiRegex = "\u001B\\[[;\\d]*m".r
     val noAnsiPrompt = prompt.replaceAll("\u001B\\[[;\\d]*m", "")
-    def redrawLine(buffer: Vector[Char], cursor: Int) = {
-      lazy val (width, _, _) = TTY.init()
-      val (_, oldCursorY, _) = calculateHeight(buffer, cursor, width, noAnsiPrompt)
-      ansi.up(oldCursorY)
+    def redrawLine(buffer: Vector[Char], cursor: Int, ups: Int) = {
+      ansi.up(ups)
+
       ansi.left(9999)
       ansi.clearScreen(0)
       val (transformedBuffer, transformedCursor) = displayTransform(buffer, cursor)
@@ -155,10 +154,11 @@ object TermCore {
             i += 1
         }
       }
-      ansi.up(oldCursorY)
-      ansi.left(9999)
 
       val (nextHeight, cursorY, cursorX) = calculateHeight(buffer, transformedCursor, width, noAnsiPrompt)
+      ansi.up(nextHeight - 1)
+      ansi.left(9999)
+
 //      Debug("DOWN " + cursorY)
 //      Debug("RIGHT " + cursorX)
       ansi.down(cursorY)
@@ -168,32 +168,21 @@ object TermCore {
     }
 
 
-    @tailrec def rec(lastState: TermState, areaHeight: Int): Option[String] = {
-      lazy val (width, _, _) = TTY.init()
-      if (!reader.ready()) redrawLine(lastState.buffer, lastState.cursor)
+    @tailrec def readChar(lastState: TermState, areaHeight: Int, ups: Int): Option[String] = {
+//      lazy val (width, _, _) = TTY.init()
+      val (_, oldCursorY, _) = calculateHeight(
+        lastState.buffer, lastState.cursor, width, noAnsiPrompt
+      )
+      if (!reader.ready()) redrawLine(lastState.buffer, lastState.cursor, ups)
       filters(TermInfo(lastState, width - noAnsiPrompt.length)) match {
         case TermState(s, b, c) =>
           val newCursor = math.max(math.min(c, b.length), 0)
-
-          val (_, oldCursorY, _) = calculateHeight(b, c, width, noAnsiPrompt)
           val (nextHeight, _, _) = calculateHeight(b, newCursor, width, noAnsiPrompt)
-//          Debug("nextHeight " + nextHeight)
-          if (nextHeight > areaHeight) {
-//            Debug(s"New Height $areaHeight -> $nextHeight")
-            // Print enough lines to ensure there's enough space for
-            // everything at the new height. By printing, we get the
-            // correct behavior of scrolling the page up (if at the
-            // bottom of the screen) or moving the cursor down (if not
-            // at the bottom). We then move back to the start of our area
-            ansi.up(oldCursorY - 1)
-            ansi.left(9999)
-            writer.write("\n" * (nextHeight - 1))
-            writer.flush()
-//            ansi.up(nextHeight - 1)
-          }
-          rec(TermState(s, b, newCursor), nextHeight)
+
+          readChar(TermState(s, b, newCursor), nextHeight, oldCursorY)
+
         case Result(s) =>
-          redrawLine(lastState.buffer, lastState.buffer.length)
+          redrawLine(lastState.buffer, lastState.buffer.length, oldCursorY)
           writer.write(10)
           writer.write(13)
           writer.flush()
@@ -204,9 +193,9 @@ object TermCore {
     }
 
     lazy val ansi = new Ansi(writer)
-    lazy val (_, _, initialConfig) = TTY.init()
+    lazy val (width, height, initialConfig) = TTY.init()
     try {
-      rec(TermState(LazyList.continually(reader.read()), Vector.empty, 0), 1)
+      readChar(TermState(LazyList.continually(reader.read()), Vector.empty, 0), 1, 0)
     }finally{
 
       // Don't close these! Closing these closes stdin/stdout,
