@@ -128,11 +128,11 @@ object TermCore {
     val noAnsiPrompt = prompt.replaceAll("\u001B\\[[;\\d]*m", "")
     def redrawLine(buffer: Vector[Char], cursor: Int) = {
       lazy val (width, _, _) = TTY.init()
-      ansi.restore()
+      val (_, oldCursorY, _) = calculateHeight(buffer, cursor, width, noAnsiPrompt)
+      ansi.up(oldCursorY)
+      ansi.left(9999)
       ansi.clearScreen(0)
-//      Debug("CURSOR " + cursor)
       val (transformedBuffer, transformedCursor) = displayTransform(buffer, cursor)
-//      Debug("TransCURSOR " + transformedCursor)
       writer.write(prompt)
       var i = 0
       var currWidth = 0
@@ -155,8 +155,9 @@ object TermCore {
             i += 1
         }
       }
+      ansi.up(oldCursorY)
+      ansi.left(9999)
 
-      ansi.restore()
       val (nextHeight, cursorY, cursorX) = calculateHeight(buffer, transformedCursor, width, noAnsiPrompt)
 //      Debug("DOWN " + cursorY)
 //      Debug("RIGHT " + cursorX)
@@ -174,7 +175,8 @@ object TermCore {
         case TermState(s, b, c) =>
           val newCursor = math.max(math.min(c, b.length), 0)
 
-          val (nextHeight, cursorY, cursorX) = calculateHeight(b, newCursor, width, noAnsiPrompt)
+          val (_, oldCursorY, _) = calculateHeight(b, c, width, noAnsiPrompt)
+          val (nextHeight, _, _) = calculateHeight(b, newCursor, width, noAnsiPrompt)
 //          Debug("nextHeight " + nextHeight)
           if (nextHeight > areaHeight) {
 //            Debug(s"New Height $areaHeight -> $nextHeight")
@@ -183,11 +185,11 @@ object TermCore {
             // correct behavior of scrolling the page up (if at the
             // bottom of the screen) or moving the cursor down (if not
             // at the bottom). We then move back to the start of our area
-            ansi.restore()
+            ansi.up(oldCursorY - 1)
+            ansi.left(9999)
             writer.write("\n" * (nextHeight - 1))
             writer.flush()
-            ansi.up(nextHeight - 1)
-            ansi.save()
+//            ansi.up(nextHeight - 1)
           }
           rec(TermState(s, b, newCursor), nextHeight)
         case Result(s) =>
@@ -204,7 +206,6 @@ object TermCore {
     lazy val ansi = new Ansi(writer)
     lazy val (_, _, initialConfig) = TTY.init()
     try {
-      ansi.save()
       rec(TermState(LazyList.continually(reader.read()), Vector.empty, 0), 1)
     }finally{
 
