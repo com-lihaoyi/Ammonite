@@ -10,7 +10,7 @@ import Util.CompileCache
 import scala.annotation.tailrec
 import scala.collection.mutable
 import scala.util.Try
-
+import ammonite.ops._
 class Repl(input: InputStream,
            output: OutputStream,
            storage: Ref[Storage],
@@ -99,9 +99,9 @@ object Repl{
     )
     traces.mkString("\n")
   }
-  case class Config(predef: String = "", ammoniteHome: java.io.File = defaultAmmoniteHome)
+  case class Config(predef: String = "", ammoniteHome: Path = defaultAmmoniteHome)
 
-  def defaultAmmoniteHome = new java.io.File(System.getProperty("user.home") + "/.ammonite")
+  def defaultAmmoniteHome = Path(System.getProperty("user.home"))/".ammonite"
   def main(args: Array[String]) = {
     val parser = new scopt.OptionParser[Config]("ammonite") {
       head("ammonite", ammonite.Constants.version)
@@ -110,12 +110,12 @@ object Repl{
         .text("Any commands you want to execute at the start of the REPL session")
       opt[File]('h', "home")
         .valueName("<file>")
-        .action((x, c) => c.copy(ammoniteHome = x))
+        .action((x, c) => c.copy(ammoniteHome = Path(x)))
         .text("The home directory of the REPL; where it looks for config and caches")
     }
     parser.parse(args, Config()).foreach(c => run(c.predef, c.ammoniteHome))
   }
-  def run(predef: String = "", ammoniteHome: java.io.File = defaultAmmoniteHome) = {
+  def run(predef: String = "", ammoniteHome: Path = defaultAmmoniteHome) = {
     println("Loading Ammonite Repl...")
     Timer("Repl.run Start")
     val storage = Storage(ammoniteHome)

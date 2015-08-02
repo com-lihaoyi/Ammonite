@@ -13,7 +13,10 @@ class Checker {
   var allOutput = ""
 
 
-  val tempDir = java.nio.file.Files.createTempDirectory("ammonite-tester").toFile
+  val tempDir = ammonite.ops.Path(
+    java.nio.file.Files.createTempDirectory("ammonite-tester")
+  )
+
 
   val interp = new Interpreter(
     Ref[String](""),
