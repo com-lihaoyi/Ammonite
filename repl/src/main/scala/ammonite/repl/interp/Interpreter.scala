@@ -159,9 +159,25 @@ class Interpreter(prompt0: Ref[String],
       Ref.live[pprint.Config](
         () => interp.pprintConfig.copy(
           width = width,
-          height = height
+          height = height / 2
         )
       )
+    }
+
+    def show[T: PPrint](implicit cfg: Config) = (t: T) => {
+      pprint.tokenize(t, height = 0)(implicitly[PPrint[T]], cfg).foreach(print)
+      println()
+    }
+    def show[T: PPrint](t: T,
+                        width: Integer = null,
+                        height: Integer = 0,
+                        indent: Integer = null,
+                        colors: pprint.Colors = null)
+                       (implicit cfg: Config = Config.Defaults.PPrintConfig) = {
+
+
+      pprint.tokenize(t, width, height, indent, colors)(implicitly[PPrint[T]], cfg).foreach(print)
+      println()
     }
 
     def search(target: scala.reflect.runtime.universe.Type) = Interpreter.this.compiler.search(target)
@@ -244,7 +260,6 @@ class Interpreter(prompt0: Ref[String],
   val hardcodedPredef =
     """import ammonite.repl.frontend.ReplBridge.repl
       |import ammonite.repl.frontend.ReplBridge.repl._
-      |import pprint.pprintln
       |import ammonite.repl.IvyConstructor._
       |""".stripMargin
 

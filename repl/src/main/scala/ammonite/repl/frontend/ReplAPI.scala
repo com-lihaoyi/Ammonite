@@ -3,6 +3,7 @@ package ammonite.repl.frontend
 import java.io.File
 
 import ammonite.ops._
+import ammonite.repl.Colors
 import pprint.{PPrinter, PPrint, Config}
 import ammonite.repl.{Colors, Ref, History}
 
@@ -109,6 +110,14 @@ trait ReplAPI {
   def width: Int
 
   def height: Int
+
+  def show[T: PPrint](implicit cfg: Config): T => Unit
+  def show[T: PPrint](t: T,
+                          width: Integer = 0,
+                          height: Integer = null,
+                          indent: Integer = null,
+                          colors: pprint.Colors = null)
+                         (implicit cfg: Config = Config.Defaults.PPrintConfig): Unit
 }
 trait Load extends (String => Unit){
   /**

@@ -39,7 +39,7 @@ object FrontEnd{
     def tabulate(snippets: Seq[String], width: Int) = {
       val gap =   2
       val maxLength = snippets.maxBy(_.replaceAll("\u001B\\[[;\\d]*m", "").length).length + gap
-      val columns = width / maxLength
+      val columns = (width / maxLength) + 1
       snippets.grouped(columns).flatMap{
         case first :+ last => first.map(_.padTo(width / columns, ' ')) :+ last :+ "\n"
       }

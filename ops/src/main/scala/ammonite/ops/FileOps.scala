@@ -152,7 +152,13 @@ object LsSeq{
     PPrinter(
       (t: LsSeq, c: Config) =>
         pprint.Internals.handleChunksVertical("LsSeq", c, (c) =>
-          t.listed.iterator.map(implicitly[PPrint[RelPath]].pprinter.render(_, c))
+          t.listed
+           .iterator
+           // Don't show dotfiles by default, to follow the behavior
+           // of bash and friends. If the user wants to see them then
+           // he can call toSeq on the result
+           .filter(!_.last.startsWith("."))
+           .map(implicitly[PPrint[RelPath]].pprinter.render(_, c))
         )
 
     )
