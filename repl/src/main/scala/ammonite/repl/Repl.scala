@@ -49,6 +49,7 @@ class Repl(input: InputStream,
     _ <- Signaller("INT") { interp.mainThread.stop() }
     out <- interp.processLine(code, stmts, _.foreach(printer.print))
   } yield {
+    Timer("interp.processLine end")
     printer.println()
     out
   }
@@ -67,6 +68,7 @@ class Repl(input: InputStream,
           printer.println(colors().error() + msg + colors().reset())
         case _ =>
       }
+      Timer("End Of Loop")
       if (interp.handleOutput(res)) loop()
     }
     loop()
