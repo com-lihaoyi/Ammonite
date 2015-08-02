@@ -1,7 +1,7 @@
 package ammonite.repl.interp
 
 import java.io.File
-import java.nio.file.Files
+import java.nio.file.{NotDirectoryException, Files}
 import acyclic.file
 import ammonite.ops._
 import ammonite.repl.Util.IvyMap
@@ -120,14 +120,9 @@ class Interpreter(prompt0: Ref[String],
 
     object load extends Load{
 
-      def apply(line: String) = {
-        processExec(line)
-      }
+      def apply(line: String) = processExec(line)
 
-      def exec(file: Path): Unit = {
-
-        apply(read(file))
-      }
+      def exec(file: Path): Unit = apply(read(file))
 
       def module(file: Path): Unit = {
         processModule(read(file))
@@ -186,8 +181,11 @@ class Interpreter(prompt0: Ref[String],
      */
     val cd = new ammonite.ops.Op1[ammonite.ops.Path, ammonite.ops.Path]{
       def apply(arg: Path) = {
-        wd0 = arg
-        wd0
+        if (!stat(arg).isDir) throw new NotDirectoryException(arg.toString)
+        else {
+          wd0 = arg
+          wd0
+        }
       }
     }
     implicit def Relativizer[T](p: T)(implicit b: Path, f: T => RelPath): Path = b/f(p)
