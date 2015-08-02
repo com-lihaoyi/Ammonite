@@ -23,7 +23,6 @@ import scala.util.Try
  * need to get prepended to subsequent commands.
  */
 trait Evaluator{
-
   def loadClass(wrapperName: String, classFiles: ClassFiles): Res[Class[_]]
   def getCurrentLine: String
   def update(newImports: Seq[ImportData]): Unit
@@ -64,32 +63,14 @@ object Evaluator{
      * map. Otherwise if you import the same name twice you get compile
      * errors instead of the desired shadowing.
      */
-    lazy val previousImports = mutable.Map(defaultImports.toSeq :_*)
+    lazy val previousImports = mutable.Map.empty[String, ImportData]
 
     lazy val defaultImports = {
-      def namesFor(t: scala.reflect.runtime.universe.Type): Set[String] = {
-        val yours = t.members.map(_.name.toString).toSet
-        val default = typeOf[Object].members.map(_.name.toString)
-        yours -- default
-      }
+      Timer("defaultImports0")
 
-      def importsFor[T: TypeTag](name: String) = {
-        namesFor(typeOf[T]).map(n => n -> ImportData(n, n, "", name)).toSeq
-      }
-
-      def importFrom(src: String, name: String) = {
-        src -> ImportData(name, name, "", src)
-      }
-
-      mutable.Map(
-        importsFor[ReplAPI]("ReplBridge.repl") ++
-        importsFor[ammonite.repl.IvyConstructor]("ammonite.repl.IvyConstructor") ++
-        Seq(
-          importFrom("pprint", "pprintln"),
-          importFrom("ReplBridge", "repl")
-        )
-        :_*
-      )
+      val res = Map.empty[String, ImportData]
+      Timer("defaultImports1")
+      res
     }
 
     lazy val defaultImportBlock = importBlock(defaultImports.values.toSeq)
@@ -133,7 +114,10 @@ object Evaluator{
 
     def loadClass(wrapperName: String, classFiles: ClassFiles): Res[Class[_]] = {
       Res[Class[_]](Try {
-        for ((name, bytes) <- classFiles) evalClassloader.newFileDict(name) = bytes
+        for ((name, bytes) <- classFiles) {
+//          println("loadClass " + name)
+          evalClassloader.newFileDict(name) = bytes
+        }
         Class.forName(wrapperName , true, evalClassloader)
       }, e => "Failed to load compiled class " + e)
     }
@@ -145,6 +129,7 @@ object Evaluator{
     def previousImportBlock = importBlock(previousImports.values.toSeq)
 
     def importBlock(importData: Seq[ImportData]) = {
+      Timer("importBlock 0")
       val snippets = for {
         (prefix, allImports) <- importData.toList.groupBy(_.prefix)
         imports <- Util.transpose(allImports.groupBy(_.fromName).values.toList)
@@ -166,7 +151,9 @@ object Evaluator{
             s"import $prefix.{$block\n}"
         }
       }
-      snippets.mkString("\n")
+      val res = snippets.mkString("\n")
+      Timer("importBlock 1")
+      res
     }
   
     def interrupted() = {
@@ -226,21 +213,24 @@ object Evaluator{
     def cachedCompileBlock(code: String,
                            imports: Seq[ImportData],
                            printCode: String = ""): Res[(String, Class[_], Seq[ImportData])] = {
+      Timer("cachedCompileBlock 0")
       val wrapperName = cacheTag(code, imports, evalClassloader.classpathHash)
+      Timer("cachedCompileBlock 1")
       val wrappedCode = wrapCode(wrapperName, code, printCode, imports)
-
+      Timer("cachedCompileBlock 2")
       val compiled = cacheLoad(wrapperName) match {
         case Some((classFiles, newImports)) =>
           addToCompilerClasspath(classFiles)
           Res.Success((classFiles, newImports))
         case None => for {
           (classFiles, newImports) <- compileClass(wrappedCode)
-          _ = cacheSave(wrapperName, (classFiles, imports))
+          _ = cacheSave(wrapperName, (classFiles, newImports))
         } yield (classFiles, newImports)
       }
-
+      Timer("cachedCompileBlock 3")
       for {
         (classFiles, newImports) <- compiled
+        _ = Timer("cachedCompileBlock 4")
         cls <- loadClass(wrapperName, classFiles)
       } yield (wrapperName, cls, newImports)
     }
@@ -248,8 +238,12 @@ object Evaluator{
     def processScriptBlock(code: String, scriptImports: Seq[ImportData]) = for {
       (wrapperName, cls, newImports) <- cachedCompileBlock(code, scriptImports)
     } yield {
+      Timer("cachedCompileBlock")
       evalMain(cls)
-      evaluationResult(wrapperName, newImports)
+      Timer("evalMain")
+      val res = evaluationResult(wrapperName, newImports)
+      Timer("evaluationResult")
+      res
     }
 
     def update(newImports: Seq[ImportData]) = {

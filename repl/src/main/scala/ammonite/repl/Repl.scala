@@ -22,6 +22,7 @@ class Repl(input: InputStream,
   val frontEnd = Ref[FrontEnd](FrontEnd.Ammonite)
 
   val printer = new PrintStream(output, true)
+  Timer("Repl init printer")
   val interp: Interpreter = new Interpreter(
     prompt,
     frontEnd,
@@ -33,6 +34,7 @@ class Repl(input: InputStream,
     storage,
     predef
   )
+  Timer("Repl init interpreter")
   val reader = new InputStreamReader(input)
   def action() = for{
     (code, stmts) <- frontEnd().action(
@@ -113,6 +115,7 @@ object Repl{
   }
   def run(predef: String = "", ammoniteHome: java.io.File = defaultAmmoniteHome) = {
     println("Loading Ammonite Repl...")
+    Timer("Repl.run Start")
     val storage = Storage(ammoniteHome)
     val repl = new Repl(
       System.in, System.out,
@@ -120,7 +123,7 @@ object Repl{
       predef = predef + "\n" + storage.loadPredef
     )
     repl.run()
-
+    Timer("Repl.run End")
   }
 }
 

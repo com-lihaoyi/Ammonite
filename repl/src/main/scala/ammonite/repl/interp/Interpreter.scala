@@ -63,17 +63,28 @@ class Interpreter(prompt0: Ref[String],
  
   //common stuff in proccessModule and processExec
   def processScript(code: String, evaluate: (String, Seq[ImportData]) => Res[Evaluated]): Unit = {
-    val blocks = Parsers.splitScript(code).map(preprocess(_, ""))
+    Timer("processScript 0")
+    val blocks0 = Parsers.splitScript(code)
+    Timer("processScript 0a")
+    Parsers.splitScript(code)
+    Timer("processScript 0b")
+
+    val blocks = blocks0.map(preprocess(_, ""))
+    Timer("processScript 1")
     val errors = blocks.collect{ case Res.Failure(err) => err }
-    if(!errors.isEmpty) 
+    Timer("processScript 2")
+    if(!errors.isEmpty)
       stdout(colors0().error() + errors.mkString("\n") + colors0().reset() + "\n")
     else
       loop(blocks.collect{ case Res.Success(o) => o }, Seq())
-
+    Timer("processScript 3")
     @tailrec def loop(blocks: Seq[Preprocessor.Output], imports: Seq[ImportData]): Unit = {
       if(!blocks.isEmpty){
+        Timer("processScript loop 0")
         val Preprocessor.Output(code, _) = blocks.head //pretty printing results is disabled for scripts
+        Timer("processScript loop 1")
         val ev = evaluate(code, imports)
+        Timer("processScript loop 2")
         ev match {
           case Res.Failure(msg) =>
             throw new CompilationError(msg)
@@ -189,6 +200,7 @@ class Interpreter(prompt0: Ref[String],
   var compiler: Compiler = _
   var pressy: Pressy = _
   def init() = {
+    Timer("Interpreter init init 0")
     compiler = Compiler(
       Classpath.jarDeps ++ extraJars,
       Classpath.dirDeps,
@@ -196,12 +208,14 @@ class Interpreter(prompt0: Ref[String],
       eval.evalClassloader,
       () => pressy.shutdownPressy()
     )
+    Timer("Interpreter init init compiler")
     pressy = Pressy(
       Classpath.jarDeps ++ extraJars,
       Classpath.dirDeps,
       dynamicClasspath,
       eval.evalClassloader
     )
+    Timer("Interpreter init init pressy")
 
     val cls = for {
       (classFiles, imports) <- compiler.compile(
@@ -217,7 +231,7 @@ class Interpreter(prompt0: Ref[String],
 
   val mainThread = Thread.currentThread()
   val preprocess = Preprocessor(compiler.parse)
-
+  Timer("Interpreter init Preprocess")
   val eval = Evaluator(
     mainThread.getContextClassLoader,
     compiler.compile,
@@ -226,13 +240,17 @@ class Interpreter(prompt0: Ref[String],
     storage().compileCacheSave,
     compiler.addToClasspath
   )
-
+  Timer("Interpreterinit eval")
   init()
+  Timer("Interpreter init init")
   // Run the predef. For now we assume that the whole thing is a single
   // command, and will get compiled & run at once. We hard-code the
   // line number to -1 if the predef exists so the first user-entered
   // line becomes 0
   if (predef != "") {
-    processExec(predef)
+    processModule(predef)
+    Timer("Interpreter init predef 0")
+    init()
+    Timer("Interpreter init predef 1")
   }
 }

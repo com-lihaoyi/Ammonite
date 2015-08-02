@@ -82,7 +82,9 @@ object Storage{
           upickle.default.read[Seq[ImportData]](metadataJson)
         }.toOption
         classFiles <- loadClassFiles(cacheDir)
-      } yield (classFiles, metadata)
+      } yield {
+        (classFiles, metadata)
+      }
     }
 
     def loadClassFiles(cacheDir: File): Option[ClassFiles] = {
