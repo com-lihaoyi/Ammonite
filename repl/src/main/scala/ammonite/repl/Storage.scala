@@ -4,7 +4,7 @@ import acyclic.file
 import java.io.{File, FileInputStream, IOException, FileWriter}
 import ammonite.ops._
 import ammonite.repl.Util.{IvyMap, CompileCache, ClassFiles}
-import org.yaml.snakeyaml.Yaml
+
 import scala.util.Try
 import scala.collection.generic.{GenericCompanion, GenericTraversableTemplate, CanBuildFrom, SeqFactory}
 import scala.collection.{IterableLike, mutable, IndexedSeqLike}
@@ -19,7 +19,7 @@ import scala.collection.JavaConversions.asScalaBuffer
  */ 
 trait Storage{
   def loadPredef: String
-  val history: StableRef[History]
+  val fullHistory: StableRef[History]
   val ivyCache: StableRef[IvyMap]
   def compileCacheSave(tag: String, data: CompileCache): Unit
   def compileCacheLoad(tag: String): Option[CompileCache]
@@ -28,49 +28,44 @@ trait Storage{
 object Storage{
 
   def apply(dir: Path): Storage = new Storage{
-  
-
-    val history = new StableRef[History]{
-      def apply(): History = {
-        val yaml = new Yaml
-        try{
-          val list = yaml.load(new FileInputStream(dir + "/history"))
-          list match {
-            case a: java.util.List[String] => new History(a.toVector)
-            case _ => new History(Vector())
-          }
-        } catch {
-          case e: IOException => new History(Vector())
-        }
+    val predef = dir/"predef.scala"
+    val cacheDir = dir/'cache
+    val compileCacheDir = cacheDir/'compile
+    val ivyCacheFile = cacheDir/"ivycache.json"
+    val metadataFile = "metadata.json"
+    val historyFile = dir/'history
+    val fullHistory = new StableRef[History]{
+      def apply(): History = try{
+        new History(upickle.default.read[Vector[String]](read(historyFile)))
+      }catch{case e: Exception =>
+        new History(Vector())
       }
 
       def update(t: History): Unit = {
-        val yaml = new Yaml
-        val fw = new FileWriter(dir + "/history")
-        yaml.dump(t.toArray, fw)
+        write.over(historyFile, upickle.default.write(t.toVector))
       }
     }
 
     def compileCacheSave(tag: String, data: CompileCache): Unit = {
       val (classFiles, imports) = data
-      val cacheDir = dir/'compileCache/tag
-      if(!exists(cacheDir)){
-        mkdir(cacheDir)
+      val tagCacheDir = compileCacheDir/tag
+      if(!exists(tagCacheDir)){
+        mkdir(tagCacheDir)
         val metadata = upickle.default.write(imports)
-        write(cacheDir/"metadata.json", metadata)
+        write(tagCacheDir/metadataFile, metadata)
         classFiles.foreach{ case (name, bytes) =>
-          write(cacheDir/s"$name.class", bytes)
+          write(tagCacheDir/s"$name.class", bytes)
         }
       }
     }
 
     def compileCacheLoad(tag: String): Option[CompileCache] = {
-      val cacheDir = dir/'compileCache/tag
-      if(!exists(cacheDir)) None
+      val tagCacheDir = compileCacheDir/tag
+      if(!exists(tagCacheDir)) None
       else for{
-        metadataJson <- Try{read(cacheDir/"metadata.json")}.toOption
+        metadataJson <- Try{read(tagCacheDir/metadataFile)}.toOption
         metadata <- Try{upickle.default.read[Seq[ImportData]](metadataJson)}.toOption
-        classFiles <- loadClassFiles(cacheDir)
+        classFiles <- loadClassFiles(tagCacheDir)
       } yield {
         (classFiles, metadata)
       }
@@ -89,25 +84,20 @@ object Storage{
 
     val ivyCache = new StableRef[IvyMap]{
       def apply() = {
-        val json = try{
-          read(dir/"ivycache.json")
-        }catch{
-          case e: java.io.FileNotFoundException => "[]"
-        }
+        val json =
+          try read(ivyCacheFile)
+          catch{ case e: java.io.FileNotFoundException => "[]" }
 
-        try{
-          upickle.default.read[IvyMap](json)
-        }catch{ case e: Exception =>
-          Map.empty
-        }
+        try upickle.default.read[IvyMap](json)
+        catch{ case e: Exception => Map.empty }
       }
       def update(map: IvyMap) = {
-        write(dir/"ivycache.json", upickle.default.write(map))
+        write(ivyCacheFile, upickle.default.write(map))
       }
     }
 
     def loadPredef = try{
-      read(dir/"predef.scala")
+      read(predef)
     } catch {
       case e: java.io.FileNotFoundException => ""
     }
@@ -141,10 +131,7 @@ object History{
   implicit val historyPPrint: pprint.PPrint[History] = pprint.PPrint(
     new pprint.PPrinter[History]{
       def render0(t: History, c: pprint.Config) = {
-        val lines = if(c.height > 0) c.height else t.length
-        val seq = "\n" +: t.dropRight(lines).flatMap{ code => Seq("@ ", code, "\n") }
-        if(t.length > lines) ("\n..." +: seq).iterator
-        else seq.iterator
+        t.iterator.flatMap(Iterator("\n", _))
       }
     }
   )

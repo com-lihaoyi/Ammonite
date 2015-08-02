@@ -32,10 +32,14 @@ class Interpreter(prompt0: Ref[String],
   val dynamicClasspath = new VirtualDirectory("(memory)", None)
   var extraJars = Seq[java.io.File]()
 
+  var history = new History(Vector())
   def processLine(code: String,
                   stmts: Seq[String],
                   printer: Iterator[String] => Unit) = {
-    if (code != "") storage().history() = storage().history() :+ code
+    if (code != "") {
+      storage().fullHistory() = storage().fullHistory() :+ code
+      history = history :+ code
+    }
     for{
       _ <- Catching { case ex =>
         Res.Exception(ex, "Something unexpected went wrong =(")
@@ -183,7 +187,8 @@ class Interpreter(prompt0: Ref[String],
     def search(target: scala.reflect.runtime.universe.Type) = Interpreter.this.compiler.search(target)
     def compiler = Interpreter.this.compiler.compiler
     def newCompiler() = init()
-    def history = storage().history()
+    def fullHistory = storage().fullHistory()
+    def history = Interpreter.this.history
 
     var wd0 = cwd
     /**

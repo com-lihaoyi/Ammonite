@@ -44,7 +44,7 @@ class Repl(input: InputStream,
       colors().prompt() + prompt() + colors().reset(),
       colors(),
       interp.pressy.complete(_, interp.eval.previousImportBlock, _),
-      storage().history()
+      storage().fullHistory()
     )
     _ <- Signaller("INT") { interp.mainThread.stop() }
     out <- interp.processLine(code, stmts, _.foreach(printer.print))

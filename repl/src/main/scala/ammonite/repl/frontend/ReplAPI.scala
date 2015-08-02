@@ -45,7 +45,14 @@ trait ReplAPI {
   def help: String
 
   /**
-   * History of commands that have been entered into the shell
+   * History of commands that have been entered into the shell, including
+   * previous sessions
+   */
+  def fullHistory: History
+
+  /**
+   * History of commands that have been entered into the shell during the
+   * current session
    */
   def history: History
 
