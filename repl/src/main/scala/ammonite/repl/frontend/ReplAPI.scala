@@ -216,3 +216,4 @@ trait DefaultReplAPI extends FullReplAPI {
     }
   }
 }
+object ReplBridge extends ammonite.repl.frontend.ReplAPIHolder{}

@@ -293,12 +293,29 @@ object Evaluator{
      * classloader can get at them.
      */
     val newFileDict = mutable.Map.empty[String, Array[Byte]]
+    def findClassPublic(name: String) = findClass(name)
+    val specialLocalClasses = Set(
+      "ammonite.repl.frontend.ReplBridge",
+      "ammonite.repl.frontend.ReplBridge$"
+    )
     override def findClass(name: String): Class[_] = {
       def loadedFromBytes =
         for(bytes <- newFileDict.get(name))
         yield defineClass(name, bytes, 0, bytes.length)
 
-      loadedFromBytes.getOrElse(super.findClass(name))
+      def special =
+        if (!specialLocalClasses(name)) None
+        else{
+          import ammonite.ops._
+//          println("Custom finding class! " + name)
+          val bytes = read.resource.bytes(root/RelPath(name.replace('.', '/') + ".class"))
+          Some(defineClass(name, bytes, 0, bytes.length))
+        }
+
+      Option(this.findLoadedClass(name))
+        .orElse(loadedFromBytes)
+        .orElse(special)
+        .getOrElse(super.findClass(name))
     }
     def add(url: URL) = {
       _classpathHash = md5Hash(_classpathHash ++ jarHash(url))

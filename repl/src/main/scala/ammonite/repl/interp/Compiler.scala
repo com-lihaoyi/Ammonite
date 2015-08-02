@@ -136,6 +136,12 @@ object Compiler{
         }
         override lazy val analyzer = CompilerCompatibility.analyzer(g, evalClassloader)
       }
+      // Initialize scalac to the parser phase immediately, so we can start
+      // using Compiler#parse even if we haven't compiled any compilation
+      // units yet due to caching
+      val run = new scalac.Run()
+      scalac.phase = run.parserPhase
+      run.cancel()
       (vd, reporter, scalac)
     }
 

@@ -51,7 +51,7 @@ class Interpreter(prompt0: Ref[String],
       Thread.currentThread().setContextClassLoader(eval.evalClassloader)
       eval.processLine(
         code,
-        s"ReplBridge.repl.Internal.combinePrints(${printSnippet.mkString(", ")})",
+        s"ammonite.repl.frontend.ReplBridge.repl.Internal.combinePrints(${printSnippet.mkString(", ")})",
         printer
       )
     } finally Thread.currentThread().setContextClassLoader(oldClassloader)
@@ -216,22 +216,14 @@ class Interpreter(prompt0: Ref[String],
       eval.evalClassloader
     )
     Timer("Interpreter init init pressy")
-
-    val cls = for {
-      (classFiles, imports) <- compiler.compile(
-        "object ReplBridge extends ammonite.repl.frontend.ReplAPIHolder{}".getBytes,
-        _ => ()
-      )
-    } yield eval.loadClass("ReplBridge", classFiles)
-    ReplAPI.initReplBridge(
-      cls.asInstanceOf[Some[Res.Success[Class[ReplAPIHolder]]]].get.s,
-      replApi
-    )
   }
+
 
   val mainThread = Thread.currentThread()
   val preprocess = Preprocessor(compiler.parse)
+
   Timer("Interpreter init Preprocess")
+
   val eval = Evaluator(
     mainThread.getContextClassLoader,
     compiler.compile,
@@ -240,17 +232,26 @@ class Interpreter(prompt0: Ref[String],
     storage().compileCacheSave,
     compiler.addToClasspath
   )
+
+  eval.evalClassloader.findClassPublic("ammonite.repl.frontend.ReplBridge$")
+  val bridgeCls = eval.evalClassloader.findClassPublic("ammonite.repl.frontend.ReplBridge")
+
+  ReplAPI.initReplBridge(
+    bridgeCls.asInstanceOf[Class[ReplAPIHolder]],
+    replApi
+  )
   Timer("Interpreterinit eval")
   init()
   Timer("Interpreter init init")
-  // Run the predef. For now we assume that the whole thing is a single
-  // command, and will get compiled & run at once. We hard-code the
-  // line number to -1 if the predef exists so the first user-entered
-  // line becomes 0
-  if (predef != "") {
-    processModule(predef)
-    Timer("Interpreter init predef 0")
-    init()
-    Timer("Interpreter init predef 1")
-  }
+  val hardcodedPredef =
+    """import ammonite.repl.frontend.ReplBridge.repl
+      |import ammonite.repl.frontend.ReplBridge.repl._
+      |import pprint.pprintln
+      |import ammonite.repl.IvyConstructor._
+      |""".stripMargin
+
+  processModule(hardcodedPredef + predef)
+  Timer("Interpreter init predef 0")
+  init()
+  Timer("Interpreter init predef 1")
 }
