@@ -68,7 +68,7 @@ object ProjectTests extends TestSuite{
           @ load("val x = 1")
 
           @ x
-          res2: Int = 1
+          res3: Int = 1
         """)
       }
     }

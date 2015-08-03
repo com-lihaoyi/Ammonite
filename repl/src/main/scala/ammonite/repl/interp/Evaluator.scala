@@ -65,16 +65,6 @@ object Evaluator{
      */
     lazy val previousImports = mutable.Map.empty[String, ImportData]
 
-    lazy val defaultImports = {
-      Timer("defaultImports0")
-
-      val res = Map.empty[String, ImportData]
-      Timer("defaultImports1")
-      res
-    }
-
-    lazy val defaultImportBlock = importBlock(defaultImports.values.toSeq)
-
     /**
      * The current line number of the REPL, used to make sure every snippet
      * evaluated can have a distinct name that doesn't collide.
@@ -204,7 +194,6 @@ object Evaluator{
                  code: String,
                  printCode: String,
                  imports: Seq[ImportData]) = s"""
-      $defaultImportBlock
       ${importBlock(imports)}
 
       object $wrapperName{

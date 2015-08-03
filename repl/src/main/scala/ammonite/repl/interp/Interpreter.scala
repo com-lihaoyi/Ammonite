@@ -29,6 +29,12 @@ class Interpreter(prompt0: Ref[String],
                   storage: Ref[Storage],
                   predef: String){ interp =>
 
+  val hardcodedPredef =
+    """import ammonite.repl.frontend.ReplBridge.repl
+      |import ammonite.repl.frontend.ReplBridge.repl._
+      |import ammonite.repl.IvyConstructor._
+      |""".stripMargin
+
   val dynamicClasspath = new VirtualDirectory("(memory)", None)
   var extraJars = Seq[java.io.File]()
 
@@ -61,9 +67,9 @@ class Interpreter(prompt0: Ref[String],
     } finally Thread.currentThread().setContextClassLoader(oldClassloader)
   }
 
-  def processModule(code: String) = processScript(code, eval.processScriptBlock)
+  def processModule(code: String) = processScript(hardcodedPredef + "\n@\n" + code, eval.processScriptBlock)
 
-  def processExec(code: String) = processScript(code, { (c, _) => evaluateLine(c, Seq(), _ => ()) })
+  def processExec(code: String) = processScript(hardcodedPredef + "\n@\n" + code, { (c, _) => evaluateLine(c, Seq(), _ => ()) })
  
   //common stuff in proccessModule and processExec
   def processScript(code: String, evaluate: (String, Seq[ImportData]) => Res[Evaluated]): Unit = {
@@ -262,13 +268,10 @@ class Interpreter(prompt0: Ref[String],
   Timer("Interpreterinit eval")
   init()
   Timer("Interpreter init init")
-  val hardcodedPredef =
-    """import ammonite.repl.frontend.ReplBridge.repl
-      |import ammonite.repl.frontend.ReplBridge.repl._
-      |import ammonite.repl.IvyConstructor._
-      |""".stripMargin
 
-  processModule(hardcodedPredef + predef)
+
+  processModule(hardcodedPredef)
+  processModule(predef)
   Timer("Interpreter init predef 0")
   init()
   Timer("Interpreter init predef 1")

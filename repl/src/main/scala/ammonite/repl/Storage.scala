@@ -86,13 +86,13 @@ object Storage{
       def apply() = {
         val json =
           try read(ivyCacheFile)
-          catch{ case e: java.io.FileNotFoundException => "[]" }
+          catch{ case e: java.nio.file.NoSuchFileException => "[]" }
 
         try upickle.default.read[IvyMap](json)
         catch{ case e: Exception => Map.empty }
       }
       def update(map: IvyMap) = {
-        write(ivyCacheFile, upickle.default.write(map))
+        write.over(ivyCacheFile, upickle.default.write(map))
       }
     }
 
