@@ -18,6 +18,7 @@ object ScriptTests extends TestSuite{
       pprint.tokenize(scriptPath)
             .mkString
     }
+
     'exec{
       'compilationBlocks{
         'loadIvy{
@@ -251,39 +252,31 @@ object ScriptTests extends TestSuite{
         )
 
         'blocks{
-          'one{
+          val cases = Seq("OneBlock.scala" -> 3, "TwoBlocks.scala" -> 4, "ThreeBlocks.scala" -> 5)
+          for((fileName, expected) <- cases){
             val storage = new MemoryStorage
             val interp = createTestInterp(storage)
-            interp.replApi.load.module(scriptPath/"OneBlock.scala")
+            val n0 = storage.compileCache.size
+            assert(n0 == 2) // Predef + hardcodedPredef
+            interp.replApi.load.module(scriptPath/fileName)
             val n = storage.compileCache.size
-            assert(n == 1) // ReplBridge doesn't get counted
-          }
-          'two{
-            val storage = new MemoryStorage
-            val interp = createTestInterp(storage)
-            interp.replApi.load.module(scriptPath/"TwoBlocks.scala")
-            val n = storage.compileCache.size
-            assert(n == 2)
-          }
-          'three{
-            val storage = new MemoryStorage
-            val interp = createTestInterp(storage)
-            interp.replApi.load.module(scriptPath/"ThreeBlocks.scala")
-            val n = storage.compileCache.size
-            assert(n == 3)
+            assert(n == expected)
           }
         }
         'persistence{
 
-          val tempDir = java.nio.file.Files.createTempDirectory("ammonite-tester").toFile
+          val tempDir = ammonite.ops.Path(
+            java.nio.file.Files.createTempDirectory("ammonite-tester-x")
+          )
+          println(tempDir)
           val interp1 = createTestInterp(Storage(tempDir))
           val interp2 = createTestInterp(Storage(tempDir))
           interp1.replApi.load.module(scriptPath/"OneBlock.scala")
           interp2.replApi.load.module(scriptPath/"OneBlock.scala")
           val n1 = interp1.eval.compilationCount
           val n2 = interp2.eval.compilationCount
-          assert(n1 == 1) // first init
-          assert(n2 == 0) // no need for further compilations
+          assert(n1 == 3) // hardcodedPredef + predef + first init
+          assert(n2 == 0) // all three should be cached
         }
         'tags{
           val storage = new MemoryStorage
@@ -293,7 +286,7 @@ object ScriptTests extends TestSuite{
           interp.replApi.load.ivy("com.lihaoyi" %% "scalatags" % "0.4.5")
           interp.replApi.load.module(scriptPath/"TagBase.scala")
           val n = storage.compileCache.size
-          assert(n == 6) // two blocks for each loading
+          assert(n == 9) // predef + two blocks for each loading
         }
         'encapsulation{
           check.session(s"""

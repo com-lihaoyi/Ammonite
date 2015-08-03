@@ -3,6 +3,7 @@ package ammonite.repl.frontend
 import java.io.File
 
 import ammonite.ops._
+import ammonite.repl.Colors
 import pprint.{PPrinter, PPrint, Config}
 import ammonite.repl.{Colors, Ref, History}
 
@@ -44,7 +45,14 @@ trait ReplAPI {
   def help: String
 
   /**
-   * History of commands that have been entered into the shell
+   * History of commands that have been entered into the shell, including
+   * previous sessions
+   */
+  def fullHistory: History
+
+  /**
+   * History of commands that have been entered into the shell during the
+   * current session
    */
   def history: History
 
@@ -109,6 +117,14 @@ trait ReplAPI {
   def width: Int
 
   def height: Int
+
+  def show[T: PPrint](implicit cfg: Config): T => Unit
+  def show[T: PPrint](t: T,
+                          width: Integer = 0,
+                          height: Integer = null,
+                          indent: Integer = null,
+                          colors: pprint.Colors = null)
+                         (implicit cfg: Config = Config.Defaults.PPrintConfig): Unit
 }
 trait Load extends (String => Unit){
   /**
@@ -216,3 +232,4 @@ trait DefaultReplAPI extends FullReplAPI {
     }
   }
 }
+object ReplBridge extends ammonite.repl.frontend.ReplAPIHolder{}

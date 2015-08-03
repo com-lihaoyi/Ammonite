@@ -23,7 +23,6 @@ import scala.util.Try
  * need to get prepended to subsequent commands.
  */
 trait Evaluator{
-
   def loadClass(wrapperName: String, classFiles: ClassFiles): Res[Class[_]]
   def getCurrentLine: String
   def update(newImports: Seq[ImportData]): Unit
@@ -64,35 +63,7 @@ object Evaluator{
      * map. Otherwise if you import the same name twice you get compile
      * errors instead of the desired shadowing.
      */
-    lazy val previousImports = mutable.Map(defaultImports.toSeq :_*)
-
-    lazy val defaultImports = {
-      def namesFor(t: scala.reflect.runtime.universe.Type): Set[String] = {
-        val yours = t.members.map(_.name.toString).toSet
-        val default = typeOf[Object].members.map(_.name.toString)
-        yours -- default
-      }
-
-      def importsFor[T: TypeTag](name: String) = {
-        namesFor(typeOf[T]).map(n => n -> ImportData(n, n, "", name)).toSeq
-      }
-
-      def importFrom(src: String, name: String) = {
-        src -> ImportData(name, name, "", src)
-      }
-
-      mutable.Map(
-        importsFor[ReplAPI]("ReplBridge.repl") ++
-        importsFor[ammonite.repl.IvyConstructor]("ammonite.repl.IvyConstructor") ++
-        Seq(
-          importFrom("pprint", "pprintln"),
-          importFrom("ReplBridge", "repl")
-        )
-        :_*
-      )
-    }
-
-    lazy val defaultImportBlock = importBlock(defaultImports.values.toSeq)
+    lazy val previousImports = mutable.Map.empty[String, ImportData]
 
     /**
      * The current line number of the REPL, used to make sure every snippet
@@ -133,7 +104,10 @@ object Evaluator{
 
     def loadClass(wrapperName: String, classFiles: ClassFiles): Res[Class[_]] = {
       Res[Class[_]](Try {
-        for ((name, bytes) <- classFiles) evalClassloader.newFileDict(name) = bytes
+        for ((name, bytes) <- classFiles) {
+//          println("loadClass " + name)
+          evalClassloader.newFileDict(name) = bytes
+        }
         Class.forName(wrapperName , true, evalClassloader)
       }, e => "Failed to load compiled class " + e)
     }
@@ -145,6 +119,7 @@ object Evaluator{
     def previousImportBlock = importBlock(previousImports.values.toSeq)
 
     def importBlock(importData: Seq[ImportData]) = {
+      Timer("importBlock 0")
       val snippets = for {
         (prefix, allImports) <- importData.toList.groupBy(_.prefix)
         imports <- Util.transpose(allImports.groupBy(_.fromName).values.toList)
@@ -166,7 +141,9 @@ object Evaluator{
             s"import $prefix.{$block\n}"
         }
       }
-      snippets.mkString("\n")
+      val res = snippets.mkString("\n")
+      Timer("importBlock 1")
+      res
     }
   
     def interrupted() = {
@@ -186,9 +163,9 @@ object Evaluator{
         printCode,
         previousImports.values.toSeq
       ))
-
+      _ = Timer("eval.processLine compileClass end")
       cls <- loadClass(wrapperName, classFiles)
-
+      _ = Timer("eval.processLine loadClass end")
       _ = currentLine += 1
       _ <- Catching{
         // Exit
@@ -205,7 +182,11 @@ object Evaluator{
     } yield {
       // Exhaust the printer iterator now, before exiting the `Catching`
       // block, so any exceptions thrown get properly caught and handled
-      evaluatorRunPrinter(printer(evalMain(cls).asInstanceOf[Iterator[String]]))
+
+      val iter = evalMain(cls).asInstanceOf[Iterator[String]]
+      Timer("eval.processLine evaluatorRunPrinter 1")
+      evaluatorRunPrinter(printer(iter))
+      Timer("eval.processLine evaluatorRunPrinter end")
       evaluationResult(wrapperName, newImports)
     }
     
@@ -213,7 +194,6 @@ object Evaluator{
                  code: String,
                  printCode: String,
                  imports: Seq[ImportData]) = s"""
-      $defaultImportBlock
       ${importBlock(imports)}
 
       object $wrapperName{
@@ -226,21 +206,24 @@ object Evaluator{
     def cachedCompileBlock(code: String,
                            imports: Seq[ImportData],
                            printCode: String = ""): Res[(String, Class[_], Seq[ImportData])] = {
+      Timer("cachedCompileBlock 0")
       val wrapperName = cacheTag(code, imports, evalClassloader.classpathHash)
+      Timer("cachedCompileBlock 1")
       val wrappedCode = wrapCode(wrapperName, code, printCode, imports)
-
+      Timer("cachedCompileBlock 2")
       val compiled = cacheLoad(wrapperName) match {
         case Some((classFiles, newImports)) =>
           addToCompilerClasspath(classFiles)
           Res.Success((classFiles, newImports))
         case None => for {
           (classFiles, newImports) <- compileClass(wrappedCode)
-          _ = cacheSave(wrapperName, (classFiles, imports))
+          _ = cacheSave(wrapperName, (classFiles, newImports))
         } yield (classFiles, newImports)
       }
-
+      Timer("cachedCompileBlock 3")
       for {
         (classFiles, newImports) <- compiled
+        _ = Timer("cachedCompileBlock 4")
         cls <- loadClass(wrapperName, classFiles)
       } yield (wrapperName, cls, newImports)
     }
@@ -248,8 +231,12 @@ object Evaluator{
     def processScriptBlock(code: String, scriptImports: Seq[ImportData]) = for {
       (wrapperName, cls, newImports) <- cachedCompileBlock(code, scriptImports)
     } yield {
+      Timer("cachedCompileBlock")
       evalMain(cls)
-      evaluationResult(wrapperName, newImports)
+      Timer("evalMain")
+      val res = evaluationResult(wrapperName, newImports)
+      Timer("evaluationResult")
+      res
     }
 
     def update(newImports: Seq[ImportData]) = {
@@ -299,12 +286,29 @@ object Evaluator{
      * classloader can get at them.
      */
     val newFileDict = mutable.Map.empty[String, Array[Byte]]
+    def findClassPublic(name: String) = findClass(name)
+    val specialLocalClasses = Set(
+      "ammonite.repl.frontend.ReplBridge",
+      "ammonite.repl.frontend.ReplBridge$"
+    )
     override def findClass(name: String): Class[_] = {
       def loadedFromBytes =
         for(bytes <- newFileDict.get(name))
         yield defineClass(name, bytes, 0, bytes.length)
 
-      loadedFromBytes.getOrElse(super.findClass(name))
+      def special =
+        if (!specialLocalClasses(name)) None
+        else{
+          import ammonite.ops._
+//          println("Custom finding class! " + name)
+          val bytes = read.resource.bytes(root/RelPath(name.replace('.', '/') + ".class"))
+          Some(defineClass(name, bytes, 0, bytes.length))
+        }
+
+      Option(this.findLoadedClass(name))
+        .orElse(loadedFromBytes)
+        .orElse(special)
+        .getOrElse(super.findClass(name))
     }
     def add(url: URL) = {
       _classpathHash = md5Hash(_classpathHash ++ jarHash(url))

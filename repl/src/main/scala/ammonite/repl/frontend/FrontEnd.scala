@@ -39,7 +39,7 @@ object FrontEnd{
     def tabulate(snippets: Seq[String], width: Int) = {
       val gap =   2
       val maxLength = snippets.maxBy(_.replaceAll("\u001B\\[[;\\d]*m", "").length).length + gap
-      val columns = width / maxLength
+      val columns = (width / maxLength) + 1
       snippets.grouped(columns).flatMap{
         case first :+ last => first.map(_.padTo(width / columns, ' ')) :+ last :+ "\n"
       }
@@ -56,8 +56,8 @@ object FrontEnd{
                colors: Colors,
                compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
                history: Seq[String]) = {
-
-      readLine(reader, output, prompt, colors, compilerComplete, history) match{
+      Timer("FrontEnd.Ammonite.action start")
+      val res = readLine(reader, output, prompt, colors, compilerComplete, history) match{
         case None => Res.Exit
         case Some(code) =>
           Parsers.Splitter.parse(code) match{
@@ -67,6 +67,8 @@ object FrontEnd{
             )
           }
       }
+      Timer("FrontEnd.Ammonite.action end")
+      res
     }
     def readLine(reader: java.io.Reader,
                  output: OutputStream,
@@ -74,6 +76,7 @@ object FrontEnd{
                  colors: Colors,
                  compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
                  history: Seq[String]) = {
+      Timer("FrontEnd.Ammonite.readLine start")
       val writer = new OutputStreamWriter(output)
       val autocompleteFilter: TermCore.Filter = {
         case TermInfo(TermState(9 ~: rest, b, c), width) => // Enter
@@ -125,10 +128,8 @@ object FrontEnd{
       val historyFilter = ReadlineFilters.HistoryFilter(() => history.reverse)
       val cutPasteFilter = ReadlineFilters.CutPasteFilter()
       val selectionFilter = AdvancedFilters.SelectionFilter()
-      TermCore.readLine(
-        prompt,
-        reader,
-        writer,
+
+      val allFilters =
         selectionFilter orElse
         AdvancedFilters.altFilter orElse
         AdvancedFilters.fnFilter orElse
@@ -137,7 +138,14 @@ object FrontEnd{
         historyFilter.filter orElse
         cutPasteFilter orElse
         multilineFilter orElse
-        BasicFilters.all,
+        BasicFilters.all
+
+      Timer("FrontEnd.Ammonite.readLine 1")
+      val res = TermCore.readLine(
+        prompt,
+        reader,
+        writer,
+        allFilters,
         displayTransform = { (buffer, cursor) =>
           val indices = Highlighter.defaultHighlightIndices(
             buffer,
@@ -168,7 +176,8 @@ object FrontEnd{
           }
         }
       )
-
+      Timer("TermCore.readLine")
+      res
     }
   }
   object JLineUnix extends JLineTerm(() => new jline.UnixTerminal())

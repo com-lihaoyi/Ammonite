@@ -102,7 +102,6 @@ lazy val repl = project
       "org.apache.ivy" % "ivy" % "2.4.0",
       "com.lihaoyi" %% "scalaparse" % "0.2.1",
       "com.lihaoyi" %% "upickle" % "0.3.4",
-      "org.yaml" % "snakeyaml" % "1.15",
       "com.lihaoyi" %% "pprint" % "0.3.4",
       "com.github.scopt" %% "scopt" % "3.3.0"
     ),

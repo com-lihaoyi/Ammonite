@@ -2,8 +2,9 @@ package ammonite.repl
 
 import acyclic.file
 import java.io.{File, FileInputStream, IOException, FileWriter}
+import ammonite.ops._
 import ammonite.repl.Util.{IvyMap, CompileCache, ClassFiles}
-import org.yaml.snakeyaml.Yaml
+
 import scala.util.Try
 import scala.collection.generic.{GenericCompanion, GenericTraversableTemplate, CanBuildFrom, SeqFactory}
 import scala.collection.{IterableLike, mutable, IndexedSeqLike}
@@ -18,7 +19,7 @@ import scala.collection.JavaConversions.asScalaBuffer
  */ 
 trait Storage{
   def loadPredef: String
-  val history: StableRef[History]
+  val fullHistory: StableRef[History]
   val ivyCache: StableRef[IvyMap]
   def compileCacheSave(tag: String, data: CompileCache): Unit
   def compileCacheLoad(tag: String): Option[CompileCache]
@@ -26,71 +27,56 @@ trait Storage{
 
 object Storage{
 
-  def apply(dir: File): Storage = new Storage{
-  
-    if(dir.exists){
-      if(!dir.isDirectory){
-        dir.delete()
-        dir.mkdir()
-      }
-    } else {
-      dir.mkdir()
-    }
-
-    val history = new StableRef[History]{
-      def apply(): History = {
-        val yaml = new Yaml
-        try{
-          val list = yaml.load(new FileInputStream(dir + "/history"))
-          list match {
-            case a: java.util.List[String] => new History(a.toVector)
-            case _ => new History(Vector())
-          }
-        } catch {
-          case e: IOException => new History(Vector())
-        }
+  def apply(dir: Path): Storage = new Storage{
+    val predef = dir/"predef.scala"
+    val cacheDir = dir/'cache
+    val compileCacheDir = cacheDir/'compile
+    val ivyCacheFile = cacheDir/"ivycache.json"
+    val metadataFile = "metadata.json"
+    val historyFile = dir/'history
+    val fullHistory = new StableRef[History]{
+      def apply(): History = try{
+        new History(upickle.default.read[Vector[String]](read(historyFile)))
+      }catch{case e: Exception =>
+        new History(Vector())
       }
 
       def update(t: History): Unit = {
-        val yaml = new Yaml
-        val fw = new FileWriter(dir + "/history")
-        yaml.dump(t.toArray, fw)
+        write.over(historyFile, upickle.default.write(t.toVector))
       }
     }
 
     def compileCacheSave(tag: String, data: CompileCache): Unit = {
       val (classFiles, imports) = data
-      val cacheDir = new File(dir + s"/compileCache/$tag")
-      if(!cacheDir.exists){
-        cacheDir.mkdirs()
+      val tagCacheDir = compileCacheDir/tag
+      if(!exists(tagCacheDir)){
+        mkdir(tagCacheDir)
         val metadata = upickle.default.write(imports)
-        writeFile(cacheDir + "/metadata.json", metadata.getBytes)
+        write(tagCacheDir/metadataFile, metadata)
         classFiles.foreach{ case (name, bytes) =>
-          writeFile(cacheDir + s"/$name.class", bytes)
+          write(tagCacheDir/s"$name.class", bytes)
         }
       }
     }
 
     def compileCacheLoad(tag: String): Option[CompileCache] = {
-      val cacheDir = new File(dir + s"/compileCache/$tag")
-      if(!cacheDir.exists) None
+      val tagCacheDir = compileCacheDir/tag
+      if(!exists(tagCacheDir)) None
       else for{
-        metadataJson <- Try{
-          new String(readFile(cacheDir + "/metadata.json"))
-        }.toOption
-        metadata <- Try{
-          upickle.default.read[Seq[ImportData]](metadataJson)
-        }.toOption
-        classFiles <- loadClassFiles(cacheDir)
-      } yield (classFiles, metadata)
+        metadataJson <- Try{read(tagCacheDir/metadataFile)}.toOption
+        metadata <- Try{upickle.default.read[Seq[ImportData]](metadataJson)}.toOption
+        classFiles <- loadClassFiles(tagCacheDir)
+      } yield {
+        (classFiles, metadata)
+      }
     }
 
-    def loadClassFiles(cacheDir: File): Option[ClassFiles] = {
-      val classFiles = cacheDir.listFiles().filter(_.getName.endsWith(".class"))
+    def loadClassFiles(cacheDir: Path): Option[ClassFiles] = {
+      val classFiles = ls(cacheDir).filter(_.ext == "class")
       Try{
-        val data = classFiles.map{ file =>
-          val className = file.getName.replaceAll("\\.class$","")
-          (className, readFile(file))
+        val data = classFiles.map{ case file =>
+          val className = (file - cacheDir).toString.stripSuffix(".class")
+          (className, read.bytes(file))
         }
         data
       }.toOption.map(_.toSeq)
@@ -98,46 +84,22 @@ object Storage{
 
     val ivyCache = new StableRef[IvyMap]{
       def apply() = {
-        val json = try{
-          new String(readFile(dir + "/ivycache.json"))
-        }catch{
-          case e: java.io.FileNotFoundException => "[]"
-        }
+        val json =
+          try read(ivyCacheFile)
+          catch{ case e: java.nio.file.NoSuchFileException => "[]" }
 
-        try{
-          upickle.default.read[IvyMap](json)
-        }catch{ case e: Exception =>
-          Map.empty
-        }
+        try upickle.default.read[IvyMap](json)
+        catch{ case e: Exception => Map.empty }
       }
       def update(map: IvyMap) = {
-        writeFile(dir + "/ivycache.json", upickle.default.write(map).getBytes)
+        write.over(ivyCacheFile, upickle.default.write(map))
       }
     }
 
     def loadPredef = try{
-      new String(readFile(dir + "/predef.scala"))
+      read(predef)
     } catch {
       case e: java.io.FileNotFoundException => ""
-    }
-
-    def writeFile(filename: String, data: Array[Byte]): Unit = {
-      val fos = new java.io.FileOutputStream(filename)
-      fos.write(data)
-      fos.flush()
-    }
-
-    def readFile(filename: String): Array[Byte] = {
-      val file = new File(filename)
-      readFile(file)
-    }
-
-    def readFile(file: File): Array[Byte] = {
-      val fis = new java.io.FileInputStream(file)
-      val bytes = new Array[Byte](file.length.toInt)
-      var c = 0
-      while(c < bytes.length) c += fis.read(bytes, c, bytes.length-c)
-      bytes
     }
   }
 }
@@ -169,10 +131,7 @@ object History{
   implicit val historyPPrint: pprint.PPrint[History] = pprint.PPrint(
     new pprint.PPrinter[History]{
       def render0(t: History, c: pprint.Config) = {
-        val lines = if(c.height > 0) c.height else t.length
-        val seq = "\n" +: t.dropRight(lines).flatMap{ code => Seq("@ ", code, "\n") }
-        if(t.length > lines) ("\n..." +: seq).iterator
-        else seq.iterator
+        t.iterator.flatMap(Iterator("\n", _))
       }
     }
   )

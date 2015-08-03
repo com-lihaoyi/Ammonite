@@ -10,7 +10,7 @@ import Util.CompileCache
 import scala.annotation.tailrec
 import scala.collection.mutable
 import scala.util.Try
-
+import ammonite.ops._
 class Repl(input: InputStream,
            output: OutputStream,
            storage: Ref[Storage],
@@ -22,6 +22,7 @@ class Repl(input: InputStream,
   val frontEnd = Ref[FrontEnd](FrontEnd.Ammonite)
 
   val printer = new PrintStream(output, true)
+  Timer("Repl init printer")
   val interp: Interpreter = new Interpreter(
     prompt,
     frontEnd,
@@ -33,6 +34,7 @@ class Repl(input: InputStream,
     storage,
     predef
   )
+  Timer("Repl init interpreter")
   val reader = new InputStreamReader(input)
   def action() = for{
     (code, stmts) <- frontEnd().action(
@@ -42,11 +44,12 @@ class Repl(input: InputStream,
       colors().prompt() + prompt() + colors().reset(),
       colors(),
       interp.pressy.complete(_, interp.eval.previousImportBlock, _),
-      storage().history()
+      storage().fullHistory()
     )
     _ <- Signaller("INT") { interp.mainThread.stop() }
     out <- interp.processLine(code, stmts, _.foreach(printer.print))
   } yield {
+    Timer("interp.processLine end")
     printer.println()
     out
   }
@@ -65,6 +68,7 @@ class Repl(input: InputStream,
           printer.println(colors().error() + msg + colors().reset())
         case _ =>
       }
+      Timer("End Of Loop")
       if (interp.handleOutput(res)) loop()
     }
     loop()
@@ -95,9 +99,9 @@ object Repl{
     )
     traces.mkString("\n")
   }
-  case class Config(predef: String = "", ammoniteHome: java.io.File = defaultAmmoniteHome)
+  case class Config(predef: String = "", ammoniteHome: Path = defaultAmmoniteHome)
 
-  def defaultAmmoniteHome = new java.io.File(System.getProperty("user.home") + "/.ammonite")
+  def defaultAmmoniteHome = Path(System.getProperty("user.home"))/".ammonite"
   def main(args: Array[String]) = {
     val parser = new scopt.OptionParser[Config]("ammonite") {
       head("ammonite", ammonite.Constants.version)
@@ -106,13 +110,14 @@ object Repl{
         .text("Any commands you want to execute at the start of the REPL session")
       opt[File]('h', "home")
         .valueName("<file>")
-        .action((x, c) => c.copy(ammoniteHome = x))
+        .action((x, c) => c.copy(ammoniteHome = Path(x)))
         .text("The home directory of the REPL; where it looks for config and caches")
     }
     parser.parse(args, Config()).foreach(c => run(c.predef, c.ammoniteHome))
   }
-  def run(predef: String = "", ammoniteHome: java.io.File = defaultAmmoniteHome) = {
+  def run(predef: String = "", ammoniteHome: Path = defaultAmmoniteHome) = {
     println("Loading Ammonite Repl...")
+    Timer("Repl.run Start")
     val storage = Storage(ammoniteHome)
     val repl = new Repl(
       System.in, System.out,
@@ -120,7 +125,7 @@ object Repl{
       predef = predef + "\n" + storage.loadPredef
     )
     repl.run()
-
+    Timer("Repl.run End")
   }
 }
 

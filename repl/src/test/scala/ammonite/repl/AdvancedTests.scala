@@ -92,16 +92,16 @@ object AdvancedTests extends TestSuite{
       }
       check2.session("""
         @ -x
-        res1: Int = -1
+        res0: Int = -1
 
         @ y
-        res2: String = "2"
+        res1: String = "2"
 
         @ x + y
-        res3: String = "12"
+        res2: String = "12"
 
         @ abs(-x)
-        res4: Int = 1
+        res3: Int = 1
       """)
 
     }
@@ -196,6 +196,26 @@ object AdvancedTests extends TestSuite{
 
         @ x
         error: not found: value x
+      """)
+    }
+    'replApiUniqueness{
+      // Make sure we can instantiate multiple copies of Interpreter, with each
+      // one getting its own `ReplBridge`. This ensures that the various
+      // Interpreters are properly encapsulated and don't interfere with each
+      // other.
+      val c1 = new Checker()
+      val c2 = new Checker()
+      c1.session("""
+        @ repl.prompt() = "A"
+      """)
+      c2.session("""
+        @ repl.prompt() = "B"
+      """)
+      c1.session("""
+        @ assert(repl.prompt() == "A")
+      """)
+      c2.session("""
+        @ assert(repl.prompt() == "B")
       """)
     }
   }

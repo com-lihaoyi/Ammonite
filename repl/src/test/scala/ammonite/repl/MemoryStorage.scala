@@ -7,7 +7,7 @@ class MemoryStorage extends Storage{
   def loadPredef = predef
 
   var _history = new History(Vector())
-  val history = new StableRef[History]{
+  val fullHistory = new StableRef[History]{
     def apply() = _history
     def update(h: History): Unit = _history = h
   }
