@@ -237,6 +237,30 @@
       Ammonite is configured via Scala code, that can live in the @code{~/.ammonite/predef.scala} file, passed in through SBT's @hl.scala{initialCommands}, or passed to the command-line executable as @code{--predef='...'}. Some examples of things you can configure:
     @hl.ref(ammoniteTests/"BuiltinTests.scala", Seq("basicConfig", "@"))
 
+  @sect{Filesystem Operations}
+    @p
+      Ammonite uses @sect.ref{Ammonite-Ops} to provide a nice API to use filesystem operations. To access it, simply call
+    @hl.scala
+      import ammonite.ops._
+    @p
+      Or add it to your @hl.scala{~/.ammonite/predef.scala} if you want it available all the time in your REPL. The Ammonite REPL also provides some additional command-line-friendly functionality on top of the default Ammonite-Ops commands:
+    @hl.ref('repl/'src/'main/'scala/'ammonite/'repl/'frontend/"ReplAPI.scala", "trait ReplAPI", "// End of ReplAPI")
+    @p
+      These are imported by default into every repl session, and basically let you treat the Ammonite-REPL much more like a Bash shell. You can `hl.scala{cd!} in and out of directories, and treat relative paths as shorthand for absolute paths when working in the shell. This means you can enter commands like
+    @hl.scala
+      @@ cd! up
+
+      @@ cd! 'foldername
+
+      @@ ls! 
+
+      @@ ls! 'foldername
+
+      @@ stat! "folder-name-with-dashes"/"file.txt'
+
+    @p
+      Without having to repeatedly qualify theses relative paths with your current working directory.
+
 @sect("Ammonite-Ops", "Rock-solid Filesystem Operations")
   @val opsExamples = 'ops/'src/'test/'scala/'test/'ammonite/'ops/"ExampleTests.scala"
   @val pathsScala = 'ops/'src/'main/'scala/'ammonite/'ops/"Path.scala"

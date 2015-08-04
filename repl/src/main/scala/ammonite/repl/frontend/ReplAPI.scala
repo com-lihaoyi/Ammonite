@@ -23,7 +23,7 @@ class ReplAPIHolder {
  */
 case object ReplExit extends ControlThrowable
 
-trait ReplAPI {
+trait ReplAPI extends OpsAPI{
   /**
    * Exit the Ammonite REPL. You can also use Ctrl-D to exit
    */
@@ -102,8 +102,31 @@ trait ReplAPI {
   implicit def derefPPrint(implicit t: Ref[pprint.Config]): pprint.Config = t()
 
   /**
+   * Current width of the terminal
+   */
+  def width: Int
+  /**
+   * Current height of the terminal
+   */
+  def height: Int
+
+  /**
+   * Lets you configure the pretty-printing of a value. By default, it simply
+   * disables truncation and prints the entire thing, but you can set other
+   * parameters as well if you want.
+   */
+  def show[T: PPrint](implicit cfg: Config): T => Unit
+  def show[T: PPrint](t: T,
+                      width: Integer = 0,
+                      height: Integer = null,
+                      indent: Integer = null,
+                      colors: pprint.Colors = null)
+                     (implicit cfg: Config = Config.Defaults.PPrintConfig): Unit
+}
+trait OpsAPI{
+  /**
    * The current working directory of the shell, that will get picked up by
-   * any ammonite.ops commands you use
+   * any [[Relativizer]] below, and can be modified using [[cd]]
    */
   implicit def wd: Path
   /**
@@ -112,20 +135,16 @@ trait ReplAPI {
    */
   val cd: ammonite.ops.Op1[ammonite.ops.Path, ammonite.ops.Path]
 
+  /**
+   * Allows you to use relative paths (and anything convertible to a relative
+   * path) as absolute paths when working in the REPL. Note that this isn't
+   * available when using Ammonite-Ops in a standalone project! In such cases,
+   * it's good practice to convert paths from relative to absolute explicitly.
+   */
   implicit def Relativizer[T](p: T)(implicit b: Path, f: T => RelPath): Path
 
-  def width: Int
-
-  def height: Int
-
-  def show[T: PPrint](implicit cfg: Config): T => Unit
-  def show[T: PPrint](t: T,
-                          width: Integer = 0,
-                          height: Integer = null,
-                          indent: Integer = null,
-                          colors: pprint.Colors = null)
-                         (implicit cfg: Config = Config.Defaults.PPrintConfig): Unit
 }
+// End of OpsAPI
 trait Load extends (String => Unit){
   /**
    * Load a `.jar` file
