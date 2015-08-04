@@ -244,7 +244,7 @@
       import ammonite.ops._
     @p
       Or add it to your @hl.scala{~/.ammonite/predef.scala} if you want it available all the time in your REPL. The Ammonite REPL also provides some additional command-line-friendly functionality on top of the default Ammonite-Ops commands:
-    @hl.ref('repl/'src/'main/'scala/'ammonite/'repl/'frontend/"ReplAPI.scala", "trait ReplAPI", "// End of ReplAPI")
+    @hl.ref('repl/'src/'main/'scala/'ammonite/'repl/'frontend/"ReplAPI.scala", "trait OpsAPI", "// End of OpsAPI")
     @p
       These are imported by default into every repl session, and basically let you treat the Ammonite-REPL much more like a Bash shell. You can `hl.scala{cd!} in and out of directories, and treat relative paths as shorthand for absolute paths when working in the shell. This means you can enter commands like
     @hl.scala
@@ -259,7 +259,26 @@
       @@ stat! "folder-name-with-dashes"/"file.txt'
 
     @p
-      Without having to repeatedly qualify theses relative paths with your current working directory.
+      Without having to repeatedly qualify theses relative paths with your current working directory. You can use Ammonite-Ops' support for @sect.ref{Spawning Subprocesses} to call external programs, even interactive ones like Python or SBT!
+
+    @hl.scala
+      @@ %python
+      Python 2.7.6 (default, Sep  9 2014, 15:04:36)
+      [GCC 4.2.1 Compatible Apple LLVM 6.0 (clang-600.0.39)] on darwin
+      Type "help", "copyright", "credits" or "license" for more information.
+      >>> print "Hello %s%s" % ("World", "!"*3)
+      Hello World!!!
+      >>> ^D
+      res3: Int = 0
+
+      @@ %sbt
+      [info] Loading global plugins from /Users/haoyi/.sbt/0.13/plugins
+      [info] Updating {file:/Users/haoyi/.sbt/0.13/plugins/}global-plugins...
+      [info] Resolving org.fusesource.jansi#jansi;1.4 ...
+      [info] Done updating.
+      [info] Set current project to haoyi (in build file:/Users/haoyi/)
+      >
+
 
 @sect("Ammonite-Ops", "Rock-solid Filesystem Operations")
   @val opsExamples = 'ops/'src/'test/'scala/'test/'ammonite/'ops/"ExampleTests.scala"
@@ -501,17 +520,20 @@
       * master
         speedip
       res4: Int = 0
+
       @@ %%git 'branch
       res5: CommandResult =
         gh-pages
         history
       * master
         speedip
+
       @@ %%git('checkout, "master")
       Already on 'master'
       res6: CommandResult =
       M	readme/Index.scalatex
       Your branch is up-to-date with 'origin/master'.
+
       @@ %git("checkout", 'master)
       M	readme/Index.scalatex
       Already on 'master'
@@ -521,7 +543,27 @@
       Ammonite-Ops currently does not provide many convenient ways of piping together multiple processes, but support may come in future if someone finds it useful enough to implement.
 
     @p
-      @hl.scala{%} calls subprocesses in a way that is compatible with a normal terminal. That means you can easily call things like @hl.scala{%vim} to open a text editor, @hl.scala{%python} to open up a Python terminal, or @hl.scala{%sbt} to open up the SBT prompt! @hl.scala{%%} does not do this.
+      @hl.scala{%} calls subprocesses in a way that is compatible with a normal terminal. That means you can easily call things like @hl.scala{%vim} to open a text editor, @hl.scala{%python} to open up a Python terminal, or @hl.scala{%sbt} to open up the SBT prompt!
+    @hl.scala
+      @@ %python
+      Python 2.7.6 (default, Sep  9 2014, 15:04:36)
+      [GCC 4.2.1 Compatible Apple LLVM 6.0 (clang-600.0.39)] on darwin
+      Type "help", "copyright", "credits" or "license" for more information.
+      >>> print "Hello %s%s" % ("World", "!"*3)
+      Hello World!!!
+      >>> ^D
+      res3: Int = 0
+
+      @@ %sbt
+      [info] Loading global plugins from /Users/haoyi/.sbt/0.13/plugins
+      [info] Updating {file:/Users/haoyi/.sbt/0.13/plugins/}global-plugins...
+      [info] Resolving org.fusesource.jansi#jansi;1.4 ...
+      [info] Done updating.
+      [info] Set current project to haoyi (in build file:/Users/haoyi/)
+      >
+
+    @p
+      @hl.scala{%%} does not do this.
 
 @sect{Changelog}
   @sect{0.4.0}
