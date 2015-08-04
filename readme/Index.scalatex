@@ -435,6 +435,70 @@
     @p
       As you can see, you can often compose elaborate operations entirely naturally using the available pipes, without needing to remember any special flags or techniques.
 
+  @sect{Spawning Subprocesses}
+    @p
+      Ammonite-Ops provides easy syntax for anyone who wants to spawn sub-processes, e.g. commands like @code{ls} or @code{git commit -am "wip"}. This is provided through the @hl.scala{%} and @hl.scala{%%} operators, which are used as follows:
+
+    @hl.scala
+      @@ %ls
+      build.sbt	log		ops		readme		repl		terminal
+      echo		modules		project		readme.md	target		tools
+      res2: Int = 0
+      @@ %%ls
+      res3: CommandResult =
+      build.sbt
+      echo
+      log
+      modules
+      ops
+      project
+      readme
+      readme.md
+      repl
+      target
+      terminal
+      ...
+
+    @p
+      In short, @hl.scala{%} lets you run a command as you would in bash, and dumps the output to standard-out in a similar way, returning the return-code. @hl.scala{%%} on the other hand returns a @hl.scala{CommandResult}, which is simply a @hl.scala{Stream[String]} of the lines from the subprocess. @hl.scala{%%} throws an exception if the return-code is non-zero. The returned @hl.scala{Stream[String]} can then be used however you like.
+    @p
+      You can also use backticks to execute commands which aren't valid Scala identifiers, e.g.
+
+    @hl.scala
+      @@ %`ssh-add`
+      Enter passphrase for /Users/haoyi/.ssh/id_rsa:
+
+    @p
+      Lastly, you can also pass arguments into these subprocess calls, as Strings or Symbols:
+    @hl.scala
+      @@ %git 'branch
+        gh-pages
+        history
+      * master
+        speedip
+      res4: Int = 0
+      @@ %%git 'branch
+      res5: CommandResult =
+        gh-pages
+        history
+      * master
+        speedip
+      @@ %%git('checkout, "master")
+      Already on 'master'
+      res6: CommandResult =
+      M	readme/Index.scalatex
+      Your branch is up-to-date with 'origin/master'.
+      @@ %git("checkout", 'master)
+      M	readme/Index.scalatex
+      Already on 'master'
+      Your branch is up-to-date with 'origin/master'.
+      res8: Int = 0
+    @p
+      Ammonite-Ops currently does not provide many convenient ways of piping together multiple processes, but support may come in future if someone finds it useful enough to implement.
+
+    @p
+      @hl.scala{%} calls subprocesses in a way that is compatible with a normal terminal. That means you can easily call things like @hl.scala{%vim} to open a text editor, @hl.scala{%python} to open up a Python terminal, or @hl.scala{%sbt} to open up the SBT prompt! @hl.scala{%%} does not do this.
+
   @sect{Changelog}
     @sect{0.4.0}
       @ul
