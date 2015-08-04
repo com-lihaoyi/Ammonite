@@ -37,9 +37,10 @@ object FrontEnd{
     def width = ammonite.terminal.TTY.consoleDim("cols")
     def height = ammonite.terminal.TTY.consoleDim("lines")
     def tabulate(snippets: Seq[String], width: Int) = {
-      val gap =   2
+      val gap = 2
       val maxLength = snippets.maxBy(_.replaceAll("\u001B\\[[;\\d]*m", "").length).length + gap
-      val columns = (width / maxLength) + 1
+      val columns = math.max(1, width / maxLength)
+      println(s"width $width, maxLength: $maxLength, columns: $columns")
       snippets.grouped(columns).flatMap{
         case first :+ last => first.map(_.padTo(width / columns, ' ')) :+ last :+ "\n"
       }
@@ -105,7 +106,7 @@ object FrontEnd{
                 val (left, right) = comp.splitAt(common.length)
                 colors.comment() + left + colors.reset() + right
               }
-              tabulate(colored, width).foreach(writer.write)
+              tabulate(colored, Ammonite.this.width).foreach(writer.write)
               writer.flush()
               val newBuffer = b.take(newCursor) ++ common ++ b.drop(c)
               TermState(rest, newBuffer, newCursor + common.length)
