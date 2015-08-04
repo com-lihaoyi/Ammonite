@@ -499,82 +499,82 @@
     @p
       @hl.scala{%} calls subprocesses in a way that is compatible with a normal terminal. That means you can easily call things like @hl.scala{%vim} to open a text editor, @hl.scala{%python} to open up a Python terminal, or @hl.scala{%sbt} to open up the SBT prompt! @hl.scala{%%} does not do this.
 
-  @sect{Changelog}
-    @sect{0.4.0}
-      @ul
-        @li
-          Re-added support for 2.10.x, minus features that don't work in it (e.g. scope-aware type-printing)
-        @li
-          Added a Standalone distribution that comes bundled with Scala 2.11.7, letting you quickly load and experiment with libraries without SBT
-        @li
-          Exception stack traces are now highlighted to make them easier to read
-        @li
-          Pretty-printing has been extracted into a separate project, and aside from that is greatly improved. Many more common cases (e.g. sealed trait hierarchies) are now pretty-printed rather than falling back to toString
-        @li
-          Exposed the @hl.scala{pprintln} function by default, letting you pretty-print any value with custom configuration (wrapping-width, truncation-height, colors, ...)
-        @li
-          Fixed cases where PPrint/TPrint was causing compilation errors
-        @li
-          Persistent data is now stored in a @code{~/.ammonite} folder. This includes @code{~/.ammonite/history}, @code{~/.ammonite/predef.scala}, and various caches
-        @li
-          You can now define a @code{~/.ammonite/predef.scala} file which will be executed the first thing when the Ammonite REPL is loaded. This is useful for common imports, @hl.scala{load.ivy}ing libraries, or configuration for your REPL
-        @li
-          Added the ability to load arbitrary Ammonite scripts via @hl.scala{load.exec} and @hl.scala{load.module}
-        @li
-          Much more configuration that was previously passed into the @hl.scala{REPL}s constructor is now done in-REPL,
-        @li
-          Added the Ammonite Terminal, as an alternative to JLine, enabled via @hl.scala{frontEnd() = ammonite.repl.frontend.FrontEnd.Ammonite} in your @code{predef.scala}
-        @li
-          Removed the ability to reload classes; using @hl.scala{load.ivy} no longer causes all existing values to be lazily recomputed.
-        @li
-          Evaluated values of type @hl.scala{Unit} are no longer echo-ed to the user
+@sect{Changelog}
+  @sect{0.4.0}
+    @ul
+      @li
+        Re-added support for 2.10.x, minus features that don't work in it (e.g. scope-aware type-printing)
+      @li
+        Added a Standalone distribution that comes bundled with Scala 2.11.7, letting you quickly load and experiment with libraries without SBT
+      @li
+        Exception stack traces are now highlighted to make them easier to read
+      @li
+        Pretty-printing has been extracted into a separate project, and aside from that is greatly improved. Many more common cases (e.g. sealed trait hierarchies) are now pretty-printed rather than falling back to toString
+      @li
+        Exposed the @hl.scala{pprintln} function by default, letting you pretty-print any value with custom configuration (wrapping-width, truncation-height, colors, ...)
+      @li
+        Fixed cases where PPrint/TPrint was causing compilation errors
+      @li
+        Persistent data is now stored in a @code{~/.ammonite} folder. This includes @code{~/.ammonite/history}, @code{~/.ammonite/predef.scala}, and various caches
+      @li
+        You can now define a @code{~/.ammonite/predef.scala} file which will be executed the first thing when the Ammonite REPL is loaded. This is useful for common imports, @hl.scala{load.ivy}ing libraries, or configuration for your REPL
+      @li
+        Added the ability to load arbitrary Ammonite scripts via @hl.scala{load.exec} and @hl.scala{load.module}
+      @li
+        Much more configuration that was previously passed into the @hl.scala{REPL}s constructor is now done in-REPL,
+      @li
+        Added the Ammonite Terminal, as an alternative to JLine, enabled via @hl.scala{frontEnd() = ammonite.repl.frontend.FrontEnd.Ammonite} in your @code{predef.scala}
+      @li
+        Removed the ability to reload classes; using @hl.scala{load.ivy} no longer causes all existing values to be lazily recomputed.
+      @li
+        Evaluated values of type @hl.scala{Unit} are no longer echo-ed to the user
 
 
-    @sect{0.3.2}
-      @ul
-        @li
-          Fix pretty-printing of higher-kinded types.
-        @li
-          Drop support for 2.10.x; ammonite is 2.11.x-only now
+  @sect{0.3.2}
+    @ul
+      @li
+        Fix pretty-printing of higher-kinded types.
+      @li
+        Drop support for 2.10.x; ammonite is 2.11.x-only now
 
-    @sect{0.3.1}
-      @ul
-        @li
-          Many of the collection @hl.scala{PPrint}s are much lazier and will avoid stringifying the whole collection if its going to get truncated anyway.
-        @li
-          Types now get printed semi-qualified (depending on what's in scope), with simple highlighting.
-        @li
-          You can define custom @hl.scala{TPrint[T]}s to provide custom printing for any type.
-        @li
-          Operator-named two-param generic types are now printed infix by default.
+  @sect{0.3.1}
+    @ul
+      @li
+        Many of the collection @hl.scala{PPrint}s are much lazier and will avoid stringifying the whole collection if its going to get truncated anyway.
+      @li
+        Types now get printed semi-qualified (depending on what's in scope), with simple highlighting.
+      @li
+        You can define custom @hl.scala{TPrint[T]}s to provide custom printing for any type.
+      @li
+        Operator-named two-param generic types are now printed infix by default.
 
-    @sect{0.3.0}
-      @ul
-        @li
-          allow @hl.scala{predef} parameter to be passed into @hl.scala{Repl.run()} call, letting you configure initialization commands or imports
-        @li
-          Compilation errors in expressions no longer show synthetic code in the message
-        @li
-          Ivy module loading now lets you configure verbosity level
-        @li
-          Defining macros in the REPL and using them in subsequent lines now works
-        @li
-          Output lines are now truncated past a certain length, which is configurable
+  @sect{0.3.0}
+    @ul
+      @li
+        allow @hl.scala{predef} parameter to be passed into @hl.scala{Repl.run()} call, letting you configure initialization commands or imports
+      @li
+        Compilation errors in expressions no longer show synthetic code in the message
+      @li
+        Ivy module loading now lets you configure verbosity level
+      @li
+        Defining macros in the REPL and using them in subsequent lines now works
+      @li
+        Output lines are now truncated past a certain length, which is configurable
 
-    @sect{0.2.9}
-      @ul
-        @li
-          Lots of improvements to @code{Ctrl-C} and @code{Ctrl-D} handling, to make it behave more like other REPLs
+  @sect{0.2.9}
+    @ul
+      @li
+        Lots of improvements to @code{Ctrl-C} and @code{Ctrl-D} handling, to make it behave more like other REPLs
 
-    @sect{0.2.8}
-      @ul
-        @li
-          Fix #47: PPrint derivation fails with nested case class
-        @li
-          Fix #14: Exception when trying to use Ammonite REPL #15 by cross building against Scala 2.10.{3,4,5} and 2.11.{3,4,5,6}
-        @li
-          Autocomplete results are sorted alphabetically (Fixed #42)
-        @li
-          Fix #39: nothing echoed on multiple import
-        @li
-          Importing things from Java packages now works properly
+  @sect{0.2.8}
+    @ul
+      @li
+        Fix #47: PPrint derivation fails with nested case class
+      @li
+        Fix #14: Exception when trying to use Ammonite REPL #15 by cross building against Scala 2.10.{3,4,5} and 2.11.{3,4,5,6}
+      @li
+        Autocomplete results are sorted alphabetically (Fixed #42)
+      @li
+        Fix #39: nothing echoed on multiple import
+      @li
+        Importing things from Java packages now works properly
