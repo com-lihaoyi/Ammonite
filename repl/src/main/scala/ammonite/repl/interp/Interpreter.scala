@@ -268,9 +268,8 @@ class Interpreter(prompt0: Ref[String],
   Timer("Interpreterinit eval")
   init()
   Timer("Interpreter init init")
-
-
   processModule(hardcodedPredef)
+  init()
   processModule(predef)
   Timer("Interpreter init predef 0")
   init()
