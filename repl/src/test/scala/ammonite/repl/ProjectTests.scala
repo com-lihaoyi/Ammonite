@@ -126,11 +126,7 @@ object ProjectTests extends TestSuite{
       check.session("""
         @ load.ivy("com.twitter" %% "finagle-httpx" % "6.26.0")
 
-        @ import com.twitter.finagle.{Httpx, Service}
-
-        @ import com.twitter.finagle.httpx
-
-        @ import com.twitter.util.{Await, Future}
+        @ import com.twitter.finagle._; import com.twitter.util._
 
         @ var serverCount = 0
 

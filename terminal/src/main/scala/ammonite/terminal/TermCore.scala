@@ -168,21 +168,26 @@ object TermCore {
     }
 
 
-    @tailrec def readChar(lastState: TermState, areaHeight: Int, ups: Int): Option[String] = {
+    @tailrec def readChar(lastState: TermState, ups: Int): Option[String] = {
 //      lazy val (width, _, _) = TTY.init()
       val (_, oldCursorY, _) = calculateHeight(
         lastState.buffer, lastState.cursor, width, noAnsiPrompt
       )
-      if (!reader.ready()) redrawLine(lastState.buffer, lastState.cursor, ups)
+      val moreInputComing = reader.ready()
+      if (!moreInputComing) redrawLine(lastState.buffer, lastState.cursor, ups)
+
       filters(TermInfo(lastState, width - noAnsiPrompt.length)) match {
         case TermState(s, b, c) =>
           val newCursor = math.max(math.min(c, b.length), 0)
-          val (nextHeight, _, _) = calculateHeight(b, newCursor, width, noAnsiPrompt)
-          if (nextHeight > areaHeight){
-            writer.write("\n")
-            writer.flush()
-          }
-          readChar(TermState(s, b, newCursor), nextHeight, oldCursorY)
+          val nextUps =
+            if (moreInputComing) {
+              Debug("moreInputComing")
+              ups
+            } else {
+              oldCursorY
+            }
+
+          readChar(TermState(s, b, newCursor), nextUps)
 
         case Result(s) =>
           redrawLine(lastState.buffer, lastState.buffer.length, oldCursorY)
@@ -198,7 +203,7 @@ object TermCore {
     lazy val ansi = new Ansi(writer)
     lazy val (width, height, initialConfig) = TTY.init()
     try {
-      readChar(TermState(LazyList.continually(reader.read()), Vector.empty, 0), 1, 0)
+      readChar(TermState(LazyList.continually(reader.read()), Vector.empty, 0), 0)
     }finally{
 
       // Don't close these! Closing these closes stdin/stdout,
