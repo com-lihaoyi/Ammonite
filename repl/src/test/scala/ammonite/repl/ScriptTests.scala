@@ -68,6 +68,16 @@ object ScriptTests extends TestSuite{
             r: Int = 24
             """)
         }
+        'limitImports{
+          check.session(s"""
+            @ import ammonite.ops._
+
+            @ load.exec($printedScriptPath/"LimitImports.scala")
+
+            @ res
+            error: not found: value res
+            """)
+        }
       }
       'failures{
         'syntaxError{
@@ -178,6 +188,16 @@ object ScriptTests extends TestSuite{
             @ val r = res
             r: Int = 24
           """)
+        }
+        'limitImports{
+          check.session(s"""
+            @ import ammonite.ops._
+
+            @ load.module($printedScriptPath/"LimitImports.scala")
+
+            @ res
+            error: not found: value res
+            """)
         }
       }
       'failures{
