@@ -470,6 +470,8 @@
           @hl.scala{things |? f} is an alias for @hl.scala{things filter f}
         @li
           @hl.scala{things |& f} is an alias for @hl.scala{things reduce f}
+        @li
+          @hl.scala{things |! f} is an alias for @hl.scala{things foreach f}
       @p
         These should behave exactly the same as their implementations; their sole purpose is to make things more concise at the command-line.
 
