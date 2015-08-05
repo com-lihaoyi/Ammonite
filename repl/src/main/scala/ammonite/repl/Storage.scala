@@ -99,7 +99,7 @@ object Storage{
     def loadPredef = try{
       read(predef)
     } catch {
-      case e: java.io.FileNotFoundException => ""
+      case e: java.nio.file.NoSuchFileException => ""
     }
   }
 }
