@@ -172,8 +172,11 @@ object FrontEnd{
               )
               val newIndices = before ++ middle ++ after
               val displayOffset = if (cursor < mark) 0 else -1
-              (Highlighter.flattenIndices(newIndices, buffer), cursor + displayOffset)
-            case _ => (Highlighter.flattenIndices(indices, buffer), cursor)
+              // Add Console.RESET to the end of the buffer to hack around bug
+              // in TermCore, to be fixed later when we clean up the crazy
+              // TermCore.readLine logic
+              (Highlighter.flattenIndices(newIndices, buffer) ++ Console.RESET, cursor + displayOffset)
+            case _ => (Highlighter.flattenIndices(indices, buffer) ++ Console.RESET, cursor)
           }
         }
       )
