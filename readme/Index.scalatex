@@ -64,6 +64,9 @@
   @p
     You can also pass a string to the @code{run} call containing any commands or imports you want executed at the start of every run. If you want Ammonite to be available in all projects, simply add the above snippet to a new file @code{~/.sbt/0.13/global.sbt}.
 
+  @p
+    If you have any questions, come hang out on the @sect.ref("Community", "mailing list or gitter channel") and get help!
+
   @sect{Features}
     @p
       Ammonite-REPL supports many more features than the default REPL, including:
@@ -333,7 +336,7 @@
 
 @sect("Ammonite-Ops", "Rock-solid Filesystem Operations")
   @p
-    Ammonite-Ops is a collection of tools intended to make common filesystem operations in Scala as concise and easy-to-use as from the Bash shell, while being robust enough to use in large applications without getting messy. It lives in the same repo as the Ammonite REPL, but can easily be used stand-alone in a normal SBT/maven project.
+    Ammonite-Ops is a library to make common filesystem operations in Scala as concise and easy-to-use as from the Bash shell, while being robust enough to use in large applications without getting messy. It lives in the same repo as the Ammonite REPL, but can easily be used stand-alone in a normal SBT/maven project.
 
   @p
     To get started with Ammonite-Ops, add this to your @code{build.sbt}:
@@ -612,6 +615,13 @@
 
     @p
       @hl.scala{%%} does not do this.
+
+@sect{Community}
+  @ul
+    @li
+      @a("Mailing List", href:="https://groups.google.com/forum/#!forum/ammonite-scala")
+    @li
+      @a("Gitter Channel", href:="https://gitter.im/lihaoyi/Ammonite")
 
 @sect{Changelog}
   @sect{0.4.0}
