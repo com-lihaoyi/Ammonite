@@ -30,12 +30,12 @@
   @p
     One way to get started with Ammonite is to download the standalone executable:
 
-  @hl.scala
+  @hl.sh
     $ curl -L -o amm http://git.io/vOo1d; chmod +x amm; ./amm
 
-    $
-    Loading Ammonite Repl...
 
+  @hl.scala
+    Loading Ammonite Repl...
     @@ List(Seq(Seq("mgg", "mgg", "lols"), Seq("mgg", "mgg")), Seq(Seq("ggx", "ggx"),Seq("ggx", "ggx", "wt  fx")))
 
     res1: List[Seq[Seq[String]]] = List(
@@ -89,13 +89,18 @@
       @p
         Ammonite-REPL uses @sect.ref{PPrint} to display its output by default. That means that everything is nicely formatted to fit within the width of the terminal, and is copy-paste-able!
 
+      @p
+        By default, Ammonite truncates the pretty-printed output to avoid flooding your terminal. If you want to disable truncation, call @hl.scala{show(...)} on your expression to pretty-print it's full output. You can also pass in an optional @hl.scala{height = ...} parameter to control how much you want to show.
     @sect{Syntax Highlighting}
       @img(src:="Highlighting.png", width:="100%")
       @p
         Ammonite syntax highlights both the code you're entering as well as any output being echoed in response. This should make it much easier to work with larger snippets of input.
       @p
         All colors are configurable, and you can easily turn off colors entirely via the @sect.ref{Configuration}.
+      @p
+        Stack traces are similarly highlighted, for easier reading:
 
+      @img(src:="ColoredTraces.png", width:="100%")
     @sect{Improved Editing}
       @p
         Ammonite by default ships with a custom implementation of readline, which provides...
@@ -238,7 +243,14 @@
 
   @sect{Configuration}
     @p
-      Ammonite is configured via Scala code, that can live in the @code{~/.ammonite/predef.scala} file, passed in through SBT's @hl.scala{initialCommands}, or passed to the command-line executable as @code{--predef='...'}. Some examples of things you can configure:
+      Ammonite is configured via Scala code, that can live in the @code{~/.ammonite/predef.scala} file, passed in through SBT's @hl.scala{initialCommands}, or passed to the command-line executable as @code{--predef='...'}.
+
+    @p
+      Anything that you put in @code{predef.scala} will be executed when you load the Ammonite REPL. This is a handy place to put common imports, setup code, or even call @hl.scala{load.ivy} to @sect.ref("Artifact Loading", "load third-party jars"). The compilation of the predef is cached, so after the first run it should not noticeably slow down the initialization of your REPL.
+
+    @p
+      Some examples of things you can configure:
+
     @hl.ref(ammoniteTests/"BuiltinTests.scala", Seq("basicConfig", "@"))
 
   @sect{Filesystem Operations}
@@ -575,29 +587,37 @@
       @li
         Re-added support for 2.10.x, minus features that don't work in it (e.g. scope-aware type-printing)
       @li
-        Added a Standalone distribution that comes bundled with Scala 2.11.7, letting you quickly load and experiment with libraries without SBT
+        Added a @sect.ref("Ammonite", "standalone distributable") that comes bundled with Scala 2.10.4 or 2.11.7, letting you quickly load and experiment with libraries without SBT
       @li
-        Exception stack traces are now highlighted to make them easier to read
+        User input now has @sect.ref{Syntax Highlighting} by default!
       @li
-        Pretty-printing has been extracted into a separate project, and aside from that is greatly improved. Many more common cases (e.g. sealed trait hierarchies) are now pretty-printed rather than falling back to toString
+        Exception stack traces are now @sect.ref("Syntax Highlighting", "highlighted") as well, to make them easier to read
       @li
-        Exposed the @hl.scala{pprintln} function by default, letting you pretty-print any value with custom configuration (wrapping-width, truncation-height, colors, ...)
+        @sect.ref("Pretty-printed output", "Pretty-printing") has been extracted into a separate project, and aside from that is greatly improved. Many more common cases (e.g. sealed trait hierarchies) are now pretty-printed rather than falling back to @code{toString}
+      @li
+        Exposed the @sect.ref("Pretty-printed output", "show") function by default, letting you pretty-print any value with custom configuration (wrapping-width, truncation-height, colors, ...)
       @li
         Fixed cases where PPrint/TPrint was causing compilation errors
       @li
         Persistent data is now stored in a @code{~/.ammonite} folder. This includes @code{~/.ammonite/history}, @code{~/.ammonite/predef.scala}, and various caches
       @li
-        You can now define a @code{~/.ammonite/predef.scala} file which will be executed the first thing when the Ammonite REPL is loaded. This is useful for common imports, @hl.scala{load.ivy}ing libraries, or configuration for your REPL
+        You can now define a @code{~/.ammonite/predef.scala} @sect.ref("Configuration") file which will be executed the first thing when the Ammonite REPL is loaded. This is useful for common imports, @hl.scala{load.ivy}ing libraries, or other configuration for your REPL
       @li
-        Added the ability to load arbitrary Ammonite scripts via @hl.scala{load.exec} and @hl.scala{load.module}
+        Added the ability to load arbitrary @sect.ref{Script Files} via @hl.scala{load.exec} and @hl.scala{load.module}
       @li
-        Much more configuration that was previously passed into the @hl.scala{REPL}s constructor is now done in-REPL,
+        @sect.ref{Configuration} that was previously passed into the @hl.scala{REPL}s constructor is now done in-REPL,
       @li
-        Added the Ammonite Terminal, as an alternative to JLine, enabled via @hl.scala{frontEnd() = ammonite.repl.frontend.FrontEnd.Ammonite} in your @code{predef.scala}
+        @sect.ref("Improved Editing", "Multi-line editing and other features") via a custom terminal interface that should behave just like readline, but with added conveniences.
       @li
         Removed the ability to reload classes; using @hl.scala{load.ivy} no longer causes all existing values to be lazily recomputed.
       @li
+        Added the @sect.ref("Filesystem Operations", "cd! and wd") built-ins to make working with filesystem operations via @sect.ref{Ammonite-Ops} more pleasant
+      @li
         Evaluated values of type @hl.scala{Unit} are no longer echo-ed to the user
+      @li
+        Performance improvements to the startup time of the REPL, with @a("more to come", href:="https://github.com/lihaoyi/Ammonite/issues/135")
+      @li
+        Third-party library resolution via @hl.scala{load.ivy} is now cached after the first call, letting you e.g. load libraries in your @code{~/.ammonite/predef.scala} without waiting for the slow ivy-resolution every startup
 
 
   @sect{0.3.2}
