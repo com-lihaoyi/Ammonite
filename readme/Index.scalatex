@@ -36,12 +36,30 @@
 
   @hl.scala
     Loading Ammonite Repl...
-    @@ List(Seq(Seq("mgg", "mgg", "lols"), Seq("mgg", "mgg")), Seq(Seq("ggx", "ggx"),Seq("ggx", "ggx", "wt  fx")))
-
+    @@ List(Seq(Seq("mgg", "mgg", "lols"), Seq("mgg", "mgg")), Seq(Seq("ggx", "ggx"),Seq("ggx", "ggx", "wtfx")))
     res1: List[Seq[Seq[String]]] = List(
       List(List("mgg", "mgg", "lols"), List("mgg", "mgg")),
       List(List("ggx", "ggx"), List("ggx", "ggx", "wtfx"))
     )
+
+    @@ load.ivy("com.lihaoyi" %% "scalatags" % "0.4.5")
+
+    @@ import scalatags.Text.all._
+    import scalatags.Text.all._
+
+    @@ a("omg", href:="www.google.com").render
+    res3: String = """
+    <a href="www.google.com">omg</a>
+    """
+
+    @@ load.ivy("org.scalaz" %% "scalaz-core" % "7.1.1")
+
+    @@ import scalaz._; import Scalaz._
+    import scalaz._
+    import Scalaz._
+
+    @@ (Option(1) |@@| Option(2))(_ + _)
+    res6: Option[Int] = Some(3)
 
   @p
     If you want some initialization code available to the REPL, you can add it to your @code{~/.ammonite/predef.scala}.
