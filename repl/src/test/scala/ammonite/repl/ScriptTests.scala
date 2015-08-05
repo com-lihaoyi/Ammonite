@@ -248,6 +248,7 @@ object ScriptTests extends TestSuite{
           Ref(Colors.BlackWhite),
           stdout = _ => (),
           storage = Ref(storage),
+          new History(Vector()),
           predef = ""
         )
 

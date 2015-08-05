@@ -28,7 +28,8 @@ trait FrontEnd{
              prompt: String,
              colors: Colors,
              compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
-             history: Seq[String]): Res[(String, Seq[String])]
+             history: Seq[String],
+             addHistory: String => Unit): Res[(String, Seq[String])]
 }
 
 object FrontEnd{
@@ -56,11 +57,13 @@ object FrontEnd{
                prompt: String,
                colors: Colors,
                compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
-               history: Seq[String]) = {
+               history: Seq[String],
+               addHistory: String => Unit) = {
       Timer("FrontEnd.Ammonite.action start")
       val res = readLine(reader, output, prompt, colors, compilerComplete, history) match{
         case None => Res.Exit
         case Some(code) =>
+          addHistory(code)
           Parsers.Splitter.parse(code) match{
             case Result.Success(value, idx) => Res.Success((code, value))
             case f: Result.Failure => Res.Failure(
@@ -196,7 +199,8 @@ object FrontEnd{
                prompt: String,
                colors: Colors,
                compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
-               history: Seq[String]) = {
+               history: Seq[String],
+               addHistory: String => Unit) = {
 
       val term = makeTerm()
       term.init()
@@ -250,10 +254,12 @@ object FrontEnd{
           case Some(newCode) =>
             val code = buffered + newCode
             Parsers.split(code) match{
-              case Some(Result.Success(value, idx)) => Res.Success(code -> value)
-              case Some(f: Result.Failure) => Res.Failure(
-                fastparse.core.SyntaxError.msg(f.input, f.traced.expected, f.index)
-              )
+              case Some(Result.Success(value, idx)) =>
+                addHistory(code)
+                Res.Success(code -> value)
+              case Some(f: Result.Failure) =>
+                addHistory(code)
+                Res.Failure(fastparse.core.SyntaxError.msg(f.input, f.traced.expected, f.index))
               case None => readCode(code + "\n")
             }
         }

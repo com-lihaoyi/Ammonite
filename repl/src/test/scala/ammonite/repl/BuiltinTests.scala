@@ -52,6 +52,7 @@ object BuiltinTests extends TestSuite{
         @ repl.colors().error() = Console.YELLOW
       """)
     }
+
     'workingDir{
       check.session("""
         @ val originalWd = wd

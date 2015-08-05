@@ -27,6 +27,7 @@ class Checker {
     Ref(Colors.BlackWhite),
     stdout = allOutput += _,
     storage = Ref(Storage(tempDir)),
+    new History(Vector()),
     predef = predef
   )
 

@@ -27,6 +27,7 @@ class Interpreter(prompt0: Ref[String],
                   colors0: Ref[Colors],
                   stdout: String => Unit,
                   storage: Ref[Storage],
+                  history: => History,
                   predef: String){ interp =>
 
   val hardcodedPredef =
@@ -38,14 +39,9 @@ class Interpreter(prompt0: Ref[String],
   val dynamicClasspath = new VirtualDirectory("(memory)", None)
   var extraJars = Seq[java.io.File]()
 
-  var history = new History(Vector())
   def processLine(code: String,
                   stmts: Seq[String],
                   printer: Iterator[String] => Unit) = {
-    if (code != "") {
-      storage().fullHistory() = storage().fullHistory() :+ code
-      history = history :+ code
-    }
     for{
       _ <- Catching { case ex =>
         Res.Exception(ex, "Something unexpected went wrong =(")

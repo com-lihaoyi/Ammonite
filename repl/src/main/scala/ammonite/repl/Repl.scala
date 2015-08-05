@@ -22,6 +22,8 @@ class Repl(input: InputStream,
   val frontEnd = Ref[FrontEnd](FrontEnd.Ammonite)
 
   val printer = new PrintStream(output, true)
+  var history = new History(Vector())
+
   Timer("Repl init printer")
   val interp: Interpreter = new Interpreter(
     prompt,
@@ -32,8 +34,10 @@ class Repl(input: InputStream,
     colors,
     printer.print,
     storage,
+    history,
     predef
   )
+
   Timer("Repl init interpreter")
   val reader = new InputStreamReader(input)
   def action() = for{
@@ -44,7 +48,11 @@ class Repl(input: InputStream,
       colors().prompt() + prompt() + colors().reset(),
       colors(),
       interp.pressy.complete(_, interp.eval.previousImportBlock, _),
-      storage().fullHistory()
+      storage().fullHistory(),
+      addHistory = (code) => if (code != "") {
+        storage().fullHistory() = storage().fullHistory() :+ code
+        history = history :+ code
+      }
     )
     _ <- Signaller("INT") { interp.mainThread.stop() }
     out <- interp.processLine(code, stmts, _.foreach(printer.print))

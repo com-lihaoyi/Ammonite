@@ -635,6 +635,12 @@
       @a("Gitter Channel", href:="https://gitter.im/lihaoyi/Ammonite")
 
 @sect{Changelog}
+  @sect{0.4.2}
+    @ul
+      @li
+        Fix @a("#139: Can't fix typos?", href := "https://github.com/lihaoyi/Ammonite/issues/139")
+      @li
+        Fix bad wrapping of long lines in ammonite-repl
   @sect{0.4.1}
     @ul
       @li
