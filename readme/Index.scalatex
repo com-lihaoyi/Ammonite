@@ -228,7 +228,11 @@
       // common initialization code
       ...
     @p
-      Ammonite provides two ways to load scripts, @hl.scala{load.exec} and @hl.scala{load.module}. With @hl.scala{load.exec} the script is executed like it was pasted in the REPL. Exec scripts can access all values previously defined in the REPL, and all sideeffects are guaranteed to be applied. Scripts loaded via @hl.scala{load.module} can't access values previously defined in the REPL, and sideeffects are applied only the once each session. However @hl.scala{load.module} offers better caching, because scripts loaded this way are guaranteed to compile only once, if the code and classpath is not modified. Scripts that are contain common intialization, or define types and values to be used in later commands should be loaded with @hl.scala{load.module}. Scripts that perform sideeffects, that should be repeated more than once in a single session, like filesystem access and printing to the shell should be loaded with @hl.scala{load.exec}. Methods defined in scripts loaded with @hl.scala{load.module} do not have this limitation.
+      Ammonite provides two ways to load scripts, @hl.scala{load.exec} and @hl.scala{load.module}. With @hl.scala{load.exec} the script is executed like it was pasted in the REPL. Exec scripts can access all values previously defined in the REPL, and all sideeffects are guaranteed to be applied. Scripts loaded via @hl.scala{load.module} can't access values previously defined in the REPL, and sideeffects are applied only the once each session. However @hl.scala{load.module} offers better caching, because scripts loaded this way are guaranteed to compile only once, if the code and classpath is not modified. Scripts that are contain common intialization, or define types and values to be used in later commands should be loaded with @hl.scala{load.module}. Scripts that perform sideeffects, that should be repeated more than once in a single session, like filesystem access and printing to the shell should be loaded with @hl.scala{load.exec}. Methods defined in scripts loaded with @hl.scala{load.module} do not have this limitation. Any scripts you load can themselves load scripts. You can also run scripts using the Ammonite executable from an external shell (e.g. bash):
+
+    @hl.scala
+      bash$ ./amm path/to/script.scala
+
     @p
       All types, values and imports defined in scripts are available to commands entered in REPL after loading the script.
 
