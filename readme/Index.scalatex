@@ -242,7 +242,15 @@
       // common initialization code
       ...
     @p
-      Ammonite provides two ways to load scripts, @hl.scala{load.exec} and @hl.scala{load.module}. With @hl.scala{load.exec} the script is executed like it was pasted in the REPL. Exec scripts can access all values previously defined in the REPL, and all sideeffects are guaranteed to be applied. Scripts loaded via @hl.scala{load.module} can't access values previously defined in the REPL, and sideeffects are applied only the once each session. However @hl.scala{load.module} offers better caching, because scripts loaded this way are guaranteed to compile only once, if the code and classpath is not modified. Scripts that are contain common intialization, or define types and values to be used in later commands should be loaded with @hl.scala{load.module}. Scripts that perform sideeffects, that should be repeated more than once in a single session, like filesystem access and printing to the shell should be loaded with @hl.scala{load.exec}. Methods defined in scripts loaded with @hl.scala{load.module} do not have this limitation. Any scripts you load can themselves load scripts. You can also run scripts using the Ammonite executable from an external shell (e.g. bash):
+      Ammonite provides two ways to load scripts, @hl.scala{load.exec} and @hl.scala{load.module}.
+
+    @p
+      With @hl.scala{load.exec} the script is executed like it was pasted in the REPL. Exec scripts can access all values previously defined in the REPL, and all side-effects are guaranteed to be applied. This is useful for one-off sets of commands.
+    @p
+      With @hl.scala{load.module}, the script is loaded like a Scala module. That means it can't access values previously defined in the REPL, but it is guaranteed to only execute once even if loaded many times by different scripts. If you want to execute the script code multiple times, put it in a function and call it after you load the script.
+
+     @p
+       Any scripts you load can themselves load scripts. You can also run scripts using the Ammonite executable from an external shell (e.g. bash):
 
     @hl.scala
       bash$ ./amm path/to/script.scala
@@ -324,12 +332,20 @@
 
 
 @sect("Ammonite-Ops", "Rock-solid Filesystem Operations")
+  @p
+    Ammonite-Ops is a collection of tools intended to make common filesystem operations in Scala as concise and easy-to-use as from the Bash shell, while being robust enough to use in large applications without getting messy. It lives in the same repo as the Ammonite REPL, but can easily be used stand-alone in a normal SBT/maven project.
+
+  @p
+    To get started with Ammonite-Ops, add this to your @code{build.sbt}:
+
+  @hl.scala{libraryDependencies += "com.lihaoyi" %% "ammonite-ops" % "@ammonite.Constants.version"}
+
+  @p
+    And you're all set!
+
   @val opsExamples = 'ops/'src/'test/'scala/'test/'ammonite/'ops/"ExampleTests.scala"
   @val pathsScala = 'ops/'src/'main/'scala/'ammonite/'ops/"Path.scala"
   @hl.ref(opsExamples, Seq("longExample", "import"), "assert(")
-
-  @p
-    Ammonite-Ops is a collection of tools intended to make common filesystem operations in Scala as concise and easy-to-use as from the Bash shell, while being robust enough to use in large applications without getting messy. It lives in the same repo as the Ammonite REPL, but can easily be used stand-alone in a normal SBT/maven project.
 
   @p
     As you can see, Ammonite-Ops replaces the common mess of boilerplate:
@@ -343,19 +359,6 @@
 
   @p
     That handles the common case for you: recursively deleting folders, not-failing if the file doesn't exist, etc.
-
-  @p
-    To get started, add this to your @code{build.sbt}:
-
-  @hl.scala{"com.lihaoyi" %% "ammonite-ops" % "@ammonite.Constants.version"}
-
-  @p
-    And this at the top of the file you want to use Ammonite:
-
-  @hl.scala{import ammonite.ops._}
-
-  @p
-    And you're all set!
 
   @sect{Paths}
     @p
