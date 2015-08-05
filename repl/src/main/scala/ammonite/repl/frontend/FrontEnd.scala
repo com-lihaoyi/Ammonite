@@ -41,7 +41,7 @@ object FrontEnd{
       val gap = 2
       val maxLength = snippets.maxBy(_.replaceAll("\u001B\\[[;\\d]*m", "").length).length + gap
       val columns = math.max(1, width / maxLength)
-      println(s"width $width, maxLength: $maxLength, columns: $columns")
+
       snippets.grouped(columns).flatMap{
         case first :+ last => first.map(_.padTo(width / columns, ' ')) :+ last :+ "\n"
       }
