@@ -29,7 +29,7 @@ object ProjectTests extends TestSuite{
             $tq
           """)
         }
-        'complex{
+        'akkahttp{
           check.session("""
             @ load.ivy("com.typesafe.akka" %% "akka-http-experimental" % "1.0-M3")
 

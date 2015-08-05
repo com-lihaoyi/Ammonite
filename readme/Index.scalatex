@@ -82,6 +82,13 @@
 
       @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("shapeless", "@"), "\"\"\"")
 
+      @p
+        Even non-trivial web frameworks like Finagle or Akka-HTTP can be simply pulled down and run in the REPL!
+
+      @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("finagle", "@"), "\"\"\"")
+
+      @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("akkahttp", "@"), "\"\"\"")
+
     @sect{Pretty-printed output}
 
       @hl.ref(advancedTests, Seq("'pprint", "@"), "\"\"\"")
