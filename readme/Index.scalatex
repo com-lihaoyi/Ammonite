@@ -58,7 +58,7 @@
     import scalaz._
     import Scalaz._
 
-    @@ (Option(1) |@@| Option(2))(_ + _)
+    @("@@ (Option(1) |@@| Option(2))(_ + _)")
     res6: Option[Int] = Some(3)
 
   @p
