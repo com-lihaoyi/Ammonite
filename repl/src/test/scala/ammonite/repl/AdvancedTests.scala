@@ -185,8 +185,9 @@ object AdvancedTests extends TestSuite{
         res0: Int = 3
       """)
     }
-    'truncation{
-      check.session("""
+    'truncation {
+      check.session(
+        """
       @ Seq.fill(20)(100)
       res0: Seq[Int] = List(
         100,
@@ -245,6 +246,7 @@ object AdvancedTests extends TestSuite{
         100,
       ...
     """)
+    }
     'private{
       check.session("""
         @ private val x = 1; val y = x + 1
