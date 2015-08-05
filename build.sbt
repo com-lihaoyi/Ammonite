@@ -31,7 +31,7 @@ val sharedSettings = Seq(
       "org.scalamacros" %% s"quasiquotes" % "2.0.0"
     )
   ),
-  publishTo := Some("releases" at "https://oss1.sonatype.org/service/local/staging/deploy/maven2"),
+  publishTo := Some("releases" at "https://oss.sonatype.org/service/local/staging/deploy/maven2"),
   pomExtra :=
     <url>https://github.com/lihaoyi/Ammonite</url>
       <licenses>
