@@ -42,7 +42,7 @@
       List(List("ggx", "ggx"), List("ggx", "ggx", "wtfx"))
     )
 
-    @@ load.ivy("com.lihaoyi" %% "scalatags" % "0.4.5")
+    @@ load.ivy("com.lihaoyi" %% "scalatags" % "0.4.5") // load a library
 
     @@ import scalatags.Text.all._
     import scalatags.Text.all._
@@ -51,15 +51,6 @@
     res3: String = """
     <a href="www.google.com">omg</a>
     """
-
-    @@ load.ivy("org.scalaz" %% "scalaz-core" % "7.1.1")
-
-    @@ import scalaz._; import Scalaz._
-    import scalaz._
-    import Scalaz._
-
-    @("@@ (Option(1) |@@| Option(2))(_ + _)")
-    res6: Option[Int] = Some(3)
 
   @p
     If you want some initialization code available to the REPL, you can add it to your @code{~/.ammonite/predef.scala}.
