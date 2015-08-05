@@ -188,7 +188,11 @@ object TermCore {
           readChar(TermState(s, b, newCursor), nextUps)
 
         case Result(s) =>
-          redrawLine(lastState.buffer, lastState.buffer.length, ups)
+          val (_, oldCursorY, _) = calculateHeight(
+            lastState.buffer, lastState.cursor, width, noAnsiPrompt
+          )
+
+          redrawLine(lastState.buffer, lastState.buffer.length, oldCursorY)
           writer.write(10)
           writer.write(13)
           writer.flush()
