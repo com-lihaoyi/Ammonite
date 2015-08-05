@@ -178,7 +178,10 @@ object TermCore {
         case TermState(s, b, c) =>
           val newCursor = math.max(math.min(c, b.length), 0)
           val (nextHeight, _, _) = calculateHeight(b, newCursor, width, noAnsiPrompt)
-
+          if (nextHeight > areaHeight){
+            writer.write("\n")
+            writer.flush()
+          }
           readChar(TermState(s, b, newCursor), nextHeight, oldCursorY)
 
         case Result(s) =>

@@ -4,7 +4,7 @@ import sbtassembly.AssemblyPlugin.defaultShellScript
 scalaVersion := "2.11.6"
 
 crossScalaVersions := Seq(
-  "2.11.3", "2.11.4", "2.11.5", "2.11.6", "2.11.7"
+  "2.10.3", "2.10.4", "2.11.3", "2.11.4", "2.11.5", "2.11.6", "2.11.7"
 )
 
 publishArtifact := false
