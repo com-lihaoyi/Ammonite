@@ -158,10 +158,10 @@ object ProjectTests extends TestSuite{
         @ Await.ready(response)
 
         @ serverCount
-        res14: Int = 1
+        res12: Int = 1
 
         @ clientResponse
-        res15: Int = 200
+        res13: Int = 200
 
         @ server.close()
       """)

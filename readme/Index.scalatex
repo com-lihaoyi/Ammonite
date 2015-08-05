@@ -31,9 +31,9 @@
     One way to get started with Ammonite is to download the standalone executable:
 
   @hl.scala
-    $ curl -o amm https://dl.dropboxusercontent.com/u/7997532/ammonite-repl-0.3.3-SNAPSHOT
+    $ curl -L -o amm http://git.io/vOo1d; chmod +x amm; ./amm
 
-    $ chmod +x amm; ./amm
+    $
     Loading Ammonite Repl...
 
     @@ List(Seq(Seq("mgg", "mgg", "lols"), Seq("mgg", "mgg")), Seq(Seq("ggx", "ggx"),Seq("ggx", "ggx", "wt  fx")))
