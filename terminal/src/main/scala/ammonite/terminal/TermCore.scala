@@ -169,10 +169,7 @@ object TermCore {
 
 
     @tailrec def readChar(lastState: TermState, ups: Int): Option[String] = {
-//      lazy val (width, _, _) = TTY.init()
-      val (_, oldCursorY, _) = calculateHeight(
-        lastState.buffer, lastState.cursor, width, noAnsiPrompt
-      )
+
       val moreInputComing = reader.ready()
       if (!moreInputComing) redrawLine(lastState.buffer, lastState.cursor, ups)
 
@@ -180,17 +177,18 @@ object TermCore {
         case TermState(s, b, c) =>
           val newCursor = math.max(math.min(c, b.length), 0)
           val nextUps =
-            if (moreInputComing) {
-              Debug("moreInputComing")
-              ups
-            } else {
+            if (moreInputComing) ups
+            else {
+              val (_, oldCursorY, _) = calculateHeight(
+                lastState.buffer, lastState.cursor, width, noAnsiPrompt
+              )
               oldCursorY
             }
 
           readChar(TermState(s, b, newCursor), nextUps)
 
         case Result(s) =>
-          redrawLine(lastState.buffer, lastState.buffer.length, oldCursorY)
+          redrawLine(lastState.buffer, lastState.buffer.length, ups)
           writer.write(10)
           writer.write(13)
           writer.flush()
