@@ -99,7 +99,9 @@ object Repl{
     )
     traces.mkString("\n")
   }
-  case class Config(predef: String = "", ammoniteHome: Path = defaultAmmoniteHome)
+  case class Config(predef: String = "",
+                    ammoniteHome: Path = defaultAmmoniteHome,
+                    file: Option[Path] = None)
 
   def defaultAmmoniteHome = Path(System.getProperty("user.home"))/".ammonite"
   def main(args: Array[String]) = {
@@ -112,19 +114,31 @@ object Repl{
         .valueName("<file>")
         .action((x, c) => c.copy(ammoniteHome = Path(x)))
         .text("The home directory of the REPL; where it looks for config and caches")
+      arg[File]("<file>...")
+        .optional()
+        .action { (x, c) => c.copy(file = Some(Path(x))) }
+        .text("The Ammonite script file you want to execute")
     }
-    parser.parse(args, Config()).foreach(c => run(c.predef, c.ammoniteHome))
+    parser.parse(args, Config()).foreach(c => run(c.predef, c.ammoniteHome, c.file))
   }
-  def run(predef: String = "", ammoniteHome: Path = defaultAmmoniteHome) = {
-    println("Loading Ammonite Repl...")
+  def run(predef: String = "",
+          ammoniteHome: Path = defaultAmmoniteHome,
+          file: Option[Path] = None) = {
+
     Timer("Repl.run Start")
-    val storage = Storage(ammoniteHome)
-    val repl = new Repl(
+    def storage = Storage(ammoniteHome)
+    def repl = new Repl(
       System.in, System.out,
       storage = Ref(storage),
       predef = predef + "\n" + storage.loadPredef
     )
-    repl.run()
+    file match{
+      case None =>
+        println("Loading Ammonite Repl...")
+        repl.run()
+      case Some(path) =>
+        repl.interp.replApi.load.module(path)
+    }
     Timer("Repl.run End")
   }
 }
