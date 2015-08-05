@@ -80,15 +80,31 @@ case class ImportData(fromName: String,
  * Encapsulates a read-write cell that can be passed around
  */
 trait StableRef[T]{
-
+  /**
+   * Get the current value of the this [[StableRef]] at this instant in time
+   */
   def apply(): T
+
+  /**
+   * Set the value of this [[StableRef]] to always be the value `t`
+   */
   def update(t: T): Unit
 }
 
 trait Ref[T] extends StableRef[T]{
+  /**
+   * Return a function that can be used to get the value of this [[Ref]]
+   * at any point in time
+   */
   def live(): () => T
+
+  /**
+   * Set the value of this [[Ref]] to always be the value of the by-name
+   * argument `t`, at any point in time
+   */
   def bind(t: => T): Unit
 }
+
 object Ref{
   implicit def refer[T](t: T): Ref[T] = Ref(t)
   implicit def refPPrint[T: PPrint]: PPrinter[Ref[T]] = PPrinter{ (ref, cfg) =>

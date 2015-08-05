@@ -185,6 +185,66 @@ object AdvancedTests extends TestSuite{
         res0: Int = 3
       """)
     }
+    'truncation{
+      check.session("""
+      @ Seq.fill(20)(100)
+      res0: Seq[Int] = List(
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+      ...
+
+      @ show(Seq.fill(20)(100))
+      res1: ammonite.pprint.Show[Seq[Int]] = List(
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      )
+
+      @ show(Seq.fill(20)(100), height = 3)
+      res2: ammonite.pprint.Show[Seq[Int]] = List(
+        100,
+        100,
+      ...
+
+      @ pprintConfig() = pprintConfig().copy(height = 5 )
+
+      @ Seq.fill(20)(100)
+      res4: Seq[Int] = List(
+        100,
+        100,
+        100,
+        100,
+      ...
+    """)
     'private{
       check.session("""
         @ private val x = 1; val y = x + 1

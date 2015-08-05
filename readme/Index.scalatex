@@ -90,7 +90,13 @@
         Ammonite-REPL uses @sect.ref{PPrint} to display its output by default. That means that everything is nicely formatted to fit within the width of the terminal, and is copy-paste-able!
 
       @p
-        By default, Ammonite truncates the pretty-printed output to avoid flooding your terminal. If you want to disable truncation, call @hl.scala{show(...)} on your expression to pretty-print it's full output. You can also pass in an optional @hl.scala{height = ...} parameter to control how much you want to show.
+        By default, Ammonite @sect.ref("Configurable Truncation", "truncates") the pretty-printed output to avoid flooding your terminal. If you want to disable truncation, call @hl.scala{show(...)} on your expression to pretty-print it's full output. You can also pass in an optional @hl.scala{height = ...} parameter to control how much you want to show before truncation.
+    @sect{Configurable Truncation}
+      @hl.ref(advancedTests, Seq("'truncation", "@"), "\"\"\"")
+
+      @p
+        Ammonite-REPL intelligently truncates your output when it's beyond a certain size. You can request for the full output to be printed on-demand, print a certain number of lines, or even change the implicit @code{pprintConfig} so subsequent lines all use your new configuration.
+
     @sect{Syntax Highlighting}
       @img(src:="Highlighting.png", width:="100%")
       @p
@@ -101,6 +107,7 @@
         Stack traces are similarly highlighted, for easier reading:
 
       @img(src:="ColoredTraces.png", width:="100%")
+
     @sect{Improved Editing}
       @p
         Ammonite by default ships with a custom implementation of readline, which provides...
@@ -114,11 +121,6 @@
          Console key-bindings! All the readline-style navigation hotkeys like @b{Ctrl-W} to delete a word or @b{Esc-Left}/@b{Right} to navigate one word left/right still work.
 
 
-    @sect{Configurable Truncation}
-      @hl.ref(advancedTests, Seq("'truncation", "@"), "\"\"\"")
-
-      @p
-        Ammonite-REPL intelligently truncates your output when it's beyond a certain size. You can request for the full output to be printed on-demand, print a certain number of lines, or even change the implicit @code{pprintConfig} so subsequent lines all use your new configuration.
 
     @sect{Superior Autocomplete}
       @p
@@ -252,6 +254,24 @@
       Some examples of things you can configure:
 
     @hl.ref(ammoniteTests/"BuiltinTests.scala", Seq("basicConfig", "@"))
+
+    @sect{Refs}
+      @p
+        By default, all the values you're seeing here with the @code{()} after them are @hl.scala{Ref}s, defined as
+
+      @hl.ref('repl/'src/'main/'scala/'ammonite/'repl/"Util.scala", "trait StableRef", "object Ref")
+
+      @p
+        As you can see from the signature, you can basically interact with the @hl.scala{Ref}s in two ways: either getting or setting their values as values, or binding their values to expressions that will be evaluated every time the @hl.scala{Ref}'s value is needed.
+
+      @p
+        As an example of the latter, you can use @hl.scala{bind} to set your @hl.scala{prompt} to always include your current working directory
+
+      @hl.scala
+        repl.prompt.bind(wd.toString + "@@ ")
+
+      @p
+        As is common practice in other shells. Further modifications to make it include e.g. your current branch in Git (which you can call through Ammonite's @sect.ref("Spawning Subprocess", "subprocess API") or the current timestamp/user are similarly possible.
 
   @sect{Filesystem Operations}
     @p
@@ -595,7 +615,7 @@
       @li
         @sect.ref("Pretty-printed output", "Pretty-printing") has been extracted into a separate project, and aside from that is greatly improved. Many more common cases (e.g. sealed trait hierarchies) are now pretty-printed rather than falling back to @code{toString}
       @li
-        Exposed the @sect.ref("Pretty-printed output", "show") function by default, letting you pretty-print any value with custom configuration (wrapping-width, truncation-height, colors, ...)
+        Exposed the @sect.ref("Configurable Truncation", "show") function by default, letting you pretty-print any value with custom configuration (wrapping-width, truncation-height, colors, ...)
       @li
         Fixed cases where PPrint/TPrint was causing compilation errors
       @li
@@ -618,7 +638,8 @@
         Performance improvements to the startup time of the REPL, with @a("more to come", href:="https://github.com/lihaoyi/Ammonite/issues/135")
       @li
         Third-party library resolution via @hl.scala{load.ivy} is now cached after the first call, letting you e.g. load libraries in your @code{~/.ammonite/predef.scala} without waiting for the slow ivy-resolution every startup
-
+      @li
+        Standardized the use of @sect.ref{Refs} for configuration, including the ability to bind them "live" to the value of an expression.
 
   @sect{0.3.2}
     @ul
