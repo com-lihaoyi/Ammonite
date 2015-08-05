@@ -59,27 +59,764 @@ span.hljs-tag, span.hljs-symbol{
 }
     </style><script src="scripts.js"></script></head><body><div>
 <a href="https://github.com/lihaoyi/ammonite" style="position: absolute;top: 0px;right: 0px;border: 0;"><img src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" /></a>
-<div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="Ammonite0.3.2" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Ammonite 0.3.2<a class=" scalatex-site-Styles-headerLink" href="#Ammonite0.3.2" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div><div class=" scalatex-site-Styles-content">
+
+<div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="Ammonite" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Ammonite<a class=" scalatex-site-Styles-headerLink" href="#Ammonite" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /><h2 style="font-weight: 300;color: #ccc;padding: 0px;margin-top: 0px;">A Modernized Scala REPL</h2></div><div class=" scalatex-site-Styles-content">
+
   <p>
-    <a href="https://github.com/lihaoyi/Ammonite">Ammonite</a> is a collection of Scala libraries intended to improve the experience of using Scala as an system shell. It includes two independent modules:
+    Ammonite is a cleanroom re-implementation of the Scala REPL from first principles. It is much more featureful than the default REPL and comes with a lot of ergonomic improvements that may be familiar to people coming from IDEs or other REPLs such as <a href="ipython.org">IPython</a> or <a href="http://www.zsh.org/">Zsh</a>.
 </p>
-  <ul>
-    <li>
-      <a href="#Ammonite-Ops">Ammonite-Ops</a>: A library for performing filesystem operations (reading, writing, copying, deleting, etc.) concisely in Scala. Much easier than doing things manually using <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">java.io</code>, while statically-typed and much safer than shelling out to Bash scripts.
-</li>
-    <li>
-      <a href="#Ammonite-REPL">Ammonite-REPL</a>: A modern, drop-in replacement for the standard Scala REPL (usable in any SBT project) with many <a href="#Features">new features</a> and better usability to make your shell usage a pleasant experience.
+  <p>
+    One way to get started with Ammonite is to download the standalone executable:
+</p>
+  <pre><code class="bash scalatex-site-Styles-highlightMe">$ curl -L -o amm http://git.io/vOo1d; chmod +x amm; ./amm
+
+</code></pre>
+  <pre><code class="scala scalatex-site-Styles-highlightMe">Loading Ammonite Repl...
+@ List(Seq(Seq(&quot;mgg&quot;, &quot;mgg&quot;, &quot;lols&quot;), Seq(&quot;mgg&quot;, &quot;mgg&quot;)), Seq(Seq(&quot;ggx&quot;, &quot;ggx&quot;),Seq(&quot;ggx&quot;, &quot;ggx&quot;, &quot;wt  fx&quot;)))
+
+res1: List[Seq[Seq[String]]] = List(
+  List(List(&quot;mgg&quot;, &quot;mgg&quot;, &quot;lols&quot;), List(&quot;mgg&quot;, &quot;mgg&quot;)),
+  List(List(&quot;ggx&quot;, &quot;ggx&quot;), List(&quot;ggx&quot;, &quot;ggx&quot;, &quot;wtfx&quot;))
+)
+</code></pre>
+  <p>
+    If you want some initialization code available to the REPL, you can add it to your <code>~/.ammonite/predef.scala</code>.
+</p>
+  <p>
+    You can also try out Ammonite-REPL in an existing Scala 2.11.x project, add the following to your <code>build.sbt</code>
+</p>
+  <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite-repl&quot; % &quot;0.4.0&quot; % &quot;test&quot; cross CrossVersion.full
+
+initialCommands in (Test, console) := &quot;&quot;&quot;ammonite.repl.Repl.run(&quot;&quot;)&quot;&quot;&quot;
+</code></pre>
+  <p>
+    After that, simple hit</p>
+  <code>
+    sbt projectName/test:console</code>
+  <p>
+    To activate the Ammonite REPL
+</p>
+  <p>
+    You can also pass a string to the <code>run</code> call containing any commands or imports you want executed at the start of every run. If you want Ammonite to be available in all projects, simply add the above snippet to a new file <code>~/.sbt/0.13/global.sbt</code>.
+</p>
+  <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="Features" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Features<a class=" scalatex-site-Styles-headerLink" href="#Features" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
+    <p>
+      Ammonite-REPL supports many more features than the default REPL, including:
+</p>
+    <h1 id="ArtifactLoading" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#ArtifactLoading" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Artifact Loading</h1>
+
+      <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">@ import scalatags.Text.all._
+error: not found: value scalatags
+
+@ load.ivy(&quot;com.lihaoyi&quot; %% &quot;scalatags&quot; % &quot;0.4.5&quot;)
+
+@ import scalatags.Text.all._
+import scalatags.Text.all._
+
+@ a(&quot;omg&quot;, href:=&quot;www.google.com&quot;).render
+res2: String = $tq
+&lt;a href=&quot;www.google.com&quot;&gt;omg&lt;/a&gt;
+$tq</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/test/scala/ammonite/repl/ProjectTests.scala#L17-L29" target="_blank"><i class="fa fa-link "></i></a></pre>
+
+      <p>
+        Ammonite allows you to load artifacts directly from maven central by copy &amp; pasting their SBT ivy-coordinate-snippet. In addition, you can also load in jars as <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">java.io.File</code>s to be included in the session or simple <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">String</code>s to be executed using the <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">load</code> command.
+</p>
+      <p>
+        This makes Ammonite ideal for trying out new libraries or tools. You can pull down projects like <a href="https://github.com/scalaz/scalaz">Scalaz</a> or <a href="https://github.com/milessabin/shapeless">Shapeless</a> and immediately start working with them in the REPL:
+</p>
+      <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">@ load.ivy(&quot;org.scalaz&quot; %% &quot;scalaz-core&quot; % &quot;7.1.1&quot;)
+
+@ import scalaz._
+import scalaz._
+
+@ import Scalaz._
+import Scalaz._
+
+@ (Option(1) |@| Option(2))(_ + _)
+res3: Option[Int] = Some(3)</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/test/scala/ammonite/repl/ProjectTests.scala#L92-L102" target="_blank"><i class="fa fa-link "></i></a></pre>
+
+      <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">@ load.ivy(&quot;com.chuusai&quot; %% &quot;shapeless&quot; % &quot;2.1.0&quot;)
+
+@ import shapeless._
+
+@ (1 :: &quot;lol&quot; :: List(1, 2, 3) :: HNil)
+res2: Int :: String :: List[Int] :: HNil = ::(1, ::(&quot;lol&quot;, ::(List(1, 2, 3), HNil)))
+
+@ res2(1)
+res3: String = &quot;lol&quot;</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/test/scala/ammonite/repl/ProjectTests.scala#L78-L87" target="_blank"><i class="fa fa-link "></i></a></pre>
+
+      <p>
+        Even non-trivial web frameworks like Finagle or Akka-HTTP can be simply pulled down and run in the REPL!
+</p>
+      <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">@ load.ivy(&quot;com.twitter&quot; %% &quot;finagle-httpx&quot; % &quot;6.26.0&quot;)
+
+@ import com.twitter.finagle._; import com.twitter.util._
+
+@ var serverCount = 0
+
+@ var clientResponse = 0
+
+@ val service = new Service[httpx.Request, httpx.Response] {
+@   def apply(req: httpx.Request): Future[httpx.Response] = {
+@     serverCount += 1
+@     Future.value(
+@       httpx.Response(req.version, httpx.Status.Ok)
+@     )
+@   }
+@ }
+
+@ val server = Httpx.serve(&quot;:8080&quot;, service)
+
+@ val client: Service[httpx.Request, httpx.Response] = Httpx.newService(&quot;:8080&quot;)
+
+@ val request = httpx.Request(httpx.Method.Get, &quot;/&quot;)
+
+@ request.host = &quot;www.scala-lang.org&quot;
+
+@ val response: Future[httpx.Response] = client(request)
+
+@ response.onSuccess { resp: httpx.Response =&gt;
+@   clientResponse = resp.getStatusCode
+@ }
+
+@ Await.ready(response)
+
+@ serverCount
+res12: Int = 1
+
+@ clientResponse
+res13: Int = 200
+
+@ server.close()</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/test/scala/ammonite/repl/ProjectTests.scala#L126-L166" target="_blank"><i class="fa fa-link "></i></a></pre>
+
+      <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">@ load.ivy(&quot;com.typesafe.akka&quot; %% &quot;akka-http-experimental&quot; % &quot;1.0-M3&quot;)
+
+@ implicit val system = akka.actor.ActorSystem()
+
+@ val serverBinding = akka.http.Http(system).bind(interface = &quot;localhost&quot;, port = 31337)
+
+@ implicit val materializer = akka.stream.ActorFlowMaterializer()
+
+@ var set = false
+
+@ serverBinding.connections.runForeach { connection =&gt;
+@   set = true
+@ }
+
+@ set
+res6: Boolean = false
+
+@ akka.stream.scaladsl.Source(
+@   List(akka.http.model.HttpRequest(uri=&quot;/&quot;))
+@ ).via(
+@   akka.http.Http().outgoingConnection(&quot;localhost&quot;, port=31337).flow
+@ ).runForeach(println)
+
+@ Thread.sleep(200)
+
+@ set
+res9: Boolean = true
+
+@ system.shutdown()</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/test/scala/ammonite/repl/ProjectTests.scala#L33-L62" target="_blank"><i class="fa fa-link "></i></a></pre>
+
+    <h1 id="Pretty-printedoutput" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#Pretty-printedoutput" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Pretty-printed output</h1>
+
+      <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">@ Seq.fill(10)(Seq.fill(3)(&quot;Foo&quot;))
+res0: Seq[Seq[String]] = List(
+  List(&quot;Foo&quot;, &quot;Foo&quot;, &quot;Foo&quot;),
+  List(&quot;Foo&quot;, &quot;Foo&quot;, &quot;Foo&quot;),
+  List(&quot;Foo&quot;, &quot;Foo&quot;, &quot;Foo&quot;),
+  List(&quot;Foo&quot;, &quot;Foo&quot;, &quot;Foo&quot;),
+  List(&quot;Foo&quot;, &quot;Foo&quot;, &quot;Foo&quot;),
+  List(&quot;Foo&quot;, &quot;Foo&quot;, &quot;Foo&quot;),
+  List(&quot;Foo&quot;, &quot;Foo&quot;, &quot;Foo&quot;),
+  List(&quot;Foo&quot;, &quot;Foo&quot;, &quot;Foo&quot;),
+  List(&quot;Foo&quot;, &quot;Foo&quot;, &quot;Foo&quot;),
+  List(&quot;Foo&quot;, &quot;Foo&quot;, &quot;Foo&quot;)
+)
+
+@ case class Foo(i: Int, s0: String, s1: Seq[String])
+defined class Foo
+
+@ Foo(1, &quot;&quot;, Nil)
+res2: Foo = Foo(1, &quot;&quot;, List())
+
+@ Foo(1234567, &quot;I am a cow, hear me moo&quot;, Seq(&quot;I weigh twice as much as you&quot;, &quot;and I look good on the barbecue&quot;))
+res3: Foo = Foo(
+  1234567,
+  &quot;I am a cow, hear me moo&quot;,
+  List(&quot;I weigh twice as much as you&quot;, &quot;and I look good on the barbecue&quot;)
+)</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/test/scala/ammonite/repl/AdvancedTests.scala#L14-L40" target="_blank"><i class="fa fa-link "></i></a></pre>
+
+      <p>
+        Ammonite-REPL uses <a href="#PPrint">PPrint</a> to display its output by default. That means that everything is nicely formatted to fit within the width of the terminal, and is copy-paste-able!
+</p>
+      <p>
+        By default, Ammonite <a href="#ConfigurableTruncation">truncates</a> the pretty-printed output to avoid flooding your terminal. If you want to disable truncation, call <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">show(...)</code> on your expression to pretty-print it's full output. You can also pass in an optional <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">height = ...</code> parameter to control how much you want to show before truncation.</p>
+    <h1 id="ConfigurableTruncation" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#ConfigurableTruncation" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Configurable Truncation</h1>
+      <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">@ Seq.fill(20)(100)
+res0: Seq[Int] = List(
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+...
+
+@ show(Seq.fill(20)(100))
+res1: ammonite.pprint.Show[Seq[Int]] = List(
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100
+)
+
+@ show(Seq.fill(20)(100), height = 3)
+res2: ammonite.pprint.Show[Seq[Int]] = List(
+  100,
+  100,
+...
+
+@ pprintConfig() = pprintConfig().copy(height = 5 )
+
+@ Seq.fill(20)(100)
+res4: Seq[Int] = List(
+  100,
+  100,
+  100,
+  100,
+...</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/test/scala/ammonite/repl/AdvancedTests.scala#L189-L246" target="_blank"><i class="fa fa-link "></i></a></pre>
+
+      <p>
+        Ammonite-REPL intelligently truncates your output when it's beyond a certain size. You can request for the full output to be printed on-demand, print a certain number of lines, or even change the implicit <code>pprintConfig</code> so subsequent lines all use your new configuration.
+</p>
+    <h1 id="SyntaxHighlighting" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#SyntaxHighlighting" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Syntax Highlighting</h1>
+      <img src="Highlighting.png" style="width: 100%;" />
+      <p>
+        Ammonite syntax highlights both the code you're entering as well as any output being echoed in response. This should make it much easier to work with larger snippets of input.</p>
+      <p>
+        All colors are configurable, and you can easily turn off colors entirely via the <a href="#Configuration">Configuration</a>.</p>
+      <p>
+        Stack traces are similarly highlighted, for easier reading:
+</p>
+      <img src="ColoredTraces.png" style="width: 100%;" />
+
+    <h1 id="ImprovedEditing" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#ImprovedEditing" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Improved Editing</h1>
+      <p>
+        Ammonite by default ships with a custom implementation of readline, which provides...
+</p>
+     <ul>
+       <li>
+         Multi-line editing! You can use the <b>Up</b> and <b>Down</b> arrows to navigate between lines within your snippet. This makes dealing with larger snippets of code much easier.</li>
+       <li>
+         Desktop key-bindings! You can use <b>Alt-Left</b>/<b>Right</b> to move forward/backwards by one word at a time or hold down <b>Shift</b> to select text to delete. These compose as you'd be used to: e.g. <b>Shift-Up</b> selects all the text between your current cursor and the same column one row up.</li>
+       <li>
+         Console key-bindings! All the readline-style navigation hotkeys like <b>Ctrl-W</b> to delete a word or <b>Esc-Left</b>/<b>Right</b> to navigate one word left/right still work.
+
+
 </li></ul>
+    <h1 id="SuperiorAutocomplete" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#SuperiorAutocomplete" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Superior Autocomplete</h1>
+      <p>
+        The original Scala REPL provides no autocomplete except for the most basic scenarios of <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">value.&lt;complete&gt;</code>. In the Ammonite-REPL, you get the same autocomplete-anywhere support that you get in a modern IDE.
+</p>
+      <pre><code class="scala scalatex-site-Styles-highlightMe">  @ Seq(1, 2, 3).map(x =&gt; x.)
+  getClass            ##                  asInstanceOf        isInstanceOf
+  toString            hashCode            equals              !=
+  ==                  %                   /                   *
+  -                   +                   ^                   &amp;
+  |                   &gt;=                  &gt;                   &lt;=
+  &lt;                   &gt;&gt;                  &gt;&gt;&gt;                 &lt;&lt;
+  unary_-             unary_+             unary_~             toDouble
+  toFloat             toLong              toInt               toChar
+  toShort             toByte              compareTo           doubleValue
+  ...
+
+  @ Futu
+  scala.collection.parallel.FutureThreadPoolTasks
+  scala.collection.parallel.FutureTasks
+  scala.concurrent.impl.Future$PromiseCompletingRunnable
+  scala.concurrent.impl.Future
+  scala.concurrent.Future
+  scala.concurrent.FutureTaskRunner
+  scala.concurrent.Future$InternalCallbackExecutor
+  scala.concurrent.Future$class
+  java.util.concurrent.Future
+  java.util.concurrent.FutureTask$WaitNode
+  java.util.concurrent.FutureTask
+  com.sun.corba.se.impl.orbutil.closure.Future
+</code></pre>
+
+      <p>
+        Neither of these examples work in the standard Scala REPL.
+</p>
+    <h1 id="Interruptingrun-awayexecutionwithCtrl-C" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#Interruptingrun-awayexecutionwithCtrl-C" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Interrupting run-away execution with Ctrl-C</h1>
+      <pre><code class="scala scalatex-site-Styles-highlightMe">  @ while(true) ()
+  ... hangs ...
+  ^Ctrl-C
+  Interrupted!
+
+  @
+</code></pre>
+      <p>
+        The traditional Scala REPL doesn't handle runaway code, and gives you no option but to kill the process, losing all your work. Ammonite-REPL lets you interrupt the thread, stop the runaway-command and keep going.
+</p>
+    <h1 id="Compiler-crashRobustness" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#Compiler-crashRobustness" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Compiler-crash Robustness</h1>
+      <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">@ val x = 1
+x: Int = 1
+
+@ /* trigger compiler crash */ trait Bar { super[Object].hashCode }
+error: java.lang.AssertionError: assertion failed
+
+@ 1 + x
+res1: Int = 2</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/test/scala/ammonite/repl/FailureTests.scala#L35-L43" target="_blank"><i class="fa fa-link "></i></a></pre>
+
+      <p>
+        The default Scala REPL throws away all your work if the compiler crashes. This doesn't make any sense, because all the compiler is is a dumb <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">String =&gt; Array[Byte]</code> pipe. In the Ammonite, we simply swap out the broken compiler for a new one and let you continue your work.</p>
+    <h1 id="OtherFixes" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#OtherFixes" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Other Fixes</h1>
+      <p>
+        Apart from the above features, the Ammonite REPL fixes a large number of bugs in the default Scala REPL, including but not limited to:</p>
+      <ul>
+        
+        
+          <li><a href="https://issues.scala-lang.org/browse/SI-6302">SI-6302</a></li>
+        
+          <li><a href="https://issues.scala-lang.org/browse/SI-8971">SI-8971</a></li>
+        
+          <li><a href="https://issues.scala-lang.org/browse/SI-9249">SI-9249</a></li>
+        
+          <li><a href="https://issues.scala-lang.org/browse/SI-4438">SI-4438</a></li>
+        
+          <li><a href="https://issues.scala-lang.org/browse/SI-8603">SI-8603</a></li>
+        
+          <li><a href="https://issues.scala-lang.org/browse/SI-6660">SI-6660</a></li>
+        
+          <li><a href="https://issues.scala-lang.org/browse/SI-7953">SI-7953</a></li>
+        
+          <li><a href="https://issues.scala-lang.org/browse/SI-6659">SI-6659</a></li>
+        
+          <li><a href="https://issues.scala-lang.org/browse/SI-8456">SI-8456</a></li>
+        
+          <li><a href="https://issues.scala-lang.org/browse/SI-1067">SI-1067</a></li>
+        
+          <li><a href="https://issues.scala-lang.org/browse/SI-8307">SI-8307</a></li>
+        
+          <li><a href="https://issues.scala-lang.org/browse/SI-9335">SI-9335</a></li>
+        </ul>
+  <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="Builtins" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Builtins<a class=" scalatex-site-Styles-headerLink" href="#Builtins" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
+    <p>
+      Ammonite contains a range of useful built-ins implemented as normal functions. Everything inside the <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">ReplAPI</code> trait is imported by default and can be accessed directly by default to control the console.
+</p>
+    <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">trait ReplAPI extends OpsAPI{
+  /**
+   * Exit the Ammonite REPL. You can also use Ctrl-D to exit
+   */
+  def exit = throw ReplExit
+
+  /**
+   * Read/writable prompt for the shell. Use this to change the
+   * REPL prompt at any time!
+   */
+  val prompt: Ref[String]
+  /**
+   * The front-end REPL used to take user input. Modifiable!
+   */
+  val frontEnd: Ref[FrontEnd]
+
+  /**
+   * Display help text if you don't know how to use the REPL
+   */
+  def help: String
+
+  /**
+   * History of commands that have been entered into the shell, including
+   * previous sessions
+   */
+  def fullHistory: History
+
+  /**
+   * History of commands that have been entered into the shell during the
+   * current session
+   */
+  def history: History
+
+  /**
+   * Get the `Type` object of [[T]]. Useful for finding
+   * what its methods are and what you can do with it
+   */
+  def typeOf[T: WeakTypeTag]: Type
+
+  /**
+   * Get the `Type` object representing the type of `t`. Useful
+   * for finding what its methods are and what you can do with it
+   *
+   */
+  def typeOf[T: WeakTypeTag](t: =&gt; T): Type
+  
+  /**
+   * Tools related to loading external scripts and code into the REPL
+   */
+  def load: Load
+
+  /**
+   * The colors that will be used to render the Ammonite REPL in the terminal
+   */
+  val colors: Ref[Colors]
+
+  /**
+   * Throw away the current scala.tools.nsc.Global and get a new one
+   */
+  def newCompiler(): Unit
+
+  /**
+   * Access the compiler to do crazy things if you really want to!
+   */
+  def compiler: scala.tools.nsc.Global
+
+  /**
+   * Show all the imports that are used to execute commands going forward
+   */
+  def imports: String
+  /**
+   * Controls how things are pretty-printed in the REPL. Feel free
+   * to shadow this with your own definition to change how things look
+   */
+  implicit val pprintConfig: Ref[pprint.Config]
+
+  implicit def derefPPrint(implicit t: Ref[pprint.Config]): pprint.Config = t()
+
+  /**
+   * Current width of the terminal
+   */
+  def width: Int
+  /**
+   * Current height of the terminal
+   */
+  def height: Int
+
+  /**
+   * Lets you configure the pretty-printing of a value. By default, it simply
+   * disables truncation and prints the entire thing, but you can set other
+   * parameters as well if you want.
+   */
+  def show[T: PPrint](implicit cfg: Config): T =&gt; Unit
+  def show[T: PPrint](t: T,
+                      width: Integer = 0,
+                      height: Integer = null,
+                      indent: Integer = null,
+                      colors: pprint.Colors = null)
+                     (implicit cfg: Config = Config.Defaults.PPrintConfig): Unit
+}
+trait OpsAPI{
+  /**
+   * The current working directory of the shell, that will get picked up by
+   * any [[Relativizer]] below, and can be modified using [[cd]]
+   */
+  implicit def wd: Path
+  /**
+   * Change the working directory `wd`; if the provided path is relative it
+   * gets appended on to the current `wd`, if it's absolute it replaces.
+   */
+  val cd: ammonite.ops.Op1[ammonite.ops.Path, ammonite.ops.Path]
+
+  /**
+   * Allows you to use relative paths (and anything convertible to a relative
+   * path) as absolute paths when working in the REPL. Note that this isn't
+   * available when using Ammonite-Ops in a standalone project! In such cases,
+   * it's good practice to convert paths from relative to absolute explicitly.
+   */
+  implicit def Relativizer[T](p: T)(implicit b: Path, f: T =&gt; RelPath): Path
+
+}
+// End of OpsAPI
+trait Load extends (String =&gt; Unit){
+  /**
+   * Load a `.jar` file
+   */
+  def jar(jar: Path): Unit
+  /**
+   * Load a library from its maven/ivy coordinates
+   */
+  def ivy(coordinates: (String, String, String), verbose: Boolean = true): Unit
+
+  /**
+   * Loads a command into the REPL and
+   * evaluates them one after another
+   */
+  def apply(line: String): Unit
+
+  /**
+   * Loads and executes the scriptfile on the specified path.
+   * Compilation units separated by `@\n` are evaluated sequentially.
+   * If an error happens it prints an error message to the console.
+   */ 
+  def exec(path: Path): Unit
+
+  def module(path: Path): Unit
+
+}</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/main/scala/ammonite/repl/frontend/ReplAPI.scala#L25-L174" target="_blank"><i class="fa fa-link "></i></a></pre>
+
+  <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="MultilineInput" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Multiline Input<a class=" scalatex-site-Styles-headerLink" href="#MultilineInput" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
+    <p>
+      To enter multiline input into the Ammonite-REPL, simply wrap the multiple lines in curly braces <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">{ ... }</code>, and Ammonite will wait until you close it before evaluating the contents:
+</p>
+    <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">@ {
+@   val x = 1
+@   val y = 2
+@   x + y
+@ }
+x: Int = 1
+y: Int = 2
+res0_2: Int = 3</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/test/scala/ammonite/repl/AdvancedTests.scala#L167-L175" target="_blank"><i class="fa fa-link "></i></a></pre>
+
+    <p>
+      As you can see, the contents of the <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">{ ... }</code> block are unwrapped and evaluated as top-level statements. You can use this to e.g. declare mutually recursive functions or classes &amp; companion-objects without being forced to squeeze everything onto a single line.
+</p>
+    <p>
+      If you don't want this un-wrapping behavior, simply add another set of curlies and the block will be evaluated as a normal block, to a single expression:
+</p>
+    <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">@ {{
+@   val x = 1
+@   val y = 2
+@   x + y
+@ }}
+res0: Int = 3</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/test/scala/ammonite/repl/AdvancedTests.scala#L179-L185" target="_blank"><i class="fa fa-link "></i></a></pre>
+
+  <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="ScriptFiles" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Script Files<a class=" scalatex-site-Styles-headerLink" href="#ScriptFiles" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
+    <p>
+      Ammonite defines a format that allows you to load external scripts into the REPL; this can be used to save common functionality so it can be used at a later date. In the simplest case, a script file is simply a sequence of Scala statements, e.g.
+</p>
+    <pre><code class="scala scalatex-site-Styles-highlightMe">// print banner
+println(&quot;Welcome to the XYZ custom REPL!!&quot;)
+
+// common imports
+import sys.process._
+import collection.mutable
+
+// common initialization code
+...
+</code></pre>
+    <p>
+      By default, everything in a script is compiled and executed as a single block. That means that if you want to perform classpath-modifying operations, such as <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">load.jar</code> or <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">load.ivy</code>, its results will not be available within the same script if you want to use methods, values or packages defined in the loaded code. To make this work, break the script up into multiple compilation units with an @ sign, e.g.
+</p>
+    <pre><code class="scala scalatex-site-Styles-highlightMe">// print banner
+println(&quot;Welcome to the XYZ custom REPL!!&quot;)
+
+load.ivy(&quot;org.scalaz&quot; %% &quot;scalaz-core&quot; % &quot;7.1.1&quot;)
+
+@
+
+// common imports
+import scalaz._
+import Scalaz._
+
+// common initialization code
+...</code></pre>
+    <p>
+      Ammonite provides two ways to load scripts, <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">load.exec</code> and <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">load.module</code>.
+</p>
+    <p>
+      With <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">load.exec</code> the script is executed like it was pasted in the REPL. Exec scripts can access all values previously defined in the REPL, and all side-effects are guaranteed to be applied. This is useful for one-off sets of commands.</p>
+    <p>
+      With <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">load.module</code>, the script is loaded like a Scala module. That means it can't access values previously defined in the REPL, but it is guaranteed to only execute once even if loaded many times by different scripts. If you want to execute the script code multiple times, put it in a function and call it after you load the script.
+</p>
+     <p>
+       Any scripts you load can themselves load scripts. You can also run scripts using the Ammonite executable from an external shell (e.g. bash):
+</p>
+    <pre><code class="scala scalatex-site-Styles-highlightMe">bash$ ./amm path/to/script.scala
+</code></pre>
+    <p>
+      All types, values and imports defined in scripts are available to commands entered in REPL after loading the script.
+</p>
+  <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="Configuration" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Configuration<a class=" scalatex-site-Styles-headerLink" href="#Configuration" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
+    <p>
+      Ammonite is configured via Scala code, that can live in the <code>~/.ammonite/predef.scala</code> file, passed in through SBT's <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">initialCommands</code>, or passed to the command-line executable as <code>--predef='...'</code>.
+</p>
+    <p>
+      Anything that you put in <code>predef.scala</code> will be executed when you load the Ammonite REPL. This is a handy place to put common imports, setup code, or even call <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">load.ivy</code> to <a href="#ArtifactLoading">load third-party jars</a>. The compilation of the predef is cached, so after the first run it should not noticeably slow down the initialization of your REPL.
+</p>
+    <p>
+      Some examples of things you can configure:
+</p>
+    <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">@ // Set the shell prompt to be something else
+
+@ repl.prompt() = &quot;&gt;&quot;
+
+@ // Change the terminal front end; the default is
+
+@ // Ammonite on Linux/OSX and JLineWindows on Windows
+
+@ repl.frontEnd() = ammonite.repl.frontend.FrontEnd.JLineUnix
+
+@ repl.frontEnd() = ammonite.repl.frontend.FrontEnd.JLineWindows
+
+@ repl.frontEnd() = ammonite.repl.frontend.FrontEnd.Ammonite
+
+@ // Changing the colors used by Ammonite; all at once:
+
+@ repl.colors() = ammonite.repl.Colors.BlackWhite
+
+@ repl.colors() = ammonite.repl.Colors.Default
+
+@ // or one at a time:
+
+@ repl.colors().prompt() = Console.RED
+
+@ repl.colors().ident() = Console.GREEN
+
+@ repl.colors().`type`() = Console.YELLOW
+
+@ repl.colors().literal() = Console.MAGENTA
+
+@ repl.colors().prefix() = Console.CYAN
+
+@ repl.colors().comment() = Console.RED
+
+@ repl.colors().keyword() = Console.BOLD
+
+@ repl.colors().selected() = Console.UNDERLINED
+
+@ repl.colors().error() = Console.YELLOW</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/test/scala/ammonite/repl/BuiltinTests.scala#L13-L52" target="_blank"><i class="fa fa-link "></i></a></pre>
+
+    <h1 id="Refs" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#Refs" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Refs</h1>
+      <p>
+        By default, all the values you're seeing here with the <code>()</code> after them are <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Ref</code>s, defined as
+</p>
+      <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">trait StableRef[T]{
+  /**
+   * Get the current value of the this [[StableRef]] at this instant in time
+   */
+  def apply(): T
+
+  /**
+   * Set the value of this [[StableRef]] to always be the value `t`
+   */
+  def update(t: T): Unit
+}
+
+trait Ref[T] extends StableRef[T]{
+  /**
+   * Return a function that can be used to get the value of this [[Ref]]
+   * at any point in time
+   */
+  def live(): () =&gt; T
+
+  /**
+   * Set the value of this [[Ref]] to always be the value of the by-name
+   * argument `t`, at any point in time
+   */
+  def bind(t: =&gt; T): Unit
+}</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/main/scala/ammonite/repl/Util.scala#L81-L107" target="_blank"><i class="fa fa-link "></i></a></pre>
+
+      <p>
+        As you can see from the signature, you can basically interact with the <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Ref</code>s in two ways: either getting or setting their values as values, or binding their values to expressions that will be evaluated every time the <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Ref</code>'s value is needed.
+</p>
+      <p>
+        As an example of the latter, you can use <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">bind</code> to set your <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">prompt</code> to always include your current working directory
+</p>
+      <pre><code class="scala scalatex-site-Styles-highlightMe">repl.prompt.bind(wd.toString + &quot;@ &quot;)
+</code></pre>
+      <p>
+        As is common practice in other shells. Further modifications to make it include e.g. your current branch in Git (which you can call through Ammonite's <a href="#SpawningSubprocess">subprocess API</a> or the current timestamp/user are similarly possible.
+</p>
+  <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="FilesystemOperations" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Filesystem Operations<a class=" scalatex-site-Styles-headerLink" href="#FilesystemOperations" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
+    <p>
+      Ammonite uses <a href="#Ammonite-Ops">Ammonite-Ops</a> to provide a nice API to use filesystem operations. To access it, simply call</p>
+    <pre><code class="scala scalatex-site-Styles-highlightMe">import ammonite.ops._</code></pre>
+    <p>
+      Or add it to your <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">~/.ammonite/predef.scala</code> if you want it available all the time in your REPL. The Ammonite REPL also provides some additional command-line-friendly functionality on top of the default Ammonite-Ops commands:</p>
+    <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">trait OpsAPI{
+  /**
+   * The current working directory of the shell, that will get picked up by
+   * any [[Relativizer]] below, and can be modified using [[cd]]
+   */
+  implicit def wd: Path
+  /**
+   * Change the working directory `wd`; if the provided path is relative it
+   * gets appended on to the current `wd`, if it's absolute it replaces.
+   */
+  val cd: ammonite.ops.Op1[ammonite.ops.Path, ammonite.ops.Path]
+
+  /**
+   * Allows you to use relative paths (and anything convertible to a relative
+   * path) as absolute paths when working in the REPL. Note that this isn't
+   * available when using Ammonite-Ops in a standalone project! In such cases,
+   * it's good practice to convert paths from relative to absolute explicitly.
+   */
+  implicit def Relativizer[T](p: T)(implicit b: Path, f: T =&gt; RelPath): Path
+
+}</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/main/scala/ammonite/repl/frontend/ReplAPI.scala#L125-L146" target="_blank"><i class="fa fa-link "></i></a></pre>
+    <p>
+      These are imported by default into every repl session, and basically let you treat the Ammonite-REPL much more like a Bash shell. You can `hl.scala{cd!} in and out of directories, and treat relative paths as shorthand for absolute paths when working in the shell. This means you can enter commands like</p>
+    <pre><code class="scala scalatex-site-Styles-highlightMe">@ cd! up
+
+@ cd! 'foldername
+
+@ ls!
+
+@ ls! 'foldername
+
+@ stat! &quot;folder-name-with-dashes&quot;/&quot;file.txt'
+</code></pre>
+    <p>
+      Without having to repeatedly qualify theses relative paths with your current working directory. You can use Ammonite-Ops' support for <a href="#SpawningSubprocesses">Spawning Subprocesses</a> to call external programs, even interactive ones like Python or SBT!
+</p>
+    <pre><code class="scala scalatex-site-Styles-highlightMe">@ %python
+Python 2.7.6 (default, Sep  9 2014, 15:04:36)
+[GCC 4.2.1 Compatible Apple LLVM 6.0 (clang-600.0.39)] on darwin
+Type &quot;help&quot;, &quot;copyright&quot;, &quot;credits&quot; or &quot;license&quot; for more information.
+&gt;&gt;&gt; print &quot;Hello %s%s&quot; % (&quot;World&quot;, &quot;!&quot;*3)
+Hello World!!!
+&gt;&gt;&gt; ^D
+res3: Int = 0
+
+@ %sbt
+[info] Loading global plugins from /Users/haoyi/.sbt/0.13/plugins
+[info] Updating {file:/Users/haoyi/.sbt/0.13/plugins/}global-plugins...
+[info] Resolving org.fusesource.jansi#jansi;1.4 ...
+[info] Done updating.
+[info] Set current project to haoyi (in build file:/Users/haoyi/)
+&gt;
+
+</code></pre></div>
+<div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="Ammonite-Ops" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Ammonite-Ops<a class=" scalatex-site-Styles-headerLink" href="#Ammonite-Ops" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /><h2 style="font-weight: 300;color: #ccc;padding: 0px;margin-top: 0px;">Rock-solid Filesystem Operations</h2></div><div class=" scalatex-site-Styles-content">
   <p>
-    Each of these are independent modules that are each usable on their own. Together, they form the basis of a systems shell that can be used as a replacement for the <a href="http://en.wikipedia.org/wiki/Bash_%28Unix_shell%29">Bash shell</a> for performing common system housekeeping tasks. Separately, <a href="#Ammonite-Ops">Ammonite-Ops</a> is a best-in-class file-system IO library and <a href="#Ammonite-REPL">Ammonite-REPL</a> is a best-in-class Scala REPL.
+    Ammonite-Ops is a collection of tools intended to make common filesystem operations in Scala as concise and easy-to-use as from the Bash shell, while being robust enough to use in large applications without getting messy. It lives in the same repo as the Ammonite REPL, but can easily be used stand-alone in a normal SBT/maven project.
 </p>
   <p>
-    Ammonite for now only works on Unix/OS-X/Linux (i.e. no <a href="https://github.com/lihaoyi/Ammonite/issues/18">Windows support</a>) and Java 7 and above.
+    To get started with Ammonite-Ops, add this to your <code>build.sbt</code>:
+</p>
+  <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">libraryDependencies += &quot;com.lihaoyi&quot; %% &quot;ammonite-ops&quot; % &quot;0.4.0&quot;</code>
 
-
-    <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="Ammonite-Ops" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Ammonite-Ops<a class=" scalatex-site-Styles-headerLink" href="#Ammonite-Ops" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /><h2 style="font-weight: 300;color: #ccc;padding: 0px;margin-top: 0px;">Rock-solid Filesystem Operations</h2></div>
-      
-      <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">import ammonite.ops._
+  <p>
+    And you're all set!
+</p>
+  
+  <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">import ammonite.ops._
 
 // Pick the directory you want to work with,
 // relative to the process working dir
@@ -114,13 +851,10 @@ val lineCount = ls.rec! wd |? (_.ext == &quot;java&quot;) | read.lines | (_.size
 // Find and concatenate all .java files directly in the working directory
 ls! wd/'dir2|? (_.ext == &quot;java&quot;) | read |&gt; write! wd/'target/&quot;bundled.java&quot;</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/test/scala/test/ammonite/ops/ExampleTests.scala#L9-L44" target="_blank"><i class="fa fa-link "></i></a></pre>
 
-      <p>
-        Ammonite-Ops is a collection of tools intended to make common filesystem operations in Scala as concise and easy-to-use as from the Bash shell, while being robust enough to use in large applications without getting messy.
+  <p>
+    As you can see, Ammonite-Ops replaces the common mess of boilerplate:
 </p>
-      <p>
-        As you can see, Ammonite-Ops replaces the common mess of boilerplate:
-</p>
-      <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">def removeAll(path: String) = {
+  <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">def removeAll(path: String) = {
   def getRecursively(f: java.io.File): Seq[java.io.File] = {
     f.listFiles.filter(_.isDirectory).flatMap(getRecursively) ++ f.listFiles
   }
@@ -133,47 +867,34 @@ ls! wd/'dir2|? (_.ext == &quot;java&quot;) | read |&gt; write! wd/'target/&quot;
 }
 removeAll(&quot;target/folder/thing&quot;)</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/test/scala/test/ammonite/ops/ExampleTests.scala#L80-L93" target="_blank"><i class="fa fa-link "></i></a></pre>
 
-      <p>
-        With a single, sleek expression:
+  <p>
+    With a single, sleek expression:
 </p>
-      <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">rm! cwd/'target/'folder/'thing</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/test/scala/test/ammonite/ops/ExampleTests.scala#L97-L98" target="_blank"><i class="fa fa-link "></i></a></pre>
+  <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">rm! cwd/'target/'folder/'thing</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/test/scala/test/ammonite/ops/ExampleTests.scala#L97-L98" target="_blank"><i class="fa fa-link "></i></a></pre>
 
-      <p>
-        That handles the common case for you: recursively deleting folders, not-failing if the file doesn't exist, etc.
+  <p>
+    That handles the common case for you: recursively deleting folders, not-failing if the file doesn't exist, etc.
 </p>
-      <p>
-        To get started, add this to your <code>build.sbt</code>:
+  <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="Paths" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Paths<a class=" scalatex-site-Styles-headerLink" href="#Paths" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
+    <p>
+      Ammonite uses strongly-typed data-structures to represent filesystem paths. The two basic versions are:
 </p>
-      <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">&quot;com.lihaoyi&quot; %% &quot;ammonite-ops&quot; % &quot;0.3.2&quot;</code>
-
-      <p>
-        And this at the top of the file you want to use Ammonite:
-</p>
-      <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">import ammonite.ops._</code>
-
-      <p>
-        And you're all set!
-</p>
-      <h1 id="Paths" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#Paths" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Paths</h1>
-        <p>
-          Ammonite uses strongly-typed data-structures to represent filesystem paths. The two basic versions are:
-</p>
-        <ul>
-          <li>
-            <code>Path</code>: an absolute path, starting from the root
+    <ul>
+      <li>
+        <code>Path</code>: an absolute path, starting from the root
 </li>
-          <li>
-            <code>RelPath</code>: a relative path, not rooted anywhere
+      <li>
+        <code>RelPath</code>: a relative path, not rooted anywhere
 </li></ul>
-        <p>
-          Generally, almost all commands take absolute <code>Path</code>s. These are basically defined as:
+    <p>
+      Generally, almost all commands take absolute <code>Path</code>s. These are basically defined as:
 </p>
-        <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">case class Path(segments: Seq[String]) extends BasePathImpl[Path]{</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/main/scala/ammonite/ops/Path.scala#L224-L225" target="_blank"><i class="fa fa-link "></i></a></pre>
+    <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">case class Path(segments: Seq[String]) extends BasePathImpl[Path]{</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/main/scala/ammonite/ops/Path.scala#L235-L236" target="_blank"><i class="fa fa-link "></i></a></pre>
 
-        <p>
-          With a number of useful operations that can be performed on them. Absolute paths can be created in a few ways:
+    <p>
+      With a number of useful operations that can be performed on them. Absolute paths can be created in a few ways:
 </p>
-        <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">// Get the process' Current Working Directory. As a convention
+    <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">// Get the process' Current Working Directory. As a convention
 // the directory that &quot;this&quot; code cares about (which may differ
 // from the cwd) is called `wd`
 val wd = cwd
@@ -193,37 +914,37 @@ wd/up
 // Up two levels from the wd
 wd/up/up</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/test/scala/test/ammonite/ops/ExampleTests.scala#L102-L121" target="_blank"><i class="fa fa-link "></i></a></pre>
 
-        <p>
-          Note that there are no in-built operations to change the `cwd`. In general you should not need to: simply defining a new path, e.g.
+    <p>
+      Note that there are no in-built operations to change the `cwd`. In general you should not need to: simply defining a new path, e.g.
 </p>
-        <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">val target = cwd/'target</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/test/scala/test/ammonite/ops/ExampleTests.scala#L123-L124" target="_blank"><i class="fa fa-link "></i></a></pre>
+    <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">val target = cwd/'target</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/test/scala/test/ammonite/ops/ExampleTests.scala#L123-L124" target="_blank"><i class="fa fa-link "></i></a></pre>
 
-        <p>
-          Should be sufficient for most needs.
+    <p>
+      Should be sufficient for most needs.
 </p>
-        <p>
-          Above, we made use of the <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">cwd</code> built-in path. There are a number of <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Path</code>s built into Ammonite:
+    <p>
+      Above, we made use of the <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">cwd</code> built-in path. There are a number of <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Path</code>s built into Ammonite:
 </p>
-        <ul>
-          <li>
-            <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">cwd</code>: The current working directory of the process. This can't be changed in Java, so if you need another path to work with the convention is to define a <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">wd</code> variable.</li>
-          <li>
-            <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">root</code>: The root of the filesystem.</li>
-          <li>
-            <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">home</code>: The home directory of the current user.</li>
-          <li>
-            <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">makeTmp</code>: Creates a temporary folder and returns the path.
+    <ul>
+      <li>
+        <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">cwd</code>: The current working directory of the process. This can't be changed in Java, so if you need another path to work with the convention is to define a <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">wd</code> variable.</li>
+      <li>
+        <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">root</code>: The root of the filesystem.</li>
+      <li>
+        <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">home</code>: The home directory of the current user.</li>
+      <li>
+        <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">makeTmp</code>: Creates a temporary folder and returns the path.
 </li></ul>
-      <h1 id="RelPaths" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#RelPaths" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>RelPaths</h1>
-        <p>
-          <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">RelPath</code>s represent relative paths. These are basically defined as:
+  <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="RelPaths" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">RelPaths<a class=" scalatex-site-Styles-headerLink" href="#RelPaths" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
+    <p>
+      <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">RelPath</code>s represent relative paths. These are basically defined as:
 </p>
-        <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">case class RelPath(segments: Seq[String], ups: Int) extends BasePathImpl[RelPath]{</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/main/scala/ammonite/ops/Path.scala#L131-L132" target="_blank"><i class="fa fa-link "></i></a></pre>
+    <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">case class RelPath(segments: Seq[String], ups: Int) extends BasePathImpl[RelPath]{</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/main/scala/ammonite/ops/Path.scala#L131-L132" target="_blank"><i class="fa fa-link "></i></a></pre>
 
-        <p>
-          The same data structure as <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Path</code>s, except that they can represent a number of <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">up</code>s before the relative path is applied. They can be created in the following ways:
+    <p>
+      The same data structure as <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Path</code>s, except that they can represent a number of <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">up</code>s before the relative path is applied. They can be created in the following ways:
 </p>
-        <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">// The path &quot;folder/file&quot;
+    <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">// The path &quot;folder/file&quot;
 val rel1 = 'folder/'file
 val rel2 = 'folder/'file
 
@@ -239,38 +960,38 @@ val minus = cwd - target
 val ups = up/up
 assert(minus == ups)</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/test/scala/test/ammonite/ops/ExampleTests.scala#L126-L141" target="_blank"><i class="fa fa-link "></i></a></pre>
 
-        <p>
-          In general, very few APIs take relative paths. Their main purpose is to be combined with absolute paths in order to create new absolute paths. e.g.
+    <p>
+      In general, very few APIs take relative paths. Their main purpose is to be combined with absolute paths in order to create new absolute paths. e.g.
 </p>
-        <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">val target = cwd/'target/'file
+    <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">val target = cwd/'target/'file
 val rel = target - cwd
 val newBase = root/'code/'server
 assert(newBase/rel == root/'code/'server/'target/'file)</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/test/scala/test/ammonite/ops/ExampleTests.scala#L146-L150" target="_blank"><i class="fa fa-link "></i></a></pre>
 
-        <p>
-          <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">up</code> is a relative path that comes in-built:
+    <p>
+      <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">up</code> is a relative path that comes in-built:
 </p>
-        <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">val target = root/'target/'file
+    <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">val target = root/'target/'file
 assert(target/up == root/'target)</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/test/scala/test/ammonite/ops/ExampleTests.scala#L152-L154" target="_blank"><i class="fa fa-link "></i></a></pre>
 
-        <p>
-          Note that all paths, both relative and absolute, are always expressed in a canonical manner:
+    <p>
+      Note that all paths, both relative and absolute, are always expressed in a canonical manner:
 </p>
-        <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">assert((root/'folder/'file/up).toString == &quot;/folder&quot;)
+    <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">assert((root/'folder/'file/up).toString == &quot;/folder&quot;)
 // not &quot;/folder/file/..&quot;
 
 assert(('folder/'file/up).toString == &quot;folder&quot;)
 // not &quot;folder/file/..&quot;</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/test/scala/test/ammonite/ops/ExampleTests.scala#L156-L161" target="_blank"><i class="fa fa-link "></i></a></pre>
 
-        <p>
-          So you don't need to worry about canonicalizing your paths before comparing them for equality or otherwise manipulating them.
+    <p>
+      So you don't need to worry about canonicalizing your paths before comparing them for equality or otherwise manipulating them.
 </p>
-      <h1 id="PathOperations" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#PathOperations" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Path Operations</h1>
+  <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="PathOperations" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Path Operations<a class=" scalatex-site-Styles-headerLink" href="#PathOperations" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
 
-        <p>
-          Ammonite's paths are transparent data-structures, and you can always access the <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">segments</code> and <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">ups</code> directly. Nevertheless, Ammonite defines a number of useful operations that handle the common cases of dealing with these paths:
+    <p>
+      Ammonite's paths are transparent data-structures, and you can always access the <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">segments</code> and <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">ups</code> directly. Nevertheless, Ammonite defines a number of useful operations that handle the common cases of dealing with these paths:
 </p>
-        <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">trait BasePath[ThisType &lt;: BasePath[ThisType]]{
+    <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">trait BasePath[ThisType &lt;: BasePath[ThisType]]{
   /**
    * The individual path segments of this path.
    */
@@ -319,54 +1040,54 @@ assert(('folder/'file/up).toString == &quot;folder&quot;)
   def last: String
 }</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/main/scala/ammonite/ops/Path.scala#L38-L87" target="_blank"><i class="fa fa-link "></i></a></pre>
 
-        <p>
-          In this definition, <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">ThisType</code> represents the same type as the current path; e.g. a <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Path</code>'s <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">/</code> returns a <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Path</code> while a <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">RelPath</code>'s <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">/</code> returns a <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">RelPath</code>. Similarly, you can only compare or subtract paths of the same type.
+    <p>
+      In this definition, <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">ThisType</code> represents the same type as the current path; e.g. a <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Path</code>'s <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">/</code> returns a <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Path</code> while a <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">RelPath</code>'s <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">/</code> returns a <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">RelPath</code>. Similarly, you can only compare or subtract paths of the same type.
 </p>
-        <p>
-          Apart from <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">RelPath</code>s themselves, a number of other data structures are convertible into <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">RelPath</code>s when spliced into a path using <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">/</code>:
+    <p>
+      Apart from <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">RelPath</code>s themselves, a number of other data structures are convertible into <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">RelPath</code>s when spliced into a path using <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">/</code>:
 </p>
-        <ul>
-          <li>
-            <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">String</code>s</li>
-          <li>
-            <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Symbols</code>s</li>
-          <li>
-            <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Array[T]</code>s where <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">T</code> is convertible into a <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">RelPath</code></li>
-          <li>
-            <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Seq[T]</code>s where <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">T</code> is convertible into a <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">RelPath</code>
+    <ul>
+      <li>
+        <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">String</code>s</li>
+      <li>
+        <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Symbols</code>s</li>
+      <li>
+        <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Array[T]</code>s where <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">T</code> is convertible into a <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">RelPath</code></li>
+      <li>
+        <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Seq[T]</code>s where <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">T</code> is convertible into a <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">RelPath</code>
 </li></ul>
-      <h1 id="Extensions" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#Extensions" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Extensions</h1>
-        <p>
-          Ammonite-Ops contains a set of extension methods on common types, which serve no purpose other than to make things more concise. These turn Scala from a &quot;relatively-concise&quot; language into one as tight as Bash scripts, while still maintaining the high level of type-safety and maintainability that comes with Scala code.
+  <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="Extensions" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Extensions<a class=" scalatex-site-Styles-headerLink" href="#Extensions" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
+    <p>
+      Ammonite-Ops contains a set of extension methods on common types, which serve no purpose other than to make things more concise. These turn Scala from a &quot;relatively-concise&quot; language into one as tight as Bash scripts, while still maintaining the high level of type-safety and maintainability that comes with Scala code.
 </p>
-        <h2 id="Traversable" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#Traversable" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Traversable</h2>
-          <p>
-            These extensions apply to any <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Traversable</code>: <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Seq</code>s, <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">List</code>s, <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Array</code>s, and others.</p>
-          <ul>
-            <li>
-              <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">things | f</code> is an alias for <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">things map f</code></li>
-            <li>
-              <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">things || f</code> is an alias for <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">things flatMap f</code></li>
-            <li>
-              <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">things |? f</code> is an alias for <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">things filter f</code></li>
-            <li>
-              <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">things |&amp; f</code> is an alias for <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">things reduce f</code></li></ul>
-          <p>
-            These should behave exactly the same as their implementations; their sole purpose is to make things more concise at the command-line.
+    <h1 id="Traversable" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#Traversable" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Traversable</h1>
+      <p>
+        These extensions apply to any <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Traversable</code>: <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Seq</code>s, <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">List</code>s, <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Array</code>s, and others.</p>
+      <ul>
+        <li>
+          <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">things | f</code> is an alias for <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">things map f</code></li>
+        <li>
+          <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">things || f</code> is an alias for <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">things flatMap f</code></li>
+        <li>
+          <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">things |? f</code> is an alias for <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">things filter f</code></li>
+        <li>
+          <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">things |&amp; f</code> is an alias for <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">things reduce f</code></li></ul>
+      <p>
+        These should behave exactly the same as their implementations; their sole purpose is to make things more concise at the command-line.
 </p>
-        <h2 id="Pipeable" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#Pipeable" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Pipeable</h2>
-          <ul>
-            <li>
-              <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">thing |&gt; f</code> is an alias for <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">f(thing)</code>
+    <h1 id="Pipeable" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#Pipeable" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Pipeable</h1>
+      <ul>
+        <li>
+          <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">thing |&gt; f</code> is an alias for <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">f(thing)</code>
 </li></ul>
-          <p>
-            This lets you flip around the function and argument, and fits nicely into the Ammonite's <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">|</code> pipelines.
+      <p>
+        This lets you flip around the function and argument, and fits nicely into the Ammonite's <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">|</code> pipelines.
 </p>
-      <h1 id="Operations" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#Operations" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Operations</h1>
-        <p>
-          All these <a href="#Paths">Paths</a> and <a href="#Extensions">Extensions</a> and what-not aren't interesting on their own, but serve as a base to use to perform filesystem operations in a concise and easy to use way. Here is a smattering of those operations:
+  <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="Operations" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Operations<a class=" scalatex-site-Styles-headerLink" href="#Operations" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
+    <p>
+      All these <a href="#Paths">Paths</a> and <a href="#Extensions">Extensions</a> and what-not aren't interesting on their own, but serve as a base to use to perform filesystem operations in a concise and easy to use way. Here is a smattering of those operations:
 </p>
-        <pre><code class="scala scalatex-site-Styles-highlightMe">/**
+    <pre><code class="scala scalatex-site-Styles-highlightMe">/**
  * An [[Op1]] that returns a Seq[R], but can also do so
  * lazily (Iterator[R]) via `op.!! arg`. You can then use
  * the iterator however you wish
@@ -397,12 +1118,12 @@ object rm extends Op1[Path, Unit]
 /**
  * List the files and folders in a directory
  */
-object ls extends StreamableOp1[Path, Path, LsSeq]
+object ls extends StreamableOp1[Path, Path, LsSeq] with ImplicitOp[LsSeq]
   /**
    * Reads a classpath resource into memory, either as a
    * string, as a Seq[String] of lines, or as a Array[Byte]
    */
-  object rec extends StreamableOp1[Path, Path, LsSeq]
+  object rec extends StreamableOp1[Path, Path, LsSeq]with ImplicitOp[LsSeq]
 /**
  * Write some data to a file. This can be a String, an Array[Byte], or a
  * Seq[String] which is treated as consecutive lines. By default, this
@@ -441,38 +1162,38 @@ object exists extends Op1[Path, Boolean]
  */
 case class kill(signal: Int) extends Op1[Int, CommandResult]</code></pre>
 
-        <p>
-          In these definitions, <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Op1</code> and <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Op2</code> are isomorphic to <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Function1</code> and <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Function2</code>. The main difference is that ops can be called in two ways:
+    <p>
+      In these definitions, <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Op1</code> and <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Op2</code> are isomorphic to <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Function1</code> and <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Function2</code>. The main difference is that ops can be called in two ways:
 </p>
-        <pre><code class="scala scalatex-site-Styles-highlightMe">rm(filepath)
+    <pre><code class="scala scalatex-site-Styles-highlightMe">rm(filepath)
 rm! filepath
 </code></pre>
-        <p>
-          The latter syntax allows you to use it more easily from the command line, where remembering to close all your parenthesis is a hassle. Indentation signifies nesting, e.g. in addition to <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">write!</code> you also have <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">write.append!</code> and <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">write.over!</code>
+    <p>
+      The latter syntax allows you to use it more easily from the command line, where remembering to close all your parenthesis is a hassle. Indentation signifies nesting, e.g. in addition to <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">write!</code> you also have <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">write.append!</code> and <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">write.over!</code>
 </p>
-        <p>
-          All of these operations are pre-defined and strongly typed, so feel free to jump to their implementation to look at what they do or what else is available.
+    <p>
+      All of these operations are pre-defined and strongly typed, so feel free to jump to their implementation to look at what they do or what else is available.
 </p>
-        <p>
-          In general, each operator has sensible/safe defaults:
+    <p>
+      In general, each operator has sensible/safe defaults:
 </p>
-        <ul>
-          <li>
-            <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">rm</code> and <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">cp</code> are recursive</li>
-          <li>
-            <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">rm</code> ignores the file if it doesn't exist</li>
-          <li>
-            all operations that create a file or folder (<code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">mkdir</code>, <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">write</code>, <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">mv</code>) automatically create any necessary parent directories</li>
-          <li>
-            <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">write</code> also does <i>not</i> stomp over existing files by default. You need to use <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">write.over</code></li></ul>
-        <p>
-          In general, this should make these operations much easier to use; the defaults should cover the 99% use case without needing any special flags or fiddling.
+    <ul>
+      <li>
+        <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">rm</code> and <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">cp</code> are recursive</li>
+      <li>
+        <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">rm</code> ignores the file if it doesn't exist</li>
+      <li>
+        all operations that create a file or folder (<code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">mkdir</code>, <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">write</code>, <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">mv</code>) automatically create any necessary parent directories</li>
+      <li>
+        <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">write</code> also does <i>not</i> stomp over existing files by default. You need to use <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">write.over</code></li></ul>
+    <p>
+      In general, this should make these operations much easier to use; the defaults should cover the 99% use case without needing any special flags or fiddling.
 </p>
-      <h1 id="Chaining" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#Chaining" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Chaining</h1>
-        <p>
-          The real value of Ammonite is the fact that you can pipe things together as easily as you could in Bash. No longer do you need to write reams of boilerplate. to accomplish simple tasks. Some of these chains are listed at the top of this readme, here are a few more fun examples:
+  <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="Chaining" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Chaining<a class=" scalatex-site-Styles-headerLink" href="#Chaining" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
+    <p>
+      The real value of Ammonite is the fact that you can pipe things together as easily as you could in Bash. No longer do you need to write reams of boilerplate. to accomplish simple tasks. Some of these chains are listed at the top of this readme, here are a few more fun examples:
 </p>
-        <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">// Move all files inside the &quot;py&quot; folder out of it
+    <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">// Move all files inside the &quot;py&quot; folder out of it
 ls! wd/&quot;py&quot; | mv.all*{case d/&quot;py&quot;/x =&gt; d/x }
 
 // Find all dot-files in the current folder
@@ -486,476 +1207,183 @@ def txt = ls.rec! wd |? (_.ext == &quot;scala&quot;) | read
 def freq(s: Seq[String]) = s groupBy (x =&gt; x) mapValues (_.length) toSeq
 val map = txt || (_.split(&quot;[^a-zA-Z0-9_]&quot;)) |&gt; freq sortBy (-_._2)</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/test/scala/test/ammonite/ops/ExampleTests.scala#L56-L70" target="_blank"><i class="fa fa-link "></i></a></pre>
 
-        <p>
-          As you can see, you can often compose elaborate operations entirely naturally using the available pipes, without needing to remember any special flags or techniques.
+    <p>
+      As you can see, you can often compose elaborate operations entirely naturally using the available pipes, without needing to remember any special flags or techniques.
 </p>
-    <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="Ammonite-REPL" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Ammonite-REPL<a class=" scalatex-site-Styles-headerLink" href="#Ammonite-REPL" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /><h2 style="font-weight: 300;color: #ccc;padding: 0px;margin-top: 0px;">A Modernized Scala REPL</h2></div>
-
-      <p>
-        Ammonite-REPL is a cleanroom re-implementation of the Scala REPL from first principles. It is much more featureful than the default REPL and comes with a lot of ergonomic improvements that may be familiar to people coming from IDEs or other REPLs such as <a href="ipython.org">IPython</a> or <a href="http://www.zsh.org/">Zsh</a>.</p>
-      <p>
-        To try out Ammonite-REPL in an existing Scala 2.11.x project, add the following to your <code>build.sbt</code>
+  <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="SpawningSubprocesses" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Spawning Subprocesses<a class=" scalatex-site-Styles-headerLink" href="#SpawningSubprocesses" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
+    <p>
+      Ammonite-Ops provides easy syntax for anyone who wants to spawn sub-processes, e.g. commands like <code>ls</code> or <code>git commit -am &quot;wip&quot;</code>. This is provided through the <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">%</code> and <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">%%</code> operators, which are used as follows:
 </p>
-      <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite-repl&quot; % &quot;0.3.2&quot; % &quot;test&quot; cross CrossVersion.full
-
-initialCommands in (Test, console) := &quot;&quot;&quot;ammonite.repl.Repl.run(&quot;&quot;)&quot;&quot;&quot;
-</code></pre>
-      <p>
-        After that, simple hit</p>
-      <code>
-        sbt projectName/test:console</code>
-      <p>
-        To activate the Ammonite REPL</p>
-      <p>
-        You can also pass a string to the <code>run</code> call containing any commands or imports you want executed at the start of every run. If you want the AmmoniteREPL to be available in all projects, simply add the above snippet to a new file <code>~/.sbt/0.13/global.sbt</code>.
-</p>
-      <h1 id="Features" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#Features" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Features</h1>
-        <p>
-          Ammonite-REPL supports many more features than the default REPL, including:
-</p>
-        <h2 id="ArtifactLoading" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#ArtifactLoading" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Artifact Loading</h2>
-
-          <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">@ import scalatags.Text.all._
-error: not found: value scalatags
-
-@ load.ivy(&quot;com.lihaoyi&quot; %% &quot;scalatags&quot; % &quot;0.4.5&quot;)
-
-@ import scalatags.Text.all._
-import scalatags.Text.all._
-
-@ a(&quot;omg&quot;, href:=&quot;www.google.com&quot;).render
-res2: String = $tq
-&lt;a href=&quot;www.google.com&quot;&gt;omg&lt;/a&gt;
-$tq</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/test/scala/ammonite/repl/AdvancedTests.scala#L15-L27" target="_blank"><i class="fa fa-link "></i></a></pre>
-
-          <p>
-            Ammonite allows you to load artifacts directly from maven central by copy &amp; pasting their SBT ivy-coordinate-snippet. In addition, you can also load in jars as <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">java.io.File</code>s to be included in the session or simple <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">String</code>s to be executed using the <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">load</code> command.
-</p>
-          <p>
-            This makes Ammonite ideal for trying out new libraries or tools. You can pull down projects like <a href="https://github.com/scalaz/scalaz">Scalaz</a> or <a href="https://github.com/milessabin/shapeless">Shapeless</a> and immediately start working with them in the REPL:
-</p>
-          <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">@ load.ivy(&quot;org.scalaz&quot; %% &quot;scalaz-core&quot; % &quot;7.1.1&quot;)
-
-@ import scalaz._
-import scalaz._
-
-@ import Scalaz._
-import Scalaz._
-
-@ (Option(1) |@| Option(2))(_ + _)
-res3: Option[Int] = Some(3)</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/test/scala/ammonite/repl/AdvancedTests.scala#L191-L201" target="_blank"><i class="fa fa-link "></i></a></pre>
-
-          <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">@ load.ivy(&quot;com.chuusai&quot; %% &quot;shapeless&quot; % &quot;2.1.0&quot;)
-
-@ import shapeless._
-
-@ (1 :: &quot;lol&quot; :: List(1, 2, 3) :: HNil)
-res2: Int :: String :: List[Int] :: HNil = ::(1, ::(&quot;lol&quot;, ::(List(1, 2, 3), HNil)))
-
-@ res2(1)
-res3: String = &quot;lol&quot;</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/test/scala/ammonite/repl/AdvancedTests.scala#L177-L186" target="_blank"><i class="fa fa-link "></i></a></pre>
-
-        <h2 id="Pretty-printedoutput" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#Pretty-printedoutput" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Pretty-printed output</h2>
-
-          <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">@ Seq.fill(10)(Seq.fill(3)(&quot;Foo&quot;))
-res0: Seq[Seq[String]] = List(
-  List(&quot;Foo&quot;, &quot;Foo&quot;, &quot;Foo&quot;),
-  List(&quot;Foo&quot;, &quot;Foo&quot;, &quot;Foo&quot;),
-  List(&quot;Foo&quot;, &quot;Foo&quot;, &quot;Foo&quot;),
-  List(&quot;Foo&quot;, &quot;Foo&quot;, &quot;Foo&quot;),
-  List(&quot;Foo&quot;, &quot;Foo&quot;, &quot;Foo&quot;),
-  List(&quot;Foo&quot;, &quot;Foo&quot;, &quot;Foo&quot;),
-  List(&quot;Foo&quot;, &quot;Foo&quot;, &quot;Foo&quot;),
-  List(&quot;Foo&quot;, &quot;Foo&quot;, &quot;Foo&quot;),
-  List(&quot;Foo&quot;, &quot;Foo&quot;, &quot;Foo&quot;),
-  List(&quot;Foo&quot;, &quot;Foo&quot;, &quot;Foo&quot;)
-)
-
-@ case class Foo(i: Int, s0: String, s1: Seq[String])
-defined class Foo
-
-@ Foo(1, &quot;&quot;, Nil)
-res2: Foo = Foo(1, &quot;&quot;, List())
-
-@ Foo(1234567, &quot;I am a cow, hear me moo&quot;, Seq(&quot;I weigh twice as much as you&quot;, &quot;and I look good on the barbecue&quot;))
-res3: Foo = Foo(
-  1234567,
-  &quot;I am a cow, hear me moo&quot;,
-  List(&quot;I weigh twice as much as you&quot;, &quot;and I look good on the barbecue&quot;)
-)</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/test/scala/ammonite/repl/AdvancedTests.scala#L116-L142" target="_blank"><i class="fa fa-link "></i></a></pre>
-
-          <p>
-            Ammonite-REPL uses <a href="#Ammonite-PPrint">Ammonite-PPrint</a> to display its output by default. That means that everything is nicely formatted to fit within the width of the terminal, and is copy-paste-able!</p>
-        <h2 id="ConfigurableTruncation" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#ConfigurableTruncation" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Configurable Truncation</h2>
-          <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">@ Seq.fill(20)(100)
-res0: Seq[Int] = List(
-  100,
-  100,
-  100,
-  100,
-  100,
-  100,
-  100,
-  100,
-  100,
-  100,
-  100,
-  100,
-  100,
-  100,
+    <pre><code class="scala scalatex-site-Styles-highlightMe">@ %ls
+build.sbt	log		ops		readme		repl		terminal
+echo		modules		project		readme.md	target		tools
+res2: Int = 0
+@ %%ls
+res3: CommandResult =
+build.sbt
+echo
+log
+modules
+ops
+project
+readme
+readme.md
+repl
+target
+terminal
 ...
-
-@ show(Seq.fill(20)(100))
-res1: ammonite.pprint.Show[Seq[Int]] = List(
-  100,
-  100,
-  100,
-  100,
-  100,
-  100,
-  100,
-  100,
-  100,
-  100,
-  100,
-  100,
-  100,
-  100,
-  100,
-  100,
-  100,
-  100,
-  100,
-  100
-)
-
-@ show(Seq.fill(20)(100), lines = 3)
-res2: ammonite.pprint.Show[Seq[Int]] = List(
-  100,
-  100,
-...
-
-@ pprintConfig = pprintConfig.copy(lines = 5)
-
-@ Seq.fill(20)(100)
-res4: Seq[Int] = List(
-  100,
-  100,
-  100,
-  100,
-...</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/test/scala/ammonite/repl/AdvancedTests.scala#L296-L353" target="_blank"><i class="fa fa-link "></i></a></pre>
-
-          <p>
-            Ammonite-REPL intelligently truncates your output when it's beyond a certain size. You can request for the full output to be printed on-demand, print a certain number of lines, or even change the implicit <code>pprintConfig</code> so subsequent lines all use your new configuration.
-
-</p>
-        <h2 id="SuperiorAutocomplete" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#SuperiorAutocomplete" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Superior Autocomplete</h2>
-          <p>
-            The original Scala REPL provides no autocomplete except for the most basic scenarios of <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">value.&lt;complete&gt;</code>. In the Ammonite-REPL, you get the same autocomplete-anywhere support that you get in a modern IDE.
-</p>
-          <pre><code class="scala scalatex-site-Styles-highlightMe">  @ Seq(1, 2, 3).map(x =&gt; x.)
-  getClass            ##                  asInstanceOf        isInstanceOf
-  toString            hashCode            equals              !=
-  ==                  %                   /                   *
-  -                   +                   ^                   &amp;
-  |                   &gt;=                  &gt;                   &lt;=
-  &lt;                   &gt;&gt;                  &gt;&gt;&gt;                 &lt;&lt;
-  unary_-             unary_+             unary_~             toDouble
-  toFloat             toLong              toInt               toChar
-  toShort             toByte              compareTo           doubleValue
-  ...
-
-  @ Futu
-  scala.collection.parallel.FutureThreadPoolTasks
-  scala.collection.parallel.FutureTasks
-  scala.concurrent.impl.Future$PromiseCompletingRunnable
-  scala.concurrent.impl.Future
-  scala.concurrent.Future
-  scala.concurrent.FutureTaskRunner
-  scala.concurrent.Future$InternalCallbackExecutor
-  scala.concurrent.Future$class
-  java.util.concurrent.Future
-  java.util.concurrent.FutureTask$WaitNode
-  java.util.concurrent.FutureTask
-  com.sun.corba.se.impl.orbutil.closure.Future
 </code></pre>
-
-          <p>
-            Neither of these examples work in the standard Scala REPL.
+    <p>
+      In short, <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">%</code> lets you run a command as you would in bash, and dumps the output to standard-out in a similar way, returning the return-code. <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">%%</code> on the other hand returns a <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">CommandResult</code>, which is simply a <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Stream[String]</code> of the lines from the subprocess. <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">%%</code> throws an exception if the return-code is non-zero. The returned <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Stream[String]</code> can then be used however you like.</p>
+    <p>
+      You can also use backticks to execute commands which aren't valid Scala identifiers, e.g.
 </p>
-        <h2 id="Interruptingrun-awayexecutionwithCtrl-C" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#Interruptingrun-awayexecutionwithCtrl-C" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Interrupting run-away execution with Ctrl-C</h2>
-          <pre><code class="scala scalatex-site-Styles-highlightMe">  @ while(true) ()
-  ... hangs ...
-  ^Ctrl-C
-  Interrupted!
-
-  @
+    <pre><code class="scala scalatex-site-Styles-highlightMe">@ %`ssh-add`
+Enter passphrase for /Users/haoyi/.ssh/id_rsa:
 </code></pre>
-          <p>
-            The traditional Scala REPL doesn't handle runaway code, and gives you no option but to kill the process, losing all your work. Ammonite-REPL lets you interrupt the thread, stop the runaway-command and keep going.
+    <p>
+      Lastly, you can also pass arguments into these subprocess calls, as Strings or Symbols:</p>
+    <pre><code class="scala scalatex-site-Styles-highlightMe">@ %git 'branch
+  gh-pages
+  history
+* master
+  speedip
+res4: Int = 0
+
+@ %%git 'branch
+res5: CommandResult =
+  gh-pages
+  history
+* master
+  speedip
+
+@ %%git('checkout, &quot;master&quot;)
+Already on 'master'
+res6: CommandResult =
+M	readme/Index.scalatex
+Your branch is up-to-date with 'origin/master'.
+
+@ %git(&quot;checkout&quot;, 'master)
+M	readme/Index.scalatex
+Already on 'master'
+Your branch is up-to-date with 'origin/master'.
+res8: Int = 0</code></pre>
+    <p>
+      Ammonite-Ops currently does not provide many convenient ways of piping together multiple processes, but support may come in future if someone finds it useful enough to implement.
 </p>
-        <h2 id="Compiler-crashRobustness" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#Compiler-crashRobustness" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Compiler-crash Robustness</h2>
-          <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">@ val x = 1
-x: Int = 1
+    <p>
+      <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">%</code> calls subprocesses in a way that is compatible with a normal terminal. That means you can easily call things like <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">%vim</code> to open a text editor, <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">%python</code> to open up a Python terminal, or <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">%sbt</code> to open up the SBT prompt!</p>
+    <pre><code class="scala scalatex-site-Styles-highlightMe">@ %python
+Python 2.7.6 (default, Sep  9 2014, 15:04:36)
+[GCC 4.2.1 Compatible Apple LLVM 6.0 (clang-600.0.39)] on darwin
+Type &quot;help&quot;, &quot;copyright&quot;, &quot;credits&quot; or &quot;license&quot; for more information.
+&gt;&gt;&gt; print &quot;Hello %s%s&quot; % (&quot;World&quot;, &quot;!&quot;*3)
+Hello World!!!
+&gt;&gt;&gt; ^D
+res3: Int = 0
 
-@ /* trigger compiler crash */ trait Bar { super[Object].hashCode }
-error: java.lang.AssertionError: assertion failed
-
-@ 1 + x
-res1: Int = 2</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/test/scala/ammonite/repl/FailureTests.scala#L23-L31" target="_blank"><i class="fa fa-link "></i></a></pre>
-
-          <p>
-            The default Scala REPL throws away all your work if the compiler crashes. This doesn't make any sense, because all the compiler is is a dumb <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">String =&gt; Array[Byte]</code> pipe. In the Ammonite, we simply swap out the broken compiler for a new one and let you continue your work.</p>
-        <h2 id="OtherFixes" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#OtherFixes" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Other Fixes</h2>
-          <p>
-            Apart from the above features, the Ammonite REPL fixes a large number of bugs in the default Scala REPL, including but not limited to:</p>
-          <ul>
-            
-            
-              <li><a href="https://issues.scala-lang.org/browse/SI-6302">SI-6302</a></li>
-            
-              <li><a href="https://issues.scala-lang.org/browse/SI-8971">SI-8971</a></li>
-            
-              <li><a href="https://issues.scala-lang.org/browse/SI-9249">SI-9249</a></li>
-            
-              <li><a href="https://issues.scala-lang.org/browse/SI-4438">SI-4438</a></li>
-            
-              <li><a href="https://issues.scala-lang.org/browse/SI-8603">SI-8603</a></li>
-            
-              <li><a href="https://issues.scala-lang.org/browse/SI-6660">SI-6660</a></li>
-            
-              <li><a href="https://issues.scala-lang.org/browse/SI-7953">SI-7953</a></li>
-            
-              <li><a href="https://issues.scala-lang.org/browse/SI-6659">SI-6659</a></li>
-            
-              <li><a href="https://issues.scala-lang.org/browse/SI-8456">SI-8456</a></li>
-            
-              <li><a href="https://issues.scala-lang.org/browse/SI-1067">SI-1067</a></li>
-            
-              <li><a href="https://issues.scala-lang.org/browse/SI-8307">SI-8307</a></li>
-            </ul>
-      <h1 id="Builtins" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#Builtins" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Builtins</h1>
-        <p>
-          Ammonite contains a range of useful built-ins implemented as normal functions. Everything inside the <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">ReplAPI</code> trait is imported by default and can be accessed directly by default to control the console.
-</p>
-        <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">trait ReplAPI {
-  /**
-   * Exit the Ammonite REPL. You can also use Ctrl-D to exit
-   */
-  def exit = throw ReplExit
-
-  /**
-   * Clears the screen of the REPL
-   */
-  def clear: Unit
-
-  /**
-   * Read/writable prompt for the shell. Use this to change the
-   * REPL prompt at any time!
-   */
-  var shellPrompt: String
-
-  /**
-   * Display this help text
-   */
-  def help: String
-
-  /**
-   * History of commands that have been entered into the shell
-   */
-  def history: Seq[String]
-
-  /**
-   * Get the `Type` object of [[T]]. Useful for finding
-   * what its methods are and what you can do with it
-   */
-  def typeOf[T: WeakTypeTag]: Type
-
-  /**
-   * Get the `Type` object representing the type of `t`. Useful
-   * for finding what its methods are and what you can do with it
-   *
-   */
-  def typeOf[T: WeakTypeTag](t: =&gt; T): Type
-  
-  /**
-   * Tools related to loading external scripts and code into the REPL
-   */
-  def load: Load
-
-  /**
-   * Throw away the current scala.tools.nsc.Global and get a new one
-   */
-  def newCompiler(): Unit
-
-  def search(target: scala.reflect.runtime.universe.Type): Option[String]
-
-  def compiler: scala.tools.nsc.Global
-  /**
-   * Prettyprint the given `value` with no truncation. Optionally takes
-   * a number of lines to print.
-   */
-  def show[T](value: T, lines: Int = 0): ammonite.pprint.Show[T]
-  /**
-   * Show all the imports that are used to execute commands going forward
-   */
-  def imports: String
-  /**
-   * Controls how things are pretty-printed in the REPL. Feel free
-   * to shadow this with your own definition to change how things look
-   */
-  implicit var pprintConfig: ammonite.pprint.Config
-}
-trait Load extends (String =&gt; Unit){
-  /**
-   * Load a `.jar` file
-   */
-  def jar(jar: java.io.File): Unit
-  /**
-   * Load a library from its maven/ivy coordinates
-   */
-  def ivy(coordinates: (String, String, String), verbose: Boolean = true): Unit
-
-  /**
-   * Loads a command into the REPL and
-   * evaluates them one after another
-   */
-  def apply(line: String): Unit
-}</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/main/scala/ammonite/repl/frontend/ReplAPI.scala#L22-L107" target="_blank"><i class="fa fa-link "></i></a></pre>
-
-    <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="Ammonite-PPrint" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Ammonite-PPrint<a class=" scalatex-site-Styles-headerLink" href="#Ammonite-PPrint" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
-      <p>
-        Ammonite comes with a pretty-printing module, which lets you easily print data structures in a readable way. This is most often used in Ammonite-Repl, but can also be used standalone if desired:
-</p>
-      <pre><code class="scala scalatex-site-Styles-highlightMe">scala&gt; import ammonite.pprint._
-scala&gt; import Config.Defaults._
-
-scala&gt; PPrint(
-  List(Seq(Seq(&quot;mgg&quot;, &quot;mgg&quot;, &quot;lols&quot;), Seq(&quot;mgg&quot;, &quot;mgg&quot;)), Seq(Seq(&quot;ggx&quot;, &quot;ggx&quot;),Seq(&quot;ggx&quot;, &quot;ggx&quot;, &quot;wtfx&quot;)))
-)
-res33: String =
-List(
-  List(List(&quot;mgg&quot;, &quot;mgg&quot;, &quot;lols&quot;), List(&quot;mgg&quot;, &quot;mgg&quot;)),
-  List(List(&quot;ggx&quot;, &quot;ggx&quot;), List(&quot;ggx&quot;, &quot;ggx&quot;, &quot;wtfx&quot;))
-)
+@ %sbt
+[info] Loading global plugins from /Users/haoyi/.sbt/0.13/plugins
+[info] Updating {file:/Users/haoyi/.sbt/0.13/plugins/}global-plugins...
+[info] Resolving org.fusesource.jansi#jansi;1.4 ...
+[info] Done updating.
+[info] Set current project to haoyi (in build file:/Users/haoyi/)
+&gt;
 </code></pre>
-      <p>
-        Note how every string is escaped, everything is laid out nicely, and the output is in a state that you can easily copy &amp; paste it back into the REPL to evaluate.</p>
-      <p>
-        You can also use</p>
-      <pre><code class="scala scalatex-site-Styles-highlightMe">import Configs.Colors._</code></pre>
-      <p>
-        Instead of <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Defaults</code> in order to turn on colored pretty-printing.</p>
-      <p>
-        Pretty-printing is by default defined for most standard library types, as well as case classes and case objects. For other types not supported, it falls back to using <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">toString</code>
-</p>
-      <pre><code class="scala scalatex-site-Styles-highlightMe">  scala&gt; PPrint(new Object())
-  res35: String = java.lang.Object@54f880c0
-</code></pre>
-      <p>
-        In order to pretty print a type <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">T</code>, you need to have a <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">T: PPrint</code> context bound present. In order to write your own custom pretty printer for some type <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">T</code>, provide a <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">PPrinter[T]</code>.</p>
-      <h1 id="TypePrinting" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#TypePrinting" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Type Printing</h1>
-        <p>
-          Ammonite also provides colored, customized and customizable printing for types, through a <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">TPrint[T]</code> typeclass. This has some advantages over the default printing: For example, two-argument operator-named types like Shapeless HLists are printed infix by default:
-</p>
-        <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">@ import scalatags.Text.all._
-error: not found: value scalatags
-
-@ load.ivy(&quot;com.lihaoyi&quot; %% &quot;scalatags&quot; % &quot;0.4.5&quot;)
-
-@ import scalatags.Text.all._
-import scalatags.Text.all._
-
-@ a(&quot;omg&quot;, href:=&quot;www.google.com&quot;).render
-res2: String = $tq
-&lt;a href=&quot;www.google.com&quot;&gt;omg&lt;/a&gt;
-$tq</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/test/scala/ammonite/repl/AdvancedTests.scala#L15-L27" target="_blank"><i class="fa fa-link "></i></a></pre>
-
-        <p>
-          Types are only printed as qualified as necessary: if you import types into local scope, they are shown un-qualified the same way you'd access them in code:
-</p>
-        <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">@ collection.mutable.Buffer(1)
-res0: collection.mutable.Buffer[Int] = ArrayBuffer(1)
-
-@ import collection.mutable
-
-@ collection.mutable.Buffer(1)
-res2: mutable.Buffer[Int] = ArrayBuffer(1)
-
-@ mutable.Buffer(1)
-res3: mutable.Buffer[Int] = ArrayBuffer(1)
-
-@ import collection.mutable.Buffer
-
-@ mutable.Buffer(1)
-res5: Buffer[Int] = ArrayBuffer(1)</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/test/scala/ammonite/repl/AdvancedTests.scala#L262-L277" target="_blank"><i class="fa fa-link "></i></a></pre>
-
-        <p>
-          And you can customize the printing for any types you own or don't own by providing an implicit, which will display it however you want:
-</p>
-        <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">@ Array(1)
-res0: Array[Int] = Array(1)
-
-@ import ammonite.pprint.TPrint
-
-@ implicit def ArrayTPrint[T: TPrint]: TPrint[Array[T]] = TPrint.lambda(
-@   c =&gt; implicitly[TPrint[T]].render(c) + c.color.literal(&quot; Array&quot;)
-@ )
-
-@ Array(1)
-res3: Int Array = Array(1)</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/test/scala/ammonite/repl/AdvancedTests.scala#L281-L292" target="_blank"><i class="fa fa-link "></i></a></pre>
-</p>
-  <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="Changelog" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Changelog<a class=" scalatex-site-Styles-headerLink" href="#Changelog" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
-    <h1 id="0.3.2" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#0.3.2" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>0.3.2</h1>
-      <ul>
-        <li>
-          Fix pretty-printing of higher-kinded types.</li>
-        <li>
-          Drop support for 2.10.x; ammonite is 2.11.x-only now
+    <p>
+      <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">%%</code> does not do this.
+</p></div>
+<div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="Changelog" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Changelog<a class=" scalatex-site-Styles-headerLink" href="#Changelog" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div><div class=" scalatex-site-Styles-content">
+  <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="0.4.0" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">0.4.0<a class=" scalatex-site-Styles-headerLink" href="#0.4.0" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
+    <ul>
+      <li>
+        Re-added support for 2.10.x, minus features that don't work in it (e.g. scope-aware type-printing)</li>
+      <li>
+        Added a <a href="#Ammonite">standalone distributable</a> that comes bundled with Scala 2.10.4 or 2.11.7, letting you quickly load and experiment with libraries without SBT</li>
+      <li>
+        User input now has <a href="#SyntaxHighlighting">Syntax Highlighting</a> by default!</li>
+      <li>
+        Exception stack traces are now <a href="#SyntaxHighlighting">highlighted</a> as well, to make them easier to read</li>
+      <li>
+        <a href="#Pretty-printedoutput">Pretty-printing</a> has been extracted into a separate project, and aside from that is greatly improved. Many more common cases (e.g. sealed trait hierarchies) are now pretty-printed rather than falling back to <code>toString</code></li>
+      <li>
+        Exposed the <a href="#ConfigurableTruncation">show</a> function by default, letting you pretty-print any value with custom configuration (wrapping-width, truncation-height, colors, ...)</li>
+      <li>
+        Fixed cases where PPrint/TPrint was causing compilation errors</li>
+      <li>
+        Persistent data is now stored in a <code>~/.ammonite</code> folder. This includes <code>~/.ammonite/history</code>, <code>~/.ammonite/predef.scala</code>, and various caches</li>
+      <li>
+        You can now define a <code>~/.ammonite/predef.scala</code> <a href="#Configuration">Configuration</a> file which will be executed the first thing when the Ammonite REPL is loaded. This is useful for common imports, <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">load.ivy</code>ing libraries, or other configuration for your REPL</li>
+      <li>
+        Added the ability to load arbitrary <a href="#ScriptFiles">Script Files</a> via <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">load.exec</code> and <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">load.module</code></li>
+      <li>
+        <a href="#Configuration">Configuration</a> that was previously passed into the <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">REPL</code>s constructor is now done in-REPL,</li>
+      <li>
+        <a href="#ImprovedEditing">Multi-line editing and other features</a> via a custom terminal interface that should behave just like readline, but with added conveniences.</li>
+      <li>
+        Removed the ability to reload classes; using <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">load.ivy</code> no longer causes all existing values to be lazily recomputed.</li>
+      <li>
+        Added the <a href="#FilesystemOperations">cd! and wd</a> built-ins to make working with filesystem operations via <a href="#Ammonite-Ops">Ammonite-Ops</a> more pleasant</li>
+      <li>
+        Evaluated values of type <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Unit</code> are no longer echo-ed to the user</li>
+      <li>
+        Performance improvements to the startup time of the REPL, with <a href="https://github.com/lihaoyi/Ammonite/issues/135">more to come</a></li>
+      <li>
+        Third-party library resolution via <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">load.ivy</code> is now cached after the first call, letting you e.g. load libraries in your <code>~/.ammonite/predef.scala</code> without waiting for the slow ivy-resolution every startup</li>
+      <li>
+        Standardized the use of <a href="#Refs">Refs</a> for configuration, including the ability to bind them &quot;live&quot; to the value of an expression.
 </li></ul>
-    <h1 id="0.3.1" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#0.3.1" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>0.3.1</h1>
-      <ul>
-        <li>
-          Many of the collection <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">PPrint</code>s are much lazier and will avoid stringifying the whole collection if its going to get truncated anyway.</li>
-        <li>
-          Types now get printed semi-qualified (depending on what's in scope), with simple highlighting.</li>
-        <li>
-          You can define custom <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">TPrint[T]</code>s to provide custom printing for any type.</li>
-        <li>
-          Operator-named two-param generic types are now printed infix by default.
+  <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="0.3.2" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">0.3.2<a class=" scalatex-site-Styles-headerLink" href="#0.3.2" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
+    <ul>
+      <li>
+        Fix pretty-printing of higher-kinded types.</li>
+      <li>
+        Drop support for 2.10.x; ammonite is 2.11.x-only now
 </li></ul>
-    <h1 id="0.3.0" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#0.3.0" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>0.3.0</h1>
-      <ul>
-        <li>
-          allow <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">predef</code> parameter to be passed into <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Repl.run()</code> call, letting you configure initialization commands or imports</li>
-        <li>
-          Compilation errors in expressions no longer show synthetic code in the message</li>
-        <li>
-          Ivy module loading now lets you configure verbosity level</li>
-        <li>
-          Defining macros in the REPL and using them in subsequent lines now works</li>
-        <li>
-          Output lines are now truncated past a certain length, which is configurable
+  <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="0.3.1" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">0.3.1<a class=" scalatex-site-Styles-headerLink" href="#0.3.1" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
+    <ul>
+      <li>
+        Many of the collection <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">PPrint</code>s are much lazier and will avoid stringifying the whole collection if its going to get truncated anyway.</li>
+      <li>
+        Types now get printed semi-qualified (depending on what's in scope), with simple highlighting.</li>
+      <li>
+        You can define custom <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">TPrint[T]</code>s to provide custom printing for any type.</li>
+      <li>
+        Operator-named two-param generic types are now printed infix by default.
 </li></ul>
-    <h1 id="0.2.9" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#0.2.9" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>0.2.9</h1>
-      <ul>
-        <li>
-          Lots of improvements to <code>Ctrl-C</code> and <code>Ctrl-D</code> handling, to make it behave more like other REPLs
+  <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="0.3.0" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">0.3.0<a class=" scalatex-site-Styles-headerLink" href="#0.3.0" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
+    <ul>
+      <li>
+        allow <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">predef</code> parameter to be passed into <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Repl.run()</code> call, letting you configure initialization commands or imports</li>
+      <li>
+        Compilation errors in expressions no longer show synthetic code in the message</li>
+      <li>
+        Ivy module loading now lets you configure verbosity level</li>
+      <li>
+        Defining macros in the REPL and using them in subsequent lines now works</li>
+      <li>
+        Output lines are now truncated past a certain length, which is configurable
 </li></ul>
-    <h1 id="0.2.8" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#0.2.8" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>0.2.8</h1>
-      <ul>
-        <li>
-          Fix #47: PPrint derivation fails with nested case class</li>
-        <li>
-          Fix #14: Exception when trying to use Ammonite REPL #15 by cross building against Scala 2.10.{3,4,5} and 2.11.{3,4,5,6}</li>
-        <li>
-          Autocomplete results are sorted alphabetically (Fixed #42)</li>
-        <li>
-          Fix #39: nothing echoed on multiple import</li>
-        <li>
-          Importing things from Java packages now works properly</li></ul></div></div><script>
+  <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="0.2.9" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">0.2.9<a class=" scalatex-site-Styles-headerLink" href="#0.2.9" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
+    <ul>
+      <li>
+        Lots of improvements to <code>Ctrl-C</code> and <code>Ctrl-D</code> handling, to make it behave more like other REPLs
+</li></ul>
+  <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="0.2.8" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">0.2.8<a class=" scalatex-site-Styles-headerLink" href="#0.2.8" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
+    <ul>
+      <li>
+        Fix #47: PPrint derivation fails with nested case class</li>
+      <li>
+        Fix #14: Exception when trying to use Ammonite REPL #15 by cross building against Scala 2.10.{3,4,5} and 2.11.{3,4,5,6}</li>
+      <li>
+        Autocomplete results are sorted alphabetically (Fixed #42)</li>
+      <li>
+        Fix #39: nothing echoed on multiple import</li>
+      <li>
+        Importing things from Java packages now works properly</li></ul></div>
+</div><script>
     scalatex.scrollspy.Controller().main(
-      [{"value":"Ammonite 0.3.2","children":[{"value":"Ammonite-Ops","children":[{"value":"Paths","children":[]},{"value":"RelPaths","children":[]},{"value":"Path Operations","children":[]},{"value":"Extensions","children":[{"value":"Traversable","children":[]},{"value":"Pipeable","children":[]}]},{"value":"Operations","children":[]},{"value":"Chaining","children":[]}]},{"value":"Ammonite-REPL","children":[{"value":"Features","children":[{"value":"Artifact Loading","children":[]},{"value":"Pretty-printed output","children":[]},{"value":"Configurable Truncation","children":[]},{"value":"Superior Autocomplete","children":[]},{"value":"Interrupting run-away execution with Ctrl-C","children":[]},{"value":"Compiler-crash Robustness","children":[]},{"value":"Other Fixes","children":[]}]},{"value":"Builtins","children":[]}]},{"value":"Ammonite-PPrint","children":[{"value":"Type Printing","children":[]}]},{"value":"Changelog","children":[{"value":"0.3.2","children":[]},{"value":"0.3.1","children":[]},{"value":"0.3.0","children":[]},{"value":"0.2.9","children":[]},{"value":"0.2.8","children":[]}]}]}]
+      [{"value":"Ammonite","children":[{"value":"Features","children":[{"value":"Artifact Loading","children":[]},{"value":"Pretty-printed output","children":[]},{"value":"Configurable Truncation","children":[]},{"value":"Syntax Highlighting","children":[]},{"value":"Improved Editing","children":[]},{"value":"Superior Autocomplete","children":[]},{"value":"Interrupting run-away execution with Ctrl-C","children":[]},{"value":"Compiler-crash Robustness","children":[]},{"value":"Other Fixes","children":[]}]},{"value":"Builtins","children":[]},{"value":"Multiline Input","children":[]},{"value":"Script Files","children":[]},{"value":"Configuration","children":[{"value":"Refs","children":[]}]},{"value":"Filesystem Operations","children":[]}]},{"value":"Ammonite-Ops","children":[{"value":"Paths","children":[]},{"value":"RelPaths","children":[]},{"value":"Path Operations","children":[]},{"value":"Extensions","children":[{"value":"Traversable","children":[]},{"value":"Pipeable","children":[]}]},{"value":"Operations","children":[]},{"value":"Chaining","children":[]},{"value":"Spawning Subprocesses","children":[]}]},{"value":"Changelog","children":[{"value":"0.4.0","children":[]},{"value":"0.3.2","children":[]},{"value":"0.3.1","children":[]},{"value":"0.3.0","children":[]},{"value":"0.2.9","children":[]},{"value":"0.2.8","children":[]}]}]
   )</script><script>
     ['DOMContentLoaded', 'load'].forEach(function(ev){
       addEventListener(ev, function(){
@@ -965,4 +1393,4 @@ res3: Int Array = Array(1)</code><a class=" scalatex-site-Styles-headerLink" sty
         );
       })
     })
-  </script></body></html>
+  </script></body></html>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
