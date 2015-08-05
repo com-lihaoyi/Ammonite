@@ -114,7 +114,7 @@ lazy val repl = project
     assemblyOption in assembly := (assemblyOption in assembly).value.copy(
       prependShellScript = Some(defaultShellScript)
     ),
-    assemblyJarName in assembly := s"${name.value}-${version.value}",
+    assemblyJarName in assembly := s"${name.value}-${version.value}-${scalaVersion.value}",
     sourceGenerators in Compile <+= sourceManaged in Compile map { dir =>
       val file = dir/"ammonite"/"pprint"/"PPrintGen.scala"
 
