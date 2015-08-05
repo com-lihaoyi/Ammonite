@@ -125,9 +125,6 @@ object ScriptTests extends TestSuite{
             @ load.exec($printedScriptPath/"MultiBlockError.scala")
             error: Compilation Failed
 
-            @ val r1 = res1
-            r1: Int = 1
-
             @ val r2 = res2
             error: Compilation Failed
             Main.scala:\\d\\+: not found: value res2
@@ -245,9 +242,6 @@ object ScriptTests extends TestSuite{
 
             @ load.module($printedScriptPath/"MultiBlockError.scala")
             error: Compilation Failed
-
-            @ val r1 = res1
-            r1: Int = 1
 
             @ val r2 = res2
             error: Compilation Failed
