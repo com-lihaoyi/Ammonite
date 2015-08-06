@@ -197,6 +197,9 @@ object ProjectTests extends TestSuite{
 
           @ mean(Rational(1, 2), Rational(3, 2), Rational(0))
           res9: Rational = 2/3
+
+          @ Interval(0, 10)
+          res10: Interval[Int] = [0, 10]
         """)
       else
         check.session(s"""
@@ -227,6 +230,9 @@ object ProjectTests extends TestSuite{
 
           @ mean(Rational(1, 2), Rational(3, 2), Rational(0))
           res9: spire.math.Rational = 2/3
+
+          @ Interval(0, 10)
+          res10: Interval[Int] = [0, 10]
         """)
     }
 
