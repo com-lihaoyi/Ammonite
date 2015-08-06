@@ -17,7 +17,7 @@ object Classpath {
   val files = collection.mutable.Buffer.empty[java.io.File]
   files.appendAll(
     System.getProperty("sun.boot.class.path")
-          .split(":")
+          .split(java.io.File.pathSeparator)
           .map(new java.io.File(_))
   )
   while(current != null){
