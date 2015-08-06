@@ -232,7 +232,7 @@ object ProjectTests extends TestSuite{
           res9: spire.math.Rational = 2/3
 
           @ Interval(0, 10)
-          res10: Interval[Int] = [0, 10]
+          res10: spire.math.Interval[Int] = [0, 10]
         """)
     }
 
