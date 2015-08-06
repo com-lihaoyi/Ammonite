@@ -635,6 +635,14 @@
       @a("Gitter Channel", href:="https://gitter.im/lihaoyi/Ammonite")
 
 @sect{Changelog}
+  @sect{0.4.3}
+    @ul
+      @li
+        Remove embarassing debug println left behind in autocomplete code
+      @li
+        Fix @code{pathSeparator} so Ammonite-REPL is at least basically-runnable on windows, although buggy
+      @li
+        Update to more robust version of pprint to fix @a("#140", href := "https://github.com/lihaoyi/Ammonite/issues/140")
   @sect{0.4.2}
     @ul
       @li
