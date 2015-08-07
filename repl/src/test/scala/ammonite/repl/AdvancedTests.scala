@@ -260,6 +260,17 @@ object AdvancedTests extends TestSuite{
         error: not found: value x
       """)
     }
+    'compilerPlugin{
+      check.session("""
+        @ load.ivy("org.spire-math" %% "kind-projector" % "0.6.3")
+
+        @ trait TC[F[_]]
+        defined trait TC
+
+        @ type TCEitherStr = TC[Either[String, ?]]
+        defined type TCEitherStr
+      """)
+    }
     'replApiUniqueness{
       // Make sure we can instantiate multiple copies of Interpreter, with each
       // one getting its own `ReplBridge`. This ensures that the various
