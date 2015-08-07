@@ -73,8 +73,8 @@ object ReadlineFilters {
       Case(Ctrl('k'))((b, c, m) => cutAllRight(b, c)),
       Case(Alt + "d")((b, c, m) => cutWordRight(b, c)),
       Case(Ctrl('w'))((b, c, m) => cutWordLeft(b, c)),
-      Case("\u007f")((b, c, m)  => cutWordLeft(b, c)),
-      Case(Ctrl('y'))((b, c, m) => paste(b, c))
+      Case(Ctrl('y'))((b, c, m) => paste(b, c)),
+      Case(Alt + "\u007f")((b, c, m) => cutWordLeft(b, c))
     )
   }
 
