@@ -35,7 +35,7 @@ trait Evaluator{
    * passing in the callback ensures the printing is still done lazily, but within
    * the exception-handling block of the `Evaluator`
    */
-  def processLine(code: String, printCode: String, printer: Iterator[String] => Unit): Res[Evaluated]
+  def processLine(code: String, printCode: String, printer: Iterator[String] => Unit, extraImports: Seq[ImportData] = Seq()): Res[Evaluated]
   def processScriptBlock(code: String, scriptImports: Seq[ImportData]): Res[Evaluated]
 
   def previousImportBlock: String
@@ -154,14 +154,14 @@ object Evaluator{
     type InvEx = InvocationTargetException
     type InitEx = ExceptionInInitializerError
 
-    def processLine(code: String, printCode: String, printer: Iterator[String] => Unit) = for {
+    def processLine(code: String, printCode: String, printer: Iterator[String] => Unit, extraImports: Seq[ImportData] = Seq()) = for {
       wrapperName <- Res.Success("cmd" + getCurrentLine)
       _ <- Catching{ case e: ThreadDeath => interrupted() }
       (classFiles, newImports) <- compileClass(wrapCode(
         wrapperName,
         code,
         printCode,
-        previousImports.values.toSeq
+        previousImports.values.toSeq ++ extraImports
       ))
       _ = Timer("eval.processLine compileClass end")
       cls <- loadClass(wrapperName, classFiles)
