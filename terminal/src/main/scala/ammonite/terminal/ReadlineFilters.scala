@@ -85,23 +85,39 @@ object ReadlineFilters {
   def lastRow(cursor: Int, buffer: Vector[Char], width: Int) = {
     (buffer.length - cursor) < width && (buffer.lastIndexOf('\n') < cursor || buffer.lastIndexOf('\n') == -1)
   }
+
   case class HistoryFilter(history: () => Seq[String]) extends TermCore.DelegateFilter{
     var index = -1
     var currentHistory = Vector[Char]()
 
-    def swapInHistory(b: Vector[Char], newIndex: Int, rest: LazyList[Int], c: Int) = {
+    def swapInHistory(b: Vector[Char], newIndex: Int, rest: LazyList[Int], c: Int): TermState = {
       if (index == -1 && newIndex != -1) currentHistory = b
-
+      val h2 = if (newIndex == -1) currentHistory else history()(newIndex).toVector
+      val c2 = if (c == b.length) h2.length else c
       index = newIndex
-
-      if (index == -1) TS(rest, currentHistory, c)
-      else TS(rest, history()(index).toVector, c)
+      TS(rest, h2, c2)
     }
+
+    def constrainIndex(n: Int): Int = {
+      val max = history().length - 1
+      if (n < -1) -1 else if (max < n) max else n
+    }
+
+    def previousHistory(b: Vector[Char], rest: LazyList[Int], c: Int): TermState =
+      swapInHistory(b, constrainIndex(index + 1), rest, c)
+
+    def nextHistory(b: Vector[Char], rest: LazyList[Int], c: Int): TermState =
+      swapInHistory(b, constrainIndex(index - 1), rest, c)
+
     def filter = {
       case TermInfo(TS(p"\u001b[A$rest", b, c), w) if firstRow(c, b, w) =>
-        swapInHistory(b, (index + 1) min (history().length - 1), rest, 99999)
+        previousHistory(b, rest, c)
+      case TermInfo(TS(p"\u0010$rest", b, c), w) if lastRow(c, b, w) =>
+        previousHistory(b, rest, c)
       case TermInfo(TS(p"\u001b[B$rest", b, c), w) if lastRow(c, b, w) =>
-        swapInHistory(b, (index - 1) max -1, rest, 0)
+        nextHistory(b, rest, c)
+      case TermInfo(TS(p"\u000e$rest", b, c), w) if firstRow(c, b, w) =>
+        nextHistory(b, rest, c)
     }
   }
 }
