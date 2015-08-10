@@ -152,17 +152,15 @@ class Interpreter(prompt0: Ref[String],
           }
           case None =>
             val resolution = IvyThing.resolveArtifact(groupId, artifactId, version, if (verbose) 2 else 1)
-            resolution map { resolved =>
+            resolution foreach { resolved =>
               storage().ivyCache() = storage().ivyCache().updated(
                 (groupId, artifactId, version),
                 resolved.map(_.getAbsolutePath).toSet
               )
 
               resolved.map(handleJar)
-            } match {
-              case Some(_) => Console.err.println("success")
-              case None => Console.err.println("failure")
-            }
+            } 
+            Console.err.println(resolution.fold("failure")(_ => "success"))
         }
         init()
       }
