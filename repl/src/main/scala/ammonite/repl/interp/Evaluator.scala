@@ -40,7 +40,9 @@ trait Evaluator{
 
   def previousImportBlock: String
   def addJar(url: URL): Unit
+  def addPluginJar(url: URL): Unit
   def evalClassloader: SpecialClassloader
+  def pluginClassloader: SpecialClassloader
 
   /*
    * How many wrappers has this instance compiled
@@ -82,10 +84,13 @@ object Evaluator{
      * actual classes with methods we can execute.
      */
     var evalClassloader: SpecialClassloader = null
+    var pluginClassloader: SpecialClassloader = null
 
     evalClassloader = new SpecialClassloader(currentClassloader)
+    pluginClassloader = new SpecialClassloader(currentClassloader)
 
     def addJar(url: URL) = evalClassloader.add(url)
+    def addPluginJar(url: URL) = pluginClassloader.add(url)
 
     private var _compilationCount = 0
     def compilationCount = _compilationCount

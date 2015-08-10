@@ -117,13 +117,14 @@ object Compiler{
             dirDeps: Seq[java.io.File],
             dynamicClasspath: VirtualDirectory,
             evalClassloader: => ClassLoader,
+            pluginClassloader: => ClassLoader,
             shutdownPressy: () => Unit): Compiler = new Compiler{
 
     val PluginXML = "scalac-plugin.xml"
 
     lazy val plugins0 = {
       import scala.collection.JavaConverters._
-      val loader = evalClassloader
+      val loader = pluginClassloader
 
       val urls = loader
         .getResources(PluginXML)

@@ -262,13 +262,32 @@ object AdvancedTests extends TestSuite{
     }
     'compilerPlugin{
       check.session("""
+        @ // Make sure plugins from eval class loader are not loaded
+
         @ load.ivy("org.spire-math" %% "kind-projector" % "0.6.3")
+
+        @ trait TC0[F[_]]
+        defined trait TC0
+
+        @ type TC0EitherStr = TC0[Either[String, ?]]
+        error: not found: type ?
+
+        @ // This one must be loaded
+
+        @ load.plugin.ivy("org.spire-math" %% "kind-projector" % "0.6.3")
 
         @ trait TC[F[_]]
         defined trait TC
 
         @ type TCEitherStr = TC[Either[String, ?]]
         defined type TCEitherStr
+
+        @ // Useless - does not add plugins, and ignored by eval class loader
+        
+        @ load.plugin.ivy("eu.timepit" %% "refined" % "0.2.1")
+
+        @ import eu.timepit.refined._
+        error: not found: value eu
       """)
     }
     'replApiUniqueness{
