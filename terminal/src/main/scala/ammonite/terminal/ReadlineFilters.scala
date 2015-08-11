@@ -90,12 +90,11 @@ object ReadlineFilters {
     var index = -1
     var currentHistory = Vector[Char]()
 
-    def swapInHistory(b: Vector[Char], newIndex: Int, rest: LazyList[Int], c: Int): TermState = {
+    def swapInHistory(b: Vector[Char], newIndex: Int, rest: LazyList[Int]): TermState = {
       if (index == -1 && newIndex != -1) currentHistory = b
-      val h2 = if (newIndex == -1) currentHistory else history()(newIndex).toVector
-      val c2 = if (c == b.length) h2.length else c
       index = newIndex
-      TS(rest, h2, c2)
+      val h = if (index == -1) currentHistory else history()(index).toVector
+      TS(rest, h, h.length)
     }
 
     def constrainIndex(n: Int): Int = {
@@ -104,10 +103,10 @@ object ReadlineFilters {
     }
 
     def previousHistory(b: Vector[Char], rest: LazyList[Int], c: Int): TermState =
-      swapInHistory(b, constrainIndex(index + 1), rest, c)
+      swapInHistory(b, constrainIndex(index + 1), rest)
 
     def nextHistory(b: Vector[Char], rest: LazyList[Int], c: Int): TermState =
-      swapInHistory(b, constrainIndex(index - 1), rest, c)
+      swapInHistory(b, constrainIndex(index - 1), rest)
 
     def filter = {
       case TermInfo(TS(p"\u001b[A$rest", b, c), w) if firstRow(c, b, w) =>
