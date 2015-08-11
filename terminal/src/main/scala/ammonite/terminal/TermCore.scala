@@ -197,6 +197,10 @@ object TermCore {
           writer.write(13)
           writer.flush()
           Some(s)
+        case ClearScreen(ts) =>
+          ansi.clearScreen(2)
+          ansi.moveTo(0, 0)
+          readChar(ts, ups)
         case Exit =>
           None
       }
@@ -234,5 +238,6 @@ object TermState{
   }
 
 }
+case class ClearScreen(ts: TermState) extends TermAction
 case object Exit extends TermAction
 case class Result(s: String) extends TermAction
