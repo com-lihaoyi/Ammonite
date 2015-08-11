@@ -68,6 +68,16 @@ object ScriptTests extends TestSuite{
             r: Int = 24
             """)
         }
+        'limitImports{
+          check.session(s"""
+            @ import ammonite.ops._
+
+            @ load.exec($printedScriptPath/"LimitImports.scala")
+
+            @ res
+            error: not found: value res
+            """)
+        }
       }
       'failures{
         'syntaxError{
@@ -114,9 +124,6 @@ object ScriptTests extends TestSuite{
 
             @ load.exec($printedScriptPath/"MultiBlockError.scala")
             error: Compilation Failed
-
-            @ val r1 = res1
-            r1: Int = 1
 
             @ val r2 = res2
             error: Compilation Failed
@@ -179,6 +186,16 @@ object ScriptTests extends TestSuite{
             r: Int = 24
           """)
         }
+        'limitImports{
+          check.session(s"""
+            @ import ammonite.ops._
+
+            @ load.module($printedScriptPath/"LimitImports.scala")
+
+            @ res
+            error: not found: value res
+            """)
+        }
       }
       'failures{
         'syntaxError{
@@ -225,9 +242,6 @@ object ScriptTests extends TestSuite{
 
             @ load.module($printedScriptPath/"MultiBlockError.scala")
             error: Compilation Failed
-
-            @ val r1 = res1
-            r1: Int = 1
 
             @ val r2 = res2
             error: Compilation Failed

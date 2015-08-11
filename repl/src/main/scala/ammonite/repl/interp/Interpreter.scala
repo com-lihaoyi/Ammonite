@@ -51,21 +51,22 @@ class Interpreter(prompt0: Ref[String],
     } yield out
   }
 
-  def evaluateLine(code: String, printSnippet: Seq[String], printer: Iterator[String] => Unit) = {
+  def evaluateLine(code: String, printSnippet: Seq[String], printer: Iterator[String] => Unit, extraImports: Seq[ImportData] = Seq() ) = {
     val oldClassloader = Thread.currentThread().getContextClassLoader
     try{
       Thread.currentThread().setContextClassLoader(eval.evalClassloader)
       eval.processLine(
         code,
         s"ammonite.repl.frontend.ReplBridge.repl.Internal.combinePrints(${printSnippet.mkString(", ")})",
-        printer
+        printer,
+        extraImports
       )
     } finally Thread.currentThread().setContextClassLoader(oldClassloader)
   }
 
   def processModule(code: String) = processScript(hardcodedPredef + "\n@\n" + code, eval.processScriptBlock)
 
-  def processExec(code: String) = processScript(hardcodedPredef + "\n@\n" + code, { (c, _) => evaluateLine(c, Seq(), _ => ()) })
+  def processExec(code: String) = processScript(hardcodedPredef + "\n@\n" + code, { (c, i) => evaluateLine(c, Seq(), _ => (), i)})
  
   //common stuff in proccessModule and processExec
   def processScript(code: String, evaluate: (String, Seq[ImportData]) => Res[Evaluated]): Unit = {
@@ -84,22 +85,21 @@ class Interpreter(prompt0: Ref[String],
     else
       loop(blocks.collect{ case Res.Success(o) => o }, Seq())
     Timer("processScript 3")
-    @tailrec def loop(blocks: Seq[Preprocessor.Output], imports: Seq[ImportData]): Unit = {
+    @tailrec def loop(blocks: Seq[Preprocessor.Output], imports: Seq[Seq[ImportData]]): Unit = {
       if(!blocks.isEmpty){
         Timer("processScript loop 0")
         val Preprocessor.Output(code, _) = blocks.head //pretty printing results is disabled for scripts
         Timer("processScript loop 1")
-        val ev = evaluate(code, imports)
+        val ev = evaluate(code, imports.flatten)
         Timer("processScript loop 2")
         ev match {
           case Res.Failure(msg) =>
             throw new CompilationError(msg)
           case Res.Success(ev) =>
-            eval.update(ev.imports)
-            loop(blocks.tail, imports ++ ev.imports)
+            loop(blocks.tail, imports :+ ev.imports)
           case _ => loop(blocks.tail, imports)
         }
-      }
+      } else imports.lastOption.foreach(eval.update(_))
     }
   }
 
