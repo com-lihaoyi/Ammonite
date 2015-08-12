@@ -13,6 +13,7 @@ object BasicFilters {
     navFilter orElse
     exitFilter orElse
     enterFilter orElse
+    clearFilter orElse
     loggingFilter orElse
     typingFilter
   }
@@ -73,9 +74,20 @@ object BasicFilters {
     case TS(13 ~: 10 ~:rest, b, c) => // Enter
       Result(b.mkString)
   }
+
   lazy val exitFilter: TermCore.Filter = {
-    case TS(Ctrl('c') ~: rest, b, c) => Result("")
-    case TS(Ctrl('d') ~: rest, b, c) => Exit
+    case TS(Ctrl('c') ~: rest, b, c) =>
+      Result("")
+    case TS(Ctrl('d') ~: rest, b, c) =>
+      // only exit if the line is empty, otherwise, behave like
+      // "delete" (i.e. delete one char to the right)
+      if (b.isEmpty) Exit else {
+        val (first, last) = b.splitAt(c)
+        TS(rest, first ++ last.drop(1), c)
+      }
+  }
+  lazy val clearFilter: TermCore.Filter = {
+    case TS(Ctrl('l') ~: rest, b, c) => ClearScreen(TS(rest, b, c))
   }
 
   def moveStart(b: Vector[Char],
