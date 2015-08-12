@@ -13,6 +13,7 @@ object BasicFilters {
     navFilter orElse
     exitFilter orElse
     enterFilter orElse
+    clearFilter orElse
     loggingFilter orElse
     typingFilter
   }
@@ -84,6 +85,9 @@ object BasicFilters {
         val (first, last) = b.splitAt(c)
         TS(rest, first ++ last.drop(1), c)
       }
+  }
+  lazy val clearFilter: TermCore.Filter = {
+    case TS(Ctrl('l') ~: rest, b, c) => ClearScreen(TS(rest, b, c))
   }
 
   def moveStart(b: Vector[Char],
