@@ -1,6 +1,7 @@
 package ammonite.repl
 
 import java.io._
+import ammonite.Constants
 import ammonite.repl.Util.IvyMap
 import ammonite.repl.frontend._
 import acyclic.file
@@ -62,8 +63,22 @@ class Repl(input: InputStream,
     out
   }
 
+  def ammoniteVersion: String =
+    Constants.version
+
+  def scalaVersion: String =
+    scala.util.Properties.versionString
+
+  def javaVersion: String =
+    System.getProperty("java.version")
+
+  def printBanner(): Unit = {
+    printer.println(s"Welcome to the Ammonite Repl $ammoniteVersion")
+    printer.println(s"(Scala $scalaVersion Java $javaVersion)")
+  }
 
   def run() = {
+    printBanner()
     @tailrec def loop(): Unit = {
       val res = action()
       res match{
@@ -114,7 +129,7 @@ object Repl{
   def defaultAmmoniteHome = Path(System.getProperty("user.home"))/".ammonite"
   def main(args: Array[String]) = {
     val parser = new scopt.OptionParser[Config]("ammonite") {
-      head("ammonite", ammonite.Constants.version)
+      head("ammonite", Constants.version)
       opt[String]('p', "predef")
         .action((x, c) => c.copy(predef = x))
         .text("Any commands you want to execute at the start of the REPL session")
@@ -142,7 +157,7 @@ object Repl{
     )
     file match{
       case None =>
-        println("Loading Ammonite Repl...")
+        println("Loading...")
         repl.run()
       case Some(path) =>
         repl.interp.replApi.load.module(path)
