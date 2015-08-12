@@ -146,17 +146,22 @@ class Interpreter(prompt0: Ref[String],
       def ivy(coordinates: (String, String, String), verbose: Boolean = true): Unit = {
         val (groupId, artifactId, version) = coordinates
         storage().ivyCache().get((groupId, artifactId, version)) match{
-          case Some(ps) => ps.map(new java.io.File(_)).map(handleJar)
+          case Some(ps) => {
+            ps.map(new java.io.File(_)).map(handleJar)
+            Console.err.println("success")
+          }
           case None =>
-            val resolved = IvyThing.resolveArtifact(groupId, artifactId, version, if (verbose) 2 else 1)
-            storage().ivyCache() = storage().ivyCache().updated(
-              (groupId, artifactId, version),
-              resolved.map(_.getAbsolutePath).toSet
-            )
+            val resolution = IvyThing.resolveArtifact(groupId, artifactId, version, if (verbose) 2 else 1)
+            resolution foreach { resolved =>
+              storage().ivyCache() = storage().ivyCache().updated(
+                (groupId, artifactId, version),
+                resolved.map(_.getAbsolutePath).toSet
+              )
 
-            resolved.map(handleJar)
+              resolved.map(handleJar)
+            } 
+            Console.err.println(resolution.fold("failure")(_ => "success"))
         }
-
         init()
       }
     }

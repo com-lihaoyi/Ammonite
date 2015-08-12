@@ -9,6 +9,8 @@ import org.apache.ivy.util._
 
 import org.apache.ivy.plugins.resolver.IBiblioResolver
 import acyclic.file
+import java.io.File
+
 object IvyConstructor extends IvyConstructor
 trait IvyConstructor{
   implicit class GroupIdExt(groupId: String){
@@ -47,7 +49,7 @@ object IvyThing {
   def resolveArtifact(groupId: String,
                       artifactId: String,
                       version: String,
-                      verbosity: Int = 2) = synchronized {
+                      verbosity: Int = 2) : Option[Array[File]] = synchronized {
     maxLevel = verbosity
     val ivy = Ivy.newInstance{
 
@@ -106,7 +108,12 @@ object IvyThing {
 
     //init resolve report
     val report = ivy.resolve(md, options)
-    //so you can get the jar libraries
-    report.getAllArtifactsReports.map(_.getLocalFile)
+    val unresolved = report.getUnresolvedDependencies()
+    if (unresolved.size > 0) {
+      Console.err.println("There were unresolved dependencies:")
+      unresolved.foreach(ur => Console.err.println("Dependency %s was unresolved".format(ur.getId())))
+      None
+    }
+    else Some(report.getAllArtifactsReports.map(_.getLocalFile))
   }
 }
