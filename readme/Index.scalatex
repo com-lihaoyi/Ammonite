@@ -635,6 +635,12 @@
       @a("Gitter Channel", href:="https://gitter.im/lihaoyi/Ammonite")
 
 @sect{Changelog}
+  @sect{0.4.4}
+    @ul
+      @li
+        @a("Lots", href:="https://github.com/lihaoyi/Ammonite/pull/153") @a("and", href:="https://github.com/lihaoyi/Ammonite/pull/158") @a("lots", href:="https://github.com/lihaoyi/Ammonite/pull/157") of terminal improvements, courtesy of @a("Erik Osheim", href:="https://github.com/non")
+      @li
+        Only the last @hl.scala("@")-delimited block in a script loaded via @hl.scala{load.module} gets its names dumped into the REPL's environment now, letting you create some semblance of hygiene.
   @sect{0.4.3}
     @ul
       @li
