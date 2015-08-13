@@ -24,7 +24,7 @@ object Parsers {
     }
   }
   val Prelude = P( (Annot ~ OneNLMax).rep ~ (Mod ~! Pass).rep )
-  val Statement = P ( scalaparse.Scala.Import | Prelude ~ BlockDef | StatCtx.Expr )
+  val Statement = P ( scalaparse.Scala.TopPkgSeq | scalaparse.Scala.Import | Prelude ~ BlockDef | StatCtx.Expr )
   def StatementBlock(blockSep: P0) = P ( Semis.? ~ (!blockSep ~ Statement).!.repX(sep=Semis) ~ Semis.? )
   val Splitter = P( StatementBlock(Fail) ~ WL ~ End)
 

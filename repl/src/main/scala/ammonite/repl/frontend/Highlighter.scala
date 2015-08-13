@@ -48,9 +48,7 @@ object Highlighter {
       var done = false
       val input = buffer.mkString
       parser.parse(input, instrument = (rule, idx, res) => {
-        for{
-          color <- ruleColors.lift(rule.asInstanceOf[Rule[_]])
-        } {
+        for(color <- ruleColors.lift(rule.asInstanceOf[Rule[_]])){
           val closeColor = indices.last._2
           val startIndex = indices.length
           indices += ((idx, color, true))
@@ -82,13 +80,17 @@ object Highlighter {
     }
     // Make sure there's an index right at the start and right at the end! This
     // resets the colors at the snippet's end so they don't bleed into later output
-    indices ++ Seq((9999, endColor, false))
+    indices ++ Seq((999999999, endColor, false))
   }
   def flattenIndices(boundedIndices: Seq[(Int, String, Boolean)],
                      buffer: Vector[Char]) = {
+
     boundedIndices
       .sliding(2)
-      .flatMap{case Seq((s, c1, _), (e, c2, _)) => c1 ++ buffer.slice(s, e) }
+      .flatMap{case Seq((s, c1, _), (e, c2, _)) =>
+        assert(e >= s, s"s: $s e: $e")
+        c1 ++ buffer.slice(s, e)
+      }
       .toVector
   }
   def highlight(parser: Parser[_],

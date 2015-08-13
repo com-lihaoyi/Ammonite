@@ -1,12 +1,8 @@
 package ammonite.repl
 
 import ammonite.repl.frontend.Highlighter
-import ammonite.repl.frontend.Highlighter._
 import utest._
 
-import scala.collection.{immutable => imm}
-import scalaparse.Scala._
-import scalaparse.syntax.Identifiers._
 import acyclic.file
 object UnitTests extends TestSuite{
 
@@ -26,10 +22,33 @@ object UnitTests extends TestSuite{
   val tests = TestSuite {
     println("UnitTests")
 
-
     'highlighting {
+      'fuzz - {
+        import ammonite.ops._
+
+        val paths = ls.rec! cwd |? (_.ext == "scala")
+        for(path <- paths){
+          val code = read! path
+          val out = Highlighter.defaultHighlight(
+            code.toVector,
+            Console.UNDERLINED,
+            Console.UNDERLINED,
+            Console.UNDERLINED,
+            Console.UNDERLINED,
+            Console.RESET
+          ).mkString
+            .replace(Console.UNDERLINED, "")
+            .replace(Console.RESET, "")
+          val outLength = out.length
+          val codeLength = code.length
+
+          assert{identity(path); outLength == codeLength}
+          assert{identity(path); out == code}
+        }
+        paths.length
+      }
       'comment - test("//a", "><B|//a>")
-      'type - test("x: y.type ", ">x: <G|y>.<Y|type>")
+      'type - test("x: y.type", ">x: <G|y>.<Y|type>")
       'literal - test("1", "><G|1>")
       'expressions - test("val (x, y) = 1 + 2 + 3", "><Y|val> (x, y) = <G|1> + <G|2> + <G|3>")
       'interpolation - test(
