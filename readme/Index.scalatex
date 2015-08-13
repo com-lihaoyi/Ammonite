@@ -635,6 +635,17 @@
       @a("Gitter Channel", href:="https://gitter.im/lihaoyi/Ammonite")
 
 @sect{Changelog}
+  @sect{0.4.5}
+    @ul
+      @li
+        Fix for running Ammonite using OpenJDK, thanks to @a("Johannes Rudolph", href:="https://github.com/jrudolph")
+      @li
+        Support for HOME and END keys, thanks to @a("Johannes Rudolph", href:="https://github.com/jrudolph")
+      @li
+        Fix for incorrect syntax highlighting (@a("#159", href:="https://github.com/lihaoyi/Ammonite/issues/159"))
+      @li
+        Support for loading compiler plugins, thanks to @a("Alexandre Archambault", href:="https://github.com/alexarchambault")
+
   @sect{0.4.4}
     @ul
       @li
