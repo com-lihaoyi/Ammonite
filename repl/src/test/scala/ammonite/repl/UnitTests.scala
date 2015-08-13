@@ -10,17 +10,13 @@ import scalaparse.syntax.Identifiers._
 import acyclic.file
 object UnitTests extends TestSuite{
 
-  def testHighlight(buffer: Vector[Char]) = Highlighter.highlight(
-    Parsers.Splitter,
+  def testHighlight(buffer: Vector[Char]) = Highlighter.defaultHighlight(
     buffer,
-    {
-      case Literals.Expr.Interp | Literals.Pat.Interp => ">"
-      case ExprLiteral => "<G|"
-      case Type => "<G|"
-      case BackTicked(body) if alphaKeywords.contains(body) => "<Y|"
-      case Literals.Comment => "<B|"
-    },
-    endColor = ">"
+    "<B|",
+    "<G|",
+    "<G|",
+    "<Y|",
+    ">"
   )
 
   def test(source: String, expected: String) = {
@@ -33,6 +29,7 @@ object UnitTests extends TestSuite{
 
     'highlighting {
       'comment - test("//a", "><B|//a>")
+      'type - test("x: y.type ", ">x: <G|y>.<Y|type>")
       'literal - test("1", "><G|1>")
       'expressions - test("val (x, y) = 1 + 2 + 3", "><Y|val> (x, y) = <G|1> + <G|2> + <G|3>")
       'interpolation - test(
@@ -68,9 +65,9 @@ object UnitTests extends TestSuite{
               } finally Thread.currentThread().setContextClassLoader(oldClassloader)
             } yield out
         """,
-        """><Y|def> processLine(stmts: <G|Seq[String]>,
-                            saveHistory: <G|(String => Unit, String) => Unit>,
-                            printer: <G|Iterator[String] => Unit>) = <Y|for>{
+        """><Y|def> processLine(stmts: <G|Seq>[<G|String>],
+                            saveHistory: (<G|String> => <G|Unit>, <G|String>) => <G|Unit>,
+                            printer: <G|Iterator>[<G|String>] => <G|Unit>) = <Y|for>{
               <Y|_> <- Catching { <Y|case> Ex(x@<Y|_>*) =>
                 <Y|val> Res.Failure(trace) = Res.Failure(x)
                 Res.Failure(trace + <G|"\nSomething unexpected went wrong =(">)

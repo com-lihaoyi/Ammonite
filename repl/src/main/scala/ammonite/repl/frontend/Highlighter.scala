@@ -50,9 +50,6 @@ object Highlighter {
       parser.parse(input, instrument = (rule, idx, res) => {
         for{
           color <- ruleColors.lift(rule.asInstanceOf[Rule[_]])
-          if !done // If we're done, do nothing
-          if idx >= indices.last._1 // If this is a re-parse, ignore it
-          if color != indices.last._2 // If it does't change the color, why bother?
         } {
           val closeColor = indices.last._2
           val startIndex = indices.length
@@ -60,6 +57,15 @@ object Highlighter {
 
           res() match {
             case s: Result.Success[_] =>
+              val prev = indices(startIndex - 1)._1
+
+              if (idx < prev && s.index <= prev){
+                indices.remove(startIndex, indices.length - startIndex)
+
+              }
+              while (idx < indices.last._1 && s.index <= indices.last._1) {
+                indices.remove(indices.length - 1)
+              }
               indices += ((s.index, closeColor, false))
               if (s.index == buffer.length) done = true
             case f: Result.Failure
