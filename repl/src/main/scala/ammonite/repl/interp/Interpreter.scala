@@ -117,6 +117,32 @@ class Interpreter(prompt0: Ref[String],
     }
   }
 
+  abstract class DefaultLoadJar extends LoadJar{
+
+    def handleJar(jar: File): Unit
+
+    def jar(jar: Path): Unit = {
+      handleJar(new java.io.File(jar.toString))
+      init()
+    }
+    def ivy(coordinates: (String, String, String), verbose: Boolean = true): Unit = {
+      val (groupId, artifactId, version) = coordinates
+      storage().ivyCache().get((groupId, artifactId, version)) match{
+        case Some(ps) => ps.map(new java.io.File(_)).map(handleJar)
+        case None =>
+          val resolved = IvyThing.resolveArtifact(groupId, artifactId, version, if (verbose) 2 else 1)
+          storage().ivyCache() = storage().ivyCache().updated(
+            (groupId, artifactId, version),
+            resolved.map(_.getAbsolutePath).toSet
+          )
+
+          resolved.map(handleJar)
+      }
+
+      init()
+    }
+  }
+
   lazy val replApi: ReplAPI = new DefaultReplAPI {
 
     def imports = interp.eval.previousImportBlock
@@ -124,7 +150,12 @@ class Interpreter(prompt0: Ref[String],
     val prompt = prompt0
     val frontEnd = frontEnd0
 
-    object load extends Load{
+    object load extends DefaultLoadJar with Load {
+
+      def handleJar(jar: File) = {
+        extraJars = extraJars ++ Seq(jar)
+        eval.addJar(jar.toURI.toURL)
+      }
 
       def apply(line: String) = processExec(line)
 
@@ -135,30 +166,11 @@ class Interpreter(prompt0: Ref[String],
         init()
       }
 
-      def handleJar(jar: File): Unit = {
-        extraJars = extraJars ++ Seq(jar)
-        eval.addJar(jar.toURI.toURL)
+      object plugin extends DefaultLoadJar {
+        def handleJar(jar: File) =
+          eval.addPluginJar(jar.toURI.toURL)
       }
-      def jar(jar: Path): Unit = {
-        handleJar(new java.io.File(jar.toString))
-        init()
-      }
-      def ivy(coordinates: (String, String, String), verbose: Boolean = true): Unit = {
-        val (groupId, artifactId, version) = coordinates
-        storage().ivyCache().get((groupId, artifactId, version)) match{
-          case Some(ps) => ps.map(new java.io.File(_)).map(handleJar)
-          case None =>
-            val resolved = IvyThing.resolveArtifact(groupId, artifactId, version, if (verbose) 2 else 1)
-            storage().ivyCache() = storage().ivyCache().updated(
-              (groupId, artifactId, version),
-              resolved.map(_.getAbsolutePath).toSet
-            )
 
-            resolved.map(handleJar)
-        }
-
-        init()
-      }
     }
 
     implicit lazy val pprintConfig: Ref[pprint.Config] = {
@@ -227,6 +239,7 @@ class Interpreter(prompt0: Ref[String],
       Classpath.dirDeps,
       dynamicClasspath,
       eval.evalClassloader,
+      eval.pluginClassloader,
       () => pressy.shutdownPressy()
     )
     Timer("Interpreter init init compiler")

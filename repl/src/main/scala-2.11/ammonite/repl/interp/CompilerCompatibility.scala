@@ -2,6 +2,7 @@ package ammonite.repl.interp
 
 import scala.tools.nsc.Global
 import scala.tools.nsc.interactive.{ Global => InteractiveGlobal }
+import scala.tools.nsc.plugins.Plugin
 import scala.tools.nsc.typechecker.Analyzer
 
 object CompilerCompatibility {
@@ -19,4 +20,7 @@ object CompilerCompatibility {
 
   def trees(g: Global)(parser: g.syntaxAnalyzer.UnitParser): Seq[Global#Tree] =
     parser.parseStatsOrPackages()
+
+  def pluginInit(plugin: Plugin, options: List[String], error: String => Unit): Boolean =
+    plugin.init(options, error)
 }

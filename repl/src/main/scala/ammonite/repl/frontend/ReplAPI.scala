@@ -145,7 +145,7 @@ trait OpsAPI{
 
 }
 // End of OpsAPI
-trait Load extends (String => Unit){
+trait LoadJar {
   /**
    * Load a `.jar` file
    */
@@ -154,7 +154,8 @@ trait Load extends (String => Unit){
    * Load a library from its maven/ivy coordinates
    */
   def ivy(coordinates: (String, String, String), verbose: Boolean = true): Unit
-
+}
+trait Load extends (String => Unit) with LoadJar{
   /**
    * Loads a command into the REPL and
    * evaluates them one after another
@@ -169,6 +170,8 @@ trait Load extends (String => Unit){
   def exec(path: Path): Unit
 
   def module(path: Path): Unit
+
+  def plugin: LoadJar
 
 }
 
