@@ -37,8 +37,10 @@ object ReadlineFilters {
     Case(Ctrl('f'))((b, c, m) => (b, c + 1)), // -> one char
     Case(Alt + "b")((b, c, m) => AdvancedFilters.wordLeft(b, c)), // <- one word
     Case(Alt + "f")((b, c, m) => AdvancedFilters.wordRight(b, c)), // -> one  word
-    Case(Ctrl('a'))((b, c, m) => BasicFilters.moveStart(b, c, m.width)), // <- one line
-    Case(Ctrl('e'))((b, c, m) => BasicFilters.moveEnd(b, c, m.width)) // -> one line
+    Case(Home)((b, c, m) => BasicFilters.moveStart(b, c, m.width)), // <- one line
+    Case(Ctrl('a'))((b, c, m) => BasicFilters.moveStart(b, c, m.width)),
+    Case(End)((b, c, m) => BasicFilters.moveEnd(b, c, m.width)), // -> one line
+    Case(Ctrl('e'))((b, c, m) => BasicFilters.moveEnd(b, c, m.width))
   )
 
   case class CutPasteFilter() extends TermCore.DelegateFilter{
