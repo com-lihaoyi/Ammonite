@@ -28,6 +28,9 @@ object SpecialKeys {
   val Right = Alt+"[C"
   val Left = Alt+"[D"
 
+  val Home = Alt+"OH"
+  val End = Alt+"OF"
+
   val ShiftUp = Alt+"[1;2A"
   val ShiftDown = Alt+"[1;2B"
   val ShiftRight = Alt+"[1;2C"
