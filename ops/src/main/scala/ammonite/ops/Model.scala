@@ -32,6 +32,10 @@ class PermSet(s: Set[PosixFilePermission]) extends Set[PosixFilePermission]{
   def +(elem: PosixFilePermission) = new PermSet(s + elem)
   def -(elem: PosixFilePermission) = new PermSet(s - elem)
   def iterator = s.iterator
+  override def toString() = {
+    import Config.Defaults.PPrintConfig
+    pprint.tokenize(this, width=999999, height=999999, colors=pprint.Colors.BlackWhite).mkString
+  }
 }
 
 object stat extends Op1[ops.Path, ops.stat]{

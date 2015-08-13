@@ -353,7 +353,7 @@
   @hl.scala{libraryDependencies += "com.lihaoyi" %% "ammonite-ops" % "@ammonite.Constants.version"}
 
   @p
-    And you're all set!
+    And you're all set! Here's an example of some common operations you can do with Ammonite-Ops
 
   @val opsExamples = 'ops/'src/'test/'scala/'test/'ammonite/'ops/"ExampleTests.scala"
   @val pathsScala = 'ops/'src/'main/'scala/'ammonite/'ops/"Path.scala"
@@ -466,38 +466,14 @@
       @li
         @hl.scala{Seq[T]}s where @hl.scala{T} is convertible into a @hl.scala{RelPath}
 
-  @sect{Extensions}
-    @p
-      Ammonite-Ops contains a set of extension methods on common types, which serve no purpose other than to make things more concise. These turn Scala from a "relatively-concise" language into one as tight as Bash scripts, while still maintaining the high level of type-safety and maintainability that comes with Scala code.
-
-    @sect{Traversable}
-      @p
-        These extensions apply to any @hl.scala{Traversable}: @hl.scala{Seq}s, @hl.scala{List}s, @hl.scala{Array}s, and others.
-      @ul
-        @li
-          @hl.scala{things | f} is an alias for @hl.scala{things map f}
-        @li
-          @hl.scala{things || f} is an alias for @hl.scala{things flatMap f}
-        @li
-          @hl.scala{things |? f} is an alias for @hl.scala{things filter f}
-        @li
-          @hl.scala{things |& f} is an alias for @hl.scala{things reduce f}
-        @li
-          @hl.scala{things |! f} is an alias for @hl.scala{things foreach f}
-      @p
-        These should behave exactly the same as their implementations; their sole purpose is to make things more concise at the command-line.
-
-    @sect{Pipeable}
-      @ul
-        @li
-          @hl.scala{thing |> f} is an alias for @hl.scala{f(thing)}
-
-      @p
-        This lets you flip around the function and argument, and fits nicely into the Ammonite's @hl.scala{|} pipelines.
-
   @sect{Operations}
     @p
-      All these @sect.ref{Paths} and @sect.ref{Extensions} and what-not aren't interesting on their own, but serve as a base to use to perform filesystem operations in a concise and easy to use way. Here is a smattering of those operations:
+      @sect.ref{Paths} not aren't interesting on their own, but serve as a base to use to perform filesystem operations in a concise and easy to use way. Here is a quick tour of the core capabilities that Ammonite-Ops provides:
+
+    @hl.ref(opsExamples, Seq("'reference", "import"))
+
+    @p
+      Here is the definition for these operations:
 
     @hl.scala(found)
 
@@ -528,6 +504,35 @@
         @hl.scala{write} also does @i{not} stomp over existing files by default. You need to use @hl.scala{write.over}
     @p
       In general, this should make these operations much easier to use; the defaults should cover the 99% use case without needing any special flags or fiddling.
+
+  @sect{Extensions}
+    @p
+      Ammonite-Ops contains a set of extension methods on common types, which serve no purpose other than to make things more concise. These turn Scala from a "relatively-concise" language into one as tight as Bash scripts, while still maintaining the high level of type-safety and maintainability that comes with Scala code.
+
+    @sect{Traversable}
+      @p
+        These extensions apply to any @hl.scala{Traversable}: @hl.scala{Seq}s, @hl.scala{List}s, @hl.scala{Array}s, and others.
+      @ul
+        @li
+          @hl.scala{things | f} is an alias for @hl.scala{things map f}
+        @li
+          @hl.scala{things || f} is an alias for @hl.scala{things flatMap f}
+        @li
+          @hl.scala{things |? f} is an alias for @hl.scala{things filter f}
+        @li
+          @hl.scala{things |& f} is an alias for @hl.scala{things reduce f}
+        @li
+          @hl.scala{things |! f} is an alias for @hl.scala{things foreach f}
+      @p
+        These should behave exactly the same as their implementations; their sole purpose is to make things more concise at the command-line.
+
+    @sect{Pipeable}
+      @ul
+        @li
+          @hl.scala{thing |> f} is an alias for @hl.scala{f(thing)}
+
+      @p
+        This lets you flip around the function and argument, and fits nicely into the Ammonite's @hl.scala{|} pipelines.
 
   @sect{Chaining}
     @p
