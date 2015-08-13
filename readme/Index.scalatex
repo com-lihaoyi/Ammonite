@@ -360,6 +360,8 @@
   @hl.ref(opsExamples, Seq("longExample", "import"), "assert(")
 
   @p
+    These examples make heavy use of Ammonite-Ops' @sect.ref{Paths}, @sect.ref{Operations} and @sect.ref{Extensions} to achieve their minimal, concise syntax
+  @p
     As you can see, Ammonite-Ops replaces the common mess of boilerplate:
 
   @hl.ref('ops/'src/'test/'scala/'test/'ammonite/'ops/"ExampleTests.scala", Seq("comparison", "def removeAll"), "assert(")
@@ -533,6 +535,14 @@
 
       @p
         This lets you flip around the function and argument, and fits nicely into the Ammonite's @hl.scala{|} pipelines.
+
+    @sect{Callable}
+      @ul
+        @li
+          @hl.scala{f! thing} is an alias for @hl.scala{f(thing)}
+
+      @p
+        This is another syntax-saving extension, that makes it easy to call functions without having to constantly be opening and closing brackets. It does nothing else.
 
   @sect{Chaining}
     @p

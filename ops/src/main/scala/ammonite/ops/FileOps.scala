@@ -54,7 +54,7 @@ object Internals{
         io.Source.fromInputStream(is).getLines()
       }
     }
-    object bytes extends Op1[Path, Array[Byte]]{
+    object bytes extends Function1[Path, Array[Byte]]{
       def apply(arg: Path) = {
         val is = readIn(arg)
         val out = new java.io.ByteArrayOutputStream()
@@ -81,11 +81,11 @@ object Internals{
 }
 
 /**
- * An [[Op1]] that returns a Seq[R], but can also do so
+ * An [[Callable1]] that returns a Seq[R], but can also do so
  * lazily (Iterator[R]) via `op.!! arg`. You can then use
  * the iterator however you wish
  */
-trait StreamableOp1[T1, R, C <: Seq[R]] extends Op1[T1, C]{
+trait StreamableOp1[T1, R, C <: Seq[R]] extends Function1[T1, C]{
   def materialize(src: T1, i: Iterator[R]): C
   def apply(arg: T1) = materialize(arg, !!(arg))
   def !!(arg: T1): Iterator[R]
@@ -96,7 +96,7 @@ trait StreamableOp1[T1, R, C <: Seq[R]] extends Op1[T1, C]{
  * Makes directories up to the specified path. Equivalent
  * to `mkdir -p` in bash
  */
-object mkdir extends Op1[Path, Unit]{
+object mkdir extends Function1[Path, Unit]{
   def apply(path: Path) = new File(path.toString).mkdirs()
 }
 
@@ -105,7 +105,7 @@ object mkdir extends Op1[Path, Unit]{
  * Moves a file from one place to another.
  * Creates any necessary directories
  */
-object mv extends Op2[Path, Path, Unit] with Internals.Mover{
+object mv extends Function2[Path, Path, Unit] with Internals.Mover{
   def apply(from: Path, to: Path) =
     java.nio.file.Files.move(from.nio, to.nio)
 
@@ -121,7 +121,7 @@ object mv extends Op2[Path, Path, Unit] with Internals.Mover{
  * Creates any necessary directories, and copies folders
  * recursively.
  */
-object cp extends Op2[Path, Path, Unit] {
+object cp extends Function2[Path, Path, Unit] {
   def apply(from: Path, to: Path) = {
     def copyOne(p: Path) = {
       Files.copy(Paths.get(p.toString), Paths.get((to/(p - from)).toString))
@@ -137,7 +137,7 @@ object cp extends Op2[Path, Path, Unit] {
  * any files or folders in the target path, or
  * does nothing if there aren't any
  */
-object rm extends Op1[Path, Unit]{
+object rm extends Function1[Path, Unit]{
   def apply(target: Path) = {
     ls.rec(target).toArray
                   .reverseIterator
@@ -176,7 +176,7 @@ case class LsSeq(base: Path, listed: RelPath*) extends Seq[Path]{
   def iterator = listed.iterator.map(base/)
 }
 
-trait ImplicitOp[V] extends Op1[Path, V]{
+trait ImplicitOp[V] extends Function1[Path, V]{
   /**
    * Make the common case of looking around the current directory fast by
    * letting the user omit the argument if there's one in scope
@@ -216,7 +216,7 @@ object ls extends StreamableOp1[Path, Path, LsSeq] with ImplicitOp[LsSeq]{
  * or [[write.append]] if you want to over-write it or add to what's already
  * there.
  */
-object write extends Op2[Path, Internals.Writable, Unit]{
+object write extends Function2[Path, Internals.Writable, Unit]{
   def apply(target: Path, data: Internals.Writable) = {
     mkdir(target/RelPath.up)
     Files.write(target.nio, data.writeableData, StandardOpenOption.CREATE_NEW)
@@ -226,7 +226,7 @@ object write extends Op2[Path, Internals.Writable, Unit]{
    * Identical to [[write]], except if the file already exists,
    * appends to the file instead of error-ing out
    */
-  object append extends Op2[Path, Internals.Writable, Unit]{
+  object append extends Function2[Path, Internals.Writable, Unit]{
     def apply(target: Path, data: Internals.Writable) = {
       mkdir(target/RelPath.up)
       Files.write(target.nio, data.writeableData, StandardOpenOption.CREATE, StandardOpenOption.APPEND)
@@ -236,7 +236,7 @@ object write extends Op2[Path, Internals.Writable, Unit]{
    * Identical to [[write]], except if the file already exists,
    * replaces the file instead of error-ing out
    */
-  object over extends Op2[Path, Internals.Writable, Unit]{
+  object over extends Function2[Path, Internals.Writable, Unit]{
     def apply(target: Path, data: Internals.Writable) = {
       mkdir(target/RelPath.up)
       Files.write(target.nio, data.writeableData)
@@ -249,7 +249,7 @@ object write extends Op2[Path, Internals.Writable, Unit]{
  * Reads a file into memory, either as a String,
  * as (read.lines(...): Seq[String]), or as (read.bytes(...): Array[Byte]).
  */
-object read extends Internals.Reader with Op1[Path, String]{
+object read extends Internals.Reader with Function1[Path, String]{
   def readIn(p: Path) = {
     java.nio.file.Files.newInputStream(p.nio)
   }
@@ -258,7 +258,7 @@ object read extends Internals.Reader with Op1[Path, String]{
    * Reads a classpath resource into memory, either as a
    * string, as a Seq[String] of lines, or as a Array[Byte]
    */
-  object resource extends Internals.Reader with Op1[Path, String]{
+  object resource extends Internals.Reader with Function1[Path, String]{
     def readIn(p: Path) = {
       val ret = getClass.getResourceAsStream(p.toString)
       ret match{
@@ -272,22 +272,22 @@ object read extends Internals.Reader with Op1[Path, String]{
 /**
  * Checks if a file or folder exists at the given path.
  */
-object exists extends Op1[Path, Boolean]{
+object exists extends Function1[Path, Boolean]{
   def apply(p: Path) = Files.exists(Paths.get(p.toString))
 }
 
-//object chmod extends Op2[Path, Unit, Unit]{
+//object chmod extends Function2[Path, Unit, Unit]{
 //  def apply(arg1: Path, arg2: Unit) = ???
 //}
-//object chgrp extends Op2[Path, Unit, Unit]{
+//object chgrp extends Function2[Path, Unit, Unit]{
 //  def apply(arg1: Path, arg2: Unit) = ???
 //}
-//object chown extends Op2[Path, Unit, Unit]{
+//object chown extends Function2[Path, Unit, Unit]{
 //  def apply(arg1: Path, arg2: Unit) = ???
 //}
-//object ps extends Op1[Unit, Unit]{
+//object ps extends Function1[Unit, Unit]{
 //  def apply(arg: Unit): Unit = ???
-//  object tree extends Op1[Unit, Unit]{
+//  object tree extends Function1[Unit, Unit]{
 //    def apply(arg: Unit): Unit = ???
 //  }
 //}
@@ -298,17 +298,17 @@ object exists extends Op1[Path, Boolean]{
  * Kills the given process with the given signal, e.g.
  * `kill(9)! pid`
  */
-case class kill(signal: Int) extends Op1[Int, CommandResult]{
+case class kill(signal: Int) extends Function1[Int, CommandResult]{
   def apply(pid: Int): CommandResult = {
 
     %%(wd = Path(new java.io.File(""))).kill("-" + signal, pid.toString)
   }
 }
-object ln extends Op2[Path, Path, Unit]{
+object ln extends Function2[Path, Path, Unit]{
   def apply(src: Path, dest: Path) = {
     Files.createLink(Paths.get(dest.toString), Paths.get(src.toString))
   }
-  object s extends Op2[Path, Path, Unit]{
+  object s extends Function2[Path, Path, Unit]{
     def apply(src: Path, dest: Path) = {
       Files.createSymbolicLink(Paths.get(dest.toString), Paths.get(src.toString))
     }

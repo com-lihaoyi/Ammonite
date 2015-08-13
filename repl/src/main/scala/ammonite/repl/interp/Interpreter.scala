@@ -214,7 +214,7 @@ class Interpreter(prompt0: Ref[String],
      * Change the working directory `wd`; if the provided path is relative it
      * gets appended on to the current `wd`, if it's absolute it replaces.
      */
-    val cd = new ammonite.ops.Op1[ammonite.ops.Path, ammonite.ops.Path]{
+    val cd = new ammonite.ops.Callable1[ammonite.ops.Path, ammonite.ops.Path]{
       def apply(arg: Path) = {
         if (!stat(arg).isDir) throw new NotDirectoryException(arg.toString)
         else {

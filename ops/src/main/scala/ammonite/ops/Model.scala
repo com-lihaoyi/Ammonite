@@ -38,7 +38,7 @@ class PermSet(s: Set[PosixFilePermission]) extends Set[PosixFilePermission]{
   }
 }
 
-object stat extends Op1[ops.Path, ops.stat]{
+object stat extends Function1[ops.Path, ops.stat]{
   def apply(p: ops.Path) = ops.stat.make(
     // Don't blow up if we stat `root`
     p.segments.lastOption.getOrElse("/"),
@@ -60,7 +60,7 @@ object stat extends Op1[ops.Path, ops.stat]{
       else ???
     )
   }
-  object full extends Op1[ops.Path, ops.stat.full] {
+  object full extends Function1[ops.Path, ops.stat.full] {
     def apply(p: ops.Path) = ops.stat.full.make(
       p.last,
       Files.readAttributes(java.nio.file.Paths.get(p.toString), classOf[BasicFileAttributes]),

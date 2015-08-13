@@ -13,14 +13,9 @@ object BasePath{
   def invalidChars = Set('/')
   def checkSegment(s: String) = {
     if (s.exists(BasePath.invalidChars)){
-      val invalid = BasePath.invalidChars.filter(s.contains(_))
       throw PathError.InvalidSegment(s)
     }
-    s match{
-      case "" => throw new PathError.InvalidSegment("")
-      case "core/src/test" => throw new PathError.InvalidSegment("core/src/test")
-      case _ =>
-    }
+    if (s == "") throw new PathError.InvalidSegment("")
   }
   def reprSection(s: String, cfg: pprint.Config) = {
     val validIdentifier = "([a-zA-Z_][a-zA-Z_0-9]+)".r

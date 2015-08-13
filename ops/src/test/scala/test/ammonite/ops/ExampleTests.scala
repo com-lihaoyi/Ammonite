@@ -133,7 +133,7 @@ object ExampleTests extends TestSuite{
       val lineCount = ls.rec! wd |? (_.ext == "java") | read.lines | (_.size) sum
 
       // Find and concatenate all .java files directly in the working directory
-      ls! wd/'dir2|? (_.ext == "java") | read |> write! wd/'target/"bundled.java"
+      ls! wd/'dir2 |? (_.ext == "java") | read |> write! wd/'target/"bundled.java"
 
       assert(
         listed == Seq(wd/"folder", wd/"folder1"),
