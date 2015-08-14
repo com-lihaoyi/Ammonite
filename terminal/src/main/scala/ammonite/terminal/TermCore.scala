@@ -199,7 +199,8 @@ object TermCore {
           Some(s)
         case ClearScreen(ts) =>
           ansi.clearScreen(2)
-          ansi.moveTo(0, 0)
+          ansi.up(9999)
+          ansi.left(9999)
           readChar(ts, ups)
         case Exit =>
           None

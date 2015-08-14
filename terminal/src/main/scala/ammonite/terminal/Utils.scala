@@ -15,28 +15,6 @@ class Ansi(output: Writer){
   def control(n: Int, c: Char) = output.write(s"\033[" + n + c)
 
   /**
-   * Moves to the desired row and column, using individual
-   * cursor movements. `0` is in the top/left counting up
-   * towards the bottom/right, and `-1` is in the bottom/right
-   * counting down towards the top/left
-   */
-  def moveTo(row: Int, col: Int) = {
-    if (row >= 0) {
-      up(9999)
-      down(row)
-    }else{
-      down(9999)
-      up(-1-row)
-    }
-    if (col >= 0) {
-      left(9999)
-      right(col)
-    }else{
-      right(9999)
-      left(-1-col)
-    }
-  }
-  /**
    * Move up `n` squares
    */
   def up(n: Int) = if (n == 0) "" else control(n, 'A')

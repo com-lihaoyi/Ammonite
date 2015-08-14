@@ -8,6 +8,11 @@ import scala.annotation.tailrec
 
 
 // Test Unicode:  漢語;𩶘da
+/**
+ * A "full" test terminal including all readline-style functionality
+ * included as filters, but without any Scala/Ammonite specific logic
+ * at all. Provides a minimal environment for manual testing
+ */
 object Term{
 
   def main(args: Array[String]): Unit = {
