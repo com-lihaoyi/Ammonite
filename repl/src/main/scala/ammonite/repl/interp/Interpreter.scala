@@ -280,8 +280,6 @@ class Interpreter(prompt0: Ref[String],
               s"val ${b.name} = ammonite.repl.frontend.ReplBridge.repl.replArgs($idx).value.asInstanceOf[${b.typeTag.tpe}]"
             }
             .mkString("\n")
-  println("Interpreter argString")
-  println(argString)
 
   processModule(hardcodedPredef)
   init()

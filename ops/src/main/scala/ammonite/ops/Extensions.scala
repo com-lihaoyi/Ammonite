@@ -30,18 +30,18 @@ trait Extensions{
 
   implicit def RegexContextMaker(s: StringContext) = new RegexContext(s)
 
-
-  implicit class Callable1[T1, R](f: (T1 => R)){
-    def !(arg: T1): R = f(arg)
-  }
-  implicit class Callable2[T1, T2, R](f: (T1, T2) => R){
-    case class !(arg1: T1) extends (T2 => R){
-      def apply(arg2: T2) = f(arg1, arg2)
-      def !(arg2: T2): R = f(arg1, arg2)
-    }
-  }
+  implicit def Callable1[T1, R](f: (T1 => R)) = new Callable1(f)
+  implicit def Callable2[T1, T2, R](f: (T1, T2) => R) = new Callable2(f)
 }
 
+case class Callable1[T1, R](f: (T1 => R)) extends (T1 => R){
+  def !(arg: T1): R = f(arg)
+  def apply(arg: T1): R = f(arg)
+}
+case class Callable2[T1, T2, R](f: (T1, T2) => R) extends ((T1, T2) => R){
+  def !(arg1: T1) = new Callable1[T2, R](arg2 => f(arg1, arg2))
+  def apply(arg1: T1, arg2: T2) = f(arg1, arg2)
+}
 object Extensions extends Extensions
 
 /**

@@ -28,7 +28,8 @@ class Checker {
     stdout = allOutput += _,
     storage = Ref(Storage(tempDir)),
     new History(Vector()),
-    predef = predef
+    predef = predef,
+    replArgs = Seq()
   )
 
   def session(sess: String): Unit = {

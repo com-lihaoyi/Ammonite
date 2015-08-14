@@ -76,7 +76,7 @@ object AdvancedTests extends TestSuite{
         """)
     }
     'exit{
-      check.result("exit", Res.Exit)
+      check.result("exit", Res.Exit())
     }
     'skip{
       check.result("", Res.Skip)

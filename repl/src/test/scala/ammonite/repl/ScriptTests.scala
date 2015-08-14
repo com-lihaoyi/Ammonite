@@ -263,7 +263,8 @@ object ScriptTests extends TestSuite{
           stdout = _ => (),
           storage = Ref(storage),
           new History(Vector()),
-          predef = ""
+          predef = "",
+          replArgs = Seq()
         )
 
         'blocks{
