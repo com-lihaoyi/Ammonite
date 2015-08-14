@@ -1,13 +1,17 @@
 package ammonite.terminal
 
 import FilterTools._
-import TermCore.{Filter, DelegateFilter}
+import TermCore.DelegateFilter
 import LazyList._
 import SpecialKeys._
+import acyclic.file
 /**
- * Created by haoyi on 6/11/15.
+ * Filters have hook into the various {Ctrl,Shift,Fn,Alt}x{Up,Down,Left,Right}
+ * combination keys, and make them behave similarly as they would on a normal
+ * GUI text editor: alt-{left, right} for word movement, hold-down-shift for
+ * text selection, etc.
  */
-object AdvancedFilters {
+object GUILikeFilters {
   case class SelectionFilter() extends DelegateFilter{
     var mark: Option[Int] = None
     def setMark(c: Int) = {

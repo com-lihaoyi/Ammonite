@@ -17,7 +17,7 @@ object Term{
 
   def main(args: Array[String]): Unit = {
     var history = List.empty[String]
-    val selection = AdvancedFilters.SelectionFilter()
+    val selection = GUILikeFilters.SelectionFilter()
 
     val reader = new java.io.InputStreamReader(System.in)
     rec()
@@ -27,8 +27,8 @@ object Term{
         reader,
         new OutputStreamWriter(System.out),
         selection orElse
-        AdvancedFilters.altFilter orElse
-        AdvancedFilters.fnFilter orElse
+        GUILikeFilters.altFilter orElse
+        GUILikeFilters.fnFilter orElse
         ReadlineFilters.navFilter orElse
         ReadlineFilters.CutPasteFilter() orElse
 //        Example multiline support by intercepting Enter key

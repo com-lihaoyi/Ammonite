@@ -49,6 +49,6 @@ class Checker(width: Int, grid: String, start: String){
   val up: TermCore.Action = BasicFilters.moveUp(_, _, width)
   val home: TermCore.Action = BasicFilters.moveStart(_, _, width)
   val end: TermCore.Action = BasicFilters.moveEnd(_, _, width)
-  val wordLeft: TermCore.Action = AdvancedFilters.wordLeft
-  val wordRight: TermCore.Action = AdvancedFilters.wordRight
+  val wordLeft: TermCore.Action = GUILikeFilters.wordLeft
+  val wordRight: TermCore.Action = GUILikeFilters.wordRight
 }

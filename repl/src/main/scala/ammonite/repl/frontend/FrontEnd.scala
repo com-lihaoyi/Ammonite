@@ -131,12 +131,12 @@ object FrontEnd{
 
       val historyFilter = ReadlineFilters.HistoryFilter(() => history.reverse)
       val cutPasteFilter = ReadlineFilters.CutPasteFilter()
-      val selectionFilter = AdvancedFilters.SelectionFilter()
+      val selectionFilter = GUILikeFilters.SelectionFilter()
 
       val allFilters =
         selectionFilter orElse
-        AdvancedFilters.altFilter orElse
-        AdvancedFilters.fnFilter orElse
+        GUILikeFilters.altFilter orElse
+        GUILikeFilters.fnFilter orElse
         ReadlineFilters.navFilter orElse
         autocompleteFilter orElse
         historyFilter.filter orElse

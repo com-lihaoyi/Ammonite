@@ -1,8 +1,9 @@
 package ammonite.terminal
 
-
+import acyclic.file
 /**
- * Created by haoyi on 6/11/15.
+ * One place to assign all the esotic control key input snippets to
+ * easy-to-remember names
  */
 object SpecialKeys {
 

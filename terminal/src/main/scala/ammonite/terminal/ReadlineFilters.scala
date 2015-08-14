@@ -39,8 +39,8 @@ object ReadlineFilters {
   lazy val navFilter = orElseAll(
     Case(Ctrl('b'))((b, c, m) => (b, c - 1)), // <- one char
     Case(Ctrl('f'))((b, c, m) => (b, c + 1)), // -> one char
-    Case(Alt + "b")((b, c, m) => AdvancedFilters.wordLeft(b, c)), // <- one word
-    Case(Alt + "f")((b, c, m) => AdvancedFilters.wordRight(b, c)), // -> one  word
+    Case(Alt + "b")((b, c, m) => GUILikeFilters.wordLeft(b, c)), // <- one word
+    Case(Alt + "f")((b, c, m) => GUILikeFilters.wordRight(b, c)), // -> one  word
     Case(Home)((b, c, m) => BasicFilters.moveStart(b, c, m.width)), // <- one line
     Case(Ctrl('a'))((b, c, m) => BasicFilters.moveStart(b, c, m.width)),
     Case(End)((b, c, m) => BasicFilters.moveEnd(b, c, m.width)), // -> one line
@@ -63,13 +63,13 @@ object ReadlineFilters {
     }
 
     def cutWordRight(b: Vector[Char], c: Int) = {
-      val start = AdvancedFilters.consumeWord(b, c, 1, 0)
+      val start = GUILikeFilters.consumeWord(b, c, 1, 0)
       currentCut = b.slice(c, start)
       (b.take(c) ++ b.drop(start), c)
     }
 
     def cutWordLeft(b: Vector[Char], c: Int) = {
-      val start = AdvancedFilters.consumeWord(b, c, -1, 1)
+      val start = GUILikeFilters.consumeWord(b, c, -1, 1)
       currentCut = b.slice(start, c)
       (b.take(start) ++ b.drop(c), start)
     }
