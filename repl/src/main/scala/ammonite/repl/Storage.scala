@@ -29,7 +29,11 @@ object Storage{
 
   def apply(dir: Path): Storage = new Storage{
     val predef = dir/"predef.scala"
-    val cacheDir = dir/'cache
+    // Each version puts its cache in a separate folder, to bust caches
+    // on every version bump; otherwise binary-incompatible changes to
+    // ReplAPI/Preprocessor/ammonite-ops will cause scripts to fail after
+    // someone upgrades Ammonite.
+    val cacheDir = dir/'cache/ammonite.Constants.version
     val compileCacheDir = cacheDir/'compile
     val ivyCacheFile = cacheDir/"ivycache.json"
     val metadataFile = "metadata.json"
