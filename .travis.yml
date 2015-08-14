@@ -7,6 +7,7 @@ jdk:
 - oraclejdk7
 - oraclejdk8
 - openjdk7
+- openjdk8
 script:
 - sbt ++$TRAVIS_SCALA_VERSION modules/test
 # Tricks to avoid unnecessary cache updates, from
