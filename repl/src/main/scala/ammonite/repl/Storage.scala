@@ -1,15 +1,12 @@
 package ammonite.repl
 
 import acyclic.file
-import java.io.{File, FileInputStream, IOException, FileWriter}
 import ammonite.ops._
 import ammonite.repl.Util.{IvyMap, CompileCache, ClassFiles}
 
 import scala.util.Try
-import scala.collection.generic.{GenericCompanion, GenericTraversableTemplate, CanBuildFrom, SeqFactory}
-import scala.collection.{IterableLike, mutable, IndexedSeqLike}
-import scala.collection.mutable.ArrayBuffer
-import scala.collection.JavaConversions.asScalaBuffer
+import scala.collection.generic.CanBuildFrom
+import scala.collection.{mutable, IndexedSeqLike}
 
 
 /**Trait for the interface of common persistent storage. 

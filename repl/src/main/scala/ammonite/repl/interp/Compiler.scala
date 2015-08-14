@@ -2,20 +2,19 @@ package ammonite.repl.interp
 
 
 import acyclic.file
-import ammonite.repl.{Timer, ImportData}
+import ammonite.repl.ImportData
 import ammonite.repl.Util.ClassFiles
 import scala.collection.mutable
-import scala.reflect.internal.util.{BatchSourceFile, OffsetPosition, Position}
+import scala.reflect.internal.util.Position
 import scala.reflect.io
 import scala.reflect.io._
 import scala.tools.nsc
-import scala.tools.nsc.{Phase, Global, Settings}
+import scala.tools.nsc.{Global, Settings}
 import scala.tools.nsc.backend.JavaPlatform
 import scala.tools.nsc.interactive.Response
-import scala.tools.nsc.plugins.{PluginComponent, Plugin}
+import scala.tools.nsc.plugins.Plugin
 
 import scala.tools.nsc.reporters.AbstractReporter
-import scala.tools.nsc.typechecker.Analyzer
 import scala.tools.nsc.util.ClassPath.JavaContext
 import scala.tools.nsc.util._
 

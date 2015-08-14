@@ -1,6 +1,5 @@
 package ammonite
 
-import scala.collection.Seq
 
 package object ops extends Extensions with RelPathStuff{
   implicit val postfixOps = scala.language.postfixOps

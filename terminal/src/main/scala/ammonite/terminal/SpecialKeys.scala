@@ -1,6 +1,5 @@
 package ammonite.terminal
 
-import ammonite.terminal.FilterTools._
 
 /**
  * Created by haoyi on 6/11/15.

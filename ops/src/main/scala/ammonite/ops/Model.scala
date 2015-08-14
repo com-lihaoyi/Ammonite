@@ -6,7 +6,6 @@ import java.nio.file.attribute._
 import ammonite.ops
 import pprint.{PPrinter, Config, PPrint}
 
-import scala.collection.SortedSet
 import scala.util.Try
 
 

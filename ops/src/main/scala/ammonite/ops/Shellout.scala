@@ -1,6 +1,6 @@
 package ammonite.ops
 
-import pprint.{PPrint, Config, PPrinter}
+import pprint.{PPrint, PPrinter}
 
 import scala.language.dynamics
 

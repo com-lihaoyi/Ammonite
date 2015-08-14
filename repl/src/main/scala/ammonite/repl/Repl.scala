@@ -1,15 +1,12 @@
 package ammonite.repl
 
 import java.io._
-import ammonite.repl.Util.IvyMap
 import ammonite.repl.frontend._
 import acyclic.file
 import ammonite.repl.interp.Interpreter
-import Util.CompileCache
 
 import scala.annotation.tailrec
-import scala.collection.mutable
-import scala.util.Try
+import scala.reflect.runtime.universe.TypeTag
 import ammonite.ops._
 class Repl(input: InputStream,
            output: OutputStream,
@@ -145,19 +142,20 @@ object Repl{
     parser.parse(args, Config()).foreach(c => run(c.predef, c.ammoniteHome, c.file))
   }
 
-  def eval[T](predef: String = "",
-              ammoniteHome: Path = defaultAmmoniteHome,
-              replArgs: Seq[Bind[_]] = Nil) = {
+  implicit def binder[T](t: (String, T))(implicit typeTag: TypeTag[T]) = {
+    Bind(t._1, t._2)(typeTag)
+  }
+  def debug(replArgs: Bind[_]*): Any = {
 
-    def storage = Storage(ammoniteHome)
+    def storage = Storage(defaultAmmoniteHome)
     def repl = new Repl(
       System.in, System.out,
       storage = Ref(storage),
-      predef = predef + "\n" + storage.loadPredef,
+      predef = "",
       replArgs
     )
 
-    repl.run().asInstanceOf[T]
+    repl.run()
   }
   def run(predef: String = "",
           ammoniteHome: Path = defaultAmmoniteHome,
@@ -168,7 +166,7 @@ object Repl{
     lazy val repl = new Repl(
       System.in, System.out,
       storage = Ref(storage),
-      predef = predef + "\n" + storage.loadPredef
+      predef = predef
     )
     file match{
       case None =>
@@ -177,7 +175,6 @@ object Repl{
       case Some(path) =>
         repl.interp.replApi.load.module(path)
     }
-    ammonite.repl.Repl.eval[Any](replArgs = Seq(ammonite.repl.Bind("hello", repl)))
     Timer("Repl.run End")
   }
 }

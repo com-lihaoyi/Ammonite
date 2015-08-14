@@ -12,7 +12,6 @@ import acyclic.file
 
 import pprint.{Config, PPrinter, PPrint}
 
-import Extensions._
 object OpError{
   type IAE = IllegalArgumentException
   case class ResourceNotFound(src: Path)

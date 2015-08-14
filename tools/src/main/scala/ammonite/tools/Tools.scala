@@ -102,7 +102,7 @@ object tee {
   def apply[T, R1, R2, R3](f1: T => R1, f2: T => R2, f3: T => R3) = (v: T) => (f1(v), f2(v), f3(v))
 }
 
-case class tail(interval: Int, prefix: Int) extends Callable1[Path, Iterator[String]]{
+case class tail(interval: Int, prefix: Int) extends Function[Path, Iterator[String]]{
   def apply(arg: Path): Iterator[String] = {
     val is = java.nio.file.Files.newInputStream(arg.nio)
     val br = new BufferedReader(new InputStreamReader(is))

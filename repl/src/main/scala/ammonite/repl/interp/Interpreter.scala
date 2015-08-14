@@ -1,16 +1,13 @@
 package ammonite.repl.interp
 
 import java.io.File
-import java.nio.file.{NotDirectoryException, Files}
+import java.nio.file.NotDirectoryException
 import acyclic.file
 import ammonite.ops._
-import ammonite.repl.Util.IvyMap
 import pprint.{Config, PPrint}
 import annotation.tailrec
 import ammonite.repl._
 import ammonite.repl.frontend._
-import Util.CompileCache
-import fastparse.core.Result
 
 import scala.reflect.io.VirtualDirectory
 
@@ -286,10 +283,10 @@ class Interpreter(prompt0: Ref[String],
   println("Interpreter argString")
   println(argString)
 
-  processModule(hardcodedPredef + "\n" + argString)
+  processModule(hardcodedPredef)
   init()
 
-  processModule(predef)
+  processModule(storage().loadPredef + "\n" + predef + "\n" + argString)
   Timer("Interpreter init predef 0")
   init()
   Timer("Interpreter init predef 1")

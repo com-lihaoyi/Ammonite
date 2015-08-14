@@ -4,7 +4,7 @@ import java.lang.reflect.InvocationTargetException
 import java.net.URL
 
 import acyclic.file
-import ammonite.repl.frontend.{ReplExit, ReplAPI}
+import ammonite.repl.frontend.ReplExit
 import ammonite.repl._
 import java.net.URLClassLoader
 import java.security.MessageDigest
