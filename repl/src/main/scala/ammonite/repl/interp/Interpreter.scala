@@ -106,7 +106,7 @@ class Interpreter(prompt0: Ref[String],
   def handleOutput(res: Res[Evaluated]) = {
     res match{
       case Res.Skip => true
-      case Res.Exit =>
+      case Res.Exit(value) =>
         pressy.shutdownPressy()
         false
       case Res.Success(ev) =>

@@ -1,7 +1,6 @@
 package ammonite.repl
 
 import java.io._
-import ammonite.Constants
 import ammonite.repl.Util.IvyMap
 import ammonite.repl.frontend._
 import acyclic.file
@@ -63,26 +62,24 @@ class Repl(input: InputStream,
     out
   }
 
-  def ammoniteVersion: String =
-    Constants.version
-
-  def scalaVersion: String =
-    scala.util.Properties.versionString
-
-  def javaVersion: String =
-    System.getProperty("java.version")
+  def ammoniteVersion = ammonite.Constants.version
+  def scalaVersion = scala.util.Properties.versionString
+  def javaVersion = System.getProperty("java.version")
 
   def printBanner(): Unit = {
     printer.println(s"Welcome to the Ammonite Repl $ammoniteVersion")
     printer.println(s"(Scala $scalaVersion Java $javaVersion)")
   }
 
-  def run() = {
+  def run(): Any = {
     printBanner()
-    @tailrec def loop(): Unit = {
+    @tailrec def loop(): Any = {
       val res = action()
-      res match{
-        case Res.Exit => printer.println("Bye!")
+      Timer("End Of Loop")
+      val res2 = res match{
+        case Res.Exit(value) =>
+          printer.println("Bye!")
+          value
         case Res.Failure(msg) => printer.println(colors().error() + msg + colors().reset())
         case Res.Exception(ex, msg) =>
           printer.println(
@@ -91,8 +88,9 @@ class Repl(input: InputStream,
           printer.println(colors().error() + msg + colors().reset())
         case _ =>
       }
-      Timer("End Of Loop")
+
       if (interp.handleOutput(res)) loop()
+      else res2
     }
     loop()
   }
@@ -129,7 +127,7 @@ object Repl{
   def defaultAmmoniteHome = Path(System.getProperty("user.home"))/".ammonite"
   def main(args: Array[String]) = {
     val parser = new scopt.OptionParser[Config]("ammonite") {
-      head("ammonite", Constants.version)
+      head("ammonite", ammonite.Constants.version)
       opt[String]('p', "predef")
         .action((x, c) => c.copy(predef = x))
         .text("Any commands you want to execute at the start of the REPL session")
@@ -143,6 +141,16 @@ object Repl{
         .text("The Ammonite script file you want to execute")
     }
     parser.parse(args, Config()).foreach(c => run(c.predef, c.ammoniteHome, c.file))
+  }
+  def eval[T](predef: String = "",
+              ammoniteHome: Path = defaultAmmoniteHome) = {
+    def storage = Storage(ammoniteHome)
+    def repl = new Repl(
+      System.in, System.out,
+      storage = Ref(storage),
+      predef = predef + "\n" + storage.loadPredef
+    )
+    repl.run().asInstanceOf[T]
   }
   def run(predef: String = "",
           ammoniteHome: Path = defaultAmmoniteHome,

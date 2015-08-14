@@ -61,7 +61,7 @@ object FrontEnd{
                addHistory: String => Unit) = {
       Timer("FrontEnd.Ammonite.action start")
       val res = readLine(reader, output, prompt, colors, compilerComplete, history) match{
-        case None => Res.Exit
+        case None => Res.Exit(())
         case Some(code) =>
           addHistory(code)
           Parsers.Splitter.parse(code) match{
@@ -250,7 +250,7 @@ object FrontEnd{
           // Strip ANSI color codes, as described http://stackoverflow.com/a/14652763/871202
           else " " * prompt.replaceAll("\u001B\\[[;\\d]*m", "").length
         )) match {
-          case None => Res.Exit
+          case None => Res.Exit(())
           case Some(newCode) =>
             val code = buffered + newCode
             Parsers.split(code) match{

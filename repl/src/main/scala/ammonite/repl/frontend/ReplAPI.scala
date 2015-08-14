@@ -21,13 +21,18 @@ class ReplAPIHolder {
 /**
  * Thrown to exit the REPL cleanly
  */
-case object ReplExit extends ControlThrowable
+case class ReplExit(value: Any) extends ControlThrowable
 
 trait ReplAPI extends OpsAPI{
   /**
    * Exit the Ammonite REPL. You can also use Ctrl-D to exit
    */
-  def exit = throw ReplExit
+  def exit = throw ReplExit(())
+
+  /**
+   * Exit the Ammonite REPL. You can also use Ctrl-D to exit
+   */
+  def exit(value: Any) = throw ReplExit(value)
 
   /**
    * Read/writable prompt for the shell. Use this to change the

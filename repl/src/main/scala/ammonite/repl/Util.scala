@@ -38,7 +38,7 @@ object Res{
   case class Exception(t: Throwable, s: String) extends Failing
 
   case object Skip extends Failing
-  case object Exit extends Failing
+  case class Exit(value: Any) extends Failing
 }
 
 /**

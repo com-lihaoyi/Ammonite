@@ -174,7 +174,7 @@ object Evaluator{
       _ = currentLine += 1
       _ <- Catching{
         // Exit
-        case Ex(_: InvEx, _: InitEx, ReplExit)  => Res.Exit
+        case Ex(_: InvEx, _: InitEx, ReplExit(value))  => Res.Exit(value)
         // Interrupted during pretty-printing
         case Ex(_: ThreadDeath)                 => interrupted()
         // Interrupted during evaluation
