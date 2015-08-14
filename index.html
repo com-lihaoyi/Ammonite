@@ -63,12 +63,12 @@ span.hljs-tag, span.hljs-symbol{
 <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="Ammonite" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Ammonite<a class=" scalatex-site-Styles-headerLink" href="#Ammonite" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /><h2 style="font-weight: 300;color: #ccc;padding: 0px;margin-top: 0px;">A Modernized Scala REPL</h2></div><div class=" scalatex-site-Styles-content">
 
   <p>
-    Ammonite is a cleanroom re-implementation of the Scala REPL from first principles. It is much more featureful than the default REPL and comes with a lot of ergonomic improvements that may be familiar to people coming from IDEs or other REPLs such as <a href="ipython.org">IPython</a> or <a href="http://www.zsh.org/">Zsh</a>.
+    Ammonite is a cleanroom re-implementation of the Scala REPL from first principles. It is much more featureful than the default REPL and comes with a lot of <a href="#Features">ergonomic improvements</a> and <a href="#Configuration">configurability</a> that may be familiar to people coming from IDEs or other REPLs such as <a href="ipython.org">IPython</a> or <a href="http://www.zsh.org/">Zsh</a>. It can be combined with <a href="#Ammonite-Ops">Ammonite-Ops</a> to replace Bash as your systems shell, but also can be used alone as a <a href="#Features">superior</a> version of the default Scala REPL, or as a <a href="#Debugging">debugging tool</a>.
 </p>
   <p>
     One way to get started with Ammonite is to download the standalone executable:
 </p>
-  <pre><code class="bash scalatex-site-Styles-highlightMe">$ curl -L -o amm http://git.io/v3E3V; chmod +x amm; ./amm
+  <pre><code class="bash scalatex-site-Styles-highlightMe">$ curl -L -o amm http://git.io/v3Xln; chmod +x amm; ./amm
 
 </code></pre>
   <pre><code class="scala scalatex-site-Styles-highlightMe">Loading Ammonite Repl...
@@ -92,9 +92,9 @@ res3: String = &quot;&quot;&quot;
     If you want some initialization code available to the REPL, you can add it to your <code>~/.ammonite/predef.scala</code>.
 </p>
   <p>
-    You can also try out Ammonite-REPL in an existing Scala 2.11.x project, add the following to your <code>build.sbt</code>
+    You can also try out Ammonite in an existing SBT project, add the following to your <code>build.sbt</code>
 </p>
-  <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite-repl&quot; % &quot;0.4.4&quot; % &quot;test&quot; cross CrossVersion.full
+  <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite-repl&quot; % &quot;0.4.5&quot; % &quot;test&quot; cross CrossVersion.full
 
 initialCommands in (Test, console) := &quot;&quot;&quot;ammonite.repl.Repl.run(&quot;&quot;)&quot;&quot;&quot;
 </code></pre>
@@ -447,7 +447,12 @@ res1: Int = 2</code><a class=" scalatex-site-Styles-headerLink" style="position:
   /**
    * Exit the Ammonite REPL. You can also use Ctrl-D to exit
    */
-  def exit = throw ReplExit
+  def exit = throw ReplExit(())
+
+  /**
+   * Exit the Ammonite REPL. You can also use Ctrl-D to exit
+   */
+  def exit(value: Any) = throw ReplExit(value)
 
   /**
    * Read/writable prompt for the shell. Use this to change the
@@ -530,6 +535,8 @@ res1: Int = 2</code><a class=" scalatex-site-Styles-headerLink" style="position:
    */
   def height: Int
 
+  def replArgs: Vector[ammonite.repl.Bind[_]]
+
   /**
    * Lets you configure the pretty-printing of a value. By default, it simply
    * disables truncation and prints the entire thing, but you can set other
@@ -551,9 +558,10 @@ trait OpsAPI{
   implicit def wd: Path
   /**
    * Change the working directory `wd`; if the provided path is relative it
-   * gets appended on to the current `wd`, if it's absolute it replaces.
+   * gets appended on to the current `wd`, if it's absolute it replaces. It
+   * returns the resultant absolute path.
    */
-  val cd: ammonite.ops.Op1[ammonite.ops.Path, ammonite.ops.Path]
+  val cd: ammonite.ops.Path =&gt; ammonite.ops.Path
 
   /**
    * Allows you to use relative paths (and anything convertible to a relative
@@ -565,7 +573,7 @@ trait OpsAPI{
 
 }
 // End of OpsAPI
-trait Load extends (String =&gt; Unit){
+trait LoadJar {
   /**
    * Load a `.jar` file
    */
@@ -574,7 +582,8 @@ trait Load extends (String =&gt; Unit){
    * Load a library from its maven/ivy coordinates
    */
   def ivy(coordinates: (String, String, String), verbose: Boolean = true): Unit
-
+}
+trait Load extends (String =&gt; Unit) with LoadJar{
   /**
    * Loads a command into the REPL and
    * evaluates them one after another
@@ -590,7 +599,9 @@ trait Load extends (String =&gt; Unit){
 
   def module(path: Path): Unit
 
-}</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/main/scala/ammonite/repl/frontend/ReplAPI.scala#L25-L174" target="_blank"><i class="fa fa-link "></i></a></pre>
+  def plugin: LoadJar
+
+}</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/main/scala/ammonite/repl/frontend/ReplAPI.scala#L25-L185" target="_blank"><i class="fa fa-link "></i></a></pre>
 
   <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="MultilineInput" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Multiline Input<a class=" scalatex-site-Styles-headerLink" href="#MultilineInput" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
     <p>
@@ -769,9 +780,10 @@ trait Ref[T] extends StableRef[T]{
   implicit def wd: Path
   /**
    * Change the working directory `wd`; if the provided path is relative it
-   * gets appended on to the current `wd`, if it's absolute it replaces.
+   * gets appended on to the current `wd`, if it's absolute it replaces. It
+   * returns the resultant absolute path.
    */
-  val cd: ammonite.ops.Op1[ammonite.ops.Path, ammonite.ops.Path]
+  val cd: ammonite.ops.Path =&gt; ammonite.ops.Path
 
   /**
    * Allows you to use relative paths (and anything convertible to a relative
@@ -781,7 +793,7 @@ trait Ref[T] extends StableRef[T]{
    */
   implicit def Relativizer[T](p: T)(implicit b: Path, f: T =&gt; RelPath): Path
 
-}</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/main/scala/ammonite/repl/frontend/ReplAPI.scala#L125-L146" target="_blank"><i class="fa fa-link "></i></a></pre>
+}</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/repl/src/main/scala/ammonite/repl/frontend/ReplAPI.scala#L132-L154" target="_blank"><i class="fa fa-link "></i></a></pre>
     <p>
       These are imported by default into every repl session, and basically let you treat the Ammonite-REPL much more like a Bash shell. You can `hl.scala{cd!} in and out of directories, and treat relative paths as shorthand for absolute paths when working in the shell. This means you can enter commands like</p>
     <pre><code class="scala scalatex-site-Styles-highlightMe">@ cd! up
@@ -812,9 +824,23 @@ res3: Int = 0
 [info] Resolving org.fusesource.jansi#jansi;1.4 ...
 [info] Done updating.
 [info] Set current project to haoyi (in build file:/Users/haoyi/)
-&gt;
-
-</code></pre></div>
+&gt;</code></pre>
+  <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="Debugging" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Debugging<a class=" scalatex-site-Styles-headerLink" href="#Debugging" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
+    <p>
+      Ammonite can be used as a tool to debug any other Scala program, by conveniently opening a REPL at any point within your program with which you can interact with live program data, similar to pdb/ipdb in Python. To do so, first add Ammonite to your classpath, e.g. through this SBT snippet:</p>
+    <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite-repl&quot; % &quot;0.4.5&quot; cross CrossVersion.full
+</code></pre>
+    <p>
+      Note that unlike the snippet given <a href="#Ammonite">above</a>, we leave out the <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">% &quot;test&quot;</code> because we may want ammonite to be available within the &quot;main&quot; project, and not just in the unit tests. Then, anywhere within your program, you can place a breakpoint via:
+</p>
+    <pre><code class="scala scalatex-site-Styles-highlightMe">import ammonite.repl.Repl._
+debug(&quot;name1&quot; -&gt; value1, &quot;name2&quot; -&gt; value2, ...)
+</code></pre>
+    <p>
+      And when your program reaches that point, it will pause and open up an Ammonite REPL with the values you provided it bound to the names you gave it. From there, you can interact with those values as normal Scala values within the REPL. Use <code>Ctrl-D</code> or <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">exit</code> to exit the REPL and continue normal program execution.</p>
+    <p>
+      The <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">debug()</code> call returns <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">: Any</code>; by default, this is <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">(): Unit</code>, but you can also return custom values by passing in an argument to <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">exit(...)</code> when you exit the REPL. This value will then be returned from <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">debug()</code>, and can be used in the rest of your Scala application.
+</p></div>
 <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="Ammonite-Ops" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Ammonite-Ops<a class=" scalatex-site-Styles-headerLink" href="#Ammonite-Ops" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /><h2 style="font-weight: 300;color: #ccc;padding: 0px;margin-top: 0px;">Rock-solid Filesystem Operations</h2></div><div class=" scalatex-site-Styles-content">
   <p>
     Ammonite-Ops is a library to make common filesystem operations in Scala as concise and easy-to-use as from the Bash shell, while being robust enough to use in large applications without getting messy. It lives in the same repo as the Ammonite REPL, but can easily be used stand-alone in a normal SBT/maven project.
@@ -822,10 +848,10 @@ res3: Int = 0
   <p>
     To get started with Ammonite-Ops, add this to your <code>build.sbt</code>:
 </p>
-  <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">libraryDependencies += &quot;com.lihaoyi&quot; %% &quot;ammonite-ops&quot; % &quot;0.4.4&quot;</code>
+  <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">libraryDependencies += &quot;com.lihaoyi&quot; %% &quot;ammonite-ops&quot; % &quot;0.4.5&quot;</code>
 
   <p>
-    And you're all set!
+    And you're all set! Here's an example of some common operations you can do with Ammonite-Ops
 </p>
   
   <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">import ammonite.ops._
@@ -861,8 +887,10 @@ val renamed = ls! wd/'dir2
 val lineCount = ls.rec! wd |? (_.ext == &quot;java&quot;) | read.lines | (_.size) sum
 
 // Find and concatenate all .java files directly in the working directory
-ls! wd/'dir2|? (_.ext == &quot;java&quot;) | read |&gt; write! wd/'target/&quot;bundled.java&quot;</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/test/scala/test/ammonite/ops/ExampleTests.scala#L9-L44" target="_blank"><i class="fa fa-link "></i></a></pre>
+ls! wd/'dir2 |? (_.ext == &quot;java&quot;) | read |&gt; write! wd/'target/&quot;bundled.java&quot;</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/test/scala/test/ammonite/ops/ExampleTests.scala#L102-L137" target="_blank"><i class="fa fa-link "></i></a></pre>
 
+  <p>
+    These examples make heavy use of Ammonite-Ops' <a href="#Paths">Paths</a>, <a href="#Operations">Operations</a> and <a href="#Extensions">Extensions</a> to achieve their minimal, concise syntax</p>
   <p>
     As you can see, Ammonite-Ops replaces the common mess of boilerplate:
 </p>
@@ -877,12 +905,12 @@ ls! wd/'dir2|? (_.ext == &quot;java&quot;) | read |&gt; write! wd/'target/&quot;
   }
   new java.io.File(path).delete
 }
-removeAll(&quot;target/folder/thing&quot;)</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/test/scala/test/ammonite/ops/ExampleTests.scala#L80-L93" target="_blank"><i class="fa fa-link "></i></a></pre>
+removeAll(&quot;target/folder/thing&quot;)</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/test/scala/test/ammonite/ops/ExampleTests.scala#L173-L186" target="_blank"><i class="fa fa-link "></i></a></pre>
 
   <p>
     With a single, sleek expression:
 </p>
-  <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">rm! cwd/'target/'folder/'thing</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/test/scala/test/ammonite/ops/ExampleTests.scala#L97-L98" target="_blank"><i class="fa fa-link "></i></a></pre>
+  <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">rm! cwd/'target/'folder/'thing</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/test/scala/test/ammonite/ops/ExampleTests.scala#L190-L191" target="_blank"><i class="fa fa-link "></i></a></pre>
 
   <p>
     That handles the common case for you: recursively deleting folders, not-failing if the file doesn't exist, etc.
@@ -901,7 +929,7 @@ removeAll(&quot;target/folder/thing&quot;)</code><a class=" scalatex-site-Styles
     <p>
       Generally, almost all commands take absolute <code>Path</code>s. These are basically defined as:
 </p>
-    <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">case class Path(segments: Seq[String]) extends BasePathImpl[Path]{</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/main/scala/ammonite/ops/Path.scala#L235-L236" target="_blank"><i class="fa fa-link "></i></a></pre>
+    <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">case class Path(segments: Seq[String]) extends BasePathImpl[Path]{</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/main/scala/ammonite/ops/Path.scala#L230-L231" target="_blank"><i class="fa fa-link "></i></a></pre>
 
     <p>
       With a number of useful operations that can be performed on them. Absolute paths can be created in a few ways:
@@ -924,12 +952,12 @@ wd/&quot;My Folder&quot;/&quot;My File.txt&quot;
 wd/up
 
 // Up two levels from the wd
-wd/up/up</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/test/scala/test/ammonite/ops/ExampleTests.scala#L102-L121" target="_blank"><i class="fa fa-link "></i></a></pre>
+wd/up/up</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/test/scala/test/ammonite/ops/ExampleTests.scala#L195-L214" target="_blank"><i class="fa fa-link "></i></a></pre>
 
     <p>
       Note that there are no in-built operations to change the `cwd`. In general you should not need to: simply defining a new path, e.g.
 </p>
-    <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">val target = cwd/'target</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/test/scala/test/ammonite/ops/ExampleTests.scala#L123-L124" target="_blank"><i class="fa fa-link "></i></a></pre>
+    <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">val target = cwd/'target</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/test/scala/test/ammonite/ops/ExampleTests.scala#L216-L217" target="_blank"><i class="fa fa-link "></i></a></pre>
 
     <p>
       Should be sufficient for most needs.
@@ -951,7 +979,7 @@ wd/up/up</code><a class=" scalatex-site-Styles-headerLink" style="position: abso
     <p>
       <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">RelPath</code>s represent relative paths. These are basically defined as:
 </p>
-    <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">case class RelPath(segments: Seq[String], ups: Int) extends BasePathImpl[RelPath]{</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/main/scala/ammonite/ops/Path.scala#L131-L132" target="_blank"><i class="fa fa-link "></i></a></pre>
+    <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">case class RelPath(segments: Seq[String], ups: Int) extends BasePathImpl[RelPath]{</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/main/scala/ammonite/ops/Path.scala#L126-L127" target="_blank"><i class="fa fa-link "></i></a></pre>
 
     <p>
       The same data structure as <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Path</code>s, except that they can represent a number of <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">up</code>s before the relative path is applied. They can be created in the following ways:
@@ -970,7 +998,7 @@ assert(target - cwd == 'target/'file)
 // `up`s get resolved automatically
 val minus = cwd - target
 val ups = up/up
-assert(minus == ups)</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/test/scala/test/ammonite/ops/ExampleTests.scala#L126-L141" target="_blank"><i class="fa fa-link "></i></a></pre>
+assert(minus == ups)</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/test/scala/test/ammonite/ops/ExampleTests.scala#L219-L234" target="_blank"><i class="fa fa-link "></i></a></pre>
 
     <p>
       In general, very few APIs take relative paths. Their main purpose is to be combined with absolute paths in order to create new absolute paths. e.g.
@@ -978,13 +1006,13 @@ assert(minus == ups)</code><a class=" scalatex-site-Styles-headerLink" style="po
     <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">val target = cwd/'target/'file
 val rel = target - cwd
 val newBase = root/'code/'server
-assert(newBase/rel == root/'code/'server/'target/'file)</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/test/scala/test/ammonite/ops/ExampleTests.scala#L146-L150" target="_blank"><i class="fa fa-link "></i></a></pre>
+assert(newBase/rel == root/'code/'server/'target/'file)</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/test/scala/test/ammonite/ops/ExampleTests.scala#L239-L243" target="_blank"><i class="fa fa-link "></i></a></pre>
 
     <p>
       <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">up</code> is a relative path that comes in-built:
 </p>
     <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">val target = root/'target/'file
-assert(target/up == root/'target)</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/test/scala/test/ammonite/ops/ExampleTests.scala#L152-L154" target="_blank"><i class="fa fa-link "></i></a></pre>
+assert(target/up == root/'target)</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/test/scala/test/ammonite/ops/ExampleTests.scala#L245-L247" target="_blank"><i class="fa fa-link "></i></a></pre>
 
     <p>
       Note that all paths, both relative and absolute, are always expressed in a canonical manner:
@@ -993,7 +1021,7 @@ assert(target/up == root/'target)</code><a class=" scalatex-site-Styles-headerLi
 // not &quot;/folder/file/..&quot;
 
 assert(('folder/'file/up).toString == &quot;folder&quot;)
-// not &quot;folder/file/..&quot;</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/test/scala/test/ammonite/ops/ExampleTests.scala#L156-L161" target="_blank"><i class="fa fa-link "></i></a></pre>
+// not &quot;folder/file/..&quot;</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/test/scala/test/ammonite/ops/ExampleTests.scala#L249-L254" target="_blank"><i class="fa fa-link "></i></a></pre>
 
     <p>
       So you don't need to worry about canonicalizing your paths before comparing them for equality or otherwise manipulating them.
@@ -1050,7 +1078,7 @@ assert(('folder/'file/up).toString == &quot;folder&quot;)
    * represents the name of the file/folder in filesystem paths
    */
   def last: String
-}</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/main/scala/ammonite/ops/Path.scala#L38-L87" target="_blank"><i class="fa fa-link "></i></a></pre>
+}</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/main/scala/ammonite/ops/Path.scala#L33-L82" target="_blank"><i class="fa fa-link "></i></a></pre>
 
     <p>
       In this definition, <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">ThisType</code> represents the same type as the current path; e.g. a <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Path</code>'s <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">/</code> returns a <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Path</code> while a <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">RelPath</code>'s <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">/</code> returns a <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">RelPath</code>. Similarly, you can only compare or subtract paths of the same type.
@@ -1068,6 +1096,130 @@ assert(('folder/'file/up).toString == &quot;folder&quot;)
       <li>
         <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Seq[T]</code>s where <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">T</code> is convertible into a <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">RelPath</code>
 </li></ul>
+  <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="Operations" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Operations<a class=" scalatex-site-Styles-headerLink" href="#Operations" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
+    <p>
+      <a href="#Paths">Paths</a> not aren't interesting on their own, but serve as a base to use to perform filesystem operations in a concise and easy to use way. Here is a quick tour of the core capabilities that Ammonite-Ops provides:
+</p>
+    <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">import ammonite.ops._
+
+// Let's pick our working directory
+val wd: Path = cwd/'ops/'target/&quot;scala-2.11&quot;/&quot;test-classes&quot;/'example3
+
+// And make sure it's empty
+rm! wd
+mkdir! wd
+
+// Reading and writing to files is done through the read! and write!
+// You can write `Strings`, `Traversable[String]`s or `Array[Byte]`s
+write(wd/&quot;file1.txt&quot;, &quot;I am cow&quot;)
+write(wd/&quot;file2.txt&quot;, Seq(&quot;I am cow&quot;, &quot;hear me moo&quot;))
+write(wd/'file3, &quot;I weigh twice as much as you&quot;.getBytes)
+
+// When reading, you can either `read!` a `String`, `read.lines!` to
+// get a `Vector[String]` or `read.bytes` to get an `Array[Byte]`
+read! wd/&quot;file1.txt&quot;        ==&gt; &quot;I am cow&quot;
+read! wd/&quot;file2.txt&quot;        ==&gt; &quot;I am cow\nhear me moo&quot;
+read.lines! wd/&quot;file2.txt&quot;  ==&gt; Vector(&quot;I am cow&quot;, &quot;hear me moo&quot;)
+read.bytes! wd/&quot;file3&quot;      ==&gt; &quot;I weigh twice as much as you&quot;.getBytes
+
+// These operations are mirrored in `read.resource`,
+// `read.resource.lines` and `read.resource.bytes` to conveniently read
+// files from your classpath:
+val resourcePath = root/'testdata/&quot;File.txt&quot;
+read.resource(resourcePath).length        ==&gt; 81
+read.resource.bytes(resourcePath).length  ==&gt; 81
+read.resource.lines(resourcePath).length  ==&gt; 4
+
+// By default, `write` fails if there is already a file in place. Use
+// `write.append` or `write.over` if you want to append-to/overwrite
+// any existing files
+write.append(wd/&quot;file1.txt&quot;, &quot;\nI eat grass&quot;)
+write.over(wd/&quot;file2.txt&quot;, &quot;I am cow\nHere I stand&quot;)
+
+read! wd/&quot;file1.txt&quot;        ==&gt; &quot;I am cow\nI eat grass&quot;
+read! wd/&quot;file2.txt&quot;        ==&gt; &quot;I am cow\nHere I stand&quot;
+
+// You can create folders through `mkdir!`. This behaves the same as
+// `mkdir -p` in Bash, and creates and parents necessary
+val deep = wd/'this/'is/'very/'deep
+mkdir! deep
+// Writing to a file also creates neccessary parents
+write(deep/'deeeep/&quot;file.txt&quot;, &quot;I am cow&quot;)
+
+// `ls` provides a listing of every direct child of the given folder.
+// Both files and folders are included
+ls! wd  ==&gt; Seq(wd/&quot;file1.txt&quot;, wd/&quot;file2.txt&quot;, wd/'file3, wd/'this)
+
+// `ls.rec` does the same thing recursively
+ls.rec! deep ==&gt; Seq(deep/'deeeep, deep/'deeeep/&quot;file.txt&quot;)
+
+// You can move files or folders with `mv` and remove them with `rm!`
+ls! deep  ==&gt; Seq(deep/'deeeep)
+mv(deep/'deeeep, deep/'renamed_deeeep)
+ls! deep  ==&gt; Seq(deep/'renamed_deeeep)
+// `rm!` behaves the same as `rm -rf` in Bash, and deletes anything:
+// file, folder, even a folder filled with contents
+rm! deep/'renamed_deeeep
+ls! deep  ==&gt; Seq()
+
+// You can stat paths to find out information about any file or
+// folder that exists there
+val info = stat! wd/&quot;file1.txt&quot;
+info.isDir  ==&gt; false
+info.isFile ==&gt; true
+info.size   ==&gt; 20
+info.name   ==&gt; &quot;file1.txt&quot;
+
+// Ammonite provides an implicit conversion from `Path` to
+// `stat`, so you can use these attributes directly
+(wd/&quot;file1.txt&quot;).size ==&gt; 20
+
+// You can also use `stat.full` which provides more information
+val fullInfo = stat.full(wd/&quot;file1.txt&quot;)
+fullInfo.ctime: FileTime
+fullInfo.atime: FileTime
+fullInfo.group: GroupPrincipal</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/test/scala/test/ammonite/ops/ExampleTests.scala#L20-L100" target="_blank"><i class="fa fa-link "></i></a></pre>
+
+    <p>
+      Here is the definition for these operations:
+</p>
+    <pre><code class="scala scalatex-site-Styles-highlightMe">/**
+ * List the files and folders in a directory
+ */
+object ls extends StreamableOp1[Path, Path, LsSeq] with ImplicitOp[LsSeq]
+  /**
+   * Reads a classpath resource into memory, either as a
+   * string, as a Seq[String] of lines, or as a Array[Byte]
+   */
+  object rec extends StreamableOp1[Path, Path, LsSeq]with ImplicitOp[LsSeq]</code></pre>
+
+    <p>
+      In these definitions, <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Op1</code> and <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Op2</code> are isomorphic to <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Function1</code> and <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Function2</code>. The main difference is that ops can be called in two ways:
+</p>
+    <pre><code class="scala scalatex-site-Styles-highlightMe">rm(filepath)
+rm! filepath
+</code></pre>
+    <p>
+      The latter syntax allows you to use it more easily from the command line, where remembering to close all your parenthesis is a hassle. Indentation signifies nesting, e.g. in addition to <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">write!</code> you also have <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">write.append!</code> and <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">write.over!</code>
+</p>
+    <p>
+      All of these operations are pre-defined and strongly typed, so feel free to jump to their implementation to look at what they do or what else is available.
+</p>
+    <p>
+      In general, each operator has sensible/safe defaults:
+</p>
+    <ul>
+      <li>
+        <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">rm</code> and <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">cp</code> are recursive</li>
+      <li>
+        <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">rm</code> ignores the file if it doesn't exist</li>
+      <li>
+        all operations that create a file or folder (<code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">mkdir</code>, <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">write</code>, <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">mv</code>) automatically create any necessary parent directories</li>
+      <li>
+        <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">write</code> also does <i>not</i> stomp over existing files by default. You need to use <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">write.over</code></li></ul>
+    <p>
+      In general, this should make these operations much easier to use; the defaults should cover the 99% use case without needing any special flags or fiddling.
+</p>
   <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="Extensions" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Extensions<a class=" scalatex-site-Styles-headerLink" href="#Extensions" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
     <p>
       Ammonite-Ops contains a set of extension methods on common types, which serve no purpose other than to make things more concise. These turn Scala from a &quot;relatively-concise&quot; language into one as tight as Bash scripts, while still maintaining the high level of type-safety and maintainability that comes with Scala code.
@@ -1097,111 +1249,13 @@ assert(('folder/'file/up).toString == &quot;folder&quot;)
       <p>
         This lets you flip around the function and argument, and fits nicely into the Ammonite's <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">|</code> pipelines.
 </p>
-  <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="Operations" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Operations<a class=" scalatex-site-Styles-headerLink" href="#Operations" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
-    <p>
-      All these <a href="#Paths">Paths</a> and <a href="#Extensions">Extensions</a> and what-not aren't interesting on their own, but serve as a base to use to perform filesystem operations in a concise and easy to use way. Here is a smattering of those operations:
-</p>
-    <pre><code class="scala scalatex-site-Styles-highlightMe">/**
- * An [[Op1]] that returns a Seq[R], but can also do so
- * lazily (Iterator[R]) via `op.!! arg`. You can then use
- * the iterator however you wish
- */
-trait StreamableOp1[T1, R, C &lt;: Seq[R]] extends Op1[T1, C]
-/**
- * Makes directories up to the specified path. Equivalent
- * to `mkdir -p` in bash
- */
-object mkdir extends Op1[Path, Unit]
-/**
- * Moves a file from one place to another.
- * Creates any necessary directories
- */
-object mv extends Op2[Path, Path, Unit] with Internals.Mover
-/**
- * Copies a file or folder from one place to another.
- * Creates any necessary directories, and copies folders
- * recursively.
- */
-object cp extends Op2[Path, Path, Unit] 
-/**
- * Roughly equivalent to bash's `rm -rf`. Deletes
- * any files or folders in the target path, or
- * does nothing if there aren't any
- */
-object rm extends Op1[Path, Unit]
-/**
- * List the files and folders in a directory
- */
-object ls extends StreamableOp1[Path, Path, LsSeq] with ImplicitOp[LsSeq]
-  /**
-   * Reads a classpath resource into memory, either as a
-   * string, as a Seq[String] of lines, or as a Array[Byte]
-   */
-  object rec extends StreamableOp1[Path, Path, LsSeq]with ImplicitOp[LsSeq]
-/**
- * Write some data to a file. This can be a String, an Array[Byte], or a
- * Seq[String] which is treated as consecutive lines. By default, this
- * fails if a file already exists at the target location. Use [[write.over]]
- * or [[write.append]] if you want to over-write it or add to what's already
- * there.
- */
-object write extends Op2[Path, Internals.Writable, Unit]
-  /**
-   * Identical to [[write]], except if the file already exists,
-   * appends to the file instead of error-ing out
-   */
-  object append extends Op2[Path, Internals.Writable, Unit]
-  /**
-   * Identical to [[write]], except if the file already exists,
-   * replaces the file instead of error-ing out
-   */
-  object over extends Op2[Path, Internals.Writable, Unit]
-/**
- * Reads a file into memory, either as a String,
- * as (read.lines(...): Seq[String]), or as (read.bytes(...): Array[Byte]).
- */
-object read extends Internals.Reader with Op1[Path, String]
-  /**
-   * Reads a classpath resource into memory, either as a
-   * string, as a Seq[String] of lines, or as a Array[Byte]
-   */
-  object resource extends Internals.Reader with Op1[Path, String]
-/**
- * Checks if a file or folder exists at the given path.
- */
-object exists extends Op1[Path, Boolean]
-/**
- * Kills the given process with the given signal, e.g.
- * `kill(9)! pid`
- */
-case class kill(signal: Int) extends Op1[Int, CommandResult]</code></pre>
-
-    <p>
-      In these definitions, <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Op1</code> and <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Op2</code> are isomorphic to <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Function1</code> and <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Function2</code>. The main difference is that ops can be called in two ways:
-</p>
-    <pre><code class="scala scalatex-site-Styles-highlightMe">rm(filepath)
-rm! filepath
-</code></pre>
-    <p>
-      The latter syntax allows you to use it more easily from the command line, where remembering to close all your parenthesis is a hassle. Indentation signifies nesting, e.g. in addition to <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">write!</code> you also have <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">write.append!</code> and <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">write.over!</code>
-</p>
-    <p>
-      All of these operations are pre-defined and strongly typed, so feel free to jump to their implementation to look at what they do or what else is available.
-</p>
-    <p>
-      In general, each operator has sensible/safe defaults:
-</p>
-    <ul>
-      <li>
-        <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">rm</code> and <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">cp</code> are recursive</li>
-      <li>
-        <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">rm</code> ignores the file if it doesn't exist</li>
-      <li>
-        all operations that create a file or folder (<code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">mkdir</code>, <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">write</code>, <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">mv</code>) automatically create any necessary parent directories</li>
-      <li>
-        <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">write</code> also does <i>not</i> stomp over existing files by default. You need to use <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">write.over</code></li></ul>
-    <p>
-      In general, this should make these operations much easier to use; the defaults should cover the 99% use case without needing any special flags or fiddling.
+    <h1 id="Callable" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#Callable" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Callable</h1>
+      <ul>
+        <li>
+          <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">f! thing</code> is an alias for <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">f(thing)</code>
+</li></ul>
+      <p>
+        This is another syntax-saving extension, that makes it easy to call functions without having to constantly be opening and closing brackets. It does nothing else.
 </p>
   <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="Chaining" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Chaining<a class=" scalatex-site-Styles-headerLink" href="#Chaining" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
     <p>
@@ -1219,7 +1273,7 @@ ls.rec! wd | (x =&gt; x.size -&gt; x) sortBy (-_._1) take 10
 // Sorted list of the most common words in your .scala source files
 def txt = ls.rec! wd |? (_.ext == &quot;scala&quot;) | read
 def freq(s: Seq[String]) = s groupBy (x =&gt; x) mapValues (_.length) toSeq
-val map = txt || (_.split(&quot;[^a-zA-Z0-9_]&quot;)) |&gt; freq sortBy (-_._2)</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/test/scala/test/ammonite/ops/ExampleTests.scala#L56-L70" target="_blank"><i class="fa fa-link "></i></a></pre>
+val map = txt || (_.split(&quot;[^a-zA-Z0-9_]&quot;)) |&gt; freq sortBy (-_._2)</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/test/scala/test/ammonite/ops/ExampleTests.scala#L149-L163" target="_blank"><i class="fa fa-link "></i></a></pre>
 
     <p>
       As you can see, you can often compose elaborate operations entirely naturally using the available pipes, without needing to remember any special flags or techniques.
@@ -1317,12 +1371,25 @@ res3: Int = 0
       <a href="https://gitter.im/lihaoyi/Ammonite">Gitter Channel</a>
 </li></ul></div>
 <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="Changelog" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Changelog<a class=" scalatex-site-Styles-headerLink" href="#Changelog" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div><div class=" scalatex-site-Styles-content">
+  <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="0.4.5" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">0.4.5<a class=" scalatex-site-Styles-headerLink" href="#0.4.5" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
+    <ul>
+      <li>
+        Fix for running Ammonite using OpenJDK, thanks to <a href="https://github.com/jrudolph">Johannes Rudolph</a></li>
+      <li>
+        Support for HOME and END keys, thanks to <a href="https://github.com/jrudolph">Johannes Rudolph</a></li>
+      <li>
+        Fix for incorrect syntax highlighting (<a href="https://github.com/lihaoyi/Ammonite/issues/159">#159</a>)</li>
+      <li>
+        Support for loading compiler plugins, thanks to <a href="https://github.com/alexarchambault">Alexandre Archambault</a></li>
+      <li>
+        You can now use Ammonite as a <a href="#Debugging">Debugging</a> tool like Python's pdb, placing an interactive breakpoint anywhere within a normal Scala application
+</li></ul>
   <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="0.4.4" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">0.4.4<a class=" scalatex-site-Styles-headerLink" href="#0.4.4" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
     <ul>
       <li>
         <a href="https://github.com/lihaoyi/Ammonite/pull/153">Lots</a> <a href="https://github.com/lihaoyi/Ammonite/pull/158">and</a> <a href="https://github.com/lihaoyi/Ammonite/pull/157">lots</a> of terminal improvements, courtesy of <a href="https://github.com/non">Erik Osheim</a></li>
       <li>
-        Only the last <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">@</code>-delimited block in a script loaded via <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">load.module</code> gets its names dumped into the REPL's environment now, letting you create some semblance of hygiene.</li></ul>
+        Only the last <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">@</code>-delimited block in a script loaded via <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">load.module</code> gets its names dumped into the REPL's environment now, letting you create some semblance of hygiene, thanks to <a href="https://github.com/laci37">Laszlo Mero</a></li></ul>
   <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="0.4.3" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">0.4.3<a class=" scalatex-site-Styles-headerLink" href="#0.4.3" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
     <ul>
       <li>
@@ -1358,11 +1425,11 @@ res3: Int = 0
       <li>
         Fixed cases where PPrint/TPrint was causing compilation errors</li>
       <li>
-        Persistent data is now stored in a <code>~/.ammonite</code> folder. This includes <code>~/.ammonite/history</code>, <code>~/.ammonite/predef.scala</code>, and various caches</li>
+        Persistent data is now stored in a <code>~/.ammonite</code> folder. This includes <code>~/.ammonite/history</code>, <code>~/.ammonite/predef.scala</code>, and various cache, thanks to <a href="https://github.com/laci37">Laszlo Mero</a></li>
       <li>
         You can now define a <code>~/.ammonite/predef.scala</code> <a href="#Configuration">Configuration</a> file which will be executed the first thing when the Ammonite REPL is loaded. This is useful for common imports, <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">load.ivy</code>ing libraries, or other configuration for your REPL</li>
       <li>
-        Added the ability to load arbitrary <a href="#ScriptFiles">Script Files</a> via <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">load.exec</code> and <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">load.module</code></li>
+        Added the ability to load arbitrary <a href="#ScriptFiles">Script Files</a> via <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">load.exec</code> and <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">load.module</code>, thanks to <a href="https://github.com/laci37">Laszlo Mero</a></li>
       <li>
         <a href="#Configuration">Configuration</a> that was previously passed into the <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">REPL</code>s constructor is now done in-REPL,</li>
       <li>
@@ -1410,7 +1477,7 @@ res3: Int = 0
       <li>
         Defining macros in the REPL and using them in subsequent lines now works</li>
       <li>
-        Output lines are now truncated past a certain length, which is configurable
+        Output lines are now truncated past a certain length, which is configurable, thanks to <a href="https://github.com/laci37">Laszlo Mero</a>
 </li></ul>
   <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="0.2.9" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">0.2.9<a class=" scalatex-site-Styles-headerLink" href="#0.2.9" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
     <ul>
@@ -1431,7 +1498,7 @@ res3: Int = 0
         Importing things from Java packages now works properly</li></ul></div>
 </div><script>
     scalatex.scrollspy.Controller().main(
-      [{"value":"Ammonite","children":[{"value":"Features","children":[{"value":"Artifact Loading","children":[]},{"value":"Pretty-printed output","children":[]},{"value":"Configurable Truncation","children":[]},{"value":"Syntax Highlighting","children":[]},{"value":"Improved Editing","children":[]},{"value":"Superior Autocomplete","children":[]},{"value":"Interrupting run-away execution with Ctrl-C","children":[]},{"value":"Compiler-crash Robustness","children":[]},{"value":"Other Fixes","children":[]}]},{"value":"Builtins","children":[]},{"value":"Multiline Input","children":[]},{"value":"Script Files","children":[]},{"value":"Configuration","children":[{"value":"Refs","children":[]}]},{"value":"Filesystem Operations","children":[]}]},{"value":"Ammonite-Ops","children":[{"value":"Paths","children":[]},{"value":"RelPaths","children":[]},{"value":"Path Operations","children":[]},{"value":"Extensions","children":[{"value":"Traversable","children":[]},{"value":"Pipeable","children":[]}]},{"value":"Operations","children":[]},{"value":"Chaining","children":[]},{"value":"Spawning Subprocesses","children":[]}]},{"value":"Community","children":[]},{"value":"Changelog","children":[{"value":"0.4.4","children":[]},{"value":"0.4.3","children":[]},{"value":"0.4.2","children":[]},{"value":"0.4.1","children":[]},{"value":"0.4.0","children":[]},{"value":"0.3.2","children":[]},{"value":"0.3.1","children":[]},{"value":"0.3.0","children":[]},{"value":"0.2.9","children":[]},{"value":"0.2.8","children":[]}]}]
+      [{"value":"Ammonite","children":[{"value":"Features","children":[{"value":"Artifact Loading","children":[]},{"value":"Pretty-printed output","children":[]},{"value":"Configurable Truncation","children":[]},{"value":"Syntax Highlighting","children":[]},{"value":"Improved Editing","children":[]},{"value":"Superior Autocomplete","children":[]},{"value":"Interrupting run-away execution with Ctrl-C","children":[]},{"value":"Compiler-crash Robustness","children":[]},{"value":"Other Fixes","children":[]}]},{"value":"Builtins","children":[]},{"value":"Multiline Input","children":[]},{"value":"Script Files","children":[]},{"value":"Configuration","children":[{"value":"Refs","children":[]}]},{"value":"Filesystem Operations","children":[]},{"value":"Debugging","children":[]}]},{"value":"Ammonite-Ops","children":[{"value":"Paths","children":[]},{"value":"RelPaths","children":[]},{"value":"Path Operations","children":[]},{"value":"Operations","children":[]},{"value":"Extensions","children":[{"value":"Traversable","children":[]},{"value":"Pipeable","children":[]},{"value":"Callable","children":[]}]},{"value":"Chaining","children":[]},{"value":"Spawning Subprocesses","children":[]}]},{"value":"Community","children":[]},{"value":"Changelog","children":[{"value":"0.4.5","children":[]},{"value":"0.4.4","children":[]},{"value":"0.4.3","children":[]},{"value":"0.4.2","children":[]},{"value":"0.4.1","children":[]},{"value":"0.4.0","children":[]},{"value":"0.3.2","children":[]},{"value":"0.3.1","children":[]},{"value":"0.3.0","children":[]},{"value":"0.2.9","children":[]},{"value":"0.2.8","children":[]}]}]
   )</script><script>
     ['DOMContentLoaded', 'load'].forEach(function(ev){
       addEventListener(ev, function(){
@@ -1441,4 +1508,4 @@ res3: Int = 0
         );
       })
     })
-  </script></body></html>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+  </script></body></html>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
