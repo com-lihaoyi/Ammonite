@@ -131,9 +131,10 @@ trait OpsAPI{
   implicit def wd: Path
   /**
    * Change the working directory `wd`; if the provided path is relative it
-   * gets appended on to the current `wd`, if it's absolute it replaces.
+   * gets appended on to the current `wd`, if it's absolute it replaces. It
+   * returns the resultant absolute path.
    */
-  val cd: ammonite.ops.Callable1[ammonite.ops.Path, ammonite.ops.Path]
+  val cd: ammonite.ops.Path => ammonite.ops.Path
 
   /**
    * Allows you to use relative paths (and anything convertible to a relative
