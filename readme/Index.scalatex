@@ -31,7 +31,7 @@
     One way to get started with Ammonite is to download the standalone executable:
 
   @hl.sh
-    $ curl -L -o amm http://git.io/v3E3V; chmod +x amm; ./amm
+    $ curl -L -o amm http://git.io/v3Xln; chmod +x amm; ./amm
 
 
   @hl.scala
