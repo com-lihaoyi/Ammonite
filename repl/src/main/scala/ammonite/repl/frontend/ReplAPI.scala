@@ -115,6 +115,8 @@ trait ReplAPI extends OpsAPI{
    */
   def height: Int
 
+  def replArgs: Vector[ammonite.repl.Bind[_]]
+
   /**
    * Lets you configure the pretty-printing of a value. By default, it simply
    * disables truncation and prints the entire thing, but you can set other

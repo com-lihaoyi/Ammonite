@@ -28,7 +28,8 @@ class Interpreter(prompt0: Ref[String],
                   stdout: String => Unit,
                   storage: Ref[Storage],
                   history: => History,
-                  predef: String){ interp =>
+                  predef: String,
+                  replArgs: Seq[Bind[_]]){ interp =>
 
   val hardcodedPredef =
     """import ammonite.repl.frontend.ReplBridge.repl
@@ -93,10 +94,8 @@ class Interpreter(prompt0: Ref[String],
         val ev = evaluate(code, imports.flatten)
         Timer("processScript loop 2")
         ev match {
-          case Res.Failure(msg) =>
-            throw new CompilationError(msg)
-          case Res.Success(ev) =>
-            loop(blocks.tail, imports :+ ev.imports)
+          case Res.Failure(msg) => throw new CompilationError(msg)
+          case Res.Success(ev) => loop(blocks.tail, imports :+ ev.imports)
           case _ => loop(blocks.tail, imports)
         }
       } else imports.lastOption.foreach(eval.update(_))
@@ -227,6 +226,8 @@ class Interpreter(prompt0: Ref[String],
     def width = interp.width
 
     def height = interp.height
+
+    override def replArgs = Interpreter.this.replArgs.toVector
   }
 
   var compiler: Compiler = _
@@ -276,8 +277,18 @@ class Interpreter(prompt0: Ref[String],
   Timer("Interpreterinit eval")
   init()
   Timer("Interpreter init init")
-  processModule(hardcodedPredef)
+  val argString =
+    replArgs.zipWithIndex
+            .map{ case (b, idx) =>
+              s"val ${b.name} = ammonite.repl.frontend.ReplBridge.repl.replArgs($idx).value.asInstanceOf[${b.typeTag.tpe}]"
+            }
+            .mkString("\n")
+  println("Interpreter argString")
+  println(argString)
+
+  processModule(hardcodedPredef + "\n" + argString)
   init()
+
   processModule(predef)
   Timer("Interpreter init predef 0")
   init()

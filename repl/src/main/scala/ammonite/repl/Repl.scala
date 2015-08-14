@@ -14,7 +14,8 @@ import ammonite.ops._
 class Repl(input: InputStream,
            output: OutputStream,
            storage: Ref[Storage],
-           predef: String = "") {
+           predef: String = "",
+           replArgs: Seq[Bind[_]] = Nil) {
 
   val prompt = Ref("@ ")
 
@@ -35,7 +36,8 @@ class Repl(input: InputStream,
     printer.print,
     storage,
     history,
-    predef
+    predef,
+    replArgs
   )
 
   Timer("Repl init interpreter")
@@ -142,14 +144,19 @@ object Repl{
     }
     parser.parse(args, Config()).foreach(c => run(c.predef, c.ammoniteHome, c.file))
   }
+
   def eval[T](predef: String = "",
-              ammoniteHome: Path = defaultAmmoniteHome) = {
+              ammoniteHome: Path = defaultAmmoniteHome,
+              replArgs: Seq[Bind[_]] = Nil) = {
+
     def storage = Storage(ammoniteHome)
     def repl = new Repl(
       System.in, System.out,
       storage = Ref(storage),
-      predef = predef + "\n" + storage.loadPredef
+      predef = predef + "\n" + storage.loadPredef,
+      replArgs
     )
+
     repl.run().asInstanceOf[T]
   }
   def run(predef: String = "",
@@ -158,7 +165,7 @@ object Repl{
 
     Timer("Repl.run Start")
     def storage = Storage(ammoniteHome)
-    def repl = new Repl(
+    lazy val repl = new Repl(
       System.in, System.out,
       storage = Ref(storage),
       predef = predef + "\n" + storage.loadPredef
@@ -170,6 +177,7 @@ object Repl{
       case Some(path) =>
         repl.interp.replApi.load.module(path)
     }
+    ammonite.repl.Repl.eval[Any](replArgs = Seq(ammonite.repl.Bind("hello", repl)))
     Timer("Repl.run End")
   }
 }
