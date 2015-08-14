@@ -27,8 +27,8 @@ val sharedSettings = Seq(
   ) ++ (
     if (scalaVersion.value startsWith "2.11.") Nil
     else Seq(
-      compilerPlugin("org.scalamacros" % s"paradise" % "2.0.0" cross CrossVersion.full),
-      "org.scalamacros" %% s"quasiquotes" % "2.0.0"
+      compilerPlugin("org.scalamacros" % s"paradise" % "2.0.1" cross CrossVersion.full),
+      "org.scalamacros" %% s"quasiquotes" % "2.0.1"
     )
   ),
   publishTo := Some("releases" at "https://oss.sonatype.org/service/local/staging/deploy/maven2"),
