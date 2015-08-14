@@ -98,7 +98,7 @@ object ReadlineFilters {
 
     def swapInHistory(indexIncrement: Int)(b: Vector[Char], rest: LazyList[Int]): TermState = {
       val newIndex = constrainIndex(index + indexIncrement)
-      if (index == -1 && newIndex != -1) currentHistory = b
+      if (index == -1) currentHistory = b
       index = newIndex
       val h = if (index == -1) currentHistory else history()(index).toVector
       TS(rest, h, h.length)
