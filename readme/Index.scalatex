@@ -25,7 +25,7 @@
 @sect("Ammonite", "A Modernized Scala REPL")
 
   @p
-    Ammonite is a cleanroom re-implementation of the Scala REPL from first principles. It is much more featureful than the default REPL and comes with a lot of ergonomic improvements that may be familiar to people coming from IDEs or other REPLs such as @a("IPython", href:="ipython.org") or @a("Zsh", href:="http://www.zsh.org/").
+    Ammonite is a cleanroom re-implementation of the Scala REPL from first principles. It is much more featureful than the default REPL and comes with a lot of @sect.ref("Features", "ergonomic improvements") and @sect.ref("Configuration", "configurability") that may be familiar to people coming from IDEs or other REPLs such as @a("IPython", href:="ipython.org") or @a("Zsh", href:="http://www.zsh.org/"). It can be combined with @sect.ref{Ammonite-Ops} to replace Bash as your systems shell, but also can be used alone as a @sect.ref("Features", "superior") version of the default Scala REPL, or as a @sect.ref("Debugging", "debugging tool").
 
   @p
     One way to get started with Ammonite is to download the standalone executable:
@@ -56,7 +56,7 @@
     If you want some initialization code available to the REPL, you can add it to your @code{~/.ammonite/predef.scala}.
 
   @p
-    You can also try out Ammonite-REPL in an existing Scala 2.11.x project, add the following to your @code{build.sbt}
+    You can also try out Ammonite in an existing SBT project, add the following to your @code{build.sbt}
 
   @hl.scala
     libraryDependencies += "com.lihaoyi" % "ammonite-repl" % "@ammonite.Constants.version" % "test" cross CrossVersion.full
@@ -341,7 +341,23 @@
       [info] Done updating.
       [info] Set current project to haoyi (in build file:/Users/haoyi/)
       >
+  @sect{Debugging}
+    @p
+      Ammonite can be used as a tool to debug any other Scala program, by conveniently opening a REPL at any point within your program with which you can interact with live program data, similar to pdb/ipdb in Python. To do so, first add Ammonite to your classpath, e.g. through this SBT snippet:
+    @hl.scala
+      libraryDependencies += "com.lihaoyi" % "ammonite-repl" % "@ammonite.Constants.version" cross CrossVersion.full
 
+    @p
+      Note that unlike the snippet given @sect.ref("Ammonite", "above"), we leave out the @hl.scala{% "test"} because we may want ammonite to be available within the "main" project, and not just in the unit tests. Then, anywhere within your program, you can place a breakpoint via:
+
+    @hl.scala
+      import ammonite.repl.Repl._
+      debug("name1" -> value1, "name2" -> value2, ...)
+
+    @p
+      And when your program reaches that point, it will pause and open up an Ammonite REPL with the values you provided it bound to the names you gave it. From there, you can interact with those values as normal Scala values within the REPL. Use @code{Ctrl-D} or @hl.scala{exit} to exit the REPL and continue normal program execution.
+    @p
+      The @hl.scala{debug()} call returns @hl.scala{: Any}; by default, this is @hl.scala{(): Unit}, but you can also return custom values by passing in an argument to @hl.scala{exit(...)} when you exit the REPL. This value will then be returned from @hl.scala{debug()}, and can be used in the rest of your Scala application.
 
 @sect("Ammonite-Ops", "Rock-solid Filesystem Operations")
   @p
@@ -660,6 +676,8 @@
         Fix for incorrect syntax highlighting (@a("#159", href:="https://github.com/lihaoyi/Ammonite/issues/159"))
       @li
         Support for loading compiler plugins, thanks to @a("Alexandre Archambault", href:="https://github.com/alexarchambault")
+      @li
+        You can now use Ammonite as a @sect.ref{Debugging} tool like Python's pdb, placing an interactive breakpoint anywhere within a normal Scala application
 
   @sect{0.4.4}
     @ul
