@@ -1,10 +1,10 @@
-package ammonite.repl
+package ammonite.repl.session
 
+import ammonite.repl.TestUtils._
+import ammonite.repl.{Checker, Res}
 import utest._
 
 import scala.collection.{immutable => imm}
-import acyclic.file
-import TestUtils.scala2_10
 
 object AdvancedTests extends TestSuite{
   val tests = TestSuite{

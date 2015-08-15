@@ -1,12 +1,9 @@
-package ammonite.repl
+package ammonite.repl.session
 
-
+import ammonite.repl.Checker
 import utest._
-import acyclic.file
 
 import scala.collection.{immutable => imm}
-import scala.reflect.io.VirtualDirectory
-import TestUtils.scala2_10
 
 object EvaluatorTests extends TestSuite{
 

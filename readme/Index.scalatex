@@ -1,6 +1,6 @@
 @import Main._
 @import ammonite.ops._
-@val ammoniteTests = 'repl/'src/'test/'scala/'ammonite/'repl
+@val ammoniteTests = 'repl/'src/'test/'scala/'ammonite/'repl/'session
 
 @val advancedTests = ammoniteTests/"AdvancedTests.scala"
 @val fileOps = read! cwd/'ops/'src/'main/'scala/'ammonite/'ops/"FileOps.scala"
@@ -189,7 +189,7 @@
         The traditional Scala REPL doesn't handle runaway code, and gives you no option but to kill the process, losing all your work. Ammonite-REPL lets you interrupt the thread, stop the runaway-command and keep going.
 
     @sect{Compiler-crash Robustness}
-      @hl.ref('repl/'src/'test/'scala/'ammonite/'repl/"FailureTests.scala", Seq("compilerCrash", "@"), "\"\"\"")
+      @hl.ref(ammoniteTests/"FailureTests.scala", Seq("compilerCrash", "@"), "\"\"\"")
 
       @p
         The default Scala REPL throws away all your work if the compiler crashes. This doesn't make any sense, because all the compiler is is a dumb @hl.scala{String => Array[Byte]} pipe. In the Ammonite, we simply swap out the broken compiler for a new one and let you continue your work.
