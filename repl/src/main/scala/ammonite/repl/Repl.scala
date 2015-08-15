@@ -62,7 +62,7 @@ class Repl(input: InputStream,
   }
 
   def ammoniteVersion = ammonite.Constants.version
-  def scalaVersion = scala.util.Properties.versionString
+  def scalaVersion = scala.util.Properties.versionNumberString
   def javaVersion = System.getProperty("java.version")
 
   def printBanner(): Unit = {
