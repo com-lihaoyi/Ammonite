@@ -26,10 +26,7 @@ object StandaloneTests extends TestSuite{
     }
     'complex{
       val evaled = exec("Complex.scala")
-      assert(
-        evaled.contains("Int GCD 6"),
-        evaled.contains("Long GCD 6")
-      )
+      assert(evaled.contains("Spire Interval [0, 10]"))
     }
   }
 }
