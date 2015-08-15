@@ -357,6 +357,12 @@
     @p
       And when your program reaches that point, it will pause and open up an Ammonite REPL with the values you provided it bound to the names you gave it. From there, you can interact with those values as normal Scala values within the REPL. Use @code{Ctrl-D} or @hl.scala{exit} to exit the REPL and continue normal program execution.
     @p
+      Here's an example of it being used to debug changes to the @a("WootJS webserver", href:="https://github.com/d6y/wootjs"):
+
+    @img(src:="Debugging.png", width:="100%")
+    @p
+      As you can see, you can bind the values you're interested in to names inside the debug REPL, and once in the REPL are free to explore them interactively.
+    @p
       The @hl.scala{debug()} call returns @hl.scala{: Any}; by default, this is @hl.scala{(): Unit}, but you can also return custom values by passing in an argument to @hl.scala{exit(...)} when you exit the REPL. This value will then be returned from @hl.scala{debug()}, and can be used in the rest of your Scala application.
 
 @sect("Ammonite-Ops", "Rock-solid Filesystem Operations")
