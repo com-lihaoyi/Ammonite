@@ -361,6 +361,9 @@
 
     @img(src:="Debugging.png", width:="100%")
     @p
+      In this case, we added the @hl.scala{debug} statement within the websocket frame handler, so we can inspect the values that are taking part in the client-server data exchange. You can also put the @hl.scala{debug} statement inside a conditional, to make it break only when certain interesting situations (e.g. bugs) occur.
+
+    @p
       As you can see, you can bind the values you're interested in to names inside the debug REPL, and once in the REPL are free to explore them interactively.
     @p
       The @hl.scala{debug()} call returns @hl.scala{: Any}; by default, this is @hl.scala{(): Unit}, but you can also return custom values by passing in an argument to @hl.scala{exit(...)} when you exit the REPL. This value will then be returned from @hl.scala{debug()}, and can be used in the rest of your Scala application.
