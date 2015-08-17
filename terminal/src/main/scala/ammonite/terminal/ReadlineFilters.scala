@@ -53,6 +53,11 @@ object ReadlineFilters {
    */
   case class CutPasteFilter() extends TermCore.DelegateFilter{
     var currentCut = Vector.empty[Char]
+    def cutCharLeft(b: Vector[Char], c: Int) = {
+      /* Do not edit current cut. Zsh(zle) & Bash(readline) do not edit the yank ring for Ctrl-h */
+      (b patch(from = c - 1, patch = Nil, replaced = 1), c - 1)
+    }
+
     def cutAllLeft(b: Vector[Char], c: Int) = {
       currentCut = b.take(c)
       (b.drop(c), 0)
@@ -83,6 +88,7 @@ object ReadlineFilters {
       Case(Ctrl('k'))((b, c, m) => cutAllRight(b, c)),
       Case(Alt + "d")((b, c, m) => cutWordRight(b, c)),
       Case(Ctrl('w'))((b, c, m) => cutWordLeft(b, c)),
+      Case(Ctrl('h'))((b, c, m) => cutCharLeft(b, c)),
       Case(Ctrl('y'))((b, c, m) => paste(b, c)),
       Case(Alt + "\u007f")((b, c, m) => cutWordLeft(b, c))
     )
