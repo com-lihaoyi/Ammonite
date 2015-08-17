@@ -71,7 +71,26 @@ object EditTests extends TestSuite{
         edit.cutAllRight,
         wordLeft
       )
-    }
+
+      * - check (
+        """
+        abcd
+        _gh
+        ijkl
+        """,
+        edit.cutCharLeft
+      )
+      
+      * - check (
+        """
+        abc_gh
+        ijkl
+        """,
+        edit.cutCharLeft,
+        edit.cutCharLeft,
+        edit.cutCharLeft
+      )
+  }
     'pasting{
 
       * - check(
@@ -112,6 +131,17 @@ object EditTests extends TestSuite{
         edit.cutWordLeft,
         edit.cutWordRight,
         edit.paste,
+        edit.paste
+      )
+      
+      * - check (
+        """
+        abcd
+        fgh_
+        ijkl
+        """,
+        edit.cutWordRight,
+        edit.cutCharLeft,
         edit.paste
       )
     }
