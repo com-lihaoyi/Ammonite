@@ -1,4 +1,4 @@
 package ammonite
 object Constants{
-  val version = "0.4.5"
+  val version = "0.4.5-SNAPSHOT"
 }
