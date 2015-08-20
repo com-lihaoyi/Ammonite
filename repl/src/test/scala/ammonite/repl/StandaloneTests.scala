@@ -2,7 +2,6 @@ package ammonite.repl
 
 import utest._
 import ammonite.ops._
-import ammonite.ops.ImplicitWd.cwd
 
 /**
  * Run a small number of scripts using the Ammonite standalone executable,

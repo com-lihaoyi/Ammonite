@@ -87,7 +87,6 @@ object Compiler{
     val vd = new io.VirtualDirectory("(memory)", None)
     lazy val settings = new Settings
     val settingsX = settings
-    settingsX.Yrangepos.value = true
     val jCtx = new JavaContext()
     val jDirs = jarDeps.map(x =>
       new DirectoryClassPath(new FileZipArchive(x), jCtx)
