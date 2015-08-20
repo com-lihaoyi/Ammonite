@@ -99,11 +99,6 @@ object BuiltinTests extends TestSuite{
         @ object X extends Dynamic
         defined object X
 
-        @ compiler.settings.language.clear()
-
-        @ object X extends Dynamic
-        error: extension of type scala.Dynamic needs to be enabled
-
         @ 1 + 1 // other things still work
 
       """)
