@@ -300,6 +300,14 @@
       @p
         As is common practice in other shells. Further modifications to make it include e.g. your current branch in Git (which you can call through Ammonite's @sect.ref("Spawning Subprocess", "subprocess API") or the current timestamp/user are similarly possible.
 
+    @sect{Compiler Flags}
+      @p
+        Apart from configuration of the rest of the shell through @sect.ref{Refs}, configuration of the Scala compiler takes place separately through the compiler's own configuration mechanism. You have access to the compiler as @code{compiler}, and can modify its settings as you see fit. Here's an example of this in action:
+
+      @hl.ref(ammoniteTests/"BuiltinTests.scala", Seq("settings", "@"))
+
+      @p
+        If you want these changes to always be present, place them in your @code{~/.ammonite/predef.scala}.
   @sect{Filesystem Operations}
     @p
       Ammonite uses @sect.ref{Ammonite-Ops} to provide a nice API to use filesystem operations. To access it, simply call
@@ -690,6 +698,14 @@
     @ul
       @li
         Provide a way of @sect.ref{Invoking Files} and passing @sect.ref{Environment Variables}
+      @li
+        Documented existing approach for setting @sect.ref{Compiler Flags}
+      @li
+        Fixed a bug in the readline re-implementation causing barely-full lines in the terminal to mess up cursor positioning and line re-drawing
+      @li
+        Remove @code{cache1234567890abcdef1234567890abcdef} objects from the autocomplete list, because they're not helpful
+      @li
+        Trim all the useless members of @hl.scala{Any} from the default import lists.
   @sect{0.4.5}
     @ul
       @li

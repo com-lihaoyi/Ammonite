@@ -24,7 +24,7 @@ object Preprocessor{
     }
 
     def pprintSignature(ident: String, customMsg: Option[String]) = {
-      val customCode = customMsg.fold("None")(x => s"""Some("$x")""")
+      val customCode = customMsg.fold("scala.None")(x => s"""Some("$x")""")
       s"""ammonite.repl.frontend.ReplBridge.repl.Internal.print($ident, $ident, "$ident", $customCode)"""
     }
     def definedStr(definitionLabel: String, name: String) =

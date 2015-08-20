@@ -76,5 +76,37 @@ object BuiltinTests extends TestSuite{
         @ assert(originalLs2 != (ls!))
       """)
     }
+    'settings{
+      check.session("""
+        @ List(1, 2, 3) + "lol"
+        res0: String = "List(1, 2, 3)lol"
+
+        @ compiler.settings.noimports.value = true
+
+        @ List(1, 2, 3) + "lol" // predef imports disappear
+        error: not found: value List
+
+        @ compiler.settings.noimports.value = false
+
+        @ List(1, 2, 3) + "lol"
+        res3: String = "List(1, 2, 3)lol"
+
+        @ object X extends Dynamic
+        error: extension of type scala.Dynamic needs to be enabled
+
+        @ compiler.settings.language.add(compiler.settings.languageFeatures.dynamics.name)
+
+        @ object X extends Dynamic
+        defined object X
+
+        @ compiler.settings.language.clear()
+
+        @ object X extends Dynamic
+        error: extension of type scala.Dynamic needs to be enabled
+
+        @ 1 + 1 // other things still work
+
+      """)
+    }
   }
 }
