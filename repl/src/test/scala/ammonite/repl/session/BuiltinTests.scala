@@ -94,7 +94,7 @@ object BuiltinTests extends TestSuite{
         @ object X extends Dynamic
         error: extension of type scala.Dynamic needs to be enabled
 
-        @ compiler.settings.language.tryToSet(List("experimental.macros"))
+        @ compiler.settings.language.tryToSet(List("dynamics"))
 
         @ object X extends Dynamic
         defined object X
