@@ -592,6 +592,7 @@
       Ammonite-Ops provides easy syntax for anyone who wants to spawn sub-processes, e.g. commands like @code{ls} or @code{git commit -am "wip"}. This is provided through the @hl.scala{%} and @hl.scala{%%} operators, which are used as follows:
 
     @hl.scala
+      @@ import ammonite.ops._
       @@ %ls
       build.sbt	log		ops		readme		repl		terminal
       echo		modules		project		readme.md	target		tools
