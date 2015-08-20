@@ -1,7 +1,7 @@
 package ammonite
 
 
-package object ops extends Extensions with RelPathStuff{
+package object ops extends ShelloutRoots(Nil, false) with Extensions with RelPathStuff{
   implicit val postfixOps = scala.language.postfixOps
 
   /**
@@ -20,7 +20,7 @@ package object ops extends Extensions with RelPathStuff{
   lazy val cwd = ops.Path(new java.io.File(""))
 
   object ImplicitWd{
-    implicit lazy val cwd = ops.cwd
+    implicit lazy val implicitCwd = ops.cwd
   }
 
   implicit class Transformable1(p: java.nio.file.Path){
@@ -46,14 +46,5 @@ package object ops extends Extensions with RelPathStuff{
 
   implicit def fileData(p: Path) = stat.full(p)
 
-  /**
-   * Dynamic shell command execution. This allows you to run commands which
-   * are not provided by Ammonite, by shelling out to bash. e.g. try
-   *
-   * %ls
-   * %ls "/"
-   * %ps 'aux
-   */
-  def %(implicit wd: Path) = new Command(wd, Vector.empty, Shellout.executeInteractive)
-  def %%(implicit wd: Path) = new Command(wd, Vector.empty, Shellout.executeStream)
+  implicit class PathCallable[T <% Path](p: T) extends ShelloutRoots(List(p.toString), true)
 }

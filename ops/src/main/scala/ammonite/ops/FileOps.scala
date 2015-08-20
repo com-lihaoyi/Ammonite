@@ -300,7 +300,7 @@ object exists extends Function1[Path, Boolean]{
 case class kill(signal: Int) extends Function1[Int, CommandResult]{
   def apply(pid: Int): CommandResult = {
 
-    %%(wd = Path(new java.io.File(""))).kill("-" + signal, pid.toString)
+    %%.kill("-" + signal, pid.toString)(wd = Path(new java.io.File("")))
   }
 }
 object ln extends Function2[Path, Path, Unit]{

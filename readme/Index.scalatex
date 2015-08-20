@@ -1,7 +1,7 @@
 @import Main._
 @import ammonite.ops._
 @val ammoniteTests = 'repl/'src/'test/'scala/'ammonite/'repl/'session
-
+@val replSource = 'repl/'src/'main/'scala/'ammonite/'repl
 @val advancedTests = ammoniteTests/"AdvancedTests.scala"
 @val fileOps = read! cwd/'ops/'src/'main/'scala/'ammonite/'ops/"FileOps.scala"
 @val found = (
@@ -205,7 +205,7 @@
     @p
       Ammonite contains a range of useful built-ins implemented as normal functions. Everything inside the @hl.scala{ReplAPI} trait is imported by default and can be accessed directly by default to control the console.
 
-    @hl.ref('repl/'src/'main/'scala/'ammonite/'repl/'frontend/"ReplAPI.scala", "trait ReplAPI", "// End of ReplAPI")
+    @hl.ref(replSource/'frontend/"ReplAPI.scala", "trait ReplAPI", "// End of ReplAPI")
 
   @sect{Multiline Input}
     @p
@@ -286,7 +286,7 @@
       @p
         By default, all the values you're seeing here with the @code{()} after them are @hl.scala{Ref}s, defined as
 
-      @hl.ref('repl/'src/'main/'scala/'ammonite/'repl/"Util.scala", "trait StableRef", "object Ref")
+      @hl.ref(replSource/"Util.scala", "trait StableRef", "object Ref")
 
       @p
         As you can see from the signature, you can basically interact with the @hl.scala{Ref}s in two ways: either getting or setting their values as values, or binding their values to expressions that will be evaluated every time the @hl.scala{Ref}'s value is needed.
@@ -307,7 +307,7 @@
       import ammonite.ops._
     @p
       Or add it to your @hl.scala{~/.ammonite/predef.scala} if you want it available all the time in your REPL. The Ammonite REPL also provides some additional command-line-friendly functionality on top of the default Ammonite-Ops commands:
-    @hl.ref('repl/'src/'main/'scala/'ammonite/'repl/'frontend/"ReplAPI.scala", "trait OpsAPI", "// End of OpsAPI")
+    @hl.ref(replSource/'frontend/"ReplAPI.scala", "trait OpsAPI", "// End of OpsAPI")
     @p
       These are imported by default into every repl session, and basically let you treat the Ammonite-REPL much more like a Bash shell. You can `hl.scala{cd!} in and out of directories, and treat relative paths as shorthand for absolute paths when working in the shell. This means you can enter commands like
     @hl.scala
@@ -380,7 +380,8 @@
   @p
     And you're all set! Here's an example of some common operations you can do with Ammonite-Ops
 
-  @val opsExamples = 'ops/'src/'test/'scala/'test/'ammonite/'ops/"ExampleTests.scala"
+  @val opsTests = 'ops/'src/'test/'scala/'test/'ammonite/'ops
+  @val opsExamples = opsTests/"ExampleTests.scala"
   @val pathsScala = 'ops/'src/'main/'scala/'ammonite/'ops/"Path.scala"
   @hl.ref(opsExamples, Seq("longExample", "import"), "assert(")
 
@@ -666,7 +667,17 @@
 
     @p
       @hl.scala{%%} does not do this.
+    @sect{Environment Variables}
+      @p
+        Ammonite lets you pass in environment variables to subprocess calls; just pass them in as named arguments when you invoke the subprocess ia @code{%} or @code{%%}:
 
+      @hl.ref(opsTests/"ShelloutTests.scala", Seq("'envArgs", "val"))
+
+    @sect{Invoking Files}
+      @p
+        You can invoke files on disk using @code{%} and @code{%%} the same way you can invoke shell commands:
+
+      @hl.ref(opsTests/"ShelloutTests.scala", Seq("'filebased", "val"))
 @sect{Community}
   @ul
     @li
@@ -675,6 +686,10 @@
       @a("Gitter Channel", href:="https://gitter.im/lihaoyi/Ammonite")
 
 @sect{Changelog}
+  @sect{0.4.6}
+    @ul
+      @li
+        Provide a way of @sect.ref{Invoking Files} and passing @sect.ref{Environment Variables}
   @sect{0.4.5}
     @ul
       @li

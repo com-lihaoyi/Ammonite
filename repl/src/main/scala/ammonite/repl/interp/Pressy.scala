@@ -53,6 +53,9 @@ object Pressy {
 
       blacklist(s.fullNameAsName('.').decoded) ||
       s.isImplicit ||
+      // Cache objects, which you should probably never need to
+      // access directly, and apart from that have annoyingly long names
+      "cache[a-f0-9]{32}".r.findPrefixMatchOf(s.name.decoded).isDefined ||
       s.isDeprecated ||
       s.decodedName == "<init>" ||
       s.decodedName.contains('$')
