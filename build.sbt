@@ -165,6 +165,16 @@ lazy val repl = project
 //    fork in (Test, testOnly) := true
   )
 
+lazy val sbtPlugin = project.in(file("sbt-plugin"))
+  .settings(acyclicSettings)
+  .settings(publishSettings)
+  .settings(
+    // not specifying a scala version, should default to the one of SBT, which is what we want
+    name := "ammonite-sbt",
+    sbt.Keys.sbtPlugin := true,
+    (unmanagedSources in Compile) += baseDirectory.value/".."/"project"/"Constants.scala"
+  )
+
 lazy val readme = ScalatexReadme(
   projectId = "readme",
   wd = file(""),
