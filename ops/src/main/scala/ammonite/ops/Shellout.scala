@@ -6,20 +6,22 @@ import scala.language.dynamics
 
 object Shellout{
 
-  def executeInteractive(wd: Path, executed: Command[_]) = {
+  def executeInteractive(wd: Path, cmd: Command[_]) = {
     val process = new java.lang.ProcessBuilder()
-    process.environment()
+    import collection.JavaConversions._
+    process.environment().putAll(cmd.envArgs)
     process.directory(new java.io.File(wd.toString))
     process
-      .command(executed.cmd:_*)
+      .command(cmd.cmd:_*)
       .inheritIO()
       .start()
       .waitFor()
 
   }
-  def executeStream(wd: Path, executed: Command[_]) = {
+  def executeStream(wd: Path, cmd: Command[_]) = {
     import scala.sys.process._
-    val p = Process(executed.cmd, new java.io.File(wd.toString))
+    val p = Process(cmd.cmd, new java.io.File(wd.toString), cmd.envArgs.toSeq:_*)
+
     CommandResult(p.lines)
   }
 }
@@ -27,39 +29,28 @@ object Shellout{
 /**
  * A staged sub-process command that has yet to be executed.
  */
-class Command[T](val cmd: Vector[String],
-                 val envArgs: Map[String, String],
-                 execute: (Path, Command[_]) => T) extends Dynamic {
-  def extend(cmd2: Vector[String]) = new Command(cmd ++ cmd2, envArgs, execute)
-  def selectDynamic(name: String)(implicit wd: Path) = execute(wd, extend(Vector(name)))
-  def applyDynamic(op: String)(args: Shellable*)(implicit wd: Path): T = {
-    execute(wd, this.extend(Vector(op) ++ args.map(_.s)))
+case class Command[T](cmd: Vector[String],
+                      envArgs: Map[String, String],
+                      execute: (Path, Command[_]) => T,
+                      blankCallsOnly: Boolean) extends Dynamic {
+  def extend(cmd2: Traversable[String], envArgs2: Traversable[(String, String)]) =
+    new Command(cmd ++ cmd2, envArgs ++ envArgs2, execute, blankCallsOnly)
+  def selectDynamic(name: String)(implicit wd: Path) = execute(wd, extend(Vector(name), Map()))
+  def opArg(op: String) = {
+    if (!blankCallsOnly) Vector(op)
+    else {
+      assert(op == "apply")
+      Vector()
+    }
   }
-  def applyDynamicNamed(name: String)(args: (String, Shellable)*): Command[T] = {
-    assert(
-      name == "apply",
-      s"""% or %% can only be called directly with keyword args,
-         |e.g. %(X=foo, Y=bar). You cannot call it with keyword
-         |arguments and a method named [$name]""".stripMargin
-    )
-    val (blankIndices, blankArgs) =
-      args.zipWithIndex
-          .collect{ case (("", y), i) => (y.s, i)}
-          .unzip
-
-    assert(
-      blankArgs.isEmpty,
-      s"""When % or %% is called with named args, e.g. %(X=foo, Y=bar),
-         |every argument must be written with a name. Arguments
-         |[${blankIndices.mkString(", ")}] with values
-         |${blankArgs.mkString(", ")} did not have names""".stripMargin
-    )
-
-    new Command(
-      cmd,
-      envArgs ++ args.map{case (x, y) => (x, y.s)},
-      execute
-    )
+  def applyDynamic(op: String)(args: Shellable*)(implicit wd: Path): T = {
+    execute(wd, this.extend(opArg(op) ++ args.map(_.s), Map()))
+  }
+  def applyDynamicNamed(op: String)
+                       (args: (String, Shellable)*)
+                       (implicit wd: Path): T = {
+    val (namedArgs, posArgs) = args.map{case (k, v) => (k, v.s)}.partition(_._1 != "")
+    execute(wd, this.extend(opArg(op) ++ posArgs.map(_._2), namedArgs))
   }
 }
 
@@ -96,7 +87,6 @@ object Shellable{
   implicit def NumericShellable[T: Numeric](s: T): Shellable = Shellable(s.toString)
 }
 
-
 /**
  * Dynamic shell command execution. This allows you to run commands which
  * are not provided by Ammonite, by shelling out to bash. e.g. try
@@ -105,5 +95,7 @@ object Shellable{
  * %ls "/"
  * %ps 'aux
  */
-object % extends Command(Vector.empty, Map.empty, Shellout.executeInteractive)
-object %% extends Command(Vector.empty, Map.empty, Shellout.executeStream)
+abstract class ShelloutRoots(prefix: Seq[String], blankCallsOnly: Boolean) {
+  val % = new Command(prefix.toVector, Map.empty, Shellout.executeInteractive, blankCallsOnly)
+  val %% = new Command(prefix.toVector, Map.empty, Shellout.executeStream, blankCallsOnly)
+}
