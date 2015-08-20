@@ -28,10 +28,28 @@ class Interpreter(prompt0: Ref[String],
                   predef: String,
                   replArgs: Seq[Bind[_]]){ interp =>
 
+
   val hardcodedPredef =
     """import ammonite.repl.frontend.ReplBridge.repl
-      |import ammonite.repl.frontend.ReplBridge.repl._
-      |import ammonite.repl.IvyConstructor._
+      |import ammonite.repl.frontend.ReplBridge.repl.{
+      |  notify => _,
+      |  wait => _,
+      |  equals => _,
+      |  asInstanceOf => _,
+      |  synchronized => _,
+      |  notifyAll => _,
+      |  isInstanceOf => _,
+      |  == => _,
+      |  Internal => _,
+      |  != => _,
+      |  getClass => _,
+      |  ne => _,
+      |  eq => _,
+      |  ## => _,
+      |  hashCode => _,
+      |  _
+      |}
+      |import ammonite.repl.IvyConstructor.{ArtifactIdExt, GroupIdExt}
       |""".stripMargin
 
   val dynamicClasspath = new VirtualDirectory("(memory)", None)
