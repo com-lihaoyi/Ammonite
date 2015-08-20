@@ -6,7 +6,7 @@ import scala.annotation.tailrec
 
 
 object Debug{
-//  val debugOutput= new FileOutputStream(new java.io.File("log"))
+//  val debugOutput= new java.io.FileOutputStream(new java.io.File("log"))
   def apply(s: Any) = {
 //    debugOutput.write((System.currentTimeMillis() + "\t\t" + s + "\n").getBytes)
   }

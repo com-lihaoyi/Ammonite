@@ -66,7 +66,9 @@ object TermCore {
         .filter(_.nonEmpty) // Without the first empty prefix
         .map{ x =>
           fragHeight(
-            x.last + (if (x.sum + x.length - 1 == cursor) 1 else 0),
+            // If the frag barely fits on one line, give it
+            // an extra spot for the cursor on the next line
+            x.last + 1,
             width
           )
         }
@@ -89,11 +91,15 @@ object TermCore {
         totalPreHeight += fragHeights(i)
       }else done = true
     }
-//    Debug("totalPreHeight " + totalPreHeight)
+    Debug("")
+    Debug("totalPreHeight\t" + totalPreHeight)
+    Debug("totalheight\t" + totalHeight)
 //    Debug("leftoverCursor " + leftoverCursor)
-//    Debug("width " + width)
+    //    Debug("width " + width)
     val cursorY = totalPreHeight + leftoverCursor / width
     val cursorX = leftoverCursor % width
+    Debug("cursorX\t" + cursorX)
+    Debug("cursorY\t" + cursorY)
     (totalHeight, cursorY, cursorX)
   }
 
@@ -156,6 +162,7 @@ object TermCore {
       }
 
       val (nextHeight, cursorY, cursorX) = calculateHeight(buffer, transformedCursor, width, noAnsiPrompt)
+      Debug("nextHeight\t" + nextHeight)
       ansi.up(nextHeight - 1)
       ansi.left(9999)
 
@@ -184,7 +191,7 @@ object TermCore {
               )
               oldCursorY
             }
-
+          Debug("nextUps\t" + nextUps)
           readChar(TermState(s, b, newCursor), nextUps)
 
         case Result(s) =>

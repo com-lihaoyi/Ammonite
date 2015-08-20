@@ -35,10 +35,10 @@ object HeightTests extends TestSuite{
         cursor = 0,
         width = 2
       )
-      assert(height == (2, 0, 0))
+      assert(height == (3, 0, 0))
       //|b
       //cd
-      //
+      //_
     }
 
     'd - {
@@ -47,10 +47,11 @@ object HeightTests extends TestSuite{
         cursor = 0,
         width = 2
       )
-      assert(height == (2, 0, 0))
+      assert(height == (4, 0, 0))
       //|b
+      //_
       //cd
-      //
+      //_
     }
 
     'e - {
@@ -59,8 +60,9 @@ object HeightTests extends TestSuite{
         cursor = 5,
         width = 2
       )
-      assert(height == (3, 2, 0))
+      assert(height == (4, 3, 0))
       //ab
+      //_
       //cd
       //|
     }
@@ -70,10 +72,11 @@ object HeightTests extends TestSuite{
         cursor = 2,
         width = 2
       )
-      assert(height == (3, 1, 0))
+      assert(height == (4, 1, 0))
       //ab
       //|
       //cd
+      //_
     }
    
 
