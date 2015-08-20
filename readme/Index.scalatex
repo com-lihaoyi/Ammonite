@@ -677,7 +677,7 @@
       @p
         You can invoke files on disk using @code{%} and @code{%%} the same way you can invoke shell commands:
 
-      @hl.ref(opsTests/"ShelloutTests.scala", Seq("'filebased", "assert"))
+      @hl.ref(opsTests/"ShelloutTests.scala", Seq("'filebased", "val"))
 @sect{Community}
   @ul
     @li
