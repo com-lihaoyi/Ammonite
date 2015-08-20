@@ -63,16 +63,22 @@ object TTY{
 //    Debug("Initializing, Height " + height)
     val initialConfig = stty("-g").trim
     stty("-icanon min 1 -icrnl -inlcr -ixon")
-    // blows up on ubuntu
-//    stty("dsusp undef")
+    // this command fails on ubuntu, but that is harmless.
+    sttyFailTolerant("dsusp undef")
     stty("-echo")
     stty("intr undef")
 //    Debug("")
     (width, height, initialConfig)
   }
+  def sttyCmd(s: String) =
+    Seq("bash", "-c", s"stty $s < /dev/tty")
   def stty(s: String) = {
     import sys.process._
-    Seq("bash", "-c", s"stty $s < /dev/tty").!!
+    sttyCmd(s).!!
+  }
+  def sttyFailTolerant(s: String) = {
+    import sys.process._
+    sttyCmd(s).!
   }
   def restore(initialConfig: String) = {
     stty(initialConfig)
