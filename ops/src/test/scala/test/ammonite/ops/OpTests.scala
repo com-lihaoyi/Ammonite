@@ -20,8 +20,8 @@ object OpTests extends TestSuite{
     )
     'lsR{
       ls.rec(res).foreach(println)
+      intercept[java.nio.file.NoSuchFileException](ls.rec(cwd/'target/'nonexistent))
       assert(
-        ls.rec(cwd/'target/'nonexistent) == Seq(),
         ls.rec(res/'folder2/'folder2b) == Seq(res/'folder2/'folder2b/"b.txt"),
         ls.rec(res/'folder2) == Seq(
           res/'folder2/'folder2a,

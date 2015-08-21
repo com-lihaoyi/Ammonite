@@ -7,8 +7,9 @@
 package ammonite.ops
 
 import java.io.{File, InputStream}
-import java.nio.file.{Files, Paths, StandardOpenOption}
+import java.nio.file.{NoSuchFileException, Files, Paths, StandardOpenOption}
 import acyclic.file
+import ammonite.ops.Internals.SelfClosingIterator
 
 import pprint.{Config, PPrinter, PPrint}
 
@@ -19,6 +20,35 @@ object OpError{
 }
 
 object Internals{
+
+  /**
+   * An iterator that can be closed, and closes itself after you exhaust it
+   * through iteration. Not quite totally safe, since you can leak filehandles
+   * by leaving half-consumed iterators, but at least common things like foreach,
+   * mkString, reduce, sum, etc. will all result in close() being called.
+   */
+  class SelfClosingIterator[+A](val underlying: Iterator[A], val close: () => Unit)
+  extends Iterator[A]{
+    private[this] var alreadyClosed = false
+    def hasNext = {
+      if (alreadyClosed) false
+      else if (!underlying.hasNext){
+        close()
+        alreadyClosed = true
+        false
+      }else{
+        true
+      }
+    }
+    def next() = {
+      val n = underlying.next()
+      if (!underlying.hasNext) {
+        alreadyClosed = true
+        close()
+      }
+      n
+    }
+  }
 
   trait Mover{
     def check: Boolean
@@ -50,7 +80,8 @@ object Internals{
       def materialize(src: Path, i: Iterator[String]) = i.toVector
       def !!(arg: Path) = {
         val is = readIn(arg)
-        io.Source.fromInputStream(is).getLines()
+        val s = io.Source.fromInputStream(is)
+        new SelfClosingIterator(s.getLines, () => s.close())
       }
     }
     object bytes extends Function1[Path, Array[Byte]]{
@@ -127,7 +158,7 @@ object cp extends Function2[Path, Path, Unit] {
     }
 
     copyOne(from)
-    FilterMapExt(ls.rec! from) | copyOne
+    if (stat(from).isDir) FilterMapExt(ls.rec! from) | copyOne
   }
 }
 
@@ -138,9 +169,14 @@ object cp extends Function2[Path, Path, Unit] {
  */
 object rm extends Function1[Path, Unit]{
   def apply(target: Path) = {
-    ls.rec(target).toArray
-                  .reverseIterator
-                  .foreach(p => new File(p.toString).delete())
+    // Emulate `rm -rf` functionality by ignoring non-existent files
+    val files =
+      try ls.rec(target)
+      catch {case e: NoSuchFileException => Nil}
+
+    files.toArray
+         .reverseIterator
+         .foreach(p => new File(p.toString).delete())
     new File(target.toString).delete
   }
 }
@@ -187,9 +223,13 @@ trait ImplicitOp[V] extends Function1[Path, V]{
  */
 object ls extends StreamableOp1[Path, Path, LsSeq] with ImplicitOp[LsSeq]{
   def materialize(src: Path, i: Iterator[Path]) = new LsSeq(src, i.toStream.map(_-src):_*)
-  def !!(arg: Path) = {
+  def !!(arg: Path): SelfClosingIterator[Path] = {
     import scala.collection.JavaConverters._
-    Files.newDirectoryStream(arg.nio).iterator().asScala.map(x => Path(x))
+    val dirStream = Files.newDirectoryStream(arg.nio)
+    new SelfClosingIterator(
+      dirStream.iterator().asScala.map(x => Path(x)),
+      () => dirStream.close()
+    )
   }
 
 
@@ -199,12 +239,12 @@ object ls extends StreamableOp1[Path, Path, LsSeq] with ImplicitOp[LsSeq]{
    */
   object rec extends StreamableOp1[Path, Path, LsSeq]with ImplicitOp[LsSeq]{
     def materialize(src: Path, i: Iterator[Path]) = new LsSeq(src, i.toStream.map(_-src):_*)
-    def recursiveListFiles(f: File): Iterator[File] = {
-      def these = Option(f.listFiles).iterator.flatMap(x=>x)
-      these ++ these.filter(_.isDirectory).flatMap(recursiveListFiles)
+    def recursiveListFiles(p: Path): Iterator[Path] = {
+      def these = ls!! p
+      these ++ these.filter(stat(_).isDir).flatMap(recursiveListFiles)
     }
     def !!(arg: Path) =
-      recursiveListFiles(new File(arg.toString)).map(f => Path(f.getCanonicalPath))
+      recursiveListFiles(arg)
   }
 }
 
