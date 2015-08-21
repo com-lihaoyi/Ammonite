@@ -707,6 +707,8 @@
         Remove @code{cache1234567890abcdef1234567890abcdef} objects from the autocomplete list, because they're not helpful
       @li
         Trim all the useless members of @hl.scala{Any} from the default import lists.
+      @li
+        Fix a file-handle-leak for most usages of @code{read.lines} and @code{ls}/@code{ls.rec}
   @sect{0.4.5}
     @ul
       @li
