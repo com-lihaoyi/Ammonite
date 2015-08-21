@@ -20,14 +20,13 @@ The layout of the repository is roughly:
 - `terminal/` is the JLine re-implementation used by Ammonite-REPL to provide syntax highlighting and multiline editing
 - `tools/` is a WIP implementation of common shell utilities in Scala; currently not used nor documented
 - `readme/` is the source code for the [Documentation](http://lihaoyi.github.io/Ammonite/#Ammonite-Ops), written in [Scalatex](http://lihaoyi.github.io/Scalatex/).
-- `modules/` is a synthetic project used for publishing, purely intended to exclude the readme
 
 ## Common Commands
 
 - `sbt ~repl/run` brings up the Ammonite-REPL using the source code in the repository, and automatically restarts it on-exit if you have made a change to the code. Useful for manual testing both of `repl/` as well as `ops/`, since you can just `import ammonite.ops._` and start using them.
 - `sbt ~terminal/run` is useful for manual testing the terminal interaction; it basically contains a minimal echo-anything terminal, with multiline input based on the count of open- and closed-parentheses. This lets you test all terminal interactions without all the complexity of the Scala compiler, classloaders, etc. that comes in `repl/`
 - `sbt ~repl/test`/`sbt ~ops/test`/`sbt ~terminal/test`  runs tests after every change. `repl/test` can be a bit slow because of the amount of code it compiles, so you may want to specify the test manually via `repl/test-only -- ammonite.repl.TestObject.path.to.test`
-- `sbt +modules/publishLocal` or `+sbt modules/publishSigned` is used for publishing.
+- `sbt +publishLocal` or `+sbt publishSigned` is used for publishing.
 - `sbt ~readme/run` builds the documentation inside its target folder, which you can view by opening `readme/target/scalatex/index.html` in your browser.
 - `git checkout gh-pages; cp -r readme/target/scalatex.* .; git commit -am .; git push` will deploy the generated documentation to Github Pages
 

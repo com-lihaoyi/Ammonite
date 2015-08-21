@@ -180,11 +180,6 @@ lazy val mainProjects = Seq[ProjectReference](
   ops, tools, terminal, repl
 )
 
-lazy val modules = project
-  .aggregate(mainProjects: _*)
-  .settings(sharedSettings)
-  .settings(noPublishSettings)
-
 lazy val root = project.in(file("."))
   .aggregate(mainProjects: _*)
   .dependsOn(mainProjects.map(p => p: ClasspathDep[ProjectReference]): _*)
