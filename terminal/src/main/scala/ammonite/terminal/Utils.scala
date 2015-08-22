@@ -63,7 +63,6 @@ object TTY{
 //    Debug("Initializing, Height " + height)
     val initialConfig = stty("-g").trim
     stty("-icanon min 1 -icrnl -inlcr -ixon")
-    // this command fails on ubuntu, but that is harmless.
     sttyFailTolerant("dsusp undef")
     stty("-echo")
     stty("intr undef")
