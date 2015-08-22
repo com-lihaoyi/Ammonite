@@ -78,7 +78,7 @@ object TTY{
   }
   def sttyFailTolerant(s: String) = {
     import sys.process._
-    sttyCmd(s).!
+    sttyCmd(s ++ " 2> /dev/null").!
   }
   def restore(initialConfig: String) = {
     stty(initialConfig)
