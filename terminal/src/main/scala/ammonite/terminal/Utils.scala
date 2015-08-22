@@ -70,16 +70,23 @@ object TTY{
 //    Debug("")
     (width, height, initialConfig)
   }
-  def sttyCmd(s: String) =
-    Seq("bash", "-c", s"stty $s < /dev/tty")
-  def stty(s: String) = {
+
+  private def sttyCmd(s: String) = {
     import sys.process._
+    Seq("bash", "-c", s"stty $s < /dev/tty"): ProcessBuilder
+  }
+
+  def stty(s: String) =
     sttyCmd(s).!!
-  }
-  def sttyFailTolerant(s: String) = {
-    import sys.process._
+  /*
+   * Executes a stty command for which failure is expected, hence the return
+   * status can be non-null and errors are ignored.
+   * This is appropriate for `stty dsusp undef`, since it's unsupported on Linux
+   * (http://man7.org/linux/man-pages/man3/termios.3.html).
+   */
+  def sttyFailTolerant(s: String) =
     sttyCmd(s ++ " 2> /dev/null").!
-  }
+
   def restore(initialConfig: String) = {
     stty(initialConfig)
   }
