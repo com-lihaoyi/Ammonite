@@ -133,6 +133,19 @@ object ScriptTests extends TestSuite{
             """)
         }
       }
+      'nestedScripts{
+        check.session(s"""
+          @ import ammonite.ops._
+
+          @ load.exec($printedScriptPath/"NestedScripts.scala")
+
+          @ val a = asd
+          error: not found: value asd
+
+          @ val b = asd2
+          b: Int = 1
+          """)
+      }
     }
     
     'module{
@@ -327,6 +340,19 @@ object ScriptTests extends TestSuite{
             case e: Exception => assert(false)
           }
         }
+      }
+      'nestedScripts{
+        check.session(s"""
+          @ import ammonite.ops._
+
+          @ load.module($printedScriptPath/"NestedScripts.scala")
+
+          @ val a = asd
+          error: not found: value asd
+
+          @ val b = asd2
+          b: Int = 1
+          """)
       }
     }
   }
