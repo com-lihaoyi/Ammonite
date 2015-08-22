@@ -63,17 +63,29 @@ object TTY{
 //    Debug("Initializing, Height " + height)
     val initialConfig = stty("-g").trim
     stty("-icanon min 1 -icrnl -inlcr -ixon")
-    // blows up on ubuntu
-//    stty("dsusp undef")
+    sttyFailTolerant("dsusp undef")
     stty("-echo")
     stty("intr undef")
 //    Debug("")
     (width, height, initialConfig)
   }
-  def stty(s: String) = {
+
+  private def sttyCmd(s: String) = {
     import sys.process._
-    Seq("bash", "-c", s"stty $s < /dev/tty").!!
+    Seq("bash", "-c", s"stty $s < /dev/tty"): ProcessBuilder
   }
+
+  def stty(s: String) =
+    sttyCmd(s).!!
+  /*
+   * Executes a stty command for which failure is expected, hence the return
+   * status can be non-null and errors are ignored.
+   * This is appropriate for `stty dsusp undef`, since it's unsupported on Linux
+   * (http://man7.org/linux/man-pages/man3/termios.3.html).
+   */
+  def sttyFailTolerant(s: String) =
+    sttyCmd(s ++ " 2> /dev/null").!
+
   def restore(initialConfig: String) = {
     stty(initialConfig)
   }
