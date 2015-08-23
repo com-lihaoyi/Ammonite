@@ -193,7 +193,7 @@ object RelPath extends RelPathStuff with (String => RelPath){
     Iterator((Seq.fill(p.ups)("up") ++ p.segments.map(BasePath.reprSection(_, c).mkString)).mkString("/"))
   }
 
-  implicit val relPathOrdering: Ordering[RelPath] = Ordering.by((rp: RelPath) => (rp.ups, rp.segments.toIterable))
+  val alphaOrdering: Ordering[RelPath] = Ordering.by(rp => (rp.ups, rp.segments.toIterable))
 }
 object Path extends (String => Path){
   def apply(s: String): Path = {
@@ -224,6 +224,8 @@ object Path extends (String => Path){
   implicit def pathRepr = pprint.PPrinter[ammonite.ops.Path]{(p, c) =>
     Iterator("root") ++ p.segments.iterator.map("/" + BasePath.reprSection(_, c).mkString)
   }
+
+  val alphaOrdering: Ordering[Path] = Ordering.by(_.segments.toIterable)
 }
 
 /**

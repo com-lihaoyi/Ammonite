@@ -148,6 +148,28 @@ object PathTests extends TestSuite{
           compileError("""'omg/'wtf > root/'omg/'wtf""")
         }
       }
+      'AlphabeticComparison{
+        'Relative - {
+          import RelPath.alphaOrdering.{mkOrderingOps => m}
+          assert(
+            m(rel/'a) <= rel/'b,
+            m(rel/'a) < rel/'b,
+            m(rel/up) < rel,
+            m(rel/up/'b) < rel/'a,
+            m(rel/up/up/'b) < rel/up/'a,
+            m(rel/up/'b) >= rel/up/'a,
+            Seq(rel/'target, rel/'src).sorted(RelPath.alphaOrdering) == Seq(rel/'src, rel/'target)
+          )
+        }
+        'Absolute - {
+          import Path.alphaOrdering.{mkOrderingOps => m}
+          assert(
+            m(root/'a) <= root/'b,
+            m(root/'a) < root/'b,
+            Seq(root/'target, root/'src).sorted(Path.alphaOrdering) == Seq(root/'src, root/'target)
+          )
+        }
+      }
     }
     'Errors{
       'InvalidChars {

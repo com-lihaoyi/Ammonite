@@ -222,7 +222,7 @@ trait ImplicitOp[V] extends Function1[Path, V]{
  * List the files and folders in a directory
  */
 object ls extends StreamableOp1[Path, Path, LsSeq] with ImplicitOp[LsSeq]{
-  def materialize(src: Path, i: Iterator[Path]) = new LsSeq(src, i.toStream.map(_ - src).sorted:_*)
+  def materialize(src: Path, i: Iterator[Path]) = new LsSeq(src, i.toStream.map(_ - src).sorted(RelPath.alphaOrdering):_*)
   def !!(arg: Path): SelfClosingIterator[Path] = {
     import scala.collection.JavaConverters._
     val dirStream = Files.newDirectoryStream(arg.nio)
