@@ -2,6 +2,7 @@ package ammonite.repl.interp
 
 import java.io.File
 import java.nio.file.NotDirectoryException
+import scala.collection.mutable
 import acyclic.file
 import ammonite.ops._
 import pprint.{Config, PPrint}
@@ -84,6 +85,9 @@ class Interpreter(prompt0: Ref[String],
 
   def processExec(code: String) = processScript(hardcodedPredef + "\n@\n" + code, { (c, i) => evaluateLine(c, Seq(), _ => (), i)})
  
+  //this variable keeps track of where should we put the imports resulting from scripts.
+  private var scriptImportCallback: Seq[ImportData] => Unit = eval.update
+
   //common stuff in proccessModule and processExec
   def processScript(code: String, evaluate: (String, Seq[ImportData]) => Res[Evaluated]): Unit = {
     Timer("processScript 0")
@@ -96,24 +100,35 @@ class Interpreter(prompt0: Ref[String],
     Timer("processScript 1")
     val errors = blocks.collect{ case Res.Failure(err) => err }
     Timer("processScript 2")
-    if(!errors.isEmpty)
-      stdout(colors0().error() + errors.mkString("\n") + colors0().reset() + "\n")
-    else
-      loop(blocks.collect{ case Res.Success(o) => o }, Seq())
+    val outerScriptImportCallback = scriptImportCallback //we store the old value, because we will reassign this in the loop
+    try{
+      if(!errors.isEmpty)
+        stdout(colors0().error() + errors.mkString("\n") + colors0().reset() + "\n")
+      else
+        loop(blocks.collect{ case Res.Success(o) => o }, Seq())
+    } finally {
+      scriptImportCallback = outerScriptImportCallback
+    }
     Timer("processScript 3")
     @tailrec def loop(blocks: Seq[Preprocessor.Output], imports: Seq[Seq[ImportData]]): Unit = {
       if(!blocks.isEmpty){
         Timer("processScript loop 0")
+        //imports from scripts loaded from this script block will end up in this buffer
+        val nestedScriptImports = mutable.Buffer.empty[ImportData]
+        scriptImportCallback = { imports => nestedScriptImports ++= imports }
         val Preprocessor.Output(code, _) = blocks.head //pretty printing results is disabled for scripts
         Timer("processScript loop 1")
         val ev = evaluate(code, imports.flatten)
         Timer("processScript loop 2")
         ev match {
           case Res.Failure(msg) => throw new CompilationError(msg)
-          case Res.Success(ev) => loop(blocks.tail, imports :+ ev.imports)
+          case Res.Success(ev) => loop(blocks.tail, imports :+ (ev.imports ++ nestedScriptImports))
           case _ => loop(blocks.tail, imports)
         }
-      } else imports.lastOption.foreach(eval.update(_))
+      } else {
+        //if we have imports to pass to the upper layer we do that
+        imports.lastOption.foreach(outerScriptImportCallback)
+      }
     }
   }
 
