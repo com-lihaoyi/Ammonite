@@ -25,6 +25,19 @@ object BasePath{
       implicitly[pprint.PPrinter[String]].render(s, cfg)
     }
   }
+  def basePathPartialOrdering[ThisType <: BasePath[ThisType]] = new PartialOrdering[ThisType] {
+    def lteq(x: ThisType, y: ThisType): Boolean = y.segments.startsWith(x.segments)
+    override def equiv(x: ThisType, y: ThisType): Boolean = x == y
+    def tryCompare(x: ThisType, y: ThisType): Option[Int] =
+      if (equiv(x, y))
+        Some(0)
+      else if (lteq(x, y))
+        Some(-1)
+      else if (gteq(x, y))
+        Some(1)
+      else
+        None
+  }
 }
 
 /**
@@ -81,6 +94,8 @@ trait BasePath[ThisType <: BasePath[ThisType]]{
 }
 
 trait BasePathImpl[ThisType <: BasePath[ThisType]] extends BasePath[ThisType]{
+  this: ThisType =>
+
   def segments: Seq[String]
 
   def make(p: Seq[String], ups: Int): ThisType
@@ -90,10 +105,10 @@ trait BasePathImpl[ThisType <: BasePath[ThisType]] extends BasePath[ThisType]{
     math.max(subpath.ups - segments.length, 0)
   )
 
-  def >=(target: ThisType) = this.segments.startsWith(target.segments)
-  def >(target: ThisType) = this >= target && this != target
-  def <=(target: ThisType) = target.segments.startsWith(this.segments)
-  def <(target: ThisType) = this <= target && this != target
+  def >=(target: ThisType) = BasePath.basePathPartialOrdering[ThisType].gteq(this, target)
+  def >(target: ThisType) = BasePath.basePathPartialOrdering[ThisType].gt(this, target)
+  def <=(target: ThisType) = BasePath.basePathPartialOrdering[ThisType].lteq(this, target)
+  def <(target: ThisType) = BasePath.basePathPartialOrdering[ThisType].lt(this, target)
   /**
    * Gives you the file extension of this path, or the empty
    * string if there is no extension
@@ -192,6 +207,8 @@ object RelPath extends RelPathStuff with (String => RelPath){
   implicit val relPathRepr = pprint.PPrinter[ammonite.ops.RelPath]{(p, c) =>
     Iterator((Seq.fill(p.ups)("up") ++ p.segments.map(BasePath.reprSection(_, c).mkString)).mkString("/"))
   }
+
+  implicit val relPathPartialOrdering: PartialOrdering[RelPath] = BasePath.basePathPartialOrdering[RelPath]
 }
 object Path extends (String => Path){
   def apply(s: String): Path = {
@@ -222,6 +239,8 @@ object Path extends (String => Path){
   implicit def pathRepr = pprint.PPrinter[ammonite.ops.Path]{(p, c) =>
     Iterator("root") ++ p.segments.iterator.map("/" + BasePath.reprSection(_, c).mkString)
   }
+
+  implicit val pathPartialOrdering: PartialOrdering[Path] = BasePath.basePathPartialOrdering[Path]
 }
 
 /**
