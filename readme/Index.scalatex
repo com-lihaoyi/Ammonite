@@ -56,22 +56,27 @@
     If you want some initialization code available to the REPL, you can add it to your @code{~/.ammonite/predef.scala}.
 
   @p
-    You can also try out Ammonite in an existing SBT project, add the following to your @code{build.sbt}
+    You can also try out Ammonite in an existing SBT project, add the following to @code{project/plugins.sbt}
 
   @hl.scala
-    libraryDependencies += "com.lihaoyi" % "ammonite-repl" % "@ammonite.Constants.version" % "test" cross CrossVersion.full
-
-    initialCommands in (Test, console) := """ammonite.repl.Repl.run("")"""
+    addSbtPlugin("com.lihaoyi" % "ammonite-sbt" % "@ammonite.Constants.version")
 
   @p
     After that, simple hit
   @code
-    sbt projectName/test:console
+    sbt projectName/ammonite:run
   @p
     To activate the Ammonite REPL
 
   @p
-    You can also pass a string to the @code{run} call containing any commands or imports you want executed at the start of every run. If you want Ammonite to be available in all projects, simply add the above snippet to a new file @code{~/.sbt/0.13/global.sbt}.
+    Hit
+  @code
+    sbt projectName/ammonite-test:run
+  @p
+    To activate the Ammonite REPL with the test build products and dependencies.
+
+  @p
+    You can also give @code{initialCommands in console} any commands or imports you want executed at the start of every run. If you want Ammonite to be available in all projects, simply add the above snippet to @code{~/.sbt/0.13/plugins/build.sbt}.
 
   @p
     If you have any questions, come hang out on the @sect.ref("Community", "mailing list or gitter channel") and get help!

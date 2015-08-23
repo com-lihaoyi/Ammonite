@@ -1,28 +1,16 @@
 import scalatex.ScalatexReadme
 import sbtassembly.AssemblyPlugin.defaultShellScript
 
-scalaVersion := "2.11.6"
-
-crossScalaVersions := Seq(
-  "2.10.3", "2.10.4", "2.10.5", "2.11.3", "2.11.4", "2.11.5", "2.11.6", "2.11.7"
-)
-
-publishArtifact := false
-
-publishTo := Some(Resolver.file("Unused transient repository", file("target/unusedrepo")))
-
-val sharedSettings = Seq(
+lazy val sharedSettings = Seq(
   scalaVersion := "2.11.7",
-  organization := "com.lihaoyi",
-  version := _root_.ammonite.Constants.version,
+  crossScalaVersions := Seq(
+    "2.10.3", "2.10.4", "2.10.5", "2.11.3", "2.11.4", "2.11.5", "2.11.6", "2.11.7"
+  ),
   libraryDependencies += "com.lihaoyi" %% "utest" % "0.3.0" % "test",
   testFrameworks += new TestFramework("utest.runner.Framework"),
   scalacOptions += "-target:jvm-1.7",
-  autoCompilerPlugins := true,
-  addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.2"),
   parallelExecution in Test := !scalaVersion.value.contains("2.10"),
   libraryDependencies ++= Seq(
-    "com.lihaoyi" %% "acyclic" % "0.1.2" % "provided",
     "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided"
   ) ++ (
     if (scalaVersion.value startsWith "2.11.") Nil
@@ -30,8 +18,20 @@ val sharedSettings = Seq(
       compilerPlugin("org.scalamacros" % s"paradise" % "2.0.1" cross CrossVersion.full),
       "org.scalamacros" %% s"quasiquotes" % "2.0.1"
     )
-  ),
+  )
+)
+
+lazy val acyclicSettings = Seq(
+  autoCompilerPlugins := true,
+  addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.2"),
+  libraryDependencies += "com.lihaoyi" %% "acyclic" % "0.1.2" % "provided"
+)
+
+lazy val publishSettings = Seq(
+  organization := "com.lihaoyi",
+  version := _root_.ammonite.Constants.version,
   publishTo := Some("releases" at "https://oss.sonatype.org/service/local/staging/deploy/maven2"),
+  pomIncludeRepository := { _ => false },
   pomExtra :=
     <url>https://github.com/lihaoyi/Ammonite</url>
       <licenses>
@@ -53,12 +53,20 @@ val sharedSettings = Seq(
       </developers>
 )
 
+lazy val noPublishSettings = Seq(
+  publish := (),
+  publishLocal := (),
+  publishArtifact := false
+)
+
 /**
  * Concise, type-safe operating-system operations in Scala: filesystem,
  * subprocesses, and other such things.
  */
 lazy val ops = project
-  .settings(sharedSettings:_*)
+  .settings(sharedSettings)
+  .settings(acyclicSettings)
+  .settings(publishSettings)
   .settings(
     name := "ammonite-ops",
     libraryDependencies += "com.lihaoyi" %% "pprint" % "0.3.4"
@@ -66,7 +74,9 @@ lazy val ops = project
 
 lazy val tools = project
   .dependsOn(ops)
-  .settings(sharedSettings:_*)
+  .settings(sharedSettings)
+  .settings(acyclicSettings)
+  .settings(publishSettings)
   .settings(
     name := "ammonite-tools",
     libraryDependencies += "com.lihaoyi" %% "pprint" % "0.3.4"
@@ -78,7 +88,9 @@ lazy val tools = project
  * can be run to test the REPL interactions
  */
 lazy val terminal = project
-  .settings(sharedSettings:_*)
+  .settings(sharedSettings)
+  .settings(acyclicSettings)
+  .settings(publishSettings)
   .settings(
     name := "ammonite-terminal"
   )
@@ -90,7 +102,9 @@ lazy val terminal = project
  */
 lazy val repl = project
   .dependsOn(terminal, ops)
-  .settings(sharedSettings:_*)
+  .settings(sharedSettings)
+  .settings(acyclicSettings)
+  .settings(publishSettings)
   .settings(
     crossVersion := CrossVersion.full,
     test in assembly := {},
@@ -151,6 +165,16 @@ lazy val repl = project
 //    fork in (Test, testOnly) := true
   )
 
+lazy val sbtPlugin = project.in(file("sbt-plugin"))
+  .settings(acyclicSettings)
+  .settings(publishSettings)
+  .settings(
+    // not specifying a scala version, should default to the one of SBT, which is what we want
+    name := "ammonite-sbt",
+    sbt.Keys.sbtPlugin := true,
+    (unmanagedSources in Compile) += baseDirectory.value/".."/"project"/"Constants.scala"
+  )
+
 lazy val readme = ScalatexReadme(
   projectId = "readme",
   wd = file(""),
@@ -162,10 +186,12 @@ lazy val readme = ScalatexReadme(
   (unmanagedSources in Compile) += baseDirectory.value/".."/"project"/"Constants.scala"
 )
 
-
-lazy val modules = project.aggregate(
+lazy val mainProjects = Seq[ProjectReference](
   ops, tools, terminal, repl
-).settings(
-  publishArtifact := false,
-  publishTo := Some(Resolver.file("Unused transient repository", file("target/unusedrepo")))
 )
+
+lazy val root = project.in(file("."))
+  .aggregate(mainProjects: _*)
+  .dependsOn(mainProjects.map(p => p: ClasspathDep[ProjectReference]): _*)
+  .settings(sharedSettings)
+  .settings(noPublishSettings)
