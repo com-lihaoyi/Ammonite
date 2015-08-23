@@ -83,10 +83,14 @@ class Interpreter(prompt0: Ref[String],
     val errors = blocks.collect{ case Res.Failure(err) => err }
     Timer("processScript 2")
     val outerScriptImportCallback = scriptImportCallback //we store the old value, because we will reassign this in the loop
-    if(!errors.isEmpty)
-      stdout(colors0().error() + errors.mkString("\n") + colors0().reset() + "\n")
-    else
-      loop(blocks.collect{ case Res.Success(o) => o }, Seq())
+    try{
+      if(!errors.isEmpty)
+        stdout(colors0().error() + errors.mkString("\n") + colors0().reset() + "\n")
+      else
+        loop(blocks.collect{ case Res.Success(o) => o }, Seq())
+    } finally {
+      scriptImportCallback = outerScriptImportCallback
+    }
     Timer("processScript 3")
     @tailrec def loop(blocks: Seq[Preprocessor.Output], imports: Seq[Seq[ImportData]]): Unit = {
       if(!blocks.isEmpty){
@@ -106,8 +110,6 @@ class Interpreter(prompt0: Ref[String],
       } else {
         //if we have imports to pass to the upper layer we do that
         imports.lastOption.foreach(outerScriptImportCallback)
-        //restore the old value
-        scriptImportCallback = outerScriptImportCallback
       }
     }
   }
