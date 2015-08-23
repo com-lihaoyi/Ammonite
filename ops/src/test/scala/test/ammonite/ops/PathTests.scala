@@ -125,6 +125,8 @@ object PathTests extends TestSuite{
         }
       }
       'Comparison{
+        implicitly[PartialOrdering[RelPath]]
+        implicitly[PartialOrdering[Path]]
         'Relative - assert(
           'omg/'wtf == 'omg/'wtf,
           'omg/'wtf != 'omg/'wtf/'bbq,
