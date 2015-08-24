@@ -236,5 +236,25 @@ object PathTests extends TestSuite{
 
       }
     }
+    'comparisons{
+
+      assert(
+        root >= root,
+        !(root > root),
+        root/'foo >= root,
+        root/'foo >= root/'foo,
+        !(root/'foo > root/'foo),
+        !(root/'foo > root/'bar),
+        !(root/'foo >= root/'bar),
+        !(root >= root/'bar)
+      )
+    }
+    'sorting{
+      assert(
+        Seq(root/'c, root, root/'b, root/'a).sorted == Seq(root, root/'a, root/'b, root/'c),
+        Seq(up/'c, up/up/'c, 'b/'c, 'a/'c, 'a/'d).sorted ==
+          Seq('a/'c, 'a/'d, 'b/'c, up/'c, up/up/'c)
+      )
+    }
   }
 }

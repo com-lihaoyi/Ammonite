@@ -64,14 +64,6 @@ trait BasePath[ThisType <: BasePath[ThisType]]{
    * This path starts with the target path and is strictly longer than it
    */
   def >(target: ThisType): Boolean
-  /**
-   * The target path starts with this path, including if it's identical
-   */
-  def <=(target: ThisType): Boolean
-  /**
-   * The target path starts with this path and is strictly longer than it
-   */
-  def <(target: ThisType): Boolean
 
   /**
    * The last segment in this path. Very commonly used, e.g. it
@@ -192,6 +184,9 @@ object RelPath extends RelPathStuff with (String => RelPath){
   implicit val relPathRepr = pprint.PPrinter[ammonite.ops.RelPath]{(p, c) =>
     Iterator((Seq.fill(p.ups)("up") ++ p.segments.map(BasePath.reprSection(_, c).mkString)).mkString("/"))
   }
+
+  implicit val relPathOrdering: Ordering[RelPath] =
+    Ordering.by((rp: RelPath) => (rp.ups, rp.segments.length, rp.segments.toIterable))
 }
 object Path extends (String => Path){
   def apply(s: String): Path = {
@@ -222,6 +217,9 @@ object Path extends (String => Path){
   implicit def pathRepr = pprint.PPrinter[ammonite.ops.Path]{(p, c) =>
     Iterator("root") ++ p.segments.iterator.map("/" + BasePath.reprSection(_, c).mkString)
   }
+
+  implicit val pathOrdering: Ordering[Path] =
+    Ordering.by((rp: Path) => (rp.segments.length, rp.segments.toIterable))
 }
 
 /**
