@@ -67,12 +67,12 @@ object PathTests extends TestSuite{
         }
         'Relativize{
           def eq[T](p: T, q: T) = assert(p == q)
-          * - eq('omg/'bbq/'wtf - 'omg/'bbq/'wtf, empty)
-          * - eq('omg/'bbq - 'omg/'bbq/'wtf, up)
-          * - eq('omg/'bbq/'wtf - 'omg/'bbq, empty/'wtf)
-          * - eq('omg/'bbq - 'omg/'bbq/'wtf, up)
-          * - eq(up/'omg/'bbq - 'omg/'bbq, up/up/up/'omg/'bbq)
-          * - intercept[PathError.NoRelativePath]('omg/'bbq - up/'omg/'bbq)
+          * - eq('omg/'bbq/'wtf relativeTo 'omg/'bbq/'wtf, empty)
+          * - eq('omg/'bbq relativeTo 'omg/'bbq/'wtf, up)
+          * - eq('omg/'bbq/'wtf relativeTo 'omg/'bbq, empty/'wtf)
+          * - eq('omg/'bbq relativeTo 'omg/'bbq/'wtf, up)
+          * - eq(up/'omg/'bbq relativeTo 'omg/'bbq, up/up/up/'omg/'bbq)
+          * - intercept[PathError.NoRelativePath]('omg/'bbq relativeTo up/'omg/'bbq)
         }
       }
       'AbsPath{
@@ -86,11 +86,11 @@ object PathTests extends TestSuite{
         }
         'Relativize{
           def eq[T](p: T, q: T) = assert(p == q)
-          * - eq(root/'omg/'bbq/'wtf - root/'omg/'bbq/'wtf, empty)
-          * - eq(root/'omg/'bbq - root/'omg/'bbq/'wtf, up)
-          * - eq(root/'omg/'bbq/'wtf - root/'omg/'bbq, empty/'wtf)
-          * - eq(root/'omg/'bbq - root/'omg/'bbq/'wtf, up)
-          * - intercept[PathError.NoRelativePath]('omg/'bbq - up/'omg/'bbq)
+          * - eq(root/'omg/'bbq/'wtf relativeTo root/'omg/'bbq/'wtf, empty)
+          * - eq(root/'omg/'bbq relativeTo root/'omg/'bbq/'wtf, up)
+          * - eq(root/'omg/'bbq/'wtf relativeTo root/'omg/'bbq, empty/'wtf)
+          * - eq(root/'omg/'bbq relativeTo root/'omg/'bbq/'wtf, up)
+          * - intercept[PathError.NoRelativePath]('omg/'bbq relativeTo up/'omg/'bbq)
         }
       }
       'Ups{
@@ -166,20 +166,20 @@ object PathTests extends TestSuite{
         val abs = cwd
         val rel = 'omg/'wtf
         compileError("""
-          abs - rel
+          abs relativeTo rel
         """).check(
           """
-          abs - rel
-                ^
+          abs relativeTo rel
+                         ^
           """,
           "type mismatch"
         )
         compileError("""
-          rel - abs
+          rel relativeTo abs
                      """).check(
             """
-          rel - abs
-                ^
+          rel relativeTo abs
+                         ^
             """,
             "type mismatch"
           )

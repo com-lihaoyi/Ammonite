@@ -285,7 +285,6 @@ object AdvancedTests extends TestSuite{
         @ // Useless - does not add plugins, and ignored by eval class loader
         
         @ load.plugin.ivy("eu.timepit" %% "refined" % "0.2.1")
-        error: failed to resolve ivy dependencies
 
         @ import eu.timepit.refined._
         error: not found: value eu
