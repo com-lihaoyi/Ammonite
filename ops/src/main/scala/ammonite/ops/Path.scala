@@ -59,11 +59,7 @@ trait BasePath[ThisType <: BasePath[ThisType]]{
   /**
    * This path starts with the target path, including if it's identical
    */
-  def >=(target: ThisType): Boolean
-  /**
-   * This path starts with the target path and is strictly longer than it
-   */
-  def >(target: ThisType): Boolean
+  def startsWith(target: ThisType): Boolean
 
   /**
    * The last segment in this path. Very commonly used, e.g. it
@@ -82,10 +78,6 @@ trait BasePathImpl[ThisType <: BasePath[ThisType]] extends BasePath[ThisType]{
     math.max(subpath.ups - segments.length, 0)
   )
 
-  def >=(target: ThisType) = this.segments.startsWith(target.segments)
-  def >(target: ThisType) = this >= target && this != target
-  def <=(target: ThisType) = target.segments.startsWith(this.segments)
-  def <(target: ThisType) = this <= target && this != target
   /**
    * Gives you the file extension of this path, or the empty
    * string if there is no extension
@@ -136,6 +128,8 @@ case class RelPath(segments: Seq[String], ups: Int) extends BasePathImpl[RelPath
     } else throw PathError.NoRelativePath(this, base)
   }
 
+  def startsWith(target: RelPath) = this.segments.startsWith(target.segments) && this.ups == target.ups
+
   override def toString = (Seq.fill(ups)("..") ++ segments).mkString("/")
   override def hashCode = segments.hashCode() + ups.hashCode()
   override def equals(o: Any): Boolean = o match {
@@ -175,6 +169,7 @@ object RelPath extends RelPathStuff with (String => RelPath){
     new RelPath(Seq(s), 0)
 
   }
+
   implicit def SeqPath[T](s: Seq[T])(implicit conv: T => RelPath): RelPath = {
     s.foldLeft(empty){_ / _}
   }
@@ -242,6 +237,9 @@ case class Path(segments: Seq[String]) extends BasePathImpl[Path]{
     case _ => false
   }
   override def hashCode = segments.hashCode()
+
+  def startsWith(target: Path) = this.segments.startsWith(target.segments)
+
   def -(base: Path): RelPath = {
     var newUps = 0
     var s2 = base.segments

@@ -128,18 +128,19 @@ object PathTests extends TestSuite{
         'Relative - assert(
           'omg/'wtf == 'omg/'wtf,
           'omg/'wtf != 'omg/'wtf/'bbq,
-          'omg/'wtf < 'omg/'wtf/'bbq,
-          'omg/'wtf/'bbq > 'omg/'wtf,
-          !('omg/'wtf > 'omg/'wtf/'bbq),
-          !('omg/'wtf/'bbq < 'omg/'wtf)
+          'omg/'wtf/'bbq startsWith 'omg/'wtf,
+          'omg/'wtf startsWith 'omg/'wtf,
+          up/'omg/'wtf startsWith up/'omg/'wtf,
+          !('omg/'wtf startsWith 'omg/'wtf/'bbq),
+          !(up/'omg/'wtf startsWith 'omg/'wtf),
+          !('omg/'wtf startsWith up/'omg/'wtf)
         )
         'Absolute - assert(
           root/'omg/'wtf == root/'omg/'wtf,
           root/'omg/'wtf != root/'omg/'wtf/'bbq,
-          root/'omg/'wtf < root/'omg/'wtf/'bbq,
-          root/'omg/'wtf/'bbq > root/'omg/'wtf,
-          !(root/'omg/'wtf > root/'omg/'wtf/'bbq),
-          !(root/'omg/'wtf/'bbq < root/'omg/'wtf)
+          root/'omg/'wtf/'bbq startsWith root/'omg/'wtf,
+          root/'omg/'wtf startsWith root/'omg/'wtf,
+          !(root/'omg/'wtf startsWith root/'omg/'wtf/'bbq)
         )
         'Invalid{
           compileError("""root/'omg/'wtf < 'omg/'wtf""")
@@ -235,19 +236,6 @@ object PathTests extends TestSuite{
         }
 
       }
-    }
-    'comparisons{
-
-      assert(
-        root >= root,
-        !(root > root),
-        root/'foo >= root,
-        root/'foo >= root/'foo,
-        !(root/'foo > root/'foo),
-        !(root/'foo > root/'bar),
-        !(root/'foo >= root/'bar),
-        !(root >= root/'bar)
-      )
     }
     'sorting{
       assert(
