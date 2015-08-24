@@ -284,10 +284,10 @@ object AdvancedTests extends TestSuite{
 
         @ // Useless - does not add plugins, and ignored by eval class loader
         
-        @ load.plugin.ivy("eu.timepit" %% "refined" % "0.2.1")
+        @ load.plugin.ivy("com.lihaoyi" %% "scalatags" % "0.4.5")
 
-        @ import eu.timepit.refined._
-        error: not found: value eu
+        @ import scalatags.JsDom
+        error: not found: value scalatags
       """)
     }
     'replApiUniqueness{
