@@ -154,7 +154,7 @@ object mv extends Function2[Path, Path, Unit] with Internals.Mover{
 object cp extends Function2[Path, Path, Unit] {
   def apply(from: Path, to: Path) = {
     def copyOne(p: Path) = {
-      Files.copy(Paths.get(p.toString), Paths.get((to/(p - from)).toString))
+      Files.copy(Paths.get(p.toString), Paths.get((to/(p relativeTo from)).toString))
     }
 
     copyOne(from)
@@ -222,7 +222,7 @@ trait ImplicitOp[V] extends Function1[Path, V]{
  * List the files and folders in a directory
  */
 object ls extends StreamableOp1[Path, Path, LsSeq] with ImplicitOp[LsSeq]{
-  def materialize(src: Path, i: Iterator[Path]) = new LsSeq(src, i.map(_-src).toVector.sorted:_*)
+  def materialize(src: Path, i: Iterator[Path]) = new LsSeq(src, i.map(_relativeTosrc).toVector.sorted:_*)
   def !!(arg: Path): SelfClosingIterator[Path] = {
     import scala.collection.JavaConverters._
     val dirStream = Files.newDirectoryStream(arg.nio)
@@ -238,7 +238,7 @@ object ls extends StreamableOp1[Path, Path, LsSeq] with ImplicitOp[LsSeq]{
    * string, as a Seq[String] of lines, or as a Array[Byte]
    */
   object rec extends StreamableOp1[Path, Path, LsSeq]with ImplicitOp[LsSeq]{
-    def materialize(src: Path, i: Iterator[Path]) = new LsSeq(src, i.map(_-src).toVector.sorted:_*)
+    def materialize(src: Path, i: Iterator[Path]) = new LsSeq(src, i.map(_relativeTosrc).toVector.sorted:_*)
     def recursiveListFiles(p: Path): Iterator[Path] = {
       def these = ls!! p
       these ++ these.filter(stat(_).isDir).flatMap(recursiveListFiles)

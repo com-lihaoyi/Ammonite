@@ -54,7 +54,7 @@ trait BasePath[ThisType <: BasePath[ThisType]]{
    * relative path that satisfies the above requirement in the general
    * case.
    */
-  def -(target: ThisType): RelPath
+  def relativeTo(target: ThisType): RelPath
 
   /**
    * This path starts with the target path, including if it's identical
@@ -112,7 +112,7 @@ case class RelPath(segments: Seq[String], ups: Int) extends BasePathImpl[RelPath
   require(ups >= 0)
   segments.foreach(BasePath.checkSegment)
   def make(p: Seq[String], ups: Int) = new RelPath(p, ups + this.ups)
-  def -(base: RelPath): RelPath = {
+  def relativeTo(base: RelPath): RelPath = {
     if (base.ups < ups) {
       new RelPath(segments, ups + base.segments.length)
     } else if (base.ups == ups) {
@@ -240,7 +240,7 @@ case class Path(segments: Seq[String]) extends BasePathImpl[Path]{
 
   def startsWith(target: Path) = this.segments.startsWith(target.segments)
 
-  def -(base: Path): RelPath = {
+  def relativeTo(base: Path): RelPath = {
     var newUps = 0
     var s2 = base.segments
 

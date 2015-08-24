@@ -275,7 +275,7 @@ object ExampleTests extends TestSuite{
     }
     'allSubpathsResolveCorrectly{
       for(abs <- ls.rec! cwd){
-        val rel = abs - cwd
+        val rel = abs relativeTo cwd
         assert(rel.ups == 0)
         assert(cwd / rel == abs)
       }

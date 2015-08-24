@@ -76,7 +76,7 @@ object Storage{
       val classFiles = ls(cacheDir).filter(_.ext == "class")
       Try{
         val data = classFiles.map{ case file =>
-          val className = (file - cacheDir).toString.stripSuffix(".class")
+          val className = (file relativeTo cacheDir).toString.stripSuffix(".class")
           (className, read.bytes(file))
         }
         data
