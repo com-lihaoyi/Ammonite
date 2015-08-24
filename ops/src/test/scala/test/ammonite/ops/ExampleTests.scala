@@ -226,10 +226,10 @@ object ExampleTests extends TestSuite{
 
       // The relative difference between two paths
       val target = cwd/'target/'file
-      assert(target - cwd == 'target/'file)
+      assert(target relativeTo cwd == 'target/'file)
 
       // `up`s get resolved automatically
-      val minus = cwd - target
+      val minus = cwd relativeTo target
       val ups = up/up
       assert(minus == ups)
       rel1: RelPath
