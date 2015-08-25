@@ -195,7 +195,6 @@ object Pressy {
      * the outside caller probably doesn't care.
      */
     def complete(snippetIndex: Int, previousImports: String, snippet: String): (Int, Seq[String], Seq[String]) = {
-
       val prefix = previousImports + "\nobject AutocompleteWrapper{\n"
       val suffix = "\n}"
       val allCode =  prefix + snippet + suffix
