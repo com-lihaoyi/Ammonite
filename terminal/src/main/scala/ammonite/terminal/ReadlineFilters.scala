@@ -42,8 +42,10 @@ object ReadlineFilters {
     Case(Alt + "b")((b, c, m) => GUILikeFilters.wordLeft(b, c)), // <- one word
     Case(Alt + "f")((b, c, m) => GUILikeFilters.wordRight(b, c)), // -> one  word
     Case(Home)((b, c, m) => BasicFilters.moveStart(b, c, m.width)), // <- one line
+    Case(HomeScreen)((b, c, m) => BasicFilters.moveStart(b, c, m.width)), // <- one line
     Case(Ctrl('a'))((b, c, m) => BasicFilters.moveStart(b, c, m.width)),
     Case(End)((b, c, m) => BasicFilters.moveEnd(b, c, m.width)), // -> one line
+    Case(EndScreen)((b, c, m) => BasicFilters.moveEnd(b, c, m.width)), // -> one line
     Case(Ctrl('e'))((b, c, m) => BasicFilters.moveEnd(b, c, m.width))
   )
 

@@ -31,6 +31,13 @@ object SpecialKeys {
   val Home = Alt+"OH"
   val End = Alt+"OF"
 
+  // For some reason Screen makes these print different incantations
+  // from a normal snippet, so this causes issues like
+  // https://github.com/lihaoyi/Ammonite/issues/152 unless we special
+  // case them
+  val HomeScreen = Alt+"[1~"
+  val EndScreen = Alt+"[4~"
+
   val ShiftUp = Alt+"[1;2A"
   val ShiftDown = Alt+"[1;2B"
   val ShiftRight = Alt+"[1;2C"
