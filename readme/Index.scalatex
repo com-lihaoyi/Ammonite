@@ -31,7 +31,7 @@
     One way to get started with Ammonite is to download the standalone executable:
 
   @hl.sh
-    $ curl -L -o amm http://git.io/v3Xln; chmod +x amm; ./amm
+    $ curl -L -o amm http://git.io/vGksC; chmod +x amm; ./amm
 
 
   @hl.scala
@@ -709,6 +709,8 @@
         Trim all the useless members of @hl.scala{Any} from the default import lists.
       @li
         Fix a file-handle-leak for most usages of @code{read.lines} and @code{ls}/@code{ls.rec}
+      @li
+        Fix bugs @a("#186", href:="https://github.com/lihaoyi/Ammonite/issues/186"), @a("#152", href:="https://github.com/lihaoyi/Ammonite/issues/152"), @a("#149", href:="https://github.com/lihaoyi/Ammonite/issues/149"), @a("#180", href:="https://github.com/lihaoyi/Ammonite/issues/180")
   @sect{0.4.5}
     @ul
       @li
