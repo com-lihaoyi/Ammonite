@@ -111,8 +111,11 @@ object FrontEnd{
               }
               tabulate(colored, Ammonite.this.width).foreach(writer.write)
               writer.flush()
-              val newBuffer = b.take(newCursor) ++ common ++ b.drop(c)
-              TermState(rest, newBuffer, newCursor + common.length)
+              if (details.length != 0) TermState(rest, b, c)
+              else {
+                val newBuffer = b.take(newCursor) ++ common ++ b.drop(c)
+                TermState(rest, newBuffer, newCursor + common.length)
+              }
             }
           }
       }

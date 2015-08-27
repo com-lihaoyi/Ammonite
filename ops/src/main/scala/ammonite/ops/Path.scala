@@ -141,10 +141,10 @@ trait RelPathStuff{
   val up = new RelPath(Nil, 1)
   val empty = new RelPath(Nil, 0)
   implicit class RelPathStart(p1: String){
-    def /(p2: RelPath) = empty/p1/p2
+    def /(subpath: RelPath) = empty/p1/subpath
   }
   implicit class RelPathStart2(p1: Symbol){
-    def /(p2: RelPath) = empty/p1/p2
+    def /(subpath: RelPath) = empty/p1/subpath
   }
 }
 object RelPath extends RelPathStuff with (String => RelPath){
