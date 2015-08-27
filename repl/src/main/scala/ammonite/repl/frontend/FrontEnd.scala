@@ -85,6 +85,7 @@ object FrontEnd{
       val autocompleteFilter: TermCore.Filter = {
         case TermInfo(TermState(9 ~: rest, b, c), width) => // Enter
           val (newCursor, completions, details) = compilerComplete(c, b.mkString)
+          // If we find nothing, we find nothing
           if (completions.length == 0 && details.length == 0) TermState(rest, b, c)
           else {
             writer.write("\n")
@@ -101,7 +102,7 @@ object FrontEnd{
             }
 
             writer.flush()
-
+            // If we find no completions, we've already printed the details to abort
             if (completions.length == 0) TermState(rest, b, c)
             else {
               val common = findPrefix(completions.head, completions.last, 0)
@@ -111,6 +112,8 @@ object FrontEnd{
               }
               tabulate(colored, Ammonite.this.width).foreach(writer.write)
               writer.flush()
+              // If the current prefix already matches a detailed result, we've
+              // already printed the messages but no need to modify buffer
               if (details.length != 0) TermState(rest, b, c)
               else {
                 val newBuffer = b.take(newCursor) ++ common ++ b.drop(c)
