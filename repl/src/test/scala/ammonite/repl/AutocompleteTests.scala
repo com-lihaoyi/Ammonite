@@ -142,6 +142,23 @@ object AutocompleteTests extends TestSuite{
 //      complete("""Seq(1, 2, 3).map(_.co<caret>mpa)""", compares ^)
 //      complete("""Seq(1, 2, 3).map(_.<caret>compa)""", compares, ^)
     }
+    'path{
+      'parse{
+        def check(s: String, output: (Option[String], Seq[String], Option[String])) = {
+          val i = s.length - s.indexOf("<caret>")
+          val value = Parsers.PathComplete.RevPath.parse(s.reverse, i).get.value
+          assert(value == output)
+        }
+        check("""'hello/<caret>""", (None, Seq("hello"), None))
+        check("""'hello / <caret>""", (None, Seq("hello"), None))
+        check("""'hello / 'worl<caret>""", (Some("worl"), Seq("hello"), None))
+        check("""'hello / "world" / <caret>""", (None, Seq("hello", "world"), None))
+        check("""'hello / "world" / "foo<caret>""", (Some("foo"), Seq("hello", "world"), None))
+        check("""'hello / "\"" / "foo<caret>""", (Some("foo"), Seq("hello", "\""), None))
+        check("""wd/ 'hello / "\"" / "foo<caret>""", (Some("foo"), Seq("hello", "\""), Some("wd")))
+        check("""`  ` / 'hello / "\"" / "foo<caret>""", (Some("foo"), Seq("hello", "\""), Some("`  `")))
+      }
+    }
   }
 }
 

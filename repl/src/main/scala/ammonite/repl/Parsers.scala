@@ -1,5 +1,7 @@
 package ammonite.repl
 
+import fastparse.all._
+
 object Parsers {
 
   import fastparse.noApi._
@@ -48,5 +50,18 @@ object Parsers {
       case Result.Success(contents, _) => Some(contents)
       case _ => None
     }
+  }
+
+  object PathComplete{
+
+    val RevSymbol = P( WS ~ (!"/") ~ scalaparse.syntax.Basic.LetterDigitDollarUnderscore.rep(1).!.map(_.reverse) ~ "'" )
+    def SingleChars = P( (!"\"" ~ AnyChar | "\"\\" ).rep )
+    val RevString0 = P( WS ~ (!"/") ~ SingleChars.!.map(_.reverse.replace("\\\"", "\"").replace("\\\\", "\\")) ~ "\"" )
+    val RevString = P( "\"" ~! RevString0 )
+
+    val Head = P( (RevString0 | RevSymbol).? )
+    val Body = P( ("/" ~ (RevSymbol | RevString)).rep.map(_.reverse) )
+    val Tail = P( ("/" ~ scalaparse.syntax.Identifiers.Id.!.map(_.reverse)).? )
+    val RevPath = P( Head ~ Body ~ Tail )
   }
 }
