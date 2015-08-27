@@ -46,5 +46,5 @@ package object ops extends ShelloutRoots(Nil, false) with Extensions with RelPat
 
   implicit def fileData(p: Path) = stat.full(p)
 
-  implicit class PathCallable[T <% Path](p: T) extends ShelloutRoots(List(p.toString), true)
+  implicit class PathCallable[T <% Path](p: T) extends ShelloutRoots(List((p: Path).toString), true)
 }
