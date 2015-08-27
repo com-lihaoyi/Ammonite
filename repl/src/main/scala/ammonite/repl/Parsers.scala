@@ -54,14 +54,21 @@ object Parsers {
 
   object PathComplete{
 
-    val RevSymbol = P( WS ~ (!"/") ~ scalaparse.syntax.Basic.LetterDigitDollarUnderscore.rep(1).!.map(_.reverse) ~ "'" )
+    def RevSymbolBase(i: Int) = P( WS ~ (!"/") ~ scalaparse.syntax.Basic.LetterDigitDollarUnderscore.rep(i).!.map(_.reverse) ~ "'" )
+    val RevSymbol0 = P( RevSymbolBase(0) )
+    val RevSymbol = P( RevSymbolBase(1) )
     def SingleChars = P( (!"\"" ~ AnyChar | "\"\\" ).rep )
     val RevString0 = P( WS ~ (!"/") ~ SingleChars.!.map(_.reverse.replace("\\\"", "\"").replace("\\\\", "\\")) ~ "\"" )
     val RevString = P( "\"" ~! RevString0 )
 
-    val Head = P( (RevString0 | RevSymbol).? )
+    val Head = P( (RevString0 | RevSymbol0).? )
     val Body = P( ("/" ~ (RevSymbol | RevString)).rep.map(_.reverse) )
     val Tail = P( ("/" ~ scalaparse.syntax.Identifiers.Id.!.map(_.reverse)).? )
-    val RevPath = P( Head ~ Body ~ Tail )
+    val RevPath = P( (Head ~~ Index ~ Body ~ Tail).map{case (a, i, b, c) => (c, b, a, i)} )
+
+    def stringSymWrap(s: String) = (scalaparse.syntax.Identifiers.Id ~ End).parse(s, 0)  match{
+      case Result.Success(v, _) =>  "'" + s
+      case f: Result.Failure => "\"" + pprint.PPrinter.escape(s) + "\""
+    }
   }
 }

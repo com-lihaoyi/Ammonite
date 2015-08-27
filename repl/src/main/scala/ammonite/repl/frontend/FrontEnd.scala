@@ -74,6 +74,35 @@ object FrontEnd{
       Timer("FrontEnd.Ammonite.action end")
       res
     }
+
+    def doSomething(completions: Seq[String],
+                    details: Seq[String],
+                    writer: OutputStreamWriter,
+                    rest: LazyList[Int],
+                    b: Vector[Char],
+                    c: Int) = {
+      // If we find nothing, we find nothing
+      if (completions.length == 0 && details.length == 0) None
+      else {
+        writer.write("\n")
+        details.foreach(writer.write)
+        writer.write("\n")
+      }
+
+      writer.flush()
+      // If we find no completions, we've already printed the details to abort
+      if (completions.length == 0) None
+      else {
+
+        tabulate(completions, Ammonite.this.width).foreach(writer.write)
+        writer.flush()
+        // If the current prefix already matches a detailed result, we've
+        // already printed the messages but no need to modify buffer
+        if (details.length != 0) None
+        else Some()
+      }
+    }
+
     def readLine(reader: java.io.Reader,
                  output: OutputStream,
                  prompt: String,
@@ -82,44 +111,53 @@ object FrontEnd{
                  history: Seq[String]) = {
       Timer("FrontEnd.Ammonite.readLine start")
       val writer = new OutputStreamWriter(output)
+
       val autocompleteFilter: TermCore.Filter = {
         case TermInfo(TermState(9 ~: rest, b, c), width) => // Enter
-          val (newCursor, completions, details) = compilerComplete(c, b.mkString)
-          // If we find nothing, we find nothing
-          if (completions.length == 0 && details.length == 0) TermState(rest, b, c)
-          else {
-            writer.write("\n")
-            for (d <- details){
-              writer.write(Highlighter.defaultHighlight(
-                d.toVector,
-                colors.comment(),
-                colors.`type`(),
-                colors.literal(),
-                colors.keyword(),
-                colors.reset()
-              ).mkString)
-              writer.write("\n")
-            }
+          val p = Parsers.PathComplete.RevPath.parse(b.reverse.mkString, b.length - c)
+          p match{
+            case Result.Success((base, seq, frag, cursorOffset), _) =>
+              import ammonite.ops._
+              if (base == None) {
+                if (exists(cwd/seq)) {
+                  val options = ls ! cwd / seq |? (_.last.startsWith(frag.getOrElse(""))) | (_.last)
+                  val (completions, details) = options.partition(_ != frag.getOrElse(""))
+                  lazy val common = findPrefix(completions.head, completions.last, 0)
+                  doSomething(completions, details, writer, rest, b, c) match{
+                    case None => TermState(rest, b, c)
+                    case Some(_) =>
+                      val newBuffer = b.take(c - cursorOffset + 1) ++ Parsers.PathComplete.stringSymWrap(common) ++ b.drop(c)
+                      TermState(rest, newBuffer, c - cursorOffset + common.length + 1)
+                  }
+                }else TermState(rest, b, c)
+              }else TermState(rest, b, c)
 
-            writer.flush()
-            // If we find no completions, we've already printed the details to abort
-            if (completions.length == 0) TermState(rest, b, c)
-            else {
-              val common = findPrefix(completions.head, completions.last, 0)
-              val colored = for(comp <- completions) yield {
+
+            case f: Result.Failure =>
+              val (newCursor, completions, details) = compilerComplete(c, b.mkString)
+              val details2 = for (d <- details) yield {
+                Highlighter.defaultHighlight(
+                  d.toVector,
+                  colors.comment(),
+                  colors.`type`(),
+                  colors.literal(),
+                  colors.keyword(),
+                  colors.reset()
+                ).mkString
+              }
+              lazy val common = findPrefix(completions.head, completions.last, 0)
+              val completions2 = for(comp <- completions) yield {
+
                 val (left, right) = comp.splitAt(common.length)
                 colors.comment() + left + colors.reset() + right
               }
-              tabulate(colored, Ammonite.this.width).foreach(writer.write)
-              writer.flush()
-              // If the current prefix already matches a detailed result, we've
-              // already printed the messages but no need to modify buffer
-              if (details.length != 0) TermState(rest, b, c)
-              else {
-                val newBuffer = b.take(newCursor) ++ common ++ b.drop(c)
-                TermState(rest, newBuffer, newCursor + common.length)
+              doSomething(completions2, details2, writer, rest, b, c) match{
+                case None =>
+                  TermState(rest, b, c)
+                case Some(_) =>
+                  val newBuffer = b.take(newCursor) ++ common ++ b.drop(c)
+                  TermState(rest, newBuffer, newCursor + common.length)
               }
-            }
           }
       }
 
