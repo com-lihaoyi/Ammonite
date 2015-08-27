@@ -695,6 +695,10 @@
       @a("Gitter Channel", href:="https://gitter.im/lihaoyi/Ammonite")
 
 @sect{Changelog}
+  @sect{0.4.7}
+    @ul
+      @li
+        Fix execution of files via symbols in the current working directory.
   @sect{0.4.6}
     @ul
       @li
