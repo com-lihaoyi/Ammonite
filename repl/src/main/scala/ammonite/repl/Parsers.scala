@@ -66,9 +66,12 @@ object Parsers {
     val Tail = P( ("/" ~ scalaparse.syntax.Identifiers.Id.!.map(_.reverse)).? )
     val RevPath = P( (Head ~~ Index ~ Body ~ Tail).map{case (a, i, b, c) => (c, b, a, i)} )
 
-    def stringSymWrap(s: String) = (scalaparse.syntax.Identifiers.Id ~ End).parse(s, 0)  match{
-      case Result.Success(v, _) =>  "'" + s
-      case f: Result.Failure => "\"" + pprint.PPrinter.escape(s) + "\""
+    def stringSymWrap(s: String) = {
+      if (s == "") "'"
+      else (scalaparse.syntax.Identifiers.Id ~ End).parse(s, 0)  match{
+        case Result.Success(v, _) =>  "'" + s
+        case f: Result.Failure => "\"" + pprint.PPrinter.escape(s) + "\""
+      }
     }
   }
 }

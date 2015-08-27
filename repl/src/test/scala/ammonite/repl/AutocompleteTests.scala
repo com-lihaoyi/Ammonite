@@ -157,6 +157,8 @@ object AutocompleteTests extends TestSuite{
         check("""'hello / "\"" / "foo<caret>""", (None, Seq("hello", "\""), Some("foo"), 4))
         check("""wd/ 'hello / "\"" / "foo<caret>""", (Some("wd"), Seq("hello", "\""), Some("foo"), 4))
         check("""`  ` / 'hello / "\"" / "foo<caret>""", (Some("`  `"), Seq("hello", "\""), Some("foo"), 4))
+        check("""home/'fi<caret>""", (Some("home"), Nil, Some("fi"), 3))
+        check("""home/'fi<caret>nd""", (Some("home"), Nil, Some("fi"), 3))
       }
       'complete{
 

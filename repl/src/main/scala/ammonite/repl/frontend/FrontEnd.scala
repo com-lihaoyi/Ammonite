@@ -112,28 +112,51 @@ object FrontEnd{
       Timer("FrontEnd.Ammonite.readLine start")
       val writer = new OutputStreamWriter(output)
 
+      def revPath(b: Vector[Char], c: Int) = {
+        Parsers.PathComplete.RevPath.parse(b.take(c).reverse.mkString, 0)
+      }
+      import ammonite.ops._
+      val rootMap = Map(
+        None -> cwd,
+        Some("wd") -> cwd,
+        Some("root") -> root,
+        Some("home") -> home
+      )
+      def okRevPath(v: Result[(Option[String], Seq[String], Option[String], Int)]) = v match{
+        case _: Result.Failure => false
+        case Result.Success(v, _) => rootMap.keySet.contains(v._1)
+      }
+
       val autocompleteFilter: TermCore.Filter = {
-        case TermInfo(TermState(9 ~: rest, b, c), width) => // Enter
-          val p = Parsers.PathComplete.RevPath.parse(b.reverse.mkString, b.length - c)
-          p match{
-            case Result.Success((base, seq, frag, cursorOffset), _) =>
-              import ammonite.ops._
-              if (base == None) {
-                if (exists(cwd/seq)) {
-                  val options = ls ! cwd / seq |? (_.last.startsWith(frag.getOrElse(""))) | (_.last)
-                  val (completions, details) = options.partition(_ != frag.getOrElse(""))
-                  lazy val common = findPrefix(completions.head, completions.last, 0)
-                  doSomething(completions, details, writer, rest, b, c) match{
-                    case None => TermState(rest, b, c)
-                    case Some(_) =>
-                      val newBuffer = b.take(c - cursorOffset + 1) ++ Parsers.PathComplete.stringSymWrap(common) ++ b.drop(c)
-                      TermState(rest, newBuffer, c - cursorOffset + common.length + 1)
-                  }
-                }else TermState(rest, b, c)
+        case TermInfo(TermState(9 ~: rest, b, c), width) if okRevPath(revPath(b, c)) => // Enter
+
+          revPath(b, c) match{
+            case Result.Success((base, seq, frag, cursorOffset), _)
+              if (seq ++ base ++ frag).length > 0 =>
+
+              val path = rootMap(base)/seq
+
+              if (exists(path)) {
+                val options = ls ! path |? (_.last.startsWith(frag.getOrElse("")))
+                val (completions, details) = options.partition(_.last != frag.getOrElse(""))
+
+                val completions2 = completions.map(_.last)
+                                              .map(Parsers.PathComplete.stringSymWrap)
+                                              .map(colors.literal() + _ + colors.reset())
+
+                import pprint.Config.Colors.PPrintConfig
+                val details2 = details.map(x => pprint.tokenize(stat(x)).mkString)
+                lazy val common = findPrefix(completions.head.last, completions.last.last, 0)
+                doSomething(completions2, details2, writer, rest, b, c) match{
+                  case None => TermState(rest, b, c)
+                  case Some(_) =>
+                    val newBuffer = b.take(c - cursorOffset) ++ Parsers.PathComplete.stringSymWrap(common) ++ b.drop(c)
+                    TermState(rest, newBuffer, c - cursorOffset + common.length + 1)
+                }
               }else TermState(rest, b, c)
 
 
-            case f: Result.Failure =>
+            case _ =>
               val (newCursor, completions, details) = compilerComplete(c, b.mkString)
               val details2 = for (d <- details) yield {
                 Highlighter.defaultHighlight(
