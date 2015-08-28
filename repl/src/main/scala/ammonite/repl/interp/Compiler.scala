@@ -134,10 +134,13 @@ object Compiler{
         elem = scala.xml.XML.load(url.openStream())
         name = (elem \\ "plugin" \ "name").text
         className = (elem \\ "plugin" \ "classname").text
-        // acyclic seems to conflict with AmmonitePlugin (happens during the tests in particular), so it's
-        // filtered out here. Else it raises:
-        //   scala.reflect.internal.FatalError: Multiple phases want to run right after typer; followers:
+        // acyclic seems to conflict with AmmonitePlugin (happens during the
+        // tests in particular), so it's filtered out here. Else it raises:
+        //
+        //   scala.reflect.internal.FatalError: Multiple phases want
+        //   to run right after typer; followers:
         //   AmmonitePhase,acyclic; created phase-order.dot
+
         if name != "acyclic"
         if name.nonEmpty && className.nonEmpty
         classOpt =
@@ -177,7 +180,8 @@ object Compiler{
           } yield plugin
         }
 
-        override def classPath = platform.classPath // Actually jcp, avoiding a path-dependent type issue in 2.10 here
+        // Actually jcp, avoiding a path-dependent type issue in 2.10 here
+        override def classPath = platform.classPath
         override lazy val platform: ThisPlatform = new JavaPlatform{
           val global: g.type = g
           override def classPath = jcp

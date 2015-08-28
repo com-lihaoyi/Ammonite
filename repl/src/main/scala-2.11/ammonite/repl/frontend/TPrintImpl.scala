@@ -103,9 +103,13 @@ object TPrintLowPri{
         suffix <- t.info match {
           case PolyType(typeParams, resultType) =>
             val paramTree = printArgSyms(t.asInstanceOf[TypeSymbol].typeParams)
-            val resultBounds = if (resultType =:= typeOf[Any]) q"$s" else q""" " <: " + ${implicitRec(resultType)} """
+            val resultBounds =
+              if (resultType =:= typeOf[Any]) q"$s"
+              else q""" " <: " + ${implicitRec(resultType)} """
+
             Some(q""" $paramTree + $resultBounds""")
-          case TypeBounds(lo, hi) if t.toString.contains("$") && lo =:= typeOf[Nothing] && hi =:= typeOf[Any] =>
+          case TypeBounds(lo, hi)
+            if t.toString.contains("$") && lo =:= typeOf[Nothing] && hi =:= typeOf[Any] =>
             None
           case TypeBounds(lo, hi) =>
             Some( printBounds(lo, hi) )
@@ -114,8 +118,15 @@ object TPrintLowPri{
           if (t.toString.endsWith(".type")) {
             val TypeBounds(lo, hi) = t.info
             val RefinedType(parents, defs) = hi
-            val filtered = internal.refinedType(parents.filter(x => !(x =:= typeOf[scala.Singleton])), defs)
-            q""" "val " + ${literalColor(q"${t.name.toString.stripSuffix(".type")}")} + ": " + ${implicitRec(filtered)}"""
+            val filtered = internal.refinedType(
+              parents.filter(x => !(x =:= typeOf[scala.Singleton])),
+              defs
+            )
+
+            q"""
+              "val " + ${literalColor(q"${t.name.toString.stripSuffix(".type")}")} +
+              ": " + ${implicitRec(filtered)}
+            """
           }else {
             q""" "type " + ${printSym(t)} + $suffix """
           }
@@ -153,7 +164,9 @@ object TPrintLowPri{
           case Some(block) => q"""${implicitRec(underlying)} + " forSome { " + $block +  " }" """
         }
       case AnnotatedType(annots, tp)    =>
-        q"${implicitRec(tp)} + ${annots.map(x => q""" " @" + ${implicitRec(x.tpe)}""").reduceLeft((x, y) => q"$x + $y")}"
+        val mapped = annots.map(x => q""" " @" + ${implicitRec(x.tpe)}""")
+                           .reduceLeft((x, y) => q"$x + $y")
+        q"${implicitRec(tp)} + $mapped"
       case RefinedType(parents, defs) =>
         val pre =
           if (parents.forall(_ =:= typeOf[AnyRef])) q""" "" """

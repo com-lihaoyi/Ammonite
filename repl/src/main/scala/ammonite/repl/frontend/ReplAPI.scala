@@ -198,7 +198,10 @@ abstract class FullReplAPI extends ReplAPI{
      * and [[PPrint]] context bounds to the same type, Scala's type inference
      * gets confused and does the wrong thing
      */
-    def print[T: TPrint: WeakTypeTag, V: PPrint](value: => T, value2: => V, ident: String, custom: Option[String])(implicit cfg: Config): Iterator[String]
+    def print[T: TPrint: WeakTypeTag, V: PPrint]
+             (value: => T, value2: => V, ident: String, custom: Option[String])
+             (implicit cfg: Config): Iterator[String]
+
     def printDef(definitionLabel: String, ident: String): Iterator[String]
     def printImport(imported: String): Iterator[String]
   }
@@ -255,7 +258,10 @@ trait DefaultReplAPI extends FullReplAPI {
       }
     }
     def printDef(definitionLabel: String, ident: String) = {
-      Iterator("defined ", colors().`type`(), definitionLabel, " ", colors().ident(), ident, colors().reset())
+      Iterator(
+        "defined ", colors().`type`(), definitionLabel, " ",
+        colors().ident(), ident, colors().reset()
+      )
     }
     def printImport(imported: String) = {
       Iterator(colors().`type`(), "import ", colors().ident(), imported, colors().reset())

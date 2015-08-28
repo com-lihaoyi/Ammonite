@@ -78,7 +78,7 @@ object FrontEnd{
       reader.setHandleUserInterrupt(true)
       val defaultHandler = reader.getCompletionHandler
       reader.setCompletionHandler(new completer.CompletionHandler {
-        def complete(reader: ConsoleReader, candidates: JList[CharSequence], position: Int): Boolean = {
+        def complete(reader: ConsoleReader, candidates: JList[CharSequence], position: Int) = {
           if (!signatures.isEmpty){
             reader.println()
             signatures.foreach(reader.println)

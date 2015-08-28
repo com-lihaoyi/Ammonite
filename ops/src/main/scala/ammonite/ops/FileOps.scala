@@ -106,7 +106,9 @@ object Internals{
     implicit def WritableString(s: String) = new Writable(s.getBytes)
     implicit def WritableArray(a: Array[Byte]) = new Writable(a)
     implicit def WritableArray2(a: Array[Array[Byte]]) = new Writable(a.flatten)
-    implicit def WritableTraversable(a: Traversable[String]) = new Writable(a.mkString("\n").getBytes)
+    implicit def WritableTraversable(a: Traversable[String]) = {
+      new Writable(a.mkString("\n").getBytes)
+    }
   }
 }
 
@@ -222,7 +224,9 @@ trait ImplicitOp[V] extends Function1[Path, V]{
  * List the files and folders in a directory
  */
 object ls extends StreamableOp1[Path, Path, LsSeq] with ImplicitOp[LsSeq]{
-  def materialize(src: Path, i: Iterator[Path]) = new LsSeq(src, i.map(_ relativeTo src).toVector.sorted:_*)
+  def materialize(src: Path, i: Iterator[Path]) =
+    new LsSeq(src, i.map(_ relativeTo src).toVector.sorted:_*)
+
   def !!(arg: Path): SelfClosingIterator[Path] = {
     import scala.collection.JavaConverters._
     val dirStream = Files.newDirectoryStream(arg.nio)
@@ -268,7 +272,12 @@ object write extends Function2[Path, Internals.Writable, Unit]{
   object append extends Function2[Path, Internals.Writable, Unit]{
     def apply(target: Path, data: Internals.Writable) = {
       mkdir(target/RelPath.up)
-      Files.write(target.nio, data.writeableData, StandardOpenOption.CREATE, StandardOpenOption.APPEND)
+      Files.write(
+        target.nio,
+        data.writeableData,
+        StandardOpenOption.CREATE,
+        StandardOpenOption.APPEND
+      )
     }
   }
   /**

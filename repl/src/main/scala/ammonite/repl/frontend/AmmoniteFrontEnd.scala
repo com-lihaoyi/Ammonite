@@ -105,7 +105,7 @@ object AmmoniteFrontEnd extends FrontEnd{
     }
 
     val autocompleteFilter: TermCore.Filter = {
-      case TermInfo(TermState(9 ~: rest, b, c), width) if okRevPath(revPath(b, c)) => // Enter
+      case TermInfo(TermState(9 ~: rest, b, c), width) if okRevPath(revPath(b, c)) =>
 
         val Result.Success((base, seq, frag, cursorOffset), _) = revPath(b, c)
 
@@ -125,7 +125,11 @@ object AmmoniteFrontEnd extends FrontEnd{
           doSomething(completions2, details2, writer, rest, b, c) match{
             case None => TermState(rest, b, c)
             case Some(_) =>
-              val newBuffer = b.take(c - cursorOffset) ++ Parsers.PathComplete.stringSymWrap(common) ++ b.drop(c)
+              val newBuffer =
+                b.take(c - cursorOffset) ++
+                Parsers.PathComplete.stringSymWrap(common) ++
+                b.drop(c)
+
               TermState(rest, newBuffer, c - cursorOffset + common.length + 1)
           }
         }else TermState(rest, b, c)
@@ -219,7 +223,10 @@ object AmmoniteFrontEnd extends FrontEnd{
             // Add Console.RESET to the end of the buffer to hack around bug
             // in TermCore, to be fixed later when we clean up the crazy
             // TermCore.readLine logic
-            (Highlighter.flattenIndices(newIndices, buffer) ++ Console.RESET, cursor + displayOffset)
+            (
+              Highlighter.flattenIndices(newIndices, buffer) ++ Console.RESET,
+              cursor + displayOffset
+            )
           case _ => (Highlighter.flattenIndices(indices, buffer) ++ Console.RESET, cursor)
         }
       }

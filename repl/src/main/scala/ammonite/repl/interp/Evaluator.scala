@@ -35,7 +35,10 @@ trait Evaluator{
    * passing in the callback ensures the printing is still done lazily, but within
    * the exception-handling block of the `Evaluator`
    */
-  def processLine(code: String, printCode: String, printer: Iterator[String] => Unit, extraImports: Seq[ImportData] = Seq()): Res[Evaluated]
+  def processLine(code: String,
+                  printCode: String,
+                  printer: Iterator[String] => Unit,
+                  extraImports: Seq[ImportData] = Seq()): Res[Evaluated]
   def processScriptBlock(code: String, scriptImports: Seq[ImportData]): Res[Evaluated]
 
   def previousImportBlock: String
@@ -138,9 +141,10 @@ object Evaluator{
             val lines = for (x <- imports) yield {
               if (x.fromName == x.toName)
                 "\n  " + Parsers.backtickWrap(x.fromName)
-              else
-                "\n  " + Parsers.backtickWrap(x.fromName) + " => " + (if (x.toName == "_") "_" else Parsers.backtickWrap(x.toName))
-
+              else {
+                "\n  " + Parsers.backtickWrap(x.fromName) +
+                " => " + (if (x.toName == "_") "_" else Parsers.backtickWrap(x.toName))
+              }
             }
             val block = lines.mkString(",")
             s"import $prefix.{$block\n}"
@@ -159,7 +163,10 @@ object Evaluator{
     type InvEx = InvocationTargetException
     type InitEx = ExceptionInInitializerError
 
-    def processLine(code: String, printCode: String, printer: Iterator[String] => Unit, extraImports: Seq[ImportData] = Seq()) = for {
+    def processLine(code: String,
+                    printCode: String,
+                    printer: Iterator[String] => Unit,
+                    extraImports: Seq[ImportData] = Seq()) = for {
       wrapperName <- Res.Success("cmd" + getCurrentLine)
       _ <- Catching{ case e: ThreadDeath => interrupted() }
       (classFiles, newImports) <- compileClass(wrapCode(
@@ -273,7 +280,11 @@ object Evaluator{
    * in imports, so we don't need to pass them explicitly.
    */
   def cacheTag(code: String, imports: Seq[ImportData], classpathHash: Array[Byte]): String = {
-    val bytes = md5Hash(md5Hash(code.getBytes) ++ md5Hash(imports.mkString.getBytes) ++ classpathHash)
+    val bytes = md5Hash(
+      md5Hash(code.getBytes) ++
+      md5Hash(imports.mkString.getBytes) ++
+      classpathHash
+    )
     "cache" + bytes.map("%02x".format(_)).mkString //add prefix to make sure it begins with a letter
   }
 

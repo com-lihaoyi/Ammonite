@@ -32,7 +32,11 @@ object AdvancedTests extends TestSuite{
         @ Foo(1, "", Nil)
         res2: Foo = Foo(1, "", List())
 
-        @ Foo(1234567, "I am a cow, hear me moo", Seq("I weigh twice as much as you", "and I look good on the barbecue"))
+        @ Foo(
+        @   1234567,
+        @   "I am a cow, hear me moo",
+        @   Seq("I weigh twice as much as you", "and I look good on the barbecue")
+        @ )
         res3: Foo = Foo(
           1234567,
           "I am a cow, hear me moo",

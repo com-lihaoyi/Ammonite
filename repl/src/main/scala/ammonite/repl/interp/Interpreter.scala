@@ -68,22 +68,34 @@ class Interpreter(prompt0: Ref[String],
     } yield out
   }
 
-  def evaluateLine(code: String, printSnippet: Seq[String], printer: Iterator[String] => Unit, extraImports: Seq[ImportData] = Seq() ) = {
+  def evaluateLine(code: String,
+                   printSnippet: Seq[String],
+                   printer: Iterator[String] => Unit,
+                   extraImports: Seq[ImportData] = Seq() ) = {
     val oldClassloader = Thread.currentThread().getContextClassLoader
     try{
       Thread.currentThread().setContextClassLoader(eval.evalClassloader)
       eval.processLine(
         code,
-        s"ammonite.repl.frontend.ReplBridge.repl.Internal.combinePrints(${printSnippet.mkString(", ")})",
+        s"""
+        ammonite.repl
+                .frontend
+                .ReplBridge
+                .repl
+                .Internal
+                .combinePrints(${printSnippet.mkString(", ")})
+        """,
         printer,
         extraImports
       )
     } finally Thread.currentThread().setContextClassLoader(oldClassloader)
   }
 
-  def processModule(code: String) = processScript(hardcodedPredef + "\n@\n" + code, eval.processScriptBlock)
+  def processModule(code: String) =
+    processScript(hardcodedPredef + "\n@\n" + code, eval.processScriptBlock)
 
-  def processExec(code: String) = processScript(hardcodedPredef + "\n@\n" + code, { (c, i) => evaluateLine(c, Seq(), _ => (), i)})
+  def processExec(code: String) =
+    processScript(hardcodedPredef + "\n@\n" + code, { (c, i) => evaluateLine(c, Nil, _ => (), i)})
  
   //this variable keeps track of where should we put the imports resulting from scripts.
   private var scriptImportCallback: Seq[ImportData] => Unit = eval.update
@@ -100,7 +112,8 @@ class Interpreter(prompt0: Ref[String],
     Timer("processScript 1")
     val errors = blocks.collect{ case Res.Failure(err) => err }
     Timer("processScript 2")
-    val outerScriptImportCallback = scriptImportCallback //we store the old value, because we will reassign this in the loop
+    // we store the old value, because we will reassign this in the loop
+    val outerScriptImportCallback = scriptImportCallback
     try{
       if(!errors.isEmpty)
         stdout(colors0().error() + errors.mkString("\n") + colors0().reset() + "\n")
@@ -113,10 +126,11 @@ class Interpreter(prompt0: Ref[String],
     @tailrec def loop(blocks: Seq[Preprocessor.Output], imports: Seq[Seq[ImportData]]): Unit = {
       if(!blocks.isEmpty){
         Timer("processScript loop 0")
-        //imports from scripts loaded from this script block will end up in this buffer
+        // imports from scripts loaded from this script block will end up in this buffer
         val nestedScriptImports = mutable.Buffer.empty[ImportData]
         scriptImportCallback = { imports => nestedScriptImports ++= imports }
-        val Preprocessor.Output(code, _) = blocks.head //pretty printing results is disabled for scripts
+        // pretty printing results is disabled for scripts
+        val Preprocessor.Output(code, _) = blocks.head
         Timer("processScript loop 1")
         val ev = evaluate(code, imports.flatten)
         Timer("processScript loop 2")
@@ -126,7 +140,7 @@ class Interpreter(prompt0: Ref[String],
           case _ => loop(blocks.tail, imports)
         }
       } else {
-        //if we have imports to pass to the upper layer we do that
+        // if we have imports to pass to the upper layer we do that
         imports.lastOption.foreach(outerScriptImportCallback)
       }
     }
@@ -159,7 +173,13 @@ class Interpreter(prompt0: Ref[String],
       storage().ivyCache().get((groupId, artifactId, version)) match{
         case Some(ps) => ps.map(new java.io.File(_)).map(handleJar)
         case None =>
-          val resolved = IvyThing.resolveArtifact(groupId, artifactId, version, if (verbose) 2 else 1)
+          val resolved = IvyThing.resolveArtifact(
+            groupId,
+            artifactId,
+            version,
+            if (verbose) 2 else 1
+          )
+
           storage().ivyCache() = storage().ivyCache().updated(
             (groupId, artifactId, version),
             resolved.map(_.getAbsolutePath).toSet
@@ -227,7 +247,9 @@ class Interpreter(prompt0: Ref[String],
       println()
     }
 
-    def search(target: scala.reflect.runtime.universe.Type) = Interpreter.this.compiler.search(target)
+    def search(target: scala.reflect.runtime.universe.Type) = {
+      Interpreter.this.compiler.search(target)
+    }
     def compiler = Interpreter.this.compiler.compiler
     def newCompiler() = init()
     def fullHistory = storage().fullHistory()
@@ -310,7 +332,16 @@ class Interpreter(prompt0: Ref[String],
   val argString =
     replArgs.zipWithIndex
             .map{ case (b, idx) =>
-              s"val ${b.name} = ammonite.repl.frontend.ReplBridge.repl.replArgs($idx).value.asInstanceOf[${b.typeTag.tpe}]"
+              s"""
+              val ${b.name} =
+                ammonite.repl
+                        .frontend
+                        .ReplBridge
+                        .repl
+                        .replArgs($idx)
+                        .value
+                        .asInstanceOf[${b.typeTag.tpe}]
+              """
             }
             .mkString("\n")
 

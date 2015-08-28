@@ -75,7 +75,10 @@ case class GrepResult(spans: Seq[(Int, Int)], txt: String)
  * regex within the pretty-printed contents.
  */
 object grep {
-  def apply[T: Grepper, V: pprint.PPrint](pat: T, str: V)(implicit c: pprint.Config): Option[GrepResult] = {
+  def apply[T: Grepper, V: pprint.PPrint]
+           (pat: T, str: V)
+           (implicit c: pprint.Config)
+           : Option[GrepResult] = {
     implicitly[Grepper[T]].apply(pat, str)
   }
 
@@ -84,8 +87,18 @@ object grep {
    * into a real T => Option[T] by materializing PPrint[T] for various values of T
    */
   object !{
-    implicit def FunkyFunc1[T: pprint.PPrint](f: ![_])(implicit c: pprint.Config): T => GenTraversableOnce[GrepResult] = f.apply[T]
-    implicit def FunkyFunc2[T: pprint.PPrint](f: ![_])(implicit c: pprint.Config): T => Boolean = x => f.apply[T](x).isDefined
+    implicit def FunkyFunc1[T: pprint.PPrint]
+                           (f: ![_])
+                           (implicit c: pprint.Config)
+                           : T => GenTraversableOnce[GrepResult] = {
+      f.apply[T]
+    }
+    implicit def FunkyFunc2[T: pprint.PPrint]
+                           (f: ![_])
+                           (implicit c: pprint.Config)
+                           : T => Boolean = {
+      x => f.apply[T](x).isDefined
+    }
   }
 
   case class ![T: Grepper](pat: T){

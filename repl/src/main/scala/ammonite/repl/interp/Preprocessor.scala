@@ -25,10 +25,24 @@ object Preprocessor{
 
     def pprintSignature(ident: String, customMsg: Option[String]) = {
       val customCode = customMsg.fold("scala.None")(x => s"""Some("$x")""")
-      s"""ammonite.repl.frontend.ReplBridge.repl.Internal.print($ident, $ident, "$ident", $customCode)"""
+      s"""
+      ammonite.repl
+              .frontend
+              .ReplBridge
+              .repl
+              .Internal
+              .print($ident, $ident, "$ident", $customCode)
+      """
     }
     def definedStr(definitionLabel: String, name: String) =
-      s"""ammonite.repl.frontend.ReplBridge.repl.Internal.printDef("$definitionLabel", "$name")"""
+      s"""
+      ammonite.repl
+              .frontend
+              .ReplBridge
+              .repl
+              .Internal
+              .printDef("$definitionLabel", "$name")
+      """
 
     def pprint(ident: String) = pprintSignature(ident, None)
 
@@ -79,7 +93,16 @@ object Preprocessor{
     val Import = Processor{
       case (name, code, tree: G#Import) =>
         val Array(keyword, body) = code.split(" ", 2)
-        Output(code, Seq(s"""ammonite.repl.frontend.ReplBridge.repl.Internal.printImport("$body")"""))
+        Output(code, Seq(
+          s"""
+          ammonite.repl
+                  .frontend
+                  .ReplBridge
+                  .repl
+                  .Internal
+                  .printImport("$body")
+          """
+        ))
     }
 
     val Expr = Processor{

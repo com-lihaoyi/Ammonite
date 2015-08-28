@@ -36,6 +36,7 @@ class Checker {
     // Remove the margin from the block and break
     // it into blank-line-delimited steps
     val margin = sess.lines.filter(_.trim != "").map(_.takeWhile(_ == ' ').length).min
+
     // Strip margin & whitespace
     val steps = sess.replace("\n" + margin, "\n").replaceAll(" *\n", "\n").split("\n\n")
 
@@ -66,8 +67,9 @@ class Checker {
         def handleFailure(failureMsg: String) = {
           val expectedStripped =
             expected.stripPrefix("error: ").replaceAll(" *\n", "\n")
-          val expectedRegex = createRegex(expectedStripped).r //using scala Regex here
-          val failureStripped = failureMsg.replaceAll("\u001B\\[[;\\d]*m", "").replaceAll(" *\n", "\n")
+          val expectedRegex = createRegex(expectedStripped).r
+          val failureStripped =
+            failureMsg.replaceAll("\u001B\\[[;\\d]*m", "").replaceAll(" *\n", "\n")
           failLoudly(assert(!expectedRegex.findFirstIn(failureStripped).isEmpty))
         }
         printed match{
@@ -81,7 +83,8 @@ class Checker {
         if (expected != ""){
           val regex = createRegex(expected)
           printed match {
-            case Res.Success(str) => failLoudly(assert(str.replaceAll(" *\n", "\n").matches(regex)))
+            case Res.Success(str) =>
+              failLoudly(assert(str.replaceAll(" *\n", "\n").matches(regex)))
             case Res.Failure(failureMsg) => assert({identity(printed); identity(regex); false})
             case Res.Exception(ex, failureMsg) =>
               val trace = Repl.showException(ex, "", "", "") + "\n" +  failureMsg
@@ -97,25 +100,39 @@ class Checker {
     }
   }
 
-  /* This method creates a regex from the expected string escaping all specials, so you don't have to bother with
-   * escaping the in tests, if they are not needed. Special meanings can be activated by inserting a backslash
+  /**
+   * This method creates a regex from the expected string escaping all specials,
+   * so you don't have to bother with escaping the in tests, if they are not
+   * needed. Special meanings can be activated by inserting a backslash
    * before the special character. This is essentially vim's nomagic mode.
    */
   def createRegex(expected: String) = {
-    val specialChars=".|+*?[](){}^$" //these characters need to be escaped to use them as regex specials.
-    //idk why do i need 4 backsalshes in the replacement
-    val escape = specialChars.map{ c => (s"\\$c", s"\\\\$c") } //first part is handled as a regex, so we need the escape to match the literal character.
-    val escapedExpected = escape.foldLeft(expected){ case (exp, (pattern, replacement)) => exp.replaceAll(pattern, replacement) } // We insert a backslash so special chars are handled as literals
-    val unescape = specialChars.map{ c => (s"\\\\\\\\\\$c", c.toString) } // special chars that had a backslash before them now have two.
-    unescape.foldLeft(escapedExpected){ case (exp, (pattern, replacement)) => exp.replaceAll(pattern, replacement) } // we replace double backslashed stuff with regex specials
+    // these characters need to be escaped to use them as regex specials.
+    val specialChars=".|+*?[](){}^$"
+    // idk why do i need 4 backslashes in the replacement
+    // first part is handled as a regex, so we need the escape to match the literal character.
+    val escape = specialChars.map{ c => (s"\\$c", s"\\\\$c") }
+    // We insert a backslash so special chars are handled as literals
+    val escapedExpected = escape.foldLeft(expected){
+      case (exp, (pattern, replacement)) => exp.replaceAll(pattern, replacement)
+    }
+    // special chars that had a backslash before them now have two.
+    val unescape = specialChars.map{ c => (s"\\\\\\\\\\$c", c.toString) }
+    // we replace double backslashed stuff with regex specials
+    unescape.foldLeft(escapedExpected){
+      case (exp, (pattern, replacement)) => exp.replaceAll(pattern, replacement)
+    }
   }
 
   def run(input: String) = {
-//    println("RUNNING")
-//    println(input)
-//    print(".")
+    //    println("RUNNING")
+    //    println(input)
+    //    print(".")
     val msg = collection.mutable.Buffer.empty[String]
-    val processed = interp.processLine(input, Parsers.split(input).get.get.value, _.foreach(msg.append(_)))
+    val processed = interp.processLine(
+      input,
+      Parsers.split(input).get.get.value, _.foreach(msg.append(_))
+    )
     val printed = processed.map(_ => msg.mkString)
 
     interp.handleOutput(processed)

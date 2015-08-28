@@ -13,7 +13,9 @@ import scala.tools.nsc.util._
  * Nice wrapper for the presentation compiler.
  */
 trait Pressy{
-  def complete(snippetIndex: Int, previousImports: String, snippet: String): (Int, Seq[String], Seq[String])
+  def complete(snippetIndex: Int,
+               previousImports: String,
+               snippet: String): (Int, Seq[String], Seq[String])
   def shutdownPressy(): Unit
 }
 object Pressy {
@@ -174,10 +176,9 @@ object Pressy {
         dynamicClasspath,
         _ => ()
       )
-      new nsc.interactive.Global(settings, reporter) {
-        g =>
-
-        override def classPath = platform.classPath // Actually jcp, avoiding a path-dependent type issue in 2.10 here
+      new nsc.interactive.Global(settings, reporter) { g =>
+        // Actually jcp, avoiding a path-dependent type issue in 2.10 here
+        override def classPath = platform.classPath
 
         override lazy val platform: ThisPlatform = new JavaPlatform {
           val global: g.type = g
@@ -194,7 +195,7 @@ object Pressy {
      * different completions depending on where the `index` is placed, but
      * the outside caller probably doesn't care.
      */
-    def complete(snippetIndex: Int, previousImports: String, snippet: String): (Int, Seq[String], Seq[String]) = {
+    def complete(snippetIndex: Int, previousImports: String, snippet: String) = {
       val prefix = previousImports + "\nobject AutocompleteWrapper{\n"
       val suffix = "\n}"
       val allCode =  prefix + snippet + suffix

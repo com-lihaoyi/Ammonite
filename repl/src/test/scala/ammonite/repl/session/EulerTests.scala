@@ -184,7 +184,9 @@ object EulerTests extends TestSuite{
         @ def m(i: Int, p: Int, c: Int): Int = if(c > 0) ns(i) * m(i + p, p, c - 1) else 1
         defined function m
 
-        @ def ms(xs: Seq[Int], ys: Seq[Int], p: Int) = ys.flatMap(y => xs.map(x => m(20 * y + x, p, 4)))
+        @ def ms(xs: Seq[Int], ys: Seq[Int], p: Int) = {
+        @   ys.flatMap(y => xs.map(x => m(20 * y + x, p, 4)))
+        @ }
         defined function ms
 
         @ val ps = (
@@ -314,9 +316,9 @@ object EulerTests extends TestSuite{
                    |77158542502016545090413245809786882778948721859617
                    |72107838435069186155435662884062257473692284509516
                    |20849603980134001723930671666823555245252804609722
-                   |53503534226472524250874054075591789781264330331690""".stripMargin.replace("\n", " ")
+                   |53503534226472524250874054075591789781264330331690"""
       check.session(s"""
-        @ val s = "$data"
+        @ val s = "${data.stripMargin.replace("\n", " ")}"
 
         @ s.split("${"""\\s+"""}").map(_.take(11).toLong).sum.toString.take(10).toLong
         res1: Long = 5537376230L

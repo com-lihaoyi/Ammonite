@@ -78,7 +78,7 @@ object UnitTests extends TestSuite{
                 Thread.currentThread().setContextClassLoader(eval.evalClassloader)
                 eval.processLine(
                   code,
-                  s"ReplBridge.shell.Internal.combinePrints(${printSnippet.mkString(", ")})",
+                  s"ReplBridge.combinePrints(${printSnippet.mkString(", ")})",
                   printer
                 )
               } finally Thread.currentThread().setContextClassLoader(oldClassloader)
@@ -98,7 +98,7 @@ object UnitTests extends TestSuite{
                 Thread.currentThread().setContextClassLoader(eval.evalClassloader)
                 eval.processLine(
                   code,
-                  <G|s"ReplBridge.shell.Internal.combinePrints(>${printSnippet.mkString(<G|", ">)}<G|)">,
+                  <G|s"ReplBridge.combinePrints(>${printSnippet.mkString(<G|", ">)}<G|)">,
                   printer
                 )
               } <Y|finally> Thread.currentThread().setContextClassLoader(oldClassloader)

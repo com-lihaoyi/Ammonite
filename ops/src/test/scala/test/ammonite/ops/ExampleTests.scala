@@ -139,7 +139,8 @@ object ExampleTests extends TestSuite{
         listed == Seq(wd/"folder", wd/"folder1"),
         lineCount == 4,
         renamed == Seq(wd/'dir2/"file1.java", wd/'dir2/"file2.java"),
-        read(wd/'target/"bundled.java") == "package example\nclass Foo{}\npackage example\nclass Bar{}"
+        read(wd/'target/"bundled.java") ==
+        "package example\nclass Foo{}\npackage example\nclass Bar{}"
       )
 
 
@@ -268,6 +269,23 @@ object ExampleTests extends TestSuite{
       ls.rec! cwd |? (_.ext == "scala") | read |> write! cwd/'target/'test/"omg.txt"
     }
 
+    'noLongLines{
+      // Ensure that we don't have any Scala files in the current working directory
+      // which have lines more than 100 characters long, excluding generated sources
+      // in `src_managed` folders.
+
+      def longLines(p: Path) =
+        (p, read.lines(p).zipWithIndex |? (_._1.length > 100) | (_._2))
+
+      val filesWithTooLongLines = (
+        ls.rec! cwd |? (_.ext == "scala")
+                    | longLines
+                    |? (_._2.length > 0)
+                    |? (!_._1.segments.contains("src_managed"))
+      )
+
+      assert(filesWithTooLongLines.length == 0)
+    }
     'rename{
 //      val d1/"omg"/x1 = wd
 //      val d2/"omg"/x2 = wd

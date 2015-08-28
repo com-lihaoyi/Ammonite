@@ -13,7 +13,8 @@ object CompilerCompatibility {
 
   type InteractiveAnalyzer = scala.tools.nsc.interactive.InteractiveAnalyzer
 
-  def interactiveAnalyzer(g: InteractiveGlobal, cl: ClassLoader): InteractiveAnalyzer { val global: g.type } =
+  def interactiveAnalyzer(g: InteractiveGlobal, cl: ClassLoader)
+                         : InteractiveAnalyzer { val global: g.type } =
     new { val global: g.type = g } with InteractiveAnalyzer {
       override def findMacroClassLoader() = cl
     }

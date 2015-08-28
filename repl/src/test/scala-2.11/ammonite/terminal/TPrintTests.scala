@@ -12,7 +12,9 @@ object TPrintTests extends TestSuite{
      val x = ""
      'plain{
        import pprint.Config.Defaults._
-       def checkVal[T](expected: String, expr: => T)(implicit tprint: TPrint[T]) = check[T](expected)(tprint)
+       def checkVal[T](expected: String, expr: => T)(implicit tprint: TPrint[T]) = {
+         check[T](expected)(tprint)
+       }
 
        def check[T](expected: String)(implicit tprint: TPrint[T]) = {
          val tprinted = tprint.render
@@ -62,7 +64,9 @@ object TPrintTests extends TestSuite{
          check[Map[Int, List[String]]]("Map[Int, List[String]]")
          check[Int => String]("Int => String")
          check[(Int, Float) => String]("(Int, Float) => String")
-         check[(Int, Float, Double, Char, Byte, Short, Long) => String]("(Int, Float, Double, Char, Byte, Short, Long) => String")
+         check[(Int, Float, Double, Char, Byte, Short, Long) => String](
+           "(Int, Float, Double, Char, Byte, Short, Long) => String"
+         )
          check[(Int, Float) => (String, String)]("(Int, Float) => (String, String)")
          check[(Int, String)]("(Int, String)")
          check[(Int, String, (Int, String), Double)]("(Int, String, (Int, String), Double)")
@@ -201,9 +205,15 @@ object TPrintTests extends TestSuite{
  //      * - checkColor[{type T = Int; val x: String; def y: Char; var z: Double}](
  //                    "{type <T> = <Int>; val <x>: <String>; def <y>: <Char>; var <z>: <Double>}"
  //      )
-       * - checkColor[Map[K, V] forSome { type K <: Int; val x: Float; type V >: (String, Float with Double) }](
-         "<Map>[<K>, <V>] forSome { type <K> <: <Int>; val <x>: <Float>; type <V> >: (<String>, <Float> with <Double>) }")
-       }
+       * - checkColor[Map[K, V] forSome {
+         type K <: Int; val x: Float; type V >: (String, Float with Double)
+       }](
+         "<Map>[<K>, <V>] forSome { " +
+           "type <K> <: <Int>; val <x>: <Float>; " +
+           "type <V> >: (<String>, <Float> with <Double>) " +
+         "}"
+       )
+     }
    }
 
  }

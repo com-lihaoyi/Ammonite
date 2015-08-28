@@ -96,7 +96,10 @@ class Repl(input: InputStream,
 }
 
 object Repl{
-  def highlightFrame(f: StackTraceElement, error: String, highlightError: String, source: String) = {
+  def highlightFrame(f: StackTraceElement,
+                     error: String,
+                     highlightError: String,
+                     source: String) = {
     val src =
       if (f.isNativeMethod) source + "Native Method" + error
       else s"$source${f.getFileName}$error:$source${f.getLineNumber}$error"
@@ -104,7 +107,10 @@ object Repl{
     val prefix :+ clsName = f.getClassName.split('.').toSeq
     val prefixString = prefix.map(_+'.').mkString("")
     val clsNameString = clsName.replace("$", error+"$"+highlightError)
-    val method = s"$error$prefixString$highlightError$clsNameString$error.$highlightError${f.getMethodName}$error"
+    val method =
+      s"$error$prefixString$highlightError$clsNameString$error" +
+      s".$highlightError${f.getMethodName}$error"
+
     s"\t$method($src)"
   }
   def showException(ex: Throwable, error: String, highlightError: String, source: String) = {

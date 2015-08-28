@@ -9,10 +9,11 @@ import scala.collection.generic.CanBuildFrom
 import scala.collection.{mutable, IndexedSeqLike}
 
 
-/**Trait for the interface of common persistent storage. 
- * This handles history and persistent caches.
- * Right now it is not threadsafe nor does it handle the mutual exclusion of files between processes. 
- * Mutexes should be added to be able to run multiple Ammonite processes on the same system.
+/**
+ * Trait for the interface of common persistent storage. This handles history
+ * and persistent caches. Right now it is not threadsafe nor does it handle
+ * the mutual exclusion of files between processes. Mutexes should be added
+ * to be able to run multiple Ammonite processes on the same system.
  */ 
 trait Storage{
   def loadPredef: String

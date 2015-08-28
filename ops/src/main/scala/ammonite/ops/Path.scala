@@ -128,7 +128,9 @@ case class RelPath(segments: Seq[String], ups: Int) extends BasePathImpl[RelPath
     } else throw PathError.NoRelativePath(this, base)
   }
 
-  def startsWith(target: RelPath) = this.segments.startsWith(target.segments) && this.ups == target.ups
+  def startsWith(target: RelPath) = {
+    this.segments.startsWith(target.segments) && this.ups == target.ups
+  }
 
   override def toString = (Seq.fill(ups)("..") ++ segments).mkString("/")
   override def hashCode = segments.hashCode() + ups.hashCode()
@@ -177,7 +179,9 @@ object RelPath extends RelPathStuff with (String => RelPath){
   implicit def ArrayPath[T](s: Array[T])(implicit conv: T => RelPath): RelPath = SeqPath(s)
 
   implicit val relPathRepr = pprint.PPrinter[ammonite.ops.RelPath]{(p, c) =>
-    Iterator((Seq.fill(p.ups)("up") ++ p.segments.map(BasePath.reprSection(_, c).mkString)).mkString("/"))
+    Iterator(
+      (Seq.fill(p.ups)("up") ++ p.segments.map(BasePath.reprSection(_, c).mkString)).mkString("/")
+    )
   }
 
   implicit val relPathOrdering: Ordering[RelPath] =

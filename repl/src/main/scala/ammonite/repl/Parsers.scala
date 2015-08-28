@@ -26,8 +26,10 @@ object Parsers {
     }
   }
   val Prelude = P( (Annot ~ OneNLMax).rep ~ (Mod ~! Pass).rep )
-  val Statement = P ( scalaparse.Scala.TopPkgSeq | scalaparse.Scala.Import | Prelude ~ BlockDef | StatCtx.Expr )
-  def StatementBlock(blockSep: P0) = P ( Semis.? ~ (!blockSep ~ Statement).!.repX(sep=Semis) ~ Semis.? )
+  val Statement =
+    P( scalaparse.Scala.TopPkgSeq | scalaparse.Scala.Import | Prelude ~ BlockDef | StatCtx.Expr )
+  def StatementBlock(blockSep: P0) =
+    P( Semis.? ~ (!blockSep ~ Statement).!.repX(sep=Semis) ~ Semis.? )
   val Splitter = P( StatementBlock(Fail) ~ WL ~ End)
 
   /**
@@ -52,13 +54,24 @@ object Parsers {
     }
   }
 
+  /**
+   * An ad-hoc parser that's meant to parse *backwards* from the location of
+   * the current cursor, and identify whether there is a path-looking prefix
+   * leading up to that location. This basically comprises reversed versions of
+   * Symbol and String parsers, as well as "partial" reversed versions that
+   * kick in if you want autocomplete halfway-through typeing a symbol/string.
+   */
   object PathComplete{
-
-    def RevSymbolBase(i: Int) = P( WS ~ (!"/") ~ scalaparse.syntax.Basic.LetterDigitDollarUnderscore.rep(i).!.map(_.reverse) ~ "'" )
+    import scalaparse.syntax.Basic.LetterDigitDollarUnderscore
+    def SymBody(i: Int) = P( LetterDigitDollarUnderscore.rep(i).!.map(_.reverse) )
+    def RevSymbolBase(i: Int) = P( WS ~ (!"/") ~ SymBody(i) ~ "'" )
     val RevSymbol0 = P( RevSymbolBase(0) )
     val RevSymbol = P( RevSymbolBase(1) )
     def SingleChars = P( (!"\"" ~ AnyChar | "\"\\" ).rep )
-    val RevString0 = P( WS ~ (!"/") ~ SingleChars.!.map(_.reverse.replace("\\\"", "\"").replace("\\\\", "\\")) ~ "\"" )
+    def reverseNormalize(s: String) = {
+      s.reverse.replace("\\\"", "\"").replace("\\\\", "\\")
+    }
+    val RevString0 = P( WS ~ (!"/") ~ SingleChars.!.map(reverseNormalize) ~ "\"" )
     val RevString = P( "\"" ~! RevString0 )
 
     val Head = P( (RevString0 | RevSymbol0).? )

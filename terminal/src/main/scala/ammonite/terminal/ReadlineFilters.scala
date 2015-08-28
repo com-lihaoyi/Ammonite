@@ -121,7 +121,8 @@ object ReadlineFilters {
       cursor < width && (buffer.indexOf('\n') >= cursor || buffer.indexOf('\n') == -1)
     }
     def lastRow(cursor: Int, buffer: Vector[Char], width: Int) = {
-      (buffer.length - cursor) < width && (buffer.lastIndexOf('\n') < cursor || buffer.lastIndexOf('\n') == -1)
+      (buffer.length - cursor) < width &&
+      (buffer.lastIndexOf('\n') < cursor || buffer.lastIndexOf('\n') == -1)
     }
 
     val previousHistory = swapInHistory(1) _

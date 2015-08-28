@@ -82,7 +82,8 @@ object TermCore {
     // Don't check if the cursor exceeds the last chunk, because
     // even if it does there's nowhere else for it to go
     for(i <- 0 until rowLengths.length -1 if !done) {
-      val delta = rowLengths(i) + (if (i == rowLengths.length - 1) 0 else 1) // length of frag and the '\n' after it
+      // length of frag and the '\n' after it
+      val delta = rowLengths(i) + (if (i == rowLengths.length - 1) 0 else 1)
 //      Debug("delta " + delta)
       val nextCursor = leftoverCursor - delta
       if (nextCursor >= 0) {
@@ -161,7 +162,9 @@ object TermCore {
         }
       }
 
-      val (nextHeight, cursorY, cursorX) = calculateHeight(buffer, transformedCursor, width, noAnsiPrompt)
+      val (nextHeight, cursorY, cursorX) =
+        calculateHeight(buffer, transformedCursor, width, noAnsiPrompt)
+
       Debug("nextHeight\t" + nextHeight)
       ansi.up(nextHeight - 1)
       ansi.left(9999)

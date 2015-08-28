@@ -587,6 +587,11 @@
     @p
       As you can see, you can often compose elaborate operations entirely naturally using the available pipes, without needing to remember any special flags or techniques.
 
+    @p
+      Here's another example:
+
+    @hl.ref(opsExamples, Seq("noLongLines", ""))
+
   @sect{Spawning Subprocesses}
     @p
       Ammonite-Ops provides easy syntax for anyone who wants to spawn sub-processes, e.g. commands like @code{ls} or @code{git commit -am "wip"}. This is provided through the @hl.scala{%} and @hl.scala{%%} operators, which are used as follows:
