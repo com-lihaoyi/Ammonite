@@ -71,20 +71,22 @@ class Checker {
           failLoudly(assert(!expectedRegex.findFirstIn(failureStripped).isEmpty))
         }
         printed match{
-          case Res.Success(v) => assert({v; allOutput; false})
+          case Res.Success(v) => assert({identity(v); identity(allOutput); false})
           case Res.Failure(failureMsg) => handleFailure(failureMsg)
           case Res.Exception(ex, failureMsg) =>
             handleFailure(Repl.showException(ex, "", "", "") + "\n" +  failureMsg)
+          case _ => ???
         }
       }else{
         if (expected != ""){
           val regex = createRegex(expected)
           printed match {
             case Res.Success(str) => failLoudly(assert(str.replaceAll(" *\n", "\n").matches(regex)))
-            case Res.Failure(failureMsg) => assert({printed; regex; false})
+            case Res.Failure(failureMsg) => assert({identity(printed); identity(regex); false})
             case Res.Exception(ex, failureMsg) =>
               val trace = Repl.showException(ex, "", "", "") + "\n" +  failureMsg
-              assert({trace; regex; false})
+              assert({identity(trace); identity(regex); false})
+            case _ => ???
           }
         }else{
           assert(
@@ -126,12 +128,13 @@ class Checker {
     val (processed, printed) = run(input)
 
     printed match{
-      case Res.Success(v) => assert({v; allOutput; false})
+      case Res.Success(v) => assert({identity(v); identity(allOutput); false})
       case Res.Failure(s) =>
         failLoudly(assert(failureCheck(s)))
       case Res.Exception(ex, s) =>
         val msg = Repl.showException(ex, "", "", "") + "\n" + s
         failLoudly(assert(failureCheck(msg)))
+      case _ => ???
     }
   }
 

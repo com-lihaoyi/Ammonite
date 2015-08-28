@@ -23,7 +23,7 @@ object BuiltinTests extends TestSuite{
 
         @ repl.frontEnd() = ammonite.repl.frontend.FrontEnd.JLineWindows
 
-        @ repl.frontEnd() = ammonite.repl.frontend.FrontEnd.Ammonite
+        @ repl.frontEnd() = ammonite.repl.frontend.AmmoniteFrontEnd
 
         @ // Changing the colors used by Ammonite; all at once:
 
