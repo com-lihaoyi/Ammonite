@@ -142,7 +142,7 @@ object Repl{
     parser.parse(args, Config()).foreach(c => run(c.predef, c.ammoniteHome, c.file))
   }
 
-  implicit def binder[T](t: (String, T))(implicit typeTag: TypeTag[T]) = {
+  implicit def ammoniteReplArrowBinder[T](t: (String, T))(implicit typeTag: TypeTag[T]) = {
     Bind(t._1, t._2)(typeTag)
   }
   def debug(replArgs: Bind[_]*): Any = {
