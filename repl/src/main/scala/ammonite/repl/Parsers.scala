@@ -64,20 +64,25 @@ object Parsers {
   object PathComplete{
 
     import scalaparse.syntax.Basic.LetterDigitDollarUnderscore
-    def SymBody(i: Int) = P( LetterDigitDollarUnderscore.rep(i).!.map(_.reverse) )
-    def RevSymbolBase(i: Int) = P( WS ~ (!"/") ~ SymBody(i) ~ "'" )
-    val RevSymbol0 = P( RevSymbolBase(0) )
-    val RevSymbol = P( RevSymbolBase(1) )
+    def BaseRevSymbol(p: P[_]) = P( WS ~ (!"/") ~ p.!.map(_.reverse) )
+
     def SingleChars = P( (!"\"" ~ AnyChar | "\"\\" ).rep )
     def reverseNormalize(s: String) = {
       s.reverse.replace("\\\"", "\"").replace("\\\\", "\\")
     }
-    val RevString0 = P( WS ~ (!"/") ~ SingleChars.!.map(reverseNormalize) ~ "\"" )
-    val RevString = P( "\"" ~! RevString0 )
+    def BaseRevString(f: String => String) = P( WS ~ (!"/") ~ SingleChars.!.map(f) ~ "\"" )
 
-    val Head = P( (RevString0 | RevSymbol0).? )
-    val Segment =
-      P( RevSymbol.map(Some(_)) | RevString.map(Some(_)) | SegmentIdent.map(_ => None) )
+    val Head = {
+      val RevSymbol0 = P( BaseRevSymbol(LetterDigitDollarUnderscore.rep(0) ~ "'") )
+      val RevString0 = P( BaseRevString("\"" + reverseNormalize(_)) )
+      P( (RevString0 | RevSymbol0).? )
+    }
+
+    val Segment = {
+      val RevString1 = P( "\"" ~! BaseRevString(reverseNormalize) )
+      val RevSymbol1 = P( BaseRevSymbol(LetterDigitDollarUnderscore.rep(1)) ~ "'" )
+      P( RevSymbol1.map(Some(_)) | RevString1.map(Some(_)) | SegmentIdent.map(_ => None) )
+    }
 
     val Body = P( ("/" ~ Segment).rep.map(_.reverse) )
     val TailIdents = P( "wd".reverse | "cwd".reverse | "root".reverse | "home".reverse )

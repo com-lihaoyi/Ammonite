@@ -151,28 +151,28 @@ object AutocompleteTests extends TestSuite{
         }
         check("""'hello/<caret>""", (None, Seq(Some("hello")), None, 0))
         check("""'hello / <caret>""", (None, Seq(Some("hello")), None, 0))
-        check("""'hello / 'worl<caret>""", (None, Seq(Some("hello")), Some("worl"), 5))
+        check("""'hello / 'worl<caret>""", (None, Seq(Some("hello")), Some("'worl"), 5))
         check("""'hello / "world" / <caret>""", (None, Seq(Some("hello"), Some("world")), None, 0))
         check(
           """'hello / "world" / "foo<caret>""",
-          (None, Seq(Some("hello"), Some("world")), Some("foo"), 4)
+          (None, Seq(Some("hello"), Some("world")), Some("\"foo"), 4)
         )
         check(
           """'hello / "\"" / "foo<caret>""",
-          (None, Seq(Some("hello"), Some("\"")), Some("foo"), 4)
+          (None, Seq(Some("hello"), Some("\"")), Some("\"foo"), 4)
         )
         check(
           """wd/ 'hello / "\"" / "foo<caret>""",
-          (Some("wd"), Seq(Some("hello"), Some("\"")), Some("foo"), 4)
+          (Some("wd"), Seq(Some("hello"), Some("\"")), Some("\"foo"), 4)
         )
 
         check(
           """wd / up / 'hello / up / "\"" / "foo<caret>""",
-          (Some("wd"), Seq(None, Some("hello"), None, Some("\"")), Some("foo"), 4)
+          (Some("wd"), Seq(None, Some("hello"), None, Some("\"")), Some("\"foo"), 4)
         )
 
-        check("""home/'fi<caret>""", (Some("home"), Nil, Some("fi"), 3))
-        check("""home/'fi<caret>nd""", (Some("home"), Nil, Some("fi"), 3))
+        check("""home/'fi<caret>""", (Some("home"), Nil, Some("'fi"), 3))
+        check("""home/'fi<caret>nd""", (Some("home"), Nil, Some("'fi"), 3))
       }
       'complete{
 

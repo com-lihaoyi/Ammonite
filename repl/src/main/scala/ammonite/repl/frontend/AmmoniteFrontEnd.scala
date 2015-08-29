@@ -6,7 +6,7 @@ import ammonite.repl.{Parsers, Res, Timer, Colors}
 import ammonite.terminal.LazyList.~:
 import ammonite.terminal._
 import fastparse.core.Result
-
+import Parsers.PathComplete.stringSymWrap
 import scala.annotation.tailrec
 
 object AmmoniteFrontEnd extends FrontEnd{
@@ -22,11 +22,12 @@ object AmmoniteFrontEnd extends FrontEnd{
       case first :+ last => first.map(_.padTo(width / columns, ' ')) :+ last :+ "\n"
     }
   }
-  @tailrec def findPrefix(a: String, b: String, index: Int): String = {
-    if (index >= a.length || index >= b.length || a(index) != b(index)) b.take(index)
-    else findPrefix(a, b, index + 1)
-  }
 
+  @tailrec def findPrefix(strings: Seq[String], i: Int = 0): String = {
+    if (strings.count(_.length > i) == 0) strings(0).take(i)
+    else if(strings.map(_(i)).distinct.length > 1) strings(0).take(i)
+    else findPrefix(strings, i + 1)
+  }
   def action(input: InputStream,
              reader: java.io.Reader,
              output: OutputStream,
@@ -112,22 +113,28 @@ object AmmoniteFrontEnd extends FrontEnd{
         val path = rootMap(base)/seq.map{case None => up; case Some(s) => s: RelPath}
 
         if (exists(path)) {
-          val options = ls ! path |? (_.last.startsWith(frag.getOrElse("")))
-          val (completions, details) = options.partition(_.last != frag.getOrElse(""))
+          val options = (
+            ls! path | (x => (x, stringSymWrap(x.last)))
+                     |? (_._2.startsWith(frag.getOrElse("")))
+          )
+          val (completions, details) = options.partition(_._2 != frag.getOrElse(""))
 
-          val completions2 = completions.map(_.last)
-            .map(Parsers.PathComplete.stringSymWrap)
-            .map(colors.literal() + _ + colors.reset())
+          val completionNames = completions.map(_._2)
+
+          val coloredCompletions = completionNames.map(colors.literal() + _ + colors.reset())
 
           import pprint.Config.Colors.PPrintConfig
-          val details2 = details.map(x => pprint.tokenize(stat(x)).mkString)
-          lazy val common = findPrefix(completions.head.last, completions.last.last, 0)
-          doSomething(completions2, details2, writer, rest, b, c) match{
+
+          val details2 = details.map(x => pprint.tokenize(stat(x._1)).mkString)
+
+          lazy val common = findPrefix(completionNames, 0)
+
+          doSomething(coloredCompletions, details2, writer, rest, b, c) match{
             case None => TermState(rest, b, c)
             case Some(_) =>
               val newBuffer =
                 b.take(c - cursorOffset) ++
-                Parsers.PathComplete.stringSymWrap(common) ++
+                common ++
                 b.drop(c)
 
               TermState(rest, newBuffer, c - cursorOffset + common.length + 1)
@@ -147,7 +154,7 @@ object AmmoniteFrontEnd extends FrontEnd{
             colors.reset()
           ).mkString
         }
-        lazy val common = findPrefix(completions.head, completions.last, 0)
+        lazy val common = findPrefix(completions, 0)
         val completions2 = for(comp <- completions) yield {
 
           val (left, right) = comp.splitAt(common.length)
