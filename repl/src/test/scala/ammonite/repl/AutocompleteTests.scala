@@ -144,25 +144,33 @@ object AutocompleteTests extends TestSuite{
     }
     'path{
       'parse{
-        def check(s: String, output: (Option[String], Seq[String], Option[String], Int)) = {
+        def check(s: String, output: (Option[String], Seq[Option[String]], Option[String], Int)) = {
           val i = s.length - s.indexOf("<caret>")
           val value = Parsers.PathComplete.RevPath.parse(s.reverse.drop(i), 0).get.value
           assert(value == output)
         }
-        check("""'hello/<caret>""", (None, Seq("hello"), None, 0))
-        check("""'hello / <caret>""", (None, Seq("hello"), None, 0))
-        check("""'hello / 'worl<caret>""", (None, Seq("hello"), Some("worl"), 5))
-        check("""'hello / "world" / <caret>""", (None, Seq("hello", "world"), None, 0))
-        check("""'hello / "world" / "foo<caret>""", (None, Seq("hello", "world"), Some("foo"), 4))
-        check("""'hello / "\"" / "foo<caret>""", (None, Seq("hello", "\""), Some("foo"), 4))
+        check("""'hello/<caret>""", (None, Seq(Some("hello")), None, 0))
+        check("""'hello / <caret>""", (None, Seq(Some("hello")), None, 0))
+        check("""'hello / 'worl<caret>""", (None, Seq(Some("hello")), Some("worl"), 5))
+        check("""'hello / "world" / <caret>""", (None, Seq(Some("hello"), Some("world")), None, 0))
+        check(
+          """'hello / "world" / "foo<caret>""",
+          (None, Seq(Some("hello"), Some("world")), Some("foo"), 4)
+        )
+        check(
+          """'hello / "\"" / "foo<caret>""",
+          (None, Seq(Some("hello"), Some("\"")), Some("foo"), 4)
+        )
         check(
           """wd/ 'hello / "\"" / "foo<caret>""",
-          (Some("wd"), Seq("hello", "\""), Some("foo"), 4)
+          (Some("wd"), Seq(Some("hello"), Some("\"")), Some("foo"), 4)
         )
+
         check(
-          """`  ` / 'hello / "\"" / "foo<caret>""",
-          (Some("`  `"), Seq("hello", "\""), Some("foo"), 4)
+          """wd / up / 'hello / up / "\"" / "foo<caret>""",
+          (Some("wd"), Seq(None, Some("hello"), None, Some("\"")), Some("foo"), 4)
         )
+
         check("""home/'fi<caret>""", (Some("home"), Nil, Some("fi"), 3))
         check("""home/'fi<caret>nd""", (Some("home"), Nil, Some("fi"), 3))
       }

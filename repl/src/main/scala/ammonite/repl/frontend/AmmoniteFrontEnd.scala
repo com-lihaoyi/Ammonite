@@ -98,7 +98,7 @@ object AmmoniteFrontEnd extends FrontEnd{
       Some("root") -> root,
       Some("home") -> home
     )
-    def okRevPath(v: Result[(Option[String], Seq[String], Option[String], Int)]) = v match{
+    def okRevPath(v: Result[(Option[String], Seq[Option[String]], Option[String], Int)]) = v match{
       case _: Result.Failure => false
       case Result.Success((base, seq, frag, i), _) =>
         rootMap.keySet.contains(base) && (seq ++ base ++ frag).length > 0
@@ -109,7 +109,7 @@ object AmmoniteFrontEnd extends FrontEnd{
 
         val Result.Success((base, seq, frag, cursorOffset), _) = revPath(b, c)
 
-        val path = rootMap(base)/seq
+        val path = rootMap(base)/seq.map{case None => up; case Some(s) => s: RelPath}
 
         if (exists(path)) {
           val options = ls ! path |? (_.last.startsWith(frag.getOrElse("")))

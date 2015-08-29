@@ -62,6 +62,7 @@ object Parsers {
    * kick in if you want autocomplete halfway-through typeing a symbol/string.
    */
   object PathComplete{
+
     import scalaparse.syntax.Basic.LetterDigitDollarUnderscore
     def SymBody(i: Int) = P( LetterDigitDollarUnderscore.rep(i).!.map(_.reverse) )
     def RevSymbolBase(i: Int) = P( WS ~ (!"/") ~ SymBody(i) ~ "'" )
@@ -75,8 +76,13 @@ object Parsers {
     val RevString = P( "\"" ~! RevString0 )
 
     val Head = P( (RevString0 | RevSymbol0).? )
-    val Body = P( ("/" ~ (RevSymbol | RevString)).rep.map(_.reverse) )
-    val Tail = P( ("/" ~ scalaparse.syntax.Identifiers.Id.!.map(_.reverse)).? )
+    val Segment =
+      P( RevSymbol.map(Some(_)) | RevString.map(Some(_)) | SegmentIdent.map(_ => None) )
+
+    val Body = P( ("/" ~ Segment).rep.map(_.reverse) )
+    val TailIdents = P( "wd".reverse | "cwd".reverse | "root".reverse | "home".reverse )
+    val SegmentIdent = P( "up".reverse )
+    val Tail = P( ("/" ~ TailIdents.!.map(_.reverse)).? )
     val RevPath = P( (Head ~~ Index ~ Body ~ Tail).map{case (a, i, b, c) => (c, b, a, i)} )
 
     def stringSymWrap(s: String) = {
