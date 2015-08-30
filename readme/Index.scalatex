@@ -308,6 +308,7 @@
 
       @p
         If you want these changes to always be present, place them in your @code{~/.ammonite/predef.scala}.
+
   @sect{Filesystem Operations}
     @p
       Ammonite uses @sect.ref{Ammonite-Ops} to provide a nice API to use filesystem operations. To access it, simply call
@@ -349,6 +350,7 @@
       [info] Done updating.
       [info] Set current project to haoyi (in build file:/Users/haoyi/)
       >
+
   @sect{Debugging}
     @p
       Ammonite can be used as a tool to debug any other Scala program, by conveniently opening a REPL at any point within your program with which you can interact with live program data, similar to pdb/ipdb in Python. To do so, first add Ammonite to your classpath, e.g. through this SBT snippet:
