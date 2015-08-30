@@ -7,9 +7,12 @@ crossScalaVersions := Seq(
   "2.10.3", "2.10.4", "2.10.5", "2.11.3", "2.11.4", "2.11.5", "2.11.6", "2.11.7"
 )
 
-publishArtifact := false
+val dontPublishSettings = Seq(
+  publishArtifact := false,
+  publishTo := Some(Resolver.file("Unused transient repository", file("target/unusedrepo")))
+)
 
-publishTo := Some(Resolver.file("Unused transient repository", file("target/unusedrepo")))
+dontPublishSettings
 
 val sharedSettings = Seq(
   scalaVersion := "2.11.7",
@@ -21,6 +24,7 @@ val sharedSettings = Seq(
   autoCompilerPlugins := true,
   addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.2"),
   parallelExecution in Test := !scalaVersion.value.contains("2.10"),
+  (unmanagedSources in Compile) += baseDirectory.value/".."/"project"/"Constants.scala",
   libraryDependencies ++= Seq(
     "com.lihaoyi" %% "acyclic" % "0.1.2" % "provided",
     "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided"
@@ -104,7 +108,6 @@ lazy val repl = project
       if (scalaVersion.value startsWith "2.10.") Nil
       else Seq("com.chuusai" %% "shapeless" % "2.1.0" % "test")
     ),
-    (unmanagedSources in Compile) += baseDirectory.value/".."/"project"/"Constants.scala",
     javaOptions += "-Xmx4G",
     assemblyOption in assembly := (assemblyOption in assembly).value.copy(
       prependShellScript = Some(defaultShellScript)
@@ -151,11 +154,19 @@ lazy val repl = project
  * common housekeeping tasks
  */
 lazy val tools = project
-  .dependsOn(ops, repl)
+  .dependsOn(ops, repl % "compile->compile;test->test")
   .settings(sharedSettings:_*)
   .settings(
     name := "ammonite-tools",
     libraryDependencies += "com.lihaoyi" %% "pprint" % "0.3.4"
+  )
+
+lazy val integrationTests = project
+  .dependsOn(ops)
+  .settings(sharedSettings:_*)
+  .settings(
+    (test in Test) <<= (test in Test).dependsOn(assembly in repl, publishLocal in published),
+    dontPublishSettings
   )
 
 lazy val readme = ScalatexReadme(
@@ -164,15 +175,14 @@ lazy val readme = ScalatexReadme(
   url = "https://github.com/lihaoyi/ammonite/tree/master",
   source = "Index"
 ).settings(
-  publishArtifact := false,
-  publishTo := Some(Resolver.file("Unused transient repository", file("target/unusedrepo"))),
-  (unmanagedSources in Compile) += baseDirectory.value/".."/"project"/"Constants.scala"
+  dontPublishSettings
 )
 
 
-lazy val modules = project.aggregate(
-  ops, tools, terminal, repl
-).settings(
-  publishArtifact := false,
-  publishTo := Some(Resolver.file("Unused transient repository", file("target/unusedrepo")))
-)
+lazy val tested = project
+  .aggregate(published, integrationTests)
+  .settings(dontPublishSettings)
+
+lazy val published = project
+  .aggregate(ops, tools, terminal, repl)
+  .settings(dontPublishSettings)

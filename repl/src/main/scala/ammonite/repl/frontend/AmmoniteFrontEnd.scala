@@ -8,8 +8,7 @@ import ammonite.terminal._
 import fastparse.core.Result
 import scala.annotation.tailrec
 
-case class AmmoniteFrontEnd(extraFilters: OutputStreamWriter => TermCore.Filter)
-extends FrontEnd{
+case class AmmoniteFrontEnd(extraFilters: TermCore.Filter = PartialFunction.empty) extends FrontEnd{
 
   def width = FrontEndUtils.width
   def height = FrontEndUtils.height
@@ -51,8 +50,6 @@ extends FrontEnd{
     import ammonite.ops._
 
     val autocompleteFilter: TermCore.Filter = {
-
-
       case TermInfo(TermState(9 ~: rest, b, c), width) =>
         val (newCursor, completions, details) = compilerComplete(c, b.mkString)
         val details2 = for (d <- details) yield {
@@ -71,11 +68,15 @@ extends FrontEnd{
           val (left, right) = comp.splitAt(common.length)
           colors.comment() + left + colors.reset() + right
         }
-        FrontEndUtils.printCompletions(completions2, details2, writer, rest, b, c)
-        if (details.length != 0 || completions.length == 0) TermState(rest, b, c)
+        val stdout =
+          FrontEndUtils.printCompletions(completions2, details2, rest, b, c)
+                       .mkString
+
+        if (details.length != 0 || completions.length == 0)
+          Printing(TermState(rest, b, c), stdout)
         else{
           val newBuffer = b.take(newCursor) ++ common ++ b.drop(c)
-          TermState(rest, newBuffer, newCursor + common.length)
+          Printing(TermState(rest, newBuffer, newCursor + common.length), stdout)
         }
 
     }
@@ -97,7 +98,7 @@ extends FrontEnd{
     val selectionFilter = GUILikeFilters.SelectionFilter()
 
     val allFilters =
-      extraFilters(writer) orElse
+      extraFilters orElse
       selectionFilter orElse
       GUILikeFilters.altFilter orElse
       GUILikeFilters.fnFilter orElse

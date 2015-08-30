@@ -23,7 +23,7 @@ object BuiltinTests extends TestSuite{
 
         @ repl.frontEnd() = ammonite.repl.frontend.FrontEnd.JLineWindows
 
-        @ repl.frontEnd() = ammonite.repl.frontend.AmmoniteFrontEnd
+        @ repl.frontEnd() = ammonite.repl.frontend.AmmoniteFrontEnd()
 
         @ // Changing the colors used by Ammonite; all at once:
 
@@ -53,29 +53,7 @@ object BuiltinTests extends TestSuite{
       """)
     }
 
-    'workingDir{
-      check.session("""
-        @ val originalWd = wd
 
-        @ import ammonite.ops._
-
-        @ val originalLs1 = %%ls
-
-        @ val originalLs2 = ls!
-
-        @ cd! up
-
-        @ assert(wd == originalWd/up)
-
-        @ cd! root
-
-        @ assert(wd == root)
-
-        @ assert(originalLs1 != (%%ls))
-
-        @ assert(originalLs2 != (ls!))
-      """)
-    }
     'settings{
       check.session("""
         @ List(1, 2, 3) + "lol"

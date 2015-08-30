@@ -52,14 +52,16 @@ object AdvancedTests extends TestSuite{
         check.session("""
           @ import ammonite.ops._
 
-          @ ls! wd/'ops
-          res1: LsSeq = LsSeq(
+          @ import ammonite.ops.ImplicitWd._
+
+          @ ls! cwd/'ops
+          res2: LsSeq = LsSeq(
             'src,
             'target
           )
 
           @ %%ls 'ops
-          res2: CommandResult =
+          res3: CommandResult =
           src
           target
         """)
@@ -67,14 +69,16 @@ object AdvancedTests extends TestSuite{
         check.session("""
           @ import ammonite.ops._
 
-          @ ls! wd/'ops
-          res1: ammonite.ops.LsSeq = LsSeq(
+          @ import ammonite.ops.ImplicitWd._
+
+          @ ls! cwd/'ops
+          res2: ammonite.ops.LsSeq = LsSeq(
             'src,
             'target
           )
 
           @ %%ls 'ops
-          res2: ammonite.ops.CommandResult =
+          res3: ammonite.ops.CommandResult =
           src
           target
         """)

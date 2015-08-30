@@ -26,7 +26,7 @@ class Checker {
     pprint.Config.Defaults.PPrintConfig.copy(height = 15),
     Ref(Colors.BlackWhite),
     stdout = allOutput += _,
-    storage = Ref(Storage(tempDir)),
+    storage = Ref(Storage(tempDir, None)),
     new History(Vector()),
     predef = predef,
     replArgs = Seq()

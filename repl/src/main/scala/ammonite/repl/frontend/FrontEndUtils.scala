@@ -36,21 +36,24 @@ object FrontEndUtils {
 
   def printCompletions(completions: Seq[String],
                        details: Seq[String],
-                       writer: OutputStreamWriter,
                        rest: LazyList[Int],
                        b: Vector[Char],
-                       c: Int) = {
-    if (details.length != 0 || completions.length != 0) writer.write("\n")
-    // If we find nothing, we find nothing
-    if (details.length != 0) {
-      FrontEndUtils.tabulate(details, FrontEndUtils.width).foreach(writer.write)
-    }
+                       c: Int): List[String] = {
 
-    // If we find no completions, we've already printed the details to abort
-    if (completions.length != 0){
-      FrontEndUtils.tabulate(completions, FrontEndUtils.width).foreach(writer.write)
-    }
-    writer.flush()
+    val prelude =
+      if (details.length != 0 || completions.length != 0) List("\n")
+      else Nil
+
+    val detailsText =
+      if (details.length == 0) Nil
+      else FrontEndUtils.tabulate(details, FrontEndUtils.width)
+
+
+    val completionText =
+      if (completions.length == 0) Nil
+      else FrontEndUtils.tabulate(completions, FrontEndUtils.width)
+
+    prelude ++ detailsText ++ completionText
   }
 
 }

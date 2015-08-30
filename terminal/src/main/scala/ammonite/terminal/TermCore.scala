@@ -183,19 +183,28 @@ object TermCore {
       val moreInputComing = reader.ready()
       if (!moreInputComing) redrawLine(lastState.buffer, lastState.cursor, ups)
 
+      def updateState(s: LazyList[Int], b: Vector[Char], c: Int): (Int, TermState) = {
+        val newCursor = math.max(math.min(c, b.length), 0)
+        val nextUps =
+          if (moreInputComing) ups
+          else {
+            val (_, oldCursorY, _) = calculateHeight(
+              lastState.buffer, lastState.cursor, width, noAnsiPrompt
+            )
+            oldCursorY
+          }
+        Debug("nextUps\t" + nextUps)
+        val newState = TermState(s, b, newCursor)
+        (nextUps, newState)
+      }
       filters(TermInfo(lastState, width - noAnsiPrompt.length)) match {
+        case Printing(TermState(s, b, c), stdout) =>
+          writer.write(stdout)
+          val (nextUps, newState) = updateState(s, b, c)
+          readChar(newState, nextUps)
         case TermState(s, b, c) =>
-          val newCursor = math.max(math.min(c, b.length), 0)
-          val nextUps =
-            if (moreInputComing) ups
-            else {
-              val (_, oldCursorY, _) = calculateHeight(
-                lastState.buffer, lastState.cursor, width, noAnsiPrompt
-              )
-              oldCursorY
-            }
-          Debug("nextUps\t" + nextUps)
-          readChar(TermState(s, b, newCursor), nextUps)
+          val (nextUps, newState) = updateState(s, b, c)
+          readChar(newState, nextUps)
 
         case Result(s) =>
           val (_, oldCursorY, _) = calculateHeight(
@@ -236,6 +245,7 @@ object TermCore {
 case class TermInfo(ts: TermState, width: Int)
 
 sealed trait TermAction
+case class Printing(ts: TermState, stdout: String) extends TermAction
 case class TermState(inputs: LazyList[Int],
                      buffer: Vector[Char],
                      cursor: Int) extends TermAction

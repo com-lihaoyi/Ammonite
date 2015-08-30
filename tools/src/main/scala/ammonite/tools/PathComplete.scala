@@ -4,7 +4,7 @@ import java.io.OutputStreamWriter
 
 import ammonite.repl.Colors
 import ammonite.repl.frontend.{FrontEndUtils, Highlighter}
-import ammonite.terminal.{TermInfo, TermState, TermCore}
+import ammonite.terminal.{Printing, TermInfo, TermState, TermCore}
 import ammonite.terminal.LazyList.~:
 /**
  * Logic to find path "literals" so we can attempt to autocomplete them based
@@ -143,7 +143,6 @@ object PathComplete {
   )
 
   def pathCompleteFilter(wd: => Path,
-                         writer: OutputStreamWriter,
                          colors: => Colors): TermCore.Filter = {
     case TermInfo(TermState(9 ~: rest, b, c), width)
       if PathComplete.findPathLiteral(b.mkString, c).isDefined =>
@@ -153,7 +152,8 @@ object PathComplete {
 
       val path = rootMap(base)(wd) / seq.map { case None => up; case Some(s) => s: RelPath }
 
-      if (exists(path)) {
+      if (!exists(path)) TermState(rest, b, c)
+      else {
         val fragPrefix = frag.getOrElse("")
 
         def wrap(s: String) =
@@ -180,14 +180,18 @@ object PathComplete {
 
         val details2 = details.map(x => pprint.tokenize(stat(x._1)).mkString)
 
-        FrontEndUtils.printCompletions(coloredCompletions, details2, writer, rest, b, c)
-        if (details.length != 0 || completions.length == 0) TermState(rest, b, c)
+        val stdout =
+          FrontEndUtils.printCompletions(coloredCompletions, details2, rest, b, c)
+                       .mkString
+
+        if (details.length != 0 || completions.length == 0)
+          Printing(TermState(rest, b, c), stdout)
         else {
           val common = FrontEndUtils.findPrefix(completions.map(_._2), 0)
           val newBuffer = b.take(c - cursorOffset) ++ common ++ b.drop(c)
-          TermState(rest, newBuffer, c - cursorOffset + common.length + 1)
+          Printing(TermState(rest, newBuffer, c - cursorOffset + common.length + 1), stdout)
         }
-      } else TermState(rest, b, c)
+      }
   }
 
   /**
