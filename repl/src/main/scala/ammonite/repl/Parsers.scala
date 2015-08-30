@@ -54,48 +54,11 @@ object Parsers {
     }
   }
 
-  /**
-   * An ad-hoc parser that's meant to parse *backwards* from the location of
-   * the current cursor, and identify whether there is a path-looking prefix
-   * leading up to that location. This basically comprises reversed versions of
-   * Symbol and String parsers, as well as "partial" reversed versions that
-   * kick in if you want autocomplete halfway-through typeing a symbol/string.
-   */
-  object PathComplete{
-
-    import scalaparse.syntax.Basic.LetterDigitDollarUnderscore
-    def BaseRevSymbol(p: P[_]) = P( WS ~ (!"/") ~ p.!.map(_.reverse) )
-
-    def SingleChars = P( (!"\"" ~ AnyChar | "\"\\" ).rep )
-    def reverseNormalize(s: String) = {
-      s.reverse.replace("\\\"", "\"").replace("\\\\", "\\")
-    }
-    def BaseRevString(f: String => String) = P( WS ~ (!"/") ~ SingleChars.!.map(f) ~ "\"" )
-
-    val Head = {
-      val RevSymbol0 = P( BaseRevSymbol(LetterDigitDollarUnderscore.rep(0) ~ "'") )
-      val RevString0 = P( BaseRevString("\"" + reverseNormalize(_)) )
-      P( (RevString0 | RevSymbol0).? )
-    }
-
-    val Segment = {
-      val RevString1 = P( "\"" ~! BaseRevString(reverseNormalize) )
-      val RevSymbol1 = P( BaseRevSymbol(LetterDigitDollarUnderscore.rep(1)) ~ "'" )
-      P( RevSymbol1.map(Some(_)) | RevString1.map(Some(_)) | SegmentIdent.map(_ => None) )
-    }
-
-    val Body = P( ("/" ~ Segment).rep.map(_.reverse) )
-    val TailIdents = P( "wd".reverse | "cwd".reverse | "root".reverse | "home".reverse )
-    val SegmentIdent = P( "up".reverse )
-    val Tail = P( ("/" ~ TailIdents.!.map(_.reverse)).? )
-    val RevPath = P( (Head ~~ Index ~ Body ~ Tail).map{case (a, i, b, c) => (c, b, a, i)} )
-
-    def stringSymWrap(s: String) = {
-      if (s == "") "'"
-      else (scalaparse.syntax.Identifiers.Id ~ End).parse(s, 0)  match{
-        case Result.Success(v, _) =>  "'" + s
-        case f: Result.Failure => "\"" + pprint.PPrinter.escape(s) + "\""
-      }
+  def stringSymWrap(s: String) = {
+    if (s == "") "'"
+    else (scalaparse.syntax.Identifiers.Id ~ End).parse(s, 0)  match{
+      case Result.Success(v, _) =>  "'" + s
+      case f: Result.Failure => "\"" + pprint.PPrinter.escape(s) + "\""
     }
   }
 }

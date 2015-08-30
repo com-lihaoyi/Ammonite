@@ -2,32 +2,18 @@ package ammonite.repl.frontend
 
 import java.io.{OutputStreamWriter, OutputStream, InputStream}
 
-import ammonite.repl.{Parsers, Res, Timer, Colors}
+import ammonite.repl.frontend.PathComplete.PathLiteralInfo
+import ammonite.repl._
 import ammonite.terminal.LazyList.~:
 import ammonite.terminal._
 import fastparse.core.Result
-import Parsers.PathComplete.stringSymWrap
 import scala.annotation.tailrec
 
 object AmmoniteFrontEnd extends FrontEnd{
 
-  def width = ammonite.terminal.TTY.consoleDim("cols")
-  def height = ammonite.terminal.TTY.consoleDim("lines")
-  def tabulate(snippets: Seq[String], width: Int) = {
-    val gap = 2
-    val maxLength = snippets.maxBy(_.replaceAll("\u001B\\[[;\\d]*m", "").length).length + gap
-    val columns = math.max(1, width / maxLength)
+  def width = FrontEndUtils.width
+  def height = FrontEndUtils.height
 
-    snippets.grouped(columns).flatMap{
-      case first :+ last => first.map(_.padTo(width / columns, ' ')) :+ last :+ "\n"
-    }
-  }
-
-  @tailrec def findPrefix(strings: Seq[String], i: Int = 0): String = {
-    if (strings.count(_.length > i) == 0) strings(0).take(i)
-    else if(strings.map(_(i)).distinct.length > 1) strings(0).take(i)
-    else findPrefix(strings, i + 1)
-  }
   def action(input: InputStream,
              reader: java.io.Reader,
              output: OutputStream,
@@ -52,33 +38,6 @@ object AmmoniteFrontEnd extends FrontEnd{
     res
   }
 
-  def doSomething(completions: Seq[String],
-                  details: Seq[String],
-                  writer: OutputStreamWriter,
-                  rest: LazyList[Int],
-                  b: Vector[Char],
-                  c: Int) = {
-    // If we find nothing, we find nothing
-    if (completions.length == 0 && details.length == 0) None
-    else {
-      writer.write("\n")
-      details.foreach(writer.write)
-      writer.write("\n")
-    }
-
-    writer.flush()
-    // If we find no completions, we've already printed the details to abort
-    if (completions.length == 0) None
-    else {
-
-      tabulate(completions, AmmoniteFrontEnd.this.width).foreach(writer.write)
-      writer.flush()
-      // If the current prefix already matches a detailed result, we've
-      // already printed the messages but no need to modify buffer
-      if (details.length != 0) None
-      else Some()
-    }
-  }
 
   def readLine(reader: java.io.Reader,
                output: OutputStream,
@@ -89,54 +48,9 @@ object AmmoniteFrontEnd extends FrontEnd{
     Timer("AmmoniteFrontEnd.readLine start")
     val writer = new OutputStreamWriter(output)
 
-    def revPath(b: Vector[Char], c: Int) = {
-      Parsers.PathComplete.RevPath.parse(b.take(c).reverse.mkString, 0)
-    }
     import ammonite.ops._
-    val rootMap = Map(
-      None -> cwd,
-      Some("wd") -> cwd,
-      Some("root") -> root,
-      Some("home") -> home
-    )
-    def okRevPath(v: Result[(Option[String], Seq[Option[String]], Option[String], Int)]) = v match{
-      case _: Result.Failure => false
-      case Result.Success((base, seq, frag, i), _) =>
-        rootMap.keySet.contains(base) && (seq ++ base ++ frag).length > 0
-    }
 
     val autocompleteFilter: TermCore.Filter = {
-      case TermInfo(TermState(9 ~: rest, b, c), width) if okRevPath(revPath(b, c)) =>
-
-        val Result.Success((base, seq, frag, cursorOffset), _) = revPath(b, c)
-
-        val path = rootMap(base)/seq.map{case None => up; case Some(s) => s: RelPath}
-
-        if (exists(path)) {
-          val fragPrefix = frag.getOrElse("")
-
-          val options = (
-            ls! path | (x => (x, stringSymWrap(x.last)))
-                     |? (_._2.startsWith(fragPrefix))
-          )
-          val (completions, details) = options.partition(_._2 != fragPrefix)
-
-          val completionNames = completions.map(_._2)
-
-          val coloredCompletions = completionNames.map(colors.literal() + _ + colors.reset())
-
-          import pprint.Config.Colors.PPrintConfig
-
-          val details2 = details.map(x => pprint.tokenize(stat(x._1)).mkString)
-
-          doSomething(coloredCompletions, details2, writer, rest, b, c) match{
-            case None => TermState(rest, b, c)
-            case Some(_) =>
-              val common = findPrefix(completionNames, 0)
-              val newBuffer = b.take(c - cursorOffset) ++ common ++ b.drop(c)
-              TermState(rest, newBuffer, c - cursorOffset + common.length + 1)
-          }
-        } else TermState(rest, b, c)
 
 
       case TermInfo(TermState(9 ~: rest, b, c), width) =>
@@ -151,13 +65,13 @@ object AmmoniteFrontEnd extends FrontEnd{
             colors.reset()
           ).mkString
         }
-        lazy val common = findPrefix(completions, 0)
+        lazy val common = FrontEndUtils.findPrefix(completions, 0)
         val completions2 = for(comp <- completions) yield {
 
           val (left, right) = comp.splitAt(common.length)
           colors.comment() + left + colors.reset() + right
         }
-        doSomething(completions2, details2, writer, rest, b, c) match{
+        PathComplete.doSomething(completions2, details2, writer, rest, b, c) match{
           case None => TermState(rest, b, c)
           case Some(_) =>
             val newBuffer = b.take(newCursor) ++ common ++ b.drop(c)
@@ -187,11 +101,13 @@ object AmmoniteFrontEnd extends FrontEnd{
       GUILikeFilters.altFilter orElse
       GUILikeFilters.fnFilter orElse
       ReadlineFilters.navFilter orElse
+      PathComplete.pathCompleteFilter(writer, colors) orElse
       autocompleteFilter orElse
       historyFilter.filter orElse
       cutPasteFilter orElse
       multilineFilter orElse
       BasicFilters.all
+
 
     Timer("AmmoniteFrontEnd.readLine 1")
     val res = TermCore.readLine(

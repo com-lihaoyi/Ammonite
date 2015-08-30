@@ -1,6 +1,6 @@
 package ammonite.repl.frontend
 
-import java.io.{OutputStreamWriter, OutputStream, InputStream}
+import java.io.{OutputStream, InputStream}
 
 import ammonite.repl._
 import fastparse.core.Result
@@ -8,13 +8,8 @@ import jline.console.{completer, ConsoleReader}
 import acyclic.file
 
 import scala.annotation.tailrec
-import scala.tools.nsc.interpreter
-import ammonite.terminal._
-import ammonite.terminal.LazyList._
 
 import scala.tools.nsc.interpreter.JList
-import scalaparse.Scala._
-import scalaparse.syntax.Identifiers._
 
 /**
  * All the mucky JLine interfacing code
