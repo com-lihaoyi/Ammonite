@@ -74,96 +74,82 @@ object PathComplete {
         }
         .toVector
         .reverse
+    spans.headOption match{
+      case None => None
+      case Some(head) =>
+        // None means we're not in a path autocomplete, Some(None) means
+        // we are but there is no incomplete segment before the cursor
+        val (frag: Option[Option[String]], prev0: Int) =
+          head match{
+            case span: Span.Id =>
+              if (snippet.substring(span.start, span.end) == "/") (Some(None), cursor)
+              else (None, 0)
+            case span: Span.String if span.end == cursor =>
+              (Some(Some(snippet.slice(span.start, span.end))), span.start)
+            case span: Span.Symbol if span.end == cursor =>
+              (Some(Some(snippet.slice(span.start, span.end))), span.start)
+            case _ => (None, 0)
+          }
 
-    // None means we're not in a path autocomplete, Some(None) means
-    // we are but there is no incomplete segment before the cursor
-    val (frag: Option[Option[String]], prev0: Int) =
-      spans.head match{
-        case span: Span.Id =>
-          if (snippet.substring(span.start, span.end) == "/") (Some(None), cursor)
-          else (None, 0)
-        case span: Span.String if span.end == cursor =>
-          (Some(Some(snippet.slice(span.start, span.end))), span.start)
-        case span: Span.Symbol if span.end == cursor =>
-          (Some(Some(snippet.slice(span.start, span.end))), span.start)
-        case _ => (None, 0)
-      }
+        def rec(prev: Int,
+                spans: List[Span],
+                segments: List[Option[String]]): (Seq[Option[String]], Option[String]) = {
 
-    def rec(prev: Int,
-            spans: List[Span],
-            segments: List[Option[String]]): (Seq[Option[String]], Option[String]) = {
+          spans match{
+            case Span.Id(start, end) :: next :: rest
+              if snippet.slice(start, end) == "/"
+                && snippet.slice(end, prev).trim() == ""
+                && snippet.slice(next.end, start).trim() == "" =>
 
-      spans match{
-        case Span.Id(start, end) :: next :: rest
-          if snippet.slice(start, end) == "/"
-            && snippet.slice(end, prev).trim() == ""
-            && snippet.slice(next.end, start).trim() == "" =>
-
-          (next, snippet.slice(next.start, next.end)) match{
-            case (_: Span.Id, "up") => rec(next.start, rest, None :: segments)
-            case (_: Span.Id, x @ ("wd" | "cwd" | "home" | "root")) => (segments, Some(x))
-            case (_: Span.String, v) =>
-              val mangled = v.drop(1).dropRight(1).replace("\\\"", "\"").replace("\\\\", "\\")
-              rec(next.start, rest, Some(mangled) :: segments)
-            case (_: Span.Symbol, v) => rec(next.start, rest, Some(v.drop(1)) :: segments)
+              (next, snippet.slice(next.start, next.end)) match{
+                case (_: Span.Id, "up") => rec(next.start, rest, None :: segments)
+                case (_: Span.Id, x) if rootMap.keySet.flatten.contains(x) => (segments, Some(x))
+                case (_: Span.String, v) =>
+                  val mangled = v.drop(1).dropRight(1).replace("\\\"", "\"").replace("\\\\", "\\")
+                  rec(next.start, rest, Some(mangled) :: segments)
+                case (_: Span.Symbol, v) => rec(next.start, rest, Some(v.drop(1)) :: segments)
+                case _ => (segments, None)
+              }
             case _ => (segments, None)
           }
-        case _ => (segments, None)
-      }
+        }
+        for {
+          frag <- frag
+          (body, base) = rec(
+            prev0,
+            if (frag.isDefined) spans.toList.drop(1) else spans.toList,
+            Nil
+          )
+          if !(body ++ frag ++ base).isEmpty
+        } yield PathLiteralInfo(base, body, frag, cursor - prev0)
     }
-    for {
-      frag <- frag
-      (body, base) = rec(
-        prev0,
-        if (frag.isDefined) spans.toList.drop(1) else spans.toList,
-        Nil
-      )
-      if !(body ++ frag ++ base).isEmpty
-    } yield PathLiteralInfo(base, body, frag, cursor - prev0)
   }
 
   import ammonite.ops._
-  val rootMap = Map(
-    None -> cwd,
-    Some("wd") -> cwd,
-    Some("cwd") -> cwd,
-    Some("root") -> root,
-    Some("home") -> home
+
+  /**
+   * Small hard-coded list of how to convert the names of various
+   * path-literal-roots into actual Paths. Some depend on the REPL's
+   * `wd`, others don't
+   */
+  val rootMap = Map[Option[String], Path => Path](
+    None -> (wd => wd),
+    Some("wd") -> (wd => wd),
+    Some("cwd") -> (wd => cwd),
+    Some("root") -> (wd => root),
+    Some("home") -> (wd => home)
   )
-  def doSomething(completions: Seq[String],
-                  details: Seq[String],
-                  writer: OutputStreamWriter,
-                  rest: LazyList[Int],
-                  b: Vector[Char],
-                  c: Int) = {
-    // If we find nothing, we find nothing
-    if (completions.length == 0 && details.length == 0) None
-    else {
-      writer.write("\n")
-      details.foreach(writer.write)
-      writer.write("\n")
-    }
 
-    writer.flush()
-    // If we find no completions, we've already printed the details to abort
-    if (completions.length == 0) None
-    else {
+  def pathCompleteFilter(wd: => Path,
+                         writer: OutputStreamWriter,
+                         colors: => Colors): TermCore.Filter = {
+    case TermInfo(TermState(9 ~: rest, b, c), width)
+      if PathComplete.findPathLiteral(b.mkString, c).isDefined =>
 
-      FrontEndUtils.tabulate(completions, FrontEndUtils.width).foreach(writer.write)
-      writer.flush()
-      // If the current prefix already matches a detailed result, we've
-      // already printed the messages but no need to modify buffer
-      if (details.length != 0) None
-      else Some()
-    }
-  }
+      val Some(PathComplete.PathLiteralInfo(base, seq, frag, cursorOffset)) =
+        PathComplete.findPathLiteral(b.mkString, c)
 
-  def pathCompleteFilter(writer: OutputStreamWriter, colors: Colors): TermCore.Filter = {
-    case TermInfo(TermState(9 ~: rest, b, c), width) if PathComplete.findPathLiteral(b.mkString, c).isDefined =>
-
-      val Some(PathComplete.PathLiteralInfo(base, seq, frag, cursorOffset)) = PathComplete.findPathLiteral(b.mkString, c)
-
-      val path = rootMap(base) / seq.map { case None => up; case Some(s) => s: RelPath }
+      val path = rootMap(base)(wd) / seq.map { case None => up; case Some(s) => s: RelPath }
 
       if (exists(path)) {
         val fragPrefix = frag.getOrElse("")
@@ -182,15 +168,19 @@ object PathComplete {
 
         val details2 = details.map(x => pprint.tokenize(stat(x._1)).mkString)
 
-        doSomething(coloredCompletions, details2, writer, rest, b, c) match {
-          case None => TermState(rest, b, c)
-          case Some(_) =>
-            val common = FrontEndUtils.findPrefix(completionNames, 0)
-            val newBuffer = b.take(c - cursorOffset) ++ common ++ b.drop(c)
-            TermState(rest, newBuffer, c - cursorOffset + common.length + 1)
+        FrontEndUtils.printCompletions(coloredCompletions, details2, writer, rest, b, c)
+        if (details.length != 0 || completions.length == 0) TermState(rest, b, c)
+        else {
+          val common = FrontEndUtils.findPrefix(completionNames, 0)
+          val newBuffer = b.take(c - cursorOffset) ++ common ++ b.drop(c)
+          TermState(rest, newBuffer, c - cursorOffset + common.length + 1)
         }
       } else TermState(rest, b, c)
   }
+
+  /**
+   * Enum used to tag the indices being returned by [[Highlighter]]
+   */
   sealed trait Interval
   object Interval{
     object Id extends Interval
@@ -198,9 +188,19 @@ object PathComplete {
     object Symbol extends Interval
     object End extends Interval
   }
+
+  /**
+   * More-convenient data-structures to work with, compared to the raw
+   * tuple-output of [[Highlighter]]
+   */
   sealed trait Span{
     def parseStart: Int;
     def end: Int
+
+    /**
+     * Different from [[parseStart]], because [[Span.Symbol]] starts
+     * parsing one-character late.
+     */
     def start: Int = parseStart
   }
   object Span{

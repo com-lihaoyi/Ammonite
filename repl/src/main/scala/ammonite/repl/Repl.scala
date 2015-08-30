@@ -17,7 +17,9 @@ class Repl(input: InputStream,
   val prompt = Ref("@ ")
 
   val colors = Ref[Colors](Colors.Default)
-  val frontEnd = Ref[FrontEnd](AmmoniteFrontEnd)
+  val frontEnd = Ref[FrontEnd](AmmoniteFrontEnd(
+    PathComplete.pathCompleteFilter(interp.replApi.wd, _, colors())
+  ))
 
   val printer = new PrintStream(output, true)
   var history = new History(Vector())

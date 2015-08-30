@@ -9,7 +9,8 @@ import ammonite.terminal._
 import fastparse.core.Result
 import scala.annotation.tailrec
 
-object AmmoniteFrontEnd extends FrontEnd{
+case class AmmoniteFrontEnd(extraFilters: OutputStreamWriter => TermCore.Filter)
+extends FrontEnd{
 
   def width = FrontEndUtils.width
   def height = FrontEndUtils.height
@@ -71,11 +72,11 @@ object AmmoniteFrontEnd extends FrontEnd{
           val (left, right) = comp.splitAt(common.length)
           colors.comment() + left + colors.reset() + right
         }
-        PathComplete.doSomething(completions2, details2, writer, rest, b, c) match{
-          case None => TermState(rest, b, c)
-          case Some(_) =>
-            val newBuffer = b.take(newCursor) ++ common ++ b.drop(c)
-            TermState(rest, newBuffer, newCursor + common.length)
+        FrontEndUtils.printCompletions(completions2, details2, writer, rest, b, c)
+        if (details.length != 0 || completions.length == 0) TermState(rest, b, c)
+        else{
+          val newBuffer = b.take(newCursor) ++ common ++ b.drop(c)
+          TermState(rest, newBuffer, newCursor + common.length)
         }
 
     }
@@ -97,11 +98,11 @@ object AmmoniteFrontEnd extends FrontEnd{
     val selectionFilter = GUILikeFilters.SelectionFilter()
 
     val allFilters =
+      extraFilters(writer) orElse
       selectionFilter orElse
       GUILikeFilters.altFilter orElse
       GUILikeFilters.fnFilter orElse
       ReadlineFilters.navFilter orElse
-      PathComplete.pathCompleteFilter(writer, colors) orElse
       autocompleteFilter orElse
       historyFilter.filter orElse
       cutPasteFilter orElse

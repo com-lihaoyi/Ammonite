@@ -1,5 +1,9 @@
 package ammonite.repl.frontend
 
+import java.io.OutputStreamWriter
+
+import ammonite.terminal.LazyList
+
 import scala.annotation.tailrec
 
 /**
@@ -23,4 +27,26 @@ object FrontEndUtils {
     else if(strings.map(_(i)).distinct.length > 1) strings(0).take(i)
     else findPrefix(strings, i + 1)
   }
+
+  def printCompletions(completions: Seq[String],
+                       details: Seq[String],
+                       writer: OutputStreamWriter,
+                       rest: LazyList[Int],
+                       b: Vector[Char],
+                       c: Int) = {
+    // If we find nothing, we find nothing
+    if (completions.length != 0 || details.length != 0) {
+      writer.write("\n")
+      details.foreach(writer.write)
+      writer.write("\n")
+    }
+
+    writer.flush()
+    // If we find no completions, we've already printed the details to abort
+    if (completions.length != 0){
+      FrontEndUtils.tabulate(completions, FrontEndUtils.width).foreach(writer.write)
+      writer.flush()
+    }
+  }
+
 }

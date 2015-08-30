@@ -38,14 +38,17 @@ object AutocompleteTests extends TestSuite{
       }
 
       'import {
-        complete( """import <caret>""", Set("java", "javax", "scala") -- _)
-        complete( """import j<caret>""", Set("java", "javax", "jline", "jawn") -- _)
-        complete( """import ja<caret>""", x => Set("java", "javax", "jawn") ^ (x - "javafx"))
-        complete( """import java.<caret>""", Set("lang", "util") -- _)
-        complete( """import java.u<caret>""", Set("util") ^ _)
-        complete( """import java.util.<caret>""", Set("LinkedHashMap", "LinkedHashSet") -- _)
-        complete( """import java.util.LinkedHa<caret>""", Set("LinkedHashMap", "LinkedHashSet") ^ _)
-        complete( """import java.util.{LinkedHa<caret>""", Set("LinkedHashMap", "LinkedHashSet") ^ _)
+        complete("""import <caret>""", Set("java", "javax", "scala") -- _)
+        complete("""import j<caret>""", Set("java", "javax", "jline", "jawn") -- _)
+        complete("""import ja<caret>""", x => Set("java", "javax", "jawn") ^ (x - "javafx"))
+        complete("""import java.<caret>""", Set("lang", "util") -- _)
+        complete("""import java.u<caret>""", Set("util") ^ _)
+        complete("""import java.util.<caret>""", Set("LinkedHashMap", "LinkedHashSet") -- _)
+        complete("""import java.util.LinkedHa<caret>""", Set("LinkedHashMap", "LinkedHashSet") ^ _)
+        complete(
+          """import java.util.{LinkedHa<caret>""",
+          Set("LinkedHashMap", "LinkedHashSet") ^ _
+        )
         complete(
           """import java.util.{LinkedHashMap, Linke<caret>""",
           Set("LinkedHashMap", "LinkedHashSet", "LinkedList") ^ _
@@ -144,10 +147,9 @@ object AutocompleteTests extends TestSuite{
       }
   }
     'path{
-
-
       'parse{
-        def check(s: String, expected: (Option[String], Seq[Option[String]], Option[String], Int)) = {
+        def check(s: String,
+                  expected: (Option[String], Seq[Option[String]], Option[String], Int)) = {
           val cursor = s.indexOf("<caret>")
           val value = frontend.PathComplete.findPathLiteral(s.take(cursor), cursor).get
           assert(value == frontend.PathComplete.PathLiteralInfo.tupled(expected))
