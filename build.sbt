@@ -175,7 +175,8 @@ lazy val readme = ScalatexReadme(
   url = "https://github.com/lihaoyi/ammonite/tree/master",
   source = "Index"
 ).settings(
-  dontPublishSettings
+  dontPublishSettings,
+  (unmanagedSources in Compile) += baseDirectory.value/".."/"project"/"Constants.scala",
 )
 
 
