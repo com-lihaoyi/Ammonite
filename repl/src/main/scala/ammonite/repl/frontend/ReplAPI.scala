@@ -23,7 +23,7 @@ class ReplAPIHolder {
  */
 case class ReplExit(value: Any) extends ControlThrowable
 
-trait ReplAPI extends OpsAPI{
+trait ReplAPI {
   /**
    * Exit the Ammonite REPL. You can also use Ctrl-D to exit
    */
@@ -130,28 +130,7 @@ trait ReplAPI extends OpsAPI{
                       colors: pprint.Colors = null)
                      (implicit cfg: Config = Config.Defaults.PPrintConfig): Unit
 }
-trait OpsAPI{
-  /**
-   * The current working directory of the shell, that will get picked up by
-   * any [[Relativizer]] below, and can be modified using [[cd]]
-   */
-  implicit def wd: Path
-  /**
-   * Change the working directory `wd`; if the provided path is relative it
-   * gets appended on to the current `wd`, if it's absolute it replaces. It
-   * returns the resultant absolute path.
-   */
-  val cd: ammonite.ops.Path => ammonite.ops.Path
 
-  /**
-   * Allows you to use relative paths (and anything convertible to a relative
-   * path) as absolute paths when working in the REPL. Note that this isn't
-   * available when using Ammonite-Ops in a standalone project! In such cases,
-   * it's good practice to convert paths from relative to absolute explicitly.
-   */
-  implicit def Relativizer[T](p: T)(implicit b: Path, f: T => RelPath): Path
-
-}
 // End of OpsAPI
 trait LoadJar {
   /**

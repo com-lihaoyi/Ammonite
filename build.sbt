@@ -31,7 +31,9 @@ val sharedSettings = Seq(
       "org.scalamacros" %% s"quasiquotes" % "2.0.1"
     )
   ),
-  publishTo := Some("releases" at "https://oss.sonatype.org/service/local/staging/deploy/maven2"),
+  publishTo := Some(
+    "releases" at "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+  ),
   pomExtra :=
     <url>https://github.com/lihaoyi/Ammonite</url>
       <licenses>
@@ -64,13 +66,6 @@ lazy val ops = project
     libraryDependencies += "com.lihaoyi" %% "pprint" % "0.3.4"
   )
 
-lazy val tools = project
-  .dependsOn(ops)
-  .settings(sharedSettings:_*)
-  .settings(
-    name := "ammonite-tools",
-    libraryDependencies += "com.lihaoyi" %% "pprint" % "0.3.4"
-  )
 
 /**
  * A standalone re-implementation of a composable readline-style REPL,
@@ -139,16 +134,28 @@ lazy val repl = project
           def make[T](f: Cfg => String): Type[T]
           def get[T: Type](cfg: Cfg): String
           implicit def F0TPrint[R: Type] = make[() => R](cfg => "() => " + get[R](cfg))
-          implicit def F1TPrint[T1: Type, R: Type] = make[T1 => R](cfg => get[T1](cfg) + " => " + get[R](cfg))
+          implicit def F1TPrint[T1: Type, R: Type] = {
+            make[T1 => R](cfg => get[T1](cfg) + " => " + get[R](cfg))
+          }
           ${typeGen.mkString("\n")}
         }
       """.stripMargin
       IO.write(file, output)
       Seq(file)
     }
+  )
 
-
-//    fork in (Test, testOnly) := true
+/**
+ * Project that binds together [[ops]] and [[repl]], turning them into a
+ * credible systems shell that can be used to replace bash/zsh/etc. for
+ * common housekeeping tasks
+ */
+lazy val tools = project
+  .dependsOn(ops, repl)
+  .settings(sharedSettings:_*)
+  .settings(
+    name := "ammonite-tools",
+    libraryDependencies += "com.lihaoyi" %% "pprint" % "0.3.4"
   )
 
 lazy val readme = ScalatexReadme(

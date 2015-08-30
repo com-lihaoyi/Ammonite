@@ -18,7 +18,7 @@ class Repl(input: InputStream,
 
   val colors = Ref[Colors](Colors.Default)
   val frontEnd = Ref[FrontEnd](AmmoniteFrontEnd(
-    PathComplete.pathCompleteFilter(interp.replApi.wd, _, colors())
+    PartialFunction.empty
   ))
 
   val printer = new PrintStream(output, true)
@@ -128,6 +128,7 @@ object Repl{
     traces.mkString("\n")
   }
   case class Config(predef: String = "",
+                    predefFile: Option[Path] = None,
                     ammoniteHome: Path = defaultAmmoniteHome,
                     file: Option[Path] = None)
 
@@ -138,6 +139,9 @@ object Repl{
       opt[String]('p', "predef")
         .action((x, c) => c.copy(predef = x))
         .text("Any commands you want to execute at the start of the REPL session")
+      opt[String]('f', "predef-file")
+        .action((x, c) => c.copy(predefFile = Some(if (x(0) == '/') Path(x) else cwd/RelPath(x))))
+        .text("Lets you load your predef from a cuctom location")
       opt[File]('h', "home")
         .valueName("<file>")
         .action((x, c) => c.copy(ammoniteHome = Path(x)))
@@ -147,15 +151,18 @@ object Repl{
         .action { (x, c) => c.copy(file = Some(Path(x))) }
         .text("The Ammonite script file you want to execute")
     }
-    parser.parse(args, Config()).foreach(c => run(c.predef, c.ammoniteHome, c.file))
+    for(c <- parser.parse(args, Config())){
+      run(c.predef, c.ammoniteHome, c.predefFile, c.file)
+    }
   }
 
   implicit def ammoniteReplArrowBinder[T](t: (String, T))(implicit typeTag: TypeTag[T]) = {
     Bind(t._1, t._2)(typeTag)
   }
+
   def debug(replArgs: Bind[_]*): Any = {
 
-    def storage = Storage(defaultAmmoniteHome)
+    def storage = Storage(defaultAmmoniteHome, None)
     def repl = new Repl(
       System.in, System.out,
       storage = Ref(storage),
@@ -167,10 +174,11 @@ object Repl{
   }
   def run(predef: String = "",
           ammoniteHome: Path = defaultAmmoniteHome,
+          predefFile: Option[Path] = None,
           file: Option[Path] = None) = {
 
     Timer("Repl.run Start")
-    def storage = Storage(ammoniteHome)
+    def storage = Storage(ammoniteHome, predefFile)
     lazy val repl = new Repl(
       System.in, System.out,
       storage = Ref(storage),

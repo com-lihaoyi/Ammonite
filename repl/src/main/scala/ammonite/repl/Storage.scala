@@ -25,8 +25,8 @@ trait Storage{
 
 object Storage{
 
-  def apply(dir: Path): Storage = new Storage{
-    val predef = dir/"predef.scala"
+  def apply(dir: Path, predefFile: Option[Path]): Storage = new Storage{
+    val predef = predefFile.getOrElse(dir/"predef.scala")
     // Each version puts its cache in a separate folder, to bust caches
     // on every version bump; otherwise binary-incompatible changes to
     // ReplAPI/Preprocessor/ammonite-ops will cause scripts to fail after

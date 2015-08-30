@@ -1,6 +1,7 @@
 package ammonite.repl
 
 import ammonite.repl.TestUtils._
+import ammonite.tools.PathComplete
 import utest._
 import acyclic.file
 
@@ -151,12 +152,12 @@ object AutocompleteTests extends TestSuite{
         def check(s: String,
                   expected: (Option[String], Seq[Option[String]], Option[String], Int)) = {
           val cursor = s.indexOf("<caret>")
-          val value = frontend.PathComplete.findPathLiteral(s.take(cursor), cursor).get
-          assert(value == frontend.PathComplete.PathLiteralInfo.tupled(expected))
+          val value = PathComplete.findPathLiteral(s.take(cursor), cursor).get
+          assert(value == PathComplete.PathLiteralInfo.tupled(expected))
         }
         def checkNeg(s: String) = {
           val cursor = s.indexOf("<caret>")
-          val res = frontend.PathComplete.findPathLiteral(s.take(cursor), cursor)
+          val res = PathComplete.findPathLiteral(s.take(cursor), cursor)
           assert(res == None)
         }
         'pos{

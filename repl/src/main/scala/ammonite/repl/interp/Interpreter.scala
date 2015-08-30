@@ -255,25 +255,6 @@ class Interpreter(prompt0: Ref[String],
     def fullHistory = storage().fullHistory()
     def history = Interpreter.this.history
 
-    var wd0 = cwd
-    /**
-     * The current working directory of the shell, that will get picked up by
-     * any ammonite.ops commands you use
-     */
-    implicit def wd = wd0
-    /**
-     * Change the working directory `wd`; if the provided path is relative it
-     * gets appended on to the current `wd`, if it's absolute it replaces.
-     */
-    val cd = (arg: Path) => {
-      if (!stat(arg).isDir) throw new NotDirectoryException(arg.toString)
-      else {
-        wd0 = arg
-        wd0
-      }
-
-    }
-    implicit def Relativizer[T](p: T)(implicit b: Path, f: T => RelPath): Path = b/f(p)
 
     def width = interp.width
 

@@ -1,11 +1,11 @@
-package ammonite.repl.frontend
+package ammonite.tools
 
 import java.io.OutputStreamWriter
-import acyclic.file
-import ammonite.repl.Colors
-import ammonite.terminal.LazyList.~:
-import ammonite.terminal.{LazyList, TermState, TermInfo, TermCore}
 
+import ammonite.repl.Colors
+import ammonite.repl.frontend.{FrontEndUtils, Highlighter}
+import ammonite.terminal.{TermInfo, TermState, TermCore}
+import ammonite.terminal.LazyList.~:
 /**
  * Logic to find path "literals" so we can attempt to autocomplete them based
  * on what's actually on the filesystem.
