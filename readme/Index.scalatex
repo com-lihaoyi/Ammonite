@@ -598,6 +598,7 @@
 
     @hl.scala
       @@ import ammonite.ops._
+      @@ import ammonite.ops.ImplicitWd._
       @@ %ls
       build.sbt	log		ops		readme		repl		terminal
       echo		modules		project		readme.md	target		tools
