@@ -2,7 +2,6 @@ package ammonite.repl.frontend
 
 import java.io.{OutputStreamWriter, OutputStream, InputStream}
 
-import ammonite.repl.frontend.PathComplete.PathLiteralInfo
 import ammonite.repl._
 import ammonite.terminal.LazyList.~:
 import ammonite.terminal._
