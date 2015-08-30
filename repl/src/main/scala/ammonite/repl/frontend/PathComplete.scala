@@ -165,9 +165,16 @@ object PathComplete {
           )
         val (completions, details) = options.partition(_._2 != fragPrefix)
 
-        val completionNames = completions.map(_._2)
+        val coloredCompletions = for((path, name) <- completions) yield{
+          val color = stat(path).fileType match{
+            case ammonite.ops.FileType.Dir => Console.CYAN
+            case ammonite.ops.FileType.File => colors.literal()
+            case ammonite.ops.FileType.SymLink => Console.YELLOW
+            case ammonite.ops.FileType.Other => Console.RED
+          }
+          color + name + colors.reset()
+        }
 
-        val coloredCompletions = completionNames.map(colors.literal() + _ + colors.reset())
 
         import pprint.Config.Colors.PPrintConfig
 
@@ -176,7 +183,7 @@ object PathComplete {
         FrontEndUtils.printCompletions(coloredCompletions, details2, writer, rest, b, c)
         if (details.length != 0 || completions.length == 0) TermState(rest, b, c)
         else {
-          val common = FrontEndUtils.findPrefix(completionNames, 0)
+          val common = FrontEndUtils.findPrefix(completions.map(_._2), 0)
           val newBuffer = b.take(c - cursorOffset) ++ common ++ b.drop(c)
           TermState(rest, newBuffer, c - cursorOffset + common.length + 1)
         }

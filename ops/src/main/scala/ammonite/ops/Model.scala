@@ -1,6 +1,6 @@
 package ammonite.ops
 
-import java.nio.file.{Paths, Files}
+import java.nio.file.{LinkOption, Paths, Files}
 import java.nio.file.attribute._
 
 import ammonite.ops
@@ -41,8 +41,8 @@ object stat extends Function1[ops.Path, ops.stat]{
   def apply(p: ops.Path) = ops.stat.make(
     // Don't blow up if we stat `root`
     p.segments.lastOption.getOrElse("/"),
-    Files.readAttributes(Paths.get(p.toString), classOf[BasicFileAttributes]),
-    Try(Files.readAttributes(Paths.get(p.toString), classOf[PosixFileAttributes])).toOption
+    Files.readAttributes(Paths.get(p.toString), classOf[BasicFileAttributes], LinkOption.NOFOLLOW_LINKS),
+    Try(Files.readAttributes(Paths.get(p.toString), classOf[PosixFileAttributes], LinkOption.NOFOLLOW_LINKS)).toOption
   )
   def make(name: String, attrs: BasicFileAttributes, posixAttrs: Option[PosixFileAttributes]) = {
     import collection.JavaConversions._
@@ -62,8 +62,8 @@ object stat extends Function1[ops.Path, ops.stat]{
   object full extends Function1[ops.Path, ops.stat.full] {
     def apply(p: ops.Path) = ops.stat.full.make(
       p.last,
-      Files.readAttributes(Paths.get(p.toString), classOf[BasicFileAttributes]),
-      Try(Files.readAttributes(Paths.get(p.toString), classOf[PosixFileAttributes])).toOption
+      Files.readAttributes(Paths.get(p.toString), classOf[BasicFileAttributes], LinkOption.NOFOLLOW_LINKS),
+      Try(Files.readAttributes(Paths.get(p.toString), classOf[PosixFileAttributes], LinkOption.NOFOLLOW_LINKS)).toOption
     )
     def make(name: String, attrs: BasicFileAttributes, posixAttrs: Option[PosixFileAttributes]) = {
       import collection.JavaConversions._
