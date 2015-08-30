@@ -693,6 +693,17 @@
         You can invoke files on disk using @code{%} and @code{%%} the same way you can invoke shell commands:
 
       @hl.ref(opsTests/"ShelloutTests.scala", Seq("'filebased", "val"))
+
+    @sect{Current Working Directory}
+      @p
+        In Ammonite the current working directory is not a side-effect like in bash. Instead it is an argument to the command you are invoking. It can be passed in explicitly of implicitly.
+
+        @hl.scala
+          %(cwd) ls // explicitly
+          // or implicitly
+          import ammonite.ops.ImplicitWd._
+          %ls
+
 @sect{Community}
   @ul
     @li
