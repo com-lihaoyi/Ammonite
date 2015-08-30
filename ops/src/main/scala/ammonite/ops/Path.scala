@@ -1,8 +1,5 @@
 package ammonite.ops
 
-
-import java.nio.file.attribute._
-
 import acyclic.file
 
 

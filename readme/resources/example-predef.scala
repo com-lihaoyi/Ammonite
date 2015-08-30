@@ -1,3 +1,8 @@
 import ammonite.ops._
 
-prompt.bind(wd.segments.lastOption.getOrElse("").toString + "@ ")
+prompt.bind(
+  Console.RESET + sys.props("user.name") +
+  Console.MAGENTA + "@" +
+  Console.RESET + wd.segments.lastOption.getOrElse("").toString +
+  Console.MAGENTA + ">\n"
+)

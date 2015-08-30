@@ -54,8 +54,7 @@ object TTY{
     Seq("bash", "-c", s"tput $s 2> /dev/tty").!!.trim.toInt
   }
   def init() = {
-    val raw = stty("-a")
-    import sys.process._
+    stty("-a")
 
     val width = consoleDim("cols")
     val height = consoleDim("lines")

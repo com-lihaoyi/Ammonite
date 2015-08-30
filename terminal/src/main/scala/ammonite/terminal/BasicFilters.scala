@@ -93,7 +93,7 @@ object BasicFilters {
   def moveStart(b: Vector[Char],
                 c: Int,
                 w: Int) = {
-    val (chunks, chunkStarts, chunkIndex) = findChunks(b, c)
+    val (_, chunkStarts, chunkIndex) = findChunks(b, c)
     val currentColumn = (c - chunkStarts(chunkIndex)) % w
     b -> (c - currentColumn)
 

@@ -34,11 +34,11 @@ trait Extensions{
   implicit def Callable2[T1, T2, R](f: (T1, T2) => R) = new Callable2(f)
 }
 
-case class Callable1[T1, R](f: (T1 => R)) extends (T1 => R){
+class Callable1[T1, R](f: (T1 => R)) extends (T1 => R){
   def !(arg: T1): R = f(arg)
   def apply(arg: T1): R = f(arg)
 }
-case class Callable2[T1, T2, R](f: (T1, T2) => R) extends ((T1, T2) => R){
+class Callable2[T1, T2, R](f: (T1, T2) => R) extends ((T1, T2) => R){
   def !(arg1: T1) = new Callable1[T2, R](arg2 => f(arg1, arg2))
   def apply(arg1: T1, arg2: T2) = f(arg1, arg2)
 }

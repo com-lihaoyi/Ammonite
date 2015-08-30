@@ -218,7 +218,7 @@ object TermCore {
     }
 
     lazy val ansi = new Ansi(writer)
-    lazy val (width, height, initialConfig) = TTY.init()
+    lazy val (width, _, initialConfig) = TTY.init()
     try {
       readChar(TermState(LazyList.continually(reader.read()), Vector.empty, 0), 0)
     }finally{
