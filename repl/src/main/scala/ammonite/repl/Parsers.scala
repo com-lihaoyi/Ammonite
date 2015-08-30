@@ -54,11 +54,12 @@ object Parsers {
     }
   }
 
+  def stringWrap(s: String) = "\"" + pprint.PPrinter.escape(s) + "\""
   def stringSymWrap(s: String) = {
     if (s == "") "'"
     else (scalaparse.syntax.Identifiers.Id ~ End).parse(s, 0)  match{
       case Result.Success(v, _) =>  "'" + s
-      case f: Result.Failure => "\"" + pprint.PPrinter.escape(s) + "\""
+      case f: Result.Failure => stringWrap(s)
     }
   }
 }

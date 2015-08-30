@@ -51,15 +51,16 @@ object PathComplete {
    */
   def findPathLiteral(snippet: String, cursor: Int): Option[PathLiteralInfo] = {
     val indices = Highlighter.highlightIndices(
-    ammonite.repl.Parsers.Splitter,
-    snippet.toVector,
-    {
-      case scalaparse.Scala.Id => Interval.Id
-      case scalaparse.Scala.Literals.Expr.String => Interval.String
-      case scalaparse.Scala.Literals.Symbol => Interval.Symbol
-    },
-    Interval.End
+      ammonite.repl.Parsers.Splitter,
+      snippet.toVector,
+      {
+        case scalaparse.Scala.Id => Interval.Id
+        case scalaparse.Scala.Literals.Expr.String => Interval.String
+        case scalaparse.Scala.Literals.Symbol => Interval.Symbol
+      },
+      Interval.End
     )
+
     val spans =
       indices
         .drop(1)
@@ -74,6 +75,7 @@ object PathComplete {
         }
         .toVector
         .reverse
+
     spans.headOption match{
       case None => None
       case Some(head) =>
@@ -154,8 +156,11 @@ object PathComplete {
       if (exists(path)) {
         val fragPrefix = frag.getOrElse("")
 
+        def wrap(s: String) =
+          if(fragPrefix.startsWith("\"")) ammonite.repl.Parsers.stringWrap(s)
+          else ammonite.repl.Parsers.stringSymWrap(s)
         val options = (
-          ls ! path | (x => (x, ammonite.repl.Parsers.stringSymWrap(x.last)))
+          ls ! path | (x => (x, wrap(x.last)))
                     |? (_._2.startsWith(fragPrefix))
           )
         val (completions, details) = options.partition(_._2 != fragPrefix)
