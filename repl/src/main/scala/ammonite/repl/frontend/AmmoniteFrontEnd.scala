@@ -113,11 +113,13 @@ object AmmoniteFrontEnd extends FrontEnd{
         val path = rootMap(base)/seq.map{case None => up; case Some(s) => s: RelPath}
 
         if (exists(path)) {
+          val fragPrefix = frag.getOrElse("")
+
           val options = (
             ls! path | (x => (x, stringSymWrap(x.last)))
-                     |? (_._2.startsWith(frag.getOrElse("")))
+                     |? (_._2.startsWith(fragPrefix))
           )
-          val (completions, details) = options.partition(_._2 != frag.getOrElse(""))
+          val (completions, details) = options.partition(_._2 != fragPrefix)
 
           val completionNames = completions.map(_._2)
 
@@ -127,19 +129,14 @@ object AmmoniteFrontEnd extends FrontEnd{
 
           val details2 = details.map(x => pprint.tokenize(stat(x._1)).mkString)
 
-          lazy val common = findPrefix(completionNames, 0)
-
           doSomething(coloredCompletions, details2, writer, rest, b, c) match{
             case None => TermState(rest, b, c)
             case Some(_) =>
-              val newBuffer =
-                b.take(c - cursorOffset) ++
-                common ++
-                b.drop(c)
-
+              val common = findPrefix(completionNames, 0)
+              val newBuffer = b.take(c - cursorOffset) ++ common ++ b.drop(c)
               TermState(rest, newBuffer, c - cursorOffset + common.length + 1)
           }
-        }else TermState(rest, b, c)
+        } else TermState(rest, b, c)
 
 
       case TermInfo(TermState(9 ~: rest, b, c), width) =>

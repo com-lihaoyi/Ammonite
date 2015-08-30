@@ -39,10 +39,10 @@ object Highlighter {
     },
     endColor = reset
   )
-  def highlightIndices(parser: fastparse.core.Parser[_],
-                buffer: Vector[Char],
-                ruleColors: PartialFunction[Rule[_], String],
-                endColor: String) = {
+  def highlightIndices[T](parser: fastparse.core.Parser[_],
+                          buffer: Vector[Char],
+                          ruleColors: PartialFunction[Rule[_], T],
+                          endColor: T) = {
     val indices = {
       var indices = collection.mutable.Buffer((0, endColor, false))
       var done = false
