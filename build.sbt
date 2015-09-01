@@ -158,7 +158,10 @@ lazy val tools = project
   .settings(sharedSettings:_*)
   .settings(
     name := "ammonite-tools",
-    libraryDependencies += "com.lihaoyi" %% "pprint" % "0.3.4"
+    libraryDependencies += "com.lihaoyi" %% "pprint" % "0.3.4",
+    (run in Test) <<= (run in Test).dependsOn(
+      publishLocal
+    )
   )
 
 lazy val integrationTests = project

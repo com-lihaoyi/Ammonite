@@ -15,7 +15,7 @@ import scala.util.control.ControlThrowable
 
 class ReplAPIHolder {
   var repl0: FullReplAPI = null
-  lazy val repl = repl0
+  implicit lazy val repl = repl0
 }
 
 /**

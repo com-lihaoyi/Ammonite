@@ -3,6 +3,8 @@ package ammonite.tools
 import java.nio.file.NotDirectoryException
 
 import ammonite.ops._
+import ammonite.repl.frontend.FrontEndUtils
+import pprint.{Config, PPrinter, PPrint}
 
 case class ShellSession() extends OpsAPI {
   var wd0 = cwd
@@ -24,6 +26,16 @@ case class ShellSession() extends OpsAPI {
 
   }
   implicit def Relativizer[T](p: T)(implicit b: Path, f: T => RelPath): Path = b/f(p)
+
+  implicit def lsSeqRepr: PPrint[LsSeq] = PPrint(
+    PPrinter(
+      (t: LsSeq, c: Config) =>
+        Iterator("\n", FrontEndUtils.tabulate(
+          t.map(p => Iterator(PathComplete.colorPath(p), p.last, Console.RESET).mkString),
+          FrontEndUtils.width
+        ).mkString)
+    )
+  )
 
 }
 trait OpsAPI{

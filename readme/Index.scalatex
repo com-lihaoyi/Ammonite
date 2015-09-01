@@ -28,29 +28,29 @@
     Ammonite is a cleanroom re-implementation of the Scala REPL from first principles. It is much more featureful than the default REPL and comes with a lot of @sect.ref("Features", "ergonomic improvements") and @sect.ref("Configuration", "configurability") that may be familiar to people coming from IDEs or other REPLs such as @a("IPython", href:="http://ipython.org/") or @a("Zsh", href:="http://www.zsh.org/"). It can be combined with @sect.ref{Ammonite-Ops} to replace Bash as your systems shell, but also can be used alone as a @sect.ref("Features", "superior") version of the default Scala REPL, or as a @sect.ref("Debugging", "debugging tool").
 
   @p
-    One way to get started with Ammonite is to download the standalone executable:
+    If you want to use Ammonite as a plain Scala shell, download the standalone executable:
 
   @hl.sh
     $ curl -L -o amm http://git.io/vGksC; chmod +x amm; ./amm
 
+  @p
+    This will give you access to Ammonite for Scala:
 
-  @hl.scala
-    Loading Ammonite Repl...
-    @@ List(Seq(Seq("mgg", "mgg", "lols"), Seq("mgg", "mgg")), Seq(Seq("ggx", "ggx"),Seq("ggx", "ggx", "wtfx")))
-    res1: List[Seq[Seq[String]]] = List(
-      List(List("mgg", "mgg", "lols"), List("mgg", "mgg")),
-      List(List("ggx", "ggx"), List("ggx", "ggx", "wtfx"))
-    )
+  @img(src:="GettingStarted.png", width:="100%")
 
-    @@ load.ivy("com.lihaoyi" %% "scalatags" % "0.4.5") // load a library
+  @p
+    With @sect.ref{Pretty Printing}, @sect.ref{Syntax Highlighting} for input and output, @sect.ref{Artifact Loading} in-REPL, and all the other nice features!
 
-    @@ import scalatags.Text.all._
-    import scalatags.Text.all._
+  @p
+    If you want to use Ammonite as a filesystem shell, download the default predef:
 
-    @@ a("omg", href:="www.google.com").render
-    res3: String = """
-    <a href="www.google.com">omg</a>
-    """
+  @hl.sh
+    $ mkdir ~/.ammonite; curl -L -o ~/.ammonite/predef.scala ???
+
+  @p
+    You can then use Ammonite as a replacement for Bash:
+
+  @img(src:="SystemShell.png", width:="100%")
 
   @p
     If you want some initialization code available to the REPL, you can add it to your @code{~/.ammonite/predef.scala}.

@@ -142,6 +142,14 @@ object PathComplete {
     Some("home") -> (wd => home)
   )
 
+  def colorPath(path: Path) = {
+    stat(path).fileType match{
+      case ammonite.ops.FileType.Dir => Console.CYAN
+      case ammonite.ops.FileType.File => Console.GREEN
+      case ammonite.ops.FileType.SymLink => Console.YELLOW
+      case ammonite.ops.FileType.Other => Console.RED
+    }
+  }
   def pathCompleteFilter(wd: => Path,
                          colors: => Colors): TermCore.Filter = {
     case TermInfo(TermState(9 ~: rest, b, c), width)
@@ -166,12 +174,7 @@ object PathComplete {
         val (completions, details) = options.partition(_._2 != fragPrefix)
 
         val coloredCompletions = for((path, name) <- completions) yield{
-          val color = stat(path).fileType match{
-            case ammonite.ops.FileType.Dir => Console.CYAN
-            case ammonite.ops.FileType.File => colors.literal()
-            case ammonite.ops.FileType.SymLink => Console.YELLOW
-            case ammonite.ops.FileType.Other => Console.RED
-          }
+          val color = colorPath(path)
           color + name + colors.reset()
         }
 
@@ -181,7 +184,7 @@ object PathComplete {
         val details2 = details.map(x => pprint.tokenize(stat(x._1)).mkString)
 
         val stdout =
-          FrontEndUtils.printCompletions(coloredCompletions, details2, rest, b, c)
+          FrontEndUtils.printCompletions(coloredCompletions, details2)
                        .mkString
 
         if (details.length != 0 || completions.length == 0)

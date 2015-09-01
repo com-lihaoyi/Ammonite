@@ -69,7 +69,7 @@ case class AmmoniteFrontEnd(extraFilters: TermCore.Filter = PartialFunction.empt
           colors.comment() + left + colors.reset() + right
         }
         val stdout =
-          FrontEndUtils.printCompletions(completions2, details2, rest, b, c)
+          FrontEndUtils.printCompletions(completions2, details2)
                        .mkString
 
         if (details.length != 0 || completions.length == 0)

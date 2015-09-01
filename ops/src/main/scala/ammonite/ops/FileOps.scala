@@ -7,7 +7,7 @@
 package ammonite.ops
 
 import java.io.{File, InputStream}
-import java.nio.file.{NoSuchFileException, Files, Paths, StandardOpenOption}
+import java.nio.file._
 import acyclic.file
 import ammonite.ops.Internals.SelfClosingIterator
 
@@ -174,7 +174,10 @@ object rm extends Function1[Path, Unit]{
     // Emulate `rm -rf` functionality by ignoring non-existent files
     val files =
       try ls.rec(target)
-      catch {case e: NoSuchFileException => Nil}
+      catch {
+        case e: NoSuchFileException => Nil
+        case e: NotDirectoryException => Nil
+      }
 
     files.toArray
          .reverseIterator
@@ -185,21 +188,6 @@ object rm extends Function1[Path, Unit]{
 
 object LsSeq{
   import language.experimental.macros
-  implicit def lsSeqRepr: PPrint[LsSeq] = PPrint(
-    PPrinter(
-      (t: LsSeq, c: Config) =>
-        pprint.Internals.handleChunksVertical("LsSeq", c, (c) =>
-          t.listed
-           .iterator
-           // Don't show dotfiles by default, to follow the behavior
-           // of bash and friends. If the user wants to see them then
-           // he can call toSeq on the result
-           .filter(!_.last.startsWith("."))
-           .map(implicitly[PPrint[RelPath]].pprinter.render(_, c))
-        )
-
-    )
-  )
 
 }
 

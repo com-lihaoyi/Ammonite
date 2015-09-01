@@ -35,10 +35,7 @@ object FrontEndUtils {
   }
 
   def printCompletions(completions: Seq[String],
-                       details: Seq[String],
-                       rest: LazyList[Int],
-                       b: Vector[Char],
-                       c: Int): List[String] = {
+                       details: Seq[String]): List[String] = {
 
     val prelude =
       if (details.length != 0 || completions.length != 0) List("\n")
