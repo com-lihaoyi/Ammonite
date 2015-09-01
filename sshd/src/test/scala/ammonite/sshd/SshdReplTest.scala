@@ -14,7 +14,7 @@ object SshdReplTest extends TestSuite {
   override val tests = TestSuite {
     'canExecuteRemoteCommand{
       withTmpDirectory { tmpDir =>
-        val repl = new SshdRepl(SshServerConfig(0, testUsername, testPassword, tmpDir))
+        val repl = new SshdRepl(SshServerConfig("localhost", 0, testUsername, testPassword, tmpDir))
         repl.start()
         val client = sshClient((testUsername, testPassword), "localhost", repl.port)
         client.connect()

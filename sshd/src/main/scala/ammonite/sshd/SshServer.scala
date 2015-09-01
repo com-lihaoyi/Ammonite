@@ -19,6 +19,7 @@ import org.apache.sshd.{SshServer => SshServerImpl}
 object SshServer {
   def apply(options: SshServerConfig, shellServer: ShellSession.Server) = {
     val sshServer = SshServerImpl.setUpDefaultServer()
+    sshServer.setHost(options.address)
     sshServer.setPort(options.port)
     sshServer.setPasswordAuthenticator(
       passwordAuthenticator(options.username, options.password)

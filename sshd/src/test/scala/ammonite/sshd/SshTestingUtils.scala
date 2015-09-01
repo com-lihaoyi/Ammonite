@@ -48,8 +48,13 @@ object SshTestingUtils {
 
   def testSshServer(user: (String, String), shell: ShellSession.Server)
                    (implicit dir: Path) = {
-    def config = SshServerConfig(port = 0,
-      username = user._1, password = user._2, ammoniteHome = dir)
+    def config = SshServerConfig(
+      "localhost",
+      port = 0,
+      username = user._1,
+      password = user._2,
+      ammoniteHome = dir
+    )
     SshServer(config, shell)
   }
 

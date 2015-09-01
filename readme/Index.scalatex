@@ -381,7 +381,7 @@
     @sect{Remote shell}
 
       @p
-        Ammonite can also be used to remotely connect to your running application and interact with it in real-time, similar to erlang `erl -remsh` command. To do this, add ammonite sshd server to your classpath, for example with SBT:
+        Ammonite can also be used to remotely connect to your running application and interact with it in real-time, similar to Erlang's @code{erl -remsh} command. To do this, add ammonite sshd server to your classpath, for example with SBT:
 
       @hl.scala
         libraryDependencies += "com.lihaoyi" % "ammonite-repl-sshd" % "@ammonite.Constants.version" cross CrossVersion.full
@@ -391,7 +391,13 @@
 
       @hl.scala
         import ammonite.sshd._
-        val replServer = new SshdRepl(SshServerConfig(port = 22222, username = "repl", password = "your_secure_password"))
+        val replServer = new SshdRepl(
+          SshServerConfig(
+            port = 22222,
+            username = "repl",
+            password = "your_secure_password"
+          )
+        )
         replServer.start()
 
       @p
@@ -403,7 +409,7 @@
         Here we can interact with UI code live, having it changing at our sight. We can try different things, see which works and which not, and then put our final bits in application code. In this example app is located on local machine, but you are free to connect to any remote node running your code.
 
       @p
-        @b{Security notes:} It might be unsafe to run this server as is on your production application. Currently it doesn't supports key-based auth, but things might change in the future. Meanwhile remember to use strong password and that the port you'll be using will be open to everybody in a network, your only protection would be a login & password you choose. For this reason there is a couple of recommendation:
+        @b{Security notes:} It is probably unsafe to run this server as is on your production application. Currently it doesn't supports key-based auth. Meanwhile remember to use strong password and that the port you'll be using will be open to everybody in a network, your only protection would be a login & password you choose. For this reason there is a couple of recommendation:
         @ul
           @li
             use non-standard port:

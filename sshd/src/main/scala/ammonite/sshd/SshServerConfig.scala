@@ -12,7 +12,8 @@ import ammonite.repl.Repl
  * @param ammoniteHome path that ammonite repl sessions will be using as their home directory
  * @param hostKeyFile path to the place where to store server's identity key
  */
-case class SshServerConfig(port: Int,
+case class SshServerConfig(address: String,
+                           port: Int,
                            username:String,
                            password:String,
                            ammoniteHome:Path = Repl.defaultAmmoniteHome,

@@ -13,7 +13,7 @@ import org.apache.sshd.server._
 private[sshd] class ShellSession(remoteShell: ShellSession.Server) extends Command {
   var in: InputStream = _
   var out: OutputStream = _
-  var exit: sshd.server.ExitCallback = _
+  var exit: ExitCallback = _
   lazy val thread = createShellServingThread()
 
   override def setInputStream(in: InputStream) = {
