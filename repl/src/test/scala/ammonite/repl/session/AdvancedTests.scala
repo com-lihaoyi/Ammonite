@@ -65,14 +65,8 @@ object AdvancedTests extends TestSuite{
 
           @ import ammonite.ops.ImplicitWd._
 
-          @ ls! cwd/'ops
-          res2: ammonite.ops.LsSeq = LsSeq(
-            'src,
-            'target
-          )
-
           @ %%ls 'ops
-          res3: ammonite.ops.CommandResult =
+          res2: ammonite.ops.CommandResult =
           src
           target
         """)
