@@ -378,7 +378,7 @@
     @p
       The @hl.scala{debug()} call returns @hl.scala{: Any}; by default, this is @hl.scala{(): Unit}, but you can also return custom values by passing in an argument to @hl.scala{exit(...)} when you exit the REPL. This value will then be returned from @hl.scala{debug()}, and can be used in the rest of your Scala application.
 
-    @sect{Remote shell}
+    @sect{Remote Shell}
 
       @p
         Ammonite can also be used to remotely connect to your running application and interact with it in real-time, similar to Erlang's @code{erl -remsh} command. To do this, add ammonite sshd server to your classpath, for example with SBT:
@@ -756,6 +756,12 @@
 @sect{Changelog}
   @sect{0.4.7}
     @ul
+      @li
+        Path-completion now works when using Ammonite as a filesystem shell
+      @li
+        Ammonite's filesystem functionality (@hl.scala{cd!}, @hl.scala{wd}, path-completion) has been pulled out of Ammonite-REPL, and is now available separately.
+      @li
+        Ammonite can now be used as a @sect.ref{Remote Shell} into an already-running Scala process, letting you SSH in to poke around at any time while it's running.
       @li
         Fix execution of files via symbols in the current working directory.
   @sect{0.4.6}
