@@ -378,6 +378,45 @@
     @p
       The @hl.scala{debug()} call returns @hl.scala{: Any}; by default, this is @hl.scala{(): Unit}, but you can also return custom values by passing in an argument to @hl.scala{exit(...)} when you exit the REPL. This value will then be returned from @hl.scala{debug()}, and can be used in the rest of your Scala application.
 
+    @sect{Remote shell}
+
+      @p
+        Ammonite can also be used to remotely connect to your running application and interact with it in real-time, similar to erlang `erl -remsh` command. To do this, add ammonite sshd server to your classpath, for example with SBT:
+
+      @hl.scala
+        libraryDependencies += "com.lihaoyi" % "ammonite-repl-sshd" % "@ammonite.Constants.version" cross CrossVersion.full
+
+      @p
+        Now add repl server to your application:
+
+      @hl.scala
+        import ammonite.sshd._
+        val replServer = new SshdRepl(SshServerConfig(port = 22222, username = "repl", password = "your_secure_password"))
+        replServer.start()
+
+      @p
+        And start your application. You will be able to connect to it using ssh like this: @hl.sh("ssh repl@localhost -p22222") and interact with your running app. Invoke @hl.scala{stop()} method whenever you want to shutdown ammonite sshd server. Here for example sshd repl server is embedded in a pseudo-graphical console application:
+
+      @img(src:="DebuggingViaSshd.png", width:="100%")
+
+      @p
+        Here we can interact with UI code live, having it changing at our sight. We can try different things, see which works and which not, and then put our final bits in application code. In this example app is located on local machine, but you are free to connect to any remote node running your code.
+
+      @p
+        @b{Security notes:} It might be unsafe to run this server as is on your production application. Currently it doesn't supports key-based auth, but things might change in the future. Meanwhile remember to use strong password and that the port you'll be using will be open to everybody in a network, your only protection would be a login & password you choose. For this reason there is a couple of recommendation:
+        @ul
+          @li
+            use non-standard port:
+            @ul
+              @li{ port 22 most likely already used by system's sshd }
+              @li{ port 22 may be reserved to be opened only with root access }
+              @li{ it's not a very usual sshd shell access so might be a little unexpected to be found at port 22 }
+              @li{ it will receive less attention so less chances to be attacked. Usually ports besides 22 aren't checked for ssh access by botnets }
+          @li
+            use original ssh as bastion to protect access from external network. You can have your non-standard port closed by a firewall from remote access, and connect to usual sshd first, then connect to localhost to another port once you're in.
+
+
+
 @sect("Ammonite-Ops", "Rock-solid Filesystem Operations")
   @p
     Ammonite-Ops is a library to make common filesystem operations in Scala as concise and easy-to-use as from the Bash shell, while being robust enough to use in large applications without getting messy. It lives in the same repo as the Ammonite REPL, but can easily be used stand-alone in a normal SBT/maven project.

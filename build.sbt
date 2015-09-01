@@ -169,6 +169,26 @@ lazy val integrationTests = project
     dontPublishSettings
   )
 
+
+/**
+ * REPL available via remote ssh access.
+ * Plug into any app environment for live hacking on a live application.
+ */
+lazy val sshd = project.
+    dependsOn(repl).
+    settings(sharedSettings:_*).
+    settings(
+      name := "ammonite-sshd",
+      libraryDependencies ++= Seq(
+        "org.apache.sshd" % "sshd-core" % "0.14.0",
+        //-- test --//
+        // slf4j-nop makes sshd server use logger that writes into the void
+        "org.slf4j" % "slf4j-nop" % "1.7.12" % "test",
+        "com.jcraft" % "jsch" % "0.1.53" % "test",
+        "org.scalacheck" %% "scalacheck" % "1.12.4" % "test"
+      )
+  )
+
 lazy val readme = ScalatexReadme(
   projectId = "readme",
   wd = file(""),
