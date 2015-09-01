@@ -1,4 +1,4 @@
-//load.ivy("com.lihaoyi" %% "ammonite-tools" % ammonite.Constants.version)
+load.ivy("com.lihaoyi" %% "ammonite-tools" % ammonite.Constants.version)
 @
 val sess = ammonite.tools.ShellSession()
 import sess._

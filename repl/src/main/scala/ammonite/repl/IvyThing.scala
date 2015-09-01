@@ -5,9 +5,10 @@ import org.apache.ivy.core.module.descriptor.{DefaultDependencyDescriptor, Defau
 import org.apache.ivy.core.module.id.ModuleRevisionId
 import org.apache.ivy.core.resolve.{IvyNode, ResolveOptions}
 import org.apache.ivy.core.settings.IvySettings
+import org.apache.ivy.plugins.repository.file.FileRepository
 import org.apache.ivy.util._
 
-import org.apache.ivy.plugins.resolver.IBiblioResolver
+import org.apache.ivy.plugins.resolver.{ChainResolver, FileSystemResolver, IBiblioResolver}
 import acyclic.file
 object IvyConstructor extends IvyConstructor
 trait IvyConstructor{
@@ -62,21 +63,54 @@ object IvyThing {
         res.setRoot("http://repo1.maven.org/maven2/")
         res
       }
+      def fileResolver(name: String, root: String, pattern: String, m2: Boolean = false) = {
+        val testRepoDir = sys.props("user.home") + root
+        val repo = new FileRepository(new java.io.File(testRepoDir))
+
+        val res = new FileSystemResolver()
+        res.addIvyPattern(testRepoDir + pattern)
+        res.addArtifactPattern(testRepoDir + pattern)
+        res.setRepository(repo)
+        res.setM2compatible(m2)
+        res.setName(name)
+
+        res
+      }
+
       //add duplicate resolvers with different name to make Ivy shut up
       //and stop giving `unknown resolver null` or `unknown resolver sbt-chain`
       //errors
+
+
       val resolvers = Seq(
-        resolver("central"),
-        resolver("sbt-chain"),
-        resolver("null")
+        fileResolver(
+          "cache",
+          "/.ivy2/cache",
+          "/[organisation]/[module]/jars/[artifact]-[revision].[ext]"
+        ),
+        fileResolver(
+          "local",
+          "/.ivy2/local",
+          "/[organisation]/[module]/[revision]/jars/[artifact].[ext]"
+        ),
+        fileResolver(
+          "m2",
+          "/.m2/repository",
+          "/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]",
+          m2 = true
+        ),
+        resolver("central")
       )
+
       //creates clear ivy settings
       val ivySettings = new IvySettings()
       //adding maven repo resolver
-      resolvers.foreach(ivySettings.addResolver)
+      val chainResolver = new ChainResolver
+      resolvers.foreach(chainResolver.add)
+      ivySettings.addResolver(chainResolver)
 
       //set to the default resolver
-      ivySettings.setDefaultResolver(resolvers(0).getName)
+      ivySettings.setDefaultResolver(chainResolver.getName)
       //creates an Ivy instance with settings
       ivySettings
     }
