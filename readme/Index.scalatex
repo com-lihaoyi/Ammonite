@@ -393,9 +393,10 @@
         import ammonite.sshd._
         val replServer = new SshdRepl(
           SshServerConfig(
-            port = 22222,
-            username = "repl",
-            password = "your_secure_password"
+            host = "localhost", // or "0.0.0.0" for public-facing shells
+            port = 22222, // Any available port
+            username = "repl", // Arbitrary
+            password = "your_secure_password" // or ""
           )
         )
         replServer.start()
@@ -409,19 +410,13 @@
         Here we can interact with UI code live, having it changing at our sight. We can try different things, see which works and which not, and then put our final bits in application code. In this example app is located on local machine, but you are free to connect to any remote node running your code.
 
       @p
-        @b{Security notes:} It is probably unsafe to run this server as is on your production application. Currently it doesn't supports key-based auth. Meanwhile remember to use strong password and that the port you'll be using will be open to everybody in a network, your only protection would be a login & password you choose. For this reason there is a couple of recommendation:
-        @ul
-          @li
-            use non-standard port:
-            @ul
-              @li{ port 22 most likely already used by system's sshd }
-              @li{ port 22 may be reserved to be opened only with root access }
-              @li{ it's not a very usual sshd shell access so might be a little unexpected to be found at port 22 }
-              @li{ it will receive less attention so less chances to be attacked. Usually ports besides 22 aren't checked for ssh access by botnets }
-          @li
-            use original ssh as bastion to protect access from external network. You can have your non-standard port closed by a firewall from remote access, and connect to usual sshd first, then connect to localhost to another port once you're in.
+        @b{Security notes:} It is probably unsafe to run this server publicly (on host @hl.scala{"0.0.0.0"}) in a production, public-facing application. Currently it doesn't supports key-based auth, and password-based auth is notoriously weak.
 
+      @p
+        Despite this, it is perfectly possible to run these on production infrastructure: simply leave the @hl.scala{host} set to @hl.scala{"localhost"}, and rely on the machine's own SSH access to keep out unwanted users: you would first @code{ssh} onto the machine itself, and then @code{ssh} into the Ammonite REPL running on @code{localhost}.
 
+      @p
+        Typically most organizations already have bastions, firewalls, and other necessary infrastructure to allow trusted parties SSH access to the relevant machines. Running on @code{localhost} lets you leverage that and gain all the same security properties without having to re-implement them in Scala.
 
 @sect("Ammonite-Ops", "Rock-solid Filesystem Operations")
   @p

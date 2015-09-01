@@ -2,8 +2,8 @@ package ammonite.sshd
 
 import scala.annotation.tailrec
 
-object StandaloneSshdRepl {
-  def main(args:Array[String]):Unit = {
+object Main {
+  def main(args:Array[String]): Unit = {
     val config = SshServerConfig("localhost", 2222, currentUserName, getPassword)
     val ammoniteServer = new SshdRepl(config)
 

@@ -16,8 +16,8 @@ case class SshServerConfig(address: String,
                            port: Int,
                            username:String,
                            password:String,
-                           ammoniteHome:Path = Repl.defaultAmmoniteHome,
-                           hostKeyFile:Option[Path] = None
+                           ammoniteHome: Path = Repl.defaultAmmoniteHome,
+                           hostKeyFile: Option[Path] = None
 ) {
   require(username.nonEmpty, "username can't be an empty string")
   override def toString =
