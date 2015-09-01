@@ -1,4 +1,4 @@
-package ammonite.repl
+package ammonite.integrationTests
 
 import utest._
 import ammonite.ops._
@@ -30,6 +30,22 @@ object StandaloneTests extends TestSuite{
     'complex{
       val evaled = exec("Complex.scala")
       assert(evaled.contains("Spire Interval [0, 10]"))
+    }
+    'shell{
+      // make sure you can load the example-predef.scala, have it pull stuff in
+      // from ivy, and make use of `cd!` and `wd` inside the executed script.
+      val res = %%bash(
+        executable,
+        "--predef-file",
+        cwd/'tools/'src/'main/'resources/"example-predef.scala",
+        "-c",
+        """val x = wd
+          |@
+          |cd('repl/'src)
+          |@
+          |println(wd relativeTo x)""".stripMargin
+      )
+      assert(res.mkString("\n") == "repl/src")
     }
   }
 }

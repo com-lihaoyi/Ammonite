@@ -129,6 +129,7 @@ object Repl{
   }
   case class Config(predef: String = "",
                     predefFile: Option[Path] = None,
+                    code: Option[String] = None,
                     ammoniteHome: Path = defaultAmmoniteHome,
                     file: Option[Path] = None)
 
@@ -142,6 +143,9 @@ object Repl{
       opt[String]('f', "predef-file")
         .action((x, c) => c.copy(predefFile = Some(if (x(0) == '/') Path(x) else cwd/RelPath(x))))
         .text("Lets you load your predef from a cuctom location")
+      opt[String]('c', "code")
+        .action((x, c) => c.copy(code = Some(x)))
+        .text("Pass in code to be run immediately in the REPL")
       opt[File]('h', "home")
         .valueName("<file>")
         .action((x, c) => c.copy(ammoniteHome = Path(x)))
@@ -152,7 +156,7 @@ object Repl{
         .text("The Ammonite script file you want to execute")
     }
     for(c <- parser.parse(args, Config())){
-      run(c.predef, c.ammoniteHome, c.predefFile, c.file)
+      run(c.predef, c.ammoniteHome, c.code, c.predefFile, c.file)
     }
   }
 
@@ -174,6 +178,7 @@ object Repl{
   }
   def run(predef: String = "",
           ammoniteHome: Path = defaultAmmoniteHome,
+          code: Option[String] = None,
           predefFile: Option[Path] = None,
           file: Option[Path] = None) = {
 
@@ -184,12 +189,15 @@ object Repl{
       storage = Ref(storage),
       predef = predef
     )
-    file match{
-      case None =>
+    (file, code) match{
+      case (None, None) =>
         println("Loading...")
         repl.run()
-      case Some(path) =>
+      case (Some(path), None) =>
         repl.interp.replApi.load.module(path)
+      case (None, Some(code)) =>
+        println(1)
+        repl.interp.replApi.load(code)
     }
     Timer("Repl.run End")
   }
