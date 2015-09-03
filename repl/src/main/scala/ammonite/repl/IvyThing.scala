@@ -155,6 +155,10 @@ object IvyThing {
     println(report.getFailedArtifactsReports.toSeq)
     println(report.getArtifacts.toSeq)
     println(report.getUnresolvedDependencies.toSeq)
+    report.getUnresolvedDependencies
+          .toSeq
+          .map(_.getProblem)
+          .foreach(_.printStackTrace())
     println(report.getUnresolvedDependencies.map(_.getProblemMessage).toSeq)
     if (unresolved.size == 0) report.getAllArtifactsReports.map(_.getLocalFile)
     else throw IvyResolutionException(unresolved.toSeq.map(_.toString))
