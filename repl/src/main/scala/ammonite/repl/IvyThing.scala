@@ -145,15 +145,15 @@ object IvyThing {
 
     //init resolve report
     val report = ivy.resolve(md, options)
-    val unresolved = report.getAllProblemMessages
+    val unresolved = report.getProblemMessages
 
     import collection.JavaConversions._
-    println("IVY THING")
-    println(report.getAllProblemMessages.length)
-    println(report.getProblemMessages.length)
-    println(report.getAllArtifactsReports.length)
-    println(report.getFailedArtifactsReports.length)
-    println(report.getArtifacts.length)
+//    println("IVY THING")
+//    println(report.getAllProblemMessages.length)
+//    println(report.getProblemMessages.length)
+//    println(report.getAllArtifactsReports.length)
+//    println(report.getFailedArtifactsReports.length)
+//    println(report.getArtifacts.length)
     if (unresolved.size == 0) report.getAllArtifactsReports.map(_.getLocalFile)
     else throw IvyResolutionException(unresolved.toSeq.map(_.toString))
   }
