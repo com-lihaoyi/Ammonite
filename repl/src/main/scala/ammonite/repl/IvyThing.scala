@@ -30,7 +30,7 @@ trait IvyConstructor{
  * And transliterated into Scala. I have no idea how or why it works.
  */
 object IvyThing {
-  case class IvyResolutionException(failed: Array[String]) extends Exception(
+  case class IvyResolutionException(failed: Seq[String]) extends Exception(
     "failed to resolve ivy dependencies " + failed.mkString(", ")
   )
   val scalaBinaryVersion =
@@ -150,6 +150,6 @@ object IvyThing {
     import collection.JavaConversions._
 
     if (unresolved.size == 0) report.getAllArtifactsReports.map(_.getLocalFile)
-    else throw IvyResolutionException(unresolved)
+    else throw IvyResolutionException(unresolved.toSeq.map(_.toString))
   }
 }
