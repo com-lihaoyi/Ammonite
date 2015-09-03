@@ -154,8 +154,8 @@ object IvyThing {
     println(report.getAllArtifactsReports.toSeq)
     println(report.getFailedArtifactsReports.toSeq)
     println(report.getArtifacts.toSeq)
-    println(report.getUnresolvedDependencies)
-    println(report.getUnresolvedDependencies.map(_.getProblemMessage))
+    println(report.getUnresolvedDependencies.toSeq)
+    println(report.getUnresolvedDependencies.map(_.getProblemMessage).toSeq)
     if (unresolved.size == 0) report.getAllArtifactsReports.map(_.getLocalFile)
     else throw IvyResolutionException(unresolved.toSeq.map(_.toString))
   }
