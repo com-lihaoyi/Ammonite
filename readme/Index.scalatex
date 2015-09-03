@@ -771,6 +771,8 @@
         Ammonite can now be used as a @sect.ref{Remote Shell} into an already-running Scala process, letting you SSH in to poke around at any time while it's running.
       @li
         Fix execution of files via symbols in the current working directory.
+      @li
+        @hl.scala{Load.ivy} now properly attempts to load artifacts from the local @code{~/.ivy/cache}, @code{~/.ivy/local} and @code{~/.m2} folders, before fetching from maven central
   @sect{0.4.6}
     @ul
       @li
