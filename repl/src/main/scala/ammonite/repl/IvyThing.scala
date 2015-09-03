@@ -3,6 +3,7 @@ package ammonite.repl
 import org.apache.ivy.Ivy
 import org.apache.ivy.core.module.descriptor.{DefaultDependencyDescriptor, DefaultModuleDescriptor}
 import org.apache.ivy.core.module.id.ModuleRevisionId
+import org.apache.ivy.core.report.DownloadStatus
 import org.apache.ivy.core.resolve.{IvyNode, ResolveOptions}
 import org.apache.ivy.core.settings.IvySettings
 import org.apache.ivy.plugins.repository.file.FileRepository
@@ -29,7 +30,7 @@ trait IvyConstructor{
  * And transliterated into Scala. I have no idea how or why it works.
  */
 object IvyThing {
-  case class IvyResolutionException(failed: Array[IvyNode]) extends Exception(
+  case class IvyResolutionException(failed: Array[(String, String, String)]) extends Exception(
     "failed to resolve ivy dependencies " + failed.mkString(", ")
   )
   val scalaBinaryVersion =
@@ -106,6 +107,7 @@ object IvyThing {
       val ivySettings = new IvySettings()
       //adding maven repo resolver
       val chainResolver = new ChainResolver
+      chainResolver.setReturnFirst(true)
       resolvers.foreach(chainResolver.add)
       ivySettings.addResolver(chainResolver)
 
@@ -143,9 +145,11 @@ object IvyThing {
 
     //init resolve report
     val report = ivy.resolve(md, options)
-    val unresolved = report.getUnresolvedDependencies
+    val unresolved = report.getAllArtifactsReports
+                           .filter(_.getDownloadStatus == DownloadStatus.FAILED)
+                           .map(_.getArtifact.getModuleRevisionId)
+                           .map(x => (x.getOrganisation, x.getName, x.getRevision))
 
-    //so you can get the jar libraries
     if (unresolved.size == 0) report.getAllArtifactsReports.map(_.getLocalFile)
     else throw IvyResolutionException(unresolved)
   }
