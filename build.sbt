@@ -159,14 +159,16 @@ lazy val tools = project
   .settings(
     name := "ammonite-tools",
     libraryDependencies += "com.lihaoyi" %% "pprint" % "0.3.4",
-    (test in Test) <<= (test in Test).dependsOn(publishLocal)
+    (test in Test) <<= (test in Test).dependsOn(publishLocal),
+    (testOnly in Test) <<= (testOnly in Test).dependsOn(publishLocal)
   )
 
-lazy val integrationTests = project
+lazy val integration = project
   .dependsOn(ops)
   .settings(sharedSettings:_*)
   .settings(
     (test in Test) <<= (test in Test).dependsOn(assembly in repl, publishLocal in published),
+    (testOnly in Test) <<= (testOnly in Test).dependsOn(assembly in repl, publishLocal in published),
     dontPublishSettings
   )
 
@@ -202,7 +204,7 @@ lazy val readme = ScalatexReadme(
 
 
 lazy val tested = project
-  .aggregate(published, integrationTests)
+  .aggregate(published, integration)
   .settings(dontPublishSettings)
 
 lazy val published = project

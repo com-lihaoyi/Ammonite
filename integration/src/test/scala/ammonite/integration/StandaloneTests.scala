@@ -1,4 +1,4 @@
-package ammonite.integrationTests
+package ammonite.integration
 
 import utest._
 import ammonite.ops._
@@ -45,7 +45,8 @@ object StandaloneTests extends TestSuite{
           |@
           |println(wd relativeTo x)""".stripMargin
       )
-      assert(res.mkString("\n") == "repl/src")
+      val output = res.mkString("\n")
+      assert(output == "repl/src")
     }
   }
 }

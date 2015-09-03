@@ -196,7 +196,6 @@ object Repl{
       case (Some(path), None) =>
         repl.interp.replApi.load.module(path)
       case (None, Some(code)) =>
-        println(1)
         repl.interp.replApi.load(code)
     }
     Timer("Repl.run End")
