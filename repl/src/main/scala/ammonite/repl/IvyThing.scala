@@ -105,6 +105,7 @@ object IvyThing {
 
       //creates clear ivy settings
       val ivySettings = new IvySettings()
+
       //adding maven repo resolver
       val chainResolver = new ChainResolver
       chainResolver.setName("chain-resolver")
@@ -150,18 +151,19 @@ object IvyThing {
     val unresolved = report.getAllProblemMessages
 
     import collection.JavaConversions._
-    println("IVY THING")
-    println(report.getAllProblemMessages.toSeq)
-    println(report.getProblemMessages.toSeq)
-    println(report.getAllArtifactsReports.toSeq)
-    println(report.getFailedArtifactsReports.toSeq)
-    println(report.getArtifacts.toSeq)
-    println(report.getUnresolvedDependencies.toSeq)
-    report.getUnresolvedDependencies
-          .toSeq
-          .map(_.getProblem)
-          .foreach(_.printStackTrace())
-    println(report.getUnresolvedDependencies.map(_.getProblemMessage).toSeq)
+//    println("IVY THING DEBUGGING")
+//    println(report.getAllProblemMessages.toSeq)
+//    println(report.getProblemMessages.toSeq)
+//    println(report.getAllArtifactsReports.toSeq)
+//    println(report.getFailedArtifactsReports.toSeq)
+//    println(report.getArtifacts.toSeq)
+//    println(report.getUnresolvedDependencies.toSeq)
+//    report.getUnresolvedDependencies
+//          .toSeq
+//          .map(_.getProblem)
+//          .foreach(_.printStackTrace())
+//
+//    println(report.getUnresolvedDependencies.map(_.getProblemMessage).toSeq)
     if (unresolved.size == 0) report.getAllArtifactsReports.map(_.getLocalFile)
     else throw IvyResolutionException(unresolved.toSeq.map(_.toString))
   }
