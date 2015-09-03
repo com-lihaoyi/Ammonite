@@ -107,12 +107,14 @@ object IvyThing {
       val ivySettings = new IvySettings()
       //adding maven repo resolver
       val chainResolver = new ChainResolver
+      chainResolver.setName("chain-resolver")
       chainResolver.setReturnFirst(true)
       resolvers.foreach(chainResolver.add)
       ivySettings.addResolver(chainResolver)
 
       //set to the default resolver
       ivySettings.setDefaultResolver(chainResolver.getName)
+
       //creates an Ivy instance with settings
       ivySettings
     }
