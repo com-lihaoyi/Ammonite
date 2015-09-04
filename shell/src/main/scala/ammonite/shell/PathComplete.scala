@@ -1,4 +1,4 @@
-package ammonite.tools
+package ammonite.shell
 
 import java.io.OutputStreamWriter
 

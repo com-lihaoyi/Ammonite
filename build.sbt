@@ -153,11 +153,11 @@ lazy val repl = project
  * credible systems shell that can be used to replace bash/zsh/etc. for
  * common housekeeping tasks
  */
-lazy val tools = project
+lazy val shell = project
   .dependsOn(ops, repl % "compile->compile;test->test")
   .settings(sharedSettings:_*)
   .settings(
-    name := "ammonite-tools",
+    name := "ammonite-shell",
     libraryDependencies += "com.lihaoyi" %% "pprint" % "0.3.4",
     (test in Test) <<= (test in Test).dependsOn(publishLocal),
     (testOnly in Test) <<= (testOnly in Test).dependsOn(publishLocal)
@@ -208,5 +208,5 @@ lazy val tested = project
   .settings(dontPublishSettings)
 
 lazy val published = project
-  .aggregate(ops, tools, terminal, repl)
+  .aggregate(ops, shell, terminal, repl)
   .settings(dontPublishSettings)

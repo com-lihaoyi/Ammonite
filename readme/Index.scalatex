@@ -321,7 +321,7 @@
     @p
       This setup will @hl.scala{import ammonite.ops._} into your Ammonite REPL, gives the nice path-completion shown above, and also provides some additional command-line-friendly functionality on top of the default @sect.ref{Ammonite-Ops} commands:
 
-    @hl.ref('tools/'src/'main/'scala/'ammonite/'tools/"ShellSession.scala", "trait OpsAPI")
+    @hl.ref('shell/'src/'main/'scala/'ammonite/'shell/"ShellSession.scala", "trait OpsAPI")
 
     @p
       These are imported by default into every repl session, and basically let you treat the Ammonite-REPL much more like a Bash shell. You can @hl.scala{cd!} in and out of directories, and treat relative paths as shorthand for absolute paths when working in the shell. This means you can enter commands like
@@ -650,7 +650,7 @@
       @@ import ammonite.ops.ImplicitWd._
       @@ %ls
       build.sbt	log		ops		readme		repl		terminal
-      echo		modules		project		readme.md	target		tools
+      echo		modules		project		readme.md	target		shell
       res2: Int = 0
       @@ %%ls
       res3: CommandResult =

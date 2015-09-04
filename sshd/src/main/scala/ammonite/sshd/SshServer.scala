@@ -62,7 +62,7 @@ object SshServer {
   // Server should have stable key
   // to not violate the user under threat of MITM attack
   private def fallbackHostkeyFilePath(options:SshServerConfig) =
-    options.ammoniteHome / "ssh" / "hostkeys"
+    options.ammoniteHome/'cache/'ssh/'hostkeys
 
   def touch(file:Path):Path = {
     import ammonite.ops._

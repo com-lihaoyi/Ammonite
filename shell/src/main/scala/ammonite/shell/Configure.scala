@@ -1,4 +1,4 @@
-package ammonite.tools
+package ammonite.shell
 
 import ammonite.repl.frontend.ReplAPI
 
@@ -8,7 +8,7 @@ import ammonite.repl.frontend.ReplAPI
 object Configure {
   def apply(repl: ReplAPI, wd: => ammonite.ops.Path) = {
     repl.frontEnd() = ammonite.repl.frontend.AmmoniteFrontEnd(
-      ammonite.tools.PathComplete.pathCompleteFilter(wd, repl.colors())
+      ammonite.shell.PathComplete.pathCompleteFilter(wd, repl.colors())
     )
 
     repl.prompt.bind(
