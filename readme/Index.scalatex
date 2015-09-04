@@ -316,54 +316,7 @@
       @p
         If you want these changes to always be present, place them in your @code{~/.ammonite/predef.scala}.
 
-  @sect{Filesystem Operations}
-    @img(src:="SystemShell.png", width:="100%")
-    @p
-      Ammonite uses @sect.ref{Ammonite-Ops} to provide a nice API to use filesystem operations. To access it, simply curl the following into your @code{predef.scala}
-
-    @hl.sh
-      @filesystemCurl
-
-    @p
-      This setup will @hl.scala{import ammonite.ops._} into your Ammonite REPL, gives the nice path-completion shown above, and also provides some additional command-line-friendly functionality on top of the default @sect.ref{Ammonite-Ops} commands:
-
-    @hl.ref('shell/'src/'main/'scala/'ammonite/'shell/"ShellSession.scala", "trait OpsAPI")
-
-    @p
-      These are imported by default into every repl session, and basically let you treat the Ammonite-REPL much more like a Bash shell. You can @hl.scala{cd!} in and out of directories, and treat relative paths as shorthand for absolute paths when working in the shell. This means you can enter commands like
-
-    @hl.scala
-      @@ cd! up
-
-      @@ cd! 'foldername
-
-      @@ ls! 
-
-      @@ ls! 'foldername
-
-      @@ stat! "folder-name-with-dashes"/"file.txt'
-
-    @p
-      Without having to repeatedly qualify theses relative paths with your current working directory. You can use Ammonite-Ops' support for @sect.ref{Spawning Subprocesses} to call external programs, even interactive ones like Python or SBT!
-
-    @hl.scala
-      @@ %python
-      Python 2.7.6 (default, Sep  9 2014, 15:04:36)
-      [GCC 4.2.1 Compatible Apple LLVM 6.0 (clang-600.0.39)] on darwin
-      Type "help", "copyright", "credits" or "license" for more information.
-      >>> print "Hello %s%s" % ("World", "!"*3)
-      Hello World!!!
-      >>> ^D
-      res3: Int = 0
-
-      @@ %sbt
-      [info] Loading global plugins from /Users/haoyi/.sbt/0.13/plugins
-      [info] Updating {file:/Users/haoyi/.sbt/0.13/plugins/}global-plugins...
-      [info] Resolving org.fusesource.jansi#jansi;1.4 ...
-      [info] Done updating.
-      [info] Set current project to haoyi (in build file:/Users/haoyi/)
-      >
-
+  
   @sect{Debugging}
     @p
       Ammonite can be used as a tool to debug any other Scala program, by conveniently opening a REPL at any point within your program with which you can interact with live program data, similar to pdb/ipdb in Python. To do so, first add Ammonite to your classpath, e.g. through this SBT snippet:
@@ -761,17 +714,121 @@
 
 @sect("Ammonite-Shell", "Replacing Bash 21st Century")
   @p
-    Ammonite-Shell is a rock-solid system shell that can replace Bash as the interface to your operating system. To begin using Ammonite-Shell, simply download the @sect.ref{Ammonite-REPL} executable (below) and download the default @code{predef.scala} to configure your REPL to be a usable systems shell:
-
-  @hl.sh  
-    @replCurl
+    Ammonite-Shell is a rock-solid system shell that can replace Bash as the interface to your operating system. To begin using Ammonite-Shell, simply  download the default @code{predef.scala} to configure your REPL to be a usable systems shell before downloading the @sect.ref{Ammonite-REPL} executable (below):
   @hl.sh
     @filesystemCurl
+  @hl.sh  
+    @replCurl
+  
 
   @p
     You can then use Ammonite as a replacement for Bash:
 
   @img(src:="SystemShell.png", width:="100%")
+
+  @sect{Learning Ammonite-Shell}
+    @p
+      Ammonite-Shell isn't backwards compatible with Bash. It isn't even the same language, giving you access to all of Scala instead of the quirky Bash scripting language. Nevertheless, lots of things you'd expect in Bash turn up in Ammonite-Shell:
+
+    @sect{Working Directory}
+      @hl.sh
+        haoyi-mbp:Ammonite haoyi$ pwd
+        /Users/haoyi/Dropbox (Personal)/Workspace/Ammonite
+
+      @hl.scala
+        haoyi-Ammonite@@ wd
+        res1: Path = root/'Users/'haoyi/"Dropbox (Personal)"/'Workspace/'Ammonite
+
+      @p
+        Bash's @hl.sh{pwd} is instead called @hl.scala{wd}. Instead of being a subprocess that prints to stdout, @hl.scala{wd} is simply a variable holding the working directory. 
+      @p
+        As you can see, the path syntax is also different: as an absolute path, @hl.scala{wd} must start from @hl.scala{root} and the path segments must be quoted as Scala @hl.scala{"string"}s or @hl.scala{'symbol}s. Apart from that, however, it is basically the same. The @sect.ref("Paths", "documentation about Paths") goes over the syntax and semantics of @sect.ref{Paths} in more detail.
+
+    @sect{Listing Files}
+      @hl.sh
+        haoyi-mbp:Ammonite haoyi$ ls
+        build.sbt project   readme.md sshd    tested
+        integration published repl    target
+        ops   readme    shell   terminal
+
+      @hl.scala
+        haoyi-Ammonite@@ ls!
+        res2: LsSeq =
+        .git            integration     readme.md       terminal
+        .gitignore      ops             repl            tested
+        .idea           project         shell
+        .travis.yml     published       sshd
+        build.sbt       readme          target
+
+      @p
+        Bash's @hl.sh{ls} syntax is tweaked slightly to become @hl.scala{ls!}. Apart from that, it basically does the same thing.
+
+      @p
+        Listing files in other folders behaves similarly:
+
+      @hl.sh
+        haoyi-mbp:Ammonite haoyi$ ls project
+        Constants.scala   build.sbt   target
+        build.properties  project
+
+        haoyi-mbp:Ammonite haoyi$ ls project/target
+        config-classes    resolution-cache  scala-2.10    streams
+
+      @hl.scala
+        haoyi-Ammonite@@ ls! 'project
+        res4: LsSeq =
+        Constants.scala         build.sbt               target
+        build.properties        project
+
+        haoyi-Ammonite@@ ls! 'project/'target
+        res5: LsSeq =
+        config-classes          scala-2.10
+        resolution-cache        streams
+      @p
+        Again, we have to use the quoted @hl.scala{'symbol'}/@hl.scala{"string"} syntax when defining @sect.ref{Paths}, but otherwise it behaves identically.
+
+  @sect{Filesystem Operations}
+
+    @p
+      Ammonite-Shell uses @sect.ref{Ammonite-Ops} to provide a nice API to use filesystem operations. THe default setup will @hl.scala{import ammonite.ops._} into your Ammonite REPL, gives the nice path-completion shown above, and also provides some additional command-line-friendly functionality on top of the default @sect.ref{Ammonite-Ops} commands:
+
+    @hl.ref('shell/'src/'main/'scala/'ammonite/'shell/"ShellSession.scala", "trait OpsAPI")
+
+    @p
+      These are imported by default into every repl session, and basically let you treat the Ammonite-REPL much more like a Bash shell. You can @hl.scala{cd!} in and out of directories, and treat relative paths as shorthand for absolute paths when working in the shell. This means you can enter commands like
+
+    @hl.scala
+      @@ cd! up
+
+      @@ cd! 'foldername
+
+      @@ ls! 
+
+      @@ ls! 'foldername
+
+      @@ stat! "folder-name-with-dashes"/"file.txt'
+
+    @p
+      Without having to repeatedly qualify theses relative paths with your current working directory. You can use Ammonite-Ops' support for @sect.ref{Spawning Subprocesses} to call external programs, even interactive ones like Python or SBT!
+
+    @hl.scala
+      @@ %python
+      Python 2.7.6 (default, Sep  9 2014, 15:04:36)
+      [GCC 4.2.1 Compatible Apple LLVM 6.0 (clang-600.0.39)] on darwin
+      Type "help", "copyright", "credits" or "license" for more information.
+      >>> print "Hello %s%s" % ("World", "!"*3)
+      Hello World!!!
+      >>> ^D
+      res3: Int = 0
+
+      @@ %sbt
+      [info] Loading global plugins from /Users/haoyi/.sbt/0.13/plugins
+      [info] Updating {file:/Users/haoyi/.sbt/0.13/plugins/}global-plugins...
+      [info] Resolving org.fusesource.jansi#jansi;1.4 ...
+      [info] Done updating.
+      [info] Set current project to haoyi (in build file:/Users/haoyi/)
+      >
+
 @sect{Community}
   @ul
     @li
@@ -792,6 +849,8 @@
         Fix execution of files via symbols in the current working directory.
       @li
         @hl.scala{Load.ivy} now properly attempts to load artifacts from the local @code{~/.ivy/cache}, @code{~/.ivy/local} and @code{~/.m2} folders, before fetching from maven central
+      @li
+        Renamed @hl.scala{cwd} to @hl.scala{pwd} for consistency with Bash
   @sect{0.4.6}
     @ul
       @li
