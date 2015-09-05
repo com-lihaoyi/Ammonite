@@ -146,6 +146,17 @@ object ScriptTests extends TestSuite{
           b: Int = 1
           """)
       }
+      'sheBang{
+        check.session(s"""
+            @  import ammonite.ops._
+
+            @ load.exec($printedScriptPath/"SheBang.scala")
+
+            @ val r = res
+            r: Int = 42
+            """)
+      }
+
     }
     
     'module{
