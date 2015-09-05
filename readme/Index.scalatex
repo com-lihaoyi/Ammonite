@@ -1,4 +1,5 @@
 @import Main._
+@import readme.Sample._
 @import ammonite.ops._
 @val ammoniteTests = 'repl/'src/'test/'scala/'ammonite/'repl/'session
 @val replSource = 'repl/'src/'main/'scala/'ammonite/'repl
@@ -24,6 +25,11 @@
 
 @val replCurl = "$ curl -L -o amm http://git.io/vGksC; chmod +x amm; ./amm"
 @val filesystemCurl = "$ mkdir ~/.ammonite; curl -L -o ~/.ammonite/predef.scala ???"
+@scalatags.Text.tags2.style
+  .hljs-symbol{
+    color: #008000;
+    font-weight: bold;
+  }
 
 @sect{Ammonite}
   @p
@@ -316,7 +322,7 @@
       @p
         If you want these changes to always be present, place them in your @code{~/.ammonite/predef.scala}.
 
-  
+
   @sect{Debugging}
     @p
       Ammonite can be used as a tool to debug any other Scala program, by conveniently opening a REPL at any point within your program with which you can interact with live program data, similar to pdb/ipdb in Python. To do so, first add Ammonite to your classpath, e.g. through this SBT snippet:
@@ -717,9 +723,9 @@
     Ammonite-Shell is a rock-solid system shell that can replace Bash as the interface to your operating system. To begin using Ammonite-Shell, simply  download the default @code{predef.scala} to configure your REPL to be a usable systems shell before downloading the @sect.ref{Ammonite-REPL} executable (below):
   @hl.sh
     @filesystemCurl
-  @hl.sh  
+  @hl.sh
     @replCurl
-  
+
 
   @p
     You can then use Ammonite as a replacement for Bash:
@@ -730,35 +736,36 @@
     @p
       Ammonite-Shell isn't backwards compatible with Bash. It isn't even the same language, giving you access to all of Scala instead of the quirky Bash scripting language. Nevertheless, lots of things you'd expect in Bash turn up in Ammonite-Shell:
 
-    @sect{Working Directory}
-      @hl.sh
-        haoyi-mbp:Ammonite haoyi$ pwd
-        /Users/haoyi/Dropbox (Personal)/Workspace/Ammonite
 
-      @hl.scala
-        haoyi-Ammonite@@ wd
-        res1: Path = root/'Users/'haoyi/"Dropbox (Personal)"/'Workspace/'Ammonite
+    @sect{Working Directory}
+      @compare("pwd", "wd")
 
       @p
-        Bash's @hl.sh{pwd} is instead called @hl.scala{wd}. Instead of being a subprocess that prints to stdout, @hl.scala{wd} is simply a variable holding the working directory. 
+        Bash's @hl.sh{pwd} is instead called @hl.scala{wd}. Instead of being a subprocess that prints to stdout, @hl.scala{wd} is simply a variable holding the working directory.
       @p
         As you can see, the path syntax is also different: as an absolute path, @hl.scala{wd} must start from @hl.scala{root} and the path segments must be quoted as Scala @hl.scala{"string"}s or @hl.scala{'symbol}s. Apart from that, however, it is basically the same. The @sect.ref("Paths", "documentation about Paths") goes over the syntax and semantics of @sect.ref{Paths} in more detail.
 
-    @sect{Listing Files}
-      @hl.sh
-        haoyi-mbp:Ammonite haoyi$ ls
-        build.sbt project   readme.md sshd    tested
-        integration published repl    target
-        ops   readme    shell   terminal
+      @p
+        You can navigate around the filesystem using @hl.scala{cd!}, instead of Bash's @hl.sh{cd}:
 
-      @hl.scala
-        haoyi-Ammonite@@ ls!
-        res2: LsSeq =
-        .git            integration     readme.md       terminal
-        .gitignore      ops             repl            tested
-        .idea           project         shell
-        .travis.yml     published       sshd
-        build.sbt       readme          target
+      @compare(
+        """
+        |pwd
+        |cd target
+        |pwd
+        |cd ..
+        |pwd""".stripMargin,
+        """
+        |wd
+        |cd! 'target
+        |wd
+        |cd! up
+        |wd
+        """.stripMargin
+      )
+
+    @sect{Listing Files}
+      @compare("ls", "ls!")
 
       @p
         Bash's @hl.sh{ls} syntax is tweaked slightly to become @hl.scala{ls!}. Apart from that, it basically does the same thing.
@@ -766,31 +773,42 @@
       @p
         Listing files in other folders behaves similarly:
 
-      @hl.sh
-        haoyi-mbp:Ammonite haoyi$ ls project
-        Constants.scala   build.sbt   target
-        build.properties  project
+      @compare("ls project", "ls! 'project")
+      @compare("ls project/target", "ls! 'project/'target")
 
-        haoyi-mbp:Ammonite haoyi$ ls project/target
-        config-classes    resolution-cache  scala-2.10    streams
-
-      @hl.scala
-        haoyi-Ammonite@@ ls! 'project
-        res4: LsSeq =
-        Constants.scala         build.sbt               target
-        build.properties        project
-
-        haoyi-Ammonite@@ ls! 'project/'target
-        res5: LsSeq =
-        config-classes          scala-2.10
-        resolution-cache        streams
       @p
-        Again, we have to use the quoted @hl.scala{'symbol'}/@hl.scala{"string"} syntax when defining @sect.ref{Paths}, but otherwise it behaves identically.
+        Again, we have to use the quoted @hl.scala{'symbol'}/@hl.scala{"string"} syntax when defining @sect.ref{Paths}, but otherwise it behaves identically. These are all functions defined by @sect.ref{Ammonite-Ops}.
+      @p
+        Listing recursively is done via @hl.scala{ls.rec}, instead of @code{find}:
+
+      @compare("find ops/src/main", "ls.rec! 'ops/'src/'main")
+
+    @sect{Filesystem Operations}
+      @p
+        Ammonite-Shell uses @sect.ref{Ammonite-Ops} to provide a nice API to use filesystem operations. THe default setup will @hl.scala{import ammonite.ops._} into your Ammonite REPL, gives the nice path-completion shown above, and also provides some additional command-line-friendly functionality on top of the default @sect.ref{Ammonite-Ops} commands:
+
+      @compare(
+        """mkdir target/test
+          |echo "hello" > target/test/hello.txt
+          |cat target/test/hello.txt
+          |ls target/test
+          |cp target/test/hello.txt target/test/hello2.txt
+          |ls target/test
+          |mv target/test/hello.txt target/test/hello3.txt
+          |ls target/test
+          |rm -rf target/test""".stripMargin,
+        """mkdir! 'target/'test
+          |write('target/'test/"hello.txt", "hello")
+          |ls! 'target/'test
+          |cp('target/'test/"hello.txt", 'target/'test/"hello2.txt")
+          |ls! 'target/'test
+          |mv('target/'test/"hello.txt", 'target/'test/"hello3.txt")
+          |ls! 'target/'test
+          |rm! 'target/'test""".stripMargin
+      )
 
   @sect{Filesystem Operations}
 
-    @p
-      Ammonite-Shell uses @sect.ref{Ammonite-Ops} to provide a nice API to use filesystem operations. THe default setup will @hl.scala{import ammonite.ops._} into your Ammonite REPL, gives the nice path-completion shown above, and also provides some additional command-line-friendly functionality on top of the default @sect.ref{Ammonite-Ops} commands:
 
     @hl.ref('shell/'src/'main/'scala/'ammonite/'shell/"ShellSession.scala", "trait OpsAPI")
 
@@ -802,7 +820,7 @@
 
       @@ cd! 'foldername
 
-      @@ ls! 
+      @@ ls!
 
       @@ ls! 'foldername
 

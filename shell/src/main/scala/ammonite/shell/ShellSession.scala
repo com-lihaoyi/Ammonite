@@ -31,7 +31,11 @@ case class ShellSession() extends OpsAPI {
     PPrinter(
       (t: LsSeq, c: Config) =>
         Iterator("\n", FrontEndUtils.tabulate(
-          t.map(p => Iterator(PathComplete.colorPath(p), p.last, Console.RESET).mkString),
+          t.map(p => Iterator(
+            PathComplete.colorPath(p),
+            pprint.tokenize(p relativeTo t.base)(implicitly, c).mkString,
+            Console.RESET
+          ).mkString),
           FrontEndUtils.width
         ).mkString)
     )
