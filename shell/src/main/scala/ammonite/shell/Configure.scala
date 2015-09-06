@@ -12,10 +12,10 @@ object Configure {
     )
 
     repl.prompt.bind(
-      Console.RESET + sys.props("user.name") +
-        Console.MAGENTA + "-" +
-        Console.RESET + wd.segments.lastOption.getOrElse("").toString +
-        Console.MAGENTA + "@ "
+      sys.props("user.name") +
+      "-" +
+      wd.segments.lastOption.getOrElse("") +
+      "@ "
     )
   }
 }

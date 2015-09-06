@@ -1,0 +1,296 @@
+@import Main._
+@import readme.Sample._
+@sect("Ammonite-Shell", "Replacing Bash 21st Century")
+  @p
+    Ammonite-Shell is a rock-solid system shell that can replace Bash as the interface to your operating system, using @a("Scala", href:="http://www.scala-lang.org/") as the primary command and scripting language. To begin using Ammonite-Shell, simply  download the default @code{predef.scala} to configure your REPL to be a usable systems shell before downloading the @sect.ref{Ammonite-REPL} executable (below):
+
+  @hl.sh
+    @filesystemCurl
+  @hl.sh
+    @replCurl
+
+  @p
+    You can then start using Ammonite as a replacement for Bash:
+
+  @img(src:="SystemShell.png", width:="100%")
+
+  @sect{Shell Basics}
+    @p
+      Ammonite-Shell isn't backwards compatible with Bash. It isn't even the same language, giving you access to all of Scala instead of the quirky Bash scripting language. Nevertheless, lots of things you'd expect in Bash turn up in Ammonite-Shell:
+
+
+    @sect{Working Directory}
+      @compare("pwd", "wd")
+
+      @p
+        Bash's @hl.sh{pwd} is instead called @hl.scala{wd}. Instead of being a subprocess that prints to stdout, @hl.scala{wd} is simply a variable holding the working directory.
+      @p
+        As you can see, the path syntax is also different: as an absolute path, @hl.scala{wd} must start from @hl.scala{root} and the path segments must be quoted as Scala @hl.scala{"string"}s or @hl.scala{'symbol}s. Apart from that, however, it is basically the same. The @sect.ref("Paths", "documentation about Paths") goes over the syntax and semantics of @sect.ref{Paths} in more detail.
+
+      @p
+        You can navigate around the filesystem using @hl.scala{cd!}, instead of Bash's @hl.sh{cd}:
+
+      @compare(
+        """
+        |pwd
+        |cd target
+        |pwd
+        |cd ..
+        |pwd""".stripMargin,
+        """
+        |wd
+        |cd! 'target
+        |wd
+        |cd! up
+        |wd
+        """.stripMargin
+      )
+
+    @sect{Listing Files}
+      @compare("ls", "ls!")
+
+      @p
+        Bash's @hl.sh{ls} syntax is tweaked slightly to become @hl.scala{ls!}. Apart from that, it basically does the same thing.
+
+      @p
+        Listing files in other folders behaves similarly:
+
+      @compare("ls project", "ls! 'project")
+      @compare("ls project/target", "ls! 'project/'target")
+
+      @p
+        Again, we have to use the quoted @hl.scala{'symbol}/@hl.scala{"string"} syntax when defining @sect.ref{Paths}, but otherwise it behaves identically. These are all functions defined by @sect.ref{Ammonite-Ops}.
+      @p
+        Listing recursively is done via @hl.scala{ls.rec}, instead of @code{find}:
+
+      @compare("find ops/src/main", "ls.rec! 'ops/'src/'main")
+
+    @sect{Filesystem Operations}
+      @p
+        Ammonite-Shell uses @sect.ref{Ammonite-Ops} to provide a nice API to use filesystem operations. THe default setup will @hl.scala{import ammonite.ops._} into your Ammonite REPL, gives the nice path-completion shown above, and also provides some additional command-line-friendly functionality on top of the default @sect.ref{Ammonite-Ops} commands:
+
+      @compare(
+        """mkdir target/test
+          |echo "hello" > target/test/hello.txt
+          |cat target/test/hello.txt
+          |ls target/test
+          |cp target/test/hello.txt target/test/hello2.txt
+          |ls target/test
+          |mv target/test/hello.txt target/test/hello3.txt
+          |ls target/test
+          |rm -rf target/test""".stripMargin,
+        """mkdir! 'target/'test
+          |write('target/'test/"hello.txt", "hello")
+          |ls! 'target/'test
+          |cp('target/'test/"hello.txt", 'target/'test/"hello2.txt")
+          |ls! 'target/'test
+          |mv('target/'test/"hello.txt", 'target/'test/"hello3.txt")
+          |ls! 'target/'test
+          |rm! 'target/'test""".stripMargin
+      )
+    @sect{Piping}
+      @p
+        Ammonite allows piping similar to how Bash does it. Unlike Bash, Ammonite has a variety of @sect.ref("Extensions", "pipes") you can use that do different things:
+      @ul
+        @li
+          @hl.scala{things | f} is an alias for @hl.scala{things map f}
+        @li
+          @hl.scala{things || f} is an alias for @hl.scala{things flatMap f}
+        @li
+          @hl.scala{things |? f} is an alias for @hl.scala{things filter f}
+        @li
+          @hl.scala{things |& f} is an alias for @hl.scala{things reduce f}
+        @li
+          @hl.scala{things |! f} is an alias for @hl.scala{things foreach f}
+
+      @p
+        For example, this is how you can get the dot-files in the current directory:
+
+      @compare("""ls -a | grep "^\." """, "ls! cwd |? (_.last(0) == '.')")
+
+      @p
+        Here, we're using the @hl.scala{|?} pipe, which basically performs a filter on the paths coming in on the left. In this case, we're checking that for each path, the first character of the last segment of that path is the character @hl.scala{'.'}. This is slightly more verbose than Bash the bash equivalent shown above, but not by too much.
+      @p
+        Here is how to find the largest 3 files in a given directory tree:
+
+      @compare(
+        "find ./repl/src -ls | sort -nrk 7 | head -3",
+        "ls.rec! wd/'repl/'src | (x => x.size -> x.last) sortBy (-_._1) take 3"
+      )
+
+      @p
+        And lastly, here is how to performa recursive line count of all the Scala files in your current directory tree:
+
+      @compare(
+        "find ./ops/src/main -name '*.scala' | xargs wc -l",
+        """ls.rec! wd/'ops/'src/'main |? (_.ext == "scala") | read.lines | (_.size) sum"""
+      )
+
+      @p
+        For more examples of how to use Ammonite's pipes, check out the section on @sect.ref{Extensions} and @sect.ref{Chaining}
+    @sect{Subprocesses}
+      @p
+        Ammonite provides a convenient way to spawn subprocesses using the @hl.scala{%} and @hl.scala{%%} commands:
+
+      @ul
+        @li
+          @hl.scala{%cmd(arg1, arg2)}: Spawn a subprocess with the command @hl.scala{cmd} and command-line arguments @hl.scala{arg1}, @hl.scala{arg2}. print out any stdout or stderr, take any input from the current console, and return the exit code when all is done.
+        @li
+          @hl.scala{%%cmd(arg1, arg2)}: Spawn a subprocess similar to using @hl.scala{%}, but return the stdout of the subprocess as a String, and throw an exception if the exit code is non-zero.
+
+      @p
+        For example, this is how you use the @code{bash} command to run a standalone bash script in Bash and Ammonite:
+
+      @compare(
+        "bash ops/src/test/resources/scripts/echo HELLO",
+        """%bash('ops/'src/'test/'resources/'scripts/'echo, "HELLO")"""
+      )
+
+      @p
+        You can use Ammonite-Ops' support for @sect.ref{Spawning Subprocesses} to call external programs, even interactive ones like Python or SBT!
+
+      @hl.scala
+        @@ %python
+        Python 2.7.6 (default, Sep  9 2014, 15:04:36)
+        [GCC 4.2.1 Compatible Apple LLVM 6.0 (clang-600.0.39)] on darwin
+        Type "help", "copyright", "credits" or "license" for more information.
+        >>> print "Hello %s%s" % ("World", "!"*3)
+        Hello World!!!
+        >>> ^D
+        res3: Int = 0
+
+        @@ %sbt
+        [info] Loading global plugins from /Users/haoyi/.sbt/0.13/plugins
+        [info] Updating {file:/Users/haoyi/.sbt/0.13/plugins/}global-plugins...
+        [info] Resolving org.fusesource.jansi#jansi;1.4 ...
+        [info] Done updating.
+        [info] Set current project to haoyi (in build file:/Users/haoyi/)
+        >
+
+  @sect{Scripting}
+    @p
+      Ammonite-Shell uses @a("Scala", href:="http://www.scala-lang.org/") as its command and scripting language. Although the commands seem short and concise, you have the full power of the language available at any time. This lets you do things that are difficult or unfeasible to do when using a traditional shell like Bash.
+
+    @sect{Scala Scripting}
+      @p
+        Since Ammonite-Shell runs Scala code, you can perform math:
+      
+      @pre(ammSample(
+          """(1 + 2) * 3
+            |math.pow(4, 4)
+          """.stripMargin
+      ))
+      @p
+        Assign things to values (@hl.scala{val}s):
+
+      @pre(ammSample(
+        """val x = (1 + 2) * 3
+          |x + x
+        """.stripMargin
+      ))
+
+      @p
+        Define re-usable functions:
+
+      @pre(ammSample(
+        """def addMul(x: Int) = (x + 2) * 3
+          |addMul(5)
+          |addMul(5) + 1
+          |addMul(5 + 1)
+        """.stripMargin
+      ))
+
+      @p
+        Or make use of mutable @hl.scala{var}s, conditionals or loops:
+      @pre(ammSample(
+        """var total = 0
+          |for(i <- 0 until 100){ if (i % 2 == 0) total += 1 }
+          |total
+        """.stripMargin
+      ))
+    @sect{Typed Values}
+      @p
+        In Ammonite-Shell, everything is a typed value and not just a stream of bytes as is the case in Bash. That means you can assign them to variables and call methods on them just like you can in any programming language:
+
+      @pre(ammSample(
+        """val files = ls! wd
+          |val count = files.length
+        """.stripMargin
+      ))
+      @p
+        As is the case in Scala, you can annotate types. 
+
+      @pre(ammSample(
+        """val files: Seq[Path] = ls! wd
+          |val count: Int = files.length
+        """.stripMargin
+      ))
+
+      @p
+        This is often not required (e.g. in the earlier example), since Scala has type inference, but it may make your code clearer. Furthermore, if you make a mistake, having types annotated will help the compiler give a more specific error message.
+
+      @p
+        The fact that variables are typed means if you try to perform the wrong operation on a variable, you get an error even before the code runs:
+
+      @pre(ammSample(
+        """val files = ls! wd
+          |ls + 123
+        """.stripMargin
+      ))
+
+      @p
+        The fact that Ammonite-Shell uses typed, structured values instead of byte streams makes a lot of things easier. For example, all the common data structures like Arrays and Maps are present:
+
+      @pre(ammSample(
+        """val numbers = Array(1, 3, 6, 10)
+          |numbers(0)
+          |numbers(3)
+          |numbers.sum
+          |numbers(3) = 100
+          |numbers.sum
+          |val scores = Map("txt" -> 5, "scala" -> 0)
+          |scores("txt")
+        """.stripMargin
+      ))
+      @p
+        Naturally, these data structures are typed too! Trying to put the wrong sort of value inside of them results in compilation errors before the code gets a chance to run:
+      @pre(ammSample(   
+        """val numbers = Array(1, 3, 6, 10)
+          |val myValue = "3"
+          |numbers(myValue) // Doesn't work
+          |numbers(1) = myValue // Also doesn't work
+          | // Need to convert the string to an Int
+          |numbers(myValue.toInt)
+          |numbers(1) = myValue.toInt
+          |numbers(1) = "2".toInt 
+        """.stripMargin
+      ))  
+    @sect{Scala/Java APIs}
+      @p
+        Apart from the pipe operators described in the earlier section on @sect.ref{Piping}, Ammonite-Shell allows you to call any valid Scala method on any value; it's just Scala after all! Here's an example using normal Scala collection operations to deal with a list of files, counting how many files exist for each extension:
+
+      @pre(ammSample(
+        """val allFiles = ls.rec! 'ops/'src/'test/'resources
+          |val extensionCounts = allFiles.groupBy(_.ext).mapValues(_.length)
+        """.stripMargin
+      ))
+
+      @p
+        Any Java APIs are likewise available:
+
+      @pre(ammSample(
+        """System.out.println("Hello from Java!")
+          |import java.util._
+          |val date = new Date()
+          |date.getDay()
+        """.stripMargin
+      ))
+
+      @p
+        In fact, Ammonite-Shell allows you to ask for any published third-party Java/Scala library for usage in the shell, and have them downloaded, automatically cached, and made available for use. See the section on @sect.ref{Artifact Loading} to learn more.
+      @p
+        In general, apart from the filesystem-specific commands, you should be able to do anything you would expect to be able to do in a Scala shell. This documentation isn't intended to be a full tutorial on the Scala language, check out the @a("Scala Documentation", href:="http://www.scala-lang.org/documentation/") if you want to learn more!
+
+    @sect{Writing/Loading Scripts}
+      @p
+        You can write scripts in the same way you write commants, and load them using the @hl.scala("load.script(...)") method
