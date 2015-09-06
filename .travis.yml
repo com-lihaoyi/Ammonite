@@ -8,7 +8,7 @@ jdk:
 - oraclejdk8
 - openjdk7
 script:
-- sbt readme/run ++$TRAVIS_SCALA_VERSION tested/test
+- sbt ++$TRAVIS_SCALA_VERSION tested/test
 ## Tricks to avoid unnecessary cache updates, from
 ## http://www.scala-sbt.org/0.13/docs/Travis-CI-with-sbt.html
 #- find $HOME/.sbt -name "*.lock" | xargs rm
