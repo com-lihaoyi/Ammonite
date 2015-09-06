@@ -10,26 +10,28 @@ object Sample{
   val replCurl = "$ curl -L -o amm http://git.io/vGksC; chmod +x amm; ./amm"
   val filesystemCurl = "$ mkdir ~/.ammonite; curl -L -o ~/.ammonite/predef.scala ???"
   val cacheVersion = 5
-  def cached(key: Any)(calc: => scalatags.Text.Frag) = {
+  def cached(key: Any)(calc: => String) = {
     val path = cwd/'target/'cache/(key.hashCode + cacheVersion).toString
-    try raw(read! path)
+    try read! path
     catch{ case e =>
-      val newValue = calc.render
+      val newValue = calc
       write.over(path, newValue)
-      raw(newValue)
+      newValue
     }
   }
 
   val ansiRegex = "\u001B\\[[;\\d]*."
-  def ammSample(ammoniteCode: String) = cached(("ammoniteCode", ammoniteCode)){
-    println("ammSample\n" + ammoniteCode)
-    val ammExec = "repl/target/scala-2.11/ammonite-repl-0.4.7-SNAPSHOT-2.11.7"
+  def ammSample(ammoniteCode: String) = {
+    val scalaVersion = scala.util.Properties.versionNumberString
+    val ammVersion = ammonite.Constants.version
+    val executableName = s"ammonite-repl-$ammVersion-$scalaVersion"
+    val ammExec = "repl/target/scala-2.11/" + executableName
     val predef = "shell/src/main/resources/example-predef.scala"
     val out = exec(Seq(ammExec, "--predef-file", predef), s"${ammoniteCode.trim}\nexit\n")
-    val lines = out.lines.toSeq.drop(4).dropRight(2).mkString("\n")
+    val lines = out.lines.toSeq.drop(3).dropRight(2).mkString("\n")
 //    println("ammSample " + lines)
     val ammOutput = lines.split("\u001b")
-    println(ammOutput.toSeq)
+
     val red = "#c0392b"
     val green = "#27ae60"
     val yellow = "#f39c12"
@@ -59,7 +61,7 @@ object Sample{
     write.over(cwd/"temp.html", wrapped.render.replaceAll("\r\n|\n\r", "\n"))
     raw(wrapped.render.replaceAll("\r\n|\n\r", "\n"))
   }
-  def exec(command: Seq[String], input: String): String = {
+  def exec(command: Seq[String], input: String): String = cached(("exec", command, input)){
     val pb = new ProcessBuilder(command:_*)
     pb.redirectErrorStream(true)
     val p = pb.start()
@@ -84,9 +86,7 @@ object Sample{
     new String(bytes)
   }
   def compare(bashCode: String, ammoniteCode: String) = {
-    println("compare!")
-    val out = cached(("bashCode", bashCode)){
-      println("bashCode " + bashCode)
+    val out = {
       val output = exec(Seq("bash", "-i"), s"\n${bashCode.trim}\nexit\n")
       output.lines
         .drop(2)
@@ -98,9 +98,6 @@ object Sample{
         .drop(1)
     }
 
-    println("RUN")
-    println("bashCode " + bashCode)
-    println("out " + out)
     div(
       u(b("Bash")),
       pre(out),

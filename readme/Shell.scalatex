@@ -239,7 +239,7 @@
         As is the case in Scala, you can annotate types. 
 
       @pre(ammSample(
-        """val files: Seq[Path] = ls! wd
+        """val files: LsSeq = ls! wd
           |val count: Int = files.length
         """.stripMargin
       ))
