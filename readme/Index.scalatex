@@ -30,9 +30,12 @@
     @li
       @sect.ref{Ammonite-REPL}: A Modernized Scala REPL
     @li
-      @sect.ref{Ammonite-Ops}: Rock-solid Filesystem Operations
+      @sect.ref{Ammonite-Ops}: A Scala Library for Rock-solid Filesystem Operations
     @li
       @sect.ref{Ammonite-Shell}: Replacing Bash for the 21st Century
+
+  @p
+    Depending on why you are here, click on the above links to jump straight to the documentation that interests you.
 
 @Repl()
 @Ops()
