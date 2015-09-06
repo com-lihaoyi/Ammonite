@@ -181,6 +181,7 @@ lazy val sshd = project.
     dependsOn(repl).
     settings(sharedSettings:_*).
     settings(
+      crossVersion := CrossVersion.full,
       name := "ammonite-sshd",
       libraryDependencies ++= Seq(
         "org.apache.sshd" % "sshd-core" % "0.14.0",
@@ -210,5 +211,5 @@ lazy val tested = project
   .settings(dontPublishSettings)
 
 lazy val published = project
-  .aggregate(ops, shell, terminal, repl)
+  .aggregate(ops, shell, terminal, repl, sshd)
   .settings(dontPublishSettings)
