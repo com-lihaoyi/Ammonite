@@ -8,7 +8,8 @@ import scalatags.Text.all._
 
 object Sample{
   val replCurl = "$ curl -L -o amm http://git.io/vZJoU; chmod +x amm; ./amm"
-  val filesystemCurl = "$ mkdir ~/.ammonite; curl -L -o ~/.ammonite/predef.scala http://git.io/vZJot"
+  val filesystemCurl =
+    "$ mkdir ~/.ammonite; curl -L -o ~/.ammonite/predef.scala http://git.io/vZJot"
   val cacheVersion = 5
   def cached(key: Any)(calc: => String) = {
     val path = cwd/'target/'cache/(key.hashCode + cacheVersion).toString
