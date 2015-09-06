@@ -1,6 +1,6 @@
 @import Main._
 @import readme.Sample._
-@sect("Ammonite-Shell", "Replacing Bash 21st Century")
+@sect("Ammonite-Shell", "Replacing Bash for the 21st Century")
   @p
     Ammonite-Shell is a rock-solid system shell that can replace Bash as the interface to your operating system, using @a("Scala", href:="http://www.scala-lang.org/") as the primary command and scripting language. It is built on top of the @sect.ref{Ammonite-REPL} and the @sect.ref{Ammonite-Ops} filesystem library, but you do not need to know anything about those to get started.
 
