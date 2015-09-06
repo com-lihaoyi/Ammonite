@@ -2,17 +2,36 @@
 @import readme.Sample._
 @sect("Ammonite-Shell", "Replacing Bash 21st Century")
   @p
-    Ammonite-Shell is a rock-solid system shell that can replace Bash as the interface to your operating system, using @a("Scala", href:="http://www.scala-lang.org/") as the primary command and scripting language. To begin using Ammonite-Shell, simply  download the default @code{predef.scala} to configure your REPL to be a usable systems shell before downloading the @sect.ref{Ammonite-REPL} executable (below):
-
-  @hl.sh
-    @filesystemCurl
-  @hl.sh
-    @replCurl
+    Ammonite-Shell is a rock-solid system shell that can replace Bash as the interface to your operating system, using @a("Scala", href:="http://www.scala-lang.org/") as the primary command and scripting language. It is built on top of the @sect.ref{Ammonite-REPL} and the @sect.ref{Ammonite-Ops} filesystem library, but you do not need to know anything about those to get started.
 
   @p
-    You can then start using Ammonite as a replacement for Bash:
+    Why would you want to use Ammonite-Shell instead of Bash? Possible reasons include:
 
-  @img(src:="SystemShell.png", width:="100%")
+  @ul
+    @li
+      You can @a("never remember the syntax to write an if-statement in Bash", href:="http://stackoverflow.com/questions/19343390/bash-if-statement-with-white-space-in-variable")
+    @li
+      You are sick of googling the same set of inconsistent, ad-hoc commands over and over: "@a("obviously", href:="http://stackoverflow.com/questions/12522269/bash-how-to-find-the-largest-file-in-a-directory-and-its-subdirectories") you need the flag @code{-nrk 7} to sort by file size!"
+    @li
+      You've seen Bash's dynamic/sloppy nature @a("fail hard", href:="https://github.com/valvesoftware/steam-for-linux/issues/3671"), and don't want your future work to fall victim to the same bugs
+    @li
+      You think that technology has improved in the last @a("38 years", href:="https://en.wikipedia.org/wiki/Bourne_shell") and a modern systems shell should be better than the shells of our forefathers
+  @p
+    If none of these apply to you, then likely you won't be interested. If any of these bullet points strikes a chord, then read on!
+
+  @sect{Getting Ammonite-Shell}
+    @p
+      To begin using Ammonite-Shell, simply  download the default @code{predef.scala} to configure your REPL to be a usable systems shell before downloading the @sect.ref{Ammonite-REPL} executable (below):
+
+    @hl.sh
+      @filesystemCurl
+    @hl.sh
+      @replCurl
+
+    @p
+      You can then start using Ammonite as a replacement for Bash:
+
+    @img(src:="SystemShell.png", width:="100%")
 
   @sect{Shell Basics}
     @p
