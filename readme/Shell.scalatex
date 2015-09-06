@@ -163,9 +163,23 @@
         "bash ops/src/test/resources/scripts/echo HELLO",
         """%bash('ops/'src/'test/'resources/'scripts/'echo, "HELLO")"""
       )
+      @p
+        Note that apart from quoting each path segment as a @hl.scala{'symbol}, we also need to quote @hl.scala{"HELLO"} as a string. That makes things slightly more verbose than a traditional shell, but also makes it much clearer when arguments are literals v.s. variables.
 
       @p
-        You can use Ammonite-Ops' support for @sect.ref{Spawning Subprocesses} to call external programs, even interactive ones like Python or SBT!
+        If you are only passing a single argument, or no arguments, Scala allows you to leave off parentheses, as shown:
+
+      @compare(
+        "git branch",
+        "%git 'branch"
+      )
+      @compare(
+        "date",
+        "%date"
+      )
+
+      @p
+        You can use Ammonite-Ops' support for @sect.ref{Spawning Subprocesses} to call any external programs, even interactive ones like Python or SBT!
 
       @hl.scala
         @@ %python

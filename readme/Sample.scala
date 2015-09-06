@@ -99,9 +99,7 @@ object Sample{
     }
 
     div(
-      u(b("Bash")),
       pre(out),
-      u(b("Scala")),
       pre(ammSample(ammoniteCode))
     )
   }
