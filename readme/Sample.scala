@@ -20,7 +20,6 @@ object Sample{
     }
   }
 
-
   val ansiRegex = "\u001B\\[[;\\d]*."
   def ammSample(ammoniteCode: String) = cached(("ammoniteCode", ammoniteCode)){
     println("ammSample\n" + ammoniteCode)

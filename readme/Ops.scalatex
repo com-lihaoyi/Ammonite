@@ -2,14 +2,7 @@
 @import readme.Sample._
 @import ammonite.ops._
 @val fileOps = read! cwd/'ops/'src/'main/'scala/'ammonite/'ops/"FileOps.scala"
-@val found = (
-  ".*/\\*\\*(\n\\s*\\*.*)+\n.*?extends.*?Op[^{]*".r
-    .findAllIn(fileOps)
-    .mkString("\n")
-    .lines
-    .map(" "+_)
-    .mkString("\n")
-)
+
 @sect("Ammonite-Ops", "Rock-solid Filesystem Operations")
   @p
     Ammonite-Ops is a library to make common filesystem operations in Scala as concise and easy-to-use as from the Bash shell, while being robust enough to use in large applications without getting messy. It lives in the same repo as the Ammonite REPL, but can easily be used stand-alone in a normal SBT/maven project.
@@ -141,11 +134,6 @@
       @sect.ref{Paths} not aren't interesting on their own, but serve as a base to use to perform filesystem operations in a concise and easy to use way. Here is a quick tour of the core capabilities that Ammonite-Ops provides:
 
     @hl.ref(opsExamples, Seq("'reference", "import"))
-
-    @p
-      Here is the definition for these operations:
-
-    @hl.scala(found)
 
     @p
       In these definitions, @hl.scala{Op1} and @hl.scala{Op2} are isomorphic to @hl.scala{Function1} and @hl.scala{Function2}. The main difference is that ops can be called in two ways:

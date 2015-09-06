@@ -37,7 +37,6 @@
     @p
       Ammonite-Shell isn't backwards compatible with Bash. It isn't even the same language, giving you access to all of Scala instead of the quirky Bash scripting language. Nevertheless, lots of things you'd expect in Bash turn up in Ammonite-Shell:
 
-
     @sect{Working Directory}
       @compare("pwd", "wd")
 
@@ -312,4 +311,4 @@
 
     @sect{Writing/Loading Scripts}
       @p
-        You can write scripts in the same way you write commants, and load them using the @hl.scala("load.script(...)") method
+        You can write scripts in the same way you write commants, and load them using the @hl.scala("load.script(...)") and @hl.scala("load.module(...)") methods. To read more about this, check out the documentation on @sect.ref{Script Files}.
