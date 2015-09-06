@@ -334,10 +334,16 @@
     @sect{Remote Shell}
 
       @p
-        Ammonite can also be used to remotely connect to your running application and interact with it in real-time, similar to Erlang's @code{erl -remsh} command. To do this, add ammonite sshd server to your classpath, for example with SBT:
+        Ammonite can also be used to remotely connect to your running application and interact with it in real-time, similar to Erlang's @code{erl -remsh} command.
+
+      @p
+        This is useful if e.g. you have multiple Scala/Java processes running but aren't sure when/if you'd want to inspect them for debugging, and if so which ones. With Ammonite, you can leave a ssh server running in each process. You can then and connect-to/disconnect-from each one at your leisure, working with the in-process Scala/Java objects and methods and classes interactively, without having to change code and restart the process to add breakpoints or instrumentation.
+
+      @p
+        To do this, add ammonite-sshd to your classpath, for example with SBT:
 
       @hl.scala
-        libraryDependencies += "com.lihaoyi" % "ammonite-repl-sshd" % "@ammonite.Constants.version" cross CrossVersion.full
+        libraryDependencies += "com.lihaoyi" % "ammonite-sshd" % "@ammonite.Constants.version" cross CrossVersion.full
 
       @p
         Now add repl server to your application:
@@ -346,7 +352,7 @@
         import ammonite.sshd._
         val replServer = new SshdRepl(
           SshServerConfig(
-            host = "localhost", // or "0.0.0.0" for public-facing shells
+            address = "localhost", // or "0.0.0.0" for public-facing shells
             port = 22222, // Any available port
             username = "repl", // Arbitrary
             password = "your_secure_password" // or ""
@@ -355,12 +361,12 @@
         replServer.start()
 
       @p
-        And start your application. You will be able to connect to it using ssh like this: @hl.sh("ssh repl@localhost -p22222") and interact with your running app. Invoke @hl.scala{stop()} method whenever you want to shutdown ammonite sshd server. Here for example sshd repl server is embedded in a pseudo-graphical console application:
+        And start your application. You will be able to connect to it using ssh like this: @hl.sh("ssh repl@localhost -p22222") and interact with your running app. Invoke @hl.scala{stop()} method whenever you want to shutdown ammonite sshd server. Here for example sshd repl server is embedded in the @a("Akka HTTP microservice example", href:="https://github.com/theiterators/akka-http-microservice"):
 
       @img(src:="DebuggingViaSshd.png", width:="100%")
 
       @p
-        Here we can interact with UI code live, having it changing at our sight. We can try different things, see which works and which not, and then put our final bits in application code. In this example app is located on local machine, but you are free to connect to any remote node running your code.
+        Here we can interact with code live, inspecting values or calling methods on the running system. We can try different things, see which works and which not, and then put our final bits in application code. In this example app is located on local machine, but you are free to connect to any remote node running your code.
 
       @p
         @b{Security notes:} It is probably unsafe to run this server publicly (on host @hl.scala{"0.0.0.0"}) in a production, public-facing application. Currently it doesn't supports key-based auth, and password-based auth is notoriously weak.
