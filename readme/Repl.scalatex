@@ -331,7 +331,7 @@
     @p
       The @hl.scala{debug()} call returns @hl.scala{: Any}; by default, this is @hl.scala{(): Unit}, but you can also return custom values by passing in an argument to @hl.scala{exit(...)} when you exit the REPL. This value will then be returned from @hl.scala{debug()}, and can be used in the rest of your Scala application.
 
-    @sect{Remote Shell}
+    @sect{Remote REPL}
 
       @p
         Ammonite can also be used to remotely connect to your running application and interact with it in real-time, similar to Erlang's @code{erl -remsh} command.

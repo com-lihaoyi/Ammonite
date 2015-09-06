@@ -18,7 +18,7 @@
       @li
         Improve the pretty-printing of the @hl.scala{ls} and @hl.scala{ls.rec} commands
       @li
-        Ammonite can now be used as a @sect.ref{Remote Shell} into an already-running Scala process, letting you SSH in to poke around at any time while it's running, thanks to @a("Viacheslav Blinov", href:="https://github.com/dant3")
+        Ammonite can now be used as a @sect.ref{Remote REPL} into an already-running Scala process, letting you SSH in to poke around at any time while it's running, thanks to @a("Viacheslav Blinov", href:="https://github.com/dant3")
       @li
         Fix execution of files via symbols in the current working directory.
       @li
