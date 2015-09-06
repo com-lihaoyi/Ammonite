@@ -1,10 +1,12 @@
 @import Main._
 @sect{Community}
+  @p
+    Ammonite is primarily maintained by @a("Li Haoyi", href:="https://github.com/lihaoyi"), with a lot of help from @a("Laszlo Mero", href:="https://github.com/laci37") over the summer through @a("Google Summer of Code", href:="https://developers.google.com/open-source/gsoc/"), and help from many other @a("contributors", href:="https://github.com/lihaoyi/Ammonite/graphs/contributors"). We have an active Gitter channel and a mailing list:
   @ul
     @li
-      @a("Mailing List", href:="https://groups.google.com/forum/#!forum/ammonite-scala")
-    @li
       @a("Gitter Channel", href:="https://gitter.im/lihaoyi/Ammonite")
+    @li
+      @a("Mailing List", href:="https://groups.google.com/forum/#!forum/ammonite-scala")
 
 @sect{Changelog}
   @sect{0.4.7}
@@ -12,9 +14,11 @@
       @li
         Path-completion now works when using Ammonite as a filesystem shell
       @li
-        Ammonite's filesystem functionality (@hl.scala{cd!}, @hl.scala{wd}, path-completion) has been pulled out of Ammonite-REPL, and is now available separately.
+        Ammonite's filesystem functionality (@hl.scala{cd!}, @hl.scala{wd}, path-completion) has been pulled out of Ammonite-REPL, and is now available separately as @sect.ref{Ammonite-Shell}.
       @li
-        Ammonite can now be used as a @sect.ref{Remote Shell} into an already-running Scala process, letting you SSH in to poke around at any time while it's running.
+        Improve the pretty-printing of the @hl.scala{ls} and @hl.scala{ls.rec} commands
+      @li
+        Ammonite can now be used as a @sect.ref{Remote Shell} into an already-running Scala process, letting you SSH in to poke around at any time while it's running, thanks to @a("Viacheslav Blinov", href:="https://github.com/dant3")
       @li
         Fix execution of files via symbols in the current working directory.
       @li
