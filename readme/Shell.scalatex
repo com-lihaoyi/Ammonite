@@ -77,11 +77,14 @@
       @compare("ls project/target", "ls! 'project/'target")
 
       @p
-        Again, we have to use the quoted @hl.scala{'symbol}/@hl.scala{"string"} syntax when defining @sect.ref{Paths}, but otherwise it behaves identically. These are all functions defined by @sect.ref{Ammonite-Ops}.
+        Again, we have to use the quoted @hl.scala{'symbol}/@hl.scala{"string"} syntax when defining @sect.ref{Paths}, but otherwise it behaves identically. You can press @code{<tab>} at any point after a @code{/} or halfway through a file-name to auto-complete it, just like in Bash.
       @p
         Listing recursively is done via @hl.scala{ls.rec}, instead of @code{find}:
 
       @compare("find ops/src/main", "ls.rec! 'ops/'src/'main")
+
+      @p
+        @hl.scala{ls}, @hl.scala{ls.rec} and other commands are all functions defined by @sect.ref{Ammonite-Ops}.
 
     @sect{Filesystem Operations}
       @p
