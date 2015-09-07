@@ -2,7 +2,7 @@
 @import readme.Sample._
 @sect("Ammonite-Shell", "Replacing Bash for the 21st Century")
   @p
-    Ammonite-Shell is a rock-solid system shell that can replace Bash as the interface to your operating system, using @a("Scala", href:="http://www.scala-lang.org/") as the primary command and scripting language, running on the JVM. Apart from system operations, Ammonite-Shell provides the full-range of @sect.ref("Scala/Java APIs", "Java APIs") for usage at the command-line, including loading libraries from Maven Central.
+    Ammonite-Shell is a rock-solid system shell that can replace Bash as the interface to your operating system, using @sect.ref("Scala as the Language", "Scala as the primary command and scripting language"), @sect.ref("Running on the JVM", "running on the JVM"). Apart from system operations, Ammonite-Shell provides the full-range of @sect.ref("Scala/Java APIs", "Java APIs") for usage at the command-line, including loading libraries from Maven Central.
 
   @p
     Why would you want to use Ammonite-Shell instead of Bash? Possible reasons include:
@@ -392,7 +392,7 @@
 
     @sect{Running on the JVM}
       @p
-        Running Ammonite directly on the JVM again is very different from how most shells work: most have their own scripting language, and their own interpreter. Most are implemented in C. What is it like running your code directly as bytecode on the JVM? Here are some of the negatives:
+        Running Ammonite directly on the @a("JVM", href:="https://en.wikipedia.org/wiki/Java_virtual_machine") again is very different from how most shells work: most have their own scripting language, and their own interpreter. Most are implemented in C. What is it like running your code directly as bytecode on the JVM? Here are some of the negatives:
 
       @ul
         @li
