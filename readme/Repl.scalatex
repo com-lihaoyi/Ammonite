@@ -167,6 +167,19 @@
 
       @p
         The default Scala REPL throws away all your work if the compiler crashes. This doesn't make any sense, because all the compiler is is a dumb @hl.scala{String => Array[Byte]} pipe. In the Ammonite, we simply swap out the broken compiler for a new one and let you continue your work.
+    @sect{Multiline Input}
+      @p
+        To enter multiline input into the Ammonite-REPL, simply wrap the multiple lines in curly braces @hl.scala("{ ... }"), and Ammonite will wait until you close it before evaluating the contents:
+
+      @hl.ref(advancedTests, Seq("'unwrapping", "@"))
+
+      @p
+        As you can see, the contents of the @hl.scala("{ ... }") block are unwrapped and evaluated as top-level statements. You can use this to e.g. declare mutually recursive functions or classes & companion-objects without being forced to squeeze everything onto a single line.
+
+      @p
+        If you don't want this un-wrapping behavior, simply add another set of curlies and the block will be evaluated as a normal block, to a single expression:
+
+      @hl.ref(advancedTests, Seq("'forceWrapping", "@"))
     @sect{Other Fixes}
       @p
         Apart from the above features, the Ammonite REPL fixes a large number of bugs in the default Scala REPL, including but not limited to:
@@ -180,20 +193,6 @@
       Ammonite contains a range of useful built-ins implemented as normal functions. Everything inside the @hl.scala{ReplAPI} trait is imported by default and can be accessed directly by default to control the console.
 
     @hl.ref(replSource/'frontend/"ReplAPI.scala", "trait ReplAPI", "// End of ReplAPI")
-
-  @sect{Multiline Input}
-    @p
-      To enter multiline input into the Ammonite-REPL, simply wrap the multiple lines in curly braces @hl.scala("{ ... }"), and Ammonite will wait until you close it before evaluating the contents:
-
-    @hl.ref(advancedTests, Seq("'unwrapping", "@"))
-
-    @p
-      As you can see, the contents of the @hl.scala("{ ... }") block are unwrapped and evaluated as top-level statements. You can use this to e.g. declare mutually recursive functions or classes & companion-objects without being forced to squeeze everything onto a single line.
-
-    @p
-      If you don't want this un-wrapping behavior, simply add another set of curlies and the block will be evaluated as a normal block, to a single expression:
-
-    @hl.ref(advancedTests, Seq("'forceWrapping", "@"))
 
   @sect{Script Files}
     @p

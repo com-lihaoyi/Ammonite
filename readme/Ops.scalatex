@@ -77,57 +77,57 @@
       @li
         @hl.scala{makeTmp}: Creates a temporary folder and returns the path.
 
-  @sect{RelPaths}
-    @p
-      @hl.scala{RelPath}s represent relative paths. These are basically defined as:
+    @sect{RelPaths}
+      @p
+        @hl.scala{RelPath}s represent relative paths. These are basically defined as:
 
-    @hl.ref(pathsScala, "class RelPath", "")
+      @hl.ref(pathsScala, "class RelPath", "")
 
-    @p
-      The same data structure as @hl.scala{Path}s, except that they can represent a number of @hl.scala{up}s before the relative path is applied. They can be created in the following ways:
+      @p
+        The same data structure as @hl.scala{Path}s, except that they can represent a number of @hl.scala{up}s before the relative path is applied. They can be created in the following ways:
 
-    @hl.ref(opsExamples, Seq("relPaths", "//"), ":")
+      @hl.ref(opsExamples, Seq("relPaths", "//"), ":")
 
-    @p
-      In general, very few APIs take relative paths. Their main purpose is to be combined with absolute paths in order to create new absolute paths. e.g.
+      @p
+        In general, very few APIs take relative paths. Their main purpose is to be combined with absolute paths in order to create new absolute paths. e.g.
 
-    @hl.ref(opsExamples, Seq("relPathCombine", "val"), "}")
+      @hl.ref(opsExamples, Seq("relPathCombine", "val"), "}")
 
-    @p
-      @hl.scala{up} is a relative path that comes in-built:
+      @p
+        @hl.scala{up} is a relative path that comes in-built:
 
-    @hl.ref(opsExamples, Seq("relPathUp", "val"), "}")
+      @hl.ref(opsExamples, Seq("relPathUp", "val"), "}")
 
-    @p
-      Note that all paths, both relative and absolute, are always expressed in a canonical manner:
+      @p
+        Note that all paths, both relative and absolute, are always expressed in a canonical manner:
 
-    @hl.ref(opsExamples, Seq("canonical", "assert"), "}")
+      @hl.ref(opsExamples, Seq("canonical", "assert"), "}")
 
-    @p
-      So you don't need to worry about canonicalizing your paths before comparing them for equality or otherwise manipulating them.
+      @p
+        So you don't need to worry about canonicalizing your paths before comparing them for equality or otherwise manipulating them.
 
-  @sect{Path Operations}
+    @sect{Path Operations}
 
-    @p
-      Ammonite's paths are transparent data-structures, and you can always access the @hl.scala{segments} and @hl.scala{ups} directly. Nevertheless, Ammonite defines a number of useful operations that handle the common cases of dealing with these paths:
+      @p
+        Ammonite's paths are transparent data-structures, and you can always access the @hl.scala{segments} and @hl.scala{ups} directly. Nevertheless, Ammonite defines a number of useful operations that handle the common cases of dealing with these paths:
 
-    @hl.ref(pathsScala, "trait BasePath", "trait")
+      @hl.ref(pathsScala, "trait BasePath", "trait")
 
-    @p
-      In this definition, @hl.scala{ThisType} represents the same type as the current path; e.g. a @hl.scala{Path}'s @hl.scala{/} returns a @hl.scala{Path} while a @hl.scala{RelPath}'s @hl.scala{/} returns a @hl.scala{RelPath}. Similarly, you can only compare or subtract paths of the same type.
+      @p
+        In this definition, @hl.scala{ThisType} represents the same type as the current path; e.g. a @hl.scala{Path}'s @hl.scala{/} returns a @hl.scala{Path} while a @hl.scala{RelPath}'s @hl.scala{/} returns a @hl.scala{RelPath}. Similarly, you can only compare or subtract paths of the same type.
 
-    @p
-      Apart from @hl.scala{RelPath}s themselves, a number of other data structures are convertible into @hl.scala{RelPath}s when spliced into a path using @hl.scala{/}:
+      @p
+        Apart from @hl.scala{RelPath}s themselves, a number of other data structures are convertible into @hl.scala{RelPath}s when spliced into a path using @hl.scala{/}:
 
-    @ul
-      @li
-        @hl.scala{String}s
-      @li
-        @hl.scala{Symbols}s
-      @li
-        @hl.scala{Array[T]}s where @hl.scala{T} is convertible into a @hl.scala{RelPath}
-      @li
-        @hl.scala{Seq[T]}s where @hl.scala{T} is convertible into a @hl.scala{RelPath}
+      @ul
+        @li
+          @hl.scala{String}s
+        @li
+          @hl.scala{Symbols}s
+        @li
+          @hl.scala{Array[T]}s where @hl.scala{T} is convertible into a @hl.scala{RelPath}
+        @li
+          @hl.scala{Seq[T]}s where @hl.scala{T} is convertible into a @hl.scala{RelPath}
 
   @sect{Operations}
     @p
@@ -163,56 +163,56 @@
     @p
       In general, this should make these operations much easier to use; the defaults should cover the 99% use case without needing any special flags or fiddling.
 
-  @sect{Extensions}
-    @p
-      Ammonite-Ops contains a set of extension methods on common types, which serve no purpose other than to make things more concise. These turn Scala from a "relatively-concise" language into one as tight as Bash scripts, while still maintaining the high level of type-safety and maintainability that comes with Scala code.
-
-    @sect{Traversable}
+    @sect{Extensions}
       @p
-        These extensions apply to any @hl.scala{Traversable}: @hl.scala{Seq}s, @hl.scala{List}s, @hl.scala{Array}s, and others.
-      @ul
-        @li
-          @hl.scala{things | f} is an alias for @hl.scala{things map f}
-        @li
-          @hl.scala{things || f} is an alias for @hl.scala{things flatMap f}
-        @li
-          @hl.scala{things |? f} is an alias for @hl.scala{things filter f}
-        @li
-          @hl.scala{things |& f} is an alias for @hl.scala{things reduce f}
-        @li
-          @hl.scala{things |! f} is an alias for @hl.scala{things foreach f}
+        Ammonite-Ops contains a set of extension methods on common types, which serve no purpose other than to make things more concise. These turn Scala from a "relatively-concise" language into one as tight as Bash scripts, while still maintaining the high level of type-safety and maintainability that comes with Scala code.
+
+      @sect{Traversable}
+        @p
+          These extensions apply to any @hl.scala{Traversable}: @hl.scala{Seq}s, @hl.scala{List}s, @hl.scala{Array}s, and others.
+        @ul
+          @li
+            @hl.scala{things | f} is an alias for @hl.scala{things map f}
+          @li
+            @hl.scala{things || f} is an alias for @hl.scala{things flatMap f}
+          @li
+            @hl.scala{things |? f} is an alias for @hl.scala{things filter f}
+          @li
+            @hl.scala{things |& f} is an alias for @hl.scala{things reduce f}
+          @li
+            @hl.scala{things |! f} is an alias for @hl.scala{things foreach f}
+        @p
+          These should behave exactly the same as their implementations; their sole purpose is to make things more concise at the command-line.
+
+      @sect{Pipeable}
+        @ul
+          @li
+            @hl.scala{thing |> f} is an alias for @hl.scala{f(thing)}
+
+        @p
+          This lets you flip around the function and argument, and fits nicely into the Ammonite's @hl.scala{|} pipelines.
+
+      @sect{Callable}
+        @ul
+          @li
+            @hl.scala{f! thing} is an alias for @hl.scala{f(thing)}
+
+        @p
+          This is another syntax-saving extension, that makes it easy to call functions without having to constantly be opening and closing brackets. It does nothing else.
+
+    @sect{Chaining}
       @p
-        These should behave exactly the same as their implementations; their sole purpose is to make things more concise at the command-line.
+        The real value of Ammonite is the fact that you can pipe things together as easily as you could in Bash. No longer do you need to write reams of boilerplate. to accomplish simple tasks. Some of these chains are listed at the top of this readme, here are a few more fun examples:
 
-    @sect{Pipeable}
-      @ul
-        @li
-          @hl.scala{thing |> f} is an alias for @hl.scala{f(thing)}
+      @hl.ref(opsExamples, Seq("longExample", "// Chains", "// Move all files"), "assert(")
 
       @p
-        This lets you flip around the function and argument, and fits nicely into the Ammonite's @hl.scala{|} pipelines.
-
-    @sect{Callable}
-      @ul
-        @li
-          @hl.scala{f! thing} is an alias for @hl.scala{f(thing)}
+        As you can see, you can often compose elaborate operations entirely naturally using the available pipes, without needing to remember any special flags or techniques.
 
       @p
-        This is another syntax-saving extension, that makes it easy to call functions without having to constantly be opening and closing brackets. It does nothing else.
+        Here's another example:
 
-  @sect{Chaining}
-    @p
-      The real value of Ammonite is the fact that you can pipe things together as easily as you could in Bash. No longer do you need to write reams of boilerplate. to accomplish simple tasks. Some of these chains are listed at the top of this readme, here are a few more fun examples:
-
-    @hl.ref(opsExamples, Seq("longExample", "// Chains", "// Move all files"), "assert(")
-
-    @p
-      As you can see, you can often compose elaborate operations entirely naturally using the available pipes, without needing to remember any special flags or techniques.
-
-    @p
-      Here's another example:
-
-    @hl.ref(opsExamples, Seq("noLongLines", ""))
+      @hl.ref(opsExamples, Seq("noLongLines", ""))
 
   @sect{Spawning Subprocesses}
     @p
