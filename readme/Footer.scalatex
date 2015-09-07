@@ -8,6 +8,12 @@
     @li
       @a("Mailing List", href:="https://groups.google.com/forum/#!forum/ammonite-scala")
 
+  @p
+    I've also given a number of talks about Ammonite. These
+  @ul
+    @li
+      @b{Beyond Bash: shell scripting in a typed, OO language}, at Scala by the Bay 2015. @a("Slides", href:="http://tinyurl.com/beyondbash")
+
 @sect{Changelog}
   @sect{0.4.7}
     @ul

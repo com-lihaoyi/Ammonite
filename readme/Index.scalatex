@@ -15,12 +15,15 @@
 
 
 @scalatags.Text.tags2.style
+  /* Hacks to make things look better */
   * .hljs-symbol{
     color: #008000;
     font-weight: bold;
     font-style: normal;
   }
-
+  .scalatex-site-Styles-content li{
+    margin-bottom: 10px;
+  }
 
 @sect{Ammonite}
   @p
