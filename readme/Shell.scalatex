@@ -2,7 +2,7 @@
 @import readme.Sample._
 @sect("Ammonite-Shell", "Replacing Bash for the 21st Century")
   @p
-    Ammonite-Shell is a rock-solid system shell that can replace Bash as the interface to your operating system, using @a("Scala", href:="http://www.scala-lang.org/") as the primary command and scripting language, running on the JVM. Apart from system operations, Ammonite-Shell provides the full-range of @sect.ref("Scala/Java APIs", "Java APIs") for usage at the command-line, including @sect.ref("Artifact Loading", "loading libraries from Maven Central").
+    Ammonite-Shell is a rock-solid system shell that can replace Bash as the interface to your operating system, using @a("Scala", href:="http://www.scala-lang.org/") as the primary command and scripting language, running on the JVM. Apart from system operations, Ammonite-Shell provides the full-range of @sect.ref("Scala/Java APIs", "Java APIs") for usage at the command-line, including loading libraries from Maven Central.
 
   @p
     Why would you want to use Ammonite-Shell instead of Bash? Possible reasons include:
@@ -17,7 +17,7 @@
     @li
       You think that technology has improved in the last @a("38 years", href:="https://en.wikipedia.org/wiki/Bourne_shell") and a modern systems shell should be better than the shells of our forefathers
   @p
-    If none of these apply to you, then likely you won't be interested. If any of these bullet points strikes a chord, then read on to get started. For more discussion w.r.t. why this project exists, take a look at the presentation slides for @a("Beyond Bash: shell scripting in a typed, OO language", href:="http://tinyurl.com/beyondbash"), presented at Scala by the Bay 2015.
+    If none of these apply to you, then likely you won't be interested. If any of these bullet points strikes a chord, then read on to get started. For more discussion about why this project exists, take a look at the presentation slides for @a("Beyond Bash: shell scripting in a typed, OO language", href:="http://tinyurl.com/beyondbash"), presented at Scala by the Bay 2015, or check out the section on @sect.ref{Design Decisions & Tradeoffs}.
 
   @sect{Getting Ammonite-Shell}
     @p
