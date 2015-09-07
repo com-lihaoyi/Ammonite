@@ -2,7 +2,7 @@
 @import readme.Sample._
 @sect("Ammonite-Shell", "Replacing Bash for the 21st Century")
   @p
-    Ammonite-Shell is a rock-solid system shell that can replace Bash as the interface to your operating system, using @a("Scala", href:="http://www.scala-lang.org/") as the primary command and scripting language. It is built on top of the @sect.ref{Ammonite-REPL} and the @sect.ref{Ammonite-Ops} filesystem library, but you do not need to know anything about those to get started.
+    Ammonite-Shell is a rock-solid system shell that can replace Bash as the interface to your operating system, using @a("Scala", href:="http://www.scala-lang.org/") as the primary command and scripting language, running on the JVM. Apart from system operations, Ammonite-Shell provides the full-range of @sect.ref("Scala/Java APIs", "Java APIs") for usage at the command-line, including @sect.ref("Artifact Loading", "loading libraries from Maven Central").
 
   @p
     Why would you want to use Ammonite-Shell instead of Bash? Possible reasons include:
@@ -300,6 +300,8 @@
           |numbers(1) = "2".toInt 
         """.stripMargin
       ))  
+      @p    
+        In general, apart from the filesystem-specific commands, you should be able to do anything you would expect to be able to do in a Scala shell or Java project. This documentation isn't intended to be a full tutorial on the Scala language, check out the @a("Scala Documentation", href:="http://www.scala-lang.org/documentation/") if you want to learn more!
     @sect{Scala/Java APIs}
       @p
         Apart from the pipe operators described in the earlier section on @sect.ref{Piping}, Ammonite-Shell allows you to call any valid Scala method on any value; it's just Scala after all! Here's an example using normal Scala collection operations to deal with a list of files, counting how many files exist for each extension:
@@ -322,9 +324,32 @@
       ))
 
       @p
-        In fact, Ammonite-Shell allows you to ask for any published third-party Java/Scala library for usage in the shell, and have them downloaded, automatically cached, and made available for use. See the section on @sect.ref{Artifact Loading} to learn more.
+        In fact, Ammonite-Shell allows you to ask for any published third-party Java/Scala library for usage in the shell, and have them downloaded, automatically cached, and made available for use. e.g. we can load popular libraries like @a("Google Guava", href:="https://github.com/google/guava") and using it in the shell:
+
+      @pre(ammSample(
+        """import com.google.common.collect.ImmutableBiMap // Doesn't work
+          |load.ivy("com.google.guava" % "guava" % "18.0") // Load from Maven Central
+          |import com.google.common.collect.ImmutableBiMap // Works now
+          |val bimap = ImmutableBiMap.of(1, "one", 2, "two", 3, "three")
+          |bimap.get(1)
+          |bimap.inverse.get("two")
+        """.stripMargin
+      ))
+
       @p
-        In general, apart from the filesystem-specific commands, you should be able to do anything you would expect to be able to do in a Scala shell. This documentation isn't intended to be a full tutorial on the Scala language, check out the @a("Scala Documentation", href:="http://www.scala-lang.org/documentation/") if you want to learn more!
+        Or Joda Time:
+
+      @pre(ammSample(
+        """load.ivy("joda-time" % "joda-time" % "2.8.2") 
+          |import org.joda.time.{DateTime, Period, Duration}
+          |val dt = new DateTime(2005, 3, 26, 12, 0, 0, 0)
+          |val plusPeriod = dt.plus(Period.days(1))
+          |dt.plus(new Duration(24L*60L*60L*1000L))
+        """.stripMargin
+      ))
+
+      @p
+        See the section on @sect.ref{Artifact Loading} to learn more.
 
     @sect{Writing/Loading Scripts}
       @p
