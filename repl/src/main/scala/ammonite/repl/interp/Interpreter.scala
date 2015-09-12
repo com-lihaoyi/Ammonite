@@ -54,6 +54,9 @@ class Interpreter(prompt0: Ref[String],
       |""".stripMargin
 
   val dynamicClasspath = new VirtualDirectory("(memory)", None)
+
+  val SheBang= "#!"
+
   var extraJars = Seq[java.io.File]()
 
   def processLine(code: String,
@@ -92,11 +95,22 @@ class Interpreter(prompt0: Ref[String],
   }
 
   def processModule(code: String) =
-    processScript(hardcodedPredef + "\n@\n" + code, eval.processScriptBlock)
+    processScript(prepareScript(code), eval.processScriptBlock)
 
   def processExec(code: String) =
-    processScript(hardcodedPredef + "\n@\n" + code, { (c, i) => evaluateLine(c, Nil, _ => (), i)})
- 
+    processScript(prepareScript(code), { (c, i) => evaluateLine(c, Nil, _ => (), i)})
+
+  private def prepareScript(code: String) =
+    hardcodedPredef + "\n@\n" + skipSheBangLine(code)
+
+  private def skipSheBangLine(code: String)= {
+    if (code.startsWith(SheBang))
+      code.substring(code.indexOf('\n'))
+     else
+      code
+  }
+
+
   //this variable keeps track of where should we put the imports resulting from scripts.
   private var scriptImportCallback: Seq[ImportData] => Unit = eval.update
 
