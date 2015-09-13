@@ -25,6 +25,9 @@ val sharedSettings = Seq(
   addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.2"),
   parallelExecution in Test := !scalaVersion.value.contains("2.10"),
   (unmanagedSources in Compile) += baseDirectory.value/".."/"project"/"Constants.scala",
+  mappings in (Compile, packageSrc) += {
+    (baseDirectory.value/".."/"project"/"Constants.scala") -> "Constants.scala"
+  },
   libraryDependencies ++= Seq(
     "com.lihaoyi" %% "acyclic" % "0.1.2" % "provided",
     "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided"
