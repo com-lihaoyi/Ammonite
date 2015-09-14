@@ -24,6 +24,12 @@ class ReplAPIHolder {
 case class ReplExit(value: Any) extends ControlThrowable
 
 trait ReplAPI {
+
+  /**
+   * My extensions
+   */
+   //def runLine: Unit 
+
   /**
    * Exit the Ammonite REPL. You can also use Ctrl-D to exit
    */
@@ -142,12 +148,12 @@ trait LoadJar {
    */
   def ivy(coordinates: (String, String, String), verbose: Boolean = true): Unit
 }
-trait Load extends (String => Unit) with LoadJar{
+trait Load extends ((String, Boolean) => Unit) with LoadJar{
   /**
    * Loads a command into the REPL and
    * evaluates them one after another
    */
-  def apply(line: String): Unit
+  def apply(line: String, visible: Boolean = false): Unit
 
   /**
    * Loads and executes the scriptfile on the specified path.

@@ -87,6 +87,8 @@ object Compiler{
     val vd = new io.VirtualDirectory("(memory)", None)
     lazy val settings = new Settings
     val settingsX = settings
+    settingsX.Yrangepos.value = true
+    settings.Ylogcp.value = true
     val jCtx = new JavaContext()
     val jDirs = jarDeps.map(x =>
       new DirectoryClassPath(new FileZipArchive(x), jCtx)
@@ -94,6 +96,10 @@ object Compiler{
       new DirectoryClassPath(new PlainDirectory(new Directory(x)), jCtx)
     ) ++ Seq(new DirectoryClassPath(dynamicClasspath, jCtx))
     val jcp = new JavaClassPath(jDirs, jCtx)
+    //println("jardeps")
+    //jarDeps.foreach(p => println(s"${p.getName.takeRight(4)} $p"))
+    //println("finished")
+
     settings.outputDirs.setSingleOutput(vd)
 
     val reporter = new AbstractReporter {
@@ -101,7 +107,9 @@ object Compiler{
 
       def display(pos: Position, msg: String, severity: Severity) = {
         severity match{
-          case ERROR => logger(Position.formatMessage(pos, msg, false))
+          case ERROR =>
+             println(s"ERROR: $msg")
+             logger(Position.formatMessage(pos, msg, false))
           case _ => logger(msg)
         }
       }
