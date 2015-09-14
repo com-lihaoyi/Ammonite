@@ -216,10 +216,10 @@
     @hl.scala
       @@ mutable.Seq(x) // doesn't work
       Compilation Failed
-      Main.scala:122: not found: value mutable
+      not found: value mutable
       mutable.Seq(x) // doesn't work
       ^
-      Main.scala:122: not found: value x
+      not found: value x
       mutable.Seq(x) // doesn't work
                   ^
       @@ import ammonite.ops._
