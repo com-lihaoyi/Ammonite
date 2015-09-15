@@ -106,8 +106,9 @@ object Evaluator{
       }
       _ = _compilationCount += 1
       result <- Res[(ClassFiles, Seq[ImportData])](
-        compiled, "Compilation Failed\n" + output.map(
-          _.split(": ").tail.mkString(": ")).mkString("\n")
+        compiled, List("Compilation Failed",
+          output.head.split(": ").tail.mkString(": "),
+          output.tail.mkString("\n")).mkString("\n")
       )
     } yield result
 

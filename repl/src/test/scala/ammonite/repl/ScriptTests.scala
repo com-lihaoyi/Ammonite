@@ -109,6 +109,15 @@ object ScriptTests extends TestSuite{
 
             """)
         }
+        'compilationErrorWithColon{
+          check.session(s"""
+            @  a = ": 1"
+            error: Compilation Failed
+            not found: value a
+            a = ": 1"
+            ^
+            """)
+        }
         'nofile{
           check.session(s"""
             @ import ammonite.ops._
