@@ -16,6 +16,14 @@
       @b{Beyond Bash: shell scripting in a typed, OO language}, at Scala by the Bay 2015. @a("Slides", href:="http://tinyurl.com/beyondbash")
 
 @sect{Changelog}
+  @sect{0.4.8}
+    @ul
+      @li
+        Swapped to G1 garbage collector to @a("reduce unnecessary memory footprint", href:="https://github.com/lihaoyi/Ammonite/issues/216")
+      @li
+        Allow splicing @hl.scala{Seq[String]}s into subprocess arguments
+      @li
+        Fix source packaging which was causing problems with ensime
   @sect{0.4.7}
     @ul
       @li
