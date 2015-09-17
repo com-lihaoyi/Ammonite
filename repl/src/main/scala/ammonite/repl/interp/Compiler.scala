@@ -101,7 +101,9 @@ object Compiler{
 
       def display(pos: Position, msg: String, severity: Severity) = {
         severity match{
-          case ERROR => logger(Position.formatMessage(pos, msg, false))
+          case ERROR => 
+            println(s"ERROR: $msg")
+            logger(Position.formatMessage(pos, msg, false))
           case _ => logger(msg)
         }
       }

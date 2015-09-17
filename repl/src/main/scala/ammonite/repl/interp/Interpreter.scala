@@ -226,7 +226,13 @@ class Interpreter(prompt0: Ref[String],
         eval.addJar(jar.toURI.toURL)
       }
 
-      def apply(line: String) = processExec(line)
+      def apply(line: String, visible: Boolean) = {
+        if (!visible) processExec(line)
+        else {
+          val res = interp.processLine(line, Parsers.split(line).get.get.value, _.foreach(interp.stdout))
+          handleOutput(res)
+        }
+      }
 
       def exec(file: Path): Unit = apply(read(file))
 

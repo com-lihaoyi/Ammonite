@@ -263,6 +263,32 @@
     @p
       All types, values and imports defined in scripts are available to commands entered in REPL after loading the script.
 
+   @p
+      Ammonite also provides a function to load a string of Scala code as if it were entered from the REPL. It comes with an option to load the code silently, or to get a printout of the results in the REPL exactly as if it was entered in the REPL:
+
+      @@
+
+      // scalaCode can be multiple lines, define functions, etc
+      // visible is an optional parameter that defaults to false (no output)
+      load(scalaCode: String, visible: Boolean = false)
+ 
+     @p
+      Here's an example:
+
+      @@
+
+      $: load("""val foo = "I am cow!" """)
+
+      $: foo
+      res19: String = "I am cow!"
+      $: load("""val bar = 42; val baz = 2; bar*baz""", true)
+      bar: Int = 42
+      baz: Int = 2
+      res21_2: Int = 84
+      $: res21_2
+      res22: Int = 84
+      $:
+
   @sect{Configuration}
     @p
       Ammonite is configured via Scala code, that can live in the @code{~/.ammonite/predef.scala} file, passed in through SBT's @hl.scala{initialCommands}, or passed to the command-line executable as @code{--predef='...'}.
