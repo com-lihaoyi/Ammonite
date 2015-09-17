@@ -20,6 +20,16 @@ object ShelloutTests extends TestSuite{
         assert((%%git "init").output.mkString.contains("Reinitialized existing Git repository"))
         assert((%%ls cwd).output.mkString.contains("readme.md"))
       }
+      'basicList{
+        val files = List("readme.md", "build.sbt")
+        val output = (%%ls files).output.mkString
+        assert(files.forall(output.contains))
+      }
+      'listMixAndMatch{
+        val stuff = List("I", "am", "bovine")
+        val result = %%echo("Hello,", stuff, "hear me roar")
+        assert(result.output.mkString.contains("Hello, " + stuff.mkString(" ") + " hear me roar"))
+      }
       'failures{
         intercept[RuntimeException]{ %%ls "does-not-exist" }
       }

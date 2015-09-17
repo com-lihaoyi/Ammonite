@@ -4,6 +4,7 @@ This is where the code for the [Ammonite](http://lihaoyi.github.io/Ammonite) pro
 
 - [Ammonite-REPL](http://lihaoyi.github.io/Ammonite), the improved Scala REPL
 - [Ammonite-Ops](http://lihaoyi.github.io/Ammonite/#Ammonite-Ops), the Scala file-system library
+- [Ammonite-Shell](http://lihaoyi.github.io/Ammonite/#Ammonite-Shell), the Bash-replacement system shell
 
 If you want to learn more about Ammonite or how to use it, check out the links above, or ask on the [Gitter Channel](https://gitter.im/lihaoyi/Ammonite). The remainder of this document is developer-docs for people who want to work on the Ammonite source code itself.
 
@@ -13,6 +14,7 @@ The layout of the repository is roughly:
 
 - `ops/` is [Ammonite-Ops](http://lihaoyi.github.io/Ammonite/#Ammonite-Ops)
 - `repl/` is [Ammonite-REPL](http://lihaoyi.github.io/Ammonite)
+- `shell/` is [Ammonite-REPL](http://lihaoyi.github.io/Ammonite/#Ammonite-Shell)
 - `terminal/` is the JLine re-implementation used by Ammonite-REPL to provide syntax highlighting and multiline editing
 - `shell/` is a WIP implementation of common shell utilities in Scala; currently not used nor documented
 - `readme/` is the source code for the [Documentation](http://lihaoyi.github.io/Ammonite/#Ammonite-Ops), written in [Scalatex](http://lihaoyi.github.io/Scalatex/).

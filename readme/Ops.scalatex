@@ -252,7 +252,7 @@
       Enter passphrase for /Users/haoyi/.ssh/id_rsa:
 
     @p
-      Lastly, you can also pass arguments into these subprocess calls, as Strings or Symbols:
+      Lastly, you can also pass arguments into these subprocess calls, as Strings, Symbols or Seqs of Strings:
     @hl.scala
       @@ %git 'branch
         gh-pages
@@ -279,6 +279,11 @@
       Already on 'master'
       Your branch is up-to-date with 'origin/master'.
       res8: Int = 0
+
+      @@ val stuff = List("readme.md", "build.sbt")
+      stuff: List[String] = List("readme.md", "build.sbt")
+      @@ %ls(".gitignore", stuff)
+      .gitignore	build.sbt	readme.md
     @p
       Ammonite-Ops currently does not provide many convenient ways of piping together multiple processes, but support may come in future if someone finds it useful enough to implement.
 

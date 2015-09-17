@@ -29,7 +29,7 @@ object SshdReplTest extends TestSuite {
         shell.input.println("SshdReplTest.remotePromise.success(true)")
         shell.input.println("exit")
 
-        assert(Await.result(remotePromise.future, 30 seconds))
+        assert(Await.result(remotePromise.future, 60 seconds))
         shell.awaitToBecomeDisconnected(60 seconds)
 
         val outputLines = shell.output.readAll.lines.toList

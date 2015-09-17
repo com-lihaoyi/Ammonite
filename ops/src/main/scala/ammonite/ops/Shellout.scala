@@ -44,13 +44,14 @@ case class Command[T](cmd: Vector[String],
     }
   }
   def applyDynamic(op: String)(args: Shellable*)(implicit wd: Path): T = {
-    execute(wd, this.extend(opArg(op) ++ args.map(_.s), Map()))
+    execute(wd, this.extend(opArg(op) ++ args.flatMap(_.s), Map()))
   }
   def applyDynamicNamed(op: String)
                        (args: (String, Shellable)*)
                        (implicit wd: Path): T = {
     val (namedArgs, posArgs) = args.map{case (k, v) => (k, v.s)}.partition(_._1 != "")
-    execute(wd, this.extend(opArg(op) ++ posArgs.map(_._2), namedArgs))
+    execute(wd, this.extend(opArg(op) ++ posArgs.flatMap(_._2),
+      namedArgs.map{case (k, v) => (k, v.head)}))
   }
 }
 
@@ -79,12 +80,13 @@ object CommandResult{
  * An implicit wrapper defining the things that can
  * be "interpolated" directly into a subprocess call.
  */
-case class Shellable(s: String)
+case class Shellable(s: Seq[String])
 object Shellable{
-  implicit def StringShellable(s: String): Shellable = Shellable(s)
-  implicit def SymbolShellable(s: Symbol): Shellable = Shellable(s.name)
-  implicit def BasePathShellable(s: BasePath[_]): Shellable = Shellable(s.toString)
-  implicit def NumericShellable[T: Numeric](s: T): Shellable = Shellable(s.toString)
+  implicit def StringShellable(s: String): Shellable = Shellable(Seq(s))
+  implicit def SeqShellable(s: Seq[String]): Shellable = Shellable(s)
+  implicit def SymbolShellable(s: Symbol): Shellable = Shellable(Seq(s.name))
+  implicit def BasePathShellable(s: BasePath[_]): Shellable = Shellable(Seq(s.toString))
+  implicit def NumericShellable[T: Numeric](s: T): Shellable = Shellable(Seq(s.toString))
 }
 
 /**
