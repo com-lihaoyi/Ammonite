@@ -110,7 +110,10 @@ lazy val repl = project
     ),
     javaOptions += "-Xmx4G",
     assemblyOption in assembly := (assemblyOption in assembly).value.copy(
-      prependShellScript = Some(defaultShellScript)
+      prependShellScript = Some(
+        // G1 Garbage Collector is awesome https://github.com/lihaoyi/Ammonite/issues/216
+        Seq("#!/usr/bin/env sh", """exec java -jar -XX:+UseG1GC "$0" "$@"""")
+      )
     ),
     assemblyJarName in assembly := s"${name.value}-${version.value}-${scalaVersion.value}",
     sourceGenerators in Compile <+= sourceManaged in Compile map { dir =>
