@@ -24,6 +24,10 @@
         Allow splicing @hl.scala{Seq[String]}s into subprocess arguments
       @li
         Fix source packaging which was causing problems with ensime
+      @li
+        Allow shebang line to make Ammonite scripts more conveniently executable
+      @li
+        Robustify line-breaking-logic
   @sect{0.4.7}
     @ul
       @li
