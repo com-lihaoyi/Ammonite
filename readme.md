@@ -14,9 +14,8 @@ The layout of the repository is roughly:
 
 - `ops/` is [Ammonite-Ops](http://lihaoyi.github.io/Ammonite/#Ammonite-Ops)
 - `repl/` is [Ammonite-REPL](http://lihaoyi.github.io/Ammonite)
-- `shell/` is [Ammonite-REPL](http://lihaoyi.github.io/Ammonite/#Ammonite-Shell)
+- `shell/` is [Ammonite-Shell](http://lihaoyi.github.io/Ammonite/#Ammonite-Shell)
 - `terminal/` is the JLine re-implementation used by Ammonite-REPL to provide syntax highlighting and multiline editing
-- `shell/` is a WIP implementation of common shell utilities in Scala; currently not used nor documented
 - `readme/` is the source code for the [Documentation](http://lihaoyi.github.io/Ammonite/#Ammonite-Ops), written in [Scalatex](http://lihaoyi.github.io/Scalatex/).
 - `modules/` is a synthetic project used for publishing, purely intended to exclude the readme
 
