@@ -11,8 +11,6 @@ import java.nio.file._
 import acyclic.file
 import ammonite.ops.Internals.SelfClosingIterator
 
-import pprint.{Config, PPrinter, PPrint}
-
 object OpError{
   type IAE = IllegalArgumentException
   case class ResourceNotFound(src: Path)

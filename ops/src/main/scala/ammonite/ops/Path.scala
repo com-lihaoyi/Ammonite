@@ -14,14 +14,7 @@ object BasePath{
     }
     if (s == "") throw new PathError.InvalidSegment("")
   }
-  def reprSection(s: String, cfg: pprint.Config) = {
-    val validIdentifier = "([a-zA-Z_][a-zA-Z_0-9]+)".r
-    if (validIdentifier.findFirstIn(s) == Some(s)){
-      implicitly[pprint.PPrinter[scala.Symbol]].render(Symbol(s), cfg)
-    }else{
-      implicitly[pprint.PPrinter[String]].render(s, cfg)
-    }
-  }
+
 }
 
 /**
@@ -175,11 +168,6 @@ object RelPath extends RelPathStuff with (String => RelPath){
 
   implicit def ArrayPath[T](s: Array[T])(implicit conv: T => RelPath): RelPath = SeqPath(s)
 
-  implicit val relPathRepr = pprint.PPrinter[ammonite.ops.RelPath]{(p, c) =>
-    Iterator(
-      (Seq.fill(p.ups)("up") ++ p.segments.map(BasePath.reprSection(_, c).mkString)).mkString("/")
-    )
-  }
 
   implicit val relPathOrdering: Ordering[RelPath] =
     Ordering.by((rp: RelPath) => (rp.ups, rp.segments.length, rp.segments.toIterable))
@@ -210,9 +198,6 @@ object Path extends (String => Path){
     def nio = java.nio.file.Paths.get(p.toString)
   }
 
-  implicit def pathRepr = pprint.PPrinter[ammonite.ops.Path]{(p, c) =>
-    Iterator("root") ++ p.segments.iterator.map("/" + BasePath.reprSection(_, c).mkString)
-  }
 
   implicit val pathOrdering: Ordering[Path] =
     Ordering.by((rp: Path) => (rp.segments.length, rp.segments.toIterable))

@@ -4,7 +4,6 @@ import java.nio.file.{LinkOption, Paths, Files}
 import java.nio.file.attribute._
 
 import ammonite.ops
-import pprint.{PPrinter, Config, PPrint}
 
 import scala.util.Try
 
@@ -17,24 +16,14 @@ object FileType{
   case object Other extends FileType
 }
 object PermSet{
-  implicit def pprintConfig(implicit c: Config) = PPrint(
-    PPrinter[PermSet]{ (p, c) =>
-      Iterator(
-        "rwxrwxrwx".zip(PosixFilePermission.values()).map{ case (k, v) =>
-          if(p.contains(v)) k else '-'
-        }.mkString)
-    }
-  )
+
 }
 class PermSet(s: Set[PosixFilePermission]) extends Set[PosixFilePermission]{
   def contains(elem: PosixFilePermission) = s.contains(elem)
   def +(elem: PosixFilePermission) = new PermSet(s + elem)
   def -(elem: PosixFilePermission) = new PermSet(s - elem)
   def iterator = s.iterator
-  override def toString() = {
-    import Config.Defaults.PPrintConfig
-    pprint.tokenize(this, width=999999, height=999999, colors=pprint.Colors.BlackWhite).mkString
-  }
+
 }
 
 object stat extends Function1[ops.Path, ops.stat]{

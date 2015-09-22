@@ -36,8 +36,8 @@ class Checker {
     // Remove the margin from the block and break
     // it into blank-line-delimited steps
     val margin = sess.lines.filter(_.trim != "").map(_.takeWhile(_ == ' ').length).min
-
     // Strip margin & whitespace
+
     val steps = sess.replace("\n" + margin, "\n").replaceAll(" *\n", "\n").split("\n\n")
 
     for(step <- steps){
@@ -89,7 +89,7 @@ class Checker {
             case Res.Exception(ex, failureMsg) =>
               val trace = Repl.showException(ex, "", "", "") + "\n" +  failureMsg
               assert({identity(trace); identity(regex); false})
-            case _ => ???
+            case _ => throw new Exception(s"Printed $printed does not match what was expected: $expected")
           }
         }else{
           assert(
@@ -125,6 +125,7 @@ class Checker {
   }
 
   def run(input: String) = {
+    println("RUNNING " + input)
     //    println("RUNNING")
     //    println(input)
     //    print(".")

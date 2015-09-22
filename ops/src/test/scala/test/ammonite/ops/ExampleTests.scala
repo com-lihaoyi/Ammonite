@@ -298,18 +298,5 @@ object ExampleTests extends TestSuite{
         assert(cwd / rel == abs)
       }
     }
-
-    'pprint{
-      import pprint.Config.Defaults._
-
-      assert(
-        pprint.tokenize(root/'hello/'world).mkString == "root/'hello/'world",
-        pprint.tokenize('hello/'world).mkString == "'hello/'world",
-        pprint.tokenize(empty/'world).mkString == "'world",
-        pprint.tokenize(empty/'hello/'world).mkString == "'hello/'world",
-        pprint.tokenize(empty/"hello world").mkString == "\"hello world\""
-      )
-
-    }
   }
 }

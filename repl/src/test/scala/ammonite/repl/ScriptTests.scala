@@ -12,12 +12,9 @@ object ScriptTests extends TestSuite{
     println("ScriptTests")
     val check = new Checker()
 
-    val scriptPath = cwd/RelPath("repl/src/test/resource/scripts")
-    val printedScriptPath = {
-      import pprint.Config.Defaults.PPrintConfig
-      pprint.tokenize(scriptPath)
-            .mkString
-    }
+    val scriptPath = cwd/'repl/'src/'test/'resources/'scripts
+    val printedScriptPath = """cwd/'repl/'src/'test/'resources/'scripts"""
+
 
     'exec{
       'compilationBlocks{

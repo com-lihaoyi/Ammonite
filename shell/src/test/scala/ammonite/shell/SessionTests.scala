@@ -13,7 +13,7 @@ object SessionTests extends TestSuite{
       check.session(s"""
         @ import ammonite.ops._
 
-        @ load.module(cwd / RelPath("shell/src/main/resources/example-predef.scala"))
+        @ load.module(cwd/'shell/'src/'main/'resources/"example-predef.scala")
 
         @ val originalWd = wd
 

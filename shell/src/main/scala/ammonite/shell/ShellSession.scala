@@ -1,6 +1,7 @@
 package ammonite.shell
 
 import java.nio.file.NotDirectoryException
+import java.nio.file.attribute.PosixFilePermission
 
 import ammonite.ops._
 import ammonite.repl.frontend.FrontEndUtils
@@ -27,6 +28,10 @@ case class ShellSession() extends OpsAPI {
   }
   implicit def Relativizer[T](p: T)(implicit b: Path, f: T => RelPath): Path = b/f(p)
 
+}
+
+object PPrints{
+
   implicit def lsSeqRepr: PPrint[LsSeq] = PPrint(
     PPrinter(
       (t: LsSeq, c: Config) =>
@@ -40,7 +45,39 @@ case class ShellSession() extends OpsAPI {
         ).mkString)
     )
   )
+  def reprSection(s: String, cfg: pprint.Config) = {
+    val validIdentifier = "([a-zA-Z_][a-zA-Z_0-9]+)".r
+    if (validIdentifier.findFirstIn(s) == Some(s)){
+      implicitly[pprint.PPrinter[scala.Symbol]].render(Symbol(s), cfg)
+    }else{
+      implicitly[pprint.PPrinter[String]].render(s, cfg)
+    }
+  }
 
+  implicit val relPathRepr = pprint.PPrinter[ammonite.ops.RelPath]{(p, c) =>
+    Iterator(
+      (Seq.fill(p.ups)("up") ++ p.segments.map(reprSection(_, c).mkString)).mkString("/")
+    )
+  }
+
+  implicit def pathRepr = pprint.PPrinter[ammonite.ops.Path]{(p, c) =>
+    Iterator("root") ++ p.segments.iterator.map("/" + reprSection(_, c).mkString)
+  }
+  implicit def commandResultRepr = PPrint(
+    PPrinter[CommandResult]((x, c) =>
+      x.output.iterator.flatMap(line =>
+        Iterator("\n", c.colors.literalColor, line, c.colors.endColor)
+      )
+    )
+  )
+  implicit def permissionPPrintConfig(implicit c: Config) = PPrint(
+    PPrinter[PermSet]{ (p, c) =>
+      Iterator(
+        "rwxrwxrwx".zip(PosixFilePermission.values()).map{ case (k, v) =>
+          if(p.contains(v)) k else '-'
+        }.mkString)
+    }
+  )
 }
 trait OpsAPI{
   /**

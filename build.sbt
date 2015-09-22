@@ -68,10 +68,7 @@ val sharedSettings = Seq(
  */
 lazy val ops = project
   .settings(sharedSettings:_*)
-  .settings(
-    name := "ammonite-ops",
-    libraryDependencies += "com.lihaoyi" %% "pprint" % "0.3.4"
-  )
+  .settings(name := "ammonite-ops")
 
 
 /**
@@ -166,6 +163,7 @@ lazy val shell = project
     name := "ammonite-shell",
     libraryDependencies += "com.lihaoyi" %% "pprint" % "0.3.4",
     (test in Test) <<= (test in Test).dependsOn(publishLocal),
+    (run in Test) <<= (run in Test).dependsOn(publishLocal),
     (testOnly in Test) <<= (testOnly in Test).dependsOn(publishLocal)
   )
 
