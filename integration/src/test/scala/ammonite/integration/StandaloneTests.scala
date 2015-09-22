@@ -20,7 +20,7 @@ object StandaloneTests extends TestSuite{
     val ammVersion = ammonite.Constants.version
     val executableName = s"ammonite-repl-$ammVersion-$scalaVersion"
     val Seq(executable) = ls.rec! cwd |? (_.last == executableName)
-    val resources = cwd/'repl/'src/'test/'resource/'standalone
+    val resources = cwd/'repl/'src/'test/'resources/'standalone
 
     def exec(name: String) = (%%bash(executable, resources/name)).mkString("\n")
     'hello{
@@ -37,7 +37,7 @@ object StandaloneTests extends TestSuite{
       val res = %%bash(
         executable,
         "--predef-file",
-        cwd/'shell/'src/'main/'resources/"example-predef.scala",
+        cwd/'shell/'src/'main/'resources/'ammonite/'shell/"example-predef.scala",
         "-c",
         """val x = wd
           |@

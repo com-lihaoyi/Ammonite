@@ -89,7 +89,9 @@ class Checker {
             case Res.Exception(ex, failureMsg) =>
               val trace = Repl.showException(ex, "", "", "") + "\n" +  failureMsg
               assert({identity(trace); identity(regex); false})
-            case _ => throw new Exception(s"Printed $printed does not match what was expected: $expected")
+            case _ => throw new Exception(
+              s"Printed $printed does not match what was expected: $expected"
+            )
           }
         }else{
           assert(
@@ -125,7 +127,6 @@ class Checker {
   }
 
   def run(input: String) = {
-    println("RUNNING " + input)
     //    println("RUNNING")
     //    println(input)
     //    print(".")

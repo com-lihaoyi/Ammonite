@@ -1,6 +1,7 @@
 package ammonite.shell
 
 import ammonite.repl.Checker
+import ammonite.repl.TestUtils._
 import utest._
 
 /**
@@ -13,7 +14,7 @@ object SessionTests extends TestSuite{
       check.session(s"""
         @ import ammonite.ops._
 
-        @ load.module(cwd/'shell/'src/'main/'resources/"example-predef.scala")
+        @ load.module(cwd/'shell/'src/'main/'resources/'ammonite/'shell/"example-predef.scala")
 
         @ val originalWd = wd
 
@@ -33,6 +34,29 @@ object SessionTests extends TestSuite{
 
         @ assert(originalLs2 != (ls!))
       """)
+    }
+    'specialPPrint{
+      // Make sure these various "special" data structures get pretty-printed
+      // correctly, i.e. not as their underlying type but as something more
+      // pleasantly human-readable
+      val typeString =
+        if (!scala2_10) "CommandResult"
+        else "ammonite.ops.CommandResult"
+      check.session(s"""
+        @ import ammonite.ops._
+
+        @ load.module(cwd/'shell/'src/'main/'resources/'ammonite/'shell/"example-predef.scala")
+
+        @ import ammonite.shell.PPrints._
+
+        @ import ammonite.ops.ImplicitWd
+
+        @ %%ls 'ops
+        res\\d\\+: $typeString =
+        src
+        target
+      """)
+
     }
   }
 }

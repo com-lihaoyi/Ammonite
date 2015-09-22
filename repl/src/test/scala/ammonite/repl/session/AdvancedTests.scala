@@ -44,33 +44,7 @@ object AdvancedTests extends TestSuite{
         )
       """)
     }
-    'specialPPrint{
-      // Make sure these various "special" data structures get pretty-printed
-      // correctly, i.e. not as their underlying type but as something more
-      // pleasantly human-readable
-      if (!scala2_10)
-        check.session("""
-          @ import ammonite.ops._
 
-          @ import ammonite.ops.ImplicitWd._
-
-          @ %%ls 'ops
-          res2: CommandResult =
-          src
-          target
-        """)
-      else
-        check.session("""
-          @ import ammonite.ops._
-
-          @ import ammonite.ops.ImplicitWd._
-
-          @ %%ls 'ops
-          res2: ammonite.ops.CommandResult =
-          src
-          target
-        """)
-    }
     'exit{
       check.result("exit", Res.Exit())
     }
