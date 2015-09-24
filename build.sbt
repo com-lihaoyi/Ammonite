@@ -22,14 +22,14 @@ val sharedSettings = Seq(
   testFrameworks += new TestFramework("utest.runner.Framework"),
   scalacOptions += "-target:jvm-1.7",
   autoCompilerPlugins := true,
-  addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.2"),
+  addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.3"),
   parallelExecution in Test := !scalaVersion.value.contains("2.10"),
   (unmanagedSources in Compile) += baseDirectory.value/".."/"project"/"Constants.scala",
   mappings in (Compile, packageSrc) += {
     (baseDirectory.value/".."/"project"/"Constants.scala") -> "Constants.scala"
   },
   libraryDependencies ++= Seq(
-    "com.lihaoyi" %% "acyclic" % "0.1.2" % "provided",
+    "com.lihaoyi" %% "acyclic" % "0.1.3" % "provided",
     "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided"
   ) ++ (
     if (scalaVersion.value startsWith "2.11.") Nil
