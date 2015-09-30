@@ -85,6 +85,7 @@ object BasicFilters {
         val (first, last) = b.splitAt(c)
         TS(rest, first ++ last.drop(1), c)
       }
+    case TS(-1 ~: rest, b, c) => Exit   // java.io.Reader.read() produces -1 on EOF
   }
   lazy val clearFilter: TermCore.Filter = {
     case TS(Ctrl('l') ~: rest, b, c) => ClearScreen(TS(rest, b, c))
