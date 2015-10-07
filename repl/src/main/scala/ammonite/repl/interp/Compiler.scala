@@ -94,6 +94,14 @@ object Compiler{
       new DirectoryClassPath(new PlainDirectory(new Directory(x)), jCtx)
     ) ++ Seq(new DirectoryClassPath(dynamicClasspath, jCtx))
     val jcp = new JavaClassPath(jDirs, jCtx)
+
+    if (Classpath.traceClasspathIssues) {
+      settings.Ylogcp.value = true
+      println("jardeps")
+      jarDeps.foreach(p => println(s"${p.getName.takeRight(4)} $p"))
+      println("finished")
+    }
+
     settings.outputDirs.setSingleOutput(vd)
 
     val reporter = new AbstractReporter {
@@ -101,7 +109,9 @@ object Compiler{
 
       def display(pos: Position, msg: String, severity: Severity) = {
         severity match{
-          case ERROR => logger(Position.formatMessage(pos, msg, false))
+          case ERROR =>
+            Classpath.traceClasspathProblem(s"ERROR: $msg")
+            logger(Position.formatMessage(pos, msg, false))
           case _ => logger(msg)
         }
       }

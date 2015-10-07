@@ -1,5 +1,11 @@
 package ammonite.repl.interp
+
+import java.io.File
+import java.util.zip.ZipFile
+
 import acyclic.file
+
+import scala.util.control.NonFatal
 
 /**
  * Loads the jars that make up the classpath of the scala-js-fiddle
@@ -7,12 +13,13 @@ import acyclic.file
  * scala-compile and scalajs-tools
  */
 object Classpath {
+  val traceClasspathIssues = sys.props.get("ammonite.trace-classpath").exists(_.toLowerCase == "true")
+
   /**
    * In memory cache of all the jars used in the compiler. This takes up some
    * memory but is better than reaching all over the filesystem every time we
    * want to do something.
    */
-
   var current = Thread.currentThread().getContextClassLoader
   val files = collection.mutable.Buffer.empty[java.io.File]
   files.appendAll(
@@ -29,7 +36,23 @@ object Classpath {
     current = current.getParent
   }
 
-  val (jarDeps, dirDeps) = files.toVector.filter(_.exists).partition(
-    x => x.isFile && !x.getName.endsWith(".so") && !x.getName.endsWith(".jnilib")
-  )
+  val (jarDeps, dirDeps) = files.toVector.filter(_.exists).partition(isJar)
+
+  def isJar(file: File): Boolean =
+    file.isFile &&
+      (file.getName.endsWith(".jar") || canBeOpenedAsJar(file))
+
+  def canBeOpenedAsJar(file: File): Boolean =
+    try {
+      val zf = new ZipFile(file)
+      zf.close()
+      true
+    } catch {
+      case NonFatal(e) =>
+        traceClasspathProblem(s"Classpath element '${file.getAbsolutePath}' could not be opened as jar file because of $e")
+        false
+    }
+
+  def traceClasspathProblem(msg: String): Unit =
+    if (traceClasspathIssues) println(msg)
 }
