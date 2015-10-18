@@ -38,7 +38,18 @@
       @sect.ref{Ammonite-Shell}: Replacing Bash for the 21st Century
 
   @p
-    Depending on why you are here, click on the above links to jump straight to the documentation that interests you.
+    Depending on why you are here, click on the above links to jump straight to the documentation that interests you. Or for an overview of the project and it's motivation, check out this talk:
+
+  @iframe(
+    "width".attr:="720", 
+    "height".attr:="405", 
+    marginLeft.auto,
+    marginRight.auto,
+    display.block,
+    src:="https://www.youtube.com/embed/dP5tkmWAhjg", 
+    "frameborder".attr := "0", 
+    "allowfullscreen".attr := "1"
+  )
 
 @Repl()
 @Ops()
