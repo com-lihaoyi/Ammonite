@@ -100,7 +100,7 @@ object FrontEnd{
                 Res.Success(code -> value)
               case Some(f: Result.Failure) =>
                 addHistory(code)
-                Res.Failure(fastparse.core.SyntaxError.msg(f.input, f.traced.expected, f.index))
+                Res.Failure(fastparse.core.ParseError.msg(f.input, f.traced.expected, f.index))
               case None => readCode(code + "\n")
             }
         }

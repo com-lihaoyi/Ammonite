@@ -11,8 +11,8 @@ object Parsers {
 
   val PatVarSplitter = {
     val Prefixes = P(Prelude ~ (`var` | `val`))
-    val Lhs = P( Prefixes ~! BindPattern.rep(1, "," ~! Pass) ~ (`:` ~! Type).? )
-    P( Lhs.! ~ (`=` ~! WL ~ StatCtx.Expr.!) ~ End )
+    val Lhs = P( Prefixes ~/ BindPattern.rep(1, "," ~/ Pass) ~ (`:` ~/ Type).? )
+    P( Lhs.! ~ (`=` ~/ WL ~ StatCtx.Expr.!) ~ End )
   }
   def patVarSplit(code: String) = {
     val Result.Success((lhs, rhs), _) = PatVarSplitter.parse(code)
@@ -25,7 +25,7 @@ object Parsers {
       case _ => "`" + pprint.PPrinter.escape(s) + "`"
     }
   }
-  val Prelude = P( (Annot ~ OneNLMax).rep ~ (Mod ~! Pass).rep )
+  val Prelude = P( (Annot ~ OneNLMax).rep ~ (Mod ~/ Pass).rep )
   val Statement =
     P( scalaparse.Scala.TopPkgSeq | scalaparse.Scala.Import | Prelude ~ BlockDef | StatCtx.Expr )
   def StatementBlock(blockSep: P0) =
