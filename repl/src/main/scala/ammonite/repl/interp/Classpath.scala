@@ -49,7 +49,10 @@ object Classpath {
       true
     } catch {
       case NonFatal(e) =>
-        traceClasspathProblem(s"Classpath element '${file.getAbsolutePath}' could not be opened as jar file because of $e")
+        traceClasspathProblem(
+          s"Classpath element '${file.getAbsolutePath}' "+
+           "could not be opened as jar file because of $e"
+        )
         false
     }
 
