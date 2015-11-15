@@ -8,6 +8,7 @@ import scala.tools.nsc
 import scala.tools.nsc.backend.JavaPlatform
 import scala.tools.nsc.interactive.Response
 import scala.tools.nsc.util._
+import scala.util.{Failure, Success, Try}
 
 /**
  * Nice wrapper for the presentation compiler.
@@ -157,8 +158,12 @@ object Pressy {
     }
     def ask(index: Int, query: (Position, Response[List[pressy.Member]]) => Unit) = {
       val position = new OffsetPosition(currentFile, index)
-      val scopes = Compiler.awaitResponse[List[pressy.Member]](query(position, _))
-      scopes.filter(_.accessible)
+      //if a match can't be found awaitResponse throws an Exception.
+      val result = Try(Compiler.awaitResponse[List[pressy.Member]](query(position, _)))
+      result match {
+        case Success(scopes) => scopes.filter(_.accessible)
+        case Failure(error) =>List.empty[pressy.Member]
+      }
     }
 
   }
@@ -217,7 +222,7 @@ object Pressy {
       val (i, all) = run.prefixed
 
       val allNames = all.collect{ case (name, None) => name}.sorted.distinct
-                        
+
       val signatures = all.collect{ case (name, Some(defn)) => defn }.sorted.distinct
 
       (i - prefix.length, allNames, signatures)
