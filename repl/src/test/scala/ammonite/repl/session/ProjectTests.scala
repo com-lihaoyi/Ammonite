@@ -102,6 +102,22 @@ object ProjectTests extends TestSuite{
         res3: Option[Int] = Some(3)
       """)
     }
+    'guava{
+      check.session("""
+        @ load.ivy("com.google.guava" % "guava" % "18.0")
+
+        @ import com.google.common.collect._
+        import com.google.common.collect._
+
+        @ val bimap = ImmutableBiMap.of(1, "one", 2, "two", 3, "three")
+
+        @ bimap.get(1)
+        res3: String = "one"
+
+        @ bimap.inverse.get("two")
+        res4: Int = 2
+      """)
+    }
     'scalaparse{
       // For some reason this blows up in 2.11.x
       // Prevent regressions when wildcard-importing things called `macro` or `_`

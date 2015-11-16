@@ -22,6 +22,26 @@ object Sample{
   }
 
   val ansiRegex = "\u001B\\[[;\\d]*."
+  // http://flatuicolors.com/
+  val red = "#c0392b"
+  val green = "#27ae60"
+  val yellow = "#f39c12"
+  val blue = "#2980b9"
+  val magenta = "#8e44ad"
+  val cyan = "#16a085"
+  val black = "#000"
+  val white = "#fff"
+  def colorSpan(c: String) = span(color:=c)
+  val colors = Map(
+    "[30m" -> black,
+    "[31m" -> red,
+    "[32m" -> green,
+    "[33m" -> yellow,
+    "[34m" -> blue,
+    "[35m" -> magenta,
+    "[36m" -> cyan,
+    "[37m" -> white
+  )
   def ammSample(ammoniteCode: String) = {
     val scalaVersion = scala.util.Properties.versionNumberString
     val ammVersion = ammonite.Constants.version
@@ -33,28 +53,11 @@ object Sample{
 //    println("ammSample " + lines)
     val ammOutput = lines.split("\u001b")
 
-    val red = "#c0392b"
-    val green = "#27ae60"
-    val yellow = "#f39c12"
-    val blue = "#2980b9"
-    val magenta = "#8e44ad"
-    val cyan = "#16a085"
-    val black = "#000"
-    val white = "#fff"
-    val colors = Map(
-      "[30m" -> span(color:=black),
-      "[31m" -> span(color:=red),
-      "[32m" -> span(color:=green),
-      "[33m" -> span(color:=yellow),
-      "[34m" -> span(color:=blue),
-      "[35m" -> span(color:=magenta),
-      "[36m" -> span(color:=cyan),
-      "[37m" -> span(color:=white)
-    )
+
     val wrapped = for(snippet <- ammOutput) yield {
       colors.find(snippet startsWith _._1) match{
-        case None => ("\u001B"+snippet).replaceAll(ansiRegex, ""): Frag
-        case Some((ansiCode, wrapper)) => wrapper(snippet.drop(ansiCode.length))
+        case None => colorSpan(black)(("\u001B"+snippet).replaceAll(ansiRegex, ""))
+        case Some((ansiCode, color)) => colorSpan(color)(snippet.drop(ansiCode.length))
       }
     }
 
@@ -63,7 +66,7 @@ object Sample{
     raw(wrapped.render.replaceAll("\r\n|\n\r", "\n"))
   }
   def exec(command: Seq[String], input: String): String = cached(("exec", command, input)){
-    println("EXEC " + command + "\t" + input)
+
     val pb = new ProcessBuilder(command:_*)
     pb.redirectErrorStream(true)
     val p = pb.start()
@@ -96,7 +99,7 @@ object Sample{
         .dropRight(2)
         .mkString("\n")
         .split("bash-3\\.2\\$")
-        .flatMap(s => Seq[Frag](span(color:="#9b59b6", "bash$"), s))
+        .flatMap(s => Seq[Frag](colorSpan(magenta)("bash$"), colorSpan(black)(s)))
         .drop(1)
     }
 

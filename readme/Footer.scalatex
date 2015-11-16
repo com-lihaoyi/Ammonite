@@ -16,6 +16,21 @@
       @b{Beyond Bash: shell scripting in a typed, OO language}, at Scala by the Bay 2015. @a("Slides", href:="http://tinyurl.com/beyondbash")
 
 @sect{Changelog}
+
+  @sect{0.4.9}
+    @ul
+      @li
+        Update to fastparse/scalaparse 0.3.1
+      @li
+        Fix for perennial classpath problems, thanks to @a("Johannes Rudolph", href:="https://github.com/jrudolph")!
+      @li
+        Fix wildcard-imports from Java libraries like Joda or Guava #213
+      @li
+        Added an MIT license
+      @li
+        Slightly more robust tab completion #252, thanks to @a("Sanjiv Sahayam", href:="https://github.com/ssanj")!
+      @li
+        Properly handly EOF in standard input #242, thanks to @a("Patrick Premont", href:="https://github.com/patrick-premont")!
   @sect{0.4.8}
     @ul
       @li
