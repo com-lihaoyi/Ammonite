@@ -162,9 +162,9 @@ lazy val shell = project
   .settings(
     name := "ammonite-shell",
     libraryDependencies += "com.lihaoyi" %% "pprint" % "0.3.4",
-    (test in Test) <<= (test in Test).dependsOn(publishLocal),
-    (run in Test) <<= (run in Test).dependsOn(publishLocal),
-    (testOnly in Test) <<= (testOnly in Test).dependsOn(publishLocal)
+    (test in Test) <<= (test in Test).dependsOn(packageBin in Compile),
+    (run in Test) <<= (run in Test).dependsOn(packageBin in Compile),
+    (testOnly in Test) <<= (testOnly in Test).dependsOn(packageBin in Compile)
   )
 
 lazy val integration = project
@@ -206,7 +206,6 @@ lazy val readme = ScalatexReadme(
   dontPublishSettings,
   scalaVersion := "2.11.7",
   (run in Compile) <<= (run in Compile).dependsOn(
-    publishLocal in published,
     assembly in repl,
     packageBin in (shell, Compile)
   ),

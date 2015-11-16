@@ -14,7 +14,7 @@ object SessionTests extends TestSuite{
       check.session(s"""
         @ import ammonite.ops._
 
-        @ load.module(cwd/'shell/'src/'main/'resources/'ammonite/'shell/"example-predef.scala")
+        @ load.module(cwd/'shell/'src/'main/'resources/'ammonite/'shell/"example-predef-bare.scala")
 
         @ val originalWd = wd
 
@@ -45,7 +45,7 @@ object SessionTests extends TestSuite{
       check.session(s"""
         @ import ammonite.ops._
 
-        @ load.module(cwd/'shell/'src/'main/'resources/'ammonite/'shell/"example-predef.scala")
+        @ load.module(cwd/'shell/'src/'main/'resources/'ammonite/'shell/"example-predef-bare.scala")
 
         @ import ammonite.shell.PPrints._
 
