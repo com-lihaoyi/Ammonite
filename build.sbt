@@ -205,7 +205,11 @@ lazy val readme = ScalatexReadme(
 ).settings(
   dontPublishSettings,
   scalaVersion := "2.11.7",
-  (run in Compile) <<= (run in Compile).dependsOn(publishLocal in published, assembly in repl),
+  (run in Compile) <<= (run in Compile).dependsOn(
+    publishLocal in published,
+    assembly in repl,
+    packageBin in (shell, Compile)
+  ),
   (unmanagedSources in Compile) += baseDirectory.value/".."/"project"/"Constants.scala"
 )
 

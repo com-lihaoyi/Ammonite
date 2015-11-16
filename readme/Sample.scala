@@ -27,7 +27,7 @@ object Sample{
     val ammVersion = ammonite.Constants.version
     val executableName = s"ammonite-repl-$ammVersion-$scalaVersion"
     val ammExec = "repl/target/scala-2.11/" + executableName
-    val predef = "shell/src/main/resources/example-predef.scala"
+    val predef = "shell/src/main/resources/ammonite/shell/example-predef-bare.scala"
     val out = exec(Seq(ammExec, "--predef-file", predef), s"${ammoniteCode.trim}\nexit\n")
     val lines = out.lines.toSeq.drop(3).dropRight(2).mkString("\n")
 //    println("ammSample " + lines)
@@ -63,6 +63,7 @@ object Sample{
     raw(wrapped.render.replaceAll("\r\n|\n\r", "\n"))
   }
   def exec(command: Seq[String], input: String): String = cached(("exec", command, input)){
+    println("EXEC " + command + "\t" + input)
     val pb = new ProcessBuilder(command:_*)
     pb.redirectErrorStream(true)
     val p = pb.start()
@@ -73,7 +74,7 @@ object Sample{
     val buffer = new Array[Byte](4096)
     val bytes =
       Iterator.continually{
-        println("reading")
+        println("reading ")
         val res = p.getInputStream.read(buffer)
         println(res)
         println(new String(buffer.take(res)))

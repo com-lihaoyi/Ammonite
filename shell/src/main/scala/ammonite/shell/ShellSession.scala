@@ -63,21 +63,20 @@ object PPrints{
   implicit def pathRepr = pprint.PPrinter[ammonite.ops.Path]{(p, c) =>
     Iterator("root") ++ p.segments.iterator.map("/" + reprSection(_, c).mkString)
   }
-  implicit def commandResultRepr = PPrint(
+  implicit def commandResultRepr: PPrinter[CommandResult] =
     PPrinter[CommandResult]((x, c) =>
       x.output.iterator.flatMap(line =>
         Iterator("\n", c.colors.literalColor, line, c.colors.endColor)
       )
     )
-  )
-  implicit def permissionPPrintConfig(implicit c: Config) = PPrint(
+  implicit def permissionPPrintConfig: PPrinter[PermSet] =
     PPrinter[PermSet]{ (p, c) =>
       Iterator(
         "rwxrwxrwx".zip(PosixFilePermission.values()).map{ case (k, v) =>
           if(p.contains(v)) k else '-'
         }.mkString)
     }
-  )
+
 }
 trait OpsAPI{
   /**
