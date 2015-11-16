@@ -1,5 +1,5 @@
 import ammonite.ops._
-load.jar(cwd/'shell/'target/"scala-2.11"/s"ammonite-shell_2.11-${ammonite.Constants.version}.jar")
+load.jar(cwd/'shell/'target/"scala-2.11"/s"ammonite-shell_${scala.util.Properties.versionNumberString}-${ammonite.Constants.version}.jar")
 @
 val sess = ammonite.shell.ShellSession()
 import sess._
