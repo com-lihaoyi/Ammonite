@@ -13,7 +13,10 @@ import scala.util.control.NonFatal
  * scala-compile and scalajs-tools
  */
 object Classpath {
-  val traceClasspathIssues = sys.props.get("ammonite.trace-classpath").exists(_.toLowerCase == "true")
+  val traceClasspathIssues =
+    sys.props
+       .get("ammonite.trace-classpath")
+       .exists(_.toLowerCase == "true")
 
   /**
    * In memory cache of all the jars used in the compiler. This takes up some

@@ -41,7 +41,7 @@ object StandaloneTests extends TestSuite{
         "-c",
         """val x = wd
           |@
-          |cd('repl/'src)
+          |cd! 'repl/'src
           |@
           |println(wd relativeTo x)""".stripMargin
       )
