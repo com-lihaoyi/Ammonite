@@ -64,6 +64,9 @@ object AmmonitePlugin{
           if !sym.isSynthetic
           if !sym.isPrivate
           if sym.isPublic
+          if sym.toString != "package class-use"
+          if sym.toString != "object package-info"
+          if sym.toString != "class package-info"
         } yield sym.decodedName
 
         val syms = for{
