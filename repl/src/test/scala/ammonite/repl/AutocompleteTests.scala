@@ -132,6 +132,8 @@ object AutocompleteTests extends TestSuite{
             "def >(x: Byte): Boolean"
           ) ^
         )
+
+
         // https://issues.scala-lang.org/browse/SI-9153
         //
         //      complete("""val x = 123; x + x.m<caret>""",
@@ -144,6 +146,11 @@ object AutocompleteTests extends TestSuite{
         //      complete("""Seq(1, 2, 3).map(_.compa<caret>)""", compares ^)
         //      complete("""Seq(1, 2, 3).map(_.co<caret>mpa)""", compares ^)
         //      complete("""Seq(1, 2, 3).map(_.<caret>compa)""", compares, ^)
+      }
+      'defTab {
+        complete( """def<caret>""",
+          Set() ^
+        )
       }
     }
   }

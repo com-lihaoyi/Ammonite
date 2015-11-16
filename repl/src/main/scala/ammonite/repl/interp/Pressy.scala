@@ -203,27 +203,29 @@ object Pressy {
     def complete(snippetIndex: Int, previousImports: String, snippet: String) = {
       val prefix = previousImports + "\nobject AutocompleteWrapper{\n"
       val suffix = "\n}"
-      val allCode =  prefix + snippet + suffix
+      val allCode = prefix + snippet + suffix
       val index = snippetIndex + prefix.length
       if (cachedPressy == null) cachedPressy = initPressy
 
       val pressy = cachedPressy
       val currentFile = new BatchSourceFile(
         Compiler.makeFile(allCode.getBytes, name = "Current.scala"),
-        allCode
-      )
+        allCode)
 
       val r = new Response[Unit]
       pressy.askReload(List(currentFile), r)
       r.get.fold(x => x, e => throw e)
 
-      val run = new Run(pressy, currentFile, allCode, index)
+      val run = Try(new Run(pressy, currentFile, allCode, index))
 
-      val (i, all) = run.prefixed
+      val (i, all): (Int, Seq[(String, Option[String])]) = run match {
+        case Success(runSuccess) => runSuccess.prefixed
+        case Failure(throwable) => (0, Seq.empty)
+      }
 
-      val allNames = all.collect{ case (name, None) => name}.sorted.distinct
+      val allNames = all.collect { case (name, None) => name }.sorted.distinct
 
-      val signatures = all.collect{ case (name, Some(defn)) => defn }.sorted.distinct
+      val signatures = all.collect { case (name, Some(defn)) => defn }.sorted.distinct
 
       (i - prefix.length, allNames, signatures)
     }
