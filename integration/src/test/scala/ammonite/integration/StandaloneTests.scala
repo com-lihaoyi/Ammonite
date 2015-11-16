@@ -37,7 +37,7 @@ object StandaloneTests extends TestSuite{
       val res = %%bash(
         executable,
         "--predef-file",
-        cwd/'shell/'src/'main/'resources/'ammonite/'shell/"example-predef.scala",
+        cwd/'shell/'src/'main/'resources/'ammonite/'shell/"example-predef-bare.scala",
         "-c",
         """val x = wd
           |@

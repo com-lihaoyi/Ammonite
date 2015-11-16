@@ -171,8 +171,8 @@ lazy val integration = project
   .dependsOn(ops)
   .settings(sharedSettings:_*)
   .settings(
-    (test in Test) <<= (test in Test).dependsOn(assembly in repl, publishLocal in published),
-    (testOnly in Test) <<= (testOnly in Test).dependsOn(assembly in repl, publishLocal in published),
+    (test in Test) <<= (test in Test).dependsOn(assembly in repl, packageBin in (shell, Compile)),
+    (testOnly in Test) <<= (testOnly in Test).dependsOn(assembly in repl, packageBin in (shell, Compile)),
     dontPublishSettings
   )
 
