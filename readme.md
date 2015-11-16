@@ -21,7 +21,7 @@ The layout of the repository is roughly:
 
 ## Common Commands
 
-- `sbt ~repl/run` brings up the Ammonite-REPL using the source code in the repository, and automatically restarts it on-exit if you have made a change to the code. Useful for manual testing both of `repl/` as well as `ops/`, since you can just `import ammonite.ops._` and start using them. Note that this does not bring in filesystem utilities like the `wd` variable, `cd!` command.
+- `sbt "~repl/run --home=.ammonite-dev"` brings up the Ammonite-REPL using the source code in the repository, and automatically restarts it on-exit if you have made a change to the code. Useful for manual testing both of `repl/` as well as `ops/`, since you can just `import ammonite.ops._` and start using them. Note that this does not bring in filesystem utilities like the `wd` variable, `cd!` command.
 - `sbt ~shell/test:run` brings up a fully-loaded shell with all filesystem utilities included: `wd`, `cd!`, autocomplete for filesystem paths, and more. This uses `readme/resources/example-predef.scala` instead of your default predef, for easier experimentation and development.
 - `sbt ~terminal/run` is useful for manual testing the terminal interaction; it basically contains a minimal echo-anything terminal, with multiline input based on the count of open- and closed-parentheses. This lets you test all terminal interactions without all the complexity of the Scala compiler, classloaders, etc. that comes in `repl/`
 - `sbt ~repl/test`/`sbt ~ops/test`/`sbt ~terminal/test`  runs tests after every change. `repl/test` can be a bit slow because of the amount of code it compiles, so you may want to specify the test manually via `repl/test-only -- ammonite.repl.TestObject.path.to.test`

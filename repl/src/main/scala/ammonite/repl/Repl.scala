@@ -142,7 +142,7 @@ object Repl{
         .text("Any commands you want to execute at the start of the REPL session")
       opt[String]('f', "predef-file")
         .action((x, c) => c.copy(predefFile = Some(if (x(0) == '/') Path(x) else cwd/RelPath(x))))
-        .text("Lets you load your predef from a cuctom location")
+        .text("Lets you load your predef from a custom location")
       opt[String]('c', "code")
         .action((x, c) => c.copy(code = Some(x)))
         .text("Pass in code to be run immediately in the REPL")
