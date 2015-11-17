@@ -151,6 +151,10 @@ object AutocompleteTests extends TestSuite{
         //Assert no NullPointerException was thrown. Does not verify any completions.
         complete( """def<caret>""", Set.empty -- _)
       }
+      'Array {
+        //Test around https://github.com/lihaoyi/Ammonite/issues/252
+        complete("""new Array<caret>""", Set() ^)
+      }
     }
   }
 }

@@ -116,7 +116,16 @@ object Pressy {
 
         val dotOffset = if (qualifier.pos.point == t.pos.point) 0 else 1
 
-        handleTypeCompletion(qualifier.pos.end, name.decoded, dotOffset)
+        //In scala 2.10.x if we call pos.end on a scala.reflect.internal.util.Position
+        //that is not a range, a java.lang.UnsupportedOperationException is thrown.
+        //We check here if Position is a range before calling .end on it.
+        //This is not needed for scala 2.11.x.
+        if (qualifier.pos.isRange) {
+          handleTypeCompletion(qualifier.pos.end, name.decoded, dotOffset)
+        } else {
+          //not prefixed
+          (0, Seq.empty)
+        }
 
       case t @ pressy.Import(expr, selectors)  =>
         // If the selectors haven't been defined yet...
@@ -162,7 +171,7 @@ object Pressy {
       val result = Try(Compiler.awaitResponse[List[pressy.Member]](query(position, _)))
       result match {
         case Success(scopes) => scopes.filter(_.accessible)
-        case Failure(error) =>List.empty[pressy.Member]
+        case Failure(error) => List.empty[pressy.Member]
       }
     }
 
