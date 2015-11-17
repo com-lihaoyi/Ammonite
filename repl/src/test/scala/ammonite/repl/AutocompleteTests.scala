@@ -148,9 +148,8 @@ object AutocompleteTests extends TestSuite{
         //      complete("""Seq(1, 2, 3).map(_.<caret>compa)""", compares, ^)
       }
       'defTab {
-        complete( """def<caret>""",
-          Set() ^
-        )
+        //Assert no NullPointerException was thrown. Does not verify any completions.
+        complete( """def<caret>""", Set.empty -- _)
       }
     }
   }
