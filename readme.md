@@ -28,7 +28,7 @@ The layout of the repository is roughly:
 - `sbt ~repl/test`/`sbt ~ops/test`/`sbt ~terminal/test`  runs tests after every change. `repl/test` can be a bit slow because of the amount of code it compiles, so you may want to specify the test manually via `repl/test-only -- ammonite.repl.TestObject.path.to.test`
 - `sbt +modules/publishLocal` or `+sbt modules/publishSigned` is used for publishing.
 - `sbt ~readme/run` builds the documentation inside its target folder, which you can view by opening `readme/target/scalatex/index.html` in your browser.
-- `git checkout gh-pages; cp -r readme/target/scalatex.* .; git commit -am .; git push` will deploy the generated documentation to Github Pages
+- `git checkout gh-pages; cp -r readme/target/scalatex/* .; git commit -am .; git push` will deploy the generated documentation to Github Pages
 
 ## Contribution Guidelines
 
