@@ -17,6 +17,43 @@ object GUILikeFilters {
     def setMark(c: Int) = {
       if (mark == None) mark = Some(c)
     }
+    def doIndent(indent: Int,
+                 b: Vector[Char],
+                 c: Int,
+                 rest: LazyList[Int],
+                 slicer: Vector[Char] => Int) = {
+
+      val markValue = mark.get
+      val (chunks, chunkStarts, chunkIndex) = FilterTools.findChunks(b, c)
+      val min = chunkStarts.lastIndexWhere(_ <= math.min(c, markValue))
+      val max = chunkStarts.indexWhere(_ > math.max(c, markValue))
+      val splitPoints = chunkStarts.slice(min, max)
+      val frags = (0 +: splitPoints :+ 99999).sliding(2).zipWithIndex
+
+      var firstOffset = 0
+      val broken =
+        for((Seq(l, r), i) <- frags) yield {
+          val slice = b.slice(l, r)
+          if (i == 0) slice
+          else{
+            val cut = slicer(slice)
+            Debug("Cut\t" + cut)
+            if (i == 1) firstOffset = cut
+
+            if (cut < 0) slice.drop(-cut)
+            else Vector.fill(cut)(' ') ++ slice
+          }
+        }
+      val flattened = broken.flatten.toVector
+      val deeperOffset = flattened.length - b.length
+
+      val (newMark, newC) =
+        if (mark.get > c) (mark.get + deeperOffset, c + firstOffset)
+        else (mark.get + firstOffset, c + deeperOffset)
+
+      mark = Some(newMark)
+      TS(rest, flattened, newC)
+    }
     def filter = orElseAll(
 
       Case(ShiftUp){(b, c, m) => setMark(c); BasicFilters.moveUp(b, c, m.width)},
@@ -30,26 +67,17 @@ object GUILikeFilters {
       Case(FnShiftRight){(b, c, m) => setMark(c); BasicFilters.moveEnd(b, c, m.width)},
       Case(FnShiftLeft){(b, c, m) => setMark(c); BasicFilters.moveStart(b, c, m.width)},
       {
+        case TS(27 ~: 91 ~: 90 ~:  rest, b, c) =>
+          val indent = 4
+          doIndent(indent, b, c, rest,
+            slice => -math.min(slice.iterator.takeWhile(_ == ' ').size, indent)
+          )
+
         case TS(9 ~: rest, b, c) if mark.isDefined => // Tab
           val indent = 4
-          val markValue = mark.get
-          val (chunks, chunkStarts, chunkIndex) = FilterTools.findChunks(b, c)
-          val min = chunkStarts.lastIndexWhere(_ < math.min(c, markValue))
-          val max = chunkStarts.indexWhere(_ > math.max(c, markValue))
-          val splitPoints = chunkStarts.slice(min, max)
-          val broken =
-            for((Seq(l, r), i) <- (0 +: splitPoints :+ 99999).sliding(2).zipWithIndex)
-            yield {
-              val padding = if (i == 0) Vector.empty[Char] else Vector.fill(indent)(' ')
-              padding ++ b.slice(l, r)
-            }
-          val deeperOffset = indent * splitPoints.length
-          val (newMark, newC) =
-            if (markValue > c) (markValue + deeperOffset, c + indent)
-            else (markValue + indent, c + deeperOffset)
-
-          mark = Some(newMark)
-          TS(rest, broken.flatten.toVector, newC)
+          doIndent(indent, b, c, rest,
+            slice => 4
+          )
 
         // Intercept every other character. If it's a  printable character,
         // delete the current selection and write the printable character.
