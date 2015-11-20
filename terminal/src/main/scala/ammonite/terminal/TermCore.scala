@@ -92,15 +92,15 @@ object TermCore {
         totalPreHeight += fragHeights(i)
       }else done = true
     }
-    Debug("")
-    Debug("totalPreHeight\t" + totalPreHeight)
-    Debug("totalheight\t" + totalHeight)
+//    Debug("")
+//    Debug("totalPreHeight\t" + totalPreHeight)
+//    Debug("totalheight\t" + totalHeight)
 //    Debug("leftoverCursor " + leftoverCursor)
     //    Debug("width " + width)
     val cursorY = totalPreHeight + leftoverCursor / width
     val cursorX = leftoverCursor % width
-    Debug("cursorX\t" + cursorX)
-    Debug("cursorY\t" + cursorY)
+//    Debug("cursorX\t" + cursorX)
+//    Debug("cursorY\t" + cursorY)
     (totalHeight, cursorY, cursorX)
   }
 
@@ -165,7 +165,7 @@ object TermCore {
       val (nextHeight, cursorY, cursorX) =
         calculateHeight(buffer, transformedCursor, width, noAnsiPrompt)
 
-      Debug("nextHeight\t" + nextHeight)
+//      Debug("nextHeight\t" + nextHeight)
       ansi.up(nextHeight - 1)
       ansi.left(9999)
 
@@ -193,7 +193,7 @@ object TermCore {
             )
             oldCursorY
           }
-        Debug("nextUps\t" + nextUps)
+//        Debug("nextUps\t" + nextUps)
         val newState = TermState(s, b, newCursor)
         (nextUps, newState)
       }

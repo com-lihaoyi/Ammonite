@@ -22,7 +22,7 @@ object BasicFilters {
     case TS(13 ~: rest, b, c) =>
       val open = b.count(_ == '(')
       val close = b.count(_ == ')')
-      Debug(open + "\t" + close)
+//      Debug(open + "\t" + close)
       if (open == close) Result(b.mkString)
       else {
         val (first, last) = b.splitAt(c)
@@ -50,7 +50,7 @@ object BasicFilters {
   }
   lazy val typingFilter: TermCore.Filter = {
     case TS(p"\u001b[3~$rest", b, c) =>
-      Debug("fn-delete")
+//      Debug("fn-delete")
       val (first, last) = b.splitAt(c)
       TS(rest, first ++ last.drop(1), c)
 
@@ -59,7 +59,7 @@ object BasicFilters {
       TS(rest, first.dropRight(1) ++ last, c - 1)
 
     case TS(char ~: rest, b, c) =>
-      Debug("NORMAL CHAR " + char)
+//      Debug("NORMAL CHAR " + char)
       val (first, last) = b.splitAt(c)
       TS(rest, (first :+ char.toChar) ++ last, c + 1)
   }

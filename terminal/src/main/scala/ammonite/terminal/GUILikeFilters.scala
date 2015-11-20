@@ -33,10 +33,12 @@ object GUILikeFilters {
         // delete the current selection and write the printable character.
         // If it's a special command, just cancel the current selection.
         case TS(char ~: inputs, buffer, cursor) if mark != None =>
-          if (char == Alt(0) || char < 'a') {
+          if (char == Alt(0) || char.toChar.isControl) {
+            Debug("A")
             mark = None
             TS(char ~: inputs, buffer, cursor)
           }else{
+            Debug("B")
             val Seq(min, max) = Seq(mark.get, cursor).sorted
             mark = None
             val newBuffer = buffer.take(min) ++ buffer.drop(max)
