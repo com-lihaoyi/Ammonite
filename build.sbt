@@ -187,10 +187,10 @@ lazy val integration = project
  * REPL available via remote ssh access.
  * Plug into any app environment for live hacking on a live application.
  */
-lazy val sshd = project.
-    dependsOn(repl).
-    settings(sharedSettings:_*).
-    settings(
+lazy val sshd = project
+    .dependsOn(repl)
+    .settings(sharedSettings:_*)
+    .settings(
       crossVersion := CrossVersion.full,
       name := "ammonite-sshd",
       libraryDependencies ++= Seq(

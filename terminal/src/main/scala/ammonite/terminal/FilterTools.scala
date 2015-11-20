@@ -59,4 +59,11 @@ object FilterTools {
     (chunks, chunkStarts, chunkIndex)
   }
 
+  def firstRow(cursor: Int, buffer: Vector[Char], width: Int) = {
+    cursor < width && (buffer.indexOf('\n') >= cursor || buffer.indexOf('\n') == -1)
+  }
+  def lastRow(cursor: Int, buffer: Vector[Char], width: Int) = {
+    (buffer.length - cursor) < width &&
+      (buffer.lastIndexOf('\n') < cursor || buffer.lastIndexOf('\n') == -1)
+  }
 }

@@ -82,15 +82,11 @@ case class AmmoniteFrontEnd(extraFilters: TermCore.Filter = PartialFunction.empt
     }
 
     val multilineFilter: TermCore.Filter = {
-      case TermState(lb ~: rest, b, c) if (lb == 10 || lb == 13) => // Enter
-        val code = b.mkString
-        ammonite.repl.Parsers.split(code) match {
-          case None =>
-            val (first, last) = b.splitAt(c)
-            TermState(rest, (first :+ '\n') ++ last, c + 1)
-          case Some(_)  =>
-            ammonite.terminal.Result(code)
-        }
+      case TermState(lb ~: rest, b, c)
+        if (lb == 10 || lb == 13)
+        && ammonite.repl.Parsers.split(b.mkString).isEmpty => // Enter
+
+        BasicFilters.injectNewLine(b, c, rest)
     }
 
     val historyFilter = ReadlineFilters.HistoryFilter(() => history.reverse)

@@ -18,16 +18,13 @@ object BasicFilters {
     typingFilter
   }
 
+  def injectNewLine(b: Vector[Char], c: Int, rest: LazyList[Int]) = {
+    val (first, last) = b.splitAt(c)
+    TermState(rest, (first :+ '\n') ++ last, c + 1)
+  }
   val multilineFilter: TermCore.Filter = {
-    case TS(13 ~: rest, b, c) =>
-      val open = b.count(_ == '(')
-      val close = b.count(_ == ')')
-//      Debug(open + "\t" + close)
-      if (open == close) Result(b.mkString)
-      else {
-        val (first, last) = b.splitAt(c)
-        TermState(rest, (first :+ '\n') ++ last, c + 1)
-      }
+    case TS(13 ~: rest, b, c) if b.count(_ == '(') != b.count(_ == ')') =>
+      injectNewLine(b, c, rest)
   }
 
   lazy val navFilter = orElseAll(
@@ -64,15 +61,18 @@ object BasicFilters {
       TS(rest, (first :+ char.toChar) ++ last, c + 1)
   }
 
+  def doEnter(b: Vector[Char], c: Int, rest: LazyList[Int]) = {
+    val (chunks, chunkStarts, chunkIndex) = FilterTools.findChunks(b, c)
+    Debug(chunks, chunkStarts, chunkIndex)
+    if (chunkIndex == chunks.length - 1) Result(b.mkString)
+    else injectNewLine(b, c, rest)
+  }
+
   lazy val enterFilter: TermCore.Filter = {
-    case TS(13 ~: rest, b, c) => // Enter
-      Result(b.mkString)
-    case TS(10 ~: rest, b, c) => // Enter
-      Result(b.mkString)
-    case TS(10 ~: 13 ~:rest, b, c) => // Enter
-      Result(b.mkString)
-    case TS(13 ~: 10 ~:rest, b, c) => // Enter
-      Result(b.mkString)
+    case TS(13 ~: rest, b, c) => doEnter(b, c, rest) // Enter
+    case TS(10 ~: rest, b, c) => doEnter(b, c, rest) // Enter
+    case TS(10 ~: 13 ~: rest, b, c) => doEnter(b, c, rest) // Enter
+    case TS(13 ~: 10 ~: rest, b, c) => doEnter(b, c, rest) // Enter
   }
 
   lazy val exitFilter: TermCore.Filter = {
