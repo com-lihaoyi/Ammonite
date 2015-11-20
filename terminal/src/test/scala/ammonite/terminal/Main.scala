@@ -52,9 +52,9 @@ object Main{
               val displayOffset = if (cursor < mark) 0 else -1
               (
                 hl(a) ++ Console.REVERSED ++ b ++ Console.RESET ++ hl(c),
-                cursor + displayOffset
+                displayOffset
               )
-            case _ => (hl(buffer), cursor)
+            case _ => (hl(buffer), 0)
           }
 
         }

@@ -156,6 +156,7 @@ object BasicFilters {
     b -> moveUpDown(b, c, w, 0, -1, c - w, _ > _, false)
   }
   def moveDown(b: Vector[Char], c: Int, w: Int) = {
+    Debug("moveDown\t" + b.length + "\t" + c + "\t" + w)
     b -> moveUpDown(b, c, w, 1, 1, c + w, _ <= _, true)
   }
 }

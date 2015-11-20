@@ -15,6 +15,7 @@ object GUILikeFilters {
   case class SelectionFilter() extends DelegateFilter{
     var mark: Option[Int] = None
     def setMark(c: Int) = {
+      Debug("setMark\t" + mark + "\t->\t" + c)
       if (mark == None) mark = Some(c)
     }
     def doIndent(indent: Int,
@@ -37,7 +38,7 @@ object GUILikeFilters {
           if (i == 0) slice
           else{
             val cut = slicer(slice)
-            Debug("Cut\t" + cut)
+
             if (i == 1) firstOffset = cut
 
             if (cut < 0) slice.drop(-cut)
@@ -54,6 +55,7 @@ object GUILikeFilters {
       mark = Some(newMark)
       TS(rest, flattened, newC)
     }
+
     def filter = orElseAll(
 
       Case(ShiftUp){(b, c, m) => setMark(c); BasicFilters.moveUp(b, c, m.width)},
@@ -83,7 +85,7 @@ object GUILikeFilters {
         // delete the current selection and write the printable character.
         // If it's a special command, just cancel the current selection.
         case TS(char ~: inputs, buffer, cursor) if mark.isDefined =>
-          if (char == Alt(0) || char.toChar.isControl) {
+          if (char == Alt(0) || char.toChar.isControl && char != 127 /*backspace*/) {
             mark = None
             TS(char ~: inputs, buffer, cursor)
           }else{
@@ -95,7 +97,6 @@ object GUILikeFilters {
               else char ~: inputs
             TS(newInputs, newBuffer, min)
           }
-
       }
     )
   }

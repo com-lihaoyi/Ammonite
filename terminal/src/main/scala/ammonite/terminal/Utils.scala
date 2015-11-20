@@ -6,9 +6,9 @@ import scala.annotation.tailrec
 
 
 object Debug{
-  val debugOutput= new java.io.FileOutputStream(new java.io.File("log"))
+//  val debugOutput= new java.io.FileOutputStream(new java.io.File("terminal/target/log"))
   def apply(s: Any) = {
-    debugOutput.write((System.currentTimeMillis() + "\t\t" + s + "\n").getBytes)
+//    debugOutput.write((System.currentTimeMillis() + "\t\t" + s + "\n").getBytes)
   }
 }
 class Ansi(output: Writer){

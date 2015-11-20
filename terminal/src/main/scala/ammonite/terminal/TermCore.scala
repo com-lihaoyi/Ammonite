@@ -35,29 +35,24 @@ object TermCore {
     frags.append(0)
     for(c <- buffer){
       if (c == '\n') frags.append(0)
-      else frags(frags.length - 1) = frags(frags.length - 1) + 1
+      else frags(frags.length - 1) = frags.last + 1
     }
     frags
   }
   def calculateHeight(buffer: Vector[Char],
-                      cursor: Int,
                       width: Int,
-                      prompt: String): (Int, Int, Int) = {
+                      prompt: String): Seq[Int] = {
     val rowLengths = splitBuffer(buffer)
 
-    calculateHeight0(rowLengths, cursor, width - prompt.length)
+    calculateHeight0(rowLengths, width - prompt.length)
   }
 
-  def findChunk() = {
-
-  }
   /**
    * Given a buffer with characters and newlines, calculates how high
    * the buffer is and where the cursor goes inside of it.
    */
   def calculateHeight0(rowLengths: Seq[Int],
-                       cursor: Int,
-                       width: Int): (Int, Int, Int) = {
+                       width: Int): Seq[Int] = {
     val fragHeights =
       rowLengths
         .inits
@@ -73,10 +68,15 @@ object TermCore {
           )
         }
 //    Debug("fragHeights " + fragHeights)
-    val totalHeight = fragHeights.sum
+    fragHeights
+  }
 
+  def positionCursor(cursor: Int,
+                     rowLengths: Seq[Int],
+                     fragHeights: Seq[Int],
+                     width: Int) = {
     var leftoverCursor = cursor
-//    Debug("leftoverCursor " + leftoverCursor)
+    //    Debug("leftoverCursor " + leftoverCursor)
     var totalPreHeight = 0
     var done = false
     // Don't check if the cursor exceeds the last chunk, because
@@ -84,24 +84,17 @@ object TermCore {
     for(i <- 0 until rowLengths.length -1 if !done) {
       // length of frag and the '\n' after it
       val delta = rowLengths(i) + (if (i == rowLengths.length - 1) 0 else 1)
-//      Debug("delta " + delta)
+      //      Debug("delta " + delta)
       val nextCursor = leftoverCursor - delta
       if (nextCursor >= 0) {
-//        Debug("nextCursor " + nextCursor)
+        //        Debug("nextCursor " + nextCursor)
         leftoverCursor = nextCursor
         totalPreHeight += fragHeights(i)
       }else done = true
     }
-//    Debug("")
-//    Debug("totalPreHeight\t" + totalPreHeight)
-//    Debug("totalheight\t" + totalHeight)
-//    Debug("leftoverCursor " + leftoverCursor)
-    //    Debug("width " + width)
     val cursorY = totalPreHeight + leftoverCursor / width
     val cursorX = leftoverCursor % width
-//    Debug("cursorX\t" + cursorX)
-//    Debug("cursorY\t" + cursorY)
-    (totalHeight, cursorY, cursorX)
+    (cursorY, cursorX)
   }
 
 
@@ -138,7 +131,7 @@ object TermCore {
 
       ansi.left(9999)
       ansi.clearScreen(0)
-      val (transformedBuffer, transformedCursor) = displayTransform(buffer, cursor)
+      val (transformedBuffer, cursorOffset) = displayTransform(buffer, cursor)
       writer.write(prompt)
       var i = 0
       var currWidth = 0
@@ -162,11 +155,16 @@ object TermCore {
         }
       }
 
-      val (nextHeight, cursorY, cursorX) =
-        calculateHeight(buffer, transformedCursor, width, noAnsiPrompt)
-
+      val rowLengths = splitBuffer(buffer)
+      val fragHeights = calculateHeight0(rowLengths, width - prompt.length)
+      val (cursorY, cursorX) = positionCursor(
+        cursor + cursorOffset,
+        rowLengths,
+        fragHeights,
+        width - prompt.length
+      )
 //      Debug("nextHeight\t" + nextHeight)
-      ansi.up(nextHeight - 1)
+      ansi.up(fragHeights.sum - 1)
       ansi.left(9999)
 
 //      Debug("DOWN " + cursorY)
@@ -179,21 +177,22 @@ object TermCore {
 
 
     @tailrec def readChar(lastState: TermState, ups: Int): Option[String] = {
-
+      Debug("")
+      Debug("readChar\t" + ups)
       val moreInputComing = reader.ready()
       if (!moreInputComing) redrawLine(lastState.buffer, lastState.cursor, ups)
+
+      val rowLengths = splitBuffer(lastState.buffer)
+      val fragHeights = calculateHeight0(rowLengths, width - prompt.length)
+      val (oldCursorY, _) = positionCursor(lastState.cursor, rowLengths, fragHeights, width - prompt.length)
 
       def updateState(s: LazyList[Int], b: Vector[Char], c: Int): (Int, TermState) = {
         val newCursor = math.max(math.min(c, b.length), 0)
         val nextUps =
           if (moreInputComing) ups
-          else {
-            val (_, oldCursorY, _) = calculateHeight(
-              lastState.buffer, lastState.cursor, width, noAnsiPrompt
-            )
-            oldCursorY
-          }
+          else oldCursorY
 //        Debug("nextUps\t" + nextUps)
+        Debug("nextUps\t" + nextUps)
         val newState = TermState(s, b, newCursor)
         (nextUps, newState)
       }
@@ -203,14 +202,11 @@ object TermCore {
           val (nextUps, newState) = updateState(s, b, c)
           readChar(newState, nextUps)
         case TermState(s, b, c) =>
+          Debug("TermState c\t" + c)
           val (nextUps, newState) = updateState(s, b, c)
           readChar(newState, nextUps)
 
         case Result(s) =>
-          val (_, oldCursorY, _) = calculateHeight(
-            lastState.buffer, lastState.cursor, width, noAnsiPrompt
-          )
-
           redrawLine(lastState.buffer, lastState.buffer.length, oldCursorY)
           writer.write(10)
           writer.write(13)
