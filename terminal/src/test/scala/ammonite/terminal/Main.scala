@@ -2,7 +2,6 @@ package ammonite.terminal
 
 import java.io.OutputStreamWriter
 
-import acyclic.file
 import scala.annotation.tailrec
 
 
@@ -13,7 +12,7 @@ import scala.annotation.tailrec
  * included as filters, but without any Scala/Ammonite specific logic
  * at all. Provides a minimal environment for manual testing
  */
-object Term{
+object Main{
 
   def main(args: Array[String]): Unit = {
     var history = List.empty[String]
