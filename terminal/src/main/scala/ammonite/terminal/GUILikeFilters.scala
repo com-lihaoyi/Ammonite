@@ -18,6 +18,7 @@ object GUILikeFilters {
       if (mark == None) mark = Some(c)
     }
     def filter = orElseAll(
+
       Case(ShiftUp){(b, c, m) => setMark(c); BasicFilters.moveUp(b, c, m.width)},
       Case(ShiftDown){(b, c, m) => setMark(c); BasicFilters.moveDown(b, c, m.width)},
       Case(ShiftRight){(b, c, m) => setMark(c); (b, c + 1)},
@@ -29,10 +30,31 @@ object GUILikeFilters {
       Case(FnShiftRight){(b, c, m) => setMark(c); BasicFilters.moveEnd(b, c, m.width)},
       Case(FnShiftLeft){(b, c, m) => setMark(c); BasicFilters.moveStart(b, c, m.width)},
       {
+        case TS(9 ~: rest, b, c) if mark.isDefined => // Tab
+          val indent = 4
+          val markValue = mark.get
+          val (chunks, chunkStarts, chunkIndex) = FilterTools.findChunks(b, c)
+          val min = chunkStarts.lastIndexWhere(_ < math.min(c, markValue))
+          val max = chunkStarts.indexWhere(_ > math.max(c, markValue))
+          val splitPoints = chunkStarts.slice(min, max)
+          val broken =
+            for((Seq(l, r), i) <- (0 +: splitPoints :+ 99999).sliding(2).zipWithIndex)
+            yield {
+              val padding = if (i == 0) Vector.empty[Char] else Vector.fill(indent)(' ')
+              padding ++ b.slice(l, r)
+            }
+          val deeperOffset = indent * splitPoints.length
+          val (newMark, newC) =
+            if (markValue > c) (markValue + deeperOffset, c + indent)
+            else (markValue + indent, c + deeperOffset)
+
+          mark = Some(newMark)
+          TS(rest, broken.flatten.toVector, newC)
+
         // Intercept every other character. If it's a  printable character,
         // delete the current selection and write the printable character.
         // If it's a special command, just cancel the current selection.
-        case TS(char ~: inputs, buffer, cursor) if mark != None =>
+        case TS(char ~: inputs, buffer, cursor) if mark.isDefined =>
           if (char == Alt(0) || char.toChar.isControl) {
             mark = None
             TS(char ~: inputs, buffer, cursor)
@@ -45,6 +67,7 @@ object GUILikeFilters {
               else char ~: inputs
             TS(newInputs, newBuffer, min)
           }
+
       }
     )
   }

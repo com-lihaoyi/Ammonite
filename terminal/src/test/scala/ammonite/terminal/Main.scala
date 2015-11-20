@@ -2,6 +2,7 @@ package ammonite.terminal
 
 import java.io.OutputStreamWriter
 
+
 import scala.annotation.tailrec
 
 
@@ -26,6 +27,7 @@ object Main{
         reader,
         new OutputStreamWriter(System.out),
         selection orElse
+        BasicFilters.tabFilter(4) orElse
         GUILikeFilters.altFilter orElse
         GUILikeFilters.fnFilter orElse
         ReadlineFilters.navFilter orElse

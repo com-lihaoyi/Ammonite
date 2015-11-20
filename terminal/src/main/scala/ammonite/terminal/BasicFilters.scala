@@ -3,6 +3,8 @@ import acyclic.file
 import ammonite.terminal.LazyList._
 import FilterTools._
 import SpecialKeys._
+import ammonite.terminal.TermCore.Filter
+
 /**
  * Filters for simple operation of a terminal: cursor-navigation
  * (including with all the modifier keys), enter/ctrl-c-exit, etc.
@@ -22,20 +24,31 @@ object BasicFilters {
     val (first, last) = b.splitAt(c)
     TermState(rest, (first :+ '\n') ++ last, c + 1)
   }
-  val multilineFilter: TermCore.Filter = {
+  def multilineFilter: TermCore.Filter = {
     case TS(13 ~: rest, b, c) if b.count(_ == '(') != b.count(_ == ')') =>
       injectNewLine(b, c, rest)
   }
 
-  lazy val navFilter = orElseAll(
+  def navFilter = orElseAll(
     Case(Up)((b, c, m) => moveUp(b, c, m.width)),
     Case(Down)((b, c, m) => moveDown(b, c, m.width)),
     Case(Right)((b, c, m) => (b, c + 1)),
     Case(Left)((b, c, m) => (b, c - 1))
   )
 
+  def tabColumn(indent: Int, b: Vector[Char], c: Int, rest: LazyList[Int]) = {
+    val (chunks, chunkStarts, chunkIndex) = FilterTools.findChunks(b, c)
+    val chunkCol = c - chunkStarts(chunkIndex)
+    val spacesToInject = indent - (chunkCol % indent)
+    val (lhs, rhs) = b.splitAt(c)
+    TS(rest, lhs ++ Vector.fill(spacesToInject)(' ') ++ rhs, c + spacesToInject)
+  }
 
-  lazy val loggingFilter: TermCore.Filter = {
+  def tabFilter(indent: Int): Filter = {
+    case TS(9 ~: rest, b, c) => tabColumn(indent, b, c, rest)
+  }
+
+  def loggingFilter: TermCore.Filter = {
     case TS(Ctrl('t') ~: rest, b, c) =>
       println("Char Display Mode Enabled! Ctrl-C to exit")
       var curr = rest
@@ -45,7 +58,7 @@ object BasicFilters {
       }
       TS(curr, b, c)
   }
-  lazy val typingFilter: TermCore.Filter = {
+  def typingFilter: TermCore.Filter = {
     case TS(p"\u001b[3~$rest", b, c) =>
 //      Debug("fn-delete")
       val (first, last) = b.splitAt(c)
@@ -63,19 +76,18 @@ object BasicFilters {
 
   def doEnter(b: Vector[Char], c: Int, rest: LazyList[Int]) = {
     val (chunks, chunkStarts, chunkIndex) = FilterTools.findChunks(b, c)
-    Debug(chunks, chunkStarts, chunkIndex)
     if (chunkIndex == chunks.length - 1) Result(b.mkString)
     else injectNewLine(b, c, rest)
   }
 
-  lazy val enterFilter: TermCore.Filter = {
+  def enterFilter: TermCore.Filter = {
     case TS(13 ~: rest, b, c) => doEnter(b, c, rest) // Enter
     case TS(10 ~: rest, b, c) => doEnter(b, c, rest) // Enter
     case TS(10 ~: 13 ~: rest, b, c) => doEnter(b, c, rest) // Enter
     case TS(13 ~: 10 ~: rest, b, c) => doEnter(b, c, rest) // Enter
   }
 
-  lazy val exitFilter: TermCore.Filter = {
+  def exitFilter: TermCore.Filter = {
     case TS(Ctrl('c') ~: rest, b, c) =>
       Result("")
     case TS(Ctrl('d') ~: rest, b, c) =>
@@ -87,7 +99,7 @@ object BasicFilters {
       }
     case TS(-1 ~: rest, b, c) => Exit   // java.io.Reader.read() produces -1 on EOF
   }
-  lazy val clearFilter: TermCore.Filter = {
+  def clearFilter: TermCore.Filter = {
     case TS(Ctrl('l') ~: rest, b, c) => ClearScreen(TS(rest, b, c))
   }
 
