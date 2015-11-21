@@ -91,7 +91,7 @@ case class AmmoniteFrontEnd(extraFilters: TermCore.Filter = PartialFunction.empt
 
     val historyFilter = ReadlineFilters.HistoryFilter(() => history.reverse)
     val cutPasteFilter = ReadlineFilters.CutPasteFilter()
-    val selectionFilter = GUILikeFilters.SelectionFilter()
+    val selectionFilter = GUILikeFilters.SelectionFilter(indent = 2)
 
     val allFilters =
       extraFilters orElse

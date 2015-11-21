@@ -12,14 +12,13 @@ import acyclic.file
  * text selection, etc.
  */
 object GUILikeFilters {
-  case class SelectionFilter() extends DelegateFilter{
+  case class SelectionFilter(indent: Int) extends DelegateFilter{
     var mark: Option[Int] = None
     def setMark(c: Int) = {
       Debug("setMark\t" + mark + "\t->\t" + c)
       if (mark == None) mark = Some(c)
     }
-    def doIndent(indent: Int,
-                 b: Vector[Char],
+    def doIndent(b: Vector[Char],
                  c: Int,
                  rest: LazyList[Int],
                  slicer: Vector[Char] => Int) = {
@@ -69,16 +68,14 @@ object GUILikeFilters {
       Case(FnShiftRight){(b, c, m) => setMark(c); BasicFilters.moveEnd(b, c, m.width)},
       Case(FnShiftLeft){(b, c, m) => setMark(c); BasicFilters.moveStart(b, c, m.width)},
       {
-        case TS(27 ~: 91 ~: 90 ~:  rest, b, c) =>
-          val indent = 4
-          doIndent(indent, b, c, rest,
+        case TS(27 ~: 91 ~: 90 ~: rest, b, c) =>
+          doIndent(b, c, rest,
             slice => -math.min(slice.iterator.takeWhile(_ == ' ').size, indent)
           )
 
         case TS(9 ~: rest, b, c) if mark.isDefined => // Tab
-          val indent = 4
-          doIndent(indent, b, c, rest,
-            slice => 4
+          doIndent(b, c, rest,
+            slice => indent
           )
 
         // Intercept every other character. If it's a  printable character,

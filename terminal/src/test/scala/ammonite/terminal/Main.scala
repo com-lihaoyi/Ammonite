@@ -17,7 +17,7 @@ object Main{
 
   def main(args: Array[String]): Unit = {
     var history = List.empty[String]
-    val selection = GUILikeFilters.SelectionFilter()
+    val selection = GUILikeFilters.SelectionFilter(indent = 4)
 
     val reader = new java.io.InputStreamReader(System.in)
     rec()
