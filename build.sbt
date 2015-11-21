@@ -35,6 +35,7 @@ val sharedSettings = Seq(
   scalacOptions += "-target:jvm-1.7",
   autoCompilerPlugins := true,
   addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.3"),
+  ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) },
   parallelExecution in Test := !scalaVersion.value.contains("2.10"),
   (unmanagedSources in Compile) += baseDirectory.value/".."/"project"/"Constants.scala",
   mappings in (Compile, packageSrc) += {
