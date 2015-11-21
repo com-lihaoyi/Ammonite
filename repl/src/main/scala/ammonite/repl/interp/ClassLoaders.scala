@@ -58,9 +58,11 @@ object SpecialClassLoader{
     f.setAccessible(true)
     var current: ClassLoader = classloader
     while(current != null){
-      val classes = f.get(current).asInstanceOf[java.util.Vector[Class[_]]]
-      import collection.JavaConversions._
-      allClasses.appendAll(classes)
+      current.synchronized{
+        val classes = f.get(current).asInstanceOf[java.util.Vector[Class[_]]]
+        import collection.JavaConversions._
+        allClasses.appendAll(classes)
+      }
       current = current.getParent
     }
     val resources = for {
