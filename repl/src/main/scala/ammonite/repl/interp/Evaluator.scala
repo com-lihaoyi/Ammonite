@@ -6,13 +6,9 @@ import java.net.URL
 import acyclic.file
 import ammonite.repl.frontend.ReplExit
 import ammonite.repl._
-import java.net.URLClassLoader
-import java.security.MessageDigest
 
-import ammonite.repl.interp.Evaluator.SpecialClassloader
 import Util.{CompileCache, ClassFiles}
 
-import scala.reflect.runtime.universe._
 import scala.collection.mutable
 import scala.util.Try
 
@@ -44,8 +40,8 @@ trait Evaluator{
   def previousImportBlock: String
   def addJar(url: URL): Unit
   def addPluginJar(url: URL): Unit
-  def evalClassloader: SpecialClassloader
-  def pluginClassloader: SpecialClassloader
+  def evalClassloader: SpecialClassLoader
+  def pluginClassloader: SpecialClassLoader
 
   /*
    * How many wrappers has this instance compiled
@@ -86,11 +82,11 @@ object Evaluator{
      * Performs the conversion of our pre-compiled `Array[Byte]`s into
      * actual classes with methods we can execute.
      */
-    var evalClassloader: SpecialClassloader = null
-    var pluginClassloader: SpecialClassloader = null
+    var evalClassloader: SpecialClassLoader = null
+    var pluginClassloader: SpecialClassLoader = null
 
-    evalClassloader = new SpecialClassloader(currentClassloader)
-    pluginClassloader = new SpecialClassloader(currentClassloader)
+    evalClassloader = new RootSpecialClassLoader(currentClassloader)
+    pluginClassloader = new RootSpecialClassLoader(currentClassloader)
 
     def addJar(url: URL) = evalClassloader.add(url)
     def addPluginJar(url: URL) = pluginClassloader.add(url)
@@ -280,93 +276,13 @@ object Evaluator{
    * in imports, so we don't need to pass them explicitly.
    */
   def cacheTag(code: String, imports: Seq[ImportData], classpathHash: Array[Byte]): String = {
-    val bytes = md5Hash(Iterator(
-      md5Hash(Iterator(code.getBytes)),
-      md5Hash(imports.iterator.map(_.toString.getBytes)),
+    val bytes = Util.md5Hash(Iterator(
+      Util.md5Hash(Iterator(code.getBytes)),
+      Util.md5Hash(imports.iterator.map(_.toString.getBytes)),
       classpathHash
     ))
     "cache" + bytes.map("%02x".format(_)).mkString //add prefix to make sure it begins with a letter
   }
 
-  def md5Hash(data: Iterator[Array[Byte]]) = {
-    val digest = MessageDigest.getInstance("MD5")
-    data.foreach(digest.update)
-    digest.digest()
-  }
 
-  /**
-   * Classloader used to implement the jar-downloading
-   * command-evaluating logic in Ammonite.
-   *
-   * http://stackoverflow.com/questions/3544614/how-is-the-control-flow-to-findclass-of
-   */
-  class SpecialClassloader(parent: ClassLoader) extends URLClassLoader(Array(), parent){
-    /**
-     * Files which have been compiled, stored so that our special
-     * classloader can get at them.
-     */
-    val newFileDict = mutable.Map.empty[String, Array[Byte]]
-    def findClassPublic(name: String) = findClass(name)
-    val specialLocalClasses = Set(
-      "ammonite.repl.frontend.ReplBridge",
-      "ammonite.repl.frontend.ReplBridge$"
-    )
-    override def findClass(name: String): Class[_] = {
-      def loadedFromBytes =
-        for(bytes <- newFileDict.get(name))
-        yield defineClass(name, bytes, 0, bytes.length)
-
-      def special =
-        if (!specialLocalClasses(name)) None
-        else{
-          import ammonite.ops._
-//          println("Custom finding class! " + name)
-          val bytes = read.resource.bytes(root/RelPath(name.replace('.', '/') + ".class"))
-          Some(defineClass(name, bytes, 0, bytes.length))
-        }
-
-      Option(this.findLoadedClass(name))
-        .orElse(loadedFromBytes)
-        .orElse(special)
-        .getOrElse(super.findClass(name))
-    }
-    def add(url: URL) = {
-      _classpathHash = md5Hash(Iterator(_classpathHash, jarHash(url)))
-      addURL(url)
-    }
-
-    private def jarHash(url: URL) = {
-      val digest = MessageDigest.getInstance("MD5")
-      val is = url.openStream
-      try {
-        val byteChunk = new Array[Byte](8192)
-        while({
-          val n = is.read(byteChunk)
-          if (n <= 0) false
-          else {
-            digest.update(byteChunk, 0, n)
-            true
-          }
-        })()
-      } finally {
-        if (is != null) is.close()
-      }
-
-      digest.digest()
-    }
-
-    //we don't need to hash in classes from newFileDict, because cache tag depend on 
-    //them implicitly through having their hash in the imports.
-    private var _classpathHash = {
-
-      val urls = getURLs
-
-      if(urls.nonEmpty){
-        urls.tail.foldLeft(jarHash(urls.head)){ (oldHash,jarURL) =>
-          md5Hash(Iterator(oldHash, jarHash(jarURL)))
-        }
-      } else md5Hash(Iterator())
-    }
-    def classpathHash: Array[Byte] = _classpathHash
-  }
 }

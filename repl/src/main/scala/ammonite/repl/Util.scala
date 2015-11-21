@@ -1,5 +1,7 @@
 package ammonite.repl
 
+import java.security.MessageDigest
+
 import acyclic.file
 import pprint.{PPrinter, PPrint}
 
@@ -152,6 +154,12 @@ object Ex{
 }
 
 object Util{
+
+  def md5Hash(data: Iterator[Array[Byte]]) = {
+    val digest = MessageDigest.getInstance("MD5")
+    data.foreach(digest.update)
+    digest.digest()
+  }
   type IvyMap = Map[(String, String, String), Set[String]]
   type ClassFiles = Traversable[(String, Array[Byte])]
   type CompileCache = (ClassFiles, Seq[ImportData])
@@ -223,3 +231,4 @@ object Colors{
  */
 case class Bind[T](name: String, value: T)
                   (implicit val typeTag: scala.reflect.runtime.universe.TypeTag[T])
+
