@@ -93,7 +93,8 @@ object Evaluator{
       Frame(
         special,
         special,
-        Map.empty[String, ImportData]
+        Map.empty[String, ImportData],
+        Seq()
       )
     }
     var frames = List(initialFrame)
@@ -105,11 +106,13 @@ object Evaluator{
       def newFrame = Frame(
         new SpecialClassLoader(evalClassloader, evalClassloader.classpathHash),
         new SpecialClassLoader(pluginClassloader, pluginClassloader.classpathHash),
-        previousImports
+        previousImports,
+        frames.head.extraJars
       )
-      def push(name: String = "") = {
-        eval.frames = newFrame :: frames
+
+      def save(name: String = "") = {
         if (name != "") namedFrames(name) = eval.frames
+        eval.frames = newFrame :: frames
       }
 
       def pop() = {

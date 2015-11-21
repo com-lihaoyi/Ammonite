@@ -5,6 +5,7 @@ import java.security.MessageDigest
 
 import ammonite.ops.{stat, Path}
 import ammonite.repl.{ImportData, Util}
+import pprint.PPrint
 
 import scala.collection.mutable
 import scala.reflect.io.VirtualDirectory
@@ -12,34 +13,39 @@ import scala.reflect.io.VirtualDirectory
 object Frame{
   def delta(oldFrame: Frame, newFrame: Frame) = {
     import pprint.Config.Colors._
-
-    val removedImports = oldFrame.previousImports.keySet -- newFrame.previousImports.keySet
-    if (removedImports.nonEmpty){
-      pprint.pprintln("Removed Imports")
-      pprint.pprintln(removedImports.map(Symbol(_)))
+    def printDelta[T: PPrint](name: String, s1: Set[T], s2: Set[T]) = {
+      val d = s1 -- s2
+      if (d.nonEmpty){
+        println(name + ":")
+        pprint.pprintln(d)
+      }
     }
-
-    val addedImports = newFrame.previousImports.keySet -- oldFrame.previousImports.keySet
-    if (addedImports.nonEmpty){
-      pprint.pprintln("Added Imports")
-      pprint.pprintln(addedImports.map(Symbol(_)))
-    }
-
-    val removedJars = oldFrame.classloader.allJars.toSet -- newFrame.classloader.allJars.toSet
-    if (removedJars.nonEmpty){
-      pprint.pprintln("Removed Jars")
-      pprint.pprintln(removedJars)
-    }
-    val addedJars = newFrame.classloader.allJars.toSet -- oldFrame.classloader.allJars.toSet
-    if (addedJars.nonEmpty){
-      pprint.pprintln("Added Jars")
-      pprint.pprintln(addedJars)
-    }
+    printDelta(
+      "Removed Imports",
+      oldFrame.previousImports.keySet.map(Symbol(_)),
+      newFrame.previousImports.keySet.map(Symbol(_))
+    )
+    printDelta(
+      "Added Imports",
+      newFrame.previousImports.keySet.map(Symbol(_)),
+      oldFrame.previousImports.keySet.map(Symbol(_))
+    )
+    printDelta(
+      "Removed Jars",
+      oldFrame.classloader.allJars.toSet,
+      newFrame.classloader.allJars.toSet
+    )
+    printDelta(
+      "Added Jars",
+      newFrame.classloader.allJars.toSet,
+      oldFrame.classloader.allJars.toSet
+    )
   }
 }
 case class Frame(classloader: SpecialClassLoader,
                  pluginClassloader: SpecialClassLoader,
-                 var previousImports: Map[String, ImportData])
+                 var previousImports: Map[String, ImportData],
+                 var extraJars: Seq[java.io.File])
 
 object SpecialClassLoader{
   def initialClasspathHash(classloader: ClassLoader) = {

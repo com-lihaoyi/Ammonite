@@ -161,7 +161,7 @@ trait Session{
     * classloader. If a name is provided, it can be used to quickly recover
     * that checkpoint later.
     */
-  def push(name: String = ""): Unit
+  def save(name: String = ""): Unit
 
   /**
     * Discards the last classloader, effectively reverting your session to

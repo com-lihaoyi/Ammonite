@@ -55,8 +55,6 @@ class Interpreter(prompt0: Ref[String],
 
   val SheBang= "#!"
 
-  var extraJars = Seq[java.io.File]()
-
   def processLine(code: String,
                   stmts: Seq[String],
                   printer: Iterator[String] => Unit) = {
@@ -221,7 +219,7 @@ class Interpreter(prompt0: Ref[String],
     object load extends DefaultLoadJar with Load {
 
       def handleJar(jar: File) = {
-        extraJars = extraJars ++ Seq(jar)
+        eval.sess.frames.head.extraJars = eval.sess.frames.head.extraJars ++ Seq(jar)
         evalClassloader.add(jar.toURI.toURL)
       }
 
@@ -283,9 +281,7 @@ class Interpreter(prompt0: Ref[String],
 
     object sess extends Session {
       def frames = eval.sess.frames
-
-      def push(name: String) = eval.sess.push(name)
-
+      def save(name: String) = eval.sess.save(name)
       def delete(name: String) = eval.sess.delete(name)
 
       def restore(name: String) = {
@@ -299,6 +295,7 @@ class Interpreter(prompt0: Ref[String],
       }
     }
   }
+
 
   val mainThread = Thread.currentThread()
   val eval = Evaluator(
@@ -317,7 +314,7 @@ class Interpreter(prompt0: Ref[String],
   def init() = {
     Timer("Interpreter init init 0")
     compiler = Compiler(
-      Classpath.jarDeps ++ extraJars,
+      Classpath.jarDeps ++ eval.sess.frames.head.extraJars,
       Classpath.dirDeps,
       dynamicClasspath,
       evalClassloader,
@@ -326,7 +323,7 @@ class Interpreter(prompt0: Ref[String],
     )
     Timer("Interpreter init init compiler")
     pressy = Pressy(
-      Classpath.jarDeps ++ extraJars,
+      Classpath.jarDeps ++ eval.sess.frames.head.extraJars,
       Classpath.dirDeps,
       dynamicClasspath,
       evalClassloader
@@ -370,7 +367,7 @@ class Interpreter(prompt0: Ref[String],
   init()
 
   processModule(storage().loadPredef + "\n" + predef + "\n" + argString)
-  eval.sess.push()
+  eval.sess.save()
   Timer("Interpreter init predef 0")
   init()
   Timer("Interpreter init predef 1")
