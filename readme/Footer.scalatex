@@ -14,6 +14,8 @@
   @ul
     @li
       @b{Beyond Bash: shell scripting in a typed, OO language}, at Scala by the Bay 2015. @a("Slides", href:="http://tinyurl.com/beyondbash")
+    @li
+      @b{Shell scripting in a typed, OO language}, at New Object Oriented Languages 2015.
 
 @sect{Changelog}
 
