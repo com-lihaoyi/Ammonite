@@ -284,7 +284,10 @@ class Interpreter(prompt0: Ref[String],
       def save(name: String) = eval.sess.save(name)
       def delete(name: String) = eval.sess.delete(name)
 
-
+      def pop(num: Int = 1) = {
+        eval.sess.pop(num)
+        init()
+      }
       def load(name: String = "") = {
         eval.sess.load(name)
         init()

@@ -134,15 +134,10 @@ trait ReplAPI {
     * check-pointing progress, reverting to earlier checkpoints, or deleting
     * checkpoints by name.
     *
-    * Checkpoints get pushed on a stack; by default, a saved checkpoint is
-    * accessible simply by calling `restore`. If you `save` multiple times in
-    * a row, calling `restore` multiple times will restore you to each of those
-    * checkpoints in turn. After `restore`-ing past a checkpoint, there is no
-    * way to retrieve it unless you provided a name while saving it.
-    *
-    * If you provide a name when `save`ing a checkpoint, it can later be
-    * `restore`d directly by providing the same name to `restore`, even if you
-    * already `restore`d past it.
+    * Frames get pushed on a stack; by default, a saved frame is
+    * accessible simply by calling `load`. If you provide a name
+    * when `save`ing a checkpoint, it can later be `load`ed directly
+    * by providing the same name to `load``
     *
     * Un-named checkpoints are garbage collected, together with their
     * classloader and associated data, when they are no longer accessible
@@ -158,18 +153,23 @@ trait Session{
   def frames: List[Frame]
   /**
     * Checkpoints your current work, placing all future work into its own
-    * classloader. If a name is provided, it can be used to quickly recover
+    * frames. If a name is provided, it can be used to quickly recover
     * that checkpoint later.
     */
   def save(name: String = ""): Unit
 
   /**
-    * Discards the last classloader, effectively reverting your session to
+    * Discards the last frames, effectively reverting your session to
     * the last `save`-ed checkpoint. If a name is provided, it instead reverts
     * your session to the checkpoint with that name.
     */
   def load(name: String = ""): Unit
 
+  /**
+    * Resets you to the last save point. If you pass in `num`, it resets
+    * you to that many savepoints since the last one.
+    */
+  def pop(num: Int = 1): Unit
   /**
     * Deletes a named checkpoint, allowing it to be garbage collected if it
     * is no longer accessible.

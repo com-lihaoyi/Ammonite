@@ -16,7 +16,7 @@ object Frame{
     def printDelta[T: PPrint](name: String, s1: Set[T], s2: Set[T]) = {
       val d = s1 -- s2
       if (d.nonEmpty){
-        println(name + ":")
+        print(name + ":")
         pprint.pprintln(d)
       }
     }

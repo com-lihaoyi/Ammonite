@@ -1,7 +1,6 @@
 package ammonite.repl.interp
 
 import java.lang.reflect.InvocationTargetException
-import java.net.URL
 
 import acyclic.file
 import ammonite.repl.frontend.{Session, ReplExit}
@@ -10,7 +9,6 @@ import ammonite.repl._
 import Util.{CompileCache, ClassFiles}
 
 import scala.collection.mutable
-import scala.reflect.io.{VirtualFile, AbstractFile, VirtualDirectory}
 import scala.util.Try
 
 /**
@@ -113,6 +111,14 @@ object Evaluator{
         eval.frames = childFrame(frames.head) :: frames
       }
 
+      def pop(num: Int = 1) = {
+        var next = eval.frames
+        for(i <- 0 until num){
+          if (next.tail != Nil) next = next.tail
+        }
+        Frame.delta(eval.frames.head, next.head)
+        eval.frames = childFrame(next.head) :: next
+      }
       def load(name: String = "") = {
         val next = if (name == "") eval.frames.tail else namedFrames(name)
         Frame.delta(eval.frames.head, next.head)
