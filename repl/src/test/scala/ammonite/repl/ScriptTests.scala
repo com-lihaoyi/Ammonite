@@ -86,7 +86,7 @@ object ScriptTests extends TestSuite{
 
             @ val r = res
             error: Compilation Failed
-            Main.scala:\\d\\+: not found: value res
+            not found: value res
             res
             ^
             """)
@@ -100,10 +100,19 @@ object ScriptTests extends TestSuite{
 
             @ val r = res
             error: Compilation Failed
-            Main.scala:\\d\\+: not found: value res
+            not found: value res
             res
             ^
 
+            """)
+        }
+        'compilationErrorWithColon{
+          check.session(s"""
+            @  a = ": 1"
+            error: Compilation Failed
+            not found: value a
+            a = ": 1"
+            ^
             """)
         }
         'nofile{
@@ -124,7 +133,7 @@ object ScriptTests extends TestSuite{
 
             @ val r2 = res2
             error: Compilation Failed
-            Main.scala:\\d\\+: not found: value res2
+            not found: value res2
             res2 
             ^
             """)
@@ -228,7 +237,7 @@ object ScriptTests extends TestSuite{
 
             @ val r = res
             error: Compilation Failed
-            Main.scala:\\d\\+: not found: value res
+            not found: value res
             res
             ^
             """)
@@ -242,7 +251,7 @@ object ScriptTests extends TestSuite{
 
             @ val r = res
             error: Compilation Failed
-            Main.scala:\\d\\+: not found: value res
+            not found: value res
             res
             ^
 
@@ -266,7 +275,7 @@ object ScriptTests extends TestSuite{
 
             @ val r2 = res2
             error: Compilation Failed
-            Main.scala:\\d\\+: not found: value res2
+            not found: value res2
             res2 
             ^
             """)
