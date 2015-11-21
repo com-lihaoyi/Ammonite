@@ -14,6 +14,18 @@ val dontPublishSettings = Seq(
 
 dontPublishSettings
 
+val macroSettings = Seq(
+  libraryDependencies ++= Seq(
+    "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided"
+  ) ++ (
+    if (scalaVersion.value startsWith "2.11.") Nil
+    else Seq(
+      compilerPlugin("org.scalamacros" % s"paradise" % "2.0.1" cross CrossVersion.full),
+      "org.scalamacros" %% s"quasiquotes" % "2.0.1"
+    )
+  )
+)
+
 val sharedSettings = Seq(
   scalaVersion := "2.11.7",
   organization := "com.lihaoyi",
@@ -29,15 +41,8 @@ val sharedSettings = Seq(
     (baseDirectory.value/".."/"project"/"Constants.scala") -> "Constants.scala"
   },
   libraryDependencies ++= Seq(
-    "com.lihaoyi" %% "acyclic" % "0.1.3" % "provided",
-    "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided"
-  ) ++ (
-    if (scalaVersion.value startsWith "2.11.") Nil
-    else Seq(
-      compilerPlugin("org.scalamacros" % s"paradise" % "2.0.1" cross CrossVersion.full),
-      "org.scalamacros" %% s"quasiquotes" % "2.0.1"
-    )
-  ),
+    "com.lihaoyi" %% "acyclic" % "0.1.3" % "provided"
+  ) ,
   publishTo := Some(
     "releases" at "https://oss.sonatype.org/service/local/staging/deploy/maven2"
   ),
@@ -67,8 +72,10 @@ val sharedSettings = Seq(
  * subprocesses, and other such things.
  */
 lazy val ops = project
-  .settings(sharedSettings:_*)
-  .settings(name := "ammonite-ops")
+  .settings(
+    sharedSettings,
+    name := "ammonite-ops"
+  )
 
 
 /**
@@ -77,8 +84,8 @@ lazy val ops = project
  * can be run to test the REPL interactions
  */
 lazy val terminal = project
-  .settings(sharedSettings:_*)
   .settings(
+    sharedSettings,
     name := "ammonite-terminal"
   )
 
@@ -89,8 +96,9 @@ lazy val terminal = project
  */
 lazy val repl = project
   .dependsOn(terminal, ops)
-  .settings(sharedSettings:_*)
   .settings(
+    macroSettings,
+    sharedSettings,
     crossVersion := CrossVersion.full,
     test in assembly := {},
     name := "ammonite-repl",
@@ -158,8 +166,8 @@ lazy val repl = project
  */
 lazy val shell = project
   .dependsOn(ops, repl % "compile->compile;test->test")
-  .settings(sharedSettings:_*)
   .settings(
+    sharedSettings,
     name := "ammonite-shell",
     libraryDependencies += "com.lihaoyi" %% "pprint" % "0.3.4",
     (test in Test) <<= (test in Test).dependsOn(packageBin in Compile),
@@ -169,8 +177,8 @@ lazy val shell = project
 
 lazy val integration = project
   .dependsOn(ops)
-  .settings(sharedSettings:_*)
   .settings(
+    sharedSettings,
     (test in Test) <<= (test in Test).dependsOn(
       assembly in repl,
       packageBin in (shell, Compile)
@@ -189,8 +197,8 @@ lazy val integration = project
  */
 lazy val sshd = project
     .dependsOn(repl)
-    .settings(sharedSettings:_*)
     .settings(
+      sharedSettings,
       crossVersion := CrossVersion.full,
       name := "ammonite-sshd",
       libraryDependencies ++= Seq(

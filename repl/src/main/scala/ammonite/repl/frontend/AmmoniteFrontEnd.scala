@@ -27,7 +27,7 @@ case class AmmoniteFrontEnd(extraFilters: TermCore.Filter = PartialFunction.empt
       case Some(code) =>
         addHistory(code)
         Parsers.Splitter.parse(code) match{
-          case Result.Success(value, idx) => Res.Success((code, value))
+          case Result.Success(value, 1  idx) => Res.Success((code, value))
           case f: Result.Failure => Res.Failure(
             fastparse.core.ParseError.msg(f.input, f.traced.expected, f.index)
           )
