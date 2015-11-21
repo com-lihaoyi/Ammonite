@@ -184,25 +184,31 @@ object TermCore {
       Debug("readChar\t" + ups)
       val moreInputComing = reader.ready()
       val (transformedBuffer, cursorOffset) = displayTransform(lastState.buffer, lastState.cursor)
+      val lastOffsetCursor = lastState.cursor + cursorOffset
       val rowLengths = splitBuffer(lastState.buffer)
       if (!moreInputComing) redrawLine(
         transformedBuffer,
-        lastState.cursor + cursorOffset,
+        lastOffsetCursor,
         ups,
         rowLengths
       )
 
       val fragHeights = calculateHeight0(rowLengths, width - prompt.length)
-      val (oldCursorY, _) = positionCursor(lastState.cursor, rowLengths, fragHeights, width - prompt.length)
+      val (oldCursorY, _) = positionCursor(
+        lastOffsetCursor,
+        rowLengths,
+        fragHeights,
+        width - prompt.length
+      )
 
       def updateState(s: LazyList[Int], b: Vector[Char], c: Int): (Int, TermState) = {
         val newCursor = math.max(math.min(c, b.length), 0)
         val nextUps =
           if (moreInputComing) ups
           else oldCursorY
-//        Debug("nextUps\t" + nextUps)
-        Debug("nextUps\t" + nextUps)
+
         val newState = TermState(s, b, newCursor)
+
         (nextUps, newState)
       }
       filters(TermInfo(lastState, width - noAnsiPrompt.length)) match {
