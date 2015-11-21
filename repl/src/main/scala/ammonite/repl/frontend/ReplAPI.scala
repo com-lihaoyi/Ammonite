@@ -168,12 +168,7 @@ trait Session{
     * the last `save`-ed checkpoint. If a name is provided, it instead reverts
     * your session to the checkpoint with that name.
     */
-  def pop(): Unit
-
-  /**
-    * Sets the current REPL session to the saved checkpoint of the same name
-    */
-  def restore(name: String): Unit
+  def load(name: String = ""): Unit
 
   /**
     * Deletes a named checkpoint, allowing it to be garbage collected if it

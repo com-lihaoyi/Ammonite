@@ -82,8 +82,6 @@ object Evaluator{
      * Performs the conversion of our pre-compiled `Array[Byte]`s into
      * actual classes with methods we can execute.
      */
-    def evalClassloader: SpecialClassLoader = frames.head.classloader
-    def pluginClassloader: SpecialClassLoader = frames.head.pluginClassloader
 
     def initialFrame = {
       def special = new SpecialClassLoader(
@@ -103,34 +101,28 @@ object Evaluator{
 
     object sess extends Session {
       def frames = eval.frames
-      def newFrame = Frame(
-        new SpecialClassLoader(evalClassloader, evalClassloader.classpathHash),
-        new SpecialClassLoader(pluginClassloader, pluginClassloader.classpathHash),
-        previousImports,
-        frames.head.extraJars
+      def childFrame(parent: Frame) = Frame(
+        new SpecialClassLoader(parent.classloader, parent.classloader.classpathHash),
+        new SpecialClassLoader(parent.pluginClassloader, parent.pluginClassloader.classpathHash),
+        parent.previousImports,
+        parent.extraJars
       )
 
       def save(name: String = "") = {
         if (name != "") namedFrames(name) = eval.frames
-        eval.frames = newFrame :: frames
+        eval.frames = childFrame(frames.head) :: frames
       }
 
-      def pop() = {
-        Frame.delta(eval.frames.head, eval.frames.tail.head)
-        eval.frames = eval.frames.tail
-        if (eval.frames.length == 1) eval.frames = newFrame :: frames
-      }
-
-      def restore(name: String) = {
-        Frame.delta(eval.frames.head, namedFrames(name).head)
-        eval.frames = namedFrames(name)
+      def load(name: String = "") = {
+        val next = if (name == "") eval.frames.tail else namedFrames(name)
+        Frame.delta(eval.frames.head, next.head)
+        eval.frames = childFrame(next.head) :: next
       }
 
       def delete(name: String) = {
         namedFrames.remove(name)
       }
     }
-
 
     private var _compilationCount = 0
     def compilationCount = _compilationCount
@@ -151,9 +143,9 @@ object Evaluator{
       Res[Class[_]](Try {
         for ((name, bytes) <- classFiles) {
 //          println("loadClass " + name)
-          evalClassloader.newFileDict(name) = bytes
+          sess.frames.head.classloader.newFileDict(name) = bytes
         }
-        Class.forName(wrapperName , true, evalClassloader)
+        Class.forName(wrapperName , true, sess.frames.head.classloader)
       }, e => "Failed to load compiled class " + e)
     }
 
@@ -256,7 +248,7 @@ object Evaluator{
                            imports: Seq[ImportData],
                            printCode: String = ""): Res[(String, Class[_], Seq[ImportData])] = {
       Timer("cachedCompileBlock 0")
-      val wrapperName = cacheTag(code, imports, evalClassloader.classpathHash)
+      val wrapperName = cacheTag(code, imports, sess.frames.head.classloader.classpathHash)
       Timer("cachedCompileBlock 1")
       val wrappedCode = wrapCode(wrapperName, code, printCode, imports)
       Timer("cachedCompileBlock 2")
