@@ -25,8 +25,8 @@ object FailureTests extends TestSuite{
         @ val x = 1 + vale
         error: Compilation Failed
         Main.scala:\d\+: not found: value vale
-        1 + vale
-            ^
+        val x = 1 + vale
+                    ^
       """)
     }
     'compilerCrash{
@@ -55,7 +55,7 @@ object FailureTests extends TestSuite{
         x.contains("java.lang.Exception: lol") &&
         x.contains("java.lang.Exception: hoho") &&
         // and none of the stuff we don't want
-        x.lines.length == 10 &&
+        x.lines.length == 6 &&
         !x.contains("Something unexpected went wrong =(")
       )
     }
