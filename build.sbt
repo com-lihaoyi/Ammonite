@@ -177,6 +177,7 @@ lazy val shell = project
 
 lazy val integration = project
   .dependsOn(ops)
+  .dependsOn(repl)
   .settings(
     sharedSettings,
     (test in Test) <<= (test in Test).dependsOn(
@@ -187,7 +188,8 @@ lazy val integration = project
       assembly in repl,
       packageBin in (shell, Compile)
     ),
-    dontPublishSettings
+    dontPublishSettings,
+    initialCommands in (Test, console) := "ammonite.integration.Main.main(null)"
   )
 
 

@@ -356,10 +356,12 @@ object Evaluator{
     }
 
     //we don't need to hash in classes from newFileDict, because cache tag depend on 
-    //them implicitly throgh having their hash in the imports.
+    //them implicitly through having their hash in the imports.
     private var _classpathHash = {
+
       val urls = getURLs
-      if(!urls.isEmpty){
+
+      if(urls.nonEmpty){
         urls.tail.foldLeft(jarHash(urls.head)){ (oldHash,jarURL) =>
           md5Hash(Iterator(oldHash, jarHash(jarURL)))
         }

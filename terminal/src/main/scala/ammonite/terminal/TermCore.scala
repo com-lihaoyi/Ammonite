@@ -159,14 +159,14 @@ object TermCore {
       }
 
 
-      val fragHeights = calculateHeight0(rowLengths, width - prompt.length)
+      val fragHeights = calculateHeight0(rowLengths, width - noAnsiPrompt.length)
       val (cursorY, cursorX) = positionCursor(
         cursor,
         rowLengths,
         fragHeights,
-        width - prompt.length
+        width - noAnsiPrompt.length
       )
-//      Debug("nextHeight\t" + nextHeight)
+
       ansi.up(fragHeights.sum - 1)
       ansi.left(9999)
 
@@ -193,12 +193,12 @@ object TermCore {
         rowLengths
       )
 
-      val fragHeights = calculateHeight0(rowLengths, width - prompt.length)
+      val fragHeights = calculateHeight0(rowLengths, width - noAnsiPrompt.length)
       val (oldCursorY, _) = positionCursor(
         lastOffsetCursor,
         rowLengths,
         fragHeights,
-        width - prompt.length
+        width - noAnsiPrompt.length
       )
 
       def updateState(s: LazyList[Int], b: Vector[Char], c: Int): (Int, TermState) = {
