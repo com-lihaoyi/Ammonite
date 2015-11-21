@@ -241,14 +241,14 @@ object Evaluator{
                  code: String,
                  printCode: String,
                  imports: Seq[ImportData]) = s"""
-      |${importBlock(imports)}
-      |
-      |object $wrapperName{
-      |$code
-      |  def $$main() = { $printCode }
-      |  override def toString = "$wrapperName"
-      |}
-    """.stripMargin
+${importBlock(imports)}
+
+object $wrapperName{
+$code
+  def $$main() = { $printCode }
+  override def toString = "$wrapperName"
+}
+"""
 
     def cachedCompileBlock(code: String,
                            imports: Seq[ImportData],
