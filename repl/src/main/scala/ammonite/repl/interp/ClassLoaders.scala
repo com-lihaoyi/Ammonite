@@ -88,7 +88,8 @@ object SpecialClassLoader{
   *
   * http://stackoverflow.com/questions/3544614/how-is-the-control-flow-to-findclass-of
   */
-class SpecialClassLoader(parent: ClassLoader, parentHash: Array[Byte]) extends URLClassLoader(Array(), parent){
+class SpecialClassLoader(parent: ClassLoader, parentHash: Array[Byte])
+  extends URLClassLoader(Array(), parent){
   /**
     * Files which have been compiled, stored so that our special
     * classloader can get at them.
