@@ -126,39 +126,42 @@ object TermCore {
 
     val ansiRegex = "\u001B\\[[;\\d]*m".r
     val noAnsiPrompt = prompt.replaceAll("\u001B\\[[;\\d]*m", "")
-    def redrawLine(buffer: Vector[Char], cursor: Int, ups: Int) = {
+    def redrawLine(buffer: Vector[Char],
+                   cursor: Int,
+                   ups: Int,
+                   rowLengths: Seq[Int]) = {
       ansi.up(ups)
 
       ansi.left(9999)
       ansi.clearScreen(0)
-      val (transformedBuffer, cursorOffset) = displayTransform(buffer, cursor)
+
       writer.write(prompt)
       var i = 0
       var currWidth = 0
-      while(i < transformedBuffer.length){
+      while(i < buffer.length){
         if (currWidth >= width - noAnsiPrompt.length){
           writer.write(" " * noAnsiPrompt.length)
           currWidth = 0
         }
 
-        ansiRegex.findPrefixMatchOf(transformedBuffer.drop(i)) match{
+        ansiRegex.findPrefixMatchOf(buffer.drop(i)) match{
           case Some(m) =>
 //            Debug("Some(m) " + m.source + " | " + m.source.length)
-            writer.write(transformedBuffer.slice(i, i + m.end).toArray)
+            writer.write(buffer.slice(i, i + m.end).toArray)
             i += m.end
           case None =>
 //            Debug("None")
-            writer.write(transformedBuffer(i))
-            if (transformedBuffer(i) == '\n') currWidth += 9999
+            writer.write(buffer(i))
+            if (buffer(i) == '\n') currWidth += 9999
             currWidth += 1
             i += 1
         }
       }
 
-      val rowLengths = splitBuffer(buffer)
+
       val fragHeights = calculateHeight0(rowLengths, width - prompt.length)
       val (cursorY, cursorX) = positionCursor(
-        cursor + cursorOffset,
+        cursor,
         rowLengths,
         fragHeights,
         width - prompt.length
@@ -180,9 +183,15 @@ object TermCore {
       Debug("")
       Debug("readChar\t" + ups)
       val moreInputComing = reader.ready()
-      if (!moreInputComing) redrawLine(lastState.buffer, lastState.cursor, ups)
-
+      val (transformedBuffer, cursorOffset) = displayTransform(lastState.buffer, lastState.cursor)
       val rowLengths = splitBuffer(lastState.buffer)
+      if (!moreInputComing) redrawLine(
+        transformedBuffer,
+        lastState.cursor + cursorOffset,
+        ups,
+        rowLengths
+      )
+
       val fragHeights = calculateHeight0(rowLengths, width - prompt.length)
       val (oldCursorY, _) = positionCursor(lastState.cursor, rowLengths, fragHeights, width - prompt.length)
 
@@ -207,7 +216,7 @@ object TermCore {
           readChar(newState, nextUps)
 
         case Result(s) =>
-          redrawLine(lastState.buffer, lastState.buffer.length, oldCursorY)
+          redrawLine(lastState.buffer, lastState.buffer.length, oldCursorY, rowLengths)
           writer.write(10)
           writer.write(13)
           writer.flush()
