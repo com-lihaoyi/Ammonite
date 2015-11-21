@@ -29,7 +29,8 @@
         Pressing @code{[Enter]} now only submits the input if your cursor is at the bottom
       @li
         Added a powerful @sect.ref{Undo} API, letting you save your work at any point in time and return to it later.
-
+      @li
+        Compiled-code-caches are now properly invalidated when you change project-code while using Ammonite as a REPL for an existing SBT project.
 
   @sect{0.4.9}
     @ul
