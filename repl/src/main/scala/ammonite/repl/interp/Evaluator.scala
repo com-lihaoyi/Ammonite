@@ -280,15 +280,19 @@ object Evaluator{
    * in imports, so we don't need to pass them explicitly.
    */
   def cacheTag(code: String, imports: Seq[ImportData], classpathHash: Array[Byte]): String = {
-    val bytes = md5Hash(
-      md5Hash(code.getBytes) ++
-      md5Hash(imports.mkString.getBytes) ++
+    val bytes = md5Hash(Iterator(
+      md5Hash(Iterator(code.getBytes)),
+      md5Hash(imports.iterator.map(_.toString.getBytes)),
       classpathHash
-    )
+    ))
     "cache" + bytes.map("%02x".format(_)).mkString //add prefix to make sure it begins with a letter
   }
 
-  def md5Hash(data: Array[Byte]) = MessageDigest.getInstance("MD5").digest(data)
+  def md5Hash(data: Iterator[Array[Byte]]) = {
+    val digest = MessageDigest.getInstance("MD5")
+    data.foreach(digest.update)
+    digest.digest()
+  }
 
   /**
    * Classloader used to implement the jar-downloading
@@ -327,25 +331,28 @@ object Evaluator{
         .getOrElse(super.findClass(name))
     }
     def add(url: URL) = {
-      _classpathHash = md5Hash(_classpathHash ++ jarHash(url))
+      _classpathHash = md5Hash(Iterator(_classpathHash, jarHash(url)))
       addURL(url)
     }
 
     private def jarHash(url: URL) = {
+      val digest = MessageDigest.getInstance("MD5")
       val is = url.openStream
-      val baos = new java.io.ByteArrayOutputStream
       try {
-        val byteChunk = new Array[Byte](4096) 
-        var n = 0
-        n = is.read(byteChunk)
-        while (n > 0) {
-          baos.write(byteChunk, 0, n)
-          n = is.read(byteChunk)
-        }
+        val byteChunk = new Array[Byte](8192)
+        while({
+          val n = is.read(byteChunk)
+          if (n <= 0) false
+          else {
+            digest.update(byteChunk, 0, n)
+            true
+          }
+        })()
       } finally {
         if (is != null) is.close()
-      }  
-      md5Hash(baos.toByteArray())
+      }
+
+      digest.digest()
     }
 
     //we don't need to hash in classes from newFileDict, because cache tag depend on 
@@ -354,9 +361,9 @@ object Evaluator{
       val urls = getURLs
       if(!urls.isEmpty){
         urls.tail.foldLeft(jarHash(urls.head)){ (oldHash,jarURL) =>
-          md5Hash(oldHash ++ jarHash(jarURL))
+          md5Hash(Iterator(oldHash, jarHash(jarURL)))
         }
-      } else md5Hash(Array.empty)
+      } else md5Hash(Iterator())
     }
     def classpathHash: Array[Byte] = _classpathHash
   }
