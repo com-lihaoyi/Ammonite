@@ -4,12 +4,13 @@ import java.lang.reflect.InvocationTargetException
 import java.net.URL
 
 import acyclic.file
-import ammonite.repl.frontend.ReplExit
+import ammonite.repl.frontend.{Session, ReplExit}
 import ammonite.repl._
 
 import Util.{CompileCache, ClassFiles}
 
 import scala.collection.mutable
+import scala.reflect.io.{VirtualFile, AbstractFile, VirtualDirectory}
 import scala.util.Try
 
 /**
@@ -38,10 +39,8 @@ trait Evaluator{
   def processScriptBlock(code: String, scriptImports: Seq[ImportData]): Res[Evaluated]
 
   def previousImportBlock: String
-  def addJar(url: URL): Unit
-  def addPluginJar(url: URL): Unit
-  def evalClassloader: SpecialClassLoader
-  def pluginClassloader: SpecialClassLoader
+
+  def sess: Session
 
   /*
    * How many wrappers has this instance compiled
@@ -50,12 +49,13 @@ trait Evaluator{
 }
 
 object Evaluator{
+
   def apply(currentClassloader: ClassLoader,
             compile: => (Array[Byte], String => Unit) => Compiler.Output,
             startingLine: Int,
             cacheLoad: String => Option[CompileCache],
             cacheSave: (String, CompileCache) => Unit,
-            addToCompilerClasspath:  => ClassFiles => Unit): Evaluator = new Evaluator{
+            addToCompilerClasspath:  => ClassFiles => Unit): Evaluator = new Evaluator{ eval =>
 
     /**
      * Imports which are required by earlier commands to the REPL. Imports
@@ -64,7 +64,7 @@ object Evaluator{
      * map. Otherwise if you import the same name twice you get compile
      * errors instead of the desired shadowing.
      */
-    lazy val previousImports = mutable.Map.empty[String, ImportData]
+    def previousImports = frames.head.previousImports
 
     /**
      * The current line number of the REPL, used to make sure every snippet
@@ -82,14 +82,52 @@ object Evaluator{
      * Performs the conversion of our pre-compiled `Array[Byte]`s into
      * actual classes with methods we can execute.
      */
-    var evalClassloader: SpecialClassLoader = null
-    var pluginClassloader: SpecialClassLoader = null
+    def evalClassloader: SpecialClassLoader = frames.head.classloader
+    def pluginClassloader: SpecialClassLoader = frames.head.pluginClassloader
 
-    evalClassloader = new RootSpecialClassLoader(currentClassloader)
-    pluginClassloader = new RootSpecialClassLoader(currentClassloader)
+    def initialFrame = {
+      def special = new SpecialClassLoader(
+        currentClassloader,
+        SpecialClassLoader.initialClasspathHash(currentClassloader)
+      )
+      Frame(
+        special,
+        special,
+        Map.empty[String, ImportData]
+      )
+    }
+    var frames = List(initialFrame)
 
-    def addJar(url: URL) = evalClassloader.add(url)
-    def addPluginJar(url: URL) = pluginClassloader.add(url)
+    val namedFrames = mutable.Map.empty[String, List[Frame]]
+
+    object sess extends Session {
+      def frames = eval.frames
+      def newFrame = Frame(
+        new SpecialClassLoader(evalClassloader, evalClassloader.classpathHash),
+        new SpecialClassLoader(pluginClassloader, pluginClassloader.classpathHash),
+        previousImports
+      )
+      def push(name: String = "") = {
+        eval.frames = newFrame :: frames
+        if (name != "") namedFrames(name) = eval.frames
+      }
+
+      def pop() = {
+        Frame.delta(eval.frames.head, eval.frames.tail.head)
+        eval.frames = eval.frames.tail
+        if (eval.frames.length == 1) eval.frames = newFrame :: frames
+      }
+
+      def restore(name: String) = {
+        Frame.delta(eval.frames.head, namedFrames(name).head)
+        eval.frames = namedFrames(name)
+      }
+
+      def delete(name: String) = {
+        namedFrames.remove(name)
+      }
+    }
+
 
     private var _compilationCount = 0
     def compilationCount = _compilationCount
@@ -248,7 +286,8 @@ object Evaluator{
     }
 
     def update(newImports: Seq[ImportData]) = {
-      for(i <- newImports) previousImports(i.toName) = i
+      val newImportMap = for(i <- newImports) yield (i.toName -> i)
+      frames.head.previousImports = previousImports ++ newImportMap
     }
 
     def evaluationResult(wrapperName: String, imports: Seq[ImportData]) = {

@@ -53,8 +53,6 @@ class Interpreter(prompt0: Ref[String],
       |import ammonite.repl.IvyConstructor.{ArtifactIdExt, GroupIdExt}
       |""".stripMargin
 
-  val dynamicClasspath = new VirtualDirectory("(memory)", None)
-
   val SheBang= "#!"
 
   var extraJars = Seq[java.io.File]()
@@ -78,7 +76,7 @@ class Interpreter(prompt0: Ref[String],
 
     val oldClassloader = Thread.currentThread().getContextClassLoader
     try{
-      Thread.currentThread().setContextClassLoader(eval.evalClassloader)
+      Thread.currentThread().setContextClassLoader(evalClassloader)
       eval.processLine(
         code,
         s"""
@@ -224,7 +222,7 @@ class Interpreter(prompt0: Ref[String],
 
       def handleJar(jar: File) = {
         extraJars = extraJars ++ Seq(jar)
-        eval.addJar(jar.toURI.toURL)
+        evalClassloader.add(jar.toURI.toURL)
       }
 
       def apply(line: String) = processExec(line)
@@ -238,7 +236,7 @@ class Interpreter(prompt0: Ref[String],
 
       object plugin extends DefaultLoadJar {
         def handleJar(jar: File) =
-          eval.addPluginJar(jar.toURI.toURL)
+          sess.frames.head.pluginClassloader.add(jar.toURI.toURL)
       }
 
     }
@@ -282,36 +280,27 @@ class Interpreter(prompt0: Ref[String],
     def height = interp.height
 
     override def replArgs = Interpreter.this.replArgs.toVector
-  }
 
-  var compiler: Compiler = _
-  var pressy: Pressy = _
-  def init() = {
-    Timer("Interpreter init init 0")
-    compiler = Compiler(
-      Classpath.jarDeps ++ extraJars,
-      Classpath.dirDeps,
-      dynamicClasspath,
-      eval.evalClassloader,
-      eval.pluginClassloader,
-      () => pressy.shutdownPressy()
-    )
-    Timer("Interpreter init init compiler")
-    pressy = Pressy(
-      Classpath.jarDeps ++ extraJars,
-      Classpath.dirDeps,
-      dynamicClasspath,
-      eval.evalClassloader
-    )
-    Timer("Interpreter init init pressy")
-  }
+    object sess extends Session {
+      def frames = eval.sess.frames
 
+      def push(name: String) = eval.sess.push(name)
+
+      def delete(name: String) = eval.sess.delete(name)
+
+      def restore(name: String) = {
+        eval.sess.restore(name)
+        init()
+      }
+
+      def pop() = {
+        eval.sess.pop()
+        init()
+      }
+    }
+  }
 
   val mainThread = Thread.currentThread()
-  val preprocess = Preprocessor(compiler.parse)
-
-  Timer("Interpreter init Preprocess")
-
   val eval = Evaluator(
     mainThread.getContextClassLoader,
     compiler.compile,
@@ -321,8 +310,38 @@ class Interpreter(prompt0: Ref[String],
     compiler.addToClasspath
   )
 
-  eval.evalClassloader.findClassPublic("ammonite.repl.frontend.ReplBridge$")
-  val bridgeCls = eval.evalClassloader.findClassPublic("ammonite.repl.frontend.ReplBridge")
+  val dynamicClasspath = new VirtualDirectory("(memory)", None)
+  var compiler: Compiler = _
+  var pressy: Pressy = _
+  def evalClassloader = eval.sess.frames.head.classloader
+  def init() = {
+    Timer("Interpreter init init 0")
+    compiler = Compiler(
+      Classpath.jarDeps ++ extraJars,
+      Classpath.dirDeps,
+      dynamicClasspath,
+      evalClassloader,
+      eval.sess.frames.head.pluginClassloader,
+      () => pressy.shutdownPressy()
+    )
+    Timer("Interpreter init init compiler")
+    pressy = Pressy(
+      Classpath.jarDeps ++ extraJars,
+      Classpath.dirDeps,
+      dynamicClasspath,
+      evalClassloader
+    )
+    Timer("Interpreter init init pressy")
+  }
+
+
+  val preprocess = Preprocessor(compiler.parse)
+
+  Timer("Interpreter init Preprocess")
+
+
+  evalClassloader.findClassPublic("ammonite.repl.frontend.ReplBridge$")
+  val bridgeCls = evalClassloader.findClassPublic("ammonite.repl.frontend.ReplBridge")
 
   ReplAPI.initReplBridge(
     bridgeCls.asInstanceOf[Class[ReplAPIHolder]],
@@ -351,6 +370,7 @@ class Interpreter(prompt0: Ref[String],
   init()
 
   processModule(storage().loadPredef + "\n" + predef + "\n" + argString)
+  eval.sess.push()
   Timer("Interpreter init predef 0")
   init()
   Timer("Interpreter init predef 1")

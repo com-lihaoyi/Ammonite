@@ -4,14 +4,45 @@ import java.net.{URL, URLClassLoader}
 import java.security.MessageDigest
 
 import ammonite.ops.{stat, Path}
-import ammonite.repl.Util
+import ammonite.repl.{ImportData, Util}
 
 import scala.collection.mutable
+import scala.reflect.io.VirtualDirectory
 
-class RootSpecialClassLoader(parent: ClassLoader) extends SpecialClassLoader(parent){
-  //we don't need to hash in classes from newFileDict, because cache tag depend on
-  //them implicitly through having their hash in the imports.
-  def initialClasspathHash = {
+object Frame{
+  def delta(oldFrame: Frame, newFrame: Frame) = {
+    import pprint.Config.Colors._
+
+    val removedImports = oldFrame.previousImports.keySet -- newFrame.previousImports.keySet
+    if (removedImports.nonEmpty){
+      pprint.pprintln("Removed Imports")
+      pprint.pprintln(removedImports.map(Symbol(_)))
+    }
+
+    val addedImports = newFrame.previousImports.keySet -- oldFrame.previousImports.keySet
+    if (addedImports.nonEmpty){
+      pprint.pprintln("Added Imports")
+      pprint.pprintln(addedImports.map(Symbol(_)))
+    }
+
+    val removedJars = oldFrame.classloader.allJars.toSet -- newFrame.classloader.allJars.toSet
+    if (removedJars.nonEmpty){
+      pprint.pprintln("Removed Jars")
+      pprint.pprintln(removedJars)
+    }
+    val addedJars = newFrame.classloader.allJars.toSet -- oldFrame.classloader.allJars.toSet
+    if (addedJars.nonEmpty){
+      pprint.pprintln("Added Jars")
+      pprint.pprintln(addedJars)
+    }
+  }
+}
+case class Frame(classloader: SpecialClassLoader,
+                 pluginClassloader: SpecialClassLoader,
+                 var previousImports: Map[String, ImportData])
+
+object SpecialClassLoader{
+  def initialClasspathHash(classloader: ClassLoader) = {
 
     // Lol this is so hax. But it works! And is way faster than trying
     // to iterate over *every* file in the classpath, and way more
@@ -19,7 +50,7 @@ class RootSpecialClassLoader(parent: ClassLoader) extends SpecialClassLoader(par
     val allClasses = collection.mutable.Buffer.empty[Class[_]]
     val f = classOf[ClassLoader].getDeclaredField("classes")
     f.setAccessible(true)
-    var current: ClassLoader = this
+    var current: ClassLoader = classloader
     while(current != null){
       val classes = f.get(current).asInstanceOf[java.util.Vector[Class[_]]]
       import collection.JavaConversions._
@@ -28,7 +59,7 @@ class RootSpecialClassLoader(parent: ClassLoader) extends SpecialClassLoader(par
     }
     val resources = for {
       cls <- allClasses
-      res = this.getResource(cls.getName.replace(".", "/") + ".class")
+      res = classloader.getResource(cls.getName.replace(".", "/") + ".class")
       if res != null
       if res.getProtocol == "file"
     } yield res
@@ -45,17 +76,13 @@ class RootSpecialClassLoader(parent: ClassLoader) extends SpecialClassLoader(par
     )
   }
 }
-class ChildSpecialClassLoader(parent: SpecialClassLoader) extends SpecialClassLoader(parent){
-  def initialClasspathHash = parent.classpathHash
-
-}
 /**
   * Classloader used to implement the jar-downloading
   * command-evaluating logic in Ammonite.
   *
   * http://stackoverflow.com/questions/3544614/how-is-the-control-flow-to-findclass-of
   */
-abstract class SpecialClassLoader(parent: ClassLoader) extends URLClassLoader(Array(), parent){
+class SpecialClassLoader(parent: ClassLoader, parentHash: Array[Byte]) extends URLClassLoader(Array(), parent){
   /**
     * Files which have been compiled, stored so that our special
     * classloader can get at them.
@@ -110,7 +137,13 @@ abstract class SpecialClassLoader(parent: ClassLoader) extends URLClassLoader(Ar
     digest.digest()
   }
 
-  def initialClasspathHash: Array[Byte]
-  var _classpathHash = initialClasspathHash
+  def initialClasspathHash = parentHash
+  private[this] var _classpathHash = initialClasspathHash
   def classpathHash: Array[Byte] = _classpathHash
+  def allJars: Seq[URL] = {
+    this.getURLs ++ ( parent match{
+      case t: SpecialClassLoader => t.allJars
+      case _ => Nil
+    })
+  }
 }

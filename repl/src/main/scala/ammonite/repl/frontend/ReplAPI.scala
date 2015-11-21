@@ -3,9 +3,9 @@ package ammonite.repl.frontend
 import java.io.File
 
 import ammonite.ops._
-import ammonite.repl.Colors
+import ammonite.repl._
+import ammonite.repl.interp.Frame
 import pprint.{PPrinter, PPrint, Config}
-import ammonite.repl.{Colors, Ref, History}
 
 import scala.reflect.runtime.universe._
 import acyclic.file
@@ -129,8 +129,58 @@ trait ReplAPI {
                       indent: Integer = null,
                       colors: pprint.Colors = null)
                      (implicit cfg: Config = Config.Defaults.PPrintConfig): Unit
+  /**
+    * Functions that can be used to manipulate the current REPL session:
+    * check-pointing progress, reverting to earlier checkpoints, or deleting
+    * checkpoints by name.
+    *
+    * Checkpoints get pushed on a stack; by default, a saved checkpoint is
+    * accessible simply by calling `restore`. If you `save` multiple times in
+    * a row, calling `restore` multiple times will restore you to each of those
+    * checkpoints in turn. After `restore`-ing past a checkpoint, there is no
+    * way to retrieve it unless you provided a name while saving it.
+    *
+    * If you provide a name when `save`ing a checkpoint, it can later be
+    * `restore`d directly by providing the same name to `restore`, even if you
+    * already `restore`d past it.
+    *
+    * Un-named checkpoints are garbage collected, together with their
+    * classloader and associated data, when they are no longer accessible
+    * due to `restore`. Named checkpoints are kept forever; call `delete`
+    * on them if you really want them to go away.
+    */
+  def sess: Session
 }
+trait Session{
+  /**
+    * The current stack of frames
+    */
+  def frames: List[Frame]
+  /**
+    * Checkpoints your current work, placing all future work into its own
+    * classloader. If a name is provided, it can be used to quickly recover
+    * that checkpoint later.
+    */
+  def push(name: String = ""): Unit
 
+  /**
+    * Discards the last classloader, effectively reverting your session to
+    * the last `save`-ed checkpoint. If a name is provided, it instead reverts
+    * your session to the checkpoint with that name.
+    */
+  def pop(): Unit
+
+  /**
+    * Sets the current REPL session to the saved checkpoint of the same name
+    */
+  def restore(name: String): Unit
+
+  /**
+    * Deletes a named checkpoint, allowing it to be garbage collected if it
+    * is no longer accessible.
+    */
+  def delete(name: String): Unit
+}
 // End of OpsAPI
 trait LoadJar {
   /**
@@ -213,7 +263,7 @@ trait DefaultReplAPI extends FullReplAPI {
   object Internal extends Internal{
     def combinePrints(iters: Iterator[String]*) = {
       iters.toIterator
-           .filter(!_.isEmpty)
+           .filter(_.nonEmpty)
            .flatMap(Iterator("\n") ++ _)
            .drop(1)
     }
