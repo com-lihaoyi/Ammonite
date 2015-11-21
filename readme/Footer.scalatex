@@ -27,6 +27,8 @@
         Multi-line-select tab-indent (and shift-tab-dedent) now works!
       @li
         Pressing @code{[Enter]} now only submits the input if your cursor is at the bottom
+      @li
+        Added a powerful @sect.ref{Undo} API, letting you save your work at any point in time and return to it later.
 
 
   @sect{0.4.9}
