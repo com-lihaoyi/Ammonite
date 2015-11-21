@@ -216,13 +216,14 @@ object TermCore {
           writer.write(stdout)
           val (nextUps, newState) = updateState(s, b, c)
           readChar(newState, nextUps)
+
         case TermState(s, b, c) =>
           Debug("TermState c\t" + c)
           val (nextUps, newState) = updateState(s, b, c)
           readChar(newState, nextUps)
 
         case Result(s) =>
-          redrawLine(lastState.buffer, lastState.buffer.length, oldCursorY, rowLengths)
+          redrawLine(transformedBuffer, lastState.buffer.length, oldCursorY, rowLengths)
           writer.write(10)
           writer.write(13)
           writer.flush()

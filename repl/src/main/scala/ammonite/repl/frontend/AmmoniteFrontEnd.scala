@@ -142,9 +142,9 @@ case class AmmoniteFrontEnd(extraFilters: TermCore.Filter = PartialFunction.empt
             // TermCore.readLine logic
             (
               Highlighter.flattenIndices(newIndices, buffer) ++ Console.RESET,
-              cursor + displayOffset
+              displayOffset
             )
-          case _ => (Highlighter.flattenIndices(indices, buffer) ++ Console.RESET, cursor)
+          case _ => (Highlighter.flattenIndices(indices, buffer) ++ Console.RESET, 0)
         }
       }
     )

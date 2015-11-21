@@ -85,7 +85,10 @@ object GUILikeFilters {
         // delete the current selection and write the printable character.
         // If it's a special command, just cancel the current selection.
         case TS(char ~: inputs, buffer, cursor) if mark.isDefined =>
-          if (char == Alt(0) || char.toChar.isControl && char != 127 /*backspace*/) {
+          if (char.toChar.isControl &&
+              char != 127 /*backspace*/ &&
+              char != 13 /*enter*/ &&
+              char != 10 /*enter*/) {
             mark = None
             TS(char ~: inputs, buffer, cursor)
           }else{

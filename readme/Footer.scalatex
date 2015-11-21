@@ -17,6 +17,18 @@
 
 @sect{Changelog}
 
+  @sect{0.5.0}
+    @ul
+      @li
+        Fixed @hl.scala{def<tab>} auto-complete crasher
+      @li
+        Fixed input-height bug around multi-line selection that would case the prompt to fly up the console
+      @li
+        Multi-line-select tab-indent (and shift-tab-dedent) now works!
+      @li
+        Pressing @code{[Enter]} now only submits the input if your cursor is at the bottom
+
+
   @sect{0.4.9}
     @ul
       @li
