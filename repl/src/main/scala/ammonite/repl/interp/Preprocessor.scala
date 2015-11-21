@@ -145,6 +145,7 @@ object Preprocessor{
               Preprocessor.Output(code, printers)
           }
         }
+
         Res(
           allDecls.reduceOption { (a, b) =>
             Output(

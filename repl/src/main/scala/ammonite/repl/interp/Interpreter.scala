@@ -75,6 +75,7 @@ class Interpreter(prompt0: Ref[String],
                    printSnippet: Seq[String],
                    printer: Iterator[String] => Unit,
                    extraImports: Seq[ImportData] = Seq() ) = {
+
     val oldClassloader = Thread.currentThread().getContextClassLoader
     try{
       Thread.currentThread().setContextClassLoader(eval.evalClassloader)

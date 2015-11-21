@@ -68,8 +68,10 @@ class Checker {
           val expectedStripped =
             expected.stripPrefix("error: ").replaceAll(" *\n", "\n")
           val expectedRegex = createRegex(expectedStripped).r
+
           val failureStripped =
             failureMsg.replaceAll("\u001B\\[[;\\d]*m", "").replaceAll(" *\n", "\n")
+
           failLoudly(assert(!expectedRegex.findFirstIn(failureStripped).isEmpty))
         }
         printed match{
