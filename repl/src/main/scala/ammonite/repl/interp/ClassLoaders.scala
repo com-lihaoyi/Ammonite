@@ -85,7 +85,7 @@ object SpecialClassLoader{
 
           override def preVisitDirectory(dir: java.nio.file.Path, attrs: BasicFileAttributes) = {
             val name = dir.getFileName.toString
-            if (simpleNameRegex.findPrefixOf(name).contains(name)) FileVisitResult.CONTINUE
+            if (simpleNameRegex.findPrefixOf(name) == Some(name)) FileVisitResult.CONTINUE
             else FileVisitResult.SKIP_SUBTREE
           }
         }
