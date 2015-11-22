@@ -11,4 +11,5 @@ object Main {
     )
   }
   def foo() = 1
+  def bar() = "two"
 }

@@ -82,10 +82,8 @@ object Evaluator{
      */
 
     def initialFrame = {
-      def special = new SpecialClassLoader(
-        currentClassloader,
-        SpecialClassLoader.initialClasspathHash(currentClassloader)
-      )
+      val hash = SpecialClassLoader.initialClasspathHash(currentClassloader)
+      def special = new SpecialClassLoader(currentClassloader, hash)
       Frame(
         special,
         special,

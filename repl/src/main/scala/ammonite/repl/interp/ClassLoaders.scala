@@ -1,9 +1,13 @@
 package ammonite.repl.interp
 
+import java.io.IOException
 import java.net.{URL, URLClassLoader}
+import java.nio.file
+import java.nio.file.attribute.BasicFileAttributes
+import java.nio.file.{SimpleFileVisitor, FileVisitResult, FileVisitor}
 import java.security.MessageDigest
 
-import ammonite.ops.{stat, Path}
+import ammonite.ops._
 import ammonite.repl.{ImportData, Util}
 import pprint.PPrint
 
@@ -48,40 +52,64 @@ case class Frame(classloader: SpecialClassLoader,
                  var extraJars: Seq[java.io.File])
 
 object SpecialClassLoader{
-  def initialClasspathHash(classloader: ClassLoader) = {
+  val simpleNameRegex = "[a-zA-Z0-9_]+".r
 
-    // Lol this is so hax. But it works! And is way faster than trying
-    // to iterate over *every* file in the classpath, and way more
-    // convenient than trying to futz around with java agents
-    val allClasses = collection.mutable.Buffer.empty[Class[_]]
-    val f = classOf[ClassLoader].getDeclaredField("classes")
-    f.setAccessible(true)
-    var current: ClassLoader = classloader
-    while(current != null){
-      current.synchronized{
-        val classes = f.get(current).asInstanceOf[java.util.Vector[Class[_]]]
-        import collection.JavaConversions._
-        allClasses.appendAll(classes)
+  /**
+    * Stats all loose class-files in the current classpath that could
+    * conceivably be part of some package, i.e. their directory path
+    * doesn't contain any non-package-identifier segments, and aggregates
+    * their names and mtimes as a "signature" of the current classpath
+    */
+  def initialClasspathHash(classloader: ClassLoader): Array[Byte] = {
+    val allClassloaders = {
+      val all = mutable.Buffer.empty[ClassLoader]
+      var current = classloader
+      while(current != null){
+        all.append(current)
+        current = current.getParent
       }
-      current = current.getParent
+      all
     }
-    val resources = for {
-      cls <- allClasses
-      res = classloader.getResource(cls.getName.replace(".", "/") + ".class")
-      if res != null
-      if res.getProtocol == "file"
-    } yield res
 
-    Util.md5Hash(
-      for(res <- resources.distinct.iterator) yield {
-        val path = Path(java.nio.file.Paths.get(res.toURI))
-        val millis = stat(path).mtime.toMillis
-        Util.md5Hash(Iterator(
-          path.toString.getBytes,
-          (0 until 64 by 8).map(offset => (millis >> offset).toByte).toArray
-        ))
-      }
-    )
+    def findMtimes(d: file.Path): Seq[(String, Long)] = {
+      val mtimes = mutable.Buffer.empty[(String, Long)]
+      // walkFileTree is *waaaaay* faster than ls.rec!
+      // That should get fixed at some point, but for now just use it instead
+      java.nio.file.Files.walkFileTree(
+        d,
+        new SimpleFileVisitor[file.Path] {
+          override def visitFile(file: java.nio.file.Path, attrs: BasicFileAttributes) = {
+            mtimes.append(file.toString -> attrs.lastModifiedTime().toMillis)
+            FileVisitResult.CONTINUE
+          }
+
+          override def preVisitDirectory(dir: java.nio.file.Path, attrs: BasicFileAttributes) = {
+            val name = dir.getFileName.toString
+            if (simpleNameRegex.findPrefixOf(name).contains(name)) FileVisitResult.CONTINUE
+            else FileVisitResult.SKIP_SUBTREE
+          }
+        }
+      )
+      mtimes
+    }
+
+    val classpathFolders =
+      allClassloaders.collect{case cl: java.net.URLClassLoader => cl.getURLs}
+                     .flatten
+                     .filter(_.getProtocol == "file")
+                     .map(_.toURI)
+                     .map(java.nio.file.Paths.get)
+                     .filter(java.nio.file.Files.isDirectory(_))
+
+    val classFileMtimes = classpathFolders.flatMap(f => findMtimes(f))
+
+    val hashes = classFileMtimes.map{ case (name, mtime) =>
+      Util.md5Hash(Iterator(
+        name.getBytes,
+        (0 until 64 by 8).iterator.map(mtime >> _).map(_.toByte).toArray
+      ))
+    }
+    Util.md5Hash(hashes.iterator)
   }
 }
 /**
