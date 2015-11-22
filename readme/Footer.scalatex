@@ -22,7 +22,7 @@
   @sect{0.5.0}
     @ul
       @li
-        Fixed @hl.scala{def<tab>} auto-complete crasher
+        Fixed @hl.scala{def<tab>} auto-complete crasher #257, thanks to @a("Matthew Edwards", href:="https://github.com/edwardsmatt")!
       @li
         Fixed input-height bug around multi-line selection that would case the prompt to fly up the console
       @li
