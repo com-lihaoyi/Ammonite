@@ -26,7 +26,7 @@ The layout of the repository is roughly:
 - `sbt ~shell/test:run` brings up a fully-loaded shell with all filesystem utilities included: `wd`, `cd!`, autocomplete for filesystem paths, and more. This uses `readme/resources/example-predef.scala` instead of your default predef, for easier experimentation and development.
 - `sbt ~integration/test:console` brings up a console in the `integration` subproject, loading Ammonite-REPL as a test console, as described in the readme
 - `sbt ~repl/test`/`sbt ~ops/test`/`sbt ~terminal/test`  runs tests after every change. `repl/test` can be a bit slow because of the amount of code it compiles, so you may want to specify the test manually via `repl/test-only -- ammonite.repl.TestObject.path.to.test`
-- `sbt assembly` to bundle the REPL as a standalone distribution
+- `sbt repl/assembly ++2.10.5 repl/assembly` to bundle the REPL as a standalone distribution
 - `sbt +modules/publishLocal` or `+sbt modules/publishSigned` is used for publishing.
 - `sbt ~readme/run` builds the documentation inside its target folder, which you can view by opening `readme/target/scalatex/index.html` in your browser.
 - `git checkout gh-pages; cp -r readme/target/scalatex/* .; git commit -am .; git push` will deploy the generated documentation to Github Pages
