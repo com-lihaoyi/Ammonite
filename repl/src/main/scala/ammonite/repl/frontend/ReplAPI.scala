@@ -138,7 +138,7 @@ trait ReplAPI {
     * Frames get pushed on a stack; by default, a saved frame is
     * accessible simply by calling `load`. If you provide a name
     * when `save`ing a checkpoint, it can later be `load`ed directly
-    * by providing the same name to `load``
+    * by providing the same name to `load`
     *
     * Un-named checkpoints are garbage collected, together with their
     * classloader and associated data, when they are no longer accessible
@@ -199,9 +199,10 @@ object SessionChanged{
       res.flatten
   }
   def delta(oldFrame: Frame, newFrame: Frame): SessionChanged = {
+    def frameSymbols(f: Frame) = f.previousImports.keySet.map(Symbol(_))
     new SessionChanged(
-      oldFrame.previousImports.keySet.map(Symbol(_)) -- newFrame.previousImports.keySet.map(Symbol(_)),
-      newFrame.previousImports.keySet.map(Symbol(_)) -- oldFrame.previousImports.keySet.map(Symbol(_)),
+      frameSymbols(oldFrame) -- frameSymbols(newFrame),
+      frameSymbols(newFrame) -- frameSymbols(oldFrame),
       oldFrame.classloader.allJars.toSet -- newFrame.classloader.allJars.toSet,
       newFrame.classloader.allJars.toSet -- oldFrame.classloader.allJars.toSet
     )
