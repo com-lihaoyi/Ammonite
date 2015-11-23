@@ -335,8 +335,6 @@ object AdvancedTests extends TestSuite{
         @ sess.save("first z")
 
         @ sess.load("xy initialized")
-        res4: ammonite.repl.frontend.SessionChanged =
-        Removed Imports: Set('res1, 'res3, 'z)
 
         @ val z = x - y
         z: Int = -1
@@ -347,17 +345,11 @@ object AdvancedTests extends TestSuite{
         res7: Int = -1
 
         @ sess.load("first z")
-        res8: ammonite.repl.frontend.SessionChanged =
-        Removed Imports: Set('res4, 'res7, 'res6)
-        Added Imports: Set('res1)
 
         @ z
         res9: Int = 3
 
         @ sess.load("second z")
-        res10: ammonite.repl.frontend.SessionChanged =
-        Removed Imports: Set('res1, 'res8, 'res9)
-        Added Imports: Set('res4)
 
         @ z
         res11: Int = -1
