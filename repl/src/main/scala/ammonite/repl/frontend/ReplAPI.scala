@@ -7,6 +7,7 @@ import ammonite.repl._
 import ammonite.repl.interp.Frame
 import pprint.{PPrinter, PPrint, Config}
 
+import scala.collection.mutable
 import scala.reflect.runtime.universe._
 import acyclic.file
 
@@ -163,18 +164,48 @@ trait Session{
     * the last `save`-ed checkpoint. If a name is provided, it instead reverts
     * your session to the checkpoint with that name.
     */
-  def load(name: String = ""): Unit
+  def load(name: String = ""): SessionChanged
 
   /**
     * Resets you to the last save point. If you pass in `num`, it resets
     * you to that many savepoints since the last one.
     */
-  def pop(num: Int = 1): Unit
+  def pop(num: Int = 1): SessionChanged
   /**
     * Deletes a named checkpoint, allowing it to be garbage collected if it
     * is no longer accessible.
     */
   def delete(name: String): Unit
+}
+case class SessionChanged(removedImports: Set[scala.Symbol],
+                          addedImports: Set[scala.Symbol],
+                          removedJars: Set[java.net.URL],
+                          addedJars: Set[java.net.URL])
+object SessionChanged{
+  implicit val pprinter: PPrinter[SessionChanged] = PPrinter[SessionChanged]{
+    (data, config) =>
+      val output = mutable.Buffer.empty[String]
+      def printDelta[T: PPrint](name: String, d: Iterable[T]) = {
+        if (d.nonEmpty){
+          Iterator("\n", name, ": ") ++ pprint.tokenize(d)(implicitly, config)
+        }else Iterator()
+      }
+      val res = Iterator(
+        printDelta("Removed Imports", data.removedImports),
+        printDelta("Added Imports", data.addedImports),
+        printDelta("Removed Jars", data.removedJars),
+        printDelta("Added Jars", data.addedJars)
+      )
+      res.flatten
+  }
+  def delta(oldFrame: Frame, newFrame: Frame): SessionChanged = {
+    new SessionChanged(
+      oldFrame.previousImports.keySet.map(Symbol(_)) -- newFrame.previousImports.keySet.map(Symbol(_)),
+      newFrame.previousImports.keySet.map(Symbol(_)) -- oldFrame.previousImports.keySet.map(Symbol(_)),
+      oldFrame.classloader.allJars.toSet -- newFrame.classloader.allJars.toSet,
+      newFrame.classloader.allJars.toSet -- oldFrame.classloader.allJars.toSet
+    )
+  }
 }
 // End of OpsAPI
 trait LoadJar {

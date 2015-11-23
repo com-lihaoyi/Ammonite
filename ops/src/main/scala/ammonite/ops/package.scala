@@ -1,7 +1,7 @@
 package ammonite
 
 
-package object ops extends ShelloutRoots(Nil, false) with Extensions with RelPathStuff{
+package object ops extends Extensions with RelPathStuff{
   implicit val postfixOps = scala.language.postfixOps
 
   /**
@@ -46,5 +46,6 @@ package object ops extends ShelloutRoots(Nil, false) with Extensions with RelPat
 
   implicit def fileData(p: Path) = stat.full(p)
 
-  implicit class PathCallable[T <% Path](p: T) extends ShelloutRoots(List((p: Path).toString), true)
+  val % = new Command(Vector.empty, Map.empty, Shellout.executeInteractive)
+  val %% = new Command(Vector.empty, Map.empty, Shellout.executeStream)
 }

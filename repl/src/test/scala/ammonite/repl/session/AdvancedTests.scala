@@ -280,5 +280,81 @@ object AdvancedTests extends TestSuite{
         @ assert(repl.prompt() == "B")
       """)
     }
+
+    'saveLoad {
+      check.session(
+        """
+        @ val veryImportant = 1
+        veryImportant: Int = 1
+
+        @ sess.save()
+
+        @ val oopsDontWantThis = 2
+        oopsDontWantThis: Int = 2
+
+        @ load.jar(ammonite.ops.cwd/'shell/'target/"scala-2.11"/"ammonite-shell_2.11-0.5.0-SNAPSHOT.jar")
+
+        @ veryImportant
+        res4: Int = 1
+
+        @ oopsDontWantThis
+        res5: Int = 2
+
+        @ ammonite.shell.Configure
+
+        @ sess.load()
+
+        @ veryImportant
+        res8: Int = 1
+
+        @ oopsDontWantThis
+        error: not found: value oopsDontWantThis
+
+        @ ammonite.shell.Configure
+        error: object shell is not a member of package ammonite
+      """)
+    }
+    'saveLoad2{
+      check.session("""
+        @ val (x, y) = (1, 2)
+        x: Int = 1
+        y: Int = 2
+
+        @ sess.save("xy initialized")
+
+        @ val z = x + y
+        z: Int = 3
+
+        @ sess.save("first z")
+
+        @ sess.load("xy initialized")
+        res4: ammonite.repl.frontend.SessionChanged =
+        Removed Imports: Set('res1, 'res3, 'z)
+
+        @ val z = x - y
+        z: Int = -1
+
+        @ sess.save("second z")
+
+        @ z
+        res7: Int = -1
+
+        @ sess.load("first z")
+        res8: ammonite.repl.frontend.SessionChanged =
+        Removed Imports: Set('res4, 'res7, 'res6)
+        Added Imports: Set('res1)
+
+        @ z
+        res9: Int = 3
+
+        @ sess.load("second z")
+        res10: ammonite.repl.frontend.SessionChanged =
+        Removed Imports: Set('res1, 'res8, 'res9)
+        Added Imports: Set('res4)
+
+        @ z
+        res11: Int = -1
+      """)
+    }
   }
 }

@@ -309,6 +309,7 @@
 
     @p
       @hl.scala{%%} does not do this.
+
     @sect{Environment Variables}
       @p
         Ammonite lets you pass in environment variables to subprocess calls; just pass them in as named arguments when you invoke the subprocess ia @code{%} or @code{%%}:
@@ -325,8 +326,4 @@
       @p
         In Ammonite the current working directory is not a side-effect unlike in bash. Instead it is an argument to the command you are invoking. It can be passed in explicitly or implicitly.
 
-        @hl.scala
-          %(cwd) ls // explicitly
-          // or implicitly
-          import ammonite.ops.ImplicitWd._
-          %ls
+      @hl.ref(opsTests/"ShelloutTests.scala", Seq("'customWorkingDir", ""))

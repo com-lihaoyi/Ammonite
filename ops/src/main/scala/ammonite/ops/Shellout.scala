@@ -29,19 +29,14 @@ object Shellout{
  */
 case class Command[T](cmd: Vector[String],
                       envArgs: Map[String, String],
-                      execute: (Path, Command[_]) => T,
-                      blankCallsOnly: Boolean) extends Dynamic {
+                      execute: (Path, Command[_]) => T) extends Dynamic {
   def extend(cmd2: Traversable[String], envArgs2: Traversable[(String, String)]) =
-    new Command(cmd ++ cmd2, envArgs ++ envArgs2, execute, blankCallsOnly)
+    new Command(cmd ++ cmd2, envArgs ++ envArgs2, execute)
   def selectDynamic(name: String)(implicit wd: Path) = execute(wd, extend(Vector(name), Map()))
-  def opArg(op: String) = {
-    if (!blankCallsOnly) Vector(op)
-    else {
-      assert(op == "apply")
-      Vector()
-    }
-  }
+  def opArg(op: String) = if (op == "apply") Nil else Vector(op)
+
   def applyDynamic(op: String)(args: Shellable*)(implicit wd: Path): T = {
+
     execute(wd, this.extend(opArg(op) ++ args.flatMap(_.s), Map()))
   }
   def applyDynamicNamed(op: String)
@@ -86,6 +81,5 @@ object Shellable{
  * %ps 'aux
  */
 abstract class ShelloutRoots(prefix: Seq[String], blankCallsOnly: Boolean) {
-  val % = new Command(prefix.toVector, Map.empty, Shellout.executeInteractive, blankCallsOnly)
-  val %% = new Command(prefix.toVector, Map.empty, Shellout.executeStream, blankCallsOnly)
+
 }

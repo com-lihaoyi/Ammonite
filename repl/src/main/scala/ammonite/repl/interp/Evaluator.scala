@@ -3,7 +3,7 @@ package ammonite.repl.interp
 import java.lang.reflect.InvocationTargetException
 
 import acyclic.file
-import ammonite.repl.frontend.{Session, ReplExit}
+import ammonite.repl.frontend.{SessionChanged, Session, ReplExit}
 import ammonite.repl._
 
 import Util.{CompileCache, ClassFiles}
@@ -114,13 +114,15 @@ object Evaluator{
         for(i <- 0 until num){
           if (next.tail != Nil) next = next.tail
         }
-        Frame.delta(eval.frames.head, next.head)
+        val out = SessionChanged.delta(eval.frames.head, next.head)
         eval.frames = childFrame(next.head) :: next
+        out
       }
       def load(name: String = "") = {
         val next = if (name == "") eval.frames.tail else namedFrames(name)
-        Frame.delta(eval.frames.head, next.head)
+        val out = SessionChanged.delta(eval.frames.head, next.head)
         eval.frames = childFrame(next.head) :: next
+        out
       }
 
       def delete(name: String) = {

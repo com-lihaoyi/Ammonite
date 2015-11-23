@@ -37,10 +37,10 @@ object ShelloutTests extends TestSuite{
       'filebased{
         val scriptFolder = cwd/'ops/'src/'test/'resources/'scripts
 
-        assert(scriptFolder/'echo%% 'HELLO == Seq("HELLO"))
+        assert(%%(scriptFolder/'echo, 'HELLO) == Seq("HELLO"))
 
         val res: CommandResult =
-          root/'bin/'bash%%("-c", "echo 'Hello'$ENV_ARG", ENV_ARG=123)
+          %%(root/'bin/'bash, "-c", "echo 'Hello'$ENV_ARG", ENV_ARG=123)
 
         assert(res.mkString == "Hello123")
       }
@@ -48,7 +48,7 @@ object ShelloutTests extends TestSuite{
         val echoRoot = Path(%%which 'echo mkString)
         assert(echoRoot == root/'bin/'echo)
 
-        assert(echoRoot%% 'HELLO == Seq("HELLO"))
+        assert(%%(echoRoot, 'HELLO) == Seq("HELLO"))
       }
 
       'envArgs{
@@ -75,6 +75,12 @@ object ShelloutTests extends TestSuite{
       val listed2 = %%ls
 
       assert(listed2 != listed1)
+    }
+    'customWorkingDir{
+      %.ls()(cwd) // explicitly
+      // or implicitly
+      import ammonite.ops.ImplicitWd._
+      %ls
     }
   }
 }

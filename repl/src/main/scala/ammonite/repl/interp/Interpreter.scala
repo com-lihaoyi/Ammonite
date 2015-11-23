@@ -285,12 +285,14 @@ class Interpreter(prompt0: Ref[String],
       def delete(name: String) = eval.sess.delete(name)
 
       def pop(num: Int = 1) = {
-        eval.sess.pop(num)
+        val res = eval.sess.pop(num)
         init()
+        res
       }
       def load(name: String = "") = {
-        eval.sess.load(name)
+        val res = eval.sess.load(name)
         init()
+        res
       }
     }
   }

@@ -14,38 +14,6 @@ import pprint.PPrint
 import scala.collection.mutable
 import scala.reflect.io.VirtualDirectory
 
-object Frame{
-  def delta(oldFrame: Frame, newFrame: Frame) = {
-    import pprint.Config.Colors._
-    def printDelta[T: PPrint](name: String, s1: Set[T], s2: Set[T]) = {
-      val d = s1 -- s2
-      if (d.nonEmpty){
-        print(name + ":")
-        pprint.pprintln(d)
-      }
-    }
-    printDelta(
-      "Removed Imports",
-      oldFrame.previousImports.keySet.map(Symbol(_)),
-      newFrame.previousImports.keySet.map(Symbol(_))
-    )
-    printDelta(
-      "Added Imports",
-      newFrame.previousImports.keySet.map(Symbol(_)),
-      oldFrame.previousImports.keySet.map(Symbol(_))
-    )
-    printDelta(
-      "Removed Jars",
-      oldFrame.classloader.allJars.toSet,
-      newFrame.classloader.allJars.toSet
-    )
-    printDelta(
-      "Added Jars",
-      newFrame.classloader.allJars.toSet,
-      oldFrame.classloader.allJars.toSet
-    )
-  }
-}
 case class Frame(classloader: SpecialClassLoader,
                  pluginClassloader: SpecialClassLoader,
                  var previousImports: Map[String, ImportData],
