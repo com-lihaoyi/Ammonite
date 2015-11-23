@@ -19,6 +19,11 @@
 
 @sect{Changelog}
 
+  @sect{0.5.1}
+    @ul
+      @li
+        Added support for word navigation with Ctrl+Arrow in Linux (#217).
+
   @sect{0.5.0}
     @ul
       @li
