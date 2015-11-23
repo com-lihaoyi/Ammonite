@@ -33,6 +33,8 @@
         Added a powerful @sect.ref{Undo} API, letting you save your work at any point in time and return to it later.
       @li
         Compiled-code-caches are now properly invalidated when you change project-code while using Ammonite as a REPL for an existing SBT project.
+      @li
+        Simplify the way shelling to to run files as subprocesses works, and align with documentation (#234)
 
   @sect{0.4.9}
     @ul
