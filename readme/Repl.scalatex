@@ -21,7 +21,7 @@
   @img(src:="GettingStarted.png", width:="100%")
 
   @p
-    With @sect.ref{Pretty Printing}, @sect.ref{Syntax Highlighting} for input and output, @sect.ref{Artifact Loading} in-REPL, and all the other nice features!
+    With @sect.ref("Pretty-printed output", "Pretty Printing"), @sect.ref{Syntax Highlighting} for input and output, @sect.ref{Artifact Loading} in-REPL, and all the other nice features!
 
   @p
     If you want to use Ammonite as a filesystem shell, take a look at @sect.ref{Ammonite-Shell}
@@ -80,7 +80,7 @@
       @hl.ref(advancedTests, Seq("'pprint", "@"), "\"\"\"")
 
       @p
-        Ammonite-REPL uses @sect.ref{PPrint} to display its output by default. That means that everything is nicely formatted to fit within the width of the terminal, and is copy-paste-able!
+        Ammonite-REPL uses @a("PPrint", href:="http://lihaoyi.github.io/upickle-pprint/pprint/") to display its output by default. That means that everything is nicely formatted to fit within the width of the terminal, and is copy-paste-able!
 
       @p
         By default, Ammonite @sect.ref("Configurable Truncation", "truncates") the pretty-printed output to avoid flooding your terminal. If you want to disable truncation, call @hl.scala{show(...)} on your expression to pretty-print it's full output. You can also pass in an optional @hl.scala{height = ...} parameter to control how much you want to show before truncation.
@@ -323,7 +323,7 @@
         repl.prompt.bind(wd.toString + "@@ ")
 
       @p
-        As is common practice in other shells. Further modifications to make it include e.g. your current branch in Git (which you can call through Ammonite's @sect.ref("Spawning Subprocess", "subprocess API") or the current timestamp/user are similarly possible.
+        As is common practice in other shells. Further modifications to make it include e.g. your current branch in Git (which you can call through Ammonite's @sect.ref("Spawning Subprocesses", "subprocess API") or the current timestamp/user are similarly possible.
 
     @sect{Compiler Flags}
       @p

@@ -2,7 +2,7 @@
 @import readme.Sample._
 @sect("Ammonite-Shell", "Replacing Bash for the 21st Century")
   @p
-    Ammonite-Shell is a rock-solid system shell that can replace Bash as the interface to your operating system, @sect.ref("Scala as the Language", "using  Scala") as the primary command and scripting language, @sect.ref("Running on the JVM", "running on the JVM"). Apart from @sect.ref("ShellBasics", "system operations"), Ammonite-Shell provides the full-range of @sect.ref("Scala/Java APIs", "Java APIs") for usage at the command-line, including loading libraries from Maven Central.
+    Ammonite-Shell is a rock-solid system shell that can replace Bash as the interface to your operating system, @sect.ref("Scala as the Language", "using  Scala") as the primary command and scripting language, @sect.ref("Running on the JVM", "running on the JVM"). Apart from @sect.ref("Shell Basics", "system operations"), Ammonite-Shell provides the full-range of @sect.ref("Scala/Java APIs", "Java APIs") for usage at the command-line, including loading libraries from Maven Central.
 
   @p
     Why would you want to use Ammonite-Shell instead of Bash? Possible reasons include:
