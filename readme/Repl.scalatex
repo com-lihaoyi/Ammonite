@@ -122,6 +122,7 @@
         Ammonite's @hl.scala{save} and @hl.scala{load} functionality is implemented via Java class-loaders.
 
     @sect{Improved Editing}
+      @img(src:="Editing.gif", display.block, marginLeft.auto, marginRight.auto, height := 172)
       @p
         Ammonite by default ships with a custom implementation of readline, which provides...
 
