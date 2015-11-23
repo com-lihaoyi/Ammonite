@@ -50,7 +50,9 @@ class Ansi(output: Writer){
 }
 object TTY{
 
-  // Prefer standard tools
+  // Prefer standard tools. Not sure why we need to do this, but for some
+  // reason the version installed by gnu-coreutils blows up sometimes giving
+  // "unable to perform all requested operations"
   val pathedTput = if (new java.io.File("/usr/bin/tput").exists()) "/usr/bin/tput" else "tput"
   val pathedStty = if (new java.io.File("/bin/stty").exists()) "/bin/stty" else "stty"
 
