@@ -49,9 +49,14 @@ class Ansi(output: Writer){
   def clearLine(n: Int) = control(n, 'K')
 }
 object TTY{
+
+  // Prefer standard tools
+  val pathedTput = if (new java.io.File("/usr/bin/tput").exists()) "/usr/bin/tput" else "tput"
+  val pathedStty = if (new java.io.File("/bin/stty").exists()) "/bin/stty" else "stty"
+
   def consoleDim(s: String) = {
     import sys.process._
-    Seq("bash", "-c", s"tput $s 2> /dev/tty").!!.trim.toInt
+    Seq("bash", "-c", s"$pathedTput $s 2> /dev/tty").!!.trim.toInt
   }
   def init() = {
     stty("-a")
@@ -71,7 +76,7 @@ object TTY{
 
   private def sttyCmd(s: String) = {
     import sys.process._
-    Seq("bash", "-c", s"stty $s < /dev/tty"): ProcessBuilder
+    Seq("bash", "-c", s"$pathedStty $s < /dev/tty"): ProcessBuilder
   }
 
   def stty(s: String) =
