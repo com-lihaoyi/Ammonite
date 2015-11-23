@@ -292,7 +292,9 @@ object AdvancedTests extends TestSuite{
         @ val oopsDontWantThis = 2
         oopsDontWantThis: Int = 2
 
-        @ load.jar(ammonite.ops.cwd/'shell/'target/"scala-2.11"/"ammonite-shell_2.11-0.5.0-SNAPSHOT.jar")
+        @ // Let's try this new cool new library
+
+        @ load.ivy("com.lihaoyi" %% "scalatags" % "0.5.3")
 
         @ veryImportant
         res4: Int = 1
@@ -300,18 +302,23 @@ object AdvancedTests extends TestSuite{
         @ oopsDontWantThis
         res5: Int = 2
 
-        @ ammonite.shell.Configure
+        @ import scalatags.Text.all._
+
+        @ div("Hello").render
+        res7: String = "<div>Hello</div>"
+
+        @ // Oh no, maybe we don't want scalatags!
 
         @ sess.load()
 
         @ veryImportant
-        res8: Int = 1
+        res9: Int = 1
 
         @ oopsDontWantThis
         error: not found: value oopsDontWantThis
 
-        @ ammonite.shell.Configure
-        error: object shell is not a member of package ammonite
+        @ import scalatags.Text.all._
+        error: not found: value scalatags
       """)
     }
     'saveLoad2{
