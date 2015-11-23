@@ -5,6 +5,7 @@ import utest._
 import utest.framework.TestSuite
 
 object ShelloutTests extends TestSuite{
+  val scriptFolder = cwd/'ops/'src/'test/'resources/'scripts
   val tests = TestSuite {
     'implicitWd{
       import ammonite.ops.ImplicitWd._
@@ -35,7 +36,7 @@ object ShelloutTests extends TestSuite{
       }
 
       'filebased{
-        val scriptFolder = cwd/'ops/'src/'test/'resources/'scripts
+
 
         assert(%%(scriptFolder/'echo, 'HELLO) == Seq("HELLO"))
 
@@ -77,10 +78,14 @@ object ShelloutTests extends TestSuite{
       assert(listed2 != listed1)
     }
     'customWorkingDir{
-      %.ls()(cwd) // explicitly
+      val res1 = %.ls()(cwd) // explicitly
       // or implicitly
       import ammonite.ops.ImplicitWd._
-      %ls
+      val res2 = %ls
+    }
+    'fileCustomWorkingDir{
+      val output = %%.apply(scriptFolder/'echo_with_wd, 'HELLO)(root/'usr)
+      assert(output == Seq("HELLO /usr"))
     }
   }
 }
