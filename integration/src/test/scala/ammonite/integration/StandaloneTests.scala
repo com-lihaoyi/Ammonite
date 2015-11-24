@@ -16,28 +16,38 @@ import utest.framework.TestSuite
 object StandaloneTests extends TestSuite{
   // Prepare standalone executable
   val scalaVersion = scala.util.Properties.versionNumberString
+
   val tests = TestSuite {
     val ammVersion = ammonite.Constants.version
     val executableName = s"ammonite-repl-$ammVersion-$scalaVersion"
     val Seq(executable) = ls.rec! cwd |? (_.last == executableName)
-    val resources = cwd/'repl/'src/'test/'resources/'standalone
+    val replStandaloneResources = cwd/'repl/'src/'test/'resources/'standalone
+    val shellAmmoniteResources = cwd/'shell/'src/'main/'resources/'ammonite/'shell
+    //use Symbol to wrap symbols with dashes.
+    val emptyPrefdef = shellAmmoniteResources/"empty-predef.scala"
+    val exampleBarePredef = shellAmmoniteResources/"example-predef-bare.scala"
 
-    def exec(name: String) = (%%bash(executable, resources/name)).mkString("\n")
+    //we use an empty predef file here to isolate the tests from external forces.
+    def exec(name: String) = (%%bash(executable, "--predef-file", emptyPrefdef,
+      replStandaloneResources/name)).mkString("\n")
+
     'hello{
       val evaled = exec("Hello.scala")
       assert(evaled == "Hello World")
     }
+
     'complex{
       val evaled = exec("Complex.scala")
       assert(evaled.contains("Spire Interval [0, 10]"))
     }
+
     'shell{
       // make sure you can load the example-predef.scala, have it pull stuff in
       // from ivy, and make use of `cd!` and `wd` inside the executed script.
       val res = %%bash(
         executable,
         "--predef-file",
-        cwd/'shell/'src/'main/'resources/'ammonite/'shell/"example-predef-bare.scala",
+        exampleBarePredef,
         "-c",
         """val x = wd
           |@
@@ -45,6 +55,7 @@ object StandaloneTests extends TestSuite{
           |@
           |println(wd relativeTo x)""".stripMargin
       )
+
       val output = res.mkString("\n")
       assert(output == "repl/src")
     }
