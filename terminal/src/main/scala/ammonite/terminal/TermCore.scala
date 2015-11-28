@@ -183,9 +183,9 @@ object TermCore {
       Debug("")
       Debug("readChar\t" + ups)
       val moreInputComing = reader.ready()
-      val (transformedBuffer, cursorOffset) = displayTransform(lastState.buffer, lastState.cursor)
-      val lastOffsetCursor = lastState.cursor + cursorOffset
-      val rowLengths = splitBuffer(lastState.buffer)
+      lazy val (transformedBuffer, cursorOffset) = displayTransform(lastState.buffer, lastState.cursor)
+      lazy val lastOffsetCursor = lastState.cursor + cursorOffset
+      lazy val rowLengths = splitBuffer(lastState.buffer)
       if (!moreInputComing) redrawLine(
         transformedBuffer,
         lastOffsetCursor,
@@ -193,11 +193,10 @@ object TermCore {
         rowLengths
       )
 
-      val fragHeights = calculateHeight0(rowLengths, width - noAnsiPrompt.length)
-      val (oldCursorY, _) = positionCursor(
+      lazy val (oldCursorY, _) = positionCursor(
         lastOffsetCursor,
         rowLengths,
-        fragHeights,
+        calculateHeight0(rowLengths, width - noAnsiPrompt.length),
         width - noAnsiPrompt.length
       )
 
