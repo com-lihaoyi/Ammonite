@@ -33,7 +33,7 @@ object ReadlineFilters {
   // Ctrl-y     paste last cut
 
   /**
-   * Basic readline-style navigation, using all the obscure alphabet 
+   * Basic readline-style navigation, using all the obscure alphabet
    * hotkeys rather than using arrows
    */
   lazy val navFilter = orElseAll(
@@ -97,29 +97,35 @@ object ReadlineFilters {
       Case(Alt + "\u007f")((b, c, m) => cutWordLeft(b, c))
     )
   }
-  
+
 
   /**
-   * Provides history navigation up and down, saving the current line. 
+   * Provides history navigation up and down, saving the current line.
+   *
+   * Up/down will only list commands that share prefix with the last manually
+   * edited line.
    */
   case class HistoryFilter(history: () => Seq[String]) extends TermCore.DelegateFilter{
     var index = -1
     var currentHistory = Vector[Char]()
+    var currentPrefix = Vector[Char]()
+    var lastHistory = Vector[Char]()
+
+    def activeHistory: Seq[String] =
+      history().filter(cmd => !cmd.isEmpty && cmd.startsWith(currentPrefix)).distinct
 
     def swapInHistory(indexIncrement: Int)(b: Vector[Char], rest: LazyList[Int]): TermState = {
-      val newIndex = constrainIndex(index + indexIncrement)
       if (index == -1) currentHistory = b
-      index = newIndex
-      val h = if (index == -1) currentHistory else history()(index).toVector
-      TS(rest, h, h.length)
+      if (b != lastHistory) currentPrefix = b // The user manually edited b.
+      index = constrainIndex(index + indexIncrement)
+      lastHistory = if (index == -1) currentHistory else activeHistory(index).toVector
+      TS(rest, lastHistory, lastHistory.length)
     }
 
     def constrainIndex(n: Int): Int = {
-      val max = history().length - 1
+      val max = activeHistory.length - 1
       if (n < -1) -1 else if (max < n) max else n
     }
-
-
 
     val previousHistory = swapInHistory(1) _
     val nextHistory = swapInHistory(-1) _
