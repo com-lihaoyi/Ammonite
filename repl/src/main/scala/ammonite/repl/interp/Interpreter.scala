@@ -147,11 +147,12 @@ class Interpreter(prompt0: Ref[String],
         Timer("processScript loop 2")
         ev match {
           case Res.Failure(msg) => throw new CompilationError(msg)
+          case Res.Exception(throwable, msg) => throw throwable
           case Res.Success(ev) => loop(
             blocks.tail,
             imports :+ (ev.imports ++ nestedScriptImports)
           )
-          case _ => loop(blocks.tail, imports)
+          case Res.Skip => loop(blocks.tail, imports)
         }
       }
     }

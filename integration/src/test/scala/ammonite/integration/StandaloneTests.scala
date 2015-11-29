@@ -75,11 +75,20 @@ object StandaloneTests extends TestSuite{
     'args{
       'full{
         val evaled = exec("Args.scala", "3", "Moo", (cwd/'omg/'moo).toString)
-        assert(evaled.contains("Hello! MooMooMoo omg/moo"))
+        assert(evaled.contains("Hello! MooMooMoo omg/moo."))
       }
       'default{
         val evaled = exec("Args.scala", "3", "Moo")
-        assert(evaled.contains("Hello! MooMooMoo "))
+        assert(evaled.contains("Hello! MooMooMoo ."))
+      }
+      // Need a way for `%%` to capture stderr before we can specify these
+      // tests a bit more tightly; currently the error just goes to stdout
+      // and there's no way to inspect/validate it =/
+      'tooFew{
+        intercept[RuntimeException]{ exec("Args.scala", "3") }
+      }
+      'cantParse{
+        intercept[RuntimeException]{ exec("Args.scala", "foo", "moo") }
       }
     }
   }

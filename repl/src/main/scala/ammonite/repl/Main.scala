@@ -6,7 +6,8 @@ import ammonite.ops._
 
 import scala.reflect.internal.annotations.compileTimeOnly
 import scala.reflect.runtime.universe.TypeTag
-
+import language.experimental.macros
+import reflect.macros.Context
 /**
   * The various entry-points to the Ammonite repl
   */
@@ -149,17 +150,39 @@ object Main{
       val quotedKwargs =
         kwargs.mapValues(pprint.PPrinter.escape)
           .map { case (k, s) => s"""$k=arg("$s")""" }
-
-      repl.interp.replApi.load(s"""
-        |import ammonite.repl.ScriptInit.{arg, callMain, pathRead}
-        |callMain{
-        |main(${(quotedArgs ++ quotedKwargs).mkString(", ")})
-        |}
-      """.stripMargin)
+      try{
+        repl.interp.replApi.load(s"""
+          |import ammonite.repl.ScriptInit.{arg, callMain, pathRead}
+          |callMain{
+          |main(${(quotedArgs ++ quotedKwargs).mkString(", ")})
+          |}
+        """.stripMargin)
+      }catch{
+        case e: ArgParseException =>
+          // For this semi-expected invalid-argument exception, chop off the
+          // irrelevant bits of the stack trace to reveal only the part which
+          // describes how parsing failed
+          e.setStackTrace(Array())
+          e.cause.setStackTrace(e.cause.getStackTrace.takeWhile( frame =>
+            frame.getClassName != "ammonite.repl.ScriptInit$" ||
+            frame.getMethodName != "parseScriptArg"
+          ))
+          throw e
+      }
     }
   }
 }
 
+case class ArgParseException(name: String,
+                             value: String,
+                             typeName: String,
+                             cause: Throwable)
+  extends Exception(
+    "\n" +
+    s"""Cannot parse value "${pprint.PPrinter.escape(value)}" """ +
+    s"into arg `$name: $typeName`",
+    cause
+  )
 /**
   * Code used to de-serialize command-line arguments when calling an Ammonite
   * script. Basically looks for a [[scopt.Read]] for the type of each argument
@@ -168,22 +191,22 @@ object Main{
   * Needs a bit of macro magic to work.
   */
 object ScriptInit{
-  import language.experimental.macros
-  import reflect.macros.Context
-  def callMainImpl[T](c: Context)(t: c.Expr[T]): c.Expr[T] = {
-    import c.universe._
-    val apply = t.tree.asInstanceOf[Apply]
-    val paramSymbols = apply.symbol.typeSignature.asInstanceOf[MethodType].params
-    val reads = paramSymbols.zip(apply.args).map{ case (tpe, term) =>
-      term match{
-        case q"$prefix($inner)" => q"implicitly[scopt.Read[$tpe]].reads($inner)"
-        case x => x
-      }
-    }
-    c.Expr[T](q"${apply.fun}(..$reads)")
+
+  def parseScriptArg[T: scopt.Read: TypeTag](name: String, value: String) = try {
+    implicitly[scopt.Read[T]].reads(value)
+  } catch{ case e: Throwable =>
+    val typeName = implicitly[TypeTag[T]].tpe.toString
+    throw ArgParseException(name, value, typeName, e)
   }
+
+
+  /**
+    * Dummy marker method used to make the compiler happy, at least until the [[callMain]]
+    * macro swoops in and rewrites things to use the real deserialization calls to the
+    * real expected types.
+    */
   @compileTimeOnly("This is a marker function and should not exist after macro expansion")
-  def arg[T](s: String): T = ???
+  def arg(s: String): Nothing = ???
 
   /**
     * Takes the call to the main method, with [[arg]]s wrapping every argument,
@@ -191,6 +214,24 @@ object ScriptInit{
     * de-serialize them
     */
   def callMain[T](t: T): T = macro callMainImpl[T]
+
+
+  def callMainImpl[T](c: Context)(t: c.Expr[T]): c.Expr[T] = {
+    import c.universe._
+    val apply = t.tree.asInstanceOf[Apply]
+    val paramSymbols = apply.symbol.typeSignature.asInstanceOf[MethodType].params
+    val reads = paramSymbols.zip(apply.args).map{ case (param, term) =>
+      val assign = term match{
+        case q"ammonite.repl.ScriptInit.arg($inner)" =>
+
+          val newPrefix = q"ammonite.repl.ScriptInit.parseScriptArg"
+          q"$newPrefix[${param.info}](${param.name.decoded}, $inner)"
+        case x => x // This case should only be for default args, which we leave unchanged
+      }
+      assign
+    }
+    c.Expr[T](q"${apply.fun}(..$reads)")
+  }
 
   /**
     * Additional [[scopt.Read]] instance to teach it how to read Ammonite paths
