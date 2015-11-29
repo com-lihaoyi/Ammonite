@@ -19,6 +19,12 @@
 
 @sect{Changelog}
 
+  @sect{0.5.1}
+    @ul
+      @li
+        Fix performance regression causing slowness when C&Ping large snippets #274
+      @li
+        Added the ability to pass arguments to Ammonite scripts from an external command line (e.g. bash)
   @sect{0.5.0}
     @ul
       @li

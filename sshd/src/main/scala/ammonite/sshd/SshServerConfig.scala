@@ -2,7 +2,7 @@ package ammonite.sshd
 
 import acyclic.file
 import ammonite.ops.Path
-import ammonite.repl.Repl
+import ammonite.repl.{Main, Repl}
 
 /**
  * Ssh server parameters
@@ -16,7 +16,7 @@ case class SshServerConfig(address: String,
                            port: Int,
                            username:String,
                            password:String,
-                           ammoniteHome: Path = Repl.defaultAmmoniteHome,
+                           ammoniteHome: Path = Main.defaultAmmoniteHome,
                            hostKeyFile: Option[Path] = None
 ) {
   require(username.nonEmpty, "username can't be an empty string")

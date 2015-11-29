@@ -112,7 +112,9 @@ class Interpreter(prompt0: Ref[String],
   private var scriptImportCallback: Seq[ImportData] => Unit = eval.update
 
   //common stuff in proccessModule and processExec
-  def processScript(code: String, evaluate: (String, Seq[ImportData]) => Res[Evaluated]): Unit = {
+  def processScript(code: String,
+                    evaluate: (String, Seq[ImportData]) => Res[Evaluated])
+                    : Seq[ImportData] = {
     Timer("processScript 0")
     val blocks0 = Parsers.splitScript(code)
     Timer("processScript 0a")
@@ -125,17 +127,15 @@ class Interpreter(prompt0: Ref[String],
     Timer("processScript 2")
     // we store the old value, because we will reassign this in the loop
     val outerScriptImportCallback = scriptImportCallback
-    try{
-      if(!errors.isEmpty)
-        stdout(colors0().error() + errors.mkString("\n") + colors0().reset() + "\n")
-      else
-        loop(blocks.collect{ case Res.Success(o) => o }, Seq())
-    } finally {
-      scriptImportCallback = outerScriptImportCallback
-    }
-    Timer("processScript 3")
-    @tailrec def loop(blocks: Seq[Preprocessor.Output], imports: Seq[Seq[ImportData]]): Unit = {
-      if(!blocks.isEmpty){
+
+
+    @tailrec def loop(blocks: Seq[Preprocessor.Output],
+                      imports: Seq[Seq[ImportData]]): Seq[ImportData] = {
+      if(blocks.isEmpty){
+        // if we have imports to pass to the upper layer we do that
+        outerScriptImportCallback(imports.last)
+        imports.last
+      }else{
         Timer("processScript loop 0")
         // imports from scripts loaded from this script block will end up in this buffer
         val nestedScriptImports = mutable.Buffer.empty[ImportData]
@@ -147,13 +147,23 @@ class Interpreter(prompt0: Ref[String],
         Timer("processScript loop 2")
         ev match {
           case Res.Failure(msg) => throw new CompilationError(msg)
-          case Res.Success(ev) => loop(blocks.tail, imports :+ (ev.imports ++ nestedScriptImports))
+          case Res.Success(ev) => loop(
+            blocks.tail,
+            imports :+ (ev.imports ++ nestedScriptImports)
+          )
           case _ => loop(blocks.tail, imports)
         }
-      } else {
-        // if we have imports to pass to the upper layer we do that
-        imports.lastOption.foreach(outerScriptImportCallback)
       }
+    }
+    try{
+      if(errors.isEmpty) loop(blocks.collect{ case Res.Success(o) => o }, Seq())
+      else {
+        stdout(colors0().error() + errors.mkString("\n") + colors0().reset() + "\n")
+        Nil
+      }
+
+    } finally {
+      scriptImportCallback = outerScriptImportCallback
     }
   }
 
@@ -260,7 +270,8 @@ class Interpreter(prompt0: Ref[String],
                        (implicit cfg: Config = Config.Defaults.PPrintConfig) = {
 
 
-      pprint.tokenize(t, width, height, indent, colors)(implicitly[PPrint[T]], cfg).foreach(print)
+      pprint.tokenize(t, width, height, indent, colors)(implicitly[PPrint[T]], cfg)
+            .foreach(print)
       println()
     }
 

@@ -6,6 +6,7 @@ import acyclic.file
 import ammonite.repl.interp.Interpreter
 
 import scala.annotation.tailrec
+import scala.reflect.internal.annotations.compileTimeOnly
 import scala.reflect.runtime.universe.TypeTag
 import ammonite.ops._
 class Repl(input: InputStream,
@@ -111,7 +112,7 @@ object Repl{
     val clsNameString = clsName.replace("$", error+"$"+highlightError)
     val method =
       s"$error$prefixString$highlightError$clsNameString$error" +
-      s".$highlightError${f.getMethodName}$error"
+        s".$highlightError${f.getMethodName}$error"
 
     s"\t$method($src)"
   }
@@ -127,78 +128,4 @@ object Repl{
     )
     traces.mkString("\n")
   }
-  case class Config(predef: String = "",
-                    predefFile: Option[Path] = None,
-                    code: Option[String] = None,
-                    ammoniteHome: Path = defaultAmmoniteHome,
-                    file: Option[Path] = None)
-
-  def defaultAmmoniteHome = Path(System.getProperty("user.home"))/".ammonite"
-  def main(args: Array[String]) = {
-    val parser = new scopt.OptionParser[Config]("ammonite") {
-      head("ammonite", ammonite.Constants.version)
-      opt[String]('p', "predef")
-        .action((x, c) => c.copy(predef = x))
-        .text("Any commands you want to execute at the start of the REPL session")
-      opt[String]('f', "predef-file")
-        .action((x, c) => c.copy(predefFile = Some(if (x(0) == '/') Path(x) else cwd/RelPath(x))))
-        .text("Lets you load your predef from a custom location")
-      opt[String]('c', "code")
-        .action((x, c) => c.copy(code = Some(x)))
-        .text("Pass in code to be run immediately in the REPL")
-      opt[File]('h', "home")
-        .valueName("<file>")
-        .action((x, c) => c.copy(ammoniteHome = Path(x)))
-        .text("The home directory of the REPL; where it looks for config and caches")
-      arg[File]("<file>...")
-        .optional()
-        .action { (x, c) => c.copy(file = Some(Path(x))) }
-        .text("The Ammonite script file you want to execute")
-    }
-    for(c <- parser.parse(args, Config())){
-      run(c.predef, c.ammoniteHome, c.code, c.predefFile, c.file)
-    }
-  }
-
-  implicit def ammoniteReplArrowBinder[T](t: (String, T))(implicit typeTag: TypeTag[T]) = {
-    Bind(t._1, t._2)(typeTag)
-  }
-
-  def debug(replArgs: Bind[_]*): Any = {
-
-    def storage = Storage(defaultAmmoniteHome, None)
-    def repl = new Repl(
-      System.in, System.out,
-      storage = Ref(storage),
-      predef = "",
-      replArgs
-    )
-
-    repl.run()
-  }
-  def run(predef: String = "",
-          ammoniteHome: Path = defaultAmmoniteHome,
-          code: Option[String] = None,
-          predefFile: Option[Path] = None,
-          file: Option[Path] = None) = {
-
-    Timer("Repl.run Start")
-    def storage = Storage(ammoniteHome, predefFile)
-    lazy val repl = new Repl(
-      System.in, System.out,
-      storage = Ref(storage),
-      predef = predef
-    )
-    (file, code) match{
-      case (None, None) =>
-        println("Loading...")
-        repl.run()
-      case (Some(path), None) =>
-        repl.interp.replApi.load.module(path)
-      case (None, Some(code)) =>
-        repl.interp.replApi.load(code)
-    }
-    Timer("Repl.run End")
-  }
 }
-

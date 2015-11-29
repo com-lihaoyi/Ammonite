@@ -183,7 +183,10 @@ object TermCore {
       Debug("")
       Debug("readChar\t" + ups)
       val moreInputComing = reader.ready()
-      lazy val (transformedBuffer, cursorOffset) = displayTransform(lastState.buffer, lastState.cursor)
+      lazy val (transformedBuffer, cursorOffset) = displayTransform(
+        lastState.buffer,
+        lastState.cursor
+      )
       lazy val lastOffsetCursor = lastState.cursor + cursorOffset
       lazy val rowLengths = splitBuffer(lastState.buffer)
       if (!moreInputComing) redrawLine(

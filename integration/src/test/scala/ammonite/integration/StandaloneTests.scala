@@ -11,25 +11,34 @@ import utest.framework.TestSuite
  * standalone executable has a pretty different classloading environment
  * from the "run in SBT on raw class files" that the rest of the tests use.
  *
- * Need to call sbt repl/assembly beforehand to make these pass
+ * These are also the only tests that cover all the argument-parsing
+ * and configuration logic inside, which the unit tests don't cover since
+ * they call the REPL programmatically
  */
 object StandaloneTests extends TestSuite{
   // Prepare standalone executable
   val scalaVersion = scala.util.Properties.versionNumberString
-
+  println("StandaloneTests")
   val tests = TestSuite {
     val ammVersion = ammonite.Constants.version
     val executableName = s"ammonite-repl-$ammVersion-$scalaVersion"
     val Seq(executable) = ls.rec! cwd |? (_.last == executableName)
-    val replStandaloneResources = cwd/'repl/'src/'test/'resources/'standalone
+    val replStandaloneResources = cwd/'integration/'src/'test/'resources/'ammonite/'integration
     val shellAmmoniteResources = cwd/'shell/'src/'main/'resources/'ammonite/'shell
     //use Symbol to wrap symbols with dashes.
     val emptyPrefdef = shellAmmoniteResources/"empty-predef.scala"
     val exampleBarePredef = shellAmmoniteResources/"example-predef-bare.scala"
 
     //we use an empty predef file here to isolate the tests from external forces.
-    def exec(name: String) = (%%bash(executable, "--predef-file", emptyPrefdef,
-      replStandaloneResources/name)).mkString("\n")
+    def exec(name: String, args: String*) = (
+      %%bash(
+        executable,
+        "--predef-file",
+        emptyPrefdef,
+        replStandaloneResources/name,
+        args
+      )
+    ).mkString("\n")
 
     'hello{
       val evaled = exec("Hello.scala")
@@ -58,6 +67,20 @@ object StandaloneTests extends TestSuite{
 
       val output = res.mkString("\n")
       assert(output == "repl/src")
+    }
+    'main{
+      val evaled = exec("Main.scala")
+      assert(evaled.contains("Hello! 1"))
+    }
+    'args{
+      'full{
+        val evaled = exec("Args.scala", "3", "Moo", (cwd/'omg/'moo).toString)
+        assert(evaled.contains("Hello! MooMooMoo omg/moo"))
+      }
+      'default{
+        val evaled = exec("Args.scala", "3", "Moo")
+        assert(evaled.contains("Hello! MooMooMoo "))
+      }
     }
   }
 }
