@@ -22,7 +22,7 @@ object FrontEndUtils {
               .grouped(math.ceil(snippets.length * 1.0 / columns).toInt)
               .toList
 
-    ammonite.repl.Util.transpose(grouped).flatMap{
+    ammonite.repl.Util.transpose(grouped).iterator.flatMap{
       case first :+ last => first.map(_.padTo(width / columns, ' ')) :+ last :+ "\n"
     }
   }

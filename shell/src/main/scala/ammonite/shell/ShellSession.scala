@@ -31,19 +31,18 @@ case class ShellSession() extends OpsAPI {
 
 object PPrints{
 
-  implicit def lsSeqRepr: PPrint[LsSeq] = PPrint(
-    PPrinter(
-      (t: LsSeq, c: Config) =>
-        Iterator("\n", FrontEndUtils.tabulate(
-          t.map(p => Iterator(
-            PathComplete.colorPath(p),
-            pprint.tokenize(p relativeTo t.base)(implicitly, c).mkString,
-            Console.RESET
-          ).mkString),
-          FrontEndUtils.width
-        ).mkString)
-    )
-  )
+  implicit def lsSeqRepr: PPrinter[LsSeq] =
+    PPrinter { (t: LsSeq, c: Config) =>
+      val snippets = for(p <- t) yield {
+        val parts =
+          Iterator(PathComplete.colorPath(p)) ++
+          pprint.tokenize(p relativeTo t.base)(implicitly, c).mkString ++
+          Iterator(Console.RESET)
+        parts.mkString
+      }
+      Iterator("\n") ++ FrontEndUtils.tabulate(snippets,FrontEndUtils.width)
+    }
+
   def reprSection(s: String, cfg: pprint.Config) = {
     val validIdentifier = "([a-zA-Z_][a-zA-Z_0-9]+)".r
     if (validIdentifier.findFirstIn(s) == Some(s)){
