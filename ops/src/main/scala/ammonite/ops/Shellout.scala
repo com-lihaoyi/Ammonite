@@ -5,11 +5,11 @@ import scala.language.dynamics
 object Shellout{
 
   def executeInteractive(wd: Path, cmd: Command[_]) = {
-    val process = new java.lang.ProcessBuilder()
+    val builder = new java.lang.ProcessBuilder()
     import collection.JavaConversions._
-    process.environment().putAll(cmd.envArgs)
-    process.directory(new java.io.File(wd.toString))
-    process
+    builder.environment().putAll(cmd.envArgs)
+    builder.directory(new java.io.File(wd.toString))
+    builder
       .command(cmd.cmd:_*)
       .inheritIO()
       .start()
@@ -17,10 +17,34 @@ object Shellout{
 
   }
   def executeStream(wd: Path, cmd: Command[_]) = {
-    import scala.sys.process._
-    val p = Process(cmd.cmd, new java.io.File(wd.toString), cmd.envArgs.toSeq:_*)
+    val builder = new java.lang.ProcessBuilder()
+    import collection.JavaConversions._
+    builder.environment().putAll(cmd.envArgs)
+    builder.directory(new java.io.File(wd.toString))
+    val process =
+      builder
+        .command(cmd.cmd:_*)
+        .start()
+    val stdout = process.getInputStream
+    val stderr = process.getErrorStream
+    val chunks = collection.mutable.Buffer.empty[Either[Bytes, Bytes]]
+    while(process.isAlive){
+      for ((std, wrapper) <- Seq(stdout -> (Left(_: Bytes)), stderr -> (Right(_: Bytes)))){
+        while (std.available() > 0){
+          val array = new Array[Byte](std.available())
+          val actuallyRead = std.read(array)
+          chunks.append(wrapper(
+            if (actuallyRead == array.length) new Bytes(array)
+            else new Bytes(array.take(actuallyRead))
+          ))
+        }
+      }
+    }
 
-    CommandResult(p.lines)
+
+//    val p = Process(cmd.cmd, new java.io.File(wd.toString), cmd.envArgs.toSeq:_*)
+
+    CommandResult(chunks, process.exitValue())
   }
 }
 
@@ -48,17 +72,30 @@ case class Command[T](cmd: Vector[String],
   }
 }
 
+class Bytes(val array: Array[Byte]){
+  override def equals(other: Any) = other match{
+    case otherBytes: Bytes => java.util.Arrays.equals(array, otherBytes.array)
+    case _ => false
+  }
+}
 /**
  * Wrapper for the `Stream[String]` of lines returned by a subprocess
  * command, but with a better `PPrint` that makes it look like one
  * block of text for easy reading
  */
-case class CommandResult(output: Stream[String]) extends Seq[String]{
-  def iterator = output.iterator
-  def apply(idx: Int) = output(idx)
-  def length: Int = output.length
-}
+case class CommandResult(chunks: Seq[Either[Bytes, Bytes]],
+                         exitCode: Int) {
 
+  val output = StreamValue(chunks.collect{case Left(s) => s})
+  val error = StreamValue(chunks.collect{case Right(s) => s})
+
+}
+case class StreamValue(chunks: Seq[Bytes]){
+  def bytes = chunks.iterator.map(_.array).toArray.flatten
+  def string: String = string("UTF-8")
+  def string(codec: String): String = new String(bytes, codec)
+  def lines = string.lines
+}
 /**
  * An implicit wrapper defining the things that can
  * be "interpolated" directly into a subprocess call.

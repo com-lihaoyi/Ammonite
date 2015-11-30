@@ -1,6 +1,7 @@
 package test.ammonite
 
 import ammonite.ops._
+import ammonite.shell._
 
 import utest._
 

@@ -63,9 +63,13 @@ object PPrints{
   }
   implicit def commandResultRepr: PPrinter[CommandResult] =
     PPrinter[CommandResult]((x, c) =>
-      x.output.iterator.flatMap(line =>
-        Iterator("\n", c.colors.literalColor, line, c.colors.endColor)
-      )
+      x.chunks.iterator.flatMap { chunk =>
+        val (color, s) = chunk match{
+          case Left(s) => (c.colors.literalColor, s)
+          case Right(s) => (Console.RED, s)
+        }
+        Iterator("\n", color, new String(s.array), c.colors.endColor)
+      }
     )
   implicit def permissionPPrintConfig: PPrinter[PermSet] =
     PPrinter[PermSet]{ (p, c) =>
