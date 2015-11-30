@@ -7,7 +7,6 @@ package ammonite.shell
 import java.io.{InputStreamReader, BufferedReader}
 
 import ammonite.ops._
-import pprint.PPrint
 
 import scala.collection.{GenTraversableOnce, mutable}
 import scala.util.matching.Regex
@@ -37,7 +36,7 @@ object Grepper{
 }
 
 object GrepResult{
-  implicit def grepResultRepr(implicit cfg: pprint.Config) = pprint.PPrinter[GrepResult]{ (gr, c) =>
+  implicit def grepResultRepr = pprint.PPrinter[GrepResult]{ (gr, cfg) =>
     val spans = mutable.Buffer.empty[String]
     var remaining = gr.spans.toList
 
@@ -48,7 +47,7 @@ object GrepResult{
     val width = cfg.width - cfg.depth * 2
     // String: |        S   E       S    E      |
     // Cuts:   0       1 2 3 4     5 6  7 8     9
-    while(!remaining.isEmpty){
+    while(remaining.nonEmpty){
       val (firstStart, firstEnd) = remaining.head
       val (included, excluded) = remaining.partition{
         case (_, end) => end - firstStart < width
@@ -105,15 +104,6 @@ object grep {
   case class ![T: Grepper](pat: T){
     def apply[V: pprint.PPrint](str: V)(implicit c: pprint.Config) = grep.this.apply(pat, str)
   }
-}
-
-/**
- * Used to split a stream down two or three different path, e.g. to
- * print out intermediate values in the middle of a longer pipeline
- */
-object tee {
-  def apply[T, R1, R2](f1: T => R1, f2: T => R2) = (v: T) => (f1(v), f2(v))
-  def apply[T, R1, R2, R3](f1: T => R1, f2: T => R2, f3: T => R3) = (v: T) => (f1(v), f2(v), f3(v))
 }
 
 case class tail(interval: Int, prefix: Int) extends Function[Path, Iterator[String]]{

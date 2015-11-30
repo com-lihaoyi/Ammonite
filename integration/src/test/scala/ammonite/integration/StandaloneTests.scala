@@ -35,7 +35,7 @@ object StandaloneTests extends TestSuite{
         executable,
         "--predef-file",
         emptyPrefdef,
-        replStandaloneResources / name,
+        replStandaloneResources/name,
         args
       )
     }
@@ -85,11 +85,15 @@ object StandaloneTests extends TestSuite{
       // tests a bit more tightly; currently the error just goes to stdout
       // and there's no way to inspect/validate it =/
       'tooFew{
-        val errorMsg = intercept[ShelloutException]{ exec("Args.scala", "3") }.result.err.string
+        val errorMsg = intercept[ShelloutException]{
+          exec("Args.scala", "3")
+        }.result.err.string
         assert(errorMsg.contains("Unspecified value parameter s"))
       }
       'cantParse{
-        val errorMsg = intercept[ShelloutException]{ exec("Args.scala", "foo", "moo") }.result.err.string
+        val errorMsg = intercept[ShelloutException]{
+          exec("Args.scala", "foo", "moo")
+        }.result.err.string
         assert(errorMsg.contains("Cannot parse value \"foo\" into arg `i: Int`"))
         // Ensure we're properly truncating the random stuff we don't care about
         // which means that the error stack that gets printed is short-ish

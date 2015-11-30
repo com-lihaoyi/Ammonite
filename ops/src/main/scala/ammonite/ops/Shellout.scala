@@ -71,6 +71,9 @@ case class Command[T](cmd: Vector[String],
   }
 }
 
+/**
+  * Trivial wrapper arround `Array[Byte]` with sane equality and useful toString
+  */
 class Bytes(val array: Array[Byte]){
   override def equals(other: Any) = other match{
     case otherBytes: Bytes => java.util.Arrays.equals(array, otherBytes.array)
@@ -112,12 +115,17 @@ case class CommandResult(exitCode: Int,
   * loudly and won't get ignored unless intentionally caught
   */
 case class ShelloutException(result: CommandResult) extends Exception(result.toString)
+
+/**
+  * Encapsulates one of the output streams from a subprocess and provides
+  * convenience methods for accessing it in a variety of forms
+  */
 case class StreamValue(chunks: Seq[Bytes]){
   def bytes = chunks.iterator.map(_.array).toArray.flatten
   lazy val string: String = string("UTF-8")
   def string(codec: String): String = new String(bytes, codec)
-  lazy val lines: Iterator[String] = string.lines
-  def lines(codec: String): Iterator[String] = string(codec).lines
+  lazy val lines: Vector[String] = string.lines.toVector
+  def lines(codec: String): Vector[String] = string(codec).lines.toVector
 }
 /**
  * An implicit wrapper defining the things that can

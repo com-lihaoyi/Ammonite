@@ -9,61 +9,72 @@ object ShelloutTests extends TestSuite{
   val tests = TestSuite {
     'implicitWd{
       import ammonite.ops.ImplicitWd._
-      'basic{
-        val listed = (%%ls "ops/src/test/resources/testdata").out.toSet
-        val expected = Set(
-          "folder1", "folder2", "File.txt"
-        )
-        assert(listed == expected)
+      'lines{
+        val res = %%ls "ops/src/test/resources/testdata"
+        assert(res.out.lines == Seq("File.txt", "folder1", "folder2"))
+      }
+      'string{
+        val res = %%ls "ops/src/test/resources/testdata"
+        assert(res.out.string == "File.txt\nfolder1\nfolder2\n")
+      }
+      'bytes{
+        val res = %%echo "abc"
+        val listed = res.out.bytes
+//        assert(listed == "File.txt\nfolder\nfolder2\nFile.txt".getBytes)
+        listed.toSeq
       }
       'chained{
-        assert((%%git 'init).out.mkString.contains("Reinitialized existing Git repository"))
-        assert((%%git "init").out.mkString.contains("Reinitialized existing Git repository"))
-        assert((%%ls cwd).out.mkString.contains("readme.md"))
+        assert((%%git 'init).out.string.contains("Reinitialized existing Git repository"))
+        assert((%%git "init").out.string.contains("Reinitialized existing Git repository"))
+        assert((%%ls cwd).out.string.contains("readme.md"))
       }
       'basicList{
         val files = List("readme.md", "build.sbt")
-        val output = (%%ls files).out.mkString
+        val output = (%%ls files).out.string
         assert(files.forall(output.contains))
       }
       'listMixAndMatch{
         val stuff = List("I", "am", "bovine")
         val result = %%echo("Hello,", stuff, "hear me roar")
-        assert(result.out.mkString.contains("Hello, " + stuff.mkString(" ") + " hear me roar"))
+        assert(result.out.string.contains("Hello, " + stuff.mkString(" ") + " hear me roar"))
       }
       'failures{
-        intercept[RuntimeException]{ %%ls "does-not-exist" }
+        val ex = intercept[ShelloutException]{ %%ls "does-not-exist" }
+        val res: CommandResult = ex.result
+        assert(
+          res.exitCode == 1,
+          res.err.string.contains("No such file or directory")
+        )
       }
 
       'filebased{
-
-
-        assert(%%(scriptFolder/'echo, 'HELLO) == Seq("HELLO"))
+        assert(%%(scriptFolder/'echo, 'HELLO).out.lines.mkString == "HELLO")
 
         val res: CommandResult =
           %%(root/'bin/'bash, "-c", "echo 'Hello'$ENV_ARG", ENV_ARG=123)
 
-        assert(res.mkString == "Hello123")
+        assert(res.out.string.trim == "Hello123")
       }
       'filebased2{
-        val echoRoot = Path(%%which 'echo mkString)
+        val res = %%which 'echo
+        val echoRoot = Path(res.out.string.trim)
         assert(echoRoot == root/'bin/'echo)
 
-        assert(%%(echoRoot, 'HELLO) == Seq("HELLO"))
+        assert(%%(echoRoot, 'HELLO).out.lines == Seq("HELLO"))
       }
 
       'envArgs{
         val res0 = %%bash("-c", "echo \"Hello$ENV_ARG\"", ENV_ARG=12)
-        assert(res0 == Seq("Hello12"))
+        assert(res0.out.lines == Seq("Hello12"))
 
         val res1 = %%bash("-c", "echo \"Hello$ENV_ARG\"", ENV_ARG=12)
-        assert(res1 == Seq("Hello12"))
+        assert(res1.out.lines == Seq("Hello12"))
 
         val res2 = %%bash("-c", "echo 'Hello$ENV_ARG'", ENV_ARG=12)
-        assert(res2 == Seq("Hello$ENV_ARG"))
+        assert(res2.out.lines == Seq("Hello$ENV_ARG"))
 
         val res3 = %%bash("-c", "echo 'Hello'$ENV_ARG", ENV_ARG=123)
-        assert(res3 == Seq("Hello123"))
+        assert(res3.out.lines == Seq("Hello123"))
       }
 
     }
@@ -85,7 +96,7 @@ object ShelloutTests extends TestSuite{
     }
     'fileCustomWorkingDir{
       val output = %%.apply(scriptFolder/'echo_with_wd, 'HELLO)(root/'usr)
-      assert(output == Seq("HELLO /usr"))
+      assert(output.out.lines == Seq("HELLO /usr"))
     }
   }
 }

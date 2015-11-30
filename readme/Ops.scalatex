@@ -243,7 +243,27 @@
     @p
       In short, @hl.scala{%} lets you run a command as you would in bash, and dumps the output to standard-out in a similar way, returning the return-code. This lets you run @code{git} commands, edit files via @code{vim}, open @code{ssh} sessions or even start @code{SBT} or @code{Python} shells right from your Scala REPL!
     @p
-      @hl.scala{%%} on the other hand is intended for programmatic usage: rather than printing to stdout, it returns a @hl.scala{CommandResult}, which is simply a @hl.scala{Stream[String]} of the lines from the subprocess. @hl.scala{%%} throws an exception if the return-code is non-zero. The returned @hl.scala{Stream[String]} can then be used however you like.
+      @hl.scala{%%} on the other hand is intended for programmatic usage: rather than printing to stdout, it returns a @hl.scala{CommandResult}, which contains the standard output @hl.scala{.out} and standard error @hl.scala{.err} of the subprocess. These provide helper methods to retrieve the stdout or stderr as a list of lines
+
+    @hl.ref(opsTests/"ShelloutTests.scala", Seq("'lines", ""))
+
+    @p
+      Or as a single string:
+
+    @hl.ref(opsTests/"ShelloutTests.scala", Seq("'string", ""))
+
+    @p
+      Or as an array of bytes:
+
+    @hl.ref(opsTests/"ShelloutTests.scala", Seq("'bytes", ""))
+
+    @p
+      @hl.scala{%%} throws an @hl.scala{ShelloutException} containig the @hl.scala{CommandResult} if the return-code is non-zero.
+
+    @hl.ref(opsTests/"ShelloutTests.scala", Seq("'failures", ""))
+
+    @p
+      In both cases, you end up with a @hl.scala{CommandResult} can then be used however you like.
     @p
       You can also use backticks to execute commands which aren't valid Scala identifiers, e.g.
 
