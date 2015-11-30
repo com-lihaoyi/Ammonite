@@ -295,7 +295,25 @@
 
     @p
       All types, values and imports defined in scripts are available to commands entered in REPL after loading the script.
+    @sect{Script Arguments}
+      @p
+        Often when calling a script from the external command- line (e.g. Bash), you need to pass arguments to configure its behavior. With Ammonite, this is done by defining a @hl.scala{main} method, e.g.
 
+      @hl.ref(wd/'integration/'src/'test/'resources/'ammonite/'integration/"Args.scala")
+
+      @p
+        When the script is run from the command line:
+      @hl.sh
+        ~/amm Args.scala 3 Moo
+      @p
+        The top-level definitions execute first (e.g. setting @hl.scala{x}), and then the @hl.scala{main} method is called with the arguments you passed in.
+      @p
+        Default arguments behave as you would expect (i.e. they allow you to omit it when calling) and arguments are parsed using the @hl.scala{scopt.Read} typeclass, which provides parsers for primitives like @code{Int}, @code{Double}, @code{String}, as well as basic data-structures like @code{Seq}s (taken as a comma-separated list) and common types like @sect.ref{Paths}.
+      @p
+        If you pass in the wrong number of arguments, or if an argument fails to deserialize, the script will fail with an exception.
+
+      @p
+        The @hl.scala{main} method does not get automatically called when you @hl.scala{load.module} or @hl.scala{load.exec} a script from @i{within} the Ammonite REPL. It gets imported into scope like any other method or value defined in the script, and you can just call it normally.
   @sect{Configuration}
     @p
       Ammonite is configured via Scala code, that can live in the @code{~/.ammonite/predef.scala} file, passed in through SBT's @hl.scala{initialCommands}, or passed to the command-line executable as @code{--predef='...'}.
