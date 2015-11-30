@@ -224,8 +224,8 @@ object ls extends StreamableOp1[Path, Path, LsSeq] with ImplicitOp[LsSeq]{
   }
 
   object rec extends Walker(){
-    def apply(filter: Path => Boolean = _ => false,
-              preOrder: Boolean = false) = Walker(filter, preOrder)
+    def apply(skip: Path => Boolean = _ => false,
+              preOrder: Boolean = false) = Walker(skip, preOrder)
   }
   /**
    * Reads a classpath resource into memory, either as a

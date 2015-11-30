@@ -39,26 +39,11 @@ object SpecialClassLoader{
       all
     }
 
-    def findMtimes(d: file.Path): Seq[(String, Long)] = {
-      val mtimes = mutable.Buffer.empty[(String, Long)]
-      // walkFileTree is *waaaaay* faster than ls.rec!
-      // That should get fixed at some point, but for now just use it instead
-      java.nio.file.Files.walkFileTree(
-        d,
-        new SimpleFileVisitor[file.Path] {
-          override def visitFile(file: java.nio.file.Path, attrs: BasicFileAttributes) = {
-            mtimes.append(file.toString -> attrs.lastModifiedTime().toMillis)
-            FileVisitResult.CONTINUE
-          }
-
-          override def preVisitDirectory(dir: java.nio.file.Path, attrs: BasicFileAttributes) = {
-            val name = dir.getFileName.toString
-            if (simpleNameRegex.findPrefixOf(name) == Some(name)) FileVisitResult.CONTINUE
-            else FileVisitResult.SKIP_SUBTREE
-          }
-        }
-      )
-      mtimes
+    def findMtimes(d: file.Path): Seq[(Path, Long)] = {
+      def skipSuspicious(path: Path) = {
+        simpleNameRegex.findPrefixOf(path.last) == Some(path.last)
+      }
+      ls.rec(skip = skipSuspicious)! Path(d) | (x => (x, x.mtime.toMillis))
     }
 
     val classpathFolders =
@@ -73,7 +58,7 @@ object SpecialClassLoader{
 
     val hashes = classFileMtimes.map{ case (name, mtime) =>
       Util.md5Hash(Iterator(
-        name.getBytes,
+        name.toString.getBytes,
         (0 until 64 by 8).iterator.map(mtime >> _).map(_.toByte).toArray
       ))
     }

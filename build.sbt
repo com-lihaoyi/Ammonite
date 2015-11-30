@@ -189,6 +189,10 @@ lazy val integration = project
       assembly in repl,
       packageBin in (shell, Compile)
     ),
+    (console in Test) <<= (console in Test).dependsOn(
+      assembly in repl,
+      packageBin in (shell, Compile)
+    ),
     dontPublishSettings,
     initialCommands in (Test, console) := "ammonite.integration.Main.main(null)"
   )

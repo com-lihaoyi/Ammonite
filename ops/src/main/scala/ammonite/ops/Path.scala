@@ -184,9 +184,14 @@ object Path extends (String => Path){
       f.toAbsolutePath.iterator().size == f.iterator().size,
       f + " is not an absolute path"
     )
-    root/RelPath.ArrayPath(
-      f.toAbsolutePath.iterator.toArray.map(_.toString)
-    )
+    val chunks = collection.mutable.Buffer.empty[String]
+    f.toAbsolutePath.iterator.map(_.toString).foreach{
+      case "." => //do nothing
+      case ".." => chunks.remove(chunks.length-1)
+      case s => chunks.append(s)
+    }
+
+    root/RelPath.SeqPath(chunks)
   }
 
   val root = new Path(Vector())

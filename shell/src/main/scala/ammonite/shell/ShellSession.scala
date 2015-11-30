@@ -27,18 +27,6 @@ case class ShellSession() extends OpsAPI {
 
   }
   implicit def Relativizer[T](p: T)(implicit b: Path, f: T => RelPath): Path = b/f(p)
-
-  /**
-    * Records how long the given computation takes to run, returning the duration
-    * in addition to the return value of that computation
-    */
-  def time[T](t: => T) = {
-    val start = System.nanoTime()
-    val res = t
-    val end = System.nanoTime()
-
-    (res, scala.concurrent.duration.Duration.fromNanos(end - start))
-  }
 }
 
 object PPrints{

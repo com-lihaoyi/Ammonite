@@ -2,10 +2,11 @@
  * User-facing tools. Rather specific, and although they could
  * be built upon as part of a larger program, they're
  */
-package ammonite.ops
+package ammonite.shell
 
 import java.io.{InputStreamReader, BufferedReader}
 
+import ammonite.ops._
 import pprint.PPrint
 
 import scala.collection.{GenTraversableOnce, mutable}
@@ -25,7 +26,7 @@ object Grepper{
     def apply[V: pprint.PPrint](t: Regex, s: V)(implicit c: pprint.Config) = {
       val txt = pprint.tokenize(s).mkString
       val items = t.findAllIn(txt).matchData.toSeq
-      if (items.length == 0) None
+      if (items.isEmpty) None
       else{
         Some(
           new GrepResult(items.map(m => (m.start, m.end)), txt)
@@ -134,3 +135,17 @@ case class tail(interval: Int, prefix: Int) extends Function[Path, Iterator[Stri
  * or use for other things.
  */
 object tail extends tail(100, 50)
+/**
+  * Records how long the given computation takes to run, returning the duration
+  * in addition to the return value of that computation
+  */
+object time {
+
+  def apply[T](t: => T) = {
+    val start = System.nanoTime()
+    val res = t
+    val end = System.nanoTime()
+
+    (res, scala.concurrent.duration.Duration.fromNanos(end - start))
+  }
+}
