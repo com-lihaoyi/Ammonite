@@ -42,7 +42,7 @@ object ShelloutTests extends TestSuite{
         val ex = intercept[ShelloutException]{ %%ls "does-not-exist" }
         val res: CommandResult = ex.result
         assert(
-          res.exitCode == 1,
+          res.exitCode != 0,
           res.err.string.contains("No such file or directory")
         )
       }
