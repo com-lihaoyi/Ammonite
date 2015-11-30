@@ -76,10 +76,12 @@ object Internals{
 
     object lines extends StreamableOp1[Path, String, Vector[String]]{
       def materialize(src: Path, i: Iterator[String]) = i.toVector
-      def !!(arg: Path) = {
-        val is = readIn(arg)
-        val s = io.Source.fromInputStream(is)
-        new SelfClosingIterator(s.getLines, () => s.close())
+      object iter extends (Path => Iterator[String]){
+        def apply(arg: Path) = {
+          val is = readIn(arg)
+          val s = io.Source.fromInputStream(is)
+          new SelfClosingIterator(s.getLines, () => s.close())
+        }
       }
     }
     object bytes extends Function1[Path, Array[Byte]]{
@@ -117,8 +119,9 @@ object Internals{
  */
 trait StreamableOp1[T1, R, C <: Seq[R]] extends Function1[T1, C]{
   def materialize(src: T1, i: Iterator[R]): C
-  def apply(arg: T1) = materialize(arg, !!(arg))
-  def !!(arg: T1): Iterator[R]
+  def apply(arg: T1) = materialize(arg, iter(arg))
+
+  val iter: T1 => Iterator[R]
 }
 
 
@@ -171,7 +174,7 @@ object rm extends Function1[Path, Unit]{
   def apply(target: Path) = {
     // Emulate `rm -rf` functionality by ignoring non-existent files
     val files =
-      try ls.rec(target)
+      try ls.rec! target
       catch {
         case e: NoSuchFileException => Nil
         case e: NotDirectoryException => Nil
@@ -182,11 +185,6 @@ object rm extends Function1[Path, Unit]{
          .foreach(p => new File(p.toString).delete())
     new File(target.toString).delete
   }
-}
-
-object LsSeq{
-  import language.experimental.macros
-
 }
 
 /**
@@ -213,28 +211,50 @@ object ls extends StreamableOp1[Path, Path, LsSeq] with ImplicitOp[LsSeq]{
   def materialize(src: Path, i: Iterator[Path]) =
     new LsSeq(src, i.map(_ relativeTo src).toVector.sorted:_*)
 
-  def !!(arg: Path): SelfClosingIterator[Path] = {
-    import scala.collection.JavaConverters._
-    val dirStream = Files.newDirectoryStream(arg.nio)
-    new SelfClosingIterator(
-      dirStream.iterator().asScala.map(x => Path(x)),
-      () => dirStream.close()
-    )
+
+  object iter extends (Path => Iterator[Path]){
+    def apply(arg: Path) = {
+      import scala.collection.JavaConverters._
+      val dirStream = Files.newDirectoryStream(arg.nio)
+      new SelfClosingIterator(
+        dirStream.iterator().asScala.map(x => Path(x)),
+        () => dirStream.close()
+      )
+    }
   }
 
-
+  object rec extends Walker(){
+    def apply(filter: Path => Boolean = _ => false,
+              preOrder: Boolean = false) = Walker(filter, preOrder)
+  }
   /**
    * Reads a classpath resource into memory, either as a
    * string, as a Seq[String] of lines, or as a Array[Byte]
    */
-  object rec extends StreamableOp1[Path, Path, LsSeq]with ImplicitOp[LsSeq]{
+  case class Walker(skip: Path => Boolean = _ => false,
+                    preOrder: Boolean = false)
+  extends StreamableOp1[Path, Path, LsSeq] with ImplicitOp[LsSeq]{
+
     def materialize(src: Path, i: Iterator[Path]) = ls.this.materialize(src, i)
     def recursiveListFiles(p: Path): Iterator[Path] = {
-      def these = ls!! p
-      these ++ these.filter(stat(_).isDir).flatMap(recursiveListFiles)
+      def these = ls.iter! p
+      for{
+        thing <- these
+        if !skip(thing)
+        sub <- {
+          if (!stat(thing).isDir) Iterator(thing)
+          else{
+            val children = recursiveListFiles(thing)
+            if (preOrder) Iterator(thing) ++ children
+            else children ++ Iterator(thing)
+          }
+        }
+      } yield sub
     }
-    def !!(arg: Path) =
-      recursiveListFiles(arg)
+    object iter extends (Path => Iterator[Path]){
+      def apply(arg: Path) = recursiveListFiles(arg)
+    }
+
   }
 }
 

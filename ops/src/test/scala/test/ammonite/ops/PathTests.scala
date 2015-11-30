@@ -158,9 +158,13 @@ object PathTests extends TestSuite{
       'InvalidSegments{
         intercept[PathError.InvalidSegment]{root/ "core/src/test"}
         intercept[PathError.InvalidSegment]{root/ ""}
+        intercept[PathError.InvalidSegment]{root/ "."}
+        intercept[PathError.InvalidSegment]{root/ ".."}
       }
       'EmptySegment {
         intercept[PathError.InvalidSegment]('src / "")
+        intercept[PathError.InvalidSegment]('src / ".")
+        intercept[PathError.InvalidSegment]('src / "..")
       }
       'CannotRelativizeAbsAndRel{
         val abs = cwd

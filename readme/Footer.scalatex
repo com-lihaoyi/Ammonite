@@ -25,6 +25,16 @@
         Fix performance regression causing slowness when C&Ping large snippets #274
       @li
         Added the ability to pass arguments to Ammonite scripts from an external command line (e.g. bash)
+      @li
+        Iterator-returning commands like @hl.scala{ls!!} @hl.scala{ls.rec!!} and @hl.scala{read.lines!!} have been renamed @hl.scala{ls.iter!} @hl.scala{ls.rec.iter!} and @hl.scala{read.lines.iter!}, to help cut down on cryptic operators
+      @li
+        Added the @hl.scala{time(...)} command to Ammonite-Shell, roughly equivalent to the bash @code{time} command, allowing easy timing of simple commands
+      @li
+        @hl.scala{ls.rec} now exposes basic configurability of the recursion, allowing you to skip directories or controlling the pre/post-order of results
+      @li
+        @hl.scala{Path}s and @hl.scala{RelPath}s no longer permit @hl.scala{"."} or @hl.scala{".."} as a path segment
+      @li
+        @hl.scala{Path}s and @hl.scala{RelPath}s now us @hl.scala{Vector[String]} instead of @hl.scala{Seq[String]} as the @hl.scala{segments} data-structure, promising more consistent semantics
   @sect{0.5.0}
     @ul
       @li

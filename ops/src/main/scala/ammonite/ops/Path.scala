@@ -12,7 +12,7 @@ object BasePath{
     if (s.exists(BasePath.invalidChars)){
       throw PathError.InvalidSegment(s)
     }
-    if (s == "") throw new PathError.InvalidSegment("")
+    if (s == "" || s == "." || s == "..") throw new PathError.InvalidSegment(s)
   }
 
 }
@@ -61,7 +61,7 @@ trait BasePath[ThisType <: BasePath[ThisType]]{
 trait BasePathImpl[ThisType <: BasePath[ThisType]] extends BasePath[ThisType]{
   def segments: Seq[String]
 
-  def make(p: Seq[String], ups: Int): ThisType
+  protected[this] def make(p: Seq[String], ups: Int): ThisType
 
   def /(subpath: RelPath) = make(
     segments.dropRight(subpath.ups) ++ subpath.segments,
@@ -98,10 +98,10 @@ object PathError{
  * segments can only occur at the left-end of the path, and
  * are collapsed into a single number [[ups]].
  */
-case class RelPath(segments: Seq[String], ups: Int) extends BasePathImpl[RelPath]{
+case class RelPath(segments: Vector[String], ups: Int) extends BasePathImpl[RelPath]{
   require(ups >= 0)
   segments.foreach(BasePath.checkSegment)
-  def make(p: Seq[String], ups: Int) = new RelPath(p, ups + this.ups)
+  protected[this] def make(p: Seq[String], ups: Int) = new RelPath(p.toVector, ups + this.ups)
   def relativeTo(base: RelPath): RelPath = {
     if (base.ups < ups) {
       new RelPath(segments, ups + base.segments.length)
@@ -130,8 +130,8 @@ case class RelPath(segments: Seq[String], ups: Int) extends BasePathImpl[RelPath
   }
 }
 trait RelPathStuff{
-  val up = new RelPath(Nil, 1)
-  val empty = new RelPath(Nil, 0)
+  val up = new RelPath(Vector(), 1)
+  val empty = new RelPath(Vector(), 0)
   implicit class RelPathStart(p1: String){
     def /(subpath: RelPath) = empty/p1/subpath
   }
@@ -158,7 +158,7 @@ object RelPath extends RelPathStuff with (String => RelPath){
   implicit def SymPath(s: Symbol): RelPath = StringPath(s.name)
   implicit def StringPath(s: String): RelPath = {
     BasePath.checkSegment(s)
-    new RelPath(Seq(s), 0)
+    new RelPath(Vector(s), 0)
 
   }
 
@@ -189,8 +189,8 @@ object Path extends (String => Path){
     )
   }
 
-  val root = new Path(Nil)
-  val home = new Path(System.getProperty("user.home").split("/").drop(1))
+  val root = new Path(Vector())
+  val home = new Path(System.getProperty("user.home").split("/").drop(1).toVector)
   def makeTmp = java.nio.file.Files.createTempDirectory(
     java.nio.file.Paths.get(System.getProperty("java.io.tmpdir")), "ammonite"
   )
@@ -207,14 +207,14 @@ object Path extends (String => Path){
  * An absolute path on the filesystem. Note that the path is
  * normalized and cannot contain any empty, "." or ".." segments
  */
-case class Path(segments: Seq[String]) extends BasePathImpl[Path]{
+case class Path(segments: Vector[String]) extends BasePathImpl[Path]{
   segments.foreach(BasePath.checkSegment)
 
-  def make(p: Seq[String], ups: Int) = {
+  protected[this] def make(p: Seq[String], ups: Int) = {
     if (ups > 0){
       throw PathError.AbsolutePathOutsideRoot
     }
-    new Path(p)
+    new Path(p.toVector)
   }
   override def toString = "/" + segments.mkString("/")
 
