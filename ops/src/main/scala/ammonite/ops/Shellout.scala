@@ -28,7 +28,12 @@ object Shellout{
     val stdout = process.getInputStream
     val stderr = process.getErrorStream
     val chunks = collection.mutable.Buffer.empty[Either[Bytes, Bytes]]
-    while(process.isAlive || stdout.available() > 0 || stderr.available() == 0){
+    while(
+      // Process.isAlive doesn't exist on JDK 7 =/
+      util.Try(process.exitValue).isFailure ||
+      stdout.available() > 0 ||
+      stderr.available() > 0
+    ){
       for ((std, wrapper) <- Seq(stdout -> (Left(_: Bytes)), stderr -> (Right(_: Bytes)))){
         while (std.available() > 0){
           val array = new Array[Byte](std.available())
