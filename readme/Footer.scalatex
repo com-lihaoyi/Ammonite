@@ -41,7 +41,8 @@
         Cross-build for 2.10.6 #282
       @li
         Refactor of the @hl.scala{CommandResult} type being returned from the @hl.scala{%%} operator, to now properly capture the raw byte output, stdout, stderr, exit code #207
-
+      @li
+        Added a new @sect.ref{grep} command.
   @sect{0.5.0}
     @ul
       @li
@@ -58,6 +59,7 @@
         Compiled-code-caches are now properly invalidated when you change project-code while using Ammonite as a REPL for an existing SBT project.
       @li
         Simplify the way shelling to to run files as subprocesses works, and align with documentation (#234)
+
 
   @sect{0.4.9}
     @ul

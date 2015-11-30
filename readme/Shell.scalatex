@@ -354,6 +354,49 @@
     @sect{Writing/Loading Scripts}
       @p
         You can write scripts in the same way you write commants, and load them using the @hl.scala("load.script(...)") and @hl.scala("load.module(...)") methods. To read more about this, check out the documentation on @sect.ref{Script Files}.
+  @sect{Utilities}
+    @p
+      Apart from the core filesystem operations provided by @sect.ref{Ammonite-Ops}, and the Scala language functionality inherent to the @sect.ref{Ammonite-REPL}, Ammonite-Shell also provides a few utilities meant purely for interactive use. These should be familiar to anyone who has used a Bash shell.
+
+    @sect{time}
+      @compare("time ls -a", "time{ls!}")
+
+      @p
+        Just as bash provides a @code{time} command that you can use to see how long a command took to run, Ammonite-Shell provides a @hl.scala{time} function which serves the same purpose.
+      @p
+        While the bash version spits out the time in an ad-hoc table format, stuck together with the output of the command, Ammonite-Shell's @hl.scala{time} instead returns a tuple containing the expression that was evaluated, and the time taken to evaluate it.
+
+    @sect{grep}
+      @compare("ls -a . | grep re", """ls! wd || grep! "re" """)
+      @compare("ls -a . | grep re", """ls! wd |? grep! "re" """)
+
+      @p
+        Ammonite provides its own @hl.scala{grep} command, which lets you easily perform ad-hoc searches within a list.
+      @p
+        As shown above, Ammonite's @hl.scala{grep} can be used via @hl.scala{||} (@hl.scala{flatMap}) or @hl.scala{|?} (@hl.scala{filter}). In the case of @hl.scala{||}, it displays the matches found, highlighted, with some additional context before and after the match. When used with @hl.scala{|?}, it simply returns the relevant items. In general, @hl.scala{||} is useful for manual exploration, while @hl.scala{|?} is useful in scripts where you want to deal with the list of matched results later.
+      @p
+        By default, Ammonite's @hl.scala{grep} matches a string as a literal. If you want to match via a regex, append a @hl.scala{.r} to the string literal to turn it into a regex:
+
+      @compare("""ls -a . | grep -G "re[a-z]\+" """, """ls! wd || grep! "re[a-z]+".r """)
+
+      @p
+        Ammonite's @hl.scala{grep} isn't limited to "filesystem"-y things; @i{any} collection of objects can be piped through @hl.scala{grep}! For example, here's @hl.scala{grep} being used to quickly search through the JVM system properties:
+
+      @pre(ammSample(
+        """// I'm only interested in OS-related properties, show them to me!
+          |sys.props || grep! "os|OS".r""".stripMargin
+      ))
+
+      @p
+        You can even use Ammonite's @hl.scala{grep} to dig through the methods of an object, even large messy objects with far-too-many methods to go over by hand hunting for what you want:
+
+      @pre(ammSample(
+        """typeOf(compiler).members.size // Too many methods to dig through!
+          |// I forgot what I want but I think it has Raw in the name
+          |typeOf(compiler).members || grep! "Raw" """.stripMargin
+      ))
+      @p
+        In general, Ammonite's @hl.scala{grep} serves the same purpose of @code{grep} in the Bash shell: a quick and dirty way to explore large amounts of semi-structured data. You probably don't want to build your enterprise business logic on top of @hl.scala{grep}'s string matching. While you're working, though, @hl.scala{grep} can be a quick way to find items of interest in collections of things (anything!) too large to sift through by hand, when you're not yet sure exactly what you want.
 
   @sect{Design Decisions & Tradeoffs}
     @p
