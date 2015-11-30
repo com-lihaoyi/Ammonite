@@ -41,10 +41,9 @@ object Shellout{
       }
     }
 
-
-//    val p = Process(cmd.cmd, new java.io.File(wd.toString), cmd.envArgs.toSeq:_*)
-
-    CommandResult(chunks, process.exitValue())
+    val res = CommandResult(process.exitValue(), chunks)
+    if (res.exitCode == 0) res
+    else throw ShelloutException(res)
   }
 }
 
@@ -77,24 +76,48 @@ class Bytes(val array: Array[Byte]){
     case otherBytes: Bytes => java.util.Arrays.equals(array, otherBytes.array)
     case _ => false
   }
+  override def toString = new String(array)
 }
 /**
- * Wrapper for the `Stream[String]` of lines returned by a subprocess
- * command, but with a better `PPrint` that makes it look like one
- * block of text for easy reading
- */
-case class CommandResult(chunks: Seq[Either[Bytes, Bytes]],
-                         exitCode: Int) {
+  * Contains the accumulated output for the invocation of a subprocess command.
+  *
+  * Apart from the exit code, the primary data-structure is a sequence of byte
+  * chunks, tagged with [[Left]] for stdout and [[Right]] for stderr. This is
+  * interleaved roughly in the order it was emitted by the subprocess, and
+  * reflects what a user would have see if the subprocess was run manually.
+  *
+  * Derived from that, is the aggregate `out` and `err` [[StreamValue]]s,
+  * wrapping stdout/stderr respectively, and providing convenient access to
+  * the aggregate output of each stream, as bytes or strings or lines.
+  */
+case class CommandResult(exitCode: Int,
+                         chunks: Seq[Either[Bytes, Bytes]]) {
 
-  val output = StreamValue(chunks.collect{case Left(s) => s})
-  val error = StreamValue(chunks.collect{case Right(s) => s})
-
+  val out = StreamValue(chunks.collect{case Left(s) => s})
+  val err = StreamValue(chunks.collect{case Right(s) => s})
+  override def toString() = {
+    s"CommandResult $exitCode\n" +
+      chunks.iterator
+            .collect{case Left(s) => s case Right(s) => s}
+            .map(x => new String(x.array))
+            .mkString
+  }
 }
+
+/**
+  * Thrown when a shellout command results in a non-zero exit code.
+  *
+  * Doesn't contain any additional information apart from the [[CommandResult]]
+  * that is normally returned, but ensures that failures in subprocesses happen
+  * loudly and won't get ignored unless intentionally caught
+  */
+case class ShelloutException(result: CommandResult) extends Exception(result.toString)
 case class StreamValue(chunks: Seq[Bytes]){
   def bytes = chunks.iterator.map(_.array).toArray.flatten
-  def string: String = string("UTF-8")
+  lazy val string: String = string("UTF-8")
   def string(codec: String): String = new String(bytes, codec)
-  def lines = string.lines
+  lazy val lines: Iterator[String] = string.lines
+  def lines(codec: String): Iterator[String] = string(codec).lines
 }
 /**
  * An implicit wrapper defining the things that can
@@ -109,14 +132,3 @@ object Shellable{
   implicit def NumericShellable[T: Numeric](s: T): Shellable = Shellable(Seq(s.toString))
 }
 
-/**
- * Dynamic shell command execution. This allows you to run commands which
- * are not provided by Ammonite, by shelling out to bash. e.g. try
- *
- * %ls
- * %ls "/"
- * %ps 'aux
- */
-abstract class ShelloutRoots(prefix: Seq[String], blankCallsOnly: Boolean) {
-
-}

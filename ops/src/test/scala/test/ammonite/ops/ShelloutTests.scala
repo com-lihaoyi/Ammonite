@@ -10,26 +10,26 @@ object ShelloutTests extends TestSuite{
     'implicitWd{
       import ammonite.ops.ImplicitWd._
       'basic{
-        val listed = (%%ls "ops/src/test/resources/testdata").output.toSet
+        val listed = (%%ls "ops/src/test/resources/testdata").out.toSet
         val expected = Set(
           "folder1", "folder2", "File.txt"
         )
         assert(listed == expected)
       }
       'chained{
-        assert((%%git 'init).output.mkString.contains("Reinitialized existing Git repository"))
-        assert((%%git "init").output.mkString.contains("Reinitialized existing Git repository"))
-        assert((%%ls cwd).output.mkString.contains("readme.md"))
+        assert((%%git 'init).out.mkString.contains("Reinitialized existing Git repository"))
+        assert((%%git "init").out.mkString.contains("Reinitialized existing Git repository"))
+        assert((%%ls cwd).out.mkString.contains("readme.md"))
       }
       'basicList{
         val files = List("readme.md", "build.sbt")
-        val output = (%%ls files).output.mkString
+        val output = (%%ls files).out.mkString
         assert(files.forall(output.contains))
       }
       'listMixAndMatch{
         val stuff = List("I", "am", "bovine")
         val result = %%echo("Hello,", stuff, "hear me roar")
-        assert(result.output.mkString.contains("Hello, " + stuff.mkString(" ") + " hear me roar"))
+        assert(result.out.mkString.contains("Hello, " + stuff.mkString(" ") + " hear me roar"))
       }
       'failures{
         intercept[RuntimeException]{ %%ls "does-not-exist" }

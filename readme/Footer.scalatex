@@ -39,6 +39,8 @@
         Pretty-printing of the results of @hl.scala{ls!} now properly gets truncated when too large #209
       @li
         Cross-build for 2.10.6 #282
+      @li
+        Refactor of the @hl.scala{CommandResult} type being returned from the @hl.scala{%%} operator, to now properly capture the raw byte output, stdout, stderr, exit code #207
 
   @sect{0.5.0}
     @ul

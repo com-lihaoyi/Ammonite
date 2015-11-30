@@ -30,24 +30,24 @@ object StandaloneTests extends TestSuite{
     val exampleBarePredef = shellAmmoniteResources/"example-predef-bare.scala"
 
     //we use an empty predef file here to isolate the tests from external forces.
-    def exec(name: String, args: String*) = (
+    def exec(name: String, args: String*) = {
       %%bash(
         executable,
         "--predef-file",
         emptyPrefdef,
-        replStandaloneResources/name,
+        replStandaloneResources / name,
         args
       )
-    ).mkString("\n")
+    }
 
     'hello{
       val evaled = exec("Hello.scala")
-      assert(evaled == "Hello World")
+      assert(evaled.out.string == "Hello World")
     }
 
     'complex{
       val evaled = exec("Complex.scala")
-      assert(evaled.contains("Spire Interval [0, 10]"))
+      assert(evaled.out.string.contains("Spire Interval [0, 10]"))
     }
 
     'shell{
@@ -65,30 +65,36 @@ object StandaloneTests extends TestSuite{
           |println(wd relativeTo x)""".stripMargin
       )
 
-      val output = res.mkString("\n")
+      val output = res.out.string
       assert(output == "repl/src")
     }
     'main{
       val evaled = exec("Main.scala")
-      assert(evaled.contains("Hello! 1"))
+      assert(evaled.out.string.contains("Hello! 1"))
     }
     'args{
       'full{
         val evaled = exec("Args.scala", "3", "Moo", (cwd/'omg/'moo).toString)
-        assert(evaled.contains("Hello! MooMooMoo omg/moo."))
+        assert(evaled.out.string.contains("Hello! MooMooMoo omg/moo."))
       }
       'default{
         val evaled = exec("Args.scala", "3", "Moo")
-        assert(evaled.contains("Hello! MooMooMoo ."))
+        assert(evaled.out.string.contains("Hello! MooMooMoo ."))
       }
       // Need a way for `%%` to capture stderr before we can specify these
       // tests a bit more tightly; currently the error just goes to stdout
       // and there's no way to inspect/validate it =/
       'tooFew{
-        intercept[RuntimeException]{ exec("Args.scala", "3") }
+        val errorMsg = intercept[ShelloutException]{ exec("Args.scala", "3") }.result.err.string
+        assert(errorMsg.contains("Unspecified value parameter s"))
       }
       'cantParse{
-        intercept[RuntimeException]{ exec("Args.scala", "foo", "moo") }
+        val errorMsg = intercept[ShelloutException]{ exec("Args.scala", "foo", "moo") }.result.err.string
+        assert(errorMsg.contains("Cannot parse value \"foo\" into arg `i: Int`"))
+        // Ensure we're properly truncating the random stuff we don't care about
+        // which means that the error stack that gets printed is short-ish
+        assert(errorMsg.lines.length < 12)
+
       }
     }
   }
