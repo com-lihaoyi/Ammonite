@@ -42,12 +42,12 @@ object StandaloneTests extends TestSuite{
 
     'hello{
       val evaled = exec("Hello.scala")
-      assert(evaled.out.string == "Hello World")
+      assert(evaled.out.trim == "Hello World")
     }
 
     'complex{
       val evaled = exec("Complex.scala")
-      assert(evaled.out.string.contains("Spire Interval [0, 10]"))
+      assert(evaled.out.trim.contains("Spire Interval [0, 10]"))
     }
 
     'shell{
@@ -65,7 +65,7 @@ object StandaloneTests extends TestSuite{
           |println(wd relativeTo x)""".stripMargin
       )
 
-      val output = res.out.string
+      val output = res.out.trim
       assert(output == "repl/src")
     }
     'main{

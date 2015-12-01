@@ -127,8 +127,13 @@ case class ShelloutException(result: CommandResult) extends Exception(result.toS
   */
 case class StreamValue(chunks: Seq[Bytes]){
   def bytes = chunks.iterator.map(_.array).toArray.flatten
+
   lazy val string: String = string("UTF-8")
   def string(codec: String): String = new String(bytes, codec)
+
+  lazy val trim: String = string.trim
+  def trim(codec: String): String = string(codec).trim
+
   lazy val lines: Vector[String] = string.lines.toVector
   def lines(codec: String): Vector[String] = string(codec).lines.toVector
 }

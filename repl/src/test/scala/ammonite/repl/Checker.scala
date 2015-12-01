@@ -86,7 +86,7 @@ class Checker {
           val regex = createRegex(expected)
           printed match {
             case Res.Success(str) =>
-              failLoudly(assert(str.replaceAll(" *\n", "\n").matches(regex)))
+              failLoudly(assert(str.replaceAll(" *\n", "\n").trim.matches(regex)))
             case Res.Failure(failureMsg) => assert({identity(printed); identity(regex); false})
             case Res.Exception(ex, failureMsg) =>
               val trace = Repl.showException(ex, "", "", "") + "\n" +  failureMsg
