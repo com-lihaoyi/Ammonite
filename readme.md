@@ -21,11 +21,28 @@ The layout of the repository is roughly:
 
 ## Common Commands
 
+### Manual Testing
+
+Although most features should be unit tested, it's still useful to fire up a REPL from the current codebase to see things work (or not). There are a variety of shells you can spin up for testing different things:
+
 - `sbt ~terminal/test:run` is useful for manual testing the terminal interaction; it basically contains a minimal echo-anything terminal, with multiline input based on the count of open- and closed-parentheses. This lets you test all terminal interactions without all the complexity of the Scala compiler, classloaders, etc. that comes in `repl/`
 - `sbt ~repl/test:run` brings up the Ammonite-REPL using the source code in the repository, and automatically restarts it on-exit if you have made a change to the code. Useful for manual testing both of `repl/` as well as `ops/`, since you can just `import ammonite.ops._` and start using them. Note that this does not bring in filesystem utilities like the `wd` variable, `cd!` command.
 - `sbt ~shell/test:run` brings up a fully-loaded shell with all filesystem utilities included: `wd`, `cd!`, autocomplete for filesystem paths, and more. This uses `readme/resources/example-predef.scala` instead of your default predef, for easier experimentation and development.
-- `sbt ~integration/test:console` brings up a console in the `integration` subproject, loading Ammonite-REPL as a test console, as described in the readme
-- `sbt ~repl/test`/`sbt ~ops/test`/`sbt ~terminal/test`  runs tests after every change. `repl/test` can be a bit slow because of the amount of code it compiles, so you may want to specify the test manually via `repl/test-only -- ammonite.repl.TestObject.path.to.test`
+- `sbt ~integration/test:run` runs the trivial main method in the `integration` subproject, letting you manually test running Ammonite programmatically, whether through `run` or `debug`
+- `sbt ~integration/test:console` brings up a console in the `integration` subproject, loading Ammonite-REPL as a test console, as described in the readme. Similar to `integration/test:run` but useful for verifying the different classloader/execution environment we get by starting Ammonite inside the Scala REPL doesn't break things
+
+### Automated Testing
+
+While working on a arbitrary `xyz` subproject, `sbt ~xyz/test` runs tests after every change. `repl/test` can be a bit slow because of the amount of code it compiles, so you may want to specify the test manually via `repl/test-only -- ammonite.repl.TestObject.path.to.test`.
+
+- `ops/test` tests the filesystem operations, without any REPL present
+- `repl/test` tests the Ammonite-REPL, without filesystem-shell integration.
+- `terminal/test` tests the readline re-implementation: keyboard navigation, shortcuts, editing, without any filesystem/scala-repl logic
+- `shell/test` tests the integration between the standalone `ops/` and `repl/` projects: features like `cd!`/`wd`, path-completion, ops-related pretty-printing and tools
+- `integration/test` kicks off the integration tests, which bundle `repl/` and `shell/` into their respective jars and invoke them as subprocesses. Somewhat slow, but exercises all the command-line-parsing stuff that the other unit tests do not exercise, and makes sure that everything works when run from `.jar`s instead of loose class-files
+
+### Publishing
+
 - `sbt repl/assembly ++2.10.5 repl/assembly` to bundle the REPL as a standalone distribution
 - `sbt +modules/publishLocal` or `+sbt modules/publishSigned` is used for publishing.
 - `sbt ~readme/run` builds the documentation inside its target folder, which you can view by opening `readme/target/scalatex/index.html` in your browser.
