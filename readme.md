@@ -48,6 +48,20 @@ While working on a arbitrary `xyz` subproject, `sbt ~xyz/test` runs tests after 
 - `sbt ~readme/run` builds the documentation inside its target folder, which you can view by opening `readme/target/scalatex/index.html` in your browser.
 - `git checkout gh-pages; cp -r readme/target/scalatex/* .; git commit -am .; git push` will deploy the generated documentation to Github Pages
 
+## Issue Tags
+
+I've started tagging open issues in the issue tracker to try and keep thigns neat. This is what the various tags mean:
+
+Each issue should only have one of these:
+
+- `bug`: this behavior clearly wrong, and needs to be fixed
+- `enhancement`: something relatively speccable, that can be worked on, finished, and will make Ammonite better
+- `wishlist`: could be totally awesome, but we're uncertain if it is worth doing at all, or if it will ever reach a "finished" state.
+
+And possibly:
+
+- `help wanted`: I don't have context, hardware, or for some other reason am unlikely to ever do this. But I know people out there care, so one of you should step up and fix it.
+
 ## Contribution Guidelines
 
 - **All code PRs should come with**: a meaningful description, inline-comments for important things, unit tests (positive and negative), and a green build in [CI](https://travis-ci.org/lihaoyi/Ammonite)
