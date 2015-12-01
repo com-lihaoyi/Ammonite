@@ -50,7 +50,7 @@ While working on a arbitrary `xyz` subproject, `sbt ~xyz/test` runs tests after 
 
 ## Issue Tags
 
-I've started tagging open issues in the issue tracker to try and keep thigns neat. This is what the various tags mean:
+I've started tagging open issues in the issue tracker to try and keep things neat. This is what the various tags mean:
 
 Each issue should only have one of these:
 
