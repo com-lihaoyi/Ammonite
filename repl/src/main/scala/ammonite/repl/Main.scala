@@ -225,7 +225,7 @@ object ScriptInit{
         case q"ammonite.repl.ScriptInit.arg($inner)" =>
 
           val newPrefix = q"ammonite.repl.ScriptInit.parseScriptArg"
-          q"$newPrefix[${param.info}](${param.name.decoded}, $inner)"
+          q"$newPrefix[${param.typeSignature}](${param.name.decoded}, $inner)"
         case x => x // This case should only be for default args, which we leave unchanged
       }
       assign
