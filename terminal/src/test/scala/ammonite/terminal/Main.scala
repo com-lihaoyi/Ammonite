@@ -3,6 +3,9 @@ package ammonite.terminal
 import java.io.OutputStreamWriter
 
 
+import ammonite.terminal.LazyList.~:
+import ammonite.terminal.TermState
+
 import scala.annotation.tailrec
 
 
@@ -18,7 +21,10 @@ object Main{
   def main(args: Array[String]): Unit = {
     var history = List.empty[String]
     val selection = GUILikeFilters.SelectionFilter(indent = 4)
-
+    def multilineFilter: TermCore.Filter = {
+      case TermState(13 ~: rest, b, c) if b.count(_ == '(') != b.count(_ == ')') =>
+        BasicFilters.injectNewLine(b, c, rest)
+    }
     val reader = new java.io.InputStreamReader(System.in)
     rec()
     @tailrec def rec(): Unit = {
@@ -26,6 +32,7 @@ object Main{
         Console.MAGENTA + "@ " + Console.RESET,
         reader,
         new OutputStreamWriter(System.out),
+        multilineFilter orElse
         selection orElse
         BasicFilters.tabFilter(4) orElse
         GUILikeFilters.altFilter orElse

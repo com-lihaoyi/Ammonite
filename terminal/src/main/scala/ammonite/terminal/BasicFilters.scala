@@ -11,7 +11,6 @@ import ammonite.terminal.TermCore.Filter
  */
 object BasicFilters {
   def all = {
-    multilineFilter orElse
     navFilter orElse
     exitFilter orElse
     enterFilter orElse
@@ -24,10 +23,7 @@ object BasicFilters {
     val (first, last) = b.splitAt(c)
     TermState(rest, (first :+ '\n') ++ last, c + 1)
   }
-  def multilineFilter: TermCore.Filter = {
-    case TS(13 ~: rest, b, c) if b.count(_ == '(') != b.count(_ == ')') =>
-      injectNewLine(b, c, rest)
-  }
+
 
   def navFilter = orElseAll(
     Case(Up)((b, c, m) => moveUp(b, c, m.width)),
