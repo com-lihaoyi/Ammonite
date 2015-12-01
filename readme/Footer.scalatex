@@ -43,6 +43,9 @@
         Refactor of the @hl.scala{CommandResult} type being returned from the @hl.scala{%%} operator, to now properly capture the raw byte output, stdout, stderr, exit code #207
       @li
         Added a new @sect.ref{grep} command.
+      @li
+        Added support for word navigation with Ctrl+Arrow in Linux (#217), thanks to @a("Ian McIntosh", href:="https://github.com/cranst0n")
+
   @sect{0.5.0}
     @ul
       @li
