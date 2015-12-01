@@ -56,7 +56,7 @@ Each issue should only have one of these:
 
 - `bug`: this behavior clearly wrong, and needs to be fixed
 - `enhancement`: something relatively speccable, that can be worked on, finished, and will make Ammonite better
-- `wishlist`: could be totally awesome, but we're uncertain if it is worth doing at all, or if it will ever reach a "finished" state.
+- `wishlist`: could be totally awesome, but we're uncertain if it is worth doing at all, what it would look like, or if it will ever reach a "finished" state.
 
 And possibly:
 
