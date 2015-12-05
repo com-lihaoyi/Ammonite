@@ -1,8 +1,7 @@
 package ammonite.terminal
-import acyclic.file
-import FilterTools._
+import ammonite.terminal.FilterTools._
 import ammonite.terminal.LazyList._
-import SpecialKeys._
+import ammonite.terminal.SpecialKeys._
 /**
  * Filters for injection of readline-specific hotkeys, the sort that
  * are available in bash, python and most other interactive command-lines
@@ -58,6 +57,11 @@ object ReadlineFilters {
     def cutCharLeft(b: Vector[Char], c: Int) = {
       /* Do not edit current cut. Zsh(zle) & Bash(readline) do not edit the yank ring for Ctrl-h */
       (b patch(from = c - 1, patch = Nil, replaced = 1), c - 1)
+    }
+
+    def cutCharCursor(b: Vector[Char], c: Int) = {
+      /* Do not edit current cut. Zsh(zle) & Bash(readline) do not edit the yank ring for Ctrl-h */
+      (b patch(from = c, patch = Nil, replaced = 1), c)
     }
 
     def cutAllLeft(b: Vector[Char], c: Int) = {

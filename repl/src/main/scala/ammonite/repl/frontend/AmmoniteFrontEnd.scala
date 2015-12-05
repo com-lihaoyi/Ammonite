@@ -1,12 +1,11 @@
 package ammonite.repl.frontend
 
-import java.io.{OutputStreamWriter, OutputStream, InputStream}
+import java.io.{InputStream, OutputStream, OutputStreamWriter}
 
 import ammonite.repl._
 import ammonite.terminal.LazyList.~:
 import ammonite.terminal._
 import fastparse.core.Result
-import scala.annotation.tailrec
 
 case class AmmoniteFrontEnd(extraFilters: TermCore.Filter = PartialFunction.empty) extends FrontEnd{
 
@@ -46,8 +45,6 @@ case class AmmoniteFrontEnd(extraFilters: TermCore.Filter = PartialFunction.empt
                history: Seq[String]) = {
     Timer("AmmoniteFrontEnd.readLine start")
     val writer = new OutputStreamWriter(output)
-
-    import ammonite.ops._
 
     val autocompleteFilter: TermCore.Filter = {
       case TermInfo(TermState(9 ~: rest, b, c), width) =>
@@ -90,12 +87,15 @@ case class AmmoniteFrontEnd(extraFilters: TermCore.Filter = PartialFunction.empt
     }
 
     val historyFilter = ReadlineFilters.HistoryFilter(() => history.reverse)
+    val viHistoryFilter = VIFilters.VIHistoryFilter(history)
     val cutPasteFilter = ReadlineFilters.CutPasteFilter()
     val selectionFilter = GUILikeFilters.SelectionFilter(indent = 2)
 
     val allFilters =
       extraFilters orElse
       selectionFilter orElse
+      VIFilters.viFilter orElse
+      viHistoryFilter orElse
       GUILikeFilters.altFilter orElse
       GUILikeFilters.fnFilter orElse
       ReadlineFilters.navFilter orElse

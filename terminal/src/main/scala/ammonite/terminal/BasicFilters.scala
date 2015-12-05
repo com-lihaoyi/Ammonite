@@ -1,8 +1,7 @@
 package ammonite.terminal
-import acyclic.file
+import ammonite.terminal.FilterTools._
 import ammonite.terminal.LazyList._
-import FilterTools._
-import SpecialKeys._
+import ammonite.terminal.SpecialKeys._
 import ammonite.terminal.TermCore.Filter
 
 /**
@@ -68,6 +67,8 @@ object BasicFilters {
       val (first, last) = b.splitAt(c)
       TS(rest, first.dropRight(1) ++ last, c - 1)
 
+    case TS(char ~: rest, b, c) if VIFilters.VISUAL_MODE =>
+      TS(rest, b, c)
     case TS(char ~: rest, b, c) =>
 //      Debug("NORMAL CHAR " + char)
       val (first, last) = b.splitAt(c)
