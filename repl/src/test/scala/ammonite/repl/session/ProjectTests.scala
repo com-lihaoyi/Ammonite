@@ -130,10 +130,10 @@ object ProjectTests extends TestSuite{
           res1: Int = 1
 
           @ ExprCtx.Parened.parse("1 + 1") // for some reason the tuple isn't pprinted
-          res2: fastparse.core.Result[Unit] = Failure("(":1:1 ..."1 + 1")
+          res2: fastparse.core.Parsed[Unit] = Failure("(":1:1 ..."1 + 1")
 
           @ ExprCtx.Parened.parse("(1 + 1)")
-          res3: fastparse.core.Result[Unit] = Success((),7)
+          res3: fastparse.core.Parsed[Unit] = Success((),7)
         """)
     }
 
