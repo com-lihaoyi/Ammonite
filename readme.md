@@ -46,7 +46,7 @@ While working on a arbitrary `xyz` subproject, `sbt ~xyz/test` runs tests after 
 - `sbt repl/assembly ++2.10.5 repl/assembly` to bundle the REPL as a standalone distribution
 - `sbt +modules/publishLocal` or `+sbt modules/publishSigned` is used for publishing.
 - `sbt ~readme/run` builds the documentation inside its target folder, which you can view by opening `readme/target/scalatex/index.html` in your browser.
-- `git checkout gh-pages; cp -r readme/target/scalatex/* .; git commit -am .; git push` will deploy the generated documentation to Github Pages
+- `git checkout gh-pages && cp -r readme/target/scalatex/* . && git commit -am . && git push` will deploy the generated documentation to Github Pages
 
 ## Issue Tags
 
