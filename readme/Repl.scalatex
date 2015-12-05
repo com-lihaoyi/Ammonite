@@ -35,7 +35,7 @@
   @hl.scala
     libraryDependencies += "com.lihaoyi" % "ammonite-repl" % "@ammonite.Constants.version" % "test" cross CrossVersion.full
 
-    initialCommands in (Test, console) := """ammonite.repl.Repl.run("")"""
+    initialCommands in (Test, console) := """ammonite.repl.Main.run("")"""
 
   @p
     After that, simple hit
@@ -364,7 +364,7 @@
       Note that unlike the snippet given @sect.ref("Ammonite", "above"), we leave out the @hl.scala{% "test"} because we may want ammonite to be available within the "main" project, and not just in the unit tests. Then, anywhere within your program, you can place a breakpoint via:
 
     @hl.scala
-      import ammonite.repl.Repl._
+      import ammonite.repl.Main._
       debug("name1" -> value1, "name2" -> value2, ...)
 
     @p

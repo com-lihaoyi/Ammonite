@@ -45,7 +45,8 @@
         Added a new @sect.ref{grep} command.
       @li
         Added support for word navigation with Ctrl+Arrow in Linux (#217), thanks to @a("Ian McIntosh", href:="https://github.com/cranst0n")
-
+      @li
+        Moved the initialization calls from @hl.scala{ammonite.repl.Repl.run} and @hl.scala{ammonite.repl.Repl.debug} into @hl.scala{ammonite.repl.Main.run} and @hl.scala{ammonite.repl.Main.debug}
   @sect{0.5.0}
     @ul
       @li
@@ -220,7 +221,7 @@
   @sect{0.3.0}
     @ul
       @li
-        allow @hl.scala{predef} parameter to be passed into @hl.scala{Repl.run()} call, letting you configure initialization commands or imports
+        allow @hl.scala{predef} parameter to be passed into @hl.scala{Main.run()} call, letting you configure initialization commands or imports
       @li
         Compilation errors in expressions no longer show synthetic code in the message
       @li
