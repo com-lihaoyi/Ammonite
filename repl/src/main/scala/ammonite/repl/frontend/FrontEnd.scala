@@ -3,7 +3,7 @@ package ammonite.repl.frontend
 import java.io.{OutputStream, InputStream}
 
 import ammonite.repl._
-import fastparse.core.Result
+import fastparse.core.Parsed
 import jline.console.{completer, ConsoleReader}
 import acyclic.file
 
@@ -95,12 +95,14 @@ object FrontEnd{
           case Some(newCode) =>
             val code = buffered + newCode
             Parsers.split(code) match{
-              case Some(Result.Success(value, idx)) =>
+              case Some(Parsed.Success(value, idx)) =>
                 addHistory(code)
                 Res.Success(code -> value)
-              case Some(f: Result.Failure) =>
+              case Some(Parsed.Failure(p, index, extra)) =>
                 addHistory(code)
-                Res.Failure(fastparse.core.ParseError.msg(f.input, f.traced.expected, f.index))
+                Res.Failure(
+                  fastparse.core.ParseError.msg(extra.input, extra.traced.expected, index)
+                )
               case None => readCode(code + "\n")
             }
         }

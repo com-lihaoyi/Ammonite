@@ -5,7 +5,7 @@ import java.io.{OutputStreamWriter, OutputStream, InputStream}
 import ammonite.repl._
 import ammonite.terminal.LazyList.~:
 import ammonite.terminal._
-import fastparse.core.Result
+import fastparse.core.Parsed
 import scala.annotation.tailrec
 
 case class AmmoniteFrontEnd(extraFilters: TermCore.Filter = PartialFunction.empty) extends FrontEnd{
@@ -27,9 +27,9 @@ case class AmmoniteFrontEnd(extraFilters: TermCore.Filter = PartialFunction.empt
       case Some(code) =>
         addHistory(code)
         Parsers.Splitter.parse(code) match{
-          case Result.Success(value, idx) => Res.Success((code, value))
-          case f: Result.Failure => Res.Failure(
-            fastparse.core.ParseError.msg(f.input, f.traced.expected, f.index)
+          case Parsed.Success(value, idx) => Res.Success((code, value))
+          case Parsed.Failure(_, index, extra) => Res.Failure(
+            fastparse.core.ParseError.msg(extra.input, extra.traced.expected, index)
           )
         }
     }

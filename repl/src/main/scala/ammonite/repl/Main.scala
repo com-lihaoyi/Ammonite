@@ -71,7 +71,7 @@ object Main{
             .Identifiers
             .Id
             .parse(k.stripPrefix("--"))
-            .isInstanceOf[fastparse.core.Result.Success[_]],
+            .isInstanceOf[fastparse.core.Parsed.Success[_]],
         s"""Only pairs of keyword arguments can come after `--`.
             |Invalid keyword: $k""".stripMargin
       )
