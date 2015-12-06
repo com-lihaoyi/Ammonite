@@ -27,15 +27,15 @@
 
 @sect{Ammonite}
   @p
-    Ammonite is a collection of projects, that can be used together or alone:
+    Ammonite enables shell-like scripting in the @lnk("Scala programming language", "http://www.scala-lang.org/"). It is made of a few subprojects:
 
   @ul
     @li
-      @sect.ref{Ammonite-REPL}: A Modernized Scala REPL
+      @sect.ref{Ammonite-REPL}: A Modernized Scala REPL, with tons of @sect.ref("Features", "bug fixes and features")
     @li
-      @sect.ref{Ammonite-Ops}: A Scala Library for Rock-solid Filesystem Operations
+      @sect.ref{Ammonite-Ops}: A Scala Library for convenient, rock-solid Filesystem Operations
     @li
-      @sect.ref{Ammonite-Shell}: Replacing Bash for the 21st Century
+      @sect.ref{Ammonite-Shell}: A modern replacement for the @lnk("Bash", "https://en.wikipedia.org/wiki/Bash_(Unix_shell)") system shell
 
   @p
     Depending on why you are here, click on the above links to jump straight to the documentation that interests you. For an overview of the project and it's motivation, check out this talk:

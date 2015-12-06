@@ -1,21 +1,21 @@
 @import Main._
 @sect{Community}
   @p
-    Ammonite is primarily maintained by @a("Li Haoyi", href:="https://github.com/lihaoyi"), with a lot of help from @a("Laszlo Mero", href:="https://github.com/laci37") over the summer through @a("Google Summer of Code", href:="https://developers.google.com/open-source/gsoc/"), and help from many other @a("contributors", href:="https://github.com/lihaoyi/Ammonite/graphs/contributors"). We have an active Gitter channel and a mailing list:
+    Ammonite is primarily maintained by @lnk("Li Haoyi", "https://github.com/lihaoyi"), with a lot of help from @lnk("Laszlo Mero", "https://github.com/laci37") over the summer through @lnk("Google Summer of Code", "https://developers.google.com/open-source/gsoc/"), and help from many other @lnk("contributors", "https://github.com/lihaoyi/Ammonite/graphs/contributors"). We have an active Gitter channel and a mailing list:
   @ul
     @li
-      @a("Gitter Channel", href:="https://gitter.im/lihaoyi/Ammonite")
+      @lnk("Gitter Channel", "https://gitter.im/lihaoyi/Ammonite")
     @li
-      @a("Mailing List", href:="https://groups.google.com/forum/#!forum/ammonite-scala")
+      @lnk("Mailing List", "https://groups.google.com/forum/#!forum/ammonite-scala")
 
   @p
     I've also given a number of talks about Ammonite:
 
   @ul
     @li
-      @a("Beyond Bash: shell scripting in a typed, OO language", href:="https://www.youtube.com/watch?v=dP5tkmWAhjg"), at Scala by the Bay 2015. @a("Slides", href:="http://tinyurl.com/beyondbash")
+      @lnk("Beyond Bash: shell scripting in a typed, OO language", "https://www.youtube.com/watch?v=dP5tkmWAhjg"), at Scala by the Bay 2015. @lnk("Slides", "http://tinyurl.com/beyondbash")
     @li
-      @a("Shell scripting in a typed, OO language", href:="https://vimeo.com/143819744"), at New Object Oriented Languages 2015.
+      @lnk("Shell scripting in a typed, OO language", "https://vimeo.com/143819744"), at New Object Oriented Languages 2015.
 
 @sect{Changelog}
 
@@ -44,13 +44,13 @@
       @li
         Added a new @sect.ref{grep} command.
       @li
-        Added support for word navigation with Ctrl+Arrow in Linux (#217), thanks to @a("Ian McIntosh", href:="https://github.com/cranst0n")
+        Added support for word navigation with Ctrl+Arrow in Linux (#217), thanks to @lnk("Ian McIntosh", "https://github.com/cranst0n")
       @li
         Moved the initialization calls from @hl.scala{ammonite.repl.Repl.run} and @hl.scala{ammonite.repl.Repl.debug} into @hl.scala{ammonite.repl.Main.run} and @hl.scala{ammonite.repl.Main.debug}
   @sect{0.5.0}
     @ul
       @li
-        Fixed @hl.scala{def<tab>} auto-complete crasher #257, thanks to @a("Matthew Edwards", href:="https://github.com/edwardsmatt")!
+        Fixed @hl.scala{def<tab>} auto-complete crasher #257, thanks to @lnk("Matthew Edwards", "https://github.com/edwardsmatt")!
       @li
         Fixed input-height bug around multi-line selection that would case the prompt to fly up the console
       @li
@@ -70,19 +70,19 @@
       @li
         Update to fastparse/scalaparse 0.3.1
       @li
-        Fix for perennial classpath problems, thanks to @a("Johannes Rudolph", href:="https://github.com/jrudolph")!
+        Fix for perennial classpath problems, thanks to @lnk("Johannes Rudolph", "https://github.com/jrudolph")!
       @li
         Fix wildcard-imports from Java libraries like Joda or Guava #213
       @li
         Added an MIT license
       @li
-        Slightly more robust tab completion #252, thanks to @a("Sanjiv Sahayam", href:="https://github.com/ssanj")!
+        Slightly more robust tab completion #252, thanks to @lnk("Sanjiv Sahayam", "https://github.com/ssanj")!
       @li
-        Properly handly EOF in standard input #242, thanks to @a("Patrick Premont", href:="https://github.com/patrick-premont")!
+        Properly handly EOF in standard input #242, thanks to @lnk("Patrick Premont", "https://github.com/patrick-premont")!
   @sect{0.4.8}
     @ul
       @li
-        Swapped to G1 garbage collector to @a("reduce unnecessary memory footprint", href:="https://github.com/lihaoyi/Ammonite/issues/216")
+        Swapped to G1 garbage collector to @lnk("reduce unnecessary memory footprint", "https://github.com/lihaoyi/Ammonite/issues/216")
       @li
         Allow splicing @hl.scala{Seq[String]}s into subprocess arguments
       @li
@@ -100,7 +100,7 @@
       @li
         Improve the pretty-printing of the @hl.scala{ls} and @hl.scala{ls.rec} commands
       @li
-        Ammonite can now be used as a @sect.ref{Remote REPL} into an already-running Scala process, letting you SSH in to poke around at any time while it's running, thanks to @a("Viacheslav Blinov", href:="https://github.com/dant3")
+        Ammonite can now be used as a @sect.ref{Remote REPL} into an already-running Scala process, letting you SSH in to poke around at any time while it's running, thanks to @lnk("Viacheslav Blinov", "https://github.com/dant3")
       @li
         Fix execution of files via symbols in the current working directory.
       @li
@@ -122,26 +122,26 @@
       @li
         Fix a file-handle-leak for most usages of @code{read.lines} and @code{ls}/@code{ls.rec}
       @li
-        Fix bugs @a("#186", href:="https://github.com/lihaoyi/Ammonite/issues/186"), @a("#152", href:="https://github.com/lihaoyi/Ammonite/issues/152"), @a("#149", href:="https://github.com/lihaoyi/Ammonite/issues/149"), @a("#180", href:="https://github.com/lihaoyi/Ammonite/issues/180")
+        Fix bugs @lnk("#186", "https://github.com/lihaoyi/Ammonite/issues/186"), @lnk("#152", "https://github.com/lihaoyi/Ammonite/issues/152"), @lnk("#149", "https://github.com/lihaoyi/Ammonite/issues/149"), @lnk("#180", "https://github.com/lihaoyi/Ammonite/issues/180")
   @sect{0.4.5}
     @ul
       @li
-        Fix for running Ammonite using OpenJDK, thanks to @a("Johannes Rudolph", href:="https://github.com/jrudolph")
+        Fix for running Ammonite using OpenJDK, thanks to @lnk("Johannes Rudolph", "https://github.com/jrudolph")
       @li
-        Support for HOME and END keys, thanks to @a("Johannes Rudolph", href:="https://github.com/jrudolph")
+        Support for HOME and END keys, thanks to @lnk("Johannes Rudolph", "https://github.com/jrudolph")
       @li
-        Fix for incorrect syntax highlighting (@a("#159", href:="https://github.com/lihaoyi/Ammonite/issues/159"))
+        Fix for incorrect syntax highlighting (@lnk("#159", "https://github.com/lihaoyi/Ammonite/issues/159"))
       @li
-        Support for loading compiler plugins, thanks to @a("Alexandre Archambault", href:="https://github.com/alexarchambault")
+        Support for loading compiler plugins, thanks to @lnk("Alexandre Archambault", "https://github.com/alexarchambault")
       @li
         You can now use Ammonite as a @sect.ref{Debugging} tool like Python's pdb, placing an interactive breakpoint anywhere within a normal Scala application
 
   @sect{0.4.4}
     @ul
       @li
-        @a("Lots", href:="https://github.com/lihaoyi/Ammonite/pull/153") @a("and", href:="https://github.com/lihaoyi/Ammonite/pull/158") @a("lots", href:="https://github.com/lihaoyi/Ammonite/pull/157") of terminal improvements, courtesy of @a("Erik Osheim", href:="https://github.com/non")
+        @lnk("Lots", "https://github.com/lihaoyi/Ammonite/pull/153") @lnk("and", "https://github.com/lihaoyi/Ammonite/pull/158") @lnk("lots", "https://github.com/lihaoyi/Ammonite/pull/157") of terminal improvements, courtesy of @lnk("Erik Osheim", "https://github.com/non")
       @li
-        Only the last @hl.scala("@")-delimited block in a script loaded via @hl.scala{load.module} gets its names dumped into the REPL's environment now, letting you create some semblance of hygiene, thanks to @a("Laszlo Mero", href:="https://github.com/laci37")
+        Only the last @hl.scala("@")-delimited block in a script loaded via @hl.scala{load.module} gets its names dumped into the REPL's environment now, letting you create some semblance of hygiene, thanks to @lnk("Laszlo Mero", "https://github.com/laci37")
   @sect{0.4.3}
     @ul
       @li
@@ -149,11 +149,11 @@
       @li
         Fix @code{pathSeparator} so Ammonite-REPL is at least basically-runnable on windows, although buggy
       @li
-        Update to more robust version of pprint to fix @a("#140", href := "https://github.com/lihaoyi/Ammonite/issues/140")
+        Update to more robust version of pprint to fix @lnk("#140", "https://github.com/lihaoyi/Ammonite/issues/140")
   @sect{0.4.2}
     @ul
       @li
-        Fix @a("#139: Can't fix typos?", href := "https://github.com/lihaoyi/Ammonite/issues/139")
+        Fix @lnk("#139: Can't fix typos?", "https://github.com/lihaoyi/Ammonite/issues/139")
       @li
         Fix bad wrapping of long lines in ammonite-repl
   @sect{0.4.1}
@@ -177,11 +177,11 @@
       @li
         Fixed cases where PPrint/TPrint was causing compilation errors
       @li
-        Persistent data is now stored in a @code{~/.ammonite} folder. This includes @code{~/.ammonite/history}, @code{~/.ammonite/predef.scala}, and various cache, thanks to @a("Laszlo Mero", href:="https://github.com/laci37")
+        Persistent data is now stored in a @code{~/.ammonite} folder. This includes @code{~/.ammonite/history}, @code{~/.ammonite/predef.scala}, and various cache, thanks to @lnk("Laszlo Mero", "https://github.com/laci37")
       @li
         You can now define a @code{~/.ammonite/predef.scala} @sect.ref("Configuration") file which will be executed the first thing when the Ammonite REPL is loaded. This is useful for common imports, @hl.scala{load.ivy}ing libraries, or other configuration for your REPL
       @li
-        Added the ability to load arbitrary @sect.ref{Script Files} via @hl.scala{load.exec} and @hl.scala{load.module}, thanks to @a("Laszlo Mero", href:="https://github.com/laci37")
+        Added the ability to load arbitrary @sect.ref{Script Files} via @hl.scala{load.exec} and @hl.scala{load.module}, thanks to @lnk("Laszlo Mero", "https://github.com/laci37")
       @li
         @sect.ref{Configuration} that was previously passed into the @hl.scala{REPL}s constructor is now done in-REPL,
       @li
@@ -193,7 +193,7 @@
       @li
         Evaluated values of type @hl.scala{Unit} are no longer echo-ed to the user
       @li
-        Performance improvements to the startup time of the REPL, with @a("more to come", href:="https://github.com/lihaoyi/Ammonite/issues/135")
+        Performance improvements to the startup time of the REPL, with @lnk("more to come", "https://github.com/lihaoyi/Ammonite/issues/135")
       @li
         Third-party library resolution via @hl.scala{load.ivy} is now cached after the first call, letting you e.g. load libraries in your @code{~/.ammonite/predef.scala} without waiting for the slow ivy-resolution every startup
       @li
@@ -229,7 +229,7 @@
       @li
         Defining macros in the REPL and using them in subsequent lines now works
       @li
-        Output lines are now truncated past a certain length, which is configurable, thanks to @a("Laszlo Mero", href:="https://github.com/laci37")
+        Output lines are now truncated past a certain length, which is configurable, thanks to @lnk("Laszlo Mero", "https://github.com/laci37")
 
   @sect{0.2.9}
     @ul

@@ -9,15 +9,15 @@
 
   @ul
     @li
-      You can @a("never remember the syntax to write an if-statement in Bash", href:="http://stackoverflow.com/questions/19343390/bash-if-statement-with-white-space-in-variable")
+      You can @lnk("never remember the syntax to write an if-statement in Bash", "http://stackoverflow.com/questions/19343390/bash-if-statement-with-white-space-in-variable")
     @li
-      You are sick of googling the same set of inconsistent, ad-hoc commands over and over: "@a("obviously", href:="http://stackoverflow.com/questions/12522269/bash-how-to-find-the-largest-file-in-a-directory-and-its-subdirectories") you need the flag @code{-nrk 7} to sort by file size!"
+      You are sick of googling the same set of inconsistent, ad-hoc commands over and over: "@lnk("obviously", "http://stackoverflow.com/questions/12522269/bash-how-to-find-the-largest-file-in-a-directory-and-its-subdirectories") you need the flag @code{-nrk 7} to sort by file size!"
     @li
-      You've seen Bash's dynamic/sloppy nature @a("fail hard", href:="https://github.com/valvesoftware/steam-for-linux/issues/3671"), and don't want your future work to fall victim to the same bugs
+      You've seen Bash's dynamic/sloppy nature @lnk("fail hard", "https://github.com/valvesoftware/steam-for-linux/issues/3671"), and don't want your future work to fall victim to the same bugs
     @li
-      You think that technology has improved in the last @a("38 years", href:="https://en.wikipedia.org/wiki/Bourne_shell") and a modern systems shell should be better than the shells of our forefathers
+      You think that technology has improved in the last @lnk("38 years", "https://en.wikipedia.org/wiki/Bourne_shell") and a modern systems shell should be better than the shells of our forefathers
   @p
-    If none of these apply to you, then likely you won't be interested. If any of these bullet points strikes a chord, then read on to get started. For more discussion about why this project exists, take a look at the presentation slides for @a("Beyond Bash: shell scripting in a typed, OO language", href:="http://tinyurl.com/beyondbash"), presented at Scala by the Bay 2015, or check out the section on @sect.ref{Design Decisions & Tradeoffs}.
+    If none of these apply to you, then likely you won't be interested. If any of these bullet points strikes a chord, then read on to get started. For more discussion about why this project exists, take a look at the presentation slides for @lnk("Beyond Bash: shell scripting in a typed, OO language", "http://tinyurl.com/beyondbash"), presented at Scala by the Bay 2015, or check out the section on @sect.ref{Design Decisions & Tradeoffs}.
 
   @sect{Getting Ammonite-Shell}
     @p
@@ -204,7 +204,7 @@
 
   @sect{Scripting}
     @p
-      Ammonite-Shell uses @a("Scala", href:="http://www.scala-lang.org/") as its command and scripting language. Although the commands seem short and concise, you have the full power of the language available at any time. This lets you do things that are difficult or unfeasible to do when using a traditional shell like Bash.
+      Ammonite-Shell uses @lnk("Scala", "http://www.scala-lang.org/") as its command and scripting language. Although the commands seem short and concise, you have the full power of the language available at any time. This lets you do things that are difficult or unfeasible to do when using a traditional shell like Bash.
 
     @sect{Scala Scripting}
       @p
@@ -301,7 +301,7 @@
         """.stripMargin
       ))  
       @p    
-        In general, apart from the filesystem-specific commands, you should be able to do anything you would expect to be able to do in a Scala shell or Java project. This documentation isn't intended to be a full tutorial on the Scala language, check out the @a("Scala Documentation", href:="http://www.scala-lang.org/documentation/") if you want to learn more!
+        In general, apart from the filesystem-specific commands, you should be able to do anything you would expect to be able to do in a Scala shell or Java project. This documentation isn't intended to be a full tutorial on the Scala language, check out the @lnk("Scala Documentation", "http://www.scala-lang.org/documentation/") if you want to learn more!
     @sect{Scala/Java APIs}
       @p
         Apart from the pipe operators described in the earlier section on @sect.ref{Piping}, Ammonite-Shell allows you to call any valid Scala method on any value; it's just Scala after all! Here's an example using normal Scala collection operations to deal with a list of files, counting how many files exist for each extension:
@@ -324,7 +324,7 @@
       ))
 
       @p
-        In fact, Ammonite-Shell allows you to ask for any published third-party Java/Scala library for usage in the shell, and have them downloaded, automatically cached, and made available for use. e.g. we can load popular libraries like @a("Google Guava", href:="https://github.com/google/guava") and using it in the shell:
+        In fact, Ammonite-Shell allows you to ask for any published third-party Java/Scala library for usage in the shell, and have them downloaded, automatically cached, and made available for use. e.g. we can load popular libraries like @lnk("Google Guava", "https://github.com/google/guava") and using it in the shell:
 
       @pre(ammSample(
         """import com.google.common.collect.ImmutableBiMap // Doesn't work
@@ -403,11 +403,11 @@
       Ammonite-Shell takes a fundamentally different architecture from traditional shells, or even more-modern shell-alternatives. Significant differences include:
     @ul
       @li
-        The command & scripting language is a standard, well-known application language (@a("Scala", href:="http://www.scala-lang.org/")) rather than one specially-designed for the shell
+        The command & scripting language is a standard, well-known application language (@lnk("Scala", "http://www.scala-lang.org/")) rather than one specially-designed for the shell
       @li
-        The shell runs on the @a("JVM", href:="https://en.wikipedia.org/wiki/Java_virtual_machine"), and can execute or integrate-with arbitrary Java/JVM code or libraries.
+        The shell runs on the @lnk("JVM", "https://en.wikipedia.org/wiki/Java_virtual_machine"), and can execute or integrate-with arbitrary Java/JVM code or libraries.
     @p
-      In this section we'll examine each of these decisions and their consequences in turn. As the incumbents in this space, we'll be looking at traditional system shells like @a("Bash", href:="https://en.wikipedia.org/wiki/Bash_(Unix_shell)"), @a("Zsh", href:="https://en.wikipedia.org/wiki/Z_shell") or @a("Fish", href:="http://fishshell.com/"), as well as popular non-system REPLs like the Python/@a("IPython", href:="https://ipython.org/") REPL.
+      In this section we'll examine each of these decisions and their consequences in turn. As the incumbents in this space, we'll be looking at traditional system shells like @lnk("Bash", "https://en.wikipedia.org/wiki/Bash_(Unix_shell)"), @lnk("Zsh", "https://en.wikipedia.org/wiki/Z_shell") or @lnk("Fish", "http://fishshell.com/"), as well as popular non-system REPLs like the Python/@lnk("IPython", "https://ipython.org/") REPL.
 
     @sect{Scala as the Language}
       @p
@@ -418,7 +418,7 @@
         @li
           The code being entered in the shell takes time to compile. The first command easily takes 3-4 to compile, and even when the compiler is "warm" there is a 0.2-0.3 second delay before any command begins executing.
         @li
-          Once compiled, the code runs extremely fast: compute-intensive code easily runs @a("50-100x faster", href:="http://benchmarksgame.alioth.debian.org/u64q/compare.php?lang=scala&lang2=python3") in Scala vs Python or Bash, once you've paid the cost of compiling it.
+          Once compiled, the code runs extremely fast: compute-intensive code easily runs @lnk("50-100x faster", "http://benchmarksgame.alioth.debian.org/u64q/compare.php?lang=scala&lang2=python3") in Scala vs Python or Bash, once you've paid the cost of compiling it.
         @li
           Many mistakes get caught even before a command begins executing. This is less valuable for small commands that execute quickly, but for slower commands processing more data, it is nice to get an error after 0.2s of compilation rather than 10s into execution.
       @p
@@ -431,19 +431,19 @@
         @li
           Scala runs most code in the same process. While you can @sect.ref("Spawning Subprocesses", "shell-out to subprocesses in Ammonite") using the @code{%} syntax, most commands like @code{ls!} and @code{rm!} are simple functions living in-process rather than in separate processes. This reduces the overhead as compared to spawning new processes each time, but does cause some additional risk: if a command causes the process to crash hard, the entire shell fails. In bash, only that command would fail.
       @p
-        The latter set of tradeoffs would be also present in many of the shell-replacements written in dynamic languages, like @a("Xonsh", href:="http://xonsh.org/") which is written in Python. The earlier set, on the other hand, are pretty unique to Ammonite using Scala. There are both positive and negative points in this list.
+        The latter set of tradeoffs would be also present in many of the shell-replacements written in dynamic languages, like @lnk("Xonsh", "http://xonsh.org/") which is written in Python. The earlier set, on the other hand, are pretty unique to Ammonite using Scala. There are both positive and negative points in this list.
 
     @sect{Running on the JVM}
       @p
-        Running Ammonite directly on the @a("JVM", href:="https://en.wikipedia.org/wiki/Java_virtual_machine") again is very different from how most shells work: most have their own scripting language, and their own interpreter. Most are implemented in C. What is it like running your code directly as bytecode on the JVM? Here are some of the negatives:
+        Running Ammonite directly on the @lnk("JVM", "https://en.wikipedia.org/wiki/Java_virtual_machine") again is very different from how most shells work: most have their own scripting language, and their own interpreter. Most are implemented in C. What is it like running your code directly as bytecode on the JVM? Here are some of the negatives:
 
       @ul
         @li
           You get JVM boot time; although some of the initial several-second delay is due to the Scala compiler's slowness, some of it is also due to the cost of JVM classloading and initialization. While a hello-world JVM project loads instantly, one which uses a large number of class-files takes longer. In contrast, shells written in C load basically instantly.
         @li
-          You get the JVM bloat: Ammonite, implemented in only a few thousand lines of code, wraps up to become a 30mb @code{.jar} file. That's already larger than most other shells out there, and gets >100mb larger if you bundle the JVM along with it! In general, the JVM class-file format is bloated and inefficient, and there is no way to exclude to numerous un-needed parts of the JVM during the initial download. @a("Project Jigsaw", href:="http://openjdk.java.net/projects/jigsaw/") will help with this when it finally lands in @a("Java 9", href:="http://openjdk.java.net/projects/jdk9/").
+          You get the JVM bloat: Ammonite, implemented in only a few thousand lines of code, wraps up to become a 30mb @code{.jar} file. That's already larger than most other shells out there, and gets >100mb larger if you bundle the JVM along with it! In general, the JVM class-file format is bloated and inefficient, and there is no way to exclude to numerous un-needed parts of the JVM during the initial download. @lnk("Project Jigsaw", "http://openjdk.java.net/projects/jigsaw/") will help with this when it finally lands in @lnk("Java 9", "http://openjdk.java.net/projects/jdk9/").
         @li
-          Ammonite uses hundreds of megabytes (~500mb at last count) of memory, again orders-of-magnitude more than an interpreter written in C or Python. The JVM has traditionally been a very pointer-heavy, memory-intensive platform for running code, and it shows. @a("Project Valhalla", href:="http://openjdk.java.net/projects/valhalla/") would help with this, also scheduled to land in Java 9.
+          Ammonite uses hundreds of megabytes (~500mb at last count) of memory, again orders-of-magnitude more than an interpreter written in C or Python. The JVM has traditionally been a very pointer-heavy, memory-intensive platform for running code, and it shows. @lnk("Project Valhalla", "http://openjdk.java.net/projects/valhalla/") would help with this, also scheduled to land in Java 9.
 
       @p
         In general, the JVM has traditionally been used as a server-side platform for long-runing services, and its slow-startup and bloated disk/memory footprints are a symptom of that. Running on the JVM also has some upsides, though:
@@ -452,12 +452,12 @@
         @li
           Ammonite code runs ridiculously fast, once you've paid 0.2-0.3s for its compilation. 50x faster than Python or Bash! This is not a trivial multiplier, and really makes a different if you're dealing with non-trivial data sets: a computation that takes a minute in Ammonite might take an hour if done at the Python REPL! This means that a moderately-large computation which may require special tools, libraries or optimizations to perform in Python might be trivial to implement naively in Ammonite while still enjoying reasonable speed.
         @li
-          Ammonite can make use of any JVM APIs, and there are a lot of them! The JVM is a general-purpose platform for a general purpose language (Java), and thus has APIs for doing all sorts of things: dealing with @a("dates and times", href:="https://docs.oracle.com/javase/8/docs/api/java/time/package-summary.html"), @a("math", href:="https://docs.oracle.com/javase/8/docs/api/java/lang/Math.html"), @a("networks", href:="https://docs.oracle.com/javase/8/docs/api/java/net/package-summary.html"), @a("threads", href:="https://docs.oracle.com/javase/8/docs/api/java/lang/Thread.html"), and many other things. While you may not always need all of these capabilities, it is nice to have them at your disposal where necessary.
+          Ammonite can make use of any JVM APIs, and there are a lot of them! The JVM is a general-purpose platform for a general purpose language (Java), and thus has APIs for doing all sorts of things: dealing with @lnk("dates and times", "https://docs.oracle.com/javase/8/docs/api/java/time/package-summary.html"), @lnk("math", "https://docs.oracle.com/javase/8/docs/api/java/lang/Math.html"), @lnk("networks", "https://docs.oracle.com/javase/8/docs/api/java/net/package-summary.html"), @lnk("threads", "https://docs.oracle.com/javase/8/docs/api/java/lang/Thread.html"), and many other things. While you may not always need all of these capabilities, it is nice to have them at your disposal where necessary.
         @li
-          Ammonite can make use of any Java/JVM libraries, and the excelent infrastructure used by Java developers to download and manage them! Any library is just a @sect.ref("Artifact Loading", "load.ivy") away. Need to parse Python source into an AST? Load @a("Jython", href:="http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22jython-standalone%22") and just do it. Need a high-performance web server? Load @a("Akka-HTTP", href:="http://doc.akka.io/docs/akka-stream-and-http-experimental/1.0-M2/scala/http/"). Need some data someone stored in a YAML file? Load @a("SnakeYAML", href:="https://bitbucket.org/asomov/snakeyaml") and parse it. You don't even need to download and manage these libraries yourself: just @hl.scala{load.ivy} them from Ammonite, and Java's excellent dependency-management infrastructure will download them (along with any transitive dependencies!), cache them locally, and make them available to your code.
+          Ammonite can make use of any Java/JVM libraries, and the excelent infrastructure used by Java developers to download and manage them! Any library is just a @sect.ref("Artifact Loading", "load.ivy") away. Need to parse Python source into an AST? Load @lnk("Jython", "http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22jython-standalone%22") and just do it. Need a high-performance web server? Load @lnk("Akka-HTTP", "http://doc.akka.io/docs/akka-stream-and-http-experimental/1.0-M2/scala/http/"). Need some data someone stored in a YAML file? Load @lnk("SnakeYAML", "https://bitbucket.org/asomov/snakeyaml") and parse it. You don't even need to download and manage these libraries yourself: just @hl.scala{load.ivy} them from Ammonite, and Java's excellent dependency-management infrastructure will download them (along with any transitive dependencies!), cache them locally, and make them available to your code.
 
       @p
-        There are both pros and cons with running Ammonite on the JVM: we gain its heavy startup/memory overhead, but also get access to its high-performance @a("JIT", href:="https://en.wikipedia.org/wiki/Just-in-time_compilation"), massive ecosystem of available packages. 
+        There are both pros and cons with running Ammonite on the JVM: we gain its heavy startup/memory overhead, but also get access to its high-performance @lnk("JIT", "https://en.wikipedia.org/wiki/Just-in-time_compilation"), massive ecosystem of available packages.
 
     @sect{Goals of Ammonite-Shell}
       @p
