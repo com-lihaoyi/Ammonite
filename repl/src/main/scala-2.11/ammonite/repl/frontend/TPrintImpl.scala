@@ -43,7 +43,13 @@ object TPrintLowPri{
           .symbol
       }
 
-      if (!s.isType) lookedUps.contains(s)
+      if (!s.isType) {
+	val s1 = lookedUps.contains(s)
+        val s2 = lookedUps.exists(x => {
+          x == s || x.tpe.termSymbol == s.asTerm
+        })
+        s1 || s2
+      }
       else {
         // Try to resolve aliases for types
         lookedUps.exists(x => x == s || x.tpe.typeSymbol == s.asInstanceOf[g.Symbol].tpe.typeSymbol)
