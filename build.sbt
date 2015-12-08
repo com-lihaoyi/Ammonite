@@ -242,7 +242,7 @@ lazy val readme = ScalatexReadme(
       (doc in (terminal, Compile)).value -> "terminal",
       (doc in (repl, Compile)).value -> "repl",
       (doc in (sshd, Compile)).value -> "sshd",
-      (doc in (shell, Compile)).value -> "sshd"
+      (doc in (shell, Compile)).value -> "shell"
     )
     for ((folder, name) <- copies){
       sbt.IO.copyDirectory(folder, apiFolder/name, overwrite = true)
