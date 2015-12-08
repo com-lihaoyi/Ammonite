@@ -150,33 +150,33 @@
         All of these operations are pre-defined and strongly typed, so feel free to jump to their implementation to look at what they do or what else is available. Here's a shortlist of the one that may interest you:
 
       @ul
-        @val docBase = "https://lihaoyi.github.io/Ammonite/api/ops/index.html#ammonite.ops"
+        @val docBase = "https://lihaoyi.github.io/Ammonite/api/ops/index.html#ammonite.ops."
         @li
-          @a(hl.scala{"ls! path"}, href := s"$docBase.ls$") returning @hl.scala{Vector[Path]}, and @hl.scala{ls.iter! path} returning a @hl.scala{Iterator[Path]}
+          @hl.scala{ls! path} @a("[doc]", href := (docBase+ "ls$")) returning @hl.scala{Vector[Path]}, and @hl.scala{ls.iter! path} returning a @hl.scala{Iterator[Path]}
         @li
-          @a(hl.scala{"ls.rec! path"}, href := s"$docBase.ls$$rec$") and @hl.scala{ls.rec.iter!}
+          @hl.scala{ls.rec! path} @a("[doc]", href := (docBase+ "ls$$rec$")) and @hl.scala{ls.rec.iter!}
         @li
-          @a(hl.scala{"read! path"}, href := s"$docBase.read$") returning a @hl.scala{String}, and @hl.scala{read.lines! path} and @hl.scala{read.bytes! path} returning @hl.scala{Seq[String]} and @hl.scala{Array[Byte]}
+          @hl.scala{read! path} @a("[doc]", href := (docBase+ "read$")) returning a @hl.scala{String}, and @hl.scala{read.lines! path} and @hl.scala{read.bytes! path} returning @hl.scala{Seq[String]} and @hl.scala{Array[Byte]}
         @li
-          @a(hl.scala{"read.resource! path"}, href := s"$docBase.read$$resource$"), and @hl.scala{read.resource.lines! path} and @hl.scala{read.resource.bytes! path}, behaves the same as @hl.scala{read!} but reads from your resource classpath instead of the filesystem
+          @hl.scala{read.resource! path}, @a("[doc]", href := (docBase+ "read$$resource$")), and @hl.scala{read.resource.lines! path} and @hl.scala{read.resource.bytes! path}, behaves the same as @hl.scala{read!} but reads from your resource classpath instead of the filesystem
         @li
-          @a(hl.scala{"write(path, contents)"}, href := s"$docBase.write$"), which lets you write @hl.scala{String}s, @hl.scala{Array[Byte]}s, and @hl.scala{Seq}s of those
+          @hl.scala{write(path, contents)}, @a("[doc]", href := (docBase+ "write$")), which lets you write @hl.scala{String}s, @hl.scala{Array[Byte]}s, and @hl.scala{Seq}s of those
         @li
-          @a(hl.scala{"rm! path"}, href := s"$docBase.rm$"), roughly Bash's @code{rm -rf}
+          @hl.scala{rm! path}, @a("[doc]", href := (docBase+ "rm$")), roughly Bash's @code{rm -rf}
         @li
-          @a(hl.scala{"mv(src, dest)"}, href := s"$docBase.mv$")
+          @hl.scala{mv(src, dest)}, @a("[doc]", href := (docBase+ "mv$"))
         @li
-          @a(hl.scala{"cp(src, dest)"}, href := s"$docBase.cp$"), roughly Bash's @code{cp -r}
+          @hl.scala{cp(src, dest)}, @a("[doc]", href := (docBase+ "cp$")), roughly Bash's @code{cp -r}
         @li
-          @a(hl.scala{"exists! path"}, href := s"$docBase.exists$")
+          @hl.scala{exists! path}, @a("[doc]", href := (docBase+ "exists$"))
         @li
-          @a(hl.scala{"stat! path"}, href := s"$docBase.stat$")
+          @hl.scala{stat! path}, @a("[doc]", href := (docBase+ "stat$"))
         @li
-          @a(hl.scala{"stat.full! path"}, href := s"$docBase.stat$$full$")
+          @hl.scala{stat.full! path}, @a("[doc]", href := (docBase+ "stat$$full$"))
         @li
-          @a(hl.scala{"ln(src, dest)"}, href := s"$docBase.ln$")
+          @hl.scala{ln(src, dest)}, @a("[doc]", href := (docBase+ "ln$"))
         @li
-          @a(hl.scala{"kill(9)! processId"}, href := s"$docBase.kill$")
+          @hl.scala{kill(9)! processId}, @a("[doc]", href := (docBase+ "kill$"))
 
       @p
         In general, each operator has sensible/safe defaults:
