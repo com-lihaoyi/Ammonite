@@ -228,8 +228,26 @@ lazy val readme = ScalatexReadme(
   scalaVersion := "2.11.7",
   (run in Compile) <<= (run in Compile).dependsOn(
     assembly in repl,
-    packageBin in (shell, Compile)
+    packageBin in (shell, Compile),
+    doc in (ops, Compile),
+    doc in (terminal, Compile),
+    doc in (repl, Compile),
+    doc in (sshd, Compile),
+    doc in (shell, Compile)
   ),
+  (run in Compile) <<= (run in Compile).dependsOn(Def.task{
+    val apiFolder = (target in Compile).value/"scalatex"/"api"
+    val copies = Seq(
+      (doc in (ops, Compile)).value -> "ops",
+      (doc in (terminal, Compile)).value -> "terminal",
+      (doc in (repl, Compile)).value -> "repl",
+      (doc in (sshd, Compile)).value -> "sshd",
+      (doc in (shell, Compile)).value -> "sshd"
+    )
+    for ((folder, name) <- copies){
+      sbt.IO.copyDirectory(folder, apiFolder/name, overwrite = true)
+    }
+  }),
   (unmanagedSources in Compile) += baseDirectory.value/".."/"project"/"Constants.scala"
 )
 

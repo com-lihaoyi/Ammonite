@@ -17,6 +17,25 @@
     @li
       @lnk("Shell scripting in a typed, OO language", "https://vimeo.com/143819744"), at New Object Oriented Languages 2015.
 
+@sect{Scaladoc}
+  @p
+    Here's the Scaladoc for the various projects:
+
+  @ul
+    @li
+      @a("Ammonite-Ops", href:="lihaoyi.github.io/Ammonite/api/ops/index.html")
+    @li
+      @a("Ammonite-Terminal", href:="lihaoyi.github.io/Ammonite/api/terminal/index.html")
+    @li
+      @a("Ammonite-Repl", href:="lihaoyi.github.io/Ammonite/api/repl/index.html")
+    @li
+      @a("Ammonite-Shell", href:="lihaoyi.github.io/Ammonite/api/shell/index.html")
+    @li
+      @a("Ammonite-Sshd", href:="lihaoyi.github.io/Ammonite/api/sshd/index.html")
+
+  @p
+    Although it's best to read the documentation on this page to learn how to use these projects, the Scaladoc is still useful as a reference.
+
 @sect{Changelog}
 
   @sect{0.5.1}

@@ -3,9 +3,6 @@ package ammonite.ops
 import acyclic.file
 
 
-/**
- * Created by haoyi on 1/25/15.
- */
 object BasePath{
   def invalidChars = Set('/')
   def checkSegment(s: String) = {
@@ -210,7 +207,7 @@ object Path extends (String => Path){
 
 /**
  * An absolute path on the filesystem. Note that the path is
- * normalized and cannot contain any empty, "." or ".." segments
+ * normalized and cannot contain any empty `""`, `"."` or `".."` segments
  */
 case class Path(segments: Vector[String]) extends BasePathImpl[Path]{
   segments.foreach(BasePath.checkSegment)

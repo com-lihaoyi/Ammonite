@@ -19,6 +19,14 @@ package object ops extends Extensions with RelPathStuff{
    */
   lazy val cwd = ops.Path(new java.io.File(""))
 
+  /**
+    * If you want to call subprocesses using [[%]] or [[%%]] and don't care
+    * what working directory they use, import this via
+    *
+    * `import ammonite.ops.ImplicitWd._`
+    *
+    * To make them use the process's working directory for each subprocess
+    */
   object ImplicitWd{
     implicit lazy val implicitCwd = ops.cwd
   }
@@ -46,6 +54,18 @@ package object ops extends Extensions with RelPathStuff{
 
   implicit def fileData(p: Path) = stat.full(p)
 
+  /**
+    * Used to spawn a subprocess interactively; any output gets printed to the
+    * console and any input gets requested from the current console. Can be
+    * used to run interactive subprocesses like `%vim`, `%python`,
+    * `%ssh "www.google.com"` or `%sbt`.
+    */
   val % = new Command(Vector.empty, Map.empty, Shellout.executeInteractive)
+  /**
+    * Spawns a subprocess non-interactively, waiting for it to complete and
+    * collecting all output into a [[CommandResult]] which exposes it in a
+    * convenient form. Call via `%%('whoami).out.trim` or
+    * `%%('git, 'commit, "-am", "Hello!").exitCode`
+    */
   val %% = new Command(Vector.empty, Map.empty, Shellout.executeStream)
 }

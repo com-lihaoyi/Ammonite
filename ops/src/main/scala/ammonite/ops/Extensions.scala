@@ -34,10 +34,19 @@ trait Extensions{
   implicit def Callable2[T1, T2, R](f: (T1, T2) => R) = new Callable2(f)
 }
 
+/**
+  * Provides `a.! b` as an alternative to the `a(b)` syntax for calling a
+  * function with one argument
+  */
 class Callable1[T1, R](f: (T1 => R)) extends (T1 => R){
   def !(arg: T1): R = f(arg)
   def apply(arg: T1): R = f(arg)
 }
+
+/**
+  * Provides `a! b` as an alternative to the `(a(b, _)` syntax for partially
+  * applying a function with two arguments
+  */
 class Callable2[T1, T2, R](f: (T1, T2) => R) extends ((T1, T2) => R){
   def !(arg1: T1) = new Callable1[T2, R](arg2 => f(arg1, arg2))
   def apply(arg1: T1, arg2: T2) = f(arg1, arg2)

@@ -2,6 +2,9 @@ package ammonite.ops
 
 import scala.language.dynamics
 
+/**
+  * Iternal utilities to support spawning subprocesses
+  */
 object Shellout{
 
   def executeInteractive(wd: Path, cmd: Command[_]) = {
@@ -53,8 +56,8 @@ object Shellout{
 }
 
 /**
- * A staged sub-process command that has yet to be executed.
- */
+  * A staged sub-process command that has yet to be executed.
+  */
 case class Command[T](cmd: Vector[String],
                       envArgs: Map[String, String],
                       execute: (Path, Command[_]) => T) extends Dynamic {
@@ -100,8 +103,15 @@ class Bytes(val array: Array[Byte]){
   */
 case class CommandResult(exitCode: Int,
                          chunks: Seq[Either[Bytes, Bytes]]) {
-
+  /**
+    * The standard output of the executed command, exposed in a number of ways
+    * for convenient access
+    */
   val out = StreamValue(chunks.collect{case Left(s) => s})
+  /**
+    * The standard error of the executed command, exposed in a number of ways
+    * for convenient access
+    */
   val err = StreamValue(chunks.collect{case Right(s) => s})
   override def toString() = {
     s"CommandResult $exitCode\n" +

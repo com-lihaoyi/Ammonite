@@ -11,11 +11,6 @@ import java.nio.file._
 import acyclic.file
 import ammonite.ops.Internals.SelfClosingIterator
 
-object OpError{
-  type IAE = IllegalArgumentException
-  case class ResourceNotFound(src: Path)
-    extends IAE(s"No resource found at path $src")
-}
 
 object Internals{
 
@@ -114,13 +109,16 @@ object Internals{
 
 /**
  * An [[Callable1]] that returns a Seq[R], but can also do so
- * lazily (Iterator[R]) via `op.!! arg`. You can then use
+ * lazily (Iterator[R]) via `op.iter! arg`. You can then use
  * the iterator however you wish
  */
 trait StreamableOp1[T1, R, C <: Seq[R]] extends Function1[T1, C]{
   def materialize(src: T1, i: Iterator[R]): C
   def apply(arg: T1) = materialize(arg, iter(arg))
 
+  /**
+    * Returns a lazy [[Iterator]] instead of an eager sequence of results.
+    */
   val iter: T1 => Iterator[R]
 }
 
@@ -135,7 +133,8 @@ object mkdir extends Function1[Path, Unit]{
 
 
 /**
- * Moves a file from one place to another.
+ * Moves a file or folder from one place to another.
+ *
  * Creates any necessary directories
  */
 object mv extends Function2[Path, Path, Unit] with Internals.Mover{
@@ -205,8 +204,12 @@ trait ImplicitOp[V] extends Function1[Path, V]{
   def !(implicit arg: Path): V = apply(arg)
 }
 /**
- * List the files and folders in a directory
- */
+  * List the files and folders in a directory. Can be called with `.iter`
+  * to return an iterator, or `.rec` to recursively list everything in
+  * subdirectories. `.rec` is a [[ls.Walker]] which means that apart from
+  * straight-forwardly listing everything, you can pass in a `skip` predicate
+  * to cause your recursion to skip certain files or folders.
+  */
 object ls extends StreamableOp1[Path, Path, LsSeq] with ImplicitOp[LsSeq]{
   def materialize(src: Path, i: Iterator[Path]) =
     new LsSeq(src, i.map(_ relativeTo src).toVector.sorted:_*)
@@ -227,10 +230,19 @@ object ls extends StreamableOp1[Path, Path, LsSeq] with ImplicitOp[LsSeq]{
     def apply(skip: Path => Boolean = _ => false,
               preOrder: Boolean = false) = Walker(skip, preOrder)
   }
+
   /**
-   * Reads a classpath resource into memory, either as a
-   * string, as a Seq[String] of lines, or as a Array[Byte]
-   */
+    * Walks a directory recursively and returns a [[LsSeq]] of all its contents.
+    *
+    * @param skip Skip certain files or folders from appearing in the output.
+    *             If you skip a folder, its entire subtree is ignored
+    * @param preOrder Whether you want a folder to appear before or after its
+    *                 contents in the final sequence. e.g. if you're deleting
+    *                 them recursively you want it to be false so the folder
+    *                 gets deleted last, but if you're copying them recursively
+    *                 you want `preOrder` to be `true` so the folder gets
+    *                 created first.
+    */
   case class Walker(skip: Path => Boolean = _ => false,
                     preOrder: Boolean = false)
   extends StreamableOp1[Path, Path, LsSeq] with ImplicitOp[LsSeq]{
@@ -358,6 +370,11 @@ case class kill(signal: Int) extends Function1[Int, CommandResult]{
     %%.kill("-" + signal, pid.toString)(wd = Path(new java.io.File("")))
   }
 }
+
+/**
+  * Creates a hardlink between two paths. Use `.s(src, dest)` to create a
+  * symlink
+  */
 object ln extends Function2[Path, Path, Unit]{
   def apply(src: Path, dest: Path) = {
     Files.createLink(Paths.get(dest.toString), Paths.get(src.toString))
