@@ -176,7 +176,7 @@
         @li
           @hl.scala{ln(src, dest)}, @a("[doc]", href := (docBase+ "ln$"))
         @li
-          @hl.scala{kill(9)! processId}, @a("[doc]", href := (docBase+ "kill$"))
+          @hl.scala{kill(9)! processId}, @a("[doc]", href := (docBase+ "kill"))
 
       @p
         In general, each operator has sensible/safe defaults:
