@@ -189,7 +189,7 @@
         @li
           all operations that create a file or folder (@hl.scala{mkdir}, @hl.scala{write}, @hl.scala{mv}) automatically create any necessary parent directories
         @li
-        @hl.scala{write} also does @i{not} stomp over existing files by default. You need to use @hl.scala{write.over}
+          @hl.scala{write} also does @i{not} stomp over existing files by default. You need to use @hl.scala{write.over}
       @p
         In general, this should make these operations much easier to use; the defaults should cover the 99% use case without needing any special flags or fiddling.
 
