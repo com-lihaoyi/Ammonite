@@ -255,7 +255,7 @@
       build.sbt	log		ops		readme		repl		terminal
       echo		modules		project		readme.md	target		shell
       res2: Int = 0
-      @@ %%ls
+      @@ %%('ls)
       res3: CommandResult =
       build.sbt
       echo
@@ -311,14 +311,14 @@
         speedip
       res4: Int = 0
 
-      @@ %%git 'branch
+      @@ %%('git, 'branch)
       res5: CommandResult =
         gh-pages
         history
       * master
         speedip
 
-      @@ %%git('checkout, "master")
+      @@ %%('git, checkout, "master")
       Already on 'master'
       res6: CommandResult =
       M	readme/Index.scalatex
@@ -332,7 +332,7 @@
 
       @@ val stuff = List("readme.md", "build.sbt")
       stuff: List[String] = List("readme.md", "build.sbt")
-      @@ %ls(".gitignore", stuff)
+      @@ %('ls, '".gitignore", stuff)
       .gitignore	build.sbt	readme.md
     @p
       Ammonite-Ops currently does not provide many convenient ways of piping together multiple processes, but support may come in future if someone finds it useful enough to implement.
