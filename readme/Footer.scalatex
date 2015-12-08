@@ -23,15 +23,15 @@
 
   @ul
     @li
-      @a("Ammonite-Ops", href:="lihaoyi.github.io/Ammonite/api/ops/index.html")
+      @a("Ammonite-Ops", href:="https://lihaoyi.github.io/Ammonite/api/ops/index.html")
     @li
-      @a("Ammonite-Terminal", href:="lihaoyi.github.io/Ammonite/api/terminal/index.html")
+      @a("Ammonite-Terminal", href:="https://lihaoyi.github.io/Ammonite/api/terminal/index.html")
     @li
-      @a("Ammonite-Repl", href:="lihaoyi.github.io/Ammonite/api/repl/index.html")
+      @a("Ammonite-Repl", href:="https://lihaoyi.github.io/Ammonite/api/repl/index.html")
     @li
-      @a("Ammonite-Shell", href:="lihaoyi.github.io/Ammonite/api/shell/index.html")
+      @a("Ammonite-Shell", href:="https://lihaoyi.github.io/Ammonite/api/shell/index.html")
     @li
-      @a("Ammonite-Sshd", href:="lihaoyi.github.io/Ammonite/api/sshd/index.html")
+      @a("Ammonite-Sshd", href:="https://lihaoyi.github.io/Ammonite/api/sshd/index.html")
 
   @p
     Although it's best to read the documentation on this page to learn how to use these projects, the Scaladoc is still useful as a reference.

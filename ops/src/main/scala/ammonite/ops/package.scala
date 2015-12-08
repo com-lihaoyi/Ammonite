@@ -40,10 +40,18 @@ package object ops extends Extensions with RelPathStuff{
   }
 
   /**
-   * Extractor to let you easily pattern match on [[ops.Path]]s
-   */
+    * Extractor to let you easily pattern match on [[ops.Path]]s. Lets you do
+    *
+    * {{{
+    *   @ val base/segment/filename = cwd
+    *   base: Path = Path(Vector("Users", "haoyi", "Dropbox (Personal)"))
+    *   segment: String = "Workspace"
+    *   filename: String = "Ammonite"
+    * }}}
+    *
+    * To break apart a path and extract various pieces of it.
+    */
   object /{
-
     def unapply[T <: BasePath[T]](p: T): Option[(T, String)] = {
       if (p.segments.length > 0)
         Some((p / up, p.last))
@@ -51,8 +59,12 @@ package object ops extends Extensions with RelPathStuff{
     }
   }
 
-
-  implicit def fileData(p: Path) = stat.full(p)
+  /**
+    * Lets you treat any path as a file, letting you access any property you'd
+    * normally access through [[stat]]-ing it by [[stat]]-ing the file for you
+    * when necessary.
+    */
+  implicit def fileData(p: Path): stat.full = stat.full(p)
 
   /**
     * Used to spawn a subprocess interactively; any output gets printed to the
