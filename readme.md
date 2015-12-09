@@ -1,10 +1,10 @@
 # Ammonite [![Build Status](https://travis-ci.org/lihaoyi/Ammonite.svg)](https://travis-ci.org/lihaoyi/Ammonite) [![Join the chat at https://gitter.im/lihaoyi/Ammonite](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/lihaoyi/Ammonite?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-This is where the code for the [Ammonite](http://lihaoyi.github.io/Ammonite) project lives; Both:
+This is where the code for the [Ammonite](https://lihaoyi.github.io/Ammonite) project lives; Both:
 
-- [Ammonite-REPL](http://lihaoyi.github.io/Ammonite), the improved Scala REPL
-- [Ammonite-Ops](http://lihaoyi.github.io/Ammonite/#Ammonite-Ops), the Scala file-system library
-- [Ammonite-Shell](http://lihaoyi.github.io/Ammonite/#Ammonite-Shell), the Bash-replacement system shell
+- [Ammonite-REPL](https://lihaoyi.github.io/Ammonite), the improved Scala REPL
+- [Ammonite-Ops](https://lihaoyi.github.io/Ammonite/#Ammonite-Ops), the Scala file-system library
+- [Ammonite-Shell](https://lihaoyi.github.io/Ammonite/#Ammonite-Shell), the Bash-replacement system shell
 
 If you want to learn more about Ammonite or how to use it, check out the links above, or ask on the [Gitter Channel](https://gitter.im/lihaoyi/Ammonite). The remainder of this document is developer-docs for people who want to work on the Ammonite source code itself.
 
@@ -12,11 +12,11 @@ If you want to learn more about Ammonite or how to use it, check out the links a
 
 The layout of the repository is roughly:
 
-- `ops/` is [Ammonite-Ops](http://lihaoyi.github.io/Ammonite/#Ammonite-Ops)
-- `repl/` is [Ammonite-REPL](http://lihaoyi.github.io/Ammonite)
-- `shell/` is [Ammonite-Shell](http://lihaoyi.github.io/Ammonite/#Ammonite-Shell)
+- `ops/` is [Ammonite-Ops](https://lihaoyi.github.io/Ammonite/#Ammonite-Ops)
+- `repl/` is [Ammonite-REPL](https://lihaoyi.github.io/Ammonite)
+- `shell/` is [Ammonite-Shell](https://lihaoyi.github.io/Ammonite/#Ammonite-Shell)
 - `terminal/` is the JLine re-implementation used by Ammonite-REPL to provide syntax highlighting and multiline editing
-- `readme/` is the source code for the [Documentation](http://lihaoyi.github.io/Ammonite/#Ammonite-Ops), written in [Scalatex](http://lihaoyi.github.io/Scalatex/).
+- `readme/` is the source code for the [Documentation](https://lihaoyi.github.io/Ammonite/#Ammonite-Ops), written in [Scalatex](https://lihaoyi.github.io/Scalatex/).
 - `modules/` is a synthetic project used for publishing, purely intended to exclude the readme
 
 ## Common Commands
@@ -66,7 +66,7 @@ And possibly:
 
 - **All code PRs should come with**: a meaningful description, inline-comments for important things, unit tests (positive and negative), and a green build in [CI](https://travis-ci.org/lihaoyi/Ammonite)
 - **Try to keep lines below 80 characters width**, with a hard limit of 100 characters.
-- **PRs for features should generally come with *something* added to the [Documentation](http://lihaoyi.github.io/Ammonite)**, so people can discover that it exists
+- **PRs for features should generally come with *something* added to the [Documentation](https://lihaoyi.github.io/Ammonite)**, so people can discover that it exists
 - **Be prepared to discuss/argue-for your changes if you want them merged**! You will probably need to refactor so your changes fit into the larger codebase
 - **If your code is hard to unit test, and you don't want to unit test it, that's ok**. But be prepared to argue why that's the case!
 - **It's entirely possible your changes won't be merged**, or will get ripped out later. This is also the case for my changes, as the Author!
