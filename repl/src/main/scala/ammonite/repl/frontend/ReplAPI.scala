@@ -5,6 +5,7 @@ import java.io.File
 import ammonite.ops._
 import ammonite.repl._
 import ammonite.repl.interp.Frame
+import org.apache.ivy.plugins.resolver.RepositoryResolver
 import pprint.{PPrinter, PPrint, Config}
 
 import scala.collection.mutable
@@ -79,6 +80,11 @@ trait ReplAPI {
    * Tools related to loading external scripts and code into the REPL
    */
   def load: Load
+
+  /**
+   * resolvers to use when loading jars 
+   */
+  def resolvers: Ref[List[RepositoryResolver]]
 
   /**
    * The colors that will be used to render the Ammonite REPL in the terminal
@@ -210,6 +216,7 @@ object SessionChanged{
 }
 // End of OpsAPI
 trait LoadJar {
+
   /**
    * Load a `.jar` file
    */

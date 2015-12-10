@@ -62,6 +62,22 @@ object ProjectTests extends TestSuite{
             @ system.shutdown()
           """)
         }
+        'resolvers{
+          check.session("""
+            @ import ammonite.repl._, Resolvers._ 
+            
+            @ val oss = httpResolver("ambiata-oss", 
+            @                        "https://ambiata-oss.s3-ap-southeast-2.amazonaws.com", 
+            @                        m2Compatible = false,
+            @                        pattern = IvyPattern)
+            
+            @ resolvers() = resolvers() :+ oss
+
+            @ load.ivy("com.ambiata" %% "mundane-csv" % "1.2.1-20151110022459-5808a4b")
+                          
+            @ import com.ambiata.mundane._
+          """)
+        }
       }
       'code{
         check.session("""
