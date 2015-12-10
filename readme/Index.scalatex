@@ -27,7 +27,7 @@
 
 @sect{Ammonite}
   @p
-    Ammonite enables shell-like scripting in the @lnk("Scala programming language", "http://www.scala-lang.org/"). It is made of a few subprojects:
+    Ammonite enables shell-like scripting in the @lnk("Scala programming language", "https://www.scala-lang.org/"). It is made of a few subprojects:
 
   @ul
     @li

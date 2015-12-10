@@ -61,7 +61,7 @@ object IvyThing {
         res.setUsepoms(true)
         res.setM2compatible(true)
         res.setName(name)
-        res.setRoot("http://repo1.maven.org/maven2/")
+        res.setRoot("https://repo1.maven.org/maven2/")
         res
       }
       def fileResolver(name: String, root: String, pattern: String, m2: Boolean = false) = {

@@ -17,7 +17,7 @@
     @li
       You think that technology has improved in the last @lnk("38 years", "https://en.wikipedia.org/wiki/Bourne_shell") and a modern systems shell should be better than the shells of our forefathers
   @p
-    If none of these apply to you, then likely you won't be interested. If any of these bullet points strikes a chord, then read on to get started. For more discussion about why this project exists, take a look at the presentation slides for @lnk("Beyond Bash: shell scripting in a typed, OO language", "http://tinyurl.com/beyondbash"), presented at Scala by the Bay 2015, or check out the section on @sect.ref{Design Decisions & Tradeoffs}.
+    If none of these apply to you, then likely you won't be interested. If any of these bullet points strikes a chord, then read on to get started. For more discussion about why this project exists, take a look at the presentation slides for @lnk("Beyond Bash: shell scripting in a typed, OO language", "https://tinyurl.com/beyondbash"), presented at Scala by the Bay 2015, or check out the section on @sect.ref{Design Decisions & Tradeoffs}.
 
   @sect{Getting Ammonite-Shell}
     @p
@@ -204,7 +204,7 @@
 
   @sect{Scripting}
     @p
-      Ammonite-Shell uses @lnk("Scala", "http://www.scala-lang.org/") as its command and scripting language. Although the commands seem short and concise, you have the full power of the language available at any time. This lets you do things that are difficult or unfeasible to do when using a traditional shell like Bash.
+      Ammonite-Shell uses @lnk("Scala", "https://www.scala-lang.org/") as its command and scripting language. Although the commands seem short and concise, you have the full power of the language available at any time. This lets you do things that are difficult or unfeasible to do when using a traditional shell like Bash.
 
     @sect{Scala Scripting}
       @p
@@ -301,7 +301,7 @@
         """.stripMargin
       ))  
       @p    
-        In general, apart from the filesystem-specific commands, you should be able to do anything you would expect to be able to do in a Scala shell or Java project. This documentation isn't intended to be a full tutorial on the Scala language, check out the @lnk("Scala Documentation", "http://www.scala-lang.org/documentation/") if you want to learn more!
+        In general, apart from the filesystem-specific commands, you should be able to do anything you would expect to be able to do in a Scala shell or Java project. This documentation isn't intended to be a full tutorial on the Scala language, check out the @lnk("Scala Documentation", "https://www.scala-lang.org/documentation/") if you want to learn more!
     @sect{Scala/Java APIs}
       @p
         Apart from the pipe operators described in the earlier section on @sect.ref{Piping}, Ammonite-Shell allows you to call any valid Scala method on any value; it's just Scala after all! Here's an example using normal Scala collection operations to deal with a list of files, counting how many files exist for each extension:
@@ -403,7 +403,7 @@
       Ammonite-Shell takes a fundamentally different architecture from traditional shells, or even more-modern shell-alternatives. Significant differences include:
     @ul
       @li
-        The command & scripting language is a standard, well-known application language (@lnk("Scala", "http://www.scala-lang.org/")) rather than one specially-designed for the shell
+        The command & scripting language is a standard, well-known application language (@lnk("Scala", "https://www.scala-lang.org/")) rather than one specially-designed for the shell
       @li
         The shell runs on the @lnk("JVM", "https://en.wikipedia.org/wiki/Java_virtual_machine"), and can execute or integrate-with arbitrary Java/JVM code or libraries.
     @p
@@ -454,7 +454,7 @@
         @li
           Ammonite can make use of any JVM APIs, and there are a lot of them! The JVM is a general-purpose platform for a general purpose language (Java), and thus has APIs for doing all sorts of things: dealing with @lnk("dates and times", "https://docs.oracle.com/javase/8/docs/api/java/time/package-summary.html"), @lnk("math", "https://docs.oracle.com/javase/8/docs/api/java/lang/Math.html"), @lnk("networks", "https://docs.oracle.com/javase/8/docs/api/java/net/package-summary.html"), @lnk("threads", "https://docs.oracle.com/javase/8/docs/api/java/lang/Thread.html"), and many other things. While you may not always need all of these capabilities, it is nice to have them at your disposal where necessary.
         @li
-          Ammonite can make use of any Java/JVM libraries, and the excelent infrastructure used by Java developers to download and manage them! Any library is just a @sect.ref("Artifact Loading", "load.ivy") away. Need to parse Python source into an AST? Load @lnk("Jython", "http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22jython-standalone%22") and just do it. Need a high-performance web server? Load @lnk("Akka-HTTP", "http://doc.akka.io/docs/akka-stream-and-http-experimental/1.0-M2/scala/http/"). Need some data someone stored in a YAML file? Load @lnk("SnakeYAML", "https://bitbucket.org/asomov/snakeyaml") and parse it. You don't even need to download and manage these libraries yourself: just @hl.scala{load.ivy} them from Ammonite, and Java's excellent dependency-management infrastructure will download them (along with any transitive dependencies!), cache them locally, and make them available to your code.
+          Ammonite can make use of any Java/JVM libraries, and the excelent infrastructure used by Java developers to download and manage them! Any library is just a @sect.ref("Artifact Loading", "load.ivy") away. Need to parse Python source into an AST? Load @lnk("Jython", "https://search.maven.org/#search%7Cga%7C1%7Ca%3A%22jython-standalone%22") and just do it. Need a high-performance web server? Load @lnk("Akka-HTTP", "http://doc.akka.io/docs/akka-stream-and-http-experimental/1.0-M2/scala/http/"). Need some data someone stored in a YAML file? Load @lnk("SnakeYAML", "https://bitbucket.org/asomov/snakeyaml") and parse it. You don't even need to download and manage these libraries yourself: just @hl.scala{load.ivy} them from Ammonite, and Java's excellent dependency-management infrastructure will download them (along with any transitive dependencies!), cache them locally, and make them available to your code.
 
       @p
         There are both pros and cons with running Ammonite on the JVM: we gain its heavy startup/memory overhead, but also get access to its high-performance @lnk("JIT", "https://en.wikipedia.org/wiki/Just-in-time_compilation"), massive ecosystem of available packages.
