@@ -13,7 +13,7 @@
 
   @ul
     @li
-      @lnk("Beyond Bash: shell scripting in a typed, OO language", "https://www.youtube.com/watch?v=dP5tkmWAhjg"), at Scala by the Bay 2015. @lnk("Slides", "http://tinyurl.com/beyondbash")
+      @lnk("Beyond Bash: shell scripting in a typed, OO language", "https://www.youtube.com/watch?v=dP5tkmWAhjg"), at Scala by the Bay 2015. @lnk("Slides", "https://tinyurl.com/beyondbash")
     @li
       @lnk("Shell scripting in a typed, OO language", "https://vimeo.com/143819744"), at New Object Oriented Languages 2015.
 

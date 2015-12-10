@@ -7,7 +7,7 @@
 @sect("Ammonite-REPL", "A Modernized Scala REPL")
 
   @p
-    Ammonite is a cleanroom re-implementation of the Scala REPL from first principles. It is much more featureful than the default REPL and comes with a lot of @sect.ref("Features", "ergonomic improvements") and @sect.ref("Configuration", "configurability") that may be familiar to people coming from IDEs or other REPLs such as @lnk("IPython", "http://ipython.org/") or @lnk("Zsh", "http://www.zsh.org/"). It can be combined with @sect.ref{Ammonite-Ops} to replace Bash as your systems shell, but also can be used alone as a @sect.ref("Features", "superior") version of the default Scala REPL, or as a @sect.ref("Debugging", "debugging tool").
+    Ammonite is a cleanroom re-implementation of the Scala REPL from first principles. It is much more featureful than the default REPL and comes with a lot of @sect.ref("Features", "ergonomic improvements") and @sect.ref("Configuration", "configurability") that may be familiar to people coming from IDEs or other REPLs such as @lnk("IPython", "https://ipython.org/") or @lnk("Zsh", "http://www.zsh.org/"). It can be combined with @sect.ref{Ammonite-Ops} to replace Bash as your systems shell, but also can be used alone as a @sect.ref("Features", "superior") version of the default Scala REPL, or as a @sect.ref("Debugging", "debugging tool").
 
   @p
     If you want to use Ammonite as a plain Scala shell, download the standalone executable:
@@ -80,7 +80,7 @@
       @hl.ref(advancedTests, Seq("'pprint", "@"), "\"\"\"")
 
       @p
-        Ammonite-REPL uses @lnk("PPrint", "http://lihaoyi.github.io/upickle-pprint/pprint/") to display its output by default. That means that everything is nicely formatted to fit within the width of the terminal, and is copy-paste-able!
+        Ammonite-REPL uses @lnk("PPrint", "https://lihaoyi.github.io/upickle-pprint/pprint/") to display its output by default. That means that everything is nicely formatted to fit within the width of the terminal, and is copy-paste-able!
 
       @p
         By default, Ammonite @sect.ref("Configurable Truncation", "truncates") the pretty-printed output to avoid flooding your terminal. If you want to disable truncation, call @hl.scala{show(...)} on your expression to pretty-print it's full output. You can also pass in an optional @hl.scala{height = ...} parameter to control how much you want to show before truncation.

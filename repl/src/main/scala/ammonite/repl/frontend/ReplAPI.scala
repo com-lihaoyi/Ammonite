@@ -285,7 +285,7 @@ trait DefaultReplAPI extends FullReplAPI {
       |to replace. Hit <tab> to autocomplete possible names.
       |
       |For a list of REPL built-ins and configuration, use `repl.<tab>`. For a more detailed
-      |description of how to use the REPL, check out http://lihaoyi.github.io/Ammonite
+      |description of how to use the REPL, check out https://lihaoyi.github.io/Ammonite
     """.stripMargin.trim
   object Internal extends Internal{
     def combinePrints(iters: Iterator[String]*) = {
