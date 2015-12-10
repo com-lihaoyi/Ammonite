@@ -79,6 +79,7 @@ object PPrints{
         }.mkString)
     }
 
+  implicit val defaultHighlightColor = GrepResult.Color(Console.BLUE + Console.YELLOW_B, Console.RESET)
 }
 trait OpsAPI{
   /**
