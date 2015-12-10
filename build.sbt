@@ -31,7 +31,7 @@ val sharedSettings = Seq(
   organization := "com.lihaoyi",
   version := _root_.ammonite.Constants.version,
   libraryDependencies += "com.lihaoyi" %% "utest" % "0.3.0" % "test",
-  testFrameworks += new TestFramework("utest.runner.Framework"),
+  testFrameworks := Seq(new TestFramework("utest.runner.Framework")),
   scalacOptions += "-target:jvm-1.7",
   autoCompilerPlugins := true,
   addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.3"),
