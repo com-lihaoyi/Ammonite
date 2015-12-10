@@ -73,7 +73,7 @@ object ProjectTests extends TestSuite{
             
             @ resolvers() = resolvers() :+ oss
 
-            @ load.ivy("com.ambiata" %% "mundane-csv" % "1.2.1-20151110022459-5808a4b")
+            @ load.ivy("com.ambiata" %% "mundane" % "1.2.1-20141230225616-50fc792")
                           
             @ import com.ambiata.mundane._
           """)
