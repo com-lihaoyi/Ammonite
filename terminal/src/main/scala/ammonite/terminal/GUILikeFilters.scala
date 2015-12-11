@@ -68,7 +68,7 @@ object GUILikeFilters {
       Case(FnShiftRight){(b, c, m) => setMark(c); BasicFilters.moveEnd(b, c, m.width)},
       Case(FnShiftLeft){(b, c, m) => setMark(c); BasicFilters.moveStart(b, c, m.width)},
       {
-        case TS(27 ~: 91 ~: 90 ~: rest, b, c) =>
+        case TS(27 ~: 91 ~: 90 ~: rest, b, c) if mark.isDefined =>
           doIndent(b, c, rest,
             slice => -math.min(slice.iterator.takeWhile(_ == ' ').size, indent)
           )
