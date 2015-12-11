@@ -9,13 +9,15 @@
       @lnk("Mailing List", "https://groups.google.com/forum/#!forum/ammonite-scala")
 
   @p
-    I've also given a number of talks about Ammonite:
+    I've also given a number of talks about Ammonite at conferences:
 
   @ul
     @li
-      @lnk("Beyond Bash: shell scripting in a typed, OO language", "https://www.youtube.com/watch?v=dP5tkmWAhjg"), at Scala by the Bay 2015. @lnk("Slides", "https://tinyurl.com/beyondbash")
+      @lnk("Rock-solid Shell Scripting in Scala", "https://vimeo.com/148552858"), at Scala Exchange 2015
     @li
       @lnk("Shell scripting in a typed, OO language", "https://vimeo.com/143819744"), at New Object Oriented Languages 2015.
+    @li
+      @lnk("Beyond Bash: shell scripting in a typed, OO language", "https://www.youtube.com/watch?v=dP5tkmWAhjg"), at Scala by the Bay 2015. @lnk("Slides", "https://tinyurl.com/beyondbash")
 
 @sect{Scaladoc}
   @p

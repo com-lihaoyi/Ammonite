@@ -39,16 +39,14 @@
 
   @p
     Depending on why you are here, click on the above links to jump straight to the documentation that interests you. For an overview of the project and it's motivation, check out this talk:
-
   @iframe(
-    "width".attr:="800", 
-    "height".attr:="450", 
-    marginLeft.auto,
-    marginRight.auto,
-    display.block,
-    src:="https://www.youtube.com/embed/dP5tkmWAhjg?vq=hd720", 
-    "frameborder".attr := "0", 
-    "allowfullscreen".attr := "1"
+    src := "https://player.vimeo.com/video/148552858",
+    width := 800,
+    height := 600,
+    "frameborder".attr := 0,
+    "webkitallowfullscreen".attr := 1,
+    "mozallowfullscreen".attr := 1,
+    "allowfullscreen".attr := 1
   )
 
 @Repl()
