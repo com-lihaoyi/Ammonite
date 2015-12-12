@@ -31,7 +31,7 @@ val sharedSettings = Seq(
   organization := "com.lihaoyi",
   version := _root_.ammonite.Constants.version,
   libraryDependencies += "com.lihaoyi" %% "utest" % "0.3.0" % "test",
-  testFrameworks += new TestFramework("utest.runner.Framework"),
+  testFrameworks := Seq(new TestFramework("utest.runner.Framework")),
   scalacOptions += "-target:jvm-1.7",
   autoCompilerPlugins := true,
   addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.3"),
@@ -66,7 +66,7 @@ val sharedSettings = Seq(
           <url>https://github.com/lihaoyi</url>
         </developer>
       </developers>
-)
+) ++ prompt
 
 /**
  * Concise, type-safe operating-system operations in Scala: filesystem,
@@ -78,6 +78,10 @@ lazy val ops = project
     name := "ammonite-ops"
   )
 
+lazy val prompt = shellPrompt in ThisBuild := { state =>
+  val name = Project.extract(state).currentRef.project
+  (if (name == "ammonite") "" else name) + "> "
+}
 
 /**
  * A standalone re-implementation of a composable readline-style REPL,
@@ -250,7 +254,6 @@ lazy val readme = ScalatexReadme(
   }),
   (unmanagedSources in Compile) += baseDirectory.value/".."/"project"/"Constants.scala"
 )
-
 
 lazy val tested = project
   .in(file("target/tested"))

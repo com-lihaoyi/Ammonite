@@ -2,6 +2,8 @@ package ammonite.repl.interp
 
 import java.io.File
 import java.nio.file.NotDirectoryException
+import org.apache.ivy.plugins.resolver.RepositoryResolver
+
 import scala.collection.mutable
 import acyclic.file
 import ammonite.ops._
@@ -182,7 +184,9 @@ class Interpreter(prompt0: Ref[String],
     }
   }
 
-  abstract class DefaultLoadJar extends LoadJar{
+  abstract class DefaultLoadJar extends LoadJar with Resolvers {
+    
+    lazy val ivyThing = IvyThing(resolvers)
 
     def handleJar(jar: File): Unit
 
@@ -201,7 +205,7 @@ class Interpreter(prompt0: Ref[String],
       psOpt match{
         case Some(ps) => ps.map(handleJar)
         case None =>
-          val resolved = IvyThing.resolveArtifact(
+          val resolved = ivyThing.resolveArtifact(
             groupId,
             artifactId,
             version,
@@ -220,14 +224,20 @@ class Interpreter(prompt0: Ref[String],
     }
   }
 
-  lazy val replApi: ReplAPI = new DefaultReplAPI {
+  lazy val replApi: ReplAPI = new DefaultReplAPI { outer => 
 
     def imports = interp.eval.previousImportBlock
     val colors = colors0
     val prompt = prompt0
     val frontEnd = frontEnd0
 
+    lazy val resolvers = 
+      Ref(Resolvers.defaultResolvers)
+
     object load extends DefaultLoadJar with Load {
+    
+      def resolvers: List[RepositoryResolver] = 
+        outer.resolvers()  
 
       def handleJar(jar: File) = {
         eval.sess.frames.head.extraJars = eval.sess.frames.head.extraJars ++ Seq(jar)
@@ -244,6 +254,9 @@ class Interpreter(prompt0: Ref[String],
       }
 
       object plugin extends DefaultLoadJar {
+        def resolvers: List[RepositoryResolver] = 
+          outer.resolvers()  
+
         def handleJar(jar: File) =
           sess.frames.head.pluginClassloader.add(jar.toURI.toURL)
       }

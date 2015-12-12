@@ -75,6 +75,11 @@
 
       @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("akkahttp", "@"), "\"\"\"")
 
+      @p
+        Ammonite-REPL is configured with a set of default resolvers but you can add your own
+        
+        @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("resolvers", "@"), "\"\"\"") 
+
     @sect{Pretty-printed output}
 
       @hl.ref(advancedTests, Seq("'pprint", "@"), "\"\"\"")
