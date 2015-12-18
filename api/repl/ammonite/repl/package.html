@@ -244,6 +244,24 @@ command-echoes, etc. in order to keep things consistent
       </a>
     </span>
       
+    </li><li name="ammonite.repl.IvyThing" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="IvyThingextendsProductwithSerializable"></a>
+      <a id="IvyThing:IvyThing"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="IvyThing.html"><span class="name">IvyThing</span></a><span class="params">(<span name="resolvers">resolvers: () ⇒ <a href="../../scala/package.html#List[+A]=List[A]" class="extmbr" name="scala.List">List</a>[<a href="Resolver.html" class="extype" name="ammonite.repl.Resolver">Resolver</a>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.repl.package@IvyThingextendsProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Resolve artifacts from Ivy.</p><div class="fullcomment"><div class="comment cmt"><p>Resolve artifacts from Ivy. Originally taken from</p><p>http://makandracards.com/evgeny-goldin/5817-calling-ivy-from-groovy-or-java</p><p>And transliterated into Scala. I have no idea how or why it works.
+</p></div></div>
     </li><li name="ammonite.repl.Ref" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
       <a id="Ref[T]extendsStableRef[T]"></a>
       <a id="Ref[T]:Ref[T]"></a>
@@ -295,6 +313,44 @@ command-echoes, etc. in order to keep things consistent
       </a>
     </span>
       <p class="shortcomment cmt">The result of a single pass through the ammonite REPL.</p>
+    </li><li name="ammonite.repl.Resolver" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="ResolverextendsAnyRef"></a>
+      <a id="Resolver:Resolver"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed </span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Resolver.html"><span class="name">Resolver</span></a><span class="result"> extends <a href="../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.repl.package@ResolverextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">A thin wrapper around <span class="extype" name="RepositoryResolver">RepositoryResolver</span>, which wraps them and provides
+hashability in order to set the cache tags.</p><div class="fullcomment"><div class="comment cmt"><p>A thin wrapper around <span class="extype" name="RepositoryResolver">RepositoryResolver</span>, which wraps them and provides
+hashability in order to set the cache tags. This lets us invalidate the ivy
+resolution cache if the set of resolvers changes
+</p></div></div>
+    </li><li name="ammonite.repl.Resolvers" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="ResolversextendsAnyRef"></a>
+      <a id="Resolvers:Resolvers"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Resolvers.html"><span class="name">Resolvers</span></a><span class="result"> extends <a href="../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.repl.package@ResolversextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
     </li><li name="ammonite.repl.StableRef" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
       <a id="StableRef[T]extendsAnyRef"></a>
       <a id="StableRef[T]:StableRef[T]"></a>
@@ -427,7 +483,7 @@ to be able to run multiple Ammonite processes on the same system.
       </a>
     </span>
       
-    </li><li name="ammonite.repl.IvyThing" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+    </li><li name="ammonite.repl.IvyThing" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="IvyThing"></a>
       <a id="IvyThing:IvyThing"></a>
       <h4 class="signature">
@@ -436,15 +492,14 @@ to be able to run multiple Ammonite processes on the same system.
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <a href="IvyThing$.html"><span class="name">IvyThing</span></a>
+        <a href="IvyThing$.html"><span class="name">IvyThing</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.repl.package@IvyThing" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Resolve artifacts from Ivy.</p><div class="fullcomment"><div class="comment cmt"><p>Resolve artifacts from Ivy. Originally taken from</p><p>http://makandracards.com/evgeny-goldin/5817-calling-ivy-from-groovy-or-java</p><p>And transliterated into Scala. I have no idea how or why it works.
-</p></div></div>
+      
     </li><li name="ammonite.repl.Main" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="Main"></a>
       <a id="Main:Main"></a>
@@ -527,6 +582,40 @@ to be able to run multiple Ammonite processes on the same system.
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.repl.package@Res" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="ammonite.repl.Resolver" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Resolver"></a>
+      <a id="Resolver:Resolver"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Resolver$.html"><span class="name">Resolver</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.repl.package@Resolver" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="ammonite.repl.Resolvers" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Resolvers"></a>
+      <a id="Resolvers:Resolvers"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Resolvers$.html"><span class="name">Resolvers</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.repl.package@Resolvers" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>

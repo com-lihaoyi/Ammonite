@@ -28,10 +28,12 @@
         </head>
         <body class="value">
       <div id="definition">
-        <img alt="Object" src="../../lib/object_big.png" />
+        <a href="IvyThing.html" title="See companion class"><img alt="Object/Class" src="../../lib/object_to_class_big.png" /></a>
         <p id="owner"><a href="../package.html" class="extype" name="ammonite">ammonite</a>.<a href="package.html" class="extype" name="ammonite.repl">repl</a></p>
-        <h1>IvyThing</h1><h3><span class="morelinks"><div>Related Doc:
-            <a href="package.html" class="extype" name="ammonite.repl">package repl</a>
+        <h1><a href="IvyThing.html" title="See companion class">IvyThing</a></h1><h3><span class="morelinks"><div>
+            Related Docs:
+            <a href="IvyThing.html" title="See companion class">class IvyThing</a>
+            | <a href="package.html" class="extype" name="ammonite.repl">package repl</a>
           </div></span></h3><span class="permalink">
       <a href="../../index.html#ammonite.repl.IvyThing$" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
@@ -45,14 +47,13 @@
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <span class="name">IvyThing</span>
+        <span class="name">IvyThing</span><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Resolve artifacts from Ivy. Originally taken from</p><p>http://makandracards.com/evgeny-goldin/5817-calling-ivy-from-groovy-or-java</p><p>And transliterated into Scala. I have no idea how or why it works.
-</p></div><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
-          <div class="superTypes hiddenContent"><a href="../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <a href="../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
         
 
@@ -70,7 +71,7 @@
                 <span class="filtertype">Inherited<br />
                 </span>
                 <ol id="linearization">
-                  <li class="in" name="ammonite.repl.IvyThing"><span>IvyThing</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                  <li class="in" name="ammonite.repl.IvyThing"><span>IvyThing</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                 </ol>
               </div><div id="ancestors">
             <span class="filtertype"></span>
@@ -89,27 +90,7 @@
         <div id="allMembers">
         
 
-        <div id="types" class="types members">
-              <h3>Type Members</h3>
-              <ol><li name="ammonite.repl.IvyThing.IvyResolutionException" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="IvyResolutionExceptionextendsExceptionwithProductwithSerializable"></a>
-      <a id="IvyResolutionException:IvyResolutionException"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">case class</span>
-      </span>
-      <span class="symbol">
-        <a href="IvyThing$$IvyResolutionException.html"><span class="name">IvyResolutionException</span></a><span class="params">(<span name="failed">failed: <a href="../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result"> extends <a href="../../scala/package.html#Exception=Exception" class="extmbr" name="scala.Exception">Exception</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.repl.IvyThing$@IvyResolutionExceptionextendsExceptionwithProductwithSerializable" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
-    </li></ol>
-            </div>
+        
 
         
 
@@ -314,19 +295,19 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="ammonite.repl.IvyThing#maxLevel" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="maxLevel:Int"></a>
-      <a id="maxLevel:Int"></a>
+    </li><li name="ammonite.repl.IvyThing#ivyInstance" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ivyInstance(resolvers:()=&gt;List[ammonite.repl.Resolver]):org.apache.ivy.Ivy"></a>
+      <a id="ivyInstance(()⇒List[Resolver]):Ivy"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">var</span>
+        <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">maxLevel</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+        <span class="name">ivyInstance</span><span class="params">(<span name="resolvers">resolvers: () ⇒ <a href="../../scala/package.html#List[+A]=List[A]" class="extmbr" name="scala.List">List</a>[<a href="Resolver.html" class="extype" name="ammonite.repl.Resolver">Resolver</a>]</span>)</span><span class="result">: <span class="extype" name="org.apache.ivy.Ivy">Ivy</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#ammonite.repl.IvyThing$@maxLevel:Int" title="Permalink" target="_top">
+      <a href="../../index.html#ammonite.repl.IvyThing$@ivyInstance(resolvers:()=&gt;List[ammonite.repl.Resolver]):org.apache.ivy.Ivy" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -382,23 +363,6 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="ammonite.repl.IvyThing#resolveArtifact" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="resolveArtifact(groupId:String,artifactId:String,version:String,verbosity:Int):Array[java.io.File]"></a>
-      <a id="resolveArtifact(String,String,String,Int):Array[File]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">resolveArtifact</span><span class="params">(<span name="groupId">groupId: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="artifactId">artifactId: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="version">version: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="verbosity">verbosity: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">2</span></span>)</span><span class="result">: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="java.io.File">File</span>]</span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.repl.IvyThing$@resolveArtifact(groupId:String,artifactId:String,version:String,verbosity:Int):Array[java.io.File]" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
     </li><li name="ammonite.repl.IvyThing#scalaBinaryVersion" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="scalaBinaryVersion:String"></a>
       <a id="scalaBinaryVersion:String"></a>
@@ -528,7 +492,11 @@
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="scala.AnyRef">
+        <div class="parent" name="scala.Serializable">
+              <h3>Inherited from <span class="extype" name="scala.Serializable">Serializable</span></h3>
+            </div><div class="parent" name="java.io.Serializable">
+              <h3>Inherited from <span class="extype" name="java.io.Serializable">Serializable</span></h3>
+            </div><div class="parent" name="scala.AnyRef">
               <h3>Inherited from <a href="../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></h3>
             </div><div class="parent" name="scala.Any">
               <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
