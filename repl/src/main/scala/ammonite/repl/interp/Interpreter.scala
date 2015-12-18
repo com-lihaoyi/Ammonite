@@ -330,7 +330,8 @@ class Interpreter(prompt0: Ref[String],
     0,
     storage().compileCacheLoad,
     storage().compileCacheSave,
-    compiler.addToClasspath
+    compiler.addToClasspath,
+  storage().sessionClassFilesDir
   )
 
   val dynamicClasspath = new VirtualDirectory("(memory)", None)

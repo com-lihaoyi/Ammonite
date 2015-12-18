@@ -8,6 +8,7 @@ import org.apache.ivy.plugins.resolver.RepositoryResolver
 import scala.util.Try
 import scala.collection.generic.CanBuildFrom
 import scala.collection.{mutable, IndexedSeqLike}
+import java.nio.file.{Files, Paths}
 
 
 /**
@@ -22,6 +23,7 @@ trait Storage{
   val ivyCache: StableRef[IvyMap]
   def compileCacheSave(tag: String, data: CompileCache): Unit
   def compileCacheLoad(tag: String): Option[CompileCache]
+  def sessionClassFilesDir: java.nio.file.Path
 }
 
 object Storage{
@@ -37,6 +39,7 @@ object Storage{
     val ivyCacheFile = cacheDir/"ivycache.json"
     val metadataFile = "metadata.json"
     val historyFile = dir/'history
+    val sessionClassFilesDir = Files.createTempDirectory(Paths.get("/tmp/"), null)
     val fullHistory = new StableRef[History]{
       def apply(): History = try{
         new History(upickle.default.read[Vector[String]](read(historyFile)))

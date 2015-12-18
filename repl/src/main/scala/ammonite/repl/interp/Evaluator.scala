@@ -1,5 +1,6 @@
 package ammonite.repl.interp
 
+import java.io.FileOutputStream
 import java.lang.reflect.InvocationTargetException
 
 import acyclic.file
@@ -10,6 +11,7 @@ import Util.{CompileCache, ClassFiles}
 
 import scala.collection.mutable
 import scala.util.Try
+import java.nio.file.Path
 
 /**
  * Takes source code and, with the help of a compiler and preprocessor,
@@ -53,7 +55,8 @@ object Evaluator{
             startingLine: Int,
             cacheLoad: String => Option[CompileCache],
             cacheSave: (String, CompileCache) => Unit,
-            addToCompilerClasspath:  => ClassFiles => Unit): Evaluator = new Evaluator{ eval =>
+            addToCompilerClasspath:  => ClassFiles => Unit,
+           sessionClassFilesDir: Path = null): Evaluator = new Evaluator{ eval =>
 
     /**
      * Imports which are required by earlier commands to the REPL. Imports
@@ -143,12 +146,34 @@ object Evaluator{
       result <- Res[(ClassFiles, Seq[ImportData])](
         compiled, "Compilation Failed\n" + output.mkString("\n")
       )
-    } yield result
+      _ = println("code: " + code + " number of class files: "  + result._1.size)
+    }
+
+      //result match {
+      //  case ammonite.repl.Res.Success(s) => println ("Number of class files: " + s._1.size)
+      //}
+      yield result
+
+
 
     def loadClass(wrapperName: String, classFiles: ClassFiles): Res[Class[_]] = {
       Res[Class[_]](Try {
         for ((name, bytes) <- classFiles) {
-//          println("loadClass " + name)
+
+          if (sessionClassFilesDir != null) {
+
+            //val tmpDir = "/tmp/praveens/"
+            val tmpDir = sessionClassFilesDir.toString()
+            val tmpFile = tmpDir + "/" + name + ".class"
+
+            println("loadClass " + name + " and writing to: " + tmpFile)
+            val fos = new FileOutputStream(tmpFile)
+            fos.write(bytes)
+            fos.close()
+          } else {
+            println("Warning: sessionClassFilesDir is null")
+          }
+
           sess.frames.head.classloader.newFileDict(name) = bytes
         }
         Class.forName(wrapperName , true, sess.frames.head.classloader)
@@ -202,6 +227,7 @@ object Evaluator{
                     printCode: String,
                     printer: Iterator[String] => Unit,
                     extraImports: Seq[ImportData] = Seq()) = for {
+      //println("cmd" + getCurrentLine)
       wrapperName <- Res.Success("cmd" + getCurrentLine)
       _ <- Catching{ case e: ThreadDeath => interrupted() }
       (classFiles, newImports) <- compileClass(wrapCode(
@@ -210,8 +236,12 @@ object Evaluator{
         printCode,
         previousImports.values.toSeq ++ extraImports
       ))
+
+
       _ = Timer("eval.processLine compileClass end")
+
       cls <- loadClass(wrapperName, classFiles)
+      _ = println()
       _ = Timer("eval.processLine loadClass end")
       _ = currentLine += 1
       _ <- Catching{
@@ -229,7 +259,7 @@ object Evaluator{
     } yield {
       // Exhaust the printer iterator now, before exiting the `Catching`
       // block, so any exceptions thrown get properly caught and handled
-
+      println(wrapperName)
       val iter = evalMain(cls).asInstanceOf[Iterator[String]]
       Timer("eval.processLine evaluatorRunPrinter 1")
       evaluatorRunPrinter(printer(iter))
@@ -255,6 +285,7 @@ $code
                            printCode: String = ""): Res[(String, Class[_], Seq[ImportData])] = {
       Timer("cachedCompileBlock 0")
       val wrapperName = cacheTag(code, imports, sess.frames.head.classloader.classpathHash)
+      println("cachedCompileBlock wrapperName: " + wrapperName)
       Timer("cachedCompileBlock 1")
       val wrappedCode = wrapCode(wrapperName, code, printCode, imports)
       Timer("cachedCompileBlock 2")
