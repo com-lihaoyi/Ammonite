@@ -115,7 +115,8 @@ lazy val repl = project
       "com.lihaoyi" %% "scalaparse" % "0.3.4",
       "com.lihaoyi" %% "upickle" % "0.3.6",
       "com.lihaoyi" %% "pprint" % "0.3.6",
-      "com.github.scopt" %% "scopt" % "3.3.0"
+      "com.github.scopt" %% "scopt" % "3.3.0",
+      "commons-io" % "commons-io" % "2.4"
     ),
     libraryDependencies ++= (
       if (scalaVersion.value startsWith "2.10.") Nil

@@ -1,7 +1,8 @@
 package ammonite.repl.interp
 
-import java.io.FileOutputStream
+import java.io.{FileInputStream, ByteArrayInputStream, FileOutputStream}
 import java.lang.reflect.InvocationTargetException
+import java.util.jar.{JarOutputStream, JarEntry}
 
 import acyclic.file
 import ammonite.repl.frontend.{SessionChanged, Session, ReplExit}
@@ -11,7 +12,11 @@ import Util.{CompileCache, ClassFiles}
 
 import scala.collection.mutable
 import scala.util.Try
-import java.nio.file.Path
+import java.nio.file
+import scala.collection.JavaConversions._ // important for 'foreach'
+import org.apache.commons.io.{FileUtils, IOUtils}
+
+//import java.nio.file.{Files,}
 
 /**
  * Takes source code and, with the help of a compiler and preprocessor,
@@ -56,7 +61,7 @@ object Evaluator{
             cacheLoad: String => Option[CompileCache],
             cacheSave: (String, CompileCache) => Unit,
             addToCompilerClasspath:  => ClassFiles => Unit,
-           sessionClassFilesDir: Path = null): Evaluator = new Evaluator{ eval =>
+           sessionClassFilesDir: java.nio.file.Path = null): Evaluator = new Evaluator{ eval =>
 
     /**
      * Imports which are required by earlier commands to the REPL. Imports
@@ -98,6 +103,9 @@ object Evaluator{
 
     val namedFrames = mutable.Map.empty[String, List[Frame]]
 
+
+
+
     object sess extends Session {
       def frames = eval.frames
       def childFrame(parent: Frame) = Frame(
@@ -131,7 +139,39 @@ object Evaluator{
       def delete(name: String) = {
         namedFrames.remove(name)
       }
+
+      override def writeJar(path: Option[String] = None): Option[String] = {
+        val jarPath: java.nio.file.Path = path match {
+          case Some(p) => java.nio.file.Paths.get(p)
+          case None => java.nio.file.Files.createTempFile("/tmp/", "jar")
+        }
+
+
+        val jarStream = new JarOutputStream(new FileOutputStream(jarPath.toFile))
+        FileUtils.listFiles(sessionClassFilesDir.toFile, Array("class"), true).foreach{ f =>
+          val shortPath = f.toString().substring(sessionClassFilesDir.toString().length+1, f.toString().length)
+
+          val entry = new JarEntry(shortPath)
+          jarStream.putNextEntry(entry)
+          jarStream.write(IOUtils.toByteArray(new FileInputStream(f)))
+          jarStream.closeEntry()
+        }
+
+        jarStream.close()
+
+        Some(jarPath.toString())
+
+        //java.nio.file.Files.walkFileTree(sessionClassFilesDir, )
+
+        //sessionClassFilesDir
+
+      }
+
+
+
     }
+
+
 
     private var _compilationCount = 0
     def compilationCount = _compilationCount

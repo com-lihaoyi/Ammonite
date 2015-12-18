@@ -182,6 +182,9 @@ trait Session{
     * is no longer accessible.
     */
   def delete(name: String): Unit
+
+  def writeJar(name: Option[String] = None): Option[String] = {None}
+
 }
 case class SessionChanged(removedImports: Set[scala.Symbol],
                           addedImports: Set[scala.Symbol],
