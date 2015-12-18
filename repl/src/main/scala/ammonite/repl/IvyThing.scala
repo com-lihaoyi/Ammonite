@@ -50,8 +50,6 @@ case class IvyThing(resolvers: () => List[Resolver]) {
                       version: String,
                       verbosity: Int = 2) = synchronized {
     maxLevel = verbosity
-    pprint.pprintln("Resolving using resolvers")
-    pprint.pprintln(resolvers())
     val ivy = ivyInstance(resolvers)
 
     val md = DefaultModuleDescriptor.newDefaultInstance(
