@@ -84,7 +84,7 @@ trait ReplAPI {
   /**
    * resolvers to use when loading jars 
    */
-  def resolvers: Ref[List[RepositoryResolver]]
+  def resolvers: Ref[List[Resolver]]
 
   /**
    * The colors that will be used to render the Ammonite REPL in the terminal

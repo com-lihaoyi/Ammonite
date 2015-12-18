@@ -40,6 +40,12 @@
 
 @sect{Changelog}
 
+  @sect{0.5.2}
+    @ul
+      @li
+        Fixed @lnk("#80: Support artifact resolvers to load libraries not published to maven central", "https://github.com/lihaoyi/Ammonite/issues/80"), by @lnk("Eric Torreborre", "https://github.com/etorreborre")
+      @li
+        Fixed @lnk("#310: java.util.NoSuchElementException: None.get on Shift+Tab without selection", "https://github.com/lihaoyi/Ammonite/issues/301"), by @lnk("senia-psm", "https://github.com/senia-psm")
   @sect{0.5.1}
     @ul
       @li

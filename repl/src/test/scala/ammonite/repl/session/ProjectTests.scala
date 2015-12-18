@@ -64,12 +64,17 @@ object ProjectTests extends TestSuite{
         }
         'resolvers{
           check.session("""
+            @ load.ivy("com.ambiata" %% "mundane" % "1.2.1-20141230225616-50fc792")
+            error: IvyResolutionException
+
             @ import ammonite.repl._, Resolvers._ 
             
-            @ val oss = httpResolver("ambiata-oss", 
-            @                        "https://ambiata-oss.s3-ap-southeast-2.amazonaws.com", 
-            @                        m2Compatible = false,
-            @                        pattern = IvyPattern)
+            @ val oss = Resolver.Http(
+            @   "ambiata-oss",
+            @   "https://ambiata-oss.s3-ap-southeast-2.amazonaws.com",
+            @   IvyPattern,
+            @   false
+            @ )
             
             @ resolvers() = resolvers() :+ oss
 

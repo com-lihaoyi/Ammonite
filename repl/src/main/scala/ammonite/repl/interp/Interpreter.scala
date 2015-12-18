@@ -186,7 +186,7 @@ class Interpreter(prompt0: Ref[String],
 
   abstract class DefaultLoadJar extends LoadJar with Resolvers {
     
-    lazy val ivyThing = IvyThing(resolvers)
+    lazy val ivyThing = IvyThing(() => resolvers)
 
     def handleJar(jar: File): Unit
 
@@ -198,7 +198,7 @@ class Interpreter(prompt0: Ref[String],
       val (groupId, artifactId, version) = coordinates
       val psOpt =
         storage().ivyCache()
-                 .get((groupId, artifactId, version))
+                 .get((resolvers.hashCode.toString, groupId, artifactId, version))
                  .map(_.map(new java.io.File(_)))
                  .filter(_.forall(_.exists()))
 
@@ -213,7 +213,7 @@ class Interpreter(prompt0: Ref[String],
           )
 
           storage().ivyCache() = storage().ivyCache().updated(
-            (groupId, artifactId, version),
+            (resolvers.hashCode.toString, groupId, artifactId, version),
             resolved.map(_.getAbsolutePath).toSet
           )
 
@@ -236,7 +236,7 @@ class Interpreter(prompt0: Ref[String],
 
     object load extends DefaultLoadJar with Load {
     
-      def resolvers: List[RepositoryResolver] = 
+      def resolvers: List[Resolver] =
         outer.resolvers()  
 
       def handleJar(jar: File) = {
@@ -254,7 +254,7 @@ class Interpreter(prompt0: Ref[String],
       }
 
       object plugin extends DefaultLoadJar {
-        def resolvers: List[RepositoryResolver] = 
+        def resolvers: List[Resolver] =
           outer.resolvers()  
 
         def handleJar(jar: File) =

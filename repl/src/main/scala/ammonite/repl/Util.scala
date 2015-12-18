@@ -160,7 +160,7 @@ object Util{
     data.foreach(digest.update)
     digest.digest()
   }
-  type IvyMap = Map[(String, String, String), Set[String]]
+  type IvyMap = Map[(String, String, String, String), Set[String]]
   type ClassFiles = Traversable[(String, Array[Byte])]
   type CompileCache = (ClassFiles, Seq[ImportData])
   def transpose[A](xs: List[List[A]]): List[List[A]] = xs.filter(_.nonEmpty) match {

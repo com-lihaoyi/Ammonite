@@ -3,6 +3,7 @@ package ammonite.repl
 import acyclic.file
 import ammonite.ops._
 import ammonite.repl.Util.{IvyMap, CompileCache, ClassFiles}
+import org.apache.ivy.plugins.resolver.RepositoryResolver
 
 import scala.util.Try
 import scala.collection.generic.CanBuildFrom

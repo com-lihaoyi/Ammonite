@@ -31,7 +31,7 @@ trait IvyConstructor{
  *
  * And transliterated into Scala. I have no idea how or why it works.
  */
-case class IvyThing(resolvers: List[RepositoryResolver]) {
+case class IvyThing(resolvers: () => List[Resolver]) {
 
   case class IvyResolutionException(failed: Seq[String]) extends Exception(
     "failed to resolve ivy dependencies " + failed.mkString(", ")
@@ -50,7 +50,8 @@ case class IvyThing(resolvers: List[RepositoryResolver]) {
                       version: String,
                       verbosity: Int = 2) = synchronized {
     maxLevel = verbosity
-
+    pprint.pprintln("Resolving using resolvers")
+    pprint.pprintln(resolvers())
     val ivy = ivyInstance(resolvers)
 
     val md = DefaultModuleDescriptor.newDefaultInstance(
@@ -105,7 +106,7 @@ case class IvyThing(resolvers: List[RepositoryResolver]) {
 
 object IvyThing {
 
-  def ivyInstance(resolvers: List[RepositoryResolver]) = Ivy.newInstance {
+  def ivyInstance(resolvers: () => List[Resolver]) = Ivy.newInstance {
 
       //creates clear ivy settings
       val ivySettings = new IvySettings()
@@ -114,7 +115,7 @@ object IvyThing {
       val chainResolver = new ChainResolver
       chainResolver.setName("chain-resolver")
       chainResolver.setReturnFirst(true)
-      resolvers.foreach(chainResolver.add)
+      resolvers().map(_()).foreach(chainResolver.add)
       ivySettings.addResolver(chainResolver)
 
       //set to the default resolver
@@ -135,7 +136,7 @@ object IvyThing {
 }
 
 trait Resolvers {
- def resolvers: List[RepositoryResolver]  
+ def resolvers: List[Resolver]
 }
 
 object Resolvers {
@@ -152,63 +153,80 @@ object Resolvers {
   
   // this pattern comes from IBiblioResolver  
   val DefaultPattern: String =
-    "[module]/[type]s/[artifact]-[revision].[ext]"  
- 
-   /** create a Maven resolver located at a given http address */
-  def httpResolver(name: String, root: String, 
-                   m2Compatible: Boolean = true,
-                   pattern: String = MavenPattern) = {
-    val res = new IBiblioResolver()
-    res.setUsepoms(true)
-    res.setM2compatible(m2Compatible)
-    res.setName(name)
-    res.setRoot(root)
-    res.setPattern(pattern)  
-    res
-  }
-  
-  /** create a local resolver */
-  def fileResolver(name: String, root: String, 
-                   pattern: String, m2: Boolean = false): RepositoryResolver = {
-    val testRepoDir = sys.props("user.home") + root
-    val repo = new FileRepository(new java.io.File(testRepoDir))
-    
-    val res = new FileSystemResolver()
-    res.addIvyPattern(testRepoDir + pattern)
-    res.addArtifactPattern(testRepoDir + pattern)
-    res.setRepository(repo)
-    res.setM2compatible(m2)
-    res.setName(name)
-    
-    res
-  }
+    "[module]/[type]s/[artifact]-[revision].[ext]"
+
   
  //add duplicate resolvers with different name to make Ivy shut up
  //and stop giving `unknown resolver null` or `unknown resolver sbt-chain`
  //errors
- lazy val defaultResolvers: List[RepositoryResolver] = List(
-   fileResolver(
+ lazy val defaultResolvers: List[Resolver] = List(
+   Resolver.File(
      "ivy-cache",
      "/.ivy2/cache",
-     "/[organisation]/[module]/jars/[artifact]-[revision].[ext]"
+     "/[organisation]/[module]/jars/[artifact]-[revision].[ext]",
+     m2 = false
    ),
-   fileResolver(
+   Resolver.File(
      "cache",
      "/.ivy2/cache",
-     "/[organisation]/[module]/jars/[artifact]-[revision].[ext]"
+     "/[organisation]/[module]/jars/[artifact]-[revision].[ext]",
+     m2 = false
    ),
-   fileResolver(
+   Resolver.File(
      "local",
      "/.ivy2/local",
-     "/[organisation]/[module]/[revision]/jars/[artifact].[ext]"
+     "/[organisation]/[module]/[revision]/jars/[artifact].[ext]",
+     m2 = false
    ),
-   fileResolver(
+   Resolver.File(
      "m2",
      "/.m2/repository",
      "/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]",
      m2 = true
    ),
-   httpResolver(name = "central", root = "http://repo1.maven.org/maven2/")
+   Resolver.Http(
+     "central",
+     "http://repo1.maven.org/maven2/",
+     MavenPattern,
+    true
+   )
  )
-   
+}
+
+/**
+  * A thin wrapper around [[RepositoryResolver]], which wraps them and provides
+  * hashability in order to set the cache tags. This lets us invalidate the ivy
+  * resolution cache if the set of resolvers changes
+  */
+sealed trait Resolver{
+  def apply(): RepositoryResolver
+}
+object Resolver{
+  case class File(name: String, root: String, pattern: String, m2: Boolean) extends Resolver{
+    def apply() = {
+      val testRepoDir = sys.props("user.home") + root
+      val repo = new FileRepository(new java.io.File(testRepoDir))
+
+      val res = new FileSystemResolver()
+      res.addIvyPattern(testRepoDir + pattern)
+      res.addArtifactPattern(testRepoDir + pattern)
+      res.setRepository(repo)
+      res.setM2compatible(m2)
+      res.setName(name)
+
+      res
+
+    }
+  }
+  case class Http(name: String, root: String, pattern: String, m2: Boolean) extends Resolver{
+    def apply() = {
+      val res = new IBiblioResolver()
+      res.setUsepoms(true)
+      res.setM2compatible(m2)
+      res.setName(name)
+      res.setRoot(root)
+      res.setPattern(pattern)
+      res
+    }
+  }
 }
