@@ -53,7 +53,12 @@ object AutocompleteTests extends TestSuite{
           """import java.util.{LinkedHashMap, Linke<caret>""",
           Set("LinkedHashMap", "LinkedHashSet", "LinkedList") ^ _
         )
-
+        complete(
+          """import scala.uti.<caret>""", Set.empty[String] -- _
+        )
+        complete(
+          """import scala.colltion.<caret>""", Set.empty[String] -- _
+        )
       }
 
       'scope {
@@ -147,10 +152,12 @@ object AutocompleteTests extends TestSuite{
         //      complete("""Seq(1, 2, 3).map(_.co<caret>mpa)""", compares ^)
         //      complete("""Seq(1, 2, 3).map(_.<caret>compa)""", compares, ^)
       }
+
       'defTab {
         //Assert no NullPointerException was thrown. Does not verify any completions.
         complete( """def<caret>""", Set.empty -- _)
       }
+
       'Array {
         //Test around https://github.com/lihaoyi/Ammonite/issues/252
         complete("""new Array<caret>""", Set() ^)
