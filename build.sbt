@@ -181,6 +181,7 @@ lazy val shell = project
     (testOnly in Test) <<= (testOnly in Test).dependsOn(packageBin in Compile)
   )
 
+
 lazy val integration = project
   .dependsOn(ops)
   .dependsOn(repl)
@@ -211,7 +212,7 @@ lazy val sshd = project
     .dependsOn(repl)
     .settings(
       sharedSettings,
-      crossVersion := CrossVersion.full,
+
       name := "ammonite-sshd",
       libraryDependencies ++= Seq(
         "org.apache.sshd" % "sshd-core" % "0.14.0",
@@ -222,6 +223,16 @@ lazy val sshd = project
         "org.scalacheck" %% "scalacheck" % "1.12.4" % "test"
       )
   )
+
+lazy val jupyter_kernel = project
+  .dependsOn(repl)
+  .settings(
+    sharedSettings,
+      name := "ammonite-jupyter-kernel",
+      crossVersion := CrossVersion.full,
+    libraryDependencies ++= Seq("org.zeromq" % "jeromq" % "0.3.5")
+  )
+
 
 lazy val readme = ScalatexReadme(
   projectId = "readme",
