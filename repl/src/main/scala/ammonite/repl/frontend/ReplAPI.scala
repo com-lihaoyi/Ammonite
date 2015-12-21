@@ -125,6 +125,13 @@ trait ReplAPI {
   def replArgs: Vector[ammonite.repl.Bind[_]]
 
   /**
+    *
+    * @param name Filename to write a JAR with
+    * @return Filename to which a JAR was written
+    */
+  def writeJar(name: String = null): String
+
+  /**
    * Lets you configure the pretty-printing of a value. By default, it simply
    * disables truncation and prints the entire thing, but you can set other
    * parameters as well if you want.
@@ -182,8 +189,6 @@ trait Session{
     * is no longer accessible.
     */
   def delete(name: String): Unit
-
-  def writeJar(name: String = null): String
 
 }
 case class SessionChanged(removedImports: Set[scala.Symbol],

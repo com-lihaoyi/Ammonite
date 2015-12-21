@@ -12,9 +12,7 @@ import Util.{CompileCache, ClassFiles}
 
 import scala.collection.mutable
 import scala.util.Try
-import java.nio.file
-import scala.collection.JavaConversions._ // important for 'foreach'
-import org.apache.commons.io.{FileUtils, IOUtils}
+
 
 //import java.nio.file.{Files,}
 
@@ -106,6 +104,7 @@ object Evaluator{
 
 
 
+
     object sess extends Session {
       def frames = eval.frames
       def childFrame(parent: Frame) = Frame(
@@ -140,31 +139,7 @@ object Evaluator{
         namedFrames.remove(name)
       }
 
-      override def writeJar(path: String = null): String = {
-        val jarPath: java.nio.file.Path = (path == null) match {
-          case false => java.nio.file.Paths.get(path)
-          case true => java.nio.file.Files.createTempFile("/tmp/", "jar")
-        }
 
-
-        val jarStream = new JarOutputStream(new FileOutputStream(jarPath.toFile))
-        FileUtils.listFiles(sessionClassFilesDir.toFile, Array("class"), true).foreach{ f =>
-          val shortPath = f.toString().substring(sessionClassFilesDir.toString().length+1, f.toString().length)
-
-          val entry = new JarEntry(shortPath)
-          jarStream.putNextEntry(entry)
-          jarStream.write(IOUtils.toByteArray(new FileInputStream(f)))
-          jarStream.closeEntry()
-        }
-
-        jarStream.close()
-        jarPath.toString()
-
-        //java.nio.file.Files.walkFileTree(sessionClassFilesDir, )
-
-        //sessionClassFilesDir
-
-      }
 
 
 

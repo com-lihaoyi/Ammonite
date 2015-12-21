@@ -1,7 +1,8 @@
 package ammonite.repl.interp
 
-import java.io.File
+import java.io.{FileInputStream, FileOutputStream, File}
 import java.nio.file.NotDirectoryException
+import java.util.jar.{JarEntry, JarOutputStream}
 import org.apache.ivy.plugins.resolver.RepositoryResolver
 
 import scala.collection.mutable
@@ -13,6 +14,9 @@ import ammonite.repl._
 import ammonite.repl.frontend._
 
 import scala.reflect.io.VirtualDirectory
+import java.nio.file
+import scala.collection.JavaConversions._ // important for 'foreach'
+import org.apache.commons.io.{FileUtils, IOUtils}
 
 /**
  * A convenient bundle of all the functionality necessary
@@ -231,6 +235,33 @@ class Interpreter(prompt0: Ref[String],
     val prompt = prompt0
     val frontEnd = frontEnd0
 
+    def writeJar(path: String = null): String = {
+      val jarPath: java.nio.file.Path = (path == null) match {
+        case false => java.nio.file.Paths.get(path)
+        case true => java.nio.file.Files.createTempFile("/tmp/", "jar")
+      }
+
+      val sessionClassFilesDir = storage().sessionClassFilesDir
+
+      val jarStream = new JarOutputStream(new FileOutputStream(jarPath.toFile))
+      FileUtils.listFiles(sessionClassFilesDir.toFile, Array("class"), true).foreach{ f =>
+        val shortPath = f.toString().substring(sessionClassFilesDir.toString().length+1, f.toString().length)
+
+        val entry = new JarEntry(shortPath)
+        jarStream.putNextEntry(entry)
+        jarStream.write(IOUtils.toByteArray(new FileInputStream(f)))
+        jarStream.closeEntry()
+      }
+
+      jarStream.close()
+      jarPath.toString()
+
+      //java.nio.file.Files.walkFileTree(sessionClassFilesDir, )
+
+      //sessionClassFilesDir
+
+    }
+
     lazy val resolvers = 
       Ref(Resolvers.defaultResolvers)
 
@@ -319,9 +350,7 @@ class Interpreter(prompt0: Ref[String],
         init()
         res
       }
-      override def writeJar(name: String = null) : String = {
-        eval.sess.writeJar(name)
-      }
+
     }
   }
 
