@@ -183,7 +183,7 @@ trait Session{
     */
   def delete(name: String): Unit
 
-  def writeJar(name: Option[String] = None): Option[String] = {None}
+  def writeJar(name: String = null): String
 
 }
 case class SessionChanged(removedImports: Set[scala.Symbol],

@@ -319,7 +319,7 @@ class Interpreter(prompt0: Ref[String],
         init()
         res
       }
-      override def writeJar(name: Option[String]) : Option[String] = {
+      override def writeJar(name: String = null) : String = {
         eval.sess.writeJar(name)
       }
     }

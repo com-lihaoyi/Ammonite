@@ -140,10 +140,10 @@ object Evaluator{
         namedFrames.remove(name)
       }
 
-      override def writeJar(path: Option[String] = None): Option[String] = {
-        val jarPath: java.nio.file.Path = path match {
-          case Some(p) => java.nio.file.Paths.get(p)
-          case None => java.nio.file.Files.createTempFile("/tmp/", "jar")
+      override def writeJar(path: String = null): String = {
+        val jarPath: java.nio.file.Path = (path == null) match {
+          case false => java.nio.file.Paths.get(path)
+          case true => java.nio.file.Files.createTempFile("/tmp/", "jar")
         }
 
 
@@ -158,8 +158,7 @@ object Evaluator{
         }
 
         jarStream.close()
-
-        Some(jarPath.toString())
+        jarPath.toString()
 
         //java.nio.file.Files.walkFileTree(sessionClassFilesDir, )
 
@@ -186,7 +185,6 @@ object Evaluator{
       result <- Res[(ClassFiles, Seq[ImportData])](
         compiled, "Compilation Failed\n" + output.mkString("\n")
       )
-      _ = println("code: " + code + " number of class files: "  + result._1.size)
     }
 
       //result match {
@@ -201,12 +199,9 @@ object Evaluator{
         for ((name, bytes) <- classFiles) {
 
           if (sessionClassFilesDir != null) {
-
-            //val tmpDir = "/tmp/praveens/"
             val tmpDir = sessionClassFilesDir.toString()
             val tmpFile = tmpDir + "/" + name + ".class"
 
-            println("loadClass " + name + " and writing to: " + tmpFile)
             val fos = new FileOutputStream(tmpFile)
             fos.write(bytes)
             fos.close()
@@ -325,7 +320,6 @@ $code
                            printCode: String = ""): Res[(String, Class[_], Seq[ImportData])] = {
       Timer("cachedCompileBlock 0")
       val wrapperName = cacheTag(code, imports, sess.frames.head.classloader.classpathHash)
-      println("cachedCompileBlock wrapperName: " + wrapperName)
       Timer("cachedCompileBlock 1")
       val wrappedCode = wrapCode(wrapperName, code, printCode, imports)
       Timer("cachedCompileBlock 2")
