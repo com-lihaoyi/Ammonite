@@ -224,16 +224,6 @@ lazy val sshd = project
       )
   )
 
-lazy val jupyter_kernel = project
-  .dependsOn(repl)
-  .settings(
-    sharedSettings,
-      name := "ammonite-jupyter-kernel",
-      crossVersion := CrossVersion.full,
-    libraryDependencies ++= Seq("org.zeromq" % "jeromq" % "0.3.5")
-  )
-
-
 lazy val readme = ScalatexReadme(
   projectId = "readme",
   wd = file(""),
