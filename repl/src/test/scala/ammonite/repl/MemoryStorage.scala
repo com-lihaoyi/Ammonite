@@ -25,5 +25,4 @@ class MemoryStorage extends Storage{
   def compileCacheSave(tag: String, data: CompileCache): Unit = compileCache(tag) = data
   def compileCacheLoad(tag: String) = compileCache.get(tag)
 
-  val sessionClassFilesDir = null //Files.createTempDirectory(Paths.get("/tmp/"), null)
 }

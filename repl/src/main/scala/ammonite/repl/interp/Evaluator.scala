@@ -251,7 +251,7 @@ object Evaluator{
       _ = Timer("eval.processLine compileClass end")
 
       cls <- loadClass(wrapperName, classFiles)
-      _ = println()
+      //_ = println()
       _ = Timer("eval.processLine loadClass end")
       _ = currentLine += 1
       _ <- Catching{
@@ -269,7 +269,7 @@ object Evaluator{
     } yield {
       // Exhaust the printer iterator now, before exiting the `Catching`
       // block, so any exceptions thrown get properly caught and handled
-      println(wrapperName)
+      //println(wrapperName)
       val iter = evalMain(cls).asInstanceOf[Iterator[String]]
       Timer("eval.processLine evaluatorRunPrinter 1")
       evaluatorRunPrinter(printer(iter))

@@ -9,6 +9,8 @@ import scala.util.Try
 import scala.collection.generic.CanBuildFrom
 import scala.collection.{mutable, IndexedSeqLike}
 import java.nio.file.{Files, Paths}
+import org.apache.commons.io.FileUtils
+
 
 
 /**
@@ -23,7 +25,10 @@ trait Storage{
   val ivyCache: StableRef[IvyMap]
   def compileCacheSave(tag: String, data: CompileCache): Unit
   def compileCacheLoad(tag: String): Option[CompileCache]
-  def sessionClassFilesDir: java.nio.file.Path
+  def savedClassFilesDir: java.nio.file.Path = null
+  def jarDir: java.nio.file.Path = null
+
+  def cleanup = {}
 }
 
 object Storage{
@@ -39,7 +44,15 @@ object Storage{
     val ivyCacheFile = cacheDir/"ivycache.json"
     val metadataFile = "metadata.json"
     val historyFile = dir/'history
-    val sessionClassFilesDir = Files.createTempDirectory(Paths.get("/tmp/"), null)
+
+    val jarDirAmm = dir/'jars
+    mkdir(jarDirAmm)
+    override val jarDir = Paths.get(jarDirAmm.toString)
+
+    val savedClassFilesBaseDir = dir/'savedClassFiles
+    mkdir(savedClassFilesBaseDir)
+
+    override val savedClassFilesDir = Files.createTempDirectory(Paths.get(savedClassFilesBaseDir.toString), null)
     val fullHistory = new StableRef[History]{
       def apply(): History = try{
         new History(upickle.default.read[Vector[String]](read(historyFile)))
@@ -108,7 +121,15 @@ object Storage{
     } catch {
       case e: java.nio.file.NoSuchFileException => ""
     }
+
+    override def cleanup(): Unit = {
+      FileUtils.deleteDirectory(savedClassFilesDir.toFile());
+    }
+
+
   }
+
+
 }
 
 class History(s: Vector[String])

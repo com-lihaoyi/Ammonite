@@ -179,6 +179,7 @@ class Interpreter(prompt0: Ref[String],
       case Res.Skip => true
       case Res.Exit(value) =>
         pressy.shutdownPressy()
+        storage().cleanup
         false
       case Res.Success(ev) =>
         eval.update(ev.imports)
@@ -238,10 +239,11 @@ class Interpreter(prompt0: Ref[String],
     def writeJar(path: String = null): String = {
       val jarPath: java.nio.file.Path = (path == null) match {
         case false => java.nio.file.Paths.get(path)
-        case true => java.nio.file.Files.createTempFile("/tmp/", "jar")
+        case true =>
+          java.nio.file.Files.createTempFile(storage().jarDir, null, ".jar")
       }
 
-      val sessionClassFilesDir = storage().sessionClassFilesDir
+      val sessionClassFilesDir = storage().savedClassFilesDir
 
       val jarStream = new JarOutputStream(new FileOutputStream(jarPath.toFile))
       FileUtils.listFiles(sessionClassFilesDir.toFile, Array("class"), true).foreach{ f =>
@@ -363,7 +365,7 @@ class Interpreter(prompt0: Ref[String],
     storage().compileCacheLoad,
     storage().compileCacheSave,
     compiler.addToClasspath,
-  storage().sessionClassFilesDir
+  storage().savedClassFilesDir
   )
 
   val dynamicClasspath = new VirtualDirectory("(memory)", None)
