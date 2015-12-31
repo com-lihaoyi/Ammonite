@@ -230,7 +230,8 @@ class Interpreter(prompt0: Ref[String],
     object load extends DefaultLoadJar with Load {
 
       def handleJar(jar: File) = {
-        eval.sess.frames.head.extraJars = eval.sess.frames.head.extraJars ++ Seq(jar).filter(Classpath.isJar)
+        eval.sess.frames.head.extraJars = eval.sess.frames.head.extraJars ++ 
+          Seq(jar).filter(Classpath.isJar)
         evalClassloader.add(jar.toURI.toURL)
       }
 
