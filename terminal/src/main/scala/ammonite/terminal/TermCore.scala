@@ -125,17 +125,21 @@ object TermCore {
                : Option[String] = {
 
     val ansiRegex = "\u001B\\[[;\\d]*m".r
-    val noAnsiPrompt = prompt.replaceAll("\u001B\\[[;\\d]*m", "")
+    val noAnsiPrompt = prompt.split("\n").last.replaceAll("\u001B\\[[;\\d]*m", "")
     def redrawLine(buffer: Vector[Char],
                    cursor: Int,
                    ups: Int,
-                   rowLengths: Seq[Int]) = {
+                   rowLengths: Seq[Int],
+                   fullPrompt: Boolean = true) = {
       ansi.up(ups)
 
       ansi.left(9999)
       ansi.clearScreen(0)
 
-      writer.write(prompt)
+      writer.write(
+        if (fullPrompt) prompt
+        else prompt.split("\n").last
+      )
       var i = 0
       var currWidth = 0
       while(i < buffer.length){
@@ -179,7 +183,7 @@ object TermCore {
     }
 
 
-    @tailrec def readChar(lastState: TermState, ups: Int): Option[String] = {
+    @tailrec def readChar(lastState: TermState, ups: Int, fullPrompt: Boolean = true): Option[String] = {
       Debug("")
       Debug("readChar\t" + ups)
       val moreInputComing = reader.ready()
@@ -193,7 +197,8 @@ object TermCore {
         transformedBuffer,
         lastOffsetCursor,
         ups,
-        rowLengths
+        rowLengths,
+        fullPrompt
       )
 
       lazy val (oldCursorY, _) = positionCursor(
@@ -222,10 +227,10 @@ object TermCore {
         case TermState(s, b, c) =>
           Debug("TermState c\t" + c)
           val (nextUps, newState) = updateState(s, b, c)
-          readChar(newState, nextUps)
+          readChar(newState, nextUps, false)
 
         case Result(s) =>
-          redrawLine(transformedBuffer, lastState.buffer.length, oldCursorY, rowLengths)
+          redrawLine(transformedBuffer, lastState.buffer.length, oldCursorY, rowLengths, false)
           writer.write(10)
           writer.write(13)
           writer.flush()
