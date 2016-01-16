@@ -33,12 +33,15 @@ object PPrints{
 
   implicit def lsSeqRepr: PPrinter[LsSeq] =
     PPrinter { (t: LsSeq, c: Config) =>
-      val snippets = for(p <- t) yield {
+      var snippets = for(p <- t) yield {
         val parts =
           Iterator(PathComplete.colorPath(p)) ++
           pprint.tokenize(p relativeTo t.base)(implicitly, c).mkString ++
           Iterator(Console.RESET)
         parts.mkString
+      }
+      if(snippets.size==0){
+        snippets=snippets:+"Empty Directory"
       }
       Iterator("\n") ++ FrontEndUtils.tabulate(snippets,FrontEndUtils.width)
     }
