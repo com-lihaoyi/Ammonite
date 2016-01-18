@@ -15,6 +15,9 @@ import scala.collection.mutable
  * the buffer", and "ansi terminal should reflect most up to date TermState"
  */
 object TermCore {
+
+  val ansiRegex = "\u001B\\[[;\\d]*m".r
+
   /**
    * Computes how tall a line of text is when wrapped at `width`.
    *
@@ -117,62 +120,12 @@ object TermCore {
    *                         cursor, without actually changing the logical
    *                         values inside them.
    */
-  def readLine(prompt: String,
+  def readLine(prompt: Prompt,
                reader: java.io.Reader,
                writer: java.io.Writer,
                filters: PartialFunction[TermInfo, TermAction] = PartialFunction.empty,
                displayTransform: (Vector[Char], Int) => (Vector[Char], Int) = (x, i) => (x, i))
                : Option[String] = {
-
-    val ansiRegex = "\u001B\\[[;\\d]*m".r
-    val lastLineBegin = prompt.lastIndexOf("\n")
-    val preLastLines = prompt.substring(0, lastLineBegin)
-    val ansiEscapes = ansiRegex.findAllIn(preLastLines).toList.reverseIterator
-
-    @tailrec
-    def effectiveAnsiEscape(state: AnsiEscapeState = new AnsiEscapeState): AnsiEscapeState = {
-      if (!ansiEscapes.hasNext) state
-      else {
-        val next = ansiEscapes.next
-        if (next == Console.RESET) state
-        else {
-          val newState = next match {
-            case color @ (Console.BLACK
-              | Console.BLUE
-              | Console.CYAN
-              | Console.GREEN
-              | Console.MAGENTA
-              | Console.RED
-              | Console.WHITE
-              | Console.YELLOW) =>
-              if (state.color.isDefined) state
-              else state.copy(color = Some(color))
-            case bgColor @ (Console.BLACK_B
-              | Console.BLUE_B
-              | Console.CYAN_B
-              | Console.GREEN_B
-              | Console.MAGENTA_B
-              | Console.RED_B
-              | Console.WHITE_B
-              | Console.YELLOW_B) =>
-              if (state.bgColor.isDefined) state
-              state.copy(bgColor = Some(bgColor))
-            case Console.REVERSED =>
-              state.copy(reversed = true)
-            case Console.BOLD =>
-              state.copy(bold = true)
-            case Console.UNDERLINED =>
-              state.copy(underlined = true)
-            case _ =>
-              state
-          }
-          effectiveAnsiEscape(newState)
-        }
-      }
-    }
-
-    val lastLine = effectiveAnsiEscape() + prompt.substring(lastLineBegin + 1)
-    val lastLineNoAnsi = lastLine.replaceAll("\u001B\\[[;\\d]*m", "")
 
     def redrawLine(buffer: Vector[Char],
                    cursor: Int,
@@ -185,14 +138,14 @@ object TermCore {
       ansi.clearScreen(0)
 
       writer.write(
-        if (fullPrompt) prompt
-        else lastLine
+        if (fullPrompt) prompt.full
+        else prompt.lastLine
       )
       var i = 0
       var currWidth = 0
       while(i < buffer.length){
-        if (currWidth >= width - lastLineNoAnsi.length){
-          writer.write(" " * lastLineNoAnsi.length)
+        if (currWidth >= width - prompt.lastLineNoAnsi.length){
+          writer.write(" " * prompt.lastLineNoAnsi.length)
           currWidth = 0
         }
 
@@ -211,12 +164,12 @@ object TermCore {
       }
 
 
-      val fragHeights = calculateHeight0(rowLengths, width - lastLineNoAnsi.length)
+      val fragHeights = calculateHeight0(rowLengths, width - prompt.lastLineNoAnsi.length)
       val (cursorY, cursorX) = positionCursor(
         cursor,
         rowLengths,
         fragHeights,
-        width - lastLineNoAnsi.length
+        width - prompt.lastLineNoAnsi.length
       )
 
       ansi.up(fragHeights.sum - 1)
@@ -226,7 +179,7 @@ object TermCore {
 //      Debug("RIGHT " + cursorX)
       ansi.down(cursorY)
       ansi.right(cursorX)
-      ansi.right(lastLineNoAnsi.length)
+      ansi.right(prompt.lastLineNoAnsi.length)
       writer.flush()
     }
 
@@ -252,8 +205,8 @@ object TermCore {
       lazy val (oldCursorY, _) = positionCursor(
         lastOffsetCursor,
         rowLengths,
-        calculateHeight0(rowLengths, width - lastLineNoAnsi.length),
-        width - lastLineNoAnsi.length
+        calculateHeight0(rowLengths, width - prompt.lastLineNoAnsi.length),
+        width - prompt.lastLineNoAnsi.length
       )
 
       def updateState(s: LazyList[Int], b: Vector[Char], c: Int): (Int, TermState) = {
@@ -266,7 +219,7 @@ object TermCore {
 
         (nextUps, newState)
       }
-      filters(TermInfo(lastState, width - lastLineNoAnsi.length)) match {
+      filters(TermInfo(lastState, width - prompt.lastLineNoAnsi.length)) match {
         case Printing(TermState(s, b, c), stdout) =>
           writer.write(stdout)
           val (nextUps, newState) = updateState(s, b, c)
@@ -330,13 +283,51 @@ case class ClearScreen(ts: TermState) extends TermAction
 case object Exit extends TermAction
 case class Result(s: String) extends TermAction
 
+
+object Prompt {
+
+  implicit def apply(prompt: String) = {
+    import Console._
+    val lastLineBegin = prompt.lastIndexOf("\n")
+    val preLastLines = prompt.substring(0, lastLineBegin)
+    val ansiEscapeState = TermCore.ansiRegex
+      .findAllIn(preLastLines)
+      .toSeq
+      .reverseIterator
+      .takeWhile(_ != Console.RESET)
+      .foldLeft(new AnsiEscapeState) {
+        case (state, color @ (BLACK | BLUE | CYAN | GREEN | MAGENTA | RED | WHITE | YELLOW))
+          if state.color.isEmpty =>
+          state.copy(color = Some(color))
+        case (state, bgColor @ (BLACK_B | BLUE_B | CYAN_B | GREEN_B | MAGENTA_B | RED_B | WHITE_B | YELLOW_B))
+          if state.bgColor.isEmpty =>
+          state.copy(bgColor = Some(bgColor))
+        case (state, REVERSED) =>
+          state.copy(reversed = true)
+        case (state, BOLD) =>
+          state.copy(bold = true)
+        case (state, UNDERLINED) =>
+          state.copy(underlined = true)
+        case (state, _) =>
+          state
+      }
+    val lastLine = ansiEscapeState + prompt.substring(lastLineBegin + 1)
+    val lastLineNoAnsi = TermCore.ansiRegex.replaceAllIn(lastLine, "")
+    new Prompt(prompt, lastLine, lastLineNoAnsi)
+  }
+}
+
+case class Prompt(
+  full: String,
+  lastLine: String,
+  lastLineNoAnsi: String)
+
 case class AnsiEscapeState(
   color: Option[String] = None,
   bgColor: Option[String] = None,
   bold: Boolean = false,
   underlined: Boolean = false,
   reversed: Boolean = false) {
-
   override def toString: String = {
     val builder = new StringBuilder(25)
     color.map(builder.append(_))
@@ -347,3 +338,4 @@ case class AnsiEscapeState(
     builder.toString
   }
 }
+
