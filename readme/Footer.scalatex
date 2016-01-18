@@ -40,6 +40,11 @@
 
 @sect{Changelog}
 
+  @sect{0.5.3}
+    @ul
+      @li
+        Added support for multi-line prompts.
+
   @sect{0.5.2}
     @ul
       @li

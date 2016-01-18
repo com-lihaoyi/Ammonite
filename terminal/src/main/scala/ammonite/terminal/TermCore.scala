@@ -125,7 +125,55 @@ object TermCore {
                : Option[String] = {
 
     val ansiRegex = "\u001B\\[[;\\d]*m".r
-    val noAnsiPrompt = prompt.split("\n").last.replaceAll("\u001B\\[[;\\d]*m", "")
+    val lastLineBegin = prompt.lastIndexOf("\n")
+    val preLastLines = prompt.substring(0, lastLineBegin)
+    val ansiEscapes = ansiRegex.findAllIn(preLastLines).toList.reverseIterator
+
+    @tailrec
+    def effectiveAnsiEscape(state: AnsiEscapeState = new AnsiEscapeState): AnsiEscapeState = {
+      if (!ansiEscapes.hasNext) state
+      else {
+        val next = ansiEscapes.next
+        if (next == Console.RESET) state
+        else {
+          val newState = next match {
+            case color @ (Console.BLACK
+              | Console.BLUE
+              | Console.CYAN
+              | Console.GREEN
+              | Console.MAGENTA
+              | Console.RED
+              | Console.WHITE
+              | Console.YELLOW) =>
+              if (state.color.isDefined) state
+              else state.copy(color = Some(color))
+            case bgColor @ (Console.BLACK_B
+              | Console.BLUE_B
+              | Console.CYAN_B
+              | Console.GREEN_B
+              | Console.MAGENTA_B
+              | Console.RED_B
+              | Console.WHITE_B
+              | Console.YELLOW_B) =>
+              if (state.bgColor.isDefined) state
+              state.copy(bgColor = Some(bgColor))
+            case Console.REVERSED =>
+              state.copy(reversed = true)
+            case Console.BOLD =>
+              state.copy(bold = true)
+            case Console.UNDERLINED =>
+              state.copy(underlined = true)
+            case _ =>
+              state
+          }
+          effectiveAnsiEscape(newState)
+        }
+      }
+    }
+
+    val lastLine = effectiveAnsiEscape() + prompt.substring(lastLineBegin + 1)
+    val lastLineNoAnsi = lastLine.replaceAll("\u001B\\[[;\\d]*m", "")
+
     def redrawLine(buffer: Vector[Char],
                    cursor: Int,
                    ups: Int,
@@ -138,13 +186,13 @@ object TermCore {
 
       writer.write(
         if (fullPrompt) prompt
-        else prompt.split("\n").last
+        else lastLine
       )
       var i = 0
       var currWidth = 0
       while(i < buffer.length){
-        if (currWidth >= width - noAnsiPrompt.length){
-          writer.write(" " * noAnsiPrompt.length)
+        if (currWidth >= width - lastLineNoAnsi.length){
+          writer.write(" " * lastLineNoAnsi.length)
           currWidth = 0
         }
 
@@ -163,12 +211,12 @@ object TermCore {
       }
 
 
-      val fragHeights = calculateHeight0(rowLengths, width - noAnsiPrompt.length)
+      val fragHeights = calculateHeight0(rowLengths, width - lastLineNoAnsi.length)
       val (cursorY, cursorX) = positionCursor(
         cursor,
         rowLengths,
         fragHeights,
-        width - noAnsiPrompt.length
+        width - lastLineNoAnsi.length
       )
 
       ansi.up(fragHeights.sum - 1)
@@ -178,7 +226,7 @@ object TermCore {
 //      Debug("RIGHT " + cursorX)
       ansi.down(cursorY)
       ansi.right(cursorX)
-      ansi.right(noAnsiPrompt.length)
+      ansi.right(lastLineNoAnsi.length)
       writer.flush()
     }
 
@@ -204,8 +252,8 @@ object TermCore {
       lazy val (oldCursorY, _) = positionCursor(
         lastOffsetCursor,
         rowLengths,
-        calculateHeight0(rowLengths, width - noAnsiPrompt.length),
-        width - noAnsiPrompt.length
+        calculateHeight0(rowLengths, width - lastLineNoAnsi.length),
+        width - lastLineNoAnsi.length
       )
 
       def updateState(s: LazyList[Int], b: Vector[Char], c: Int): (Int, TermState) = {
@@ -218,7 +266,7 @@ object TermCore {
 
         (nextUps, newState)
       }
-      filters(TermInfo(lastState, width - noAnsiPrompt.length)) match {
+      filters(TermInfo(lastState, width - lastLineNoAnsi.length)) match {
         case Printing(TermState(s, b, c), stdout) =>
           writer.write(stdout)
           val (nextUps, newState) = updateState(s, b, c)
@@ -281,3 +329,21 @@ object TermState{
 case class ClearScreen(ts: TermState) extends TermAction
 case object Exit extends TermAction
 case class Result(s: String) extends TermAction
+
+case class AnsiEscapeState(
+  color: Option[String] = None,
+  bgColor: Option[String] = None,
+  bold: Boolean = false,
+  underlined: Boolean = false,
+  reversed: Boolean = false) {
+
+  override def toString: String = {
+    val builder = new StringBuilder(25)
+    color.map(builder.append(_))
+    bgColor.map(builder.append(_))
+    if (bold) builder.append(Console.BOLD)
+    if (underlined) builder.append(Console.UNDERLINED)
+    if (reversed) builder.append(Console.REVERSED)
+    builder.toString
+  }
+}
