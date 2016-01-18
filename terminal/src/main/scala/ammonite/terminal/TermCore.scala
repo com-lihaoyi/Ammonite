@@ -183,8 +183,8 @@ object TermCore {
       writer.flush()
     }
 
-
-    @tailrec def readChar(lastState: TermState, ups: Int, fullPrompt: Boolean = true): Option[String] = {
+    @tailrec
+    def readChar(lastState: TermState, ups: Int, fullPrompt: Boolean = true): Option[String] = {
       Debug("")
       Debug("readChar\t" + ups)
       val moreInputComing = reader.ready()
@@ -286,8 +286,12 @@ case class Result(s: String) extends TermAction
 
 object Prompt {
 
+  import Console._
+
+  private val colors = Set(BLACK, BLUE, CYAN, GREEN, MAGENTA, RED, WHITE, YELLOW)
+  private val bgColors = Set(BLACK_B, BLUE_B, CYAN_B, GREEN_B, MAGENTA_B, RED_B, WHITE_B, YELLOW_B)
+
   implicit def apply(prompt: String) = {
-    import Console._
     val lastLineBegin = prompt.lastIndexOf("\n")
     val preLastLines = prompt.substring(0, lastLineBegin)
     val ansiEscapeState = TermCore.ansiRegex
@@ -296,11 +300,9 @@ object Prompt {
       .reverseIterator
       .takeWhile(_ != Console.RESET)
       .foldLeft(new AnsiEscapeState) {
-        case (state, color @ (BLACK | BLUE | CYAN | GREEN | MAGENTA | RED | WHITE | YELLOW))
-          if state.color.isEmpty =>
+        case (state, color) if state.color.isEmpty && colors.contains(color) =>
           state.copy(color = Some(color))
-        case (state, bgColor @ (BLACK_B | BLUE_B | CYAN_B | GREEN_B | MAGENTA_B | RED_B | WHITE_B | YELLOW_B))
-          if state.bgColor.isEmpty =>
+        case (state, bgColor) if state.bgColor.isEmpty && bgColors.contains(bgColor)=>
           state.copy(bgColor = Some(bgColor))
         case (state, REVERSED) =>
           state.copy(reversed = true)
