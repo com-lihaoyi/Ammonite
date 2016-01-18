@@ -7,9 +7,19 @@ object PromptTests extends TestSuite{
 
   val tests = TestSuite{
 
-    'test1 {
+    'singleLinePrompt {
       val username = s"${BOLD}${YELLOW}username${RESET}"
-      val directory = s"in ${BOLD}${REVERSED}${GREEN}${UNDERLINED}directory"
+      val directory = s" in ${BOLD}${REVERSED}${GREEN}${UNDERLINED}directory"
+      val full = s"${username}${directory} ${WHITE}@ "
+      val prompt = Prompt(full)
+      assert(prompt.full == full)
+      assert(prompt.lastLine == full)
+      assert(prompt.lastLineNoAnsi == "username in directory @ ")
+    }
+
+    'multiLinePrompt {
+      val username = s"${BOLD}${YELLOW}username${RESET}"
+      val directory = s" in ${BOLD}${REVERSED}${GREEN}${UNDERLINED}directory"
       val full = s"${username}${directory}\n${WHITE}@ "
       val prompt = Prompt(full)
       assert(prompt.full == full)

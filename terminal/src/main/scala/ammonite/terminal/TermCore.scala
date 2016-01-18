@@ -293,36 +293,41 @@ object Prompt {
 
   implicit def apply(prompt: String) = {
     val lastLineBegin = prompt.lastIndexOf("\n")
-    val preLastLines = prompt.substring(0, lastLineBegin)
-    val ansiEscapeState = TermCore.ansiRegex
-      .findAllIn(preLastLines)
-      .toSeq
-      .reverseIterator
-      .takeWhile(_ != Console.RESET)
-      .foldLeft(new AnsiEscapeState) {
-        case (state, color) if state.color.isEmpty && colors.contains(color) =>
-          state.copy(color = Some(color))
-        case (state, bgColor) if state.bgColor.isEmpty && bgColors.contains(bgColor)=>
-          state.copy(bgColor = Some(bgColor))
-        case (state, REVERSED) =>
-          state.copy(reversed = true)
-        case (state, BOLD) =>
-          state.copy(bold = true)
-        case (state, UNDERLINED) =>
-          state.copy(underlined = true)
-        case (state, _) =>
-          state
-      }
-    val lastLine = ansiEscapeState + prompt.substring(lastLineBegin + 1)
-    val lastLineNoAnsi = TermCore.ansiRegex.replaceAllIn(lastLine, "")
-    new Prompt(prompt, lastLine, lastLineNoAnsi)
+    if (lastLineBegin == -1) {
+      new Prompt(prompt, prompt)
+    } else {
+      val preLastLines = prompt.substring(0, lastLineBegin)
+      val ansiEscapeState = TermCore.ansiRegex
+        .findAllIn(preLastLines)
+        .toSeq
+        .reverseIterator
+        .takeWhile(_ != Console.RESET)
+        .foldLeft(new AnsiEscapeState) {
+          case (state, color) if state.color.isEmpty && colors.contains(color) =>
+            state.copy(color = Some(color))
+          case (state, bgColor) if state.bgColor.isEmpty && bgColors.contains(bgColor)=>
+            state.copy(bgColor = Some(bgColor))
+          case (state, REVERSED) =>
+            state.copy(reversed = true)
+          case (state, BOLD) =>
+            state.copy(bold = true)
+          case (state, UNDERLINED) =>
+            state.copy(underlined = true)
+          case (state, _) =>
+            state
+        }
+      val lastLine = ansiEscapeState + prompt.substring(lastLineBegin + 1)
+      new Prompt(prompt, lastLine)
+    }
   }
 }
 
 case class Prompt(
   full: String,
-  lastLine: String,
-  lastLineNoAnsi: String)
+  lastLine: String) {
+
+  val lastLineNoAnsi = TermCore.ansiRegex.replaceAllIn(lastLine, "")
+}
 
 case class AnsiEscapeState(
   color: Option[String] = None,
