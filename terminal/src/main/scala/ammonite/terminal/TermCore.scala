@@ -15,6 +15,9 @@ import scala.collection.mutable
  * the buffer", and "ansi terminal should reflect most up to date TermState"
  */
 object TermCore {
+
+  val ansiRegex = "\u001B\\[[;\\d]*m".r
+
   /**
    * Computes how tall a line of text is when wrapped at `width`.
    *
@@ -117,30 +120,32 @@ object TermCore {
    *                         cursor, without actually changing the logical
    *                         values inside them.
    */
-  def readLine(prompt: String,
+  def readLine(prompt: Prompt,
                reader: java.io.Reader,
                writer: java.io.Writer,
                filters: PartialFunction[TermInfo, TermAction] = PartialFunction.empty,
                displayTransform: (Vector[Char], Int) => (Vector[Char], Int) = (x, i) => (x, i))
                : Option[String] = {
 
-    val ansiRegex = "\u001B\\[[;\\d]*m".r
-    val noAnsiPrompt = prompt.replaceAll("\u001B\\[[;\\d]*m", "")
     def redrawLine(buffer: Vector[Char],
                    cursor: Int,
                    ups: Int,
-                   rowLengths: Seq[Int]) = {
+                   rowLengths: Seq[Int],
+                   fullPrompt: Boolean = true) = {
       ansi.up(ups)
 
       ansi.left(9999)
       ansi.clearScreen(0)
 
-      writer.write(prompt)
+      writer.write(
+        if (fullPrompt) prompt.full
+        else prompt.lastLine
+      )
       var i = 0
       var currWidth = 0
       while(i < buffer.length){
-        if (currWidth >= width - noAnsiPrompt.length){
-          writer.write(" " * noAnsiPrompt.length)
+        if (currWidth >= width - prompt.lastLineNoAnsi.length){
+          writer.write(" " * prompt.lastLineNoAnsi.length)
           currWidth = 0
         }
 
@@ -159,12 +164,12 @@ object TermCore {
       }
 
 
-      val fragHeights = calculateHeight0(rowLengths, width - noAnsiPrompt.length)
+      val fragHeights = calculateHeight0(rowLengths, width - prompt.lastLineNoAnsi.length)
       val (cursorY, cursorX) = positionCursor(
         cursor,
         rowLengths,
         fragHeights,
-        width - noAnsiPrompt.length
+        width - prompt.lastLineNoAnsi.length
       )
 
       ansi.up(fragHeights.sum - 1)
@@ -174,12 +179,12 @@ object TermCore {
 //      Debug("RIGHT " + cursorX)
       ansi.down(cursorY)
       ansi.right(cursorX)
-      ansi.right(noAnsiPrompt.length)
+      ansi.right(prompt.lastLineNoAnsi.length)
       writer.flush()
     }
 
-
-    @tailrec def readChar(lastState: TermState, ups: Int): Option[String] = {
+    @tailrec
+    def readChar(lastState: TermState, ups: Int, fullPrompt: Boolean = true): Option[String] = {
       Debug("")
       Debug("readChar\t" + ups)
       val moreInputComing = reader.ready()
@@ -193,14 +198,15 @@ object TermCore {
         transformedBuffer,
         lastOffsetCursor,
         ups,
-        rowLengths
+        rowLengths,
+        fullPrompt
       )
 
       lazy val (oldCursorY, _) = positionCursor(
         lastOffsetCursor,
         rowLengths,
-        calculateHeight0(rowLengths, width - noAnsiPrompt.length),
-        width - noAnsiPrompt.length
+        calculateHeight0(rowLengths, width - prompt.lastLineNoAnsi.length),
+        width - prompt.lastLineNoAnsi.length
       )
 
       def updateState(s: LazyList[Int], b: Vector[Char], c: Int): (Int, TermState) = {
@@ -213,7 +219,7 @@ object TermCore {
 
         (nextUps, newState)
       }
-      filters(TermInfo(lastState, width - noAnsiPrompt.length)) match {
+      filters(TermInfo(lastState, width - prompt.lastLineNoAnsi.length)) match {
         case Printing(TermState(s, b, c), stdout) =>
           writer.write(stdout)
           val (nextUps, newState) = updateState(s, b, c)
@@ -222,10 +228,10 @@ object TermCore {
         case TermState(s, b, c) =>
           Debug("TermState c\t" + c)
           val (nextUps, newState) = updateState(s, b, c)
-          readChar(newState, nextUps)
+          readChar(newState, nextUps, false)
 
         case Result(s) =>
-          redrawLine(transformedBuffer, lastState.buffer.length, oldCursorY, rowLengths)
+          redrawLine(transformedBuffer, lastState.buffer.length, oldCursorY, rowLengths, false)
           writer.write(10)
           writer.write(13)
           writer.flush()
@@ -276,3 +282,67 @@ object TermState{
 case class ClearScreen(ts: TermState) extends TermAction
 case object Exit extends TermAction
 case class Result(s: String) extends TermAction
+
+
+object Prompt {
+
+  import Console._
+
+  private val colors = Set(BLACK, BLUE, CYAN, GREEN, MAGENTA, RED, WHITE, YELLOW)
+  private val bgColors = Set(BLACK_B, BLUE_B, CYAN_B, GREEN_B, MAGENTA_B, RED_B, WHITE_B, YELLOW_B)
+
+  implicit def apply(prompt: String) = {
+    val lastLineBegin = prompt.lastIndexOf("\n")
+    if (lastLineBegin == -1) {
+      new Prompt(prompt, prompt)
+    } else {
+      val preLastLines = prompt.substring(0, lastLineBegin)
+      val ansiEscapeState = TermCore.ansiRegex
+        .findAllIn(preLastLines)
+        .toSeq
+        .reverseIterator
+        .takeWhile(_ != Console.RESET)
+        .foldLeft(new AnsiEscapeState) {
+          case (state, color) if state.color.isEmpty && colors.contains(color) =>
+            state.copy(color = Some(color))
+          case (state, bgColor) if state.bgColor.isEmpty && bgColors.contains(bgColor)=>
+            state.copy(bgColor = Some(bgColor))
+          case (state, REVERSED) =>
+            state.copy(reversed = true)
+          case (state, BOLD) =>
+            state.copy(bold = true)
+          case (state, UNDERLINED) =>
+            state.copy(underlined = true)
+          case (state, _) =>
+            state
+        }
+      val lastLine = ansiEscapeState + prompt.substring(lastLineBegin + 1)
+      new Prompt(prompt, lastLine)
+    }
+  }
+}
+
+case class Prompt(
+  full: String,
+  lastLine: String) {
+
+  val lastLineNoAnsi = TermCore.ansiRegex.replaceAllIn(lastLine, "")
+}
+
+case class AnsiEscapeState(
+  color: Option[String] = None,
+  bgColor: Option[String] = None,
+  bold: Boolean = false,
+  underlined: Boolean = false,
+  reversed: Boolean = false) {
+  override def toString: String = {
+    val builder = new StringBuilder(25)
+    color.map(builder.append(_))
+    bgColor.map(builder.append(_))
+    if (bold) builder.append(Console.BOLD)
+    if (underlined) builder.append(Console.UNDERLINED)
+    if (reversed) builder.append(Console.REVERSED)
+    builder.toString
+  }
+}
+
