@@ -29,7 +29,7 @@ object Main{
     rec()
     @tailrec def rec(): Unit = {
       TermCore.readLine(
-        Console.MAGENTA + "@ " + Console.RESET,
+        Console.MAGENTA + (0 until 10).mkString + "\n@ " + Console.RESET,
         reader,
         new OutputStreamWriter(System.out),
         multilineFilter orElse

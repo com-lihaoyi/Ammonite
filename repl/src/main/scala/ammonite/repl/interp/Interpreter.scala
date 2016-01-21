@@ -321,6 +321,7 @@ class Interpreter(prompt0: Ref[String],
       }
     }
   }
+  ::
 
 
   val mainThread = Thread.currentThread()
