@@ -280,3 +280,5 @@
         Fix #39: nothing echoed on multiple import
       @li
         Importing things from Java packages now works properly
+      @li
+        Fix #312 lsing empty directory gives error
