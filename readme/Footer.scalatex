@@ -44,7 +44,8 @@
     @ul
       @li
         Added support for multi-line prompts.
-
+      @li
+        Fix #312 lsing empty directory gives error
   @sect{0.5.2}
     @ul
       @li
@@ -280,5 +281,3 @@
         Fix #39: nothing echoed on multiple import
       @li
         Importing things from Java packages now works properly
-      @li
-        Fix #312 lsing empty directory gives error
