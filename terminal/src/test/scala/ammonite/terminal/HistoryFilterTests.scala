@@ -1,121 +1,153 @@
 package ammonite.terminal
 
 import utest._
-import acyclic.file
 
 object HistoryFilterTests extends TestSuite {
 
   val tests = TestSuite {
-    val rest = LazyList.continually(1) // Doesn't matter.
-    val assertCommand = """(.*)<([ud]+)>(.*)""".r
+    val rest = LazyList.continually(1) // Ignore.
+    val assertCommand =
+      """(.*)<([ud]+)>(.*)""".r
 
-    'selection{
+    'history {
       var history = List.empty[String]
-      def withHistoryFilter(f: ReadlineFilters.HistoryFilter => Unit): String = {
-        // Initialize new filter for each line.
-        val filter = ReadlineFilters.HistoryFilter(() => history)
-        f(filter)
-        filter.lastHistory.mkString
-      }
 
+      /**
+        * Runs terminal session and asserts on lines matching assertCommand.
+        *
+        * - A line ending with ¶ means the user pressed enter.
+        * - A line not ending with ¶ means the user edited the line.
+        */
       def check(session: String): Unit = {
+        history = List.empty[String]
         var assertsSomething = false
-        val commands = session.lines.map(_.trim).withFilter(!_.isEmpty)
-        commands.foreach {
-          case assertCommand(before, upDownSequence, expected) =>
-            val b = before.toCharArray.toVector
-            val result = withHistoryFilter { filter =>
-              upDownSequence.foreach {
-                case 'd' =>
-                  filter.nextHistory(b, rest)
-                case 'u' =>
-                  filter.previousHistory(b, rest)
-              }
+        val commands = session.trim.split("¶")
+        commands.foreach { command =>
+          val filter = ReadlineFilters.HistoryFilter(() => history)
+          val toExecute = command.lines.map(_.trim).withFilter(!_.isEmpty)
+            .map {
+              case assertCommand(prefix, upDownSequence, expected) =>
+                val b = prefix.toVector
+                upDownSequence.foreach {
+                  case 'd' =>
+                    filter.nextHistory(b, rest)
+                  case 'u' =>
+                    filter.previousHistory(b, rest)
+                }
+                val result = filter.lastCommand.mkString
+                assert(result == expected)
+                assertsSomething = true
+                result
+              case cmd => cmd
             }
-            assert(result == expected)
-            assertsSomething = true
-            history = result :: history
-          case cmd =>
-            history = cmd :: history
+          val exec = toExecute.toList.last
+          history = exec :: history
         }
         assert(assertsSomething)
       }
 
-      'up - check(
-        """
-        a
-        <u>a
-        """)
-
-      'updown - check(
-        """
-        a
-        <ud>
-        """)
-
-      'upup - check(
-        """
-        a
-        b
-        <uu>a
-        """)
-
-      "up to the top" - check(
-        """
-        a
-        b
-        <uuuuddduuuuuuuuuuuuuuuuuu>a
-        """)
-
-      "down to the bottom" - check(
-        """
-        a
-        b
-        foo<uudddddddddddddddddddddd>foo
-        """)
+      'empty - {
+        "up down" - check(
+          """
+          a¶
+          <ud>¶
+          """)
 
 
-      'upupdown - check(
-        """
-        a
-        b
-        <uud>b
-        """)
+        "up up down" - check(
+          """
+          a¶
+          b¶
+          <uud>b¶
+          """)
 
-      'duplicates - check(
-        """
-        banana
-        a
-        a
-        <uu>banana
-        """)
+        "up up" - check(
+          """
+          a¶
+          b¶
+          <uu>a¶
+          """)
 
-      'prefix - check(
-        """
-        11
-        aa
-        1<u>11
-        """)
+        'up - check(
+          """
+          a¶
+          <u>a¶
+          """)
+      }
 
-      "prefix order" - check(
-        """
-        123
-        12
-        aaa
-        1<u>12
-        1<uu>123
-        """)
+      'fallback - {
+        'bottom - check(
+          """
+          a¶
+          b¶
+          <dddduudddddddddddddddddd>¶
+          """)
 
+        'top - check(
+          """
+          a¶
+          b¶
+          <uuuuddduuuuuuuuuuuuuuuuuu>a¶
+          """)
+      }
 
-      'prefixes - check(
-        """
-        println("foo")
-        val x = 1
-        val y = 2
-        p<u>println("foo")
-        v<u>val y = 2
-        val x<u>val x = 1
-        """)
+      'duplicates - {
+        * - check(
+          """
+          banana¶
+          a¶
+          a¶
+          <uu>banana¶
+          """)
+        * - check(
+          """
+          abc¶
+          ab¶
+          ab¶
+          a¶
+          a<uu>abc¶
+          """)
+      }
+
+      'prefix - {
+        * - check(
+          """
+          11¶
+          aa¶
+          1<u>11¶
+          """)
+
+        * - check(
+          """
+          123¶
+          12¶
+          aaa¶
+          1<u>12¶
+          1<uu>123¶
+          """)
+
+        * - check(
+          """
+          println("foo")¶
+          val x = 1¶
+          val y = 2¶
+          p<u>println("foo")¶
+          v<u>val y = 2¶
+          val x<u>val x = 1¶
+          """)
+      }
+
+      'edits - {
+        'abc - check(
+          """
+          abcd¶
+          abc¶
+          ab¶
+          a¶
+          a<u>ab
+          abc<u>abcd¶
+          """)
+      }
     }
   }
 }
