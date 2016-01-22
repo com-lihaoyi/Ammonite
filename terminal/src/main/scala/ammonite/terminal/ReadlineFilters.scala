@@ -117,6 +117,8 @@ object ReadlineFilters {
     // Which commands has the user seen. Used to deduplicate results.
     val visited = mutable.Set[String]()
 
+    val commands = mutable.Map.empty[Int, String]
+
     def swapInHistory(up: Boolean)
                      (b: Vector[Char], rest: LazyList[Int]): TermState = {
       if (lastUp != up) {
@@ -124,9 +126,12 @@ object ReadlineFilters {
         lastUp = up
       }
       // Exclude active line from search results, user wants something else.
-      visited += b.mkString
-      if (index == 0) currentCommand = b
-      if (b != lastCommand) currentPrefix = b // The user manually edited b.
+      val cmd = b.mkString
+      if (index == 0) commands += index -> cmd
+      if (b.nonEmpty && b != lastCommand) { // The user manually edited b.
+        commands += index -> cmd
+        currentPrefix = b
+      }
       val command = nextCommand(up)
       lastCommand = command._1.toVector
       index = command._2
@@ -134,8 +139,16 @@ object ReadlineFilters {
       TS(rest, lastCommand, lastCommand.length)
     }
 
+    def getCommands: Seq[(String, Int)] = {
+      (commands(0) +: history()).zipWithIndex.map {
+        case (cmd, i) =>
+          commands.getOrElse(i, cmd) -> i
+      }
+    }
+
     def nextCommand(up: Boolean): (String, Int) = {
-      val allCommands = (currentCommand.mkString +: history()).zipWithIndex
+      val allCommands = getCommands
+      visited += allCommands(index)._1
       val candidateCommands = {
         if (up) allCommands.drop(index + 1)
         else allCommands.take(index).reverse
@@ -147,8 +160,7 @@ object ReadlineFilters {
           cmd.startsWith(prefix)
         case _ => false
       }.getOrElse {
-        if (up) allCommands.last
-        else allCommands.head
+        allCommands(index)
       }
     }
 

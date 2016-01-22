@@ -50,7 +50,8 @@ object HistoryFilterTests extends TestSuite {
         "up down" - check(
           """
           a¶
-          <ud>¶
+          <u>a
+          <d>¶
           """)
 
 
@@ -133,6 +134,7 @@ object HistoryFilterTests extends TestSuite {
           val y = 2¶
           p<u>println("foo")¶
           v<u>val y = 2¶
+          <u>val y = 2¶
           val x<u>val x = 1¶
           """)
       }
@@ -146,6 +148,22 @@ object HistoryFilterTests extends TestSuite {
           a¶
           a<u>ab
           abc<u>abcd¶
+          """)
+
+        "preserve edit" - check(
+          """
+          command1¶
+          <uu>command1
+          command2<d>command2
+          """)
+
+        "preserve edits" - check(
+          """
+          ignore¶
+          ab¶
+          a<u>ab
+          abc<u>abc
+          <d>abc¶
           """)
       }
     }
