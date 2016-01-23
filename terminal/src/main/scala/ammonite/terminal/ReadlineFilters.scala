@@ -1,5 +1,6 @@
 package ammonite.terminal
 import acyclic.file
+import scala.collection.mutable
 import FilterTools._
 import ammonite.terminal.LazyList._
 import SpecialKeys._
@@ -33,16 +34,14 @@ object ReadlineFilters {
   // Ctrl-y     paste last cut
 
   /**
-   * Basic readline-style navigation, using all the obscure alphabet 
+   * Basic readline-style navigation, using all the obscure alphabet
    * hotkeys rather than using arrows
    */
   lazy val navFilter = orElseAll(
     Case(Ctrl('b'))((b, c, m) => (b, c - 1)), // <- one char
     Case(Ctrl('f'))((b, c, m) => (b, c + 1)), // -> one char
     Case(Alt + "b")((b, c, m) => GUILikeFilters.wordLeft(b, c)), // <- one word
-    Case(LinuxCtrlLeft)((b, c, m) => GUILikeFilters.wordLeft(b, c)), // <- one word
     Case(Alt + "f")((b, c, m) => GUILikeFilters.wordRight(b, c)), // -> one  word
-    Case(LinuxCtrlRight)((b, c, m) => GUILikeFilters.wordRight(b, c)), // -> one word
     Case(Home)((b, c, m) => BasicFilters.moveStart(b, c, m.width)), // <- one line
     Case(HomeScreen)((b, c, m) => BasicFilters.moveStart(b, c, m.width)), // <- one line
     Case(Ctrl('a'))((b, c, m) => BasicFilters.moveStart(b, c, m.width)),
@@ -97,32 +96,76 @@ object ReadlineFilters {
       Case(Alt + "\u007f")((b, c, m) => cutWordLeft(b, c))
     )
   }
-  
 
   /**
-   * Provides history navigation up and down, saving the current line. 
+   * Provides history navigation up and down, saving the current line.
+   *
+   * Up/down will only list commands that share prefix with the last manually
+   * edited line.
    */
-  case class HistoryFilter(history: () => Seq[String]) extends TermCore.DelegateFilter{
-    var index = -1
-    var currentHistory = Vector[Char]()
+  case class HistoryFilter(history: () => Seq[String]) extends TermCore.DelegateFilter {
+    // The index of the currently active line.
+    var index = 0
+    // The command in front of history. Has not been executed yet.
+    var currentCommand = Vector[Char]()
+    // The prefix we search by while looking up/down.
+    var currentPrefix = Vector[Char]()
+    // The last command displayed to the user by this HistoryFilter.
+    var lastCommand = Vector[Char]()
+    // Did the user press up last time? Used to deduplicate results.
+    var lastUp = false
+    // Which commands has the user seen. Used to deduplicate results.
+    val visited = mutable.Set[String]()
 
-    def swapInHistory(indexIncrement: Int)(b: Vector[Char], rest: LazyList[Int]): TermState = {
-      val newIndex = constrainIndex(index + indexIncrement)
-      if (index == -1) currentHistory = b
-      index = newIndex
-      val h = if (index == -1) currentHistory else history()(index).toVector
-      TS(rest, h, h.length)
+    val commands = mutable.Map.empty[Int, String]
+
+    def swapInHistory(up: Boolean)
+                     (b: Vector[Char], rest: LazyList[Int]): TermState = {
+      if (lastUp != up) {
+        visited.clear() // User switched direction.
+        lastUp = up
+      }
+      // Exclude active line from search results, user wants something else.
+      val cmd = b.mkString
+      if (index == 0) commands += index -> cmd
+      if (b.nonEmpty && b != lastCommand) { // The user manually edited b.
+        commands += index -> cmd
+        currentPrefix = b
+      }
+      val command = nextCommand(up)
+      lastCommand = command._1.toVector
+      index = command._2
+      // TODO(olafur) how do I underline prefix??
+      TS(rest, lastCommand, lastCommand.length)
     }
 
-    def constrainIndex(n: Int): Int = {
-      val max = history().length - 1
-      if (n < -1) -1 else if (max < n) max else n
+    def getCommands: Seq[(String, Int)] = {
+      (commands(0) +: history()).zipWithIndex.map {
+        case (cmd, i) =>
+          commands.getOrElse(i, cmd) -> i
+      }
     }
 
+    def nextCommand(up: Boolean): (String, Int) = {
+      val allCommands = getCommands
+      visited += allCommands(index)._1
+      val candidateCommands = {
+        if (up) allCommands.drop(index + 1)
+        else allCommands.take(index).reverse
+      }
+      val prefix = currentPrefix.mkString
+      candidateCommands.find {
+        case (cmd, _) if !visited.contains(cmd) =>
+          visited += cmd
+          cmd.startsWith(prefix)
+        case _ => false
+      }.getOrElse {
+        allCommands(index)
+      }
+    }
 
-
-    val previousHistory = swapInHistory(1) _
-    val nextHistory = swapInHistory(-1) _
+    val previousHistory = swapInHistory(up = true) _
+    val nextHistory = swapInHistory(up = false) _
 
     def filter = {
       case TermInfo(TS(p"\u001b[A$rest", b, c), w) if firstRow(c, b, w) =>
@@ -136,3 +179,4 @@ object ReadlineFilters {
     }
   }
 }
+
