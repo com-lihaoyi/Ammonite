@@ -115,7 +115,8 @@ lazy val repl = project
       "com.lihaoyi" %% "scalaparse" % "0.3.4",
       "com.lihaoyi" %% "upickle" % "0.3.6",
       "com.lihaoyi" %% "pprint" % "0.3.6",
-      "com.github.scopt" %% "scopt" % "3.3.0"
+      "com.github.scopt" %% "scopt" % "3.3.0",
+      "commons-io" % "commons-io" % "2.4"
     ),
     libraryDependencies ++= (
       if (scalaVersion.value startsWith "2.10.") Nil
@@ -180,6 +181,7 @@ lazy val shell = project
     (testOnly in Test) <<= (testOnly in Test).dependsOn(packageBin in Compile)
   )
 
+
 lazy val integration = project
   .dependsOn(ops)
   .dependsOn(repl)
@@ -210,7 +212,7 @@ lazy val sshd = project
     .dependsOn(repl)
     .settings(
       sharedSettings,
-      crossVersion := CrossVersion.full,
+
       name := "ammonite-sshd",
       libraryDependencies ++= Seq(
         "org.apache.sshd" % "sshd-core" % "0.14.0",
