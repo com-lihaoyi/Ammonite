@@ -113,8 +113,8 @@ lazy val repl = project
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
       "org.apache.ivy" % "ivy" % "2.4.0",
       "com.lihaoyi" %% "scalaparse" % "0.3.4",
-      "com.lihaoyi" %% "upickle" % "0.3.6",
-      "com.lihaoyi" %% "pprint" % "0.3.6",
+      "com.lihaoyi" %% "upickle" % "0.3.7",
+      "com.lihaoyi" %% "pprint" % "0.3.7",
       "com.github.scopt" %% "scopt" % "3.3.0"
     ),
     libraryDependencies ++= (
