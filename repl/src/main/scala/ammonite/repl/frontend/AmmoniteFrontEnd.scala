@@ -179,8 +179,6 @@ case class AmmoniteFrontEnd(extraFilters: TermCore.Filter = PartialFunction.empt
             val screenEnd = offsetIndex(searchEnd)
             val prefix = newBuffer.take(screenStart)
             val middle = newBuffer.slice(screenStart, screenEnd).padTo(1, ' ')
-            Debug(s"cursor $cursor")
-            Debug(s"newNewBuffer $searchStart $searchEnd $middle")
             val suffix = newBuffer.drop(screenEnd)
 
             prefix ++ Console.UNDERLINED ++ middle ++ resetUnderline ++ suffix

@@ -162,19 +162,29 @@ object ReadlineFilters {
                       rest: LazyList[Int],
                       defaultCursor: Int,
                       skipped: Vector[Char]) = {
-      val sanitizedSearch = searchTerm.getOrElse(Vector())
-      val (newHistoryIndex, newBuffer, newCursor) = HistoryFilter.findNewHistoryIndex(
-        start,
-        sanitizedSearch,
-        history(),
-        increment,
-        skipped
-      )
+      val (newHistoryIndex, newBuffer, newCursor) =
+        if (searchTerm.get.nonEmpty) {
+          HistoryFilter.findNewHistoryIndex(
+            start,
+            searchTerm.get,
+            history(),
+            increment,
+            skipped
+          )
+        } else{
+          val msg = Seq(
+            "_",
+            Console.BLUE,
+            " ...press any key to searching, `up` for more results",
+            Console.RESET
+          ).flatten.toVector
+          (start, msg, defaultCursor)
+        }
       historyIndex = newHistoryIndex
 
       historyIndex match {
-        case -1 => TS(rest, sanitizedSearch, sanitizedSearch.length )
-        case i => TS(rest, newBuffer, if (sanitizedSearch.isEmpty) defaultCursor else newCursor)
+        case -1 => TS(rest, newBuffer, newBuffer.length )
+        case i => TS(rest, newBuffer, newCursor)
       }
     }
 
@@ -220,6 +230,7 @@ object ReadlineFilters {
       case TS(char ~: inputs, buffer, cursor) if activeSearch && char.toChar.isControl =>
         val current =
           if (historyIndex == -1) buffer
+          else if (searchTerm.get.isEmpty) Vector()
           else history()(historyIndex).toVector
         historyIndex = -1
         searchTerm = None
