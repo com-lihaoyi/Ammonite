@@ -154,7 +154,9 @@ object ReadlineFilters {
       */
     def startHistory(b: Vector[Char], defaultCursor: Int): (Vector[Char], Int) = {
       if (b.nonEmpty) searchTerm = Some(b)
-      up(defaultCursor, Vector())
+      val res = upSkip(Vector(), defaultCursor)
+      println(res)
+      res
     }
 
     def searchHistory(start: Int,
@@ -178,7 +180,7 @@ object ReadlineFilters {
           val msg = Seq(
             "_",
             Console.BLUE,
-            " ...press any key to searching, `up` for more results",
+            " ...press any key to search, `up` for more results",
             Console.RESET
           ).flatten.toVector
           (start, msg, defaultCursor)
@@ -192,8 +194,8 @@ object ReadlineFilters {
 
     def activeHistory = searchTerm.nonEmpty || historyIndex != -1
     def activeSearch = searchTerm.nonEmpty
-    def up(c: Int, skipped: Vector[Char]) = {
-      searchHistory(historyIndex + 1, 1, c, skipped)
+    def upSkip(b: Vector[Char], c: Int) = {
+      searchHistory(historyIndex + 1, 1, c, b)
     }
     def down(c: Int, skipped: Vector[Char]) = {
       searchHistory(historyIndex - 1, -1, c, skipped)
@@ -201,14 +203,21 @@ object ReadlineFilters {
     def wrap(rest: LazyList[Int], out: (Vector[Char], Int)) = {
       TS(rest, out._1, out._2)
     }
+    def ctrlR(b: Vector[Char], c: Int) = {
+      if (activeSearch) upSkip(b, c)
+      else {
+        searchTerm = Some(b)
+        startHistory(b, c)
+      }
+    }
+    def printableChar(char: Char, b: Vector[Char], c: Int) = {
+      searchTerm = searchTerm.map(_ :+ char)
+      searchHistory(historyIndex.max(0), 1, c, Vector())
+    }
     def filter = {
       // Ways to kick off the history search if you're not already in it
-      case TS(18 ~: rest, b, c) =>
-        if (activeSearch) wrap(rest, up(c, b))
-        else {
-          searchTerm = Some(b)
-          wrap(rest, startHistory(b, c))
-        }
+      case TS(18 ~: rest, b, c) => wrap(rest, ctrlR(b, c))
+
       // Ways to kick off the history search if you're not already in it
       case TermInfo(TS(p"\u001b[A$rest", b, c), w) if firstRow(c, b, w) && !activeHistory =>
         wrap(rest, startHistory(b, c))
@@ -220,8 +229,8 @@ object ReadlineFilters {
 
       // Navigating up and down the history. Each up or down searches for
       // the next thing that matches your current searchTerm
-      case TS(p"\u001b[A$rest", b, c) if activeHistory => wrap(rest, up(c, b))
-      case TS(p"\u0010$rest", b, c) if activeHistory   => wrap(rest, up(c, b))
+      case TS(p"\u001b[A$rest", b, c) if activeHistory => wrap(rest, upSkip(b, c))
+      case TS(p"\u0010$rest", b, c) if activeHistory   => wrap(rest, upSkip(b, c))
       case TS(p"\u001b[B$rest", b, c) if activeHistory => wrap(rest, down(c, b))
       case TS(p"\u000e$rest", b, c) if activeHistory   => wrap(rest, down(c, b))
 
@@ -243,8 +252,7 @@ object ReadlineFilters {
 
       // Intercept every other printable character.
       case TS(char ~: rest, buffer, cursor) if activeSearch =>
-        searchTerm = searchTerm.map(_ :+ char.toChar)
-        wrap(rest, searchHistory(historyIndex.max(0), 1, cursor, Vector()))
+        wrap(rest, printableChar(char.toChar, buffer, cursor))
     }
   }
 }

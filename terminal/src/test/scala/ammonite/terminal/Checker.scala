@@ -2,12 +2,16 @@ package ammonite.terminal
 import utest._
 object Checker{
   def normalize(s: String) = {
-    val lines = s.lines.toVector
-    val min = lines.map(_.indexWhere(_ != ' '))
-      .filter(_ != -1)
-      .min
-    lines.drop(1).dropRight(1).map(_.drop(min)).mkString("\n").replace("\\\n", "")
+    // Only do line/margin mangling for multi-line strings
+    if (s.indexOf('\n') == -1) s
+    else{
+      val lines = s.lines.toVector
+      val min = lines.map(_.indexWhere(_ != ' '))
+        .filter(_ != -1)
+        .min
+      lines.drop(1).dropRight(1).map(_.drop(min)).mkString("\n").replace("\\\n", "")
 
+    }
   }
 
   def apply(width: Int, grid: String) =
@@ -21,28 +25,39 @@ object Checker{
  */
 class Checker(width: Int, grid: String){
 
-  def apply(end0: String, actions: TermCore.Action*) = {
+  var currentGrid = grid.replace("_", "").toVector
+  var currentCursor = grid.indexOf('_')
 
-    val end = Checker.normalize(end0)
-    val gridv = grid.replace("_", "").toVector
-    val startCursor = grid.indexOf('_')
-    val (endGrid, endCursor) = actions.foldLeft((gridv, startCursor)) {
+  def run(actions: TermCore.Action*) = {
+    println("------------------------------------------")
+    val (endGrid, endCursor) = actions.foldLeft((currentGrid, currentCursor)) {
       case ((g, c), f) =>
         val (g1, c1) = f(g, c)
-        (g1, math.min(gridv.length, math.max(0, c1)))
+        (g1, math.min(g1.length, math.max(0, c1)))
     }
 
-    val endState =
-      if (endCursor == endGrid.length) endGrid ++ "_"
-      else if (endGrid(endCursor) != '\n') endGrid.updated(endCursor, '_')
-      else{
-        val (a, b) = endGrid.splitAt(endCursor)
-        a ++ "_" ++ b
-      }
+    currentGrid = endGrid
+    currentCursor = endCursor
 
+    this
+  }
+  def check(end0: String) = {
+    val expectedEnd = Checker.normalize(end0)
+    val prefix = currentGrid.take(currentCursor)
+    val suffix = currentGrid.drop(currentCursor+1)
+    val middle = currentGrid.lift(currentCursor) match{
+      case None => Seq('_')
+      case Some('\n') => Seq('_', '\n')
+      case _ => Seq('_')
+    }
 
-    val endString = endState.mkString
-    assert(end == endString)
+    val actualEnd = (prefix ++ middle ++ suffix).mkString
+    assert(actualEnd == expectedEnd)
+    this
+  }
+  def apply(end0: String, actions: TermCore.Action*) = {
+    run(actions:_*)
+    check(end0)
   }
   val edit = new ReadlineFilters.CutPasteFilter()
   val down: TermCore.Action = BasicFilters.moveDown(_, _, width)
