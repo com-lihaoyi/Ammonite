@@ -162,16 +162,20 @@ object ReadlineFilters {
                       rest: LazyList[Int],
                       defaultCursor: Int,
                       skipped: Vector[Char]) = {
-      val (newHistoryIndex, newBuffer, newCursor) =
-        if (searchTerm.get.nonEmpty) {
-          HistoryFilter.findNewHistoryIndex(
-            start,
-            searchTerm.get,
-            history(),
-            increment,
-            skipped
-          )
-        } else{
+
+      def nextHistoryIndexFor(v: Vector[Char]) = {
+        HistoryFilter.findNewHistoryIndex(start, v, history(), increment, skipped)
+      }
+
+      val (newHistoryIndex, newBuffer, newCursor) = searchTerm match{
+        // We're not searching for anything, just browsing history.
+        // Pass in Vector.empty so we scroll through all items
+        case None => nextHistoryIndexFor(Vector.empty)
+        // We're searching for some item with a particular search term
+        case Some(b) if b.nonEmpty => nextHistoryIndexFor(b)
+        // We're searching for nothing in particular; in this case,
+        // show a help message instead of an unhelpful, empty buffer
+        case Some(b) if b.isEmpty =>
           val msg = Seq(
             "_",
             Console.BLUE,
@@ -179,13 +183,12 @@ object ReadlineFilters {
             Console.RESET
           ).flatten.toVector
           (start, msg, defaultCursor)
-        }
+
+      }
+
       historyIndex = newHistoryIndex
 
-      historyIndex match {
-        case -1 => TS(rest, newBuffer, newBuffer.length )
-        case i => TS(rest, newBuffer, newCursor)
-      }
+      TS(rest, newBuffer, newCursor)
     }
 
     def activeHistory = searchTerm.nonEmpty || historyIndex != -1
@@ -196,6 +199,7 @@ object ReadlineFilters {
     def down(rest: LazyList[Int], c: Int, skipped: Vector[Char]) = {
       searchHistory(historyIndex - 1, -1, rest, c, skipped)
     }
+
     def filter = {
       // Ways to kick off the history search if you're not already in it
       case TS(18 ~: rest, b, c) =>
