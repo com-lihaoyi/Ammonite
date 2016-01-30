@@ -6,7 +6,7 @@ import utest._
 
 object HistoryTests extends TestSuite{
 
-
+  val emptySearchMessage = s"_${Console.BLUE} ...press any key to search, `up` for more results${Console.RESET}"
   val tests = TestSuite{
     val history = new HistoryFilter(() => Vector(
       "abcde",
@@ -33,12 +33,11 @@ object HistoryTests extends TestSuite{
       'empty{
         checker("_")
           .run(history.ctrlR)
-          .check(s"_${Console.BLUE} ...press any key to search, `up` for more results${Console.RESET}")
+          .check(emptySearchMessage)
           .run(history.printableChar('c'))
           .check("abc_e")
-//        doesn't work???
-//          .run(history.backspace)
-//          .check(s"_${Console.BLUE} ...press any key to search, `up` for more results${Console.RESET}")
+          .run(history.backspace)
+          .check(s"_${Console.BLUE} ...press any key to search, `up` for more results${Console.RESET}")
       }
       'nonEmpty{
         checker("cd_")
@@ -66,23 +65,51 @@ object HistoryTests extends TestSuite{
     // When you page up with something that doesn't exist in history, it
     // should preserve the current line and move your cursor to the end
     'ups{
-        checker("abc")
-          .run(history.startHistory)
-          .check("abc_e")
-          .run(history.up)
-          .check("abc_efg")
-          // Pressing up should treat the duplicates entries in history as
-          // one entry when navigating through them
-          .run(history.up)
-          .check("abc_efghi")
-          // You should be able to cycle through the end of the history and
-          // back to the original command
-          .run(history.up)
-          .check("abc_")
-          .run(history.up)
-          .check("abc_e")
+      checker("abc")
+        .run(history.startHistory)
+        .check("abc_e")
+        .run(history.up)
+        .check("abc_efg")
+        // Pressing up should treat the duplicates entries in history as
+        // one entry when navigating through them
+        .run(history.up)
+        .check("abc_efghi")
+        // You should be able to cycle through the end of the history and
+        // back to the original command
+        .run(history.up)
+        .check("abc_")
+        .run(history.up)
+        .check("abc_e")
     }
+    'upsTyping{
+      checker("de")
+        .run(history.startHistory)
+        .check("abcde_")
+        // Entering more characters should refine the search
+        .run(history.printableChar('f'))
+        .check("abcdef_")
+        // Deleting characters and typing them back in should do nothing
+        // except move the cursor
+        .run(history.backspace)
+        .check("abcde_g")
+        .run(history.backspace)
+        .check("abcd_fg")
+        .run(history.printableChar('e'))
+        .check("abcde_g")
+        .run(history.printableChar('f'))
+        .check("abcdef_")
+        // Deleting all characters from search should show the empty search message
+        .run(history.backspace)
+        .run(history.backspace)
+        .run(history.backspace)
+        .run(history.backspace)
+        .check(emptySearchMessage)
+        // But typing something in should make it go away and
+        // find something relevant to show you
+        .run(history.printableChar('i'))
+        .check("abcdefghi_")
 
+    }
     'down{
       checker("abc_")
         .run(history.startHistory)

@@ -24,7 +24,7 @@ object Checker{
  * verify that they do the right thing.
  */
 class Checker(width: Int, grid: String){
-
+  override def toString = s"Checker($stringGrid)"
   var currentGrid = grid.replace("_", "").toVector
   var currentCursor = grid.indexOf('_')
 
@@ -41,8 +41,7 @@ class Checker(width: Int, grid: String){
 
     this
   }
-  def check(end0: String) = {
-    val expectedEnd = Checker.normalize(end0)
+  def stringGrid = {
     val prefix = currentGrid.take(currentCursor)
     val suffix = currentGrid.drop(currentCursor+1)
     val middle = currentGrid.lift(currentCursor) match{
@@ -51,8 +50,12 @@ class Checker(width: Int, grid: String){
       case _ => Seq('_')
     }
 
-    val actualEnd = (prefix ++ middle ++ suffix).mkString
-    assert(actualEnd == expectedEnd)
+    (prefix ++ middle ++ suffix).mkString
+  }
+  def check(end0: String) = {
+    val expectedStringGrid = Checker.normalize(end0)
+    val actualGrid = stringGrid
+    assert(actualGrid == expectedStringGrid)
     this
   }
   def apply(end0: String, actions: TermCore.Action*) = {
