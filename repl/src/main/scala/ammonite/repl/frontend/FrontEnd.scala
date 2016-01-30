@@ -23,7 +23,7 @@ trait FrontEnd{
              prompt: String,
              colors: Colors,
              compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
-             history: Seq[String],
+             history: IndexedSeq[String],
              addHistory: String => Unit): Res[(String, Seq[String])]
 }
 
@@ -40,7 +40,7 @@ object FrontEnd{
                prompt: String,
                colors: Colors,
                compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
-               history: Seq[String],
+               history: IndexedSeq[String],
                addHistory: String => Unit) = {
 
       val term = makeTerm()
@@ -57,10 +57,10 @@ object FrontEnd{
             cursor,
             buf
           )
-          if (!completions.isEmpty) {
+          if (completions.nonEmpty) {
             candidates.addAll(completions.sorted)
             signatures = sigs.sorted
-          } else if (!sigs.isEmpty){
+          } else if (sigs.nonEmpty){
             reader.println()
             sigs.foreach(reader.println)
             reader.drawLine()
@@ -74,7 +74,7 @@ object FrontEnd{
       val defaultHandler = reader.getCompletionHandler
       reader.setCompletionHandler(new completer.CompletionHandler {
         def complete(reader: ConsoleReader, candidates: JList[CharSequence], position: Int) = {
-          if (!signatures.isEmpty){
+          if (signatures.nonEmpty){
             reader.println()
             signatures.foreach(reader.println)
             reader.drawLine()

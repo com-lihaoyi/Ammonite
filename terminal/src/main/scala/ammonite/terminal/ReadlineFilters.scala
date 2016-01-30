@@ -97,42 +97,131 @@ object ReadlineFilters {
       Case(Alt + "\u007f")((b, c, m) => cutWordLeft(b, c))
     )
   }
-  
 
+  object HistoryFilter{
+    /**
+      * @param startIndex The first index to start looking from
+      * @param searchTerm The term we're searching from; can be empty
+      * @param history The history we're searching through
+      * @param indexIncrement Which direction to search, +1 or -1
+      */
+    def findNewHistoryIndex(startIndex: Int,
+                            searchTerm: Vector[Char],
+                            history: IndexedSeq[String],
+                            indexIncrement: Int) = {
+
+      def rec(i: Int): Option[Int] = history.lift(i) match{
+        case None if i == -1 => Some(-1)
+        case None => None
+        case Some(s)
+          if s.contains(searchTerm) && !s.contentEquals(searchTerm) => Some(i)
+        case _ => rec(i + indexIncrement)
+      }
+
+      val newHistoryIndex = rec(startIndex).getOrElse(-1)
+      val newBuffer =
+        if (newHistoryIndex == -1) searchTerm
+        else history(newHistoryIndex).toVector
+
+      val newCursor =
+        if (newHistoryIndex == -1) newBuffer.length
+        else history(newHistoryIndex).indexOfSlice(searchTerm) + searchTerm.length
+
+      (newHistoryIndex, newBuffer, newCursor)
+    }
+  }
   /**
-   * Provides history navigation up and down, saving the current line. 
+   * Provides history navigation up and down, saving the current line.
    */
-  case class HistoryFilter(history: () => Seq[String]) extends TermCore.DelegateFilter{
-    var index = -1
-    var currentHistory = Vector[Char]()
+  case class HistoryFilter(history: () => IndexedSeq[String]) extends TermCore.DelegateFilter{
+    /**
+      * `-1` means we haven't started looking at history, `n >= 0` means we're
+      * currently at history command `n`
+      */
+    var historyIndex = -1
 
-    def swapInHistory(indexIncrement: Int)(b: Vector[Char], rest: LazyList[Int]): TermState = {
-      val newIndex = constrainIndex(index + indexIncrement)
-      if (index == -1) currentHistory = b
-      index = newIndex
-      val h = if (index == -1) currentHistory else history()(index).toVector
-      TS(rest, h, h.length)
+    /**
+      * The term we're searching for, if any.
+      */
+    var searchTerm = Vector.empty[Char]
+
+    /**
+      * Kicks the HistoryFilter from passive-mode into search-history mode
+      */
+    def startHistory(b: Vector[Char], rest: LazyList[Int]): TermState = {
+      searchTerm = b
+      searchHistory(0, 1, rest)
     }
 
-    def constrainIndex(n: Int): Int = {
-      val max = history().length - 1
-      if (n < -1) -1 else if (max < n) max else n
+    def searchHistory(start: Int, increment: Int, rest: LazyList[Int]) = {
+      val (newHistoryIndex, newBuffer, newCursor) = HistoryFilter.findNewHistoryIndex(
+        start,
+        searchTerm,
+        history(),
+        increment
+      )
+
+      historyIndex = newHistoryIndex
+      historyIndex match {
+        case -1 => TS(rest, searchTerm, searchTerm.length)
+        case i => TS(rest, newBuffer, newCursor)
+      }
     }
 
+    def filter = orElseAll(
+      {
+        // Ways to kick off the history search if you're not already in it
+        case TermInfo(TS(p"\u001b[A$rest", b, c), w)
+          if firstRow(c, b, w) && historyIndex == -1 =>
+          startHistory(b, rest)
+        case TermInfo(TS(p"\u0010$rest", b, c), w)
+          if lastRow(c, b, w) && historyIndex == -1 =>
+          startHistory(b, rest)
+
+        // Things you can do when you're already in the history search
+
+        // Navigating up and down the history. Each up or down searches for
+        // the next thing that matches your current searchTerm
+        case TermInfo(TS(p"\u001b[A$rest", b, c), w) if historyIndex != -1 =>
+          Debug("Up\t" + historyIndex)
+          searchHistory(historyIndex + 1, 1, rest)
+
+        case TermInfo(TS(p"\u0010$rest", b, c), w) if historyIndex != -1 =>
+          searchHistory(historyIndex + 1, 1, rest)
+
+        case TermInfo(TS(p"\u001b[B$rest", b, c), w) if historyIndex != -1 =>
+          Debug("Down\t" + historyIndex)
+          searchHistory(historyIndex - 1, -1, rest)
+
+        case TermInfo(TS(p"\u000e$rest", b, c), w) if historyIndex != -1  =>
+          searchHistory(historyIndex - 1, -1, rest)
 
 
-    val previousHistory = swapInHistory(1) _
-    val nextHistory = swapInHistory(-1) _
+        // Intercept Backspace and delete a character, preserving search
+        case TS(127 ~: inputs, buffer, cursor) if historyIndex != -1 =>
+          searchTerm = searchTerm.dropRight(1)
+          searchHistory(historyIndex, 1, inputs)
 
-    def filter = {
-      case TermInfo(TS(p"\u001b[A$rest", b, c), w) if firstRow(c, b, w) =>
-        previousHistory(b, rest)
-      case TermInfo(TS(p"\u0010$rest", b, c), w) if lastRow(c, b, w) =>
-        previousHistory(b, rest)
-      case TermInfo(TS(p"\u001b[B$rest", b, c), w) if lastRow(c, b, w) =>
-        nextHistory(b, rest)
-      case TermInfo(TS(p"\u000e$rest", b, c), w) if firstRow(c, b, w) =>
-        nextHistory(b, rest)
-    }
+        // Intercept Enter and submit the currently-searched command for evaluation
+        case TS(char ~: inputs, buffer, cursor)
+          if historyIndex != -1 && char == 13 || char == 10 =>
+          val current = history()(historyIndex).toVector
+          historyIndex = -1
+          TS(char ~: inputs, current, cursor)
+
+        // Intercept other control characters and drop out of search
+        case TS(char ~: inputs, buffer, cursor)
+          if historyIndex != -1 && char.toChar.isControl =>
+          val current = history()(historyIndex).toVector
+          historyIndex = -1
+          TS(char ~: inputs, current, cursor)
+
+        // Intercept every other printable character.
+        case TS(char ~: inputs, buffer, cursor)
+          if historyIndex != -1 =>
+          searchTerm = searchTerm :+ char.toChar
+          searchHistory(historyIndex, 1, inputs)
+      }
+    )
   }
 }

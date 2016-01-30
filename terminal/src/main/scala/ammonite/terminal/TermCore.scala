@@ -185,8 +185,8 @@ object TermCore {
 
     @tailrec
     def readChar(lastState: TermState, ups: Int, fullPrompt: Boolean = true): Option[String] = {
-      Debug("")
-      Debug("readChar\t" + ups)
+//      Debug("")
+//      Debug("readChar\t" + ups)
       val moreInputComing = reader.ready()
       lazy val (transformedBuffer, cursorOffset) = displayTransform(
         lastState.buffer,
@@ -226,7 +226,7 @@ object TermCore {
           readChar(newState, nextUps)
 
         case TermState(s, b, c) =>
-          Debug("TermState c\t" + c)
+//          Debug("TermState c\t" + c)
           val (nextUps, newState) = updateState(s, b, c)
           readChar(newState, nextUps, false)
 

@@ -19,7 +19,7 @@ case class AmmoniteFrontEnd(extraFilters: TermCore.Filter = PartialFunction.empt
              prompt: String,
              colors: Colors,
              compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
-             history: Seq[String],
+             history: IndexedSeq[String],
              addHistory: String => Unit) = {
     Timer("AmmoniteFrontEnd.action start")
     val res = readLine(reader, output, prompt, colors, compilerComplete, history) match{
@@ -43,7 +43,7 @@ case class AmmoniteFrontEnd(extraFilters: TermCore.Filter = PartialFunction.empt
                prompt: String,
                colors: Colors,
                compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
-               history: Seq[String]) = {
+               history: IndexedSeq[String]) = {
     Timer("AmmoniteFrontEnd.readLine start")
     val writer = new OutputStreamWriter(output)
 
@@ -72,7 +72,7 @@ case class AmmoniteFrontEnd(extraFilters: TermCore.Filter = PartialFunction.empt
           FrontEndUtils.printCompletions(completions2, details2)
                        .mkString
 
-        if (details.length != 0 || completions.length == 0)
+        if (details.nonEmpty || completions.nonEmpty)
           Printing(TermState(rest, b, c), stdout)
         else{
           val newBuffer = b.take(newCursor) ++ common ++ b.drop(c)
@@ -99,8 +99,8 @@ case class AmmoniteFrontEnd(extraFilters: TermCore.Filter = PartialFunction.empt
       GUILikeFilters.altFilter orElse
       GUILikeFilters.fnFilter orElse
       ReadlineFilters.navFilter orElse
-      autocompleteFilter orElse
       historyFilter.filter orElse
+      autocompleteFilter orElse
       cutPasteFilter orElse
       multilineFilter orElse
       BasicFilters.all
@@ -113,15 +113,17 @@ case class AmmoniteFrontEnd(extraFilters: TermCore.Filter = PartialFunction.empt
       writer,
       allFilters,
       displayTransform = { (buffer, cursor) =>
+        val resetColor = "\u001b[39m"
+        val resetUnderline = "\u001b[24m"
         val indices = Highlighter.defaultHighlightIndices(
           buffer,
           colors.comment(),
           colors.`type`(),
           colors.literal(),
           colors.keyword(),
-          colors.reset()
+          resetColor
         )
-        selectionFilter.mark match{
+        val (newBuffer, offset) = selectionFilter.mark match{
           case Some(mark) if mark != cursor =>
             val Seq(min, max) = Seq(cursor, mark).sorted
             val before = indices.filter(_._1 <= min)
@@ -141,11 +143,45 @@ case class AmmoniteFrontEnd(extraFilters: TermCore.Filter = PartialFunction.empt
             // in TermCore, to be fixed later when we clean up the crazy
             // TermCore.readLine logic
             (
-              Highlighter.flattenIndices(newIndices, buffer) ++ Console.RESET,
+              Highlighter.flattenIndices(newIndices, buffer) ++ resetColor,
               displayOffset
             )
-          case _ => (Highlighter.flattenIndices(indices, buffer) ++ Console.RESET, 0)
+          case _ => (Highlighter.flattenIndices(indices, buffer) ++ resetColor, 0)
         }
+
+        val newNewBuffer: Vector[Char] = if (historyFilter.historyIndex == -1) newBuffer else {
+          def offsetIndex(in: Int) = {
+            var splitIndex = 0
+            var length = 0
+            val ansiRegex = "\u001B\\[[;\\d]*."
+            while(length < in){
+              ansiRegex.r.findPrefixOf(newBuffer.drop(splitIndex)) match{
+                case None =>
+                  splitIndex += 1
+                  length += 1
+                case Some(s) =>
+                  splitIndex += s.length
+              }
+            }
+            splitIndex
+          }
+          val searchStart = buffer.indexOfSlice(historyFilter.searchTerm)
+          val searchEnd = searchStart + historyFilter.searchTerm.length
+          val screenStart = offsetIndex(searchStart)
+          val screenEnd = offsetIndex(searchEnd)
+          val prefix = newBuffer.take(screenStart)
+          val middle = newBuffer.slice(screenStart, screenEnd)
+
+          val suffix = newBuffer.drop(screenEnd)
+//          println("SPLIT INDEX: " + splitIndex)
+//          println("PREFIX: " + prefix)
+//          println("SUFFIX: " + suffix)
+
+          val out = prefix ++ Console.UNDERLINED ++ middle ++ resetUnderline ++ suffix
+//          println("OUT: " + out)
+          out
+        }
+        (newNewBuffer, offset)
       }
     )
     Timer("TermCore.readLine")

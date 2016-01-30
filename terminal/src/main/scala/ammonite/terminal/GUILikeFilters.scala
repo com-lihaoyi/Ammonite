@@ -78,10 +78,9 @@ object GUILikeFilters {
             slice => indent
           )
 
-        // Intercept every other character. If it's a  printable character,
-        // delete the current selection and write the printable character.
-        // If it's a special command, just cancel the current selection.
+        // Intercept every other character.
         case TS(char ~: inputs, buffer, cursor) if mark.isDefined =>
+          // If it's a special command, just cancel the current selection.
           if (char.toChar.isControl &&
               char != 127 /*backspace*/ &&
               char != 13 /*enter*/ &&
@@ -89,6 +88,8 @@ object GUILikeFilters {
             mark = None
             TS(char ~: inputs, buffer, cursor)
           }else{
+            // If it's a  printable character, delete the current
+            // selection and write the printable character.
             val Seq(min, max) = Seq(mark.get, cursor).sorted
             mark = None
             val newBuffer = buffer.take(min) ++ buffer.drop(max)
