@@ -146,20 +146,29 @@ object ReadlineFilters {
 
     /**
       * The term we're searching for, if any.
+      *
+      * - `None` means we're not searching for anything, e.g. we're just
+      *   browsing history
+      *
+      * - `Some(term)` where `term` is not empty is what it normally looks
+      *   like when we're searching for something
+      *
+      * - `Some(term)` where `term` is empty only really happens when you
+      *   start searching and delete things, or if you `Ctrl-R` on an empty
+      *   prompt
       */
     var searchTerm: Option[Vector[Char]] = None
 
     /**
       * Kicks the HistoryFilter from passive-mode into search-history mode
       */
-    def startHistory(b: Vector[Char], defaultCursor: Int): (Vector[Char], Int) = {
+    def startHistory(b: Vector[Char], c: Int): (Vector[Char], Int) = {
       if (b.nonEmpty) searchTerm = Some(b)
-      upSkip(Vector(), defaultCursor)
+      up(Vector(), c)
     }
 
     def searchHistory(start: Int,
                       increment: Int,
-                      defaultCursor: Int,
                       skipped: Vector[Char]) = {
 
       def nextHistoryIndexFor(v: Vector[Char]) = {
@@ -169,7 +178,9 @@ object ReadlineFilters {
       val (newHistoryIndex, newBuffer, newCursor) = searchTerm match{
         // We're not searching for anything, just browsing history.
         // Pass in Vector.empty so we scroll through all items
-        case None => nextHistoryIndexFor(Vector.empty)
+        case None =>
+          val (i, b, c) = nextHistoryIndexFor(Vector.empty)
+          (i, b, 99999)
         // We're searching for some item with a particular search term
         case Some(b) if b.nonEmpty => nextHistoryIndexFor(b)
         // We're searching for nothing in particular; in this case,
@@ -181,7 +192,8 @@ object ReadlineFilters {
             " ...press any key to search, `up` for more results",
             Console.RESET
           ).flatten.toVector
-          (start, msg, defaultCursor)
+          // The cursor in this case always goes to zero
+          (start, msg, 0)
 
       }
 
@@ -192,31 +204,32 @@ object ReadlineFilters {
 
     def activeHistory = searchTerm.nonEmpty || historyIndex != -1
     def activeSearch = searchTerm.nonEmpty
-    def upSkip(b: Vector[Char], c: Int) = {
-      searchHistory(historyIndex + 1, 1, c, b)
+    def up(b: Vector[Char], c: Int) = {
+      searchHistory(historyIndex + 1, 1, b)
     }
     def down(b: Vector[Char], c: Int) = {
-      searchHistory(historyIndex - 1, -1, c, b)
+      searchHistory(historyIndex - 1, -1, b)
     }
     def wrap(rest: LazyList[Int], out: (Vector[Char], Int)) = {
       TS(rest, out._1, out._2)
     }
     def ctrlR(b: Vector[Char], c: Int) = {
-      if (activeSearch) upSkip(b, c)
+      if (activeSearch) up(b, c)
       else {
         searchTerm = Some(b)
-        startHistory(b, c)
+        up(Vector(), c)
       }
     }
     def printableChar(char: Char)(b: Vector[Char], c: Int) = {
       searchTerm = searchTerm.map(_ :+ char)
-      searchHistory(historyIndex.max(0), 1, c, Vector())
+      searchHistory(historyIndex.max(0), 1, Vector())
     }
 
     def backspace(b: Vector[Char], c: Int) = {
       searchTerm = searchTerm.map(_.dropRight(1))
-      searchHistory(historyIndex, 1, c - 1, Vector())
+      searchHistory(historyIndex, 1, Vector())
     }
+
 
     def filter = {
       // Ways to kick off the history search if you're not already in it
@@ -233,8 +246,8 @@ object ReadlineFilters {
 
       // Navigating up and down the history. Each up or down searches for
       // the next thing that matches your current searchTerm
-      case TS(p"\u001b[A$rest", b, c) if activeHistory => wrap(rest, upSkip(b, c))
-      case TS(p"\u0010$rest", b, c) if activeHistory   => wrap(rest, upSkip(b, c))
+      case TS(p"\u001b[A$rest", b, c) if activeHistory => wrap(rest, up(b, c))
+      case TS(p"\u0010$rest", b, c) if activeHistory   => wrap(rest, up(b, c))
       case TS(p"\u001b[B$rest", b, c) if activeHistory => wrap(rest, down(b, c))
       case TS(p"\u000e$rest", b, c) if activeHistory   => wrap(rest, down(b, c))
 
