@@ -104,6 +104,8 @@ object ReadlineFilters {
       * @param searchTerm The term we're searching from; can be empty
       * @param history The history we're searching through
       * @param indexIncrement Which direction to search, +1 or -1
+      * @param skipped Any buffers which we should skip in our search results,
+      *                e.g. because the user has seen them before.
       */
     def findNewHistoryIndex(startIndex: Int,
                             searchTerm: Vector[Char],
@@ -211,7 +213,7 @@ object ReadlineFilters {
       // Intercept Backspace and delete a character, preserving search
       case TS(127 ~: inputs, buffer, cursor) if activeSearch =>
         searchTerm = searchTerm.map(_.dropRight(1))
-        searchHistory(historyIndex, 1, inputs, cursor - 1, buffer)
+        searchHistory(historyIndex, 1, inputs, cursor - 1, Vector())
 
       // Intercept Enter other control characters and drop
       // out of search, forwarding that character downstream
@@ -225,7 +227,6 @@ object ReadlineFilters {
 
       // Intercept every other printable character.
       case TS(char ~: inputs, buffer, cursor) if activeSearch =>
-
         searchTerm = searchTerm.map(_ :+ char.toChar)
         searchHistory(historyIndex.max(0), 1, inputs, cursor, Vector())
     }
