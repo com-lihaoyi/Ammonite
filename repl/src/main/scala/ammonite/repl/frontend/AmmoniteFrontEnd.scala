@@ -149,38 +149,40 @@ case class AmmoniteFrontEnd(extraFilters: TermCore.Filter = PartialFunction.empt
           case _ => (Highlighter.flattenIndices(indices, buffer) ++ resetColor, 0)
         }
 
-        val newNewBuffer: Vector[Char] = if (historyFilter.historyIndex == -1) newBuffer else {
-          def offsetIndex(in: Int) = {
-            var splitIndex = 0
-            var length = 0
-            val ansiRegex = "\u001B\\[[;\\d]*."
-            while(length < in){
-              ansiRegex.r.findPrefixOf(newBuffer.drop(splitIndex)) match{
-                case None =>
-                  splitIndex += 1
-                  length += 1
-                case Some(s) =>
-                  splitIndex += s.length
+        val newNewBuffer: Vector[Char] =
+          if (!historyFilter.activeSearch) newBuffer
+          else {
+            def offsetIndex(in: Int) = {
+              var splitIndex = 0
+              var length = 0
+              val ansiRegex = "\u001B\\[[;\\d]*."
+              while(length < in){
+                ansiRegex.r.findPrefixOf(newBuffer.drop(splitIndex)) match{
+                  case None =>
+                    splitIndex += 1
+                    length += 1
+                  case Some(s) =>
+                    splitIndex += s.length
+                }
               }
+              splitIndex
             }
-            splitIndex
+            val searchStart = buffer.indexOfSlice(historyFilter.searchTerm)
+            val searchEnd = searchStart + historyFilter.searchTerm.length
+            val screenStart = offsetIndex(searchStart)
+            val screenEnd = offsetIndex(searchEnd)
+            val prefix = newBuffer.take(screenStart)
+            val middle = newBuffer.slice(screenStart, screenEnd)
+
+            val suffix = newBuffer.drop(screenEnd)
+  //          println("SPLIT INDEX: " + splitIndex)
+  //          println("PREFIX: " + prefix)
+  //          println("SUFFIX: " + suffix)
+
+            val out = prefix ++ Console.UNDERLINED ++ middle ++ resetUnderline ++ suffix
+  //          println("OUT: " + out)
+            out
           }
-          val searchStart = buffer.indexOfSlice(historyFilter.searchTerm)
-          val searchEnd = searchStart + historyFilter.searchTerm.length
-          val screenStart = offsetIndex(searchStart)
-          val screenEnd = offsetIndex(searchEnd)
-          val prefix = newBuffer.take(screenStart)
-          val middle = newBuffer.slice(screenStart, screenEnd)
-
-          val suffix = newBuffer.drop(screenEnd)
-//          println("SPLIT INDEX: " + splitIndex)
-//          println("PREFIX: " + prefix)
-//          println("SUFFIX: " + suffix)
-
-          val out = prefix ++ Console.UNDERLINED ++ middle ++ resetUnderline ++ suffix
-//          println("OUT: " + out)
-          out
-        }
         (newNewBuffer, offset)
       }
     )
