@@ -181,7 +181,7 @@ object NavigationTests extends TestSuite{
       )
       import check._
       'updown{
-        check(
+        * - check(
           """
           abcdefg\
           h_jk
@@ -191,7 +191,7 @@ object NavigationTests extends TestSuite{
           """,
           up
         )
-        check(
+        * - check(
           """
           a_cdefg\
           hijk
@@ -201,7 +201,7 @@ object NavigationTests extends TestSuite{
           """,
           up, up
         )
-        check(
+        * - check(
           """
           abcdefg\
           hijk
@@ -211,7 +211,7 @@ object NavigationTests extends TestSuite{
           """,
           down
         )
-        check(
+        * - check(
           """
           abcdefg\
           hijk
