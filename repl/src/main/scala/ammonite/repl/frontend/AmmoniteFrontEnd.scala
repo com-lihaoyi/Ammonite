@@ -167,21 +167,23 @@ case class AmmoniteFrontEnd(extraFilters: TermCore.Filter = PartialFunction.empt
               }
               splitIndex
             }
-            val searchStart = buffer.indexOfSlice(historyFilter.searchTerm)
-            val searchEnd = searchStart + historyFilter.searchTerm.length
+            val (searchStart, searchEnd) =
+              if (historyFilter.searchTerm.get.isEmpty) (cursor, cursor+1)
+              else {
+                val start = buffer.indexOfSlice(historyFilter.searchTerm.get)
+                val end = start + (historyFilter.searchTerm.get.length max 1)
+                (start, end)
+              }
+
             val screenStart = offsetIndex(searchStart)
             val screenEnd = offsetIndex(searchEnd)
             val prefix = newBuffer.take(screenStart)
-            val middle = newBuffer.slice(screenStart, screenEnd)
-
+            val middle = newBuffer.slice(screenStart, screenEnd).padTo(1, ' ')
+            Debug(s"cursor $cursor")
+            Debug(s"newNewBuffer $searchStart $searchEnd $middle")
             val suffix = newBuffer.drop(screenEnd)
-  //          println("SPLIT INDEX: " + splitIndex)
-  //          println("PREFIX: " + prefix)
-  //          println("SUFFIX: " + suffix)
 
-            val out = prefix ++ Console.UNDERLINED ++ middle ++ resetUnderline ++ suffix
-  //          println("OUT: " + out)
-            out
+            prefix ++ Console.UNDERLINED ++ middle ++ resetUnderline ++ suffix
           }
         (newNewBuffer, offset)
       }

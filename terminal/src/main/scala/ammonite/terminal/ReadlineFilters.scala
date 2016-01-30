@@ -108,13 +108,15 @@ object ReadlineFilters {
     def findNewHistoryIndex(startIndex: Int,
                             searchTerm: Vector[Char],
                             history: IndexedSeq[String],
-                            indexIncrement: Int) = {
+                            indexIncrement: Int,
+                            skipped: Vector[Char]) = {
 
       def rec(i: Int): Int = history.lift(i) match{
         case None if i == -1 => -1
         case None => -1
         case Some(s)
-          if s.contains(searchTerm) && !s.contentEquals(searchTerm) => i
+          if s.contains(searchTerm)
+          && !s.contentEquals(skipped) => i
         case _ => rec(i + indexIncrement)
       }
 
@@ -143,98 +145,89 @@ object ReadlineFilters {
     /**
       * The term we're searching for, if any.
       */
-    var searchTerm = Vector.empty[Char]
+    var searchTerm: Option[Vector[Char]] = None
 
     /**
       * Kicks the HistoryFilter from passive-mode into search-history mode
       */
-    def startHistory(b: Vector[Char], rest: LazyList[Int]): TermState = {
-      searchTerm = b
-      searchHistory(0, 1, rest)
+    def startHistory(b: Vector[Char], rest: LazyList[Int], defaultCursor: Int): TermState = {
+      if (b.nonEmpty) searchTerm = Some(b)
+      up(rest, defaultCursor, Vector())
     }
 
-    def searchHistory(start: Int, increment: Int, rest: LazyList[Int]) = {
+    def searchHistory(start: Int,
+                      increment: Int,
+                      rest: LazyList[Int],
+                      defaultCursor: Int,
+                      skipped: Vector[Char]) = {
+      val sanitizedSearch = searchTerm.getOrElse(Vector())
       val (newHistoryIndex, newBuffer, newCursor) = HistoryFilter.findNewHistoryIndex(
         start,
-        searchTerm,
+        sanitizedSearch,
         history(),
-        increment
+        increment,
+        skipped
       )
-      Debug(s"searchHistory $newHistoryIndex $newBuffer $newCursor")
       historyIndex = newHistoryIndex
+
       historyIndex match {
-        case -1 => TS(rest, searchTerm, searchTerm.length)
-        case i => TS(rest, newBuffer, newCursor)
+        case -1 => TS(rest, sanitizedSearch, sanitizedSearch.length )
+        case i => TS(rest, newBuffer, if (sanitizedSearch.isEmpty) defaultCursor else newCursor)
       }
     }
+
     def activeHistory = searchTerm.nonEmpty || historyIndex != -1
     def activeSearch = searchTerm.nonEmpty
-    def filter = orElseAll(
-      {
-        // Ways to kick off the history search if you're not already in it
-        case TermInfo(TS(18 ~: rest, b, c), w) =>
-          println("To perform a reverse-i-search, simply...")
-          startHistory(b, rest)
+    def up(rest: LazyList[Int], c: Int, skipped: Vector[Char]) = {
+      searchHistory(historyIndex + 1, 1, rest, c, skipped)
+    }
+    def down(rest: LazyList[Int], c: Int, skipped: Vector[Char]) = {
+      searchHistory(historyIndex - 1, -1, rest, c, skipped)
+    }
+    def filter = {
+      // Ways to kick off the history search if you're not already in it
+      case TS(18 ~: rest, b, c) =>
+        if (activeSearch) up(rest, c, b)
+        else {
+          searchTerm = Some(b)
+          startHistory(b, rest, c)
+        }
+      // Ways to kick off the history search if you're not already in it
+      case TermInfo(TS(p"\u001b[A$rest", b, c), w) if firstRow(c, b, w) && !activeHistory =>
+        startHistory(b, rest, c)
 
-        // Ways to kick off the history search if you're not already in it
-        case TermInfo(TS(p"\u001b[A$rest", b, c), w)
-          if firstRow(c, b, w) && !activeHistory =>
-          startHistory(b, rest)
+      case TermInfo(TS(p"\u0010$rest", b, c), w) if lastRow(c, b, w) && !activeHistory =>
+        startHistory(b, rest, c)
 
-        case TermInfo(TS(p"\u0010$rest", b, c), w)
-          if lastRow(c, b, w) && !activeHistory =>
-          startHistory(b, rest)
+      // Things you can do when you're already in the history search
 
-        // Things you can do when you're already in the history search
+      // Navigating up and down the history. Each up or down searches for
+      // the next thing that matches your current searchTerm
+      case TS(p"\u001b[A$rest", b, c) if activeHistory => up(rest, c, b)
+      case TS(p"\u0010$rest", b, c) if activeHistory   => up(rest, c, b)
+      case TS(p"\u001b[B$rest", b, c) if activeHistory => down(rest, c, b)
+      case TS(p"\u000e$rest", b, c) if activeHistory   => down(rest, c, b)
 
-        // Navigating up and down the history. Each up or down searches for
-        // the next thing that matches your current searchTerm
-        case TermInfo(TS(p"\u001b[A$rest", b, c), w) if activeHistory =>
-          Debug("Up\t" + historyIndex)
-          searchHistory(historyIndex + 1, 1, rest)
+      // Intercept Backspace and delete a character, preserving search
+      case TS(127 ~: inputs, buffer, cursor) if activeSearch =>
+        searchTerm = searchTerm.map(_.dropRight(1))
+        searchHistory(historyIndex, 1, inputs, cursor - 1, buffer)
 
-        case TermInfo(TS(p"\u0010$rest", b, c), w) if activeHistory =>
-          searchHistory(historyIndex + 1, 1, rest)
+      // Intercept Enter other control characters and drop
+      // out of search, forwarding that character downstream
+      case TS(char ~: inputs, buffer, cursor) if activeSearch && char.toChar.isControl =>
+        val current =
+          if (historyIndex == -1) buffer
+          else history()(historyIndex).toVector
+        historyIndex = -1
+        searchTerm = None
+        TS(char ~: inputs, current, cursor)
 
-        case TermInfo(TS(p"\u001b[B$rest", b, c), w) if activeHistory =>
-          Debug("Down\t" + historyIndex)
-          searchHistory(historyIndex - 1, -1, rest)
+      // Intercept every other printable character.
+      case TS(char ~: inputs, buffer, cursor) if activeSearch =>
 
-        case TermInfo(TS(p"\u000e$rest", b, c), w) if activeHistory =>
-          searchHistory(historyIndex - 1, -1, rest)
-
-        // Intercept Backspace and delete a character, preserving search
-        case TS(127 ~: inputs, buffer, cursor) if activeSearch =>
-          searchTerm = searchTerm.dropRight(1)
-          searchHistory(historyIndex, 1, inputs)
-
-        // Intercept Enter and submit the currently-searched command for evaluation
-        case TS(char ~: inputs, buffer, cursor)
-          if activeSearch && char == 13 || char == 10 =>
-          val current =
-            if (historyIndex == -1) buffer
-            else history()(historyIndex).toVector
-          historyIndex = -1
-          searchTerm = Vector.empty
-          TS(char ~: inputs, current, cursor)
-
-        // Intercept other control characters and drop out of search
-        case TS(char ~: inputs, buffer, cursor)
-          if activeSearch && char.toChar.isControl =>
-          val current =
-            if (historyIndex == -1) buffer
-            else history()(historyIndex).toVector
-          historyIndex = -1
-          searchTerm = Vector.empty
-          TS(char ~: inputs, current, cursor)
-
-        // Intercept every other printable character.
-        case TS(char ~: inputs, buffer, cursor)
-          if activeSearch =>
-          searchTerm = searchTerm :+ char.toChar
-          searchHistory(historyIndex, 1, inputs)
-
-      }
-    )
+        searchTerm = searchTerm.map(_ :+ char.toChar)
+        searchHistory(historyIndex.max(0), 1, inputs, cursor, Vector())
+    }
   }
 }
