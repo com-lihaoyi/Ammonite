@@ -181,46 +181,53 @@ object NavigationTests extends TestSuite{
       )
       import check._
       'updown{
-        * - check(
-          """
-          abcdefg\
-          h_jk
-          lmnopqr\
-          s
-          tuvwxyz
-          """,
-          up
-        )
-        * - check(
-          """
-          a_cdefg\
-          hijk
-          lmnopqr\
-          s
-          tuvwxyz
-          """,
-          up, up
-        )
-        * - check(
-          """
-          abcdefg\
-          hijk
-          lmnopqr\
-          s_
-          tuvwxyz
-          """,
-          down
-        )
-        * - check(
-          """
-          abcdefg\
-          hijk
-          lmnopqr\
-          s
-          t_vwxyz
-          """,
-          down, down
-        )
+        * - {
+          check
+            .run(up)
+            .check(
+              """
+              abcdefg\
+              h_jk
+              lmnopqr\
+              s
+              tuvwxyz
+              """
+            )
+            .run(up)
+            .check(
+              """
+              a_cdefg\
+              hijk
+              lmnopqr\
+              s
+              tuvwxyz
+              """
+            )
+        }
+        * - {
+          check
+          .run(down)
+          .check(
+            """
+            abcdefg\
+            hijk
+            lmnopqr\
+            s_
+            tuvwxyz
+            """
+          )
+          .run(down)
+          .check(
+            """
+            abcdefg\
+            hijk
+            lmnopqr\
+            s
+            t_vwxyz
+            """
+          )
+        }
+
       }
       'startend{
 
@@ -290,120 +297,116 @@ object NavigationTests extends TestSuite{
       )
       import check._
 
-      * - check(
-        """
-          s.dropPref\
-          ix(
-            _ase.map\
-          (x.toInt)
+      * - {
+        check
+          .run(wordLeft)
+          .check(
+            """
+            s.dropPref\
+            ix(
+              _ase.map\
+            (x.toInt)
+            )
+            """
           )
-        """,
-        wordLeft
-      )
-      * - check(
-        """
-          s.dropPref\
-          ix(
-            base_map\
-          (x.toInt)
+          .run(wordRight)
+          .check(
+            """
+            s.dropPref\
+            ix(
+              base_map\
+            (x.toInt)
+            )
+            """
           )
-        """,
-        wordLeft, wordRight
-      )
-      * - check(
-        """
-          s._ropPref\
-          ix(
-            base.map\
-          (x.toInt)
+      }
+      * - {
+        check
+          .run(wordLeft, wordLeft)
+          .check(
+            """
+            s._ropPref\
+            ix(
+              base.map\
+            (x.toInt)
+            )
+            """
           )
-        """,
-        wordLeft, wordLeft
-      )
-      * - check(
-        """
-          _.dropPref\
-          ix(
-            base.map\
-          (x.toInt)
+          .run(wordLeft)
+          .check(
+            """
+            _.dropPref\
+            ix(
+              base.map\
+            (x.toInt)
+            )
+            """
           )
-        """,
-        wordLeft, wordLeft, wordLeft
-      )
-      // Overshooting
-      * - check(
-        """
-          _.dropPref\
-          ix(
-            base.map\
-          (x.toInt)
+          .run(wordLeft)
+          .check(
+            """
+            _.dropPref\
+            ix(
+              base.map\
+            (x.toInt)
+            )
+            """
           )
-        """,
-        wordLeft, wordLeft, wordLeft, wordLeft
-      )
-      * - check(
-        """
-          s.dropPref\
-          ix(
-            base_map\
-          (x.toInt)
-          )
-        """,
-        wordRight
-      )
-      * - check(
-        """
-          s.dropPref\
-          ix(
-            base.map\
-          _x.toInt)
-          )
-        """,
-        wordRight, wordRight
-      )
+      }
 
-      * - check(
-        """
-          s.dropPref\
-          ix(
-            base.map\
-          (x_toInt)
+      * - {
+        check
+          .run(wordRight)
+          .check(
+            """
+            s.dropPref\
+            ix(
+              base_map\
+            (x.toInt)
+            )
+            """
           )
-        """,
-        wordRight, wordRight, wordRight
-      )
-      * - check(
-        """
-          s.dropPref\
-          ix(
-            base.map\
-          (x.toInt_
+          .run(wordRight)
+          .check(
+            """
+            s.dropPref\
+            ix(
+              base.map\
+            _x.toInt)
+            )
+            """
           )
-        """,
-        wordRight, wordRight, wordRight, wordRight
-      )
-
-      * - check(
-        """
-          s.dropPref\
-          ix(
-            base.map\
-          (x.toInt)
-          )_
-        """,
-        wordRight, wordRight, wordRight, wordRight, wordRight
-      )
-      // Overshooting
-      * - check(
-        """
-          s.dropPref\
-          ix(
-            base.map\
-          (x.toInt)
-          )_
-        """,
-        wordRight, wordRight, wordRight, wordRight, wordRight
-      )
+          .run(wordRight)
+          .check(
+            """
+            s.dropPref\
+            ix(
+              base.map\
+            (x_toInt)
+            )
+            """
+          )
+          .run(wordRight)
+          .check(
+            """
+            s.dropPref\
+            ix(
+              base.map\
+            (x.toInt_
+            )
+            """
+          )
+          .run(wordRight)
+          .check(
+            """
+            s.dropPref\
+            ix(
+              base.map\
+            (x.toInt)
+            )_
+            """
+          )
+      }
     }
 
   }
