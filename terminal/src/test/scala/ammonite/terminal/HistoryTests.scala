@@ -34,10 +34,13 @@ object HistoryTests extends TestSuite{
         checker("_")
           .run(history.ctrlR)
           .check(s"_${Console.BLUE} ...press any key to search, `up` for more results${Console.RESET}")
-          .run(history.printableChar('c', _, _))
+          .run(history.printableChar('c'))
           .check("abc_e")
+          .run(history.backspace)
+          .check(s"_${Console.BLUE} ...press any key to search, `up` for more results${Console.RESET}")
       }
     }
+
     // When you page up with something that doesn't exist in history, it
     // should preserve the current line and move your cursor to the end
     'ups{
@@ -52,10 +55,22 @@ object HistoryTests extends TestSuite{
           .check("abc_efghi")
           // You should be able to cycle through the end of the history and
           // back to the original command
-//          .run(history.upSkip)
-//          .check("abc_")
-//          .run(history.upSkip)
-//          .check("abc_e")
+          .run(history.upSkip)
+          .check("abc_")
+          .run(history.upSkip)
+          .check("abc_e")
+    }
+
+    'down{
+      checker("abc_")
+        .run(history.startHistory)
+        .check("abc_e")
+        .run(history.down)
+        .check("abc_")
+        // `down` doesn't wrap around like `up` does
+        .run(history.down)
+        .check("abc_")
+
     }
 
 
