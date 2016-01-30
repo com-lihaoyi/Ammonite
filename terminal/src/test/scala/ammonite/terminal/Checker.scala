@@ -27,9 +27,13 @@ class Checker(width: Int, grid: String){
   override def toString = s"Checker($stringGrid)"
   var currentGrid = grid.replace("_", "").toVector
   var currentCursor = grid.indexOf('_')
+  Predef.assert(
+    currentCursor != -1,
+    "Cannot find `_` in grid passed to Checker, it needs to " +
+    "exist to tell the checker where the cursor starts off at"
+  )
 
   def run(actions: TermCore.Action*) = {
-    println("------------------------------------------")
     val (endGrid, endCursor) = actions.foldLeft((currentGrid, currentCursor)) {
       case ((g, c), f) =>
         val (g1, c1) = f(g, c)
@@ -38,17 +42,12 @@ class Checker(width: Int, grid: String){
 
     currentGrid = endGrid
     currentCursor = endCursor
-
     this
   }
   def stringGrid = {
     val prefix = currentGrid.take(currentCursor)
-    val suffix = currentGrid.drop(currentCursor+1)
-    val middle = currentGrid.lift(currentCursor) match{
-      case None => Seq('_')
-      case Some('\n') => Seq('_', '\n')
-      case _ => Seq('_')
-    }
+    val suffix = currentGrid.drop(currentCursor)
+    val middle = "_"
 
     (prefix ++ middle ++ suffix).mkString
   }

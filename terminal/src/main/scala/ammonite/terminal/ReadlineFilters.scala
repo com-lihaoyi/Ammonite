@@ -112,27 +112,39 @@ object ReadlineFilters {
                             history: IndexedSeq[String],
                             indexIncrement: Int,
                             skipped: Vector[Char]) = {
-
-      def rec(i: Int): Int = history.lift(i) match{
-        case None if i == -1 => -1
-        case None => -1
-        case Some(s)
-          if s.contains(searchTerm)
-          && !s.contentEquals(skipped) => i
+      /**
+        * `Some(i)` means we found a reasonable result at history element `i`
+        * `None` means we couldn't find anything, and should show a not-found
+        * error to the user
+        */
+      def rec(i: Int): Option[Int] = history.lift(i) match{
+        // If i < 0, it means the user is pressing `down` too many times, which
+        // means it doesn't show anything but we shouldn't show an error
+        case None if i < 0 => Some(-1)
+        case None => None
+        case Some(s) if s.contains(searchTerm) && !s.contentEquals(skipped) =>
+          Some(i)
         case _ => rec(i + indexIncrement)
       }
 
       val newHistoryIndex = rec(startIndex)
-      val newBuffer =
-        if (newHistoryIndex == -1) searchTerm
-        else history(newHistoryIndex).toVector
+      val foundIndex = newHistoryIndex.find(_ != -1)
+      val newBuffer = foundIndex match{
+        case None => searchTerm
+        case Some(i) => history(i).toVector
+      }
 
-      val newCursor =
-        if (newHistoryIndex == -1) newBuffer.length
-        else history(newHistoryIndex).indexOfSlice(searchTerm) + searchTerm.length
+      val newCursor = foundIndex match{
+        case None => newBuffer.length
+        case Some(i) => history(i).indexOfSlice(searchTerm) + searchTerm.length
+      }
 
       (newHistoryIndex, newBuffer, newCursor)
     }
+    val emptySearchMessage =
+      s" ${Console.BLUE}...press any key to search, `up` for more results${Console.RESET}"
+    val cannotFindSearchMessage =
+      s" ${Console.BLUE}...cannot be found in the history${Console.RESET}"
   }
   /**
    * Provides history navigation up and down, saving the current line.
@@ -169,6 +181,7 @@ object ReadlineFilters {
 
     def searchHistory(start: Int,
                       increment: Int,
+                      buffer: Vector[Char],
                       skipped: Vector[Char]) = {
 
       def nextHistoryIndexFor(v: Vector[Char]) = {
@@ -182,22 +195,23 @@ object ReadlineFilters {
           val (i, b, c) = nextHistoryIndexFor(Vector.empty)
           (i, b, 99999)
         // We're searching for some item with a particular search term
-        case Some(b) if b.nonEmpty => nextHistoryIndexFor(b)
+        case Some(b) if b.nonEmpty =>
+          val (i, b1, c) = nextHistoryIndexFor(b)
+          val msg =
+            if (i.nonEmpty || b1 != buffer) ""
+            else HistoryFilter.cannotFindSearchMessage
+
+          (i, b1 ++ msg, c)
         // We're searching for nothing in particular; in this case,
         // show a help message instead of an unhelpful, empty buffer
         case Some(b) if b.isEmpty =>
-          val msg = Seq(
-            "_",
-            Console.BLUE,
-            " ...press any key to search, `up` for more results",
-            Console.RESET
-          ).flatten.toVector
+          val msg = HistoryFilter.emptySearchMessage.toVector
           // The cursor in this case always goes to zero
-          (start, msg, 0)
+          (Some(start), msg, 0)
 
       }
 
-      historyIndex = newHistoryIndex
+      historyIndex = newHistoryIndex.getOrElse(-1)
 
       (newBuffer, newCursor)
     }
@@ -205,10 +219,10 @@ object ReadlineFilters {
     def activeHistory = searchTerm.nonEmpty || historyIndex != -1
     def activeSearch = searchTerm.nonEmpty
     def up(b: Vector[Char], c: Int) = {
-      searchHistory(historyIndex + 1, 1, b)
+      searchHistory(historyIndex + 1, 1, b, b)
     }
     def down(b: Vector[Char], c: Int) = {
-      searchHistory(historyIndex - 1, -1, b)
+      searchHistory(historyIndex - 1, -1, b, b)
     }
     def wrap(rest: LazyList[Int], out: (Vector[Char], Int)) = {
       TS(rest, out._1, out._2)
@@ -222,12 +236,12 @@ object ReadlineFilters {
     }
     def printableChar(char: Char)(b: Vector[Char], c: Int) = {
       searchTerm = searchTerm.map(_ :+ char)
-      searchHistory(historyIndex.max(0), 1, Vector())
+      searchHistory(historyIndex.max(0), 1, b :+ char, Vector())
     }
 
     def backspace(b: Vector[Char], c: Int) = {
       searchTerm = searchTerm.map(_.dropRight(1))
-      searchHistory(historyIndex, 1, Vector())
+      searchHistory(historyIndex, 1, b, Vector())
     }
 
 

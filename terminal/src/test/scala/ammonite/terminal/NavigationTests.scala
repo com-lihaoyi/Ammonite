@@ -24,7 +24,7 @@ object NavigationTests extends TestSuite{
       'noop - check(
         """
         abcd
-        e_gh
+        e_fgh
         ijkl
         """,
         (g, v) => (g, v)
@@ -36,13 +36,13 @@ object NavigationTests extends TestSuite{
           """
           abcd
           efgh
-          i_kl
+          i_jkl
           """,
           down
         )
         'up - check(
           """
-          a_cd
+          a_bcd
           efgh
           ijkl
           """,
@@ -51,14 +51,14 @@ object NavigationTests extends TestSuite{
         'updown - check(
           """
           abcd
-          e_gh
+          e_fgh
           ijkl
           """,
           up, down
         )
         'upup - check(
           """
-          _bcd
+          _abcd
           efgh
           ijkl
           """,
@@ -75,7 +75,7 @@ object NavigationTests extends TestSuite{
         'upupdown - check(
           """
           abcd
-          _fgh
+          _efgh
           ijkl
           """,
           up, up, down
@@ -101,7 +101,7 @@ object NavigationTests extends TestSuite{
         'start - check(
           """
           abcd
-          _fgh
+          _efgh
           ijkl
           """,
           home
@@ -130,7 +130,7 @@ object NavigationTests extends TestSuite{
         hijk
         lmnopqr
         s
-        t_vwxyz
+        t_uvwxyz
         """,
         down, down
       )
@@ -138,7 +138,7 @@ object NavigationTests extends TestSuite{
         """
         abcdefg
         hijk
-        l_nopqr
+        l_mnopqr
         s
         tuvwxyz
         """,
@@ -146,7 +146,7 @@ object NavigationTests extends TestSuite{
       )
       'upup- check(
         """
-        ab_defg
+        ab_cdefg
         hijk
         lmnopqr
         s
@@ -187,7 +187,7 @@ object NavigationTests extends TestSuite{
             .check(
               """
               abcdefg\
-              h_jk
+              h_ijk
               lmnopqr\
               s
               tuvwxyz
@@ -196,7 +196,7 @@ object NavigationTests extends TestSuite{
             .run(up)
             .check(
               """
-              a_cdefg\
+              a_bcdefg\
               hijk
               lmnopqr\
               s
@@ -223,7 +223,7 @@ object NavigationTests extends TestSuite{
             hijk
             lmnopqr\
             s
-            t_vwxyz
+            t_uvwxyz
             """
           )
         }
@@ -236,7 +236,7 @@ object NavigationTests extends TestSuite{
           abcdefg\
           hijk
           lmnopqr\
-          _
+          _s
           tuvwxyz
           """,
           end
@@ -245,7 +245,7 @@ object NavigationTests extends TestSuite{
           """
           abcdefg\
           hijk
-          _mnopqr\
+          _lmnopqr\
           s
           tuvwxyz
           """,
@@ -254,7 +254,7 @@ object NavigationTests extends TestSuite{
         * - check(
           """
           abcdefg\
-          _ijk
+          _hijk
           lmnopqr\
           s
           tuvwxyz
@@ -264,7 +264,7 @@ object NavigationTests extends TestSuite{
         * - check(
           """
           abcdefg\
-          _ijk
+          _hijk
           lmnopqr\
           s
           tuvwxyz
@@ -274,7 +274,7 @@ object NavigationTests extends TestSuite{
         * - check(
           """
           abcdefg\
-          _ijk
+          _hijk
           lmnopqr\
           s
           tuvwxyz
@@ -304,7 +304,7 @@ object NavigationTests extends TestSuite{
             """
             s.dropPref\
             ix(
-              _ase.map\
+              _base.map\
             (x.toInt)
             )
             """
@@ -314,7 +314,7 @@ object NavigationTests extends TestSuite{
             """
             s.dropPref\
             ix(
-              base_map\
+              base_.map\
             (x.toInt)
             )
             """
@@ -325,7 +325,7 @@ object NavigationTests extends TestSuite{
           .run(wordLeft, wordLeft)
           .check(
             """
-            s._ropPref\
+            s._dropPref\
             ix(
               base.map\
             (x.toInt)
@@ -335,7 +335,7 @@ object NavigationTests extends TestSuite{
           .run(wordLeft)
           .check(
             """
-            _.dropPref\
+            _s.dropPref\
             ix(
               base.map\
             (x.toInt)
@@ -345,7 +345,7 @@ object NavigationTests extends TestSuite{
           .run(wordLeft)
           .check(
             """
-            _.dropPref\
+            _s.dropPref\
             ix(
               base.map\
             (x.toInt)
@@ -361,7 +361,7 @@ object NavigationTests extends TestSuite{
             """
             s.dropPref\
             ix(
-              base_map\
+              base_.map\
             (x.toInt)
             )
             """
@@ -372,7 +372,7 @@ object NavigationTests extends TestSuite{
             s.dropPref\
             ix(
               base.map\
-            _x.toInt)
+            _(x.toInt)
             )
             """
           )
@@ -382,7 +382,7 @@ object NavigationTests extends TestSuite{
             s.dropPref\
             ix(
               base.map\
-            (x_toInt)
+            (x_.toInt)
             )
             """
           )
@@ -392,7 +392,7 @@ object NavigationTests extends TestSuite{
             s.dropPref\
             ix(
               base.map\
-            (x.toInt_
+            (x.toInt_)
             )
             """
           )
