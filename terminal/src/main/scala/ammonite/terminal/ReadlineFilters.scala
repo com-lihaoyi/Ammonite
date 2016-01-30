@@ -152,14 +152,13 @@ object ReadlineFilters {
     /**
       * Kicks the HistoryFilter from passive-mode into search-history mode
       */
-    def startHistory(b: Vector[Char], rest: LazyList[Int], defaultCursor: Int): TermState = {
+    def startHistory(b: Vector[Char], defaultCursor: Int): (Vector[Char], Int) = {
       if (b.nonEmpty) searchTerm = Some(b)
-      up(rest, defaultCursor, Vector())
+      up(defaultCursor, Vector())
     }
 
     def searchHistory(start: Int,
                       increment: Int,
-                      rest: LazyList[Int],
                       defaultCursor: Int,
                       skipped: Vector[Char]) = {
 
@@ -188,46 +187,48 @@ object ReadlineFilters {
 
       historyIndex = newHistoryIndex
 
-      TS(rest, newBuffer, newCursor)
+      (newBuffer, newCursor)
     }
 
     def activeHistory = searchTerm.nonEmpty || historyIndex != -1
     def activeSearch = searchTerm.nonEmpty
-    def up(rest: LazyList[Int], c: Int, skipped: Vector[Char]) = {
-      searchHistory(historyIndex + 1, 1, rest, c, skipped)
+    def up(c: Int, skipped: Vector[Char]) = {
+      searchHistory(historyIndex + 1, 1, c, skipped)
     }
-    def down(rest: LazyList[Int], c: Int, skipped: Vector[Char]) = {
-      searchHistory(historyIndex - 1, -1, rest, c, skipped)
+    def down(c: Int, skipped: Vector[Char]) = {
+      searchHistory(historyIndex - 1, -1, c, skipped)
     }
-
+    def wrap(rest: LazyList[Int], out: (Vector[Char], Int)) = {
+      TS(rest, out._1, out._2)
+    }
     def filter = {
       // Ways to kick off the history search if you're not already in it
       case TS(18 ~: rest, b, c) =>
-        if (activeSearch) up(rest, c, b)
+        if (activeSearch) wrap(rest, up(c, b))
         else {
           searchTerm = Some(b)
-          startHistory(b, rest, c)
+          wrap(rest, startHistory(b, c))
         }
       // Ways to kick off the history search if you're not already in it
       case TermInfo(TS(p"\u001b[A$rest", b, c), w) if firstRow(c, b, w) && !activeHistory =>
-        startHistory(b, rest, c)
+        wrap(rest, startHistory(b, c))
 
       case TermInfo(TS(p"\u0010$rest", b, c), w) if lastRow(c, b, w) && !activeHistory =>
-        startHistory(b, rest, c)
+        wrap(rest, startHistory(b, c))
 
       // Things you can do when you're already in the history search
 
       // Navigating up and down the history. Each up or down searches for
       // the next thing that matches your current searchTerm
-      case TS(p"\u001b[A$rest", b, c) if activeHistory => up(rest, c, b)
-      case TS(p"\u0010$rest", b, c) if activeHistory   => up(rest, c, b)
-      case TS(p"\u001b[B$rest", b, c) if activeHistory => down(rest, c, b)
-      case TS(p"\u000e$rest", b, c) if activeHistory   => down(rest, c, b)
+      case TS(p"\u001b[A$rest", b, c) if activeHistory => wrap(rest, up(c, b))
+      case TS(p"\u0010$rest", b, c) if activeHistory   => wrap(rest, up(c, b))
+      case TS(p"\u001b[B$rest", b, c) if activeHistory => wrap(rest, down(c, b))
+      case TS(p"\u000e$rest", b, c) if activeHistory   => wrap(rest, down(c, b))
 
       // Intercept Backspace and delete a character, preserving search
-      case TS(127 ~: inputs, buffer, cursor) if activeSearch =>
+      case TS(127 ~: rest, buffer, cursor) if activeSearch =>
         searchTerm = searchTerm.map(_.dropRight(1))
-        searchHistory(historyIndex, 1, inputs, cursor - 1, Vector())
+        wrap(rest, searchHistory(historyIndex, 1, cursor - 1, Vector()))
 
       // Intercept Enter other control characters and drop
       // out of search, forwarding that character downstream
@@ -241,9 +242,9 @@ object ReadlineFilters {
         TS(char ~: inputs, current, cursor)
 
       // Intercept every other printable character.
-      case TS(char ~: inputs, buffer, cursor) if activeSearch =>
+      case TS(char ~: rest, buffer, cursor) if activeSearch =>
         searchTerm = searchTerm.map(_ :+ char.toChar)
-        searchHistory(historyIndex.max(0), 1, inputs, cursor, Vector())
+        wrap(rest, searchHistory(historyIndex.max(0), 1, cursor, Vector()))
     }
   }
 }

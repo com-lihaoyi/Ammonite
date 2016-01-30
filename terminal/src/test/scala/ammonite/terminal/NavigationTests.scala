@@ -11,14 +11,9 @@ object NavigationTests extends TestSuite{
       // grid of characters
       val check = Checker(
         width = 5,
-        grid = """
+        """
           abcd
-          efgh
-          ijkl
-        """ ,
-        start = """
-          abcd
-          e_gh
+          e_fgh
           ijkl
         """
 
@@ -118,17 +113,10 @@ object NavigationTests extends TestSuite{
       // are of uneven lengths
       val check = Checker(
         width = 10,
-        grid = """
+        """
           abcdefg
           hijk
-          lmnopqr
-          s
-          tuvwxyz
-        """,
-        start = """
-          abcdefg
-          hijk
-          lm_opqr
+          lm_nopqr
           s
           tuvwxyz
         """
@@ -183,17 +171,10 @@ object NavigationTests extends TestSuite{
       // should behave like separate lines
       val check = Checker(
         width = 7,
-        grid = """
+        """
           abcdefg\
           hijk
-          lmnopqr\
-          s
-          tuvwxyz
-        """,
-        start = """
-          abcdefg\
-          hijk
-          l_nopqr\
+          l_mnopqr\
           s
           tuvwxyz
         """
@@ -299,17 +280,10 @@ object NavigationTests extends TestSuite{
       // Tests of word-by-word navigation
       val check = Checker(
         width = 10,
-        grid = """
+        """
           s.dropPref\
           ix(
-            base.map\
-          (x.toInt)
-          )
-        """,
-        start = """
-          s.dropPref\
-          ix(
-            b_se.map\
+            b_ase.map\
           (x.toInt)
           )
         """

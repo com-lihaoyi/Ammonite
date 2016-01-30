@@ -10,8 +10,8 @@ object Checker{
 
   }
 
-  def apply(width: Int, grid: String, start: String) =
-    new Checker(width, normalize(grid), normalize(start))
+  def apply(width: Int, grid: String) =
+    new Checker(width, normalize(grid))
 }
 
 /**
@@ -19,13 +19,13 @@ object Checker{
  * [[TermCore.Action]]s against an in-memory (Vector[Char], Int) and
  * verify that they do the right thing.
  */
-class Checker(width: Int, grid: String, start: String){
+class Checker(width: Int, grid: String){
 
   def apply(end0: String, actions: TermCore.Action*) = {
 
     val end = Checker.normalize(end0)
-    val gridv = grid.toVector
-    val startCursor = start.indexOf('_')
+    val gridv = grid.replace("_", "").toVector
+    val startCursor = grid.indexOf('_')
     val (endGrid, endCursor) = actions.foldLeft((gridv, startCursor)) {
       case ((g, c), f) =>
         val (g1, c1) = f(g, c)

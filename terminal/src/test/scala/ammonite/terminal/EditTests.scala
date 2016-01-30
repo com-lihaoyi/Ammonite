@@ -10,12 +10,7 @@ object EditTests extends TestSuite{
       width = 5,
       grid = """
         abcd
-        efgh
-        ijkl
-      """ ,
-      start = """
-        abcd
-        e_gh
+        e_fgh
         ijkl
       """
     )
