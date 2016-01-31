@@ -55,6 +55,7 @@ object TPrintTests extends TestSuite{
        'mutable{
 
          check[collection.mutable.Buffer[Int]]("collection.mutable.Buffer[Int]")
+         import collection.mutable
          check[collection.mutable.Buffer[Int]]("mutable.Buffer[Int]")
          check[Seq[Int]]("Seq[Int]")
          check[collection.Seq[Int]]("Seq[Int]")
