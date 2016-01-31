@@ -25,7 +25,7 @@ class Interpreter(prompt0: Ref[String],
                   height: => Int,
                   pprintConfig: pprint.Config,
                   colors0: Ref[Colors],
-                  stdout: String => Unit,
+                  printer: Printer,
                   storage: Ref[Storage],
                   history: => History,
                   predef: String,
@@ -55,11 +55,9 @@ class Interpreter(prompt0: Ref[String],
       |import ammonite.repl.IvyConstructor.{ArtifactIdExt, GroupIdExt}
       |""".stripMargin
 
-  val SheBang= "#!"
-
+  val SheBang = "#!"
   def processLine(code: String,
-                  stmts: Seq[String],
-                  printer: Iterator[String] => Unit) = {
+                  stmts: Seq[String]) = {
     for{
       _ <- Catching { case ex =>
         Res.Exception(ex, "Something unexpected went wrong =(")
@@ -71,7 +69,7 @@ class Interpreter(prompt0: Ref[String],
 
   def evaluateLine(code: String,
                    printSnippet: Seq[String],
-                   printer: Iterator[String] => Unit,
+                   printer: Printer,
                    extraImports: Seq[ImportData] = Seq() ) = {
 
     val oldClassloader = Thread.currentThread().getContextClassLoader
@@ -94,10 +92,10 @@ class Interpreter(prompt0: Ref[String],
   }
 
   def processModule(code: String) =
-    processScript(prepareScript(code), eval.processScriptBlock)
+    processScript(prepareScript(code), eval.processScriptBlock(_, _, printer))
 
   def processExec(code: String) =
-    processScript(prepareScript(code), { (c, i) => evaluateLine(c, Nil, _ => (), i)})
+    processScript(prepareScript(code), { (c, i) => evaluateLine(c, Nil, printer, i)})
 
   private def prepareScript(code: String) =
     hardcodedPredef + "\n@\n" + skipSheBangLine(code)
@@ -159,11 +157,7 @@ class Interpreter(prompt0: Ref[String],
           case Res.Exception(throwable, msg) => throw throwable
           case Res.Success(ev) =>
             val last = Frame.mergeImports(ev.imports, nestedScriptImports)
-            loop(
-            blocks.tail,
-            Frame.mergeImports(scriptImports, last),
-            last
-          )
+            loop(blocks.tail, Frame.mergeImports(scriptImports, last), last)
           case Res.Skip => loop(blocks.tail, scriptImports, lastImports)
         }
       }
@@ -171,7 +165,7 @@ class Interpreter(prompt0: Ref[String],
     try{
       if(errors.isEmpty) loop(blocks.collect{ case Res.Success(o) => o }, Seq(), Seq())
       else {
-        stdout(colors0().error() + errors.mkString("\n") + colors0().reset() + "\n")
+        printer.error(errors.mkString("\n"))
         Nil
       }
 
@@ -331,8 +325,6 @@ class Interpreter(prompt0: Ref[String],
       }
     }
   }
-  ::
-
 
   val mainThread = Thread.currentThread()
   val eval = Evaluator(

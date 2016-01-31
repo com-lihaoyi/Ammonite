@@ -188,6 +188,7 @@ object Pressy {
       val (settings, reporter, _, jcp) = Compiler.initGlobalBits(
         classpath,
         dynamicClasspath,
+        _ => (),
         _ => ()
       )
       new nsc.interactive.Global(settings, reporter) { g =>

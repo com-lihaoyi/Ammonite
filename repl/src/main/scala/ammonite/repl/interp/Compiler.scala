@@ -1,4 +1,5 @@
-package ammonite.repl.interp
+package ammonite.repl
+package interp
 
 
 import acyclic.file
@@ -32,7 +33,9 @@ import scala.tools.nsc.util._
  */
 trait Compiler{
   def compiler: nsc.Global
-  def compile(src: Array[Byte], runLogger: String => Unit): Compiler.Output
+  def compile(src: Array[Byte],
+              printer: Printer): Compiler.Output
+
   def search(name: scala.reflect.runtime.universe.Type): Option[String]
   /**
    * Either the statements that were parsed or the error message
@@ -82,7 +85,8 @@ object Compiler{
    */
   def initGlobalBits(classpath: Seq[java.io.File],
                      dynamicClasspath: VirtualDirectory,
-                     logger: => String => Unit)= {
+                     errorLogger: => String => Unit,
+                     warningLogger: => String => Unit) = {
     val vd = new io.VirtualDirectory("(memory)", None)
     lazy val settings = new Settings
     val settingsX = settings
@@ -116,8 +120,9 @@ object Compiler{
         severity match{
           case ERROR =>
             Classpath.traceClasspathProblem(s"ERROR: $msg")
-            logger(Position.formatMessage(pos, msg, false))
-          case _ => logger(msg)
+            errorLogger(Position.formatMessage(pos, msg, false))
+          case WARNING =>
+            warningLogger(Position.formatMessage(pos, msg, false))
         }
       }
 
@@ -171,13 +176,14 @@ object Compiler{
       plugins.collect{case (name, _, Some(cls)) => name -> cls }
     }
 
-    var logger: String => Unit = s => ()
+    var errorLogger: String => Unit = s => ()
+    var warningLogger: String => Unit = s => ()
 
     var lastImports = Seq.empty[ImportData]
 
     val (vd, reporter, compiler) = {
       val (settings, reporter, vd, jcp) = initGlobalBits(
-        classpath, dynamicClasspath, logger
+        classpath, dynamicClasspath, errorLogger, warningLogger
       )
       val scalac = new nsc.Global(settings, reporter) { g =>
         override lazy val plugins = List(new AmmonitePlugin(g, lastImports = _)) ++ {
@@ -247,9 +253,10 @@ object Compiler{
      * Compiles a blob of bytes and spits of a list of classfiles
      */
     def compile(src: Array[Byte],
-                runLogger: String => Unit): Output = {
+                printer: Printer): Output = {
       compiler.reporter.reset()
-      this.logger = runLogger
+      this.errorLogger = printer.error
+      this.warningLogger = printer.warning
       val singleFile = makeFile( src)
 
       val run = new compiler.Run()
@@ -282,12 +289,14 @@ object Compiler{
     }
 
     def parse(line: String): Either[String, Seq[Global#Tree]]= {
-      val out = mutable.Buffer.empty[String]
-      logger = out.append(_)
+      val errors = mutable.Buffer.empty[String]
+      val warnings = mutable.Buffer.empty[String]
+      errorLogger = errors.append(_)
+      warningLogger = warnings.append(_)
       reporter.reset()
       val parser = compiler.newUnitParser(line)
       val trees = CompilerCompatibility.trees(compiler)(parser)
-      if (reporter.hasErrors) Left(out.mkString("\n"))
+      if (reporter.hasErrors) Left(errors.mkString("\n"))
       else Right(trees)
     }
   }

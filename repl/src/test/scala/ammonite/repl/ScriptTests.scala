@@ -279,7 +279,7 @@ object ScriptTests extends TestSuite{
           80,
           pprint.Config.Defaults.PPrintConfig.copy(height = 15),
           Ref(Colors.BlackWhite),
-          stdout = _ => (),
+          printer = Printer(_ => (), _ => (), _ => ()),
           storage = Ref(storage),
           new History(Vector()),
           predef = "",

@@ -213,6 +213,7 @@ case class Colors(prompt: Ref[String],
                   keyword: Ref[String],
                   selected: Ref[String],
                   error: Ref[String],
+                  warning: Ref[String],
                   reset: Ref[String])
 object Colors{
 
@@ -226,9 +227,10 @@ object Colors{
     Console.YELLOW,
     Console.REVERSED,
     Console.RED,
+    Console.YELLOW,
     Console.RESET
   )
-  def BlackWhite = Colors("", "", "", "", "", "", "", "", "", "")
+  def BlackWhite = Colors("", "", "", "", "", "", "", "", "", "", "")
 }
 
 /**
@@ -237,3 +239,14 @@ object Colors{
  */
 case class Bind[T](name: String, value: T)
                   (implicit val typeTag: scala.reflect.runtime.universe.TypeTag[T])
+
+/**
+  * Encapsulates the ways the Ammonite REPL prints things
+  *
+  * @param out How you want it to print streaming fragments of stdout
+  * @param warning How you want it to print a complete warning
+  * @param error How you want it to print a complete error
+  */
+case class Printer(out: String => Unit,
+                   warning: String => Unit,
+                   error: String => Unit)

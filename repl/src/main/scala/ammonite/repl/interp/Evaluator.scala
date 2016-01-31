@@ -33,9 +33,12 @@ trait Evaluator{
    */
   def processLine(code: String,
                   printCode: String,
-                  printer: Iterator[String] => Unit,
+                  printer: Printer,
                   extraImports: Seq[ImportData] = Seq()): Res[Evaluated]
-  def processScriptBlock(code: String, scriptImports: Seq[ImportData]): Res[Evaluated]
+
+  def processScriptBlock(code: String,
+                         scriptImports: Seq[ImportData],
+                         printer: Printer): Res[Evaluated]
 
   def previousImportBlock: String
 
@@ -49,8 +52,9 @@ trait Evaluator{
 
 object Evaluator{
 
+
   def apply(currentClassloader: ClassLoader,
-            compile: => (Array[Byte], String => Unit) => Compiler.Output,
+            compile: => (Array[Byte], Printer) => Compiler.Output,
             startingLine: Int,
             cacheLoad: String => Option[CompileCache],
             cacheSave: (String, CompileCache) => Unit,
@@ -134,17 +138,17 @@ object Evaluator{
     private var _compilationCount = 0
     def compilationCount = _compilationCount
 
-    def compileClass(code: String): Res[(ClassFiles, Seq[ImportData])] = for {
-      (output, compiled) <- Res.Success{
-        val output = mutable.Buffer.empty[String]
-        val c = compile(code.getBytes, output.append(_))
-        (output, c)
+    def compileClass(code: String, printer: Printer): Res[(ClassFiles, Seq[ImportData])] = for {
+      compiled <- Res.Success{
+        val c = compile(code.getBytes, printer)
+        c
       }
       _ = _compilationCount += 1
-      result <- Res[(ClassFiles, Seq[ImportData])](
-        compiled, "Compilation Failed\n" + output.mkString("\n")
+      (classfiles, imports) <- Res[(ClassFiles, Seq[ImportData])](
+        compiled,
+        "Compilation Failed"
       )
-    } yield result
+    } yield (classfiles, imports)
 
     def loadClass(wrapperName: String, classFiles: ClassFiles): Res[Class[_]] = {
       Res[Class[_]](Try {
@@ -203,16 +207,19 @@ object Evaluator{
 
     def processLine(code: String,
                     printCode: String,
-                    printer: Iterator[String] => Unit,
+                    printer: Printer,
                     extraImports: Seq[ImportData] = Seq()) = for {
       wrapperName <- Res.Success("cmd" + getCurrentLine)
       _ <- Catching{ case e: ThreadDeath => interrupted() }
-      (classFiles, newImports) <- compileClass(wrapCode(
-        wrapperName,
-        code,
-        printCode,
-        Frame.mergeImports(imports, extraImports)
-      ))
+      (classFiles, newImports) <- compileClass(
+        wrapCode(
+          wrapperName,
+          code,
+          printCode,
+          Frame.mergeImports(imports, extraImports)
+        ),
+        printer
+      )
       _ = Timer("eval.processLine compileClass end")
       cls <- loadClass(wrapperName, classFiles)
       _ = Timer("eval.processLine loadClass end")
@@ -235,7 +242,7 @@ object Evaluator{
 
       val iter = evalMain(cls).asInstanceOf[Iterator[String]]
       Timer("eval.processLine evaluatorRunPrinter 1")
-      evaluatorRunPrinter(printer(iter))
+      evaluatorRunPrinter(iter.foreach(printer.out))
       Timer("eval.processLine evaluatorRunPrinter end")
       evaluationResult(wrapperName, newImports)
     }
@@ -255,6 +262,7 @@ $code
 
     def cachedCompileBlock(code: String,
                            imports: Seq[ImportData],
+                           printer: Printer,
                            printCode: String = ""): Res[(String, Class[_], Seq[ImportData])] = {
       Timer("cachedCompileBlock 0")
       val wrapperName = cacheTag(code, imports, sess.frames.head.classloader.classpathHash)
@@ -266,7 +274,7 @@ $code
           addToCompilerClasspath(classFiles)
           Res.Success((classFiles, newImports))
         case None => for {
-          (classFiles, newImports) <- compileClass(wrappedCode)
+          (classFiles, newImports) <- compileClass(wrappedCode, printer)
           _ = cacheSave(wrapperName, (classFiles, newImports))
         } yield (classFiles, newImports)
       }
@@ -278,8 +286,12 @@ $code
       } yield (wrapperName, cls, newImports)
     }
 
-    def processScriptBlock(code: String, scriptImports: Seq[ImportData]) = for {
-      (wrapperName, cls, newImports) <- cachedCompileBlock(code, scriptImports)
+    def processScriptBlock(code: String,
+                           scriptImports: Seq[ImportData],
+                           printer: Printer) = for {
+      (wrapperName, cls, newImports) <- cachedCompileBlock(
+        code, scriptImports, printer
+      )
     } yield {
       Timer("cachedCompileBlock")
       evalMain(cls)
@@ -293,7 +305,8 @@ $code
       frames.head.addImports(newImports)
     }
 
-    def evaluationResult(wrapperName: String, imports: Seq[ImportData]) = {
+    def evaluationResult(wrapperName: String,
+                         imports: Seq[ImportData]) = {
       Evaluated(
         wrapperName,
         imports.map(id => id.copy(

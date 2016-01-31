@@ -1,14 +1,11 @@
 package ammonite.repl
 
-import java.io._
+import java.io.{PrintStream, InputStream, OutputStream, InputStreamReader}
 import ammonite.repl.frontend._
 import acyclic.file
 import ammonite.repl.interp.Interpreter
 
 import scala.annotation.tailrec
-import scala.reflect.internal.annotations.compileTimeOnly
-import scala.reflect.runtime.universe.TypeTag
-import ammonite.ops._
 class Repl(input: InputStream,
            output: OutputStream,
            storage: Ref[Storage],
@@ -22,10 +19,20 @@ class Repl(input: InputStream,
     PartialFunction.empty
   ))
 
-  val printer = new PrintStream(output, true)
+  val printStream = new PrintStream(output, true)
   var history = new History(Vector())
 
+
+  def printlnWithColor(color: String, s: String) = {
+    Seq(color, s, colors().reset(), "\n").foreach(printStream.print)
+  }
+  val printer = Printer(
+    _.foreach(printStream.print),
+    printlnWithColor(colors().warning(), _),
+    printlnWithColor(colors().error(), _)
+  )
   Timer("Repl init printer")
+
   val interp: Interpreter = new Interpreter(
     prompt,
     frontEnd,
@@ -33,7 +40,7 @@ class Repl(input: InputStream,
     frontEnd().height,
     pprint.Config.Colors.PPrintConfig,
     colors,
-    printer.print,
+    printer,
     storage,
     history,
     predef,
@@ -57,10 +64,10 @@ class Repl(input: InputStream,
       }
     )
     _ <- Signaller("INT") { interp.mainThread.stop() }
-    out <- interp.processLine(code, stmts, _.foreach(printer.print))
+    out <- interp.processLine(code, stmts)
   } yield {
     Timer("interp.processLine end")
-    printer.println()
+    printStream.println()
     out
   }
 
@@ -69,8 +76,8 @@ class Repl(input: InputStream,
   def javaVersion = System.getProperty("java.version")
 
   def printBanner(): Unit = {
-    printer.println(s"Welcome to the Ammonite Repl $ammoniteVersion")
-    printer.println(s"(Scala $scalaVersion Java $javaVersion)")
+    printStream.println(s"Welcome to the Ammonite Repl $ammoniteVersion")
+    printStream.println(s"(Scala $scalaVersion Java $javaVersion)")
   }
 
   def run(): Any = {
@@ -80,14 +87,14 @@ class Repl(input: InputStream,
       Timer("End Of Loop")
       val res2 = res match{
         case Res.Exit(value) =>
-          printer.println("Bye!")
+          printStream.println("Bye!")
           value
-        case Res.Failure(msg) => printer.println(colors().error() + msg + colors().reset())
+        case Res.Failure(msg) => printer.error(msg)
         case Res.Exception(ex, msg) =>
-          printer.println(
+          printer.error(
             Repl.showException(ex, colors().error(), colors().reset(), colors().literal())
           )
-          printer.println(colors().error() + msg + colors().reset())
+          printer.error(msg)
         case _ =>
       }
 
@@ -114,7 +121,7 @@ object Repl{
       s"$error$prefixString$highlightError$clsNameString$error" +
         s".$highlightError${f.getMethodName}$error"
 
-    s"\t$method($src)"
+    s"  $method($src)"
   }
   def showException(ex: Throwable, error: String, highlightError: String, source: String) = {
     val cutoff = Set("$main", "evaluatorRunPrinter")

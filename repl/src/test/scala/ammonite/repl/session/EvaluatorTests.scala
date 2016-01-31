@@ -254,6 +254,17 @@ object EvaluatorTests extends TestSuite{
         res3: Seq[Int] = List(1)
       """)
     }
+    'warnings{
+      val warningMsg =
+        "fruitless type test: a value of type List[Int] cannot " +
+        "also be a List[Double] (the underlying of List[Double]) " +
+        "(but still might match its erasure)"
+
+      check.session(s"""
+        @ List(1) match { case _: List[Double] => 2 }
+        warning: $warningMsg
+      """)
+    }
     'backticks{
       check.session("""
         @ val `1+1` = 1

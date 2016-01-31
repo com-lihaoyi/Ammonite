@@ -4,6 +4,9 @@ import ammonite.repl.frontend._
 import ammonite.repl.interp.Interpreter
 import utest._
 import acyclic.file
+
+import scala.collection.mutable
+
 /**
  * A test REPL which does not read from stdin or stdout files, but instead lets
  * you feed in lines or sessions programmatically and have it execute them.
@@ -17,7 +20,14 @@ class Checker {
     java.nio.file.Files.createTempDirectory("ammonite-tester")
   )
 
-
+  val out = mutable.Buffer.empty[String]
+  val warning = mutable.Buffer.empty[String]
+  val error = mutable.Buffer.empty[String]
+  val printer = Printer(
+    out.append(_),
+    s => warning.append(s"$s\n"),
+    s => error.append(s"$s\n")
+  )
   val interp = new Interpreter(
     Ref[String](""),
     Ref(null),
@@ -25,7 +35,7 @@ class Checker {
     80,
     pprint.Config.Defaults.PPrintConfig.copy(height = 15),
     Ref(Colors.BlackWhite),
-    stdout = allOutput += _,
+    printer,
     storage = Ref(Storage(tempDir, None)),
     new History(Vector()),
     predef = predef,
@@ -61,43 +71,30 @@ class Checker {
       val expected = resultLines.mkString("\n").trim
       allOutput += commandText.map("\n@ " + _).mkString("\n")
 
-      val (processed, printed) = run(commandText.mkString("\n"))
+      val (processed, allOut, warning, error) = run(commandText.mkString("\n"))
       interp.handleOutput(processed)
-      if (expected.startsWith("error: ")){
-        def handleFailure(failureMsg: String) = {
-          val expectedStripped =
-            expected.stripPrefix("error: ").replaceAll(" *\n", "\n")
-          val expectedRegex = createRegex(expectedStripped).r
+      if (expected.startsWith("error: ")) {
+        val strippedExpected = expected.stripPrefix("error: ")
+        assert(error.contains(strippedExpected))
 
-          val failureStripped =
-            failureMsg.replaceAll("\u001B\\[[;\\d]*m", "").replaceAll(" *\n", "\n")
+      }else if (expected.startsWith("warning: ")){
+        val strippedExpected = expected.stripPrefix("warning: ")
+        assert(warning.contains(strippedExpected))
 
-          failLoudly(assert(expectedRegex.findFirstIn(failureStripped).nonEmpty))
-        }
-        printed match{
-          case Res.Success(v) => assert({identity(v); identity(allOutput); false})
-          case Res.Failure(failureMsg) => handleFailure(failureMsg)
+      }else if (expected == "") {
+        assert(processed.isInstanceOf[Res.Success[_]] || processed.isInstanceOf[Res.Skip.type])
+
+      }else {
+        val regex = createRegex(expected)
+        processed match {
+          case Res.Success(str) =>
+            failLoudly(assert(allOut.replaceAll(" *\n", "\n").trim.matches(regex)))
+          case Res.Failure(failureMsg) => assert({identity(out); identity(regex); false})
           case Res.Exception(ex, failureMsg) =>
-            handleFailure(Repl.showException(ex, "", "", "") + "\n" +  failureMsg)
-          case _ => ???
-        }
-      }else{
-        if (expected != ""){
-          val regex = createRegex(expected)
-          printed match {
-            case Res.Success(str) =>
-              failLoudly(assert(str.replaceAll(" *\n", "\n").trim.matches(regex)))
-            case Res.Failure(failureMsg) => assert({identity(printed); identity(regex); false})
-            case Res.Exception(ex, failureMsg) =>
-              val trace = Repl.showException(ex, "", "", "") + "\n" +  failureMsg
-              assert({identity(trace); identity(regex); false})
-            case _ => throw new Exception(
-              s"Printed $printed does not match what was expected: $expected"
-            )
-          }
-        }else{
-          assert(
-            printed.isInstanceOf[Res.Success[_]] || printed.isInstanceOf[Res.Skip.type]
+            val trace = Repl.showException(ex, "", "", "") + "\n" +  failureMsg
+            assert({identity(trace); identity(regex); false})
+          case _ => throw new Exception(
+            s"Printed $allOut does not match what was expected: $expected"
           )
         }
       }
@@ -129,26 +126,26 @@ class Checker {
   }
 
   def run(input: String) = {
-    //    println("RUNNING")
-    //    println(input)
-    //    print(".")
-    val msg = collection.mutable.Buffer.empty[String]
+
+    out.clear()
+    warning.clear()
+    error.clear()
     val processed = interp.processLine(
       input,
-      Parsers.split(input).get.get.value, _.foreach(msg.append(_))
+      Parsers.split(input).get.get.value
     )
-    val printed = processed.map(_ => msg.mkString)
 
+    val allOut = out.mkString ++ "\n" ++ (warning ++ error).mkString("\n")
     interp.handleOutput(processed)
-    (processed, printed)
+    (processed, allOut, warning.mkString, error.mkString)
   }
 
 
   def fail(input: String,
            failureCheck: String => Boolean = _ => true) = {
-    val (processed, printed) = run(input)
+    val (processed, out, warning, error) = run(input)
 
-    printed match{
+    processed match{
       case Res.Success(v) => assert({identity(v); identity(allOutput); false})
       case Res.Failure(s) =>
         failLoudly(assert(failureCheck(s)))
@@ -160,7 +157,7 @@ class Checker {
   }
 
   def result(input: String, expected: Res[Evaluated]) = {
-    val (processed, printed) = run(input)
+    val (processed, allOut, warning, error) = run(input)
     assert(processed == expected)
   }
   def failLoudly[T](t: => T) =
