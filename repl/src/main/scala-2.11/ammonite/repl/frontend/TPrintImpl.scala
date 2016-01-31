@@ -187,6 +187,8 @@ object TPrintLowPri{
         q"$pre + ${
           if (defs.isEmpty) "" else "{" + defs.mkString(";") + "}"
         }"
+      case ConstantType(value) =>
+        q"$value.toString"
     }
     lazy val cfgSym = c.freshName[TermName]("cfg")
     val res = c.Expr[TPrint[T]](q"""ammonite.repl.frontend.TPrint.lambda{

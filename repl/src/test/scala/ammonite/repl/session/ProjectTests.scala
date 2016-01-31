@@ -97,15 +97,20 @@ object ProjectTests extends TestSuite{
     'shapeless{
       // Shapeless 2.1.0 isn't published for scala 2.10
       if (!scala2_10) check.session("""
-        @ load.ivy("com.chuusai" %% "shapeless" % "2.1.0")
+        @ load.ivy("com.chuusai" %% "shapeless" % "2.2.5")
 
         @ import shapeless._
 
         @ (1 :: "lol" :: List(1, 2, 3) :: HNil)
-        res2 Int :: String :: List[Int] :: HNil = 1 :: lol :: List(1, 2, 3) :: HNil
+        res2: Int :: String :: List[Int] :: HNil = 1 :: lol :: List(1, 2, 3) :: HNil
 
         @ res2(1)
         res3: String = "lol"
+
+        @ import shapeless.syntax.singleton._
+
+        @ 2.narrow
+        res5: 2 = 2
       """)
     }
 
