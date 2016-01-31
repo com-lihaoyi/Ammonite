@@ -11,23 +11,25 @@ import scala.collection.mutable
 object Frame{
   /**
     * Figure out which imports will get stomped over by future imports
-    * before they get used, and just ignore those
+    * before they get used, and just ignore those.
     */
   def mergeImports(importss: Seq[ImportData]*) = {
+    // We iterate over the combined reversed imports, keeping track of the
+    // things that will-be-stomped-over-in-the-non-reversed-world in a map.
+    // If an import's target destination will get stomped over we ignore it
+    //
+    // At the end of the day we re-reverse the trimmed list and return it.
     val importData = importss.flatten
-    for {
-      (data @ ImportData(fromName, toName, prefix), i) <- importData.zipWithIndex
-      if fromName != "_"
-      usedIndex = importData.indexWhere(d => d.prefix == toName, i + 1)
-      stompedIndex = importData.indexWhere(d => d.toName == toName, i + 1)
-      alive = (usedIndex, stompedIndex) match{
-        case (-1, -1) => true
-        case (used, -1) => true
-        case (-1, stomped) => false
-        case (used, stomped) => used < stomped
+    val stomped = mutable.Set.empty[String]
+    val out = mutable.Buffer.empty[ImportData]
+    for(data <- importData.reverseIterator){
+      if(!stomped(data.toName)) {
+        out.append(data)
+        stomped.add(data.toName)
+        stomped.remove(data.prefix)
       }
-      if alive
-    } yield data
+    }
+    out.reverse
   }
 }
 
