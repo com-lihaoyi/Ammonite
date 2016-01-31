@@ -25,6 +25,7 @@ case class AmmoniteFrontEnd(extraFilters: TermCore.Filter = PartialFunction.empt
     val res = readLine(reader, output, prompt, colors, compilerComplete, history) match{
       case None => Res.Exit(())
       case Some(code) =>
+
         addHistory(code)
         Parsers.Splitter.parse(code) match{
           case Parsed.Success(value, idx) => Res.Success((code, value))
@@ -46,8 +47,6 @@ case class AmmoniteFrontEnd(extraFilters: TermCore.Filter = PartialFunction.empt
                history: IndexedSeq[String]) = {
     Timer("AmmoniteFrontEnd.readLine start")
     val writer = new OutputStreamWriter(output)
-
-    import ammonite.ops._
 
     val autocompleteFilter: TermCore.Filter = {
       case TermInfo(TermState(9 ~: rest, b, c), width) =>
