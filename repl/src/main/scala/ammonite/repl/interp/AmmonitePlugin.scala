@@ -95,11 +95,15 @@ object AmmonitePlugin{
         (fromName, toName, importString) <- symbols
         //              _ = println(fromName + "\t"+ toName)
 
+        // Probably synthetic
         if !fromName.contains("$")
         if fromName != "<init>"
         if fromName != "<clinit>"
         if fromName != "$main"
+        // Don't care about this
         if fromName != "toString"
+        // Behaves weird in 2.10.x, better to just ignore.
+        if fromName != "_"
       } yield ImportData(fromName, toName, importString)
     )
   }

@@ -130,12 +130,13 @@ object ImportTests extends TestSuite{
           @ import scala.concurrent.duration._
 
           @ Duration.Inf
-          res2: Duration.Infinite = Duration.Inf
 
           @ import importing_issue._
 
+          @ Duration.Inf
+
           @ "foo"
-          res4: String = "foo"
+          res5: String = "foo"
         """)
       }
       'shadowPrefix2{
