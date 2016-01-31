@@ -8,6 +8,7 @@ import ammonite.repl._
 
 import Util.{CompileCache, ClassFiles}
 
+import scala.collection.immutable.ListMap
 import scala.collection.mutable
 import scala.util.Try
 
@@ -87,7 +88,7 @@ object Evaluator{
       Frame(
         special,
         special,
-        Map.empty[String, ImportData],
+        Seq.empty[(String, ImportData)],
         Seq()
       )
     }
@@ -159,33 +160,45 @@ object Evaluator{
     def evalMain(cls: Class[_]) =
       cls.getDeclaredMethod("$main").invoke(null)
 
-    def previousImportBlock = importBlock(previousImports.values.toSeq)
+    def previousImportBlock = importBlock(previousImports.map(_._2))
 
-    def importBlock(importData: Seq[ImportData]) = {
+    def importBlock(importData0: Seq[ImportData]) = {
+      val importData = importData0.toVector
       Timer("importBlock 0")
-      val snippets = for {
-        (prefix, allImports) <- importData.toList.groupBy(_.prefix)
-        imports <- Util.transpose(allImports.groupBy(_.fromName).values.toList)
-      } yield {
-        // Don't import importable variables called `_`. They seem to
-        // confuse Scala into thinking it's a wildcard even when it isn't
-        imports.filter(_.fromName != "_") match{
-          case Seq(imp) if imp.fromName == imp.toName =>
-            s"import $prefix.${Parsers.backtickWrap(imp.fromName)}"
-          case imports =>
-            val lines = for (x <- imports) yield {
-              if (x.fromName == x.toName)
-                "\n  " + Parsers.backtickWrap(x.fromName)
-              else {
-                "\n  " + Parsers.backtickWrap(x.fromName) +
-                " => " + (if (x.toName == "_") "_" else Parsers.backtickWrap(x.toName))
-              }
-            }
-            val block = lines.mkString(",")
-            s"import $prefix.{$block\n}"
+      // Figure out which imports will get stomped over by future imports
+      // before they get used, and just ignore those
+      val filtered = for {
+        (data @ ImportData(fromName, toName, prefix), i) <- importData.zipWithIndex
+        if fromName != "_"
+        usedIndex = importData.indexWhere(d => d.prefix == toName, i + 1)
+        stompedIndex = importData.indexWhere(d => d.toName == toName, i + 1)
+        alive = (usedIndex, stompedIndex) match{
+          case (-1, -1) => true
+          case (used, -1) => true
+          case (-1, stomped) => false
+          case (used, stomped) => used < stomped
         }
+        if alive
+      } yield data
+
+      // Group the remaining imports into sliding groups according to their
+      // prefix, while still maintaining their ordering
+      val grouped = mutable.Buffer[mutable.Buffer[ImportData]]()
+      for(data <- filtered){
+        if (grouped.isEmpty) grouped.append(mutable.Buffer(data))
+        else if (grouped.last.last.prefix == data.prefix) grouped.last.append(data)
+        else grouped.append(mutable.Buffer(data))
       }
-      val res = snippets.mkString("\n")
+
+      // Stringify everything
+      val out = for(group <- grouped) yield {
+        val printedGroup = for(item <- group) yield{
+          if (item.fromName == item.toName) Parsers.backtickWrap(item.fromName)
+          else s"${Parsers.backtickWrap(item.fromName)} => ${Parsers.backtickWrap(item.toName)}"
+        }
+        "import " + group.head.prefix + ".{\n  " + printedGroup.mkString(",\n  ") + "\n}\n"
+      }
+      val res = out.mkString
       Timer("importBlock 1")
       res
     }
@@ -208,7 +221,7 @@ object Evaluator{
         wrapperName,
         code,
         printCode,
-        previousImports.values.toSeq ++ extraImports
+        extraImports ++: previousImports.map(_._2)
       ))
       _ = Timer("eval.processLine compileClass end")
       cls <- loadClass(wrapperName, classFiles)
@@ -287,7 +300,7 @@ $code
     }
 
     def update(newImports: Seq[ImportData]) = {
-      val newImportMap = for(i <- newImports) yield (i.toName -> i)
+      val newImportMap = for(i <- newImports) yield (i.toName, i)
       frames.head.previousImports = previousImports ++ newImportMap
     }
 
@@ -295,7 +308,6 @@ $code
       Evaluated(
         wrapperName,
         imports.map(id => id.copy(
-          wrapperName = wrapperName,
           prefix = if (id.prefix == "") wrapperName else id.prefix
         ))
       )

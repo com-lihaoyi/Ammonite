@@ -75,7 +75,6 @@ case class Evaluated(wrapper: String,
 
 case class ImportData(fromName: String,
                       toName: String,
-                      wrapperName: String,
                       prefix: String)
 
 /**

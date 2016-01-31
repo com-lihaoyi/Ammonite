@@ -11,12 +11,13 @@ import ammonite.ops._
 import ammonite.repl.{ImportData, Util}
 import pprint.PPrint
 
+import scala.collection.immutable.ListMap
 import scala.collection.mutable
 import scala.reflect.io.VirtualDirectory
 
 case class Frame(classloader: SpecialClassLoader,
                  pluginClassloader: SpecialClassLoader,
-                 var previousImports: Map[String, ImportData],
+                 var previousImports: Seq[(String, ImportData)],
                  var classpath: Seq[java.io.File])
 
 object SpecialClassLoader{

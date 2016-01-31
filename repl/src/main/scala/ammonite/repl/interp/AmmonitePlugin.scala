@@ -100,7 +100,7 @@ object AmmonitePlugin{
         if fromName != "<clinit>"
         if fromName != "$main"
         if fromName != "toString"
-      } yield ImportData(fromName, toName, "", importString)
+      } yield ImportData(fromName, toName, importString)
     )
   }
 }

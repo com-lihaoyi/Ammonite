@@ -205,7 +205,7 @@ object SessionChanged{
       res.flatten
   }
   def delta(oldFrame: Frame, newFrame: Frame): SessionChanged = {
-    def frameSymbols(f: Frame) = f.previousImports.keySet.map(Symbol(_))
+    def frameSymbols(f: Frame) = f.previousImports.map(_._1).map(Symbol(_)).toSet
     new SessionChanged(
       frameSymbols(oldFrame) -- frameSymbols(newFrame),
       frameSymbols(newFrame) -- frameSymbols(oldFrame),
