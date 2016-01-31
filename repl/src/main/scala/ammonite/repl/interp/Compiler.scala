@@ -112,7 +112,7 @@ object Compiler{
     }
 
     settings.outputDirs.setSingleOutput(vd)
-
+    settings.nowarnings.value = true
     val reporter = new AbstractReporter {
       def displayPrompt(): Unit = ???
 

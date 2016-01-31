@@ -49,6 +49,23 @@ object FailureTests extends TestSuite{
         error: failed to resolve ivy dependencies
       """)
     }
+
+    'warnings{
+      val fruitlessTypeTestWarningMessageBlahBlahBlah =
+        "fruitless type test: a value of type List[Int] cannot " +
+          "also be a List[Double] (the underlying of List[Double]) " +
+          "(but still might match its erasure)"
+
+      check.session(s"""
+        @ List(1) match { case _: List[Double] => 2 }
+        res0: Int = 2
+
+        @ compiler.settings.nowarnings.value = false
+
+        @ List(1) match { case _: List[Double] => 2 }
+        warning: $fruitlessTypeTestWarningMessageBlahBlahBlah
+      """)
+    }
     'exceptionHandling{
       check.fail("""throw new Exception("lol", new Exception("hoho"))""", x =>
         // It contains the things we want

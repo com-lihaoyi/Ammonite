@@ -54,6 +54,14 @@
         Fixed #258: java.util.NoSuchElementException: head of empty list in Ammonite-REPL
       @li
         Fixed #198: NoSuchElementException thrown in REPL when using a type alias to refer to a shapeless coproduct
+      @li
+        Warnings can now be enabled with the flag @hl.scala{compiler.settings.nowarn.value = false}
+      @li
+        Stopped Ivy from spitting out countless useless @code{unknown resolver null} warnings when resolving dependencies (#144)
+      @li
+        Fixed edge cases around import shadowing and sequencing (#199, #248)
+
+
   @sect{0.5.2}
     @ul
       @li

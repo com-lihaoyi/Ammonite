@@ -71,7 +71,7 @@ class Checker {
       val expected = resultLines.mkString("\n").trim
       allOutput += commandText.map("\n@ " + _).mkString("\n")
 
-      val (processed, allOut, warning, error) = run(commandText.mkString("\n"))
+      val (processed, out, warning, error) = run(commandText.mkString("\n"))
       interp.handleOutput(processed)
       if (expected.startsWith("error: ")) {
         val strippedExpected = expected.stripPrefix("error: ")
@@ -88,13 +88,14 @@ class Checker {
         val regex = createRegex(expected)
         processed match {
           case Res.Success(str) =>
-            failLoudly(assert(allOut.replaceAll(" *\n", "\n").trim.matches(regex)))
+            failLoudly(assert(out.replaceAll(" *\n", "\n").trim.matches(regex)))
+
           case Res.Failure(failureMsg) => assert({identity(out); identity(regex); false})
           case Res.Exception(ex, failureMsg) =>
             val trace = Repl.showException(ex, "", "", "") + "\n" +  failureMsg
             assert({identity(trace); identity(regex); false})
           case _ => throw new Exception(
-            s"Printed $allOut does not match what was expected: $expected"
+            s"Printed $out does not match what was expected: $expected"
           )
         }
       }
@@ -135,9 +136,8 @@ class Checker {
       Parsers.split(input).get.get.value
     )
 
-    val allOut = out.mkString ++ "\n" ++ (warning ++ error).mkString("\n")
     interp.handleOutput(processed)
-    (processed, allOut, warning.mkString, error.mkString)
+    (processed, out.mkString, warning.mkString("\n"), error.mkString("\n"))
   }
 
 
