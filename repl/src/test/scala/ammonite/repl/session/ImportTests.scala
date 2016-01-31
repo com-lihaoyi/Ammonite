@@ -137,7 +137,7 @@ object ImportTests extends TestSuite{
           @ "foo" // Make sure this still works
           res4: String = "foo"
 
-          @ Duration.Inf // This fails due to a scala compiler bug
+          @ Duration.Inf // This fails due to a compiler bug SI-6039
           error: Compilation Failed
         """)
         // This failed kinda non-deterministically in 0.5.2 (#248); it depended

@@ -106,20 +106,27 @@ object IvyThing {
 
   def ivyInstance(resolvers: () => List[Resolver]) = Ivy.newInstance {
 
-      //creates clear ivy settings
-      val ivySettings = new IvySettings()
+      // create clear ivy settings
+      val ivySettings = new IvySettings(){
+        // Override getResolver to make it stop spewing up useless
+        // `unknown resolver` errors:  lihaoyi/Ammonite/issues/144
+        override def getResolver(resolverName: String): DependencyResolver = {
+          if (!this.getResolverNames.contains(resolverName)) null
+          else super.getResolver(resolverName)
+        }
+      }
 
-      //adding maven repo resolver
+      // add maven repo resolver
       val chainResolver = new ChainResolver
       chainResolver.setName("chain-resolver")
       chainResolver.setReturnFirst(true)
       resolvers().map(_()).foreach(chainResolver.add)
       ivySettings.addResolver(chainResolver)
 
-      //set to the default resolver
+      // set to the default resolver
       ivySettings.setDefaultResolver(chainResolver.getName)
 
-      //creates an Ivy instance with settings
+      // creates an Ivy instance with settings
       ivySettings
     }
     
@@ -156,23 +163,6 @@ object Resolvers {
   
 
  lazy val defaultResolvers: List[Resolver] = List(
-   // Add duplicate resolvers with different name to make Ivy shut up
-   // and stop giving `unknown resolver null` or `unknown resolver sbt-chain`
-   // errors
-   Resolver.File(
-     null,
-     "/.ivy2/cache",
-     "/[organisation]/[module]/jars/[artifact]-[revision].[ext]",
-     m2 = false
-   ),
-   Resolver.File(
-     "sbt-chain",
-     "/.ivy2/cache",
-     "/[organisation]/[module]/jars/[artifact]-[revision].[ext]",
-     m2 = false
-   ),
-
-   // Real resolvers
    Resolver.File(
      "ivy-cache",
      "/.ivy2/cache",
