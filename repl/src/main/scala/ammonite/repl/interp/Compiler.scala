@@ -90,7 +90,7 @@ object Compiler{
     val (dirDeps, jarDeps) = classpath.partition(_.isDirectory)
 
     val jarCP =
-      jarDeps.filter(_.getName.endsWith(".jar"))
+      jarDeps.filter(x => x.getName.endsWith(".jar") || Classpath.canBeOpenedAsJar(x))
              .map(x => new DirectoryClassPath(new FileZipArchive(x), jCtx))
              .toVector
 

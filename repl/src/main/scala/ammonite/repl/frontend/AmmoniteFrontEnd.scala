@@ -61,6 +61,7 @@ case class AmmoniteFrontEnd(extraFilters: TermCore.Filter = PartialFunction.empt
             colors.reset()
           ).mkString
         }
+
         lazy val common = FrontEndUtils.findPrefix(completions, 0)
         val completions2 = for(comp <- completions) yield {
 

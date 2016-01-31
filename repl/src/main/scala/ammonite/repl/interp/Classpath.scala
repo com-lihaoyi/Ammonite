@@ -41,6 +41,19 @@ object Classpath {
 
   val classpath = files.toVector.filter(_.exists)
 
+  def canBeOpenedAsJar(file: File): Boolean =
+    try {
+      val zf = new ZipFile(file)
+      zf.close()
+      true
+    } catch {
+      case NonFatal(e) =>
+        traceClasspathProblem(
+          s"Classpath element '${file.getAbsolutePath}' "+
+            "could not be opened as jar file because of $e"
+        )
+        false
+    }
   def traceClasspathProblem(msg: String): Unit =
     if (traceClasspathIssues) println(msg)
 }
