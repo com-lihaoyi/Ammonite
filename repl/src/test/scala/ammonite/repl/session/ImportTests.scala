@@ -120,7 +120,7 @@ object ImportTests extends TestSuite{
         """)
       }
       'shadowPrefix{
-        check.session("""
+        * - check.session("""
           @ object importing_issue {
           @   object scala {
           @     def evilThing = ???
@@ -133,20 +133,19 @@ object ImportTests extends TestSuite{
 
           @ import importing_issue._
 
-          @ Duration.Inf
+          @ "foo" // Make sure this still works
+          res4: String = "foo"
 
-          @ "foo"
-          res5: String = "foo"
+          @ Duration.Inf // This fails due to a scala compiler bug
+          error: Compilation Failed
         """)
-      }
-      'shadowPrefix2{
-        // This failed kinda non-deterministically in 0.5.2; it depended
+        // This failed kinda non-deterministically in 0.5.2 (#248); it depended
         // on what ordering the imports were generated in, which depended
         // on the ordering of the `scala.Map` they were stored in, which
         // is arbitrary. Choosing different identifiers for `foo` `bar` and
         // `baz` affected this ordering and whether or not it fail.
         // Nevertheless, here's a test case that used to fail, but now doesn't
-        check.session("""
+        * - check.session("""
           @ object baz { val foo = 1 }
 
           @ object foo { val bar = 2 }
@@ -157,6 +156,71 @@ object ImportTests extends TestSuite{
 
           @ bar
           res4: Int = 2
+        """)
+
+      }
+
+      'typeTermSeparation{
+        // Make sure that you can have a term and a type of the same name
+        // coming from different places and they don't stomp over each other
+        // (#199) and both are accessible.
+        * - check.session("""
+          @ val Foo = 1
+
+          @ type Foo = Int
+
+          @ Foo
+          res2: Int = 1
+
+          @ 2: Foo
+          res3: Foo = 2
+        """)
+
+        * - check.session("""
+          @ object pkg1{ val Order = "lolz" }
+
+          @ object pkg2{ type Order[+T] = Seq[T] }
+
+          @ import pkg1._
+
+          @ Order
+          res3: String = "lolz"
+
+          @ import pkg2._
+
+          @ Seq(1): Order[Int]
+          res5: Order[Int] = List(1)
+
+          @ Seq(Order): Order[String]
+          res6: Order[String] = List("lolz")
+        """)
+
+        // Even though you can import the same-named type and term from different
+        // places and have it work, if you import them both from the same place,
+        // a single type or term of the same name will stomp over both of them.
+        //
+        // This is basically impossible to avoid in Scala unless we want to
+        // generate forwarder objects to import from which is very difficult
+        // (e.g. we would need to generate forwarder-methods for arbitrarily
+        // complex method signatures) or generate ever-more-nested wrapper
+        // objects for imports to make the later imports take priority (which
+        // results in a quadratic number of class files)
+        //
+        // This is sufficiently edge-casey that I'm gonna call this a wontfix
+        * - check.session("""
+          @ object bar { val foo = 1; type foo = Int }
+
+          @ object baz { val foo = 2 }
+
+          @ import bar.foo
+
+          @ import baz.foo
+
+          @ foo
+          res4: Int = 2
+
+          @ 1: foo
+          error: Compilation Failed
         """)
       }
     }

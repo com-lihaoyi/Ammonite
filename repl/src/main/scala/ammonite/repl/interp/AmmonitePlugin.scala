@@ -33,12 +33,12 @@ object AmmonitePlugin{
 
     def decode(t: g.Tree) = {
       val sym = t.symbol
-      (sym.decodedName, sym.decodedName, "")
+      (sym.isType, sym.decodedName, sym.decodedName, "")
     }
 
     val stats = unit.body.children.last.asInstanceOf[g.ModuleDef].impl.body
     val symbols = stats.filter(x => !Option(x.symbol).exists(_.isPrivate))
-                       .foldLeft(List.empty[(String, String, String)]){
+                       .foldLeft(List.empty[(Boolean, String, String, String)]){
       // These are all the ways we want to import names from previous
       // executions into the current one. Most are straightforward, except
       // `import` statements for which we make use of the typechecker to
@@ -54,7 +54,7 @@ object AmmonitePlugin{
         val prefix = rec(expr).reverseMap(x => Parsers.backtickWrap(x.decoded)).mkString(".")
         val renamings =
           for(t @ g.ImportSelector(name, _, rename, _) <- selectors) yield {
-            Option(rename).map(name.decoded -> _.decoded)
+            Option(rename).map(x => name.decoded -> (name.isTypeName, x.decoded))
           }
         val renameMap = renamings.flatten.map(_.swap).toMap
         val info = new g.analyzer.ImportInfo(t, 0)
@@ -67,7 +67,9 @@ object AmmonitePlugin{
           if sym.toString != "package class-use"
           if sym.toString != "object package-info"
           if sym.toString != "class package-info"
-        } yield sym.decodedName
+        } yield {
+          (sym.isType, sym.decodedName)
+        }
 
         val syms = for{
           // For some reason `info.allImportedSymbols` does not show imported
@@ -77,9 +79,9 @@ object AmmonitePlugin{
           //
           // As opposed to via import scala.reflect.macros._.
           // Thus we need to combine allImportedSymbols with the renameMap
-          sym <- symNames.toList ++ renameMap.keys
+          (isType, sym) <- symNames.toList ++ renameMap.keys
         } yield {
-          (renameMap.getOrElse(sym, sym), sym, prefix)
+          (isType, renameMap.getOrElse((isType, sym), sym), sym, prefix)
         }
         syms ::: ctx
       case (ctx, t @ g.DefDef(_, _, _, _, _, _))  => decode(t) :: ctx
@@ -90,21 +92,34 @@ object AmmonitePlugin{
       case (ctx, t) => ctx
     }
 
-    output(
-      for {
-        (fromName, toName, importString) <- symbols
-        //              _ = println(fromName + "\t"+ toName)
+    val grouped =
+      symbols.distinct
+             .groupBy{case (a, b, c, d) => (b, c, d) }
+             .mapValues(_.map(_._1))
 
-        // Probably synthetic
-        if !fromName.contains("$")
-        if fromName != "<init>"
-        if fromName != "<clinit>"
-        if fromName != "$main"
-        // Don't care about this
-        if fromName != "toString"
-        // Behaves weird in 2.10.x, better to just ignore.
-        if fromName != "_"
-      } yield ImportData(fromName, toName, importString)
-    )
+//    pprint.log(grouped, "grouped")
+    val open = for {
+      ((fromName, toName, importString), items) <- grouped
+      //              _ = println(fromName + "\t"+ toName)
+
+      // Probably synthetic
+      if !fromName.contains("$")
+      if fromName != "<init>"
+      if fromName != "<clinit>"
+      if fromName != "$main"
+      // Don't care about this
+      if fromName != "toString"
+      // Behaves weird in 2.10.x, better to just ignore.
+      if fromName != "_"
+    } yield {
+      val importType = items match{
+        case Seq(true) => ImportData.Type
+        case Seq(false) => ImportData.Term
+        case Seq(_, _) => ImportData.TermType
+      }
+      ImportData(fromName, toName, importString, importType)
+    }
+//    pprint.log(open, "open")
+    output(open.toVector)
   }
 }

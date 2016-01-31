@@ -170,10 +170,15 @@ object Evaluator{
       val grouped = mutable.Buffer[mutable.Buffer[ImportData]]()
       for(data <- importData){
         if (grouped.isEmpty) grouped.append(mutable.Buffer(data))
-        else if (grouped.last.last.prefix == data.prefix) grouped.last.append(data)
-        else grouped.append(mutable.Buffer(data))
+        else {
+          val last = grouped.last.last
+          // Group type imports differently from term imports, in case we
+          // import the same thing but rename it differently
+          if (last.prefix == data.prefix) grouped.last.append(data)
+          else grouped.append(mutable.Buffer(data))
+        }
       }
-
+//      pprint.log(grouped)
       // Stringify everything
       val out = for(group <- grouped) yield {
         val printedGroup = for(item <- group) yield{
@@ -183,6 +188,7 @@ object Evaluator{
         "import " + group.head.prefix + ".{\n  " + printedGroup.mkString(",\n  ") + "\n}\n"
       }
       val res = out.mkString
+
       Timer("importBlock 1")
       res
     }

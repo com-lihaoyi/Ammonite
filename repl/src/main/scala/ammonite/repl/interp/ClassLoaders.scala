@@ -20,13 +20,19 @@ object Frame{
     //
     // At the end of the day we re-reverse the trimmed list and return it.
     val importData = importss.flatten
-    val stomped = mutable.Set.empty[String]
+    val stompedTypes = mutable.Set.empty[String]
+    val stompedTerms = mutable.Set.empty[String]
     val out = mutable.Buffer.empty[ImportData]
     for(data <- importData.reverseIterator){
-      if(!stomped(data.toName)) {
+      val stomped = data.importType match{
+        case ImportData.Term => Seq(stompedTerms)
+        case ImportData.Type => Seq(stompedTypes)
+        case ImportData.TermType => Seq(stompedTerms, stompedTypes)
+      }
+      if (!stomped.exists(_(data.toName))){
         out.append(data)
-        stomped.add(data.toName)
-        stomped.remove(data.prefix)
+        stomped.foreach(_.add(data.toName))
+        stompedTerms.remove(data.prefix)
       }
     }
     out.reverse

@@ -75,7 +75,14 @@ case class Evaluated(wrapper: String,
 
 case class ImportData(fromName: String,
                       toName: String,
-                      prefix: String)
+                      prefix: String,
+                      importType: ImportData.ImportType)
+object ImportData{
+  case class ImportType(name: String)
+  val Type = ImportType("Type")
+  val Term = ImportType("Term")
+  val TermType = ImportType("TermType")
+}
 
 /**
  * Encapsulates a read-write cell that can be passed around
