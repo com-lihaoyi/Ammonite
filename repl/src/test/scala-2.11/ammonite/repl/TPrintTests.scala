@@ -1,6 +1,7 @@
-package ammonite.terminal
-import utest._
+package ammonite.repl
+
 import ammonite.repl.frontend.TPrint
+import utest._
 
 object TPrintTests extends TestSuite{
 
@@ -54,7 +55,6 @@ object TPrintTests extends TestSuite{
        'mutable{
 
          check[collection.mutable.Buffer[Int]]("collection.mutable.Buffer[Int]")
-         import collection.mutable
          check[collection.mutable.Buffer[Int]]("mutable.Buffer[Int]")
          check[Seq[Int]]("Seq[Int]")
          check[collection.Seq[Int]]("Seq[Int]")
