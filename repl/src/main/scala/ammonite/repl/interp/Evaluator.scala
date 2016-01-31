@@ -101,7 +101,7 @@ object Evaluator{
         new SpecialClassLoader(parent.classloader, parent.classloader.classpathHash),
         new SpecialClassLoader(parent.pluginClassloader, parent.pluginClassloader.classpathHash),
         parent.previousImports,
-        parent.extraJars
+        parent.classpath
       )
 
       def save(name: String = "") = {

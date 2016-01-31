@@ -80,20 +80,25 @@ object Compiler{
    * for the Scala compiler to function, common between the
    * normal and presentation compiler
    */
-  def initGlobalBits(jarDeps: Seq[java.io.File],
-                     dirDeps: Seq[java.io.File],
+  def initGlobalBits(classpath: Seq[java.io.File],
                      dynamicClasspath: VirtualDirectory,
                      logger: => String => Unit)= {
     val vd = new io.VirtualDirectory("(memory)", None)
     lazy val settings = new Settings
     val settingsX = settings
     val jCtx = new JavaContext()
-    val jDirs = jarDeps.map(x =>
-      new DirectoryClassPath(new FileZipArchive(x), jCtx)
-    ).toVector ++ dirDeps.map(x =>
-      new DirectoryClassPath(new PlainDirectory(new Directory(x)), jCtx)
-    ) ++ Seq(new DirectoryClassPath(dynamicClasspath, jCtx))
-    val jcp = new JavaClassPath(jDirs, jCtx)
+    val (dirDeps, jarDeps) = classpath.partition(_.isDirectory)
+
+    val jarCP =
+      jarDeps.filter(_.getName.endsWith(".jar"))
+             .map(x => new DirectoryClassPath(new FileZipArchive(x), jCtx))
+             .toVector
+
+    val dirCP =
+      dirDeps.map(x => new DirectoryClassPath(new PlainDirectory(new Directory(x)), jCtx))
+
+    val dynamicCP = Seq(new DirectoryClassPath(dynamicClasspath, jCtx))
+    val jcp = new JavaClassPath(jarCP ++ dirCP ++ dynamicCP, jCtx)
 
     if (Classpath.traceClasspathIssues) {
       settings.Ylogcp.value = true
@@ -121,8 +126,7 @@ object Compiler{
     (settings, reporter, vd, jcp)
   }
 
-  def apply(jarDeps: Seq[java.io.File],
-            dirDeps: Seq[java.io.File],
+  def apply(classpath: Seq[java.io.File],
             dynamicClasspath: VirtualDirectory,
             evalClassloader: => ClassLoader,
             pluginClassloader: => ClassLoader,
@@ -173,7 +177,7 @@ object Compiler{
 
     val (vd, reporter, compiler) = {
       val (settings, reporter, vd, jcp) = initGlobalBits(
-        jarDeps, dirDeps, dynamicClasspath, logger
+        classpath, dynamicClasspath, logger
       )
       val scalac = new nsc.Global(settings, reporter) { g =>
         override lazy val plugins = List(new AmmonitePlugin(g, lastImports = _)) ++ {

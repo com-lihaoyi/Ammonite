@@ -53,7 +53,24 @@ object BuiltinTests extends TestSuite{
       """)
     }
 
+    'loadCP{
+      check.session("""
+        @ import ammonite.ops._
 
+        @ import ammonite.ops.ImplicitWd._
+
+        @ val scalaVersion = ("scala-"+scala.util.Properties.versionNumberString.dropRight(2))
+
+        @ val dest = cwd/'repl/'target/scalaVersion/  "test-classes"/'loadable
+
+        @ %javac dest/'hello/"Hello.java"
+
+        @ load.cp(dest)
+
+        @ hello.Hello.hello()
+        res6: String = "Hello!"
+      """)
+    }
     'settings{
       check.session("""
         @ List(1, 2, 3) + "lol"

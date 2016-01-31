@@ -188,10 +188,10 @@ class Interpreter(prompt0: Ref[String],
     
     lazy val ivyThing = IvyThing(() => resolvers)
 
-    def handleJar(jar: File): Unit
+    def handleClasspath(jar: File): Unit
 
-    def jar(jar: Path): Unit = {
-      handleJar(new java.io.File(jar.toString))
+    def cp(jar: Path): Unit = {
+      handleClasspath(new java.io.File(jar.toString))
       init()
     }
     def ivy(coordinates: (String, String, String), verbose: Boolean = true): Unit = {
@@ -203,7 +203,7 @@ class Interpreter(prompt0: Ref[String],
                  .filter(_.forall(_.exists()))
 
       psOpt match{
-        case Some(ps) => ps.map(handleJar)
+        case Some(ps) => ps.map(handleClasspath)
         case None =>
           val resolved = ivyThing.resolveArtifact(
             groupId,
@@ -217,30 +217,30 @@ class Interpreter(prompt0: Ref[String],
             resolved.map(_.getAbsolutePath).toSet
           )
 
-          resolved.map(handleJar)
+          resolved.map(handleClasspath)
       }
 
       init()
     }
   }
 
-  lazy val replApi: ReplAPI = new DefaultReplAPI { outer => 
+  lazy val replApi: ReplAPI = new DefaultReplAPI { outer =>
 
     def imports = interp.eval.previousImportBlock
     val colors = colors0
     val prompt = prompt0
     val frontEnd = frontEnd0
 
-    lazy val resolvers = 
+    lazy val resolvers =
       Ref(Resolvers.defaultResolvers)
 
     object load extends DefaultLoadJar with Load {
-    
-      def resolvers: List[Resolver] =
-        outer.resolvers()  
 
-      def handleJar(jar: File) = {
-        eval.sess.frames.head.extraJars = eval.sess.frames.head.extraJars ++ Seq(jar)
+      def resolvers: List[Resolver] =
+        outer.resolvers()
+
+      def handleClasspath(jar: File) = {
+        eval.sess.frames.head.classpath = eval.sess.frames.head.classpath ++ Seq(jar)
         evalClassloader.add(jar.toURI.toURL)
       }
 
@@ -255,9 +255,9 @@ class Interpreter(prompt0: Ref[String],
 
       object plugin extends DefaultLoadJar {
         def resolvers: List[Resolver] =
-          outer.resolvers()  
+          outer.resolvers()
 
-        def handleJar(jar: File) =
+        def handleClasspath(jar: File) =
           sess.frames.head.pluginClassloader.add(jar.toURI.toURL)
       }
 
@@ -341,8 +341,7 @@ class Interpreter(prompt0: Ref[String],
   def init() = {
     Timer("Interpreter init init 0")
     compiler = Compiler(
-      Classpath.jarDeps ++ eval.sess.frames.head.extraJars,
-      Classpath.dirDeps,
+      Classpath.classpath ++ eval.sess.frames.head.classpath,
       dynamicClasspath,
       evalClassloader,
       eval.sess.frames.head.pluginClassloader,
@@ -350,8 +349,7 @@ class Interpreter(prompt0: Ref[String],
     )
     Timer("Interpreter init init compiler")
     pressy = Pressy(
-      Classpath.jarDeps ++ eval.sess.frames.head.extraJars,
-      Classpath.dirDeps,
+      Classpath.classpath ++ eval.sess.frames.head.classpath,
       dynamicClasspath,
       evalClassloader
     )

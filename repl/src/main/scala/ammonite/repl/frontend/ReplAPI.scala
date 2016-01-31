@@ -218,9 +218,9 @@ object SessionChanged{
 trait LoadJar {
 
   /**
-   * Load a `.jar` file
+   * Load a `.jar` file or directory into your JVM classpath
    */
-  def jar(jar: Path): Unit
+  def cp(jar: Path): Unit
   /**
    * Load a library from its maven/ivy coordinates
    */

@@ -17,7 +17,7 @@ import scala.reflect.io.VirtualDirectory
 case class Frame(classloader: SpecialClassLoader,
                  pluginClassloader: SpecialClassLoader,
                  var previousImports: Map[String, ImportData],
-                 var extraJars: Seq[java.io.File])
+                 var classpath: Seq[java.io.File])
 
 object SpecialClassLoader{
   val simpleNameRegex = "[a-zA-Z0-9_]+".r

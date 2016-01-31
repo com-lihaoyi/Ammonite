@@ -178,8 +178,7 @@ object Pressy {
     }
 
   }
-  def apply(jarDeps: Seq[java.io.File],
-            dirDeps: Seq[java.io.File],
+  def apply(classpath: Seq[java.io.File],
             dynamicClasspath: VirtualDirectory,
             evalClassloader: => ClassLoader): Pressy = new Pressy {
 
@@ -187,8 +186,7 @@ object Pressy {
 
     def initPressy = {
       val (settings, reporter, _, jcp) = Compiler.initGlobalBits(
-        jarDeps,
-        dirDeps,
+        classpath,
         dynamicClasspath,
         _ => ()
       )

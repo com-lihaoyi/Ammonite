@@ -39,25 +39,7 @@ object Classpath {
     current = current.getParent
   }
 
-  val (jarDeps, dirDeps) = files.toVector.filter(_.exists).partition(isJar)
-
-  def isJar(file: File): Boolean =
-    file.isFile &&
-      (file.getName.endsWith(".jar") || canBeOpenedAsJar(file))
-
-  def canBeOpenedAsJar(file: File): Boolean =
-    try {
-      val zf = new ZipFile(file)
-      zf.close()
-      true
-    } catch {
-      case NonFatal(e) =>
-        traceClasspathProblem(
-          s"Classpath element '${file.getAbsolutePath}' "+
-           "could not be opened as jar file because of $e"
-        )
-        false
-    }
+  val classpath = files.toVector.filter(_.exists)
 
   def traceClasspathProblem(msg: String): Unit =
     if (traceClasspathIssues) println(msg)
