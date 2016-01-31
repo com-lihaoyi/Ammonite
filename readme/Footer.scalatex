@@ -43,9 +43,17 @@
   @sect{0.5.3}
     @ul
       @li
-        Added support for multi-line prompts.
+        Added support for multi-line prompts, thanks to @lnk("thirstycrow", "https://github.com/thirstycrow")
       @li
-        Fix #312 lsing empty directory gives error
+        Fix #312 lsing empty directory gives error, thanks to @lnk("coderabhishek", "https://github.com/coderabhishek")
+      @li
+        Implemented history-search/reverse-i-search/Ctrl-R
+      @li
+        Fixed #325: error due to function types with by-name parameters
+      @li
+        Fixed #258: java.util.NoSuchElementException: head of empty list in Ammonite-REPL
+      @li
+        Fixed #198: NoSuchElementException thrown in REPL when using a type alias to refer to a shapeless coproduct
   @sect{0.5.2}
     @ul
       @li
