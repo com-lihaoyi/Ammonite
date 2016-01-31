@@ -1,24 +1,57 @@
 package ammonite.repl.interp
 
-import java.io.IOException
 import java.net.{URL, URLClassLoader}
 import java.nio.file
-import java.nio.file.attribute.BasicFileAttributes
-import java.nio.file.{SimpleFileVisitor, FileVisitResult, FileVisitor}
 import java.security.MessageDigest
 
 import ammonite.ops._
 import ammonite.repl.{ImportData, Util}
-import pprint.PPrint
-
-import scala.collection.immutable.ListMap
 import scala.collection.mutable
-import scala.reflect.io.VirtualDirectory
 
-case class Frame(classloader: SpecialClassLoader,
-                 pluginClassloader: SpecialClassLoader,
-                 var previousImports: Seq[(String, ImportData)],
-                 var classpath: Seq[java.io.File])
+object Frame{
+  /**
+    * Figure out which imports will get stomped over by future imports
+    * before they get used, and just ignore those
+    */
+  def mergeImports(importss: Seq[ImportData]*) = {
+    val importData = importss.flatten
+    for {
+      (data @ ImportData(fromName, toName, prefix), i) <- importData.zipWithIndex
+      if fromName != "_"
+      usedIndex = importData.indexWhere(d => d.prefix == toName, i + 1)
+      stompedIndex = importData.indexWhere(d => d.toName == toName, i + 1)
+      alive = (usedIndex, stompedIndex) match{
+        case (-1, -1) => true
+        case (used, -1) => true
+        case (-1, stomped) => false
+        case (used, stomped) => used < stomped
+      }
+      if alive
+    } yield data
+  }
+}
+
+
+/**
+  * Represents a single "frame" of the `sess.save`/`sess.load` stack/tree.
+  *
+  * Exposes `imports` and `classpath` as readable but only writable
+  * in particular ways: `imports` can only be updated via `mergeImports`,
+  * while `classpath` can only be added to.
+  */
+class Frame(val classloader: SpecialClassLoader,
+            val pluginClassloader: SpecialClassLoader,
+            private[this] var imports0: Seq[ImportData],
+            private[this] var classpath0: Seq[java.io.File]){
+  def imports = imports0
+  def classpath = classpath0
+  def addImports(additional: Seq[ImportData]) = {
+    imports0 = Frame.mergeImports(imports0, additional)
+  }
+  def addClasspath(additional: Seq[java.io.File]) = {
+    classpath0 = classpath0 ++ additional
+  }
+}
 
 object SpecialClassLoader{
   val simpleNameRegex = "[a-zA-Z0-9_]+".r

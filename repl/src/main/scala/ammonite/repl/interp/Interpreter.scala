@@ -115,8 +115,7 @@ class Interpreter(prompt0: Ref[String],
 
   //common stuff in proccessModule and processExec
   def processScript(code: String,
-                    evaluate: (String, Seq[ImportData]) => Res[Evaluated])
-                    : Seq[ImportData] = {
+                    evaluate: (String, Seq[ImportData]) => Res[Evaluated]): Seq[ImportData] = {
     Timer("processScript 0")
     val blocks0 = Parsers.splitScript(code)
     Timer("processScript 0a")
@@ -130,10 +129,9 @@ class Interpreter(prompt0: Ref[String],
     // we store the old value, because we will reassign this in the loop
     val outerScriptImportCallback = scriptImportCallback
 
-
     @tailrec def loop(blocks: Seq[Preprocessor.Output],
                       imports: Seq[Seq[ImportData]]): Seq[ImportData] = {
-      if(blocks.isEmpty){
+      if(blocks.isEmpty){ // No more blocks
         // if we have imports to pass to the upper layer we do that
         outerScriptImportCallback(imports.last)
         imports.last
@@ -145,14 +143,14 @@ class Interpreter(prompt0: Ref[String],
         // pretty printing results is disabled for scripts
         val Preprocessor.Output(code, _) = blocks.head
         Timer("processScript loop 1")
-        val ev = evaluate(code, imports.flatten)
+        val ev = evaluate(code, Frame.mergeImports(imports:_*))
         Timer("processScript loop 2")
         ev match {
           case Res.Failure(msg) => throw new CompilationError(msg)
           case Res.Exception(throwable, msg) => throw throwable
           case Res.Success(ev) => loop(
             blocks.tail,
-            imports :+ (ev.imports ++ nestedScriptImports)
+            imports :+ Frame.mergeImports(ev.imports, nestedScriptImports)
           )
           case Res.Skip => loop(blocks.tail, imports)
         }
@@ -240,7 +238,7 @@ class Interpreter(prompt0: Ref[String],
         outer.resolvers()
 
       def handleClasspath(jar: File) = {
-        eval.sess.frames.head.classpath = eval.sess.frames.head.classpath ++ Seq(jar)
+        eval.sess.frames.head.addClasspath(Seq(jar))
         evalClassloader.add(jar.toURI.toURL)
       }
 

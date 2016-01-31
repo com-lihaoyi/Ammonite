@@ -72,7 +72,7 @@ class Checker {
           val failureStripped =
             failureMsg.replaceAll("\u001B\\[[;\\d]*m", "").replaceAll(" *\n", "\n")
 
-          failLoudly(assert(!expectedRegex.findFirstIn(failureStripped).isEmpty))
+          failLoudly(assert(expectedRegex.findFirstIn(failureStripped).nonEmpty))
         }
         printed match{
           case Res.Success(v) => assert({identity(v); identity(allOutput); false})

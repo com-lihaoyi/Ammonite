@@ -63,7 +63,7 @@ object Evaluator{
      * map. Otherwise if you import the same name twice you get compile
      * errors instead of the desired shadowing.
      */
-    def previousImports = frames.head.previousImports
+    def imports = frames.head.imports
 
     /**
      * The current line number of the REPL, used to make sure every snippet
@@ -85,10 +85,10 @@ object Evaluator{
     def initialFrame = {
       val hash = SpecialClassLoader.initialClasspathHash(currentClassloader)
       def special = new SpecialClassLoader(currentClassloader, hash)
-      Frame(
+      new Frame(
         special,
         special,
-        Seq.empty[(String, ImportData)],
+        Seq.empty[ImportData],
         Seq()
       )
     }
@@ -98,10 +98,10 @@ object Evaluator{
 
     object sess extends Session {
       def frames = eval.frames
-      def childFrame(parent: Frame) = Frame(
+      def childFrame(parent: Frame) = new Frame(
         new SpecialClassLoader(parent.classloader, parent.classloader.classpathHash),
         new SpecialClassLoader(parent.pluginClassloader, parent.pluginClassloader.classpathHash),
-        parent.previousImports,
+        parent.imports,
         parent.classpath
       )
 
@@ -160,31 +160,15 @@ object Evaluator{
     def evalMain(cls: Class[_]) =
       cls.getDeclaredMethod("$main").invoke(null)
 
-    def previousImportBlock = importBlock(previousImports.map(_._2))
+    def previousImportBlock = importBlock(imports)
 
-    def importBlock(importData0: Seq[ImportData]) = {
-      val importData = importData0.toVector
+    def importBlock(importData: Seq[ImportData]) = {
       Timer("importBlock 0")
-      // Figure out which imports will get stomped over by future imports
-      // before they get used, and just ignore those
-      val filtered = for {
-        (data @ ImportData(fromName, toName, prefix), i) <- importData.zipWithIndex
-        if fromName != "_"
-        usedIndex = importData.indexWhere(d => d.prefix == toName, i + 1)
-        stompedIndex = importData.indexWhere(d => d.toName == toName, i + 1)
-        alive = (usedIndex, stompedIndex) match{
-          case (-1, -1) => true
-          case (used, -1) => true
-          case (-1, stomped) => false
-          case (used, stomped) => used < stomped
-        }
-        if alive
-      } yield data
 
       // Group the remaining imports into sliding groups according to their
       // prefix, while still maintaining their ordering
       val grouped = mutable.Buffer[mutable.Buffer[ImportData]]()
-      for(data <- filtered){
+      for(data <- importData){
         if (grouped.isEmpty) grouped.append(mutable.Buffer(data))
         else if (grouped.last.last.prefix == data.prefix) grouped.last.append(data)
         else grouped.append(mutable.Buffer(data))
@@ -202,7 +186,7 @@ object Evaluator{
       Timer("importBlock 1")
       res
     }
-  
+
     def interrupted() = {
       Thread.interrupted()
       Res.Failure("\nInterrupted!")
@@ -221,7 +205,7 @@ object Evaluator{
         wrapperName,
         code,
         printCode,
-        extraImports ++: previousImports.map(_._2)
+        Frame.mergeImports(imports, extraImports)
       ))
       _ = Timer("eval.processLine compileClass end")
       cls <- loadClass(wrapperName, classFiles)
@@ -300,8 +284,7 @@ $code
     }
 
     def update(newImports: Seq[ImportData]) = {
-      val newImportMap = for(i <- newImports) yield (i.toName, i)
-      frames.head.previousImports = previousImports ++ newImportMap
+      frames.head.addImports(newImports)
     }
 
     def evaluationResult(wrapperName: String, imports: Seq[ImportData]) = {
