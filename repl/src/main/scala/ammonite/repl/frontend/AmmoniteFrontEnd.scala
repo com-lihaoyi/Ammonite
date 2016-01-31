@@ -72,7 +72,7 @@ case class AmmoniteFrontEnd(extraFilters: TermCore.Filter = PartialFunction.empt
           FrontEndUtils.printCompletions(completions2, details2)
                        .mkString
 
-        if (details.nonEmpty || completions.nonEmpty)
+        if (details.nonEmpty || completions.isEmpty)
           Printing(TermState(rest, b, c), stdout)
         else{
           val newBuffer = b.take(newCursor) ++ common ++ b.drop(c)
