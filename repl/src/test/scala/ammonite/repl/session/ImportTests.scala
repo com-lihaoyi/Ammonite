@@ -1,6 +1,7 @@
 package ammonite.repl.session
 
 import ammonite.repl.Checker
+import ammonite.repl.TestUtils._
 import utest._
 
 import scala.collection.{immutable => imm}
@@ -176,24 +177,27 @@ object ImportTests extends TestSuite{
           res3: Foo = 2
         """)
 
-        * - check.session("""
-          @ object pkg1{ val Order = "lolz" }
+        * - {
+          val pkg2 = if (scala2_10) "pkg2." else ""
+          check.session(s"""
+            @ object pkg1{ val Order = "lolz" }
 
-          @ object pkg2{ type Order[+T] = Seq[T] }
+            @ object pkg2{ type Order[+T] = Seq[T] }
 
-          @ import pkg1._
+            @ import pkg1._
 
-          @ Order
-          res3: String = "lolz"
+            @ Order
+            res3: String = "lolz"
 
-          @ import pkg2._
+            @ import pkg2._
 
-          @ Seq(1): Order[Int]
-          res5: Order[Int] = List(1)
+            @ Seq(1): Order[Int]
+            res5: ${pkg2}Order[Int] = List(1)
 
-          @ Seq(Order): Order[String]
-          res6: Order[String] = List("lolz")
-        """)
+            @ Seq(Order): Order[String]
+            res6: ${pkg2}Order[String] = List("lolz")
+          """)
+        }
 
         // Even though you can import the same-named type and term from different
         // places and have it work, if you import them both from the same place,
