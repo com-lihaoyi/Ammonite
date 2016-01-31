@@ -186,6 +186,13 @@ object TPrintTests extends TestSuite{
          class C[T[_]]
          check[C[List]]("C[List]")
        }
+       'byName{
+         check[(=> Int) => Double]("Function1[=> Int, Double]")
+         check[(=> Int, String, => (=> Char) => Float) => Double](
+           "Function3[=> Int, String, => Function1[=> Char, Float], Double]"
+         )
+       }
+
      }
      'colored{
        import pprint.Config.Colors._
