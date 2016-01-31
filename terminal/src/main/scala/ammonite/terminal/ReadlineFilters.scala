@@ -142,7 +142,7 @@ object ReadlineFilters {
       (newHistoryIndex, newBuffer, newCursor)
     }
     val emptySearchMessage =
-      s" ${Console.BLUE}...press any key to search, `up` for more results${Console.RESET}"
+      s" ${Console.BLUE}...enter the string to search, then `up` for more results${Console.RESET}"
     val cannotFindSearchMessage =
       s" ${Console.BLUE}...cannot be found in the history${Console.RESET}"
   }
