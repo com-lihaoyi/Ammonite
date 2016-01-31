@@ -154,10 +154,25 @@ object Resolvers {
     "[module]/[type]s/[artifact]-[revision].[ext]"
 
   
- //add duplicate resolvers with different name to make Ivy shut up
- //and stop giving `unknown resolver null` or `unknown resolver sbt-chain`
- //errors
+
  lazy val defaultResolvers: List[Resolver] = List(
+   // Add duplicate resolvers with different name to make Ivy shut up
+   // and stop giving `unknown resolver null` or `unknown resolver sbt-chain`
+   // errors
+   Resolver.File(
+     null,
+     "/.ivy2/cache",
+     "/[organisation]/[module]/jars/[artifact]-[revision].[ext]",
+     m2 = false
+   ),
+   Resolver.File(
+     "sbt-chain",
+     "/.ivy2/cache",
+     "/[organisation]/[module]/jars/[artifact]-[revision].[ext]",
+     m2 = false
+   ),
+
+   // Real resolvers
    Resolver.File(
      "ivy-cache",
      "/.ivy2/cache",
