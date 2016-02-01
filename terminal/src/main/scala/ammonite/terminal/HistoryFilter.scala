@@ -168,7 +168,7 @@ class HistoryFilter(history: () => IndexedSeq[String],
         // If we're searching for an empty string, special-case this and return
         // an empty buffer rather than the first history item (which would be
         // the default) because that wouldn't make much sense
-        else if (searchTerm.get.isEmpty) Vector()
+        else if (searchTerm.exists(_.isEmpty)) Vector()
         // Otherwise, pick whatever history entry we're at and use that
         else history()(historyIndex).toVector
       historyIndex = -1
