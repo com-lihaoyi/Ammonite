@@ -89,17 +89,19 @@ case class AmmoniteFrontEnd(extraFilters: TermCore.Filter = PartialFunction.empt
         BasicFilters.injectNewLine(b, c, rest)
     }
 
-    val historyFilter = HistoryFilter(() => history.reverse)
+    val historyFilter = new HistoryFilter(
+      () => history.reverse, colors.comment(), colors.reset()
+    )
     val cutPasteFilter = ReadlineFilters.CutPasteFilter()
     val selectionFilter = GUILikeFilters.SelectionFilter(indent = 2)
 
     val allFilters =
+      historyFilter.filter orElse
       extraFilters orElse
       selectionFilter orElse
       GUILikeFilters.altFilter orElse
       GUILikeFilters.fnFilter orElse
       ReadlineFilters.navFilter orElse
-      historyFilter.filter orElse
       autocompleteFilter orElse
       cutPasteFilter orElse
       multilineFilter orElse
@@ -114,7 +116,7 @@ case class AmmoniteFrontEnd(extraFilters: TermCore.Filter = PartialFunction.empt
       allFilters,
       displayTransform = { (buffer, cursor) =>
         val resetColor = "\u001b[39m"
-        val resetUnderline = "\u001b[24m"
+
         val indices = Highlighter.defaultHighlightIndices(
           buffer,
           colors.comment(),
@@ -149,40 +151,10 @@ case class AmmoniteFrontEnd(extraFilters: TermCore.Filter = PartialFunction.empt
           case _ => (Highlighter.flattenIndices(indices, buffer) ++ resetColor, 0)
         }
 
-        val newNewBuffer: Vector[Char] =
-          if (!historyFilter.activeSearch) newBuffer
-          else {
-            def offsetIndex(in: Int) = {
-              var splitIndex = 0
-              var length = 0
-              val ansiRegex = "\u001B\\[[;\\d]*."
-              while(length < in){
-                ansiRegex.r.findPrefixOf(newBuffer.drop(splitIndex)) match{
-                  case None =>
-                    splitIndex += 1
-                    length += 1
-                  case Some(s) =>
-                    splitIndex += s.length
-                }
-              }
-              splitIndex
-            }
-            val (searchStart, searchEnd) =
-              if (historyFilter.searchTerm.get.isEmpty) (cursor, cursor+1)
-              else {
-                val start = buffer.indexOfSlice(historyFilter.searchTerm.get)
-                val end = start + (historyFilter.searchTerm.get.length max 1)
-                (start, end)
-              }
-
-            val screenStart = offsetIndex(searchStart)
-            val screenEnd = offsetIndex(searchEnd)
-            val prefix = newBuffer.take(screenStart)
-            val middle = newBuffer.slice(screenStart, screenEnd).padTo(1, ' ')
-            val suffix = newBuffer.drop(screenEnd)
-
-            prefix ++ Console.UNDERLINED ++ middle ++ resetUnderline ++ suffix
-          }
+        val newNewBuffer: Vector[Char] = HistoryFilter.mangleBuffer(
+          historyFilter, newBuffer, cursor,
+          Console.UNDERLINED, Ansi.resetUnderline
+        )
         (newNewBuffer, offset)
       }
     )

@@ -4,58 +4,12 @@ import ammonite.terminal.FilterTools._
 import ammonite.terminal.LazyList._
 
 
-object HistoryFilter{
-  /**
-    * @param startIndex The first index to start looking from
-    * @param searchTerm The term we're searching from; can be empty
-    * @param history The history we're searching through
-    * @param indexIncrement Which direction to search, +1 or -1
-    * @param skipped Any buffers which we should skip in our search results,
-    *                e.g. because the user has seen them before.
-    */
-  def findNewHistoryIndex(startIndex: Int,
-                          searchTerm: Vector[Char],
-                          history: IndexedSeq[String],
-                          indexIncrement: Int,
-                          skipped: Vector[Char]) = {
-    /**
-      * `Some(i)` means we found a reasonable result at history element `i`
-      * `None` means we couldn't find anything, and should show a not-found
-      * error to the user
-      */
-    def rec(i: Int): Option[Int] = history.lift(i) match{
-      // If i < 0, it means the user is pressing `down` too many times, which
-      // means it doesn't show anything but we shouldn't show an error
-      case None if i < 0 => Some(-1)
-      case None => None
-      case Some(s) if s.contains(searchTerm) && !s.contentEquals(skipped) =>
-        Some(i)
-      case _ => rec(i + indexIncrement)
-    }
-
-    val newHistoryIndex = rec(startIndex)
-    val foundIndex = newHistoryIndex.find(_ != -1)
-    val newBuffer = foundIndex match{
-      case None => searchTerm
-      case Some(i) => history(i).toVector
-    }
-
-    val newCursor = foundIndex match{
-      case None => newBuffer.length
-      case Some(i) => history(i).indexOfSlice(searchTerm) + searchTerm.length
-    }
-
-    (newHistoryIndex, newBuffer, newCursor)
-  }
-  val emptySearchMessage =
-    s" ${Console.BLUE}...enter the string to search for, then `up` for more${Console.RESET}"
-  val cannotFindSearchMessage =
-    s" ${Console.BLUE}...can't be found in history; re-starting search${Console.RESET}"
-}
 /**
   * Provides history navigation up and down, saving the current line.
   */
-case class HistoryFilter(history: () => IndexedSeq[String]) extends TermCore.DelegateFilter{
+class HistoryFilter(history: () => IndexedSeq[String],
+                    commentStartColor: String,
+                    commentEndColor: String) extends TermCore.DelegateFilter{
   /**
     * `-1` means we haven't started looking at history, `n >= 0` means we're
     * currently at history command `n`
@@ -93,7 +47,6 @@ case class HistoryFilter(history: () => IndexedSeq[String]) extends TermCore.Del
     def nextHistoryIndexFor(v: Vector[Char]) = {
       HistoryFilter.findNewHistoryIndex(start, v, history(), increment, skipped)
     }
-
     val (newHistoryIndex, newBuffer, newCursor) = searchTerm match{
       // We're not searching for anything, just browsing history.
       // Pass in Vector.empty so we scroll through all items
@@ -107,16 +60,16 @@ case class HistoryFilter(history: () => IndexedSeq[String]) extends TermCore.Del
 
         val msg =
           if (i.nonEmpty) ""
-          else HistoryFilter.cannotFindSearchMessage
+          else commentStartColor + HistoryFilter.cannotFindSearchMessage + commentEndColor
 
         (i, b1 ++ msg, c)
 
       // We're searching for nothing in particular; in this case,
       // show a help message instead of an unhelpful, empty buffer
       case Some(b) if b.isEmpty =>
-        val msg = HistoryFilter.emptySearchMessage.toVector
+        val msg = commentStartColor + HistoryFilter.emptySearchMessage + commentEndColor
         // The cursor in this case always goes to zero
-        (Some(start), msg, 0)
+        (Some(start), msg.toVector, 0)
 
     }
 
@@ -203,4 +156,97 @@ case class HistoryFilter(history: () => IndexedSeq[String]) extends TermCore.Del
       historyIndex = -1
       TS(char ~: rest, buffer, cursor)
   }
+}
+
+object HistoryFilter{
+
+  val ansiRegex = "\u001B\\[[;\\d]*."
+  def mangleBuffer(historyFilter: HistoryFilter,
+                   buffer: Vector[Char],
+                   cursor: Int,
+                   startColor: String,
+                   endColor: String) = {
+    if (!historyFilter.activeSearch) buffer
+    else {
+      def offsetIndex(in: Int) = {
+        var splitIndex = 0
+        var length = 0
+
+        while(length < in){
+          ansiRegex.r.findPrefixOf(buffer.drop(splitIndex)) match{
+            case None =>
+              splitIndex += 1
+              length += 1
+            case Some(s) =>
+              splitIndex += s.length
+          }
+        }
+        splitIndex
+      }
+      val (searchStart, searchEnd) =
+        if (historyFilter.searchTerm.get.isEmpty) (cursor, cursor+1)
+        else {
+          val start = ansiRegex.r.replaceAllIn(buffer, "").indexOfSlice(historyFilter.searchTerm.get)
+          val end = start + (historyFilter.searchTerm.get.length max 1)
+          (start, end)
+        }
+
+      val screenStart = offsetIndex(searchStart)
+      val screenEnd = offsetIndex(searchEnd)
+      val prefix = buffer.take(screenStart)
+      val middle = buffer.slice(screenStart, screenEnd).padTo(1, ' ')
+      val suffix = buffer.drop(screenEnd)
+
+      prefix ++ startColor ++ middle ++ endColor ++ suffix
+    }
+
+  }
+  /**
+    * @param startIndex The first index to start looking from
+    * @param searchTerm The term we're searching from; can be empty
+    * @param history The history we're searching through
+    * @param indexIncrement Which direction to search, +1 or -1
+    * @param skipped Any buffers which we should skip in our search results,
+    *                e.g. because the user has seen them before.
+    */
+  def findNewHistoryIndex(startIndex: Int,
+                          searchTerm: Vector[Char],
+                          history: IndexedSeq[String],
+                          indexIncrement: Int,
+                          skipped: Vector[Char]) = {
+    /**
+      * `Some(i)` means we found a reasonable result at history element `i`
+      * `None` means we couldn't find anything, and should show a not-found
+      * error to the user
+      */
+    def rec(i: Int): Option[Int] = history.lift(i) match{
+      // If i < 0, it means the user is pressing `down` too many times, which
+      // means it doesn't show anything but we shouldn't show an error
+      case None if i < 0 => Some(-1)
+      case None => None
+      case Some(s) if s.contains(searchTerm) && !s.contentEquals(skipped) =>
+        Some(i)
+      case _ => rec(i + indexIncrement)
+    }
+
+    val newHistoryIndex = rec(startIndex)
+    val foundIndex = newHistoryIndex.find(_ != -1)
+    val newBuffer = foundIndex match{
+      case None => searchTerm
+      case Some(i) => history(i).toVector
+    }
+
+    val newCursor = foundIndex match{
+      case None => newBuffer.length
+      case Some(i) => history(i).indexOfSlice(searchTerm) + searchTerm.length
+    }
+
+    (newHistoryIndex, newBuffer, newCursor)
+  }
+  val emptySearchMessage =
+    s" ...enter the string to search for, then `up` for more"
+  val cannotFindSearchMessage =
+    s" ...can't be found in history; re-starting search"
+
+
 }

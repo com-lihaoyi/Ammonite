@@ -7,12 +7,16 @@ object HistoryTests extends TestSuite{
 
 
   val tests = TestSuite{
-    val history = new HistoryFilter(() => Vector(
-      "abcde",
-      "abcdefg",
-      "abcdefg",
-      "abcdefghi"
-    ))
+    val history = new HistoryFilter(
+      () => Vector(
+        "abcde",
+        "abcdefg",
+        "abcdefg",
+        "abcdefghi"
+      ),
+      "",
+      ""
+    )
     def checker(start: String)= Checker(
       width = 50,
       grid = start

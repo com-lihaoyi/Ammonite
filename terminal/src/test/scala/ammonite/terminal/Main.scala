@@ -4,7 +4,6 @@ import java.io.OutputStreamWriter
 
 
 import ammonite.terminal.LazyList.~:
-import ammonite.terminal.TermState
 
 import scala.annotation.tailrec
 
@@ -28,10 +27,13 @@ object Main{
     val reader = new java.io.InputStreamReader(System.in)
     rec()
     @tailrec def rec(): Unit = {
+      val historyFilter = new HistoryFilter(
+        () => history.toVector, Console.BLUE, Ansi.resetForegroundColor)
       TermCore.readLine(
         Console.MAGENTA + (0 until 10).mkString + "\n@ " + Console.RESET,
         reader,
         new OutputStreamWriter(System.out),
+        historyFilter orElse
         multilineFilter orElse
         selection orElse
         BasicFilters.tabFilter(4) orElse
@@ -40,7 +42,6 @@ object Main{
         ReadlineFilters.navFilter orElse
         ReadlineFilters.CutPasteFilter() orElse
 //        Example multiline support by intercepting Enter key
-        HistoryFilter(() => history.toVector) orElse
         BasicFilters.all,
         // Example displayTransform: underline all non-spaces
         displayTransform = (buffer, cursor) => {
@@ -48,22 +49,27 @@ object Main{
           def hl(b: Vector[Char]): Vector[Char] = b.flatMap{
             case ' ' => " "
             case '\n' => "\n"
-            case c => Console.UNDERLINED + c + Console.RESET
+            case c => Console.UNDERLINED + c + Ansi.resetUnderline
           }
           // and highlight the selection
-          selection.mark match{
+          val (newBuffer, newCursor) = selection.mark match{
             case Some(mark) if mark != cursor =>
               val Seq(min, max) = Seq(mark, cursor).sorted
               val (a, b0) = buffer.splitAt(min)
               val (b, c) = b0.splitAt(max - min)
               val displayOffset = if (cursor < mark) 0 else -1
               (
-                hl(a) ++ Console.REVERSED ++ b ++ Console.RESET ++ hl(c),
+                hl(a) ++ Console.BLUE_B ++ b ++ Ansi.resetBackgroundColor ++ hl(c),
                 displayOffset
               )
+
             case _ => (hl(buffer), 0)
           }
-
+          val newNewBuffer = HistoryFilter.mangleBuffer(
+            historyFilter, buffer, cursor,
+            Console.GREEN, Ansi.resetForegroundColor
+          )
+          (newNewBuffer, newCursor)
         }
       ) match {
         case None => println("Bye!")
