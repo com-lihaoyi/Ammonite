@@ -89,7 +89,7 @@ case class AmmoniteFrontEnd(extraFilters: TermCore.Filter = PartialFunction.empt
         BasicFilters.injectNewLine(b, c, rest)
     }
 
-    val historyFilter = ReadlineFilters.HistoryFilter(() => history.reverse)
+    val historyFilter = HistoryFilter(() => history.reverse)
     val cutPasteFilter = ReadlineFilters.CutPasteFilter()
     val selectionFilter = GUILikeFilters.SelectionFilter(indent = 2)
 

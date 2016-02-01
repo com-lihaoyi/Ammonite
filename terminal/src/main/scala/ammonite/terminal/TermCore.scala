@@ -163,7 +163,6 @@ object TermCore {
         }
       }
 
-
       val fragHeights = calculateHeight0(rowLengths, width - prompt.lastLineNoAnsi.length)
       val (cursorY, cursorX) = positionCursor(
         cursor,
@@ -185,15 +184,18 @@ object TermCore {
 
     @tailrec
     def readChar(lastState: TermState, ups: Int, fullPrompt: Boolean = true): Option[String] = {
-//      Debug("")
-//      Debug("readChar\t" + ups)
       val moreInputComing = reader.ready()
+
       lazy val (transformedBuffer, cursorOffset) = displayTransform(
         lastState.buffer,
         lastState.cursor
       )
+
       lazy val lastOffsetCursor = lastState.cursor + cursorOffset
-      lazy val rowLengths = splitBuffer(lastState.buffer)
+
+      lazy val rowLengths = splitBuffer(
+        ansiRegex.replaceAllIn(lastState.buffer, "").toVector
+      )
       if (!moreInputComing) redrawLine(
         transformedBuffer,
         lastOffsetCursor,

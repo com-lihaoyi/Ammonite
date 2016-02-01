@@ -40,7 +40,7 @@ object Main{
         ReadlineFilters.navFilter orElse
         ReadlineFilters.CutPasteFilter() orElse
 //        Example multiline support by intercepting Enter key
-        ReadlineFilters.HistoryFilter(() => history.toVector) orElse
+        HistoryFilter(() => history.toVector) orElse
         BasicFilters.all,
         // Example displayTransform: underline all non-spaces
         displayTransform = (buffer, cursor) => {

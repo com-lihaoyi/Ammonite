@@ -1,6 +1,5 @@
 package ammonite.terminal
 
-import ammonite.terminal.ReadlineFilters.HistoryFilter
 import utest._
 
 
@@ -24,7 +23,7 @@ object HistoryTests extends TestSuite{
     'noHistory{
       checker("Hell_o")
         .run(history.startHistory)
-        .check("Hello_")
+        .check("Hello_" + HistoryFilter.cannotFindSearchMessage)
         .run(history.up)
         .check("Hello_" + HistoryFilter.cannotFindSearchMessage)
     }
@@ -79,7 +78,7 @@ object HistoryTests extends TestSuite{
         // You should be able to cycle through the end of the history and
         // back to the original command
         .run(history.up)
-        .check("abc_")
+        .check("abc_" + HistoryFilter.cannotFindSearchMessage)
         .run(history.up)
         .check("abc_de")
     }
