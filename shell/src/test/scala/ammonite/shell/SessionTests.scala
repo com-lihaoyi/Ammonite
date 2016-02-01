@@ -52,7 +52,7 @@ object SessionTests extends TestSuite{
         @ import ammonite.ops.ImplicitWd
 
         @ %%ls 'ops
-        res15: $typeString =
+        res4: $typeString =
         src
         target
       """)

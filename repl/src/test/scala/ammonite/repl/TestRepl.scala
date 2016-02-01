@@ -88,7 +88,9 @@ class TestRepl {
       }else {
         processed match {
           case Res.Success(str) =>
-            failLoudly(assert(out == expected))
+            // Strip trailing whitespace
+            def normalize(s: String) = s.lines.map(_.replaceAll(" *$", "")).mkString("\n")
+            failLoudly(assert(normalize(out) == normalize(expected)))
 
           case Res.Failure(failureMsg) => assert({identity(out); identity(expected); false})
           case Res.Exception(ex, failureMsg) =>
