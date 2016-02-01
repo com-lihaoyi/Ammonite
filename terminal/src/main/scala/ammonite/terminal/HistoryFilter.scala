@@ -106,46 +106,69 @@ class HistoryFilter(history: () => IndexedSeq[String],
     searchHistory(historyIndex, 1, b, Vector())
   }
 
+  /**
+    * Predicate to check if either we're searching for a term or if we're in
+    * history-browsing mode and some predicate is true.
+    *
+    * Very often we want to capture keystrokes in search-mode more aggressively
+    * than in history-mode, e.g. search-mode drops you out more aggressively
+    * than history-mode does, and its up/down keys cycle through history more
+    * aggressively on every keystroke while history-mode only cycles when you
+    * reach the top/bottom line of the multi-line input.
+    */
+  def searchOrHistoryAnd(cond: Boolean) = {
+    activeSearch || (activeHistory && cond)
+  }
+
+  val dropHistoryChars = Set(13, 10, 9) // Enter or Tab
   def filter = {
-    // Ways to kick off the history search if you're not already in it
+    // Ways to kick off the history/search if you're not already in it
+
+    // `Ctrl-R`
     case TS(18 ~: rest, b, c) => wrap(rest, ctrlR(b, c))
 
-    // Ways to kick off the history search if you're not already in it
+    // `Up` from the first line in the input
     case TermInfo(TS(p"\u001b[A$rest", b, c), w) if firstRow(c, b, w) && !activeHistory =>
       wrap(rest, startHistory(b, c))
 
-    case TermInfo(TS(p"\u0010$rest", b, c), w) if lastRow(c, b, w) && !activeHistory =>
+    case TermInfo(TS(p"\u0010$rest", b, c), w) if firstRow(c, b, w) && !activeHistory =>
       wrap(rest, startHistory(b, c))
 
     // Things you can do when you're already in the history search
 
     // Navigating up and down the history. Each up or down searches for
     // the next thing that matches your current searchTerm
-    case TermInfo(TS(p"\u001b[A$rest", b, c), w) if activeHistory && firstRow(c, b, w) =>
+    // Up
+    case TermInfo(TS(p"\u001b[A$rest", b, c), w) if searchOrHistoryAnd(firstRow(c, b, w)) =>
       wrap(rest, up(b, c))
-    case TermInfo(TS(p"\u0010$rest", b, c), w) if activeHistory && firstRow(c, b, w) =>
+    case TermInfo(TS(p"\u0010$rest", b, c), w) if searchOrHistoryAnd(firstRow(c, b, w)) =>
       wrap(rest, up(b, c))
-
-    case TermInfo(TS(p"\u001b[B$rest", b, c), w) if activeHistory && lastRow(c, b, w)  =>
+    // Down
+    case TermInfo(TS(p"\u001b[B$rest", b, c), w) if searchOrHistoryAnd(lastRow(c, b, w))  =>
       wrap(rest, down(b, c))
-    case TermInfo(TS(p"\u000e$rest", b, c), w) if activeHistory && lastRow(c, b, w)    =>
+    case TermInfo(TS(p"\u000e$rest", b, c), w) if searchOrHistoryAnd(lastRow(c, b, w))  =>
       wrap(rest, down(b, c))
 
 
-    // Intercept Backspace and delete a character, preserving search
-    case TS(127 ~: rest, buffer, cursor) if activeSearch =>
+    // Intercept Backspace and delete a character in search-mode, preserving it, but
+    // letting it fall through and dropping you out of history-mode if you try to make
+    // edits
+    case TS(127 ~: rest, buffer, cursor) if activeSearch && !activeHistory =>
       wrap(rest, backspace(buffer, cursor))
 
-    // Intercept Enter or tab and drop
-    // out of history, forwarding that character downstream
+    // Any other control characters drop you out of search mode, but only the
+    // set of `dropHistoryChars` drops you out of history mode
     case TS(char ~: inputs, buffer, cursor)
-      if activeSearch && char.toChar.isControl
-      && char == 13 || char == 10 || char == 9 =>
+      if char.toChar.isControl && searchOrHistoryAnd(dropHistoryChars(char)) =>
       val newBuffer =
         // If we're back to -1, it means we've wrapped around and are
         // displaying the original search term with a wrap-around message
         // in the terminal. Drop the message and just preserve the search term
         if (historyIndex == -1) searchTerm.get
+        // If we're searching for an empty string, special-case this and return
+        // an empty buffer rather than the first history item (which would be
+        // the default) because that wouldn't make much sense
+        else if (searchTerm.get.isEmpty) Vector()
         // Otherwise, pick whatever history entry we're at and use that
         else history()(historyIndex).toVector
       historyIndex = -1
