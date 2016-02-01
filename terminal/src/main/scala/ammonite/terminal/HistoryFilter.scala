@@ -121,18 +121,26 @@ class HistoryFilter(history: () => IndexedSeq[String],
 
     // Navigating up and down the history. Each up or down searches for
     // the next thing that matches your current searchTerm
-    case TS(p"\u001b[A$rest", b, c) if activeHistory => wrap(rest, up(b, c))
-    case TS(p"\u0010$rest", b, c) if activeHistory   => wrap(rest, up(b, c))
-    case TS(p"\u001b[B$rest", b, c) if activeHistory => wrap(rest, down(b, c))
-    case TS(p"\u000e$rest", b, c) if activeHistory   => wrap(rest, down(b, c))
+    case TermInfo(TS(p"\u001b[A$rest", b, c), w) if activeHistory && firstRow(c, b, w) =>
+      wrap(rest, up(b, c))
+    case TermInfo(TS(p"\u0010$rest", b, c), w) if activeHistory && firstRow(c, b, w) =>
+      wrap(rest, up(b, c))
+
+    case TermInfo(TS(p"\u001b[B$rest", b, c), w) if activeHistory && lastRow(c, b, w)  =>
+      wrap(rest, down(b, c))
+    case TermInfo(TS(p"\u000e$rest", b, c), w) if activeHistory && lastRow(c, b, w)    =>
+      wrap(rest, down(b, c))
+
 
     // Intercept Backspace and delete a character, preserving search
     case TS(127 ~: rest, buffer, cursor) if activeSearch =>
       wrap(rest, backspace(buffer, cursor))
 
-    // Intercept Enter other control characters and drop
+    // Intercept Enter or tab and drop
     // out of history, forwarding that character downstream
-    case TS(char ~: inputs, buffer, cursor) if activeSearch && char.toChar.isControl =>
+    case TS(char ~: inputs, buffer, cursor)
+      if activeSearch && char.toChar.isControl
+      && char == 13 || char == 10 || char == 9 =>
       val newBuffer =
         // If we're back to -1, it means we've wrapped around and are
         // displaying the original search term with a wrap-around message
