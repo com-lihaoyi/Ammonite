@@ -429,9 +429,12 @@
 
       @p
         Typically most organizations already have bastions, firewalls, and other necessary infrastructure to allow trusted parties SSH access to the relevant machines. Running on @code{localhost} lets you leverage that and gain all the same security properties without having to re-implement them in Scala.
+
   @sect{REPL Cookbook}
+
     @p
       The Ammonite REPL is meant to be extended: you can load in arbitary Java/Scala modules from the internet via @hl.scala{@sect.ref("Artifact Loading", "load.ivy")}, and can extend the REPL to do anything you wish to do, and tools like @sect.ref{Ammonite-Shell} are simply modules like any other. Here are a few example snippets of things you can do with the Ammonite-REPL:
+
     @sect{HTTP Requests}
       @p
         Ammonite does not come with a built-in way to make HTTP requests, but there are Java /Scala modules that do this quite well! Here's an example:
@@ -504,14 +507,12 @@
 
         @@ doc.select("h1")
         res54: select.Elements = <h1 id="firstHeading" class="firstHeading" lang="en">Main Page</h1>
-        @@ doc.select("h2")
+        @@ doc.select("h2") // this is huge and messy
         res55: select.Elements = <h2 id="mp-tfa-h2" style="margin:3px; background:#cef2e0; font-family:inherit; font-size:120%; font-weight:bold; border:1px solid #a3bfb1; text-align:left; color:#000; padding:0.2em 0.4em;"><span class="mw-headline" id="From_today.27s_featured_article">From today's featured article</span></h2>
         <h2 id="mp-dyk-h2" style="margin:3px; background:#cef2e0; font-family:inherit; font-size:120%; font-weight:bold; border:1px solid #a3bfb1; text-align:left; color:#000; padding:0.2em 0.4em;"><span class="mw-headline" id="Did_you_know...">Did you know...</span></h2>
-        <h2 id="mp-itn-h2" style="margin:3px; background:#cedff2; font-family:inherit; font-size:120%; font-weight:bold; border:1px solid #a3b0bf; text-align:left; color:#000; padding:0.2em 0.4em;"><span class="mw-headline" id="In_the_news">In the news</span></h2>
-        <h2 id="mp-otd-h2" style="margin:3px; background:#cedff2; font-family:inherit; font-size:120%; font-weight:bold; border:1px solid #a3b0bf; text-align:left; color:#000; padding:0.2em 0.4em;"><span class="mw-headline" id="On_this_day...">On this day...</span></h2>
         ...
 
-        @@ doc.select("h2").map(_.text)
+        @@ doc.select("h2").map(_.text) // but you can easily pull out the bits you want
         res56: collection.mutable.Buffer[String] = ArrayBuffer(
           "From today's featured article",
           "Did you know...",
@@ -594,7 +595,7 @@
         @@ import org.apache.poi.xwpf.usermodel._ // Bring Ms-Word APIs into scope
         @@ import collection.JavaConversions._    // Make use of Java collections easier
 
-        @@ val path = cwd/up/up/'Archive/'Documents/"Old Resumes"/"Resume V2.docx"
+        @@ val path = cwd/'repl/'src/'test/'resources/'testdata/"Resume V2.docx"
 
         @@ val docx = new XWPFDocument(new java.io.ByteArrayInputStream(read.bytes(path)))
 
@@ -724,7 +725,7 @@
           "you"
         ...
 
-        @@ import opennlp.tools.namefind._
+        @@ import opennlp.tools.namefind._ // Turns out we need more test data...
 
         @@ val nameDataUrl = "http://opennlp.sourceforge.net/models-1.5/en-ner-person.bin"
 
@@ -746,5 +747,11 @@
         @@ val names = nameFinder.find(tokens)
         names: Array[opennlp.tools.util.Span] = Array([8..9) person, [15..17) person)
 
-        @@ opennlp.tools.util.Span.spansToStrings(names, tokens)
+        @@ opennlp.tools.util.Span.spansToStrings(names, tokens) // Woohoo, names!
         res96: Array[String] = Array("Mike", "Peter Smith")
+
+      @p
+        This took a while, but only in comparison to the earlier cookbook recipes: this one is still less than 20 steps, which is not bad for something that installs multiple third-party modules, pulls down training data off the internet, and then does natural language processing to extract the english names from a text blob!
+
+      @p
+        Obviously we did not go very deep into the field. If you did, it would definitely be a lot more reading and understanding than just blindly following tutorials like I did above, and you probably would find it worth the time to set up a proper project. Nevertheless, this quick 5-minute run through of how to perform the basics of NLP is a fun way to get started whether or not you decide to take it further, and is only possible because of the Ammonite REPL!
