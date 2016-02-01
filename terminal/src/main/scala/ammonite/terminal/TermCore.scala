@@ -381,9 +381,19 @@ object Prompt {
           case (state, _) =>
             state
         }
-      val lastLine = ansiEscapeState + prompt.substring(lastLineBegin + 1)
+      val lastLine = render(ansiEscapeState) + prompt.substring(lastLineBegin + 1)
       new Prompt(prompt, lastLine)
     }
+  }
+  def render(ansi: AnsiEscapeState): String = {
+    import ansi._
+    val builder = new StringBuilder(25)
+    color.map(builder.append(_))
+    bgColor.map(builder.append(_))
+    if (bold) builder.append(Console.BOLD)
+    if (underlined) builder.append(Console.UNDERLINED)
+    if (reversed) builder.append(Console.REVERSED)
+    builder.toString
   }
 }
 
@@ -394,20 +404,5 @@ case class Prompt(
   val lastLineNoAnsi = TermCore.ansiRegex.replaceAllIn(lastLine, "")
 }
 
-case class AnsiEscapeState(
-  color: Option[String] = None,
-  bgColor: Option[String] = None,
-  bold: Boolean = false,
-  underlined: Boolean = false,
-  reversed: Boolean = false) {
-  override def toString: String = {
-    val builder = new StringBuilder(25)
-    color.map(builder.append(_))
-    bgColor.map(builder.append(_))
-    if (bold) builder.append(Console.BOLD)
-    if (underlined) builder.append(Console.UNDERLINED)
-    if (reversed) builder.append(Console.REVERSED)
-    builder.toString
-  }
-}
+
 

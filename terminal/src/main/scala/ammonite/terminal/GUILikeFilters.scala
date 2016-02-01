@@ -5,6 +5,7 @@ import TermCore.DelegateFilter
 import LazyList._
 import SpecialKeys._
 import acyclic.file
+
 /**
  * Filters have hook into the various {Ctrl,Shift,Fn,Alt}x{Up,Down,Left,Right}
  * combination keys, and make them behave similarly as they would on a normal
@@ -100,6 +101,24 @@ object GUILikeFilters {
           }
       }
     )
+  }
+  object SelectionFilter{
+    def mangleBuffer(selectionFilter: SelectionFilter,
+                     string: AnsiStr,
+                     cursor: Int,
+                     startColor: AnsiStr,
+                     endColor: AnsiStr) = {
+      selectionFilter.mark match{
+        case Some(mark) if mark != cursor =>
+          val Seq(min, max) = Seq(cursor, mark).sorted
+          val (prefix, rest) = string.split(min)
+          val (middle, suffix) = rest.split(max)
+          val displayOffset = if (cursor < mark) 0 else -1
+          val newFrags = prefix ++ startColor ++ middle ++ endColor ++ suffix
+          (newFrags, displayOffset)
+        case _ => (string, 0)
+      }
+    }
   }
 
   val fnFilter = orElseAll(

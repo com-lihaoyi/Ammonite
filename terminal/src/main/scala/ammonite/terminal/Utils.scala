@@ -57,6 +57,7 @@ object Ansi{
   val resetForegroundColor = "\u001b[39m"
   val resetBackgroundColor = "\u001b[49m"
 }
+
 object TTY{
 
   // Prefer standard tools. Not sure why we need to do this, but for some

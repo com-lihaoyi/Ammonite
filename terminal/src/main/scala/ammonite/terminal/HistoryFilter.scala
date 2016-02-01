@@ -226,44 +226,25 @@ class HistoryFilter(history: () => IndexedSeq[String],
 
 object HistoryFilter{
 
-  val ansiRegex = "\u001B\\[[;\\d]*."
+
   def mangleBuffer(historyFilter: HistoryFilter,
-                   buffer: Vector[Char],
+                   buffer: AnsiStr,
                    cursor: Int,
-                   startColor: String,
-                   endColor: String) = {
+                   startColor: AnsiStr,
+                   endColor: AnsiStr) = {
     if (!historyFilter.activeSearch) buffer
     else {
-      def offsetIndex(in: Int) = {
-        var splitIndex = 0
-        var length = 0
-
-        while(length < in){
-          ansiRegex.r.findPrefixOf(buffer.drop(splitIndex)) match{
-            case None =>
-              splitIndex += 1
-              length += 1
-            case Some(s) =>
-              splitIndex += s.length
-          }
-        }
-        splitIndex
-      }
       val (searchStart, searchEnd) =
         if (historyFilter.searchTerm.get.isEmpty) (cursor, cursor+1)
         else {
-          val start = ansiRegex.r.replaceAllIn(buffer, "").indexOfSlice(
-            historyFilter.searchTerm.get
-          )
+          val start = buffer.plainText.indexOfSlice(historyFilter.searchTerm.get)
+
           val end = start + (historyFilter.searchTerm.get.length max 1)
           (start, end)
         }
 
-      val screenStart = offsetIndex(searchStart)
-      val screenEnd = offsetIndex(searchEnd)
-      val prefix = buffer.take(screenStart)
-      val middle = buffer.slice(screenStart, screenEnd).padTo(1, ' ')
-      val suffix = buffer.drop(screenEnd)
+      val (prefix, rest) = buffer.split(searchStart)
+      val (middle, suffix) = rest.split(searchEnd)
 
       prefix ++ startColor ++ middle ++ endColor ++ suffix
     }

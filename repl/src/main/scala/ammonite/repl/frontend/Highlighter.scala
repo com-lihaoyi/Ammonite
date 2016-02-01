@@ -12,6 +12,19 @@ object Highlighter {
     }
   }
 
+
+  def flattenIndices(boundedIndices: Seq[(Int, String, Boolean)],
+                     buffer: Vector[Char]) = {
+
+    boundedIndices
+      .sliding(2)
+      .flatMap{case Seq((s, c1, _), (e, c2, _)) =>
+        assert(e >= s, s"s: $s e: $e")
+        c1 ++ buffer.slice(s, e)
+      }
+      .toVector
+  }
+
   def defaultHighlight(buffer: Vector[Char],
                        comment: String,
                        `type`: String,
@@ -81,17 +94,6 @@ object Highlighter {
     // Make sure there's an index right at the start and right at the end! This
     // resets the colors at the snippet's end so they don't bleed into later output
     indices ++ Seq((999999999, endColor, false))
-  }
-  def flattenIndices(boundedIndices: Seq[(Int, String, Boolean)],
-                     buffer: Vector[Char]) = {
-
-    boundedIndices
-      .sliding(2)
-      .flatMap{case Seq((s, c1, _), (e, c2, _)) =>
-        assert(e >= s, s"s: $s e: $e")
-        c1 ++ buffer.slice(s, e)
-      }
-      .toVector
   }
   def highlight(parser: Parser[_],
                 buffer: Vector[Char],
