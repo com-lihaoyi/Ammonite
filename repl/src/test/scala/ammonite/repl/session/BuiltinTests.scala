@@ -72,7 +72,13 @@ object BuiltinTests extends TestSuite{
       """)
     }
     'settings{
-      check.session("""
+      val fruitlessTypeTestWarningMessageBlahBlahBlah =
+        "fruitless type test: a value of type List[Int] cannot " +
+          "also be a List[Double] (the underlying of List[Double]) " +
+          "(but still might match its erasure)"
+      check.session(s"""
+        @ // Disabling default Scala imports
+
         @ List(1, 2, 3) + "lol"
         res0: String = "List(1, 2, 3)lol"
 
@@ -86,6 +92,8 @@ object BuiltinTests extends TestSuite{
         @ List(1, 2, 3) + "lol"
         res3: String = "List(1, 2, 3)lol"
 
+        @ // Disabling Scala language-import enforcement
+
         @ object X extends Dynamic
         error: extension of type scala.Dynamic needs to be enabled
 
@@ -96,8 +104,18 @@ object BuiltinTests extends TestSuite{
 
         @ 1 + 1 // other things still work
 
+        @ // Enabling warnings (which are disabled by default)
+
+        @ List(1) match { case _: List[Double] => 2 }
+        res7: Int = 2
+
+        @ compiler.settings.nowarnings.value = false
+
+        @ List(1) match { case _: List[Double] => 2 }
+        warning: $fruitlessTypeTestWarningMessageBlahBlahBlah
       """)
     }
+
 
     'saveLoad {
       check.session(
