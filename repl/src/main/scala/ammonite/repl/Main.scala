@@ -104,7 +104,7 @@ object Main{
 
     val storage = Storage(defaultAmmoniteHome, None)
     val repl = new Repl(
-      System.in, System.out,
+      System.in, System.out, System.err,
       storage = Ref(storage),
       predef = "",
       replArgs
@@ -127,7 +127,7 @@ object Main{
     Timer("Repl.run Start")
     def storage = Storage(ammoniteHome, predefFile)
     lazy val repl = new Repl(
-      System.in, System.out,
+      System.in, System.out, System.err,
       storage = Ref(storage),
       predef = predef
     )

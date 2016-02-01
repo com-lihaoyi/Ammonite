@@ -8,6 +8,7 @@ import ammonite.repl.interp.Interpreter
 import scala.annotation.tailrec
 class Repl(input: InputStream,
            output: OutputStream,
+           error: OutputStream,
            storage: Ref[Storage],
            predef: String = "",
            replArgs: Seq[Bind[_]] = Nil) {
@@ -20,11 +21,12 @@ class Repl(input: InputStream,
   ))
 
   val printStream = new PrintStream(output, true)
+  val errorPrintStream = new PrintStream(error, true)
   var history = new History(Vector())
 
 
   def printlnWithColor(color: String, s: String) = {
-    Seq(color, s, colors().reset(), "\n").foreach(printStream.print)
+    Seq(color, s, colors().reset(), "\n").foreach(errorPrintStream.print)
   }
   val printer = Printer(
     _.foreach(printStream.print),
