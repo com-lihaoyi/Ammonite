@@ -64,8 +64,6 @@
       @p
         This makes Ammonite ideal for trying out new libraries or tools. You can pull down projects like @lnk("Scalaz", "https://github.com/scalaz/scalaz") or @lnk("Shapeless", "https://github.com/milessabin/shapeless") and immediately start working with them in the REPL:
 
-      @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("scalaz", "@"), "\"\"\"")
-
       @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("shapeless", "@"), "\"\"\"")
 
       @p
@@ -73,7 +71,6 @@
 
       @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("finagle", "@"), "\"\"\"")
 
-      @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("akkahttp", "@"), "\"\"\"")
 
       @p
         Ammonite-REPL is configured with a set of default resolvers but you can add your own
@@ -113,11 +110,11 @@
       @p
         Defined some memory-hogging variable you didn't need? Loaded the wrong version of some third-party library? Reluctant to reload the REPL because reloading is slow? Fear not! With Ammonite, you can save your important work, do whatever you want later, and simply discard all the jars you loaded, variables you defined
 
-      @hl.ref(advancedTests, Seq("'saveLoad", "@"))
+      @hl.ref(ammoniteTests/"BuiltinTests.scala", Seq("'saveLoad", "@"))
       @p
         Apart from plain @hl.scala{save}s and @hl.scala{load}s, which simply discard everything after the most recent save, you can also provide a name to these functions. That lets you stop working on a branch, go do something else for a while, and be able to come back later to continue where you left off:
 
-      @hl.ref(advancedTests, Seq("'saveLoad2", "@"))
+      @hl.ref(ammoniteTests/"BuiltinTests.scala", Seq("'saveLoad2", "@"))
 
 
       @p

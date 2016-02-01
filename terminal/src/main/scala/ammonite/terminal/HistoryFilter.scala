@@ -186,7 +186,9 @@ object HistoryFilter{
       val (searchStart, searchEnd) =
         if (historyFilter.searchTerm.get.isEmpty) (cursor, cursor+1)
         else {
-          val start = ansiRegex.r.replaceAllIn(buffer, "").indexOfSlice(historyFilter.searchTerm.get)
+          val start = ansiRegex.r.replaceAllIn(buffer, "").indexOfSlice(
+            historyFilter.searchTerm.get
+          )
           val end = start + (historyFilter.searchTerm.get.length max 1)
           (start, end)
         }

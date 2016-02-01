@@ -73,9 +73,8 @@ object BuiltinTests extends TestSuite{
     }
     'settings{
       val fruitlessTypeTestWarningMessageBlahBlahBlah =
-        "fruitless type test: a value of type List[Int] cannot " +
-          "also be a List[Double] (the underlying of List[Double]) " +
-          "(but still might match its erasure)"
+        "fruitless type test: a value of type List[Int] cannot also be a List[Double]"
+
       check.session(s"""
         @ // Disabling default Scala imports
 
