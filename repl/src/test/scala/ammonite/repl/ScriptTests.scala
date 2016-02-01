@@ -10,7 +10,7 @@ import acyclic.file
 object ScriptTests extends TestSuite{
   val tests = TestSuite{
     println("ScriptTests")
-    val check = new Checker()
+    val check = new TestRepl()
 
     val scriptPath = cwd/'repl/'src/'test/'resources/'scripts
     val printedScriptPath = """cwd/'repl/'src/'test/'resources/'scripts"""
@@ -85,10 +85,10 @@ object ScriptTests extends TestSuite{
             error: ParseError
 
             @ val r = res
-            error: Compilation Failed
-            Main.scala:\\d\\+: not found: value res
+            error: not found: value res
             val r = res
                     ^
+            Compilation Failed
             """)
         }
         'compilationError{
@@ -99,10 +99,10 @@ object ScriptTests extends TestSuite{
             error: Compilation Failed
 
             @ val r = res
-            error: Compilation Failed
-            Main.scala:\\d\\+: not found: value res
+            error: not found: value res
             val r = res
                     ^
+            Compilation Failed
             """)
         }
         'nofile{
@@ -122,10 +122,10 @@ object ScriptTests extends TestSuite{
             error: Compilation Failed
 
             @ val r2 = res2
-            error: Compilation Failed
-            Main.scala:\\d\\+: not found: value res2
+            error: not found: value res2
             val r2 = res2
                      ^
+            Compilation Failed
             """)
         }
       }
@@ -226,10 +226,10 @@ object ScriptTests extends TestSuite{
             error: ParseError
 
             @ val r = res
-            error: Compilation Failed
-            Main.scala:\\d\\+: not found: value res
+            error: not found: value res
             val r = res
                     ^
+            Compilation Failed
             """)
         }
         'compilationError{
@@ -240,11 +240,10 @@ object ScriptTests extends TestSuite{
             error: Compilation Failed
 
             @ val r = res
-            error: Compilation Failed
-            Main.scala:\\d\\+: not found: value res
+            error: not found: value res
             val r = res
                     ^
-            """)
+            Compilation Failed""")
         }
         'nofile{
           check.session(s"""
@@ -263,10 +262,10 @@ object ScriptTests extends TestSuite{
             error: Compilation Failed
 
             @ val r2 = res2
-            error: Compilation Failed
-            Main.scala:\\d\\+: not found: value res2
+            error: not found: value res2
             val r2 = res2
                      ^
+            Compilation Failed
             """)
         }
       }

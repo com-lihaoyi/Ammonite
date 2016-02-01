@@ -7,42 +7,6 @@ import pprint.{PPrinter, PPrint}
 
 import scala.util.Try
 
-object Res{
-  def apply[T](o: Option[T], errMsg: => String) = o match{
-    case Some(s) => Success(s)
-    case None => Failure(errMsg)
-  }
-  def apply[T](o: Try[T], errMsg: Throwable => String) = o match{
-    case util.Success(s) => Success(s)
-    case util.Failure(t) => Failure(errMsg(t))
-  }
-
-  /**
-   * Successes map and flatmap just like a simple Box[T]
-   */
-  case class Success[+T](s: T) extends Res[T] {
-    def flatMap[V](f: T => Res[V]): Res[V] = f(s) match {
-      case Success(v) => Success(v)
-      case other => other
-    }
-
-    def map[V](f: T => V): Res[V] = Success(f(s))
-  }
-
-  /**
-   * Failing results never call their callbacks, and just remain unchanged
-   */
-  sealed abstract class Failing extends Res[Nothing]{
-    def flatMap[V](f: Nothing => Res[V]): Res[V] = this
-    def map[V](f: Nothing => V): Res[V] = this
-  }
-  case class Failure(s: String) extends Failing
-  case class Exception(t: Throwable, s: String) extends Failing
-
-  case object Skip extends Failing
-  case class Exit(value: Any) extends Failing
-}
-
 /**
  * The result of a single pass through the ammonite REPL.
  */
@@ -69,6 +33,60 @@ case class Catching(handler: PartialFunction[Throwable, Res.Failing]) {
   def map[T](t: Unit => T): Res[T] =
     try Res.Success(t(())) catch handler
 }
+
+
+object Res{
+  def apply[T](o: Option[T], errMsg: => String) = o match{
+    case Some(s) => Success(s)
+    case None => Failure(errMsg)
+  }
+  def apply[T](o: Try[T], errMsg: Throwable => String) = o match{
+    case util.Success(s) => Success(s)
+    case util.Failure(t) => Failure(errMsg(t))
+  }
+
+  /**
+    * Successes map and flatmap just like a simple Box[T]
+    */
+  case class Success[+T](s: T) extends Res[T] {
+    def flatMap[V](f: T => Res[V]): Res[V] = f(s) match {
+      case Success(v) => Success(v)
+      case other => other
+    }
+
+    def map[V](f: T => V): Res[V] = Success(f(s))
+  }
+
+  /**
+    * Failing results never call their callbacks, and just remain unchanged
+    */
+  sealed abstract class Failing extends Res[Nothing]{
+    def flatMap[V](f: Nothing => Res[V]): Res[V] = this
+    def map[V](f: Nothing => V): Res[V] = this
+  }
+
+  /**
+    * Something failed before the code was run, perhaps a compile error
+    * or a compiler crash or other infrastructure-y problem
+    */
+  case class Failure(s: String) extends Failing
+
+  /**
+    * An exception was thrown when the command was being run
+    */
+  case class Exception(t: Throwable, s: String) extends Failing
+
+  /**
+    * Nothing was entered
+    */
+  case object Skip extends Failing
+
+  /**
+    * The user wanted to exit the REPL
+    */
+  case class Exit(value: Any) extends Failing
+}
+
 
 case class Evaluated(wrapper: String,
                      imports: Seq[ImportData])

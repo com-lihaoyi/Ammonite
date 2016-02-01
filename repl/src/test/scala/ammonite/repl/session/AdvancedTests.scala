@@ -1,7 +1,7 @@
 package ammonite.repl.session
 
 import ammonite.repl.TestUtils._
-import ammonite.repl.{Checker, Res}
+import ammonite.repl.{TestRepl, Res}
 import utest._
 
 import scala.collection.{immutable => imm}
@@ -9,7 +9,7 @@ import scala.collection.{immutable => imm}
 object AdvancedTests extends TestSuite{
   val tests = TestSuite{
     println("AdvancedTests")
-    val check = new Checker()
+    val check = new TestRepl()
     'pprint{
       check.session("""
         @ Seq.fill(10)(Seq.fill(3)("Foo"))
@@ -53,7 +53,7 @@ object AdvancedTests extends TestSuite{
     }
 
     'predef{
-      val check2 = new Checker{
+      val check2 = new TestRepl{
         override def predef = """
           import math.abs
           val x = 1
@@ -265,8 +265,8 @@ object AdvancedTests extends TestSuite{
       // one getting its own `ReplBridge`. This ensures that the various
       // Interpreters are properly encapsulated and don't interfere with each
       // other.
-      val c1 = new Checker()
-      val c2 = new Checker()
+      val c1 = new TestRepl()
+      val c2 = new TestRepl()
       c1.session("""
         @ repl.prompt() = "A"
       """)

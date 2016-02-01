@@ -1,6 +1,6 @@
 package ammonite.repl.session
 
-import ammonite.repl.Checker
+import ammonite.repl.TestRepl
 import ammonite.repl.TestUtils._
 import utest._
 
@@ -10,7 +10,7 @@ object ImportTests extends TestSuite{
 
   val tests = TestSuite{
     println("ImportTests")
-    val check = new Checker()
+    val check = new TestRepl()
 
     'basic {
       'hello{

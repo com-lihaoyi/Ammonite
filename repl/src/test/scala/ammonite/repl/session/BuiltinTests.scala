@@ -1,6 +1,6 @@
 package ammonite.repl.session
 
-import ammonite.repl.Checker
+import ammonite.repl.TestRepl
 import utest._
 
 import scala.collection.{immutable => imm}
@@ -8,7 +8,7 @@ object BuiltinTests extends TestSuite{
 
   val tests = TestSuite{
     println("EvaluatorTests")
-    val check = new Checker()
+    val check = new TestRepl()
     'basicConfig{
       check.session("""
         @ // Set the shell prompt to be something else

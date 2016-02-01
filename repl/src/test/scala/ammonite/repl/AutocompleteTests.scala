@@ -9,7 +9,7 @@ object AutocompleteTests extends TestSuite{
   val tests = TestSuite {
     println("AutocompleteTests")
     'selection{
-      val check = new Checker()
+      val check = new TestRepl()
       def complete(caretCode: String,
                    cmp: (Set[String]) => Set[String],
                    sigs: (Set[String]) => Set[String] = _ => Set()) = {

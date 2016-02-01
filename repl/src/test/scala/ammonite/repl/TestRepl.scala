@@ -11,7 +11,7 @@ import scala.collection.mutable
  * A test REPL which does not read from stdin or stdout files, but instead lets
  * you feed in lines or sessions programmatically and have it execute them.
  */
-class Checker {
+class TestRepl {
   def predef = ""
   var allOutput = ""
 
@@ -25,8 +25,8 @@ class Checker {
   val error = mutable.Buffer.empty[String]
   val printer = Printer(
     out.append(_),
-    s => warning.append(s"$s\n"),
-    s => error.append(s"$s\n")
+    warning.append(_),
+    error.append(_)
   )
   val interp = new Interpreter(
     Ref[String](""),
@@ -73,6 +73,7 @@ class Checker {
 
       val (processed, out, warning, error) = run(commandText.mkString("\n"))
       interp.handleOutput(processed)
+
       if (expected.startsWith("error: ")) {
         val strippedExpected = expected.stripPrefix("error: ")
         assert(error.contains(strippedExpected))
@@ -85,44 +86,19 @@ class Checker {
         assert(processed.isInstanceOf[Res.Success[_]] || processed.isInstanceOf[Res.Skip.type])
 
       }else {
-        val regex = createRegex(expected)
         processed match {
           case Res.Success(str) =>
-            failLoudly(assert(out.replaceAll(" *\n", "\n").trim.matches(regex)))
+            failLoudly(assert(out == expected))
 
-          case Res.Failure(failureMsg) => assert({identity(out); identity(regex); false})
+          case Res.Failure(failureMsg) => assert({identity(out); identity(expected); false})
           case Res.Exception(ex, failureMsg) =>
             val trace = Repl.showException(ex, "", "", "") + "\n" +  failureMsg
-            assert({identity(trace); identity(regex); false})
+            assert({identity(trace); identity(expected); false})
           case _ => throw new Exception(
             s"Printed $out does not match what was expected: $expected"
           )
         }
       }
-    }
-  }
-
-  /**
-   * This method creates a regex from the expected string escaping all specials,
-   * so you don't have to bother with escaping the in tests, if they are not
-   * needed. Special meanings can be activated by inserting a backslash
-   * before the special character. This is essentially vim's nomagic mode.
-   */
-  def createRegex(expected: String) = {
-    // these characters need to be escaped to use them as regex specials.
-    val specialChars=".|+*?[](){}^$"
-    // idk why do i need 4 backslashes in the replacement
-    // first part is handled as a regex, so we need the escape to match the literal character.
-    val escape = specialChars.map{ c => (s"\\$c", s"\\\\$c") }
-    // We insert a backslash so special chars are handled as literals
-    val escapedExpected = escape.foldLeft(expected){
-      case (exp, (pattern, replacement)) => exp.replaceAll(pattern, replacement)
-    }
-    // special chars that had a backslash before them now have two.
-    val unescape = specialChars.map{ c => (s"\\\\\\\\\\$c", c.toString) }
-    // we replace double backslashed stuff with regex specials
-    unescape.foldLeft(escapedExpected){
-      case (exp, (pattern, replacement)) => exp.replaceAll(pattern, replacement)
     }
   }
 
@@ -135,7 +111,12 @@ class Checker {
       input,
       Parsers.split(input).get.get.value
     )
-
+    processed match{
+      case Res.Failure(s) => printer.error(s)
+      case Res.Exception(throwable, msg) =>
+        printer.error(Repl.showException(throwable, "", "", ""))
+      case _ =>
+    }
     interp.handleOutput(processed)
     (processed, out.mkString, warning.mkString("\n"), error.mkString("\n"))
   }

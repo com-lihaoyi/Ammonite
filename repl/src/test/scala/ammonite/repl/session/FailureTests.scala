@@ -1,13 +1,13 @@
 package ammonite.repl.session
 
-import ammonite.repl.Checker
+import ammonite.repl.TestRepl
 import utest._
 
 import scala.collection.{immutable => imm}
 object FailureTests extends TestSuite{
   val tests = TestSuite{
     println("FailureTests")
-    val check = new Checker()
+    val check = new TestRepl()
     'compileFailure {
       check.session("""
         @ doesnt_exist
@@ -17,16 +17,16 @@ object FailureTests extends TestSuite{
         error: package java is not a value
 
         @ 1 + vale
-        error: Compilation Failed
-        Main.scala:\d\+: not found: value vale
+        error: not found: value vale
         1 + vale
             ^
+        Compilation Failed
 
         @ val x = 1 + vale
-        error: Compilation Failed
-        Main.scala:\d\+: not found: value vale
+        error: not found: value vale
         val x = 1 + vale
                     ^
+        Compilation Failed
       """)
     }
     'compilerCrash{

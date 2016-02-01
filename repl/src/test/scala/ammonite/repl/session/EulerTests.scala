@@ -1,11 +1,11 @@
 package ammonite.repl.session
 
-import ammonite.repl.Checker
+import ammonite.repl.TestRepl
 import utest._
 object EulerTests extends TestSuite{
   val tests = TestSuite{
     println("EulerTests")
-    val check = new Checker()
+    val check = new TestRepl()
 
 
     // Taken from https://pavelfatin.com/scala-for-project-euler/
