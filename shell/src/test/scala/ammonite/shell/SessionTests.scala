@@ -8,8 +8,9 @@ import utest._
  * Created by haoyi on 8/30/15.
  */
 object SessionTests extends TestSuite{
-  val check = new TestRepl()
+
   val tests = TestSuite{
+    val check = new TestRepl()
     'workingDir{
       check.session(s"""
         @ import ammonite.ops._
