@@ -51,31 +51,31 @@ object Sample{
     val ammExec = "repl/target/scala-2.11/" + executableName
     val predef = "shell/src/main/resources/ammonite/shell/example-predef-bare.scala"
     val out = exec(Seq(ammExec, "--predef-file", predef), s"${ammoniteCode.trim}\nexit\n")
+//    val out = read! wd/'target/'cache/"-1080873603"
     val lines = out.lines.toSeq.drop(3).dropRight(2).mkString("\n")
 //    println("ammSample " + lines)
     val ammOutput = lines.split("\u001b")
 
-    val buffered = mutable.Buffer.empty[Modifier]
+    var bufferedColor: Option[Modifier] = None
+    var bufferedBackground: Option[Modifier] = None
     val wrapped = mutable.Buffer.empty[Tag]
     for(snippet <- ammOutput) {
-      colors.find(snippet startsWith _._1) match{
-        case None =>
-          backgrounds.find(snippet startsWith _._1) match{
-            case Some((ansiCode, cssColor)) =>
-              buffered.append(backgroundColor := backgrounds(ansiCode))
-            case None =>
-              wrapped.append(
-                span(color := black, ("\u001B"+snippet).replaceAll(ansiRegex, ""))
-              )
-          }
-
-        case Some((ansiCode, cssColor)) =>
-          val frag = span(color := cssColor, buffered.headOption, snippet.drop(ansiCode.length))
-          wrapped.append(frag)
-          buffered.clear()
+      if (snippet.startsWith(Console.RESET.tail)) {
+        bufferedColor = None
+        bufferedBackground = None
       }
-    }
+      colors.find(snippet startsWith _._1).foreach{
+        case (ansiCode, cssColor) =>
+          bufferedColor = Some(color := cssColor)
+      }
+      backgrounds.find(snippet startsWith _._1).foreach{
+        case (ansiCode, cssColor) =>
+          bufferedBackground = Some(backgroundColor := cssColor)
+      }
 
+      val frag = span(bufferedColor, bufferedBackground, snippet.replaceFirst(ansiRegex.tail, ""))
+      wrapped.append(frag)
+    }
 
     write.over(cwd/"temp.html", wrapped.render.replaceAll("\r\n|\n\r", "\n"))
     raw(wrapped.render.replaceAll("\r\n|\n\r", "\n"))
