@@ -183,38 +183,7 @@ trait Session{
     */
   def delete(name: String): Unit
 }
-case class SessionChanged(removedImports: Set[scala.Symbol],
-                          addedImports: Set[scala.Symbol],
-                          removedJars: Set[java.net.URL],
-                          addedJars: Set[java.net.URL])
-object SessionChanged{
-  implicit val pprinter: PPrinter[SessionChanged] = PPrinter[SessionChanged]{
-    (data, config) =>
-      val output = mutable.Buffer.empty[String]
-      def printDelta[T: PPrint](name: String, d: Iterable[T]) = {
-        if (d.nonEmpty){
-          Iterator("\n", name, ": ") ++ pprint.tokenize(d)(implicitly, config)
-        }else Iterator()
-      }
-      val res = Iterator(
-        printDelta("Removed Imports", data.removedImports),
-        printDelta("Added Imports", data.addedImports),
-        printDelta("Removed Jars", data.removedJars),
-        printDelta("Added Jars", data.addedJars)
-      )
-      res.flatten
-  }
-  def delta(oldFrame: Frame, newFrame: Frame): SessionChanged = {
-    def frameSymbols(f: Frame) = f.imports.map(_.toName).map(Symbol(_)).toSet
-    new SessionChanged(
-      frameSymbols(oldFrame) -- frameSymbols(newFrame),
-      frameSymbols(newFrame) -- frameSymbols(oldFrame),
-      oldFrame.classloader.allJars.toSet -- newFrame.classloader.allJars.toSet,
-      newFrame.classloader.allJars.toSet -- oldFrame.classloader.allJars.toSet
-    )
-  }
-}
-// End of OpsAPI
+
 trait LoadJar {
 
   /**
@@ -332,3 +301,35 @@ trait DefaultReplAPI extends FullReplAPI {
   }
 }
 object ReplBridge extends ammonite.repl.frontend.ReplAPIHolder{}
+
+case class SessionChanged(removedImports: Set[scala.Symbol],
+                          addedImports: Set[scala.Symbol],
+                          removedJars: Set[java.net.URL],
+                          addedJars: Set[java.net.URL])
+object SessionChanged{
+  implicit val pprinter: PPrinter[SessionChanged] = PPrinter[SessionChanged]{
+    (data, config) =>
+      val output = mutable.Buffer.empty[String]
+      def printDelta[T: PPrint](name: String, d: Iterable[T]) = {
+        if (d.nonEmpty){
+          Iterator("\n", name, ": ") ++ pprint.tokenize(d)(implicitly, config)
+        }else Iterator()
+      }
+      val res = Iterator(
+        printDelta("Removed Imports", data.removedImports),
+        printDelta("Added Imports", data.addedImports),
+        printDelta("Removed Jars", data.removedJars),
+        printDelta("Added Jars", data.addedJars)
+      )
+      res.flatten
+  }
+  def delta(oldFrame: Frame, newFrame: Frame): SessionChanged = {
+    def frameSymbols(f: Frame) = f.imports.map(_.toName).map(Symbol(_)).toSet
+    new SessionChanged(
+      frameSymbols(oldFrame) -- frameSymbols(newFrame),
+      frameSymbols(newFrame) -- frameSymbols(oldFrame),
+      oldFrame.classloader.allJars.toSet -- newFrame.classloader.allJars.toSet,
+      newFrame.classloader.allJars.toSet -- oldFrame.classloader.allJars.toSet
+    )
+  }
+}

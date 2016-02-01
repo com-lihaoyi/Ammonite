@@ -429,3 +429,25 @@
 
       @p
         Typically most organizations already have bastions, firewalls, and other necessary infrastructure to allow trusted parties SSH access to the relevant machines. Running on @code{localhost} lets you leverage that and gain all the same security properties without having to re-implement them in Scala.
+  @sect{REPL Cookbook}
+    @p
+      The Ammonite REPL is meant to be extended: you can load in arbitary Java/Scala modules from the internet via @hl.scala{@sect.ref("Artifact Loading", "load.ivy"}}, and can extend the REPL to do anything you wish to do, and tools like @sect.ref{Ammonite-Shell} are simply modules like any other. Here are a few example snippets of things you can do with the Ammonite-REPL:
+    @sect{HTTP Requests}
+      @p
+        Ammonite does not come with a built-in way to make HTTP requests, but there are Java /Scala modules that do this quite well! Here's an example:
+
+      @hl.scala
+        @ load.ivy("org.scalaj" %% "scalaj-http" % "2.2.0")
+
+        @ import ammonite.ops._, scalaj.http._
+
+        @ val resp = Http("https://api.github.com/repos/scala/scala").asString
+
+        @ val parsed = upickle.json.read(resp.body).asInstanceOf[upickle.Js.Obj]
+
+        @ for((k, v) <- parsed.value) write(cwd/'target/'temp/key, upickle.json.write(value))
+
+        @ ls! cwd/'target/'temp
+
+      @p
+        In this example, we use the @lnk("Scalaj HTTP", "https://github.com/scalaj/scalaj-http") library to download a URL, and we use @lnk("uPickle", "http://lihaoyi.github.io/upickle-pprint/upickle/") and @sect.ref{Ammonite-Ops} to parse the JSON and write it into files. uPickle and Ammonite-Ops are bundled with the Ammonite REPL and are used internally, and while Scalaj HTTP isn't, we can simply load it from the public repositories via @hl.scala{load.ivy}
