@@ -431,23 +431,320 @@
         Typically most organizations already have bastions, firewalls, and other necessary infrastructure to allow trusted parties SSH access to the relevant machines. Running on @code{localhost} lets you leverage that and gain all the same security properties without having to re-implement them in Scala.
   @sect{REPL Cookbook}
     @p
-      The Ammonite REPL is meant to be extended: you can load in arbitary Java/Scala modules from the internet via @hl.scala{@sect.ref("Artifact Loading", "load.ivy"}}, and can extend the REPL to do anything you wish to do, and tools like @sect.ref{Ammonite-Shell} are simply modules like any other. Here are a few example snippets of things you can do with the Ammonite-REPL:
+      The Ammonite REPL is meant to be extended: you can load in arbitary Java/Scala modules from the internet via @hl.scala{@sect.ref("Artifact Loading", "load.ivy")}, and can extend the REPL to do anything you wish to do, and tools like @sect.ref{Ammonite-Shell} are simply modules like any other. Here are a few example snippets of things you can do with the Ammonite-REPL:
     @sect{HTTP Requests}
       @p
         Ammonite does not come with a built-in way to make HTTP requests, but there are Java /Scala modules that do this quite well! Here's an example:
 
       @hl.scala
-        @ load.ivy("org.scalaj" %% "scalaj-http" % "2.2.0")
+        Welcome to the Ammonite Repl
+        @@ load.ivy("org.scalaj" %% "scalaj-http" % "2.2.0")
+        :: loading settings ::
+        :: resolving dependencies ::
+        ...
+        [SUCCESSFUL ] org.scalaj#scalaj-http_2.11;2.2.0!scalaj-http_2.11.jar (63ms)
 
-        @ import ammonite.ops._, scalaj.http._
+        @@ import ammonite.ops._, scalaj.http._
+        import ammonite.ops._, scalaj.http._
 
-        @ val resp = Http("https://api.github.com/repos/scala/scala").asString
+        @@ val resp = Http("https://api.github.com/repos/scala/scala").asString
+        resp: HttpResponse[String] = HttpResponse(
+        {"id":2888818,"name":"scala","full_name":"scala/scala","owner":
+        {"login":"scala","id":57059,"avatar_url":
+        "https://avatars.githubusercontent.com/u/57059?v=3","gravatar_id":"",
+        "url":"https://api.github.com/users/scala","html_url":"https://github.com/scala",
+        "followers_url":"https://api.github.com/users/scala/followers",
+        "following_url":"https://api.github.com/users/scala/following{/other_user}",
+        "gists_url":"https://api.github.com/users/scala/gists{/gist_id}",
+        "starred_url":"https://api.github.com/users/scala/starred{/owner}{/repo}",
+        "subscriptions_url":"https://api.github.com/users/scala/subscriptions",
+        ...
 
-        @ val parsed = upickle.json.read(resp.body).asInstanceOf[upickle.Js.Obj]
+        @@ for((k, v) <- parsed.value) write(cwd/'target/'temp/key, upickle.json.write(value))
 
-        @ for((k, v) <- parsed.value) write(cwd/'target/'temp/key, upickle.json.write(value))
+        @@ val parsed = upickle.json.read(resp.body).asInstanceOf[upickle.Js.Obj]
+        parsed: upickle.Js.Obj = Obj(
+          ArrayBuffer(
+            ("id", Num(2888818.0)),
+            ("name", Str("scala")),
+            ("full_name", Str("scala/scala")),
+            (
+              "owner",
+              Obj(
+                ArrayBuffer(
+                  ("login", Str("scala")),
+        ...
 
-        @ ls! cwd/'target/'temp
+        @@ for((k, v) <- parsed.value) write(cwd/'target/'temp/k, upickle.json.write(v))
+
+        @@ ls! cwd/'target/'temp
+        res6: LsSeq = LsSeq(
+          /Users/haoyi/Dropbox (Personal)/Workspace/Ammonite/target/temp/archive_url,
+          /Users/haoyi/Dropbox (Personal)/Workspace/Ammonite/target/temp/assignees_url,
+          /Users/haoyi/Dropbox (Personal)/Workspace/Ammonite/target/temp/blobs_url,
+          /Users/haoyi/Dropbox (Personal)/Workspace/Ammonite/target/temp/branches_url,,
+        ...
 
       @p
-        In this example, we use the @lnk("Scalaj HTTP", "https://github.com/scalaj/scalaj-http") library to download a URL, and we use @lnk("uPickle", "http://lihaoyi.github.io/upickle-pprint/upickle/") and @sect.ref{Ammonite-Ops} to parse the JSON and write it into files. uPickle and Ammonite-Ops are bundled with the Ammonite REPL and are used internally, and while Scalaj HTTP isn't, we can simply load it from the public repositories via @hl.scala{load.ivy}
+        In this example, we use the @lnk("Scalaj HTTP", "https://github.com/scalaj/scalaj-http") library to download a URL, and we use @lnk("uPickle", "http://lihaoyi.github.io/upickle-pprint/upickle/") and @sect.ref{Ammonite-Ops} to parse the JSON and write it into files. uPickle and Ammonite-Ops are bundled with the Ammonite REPL and are used internally, and while Scalaj HTTP isn't, we can simply load it from the public repositories via @hl.scala{load.ivy}.
+      @p
+        This is a small example, but it illustrates the potential: if you find yourself needing to scrape some website or bulk-download large quantities of data from some website's HTTP/JSON API, you can start doing so within a matter of seconds using Ammonite. The results are given to you in nicely structured data, and you can deal with them using any Java or Scala libraries or tools you are used to rather than being forced to munge around in Bash. Sometimes, you may find that you need to get data from somewhere without a nice JSON API, which means you'd need to fall back to @sect.ref{Scraping HTML}...
+
+    @sect{Scraping HTML}
+      @p
+        Not every website has an API, and not every website is meant to be accessed programmatically. That doesn't mean you can't do it! Using libraries like @lnk("JSoup", "http://jsoup.org/"), you can quickly and easily get the computer to extract useful information from HTML that was meant to humans. Using the Ammonite REPL, you can do it interactively and without needing to set up annoying project scaffolding.
+      @hl.scala
+        @@ load.ivy("org.jsoup" % "jsoup" % "1.7.2")
+
+        @@ import org.jsoup._ // import Jsoup
+
+        @@ collection.JavaConversions._ // make Java collections easier to use
+
+        @@ val doc = Jsoup.connect("http://en.wikipedia.org/").get()
+
+        @@ doc.select("h1")
+        res54: select.Elements = <h1 id="firstHeading" class="firstHeading" lang="en">Main Page</h1>
+        @@ doc.select("h2")
+        res55: select.Elements = <h2 id="mp-tfa-h2" style="margin:3px; background:#cef2e0; font-family:inherit; font-size:120%; font-weight:bold; border:1px solid #a3bfb1; text-align:left; color:#000; padding:0.2em 0.4em;"><span class="mw-headline" id="From_today.27s_featured_article">From today's featured article</span></h2>
+        <h2 id="mp-dyk-h2" style="margin:3px; background:#cef2e0; font-family:inherit; font-size:120%; font-weight:bold; border:1px solid #a3bfb1; text-align:left; color:#000; padding:0.2em 0.4em;"><span class="mw-headline" id="Did_you_know...">Did you know...</span></h2>
+        <h2 id="mp-itn-h2" style="margin:3px; background:#cedff2; font-family:inherit; font-size:120%; font-weight:bold; border:1px solid #a3b0bf; text-align:left; color:#000; padding:0.2em 0.4em;"><span class="mw-headline" id="In_the_news">In the news</span></h2>
+        <h2 id="mp-otd-h2" style="margin:3px; background:#cedff2; font-family:inherit; font-size:120%; font-weight:bold; border:1px solid #a3b0bf; text-align:left; color:#000; padding:0.2em 0.4em;"><span class="mw-headline" id="On_this_day...">On this day...</span></h2>
+        ...
+
+        @@ doc.select("h2").map(_.text)
+        res56: collection.mutable.Buffer[String] = ArrayBuffer(
+          "From today's featured article",
+          "Did you know...",
+          "In the news",
+          "On this day...",
+          "From today's featured list",
+          "Today's featured picture",
+          "Other areas of Wikipedia",
+          "Wikipedia's sister projects",
+          "Wikipedia languages",
+          "Navigation menu"
+        )
+      @p
+        If you wanted to scrape headlines off some news-site or scrape video game reviews off of some gaming site, you don't need to worry about setting up a project and installing libraries and all that stuff. You can simply load libraries like Jsoup right into the Ammonite REPL, copy some example from their website, and start scraping useful information in less than a minute.
+
+    @sect{GUI Applications}
+      @p
+        The Ammonite REPL runs on the Java virtual machine, which means you can use it to create Desktop GUI applications like anyone else who uses Java! Here's an example of how to create a hello-world interactive desktop app using Swing
+
+      @hl.scala
+        @@ {
+          import javax.swing._, java.awt.event._
+          val frame = new JFrame("Hello World Window")
+
+          val button = new JButton("Click Me")
+          button.addActionListener(new ActionListener{
+            def actionPerformed(e: ActionEvent) = button.setText("You clicked the button!")
+          })
+          button.setPreferredSize(new java.awt.Dimension(200, 100))
+          frame.getContentPane.add(button)
+          frame.pack()
+          frame.setVisible(true)
+
+          }
+      @p
+        This can be run inside the Ammonite REPL without installing anything, and will show the following window with a single button:
+
+      @img(src:="Swing1.png", marginLeft.auto, marginRight.auto)
+
+      @p
+        When clicked, it changes text:
+
+      @img(src:="Swing2.png", marginLeft.auto, marginRight.auto)
+
+      @p
+        Although this is just a small demo, you can use Ammonite yourself to experiment with GUI programming without needing to go through the hassle of setting up an environment and project and all that rigmarole. Just run the code right in the console! You can even interact with the GUI live in the console, e.g. running this snippet of code to add another action listener to keep count of how many times you clicked the button
+
+      @hl.scala
+        @@ {
+          var count = 0
+          button.addActionListener(new ActionListener{
+            def actionPerformed(e: ActionEvent) = {
+              count += 1
+              frame.setTitle("Clicks: " + count)
+            }
+          })
+          }
+
+      @p
+        Which immediately becomes visible in the title of the window:
+
+      @img(src:="Swing3.png", marginLeft.auto, marginRight.auto)
+
+      @p
+        Even while you're clicking on the button, you can still access @code{count} in the console:
+      @hl.scala
+        @@ count
+        res12: Int = 6
+      @p
+        This is a level of live interactivity which is traditionally hard to come by in the world of desktop GUI applications, but with the Ammonite REPL, it's totally seamless
+
+    @sect{Office Automation}
+      @p
+        Apart from writing code, you very often find yourself dealing with documents and spreadsheets of various sorts. This is often rather tedious. Wouldn't it be cool if you could deal with these things programmatically? It turns out that there are open-soure Java libraries such as @lnk("Apache POI", "https://poi.apache.org/") that let you do this, and with the Ammonite-REPL you can quickly and easily load these libraries and get to work on your favorite documents. Here's an example extracting some data from my old Resume, in @code{.docx} format:
+
+      @hl.scala
+        @@ load.ivy("org.apache.poi" % "poi-ooxml" % "3.13")
+
+        @@ import ammonite.ops._                  // Prepare to deal with some files
+        @@ import org.apache.poi.xwpf.usermodel._ // Bring Ms-Word APIs into scope
+        @@ import collection.JavaConversions._    // Make use of Java collections easier
+
+        @@ val path = cwd/up/up/'Archive/'Documents/"Old Resumes"/"Resume V2.docx"
+
+        @@ val docx = new XWPFDocument(new java.io.ByteArrayInputStream(read.bytes(path)))
+
+        @@ docx.get<tab>
+        getAllEmbedds                            getParagraphArray
+        getAllPackagePictures                    getParagraphPos
+        getAllPictures                           getParagraphs
+        getBodyElements                          getParagraphsIterator
+        getBodyElementsIterator                  getParent
+        getClass                                 getPart
+        getCommentByID                           getPartById
+        getComments                              getPartType
+        getDocument                              getPictureDataByID
+        ...
+
+        @@ docx.getParagraphs.map(_.getText)
+        res28: collection.mutable.Buffer[String] = ArrayBuffer(
+          """
+        Haoyi Li
+          """,
+          """
+        Education	Massachusetts Institute of Technology		Cambridge, MA
+          """,
+          """
+        Bachelor of Science degree in Computer Science, GPA 4.8/5.0	 Sep 2010 – Jun 2013
+          """,
+          """
+        Work	Dropbox		San Francisco, CA
+        ...
+
+        @@ docx.getHyperlinks.map(_.getURL)
+        res27: Array[String] = Array(
+          "http://vimeo.com/87845442",
+          "http://www.github.com/lihaoyi/scalatags",
+          "http://www.github.com/lihaoyi/scala.rx",
+          "http://www.github.com/lihaoyi/scala-js-fiddle",
+          "http://www.github.com/lihaoyi/metascala",
+          "https://www.github.com/lihaoyi/macropy",
+          "http://www.github.com/lihaoyi",
+          "http://www.github.com/lihaoyi"
+        )
+      @p
+        As you can see, loading the Apache POI library is just a single command, reading in my resume file is just one or two more, and then you can immediate start exploring the document's data model to see what inside interests you. You even get tab-completion on the methods of the document, making it really easy for you to interactively explore all the things that a word document has to offer!
+      @p
+        This is just a small example, but you can easily do more things in the same vein: Apache POI lets you create/modify/save @code{.docx} files in addition to reading from them, meaning you can automatically perform batch operations on large numbers of documents. The library also provides mechanisms to load in Excel spreadsheets and Powerpoint slide decks, meaning you have easy, programmable access to the great bulk of any Microsoft-Office files you find yourself dealing with.
+    @sect{Image Processing}
+      @p
+        You can perform lots of image operations in Java. You can use @lnk("BufferedImagee", "https://docs.oracle.com/javase/7/docs/api/java/awt/image/BufferedImage.html") if you want to access the low-level details or read/write individual pixels, and using @lnk("Java2D", "http://zetcode.com/gfx/java2d/") you can draw shapes, perform transforms, or do anything you could possibly want to do with the images.
+      @p
+        There are also simple libraries like @lnk("Thumbnailator", "https://github.com/coobird/thumbnailator") if you're doing basic things like renaming/resizing/rotating and don't need pixel-per-pixel access. This is an example of using Thumbnailator to resize a folder of images and put them somewhere else:
+
+      @hl.scala
+        @@ load.ivy("net.coobird" % "thumbnailator" % "0.4.8")
+
+        @@ import net.coobird.thumbnailator._
+        import net.coobird.thumbnailator._
+
+        @@ val images = ls! cwd/'repl/'src/'test/'resources/'testdata/'images
+        images: LsSeq = LsSeq(
+          /Users/haoyi/Dropbox (Personal)/Workspace/Ammonite/repl/src/test/resources/testdata/images/GettingStarted.png,
+          /Users/haoyi/Dropbox (Personal)/Workspace/Ammonite/repl/src/test/resources/testdata/images/Highlighting.png,
+          /Users/haoyi/Dropbox (Personal)/Workspace/Ammonite/repl/src/test/resources/testdata/images/SystemShell.png
+        )
+        @@ val dest = cwd/'target/'thumbnails
+        dest: Path = /Users/haoyi/Dropbox (Personal)/Workspace/Ammonite/target/thumbnails
+
+        @@ mkdir! dest
+
+        @@ for(i <- images) {
+            Thumbnails.of(i.toString).size(200, 200).toFile(dest/i.last toString)
+          }
+
+        @@ val thumbnails = ls! dest
+        thumbnails: LsSeq = LsSeq(
+          /Users/haoyi/Dropbox (Personal)/Workspace/Ammonite/target/thumbnails/GettingStarted.png,
+          /Users/haoyi/Dropbox (Personal)/Workspace/Ammonite/target/thumbnails/Highlighting.png,
+          /Users/haoyi/Dropbox (Personal)/Workspace/Ammonite/target/thumbnails/SystemShell.png
+        )
+
+        @@ images.map(_.size) // Original image files are pretty big
+        res44: Seq[Long] = List(180913L, 208328L, 227570L)
+
+        @@ thumbnails.map(_.size) // Thumbnailed image files are much smaller
+        res45: Seq[Long] = List(11129L, 11790L, 11893L)
+    @sect{Machine Learning}
+      @p
+        The word "Machine Learning" sounds big and intimidating, like something you'd need to spend 6 years getting a PhD before you understand. What if you could "do some machine-learning" (whatever that means) in your spare time, in a minute or two? It turns out there are many Java libraries that can help you with basics, and with the Ammonite REPL getting started is easy.
+
+      @p
+        Here's one example of how you can get started using the @lnk("OpenNLP", "http://opennlp.apache.org/") project to do some natural-language processing in just a few minutes. The example was found @lnk("online", "http://www.programcreek.com/2012/05/opennlp-tutorial/#sentence detector"), and shows how to extract english names from a raw @code{String} using NLP:
+
+      @hl.scala
+        @@ load.ivy("org.apache.opennlp" % "opennlp-tools" % "1.6.0") // load OpenNLP
+
+        @@ // Turns out you need training data, use Scalaj-HTTP to download it
+
+        @@ load.ivy("org.scalaj" %% "scalaj-http" % "2.2.0")
+
+        @@ val tokenDataUrl = "http://opennlp.sourceforge.net/models-1.5/en-token.bin"
+
+        @@ val tokenData = scalaj.http.Http(tokenDataUrl).asBytes
+        tokenData: HttpResponse[Array[Byte]] = HttpResponse(
+          Array(
+            80,
+            75,
+            3,
+            4,
+            20,
+        ...
+
+        @@ import opennlp.tools.tokenize._ // let's get started with OpenNLP!
+
+        @@ val str = "Hi. How are you? This is Mike. Did you see book about Peter Smith?"
+
+        @@ import java.io.ByteArrayInputStream
+
+        @@ val tokenModel = new TokenizerModel(new ByteArrayInputStream(tokenData.body))
+
+        @@ val tokenizer = new TokenizerME(tokenModel)
+
+        @@ val tokens = tokenizer.tokenize(p)
+        tplems: Array[String] = Array(
+          "Hi",
+          ".",
+          "How",
+          "are",
+          "you"
+        ...
+
+        @@ import opennlp.tools.namefind._
+
+        @@ val nameDataUrl = "http://opennlp.sourceforge.net/models-1.5/en-ner-person.bin"
+
+        @@ val nameData = Http(nameDataUrl).asBytes
+        nameData: HttpResponse[Array[Byte]] = HttpResponse(
+          Array(
+            80,
+            75,
+            3,
+            4,
+            20,
+        ...
+
+        @@ val nameModel = new TokenNameFinderModel(new ByteArrayInputStream(nameData.body))
+
+        @@ val nameFinder = new NameFinderME(nameModel)
+        nameFinder: NameFinderME = opennlp.tools.namefind.NameFinderME@@491eb5ef
+
+        @@ val names = nameFinder.find(tokens)
+        names: Array[opennlp.tools.util.Span] = Array([8..9) person, [15..17) person)
+
+        @@ opennlp.tools.util.Span.spansToStrings(names, tokens)
+        res96: Array[String] = Array("Mike", "Peter Smith")
