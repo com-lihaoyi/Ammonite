@@ -47,7 +47,7 @@
       @li
         Fix #312 lsing empty directory gives error, thanks to @lnk("coderabhishek", "https://github.com/coderabhishek")
       @li
-        Implemented history-search/reverse-i-search/Ctrl-R
+        Implemented @sect.ref{History Search}, also known as reverse-i-search/Ctrl-R
       @li
         Fixed #325: error due to function types with by-name parameters
       @li

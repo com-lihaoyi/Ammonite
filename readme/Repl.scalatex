@@ -148,6 +148,16 @@
         @p
           All the readline-style navigation hotkeys like @b{Ctrl-W} to delete a word or @b{Esc-Left}/@b{Right} to navigate one word left/right still work. If you're comfortable with consoles like Bash, Python, IPython or even the default Scala console, you should have no trouble as all the exact same hotkeys work in Ammonite
 
+      @sect{History Search}
+
+        @img(src:="HistorySearch.gif", width:="445px", marginRight.auto, marginLeft.auto, display.block)
+
+        @p
+          Apart from browsing your command-line history with @code{UP}, you can also perform a history search by entering some search term and @i{then} pressing @code{UP}. That will pull up the most recent history line with that term in it, underlined. You can continue to press @code{UP} or @code{DOWN} to cycle through the matches, or @code{Backspace} or continue typing characters to refine your search to what you want.
+        @p
+          You can press @code{TAB}, or any other command character (@code{LEFT}, @code{RIGHT}, ...) to end the search and let you continue working with the currently-displayed command. Pressing @code{ENTER} will end the search and immediately submit the command to be run.
+        @p
+          You can also kick off a history search using @code{Ctrl-R}, and use @code{Ctrl-R} to cycle through the matches.
 
 
     @sect{Superior Autocomplete}
