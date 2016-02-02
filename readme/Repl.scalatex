@@ -444,7 +444,21 @@
   @sect{REPL Cookbook}
 
     @p
-      The Ammonite REPL is meant to be extended: you can load in arbitary Java/Scala modules from the internet via @sect.ref("Artifact Loading", "load.ivy"), and can extend the REPL to do anything you wish to do, and tools like @sect.ref{Ammonite-Shell} are simply modules like any other. Here are a few example snippets of things you can do with the Ammonite-REPL:
+      The Ammonite Scala REPL is meant to be extended: you can load in arbitary Java/Scala modules from the internet via @sect.ref("Artifact Loading", "load.ivy"). Using this third-party code, you extend the REPL to do anything you wish to do, and tools like @sect.ref{Ammonite-Shell} are simply modules like any other. Simple install Java, @sect.ref("Ammonite-REPL", "download Ammonite") onto any Linux/OSX machine, and try out one of these fun snippets!
+
+    @ul
+      @li
+        @sect.ref{HTTP Requests}
+      @li
+        @sect.ref{Scraping HTML}
+      @li
+        @sect.ref{GUI Applications}
+      @li
+        @sect.ref{Office Automation}
+      @li
+        @sect.ref{Image Processing}
+      @li
+        @sect.ref{Machine Learning}
 
     @sect{HTTP Requests}
       @p
@@ -651,6 +665,8 @@
         As you can see, loading the Apache POI library is just a single command, reading in my resume file is just one or two more, and then you can immediate start exploring the document's data model to see what inside interests you. You even get tab-completion on the methods of the document, making it really easy for you to interactively explore all the things that a word document has to offer!
       @p
         This is just a small example, but you can easily do more things in the same vein: Apache POI lets you create/modify/save @code{.docx} files in addition to reading from them, meaning you can automatically perform batch operations on large numbers of documents. The library also provides mechanisms to load in Excel spreadsheets and Powerpoint slide decks, meaning you have easy, programmable access to the great bulk of any Microsoft-Office files you find yourself dealing with.
+
+
     @sect{Image Processing}
       @p
         You can perform lots of image operations in Java. You can use @lnk("BufferedImagee", "https://docs.oracle.com/javase/7/docs/api/java/awt/image/BufferedImage.html") if you want to access the low-level details or read/write individual pixels, and using @lnk("Java2D", "http://zetcode.com/gfx/java2d/") you can draw shapes, perform transforms, or do anything you could possibly want to do with the images.
