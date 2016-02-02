@@ -28,10 +28,12 @@
         </head>
         <body class="type">
       <div id="definition">
-        <img alt="Class" src="../../../lib/class_big.png" />
+        <a href="Frame$.html" title="See companion object"><img alt="Class/Object" src="../../../lib/class_to_object_big.png" /></a>
         <p id="owner"><a href="../../package.html" class="extype" name="ammonite">ammonite</a>.<a href="../package.html" class="extype" name="ammonite.repl">repl</a>.<a href="package.html" class="extype" name="ammonite.repl.interp">interp</a></p>
-        <h1>Frame</h1><h3><span class="morelinks"><div>Related Doc:
-            <a href="package.html" class="extype" name="ammonite.repl.interp">package interp</a>
+        <h1><a href="Frame$.html" title="See companion object">Frame</a></h1><h3><span class="morelinks"><div>
+            Related Docs:
+            <a href="Frame$.html" title="See companion object">object Frame</a>
+            | <a href="package.html" class="extype" name="ammonite.repl.interp">package interp</a>
           </div></span></h3><span class="permalink">
       <a href="../../../index.html#ammonite.repl.interp.Frame" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
@@ -42,16 +44,19 @@
       <h4 id="signature" class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">case class</span>
+        <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <span class="name">Frame</span><span class="params">(<span name="classloader">classloader: <a href="SpecialClassLoader.html" class="extype" name="ammonite.repl.interp.SpecialClassLoader">SpecialClassLoader</a></span>, <span name="pluginClassloader">pluginClassloader: <a href="SpecialClassLoader.html" class="extype" name="ammonite.repl.interp.SpecialClassLoader">SpecialClassLoader</a></span>, <span name="previousImports">previousImports: <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <a href="../ImportData.html" class="extype" name="ammonite.repl.ImportData">ImportData</a>]</span>, <span name="extraJars">extraJars: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<span class="extype" name="java.io.File">File</span>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">Frame</span><span class="result"> extends <a href="../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Represents a single &quot;frame&quot; of the <code>sess.save</code>/<code>sess.load</code> stack/tree.</p><p>Exposes <code>imports</code> and <code>classpath</code> as readable but only writable
+in particular ways: <code>imports</code> can only be updated via <code>mergeImports</code>,
+while <code>classpath</code> can only be added to.
+</p></div><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
-          <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.Product">Product</span>, <span class="extype" name="scala.Equals">Equals</span>, <a href="../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent"><a href="../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
         
 
@@ -69,7 +74,7 @@
                 <span class="filtertype">Inherited<br />
                 </span>
                 <ol id="linearization">
-                  <li class="in" name="ammonite.repl.interp.Frame"><span>Frame</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.Product"><span>Product</span></li><li class="in" name="scala.Equals"><span>Equals</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                  <li class="in" name="ammonite.repl.interp.Frame"><span>Frame</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                 </ol>
               </div><div id="ancestors">
             <span class="filtertype"></span>
@@ -89,7 +94,7 @@
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="ammonite.repl.interp.Frame#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(classloader:ammonite.repl.interp.SpecialClassLoader,pluginClassloader:ammonite.repl.interp.SpecialClassLoader,previousImports:Map[String,ammonite.repl.ImportData],extraJars:Seq[java.io.File]):ammonite.repl.interp.Frame"></a>
+      <a id="&lt;init&gt;(classloader:ammonite.repl.interp.SpecialClassLoader,pluginClassloader:ammonite.repl.interp.SpecialClassLoader,imports0:Seq[ammonite.repl.ImportData],classpath0:Seq[java.io.File]):ammonite.repl.interp.Frame"></a>
       <a id="&lt;init&gt;:Frame"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -97,10 +102,10 @@
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">Frame</span><span class="params">(<span name="classloader">classloader: <a href="SpecialClassLoader.html" class="extype" name="ammonite.repl.interp.SpecialClassLoader">SpecialClassLoader</a></span>, <span name="pluginClassloader">pluginClassloader: <a href="SpecialClassLoader.html" class="extype" name="ammonite.repl.interp.SpecialClassLoader">SpecialClassLoader</a></span>, <span name="previousImports">previousImports: <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <a href="../ImportData.html" class="extype" name="ammonite.repl.ImportData">ImportData</a>]</span>, <span name="extraJars">extraJars: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<span class="extype" name="java.io.File">File</span>]</span>)</span>
+        <span class="name">Frame</span><span class="params">(<span name="classloader">classloader: <a href="SpecialClassLoader.html" class="extype" name="ammonite.repl.interp.SpecialClassLoader">SpecialClassLoader</a></span>, <span name="pluginClassloader">pluginClassloader: <a href="SpecialClassLoader.html" class="extype" name="ammonite.repl.interp.SpecialClassLoader">SpecialClassLoader</a></span>, <span name="imports0">imports0: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="../ImportData.html" class="extype" name="ammonite.repl.ImportData">ImportData</a>]</span>, <span name="classpath0">classpath0: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<span class="extype" name="java.io.File">File</span>]</span>)</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Frame@&lt;init&gt;(classloader:ammonite.repl.interp.SpecialClassLoader,pluginClassloader:ammonite.repl.interp.SpecialClassLoader,previousImports:Map[String,ammonite.repl.ImportData],extraJars:Seq[java.io.File]):ammonite.repl.interp.Frame" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.Frame@&lt;init&gt;(classloader:ammonite.repl.interp.SpecialClassLoader,pluginClassloader:ammonite.repl.interp.SpecialClassLoader,imports0:Seq[ammonite.repl.ImportData],classpath0:Seq[java.io.File]):ammonite.repl.interp.Frame" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -165,6 +170,40 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="ammonite.repl.interp.Frame#addClasspath" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="addClasspath(additional:Seq[java.io.File]):Unit"></a>
+      <a id="addClasspath(Seq[File]):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">addClasspath</span><span class="params">(<span name="additional">additional: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<span class="extype" name="java.io.File">File</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.repl.interp.Frame@addClasspath(additional:Seq[java.io.File]):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="ammonite.repl.interp.Frame#addImports" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="addImports(additional:Seq[ammonite.repl.ImportData]):Unit"></a>
+      <a id="addImports(Seq[ImportData]):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">addImports</span><span class="params">(<span name="additional">additional: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="../ImportData.html" class="extype" name="ammonite.repl.ImportData">ImportData</a>]</span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.repl.interp.Frame@addImports(additional:Seq[ammonite.repl.ImportData]):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
     </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <a id="asInstanceOf[T0]:T0"></a>
@@ -195,6 +234,23 @@
       </span>
       </h4><span class="permalink">
       <a href="../../../index.html#ammonite.repl.interp.Frame@classloader:ammonite.repl.interp.SpecialClassLoader" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="ammonite.repl.interp.Frame#classpath" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="classpath:Seq[java.io.File]"></a>
+      <a id="classpath:Seq[File]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">classpath</span><span class="result">: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<span class="extype" name="java.io.File">File</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.repl.interp.Frame@classpath:Seq[java.io.File]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -239,23 +295,23 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="ammonite.repl.interp.Frame#extraJars" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="extraJars:Seq[java.io.File]"></a>
-      <a id="extraJars:Seq[File]"></a>
+    </li><li name="scala.AnyRef#equals" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="equals(x$1:Any):Boolean"></a>
+      <a id="equals(Any):Boolean"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">var</span>
+        <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">extraJars</span><span class="result">: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<span class="extype" name="java.io.File">File</span>]</span>
+        <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Frame@extraJars:Seq[java.io.File]" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.Frame@equals(x$1:Any):Boolean" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="scala.AnyRef#finalize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
       <a id="finalize():Unit"></a>
@@ -296,6 +352,40 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#hashCode" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="hashCode():Int"></a>
+      <a id="hashCode():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">hashCode</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.repl.interp.Frame@hashCode():Int" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="ammonite.repl.interp.Frame#imports" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="imports:Seq[ammonite.repl.ImportData]"></a>
+      <a id="imports:Seq[ImportData]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">imports</span><span class="result">: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="../ImportData.html" class="extype" name="ammonite.repl.ImportData">ImportData</a>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.repl.interp.Frame@imports:Seq[ammonite.repl.ImportData]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
     </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <a id="isInstanceOf[T0]:Boolean"></a>
@@ -381,23 +471,6 @@
       </a>
     </span>
       
-    </li><li name="ammonite.repl.interp.Frame#previousImports" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="previousImports:Map[String,ammonite.repl.ImportData]"></a>
-      <a id="previousImports:Map[String,ImportData]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">var</span>
-      </span>
-      <span class="symbol">
-        <span class="name">previousImports</span><span class="result">: <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <a href="../ImportData.html" class="extype" name="ammonite.repl.ImportData">ImportData</a>]</span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Frame@previousImports:Map[String,ammonite.repl.ImportData]" title="Permalink" target="_top">
-        <img src="../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
     </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
       <a id="synchronized[T0](⇒T0):T0"></a>
@@ -415,6 +488,23 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#toString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="toString():String"></a>
+      <a id="toString():String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.repl.interp.Frame@toString():String" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <a id="wait():Unit"></a>
@@ -493,15 +583,7 @@
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="scala.Serializable">
-              <h3>Inherited from <span class="extype" name="scala.Serializable">Serializable</span></h3>
-            </div><div class="parent" name="java.io.Serializable">
-              <h3>Inherited from <span class="extype" name="java.io.Serializable">Serializable</span></h3>
-            </div><div class="parent" name="scala.Product">
-              <h3>Inherited from <span class="extype" name="scala.Product">Product</span></h3>
-            </div><div class="parent" name="scala.Equals">
-              <h3>Inherited from <span class="extype" name="scala.Equals">Equals</span></h3>
-            </div><div class="parent" name="scala.AnyRef">
+        <div class="parent" name="scala.AnyRef">
               <h3>Inherited from <a href="../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></h3>
             </div><div class="parent" name="scala.Any">
               <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>

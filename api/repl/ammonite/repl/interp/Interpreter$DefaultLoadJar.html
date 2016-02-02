@@ -112,19 +112,19 @@
 
         <div id="values" class="values members">
               <h3>Abstract Value Members</h3>
-              <ol><li name="ammonite.repl.interp.Interpreter.DefaultLoadJar#handleJar" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
-      <a id="handleJar(jar:java.io.File):Unit"></a>
-      <a id="handleJar(File):Unit"></a>
+              <ol><li name="ammonite.repl.interp.Interpreter.DefaultLoadJar#handleClasspath" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="handleClasspath(jar:java.io.File):Unit"></a>
+      <a id="handleClasspath(File):Unit"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier">abstract </span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">handleJar</span><span class="params">(<span name="jar">jar: <span class="extype" name="java.io.File">File</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+        <span class="name">handleClasspath</span><span class="params">(<span name="jar">jar: <span class="extype" name="java.io.File">File</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Interpreter$DefaultLoadJar@handleJar(jar:java.io.File):Unit" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.Interpreter$DefaultLoadJar@handleClasspath(jar:java.io.File):Unit" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -242,6 +242,25 @@
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="ammonite.repl.interp.Interpreter.DefaultLoadJar#cp" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="cp(jar:ammonite.ops.Path):Unit"></a>
+      <a id="cp(Path):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">cp</span><span class="params">(<span name="jar">jar: <span class="extype" name="ammonite.ops.Path">Path</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.repl.interp.Interpreter$DefaultLoadJar@cp(jar:ammonite.ops.Path):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Load a <code>.jar</code> file or directory into your JVM classpath
+</p><div class="fullcomment"><div class="comment cmt"><p>Load a <code>.jar</code> file or directory into your JVM classpath
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="ammonite.repl.interp.Interpreter.DefaultLoadJar">DefaultLoadJar</a> → <a href="../frontend/LoadJar.html" class="extype" name="ammonite.repl.frontend.LoadJar">LoadJar</a></dd></dl></div>
     </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a>
       <a id="eq(AnyRef):Boolean"></a>
@@ -386,25 +405,6 @@
       </a>
     </span>
       
-    </li><li name="ammonite.repl.interp.Interpreter.DefaultLoadJar#jar" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="jar(jar:ammonite.ops.Path):Unit"></a>
-      <a id="jar(Path):Unit"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">jar</span><span class="params">(<span name="jar">jar: <span class="extype" name="ammonite.ops.Path">Path</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Interpreter$DefaultLoadJar@jar(jar:ammonite.ops.Path):Unit" title="Permalink" target="_top">
-        <img src="../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">Load a <code>.jar</code> file
-</p><div class="fullcomment"><div class="comment cmt"><p>Load a <code>.jar</code> file
-</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="ammonite.repl.interp.Interpreter.DefaultLoadJar">DefaultLoadJar</a> → <a href="../frontend/LoadJar.html" class="extype" name="ammonite.repl.frontend.LoadJar">LoadJar</a></dd></dl></div>
     </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a>
       <a id="ne(AnyRef):Boolean"></a>

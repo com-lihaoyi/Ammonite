@@ -92,7 +92,7 @@ real encapsulation for now.
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="ammonite.repl.interp.Interpreter#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(prompt0:ammonite.repl.Ref[String],frontEnd0:ammonite.repl.Ref[ammonite.repl.frontend.FrontEnd],width:=&gt;Int,height:=&gt;Int,pprintConfig:pprint.Config,colors0:ammonite.repl.Ref[ammonite.repl.Colors],stdout:String=&gt;Unit,storage:ammonite.repl.Ref[ammonite.repl.Storage],history:=&gt;ammonite.repl.History,predef:String,replArgs:Seq[ammonite.repl.Bind[_]]):ammonite.repl.interp.Interpreter"></a>
+      <a id="&lt;init&gt;(prompt0:ammonite.repl.Ref[String],frontEnd0:ammonite.repl.Ref[ammonite.repl.frontend.FrontEnd],width:=&gt;Int,height:=&gt;Int,pprintConfig:pprint.Config,colors0:ammonite.repl.Ref[ammonite.repl.Colors],printer:ammonite.repl.Printer,storage:ammonite.repl.Ref[ammonite.repl.Storage],history:=&gt;ammonite.repl.History,predef:String,replArgs:Seq[ammonite.repl.Bind[_]]):ammonite.repl.interp.Interpreter"></a>
       <a id="&lt;init&gt;:Interpreter"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -100,10 +100,10 @@ real encapsulation for now.
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">Interpreter</span><span class="params">(<span name="prompt0">prompt0: <a href="../Ref.html" class="extype" name="ammonite.repl.Ref">Ref</a>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="frontEnd0">frontEnd0: <a href="../Ref.html" class="extype" name="ammonite.repl.Ref">Ref</a>[<a href="../frontend/FrontEnd.html" class="extype" name="ammonite.repl.frontend.FrontEnd">FrontEnd</a>]</span>, <span name="width">width: ⇒ <span class="extype" name="scala.Int">Int</span></span>, <span name="height">height: ⇒ <span class="extype" name="scala.Int">Int</span></span>, <span name="pprintConfig">pprintConfig: <span class="extype" name="pprint.Config">Config</span></span>, <span name="colors0">colors0: <a href="../Ref.html" class="extype" name="ammonite.repl.Ref">Ref</a>[<a href="../Colors.html" class="extype" name="ammonite.repl.Colors">Colors</a>]</span>, <span name="stdout">stdout: (<span class="extype" name="scala.Predef.String">String</span>) ⇒ <span class="extype" name="scala.Unit">Unit</span></span>, <span name="storage">storage: <a href="../Ref.html" class="extype" name="ammonite.repl.Ref">Ref</a>[<a href="../Storage.html" class="extype" name="ammonite.repl.Storage">Storage</a>]</span>, <span name="history">history: ⇒ <a href="../History.html" class="extype" name="ammonite.repl.History">History</a></span>, <span name="predef">predef: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="replArgs">replArgs: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="../Bind.html" class="extype" name="ammonite.repl.Bind">Bind</a>[_]]</span>)</span>
+        <span class="name">Interpreter</span><span class="params">(<span name="prompt0">prompt0: <a href="../Ref.html" class="extype" name="ammonite.repl.Ref">Ref</a>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="frontEnd0">frontEnd0: <a href="../Ref.html" class="extype" name="ammonite.repl.Ref">Ref</a>[<a href="../frontend/FrontEnd.html" class="extype" name="ammonite.repl.frontend.FrontEnd">FrontEnd</a>]</span>, <span name="width">width: ⇒ <span class="extype" name="scala.Int">Int</span></span>, <span name="height">height: ⇒ <span class="extype" name="scala.Int">Int</span></span>, <span name="pprintConfig">pprintConfig: <span class="extype" name="pprint.Config">Config</span></span>, <span name="colors0">colors0: <a href="../Ref.html" class="extype" name="ammonite.repl.Ref">Ref</a>[<a href="../Colors.html" class="extype" name="ammonite.repl.Colors">Colors</a>]</span>, <span name="printer">printer: <a href="../Printer.html" class="extype" name="ammonite.repl.Printer">Printer</a></span>, <span name="storage">storage: <a href="../Ref.html" class="extype" name="ammonite.repl.Ref">Ref</a>[<a href="../Storage.html" class="extype" name="ammonite.repl.Storage">Storage</a>]</span>, <span name="history">history: ⇒ <a href="../History.html" class="extype" name="ammonite.repl.History">History</a></span>, <span name="predef">predef: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="replArgs">replArgs: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="../Bind.html" class="extype" name="ammonite.repl.Bind">Bind</a>[_]]</span>)</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Interpreter@&lt;init&gt;(prompt0:ammonite.repl.Ref[String],frontEnd0:ammonite.repl.Ref[ammonite.repl.frontend.FrontEnd],width:=&gt;Int,height:=&gt;Int,pprintConfig:pprint.Config,colors0:ammonite.repl.Ref[ammonite.repl.Colors],stdout:String=&gt;Unit,storage:ammonite.repl.Ref[ammonite.repl.Storage],history:=&gt;ammonite.repl.History,predef:String,replArgs:Seq[ammonite.repl.Bind[_]]):ammonite.repl.interp.Interpreter" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.Interpreter@&lt;init&gt;(prompt0:ammonite.repl.Ref[String],frontEnd0:ammonite.repl.Ref[ammonite.repl.frontend.FrontEnd],width:=&gt;Int,height:=&gt;Int,pprintConfig:pprint.Config,colors0:ammonite.repl.Ref[ammonite.repl.Colors],printer:ammonite.repl.Printer,storage:ammonite.repl.Ref[ammonite.repl.Storage],history:=&gt;ammonite.repl.History,predef:String,replArgs:Seq[ammonite.repl.Bind[_]]):ammonite.repl.interp.Interpreter" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -382,18 +382,18 @@ real encapsulation for now.
     </span>
       
     </li><li name="ammonite.repl.interp.Interpreter#evaluateLine" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="evaluateLine(code:String,printSnippet:Seq[String],printer:Iterator[String]=&gt;Unit,extraImports:Seq[ammonite.repl.ImportData]):ammonite.repl.Res[ammonite.repl.Evaluated]"></a>
-      <a id="evaluateLine(String,Seq[String],(Iterator[String])⇒Unit,Seq[ImportData]):Res[Evaluated]"></a>
+      <a id="evaluateLine(code:String,printSnippet:Seq[String],printer:ammonite.repl.Printer,extraImports:Seq[ammonite.repl.ImportData]):ammonite.repl.Res[ammonite.repl.Evaluated]"></a>
+      <a id="evaluateLine(String,Seq[String],Printer,Seq[ImportData]):Res[Evaluated]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">evaluateLine</span><span class="params">(<span name="code">code: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="printSnippet">printSnippet: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="printer">printer: (<a href="../../../scala/package.html#Iterator[+A]=Iterator[A]" class="extmbr" name="scala.Iterator">Iterator</a>[<span class="extype" name="scala.Predef.String">String</span>]) ⇒ <span class="extype" name="scala.Unit">Unit</span></span>, <span name="extraImports">extraImports: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="../ImportData.html" class="extype" name="ammonite.repl.ImportData">ImportData</a>] = <span class="symbol">Seq()</span></span>)</span><span class="result">: <a href="../Res.html" class="extype" name="ammonite.repl.Res">Res</a>[<a href="../Evaluated.html" class="extype" name="ammonite.repl.Evaluated">Evaluated</a>]</span>
+        <span class="name">evaluateLine</span><span class="params">(<span name="code">code: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="printSnippet">printSnippet: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="printer">printer: <a href="../Printer.html" class="extype" name="ammonite.repl.Printer">Printer</a></span>, <span name="extraImports">extraImports: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="../ImportData.html" class="extype" name="ammonite.repl.ImportData">ImportData</a>] = <span class="symbol">Seq()</span></span>)</span><span class="result">: <a href="../Res.html" class="extype" name="ammonite.repl.Res">Res</a>[<a href="../Evaluated.html" class="extype" name="ammonite.repl.Evaluated">Evaluated</a>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Interpreter@evaluateLine(code:String,printSnippet:Seq[String],printer:Iterator[String]=&gt;Unit,extraImports:Seq[ammonite.repl.ImportData]):ammonite.repl.Res[ammonite.repl.Evaluated]" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.Interpreter@evaluateLine(code:String,printSnippet:Seq[String],printer:ammonite.repl.Printer,extraImports:Seq[ammonite.repl.ImportData]):ammonite.repl.Res[ammonite.repl.Evaluated]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -643,18 +643,18 @@ real encapsulation for now.
     </span>
       
     </li><li name="ammonite.repl.interp.Interpreter#processLine" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="processLine(code:String,stmts:Seq[String],printer:Iterator[String]=&gt;Unit):ammonite.repl.Res[ammonite.repl.Evaluated]"></a>
-      <a id="processLine(String,Seq[String],(Iterator[String])⇒Unit):Res[Evaluated]"></a>
+      <a id="processLine(code:String,stmts:Seq[String]):ammonite.repl.Res[ammonite.repl.Evaluated]"></a>
+      <a id="processLine(String,Seq[String]):Res[Evaluated]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">processLine</span><span class="params">(<span name="code">code: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="stmts">stmts: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="printer">printer: (<a href="../../../scala/package.html#Iterator[+A]=Iterator[A]" class="extmbr" name="scala.Iterator">Iterator</a>[<span class="extype" name="scala.Predef.String">String</span>]) ⇒ <span class="extype" name="scala.Unit">Unit</span></span>)</span><span class="result">: <a href="../Res.html" class="extype" name="ammonite.repl.Res">Res</a>[<a href="../Evaluated.html" class="extype" name="ammonite.repl.Evaluated">Evaluated</a>]</span>
+        <span class="name">processLine</span><span class="params">(<span name="code">code: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="stmts">stmts: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result">: <a href="../Res.html" class="extype" name="ammonite.repl.Res">Res</a>[<a href="../Evaluated.html" class="extype" name="ammonite.repl.Evaluated">Evaluated</a>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Interpreter@processLine(code:String,stmts:Seq[String],printer:Iterator[String]=&gt;Unit):ammonite.repl.Res[ammonite.repl.Evaluated]" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.Interpreter@processLine(code:String,stmts:Seq[String]):ammonite.repl.Res[ammonite.repl.Evaluated]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>

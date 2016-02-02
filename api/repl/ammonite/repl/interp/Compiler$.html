@@ -170,18 +170,18 @@ Otherwise it's a Traversable of (filename, bytes) tuples
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="ammonite.repl.interp.Compiler#apply" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="apply(jarDeps:Seq[java.io.File],dirDeps:Seq[java.io.File],dynamicClasspath:scala.reflect.io.VirtualDirectory,evalClassloader:=&gt;ClassLoader,pluginClassloader:=&gt;ClassLoader,shutdownPressy:()=&gt;Unit):ammonite.repl.interp.Compiler"></a>
-      <a id="apply(Seq[File],Seq[File],VirtualDirectory,⇒ClassLoader,⇒ClassLoader,()⇒Unit):Compiler"></a>
+      <a id="apply(classpath:Seq[java.io.File],dynamicClasspath:scala.reflect.io.VirtualDirectory,evalClassloader:=&gt;ClassLoader,pluginClassloader:=&gt;ClassLoader,shutdownPressy:()=&gt;Unit):ammonite.repl.interp.Compiler"></a>
+      <a id="apply(Seq[File],VirtualDirectory,⇒ClassLoader,⇒ClassLoader,()⇒Unit):Compiler"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">apply</span><span class="params">(<span name="jarDeps">jarDeps: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<span class="extype" name="java.io.File">File</span>]</span>, <span name="dirDeps">dirDeps: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<span class="extype" name="java.io.File">File</span>]</span>, <span name="dynamicClasspath">dynamicClasspath: <span class="extype" name="scala.reflect.io.VirtualDirectory">VirtualDirectory</span></span>, <span name="evalClassloader">evalClassloader: ⇒ <span class="extype" name="java.lang.ClassLoader">ClassLoader</span></span>, <span name="pluginClassloader">pluginClassloader: ⇒ <span class="extype" name="java.lang.ClassLoader">ClassLoader</span></span>, <span name="shutdownPressy">shutdownPressy: () ⇒ <span class="extype" name="scala.Unit">Unit</span></span>)</span><span class="result">: <a href="Compiler.html" class="extype" name="ammonite.repl.interp.Compiler">Compiler</a></span>
+        <span class="name">apply</span><span class="params">(<span name="classpath">classpath: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<span class="extype" name="java.io.File">File</span>]</span>, <span name="dynamicClasspath">dynamicClasspath: <span class="extype" name="scala.reflect.io.VirtualDirectory">VirtualDirectory</span></span>, <span name="evalClassloader">evalClassloader: ⇒ <span class="extype" name="java.lang.ClassLoader">ClassLoader</span></span>, <span name="pluginClassloader">pluginClassloader: ⇒ <span class="extype" name="java.lang.ClassLoader">ClassLoader</span></span>, <span name="shutdownPressy">shutdownPressy: () ⇒ <span class="extype" name="scala.Unit">Unit</span></span>)</span><span class="result">: <a href="Compiler.html" class="extype" name="ammonite.repl.interp.Compiler">Compiler</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Compiler$@apply(jarDeps:Seq[java.io.File],dirDeps:Seq[java.io.File],dynamicClasspath:scala.reflect.io.VirtualDirectory,evalClassloader:=&gt;ClassLoader,pluginClassloader:=&gt;ClassLoader,shutdownPressy:()=&gt;Unit):ammonite.repl.interp.Compiler" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.Compiler$@apply(classpath:Seq[java.io.File],dynamicClasspath:scala.reflect.io.VirtualDirectory,evalClassloader:=&gt;ClassLoader,pluginClassloader:=&gt;ClassLoader,shutdownPressy:()=&gt;Unit):ammonite.repl.interp.Compiler" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -337,18 +337,18 @@ into a standard scala.concurrent.Future
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="ammonite.repl.interp.Compiler#initGlobalBits" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="initGlobalBits(jarDeps:Seq[java.io.File],dirDeps:Seq[java.io.File],dynamicClasspath:scala.reflect.io.VirtualDirectory,logger:=&gt;String=&gt;Unit):(scala.tools.nsc.Settings,scala.tools.nsc.reporters.AbstractReporter,scala.reflect.io.VirtualDirectory,scala.tools.nsc.util.JavaClassPath)"></a>
-      <a id="initGlobalBits(Seq[File],Seq[File],VirtualDirectory,⇒(String)⇒Unit):(Settings,AbstractReporter,VirtualDirectory,JavaClassPath)"></a>
+      <a id="initGlobalBits(classpath:Seq[java.io.File],dynamicClasspath:scala.reflect.io.VirtualDirectory,errorLogger:=&gt;String=&gt;Unit,warningLogger:=&gt;String=&gt;Unit):(scala.tools.nsc.Settings,scala.tools.nsc.reporters.AbstractReporter,scala.reflect.io.VirtualDirectory,scala.tools.nsc.util.JavaClassPath)"></a>
+      <a id="initGlobalBits(Seq[File],VirtualDirectory,⇒(String)⇒Unit,⇒(String)⇒Unit):(Settings,AbstractReporter,VirtualDirectory,JavaClassPath)"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">initGlobalBits</span><span class="params">(<span name="jarDeps">jarDeps: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<span class="extype" name="java.io.File">File</span>]</span>, <span name="dirDeps">dirDeps: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<span class="extype" name="java.io.File">File</span>]</span>, <span name="dynamicClasspath">dynamicClasspath: <span class="extype" name="scala.reflect.io.VirtualDirectory">VirtualDirectory</span></span>, <span name="logger">logger: ⇒ (<span class="extype" name="scala.Predef.String">String</span>) ⇒ <span class="extype" name="scala.Unit">Unit</span></span>)</span><span class="result">: (<span class="extype" name="scala.tools.nsc.Settings">Settings</span>, <span class="extype" name="scala.tools.nsc.reporters.AbstractReporter">AbstractReporter</span>, <span class="extype" name="scala.reflect.io.VirtualDirectory">VirtualDirectory</span>, <span class="extype" name="scala.tools.nsc.util.JavaClassPath">JavaClassPath</span>)</span>
+        <span class="name">initGlobalBits</span><span class="params">(<span name="classpath">classpath: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<span class="extype" name="java.io.File">File</span>]</span>, <span name="dynamicClasspath">dynamicClasspath: <span class="extype" name="scala.reflect.io.VirtualDirectory">VirtualDirectory</span></span>, <span name="errorLogger">errorLogger: ⇒ (<span class="extype" name="scala.Predef.String">String</span>) ⇒ <span class="extype" name="scala.Unit">Unit</span></span>, <span name="warningLogger">warningLogger: ⇒ (<span class="extype" name="scala.Predef.String">String</span>) ⇒ <span class="extype" name="scala.Unit">Unit</span></span>)</span><span class="result">: (<span class="extype" name="scala.tools.nsc.Settings">Settings</span>, <span class="extype" name="scala.tools.nsc.reporters.AbstractReporter">AbstractReporter</span>, <span class="extype" name="scala.reflect.io.VirtualDirectory">VirtualDirectory</span>, <span class="extype" name="scala.tools.nsc.util.JavaClassPath">JavaClassPath</span>)</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Compiler$@initGlobalBits(jarDeps:Seq[java.io.File],dirDeps:Seq[java.io.File],dynamicClasspath:scala.reflect.io.VirtualDirectory,logger:=&gt;String=&gt;Unit):(scala.tools.nsc.Settings,scala.tools.nsc.reporters.AbstractReporter,scala.reflect.io.VirtualDirectory,scala.tools.nsc.util.JavaClassPath)" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.Compiler$@initGlobalBits(classpath:Seq[java.io.File],dynamicClasspath:scala.reflect.io.VirtualDirectory,errorLogger:=&gt;String=&gt;Unit,warningLogger:=&gt;String=&gt;Unit):(scala.tools.nsc.Settings,scala.tools.nsc.reporters.AbstractReporter,scala.reflect.io.VirtualDirectory,scala.tools.nsc.util.JavaClassPath)" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>

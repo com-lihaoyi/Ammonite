@@ -91,7 +91,7 @@
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="ammonite.repl.Repl#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(input:java.io.InputStream,output:java.io.OutputStream,storage:ammonite.repl.Ref[ammonite.repl.Storage],predef:String,replArgs:Seq[ammonite.repl.Bind[_]]):ammonite.repl.Repl"></a>
+      <a id="&lt;init&gt;(input:java.io.InputStream,output:java.io.OutputStream,error:java.io.OutputStream,storage:ammonite.repl.Ref[ammonite.repl.Storage],predef:String,replArgs:Seq[ammonite.repl.Bind[_]]):ammonite.repl.Repl"></a>
       <a id="&lt;init&gt;:Repl"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -99,10 +99,10 @@
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">Repl</span><span class="params">(<span name="input">input: <span class="extype" name="java.io.InputStream">InputStream</span></span>, <span name="output">output: <span class="extype" name="java.io.OutputStream">OutputStream</span></span>, <span name="storage">storage: <a href="Ref.html" class="extype" name="ammonite.repl.Ref">Ref</a>[<a href="Storage.html" class="extype" name="ammonite.repl.Storage">Storage</a>]</span>, <span name="predef">predef: <span class="extype" name="scala.Predef.String">String</span> = <span class="symbol">&quot;&quot;</span></span>, <span name="replArgs">replArgs: <a href="../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="Bind.html" class="extype" name="ammonite.repl.Bind">Bind</a>[_]] = <span class="symbol">Nil</span></span>)</span>
+        <span class="name">Repl</span><span class="params">(<span name="input">input: <span class="extype" name="java.io.InputStream">InputStream</span></span>, <span name="output">output: <span class="extype" name="java.io.OutputStream">OutputStream</span></span>, <span name="error">error: <span class="extype" name="java.io.OutputStream">OutputStream</span></span>, <span name="storage">storage: <a href="Ref.html" class="extype" name="ammonite.repl.Ref">Ref</a>[<a href="Storage.html" class="extype" name="ammonite.repl.Storage">Storage</a>]</span>, <span name="predef">predef: <span class="extype" name="scala.Predef.String">String</span> = <span class="symbol">&quot;&quot;</span></span>, <span name="replArgs">replArgs: <a href="../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="Bind.html" class="extype" name="ammonite.repl.Bind">Bind</a>[_]] = <span class="symbol">Nil</span></span>)</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#ammonite.repl.Repl@&lt;init&gt;(input:java.io.InputStream,output:java.io.OutputStream,storage:ammonite.repl.Ref[ammonite.repl.Storage],predef:String,replArgs:Seq[ammonite.repl.Bind[_]]):ammonite.repl.Repl" title="Permalink" target="_top">
+      <a href="../../index.html#ammonite.repl.Repl@&lt;init&gt;(input:java.io.InputStream,output:java.io.OutputStream,error:java.io.OutputStream,storage:ammonite.repl.Ref[ammonite.repl.Storage],predef:String,replArgs:Seq[ammonite.repl.Bind[_]]):ammonite.repl.Repl" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -292,6 +292,23 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="ammonite.repl.Repl#errorPrintStream" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="errorPrintStream:java.io.PrintStream"></a>
+      <a id="errorPrintStream:PrintStream"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">errorPrintStream</span><span class="result">: <span class="extype" name="java.io.PrintStream">PrintStream</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.repl.Repl@errorPrintStream:java.io.PrintStream" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
     </li><li name="scala.AnyRef#finalize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
       <a id="finalize():Unit"></a>
@@ -502,19 +519,53 @@
       </a>
     </span>
       
-    </li><li name="ammonite.repl.Repl#printer" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="printer:java.io.PrintStream"></a>
-      <a id="printer:PrintStream"></a>
+    </li><li name="ammonite.repl.Repl#printStream" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="printStream:java.io.PrintStream"></a>
+      <a id="printStream:PrintStream"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">printer</span><span class="result">: <span class="extype" name="java.io.PrintStream">PrintStream</span></span>
+        <span class="name">printStream</span><span class="result">: <span class="extype" name="java.io.PrintStream">PrintStream</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#ammonite.repl.Repl@printer:java.io.PrintStream" title="Permalink" target="_top">
+      <a href="../../index.html#ammonite.repl.Repl@printStream:java.io.PrintStream" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="ammonite.repl.Repl#printer" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="printer:ammonite.repl.Printer"></a>
+      <a id="printer:Printer"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">printer</span><span class="result">: <a href="Printer.html" class="extype" name="ammonite.repl.Printer">Printer</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.repl.Repl@printer:ammonite.repl.Printer" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="ammonite.repl.Repl#printlnWithColor" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="printlnWithColor(color:String,s:String):Unit"></a>
+      <a id="printlnWithColor(String,String):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">printlnWithColor</span><span class="params">(<span name="color">color: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="s">s: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.repl.Repl@printlnWithColor(color:String,s:String):Unit" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>

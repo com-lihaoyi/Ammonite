@@ -132,23 +132,26 @@ you query source strings using an in-built presentation compiler
 evaluates it and returns a <code>Result[(output: String, imports: String)]</code>
 where <code>output</code> is what gets printed and <code>imports</code> are any imports that
 need to get prepended to subsequent commands.</p>
-    </li><li name="ammonite.repl.interp.Frame" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="FrameextendsProductwithSerializable"></a>
+    </li><li name="ammonite.repl.interp.Frame" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="FrameextendsAnyRef"></a>
       <a id="Frame:Frame"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">case class</span>
+        <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <a href="Frame.html"><span class="name">Frame</span></a><span class="params">(<span name="classloader">classloader: <a href="SpecialClassLoader.html" class="extype" name="ammonite.repl.interp.SpecialClassLoader">SpecialClassLoader</a></span>, <span name="pluginClassloader">pluginClassloader: <a href="SpecialClassLoader.html" class="extype" name="ammonite.repl.interp.SpecialClassLoader">SpecialClassLoader</a></span>, <span name="previousImports">previousImports: <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <a href="../ImportData.html" class="extype" name="ammonite.repl.ImportData">ImportData</a>]</span>, <span name="extraJars">extraJars: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<span class="extype" name="java.io.File">File</span>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a href="Frame.html"><span class="name">Frame</span></a><span class="result"> extends <a href="../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.package@FrameextendsProductwithSerializable" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.package@FrameextendsAnyRef" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">Represents a single &quot;frame&quot; of the <code>sess.save</code>/<code>sess.load</code> stack/tree.</p><div class="fullcomment"><div class="comment cmt"><p>Represents a single &quot;frame&quot; of the <code>sess.save</code>/<code>sess.load</code> stack/tree.</p><p>Exposes <code>imports</code> and <code>classpath</code> as readable but only writable
+in particular ways: <code>imports</code> can only be updated via <code>mergeImports</code>,
+while <code>classpath</code> can only be added to.
+</p></div></div>
     </li><li name="ammonite.repl.interp.Interpreter" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="InterpreterextendsAnyRef"></a>
       <a id="Interpreter:Interpreter"></a>
@@ -319,6 +322,23 @@ scala-compile and scalajs-tools
       </span>
       </h4><span class="permalink">
       <a href="../../../index.html#ammonite.repl.interp.package@Evaluator" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="ammonite.repl.interp.Frame" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Frame"></a>
+      <a id="Frame:Frame"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Frame$.html"><span class="name">Frame</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.repl.interp.package@Frame" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>

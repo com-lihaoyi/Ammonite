@@ -28,10 +28,12 @@
         </head>
         <body class="type">
       <div id="definition">
-        <img alt="Class" src="../../lib/class_big.png" />
+        <a href="ImportData$.html" title="See companion object"><img alt="Class/Object" src="../../lib/class_to_object_big.png" /></a>
         <p id="owner"><a href="../package.html" class="extype" name="ammonite">ammonite</a>.<a href="package.html" class="extype" name="ammonite.repl">repl</a></p>
-        <h1>ImportData</h1><h3><span class="morelinks"><div>Related Doc:
-            <a href="package.html" class="extype" name="ammonite.repl">package repl</a>
+        <h1><a href="ImportData$.html" title="See companion object">ImportData</a></h1><h3><span class="morelinks"><div>
+            Related Docs:
+            <a href="ImportData$.html" title="See companion object">object ImportData</a>
+            | <a href="package.html" class="extype" name="ammonite.repl">package repl</a>
           </div></span></h3><span class="permalink">
       <a href="../../index.html#ammonite.repl.ImportData" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
@@ -45,7 +47,7 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">ImportData</span><span class="params">(<span name="fromName">fromName: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="toName">toName: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="wrapperName">wrapperName: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="prefix">prefix: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">ImportData</span><span class="params">(<span name="fromName">fromName: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="toName">toName: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="prefix">prefix: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="importType">importType: <a href="ImportData$$ImportType.html" class="extype" name="ammonite.repl.ImportData.ImportType">ImportType</a></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
       
@@ -89,7 +91,7 @@
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="ammonite.repl.ImportData#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(fromName:String,toName:String,wrapperName:String,prefix:String):ammonite.repl.ImportData"></a>
+      <a id="&lt;init&gt;(fromName:String,toName:String,prefix:String,importType:ammonite.repl.ImportData.ImportType):ammonite.repl.ImportData"></a>
       <a id="&lt;init&gt;:ImportData"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -97,10 +99,10 @@
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">ImportData</span><span class="params">(<span name="fromName">fromName: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="toName">toName: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="wrapperName">wrapperName: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="prefix">prefix: <span class="extype" name="scala.Predef.String">String</span></span>)</span>
+        <span class="name">ImportData</span><span class="params">(<span name="fromName">fromName: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="toName">toName: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="prefix">prefix: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="importType">importType: <a href="ImportData$$ImportType.html" class="extype" name="ammonite.repl.ImportData.ImportType">ImportType</a></span>)</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#ammonite.repl.ImportData@&lt;init&gt;(fromName:String,toName:String,wrapperName:String,prefix:String):ammonite.repl.ImportData" title="Permalink" target="_top">
+      <a href="../../index.html#ammonite.repl.ImportData@&lt;init&gt;(fromName:String,toName:String,prefix:String,importType:ammonite.repl.ImportData.ImportType):ammonite.repl.ImportData" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -279,6 +281,23 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="ammonite.repl.ImportData#importType" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="importType:ammonite.repl.ImportData.ImportType"></a>
+      <a id="importType:ImportType"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">importType</span><span class="result">: <a href="ImportData$$ImportType.html" class="extype" name="ammonite.repl.ImportData.ImportType">ImportType</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.repl.ImportData@importType:ammonite.repl.ImportData.ImportType" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
     </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <a id="isInstanceOf[T0]:Boolean"></a>
@@ -467,23 +486,6 @@
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="ammonite.repl.ImportData#wrapperName" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="wrapperName:String"></a>
-      <a id="wrapperName:String"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">wrapperName</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.repl.ImportData@wrapperName:String" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
     </li></ol>
             </div>
 
