@@ -7,48 +7,52 @@
 @sect("Ammonite-REPL", "A Modernized Scala REPL")
 
   @p
-    Ammonite is a cleanroom re-implementation of the Scala REPL from first principles. It is much more featureful than the default REPL and comes with a lot of @sect.ref("Features", "ergonomic improvements") and @sect.ref("Configuration", "configurability") that may be familiar to people coming from IDEs or other REPLs such as @lnk("IPython", "https://ipython.org/") or @lnk("Zsh", "http://www.zsh.org/"). It can be combined with @sect.ref{Ammonite-Ops} to replace Bash as your systems shell, but also can be used alone as a @sect.ref("Features", "superior") version of the default Scala REPL, or as a @sect.ref("Debugging", "debugging tool").
+    Ammonite is an improved Scala REPL, re-implemented from first principles. It is much more featureful than the default REPL and comes with a lot of @sect.ref("Features", "ergonomic improvements") and @sect.ref("Configuration", "configurability") that may be familiar to people coming from IDEs or other REPLs such as @lnk("IPython", "https://ipython.org/") or @lnk("Zsh", "http://www.zsh.org/").
 
   @p
-    If you want to use Ammonite as a plain Scala shell, download the standalone executable:
+    It can be combined with @sect.ref{Ammonite-Ops} to replace Bash as your systems shell, but also can be used alone as a @sect.ref("Features", "superior") version of the default Scala REPL, or as a @sect.ref("Debugging", "debugging tool"), or for many other @sect.ref("REPL Cookbook", "fun and interesting things")!
 
-  @hl.sh
-    @replCurl
+  @sect{Getting Started}
+    @p
+      If you want to use Ammonite as a plain Scala shell, download the standalone executable:
 
-  @p
-    This will give you access to Ammonite for Scala:
+    @hl.sh
+      @replCurl
 
-  @img(src:="GettingStarted.png", width:="100%")
+    @p
+      This will give you access to Ammonite for Scala:
 
-  @p
-    With @sect.ref("Pretty-printed output", "Pretty Printing"), @sect.ref{Syntax Highlighting} for input and output, @sect.ref{Artifact Loading} in-REPL, and all the other nice features!
+    @img(src:="GettingStarted.png", width:="100%")
 
-  @p
-    If you want to use Ammonite as a filesystem shell, take a look at @sect.ref{Ammonite-Shell}
+    @p
+      With @sect.ref("Pretty-printed output", "Pretty Printing"), @sect.ref{Syntax Highlighting} for input and output, @sect.ref{Artifact Loading} in-REPL, and all the other nice @sect.ref{Features}!
 
-  @p
-    If you want some initialization code available to the REPL, you can add it to your @code{~/.ammonite/predef.scala}.
+    @p
+      If you want to use Ammonite as a filesystem shell, take a look at @sect.ref{Ammonite-Shell}. If you're not sure what to do with Ammonite, check out the @sect.ref{REPL Cookbook} for some fun ideas!
 
-  @p
-    You can also try out Ammonite in an existing SBT project, add the following to your @code{build.sbt}
+    @p
+      If you want some initialization code available to the REPL, you can add it to your @code{~/.ammonite/predef.scala}.
+    @p
+      If you have any questions, come hang out on the @sect.ref("Community", "mailing list or gitter channel") and get help!
 
-  @hl.scala
-    libraryDependencies += "com.lihaoyi" % "ammonite-repl" % "@ammonite.Constants.version" % "test" cross CrossVersion.full
+    @sect{Ammonite-REPL in SBT}
+      @p
+        You can also try out Ammonite in an existing SBT project, add the following to your @code{build.sbt}
 
-    initialCommands in (Test, console) := """ammonite.repl.Main.run("")"""
+      @hl.scala
+        libraryDependencies += "com.lihaoyi" % "ammonite-repl" % "@ammonite.Constants.version" % "test" cross CrossVersion.full
 
-  @p
-    After that, simple hit
-  @code
-    sbt projectName/test:console
-  @p
-    To activate the Ammonite REPL
+        initialCommands in (Test, console) := """ammonite.repl.Main.run("")"""
 
-  @p
-    You can also pass a string to the @code{run} call containing any commands or imports you want executed at the start of every run. If you want Ammonite to be available in all projects, simply add the above snippet to a new file @code{~/.sbt/0.13/global.sbt}.
+      @p
+        After that, simple hit
+      @code
+        sbt projectName/test:console
+      @p
+        To activate the Ammonite REPL
 
-  @p
-    If you have any questions, come hang out on the @sect.ref("Community", "mailing list or gitter channel") and get help!
+      @p
+        You can also pass a string to the @code{run} call containing any commands or imports you want executed at the start of every run. If you want Ammonite to be available in all projects, simply add the above snippet to a new file @code{~/.sbt/0.13/global.sbt}.
 
   @sect{Features}
     @p
