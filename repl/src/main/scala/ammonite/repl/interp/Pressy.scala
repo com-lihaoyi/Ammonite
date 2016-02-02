@@ -131,13 +131,15 @@ object Pressy {
         // If the selectors haven't been defined yet...
         if (selectors.head.name.toString == "<error>") {
           if (expr.tpe.toString == "<error>") {
-            // If the expr is badly typed, try to scope complete it
-            val exprName = expr.asInstanceOf[pressy.Ident].name.decoded
-            expr.pos.point -> handleCompletion(
-              ask(expr.pos.point, pressy.askScopeCompletion),
-              // if it doesn't have a name at all, accept anything
-              if (exprName == "<error>") "" else exprName
-            )
+              // If the expr is badly typed, try to scope complete it
+              if (expr.isInstanceOf[pressy.Ident]) {
+                val exprName =  expr.asInstanceOf[pressy.Ident].name.decoded
+                expr.pos.point -> handleCompletion(
+                  ask(expr.pos.point, pressy.askScopeCompletion),
+                  // if it doesn't have a name at all, accept anything
+                  if (exprName == "<error>") "" else exprName
+                )
+              } else (expr.pos.point, Seq.empty)
           } else {
             // If the expr is well typed, type complete
             // the next thing
@@ -176,8 +178,7 @@ object Pressy {
     }
 
   }
-  def apply(jarDeps: Seq[java.io.File],
-            dirDeps: Seq[java.io.File],
+  def apply(classpath: Seq[java.io.File],
             dynamicClasspath: VirtualDirectory,
             evalClassloader: => ClassLoader): Pressy = new Pressy {
 
@@ -185,9 +186,9 @@ object Pressy {
 
     def initPressy = {
       val (settings, reporter, _, jcp) = Compiler.initGlobalBits(
-        jarDeps,
-        dirDeps,
+        classpath,
         dynamicClasspath,
+        _ => (),
         _ => ()
       )
       new nsc.interactive.Global(settings, reporter) { g =>

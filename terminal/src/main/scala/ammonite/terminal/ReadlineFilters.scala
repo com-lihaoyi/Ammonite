@@ -40,7 +40,9 @@ object ReadlineFilters {
     Case(Ctrl('b'))((b, c, m) => (b, c - 1)), // <- one char
     Case(Ctrl('f'))((b, c, m) => (b, c + 1)), // -> one char
     Case(Alt + "b")((b, c, m) => GUILikeFilters.wordLeft(b, c)), // <- one word
+    Case(LinuxCtrlLeft)((b, c, m) => GUILikeFilters.wordLeft(b, c)), // <- one word
     Case(Alt + "f")((b, c, m) => GUILikeFilters.wordRight(b, c)), // -> one  word
+    Case(LinuxCtrlRight)((b, c, m) => GUILikeFilters.wordRight(b, c)), // -> one word
     Case(Home)((b, c, m) => BasicFilters.moveStart(b, c, m.width)), // <- one line
     Case(HomeScreen)((b, c, m) => BasicFilters.moveStart(b, c, m.width)), // <- one line
     Case(Ctrl('a'))((b, c, m) => BasicFilters.moveStart(b, c, m.width)),
@@ -95,42 +97,5 @@ object ReadlineFilters {
       Case(Alt + "\u007f")((b, c, m) => cutWordLeft(b, c))
     )
   }
-  
 
-  /**
-   * Provides history navigation up and down, saving the current line. 
-   */
-  case class HistoryFilter(history: () => Seq[String]) extends TermCore.DelegateFilter{
-    var index = -1
-    var currentHistory = Vector[Char]()
-
-    def swapInHistory(indexIncrement: Int)(b: Vector[Char], rest: LazyList[Int]): TermState = {
-      val newIndex = constrainIndex(index + indexIncrement)
-      if (index == -1) currentHistory = b
-      index = newIndex
-      val h = if (index == -1) currentHistory else history()(index).toVector
-      TS(rest, h, h.length)
-    }
-
-    def constrainIndex(n: Int): Int = {
-      val max = history().length - 1
-      if (n < -1) -1 else if (max < n) max else n
-    }
-
-
-
-    val previousHistory = swapInHistory(1) _
-    val nextHistory = swapInHistory(-1) _
-
-    def filter = {
-      case TermInfo(TS(p"\u001b[A$rest", b, c), w) if firstRow(c, b, w) =>
-        previousHistory(b, rest)
-      case TermInfo(TS(p"\u0010$rest", b, c), w) if lastRow(c, b, w) =>
-        previousHistory(b, rest)
-      case TermInfo(TS(p"\u001b[B$rest", b, c), w) if lastRow(c, b, w) =>
-        nextHistory(b, rest)
-      case TermInfo(TS(p"\u000e$rest", b, c), w) if firstRow(c, b, w) =>
-        nextHistory(b, rest)
-    }
-  }
 }

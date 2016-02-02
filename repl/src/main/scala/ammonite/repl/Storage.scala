@@ -3,6 +3,7 @@ package ammonite.repl
 import acyclic.file
 import ammonite.ops._
 import ammonite.repl.Util.{IvyMap, CompileCache, ClassFiles}
+import org.apache.ivy.plugins.resolver.RepositoryResolver
 
 import scala.util.Try
 import scala.collection.generic.CanBuildFrom
@@ -44,7 +45,7 @@ object Storage{
       }
 
       def update(t: History): Unit = {
-        write.over(historyFile, upickle.default.write(t.toVector))
+        write.over(historyFile, upickle.default.write(t.toVector, indent = 4))
       }
     }
 
@@ -53,7 +54,7 @@ object Storage{
       val tagCacheDir = compileCacheDir/tag
       if(!exists(tagCacheDir)){
         mkdir(tagCacheDir)
-        val metadata = upickle.default.write(imports)
+        val metadata = upickle.default.write(imports, indent = 4)
         write(tagCacheDir/metadataFile, metadata)
         classFiles.foreach{ case (name, bytes) =>
           write(tagCacheDir/s"$name.class", bytes)
@@ -95,7 +96,7 @@ object Storage{
         catch{ case e: Exception => Map.empty }
       }
       def update(map: IvyMap) = {
-        write.over(ivyCacheFile, upickle.default.write(map))
+        write.over(ivyCacheFile, upickle.default.write(map, indent = 4))
       }
     }
 

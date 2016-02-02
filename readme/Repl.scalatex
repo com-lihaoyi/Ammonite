@@ -7,48 +7,52 @@
 @sect("Ammonite-REPL", "A Modernized Scala REPL")
 
   @p
-    Ammonite is a cleanroom re-implementation of the Scala REPL from first principles. It is much more featureful than the default REPL and comes with a lot of @sect.ref("Features", "ergonomic improvements") and @sect.ref("Configuration", "configurability") that may be familiar to people coming from IDEs or other REPLs such as @a("IPython", href:="http://ipython.org/") or @a("Zsh", href:="http://www.zsh.org/"). It can be combined with @sect.ref{Ammonite-Ops} to replace Bash as your systems shell, but also can be used alone as a @sect.ref("Features", "superior") version of the default Scala REPL, or as a @sect.ref("Debugging", "debugging tool").
+    Ammonite is an improved Scala REPL, re-implemented from first principles. It is much more featureful than the default REPL and comes with a lot of @sect.ref("Features", "ergonomic improvements") and @sect.ref("Configuration", "configurability") that may be familiar to people coming from IDEs or other REPLs such as @lnk("IPython", "https://ipython.org/") or @lnk("Zsh", "http://www.zsh.org/").
 
   @p
-    If you want to use Ammonite as a plain Scala shell, download the standalone executable:
+    It can be combined with @sect.ref{Ammonite-Ops} to replace Bash as your systems shell, but also can be used alone as a @sect.ref("Features", "superior") version of the default Scala REPL, or as a @sect.ref("Debugging", "debugging tool"), or for many other @sect.ref("REPL Cookbook", "fun and interesting things")!
 
-  @hl.sh
-    @replCurl
+  @sect{Getting Started}
+    @p
+      If you want to use Ammonite as a plain Scala shell, download the standalone executable:
 
-  @p
-    This will give you access to Ammonite for Scala:
+    @hl.sh
+      @replCurl
 
-  @img(src:="GettingStarted.png", width:="100%")
+    @p
+      This will give you access to Ammonite for Scala:
 
-  @p
-    With @sect.ref("Pretty-printed output", "Pretty Printing"), @sect.ref{Syntax Highlighting} for input and output, @sect.ref{Artifact Loading} in-REPL, and all the other nice features!
+    @img(src:="GettingStarted.png", width:="100%")
 
-  @p
-    If you want to use Ammonite as a filesystem shell, take a look at @sect.ref{Ammonite-Shell}
+    @p
+      With @sect.ref("Pretty-printed output", "Pretty Printing"), @sect.ref{Syntax Highlighting} for input and output, @sect.ref{Artifact Loading} in-REPL, and all the other nice @sect.ref{Features}!
 
-  @p
-    If you want some initialization code available to the REPL, you can add it to your @code{~/.ammonite/predef.scala}.
+    @p
+      If you want to use Ammonite as a filesystem shell, take a look at @sect.ref{Ammonite-Shell}. If you're not sure what to do with Ammonite, check out the @sect.ref{REPL Cookbook} for some fun ideas!
 
-  @p
-    You can also try out Ammonite in an existing SBT project, add the following to your @code{build.sbt}
+    @p
+      If you want some initialization code available to the REPL, you can add it to your @code{~/.ammonite/predef.scala}.
+    @p
+      If you have any questions, come hang out on the @sect.ref("Community", "mailing list or gitter channel") and get help!
 
-  @hl.scala
-    libraryDependencies += "com.lihaoyi" % "ammonite-repl" % "@ammonite.Constants.version" % "test" cross CrossVersion.full
+    @sect{Ammonite-REPL in SBT}
+      @p
+        You can also try out Ammonite in an existing SBT project, add the following to your @code{build.sbt}
 
-    initialCommands in (Test, console) := """ammonite.repl.Repl.run("")"""
+      @hl.scala
+        libraryDependencies += "com.lihaoyi" % "ammonite-repl" % "@ammonite.Constants.version" % "test" cross CrossVersion.full
 
-  @p
-    After that, simple hit
-  @code
-    sbt projectName/test:console
-  @p
-    To activate the Ammonite REPL
+        initialCommands in (Test, console) := """ammonite.repl.Main.run("")"""
 
-  @p
-    You can also pass a string to the @code{run} call containing any commands or imports you want executed at the start of every run. If you want Ammonite to be available in all projects, simply add the above snippet to a new file @code{~/.sbt/0.13/global.sbt}.
+      @p
+        After that, simple hit
+      @code
+        sbt projectName/test:console
+      @p
+        To activate the Ammonite REPL
 
-  @p
-    If you have any questions, come hang out on the @sect.ref("Community", "mailing list or gitter channel") and get help!
+      @p
+        You can also pass a string to the @code{run} call containing any commands or imports you want executed at the start of every run. If you want Ammonite to be available in all projects, simply add the above snippet to a new file @code{~/.sbt/0.13/global.sbt}.
 
   @sect{Features}
     @p
@@ -62,9 +66,7 @@
         Ammonite allows you to load artifacts directly from maven central by copy & pasting their SBT ivy-coordinate-snippet. In addition, you can also load in jars as @hl.scala{java.io.File}s to be included in the session or simple @hl.scala{String}s to be executed using the @hl.scala{load} command.
 
       @p
-        This makes Ammonite ideal for trying out new libraries or tools. You can pull down projects like @a("Scalaz", href:="https://github.com/scalaz/scalaz") or @a("Shapeless", href:="https://github.com/milessabin/shapeless") and immediately start working with them in the REPL:
-
-      @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("scalaz", "@"), "\"\"\"")
+        This makes Ammonite ideal for trying out new libraries or tools. You can pull down projects like @lnk("Scalaz", "https://github.com/scalaz/scalaz") or @lnk("Shapeless", "https://github.com/milessabin/shapeless") and immediately start working with them in the REPL:
 
       @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("shapeless", "@"), "\"\"\"")
 
@@ -73,14 +75,18 @@
 
       @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("finagle", "@"), "\"\"\"")
 
-      @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("akkahttp", "@"), "\"\"\"")
+
+      @p
+        Ammonite-REPL is configured with a set of default resolvers but you can add your own
+        
+        @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("resolvers", "@"), "\"\"\"") 
 
     @sect{Pretty-printed output}
 
       @hl.ref(advancedTests, Seq("'pprint", "@"), "\"\"\"")
 
       @p
-        Ammonite-REPL uses @a("PPrint", href:="http://lihaoyi.github.io/upickle-pprint/pprint/") to display its output by default. That means that everything is nicely formatted to fit within the width of the terminal, and is copy-paste-able!
+        Ammonite-REPL uses @lnk("PPrint", "https://lihaoyi.github.io/upickle-pprint/pprint/") to display its output by default. That means that everything is nicely formatted to fit within the width of the terminal, and is copy-paste-able!
 
       @p
         By default, Ammonite @sect.ref("Configurable Truncation", "truncates") the pretty-printed output to avoid flooding your terminal. If you want to disable truncation, call @hl.scala{show(...)} on your expression to pretty-print it's full output. You can also pass in an optional @hl.scala{height = ...} parameter to control how much you want to show before truncation.
@@ -108,11 +114,11 @@
       @p
         Defined some memory-hogging variable you didn't need? Loaded the wrong version of some third-party library? Reluctant to reload the REPL because reloading is slow? Fear not! With Ammonite, you can save your important work, do whatever you want later, and simply discard all the jars you loaded, variables you defined
 
-      @hl.ref(advancedTests, Seq("'saveLoad", "@"))
+      @hl.ref(ammoniteTests/"BuiltinTests.scala", Seq("'saveLoad", "@"))
       @p
         Apart from plain @hl.scala{save}s and @hl.scala{load}s, which simply discard everything after the most recent save, you can also provide a name to these functions. That lets you stop working on a branch, go do something else for a while, and be able to come back later to continue where you left off:
 
-      @hl.ref(advancedTests, Seq("'saveLoad2", "@"))
+      @hl.ref(ammoniteTests/"BuiltinTests.scala", Seq("'saveLoad2", "@"))
 
 
       @p
@@ -146,6 +152,16 @@
         @p
           All the readline-style navigation hotkeys like @b{Ctrl-W} to delete a word or @b{Esc-Left}/@b{Right} to navigate one word left/right still work. If you're comfortable with consoles like Bash, Python, IPython or even the default Scala console, you should have no trouble as all the exact same hotkeys work in Ammonite
 
+      @sect{History Search}
+
+        @img(src:="HistorySearch.gif", width:="445px", marginRight.auto, marginLeft.auto, display.block)
+
+        @p
+          Apart from browsing your command-line history with @code{UP}, you can also perform a history search by entering some search term and @i{then} pressing @code{UP}. That will pull up the most recent history line with that term in it, underlined. You can continue to press @code{UP} or @code{DOWN} to cycle through the matches, or @code{Backspace} or continue typing characters to refine your search to what you want.
+        @p
+          You can press @code{TAB}, or any other command character (@code{LEFT}, @code{RIGHT}, ...) to end the search and let you continue working with the currently-displayed command. Pressing @code{ENTER} will end the search and immediately submit the command to be run.
+        @p
+          You can also kick off a history search using @code{Ctrl-R}, and use @code{Ctrl-R} to cycle through the matches.
 
 
     @sect{Superior Autocomplete}
@@ -200,9 +216,10 @@
 
       @p
         The default Scala REPL throws away all your work if the compiler crashes. This doesn't make any sense, because all the compiler is is a dumb @hl.scala{String => Array[Byte]} pipe. In the Ammonite, we simply swap out the broken compiler for a new one and let you continue your work.
-    @sect{Multiline Input}
+
+    @sect{Block Input}
       @p
-        To enter multiline input into the Ammonite-REPL, simply wrap the multiple lines in curly braces @hl.scala("{ ... }"), and Ammonite will wait until you close it before evaluating the contents:
+        To enter block input (many independent lines all at once) into the Ammonite-REPL, simply wrap the multiple lines in curly braces @hl.scala("{ ... }"), and Ammonite will wait until you close it before evaluating the contents:
 
       @hl.ref(advancedTests, Seq("'unwrapping", "@"))
 
@@ -263,7 +280,7 @@
       res1: mutable.Seq[Int] = ArrayBuffer(123)
 
     @p
-      By default, everything in a script is compiled and executed as a single block. That means that if you want to perform classpath-modifying operations, such as @hl.scala{load.jar} or @hl.scala{load.ivy}, its results will not be available within the same script if you want to use methods, values or packages defined in the loaded code. To make this work, break the script up into multiple compilation units with an @@ sign, e.g.
+      By default, everything in a script is compiled and executed as a single block. That means that if you want to perform classpath-modifying operations, such as @hl.scala{load.cp} or @hl.scala{load.ivy}, its results will not be available within the same script if you want to use methods, values or packages defined in the loaded code. To make this work, break the script up into multiple compilation units with an @@ sign, e.g.
 
     @hl.scala
       // print banner
@@ -295,7 +312,25 @@
 
     @p
       All types, values and imports defined in scripts are available to commands entered in REPL after loading the script.
+    @sect{Script Arguments}
+      @p
+        Often when calling a script from the external command- line (e.g. Bash), you need to pass arguments to configure its behavior. With Ammonite, this is done by defining a @hl.scala{main} method, e.g.
 
+      @hl.ref(wd/'integration/'src/'test/'resources/'ammonite/'integration/"Args.scala")
+
+      @p
+        When the script is run from the command line:
+      @hl.sh
+        ~/amm Args.scala 3 Moo
+      @p
+        The top-level definitions execute first (e.g. setting @hl.scala{x}), and then the @hl.scala{main} method is called with the arguments you passed in.
+      @p
+        Default arguments behave as you would expect (i.e. they allow you to omit it when calling) and arguments are parsed using the @hl.scala{scopt.Read} typeclass, which provides parsers for primitives like @code{Int}, @code{Double}, @code{String}, as well as basic data-structures like @code{Seq}s (taken as a comma-separated list) and common types like @sect.ref{Paths}.
+      @p
+        If you pass in the wrong number of arguments, or if an argument fails to deserialize, the script will fail with an exception.
+
+      @p
+        The @hl.scala{main} method does not get automatically called when you @hl.scala{load.module} or @hl.scala{load.exec} a script from @i{within} the Ammonite REPL. It gets imported into scope like any other method or value defined in the script, and you can just call it normally.
   @sect{Configuration}
     @p
       Ammonite is configured via Scala code, that can live in the @code{~/.ammonite/predef.scala} file, passed in through SBT's @hl.scala{initialCommands}, or passed to the command-line executable as @code{--predef='...'}.
@@ -346,14 +381,14 @@
       Note that unlike the snippet given @sect.ref("Ammonite", "above"), we leave out the @hl.scala{% "test"} because we may want ammonite to be available within the "main" project, and not just in the unit tests. Then, anywhere within your program, you can place a breakpoint via:
 
     @hl.scala
-      import ammonite.repl.Repl._
+      import ammonite.repl.Main._
       debug("name1" -> value1, "name2" -> value2, ...)
 
     @p
       And when your program reaches that point, it will pause and open up an Ammonite REPL with the values you provided it bound to the names you gave it. From there, you can interact with those values as normal Scala values within the REPL. Use @code{Ctrl-D} or @hl.scala{exit} to exit the REPL and continue normal program execution. Note that the names given must be plain Scala identifiers.
 
     @p
-      Here's an example of it being used to debug changes to the @a("WootJS webserver", href:="https://github.com/d6y/wootjs"):
+      Here's an example of it being used to debug changes to the @lnk("WootJS webserver", "https://github.com/d6y/wootjs"):
 
     @img(src:="Debugging.png", width:="100%")
     @p
@@ -394,7 +429,7 @@
         replServer.start()
 
       @p
-        And start your application. You will be able to connect to it using ssh like this: @hl.sh("ssh repl@localhost -p22222") and interact with your running app. Invoke @hl.scala{stop()} method whenever you want to shutdown ammonite sshd server. Here for example sshd repl server is embedded in the @a("Akka HTTP microservice example", href:="https://github.com/theiterators/akka-http-microservice"):
+        And start your application. You will be able to connect to it using ssh like this: @hl.sh("ssh repl@localhost -p22222") and interact with your running app. Invoke @hl.scala{stop()} method whenever you want to shutdown ammonite sshd server. Here for example sshd repl server is embedded in the @lnk("Akka HTTP microservice example", "https://github.com/theiterators/akka-http-microservice"):
 
       @img(src:="DebuggingViaSshd.png", width:="100%")
 
@@ -409,3 +444,344 @@
 
       @p
         Typically most organizations already have bastions, firewalls, and other necessary infrastructure to allow trusted parties SSH access to the relevant machines. Running on @code{localhost} lets you leverage that and gain all the same security properties without having to re-implement them in Scala.
+
+  @sect{REPL Cookbook}
+
+    @p
+      The Ammonite Scala REPL is meant to be extended: you can load in arbitary Java/Scala modules from the internet via @sect.ref("Artifact Loading", "load.ivy"). Using this third-party code, you extend the REPL to do anything you wish to do, and tools like @sect.ref{Ammonite-Shell} are simply modules like any other. Simple install Java, @sect.ref("Ammonite-REPL", "download Ammonite") onto any Linux/OSX machine, and try out one of these fun snippets!
+
+    @ul
+      @li
+        @sect.ref{HTTP Requests}
+      @li
+        @sect.ref{Scraping HTML}
+      @li
+        @sect.ref{GUI Applications}
+      @li
+        @sect.ref{Office Automation}
+      @li
+        @sect.ref{Image Processing}
+      @li
+        @sect.ref{Machine Learning}
+
+    @sect{HTTP Requests}
+      @p
+        Ammonite does not come with a built-in way to make HTTP requests, but there are Java /Scala modules that do this quite well! Here's an example:
+
+      @hl.scala
+        Welcome to the Ammonite Repl
+        @@ load.ivy("org.scalaj" %% "scalaj-http" % "2.2.0")
+        :: loading settings ::
+        :: resolving dependencies ::
+        ...
+        [SUCCESSFUL ] org.scalaj#scalaj-http_2.11;2.2.0!scalaj-http_2.11.jar (63ms)
+
+        @@ import ammonite.ops._, scalaj.http._
+        import ammonite.ops._, scalaj.http._
+
+        @@ val resp = Http("https://api.github.com/repos/scala/scala").asString
+        resp: HttpResponse[String] = HttpResponse(
+        {"id":2888818,"name":"scala","full_name":"scala/scala","owner":
+        {"login":"scala","id":57059,"avatar_url":
+        "https://avatars.githubusercontent.com/u/57059?v=3","gravatar_id":"",
+        "url":"https://api.github.com/users/scala","html_url":"https://github.com/scala",
+        "followers_url":"https://api.github.com/users/scala/followers",
+        "following_url":"https://api.github.com/users/scala/following{/other_user}",
+        "gists_url":"https://api.github.com/users/scala/gists{/gist_id}",
+        "starred_url":"https://api.github.com/users/scala/starred{/owner}{/repo}",
+        "subscriptions_url":"https://api.github.com/users/scala/subscriptions",
+        ...
+
+        @@ val parsed = upickle.json.read(resp.body).asInstanceOf[upickle.Js.Obj]
+        parsed: upickle.Js.Obj = Obj(
+          ArrayBuffer(
+            ("id", Num(2888818.0)),
+            ("name", Str("scala")),
+            ("full_name", Str("scala/scala")),
+            (
+              "owner",
+              Obj(
+                ArrayBuffer(
+                  ("login", Str("scala")),
+        ...
+
+        @@ for((k, v) <- parsed.value) write(cwd/'target/'temp/k, upickle.json.write(v))
+
+        @@ ls! cwd/'target/'temp
+        res6: LsSeq = LsSeq(
+          /Users/haoyi/Dropbox (Personal)/Workspace/Ammonite/target/temp/archive_url,
+          /Users/haoyi/Dropbox (Personal)/Workspace/Ammonite/target/temp/assignees_url,
+          /Users/haoyi/Dropbox (Personal)/Workspace/Ammonite/target/temp/blobs_url,
+          /Users/haoyi/Dropbox (Personal)/Workspace/Ammonite/target/temp/branches_url,,
+        ...
+
+      @p
+        In this example, we use the @lnk("Scalaj HTTP", "https://github.com/scalaj/scalaj-http") library to download a URL, and we use @lnk("uPickle", "http://lihaoyi.github.io/upickle-pprint/upickle/") and @sect.ref{Ammonite-Ops} to parse the JSON and write it into files. uPickle and Ammonite-Ops are bundled with the Ammonite REPL and are used internally, and while Scalaj HTTP isn't, we can simply load it from the public repositories via @hl.scala{load.ivy}.
+      @p
+        This is a small example, but it illustrates the potential: if you find yourself needing to scrape some website or bulk-download large quantities of data from some website's HTTP/JSON API, you can start doing so within a matter of seconds using Ammonite. The results are given to you in nicely structured data, and you can deal with them using any Java or Scala libraries or tools you are used to rather than being forced to munge around in Bash. Sometimes, you may find that you need to get data from somewhere without a nice JSON API, which means you'd need to fall back to @sect.ref{Scraping HTML}...
+
+    @sect{Scraping HTML}
+      @p
+        Not every website has an API, and not every website is meant to be accessed programmatically. That doesn't mean you can't do it! Using libraries like @lnk("JSoup", "http://jsoup.org/"), you can quickly and easily get the computer to extract useful information from HTML that was meant to humans. Using the Ammonite REPL, you can do it interactively and without needing to set up annoying project scaffolding.
+      @hl.scala
+        @@ load.ivy("org.jsoup" % "jsoup" % "1.7.2")
+
+        @@ import org.jsoup._ // import Jsoup
+
+        @@ import collection.JavaConversions._ // make Java collections easier to use
+
+        @@ val doc = Jsoup.connect("http://en.wikipedia.org/").get()
+
+        @@ doc.select("h1")
+        res54: select.Elements = <h1 id="firstHeading" class="firstHeading" lang="en">Main Page</h1>
+        @@ doc.select("h2") // this is huge and messy
+        res55: select.Elements = <h2 id="mp-tfa-h2" style="margin:3px; background:#cef2e0; font-family:inherit; font-size:120%; font-weight:bold; border:1px solid #a3bfb1; text-align:left; color:#000; padding:0.2em 0.4em;"><span class="mw-headline" id="From_today.27s_featured_article">From today's featured article</span></h2>
+        <h2 id="mp-dyk-h2" style="margin:3px; background:#cef2e0; font-family:inherit; font-size:120%; font-weight:bold; border:1px solid #a3bfb1; text-align:left; color:#000; padding:0.2em 0.4em;"><span class="mw-headline" id="Did_you_know...">Did you know...</span></h2>
+        ...
+
+        @@ doc.select("h2").map(_.text) // but you can easily pull out the bits you want
+        res56: collection.mutable.Buffer[String] = ArrayBuffer(
+          "From today's featured article",
+          "Did you know...",
+          "In the news",
+          "On this day...",
+          "From today's featured list",
+          "Today's featured picture",
+          "Other areas of Wikipedia",
+          "Wikipedia's sister projects",
+          "Wikipedia languages",
+          "Navigation menu"
+        )
+      @p
+        If you wanted to scrape headlines off some news-site or scrape video game reviews off of some gaming site, you don't need to worry about setting up a project and installing libraries and all that stuff. You can simply load libraries like Jsoup right into the Ammonite REPL, copy some example from their website, and start scraping useful information in less than a minute.
+
+    @sect{GUI Applications}
+      @p
+        The Ammonite REPL runs on the Java virtual machine, which means you can use it to create Desktop GUI applications like anyone else who uses Java! Here's an example of how to create a hello-world interactive desktop app using Swing
+
+      @hl.scala
+        @@ {
+          import javax.swing._, java.awt.event._
+          val frame = new JFrame("Hello World Window")
+
+          val button = new JButton("Click Me")
+          button.addActionListener(new ActionListener{
+            def actionPerformed(e: ActionEvent) = button.setText("You clicked the button!")
+          })
+          button.setPreferredSize(new java.awt.Dimension(200, 100))
+          frame.getContentPane.add(button)
+          frame.pack()
+          frame.setVisible(true)
+
+          }
+      @p
+        This can be run inside the Ammonite REPL without installing anything, and will show the following window with a single button:
+
+      @img(src:="Swing1.png", marginLeft.auto, marginRight.auto)
+
+      @p
+        When clicked, it changes text:
+
+      @img(src:="Swing2.png", marginLeft.auto, marginRight.auto)
+
+      @p
+        Although this is just a small demo, you can use Ammonite yourself to experiment with GUI programming without needing to go through the hassle of setting up an environment and project and all that rigmarole. Just run the code right in the console! You can even interact with the GUI live in the console, e.g. running this snippet of code to add another action listener to keep count of how many times you clicked the button
+
+      @hl.scala
+        @@ {
+          var count = 0
+          button.addActionListener(new ActionListener{
+            def actionPerformed(e: ActionEvent) = {
+              count += 1
+              frame.setTitle("Clicks: " + count)
+            }
+          })
+          }
+
+      @p
+        Which immediately becomes visible in the title of the window:
+
+      @img(src:="Swing3.png", marginLeft.auto, marginRight.auto)
+
+      @p
+        Even while you're clicking on the button, you can still access @code{count} in the console:
+      @hl.scala
+        @@ count
+        res12: Int = 6
+      @p
+        This is a level of live interactivity which is traditionally hard to come by in the world of desktop GUI applications, but with the Ammonite REPL, it's totally seamless
+
+    @sect{Office Automation}
+      @p
+        Apart from writing code, you very often find yourself dealing with documents and spreadsheets of various sorts. This is often rather tedious. Wouldn't it be cool if you could deal with these things programmatically? It turns out that there are open-soure Java libraries such as @lnk("Apache POI", "https://poi.apache.org/") that let you do this, and with the Ammonite-REPL you can quickly and easily load these libraries and get to work on your favorite documents. Here's an example extracting some data from my old Resume, in @code{.docx} format:
+
+      @hl.scala
+        @@ load.ivy("org.apache.poi" % "poi-ooxml" % "3.13")
+
+        @@ import ammonite.ops._                  // Prepare to deal with some files
+        @@ import org.apache.poi.xwpf.usermodel._ // Bring Ms-Word APIs into scope
+        @@ import collection.JavaConversions._    // Make use of Java collections easier
+
+        @@ val path = cwd/'repl/'src/'test/'resources/'testdata/"Resume.docx"
+
+        @@ val docx = new XWPFDocument(new java.io.ByteArrayInputStream(read.bytes(path)))
+
+        @@ docx.get<tab>
+        getAllEmbedds                            getParagraphArray
+        getAllPackagePictures                    getParagraphPos
+        getAllPictures                           getParagraphs
+        getBodyElements                          getParagraphsIterator
+        getBodyElementsIterator                  getParent
+        getClass                                 getPart
+        getCommentByID                           getPartById
+        getComments                              getPartType
+        getDocument                              getPictureDataByID
+        ...
+
+        @@ docx.getParagraphs.map(_.getText)
+        res28: collection.mutable.Buffer[String] = ArrayBuffer(
+          """
+        Haoyi Li
+          """,
+          """
+        Education	Massachusetts Institute of Technology		Cambridge, MA
+          """,
+          """
+        Bachelor of Science degree in Computer Science, GPA 4.8/5.0	 Sep 2010 – Jun 2013
+          """,
+          """
+        Work	Dropbox		San Francisco, CA
+          """
+        ...
+
+        @@ docx.getHyperlinks.map(_.getURL)
+        res27: Array[String] = Array(
+          "http://vimeo.com/87845442",
+          "http://www.github.com/lihaoyi/scalatags",
+          "http://www.github.com/lihaoyi/scala.rx",
+          "http://www.github.com/lihaoyi/scala-js-fiddle",
+          "http://www.github.com/lihaoyi/metascala",
+          "https://www.github.com/lihaoyi/macropy",
+          "http://www.github.com/lihaoyi",
+          "http://www.github.com/lihaoyi"
+        )
+      @p
+        As you can see, loading the Apache POI library is just a single command, reading in my resume file is just one or two more, and then you can immediate start exploring the document's data model to see what inside interests you. You even get tab-completion on the methods of the document, making it really easy for you to interactively explore all the things that a word document has to offer!
+      @p
+        This is just a small example, but you can easily do more things in the same vein: Apache POI lets you create/modify/save @code{.docx} files in addition to reading from them, meaning you can automatically perform batch operations on large numbers of documents. The library also provides mechanisms to load in Excel spreadsheets and Powerpoint slide decks, meaning you have easy, programmable access to the great bulk of any Microsoft-Office files you find yourself dealing with.
+
+
+    @sect{Image Processing}
+      @p
+        You can perform lots of image operations in Java. You can use @lnk("BufferedImagee", "https://docs.oracle.com/javase/7/docs/api/java/awt/image/BufferedImage.html") if you want to access the low-level details or read/write individual pixels, and using @lnk("Java2D", "http://zetcode.com/gfx/java2d/") you can draw shapes, perform transforms, or do anything you could possibly want to do with the images.
+      @p
+        There are also simple libraries like @lnk("Thumbnailator", "https://github.com/coobird/thumbnailator") if you're doing basic things like renaming/resizing/rotating and don't need pixel-per-pixel access. This is an example of using Thumbnailator to resize a folder of images and put them somewhere else:
+
+      @hl.scala
+        @@ load.ivy("net.coobird" % "thumbnailator" % "0.4.8")
+
+        @@ import net.coobird.thumbnailator._
+        import net.coobird.thumbnailator._
+
+        @@ val images = ls! cwd/'repl/'src/'test/'resources/'testdata/'images
+        images: LsSeq = LsSeq(
+          /Users/haoyi/Dropbox (Personal)/Workspace/Ammonite/repl/src/test/resources/testdata/images/GettingStarted.png,
+          /Users/haoyi/Dropbox (Personal)/Workspace/Ammonite/repl/src/test/resources/testdata/images/Highlighting.png,
+          /Users/haoyi/Dropbox (Personal)/Workspace/Ammonite/repl/src/test/resources/testdata/images/SystemShell.png
+        )
+        @@ val dest = cwd/'target/'thumbnails
+        dest: Path = /Users/haoyi/Dropbox (Personal)/Workspace/Ammonite/target/thumbnails
+
+        @@ mkdir! dest
+
+        @@ for(i <- images) {
+            Thumbnails.of(i.toString).size(200, 200).toFile(dest/i.last toString)
+          }
+
+        @@ val thumbnails = ls! dest
+        thumbnails: LsSeq = LsSeq(
+          /Users/haoyi/Dropbox (Personal)/Workspace/Ammonite/target/thumbnails/GettingStarted.png,
+          /Users/haoyi/Dropbox (Personal)/Workspace/Ammonite/target/thumbnails/Highlighting.png,
+          /Users/haoyi/Dropbox (Personal)/Workspace/Ammonite/target/thumbnails/SystemShell.png
+        )
+
+        @@ images.map(_.size) // Original image files are pretty big
+        res44: Seq[Long] = List(180913L, 208328L, 227570L)
+
+        @@ thumbnails.map(_.size) // Thumbnailed image files are much smaller
+        res45: Seq[Long] = List(11129L, 11790L, 11893L)
+    @sect{Machine Learning}
+      @p
+        The word "Machine Learning" sounds big and intimidating, like something you'd need to spend 6 years getting a PhD before you understand. What if you could "do some machine-learning" (whatever that means) in your spare time, in a minute or two? It turns out there are many Java libraries that can help you with basics, and with the Ammonite REPL getting started is easy.
+
+      @p
+        Here's one example of how you can get started using the @lnk("OpenNLP", "http://opennlp.apache.org/") project to do some natural-language processing in just a few minutes. The example was found @lnk("online", "http://www.programcreek.com/2012/05/opennlp-tutorial/#sentence detector"), and shows how to extract english names from a raw @code{String} using NLP:
+
+      @hl.scala
+        @@ load.ivy("org.apache.opennlp" % "opennlp-tools" % "1.6.0") // load OpenNLP
+
+        @@ // Turns out you need training data, use Scalaj-HTTP to download it
+
+        @@ load.ivy("org.scalaj" %% "scalaj-http" % "2.2.0")
+
+        @@ val tokenDataUrl = "http://opennlp.sourceforge.net/models-1.5/en-token.bin"
+
+        @@ val tokenData = scalaj.http.Http(tokenDataUrl).asBytes
+        tokenData: HttpResponse[Array[Byte]] = HttpResponse(
+          Array(
+            80,
+            75,
+            3,
+            4,
+            20,
+        ...
+
+        @@ import opennlp.tools.tokenize._ // let's get started with OpenNLP!
+
+        @@ val str = "Hi. How are you? This is Mike. Did you see book about Peter Smith?"
+
+        @@ import java.io.ByteArrayInputStream
+
+        @@ val tokenModel = new TokenizerModel(new ByteArrayInputStream(tokenData.body))
+
+        @@ val tokenizer = new TokenizerME(tokenModel)
+
+        @@ val tokens = tokenizer.tokenize(str)
+        tplems: Array[String] = Array(
+          "Hi",
+          ".",
+          "How",
+          "are",
+          "you"
+        ...
+
+        @@ import opennlp.tools.namefind._ // Turns out we need more test data...
+
+        @@ val nameDataUrl = "http://opennlp.sourceforge.net/models-1.5/en-ner-person.bin"
+
+        @@ val nameData = Http(nameDataUrl).asBytes
+        nameData: HttpResponse[Array[Byte]] = HttpResponse(
+          Array(
+            80,
+            75,
+            3,
+            4,
+            20,
+        ...
+
+        @@ val nameModel = new TokenNameFinderModel(new ByteArrayInputStream(nameData.body))
+
+        @@ val nameFinder = new NameFinderME(nameModel)
+        nameFinder: NameFinderME = opennlp.tools.namefind.NameFinderME@@491eb5ef
+
+        @@ val names = nameFinder.find(tokens)
+        names: Array[opennlp.tools.util.Span] = Array([8..9) person, [15..17) person)
+
+        @@ opennlp.tools.util.Span.spansToStrings(names, tokens) // Woohoo, names!
+        res96: Array[String] = Array("Mike", "Peter Smith")
+
+      @p
+        This took a while, but only in comparison to the earlier cookbook recipes: this one is still less than 20 steps, which is not bad for something that installs multiple third-party modules, pulls down training data off the internet, and then does natural language processing to extract the english names from a text blob!
+
+      @p
+        Obviously we did not go very deep into the field. If you did, it would definitely be a lot more reading and understanding than just blindly following tutorials like I did above, and you probably would find it worth the time to set up a proper project. Nevertheless, this quick 5-minute run through of how to perform the basics of NLP is a fun way to get started whether or not you decide to take it further, and is only possible because of the Ammonite REPL!

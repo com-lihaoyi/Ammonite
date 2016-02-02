@@ -6,7 +6,7 @@ import scala.annotation.tailrec
 
 
 object Debug{
-  lazy val debugOutput= new java.io.FileOutputStream(new java.io.File("terminal/target/log"))
+//  lazy val debugOutput= new java.io.FileOutputStream(new java.io.File("terminal/target/log"))
   def apply(s: Any) = {
 //    debugOutput.write((System.currentTimeMillis() + "\t\t" + s + "\n").getBytes)
   }
@@ -47,6 +47,11 @@ class Ansi(output: Writer){
    * n=2: clear entire line
    */
   def clearLine(n: Int) = control(n, 'K')
+}
+object Ansi{
+  val resetUnderline = "\u001b[24m"
+  val resetForegroundColor = "\u001b[39m"
+  val resetBackgroundColor = "\u001b[49m"
 }
 object TTY{
 

@@ -6,7 +6,7 @@ package ammonite.shell
 object Main {
   val examplePredef = "shell/src/main/resources/ammonite/shell/example-predef-bare.scala"
   def main(args: Array[String]) = {
-    ammonite.repl.Repl.main(
+    ammonite.repl.Main.main(
       Array("--predef-file", examplePredef) ++ args
     )
   }

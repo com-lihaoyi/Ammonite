@@ -1,23 +1,65 @@
 package ammonite.repl.interp
 
-import java.io.IOException
 import java.net.{URL, URLClassLoader}
 import java.nio.file
-import java.nio.file.attribute.BasicFileAttributes
-import java.nio.file.{SimpleFileVisitor, FileVisitResult, FileVisitor}
 import java.security.MessageDigest
 
 import ammonite.ops._
 import ammonite.repl.{ImportData, Util}
-import pprint.PPrint
-
 import scala.collection.mutable
-import scala.reflect.io.VirtualDirectory
 
-case class Frame(classloader: SpecialClassLoader,
-                 pluginClassloader: SpecialClassLoader,
-                 var previousImports: Map[String, ImportData],
-                 var extraJars: Seq[java.io.File])
+object Frame{
+  /**
+    * Figure out which imports will get stomped over by future imports
+    * before they get used, and just ignore those.
+    */
+  def mergeImports(importss: Seq[ImportData]*) = {
+    // We iterate over the combined reversed imports, keeping track of the
+    // things that will-be-stomped-over-in-the-non-reversed-world in a map.
+    // If an import's target destination will get stomped over we ignore it
+    //
+    // At the end of the day we re-reverse the trimmed list and return it.
+    val importData = importss.flatten
+    val stompedTypes = mutable.Set.empty[String]
+    val stompedTerms = mutable.Set.empty[String]
+    val out = mutable.Buffer.empty[ImportData]
+    for(data <- importData.reverseIterator){
+      val stomped = data.importType match{
+        case ImportData.Term => Seq(stompedTerms)
+        case ImportData.Type => Seq(stompedTypes)
+        case ImportData.TermType => Seq(stompedTerms, stompedTypes)
+      }
+      if (!stomped.exists(_(data.toName))){
+        out.append(data)
+        stomped.foreach(_.add(data.toName))
+        stompedTerms.remove(data.prefix)
+      }
+    }
+    out.reverse
+  }
+}
+
+
+/**
+  * Represents a single "frame" of the `sess.save`/`sess.load` stack/tree.
+  *
+  * Exposes `imports` and `classpath` as readable but only writable
+  * in particular ways: `imports` can only be updated via `mergeImports`,
+  * while `classpath` can only be added to.
+  */
+class Frame(val classloader: SpecialClassLoader,
+            val pluginClassloader: SpecialClassLoader,
+            private[this] var imports0: Seq[ImportData],
+            private[this] var classpath0: Seq[java.io.File]){
+  def imports = imports0
+  def classpath = classpath0
+  def addImports(additional: Seq[ImportData]) = {
+    imports0 = Frame.mergeImports(imports0, additional)
+  }
+  def addClasspath(additional: Seq[java.io.File]) = {
+    classpath0 = classpath0 ++ additional
+  }
+}
 
 object SpecialClassLoader{
   val simpleNameRegex = "[a-zA-Z0-9_]+".r
@@ -39,26 +81,11 @@ object SpecialClassLoader{
       all
     }
 
-    def findMtimes(d: file.Path): Seq[(String, Long)] = {
-      val mtimes = mutable.Buffer.empty[(String, Long)]
-      // walkFileTree is *waaaaay* faster than ls.rec!
-      // That should get fixed at some point, but for now just use it instead
-      java.nio.file.Files.walkFileTree(
-        d,
-        new SimpleFileVisitor[file.Path] {
-          override def visitFile(file: java.nio.file.Path, attrs: BasicFileAttributes) = {
-            mtimes.append(file.toString -> attrs.lastModifiedTime().toMillis)
-            FileVisitResult.CONTINUE
-          }
-
-          override def preVisitDirectory(dir: java.nio.file.Path, attrs: BasicFileAttributes) = {
-            val name = dir.getFileName.toString
-            if (simpleNameRegex.findPrefixOf(name) == Some(name)) FileVisitResult.CONTINUE
-            else FileVisitResult.SKIP_SUBTREE
-          }
-        }
-      )
-      mtimes
+    def findMtimes(d: file.Path): Seq[(Path, Long)] = {
+      def skipSuspicious(path: Path) = {
+        simpleNameRegex.findPrefixOf(path.last) == Some(path.last)
+      }
+      ls.rec(skip = skipSuspicious)! Path(d) | (x => (x, x.mtime.toMillis))
     }
 
     val classpathFolders =
@@ -73,7 +100,7 @@ object SpecialClassLoader{
 
     val hashes = classFileMtimes.map{ case (name, mtime) =>
       Util.md5Hash(Iterator(
-        name.getBytes,
+        name.toString.getBytes,
         (0 until 64 by 8).iterator.map(mtime >> _).map(_.toByte).toArray
       ))
     }

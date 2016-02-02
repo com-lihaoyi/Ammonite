@@ -10,12 +10,7 @@ object EditTests extends TestSuite{
       width = 5,
       grid = """
         abcd
-        efgh
-        ijkl
-      """ ,
-      start = """
-        abcd
-        e_gh
+        e_fgh
         ijkl
       """
     )
@@ -26,7 +21,7 @@ object EditTests extends TestSuite{
       * - check(
         """
         abcd
-        _gh
+        _fgh
         ijkl
         """,
         edit.cutWordLeft
@@ -42,7 +37,7 @@ object EditTests extends TestSuite{
       * - check(
         """
         abcd
-        _
+        _e
         ijkl
         """,
         edit.cutWordRight,
@@ -50,7 +45,7 @@ object EditTests extends TestSuite{
       )
       * - check(
         """
-        _gh
+        _fgh
         ijkl
         """,
         edit.cutAllLeft
@@ -66,7 +61,7 @@ object EditTests extends TestSuite{
       * - check(
         """
         abcd
-        _
+        _e
         """,
         edit.cutAllRight,
         wordLeft
@@ -75,7 +70,7 @@ object EditTests extends TestSuite{
       * - check (
         """
         abcd
-        _gh
+        _fgh
         ijkl
         """,
         edit.cutCharLeft
@@ -83,7 +78,7 @@ object EditTests extends TestSuite{
       
       * - check (
         """
-        abc_gh
+        abc_fgh
         ijkl
         """,
         edit.cutCharLeft,
@@ -96,7 +91,7 @@ object EditTests extends TestSuite{
       * - check(
         """
         abcd
-        e_gh
+        e_fgh
         ijkl
         """,
         edit.cutWordLeft,
@@ -105,7 +100,7 @@ object EditTests extends TestSuite{
       * - check(
         """
         abcd
-        ee_gh
+        ee_fgh
         ijkl
         """,
         edit.cutWordLeft,

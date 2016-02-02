@@ -5,6 +5,7 @@ import java.io.File
 import ammonite.ops._
 import ammonite.repl._
 import ammonite.repl.interp.Frame
+import org.apache.ivy.plugins.resolver.RepositoryResolver
 import pprint.{PPrinter, PPrint, Config}
 
 import scala.collection.mutable
@@ -79,6 +80,11 @@ trait ReplAPI {
    * Tools related to loading external scripts and code into the REPL
    */
   def load: Load
+
+  /**
+   * resolvers to use when loading jars 
+   */
+  def resolvers: Ref[List[Resolver]]
 
   /**
    * The colors that will be used to render the Ammonite REPL in the terminal
@@ -177,43 +183,13 @@ trait Session{
     */
   def delete(name: String): Unit
 }
-case class SessionChanged(removedImports: Set[scala.Symbol],
-                          addedImports: Set[scala.Symbol],
-                          removedJars: Set[java.net.URL],
-                          addedJars: Set[java.net.URL])
-object SessionChanged{
-  implicit val pprinter: PPrinter[SessionChanged] = PPrinter[SessionChanged]{
-    (data, config) =>
-      val output = mutable.Buffer.empty[String]
-      def printDelta[T: PPrint](name: String, d: Iterable[T]) = {
-        if (d.nonEmpty){
-          Iterator("\n", name, ": ") ++ pprint.tokenize(d)(implicitly, config)
-        }else Iterator()
-      }
-      val res = Iterator(
-        printDelta("Removed Imports", data.removedImports),
-        printDelta("Added Imports", data.addedImports),
-        printDelta("Removed Jars", data.removedJars),
-        printDelta("Added Jars", data.addedJars)
-      )
-      res.flatten
-  }
-  def delta(oldFrame: Frame, newFrame: Frame): SessionChanged = {
-    def frameSymbols(f: Frame) = f.previousImports.keySet.map(Symbol(_))
-    new SessionChanged(
-      frameSymbols(oldFrame) -- frameSymbols(newFrame),
-      frameSymbols(newFrame) -- frameSymbols(oldFrame),
-      oldFrame.classloader.allJars.toSet -- newFrame.classloader.allJars.toSet,
-      newFrame.classloader.allJars.toSet -- oldFrame.classloader.allJars.toSet
-    )
-  }
-}
-// End of OpsAPI
+
 trait LoadJar {
+
   /**
-   * Load a `.jar` file
+   * Load a `.jar` file or directory into your JVM classpath
    */
-  def jar(jar: Path): Unit
+  def cp(jar: Path): Unit
   /**
    * Load a library from its maven/ivy coordinates
    */
@@ -285,7 +261,7 @@ trait DefaultReplAPI extends FullReplAPI {
       |to replace. Hit <tab> to autocomplete possible names.
       |
       |For a list of REPL built-ins and configuration, use `repl.<tab>`. For a more detailed
-      |description of how to use the REPL, check out http://lihaoyi.github.io/Ammonite
+      |description of how to use the REPL, check out https://lihaoyi.github.io/Ammonite
     """.stripMargin.trim
   object Internal extends Internal{
     def combinePrints(iters: Iterator[String]*) = {
@@ -325,3 +301,35 @@ trait DefaultReplAPI extends FullReplAPI {
   }
 }
 object ReplBridge extends ammonite.repl.frontend.ReplAPIHolder{}
+
+case class SessionChanged(removedImports: Set[scala.Symbol],
+                          addedImports: Set[scala.Symbol],
+                          removedJars: Set[java.net.URL],
+                          addedJars: Set[java.net.URL])
+object SessionChanged{
+  implicit val pprinter: PPrinter[SessionChanged] = PPrinter[SessionChanged]{
+    (data, config) =>
+      val output = mutable.Buffer.empty[String]
+      def printDelta[T: PPrint](name: String, d: Iterable[T]) = {
+        if (d.nonEmpty){
+          Iterator("\n", name, ": ") ++ pprint.tokenize(d)(implicitly, config)
+        }else Iterator()
+      }
+      val res = Iterator(
+        printDelta("Removed Imports", data.removedImports),
+        printDelta("Added Imports", data.addedImports),
+        printDelta("Removed Jars", data.removedJars),
+        printDelta("Added Jars", data.addedJars)
+      )
+      res.flatten
+  }
+  def delta(oldFrame: Frame, newFrame: Frame): SessionChanged = {
+    def frameSymbols(f: Frame) = f.imports.map(_.toName).map(Symbol(_)).toSet
+    new SessionChanged(
+      frameSymbols(oldFrame) -- frameSymbols(newFrame),
+      frameSymbols(newFrame) -- frameSymbols(oldFrame),
+      oldFrame.classloader.allJars.toSet -- newFrame.classloader.allJars.toSet,
+      newFrame.classloader.allJars.toSet -- oldFrame.classloader.allJars.toSet
+    )
+  }
+}

@@ -145,23 +145,53 @@
     @p
       The latter syntax allows you to use it more easily from the command line, where remembering to close all your parenthesis is a hassle. Indentation signifies nesting, e.g. in addition to @hl.scala{write!} you also have @hl.scala{write.append!} and @hl.scala{write.over!}
 
-    @p
-      All of these operations are pre-defined and strongly typed, so feel free to jump to their implementation to look at what they do or what else is available.
+    @sect{Operator Reference}
+      @p
+        All of these operations are pre-defined and strongly typed, so feel free to jump to their implementation to look at what they do or what else is available. Here's a shortlist of the one that may interest you:
 
-    @p
-      In general, each operator has sensible/safe defaults:
+      @ul
+        @val docBase = "https://lihaoyi.github.io/Ammonite/api/ops/index.html#ammonite.ops."
+        @li
+          @hl.scala{ls! path} @a("[doc]", href := (docBase+ "ls$")) returning @hl.scala{Vector[Path]}, and @hl.scala{ls.iter! path} returning a @hl.scala{Iterator[Path]}
+        @li
+          @hl.scala{ls.rec! path} @a("[doc]", href := (docBase+ "ls$$rec$")) and @hl.scala{ls.rec.iter!}
+        @li
+          @hl.scala{read! path} @a("[doc]", href := (docBase+ "read$")) returning a @hl.scala{String}, and @hl.scala{read.lines! path} and @hl.scala{read.bytes! path} returning @hl.scala{Seq[String]} and @hl.scala{Array[Byte]}
+        @li
+          @hl.scala{read.resource! path}, @a("[doc]", href := (docBase+ "read$$resource$")), and @hl.scala{read.resource.lines! path} and @hl.scala{read.resource.bytes! path}, behaves the same as @hl.scala{read!} but reads from your resource classpath instead of the filesystem
+        @li
+          @hl.scala{write(path, contents)}, @a("[doc]", href := (docBase+ "write$")), which lets you write @hl.scala{String}s, @hl.scala{Array[Byte]}s, and @hl.scala{Seq}s of those
+        @li
+          @hl.scala{rm! path}, @a("[doc]", href := (docBase+ "rm$")), roughly Bash's @code{rm -rf}
+        @li
+          @hl.scala{mv(src, dest)}, @a("[doc]", href := (docBase+ "mv$"))
+        @li
+          @hl.scala{cp(src, dest)}, @a("[doc]", href := (docBase+ "cp$")), roughly Bash's @code{cp -r}
+        @li
+          @hl.scala{exists! path}, @a("[doc]", href := (docBase+ "exists$"))
+        @li
+          @hl.scala{stat! path}, @a("[doc]", href := (docBase+ "stat$"))
+        @li
+          @hl.scala{stat.full! path}, @a("[doc]", href := (docBase+ "stat$$full$"))
+        @li
+          @hl.scala{ln(src, dest)}, @a("[doc]", href := (docBase+ "ln$"))
+        @li
+          @hl.scala{kill(9)! processId}, @a("[doc]", href := (docBase+ "kill"))
 
-    @ul
-      @li
-        @hl.scala{rm} and @hl.scala{cp} are recursive
-      @li
-        @hl.scala{rm} ignores the file if it doesn't exist
-      @li
-        all operations that create a file or folder (@hl.scala{mkdir}, @hl.scala{write}, @hl.scala{mv}) automatically create any necessary parent directories
-      @li
-        @hl.scala{write} also does @i{not} stomp over existing files by default. You need to use @hl.scala{write.over}
-    @p
-      In general, this should make these operations much easier to use; the defaults should cover the 99% use case without needing any special flags or fiddling.
+      @p
+        In general, each operator has sensible/safe defaults:
+
+      @ul
+        @li
+          @hl.scala{rm} and @hl.scala{cp} are recursive
+        @li
+          @hl.scala{rm} ignores the file if it doesn't exist
+        @li
+          all operations that create a file or folder (@hl.scala{mkdir}, @hl.scala{write}, @hl.scala{mv}) automatically create any necessary parent directories
+        @li
+          @hl.scala{write} also does @i{not} stomp over existing files by default. You need to use @hl.scala{write.over}
+      @p
+        In general, this should make these operations much easier to use; the defaults should cover the 99% use case without needing any special flags or fiddling.
 
     @sect{Extensions}
       @p
@@ -225,7 +255,7 @@
       build.sbt	log		ops		readme		repl		terminal
       echo		modules		project		readme.md	target		shell
       res2: Int = 0
-      @@ %%ls
+      @@ %%('ls)
       res3: CommandResult =
       build.sbt
       echo
@@ -243,7 +273,27 @@
     @p
       In short, @hl.scala{%} lets you run a command as you would in bash, and dumps the output to standard-out in a similar way, returning the return-code. This lets you run @code{git} commands, edit files via @code{vim}, open @code{ssh} sessions or even start @code{SBT} or @code{Python} shells right from your Scala REPL!
     @p
-      @hl.scala{%%} on the other hand is intended for programmatic usage: rather than printing to stdout, it returns a @hl.scala{CommandResult}, which is simply a @hl.scala{Stream[String]} of the lines from the subprocess. @hl.scala{%%} throws an exception if the return-code is non-zero. The returned @hl.scala{Stream[String]} can then be used however you like.
+      @hl.scala{%%} on the other hand is intended for programmatic usage: rather than printing to stdout, it returns a @hl.scala{CommandResult}, which contains the standard output @hl.scala{.out} and standard error @hl.scala{.err} of the subprocess. These provide helper methods to retrieve the stdout or stderr as a list of lines
+
+    @hl.ref(opsTests/"ShelloutTests.scala", Seq("'lines", ""))
+
+    @p
+      Or as a single string:
+
+    @hl.ref(opsTests/"ShelloutTests.scala", Seq("'string", ""))
+
+    @p
+      Or as an array of bytes:
+
+    @hl.ref(opsTests/"ShelloutTests.scala", Seq("'bytes", ""))
+
+    @p
+      @hl.scala{%%} throws an @hl.scala{ShelloutException} containig the @hl.scala{CommandResult} if the return-code is non-zero.
+
+    @hl.ref(opsTests/"ShelloutTests.scala", Seq("'failures", ""))
+
+    @p
+      In both cases, you end up with a @hl.scala{CommandResult} can then be used however you like.
     @p
       You can also use backticks to execute commands which aren't valid Scala identifiers, e.g.
 
@@ -261,14 +311,14 @@
         speedip
       res4: Int = 0
 
-      @@ %%git 'branch
+      @@ %%('git, 'branch)
       res5: CommandResult =
         gh-pages
         history
       * master
         speedip
 
-      @@ %%git('checkout, "master")
+      @@ %%('git, checkout, "master")
       Already on 'master'
       res6: CommandResult =
       M	readme/Index.scalatex
@@ -282,7 +332,7 @@
 
       @@ val stuff = List("readme.md", "build.sbt")
       stuff: List[String] = List("readme.md", "build.sbt")
-      @@ %ls(".gitignore", stuff)
+      @@ %('ls, '".gitignore", stuff)
       .gitignore	build.sbt	readme.md
     @p
       Ammonite-Ops currently does not provide many convenient ways of piping together multiple processes, but support may come in future if someone finds it useful enough to implement.

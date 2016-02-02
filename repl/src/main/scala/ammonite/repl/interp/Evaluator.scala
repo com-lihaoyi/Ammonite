@@ -8,6 +8,7 @@ import ammonite.repl._
 
 import Util.{CompileCache, ClassFiles}
 
+import scala.collection.immutable.ListMap
 import scala.collection.mutable
 import scala.util.Try
 
@@ -32,9 +33,12 @@ trait Evaluator{
    */
   def processLine(code: String,
                   printCode: String,
-                  printer: Iterator[String] => Unit,
+                  printer: Printer,
                   extraImports: Seq[ImportData] = Seq()): Res[Evaluated]
-  def processScriptBlock(code: String, scriptImports: Seq[ImportData]): Res[Evaluated]
+
+  def processScriptBlock(code: String,
+                         scriptImports: Seq[ImportData],
+                         printer: Printer): Res[Evaluated]
 
   def previousImportBlock: String
 
@@ -48,8 +52,9 @@ trait Evaluator{
 
 object Evaluator{
 
+
   def apply(currentClassloader: ClassLoader,
-            compile: => (Array[Byte], String => Unit) => Compiler.Output,
+            compile: => (Array[Byte], Printer) => Compiler.Output,
             startingLine: Int,
             cacheLoad: String => Option[CompileCache],
             cacheSave: (String, CompileCache) => Unit,
@@ -62,7 +67,7 @@ object Evaluator{
      * map. Otherwise if you import the same name twice you get compile
      * errors instead of the desired shadowing.
      */
-    def previousImports = frames.head.previousImports
+    def imports = frames.head.imports
 
     /**
      * The current line number of the REPL, used to make sure every snippet
@@ -84,10 +89,10 @@ object Evaluator{
     def initialFrame = {
       val hash = SpecialClassLoader.initialClasspathHash(currentClassloader)
       def special = new SpecialClassLoader(currentClassloader, hash)
-      Frame(
+      new Frame(
         special,
         special,
-        Map.empty[String, ImportData],
+        Seq.empty[ImportData],
         Seq()
       )
     }
@@ -97,11 +102,11 @@ object Evaluator{
 
     object sess extends Session {
       def frames = eval.frames
-      def childFrame(parent: Frame) = Frame(
+      def childFrame(parent: Frame) = new Frame(
         new SpecialClassLoader(parent.classloader, parent.classloader.classpathHash),
         new SpecialClassLoader(parent.pluginClassloader, parent.pluginClassloader.classpathHash),
-        parent.previousImports,
-        parent.extraJars
+        parent.imports,
+        parent.classpath
       )
 
       def save(name: String = "") = {
@@ -133,17 +138,17 @@ object Evaluator{
     private var _compilationCount = 0
     def compilationCount = _compilationCount
 
-    def compileClass(code: String): Res[(ClassFiles, Seq[ImportData])] = for {
-      (output, compiled) <- Res.Success{
-        val output = mutable.Buffer.empty[String]
-        val c = compile(code.getBytes, output.append(_))
-        (output, c)
+    def compileClass(code: String, printer: Printer): Res[(ClassFiles, Seq[ImportData])] = for {
+      compiled <- Res.Success{
+        val c = compile(code.getBytes, printer)
+        c
       }
       _ = _compilationCount += 1
-      result <- Res[(ClassFiles, Seq[ImportData])](
-        compiled, "Compilation Failed\n" + output.mkString("\n")
+      (classfiles, imports) <- Res[(ClassFiles, Seq[ImportData])](
+        compiled,
+        "Compilation Failed"
       )
-    } yield result
+    } yield (classfiles, imports)
 
     def loadClass(wrapperName: String, classFiles: ClassFiles): Res[Class[_]] = {
       Res[Class[_]](Try {
@@ -159,37 +164,39 @@ object Evaluator{
     def evalMain(cls: Class[_]) =
       cls.getDeclaredMethod("$main").invoke(null)
 
-    def previousImportBlock = importBlock(previousImports.values.toSeq)
+    def previousImportBlock = importBlock(imports)
 
     def importBlock(importData: Seq[ImportData]) = {
       Timer("importBlock 0")
-      val snippets = for {
-        (prefix, allImports) <- importData.toList.groupBy(_.prefix)
-        imports <- Util.transpose(allImports.groupBy(_.fromName).values.toList)
-      } yield {
-        // Don't import importable variables called `_`. They seem to
-        // confuse Scala into thinking it's a wildcard even when it isn't
-        imports.filter(_.fromName != "_") match{
-          case Seq(imp) if imp.fromName == imp.toName =>
-            s"import $prefix.${Parsers.backtickWrap(imp.fromName)}"
-          case imports =>
-            val lines = for (x <- imports) yield {
-              if (x.fromName == x.toName)
-                "\n  " + Parsers.backtickWrap(x.fromName)
-              else {
-                "\n  " + Parsers.backtickWrap(x.fromName) +
-                " => " + (if (x.toName == "_") "_" else Parsers.backtickWrap(x.toName))
-              }
-            }
-            val block = lines.mkString(",")
-            s"import $prefix.{$block\n}"
+
+      // Group the remaining imports into sliding groups according to their
+      // prefix, while still maintaining their ordering
+      val grouped = mutable.Buffer[mutable.Buffer[ImportData]]()
+      for(data <- importData){
+        if (grouped.isEmpty) grouped.append(mutable.Buffer(data))
+        else {
+          val last = grouped.last.last
+          // Group type imports differently from term imports, in case we
+          // import the same thing but rename it differently
+          if (last.prefix == data.prefix) grouped.last.append(data)
+          else grouped.append(mutable.Buffer(data))
         }
       }
-      val res = snippets.mkString("\n")
+//      pprint.log(grouped)
+      // Stringify everything
+      val out = for(group <- grouped) yield {
+        val printedGroup = for(item <- group) yield{
+          if (item.fromName == item.toName) Parsers.backtickWrap(item.fromName)
+          else s"${Parsers.backtickWrap(item.fromName)} => ${Parsers.backtickWrap(item.toName)}"
+        }
+        "import " + group.head.prefix + ".{\n  " + printedGroup.mkString(",\n  ") + "\n}\n"
+      }
+      val res = out.mkString
+
       Timer("importBlock 1")
       res
     }
-  
+
     def interrupted() = {
       Thread.interrupted()
       Res.Failure("\nInterrupted!")
@@ -200,16 +207,19 @@ object Evaluator{
 
     def processLine(code: String,
                     printCode: String,
-                    printer: Iterator[String] => Unit,
+                    printer: Printer,
                     extraImports: Seq[ImportData] = Seq()) = for {
       wrapperName <- Res.Success("cmd" + getCurrentLine)
       _ <- Catching{ case e: ThreadDeath => interrupted() }
-      (classFiles, newImports) <- compileClass(wrapCode(
-        wrapperName,
-        code,
-        printCode,
-        previousImports.values.toSeq ++ extraImports
-      ))
+      (classFiles, newImports) <- compileClass(
+        wrapCode(
+          wrapperName,
+          code,
+          printCode,
+          Frame.mergeImports(imports, extraImports)
+        ),
+        printer
+      )
       _ = Timer("eval.processLine compileClass end")
       cls <- loadClass(wrapperName, classFiles)
       _ = Timer("eval.processLine loadClass end")
@@ -232,7 +242,7 @@ object Evaluator{
 
       val iter = evalMain(cls).asInstanceOf[Iterator[String]]
       Timer("eval.processLine evaluatorRunPrinter 1")
-      evaluatorRunPrinter(printer(iter))
+      evaluatorRunPrinter(iter.foreach(printer.out))
       Timer("eval.processLine evaluatorRunPrinter end")
       evaluationResult(wrapperName, newImports)
     }
@@ -252,6 +262,7 @@ $code
 
     def cachedCompileBlock(code: String,
                            imports: Seq[ImportData],
+                           printer: Printer,
                            printCode: String = ""): Res[(String, Class[_], Seq[ImportData])] = {
       Timer("cachedCompileBlock 0")
       val wrapperName = cacheTag(code, imports, sess.frames.head.classloader.classpathHash)
@@ -263,7 +274,7 @@ $code
           addToCompilerClasspath(classFiles)
           Res.Success((classFiles, newImports))
         case None => for {
-          (classFiles, newImports) <- compileClass(wrappedCode)
+          (classFiles, newImports) <- compileClass(wrappedCode, printer)
           _ = cacheSave(wrapperName, (classFiles, newImports))
         } yield (classFiles, newImports)
       }
@@ -275,8 +286,12 @@ $code
       } yield (wrapperName, cls, newImports)
     }
 
-    def processScriptBlock(code: String, scriptImports: Seq[ImportData]) = for {
-      (wrapperName, cls, newImports) <- cachedCompileBlock(code, scriptImports)
+    def processScriptBlock(code: String,
+                           scriptImports: Seq[ImportData],
+                           printer: Printer) = for {
+      (wrapperName, cls, newImports) <- cachedCompileBlock(
+        code, scriptImports, printer
+      )
     } yield {
       Timer("cachedCompileBlock")
       evalMain(cls)
@@ -287,15 +302,14 @@ $code
     }
 
     def update(newImports: Seq[ImportData]) = {
-      val newImportMap = for(i <- newImports) yield (i.toName -> i)
-      frames.head.previousImports = previousImports ++ newImportMap
+      frames.head.addImports(newImports)
     }
 
-    def evaluationResult(wrapperName: String, imports: Seq[ImportData]) = {
+    def evaluationResult(wrapperName: String,
+                         imports: Seq[ImportData]) = {
       Evaluated(
         wrapperName,
         imports.map(id => id.copy(
-          wrapperName = wrapperName,
           prefix = if (id.prefix == "") wrapperName else id.prefix
         ))
       )

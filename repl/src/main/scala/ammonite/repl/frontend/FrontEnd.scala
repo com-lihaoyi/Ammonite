@@ -3,7 +3,7 @@ package ammonite.repl.frontend
 import java.io.{OutputStream, InputStream}
 
 import ammonite.repl._
-import fastparse.core.Result
+import fastparse.core.Parsed
 import jline.console.{completer, ConsoleReader}
 import acyclic.file
 
@@ -23,7 +23,7 @@ trait FrontEnd{
              prompt: String,
              colors: Colors,
              compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
-             history: Seq[String],
+             history: IndexedSeq[String],
              addHistory: String => Unit): Res[(String, Seq[String])]
 }
 
@@ -40,7 +40,7 @@ object FrontEnd{
                prompt: String,
                colors: Colors,
                compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
-               history: Seq[String],
+               history: IndexedSeq[String],
                addHistory: String => Unit) = {
 
       val term = makeTerm()
@@ -57,10 +57,10 @@ object FrontEnd{
             cursor,
             buf
           )
-          if (!completions.isEmpty) {
+          if (completions.nonEmpty) {
             candidates.addAll(completions.sorted)
             signatures = sigs.sorted
-          } else if (!sigs.isEmpty){
+          } else if (sigs.nonEmpty){
             reader.println()
             sigs.foreach(reader.println)
             reader.drawLine()
@@ -74,7 +74,7 @@ object FrontEnd{
       val defaultHandler = reader.getCompletionHandler
       reader.setCompletionHandler(new completer.CompletionHandler {
         def complete(reader: ConsoleReader, candidates: JList[CharSequence], position: Int) = {
-          if (!signatures.isEmpty){
+          if (signatures.nonEmpty){
             reader.println()
             signatures.foreach(reader.println)
             reader.drawLine()
@@ -95,12 +95,14 @@ object FrontEnd{
           case Some(newCode) =>
             val code = buffered + newCode
             Parsers.split(code) match{
-              case Some(Result.Success(value, idx)) =>
+              case Some(Parsed.Success(value, idx)) =>
                 addHistory(code)
                 Res.Success(code -> value)
-              case Some(f: Result.Failure) =>
+              case Some(Parsed.Failure(p, index, extra)) =>
                 addHistory(code)
-                Res.Failure(fastparse.core.ParseError.msg(f.input, f.traced.expected, f.index))
+                Res.Failure(
+                  fastparse.core.ParseError.msg(extra.input, extra.traced.expected, index)
+                )
               case None => readCode(code + "\n")
             }
         }

@@ -7,7 +7,9 @@ import ammonite.ops
 
 import scala.util.Try
 
-
+/**
+  * Simple enum with the possible filesystem objects a path can resolve to
+  */
 sealed trait FileType
 object FileType{
   case object File extends FileType
@@ -18,6 +20,10 @@ object FileType{
 object PermSet{
 
 }
+
+/**
+  * A set of permissions
+  */
 class PermSet(s: Set[PosixFilePermission]) extends Set[PosixFilePermission]{
   def contains(elem: PosixFilePermission) = s.contains(elem)
   def +(elem: PosixFilePermission) = new PermSet(s + elem)
@@ -25,6 +31,7 @@ class PermSet(s: Set[PosixFilePermission]) extends Set[PosixFilePermission]{
   def iterator = s.iterator
 
 }
+
 
 object stat extends Function1[ops.Path, ops.stat]{
   def apply(p: ops.Path) = ops.stat.make(
@@ -89,6 +96,12 @@ object stat extends Function1[ops.Path, ops.stat]{
       )
     }
   }
+
+  /**
+    * A richer, more informative version of the [[stat]] object.
+    *
+    * Created using `stat.full! filePath`
+    */
   case class full(name: String,
                   size: Long,
                   mtime: FileTime,
@@ -105,7 +118,13 @@ object stat extends Function1[ops.Path, ops.stat]{
   }
 }
 
-
+/**
+  * The result from doing an system `stat` on a particular path.
+  *
+  * Created via `stat! filePath`.
+  *
+  * If you want more information, use `stat.full`
+  */
 case class stat(name: String,
                 size: Long,
                 mtime: FileTime,

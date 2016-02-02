@@ -88,11 +88,24 @@ object TPrintLowPri{
 
 
     def implicitRec(tpe: Type) = {
+      val byName = (tpe: Type) match{
+        case t: TypeRef if t.toString.startsWith("=> ") => Some(t.args(0))
+        case _ => None
+      }
+
       try {
         // Make sure the type isn't higher-kinded or some other weird
         // thing, and actually can fit inside the square brackets
-        c.typecheck(q"null.asInstanceOf[$tpe]")
-        q""" ammonite.repl.frontend.TPrint.implicitly[$tpe].render($cfgSym) """
+
+        byName match{
+          case Some(t) =>
+            c.typecheck(q"null.asInstanceOf[$tpe]")
+            q""" "=> " + ammonite.repl.frontend.TPrint.implicitly[$t].render($cfgSym) """
+          case _ =>
+            c.typecheck(q"null.asInstanceOf[$tpe]")
+            q""" ammonite.repl.frontend.TPrint.implicitly[$tpe].render($cfgSym) """
+        }
+
       }catch{case e: TypecheckException =>
         rec0(tpe)
       }
@@ -180,6 +193,8 @@ object TPrintLowPri{
         q"$pre + ${
           if (defs.isEmpty) "" else "{" + defs.mkString(";") + "}"
         }"
+      case ConstantType(value) =>
+        q"$value.toString"
     }
     lazy val cfgSym = c.freshName[TermName]("cfg")
     val res = c.Expr[TPrint[T]](q"""ammonite.repl.frontend.TPrint.lambda{

@@ -1,6 +1,6 @@
 package ammonite.shell
 
-import ammonite.repl.Checker
+import ammonite.repl.TestRepl
 import ammonite.repl.TestUtils._
 import utest._
 
@@ -8,8 +8,9 @@ import utest._
  * Created by haoyi on 8/30/15.
  */
 object SessionTests extends TestSuite{
-  val check = new Checker()
+
   val tests = TestSuite{
+    val check = new TestRepl()
     'workingDir{
       check.session(s"""
         @ import ammonite.ops._
@@ -52,7 +53,7 @@ object SessionTests extends TestSuite{
         @ import ammonite.ops.ImplicitWd
 
         @ %%ls 'ops
-        res\\d\\+: $typeString =
+        res4: $typeString =
         src
         target
       """)

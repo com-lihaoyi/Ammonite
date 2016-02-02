@@ -7,10 +7,10 @@ import scala.collection.mutable
 import scalatags.Text.all._
 
 object Sample{
-  val replCurl = "$ curl -L -o amm http://git.io/vBTzM; chmod +x amm; ./amm"
+  val replCurl = "$ curl -L -o amm https://git.io/vgU1w; chmod +x amm; ./amm"
   val filesystemCurl =
-    "$ mkdir ~/.ammonite; curl -L -o ~/.ammonite/predef.scala http://git.io/vBTz7"
-  val cacheVersion = 5
+    "$ mkdir ~/.ammonite; curl -L -o ~/.ammonite/predef.scala https://git.io/vgU16"
+  val cacheVersion = 6
   def cached(key: Any)(calc: => String) = {
     val path = cwd/'target/'cache/(key.hashCode + cacheVersion).toString
     try read! path
@@ -31,16 +31,18 @@ object Sample{
   val cyan = "#16a085"
   val black = "#000"
   val white = "#fff"
-  def colorSpan(c: String) = span(color:=c)
   val colors = Map(
-    "[30m" -> black,
-    "[31m" -> red,
-    "[32m" -> green,
-    "[33m" -> yellow,
-    "[34m" -> blue,
-    "[35m" -> magenta,
-    "[36m" -> cyan,
-    "[37m" -> white
+    Console.BLACK.tail -> black,
+    Console.RED.tail -> red,
+    Console.GREEN.tail -> green,
+    Console.YELLOW.tail -> yellow,
+    Console.BLUE.tail -> blue,
+    Console.MAGENTA.tail -> magenta,
+    Console.CYAN.tail -> cyan,
+    Console.WHITE.tail -> white
+  )
+  val backgrounds = Map(
+    Console.YELLOW_B.tail -> yellow
   )
   def ammSample(ammoniteCode: String) = {
     val scalaVersion = scala.util.Properties.versionNumberString
@@ -49,18 +51,34 @@ object Sample{
     val ammExec = "repl/target/scala-2.11/" + executableName
     val predef = "shell/src/main/resources/ammonite/shell/example-predef-bare.scala"
     val out = exec(Seq(ammExec, "--predef-file", predef), s"${ammoniteCode.trim}\nexit\n")
+//    val out = read! wd/'target/'cache/"-1080873603"
     val lines = out.lines.toSeq.drop(3).dropRight(2).mkString("\n")
 //    println("ammSample " + lines)
     val ammOutput = lines.split("\u001b")
 
-
-    val wrapped = for(snippet <- ammOutput) yield {
-      colors.find(snippet startsWith _._1) match{
-        case None => colorSpan(black)(("\u001B"+snippet).replaceAll(ansiRegex, ""))
-        case Some((ansiCode, color)) => colorSpan(color)(snippet.drop(ansiCode.length))
+    var bufferedColor: Option[Modifier] = None
+    var bufferedBackground: Option[Modifier] = None
+    val wrapped = mutable.Buffer.empty[Tag]
+    for(snippet <- ammOutput) {
+      if (snippet.startsWith(Console.RESET.tail)) {
+        bufferedColor = None
+        bufferedBackground = None
       }
-    }
+      if (snippet.startsWith("[39m")) { // reset foreground color
+        bufferedColor = None
+      }
+      colors.find(snippet startsWith _._1).foreach{
+        case (ansiCode, cssColor) =>
+          bufferedColor = Some(color := cssColor)
+      }
+      backgrounds.find(snippet startsWith _._1).foreach{
+        case (ansiCode, cssColor) =>
+          bufferedBackground = Some(backgroundColor := cssColor)
+      }
 
+      val frag = span(bufferedColor, bufferedBackground, snippet.replaceFirst(ansiRegex.tail, ""))
+      wrapped.append(frag)
+    }
 
     write.over(cwd/"temp.html", wrapped.render.replaceAll("\r\n|\n\r", "\n"))
     raw(wrapped.render.replaceAll("\r\n|\n\r", "\n"))
@@ -83,7 +101,7 @@ object Sample{
         println(new String(buffer.take(res)))
         if(res == -1) None else Some(buffer.take(res))
       }
-      .takeWhile(_ != None)
+      .takeWhile(_.isDefined)
       .toArray
       .flatten
       .flatten
@@ -99,7 +117,7 @@ object Sample{
         .dropRight(2)
         .mkString("\n")
         .split("bash-3\\.2\\$")
-        .flatMap(s => Seq[Frag](colorSpan(magenta)("bash$"), colorSpan(black)(s)))
+        .flatMap(s => Seq[Frag](span(color := magenta, "bash$"), span(color := black, s)))
         .drop(1)
     }
 

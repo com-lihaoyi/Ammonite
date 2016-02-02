@@ -1,7 +1,7 @@
 package ammonite.repl.session
 
 import ammonite.repl.TestUtils._
-import ammonite.repl.{Checker, Res}
+import ammonite.repl.{TestRepl, Res}
 import utest._
 
 import scala.collection.{immutable => imm}
@@ -9,7 +9,7 @@ import scala.collection.{immutable => imm}
 object AdvancedTests extends TestSuite{
   val tests = TestSuite{
     println("AdvancedTests")
-    val check = new Checker()
+    val check = new TestRepl()
     'pprint{
       check.session("""
         @ Seq.fill(10)(Seq.fill(3)("Foo"))
@@ -53,7 +53,7 @@ object AdvancedTests extends TestSuite{
     }
 
     'predef{
-      val check2 = new Checker{
+      val check2 = new TestRepl{
         override def predef = """
           import math.abs
           val x = 1
@@ -265,8 +265,8 @@ object AdvancedTests extends TestSuite{
       // one getting its own `ReplBridge`. This ensures that the various
       // Interpreters are properly encapsulated and don't interfere with each
       // other.
-      val c1 = new Checker()
-      val c2 = new Checker()
+      val c1 = new TestRepl()
+      val c2 = new TestRepl()
       c1.session("""
         @ repl.prompt() = "A"
       """)
@@ -281,79 +281,5 @@ object AdvancedTests extends TestSuite{
       """)
     }
 
-    'saveLoad {
-      check.session(
-        """
-        @ val veryImportant = 1
-        veryImportant: Int = 1
-
-        @ sess.save()
-
-        @ val oopsDontWantThis = 2
-        oopsDontWantThis: Int = 2
-
-        @ // Let's try this new cool new library
-
-        @ load.ivy("com.lihaoyi" %% "scalatags" % "0.5.3")
-
-        @ veryImportant
-        res4: Int = 1
-
-        @ oopsDontWantThis
-        res5: Int = 2
-
-        @ import scalatags.Text.all._
-
-        @ div("Hello").render
-        res7: String = "<div>Hello</div>"
-
-        @ // Oh no, maybe we don't want scalatags!
-
-        @ sess.load()
-
-        @ veryImportant
-        res9: Int = 1
-
-        @ oopsDontWantThis
-        error: not found: value oopsDontWantThis
-
-        @ import scalatags.Text.all._
-        error: not found: value scalatags
-      """)
-    }
-    'saveLoad2{
-      check.session("""
-        @ val (x, y) = (1, 2)
-        x: Int = 1
-        y: Int = 2
-
-        @ sess.save("xy initialized")
-
-        @ val z = x + y
-        z: Int = 3
-
-        @ sess.save("first z")
-
-        @ sess.load("xy initialized")
-
-        @ val z = x - y
-        z: Int = -1
-
-        @ sess.save("second z")
-
-        @ z
-        res7: Int = -1
-
-        @ sess.load("first z")
-
-        @ z
-        res9: Int = 3
-
-        @ sess.load("second z")
-
-        @ z
-        res11: Int = -1
-      """)
-    }
   }
 }

@@ -1,15 +1,14 @@
 package ammonite.repl
 
-import java.io._
+import java.io.{PrintStream, InputStream, OutputStream, InputStreamReader}
 import ammonite.repl.frontend._
 import acyclic.file
 import ammonite.repl.interp.Interpreter
 
 import scala.annotation.tailrec
-import scala.reflect.runtime.universe.TypeTag
-import ammonite.ops._
 class Repl(input: InputStream,
            output: OutputStream,
+           error: OutputStream,
            storage: Ref[Storage],
            predef: String = "",
            replArgs: Seq[Bind[_]] = Nil) {
@@ -21,10 +20,21 @@ class Repl(input: InputStream,
     PartialFunction.empty
   ))
 
-  val printer = new PrintStream(output, true)
+  val printStream = new PrintStream(output, true)
+  val errorPrintStream = new PrintStream(error, true)
   var history = new History(Vector())
 
+
+  def printlnWithColor(color: String, s: String) = {
+    Seq(color, s, colors().reset(), "\n").foreach(errorPrintStream.print)
+  }
+  val printer = Printer(
+    _.foreach(printStream.print),
+    printlnWithColor(colors().warning(), _),
+    printlnWithColor(colors().error(), _)
+  )
   Timer("Repl init printer")
+
   val interp: Interpreter = new Interpreter(
     prompt,
     frontEnd,
@@ -32,7 +42,7 @@ class Repl(input: InputStream,
     frontEnd().height,
     pprint.Config.Colors.PPrintConfig,
     colors,
-    printer.print,
+    printer,
     storage,
     history,
     predef,
@@ -56,10 +66,10 @@ class Repl(input: InputStream,
       }
     )
     _ <- Signaller("INT") { interp.mainThread.stop() }
-    out <- interp.processLine(code, stmts, _.foreach(printer.print))
+    out <- interp.processLine(code, stmts)
   } yield {
     Timer("interp.processLine end")
-    printer.println()
+    printStream.println()
     out
   }
 
@@ -68,8 +78,8 @@ class Repl(input: InputStream,
   def javaVersion = System.getProperty("java.version")
 
   def printBanner(): Unit = {
-    printer.println(s"Welcome to the Ammonite Repl $ammoniteVersion")
-    printer.println(s"(Scala $scalaVersion Java $javaVersion)")
+    printStream.println(s"Welcome to the Ammonite Repl $ammoniteVersion")
+    printStream.println(s"(Scala $scalaVersion Java $javaVersion)")
   }
 
   def run(): Any = {
@@ -79,14 +89,14 @@ class Repl(input: InputStream,
       Timer("End Of Loop")
       val res2 = res match{
         case Res.Exit(value) =>
-          printer.println("Bye!")
+          printStream.println("Bye!")
           value
-        case Res.Failure(msg) => printer.println(colors().error() + msg + colors().reset())
+        case Res.Failure(msg) => printer.error(msg)
         case Res.Exception(ex, msg) =>
-          printer.println(
+          printer.error(
             Repl.showException(ex, colors().error(), colors().reset(), colors().literal())
           )
-          printer.println(colors().error() + msg + colors().reset())
+          printer.error(msg)
         case _ =>
       }
 
@@ -111,9 +121,9 @@ object Repl{
     val clsNameString = clsName.replace("$", error+"$"+highlightError)
     val method =
       s"$error$prefixString$highlightError$clsNameString$error" +
-      s".$highlightError${f.getMethodName}$error"
+        s".$highlightError${f.getMethodName}$error"
 
-    s"\t$method($src)"
+    s"  $method($src)"
   }
   def showException(ex: Throwable, error: String, highlightError: String, source: String) = {
     val cutoff = Set("$main", "evaluatorRunPrinter")
@@ -127,78 +137,4 @@ object Repl{
     )
     traces.mkString("\n")
   }
-  case class Config(predef: String = "",
-                    predefFile: Option[Path] = None,
-                    code: Option[String] = None,
-                    ammoniteHome: Path = defaultAmmoniteHome,
-                    file: Option[Path] = None)
-
-  def defaultAmmoniteHome = Path(System.getProperty("user.home"))/".ammonite"
-  def main(args: Array[String]) = {
-    val parser = new scopt.OptionParser[Config]("ammonite") {
-      head("ammonite", ammonite.Constants.version)
-      opt[String]('p', "predef")
-        .action((x, c) => c.copy(predef = x))
-        .text("Any commands you want to execute at the start of the REPL session")
-      opt[String]('f', "predef-file")
-        .action((x, c) => c.copy(predefFile = Some(if (x(0) == '/') Path(x) else cwd/RelPath(x))))
-        .text("Lets you load your predef from a custom location")
-      opt[String]('c', "code")
-        .action((x, c) => c.copy(code = Some(x)))
-        .text("Pass in code to be run immediately in the REPL")
-      opt[File]('h', "home")
-        .valueName("<file>")
-        .action((x, c) => c.copy(ammoniteHome = Path(x)))
-        .text("The home directory of the REPL; where it looks for config and caches")
-      arg[File]("<file>...")
-        .optional()
-        .action { (x, c) => c.copy(file = Some(Path(x))) }
-        .text("The Ammonite script file you want to execute")
-    }
-    for(c <- parser.parse(args, Config())){
-      run(c.predef, c.ammoniteHome, c.code, c.predefFile, c.file)
-    }
-  }
-
-  implicit def ammoniteReplArrowBinder[T](t: (String, T))(implicit typeTag: TypeTag[T]) = {
-    Bind(t._1, t._2)(typeTag)
-  }
-
-  def debug(replArgs: Bind[_]*): Any = {
-
-    def storage = Storage(defaultAmmoniteHome, None)
-    def repl = new Repl(
-      System.in, System.out,
-      storage = Ref(storage),
-      predef = "",
-      replArgs
-    )
-
-    repl.run()
-  }
-  def run(predef: String = "",
-          ammoniteHome: Path = defaultAmmoniteHome,
-          code: Option[String] = None,
-          predefFile: Option[Path] = None,
-          file: Option[Path] = None) = {
-
-    Timer("Repl.run Start")
-    def storage = Storage(ammoniteHome, predefFile)
-    lazy val repl = new Repl(
-      System.in, System.out,
-      storage = Ref(storage),
-      predef = predef
-    )
-    (file, code) match{
-      case (None, None) =>
-        println("Loading...")
-        repl.run()
-      case (Some(path), None) =>
-        repl.interp.replApi.load.module(path)
-      case (None, Some(code)) =>
-        repl.interp.replApi.load(code)
-    }
-    Timer("Repl.run End")
-  }
 }
-

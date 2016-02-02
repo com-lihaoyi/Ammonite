@@ -27,28 +27,26 @@
 
 @sect{Ammonite}
   @p
-    Ammonite is a collection of projects, that can be used together or alone:
+    Ammonite enables shell-like scripting in the @lnk("Scala programming language", "https://www.scala-lang.org/"). It is made of a few subprojects:
 
   @ul
     @li
-      @sect.ref{Ammonite-REPL}: A Modernized Scala REPL
+      @sect.ref{Ammonite-REPL}: A Modernized Scala REPL, with tons of @sect.ref("Features", "bug fixes and features")
     @li
-      @sect.ref{Ammonite-Ops}: A Scala Library for Rock-solid Filesystem Operations
+      @sect.ref{Ammonite-Ops}: A Scala Library for convenient, rock-solid Filesystem Operations
     @li
-      @sect.ref{Ammonite-Shell}: Replacing Bash for the 21st Century
+      @sect.ref{Ammonite-Shell}: A modern replacement for the @lnk("Bash", "https://en.wikipedia.org/wiki/Bash_(Unix_shell)") system shell
 
   @p
     Depending on why you are here, click on the above links to jump straight to the documentation that interests you. For an overview of the project and it's motivation, check out this talk:
-
   @iframe(
-    "width".attr:="800", 
-    "height".attr:="450", 
-    marginLeft.auto,
-    marginRight.auto,
-    display.block,
-    src:="https://www.youtube.com/embed/dP5tkmWAhjg?vq=hd720", 
-    "frameborder".attr := "0", 
-    "allowfullscreen".attr := "1"
+    src := "https://player.vimeo.com/video/148552858",
+    width := 800,
+    height := 600,
+    "frameborder".attr := 0,
+    "webkitallowfullscreen".attr := 1,
+    "mozallowfullscreen".attr := 1,
+    "allowfullscreen".attr := 1
   )
 
 @Repl()

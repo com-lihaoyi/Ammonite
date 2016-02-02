@@ -27,24 +27,22 @@ case class ShellSession() extends OpsAPI {
 
   }
   implicit def Relativizer[T](p: T)(implicit b: Path, f: T => RelPath): Path = b/f(p)
-
 }
 
 object PPrints{
 
-  implicit def lsSeqRepr: PPrint[LsSeq] = PPrint(
-    PPrinter(
-      (t: LsSeq, c: Config) =>
-        Iterator("\n", FrontEndUtils.tabulate(
-          t.map(p => Iterator(
-            PathComplete.colorPath(p),
-            pprint.tokenize(p relativeTo t.base)(implicitly, c).mkString,
-            Console.RESET
-          ).mkString),
-          FrontEndUtils.width
-        ).mkString)
-    )
-  )
+  implicit def lsSeqRepr: PPrinter[LsSeq] =
+    PPrinter { (t: LsSeq, c: Config) =>
+      val snippets = for(p <- t) yield {
+        val parts =
+          Iterator(PathComplete.colorPath(p)) ++
+          pprint.tokenize(p relativeTo t.base)(implicitly, c).mkString ++
+          Iterator(Console.RESET)
+        parts.mkString
+      }
+      Iterator("\n") ++ FrontEndUtils.tabulate(snippets,FrontEndUtils.width)
+    }
+
   def reprSection(s: String, cfg: pprint.Config) = {
     val validIdentifier = "([a-zA-Z_][a-zA-Z_0-9]+)".r
     if (validIdentifier.findFirstIn(s) == Some(s)){
@@ -65,9 +63,13 @@ object PPrints{
   }
   implicit def commandResultRepr: PPrinter[CommandResult] =
     PPrinter[CommandResult]((x, c) =>
-      x.output.iterator.flatMap(line =>
-        Iterator("\n", c.colors.literalColor, line, c.colors.endColor)
-      )
+      x.chunks.iterator.flatMap { chunk =>
+        val (color, s) = chunk match{
+          case Left(s) => (c.colors.literalColor, s)
+          case Right(s) => (Console.RED, s)
+        }
+        Iterator("\n", color, new String(s.array), c.colors.endColor)
+      }
     )
   implicit def permissionPPrintConfig: PPrinter[PermSet] =
     PPrinter[PermSet]{ (p, c) =>
@@ -77,6 +79,9 @@ object PPrints{
         }.mkString)
     }
 
+  implicit val defaultHighlightColor = {
+    GrepResult.Color(Console.BLUE + Console.YELLOW_B, Console.RESET)
+  }
 }
 trait OpsAPI{
   /**

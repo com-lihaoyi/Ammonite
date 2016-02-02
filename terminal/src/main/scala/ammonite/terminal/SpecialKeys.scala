@@ -53,6 +53,9 @@ object SpecialKeys {
   val AltRight = Alt*2+"[C"
   val AltLeft = Alt*2+"[D"
 
+  val LinuxCtrlRight = Alt+"[1;5C"
+  val LinuxCtrlLeft = Alt+"[1;5D"
+
   val FnAltUp = Alt*2+"[5~"
   val FnAltDown = Alt*2+"[6~"
   val FnAltRight = Alt+"[1;9F"
