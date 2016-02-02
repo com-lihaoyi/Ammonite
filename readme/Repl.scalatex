@@ -463,8 +463,6 @@
         "subscriptions_url":"https://api.github.com/users/scala/subscriptions",
         ...
 
-        @@ for((k, v) <- parsed.value) write(cwd/'target/'temp/key, upickle.json.write(value))
-
         @@ val parsed = upickle.json.read(resp.body).asInstanceOf[upickle.Js.Obj]
         parsed: upickle.Js.Obj = Obj(
           ArrayBuffer(
@@ -501,7 +499,7 @@
 
         @@ import org.jsoup._ // import Jsoup
 
-        @@ collection.JavaConversions._ // make Java collections easier to use
+        @@ import collection.JavaConversions._ // make Java collections easier to use
 
         @@ val doc = Jsoup.connect("http://en.wikipedia.org/").get()
 
@@ -595,7 +593,7 @@
         @@ import org.apache.poi.xwpf.usermodel._ // Bring Ms-Word APIs into scope
         @@ import collection.JavaConversions._    // Make use of Java collections easier
 
-        @@ val path = cwd/'repl/'src/'test/'resources/'testdata/"Resume V2.docx"
+        @@ val path = cwd/'repl/'src/'test/'resources/'testdata/"Resume.docx"
 
         @@ val docx = new XWPFDocument(new java.io.ByteArrayInputStream(read.bytes(path)))
 
@@ -717,7 +715,7 @@
 
         @@ val tokenizer = new TokenizerME(tokenModel)
 
-        @@ val tokens = tokenizer.tokenize(p)
+        @@ val tokens = tokenizer.tokenize(str)
         tplems: Array[String] = Array(
           "Hi",
           ".",
