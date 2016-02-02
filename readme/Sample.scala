@@ -7,9 +7,9 @@ import scala.collection.mutable
 import scalatags.Text.all._
 
 object Sample{
-  val replCurl = "$ curl -L -o amm https://git.io/v0FGO; chmod +x amm; ./amm"
+  val replCurl = "$ curl -L -o amm https://git.io/vgU1w; chmod +x amm; ./amm"
   val filesystemCurl =
-    "$ mkdir ~/.ammonite; curl -L -o ~/.ammonite/predef.scala https://git.io/v0FGW"
+    "$ mkdir ~/.ammonite; curl -L -o ~/.ammonite/predef.scala https://git.io/vgU16"
   val cacheVersion = 6
   def cached(key: Any)(calc: => String) = {
     val path = cwd/'target/'cache/(key.hashCode + cacheVersion).toString
