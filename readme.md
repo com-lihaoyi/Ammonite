@@ -44,7 +44,9 @@ While working on a arbitrary `xyz` subproject, `sbt ~xyz/test` runs tests after 
 ### Publishing
 
 - `sbt repl/assembly ++2.10.5 repl/assembly` to bundle the REPL as a standalone distribution
-- `sbt +modules/publishLocal` or `+sbt modules/publishSigned` is used for publishing.
+- `sbt +published/publishLocal` or `sbt +published/publishSigned` is used for publishing.
+- Create a new release on [https://github.com/lihaoyi/Ammonite/releases] and upload the two executables for 2.11.7 an 2.10.5, as well as the `shell/src/main/resources/ammonite/shell/example-predef.scala` file.
+- Create short URLs for the 2.11.7 executable download and the `example-predef.scala` file and the readme code in `readme/Sample.scala` to use these short URLs
 - `sbt ~readme/run` builds the documentation inside its target folder, which you can view by opening `readme/target/scalatex/index.html` in your browser.
 - `git checkout gh-pages && cp -r readme/target/scalatex/* . && git commit -am . && git push` will deploy the generated documentation to Github Pages
 

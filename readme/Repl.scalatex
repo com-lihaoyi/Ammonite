@@ -212,9 +212,10 @@
 
       @p
         The default Scala REPL throws away all your work if the compiler crashes. This doesn't make any sense, because all the compiler is is a dumb @hl.scala{String => Array[Byte]} pipe. In the Ammonite, we simply swap out the broken compiler for a new one and let you continue your work.
-    @sect{Multiline Input}
+
+    @sect{Block Input}
       @p
-        To enter multiline input into the Ammonite-REPL, simply wrap the multiple lines in curly braces @hl.scala("{ ... }"), and Ammonite will wait until you close it before evaluating the contents:
+        To enter block input (many independent lines all at once) into the Ammonite-REPL, simply wrap the multiple lines in curly braces @hl.scala("{ ... }"), and Ammonite will wait until you close it before evaluating the contents:
 
       @hl.ref(advancedTests, Seq("'unwrapping", "@"))
 
