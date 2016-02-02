@@ -433,7 +433,7 @@
   @sect{REPL Cookbook}
 
     @p
-      The Ammonite REPL is meant to be extended: you can load in arbitary Java/Scala modules from the internet via @hl.scala{@sect.ref("Artifact Loading", "load.ivy")}, and can extend the REPL to do anything you wish to do, and tools like @sect.ref{Ammonite-Shell} are simply modules like any other. Here are a few example snippets of things you can do with the Ammonite-REPL:
+      The Ammonite REPL is meant to be extended: you can load in arbitary Java/Scala modules from the internet via @sect.ref("Artifact Loading", "load.ivy"), and can extend the REPL to do anything you wish to do, and tools like @sect.ref{Ammonite-Shell} are simply modules like any other. Here are a few example snippets of things you can do with the Ammonite-REPL:
 
     @sect{HTTP Requests}
       @p

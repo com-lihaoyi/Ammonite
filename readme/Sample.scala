@@ -64,6 +64,9 @@ object Sample{
         bufferedColor = None
         bufferedBackground = None
       }
+      if (snippet.startsWith("[39m")) { // reset foreground color
+        bufferedColor = None
+      }
       colors.find(snippet startsWith _._1).foreach{
         case (ansiCode, cssColor) =>
           bufferedColor = Some(color := cssColor)
