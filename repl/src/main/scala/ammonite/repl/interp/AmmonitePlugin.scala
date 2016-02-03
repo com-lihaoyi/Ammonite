@@ -35,6 +35,29 @@ object AmmonitePlugin{
       val sym = t.symbol
       (sym.isType, sym.decodedName, sym.decodedName, "")
     }
+    val ignoredSyms = Set(
+      "package class-use",
+      "object package-info",
+      "class package-info"
+    )
+    val ignoredNames = Set(
+      // Probably synthetic
+      "<init>",
+      "<clinit>",
+      "$main",
+      // Don't care about this
+      "toString",
+      // Behaves weird in 2.10.x, better to just ignore.
+      "_"
+    )
+    def saneSym(sym: g.Symbol): Boolean = {
+      !sym.name.decoded.contains('$') &&
+      sym.exists &&
+      !sym.isSynthetic &&
+      !sym.isPrivate &&
+      !ignoredSyms(sym.toString) &&
+      !ignoredNames(sym.name.decoded)
+    }
 
     val stats = unit.body.children.last.asInstanceOf[g.ModuleDef].impl.body
     val symbols = stats.filter(x => !Option(x.symbol).exists(_.isPrivate))
@@ -53,6 +76,7 @@ object AmmonitePlugin{
         }
         val prefix = rec(expr).reverseMap(x => Parsers.backtickWrap(x.decoded)).mkString(".")
 
+
         /**
           * A map of each name importable from `expr`, to a `Seq[Boolean]`
           * containing a `true` if there's a type-symbol you can import, `false`
@@ -61,10 +85,11 @@ object AmmonitePlugin{
           */
         val importableIsTypes =
           expr.tpe
-            .members
-            .filter(_.exists)
-            .groupBy(_.name.decoded)
-            .mapValues(_.map(_.isType))
+              .members
+              .filter(saneSym(_))
+              .groupBy(_.name.decoded)
+              .mapValues(_.map(_.isType).toVector)
+
 
         val renamings = for{
           t @ g.ImportSelector(name, _, rename, _) <- selectors
@@ -76,13 +101,7 @@ object AmmonitePlugin{
 
         val symNames = for {
           sym <- info.allImportedSymbols
-          if !sym.isSynthetic
-          if !sym.isPrivate
-          if sym.exists
-          if sym.isPublic
-          if sym.toString != "package class-use"
-          if sym.toString != "object package-info"
-          if sym.toString != "class package-info"
+          if saneSym(sym)
         } yield {
           (sym.isType, sym.decodedName)
         }
@@ -113,20 +132,10 @@ object AmmonitePlugin{
              .groupBy{case (a, b, c, d) => (b, c, d) }
              .mapValues(_.map(_._1))
 
-//    pprint.log(grouped, "grouped")
+
     val open = for {
       ((fromName, toName, importString), items) <- grouped
-      //              _ = println(fromName + "\t"+ toName)
-
-      // Probably synthetic
-      if !fromName.contains("$")
-      if fromName != "<init>"
-      if fromName != "<clinit>"
-      if fromName != "$main"
-      // Don't care about this
-      if fromName != "toString"
-      // Behaves weird in 2.10.x, better to just ignore.
-      if fromName != "_"
+      if !ignoredNames(fromName)
     } yield {
       val importType = items match{
         case Seq(true) => ImportData.Type
@@ -135,7 +144,7 @@ object AmmonitePlugin{
       }
       ImportData(fromName, toName, importString, importType)
     }
-//    pprint.log(open, "open")
+
     output(open.toVector)
   }
 }
