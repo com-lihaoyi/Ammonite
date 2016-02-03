@@ -55,6 +55,8 @@ object AmmonitePlugin{
       sym.exists &&
       !sym.isSynthetic &&
       !sym.isPrivate &&
+      !sym.isProtected &&
+      sym.isPublic &&
       !ignoredSyms(sym.toString) &&
       !ignoredNames(sym.name.decoded)
     }
