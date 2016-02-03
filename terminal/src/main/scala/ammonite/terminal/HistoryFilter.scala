@@ -120,7 +120,7 @@ class HistoryFilter(history: () => IndexedSeq[String],
     activeSearch || (activeHistory && cond)
   }
 
-  val dropHistoryChars = Set(13, 10, 9) // Enter or Tab
+  val dropHistoryChars = Set(13, 10, 9, 127) // Enter or Tab or Backspace
   def filter = {
     // Ways to kick off the history/search if you're not already in it
 
