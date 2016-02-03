@@ -226,18 +226,26 @@ object ImportTests extends TestSuite{
           @ 1: foo
           error: Compilation Failed
         """)
+        // Prefix things properly in Scala-2.10 where the type printer is dumb
+        val prefix1 = if (scala2_10) "ammonite.repl.testcode.paulp1." else ""
+        val prefix2 = if (scala2_10) "ammonite.repl.testcode.paulp2." else ""
+        val prefix3 = if (scala2_10) "ammonite.repl.testcode.paulp3." else ""
+        val prefix4 = if (scala2_10) "Paulp4." else ""
+        val prefix5 = if (scala2_10) "Paulp5." else ""
+        val prefix6 = if (scala2_10) "Paulp6." else ""
+        'paulp - {
 
-        'paulp - check.session("""
+          check.session(s"""
           @ import ammonite.repl.testcode.paulp1._, ammonite.repl.testcode.paulp2._
 
           @ new Paulp; Paulp // Paulp's example in #199
-          res1_0: Paulp = paulp1.Paulp1
-          res1_1: Paulp.type = paulp2.Paulp2
+          res1_0: ${prefix1}Paulp = paulp1.Paulp1
+          res1_1: ${prefix2}Paulp.type = paulp2.Paulp2
 
           @ val Paulp = 123 // Shadow the term but not the type
 
           @ new Paulp; Paulp // Shouldn't change
-          res3_0: Paulp = paulp1.Paulp1
+          res3_0: ${prefix1}Paulp = paulp1.Paulp1
           res3_1: Int = 123
 
           @ object Paulp3{
@@ -258,36 +266,36 @@ object ImportTests extends TestSuite{
           @ import Paulp4.Paulp, Paulp5.Paulp // cross import, shadow both
 
           @ Paulp
-          res10: Paulp.type = Paulp4
+          res10: ${prefix4}Paulp.type = Paulp4
 
           @ new Paulp
-          res11: Paulp = Paulp5
+          res11: ${prefix5}Paulp = Paulp5
 
           @ import ammonite.repl.testcode.paulp1._ // individually import & shadow...
 
           @ new Paulp; Paulp
-          res13_0: Paulp = paulp1.Paulp1
-          res13_1: Paulp.type = Paulp4
+          res13_0: ${prefix1}Paulp = paulp1.Paulp1
+          res13_1: ${prefix4}Paulp.type = Paulp4
 
           @ import ammonite.repl.testcode.paulp2._ // one at a time...
 
           @ new Paulp; Paulp
-          res15_0: Paulp = paulp1.Paulp1
-          res15_1: Paulp.type = paulp2.Paulp2
+          res15_0: ${prefix1}Paulp = paulp1.Paulp1
+          res15_1: ${prefix2}Paulp.type = paulp2.Paulp2
 
           @ object Paulp6{ val Paulp = 1; type Paulp = Int }
 
           @ import Paulp6._ // This should shadow both
 
           @ Paulp: Paulp
-          res18: Paulp = 1
+          res18: ${prefix6}Paulp = 1
 
           @ import Paulp4._
 
           @ Paulp
-          res20: Paulp.type = Paulp4
+          res20: ${prefix4}Paulp.type = Paulp4
 
-          @ Paulp: Paulp // Improper shadowing!
+          @ Paulp: Paulp // Improper shadowing! This is a known issue but hard to fix
           error: not found: type Paulp
 
           @ val Paulp = 12345
@@ -295,17 +303,18 @@ object ImportTests extends TestSuite{
           @ import Paulp6.Paulp
 
           @ Paulp
-        """)
-      }
-      'paulpTypeRegression{
-        check.session("""
+          """)
+        }
+        'paulpTypeRegression{
+          check.session(s"""
           @ type Paulp = Int
 
           @ import ammonite.repl.testcode.paulp3.Paulp
 
           @ new Paulp
-          res2: Paulp = paulp3.Paulp-class
+          res2: ${prefix3}Paulp = paulp3.Paulp-class
         """)
+        }
       }
     }
   }
