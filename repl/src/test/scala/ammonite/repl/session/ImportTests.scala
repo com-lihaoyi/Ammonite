@@ -263,7 +263,7 @@ object ImportTests extends TestSuite{
           @ new Paulp
           res11: Paulp = Paulp5
 
-          @ import ammonite.repl.testcode.paulp1._ // individually import & shadow
+          @ import ammonite.repl.testcode.paulp1._ // individually import & shadow...
 
           @ new Paulp; Paulp
           res13_0: Paulp = paulp1.Paulp1
@@ -289,6 +289,22 @@ object ImportTests extends TestSuite{
 
           @ Paulp: Paulp // Improper shadowing!
           error: not found: type Paulp
+
+          @ val Paulp = 12345
+
+          @ import Paulp6.Paulp
+
+          @ Paulp
+        """)
+      }
+      'paulpTypeRegression{
+        check.session("""
+          @ type Paulp = Int
+
+          @ import ammonite.repl.testcode.paulp3.Paulp
+
+          @ new Paulp
+          res2: Paulp = paulp3.Paulp-class
         """)
       }
     }

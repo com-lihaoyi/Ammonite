@@ -12,3 +12,13 @@ package paulp2 {
   }
 }
 
+
+package paulp3 {
+  object Paulp {
+    override def toString = "paulp3.Paulp-object"
+  }
+  class Paulp{
+    override def toString = "paulp3.Paulp-class"
+  }
+}
+

@@ -193,7 +193,12 @@ object TPrintTests extends TestSuite{
            "Function3[=> Int, String, => Function1[=> Char, Float], Double]"
          )
        }
-
+       'range{
+         check[Range]("Range")
+         checkVal("Range.Inclusive", 0 to 10)
+         checkVal("Range", 0 until 10)
+         check[Range.Inclusive]("Range.Inclusive")
+       }
      }
      'colored{
        import pprint.Config.Colors._

@@ -44,16 +44,15 @@ object TPrintLowPri{
       }
 
       if (!s.isType) {
-	val s1 = lookedUps.contains(s)
-        val s2 = lookedUps.exists(x => {
+        // Try to de-reference `val` references
+	      lookedUps.exists(x =>
           x == s || x.tpe.termSymbol == s.asTerm
-        })
-        s1 || s2
-      }
-      else {
+        )
+      } else {
         // Try to resolve aliases for types
-        lookedUps.exists(x => x == s || x.tpe.typeSymbol == s.asInstanceOf[g.Symbol].tpe.typeSymbol)
-      }
+        lookedUps.exists(x =>
+          x == s || x.tpe.typeSymbol == s.asInstanceOf[g.Symbol].tpe.typeSymbol
+        )}
     }
 
     def prefixFor(pre: Type, sym: Symbol): Tree = {

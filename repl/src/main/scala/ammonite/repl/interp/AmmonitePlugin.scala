@@ -53,17 +53,24 @@ object AmmonitePlugin{
         }
         val prefix = rec(expr).reverseMap(x => Parsers.backtickWrap(x.decoded)).mkString(".")
 
-        val renamings =
-          for(t @ g.ImportSelector(name, _, rename, _) <- selectors) yield {
-            val isType =
-              expr.tpe
-                .members
-                .filter(_.exists)
-                .find(_.name string_== name)
-                .exists(_.isType)
+        /**
+          * A map of each name importable from `expr`, to a `Seq[Boolean]`
+          * containing a `true` if there's a type-symbol you can import, `false`
+          * if there's a non-type symbol and both if there are both type and
+          * non-type symbols that are importable for that name
+          */
+        val importableIsTypes =
+          expr.tpe
+            .members
+            .filter(_.exists)
+            .groupBy(_.name.decoded)
+            .mapValues(_.map(_.isType))
 
-            Option(rename).map(x => name.decoded ->  (isType, x.decoded))
-          }
+        val renamings = for{
+          t @ g.ImportSelector(name, _, rename, _) <- selectors
+          isType <- importableIsTypes.getOrElse(name.decode, Nil) // getOrElse just in case...
+        } yield Option(rename).map(x => name.decoded ->  (isType, x.decoded))
+
         val renameMap = renamings.flatten.map(_.swap).toMap
         val info = new g.analyzer.ImportInfo(t, 0)
 
