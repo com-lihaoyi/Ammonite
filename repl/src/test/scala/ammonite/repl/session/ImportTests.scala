@@ -226,6 +226,70 @@ object ImportTests extends TestSuite{
           @ 1: foo
           error: Compilation Failed
         """)
+
+        'paulp - check.session("""
+          @ import ammonite.repl.testcode.paulp1._, ammonite.repl.testcode.paulp2._
+
+          @ new Paulp; Paulp // Paulp's example in #199
+          res1_0: Paulp = paulp1.Paulp1
+          res1_1: Paulp.type = paulp2.Paulp2
+
+          @ val Paulp = 123 // Shadow the term but not the type
+
+          @ new Paulp; Paulp // Shouldn't change
+          res3_0: Paulp = paulp1.Paulp1
+          res3_1: Int = 123
+
+          @ object Paulp3{
+          @   val Paulp = 1
+          @   type Paulp = Array[Int]
+          @ }
+
+          @ import Paulp3._ // Actually shadow them now
+
+          @ (new Paulp(0)).length; Paulp
+          res6_0: Int = 0
+          res6_1: Int = 1
+
+          @ object Paulp4{ object Paulp{override def toString = "Paulp4"}}
+
+          @ object Paulp5{ class Paulp{override def toString = "Paulp5"}}
+
+          @ import Paulp4.Paulp, Paulp5.Paulp // cross import, shadow both
+
+          @ Paulp
+          res10: Paulp.type = Paulp4
+
+          @ new Paulp
+          res11: Paulp = Paulp5
+
+          @ import ammonite.repl.testcode.paulp1._ // individually import & shadow
+
+          @ new Paulp; Paulp
+          res13_0: Paulp = paulp1.Paulp1
+          res13_1: Paulp.type = Paulp4
+
+          @ import ammonite.repl.testcode.paulp2._ // one at a time...
+
+          @ new Paulp; Paulp
+          res15_0: Paulp = paulp1.Paulp1
+          res15_1: Paulp.type = paulp2.Paulp2
+
+          @ object Paulp6{ val Paulp = 1; type Paulp = Int }
+
+          @ import Paulp6._ // This should shadow both
+
+          @ Paulp: Paulp
+          res18: Paulp = 1
+
+          @ import Paulp4._
+
+          @ Paulp
+          res20: Paulp.type = Paulp4
+
+          @ Paulp: Paulp // Improper shadowing!
+          error: not found: type Paulp
+        """)
       }
     }
   }

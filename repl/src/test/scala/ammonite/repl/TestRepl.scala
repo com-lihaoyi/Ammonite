@@ -90,9 +90,10 @@ class TestRepl {
           case Res.Success(str) =>
             // Strip trailing whitespace
             def normalize(s: String) = s.lines.map(_.replaceAll(" *$", "")).mkString("\n").trim()
-            failLoudly(assert(normalize(out) == normalize(expected)))
+            failLoudly(assert{identity(error); identity(warning); normalize(out) == normalize(expected)})
 
-          case Res.Failure(failureMsg) => assert({identity(out); identity(expected); false})
+          case Res.Failure(failureMsg) =>
+            assert({identity(error); identity(warning); identity(out); identity(expected); false})
           case Res.Exception(ex, failureMsg) =>
             val trace = Repl.showException(ex, "", "", "") + "\n" +  failureMsg
             assert({identity(trace); identity(expected); false})

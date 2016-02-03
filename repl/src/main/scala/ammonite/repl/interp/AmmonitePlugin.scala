@@ -52,9 +52,17 @@ object AmmonitePlugin{
           }
         }
         val prefix = rec(expr).reverseMap(x => Parsers.backtickWrap(x.decoded)).mkString(".")
+
         val renamings =
           for(t @ g.ImportSelector(name, _, rename, _) <- selectors) yield {
-            Option(rename).map(x => name.decoded -> (name.isTypeName, x.decoded))
+            val isType =
+              expr.tpe
+                .members
+                .filter(_.exists)
+                .find(_.name string_== name)
+                .exists(_.isType)
+
+            Option(rename).map(x => name.decoded ->  (isType, x.decoded))
           }
         val renameMap = renamings.flatten.map(_.swap).toMap
         val info = new g.analyzer.ImportInfo(t, 0)
@@ -63,6 +71,7 @@ object AmmonitePlugin{
           sym <- info.allImportedSymbols
           if !sym.isSynthetic
           if !sym.isPrivate
+          if sym.exists
           if sym.isPublic
           if sym.toString != "package class-use"
           if sym.toString != "object package-info"
@@ -79,7 +88,7 @@ object AmmonitePlugin{
           //
           // As opposed to via import scala.reflect.macros._.
           // Thus we need to combine allImportedSymbols with the renameMap
-          (isType, sym) <- symNames.toList ++ renameMap.keys
+          (isType, sym) <- (symNames.toList ++ renameMap.keys).distinct
         } yield {
           (isType, renameMap.getOrElse((isType, sym), sym), sym, prefix)
         }
