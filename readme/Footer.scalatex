@@ -42,6 +42,14 @@
       Although it's best to read the documentation on this page to learn how to use these projects, the Scaladoc is still useful as a reference.
   
   @sect{Changelog}
+    @sect{0.5.4}
+      @ul
+        @li
+          Improve the pretty-printing for @hl.scala{Range.Inclusive} #337
+        @li
+          More fixes to shadowing behavior of @hl.scala{type}s and @hl.scala{val}s #199
+        @li
+          Pressing @code{BACKSPACE} now drops you out of history-browsing properly, preserving your edits if you then press @code{ENTER} without entering any other characters #338
     @sect{0.5.3}
       @ul
         @li
