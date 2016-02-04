@@ -45,7 +45,7 @@
     @sect{0.5.4}
       @ul
         @li
-          Improve the pretty-printing for @hl.scala{Range.Inclusive} #337
+          Improve the pretty-printing for @hl.scala{Range.Inclusive} #337, thanks to @lnk("Saheb", "https://github.com/Saheb")
         @li
           More fixes to shadowing behavior of @hl.scala{type}s and @hl.scala{val}s #199
         @li
