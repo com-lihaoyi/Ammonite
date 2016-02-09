@@ -30,11 +30,11 @@ trait ReplAPI {
    * Exit the Ammonite REPL. You can also use Ctrl-D to exit
    */
   def exit = throw ReplExit(())
-
   /**
    * Exit the Ammonite REPL. You can also use Ctrl-D to exit
    */
   def exit(value: Any) = throw ReplExit(value)
+
 
   /**
    * Read/writable prompt for the shell. Use this to change the
@@ -50,7 +50,7 @@ trait ReplAPI {
    * Display help text if you don't know how to use the REPL
    */
   def help: String
-
+  def lastException:Throwable
   /**
    * History of commands that have been entered into the shell, including
    * previous sessions

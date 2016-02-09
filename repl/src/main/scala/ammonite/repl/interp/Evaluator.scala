@@ -34,7 +34,9 @@ trait Evaluator{
   def processLine(code: String,
                   printCode: String,
                   printer: Printer,
-                  extraImports: Seq[ImportData] = Seq()): Res[Evaluated]
+                  extraImports: Seq[ImportData] = Seq(),
+                  exception_update:(Throwable) => Unit
+                 ): Res[Evaluated]
 
   def processScriptBlock(code: String,
                          scriptImports: Seq[ImportData],
@@ -208,7 +210,9 @@ object Evaluator{
     def processLine(code: String,
                     printCode: String,
                     printer: Printer,
-                    extraImports: Seq[ImportData] = Seq()) = for {
+                    extraImports: Seq[ImportData] = Seq(),
+                    exception_update:(Throwable) => Unit
+                   ) = for {
       wrapperName <- Res.Success("cmd" + getCurrentLine)
       _ <- Catching{ case e: ThreadDeath => interrupted() }
       (classFiles, newImports) <- compileClass(
@@ -228,13 +232,19 @@ object Evaluator{
         // Exit
         case Ex(_: InvEx, _: InitEx, ReplExit(value))  => Res.Exit(value)
         // Interrupted during pretty-printing
-        case Ex(_: ThreadDeath)                 => interrupted()
-        // Interrupted during evaluation
-        case Ex(_: InvEx, _: ThreadDeath)       => interrupted()
+        case Ex(e: ThreadDeath)                 =>  exception_update(e)
+                                                    interrupted()
 
-        case Ex(_: InvEx, _: InitEx, userEx@_*) => Res.Exception(userEx(0), "")
-        case Ex(_: InvEx, userEx@_*)            => Res.Exception(userEx(0), "")
-        case Ex(userEx@_*)                      => Res.Exception(userEx(0), "")
+        // Interrupted during evaluation
+        case Ex(_: InvEx, e: ThreadDeath)       =>  exception_update(e)
+                                                    interrupted()
+
+        case Ex(_: InvEx, _: InitEx, userEx@_*) =>   exception_update(userEx(0))
+                                                      Res.Exception(userEx(0), "")
+        case Ex(_: InvEx, userEx@_*)            =>   exception_update(userEx(0))
+                                                      Res.Exception(userEx(0), "")
+        case Ex(userEx@_*)                      =>    exception_update(userEx(0))
+                                                      Res.Exception(userEx(0), "")
       }
     } yield {
       // Exhaust the printer iterator now, before exiting the `Catching`
