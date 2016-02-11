@@ -56,7 +56,7 @@ class Interpreter(prompt0: Ref[String],
       |""".stripMargin
 
   val SheBang = "#!"
-  var lastEx:Throwable=null
+  var lastException: Throwable = null
 
   def processLine(code: String,
                   stmts: Seq[String]) = {
@@ -89,7 +89,7 @@ class Interpreter(prompt0: Ref[String],
         """,
         printer,
         extraImports,
-        lastEx = _  //passing a setter partial function to update lastEx
+        lastException = _  //passing a setter partial function to update lastEx
       )
     } finally Thread.currentThread().setContextClassLoader(oldClassloader)
   }
@@ -177,7 +177,7 @@ class Interpreter(prompt0: Ref[String],
     }
   }
 
-  def   handleOutput(res: Res[Evaluated]) = {
+  def handleOutput(res: Res[Evaluated]) = {
     res match{
       case Res.Skip => true
       case Res.Exit(value) =>
@@ -233,7 +233,7 @@ class Interpreter(prompt0: Ref[String],
 
   lazy val replApi: ReplAPI = new DefaultReplAPI { outer =>
 
-    def lastException=lastEx
+    def lastException = Interpreter.this.lastException
 
     def imports = interp.eval.previousImportBlock
     val colors = colors0

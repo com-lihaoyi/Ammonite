@@ -50,7 +50,7 @@ trait ReplAPI {
    * Display help text if you don't know how to use the REPL
    */
   def help: String
-  def lastException:Throwable
+  def lastException: Throwable
   /**
    * History of commands that have been entered into the shell, including
    * previous sessions

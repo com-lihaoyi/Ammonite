@@ -35,7 +35,7 @@ trait Evaluator{
                   printCode: String,
                   printer: Printer,
                   extraImports: Seq[ImportData] = Seq(),
-                  exception_update:(Throwable) => Unit
+                  on_exception: Throwable => Unit
                  ): Res[Evaluated]
 
   def processScriptBlock(code: String,
@@ -211,7 +211,7 @@ object Evaluator{
                     printCode: String,
                     printer: Printer,
                     extraImports: Seq[ImportData] = Seq(),
-                    exception_update:(Throwable) => Unit
+                    on_exception: Throwable => Unit
                    ) = for {
       wrapperName <- Res.Success("cmd" + getCurrentLine)
       _ <- Catching{ case e: ThreadDeath => interrupted() }
@@ -232,18 +232,18 @@ object Evaluator{
         // Exit
         case Ex(_: InvEx, _: InitEx, ReplExit(value))  => Res.Exit(value)
         // Interrupted during pretty-printing
-        case Ex(e: ThreadDeath)                 =>  exception_update(e)
+        case Ex(e: ThreadDeath)                 =>  on_exception(e)
                                                     interrupted()
 
         // Interrupted during evaluation
-        case Ex(_: InvEx, e: ThreadDeath)       =>  exception_update(e)
+        case Ex(_: InvEx, e: ThreadDeath)       =>  on_exception(e)
                                                     interrupted()
 
-        case Ex(_: InvEx, _: InitEx, userEx@_*) =>   exception_update(userEx(0))
+        case Ex(_: InvEx, _: InitEx, userEx@_*) =>   on_exception(userEx(0))
                                                       Res.Exception(userEx(0), "")
-        case Ex(_: InvEx, userEx@_*)            =>   exception_update(userEx(0))
+        case Ex(_: InvEx, userEx@_*)            =>   on_exception(userEx(0))
                                                       Res.Exception(userEx(0), "")
-        case Ex(userEx@_*)                      =>    exception_update(userEx(0))
+        case Ex(userEx@_*)                      =>    on_exception(userEx(0))
                                                       Res.Exception(userEx(0), "")
       }
     } yield {
