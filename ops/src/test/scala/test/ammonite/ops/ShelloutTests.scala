@@ -18,11 +18,13 @@ object ShelloutTests extends TestSuite{
         val res = %%('ls, "ops/src/test/resources/testdata")
         assert(res.out.string == "File.txt\nfolder1\nfolder2\n")
       }
-      'bytes - Unix{
-        val res = %%('echo, "abc")
-        val listed = res.out.bytes
-//        assert(listed == "File.txt\nfolder\nfolder2\nFile.txt".getBytes)
-        listed.toSeq
+      'bytes{
+        if(Unix()){
+          val res = %%('echo, "abc")
+          val listed = res.out.bytes
+          //        assert(listed == "File.txt\nfolder\nfolder2\nFile.txt".getBytes)
+          listed.toSeq
+        }
       }
       'chained{
         assert(%%('git, 'init).out.string.contains("Reinitialized existing Git repository"))
@@ -48,20 +50,24 @@ object ShelloutTests extends TestSuite{
         )
       }
 
-      'filebased - Unix{
-        assert(%%(scriptFolder/'echo, 'HELLO).out.lines.mkString == "HELLO")
+      'filebased{
+        if(Unix()){
+          assert(%%(scriptFolder/'echo, 'HELLO).out.lines.mkString == "HELLO")
 
-        val res: CommandResult =
-          %%(root/'bin/'bash, "-c", "echo 'Hello'$ENV_ARG", ENV_ARG=123)
+          val res: CommandResult =
+            %%(root/'bin/'bash, "-c", "echo 'Hello'$ENV_ARG", ENV_ARG=123)
 
-        assert(res.out.string.trim == "Hello123")
+          assert(res.out.string.trim == "Hello123")
+        }
       }
-      'filebased2 - Unix{
-        val res = %%('which, 'echo)
-        val echoRoot = Path(res.out.string.trim)
-        assert(echoRoot == root/'bin/'echo)
+      'filebased2{
+        if(Unix()){
+          val res = %%('which, 'echo)
+          val echoRoot = Path(res.out.string.trim)
+          assert(echoRoot == root/'bin/'echo)
 
-        assert(%%(echoRoot, 'HELLO).out.lines == Seq("HELLO"))
+          assert(%%(echoRoot, 'HELLO).out.lines == Seq("HELLO"))
+        }
       }
 
       'envArgs{
@@ -95,9 +101,11 @@ object ShelloutTests extends TestSuite{
       import ammonite.ops.ImplicitWd._
       val res2 = %ls
     }
-    'fileCustomWorkingDir - Unix{
-      val output = %%.apply(scriptFolder/'echo_with_wd, 'HELLO)(root/'usr)
-      assert(output.out.lines == Seq("HELLO /usr"))
+    'fileCustomWorkingDir - {
+      if(Unix()){
+        val output = %%.apply(scriptFolder/'echo_with_wd, 'HELLO)(root/'usr)
+        assert(output.out.lines == Seq("HELLO /usr"))
+      }
     }
   }
 }
