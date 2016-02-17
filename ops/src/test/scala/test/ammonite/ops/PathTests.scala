@@ -266,14 +266,14 @@ object PathTests extends TestSuite{
 
         // You can also pass in java.io.File and java.nio.file.Path
         // objects instead of Strings when constructing paths
-          val relIoFile = new java.io.File(relStr)
-          val absNioFile = java.nio.file.Paths.get(absStr)
+        val relIoFile = new java.io.File(relStr)
+        val absNioFile = java.nio.file.Paths.get(absStr)
 
-          assert(
-            RelPath(relIoFile) == 'hello/'cow,
-            Path(absNioFile) == root/'hello/'world,
-            Path(relIoFile, root/'base) == root/'base/'hello/'cow
-          )
+        assert(
+          RelPath(relIoFile) == 'hello/'cow,
+          Path(absNioFile) == root/'hello/'world,
+          Path(relIoFile, root/'base) == root/'base/'hello/'cow
+        )
       }
       'basepath{
         val relStr = "hello/cow/world/.."
