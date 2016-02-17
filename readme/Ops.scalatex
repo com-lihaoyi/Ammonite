@@ -129,6 +129,39 @@
         @li
           @hl.scala{Seq[T]}s where @hl.scala{T} is convertible into a @hl.scala{RelPath}
 
+    @sect{Constructing Paths}
+      @p
+        Apart from built-ins like @hl.scala{cwd} or @hl.scala{root} or @hl.scala{home}, you can also construct Ammonite's @hl.scala{Path}s from @hl.scala{String}s, @hl.scala{java.io.File}s or @hl.scala{java.nio.file.Path}s:
+
+      @hl.ref(opsTests/"PathTests.scala", Seq("construction", "success"))
+
+      @p
+        Trying to construct invalid paths fails with exceptions:
+
+      @hl.ref(opsTests/"PathTests.scala", Seq("construction", "failure"))
+      @p
+        As you can see, attempting to parse a relative path with @hl.scala{Path} or an absolute path with @hl.scala{RelPath} throws an exception. If you're uncertain about what kind of path you are getting, you could use @hl.scala{BasePath} to parse it:
+
+      @hl.ref(opsTests/"PathTests.scala", Seq("construction", "basepath"))
+
+      @p
+        This converts it into a @hl.scala{BasePath}, which is either a @hl.scala{Path} or @hl.scala{RelPath}. It's then up to you to pattern-match on the types and decide what you want to do in each case.
+
+      @p
+        You can also pass in a second argument to @hl.scala{Path(..., base)}. If the path being parsed is a relative path, this @hl.scala{base} will be used to coerce it into an absolute path:
+
+      @hl.ref(opsTests/"PathTests.scala", Seq("construction", "based"))
+
+      @p
+        For example, if you wanted the common behavior of converting relative paths to absolute based on your current working directory, you can pass in @hl.scala{cwd} as the second argument to @hl.scala{Path(...)}. Apart from passing in @hl.scala{String}s or @hl.scala{java.io.File}s or @hl.scala{java.nio.file.Path}s, you can also pass in @hl.scala{BasePath}s you parsed early as a convenient way of converting it to a absolute path, if it isn't already one.
+
+      @hr
+
+      @p
+        In general, Ammonite is very picky about the distinction between relative and absolute paths, and doesn't allow "automatic" conversion between them based on current-working-directory the same way many other filesystem APIs (Bash, Java, Python, ...) do. Even in cases where it's uncertain, e.g. you're taking user input as a @hl.scala{String}, you have to either handle both possibilities with @hl.scala{BasePath} or explicitly choose to convert relative paths to absolute using some base.
+      @p
+        While this adds some boilerplate, it should overall result in more robust filesystem code that doesn't contain bugs like @lnk("this one", "https://github.com/valvesoftware/steam-for-linux/issues/3671").
+
   @sect{Operations}
     @p
       @sect.ref{Paths} not aren't interesting on their own, but serve as a base to use to perform filesystem operations in a concise and easy to use way. Here is a quick tour of the core capabilities that Ammonite-Ops provides:

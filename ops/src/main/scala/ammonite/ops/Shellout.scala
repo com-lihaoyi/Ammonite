@@ -156,7 +156,7 @@ object Shellable{
   implicit def StringShellable(s: String): Shellable = Shellable(Seq(s))
   implicit def SeqShellable(s: Seq[String]): Shellable = Shellable(s)
   implicit def SymbolShellable(s: Symbol): Shellable = Shellable(Seq(s.name))
-  implicit def BasePathShellable(s: BasePath[_]): Shellable = Shellable(Seq(s.toString))
+  implicit def BasePathShellable(s: BasePath): Shellable = Shellable(Seq(s.toString))
   implicit def NumericShellable[T: Numeric](s: T): Shellable = Shellable(Seq(s.toString))
 }
 

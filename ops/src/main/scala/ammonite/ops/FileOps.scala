@@ -139,7 +139,7 @@ object mkdir extends Function1[Path, Unit]{
  */
 object mv extends Function2[Path, Path, Unit] with Internals.Mover{
   def apply(from: Path, to: Path) =
-    java.nio.file.Files.move(from.nio, to.nio)
+    java.nio.file.Files.move(from.toNIO, to.toNIO)
 
   def check = false
 
@@ -218,7 +218,7 @@ object ls extends StreamableOp1[Path, Path, LsSeq] with ImplicitOp[LsSeq]{
   object iter extends (Path => Iterator[Path]){
     def apply(arg: Path) = {
       import scala.collection.JavaConverters._
-      val dirStream = Files.newDirectoryStream(arg.nio)
+      val dirStream = Files.newDirectoryStream(arg.toNIO)
       new SelfClosingIterator(
         dirStream.iterator().asScala.map(x => Path(x)),
         () => dirStream.close()
@@ -280,7 +280,7 @@ object ls extends StreamableOp1[Path, Path, LsSeq] with ImplicitOp[LsSeq]{
 object write extends Function2[Path, Internals.Writable, Unit]{
   def apply(target: Path, data: Internals.Writable) = {
     mkdir(target/RelPath.up)
-    Files.write(target.nio, data.writeableData, StandardOpenOption.CREATE_NEW)
+    Files.write(target.toNIO, data.writeableData, StandardOpenOption.CREATE_NEW)
   }
 
   /**
@@ -291,7 +291,7 @@ object write extends Function2[Path, Internals.Writable, Unit]{
     def apply(target: Path, data: Internals.Writable) = {
       mkdir(target/RelPath.up)
       Files.write(
-        target.nio,
+        target.toNIO,
         data.writeableData,
         StandardOpenOption.CREATE,
         StandardOpenOption.APPEND
@@ -305,7 +305,7 @@ object write extends Function2[Path, Internals.Writable, Unit]{
   object over extends Function2[Path, Internals.Writable, Unit]{
     def apply(target: Path, data: Internals.Writable) = {
       mkdir(target/RelPath.up)
-      Files.write(target.nio, data.writeableData)
+      Files.write(target.toNIO, data.writeableData)
     }
   }
 }
@@ -317,7 +317,7 @@ object write extends Function2[Path, Internals.Writable, Unit]{
  */
 object read extends Internals.Reader with Function1[Path, String]{
   def readIn(p: Path) = {
-    java.nio.file.Files.newInputStream(p.nio)
+    java.nio.file.Files.newInputStream(p.toNIO)
   }
 
   /**

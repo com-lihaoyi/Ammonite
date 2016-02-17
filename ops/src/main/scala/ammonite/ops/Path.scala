@@ -2,23 +2,38 @@ package ammonite.ops
 
 import acyclic.file
 
+/**
+  * Enforces a standard interface for constructing [[BasePath]]-like things
+  * from java types of various sorts
+  */
+trait PathFactory[PathType <: BasePath] extends (String => PathType){
+  def apply(f: java.io.File): PathType = apply(f.getPath)
+  def apply(s: String): PathType = apply(java.nio.file.Paths.get(s))
+  def apply(f: java.nio.file.Path): PathType
+}
 
-object BasePath{
+object BasePath extends PathFactory[BasePath]{
+  def apply(f: java.nio.file.Path) = {
+    if (f.isAbsolute) Path(f)
+    else RelPath(f)
+  }
   def invalidChars = Set('/')
   def checkSegment(s: String) = {
-    if (s.exists(BasePath.invalidChars)){
-      throw PathError.InvalidSegment(s)
-    }
+    if (s.exists(BasePath.invalidChars)) throw PathError.InvalidSegment(s)
     if (s == "" || s == "." || s == "..") throw new PathError.InvalidSegment(s)
   }
-
+  def chunkify(s: java.nio.file.Path) = {
+    import collection.JavaConversions._
+    s.iterator().map(_.toString).filter(_ != ".").toVector
+  }
 }
 
 /**
  * A path which is either an absolute [[Path]] or a relative [[RelPath]],
  * with shared APIs and implementations.
  */
-trait BasePath[ThisType <: BasePath[ThisType]]{
+trait BasePath{
+  type ThisType <: BasePath
   /**
    * The individual path segments of this path.
    */
@@ -53,9 +68,24 @@ trait BasePath[ThisType <: BasePath[ThisType]]{
    * represents the name of the file/folder in filesystem paths
    */
   def last: String
+
+  /**
+    * Gives you the file extension of this path, or the empty
+    * string if there is no extension
+    */
+  def ext: String
+
+  /**
+    * Convert this into an java.nio.file.Path for easy interop
+    */
+  def toNIO: java.nio.file.Path
+  /**
+    * Convert this into an java.io.File for easy interop
+    */
+  def toIO: java.io.File
 }
 
-trait BasePathImpl[ThisType <: BasePath[ThisType]] extends BasePath[ThisType]{
+trait BasePathImpl extends BasePath{
   def segments: Seq[String]
 
   protected[this] def make(p: Seq[String], ups: Int): ThisType
@@ -65,22 +95,24 @@ trait BasePathImpl[ThisType <: BasePath[ThisType]] extends BasePath[ThisType]{
     math.max(subpath.ups - segments.length, 0)
   )
 
-  /**
-   * Gives you the file extension of this path, or the empty
-   * string if there is no extension
-   */
   def ext = {
     if (!segments.last.contains('.')) ""
     else segments.last.split('.').lastOption.getOrElse("")
   }
+
+  def toIO = toNIO.toFile
 
   def last = segments.last
 }
 
 object PathError{
   type IAE = IllegalArgumentException
-  case class InvalidSegment(segment: String)
-    extends IAE(s"Path segment [$segment] not allowed")
+  private[this] def errorMsg(s: String) =
+    s"[$s] is not a valid path segment. If you want to parse an absolute " +
+      "or relative path that may have multiple segments, consider using the " +
+      "Path(...) or RelPath(...) constructor calls"
+
+  case class InvalidSegment(segment: String) extends IAE(errorMsg(segment))
 
   case object AbsolutePathOutsideRoot
     extends IAE("The path created has enough ..s that it would start outside the root directory")
@@ -95,9 +127,9 @@ object PathError{
  * segments can only occur at the left-end of the path, and
  * are collapsed into a single number [[ups]].
  */
-case class RelPath(segments: Vector[String], ups: Int) extends BasePathImpl[RelPath]{
+case class RelPath private[ops] (segments: Vector[String], ups: Int) extends BasePathImpl{
+  type ThisType = RelPath
   require(ups >= 0)
-  segments.foreach(BasePath.checkSegment)
   protected[this] def make(p: Seq[String], ups: Int) = new RelPath(p.toVector, ups + this.ups)
   def relativeTo(base: RelPath): RelPath = {
     if (base.ups < ups) {
@@ -119,37 +151,26 @@ case class RelPath(segments: Vector[String], ups: Int) extends BasePathImpl[RelP
     this.segments.startsWith(target.segments) && this.ups == target.ups
   }
 
+  def toNIO = toNIO(java.nio.file.FileSystems.getDefault)
+  def toNIO(fs: java.nio.file.FileSystem) = fs.getPath(segments.head, segments.tail:_*)
+
   override def toString = (Seq.fill(ups)("..") ++ segments).mkString("/")
   override def hashCode = segments.hashCode() + ups.hashCode()
   override def equals(o: Any): Boolean = o match {
     case p: RelPath => segments == p.segments && p.ups == ups
     case _ => false
   }
+
 }
-trait RelPathStuff{
-  val up = new RelPath(Vector(), 1)
-  val empty = new RelPath(Vector(), 0)
-  implicit class RelPathStart(p1: String){
-    def /(subpath: RelPath) = empty/p1/subpath
-  }
-  implicit class RelPathStart2(p1: Symbol){
-    def /(subpath: RelPath) = empty/p1/subpath
-  }
-}
-object RelPath extends RelPathStuff with (String => RelPath){
-  def apply(s: String) = {
-    apply(java.nio.file.Paths.get(s))
-  }
-  def apply(s: java.nio.file.Path) = {
+object RelPath extends RelPathStuff with PathFactory[RelPath]{
+  def apply(f: java.nio.file.Path): RelPath = {
+
     import collection.JavaConversions._
-    require(
-      s.toAbsolutePath.iterator().size != s.iterator().size,
-      s + " is not an relative path"
-    )
-    empty/s.iterator.toArray.map(_.toString)
-  }
-  implicit class Transformable1(p: RelPath){
-    def nio = java.nio.file.Paths.get(p.toString)
+    require(!f.isAbsolute, f + " is not an relative path")
+
+    val segments = BasePath.chunkify(f.normalize())
+    val (ups, rest) = segments.partition(_ == "..")
+    new RelPath(rest, ups.length)
   }
 
   implicit def SymPath(s: Symbol): RelPath = StringPath(s.name)
@@ -169,37 +190,41 @@ object RelPath extends RelPathStuff with (String => RelPath){
   implicit val relPathOrdering: Ordering[RelPath] =
     Ordering.by((rp: RelPath) => (rp.ups, rp.segments.length, rp.segments.toIterable))
 }
-object Path extends (String => Path){
-  def apply(s: String): Path = {
-    apply(java.nio.file.Paths.get(s))
+trait RelPathStuff{
+  val up: RelPath = new RelPath(Vector.empty, 1)
+  val empty: RelPath = new RelPath(Vector.empty, 0)
+  implicit class RelPathStart(p1: String){
+    def /(subpath: RelPath) = empty/p1/subpath
   }
+  implicit class RelPathStart2(p1: Symbol){
+    def /(subpath: RelPath) = empty/p1/subpath
+  }
+}
 
-  def apply(f: java.io.File): Path = apply(f.getCanonicalPath)
+
+object Path extends PathFactory[Path]{
+  def apply(p: BasePath, base: Path) = p match{
+    case p: RelPath => base/p
+    case p: Path => p
+  }
+  def apply(f: java.io.File, base: Path): Path = apply(BasePath(f), base)
+  def apply(s: String, base: Path): Path = apply(BasePath(s), base)
+  def apply(f: java.nio.file.Path, base: Path): Path = apply(BasePath(f), base)
   def apply(f: java.nio.file.Path): Path = {
     import collection.JavaConversions._
-    require(
-      f.toAbsolutePath.iterator().size == f.iterator().size,
-      f + " is not an absolute path"
-    )
-    val chunks = collection.mutable.Buffer.empty[String]
-    f.toAbsolutePath.iterator.map(_.toString).foreach{
-      case "." => //do nothing
-      case ".." => chunks.remove(chunks.length-1)
-      case s => chunks.append(s)
-    }
+    val chunks = BasePath.chunkify(f)
+    if (chunks.count(_ == "..") > chunks.size / 2) throw PathError.AbsolutePathOutsideRoot
 
-    root/RelPath.SeqPath(chunks)
+    require(f.isAbsolute, f + " is not an absolute path")
+    Path(f.getRoot, BasePath.chunkify(f.normalize()))
   }
 
-  val root = new Path(Vector())
-  val home = new Path(System.getProperty("user.home").split("/").drop(1).toVector)
+  val root = Path(java.nio.file.Paths.get("/"))
+  val home = Path(System.getProperty("user.home"))
+
   def makeTmp = java.nio.file.Files.createTempDirectory(
     java.nio.file.Paths.get(System.getProperty("java.io.tmpdir")), "ammonite"
   )
-  implicit class Transformable(p: Path){
-    def nio = java.nio.file.Paths.get(p.toString)
-  }
-
 
   implicit val pathOrdering: Ordering[Path] =
     Ordering.by((rp: Path) => (rp.segments.length, rp.segments.toIterable))
@@ -209,14 +234,18 @@ object Path extends (String => Path){
  * An absolute path on the filesystem. Note that the path is
  * normalized and cannot contain any empty `""`, `"."` or `".."` segments
  */
-case class Path(segments: Vector[String]) extends BasePathImpl[Path]{
-  segments.foreach(BasePath.checkSegment)
+case class Path private[ops] (root: java.nio.file.Path, segments: Vector[String])
+extends BasePathImpl{
+
+  type ThisType = Path
+
+  def toNIO = root.resolve(root.getFileSystem.getPath(segments.head, segments.tail:_*))
 
   protected[this] def make(p: Seq[String], ups: Int) = {
     if (ups > 0){
       throw PathError.AbsolutePathOutsideRoot
     }
-    new Path(p.toVector)
+    new Path(root, p.toVector)
   }
   override def toString = "/" + segments.mkString("/")
 
@@ -236,6 +265,6 @@ case class Path(segments: Vector[String]) extends BasePathImpl[Path]{
       s2 = s2.dropRight(1)
       newUps += 1
     }
-    new RelPath(segments.drop(s2.length), newUps)
+    RelPath(segments.drop(s2.length), newUps)
   }
 }

@@ -17,7 +17,7 @@ package object ops extends Extensions with RelPathStuff{
   /**
    * The current working directory for this process.
    */
-  lazy val cwd = ops.Path(new java.io.File(""))
+  lazy val cwd = ops.Path(new java.io.File("").getCanonicalPath)
 
   /**
     * If you want to call subprocesses using [[%]] or [[%%]] and don't care
@@ -29,14 +29,6 @@ package object ops extends Extensions with RelPathStuff{
     */
   object ImplicitWd{
     implicit lazy val implicitCwd = ops.cwd
-  }
-
-  implicit class Transformable1(p: java.nio.file.Path){
-    def amm = {
-      import collection.JavaConversions._
-      if (p.toAbsolutePath.iterator().size == p.iterator().size) ops.Path(p)
-      else ops.RelPath(p)
-    }
   }
 
   /**
@@ -52,7 +44,7 @@ package object ops extends Extensions with RelPathStuff{
     * To break apart a path and extract various pieces of it.
     */
   object /{
-    def unapply[T <: BasePath[T]](p: T): Option[(T, String)] = {
+    def unapply[T <: BasePath](p: T): Option[(p.ThisType, String)] = {
       if (p.segments.length > 0)
         Some((p / up, p.last))
       else None

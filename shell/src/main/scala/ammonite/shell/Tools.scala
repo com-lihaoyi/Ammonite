@@ -151,7 +151,7 @@ object grep {
 
 case class tail(interval: Int, prefix: Int) extends Function[Path, Iterator[String]]{
   def apply(arg: Path): Iterator[String] = {
-    val is = java.nio.file.Files.newInputStream(arg.nio)
+    val is = java.nio.file.Files.newInputStream(arg.toNIO)
     val br = new BufferedReader(new InputStreamReader(is))
     Iterator.continually{
       val line = br.readLine()
