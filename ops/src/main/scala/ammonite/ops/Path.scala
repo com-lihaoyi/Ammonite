@@ -222,7 +222,7 @@ object Path extends PathFactory[Path]{
     Path(f.getRoot, BasePath.chunkify(f.normalize()))
   }
 
-  val root = Path(java.nio.file.Paths.get("/"))
+  val root = Path(java.nio.file.Paths.get("").toAbsolutePath.getRoot)
   val home = Path(System.getProperty("user.home"))
 
   def makeTmp = java.nio.file.Files.createTempDirectory(
