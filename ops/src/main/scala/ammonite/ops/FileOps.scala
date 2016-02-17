@@ -61,26 +61,26 @@ object Internals{
   }
 
   trait Reader{
-    def readIn(p: Path): InputStream
-    def apply(arg: Path) = {
+    def readIn(p: InputPath): InputStream
+    def apply(arg: InputPath) = {
       val is = readIn(arg)
       val res = io.Source.fromInputStream(is).mkString
       is.close()
       res
     }
 
-    object lines extends StreamableOp1[Path, String, Vector[String]]{
-      def materialize(src: Path, i: Iterator[String]) = i.toVector
-      object iter extends (Path => Iterator[String]){
-        def apply(arg: Path) = {
+    object lines extends StreamableOp1[InputPath, String, Vector[String]]{
+      def materialize(src: InputPath, i: Iterator[String]) = i.toVector
+      object iter extends (InputPath => Iterator[String]){
+        def apply(arg: InputPath) = {
           val is = readIn(arg)
           val s = io.Source.fromInputStream(is, "UTF-8")
           new SelfClosingIterator(s.getLines, () => s.close())
         }
       }
     }
-    object bytes extends Function1[Path, Array[Byte]]{
-      def apply(arg: Path) = {
+    object bytes extends Function1[InputPath, Array[Byte]]{
+      def apply(arg: InputPath) = {
         val is = readIn(arg)
         val out = new java.io.ByteArrayOutputStream()
         val buffer = new Array[Byte](8192)
@@ -315,24 +315,8 @@ object write extends Function2[Path, Internals.Writable, Unit]{
  * Reads a file into memory, either as a String,
  * as (read.lines(...): Seq[String]), or as (read.bytes(...): Array[Byte]).
  */
-object read extends Internals.Reader with Function1[Path, String]{
-  def readIn(p: Path) = {
-    java.nio.file.Files.newInputStream(p.toNIO)
-  }
-
-  /**
-   * Reads a classpath resource into memory, either as a
-   * string, as a Seq[String] of lines, or as a Array[Byte]
-   */
-  object resource extends Internals.Reader with Function1[Path, String]{
-    def readIn(p: Path) = {
-      val ret = getClass.getResourceAsStream(p.toString)
-      ret match{
-        case null => throw new java.nio.file.NoSuchFileException(p.toString)
-        case _ => ret
-      }
-    }
-  }
+object read extends Internals.Reader with Function1[InputPath, String]{
+  def readIn(p: InputPath) = p.newInputStream()
 }
 
 /**
@@ -367,7 +351,7 @@ object exists extends Function1[Path, Boolean]{
 case class kill(signal: Int) extends Function1[Int, CommandResult]{
   def apply(pid: Int): CommandResult = {
 
-    %%.kill("-" + signal, pid.toString)(wd = Path(new java.io.File("")))
+    %%('kill, "-" + signal, pid.toString)(wd = Path(new java.io.File("")))
   }
 }
 

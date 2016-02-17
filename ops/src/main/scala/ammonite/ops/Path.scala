@@ -6,7 +6,7 @@ import acyclic.file
   * Enforces a standard interface for constructing [[BasePath]]-like things
   * from java types of various sorts
   */
-trait PathFactory[PathType <: BasePath] extends (String => PathType){
+sealed trait PathFactory[PathType <: BasePath] extends (String => PathType){
   def apply(f: java.io.File): PathType = apply(f.getPath)
   def apply(s: String): PathType = apply(java.nio.file.Paths.get(s))
   def apply(f: java.nio.file.Path): PathType
@@ -29,10 +29,20 @@ object BasePath extends PathFactory[BasePath]{
 }
 
 /**
+  * A path that can be read from, either a [[Path]] or a [[ResourcePath]]
+  */
+sealed trait InputPath{
+  protected[ops] def newInputStream(): java.io.InputStream
+}
+
+/**
  * A path which is either an absolute [[Path]] or a relative [[RelPath]],
  * with shared APIs and implementations.
+ *
+ * Most of the filesystem-independent path-manipulation logic that lets you
+ * splice paths together or navigate in and out of paths lives in this interface
  */
-trait BasePath{
+sealed trait BasePath{
   type ThisType <: BasePath
   /**
    * The individual path segments of this path.
@@ -75,14 +85,7 @@ trait BasePath{
     */
   def ext: String
 
-  /**
-    * Convert this into an java.nio.file.Path for easy interop
-    */
-  def toNIO: java.nio.file.Path
-  /**
-    * Convert this into an java.io.File for easy interop
-    */
-  def toIO: java.io.File
+
 }
 
 trait BasePathImpl extends BasePath{
@@ -99,8 +102,6 @@ trait BasePathImpl extends BasePath{
     if (!segments.last.contains('.')) ""
     else segments.last.split('.').lastOption.getOrElse("")
   }
-
-  def toIO = toNIO.toFile
 
   def last = segments.last
 }
@@ -151,13 +152,7 @@ case class RelPath private[ops] (segments: Vector[String], ups: Int) extends Bas
     this.segments.startsWith(target.segments) && this.ups == target.ups
   }
 
-  def toNIO = toNIO(java.nio.file.FileSystems.getDefault)
-  def toNIO(fs: java.nio.file.FileSystem) = {
-
-    fs.getPath(segments.mkString(fs.getSeparator))
-  }
-
-  override def toString = toNIO.toString
+  override def toString = segments.mkString("/")
   override def hashCode = segments.hashCode() + ups.hashCode()
   override def equals(o: Any): Boolean = o match {
     case p: RelPath => segments == p.segments && p.ups == ups
@@ -238,8 +233,8 @@ object Path extends PathFactory[Path]{
  * normalized and cannot contain any empty `""`, `"."` or `".."` segments
  */
 case class Path private[ops] (root: java.nio.file.Path, segments: Vector[String])
-extends BasePathImpl{
-
+extends BasePathImpl with InputPath{
+  protected[ops] def newInputStream = java.nio.file.Files.newInputStream(toNIO)
   type ThisType = Path
 
   def toNIO = root.resolve(segments.mkString(root.getFileSystem.getSeparator))
@@ -270,4 +265,44 @@ extends BasePathImpl{
     }
     RelPath(segments.drop(s2.length), newUps)
   }
+
+  def toIO = toNIO.toFile
+}
+object ResourcePath{
+  val resource = ResourcePath(Vector.empty)
+}
+case class ResourcePath private[ops] (segments: Vector[String])
+  extends BasePathImpl with InputPath{
+  type ThisType = ResourcePath
+  override def toString = "/"+segments.mkString("/")
+  protected[ops] def newInputStream = {
+    getClass.getResourceAsStream(this.toString) match{
+      case null => throw new java.nio.file.NoSuchFileException(this.toString)
+      case stream => stream
+    }
+  }
+  protected[this] def make(p: Seq[String], ups: Int) = {
+    if (ups > 0){
+      throw PathError.AbsolutePathOutsideRoot
+    }
+    new ResourcePath(p.toVector)
+  }
+
+  def relativeTo(base: ResourcePath) = {
+    var newUps = 0
+    var s2 = base.segments
+
+    while(!segments.startsWith(s2)){
+      s2 = s2.dropRight(1)
+      newUps += 1
+    }
+    RelPath(segments.drop(s2.length), newUps)
+  }
+
+
+  def startsWith(target: ResourcePath) = {
+    segments.startsWith(target.segments)
+  }
+
+
 }

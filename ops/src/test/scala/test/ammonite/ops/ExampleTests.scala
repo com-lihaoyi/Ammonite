@@ -43,10 +43,10 @@ object ExampleTests extends TestSuite{
       // These operations are mirrored in `read.resource`,
       // `read.resource.lines` and `read.resource.bytes` to conveniently read
       // files from your classpath:
-      val resourcePath = root/'testdata/"File.txt"
-      read.resource(resourcePath).length        ==> 81
-      read.resource.bytes(resourcePath).length  ==> 81
-      read.resource.lines(resourcePath).length  ==> 4
+      val resourcePath = resource/'testdata/"File.txt"
+      read(resourcePath).length        ==> 81
+      read.bytes(resourcePath).length  ==> 81
+      read.lines(resourcePath).length  ==> 4
 
       // By default, `write` fails if there is already a file in place. Use
       // `write.append` or `write.over` if you want to append-to/overwrite
@@ -247,13 +247,14 @@ object ExampleTests extends TestSuite{
       val target = root/'target/'file
       assert(target/up == root/'target)
     }
-    'canonical{
+    'canonical - {if (Unix()){
+
       assert((root/'folder/'file/up).toString == "/folder")
       // not "/folder/file/.."
 
       assert(('folder/'file/up).toString == "folder")
       // not "folder/file/.."
-    }
+    }}
     'findWc{
       val wd = cwd/'ops/'src/'test/'resources/'testdata
 
@@ -265,9 +266,9 @@ object ExampleTests extends TestSuite{
     'addUpScalaSize{
       ls.rec! cwd |? (_.ext == "scala") | (_.size) |& (_ + _)
     }
-    'concatAll{
+    'concatAll{if (Unix()){
       ls.rec! cwd |? (_.ext == "scala") | read |> write! cwd/'target/'test/"omg.txt"
-    }
+    }}
 
     'noLongLines{
       // Ensure that we don't have any Scala files in the current working directory

@@ -9,6 +9,8 @@ package object ops extends Extensions with RelPathStuff{
    */
   val root = ops.Path.root
 
+  val resource = ops.ResourcePath.resource
+
   /**
    * The user's home directory
    */

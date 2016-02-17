@@ -14,7 +14,6 @@ object PathTests extends TestSuite{
           assert(
             // ammonite.Path to java.nio.file.Path
             (root/'omg).toNIO == Paths.get("/omg"),
-            (empty/'omg).toNIO == Paths.get("omg"),
 
             // java.nio.file.Path to ammonite.Path
             root/'omg == Path(Paths.get("/omg")),
@@ -34,18 +33,22 @@ object PathTests extends TestSuite{
       'RelPath{
         'Constructors {
           'Symbol {
-            val rel1 = rel / 'ammonite
-            assert(
-              rel1.segments == Seq("src", "main", "scala", "ammonite"),
-              rel1.toString == "src/main/scala/ammonite"
-            )
+            if (Unix()){
+              val rel1 = rel / 'ammonite
+              assert(
+                rel1.segments == Seq("src", "main", "scala", "ammonite"),
+                rel1.toString == "src/main/scala/ammonite"
+              )
+            }
           }
           'String {
-            val rel1 = rel / "Path.scala"
-            assert(
-              rel1.segments == Seq("src", "main", "scala", "Path.scala"),
-              rel1.toString == "src/main/scala/Path.scala"
-            )
+            if (Unix()){
+              val rel1 = rel / "Path.scala"
+              assert(
+                rel1.segments == Seq("src", "main", "scala", "Path.scala"),
+                rel1.toString == "src/main/scala/Path.scala"
+              )
+            }
           }
           'Combos{
             def check(rel1: RelPath) = assert(
@@ -53,18 +56,30 @@ object PathTests extends TestSuite{
               rel1.toString == "src/main/scala/sub1/sub2"
             )
             'ArrayString - {
-              val arr = Array("sub1", "sub2")
-              check(rel / arr)
+              if (Unix()){
+                val arr = Array("sub1", "sub2")
+                check(rel / arr)
+              }
             }
             'ArraySymbol - {
-              val arr = Array('sub1, 'sub2)
-              check(rel / arr)
+              if (Unix()){
+                val arr = Array('sub1, 'sub2)
+                check(rel / arr)
+              }
             }
-            'SeqString - check(rel / Seq("sub1", "sub2"))
-            'SeqSymbol - check(rel / Seq('sub1, 'sub2))
-            'SeqSeqSeqSymbol - check(
-              rel / Seq(Seq(Seq('sub1), Seq()), Seq(Seq('sub2)), Seq())
-            )
+            'SeqString - {
+              if (Unix()) check(rel / Seq("sub1", "sub2"))
+            }
+            'SeqSymbol - {
+              if (Unix()) check(rel / Seq('sub1, 'sub2))
+            }
+            'SeqSeqSeqSymbol - {
+              if (Unix()){
+                check(
+                  rel / Seq(Seq(Seq('sub1), Seq()), Seq(Seq('sub2)), Seq())
+                )
+              }
+            }
           }
         }
         'Relativize{
@@ -81,7 +96,7 @@ object PathTests extends TestSuite{
         val d = cwd
         val abs = d / rel
         'Constructor {
-          assert(
+          if (Unix()) assert(
             abs.toString.drop(d.toString.length) == "/src/main/scala",
             abs.toString.length > d.toString.length
           )
