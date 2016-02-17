@@ -157,7 +157,7 @@ case class RelPath private[ops] (segments: Vector[String], ups: Int) extends Bas
     fs.getPath(segments.mkString(fs.getSeparator))
   }
 
-  override def toString = (Seq.fill(ups)("..") ++ segments).mkString("/")
+  override def toString = toNIO.toString
   override def hashCode = segments.hashCode() + ups.hashCode()
   override def equals(o: Any): Boolean = o match {
     case p: RelPath => segments == p.segments && p.ups == ups
@@ -250,7 +250,7 @@ extends BasePathImpl{
     }
     new Path(root, p.toVector)
   }
-  override def toString = "/" + segments.mkString("/")
+  override def toString = toNIO.toString
 
   override def equals(o: Any): Boolean = o match {
     case p: Path => segments == p.segments
