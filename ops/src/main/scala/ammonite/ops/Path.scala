@@ -152,7 +152,10 @@ case class RelPath private[ops] (segments: Vector[String], ups: Int) extends Bas
   }
 
   def toNIO = toNIO(java.nio.file.FileSystems.getDefault)
-  def toNIO(fs: java.nio.file.FileSystem) = fs.getPath(segments.head, segments.tail:_*)
+  def toNIO(fs: java.nio.file.FileSystem) = {
+
+    fs.getPath(segments.mkString(fs.getSeparator))
+  }
 
   override def toString = (Seq.fill(ups)("..") ++ segments).mkString("/")
   override def hashCode = segments.hashCode() + ups.hashCode()
@@ -239,7 +242,7 @@ extends BasePathImpl{
 
   type ThisType = Path
 
-  def toNIO = root.resolve(root.getFileSystem.getPath(segments.head, segments.tail:_*))
+  def toNIO = root.resolve(segments.mkString(root.getFileSystem.getSeparator))
 
   protected[this] def make(p: Seq[String], ups: Int) = {
     if (ups > 0){
