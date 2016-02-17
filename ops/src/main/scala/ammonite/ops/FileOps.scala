@@ -74,7 +74,7 @@ object Internals{
       object iter extends (Path => Iterator[String]){
         def apply(arg: Path) = {
           val is = readIn(arg)
-          val s = io.Source.fromInputStream(is)
+          val s = io.Source.fromInputStream(is, "UTF-8")
           new SelfClosingIterator(s.getLines, () => s.close())
         }
       }
@@ -98,11 +98,11 @@ object Internals{
   class Writable(val writeableData: Array[Byte])
 
   object Writable{
-    implicit def WritableString(s: String) = new Writable(s.getBytes)
+    implicit def WritableString(s: String) = new Writable(s.getBytes("UTF-8"))
     implicit def WritableArray(a: Array[Byte]) = new Writable(a)
     implicit def WritableArray2(a: Array[Array[Byte]]) = new Writable(a.flatten)
     implicit def WritableTraversable(a: Traversable[String]) = {
-      new Writable(a.mkString("\n").getBytes)
+      new Writable(a.mkString("\n").getBytes("UTF-8"))
     }
   }
 }
