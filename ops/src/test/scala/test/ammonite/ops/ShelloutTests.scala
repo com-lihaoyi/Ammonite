@@ -6,6 +6,7 @@ import utest.framework.TestSuite
 
 object ShelloutTests extends TestSuite{
   val scriptFolder = cwd/'ops/'src/'test/'resources/'scripts
+
   val tests = TestSuite {
     'implicitWd{
       import ammonite.ops.ImplicitWd._
@@ -17,7 +18,7 @@ object ShelloutTests extends TestSuite{
         val res = %%('ls, "ops/src/test/resources/testdata")
         assert(res.out.string == "File.txt\nfolder1\nfolder2\n")
       }
-      'bytes{
+      'bytes - Unix{
         val res = %%('echo, "abc")
         val listed = res.out.bytes
 //        assert(listed == "File.txt\nfolder\nfolder2\nFile.txt".getBytes)
@@ -47,7 +48,7 @@ object ShelloutTests extends TestSuite{
         )
       }
 
-      'filebased{
+      'filebased - Unix{
         assert(%%(scriptFolder/'echo, 'HELLO).out.lines.mkString == "HELLO")
 
         val res: CommandResult =
@@ -55,7 +56,7 @@ object ShelloutTests extends TestSuite{
 
         assert(res.out.string.trim == "Hello123")
       }
-      'filebased2{
+      'filebased2 - Unix{
         val res = %%('which, 'echo)
         val echoRoot = Path(res.out.string.trim)
         assert(echoRoot == root/'bin/'echo)
@@ -94,7 +95,7 @@ object ShelloutTests extends TestSuite{
       import ammonite.ops.ImplicitWd._
       val res2 = %ls
     }
-    'fileCustomWorkingDir{
+    'fileCustomWorkingDir - Unix{
       val output = %%.apply(scriptFolder/'echo_with_wd, 'HELLO)(root/'usr)
       assert(output.out.lines == Seq("HELLO /usr"))
     }

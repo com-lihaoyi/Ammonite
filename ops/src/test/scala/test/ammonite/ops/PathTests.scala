@@ -9,7 +9,7 @@ object PathTests extends TestSuite{
   val tests = TestSuite {
     'Basic{
       val rel = 'src/'main/'scala
-      'Transformers{
+      'Transformers - Unix{
         assert(
           // ammonite.Path to java.nio.file.Path
           (root/'omg).toNIO == Paths.get("/omg"),
@@ -193,7 +193,7 @@ object PathTests extends TestSuite{
             "type mismatch"
           )
       }
-      'InvalidCasts{
+      'InvalidCasts-Unix{
         intercept[IllegalArgumentException](Path("omg/cow"))
         intercept[IllegalArgumentException](RelPath("/omg/cow"))
       }
@@ -253,7 +253,7 @@ object PathTests extends TestSuite{
           Seq('a/'c, 'a/'d, 'b/'c, up/'c, up/up/'c)
       )
     }
-    'construction{
+    'construction - Unix{
       'success{
         val relStr = "hello/cow/world/.."
         val absStr = "/hello/world"
