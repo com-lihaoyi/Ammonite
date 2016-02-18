@@ -222,11 +222,10 @@ object TermCore {
         lastState.cursor
       )
 
-      val transformedBuffer = transformedBuffer0 ++ AnsiStr.parse(lastState.msg)
+      val transformedBuffer = transformedBuffer0 ++ lastState.msg
       lazy val lastOffsetCursor = lastState.cursor + cursorOffset
-
       lazy val rowLengths = splitBuffer(
-        ansiRegex.replaceAllIn(lastState.buffer ++ lastState.msg, "").toVector
+        ansiRegex.replaceAllIn(lastState.buffer ++ lastState.msg.render, "").toVector
       )
       val narrowWidth = width - prompt.lastLine.length
       val newlinePrompt = rowLengths.exists(_ >= narrowWidth)
@@ -249,7 +248,7 @@ object TermCore {
         actualWidth
       )
 
-      def updateState(s: LazyList[Int], b: Vector[Char], c: Int, msg: String): (Int, TermState) = {
+      def updateState(s: LazyList[Int], b: Vector[Char], c: Int, msg: AnsiStr): (Int, TermState) = {
         val newCursor = math.max(math.min(c, b.length), 0)
         val nextUps =
           if (moreInputComing) ups
@@ -266,7 +265,6 @@ object TermCore {
           readChar(newState, nextUps)
 
         case TermState(s, b, c, msg) =>
-//          Debug("TermState c\t" + c)
           val (nextUps, newState) = updateState(s, b, c, msg)
           readChar(newState, nextUps, false)
 
@@ -312,12 +310,12 @@ case class Printing(ts: TermState, stdout: String) extends TermAction
 case class TermState(inputs: LazyList[Int],
                      buffer: Vector[Char],
                      cursor: Int,
-                     msg: String = "") extends TermAction
+                     msg: AnsiStr = "") extends TermAction
 object TermState{
-  def unapply(ti: TermInfo): Option[(LazyList[Int], Vector[Char], Int, String)] = {
+  def unapply(ti: TermInfo): Option[(LazyList[Int], Vector[Char], Int, AnsiStr)] = {
     TermState.unapply(ti.ts)
   }
-  def unapply(ti: TermAction): Option[(LazyList[Int], Vector[Char], Int, String)] = ti match{
+  def unapply(ti: TermAction): Option[(LazyList[Int], Vector[Char], Int, AnsiStr)] = ti match{
     case ts: TermState => TermState.unapply(ts)
     case _ => None
   }

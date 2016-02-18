@@ -27,7 +27,8 @@ object AnsiStr{
   val REVERSED = AnsiStr.parse(Console.REVERSED)
 
   lazy val ansiRegex = "\u001B\\[[;\\d]*m".r
-  def parse(raw: CharSequence) = {
+
+  implicit def parse(raw: CharSequence): AnsiStr = {
     val matches = ansiRegex.findAllMatchIn(raw)
     val indices = Seq(0) ++ matches.flatMap{m => Seq(m.start, m.end)} ++ Seq(raw.length)
 
