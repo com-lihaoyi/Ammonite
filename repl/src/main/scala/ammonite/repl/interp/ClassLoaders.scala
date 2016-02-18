@@ -135,7 +135,7 @@ class SpecialClassLoader(parent: ClassLoader, parentHash: Array[Byte])
       else{
         import ammonite.ops._
         //          println("Custom finding class! " + name)
-        val bytes = read.resource.bytes(root/RelPath(name.replace('.', '/') + ".class"))
+        val bytes = read.bytes(resource/RelPath(name.replace('.', '/') + ".class"))
         Some(defineClass(name, bytes, 0, bytes.length))
       }
 
