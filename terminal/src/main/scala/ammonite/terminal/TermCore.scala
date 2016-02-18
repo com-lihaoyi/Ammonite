@@ -153,10 +153,24 @@ object TermCore {
       ansi.left(9999)
       ansi.clearScreen(0)
       writer.write(promptLine)
-
       if (newlinePrompt) writer.write("\n")
       writer.write(buffer.toArray)
 
+      if (buffer.length == cursor) {
+        // I'm not sure why this is necessary, but it seems that without it, a
+        // cursor that "barely" overshoots the end of a line, at the end of the
+        // buffer, does not properly wrap and ends up dangling off the
+        // right-edge of the terminal window!
+        //
+        // This causes problems later since the cursor is at the wrong X/Y,
+        // confusing the rest of the math and ending up over-shooting on the
+        // `ansi.up` calls, over-writing earlier lines. This prints a single
+        // space such that instead of dangling it forces the cursor onto the
+        // next line for-realz. If it isn't dangling the extra space is a no-op
+        writer.write(" ")
+      }
+      Debug("buffer.length\t"+buffer.length)
+      Debug("actualWidth\t"+actualWidth)
       val fragHeights = calculateHeight0(rowLengths, actualWidth)
       Debug("fragHeights\t" + fragHeights)
       val (cursorY, cursorX) = positionCursor(
@@ -168,11 +182,8 @@ object TermCore {
       Debug("cursorY\t"+cursorY)
       Debug("cursorX\t"+cursorX)
       ansi.up(fragHeights.sum - 1)
-
       ansi.left(9999)
-
       ansi.down(cursorY)
-
       ansi.right(cursorX)
       if (!newlinePrompt) ansi.right(prompt.lastLineNoAnsi.length)
 
@@ -223,23 +234,23 @@ object TermCore {
 
         val newState = TermState(s, b, newCursor, msg)
 
-        (nextUps + newlineUp, newState)
+        (nextUps, newState)
       }
       filters(TermInfo(lastState, actualWidth)) match {
         case Printing(TermState(s, b, c, msg), stdout) =>
           writer.write(stdout)
           val (nextUps, newState) = updateState(s, b, c, msg)
-          readChar(newState, nextUps)
+          readChar(newState, nextUps + newlineUp)
 
         case TermState(s, b, c, msg) =>
 //          Debug("TermState c\t" + c)
           val (nextUps, newState) = updateState(s, b, c, msg)
-          readChar(newState, nextUps, false)
+          readChar(newState, nextUps + newlineUp, false)
 
         case Result(s) =>
           redrawLine(
             transformedBuffer, lastState.buffer.length,
-            oldCursorY, rowLengths, false, newlinePrompt
+            oldCursorY + newlineUp, rowLengths, false, newlinePrompt
           )
           writer.write(10)
           writer.write(13)
