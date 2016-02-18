@@ -26,11 +26,13 @@ object AnsiStr{
   val UNDERLINED = AnsiStr.parse(Console.UNDERLINED)
   val REVERSED = AnsiStr.parse(Console.REVERSED)
 
-  val ansiRegex = "\u001B\\[[;\\d]*m".r
+  lazy val ansiRegex = "\u001B\\[[;\\d]*m".r
   def parse(raw: CharSequence) = {
     val matches = ansiRegex.findAllMatchIn(raw)
+    val indices = Seq(0) ++ matches.flatMap{m => Seq(m.start, m.end)} ++ Seq(raw.length)
+
     val fragIter = for{
-      Seq(start, end) <- matches.flatMap{m => Seq(m.start, m.end)}.sliding(2)
+      Seq(start, end) <- indices.sliding(2).toSeq
       if start != end
     } yield {
       val frag = raw.subSequence(start, end).toString
@@ -49,11 +51,11 @@ class AnsiStr(val fragments: Vector[Either[String, String]]){
   def length = fragments.collect{case Right(s) => s.length}.sum
   def render = fragments.flatMap{case Left(s) => s; case Right(s) => s}
   def plainText = fragments.collect{case Right(s) => s}.flatten
-
+  override def toString = render.mkString
   def split(index: Int) = {
     val (splitState, fragIndex, leftOver) = query(index)
     val leftFrags = fragments.take(fragIndex)
-    val rightFrags = fragments.take(fragIndex + 1)
+    val rightFrags = fragments.drop(fragIndex + 1)
     val middle = fragments(fragIndex).asInstanceOf[Right[String, String]].b
     val (leftPartial, rightPartial) = middle.splitAt(leftOver)
     val cleanSplit = splitState == AnsiEscapeState()
@@ -86,8 +88,8 @@ class AnsiStr(val fragments: Vector[Either[String, String]]){
                      state: AnsiEscapeState,
                      screenLength: Int): (AnsiEscapeState, Int, Int) = {
       import Console._
-      fragments(index) match{
-        case Left(s) =>
+      fragments.lift(index) match{
+        case Some(Left(s)) =>
           val newState = s match{
             case BLACK | RED | GREEN | YELLOW | BLUE | MAGENTA | CYAN | WHITE =>
               state.copy(color = Some(s))
@@ -99,20 +101,20 @@ class AnsiStr(val fragments: Vector[Either[String, String]]){
             case RESET => AnsiEscapeState()
           }
           rec(index + 1, newState, screenLength)
-        case Right(s) =>
+        case Some(Right(s)) =>
           val fragLength = s.length
-          if (screenLength + fragLength <= targetScreenLength) {
+          if (screenLength + fragLength <= targetScreenLength && index + 1 < fragments.length) {
             rec(index + 1, state, screenLength + fragLength)
           }else{
-            (state, index, screenLength + fragLength - targetScreenLength)
+            (state, index, targetScreenLength - screenLength)
           }
       }
     }
     rec(0, AnsiEscapeState(), 0)
   }
 }
-case class AnsiEscapeState(color: List[String] = Nil,
-                           bgColor: List[String] = Nil,
-                           bold: Int = 0,
-                           underlined: Int= 0,
-                           reversed: Int = 0)
+case class AnsiEscapeState(color: Option[String] = None,
+                           bgColor: Option[String] = None,
+                           bold: Boolean = false,
+                           underlined: Boolean = false,
+                           reversed: Boolean = false)

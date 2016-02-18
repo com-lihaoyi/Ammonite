@@ -67,8 +67,8 @@ object Main{
             case _ => (hl(buffer), 0)
           }
           val newNewBuffer = HistoryFilter.mangleBuffer(
-            historyFilter, buffer, cursor,
-            Console.GREEN, Ansi.resetForegroundColor
+            historyFilter, AnsiStr.parse(buffer), cursor,
+            AnsiStr.GREEN, AnsiStr.RESET
           )
           (newNewBuffer, newCursor)
         }

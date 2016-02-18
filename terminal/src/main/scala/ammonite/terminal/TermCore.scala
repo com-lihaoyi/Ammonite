@@ -125,7 +125,7 @@ object TermCore {
                reader: java.io.Reader,
                writer: java.io.Writer,
                filters: PartialFunction[TermInfo, TermAction] = PartialFunction.empty,
-               displayTransform: (Vector[Char], Int) => (Vector[Char], Int) = (x, i) => (x, i))
+               displayTransform: (Vector[Char], Int) => (AnsiStr, Int) = (x, i) => (AnsiStr.parse(x), i))
                : Option[String] = {
 
     /**
@@ -137,7 +137,7 @@ object TermCore {
       * math all over the place, incredibly prone to off-by-ones, in order
       * to at the end of the day position the cursor in the right spot.
       */
-    def redrawLine(buffer: Vector[Char],
+    def redrawLine(buffer: AnsiStr,
                    cursor: Int,
                    ups: Int,
                    rowLengths: Seq[Int],
@@ -183,10 +183,10 @@ object TermCore {
       // guaranteed that the lines are short, so we can indent the newlines
       // without fear of wrapping
       writer.write(
-        if (newlinePrompt)buffer.toArray
+        if (newlinePrompt) buffer.render.toArray
         else{
           val indent = " " * prompt.lastLineNoAnsi.length
-          buffer.flatMap{
+          buffer.render.flatMap{
             case '\n' => Array('\n', indent:_*)
             case x => Array(x)
           }.toArray
@@ -243,7 +243,7 @@ object TermCore {
         lastState.cursor
       )
 
-      val transformedBuffer = transformedBuffer0 ++ lastState.msg
+      val transformedBuffer = transformedBuffer0 ++ AnsiStr.parse(lastState.msg)
       lazy val lastOffsetCursor = lastState.cursor + cursorOffset
 
       lazy val rowLengths = splitBuffer(
