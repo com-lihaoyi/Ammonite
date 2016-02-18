@@ -6,9 +6,13 @@ import scala.annotation.tailrec
 
 
 object Debug{
-  lazy val debugOutput= new java.io.FileOutputStream(new java.io.File("terminal/target/log"))
+  lazy val debugOutput = {
+    if (System.getProperty("ammonite-sbt-build") != "true") ???
+    else new java.io.FileOutputStream(new java.io.File("terminal/target/log"))
+  }
   def apply(s: Any) = {
-    debugOutput.write((System.currentTimeMillis() + "\t\t" + s + "\n").getBytes)
+    if (System.getProperty("ammonite-sbt-build") == "true")
+      debugOutput.write((System.currentTimeMillis() + "\t\t" + s + "\n").getBytes)
   }
 }
 class Ansi(output: Writer){

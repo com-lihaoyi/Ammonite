@@ -1,6 +1,8 @@
 import scalatex.ScalatexReadme
 import sbtassembly.AssemblyPlugin.defaultShellScript
 
+
+
 scalaVersion := "2.11.6"
 
 crossScalaVersions := Seq(

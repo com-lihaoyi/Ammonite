@@ -128,12 +128,31 @@ object TermCore {
                displayTransform: (Vector[Char], Int) => (Vector[Char], Int) = (x, i) => (x, i))
                : Option[String] = {
 
+    /**
+      * Erases the previous line and re-draws it with the new buffer and
+      * cursor.
+      *
+      * Relies on `ups` to know how "tall" the previous line was, to go up
+      * and erase that many rows in the console. Performs a lot of horrific
+      * math all over the place, incredibly prone to off-by-ones, in order
+      * to at the end of the day position the cursor in the right spot.
+      */
     def redrawLine(buffer: Vector[Char],
                    cursor: Int,
                    ups: Int,
                    rowLengths: Seq[Int],
                    fullPrompt: Boolean = true,
                    newlinePrompt: Boolean = false) = {
+
+
+      // Enable this in certain cases (e.g. cursor near the value you are
+      // interested into) see what's going on with all the ansi screen-cursor
+      // movement
+      def debugDelay() = if (false){
+        Thread.sleep(200)
+        writer.flush()
+      }
+
 
       val promptLine =
         if (fullPrompt) prompt.full
@@ -149,33 +168,32 @@ object TermCore {
       Debug("cursor\t" + cursor)
 
       ansi.up(ups)
-
+      debugDelay()
       ansi.left(9999)
+      debugDelay()
       ansi.clearScreen(0)
+      debugDelay()
       writer.write(promptLine)
+      debugDelay()
       if (newlinePrompt) writer.write("\n")
+      debugDelay()
 
-      var i = 0
-      var currWidth = 0
-      while(i < buffer.length){
-        if (currWidth >= actualWidth && !newlinePrompt){
-          writer.write(" " * prompt.lastLineNoAnsi.length)
-          currWidth = 0
+      // Under `newlinePrompt`, we print the thing verbatim, since we want to
+      // avoid breaking code by adding random indentation. If not, we are
+      // guaranteed that the lines are short, so we can indent the newlines
+      // without fear of wrapping
+      writer.write(
+        if (newlinePrompt)buffer.toArray
+        else{
+          val indent = " " * prompt.lastLineNoAnsi.length
+          buffer.flatMap{
+            case '\n' => Array('\n', indent:_*)
+            case x => Array(x)
+          }.toArray
         }
+      )
 
-        ansiRegex.findPrefixMatchOf(buffer.drop(i)) match{
-          case Some(m) =>
-            //            Debug("Some(m) " + m.source + " | " + m.source.length)
-            writer.write(buffer.slice(i, i + m.end).toArray)
-            i += m.end
-          case None =>
-            //            Debug("None")
-            writer.write(buffer(i))
-            if (buffer(i) == '\n') currWidth += 9999
-            currWidth += 1
-            i += 1
-        }
-      }
+      debugDelay()
       val nonAnsiBufferLength = rowLengths.length + rowLengths.sum - 1
 
       if (cursor == nonAnsiBufferLength){
@@ -204,9 +222,13 @@ object TermCore {
       Debug("cursorY\t"+cursorY)
       Debug("cursorX\t"+cursorX)
       ansi.up(fragHeights.sum - 1)
+      debugDelay()
       ansi.left(9999)
+      debugDelay()
       ansi.down(cursorY)
+      debugDelay()
       ansi.right(cursorX)
+      debugDelay()
       if (!newlinePrompt) ansi.right(prompt.lastLineNoAnsi.length)
 
       writer.flush()
@@ -252,7 +274,7 @@ object TermCore {
         val newCursor = math.max(math.min(c, b.length), 0)
         val nextUps =
           if (moreInputComing) ups
-          else oldCursorY
+          else oldCursorY + newlineUp
 
         val newState = TermState(s, b, newCursor, msg)
 
@@ -262,12 +284,12 @@ object TermCore {
         case Printing(TermState(s, b, c, msg), stdout) =>
           writer.write(stdout)
           val (nextUps, newState) = updateState(s, b, c, msg)
-          readChar(newState, nextUps + newlineUp)
+          readChar(newState, nextUps)
 
         case TermState(s, b, c, msg) =>
 //          Debug("TermState c\t" + c)
           val (nextUps, newState) = updateState(s, b, c, msg)
-          readChar(newState, nextUps + newlineUp, false)
+          readChar(newState, nextUps, false)
 
         case Result(s) =>
           redrawLine(

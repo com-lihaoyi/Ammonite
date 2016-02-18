@@ -18,6 +18,7 @@ import scala.annotation.tailrec
 object Main{
 
   def main(args: Array[String]): Unit = {
+    System.setProperty("ammonite-sbt-build", "true")
     var history = List.empty[String]
     val selection = GUILikeFilters.SelectionFilter(indent = 4)
     def multilineFilter: TermCore.Filter = {
