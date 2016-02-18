@@ -154,9 +154,31 @@ object TermCore {
       ansi.clearScreen(0)
       writer.write(promptLine)
       if (newlinePrompt) writer.write("\n")
-      writer.write(buffer.toArray)
 
-      if (buffer.length == cursor) {
+      var i = 0
+      var currWidth = 0
+      while(i < buffer.length){
+        if (currWidth >= actualWidth && !newlinePrompt){
+          writer.write(" " * prompt.lastLineNoAnsi.length)
+          currWidth = 0
+        }
+
+        ansiRegex.findPrefixMatchOf(buffer.drop(i)) match{
+          case Some(m) =>
+            //            Debug("Some(m) " + m.source + " | " + m.source.length)
+            writer.write(buffer.slice(i, i + m.end).toArray)
+            i += m.end
+          case None =>
+            //            Debug("None")
+            writer.write(buffer(i))
+            if (buffer(i) == '\n') currWidth += 9999
+            currWidth += 1
+            i += 1
+        }
+      }
+      val nonAnsiBufferLength = rowLengths.length + rowLengths.sum - 1
+
+      if (cursor == nonAnsiBufferLength){
         // I'm not sure why this is necessary, but it seems that without it, a
         // cursor that "barely" overshoots the end of a line, at the end of the
         // buffer, does not properly wrap and ends up dangling off the
