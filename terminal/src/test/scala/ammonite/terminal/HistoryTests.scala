@@ -26,10 +26,12 @@ object HistoryTests extends TestSuite{
     // should preserve the current line and move your cursor to the end
     'noHistory{
       checker("Hell_o")
-        .run(history.startHistory)
-        .check("Hello_" + HistoryFilter.cannotFindSearchMessage)
-        .run(history.up)
-        .check("Hello_" + HistoryFilter.cannotFindSearchMessage)
+        .runMsg(history.startHistory)
+        .check("Hello_")
+        .checkMsg(HistoryFilter.cannotFindSearchMessage)
+        .runMsg(history.up)
+        .check("Hello_")
+        .checkMsg(HistoryFilter.cannotFindSearchMessage)
     }
 
 
@@ -37,33 +39,35 @@ object HistoryTests extends TestSuite{
       // If you hit Ctrl-R on an empty line, it shows a nice help message
       'empty{
         checker("_")
-          .run(history.ctrlR)
-          .check("_" + HistoryFilter.emptySearchMessage)
-          .run(history.printableChar('c'))
+          .runMsg(history.ctrlR)
+          .check("_")
+          .checkMsg(HistoryFilter.emptySearchMessage)
+          .runMsg(history.printableChar('c'))
           .check("abc_de")
-          .run(history.backspace)
-          .check("_" + HistoryFilter.emptySearchMessage)
+          .runMsg(history.backspace)
+          .check("_")
+          .checkMsg(HistoryFilter.emptySearchMessage)
       }
       'nonEmpty{
         checker("cd_")
-          .run(history.ctrlR)
+          .runMsg(history.ctrlR)
           .check("abcd_e")
-          .run(history.ctrlR) // `ctrlR` should behave like `up` if called multiple times
+          .runMsg(history.ctrlR) // `ctrlR` should behave like `up` if called multiple times
           .check("abcd_efg")
-          .run(history.printableChar('e'))
-          .run(history.printableChar('f'))
-          .run(history.printableChar('g'))
-          .run(history.printableChar('h'))
+          .runMsg(history.printableChar('e'))
+          .runMsg(history.printableChar('f'))
+          .runMsg(history.printableChar('g'))
+          .runMsg(history.printableChar('h'))
           .check("abcdefgh_i")
       }
     }
     'historyNoSearch{
       checker("_")
-        .run(history.startHistory)
+        .runMsg(history.startHistory)
         .check("abcde_")
-        .run(history.up)
+        .runMsg(history.up)
         .check("abcdefg_")
-        .run(history.up)
+        .runMsg(history.up)
         .check("abcdefghi_")
     }
 
@@ -71,65 +75,68 @@ object HistoryTests extends TestSuite{
     // should preserve the current line and move your cursor to the end
     'ups{
       checker("abc_")
-        .run(history.startHistory)
+        .runMsg(history.startHistory)
         .check("abc_de")
-        .run(history.up)
+        .runMsg(history.up)
         .check("abc_defg")
         // Pressing up should treat the duplicates entries in history as
         // one entry when navigating through them
-        .run(history.up)
+        .runMsg(history.up)
         .check("abc_defghi")
         // You should be able to cycle through the end of the history and
         // back to the original command
-        .run(history.up)
-        .check("abc_" + HistoryFilter.cannotFindSearchMessage)
-        .run(history.up)
+        .runMsg(history.up)
+        .check("abc_")
+        .checkMsg(HistoryFilter.cannotFindSearchMessage)
+        .runMsg(history.up)
         .check("abc_de")
     }
     'upsTyping{
       checker("de_")
-        .run(history.startHistory)
+        .runMsg(history.startHistory)
         .check("abcde_")
         // Entering more characters should refine the search
-        .run(history.printableChar('f'))
+        .runMsg(history.printableChar('f'))
         .check("abcdef_g")
         // Deleting characters and typing them back in should do nothing
         // except move the cursor
-        .run(history.backspace)
+        .runMsg(history.backspace)
         .check("abcde_fg")
-        .run(history.backspace)
+        .runMsg(history.backspace)
         .check("abcd_efg")
-        .run(history.printableChar('e'))
+        .runMsg(history.printableChar('e'))
         .check("abcde_fg")
-        .run(history.printableChar('f'))
+        .runMsg(history.printableChar('f'))
         .check("abcdef_g")
         // Deleting all characters from search should show the empty search message
-        .run(history.backspace)
-        .run(history.backspace)
-        .run(history.backspace)
-        .run(history.backspace)
-        .check("_" + HistoryFilter.emptySearchMessage)
+        .runMsg(history.backspace)
+        .runMsg(history.backspace)
+        .runMsg(history.backspace)
+        .runMsg(history.backspace)
+        .check("_")
+        .checkMsg(HistoryFilter.emptySearchMessage)
         // But typing something in should make it go away and
         // find something relevant to show you
-        .run(history.printableChar('i'))
+        .runMsg(history.printableChar('i'))
         .check("abcdefghi_")
 
     }
     'cannotFindSearch{
       checker("abcde_")
-        .run(history.startHistory)
+        .runMsg(history.startHistory)
         .check("abcde_")
-        .run(history.printableChar('Z'))
-        .check("abcdeZ_" + HistoryFilter.cannotFindSearchMessage)
+        .runMsg(history.printableChar('Z'))
+        .check("abcdeZ_")
+        .checkMsg(HistoryFilter.cannotFindSearchMessage)
     }
     'down{
       checker("abc_")
-        .run(history.startHistory)
+        .runMsg(history.startHistory)
         .check("abc_de")
-        .run(history.down)
+        .runMsg(history.down)
         .check("abc_")
         // `down` doesn't wrap around like `up` does
-        .run(history.down)
+        .runMsg(history.down)
         .check("abc_")
 
     }

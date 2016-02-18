@@ -103,6 +103,7 @@ object TermCore {
 
   type Filter = PartialFunction[TermInfo, TermAction]
   type Action = (Vector[Char], Int) => (Vector[Char], Int)
+  type MsgAction = (Vector[Char], Int) => (Vector[Char], Int, String)
   trait DelegateFilter extends Filter{
     def filter: Filter
     def isDefinedAt(x: TermInfo) = filter.isDefinedAt(x)

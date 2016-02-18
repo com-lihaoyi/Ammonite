@@ -27,22 +27,28 @@ class Checker(width: Int, grid: String){
   override def toString = s"Checker($stringGrid)"
   var currentGrid = grid.replace("_", "").toVector
   var currentCursor = grid.indexOf('_')
+  var currentMsg = ""
   Predef.assert(
     currentCursor != -1,
     "Cannot find `_` in grid passed to Checker, it needs to " +
     "exist to tell the checker where the cursor starts off at"
   )
-
-  def run(actions: TermCore.Action*) = {
-    val (endGrid, endCursor) = actions.foldLeft((currentGrid, currentCursor)) {
-      case ((g, c), f) =>
-        val (g1, c1) = f(g, c)
-        (g1, math.min(g1.length, math.max(0, c1)))
+  def runMsg(actions: TermCore.MsgAction*) = {
+    val (endGrid, endCursor, endMsg) = actions.foldLeft((currentGrid, currentCursor, "")) {
+      case ((g, c, m0), f) =>
+        val (g1, c1, msg) = f(g, c)
+        (g1, math.min(g1.length, math.max(0, c1)), msg)
     }
-
     currentGrid = endGrid
     currentCursor = endCursor
+    currentMsg = endMsg
     this
+  }
+  def run(actions: TermCore.Action*) = {
+    runMsg(actions.map{ f => (b: Vector[Char], c: Int) =>
+      val (b1, c1) = f(b, c)
+      (b1, c1, "")
+    }:_*)
   }
   def stringGrid = {
     val prefix = currentGrid.take(currentCursor)
@@ -55,6 +61,10 @@ class Checker(width: Int, grid: String){
     val expectedStringGrid = Checker.normalize(end0)
     val actualGrid = stringGrid
     assert(actualGrid == expectedStringGrid)
+    this
+  }
+  def checkMsg(expectedMsg: String) = {
+    assert(currentMsg == expectedMsg)
     this
   }
   def apply(end0: String, actions: TermCore.Action*) = {
