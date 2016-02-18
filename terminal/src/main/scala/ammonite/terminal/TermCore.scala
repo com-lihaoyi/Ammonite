@@ -186,11 +186,12 @@ object TermCore {
     def readChar(lastState: TermState, ups: Int, fullPrompt: Boolean = true): Option[String] = {
       val moreInputComing = reader.ready()
 
-      lazy val (transformedBuffer, cursorOffset) = displayTransform(
+      lazy val (transformedBuffer0, cursorOffset) = displayTransform(
         lastState.buffer,
         lastState.cursor
       )
 
+      val transformedBuffer = transformedBuffer0 ++ lastState.msg
       lazy val lastOffsetCursor = lastState.cursor + cursorOffset
 
       lazy val rowLengths = splitBuffer(
@@ -211,25 +212,25 @@ object TermCore {
         width - prompt.lastLineNoAnsi.length
       )
 
-      def updateState(s: LazyList[Int], b: Vector[Char], c: Int): (Int, TermState) = {
+      def updateState(s: LazyList[Int], b: Vector[Char], c: Int, msg: String): (Int, TermState) = {
         val newCursor = math.max(math.min(c, b.length), 0)
         val nextUps =
           if (moreInputComing) ups
           else oldCursorY
 
-        val newState = TermState(s, b, newCursor)
+        val newState = TermState(s, b, newCursor, msg)
 
         (nextUps, newState)
       }
       filters(TermInfo(lastState, width - prompt.lastLineNoAnsi.length)) match {
-        case Printing(TermState(s, b, c), stdout) =>
+        case Printing(TermState(s, b, c, msg), stdout) =>
           writer.write(stdout)
-          val (nextUps, newState) = updateState(s, b, c)
+          val (nextUps, newState) = updateState(s, b, c, msg)
           readChar(newState, nextUps)
 
-        case TermState(s, b, c) =>
+        case TermState(s, b, c, msg) =>
 //          Debug("TermState c\t" + c)
-          val (nextUps, newState) = updateState(s, b, c)
+          val (nextUps, newState) = updateState(s, b, c, msg)
           readChar(newState, nextUps, false)
 
         case Result(s) =>
@@ -251,7 +252,7 @@ object TermCore {
     lazy val ansi = new Ansi(writer)
     lazy val (width, _, initialConfig) = TTY.init()
     try {
-      readChar(TermState(LazyList.continually(reader.read()), Vector.empty, 0), 0)
+      readChar(TermState(LazyList.continually(reader.read()), Vector.empty, 0, ""), 0)
     }finally{
 
       // Don't close these! Closing these closes stdin/stdout,
@@ -270,12 +271,13 @@ sealed trait TermAction
 case class Printing(ts: TermState, stdout: String) extends TermAction
 case class TermState(inputs: LazyList[Int],
                      buffer: Vector[Char],
-                     cursor: Int) extends TermAction
+                     cursor: Int,
+                     msg: String = "") extends TermAction
 object TermState{
-  def unapply(ti: TermInfo): Option[(LazyList[Int], Vector[Char], Int)] = {
+  def unapply(ti: TermInfo): Option[(LazyList[Int], Vector[Char], Int, String)] = {
     TermState.unapply(ti.ts)
   }
-  def unapply(ti: TermAction): Option[(LazyList[Int], Vector[Char], Int)] = ti match{
+  def unapply(ti: TermAction): Option[(LazyList[Int], Vector[Char], Int, String)] = ti match{
     case ts: TermState => TermState.unapply(ts)
     case _ => None
   }

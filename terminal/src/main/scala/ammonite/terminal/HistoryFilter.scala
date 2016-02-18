@@ -34,7 +34,7 @@ class HistoryFilter(history: () => IndexedSeq[String],
   /**
     * Kicks the HistoryFilter from passive-mode into search-history mode
     */
-  def startHistory(b: Vector[Char], c: Int): (Vector[Char], Int) = {
+  def startHistory(b: Vector[Char], c: Int): (Vector[Char], Int, String) = {
     if (b.nonEmpty) searchTerm = Some(b)
     up(Vector(), c)
   }
@@ -47,12 +47,12 @@ class HistoryFilter(history: () => IndexedSeq[String],
     def nextHistoryIndexFor(v: Vector[Char]) = {
       HistoryFilter.findNewHistoryIndex(start, v, history(), increment, skipped)
     }
-    val (newHistoryIndex, newBuffer, newCursor) = searchTerm match{
+    val (newHistoryIndex, newBuffer, newMsg, newCursor) = searchTerm match{
       // We're not searching for anything, just browsing history.
       // Pass in Vector.empty so we scroll through all items
       case None =>
         val (i, b, c) = nextHistoryIndexFor(Vector.empty)
-        (i, b, 99999)
+        (i, b, "", 99999)
 
       // We're searching for some item with a particular search term
       case Some(b) if b.nonEmpty =>
@@ -62,20 +62,20 @@ class HistoryFilter(history: () => IndexedSeq[String],
           if (i.nonEmpty) ""
           else commentStartColor + HistoryFilter.cannotFindSearchMessage + commentEndColor
 
-        (i, b1 ++ msg, c)
+        (i, b1, msg, c)
 
       // We're searching for nothing in particular; in this case,
       // show a help message instead of an unhelpful, empty buffer
       case Some(b) if b.isEmpty =>
         val msg = commentStartColor + HistoryFilter.emptySearchMessage + commentEndColor
         // The cursor in this case always goes to zero
-        (Some(start), msg.toVector, 0)
+        (Some(start), Vector(), msg, 0)
 
     }
 
     historyIndex = newHistoryIndex.getOrElse(-1)
 
-    (newBuffer, newCursor)
+    (newBuffer, newCursor, newMsg)
   }
 
   def activeHistory = searchTerm.nonEmpty || historyIndex != -1
@@ -86,8 +86,8 @@ class HistoryFilter(history: () => IndexedSeq[String],
   def down(b: Vector[Char], c: Int) = {
     searchHistory(historyIndex - 1, -1, b, b)
   }
-  def wrap(rest: LazyList[Int], out: (Vector[Char], Int)) = {
-    TS(rest, out._1, out._2)
+  def wrap(rest: LazyList[Int], out: (Vector[Char], Int, String)) = {
+    TS(rest, out._1, out._2, out._3)
   }
   def ctrlR(b: Vector[Char], c: Int) = {
     if (activeSearch) up(b, c)
@@ -125,13 +125,13 @@ class HistoryFilter(history: () => IndexedSeq[String],
     // Ways to kick off the history/search if you're not already in it
 
     // `Ctrl-R`
-    case TS(18 ~: rest, b, c) => wrap(rest, ctrlR(b, c))
+    case TS(18 ~: rest, b, c, _) => wrap(rest, ctrlR(b, c))
 
     // `Up` from the first line in the input
-    case TermInfo(TS(p"\u001b[A$rest", b, c), w) if firstRow(c, b, w) && !activeHistory =>
+    case TermInfo(TS(p"\u001b[A$rest", b, c, _), w) if firstRow(c, b, w) && !activeHistory =>
       wrap(rest, startHistory(b, c))
 
-    case TermInfo(TS(p"\u0010$rest", b, c), w) if firstRow(c, b, w) && !activeHistory =>
+    case TermInfo(TS(p"\u0010$rest", b, c, _), w) if firstRow(c, b, w) && !activeHistory =>
       wrap(rest, startHistory(b, c))
 
     // Things you can do when you're already in the history search
@@ -139,26 +139,26 @@ class HistoryFilter(history: () => IndexedSeq[String],
     // Navigating up and down the history. Each up or down searches for
     // the next thing that matches your current searchTerm
     // Up
-    case TermInfo(TS(p"\u001b[A$rest", b, c), w) if searchOrHistoryAnd(firstRow(c, b, w)) =>
+    case TermInfo(TS(p"\u001b[A$rest", b, c, _), w) if searchOrHistoryAnd(firstRow(c, b, w)) =>
       wrap(rest, up(b, c))
-    case TermInfo(TS(p"\u0010$rest", b, c), w) if searchOrHistoryAnd(firstRow(c, b, w)) =>
+    case TermInfo(TS(p"\u0010$rest", b, c, _), w) if searchOrHistoryAnd(firstRow(c, b, w)) =>
       wrap(rest, up(b, c))
     // Down
-    case TermInfo(TS(p"\u001b[B$rest", b, c), w) if searchOrHistoryAnd(lastRow(c, b, w))  =>
+    case TermInfo(TS(p"\u001b[B$rest", b, c, _), w) if searchOrHistoryAnd(lastRow(c, b, w))  =>
       wrap(rest, down(b, c))
-    case TermInfo(TS(p"\u000e$rest", b, c), w) if searchOrHistoryAnd(lastRow(c, b, w))  =>
+    case TermInfo(TS(p"\u000e$rest", b, c, _), w) if searchOrHistoryAnd(lastRow(c, b, w))  =>
       wrap(rest, down(b, c))
 
 
     // Intercept Backspace and delete a character in search-mode, preserving it, but
     // letting it fall through and dropping you out of history-mode if you try to make
     // edits
-    case TS(127 ~: rest, buffer, cursor) if activeSearch && !activeHistory =>
+    case TS(127 ~: rest, buffer, cursor, _) if activeSearch && !activeHistory =>
       wrap(rest, backspace(buffer, cursor))
 
     // Any other control characters drop you out of search mode, but only the
     // set of `dropHistoryChars` drops you out of history mode
-    case TS(char ~: inputs, buffer, cursor)
+    case TS(char ~: inputs, buffer, cursor, _)
       if char.toChar.isControl && searchOrHistoryAnd(dropHistoryChars(char)) =>
       val newBuffer =
         // If we're back to -1, it means we've wrapped around and are
@@ -177,13 +177,13 @@ class HistoryFilter(history: () => IndexedSeq[String],
 
     // Intercept every other printable character when search is on and
     // enter it into the current search
-    case TS(char ~: rest, buffer, cursor) if activeSearch =>
+    case TS(char ~: rest, buffer, cursor, _) if activeSearch =>
       wrap(rest, printableChar(char.toChar)(buffer, cursor))
 
     // If you're not in search but are in history, entering any printable
     // characters kicks you out of it and preserves the current buffer. This
     // makes it harder for you to accidentally lose work due to history-moves
-    case TS(char ~: rest, buffer, cursor) if activeHistory && !char.toChar.isControl =>
+    case TS(char ~: rest, buffer, cursor, _) if activeHistory && !char.toChar.isControl =>
       historyIndex = -1
       TS(char ~: rest, buffer, cursor)
   }

@@ -68,18 +68,18 @@ object GUILikeFilters {
       Case(FnShiftRight){(b, c, m) => setMark(c); BasicFilters.moveEnd(b, c, m.width)},
       Case(FnShiftLeft){(b, c, m) => setMark(c); BasicFilters.moveStart(b, c, m.width)},
       {
-        case TS(27 ~: 91 ~: 90 ~: rest, b, c) if mark.isDefined =>
+        case TS(27 ~: 91 ~: 90 ~: rest, b, c, _) if mark.isDefined =>
           doIndent(b, c, rest,
             slice => -math.min(slice.iterator.takeWhile(_ == ' ').size, indent)
           )
 
-        case TS(9 ~: rest, b, c) if mark.isDefined => // Tab
+        case TS(9 ~: rest, b, c, _) if mark.isDefined => // Tab
           doIndent(b, c, rest,
             slice => indent
           )
 
         // Intercept every other character.
-        case TS(char ~: inputs, buffer, cursor) if mark.isDefined =>
+        case TS(char ~: inputs, buffer, cursor, _) if mark.isDefined =>
           // If it's a special command, just cancel the current selection.
           if (char.toChar.isControl &&
               char != 127 /*backspace*/ &&

@@ -41,11 +41,11 @@ object BasicFilters {
   }
 
   def tabFilter(indent: Int): Filter = {
-    case TS(9 ~: rest, b, c) => tabColumn(indent, b, c, rest)
+    case TS(9 ~: rest, b, c, _) => tabColumn(indent, b, c, rest)
   }
 
   def loggingFilter: TermCore.Filter = {
-    case TS(Ctrl('t') ~: rest, b, c) =>
+    case TS(Ctrl('t') ~: rest, b, c, _) =>
       println("Char Display Mode Enabled! Ctrl-C to exit")
       var curr = rest
       while (curr.head != 3) {
@@ -55,16 +55,16 @@ object BasicFilters {
       TS(curr, b, c)
   }
   def typingFilter: TermCore.Filter = {
-    case TS(p"\u001b[3~$rest", b, c) =>
+    case TS(p"\u001b[3~$rest", b, c, _) =>
 //      Debug("fn-delete")
       val (first, last) = b.splitAt(c)
       TS(rest, first ++ last.drop(1), c)
 
-    case TS(127 ~: rest, b, c) => // Backspace
+    case TS(127 ~: rest, b, c, _) => // Backspace
       val (first, last) = b.splitAt(c)
       TS(rest, first.dropRight(1) ++ last, c - 1)
 
-    case TS(char ~: rest, b, c) =>
+    case TS(char ~: rest, b, c, _) =>
 //      Debug("NORMAL CHAR " + char)
       val (first, last) = b.splitAt(c)
       TS(rest, (first :+ char.toChar) ++ last, c + 1)
@@ -77,26 +77,26 @@ object BasicFilters {
   }
 
   def enterFilter: TermCore.Filter = {
-    case TS(13 ~: rest, b, c) => doEnter(b, c, rest) // Enter
-    case TS(10 ~: rest, b, c) => doEnter(b, c, rest) // Enter
-    case TS(10 ~: 13 ~: rest, b, c) => doEnter(b, c, rest) // Enter
-    case TS(13 ~: 10 ~: rest, b, c) => doEnter(b, c, rest) // Enter
+    case TS(13 ~: rest, b, c, _) => doEnter(b, c, rest) // Enter
+    case TS(10 ~: rest, b, c, _) => doEnter(b, c, rest) // Enter
+    case TS(10 ~: 13 ~: rest, b, c, _) => doEnter(b, c, rest) // Enter
+    case TS(13 ~: 10 ~: rest, b, c, _) => doEnter(b, c, rest) // Enter
   }
 
   def exitFilter: TermCore.Filter = {
-    case TS(Ctrl('c') ~: rest, b, c) =>
+    case TS(Ctrl('c') ~: rest, b, c, _) =>
       Result("")
-    case TS(Ctrl('d') ~: rest, b, c) =>
+    case TS(Ctrl('d') ~: rest, b, c, _) =>
       // only exit if the line is empty, otherwise, behave like
       // "delete" (i.e. delete one char to the right)
       if (b.isEmpty) Exit else {
         val (first, last) = b.splitAt(c)
         TS(rest, first ++ last.drop(1), c)
       }
-    case TS(-1 ~: rest, b, c) => Exit   // java.io.Reader.read() produces -1 on EOF
+    case TS(-1 ~: rest, b, c, _) => Exit   // java.io.Reader.read() produces -1 on EOF
   }
   def clearFilter: TermCore.Filter = {
-    case TS(Ctrl('l') ~: rest, b, c) => ClearScreen(TS(rest, b, c))
+    case TS(Ctrl('l') ~: rest, b, c, _) => ClearScreen(TS(rest, b, c))
   }
 
   def moveStart(b: Vector[Char],

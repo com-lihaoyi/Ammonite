@@ -49,7 +49,7 @@ case class AmmoniteFrontEnd(extraFilters: TermCore.Filter = PartialFunction.empt
     val writer = new OutputStreamWriter(output)
 
     val autocompleteFilter: TermCore.Filter = {
-      case TermInfo(TermState(9 ~: rest, b, c), width) =>
+      case TermInfo(TermState(9 ~: rest, b, c, _), width) =>
         val (newCursor, completions, details) = compilerComplete(c, b.mkString)
         val details2 = for (d <- details) yield {
           Highlighter.defaultHighlight(
@@ -82,7 +82,7 @@ case class AmmoniteFrontEnd(extraFilters: TermCore.Filter = PartialFunction.empt
     }
 
     val multilineFilter: TermCore.Filter = {
-      case TermState(lb ~: rest, b, c)
+      case TermState(lb ~: rest, b, c, _)
         if (lb == 10 || lb == 13)
         && ammonite.repl.Parsers.split(b.mkString).isEmpty => // Enter
 
