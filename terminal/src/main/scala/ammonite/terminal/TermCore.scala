@@ -195,8 +195,9 @@ object TermCore {
       lazy val lastOffsetCursor = lastState.cursor + cursorOffset
 
       lazy val rowLengths = splitBuffer(
-        ansiRegex.replaceAllIn(lastState.buffer, "").toVector
+        ansiRegex.replaceAllIn(lastState.buffer ++ lastState.msg, "").toVector
       )
+
       if (!moreInputComing) redrawLine(
         transformedBuffer,
         lastOffsetCursor,
