@@ -30,7 +30,7 @@ object Main{
       val historyFilter = new HistoryFilter(
         () => history.toVector, Console.BLUE, Ansi.resetForegroundColor)
       TermCore.readLine(
-        Console.MAGENTA + (0 until 10).mkString + "\n@ " + Console.RESET,
+        Console.MAGENTA + (0 until 10).mkString + "\n@@@ " + Console.RESET,
         reader,
         new OutputStreamWriter(System.out),
         historyFilter orElse

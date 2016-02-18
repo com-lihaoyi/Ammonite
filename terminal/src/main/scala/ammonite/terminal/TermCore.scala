@@ -132,54 +132,50 @@ object TermCore {
                    cursor: Int,
                    ups: Int,
                    rowLengths: Seq[Int],
-                   fullPrompt: Boolean = true) = {
+                   fullPrompt: Boolean = true,
+                   newlinePrompt: Boolean = false) = {
+
+      val promptLine =
+        if (fullPrompt) prompt.full
+        else prompt.lastLine
+
+      val promptWidth = if(newlinePrompt) 0 else prompt.lastLineNoAnsi.length
+      val actualWidth = width - promptWidth
+      Debug("")
+      Debug("---------------- redrawLine ----------------")
+      Debug("ups\t"+ups)
+      Debug("newlinePrompt\t"+newlinePrompt)
+      Debug("rowLengths\t" + rowLengths)
+      Debug("cursor\t" + cursor)
+
       ansi.up(ups)
 
       ansi.left(9999)
       ansi.clearScreen(0)
+      writer.write(promptLine)
 
-      writer.write(
-        if (fullPrompt) prompt.full
-        else prompt.lastLine
-      )
-      var i = 0
-      var currWidth = 0
-      while(i < buffer.length){
-        if (currWidth >= width - prompt.lastLineNoAnsi.length){
-          writer.write(" " * prompt.lastLineNoAnsi.length)
-          currWidth = 0
-        }
+      if (newlinePrompt) writer.write("\n")
+      writer.write(buffer.toArray)
 
-        ansiRegex.findPrefixMatchOf(buffer.drop(i)) match{
-          case Some(m) =>
-//            Debug("Some(m) " + m.source + " | " + m.source.length)
-            writer.write(buffer.slice(i, i + m.end).toArray)
-            i += m.end
-          case None =>
-//            Debug("None")
-            writer.write(buffer(i))
-            if (buffer(i) == '\n') currWidth += 9999
-            currWidth += 1
-            i += 1
-        }
-      }
-
-      val fragHeights = calculateHeight0(rowLengths, width - prompt.lastLineNoAnsi.length)
+      val fragHeights = calculateHeight0(rowLengths, actualWidth)
+      Debug("fragHeights\t" + fragHeights)
       val (cursorY, cursorX) = positionCursor(
         cursor,
         rowLengths,
         fragHeights,
-        width - prompt.lastLineNoAnsi.length
+        actualWidth
       )
-
+      Debug("cursorY\t"+cursorY)
+      Debug("cursorX\t"+cursorX)
       ansi.up(fragHeights.sum - 1)
+
       ansi.left(9999)
 
-//      Debug("DOWN " + cursorY)
-//      Debug("RIGHT " + cursorX)
       ansi.down(cursorY)
+
       ansi.right(cursorX)
-      ansi.right(prompt.lastLineNoAnsi.length)
+      if (!newlinePrompt) ansi.right(prompt.lastLineNoAnsi.length)
+
       writer.flush()
     }
 
@@ -198,20 +194,25 @@ object TermCore {
       lazy val rowLengths = splitBuffer(
         ansiRegex.replaceAllIn(lastState.buffer ++ lastState.msg, "").toVector
       )
-
+      val narrowWidth = width - prompt.lastLineNoAnsi.length
+      val newlinePrompt = rowLengths.exists(_ >= narrowWidth)
+      val promptWidth = if(newlinePrompt) 0 else prompt.lastLineNoAnsi.length
+      val actualWidth = width - promptWidth
+      val newlineUp = if (newlinePrompt) 1 else 0
       if (!moreInputComing) redrawLine(
         transformedBuffer,
         lastOffsetCursor,
         ups,
         rowLengths,
-        fullPrompt
+        fullPrompt,
+        newlinePrompt
       )
 
       lazy val (oldCursorY, _) = positionCursor(
         lastOffsetCursor,
         rowLengths,
-        calculateHeight0(rowLengths, width - prompt.lastLineNoAnsi.length),
-        width - prompt.lastLineNoAnsi.length
+        calculateHeight0(rowLengths, actualWidth),
+        actualWidth
       )
 
       def updateState(s: LazyList[Int], b: Vector[Char], c: Int, msg: String): (Int, TermState) = {
@@ -222,9 +223,9 @@ object TermCore {
 
         val newState = TermState(s, b, newCursor, msg)
 
-        (nextUps, newState)
+        (nextUps + newlineUp, newState)
       }
-      filters(TermInfo(lastState, width - prompt.lastLineNoAnsi.length)) match {
+      filters(TermInfo(lastState, actualWidth)) match {
         case Printing(TermState(s, b, c, msg), stdout) =>
           writer.write(stdout)
           val (nextUps, newState) = updateState(s, b, c, msg)
@@ -236,7 +237,10 @@ object TermCore {
           readChar(newState, nextUps, false)
 
         case Result(s) =>
-          redrawLine(transformedBuffer, lastState.buffer.length, oldCursorY, rowLengths, false)
+          redrawLine(
+            transformedBuffer, lastState.buffer.length,
+            oldCursorY, rowLengths, false, newlinePrompt
+          )
           writer.write(10)
           writer.write(13)
           writer.flush()
