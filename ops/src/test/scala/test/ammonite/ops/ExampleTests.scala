@@ -66,7 +66,7 @@ object ExampleTests extends TestSuite{
 
       // `ls` provides a listing of every direct child of the given folder.
       // Both files and folders are included
-      ls! wd  ==> Seq(wd/"file1.txt", wd/"file2.txt", wd/'file3, wd/'this)
+      ls! wd    ==> Seq(wd/"file1.txt", wd/"file2.txt", wd/'file3, wd/'this)
 
       // `ls.rec` does the same thing recursively
       ls.rec! deep ==> Seq(deep/'deeeep, deep/'deeeep/"file.txt")
@@ -75,9 +75,17 @@ object ExampleTests extends TestSuite{
       ls! deep  ==> Seq(deep/'deeeep)
       mv(deep/'deeeep, deep/'renamed_deeeep)
       ls! deep  ==> Seq(deep/'renamed_deeeep)
+
+      // like `mv.into` lets you move a file into a
+      // particular folder, rather than to particular path
+      mv.into(deep/'renamed_deeeep/"file.txt", deep)
+      ls! deep/'renamed_deeeep ==> Seq()
+      ls! deep  ==> Seq(deep/"file.txt", deep/'renamed_deeeep)
+
       // `rm!` behaves the same as `rm -rf` in Bash, and deletes anything:
       // file, folder, even a folder filled with contents
       rm! deep/'renamed_deeeep
+      rm! deep/"file.txt"
       ls! deep  ==> Seq()
 
       // You can stat paths to find out information about any file or
@@ -112,8 +120,10 @@ object ExampleTests extends TestSuite{
       // Make a folder named "folder"
       mkdir! wd/'folder
 
-      // Copy a file or folder
+      // Copy a file or folder to a particular path
       cp(wd/'folder, wd/'folder1)
+      // Copy a file or folder *into* another folder at a particular path
+      cp.into(wd/'folder, wd/'folder1)
 
       // List the current directory
       val listed = ls! wd
@@ -136,7 +146,8 @@ object ExampleTests extends TestSuite{
       ls! wd/'dir2 |? (_.ext == "java") | read |> write! wd/'target/"bundled.java"
 
       assert(
-        listed == Seq(wd/"folder", wd/"folder1"),
+        listed == Seq(wd/'folder, wd/'folder1),
+        ls(wd/'folder1) == Seq(wd/'folder1/'folder),
         lineCount == 4,
         renamed == Seq(wd/'dir2/"file1.java", wd/'dir2/"file2.java"),
         read(wd/'target/"bundled.java") ==

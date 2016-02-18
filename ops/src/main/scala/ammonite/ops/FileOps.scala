@@ -146,6 +146,11 @@ object mv extends Function2[Path, Path, Unit] with Internals.Mover{
   object all extends Internals.Mover{
     def check = true
   }
+  object into extends Function2[Path, Path, Unit]{
+    def apply(from: Path, to: Path) = {
+      mv(from, to/from.last)
+    }
+  }
 }
 
 /**
@@ -156,11 +161,16 @@ object mv extends Function2[Path, Path, Unit] with Internals.Mover{
 object cp extends Function2[Path, Path, Unit] {
   def apply(from: Path, to: Path) = {
     def copyOne(p: Path) = {
-      Files.copy(Paths.get(p.toString), Paths.get((to/(p relativeTo from)).toString))
+      Files.copy(p.toNIO, (to/(p relativeTo from)).toNIO)
     }
 
     copyOne(from)
     if (stat(from).isDir) FilterMapExt(ls.rec! from) | copyOne
+  }
+  object into extends Function2[Path, Path, Unit]{
+    def apply(from: Path, to: Path) = {
+      cp(from, to/from.last)
+    }
   }
 }
 
