@@ -243,8 +243,8 @@ object HistoryFilter{
           (start, end)
         }
 
-      val (prefix, rest) = buffer.split(searchStart)
-      val (middle, suffix) = rest.split(searchEnd)
+      val (prefix, rest) = buffer.splitAt(searchStart)
+      val (middle, suffix) = rest.splitAt(searchEnd)
 
       prefix ++ startColor ++ middle ++ endColor ++ suffix
     }

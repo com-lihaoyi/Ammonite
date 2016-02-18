@@ -111,8 +111,8 @@ object GUILikeFilters {
       selectionFilter.mark match{
         case Some(mark) if mark != cursor =>
           val Seq(min, max) = Seq(cursor, mark).sorted
-          val (prefix, rest) = string.split(min)
-          val (middle, suffix) = rest.split(max)
+          val (prefix, rest) = string.splitAt(min)
+          val (middle, suffix) = rest.splitAt(max)
           val displayOffset = if (cursor < mark) 0 else -1
           val newFrags = prefix ++ startColor ++ middle ++ endColor ++ suffix
           (newFrags, displayOffset)

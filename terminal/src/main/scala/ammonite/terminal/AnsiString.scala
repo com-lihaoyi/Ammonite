@@ -48,11 +48,13 @@ object AnsiStr{
   */
 class AnsiStr(val fragments: Vector[Either[String, String]]){
   def ++(other: AnsiStr) = new AnsiStr(fragments ++ other.fragments)
-  def length = fragments.collect{case Right(s) => s.length}.sum
-  def render = fragments.flatMap{case Left(s) => s; case Right(s) => s}
-  def plainText = fragments.collect{case Right(s) => s}.flatten
-  override def toString = render.mkString
-  def split(index: Int) = {
+  lazy val length = plainText.length
+  lazy val render = fragments.flatMap{case Left(s) => s; case Right(s) => s}
+  lazy val plainText = fragments.collect{case Right(s) => s}.flatten
+
+  override lazy val toString = render.mkString
+
+  def splitAt(index: Int) = {
     val (splitState, fragIndex, leftOver) = query(index)
     val leftFrags = fragments.take(fragIndex)
     val rightFrags = fragments.drop(fragIndex + 1)
@@ -66,14 +68,8 @@ class AnsiStr(val fragments: Vector[Either[String, String]]){
     val rightPartialOpt = if (rightPartial.isEmpty) Vector() else Vector(Right(rightPartial))
     val rightStartOpt =
       if (cleanSplit) Vector()
-      else {
-        val color = splitState.color.toVector
-        val bgColor = splitState.bgColor.toVector
-        val bold = if (splitState.bold) Vector(Console.BOLD) else Vector()
-        val underlined = if (splitState.underlined) Vector(Console.UNDERLINED) else Vector()
-        val reversed = if (splitState.reversed) Vector(Console.REVERSED) else Vector()
-        (color ++ bgColor ++ bold ++ underlined ++ reversed).map(Right(_))
-      }
+      else splitState.render.fragments
+
     val right = rightStartOpt ++ rightPartialOpt ++ rightFrags
     (new AnsiStr(left), new AnsiStr(right))
   }
@@ -117,4 +113,13 @@ case class AnsiEscapeState(color: Option[String] = None,
                            bgColor: Option[String] = None,
                            bold: Boolean = false,
                            underlined: Boolean = false,
-                           reversed: Boolean = false)
+                           reversed: Boolean = false){
+  def render = {
+    val color = this.color.toVector
+    val bgColor = this.bgColor.toVector
+    val bold = if (this.bold) Vector(Console.BOLD) else Vector()
+    val underlined = if (this.underlined) Vector(Console.UNDERLINED) else Vector()
+    val reversed = if (this.reversed) Vector(Console.REVERSED) else Vector()
+    new AnsiStr((color ++ bgColor ++ bold ++ underlined ++ reversed).map(Left(_)))
+  }
+}

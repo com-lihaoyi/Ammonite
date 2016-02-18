@@ -16,14 +16,12 @@ object AnsiStrTests extends TestSuite{
         parse(rgbOps).render.mkString == rgbOps,
         parse(rgb).render.mkString == rgb
       )
-
     }
+
     'concat{
       assert((parse(rgbOps) ++ parse(rgbOps)).render.mkString == rgbOps ++ rgbOps)
     }
-    'query{
 
-    }
     'split{
       val splits = Seq(
         // Under-shot indexes just get clamped
@@ -50,7 +48,7 @@ object AnsiStrTests extends TestSuite{
         (99, s"+1+$RED-2-$GREEN*3*$BLUE/4/", s"$BLUE")
       )
       for((index, expectedLeft0, expectedRight0) <- splits){
-        val (splitLeft, splitRight) = parse(rgbOps).split(index)
+        val (splitLeft, splitRight) = parse(rgbOps).splitAt(index)
         val (expectedLeft, expectedRight) = (expectedLeft0.toVector, expectedRight0.toVector)
         val left = splitLeft.render
         val right = splitRight.render
