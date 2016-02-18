@@ -132,12 +132,36 @@ object mkdir extends Function1[Path, Unit]{
 }
 
 
+trait CopyMove extends Function2[Path, Path, Unit]{
+
+  /**
+    * Copy or move a file into a particular folder, rather
+    * than into a particular path
+    */
+  object into extends Function2[Path, Path, Unit]{
+    def apply(from: Path, to: Path) = {
+      CopyMove.this(from, to/from.last)
+    }
+  }
+
+  /**
+    * Copy or move a file, stomping over anything
+    * that may have been there before
+    */
+  object over extends Function2[Path, Path, Unit]{
+    def apply(from: Path, to: Path) = {
+      rm(to)
+      CopyMove.this(from, to)
+    }
+  }
+}
+
 /**
  * Moves a file or folder from one place to another.
  *
  * Creates any necessary directories
  */
-object mv extends Function2[Path, Path, Unit] with Internals.Mover{
+object mv extends Function2[Path, Path, Unit] with Internals.Mover with CopyMove{
   def apply(from: Path, to: Path) =
     java.nio.file.Files.move(from.toNIO, to.toNIO)
 
@@ -146,11 +170,6 @@ object mv extends Function2[Path, Path, Unit] with Internals.Mover{
   object all extends Internals.Mover{
     def check = true
   }
-  object into extends Function2[Path, Path, Unit]{
-    def apply(from: Path, to: Path) = {
-      mv(from, to/from.last)
-    }
-  }
 }
 
 /**
@@ -158,7 +177,7 @@ object mv extends Function2[Path, Path, Unit] with Internals.Mover{
  * Creates any necessary directories, and copies folders
  * recursively.
  */
-object cp extends Function2[Path, Path, Unit] {
+object cp extends Function2[Path, Path, Unit] with CopyMove{
   def apply(from: Path, to: Path) = {
     def copyOne(p: Path) = {
       Files.copy(p.toNIO, (to/(p relativeTo from)).toNIO)
@@ -167,11 +186,7 @@ object cp extends Function2[Path, Path, Unit] {
     copyOne(from)
     if (stat(from).isDir) FilterMapExt(ls.rec! from) | copyOne
   }
-  object into extends Function2[Path, Path, Unit]{
-    def apply(from: Path, to: Path) = {
-      cp(from, to/from.last)
-    }
-  }
+
 }
 
 /**

@@ -76,11 +76,17 @@ object ExampleTests extends TestSuite{
       mv(deep/'deeeep, deep/'renamed_deeeep)
       ls! deep  ==> Seq(deep/'renamed_deeeep)
 
-      // like `mv.into` lets you move a file into a
+      // `mv.into` lets you move a file into a
       // particular folder, rather than to particular path
       mv.into(deep/'renamed_deeeep/"file.txt", deep)
       ls! deep/'renamed_deeeep ==> Seq()
       ls! deep  ==> Seq(deep/"file.txt", deep/'renamed_deeeep)
+
+      // `mv.over` lets you move a file to a particular path, but
+      // if something was there before it stomps over it
+      mv.over(deep/"file.txt", deep/'renamed_deeeep)
+      ls! deep  ==> Seq(deep/'renamed_deeeep)
+      read! deep/'renamed_deeeep ==> "I am cow" // contents from file.txt
 
       // `rm!` behaves the same as `rm -rf` in Bash, and deletes anything:
       // file, folder, even a folder filled with contents
@@ -123,7 +129,10 @@ object ExampleTests extends TestSuite{
       // Copy a file or folder to a particular path
       cp(wd/'folder, wd/'folder1)
       // Copy a file or folder *into* another folder at a particular path
+      // There's also `cp.over` which copies it to a path and stomps over
+      // anything that was there before.
       cp.into(wd/'folder, wd/'folder1)
+
 
       // List the current directory
       val listed = ls! wd
