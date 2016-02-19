@@ -119,7 +119,7 @@ object Ansi {
       val (left, rest) = splitAt(start)
       val (middle, right) = rest.splitAt(end - start)
       val newMiddle = new Str(middle.fragments.flatMap {
-        case Color(Console.RESET) => Seq(Color(Console.RESET), color)
+        case Reset => Seq(Reset, color)
         case c: Color if Color.OverlapMap(color).contains(c) => Seq()
         case c => Seq(c)
       })
