@@ -72,7 +72,10 @@ object Ansi {
     } yield (color.color, color)).toMap
   }
 
-
+  /**
+    * A piece of an [[Ansi.Str]] which just contains raw string-content,
+    * without any special characters
+    */
   case class Content(value: String) extends Frag
 
   /**
@@ -121,60 +124,60 @@ object Ansi {
       * Overlays the desired color over the specified range of the [[Ansi.Str]].
       */
     def overlay(overlayColor: Color, start: Int, end: Int) = {
-      var newCurrentState = State()
-      val output = collection.mutable.Buffer.empty[Frag]
-      def append(f: Frag) = f match{
-        case c: Content => output.append(c)
-        case c: Color =>
-          newCurrentState = newCurrentState.transform(c)
-          output.append(c)
-      }
-      walk{ (frag, state, index, screenLength) =>
+      transform{ (frag, originalState, transformedState, index, screenLength) =>
         frag match{
           case c: Content =>
-
             val fragLength = c.value.length
-
             if (screenLength < start && screenLength + fragLength >= start){
               // Turning it on
-              if (state.transform(overlayColor) == state) append(c)
-              else {
-                val (pre, post) = c.value.splitAt(start - screenLength)
-                append(Content(pre))
-                append(overlayColor)
-                append(Content(post))
-              }
+              val (pre, post) = c.value.splitAt(start - screenLength)
+              Seq(Content(pre), overlayColor, Content(post))
             }else if (screenLength < end && screenLength + fragLength >= end){
               // Turning it off
-
-              if (newCurrentState == state) append(c)
-              else {
-                val (pre, post) = c.value.splitAt(end - screenLength)
-                append(Content(pre))
-                state.diffFrom(newCurrentState).foreach(append(_))
-                append(Content(post))
-              }
-
-            }else append(c)
+              val (pre, post) = c.value.splitAt(end - screenLength)
+              Seq(Content(pre)) ++ originalState.diffFrom(transformedState) ++ Seq(Content(post))
+            }else Seq(c)
           case c: Color =>
             // Inside the range
             if (screenLength >= start && screenLength <= end){
-              val stompedState = newCurrentState.transform(c).transform(overlayColor)
-
-              stompedState.diffFrom(newCurrentState).foreach(append)
-
-            }else{// Outside, just add stuff if it makes a difference
-              if (state.transform(c) != state) {
-                append(c)
-              }
-            }
+              val stompedState = transformedState.transform(c).transform(overlayColor)
+              stompedState.diffFrom(transformedState)
+            }else Seq(c)
 
         }
+      }
+    }
+
+    /**
+      * Runs a function over the sequence of [[Frag]]s and [[State]]s to
+      * transform it into a new sequence of [[Frag]]s. The callback returns
+      * 0 or more [[Frag]]s per call, which get stitched together into the
+      * final result, with consecutive [[Content]]s collapsed and redundant
+      * [[Color]]s removed
+      */
+    def transform(f: (Frag, State, State, Int, Int) => Seq[Frag]) = {
+      var newCurrentState = State()
+      val output = collection.mutable.Buffer.empty[Frag]
+      def append(f: Frag) = f match{
+        case c: Content =>
+          output.lastOption match{
+            case Some(c0: Content) => output(output.length-1) = Content(c0.value + c.value)
+            case _ => output.append(c)
+          }
+        case c: Color =>
+          val transformedState = newCurrentState.transform(c)
+          if (transformedState != newCurrentState){
+            newCurrentState = transformedState
+            output.append(c)
+          }
+      }
+
+      walk{ (frag, originalState, index, screenLength) =>
+        f(frag, originalState, newCurrentState, index, screenLength).foreach(append)
         true
       }
       Str(output.toVector)
     }
-
     /**
       * Walk over the sequence of [[Frag]]s; the callback gets called with each
       * frag, together with some computed metadata about the ansi-[[State]] and
