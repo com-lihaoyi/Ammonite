@@ -57,11 +57,11 @@ object Main{
           // and highlight the selection
           val ansiBuffer = Ansi.Str.parse(hl(buffer))
           val (newBuffer, cursorOffset) = SelectionFilter.mangleBuffer(
-            selection, ansiBuffer, cursor, Ansi.Reversed, Ansi.Reset
+            selection, ansiBuffer, cursor, Ansi.Reversed
           )
           val newNewBuffer = HistoryFilter.mangleBuffer(
             historyFilter, newBuffer, cursor,
-            Ansi.Green, Ansi.Reset
+            Ansi.Green
           )
 
           (newNewBuffer, cursorOffset)

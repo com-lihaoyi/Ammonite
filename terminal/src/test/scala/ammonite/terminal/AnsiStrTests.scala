@@ -81,6 +81,34 @@ object AnsiStrTests extends TestSuite{
         val expected = s"+++$RED-$YELLOW--$UNDERLINED*$GREEN**$BLUE///"
         assert(overlayed == expected)
       }
+      'underlines{
+        val resetty = s"$UNDERLINED#$RESET    $UNDERLINED#$RESET"
+        'underlineBug{
+          val overlayed = resetty.overlay(Ansi.Reversed, 0, 2).toString
+          val expected = s"$UNDERLINED$REVERSED#$RESET$REVERSED $RESET   $UNDERLINED#$RESET"
+          assert(overlayed == expected)
+        }
+        'barelyOverlapping{
+          val overlayed = resetty.overlay(Ansi.Reversed, 0, 1).toString
+          val expected = s"$UNDERLINED$REVERSED#$RESET$UNDERLINED$RESET    $UNDERLINED#$RESET"
+          assert(overlayed == expected)
+        }
+        'endOfLine{
+          val overlayed = resetty.overlay(Ansi.Reversed, 5, 6).toString
+          val expected = s"$UNDERLINED#$RESET    $REVERSED$UNDERLINED#$RESET$UNDERLINED$RESET"
+          assert(overlayed == expected)
+        }
+        'overshoot{
+          val overlayed = resetty.overlay(Ansi.Reversed, 5, 10).toString
+          val expected = s"$UNDERLINED#$RESET    $REVERSED$UNDERLINED#$RESET$REVERSED"
+          assert(overlayed == expected)
+        }
+        'empty{
+          val overlayed = resetty.overlay(Ansi.Reversed, 0, 0).toString
+          val expected = s"$UNDERLINED$REVERSED#$RESET$UNDERLINED$RESET    $UNDERLINED#$RESET"
+          assert(overlayed== resetty)
+        }
+      }
     }
   }
 }

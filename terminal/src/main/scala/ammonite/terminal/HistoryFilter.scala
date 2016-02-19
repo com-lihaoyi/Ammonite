@@ -230,8 +230,7 @@ object HistoryFilter{
   def mangleBuffer(historyFilter: HistoryFilter,
                    buffer: Ansi.Str,
                    cursor: Int,
-                   startColor: Ansi.Color,
-                   endColor: Ansi.Color) = {
+                   startColor: Ansi.Color) = {
     if (!historyFilter.activeSearch) buffer
     else {
       val (searchStart, searchEnd) =
@@ -243,10 +242,8 @@ object HistoryFilter{
           (start, end)
         }
 
-      val (prefix, rest) = buffer.splitAt(searchStart)
-      val (middle, suffix) = rest.splitAt(searchEnd)
-
-      prefix ++ startColor ++ middle ++ endColor ++ suffix
+      val newStr = buffer.overlay(startColor, searchStart, searchEnd)
+      newStr
     }
 
   }

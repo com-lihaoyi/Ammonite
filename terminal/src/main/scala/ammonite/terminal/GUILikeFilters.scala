@@ -106,16 +106,13 @@ object GUILikeFilters {
     def mangleBuffer(selectionFilter: SelectionFilter,
                      string: Ansi.Str,
                      cursor: Int,
-                     startColor: Ansi.Str,
-                     endColor: Ansi.Str) = {
+                     startColor: Ansi.Color) = {
       selectionFilter.mark match{
         case Some(mark) if mark != cursor =>
           val Seq(min, max) = Seq(cursor, mark).sorted
-          val (prefix, rest) = string.splitAt(min)
-          val (middle, suffix) = rest.splitAt(max - min)
           val displayOffset = if (cursor < mark) 0 else -1
-          val newFrags = prefix ++ startColor ++ middle ++ endColor ++ suffix
-          (newFrags, displayOffset)
+          val newStr = string.overlay(startColor, min, max)
+          (newStr, displayOffset)
         case _ => (string, 0)
       }
     }

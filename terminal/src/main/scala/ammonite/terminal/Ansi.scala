@@ -72,11 +72,19 @@ object Ansi {
     } yield (color.color, color)).toMap
   }
 
+  object Content{
+    def fromMaybeEmpty(value: String) = {
+      if (value.isEmpty) Nil
+      else Seq(Content(value))
+    }
+  }
   /**
     * A piece of an [[Ansi.Str]] which just contains raw string-content,
     * without any special characters
     */
-  case class Content(value: String) extends Frag
+  case class Content(value: String) extends Frag{
+    assert(value.length > 0)
+  }
 
   /**
     * A piece of an [[Ansi.Str]]
@@ -141,7 +149,11 @@ object Ansi {
     def selfCheck() = {
       val b = new Str.Builder
       fragments.foreach(b.append)
-      assert(b.result == fragments, s"Not the same\n${b.result}\n$fragments")
+      assert(
+        b.result == fragments,
+        s"Ansi.Str self-check failed: the collapsed-version of the Str isn't " +
+        s"the same as the original\n${b.result}\n$fragments"
+      )
     }
     selfCheck()
 
@@ -162,27 +174,32 @@ object Ansi {
       * Overlays the desired color over the specified range of the [[Ansi.Str]].
       */
     def overlay(overlayColor: Color, start: Int, end: Int) = {
+      require(end >= start,
+        s"end:$end must be greater than start:$end in AnsiStr#overlay call"
+      )
+
       transform{ (frag, originalState, transformedState, index, screenLength) =>
-        frag match{
+        val res = frag match{
           case c: Content =>
             val fragLength = c.value.length
             if (screenLength < start && screenLength + fragLength >= start){
               // Turning it on
               val (pre, post) = c.value.splitAt(start - screenLength)
-              Seq(Content(pre), overlayColor, Content(post))
+              Content.fromMaybeEmpty(pre) ++ Seq(overlayColor) ++ Content.fromMaybeEmpty(post)
             }else if (screenLength < end && screenLength + fragLength >= end){
               // Turning it off
               val (pre, post) = c.value.splitAt(end - screenLength)
-              Seq(Content(pre)) ++ originalState.diffFrom(transformedState) ++ Seq(Content(post))
+              Content.fromMaybeEmpty(pre) ++ originalState.diffFrom(transformedState) ++ Content.fromMaybeEmpty(post)
             }else Seq(c)
           case c: Color =>
             // Inside the range
-            if (screenLength >= start && screenLength <= end){
+            if (screenLength >= start && screenLength < end){
               val stompedState = transformedState.transform(c).transform(overlayColor)
               stompedState.diffFrom(transformedState)
             }else Seq(c)
 
         }
+        res
       }
     }
 

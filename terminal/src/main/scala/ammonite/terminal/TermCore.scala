@@ -330,7 +330,7 @@ object Prompt {
   implicit def construct(prompt: String): Prompt = {
     val parsedPrompt = Ansi.Str.parse(prompt)
     val index = parsedPrompt.plainText.lastIndexOf('\n')
-    val (first, last) = parsedPrompt.splitAt(index+1)
+    val (_, last) = parsedPrompt.splitAt(index+1)
     Prompt(parsedPrompt, last)
   }
 }
