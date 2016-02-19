@@ -132,6 +132,55 @@ object Ansi {
       left ++ color ++ newMiddle ++ capReset ++ right
     }
 
+    def walk(f: (Fragment, State, Int) => Boolean): (State, Int) = {
+      @tailrec def rec(index: Int,
+                       state: State): (State, Int) = {
+        import Console._
+        if (index >= fragments.length) (state, index)
+        else if (!f(fragments(index), state, index)) (state, index)
+        else fragments.lift(index) match {
+          case Some(s: Color) =>
+
+            val newState = s match {
+              case Black | Red | Green | Yellow | Blue | Magenta | Cyan | White =>
+                state.copy(color = Some(s))
+              case BlackB | RedB | GreenB | YellowB | BlueB | MagentaB | CyanB | WhiteB =>
+                state.copy(bgColor = Some(s))
+              case Underlined => state.copy(underlined = true)
+              case Bold => state.copy(bold = true)
+              case Reversed => state.copy(reversed = true)
+              case Reset => State()
+              case x =>
+                throw new Exception("WTF IS DIS " + x)
+            }
+
+            rec(index + 1, newState)
+          case Some(Content(s)) => rec(index + 1, state)
+          case None => (state, index)
+        }
+      }
+      rec(0, State())
+    }
+
+    /**
+      * Tells you the state the desired visible-character index into the string,
+      * and how far into the sequence of segments this happens
+      */
+    def query(targetScreenLength: Int): (State, Int, Int) = {
+      var screenLength = 0
+      val (endState, endIndex) = walk{
+        case (frag: Color, state, index) => true
+        case (frag: Content, state, index) =>
+          val fragLength = frag.value.length
+          if (screenLength + fragLength > targetScreenLength) false
+          else {
+            screenLength = screenLength + fragLength
+            true
+          }
+      }
+      (endState,  endIndex, targetScreenLength - screenLength)
+    }
+
     /**
       * Splits this [[Str]] at the specified plaintext index, producing
       * two children that when rendered will result in the same visual output.
@@ -166,7 +215,7 @@ object Ansi {
       * Tells you the state the desired visible-character index into the string,
       * and how far into the sequence of segments this happens
       */
-    def query(targetScreenLength: Int): (State, Int, Int) = {
+    def query_old(targetScreenLength: Int): (State, Int, Int) = {
 
       @tailrec def rec(index: Int,
                        state: State,
