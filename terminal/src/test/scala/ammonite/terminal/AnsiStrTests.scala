@@ -2,13 +2,21 @@ package ammonite.terminal
 
 import utest._
 
-import scala.Console._
+import scala.Console.{
+  RED => R, 
+  GREEN => G, 
+  BLUE => B,
+  YELLOW => Y,
+  UNDERLINED => UND, 
+  REVERSED => REV, 
+  RESET => RES
+}
 
 object AnsiStrTests extends TestSuite{
   import Ansi.Str.parse
   val tests = TestSuite{
-    val rgbOps = s"+++$RED---$GREEN***$BLUE///"
-    val rgb = s"$RED$GREEN$BLUE"
+    val rgbOps = s"+++$R---$G***$B///"
+    val rgb = s"$R$G$B"
     'parsing{
       assert(
         parse(rgbOps).plainText.mkString == "+++---***///",
@@ -19,7 +27,7 @@ object AnsiStrTests extends TestSuite{
     }
 
     'autoCollapse{
-      val frags = parse(s"$RED$RED Hello$BLUE $BLUE World").fragments
+      val frags = parse(s"$R$R Hello$B $B World").fragments
       val expected = Vector(
         Ansi.Red, Ansi.Content(" Hello"),
         Ansi.Blue, Ansi.Content("  World"))
@@ -32,27 +40,27 @@ object AnsiStrTests extends TestSuite{
     'split{
       val splits = Seq(
         // Under-shot indexes just get clamped
-        (-99,  s"", s"+++$RED---$GREEN***$BLUE///"),
-        (-1,  s"", s"+++$RED---$GREEN***$BLUE///"),
+        (-99,  s"", s"+++$R---$G***$B///"),
+        (-1,  s"", s"+++$R---$G***$B///"),
 
         // These are the standard series
-        (0,  s"", s"+++$RED---$GREEN***$BLUE///"),
-        (1,  s"+", s"++$RED---$GREEN***$BLUE///"),
-        (2,  s"++", s"+$RED---$GREEN***$BLUE///"),
-        (3,  s"+++$RED", s"$RED---$GREEN***$BLUE///"),
-        (4,  s"+++$RED-", s"$RED--$GREEN***$BLUE///"),
-        (5,  s"+++$RED--", s"$RED-$GREEN***$BLUE///"),
-        (6,  s"+++$RED---$GREEN", s"$GREEN***$BLUE///"),
-        (7,  s"+++$RED---$GREEN*", s"$GREEN**$BLUE///"),
-        (8,  s"+++$RED---$GREEN**", s"$GREEN*$BLUE///"),
-        (9,  s"+++$RED---$GREEN***$BLUE", s"$BLUE///"),
-        (10, s"+++$RED---$GREEN***$BLUE/", s"$BLUE//"),
-        (11, s"+++$RED---$GREEN***$BLUE//", s"$BLUE/"),
-        (12, s"+++$RED---$GREEN***$BLUE///", s"$BLUE"),
+        (0,  s"", s"+++$R---$G***$B///"),
+        (1,  s"+", s"++$R---$G***$B///"),
+        (2,  s"++", s"+$R---$G***$B///"),
+        (3,  s"+++$R", s"$R---$G***$B///"),
+        (4,  s"+++$R-", s"$R--$G***$B///"),
+        (5,  s"+++$R--", s"$R-$G***$B///"),
+        (6,  s"+++$R---$G", s"$G***$B///"),
+        (7,  s"+++$R---$G*", s"$G**$B///"),
+        (8,  s"+++$R---$G**", s"$G*$B///"),
+        (9,  s"+++$R---$G***$B", s"$B///"),
+        (10, s"+++$R---$G***$B/", s"$B//"),
+        (11, s"+++$R---$G***$B//", s"$B/"),
+        (12, s"+++$R---$G***$B///", s"$B"),
 
         // Overshoots just get clamped
-        (13, s"+++$RED---$GREEN***$BLUE///", s"$BLUE"),
-        (99, s"+++$RED---$GREEN***$BLUE///", s"$BLUE")
+        (13, s"+++$R---$G***$B///", s"$B"),
+        (99, s"+++$R---$G***$B///", s"$B")
       )
       for((index, expectedLeft0, expectedRight0) <- splits){
         val (splitLeft, splitRight) = parse(rgbOps).splitAt(index)
@@ -66,47 +74,51 @@ object AnsiStrTests extends TestSuite{
     'overlay{
       'simple{
         val overlayed = rgbOps.overlay(Ansi.Yellow, 4, 7)
-        val expected = s"+++$RED-$YELLOW--*$GREEN**$BLUE///"
+        val expected = s"+++$R-$Y--*$G**$B///"
         assert(overlayed.toString == expected)
       }
       'resetty{
-        val resetty = s"+$RESET++$RED--$RESET-$RESET$GREEN***$BLUE///"
+        val resetty = s"+$RES++$R--$RES-$RES$G***$B///"
         val overlayed = resetty.overlay(Ansi.Yellow, 4, 7).toString
-        val expected = s"+++$RED-$YELLOW--*$GREEN**$BLUE///"
+        val expected = s"+++$R-$Y--*$G**$B///"
         assert(overlayed == expected)
       }
       'mixedResetUnderline{
-        val resetty = s"+$RESET++$RED--$RESET-$UNDERLINED$GREEN***$BLUE///"
+        val resetty = s"+$RES++$R--$RES-$UND$G***$B///"
         val overlayed = resetty.overlay(Ansi.Yellow, 4, 7).toString
-        val expected = s"+++$RED-$YELLOW--$UNDERLINED*$GREEN**$BLUE///"
+        val expected = s"+++$R-$Y--$UND*$G**$B///"
         assert(overlayed == expected)
       }
       'underlines{
-        val resetty = s"$UNDERLINED#$RESET    $UNDERLINED#$RESET"
+        val resetty = s"$UND#$RES    $UND#$RES"
         'underlineBug{
           val overlayed = resetty.overlay(Ansi.Reversed, 0, 2).toString
-          val expected = s"$UNDERLINED$REVERSED#$RESET$REVERSED $RESET   $UNDERLINED#$RESET"
+          val expected = s"$UND$REV#$RES$REV $RES   $UND#$RES"
           assert(overlayed == expected)
         }
         'barelyOverlapping{
           val overlayed = resetty.overlay(Ansi.Reversed, 0, 1).toString
-          val expected = s"$UNDERLINED$REVERSED#$RESET$UNDERLINED$RESET    $UNDERLINED#$RESET"
+          val expected = s"$UND$REV#$RES$UND$RES    $UND#$RES"
           assert(overlayed == expected)
         }
         'endOfLine{
           val overlayed = resetty.overlay(Ansi.Reversed, 5, 6).toString
-          val expected = s"$UNDERLINED#$RESET    $REVERSED$UNDERLINED#$RESET$UNDERLINED$RESET"
+          val expected = s"$UND#$RES    $REV$UND#$RES$UND$RES"
           assert(overlayed == expected)
         }
         'overshoot{
           val overlayed = resetty.overlay(Ansi.Reversed, 5, 10).toString
-          val expected = s"$UNDERLINED#$RESET    $REVERSED$UNDERLINED#$RESET$REVERSED"
+          val expected = s"$UND#$RES    $REV$UND#$RES$REV"
           assert(overlayed == expected)
         }
         'empty{
           val overlayed = resetty.overlay(Ansi.Reversed, 0, 0).toString
-          val expected = s"$UNDERLINED$REVERSED#$RESET$UNDERLINED$RESET    $UNDERLINED#$RESET"
-          assert(overlayed== resetty)
+          assert(overlayed == resetty)
+        }
+        'singleContent{
+          val overlayed = resetty.overlay(Ansi.Reversed, 2, 4).toString
+          val expected = s"$UND#$RES $REV  $RES $UND#$RES"
+          assert(overlayed == expected)
         }
       }
     }

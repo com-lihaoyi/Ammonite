@@ -182,15 +182,33 @@ object Ansi {
         val res = frag match{
           case c: Content =>
             val fragLength = c.value.length
-            if (screenLength < start && screenLength + fragLength >= start){
-              // Turning it on
-              val (pre, post) = c.value.splitAt(start - screenLength)
-              Content.fromMaybeEmpty(pre) ++ Seq(overlayColor) ++ Content.fromMaybeEmpty(post)
-            }else if (screenLength < end && screenLength + fragLength >= end){
-              // Turning it off
-              val (pre, post) = c.value.splitAt(end - screenLength)
-              Content.fromMaybeEmpty(pre) ++ originalState.diffFrom(transformedState) ++ Content.fromMaybeEmpty(post)
-            }else Seq(c)
+            val starting = screenLength < start && screenLength + fragLength >= start
+            val ending = screenLength < end && screenLength + fragLength >= end
+            (starting, ending) match{
+              case (true, true) =>
+                val (pre, rest) = c.value.splitAt(start - screenLength)
+                val (middle, post) = rest.splitAt(end - start)
+                Content.fromMaybeEmpty(pre) ++
+                Seq(overlayColor) ++
+                Content.fromMaybeEmpty(middle) ++
+                originalState.diffFrom(transformedState.transform(overlayColor)) ++
+                Content.fromMaybeEmpty(post)
+              case (true, false) =>
+                // Turning it on
+                val (pre, post) = c.value.splitAt(start - screenLength)
+                Content.fromMaybeEmpty(pre) ++
+                Seq(overlayColor) ++
+                Content.fromMaybeEmpty(post)
+              case (false, true) =>
+                // Turning it off
+                val (pre, post) = c.value.splitAt(end - screenLength)
+                Content.fromMaybeEmpty(pre) ++
+                originalState.diffFrom(transformedState) ++
+                Content.fromMaybeEmpty(post)
+              case (false, false) =>  Seq(c)
+
+            }
+
           case c: Color =>
             // Inside the range
             if (screenLength >= start && screenLength < end){
