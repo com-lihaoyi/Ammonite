@@ -125,7 +125,7 @@ object TermCore {
                reader: java.io.Reader,
                writer: java.io.Writer,
                filters: PartialFunction[TermInfo, TermAction] = PartialFunction.empty,
-               displayTransform: (Vector[Char], Int) => (AnsiStr, Int) = (x, i) => (AnsiStr.parse(x), i))
+               displayTransform: (Vector[Char], Int) => (Ansi.Str, Int) = (x, i) => (Ansi.Str.parse(x), i))
                : Option[String] = {
 
     /**
@@ -137,7 +137,7 @@ object TermCore {
       * math all over the place, incredibly prone to off-by-ones, in order
       * to at the end of the day position the cursor in the right spot.
       */
-    def redrawLine(buffer: AnsiStr,
+    def redrawLine(buffer: Ansi.Str,
                    cursor: Int,
                    ups: Int,
                    rowLengths: Seq[Int],
@@ -248,7 +248,7 @@ object TermCore {
         actualWidth
       )
 
-      def updateState(s: LazyList[Int], b: Vector[Char], c: Int, msg: AnsiStr): (Int, TermState) = {
+      def updateState(s: LazyList[Int], b: Vector[Char], c: Int, msg: Ansi.Str): (Int, TermState) = {
         val newCursor = math.max(math.min(c, b.length), 0)
         val nextUps =
           if (moreInputComing) ups
@@ -287,7 +287,7 @@ object TermCore {
       }
     }
 
-    lazy val ansi = new Ansi(writer)
+    lazy val ansi = new AnsiNav(writer)
     lazy val (width, _, initialConfig) = TTY.init()
     try {
       readChar(TermState(LazyList.continually(reader.read()), Vector.empty, 0, ""), 0)
@@ -310,12 +310,12 @@ case class Printing(ts: TermState, stdout: String) extends TermAction
 case class TermState(inputs: LazyList[Int],
                      buffer: Vector[Char],
                      cursor: Int,
-                     msg: AnsiStr = "") extends TermAction
+                     msg: Ansi.Str = "") extends TermAction
 object TermState{
-  def unapply(ti: TermInfo): Option[(LazyList[Int], Vector[Char], Int, AnsiStr)] = {
+  def unapply(ti: TermInfo): Option[(LazyList[Int], Vector[Char], Int, Ansi.Str)] = {
     TermState.unapply(ti.ts)
   }
-  def unapply(ti: TermAction): Option[(LazyList[Int], Vector[Char], Int, AnsiStr)] = ti match{
+  def unapply(ti: TermAction): Option[(LazyList[Int], Vector[Char], Int, Ansi.Str)] = ti match{
     case ts: TermState => TermState.unapply(ts)
     case _ => None
   }
@@ -328,14 +328,14 @@ case class Result(s: String) extends TermAction
 
 object Prompt {
   implicit def construct(prompt: String): Prompt = {
-    val parsedPrompt = AnsiStr.parse(prompt)
+    val parsedPrompt = Ansi.Str.parse(prompt)
     val index = parsedPrompt.plainText.lastIndexOf('\n')
     val (first, last) = parsedPrompt.splitAt(index+1)
     Prompt(parsedPrompt, last)
   }
 }
 
-case class Prompt(full: AnsiStr, lastLine: AnsiStr)
+case class Prompt(full: Ansi.Str, lastLine: Ansi.Str)
 
 
 

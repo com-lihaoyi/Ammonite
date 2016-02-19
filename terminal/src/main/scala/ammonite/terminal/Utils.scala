@@ -15,7 +15,7 @@ object Debug{
       debugOutput.write((System.currentTimeMillis() + "\t\t" + s + "\n").getBytes)
   }
 }
-class Ansi(output: Writer){
+class AnsiNav(output: Writer){
   def control(n: Int, c: Char) = output.write(s"\033[" + n + c)
 
   /**
@@ -52,7 +52,7 @@ class Ansi(output: Writer){
    */
   def clearLine(n: Int) = control(n, 'K')
 }
-object Ansi{
+object AnsiNav{
   val resetUnderline = "\u001b[24m"
   val resetForegroundColor = "\u001b[39m"
   val resetBackgroundColor = "\u001b[49m"

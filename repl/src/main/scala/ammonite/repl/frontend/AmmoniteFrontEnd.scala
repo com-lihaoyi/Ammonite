@@ -126,14 +126,14 @@ case class AmmoniteFrontEnd(extraFilters: TermCore.Filter = PartialFunction.empt
           colors.keyword(),
           resetColor
         )
-        val highlighted = AnsiStr.parse(Highlighter.flattenIndices(indices, buffer).mkString)
+        val highlighted = Ansi.Str.parse(Highlighter.flattenIndices(indices, buffer).mkString)
         val (newBuffer, offset) = SelectionFilter.mangleBuffer(
-          selectionFilter, highlighted, cursor, AnsiStr.parse(colors.selected()), Ansi.resetBackgroundColor
+          selectionFilter, highlighted, cursor, Ansi.Str.parse(colors.selected()), AnsiNav.resetBackgroundColor
         )
 
         val newNewBuffer: Vector[Char] = HistoryFilter.mangleBuffer(
           historyFilter, newBuffer, cursor,
-          Console.UNDERLINED, Ansi.resetUnderline
+          Console.UNDERLINED, AnsiNav.resetUnderline
         )
         (newNewBuffer, offset)
       }

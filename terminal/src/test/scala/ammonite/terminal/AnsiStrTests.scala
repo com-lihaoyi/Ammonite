@@ -5,13 +5,13 @@ import utest._
 import scala.Console._
 
 object AnsiStrTests extends TestSuite{
-  import AnsiStr.parse
+  import Ansi.Str.parse
   val tests = TestSuite{
-    val rgbOps = s"+1+$RED-2-$GREEN*3*$BLUE/4/"
+    val rgbOps = s"+!+$RED-!-$GREEN*!*$BLUE/!/"
     val rgb = s"$RED$GREEN$BLUE"
     'parsing{
       assert(
-        parse(rgbOps).plainText.mkString == "+1+-2-*3*/4/",
+        parse(rgbOps).plainText.mkString == "+!+-!-*!*/!/",
         parse(rgb).plainText.mkString == "",
         parse(rgbOps).render.mkString == rgbOps,
         parse(rgb).render.mkString == rgb
@@ -25,27 +25,27 @@ object AnsiStrTests extends TestSuite{
     'split{
       val splits = Seq(
         // Under-shot indexes just get clamped
-        (-99,  s"", s"+1+$RED-2-$GREEN*3*$BLUE/4/"),
-        (-1,  s"", s"+1+$RED-2-$GREEN*3*$BLUE/4/"),
+        (-99,  s"", s"+!+$RED-!-$GREEN*!*$BLUE/!/"),
+        (-1,  s"", s"+!+$RED-!-$GREEN*!*$BLUE/!/"),
 
         // These are the standard series
-        (0,  s"", s"+1+$RED-2-$GREEN*3*$BLUE/4/"),
-        (1,  s"+", s"1+$RED-2-$GREEN*3*$BLUE/4/"),
-        (2,  s"+1", s"+$RED-2-$GREEN*3*$BLUE/4/"),
-        (3,  s"+1+$RED", s"$RED-2-$GREEN*3*$BLUE/4/"),
-        (4,  s"+1+$RED-", s"${RED}2-$GREEN*3*$BLUE/4/"),
-        (5,  s"+1+$RED-2", s"$RED-$GREEN*3*$BLUE/4/"),
-        (6,  s"+1+$RED-2-$GREEN", s"$GREEN*3*$BLUE/4/"),
-        (7,  s"+1+$RED-2-$GREEN*", s"${GREEN}3*$BLUE/4/"),
-        (8,  s"+1+$RED-2-$GREEN*3", s"$GREEN*$BLUE/4/"),
-        (9,  s"+1+$RED-2-$GREEN*3*$BLUE", s"$BLUE/4/"),
-        (10, s"+1+$RED-2-$GREEN*3*$BLUE/", s"${BLUE}4/"),
-        (11, s"+1+$RED-2-$GREEN*3*$BLUE/4", s"$BLUE/"),
-        (12, s"+1+$RED-2-$GREEN*3*$BLUE/4/", s"$BLUE"),
+        (0,  s"", s"+!+$RED-!-$GREEN*!*$BLUE/!/"),
+        (1,  s"+", s"!+$RED-!-$GREEN*!*$BLUE/!/"),
+        (2,  s"+!", s"+$RED-!-$GREEN*!*$BLUE/!/"),
+        (3,  s"+!+$RED", s"$RED-!-$GREEN*!*$BLUE/!/"),
+        (4,  s"+!+$RED-", s"$RED!-$GREEN*!*$BLUE/!/"),
+        (5,  s"+!+$RED-!", s"$RED-$GREEN*!*$BLUE/!/"),
+        (6,  s"+!+$RED-!-$GREEN", s"$GREEN*!*$BLUE/!/"),
+        (7,  s"+!+$RED-!-$GREEN*", s"$GREEN!*$BLUE/!/"),
+        (8,  s"+!+$RED-!-$GREEN*!", s"$GREEN*$BLUE/!/"),
+        (9,  s"+!+$RED-!-$GREEN*!*$BLUE", s"$BLUE/!/"),
+        (10, s"+!+$RED-!-$GREEN*!*$BLUE/", s"$BLUE!/"),
+        (11, s"+!+$RED-!-$GREEN*!*$BLUE/!", s"$BLUE/"),
+        (12, s"+!+$RED-!-$GREEN*!*$BLUE/!/", s"$BLUE"),
 
         // Overshoots just get clamped
-        (13, s"+1+$RED-2-$GREEN*3*$BLUE/4/", s"$BLUE"),
-        (99, s"+1+$RED-2-$GREEN*3*$BLUE/4/", s"$BLUE")
+        (13, s"+!+$RED-!-$GREEN*!*$BLUE/!/", s"$BLUE"),
+        (99, s"+!+$RED-!-$GREEN*!*$BLUE/!/", s"$BLUE")
       )
       for((index, expectedLeft0, expectedRight0) <- splits){
         val (splitLeft, splitRight) = parse(rgbOps).splitAt(index)
@@ -56,5 +56,10 @@ object AnsiStrTests extends TestSuite{
       }
     }
 
+    'overlay{
+      val overlayed = rgbOps.overlay(Ansi.Yellow, 4, 7)
+      val expected = s"+!+$RED-$YELLOW!-*$GREEN!*$BLUE/!/"
+      assert(overlayed.toString == expected)
+    }
   }
 }

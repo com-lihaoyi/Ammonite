@@ -228,10 +228,10 @@ object HistoryFilter{
 
 
   def mangleBuffer(historyFilter: HistoryFilter,
-                   buffer: AnsiStr,
+                   buffer: Ansi.Str,
                    cursor: Int,
-                   startColor: AnsiStr,
-                   endColor: AnsiStr) = {
+                   startColor: Ansi.Color,
+                   endColor: Ansi.Color) = {
     if (!historyFilter.activeSearch) buffer
     else {
       val (searchStart, searchEnd) =

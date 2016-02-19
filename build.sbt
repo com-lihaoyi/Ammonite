@@ -93,7 +93,8 @@ lazy val prompt = shellPrompt in ThisBuild := { state =>
 lazy val terminal = project
   .settings(
     sharedSettings,
-    name := "ammonite-terminal"
+    name := "ammonite-terminal",
+    libraryDependencies += "com.lihaoyi" %% "sourcecode" % "0.1.0"
   )
 
 /**
