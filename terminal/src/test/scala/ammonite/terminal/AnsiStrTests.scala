@@ -57,9 +57,17 @@ object AnsiStrTests extends TestSuite{
     }
 
     'overlay{
-      val overlayed = rgbOps.overlay(Ansi.Yellow, 4, 7)
-      val expected = s"+!+$RED-$YELLOW!-*$GREEN!*$BLUE/!/"
-      assert(overlayed.toString == expected)
+      'simple{
+        val overlayed = rgbOps.overlay(Ansi.Yellow, 4, 7)
+        val expected = s"+!+$RED-$YELLOW!-*$GREEN!*$BLUE/!/"
+        assert(overlayed.toString == expected)
+      }
+      'resetty{
+        val resetty = s"+$RESET!+$RED-!$RESET-$RESET$GREEN*!*$BLUE/!/"
+        val overlayed = rgbOps.overlay(Ansi.Yellow, 4, 7)
+        val expected = s"+!+$RED-$YELLOW!-*$GREEN!*$BLUE/!/"
+        assert(overlayed.toString == expected)
+      }
     }
   }
 }

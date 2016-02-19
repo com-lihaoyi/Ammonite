@@ -38,20 +38,32 @@ object Ansi {
   }
   object Color {
 
-
     val OverlapSets = Set(
       Set(Black, Red, Green, Yellow, Blue, Magenta, Cyan, White),
       Set(BlackB, RedB, GreenB, YellowB, BlueB, MagentaB, CyanB, WhiteB),
       Set(Bold),
       Set(Underlined),
-      Set(Reversed)
+      Set(Reversed),
+      Set(Reset)
     )
 
-    val OverlapMap = (for {
-      set <- OverlapSets
-      color <- set
-    } yield (color, set)).toMap
+    /**
+      * A mapping of who stomps over who. Note that this isn't symmetric!
+      * `Reset` stomps over everyone, but nobody stomps over `Reset`. If
+      * a color stomps over another, that means that when a stomp-er directly
+      * follows a stomp-ee the stomp-ee can be ommitted
+      */
+    val OverlapMap = {
+      val colorSets = for {
+        set <- OverlapSets
+        color <- set
+      } yield (color, set)
 
+      colorSets.toMap ++ Seq(Reset -> OverlapSets.flatten)
+    }
+    /**
+      * Quickly convert string-colors into [[Ansi.Color]]s
+      */
     val ParseMap = (for {
       set <- OverlapSets
       color <- set
@@ -78,7 +90,8 @@ object Ansi {
         if start != end
       } yield {
         val frag = raw.subSequence(start, end).toString
-        if (frag.charAt(0) == '\u001b') Color.ParseMap(frag) else Content(frag)
+        if (frag.charAt(0) == '\u001b') Color.ParseMap(frag)
+        else Content(frag)
       }
 
       new Str(fragIter.toVector)
