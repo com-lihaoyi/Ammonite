@@ -109,6 +109,8 @@ object TermCore {
     def isDefinedAt(x: TermInfo) = filter.isDefinedAt(x)
     def apply(v1: TermInfo) = filter(v1)
   }
+
+  def noTransform(x: Vector[Char], i: Int) = (Ansi.Str.parse(x), i)
   /**
    * Blockingly reads a line from the given input stream and returns it.
    *
@@ -125,7 +127,7 @@ object TermCore {
                reader: java.io.Reader,
                writer: java.io.Writer,
                filters: PartialFunction[TermInfo, TermAction] = PartialFunction.empty,
-               displayTransform: (Vector[Char], Int) => (Ansi.Str, Int) = (x, i) => (Ansi.Str.parse(x), i))
+               displayTransform: (Vector[Char], Int) => (Ansi.Str, Int) = noTransform)
                : Option[String] = {
 
     /**
