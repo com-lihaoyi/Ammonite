@@ -18,6 +18,13 @@ object AnsiStrTests extends TestSuite{
       )
     }
 
+    'autoCollapse{
+      val frags = parse(s"$RED$RED Hello$BLUE $BLUE World").fragments
+      val expected = Vector(
+        Ansi.Red, Ansi.Content(" Hello"),
+        Ansi.Blue, Ansi.Content("  World"))
+      assert(frags == expected)
+    }
     'concat{
       assert((parse(rgbOps) ++ parse(rgbOps)).render.mkString == rgbOps ++ rgbOps)
     }

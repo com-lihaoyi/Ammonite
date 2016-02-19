@@ -3,7 +3,7 @@ package ammonite.terminal
 import scala.annotation.tailrec
 
 object Ansi {
-  val Empty = Str(Vector())
+  val Empty = Str.parse("")
   val Black = new Color(Console.BLACK)
   val Red = new Color(Console.RED)
   val Green = new Color(Console.GREEN)
@@ -86,33 +86,71 @@ object Ansi {
 
   object Str {
 
+    /**
+      * Feed in a bunch of individual [[Frag]]s and this will produce a
+      * [[result]] which optimizes those frags, collapsing [[Content]]s
+      * and removing redundant [[Color]]s.
+      */
+    class Builder{
+      private[this] var newCurrentState = State()
+      private[this] val buffer = collection.mutable.Buffer.empty[Frag]
+      def result = buffer.toVector
+      def currentState = newCurrentState
+      def append(f: Frag) = f match{
+        case c: Content =>
+          buffer.lastOption match{
+            case Some(c0: Content) => buffer(buffer.length-1) = Content(c0.value + c.value)
+            case _ => buffer.append(c)
+          }
+        case c: Color =>
+          val transformedState = newCurrentState.transform(c)
+          if (transformedState != newCurrentState){
+            newCurrentState = transformedState
+            buffer.append(c)
+          }
+      }
+    }
 
     lazy val ansiRegex = "\u001B\\[[;\\d]*m".r
 
     implicit def parse(raw: CharSequence): Str = {
       val matches = ansiRegex.findAllMatchIn(raw)
       val indices = Seq(0) ++ matches.flatMap { m => Seq(m.start, m.end) } ++ Seq(raw.length)
-
-      val fragIter = for {
+      val b = new Str.Builder
+      for {
         Seq(start, end) <- indices.sliding(2).toSeq
         if start != end
-      } yield {
+      } {
         val frag = raw.subSequence(start, end).toString
-        if (frag.charAt(0) == '\u001b') Color.ParseMap(frag)
-        else Content(frag)
+        if (frag.charAt(0) == '\u001b') b.append(Color.ParseMap(frag))
+        else b.append(Content(frag))
       }
 
-      new Str(fragIter.toVector)
+      Str(b.result)
     }
 
     implicit def fromColor(s: Color): Str = Str(Vector(s))
   }
+
   /**
-    *
-    * @param fragments Left means it's some ansi escape, Right means it's content.
+    * Represents a structured Ansi-colored string, containing both [[Color]]s
+    * and string [[Content]], with operations that let you easily manipulate
+    * the string while keeping colors sane.
     */
-  case class Str(fragments: Vector[Frag]) {
-    def ++(other: Str) = new Str(fragments ++ other.fragments)
+  case class Str private(fragments: Vector[Frag]) {
+    def selfCheck() = {
+      val b = new Str.Builder
+      fragments.foreach(b.append)
+      assert(b.result == fragments, s"Not the same\n${b.result}\n$fragments")
+    }
+    selfCheck()
+
+    def ++(other: Str) = {
+      val b = new Str.Builder
+      fragments.foreach(b.append)
+      other.fragments.foreach(b.append)
+      Str(b.result)
+    }
 
     lazy val length = plainText.length
     lazy val render = fragments.flatMap { case Color(s) => s; case Content(s) => s }
@@ -156,27 +194,12 @@ object Ansi {
       * [[Color]]s removed
       */
     def transform(f: (Frag, State, State, Int, Int) => Seq[Frag]) = {
-      var newCurrentState = State()
-      val output = collection.mutable.Buffer.empty[Frag]
-      def append(f: Frag) = f match{
-        case c: Content =>
-          output.lastOption match{
-            case Some(c0: Content) => output(output.length-1) = Content(c0.value + c.value)
-            case _ => output.append(c)
-          }
-        case c: Color =>
-          val transformedState = newCurrentState.transform(c)
-          if (transformedState != newCurrentState){
-            newCurrentState = transformedState
-            output.append(c)
-          }
-      }
-
+      val b = new Str.Builder
       walk{ (frag, originalState, index, screenLength) =>
-        f(frag, originalState, newCurrentState, index, screenLength).foreach(append)
+        f(frag, originalState, b.currentState, index, screenLength).foreach(b.append)
         true
       }
-      Str(output.toVector)
+      Str(b.result)
     }
     /**
       * Walk over the sequence of [[Frag]]s; the callback gets called with each
@@ -242,49 +265,12 @@ object Ansi {
       val rightPartialOpt = if (rightPartial.isEmpty) Vector() else Vector(Content(rightPartial))
       val rightStartOpt =
         if (cleanSplit) Vector()
-        else splitState.render.fragments
+        else splitState.colors
 
       val right = rightStartOpt ++ rightPartialOpt ++ rightFrags
       (new Str(left), new Str(right))
     }
 
-    /**
-      * Tells you the state the desired visible-character index into the string,
-      * and how far into the sequence of segments this happens
-      */
-    def query_old(targetScreenLength: Int): (State, Int, Int) = {
-
-      @tailrec def rec(index: Int,
-                       state: State,
-                       screenLength: Int): (State, Int, Int) = {
-        import Console._
-        fragments.lift(index) match {
-          case Some(s: Color) =>
-            val newState = s match {
-              case Black | Red | Green | Yellow | Blue | Magenta | Cyan | White =>
-                state.copy(color = Some(s))
-              case BlackB | RedB | GreenB | YellowB | BlueB | MagentaB | CyanB | WhiteB =>
-                state.copy(bgColor = Some(s))
-              case Underlined => state.copy(underlined = true)
-              case Bold => state.copy(bold = true)
-              case Reversed => state.copy(reversed = true)
-              case Reset => State()
-              case x =>
-                throw new Exception("WTF IS DIS " + x)
-            }
-            rec(index + 1, newState, screenLength)
-          case Some(Content(s)) =>
-            val fragLength = s.length
-            if (screenLength + fragLength <= targetScreenLength && index + 1 < fragments.length) {
-              rec(index + 1, state, screenLength + fragLength)
-            } else {
-              (state, index, targetScreenLength - screenLength)
-            }
-          case None => (state, index, 0)
-        }
-      }
-      rec(0, State(), 0)
-    }
   }
 
   case class State(color: Option[Color] = None,
@@ -316,7 +302,6 @@ object Ansi {
       val reversed = if (this.reversed) Vector(Reversed) else Vector()
       color ++ bgColor ++ bold ++ underlined ++ reversed
     }
-    def render = Str(colors)
 
     def diffFrom(source: State): Vector[Color] = {
 
