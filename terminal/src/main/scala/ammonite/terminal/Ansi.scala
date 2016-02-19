@@ -12,6 +12,7 @@ object Ansi {
   val Magenta = new Color(Console.MAGENTA)
   val Cyan = new Color(Console.CYAN)
   val White = new Color(Console.WHITE)
+  val ResetFore = new Color("\u001b[39m")
 
   val BlackB = new Color(Console.BLACK_B)
   val RedB = new Color(Console.RED_B)
@@ -21,6 +22,7 @@ object Ansi {
   val MagentaB = new Color(Console.MAGENTA_B)
   val CyanB = new Color(Console.CYAN_B)
   val WhiteB = new Color(Console.WHITE_B)
+  val ResetB = new Color("\u001b[49m")
 
   val Reset = new Color(Console.RESET)
   val Bold = new Color(Console.BOLD)
@@ -33,14 +35,14 @@ object Ansi {
     *
     * @param color the actual ANSI string
     */
-  case class Color(color: String)(implicit name: sourcecode.Name) extends Fragment {
+  case class Color(color: String)(implicit name: sourcecode.Name) extends Frag {
     override def toString = color + name.value + Console.RESET
   }
   object Color {
 
     val OverlapSets = Set(
-      Set(Black, Red, Green, Yellow, Blue, Magenta, Cyan, White),
-      Set(BlackB, RedB, GreenB, YellowB, BlueB, MagentaB, CyanB, WhiteB),
+      Set(Black, Red, Green, Yellow, Blue, Magenta, Cyan, White, ResetFore),
+      Set(BlackB, RedB, GreenB, YellowB, BlueB, MagentaB, CyanB, WhiteB, ResetB),
       Set(Bold),
       Set(Underlined),
       Set(Reversed),
@@ -71,9 +73,12 @@ object Ansi {
   }
 
 
-  case class Content(value: String) extends Fragment
+  case class Content(value: String) extends Frag
 
-  sealed trait Fragment
+  /**
+    * A piece of an [[Ansi.Str]]
+    */
+  sealed trait Frag
 
 
   object Str {
@@ -103,7 +108,7 @@ object Ansi {
     *
     * @param fragments Left means it's some ansi escape, Right means it's content.
     */
-  case class Str(fragments: Vector[Fragment]) {
+  case class Str(fragments: Vector[Frag]) {
     def ++(other: Str) = new Str(fragments ++ other.fragments)
 
     lazy val length = plainText.length
@@ -115,51 +120,92 @@ object Ansi {
     /**
       * Overlays the desired color over the specified range of the [[Ansi.Str]].
       */
-    def overlay(color: Color, start: Int, end: Int) = {
-      val (left, rest) = splitAt(start)
-      val (middle, right) = rest.splitAt(end - start)
-      val newMiddle = new Str(middle.fragments.flatMap {
-        case Reset => Seq(Reset, color)
-        case c: Color if Color.OverlapMap(color).contains(c) => Seq()
-        case c => Seq(c)
-      })
+    def overlay(overlayColor: Color, start: Int, end: Int) = {
+      var newCurrentState = State()
+      val output = collection.mutable.Buffer.empty[Frag]
+      def append(f: Frag) = f match{
+        case c: Content => output.append(c)
+        case c: Color =>
+          newCurrentState = newCurrentState.transform(c)
+          output.append(c)
+      }
+      walk{ (frag, state, index, screenLength) =>
+        frag match{
+          case c: Content =>
 
-      val (endColor, _, _) = this.query(end)
-      val capReset: Str =
-        if (endColor.colors.exists(Color.OverlapMap(color))) Empty
-        else Reset
+            val fragLength = c.value.length
 
-      left ++ color ++ newMiddle ++ capReset ++ right
-    }
+            if (screenLength < start && screenLength + fragLength >= start){
+              // Turning it on
+              if (state.transform(overlayColor) == state) output.append(c)
+              else {
+                val splitIndex = start - screenLength
+                val (pre, post) = c.value.splitAt(splitIndex)
 
-    def walk(f: (Fragment, State, Int) => Boolean): (State, Int) = {
-      @tailrec def rec(index: Int,
-                       state: State): (State, Int) = {
-        import Console._
-        if (index >= fragments.length) (state, index)
-        else if (!f(fragments(index), state, index)) (state, index)
-        else fragments.lift(index) match {
-          case Some(s: Color) =>
+                append(Content(pre))
+                append(overlayColor)
+                append(Content(post))
+              }
+            }else if (screenLength < end && screenLength + fragLength >= end){
+              // Turning it off
 
-            val newState = s match {
-              case Black | Red | Green | Yellow | Blue | Magenta | Cyan | White =>
-                state.copy(color = Some(s))
-              case BlackB | RedB | GreenB | YellowB | BlueB | MagentaB | CyanB | WhiteB =>
-                state.copy(bgColor = Some(s))
-              case Underlined => state.copy(underlined = true)
-              case Bold => state.copy(bold = true)
-              case Reversed => state.copy(reversed = true)
-              case Reset => State()
-              case x =>
-                throw new Exception("WTF IS DIS " + x)
+              if (newCurrentState == state) output.append(c)
+              else {
+                val splitIndex = end - screenLength
+                val (pre, post) = c.value.splitAt(splitIndex)
+                val resetColors = state.diffFrom(newCurrentState)
+
+                append(Content(pre))
+                resetColors.foreach(append(_))
+                append(Content(post))
+              }
+
+            }else output.append(c)
+          case c: Color =>
+            // Inside the range
+            if (screenLength >= start && screenLength <= end){
+              val stompedState = newCurrentState.transform(c)
+              val stompedState2 = stompedState.transform(overlayColor)
+              if (stompedState2 != newCurrentState){
+                append(c)
+                if (stompedState != stompedState) {
+                  append(overlayColor)
+                }
+              }
+            }else{// Outside, just add stuff if it makes a difference
+              if (state.transform(c) != state) {
+                append(c)
+              }
             }
 
-            rec(index + 1, newState)
-          case Some(Content(s)) => rec(index + 1, state)
-          case None => (state, index)
+        }
+        true
+      }
+      Str(output.toVector)
+    }
+
+    /**
+      * Walk over the sequence of [[Frag]]s; the callback gets called with each
+      * frag, together with some computed metadata about the ansi-[[State]] and
+      * screen length. In response, it returns a boolean that determines whether
+      * or not to continue walking or bail early.
+      */
+    def walk(f: (Frag, State, Int, Int) => Boolean): (State, Int, Int) = {
+
+      @tailrec def rec(index: Int,
+                       state: State,
+                       screenLength: Int): (State, Int, Int) = {
+        if (index >= fragments.length) (state, index, screenLength)
+        else if (!f(fragments(index), state, index, screenLength)) (state, index, screenLength)
+        else fragments.lift(index) match {
+          case Some(s: Color) =>
+            val newState = state.transform(s)
+            rec(index + 1, newState, screenLength)
+          case Some(Content(s)) => rec(index + 1, state, screenLength + s.length)
+          case None => (state, index, screenLength)
         }
       }
-      rec(0, State())
+      rec(0, State(), 0)
     }
 
     /**
@@ -167,18 +213,15 @@ object Ansi {
       * and how far into the sequence of segments this happens
       */
     def query(targetScreenLength: Int): (State, Int, Int) = {
-      var screenLength = 0
-      val (endState, endIndex) = walk{
-        case (frag: Color, state, index) => true
-        case (frag: Content, state, index) =>
+
+      val (endState, endIndex, endScreenLength) = walk{
+        case (frag: Color, state, index, screenLength) => true
+        case (frag: Content, state, index, screenLength) =>
           val fragLength = frag.value.length
           if (screenLength + fragLength > targetScreenLength) false
-          else {
-            screenLength = screenLength + fragLength
-            true
-          }
+          else true
       }
-      (endState,  endIndex, targetScreenLength - screenLength)
+      (endState,  endIndex, targetScreenLength - endScreenLength)
     }
 
     /**
@@ -256,7 +299,22 @@ object Ansi {
                    underlined: Boolean = false,
                    reversed: Boolean = false) {
 
-    def colors = {
+    def transform(c: Color) = c match {
+      case Black | Red | Green | Yellow | Blue | Magenta | Cyan | White =>
+        this.copy(color = Some(c))
+      case ResetFore => this.copy(color = None)
+      case BlackB | RedB | GreenB | YellowB | BlueB | MagentaB | CyanB | WhiteB =>
+        this.copy(bgColor = Some(c))
+      case ResetB => this.copy(bgColor = None)
+      case Underlined => this.copy(underlined = true)
+      case Bold => this.copy(bold = true)
+      case Reversed => this.copy(reversed = true)
+      case Reset => State()
+      case x =>
+        throw new Exception("WTF IS DIS " + x)
+    }
+
+    def colors: Vector[Color] = {
       val color = this.color.toVector
       val bgColor = this.bgColor.toVector
       val bold = if (this.bold) Vector(Bold) else Vector()
@@ -265,6 +323,25 @@ object Ansi {
       color ++ bgColor ++ bold ++ underlined ++ reversed
     }
     def render = Str(colors)
+
+    def diffFrom(source: State): Vector[Color] = {
+
+      if (!this.bold && source.bold ||
+          !this.underlined && source.underlined ||
+          !this.reversed && source.reversed){
+        Vector(Reset) ++ colors
+      }else{
+        val out = collection.mutable.Buffer.empty[Color]
+        if (this.color != source.color) out.append(color.getOrElse(ResetFore))
+        if (this.bgColor != source.bgColor) out.append(bgColor.getOrElse(ResetB))
+        // This can only turn *on* the flags, because if any of them could turn
+        // *off* the flags it would have been caught in the if-block above
+        if (this.bold != source.bold) out.append(Bold)
+        if (this.underlined != source.underlined ) out.append(Underlined)
+        if (this.reversed != source.reversed) out.append(Reversed)
+        out.toVector
+      }
+    }
   }
 
 }
