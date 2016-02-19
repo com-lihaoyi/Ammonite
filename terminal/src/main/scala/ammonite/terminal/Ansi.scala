@@ -35,7 +35,7 @@ object Ansi {
     *
     * @param color the actual ANSI string
     */
-  case class Color(color: String)(implicit name: sourcecode.Name) extends Frag {
+  case class Color private[Ansi] (color: String)(implicit name: sourcecode.Name) extends Frag {
     override def toString = color + name.value + Console.RESET
   }
   object Color {
@@ -144,6 +144,10 @@ object Ansi {
     * Represents a structured Ansi-colored string, containing both [[Color]]s
     * and string [[Content]], with operations that let you easily manipulate
     * the string while keeping colors sane.
+    *
+    * Maintains an invariant that it is always in a "collapsed" state: the
+    * fragments never have any consecutive [[Content]] nodes, or any
+    * consecutive redundant [[Color]] nodes.
     */
   case class Str private(fragments: Vector[Frag]) {
     def selfCheck() = {
@@ -287,20 +291,22 @@ object Ansi {
 
       val middle = fragments.lift(fragIndex) match {
         case Some(Content(b)) => b
-        case Some(Color(_)) => ???
         case None => ""
+        case Some(Color(_)) =>
+          // This shouldn't happen! When you split the Str, the middle node
+          // can't be a `Color` because it can only split a middle-node with
+          // a non-zero width.
+          ???
+
       }
 
       val (leftPartial, rightPartial) = middle.splitAt(leftOver)
-      val cleanSplit = splitState == State()
 
       val leftPartialOpt = if (leftPartial.isEmpty) None else Some(Content(leftPartial))
       val left = leftFrags ++ leftPartialOpt
 
       val rightPartialOpt = if (rightPartial.isEmpty) Vector() else Vector(Content(rightPartial))
-      val rightStartOpt =
-        if (cleanSplit) Vector()
-        else splitState.colors
+      val rightStartOpt = splitState.colors
 
       val right = rightStartOpt ++ rightPartialOpt ++ rightFrags
       (new Str(left), new Str(right))
@@ -308,12 +314,19 @@ object Ansi {
 
   }
 
+  /**
+    * Represents the state of the ANSI color state machine at any point in the
+    * string.
+    */
   case class State(color: Option[Color] = None,
                    bgColor: Option[Color] = None,
                    bold: Boolean = false,
                    underlined: Boolean = false,
                    reversed: Boolean = false) {
-
+    /**
+      * Applies a color to this state and returns a new one modified by
+      * whatever that color does.
+      */
     def transform(c: Color) = c match {
       case Black | Red | Green | Yellow | Blue | Magenta | Cyan | White =>
         this.copy(color = Some(c))
@@ -329,15 +342,15 @@ object Ansi {
         throw new Exception("WTF IS DIS " + x)
     }
 
-    def colors: Vector[Color] = {
-      val color = this.color.toVector
-      val bgColor = this.bgColor.toVector
-      val bold = if (this.bold) Vector(Bold) else Vector()
-      val underlined = if (this.underlined) Vector(Underlined ) else Vector()
-      val reversed = if (this.reversed) Vector(Reversed) else Vector()
-      color ++ bgColor ++ bold ++ underlined ++ reversed
-    }
+    /**
+      * The colors that would turn an empty state into this one
+      */
+    def colors: Vector[Color] = diffFrom(State())
 
+    /**
+      * Returns a sequence of colors that when used to `transform` the `source`
+      * state would make it equivalent to `this`
+      */
     def diffFrom(source: State): Vector[Color] = {
 
       if (!this.bold && source.bold ||

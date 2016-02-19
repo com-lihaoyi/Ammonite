@@ -115,7 +115,7 @@ lazy val repl = project
       "jline" % "jline" % "2.12",
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
       "org.apache.ivy" % "ivy" % "2.4.0",
-      "com.lihaoyi" %% "scalaparse" % "0.3.4",
+      "com.lihaoyi" %% "scalaparse" % "0.3.5",
       "com.lihaoyi" %% "upickle" % "0.3.8",
       "com.lihaoyi" %% "pprint" % "0.3.8",
       "com.github.scopt" %% "scopt" % "3.3.0"

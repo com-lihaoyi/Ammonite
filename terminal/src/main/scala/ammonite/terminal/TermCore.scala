@@ -248,7 +248,11 @@ object TermCore {
         actualWidth
       )
 
-      def updateState(s: LazyList[Int], b: Vector[Char], c: Int, msg: Ansi.Str): (Int, TermState) = {
+      def updateState(s: LazyList[Int],
+                      b: Vector[Char],
+                      c: Int,
+                      msg: Ansi.Str): (Int, TermState) = {
+
         val newCursor = math.max(math.min(c, b.length), 0)
         val nextUps =
           if (moreInputComing) ups
