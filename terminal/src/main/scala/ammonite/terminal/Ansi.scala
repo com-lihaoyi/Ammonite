@@ -137,11 +137,9 @@ object Ansi {
 
             if (screenLength < start && screenLength + fragLength >= start){
               // Turning it on
-              if (state.transform(overlayColor) == state) output.append(c)
+              if (state.transform(overlayColor) == state) append(c)
               else {
-                val splitIndex = start - screenLength
-                val (pre, post) = c.value.splitAt(splitIndex)
-
+                val (pre, post) = c.value.splitAt(start - screenLength)
                 append(Content(pre))
                 append(overlayColor)
                 append(Content(post))
@@ -149,29 +147,22 @@ object Ansi {
             }else if (screenLength < end && screenLength + fragLength >= end){
               // Turning it off
 
-              if (newCurrentState == state) output.append(c)
+              if (newCurrentState == state) append(c)
               else {
-                val splitIndex = end - screenLength
-                val (pre, post) = c.value.splitAt(splitIndex)
-                val resetColors = state.diffFrom(newCurrentState)
-
+                val (pre, post) = c.value.splitAt(end - screenLength)
                 append(Content(pre))
-                resetColors.foreach(append(_))
+                state.diffFrom(newCurrentState).foreach(append(_))
                 append(Content(post))
               }
 
-            }else output.append(c)
+            }else append(c)
           case c: Color =>
             // Inside the range
             if (screenLength >= start && screenLength <= end){
-              val stompedState = newCurrentState.transform(c)
-              val stompedState2 = stompedState.transform(overlayColor)
-              if (stompedState2 != newCurrentState){
-                append(c)
-                if (stompedState != stompedState) {
-                  append(overlayColor)
-                }
-              }
+              val stompedState = newCurrentState.transform(c).transform(overlayColor)
+
+              stompedState.diffFrom(newCurrentState).foreach(append)
+
             }else{// Outside, just add stuff if it makes a difference
               if (state.transform(c) != state) {
                 append(c)
