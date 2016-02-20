@@ -94,7 +94,7 @@ class TestRepl {
               assert{identity(error); identity(warning); normalize(out) == normalize(expected)}
             )
 
-          case Res.Failure(failureMsg) =>
+          case Res.Failure(ex, failureMsg) =>
             assert({identity(error); identity(warning); identity(out); identity(expected); false})
           case Res.Exception(ex, failureMsg) =>
             val trace = Repl.showException(ex, "", "", "") + "\n" +  failureMsg
@@ -117,7 +117,7 @@ class TestRepl {
       Parsers.split(input).get.get.value
     )
     processed match{
-      case Res.Failure(s) => printer.error(s)
+      case Res.Failure(ex, s) => printer.error(s)
       case Res.Exception(throwable, msg) =>
         printer.error(Repl.showException(throwable, "", "", ""))
       case _ =>
@@ -133,7 +133,7 @@ class TestRepl {
 
     processed match{
       case Res.Success(v) => assert({identity(v); identity(allOutput); false})
-      case Res.Failure(s) =>
+      case Res.Failure(ex, s) =>
         failLoudly(assert(failureCheck(s)))
       case Res.Exception(ex, s) =>
         val msg = Repl.showException(ex, "", "", "") + "\n" + s

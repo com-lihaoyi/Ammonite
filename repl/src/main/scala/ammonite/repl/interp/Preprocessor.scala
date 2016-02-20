@@ -120,7 +120,7 @@ object Preprocessor{
     def complete(code: String, wrapperId: String, postSplit: Seq[String]) = {
       val reParsed = postSplit.map(p => (parse(p), p))
       val errors = reParsed.collect{case (Left(e), _) => e }
-      if (errors.length != 0) Res.Failure(errors.mkString("\n"))
+      if (errors.length != 0) Res.Failure(None, errors.mkString("\n"))
       else {
         val allDecls = for (((Right(trees), code), i) <- reParsed.zipWithIndex) yield {
           // Suffix the name of the result variable with the index of

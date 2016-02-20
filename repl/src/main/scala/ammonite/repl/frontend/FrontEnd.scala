@@ -101,6 +101,7 @@ object FrontEnd{
               case Some(Parsed.Failure(p, index, extra)) =>
                 addHistory(code)
                 Res.Failure(
+                  None,
                   fastparse.core.ParseError.msg(extra.input, extra.traced.expected, index)
                 )
               case None => readCode(code + "\n")

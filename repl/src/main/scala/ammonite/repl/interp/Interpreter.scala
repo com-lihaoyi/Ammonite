@@ -88,8 +88,7 @@ class Interpreter(prompt0: Ref[String],
                 .combinePrints(${printSnippet.mkString(", ")})
         """,
         printer,
-        extraImports,
-        lastException = _  //passing a setter partial function to update lastEx
+        extraImports
       )
     } finally Thread.currentThread().setContextClassLoader(oldClassloader)
   }
@@ -125,7 +124,7 @@ class Interpreter(prompt0: Ref[String],
 
     val blocks = blocks0.map(preprocess(_, ""))
     Timer("processScript 1")
-    val errors = blocks.collect{ case Res.Failure(err) => err }
+    val errors = blocks.collect{ case Res.Failure(ex, err) => err }
     Timer("processScript 2")
     // we store the old value, because we will reassign this in the loop
     val outerScriptImportCallback = scriptImportCallback
@@ -156,7 +155,7 @@ class Interpreter(prompt0: Ref[String],
         val ev = evaluate(code, scriptImports)
         Timer("processScript loop 2")
         ev match {
-          case Res.Failure(msg) => throw new CompilationError(msg)
+          case Res.Failure(ex, msg) => throw new CompilationError(msg)
           case Res.Exception(throwable, msg) => throw throwable
           case Res.Success(ev) =>
             val last = Frame.mergeImports(ev.imports, nestedScriptImports)
@@ -186,8 +185,10 @@ class Interpreter(prompt0: Ref[String],
       case Res.Success(ev) =>
         eval.update(ev.imports)
         true
-      case Res.Failure(msg) => true
-      case Res.Exception(ex, msg) => true
+      case Res.Failure(ex, msg) =>    lastException = ex.getOrElse(lastException)
+                                  true
+      case Res.Exception(ex, msg) =>  lastException = ex
+                                      true
     }
   }
 

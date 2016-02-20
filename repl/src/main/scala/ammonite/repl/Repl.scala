@@ -92,7 +92,7 @@ class Repl(input: InputStream,
         case Res.Exit(value) =>
           printStream.println("Bye!")
           value
-        case Res.Failure(msg) => printer.error(msg)
+        case Res.Failure(ex, msg) => printer.error(msg)
         case Res.Exception(ex, msg) =>
           printer.error(
             Repl.showException(ex, colors().error(), colors().reset(), colors().literal())
