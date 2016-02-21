@@ -61,26 +61,26 @@ object Internals{
   }
 
   trait Reader{
-    def readIn(p: Path): InputStream
-    def apply(arg: Path) = {
+    def readIn(p: InputPath): InputStream
+    def apply(arg: InputPath) = {
       val is = readIn(arg)
       val res = io.Source.fromInputStream(is).mkString
       is.close()
       res
     }
 
-    object lines extends StreamableOp1[Path, String, Vector[String]]{
-      def materialize(src: Path, i: Iterator[String]) = i.toVector
-      object iter extends (Path => Iterator[String]){
-        def apply(arg: Path) = {
+    object lines extends StreamableOp1[InputPath, String, Vector[String]]{
+      def materialize(src: InputPath, i: Iterator[String]) = i.toVector
+      object iter extends (InputPath => Iterator[String]){
+        def apply(arg: InputPath) = {
           val is = readIn(arg)
-          val s = io.Source.fromInputStream(is)
+          val s = io.Source.fromInputStream(is, "UTF-8")
           new SelfClosingIterator(s.getLines, () => s.close())
         }
       }
     }
-    object bytes extends Function1[Path, Array[Byte]]{
-      def apply(arg: Path) = {
+    object bytes extends Function1[InputPath, Array[Byte]]{
+      def apply(arg: InputPath) = {
         val is = readIn(arg)
         val out = new java.io.ByteArrayOutputStream()
         val buffer = new Array[Byte](8192)
@@ -98,11 +98,11 @@ object Internals{
   class Writable(val writeableData: Array[Byte])
 
   object Writable{
-    implicit def WritableString(s: String) = new Writable(s.getBytes)
+    implicit def WritableString(s: String) = new Writable(s.getBytes("UTF-8"))
     implicit def WritableArray(a: Array[Byte]) = new Writable(a)
     implicit def WritableArray2(a: Array[Array[Byte]]) = new Writable(a.flatten)
     implicit def WritableTraversable(a: Traversable[String]) = {
-      new Writable(a.mkString("\n").getBytes)
+      new Writable(a.mkString("\n").getBytes("UTF-8"))
     }
   }
 }
@@ -132,14 +132,38 @@ object mkdir extends Function1[Path, Unit]{
 }
 
 
+trait CopyMove extends Function2[Path, Path, Unit]{
+
+  /**
+    * Copy or move a file into a particular folder, rather
+    * than into a particular path
+    */
+  object into extends Function2[Path, Path, Unit]{
+    def apply(from: Path, to: Path) = {
+      CopyMove.this(from, to/from.last)
+    }
+  }
+
+  /**
+    * Copy or move a file, stomping over anything
+    * that may have been there before
+    */
+  object over extends Function2[Path, Path, Unit]{
+    def apply(from: Path, to: Path) = {
+      rm(to)
+      CopyMove.this(from, to)
+    }
+  }
+}
+
 /**
  * Moves a file or folder from one place to another.
  *
  * Creates any necessary directories
  */
-object mv extends Function2[Path, Path, Unit] with Internals.Mover{
+object mv extends Function2[Path, Path, Unit] with Internals.Mover with CopyMove{
   def apply(from: Path, to: Path) =
-    java.nio.file.Files.move(from.nio, to.nio)
+    java.nio.file.Files.move(from.toNIO, to.toNIO)
 
   def check = false
 
@@ -153,15 +177,16 @@ object mv extends Function2[Path, Path, Unit] with Internals.Mover{
  * Creates any necessary directories, and copies folders
  * recursively.
  */
-object cp extends Function2[Path, Path, Unit] {
+object cp extends Function2[Path, Path, Unit] with CopyMove{
   def apply(from: Path, to: Path) = {
     def copyOne(p: Path) = {
-      Files.copy(Paths.get(p.toString), Paths.get((to/(p relativeTo from)).toString))
+      Files.copy(p.toNIO, (to/(p relativeTo from)).toNIO)
     }
 
     copyOne(from)
     if (stat(from).isDir) FilterMapExt(ls.rec! from) | copyOne
   }
+
 }
 
 /**
@@ -218,7 +243,7 @@ object ls extends StreamableOp1[Path, Path, LsSeq] with ImplicitOp[LsSeq]{
   object iter extends (Path => Iterator[Path]){
     def apply(arg: Path) = {
       import scala.collection.JavaConverters._
-      val dirStream = Files.newDirectoryStream(arg.nio)
+      val dirStream = Files.newDirectoryStream(arg.toNIO)
       new SelfClosingIterator(
         dirStream.iterator().asScala.map(x => Path(x)),
         () => dirStream.close()
@@ -280,7 +305,7 @@ object ls extends StreamableOp1[Path, Path, LsSeq] with ImplicitOp[LsSeq]{
 object write extends Function2[Path, Internals.Writable, Unit]{
   def apply(target: Path, data: Internals.Writable) = {
     mkdir(target/RelPath.up)
-    Files.write(target.nio, data.writeableData, StandardOpenOption.CREATE_NEW)
+    Files.write(target.toNIO, data.writeableData, StandardOpenOption.CREATE_NEW)
   }
 
   /**
@@ -291,7 +316,7 @@ object write extends Function2[Path, Internals.Writable, Unit]{
     def apply(target: Path, data: Internals.Writable) = {
       mkdir(target/RelPath.up)
       Files.write(
-        target.nio,
+        target.toNIO,
         data.writeableData,
         StandardOpenOption.CREATE,
         StandardOpenOption.APPEND
@@ -305,7 +330,7 @@ object write extends Function2[Path, Internals.Writable, Unit]{
   object over extends Function2[Path, Internals.Writable, Unit]{
     def apply(target: Path, data: Internals.Writable) = {
       mkdir(target/RelPath.up)
-      Files.write(target.nio, data.writeableData)
+      Files.write(target.toNIO, data.writeableData)
     }
   }
 }
@@ -315,24 +340,8 @@ object write extends Function2[Path, Internals.Writable, Unit]{
  * Reads a file into memory, either as a String,
  * as (read.lines(...): Seq[String]), or as (read.bytes(...): Array[Byte]).
  */
-object read extends Internals.Reader with Function1[Path, String]{
-  def readIn(p: Path) = {
-    java.nio.file.Files.newInputStream(p.nio)
-  }
-
-  /**
-   * Reads a classpath resource into memory, either as a
-   * string, as a Seq[String] of lines, or as a Array[Byte]
-   */
-  object resource extends Internals.Reader with Function1[Path, String]{
-    def readIn(p: Path) = {
-      val ret = getClass.getResourceAsStream(p.toString)
-      ret match{
-        case null => throw new java.nio.file.NoSuchFileException(p.toString)
-        case _ => ret
-      }
-    }
-  }
+object read extends Internals.Reader with Function1[InputPath, String]{
+  def readIn(p: InputPath) = p.newInputStream()
 }
 
 /**
@@ -367,7 +376,7 @@ object exists extends Function1[Path, Boolean]{
 case class kill(signal: Int) extends Function1[Int, CommandResult]{
   def apply(pid: Int): CommandResult = {
 
-    %%.kill("-" + signal, pid.toString)(wd = Path(new java.io.File("")))
+    %%('kill, "-" + signal, pid.toString)(wd = Path(new java.io.File("")))
   }
 }
 

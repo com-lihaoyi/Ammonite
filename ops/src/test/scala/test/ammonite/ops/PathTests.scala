@@ -9,41 +9,46 @@ object PathTests extends TestSuite{
   val tests = TestSuite {
     'Basic{
       val rel = 'src/'main/'scala
-      'Transformers{
-        assert(
-          // ammonite.Path to java.nio.file.Path
-          (root/'omg).nio == Paths.get("/omg"),
-          (empty/'omg).nio == Paths.get("omg"),
+      'Transformers - {
+        if(Unix()){
+          assert(
+            // ammonite.Path to java.nio.file.Path
+            (root/'omg).toNIO == Paths.get("/omg"),
 
-          // java.nio.file.Path to ammonite.Path
-          root/'omg == Paths.get("/omg").amm,
-          empty/'omg == Paths.get("omg").amm,
+            // java.nio.file.Path to ammonite.Path
+            root/'omg == Path(Paths.get("/omg")),
+            empty/'omg == RelPath(Paths.get("omg")),
 
-          // ammonite.Path to String
-          (root/'omg).toString == "/omg",
-          (empty/'omg).toString == "omg",
+            // ammonite.Path to String
+            (root/'omg).toString == "/omg",
+            (empty/'omg).toString == "omg",
 
-          // String to ammonite.Path
-          root/'omg == Path("/omg"),
-          empty/'omg == RelPath("omg")
-        )
+            // String to ammonite.Path
+            root/'omg == Path("/omg"),
+            empty/'omg == RelPath("omg")
+          )
+        }
       }
 
       'RelPath{
         'Constructors {
           'Symbol {
-            val rel1 = rel / 'ammonite
-            assert(
-              rel1.segments == Seq("src", "main", "scala", "ammonite"),
-              rel1.toString == "src/main/scala/ammonite"
-            )
+            if (Unix()){
+              val rel1 = rel / 'ammonite
+              assert(
+                rel1.segments == Seq("src", "main", "scala", "ammonite"),
+                rel1.toString == "src/main/scala/ammonite"
+              )
+            }
           }
           'String {
-            val rel1 = rel / "Path.scala"
-            assert(
-              rel1.segments == Seq("src", "main", "scala", "Path.scala"),
-              rel1.toString == "src/main/scala/Path.scala"
-            )
+            if (Unix()){
+              val rel1 = rel / "Path.scala"
+              assert(
+                rel1.segments == Seq("src", "main", "scala", "Path.scala"),
+                rel1.toString == "src/main/scala/Path.scala"
+              )
+            }
           }
           'Combos{
             def check(rel1: RelPath) = assert(
@@ -51,18 +56,30 @@ object PathTests extends TestSuite{
               rel1.toString == "src/main/scala/sub1/sub2"
             )
             'ArrayString - {
-              val arr = Array("sub1", "sub2")
-              check(rel / arr)
+              if (Unix()){
+                val arr = Array("sub1", "sub2")
+                check(rel / arr)
+              }
             }
             'ArraySymbol - {
-              val arr = Array('sub1, 'sub2)
-              check(rel / arr)
+              if (Unix()){
+                val arr = Array('sub1, 'sub2)
+                check(rel / arr)
+              }
             }
-            'SeqString - check(rel / Seq("sub1", "sub2"))
-            'SeqSymbol - check(rel / Seq('sub1, 'sub2))
-            'SeqSeqSeqSymbol - check(
-              rel / Seq(Seq(Seq('sub1), Seq()), Seq(Seq('sub2)), Seq())
-            )
+            'SeqString - {
+              if (Unix()) check(rel / Seq("sub1", "sub2"))
+            }
+            'SeqSymbol - {
+              if (Unix()) check(rel / Seq('sub1, 'sub2))
+            }
+            'SeqSeqSeqSymbol - {
+              if (Unix()){
+                check(
+                  rel / Seq(Seq(Seq('sub1), Seq()), Seq(Seq('sub2)), Seq())
+                )
+              }
+            }
           }
         }
         'Relativize{
@@ -79,7 +96,7 @@ object PathTests extends TestSuite{
         val d = cwd
         val abs = d / rel
         'Constructor {
-          assert(
+          if (Unix()) assert(
             abs.toString.drop(d.toString.length) == "/src/main/scala",
             abs.toString.length > d.toString.length
           )
@@ -152,8 +169,13 @@ object PathTests extends TestSuite{
     }
     'Errors{
       'InvalidChars {
-        val ex = intercept[PathError.InvalidSegment]('src / "Main/.scala")
+        val ex = intercept[PathError.InvalidSegment]('src/"Main/.scala")
+
         val PathError.InvalidSegment("Main/.scala") = ex
+
+        val ex2 = intercept[PathError.InvalidSegment](root/"hello"/".."/"world")
+
+        val PathError.InvalidSegment("..") = ex2
       }
       'InvalidSegments{
         intercept[PathError.InvalidSegment]{root/ "core/src/test"}
@@ -189,8 +211,10 @@ object PathTests extends TestSuite{
           )
       }
       'InvalidCasts{
-        intercept[IllegalArgumentException](Path("omg/cow"))
-        intercept[IllegalArgumentException](RelPath("/omg/cow"))
+        if(Unix()){
+          intercept[IllegalArgumentException](Path("omg/cow"))
+          intercept[IllegalArgumentException](RelPath("/omg/cow"))
+        }
       }
       'Pollution{
         // Make sure we're not polluting too much
@@ -247,6 +271,71 @@ object PathTests extends TestSuite{
         Seq(up/'c, up/up/'c, 'b/'c, 'a/'c, 'a/'d).sorted ==
           Seq('a/'c, 'a/'d, 'b/'c, up/'c, up/up/'c)
       )
+    }
+    'construction{
+      'success{
+        if(Unix()){
+          val relStr = "hello/cow/world/.."
+          val absStr = "/hello/world"
+
+          assert(
+            RelPath(relStr) == 'hello/'cow,
+            Path(absStr) == root/'hello/'world
+
+          )
+
+          // You can also pass in java.io.File and java.nio.file.Path
+          // objects instead of Strings when constructing paths
+          val relIoFile = new java.io.File(relStr)
+          val absNioFile = java.nio.file.Paths.get(absStr)
+
+          assert(
+            RelPath(relIoFile) == 'hello/'cow,
+            Path(absNioFile) == root/'hello/'world,
+            Path(relIoFile, root/'base) == root/'base/'hello/'cow
+          )
+        }
+      }
+      'basepath{
+        if(Unix()){
+          val relStr = "hello/cow/world/.."
+          val absStr = "/hello/world"
+          assert(
+            BasePath(relStr) == 'hello/'cow,
+            BasePath(absStr) == root/'hello/'world
+          )
+        }
+      }
+      'based{
+        if(Unix()){
+          val relStr = "hello/cow/world/.."
+          val absStr = "/hello/world"
+          val basePath: BasePath = BasePath(relStr)
+          assert(
+            Path(relStr, root/'base) == root/'base/'hello/'cow,
+            Path(absStr, root/'base) == root/'hello/'world,
+            Path(basePath, root/'base) == root/'base/'hello/'cow
+          )
+        }
+      }
+      'failure{
+        if(Unix()){
+          val relStr = "hello/.."
+          intercept[java.lang.IllegalArgumentException]{
+            Path(relStr)
+          }
+
+          val absStr = "/hello"
+          intercept[java.lang.IllegalArgumentException]{
+            RelPath(absStr)
+          }
+
+          val tooManyUpsStr = "/hello/../.."
+          intercept[PathError.AbsolutePathOutsideRoot.type]{
+            Path(tooManyUpsStr)
+          }
+        }
+      }
     }
   }
 }

@@ -3,6 +3,7 @@ package ammonite.terminal
 import java.io.OutputStreamWriter
 
 
+import ammonite.terminal.GUILikeFilters.SelectionFilter
 import ammonite.terminal.LazyList.~:
 
 import scala.annotation.tailrec
@@ -18,19 +19,20 @@ import scala.annotation.tailrec
 object Main{
 
   def main(args: Array[String]): Unit = {
+    System.setProperty("ammonite-sbt-build", "true")
     var history = List.empty[String]
     val selection = GUILikeFilters.SelectionFilter(indent = 4)
     def multilineFilter: TermCore.Filter = {
-      case TermState(13 ~: rest, b, c) if b.count(_ == '(') != b.count(_ == ')') =>
+      case TermState(13 ~: rest, b, c, _) if b.count(_ == '(') != b.count(_ == ')') =>
         BasicFilters.injectNewLine(b, c, rest)
     }
     val reader = new java.io.InputStreamReader(System.in)
     rec()
     @tailrec def rec(): Unit = {
       val historyFilter = new HistoryFilter(
-        () => history.toVector, Console.BLUE, Ansi.resetForegroundColor)
+        () => history.toVector, Console.BLUE, AnsiNav.resetForegroundColor)
       TermCore.readLine(
-        Console.MAGENTA + (0 until 10).mkString + "\n@ " + Console.RESET,
+        Console.MAGENTA + (0 until 10).mkString + "\n@@@ " + Console.RESET,
         reader,
         new OutputStreamWriter(System.out),
         historyFilter orElse
@@ -46,30 +48,23 @@ object Main{
         // Example displayTransform: underline all non-spaces
         displayTransform = (buffer, cursor) => {
           // underline all non-blank lines
+
           def hl(b: Vector[Char]): Vector[Char] = b.flatMap{
             case ' ' => " "
             case '\n' => "\n"
-            case c => Console.UNDERLINED + c + Ansi.resetUnderline
+            case c => Console.UNDERLINED + c + Console.RESET
           }
           // and highlight the selection
-          val (newBuffer, newCursor) = selection.mark match{
-            case Some(mark) if mark != cursor =>
-              val Seq(min, max) = Seq(mark, cursor).sorted
-              val (a, b0) = buffer.splitAt(min)
-              val (b, c) = b0.splitAt(max - min)
-              val displayOffset = if (cursor < mark) 0 else -1
-              (
-                hl(a) ++ Console.BLUE_B ++ b ++ Ansi.resetBackgroundColor ++ hl(c),
-                displayOffset
-              )
-
-            case _ => (hl(buffer), 0)
-          }
-          val newNewBuffer = HistoryFilter.mangleBuffer(
-            historyFilter, buffer, cursor,
-            Console.GREEN, Ansi.resetForegroundColor
+          val ansiBuffer = Ansi.Str.parse(hl(buffer))
+          val (newBuffer, cursorOffset) = SelectionFilter.mangleBuffer(
+            selection, ansiBuffer, cursor, Ansi.Reversed
           )
-          (newNewBuffer, newCursor)
+          val newNewBuffer = HistoryFilter.mangleBuffer(
+            historyFilter, newBuffer, cursor,
+            Ansi.Green
+          )
+
+          (newNewBuffer, cursorOffset)
         }
       ) match {
         case None => println("Bye!")

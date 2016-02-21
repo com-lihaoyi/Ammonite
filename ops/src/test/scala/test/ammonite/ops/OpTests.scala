@@ -42,7 +42,7 @@ object OpTests extends TestSuite{
       )
     }
     'readResource{
-      assert(read.resource(root/'testdata/"File.txt").contains(
+      assert(read(resource/'testdata/"File.txt").contains(
         "I weigh twice as much as you"
       ))
     }
@@ -220,7 +220,7 @@ object OpTests extends TestSuite{
         'nonexistant{
           * - intercept[nio.NoSuchFileException](ls! d/'nonexistent)
           * - intercept[nio.NoSuchFileException](read! d/'nonexistent)
-          * - intercept[nio.NoSuchFileException](read.resource! d/'nonexistent)
+          * - intercept[nio.NoSuchFileException](read! resource/'failures/'nonexistent)
           * - intercept[nio.NoSuchFileException](cp! d/'nonexistent ! d/'yolo)
           * - intercept[nio.NoSuchFileException](mv! d/'nonexistent ! d/'yolo)
         }

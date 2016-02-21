@@ -103,11 +103,14 @@ object TermCore {
 
   type Filter = PartialFunction[TermInfo, TermAction]
   type Action = (Vector[Char], Int) => (Vector[Char], Int)
+  type MsgAction = (Vector[Char], Int) => (Vector[Char], Int, String)
   trait DelegateFilter extends Filter{
     def filter: Filter
     def isDefinedAt(x: TermInfo) = filter.isDefinedAt(x)
     def apply(v1: TermInfo) = filter(v1)
   }
+
+  def noTransform(x: Vector[Char], i: Int) = (Ansi.Str.parse(x), i)
   /**
    * Blockingly reads a line from the given input stream and returns it.
    *
@@ -124,61 +127,91 @@ object TermCore {
                reader: java.io.Reader,
                writer: java.io.Writer,
                filters: PartialFunction[TermInfo, TermAction] = PartialFunction.empty,
-               displayTransform: (Vector[Char], Int) => (Vector[Char], Int) = (x, i) => (x, i))
+               displayTransform: (Vector[Char], Int) => (Ansi.Str, Int) = noTransform)
                : Option[String] = {
 
-    def redrawLine(buffer: Vector[Char],
+    /**
+      * Erases the previous line and re-draws it with the new buffer and
+      * cursor.
+      *
+      * Relies on `ups` to know how "tall" the previous line was, to go up
+      * and erase that many rows in the console. Performs a lot of horrific
+      * math all over the place, incredibly prone to off-by-ones, in order
+      * to at the end of the day position the cursor in the right spot.
+      */
+    def redrawLine(buffer: Ansi.Str,
                    cursor: Int,
                    ups: Int,
                    rowLengths: Seq[Int],
-                   fullPrompt: Boolean = true) = {
-      ansi.up(ups)
+                   fullPrompt: Boolean = true,
+                   newlinePrompt: Boolean = false) = {
 
-      ansi.left(9999)
-      ansi.clearScreen(0)
 
-      writer.write(
-        if (fullPrompt) prompt.full
-        else prompt.lastLine
-      )
-      var i = 0
-      var currWidth = 0
-      while(i < buffer.length){
-        if (currWidth >= width - prompt.lastLineNoAnsi.length){
-          writer.write(" " * prompt.lastLineNoAnsi.length)
-          currWidth = 0
-        }
-
-        ansiRegex.findPrefixMatchOf(buffer.drop(i)) match{
-          case Some(m) =>
-//            Debug("Some(m) " + m.source + " | " + m.source.length)
-            writer.write(buffer.slice(i, i + m.end).toArray)
-            i += m.end
-          case None =>
-//            Debug("None")
-            writer.write(buffer(i))
-            if (buffer(i) == '\n') currWidth += 9999
-            currWidth += 1
-            i += 1
-        }
+      // Enable this in certain cases (e.g. cursor near the value you are
+      // interested into) see what's going on with all the ansi screen-cursor
+      // movement
+      def debugDelay() = if (false){
+        Thread.sleep(200)
+        writer.flush()
       }
 
-      val fragHeights = calculateHeight0(rowLengths, width - prompt.lastLineNoAnsi.length)
+
+      val promptLine =
+        if (fullPrompt) prompt.full
+        else prompt.lastLine
+
+      val promptWidth = if(newlinePrompt) 0 else prompt.lastLine.length
+      val actualWidth = width - promptWidth
+
+      ansi.up(ups)
+      ansi.left(9999)
+      ansi.clearScreen(0)
+      writer.write(promptLine.toString)
+      if (newlinePrompt) writer.write("\n")
+
+      // Under `newlinePrompt`, we print the thing verbatim, since we want to
+      // avoid breaking code by adding random indentation. If not, we are
+      // guaranteed that the lines are short, so we can indent the newlines
+      // without fear of wrapping
+      writer.write(
+        if (newlinePrompt) buffer.render.toArray
+        else{
+          val indent = " " * prompt.lastLine.length
+          buffer.render.flatMap{
+            case '\n' => Array('\n', indent:_*)
+            case x => Array(x)
+          }.toArray
+        }
+      )
+
+      val nonAnsiBufferLength = rowLengths.length + rowLengths.sum - 1
+
+      if (cursor == nonAnsiBufferLength){
+        // I'm not sure why this is necessary, but it seems that without it, a
+        // cursor that "barely" overshoots the end of a line, at the end of the
+        // buffer, does not properly wrap and ends up dangling off the
+        // right-edge of the terminal window!
+        //
+        // This causes problems later since the cursor is at the wrong X/Y,
+        // confusing the rest of the math and ending up over-shooting on the
+        // `ansi.up` calls, over-writing earlier lines. This prints a single
+        // space such that instead of dangling it forces the cursor onto the
+        // next line for-realz. If it isn't dangling the extra space is a no-op
+        writer.write(" ")
+      }
+      val fragHeights = calculateHeight0(rowLengths, actualWidth)
       val (cursorY, cursorX) = positionCursor(
         cursor,
         rowLengths,
         fragHeights,
-        width - prompt.lastLineNoAnsi.length
+        actualWidth
       )
-
       ansi.up(fragHeights.sum - 1)
       ansi.left(9999)
-
-//      Debug("DOWN " + cursorY)
-//      Debug("RIGHT " + cursorX)
       ansi.down(cursorY)
       ansi.right(cursorX)
-      ansi.right(prompt.lastLineNoAnsi.length)
+      if (!newlinePrompt) ansi.right(prompt.lastLine.length)
+
       writer.flush()
     }
 
@@ -186,54 +219,66 @@ object TermCore {
     def readChar(lastState: TermState, ups: Int, fullPrompt: Boolean = true): Option[String] = {
       val moreInputComing = reader.ready()
 
-      lazy val (transformedBuffer, cursorOffset) = displayTransform(
+      lazy val (transformedBuffer0, cursorOffset) = displayTransform(
         lastState.buffer,
         lastState.cursor
       )
 
+      val transformedBuffer = transformedBuffer0 ++ lastState.msg
       lazy val lastOffsetCursor = lastState.cursor + cursorOffset
-
       lazy val rowLengths = splitBuffer(
-        ansiRegex.replaceAllIn(lastState.buffer, "").toVector
+        ansiRegex.replaceAllIn(lastState.buffer ++ lastState.msg.render, "").toVector
       )
+      val narrowWidth = width - prompt.lastLine.length
+      val newlinePrompt = rowLengths.exists(_ >= narrowWidth)
+      val promptWidth = if(newlinePrompt) 0 else prompt.lastLine.length
+      val actualWidth = width - promptWidth
+      val newlineUp = if (newlinePrompt) 1 else 0
       if (!moreInputComing) redrawLine(
         transformedBuffer,
         lastOffsetCursor,
         ups,
         rowLengths,
-        fullPrompt
+        fullPrompt,
+        newlinePrompt
       )
 
       lazy val (oldCursorY, _) = positionCursor(
         lastOffsetCursor,
         rowLengths,
-        calculateHeight0(rowLengths, width - prompt.lastLineNoAnsi.length),
-        width - prompt.lastLineNoAnsi.length
+        calculateHeight0(rowLengths, actualWidth),
+        actualWidth
       )
 
-      def updateState(s: LazyList[Int], b: Vector[Char], c: Int): (Int, TermState) = {
+      def updateState(s: LazyList[Int],
+                      b: Vector[Char],
+                      c: Int,
+                      msg: Ansi.Str): (Int, TermState) = {
+
         val newCursor = math.max(math.min(c, b.length), 0)
         val nextUps =
           if (moreInputComing) ups
-          else oldCursorY
+          else oldCursorY + newlineUp
 
-        val newState = TermState(s, b, newCursor)
+        val newState = TermState(s, b, newCursor, msg)
 
         (nextUps, newState)
       }
-      filters(TermInfo(lastState, width - prompt.lastLineNoAnsi.length)) match {
-        case Printing(TermState(s, b, c), stdout) =>
+      filters(TermInfo(lastState, actualWidth)) match {
+        case Printing(TermState(s, b, c, msg), stdout) =>
           writer.write(stdout)
-          val (nextUps, newState) = updateState(s, b, c)
+          val (nextUps, newState) = updateState(s, b, c, msg)
           readChar(newState, nextUps)
 
-        case TermState(s, b, c) =>
-//          Debug("TermState c\t" + c)
-          val (nextUps, newState) = updateState(s, b, c)
+        case TermState(s, b, c, msg) =>
+          val (nextUps, newState) = updateState(s, b, c, msg)
           readChar(newState, nextUps, false)
 
         case Result(s) =>
-          redrawLine(transformedBuffer, lastState.buffer.length, oldCursorY, rowLengths, false)
+          redrawLine(
+            transformedBuffer, lastState.buffer.length,
+            oldCursorY + newlineUp, rowLengths, false, newlinePrompt
+          )
           writer.write(10)
           writer.write(13)
           writer.flush()
@@ -248,10 +293,10 @@ object TermCore {
       }
     }
 
-    lazy val ansi = new Ansi(writer)
+    lazy val ansi = new AnsiNav(writer)
     lazy val (width, _, initialConfig) = TTY.init()
     try {
-      readChar(TermState(LazyList.continually(reader.read()), Vector.empty, 0), 0)
+      readChar(TermState(LazyList.continually(reader.read()), Vector.empty, 0, ""), 0)
     }finally{
 
       // Don't close these! Closing these closes stdin/stdout,
@@ -270,12 +315,13 @@ sealed trait TermAction
 case class Printing(ts: TermState, stdout: String) extends TermAction
 case class TermState(inputs: LazyList[Int],
                      buffer: Vector[Char],
-                     cursor: Int) extends TermAction
+                     cursor: Int,
+                     msg: Ansi.Str = "") extends TermAction
 object TermState{
-  def unapply(ti: TermInfo): Option[(LazyList[Int], Vector[Char], Int)] = {
+  def unapply(ti: TermInfo): Option[(LazyList[Int], Vector[Char], Int, Ansi.Str)] = {
     TermState.unapply(ti.ts)
   }
-  def unapply(ti: TermAction): Option[(LazyList[Int], Vector[Char], Int)] = ti match{
+  def unapply(ti: TermAction): Option[(LazyList[Int], Vector[Char], Int, Ansi.Str)] = ti match{
     case ts: TermState => TermState.unapply(ts)
     case _ => None
   }
@@ -287,64 +333,15 @@ case class Result(s: String) extends TermAction
 
 
 object Prompt {
-
-  import Console._
-
-  private val colors = Set(BLACK, BLUE, CYAN, GREEN, MAGENTA, RED, WHITE, YELLOW)
-  private val bgColors = Set(BLACK_B, BLUE_B, CYAN_B, GREEN_B, MAGENTA_B, RED_B, WHITE_B, YELLOW_B)
-
-  implicit def apply(prompt: String) = {
-    val lastLineBegin = prompt.lastIndexOf("\n")
-    if (lastLineBegin == -1) {
-      new Prompt(prompt, prompt)
-    } else {
-      val preLastLines = prompt.substring(0, lastLineBegin)
-      val ansiEscapeState = TermCore.ansiRegex
-        .findAllIn(preLastLines)
-        .toSeq
-        .reverseIterator
-        .takeWhile(_ != Console.RESET)
-        .foldLeft(new AnsiEscapeState) {
-          case (state, color) if state.color.isEmpty && colors.contains(color) =>
-            state.copy(color = Some(color))
-          case (state, bgColor) if state.bgColor.isEmpty && bgColors.contains(bgColor)=>
-            state.copy(bgColor = Some(bgColor))
-          case (state, REVERSED) =>
-            state.copy(reversed = true)
-          case (state, BOLD) =>
-            state.copy(bold = true)
-          case (state, UNDERLINED) =>
-            state.copy(underlined = true)
-          case (state, _) =>
-            state
-        }
-      val lastLine = ansiEscapeState + prompt.substring(lastLineBegin + 1)
-      new Prompt(prompt, lastLine)
-    }
+  implicit def construct(prompt: String): Prompt = {
+    val parsedPrompt = Ansi.Str.parse(prompt)
+    val index = parsedPrompt.plainText.lastIndexOf('\n')
+    val (_, last) = parsedPrompt.splitAt(index+1)
+    Prompt(parsedPrompt, last)
   }
 }
 
-case class Prompt(
-  full: String,
-  lastLine: String) {
+case class Prompt(full: Ansi.Str, lastLine: Ansi.Str)
 
-  val lastLineNoAnsi = TermCore.ansiRegex.replaceAllIn(lastLine, "")
-}
 
-case class AnsiEscapeState(
-  color: Option[String] = None,
-  bgColor: Option[String] = None,
-  bold: Boolean = false,
-  underlined: Boolean = false,
-  reversed: Boolean = false) {
-  override def toString: String = {
-    val builder = new StringBuilder(25)
-    color.map(builder.append(_))
-    bgColor.map(builder.append(_))
-    if (bold) builder.append(Console.BOLD)
-    if (underlined) builder.append(Console.UNDERLINED)
-    if (reversed) builder.append(Console.REVERSED)
-    builder.toString
-  }
-}
 

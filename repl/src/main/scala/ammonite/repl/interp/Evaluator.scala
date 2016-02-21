@@ -228,7 +228,8 @@ object Evaluator{
       _ = currentLine += 1
       _ <- Catching{
         // Exit
-        case Ex(_: InvEx, _: InitEx, ReplExit(value))  => Res.Exit(value)
+        case Ex(_: InvEx, _: InitEx, ReplExit(value))  =>
+          Res.Exit(value)
         // Interrupted during pretty-printing
         case Ex(e: ThreadDeath)                 =>  interrupted(e)
 
@@ -238,6 +239,7 @@ object Evaluator{
         case Ex(_: InvEx, _: InitEx, userEx@_*) =>   Res.Exception(userEx(0), "")
         case Ex(_: InvEx, userEx@_*)            =>   Res.Exception(userEx(0), "")
         case Ex(userEx@_*)                      =>   Res.Exception(userEx(0), "")
+
       }
     } yield {
       // Exhaust the printer iterator now, before exiting the `Catching`

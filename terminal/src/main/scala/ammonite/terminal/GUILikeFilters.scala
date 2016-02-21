@@ -5,6 +5,7 @@ import TermCore.DelegateFilter
 import LazyList._
 import SpecialKeys._
 import acyclic.file
+
 /**
  * Filters have hook into the various {Ctrl,Shift,Fn,Alt}x{Up,Down,Left,Right}
  * combination keys, and make them behave similarly as they would on a normal
@@ -68,18 +69,18 @@ object GUILikeFilters {
       Case(FnShiftRight){(b, c, m) => setMark(c); BasicFilters.moveEnd(b, c, m.width)},
       Case(FnShiftLeft){(b, c, m) => setMark(c); BasicFilters.moveStart(b, c, m.width)},
       {
-        case TS(27 ~: 91 ~: 90 ~: rest, b, c) if mark.isDefined =>
+        case TS(27 ~: 91 ~: 90 ~: rest, b, c, _) if mark.isDefined =>
           doIndent(b, c, rest,
             slice => -math.min(slice.iterator.takeWhile(_ == ' ').size, indent)
           )
 
-        case TS(9 ~: rest, b, c) if mark.isDefined => // Tab
+        case TS(9 ~: rest, b, c, _) if mark.isDefined => // Tab
           doIndent(b, c, rest,
             slice => indent
           )
 
         // Intercept every other character.
-        case TS(char ~: inputs, buffer, cursor) if mark.isDefined =>
+        case TS(char ~: inputs, buffer, cursor, _) if mark.isDefined =>
           // If it's a special command, just cancel the current selection.
           if (char.toChar.isControl &&
               char != 127 /*backspace*/ &&
@@ -100,6 +101,21 @@ object GUILikeFilters {
           }
       }
     )
+  }
+  object SelectionFilter{
+    def mangleBuffer(selectionFilter: SelectionFilter,
+                     string: Ansi.Str,
+                     cursor: Int,
+                     startColor: Ansi.Color) = {
+      selectionFilter.mark match{
+        case Some(mark) if mark != cursor =>
+          val Seq(min, max) = Seq(cursor, mark).sorted
+          val displayOffset = if (cursor < mark) 0 else -1
+          val newStr = string.overlay(startColor, min, max)
+          (newStr, displayOffset)
+        case _ => (string, 0)
+      }
+    }
   }
 
   val fnFilter = orElseAll(

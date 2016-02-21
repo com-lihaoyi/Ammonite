@@ -43,10 +43,10 @@ object ExampleTests extends TestSuite{
       // These operations are mirrored in `read.resource`,
       // `read.resource.lines` and `read.resource.bytes` to conveniently read
       // files from your classpath:
-      val resourcePath = root/'testdata/"File.txt"
-      read.resource(resourcePath).length        ==> 81
-      read.resource.bytes(resourcePath).length  ==> 81
-      read.resource.lines(resourcePath).length  ==> 4
+      val resourcePath = resource/'testdata/"File.txt"
+      read(resourcePath).length        ==> 81
+      read.bytes(resourcePath).length  ==> 81
+      read.lines(resourcePath).length  ==> 4
 
       // By default, `write` fails if there is already a file in place. Use
       // `write.append` or `write.over` if you want to append-to/overwrite
@@ -66,7 +66,7 @@ object ExampleTests extends TestSuite{
 
       // `ls` provides a listing of every direct child of the given folder.
       // Both files and folders are included
-      ls! wd  ==> Seq(wd/"file1.txt", wd/"file2.txt", wd/'file3, wd/'this)
+      ls! wd    ==> Seq(wd/"file1.txt", wd/"file2.txt", wd/'file3, wd/'this)
 
       // `ls.rec` does the same thing recursively
       ls.rec! deep ==> Seq(deep/'deeeep, deep/'deeeep/"file.txt")
@@ -75,9 +75,23 @@ object ExampleTests extends TestSuite{
       ls! deep  ==> Seq(deep/'deeeep)
       mv(deep/'deeeep, deep/'renamed_deeeep)
       ls! deep  ==> Seq(deep/'renamed_deeeep)
+
+      // `mv.into` lets you move a file into a
+      // particular folder, rather than to particular path
+      mv.into(deep/'renamed_deeeep/"file.txt", deep)
+      ls! deep/'renamed_deeeep ==> Seq()
+      ls! deep  ==> Seq(deep/"file.txt", deep/'renamed_deeeep)
+
+      // `mv.over` lets you move a file to a particular path, but
+      // if something was there before it stomps over it
+      mv.over(deep/"file.txt", deep/'renamed_deeeep)
+      ls! deep  ==> Seq(deep/'renamed_deeeep)
+      read! deep/'renamed_deeeep ==> "I am cow" // contents from file.txt
+
       // `rm!` behaves the same as `rm -rf` in Bash, and deletes anything:
       // file, folder, even a folder filled with contents
       rm! deep/'renamed_deeeep
+      rm! deep/"file.txt"
       ls! deep  ==> Seq()
 
       // You can stat paths to find out information about any file or
@@ -112,8 +126,13 @@ object ExampleTests extends TestSuite{
       // Make a folder named "folder"
       mkdir! wd/'folder
 
-      // Copy a file or folder
+      // Copy a file or folder to a particular path
       cp(wd/'folder, wd/'folder1)
+      // Copy a file or folder *into* another folder at a particular path
+      // There's also `cp.over` which copies it to a path and stomps over
+      // anything that was there before.
+      cp.into(wd/'folder, wd/'folder1)
+
 
       // List the current directory
       val listed = ls! wd
@@ -136,7 +155,8 @@ object ExampleTests extends TestSuite{
       ls! wd/'dir2 |? (_.ext == "java") | read |> write! wd/'target/"bundled.java"
 
       assert(
-        listed == Seq(wd/"folder", wd/"folder1"),
+        listed == Seq(wd/'folder, wd/'folder1),
+        ls(wd/'folder1) == Seq(wd/'folder1/'folder),
         lineCount == 4,
         renamed == Seq(wd/'dir2/"file1.java", wd/'dir2/"file2.java"),
         read(wd/'target/"bundled.java") ==
@@ -247,13 +267,14 @@ object ExampleTests extends TestSuite{
       val target = root/'target/'file
       assert(target/up == root/'target)
     }
-    'canonical{
+    'canonical - {if (Unix()){
+
       assert((root/'folder/'file/up).toString == "/folder")
       // not "/folder/file/.."
 
       assert(('folder/'file/up).toString == "folder")
       // not "folder/file/.."
-    }
+    }}
     'findWc{
       val wd = cwd/'ops/'src/'test/'resources/'testdata
 
@@ -265,9 +286,9 @@ object ExampleTests extends TestSuite{
     'addUpScalaSize{
       ls.rec! cwd |? (_.ext == "scala") | (_.size) |& (_ + _)
     }
-    'concatAll{
+    'concatAll{if (Unix()){
       ls.rec! cwd |? (_.ext == "scala") | read |> write! cwd/'target/'test/"omg.txt"
-    }
+    }}
 
     'noLongLines{
       // Ensure that we don't have any Scala files in the current working directory
