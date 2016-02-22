@@ -54,6 +54,8 @@
       @p
         You can also pass a string to the @code{run} call containing any commands or imports you want executed at the start of every run. If you want Ammonite to be available in all projects, simply add the above snippet to a new file @code{~/.sbt/0.13/global.sbt}.
 
+      @p
+        Note: Ammonite-REPL does @i{not} support Windows, even though @sect.ref{Ammonite-Ops} does. See @lnk("#119", "https://github.com/lihaoyi/Ammonite/issues/119") if you are interested in details or want to try your hand at making it work.
   @sect{Features}
     @p
       Ammonite-REPL supports many more features than the default REPL, including:

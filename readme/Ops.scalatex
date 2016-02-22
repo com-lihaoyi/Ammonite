@@ -35,6 +35,9 @@
   @p
     That handles the common case for you: recursively deleting folders, not-failing if the file doesn't exist, etc.
 
+  @p
+    Note: Ammonite-Ops supports Windows experimentally, even if @sect.ref{Ammonite-REPL} does not. That means you can use these convenient filesystem operations and commands in your Scala programs that run on Windows. Try it out and let me know if there are problems.
+
   @sect{Paths}
     @p
       Ammonite uses strongly-typed data-structures to represent filesystem paths. The two basic versions are:
