@@ -66,13 +66,13 @@ object Res{
   }
 
   /**
-    * Something failed before the code was run, perhaps a compile error
-    * or a compiler crash or other infrastructure-y problem
+    * A known failure occured, maybe caused by an exception
+    * (e.g. `ThreadDeath`) and maybe not (e.g. compile error)
     */
   case class Failure(ex: Option[Throwable], s: String) extends Failing
 
   /**
-    * An exception was thrown when the command was being run
+    * An unknown exception was thrown when the command was being run
     */
   case class Exception(t: Throwable, s: String) extends Failing
 
