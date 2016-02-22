@@ -47,7 +47,7 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">RelPath</span><span class="params">(<span name="segments">segments: <span class="extype" name="scala.Vector">Vector</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="ups">ups: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result"> extends <a href="BasePathImpl.html" class="extype" name="ammonite.ops.BasePathImpl">BasePathImpl</a>[<a href="" class="extype" name="ammonite.ops.RelPath">RelPath</a>] with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">RelPath</span><span class="result"> extends <a href="BasePathImpl.html" class="extype" name="ammonite.ops.BasePathImpl">BasePathImpl</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
       
@@ -57,7 +57,7 @@ segments can only occur at the left-end of the path, and
 are collapsed into a single number <a href="#ups:Int" class="extmbr" name="ammonite.ops.RelPath#ups">ups</a>.
 </p></div><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
-          <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.Product">Product</span>, <span class="extype" name="scala.Equals">Equals</span>, <a href="BasePathImpl.html" class="extype" name="ammonite.ops.BasePathImpl">BasePathImpl</a>[<a href="" class="extype" name="ammonite.ops.RelPath">RelPath</a>], <a href="BasePath.html" class="extype" name="ammonite.ops.BasePath">BasePath</a>[<a href="" class="extype" name="ammonite.ops.RelPath">RelPath</a>], <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.Product">Product</span>, <span class="extype" name="scala.Equals">Equals</span>, <a href="BasePathImpl.html" class="extype" name="ammonite.ops.BasePathImpl">BasePathImpl</a>, <a href="BasePath.html" class="extype" name="ammonite.ops.BasePath">BasePath</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
         
 
@@ -92,29 +92,29 @@ are collapsed into a single number <a href="#ups:Int" class="extmbr" name="ammon
 
       <div id="template">
         <div id="allMembers">
-        <div id="constructors" class="members">
-              <h3>Instance Constructors</h3>
-              <ol><li name="ammonite.ops.RelPath#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(segments:Vector[String],ups:Int):ammonite.ops.RelPath"></a>
-      <a id="&lt;init&gt;:RelPath"></a>
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="ammonite.ops.RelPath.ThisType" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ThisType=ammonite.ops.RelPath"></a>
+      <a id="ThisType:ThisType"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">new</span>
+        <span class="kind">type</span>
       </span>
       <span class="symbol">
-        <span class="name">RelPath</span><span class="params">(<span name="segments">segments: <span class="extype" name="scala.Vector">Vector</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="ups">ups: <span class="extype" name="scala.Int">Int</span></span>)</span>
+        <span class="name">ThisType</span><span class="result"> = <a href="" class="extype" name="ammonite.ops.RelPath">RelPath</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#ammonite.ops.RelPath@&lt;init&gt;(segments:Vector[String],ups:Int):ammonite.ops.RelPath" title="Permalink" target="_top">
+      <a href="../../index.html#ammonite.ops.RelPath@ThisType=ammonite.ops.RelPath" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="ammonite.ops.RelPath">RelPath</a> → <a href="BasePath.html" class="extype" name="ammonite.ops.BasePath">BasePath</a></dd></dl></div>
     </li></ol>
             </div>
-
-        
 
         
 
@@ -155,18 +155,18 @@ are collapsed into a single number <a href="#ups:Int" class="extmbr" name="ammon
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="ammonite.ops.BasePathImpl#/" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="/(subpath:ammonite.ops.RelPath):ThisType"></a>
-      <a id="/(RelPath):RelPath"></a>
+      <a id="/(subpath:ammonite.ops.RelPath):BasePathImpl.this.ThisType"></a>
+      <a id="/(RelPath):ThisType"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span title="gt4s: $div" class="name">/</span><span class="params">(<span name="subpath">subpath: <a href="" class="extype" name="ammonite.ops.RelPath">RelPath</a></span>)</span><span class="result">: <a href="" class="extype" name="ammonite.ops.RelPath">RelPath</a></span>
+        <span title="gt4s: $div" class="name">/</span><span class="params">(<span name="subpath">subpath: <a href="" class="extype" name="ammonite.ops.RelPath">RelPath</a></span>)</span><span class="result">: <a href="#ThisType=ammonite.ops.RelPath" class="extmbr" name="ammonite.ops.RelPath.ThisType">ThisType</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#ammonite.ops.RelPath@/(subpath:ammonite.ops.RelPath):ThisType" title="Permalink" target="_top">
+      <a href="../../index.html#ammonite.ops.RelPath@/(subpath:ammonite.ops.RelPath):BasePathImpl.this.ThisType" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -275,7 +275,7 @@ a path of the same type as this one (e.g. <code>Path</code> returns <code>Path</
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">ext</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+        <span class="name">ext</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.RelPath@ext:String" title="Permalink" target="_top">
@@ -286,7 +286,7 @@ a path of the same type as this one (e.g. <code>Path</code> returns <code>Path</
 string if there is no extension
 </p><div class="fullcomment"><div class="comment cmt"><p>Gives you the file extension of this path, or the empty
 string if there is no extension
-</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="BasePathImpl.html" class="extype" name="ammonite.ops.BasePathImpl">BasePathImpl</a></dd></dl></div>
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="BasePathImpl.html" class="extype" name="ammonite.ops.BasePathImpl">BasePathImpl</a> → <a href="BasePath.html" class="extype" name="ammonite.ops.BasePath">BasePath</a></dd></dl></div>
     </li><li name="scala.AnyRef#finalize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
       <a id="finalize():Unit"></a>
@@ -647,9 +647,9 @@ case.
             </div><div class="parent" name="scala.Equals">
               <h3>Inherited from <span class="extype" name="scala.Equals">Equals</span></h3>
             </div><div class="parent" name="ammonite.ops.BasePathImpl">
-              <h3>Inherited from <a href="BasePathImpl.html" class="extype" name="ammonite.ops.BasePathImpl">BasePathImpl</a>[<a href="" class="extype" name="ammonite.ops.RelPath">RelPath</a>]</h3>
+              <h3>Inherited from <a href="BasePathImpl.html" class="extype" name="ammonite.ops.BasePathImpl">BasePathImpl</a></h3>
             </div><div class="parent" name="ammonite.ops.BasePath">
-              <h3>Inherited from <a href="BasePath.html" class="extype" name="ammonite.ops.BasePath">BasePath</a>[<a href="" class="extype" name="ammonite.ops.RelPath">RelPath</a>]</h3>
+              <h3>Inherited from <a href="BasePath.html" class="extype" name="ammonite.ops.BasePath">BasePath</a></h3>
             </div><div class="parent" name="scala.AnyRef">
               <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
             </div><div class="parent" name="scala.Any">

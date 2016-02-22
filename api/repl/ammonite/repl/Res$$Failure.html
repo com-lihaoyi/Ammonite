@@ -45,12 +45,12 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">Failure</span><span class="params">(<span name="s">s: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <a href="Res$$Failing.html" class="extype" name="ammonite.repl.Res.Failing">Failing</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">Failure</span><span class="params">(<span name="ex">ex: <span class="extype" name="scala.Option">Option</span>[<a href="../../scala/package.html#Throwable=Throwable" class="extmbr" name="scala.Throwable">Throwable</a>]</span>, <span name="s">s: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <a href="Res$$Failing.html" class="extype" name="ammonite.repl.Res.Failing">Failing</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Something failed before the code was run, perhaps a compile error
-or a compiler crash or other infrastructure-y problem
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>A known failure occured, maybe caused by an exception
+(e.g. <code>ThreadDeath</code>) and maybe not (e.g. compile error)
 </p></div><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.Product">Product</span>, <span class="extype" name="scala.Equals">Equals</span>, <a href="Res$$Failing.html" class="extype" name="ammonite.repl.Res.Failing">Failing</a>, <a href="Res.html" class="extype" name="ammonite.repl.Res">Res</a>[<span class="extype" name="scala.Nothing">Nothing</span>], <a href="../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a>, <span class="extype" name="scala.Any">Any</span></div>
@@ -91,7 +91,7 @@ or a compiler crash or other infrastructure-y problem
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="ammonite.repl.Res.Failure#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(s:String):ammonite.repl.Res.Failure"></a>
+      <a id="&lt;init&gt;(ex:Option[Throwable],s:String):ammonite.repl.Res.Failure"></a>
       <a id="&lt;init&gt;:Failure"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -99,10 +99,10 @@ or a compiler crash or other infrastructure-y problem
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">Failure</span><span class="params">(<span name="s">s: <span class="extype" name="scala.Predef.String">String</span></span>)</span>
+        <span class="name">Failure</span><span class="params">(<span name="ex">ex: <span class="extype" name="scala.Option">Option</span>[<a href="../../scala/package.html#Throwable=Throwable" class="extmbr" name="scala.Throwable">Throwable</a>]</span>, <span name="s">s: <span class="extype" name="scala.Predef.String">String</span></span>)</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#ammonite.repl.Res$$Failure@&lt;init&gt;(s:String):ammonite.repl.Res.Failure" title="Permalink" target="_top">
+      <a href="../../index.html#ammonite.repl.Res$$Failure@&lt;init&gt;(ex:Option[Throwable],s:String):ammonite.repl.Res.Failure" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -224,6 +224,23 @@ or a compiler crash or other infrastructure-y problem
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="ammonite.repl.Res.Failure#ex" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ex:Option[Throwable]"></a>
+      <a id="ex:Option[Throwable]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ex</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<a href="../../scala/package.html#Throwable=Throwable" class="extmbr" name="scala.Throwable">Throwable</a>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.repl.Res$$Failure@ex:Option[Throwable]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
     </li><li name="ammonite.repl.Res#filter" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="filter(f:T=&gt;Boolean):ammonite.repl.Res[T]"></a>
       <a id="filter((Nothing)⇒Boolean):Res[Nothing]"></a>

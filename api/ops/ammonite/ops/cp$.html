@@ -45,7 +45,7 @@
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <span class="name">cp</span><span class="result"> extends (<a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>, <a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>) ⇒ <span class="extype" name="scala.Unit">Unit</span></span>
+        <span class="name">cp</span><span class="result"> extends (<a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>, <a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>) ⇒ <span class="extype" name="scala.Unit">Unit</span> with <a href="CopyMove.html" class="extype" name="ammonite.ops.CopyMove">CopyMove</a></span>
       </span>
       </h4>
       
@@ -54,7 +54,7 @@ Creates any necessary directories, and copies folders
 recursively.
 </p></div><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
-          <div class="superTypes hiddenContent">(<a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>, <a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>) ⇒ <span class="extype" name="scala.Unit">Unit</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent"><a href="CopyMove.html" class="extype" name="ammonite.ops.CopyMove">CopyMove</a>, (<a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>, <a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>) ⇒ <span class="extype" name="scala.Unit">Unit</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
         
 
@@ -72,7 +72,7 @@ recursively.
                 <span class="filtertype">Inherited<br />
                 </span>
                 <ol id="linearization">
-                  <li class="in" name="ammonite.ops.cp"><span>cp</span></li><li class="in" name="scala.Function2"><span>Function2</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                  <li class="in" name="ammonite.ops.cp"><span>cp</span></li><li class="in" name="ammonite.ops.CopyMove"><span>CopyMove</span></li><li class="in" name="scala.Function2"><span>Function2</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                 </ol>
               </div><div id="ancestors">
             <span class="filtertype"></span>
@@ -316,6 +316,27 @@ recursively.
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="ammonite.ops.CopyMove.into" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="into"></a>
+      <a id="into:into"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="CopyMove$into$.html"><span class="name">into</span></a><span class="result"> extends (<a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>, <a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>) ⇒ <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.ops.CopyMove@into" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Copy or move a file into a particular folder, rather
+than into a particular path
+</p><div class="fullcomment"><div class="comment cmt"><p>Copy or move a file into a particular folder, rather
+than into a particular path
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="CopyMove.html" class="extype" name="ammonite.ops.CopyMove">CopyMove</a></dd></dl></div>
     </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <a id="isInstanceOf[T0]:Boolean"></a>
@@ -384,6 +405,27 @@ recursively.
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="ammonite.ops.CopyMove.over" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="over"></a>
+      <a id="over:over"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="CopyMove$over$.html"><span class="name">over</span></a><span class="result"> extends (<a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>, <a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>) ⇒ <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.ops.CopyMove@over" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Copy or move a file, stomping over anything
+that may have been there before
+</p><div class="fullcomment"><div class="comment cmt"><p>Copy or move a file, stomping over anything
+that may have been there before
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="CopyMove.html" class="extype" name="ammonite.ops.CopyMove">CopyMove</a></dd></dl></div>
     </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
       <a id="synchronized[T0](⇒T0):T0"></a>
@@ -516,7 +558,9 @@ recursively.
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="scala.Function2">
+        <div class="parent" name="ammonite.ops.CopyMove">
+              <h3>Inherited from <a href="CopyMove.html" class="extype" name="ammonite.ops.CopyMove">CopyMove</a></h3>
+            </div><div class="parent" name="scala.Function2">
               <h3>Inherited from (<a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>, <a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>) ⇒ <span class="extype" name="scala.Unit">Unit</span></h3>
             </div><div class="parent" name="scala.AnyRef">
               <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>

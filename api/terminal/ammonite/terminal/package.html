@@ -66,36 +66,19 @@
 
         <div id="types" class="types members">
               <h3>Type Members</h3>
-              <ol><li name="ammonite.terminal.Ansi" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="AnsiextendsAnyRef"></a>
-      <a id="Ansi:Ansi"></a>
+              <ol><li name="ammonite.terminal.AnsiNav" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="AnsiNavextendsAnyRef"></a>
+      <a id="AnsiNav:AnsiNav"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <a href="Ansi.html"><span class="name">Ansi</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+        <a href="AnsiNav.html"><span class="name">AnsiNav</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.package@AnsiextendsAnyRef" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
-    </li><li name="ammonite.terminal.AnsiEscapeState" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="AnsiEscapeStateextendsProductwithSerializable"></a>
-      <a id="AnsiEscapeState:AnsiEscapeState"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">case class</span>
-      </span>
-      <span class="symbol">
-        <a href="AnsiEscapeState.html"><span class="name">AnsiEscapeState</span></a><span class="params">(<span name="color">color: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol">None</span></span>, <span name="bgColor">bgColor: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol">None</span></span>, <span name="bold">bold: <span class="extype" name="scala.Boolean">Boolean</span> = <span class="symbol">false</span></span>, <span name="underlined">underlined: <span class="extype" name="scala.Boolean">Boolean</span> = <span class="symbol">false</span></span>, <span name="reversed">reversed: <span class="extype" name="scala.Boolean">Boolean</span> = <span class="symbol">false</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.package@AnsiEscapeStateextendsProductwithSerializable" title="Permalink" target="_top">
+      <a href="../../index.html#ammonite.terminal.package@AnsiNavextendsAnyRef" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -178,7 +161,7 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a href="Prompt.html"><span class="name">Prompt</span></a><span class="params">(<span name="full">full: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="lastLine">lastLine: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a href="Prompt.html"><span class="name">Prompt</span></a><span class="params">(<span name="full">full: <a href="Ansi$$Str.html" class="extype" name="ammonite.terminal.Ansi.Str">Str</a></span>, <span name="lastLine">lastLine: <a href="Ansi$$Str.html" class="extype" name="ammonite.terminal.Ansi.Str">Str</a></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.terminal.package@PromptextendsProductwithSerializable" title="Permalink" target="_top">
@@ -246,7 +229,7 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a href="TermState.html"><span class="name">TermState</span></a><span class="params">(<span name="inputs">inputs: <a href="LazyList.html" class="extype" name="ammonite.terminal.LazyList">LazyList</a>[<span class="extype" name="scala.Int">Int</span>]</span>, <span name="buffer">buffer: <span class="extype" name="scala.Vector">Vector</span>[<span class="extype" name="scala.Char">Char</span>]</span>, <span name="cursor">cursor: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result"> extends <a href="TermAction.html" class="extype" name="ammonite.terminal.TermAction">TermAction</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a href="TermState.html"><span class="name">TermState</span></a><span class="params">(<span name="inputs">inputs: <a href="LazyList.html" class="extype" name="ammonite.terminal.LazyList">LazyList</a>[<span class="extype" name="scala.Int">Int</span>]</span>, <span name="buffer">buffer: <span class="extype" name="scala.Vector">Vector</span>[<span class="extype" name="scala.Char">Char</span>]</span>, <span name="cursor">cursor: <span class="extype" name="scala.Int">Int</span></span>, <span name="msg">msg: <a href="Ansi$$Str.html" class="extype" name="ammonite.terminal.Ansi.Str">Str</a> = <span class="symbol"><span class="name"><a href="Ansi$$Str$.html">&quot;&quot;</a></span></span></span>)</span><span class="result"> extends <a href="TermAction.html" class="extype" name="ammonite.terminal.TermAction">TermAction</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.terminal.package@TermStateextendsTermActionwithProductwithSerializable" title="Permalink" target="_top">
@@ -274,6 +257,23 @@
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.terminal.package@Ansi" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="ammonite.terminal.AnsiNav" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="AnsiNav"></a>
+      <a id="AnsiNav:AnsiNav"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="AnsiNav$.html"><span class="name">AnsiNav</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.terminal.package@AnsiNav" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>

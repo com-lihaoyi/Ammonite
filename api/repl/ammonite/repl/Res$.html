@@ -108,7 +108,7 @@
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">An exception was thrown when the command was being run
+      <p class="shortcomment cmt">An unknown exception was thrown when the command was being run
 </p>
     </li><li name="ammonite.repl.Res.Exit" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="ExitextendsRes.FailingwithProductwithSerializable"></a>
@@ -146,7 +146,7 @@
     </span>
       <p class="shortcomment cmt">Failing results never call their callbacks, and just remain unchanged
 </p>
-    </li><li name="ammonite.repl.Res.Failure" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="ammonite.repl.Res.Failure" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="FailureextendsRes.FailingwithProductwithSerializable"></a>
       <a id="Failure:Failure"></a>
       <h4 class="signature">
@@ -155,16 +155,17 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a href="Res$$Failure.html"><span class="name">Failure</span></a><span class="params">(<span name="s">s: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <a href="Res$$Failing.html" class="extype" name="ammonite.repl.Res.Failing">Failing</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a href="Res$$Failure.html"><span class="name">Failure</span></a><span class="params">(<span name="ex">ex: <span class="extype" name="scala.Option">Option</span>[<a href="../../scala/package.html#Throwable=Throwable" class="extmbr" name="scala.Throwable">Throwable</a>]</span>, <span name="s">s: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <a href="Res$$Failing.html" class="extype" name="ammonite.repl.Res.Failing">Failing</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.repl.Res$@FailureextendsRes.FailingwithProductwithSerializable" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Something failed before the code was run, perhaps a compile error
-or a compiler crash or other infrastructure-y problem
-</p>
+      <p class="shortcomment cmt">A known failure occured, maybe caused by an exception
+(e.g.</p><div class="fullcomment"><div class="comment cmt"><p>A known failure occured, maybe caused by an exception
+(e.g. <code>ThreadDeath</code>) and maybe not (e.g. compile error)
+</p></div></div>
     </li><li name="ammonite.repl.Res.Success" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="Success[+T]extendsRes[T]withProductwithSerializable"></a>
       <a id="Success[+T]:Success[T]"></a>

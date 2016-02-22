@@ -43,22 +43,23 @@
 
       <h4 id="signature" class="signature">
       <span class="modifier_kind">
-        <span class="modifier"></span>
+        <span class="modifier">sealed </span>
         <span class="kind">trait</span>
       </span>
       <span class="symbol">
-        <span class="name">BasePath</span><span class="tparams">[<span name="ThisType">ThisType &lt;: <a href="" class="extype" name="ammonite.ops.BasePath">BasePath</a>[<span class="extype" name="ammonite.ops.BasePath.ThisType">ThisType</span>]</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+        <span class="name">BasePath</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
       </span>
       </h4>
       
           <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>A path which is either an absolute <a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a> or a relative <a href="RelPath.html" class="extype" name="ammonite.ops.RelPath">RelPath</a>,
-with shared APIs and implementations.
+with shared APIs and implementations.</p><p>Most of the filesystem-independent path-manipulation logic that lets you
+splice paths together or navigate in and out of paths lives in this interface
 </p></div><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div><div class="toggleContainer block">
             <span class="toggle">Known Subclasses</span>
-            <div class="subClasses hiddenContent"><a href="BasePathImpl.html" class="extype" name="ammonite.ops.BasePathImpl">BasePathImpl</a>, <a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>, <a href="RelPath.html" class="extype" name="ammonite.ops.RelPath">RelPath</a></div>
+            <div class="subClasses hiddenContent"><a href="BasePathImpl.html" class="extype" name="ammonite.ops.BasePathImpl">BasePathImpl</a>, <a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>, <a href="RelPath.html" class="extype" name="ammonite.ops.RelPath">RelPath</a>, <a href="ResourcePath.html" class="extype" name="ammonite.ops.ResourcePath">ResourcePath</a></div>
           </div></div>
         
 
@@ -95,12 +96,32 @@ with shared APIs and implementations.
         <div id="allMembers">
         
 
-        
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="ammonite.ops.BasePath.ThisType" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="ThisType&lt;:ammonite.ops.BasePath"></a>
+      <a id="ThisType:ThisType"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ThisType</span><span class="result"> &lt;: <a href="" class="extype" name="ammonite.ops.BasePath">BasePath</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.ops.BasePath@ThisType&lt;:ammonite.ops.BasePath" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li></ol>
+            </div>
 
         <div id="values" class="values members">
               <h3>Abstract Value Members</h3>
               <ol><li name="ammonite.ops.BasePath#/" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="/(subpath:ammonite.ops.RelPath):ThisType"></a>
+      <a id="/(subpath:ammonite.ops.RelPath):BasePath.this.ThisType"></a>
       <a id="/(RelPath):ThisType"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -108,10 +129,10 @@ with shared APIs and implementations.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span title="gt4s: $div" class="name">/</span><span class="params">(<span name="subpath">subpath: <a href="RelPath.html" class="extype" name="ammonite.ops.RelPath">RelPath</a></span>)</span><span class="result">: <span class="extype" name="ammonite.ops.BasePath.ThisType">ThisType</span></span>
+        <span title="gt4s: $div" class="name">/</span><span class="params">(<span name="subpath">subpath: <a href="RelPath.html" class="extype" name="ammonite.ops.RelPath">RelPath</a></span>)</span><span class="result">: <a href="#ThisType&lt;:ammonite.ops.BasePath" class="extmbr" name="ammonite.ops.BasePath.ThisType">ThisType</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#ammonite.ops.BasePath@/(subpath:ammonite.ops.RelPath):ThisType" title="Permalink" target="_top">
+      <a href="../../index.html#ammonite.ops.BasePath@/(subpath:ammonite.ops.RelPath):BasePath.this.ThisType" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -120,6 +141,25 @@ a path of the same type as this one (e.g.</p><div class="fullcomment"><div class
 a path of the same type as this one (e.g. <code>Path</code> returns <code>Path</code>,
 <code>RelPath</code> returns <code>RelPath</code>
 </p></div></div>
+    </li><li name="ammonite.ops.BasePath#ext" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="ext:String"></a>
+      <a id="ext:String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ext</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.ops.BasePath@ext:String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Gives you the file extension of this path, or the empty
+string if there is no extension
+</p>
     </li><li name="ammonite.ops.BasePath#last" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
       <a id="last:String"></a>
       <a id="last:String"></a>
@@ -140,7 +180,7 @@ a path of the same type as this one (e.g. <code>Path</code> returns <code>Path</
 represents the name of the file/folder in filesystem paths
 </p></div></div>
     </li><li name="ammonite.ops.BasePath#relativeTo" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="relativeTo(target:ThisType):ammonite.ops.RelPath"></a>
+      <a id="relativeTo(target:BasePath.this.ThisType):ammonite.ops.RelPath"></a>
       <a id="relativeTo(ThisType):RelPath"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -148,10 +188,10 @@ represents the name of the file/folder in filesystem paths
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">relativeTo</span><span class="params">(<span name="target">target: <span class="extype" name="ammonite.ops.BasePath.ThisType">ThisType</span></span>)</span><span class="result">: <a href="RelPath.html" class="extype" name="ammonite.ops.RelPath">RelPath</a></span>
+        <span class="name">relativeTo</span><span class="params">(<span name="target">target: <a href="#ThisType&lt;:ammonite.ops.BasePath" class="extmbr" name="ammonite.ops.BasePath.ThisType">ThisType</a></span>)</span><span class="result">: <a href="RelPath.html" class="extype" name="ammonite.ops.RelPath">RelPath</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#ammonite.ops.BasePath@relativeTo(target:ThisType):ammonite.ops.RelPath" title="Permalink" target="_top">
+      <a href="../../index.html#ammonite.ops.BasePath@relativeTo(target:BasePath.this.ThisType):ammonite.ops.RelPath" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -181,7 +221,7 @@ case.
     </span>
       <p class="shortcomment cmt">The individual path segments of this path.</p>
     </li><li name="ammonite.ops.BasePath#startsWith" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
-      <a id="startsWith(target:ThisType):Boolean"></a>
+      <a id="startsWith(target:BasePath.this.ThisType):Boolean"></a>
       <a id="startsWith(ThisType):Boolean"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -189,10 +229,10 @@ case.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">startsWith</span><span class="params">(<span name="target">target: <span class="extype" name="ammonite.ops.BasePath.ThisType">ThisType</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+        <span class="name">startsWith</span><span class="params">(<span name="target">target: <a href="#ThisType&lt;:ammonite.ops.BasePath" class="extmbr" name="ammonite.ops.BasePath.ThisType">ThisType</a></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#ammonite.ops.BasePath@startsWith(target:ThisType):Boolean" title="Permalink" target="_top">
+      <a href="../../index.html#ammonite.ops.BasePath@startsWith(target:BasePath.this.ThisType):Boolean" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>

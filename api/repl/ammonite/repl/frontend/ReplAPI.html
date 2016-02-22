@@ -243,6 +243,30 @@ current session
     </span>
       <p class="shortcomment cmt">Show all the imports that are used to execute commands going forward
 </p>
+    </li><li name="ammonite.repl.frontend.ReplAPI#lastException" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="lastException:Throwable"></a>
+      <a id="lastException:Throwable"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">lastException</span><span class="result">: <a href="../../../scala/package.html#Throwable=Throwable" class="extmbr" name="scala.Throwable">Throwable</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.repl.frontend.ReplAPI@lastException:Throwable" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The last exception that was thrown in the REPL; <code>null</code> if nothing has
+yet been thrown.</p><div class="fullcomment"><div class="comment cmt"><p>The last exception that was thrown in the REPL; <code>null</code> if nothing has
+yet been thrown. Useful if you want additional information from the
+thrown exception than the printed stack trace (e.g. many exceptions have
+additional metadata attached) or if you want to show the stack trace
+on an exception that doesn't normally print it (e.g. seeing the stack
+when a Ctrl-C interrupt happened) via <code>lastException.printStackTrace</code>.
+</p></div></div>
     </li><li name="ammonite.repl.frontend.ReplAPI#load" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
       <a id="load:ammonite.repl.frontend.Load"></a>
       <a id="load:Load"></a>

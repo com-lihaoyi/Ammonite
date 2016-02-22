@@ -47,7 +47,7 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">TermState</span><span class="params">(<span name="inputs">inputs: <a href="LazyList.html" class="extype" name="ammonite.terminal.LazyList">LazyList</a>[<span class="extype" name="scala.Int">Int</span>]</span>, <span name="buffer">buffer: <span class="extype" name="scala.Vector">Vector</span>[<span class="extype" name="scala.Char">Char</span>]</span>, <span name="cursor">cursor: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result"> extends <a href="TermAction.html" class="extype" name="ammonite.terminal.TermAction">TermAction</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">TermState</span><span class="params">(<span name="inputs">inputs: <a href="LazyList.html" class="extype" name="ammonite.terminal.LazyList">LazyList</a>[<span class="extype" name="scala.Int">Int</span>]</span>, <span name="buffer">buffer: <span class="extype" name="scala.Vector">Vector</span>[<span class="extype" name="scala.Char">Char</span>]</span>, <span name="cursor">cursor: <span class="extype" name="scala.Int">Int</span></span>, <span name="msg">msg: <a href="Ansi$$Str.html" class="extype" name="ammonite.terminal.Ansi.Str">Str</a> = <span class="symbol"><span class="name"><a href="Ansi$$Str$.html">&quot;&quot;</a></span></span></span>)</span><span class="result"> extends <a href="TermAction.html" class="extype" name="ammonite.terminal.TermAction">TermAction</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
       
@@ -91,7 +91,7 @@
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="ammonite.terminal.TermState#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(inputs:ammonite.terminal.LazyList[Int],buffer:Vector[Char],cursor:Int):ammonite.terminal.TermState"></a>
+      <a id="&lt;init&gt;(inputs:ammonite.terminal.LazyList[Int],buffer:Vector[Char],cursor:Int,msg:ammonite.terminal.Ansi.Str):ammonite.terminal.TermState"></a>
       <a id="&lt;init&gt;:TermState"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -99,10 +99,10 @@
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">TermState</span><span class="params">(<span name="inputs">inputs: <a href="LazyList.html" class="extype" name="ammonite.terminal.LazyList">LazyList</a>[<span class="extype" name="scala.Int">Int</span>]</span>, <span name="buffer">buffer: <span class="extype" name="scala.Vector">Vector</span>[<span class="extype" name="scala.Char">Char</span>]</span>, <span name="cursor">cursor: <span class="extype" name="scala.Int">Int</span></span>)</span>
+        <span class="name">TermState</span><span class="params">(<span name="inputs">inputs: <a href="LazyList.html" class="extype" name="ammonite.terminal.LazyList">LazyList</a>[<span class="extype" name="scala.Int">Int</span>]</span>, <span name="buffer">buffer: <span class="extype" name="scala.Vector">Vector</span>[<span class="extype" name="scala.Char">Char</span>]</span>, <span name="cursor">cursor: <span class="extype" name="scala.Int">Int</span></span>, <span name="msg">msg: <a href="Ansi$$Str.html" class="extype" name="ammonite.terminal.Ansi.Str">Str</a> = <span class="symbol"><span class="name"><a href="Ansi$$Str$.html">&quot;&quot;</a></span></span></span>)</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.TermState@&lt;init&gt;(inputs:ammonite.terminal.LazyList[Int],buffer:Vector[Char],cursor:Int):ammonite.terminal.TermState" title="Permalink" target="_top">
+      <a href="../../index.html#ammonite.terminal.TermState@&lt;init&gt;(inputs:ammonite.terminal.LazyList[Int],buffer:Vector[Char],cursor:Int,msg:ammonite.terminal.Ansi.Str):ammonite.terminal.TermState" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -332,6 +332,23 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="ammonite.terminal.TermState#msg" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="msg:ammonite.terminal.Ansi.Str"></a>
+      <a id="msg:Str"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">msg</span><span class="result">: <a href="Ansi$$Str.html" class="extype" name="ammonite.terminal.Ansi.Str">Str</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.terminal.TermState@msg:ammonite.terminal.Ansi.Str" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
     </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a>
       <a id="ne(AnyRef):Boolean"></a>
