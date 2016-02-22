@@ -50,6 +50,15 @@ trait ReplAPI {
    * Display help text if you don't know how to use the REPL
    */
   def help: String
+
+  /**
+    * The last exception that was thrown in the REPL; `null` if nothing has
+    * yet been thrown. Useful if you want additional information from the
+    * thrown exception than the printed stack trace (e.g. many exceptions have
+    * additional metadata attached) or if you want to show the stack trace
+    * on an exception that doesn't normally print it (e.g. seeing the stack
+    * when a Ctrl-C interrupt happened) via `lastException.printStackTrace`.
+    */
   def lastException: Throwable
   /**
    * History of commands that have been entered into the shell, including
