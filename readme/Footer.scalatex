@@ -45,9 +45,9 @@
     @sect{0.5.5}
       @ul
         @li
-          Experimental support for Ammonite-Ops in Windows! I haven't tested it but basic CI passes [here](https://ci.appveyor.com/project/lihaoyi/ammonite), so try it out and let me know if there are problems (#120)
+          Experimental support for Ammonite-Ops in Windows! I haven't tested it but basic CI passes @lnk("here", "https://ci.appveyor.com/project/lihaoyi/ammonite"), so try it out and let me know if there are problems (#120)
         @li
-          Changes around Ammonite-Ops's definition of @hl.scala{Path}s: they now wrap a @code{java.nio.file.Path} (#346), and thus can be used on Windows, on multiple drives, or with virtual filesystems such as [JimFS](https://github.com/google/jimfs).
+          Changes around Ammonite-Ops's definition of @hl.scala{Path}s: they now wrap a @code{java.nio.file.Path} (#346), and thus can be used on Windows, on multiple drives, or with virtual filesystems such as @lnk("JimFS", "https://github.com/google/jimfs").
         @li
           Construction of @hl.scala{Path}s from various types (@hl.scala{String}s, @hl.scala{java.nio.file.Path}, @hl.scala{java.io.File}) is much more well behaved & consistent now. See @sect.ref{Constructing Paths} for details.
         @li
