@@ -152,7 +152,7 @@ object PathComplete {
   }
   def pathCompleteFilter(wd: => Path,
                          colors: => Colors): TermCore.Filter = {
-    case TermInfo(TermState(9 ~: rest, b, c), width)
+    case TermInfo(TermState(9 ~: rest, b, c, _), width)
       if PathComplete.findPathLiteral(b.mkString, c).isDefined =>
 
       val Some(PathComplete.PathLiteralInfo(base, seq, frag, cursorOffset)) =
