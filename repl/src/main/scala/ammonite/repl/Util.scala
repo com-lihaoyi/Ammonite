@@ -38,11 +38,11 @@ case class Catching(handler: PartialFunction[Throwable, Res.Failing]) {
 object Res{
   def apply[T](o: Option[T], errMsg: => String) = o match{
     case Some(s) => Success(s)
-    case None => Failure(errMsg)
+    case None => Failure(None, errMsg)
   }
   def apply[T](o: Try[T], errMsg: Throwable => String) = o match{
     case util.Success(s) => Success(s)
-    case util.Failure(t) => Failure(errMsg(t))
+    case util.Failure(t) => Failure(None, errMsg(t))
   }
 
   /**
@@ -69,7 +69,7 @@ object Res{
     * Something failed before the code was run, perhaps a compile error
     * or a compiler crash or other infrastructure-y problem
     */
-  case class Failure(s: String) extends Failing
+  case class Failure(ex: Option[Throwable], s: String) extends Failing
 
   /**
     * An exception was thrown when the command was being run

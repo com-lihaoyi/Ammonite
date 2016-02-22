@@ -34,7 +34,8 @@ trait Evaluator{
   def processLine(code: String,
                   printCode: String,
                   printer: Printer,
-                  extraImports: Seq[ImportData] = Seq()): Res[Evaluated]
+                  extraImports: Seq[ImportData] = Seq()
+                 ): Res[Evaluated]
 
   def processScriptBlock(code: String,
                          scriptImports: Seq[ImportData],
@@ -197,9 +198,9 @@ object Evaluator{
       res
     }
 
-    def interrupted() = {
+    def interrupted(e: Throwable) = {
       Thread.interrupted()
-      Res.Failure("\nInterrupted!")
+      Res.Failure(Some(e), "\nInterrupted!")
     }
 
     type InvEx = InvocationTargetException
@@ -208,9 +209,10 @@ object Evaluator{
     def processLine(code: String,
                     printCode: String,
                     printer: Printer,
-                    extraImports: Seq[ImportData] = Seq()) = for {
+                    extraImports: Seq[ImportData] = Seq()
+                   ) = for {
       wrapperName <- Res.Success("cmd" + getCurrentLine)
-      _ <- Catching{ case e: ThreadDeath => interrupted() }
+      _ <- Catching{ case e: ThreadDeath => interrupted(e) }
       (classFiles, newImports) <- compileClass(
         wrapCode(
           wrapperName,
@@ -227,26 +229,17 @@ object Evaluator{
       _ <- Catching{
         // Exit
         case Ex(_: InvEx, _: InitEx, ReplExit(value))  =>
-          println("AAAAAAAAAAAAAAAA")
           Res.Exit(value)
         // Interrupted during pretty-printing
-        case Ex(_: ThreadDeath)                 =>
-          println("BBBBBBBBBBBBBBBB")
-          interrupted()
-        // Interrupted during evaluation
-        case Ex(_: InvEx, _: ThreadDeath)       =>
-          println("CCCCCCCCCCCCCCCC")
-          interrupted()
+        case Ex(e: ThreadDeath)                 =>  interrupted(e)
 
-        case Ex(_: InvEx, _: InitEx, userEx@_*) =>
-          println("DDDDDDDDDDDDDDDD")
-          Res.Exception(userEx(0), "")
-        case Ex(_: InvEx, userEx@_*)            =>
-          println("EEEEEEEEEEEEEEEE")
-          Res.Exception(userEx(0), "")
-        case Ex(userEx@_*)                      =>
-          println("FFFFFFFFFFFFFFFF")
-          Res.Exception(userEx(0), "")
+        // Interrupted during evaluation
+        case Ex(_: InvEx, e: ThreadDeath)       =>  interrupted(e)
+
+        case Ex(_: InvEx, _: InitEx, userEx@_*) =>   Res.Exception(userEx(0), "")
+        case Ex(_: InvEx, userEx@_*)            =>   Res.Exception(userEx(0), "")
+        case Ex(userEx@_*)                      =>   Res.Exception(userEx(0), "")
+
       }
     } yield {
       // Exhaust the printer iterator now, before exiting the `Catching`
