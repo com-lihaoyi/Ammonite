@@ -59,7 +59,7 @@ While working on a arbitrary `xyz` subproject, `sbt ~xyz/test` runs tests after 
 - Create short URLs for the 2.11.7 executable download and the `example-predef.scala` file and the readme code in `readme/Sample.scala` to use these short URLs
 - `sbt ~readme/run` builds the documentation inside its target folder, which you can view by opening `readme/target/scalatex/index.html` in your browser.
 - `git commit -am $VERSION` with the new version number, and `git tag $VERSION`
-- `git checkout gh-pages && cp -r readme/target/scalatex/* . && git commit -am . && git push` will deploy the generated documentation to Github Pages
+- `git checkout gh-pages && cp -r readme/target/scalatex/* . && git add -A && git commit -am . && git push` will deploy the generated documentation to Github Pages
 - Swap `project/Constants.scala` to `$NEXT_VERSION-SNAPSHOT` and commit it
 
 ## Issue Tags
