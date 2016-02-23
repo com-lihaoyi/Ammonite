@@ -160,7 +160,7 @@ object Compiler{
         //   to run right after typer; followers:
         //   AmmonitePhase,acyclic; created phase-order.dot
 
-        if name != "acyclic"
+        if name != "acyclic" && name != "scctInstrumentation"
         if name.nonEmpty && className.nonEmpty
         classOpt =
           try Some(loader.loadClass(className))
