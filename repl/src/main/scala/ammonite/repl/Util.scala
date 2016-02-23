@@ -188,13 +188,16 @@ object Util{
   type ClassFiles = Traversable[(String, Array[Byte])]
   type CompileCache = (ClassFiles, Seq[ImportData])
   
-  @scala.annotation.tailrec
-  def transpose[A](xs: List[List[A]], result: List[List[A]]): List[List[A]] =
-  xs.filter(_.nonEmpty) match {
-    case Nil    =>  result
-    case ys: List[List[A]] => transpose(ys.map{ _.tail }, ys.map{ _.head }::result)
+  def transpose[A](xs: List[List[A]]): List[List[A]] = {
+
+  	@scala.annotation.tailrec
+  	def transpose[A](xs: List[List[A]], result: List[List[A]]): List[List[A]] =
+  	xs.filter(_.nonEmpty) match {
+    	case Nil    =>  result
+    	case ys: List[List[A]] => transpose(ys.map{ _.tail }, ys.map{ _.head }::result)
+  	}
+  	transpose(xs, Nil).reverse
   }
-  def transpose[A](xs: List[List[A]]): List[List[A]] = transpose(xs, Nil).reverse
 }
 
 object Timer{
