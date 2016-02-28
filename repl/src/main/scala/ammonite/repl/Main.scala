@@ -236,5 +236,5 @@ object ScriptInit{
   /**
     * Additional [[scopt.Read]] instance to teach it how to read Ammonite paths
     */
-  implicit def pathRead: scopt.Read[Path] = scopt.Read.stringRead.map(Path(_))
+  implicit def pathRead: scopt.Read[Path] = scopt.Read.stringRead.map(Path(_, cwd))
 }
