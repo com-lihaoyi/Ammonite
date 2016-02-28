@@ -86,7 +86,7 @@ object TermCore {
     // even if it does there's nowhere else for it to go
     for(i <- 0 until rowLengths.length -1 if !done) {
       // length of frag and the '\n' after it
-      val delta = rowLengths(i) + (if (i == rowLengths.length - 1) 0 else 1)
+      val delta = rowLengths(i) + 1
       //      Debug("delta " + delta)
       val nextCursor = leftoverCursor - delta
       if (nextCursor >= 0) {
@@ -95,8 +95,10 @@ object TermCore {
         totalPreHeight += fragHeights(i)
       }else done = true
     }
+
     val cursorY = totalPreHeight + leftoverCursor / width
     val cursorX = leftoverCursor % width
+
     (cursorY, cursorX)
   }
 
@@ -169,36 +171,38 @@ object TermCore {
       writer.write(promptLine.toString)
       if (newlinePrompt) writer.write("\n")
 
-      // Under `newlinePrompt`, we print the thing verbatim, since we want to
-      // avoid breaking code by adding random indentation. If not, we are
-      // guaranteed that the lines are short, so we can indent the newlines
+      // I'm not sure why this is necessary, but it seems that without it, a
+      // cursor that "barely" overshoots the end of a line, at the end of the
+      // buffer, does not properly wrap and ends up dangling off the
+      // right-edge of the terminal window!
+      //
+      // This causes problems later since the cursor is at the wrong X/Y,
+      // confusing the rest of the math and ending up over-shooting on the
+      // `ansi.up` calls, over-writing earlier lines. This prints a single
+      // space such that instead of dangling it forces the cursor onto the
+      // next line for-realz. If it isn't dangling the extra space is a no-op
+      val lineStuffer = ' '
+      // Under `newlinePrompt`, we print the thing almost-verbatim, since we
+      // want to avoid breaking code by adding random indentation. If not, we
+      // are guaranteed that the lines are short, so we can indent the newlines
       // without fear of wrapping
-      writer.write(
-        if (newlinePrompt) buffer.render.toArray
-        else{
+      val newlineReplacement =
+        if (newlinePrompt) {
+
+          Array(lineStuffer, '\n')
+        } else {
           val indent = " " * prompt.lastLine.length
-          buffer.render.flatMap{
-            case '\n' => Array('\n', indent:_*)
-            case x => Array(x)
-          }.toArray
+          Array('\n', indent:_*)
         }
+
+      writer.write(
+        buffer.render.flatMap{
+          case '\n' => newlineReplacement
+          case x => Array(x)
+        }.toArray
       )
+      writer.write(lineStuffer)
 
-      val nonAnsiBufferLength = rowLengths.length + rowLengths.sum - 1
-
-      if (cursor == nonAnsiBufferLength){
-        // I'm not sure why this is necessary, but it seems that without it, a
-        // cursor that "barely" overshoots the end of a line, at the end of the
-        // buffer, does not properly wrap and ends up dangling off the
-        // right-edge of the terminal window!
-        //
-        // This causes problems later since the cursor is at the wrong X/Y,
-        // confusing the rest of the math and ending up over-shooting on the
-        // `ansi.up` calls, over-writing earlier lines. This prints a single
-        // space such that instead of dangling it forces the cursor onto the
-        // next line for-realz. If it isn't dangling the extra space is a no-op
-        writer.write(" ")
-      }
       val fragHeights = calculateHeight0(rowLengths, actualWidth)
       val (cursorY, cursorX) = positionCursor(
         cursor,
