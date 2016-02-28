@@ -1,374 +1,269 @@
 package ammonite.terminal
 
-import scala.annotation.tailrec
+
 
 object Ansi {
-  val Empty = Str.parse("")
-  val Black = new Color(Console.BLACK)
-  val Red = new Color(Console.RED)
-  val Green = new Color(Console.GREEN)
-  val Yellow = new Color(Console.YELLOW)
-  val Blue = new Color(Console.BLUE)
-  val Magenta = new Color(Console.MAGENTA)
-  val Cyan = new Color(Console.CYAN)
-  val White = new Color(Console.WHITE)
-  val ResetFore = new Color("\u001b[39m")
-
-  val BlackB = new Color(Console.BLACK_B)
-  val RedB = new Color(Console.RED_B)
-  val GreenB = new Color(Console.GREEN_B)
-  val YellowB = new Color(Console.YELLOW_B)
-  val BlueB = new Color(Console.BLUE_B)
-  val MagentaB = new Color(Console.MAGENTA_B)
-  val CyanB = new Color(Console.CYAN_B)
-  val WhiteB = new Color(Console.WHITE_B)
-  val ResetB = new Color("\u001b[49m")
-
-  val Reset = new Color(Console.RESET)
-  val Bold = new Color(Console.BOLD)
-  val Underlined = new Color(Console.UNDERLINED)
-  val Reversed = new Color(Console.REVERSED)
 
   /**
     * Represents a single, atomic ANSI escape sequence that results in a
-    * color, background or decoration being added to the output
+    * color, background or decoration being added to the output.
     *
-    * @param color the actual ANSI string
+    * @param escape the actual ANSI escape sequence corresponding to this Attr
     */
-  case class Color private[Ansi] (color: String)(implicit name: sourcecode.Name) extends Frag {
-    override def toString = color + name.value + Console.RESET
-  }
-  object Color {
+  case class Attr private[Ansi](escape: Option[String], resetMask: Int, applyMask: Int)
+                               (implicit name: sourcecode.Name) {
+    override def toString = escape.getOrElse("") + name.value + Console.RESET
+    def transform(state: Short) = ((state & ~resetMask) | applyMask).toShort
 
-    val OverlapSets = Set(
-      Set(Black, Red, Green, Yellow, Blue, Magenta, Cyan, White, ResetFore),
-      Set(BlackB, RedB, GreenB, YellowB, BlueB, MagentaB, CyanB, WhiteB, ResetB),
-      Set(Bold),
-      Set(Underlined),
-      Set(Reversed),
-      Set(Reset)
+    def matches(state: Short) = (state & resetMask) == applyMask
+
+  }
+  object Attr {
+    val Reset = new Attr(Some(Console.RESET), Short.MaxValue, 0)
+
+    /**
+      * Quickly convert string-colors into [[Ansi.Attr]]s
+      */
+    val ParseMap = {
+      val pairs = for {
+        cat <- categories
+        color <- cat.all
+        str <- color.escape
+      } yield (str, color)
+      (pairs :+ (Console.RESET -> Reset)).toMap
+    }
+  }
+
+  /**
+    * Represents a set of [[Ansi.Attr]]s all occupying the same bit-space
+    * in the state `Short`
+    */
+  sealed abstract class Category(implicit catName: sourcecode.Enclosing){
+    val mask: Int
+    val all: Seq[Attr]
+    lazy val bitsMap = all.map{ m => m.applyMask -> m}.toMap
+    def makeAttr(s: Option[String], applyMask: Int)(implicit name: sourcecode.Name) = {
+      new Attr(s, mask, applyMask)(
+        sourcecode.Name(catName.value.stripSuffix(".<init>") + "." + name.value)
+      )
+    }
+  }
+
+  object Color extends Category{
+
+    val mask = 15 << 7
+    val Reset     = makeAttr(Some("\u001b[39m"),     0 << 7)
+    val Black     = makeAttr(Some(Console.BLACK),    1 << 7)
+    val Red       = makeAttr(Some(Console.RED),      2 << 7)
+    val Green     = makeAttr(Some(Console.GREEN),    3 << 7)
+    val Yellow    = makeAttr(Some(Console.YELLOW),   4 << 7)
+    val Blue      = makeAttr(Some(Console.BLUE),     5 << 7)
+    val Magenta   = makeAttr(Some(Console.MAGENTA),  6 << 7)
+    val Cyan      = makeAttr(Some(Console.CYAN),     7 << 7)
+    val White     = makeAttr(Some(Console.WHITE),    8 << 7)
+
+    val all = Vector(
+      Reset, Black, Red, Green, Yellow,
+      Blue, Magenta, Cyan, White
     )
-
-    /**
-      * A mapping of who stomps over who. Note that this isn't symmetric!
-      * `Reset` stomps over everyone, but nobody stomps over `Reset`. If
-      * a color stomps over another, that means that when a stomp-er directly
-      * follows a stomp-ee the stomp-ee can be ommitted
-      */
-    val OverlapMap = {
-      val colorSets = for {
-        set <- OverlapSets
-        color <- set
-      } yield (color, set)
-
-      colorSets.toMap ++ Seq(Reset -> OverlapSets.flatten)
-    }
-    /**
-      * Quickly convert string-colors into [[Ansi.Color]]s
-      */
-    val ParseMap = (for {
-      set <- OverlapSets
-      color <- set
-    } yield (color.color, color)).toMap
   }
 
-  object Content{
-    def fromMaybeEmpty(value: String) = {
-      if (value.isEmpty) Nil
-      else Seq(Content(value))
-    }
+  object Back extends Category{
+    val mask = 15 << 3
+
+    val Reset    = makeAttr(Some("\u001b[49m"),       0 << 3)
+    val Black    = makeAttr(Some(Console.BLACK_B),    1 << 3)
+    val Red      = makeAttr(Some(Console.RED_B),      2 << 3)
+    val Green    = makeAttr(Some(Console.GREEN_B),    3 << 3)
+    val Yellow   = makeAttr(Some(Console.YELLOW_B),   4 << 3)
+    val Blue     = makeAttr(Some(Console.BLUE_B),     5 << 3)
+    val Magenta  = makeAttr(Some(Console.MAGENTA_B),  6 << 3)
+    val Cyan     = makeAttr(Some(Console.CYAN_B),     7 << 3)
+    val White    = makeAttr(Some(Console.WHITE_B),    8 << 3)
+
+    val all = Seq(
+      Reset, Black, Red, Green, Yellow,
+      Blue, Magenta, Cyan, White
+    )
   }
-  /**
-    * A piece of an [[Ansi.Str]] which just contains raw string-content,
-    * without any special characters
-    */
-  case class Content(value: String) extends Frag{
-    assert(value.length > 0)
+  object Bold extends Category{
+    val mask = 1 << 0
+    val On  = makeAttr(Some(Console.BOLD), 1 << 0)
+    val Off = makeAttr(None              , 0 << 0)
+    val all = Seq(On, Off)
   }
 
-  /**
-    * A piece of an [[Ansi.Str]]
-    */
-  sealed trait Frag
+  object Underlined extends Category{
+    val mask = 1 << 1
+    val On  = makeAttr(Some(Console.UNDERLINED), 1 << 1)
+    val Off = makeAttr(None,                     0 << 1)
+    val all = Seq(On, Off)
+  }
+  object Reversed extends Category{
+    val mask = 1 << 2
+    val On  = makeAttr(Some(Console.REVERSED),   1 << 2)
+    val Off = makeAttr(None,                     0 << 2)
+    val all = Seq(On, Off)
+  }
 
+  val hardOffMask = Bold.mask | Underlined.mask | Reversed.mask
+  val categories = Vector(
+    Color,
+    Back,
+    Bold,
+    Underlined,
+    Reversed
+  )
 
   object Str {
-
-    /**
-      * Feed in a bunch of individual [[Frag]]s and this will produce a
-      * [[result]] which optimizes those frags, collapsing [[Content]]s
-      * and removing redundant [[Color]]s.
-      */
-    class Builder{
-      private[this] var newCurrentState = State()
-      private[this] val buffer = collection.mutable.Buffer.empty[Frag]
-      def result = buffer.toVector
-      def currentState = newCurrentState
-      def append(f: Frag) = f match{
-        case c: Content =>
-          buffer.lastOption match{
-            case Some(c0: Content) => buffer(buffer.length-1) = Content(c0.value + c.value)
-            case _ => buffer.append(c)
-          }
-        case c: Color =>
-          val transformedState = newCurrentState.transform(c)
-          if (transformedState != newCurrentState){
-            newCurrentState = transformedState
-            buffer.append(c)
-          }
-      }
-    }
 
     lazy val ansiRegex = "\u001B\\[[;\\d]*m".r
 
     implicit def parse(raw: CharSequence): Str = {
+      // This will
+      val chars = new Array[Char](raw.length)
+      val colors = new Array[Short](raw.length)
+      var currentIndex = 0
+      var currentColor = 0.toShort
+
       val matches = ansiRegex.findAllMatchIn(raw)
       val indices = Seq(0) ++ matches.flatMap { m => Seq(m.start, m.end) } ++ Seq(raw.length)
-      val b = new Str.Builder
+
       for {
         Seq(start, end) <- indices.sliding(2).toSeq
         if start != end
       } {
         val frag = raw.subSequence(start, end).toString
-        if (frag.charAt(0) == '\u001b') b.append(Color.ParseMap(frag))
-        else b.append(Content(frag))
+        if (frag.charAt(0) == '\u001b') {
+          currentColor = Attr.ParseMap(frag).transform(currentColor)
+        } else {
+          var i = 0
+          while(i < frag.length){
+            chars(currentIndex) = frag(i)
+            colors(currentIndex) = currentColor
+            i += 1
+            currentIndex += 1
+          }
+        }
       }
 
-      Str(b.result)
+      Str(chars.take(currentIndex), colors.take(currentIndex))
     }
 
-    implicit def fromColor(s: Color): Str = Str(Vector(s))
   }
 
   /**
-    * Represents a structured Ansi-colored string, containing both [[Color]]s
-    * and string [[Content]], with operations that let you easily manipulate
-    * the string while keeping colors sane.
+    * An [[Ansi.Str]]'s `color`s array is filled with shorts, each representing
+    * the ANSI state of one character encoded in its bits. Each [[Attr]] belongs
+    * to a [[Category]] that occupies a range of bits within each short:
     *
-    * Maintains an invariant that it is always in a "collapsed" state: the
-    * fragments never have any consecutive [[Content]] nodes, or any
-    * consecutive redundant [[Color]] nodes.
+    * 15 14 13 12 11 10  9  8  7  6  5  4  3  2  1  0
+    *  |-----------|  |--------|  |--------|  |  |  |bold
+    *              |           |           |  |  |reversed
+    *              |           |           |  |underlined
+    *              |           |           |foreground-color
+    *              |           |background-color
+    *              |unused
+    *
+    *
+    * The `0000 0000 0000 0000` short corresponds to plain text with no decoration
+    *
     */
-  case class Str private(fragments: Vector[Frag]) {
-    def selfCheck() = {
-      val b = new Str.Builder
-      fragments.foreach(b.append)
-      assert(
-        b.result == fragments,
-        s"Ansi.Str self-check failed: the collapsed-version of the Str isn't " +
-        s"the same as the original\n${b.result}\n$fragments"
-      )
+  type State = Short
+
+  /**
+    * Encapsulates a string with associated ANSI colors and text decorations.
+    *
+    * Contains some basic string methods, as well as some ansi methods to e.g.
+    * apply particular colors or other decorations to particular sections of
+    * the [[Ansi.Str]]. [[render]] flattens it out into a `java.lang.String`
+    * with all the colors present as ANSI escapes.
+    *
+    */
+  case class Str private(chars: Array[Char], colors: Array[State]) {
+    require(chars.length == colors.length)
+
+    def ++(other: Str) = Str(chars ++ other.chars, colors ++ other.colors)
+    def splitAt(index: Int) = {
+      val (leftChars, rightChars) = chars.splitAt(index)
+      val (leftColors, rightColors) = colors.splitAt(index)
+      (new Str(leftChars, leftColors), new Str(rightChars, rightColors))
     }
-    selfCheck()
+    def length = chars.length
+    override def toString = render
 
-    def ++(other: Str) = {
-      val b = new Str.Builder
-      fragments.foreach(b.append)
-      other.fragments.foreach(b.append)
-      Str(b.result)
+    def plainText = new String(chars.toArray)
+    def render = {
+      // Pre-size StringBuilder with approximate size (ansi colors tend
+      // to be about 5 chars long) to avoid re-allocations during growth
+      val output = new StringBuilder(chars.length + colors.length * 5)
+
+
+      var currentState = 0.toShort
+      /**
+        * Emit the ansi escapes necessary to transition
+        * between two states, if necessary.
+        */
+      def emitDiff(nextState: Short) = if (currentState != nextState){
+        // Any of these transitions from 1 to 0 within the hardOffMask
+        // categories cannot be done with a single ansi escape, and need
+        // you to emit a RESET followed by re-building whatever ansi state
+        // you previous had from scratch
+        if ((currentState & ~nextState & hardOffMask) != 0){
+          output.append(Console.RESET)
+          currentState = 0
+        }
+
+        var categoryIndex = 0
+        while(categoryIndex < categories.length){
+          val cat = categories(categoryIndex)
+          if ((cat.mask & currentState) != (cat.mask & nextState)){
+            val attr = cat.bitsMap(nextState & cat.mask)
+
+            if (attr.escape.isDefined) {
+              output.append(attr.escape.get)
+            }
+          }
+          categoryIndex += 1
+        }
+      }
+
+      var i = 0
+      while(i < colors.length){
+        // Emit ANSI escapes to change colors where necessary
+        emitDiff(colors(i))
+        currentState = colors(i)
+        output.append(chars(i))
+        i += 1
+      }
+
+      // Cap off the left-hand-side of the rendered string with any ansi escape
+      // codes necessary to rest the state to 0
+      emitDiff(0)
+
+      output.toString
     }
 
-    lazy val length = plainText.length
-    lazy val render = fragments.flatMap { case Color(s) => s; case Content(s) => s }
-    lazy val plainText = fragments.collect { case Content(s) => s }.flatten
 
-    override lazy val toString = render.mkString
 
     /**
       * Overlays the desired color over the specified range of the [[Ansi.Str]].
       */
-    def overlay(overlayColor: Color, start: Int, end: Int) = {
+    def overlay(overlayColor: Attr, start: Int, end: Int) = {
       require(end >= start,
         s"end:$end must be greater than start:$end in AnsiStr#overlay call"
       )
-
-      transform{ (frag, originalState, transformedState, index, screenLength) =>
-        val res = frag match{
-          case c: Content =>
-            val fragLength = c.value.length
-            val starting = screenLength < start && screenLength + fragLength >= start
-            val ending = screenLength < end && screenLength + fragLength >= end
-            (starting, ending) match{
-              case (true, true) =>
-                val (pre, rest) = c.value.splitAt(start - screenLength)
-                val (middle, post) = rest.splitAt(end - start)
-                Content.fromMaybeEmpty(pre) ++
-                Seq(overlayColor) ++
-                Content.fromMaybeEmpty(middle) ++
-                originalState.diffFrom(transformedState.transform(overlayColor)) ++
-                Content.fromMaybeEmpty(post)
-              case (true, false) =>
-                // Turning it on
-                val (pre, post) = c.value.splitAt(start - screenLength)
-                Content.fromMaybeEmpty(pre) ++
-                Seq(overlayColor) ++
-                Content.fromMaybeEmpty(post)
-              case (false, true) =>
-                // Turning it off
-                val (pre, post) = c.value.splitAt(end - screenLength)
-                Content.fromMaybeEmpty(pre) ++
-                originalState.diffFrom(transformedState) ++
-                Content.fromMaybeEmpty(post)
-              case (false, false) =>  Seq(c)
-
-            }
-
-          case c: Color =>
-            // Inside the range
-            if (screenLength >= start && screenLength < end){
-              val stompedState = transformedState.transform(c).transform(overlayColor)
-              stompedState.diffFrom(transformedState)
-            }else Seq(c)
-
-        }
-        res
+      val colorsOut = new Array[Short](colors.length)
+      var i = 0
+      while(i < colors.length){
+        if (i >= start && i < end) colorsOut(i) = overlayColor.transform(colors(i))
+        else colorsOut(i) = colors(i)
+        i += 1
       }
-    }
-
-    /**
-      * Runs a function over the sequence of [[Frag]]s and [[State]]s to
-      * transform it into a new sequence of [[Frag]]s. The callback returns
-      * 0 or more [[Frag]]s per call, which get stitched together into the
-      * final result, with consecutive [[Content]]s collapsed and redundant
-      * [[Color]]s removed
-      */
-    def transform(f: (Frag, State, State, Int, Int) => Seq[Frag]) = {
-      val b = new Str.Builder
-      walk{ (frag, originalState, index, screenLength) =>
-        f(frag, originalState, b.currentState, index, screenLength).foreach(b.append)
-        true
-      }
-      Str(b.result)
-    }
-    /**
-      * Walk over the sequence of [[Frag]]s; the callback gets called with each
-      * frag, together with some computed metadata about the ansi-[[State]] and
-      * screen length. In response, it returns a boolean that determines whether
-      * or not to continue walking or bail early.
-      */
-    def walk(f: (Frag, State, Int, Int) => Boolean): (State, Int, Int) = {
-
-      @tailrec def rec(index: Int,
-                       state: State,
-                       screenLength: Int): (State, Int, Int) = {
-        if (index >= fragments.length) (state, index, screenLength)
-        else if (!f(fragments(index), state, index, screenLength)) (state, index, screenLength)
-        else fragments.lift(index) match {
-          case Some(s: Color) =>
-            val newState = state.transform(s)
-            rec(index + 1, newState, screenLength)
-          case Some(Content(s)) => rec(index + 1, state, screenLength + s.length)
-          case None => (state, index, screenLength)
-        }
-      }
-      rec(0, State(), 0)
-    }
-
-    /**
-      * Tells you the state the desired visible-character index into the string,
-      * and how far into the sequence of segments this happens
-      */
-    def query(targetScreenLength: Int): (State, Int, Int) = {
-
-      val (endState, endIndex, endScreenLength) = walk{
-        case (frag: Color, state, index, screenLength) => true
-        case (frag: Content, state, index, screenLength) =>
-          val fragLength = frag.value.length
-          if (screenLength + fragLength > targetScreenLength) false
-          else true
-      }
-      (endState,  endIndex, targetScreenLength - endScreenLength)
-    }
-
-    /**
-      * Splits this [[Str]] at the specified plaintext index, producing
-      * two children that when rendered will result in the same visual output.
-      */
-    def splitAt(index: Int) = {
-      val (splitState, fragIndex, leftOver) = query(index)
-      val leftFrags = fragments.take(fragIndex)
-      val rightFrags = fragments.drop(fragIndex + 1)
-
-      val middle = fragments.lift(fragIndex) match {
-        case Some(Content(b)) => b
-        case None => ""
-        case Some(Color(_)) =>
-          // This shouldn't happen! When you split the Str, the middle node
-          // can't be a `Color` because it can only split a middle-node with
-          // a non-zero width.
-          ???
-
-      }
-
-      val (leftPartial, rightPartial) = middle.splitAt(leftOver)
-
-      val leftPartialOpt = if (leftPartial.isEmpty) None else Some(Content(leftPartial))
-      val left = leftFrags ++ leftPartialOpt
-
-      val rightPartialOpt = if (rightPartial.isEmpty) Vector() else Vector(Content(rightPartial))
-      val rightStartOpt = splitState.colors
-
-      val right = rightStartOpt ++ rightPartialOpt ++ rightFrags
-      (new Str(left), new Str(right))
+      new Str(chars, colorsOut)
     }
 
   }
 
-  /**
-    * Represents the state of the ANSI color state machine at any point in the
-    * string.
-    */
-  case class State(color: Option[Color] = None,
-                   bgColor: Option[Color] = None,
-                   bold: Boolean = false,
-                   underlined: Boolean = false,
-                   reversed: Boolean = false) {
-    /**
-      * Applies a color to this state and returns a new one modified by
-      * whatever that color does.
-      */
-    def transform(c: Color) = c match {
-      case Black | Red | Green | Yellow | Blue | Magenta | Cyan | White =>
-        this.copy(color = Some(c))
-      case ResetFore => this.copy(color = None)
-      case BlackB | RedB | GreenB | YellowB | BlueB | MagentaB | CyanB | WhiteB =>
-        this.copy(bgColor = Some(c))
-      case ResetB => this.copy(bgColor = None)
-      case Underlined => this.copy(underlined = true)
-      case Bold => this.copy(bold = true)
-      case Reversed => this.copy(reversed = true)
-      case Reset => State()
-      case x =>
-        throw new Exception("WTF IS DIS " + x)
-    }
-
-    /**
-      * The colors that would turn an empty state into this one
-      */
-    def colors: Vector[Color] = diffFrom(State())
-
-    /**
-      * Returns a sequence of colors that when used to `transform` the `source`
-      * state would make it equivalent to `this`
-      */
-    def diffFrom(source: State): Vector[Color] = {
-
-      if (!this.bold && source.bold ||
-          !this.underlined && source.underlined ||
-          !this.reversed && source.reversed){
-        Vector(Reset) ++ colors
-      }else{
-        val out = collection.mutable.Buffer.empty[Color]
-        if (this.color != source.color) out.append(color.getOrElse(ResetFore))
-        if (this.bgColor != source.bgColor) out.append(bgColor.getOrElse(ResetB))
-        // This can only turn *on* the flags, because if any of them could turn
-        // *off* the flags it would have been caught in the if-block above
-        if (this.bold != source.bold) out.append(Bold)
-        if (this.underlined != source.underlined ) out.append(Underlined)
-        if (this.reversed != source.reversed) out.append(Reversed)
-        out.toVector
-      }
-    }
-  }
 
 }

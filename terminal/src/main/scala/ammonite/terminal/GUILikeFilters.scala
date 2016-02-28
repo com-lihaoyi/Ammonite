@@ -106,7 +106,7 @@ object GUILikeFilters {
     def mangleBuffer(selectionFilter: SelectionFilter,
                      string: Ansi.Str,
                      cursor: Int,
-                     startColor: Ansi.Color) = {
+                     startColor: Ansi.Attr) = {
       selectionFilter.mark match{
         case Some(mark) if mark != cursor =>
           val Seq(min, max) = Seq(cursor, mark).sorted
