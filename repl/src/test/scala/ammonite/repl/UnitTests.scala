@@ -21,7 +21,11 @@ object UnitTests extends TestSuite{
   }
   val tests = TestSuite {
     println("UnitTests")
-
+    'transpose{
+      // Make sure this doesn't stack-overflow
+      val inner = List.fill(1000000)(1)
+      assert(Util.transpose(List.fill(10)(inner)) == List.fill(1000000)(List.fill(10)(1)))
+    }
     'highlighting {
       'fuzz - {
         import ammonite.ops._

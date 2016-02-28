@@ -42,6 +42,17 @@
       Although it's best to read the documentation on this page to learn how to use these projects, the Scaladoc is still useful as a reference.
   
   @sect{Changelog}
+
+    @sect{0.5.6}
+      @ul
+        @li
+          Fixed #341: stack overflow when `ls`ing large directories
+        @li
+          Fixed regression preventing you from running scripts via `./amm` using relative paths #353
+        @li
+          Ammonite should be more robust when interacting with other compiler plugins
+        @li
+          Fixed #352: imports now don't get improperly collapsed, and defining a value called `repl` no longer borks your session.
     @sect{0.5.5}
       @ul
         @li
