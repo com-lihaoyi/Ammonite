@@ -317,5 +317,17 @@ object ImportTests extends TestSuite{
         }
       }
     }
+    'collapsing{
+      check.session("""
+        @ object Foo{ val bar = 1 }
+
+        @ import Foo.bar
+
+        @ import Foo.{bar => _}
+
+        @ bar
+        res3: Int = 1
+      """)
+    }
   }
 }
