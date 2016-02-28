@@ -42,6 +42,12 @@
       Although it's best to read the documentation on this page to learn how to use these projects, the Scaladoc is still useful as a reference.
   
   @sect{Changelog}
+
+    @sect{0.5.6}
+      @ul
+        @li
+          Displaying large instances of paths does not cause stack overflow. (#351)
+
     @sect{0.5.5}
       @ul
         @li

@@ -187,9 +187,16 @@ object Util{
   type IvyMap = Map[(String, String, String, String), Set[String]]
   type ClassFiles = Traversable[(String, Array[Byte])]
   type CompileCache = (ClassFiles, Seq[ImportData])
-  def transpose[A](xs: List[List[A]]): List[List[A]] = xs.filter(_.nonEmpty) match {
-    case Nil    =>  Nil
-    case ys: List[List[A]] => ys.map{ _.head }::transpose(ys.map{ _.tail })
+  
+  def transpose[A](xs: List[List[A]]): List[List[A]] = {
+
+  	@scala.annotation.tailrec
+  	def transpose[A](xs: List[List[A]], result: List[List[A]]): List[List[A]] =
+  	xs.filter(_.nonEmpty) match {
+    	case Nil    =>  result
+    	case ys: List[List[A]] => transpose(ys.map{ _.tail }, ys.map{ _.head }::result)
+  	}
+  	transpose(xs, Nil).reverse
   }
 }
 
