@@ -33,10 +33,15 @@ val sharedSettings = Seq(
   organization := "com.lihaoyi",
   version := _root_.ammonite.Constants.version,
   libraryDependencies += "com.lihaoyi" %% "utest" % "0.3.0" % "test",
+
+  libraryDependencies ++= {
+    if (scalaVersion.value startsWith "2.11.") Nil
+    else Seq("org.scala-lang" % "scala-compiler" % scalaVersion.value % "provided")
+  },
   testFrameworks := Seq(new TestFramework("utest.runner.Framework")),
   scalacOptions += "-target:jvm-1.7",
   autoCompilerPlugins := true,
-  addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.3"),
+  addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.4"),
   ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) },
   parallelExecution in Test := !scalaVersion.value.contains("2.10"),
   (unmanagedSources in Compile) += baseDirectory.value/".."/"project"/"Constants.scala",
@@ -44,7 +49,7 @@ val sharedSettings = Seq(
     (baseDirectory.value/".."/"project"/"Constants.scala") -> "Constants.scala"
   },
   libraryDependencies ++= Seq(
-    "com.lihaoyi" %% "acyclic" % "0.1.3" % "provided"
+    "com.lihaoyi" %% "acyclic" % "0.1.4" % "provided"
   ) ,
   publishTo := Some(
     "releases" at "https://oss.sonatype.org/service/local/staging/deploy/maven2"
