@@ -26,9 +26,8 @@ object FilterTools {
   /**
    * `orElse`-s together each partial function passed to it
    */
-  def orElseAll[T, V](pfs: PartialFunction[T, V]*) = new PartialFunction[T, V]{
-    def isDefinedAt(x: T) = pfs.exists(_.isDefinedAt(x))
-    def apply(v1: T) = pfs.find(_.isDefinedAt(v1)).map(_(v1)).getOrElse(throw new MatchError(v1))
+  def orElseAll[T, V](pfs: (T => Option[V])*) = new Function[T, Option[V]]{
+    def apply(v1: T) = pfs.iterator.flatMap(_(v1)).take(1).toSeq.headOption
   }
 
   /**
@@ -56,7 +55,7 @@ object FilterTools {
           cursor1
         )
       }
-    }
+    }.lift
 
   /**
    * Shorthand for pattern matching on [[TermState]]

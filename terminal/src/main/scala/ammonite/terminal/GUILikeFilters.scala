@@ -68,7 +68,7 @@ object GUILikeFilters {
       Case(AltShiftLeft){(b, c, m) => setMark(c); wordLeft(b, c)},
       Case(FnShiftRight){(b, c, m) => setMark(c); BasicFilters.moveEnd(b, c, m.width)},
       Case(FnShiftLeft){(b, c, m) => setMark(c); BasicFilters.moveStart(b, c, m.width)},
-      {
+      TermCore.Filter{
         case TS(27 ~: 91 ~: 90 ~: rest, b, c, _) if mark.isDefined =>
           doIndent(b, c, rest,
             slice => -math.min(slice.iterator.takeWhile(_ == ' ').size, indent)

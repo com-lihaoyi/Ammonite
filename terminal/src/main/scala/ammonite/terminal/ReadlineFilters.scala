@@ -152,7 +152,7 @@ object ReadlineFilters {
 
       // If some command goes through that's not appending/prepending to the
       // kill ring, stop appending and allow the next kill to override it
-      {case ti if {accumulating = false; false} => ???},
+      {_ => accumulating = false; None},
       Case(Ctrl('h'))((b, c, m) => cutCharLeft(b, c)),
       Case(Ctrl('y'))((b, c, m) => paste(b, c))
     )
@@ -244,8 +244,12 @@ object ReadlineFilters {
     val undoMsg = Console.BLUE + " ...undoing last action, `Alt -` or `Esc -` to redo"
     val redoMsg = Console.BLUE + " ...redoing last action"
     def filter = orElseAll(
-      {case TS(q ~: rest, b, c, _) if {Debug("UndoFilter.filter " + q); pushUndos(b, c); false} => ???},
-      {
+      {case TS(q ~: rest, b, c, _) =>
+        Debug("UndoFilter.filter " + q)
+        pushUndos(b, c)
+        None
+      },
+      TermCore.Filter{
         case TS(31 ~: rest, b, c, _) => wrap(undo(b, c), rest, undoMsg)
         case TS(27 ~: 45 ~: rest, b, c, _) => wrap(redo(b, c), rest, "")
       }

@@ -23,7 +23,7 @@ object Main{
     System.setProperty("ammonite-sbt-build", "true")
     var history = List.empty[String]
     val selection = GUILikeFilters.SelectionFilter(indent = 4)
-    def multilineFilter: TermCore.Filter = {
+    def multilineFilter: TermCore.Filter = TermCore.Filter{
       case TermState(13 ~: rest, b, c, _) if b.count(_ == '(') != b.count(_ == ')') =>
         BasicFilters.injectNewLine(b, c, rest)
     }
@@ -37,17 +37,19 @@ object Main{
         Console.MAGENTA + (0 until 10).mkString + "\n@@@ " + Console.RESET,
         reader,
         new OutputStreamWriter(System.out),
-        ReadlineFilters.UndoFilter() orElse
-        cutPaste orElse
-        historyFilter orElse
-        multilineFilter orElse
-        selection orElse
-        BasicFilters.tabFilter(4) orElse
-        GUILikeFilters.altFilter orElse
-        GUILikeFilters.fnFilter orElse
-        ReadlineFilters.navFilter orElse
-//        Example multiline support by intercepting Enter key
-        BasicFilters.all,
+        FilterTools.orElseAll(
+          ReadlineFilters.UndoFilter(),
+          cutPaste,
+          historyFilter,
+          multilineFilter,
+          selection,
+          BasicFilters.tabFilter(4),
+          GUILikeFilters.altFilter,
+          GUILikeFilters.fnFilter,
+          ReadlineFilters.navFilter,
+  //        Example multiline support by intercepting Enter key
+          BasicFilters.all
+        ),
         // Example displayTransform: underline all non-spaces
         displayTransform = (buffer, cursor) => {
           // underline all non-blank lines

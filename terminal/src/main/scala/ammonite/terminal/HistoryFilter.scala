@@ -134,17 +134,21 @@ class HistoryFilter(history: () => IndexedSeq[String],
     searchTerm = None
   }
 
-  def filter = prelude orElse filter0.andThen{
-    // Reset the `prevBuffer` every time `filter0` runs successfully. This means
-    // that every time we check `prevBuffer` to see if it has changed, we do not
-    // see any changes caused by our own code in this HistoryFilter
-    case ts: TermState =>
-      prevBuffer = Some(ts.buffer)
-      ts
-    case x => x
+  def filter = (ti) => {
+    prelude(ti) match {
+      case None =>
+        prevBuffer = Some(ti.ts.buffer)
+        filter0(ti) match{
+          case Some(ts: TermState) =>
+            prevBuffer = Some(ts.buffer)
+            Some(ts)
+          case x => x
+        }
+      case some => some
+    }
   }
 
-  def prelude: TermCore.Filter = {
+  def prelude: TermCore.Filter = TermCore.Filter{
     case TS(inputs, b, c, _) if activeHistory && prevBuffer.exists(_ != b) =>
       endHistory()
       prevBuffer = None
@@ -153,10 +157,10 @@ class HistoryFilter(history: () => IndexedSeq[String],
     // weird hacks to make it run code every time without having to be the one
     // handling the input; ideally we'd change TermCore.Filter to be something
     // other than a PartialFunction, but for now this will do.
-    case ti if {prevBuffer = Some(ti.ts.buffer); false} => ???
+    case ti if {; false} => ???
   }
 
-  def filter0: TermCore.Filter = {
+  def filter0: TermCore.Filter = TermCore.Filter{
     // Ways to kick off the history/search if you're not already in it
 
     // `Ctrl-R`

@@ -102,13 +102,12 @@ object TermCore {
     (cursorY, cursorX)
   }
 
-
-  type Filter = PartialFunction[TermInfo, TermAction]
+  def Filter(f: PartialFunction[TermInfo, TermAction]) = f.lift
+  type Filter = TermInfo => Option[TermAction]
   type Action = (Vector[Char], Int) => (Vector[Char], Int)
   type MsgAction = (Vector[Char], Int) => (Vector[Char], Int, String)
   trait DelegateFilter extends Filter{
     def filter: Filter
-    def isDefinedAt(x: TermInfo) = filter.isDefinedAt(x)
     def apply(v1: TermInfo) = filter(v1)
   }
 
@@ -128,7 +127,7 @@ object TermCore {
   def readLine(prompt: Prompt,
                reader: java.io.Reader,
                writer: java.io.Writer,
-               filters: PartialFunction[TermInfo, TermAction] = PartialFunction.empty,
+               filters: TermInfo => Option[TermAction] = _ => None,
                displayTransform: (Vector[Char], Int) => (Ansi.Str, Int) = noTransform)
                : Option[String] = {
 
@@ -269,7 +268,7 @@ object TermCore {
         (nextUps, newState)
       }
       Debug("TermCore.readChar")
-      filters(TermInfo(lastState, actualWidth)) match {
+      filters(TermInfo(lastState, actualWidth)).get match {
         case Printing(TermState(s, b, c, msg), stdout) =>
           writer.write(stdout)
           val (nextUps, newState) = updateState(s, b, c, msg)

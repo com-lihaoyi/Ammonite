@@ -10,14 +10,14 @@ import ammonite.terminal.TermCore.Filter
  * (including with all the modifier keys), enter/ctrl-c-exit, etc.
  */
 object BasicFilters {
-  def all = {
-    navFilter orElse
-    exitFilter orElse
-    enterFilter orElse
-    clearFilter orElse
-    loggingFilter orElse
+  def all = orElseAll(
+    navFilter,
+    exitFilter,
+    enterFilter,
+    clearFilter,
+    loggingFilter,
     typingFilter
-  }
+  )
 
   def injectNewLine(b: Vector[Char], c: Int, rest: LazyList[Int]) = {
     val (first, last) = b.splitAt(c)
@@ -40,11 +40,11 @@ object BasicFilters {
     TS(rest, lhs ++ Vector.fill(spacesToInject)(' ') ++ rhs, c + spacesToInject)
   }
 
-  def tabFilter(indent: Int): Filter = {
+  def tabFilter(indent: Int): Filter = TermCore.Filter{
     case TS(9 ~: rest, b, c, _) => tabColumn(indent, b, c, rest)
   }
 
-  def loggingFilter: TermCore.Filter = {
+  def loggingFilter: TermCore.Filter = TermCore.Filter{
     case TS(Ctrl('q') ~: rest, b, c, _) =>
       println("Char Display Mode Enabled! Ctrl-C to exit")
       var curr = rest
@@ -54,7 +54,7 @@ object BasicFilters {
       }
       TS(curr, b, c)
   }
-  def typingFilter: TermCore.Filter = {
+  def typingFilter: TermCore.Filter = TermCore.Filter{
     case TS(p"\u001b[3~$rest", b, c, _) =>
 //      Debug("fn-delete")
       val (first, last) = b.splitAt(c)
@@ -76,14 +76,14 @@ object BasicFilters {
     else injectNewLine(b, c, rest)
   }
 
-  def enterFilter: TermCore.Filter = {
+  def enterFilter: TermCore.Filter = TermCore.Filter{
     case TS(13 ~: rest, b, c, _) => doEnter(b, c, rest) // Enter
     case TS(10 ~: rest, b, c, _) => doEnter(b, c, rest) // Enter
     case TS(10 ~: 13 ~: rest, b, c, _) => doEnter(b, c, rest) // Enter
     case TS(13 ~: 10 ~: rest, b, c, _) => doEnter(b, c, rest) // Enter
   }
 
-  def exitFilter: TermCore.Filter = {
+  def exitFilter: TermCore.Filter = TermCore.Filter{
     case TS(Ctrl('c') ~: rest, b, c, _) =>
       Result("")
     case TS(Ctrl('d') ~: rest, b, c, _) =>
@@ -95,7 +95,7 @@ object BasicFilters {
       }
     case TS(-1 ~: rest, b, c, _) => Exit   // java.io.Reader.read() produces -1 on EOF
   }
-  def clearFilter: TermCore.Filter = {
+  def clearFilter: TermCore.Filter = TermCore.Filter{
     case TS(Ctrl('l') ~: rest, b, c, _) => ClearScreen(TS(rest, b, c))
   }
 
