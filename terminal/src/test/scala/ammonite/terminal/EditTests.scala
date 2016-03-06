@@ -120,7 +120,7 @@ object EditTests extends TestSuite{
       * - check(
         """
         abcd
-        fghfgh_
+        efghefgh_
         ijkl
         """,
         edit.cutWordLeft,

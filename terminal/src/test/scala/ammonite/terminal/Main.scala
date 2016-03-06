@@ -27,6 +27,7 @@ object Main{
         BasicFilters.injectNewLine(b, c, rest)
     }
     val reader = new java.io.InputStreamReader(System.in)
+    val cutPaste = ReadlineFilters.CutPasteFilter()
     rec()
     @tailrec def rec(): Unit = {
       val historyFilter = new HistoryFilter(
@@ -35,6 +36,7 @@ object Main{
         Console.MAGENTA + (0 until 10).mkString + "\n@@@ " + Console.RESET,
         reader,
         new OutputStreamWriter(System.out),
+        cutPaste orElse
         historyFilter orElse
         multilineFilter orElse
         selection orElse
@@ -42,7 +44,6 @@ object Main{
         GUILikeFilters.altFilter orElse
         GUILikeFilters.fnFilter orElse
         ReadlineFilters.navFilter orElse
-        ReadlineFilters.CutPasteFilter() orElse
 //        Example multiline support by intercepting Enter key
         BasicFilters.all,
         // Example displayTransform: underline all non-spaces

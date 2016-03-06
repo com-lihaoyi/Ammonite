@@ -93,34 +93,46 @@ object ReadlineFilters {
    * use these shortcuts for deleting and don't use paste much at all.
    */
   case class CutPasteFilter() extends TermCore.DelegateFilter{
+    var accumulating = false
     var currentCut = Vector.empty[Char]
+    def prepend(b: Vector[Char]) = {
+      if (accumulating) currentCut = b ++ currentCut
+      else currentCut = b
+      accumulating = true
+    }
+    def append(b: Vector[Char]) = {
+      if (accumulating) currentCut = currentCut ++ b
+      else currentCut = b
+      accumulating = true
+    }
     def cutCharLeft(b: Vector[Char], c: Int) = {
       /* Do not edit current cut. Zsh(zle) & Bash(readline) do not edit the yank ring for Ctrl-h */
       (b patch(from = c - 1, patch = Nil, replaced = 1), c - 1)
     }
 
     def cutAllLeft(b: Vector[Char], c: Int) = {
-      currentCut = b.take(c)
+      prepend(b.take(c))
       (b.drop(c), 0)
     }
     def cutAllRight(b: Vector[Char], c: Int) = {
-      currentCut = b.drop(c)
+      append(b.drop(c))
       (b.take(c), c)
     }
 
     def cutWordRight(b: Vector[Char], c: Int) = {
       val start = GUILikeFilters.consumeWord(b, c, 1, 0)
-      currentCut = b.slice(c, start)
+      append(b.slice(c, start))
       (b.take(c) ++ b.drop(start), c)
     }
 
     def cutWordLeft(b: Vector[Char], c: Int) = {
       val start = GUILikeFilters.consumeWord(b, c - 1, -1, 1)
-      currentCut = b.slice(start, c)
+      prepend(b.slice(start, c))
       (b.take(start) ++ b.drop(c), start)
     }
 
     def paste(b: Vector[Char], c: Int) = {
+      accumulating = false
       (b.take(c) ++ currentCut ++ b.drop(c), c + currentCut.length)
     }
 
@@ -129,9 +141,16 @@ object ReadlineFilters {
       Case(Ctrl('k'))((b, c, m) => cutAllRight(b, c)),
       Case(Alt + "d")((b, c, m) => cutWordRight(b, c)),
       Case(Ctrl('w'))((b, c, m) => cutWordLeft(b, c)),
+      Case(Alt + "\u007f")((b, c, m) => cutWordLeft(b, c)),
+      // weird hacks to make it run code every time without having to be the one
+      // handling the input; ideally we'd change TermCore.Filter to be something
+      // other than a PartialFunction, but for now this will do.
+
+      // If some command goes through that's not appending/prepending to the
+      // kill ring, stop appending and allow the next kill to override it
+      {case ti if {accumulating = false; false} => ???},
       Case(Ctrl('h'))((b, c, m) => cutCharLeft(b, c)),
-      Case(Ctrl('y'))((b, c, m) => paste(b, c)),
-      Case(Alt + "\u007f")((b, c, m) => cutWordLeft(b, c))
+      Case(Ctrl('y'))((b, c, m) => paste(b, c))
     )
   }
 

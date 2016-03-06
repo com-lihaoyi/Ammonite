@@ -40,6 +40,7 @@ case class AmmoniteFrontEnd(extraFilters: TermCore.Filter = PartialFunction.empt
     res
   }
 
+  val cutPasteFilter = ReadlineFilters.CutPasteFilter()
 
   def readLine(reader: java.io.Reader,
                output: OutputStream,
@@ -94,7 +95,6 @@ case class AmmoniteFrontEnd(extraFilters: TermCore.Filter = PartialFunction.empt
     val historyFilter = new HistoryFilter(
       () => history.reverse, colors.comment(), colors.reset()
     )
-    val cutPasteFilter = ReadlineFilters.CutPasteFilter()
     val selectionFilter = GUILikeFilters.SelectionFilter(indent = 2)
 
     val allFilters =
