@@ -55,7 +55,8 @@
           Fixed #352: imports now don't get improperly collapsed, and defining a value called @code{repl} no longer borks your session.
         @li
           Improved readline-emulation of @code{AmmoniteFrontEnd}: @code{Ctrl-T} and @code{Alt-T} now properly transpose characters and words, and the kill-ring now properly aggregates multiple consecutive kills.
-
+        @li
+          Added asserts to @code{rm} @code{cp} and @code{mv} to prevent you from removing the root folder, or copying/moving folders into themselves.
     @sect{0.5.5}
       @ul
         @li

@@ -162,8 +162,14 @@ trait CopyMove extends Function2[Path, Path, Unit]{
  * Creates any necessary directories
  */
 object mv extends Function2[Path, Path, Unit] with Internals.Mover with CopyMove{
-  def apply(from: Path, to: Path) =
+  def apply(from: Path, to: Path) = {
+    require(
+      !to.startsWith(from),
+      s"Can't move a directory into itself: $to is inside $from"
+    )
     java.nio.file.Files.move(from.toNIO, to.toNIO)
+  }
+
 
   def check = false
 
@@ -179,6 +185,10 @@ object mv extends Function2[Path, Path, Unit] with Internals.Mover with CopyMove
  */
 object cp extends Function2[Path, Path, Unit] with CopyMove{
   def apply(from: Path, to: Path) = {
+    require(
+      !to.startsWith(from),
+      s"Can't copy a directory into itself: $to is inside $from"
+    )
     def copyOne(p: Path) = {
       Files.copy(p.toNIO, (to/(p relativeTo from)).toNIO)
     }
@@ -196,6 +206,10 @@ object cp extends Function2[Path, Path, Unit] with CopyMove{
  */
 object rm extends Function1[Path, Unit]{
   def apply(target: Path) = {
+    require(
+      target.segments.nonEmpty,
+      s"Cannot rm a root directory: $target"
+    )
     // Emulate `rm -rf` functionality by ignoring non-existent files
     val files =
       try ls.rec! target
