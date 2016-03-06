@@ -11,13 +11,28 @@ abstract class Enum{
   protected[this] def Item[T](constructor: String => T)
                              (implicit i: sourcecode.Name): T = constructor(i.value)
 }
+
 sealed class UndoState(override val toString: String)
 object UndoState extends Enum{
   val Default, Typing, Deleting, Navigating = Item(new UndoState(_))
 }
 
-case class UndoFilter() extends TermCore.DelegateFilter{
-  val undoStack = mutable.Buffer(Vector[Char]() -> 0)
+object UndoFilter{
+  val undoMsg = Ansi.Color.Blue(" ...undoing last action, `Alt -` or `Esc -` to redo")
+  val cannotUndoMsg = Ansi.Color.Blue(" ...no more actions to undo")
+  val redoMsg = Ansi.Color.Blue(" ...redoing last action")
+  val cannotRedoMsg = Ansi.Color.Blue(" ...no more actions to redo")
+}
+
+case class UndoFilter(maxUndo: Int = 25) extends TermCore.DelegateFilter{
+  /**
+    * The current stack of states that undo/redo would cycle through.
+    */
+  val undoBuffer = mutable.Buffer[(Vector[Char], Int)](Vector[Char]() -> 0)
+
+  /**
+    * The current position in the undoStack that the terminal is currently in.
+    */
   var undoIndex = 0
   /**
     * An enum representing what the user is "currently" doing. Used to
@@ -27,29 +42,39 @@ case class UndoFilter() extends TermCore.DelegateFilter{
     * typed gets grouped into 3 different undo steps
     */
   var state = UndoState.Default
-  def currentUndo = undoStack(undoStack.length - undoIndex - 1)
+  def currentUndo = undoBuffer(undoBuffer.length - undoIndex - 1)
   def undo(b: Vector[Char], c: Int) = {
-    if (undoIndex < undoStack.length - 1) {
-      undoIndex += 1
-      state = UndoState.Default
-    }
-    currentUndo
+    val msg =
+      if (undoIndex >= undoBuffer.length - 1) UndoFilter.cannotUndoMsg
+      else {
+        undoIndex += 1
+        state = UndoState.Default
+        UndoFilter.undoMsg
+      }
+    val (b1, c1) = currentUndo
+    (b1, c1, msg)
   }
   def redo(b: Vector[Char], c: Int) = {
-    if (undoIndex > 0) {
-      undoIndex -= 1
-      state = UndoState.Default
-    }
+    val msg =
+      if (undoIndex <= 0) UndoFilter.cannotRedoMsg
+      else {
+        undoIndex -= 1
+        state = UndoState.Default
+        UndoFilter.redoMsg
+      }
+
     currentUndo
+    val (b1, c1) = currentUndo
+    (b1, c1, msg)
   }
-  def wrap(bc: (Vector[Char], Int), rest: LazyList[Int], msg: Ansi.Str) = {
-    val (b, c) = bc
+  def wrap(bc: (Vector[Char], Int, Ansi.Str), rest: LazyList[Int]) = {
+    val (b, c, msg) = bc
     TS(rest, b, c, msg)
   }
 
   def pushUndos(b: Vector[Char], c: Int) = {
+
     val (lastB, lastC) = currentUndo
-    Debug("")
     // Since we don't have access to the `typingFilter` in this code, we
     // instead attempt to reverse-engineer "what happened" to the buffer by
     // comparing the old one with the new.
@@ -57,7 +82,6 @@ case class UndoFilter() extends TermCore.DelegateFilter{
     // It turns out that it's not that hard to identify the few cases we care
     // about, since they're all result in either 0 or 1 chars being different
     // between old and new buffers.
-
     val newState =
     // Nothing changed means nothing changed
       if (lastC == c && lastB == b) state
@@ -73,21 +97,26 @@ case class UndoFilter() extends TermCore.DelegateFilter{
       else UndoState.Default
 
     if (state != newState || newState == UndoState.Default && (lastB, lastC) != (b, c)) {
+      // If something changes: either we enter a new `UndoState`, or we're in
+      // the `Default` undo state and the terminal buffer/cursor change, then
+      // truncate the `undoStack` and add a new tuple to the stack that we can
+      // build upon. This means that we lose all ability to re-do actions after
+      // someone starts making edits, which is consistent with most other
+      // editors
       state = newState
-      undoStack.dropRight(undoIndex)
+      undoBuffer.remove(undoBuffer.length - undoIndex, undoIndex)
       undoIndex = 0
-      undoStack.append(b -> c)
-    }else{
-      if (undoIndex == 0 && (b, c) != undoStack.last) {
-        undoStack(undoStack.length - 1) = (b, c)
-      }
+
+      if(undoBuffer.length == maxUndo) undoBuffer.remove(0)
+
+      undoBuffer.append(b -> c)
+    }else if (undoIndex == 0 && (b, c) != undoBuffer(undoBuffer.length - 1)) {
+      undoBuffer(undoBuffer.length - 1) = (b, c)
     }
 
     state = newState
   }
 
-  val undoMsg = Console.BLUE + " ...undoing last action, `Alt -` or `Esc -` to redo"
-  val redoMsg = Console.BLUE + " ...redoing last action"
   def filter = TermCore.Filter.merge(
     {
       case TS(q ~: rest, b, c, _) =>
@@ -95,8 +124,9 @@ case class UndoFilter() extends TermCore.DelegateFilter{
         None
     },
     TermCore.Filter{
-      case TS(31 ~: rest, b, c, _) => wrap(undo(b, c), rest, undoMsg)
-      case TS(27 ~: 45 ~: rest, b, c, _) => wrap(redo(b, c), rest, "")
+      case TS(31 ~: rest, b, c, _) => wrap(undo(b, c), rest)
+      case TS(27 ~: 114 ~: rest, b, c, _) => wrap(undo(b, c), rest)
+      case TS(27 ~: 45 ~: rest, b, c, _) => wrap(redo(b, c), rest)
     }
   )
 }

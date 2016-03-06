@@ -16,7 +16,7 @@ object Ansi {
     def transform(state: Short) = ((state & ~resetMask) | applyMask).toShort
 
     def matches(state: Short) = (state & resetMask) == applyMask
-
+    def apply(s: Ansi.Str) = s.overlay(this, 0, s.length)
   }
   object Attr {
     val Reset = new Attr(Some(Console.RESET), Short.MaxValue, 0)

@@ -272,7 +272,9 @@ object TermCore {
 
         (nextUps, newState)
       }
-      Debug("TermCore.readChar")
+      // `.get` because we assume that *some* filter is going to match each
+      // character, even if only to dump the character to the screen. If nobody
+      // matches the character then we can feel free to blow up
       filters(TermInfo(lastState, actualWidth)).get match {
         case Printing(TermState(s, b, c, msg), stdout) =>
           writer.write(stdout)
