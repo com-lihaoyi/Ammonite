@@ -14,7 +14,7 @@ import scala.collection.mutable
  * Maintains basic invariants, such as "cursor should always be within
  * the buffer", and "ansi terminal should reflect most up to date TermState"
  */
-object TermCore {
+object Terminal {
 
   val ansiRegex = "\u001B\\[[;\\d]*m".r
 
@@ -226,7 +226,7 @@ object TermCore {
       val transformedBuffer = transformedBuffer0 ++ lastState.msg
       lazy val lastOffsetCursor = lastState.cursor + cursorOffset
       lazy val rowLengths = splitBuffer(
-        ansiRegex.replaceAllIn(lastState.buffer ++ lastState.msg.render, "").toVector
+        lastState.buffer ++ lastState.msg.plainText
       )
       val narrowWidth = width - prompt.lastLine.length
       val newlinePrompt = rowLengths.exists(_ >= narrowWidth)

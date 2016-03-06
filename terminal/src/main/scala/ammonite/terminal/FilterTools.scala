@@ -63,7 +63,7 @@ object FilterTools {
 
 
   def findChunks(b: Vector[Char], c: Int) = {
-    val chunks = TermCore.splitBuffer(b)
+    val chunks = Terminal.splitBuffer(b)
     // The index of the first character in each chunk
     val chunkStarts = chunks.inits.map(x => x.length + x.sum).toStream.reverse
     // Index of the current chunk that contains the cursor

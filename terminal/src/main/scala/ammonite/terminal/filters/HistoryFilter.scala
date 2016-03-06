@@ -6,7 +6,9 @@ import ammonite.terminal._
 import acyclic.file
 
 /**
-  * Provides history navigation up and down, saving the current line.
+  * Provides history navigation up and down, saving the current line, a well
+  * as history-search functionality (`Ctrl R` in bash) letting you quickly find
+  * & filter previous commands by entering a sub-string.
   */
 class HistoryFilter(history: () => IndexedSeq[String],
                     commentStartColor: String,

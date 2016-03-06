@@ -7,26 +7,29 @@ import acyclic.file
 import scala.collection.mutable
 
 
-abstract class Enum{
-  protected[this] def Item[T](constructor: String => T)
-                             (implicit i: sourcecode.Name): T = constructor(i.value)
-}
-
-sealed class UndoState(override val toString: String)
-object UndoState extends Enum{
-  val Default, Typing, Deleting, Navigating = Item(new UndoState(_))
-}
-
-object UndoFilter{
-  val undoMsg = Ansi.Color.Blue(" ...undoing last action, `Alt -` or `Esc -` to redo")
-  val cannotUndoMsg = Ansi.Color.Blue(" ...no more actions to undo")
-  val redoMsg = Ansi.Color.Blue(" ...redoing last action")
-  val cannotRedoMsg = Ansi.Color.Blue(" ...no more actions to redo")
-}
-
+/**
+  * A filter that implements "undo" functionality in the ammonite REPL. It
+  * shares the same `Ctrl -` hotkey that the bash undo, but shares behavior
+  * with the undo behavior in desktop text editors:
+  *
+  * - Multiple `delete`s in a row get collapsed
+  * - In addition to edits you can undo cursor movements: undo will bring your
+  *   cursor back to location of previous edits before it undoes them
+  * - Provides "redo" functionality under `Alt -`/`Esc -`: un-undo the things
+  *   you didn't actually want to undo!
+  *
+  * @param maxUndo: the maximum number of undo-frames that are stored.
+  */
 case class UndoFilter(maxUndo: Int = 25) extends DelegateFilter{
   /**
     * The current stack of states that undo/redo would cycle through.
+    *
+    * Not really the appropriate data structure, since when it reaches
+    * `maxUndo` in length we remove one element from the start whenever we
+    * append one element to the end, which costs `O(n)`. On the other hand,
+    * It also costs `O(n)` to maintain the buffer of previous states, and
+    * so `n` is probably going to be pretty small anyway (tens?) so `O(n)`
+    * is perfectly fine.
     */
   val undoBuffer = mutable.Buffer[(Vector[Char], Int)](Vector[Char]() -> 0)
 
@@ -129,4 +132,17 @@ case class UndoFilter(maxUndo: Int = 25) extends DelegateFilter{
       case TS(27 ~: 45 ~: rest, b, c, _) => wrap(redo(b, c), rest)
     }
   )
+}
+
+
+sealed class UndoState(override val toString: String)
+object UndoState extends Enum{
+  val Default, Typing, Deleting, Navigating = Item(new UndoState(_))
+}
+
+object UndoFilter{
+  val undoMsg = Ansi.Color.Blue(" ...undoing last action, `Alt -` or `Esc -` to redo")
+  val cannotUndoMsg = Ansi.Color.Blue(" ...no more actions to undo")
+  val redoMsg = Ansi.Color.Blue(" ...redoing last action")
+  val cannotRedoMsg = Ansi.Color.Blue(" ...no more actions to redo")
 }

@@ -4,7 +4,17 @@ import java.io.{OutputStream, ByteArrayOutputStream, Writer}
 import acyclic.file
 import scala.annotation.tailrec
 
-
+/**
+  * Prints stuff to an ad-hoc logging file when running the ammonite-repl or
+  * ammonite-terminal in development mode in its SBT project.
+  *
+  * Very handy for the common case where you're debugging terminal interactions
+  * and cannot use `println` because it will stomp all over your already messed
+  * up terminal state and block debugging. With [[Debug]], you can have a
+  * separate terminal open tailing the log file and log as verbosely as you
+  * want without affecting the primary terminal you're using to interact with
+  * Ammonite.
+  */
 object Debug{
   lazy val debugOutput = {
     if (System.getProperty("ammonite-sbt-build") != "true") ???
@@ -15,6 +25,17 @@ object Debug{
       debugOutput.write((System.currentTimeMillis() + "\t\t" + s + "\n").getBytes)
   }
 }
+
+/**
+  * A small helper class to quickly define enumerations: extend this class in
+  * your companion object and define the items via `val a, b, c = Item(...)`
+  * passing in your enum class constructor in place of `...`.
+  */
+abstract class Enum{
+  protected[this] def Item[T](constructor: String => T)
+                             (implicit i: sourcecode.Name): T = constructor(i.value)
+}
+
 class AnsiNav(output: Writer){
   def control(n: Int, c: Char) = output.write(s"\033[" + n + c)
 

@@ -114,7 +114,7 @@ case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEn
 
 
     Timer("AmmoniteFrontEnd.readLine 1")
-    val res = TermCore.readLine(
+    val res = Terminal.readLine(
       prompt,
       reader,
       writer,

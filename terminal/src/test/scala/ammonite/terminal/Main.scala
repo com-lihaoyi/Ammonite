@@ -34,7 +34,7 @@ object Main{
     @tailrec def rec(): Unit = {
       val historyFilter = new HistoryFilter(
         () => history.toVector, Console.BLUE, AnsiNav.resetForegroundColor)
-      TermCore.readLine(
+      Terminal.readLine(
         Console.MAGENTA + (0 until 10).mkString + "\n@@@ " + Console.RESET,
         reader,
         new OutputStreamWriter(System.out),
