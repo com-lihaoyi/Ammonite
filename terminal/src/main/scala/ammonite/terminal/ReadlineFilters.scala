@@ -195,9 +195,9 @@ object ReadlineFilters {
       }
       currentUndo
     }
-    def wrap(bc: (Vector[Char], Int), rest: LazyList[Int]) = {
+    def wrap(bc: (Vector[Char], Int), rest: LazyList[Int], msg: Ansi.Str) = {
       val (b, c) = bc
-      TS(rest, b, c)
+      TS(rest, b, c, msg)
     }
 
     def pushUndos(b: Vector[Char], c: Int) = {
@@ -235,16 +235,20 @@ object ReadlineFilters {
         undoStack.append(b -> c)
       }else{
         Debug(s"pushUndos update\t${undoStack(undoStack.length - 1)}\t->\t${(b, c)}")
-        undoStack(undoStack.length - 1) = (b, c)
+        if ((b, c) != undoStack.last) undoStack(undoStack.length - 1) = (b, c)
       }
 
       state = newState
     }
 
-    def filter = {
-      case TS(q ~: rest, b, c, _) if {Debug("UndoFilter.filter " + q); pushUndos(b, c); false} => ???
-      case TS(31 ~: rest, b, c, _) => wrap(undo(b, c), rest)
-      case TS(27 ~: 45 ~: rest, b, c, _) => wrap(redo(b, c), rest)
-    }
+    val undoMsg = Console.BLUE + " ...undoing last action, `Alt -` or `Esc -` to redo"
+    val redoMsg = Console.BLUE + " ...redoing last action"
+    def filter = orElseAll(
+      {case TS(q ~: rest, b, c, _) if {Debug("UndoFilter.filter " + q); pushUndos(b, c); false} => ???},
+      {
+        case TS(31 ~: rest, b, c, _) => wrap(undo(b, c), rest, undoMsg)
+        case TS(27 ~: 45 ~: rest, b, c, _) => wrap(redo(b, c), rest, "")
+      }
+    )
   }
 }
