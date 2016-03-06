@@ -6,6 +6,7 @@ import java.io.OutputStreamWriter
 import ammonite.terminal.GUILikeFilters.SelectionFilter
 import ammonite.terminal.LazyList.~:
 
+
 import scala.annotation.tailrec
 
 
@@ -36,6 +37,7 @@ object Main{
         Console.MAGENTA + (0 until 10).mkString + "\n@@@ " + Console.RESET,
         reader,
         new OutputStreamWriter(System.out),
+        ReadlineFilters.UndoFilter() orElse
         cutPaste orElse
         historyFilter orElse
         multilineFilter orElse

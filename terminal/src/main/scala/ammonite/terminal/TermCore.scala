@@ -268,6 +268,7 @@ object TermCore {
 
         (nextUps, newState)
       }
+      Debug("TermCore.readChar")
       filters(TermInfo(lastState, actualWidth)) match {
         case Printing(TermState(s, b, c, msg), stdout) =>
           writer.write(stdout)
