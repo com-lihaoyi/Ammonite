@@ -134,7 +134,7 @@ object Ansi {
         if start != end
       } {
         val frag = raw.subSequence(start, end).toString
-        if (frag.charAt(0) == '\u001b') {
+        if (frag.charAt(0) == '\u001b' && Attr.ParseMap.contains(frag)) {
           currentColor = Attr.ParseMap(frag).transform(currentColor)
         } else {
           var i = 0
