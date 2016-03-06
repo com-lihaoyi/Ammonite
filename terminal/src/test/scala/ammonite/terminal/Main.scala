@@ -3,8 +3,10 @@ package ammonite.terminal
 import java.io.OutputStreamWriter
 
 
-import ammonite.terminal.GUILikeFilters.SelectionFilter
+import ammonite.terminal.filters.{GUILikeFilters, BasicFilters, HistoryFilter, ReadlineFilters}
+import GUILikeFilters.SelectionFilter
 import ammonite.terminal.LazyList.~:
+import ammonite.terminal.filters.{BasicFilters, HistoryFilter, ReadlineFilters}
 
 
 import scala.annotation.tailrec
@@ -37,7 +39,7 @@ object Main{
         Console.MAGENTA + (0 until 10).mkString + "\n@@@ " + Console.RESET,
         reader,
         new OutputStreamWriter(System.out),
-        FilterTools.orElseAll(
+        TermCore.Filter.merge(
           ReadlineFilters.UndoFilter(),
           cutPaste,
           historyFilter,

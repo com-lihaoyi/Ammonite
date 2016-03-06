@@ -1,11 +1,8 @@
-package ammonite.terminal
-import acyclic.file
-import FilterTools._
-import ammonite.terminal.LazyList._
-import SpecialKeys._
-import ammonite.terminal.TermState
+package ammonite.terminal.filters
 
-import scala.collection.mutable
+import ammonite.terminal.FilterTools._
+import ammonite.terminal.SpecialKeys._
+import ammonite.terminal.TermCore
 
 /**
  * Filters for injection of readline-specific hotkeys, the sort that
@@ -40,7 +37,7 @@ object ReadlineFilters {
    * Basic readline-style navigation, using all the obscure alphabet 
    * hotkeys rather than using arrows
    */
-  lazy val navFilter = orElseAll(
+  lazy val navFilter = TermCore.Filter.merge(
     Case(Ctrl('b'))((b, c, m) => (b, c - 1)), // <- one char
     Case(Ctrl('f'))((b, c, m) => (b, c + 1)), // -> one char
     Case(Alt + "b")((b, c, m) => GUILikeFilters.wordLeft(b, c)), // <- one word
@@ -140,7 +137,7 @@ object ReadlineFilters {
       (b.take(c) ++ currentCut ++ b.drop(c), c + currentCut.length)
     }
 
-    def filter = orElseAll(
+    def filter = TermCore.Filter.merge(
       Case(Ctrl('u'))((b, c, m) => cutAllLeft(b, c)),
       Case(Ctrl('k'))((b, c, m) => cutAllRight(b, c)),
       Case(Alt + "d")((b, c, m) => cutWordRight(b, c)),
@@ -158,101 +155,4 @@ object ReadlineFilters {
     )
   }
 
-  abstract class Enum{
-    protected[this] def Item[T](constructor: String => T)
-                               (implicit i: sourcecode.Name): T = constructor(i.value)
-  }
-  sealed class UndoState(override val toString: String)
-  object UndoState extends Enum{
-    val Default, Typing, Deleting, Navigating = Item(new UndoState(_))
-  }
-
-  case class UndoFilter() extends TermCore.DelegateFilter{
-    val undoStack = mutable.Buffer(Vector[Char]() -> 0)
-    var undoIndex = 0
-    /**
-      * An enum representing what the user is "currently" doing. Used to
-      * collapse sequential actions into one undo step: e.g. 10 plain
-      * chars typed becomes 1 undo step, or 10 chars deleted becomes one undo
-      * step, but 4 chars typed followed by 3 chars deleted followed by 3 chars
-      * typed gets grouped into 3 different undo steps
-      */
-    var state = UndoState.Default
-    def currentUndo = undoStack(undoStack.length - undoIndex - 1)
-    def undo(b: Vector[Char], c: Int) = {
-      Debug(s"UndoFilter.undo\t$undoIndex\t$undoStack")
-      if (undoIndex < undoStack.length - 1) {
-        undoIndex += 1
-        state = UndoState.Default
-      }
-      currentUndo
-    }
-    def redo(b: Vector[Char], c: Int) = {
-      Debug(s"UndoFilter.redo\t$undoIndex\t$undoStack")
-      if (undoIndex > 0) {
-        undoIndex -= 1
-        state = UndoState.Default
-      }
-      currentUndo
-    }
-    def wrap(bc: (Vector[Char], Int), rest: LazyList[Int], msg: Ansi.Str) = {
-      val (b, c) = bc
-      TS(rest, b, c, msg)
-    }
-
-    def pushUndos(b: Vector[Char], c: Int) = {
-      val (lastB, lastC) = currentUndo
-      Debug("")
-      // Since we don't have access to the `typingFilter` in this code, we
-      // instead attempt to reverse-engineer "what happened" to the buffer by
-      // comparing the old one with the new.
-      //
-      // It turns out that it's not that hard to identify the few cases we care
-      // about, since they're all result in either 0 or 1 chars being different
-      // between old and new buffers.
-
-      val newState =
-        // Nothing changed means nothign changed
-        if (lastC == c && lastB == b) state
-        // if cursor advanced 1, and buffer grew by 1 at the cursor, we're typing
-        else if (lastC + 1 == c && lastB == b.patch(c-1, Nil, 1))UndoState.Typing
-        // cursor moved left 1, and buffer lost 1 char at that point, we're deleting
-        else if (lastC - 1 == c && lastB.patch(c, Nil, 1) == b) UndoState.Deleting
-        // cursor didn't move, and buffer lost 1 char at that point, we're also deleting
-        else if (lastC == c && lastB.patch(c - 1, Nil, 1) == b) UndoState.Deleting
-        // cursor moved around but buffer didn't change, we're navigating
-        else if (lastC != c && lastB == b) UndoState.Navigating
-        // otherwise, sit in the "Default" state where every change is recorded.
-        else UndoState.Default
-
-      Debug(s"pushUndos\t$lastB\t->\t$b")
-      Debug(s"pushUndos\t$state\t->\t$newState")
-      if (state != newState || newState == UndoState.Default && (lastB, lastC) != (b, c)) {
-        Debug("pushUndos replace")
-        state = newState
-        undoStack.dropRight(undoIndex)
-        undoIndex = 0
-        undoStack.append(b -> c)
-      }else{
-        Debug(s"pushUndos update\t${undoStack(undoStack.length - 1)}\t->\t${(b, c)}")
-        if ((b, c) != undoStack.last) undoStack(undoStack.length - 1) = (b, c)
-      }
-
-      state = newState
-    }
-
-    val undoMsg = Console.BLUE + " ...undoing last action, `Alt -` or `Esc -` to redo"
-    val redoMsg = Console.BLUE + " ...redoing last action"
-    def filter = orElseAll(
-      {case TS(q ~: rest, b, c, _) =>
-        Debug("UndoFilter.filter " + q)
-        pushUndos(b, c)
-        None
-      },
-      TermCore.Filter{
-        case TS(31 ~: rest, b, c, _) => wrap(undo(b, c), rest, undoMsg)
-        case TS(27 ~: 45 ~: rest, b, c, _) => wrap(redo(b, c), rest, "")
-      }
-    )
-  }
 }

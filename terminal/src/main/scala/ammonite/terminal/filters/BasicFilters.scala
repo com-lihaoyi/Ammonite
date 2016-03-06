@@ -1,16 +1,17 @@
-package ammonite.terminal
-import acyclic.file
+package ammonite.terminal.filters
+
+import ammonite.terminal.FilterTools._
 import ammonite.terminal.LazyList._
-import FilterTools._
-import SpecialKeys._
+import ammonite.terminal.SpecialKeys._
 import ammonite.terminal.TermCore.Filter
+import ammonite.terminal._
 
 /**
  * Filters for simple operation of a terminal: cursor-navigation
  * (including with all the modifier keys), enter/ctrl-c-exit, etc.
  */
 object BasicFilters {
-  def all = orElseAll(
+  def all = TermCore.Filter.merge(
     navFilter,
     exitFilter,
     enterFilter,
@@ -25,7 +26,7 @@ object BasicFilters {
   }
 
 
-  def navFilter = orElseAll(
+  def navFilter = TermCore.Filter.merge(
     Case(Up)((b, c, m) => moveUp(b, c, m.width)),
     Case(Down)((b, c, m) => moveDown(b, c, m.width)),
     Case(Right)((b, c, m) => (b, c + 1)),

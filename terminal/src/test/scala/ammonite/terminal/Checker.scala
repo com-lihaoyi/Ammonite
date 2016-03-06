@@ -1,4 +1,6 @@
 package ammonite.terminal
+
+import ammonite.terminal.filters.{GUILikeFilters, BasicFilters, ReadlineFilters}
 import utest._
 object Checker{
   def normalize(s: String) = {

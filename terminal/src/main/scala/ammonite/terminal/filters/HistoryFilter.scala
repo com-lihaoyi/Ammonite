@@ -1,7 +1,8 @@
-package ammonite.terminal
+package ammonite.terminal.filters
 
 import ammonite.terminal.FilterTools._
 import ammonite.terminal.LazyList._
+import ammonite.terminal._
 
 
 /**

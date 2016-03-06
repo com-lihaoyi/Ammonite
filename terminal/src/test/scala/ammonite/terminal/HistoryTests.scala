@@ -1,5 +1,6 @@
 package ammonite.terminal
 
+import ammonite.terminal.filters.HistoryFilter
 import utest._
 
 

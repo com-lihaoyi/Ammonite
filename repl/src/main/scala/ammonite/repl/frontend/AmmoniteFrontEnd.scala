@@ -3,9 +3,11 @@ package ammonite.repl.frontend
 import java.io.{OutputStreamWriter, OutputStream, InputStream}
 
 import ammonite.repl._
-import ammonite.terminal.GUILikeFilters.SelectionFilter
+import ammonite.terminal.filters.{GUILikeFilters, BasicFilters, HistoryFilter, ReadlineFilters}
+import GUILikeFilters.SelectionFilter
 import ammonite.terminal.LazyList.~:
 import ammonite.terminal._
+import ammonite.terminal.filters.{BasicFilters, HistoryFilter, ReadlineFilters}
 import fastparse.core.Parsed
 import scala.annotation.tailrec
 

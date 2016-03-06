@@ -1,5 +1,6 @@
 package ammonite.terminal
 
+import ammonite.terminal.filters.ReadlineFilters
 import utest._
 
 

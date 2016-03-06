@@ -1,10 +1,10 @@
-package ammonite.terminal
+package ammonite.terminal.filters
 
-import FilterTools._
-import TermCore.DelegateFilter
-import LazyList._
-import SpecialKeys._
-import acyclic.file
+import ammonite.terminal.FilterTools._
+import ammonite.terminal.LazyList.~:
+import ammonite.terminal.SpecialKeys._
+import ammonite.terminal.TermCore.DelegateFilter
+import ammonite.terminal._
 
 /**
  * Filters have hook into the various {Ctrl,Shift,Fn,Alt}x{Up,Down,Left,Right}
@@ -56,7 +56,7 @@ object GUILikeFilters {
       TS(rest, flattened, newC)
     }
 
-    def filter = orElseAll(
+    def filter = TermCore.Filter.merge(
 
       Case(ShiftUp){(b, c, m) => setMark(c); BasicFilters.moveUp(b, c, m.width)},
       Case(ShiftDown){(b, c, m) => setMark(c); BasicFilters.moveDown(b, c, m.width)},
@@ -118,26 +118,26 @@ object GUILikeFilters {
     }
   }
 
-  val fnFilter = orElseAll(
+  val fnFilter = TermCore.Filter.merge(
     Case(FnUp)((b, c, m) => (b, c - 9999)),
     Case(FnDown)((b, c, m) => (b, c + 9999)),
     Case(FnRight)((b, c, m) => BasicFilters.moveEnd(b, c, m.width)),
     Case(FnLeft)((b, c, m) => BasicFilters.moveStart(b, c, m.width))
   )
-  val altFilter = orElseAll(
+  val altFilter = TermCore.Filter.merge(
     Case(AltUp){(b, c, m) => BasicFilters.moveUp(b, c, m.width)},
     Case(AltDown){(b, c, m) => BasicFilters.moveDown(b, c, m.width)},
     Case(AltRight){(b, c, m) => wordRight(b, c)},
     Case(AltLeft){(b, c, m) => wordLeft(b, c)}
   )
 
-  val fnAltFilter = orElseAll(
+  val fnAltFilter = TermCore.Filter.merge(
     Case(FnAltUp){(b, c, m) => (b, c)},
     Case(FnAltDown){(b, c, m) => (b, c)},
     Case(FnAltRight){(b, c, m) => (b, c)},
     Case(FnAltLeft){(b, c, m) => (b, c)}
   )
-  val fnAltShiftFilter = orElseAll(
+  val fnAltShiftFilter = TermCore.Filter.merge(
     Case(FnAltShiftRight){(b, c, m) => (b, c)},
     Case(FnAltShiftLeft){(b, c, m) => (b, c)}
   )

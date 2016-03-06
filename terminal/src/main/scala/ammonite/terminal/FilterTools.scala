@@ -23,12 +23,7 @@ object FilterTools {
   }
 
 
-  /**
-   * `orElse`-s together each partial function passed to it
-   */
-  def orElseAll[T, V](pfs: (T => Option[V])*) = new Function[T, Option[V]]{
-    def apply(v1: T) = pfs.iterator.flatMap(_(v1)).take(1).toSeq.headOption
-  }
+
 
   /**
    * Shorthand to construct a filter in the common case where you're

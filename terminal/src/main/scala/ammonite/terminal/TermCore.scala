@@ -102,7 +102,12 @@ object TermCore {
     (cursorY, cursorX)
   }
 
-  def Filter(f: PartialFunction[TermInfo, TermAction]) = f.lift
+  object Filter{
+    def apply(f: PartialFunction[TermInfo, TermAction]) = f.lift
+    def merge(pfs: (TermInfo => Option[TermAction])*) = {
+      (v1: TermInfo) => pfs.iterator.flatMap(_(v1)).take(1).toSeq.headOption
+    }
+  }
   type Filter = TermInfo => Option[TermAction]
   type Action = (Vector[Char], Int) => (Vector[Char], Int)
   type MsgAction = (Vector[Char], Int) => (Vector[Char], Int, String)
