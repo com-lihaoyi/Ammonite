@@ -48,8 +48,45 @@ object ReadlineFilters {
     Case(Ctrl('a'))((b, c, m) => BasicFilters.moveStart(b, c, m.width)),
     Case(End)((b, c, m) => BasicFilters.moveEnd(b, c, m.width)), // -> one line
     Case(EndScreen)((b, c, m) => BasicFilters.moveEnd(b, c, m.width)), // -> one line
-    Case(Ctrl('e'))((b, c, m) => BasicFilters.moveEnd(b, c, m.width))
+    Case(Ctrl('e'))((b, c, m) => BasicFilters.moveEnd(b, c, m.width)),
+    Case(Alt + "t")((b, c, m) => transposeWord(b, c)),
+    Case(Ctrl('t'))((b, c, m) => transposeLetter(b, c))
   )
+
+  def transposeLetter(b: Vector[Char], c: Int) = {
+    // If there's no letter before the cursor to transpose, don't do anything
+    if (c == 0) (b, c)
+    else if (c == b.length) (b.dropRight(2) ++ b.takeRight(2).reverse, c)
+    else (b.patch(c-1, b.slice(c-1, c+1).reverse, 2), c + 1)
+  }
+
+  def transposeWord(b: Vector[Char], c: Int) = {
+    val leftStart0 = GUILikeFilters.consumeWord(b, c - 1, -1, 1)
+    val leftEnd0 = GUILikeFilters.consumeWord(b, leftStart0, 1, 0)
+    val rightEnd = GUILikeFilters.consumeWord(b, c, 1, 0)
+    val rightStart = GUILikeFilters.consumeWord(b, rightEnd - 1, -1, 1)
+
+    // If no word to the left to transpose, do nothing
+    if (leftStart0 == 0 && rightStart == 0) (b, c)
+    else {
+      val (leftStart, leftEnd) =
+        // If there is no word to the *right* to transpose,
+        // transpose the two words to the left instead
+        if (leftEnd0 == b.length && rightEnd == b.length){
+          val leftStart = GUILikeFilters.consumeWord(b, leftStart0 - 1, -1, 1)
+          val leftEnd = GUILikeFilters.consumeWord(b, leftStart, 1, 0)
+          (leftStart, leftEnd)
+        }else (leftStart0, leftEnd0)
+
+      val newB =
+        b.slice(0, leftStart) ++
+          b.slice(rightStart, rightEnd) ++
+          b.slice(leftEnd, rightStart) ++
+          b.slice(leftStart, leftEnd) ++
+          b.slice(rightEnd, b.length)
+      (newB, rightEnd)
+    }
+  }
 
   /**
    * All the cut-pasting logic, though for many people they simply
@@ -78,7 +115,7 @@ object ReadlineFilters {
     }
 
     def cutWordLeft(b: Vector[Char], c: Int) = {
-      val start = GUILikeFilters.consumeWord(b, c, -1, 1)
+      val start = GUILikeFilters.consumeWord(b, c - 1, -1, 1)
       currentCut = b.slice(start, c)
       (b.take(start) ++ b.drop(c), start)
     }

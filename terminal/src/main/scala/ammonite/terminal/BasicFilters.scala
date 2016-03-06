@@ -45,7 +45,7 @@ object BasicFilters {
   }
 
   def loggingFilter: TermCore.Filter = {
-    case TS(Ctrl('t') ~: rest, b, c, _) =>
+    case TS(Ctrl('m') ~: rest, b, c, _) =>
       println("Char Display Mode Enabled! Ctrl-C to exit")
       var curr = rest
       while (curr.head != 3) {
@@ -152,7 +152,6 @@ object BasicFilters {
     b -> moveUpDown(b, c, w, 0, -1, c - w, _ > _, false)
   }
   def moveDown(b: Vector[Char], c: Int, w: Int) = {
-    Debug("moveDown\t" + b.length + "\t" + c + "\t" + w)
     b -> moveUpDown(b, c, w, 1, 1, c + w, _ <= _, true)
   }
 }
