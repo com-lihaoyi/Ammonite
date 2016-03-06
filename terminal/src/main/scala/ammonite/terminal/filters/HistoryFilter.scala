@@ -154,11 +154,6 @@ class HistoryFilter(history: () => IndexedSeq[String],
       endHistory()
       prevBuffer = None
       TS(inputs, b, c)
-
-    // weird hacks to make it run code every time without having to be the one
-    // handling the input; ideally we'd change TermCore.Filter to be something
-    // other than a PartialFunction, but for now this will do.
-    case ti if {; false} => ???
   }
 
   def filter0: TermCore.Filter = TermCore.Filter{

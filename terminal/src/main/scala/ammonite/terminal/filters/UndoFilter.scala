@@ -29,7 +29,6 @@ case class UndoFilter() extends TermCore.DelegateFilter{
   var state = UndoState.Default
   def currentUndo = undoStack(undoStack.length - undoIndex - 1)
   def undo(b: Vector[Char], c: Int) = {
-    Debug(s"UndoFilter.undo\t$undoIndex\t$undoStack")
     if (undoIndex < undoStack.length - 1) {
       undoIndex += 1
       state = UndoState.Default
@@ -37,7 +36,6 @@ case class UndoFilter() extends TermCore.DelegateFilter{
     currentUndo
   }
   def redo(b: Vector[Char], c: Int) = {
-    Debug(s"UndoFilter.redo\t$undoIndex\t$undoStack")
     if (undoIndex > 0) {
       undoIndex -= 1
       state = UndoState.Default
@@ -61,10 +59,10 @@ case class UndoFilter() extends TermCore.DelegateFilter{
     // between old and new buffers.
 
     val newState =
-    // Nothing changed means nothign changed
+    // Nothing changed means nothing changed
       if (lastC == c && lastB == b) state
       // if cursor advanced 1, and buffer grew by 1 at the cursor, we're typing
-      else if (lastC + 1 == c && lastB == b.patch(c-1, Nil, 1))UndoState.Typing
+      else if (lastC + 1 == c && lastB == b.patch(c-1, Nil, 1)) UndoState.Typing
       // cursor moved left 1, and buffer lost 1 char at that point, we're deleting
       else if (lastC - 1 == c && lastB.patch(c, Nil, 1) == b) UndoState.Deleting
       // cursor didn't move, and buffer lost 1 char at that point, we're also deleting
@@ -74,17 +72,15 @@ case class UndoFilter() extends TermCore.DelegateFilter{
       // otherwise, sit in the "Default" state where every change is recorded.
       else UndoState.Default
 
-    Debug(s"pushUndos\t$lastB\t->\t$b")
-    Debug(s"pushUndos\t$state\t->\t$newState")
     if (state != newState || newState == UndoState.Default && (lastB, lastC) != (b, c)) {
-      Debug("pushUndos replace")
       state = newState
       undoStack.dropRight(undoIndex)
       undoIndex = 0
       undoStack.append(b -> c)
     }else{
-      Debug(s"pushUndos update\t${undoStack(undoStack.length - 1)}\t->\t${(b, c)}")
-      if ((b, c) != undoStack.last) undoStack(undoStack.length - 1) = (b, c)
+      if (undoIndex == 0 && (b, c) != undoStack.last) {
+        undoStack(undoStack.length - 1) = (b, c)
+      }
     }
 
     state = newState
@@ -93,10 +89,10 @@ case class UndoFilter() extends TermCore.DelegateFilter{
   val undoMsg = Console.BLUE + " ...undoing last action, `Alt -` or `Esc -` to redo"
   val redoMsg = Console.BLUE + " ...redoing last action"
   def filter = TermCore.Filter.merge(
-    {case TS(q ~: rest, b, c, _) =>
-      Debug("UndoFilter.filter " + q)
-      pushUndos(b, c)
-      None
+    {
+      case TS(q ~: rest, b, c, _) =>
+        pushUndos(b, c)
+        None
     },
     TermCore.Filter{
       case TS(31 ~: rest, b, c, _) => wrap(undo(b, c), rest, undoMsg)
