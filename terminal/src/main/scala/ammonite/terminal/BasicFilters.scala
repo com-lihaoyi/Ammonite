@@ -45,7 +45,7 @@ object BasicFilters {
   }
 
   def loggingFilter: TermCore.Filter = {
-    case TS(Ctrl('m') ~: rest, b, c, _) =>
+    case TS(Ctrl('q') ~: rest, b, c, _) =>
       println("Char Display Mode Enabled! Ctrl-C to exit")
       var curr = rest
       while (curr.head != 3) {
