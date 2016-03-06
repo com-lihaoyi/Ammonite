@@ -4,7 +4,7 @@ import java.io.OutputStreamWriter
 
 import ammonite.repl.Colors
 import ammonite.repl.frontend.{FrontEndUtils, Highlighter}
-import ammonite.terminal.{Printing, TermInfo, TermState, Terminal}
+import ammonite.terminal._
 import ammonite.terminal.LazyList.~:
 /**
  * Logic to find path "literals" so we can attempt to autocomplete them based
@@ -151,7 +151,7 @@ object PathComplete {
     }
   }
   def pathCompleteFilter(wd: => Path,
-                         colors: => Colors): Terminal.Filter = {
+                         colors: => Colors): Filter = Filter{
     case TermInfo(TermState(9 ~: rest, b, c, _), width)
       if PathComplete.findPathLiteral(b.mkString, c).isDefined =>
 
