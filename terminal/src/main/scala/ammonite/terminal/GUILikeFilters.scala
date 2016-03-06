@@ -145,15 +145,14 @@ object GUILikeFilters {
 
   def consumeWord(b: Vector[Char], c: Int, delta: Int, offset: Int) = {
     var current = c
-    // Move at least one character! Otherwise
-    // you get stuck at the end of a word.
-    current += delta
     while(b.isDefinedAt(current) && !b(current).isLetterOrDigit) current += delta
     while(b.isDefinedAt(current) && b(current).isLetterOrDigit) current += delta
     current + offset
   }
 
-  def wordLeft(b: Vector[Char], c: Int) = b -> consumeWord(b, c, -1, 1)
+  // c -1 to move at least one character! Otherwise you get stuck at the start of
+  // a word.
+  def wordLeft(b: Vector[Char], c: Int) = b -> consumeWord(b, c - 1, -1, 1)
   def wordRight(b: Vector[Char], c: Int) = b -> consumeWord(b, c, 1, 0)
 
 }
