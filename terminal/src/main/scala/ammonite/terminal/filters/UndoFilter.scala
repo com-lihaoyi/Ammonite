@@ -3,7 +3,7 @@ package ammonite.terminal.filters
 import ammonite.terminal.FilterTools._
 import ammonite.terminal.LazyList.~:
 import ammonite.terminal._
-
+import acyclic.file
 import scala.collection.mutable
 
 
@@ -24,7 +24,7 @@ object UndoFilter{
   val cannotRedoMsg = Ansi.Color.Blue(" ...no more actions to redo")
 }
 
-case class UndoFilter(maxUndo: Int = 25) extends TermCore.DelegateFilter{
+case class UndoFilter(maxUndo: Int = 25) extends DelegateFilter{
   /**
     * The current stack of states that undo/redo would cycle through.
     */
@@ -117,13 +117,13 @@ case class UndoFilter(maxUndo: Int = 25) extends TermCore.DelegateFilter{
     state = newState
   }
 
-  def filter = TermCore.Filter.merge(
-    {
+  def filter = Filter.merge(
+    Filter.wrap{
       case TS(q ~: rest, b, c, _) =>
         pushUndos(b, c)
         None
     },
-    TermCore.Filter{
+    Filter{
       case TS(31 ~: rest, b, c, _) => wrap(undo(b, c), rest)
       case TS(27 ~: 114 ~: rest, b, c, _) => wrap(undo(b, c), rest)
       case TS(27 ~: 45 ~: rest, b, c, _) => wrap(redo(b, c), rest)

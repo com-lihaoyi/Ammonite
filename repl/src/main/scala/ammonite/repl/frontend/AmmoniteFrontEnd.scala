@@ -3,15 +3,14 @@ package ammonite.repl.frontend
 import java.io.{OutputStreamWriter, OutputStream, InputStream}
 
 import ammonite.repl._
-import ammonite.terminal.filters.{GUILikeFilters, BasicFilters, HistoryFilter, ReadlineFilters}
+import ammonite.terminal.filters._
 import GUILikeFilters.SelectionFilter
 import ammonite.terminal.LazyList.~:
 import ammonite.terminal._
-import ammonite.terminal.filters.{BasicFilters, HistoryFilter, ReadlineFilters}
 import fastparse.core.Parsed
 import scala.annotation.tailrec
 
-case class AmmoniteFrontEnd(extraFilters: TermCore.Filter = PartialFunction.empty) extends FrontEnd{
+case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEnd{
 
   def width = FrontEndUtils.width
   def height = FrontEndUtils.height
@@ -53,7 +52,7 @@ case class AmmoniteFrontEnd(extraFilters: TermCore.Filter = PartialFunction.empt
     Timer("AmmoniteFrontEnd.readLine start")
     val writer = new OutputStreamWriter(output)
 
-    val autocompleteFilter: TermCore.Filter = {
+    val autocompleteFilter: Filter = Filter{
       case TermInfo(TermState(9 ~: rest, b, c, _), width) =>
         val (newCursor, completions, details) = compilerComplete(c, b.mkString)
         val details2 = for (d <- details) yield {
@@ -86,7 +85,7 @@ case class AmmoniteFrontEnd(extraFilters: TermCore.Filter = PartialFunction.empt
 
     }
 
-    val multilineFilter: TermCore.Filter = {
+    val multilineFilter: Filter = Filter{
       case TermState(lb ~: rest, b, c, _)
         if (lb == 10 || lb == 13)
         && ammonite.repl.Parsers.split(b.mkString).isEmpty => // Enter
@@ -99,17 +98,19 @@ case class AmmoniteFrontEnd(extraFilters: TermCore.Filter = PartialFunction.empt
     )
     val selectionFilter = GUILikeFilters.SelectionFilter(indent = 2)
 
-    val allFilters =
-      historyFilter.filter orElse
-      extraFilters orElse
-      selectionFilter orElse
-      GUILikeFilters.altFilter orElse
-      GUILikeFilters.fnFilter orElse
-      ReadlineFilters.navFilter orElse
-      autocompleteFilter orElse
-      cutPasteFilter orElse
-      multilineFilter orElse
+    val allFilters = Filter.merge(
+      UndoFilter(),
+      historyFilter,
+      extraFilters,
+      selectionFilter,
+      GUILikeFilters.altFilter,
+      GUILikeFilters.fnFilter,
+      ReadlineFilters.navFilter,
+      autocompleteFilter,
+      cutPasteFilter,
+      multilineFilter,
       BasicFilters.all
+    )
 
 
     Timer("AmmoniteFrontEnd.readLine 1")

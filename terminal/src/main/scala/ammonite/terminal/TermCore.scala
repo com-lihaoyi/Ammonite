@@ -102,19 +102,10 @@ object TermCore {
     (cursorY, cursorX)
   }
 
-  object Filter{
-    def apply(f: PartialFunction[TermInfo, TermAction]) = f.lift
-    def merge(pfs: (TermInfo => Option[TermAction])*) = {
-      (v1: TermInfo) => pfs.iterator.flatMap(_(v1)).take(1).toSeq.headOption
-    }
-  }
-  type Filter = TermInfo => Option[TermAction]
+
   type Action = (Vector[Char], Int) => (Vector[Char], Int)
   type MsgAction = (Vector[Char], Int) => (Vector[Char], Int, String)
-  trait DelegateFilter extends Filter{
-    def filter: Filter
-    def apply(v1: TermInfo) = filter(v1)
-  }
+
 
   def noTransform(x: Vector[Char], i: Int) = (Ansi.Str.parse(x), i)
   /**
@@ -132,7 +123,7 @@ object TermCore {
   def readLine(prompt: Prompt,
                reader: java.io.Reader,
                writer: java.io.Writer,
-               filters: TermInfo => Option[TermAction] = _ => None,
+               filters: Filter,
                displayTransform: (Vector[Char], Int) => (Ansi.Str, Int) = noTransform)
                : Option[String] = {
 
@@ -275,7 +266,7 @@ object TermCore {
       // `.get` because we assume that *some* filter is going to match each
       // character, even if only to dump the character to the screen. If nobody
       // matches the character then we can feel free to blow up
-      filters(TermInfo(lastState, actualWidth)).get match {
+      filters.op(TermInfo(lastState, actualWidth)).get match {
         case Printing(TermState(s, b, c, msg), stdout) =>
           writer.write(stdout)
           val (nextUps, newState) = updateState(s, b, c, msg)
@@ -319,30 +310,6 @@ object TermCore {
     }
   }
 }
-
-case class TermInfo(ts: TermState, width: Int)
-
-sealed trait TermAction
-case class Printing(ts: TermState, stdout: String) extends TermAction
-case class TermState(inputs: LazyList[Int],
-                     buffer: Vector[Char],
-                     cursor: Int,
-                     msg: Ansi.Str = "") extends TermAction
-object TermState{
-  def unapply(ti: TermInfo): Option[(LazyList[Int], Vector[Char], Int, Ansi.Str)] = {
-    TermState.unapply(ti.ts)
-  }
-  def unapply(ti: TermAction): Option[(LazyList[Int], Vector[Char], Int, Ansi.Str)] = ti match{
-    case ts: TermState => TermState.unapply(ts)
-    case _ => None
-  }
-
-}
-case class ClearScreen(ts: TermState) extends TermAction
-case object Exit extends TermAction
-case class Result(s: String) extends TermAction
-
-
 object Prompt {
   implicit def construct(prompt: String): Prompt = {
     val parsedPrompt = Ansi.Str.parse(prompt)

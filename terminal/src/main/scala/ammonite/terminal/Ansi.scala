@@ -1,6 +1,6 @@
 package ammonite.terminal
 
-
+import acyclic.file
 
 object Ansi {
 

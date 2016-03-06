@@ -24,7 +24,7 @@ object Main{
     System.setProperty("ammonite-sbt-build", "true")
     var history = List.empty[String]
     val selection = GUILikeFilters.SelectionFilter(indent = 4)
-    def multilineFilter: TermCore.Filter = TermCore.Filter{
+    def multilineFilter: Filter = Filter{
       case TermState(13 ~: rest, b, c, _) if b.count(_ == '(') != b.count(_ == ')') =>
         BasicFilters.injectNewLine(b, c, rest)
     }
@@ -38,7 +38,7 @@ object Main{
         Console.MAGENTA + (0 until 10).mkString + "\n@@@ " + Console.RESET,
         reader,
         new OutputStreamWriter(System.out),
-        TermCore.Filter.merge(
+        Filter.merge(
           UndoFilter(),
           cutPaste,
           historyFilter,

@@ -3,14 +3,15 @@ package ammonite.terminal.filters
 import ammonite.terminal.FilterTools._
 import ammonite.terminal.LazyList._
 import ammonite.terminal._
-
+import acyclic.file
 
 /**
   * Provides history navigation up and down, saving the current line.
   */
 class HistoryFilter(history: () => IndexedSeq[String],
                     commentStartColor: String,
-                    commentEndColor: String) extends TermCore.DelegateFilter{
+                    commentEndColor: String) extends DelegateFilter{
+
   /**
     * `-1` means we haven't started looking at history, `n >= 0` means we're
     * currently at history command `n`
@@ -135,28 +136,30 @@ class HistoryFilter(history: () => IndexedSeq[String],
     searchTerm = None
   }
 
-  def filter = (ti) => {
-    prelude(ti) match {
-      case None =>
-        prevBuffer = Some(ti.ts.buffer)
-        filter0(ti) match{
-          case Some(ts: TermState) =>
-            prevBuffer = Some(ts.buffer)
-            Some(ts)
-          case x => x
-        }
-      case some => some
+  def filter = Filter.wrap{
+    (ti: TermInfo) => {
+      prelude.op(ti) match {
+        case None =>
+          prevBuffer = Some(ti.ts.buffer)
+          filter0.op(ti) match{
+            case Some(ts: TermState) =>
+              prevBuffer = Some(ts.buffer)
+              Some(ts)
+            case x => x
+          }
+        case some => some
+      }
     }
   }
 
-  def prelude: TermCore.Filter = TermCore.Filter{
+  def prelude: Filter = Filter{
     case TS(inputs, b, c, _) if activeHistory && prevBuffer.exists(_ != b) =>
       endHistory()
       prevBuffer = None
       TS(inputs, b, c)
   }
 
-  def filter0: TermCore.Filter = TermCore.Filter{
+  def filter0: Filter = Filter{
     // Ways to kick off the history/search if you're not already in it
 
     // `Ctrl-R`

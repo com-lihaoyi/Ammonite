@@ -1,9 +1,9 @@
 package ammonite.terminal.filters
-
+import acyclic.file
 import ammonite.terminal.FilterTools._
 import ammonite.terminal.LazyList.~:
 import ammonite.terminal.SpecialKeys._
-import ammonite.terminal.TermCore.DelegateFilter
+import ammonite.terminal.DelegateFilter
 import ammonite.terminal._
 
 /**
@@ -56,7 +56,7 @@ object GUILikeFilters {
       TS(rest, flattened, newC)
     }
 
-    def filter = TermCore.Filter.merge(
+    def filter = Filter.merge(
 
       Case(ShiftUp){(b, c, m) => setMark(c); BasicFilters.moveUp(b, c, m.width)},
       Case(ShiftDown){(b, c, m) => setMark(c); BasicFilters.moveDown(b, c, m.width)},
@@ -68,7 +68,7 @@ object GUILikeFilters {
       Case(AltShiftLeft){(b, c, m) => setMark(c); wordLeft(b, c)},
       Case(FnShiftRight){(b, c, m) => setMark(c); BasicFilters.moveEnd(b, c, m.width)},
       Case(FnShiftLeft){(b, c, m) => setMark(c); BasicFilters.moveStart(b, c, m.width)},
-      TermCore.Filter{
+      Filter{
         case TS(27 ~: 91 ~: 90 ~: rest, b, c, _) if mark.isDefined =>
           doIndent(b, c, rest,
             slice => -math.min(slice.iterator.takeWhile(_ == ' ').size, indent)
@@ -118,26 +118,26 @@ object GUILikeFilters {
     }
   }
 
-  val fnFilter = TermCore.Filter.merge(
+  val fnFilter = Filter.merge(
     Case(FnUp)((b, c, m) => (b, c - 9999)),
     Case(FnDown)((b, c, m) => (b, c + 9999)),
     Case(FnRight)((b, c, m) => BasicFilters.moveEnd(b, c, m.width)),
     Case(FnLeft)((b, c, m) => BasicFilters.moveStart(b, c, m.width))
   )
-  val altFilter = TermCore.Filter.merge(
+  val altFilter = Filter.merge(
     Case(AltUp){(b, c, m) => BasicFilters.moveUp(b, c, m.width)},
     Case(AltDown){(b, c, m) => BasicFilters.moveDown(b, c, m.width)},
     Case(AltRight){(b, c, m) => wordRight(b, c)},
     Case(AltLeft){(b, c, m) => wordLeft(b, c)}
   )
 
-  val fnAltFilter = TermCore.Filter.merge(
+  val fnAltFilter = Filter.merge(
     Case(FnAltUp){(b, c, m) => (b, c)},
     Case(FnAltDown){(b, c, m) => (b, c)},
     Case(FnAltRight){(b, c, m) => (b, c)},
     Case(FnAltLeft){(b, c, m) => (b, c)}
   )
-  val fnAltShiftFilter = TermCore.Filter.merge(
+  val fnAltShiftFilter = Filter.merge(
     Case(FnAltShiftRight){(b, c, m) => (b, c)},
     Case(FnAltShiftLeft){(b, c, m) => (b, c)}
   )

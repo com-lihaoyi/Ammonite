@@ -4,6 +4,7 @@ import java.io.{PrintStream, InputStream, OutputStream, InputStreamReader}
 import ammonite.repl.frontend._
 import acyclic.file
 import ammonite.repl.interp.Interpreter
+import ammonite.terminal.Filter
 
 import scala.annotation.tailrec
 class Repl(input: InputStream,
@@ -16,9 +17,7 @@ class Repl(input: InputStream,
   val prompt = Ref("@ ")
 
   val colors = Ref[Colors](Colors.Default)
-  val frontEnd = Ref[FrontEnd](AmmoniteFrontEnd(
-    PartialFunction.empty
-  ))
+  val frontEnd = Ref[FrontEnd](AmmoniteFrontEnd(Filter.empty))
 
   val printStream = new PrintStream(output, true)
   val errorPrintStream = new PrintStream(error, true)

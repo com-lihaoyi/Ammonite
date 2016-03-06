@@ -30,13 +30,15 @@ object FilterTools {
    * switching on the prefix of the input stream and want to run some
    * transformation on the buffer/cursor
    */
-  def Case(s: String)(f: (Vector[Char], Int, TermInfo) => (Vector[Char], Int)) =
-    new PartialFunction[TermInfo, TermAction] {
+  def Case(s: String)
+          (f: (Vector[Char], Int, TermInfo) => (Vector[Char], Int))
+          (implicit l: sourcecode.Line, enc: sourcecode.Enclosing) = new Filter {
+    val op = new PartialFunction[TermInfo, TermAction] {
       def isDefinedAt(x: TermInfo) = {
 
         def rec(i: Int, c: LazyList[Int]): Boolean = {
           if (i >= s.length) true
-          else if (c.head == s(i)) rec(i+1, c.tail)
+          else if (c.head == s(i)) rec(i + 1, c.tail)
           else false
         }
         rec(0, x.ts.inputs)
@@ -51,6 +53,8 @@ object FilterTools {
         )
       }
     }.lift
+    override def toString = enc.value + ":" + l.value
+  }
 
   /**
    * Shorthand for pattern matching on [[TermState]]

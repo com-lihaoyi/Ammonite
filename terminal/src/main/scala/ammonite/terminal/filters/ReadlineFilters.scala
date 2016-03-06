@@ -2,8 +2,8 @@ package ammonite.terminal.filters
 
 import ammonite.terminal.FilterTools._
 import ammonite.terminal.SpecialKeys._
-import ammonite.terminal.TermCore
-
+import ammonite.terminal.{DelegateFilter, Filter, TermCore}
+import acyclic.file
 /**
  * Filters for injection of readline-specific hotkeys, the sort that
  * are available in bash, python and most other interactive command-lines
@@ -37,7 +37,7 @@ object ReadlineFilters {
    * Basic readline-style navigation, using all the obscure alphabet 
    * hotkeys rather than using arrows
    */
-  lazy val navFilter = TermCore.Filter.merge(
+  lazy val navFilter = Filter.merge(
     Case(Ctrl('b'))((b, c, m) => (b, c - 1)), // <- one char
     Case(Ctrl('f'))((b, c, m) => (b, c + 1)), // -> one char
     Case(Alt + "b")((b, c, m) => GUILikeFilters.wordLeft(b, c)), // <- one word
@@ -93,7 +93,7 @@ object ReadlineFilters {
    * All the cut-pasting logic, though for many people they simply
    * use these shortcuts for deleting and don't use paste much at all.
    */
-  case class CutPasteFilter() extends TermCore.DelegateFilter{
+  case class CutPasteFilter() extends DelegateFilter{
     var accumulating = false
     var currentCut = Vector.empty[Char]
     def prepend(b: Vector[Char]) = {
@@ -137,19 +137,19 @@ object ReadlineFilters {
       (b.take(c) ++ currentCut ++ b.drop(c), c + currentCut.length)
     }
 
-    def filter = TermCore.Filter.merge(
+    def filter = Filter.merge(
       Case(Ctrl('u'))((b, c, m) => cutAllLeft(b, c)),
       Case(Ctrl('k'))((b, c, m) => cutAllRight(b, c)),
       Case(Alt + "d")((b, c, m) => cutWordRight(b, c)),
       Case(Ctrl('w'))((b, c, m) => cutWordLeft(b, c)),
       Case(Alt + "\u007f")((b, c, m) => cutWordLeft(b, c)),
       // weird hacks to make it run code every time without having to be the one
-      // handling the input; ideally we'd change TermCore.Filter to be something
+      // handling the input; ideally we'd change Filter to be something
       // other than a PartialFunction, but for now this will do.
 
       // If some command goes through that's not appending/prepending to the
       // kill ring, stop appending and allow the next kill to override it
-      {_ => accumulating = false; None},
+      Filter.wrap{_ => accumulating = false; None},
       Case(Ctrl('h'))((b, c, m) => cutCharLeft(b, c)),
       Case(Ctrl('y'))((b, c, m) => paste(b, c))
     )
