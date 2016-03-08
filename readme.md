@@ -55,12 +55,13 @@ While working on a arbitrary `xyz` subproject, `sbt ~xyz/test` runs tests after 
 - Update the `project/Constants.scala` version number to the new version
 - `sbt ++2.11.7 repl/assembly ++2.10.5 repl/assembly` to bundle the REPL as a standalone distribution
 - `sbt +published/publishLocal` or `sbt +published/publishSigned` is used for publishing.
-- Create a new release on [https://github.com/lihaoyi/Ammonite/releases] and upload the two executables for 2.11.7 an 2.10.5, as well as the `shell/src/main/resources/ammonite/shell/example-predef.scala` file.
+- Create a new release on [https://github.com/lihaoyi/Ammonite/releases] and upload the two executables for 2.11.7 and 2.10.5, as well as the `shell/src/main/resources/ammonite/shell/example-predef.scala` file.
 - Create short URLs for the 2.11.7 executable download and the `example-predef.scala` file and the readme code in `readme/Sample.scala` to use these short URLs
 - `sbt ~readme/run` builds the documentation inside its target folder, which you can view by opening `readme/target/scalatex/index.html` in your browser.
 - `git commit -am $VERSION` with the new version number, and `git tag $VERSION`
 - `git checkout gh-pages && cp -r readme/target/scalatex/* . && git add -A && git commit -am . && git push` will deploy the generated documentation to Github Pages
 - Swap `project/Constants.scala` to `$NEXT_VERSION-SNAPSHOT` and commit it
+- Wait 30 minutes for things to and run through the curl-download flow and make sure it works
 
 ## Issue Tags
 
