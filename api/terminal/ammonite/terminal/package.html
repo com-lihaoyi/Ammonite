@@ -100,23 +100,72 @@
       </a>
     </span>
       
-    </li><li name="ammonite.terminal.HistoryFilter" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="HistoryFilterextendsTermCore.DelegateFilter"></a>
-      <a id="HistoryFilter:HistoryFilter"></a>
+    </li><li name="ammonite.terminal.DelegateFilter" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="DelegateFilterextendsFilter"></a>
+      <a id="DelegateFilter:DelegateFilter"></a>
       <h4 class="signature">
       <span class="modifier_kind">
-        <span class="modifier"></span>
+        <span class="modifier">abstract </span>
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <a href="HistoryFilter.html"><span class="name">HistoryFilter</span></a><span class="result"> extends <a href="TermCore$$DelegateFilter.html" class="extype" name="ammonite.terminal.TermCore.DelegateFilter">DelegateFilter</a></span>
+        <a href="DelegateFilter.html"><span class="name">DelegateFilter</span></a><span class="result"> extends <a href="Filter.html" class="extype" name="ammonite.terminal.Filter">Filter</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.package@HistoryFilterextendsTermCore.DelegateFilter" title="Permalink" target="_top">
+      <a href="../../index.html#ammonite.terminal.package@DelegateFilterextendsFilter" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Provides history navigation up and down, saving the current line.</p>
+      <p class="shortcomment cmt">A filter as an abstract class, letting you provide a <a href="DelegateFilter.html#filter:ammonite.terminal.Filter" class="extmbr" name="ammonite.terminal.DelegateFilter#filter">filter</a> instead of
+an <code>op</code>, automatically providing a good <code>.toString</code> for debugging, and
+providing a reasonable &quot;place&quot; inside the inheriting class/object to put
+state or helpers or other logic associated with the filter.</p>
+    </li><li name="ammonite.terminal.Enum" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="EnumextendsAnyRef"></a>
+      <a id="Enum:Enum"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Enum.html"><span class="name">Enum</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.terminal.package@EnumextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">A small helper class to quickly define enumerations: extend this class in
+your companion object and define the items via <code>val a, b, c = Item(...)</code>
+passing in your enum class constructor in place of <code>...</code>.</p>
+    </li><li name="ammonite.terminal.Filter" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="FilterextendsAnyRef"></a>
+      <a id="Filter:Filter"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Filter.html"><span class="name">Filter</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.terminal.package@FilterextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The way you configure your terminal behavior; a trivial wrapper around a
+function, though you should provide a good <code>.toString</code> method to make
+debugging easier.</p><div class="fullcomment"><div class="comment cmt"><p>The way you configure your terminal behavior; a trivial wrapper around a
+function, though you should provide a good <code>.toString</code> method to make
+debugging easier. The <a href="TermInfo.html" class="extype" name="ammonite.terminal.TermInfo">TermInfo</a> and <a href="TermAction.html" class="extype" name="ammonite.terminal.TermAction">TermAction</a> types are its
+interface to the terminal.</p><p><a href="Filter.html" class="extype" name="ammonite.terminal.Filter">Filter</a>s are composed sequentially: if a filter returns <code>None</code> the next
+filter is tried, while if a filter returns <code>Some</code> that ends the cascade.
+While your <code>op</code> function interacts with the terminal purely through
+immutable case classes, the Filter itself is free to maintain its own state
+and mutate it whenever, even when returning <code>None</code> to continue the cascade.
+</p></div></div>
     </li><li name="ammonite.terminal.LazyList" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="LazyList[T]extendsProductwithSerializable"></a>
       <a id="LazyList[T]:LazyList[T]"></a>
@@ -278,25 +327,7 @@
       </a>
     </span>
       
-    </li><li name="ammonite.terminal.BasicFilters" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="BasicFilters"></a>
-      <a id="BasicFilters:BasicFilters"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">object</span>
-      </span>
-      <span class="symbol">
-        <a href="BasicFilters$.html"><span class="name">BasicFilters</span></a>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.package@BasicFilters" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">Filters for simple operation of a terminal: cursor-navigation
-(including with all the modifier keys), enter/ctrl-c-exit, etc.</p>
-    </li><li name="ammonite.terminal.Debug" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="ammonite.terminal.Debug" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="Debug"></a>
       <a id="Debug:Debug"></a>
       <h4 class="signature">
@@ -312,7 +343,15 @@
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">Prints stuff to an ad-hoc logging file when running the ammonite-repl or
+ammonite-terminal in development mode in its SBT project.</p><div class="fullcomment"><div class="comment cmt"><p>Prints stuff to an ad-hoc logging file when running the ammonite-repl or
+ammonite-terminal in development mode in its SBT project.</p><p>Very handy for the common case where you're debugging terminal interactions
+and cannot use <code>println</code> because it will stomp all over your already messed
+up terminal state and block debugging. With <a href="Debug$.html" class="extype" name="ammonite.terminal.Debug">Debug</a>, you can have a
+separate terminal open tailing the log file and log as verbosely as you
+want without affecting the primary terminal you're using to interact with
+Ammonite.
+</p></div></div>
     </li><li name="ammonite.terminal.Exit" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="Exit"></a>
       <a id="Exit:Exit"></a>
@@ -326,6 +365,23 @@
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.terminal.package@Exit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="ammonite.terminal.Filter" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Filter"></a>
+      <a id="Filter:Filter"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Filter$.html"><span class="name">Filter</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.terminal.package@Filter" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -348,43 +404,6 @@
     </span>
       <p class="shortcomment cmt">A collection of helpers that to simpify the common case of building filters
 </p>
-    </li><li name="ammonite.terminal.GUILikeFilters" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="GUILikeFilters"></a>
-      <a id="GUILikeFilters:GUILikeFilters"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">object</span>
-      </span>
-      <span class="symbol">
-        <a href="GUILikeFilters$.html"><span class="name">GUILikeFilters</span></a>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.package@GUILikeFilters" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">Filters have hook into the various {Ctrl,Shift,Fn,Alt}x{Up,Down,Left,Right}
-combination keys, and make them behave similarly as they would on a normal
-GUI text editor: alt-{left, right} for word movement, hold-down-shift for
-text selection, etc.</p>
-    </li><li name="ammonite.terminal.HistoryFilter" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="HistoryFilter"></a>
-      <a id="HistoryFilter:HistoryFilter"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">object</span>
-      </span>
-      <span class="symbol">
-        <a href="HistoryFilter$.html"><span class="name">HistoryFilter</span></a>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.package@HistoryFilter" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
     </li><li name="ammonite.terminal.LazyList" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="LazyList"></a>
       <a id="LazyList:LazyList"></a>
@@ -419,25 +438,6 @@ text selection, etc.</p>
       </a>
     </span>
       
-    </li><li name="ammonite.terminal.ReadlineFilters" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="ReadlineFilters"></a>
-      <a id="ReadlineFilters:ReadlineFilters"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">object</span>
-      </span>
-      <span class="symbol">
-        <a href="ReadlineFilters$.html"><span class="name">ReadlineFilters</span></a>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.package@ReadlineFilters" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">Filters for injection of readline-specific hotkeys, the sort that
-are available in bash, python and most other interactive command-lines
-</p>
     </li><li name="ammonite.terminal.SpecialKeys" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="SpecialKeys"></a>
       <a id="SpecialKeys:SpecialKeys"></a>
@@ -474,29 +474,6 @@ easy-to-remember names
       </a>
     </span>
       
-    </li><li name="ammonite.terminal.TermCore" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="TermCore"></a>
-      <a id="TermCore:TermCore"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">object</span>
-      </span>
-      <span class="symbol">
-        <a href="TermCore$.html"><span class="name">TermCore</span></a>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.package@TermCore" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">The core logic around a terminal; it defines the base <code>filters</code> API
-through which anything (including basic cursor-navigation and typing)
-interacts with the terminal.</p><div class="fullcomment"><div class="comment cmt"><p>The core logic around a terminal; it defines the base <code>filters</code> API
-through which anything (including basic cursor-navigation and typing)
-interacts with the terminal.</p><p>Maintains basic invariants, such as &quot;cursor should always be within
-the buffer&quot;, and &quot;ansi terminal should reflect most up to date TermState&quot;
-</p></div></div>
     </li><li name="ammonite.terminal.TermState" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="TermState"></a>
       <a id="TermState:TermState"></a>
@@ -510,6 +487,46 @@ the buffer&quot;, and &quot;ansi terminal should reflect most up to date TermSta
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.terminal.package@TermState" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="ammonite.terminal.Terminal" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="Terminal"></a>
+      <a id="Terminal:Terminal"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Terminal$.html"><span class="name">Terminal</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.terminal.package@Terminal" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The core logic around a terminal; it defines the base <code>filters</code> API
+through which anything (including basic cursor-navigation and typing)
+interacts with the terminal.</p><div class="fullcomment"><div class="comment cmt"><p>The core logic around a terminal; it defines the base <code>filters</code> API
+through which anything (including basic cursor-navigation and typing)
+interacts with the terminal.</p><p>Maintains basic invariants, such as &quot;cursor should always be within
+the buffer&quot;, and &quot;ansi terminal should reflect most up to date TermState&quot;
+</p></div></div>
+    </li><li name="ammonite.terminal.filters" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="filters"></a>
+      <a id="filters:filters"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a href="filters/package.html"><span class="name">filters</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.terminal.package@filters" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>

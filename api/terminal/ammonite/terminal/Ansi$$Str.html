@@ -51,12 +51,10 @@
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Represents a structured Ansi-colored string, containing both <a href="Ansi$$Color.html" class="extype" name="ammonite.terminal.Ansi.Color">Color</a>s
-and string <a href="Ansi$$Content.html" class="extype" name="ammonite.terminal.Ansi.Content">Content</a>, with operations that let you easily manipulate
-the string while keeping colors sane.</p><p>Maintains an invariant that it is always in a &quot;collapsed&quot; state: the
-fragments never have any consecutive <a href="Ansi$$Content.html" class="extype" name="ammonite.terminal.Ansi.Content">Content</a> nodes, or any
-consecutive redundant <a href="Ansi$$Color.html" class="extype" name="ammonite.terminal.Ansi.Color">Color</a> nodes.
-</p></div><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Encapsulates a string with associated ANSI colors and text decorations.</p><p>Contains some basic string methods, as well as some ansi methods to e.g.
+apply particular colors or other decorations to particular sections of
+the <a href="" class="extype" name="ammonite.terminal.Ansi.Str">Ansi.Str</a>. <a href="#render:String" class="extmbr" name="ammonite.terminal.Ansi.Str#render">render</a> flattens it out into a <code>java.lang.String</code>
+with all the colors present as ANSI escapes.</p></div><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.Product">Product</span>, <span class="extype" name="scala.Equals">Equals</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
@@ -186,6 +184,23 @@ consecutive redundant <a href="Ansi$$Color.html" class="extype" name="ammonite.t
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="ammonite.terminal.Ansi.Str#chars" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="chars:Array[Char]"></a>
+      <a id="chars:Array[Char]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">chars</span><span class="result">: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Char">Char</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.terminal.Ansi$$Str@chars:Array[Char]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
     </li><li name="scala.AnyRef#clone" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a>
       <a id="clone():AnyRef"></a>
@@ -209,6 +224,23 @@ consecutive redundant <a href="Ansi$$Color.html" class="extype" name="ammonite.t
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="ammonite.terminal.Ansi.Str#colors" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="colors:Array[ammonite.terminal.Ansi.State]"></a>
+      <a id="colors:Array[State]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">colors</span><span class="result">: <span class="extype" name="scala.Array">Array</span>[<a href="Ansi$.html#State=Short" class="extmbr" name="ammonite.terminal.Ansi.State">State</a>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.terminal.Ansi$$Str@colors:Array[ammonite.terminal.Ansi.State]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
     </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a>
       <a id="eq(AnyRef):Boolean"></a>
@@ -249,23 +281,6 @@ consecutive redundant <a href="Ansi$$Color.html" class="extype" name="ammonite.t
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="ammonite.terminal.Ansi.Str#fragments" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="fragments:Vector[ammonite.terminal.Ansi.Frag]"></a>
-      <a id="fragments:Vector[Frag]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">fragments</span><span class="result">: <span class="extype" name="scala.Vector">Vector</span>[<a href="Ansi$$Frag.html" class="extype" name="ammonite.terminal.Ansi.Frag">Frag</a>]</span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Ansi$$Str@fragments:Vector[ammonite.terminal.Ansi.Frag]" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
     </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <a id="getClass():Class[_]"></a>
@@ -306,7 +321,7 @@ consecutive redundant <a href="Ansi$$Color.html" class="extype" name="ammonite.t
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">lazy val</span>
+        <span class="kind">def</span>
       </span>
       <span class="symbol">
         <span class="name">length</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
@@ -369,88 +384,52 @@ consecutive redundant <a href="Ansi$$Color.html" class="extype" name="ammonite.t
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
     </li><li name="ammonite.terminal.Ansi.Str#overlay" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="overlay(overlayColor:ammonite.terminal.Ansi.Color,start:Int,end:Int):ammonite.terminal.Ansi.Str"></a>
-      <a id="overlay(Color,Int,Int):Str"></a>
+      <a id="overlay(overlayColor:ammonite.terminal.Ansi.Attr,start:Int,end:Int):ammonite.terminal.Ansi.Str"></a>
+      <a id="overlay(Attr,Int,Int):Str"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">overlay</span><span class="params">(<span name="overlayColor">overlayColor: <a href="Ansi$$Color.html" class="extype" name="ammonite.terminal.Ansi.Color">Color</a></span>, <span name="start">start: <span class="extype" name="scala.Int">Int</span></span>, <span name="end">end: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <a href="" class="extype" name="ammonite.terminal.Ansi.Str">Str</a></span>
+        <span class="name">overlay</span><span class="params">(<span name="overlayColor">overlayColor: <a href="Ansi$$Attr.html" class="extype" name="ammonite.terminal.Ansi.Attr">Attr</a></span>, <span name="start">start: <span class="extype" name="scala.Int">Int</span></span>, <span name="end">end: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <a href="" class="extype" name="ammonite.terminal.Ansi.Str">Str</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Ansi$$Str@overlay(overlayColor:ammonite.terminal.Ansi.Color,start:Int,end:Int):ammonite.terminal.Ansi.Str" title="Permalink" target="_top">
+      <a href="../../index.html#ammonite.terminal.Ansi$$Str@overlay(overlayColor:ammonite.terminal.Ansi.Attr,start:Int,end:Int):ammonite.terminal.Ansi.Str" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <p class="shortcomment cmt">Overlays the desired color over the specified range of the <a href="" class="extype" name="ammonite.terminal.Ansi.Str">Ansi.Str</a>.</p>
     </li><li name="ammonite.terminal.Ansi.Str#plainText" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="plainText:scala.collection.immutable.Vector[Char]"></a>
-      <a id="plainText:Vector[Char]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">lazy val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">plainText</span><span class="result">: <span class="extype" name="scala.collection.immutable.Vector">Vector</span>[<span class="extype" name="scala.Char">Char</span>]</span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Ansi$$Str@plainText:scala.collection.immutable.Vector[Char]" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
-    </li><li name="ammonite.terminal.Ansi.Str#query" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="query(targetScreenLength:Int):(ammonite.terminal.Ansi.State,Int,Int)"></a>
-      <a id="query(Int):(State,Int,Int)"></a>
+      <a id="plainText:String"></a>
+      <a id="plainText:String"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">query</span><span class="params">(<span name="targetScreenLength">targetScreenLength: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: (<a href="Ansi$$State.html" class="extype" name="ammonite.terminal.Ansi.State">State</a>, <span class="extype" name="scala.Int">Int</span>, <span class="extype" name="scala.Int">Int</span>)</span>
+        <span class="name">plainText</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Ansi$$Str@query(targetScreenLength:Int):(ammonite.terminal.Ansi.State,Int,Int)" title="Permalink" target="_top">
+      <a href="../../index.html#ammonite.terminal.Ansi$$Str@plainText:String" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Tells you the state the desired visible-character index into the string,
-and how far into the sequence of segments this happens
-</p>
+      
     </li><li name="ammonite.terminal.Ansi.Str#render" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="render:scala.collection.immutable.Vector[Char]"></a>
-      <a id="render:Vector[Char]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">lazy val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">render</span><span class="result">: <span class="extype" name="scala.collection.immutable.Vector">Vector</span>[<span class="extype" name="scala.Char">Char</span>]</span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Ansi$$Str@render:scala.collection.immutable.Vector[Char]" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
-    </li><li name="ammonite.terminal.Ansi.Str#selfCheck" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="selfCheck():Unit"></a>
-      <a id="selfCheck():Unit"></a>
+      <a id="render:String"></a>
+      <a id="render:String"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">selfCheck</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+        <span class="name">render</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Ansi$$Str@selfCheck():Unit" title="Permalink" target="_top">
+      <a href="../../index.html#ammonite.terminal.Ansi$$Str@render:String" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -471,8 +450,7 @@ and how far into the sequence of segments this happens
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Splits this <a href="" class="extype" name="ammonite.terminal.Ansi.Str">Str</a> at the specified plaintext index, producing
-two children that when rendered will result in the same visual output.</p>
+      
     </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
       <a id="synchronized[T0](⇒T0):T0"></a>
@@ -491,45 +469,22 @@ two children that when rendered will result in the same visual output.</p>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
     </li><li name="ammonite.terminal.Ansi.Str#toString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="toString:String"></a>
-      <a id="toString:String"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">lazy val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">toString</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Ansi$$Str@toString:String" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="ammonite.terminal.Ansi.Str">Str</a> → AnyRef → Any</dd></dl></div>
-    </li><li name="ammonite.terminal.Ansi.Str#transform" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="transform(f:(ammonite.terminal.Ansi.Frag,ammonite.terminal.Ansi.State,ammonite.terminal.Ansi.State,Int,Int)=&gt;Seq[ammonite.terminal.Ansi.Frag]):ammonite.terminal.Ansi.Str"></a>
-      <a id="transform((Frag,State,State,Int,Int)⇒Seq[Frag]):Str"></a>
+      <a id="toString():String"></a>
+      <a id="toString():String"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">transform</span><span class="params">(<span name="f">f: (<a href="Ansi$$Frag.html" class="extype" name="ammonite.terminal.Ansi.Frag">Frag</a>, <a href="Ansi$$State.html" class="extype" name="ammonite.terminal.Ansi.State">State</a>, <a href="Ansi$$State.html" class="extype" name="ammonite.terminal.Ansi.State">State</a>, <span class="extype" name="scala.Int">Int</span>, <span class="extype" name="scala.Int">Int</span>) ⇒ <span class="extype" name="scala.Seq">Seq</span>[<a href="Ansi$$Frag.html" class="extype" name="ammonite.terminal.Ansi.Frag">Frag</a>]</span>)</span><span class="result">: <a href="" class="extype" name="ammonite.terminal.Ansi.Str">Str</a></span>
+        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Ansi$$Str@transform(f:(ammonite.terminal.Ansi.Frag,ammonite.terminal.Ansi.State,ammonite.terminal.Ansi.State,Int,Int)=&gt;Seq[ammonite.terminal.Ansi.Frag]):ammonite.terminal.Ansi.Str" title="Permalink" target="_top">
+      <a href="../../index.html#ammonite.terminal.Ansi$$Str@toString():String" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Runs a function over the sequence of <a href="Ansi$$Frag.html" class="extype" name="ammonite.terminal.Ansi.Frag">Frag</a>s and <a href="Ansi$$State.html" class="extype" name="ammonite.terminal.Ansi.State">State</a>s to
-transform it into a new sequence of <a href="Ansi$$Frag.html" class="extype" name="ammonite.terminal.Ansi.Frag">Frag</a>s.</p><div class="fullcomment"><div class="comment cmt"><p>Runs a function over the sequence of <a href="Ansi$$Frag.html" class="extype" name="ammonite.terminal.Ansi.Frag">Frag</a>s and <a href="Ansi$$State.html" class="extype" name="ammonite.terminal.Ansi.State">State</a>s to
-transform it into a new sequence of <a href="Ansi$$Frag.html" class="extype" name="ammonite.terminal.Ansi.Frag">Frag</a>s. The callback returns
-0 or more <a href="Ansi$$Frag.html" class="extype" name="ammonite.terminal.Ansi.Frag">Frag</a>s per call, which get stitched together into the
-final result, with consecutive <a href="Ansi$$Content.html" class="extype" name="ammonite.terminal.Ansi.Content">Content</a>s collapsed and redundant
-<a href="Ansi$$Color.html" class="extype" name="ammonite.terminal.Ansi.Color">Color</a>s removed
-</p></div></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="ammonite.terminal.Ansi.Str">Str</a> → AnyRef → Any</dd></dl></div>
     </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <a id="wait():Unit"></a>
@@ -599,29 +554,6 @@ final result, with consecutive <a href="Ansi$$Content.html" class="extype" name=
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="ammonite.terminal.Ansi.Str#walk" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="walk(f:(ammonite.terminal.Ansi.Frag,ammonite.terminal.Ansi.State,Int,Int)=&gt;Boolean):(ammonite.terminal.Ansi.State,Int,Int)"></a>
-      <a id="walk((Frag,State,Int,Int)⇒Boolean):(State,Int,Int)"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">walk</span><span class="params">(<span name="f">f: (<a href="Ansi$$Frag.html" class="extype" name="ammonite.terminal.Ansi.Frag">Frag</a>, <a href="Ansi$$State.html" class="extype" name="ammonite.terminal.Ansi.State">State</a>, <span class="extype" name="scala.Int">Int</span>, <span class="extype" name="scala.Int">Int</span>) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="result">: (<a href="Ansi$$State.html" class="extype" name="ammonite.terminal.Ansi.State">State</a>, <span class="extype" name="scala.Int">Int</span>, <span class="extype" name="scala.Int">Int</span>)</span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Ansi$$Str@walk(f:(ammonite.terminal.Ansi.Frag,ammonite.terminal.Ansi.State,Int,Int)=&gt;Boolean):(ammonite.terminal.Ansi.State,Int,Int)" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">Walk over the sequence of <a href="Ansi$$Frag.html" class="extype" name="ammonite.terminal.Ansi.Frag">Frag</a>s; the callback gets called with each
-frag, together with some computed metadata about the ansi-<a href="Ansi$$State.html" class="extype" name="ammonite.terminal.Ansi.State">State</a> and
-screen length.</p><div class="fullcomment"><div class="comment cmt"><p>Walk over the sequence of <a href="Ansi$$Frag.html" class="extype" name="ammonite.terminal.Ansi.Frag">Frag</a>s; the callback gets called with each
-frag, together with some computed metadata about the ansi-<a href="Ansi$$State.html" class="extype" name="ammonite.terminal.Ansi.State">State</a> and
-screen length. In response, it returns a boolean that determines whether
-or not to continue walking or bail early.
-</p></div></div>
     </li></ol>
             </div>
 

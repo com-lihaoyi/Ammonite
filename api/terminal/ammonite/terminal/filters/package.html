@@ -1,0 +1,272 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <title>filters - ammonite.terminal.filters</title>
+          <meta name="description" content="filters - ammonite.terminal.filters" />
+          <meta name="keywords" content="filters ammonite.terminal.filters" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../../lib/template.js"></script>
+      <script type="text/javascript" src="../../../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../../index.html';
+            var hash = 'ammonite.terminal.filters.package';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <img alt="Package" src="../../../lib/package_big.png" />
+        <p id="owner"><a href="../../package.html" class="extype" name="ammonite">ammonite</a>.<a href="../package.html" class="extype" name="ammonite.terminal">terminal</a></p>
+        <h1>filters</h1><span class="permalink">
+      <a href="../../../index.html#ammonite.terminal.filters.package" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <span class="name">filters</span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        
+        
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="ammonite.terminal.filters.HistoryFilter" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="HistoryFilterextendsDelegateFilter"></a>
+      <a id="HistoryFilter:HistoryFilter"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="HistoryFilter.html"><span class="name">HistoryFilter</span></a><span class="result"> extends <a href="../DelegateFilter.html" class="extype" name="ammonite.terminal.DelegateFilter">DelegateFilter</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.terminal.filters.package@HistoryFilterextendsDelegateFilter" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Provides history navigation up and down, saving the current line, a well
+as history-search functionality (<code>Ctrl R</code> in bash) letting you quickly find
+&amp; filter previous commands by entering a sub-string.</p>
+    </li><li name="ammonite.terminal.filters.UndoFilter" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="UndoFilterextendsDelegateFilterwithProductwithSerializable"></a>
+      <a id="UndoFilter:UndoFilter"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="UndoFilter.html"><span class="name">UndoFilter</span></a><span class="params">(<span name="maxUndo">maxUndo: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">25</span></span>)</span><span class="result"> extends <a href="../DelegateFilter.html" class="extype" name="ammonite.terminal.DelegateFilter">DelegateFilter</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.terminal.filters.package@UndoFilterextendsDelegateFilterwithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">A filter that implements &quot;undo&quot; functionality in the ammonite REPL.</p><div class="fullcomment"><div class="comment cmt"><p>A filter that implements &quot;undo&quot; functionality in the ammonite REPL. It
+shares the same <code>Ctrl -</code> hotkey that the bash undo, but shares behavior
+with the undo behavior in desktop text editors:</p><p>- Multiple <code>delete</code>s in a row get collapsed
+- In addition to edits you can undo cursor movements: undo will bring your
+  cursor back to location of previous edits before it undoes them
+- Provides &quot;redo&quot; functionality under <code>Alt -</code>/<code>Esc -</code>: un-undo the things
+  you didn't actually want to undo!
+</p></div></div>
+    </li><li name="ammonite.terminal.filters.UndoState" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="UndoStateextendsAnyRef"></a>
+      <a id="UndoState:UndoState"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="UndoState.html"><span class="name">UndoState</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.terminal.filters.package@UndoStateextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li></ol>
+            </div>
+
+        
+
+        <div id="values" class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="ammonite.terminal.filters.BasicFilters" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="BasicFilters"></a>
+      <a id="BasicFilters:BasicFilters"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="BasicFilters$.html"><span class="name">BasicFilters</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.terminal.filters.package@BasicFilters" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Filters for simple operation of a terminal: cursor-navigation
+(including with all the modifier keys), enter/ctrl-c-exit, etc.</p>
+    </li><li name="ammonite.terminal.filters.GUILikeFilters" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="GUILikeFilters"></a>
+      <a id="GUILikeFilters:GUILikeFilters"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="GUILikeFilters$.html"><span class="name">GUILikeFilters</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.terminal.filters.package@GUILikeFilters" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Filters have hook into the various {Ctrl,Shift,Fn,Alt}x{Up,Down,Left,Right}
+combination keys, and make them behave similarly as they would on a normal
+GUI text editor: alt-{left, right} for word movement, hold-down-shift for
+text selection, etc.</p>
+    </li><li name="ammonite.terminal.filters.HistoryFilter" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="HistoryFilter"></a>
+      <a id="HistoryFilter:HistoryFilter"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="HistoryFilter$.html"><span class="name">HistoryFilter</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.terminal.filters.package@HistoryFilter" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="ammonite.terminal.filters.ReadlineFilters" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ReadlineFilters"></a>
+      <a id="ReadlineFilters:ReadlineFilters"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="ReadlineFilters$.html"><span class="name">ReadlineFilters</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.terminal.filters.package@ReadlineFilters" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Filters for injection of readline-specific hotkeys, the sort that
+are available in bash, python and most other interactive command-lines
+</p>
+    </li><li name="ammonite.terminal.filters.UndoFilter" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="UndoFilter"></a>
+      <a id="UndoFilter:UndoFilter"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="UndoFilter$.html"><span class="name">UndoFilter</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.terminal.filters.package@UndoFilter" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="ammonite.terminal.filters.UndoState" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="UndoState"></a>
+      <a id="UndoState:UndoState"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="UndoState$.html"><span class="name">UndoState</span></a><span class="result"> extends <a href="../Enum.html" class="extype" name="ammonite.terminal.Enum">Enum</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.terminal.filters.package@UndoState" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>

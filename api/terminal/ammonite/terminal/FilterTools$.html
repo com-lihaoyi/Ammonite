@@ -147,18 +147,18 @@
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="ammonite.terminal.FilterTools#Case" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="Case(s:String)(f:(Vector[Char],Int,ammonite.terminal.TermInfo)=&gt;(Vector[Char],Int)):PartialFunction[ammonite.terminal.TermInfo,ammonite.terminal.TermAction]{defapply(v1:ammonite.terminal.TermInfo):ammonite.terminal.TermState}"></a>
-      <a id="Case(String)((Vector[Char],Int,TermInfo)⇒(Vector[Char],Int)):PartialFunction[TermInfo,TermAction]{defapply(v1:ammonite.terminal.TermInfo):ammonite.terminal.TermState}"></a>
+      <a id="Case(s:String)(f:(Vector[Char],Int,ammonite.terminal.TermInfo)=&gt;(Vector[Char],Int))(implicitl:sourcecode.Line,implicitenc:sourcecode.Enclosing):ammonite.terminal.Filter"></a>
+      <a id="Case(String)((Vector[Char],Int,TermInfo)⇒(Vector[Char],Int))(Line,Enclosing):Filter"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">Case</span><span class="params">(<span name="s">s: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="params">(<span name="f">f: (<span class="extype" name="scala.Vector">Vector</span>[<span class="extype" name="scala.Char">Char</span>], <span class="extype" name="scala.Int">Int</span>, <a href="TermInfo.html" class="extype" name="ammonite.terminal.TermInfo">TermInfo</a>) ⇒ (<span class="extype" name="scala.Vector">Vector</span>[<span class="extype" name="scala.Char">Char</span>], <span class="extype" name="scala.Int">Int</span>)</span>)</span><span class="result">: <span class="extype" name="scala.PartialFunction">PartialFunction</span>[<a href="TermInfo.html" class="extype" name="ammonite.terminal.TermInfo">TermInfo</a>, <a href="TermAction.html" class="extype" name="ammonite.terminal.TermAction">TermAction</a>] { def apply(v1: ammonite.terminal.TermInfo): ammonite.terminal.TermState }</span>
+        <span class="name">Case</span><span class="params">(<span name="s">s: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="params">(<span name="f">f: (<span class="extype" name="scala.Vector">Vector</span>[<span class="extype" name="scala.Char">Char</span>], <span class="extype" name="scala.Int">Int</span>, <a href="TermInfo.html" class="extype" name="ammonite.terminal.TermInfo">TermInfo</a>) ⇒ (<span class="extype" name="scala.Vector">Vector</span>[<span class="extype" name="scala.Char">Char</span>], <span class="extype" name="scala.Int">Int</span>)</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="l">l: <span class="extype" name="sourcecode.Line">Line</span></span>, <span name="enc">enc: <span class="extype" name="sourcecode.Enclosing">Enclosing</span></span>)</span><span class="result">: <a href="Filter.html" class="extype" name="ammonite.terminal.Filter">Filter</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.FilterTools$@Case(s:String)(f:(Vector[Char],Int,ammonite.terminal.TermInfo)=&gt;(Vector[Char],Int)):PartialFunction[ammonite.terminal.TermInfo,ammonite.terminal.TermAction]{defapply(v1:ammonite.terminal.TermInfo):ammonite.terminal.TermState}" title="Permalink" target="_top">
+      <a href="../../index.html#ammonite.terminal.FilterTools$@Case(s:String)(f:(Vector[Char],Int,ammonite.terminal.TermInfo)=&gt;(Vector[Char],Int))(implicitl:sourcecode.Line,implicitenc:sourcecode.Enclosing):ammonite.terminal.Filter" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -468,24 +468,6 @@ transformation on the buffer/cursor
       </a>
     </span>
       
-    </li><li name="ammonite.terminal.FilterTools#orElseAll" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="orElseAll[T,V](pfs:PartialFunction[T,V]*):PartialFunction[T,V]"></a>
-      <a id="orElseAll[T,V](PartialFunction[T,V]*):PartialFunction[T,V]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">orElseAll</span><span class="tparams">[<span name="T">T</span>, <span name="V">V</span>]</span><span class="params">(<span name="pfs">pfs: <span class="extype" name="scala.PartialFunction">PartialFunction</span>[<span class="extype" name="ammonite.terminal.FilterTools.orElseAll.T">T</span>, <span class="extype" name="ammonite.terminal.FilterTools.orElseAll.V">V</span>]*</span>)</span><span class="result">: <span class="extype" name="scala.PartialFunction">PartialFunction</span>[<span class="extype" name="ammonite.terminal.FilterTools.orElseAll.T">T</span>, <span class="extype" name="ammonite.terminal.FilterTools.orElseAll.V">V</span>]</span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.FilterTools$@orElseAll[T,V](pfs:PartialFunction[T,V]*):PartialFunction[T,V]" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt"><code>orElse</code>-s together each partial function passed to it
-</p>
     </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
       <a id="synchronized[T0](⇒T0):T0"></a>

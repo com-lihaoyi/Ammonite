@@ -49,7 +49,14 @@
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Prints stuff to an ad-hoc logging file when running the ammonite-repl or
+ammonite-terminal in development mode in its SBT project.</p><p>Very handy for the common case where you're debugging terminal interactions
+and cannot use <code>println</code> because it will stomp all over your already messed
+up terminal state and block debugging. With <a href="" class="extype" name="ammonite.terminal.Debug">Debug</a>, you can have a
+separate terminal open tailing the log file and log as verbosely as you
+want without affecting the primary terminal you're using to interact with
+Ammonite.
+</p></div><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>

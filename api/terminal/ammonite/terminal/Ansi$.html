@@ -90,80 +90,69 @@
 
         <div id="types" class="types members">
               <h3>Type Members</h3>
-              <ol><li name="ammonite.terminal.Ansi.Color" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="ColorextendsAnsi.FragwithProductwithSerializable"></a>
-      <a id="Color:Color"></a>
+              <ol><li name="ammonite.terminal.Ansi.Attr" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="AttrextendsProductwithSerializable"></a>
+      <a id="Attr:Attr"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a href="Ansi$$Color.html"><span class="name">Color</span></a><span class="result"> extends <a href="Ansi$$Frag.html" class="extype" name="ammonite.terminal.Ansi.Frag">Frag</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a href="Ansi$$Attr.html"><span class="name">Attr</span></a><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Ansi$@ColorextendsAnsi.FragwithProductwithSerializable" title="Permalink" target="_top">
+      <a href="../../index.html#ammonite.terminal.Ansi$@AttrextendsProductwithSerializable" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <p class="shortcomment cmt">Represents a single, atomic ANSI escape sequence that results in a
-color, background or decoration being added to the output
-</p>
-    </li><li name="ammonite.terminal.Ansi.Content" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="ContentextendsAnsi.FragwithProductwithSerializable"></a>
-      <a id="Content:Content"></a>
+color, background or decoration being added to the output.</p>
+    </li><li name="ammonite.terminal.Ansi.Category" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="CategoryextendsAnyRef"></a>
+      <a id="Category:Category"></a>
       <h4 class="signature">
       <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">case class</span>
+        <span class="modifier">sealed abstract </span>
+        <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <a href="Ansi$$Content.html"><span class="name">Content</span></a><span class="params">(<span name="value">value: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <a href="Ansi$$Frag.html" class="extype" name="ammonite.terminal.Ansi.Frag">Frag</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a href="Ansi$$Category.html"><span class="name">Category</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Ansi$@ContentextendsAnsi.FragwithProductwithSerializable" title="Permalink" target="_top">
+      <a href="../../index.html#ammonite.terminal.Ansi$@CategoryextendsAnyRef" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">A piece of an <a href="Ansi$$Str.html" class="extype" name="ammonite.terminal.Ansi.Str">Ansi.Str</a> which just contains raw string-content,
-without any special characters
+      <p class="shortcomment cmt">Represents a set of <a href="Ansi$$Attr.html" class="extype" name="ammonite.terminal.Ansi.Attr">Ansi.Attr</a>s all occupying the same bit-space
+in the state <code>Short</code>
 </p>
-    </li><li name="ammonite.terminal.Ansi.Frag" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
-      <a id="FragextendsAnyRef"></a>
-      <a id="Frag:Frag"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier">sealed </span>
-        <span class="kind">trait</span>
-      </span>
-      <span class="symbol">
-        <a href="Ansi$$Frag.html"><span class="name">Frag</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Ansi$@FragextendsAnyRef" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">A piece of an <a href="Ansi$$Str.html" class="extype" name="ammonite.terminal.Ansi.Str">Ansi.Str</a>
-</p>
-    </li><li name="ammonite.terminal.Ansi.State" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="StateextendsProductwithSerializable"></a>
+    </li><li name="ammonite.terminal.Ansi.State" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="State=Short"></a>
       <a id="State:State"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">case class</span>
+        <span class="kind">type</span>
       </span>
       <span class="symbol">
-        <a href="Ansi$$State.html"><span class="name">State</span></a><span class="params">(<span name="color">color: <span class="extype" name="scala.Option">Option</span>[<a href="Ansi$$Color.html" class="extype" name="ammonite.terminal.Ansi.Color">Color</a>] = <span class="symbol">None</span></span>, <span name="bgColor">bgColor: <span class="extype" name="scala.Option">Option</span>[<a href="Ansi$$Color.html" class="extype" name="ammonite.terminal.Ansi.Color">Color</a>] = <span class="symbol">None</span></span>, <span name="bold">bold: <span class="extype" name="scala.Boolean">Boolean</span> = <span class="symbol">false</span></span>, <span name="underlined">underlined: <span class="extype" name="scala.Boolean">Boolean</span> = <span class="symbol">false</span></span>, <span name="reversed">reversed: <span class="extype" name="scala.Boolean">Boolean</span> = <span class="symbol">false</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">State</span><span class="result"> = <span class="extype" name="scala.Short">Short</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Ansi$@StateextendsProductwithSerializable" title="Permalink" target="_top">
+      <a href="../../index.html#ammonite.terminal.Ansi$@State=Short" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Represents the state of the ANSI color state machine at any point in the
-string.</p>
+      <p class="shortcomment cmt">An <a href="Ansi$$Str.html" class="extype" name="ammonite.terminal.Ansi.Str">Ansi.Str</a>'s <code>color</code>s array is filled with shorts, each representing
+the ANSI state of one character encoded in its bits.</p><div class="fullcomment"><div class="comment cmt"><p>An <a href="Ansi$$Str.html" class="extype" name="ammonite.terminal.Ansi.Str">Ansi.Str</a>'s <code>color</code>s array is filled with shorts, each representing
+the ANSI state of one character encoded in its bits. Each <a href="Ansi$$Attr.html" class="extype" name="ammonite.terminal.Ansi.Attr">Attr</a> belongs
+to a <a href="Ansi$$Category.html" class="extype" name="ammonite.terminal.Ansi.Category">Category</a> that occupies a range of bits within each short:</p><p>15 14 13 12 11 10  9  8  7  6  5  4  3  2  1  0
+ |-----------|  |--------|  |--------|  |  |  |bold
+             |           |           |  |  |reversed
+             |           |           |  |underlined
+             |           |           |foreground-color
+             |           |background-color
+             |unused</p><p>The <code>0000 0000 0000 0000</code> short corresponds to plain text with no decoration</p></div></div>
     </li><li name="ammonite.terminal.Ansi.Str" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="StrextendsProductwithSerializable"></a>
       <a id="Str:Str"></a>
@@ -180,14 +169,10 @@ string.</p>
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Represents a structured Ansi-colored string, containing both <a href="Ansi$$Color.html" class="extype" name="ammonite.terminal.Ansi.Color">Color</a>s
-and string <a href="Ansi$$Content.html" class="extype" name="ammonite.terminal.Ansi.Content">Content</a>, with operations that let you easily manipulate
-the string while keeping colors sane.</p><div class="fullcomment"><div class="comment cmt"><p>Represents a structured Ansi-colored string, containing both <a href="Ansi$$Color.html" class="extype" name="ammonite.terminal.Ansi.Color">Color</a>s
-and string <a href="Ansi$$Content.html" class="extype" name="ammonite.terminal.Ansi.Content">Content</a>, with operations that let you easily manipulate
-the string while keeping colors sane.</p><p>Maintains an invariant that it is always in a &quot;collapsed&quot; state: the
-fragments never have any consecutive <a href="Ansi$$Content.html" class="extype" name="ammonite.terminal.Ansi.Content">Content</a> nodes, or any
-consecutive redundant <a href="Ansi$$Color.html" class="extype" name="ammonite.terminal.Ansi.Color">Color</a> nodes.
-</p></div></div>
+      <p class="shortcomment cmt">Encapsulates a string with associated ANSI colors and text decorations.</p><div class="fullcomment"><div class="comment cmt"><p>Encapsulates a string with associated ANSI colors and text decorations.</p><p>Contains some basic string methods, as well as some ansi methods to e.g.
+apply particular colors or other decorations to particular sections of
+the <a href="Ansi$$Str.html" class="extype" name="ammonite.terminal.Ansi.Str">Ansi.Str</a>. <a href="Ansi$$Str.html#render:String" class="extmbr" name="ammonite.terminal.Ansi.Str#render">render</a> flattens it out into a <code>java.lang.String</code>
+with all the colors present as ANSI escapes.</p></div></div>
     </li></ol>
             </div>
 
@@ -246,87 +231,53 @@ consecutive redundant <a href="Ansi$$Color.html" class="extype" name="ammonite.t
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="ammonite.terminal.Ansi#Black" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="Black:ammonite.terminal.Ansi.Color"></a>
-      <a id="Black:Color"></a>
+    </li><li name="ammonite.terminal.Ansi.Attr" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Attr"></a>
+      <a id="Attr:Attr"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">val</span>
+        <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <span class="name">Black</span><span class="result">: <a href="Ansi$$Color.html" class="extype" name="ammonite.terminal.Ansi.Color">Color</a></span>
+        <a href="Ansi$$Attr$.html"><span class="name">Attr</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Ansi$@Black:ammonite.terminal.Ansi.Color" title="Permalink" target="_top">
+      <a href="../../index.html#ammonite.terminal.Ansi$@Attr" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
-    </li><li name="ammonite.terminal.Ansi#BlackB" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="BlackB:ammonite.terminal.Ansi.Color"></a>
-      <a id="BlackB:Color"></a>
+    </li><li name="ammonite.terminal.Ansi.Back" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Back"></a>
+      <a id="Back:Back"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">val</span>
+        <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <span class="name">BlackB</span><span class="result">: <a href="Ansi$$Color.html" class="extype" name="ammonite.terminal.Ansi.Color">Color</a></span>
+        <a href="Ansi$$Back$.html"><span class="name">Back</span></a><span class="result"> extends <a href="Ansi$$Category.html" class="extype" name="ammonite.terminal.Ansi.Category">Category</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Ansi$@BlackB:ammonite.terminal.Ansi.Color" title="Permalink" target="_top">
+      <a href="../../index.html#ammonite.terminal.Ansi$@Back" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
-    </li><li name="ammonite.terminal.Ansi#Blue" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="Blue:ammonite.terminal.Ansi.Color"></a>
-      <a id="Blue:Color"></a>
+    </li><li name="ammonite.terminal.Ansi.Bold" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Bold"></a>
+      <a id="Bold:Bold"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">val</span>
+        <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <span class="name">Blue</span><span class="result">: <a href="Ansi$$Color.html" class="extype" name="ammonite.terminal.Ansi.Color">Color</a></span>
+        <a href="Ansi$$Bold$.html"><span class="name">Bold</span></a><span class="result"> extends <a href="Ansi$$Category.html" class="extype" name="ammonite.terminal.Ansi.Category">Category</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Ansi$@Blue:ammonite.terminal.Ansi.Color" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
-    </li><li name="ammonite.terminal.Ansi#BlueB" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="BlueB:ammonite.terminal.Ansi.Color"></a>
-      <a id="BlueB:Color"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">BlueB</span><span class="result">: <a href="Ansi$$Color.html" class="extype" name="ammonite.terminal.Ansi.Color">Color</a></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Ansi$@BlueB:ammonite.terminal.Ansi.Color" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
-    </li><li name="ammonite.terminal.Ansi#Bold" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="Bold:ammonite.terminal.Ansi.Color"></a>
-      <a id="Bold:Color"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">Bold</span><span class="result">: <a href="Ansi$$Color.html" class="extype" name="ammonite.terminal.Ansi.Color">Color</a></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Ansi$@Bold:ammonite.terminal.Ansi.Color" title="Permalink" target="_top">
+      <a href="../../index.html#ammonite.terminal.Ansi$@Bold" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -340,7 +291,7 @@ consecutive redundant <a href="Ansi$$Color.html" class="extype" name="ammonite.t
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <a href="Ansi$$Color$.html"><span class="name">Color</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a href="Ansi$$Color$.html"><span class="name">Color</span></a><span class="result"> extends <a href="Ansi$$Category.html" class="extype" name="ammonite.terminal.Ansi.Category">Category</a></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.terminal.Ansi$@Color" title="Permalink" target="_top">
@@ -348,240 +299,19 @@ consecutive redundant <a href="Ansi$$Color.html" class="extype" name="ammonite.t
       </a>
     </span>
       
-    </li><li name="ammonite.terminal.Ansi.Content" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="Content"></a>
-      <a id="Content:Content"></a>
+    </li><li name="ammonite.terminal.Ansi.Reversed" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Reversed"></a>
+      <a id="Reversed:Reversed"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <a href="Ansi$$Content$.html"><span class="name">Content</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a href="Ansi$$Reversed$.html"><span class="name">Reversed</span></a><span class="result"> extends <a href="Ansi$$Category.html" class="extype" name="ammonite.terminal.Ansi.Category">Category</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Ansi$@Content" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
-    </li><li name="ammonite.terminal.Ansi#Cyan" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="Cyan:ammonite.terminal.Ansi.Color"></a>
-      <a id="Cyan:Color"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">Cyan</span><span class="result">: <a href="Ansi$$Color.html" class="extype" name="ammonite.terminal.Ansi.Color">Color</a></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Ansi$@Cyan:ammonite.terminal.Ansi.Color" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
-    </li><li name="ammonite.terminal.Ansi#CyanB" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="CyanB:ammonite.terminal.Ansi.Color"></a>
-      <a id="CyanB:Color"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">CyanB</span><span class="result">: <a href="Ansi$$Color.html" class="extype" name="ammonite.terminal.Ansi.Color">Color</a></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Ansi$@CyanB:ammonite.terminal.Ansi.Color" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
-    </li><li name="ammonite.terminal.Ansi#Empty" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="Empty:ammonite.terminal.Ansi.Str"></a>
-      <a id="Empty:Str"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">Empty</span><span class="result">: <a href="Ansi$$Str.html" class="extype" name="ammonite.terminal.Ansi.Str">Str</a></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Ansi$@Empty:ammonite.terminal.Ansi.Str" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
-    </li><li name="ammonite.terminal.Ansi#Green" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="Green:ammonite.terminal.Ansi.Color"></a>
-      <a id="Green:Color"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">Green</span><span class="result">: <a href="Ansi$$Color.html" class="extype" name="ammonite.terminal.Ansi.Color">Color</a></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Ansi$@Green:ammonite.terminal.Ansi.Color" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
-    </li><li name="ammonite.terminal.Ansi#GreenB" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="GreenB:ammonite.terminal.Ansi.Color"></a>
-      <a id="GreenB:Color"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">GreenB</span><span class="result">: <a href="Ansi$$Color.html" class="extype" name="ammonite.terminal.Ansi.Color">Color</a></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Ansi$@GreenB:ammonite.terminal.Ansi.Color" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
-    </li><li name="ammonite.terminal.Ansi#Magenta" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="Magenta:ammonite.terminal.Ansi.Color"></a>
-      <a id="Magenta:Color"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">Magenta</span><span class="result">: <a href="Ansi$$Color.html" class="extype" name="ammonite.terminal.Ansi.Color">Color</a></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Ansi$@Magenta:ammonite.terminal.Ansi.Color" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
-    </li><li name="ammonite.terminal.Ansi#MagentaB" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="MagentaB:ammonite.terminal.Ansi.Color"></a>
-      <a id="MagentaB:Color"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">MagentaB</span><span class="result">: <a href="Ansi$$Color.html" class="extype" name="ammonite.terminal.Ansi.Color">Color</a></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Ansi$@MagentaB:ammonite.terminal.Ansi.Color" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
-    </li><li name="ammonite.terminal.Ansi#Red" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="Red:ammonite.terminal.Ansi.Color"></a>
-      <a id="Red:Color"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">Red</span><span class="result">: <a href="Ansi$$Color.html" class="extype" name="ammonite.terminal.Ansi.Color">Color</a></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Ansi$@Red:ammonite.terminal.Ansi.Color" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
-    </li><li name="ammonite.terminal.Ansi#RedB" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="RedB:ammonite.terminal.Ansi.Color"></a>
-      <a id="RedB:Color"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">RedB</span><span class="result">: <a href="Ansi$$Color.html" class="extype" name="ammonite.terminal.Ansi.Color">Color</a></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Ansi$@RedB:ammonite.terminal.Ansi.Color" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
-    </li><li name="ammonite.terminal.Ansi#Reset" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="Reset:ammonite.terminal.Ansi.Color"></a>
-      <a id="Reset:Color"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">Reset</span><span class="result">: <a href="Ansi$$Color.html" class="extype" name="ammonite.terminal.Ansi.Color">Color</a></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Ansi$@Reset:ammonite.terminal.Ansi.Color" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
-    </li><li name="ammonite.terminal.Ansi#ResetB" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="ResetB:ammonite.terminal.Ansi.Color"></a>
-      <a id="ResetB:Color"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">ResetB</span><span class="result">: <a href="Ansi$$Color.html" class="extype" name="ammonite.terminal.Ansi.Color">Color</a></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Ansi$@ResetB:ammonite.terminal.Ansi.Color" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
-    </li><li name="ammonite.terminal.Ansi#ResetFore" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="ResetFore:ammonite.terminal.Ansi.Color"></a>
-      <a id="ResetFore:Color"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">ResetFore</span><span class="result">: <a href="Ansi$$Color.html" class="extype" name="ammonite.terminal.Ansi.Color">Color</a></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Ansi$@ResetFore:ammonite.terminal.Ansi.Color" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
-    </li><li name="ammonite.terminal.Ansi#Reversed" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="Reversed:ammonite.terminal.Ansi.Color"></a>
-      <a id="Reversed:Color"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">Reversed</span><span class="result">: <a href="Ansi$$Color.html" class="extype" name="ammonite.terminal.Ansi.Color">Color</a></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Ansi$@Reversed:ammonite.terminal.Ansi.Color" title="Permalink" target="_top">
+      <a href="../../index.html#ammonite.terminal.Ansi$@Reversed" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -603,87 +333,19 @@ consecutive redundant <a href="Ansi$$Color.html" class="extype" name="ammonite.t
       </a>
     </span>
       
-    </li><li name="ammonite.terminal.Ansi#Underlined" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="Underlined:ammonite.terminal.Ansi.Color"></a>
-      <a id="Underlined:Color"></a>
+    </li><li name="ammonite.terminal.Ansi.Underlined" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Underlined"></a>
+      <a id="Underlined:Underlined"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">val</span>
+        <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <span class="name">Underlined</span><span class="result">: <a href="Ansi$$Color.html" class="extype" name="ammonite.terminal.Ansi.Color">Color</a></span>
+        <a href="Ansi$$Underlined$.html"><span class="name">Underlined</span></a><span class="result"> extends <a href="Ansi$$Category.html" class="extype" name="ammonite.terminal.Ansi.Category">Category</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Ansi$@Underlined:ammonite.terminal.Ansi.Color" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
-    </li><li name="ammonite.terminal.Ansi#White" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="White:ammonite.terminal.Ansi.Color"></a>
-      <a id="White:Color"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">White</span><span class="result">: <a href="Ansi$$Color.html" class="extype" name="ammonite.terminal.Ansi.Color">Color</a></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Ansi$@White:ammonite.terminal.Ansi.Color" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
-    </li><li name="ammonite.terminal.Ansi#WhiteB" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="WhiteB:ammonite.terminal.Ansi.Color"></a>
-      <a id="WhiteB:Color"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">WhiteB</span><span class="result">: <a href="Ansi$$Color.html" class="extype" name="ammonite.terminal.Ansi.Color">Color</a></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Ansi$@WhiteB:ammonite.terminal.Ansi.Color" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
-    </li><li name="ammonite.terminal.Ansi#Yellow" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="Yellow:ammonite.terminal.Ansi.Color"></a>
-      <a id="Yellow:Color"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">Yellow</span><span class="result">: <a href="Ansi$$Color.html" class="extype" name="ammonite.terminal.Ansi.Color">Color</a></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Ansi$@Yellow:ammonite.terminal.Ansi.Color" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
-    </li><li name="ammonite.terminal.Ansi#YellowB" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="YellowB:ammonite.terminal.Ansi.Color"></a>
-      <a id="YellowB:Color"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">YellowB</span><span class="result">: <a href="Ansi$$Color.html" class="extype" name="ammonite.terminal.Ansi.Color">Color</a></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Ansi$@YellowB:ammonite.terminal.Ansi.Color" title="Permalink" target="_top">
+      <a href="../../index.html#ammonite.terminal.Ansi$@Underlined" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -705,6 +367,23 @@ consecutive redundant <a href="Ansi$$Color.html" class="extype" name="ammonite.t
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="ammonite.terminal.Ansi#categories" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="categories:scala.collection.immutable.Vector[ammonite.terminal.Ansi.Category]"></a>
+      <a id="categories:Vector[Category]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">categories</span><span class="result">: <span class="extype" name="scala.collection.immutable.Vector">Vector</span>[<a href="Ansi$$Category.html" class="extype" name="ammonite.terminal.Ansi.Category">Category</a>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.terminal.Ansi$@categories:scala.collection.immutable.Vector[ammonite.terminal.Ansi.Category]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
     </li><li name="scala.AnyRef#clone" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a>
       <a id="clone():AnyRef"></a>
@@ -802,6 +481,23 @@ consecutive redundant <a href="Ansi$$Color.html" class="extype" name="ammonite.t
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="ammonite.terminal.Ansi#hardOffMask" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="hardOffMask:Int"></a>
+      <a id="hardOffMask:Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">hardOffMask</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.terminal.Ansi$@hardOffMask:Int" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
     </li><li name="scala.AnyRef#hashCode" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="hashCode():Int"></a>
       <a id="hashCode():Int"></a>

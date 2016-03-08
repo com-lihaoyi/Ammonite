@@ -1,0 +1,726 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <title>UndoFilter - ammonite.terminal.filters.UndoFilter</title>
+          <meta name="description" content="UndoFilter - ammonite.terminal.filters.UndoFilter" />
+          <meta name="keywords" content="UndoFilter ammonite.terminal.filters.UndoFilter" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../../lib/template.js"></script>
+      <script type="text/javascript" src="../../../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../../index.html';
+            var hash = 'ammonite.terminal.filters.UndoFilter';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="type">
+      <div id="definition">
+        <a href="UndoFilter$.html" title="See companion object"><img alt="Class/Object" src="../../../lib/class_to_object_big.png" /></a>
+        <p id="owner"><a href="../../package.html" class="extype" name="ammonite">ammonite</a>.<a href="../package.html" class="extype" name="ammonite.terminal">terminal</a>.<a href="package.html" class="extype" name="ammonite.terminal.filters">filters</a></p>
+        <h1><a href="UndoFilter$.html" title="See companion object">UndoFilter</a></h1><h3><span class="morelinks"><div>
+            Related Docs:
+            <a href="UndoFilter$.html" title="See companion object">object UndoFilter</a>
+            | <a href="package.html" class="extype" name="ammonite.terminal.filters">package filters</a>
+          </div></span></h3><span class="permalink">
+      <a href="../../../index.html#ammonite.terminal.filters.UndoFilter" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <span class="name">UndoFilter</span><span class="params">(<span name="maxUndo">maxUndo: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">25</span></span>)</span><span class="result"> extends <a href="../DelegateFilter.html" class="extype" name="ammonite.terminal.DelegateFilter">DelegateFilter</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>A filter that implements &quot;undo&quot; functionality in the ammonite REPL. It
+shares the same <code>Ctrl -</code> hotkey that the bash undo, but shares behavior
+with the undo behavior in desktop text editors:</p><p>- Multiple <code>delete</code>s in a row get collapsed
+- In addition to edits you can undo cursor movements: undo will bring your
+  cursor back to location of previous edits before it undoes them
+- Provides &quot;redo&quot; functionality under <code>Alt -</code>/<code>Esc -</code>: un-undo the things
+  you didn't actually want to undo!
+</p></div><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.Product">Product</span>, <span class="extype" name="scala.Equals">Equals</span>, <a href="../DelegateFilter.html" class="extype" name="ammonite.terminal.DelegateFilter">DelegateFilter</a>, <a href="../Filter.html" class="extype" name="ammonite.terminal.Filter">Filter</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By inheritance</span></li>
+              </ol>
+            </div>
+        <div id="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="ammonite.terminal.filters.UndoFilter"><span>UndoFilter</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.Product"><span>Product</span></li><li class="in" name="scala.Equals"><span>Equals</span></li><li class="in" name="ammonite.terminal.DelegateFilter"><span>DelegateFilter</span></li><li class="in" name="ammonite.terminal.Filter"><span>Filter</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div id="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show all</span></li>
+            </ol>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        <div id="constructors" class="members">
+              <h3>Instance Constructors</h3>
+              <ol><li name="ammonite.terminal.filters.UndoFilter#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="&lt;init&gt;(maxUndo:Int):ammonite.terminal.filters.UndoFilter"></a>
+      <a id="&lt;init&gt;:UndoFilter"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">new</span>
+      </span>
+      <span class="symbol">
+        <span class="name">UndoFilter</span><span class="params">(<span name="maxUndo">maxUndo: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">25</span></span>)</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.terminal.filters.UndoFilter@&lt;init&gt;(maxUndo:Int):ammonite.terminal.filters.UndoFilter" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt"></p>
+    </li></ol>
+            </div>
+
+        
+
+        
+
+        <div id="values" class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="scala.AnyRef#!=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="!=(x$1:Any):Boolean"></a>
+      <a id="!=(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.terminal.filters.UndoFilter@!=(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef###" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="##():Int"></a>
+      <a id="##():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $hash$hash" class="name">##</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.terminal.filters.UndoFilter@##():Int" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="==(x$1:Any):Boolean"></a>
+      <a id="==(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.terminal.filters.UndoFilter@==(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="asInstanceOf[T0]:T0"></a>
+      <a id="asInstanceOf[T0]:T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">asInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Any.asInstanceOf.T0">T0</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.terminal.filters.UndoFilter@asInstanceOf[T0]:T0" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scala.AnyRef#clone" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="clone():Object"></a>
+      <a id="clone():AnyRef"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">clone</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.terminal.filters.UndoFilter@clone():Object" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.CloneNotSupportedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="ammonite.terminal.filters.UndoFilter#currentUndo" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="currentUndo:(Vector[Char],Int)"></a>
+      <a id="currentUndo:(Vector[Char],Int)"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">currentUndo</span><span class="result">: (<span class="extype" name="scala.Vector">Vector</span>[<span class="extype" name="scala.Char">Char</span>], <span class="extype" name="scala.Int">Int</span>)</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.terminal.filters.UndoFilter@currentUndo:(Vector[Char],Int)" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="ammonite.terminal.DelegateFilter#enclosing" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="enclosing:sourcecode.Enclosing"></a>
+      <a id="enclosing:Enclosing"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">enclosing</span><span class="result">: <span class="extype" name="sourcecode.Enclosing">Enclosing</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.terminal.filters.UndoFilter@enclosing:sourcecode.Enclosing" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../DelegateFilter.html" class="extype" name="ammonite.terminal.DelegateFilter">DelegateFilter</a></dd></dl></div>
+    </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="eq(x$1:AnyRef):Boolean"></a>
+      <a id="eq(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">eq</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.terminal.filters.UndoFilter@eq(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="ammonite.terminal.filters.UndoFilter#filter" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="filter:ammonite.terminal.Filter"></a>
+      <a id="filter:Filter"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">filter</span><span class="result">: <a href="../Filter.html" class="extype" name="ammonite.terminal.Filter">Filter</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.terminal.filters.UndoFilter@filter:ammonite.terminal.Filter" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="ammonite.terminal.filters.UndoFilter">UndoFilter</a> → <a href="../DelegateFilter.html" class="extype" name="ammonite.terminal.DelegateFilter">DelegateFilter</a></dd></dl></div>
+    </li><li name="scala.AnyRef#finalize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="finalize():Unit"></a>
+      <a id="finalize():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">finalize</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.terminal.filters.UndoFilter@finalize():Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="symbol">classOf[java.lang.Throwable]</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getClass():Class[_]"></a>
+      <a id="getClass():Class[_]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getClass</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.Class">Class</span>[_]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.terminal.filters.UndoFilter@getClass():Class[_]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="ammonite.terminal.DelegateFilter#identifier" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="identifier:String"></a>
+      <a id="identifier:String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">identifier</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.terminal.filters.UndoFilter@identifier:String" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">the <code>.toString</code> of this object, except by making it separate we force
+the implementer to provide something and stop them from accidentally
+leaving it as the meaningless default.</p><div class="fullcomment"><div class="comment cmt"><p>the <code>.toString</code> of this object, except by making it separate we force
+the implementer to provide something and stop them from accidentally
+leaving it as the meaningless default.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../DelegateFilter.html" class="extype" name="ammonite.terminal.DelegateFilter">DelegateFilter</a> → <a href="../Filter.html" class="extype" name="ammonite.terminal.Filter">Filter</a></dd></dl></div>
+    </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.terminal.filters.UndoFilter@isInstanceOf[T0]:Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="ammonite.terminal.filters.UndoFilter#maxUndo" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="maxUndo:Int"></a>
+      <a id="maxUndo:Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">maxUndo</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.terminal.filters.UndoFilter@maxUndo:Int" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ne(x$1:AnyRef):Boolean"></a>
+      <a id="ne(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ne</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.terminal.filters.UndoFilter@ne(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notify" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notify():Unit"></a>
+      <a id="notify():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notify</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.terminal.filters.UndoFilter@notify():Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notifyAll" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notifyAll():Unit"></a>
+      <a id="notifyAll():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notifyAll</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.terminal.filters.UndoFilter@notifyAll():Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="ammonite.terminal.DelegateFilter#op" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="op:ammonite.terminal.TermInfo=&gt;Option[ammonite.terminal.TermAction]"></a>
+      <a id="op:(TermInfo)⇒Option[TermAction]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">op</span><span class="result">: (<a href="../TermInfo.html" class="extype" name="ammonite.terminal.TermInfo">TermInfo</a>) ⇒ <span class="extype" name="scala.Option">Option</span>[<a href="../TermAction.html" class="extype" name="ammonite.terminal.TermAction">TermAction</a>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.terminal.filters.UndoFilter@op:ammonite.terminal.TermInfo=&gt;Option[ammonite.terminal.TermAction]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../DelegateFilter.html" class="extype" name="ammonite.terminal.DelegateFilter">DelegateFilter</a> → <a href="../Filter.html" class="extype" name="ammonite.terminal.Filter">Filter</a></dd></dl></div>
+    </li><li name="ammonite.terminal.filters.UndoFilter#pushUndos" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="pushUndos(b:Vector[Char],c:Int):Unit"></a>
+      <a id="pushUndos(Vector[Char],Int):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">pushUndos</span><span class="params">(<span name="b">b: <span class="extype" name="scala.Vector">Vector</span>[<span class="extype" name="scala.Char">Char</span>]</span>, <span name="c">c: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.terminal.filters.UndoFilter@pushUndos(b:Vector[Char],c:Int):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="ammonite.terminal.filters.UndoFilter#redo" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="redo(b:Vector[Char],c:Int):(Vector[Char],Int,ammonite.terminal.Ansi.Str)"></a>
+      <a id="redo(Vector[Char],Int):(Vector[Char],Int,Str)"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">redo</span><span class="params">(<span name="b">b: <span class="extype" name="scala.Vector">Vector</span>[<span class="extype" name="scala.Char">Char</span>]</span>, <span name="c">c: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: (<span class="extype" name="scala.Vector">Vector</span>[<span class="extype" name="scala.Char">Char</span>], <span class="extype" name="scala.Int">Int</span>, <a href="../Ansi$$Str.html" class="extype" name="ammonite.terminal.Ansi.Str">Str</a>)</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.terminal.filters.UndoFilter@redo(b:Vector[Char],c:Int):(Vector[Char],Int,ammonite.terminal.Ansi.Str)" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="ammonite.terminal.filters.UndoFilter#state" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="state:ammonite.terminal.filters.UndoState"></a>
+      <a id="state:UndoState"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">var</span>
+      </span>
+      <span class="symbol">
+        <span class="name">state</span><span class="result">: <a href="UndoState.html" class="extype" name="ammonite.terminal.filters.UndoState">UndoState</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.terminal.filters.UndoFilter@state:ammonite.terminal.filters.UndoState" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">An enum representing what the user is &quot;currently&quot; doing.</p><div class="fullcomment"><div class="comment cmt"><p>An enum representing what the user is &quot;currently&quot; doing. Used to
+collapse sequential actions into one undo step: e.g. 10 plain
+chars typed becomes 1 undo step, or 10 chars deleted becomes one undo
+step, but 4 chars typed followed by 3 chars deleted followed by 3 chars
+typed gets grouped into 3 different undo steps
+</p></div></div>
+    </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
+      <a id="synchronized[T0](⇒T0):T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">synchronized</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="params">(<span name="arg0">arg0: ⇒ <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>)</span><span class="result">: <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.terminal.filters.UndoFilter@synchronized[T0](x$1:=&gt;T0):T0" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="ammonite.terminal.Filter#toString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="toString():String"></a>
+      <a id="toString():String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.terminal.filters.UndoFilter@toString():String" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../Filter.html" class="extype" name="ammonite.terminal.Filter">Filter</a> → AnyRef → Any</dd></dl></div>
+    </li><li name="ammonite.terminal.filters.UndoFilter#undo" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="undo(b:Vector[Char],c:Int):(Vector[Char],Int,ammonite.terminal.Ansi.Str)"></a>
+      <a id="undo(Vector[Char],Int):(Vector[Char],Int,Str)"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">undo</span><span class="params">(<span name="b">b: <span class="extype" name="scala.Vector">Vector</span>[<span class="extype" name="scala.Char">Char</span>]</span>, <span name="c">c: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: (<span class="extype" name="scala.Vector">Vector</span>[<span class="extype" name="scala.Char">Char</span>], <span class="extype" name="scala.Int">Int</span>, <a href="../Ansi$$Str.html" class="extype" name="ammonite.terminal.Ansi.Str">Str</a>)</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.terminal.filters.UndoFilter@undo(b:Vector[Char],c:Int):(Vector[Char],Int,ammonite.terminal.Ansi.Str)" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="ammonite.terminal.filters.UndoFilter#undoBuffer" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="undoBuffer:scala.collection.mutable.Buffer[(Vector[Char],Int)]"></a>
+      <a id="undoBuffer:Buffer[(Vector[Char],Int)]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">undoBuffer</span><span class="result">: <span class="extype" name="scala.collection.mutable.Buffer">Buffer</span>[(<span class="extype" name="scala.Vector">Vector</span>[<span class="extype" name="scala.Char">Char</span>], <span class="extype" name="scala.Int">Int</span>)]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.terminal.filters.UndoFilter@undoBuffer:scala.collection.mutable.Buffer[(Vector[Char],Int)]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The current stack of states that undo/redo would cycle through.</p><div class="fullcomment"><div class="comment cmt"><p>The current stack of states that undo/redo would cycle through.</p><p>Not really the appropriate data structure, since when it reaches
+<code>maxUndo</code> in length we remove one element from the start whenever we
+append one element to the end, which costs <code>O(n)</code>. On the other hand,
+It also costs <code>O(n)</code> to maintain the buffer of previous states, and
+so <code>n</code> is probably going to be pretty small anyway (tens?) so <code>O(n)</code>
+is perfectly fine.
+</p></div></div>
+    </li><li name="ammonite.terminal.filters.UndoFilter#undoIndex" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="undoIndex:Int"></a>
+      <a id="undoIndex:Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">var</span>
+      </span>
+      <span class="symbol">
+        <span class="name">undoIndex</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.terminal.filters.UndoFilter@undoIndex:Int" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The current position in the undoStack that the terminal is currently in.</p>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait():Unit"></a>
+      <a id="wait():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.terminal.filters.UndoFilter@wait():Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long,x$2:Int):Unit"></a>
+      <a id="wait(Long,Int):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.terminal.filters.UndoFilter@wait(x$1:Long,x$2:Int):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long):Unit"></a>
+      <a id="wait(Long):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.terminal.filters.UndoFilter@wait(x$1:Long):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="ammonite.terminal.filters.UndoFilter#wrap" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="wrap(bc:(Vector[Char],Int,ammonite.terminal.Ansi.Str),rest:ammonite.terminal.LazyList[Int]):ammonite.terminal.TermState"></a>
+      <a id="wrap((Vector[Char],Int,Str),LazyList[Int]):TermState"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wrap</span><span class="params">(<span name="bc">bc: (<span class="extype" name="scala.Vector">Vector</span>[<span class="extype" name="scala.Char">Char</span>], <span class="extype" name="scala.Int">Int</span>, <a href="../Ansi$$Str.html" class="extype" name="ammonite.terminal.Ansi.Str">Str</a>)</span>, <span name="rest">rest: <a href="../LazyList.html" class="extype" name="ammonite.terminal.LazyList">LazyList</a>[<span class="extype" name="scala.Int">Int</span>]</span>)</span><span class="result">: <a href="../TermState.html" class="extype" name="ammonite.terminal.TermState">TermState</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.terminal.filters.UndoFilter@wrap(bc:(Vector[Char],Int,ammonite.terminal.Ansi.Str),rest:ammonite.terminal.LazyList[Int]):ammonite.terminal.TermState" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="scala.Serializable">
+              <h3>Inherited from <span class="extype" name="scala.Serializable">Serializable</span></h3>
+            </div><div class="parent" name="java.io.Serializable">
+              <h3>Inherited from <span class="extype" name="java.io.Serializable">Serializable</span></h3>
+            </div><div class="parent" name="scala.Product">
+              <h3>Inherited from <span class="extype" name="scala.Product">Product</span></h3>
+            </div><div class="parent" name="scala.Equals">
+              <h3>Inherited from <span class="extype" name="scala.Equals">Equals</span></h3>
+            </div><div class="parent" name="ammonite.terminal.DelegateFilter">
+              <h3>Inherited from <a href="../DelegateFilter.html" class="extype" name="ammonite.terminal.DelegateFilter">DelegateFilter</a></h3>
+            </div><div class="parent" name="ammonite.terminal.Filter">
+              <h3>Inherited from <a href="../Filter.html" class="extype" name="ammonite.terminal.Filter">Filter</a></h3>
+            </div><div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>
