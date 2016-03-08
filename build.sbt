@@ -33,6 +33,13 @@ val sharedSettings = Seq(
   organization := "com.lihaoyi",
   version := _root_.ammonite.Constants.version,
   libraryDependencies += "com.lihaoyi" %% "utest" % "0.3.0" % "test",
+  // Needed for acyclic to work...
+  libraryDependencies ++= {
+    if (scalaVersion.value startsWith "2.11.") Nil
+    else Seq(
+      "org.scala-lang" % "scala-compiler" % scalaVersion.value % "provided"
+    )
+  },
   testFrameworks := Seq(new TestFramework("utest.runner.Framework")),
   scalacOptions += "-target:jvm-1.7",
   autoCompilerPlugins := true,
@@ -94,8 +101,7 @@ lazy val terminal = project
   .settings(
     sharedSettings,
     name := "ammonite-terminal",
-    libraryDependencies += "com.lihaoyi" %% "sourcecode" % "0.1.1",
-    macroSettings
+    libraryDependencies += "com.lihaoyi" %% "sourcecode" % "0.1.1"
   )
 
 /**
