@@ -174,6 +174,10 @@ class HistoryFilter(history: () => IndexedSeq[String],
     case TermInfo(TS(p"\u0010$rest", b, c, _), w) if firstRow(c, b, w) && !activeHistory =>
       wrap(rest, startHistory(b, c))
 
+    // `Page-Up` from first character starts history
+    case TermInfo(TS(p"\u001b[5~$rest", b, c, _), w) if c == 0 && !activeHistory =>
+      wrap(rest, startHistory(b, c))
+
     // Things you can do when you're already in the history search
 
     // Navigating up and down the history. Each up or down searches for
@@ -183,10 +187,19 @@ class HistoryFilter(history: () => IndexedSeq[String],
       wrap(rest, up(b, c))
     case TermInfo(TS(p"\u0010$rest", b, c, _), w) if searchOrHistoryAnd(firstRow(c, b, w)) =>
       wrap(rest, up(b, c))
+
+    // `Page-Up` from first character cycles history up
+    case TermInfo(TS(p"\u001b[5~$rest", b, c, _), w) if searchOrHistoryAnd(c == 0) =>
+      wrap(rest, up(b, c))
+
     // Down
     case TermInfo(TS(p"\u001b[B$rest", b, c, _), w) if searchOrHistoryAnd(lastRow(c, b, w))  =>
       wrap(rest, down(b, c))
     case TermInfo(TS(p"\u000e$rest", b, c, _), w) if searchOrHistoryAnd(lastRow(c, b, w))  =>
+      wrap(rest, down(b, c))
+
+    // `Page-Down` from last character cycles history down
+    case TermInfo(TS(p"\u001b[6~$rest", b, c, _), w) if searchOrHistoryAnd(c == b.length - 1) =>
       wrap(rest, down(b, c))
 
 

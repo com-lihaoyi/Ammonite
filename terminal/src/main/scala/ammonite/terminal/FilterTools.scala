@@ -53,7 +53,7 @@ object FilterTools {
         )
       }
     }.lift
-    override def toString = enc.value + ":" + l.value
+    def identifier = enc.value + ":" + l.value
   }
 
   /**

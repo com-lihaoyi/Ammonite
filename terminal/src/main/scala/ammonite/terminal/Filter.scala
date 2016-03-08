@@ -6,14 +6,14 @@ object Filter{
            (implicit i: sourcecode.Enclosing): Filter =
     new Filter{
       val op = f.lift
-      override def toString = i.value
+      def identifier = i.value
     }
 
   def wrap(f: TermInfo => Option[TermAction])
           (implicit i: sourcecode.Enclosing): Filter =
     new Filter{
       val op = f
-      override def toString = i.value
+      def identifier = i.value
     }
 
   /**
@@ -24,7 +24,7 @@ object Filter{
 
     val op = (v1: TermInfo) => pfs.iterator.map(_.op(v1)).find(_.isDefined).flatten
 
-    override def toString = i.value
+    def identifier = i.value
   }
   val empty = Filter.merge()
 }
@@ -43,6 +43,14 @@ object Filter{
   */
 trait Filter{
   val op: TermInfo => Option[TermAction]
+
+  /**
+    * the `.toString` of this object, except by making it separate we force
+    * the implementer to provide something and stop them from accidentally
+    * leaving it as the meaningless default.
+    */
+  def identifier: String
+  override def toString = identifier
 }
 
 /**
@@ -54,5 +62,5 @@ trait Filter{
 abstract class DelegateFilter(implicit val enclosing: sourcecode.Enclosing) extends Filter{
   def filter: Filter
   val op = filter.op
-  override def toString = enclosing.value
+  def identifier = enclosing.value
 }

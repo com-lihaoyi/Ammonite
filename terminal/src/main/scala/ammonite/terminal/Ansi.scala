@@ -38,14 +38,12 @@ object Ansi {
     * Represents a set of [[Ansi.Attr]]s all occupying the same bit-space
     * in the state `Short`
     */
-  sealed abstract class Category(implicit catName: sourcecode.Enclosing){
+  sealed abstract class Category(implicit catName: sourcecode.Name){
     val mask: Int
     val all: Seq[Attr]
     lazy val bitsMap = all.map{ m => m.applyMask -> m}.toMap
     def makeAttr(s: Option[String], applyMask: Int)(implicit name: sourcecode.Name) = {
-      new Attr(s, mask, applyMask)(
-        sourcecode.Name(catName.value.stripSuffix(".<init>") + "." + name.value)
-      )
+      new Attr(s, mask, applyMask)(catName.value + "." + name.value)
     }
   }
 

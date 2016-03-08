@@ -31,9 +31,11 @@ object Debug{
   * your companion object and define the items via `val a, b, c = Item(...)`
   * passing in your enum class constructor in place of `...`.
   */
-abstract class Enum{
+abstract class Enum(implicit enumName: sourcecode.Name){
   protected[this] def Item[T](constructor: String => T)
-                             (implicit i: sourcecode.Name): T = constructor(i.value)
+                             (implicit i: sourcecode.Name): T = {
+    constructor(enumName.value + "." + i.value)
+  }
 }
 
 class AnsiNav(output: Writer){
