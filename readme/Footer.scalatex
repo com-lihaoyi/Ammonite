@@ -59,6 +59,8 @@
           Added asserts to @code{rm} @code{cp} and @code{mv} to prevent you from removing the root folder, or copying/moving folders into themselves.
         @li
           Command-line-undo via @code{Ctrl -} and redo via @code{Esc/Alt -} are now supported.
+        @li
+          Page-up and Page-down (fn-up and fn-down on Macs) scrolls through history when used at the start/end of input, allowing you to use page-up/page-down to quickly scroll through history with lots of multi-line blocks.
 
     @sect{0.5.5}
       @ul
