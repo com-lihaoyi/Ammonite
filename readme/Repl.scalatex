@@ -98,18 +98,7 @@
       @p
         Ammonite-REPL intelligently truncates your output when it's beyond a certain size. You can request for the full output to be printed on-demand, print a certain number of lines, or even change the implicit @code{pprintConfig} so subsequent lines all use your new configuration.
 
-    @sect{Syntax Highlighting}
-      @img(src:="Highlighting.png", width:="100%")
-      @p
-        Ammonite syntax highlights both the code you're entering as well as any output being echoed in response. This should make it much easier to work with larger snippets of input.
-      @p
-        All colors are configurable, and you can easily turn off colors entirely via the @sect.ref{Configuration}.
-      @p
-        Stack traces are similarly highlighted, for easier reading:
-
-      @img(src:="ColoredTraces.png", width:="100%")
-
-    @sect{Undo}
+    @sect{Save/Load Session}
       @p
         Ammonite allows you to save your work half way through, letting you discard and future changes and returning to the state of the world you saved.
 
@@ -128,43 +117,6 @@
 
       @p
         Ammonite's @hl.scala{save} and @hl.scala{load} functionality is implemented via Java class-loaders.
-
-    @sect{Improved Editing}
-      @img(src:="Editing.gif", display.block, marginLeft.auto, marginRight.auto, height := 172)
-      @p
-        Ammonite by default ships with a custom implementation of readline, which provides...
-
-      @sect{Multi-line editing}
-
-        @p
-          You can use the @b{Up} and @b{Down} arrows to navigate between lines within your snippet. @code{Enter} only executes the code when you're on the last line of a multi-line snippet, meaning you can take your time, space out your code nicely, and fix any mistakes anywhere in your snippet. History is multi-line too, meaning re-running a multi-line snippet is trivial, even with tweaks.
-
-        @p
-          Long gone are the days where you're desperately trying to cram everything in a single line, or curse quietly when you notice a mistake in an earlier line you are no longer able to fix. No more painstakingly crafting a multi-line snippet, and then having to painstakingly fish it line by individual line out of the history so you can run it again!
-
-      @sect{Desktop key-bindings}
-
-        @p
-          You can use @b{Alt-Left}/@b{Right} to move forward/backwards by one word at a time or hold down @b{Shift} to select text to delete. These compose as you'd be used to: e.g. @b{Shift-Up} selects all the text between your current cursor and the same column one row up.
-
-        @p
-          @code{Tab} and @code{Shift-Tab} now work to block-indent and -dedent sections of code, as you'd expect in any desktop editor like Sublime Text or IntelliJ. This further enhances the multi-line editing experience, letting your nicely lay-out your more-complex REPL commands the same way you'd format code in any other editor.
-
-      @sect{Console key-bindings}
-        @p
-          All the readline-style navigation hotkeys like @b{Ctrl-W} to delete a word or @b{Esc-Left}/@b{Right} to navigate one word left/right still work. If you're comfortable with consoles like Bash, Python, IPython or even the default Scala console, you should have no trouble as all the exact same hotkeys work in Ammonite
-
-      @sect{History Search}
-
-        @img(src:="HistorySearch.gif", width:="445px", marginRight.auto, marginLeft.auto, display.block)
-
-        @p
-          Apart from browsing your command-line history with @code{UP}, you can also perform a history search by entering some search term and @i{then} pressing @code{UP}. That will pull up the most recent history line with that term in it, underlined. You can continue to press @code{UP} or @code{DOWN} to cycle through the matches, or @code{Backspace} or continue typing characters to refine your search to what you want.
-        @p
-          You can press @code{TAB}, or any other command character (@code{LEFT}, @code{RIGHT}, ...) to end the search and let you continue working with the currently-displayed command. Pressing @code{ENTER} will end the search and immediately submit the command to be run.
-        @p
-          You can also kick off a history search using @code{Ctrl-R}, and use @code{Ctrl-R} to cycle through the matches.
-
 
     @sect{Superior Autocomplete}
       @p
@@ -219,6 +171,61 @@
       @p
         The default Scala REPL throws away all your work if the compiler crashes. This doesn't make any sense, because all the compiler is is a dumb @hl.scala{String => Array[Byte]} pipe. In the Ammonite, we simply swap out the broken compiler for a new one and let you continue your work.
 
+    @sect{Other Fixes}
+      @p
+        Apart from the above features, the Ammonite REPL fixes a large number of bugs in the default Scala REPL, including but not limited to:
+      @ul
+        @val bugs = Seq("6302", "8971", "9249", "4438", "8603", "6660", "7953", "6659", "8456", "1067", "8307", "9335")
+        @for(bug <- bugs){
+          @li(a("SI-"+bug, href:="https://issues.scala-lang.org/browse/SI-"+bug))
+        }
+
+  @sect{Editing}
+
+    @p
+      Ammonite by default ships with a custom implementation of readline, which provides...
+
+    @sect{Syntax Highlighting}
+      @img(src:="Highlighting.png", width:="100%")
+      @p
+        Ammonite syntax highlights both the code you're entering as well as any output being echoed in response. This should make it much easier to work with larger snippets of input.
+      @p
+        All colors are configurable, and you can easily turn off colors entirely via the @sect.ref{Configuration}.
+      @p
+        Stack traces are similarly highlighted, for easier reading:
+  
+      @img(src:="ColoredTraces.png", width:="100%")
+    @sect{Multi-line editing}
+
+      @p
+        You can use the @b{Up} and @b{Down} arrows to navigate between lines within your snippet. @code{Enter} only executes the code when you're on the last line of a multi-line snippet, meaning you can take your time, space out your code nicely, and fix any mistakes anywhere in your snippet. History is multi-line too, meaning re-running a multi-line snippet is trivial, even with tweaks.
+
+      @p
+        Long gone are the days where you're desperately trying to cram everything in a single line, or curse quietly when you notice a mistake in an earlier line you are no longer able to fix. No more painstakingly crafting a multi-line snippet, and then having to painstakingly fish it line by individual line out of the history so you can run it again!
+
+    @sect{Desktop key-bindings}
+      @img(src:="Editing.gif", display.block, marginLeft.auto, marginRight.auto, height := 172)
+      @p
+        You can use @b{Alt-Left}/@b{Right} to move forward/backwards by one word at a time or hold down @b{Shift} to select text to delete. These compose as you'd be used to: e.g. @b{Shift-Up} selects all the text between your current cursor and the same column one row up.
+
+      @p
+        @code{Tab} and @code{Shift-Tab} now work to block-indent and -dedent sections of code, as you'd expect in any desktop editor like Sublime Text or IntelliJ. This further enhances the multi-line editing experience, letting your nicely lay-out your more-complex REPL commands the same way you'd format code in any other editor.
+
+    @sect{Console key-bindings}
+      @p
+        All the readline-style navigation hotkeys like @b{Ctrl-W} to delete a word or @b{Esc-Left}/@b{Right} to navigate one word left/right still work. If you're comfortable with consoles like Bash, Python, IPython or even the default Scala console, you should have no trouble as all the exact same hotkeys work in Ammonite
+
+    @sect{History Search}
+
+      @img(src:="HistorySearch.gif", width:="445px", marginRight.auto, marginLeft.auto, display.block)
+
+      @p
+        Apart from browsing your command-line history with @code{UP}, you can also perform a history search by entering some search term and @i{then} pressing @code{UP}. That will pull up the most recent history line with that term in it, underlined. You can continue to press @code{UP} or @code{DOWN} to cycle through the matches, or @code{Backspace} or continue typing characters to refine your search to what you want.
+      @p
+        You can press @code{TAB}, or any other command character (@code{LEFT}, @code{RIGHT}, ...) to end the search and let you continue working with the currently-displayed command. Pressing @code{ENTER} will end the search and immediately submit the command to be run.
+      @p
+        You can also kick off a history search using @code{Ctrl-R}, and use @code{Ctrl-R} to cycle through the matches.
+
     @sect{Block Input}
       @p
         To enter block input (many independent lines all at once) into the Ammonite-REPL, simply wrap the multiple lines in curly braces @hl.scala("{ ... }"), and Ammonite will wait until you close it before evaluating the contents:
@@ -232,14 +239,20 @@
         If you don't want this un-wrapping behavior, simply add another set of curlies and the block will be evaluated as a normal block, to a single expression:
 
       @hl.ref(advancedTests, Seq("'forceWrapping", "@"))
-    @sect{Other Fixes}
+
+    @sect{Undo & Redo}
+      @img(src:="UndoRedo.gif", display.block, marginLeft.auto, marginRight.auto, height := 154)
       @p
-        Apart from the above features, the Ammonite REPL fixes a large number of bugs in the default Scala REPL, including but not limited to:
+        The Ammonite command-line editor allows you to undo and re-do portions of your edits:
       @ul
-        @val bugs = Seq("6302", "8971", "9249", "4438", "8603", "6660", "7953", "6659", "8456", "1067", "8307", "9335")
-        @for(bug <- bugs){
-          @li(a("SI-"+bug, href:="https://issues.scala-lang.org/browse/SI-"+bug))
-        }
+        @li
+          @code{Ctrl -}: Undo last change
+        @li
+          @code{Alt/Esc -}: Redo last change
+
+      @p
+        Each block of typing, deletes, or navigation counts as one undo. This should make it much more convenient to recover from botched copy-pastes or bulk-deletions.
+
   @sect{Builtins}
     @p
       Ammonite contains a range of useful built-ins implemented as normal functions. Everything inside the @hl.scala{ReplAPI} trait is imported by default and can be accessed directly by default to control the console.

@@ -58,7 +58,7 @@
         @li
           Added asserts to @code{rm} @code{cp} and @code{mv} to prevent you from removing the root folder, or copying/moving folders into themselves.
         @li
-          Command-line-undo via @code{Ctrl -} and redo via @code{Esc/Alt -} are now supported.
+          @sect.ref("Undo & Redo", "Command-line-undo") via @code{Ctrl -} and redo via @code{Esc/Alt -} are now supported.
         @li
           Page-up and Page-down (fn-up and fn-down on Macs) scrolls through history when used at the start/end of input, allowing you to use page-up/page-down to quickly scroll through history with lots of multi-line blocks.
 
@@ -159,7 +159,7 @@
         @li
           Pressing @code{[Enter]} now only submits the input if your cursor is at the bottom
         @li
-          Added a powerful @sect.ref{Undo} API, letting you save your work at any point in time and return to it later.
+          Added a powerful @sect.ref{Save/Load Session} API, letting you save your work at any point in time and return to it later.
         @li
           Compiled-code-caches are now properly invalidated when you change project-code while using Ammonite as a REPL for an existing SBT project.
         @li
@@ -286,7 +286,7 @@
         @li
           @sect.ref{Configuration} that was previously passed into the @hl.scala{REPL}s constructor is now done in-REPL,
         @li
-          @sect.ref("Improved Editing", "Multi-line editing and other features") via a custom terminal interface that should behave just like readline, but with added conveniences.
+          @sect.ref("Editing", "Multi-line editing and other features") via a custom terminal interface that should behave just like readline, but with added conveniences.
         @li
           Removed the ability to reload classes; using @hl.scala{load.ivy} no longer causes all existing values to be lazily recomputed.
         @li
