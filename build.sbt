@@ -6,7 +6,8 @@ import sbtassembly.AssemblyPlugin.defaultShellScript
 scalaVersion := "2.11.6"
 
 crossScalaVersions := Seq(
-  "2.10.3", "2.10.4", "2.10.5", "2.10.6", "2.11.3", "2.11.4", "2.11.5", "2.11.6", "2.11.7"
+  "2.10.3", "2.10.4", "2.10.5", "2.10.6",
+  "2.11.3", "2.11.4", "2.11.5", "2.11.6", "2.11.7", "2.11.8"
 )
 
 val dontPublishSettings = Seq(
@@ -29,7 +30,7 @@ val macroSettings = Seq(
 )
 
 val sharedSettings = Seq(
-  scalaVersion := "2.11.7",
+  scalaVersion := "2.11.8",
   organization := "com.lihaoyi",
   version := _root_.ammonite.Constants.version,
   libraryDependencies += "com.lihaoyi" %% "utest" % "0.3.0" % "test",
@@ -240,7 +241,7 @@ lazy val readme = ScalatexReadme(
   source = "Index"
 ).settings(
   dontPublishSettings,
-  scalaVersion := "2.11.7",
+  scalaVersion := "2.11.8",
   (run in Compile) <<= (run in Compile).dependsOn(
     assembly in repl,
     packageBin in (shell, Compile),
