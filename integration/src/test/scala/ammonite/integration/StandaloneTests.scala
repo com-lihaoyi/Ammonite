@@ -3,7 +3,6 @@ package ammonite.integration
 import utest._
 import ammonite.ops._
 import ammonite.ops.ImplicitWd._
-import utest.framework.TestSuite
 
 /**
  * Run a small number of scripts using the Ammonite standalone executable,
