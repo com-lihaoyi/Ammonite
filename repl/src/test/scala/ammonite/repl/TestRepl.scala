@@ -148,7 +148,7 @@ class TestRepl {
   }
   def failLoudly[T](t: => T) =
     try t
-    catch{ case e: utest.framework.AssertionError =>
+    catch{ case e: utest.AssertionError =>
       println("FAILURE TRACE\n" + allOutput)
       throw e
     }

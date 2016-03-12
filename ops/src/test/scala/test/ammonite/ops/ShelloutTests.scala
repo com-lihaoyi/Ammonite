@@ -2,7 +2,6 @@ package test.ammonite.ops
 
 import ammonite.ops._
 import utest._
-import utest.framework.TestSuite
 
 object ShelloutTests extends TestSuite{
   val scriptFolder = cwd/'ops/'src/'test/'resources/'scripts

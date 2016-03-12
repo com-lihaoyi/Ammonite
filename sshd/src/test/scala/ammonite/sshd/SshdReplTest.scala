@@ -1,7 +1,6 @@
 package ammonite.sshd
 
 import utest._
-import utest.framework.TestSuite
 
 import scala.concurrent.{Await, Promise}
 import scala.language.postfixOps
