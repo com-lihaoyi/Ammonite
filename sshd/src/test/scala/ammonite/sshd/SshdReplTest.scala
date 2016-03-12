@@ -11,7 +11,7 @@ object SshdReplTest extends TestSuite {
   val remotePromise = Promise[Boolean]()
 
   override val tests = TestSuite {
-    'canExecuteRemoteCommand{
+    'canExecuteRemoteCommand - retry(3){ // Flaky, not sure why
       withTmpDirectory { tmpDir =>
         val repl = new SshdRepl(SshServerConfig("localhost", 0, testUsername, testPassword, tmpDir))
         repl.start()
