@@ -1,10 +1,10 @@
-package ammonite.terminal
-
-import FilterTools._
-import TermCore.DelegateFilter
-import LazyList._
-import SpecialKeys._
+package ammonite.terminal.filters
 import acyclic.file
+import ammonite.terminal.FilterTools._
+import ammonite.terminal.LazyList.~:
+import ammonite.terminal.SpecialKeys._
+import ammonite.terminal.DelegateFilter
+import ammonite.terminal._
 
 /**
  * Filters have hook into the various {Ctrl,Shift,Fn,Alt}x{Up,Down,Left,Right}
@@ -56,7 +56,7 @@ object GUILikeFilters {
       TS(rest, flattened, newC)
     }
 
-    def filter = orElseAll(
+    def filter = Filter.merge(
 
       Case(ShiftUp){(b, c, m) => setMark(c); BasicFilters.moveUp(b, c, m.width)},
       Case(ShiftDown){(b, c, m) => setMark(c); BasicFilters.moveDown(b, c, m.width)},
@@ -68,7 +68,7 @@ object GUILikeFilters {
       Case(AltShiftLeft){(b, c, m) => setMark(c); wordLeft(b, c)},
       Case(FnShiftRight){(b, c, m) => setMark(c); BasicFilters.moveEnd(b, c, m.width)},
       Case(FnShiftLeft){(b, c, m) => setMark(c); BasicFilters.moveStart(b, c, m.width)},
-      {
+      Filter{
         case TS(27 ~: 91 ~: 90 ~: rest, b, c, _) if mark.isDefined =>
           doIndent(b, c, rest,
             slice => -math.min(slice.iterator.takeWhile(_ == ' ').size, indent)
@@ -106,7 +106,7 @@ object GUILikeFilters {
     def mangleBuffer(selectionFilter: SelectionFilter,
                      string: Ansi.Str,
                      cursor: Int,
-                     startColor: Ansi.Color) = {
+                     startColor: Ansi.Attr) = {
       selectionFilter.mark match{
         case Some(mark) if mark != cursor =>
           val Seq(min, max) = Seq(cursor, mark).sorted
@@ -118,26 +118,26 @@ object GUILikeFilters {
     }
   }
 
-  val fnFilter = orElseAll(
+  val fnFilter = Filter.merge(
     Case(FnUp)((b, c, m) => (b, c - 9999)),
     Case(FnDown)((b, c, m) => (b, c + 9999)),
     Case(FnRight)((b, c, m) => BasicFilters.moveEnd(b, c, m.width)),
     Case(FnLeft)((b, c, m) => BasicFilters.moveStart(b, c, m.width))
   )
-  val altFilter = orElseAll(
+  val altFilter = Filter.merge(
     Case(AltUp){(b, c, m) => BasicFilters.moveUp(b, c, m.width)},
     Case(AltDown){(b, c, m) => BasicFilters.moveDown(b, c, m.width)},
     Case(AltRight){(b, c, m) => wordRight(b, c)},
     Case(AltLeft){(b, c, m) => wordLeft(b, c)}
   )
 
-  val fnAltFilter = orElseAll(
+  val fnAltFilter = Filter.merge(
     Case(FnAltUp){(b, c, m) => (b, c)},
     Case(FnAltDown){(b, c, m) => (b, c)},
     Case(FnAltRight){(b, c, m) => (b, c)},
     Case(FnAltLeft){(b, c, m) => (b, c)}
   )
-  val fnAltShiftFilter = orElseAll(
+  val fnAltShiftFilter = Filter.merge(
     Case(FnAltShiftRight){(b, c, m) => (b, c)},
     Case(FnAltShiftLeft){(b, c, m) => (b, c)}
   )
@@ -145,15 +145,14 @@ object GUILikeFilters {
 
   def consumeWord(b: Vector[Char], c: Int, delta: Int, offset: Int) = {
     var current = c
-    // Move at least one character! Otherwise
-    // you get stuck at the end of a word.
-    current += delta
     while(b.isDefinedAt(current) && !b(current).isLetterOrDigit) current += delta
     while(b.isDefinedAt(current) && b(current).isLetterOrDigit) current += delta
     current + offset
   }
 
-  def wordLeft(b: Vector[Char], c: Int) = b -> consumeWord(b, c, -1, 1)
+  // c -1 to move at least one character! Otherwise you get stuck at the start of
+  // a word.
+  def wordLeft(b: Vector[Char], c: Int) = b -> consumeWord(b, c - 1, -1, 1)
   def wordRight(b: Vector[Char], c: Int) = b -> consumeWord(b, c, 1, 0)
 
 }

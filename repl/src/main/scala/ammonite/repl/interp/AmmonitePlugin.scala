@@ -17,8 +17,9 @@ class AmmonitePlugin(g: scala.tools.nsc.Global, output: Seq[ImportData] => Unit)
   val components: List[PluginComponent] = List(
     new PluginComponent {
       val global = g
+
       val runsAfter = List("typer")
-      override val runsRightAfter = Some("typer")
+      override val runsBefore = List("patmat")
       val phaseName = "AmmonitePhase"
 
       def newPhase(prev: Phase): Phase = new g.GlobalPhase(prev) {

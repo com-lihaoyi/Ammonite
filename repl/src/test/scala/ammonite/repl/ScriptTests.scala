@@ -18,7 +18,7 @@ object ScriptTests extends TestSuite{
 
     'exec{
       'compilationBlocks{
-        'loadIvy{
+        'loadIvy - retry(3){ // ivy or maven central seems to be flaky =/ =/ =/
           check.session(s"""
             @ import ammonite.ops._
 

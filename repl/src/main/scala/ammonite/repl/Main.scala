@@ -34,7 +34,7 @@ object Main{
         .action((x, c) => c.copy(predef = x))
         .text("Any commands you want to execute at the start of the REPL session")
       opt[String]('f', "predef-file")
-        .action((x, c) => c.copy(predefFile = Some(if (x(0) == '/') Path(x) else cwd/RelPath(x))))
+        .action((x, c) => c.copy(predefFile = Some(Path(x, cwd))))
         .text("Lets you load your predef from a custom location")
       opt[String]('c', "code")
         .action((x, c) => c.copy(code = Some(x)))
@@ -44,11 +44,11 @@ object Main{
         .text("Print time taken for each step")
       opt[File]('h', "home")
         .valueName("<file>")
-        .action((x, c) => c.copy(ammoniteHome = Path(x)))
+        .action((x, c) => c.copy(ammoniteHome = Path(x, cwd)))
         .text("The home directory of the REPL; where it looks for config and caches")
-      arg[File]("<file-args>...")
+      arg[String]("<file-args>...")
         .optional()
-        .action { (x, c) => c.copy(file = Some(Path(x))) }
+        .action { (x, c) => c.copy(file = Some(Path(x, cwd))) }
         .text("The Ammonite script file you want to execute")
       arg[String]("<args>...")
         .optional()
@@ -241,5 +241,5 @@ object ScriptInit{
   /**
     * Additional [[scopt.Read]] instance to teach it how to read Ammonite paths
     */
-  implicit def pathRead: scopt.Read[Path] = scopt.Read.stringRead.map(Path(_))
+  implicit def pathRead: scopt.Read[Path] = scopt.Read.stringRead.map(Path(_, cwd))
 }

@@ -8,8 +8,8 @@ object HeightTests extends TestSuite{
   val tests = TestSuite{
 
     'a - {
-      val height = TermCore.calculateHeight0(
-        TermCore.splitBuffer("abcde".toVector),
+      val height = Terminal.calculateHeight0(
+        Terminal.splitBuffer("abcde".toVector),
         width = 2
       )
       assert(height == Seq(3))
@@ -18,8 +18,8 @@ object HeightTests extends TestSuite{
       //e
     }
     'b - {
-      val height = TermCore.calculateHeight0(
-        TermCore.splitBuffer("abcd".toVector),
+      val height = Terminal.calculateHeight0(
+        Terminal.splitBuffer("abcd".toVector),
         width = 2
       )
       assert(height == Seq(3))
@@ -28,8 +28,8 @@ object HeightTests extends TestSuite{
       //|
     }
     'c - {
-      val height = TermCore.calculateHeight0(
-        TermCore.splitBuffer("abcd".toVector),
+      val height = Terminal.calculateHeight0(
+        Terminal.splitBuffer("abcd".toVector),
         width = 2
       )
       assert(height == Seq(3))
@@ -39,8 +39,8 @@ object HeightTests extends TestSuite{
     }
 
     'd - {
-      val height = TermCore.calculateHeight0(
-        TermCore.splitBuffer("ab\ncd".toVector),
+      val height = Terminal.calculateHeight0(
+        Terminal.splitBuffer("ab\ncd".toVector),
         width = 2
       )
       assert(height == Seq(2, 2))
@@ -51,8 +51,8 @@ object HeightTests extends TestSuite{
     }
 
     'e - {
-      val height = TermCore.calculateHeight0(
-        TermCore.splitBuffer("ab\ncd".toVector),
+      val height = Terminal.calculateHeight0(
+        Terminal.splitBuffer("ab\ncd".toVector),
         width = 2
       )
       assert(height == Seq(2, 2))
@@ -62,8 +62,8 @@ object HeightTests extends TestSuite{
       //|
     }
     'f - {
-      val height = TermCore.calculateHeight0(
-        TermCore.splitBuffer("ab\ncd".toVector),
+      val height = Terminal.calculateHeight0(
+        Terminal.splitBuffer("ab\ncd".toVector),
         width = 2
       )
       assert(height == Seq(2, 2))

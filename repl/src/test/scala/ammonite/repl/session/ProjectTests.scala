@@ -12,7 +12,7 @@ object ProjectTests extends TestSuite{
     val check = new TestRepl()
     'load{
       'ivy{
-        'standalone{
+        'standalone - retry(3){ // ivy or maven central are flaky =/
           val tq = "\"\"\""
           check.session(s"""
             @ import scalatags.Text.all._
@@ -62,7 +62,7 @@ object ProjectTests extends TestSuite{
             @ system.shutdown()
           """)
         }
-        'resolvers{
+        'resolvers - retry(2){// ivy flakyness...
           check.session("""
             @ load.ivy("com.ambiata" %% "mundane" % "1.2.1-20141230225616-50fc792")
             error: IvyResolutionException

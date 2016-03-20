@@ -6,7 +6,8 @@ import sbtassembly.AssemblyPlugin.defaultShellScript
 scalaVersion := "2.11.6"
 
 crossScalaVersions := Seq(
-  "2.10.3", "2.10.4", "2.10.5", "2.10.6", "2.11.3", "2.11.4", "2.11.5", "2.11.6", "2.11.7"
+  "2.10.3", "2.10.4", "2.10.5", "2.10.6",
+  "2.11.3", "2.11.4", "2.11.5", "2.11.6", "2.11.7", "2.11.8"
 )
 
 val dontPublishSettings = Seq(
@@ -29,14 +30,21 @@ val macroSettings = Seq(
 )
 
 val sharedSettings = Seq(
-  scalaVersion := "2.11.7",
+  scalaVersion := "2.11.8",
   organization := "com.lihaoyi",
   version := _root_.ammonite.Constants.version,
-  libraryDependencies += "com.lihaoyi" %% "utest" % "0.3.0" % "test",
+  libraryDependencies += "com.lihaoyi" %% "utest" % "0.4.3" % "test",
+  // Needed for acyclic to work...
+  libraryDependencies ++= {
+    if (scalaVersion.value startsWith "2.11.") Nil
+    else Seq(
+      "org.scala-lang" % "scala-compiler" % scalaVersion.value % "provided"
+    )
+  },
   testFrameworks := Seq(new TestFramework("utest.runner.Framework")),
   scalacOptions += "-target:jvm-1.7",
   autoCompilerPlugins := true,
-  addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.3"),
+  addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.4"),
   ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) },
   parallelExecution in Test := !scalaVersion.value.contains("2.10"),
   (unmanagedSources in Compile) += baseDirectory.value/".."/"project"/"Constants.scala",
@@ -44,7 +52,7 @@ val sharedSettings = Seq(
     (baseDirectory.value/".."/"project"/"Constants.scala") -> "Constants.scala"
   },
   libraryDependencies ++= Seq(
-    "com.lihaoyi" %% "acyclic" % "0.1.3" % "provided"
+    "com.lihaoyi" %% "acyclic" % "0.1.4" % "provided"
   ) ,
   publishTo := Some(
     "releases" at "https://oss.sonatype.org/service/local/staging/deploy/maven2"
@@ -94,7 +102,8 @@ lazy val terminal = project
   .settings(
     sharedSettings,
     name := "ammonite-terminal",
-    libraryDependencies += "com.lihaoyi" %% "sourcecode" % "0.1.0"
+    libraryDependencies += "com.lihaoyi" %% "sourcecode" % "0.1.1",
+    macroSettings
   )
 
 /**
@@ -115,10 +124,10 @@ lazy val repl = project
       "jline" % "jline" % "2.12",
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
       "org.apache.ivy" % "ivy" % "2.4.0",
-      "com.lihaoyi" %% "scalaparse" % "0.3.5",
+      "com.lihaoyi" %% "scalaparse" % "0.3.7",
       "com.lihaoyi" %% "upickle" % "0.3.8",
       "com.lihaoyi" %% "pprint" % "0.3.8",
-      "com.github.scopt" %% "scopt" % "3.3.0"
+      "com.github.scopt" %% "scopt" % "3.4.0"
     ),
     libraryDependencies ++= (
       if (scalaVersion.value startsWith "2.10.") Nil
@@ -232,7 +241,7 @@ lazy val readme = ScalatexReadme(
   source = "Index"
 ).settings(
   dontPublishSettings,
-  scalaVersion := "2.11.7",
+  scalaVersion := "2.11.8",
   (run in Compile) <<= (run in Compile).dependsOn(
     assembly in repl,
     packageBin in (shell, Compile),

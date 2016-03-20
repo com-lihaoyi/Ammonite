@@ -4,7 +4,6 @@ import ammonite.ops.Path
 import com.jcraft.jsch.{JSchException, Session}
 import org.scalacheck.Prop.forAll
 import utest._
-import utest.framework.TestSuite
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Promise}

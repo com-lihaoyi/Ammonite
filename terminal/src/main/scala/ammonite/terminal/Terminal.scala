@@ -14,7 +14,7 @@ import scala.collection.mutable
  * Maintains basic invariants, such as "cursor should always be within
  * the buffer", and "ansi terminal should reflect most up to date TermState"
  */
-object TermCore {
+object Terminal {
 
   val ansiRegex = "\u001B\\[[;\\d]*m".r
 
@@ -86,7 +86,7 @@ object TermCore {
     // even if it does there's nowhere else for it to go
     for(i <- 0 until rowLengths.length -1 if !done) {
       // length of frag and the '\n' after it
-      val delta = rowLengths(i) + (if (i == rowLengths.length - 1) 0 else 1)
+      val delta = rowLengths(i) + 1
       //      Debug("delta " + delta)
       val nextCursor = leftoverCursor - delta
       if (nextCursor >= 0) {
@@ -95,20 +95,17 @@ object TermCore {
         totalPreHeight += fragHeights(i)
       }else done = true
     }
+
     val cursorY = totalPreHeight + leftoverCursor / width
     val cursorX = leftoverCursor % width
+
     (cursorY, cursorX)
   }
 
 
-  type Filter = PartialFunction[TermInfo, TermAction]
   type Action = (Vector[Char], Int) => (Vector[Char], Int)
   type MsgAction = (Vector[Char], Int) => (Vector[Char], Int, String)
-  trait DelegateFilter extends Filter{
-    def filter: Filter
-    def isDefinedAt(x: TermInfo) = filter.isDefinedAt(x)
-    def apply(v1: TermInfo) = filter(v1)
-  }
+
 
   def noTransform(x: Vector[Char], i: Int) = (Ansi.Str.parse(x), i)
   /**
@@ -126,7 +123,7 @@ object TermCore {
   def readLine(prompt: Prompt,
                reader: java.io.Reader,
                writer: java.io.Writer,
-               filters: PartialFunction[TermInfo, TermAction] = PartialFunction.empty,
+               filters: Filter,
                displayTransform: (Vector[Char], Int) => (Ansi.Str, Int) = noTransform)
                : Option[String] = {
 
@@ -169,36 +166,38 @@ object TermCore {
       writer.write(promptLine.toString)
       if (newlinePrompt) writer.write("\n")
 
-      // Under `newlinePrompt`, we print the thing verbatim, since we want to
-      // avoid breaking code by adding random indentation. If not, we are
-      // guaranteed that the lines are short, so we can indent the newlines
+      // I'm not sure why this is necessary, but it seems that without it, a
+      // cursor that "barely" overshoots the end of a line, at the end of the
+      // buffer, does not properly wrap and ends up dangling off the
+      // right-edge of the terminal window!
+      //
+      // This causes problems later since the cursor is at the wrong X/Y,
+      // confusing the rest of the math and ending up over-shooting on the
+      // `ansi.up` calls, over-writing earlier lines. This prints a single
+      // space such that instead of dangling it forces the cursor onto the
+      // next line for-realz. If it isn't dangling the extra space is a no-op
+      val lineStuffer = ' '
+      // Under `newlinePrompt`, we print the thing almost-verbatim, since we
+      // want to avoid breaking code by adding random indentation. If not, we
+      // are guaranteed that the lines are short, so we can indent the newlines
       // without fear of wrapping
-      writer.write(
-        if (newlinePrompt) buffer.render.toArray
-        else{
+      val newlineReplacement =
+        if (newlinePrompt) {
+
+          Array(lineStuffer, '\n')
+        } else {
           val indent = " " * prompt.lastLine.length
-          buffer.render.flatMap{
-            case '\n' => Array('\n', indent:_*)
-            case x => Array(x)
-          }.toArray
+          Array('\n', indent:_*)
         }
+
+      writer.write(
+        buffer.render.flatMap{
+          case '\n' => newlineReplacement
+          case x => Array(x)
+        }.toArray
       )
+      writer.write(lineStuffer)
 
-      val nonAnsiBufferLength = rowLengths.length + rowLengths.sum - 1
-
-      if (cursor == nonAnsiBufferLength){
-        // I'm not sure why this is necessary, but it seems that without it, a
-        // cursor that "barely" overshoots the end of a line, at the end of the
-        // buffer, does not properly wrap and ends up dangling off the
-        // right-edge of the terminal window!
-        //
-        // This causes problems later since the cursor is at the wrong X/Y,
-        // confusing the rest of the math and ending up over-shooting on the
-        // `ansi.up` calls, over-writing earlier lines. This prints a single
-        // space such that instead of dangling it forces the cursor onto the
-        // next line for-realz. If it isn't dangling the extra space is a no-op
-        writer.write(" ")
-      }
       val fragHeights = calculateHeight0(rowLengths, actualWidth)
       val (cursorY, cursorX) = positionCursor(
         cursor,
@@ -227,7 +226,7 @@ object TermCore {
       val transformedBuffer = transformedBuffer0 ++ lastState.msg
       lazy val lastOffsetCursor = lastState.cursor + cursorOffset
       lazy val rowLengths = splitBuffer(
-        ansiRegex.replaceAllIn(lastState.buffer ++ lastState.msg.render, "").toVector
+        lastState.buffer ++ lastState.msg.plainText
       )
       val narrowWidth = width - prompt.lastLine.length
       val newlinePrompt = rowLengths.exists(_ >= narrowWidth)
@@ -264,7 +263,10 @@ object TermCore {
 
         (nextUps, newState)
       }
-      filters(TermInfo(lastState, actualWidth)) match {
+      // `.get` because we assume that *some* filter is going to match each
+      // character, even if only to dump the character to the screen. If nobody
+      // matches the character then we can feel free to blow up
+      filters.op(TermInfo(lastState, actualWidth)).get match {
         case Printing(TermState(s, b, c, msg), stdout) =>
           writer.write(stdout)
           val (nextUps, newState) = updateState(s, b, c, msg)
@@ -308,30 +310,6 @@ object TermCore {
     }
   }
 }
-
-case class TermInfo(ts: TermState, width: Int)
-
-sealed trait TermAction
-case class Printing(ts: TermState, stdout: String) extends TermAction
-case class TermState(inputs: LazyList[Int],
-                     buffer: Vector[Char],
-                     cursor: Int,
-                     msg: Ansi.Str = "") extends TermAction
-object TermState{
-  def unapply(ti: TermInfo): Option[(LazyList[Int], Vector[Char], Int, Ansi.Str)] = {
-    TermState.unapply(ti.ts)
-  }
-  def unapply(ti: TermAction): Option[(LazyList[Int], Vector[Char], Int, Ansi.Str)] = ti match{
-    case ts: TermState => TermState.unapply(ts)
-    case _ => None
-  }
-
-}
-case class ClearScreen(ts: TermState) extends TermAction
-case object Exit extends TermAction
-case class Result(s: String) extends TermAction
-
-
 object Prompt {
   implicit def construct(prompt: String): Prompt = {
     val parsedPrompt = Ansi.Str.parse(prompt)

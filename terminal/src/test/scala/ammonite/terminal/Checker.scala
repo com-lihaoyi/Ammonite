@@ -1,4 +1,6 @@
 package ammonite.terminal
+
+import ammonite.terminal.filters.{GUILikeFilters, BasicFilters, ReadlineFilters}
 import utest._
 object Checker{
   def normalize(s: String) = {
@@ -20,7 +22,7 @@ object Checker{
 
 /**
  * A shell emulator that you can use to test out sequences of various
- * [[TermCore.Action]]s against an in-memory (Vector[Char], Int) and
+ * [[Terminal.Action]]s against an in-memory (Vector[Char], Int) and
  * verify that they do the right thing.
  */
 class Checker(width: Int, grid: String){
@@ -33,7 +35,7 @@ class Checker(width: Int, grid: String){
     "Cannot find `_` in grid passed to Checker, it needs to " +
     "exist to tell the checker where the cursor starts off at"
   )
-  def runMsg(actions: TermCore.MsgAction*) = {
+  def runMsg(actions: Terminal.MsgAction*) = {
     val (endGrid, endCursor, endMsg) = actions.foldLeft((currentGrid, currentCursor, "")) {
       case ((g, c, m0), f) =>
         val (g1, c1, msg) = f(g, c)
@@ -44,7 +46,7 @@ class Checker(width: Int, grid: String){
     currentMsg = endMsg
     this
   }
-  def run(actions: TermCore.Action*) = {
+  def run(actions: Terminal.Action*) = {
     runMsg(actions.map{ f => (b: Vector[Char], c: Int) =>
       val (b1, c1) = f(b, c)
       (b1, c1, "")
@@ -67,15 +69,15 @@ class Checker(width: Int, grid: String){
     assert(currentMsg == expectedMsg)
     this
   }
-  def apply(end0: String, actions: TermCore.Action*) = {
+  def apply(end0: String, actions: Terminal.Action*) = {
     run(actions:_*)
     check(end0)
   }
   val edit = new ReadlineFilters.CutPasteFilter()
-  val down: TermCore.Action = BasicFilters.moveDown(_, _, width)
-  val up: TermCore.Action = BasicFilters.moveUp(_, _, width)
-  val home: TermCore.Action = BasicFilters.moveStart(_, _, width)
-  val end: TermCore.Action = BasicFilters.moveEnd(_, _, width)
-  val wordLeft: TermCore.Action = GUILikeFilters.wordLeft
-  val wordRight: TermCore.Action = GUILikeFilters.wordRight
+  val down: Terminal.Action = BasicFilters.moveDown(_, _, width)
+  val up: Terminal.Action = BasicFilters.moveUp(_, _, width)
+  val home: Terminal.Action = BasicFilters.moveStart(_, _, width)
+  val end: Terminal.Action = BasicFilters.moveEnd(_, _, width)
+  val wordLeft: Terminal.Action = GUILikeFilters.wordLeft
+  val wordRight: Terminal.Action = GUILikeFilters.wordRight
 }

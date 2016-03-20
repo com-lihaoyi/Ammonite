@@ -1,23 +1,24 @@
-package ammonite.terminal
+package ammonite.terminal.filters
 import acyclic.file
+import ammonite.terminal.FilterTools._
 import ammonite.terminal.LazyList._
-import FilterTools._
-import SpecialKeys._
-import ammonite.terminal.TermCore.Filter
+import ammonite.terminal.SpecialKeys._
+import ammonite.terminal.Filter
+import ammonite.terminal._
 
 /**
  * Filters for simple operation of a terminal: cursor-navigation
  * (including with all the modifier keys), enter/ctrl-c-exit, etc.
  */
 object BasicFilters {
-  def all = {
-    navFilter orElse
-    exitFilter orElse
-    enterFilter orElse
-    clearFilter orElse
-    loggingFilter orElse
+  def all = Filter.merge(
+    navFilter,
+    exitFilter,
+    enterFilter,
+    clearFilter,
+    loggingFilter,
     typingFilter
-  }
+  )
 
   def injectNewLine(b: Vector[Char], c: Int, rest: LazyList[Int]) = {
     val (first, last) = b.splitAt(c)
@@ -25,7 +26,7 @@ object BasicFilters {
   }
 
 
-  def navFilter = orElseAll(
+  def navFilter = Filter.merge(
     Case(Up)((b, c, m) => moveUp(b, c, m.width)),
     Case(Down)((b, c, m) => moveDown(b, c, m.width)),
     Case(Right)((b, c, m) => (b, c + 1)),
@@ -40,12 +41,12 @@ object BasicFilters {
     TS(rest, lhs ++ Vector.fill(spacesToInject)(' ') ++ rhs, c + spacesToInject)
   }
 
-  def tabFilter(indent: Int): Filter = {
+  def tabFilter(indent: Int): Filter = Filter{
     case TS(9 ~: rest, b, c, _) => tabColumn(indent, b, c, rest)
   }
 
-  def loggingFilter: TermCore.Filter = {
-    case TS(Ctrl('t') ~: rest, b, c, _) =>
+  def loggingFilter: Filter = Filter{
+    case TS(Ctrl('q') ~: rest, b, c, _) =>
       println("Char Display Mode Enabled! Ctrl-C to exit")
       var curr = rest
       while (curr.head != 3) {
@@ -54,7 +55,7 @@ object BasicFilters {
       }
       TS(curr, b, c)
   }
-  def typingFilter: TermCore.Filter = {
+  def typingFilter: Filter = Filter{
     case TS(p"\u001b[3~$rest", b, c, _) =>
 //      Debug("fn-delete")
       val (first, last) = b.splitAt(c)
@@ -76,14 +77,14 @@ object BasicFilters {
     else injectNewLine(b, c, rest)
   }
 
-  def enterFilter: TermCore.Filter = {
+  def enterFilter: Filter = Filter{
     case TS(13 ~: rest, b, c, _) => doEnter(b, c, rest) // Enter
     case TS(10 ~: rest, b, c, _) => doEnter(b, c, rest) // Enter
     case TS(10 ~: 13 ~: rest, b, c, _) => doEnter(b, c, rest) // Enter
     case TS(13 ~: 10 ~: rest, b, c, _) => doEnter(b, c, rest) // Enter
   }
 
-  def exitFilter: TermCore.Filter = {
+  def exitFilter: Filter = Filter{
     case TS(Ctrl('c') ~: rest, b, c, _) =>
       Result("")
     case TS(Ctrl('d') ~: rest, b, c, _) =>
@@ -95,7 +96,7 @@ object BasicFilters {
       }
     case TS(-1 ~: rest, b, c, _) => Exit   // java.io.Reader.read() produces -1 on EOF
   }
-  def clearFilter: TermCore.Filter = {
+  def clearFilter: Filter = Filter{
     case TS(Ctrl('l') ~: rest, b, c, _) => ClearScreen(TS(rest, b, c))
   }
 
@@ -152,7 +153,6 @@ object BasicFilters {
     b -> moveUpDown(b, c, w, 0, -1, c - w, _ > _, false)
   }
   def moveDown(b: Vector[Char], c: Int, w: Int) = {
-    Debug("moveDown\t" + b.length + "\t" + c + "\t" + w)
     b -> moveUpDown(b, c, w, 1, 1, c + w, _ <= _, true)
   }
 }

@@ -1,15 +1,19 @@
-package ammonite.terminal
+package ammonite.terminal.filters
 
 import ammonite.terminal.FilterTools._
 import ammonite.terminal.LazyList._
-
+import ammonite.terminal._
+import acyclic.file
 
 /**
-  * Provides history navigation up and down, saving the current line.
+  * Provides history navigation up and down, saving the current line, a well
+  * as history-search functionality (`Ctrl R` in bash) letting you quickly find
+  * & filter previous commands by entering a sub-string.
   */
 class HistoryFilter(history: () => IndexedSeq[String],
                     commentStartColor: String,
-                    commentEndColor: String) extends TermCore.DelegateFilter{
+                    commentEndColor: String) extends DelegateFilter{
+
   /**
     * `-1` means we haven't started looking at history, `n >= 0` means we're
     * currently at history command `n`
@@ -134,29 +138,30 @@ class HistoryFilter(history: () => IndexedSeq[String],
     searchTerm = None
   }
 
-  def filter = prelude orElse filter0.andThen{
-    // Reset the `prevBuffer` every time `filter0` runs successfully. This means
-    // that every time we check `prevBuffer` to see if it has changed, we do not
-    // see any changes caused by our own code in this HistoryFilter
-    case ts: TermState =>
-      prevBuffer = Some(ts.buffer)
-      ts
-    case x => x
+  def filter = Filter.wrap{
+    (ti: TermInfo) => {
+      prelude.op(ti) match {
+        case None =>
+          prevBuffer = Some(ti.ts.buffer)
+          filter0.op(ti) match{
+            case Some(ts: TermState) =>
+              prevBuffer = Some(ts.buffer)
+              Some(ts)
+            case x => x
+          }
+        case some => some
+      }
+    }
   }
 
-  def prelude: TermCore.Filter = {
+  def prelude: Filter = Filter{
     case TS(inputs, b, c, _) if activeHistory && prevBuffer.exists(_ != b) =>
       endHistory()
       prevBuffer = None
       TS(inputs, b, c)
-
-    // weird hacks to make it run code every time without having to be the one
-    // handling the input; ideally we'd change TermCore.Filter to be something
-    // other than a PartialFunction, but for now this will do.
-    case ti if {prevBuffer = Some(ti.ts.buffer); false} => ???
   }
 
-  def filter0: TermCore.Filter = {
+  def filter0: Filter = Filter{
     // Ways to kick off the history/search if you're not already in it
 
     // `Ctrl-R`
@@ -166,7 +171,8 @@ class HistoryFilter(history: () => IndexedSeq[String],
     case TermInfo(TS(p"\u001b[A$rest", b, c, _), w) if firstRow(c, b, w) && !activeHistory =>
       wrap(rest, startHistory(b, c))
 
-    case TermInfo(TS(p"\u0010$rest", b, c, _), w) if firstRow(c, b, w) && !activeHistory =>
+    // `Page-Up` from first character starts history
+    case TermInfo(TS(p"\u001b[5~$rest", b, c, _), w) if c == 0 && !activeHistory =>
       wrap(rest, startHistory(b, c))
 
     // Things you can do when you're already in the history search
@@ -176,12 +182,17 @@ class HistoryFilter(history: () => IndexedSeq[String],
     // Up
     case TermInfo(TS(p"\u001b[A$rest", b, c, _), w) if searchOrHistoryAnd(firstRow(c, b, w)) =>
       wrap(rest, up(b, c))
-    case TermInfo(TS(p"\u0010$rest", b, c, _), w) if searchOrHistoryAnd(firstRow(c, b, w)) =>
+
+    // `Page-Up` from first character cycles history up
+    case TermInfo(TS(p"\u001b[5~$rest", b, c, _), w) if searchOrHistoryAnd(c == 0) =>
       wrap(rest, up(b, c))
+
     // Down
     case TermInfo(TS(p"\u001b[B$rest", b, c, _), w) if searchOrHistoryAnd(lastRow(c, b, w))  =>
       wrap(rest, down(b, c))
-    case TermInfo(TS(p"\u000e$rest", b, c, _), w) if searchOrHistoryAnd(lastRow(c, b, w))  =>
+
+    // `Page-Down` from last character cycles history down
+    case TermInfo(TS(p"\u001b[6~$rest", b, c, _), w) if searchOrHistoryAnd(c == b.length - 1) =>
       wrap(rest, down(b, c))
 
 
@@ -230,7 +241,7 @@ object HistoryFilter{
   def mangleBuffer(historyFilter: HistoryFilter,
                    buffer: Ansi.Str,
                    cursor: Int,
-                   startColor: Ansi.Color) = {
+                   startColor: Ansi.Attr) = {
     if (!historyFilter.activeSearch) buffer
     else {
       val (searchStart, searchEnd) =

@@ -8,15 +8,6 @@ import utest._
 object ExampleTests extends TestSuite{
 
   val tests = TestSuite {
-    implicit class ArrowAssert(result: Any){
-      def ==>(expected: Any) = {
-        (result, expected) match{
-          case (result: Array[_], expected: Array[_]) =>
-            assert(result.toSeq == expected.toSeq)
-          case (result, expected) => assert(result == expected)
-        }
-      }
-    }
     'reference{
       import ammonite.ops._
 

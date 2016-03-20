@@ -56,6 +56,7 @@ class Interpreter(prompt0: Ref[String],
       |""".stripMargin
 
   val SheBang = "#!"
+
   var lastException: Throwable = null
 
   def processLine(code: String,

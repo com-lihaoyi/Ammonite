@@ -42,6 +42,26 @@
       Although it's best to read the documentation on this page to learn how to use these projects, the Scaladoc is still useful as a reference.
   
   @sect{Changelog}
+
+    @sect{0.5.6}
+      @ul
+        @li
+          Fixed #341: stack overflow when @code{ls}ing large directories
+        @li
+          Fixed regression preventing you from running scripts via @code{./amm} using relative paths #353
+        @li
+          Ammonite should be more robust when interacting with other compiler plugins
+        @li
+          Fixed #352: imports now don't get improperly collapsed, and defining a value called @code{repl} no longer borks your session.
+        @li
+          Improved readline-emulation of @code{AmmoniteFrontEnd}: @code{Ctrl-T} and @code{Alt-T} now properly transpose characters and words, and the kill-ring now properly aggregates multiple consecutive kills.
+        @li
+          Added asserts to @code{rm} @code{cp} and @code{mv} to prevent you from removing the root folder, or copying/moving folders into themselves.
+        @li
+          @sect.ref("Undo & Redo", "Command-line-undo") via @code{Ctrl -} and redo via @code{Esc/Alt -} are now supported.
+        @li
+          Page-up and Page-down (fn-up and fn-down on Macs) scrolls through history when used at the start/end of input, allowing you to use page-up/page-down to quickly scroll through history with lots of multi-line blocks.
+
     @sect{0.5.5}
       @ul
         @li
@@ -60,7 +80,8 @@
           Wrapping content is automatically shifted onto a new line, to avoid problems when copying and pasting #205
         @li
           Thrown exceptions are now made available to you in the REPL under the @code{lastException} variable #289, in case you need more metadata from it or you want the stack-trace of a non-printed-by-default exception (e.g. @code{ThreadDeath} due to @code{Ctrl-C}). Thanks to @lnk("coderabhishek", "https://github.com/coderabhishek")!
-
+        @li
+          Fixed #280: Ammonite REPL confused by singleton types
     @sect{0.5.4}
       @ul
         @li
@@ -138,7 +159,7 @@
         @li
           Pressing @code{[Enter]} now only submits the input if your cursor is at the bottom
         @li
-          Added a powerful @sect.ref{Undo} API, letting you save your work at any point in time and return to it later.
+          Added a powerful @sect.ref{Save/Load Session} API, letting you save your work at any point in time and return to it later.
         @li
           Compiled-code-caches are now properly invalidated when you change project-code while using Ammonite as a REPL for an existing SBT project.
         @li
@@ -265,7 +286,7 @@
         @li
           @sect.ref{Configuration} that was previously passed into the @hl.scala{REPL}s constructor is now done in-REPL,
         @li
-          @sect.ref("Improved Editing", "Multi-line editing and other features") via a custom terminal interface that should behave just like readline, but with added conveniences.
+          @sect.ref("Editing", "Multi-line editing and other features") via a custom terminal interface that should behave just like readline, but with added conveniences.
         @li
           Removed the ability to reload classes; using @hl.scala{load.ivy} no longer causes all existing values to be lazily recomputed.
         @li

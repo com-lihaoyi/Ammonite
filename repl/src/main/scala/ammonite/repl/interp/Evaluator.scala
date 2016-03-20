@@ -177,10 +177,16 @@ object Evaluator{
         if (grouped.isEmpty) grouped.append(mutable.Buffer(data))
         else {
           val last = grouped.last.last
-          // Group type imports differently from term imports, in case we
-          // import the same thing but rename it differently
-          if (last.prefix == data.prefix) grouped.last.append(data)
-          else grouped.append(mutable.Buffer(data))
+
+          // Start a new import if we're importing from somewhere else, or
+          // we're importing the same thing from the same place but aliasing
+          // it to a different name, since you can't import the same thing
+          // twice in a single import statement
+          val startNewImport =
+            last.prefix != data.prefix || grouped.last.exists(_.fromName == data.fromName)
+
+          if (startNewImport) grouped.append(mutable.Buffer(data))
+          else grouped.last.append(data)
         }
       }
 //      pprint.log(grouped)
