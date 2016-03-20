@@ -59,8 +59,9 @@ object StandaloneTests extends TestSuite{
         replStandaloneResources/name,
         "-t"
         )
-      println("Time analysis of loading qs.scala(test script)\n\n"
-              +res.out.toString+"\n-------------------------")
+      println("Time analysis of loading qs.scala(test script)\n\n")
+      res.out.lines.foreach { println }
+      println("\n-------------------------")
     }
 
     'shell{
