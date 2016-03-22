@@ -203,6 +203,7 @@ object Util{
 
 object Timer{
   var current = 0L
+  var show = false
   def reset() = current = System.nanoTime()
   /**
    * Prints the time, in millis, that has passed
@@ -210,7 +211,7 @@ object Timer{
    */
   def apply(s: String) = {
     val now = System.nanoTime()
-//    println(s + ": " + (now - current) / 1000000.0)
+      if(show) println(s + ": " + (now - current) / 1000000.0)
     current = now
   }
 }
