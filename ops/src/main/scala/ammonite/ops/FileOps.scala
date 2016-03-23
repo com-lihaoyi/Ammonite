@@ -294,13 +294,11 @@ object write extends Function2[Path, Internals.Writable, Unit]{
  * as (read.lines(...): Seq[String]), or as (read.bytes(...): Array[Byte]).
  */
 object read extends Function1[InputPath, String]{
-  def readIn(p: InputPath) = p.getInputStream()
+  def getInputStream(p: InputPath) = p.getInputStream()
 
 //  def apply(arg: InputPath) = new String(arg.getBytes, Charset.forName("UTF-8"))
   def apply(arg: InputPath) = apply(arg, "utf-8")
-  def apply(arg: InputPath, charSet: String) = {
-  new String(arg.getBytes, charSet)
-}
+  def apply(arg: InputPath, charSet: String) = new String(arg.getBytes, charSet)
 
   object lines extends StreamableOp1[InputPath, String, Vector[String]]{
     def materialize(src: InputPath, i: Iterator[String]) = i.toVector
@@ -316,7 +314,6 @@ object read extends Function1[InputPath, String]{
   object bytes extends Function1[InputPath, Array[Byte]]{
     def apply(arg: InputPath) = arg.getBytes
   }
-
 }
 
 /**

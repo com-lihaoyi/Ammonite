@@ -144,6 +144,20 @@ object ProjectTests extends TestSuite{
         res4: Int = 2
       """)
     }
+    'resources{
+      check.session("""
+        @ import ammonite.ops._
+
+        @ val path = resource/'org/'apache/'jackrabbit/'oak/'plugins/'blob/"blobstore.properties"
+
+        @ read! path
+        error: ResourceNotFoundException
+
+        @ load.ivy("org.apache.jackrabbit" % "oak-core" % "1.3.16")
+
+        @ read! path // Should work now
+      """)
+    }
     'scalaparse{
       // For some reason this blows up in 2.11.x
       // Prevent regressions when wildcard-importing things called `macro` or `_`

@@ -1,5 +1,6 @@
 package ammonite.ops
 
+import java.io.InputStream
 import java.nio.charset.Charset
 
 import acyclic.file
@@ -31,20 +32,38 @@ object BasePath extends PathFactory[BasePath]{
 }
 
 /**
-  * A path that can be read from, either a [[Path]] or a [[ResourcePath]]
+  * A path that can be read from, either a [[Path]] or a [[ResourcePath]].
+  * Encapsulates the logic of how to read from it in various ways.
   */
-sealed trait InputPath{
+trait InputPath{
   protected[ops] def getInputStream(): java.io.InputStream
-  protected[ops] def getBytes(): Array[Byte]
+  protected[ops] def getBytes(): Array[Byte] = {
+    val is = getInputStream
+    val out = new java.io.ByteArrayOutputStream()
+    val buffer = new Array[Byte](1024 * 1024)
+    var r = 0
+    while (r != -1) {
+      r = is.read(buffer)
+      if (r != -1) out.write(buffer, 0, r)
+    }
+    is.close()
+    out.toByteArray
+  }
   protected[ops] def getLineIterator(charSet: String): Iterator[String] = {
     val is = getInputStream
     val s = io.Source.fromInputStream(is, charSet)
     new SelfClosingIterator(s.getLines, () => s.close())
   }
-  protected[ops] def getLines(charSet: String): Vector[String]
-
+  protected[ops] def getLines(charSet: String): Vector[String] = {
+    getLineIterator(charSet).toVector
+  }
 }
 
+object InputPath{
+  implicit class InputStreamToInputPath(is: InputStream) extends InputPath{
+    def getInputStream() = is
+  }
+}
 /**
  * A path which is either an absolute [[Path]] or a relative [[RelPath]],
  * with shared APIs and implementations.
@@ -168,8 +187,8 @@ case class RelPath private[ops] (segments: Vector[String], ups: Int) extends Bas
     case p: RelPath => segments == p.segments && p.ups == ups
     case _ => false
   }
-
 }
+
 object RelPath extends RelPathStuff with PathFactory[RelPath]{
   def apply(f: java.nio.file.Path): RelPath = {
 
@@ -278,24 +297,60 @@ extends BasePathImpl with InputPath{
 
   def toIO = toNIO.toFile
 
-  def getBytes = java.nio.file.Files.readAllBytes(toNIO)
+  override def getBytes = java.nio.file.Files.readAllBytes(toNIO)
   import collection.JavaConversions._
 
-  def getLines(charSet: String) = {
+  override def getLines(charSet: String) = {
     java.nio.file.Files.readAllLines(toNIO, Charset.forName(charSet)).toVector
+  }
+}
+
+/**
+  * Represents a possible root where classpath resources can be loaded from;
+  * either a [[ResourceRoot.ClassLoader]] or a [[ResourceRoot.Class]]. Resources
+  * loaded from classloaders are always loaded via their absolute path, while
+  * resources loaded via classes are always loaded relatively.
+  */
+sealed trait ResourceRoot{
+  def getResourceAsStream(s: String): InputStream
+  def errorName: String
+}
+object ResourceRoot{
+  private[this] def renderClassloader(cl: java.lang.ClassLoader) = {
+    cl.getClass.getName + "@" + java.lang.Integer.toHexString(cl.hashCode())
+  }
+  implicit def classResourceRoot(cls: java.lang.Class[_]): ResourceRoot = Class(cls)
+  case class Class(cls: java.lang.Class[_]) extends ResourceRoot{
+    def getResourceAsStream(s: String) = cls.getResourceAsStream(s)
+    def errorName = renderClassloader(cls.getClassLoader) + ":" + cls.getName
+  }
+  implicit def classLoaderResourceRoot(cl: java.lang.ClassLoader): ResourceRoot = ClassLoader(cl)
+  case class ClassLoader(cl: java.lang.ClassLoader) extends ResourceRoot{
+    def getResourceAsStream(s: String) = cl.getResourceAsStream(s)
+    def errorName = renderClassloader(cl)
   }
 
 }
 object ResourcePath{
-  val resource = ResourcePath(Vector.empty)
+  def resource(resRoot: ResourceRoot) = {
+    ResourcePath(resRoot, Vector.empty)
+  }
 }
-case class ResourcePath private[ops] (segments: Vector[String])
+
+/**
+  * Classloaders are tricky: http://stackoverflow.com/questions/12292926
+  *
+  * @param resRoot
+  * @param segments
+  */
+case class ResourcePath private[ops](resRoot: ResourceRoot, segments: Vector[String])
   extends BasePathImpl with InputPath{
   type ThisType = ResourcePath
-  override def toString = "/"+segments.mkString("/")
+  override def toString = resRoot.errorName + "/" + segments.mkString("/")
+
   protected[ops] def getInputStream = {
-    getClass.getResourceAsStream(this.toString) match{
-      case null => throw new java.nio.file.NoSuchFileException(this.toString)
+    resRoot.getResourceAsStream(segments.mkString("/")) match{
+      case null => throw new ResourceNotFoundException(this)
       case stream => stream
     }
   }
@@ -303,7 +358,7 @@ case class ResourcePath private[ops] (segments: Vector[String])
     if (ups > 0){
       throw PathError.AbsolutePathOutsideRoot
     }
-    new ResourcePath(p.toVector)
+    new ResourcePath(resRoot, p.toVector)
   }
 
   def relativeTo(base: ResourcePath) = {
@@ -322,23 +377,14 @@ case class ResourcePath private[ops] (segments: Vector[String])
     segments.startsWith(target.segments)
   }
 
-  def getBytes = {
-    val is = getInputStream
-    val out = new java.io.ByteArrayOutputStream()
-    val buffer = new Array[Byte](1024 * 1024)
-    var r = 0
-    while (r != -1) {
-      r = is.read(buffer)
-      if (r != -1) out.write(buffer, 0, r)
-    }
-    is.close()
-    out.toByteArray
-  }
-
-
-  def getLines(charSet: String) = getLineIterator(charSet).toVector
 }
 
+
+/**
+  * Thrown when you try to read from a resource that doesn't exist.
+  * @param path
+  */
+case class ResourceNotFoundException(path: ResourcePath) extends Exception(path.toString)
 
 /**
   * An iterator that can be closed, and closes itself after you exhaust it

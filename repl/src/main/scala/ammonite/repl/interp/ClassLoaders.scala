@@ -115,6 +115,7 @@ object SpecialClassLoader{
   */
 class SpecialClassLoader(parent: ClassLoader, parentHash: Array[Byte])
   extends URLClassLoader(Array(), parent){
+
   /**
     * Files which have been compiled, stored so that our special
     * classloader can get at them.
@@ -135,7 +136,10 @@ class SpecialClassLoader(parent: ClassLoader, parentHash: Array[Byte])
       else{
         import ammonite.ops._
         //          println("Custom finding class! " + name)
-        val bytes = read.bytes(resource/RelPath(name.replace('.', '/') + ".class"))
+        val bytes = read.bytes(
+          this.getResourceAsStream(name.replace('.', '/') + ".class")
+        )
+
         Some(defineClass(name, bytes, 0, bytes.length))
       }
 
