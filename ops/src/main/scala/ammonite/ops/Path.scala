@@ -1,5 +1,7 @@
 package ammonite.ops
 
+import java.nio.charset.Charset
+
 import acyclic.file
 
 /**
@@ -32,7 +34,15 @@ object BasePath extends PathFactory[BasePath]{
   * A path that can be read from, either a [[Path]] or a [[ResourcePath]]
   */
 sealed trait InputPath{
-  protected[ops] def newInputStream(): java.io.InputStream
+  protected[ops] def getInputStream(): java.io.InputStream
+  protected[ops] def getBytes(): Array[Byte]
+  protected[ops] def getLineIterator(charSet: String): Iterator[String] = {
+    val is = getInputStream
+    val s = io.Source.fromInputStream(is, charSet)
+    new SelfClosingIterator(s.getLines, () => s.close())
+  }
+  protected[ops] def getLines(charSet: String): Vector[String]
+
 }
 
 /**
@@ -234,7 +244,7 @@ object Path extends PathFactory[Path]{
  */
 case class Path private[ops] (root: java.nio.file.Path, segments: Vector[String])
 extends BasePathImpl with InputPath{
-  protected[ops] def newInputStream = java.nio.file.Files.newInputStream(toNIO)
+  protected[ops] def getInputStream = java.nio.file.Files.newInputStream(toNIO)
   type ThisType = Path
 
   def toNIO = root.resolve(segments.mkString(root.getFileSystem.getSeparator))
@@ -267,6 +277,14 @@ extends BasePathImpl with InputPath{
   }
 
   def toIO = toNIO.toFile
+
+  def getBytes = java.nio.file.Files.readAllBytes(toNIO)
+  import collection.JavaConversions._
+
+  def getLines(charSet: String) = {
+    java.nio.file.Files.readAllLines(toNIO, Charset.forName(charSet)).toVector
+  }
+
 }
 object ResourcePath{
   val resource = ResourcePath(Vector.empty)
@@ -275,7 +293,7 @@ case class ResourcePath private[ops] (segments: Vector[String])
   extends BasePathImpl with InputPath{
   type ThisType = ResourcePath
   override def toString = "/"+segments.mkString("/")
-  protected[ops] def newInputStream = {
+  protected[ops] def getInputStream = {
     getClass.getResourceAsStream(this.toString) match{
       case null => throw new java.nio.file.NoSuchFileException(this.toString)
       case stream => stream
@@ -304,5 +322,49 @@ case class ResourcePath private[ops] (segments: Vector[String])
     segments.startsWith(target.segments)
   }
 
+  def getBytes = {
+    val is = getInputStream
+    val out = new java.io.ByteArrayOutputStream()
+    val buffer = new Array[Byte](1024 * 1024)
+    var r = 0
+    while (r != -1) {
+      r = is.read(buffer)
+      if (r != -1) out.write(buffer, 0, r)
+    }
+    is.close()
+    out.toByteArray
+  }
 
+
+  def getLines(charSet: String) = getLineIterator(charSet).toVector
+}
+
+
+/**
+  * An iterator that can be closed, and closes itself after you exhaust it
+  * through iteration. Not quite totally safe, since you can leak filehandles
+  * by leaving half-consumed iterators, but at least common things like foreach,
+  * mkString, reduce, sum, etc. will all result in close() being called.
+  */
+class SelfClosingIterator[+A](val underlying: Iterator[A], val close: () => Unit)
+  extends Iterator[A]{
+  private[this] var alreadyClosed = false
+  def hasNext = {
+    if (alreadyClosed) false
+    else if (!underlying.hasNext){
+      close()
+      alreadyClosed = true
+      false
+    }else{
+      true
+    }
+  }
+  def next() = {
+    val n = underlying.next()
+    if (!underlying.hasNext) {
+      alreadyClosed = true
+      close()
+    }
+    n
+  }
 }

@@ -42,7 +42,13 @@
       Although it's best to read the documentation on this page to learn how to use these projects, the Scaladoc is still useful as a reference.
   
   @sect{Changelog}
-
+    @sect{0.5.7}
+      @ul
+        @li
+          Improved performance of various @hl.scala{read!} commands to be competitive with @hl.scala{java.nio} (#362)
+        @li
+          @hl.scala{read!} and @hl.scala{read.lines!} now take an optional charset, passed via @hl.scala{read(file, charSet: String)} or @hl.scala{read.lines(file, charSet: String)} which defaults to @hl.scala{"utf-8"}
+          
     @sect{0.5.6}
       @ul
         @li
