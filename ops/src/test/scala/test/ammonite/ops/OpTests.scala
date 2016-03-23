@@ -54,8 +54,10 @@ object OpTests extends TestSuite{
         }
 
         'relative {
-          val contents = read! resource(classOf[test.ammonite.ops.Testing])/'folder/"file.txt"
+          val cls = classOf[test.ammonite.ops.Testing]
+          val contents = read! resource(cls)/'folder/"file.txt"
           assert(contents.contains("file contents lols"))
+
           val contents2 = read! resource(getClass)/'folder/"file.txt"
           assert(contents2.contains("file contents lols"))
         }

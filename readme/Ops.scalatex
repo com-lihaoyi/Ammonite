@@ -283,12 +283,12 @@
     @p
       In addition to manipulating paths on the filesystem, you can also manipulate @code{resource} paths in order to read resources off of the Java classpath. By default, the path used to load resources is absolute, using the @hl.scala{Thread.currentThread().getContextClassLoader}. You can also pass in a classloader explicitly to the @hl.scala{resource} call:
 
-    @hl.ref(opsTests/"OpTests.scala", Seq("readResource", "absolute"))
+    @hl.ref(opsTests/"OpTests.scala", Seq("readResource", "absolute", ""))
 
     @p
       If you want to load resources relative to a particular class, pass in a class for the resource to be relative, or @hl.scala{getClass} to get something relative to the current class.
 
-    @hl.ref(opsTests/"OpTests.scala", Seq("readResource", "relative"))
+    @hl.ref(opsTests/"OpTests.scala", Seq("readResource", "relative", ""))
 
     @p
       In both cases, reading resources is performed as if you did not pass a leading slash into the @hl.scala{getResource("foo/bar")} call. In the case of @hl.scala{ClassLoader#getResource}, passing in a leading slash is never valid, and in the case of @hl.scala{Class#getResource}, passing in a leading slash is equivalent to calling @hl.scala{getResource} on the @hl.scala{ClassLoader}.
