@@ -18,7 +18,8 @@ object Main{
                     ammoniteHome: Path = defaultAmmoniteHome,
                     file: Option[Path] = None,
                     args: Seq[String] = Vector.empty,
-                    kwargs: Map[String, String] = Map.empty)
+                    kwargs: Map[String, String] = Map.empty,
+                    time: Boolean = false)
 
   def defaultAmmoniteHome = Path(System.getProperty("user.home"))/".ammonite"
 
@@ -38,6 +39,9 @@ object Main{
       opt[String]('c', "code")
         .action((x, c) => c.copy(code = Some(x)))
         .text("Pass in code to be run immediately in the REPL")
+      opt[Unit]('t', "time")
+        .action((_, c) => c.copy(time = true))
+        .text("Print time taken for each step")
       opt[File]('h', "home")
         .valueName("<file>")
         .action((x, c) => c.copy(ammoniteHome = Path(x, cwd)))
@@ -79,6 +83,7 @@ object Main{
     }
 
     for(c <- parser.parse(before, Config())){
+      Timer.show = c.time
       run(
         c.predef,
         c.ammoniteHome,

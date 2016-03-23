@@ -49,6 +49,20 @@ object StandaloneTests extends TestSuite{
       assert(evaled.out.trim.contains("Spire Interval [0, 10]"))
     }
 
+    'load_script{
+      val name = "qs.scala"
+      val res = %%bash(
+        executable,
+        "--predef-file",
+        emptyPrefdef,
+        replStandaloneResources/name,
+        "-t"
+        )
+      println("Time analysis of loading qs.scala(test script)\n\n")
+      res.out.lines.foreach { println }
+      println("\n-------------------------")
+    }
+
     'shell{
       // make sure you can load the example-predef.scala, have it pull stuff in
       // from ivy, and make use of `cd!` and `wd` inside the executed script.
