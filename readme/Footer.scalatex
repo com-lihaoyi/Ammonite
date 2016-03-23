@@ -48,7 +48,7 @@
           Improved performance of various @hl.scala{read!} commands to be competitive with @hl.scala{java.nio} (#362)
         @li
           @hl.scala{read!} and @hl.scala{read.lines!} now take an optional charset, passed via @hl.scala{read(file, charSet: String)} or @hl.scala{read.lines(file, charSet: String)} which defaults to @hl.scala{"utf-8"}
-          
+
     @sect{0.5.6}
       @ul
         @li
