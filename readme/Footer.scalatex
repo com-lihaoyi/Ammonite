@@ -54,6 +54,8 @@
           Re-organize @sect.ref{Reading Resources} in Ammonite-Ops to allow proper handling of absolute and relative resources by passing in @hl.scala{Class}s or @hl.scala{ClassLoader}s
         @li
           Make @hl.scala{read!} work on @hl.scala{InputStream}s
+        @li
+          Renamed @hl.scala{InputPath} to @hl.scala{Readable}, a more appropiate name now that it works on two different non-path entities (resources and @hl.scala{InputStream}s)
 
     @sect{0.5.6}
       @ul

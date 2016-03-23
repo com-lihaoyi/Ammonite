@@ -35,7 +35,7 @@ object BasePath extends PathFactory[BasePath]{
   * A path that can be read from, either a [[Path]] or a [[ResourcePath]].
   * Encapsulates the logic of how to read from it in various ways.
   */
-trait InputPath{
+trait Readable{
   protected[ops] def getInputStream(): java.io.InputStream
   protected[ops] def getBytes(): Array[Byte] = {
     val is = getInputStream
@@ -59,8 +59,8 @@ trait InputPath{
   }
 }
 
-object InputPath{
-  implicit class InputStreamToInputPath(is: InputStream) extends InputPath{
+object Readable{
+  implicit class InputStreamToReadable(is: InputStream) extends Readable{
     def getInputStream() = is
   }
 }
@@ -262,7 +262,7 @@ object Path extends PathFactory[Path]{
  * normalized and cannot contain any empty `""`, `"."` or `".."` segments
  */
 case class Path private[ops] (root: java.nio.file.Path, segments: Vector[String])
-extends BasePathImpl with InputPath{
+extends BasePathImpl with Readable{
   protected[ops] def getInputStream = java.nio.file.Files.newInputStream(toNIO)
   type ThisType = Path
 
@@ -344,7 +344,7 @@ object ResourcePath{
   * @param segments
   */
 case class ResourcePath private[ops](resRoot: ResourceRoot, segments: Vector[String])
-  extends BasePathImpl with InputPath{
+  extends BasePathImpl with Readable{
   type ThisType = ResourcePath
   override def toString = resRoot.errorName + "/" + segments.mkString("/")
 

@@ -293,26 +293,26 @@ object write extends Function2[Path, Internals.Writable, Unit]{
  * Reads a file into memory, either as a String,
  * as (read.lines(...): Seq[String]), or as (read.bytes(...): Array[Byte]).
  */
-object read extends Function1[InputPath, String]{
-  def getInputStream(p: InputPath) = p.getInputStream()
+object read extends Function1[Readable, String]{
+  def getInputStream(p: Readable) = p.getInputStream()
 
 //  def apply(arg: InputPath) = new String(arg.getBytes, Charset.forName("UTF-8"))
-  def apply(arg: InputPath) = apply(arg, "utf-8")
-  def apply(arg: InputPath, charSet: String) = new String(arg.getBytes, charSet)
+  def apply(arg: Readable) = apply(arg, "utf-8")
+  def apply(arg: Readable, charSet: String) = new String(arg.getBytes, charSet)
 
-  object lines extends StreamableOp1[InputPath, String, Vector[String]]{
-    def materialize(src: InputPath, i: Iterator[String]) = i.toVector
+  object lines extends StreamableOp1[Readable, String, Vector[String]]{
+    def materialize(src: Readable, i: Iterator[String]) = i.toVector
 
-    object iter extends (InputPath => Iterator[String]){
-      def apply(arg: InputPath) = arg.getLineIterator("utf-8")
-      def apply(arg: InputPath, charSet: String) = arg.getLineIterator(charSet)
+    object iter extends (Readable => Iterator[String]){
+      def apply(arg: Readable) = arg.getLineIterator("utf-8")
+      def apply(arg: Readable, charSet: String) = arg.getLineIterator(charSet)
     }
 
-    def apply(arg: InputPath, charSet: String) = arg.getLines(charSet)
-    override def apply(arg: InputPath) = apply(arg, "utf-8")
+    def apply(arg: Readable, charSet: String) = arg.getLines(charSet)
+    override def apply(arg: Readable) = apply(arg, "utf-8")
   }
-  object bytes extends Function1[InputPath, Array[Byte]]{
-    def apply(arg: InputPath) = arg.getBytes
+  object bytes extends Function1[Readable, Array[Byte]]{
+    def apply(arg: Readable) = arg.getBytes
   }
 }
 
