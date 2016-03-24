@@ -223,7 +223,7 @@ object Terminal {
         lastState.cursor
       )
 
-      val transformedBuffer = transformedBuffer0 ++ lastState.msg
+      lazy val transformedBuffer = transformedBuffer0 ++ lastState.msg
       lazy val lastOffsetCursor = lastState.cursor + cursorOffset
       lazy val rowLengths = splitBuffer(
         lastState.buffer ++ lastState.msg.plainText
