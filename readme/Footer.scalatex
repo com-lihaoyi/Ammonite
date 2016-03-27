@@ -58,7 +58,8 @@
           Renamed @hl.scala{InputPath} to @hl.scala{Readable}, a more appropiate name now that it works on two different non-path entities (resources and @hl.scala{InputStream}s)
         @li
           Bump uPickle and PPrint to 0.3.9
-
+        @li
+          Now published for Scala 2.11.8, thanks to @lnk("Clark Kampfe", "https://github.com/ckampfe")
     @sect{0.5.6}
       @ul
         @li
