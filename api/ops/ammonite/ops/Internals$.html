@@ -62,7 +62,7 @@
               <ol>
                 
                 <li class="alpha in"><span>Alphabetic</span></li>
-                <li class="inherit out"><span>By inheritance</span></li>
+                <li class="inherit out"><span>By Inheritance</span></li>
               </ol>
             </div>
         <div id="ancestors">
@@ -75,7 +75,7 @@
             <span class="filtertype"></span>
             <ol>
               <li class="hideall out"><span>Hide All</span></li>
-              <li class="showall in"><span>Show all</span></li>
+              <li class="showall in"><span>Show All</span></li>
             </ol>
           </div>
         <div id="visbl">
@@ -107,45 +107,6 @@
       </a>
     </span>
       
-    </li><li name="ammonite.ops.Internals.Reader" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
-      <a id="ReaderextendsAnyRef"></a>
-      <a id="Reader:Reader"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">trait</span>
-      </span>
-      <span class="symbol">
-        <a href="Internals$$Reader.html"><span class="name">Reader</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.ops.Internals$@ReaderextendsAnyRef" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
-    </li><li name="ammonite.ops.Internals.SelfClosingIterator" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="SelfClosingIterator[+A]extendsIterator[A]"></a>
-      <a id="SelfClosingIterator[+A]:SelfClosingIterator[A]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">class</span>
-      </span>
-      <span class="symbol">
-        <a href="Internals$$SelfClosingIterator.html"><span class="name">SelfClosingIterator</span></a><span class="tparams">[<span name="A">+A</span>]</span><span class="result"> extends <span class="extype" name="scala.Iterator">Iterator</span>[<span class="extype" name="ammonite.ops.Internals.SelfClosingIterator.A">A</span>]</span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.ops.Internals$@SelfClosingIterator[+A]extendsIterator[A]" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">An iterator that can be closed, and closes itself after you exhaust it
-through iteration.</p><div class="fullcomment"><div class="comment cmt"><p>An iterator that can be closed, and closes itself after you exhaust it
-through iteration. Not quite totally safe, since you can leak filehandles
-by leaving half-consumed iterators, but at least common things like foreach,
-mkString, reduce, sum, etc. will all result in close() being called.
-</p></div></div>
     </li><li name="ammonite.ops.Internals.Writable" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="WritableextendsAnyRef"></a>
       <a id="Writable:Writable"></a>

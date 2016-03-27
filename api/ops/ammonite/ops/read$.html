@@ -45,7 +45,7 @@
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <span class="name">read</span><span class="result"> extends <a href="Internals$$Reader.html" class="extype" name="ammonite.ops.Internals.Reader">Reader</a> with (<a href="InputPath.html" class="extype" name="ammonite.ops.InputPath">InputPath</a>) ⇒ <span class="extype" name="scala.Predef.String">String</span></span>
+        <span class="name">read</span><span class="result"> extends (<a href="Readable.html" class="extype" name="ammonite.ops.Readable">Readable</a>) ⇒ <span class="extype" name="scala.Predef.String">String</span></span>
       </span>
       </h4>
       
@@ -53,7 +53,7 @@
 as (read.lines(...): Seq[String]), or as (read.bytes(...): Array[Byte]).
 </p></div><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
-          <div class="superTypes hiddenContent">(<a href="InputPath.html" class="extype" name="ammonite.ops.InputPath">InputPath</a>) ⇒ <span class="extype" name="scala.Predef.String">String</span>, <a href="Internals$$Reader.html" class="extype" name="ammonite.ops.Internals.Reader">Reader</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent">(<a href="Readable.html" class="extype" name="ammonite.ops.Readable">Readable</a>) ⇒ <span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
         
 
@@ -64,20 +64,20 @@ as (read.lines(...): Seq[String]), or as (read.bytes(...): Array[Byte]).
               <ol>
                 
                 <li class="alpha in"><span>Alphabetic</span></li>
-                <li class="inherit out"><span>By inheritance</span></li>
+                <li class="inherit out"><span>By Inheritance</span></li>
               </ol>
             </div>
         <div id="ancestors">
                 <span class="filtertype">Inherited<br />
                 </span>
                 <ol id="linearization">
-                  <li class="in" name="ammonite.ops.read"><span>read</span></li><li class="in" name="scala.Function1"><span>Function1</span></li><li class="in" name="ammonite.ops.Internals.Reader"><span>Reader</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                  <li class="in" name="ammonite.ops.read"><span>read</span></li><li class="in" name="scala.Function1"><span>Function1</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                 </ol>
               </div><div id="ancestors">
             <span class="filtertype"></span>
             <ol>
               <li class="hideall out"><span>Hide All</span></li>
-              <li class="showall in"><span>Show all</span></li>
+              <li class="showall in"><span>Show All</span></li>
             </ol>
           </div>
         <div id="visbl">
@@ -149,14 +149,14 @@ as (read.lines(...): Seq[String]), or as (read.bytes(...): Array[Byte]).
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="scala.Function1#andThen" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="andThen[A](g:R=&gt;A):T1=&gt;A"></a>
-      <a id="andThen[A]((String)⇒A):(InputPath)⇒A"></a>
+      <a id="andThen[A]((String)⇒A):(Readable)⇒A"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">andThen</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="g">g: (<span class="extype" name="scala.Predef.String">String</span>) ⇒ <span class="extype" name="scala.Function1.andThen.A">A</span></span>)</span><span class="result">: (<a href="InputPath.html" class="extype" name="ammonite.ops.InputPath">InputPath</a>) ⇒ <span class="extype" name="scala.Function1.andThen.A">A</span></span>
+        <span class="name">andThen</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="g">g: (<span class="extype" name="scala.Predef.String">String</span>) ⇒ <span class="extype" name="scala.Function1.andThen.A">A</span></span>)</span><span class="result">: (<a href="Readable.html" class="extype" name="ammonite.ops.Readable">Readable</a>) ⇒ <span class="extype" name="scala.Function1.andThen.A">A</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.read$@andThen[A](g:R=&gt;A):T1=&gt;A" title="Permalink" target="_top">
@@ -167,23 +167,40 @@ as (read.lines(...): Seq[String]), or as (read.bytes(...): Array[Byte]).
                 <span class="name">@unspecialized</span><span class="args">()</span>
               
         </dd></dl></div>
-    </li><li name="ammonite.ops.Internals.Reader#apply" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="apply(arg:ammonite.ops.InputPath):String"></a>
-      <a id="apply(InputPath):String"></a>
+    </li><li name="ammonite.ops.read#apply" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="apply(arg:ammonite.ops.Readable,charSet:String):String"></a>
+      <a id="apply(Readable,String):String"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">apply</span><span class="params">(<span name="arg">arg: <a href="InputPath.html" class="extype" name="ammonite.ops.InputPath">InputPath</a></span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+        <span class="name">apply</span><span class="params">(<span name="arg">arg: <a href="Readable.html" class="extype" name="ammonite.ops.Readable">Readable</a></span>, <span name="charSet">charSet: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#ammonite.ops.read$@apply(arg:ammonite.ops.InputPath):String" title="Permalink" target="_top">
+      <a href="../../index.html#ammonite.ops.read$@apply(arg:ammonite.ops.Readable,charSet:String):String" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Internals$$Reader.html" class="extype" name="ammonite.ops.Internals.Reader">Reader</a></dd></dl></div>
+      
+    </li><li name="ammonite.ops.read#apply" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="apply(arg:ammonite.ops.Readable):String"></a>
+      <a id="apply(Readable):String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">apply</span><span class="params">(<span name="arg">arg: <a href="Readable.html" class="extype" name="ammonite.ops.Readable">Readable</a></span>)</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.ops.read$@apply(arg:ammonite.ops.Readable):String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="ammonite.ops.read">read</a> → Function1</dd></dl></div>
     </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <a id="asInstanceOf[T0]:T0"></a>
@@ -201,7 +218,7 @@ as (read.lines(...): Seq[String]), or as (read.bytes(...): Array[Byte]).
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="ammonite.ops.Internals.Reader.bytes" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+    </li><li name="ammonite.ops.read.bytes" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="bytes"></a>
       <a id="bytes:bytes"></a>
       <h4 class="signature">
@@ -210,14 +227,14 @@ as (read.lines(...): Seq[String]), or as (read.bytes(...): Array[Byte]).
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <a href="Internals$$Reader$bytes$.html"><span class="name">bytes</span></a><span class="result"> extends (<a href="InputPath.html" class="extype" name="ammonite.ops.InputPath">InputPath</a>) ⇒ <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Byte">Byte</span>]</span>
+        <a href="read$$bytes$.html"><span class="name">bytes</span></a><span class="result"> extends (<a href="Readable.html" class="extype" name="ammonite.ops.Readable">Readable</a>) ⇒ <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Byte">Byte</span>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#ammonite.ops.Internals$$Reader@bytes" title="Permalink" target="_top">
+      <a href="../../index.html#ammonite.ops.read$@bytes" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Internals$$Reader.html" class="extype" name="ammonite.ops.Internals.Reader">Reader</a></dd></dl></div>
+      
     </li><li name="scala.AnyRef#clone" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a>
       <a id="clone():AnyRef"></a>
@@ -243,14 +260,14 @@ as (read.lines(...): Seq[String]), or as (read.bytes(...): Array[Byte]).
         </dd></dl></div>
     </li><li name="scala.Function1#compose" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="compose[A](g:A=&gt;T1):A=&gt;R"></a>
-      <a id="compose[A]((A)⇒InputPath):(A)⇒String"></a>
+      <a id="compose[A]((A)⇒Readable):(A)⇒String"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">compose</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="g">g: (<span class="extype" name="scala.Function1.compose.A">A</span>) ⇒ <a href="InputPath.html" class="extype" name="ammonite.ops.InputPath">InputPath</a></span>)</span><span class="result">: (<span class="extype" name="scala.Function1.compose.A">A</span>) ⇒ <span class="extype" name="scala.Predef.String">String</span></span>
+        <span class="name">compose</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="g">g: (<span class="extype" name="scala.Function1.compose.A">A</span>) ⇒ <a href="Readable.html" class="extype" name="ammonite.ops.Readable">Readable</a></span>)</span><span class="result">: (<span class="extype" name="scala.Function1.compose.A">A</span>) ⇒ <span class="extype" name="scala.Predef.String">String</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.read$@compose[A](g:A=&gt;T1):A=&gt;R" title="Permalink" target="_top">
@@ -335,6 +352,23 @@ as (read.lines(...): Seq[String]), or as (read.bytes(...): Array[Byte]).
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="ammonite.ops.read#getInputStream" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="getInputStream(p:ammonite.ops.Readable):java.io.InputStream"></a>
+      <a id="getInputStream(Readable):InputStream"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getInputStream</span><span class="params">(<span name="p">p: <a href="Readable.html" class="extype" name="ammonite.ops.Readable">Readable</a></span>)</span><span class="result">: <span class="extype" name="java.io.InputStream">InputStream</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.ops.read$@getInputStream(p:ammonite.ops.Readable):java.io.InputStream" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
     </li><li name="scala.AnyRef#hashCode" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="hashCode():Int"></a>
       <a id="hashCode():Int"></a>
@@ -369,7 +403,7 @@ as (read.lines(...): Seq[String]), or as (read.bytes(...): Array[Byte]).
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="ammonite.ops.Internals.Reader.lines" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+    </li><li name="ammonite.ops.read.lines" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="lines"></a>
       <a id="lines:lines"></a>
       <h4 class="signature">
@@ -378,14 +412,14 @@ as (read.lines(...): Seq[String]), or as (read.bytes(...): Array[Byte]).
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <a href="Internals$$Reader$lines$.html"><span class="name">lines</span></a><span class="result"> extends <a href="StreamableOp1.html" class="extype" name="ammonite.ops.StreamableOp1">StreamableOp1</a>[<a href="InputPath.html" class="extype" name="ammonite.ops.InputPath">InputPath</a>, <span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Vector">Vector</span>[<span class="extype" name="scala.Predef.String">String</span>]]</span>
+        <a href="read$$lines$.html"><span class="name">lines</span></a><span class="result"> extends <a href="StreamableOp1.html" class="extype" name="ammonite.ops.StreamableOp1">StreamableOp1</a>[<a href="Readable.html" class="extype" name="ammonite.ops.Readable">Readable</a>, <span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Vector">Vector</span>[<span class="extype" name="scala.Predef.String">String</span>]]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#ammonite.ops.Internals$$Reader@lines" title="Permalink" target="_top">
+      <a href="../../index.html#ammonite.ops.read$@lines" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Internals$$Reader.html" class="extype" name="ammonite.ops.Internals.Reader">Reader</a></dd></dl></div>
+      
     </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a>
       <a id="ne(AnyRef):Boolean"></a>
@@ -437,23 +471,6 @@ as (read.lines(...): Seq[String]), or as (read.bytes(...): Array[Byte]).
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="ammonite.ops.read#readIn" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="readIn(p:ammonite.ops.InputPath):java.io.InputStream"></a>
-      <a id="readIn(InputPath):InputStream"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">readIn</span><span class="params">(<span name="p">p: <a href="InputPath.html" class="extype" name="ammonite.ops.InputPath">InputPath</a></span>)</span><span class="result">: <span class="extype" name="java.io.InputStream">InputStream</span></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.ops.read$@readIn(p:ammonite.ops.InputPath):java.io.InputStream" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="ammonite.ops.read">read</a> → <a href="Internals$$Reader.html" class="extype" name="ammonite.ops.Internals.Reader">Reader</a></dd></dl></div>
     </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
       <a id="synchronized[T0](⇒T0):T0"></a>
@@ -567,9 +584,7 @@ as (read.lines(...): Seq[String]), or as (read.bytes(...): Array[Byte]).
 
         <div id="inheritedMembers">
         <div class="parent" name="scala.Function1">
-              <h3>Inherited from (<a href="InputPath.html" class="extype" name="ammonite.ops.InputPath">InputPath</a>) ⇒ <span class="extype" name="scala.Predef.String">String</span></h3>
-            </div><div class="parent" name="ammonite.ops.Internals.Reader">
-              <h3>Inherited from <a href="Internals$$Reader.html" class="extype" name="ammonite.ops.Internals.Reader">Reader</a></h3>
+              <h3>Inherited from (<a href="Readable.html" class="extype" name="ammonite.ops.Readable">Readable</a>) ⇒ <span class="extype" name="scala.Predef.String">String</span></h3>
             </div><div class="parent" name="scala.AnyRef">
               <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
             </div><div class="parent" name="scala.Any">
