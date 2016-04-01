@@ -13,7 +13,7 @@ import scalaj.http._
 val server = NettyServer.fromRouter(new ServerConfig(
   rootDir = new java.io.File("."),
   port = Some(19000), sslPort = None,
-  address = "127.0.0.1", mode = play.api.Mode.Dev,
+  address = "0.0.0.0", mode = play.api.Mode.Dev,
   properties = System.getProperties,
   configuration = play.api.Configuration(
     "play.server.netty" -> Map(
