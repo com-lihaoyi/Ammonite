@@ -85,6 +85,10 @@ object StandaloneTests extends TestSuite{
       val evaled = exec("Main.scala")
       assert(evaled.out.string.contains("Hello! 1"))
     }
+    'classloaders{
+      val evaled = exec("Resources.scala")
+      assert(evaled.out.string.contains("1745"))
+    }
     'args{
       'full{
         val evaled = exec("Args.scala", "3", "Moo", (cwd/'omg/'moo).toString)
