@@ -101,8 +101,10 @@ class Interpreter(prompt0: Ref[String],
 
   }
 
-  def processModule(code: String) =
-    processScript(prepareScript(code), (code, imports) => withContextClassloader(eval.processScriptBlock(code, imports, printer)))
+  def processModule(code: String) = processScript(
+    prepareScript(code),
+    (code, imports) => withContextClassloader(eval.processScriptBlock(code, imports, printer))
+  )
 
   def processExec(code: String) =
     processScript(prepareScript(code), { (c, i) => evaluateLine(c, Nil, printer, i)})
