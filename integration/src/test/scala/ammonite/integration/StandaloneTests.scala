@@ -89,10 +89,10 @@ object StandaloneTests extends TestSuite{
       val evaled = exec("Resources.scala")
       assert(evaled.out.string.contains("1745"))
     }
-    'playframework{
-      val evaled = exec("PlayFramework.scala")
-      assert(evaled.out.string.contains("Hello bar"))
-    }
+//    'playframework{
+//      val evaled = exec("PlayFramework.scala")
+//      assert(evaled.out.string.contains("Hello bar"))
+//    }
     'args{
       'full{
         val evaled = exec("Args.scala", "3", "Moo", (cwd/'omg/'moo).toString)
