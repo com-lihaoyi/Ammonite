@@ -34,10 +34,23 @@ object ExampleTests extends TestSuite{
       // These operations are mirrored in `read.resource`,
       // `read.resource.lines` and `read.resource.bytes` to conveniently read
       // files from your classpath:
-      val resourcePath = resource/'testdata/"File.txt"
-      read(resourcePath).length        ==> 81
-      read.bytes(resourcePath).length  ==> 81
-      read.lines(resourcePath).length  ==> 4
+      val resourcePath = resource/'test/'ammonite/'ops/'folder/"file.txt"
+      read(resourcePath).length        ==> 18
+      read.bytes(resourcePath).length  ==> 18
+      read.lines(resourcePath).length  ==> 1
+
+      // You can read resources relative to any particular class, including
+      // the "current" class by passing in `getClass`
+      val relResourcePath = resource(getClass)/'folder/"file.txt"
+      read(relResourcePath).length        ==> 18
+      read.bytes(relResourcePath).length  ==> 18
+      read.lines(relResourcePath).length  ==> 1
+
+      // You can also read `InputStream`s
+      val inputStream = new java.io.ByteArrayInputStream(
+        Array[Byte](104, 101, 108, 108, 111)
+      )
+      read(inputStream)           ==> "hello"
 
       // By default, `write` fails if there is already a file in place. Use
       // `write.append` or `write.over` if you want to append-to/overwrite

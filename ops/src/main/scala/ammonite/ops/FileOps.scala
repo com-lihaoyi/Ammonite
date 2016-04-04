@@ -7,41 +7,14 @@
 package ammonite.ops
 
 import java.io.{File, InputStream}
+import java.nio.charset.Charset
 import java.nio.file._
+
 import acyclic.file
-import ammonite.ops.Internals.SelfClosingIterator
 
 
 object Internals{
 
-  /**
-   * An iterator that can be closed, and closes itself after you exhaust it
-   * through iteration. Not quite totally safe, since you can leak filehandles
-   * by leaving half-consumed iterators, but at least common things like foreach,
-   * mkString, reduce, sum, etc. will all result in close() being called.
-   */
-  class SelfClosingIterator[+A](val underlying: Iterator[A], val close: () => Unit)
-  extends Iterator[A]{
-    private[this] var alreadyClosed = false
-    def hasNext = {
-      if (alreadyClosed) false
-      else if (!underlying.hasNext){
-        close()
-        alreadyClosed = true
-        false
-      }else{
-        true
-      }
-    }
-    def next() = {
-      val n = underlying.next()
-      if (!underlying.hasNext) {
-        alreadyClosed = true
-        close()
-      }
-      n
-    }
-  }
 
   trait Mover{
     def check: Boolean
@@ -60,40 +33,6 @@ object Internals{
     }
   }
 
-  trait Reader{
-    def readIn(p: InputPath): InputStream
-    def apply(arg: InputPath) = {
-      val is = readIn(arg)
-      val res = io.Source.fromInputStream(is).mkString
-      is.close()
-      res
-    }
-
-    object lines extends StreamableOp1[InputPath, String, Vector[String]]{
-      def materialize(src: InputPath, i: Iterator[String]) = i.toVector
-      object iter extends (InputPath => Iterator[String]){
-        def apply(arg: InputPath) = {
-          val is = readIn(arg)
-          val s = io.Source.fromInputStream(is, "UTF-8")
-          new SelfClosingIterator(s.getLines, () => s.close())
-        }
-      }
-    }
-    object bytes extends Function1[InputPath, Array[Byte]]{
-      def apply(arg: InputPath) = {
-        val is = readIn(arg)
-        val out = new java.io.ByteArrayOutputStream()
-        val buffer = new Array[Byte](8192)
-        var r = 0
-        while (r != -1) {
-          r = is.read(buffer)
-          if (r != -1) out.write(buffer, 0, r)
-        }
-        is.close()
-        out.toByteArray
-      }
-    }
-  }
 
   class Writable(val writeableData: Array[Byte])
 
@@ -354,8 +293,27 @@ object write extends Function2[Path, Internals.Writable, Unit]{
  * Reads a file into memory, either as a String,
  * as (read.lines(...): Seq[String]), or as (read.bytes(...): Array[Byte]).
  */
-object read extends Internals.Reader with Function1[InputPath, String]{
-  def readIn(p: InputPath) = p.newInputStream()
+object read extends Function1[Readable, String]{
+  def getInputStream(p: Readable) = p.getInputStream()
+
+//  def apply(arg: InputPath) = new String(arg.getBytes, Charset.forName("UTF-8"))
+  def apply(arg: Readable) = apply(arg, "utf-8")
+  def apply(arg: Readable, charSet: String) = new String(arg.getBytes, charSet)
+
+  object lines extends StreamableOp1[Readable, String, Vector[String]]{
+    def materialize(src: Readable, i: Iterator[String]) = i.toVector
+
+    object iter extends (Readable => Iterator[String]){
+      def apply(arg: Readable) = arg.getLineIterator("utf-8")
+      def apply(arg: Readable, charSet: String) = arg.getLineIterator(charSet)
+    }
+
+    def apply(arg: Readable, charSet: String) = arg.getLines(charSet)
+    override def apply(arg: Readable) = apply(arg, "utf-8")
+  }
+  object bytes extends Function1[Readable, Array[Byte]]{
+    def apply(arg: Readable) = arg.getBytes
+  }
 }
 
 /**

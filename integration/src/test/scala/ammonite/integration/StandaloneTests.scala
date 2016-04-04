@@ -50,7 +50,7 @@ object StandaloneTests extends TestSuite{
     }
 
     'load_script{
-      val name = "qs.scala"
+      val name = "QuickSort.scala"
       val res = %%bash(
         executable,
         "--predef-file",
@@ -110,6 +110,14 @@ object StandaloneTests extends TestSuite{
       val evaled = exec("Main.scala")
       assert(evaled.out.string.contains("Hello! 1"))
     }
+    'classloaders{
+      val evaled = exec("Resources.scala")
+      assert(evaled.out.string.contains("1745"))
+    }
+//    'playframework{
+//      val evaled = exec("PlayFramework.scala")
+//      assert(evaled.out.string.contains("Hello bar"))
+//    }
     'args{
       'full{
         val evaled = exec("Args.scala", "3", "Moo", (cwd/'omg/'moo).toString)

@@ -7,14 +7,14 @@ import scala.collection.mutable
 import scalatags.Text.all._
 
 object Sample{
-  assert(
-    !ammonite.Constants.version.endsWith("-SNAPSHOT"),
-    s"Building documentation for versions ${ammonite.Constants.version} will result in " +
-    "invalid maven coordinates; reset the version to the last non-SNAPSHOT before building"
-  )
-  val replCurl = "$ curl -L -o amm https://git.io/vafIQ; chmod +x amm; ./amm"
+//  assert(
+//    !ammonite.Constants.version.endsWith("-SNAPSHOT"),
+//    s"Building documentation for versions ${ammonite.Constants.version} will result in " +
+//    "invalid maven coordinates; reset the version to the last non-SNAPSHOT before building"
+//  )
+  val replCurl = "$ curl -L -o amm https://git.io/vVfy5; chmod +x amm; ./amm"
   val filesystemCurl =
-    "$ mkdir ~/.ammonite; curl -L -o ~/.ammonite/predef.scala https://git.io/vafLk"
+    "$ mkdir ~/.ammonite; curl -L -o ~/.ammonite/predef.scala https://git.io/vVfyF"
   val cacheVersion = 6
   def cached(key: Any)(calc: => String) = {
     val path = cwd/'target/'cache/(key.hashCode + cacheVersion).toString

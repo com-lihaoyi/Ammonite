@@ -9,7 +9,9 @@ package object ops extends Extensions with RelPathStuff{
    */
   val root = ops.Path.root
 
-  val resource = ops.ResourcePath.resource
+  def resource(implicit resRoot: ResourceRoot = Thread.currentThread().getContextClassLoader) ={
+    ops.ResourcePath.resource(resRoot)
+  }
 
   /**
    * The user's home directory

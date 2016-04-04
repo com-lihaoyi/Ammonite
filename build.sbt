@@ -125,8 +125,8 @@ lazy val repl = project
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
       "org.apache.ivy" % "ivy" % "2.4.0",
       "com.lihaoyi" %% "scalaparse" % "0.3.7",
-      "com.lihaoyi" %% "upickle" % "0.3.8",
-      "com.lihaoyi" %% "pprint" % "0.3.8",
+      "com.lihaoyi" %% "upickle" % "0.3.9",
+      "com.lihaoyi" %% "pprint" % "0.3.9",
       "com.github.scopt" %% "scopt" % "3.4.0"
     ),
     libraryDependencies ++= (
@@ -192,23 +192,19 @@ lazy val shell = project
     (testOnly in Test) <<= (testOnly in Test).dependsOn(packageBin in Compile)
   )
 
+val integrationTasks = Seq(
+  assembly in repl,
+  packageBin in (shell, Compile)
+)
 lazy val integration = project
   .dependsOn(ops)
   .dependsOn(repl)
   .settings(
     sharedSettings,
-    (test in Test) <<= (test in Test).dependsOn(
-      assembly in repl,
-      packageBin in (shell, Compile)
-    ),
-    (testOnly in Test) <<= (testOnly in Test).dependsOn(
-      assembly in repl,
-      packageBin in (shell, Compile)
-    ),
-    (console in Test) <<= (console in Test).dependsOn(
-      assembly in repl,
-      packageBin in (shell, Compile)
-    ),
+    (test in Test) <<= (test in Test).dependsOn(integrationTasks:_*),
+    (run in Test) <<= (run in Test).dependsOn(integrationTasks:_*),
+    (testOnly in Test) <<= (testOnly in Test).dependsOn(integrationTasks:_*),
+    (console in Test) <<= (console in Test).dependsOn(integrationTasks:_*),
     dontPublishSettings,
     initialCommands in (Test, console) := "ammonite.integration.Main.main(null)"
   )

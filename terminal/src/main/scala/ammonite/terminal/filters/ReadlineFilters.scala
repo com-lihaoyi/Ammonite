@@ -41,8 +41,10 @@ object ReadlineFilters {
     Case(Ctrl('b'))((b, c, m) => (b, c - 1)), // <- one char
     Case(Ctrl('f'))((b, c, m) => (b, c + 1)), // -> one char
     Case(Alt + "b")((b, c, m) => GUILikeFilters.wordLeft(b, c)), // <- one word
+    Case(Alt + "B")((b, c, m) => GUILikeFilters.wordLeft(b, c)), // <- one word
     Case(LinuxCtrlLeft)((b, c, m) => GUILikeFilters.wordLeft(b, c)), // <- one word
     Case(Alt + "f")((b, c, m) => GUILikeFilters.wordRight(b, c)), // -> one  word
+    Case(Alt + "F")((b, c, m) => GUILikeFilters.wordRight(b, c)), // -> one  word
     Case(LinuxCtrlRight)((b, c, m) => GUILikeFilters.wordRight(b, c)), // -> one word
     Case(Home)((b, c, m) => BasicFilters.moveStart(b, c, m.width)), // <- one line
     Case(HomeScreen)((b, c, m) => BasicFilters.moveStart(b, c, m.width)), // <- one line
@@ -51,6 +53,7 @@ object ReadlineFilters {
     Case(EndScreen)((b, c, m) => BasicFilters.moveEnd(b, c, m.width)), // -> one line
     Case(Ctrl('e'))((b, c, m) => BasicFilters.moveEnd(b, c, m.width)),
     Case(Alt + "t")((b, c, m) => transposeWord(b, c)),
+    Case(Alt + "T")((b, c, m) => transposeWord(b, c)),
     Case(Ctrl('t'))((b, c, m) => transposeLetter(b, c))
   )
 

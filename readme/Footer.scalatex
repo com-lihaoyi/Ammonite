@@ -42,7 +42,24 @@
       Although it's best to read the documentation on this page to learn how to use these projects, the Scaladoc is still useful as a reference.
   
   @sect{Changelog}
-
+    @sect{0.5.7}
+      @ul
+        @li
+          Improved performance of various @hl.scala{read!} commands to be competitive with @hl.scala{java.nio} (#362)
+        @li
+          @hl.scala{read!} and @hl.scala{read.lines!} now take an optional charset, passed via @hl.scala{read(file, charSet: String)} or @hl.scala{read.lines(file, charSet: String)} which defaults to @hl.scala{"utf-8"}
+        @li
+          Make @hl.scala{read! resource} read from the @hl.scala{Thread.currentThread.getContextClassLoader} by default, fixing #348
+        @li
+          Re-organize @sect.ref{Reading Resources} in Ammonite-Ops to allow proper handling of absolute and relative resources by passing in @hl.scala{Class}s or @hl.scala{ClassLoader}s
+        @li
+          Make @hl.scala{read!} work on @hl.scala{InputStream}s
+        @li
+          Renamed @hl.scala{InputPath} to @hl.scala{Readable}, a more appropiate name now that it works on two different non-path entities (resources and @hl.scala{InputStream}s)
+        @li
+          Bump uPickle and PPrint to 0.3.9
+        @li
+          Now published for Scala 2.11.8, thanks to @lnk("Clark Kampfe", "https://github.com/ckampfe")
     @sect{0.5.6}
       @ul
         @li

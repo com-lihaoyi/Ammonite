@@ -192,9 +192,7 @@
         @li
           @hl.scala{ls.rec! path} @a("[doc]", href := (docBase+ "ls$$rec$")) and @hl.scala{ls.rec.iter!}
         @li
-          @hl.scala{read! path} @a("[doc]", href := (docBase+ "read$")) returning a @hl.scala{String}, and @hl.scala{read.lines! path} and @hl.scala{read.bytes! path} returning @hl.scala{Seq[String]} and @hl.scala{Array[Byte]}
-        @li
-          @hl.scala{read.resource! path}, @a("[doc]", href := (docBase+ "read$$resource$")), and @hl.scala{read.resource.lines! path} and @hl.scala{read.resource.bytes! path}, behaves the same as @hl.scala{read!} but reads from your resource classpath instead of the filesystem
+          @hl.scala{read! path} @a("[doc]", href := (docBase+ "read$")) returning a @hl.scala{String}, and @hl.scala{read.lines! path} and @hl.scala{read.bytes! path} returning @hl.scala{Seq[String]} and @hl.scala{Array[Byte]}. You can also use the various @code{read!} commands for @sect.ref{Reading Resources} or reading @hl.scala{java.io.InputStream}s
         @li
           @hl.scala{write(path, contents)}, @a("[doc]", href := (docBase+ "write$")), which lets you write @hl.scala{String}s, @hl.scala{Array[Byte]}s, and @hl.scala{Seq}s of those
         @li
@@ -228,6 +226,7 @@
           @hl.scala{write} also does @i{not} stomp over existing files by default. You need to use @hl.scala{write.over}
       @p
         In general, this should make these operations much easier to use; the defaults should cover the 99% use case without needing any special flags or fiddling.
+
 
     @sect{Extensions}
       @p
@@ -279,6 +278,26 @@
         Here's another example:
 
       @hl.ref(opsExamples, Seq("noLongLines", ""))
+
+  @sect{Reading Resources}
+    @p
+      In addition to manipulating paths on the filesystem, you can also manipulate @code{resource} paths in order to read resources off of the Java classpath. By default, the path used to load resources is absolute, using the @hl.scala{Thread.currentThread().getContextClassLoader}. You can also pass in a classloader explicitly to the @hl.scala{resource} call:
+
+    @hl.ref(opsTests/"OpTests.scala", Seq("readResource", "absolute", ""))
+
+    @p
+      If you want to load resources relative to a particular class, pass in a class for the resource to be relative, or @hl.scala{getClass} to get something relative to the current class.
+
+    @hl.ref(opsTests/"OpTests.scala", Seq("readResource", "relative", ""))
+
+    @p
+      In both cases, reading resources is performed as if you did not pass a leading slash into the @hl.scala{getResource("foo/bar")} call. In the case of @hl.scala{ClassLoader#getResource}, passing in a leading slash is never valid, and in the case of @hl.scala{Class#getResource}, passing in a leading slash is equivalent to calling @hl.scala{getResource} on the @hl.scala{ClassLoader}.
+    @p
+      Ammonite-Ops ensures you only use the two valid cases in the API, without a leading slash, and not the two cases with a leading slash which are redundant (in the case of @hl.scala{Class#getResource}, which can be replaced by @hl.scala{ClassLoader#getResource}) or invalid (a leading slash with @hl.scala{ClassLoader#getResource})
+    @p
+      Note that you can only @hl.scala{read!} from paths; you can't write to them or perform any other filesystem operations on them, since they're not really files.
+    @p
+      Note also that resources belong to classloaders, and you may have multiple classloaders in your application e.g. if you are running in a servlet or REPL. Make sure you use the correct classloader (or a class belonging to the correct classloader) to load the resources you want, or else it might not find them.
 
   @sect{Spawning Subprocesses}
     @p

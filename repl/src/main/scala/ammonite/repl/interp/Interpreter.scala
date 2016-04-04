@@ -71,14 +71,21 @@ class Interpreter(prompt0: Ref[String],
     } yield out
   }
 
-  def evaluateLine(code: String,
-                   printSnippet: Seq[String],
-                   printer: Printer,
-                   extraImports: Seq[ImportData] = Seq() ) = {
-
+  def withContextClassloader[T](t: => T) = {
     val oldClassloader = Thread.currentThread().getContextClassLoader
     try{
       Thread.currentThread().setContextClassLoader(evalClassloader)
+      t
+    } finally {
+      Thread.currentThread().setContextClassLoader(oldClassloader)
+    }
+  }
+
+  def evaluateLine(code: String,
+                   printSnippet: Seq[String],
+                   printer: Printer,
+                   extraImports: Seq[ImportData] = Seq() ) = withContextClassloader{
+
       eval.processLine(
         code,
         s"""
@@ -92,11 +99,13 @@ class Interpreter(prompt0: Ref[String],
         printer,
         extraImports
       )
-    } finally Thread.currentThread().setContextClassLoader(oldClassloader)
+
   }
 
-  def processModule(code: String) =
-    processScript(prepareScript(code), eval.processScriptBlock(_, _, printer))
+  def processModule(code: String) = processScript(
+    prepareScript(code),
+    (code, imports) => withContextClassloader(eval.processScriptBlock(code, imports, printer))
+  )
 
   def processExec(code: String) =
     processScript(prepareScript(code), { (c, i) => evaluateLine(c, Nil, printer, i)})

@@ -1,5 +1,6 @@
 package test.ammonite.ops
 
+import java.nio.file.NoSuchFileException
 import java.nio.{file => nio}
 
 import ammonite.ops._
@@ -42,9 +43,40 @@ object OpTests extends TestSuite{
       )
     }
     'readResource{
-      assert(read(resource/'testdata/"File.txt").contains(
-        "I weigh twice as much as you"
-      ))
+      'positive{
+        'absolute{
+          val contents = read(resource/'test/'ammonite/'ops/'folder/"file.txt")
+          assert(contents.contains("file contents lols"))
+
+          val cl = getClass.getClassLoader
+          val contents2 = read(resource(cl)/'test/'ammonite/'ops/'folder/"file.txt")
+          assert(contents2.contains("file contents lols"))
+        }
+
+        'relative {
+          val cls = classOf[test.ammonite.ops.Testing]
+          val contents = read! resource(cls)/'folder/"file.txt"
+          assert(contents.contains("file contents lols"))
+
+          val contents2 = read! resource(getClass)/'folder/"file.txt"
+          assert(contents2.contains("file contents lols"))
+        }
+      }
+      'negative{
+        * - intercept[ResourceNotFoundException]{
+          read(resource/'folder/"file.txt")
+        }
+
+        * - intercept[ResourceNotFoundException]{
+          read(resource(classOf[test.ammonite.ops.Testing])/'test/'ammonite/'ops/'folder/"file.txt")
+        }
+        * - intercept[ResourceNotFoundException]{
+          read(resource(getClass)/'test/'ammonite/'ops/'folder/"file.txt")
+        }
+        * - intercept[ResourceNotFoundException]{
+          read(resource(getClass.getClassLoader)/'folder/"file.txt")
+        }
+      }
     }
     'rm{
       // shouldn't crash
@@ -220,7 +252,7 @@ object OpTests extends TestSuite{
         'nonexistant{
           * - intercept[nio.NoSuchFileException](ls! d/'nonexistent)
           * - intercept[nio.NoSuchFileException](read! d/'nonexistent)
-          * - intercept[nio.NoSuchFileException](read! resource/'failures/'nonexistent)
+          * - intercept[ResourceNotFoundException](read! resource/'failures/'nonexistent)
           * - intercept[nio.NoSuchFileException](cp! d/'nonexistent ! d/'yolo)
           * - intercept[nio.NoSuchFileException](mv! d/'nonexistent ! d/'yolo)
         }
