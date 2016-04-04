@@ -125,7 +125,7 @@ span.hljs-tag, span.hljs-symbol{
       <p>
         You can also try out Ammonite in an existing SBT project, add the following to your <code>build.sbt</code>
 </p>
-      <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite-repl&quot; % &quot;0.5.8-SNAPSHOT&quot; % &quot;test&quot; cross CrossVersion.full
+      <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite-repl&quot; % &quot;0.5.7&quot; % &quot;test&quot; cross CrossVersion.full
 
 initialCommands in (Test, console) := &quot;&quot;&quot;ammonite.repl.Main.run(&quot;&quot;)&quot;&quot;&quot;
 </code></pre>
@@ -1035,7 +1035,7 @@ warning: $fruitlessTypeTestWarningMessageBlahBlahBlah</code><a class=" scalatex-
   <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="Debugging" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Debugging<a class=" scalatex-site-Styles-headerLink" href="#Debugging" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
     <p>
       Ammonite can be used as a tool to debug any other Scala program, by conveniently opening a REPL at any point within your program with which you can interact with live program data, similar to pdb/ipdb in Python. To do so, first add Ammonite to your classpath, e.g. through this SBT snippet:</p>
-    <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite-repl&quot; % &quot;0.5.8-SNAPSHOT&quot; cross CrossVersion.full
+    <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite-repl&quot; % &quot;0.5.7&quot; cross CrossVersion.full
 </code></pre>
     <p>
       Note that unlike the snippet given <a href="#Ammonite">above</a>, we leave out the <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">% &quot;test&quot;</code> because we may want ammonite to be available within the &quot;main&quot; project, and not just in the unit tests. Then, anywhere within your program, you can place a breakpoint via:
@@ -1069,7 +1069,7 @@ debug(&quot;name1&quot; -&gt; value1, &quot;name2&quot; -&gt; value2, ...)
       <p>
         To do this, add ammonite-sshd to your classpath, for example with SBT:
 </p>
-      <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite-sshd&quot; % &quot;0.5.8-SNAPSHOT&quot; cross CrossVersion.full
+      <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite-sshd&quot; % &quot;0.5.7&quot; cross CrossVersion.full
 </code></pre>
       <p>
         Now add repl server to your application:
@@ -1444,7 +1444,7 @@ res96: Array[String] = Array(&quot;Mike&quot;, &quot;Peter Smith&quot;)
   <p>
     To get started with Ammonite-Ops, add this to your <code>build.sbt</code>:
 </p>
-  <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">libraryDependencies += &quot;com.lihaoyi&quot; %% &quot;ammonite-ops&quot; % &quot;0.5.8-SNAPSHOT&quot;</code>
+  <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">libraryDependencies += &quot;com.lihaoyi&quot; %% &quot;ammonite-ops&quot; % &quot;0.5.7&quot;</code>
 
   <p>
     And you're all set! Here's an example of some common operations you can do with Ammonite-Ops
@@ -2717,7 +2717,7 @@ import com.google.common.collect.ImmutableBiMap // Doesn't work
            ^</span><span>
 </span><span style="color: #c0392b;">Compilation Failed</span><span>
 </span><span></span><span></span><span style="color: #8e44ad;">haoyi-Ammonite@ </span><span>load.ivy(</span><span style="color: #27ae60;">&quot;com.google.guava&quot;</span><span> % </span><span style="color: #27ae60;">&quot;guava&quot;</span><span> % </span><span style="color: #27ae60;">&quot;18.0&quot;</span><span>) </span><span style="color: #2980b9;">// Load from Maven Central</span><span> </span><span></span><span></span><span>
-:: loading settings :: url = jar:file:/Users/haoyi/Dropbox%20(Personal)/Workspace/Ammonite/repl/target/scala-2.11/ammonite-repl-0.5.8-SNAPSHOT-2.11.8!/org/apache/ivy/core/settings/ivysettings.xml
+:: loading settings :: url = jar:file:/Users/haoyi/Dropbox%20(Personal)/Workspace/Ammonite/repl/target/scala-2.11/ammonite-repl-0.5.7-2.11.8!/org/apache/ivy/core/settings/ivysettings.xml
 :: resolving dependencies :: com.google.guava#guava-caller;working
 	confs: [default]
 	found com.google.guava#guava;18.0 in central
@@ -2736,7 +2736,7 @@ import com.google.common.collect.ImmutableBiMap // Doesn't work
         Or Joda Time:
 </p>
       <pre><span></span><span></span><span></span><span style="color: #8e44ad;">haoyi-Ammonite@ </span><span>load.ivy(</span><span style="color: #27ae60;">&quot;joda-time&quot;</span><span> % </span><span style="color: #27ae60;">&quot;joda-time&quot;</span><span> % </span><span style="color: #27ae60;">&quot;2.8.2&quot;</span><span>)  </span><span></span><span></span><span>
-:: loading settings :: url = jar:file:/Users/haoyi/Dropbox%20(Personal)/Workspace/Ammonite/repl/target/scala-2.11/ammonite-repl-0.5.8-SNAPSHOT-2.11.8!/org/apache/ivy/core/settings/ivysettings.xml
+:: loading settings :: url = jar:file:/Users/haoyi/Dropbox%20(Personal)/Workspace/Ammonite/repl/target/scala-2.11/ammonite-repl-0.5.7-2.11.8!/org/apache/ivy/core/settings/ivysettings.xml
 :: resolving dependencies :: joda-time#joda-time-caller;working
 	confs: [default]
 	found joda-time#joda-time;2.8.2 in central
