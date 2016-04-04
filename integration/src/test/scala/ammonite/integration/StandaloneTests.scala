@@ -63,6 +63,31 @@ object StandaloneTests extends TestSuite{
       println("\n-------------------------")
     }
 
+    'error_test{
+      val name = "Error_line_number_test.scala"
+      try {
+        val res = %%bash(
+          executable,
+          "--predef-file",
+          emptyPrefdef,
+          replStandaloneResources / name
+          )
+      }
+      catch
+        {      // expected_error_msg is expected error message for test file
+          case ex: Throwable => val expected_error_msg = """ammonite.ops.ShelloutException:
+                                                           |CommandResult 1##
+                                                           |Exception in thread "main" ammonite&&
+                                                           |.repl.CompilationError: ("}" | `case`)&&
+                                                           |:5:24 ...")\n  }\n\n  d"""".stripMargin.replaceAll("\n"," ")
+                                                           .replaceAll("## ","\n").replaceAll("&& ","")
+
+                                println("Error thrown by test file:\n" + ex.toString.substring(0,145) + "\n------------------\n\n")
+                                assert(ex.toString.substring(0,145) == expected_error_msg)
+        }
+    }
+
+
     'shell{
       // make sure you can load the example-predef.scala, have it pull stuff in
       // from ivy, and make use of `cd!` and `wd` inside the executed script.
