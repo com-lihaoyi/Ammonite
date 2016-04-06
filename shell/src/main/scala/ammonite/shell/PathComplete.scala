@@ -1,7 +1,8 @@
 package ammonite.shell
 
 import java.io.OutputStreamWriter
-
+import ammonite.terminal._
+import Filter._
 import ammonite.repl.Colors
 import ammonite.repl.frontend.{FrontEndUtils, Highlighter}
 import ammonite.terminal._
@@ -151,7 +152,7 @@ object PathComplete {
     }
   }
   def pathCompleteFilter(wd: => Path,
-                         colors: => Colors): Filter = Filter{
+                         colors: => Colors): Filter = partial{
     case TermInfo(TermState(9 ~: rest, b, c, _), width)
       if PathComplete.findPathLiteral(b.mkString, c).isDefined =>
 

@@ -7,6 +7,8 @@ package ammonite.shell
 import java.io.{InputStreamReader, BufferedReader}
 
 import ammonite.ops._
+import ammonite.repl.Colors
+import ammonite.terminal.Strings
 
 import scala.collection.{GenTraversableOnce, mutable}
 import scala.util.matching.Regex
@@ -180,5 +182,31 @@ object time {
     val end = System.nanoTime()
 
     (res, scala.concurrent.duration.Duration.fromNanos(end - start))
+  }
+}
+
+object browse{
+  // R -> show ansi-colors as colors, M -> show current-browse-% bar
+  val lessViewer = Seq("less", "-RM")
+  def apply[T: pprint.PPrint](t: T,
+
+                              viewer: Strings = lessViewer,
+                              width: Integer = null,
+                              height: Integer = null,
+                              indent: Integer = null,
+                              colors: pprint.Colors = null)
+                             (implicit c: pprint.Config, wd: Path) = {
+    %(
+      viewer.values,
+      tmp(
+        pprint.tokenize(
+          t,
+          width = width,
+          height = -1,
+          indent = indent,
+          colors = colors
+        )
+      )
+    )
   }
 }

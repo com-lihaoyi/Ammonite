@@ -22,11 +22,26 @@ object SpecialKeys {
    */
   def Alt = "\u001b"
 
+  val Backspace = 127.toChar.toString
+  val FnDelete = Alt + "[3~"
 
-  val Up = Alt+"[A"
-  val Down = Alt+"[B"
-  val Right = Alt+"[C"
-  val Left = Alt+"[D"
+  val Tab = 9.toChar.toString
+  val NewLine = Seq("\n", "\r", "\n\r", "\r\n")
+
+  val DefaultUp = Alt+"[A"
+  val DefaultDown = Alt+"[B"
+  val DefaultRight = Alt+"[C"
+  val DefaultLeft = Alt+"[D"
+
+  val WeirdUp = Alt+"OA"
+  val WeirdDown = Alt+"OB"
+  val WeirdRight = Alt+"OC"
+  val WeirdLeft = Alt+"OD"
+
+  val Up = Seq(DefaultUp, WeirdUp)
+  val Down = Seq(DefaultDown, WeirdDown)
+  val Right = Seq(DefaultRight, WeirdRight)
+  val Left = Seq(DefaultLeft, WeirdLeft)
 
   val Home = Alt+"OH"
   val End = Alt+"OF"

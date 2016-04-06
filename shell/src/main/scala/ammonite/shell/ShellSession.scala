@@ -35,9 +35,9 @@ object PPrints{
     PPrinter { (t: LsSeq, c: Config) =>
       val snippets = for(p <- t) yield {
         val parts =
-          Iterator(PathComplete.colorPath(p)) ++
+          Iterator(c.colors.literalColor) ++
           pprint.tokenize(p relativeTo t.base)(implicitly, c).mkString ++
-          Iterator(Console.RESET)
+          Iterator(c.colors.endColor)
         parts.mkString
       }
       Iterator("\n") ++ FrontEndUtils.tabulate(snippets,FrontEndUtils.width)

@@ -1,6 +1,7 @@
 package ammonite.terminal.filters
 
-import ammonite.terminal.FilterTools._
+
+import ammonite.terminal.Filter._
 import ammonite.terminal.SpecialKeys._
 import ammonite.terminal.{DelegateFilter, Filter, Terminal}
 import acyclic.file
@@ -38,23 +39,23 @@ object ReadlineFilters {
    * hotkeys rather than using arrows
    */
   lazy val navFilter = Filter.merge(
-    Case(Ctrl('b'))((b, c, m) => (b, c - 1)), // <- one char
-    Case(Ctrl('f'))((b, c, m) => (b, c + 1)), // -> one char
-    Case(Alt + "b")((b, c, m) => GUILikeFilters.wordLeft(b, c)), // <- one word
-    Case(Alt + "B")((b, c, m) => GUILikeFilters.wordLeft(b, c)), // <- one word
-    Case(LinuxCtrlLeft)((b, c, m) => GUILikeFilters.wordLeft(b, c)), // <- one word
-    Case(Alt + "f")((b, c, m) => GUILikeFilters.wordRight(b, c)), // -> one  word
-    Case(Alt + "F")((b, c, m) => GUILikeFilters.wordRight(b, c)), // -> one  word
-    Case(LinuxCtrlRight)((b, c, m) => GUILikeFilters.wordRight(b, c)), // -> one word
-    Case(Home)((b, c, m) => BasicFilters.moveStart(b, c, m.width)), // <- one line
-    Case(HomeScreen)((b, c, m) => BasicFilters.moveStart(b, c, m.width)), // <- one line
-    Case(Ctrl('a'))((b, c, m) => BasicFilters.moveStart(b, c, m.width)),
-    Case(End)((b, c, m) => BasicFilters.moveEnd(b, c, m.width)), // -> one line
-    Case(EndScreen)((b, c, m) => BasicFilters.moveEnd(b, c, m.width)), // -> one line
-    Case(Ctrl('e'))((b, c, m) => BasicFilters.moveEnd(b, c, m.width)),
-    Case(Alt + "t")((b, c, m) => transposeWord(b, c)),
-    Case(Alt + "T")((b, c, m) => transposeWord(b, c)),
-    Case(Ctrl('t'))((b, c, m) => transposeLetter(b, c))
+    simple(Ctrl('b'))((b, c, m) => (b, c - 1)), // <- one char
+    simple(Ctrl('f'))((b, c, m) => (b, c + 1)), // -> one char
+    simple(Alt + "b")((b, c, m) => GUILikeFilters.wordLeft(b, c)), // <- one word
+    simple(Alt + "B")((b, c, m) => GUILikeFilters.wordLeft(b, c)), // <- one word
+    simple(LinuxCtrlLeft)((b, c, m) => GUILikeFilters.wordLeft(b, c)), // <- one word
+    simple(Alt + "f")((b, c, m) => GUILikeFilters.wordRight(b, c)), // -> one  word
+    simple(Alt + "F")((b, c, m) => GUILikeFilters.wordRight(b, c)), // -> one  word
+    simple(LinuxCtrlRight)((b, c, m) => GUILikeFilters.wordRight(b, c)), // -> one word
+    simple(Home)((b, c, m) => BasicFilters.moveStart(b, c, m.width)), // <- one line
+    simple(HomeScreen)((b, c, m) => BasicFilters.moveStart(b, c, m.width)), // <- one line
+    simple(Ctrl('a'))((b, c, m) => BasicFilters.moveStart(b, c, m.width)),
+    simple(End)((b, c, m) => BasicFilters.moveEnd(b, c, m.width)), // -> one line
+    simple(EndScreen)((b, c, m) => BasicFilters.moveEnd(b, c, m.width)), // -> one line
+    simple(Ctrl('e'))((b, c, m) => BasicFilters.moveEnd(b, c, m.width)),
+    simple(Alt + "t")((b, c, m) => transposeWord(b, c)),
+    simple(Alt + "T")((b, c, m) => transposeWord(b, c)),
+    simple(Ctrl('t'))((b, c, m) => transposeLetter(b, c))
   )
 
   def transposeLetter(b: Vector[Char], c: Int) = {
@@ -141,11 +142,11 @@ object ReadlineFilters {
     }
 
     def filter = Filter.merge(
-      Case(Ctrl('u'))((b, c, m) => cutAllLeft(b, c)),
-      Case(Ctrl('k'))((b, c, m) => cutAllRight(b, c)),
-      Case(Alt + "d")((b, c, m) => cutWordRight(b, c)),
-      Case(Ctrl('w'))((b, c, m) => cutWordLeft(b, c)),
-      Case(Alt + "\u007f")((b, c, m) => cutWordLeft(b, c)),
+      simple(Ctrl('u'))((b, c, m) => cutAllLeft(b, c)),
+      simple(Ctrl('k'))((b, c, m) => cutAllRight(b, c)),
+      simple(Alt + "d")((b, c, m) => cutWordRight(b, c)),
+      simple(Ctrl('w'))((b, c, m) => cutWordLeft(b, c)),
+      simple(Alt + "\u007f")((b, c, m) => cutWordLeft(b, c)),
       // weird hacks to make it run code every time without having to be the one
       // handling the input; ideally we'd change Filter to be something
       // other than a PartialFunction, but for now this will do.
@@ -153,8 +154,8 @@ object ReadlineFilters {
       // If some command goes through that's not appending/prepending to the
       // kill ring, stop appending and allow the next kill to override it
       Filter.wrap{_ => accumulating = false; None},
-      Case(Ctrl('h'))((b, c, m) => cutCharLeft(b, c)),
-      Case(Ctrl('y'))((b, c, m) => paste(b, c))
+      simple(Ctrl('h'))((b, c, m) => cutCharLeft(b, c)),
+      simple(Ctrl('y'))((b, c, m) => paste(b, c))
     )
   }
 

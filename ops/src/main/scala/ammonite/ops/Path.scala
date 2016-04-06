@@ -249,10 +249,6 @@ object Path extends PathFactory[Path]{
   val root = Path(java.nio.file.Paths.get("").toAbsolutePath.getRoot)
   val home = Path(System.getProperty("user.home"))
 
-  def makeTmp = java.nio.file.Files.createTempDirectory(
-    java.nio.file.Paths.get(System.getProperty("java.io.tmpdir")), "ammonite"
-  )
-
   implicit val pathOrdering: Ordering[Path] =
     Ordering.by((rp: Path) => (rp.segments.length, rp.segments.toIterable))
 }

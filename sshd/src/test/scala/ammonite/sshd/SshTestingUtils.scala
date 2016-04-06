@@ -38,7 +38,7 @@ object SshTestingUtils {
 
 
   def withTmpDirectory[T](block: Path => T):T = {
-    lazy val tmpDir = Path(Path.makeTmp)
+    lazy val tmpDir = tmp.dir()
     try {
       block(tmpDir)
     } finally {

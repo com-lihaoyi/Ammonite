@@ -2,10 +2,11 @@ package ammonite.terminal.filters
 
 import ammonite.terminal.FilterTools._
 import ammonite.terminal.LazyList.~:
+import ammonite.terminal.SpecialKeys.Ctrl
 import ammonite.terminal._
 import acyclic.file
 import scala.collection.mutable
-
+import Filter._
 
 /**
   * A filter that implements "undo" functionality in the ammonite REPL. It
@@ -126,11 +127,9 @@ case class UndoFilter(maxUndo: Int = 25) extends DelegateFilter{
         pushUndos(b, c)
         None
     },
-    Filter{
-      case TS(31 ~: rest, b, c, _) => wrap(undo(b, c), rest)
-      case TS(27 ~: 114 ~: rest, b, c, _) => wrap(undo(b, c), rest)
-      case TS(27 ~: 45 ~: rest, b, c, _) => wrap(redo(b, c), rest)
-    }
+    action(Ctrl('-')){ case TS(rest, b, c, _) => wrap(undo(b, c), rest) },
+    action(SpecialKeys.Alt + 'r'){ case TS(rest, b, c, _) => wrap(undo(b, c), rest) },
+    action(SpecialKeys.Alt + '-'){ case TS(rest, b, c, _) => wrap(redo(b, c), rest) }
   )
 }
 

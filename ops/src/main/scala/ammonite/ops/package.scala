@@ -19,6 +19,40 @@ package object ops extends Extensions with RelPathStuff{
   val home = Path(System.getProperty("user.home"))
 
   /**
+    * Alias for `java.nio.file.Files.createTempFile` and
+    * `java.io.File.deleteOnExit`. Pass in `deleteOnExit = false` if you want
+    * the temp file to stick around.
+    */
+  object tmp{
+
+    def dir(dir: Path = null,
+            prefix: String = null,
+            deleteOnExit: Boolean = true): Path = {
+      val nioPath = dir match{
+        case null => java.nio.file.Files.createTempDirectory(prefix)
+        case _ => java.nio.file.Files.createTempDirectory(dir.toNIO, prefix)
+      }
+      if (deleteOnExit) nioPath.toFile.deleteOnExit()
+      Path(nioPath)
+    }
+    def apply(contents: Internals.Writable = null,
+              dir: Path = null,
+              prefix: String = null,
+              suffix: String = null,
+              deleteOnExit: Boolean = true): Path = {
+
+      val nioPath = dir match{
+        case null => java.nio.file.Files.createTempFile(prefix, suffix)
+        case _ => java.nio.file.Files.createTempFile(dir.toNIO, prefix, suffix)
+      }
+
+      if (contents != null) write.over(Path(nioPath), contents)
+      if (deleteOnExit) nioPath.toFile.deleteOnExit()
+      Path(nioPath)
+    }
+  }
+
+  /**
    * The current working directory for this process.
    */
   lazy val cwd = ops.Path(new java.io.File("").getCanonicalPath)
@@ -68,12 +102,12 @@ package object ops extends Extensions with RelPathStuff{
     * used to run interactive subprocesses like `%vim`, `%python`,
     * `%ssh "www.google.com"` or `%sbt`.
     */
-  val % = new Command(Vector.empty, Map.empty, Shellout.executeInteractive)
+  val % = Shellout.%
   /**
     * Spawns a subprocess non-interactively, waiting for it to complete and
     * collecting all output into a [[CommandResult]] which exposes it in a
     * convenient form. Call via `%%('whoami).out.trim` or
     * `%%('git, 'commit, "-am", "Hello!").exitCode`
     */
-  val %% = new Command(Vector.empty, Map.empty, Shellout.executeStream)
+  val %% = Shellout.%%
 }

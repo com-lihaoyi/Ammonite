@@ -1,24 +1,52 @@
 package ammonite.ops
 
+import scala.annotation.tailrec
 import scala.language.dynamics
 
 /**
   * Iternal utilities to support spawning subprocesses
   */
 object Shellout{
-
+  val % = new Command(Vector.empty, Map.empty, Shellout.executeInteractive)
+  val %% = new Command(Vector.empty, Map.empty, Shellout.executeStream)
   def executeInteractive(wd: Path, cmd: Command[_]) = {
     val builder = new java.lang.ProcessBuilder()
     import collection.JavaConversions._
     builder.environment().putAll(cmd.envArgs)
     builder.directory(new java.io.File(wd.toString))
-    builder
-      .command(cmd.cmd:_*)
-      .inheritIO()
-      .start()
-      .waitFor()
 
+    val proc =
+      builder
+        .command(cmd.cmd:_*)
+        .inheritIO()
+        .start()
+
+    // If someone `Ctrl C`s the Ammonite REPL while we are waiting on a
+    // subprocess, don't stop waiting!
+    //
+    // - For "well behaved" subprocess like `ls` or `yes`, they will terminate
+    //   on their own and return control to us when they receive a `Ctrl C`
+    //
+    // - For "capturing" processes like `vim` or `python` or `bash`, those
+    //   should *not* exit on Ctrl-C, and in fact we do not even receive an
+    //   interrupt because they do terminal magic
+    //
+    // - For weird processes like `less` or `git log`, without this
+    //   ignore-exceptions tail recursion it would stop waiting for the
+    //   subprocess but the *less* subprocess will still be around! This messes
+    //   up all our IO for as long as the subprocess lives. We can't force-quit
+    //   the subprocess because *it's* children may hand around and do the same
+    //   thing (e.g. in the case of `git log`, which leaves a `less` grandchild
+    //   hanging around). Thus we simply don't let `Ctrl C` interrupt these
+    //   fellas, and force you to use e.g. `q` to exit `less` gracefully.
+
+    @tailrec def run(): Unit =
+      try proc.waitFor()
+      catch {case e => run() }
+
+    run()
   }
+
   def executeStream(wd: Path, cmd: Command[_]) = {
     val builder = new java.lang.ProcessBuilder()
     import collection.JavaConversions._

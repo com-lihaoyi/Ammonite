@@ -398,6 +398,25 @@
       @p
         In general, Ammonite's @hl.scala{grep} serves the same purpose of @code{grep} in the Bash shell: a quick and dirty way to explore large amounts of semi-structured data. You probably don't want to build your enterprise business logic on top of @hl.scala{grep}'s string matching. While you're working, though, @hl.scala{grep} can be a quick way to find items of interest in collections of things (anything!) too large to sift through by hand, when you're not yet sure exactly what you want.
 
+    @sect{browse}
+
+      @img(src:="Browse.gif", display.block, marginLeft.auto, marginRight.auto, height := 278)
+
+      @p
+        @hl.scala{browse} is a utility that lets you open up far-too-large data structures in the @code{less} pager, letting you page through large quantities of text, navigating around it and searching through it, without needing to spam your terminal output with its contents and losing your earlier work to the output-spam. Simple call @hl.scala{browse} on whatever value you want, e.g. this 50 thousand line @hl.scala{ls.rec} result show above.
+
+      @p
+        If you're dealing with large blobs of data that you want to dig through manually, you might normally format it nicely, write it to a file, and open it in @code{vim} or @code{less} or an editor such as Sublime Text. @hl.scala{browse} makes that process quick and convenient.
+
+      @p
+        You can customize the @hl.scala{browse} call like you would a @hl.scala{show} call or @hl.scala{pprint.pprintln} call, e.g. setting an optional @hl.scala{width}, @hl.scala{colors} or @hl.scala{indent}. You can also choose a @hl.scala{viewer} program in case you don't want to use @code{less}: e.g. here's a command that would open it up in @code{vim}:
+
+      @hl.scala
+        haoyi-Ammonite@@ browse(res0, viewer="vim", colors = pprint.Colors.BlackWhite)
+
+      @p
+        Apart from using @hl.scala{viewer="vim"}, we also set the @hl.scala{colors} to black and white because Vim by default doesn't display ANSI colors nicely. You can also pass in a @hl.scala{Seq} of strings to @hl.scala{viewer} if you want to pass additional flags to your editor, and of course use any other editor you would like such as @hl.scala{"emacs"} or @hl.scala{"nano"} or @hl.scala{"subl"}
+
   @sect{Design Decisions & Tradeoffs}
     @p
       Ammonite-Shell takes a fundamentally different architecture from traditional shells, or even more-modern shell-alternatives. Significant differences include:
