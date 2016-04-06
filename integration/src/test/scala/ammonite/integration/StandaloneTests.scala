@@ -64,27 +64,23 @@ object StandaloneTests extends TestSuite{
     }
 
     'error_test{
+      //Make sure correct line numbers are printed when an erroneous script is executed
       val name = "Error_line_number_test.scala"
-      try {
-        val res = %%bash(
+      val e = intercept[ShelloutException]{
+        %%bash(
           executable,
           "--predef-file",
           emptyPrefdef,
           replStandaloneResources / name
           )
       }
-      catch
-        {      // expected_error_msg is expected error message for test file
-          case ex: Throwable => val expected_error_msg = """ammonite.ops.ShelloutException:
-                                                           |CommandResult 1##
-                                                           |Exception in thread "main" ammonite&&
-                                                           |.repl.CompilationError: ("}" | `case`)&&
-                                                           |:5:24 ...")\n  }\n\n  d"""".stripMargin.replaceAll("\n"," ")
-                                                           .replaceAll("## ","\n").replaceAll("&& ","")
+      val expected_error_msg =
+        """ammonite.repl.CompilationError: ("}" | `case`):5:24 ...")\n  }\n\n  d"
+          |    printlnqs(unsorted))
+          |                       ^""".stripMargin
 
-                                println("Error thrown by test file:\n" + ex.toString.substring(0,145) + "\n------------------\n\n")
-                                assert(ex.toString.substring(0,145) == expected_error_msg)
-        }
+      assert(e.toString.contains(expected_error_msg))
+
     }
 
 

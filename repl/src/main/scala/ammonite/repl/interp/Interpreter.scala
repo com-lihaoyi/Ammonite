@@ -192,7 +192,10 @@ class Interpreter(prompt0: Ref[String],
     val actual_code = code.slice(code.indexOf('@') + 2, code.length)
 
     Parsers.splitScript(actual_code) match {
-      case f: Parsed.Failure => throw new CompilationError(f.msg)
+      case f: Parsed.Failure =>
+        val marked_message = ParseError(f).toString.split("\n")
+        val message = f.msg + "\n"+marked_message(marked_message.size-2)+"\n"+marked_message(marked_message.size-1)
+        throw new CompilationError(message)
       case s: Parsed.Success[Unit] => processCorrectScript(code,evaluate)
     }
   }
