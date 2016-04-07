@@ -42,6 +42,15 @@
       Although it's best to read the documentation on this page to learn how to use these projects, the Scaladoc is still useful as a reference.
   
   @sect{Changelog}
+    @sect{0.5.8}
+      @ul
+        @li
+          @hl.scala{write} has been generalized to work on any combination of @hl.scala{Array}, @hl.scala{Traversable} and @hl.scala{Iterator}. e.g. @hl.scala{write(foo: Iterator[Iterator[Array[String]]])}
+        @li
+          @hl.scala{write} no longer inserts newlines between items by default.
+        @li
+          Introduced the @sect.ref{browse} helper to @sect.ref{Ammonite-Shell}, letting you easily open up large data structures in external editors like Vim or Emacs to browse them without spamming the console
+
     @sect{0.5.7}
       @ul
         @li

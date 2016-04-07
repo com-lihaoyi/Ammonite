@@ -78,7 +78,7 @@
       @li
         @hl.scala{home}: The home directory of the current user.
       @li
-        @hl.scala{makeTmp}: Creates a temporary folder and returns the path.
+        @hl.scala{tmp()}/@hl.scala{tmp.dir()}: Creates a temporary file/folder and returns the path.
 
     @sect{RelPaths}
       @p

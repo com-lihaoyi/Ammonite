@@ -175,3 +175,12 @@ object LazyList{
     }
   }
 }
+/**
+  * Implicitly instantiated class letting you pass in a single string or a
+  * sequence of strings anywhere a set of prefixes is required
+  */
+case class Strings(values: Seq[String])
+object Strings{
+  implicit def stringPrefix(s: String) = Strings(Seq(s))
+  implicit def stringSeqPrefix(s: Seq[String]) = Strings(s)
+}

@@ -2,9 +2,10 @@ package ammonite.terminal.filters
 
 import ammonite.terminal.FilterTools._
 import ammonite.terminal.LazyList._
+import ammonite.terminal.SpecialKeys.Ctrl
 import ammonite.terminal._
 import acyclic.file
-
+import Filter._
 /**
   * Provides history navigation up and down, saving the current line, a well
   * as history-search functionality (`Ctrl R` in bash) letting you quickly find
@@ -154,97 +155,102 @@ class HistoryFilter(history: () => IndexedSeq[String],
     }
   }
 
-  def prelude: Filter = Filter{
+  def prelude: Filter = partial{
     case TS(inputs, b, c, _) if activeHistory && prevBuffer.exists(_ != b) =>
       endHistory()
       prevBuffer = None
       TS(inputs, b, c)
   }
 
-  def filter0: Filter = Filter{
+
+  def filter0: Filter = Filter.merge(
     // Ways to kick off the history/search if you're not already in it
-
-    // `Ctrl-R`
-    case TS(18 ~: rest, b, c, _) => wrap(rest, ctrlR(b, c))
-
-    // `Up` from the first line in the input
-    case TermInfo(TS(p"\u001b[A$rest", b, c, _), w) if firstRow(c, b, w) && !activeHistory =>
-      wrap(rest, startHistory(b, c))
-
-    // `Ctrl P`
-    case TermInfo(TS(p"\u0010$rest", b, c, _), w) if firstRow(c, b, w) && !activeHistory =>
-      wrap(rest, startHistory(b, c))
-
+    action(Ctrl('r'))(
+      ts => wrap(ts.inputs, ctrlR(ts.buffer, ts.cursor))
+    ),
+    action(SpecialKeys.Up, ti => firstRowInfo(ti) && !activeHistory)(
+      ts => wrap(ts.inputs, startHistory(ts.buffer, ts.cursor))
+    ),
+    action(Ctrl('p'), ti => firstRowInfo(ti) && !activeHistory)(
+      ts => wrap(ts.inputs, startHistory(ts.buffer, ts.cursor))
+    ),
     // `Page-Up` from first character starts history
-    case TermInfo(TS(p"\u001b[5~$rest", b, c, _), w) if c == 0 && !activeHistory =>
-      wrap(rest, startHistory(b, c))
-
+    action(SpecialKeys.FnUp, ti => ti.ts.cursor == 0 && !activeHistory)(
+      ts => wrap(ts.inputs, startHistory(ts.buffer, ts.cursor))
+    ),
     // Things you can do when you're already in the history search
 
     // Navigating up and down the history. Each up or down searches for
     // the next thing that matches your current searchTerm
-    // Up
-    case TermInfo(TS(p"\u001b[A$rest", b, c, _), w) if searchOrHistoryAnd(firstRow(c, b, w)) =>
-      wrap(rest, up(b, c))
-
-    // Ctrl P
-    case TermInfo(TS(p"\u0010$rest", b, c, _), w) if searchOrHistoryAnd(firstRow(c, b, w)) =>
-      wrap(rest, up(b, c))
-
-    // `Page-Up` from first character cycles history up
-    case TermInfo(TS(p"\u001b[5~$rest", b, c, _), w) if searchOrHistoryAnd(c == 0) =>
-      wrap(rest, up(b, c))
-
-    // Down
-    case TermInfo(TS(p"\u001b[B$rest", b, c, _), w) if searchOrHistoryAnd(lastRow(c, b, w))  =>
-      wrap(rest, down(b, c))
-
-    // `Ctrl N`
-
-    case TermInfo(TS(p"\u000e$rest", b, c, _), w) if searchOrHistoryAnd(lastRow(c, b, w))  =>
-      wrap(rest, down(b, c))
-    // `Page-Down` from last character cycles history down
-    case TermInfo(TS(p"\u001b[6~$rest", b, c, _), w) if searchOrHistoryAnd(c == b.length - 1) =>
-      wrap(rest, down(b, c))
-
-
+    action(
+      SpecialKeys.Up,
+      ti => searchOrHistoryAnd(firstRowInfo(ti)))(
+      ts => wrap(ts.inputs, up(ts.buffer, ts.cursor))
+    ),
+    action(
+      Ctrl('p'),
+      ti => searchOrHistoryAnd(firstRowInfo(ti)))(
+      ts => wrap(ts.inputs, up(ts.buffer, ts.cursor))
+    ),
+    action(
+      SpecialKeys.FnUp, // Page Up from first character cycles history up
+      ti => searchOrHistoryAnd(ti.ts.cursor == 0))(
+      ts => wrap(ts.inputs, up(ts.buffer, ts.cursor))
+    ),
+    action(
+      SpecialKeys.Down,
+      ti => searchOrHistoryAnd(lastRow(ti.ts.cursor, ti.ts.buffer, ti.width)))(
+      ts => wrap(ts.inputs, down(ts.buffer, ts.cursor))
+    ),
+    action(
+      Ctrl('n'),
+      ti => searchOrHistoryAnd(lastRow(ti.ts.cursor, ti.ts.buffer, ti.width)))(
+      ts => wrap(ts.inputs, down(ts.buffer, ts.cursor))
+    ),
+    action(  // `Page-Down` from last character cycles history down
+      SpecialKeys.FnDown,
+      ti => searchOrHistoryAnd(ti.ts.cursor == ti.ts.buffer.length))(
+      ts => wrap(ts.inputs, down(ts.buffer, ts.cursor))
+    ),
     // Intercept Backspace and delete a character in search-mode, preserving it, but
     // letting it fall through and dropping you out of history-mode if you try to make
     // edits
-    case TS(127 ~: rest, buffer, cursor, _) if activeSearch =>
-      wrap(rest, backspace(buffer, cursor))
+    action(SpecialKeys.Backspace, ti => activeSearch)(
+      ts => wrap(ts.inputs, down(ts.buffer, ts.cursor))
+    ),
+    partial{
+      // Any other control characters drop you out of search mode, but only the
+      // set of `dropHistoryChars` drops you out of history mode
+      case TS(char ~: inputs, buffer, cursor, _)
+        if char.toChar.isControl && searchOrHistoryAnd(dropHistoryChars(char)) =>
+        val newBuffer =
+        // If we're back to -1, it means we've wrapped around and are
+        // displaying the original search term with a wrap-around message
+        // in the terminal. Drop the message and just preserve the search term
+          if (historyIndex == -1) searchTerm.get
+          // If we're searching for an empty string, special-case this and return
+          // an empty buffer rather than the first history item (which would be
+          // the default) because that wouldn't make much sense
+          else if (searchTerm.exists(_.isEmpty)) Vector()
+          // Otherwise, pick whatever history entry we're at and use that
+          else history()(historyIndex).toVector
+        endHistory()
 
-    // Any other control characters drop you out of search mode, but only the
-    // set of `dropHistoryChars` drops you out of history mode
-    case TS(char ~: inputs, buffer, cursor, _)
-      if char.toChar.isControl && searchOrHistoryAnd(dropHistoryChars(char)) =>
-      val newBuffer =
-      // If we're back to -1, it means we've wrapped around and are
-      // displaying the original search term with a wrap-around message
-      // in the terminal. Drop the message and just preserve the search term
-        if (historyIndex == -1) searchTerm.get
-        // If we're searching for an empty string, special-case this and return
-        // an empty buffer rather than the first history item (which would be
-        // the default) because that wouldn't make much sense
-        else if (searchTerm.exists(_.isEmpty)) Vector()
-        // Otherwise, pick whatever history entry we're at and use that
-        else history()(historyIndex).toVector
-      endHistory()
+        TS(char ~: inputs, newBuffer, cursor)
 
-      TS(char ~: inputs, newBuffer, cursor)
+      // Intercept every other printable character when search is on and
+      // enter it into the current search
+      case TS(char ~: rest, buffer, cursor, _) if activeSearch =>
+        wrap(rest, printableChar(char.toChar)(buffer, cursor))
 
-    // Intercept every other printable character when search is on and
-    // enter it into the current search
-    case TS(char ~: rest, buffer, cursor, _) if activeSearch =>
-      wrap(rest, printableChar(char.toChar)(buffer, cursor))
-
-    // If you're not in search but are in history, entering any printable
-    // characters kicks you out of it and preserves the current buffer. This
-    // makes it harder for you to accidentally lose work due to history-moves
-    case TS(char ~: rest, buffer, cursor, _) if activeHistory && !char.toChar.isControl =>
-      historyIndex = -1
-      TS(char ~: rest, buffer, cursor)
-  }
+      // If you're not in search but are in history, entering any printable
+      // characters kicks you out of it and preserves the current buffer. This
+      // makes it harder for you to accidentally lose work due to history-moves
+      case TS(char ~: rest, buffer, cursor, _) if activeHistory && !char.toChar.isControl =>
+        historyIndex = -1
+        TS(char ~: rest, buffer, cursor)
+    }
+  )
 }
 
 object HistoryFilter{

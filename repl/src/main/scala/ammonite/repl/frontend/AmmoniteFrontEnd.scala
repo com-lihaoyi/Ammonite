@@ -9,7 +9,7 @@ import ammonite.terminal.LazyList.~:
 import ammonite.terminal._
 import fastparse.core.Parsed
 import scala.annotation.tailrec
-
+import Filter._
 case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEnd{
 
   def width = FrontEndUtils.width
@@ -52,8 +52,8 @@ case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEn
     Timer("AmmoniteFrontEnd.readLine start")
     val writer = new OutputStreamWriter(output)
 
-    val autocompleteFilter: Filter = Filter{
-      case TermInfo(TermState(9 ~: rest, b, c, _), width) =>
+    val autocompleteFilter: Filter = Filter.action(SpecialKeys.Tab){
+      case TermState(rest, b, c, _) =>
         val (newCursor, completions, details) = compilerComplete(c, b.mkString)
         val details2 = for (d <- details) yield {
           Highlighter.defaultHighlight(
@@ -85,10 +85,12 @@ case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEn
 
     }
 
-    val multilineFilter: Filter = Filter{
-      case TermState(lb ~: rest, b, c, _)
-        if (lb == 10 || lb == 13)
-        && ammonite.repl.Parsers.split(b.mkString).isEmpty => // Enter
+    // Enter
+    val multilineFilter = Filter.action(
+      SpecialKeys.NewLine,
+      ti => ammonite.repl.Parsers.split(ti.ts.buffer.mkString).isEmpty
+    ){
+      case TermState(lb ~: rest, b, c, _) =>
 
         BasicFilters.injectNewLine(b, c, rest)
     }

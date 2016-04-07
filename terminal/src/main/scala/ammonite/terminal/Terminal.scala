@@ -16,8 +16,6 @@ import scala.collection.mutable
  */
 object Terminal {
 
-  val ansiRegex = "\u001B\\[[;\\d]*m".r
-
   /**
    * Computes how tall a line of text is when wrapped at `width`.
    *

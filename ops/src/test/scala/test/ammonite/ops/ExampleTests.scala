@@ -21,7 +21,7 @@ object ExampleTests extends TestSuite{
       // Reading and writing to files is done through the read! and write!
       // You can write `Strings`, `Traversable[String]`s or `Array[Byte]`s
       write(wd/"file1.txt", "I am cow")
-      write(wd/"file2.txt", Seq("I am cow", "hear me moo"))
+      write(wd/"file2.txt", Seq("I am cow\n", "hear me moo"))
       write(wd/'file3, "I weigh twice as much as you".getBytes)
 
       // When reading, you can either `read!` a `String`, `read.lines!` to
@@ -143,8 +143,8 @@ object ExampleTests extends TestSuite{
 
       // Write to a file without pain! Necessary
       // enclosing directories are created automatically
-      write(wd/'dir2/"file1.scala", "package example\nclass Foo{}")
-      write(wd/'dir2/"file2.scala", "package example\nclass Bar{}")
+      write(wd/'dir2/"file1.scala", "package example\nclass Foo{}\n")
+      write(wd/'dir2/"file2.scala", "package example\nclass Bar{}\n")
 
       // Rename all .scala files inside the folder d into .java files
       ls! wd/'dir2 | mv{case r"$x.scala" => s"$x.java"}
@@ -164,7 +164,7 @@ object ExampleTests extends TestSuite{
         lineCount == 4,
         renamed == Seq(wd/'dir2/"file1.java", wd/'dir2/"file2.java"),
         read(wd/'target/"bundled.java") ==
-        "package example\nclass Foo{}\npackage example\nclass Bar{}"
+        "package example\nclass Foo{}\npackage example\nclass Bar{}\n"
       )
 
 

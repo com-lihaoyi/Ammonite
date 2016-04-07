@@ -6,9 +6,10 @@
  */
 package ammonite.ops
 
-import java.io.{File, InputStream}
+import java.io.{OutputStream, File, InputStream}
 import java.nio.charset.Charset
 import java.nio.file._
+import java.util.Objects
 
 import acyclic.file
 
@@ -20,28 +21,39 @@ object Internals{
     def check: Boolean
     def apply(t: PartialFunction[String, String])(from: Path) = {
       if (check || t.isDefinedAt(from.last)){
-        val dest = from/up/t(from.last)
+        val dest = from/RelPath.up/t(from.last)
         new File(from.toString).renameTo(new File(dest.toString))
       }
     }
     def *(t: PartialFunction[Path, Path])(from: Path) = {
       if (check || t.isDefinedAt(from)) {
         val dest = t(from)
-        mkdir! dest/up
+        mkdir(dest/RelPath.up)
         new File(from.toString).renameTo(new File(t(from).toString))
       }
     }
   }
 
 
-  class Writable(val writeableData: Array[Byte])
+  class Writable(val writeableData: Iterator[Array[Byte]])
 
   object Writable{
-    implicit def WritableString(s: String) = new Writable(s.getBytes("UTF-8"))
-    implicit def WritableArray(a: Array[Byte]) = new Writable(a)
-    implicit def WritableArray2(a: Array[Array[Byte]]) = new Writable(a.flatten)
-    implicit def WritableTraversable(a: Traversable[String]) = {
-      new Writable(a.mkString("\n").getBytes("UTF-8"))
+    implicit def WritableString(s: String) = new Writable(
+      Iterator(s.getBytes("UTF-8"))
+    )
+    implicit def WritableBytes(a: Array[Byte]) = new Writable(Iterator(a))
+    implicit def WritableArray[T](a: Array[T])(implicit f: T => Writable) = {
+      new Writable(
+        a.iterator.map(f(_).writeableData).flatten
+      )
+    }
+    implicit def WritableTraversable[T](a: Traversable[T])(implicit f: T => Writable) = {
+      new Writable(
+        a.toIterator.map(f(_).writeableData).flatten
+      )
+    }
+    implicit def WritableIterator[T](a: Iterator[T])(implicit f: T => Writable) = {
+      new Writable(a.map(f(_).writeableData).flatten)
     }
   }
 }
@@ -133,7 +145,7 @@ object cp extends Function2[Path, Path, Unit] with CopyMove{
     }
 
     copyOne(from)
-    if (stat(from).isDir) FilterMapExt(ls.rec! from) | copyOne
+    if (stat(from).isDir) Extensions.FilterMapExt(ls.rec! from) | copyOne
   }
 
 }
@@ -151,7 +163,7 @@ object rm extends Function1[Path, Unit]{
     )
     // Emulate `rm -rf` functionality by ignoring non-existent files
     val files =
-      try ls.rec! target
+      try ls.rec(target)
       catch {
         case e: NoSuchFileException => Nil
         case e: NotDirectoryException => Nil
@@ -227,7 +239,7 @@ object ls extends StreamableOp1[Path, Path, LsSeq] with ImplicitOp[LsSeq]{
 
     def materialize(src: Path, i: Iterator[Path]) = ls.this.materialize(src, i)
     def recursiveListFiles(p: Path): Iterator[Path] = {
-      def these = ls.iter! p
+      def these = ls.iter(p)
       for{
         thing <- these
         if !skip(thing)
@@ -256,9 +268,32 @@ object ls extends StreamableOp1[Path, Path, LsSeq] with ImplicitOp[LsSeq]{
  * there.
  */
 object write extends Function2[Path, Internals.Writable, Unit]{
+  /**
+    * Performs the actual opening and writing to a file. Basically cribbed
+    * from `java.nio.file.Files.write` so we could re-use it properly for
+    * different combinations of flags and all sorts of [[Internals.Writable]]s
+    */
+  def write(target: Path, data: Internals.Writable, flags: StandardOpenOption*) = {
+
+    val out = Files.newOutputStream(target.toNIO, flags:_*)
+    try {
+      for(bytes <- data.writeableData){
+        val len: Int = bytes.length
+        var rem: Int = len
+        while (rem > 0) {
+          val n: Int = Math.min(rem, 8192)
+          out.write(bytes, len - rem, n)
+          rem -= n
+        }
+      }
+    } finally {
+      if (out != null) out.close()
+    }
+
+  }
   def apply(target: Path, data: Internals.Writable) = {
     mkdir(target/RelPath.up)
-    Files.write(target.toNIO, data.writeableData, StandardOpenOption.CREATE_NEW)
+    write(target, data, StandardOpenOption.CREATE_NEW)
   }
 
   /**
@@ -268,12 +303,7 @@ object write extends Function2[Path, Internals.Writable, Unit]{
   object append extends Function2[Path, Internals.Writable, Unit]{
     def apply(target: Path, data: Internals.Writable) = {
       mkdir(target/RelPath.up)
-      Files.write(
-        target.toNIO,
-        data.writeableData,
-        StandardOpenOption.CREATE,
-        StandardOpenOption.APPEND
-      )
+      write(target, data, StandardOpenOption.CREATE, StandardOpenOption.APPEND)
     }
   }
   /**
@@ -283,7 +313,7 @@ object write extends Function2[Path, Internals.Writable, Unit]{
   object over extends Function2[Path, Internals.Writable, Unit]{
     def apply(target: Path, data: Internals.Writable) = {
       mkdir(target/RelPath.up)
-      Files.write(target.toNIO, data.writeableData)
+      write(target, data, StandardOpenOption.CREATE)
     }
   }
 }
@@ -348,7 +378,7 @@ object exists extends Function1[Path, Boolean]{
 case class kill(signal: Int) extends Function1[Int, CommandResult]{
   def apply(pid: Int): CommandResult = {
 
-    %%('kill, "-" + signal, pid.toString)(wd = Path(new java.io.File("")))
+    Shellout.%%('kill, "-" + signal, pid.toString)(wd = Path(new java.io.File("")))
   }
 }
 
