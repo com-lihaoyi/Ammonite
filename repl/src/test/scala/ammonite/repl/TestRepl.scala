@@ -76,10 +76,14 @@ class TestRepl {
 
       if (expected.startsWith("error: ")) {
         val strippedExpected = expected.stripPrefix("error: ")
+        if(sess.contains("val r = res"))
+          println("ERROR: \n"+error+"\n88888888888\n"+strippedExpected+"??????+"+error.contains(strippedExpected).toString+"?????\n\n")
         assert(error.contains(strippedExpected))
 
       }else if (expected.startsWith("warning: ")){
         val strippedExpected = expected.stripPrefix("warning: ")
+        if(sess.contains("val r = res"))
+          println("WARNING: \n"+warning+"\n88888888888\n"+strippedExpected+"???"+warning.contains(strippedExpected).toString+"????????\n\n")
         assert(warning.contains(strippedExpected))
 
       }else if (expected == "") {
