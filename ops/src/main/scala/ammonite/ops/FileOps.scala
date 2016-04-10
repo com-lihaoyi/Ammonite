@@ -375,10 +375,9 @@ object exists extends Function1[Path, Boolean]{
  * Kills the given process with the given signal, e.g.
  * `kill(9)! pid`
  */
-case class kill(signal: Int) extends Function1[Int, CommandResult]{
+case class kill(signal: Int)(implicit wd: Path) extends Function1[Int, CommandResult]{
   def apply(pid: Int): CommandResult = {
-
-    Shellout.%%('kill, "-" + signal, pid.toString)(wd = Path(new java.io.File("")))
+    Shellout.%%('kill, "-" + signal, pid.toString)
   }
 }
 
