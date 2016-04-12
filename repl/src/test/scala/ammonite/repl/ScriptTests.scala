@@ -82,7 +82,7 @@ object ScriptTests extends TestSuite{
             @ import ammonite.ops._
 
             @ load.exec($printedScriptPath/"SyntaxError.scala")
-            error: ParseError
+            error: CompilationError
 
             @ val r = res
             error: not found: value res
@@ -223,7 +223,7 @@ object ScriptTests extends TestSuite{
             @ import ammonite.ops._
 
             @ load.exec($printedScriptPath/"SyntaxError.scala")
-            error: ParseError
+            error: CompilationError
 
             @ val r = res
             error: not found: value res
