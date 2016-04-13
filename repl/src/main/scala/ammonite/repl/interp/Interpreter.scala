@@ -124,8 +124,10 @@ class Interpreter(prompt0: Ref[String],
   //this variable keeps track of where should we put the imports resulting from scripts.
   private var scriptImportCallback: Seq[ImportData] => Unit = eval.update
 
+  type EvaluateCallback = (String, Seq[ImportData]) => Res[Evaluated]
+
   def processCorrectScript(code: String,
-                           evaluate: (String, Seq[ImportData]) => Res[Evaluated]): Seq[ImportData] = {
+                           evaluate: EvaluateCallback): Seq[ImportData] = {
     val blocks0 = Parsers.splitScript(code)
     Timer("processScript 0a")
     Parsers.splitScript(code)
@@ -194,7 +196,8 @@ class Interpreter(prompt0: Ref[String],
     Parsers.splitScript(actual_code) match {
       case f: Parsed.Failure =>
         val marked_message = ParseError(f).toString.split("\n")
-        val message = f.msg + "\n"+marked_message(marked_message.size-2)+"\n"+marked_message(marked_message.size-1)
+        val message = f.msg + "\n" + marked_message(marked_message.size-2) +
+          "\n" + marked_message(marked_message.size-1)
         throw new CompilationError(message)
       case s: Parsed.Success[Unit] => processCorrectScript(code,evaluate)
     }
