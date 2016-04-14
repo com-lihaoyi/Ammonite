@@ -172,7 +172,7 @@ object TPrintLowPri{
       case TypeRef(pre, sym, List(left, right))
         if lookup(sym) && sym.name.encodedName.toString != sym.name.decodedName.toString =>
 
-        q"""${implicitRec(left)} + " " + ${printSym(sym)} + " " +${implicitRec(right)}"""
+        q"""${printSym(sym)} + "[" + ${implicitRec(left)} + ", " + ${implicitRec(right)} + "]" """
 
       case TypeRef(NoPrefix, sym, args) => q"${printSym(sym)} + ${printArgs(args)}"
       case TypeRef(pre, sym, args)      => q"${prefixFor(pre, sym)} + ${printArgs(args)}"
