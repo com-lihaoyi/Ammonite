@@ -84,13 +84,13 @@ object TPrintTests extends TestSuite{
          check[Either[Int, String]]("Either[Int, String]")
 
          import X.++
-         check[Int ++ String]("Int ++ String")
-         check[++[Int, String]]("Int ++ String")
+         check[Int ++ String]("++[Int, String]")
+         check[++[Int, String]]("++[Int, String]")
 
          import shapeless._
 
          check[Int :: String :: (Char, Seq[Float]) :: HNil](
-              "Int :: String :: (Char, Seq[Float]) :: HNil"
+              "::[Int, ::[String, ::[(Char, Seq[Float]), HNil]]]"
          )
 
        }
