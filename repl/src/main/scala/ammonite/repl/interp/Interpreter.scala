@@ -126,6 +126,17 @@ class Interpreter(prompt0: Ref[String],
 
   type EvaluateCallback = (String, Seq[ImportData]) => Res[Evaluated]
 
+  def errMsg(msg: String, code: String, expected: String, idx: Int): String = {
+    val locationString = {
+      val (first, last) = code.splitAt(idx)
+      val lastSnippet = last.split('\n').headOption.getOrElse("")
+      val firstSnippet = first.reverse.split('\n').lift(0).getOrElse("").reverse
+      firstSnippet + lastSnippet + "\n" + (" " * firstSnippet.length) + "^"
+    }
+
+    s"Syntax Error: $msg\n$locationString"
+  }
+
   def processCorrectScript(code: String,
                            evaluate: EvaluateCallback): Seq[ImportData] = {
     val blocks0 = Parsers.splitScript(code)
@@ -195,10 +206,7 @@ class Interpreter(prompt0: Ref[String],
 
     Parsers.splitScript(actualCode) match {
       case f: Parsed.Failure =>
-        val markedMessage = ParseError(f).toString.split("\n")
-        val message = f.msg + "\n" + markedMessage(markedMessage.size-2) +
-          "\n" + markedMessage(markedMessage.size-1)
-        throw new CompilationError(message)
+        throw new CompilationError(errMsg(f.msg, actualCode, f.extra.traced.expected, f.index))
       case s: Parsed.Success[Unit] => processCorrectScript(code,evaluate)
     }
   }
