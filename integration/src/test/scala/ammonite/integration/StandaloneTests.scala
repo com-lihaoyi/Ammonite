@@ -65,7 +65,7 @@ object StandaloneTests extends TestSuite{
 
     'error_test{
       //Make sure correct line numbers are printed when an erroneous script is executed
-      val name = "Error_line_number_test.scala"
+      val name = "ErrorLineNumberTest.scala"
       val e = intercept[ShelloutException]{
         %%bash(
           executable,
@@ -74,12 +74,12 @@ object StandaloneTests extends TestSuite{
           replStandaloneResources / name
           )
       }
-      val expected_error_msg =
+      val expectedErrorMsg =
         """ammonite.repl.CompilationError: ("}" | `case`):5:24 ...")\n  }\n\n  d"
           |    printlnqs(unsorted))
           |                       ^""".stripMargin
 
-      assert(e.toString.contains(expected_error_msg))
+      assert(e.toString.contains(expectedErrorMsg))
 
     }
 
