@@ -63,7 +63,7 @@ object StandaloneTests extends TestSuite{
       println("\n-------------------------")
     }
 
-    'error_test{
+    'errorTest{
       //Make sure correct line numbers are printed when an erroneous script is executed
       val name = "ErrorLineNumberTest.scala"
       val e = intercept[ShelloutException]{
@@ -75,12 +75,53 @@ object StandaloneTests extends TestSuite{
           )
       }
       val expectedErrorMsg =
-        """ammonite.repl.CompilationError: ("}" | `case`):5:24 ...")\n  }\n\n  d"
+        """ammonite.repl.CompilationError: Syntax Error: ("}" | `case`):5:24 ...")\n  }\n\n  d"
           |    printlnqs(unsorted))
           |                       ^""".stripMargin
 
       assert(e.toString.contains(expectedErrorMsg))
 
+    }
+
+    'multipleCompilationUnitErrorTest1{
+      //Make sure correct line numbers are printed when an erroneous script is executed
+      val file = "MultipleCompilationUnitErrorMsgTest1.scala"
+
+      val e = intercept[ShelloutException]{
+        %%bash(
+          executable,
+          "--predef-file",
+          emptyPrefdef,
+          replStandaloneResources / file
+          )
+      }
+      val expectedErrorMsg =
+        """ammonite.repl.CompilationError: Syntax Error: End:5:1 ..."}"
+          |}
+          |^""".stripMargin
+
+      assert(e.toString.contains(expectedErrorMsg))
+
+    }
+
+    'multipleCompilationUnitErrorTest2{
+      //Make sure correct line numbers are printed when an erroneous script is executed
+      val file = "MultipleCompilationUnitErrorMsgTest2.scala"
+
+      val e = intercept[ShelloutException]{
+        %%bash(
+          executable,
+          "--predef-file",
+          emptyPrefdef,
+          replStandaloneResources / file
+          )
+      }
+      val expectedErrorMsg =
+        """ammonite.repl.CompilationError: Syntax Error: End:3:1 ..."}\n@\n1 + 1"
+          |}
+          |^""".stripMargin
+
+      assert(e.toString.contains(expectedErrorMsg))
     }
 
 
