@@ -137,17 +137,15 @@ class Interpreter(prompt0: Ref[String],
     s"Syntax Error: $msg\n$locationString"
   }
 
-  def processCorrectScript(code: String,
+  def processCorrectScript(parsedCode: Parsed.Success[Seq[Seq[String]]],
                            evaluate: EvaluateCallback): Seq[ImportData] = {
-    val blocks0 = Parsers.splitScript(code)
-    Timer("processScript 0a")
-    Parsers.splitScript(code)
-    Timer("processScript 0b")
-    val blocks = blocks0.get.value.map(preprocess(_, ""))
 
-    Timer("processScript 1")
+    val blocks0 = Parsers.splitScript(hardcodedPredef).get.value ++ parsedCode.get.value
+    val blocks = blocks0.map(preprocess(_, ""))
+
+    Timer("processCorrectScript 1")
     val errors = blocks.collect { case Res.Failure(ex, err) => err }
-    Timer("processScript 2")
+    Timer("processCorrectScript 2")
     // we store the old value, because we will reassign this in the loop
     val outerScriptImportCallback = scriptImportCallback
 
@@ -204,10 +202,14 @@ class Interpreter(prompt0: Ref[String],
     Timer("processScript 0")
     val actualCode = code.slice(code.indexOf('@') + 2, code.length)
 
+    Timer("processScript 0a")
     Parsers.splitScript(actualCode) match {
       case f: Parsed.Failure =>
+        Timer("processScriptFailed 0b")
         throw new CompilationError(errMsg(f.msg, actualCode, f.extra.traced.expected, f.index))
-      case s: Parsed.Success[Unit] => processCorrectScript(code,evaluate)
+      case s: Parsed.Success[Seq[Seq[String]]] =>
+        Timer("processCorrectScript 0b")
+        processCorrectScript(s,evaluate)
     }
   }
 
