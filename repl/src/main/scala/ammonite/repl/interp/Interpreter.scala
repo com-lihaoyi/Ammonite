@@ -103,12 +103,12 @@ class Interpreter(prompt0: Ref[String],
   }
 
   def processModule(code: String) = processScript(
-    code,
+    skipSheBangLine(code),
     (code, imports) => withContextClassloader(eval.processScriptBlock(code, imports, printer))
   )
 
   def processExec(code: String) =
-    processScript(code, { (c, i) => evaluateLine(c, Nil, printer, i)})
+    processScript(skipSheBangLine(code), { (c, i) => evaluateLine(c, Nil, printer, i)})
 
 
   private def skipSheBangLine(code: String)= {
