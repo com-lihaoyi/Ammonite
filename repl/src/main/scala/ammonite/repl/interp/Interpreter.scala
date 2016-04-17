@@ -103,15 +103,13 @@ class Interpreter(prompt0: Ref[String],
   }
 
   def processModule(code: String) = processScript(
-    prepareScript(code),
+    code,
     (code, imports) => withContextClassloader(eval.processScriptBlock(code, imports, printer))
   )
 
   def processExec(code: String) =
-    processScript(prepareScript(code), { (c, i) => evaluateLine(c, Nil, printer, i)})
+    processScript(code, { (c, i) => evaluateLine(c, Nil, printer, i)})
 
-  private def prepareScript(code: String) =
-    hardcodedPredef + "\n@\n" + skipSheBangLine(code)
 
   private def skipSheBangLine(code: String)= {
     if (code.startsWith(SheBang))
@@ -139,6 +137,7 @@ class Interpreter(prompt0: Ref[String],
 
   def processCorrectScript(parsedCode: Parsed.Success[Seq[Seq[String]]],
                            evaluate: EvaluateCallback): Seq[ImportData] = {
+
 
     val blocks0 = Parsers.splitScript(hardcodedPredef).get.value ++ parsedCode.get.value
     val blocks = blocks0.map(preprocess(_, ""))
@@ -199,14 +198,13 @@ class Interpreter(prompt0: Ref[String],
   //common stuff in proccessModule and processExec
   def processScript(code: String,
                     evaluate: (String, Seq[ImportData]) => Res[Evaluated]): Seq[ImportData] = {
-    Timer("processScript 0")
-    val actualCode = code.slice(code.indexOf('@') + 2, code.length)
 
     Timer("processScript 0a")
-    Parsers.splitScript(actualCode) match {
+
+    Parsers.splitScript(code) match {
       case f: Parsed.Failure =>
         Timer("processScriptFailed 0b")
-        throw new CompilationError(errMsg(f.msg, actualCode, f.extra.traced.expected, f.index))
+        throw new CompilationError(errMsg(f.msg, code, f.extra.traced.expected, f.index))
       case s: Parsed.Success[Seq[Seq[String]]] =>
         Timer("processCorrectScript 0b")
         processCorrectScript(s,evaluate)
