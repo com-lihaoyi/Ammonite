@@ -6,6 +6,7 @@ import org.apache.ivy.plugins.resolver.RepositoryResolver
 
 import scala.collection.mutable
 import acyclic.file
+import fastparse.all._
 import ammonite.ops._
 import pprint.{Config, PPrint}
 import annotation.tailrec
@@ -102,15 +103,13 @@ class Interpreter(prompt0: Ref[String],
   }
 
   def processModule(code: String) = processScript(
-    prepareScript(code),
+    skipSheBangLine(code),
     (code, imports) => withContextClassloader(eval.processScriptBlock(code, imports, printer))
   )
 
   def processExec(code: String) =
-    processScript(prepareScript(code), { (c, i) => evaluateLine(c, Nil, printer, i)})
+    processScript(skipSheBangLine(code), { (c, i) => evaluateLine(c, Nil, printer, i)})
 
-  private def prepareScript(code: String) =
-    hardcodedPredef + "\n@\n" + skipSheBangLine(code)
 
   private def skipSheBangLine(code: String)= {
     if (code.startsWith(SheBang))
@@ -123,19 +122,29 @@ class Interpreter(prompt0: Ref[String],
   //this variable keeps track of where should we put the imports resulting from scripts.
   private var scriptImportCallback: Seq[ImportData] => Unit = eval.update
 
-  //common stuff in proccessModule and processExec
-  def processScript(code: String,
-                    evaluate: (String, Seq[ImportData]) => Res[Evaluated]): Seq[ImportData] = {
-    Timer("processScript 0")
-    val blocks0 = Parsers.splitScript(code)
-    Timer("processScript 0a")
-    Parsers.splitScript(code)
-    Timer("processScript 0b")
+  type EvaluateCallback = (String, Seq[ImportData]) => Res[Evaluated]
 
+  def errMsg(msg: String, code: String, expected: String, idx: Int): String = {
+    val locationString = {
+      val (first, last) = code.splitAt(idx)
+      val lastSnippet = last.split('\n').headOption.getOrElse("")
+      val firstSnippet = first.reverse.split('\n').lift(0).getOrElse("").reverse
+      firstSnippet + lastSnippet + "\n" + (" " * firstSnippet.length) + "^"
+    }
+
+    s"Syntax Error: $msg\n$locationString"
+  }
+
+  def processCorrectScript(parsedCode: Parsed.Success[Seq[Seq[String]]],
+                           evaluate: EvaluateCallback): Seq[ImportData] = {
+
+
+    val blocks0 = Parsers.splitScript(hardcodedPredef).get.value ++ parsedCode.get.value
     val blocks = blocks0.map(preprocess(_, ""))
-    Timer("processScript 1")
-    val errors = blocks.collect{ case Res.Failure(ex, err) => err }
-    Timer("processScript 2")
+
+    Timer("processCorrectScript 1")
+    val errors = blocks.collect { case Res.Failure(ex, err) => err }
+    Timer("processCorrectScript 2")
     // we store the old value, because we will reassign this in the loop
     val outerScriptImportCallback = scriptImportCallback
 
@@ -150,11 +159,12 @@ class Interpreter(prompt0: Ref[String],
     @tailrec def loop(blocks: Seq[Preprocessor.Output],
                       scriptImports: Seq[ImportData],
                       lastImports: Seq[ImportData]): Seq[ImportData] = {
-      if(blocks.isEmpty){ // No more blocks
+      if (blocks.isEmpty) {
+        // No more blocks
         // if we have imports to pass to the upper layer we do that
         outerScriptImportCallback(lastImports)
         lastImports
-      }else{
+      } else {
         Timer("processScript loop 0")
         // imports from scripts loaded from this script block will end up in this buffer
         val nestedScriptImports = mutable.Buffer.empty[ImportData]
@@ -174,8 +184,8 @@ class Interpreter(prompt0: Ref[String],
         }
       }
     }
-    try{
-      if(errors.isEmpty) loop(blocks.collect{ case Res.Success(o) => o }, Seq(), Seq())
+    try {
+      if (errors.isEmpty) loop(blocks.collect { case Res.Success(o) => o }, Seq(), Seq())
       else {
         printer.error(errors.mkString("\n"))
         Nil
@@ -183,6 +193,21 @@ class Interpreter(prompt0: Ref[String],
 
     } finally {
       scriptImportCallback = outerScriptImportCallback
+    }
+  }
+  //common stuff in proccessModule and processExec
+  def processScript(code: String,
+                    evaluate: (String, Seq[ImportData]) => Res[Evaluated]): Seq[ImportData] = {
+
+    Timer("processScript 0a")
+
+    Parsers.splitScript(code) match {
+      case f: Parsed.Failure =>
+        Timer("processScriptFailed 0b")
+        throw new CompilationError(errMsg(f.msg, code, f.extra.traced.expected, f.index))
+      case s: Parsed.Success[Seq[Seq[String]]] =>
+        Timer("processCorrectScript 0b")
+        processCorrectScript(s,evaluate)
     }
   }
 

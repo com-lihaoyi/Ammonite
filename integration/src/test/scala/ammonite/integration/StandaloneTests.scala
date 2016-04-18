@@ -63,6 +63,68 @@ object StandaloneTests extends TestSuite{
       println("\n-------------------------")
     }
 
+    'errorTest{
+      //Make sure correct line numbers are printed when an erroneous script is executed
+      val name = "ErrorLineNumberTest.scala"
+      val e = intercept[ShelloutException]{
+        %%bash(
+          executable,
+          "--predef-file",
+          emptyPrefdef,
+          replStandaloneResources / name
+          )
+      }
+      val expectedErrorMsg =
+        """ammonite.repl.CompilationError: Syntax Error: ("}" | `case`):5:24 ...")\n  }\n\n  d"
+          |    printlnqs(unsorted))
+          |                       ^""".stripMargin
+
+      assert(e.toString.contains(expectedErrorMsg))
+
+    }
+
+    'multipleCompilationUnitErrorTest1{
+      //Make sure correct line numbers are printed when an erroneous script is executed
+      val file = "MultipleCompilationUnitErrorMsgTest1.scala"
+
+      val e = intercept[ShelloutException]{
+        %%bash(
+          executable,
+          "--predef-file",
+          emptyPrefdef,
+          replStandaloneResources / file
+          )
+      }
+      val expectedErrorMsg =
+        """ammonite.repl.CompilationError: Syntax Error: End:5:1 ..."}"
+          |}
+          |^""".stripMargin
+
+      assert(e.toString.contains(expectedErrorMsg))
+
+    }
+
+    'multipleCompilationUnitErrorTest2{
+      //Make sure correct line numbers are printed when an erroneous script is executed
+      val file = "MultipleCompilationUnitErrorMsgTest2.scala"
+
+      val e = intercept[ShelloutException]{
+        %%bash(
+          executable,
+          "--predef-file",
+          emptyPrefdef,
+          replStandaloneResources / file
+          )
+      }
+      val expectedErrorMsg =
+        """ammonite.repl.CompilationError: Syntax Error: End:3:1 ..."}\n@\n1 + 1"
+          |}
+          |^""".stripMargin
+
+      assert(e.toString.contains(expectedErrorMsg))
+    }
+
+
     'shell{
       // make sure you can load the example-predef.scala, have it pull stuff in
       // from ivy, and make use of `cd!` and `wd` inside the executed script.

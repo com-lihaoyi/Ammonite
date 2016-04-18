@@ -44,7 +44,7 @@ object Parsers {
   val Separator = P( WL ~ "@" ~~ CharIn(" \n").rep(1) )
   val CompilationUnit = P( WL ~ StatementBlock(Separator) ~ WL )
   val ScriptSplitter = P( CompilationUnit.repX(1, Separator) ~ End)
-  def splitScript(code: String) = ScriptSplitter.parse(code).get.value
+  def splitScript(code: String) = ScriptSplitter.parse(code)
 
   val BlockUnwrapper = P( "{" ~ Block.! ~ "}" ~ End)
   def unwrapBlock(code: String) = {
