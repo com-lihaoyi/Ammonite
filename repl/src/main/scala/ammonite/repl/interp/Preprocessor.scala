@@ -11,7 +11,7 @@ import scala.tools.nsc.{Global => G}
  * three things:
  */
 trait Preprocessor{
-  def apply(stmts: Seq[String], wrapperId: String): Res[Preprocessor.Output]
+  def apply(stmts: Seq[String], wrapperId: String, comment: String = ""): Res[Preprocessor.Output]
 }
 object Preprocessor{
 
@@ -99,30 +99,34 @@ object Preprocessor{
 
     val Expr = Processor{
       //Expressions are lifted to anon function applications so they will be JITed
-      case (name, code, tree) => Output(s"val $name = \n$code", Seq(pprint(name)))
+      case (name, code, tree) => Output(s"val $name = $code", Seq(pprint(name)))
     }
 
     val decls = Seq[(String, String, G#Tree) => Option[Preprocessor.Output]](
       ObjectDef, ClassDef, TraitDef, DefDef, TypeDef, PatVarDef, Import, Expr
     )
 
-    def apply(stmts: Seq[String], wrapperId: String): Res[Preprocessor.Output] = {
+    def apply(stmts: Seq[String], wrapperId: String, comment: String = ""): Res[Preprocessor.Output] = {
       val unwrapped = stmts.flatMap{x => Parsers.unwrapBlock(x) match {
-        case Some(contents) => Parsers.split(contents).get.get.value
+        case Some(contents) =>
+          Parsers.split(contents).get.get.value
+
         case None => Seq(x)
       }}
       unwrapped match{
         case Nil => Res.Skip
-        case postSplit => complete(stmts.mkString, wrapperId, postSplit.map(_.trim))
+        case postSplit =>
+          complete(stmts.mkString(""), wrapperId, postSplit, comment)
+
       }
     }
     
-    def complete(code: String, wrapperId: String, postSplit: Seq[String]) = {
+    def complete(code: String, wrapperId: String, postSplit: Seq[String], comment: String) = {
       val reParsed = postSplit.map(p => (parse(p), p))
       val errors = reParsed.collect{case (Left(e), _) => e }
       if (errors.length != 0) Res.Failure(None, errors.mkString("\n"))
       else {
-        val allDecls = for (((Right(trees), code), i) <- reParsed.zipWithIndex) yield {
+        var allDecls = for (((Right(trees @ x :: y), code), i) <- reParsed.zipWithIndex) yield {
           // Suffix the name of the result variable with the index of
           // the tree if there is more than one statement in this command
           val suffix = if (reParsed.length > 1) "_" + i else ""
@@ -145,12 +149,15 @@ object Preprocessor{
                 Preprocessor.Output(_, printers) = handleTree(tree)
                 printer <- printers
               } yield printer
+
               Preprocessor.Output(code, printers)
           }
         }
 
+        val Seq(first, rest@_*) = allDecls
+        val allDeclsWithComments = Output(comment + first.code , first.printer) +: rest
         Res(
-          allDecls.reduceOption { (a, b) =>
+          allDeclsWithComments.reduceOption { (a, b) =>
             Output(
               a.code + ";" + b.code,
               a.printer ++ b.printer
@@ -158,6 +165,7 @@ object Preprocessor{
           },
           "Don't know how to handle " + code
         )
+
       }
     }
   }

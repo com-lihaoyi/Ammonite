@@ -124,6 +124,83 @@ object StandaloneTests extends TestSuite{
       assert(e.toString.contains(expectedErrorMsg))
     }
 
+    'compilationErrorLineNumberTest1{
+      //Make sure correct line numbers are printed when an erroneous script is executed
+      val name = "compilationErrorLineNumberTest1.scala"
+      val e = intercept[ShelloutException]{
+        %%bash(
+          executable,
+          "--predef-file",
+          emptyPrefdef,
+          replStandaloneResources / name
+          )
+      }
+      val expectedErrorMsg =
+        """Main.scala:11: not found: value quicort
+          |    quicort(unsorted.filter(_ < pivot)):::List(pivot):::quicksort(unsorted.filter(_ > pivot))
+          |    ^""".stripMargin
+
+      assert(e.toString.contains(expectedErrorMsg))
+
+    }
+
+    'compilationErrorLineNumberTest2{
+      //Make sure correct line numbers are printed when an erroneous script is executed
+      val name = "compilationErrorLineNumberTest2.scala"
+      val e = intercept[ShelloutException]{
+        %%bash(
+          executable,
+          "--predef-file",
+          emptyPrefdef,
+          replStandaloneResources / name
+          )
+      }
+      val expectedErrorMsg =
+        """Main.scala:14: not found: value printnl
+          |val res_0 = printnl("OK")
+          |            ^""".stripMargin
+
+      assert(e.toString.contains(expectedErrorMsg))
+
+    }
+
+    'compilationErrorLineNumberTest3{
+      //Make sure correct line numbers are printed when an erroneous script is executed
+      val name = "compilationErrorLineNumberTest3.scala"
+      val e = intercept[ShelloutException]{
+        %%bash(
+          executable,
+          "--predef-file",
+          emptyPrefdef,
+          replStandaloneResources / name
+          )
+      }
+      val expectedErrorMsg =
+        """Main.scala:30: not found: value prinntl
+          |val res = prinntl("Ammonite")
+          |          ^""".stripMargin
+
+      assert(e.toString.contains(expectedErrorMsg))
+
+    }
+
+    'compilationErrorLineNumberTest4{
+      //Make sure correct line numbers are printed when an erroneous script is executed
+      val name = "compilationErrorLineNumberTest4.scala"
+      val e = intercept[ShelloutException]{
+        %%bash(
+          executable,
+          "--predef-file",
+          emptyPrefdef,
+          replStandaloneResources / name
+          )
+      }
+      val expectedErrorMsg =
+        """Main.scala:17: value a is not a member of""".stripMargin
+
+      assert(e.toString.contains(expectedErrorMsg))
+
+    }
 
     'shell{
       // make sure you can load the example-predef.scala, have it pull stuff in
@@ -139,6 +216,7 @@ object StandaloneTests extends TestSuite{
           |@
           |println(wd relativeTo x)""".stripMargin
       )
+
 
       val output = res.out.trim
       assert(output == "repl/src")

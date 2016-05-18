@@ -55,7 +55,7 @@ object Evaluator{
 
 
   def apply(currentClassloader: ClassLoader,
-            compile: => (Array[Byte], Printer) => Compiler.Output,
+            compile: => (Array[Byte], Printer, Int) => Compiler.Output,
             startingLine: Int,
             cacheLoad: String => Option[CompileCache],
             cacheSave: (String, CompileCache) => Unit,
@@ -139,9 +139,9 @@ object Evaluator{
     private var _compilationCount = 0
     def compilationCount = _compilationCount
 
-    def compileClass(code: String, printer: Printer): Res[(ClassFiles, Seq[ImportData])] = for {
+    def compileClass(code: (String, Int), printer: Printer): Res[(ClassFiles, Seq[ImportData])] = for {
       compiled <- Res.Success{
-        val c = compile(code.getBytes, printer)
+        val c = compile(code._1.getBytes, printer, code._2)
         c
       }
       _ = _compilationCount += 1
@@ -261,15 +261,20 @@ object Evaluator{
     def wrapCode(wrapperName: String,
                  code: String,
                  printCode: String,
-                 imports: Seq[ImportData]) = s"""
+                 imports: Seq[ImportData]) = {
+
+     val topWrapper = s"""
 ${importBlock(imports)}
 
-object $wrapperName{
-$code
-  def $$main() = { $printCode }
+object $wrapperName{\n"""
+
+     val bottomWrapper = s"""\ndef $$main() = { $printCode }
   override def toString = "$wrapperName"
 }
 """
+     val importsLen = topWrapper.length
+     (topWrapper + code + bottomWrapper, importsLen)
+    }
 
     def cachedCompileBlock(code: String,
                            imports: Seq[ImportData],
@@ -300,17 +305,18 @@ $code
     def processScriptBlock(code: String,
                            scriptImports: Seq[ImportData],
                            printer: Printer) = for {
-      (wrapperName, cls, newImports) <- cachedCompileBlock(
-        code, scriptImports, printer
-      )
-    } yield {
-      Timer("cachedCompileBlock")
-      evalMain(cls)
-      Timer("evalMain")
-      val res = evaluationResult(wrapperName, newImports)
-      Timer("evaluationResult")
-      res
-    }
+        (wrapperName, cls, newImports) <- cachedCompileBlock(
+          code, scriptImports, printer
+        )
+      } yield {
+        Timer("cachedCompileBlock")
+        evalMain(cls)
+        Timer("evalMain")
+        val res = evaluationResult(wrapperName, newImports)
+        Timer("evaluationResult")
+        res
+      }
+
 
     def update(newImports: Seq[ImportData]) = {
       frames.head.addImports(newImports)

@@ -103,12 +103,13 @@ class Interpreter(prompt0: Ref[String],
   }
 
   def processModule(code: String) = processScript(
-    skipSheBangLine(code),
-    (code, imports) => withContextClassloader(eval.processScriptBlock(code, imports, printer))
-  )
+      skipSheBangLine(code),
+      (code, imports) => withContextClassloader(eval.processScriptBlock(code, imports, printer))
+    )
+
 
   def processExec(code: String) =
-    processScript(skipSheBangLine(code), { (c, i) => evaluateLine(c, Nil, printer, i)})
+    processScript(skipSheBangLine(code), { (c, i) => evaluateLine(c, Nil, printer, i) })
 
 
   private def skipSheBangLine(code: String)= {
@@ -135,12 +136,26 @@ class Interpreter(prompt0: Ref[String],
     s"Syntax Error: $msg\n$locationString"
   }
 
-  def processCorrectScript(parsedCode: Parsed.Success[Seq[Seq[String]]],
+  def processCorrectScript(rawParsedCode: Parsed.Success[Seq[( String, Seq[String])]],
                            evaluate: EvaluateCallback): Seq[ImportData] = {
 
+    var offset = 0
+    var parsedCode: Seq[( String, Seq[String])] = Seq()
+    for( (comment, code) <- rawParsedCode.get.value ){
+      val ncomment = comment + "\n"*offset
+      offset = offset + comment.count(_ == '\n') + code.foldLeft(0){ (z,x) =>
+        z + x.count(_ == '\n')
+      } + 1
 
-    val blocks0 = Parsers.splitScript(hardcodedPredef).get.value ++ parsedCode.get.value
-    val blocks = blocks0.map(preprocess(_, ""))
+      parsedCode = parsedCode :+ (ncomment, code)
+    }
+
+    val parsedHardcodedPredef  = Parsers.splitScript(hardcodedPredef).get.value
+    val blocks0 = parsedHardcodedPredef ++ parsedCode
+
+    val blocks = for{
+      (comment, code) <- blocks0
+    } yield preprocess(code,"",comment)
 
     Timer("processCorrectScript 1")
     val errors = blocks.collect { case Res.Failure(ex, err) => err }
@@ -170,7 +185,9 @@ class Interpreter(prompt0: Ref[String],
         val nestedScriptImports = mutable.Buffer.empty[ImportData]
         scriptImportCallback = { imports => nestedScriptImports ++= imports }
         // pretty printing results is disabled for scripts
+
         val Preprocessor.Output(code, _) = blocks.head
+
         Timer("processScript loop 1")
         val ev = evaluate(code, scriptImports)
         Timer("processScript loop 2")
@@ -200,12 +217,11 @@ class Interpreter(prompt0: Ref[String],
                     evaluate: (String, Seq[ImportData]) => Res[Evaluated]): Seq[ImportData] = {
 
     Timer("processScript 0a")
-
     Parsers.splitScript(code) match {
       case f: Parsed.Failure =>
         Timer("processScriptFailed 0b")
         throw new CompilationError(errMsg(f.msg, code, f.extra.traced.expected, f.index))
-      case s: Parsed.Success[Seq[Seq[String]]] =>
+      case s: Parsed.Success[Seq[(String, Seq[String])]] =>
         Timer("processCorrectScript 0b")
         processCorrectScript(s,evaluate)
     }

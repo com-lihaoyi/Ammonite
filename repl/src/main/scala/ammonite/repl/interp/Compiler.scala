@@ -34,13 +34,15 @@ import scala.tools.nsc.util._
 trait Compiler{
   def compiler: nsc.Global
   def compile(src: Array[Byte],
-              printer: Printer): Compiler.Output
+              printer: Printer,
+              impLen: Int): Compiler.Output
 
   def search(name: scala.reflect.runtime.universe.Type): Option[String]
   /**
    * Either the statements that were parsed or the error message
    */
   def parse(line: String): Either[String, Seq[Global#Tree]]
+  var importsLen = 0
 
   /**
    * Writes files to dynamicClasspath. Needed for loading cached classes.
@@ -138,7 +140,6 @@ object Compiler{
             shutdownPressy: () => Unit): Compiler = new Compiler{
 
     val PluginXML = "scalac-plugin.xml"
-
     lazy val plugins0 = {
       import scala.collection.JavaConverters._
       val loader = pluginClassloader
@@ -178,7 +179,7 @@ object Compiler{
         classpath, dynamicClasspath, errorLogger, warningLogger
       )
       val scalac = new nsc.Global(settings, reporter) { g =>
-        override lazy val plugins = List(new AmmonitePlugin(g, lastImports = _)) ++ {
+        override lazy val plugins = List(new AmmonitePlugin(g, lastImports = _, importsLen)) ++ {
           for {
             (name, cls) <- plugins0
             plugin = Plugin.instantiate(cls, g)
@@ -245,12 +246,14 @@ object Compiler{
      * Compiles a blob of bytes and spits of a list of classfiles
      */
     def compile(src: Array[Byte],
-                printer: Printer): Output = {
+                printer: Printer,
+                impLen: Int): Output = {
+
       compiler.reporter.reset()
       this.errorLogger = printer.error
       this.warningLogger = printer.warning
       val singleFile = makeFile( src)
-
+      this.importsLen = impLen
       val run = new compiler.Run()
       vd.clear()
       run.compileFiles(List(singleFile))

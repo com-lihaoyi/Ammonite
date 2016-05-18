@@ -154,7 +154,7 @@ object ScriptTests extends TestSuite{
       }
 
     }
-    
+
     'module{
       'compilationBlocks{
         'loadIvy{
@@ -270,7 +270,7 @@ object ScriptTests extends TestSuite{
         }
       }
       'caching{
-        
+
         def createTestInterp(storage: Storage) = new Interpreter(
           Ref[String](""),
           Ref(null),
@@ -338,7 +338,7 @@ object ScriptTests extends TestSuite{
           val interp = createTestInterp(storage)
           interp.replApi.load.module(scriptPath/"ThreeBlocks.scala")
           try{
-            Class.forName("cmd0") 
+            Class.forName("cmd0")
             assert(false)
           } catch {
             case e: ClassNotFoundException => assert(true)
