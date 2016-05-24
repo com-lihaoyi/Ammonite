@@ -435,6 +435,8 @@
 
       @p
         In general, if you are having trouble understanding the combination of implicit parameters, implicit conversions, macros, and other odd Scala features, @hl.scala{desugar} could you see what is left after all the magic happens.
+      @p
+        @hl.scala{desugar} only works in Scala 2.11.x and above, not in 2.10.x
 
   @sect{Design Decisions & Tradeoffs}
     @p

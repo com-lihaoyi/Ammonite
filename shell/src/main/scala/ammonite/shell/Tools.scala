@@ -4,14 +4,11 @@
  */
 package ammonite.shell
 
-import scala.language.experimental.macros
+
 import java.io.{BufferedReader, InputStreamReader}
 
 import ammonite.ops._
-import ammonite.repl.Colors
 import ammonite.terminal.Strings
-import org.scalafmt.{ScalafmtRunner, ScalafmtStyle}
-import sourcecode.Compat.Context
 
 import scala.collection.{GenTraversableOnce, mutable}
 import scala.util.matching.Regex
@@ -211,35 +208,4 @@ object browse{
       )
     )
   }
-}
-
-object desugar{
-
-  def transformer(c: Context)(expr: c.Expr[Any]): c.Expr[String] = {
-    import c.universe._
-    c.Expr[String](q"""
-      ammonite.shell.desugar.impl(
-        ${showCode(expr.tree)}
-      )
-    """)
-  }
-  def impl(s: String) = {
-    ammonite.repl.frontend.Highlighter.defaultHighlight(
-      org.scalafmt.Scalafmt.format(
-        s,
-        style = ScalafmtStyle.default.copy(
-          continuationIndentCallSite = 2,
-          continuationIndentDefnSite = 2,
-          configStyleArguments = false
-        ),
-        runner = ScalafmtRunner.statement
-      ).get.toVector,
-      Console.BLUE,
-      Console.GREEN,
-      Console.GREEN,
-      Console.YELLOW,
-      Console.RESET
-    ).mkString
-  }
-  def apply(expr: Any): String = macro transformer
 }
