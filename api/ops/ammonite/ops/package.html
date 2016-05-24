@@ -49,7 +49,7 @@
       
           <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
-          <div class="superTypes hiddenContent"><a href="RelPathStuff.html" class="extype" name="ammonite.ops.RelPathStuff">RelPathStuff</a>, <a href="Extensions.html" class="extype" name="ammonite.ops.Extensions">Extensions</a>, <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a>, <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Any" class="extype" target="_top">Any</a></div>
+          <div class="superTypes hiddenContent"><a href="RelPathStuff.html" class="extype" name="ammonite.ops.RelPathStuff">RelPathStuff</a>, <a href="Extensions.html" class="extype" name="ammonite.ops.Extensions">Extensions</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
         
 
@@ -97,16 +97,16 @@
         <span class="kind">trait</span>
       </span>
       <span class="symbol">
-        <a href="BasePath.html"><span class="name">BasePath</span></a><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>
+        <a href="BasePath.html"><span class="name">BasePath</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.package@BasePathextendsAnyRef" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">A path which is either an absolute <a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>, a relative <a href="RelPath.html" class="extype" name="ammonite.ops.RelPath">RelPath</a>,
-or a <a href="ResourcePath.html" class="extype" name="ammonite.ops.ResourcePath">ResourcePath</a> with shared APIs and implementations.</p><div class="fullcomment"><div class="comment cmt"><p>A path which is either an absolute <a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>, a relative <a href="RelPath.html" class="extype" name="ammonite.ops.RelPath">RelPath</a>,
-or a <a href="ResourcePath.html" class="extype" name="ammonite.ops.ResourcePath">ResourcePath</a> with shared APIs and implementations.</p><p>Most of the filesystem-independent path-manipulation logic that lets you
+      <p class="shortcomment cmt">A path which is either an absolute <a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a> or a relative <a href="RelPath.html" class="extype" name="ammonite.ops.RelPath">RelPath</a>,
+with shared APIs and implementations.</p><div class="fullcomment"><div class="comment cmt"><p>A path which is either an absolute <a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a> or a relative <a href="RelPath.html" class="extype" name="ammonite.ops.RelPath">RelPath</a>,
+with shared APIs and implementations.</p><p>Most of the filesystem-independent path-manipulation logic that lets you
 splice paths together or navigate in and out of paths lives in this interface
 </p></div></div>
     </li><li name="ammonite.ops.BasePathImpl" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
@@ -135,7 +135,7 @@ splice paths together or navigate in and out of paths lives in this interface
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <a href="Bytes.html"><span class="name">Bytes</span></a><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>
+        <a href="Bytes.html"><span class="name">Bytes</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.package@BytesextendsAnyRef" title="Permalink" target="_top">
@@ -191,7 +191,7 @@ applying a function with two arguments
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a href="Command.html"><span class="name">Command</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="cmd">cmd: <span class="extype" name="scala.Vector">Vector</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="envArgs">envArgs: <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="execute">execute: (<a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>, <a href="Command.html" class="extype" name="ammonite.ops.Command">Command</a>[_]) ⇒ <span class="extype" name="ammonite.ops.Command.T">T</span></span>)</span><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Dynamic" class="extype" target="_top">Dynamic</a> with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+        <a href="Command.html"><span class="name">Command</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="cmd">cmd: <span class="extype" name="scala.Vector">Vector</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="envArgs">envArgs: <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="execute">execute: (<a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>, <a href="Command.html" class="extype" name="ammonite.ops.Command">Command</a>[_]) ⇒ <span class="extype" name="ammonite.ops.Command.T">T</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Dynamic">Dynamic</span> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.package@Command[T]extendsDynamicwithProductwithSerializable" title="Permalink" target="_top">
@@ -208,7 +208,7 @@ applying a function with two arguments
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a href="CommandResult.html"><span class="name">CommandResult</span></a><span class="params">(<span name="exitCode">exitCode: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a></span>, <span name="chunks">chunks: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Either">Either</span>[<a href="Bytes.html" class="extype" name="ammonite.ops.Bytes">Bytes</a>, <a href="Bytes.html" class="extype" name="ammonite.ops.Bytes">Bytes</a>]]</span>)</span><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+        <a href="CommandResult.html"><span class="name">CommandResult</span></a><span class="params">(<span name="exitCode">exitCode: <span class="extype" name="scala.Int">Int</span></span>, <span name="chunks">chunks: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Either">Either</span>[<a href="Bytes.html" class="extype" name="ammonite.ops.Bytes">Bytes</a>, <a href="Bytes.html" class="extype" name="ammonite.ops.Bytes">Bytes</a>]]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.package@CommandResultextendsProductwithSerializable" title="Permalink" target="_top">
@@ -231,7 +231,7 @@ the aggregate output of each stream, as bytes or strings or lines.
         <span class="kind">trait</span>
       </span>
       <span class="symbol">
-        <a href="CopyMove.html"><span class="name">CopyMove</span></a><span class="result"> extends (<a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>, <a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>) ⇒ <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
+        <a href="CopyMove.html"><span class="name">CopyMove</span></a><span class="result"> extends (<a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>, <a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>) ⇒ <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.package@CopyMoveextends(ammonite.ops.Path,ammonite.ops.Path)=&gt;Unit" title="Permalink" target="_top">
@@ -248,7 +248,7 @@ the aggregate output of each stream, as bytes or strings or lines.
         <span class="kind">trait</span>
       </span>
       <span class="symbol">
-        <a href="Extensions.html"><span class="name">Extensions</span></a><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>
+        <a href="Extensions.html"><span class="name">Extensions</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.package@ExtensionsextendsAnyRef" title="Permalink" target="_top">
@@ -256,25 +256,6 @@ the aggregate output of each stream, as bytes or strings or lines.
       </a>
     </span>
       
-    </li><li name="ammonite.ops.FilePath" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
-      <a id="FilePathextendsBasePath"></a>
-      <a id="FilePath:FilePath"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier">sealed </span>
-        <span class="kind">trait</span>
-      </span>
-      <span class="symbol">
-        <a href="FilePath.html"><span class="name">FilePath</span></a><span class="result"> extends <a href="BasePath.html" class="extype" name="ammonite.ops.BasePath">BasePath</a></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.ops.package@FilePathextendsBasePath" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">Represents a value that is either an absolute <a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a> or a
-relative <a href="ResourcePath.html" class="extype" name="ammonite.ops.ResourcePath">ResourcePath</a>, and can be constructed from
-</p>
     </li><li name="ammonite.ops.FileType" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
       <a id="FileTypeextendsAnyRef"></a>
       <a id="FileType:FileType"></a>
@@ -284,7 +265,7 @@ relative <a href="ResourcePath.html" class="extype" name="ammonite.ops.ResourceP
         <span class="kind">trait</span>
       </span>
       <span class="symbol">
-        <a href="FileType.html"><span class="name">FileType</span></a><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>
+        <a href="FileType.html"><span class="name">FileType</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.package@FileTypeextendsAnyRef" title="Permalink" target="_top">
@@ -302,7 +283,7 @@ relative <a href="ResourcePath.html" class="extype" name="ammonite.ops.ResourceP
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <a href="FilterMapExt.html"><span class="name">FilterMapExt</span></a><span class="tparams">[<span name="T">+T</span>, <span name="Repr">Repr</span>]</span><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>
+        <a href="FilterMapExt.html"><span class="name">FilterMapExt</span></a><span class="tparams">[<span name="T">+T</span>, <span name="Repr">Repr</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.package@FilterMapExt[+T,Repr]extendsAnyRef" title="Permalink" target="_top">
@@ -321,7 +302,7 @@ command line.</p>
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <a href="FilterMapExt2.html"><span class="name">FilterMapExt2</span></a><span class="tparams">[<span name="T">+T</span>]</span><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>
+        <a href="FilterMapExt2.html"><span class="name">FilterMapExt2</span></a><span class="tparams">[<span name="T">+T</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.package@FilterMapExt2[+T]extendsAnyRef" title="Permalink" target="_top">
@@ -357,7 +338,7 @@ command line.</p>
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a href="LsSeq.html"><span class="name">LsSeq</span></a><span class="params">(<span name="base">base: <a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a></span>, <span name="listed">listed: <a href="RelPath.html" class="extype" name="ammonite.ops.RelPath">RelPath</a>*</span>)</span><span class="result"> extends <span class="extype" name="scala.Seq">Seq</span>[<a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>] with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+        <a href="LsSeq.html"><span class="name">LsSeq</span></a><span class="params">(<span name="base">base: <a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a></span>, <span name="listed">listed: <a href="RelPath.html" class="extype" name="ammonite.ops.RelPath">RelPath</a>*</span>)</span><span class="result"> extends <span class="extype" name="scala.Seq">Seq</span>[<a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>] with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.package@LsSeqextendsSeq[ammonite.ops.Path]withProductwithSerializable" title="Permalink" target="_top">
@@ -368,7 +349,7 @@ command line.</p>
 experience
 </p>
     </li><li name="ammonite.ops.Path" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="PathextendsFilePathwithBasePathImplwithReadablewithProductwithSerializable"></a>
+      <a id="PathextendsBasePathImplwithReadablewithProductwithSerializable"></a>
       <a id="Path:Path"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -376,10 +357,10 @@ experience
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a href="Path.html"><span class="name">Path</span></a><span class="result"> extends <a href="FilePath.html" class="extype" name="ammonite.ops.FilePath">FilePath</a> with <a href="BasePathImpl.html" class="extype" name="ammonite.ops.BasePathImpl">BasePathImpl</a> with <a href="Readable.html" class="extype" name="ammonite.ops.Readable">Readable</a> with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+        <a href="Path.html"><span class="name">Path</span></a><span class="result"> extends <a href="BasePathImpl.html" class="extype" name="ammonite.ops.BasePathImpl">BasePathImpl</a> with <a href="Readable.html" class="extype" name="ammonite.ops.Readable">Readable</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#ammonite.ops.package@PathextendsFilePathwithBasePathImplwithReadablewithProductwithSerializable" title="Permalink" target="_top">
+      <a href="../../index.html#ammonite.ops.package@PathextendsBasePathImplwithReadablewithProductwithSerializable" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -432,7 +413,7 @@ from java types of various sorts
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <a href="Pipeable.html"><span class="name">Pipeable</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>
+        <a href="Pipeable.html"><span class="name">Pipeable</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.package@Pipeable[T]extendsAnyRef" title="Permalink" target="_top">
@@ -450,7 +431,7 @@ from java types of various sorts
         <span class="kind">trait</span>
       </span>
       <span class="symbol">
-        <a href="Readable.html"><span class="name">Readable</span></a><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>
+        <a href="Readable.html"><span class="name">Readable</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.package@ReadableextendsAnyRef" title="Permalink" target="_top">
@@ -469,7 +450,7 @@ Encapsulates the logic of how to read from it in various ways.
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <a href="RegexContext.html"><span class="name">RegexContext</span></a><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>
+        <a href="RegexContext.html"><span class="name">RegexContext</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.package@RegexContextextendsAnyRef" title="Permalink" target="_top">
@@ -479,7 +460,7 @@ Encapsulates the logic of how to read from it in various ways.
       <p class="shortcomment cmt">Lets you pattern match strings with interpolated glob-variables
 </p>
     </li><li name="ammonite.ops.RelPath" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="RelPathextendsFilePathwithBasePathImplwithProductwithSerializable"></a>
+      <a id="RelPathextendsBasePathImplwithProductwithSerializable"></a>
       <a id="RelPath:RelPath"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -487,10 +468,10 @@ Encapsulates the logic of how to read from it in various ways.
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a href="RelPath.html"><span class="name">RelPath</span></a><span class="result"> extends <a href="FilePath.html" class="extype" name="ammonite.ops.FilePath">FilePath</a> with <a href="BasePathImpl.html" class="extype" name="ammonite.ops.BasePathImpl">BasePathImpl</a> with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+        <a href="RelPath.html"><span class="name">RelPath</span></a><span class="result"> extends <a href="BasePathImpl.html" class="extype" name="ammonite.ops.BasePathImpl">BasePathImpl</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#ammonite.ops.package@RelPathextendsFilePathwithBasePathImplwithProductwithSerializable" title="Permalink" target="_top">
+      <a href="../../index.html#ammonite.ops.package@RelPathextendsBasePathImplwithProductwithSerializable" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -508,7 +489,7 @@ are collapsed into a single number <a href="RelPath.html#ups:Int" class="extmbr"
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <a href="RelPathStuff$RelPathStart.html"><span class="name">RelPathStart</span></a><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>
+        <a href="RelPathStuff$RelPathStart.html"><span class="name">RelPathStart</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.RelPathStuff@RelPathStartextendsAnyRef" title="Permalink" target="_top">
@@ -525,7 +506,7 @@ are collapsed into a single number <a href="RelPath.html#ups:Int" class="extmbr"
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <a href="RelPathStuff$RelPathStart2.html"><span class="name">RelPathStart2</span></a><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>
+        <a href="RelPathStuff$RelPathStart2.html"><span class="name">RelPathStart2</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.RelPathStuff@RelPathStart2extendsAnyRef" title="Permalink" target="_top">
@@ -542,7 +523,7 @@ are collapsed into a single number <a href="RelPath.html#ups:Int" class="extmbr"
         <span class="kind">trait</span>
       </span>
       <span class="symbol">
-        <a href="RelPathStuff.html"><span class="name">RelPathStuff</span></a><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>
+        <a href="RelPathStuff.html"><span class="name">RelPathStuff</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.package@RelPathStuffextendsAnyRef" title="Permalink" target="_top">
@@ -559,7 +540,7 @@ are collapsed into a single number <a href="RelPath.html#ups:Int" class="extmbr"
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a href="ResourceNotFoundException.html"><span class="name">ResourceNotFoundException</span></a><span class="params">(<span name="path">path: <a href="ResourcePath.html" class="extype" name="ammonite.ops.ResourcePath">ResourcePath</a></span>)</span><span class="result"> extends <span class="extype" name="scala.Exception">Exception</span> with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+        <a href="ResourceNotFoundException.html"><span class="name">ResourceNotFoundException</span></a><span class="params">(<span name="path">path: <a href="ResourcePath.html" class="extype" name="ammonite.ops.ResourcePath">ResourcePath</a></span>)</span><span class="result"> extends <span class="extype" name="scala.Exception">Exception</span> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.package@ResourceNotFoundExceptionextendsExceptionwithProductwithSerializable" title="Permalink" target="_top">
@@ -576,7 +557,7 @@ are collapsed into a single number <a href="RelPath.html#ups:Int" class="extmbr"
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a href="ResourcePath.html"><span class="name">ResourcePath</span></a><span class="result"> extends <a href="BasePathImpl.html" class="extype" name="ammonite.ops.BasePathImpl">BasePathImpl</a> with <a href="Readable.html" class="extype" name="ammonite.ops.Readable">Readable</a> with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+        <a href="ResourcePath.html"><span class="name">ResourcePath</span></a><span class="result"> extends <a href="BasePathImpl.html" class="extype" name="ammonite.ops.BasePathImpl">BasePathImpl</a> with <a href="Readable.html" class="extype" name="ammonite.ops.Readable">Readable</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.package@ResourcePathextendsBasePathImplwithReadablewithProductwithSerializable" title="Permalink" target="_top">
@@ -594,7 +575,7 @@ are collapsed into a single number <a href="RelPath.html#ups:Int" class="extmbr"
         <span class="kind">trait</span>
       </span>
       <span class="symbol">
-        <a href="ResourceRoot.html"><span class="name">ResourceRoot</span></a><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>
+        <a href="ResourceRoot.html"><span class="name">ResourceRoot</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.package@ResourceRootextendsAnyRef" title="Permalink" target="_top">
@@ -638,7 +619,7 @@ mkString, reduce, sum, etc. will all result in close() being called.
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a href="Shellable.html"><span class="name">Shellable</span></a><span class="params">(<span name="s">s: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+        <a href="Shellable.html"><span class="name">Shellable</span></a><span class="params">(<span name="s">s: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.package@ShellableextendsProductwithSerializable" title="Permalink" target="_top">
@@ -656,7 +637,7 @@ be &quot;interpolated&quot; directly into a subprocess call.</p>
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a href="ShelloutException.html"><span class="name">ShelloutException</span></a><span class="params">(<span name="result">result: <a href="CommandResult.html" class="extype" name="ammonite.ops.CommandResult">CommandResult</a></span>)</span><span class="result"> extends <span class="extype" name="scala.Exception">Exception</span> with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+        <a href="ShelloutException.html"><span class="name">ShelloutException</span></a><span class="params">(<span name="result">result: <a href="CommandResult.html" class="extype" name="ammonite.ops.CommandResult">CommandResult</a></span>)</span><span class="result"> extends <span class="extype" name="scala.Exception">Exception</span> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.package@ShelloutExceptionextendsExceptionwithProductwithSerializable" title="Permalink" target="_top">
@@ -676,7 +657,7 @@ loudly and won't get ignored unless intentionally caught
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a href="StreamValue.html"><span class="name">StreamValue</span></a><span class="params">(<span name="chunks">chunks: <span class="extype" name="scala.Seq">Seq</span>[<a href="Bytes.html" class="extype" name="ammonite.ops.Bytes">Bytes</a>]</span>)</span><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+        <a href="StreamValue.html"><span class="name">StreamValue</span></a><span class="params">(<span name="chunks">chunks: <span class="extype" name="scala.Seq">Seq</span>[<a href="Bytes.html" class="extype" name="ammonite.ops.Bytes">Bytes</a>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.package@StreamValueextendsProductwithSerializable" title="Permalink" target="_top">
@@ -716,7 +697,7 @@ the iterator however you wish
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <a href="Extensions$iterShow.html"><span class="name">iterShow</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>
+        <a href="Extensions$iterShow.html"><span class="name">iterShow</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.Extensions@iterShow[T]extendsAnyRef" title="Permalink" target="_top">
@@ -733,7 +714,7 @@ the iterator however you wish
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a href="kill.html"><span class="name">kill</span></a><span class="params">(<span name="signal">signal: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="wd">wd: <a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a></span>)</span><span class="result"> extends (<a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a>) ⇒ <a href="CommandResult.html" class="extype" name="ammonite.ops.CommandResult">CommandResult</a> with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+        <a href="kill.html"><span class="name">kill</span></a><span class="params">(<span name="signal">signal: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result"> extends (<span class="extype" name="scala.Int">Int</span>) ⇒ <a href="CommandResult.html" class="extype" name="ammonite.ops.CommandResult">CommandResult</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.package@killextendsInt=&gt;ammonite.ops.CommandResultwithProductwithSerializable" title="Permalink" target="_top">
@@ -752,7 +733,7 @@ the iterator however you wish
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a href="stat.html"><span class="name">stat</span></a><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="size">size: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Long" class="extype" target="_top">Long</a></span>, <span name="mtime">mtime: <span class="extype" name="java.nio.file.attribute.FileTime">FileTime</span></span>, <span name="owner">owner: <span class="extype" name="java.nio.file.attribute.UserPrincipal">UserPrincipal</span></span>, <span name="permissions">permissions: <a href="PermSet.html" class="extype" name="ammonite.ops.PermSet">PermSet</a></span>, <span name="fileType">fileType: <a href="FileType.html" class="extype" name="ammonite.ops.FileType">FileType</a></span>)</span><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+        <a href="stat.html"><span class="name">stat</span></a><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="size">size: <span class="extype" name="scala.Long">Long</span></span>, <span name="mtime">mtime: <span class="extype" name="java.nio.file.attribute.FileTime">FileTime</span></span>, <span name="owner">owner: <span class="extype" name="java.nio.file.attribute.UserPrincipal">UserPrincipal</span></span>, <span name="permissions">permissions: <a href="PermSet.html" class="extype" name="ammonite.ops.PermSet">PermSet</a></span>, <span name="fileType">fileType: <a href="FileType.html" class="extype" name="ammonite.ops.FileType">FileType</a></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.package@statextendsProductwithSerializable" title="Permalink" target="_top">
@@ -769,18 +750,18 @@ the iterator however you wish
         <div id="values" class="values members">
               <h3>Value Members</h3>
               <ol><li name="ammonite.ops#%" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="%:ammonite.ops.Command[Unit]"></a>
-      <a id="%:Command[Unit]"></a>
+      <a id="%:ammonite.ops.Command[Int]"></a>
+      <a id="%:Command[Int]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span title="gt4s: $percent" class="name">%</span><span class="result">: <a href="Command.html" class="extype" name="ammonite.ops.Command">Command</a>[<a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a>]</span>
+        <span title="gt4s: $percent" class="name">%</span><span class="result">: <a href="Command.html" class="extype" name="ammonite.ops.Command">Command</a>[<span class="extype" name="scala.Int">Int</span>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#ammonite.ops.package@%:ammonite.ops.Command[Unit]" title="Permalink" target="_top">
+      <a href="../../index.html#ammonite.ops.package@%:ammonite.ops.Command[Int]" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -843,7 +824,7 @@ filename: <span class="std">String</span> = <span class="lit">"Ammonite"</span><
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <a href="BasePath$.html"><span class="name">BasePath</span></a>
+        <a href="BasePath$.html"><span class="name">BasePath</span></a><span class="result"> extends <a href="PathFactory.html" class="extype" name="ammonite.ops.PathFactory">PathFactory</a>[<a href="BasePath.html" class="extype" name="ammonite.ops.BasePath">BasePath</a>]</span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.package@BasePath" title="Permalink" target="_top">
@@ -919,23 +900,6 @@ filename: <span class="std">String</span> = <span class="lit">"Ammonite"</span><
       </a>
     </span>
       
-    </li><li name="ammonite.ops.FilePath" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="FilePath"></a>
-      <a id="FilePath:FilePath"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">object</span>
-      </span>
-      <span class="symbol">
-        <a href="FilePath$.html"><span class="name">FilePath</span></a><span class="result"> extends <a href="PathFactory.html" class="extype" name="ammonite.ops.PathFactory">PathFactory</a>[<a href="FilePath.html" class="extype" name="ammonite.ops.FilePath">FilePath</a>]</span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.ops.package@FilePath" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
     </li><li name="ammonite.ops.FileType" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="FileType"></a>
       <a id="FileType:FileType"></a>
@@ -962,7 +926,7 @@ filename: <span class="std">String</span> = <span class="lit">"Ammonite"</span><
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">FilterMapArrays</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="a">a: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Array" class="extype" target="_top">Array</a>[<span class="extype" name="ammonite.ops.Extensions.FilterMapArrays.T">T</span>]</span>)</span><span class="result">: <a href="FilterMapExt.html" class="extype" name="ammonite.ops.FilterMapExt">FilterMapExt</a>[<span class="extype" name="ammonite.ops.Extensions.FilterMapArrays.T">T</span>, <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Array" class="extype" target="_top">Array</a>[<span class="extype" name="ammonite.ops.Extensions.FilterMapArrays.T">T</span>]]</span>
+        <span class="name">FilterMapArrays</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="a">a: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="ammonite.ops.Extensions.FilterMapArrays.T">T</span>]</span>)</span><span class="result">: <a href="FilterMapExt.html" class="extype" name="ammonite.ops.FilterMapExt">FilterMapExt</a>[<span class="extype" name="ammonite.ops.Extensions.FilterMapArrays.T">T</span>, <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="ammonite.ops.Extensions.FilterMapArrays.T">T</span>]]</span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.package@FilterMapArrays[T](a:Array[T]):ammonite.ops.FilterMapExt[T,Array[T]]" title="Permalink" target="_top">
@@ -981,7 +945,7 @@ filename: <span class="std">String</span> = <span class="lit">"Ammonite"</span><
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">FilterMapExt</span><span class="tparams">[<span name="T">T</span>, <span name="Repr">Repr</span>]</span><span class="params">(<span name="i">i: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.collection.TraversableLike" class="extype" target="_top">TraversableLike</a>[<span class="extype" name="ammonite.ops.Extensions.FilterMapExt.T">T</span>, <span class="extype" name="ammonite.ops.Extensions.FilterMapExt.Repr">Repr</span>]</span>)</span><span class="result">: <a href="FilterMapExt.html" class="extype" name="ammonite.ops.FilterMapExt">FilterMapExt</a>[<span class="extype" name="ammonite.ops.Extensions.FilterMapExt.T">T</span>, <span class="extype" name="ammonite.ops.Extensions.FilterMapExt.Repr">Repr</span>]</span>
+        <span class="name">FilterMapExt</span><span class="tparams">[<span name="T">T</span>, <span name="Repr">Repr</span>]</span><span class="params">(<span name="i">i: <span class="extype" name="scala.collection.TraversableLike">TraversableLike</span>[<span class="extype" name="ammonite.ops.Extensions.FilterMapExt.T">T</span>, <span class="extype" name="ammonite.ops.Extensions.FilterMapExt.Repr">Repr</span>]</span>)</span><span class="result">: <a href="FilterMapExt.html" class="extype" name="ammonite.ops.FilterMapExt">FilterMapExt</a>[<span class="extype" name="ammonite.ops.Extensions.FilterMapExt.T">T</span>, <span class="extype" name="ammonite.ops.Extensions.FilterMapExt.Repr">Repr</span>]</span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.package@FilterMapExt[T,Repr](i:scala.collection.TraversableLike[T,Repr]):ammonite.ops.FilterMapExt[T,Repr]" title="Permalink" target="_top">
@@ -1022,8 +986,8 @@ filename: <span class="std">String</span> = <span class="lit">"Ammonite"</span><
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">If you want to call subprocesses using <a href="#%:ammonite.ops.Command[Unit]" class="extmbr" name="ammonite.ops#%">%</a> or <a href="#%%:ammonite.ops.Command[ammonite.ops.CommandResult]" class="extmbr" name="ammonite.ops#%%">%%</a> and don't care
-what working directory they use, import this via</p><div class="fullcomment"><div class="comment cmt"><p>If you want to call subprocesses using <a href="#%:ammonite.ops.Command[Unit]" class="extmbr" name="ammonite.ops#%">%</a> or <a href="#%%:ammonite.ops.Command[ammonite.ops.CommandResult]" class="extmbr" name="ammonite.ops#%%">%%</a> and don't care
+      <p class="shortcomment cmt">If you want to call subprocesses using <a href="#%:ammonite.ops.Command[Int]" class="extmbr" name="ammonite.ops#%">%</a> or <a href="#%%:ammonite.ops.Command[ammonite.ops.CommandResult]" class="extmbr" name="ammonite.ops#%%">%%</a> and don't care
+what working directory they use, import this via</p><div class="fullcomment"><div class="comment cmt"><p>If you want to call subprocesses using <a href="#%:ammonite.ops.Command[Int]" class="extmbr" name="ammonite.ops#%">%</a> or <a href="#%%:ammonite.ops.Command[ammonite.ops.CommandResult]" class="extmbr" name="ammonite.ops#%%">%%</a> and don't care
 what working directory they use, import this via</p><p><code>import ammonite.ops.ImplicitWd._</code></p><p>To make them use the process's working directory for each subprocess
 </p></div></div>
     </li><li name="ammonite.ops.Internals" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
@@ -1052,7 +1016,7 @@ what working directory they use, import this via</p><p><code>import ammonite.ops
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <a href="Path$.html"><span class="name">Path</span></a><span class="result"> extends <a href="PathFactory.html" class="extype" name="ammonite.ops.PathFactory">PathFactory</a>[<a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>] with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+        <a href="Path$.html"><span class="name">Path</span></a><span class="result"> extends <a href="PathFactory.html" class="extype" name="ammonite.ops.PathFactory">PathFactory</a>[<a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>] with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.package@Path" title="Permalink" target="_top">
@@ -1154,7 +1118,7 @@ what working directory they use, import this via</p><p><code>import ammonite.ops
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">RegexContextMaker</span><span class="params">(<span name="s">s: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.StringContext" class="extype" target="_top">StringContext</a></span>)</span><span class="result">: <a href="RegexContext.html" class="extype" name="ammonite.ops.RegexContext">RegexContext</a></span>
+        <span class="name">RegexContextMaker</span><span class="params">(<span name="s">s: <span class="extype" name="scala.StringContext">StringContext</span></span>)</span><span class="result">: <a href="RegexContext.html" class="extype" name="ammonite.ops.RegexContext">RegexContext</a></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.package@RegexContextMaker(s:StringContext):ammonite.ops.RegexContext" title="Permalink" target="_top">
@@ -1171,7 +1135,7 @@ what working directory they use, import this via</p><p><code>import ammonite.ops
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <a href="RelPath$.html"><span class="name">RelPath</span></a><span class="result"> extends <a href="RelPathStuff.html" class="extype" name="ammonite.ops.RelPathStuff">RelPathStuff</a> with <a href="PathFactory.html" class="extype" name="ammonite.ops.PathFactory">PathFactory</a>[<a href="RelPath.html" class="extype" name="ammonite.ops.RelPath">RelPath</a>] with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+        <a href="RelPath$.html"><span class="name">RelPath</span></a><span class="result"> extends <a href="RelPathStuff.html" class="extype" name="ammonite.ops.RelPathStuff">RelPathStuff</a> with <a href="PathFactory.html" class="extype" name="ammonite.ops.PathFactory">PathFactory</a>[<a href="RelPath.html" class="extype" name="ammonite.ops.RelPath">RelPath</a>] with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.package@RelPath" title="Permalink" target="_top">
@@ -1188,7 +1152,7 @@ what working directory they use, import this via</p><p><code>import ammonite.ops
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <a href="ResourcePath$.html"><span class="name">ResourcePath</span></a><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+        <a href="ResourcePath$.html"><span class="name">ResourcePath</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.package@ResourcePath" title="Permalink" target="_top">
@@ -1222,7 +1186,7 @@ what working directory they use, import this via</p><p><code>import ammonite.ops
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">SeqFactoryFunc</span><span class="tparams">[<span name="T">T</span>, <span name="CC">CC<span class="tparams">[<span name="X">X</span>]</span> &lt;: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.collection.Seq" class="extype" target="_top">Seq</a>[<span class="extype" name="ammonite.ops.Extensions.SeqFactoryFunc.CC.X">X</span>] with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.collection.generic.GenericTraversableTemplate" class="extype" target="_top">GenericTraversableTemplate</a>[<span class="extype" name="ammonite.ops.Extensions.SeqFactoryFunc.CC.X">X</span>, <span class="extype" name="ammonite.ops.Extensions.SeqFactoryFunc.CC">CC</span>]</span>]</span><span class="params">(<span name="s">s: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.collection.generic.SeqFactory" class="extype" target="_top">SeqFactory</a>[<span class="extype" name="ammonite.ops.Extensions.SeqFactoryFunc.CC">CC</span>]</span>)</span><span class="result">: (<a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.collection.Seq" class="extype" target="_top">Seq</a>[<span class="extype" name="ammonite.ops.Extensions.SeqFactoryFunc.T">T</span>]) ⇒ <span class="extype" name="ammonite.ops.Extensions.SeqFactoryFunc.CC">CC</span>[<span class="extype" name="ammonite.ops.Extensions.SeqFactoryFunc.T">T</span>]</span>
+        <span class="name">SeqFactoryFunc</span><span class="tparams">[<span name="T">T</span>, <span name="CC">CC<span class="tparams">[<span name="X">X</span>]</span> &lt;: <span class="extype" name="scala.collection.Seq">Seq</span>[<span class="extype" name="ammonite.ops.Extensions.SeqFactoryFunc.CC.X">X</span>] with <span class="extype" name="scala.collection.generic.GenericTraversableTemplate">GenericTraversableTemplate</span>[<span class="extype" name="ammonite.ops.Extensions.SeqFactoryFunc.CC.X">X</span>, <span class="extype" name="ammonite.ops.Extensions.SeqFactoryFunc.CC">CC</span>]</span>]</span><span class="params">(<span name="s">s: <span class="extype" name="scala.collection.generic.SeqFactory">SeqFactory</span>[<span class="extype" name="ammonite.ops.Extensions.SeqFactoryFunc.CC">CC</span>]</span>)</span><span class="result">: (<span class="extype" name="scala.collection.Seq">Seq</span>[<span class="extype" name="ammonite.ops.Extensions.SeqFactoryFunc.T">T</span>]) ⇒ <span class="extype" name="ammonite.ops.Extensions.SeqFactoryFunc.CC">CC</span>[<span class="extype" name="ammonite.ops.Extensions.SeqFactoryFunc.T">T</span>]</span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.package@SeqFactoryFunc[T,CC[X]&lt;:Seq[X]withscala.collection.generic.GenericTraversableTemplate[X,CC]](s:scala.collection.generic.SeqFactory[CC]):Seq[T]=&gt;CC[T]" title="Permalink" target="_top">
@@ -1242,7 +1206,7 @@ e.g. Seq(1, 2, 3) |&gt; Vector
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <a href="Shellable$.html"><span class="name">Shellable</span></a><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+        <a href="Shellable$.html"><span class="name">Shellable</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.package@Shellable" title="Permalink" target="_top">
@@ -1277,7 +1241,7 @@ e.g. Seq(1, 2, 3) |&gt; Vector
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <a href="cp$.html"><span class="name">cp</span></a><span class="result"> extends (<a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>, <a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>) ⇒ <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a> with <a href="CopyMove.html" class="extype" name="ammonite.ops.CopyMove">CopyMove</a></span>
+        <a href="cp$.html"><span class="name">cp</span></a><span class="result"> extends (<a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>, <a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>) ⇒ <span class="extype" name="scala.Unit">Unit</span> with <a href="CopyMove.html" class="extype" name="ammonite.ops.CopyMove">CopyMove</a></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.package@cp" title="Permalink" target="_top">
@@ -1331,7 +1295,7 @@ recursively.
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <a href="exists$.html"><span class="name">exists</span></a><span class="result"> extends (<a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>) ⇒ <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
+        <a href="exists$.html"><span class="name">exists</span></a><span class="result"> extends (<a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.package@exists" title="Permalink" target="_top">
@@ -1385,7 +1349,7 @@ when necessary.</p>
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <a href="ln$.html"><span class="name">ln</span></a><span class="result"> extends (<a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>, <a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>) ⇒ <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
+        <a href="ln$.html"><span class="name">ln</span></a><span class="result"> extends (<a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>, <a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>) ⇒ <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.package@ln" title="Permalink" target="_top">
@@ -1426,7 +1390,7 @@ to cause your recursion to skip certain files or folders.
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <a href="mkdir$.html"><span class="name">mkdir</span></a><span class="result"> extends (<a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>) ⇒ <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
+        <a href="mkdir$.html"><span class="name">mkdir</span></a><span class="result"> extends (<a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>) ⇒ <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.package@mkdir" title="Permalink" target="_top">
@@ -1445,7 +1409,7 @@ to <code>mkdir -p</code> in bash
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <a href="mv$.html"><span class="name">mv</span></a><span class="result"> extends (<a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>, <a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>) ⇒ <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a> with <a href="Internals$$Mover.html" class="extype" name="ammonite.ops.Internals.Mover">Mover</a> with <a href="CopyMove.html" class="extype" name="ammonite.ops.CopyMove">CopyMove</a></span>
+        <a href="mv$.html"><span class="name">mv</span></a><span class="result"> extends (<a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>, <a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>) ⇒ <span class="extype" name="scala.Unit">Unit</span> with <a href="Internals$$Mover.html" class="extype" name="ammonite.ops.Internals.Mover">Mover</a> with <a href="CopyMove.html" class="extype" name="ammonite.ops.CopyMove">CopyMove</a></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.package@mv" title="Permalink" target="_top">
@@ -1515,7 +1479,7 @@ as (read.lines(...): Seq[String]), or as (read.bytes(...): Array[Byte]).</p>
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <a href="rm$.html"><span class="name">rm</span></a><span class="result"> extends (<a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>) ⇒ <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
+        <a href="rm$.html"><span class="name">rm</span></a><span class="result"> extends (<a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>) ⇒ <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.package@rm" title="Permalink" target="_top">
@@ -1553,7 +1517,7 @@ does nothing if there aren't any
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <a href="stat$.html"><span class="name">stat</span></a><span class="result"> extends (<a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>) ⇒ <a href="stat.html" class="extype" name="ammonite.ops.stat">stat</a> with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+        <a href="stat$.html"><span class="name">stat</span></a><span class="result"> extends (<a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>) ⇒ <a href="stat.html" class="extype" name="ammonite.ops.stat">stat</a> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.package@stat" title="Permalink" target="_top">
@@ -1561,27 +1525,6 @@ does nothing if there aren't any
       </a>
     </span>
       
-    </li><li name="ammonite.ops.tmp" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="tmp"></a>
-      <a id="tmp:tmp"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">object</span>
-      </span>
-      <span class="symbol">
-        <a href="package$$tmp$.html"><span class="name">tmp</span></a>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.ops.package@tmp" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">Alias for <code>java.nio.file.Files.createTempFile</code> and
-<code>java.io.File.deleteOnExit</code>.</p><div class="fullcomment"><div class="comment cmt"><p>Alias for <code>java.nio.file.Files.createTempFile</code> and
-<code>java.io.File.deleteOnExit</code>. Pass in <code>deleteOnExit = false</code> if you want
-the temp file to stick around.
-</p></div></div>
     </li><li name="ammonite.ops.RelPathStuff#up" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="up:ammonite.ops.RelPath"></a>
       <a id="up:RelPath"></a>
@@ -1608,7 +1551,7 @@ the temp file to stick around.
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <a href="write$.html"><span class="name">write</span></a><span class="result"> extends (<a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>, <a href="Internals$$Writable.html" class="extype" name="ammonite.ops.Internals.Writable">Writable</a>) ⇒ <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
+        <a href="write$.html"><span class="name">write</span></a><span class="result"> extends (<a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>, <a href="Internals$$Writable.html" class="extype" name="ammonite.ops.Internals.Writable">Writable</a>) ⇒ <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.package@write" title="Permalink" target="_top">
@@ -1635,9 +1578,9 @@ there.
             </div><div class="parent" name="ammonite.ops.Extensions">
               <h3>Inherited from <a href="Extensions.html" class="extype" name="ammonite.ops.Extensions">Extensions</a></h3>
             </div><div class="parent" name="scala.AnyRef">
-              <h3>Inherited from <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></h3>
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
             </div><div class="parent" name="scala.Any">
-              <h3>Inherited from <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Any" class="extype" target="_top">Any</a></h3>
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
             </div>
         
         </div>

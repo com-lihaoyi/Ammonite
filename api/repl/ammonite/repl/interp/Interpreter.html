@@ -54,7 +54,7 @@ to interpret Scala code. Doesn't attempt to provide any
 real encapsulation for now.
 </p></div><dl class="attributes block"> <dt>Self Type</dt><dd><a href="" class="extype" name="ammonite.repl.interp.Interpreter">Interpreter</a></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
-          <div class="superTypes hiddenContent"><a href="../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a>, <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Any" class="extype" target="_top">Any</a></div>
+          <div class="superTypes hiddenContent"><a href="../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
         
 
@@ -100,7 +100,7 @@ real encapsulation for now.
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">Interpreter</span><span class="params">(<span name="prompt0">prompt0: <a href="../Ref.html" class="extype" name="ammonite.repl.Ref">Ref</a>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="frontEnd0">frontEnd0: <a href="../Ref.html" class="extype" name="ammonite.repl.Ref">Ref</a>[<a href="../frontend/FrontEnd.html" class="extype" name="ammonite.repl.frontend.FrontEnd">FrontEnd</a>]</span>, <span name="width">width: ⇒ <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a></span>, <span name="height">height: ⇒ <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a></span>, <span name="pprintConfig">pprintConfig: <span class="extype" name="pprint.Config">Config</span></span>, <span name="colors0">colors0: <a href="../Ref.html" class="extype" name="ammonite.repl.Ref">Ref</a>[<a href="../Colors.html" class="extype" name="ammonite.repl.Colors">Colors</a>]</span>, <span name="printer">printer: <a href="../Printer.html" class="extype" name="ammonite.repl.Printer">Printer</a></span>, <span name="storage">storage: <a href="../Ref.html" class="extype" name="ammonite.repl.Ref">Ref</a>[<a href="../Storage.html" class="extype" name="ammonite.repl.Storage">Storage</a>]</span>, <span name="history">history: ⇒ <a href="../History.html" class="extype" name="ammonite.repl.History">History</a></span>, <span name="predef">predef: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="replArgs">replArgs: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="../Bind.html" class="extype" name="ammonite.repl.Bind">Bind</a>[_]]</span>)</span>
+        <span class="name">Interpreter</span><span class="params">(<span name="prompt0">prompt0: <a href="../Ref.html" class="extype" name="ammonite.repl.Ref">Ref</a>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="frontEnd0">frontEnd0: <a href="../Ref.html" class="extype" name="ammonite.repl.Ref">Ref</a>[<a href="../frontend/FrontEnd.html" class="extype" name="ammonite.repl.frontend.FrontEnd">FrontEnd</a>]</span>, <span name="width">width: ⇒ <span class="extype" name="scala.Int">Int</span></span>, <span name="height">height: ⇒ <span class="extype" name="scala.Int">Int</span></span>, <span name="pprintConfig">pprintConfig: <span class="extype" name="pprint.Config">Config</span></span>, <span name="colors0">colors0: <a href="../Ref.html" class="extype" name="ammonite.repl.Ref">Ref</a>[<a href="../Colors.html" class="extype" name="ammonite.repl.Colors">Colors</a>]</span>, <span name="printer">printer: <a href="../Printer.html" class="extype" name="ammonite.repl.Printer">Printer</a></span>, <span name="storage">storage: <a href="../Ref.html" class="extype" name="ammonite.repl.Ref">Ref</a>[<a href="../Storage.html" class="extype" name="ammonite.repl.Storage">Storage</a>]</span>, <span name="history">history: ⇒ <a href="../History.html" class="extype" name="ammonite.repl.History">History</a></span>, <span name="predef">predef: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="replArgs">replArgs: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="../Bind.html" class="extype" name="ammonite.repl.Bind">Bind</a>[_]]</span>)</span>
       </span>
       </h4><span class="permalink">
       <a href="../../../index.html#ammonite.repl.interp.Interpreter@&lt;init&gt;(prompt0:ammonite.repl.Ref[String],frontEnd0:ammonite.repl.Ref[ammonite.repl.frontend.FrontEnd],width:=&gt;Int,height:=&gt;Int,pprintConfig:pprint.Config,colors0:ammonite.repl.Ref[ammonite.repl.Colors],printer:ammonite.repl.Printer,storage:ammonite.repl.Ref[ammonite.repl.Storage],history:=&gt;ammonite.repl.History,predef:String,replArgs:Seq[ammonite.repl.Bind[_]]):ammonite.repl.interp.Interpreter" title="Permalink" target="_top">
@@ -130,23 +130,6 @@ real encapsulation for now.
       </a>
     </span>
       
-    </li><li name="ammonite.repl.interp.Interpreter.EvaluateCallback" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="EvaluateCallback=(String,Seq[ammonite.repl.ImportData])=&gt;ammonite.repl.Res[ammonite.repl.Evaluated]"></a>
-      <a id="EvaluateCallback:EvaluateCallback"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">type</span>
-      </span>
-      <span class="symbol">
-        <span class="name">EvaluateCallback</span><span class="result"> = (<span class="extype" name="scala.Predef.String">String</span>, <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="../ImportData.html" class="extype" name="ammonite.repl.ImportData">ImportData</a>]) ⇒ <a href="../Res.html" class="extype" name="ammonite.repl.Res">Res</a>[<a href="../Evaluated.html" class="extype" name="ammonite.repl.Evaluated">Evaluated</a>]</span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Interpreter@EvaluateCallback=(String,Seq[ammonite.repl.ImportData])=&gt;ammonite.repl.Res[ammonite.repl.Evaluated]" title="Permalink" target="_top">
-        <img src="../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
     </li></ol>
             </div>
 
@@ -163,7 +146,7 @@ real encapsulation for now.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Any" class="extype" target="_top">Any</a></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../../index.html#ammonite.repl.interp.Interpreter@!=(x$1:Any):Boolean" title="Permalink" target="_top">
@@ -180,7 +163,7 @@ real encapsulation for now.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span title="gt4s: $hash$hash" class="name">##</span><span class="params">()</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a></span>
+        <span title="gt4s: $hash$hash" class="name">##</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../../index.html#ammonite.repl.interp.Interpreter@##():Int" title="Permalink" target="_top">
@@ -197,7 +180,7 @@ real encapsulation for now.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Any" class="extype" target="_top">Any</a></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../../index.html#ammonite.repl.interp.Interpreter@==(x$1:Any):Boolean" title="Permalink" target="_top">
@@ -322,7 +305,7 @@ real encapsulation for now.
         <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">dynamicClasspath</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.reflect.io.VirtualDirectory" class="extype" target="_top">VirtualDirectory</a></span>
+        <span class="name">dynamicClasspath</span><span class="result">: <span class="extype" name="scala.reflect.io.VirtualDirectory">VirtualDirectory</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../../index.html#ammonite.repl.interp.Interpreter@dynamicClasspath:scala.reflect.io.VirtualDirectory" title="Permalink" target="_top">
@@ -339,7 +322,7 @@ real encapsulation for now.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">eq</span><span class="params">(<span name="arg0">arg0: <a href="../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
+        <span class="name">eq</span><span class="params">(<span name="arg0">arg0: <a href="../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../../index.html#ammonite.repl.interp.Interpreter@eq(x$1:AnyRef):Boolean" title="Permalink" target="_top">
@@ -356,7 +339,7 @@ real encapsulation for now.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Any" class="extype" target="_top">Any</a></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
+        <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../../index.html#ammonite.repl.interp.Interpreter@equals(x$1:Any):Boolean" title="Permalink" target="_top">
@@ -364,23 +347,6 @@ real encapsulation for now.
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="ammonite.repl.interp.Interpreter#errMsg" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="errMsg(msg:String,code:String,expected:String,idx:Int):String"></a>
-      <a id="errMsg(String,String,String,Int):String"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">errMsg</span><span class="params">(<span name="msg">msg: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="code">code: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="expected">expected: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="idx">idx: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a></span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Interpreter@errMsg(msg:String,code:String,expected:String,idx:Int):String" title="Permalink" target="_top">
-        <img src="../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
     </li><li name="ammonite.repl.interp.Interpreter#eval" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="eval:ammonite.repl.interp.Evaluator"></a>
       <a id="eval:Evaluator"></a>
@@ -441,7 +407,7 @@ real encapsulation for now.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">finalize</span><span class="params">()</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
+        <span class="name">finalize</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../../index.html#ammonite.repl.interp.Interpreter@finalize():Unit" title="Permalink" target="_top">
@@ -481,7 +447,7 @@ real encapsulation for now.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">handleOutput</span><span class="params">(<span name="res">res: <a href="../Res.html" class="extype" name="ammonite.repl.Res">Res</a>[<a href="../Evaluated.html" class="extype" name="ammonite.repl.Evaluated">Evaluated</a>]</span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
+        <span class="name">handleOutput</span><span class="params">(<span name="res">res: <a href="../Res.html" class="extype" name="ammonite.repl.Res">Res</a>[<a href="../Evaluated.html" class="extype" name="ammonite.repl.Evaluated">Evaluated</a>]</span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../../index.html#ammonite.repl.interp.Interpreter@handleOutput(res:ammonite.repl.Res[ammonite.repl.Evaluated]):Boolean" title="Permalink" target="_top">
@@ -515,7 +481,7 @@ real encapsulation for now.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">hashCode</span><span class="params">()</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a></span>
+        <span class="name">hashCode</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../../index.html#ammonite.repl.interp.Interpreter@hashCode():Int" title="Permalink" target="_top">
@@ -532,7 +498,7 @@ real encapsulation for now.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">init</span><span class="params">()</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
+        <span class="name">init</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../../index.html#ammonite.repl.interp.Interpreter@init():Unit" title="Permalink" target="_top">
@@ -549,7 +515,7 @@ real encapsulation for now.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">isInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
+        <span class="name">isInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../../index.html#ammonite.repl.interp.Interpreter@isInstanceOf[T0]:Boolean" title="Permalink" target="_top">
@@ -600,7 +566,7 @@ real encapsulation for now.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">ne</span><span class="params">(<span name="arg0">arg0: <a href="../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
+        <span class="name">ne</span><span class="params">(<span name="arg0">arg0: <a href="../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../../index.html#ammonite.repl.interp.Interpreter@ne(x$1:AnyRef):Boolean" title="Permalink" target="_top">
@@ -617,7 +583,7 @@ real encapsulation for now.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">notify</span><span class="params">()</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
+        <span class="name">notify</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../../index.html#ammonite.repl.interp.Interpreter@notify():Unit" title="Permalink" target="_top">
@@ -634,7 +600,7 @@ real encapsulation for now.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">notifyAll</span><span class="params">()</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
+        <span class="name">notifyAll</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../../index.html#ammonite.repl.interp.Interpreter@notifyAll():Unit" title="Permalink" target="_top">
@@ -672,23 +638,6 @@ real encapsulation for now.
       </span>
       </h4><span class="permalink">
       <a href="../../../index.html#ammonite.repl.interp.Interpreter@pressy:ammonite.repl.interp.Pressy" title="Permalink" target="_top">
-        <img src="../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
-    </li><li name="ammonite.repl.interp.Interpreter#processCorrectScript" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="processCorrectScript(parsedCode:fastparse.all.Parsed.Success[Seq[Seq[String]]],evaluate:Interpreter.this.EvaluateCallback):Seq[ammonite.repl.ImportData]"></a>
-      <a id="processCorrectScript(Success[Seq[Seq[String]]],EvaluateCallback):Seq[ImportData]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">processCorrectScript</span><span class="params">(<span name="parsedCode">parsedCode: <span class="extype" name="fastparse.core.Parsed.Success">Success</span>[<a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<span class="extype" name="scala.Predef.String">String</span>]]]</span>, <span name="evaluate">evaluate: <a href="#EvaluateCallback=(String,Seq[ammonite.repl.ImportData])=&gt;ammonite.repl.Res[ammonite.repl.Evaluated]" class="extmbr" name="ammonite.repl.interp.Interpreter.EvaluateCallback">EvaluateCallback</a></span>)</span><span class="result">: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="../ImportData.html" class="extype" name="ammonite.repl.ImportData">ImportData</a>]</span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Interpreter@processCorrectScript(parsedCode:fastparse.all.Parsed.Success[Seq[Seq[String]]],evaluate:Interpreter.this.EvaluateCallback):Seq[ammonite.repl.ImportData]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -821,7 +770,7 @@ real encapsulation for now.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">wait</span><span class="params">()</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
+        <span class="name">wait</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../../index.html#ammonite.repl.interp.Interpreter@wait():Unit" title="Permalink" target="_top">
@@ -844,7 +793,7 @@ real encapsulation for now.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Long" class="extype" target="_top">Long</a></span>, <span name="arg1">arg1: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../../index.html#ammonite.repl.interp.Interpreter@wait(x$1:Long,x$2:Int):Unit" title="Permalink" target="_top">
@@ -867,7 +816,7 @@ real encapsulation for now.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Long" class="extype" target="_top">Long</a></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../../index.html#ammonite.repl.interp.Interpreter@wait(x$1:Long):Unit" title="Permalink" target="_top">
@@ -881,23 +830,6 @@ real encapsulation for now.
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="ammonite.repl.interp.Interpreter#withContextClassloader" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="withContextClassloader[T](t:=&gt;T):T"></a>
-      <a id="withContextClassloader[T](⇒T):T"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">withContextClassloader</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="t">t: ⇒ <span class="extype" name="ammonite.repl.interp.Interpreter.withContextClassloader.T">T</span></span>)</span><span class="result">: <span class="extype" name="ammonite.repl.interp.Interpreter.withContextClassloader.T">T</span></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Interpreter@withContextClassloader[T](t:=&gt;T):T" title="Permalink" target="_top">
-        <img src="../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
     </li></ol>
             </div>
 
@@ -910,7 +842,7 @@ real encapsulation for now.
         <div class="parent" name="scala.AnyRef">
               <h3>Inherited from <a href="../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></h3>
             </div><div class="parent" name="scala.Any">
-              <h3>Inherited from <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Any" class="extype" target="_top">Any</a></h3>
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
             </div>
         
         </div>

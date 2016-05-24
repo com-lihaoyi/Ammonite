@@ -52,7 +52,7 @@
           <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>A collection of helpers that to simpify the common case of building filters
 </p></div><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
-          <div class="superTypes hiddenContent"><a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a>, <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Any" class="extype" target="_top">Any</a></div>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
         
 
@@ -104,7 +104,7 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Any" class="extype" target="_top">Any</a></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.terminal.FilterTools$@!=(x$1:Any):Boolean" title="Permalink" target="_top">
@@ -121,7 +121,7 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span title="gt4s: $hash$hash" class="name">##</span><span class="params">()</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a></span>
+        <span title="gt4s: $hash$hash" class="name">##</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.terminal.FilterTools$@##():Int" title="Permalink" target="_top">
@@ -138,7 +138,7 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Any" class="extype" target="_top">Any</a></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.terminal.FilterTools$@==(x$1:Any):Boolean" title="Permalink" target="_top">
@@ -146,6 +146,26 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="ammonite.terminal.FilterTools#Case" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Case(s:String)(f:(Vector[Char],Int,ammonite.terminal.TermInfo)=&gt;(Vector[Char],Int))(implicitl:sourcecode.Line,implicitenc:sourcecode.Enclosing):ammonite.terminal.Filter"></a>
+      <a id="Case(String)((Vector[Char],Int,TermInfo)⇒(Vector[Char],Int))(Line,Enclosing):Filter"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Case</span><span class="params">(<span name="s">s: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="params">(<span name="f">f: (<span class="extype" name="scala.Vector">Vector</span>[<span class="extype" name="scala.Char">Char</span>], <span class="extype" name="scala.Int">Int</span>, <a href="TermInfo.html" class="extype" name="ammonite.terminal.TermInfo">TermInfo</a>) ⇒ (<span class="extype" name="scala.Vector">Vector</span>[<span class="extype" name="scala.Char">Char</span>], <span class="extype" name="scala.Int">Int</span>)</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="l">l: <span class="extype" name="sourcecode.Line">Line</span></span>, <span name="enc">enc: <span class="extype" name="sourcecode.Enclosing">Enclosing</span></span>)</span><span class="result">: <a href="Filter.html" class="extype" name="ammonite.terminal.Filter">Filter</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.terminal.FilterTools$@Case(s:String)(f:(Vector[Char],Int,ammonite.terminal.TermInfo)=&gt;(Vector[Char],Int))(implicitl:sourcecode.Line,implicitenc:sourcecode.Enclosing):ammonite.terminal.Filter" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Shorthand to construct a filter in the common case where you're
+switching on the prefix of the input stream and want to run some
+transformation on the buffer/cursor
+</p>
     </li><li name="ammonite.terminal.FilterTools#TS" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="TS:ammonite.terminal.TermState.type"></a>
       <a id="TS:TermState.type"></a>
@@ -207,7 +227,7 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">clone</span><span class="params">()</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>
+        <span class="name">clone</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.AnyRef">AnyRef</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.terminal.FilterTools$@clone():Object" title="Permalink" target="_top">
@@ -230,7 +250,7 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">eq</span><span class="params">(<span name="arg0">arg0: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
+        <span class="name">eq</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.terminal.FilterTools$@eq(x$1:AnyRef):Boolean" title="Permalink" target="_top">
@@ -247,7 +267,7 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Any" class="extype" target="_top">Any</a></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
+        <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.terminal.FilterTools$@equals(x$1:Any):Boolean" title="Permalink" target="_top">
@@ -264,7 +284,7 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">finalize</span><span class="params">()</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
+        <span class="name">finalize</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.terminal.FilterTools$@finalize():Unit" title="Permalink" target="_top">
@@ -287,7 +307,7 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">findChunks</span><span class="params">(<span name="b">b: <span class="extype" name="scala.Vector">Vector</span>[<a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Char" class="extype" target="_top">Char</a>]</span>, <span name="c">c: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a></span>)</span><span class="result">: (<span class="extype" name="scala.collection.mutable.Buffer">Buffer</span>[<a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a>], <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.collection.immutable.Stream" class="extype" target="_top">Stream</a>[<a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a>], <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a>)</span>
+        <span class="name">findChunks</span><span class="params">(<span name="b">b: <span class="extype" name="scala.Vector">Vector</span>[<span class="extype" name="scala.Char">Char</span>]</span>, <span name="c">c: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: (<span class="extype" name="scala.collection.mutable.Buffer">Buffer</span>[<span class="extype" name="scala.Int">Int</span>], <span class="extype" name="scala.collection.immutable.Stream">Stream</span>[<span class="extype" name="scala.Int">Int</span>], <span class="extype" name="scala.Int">Int</span>)</span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.terminal.FilterTools$@findChunks(b:Vector[Char],c:Int):(scala.collection.mutable.Buffer[Int],scala.collection.immutable.Stream[Int],Int)" title="Permalink" target="_top">
@@ -304,27 +324,10 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">firstRow</span><span class="params">(<span name="cursor">cursor: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a></span>, <span name="buffer">buffer: <span class="extype" name="scala.Vector">Vector</span>[<a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Char" class="extype" target="_top">Char</a>]</span>, <span name="width">width: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
+        <span class="name">firstRow</span><span class="params">(<span name="cursor">cursor: <span class="extype" name="scala.Int">Int</span></span>, <span name="buffer">buffer: <span class="extype" name="scala.Vector">Vector</span>[<span class="extype" name="scala.Char">Char</span>]</span>, <span name="width">width: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.terminal.FilterTools$@firstRow(cursor:Int,buffer:Vector[Char],width:Int):Boolean" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
-    </li><li name="ammonite.terminal.FilterTools#firstRowInfo" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="firstRowInfo(ti:ammonite.terminal.TermInfo):Boolean"></a>
-      <a id="firstRowInfo(TermInfo):Boolean"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">firstRowInfo</span><span class="params">(<span name="ti">ti: <a href="TermInfo.html" class="extype" name="ammonite.terminal.TermInfo">TermInfo</a></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.FilterTools$@firstRowInfo(ti:ammonite.terminal.TermInfo):Boolean" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -355,7 +358,7 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">hashCode</span><span class="params">()</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a></span>
+        <span class="name">hashCode</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.terminal.FilterTools$@hashCode():Int" title="Permalink" target="_top">
@@ -372,7 +375,7 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">isInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
+        <span class="name">isInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.terminal.FilterTools$@isInstanceOf[T0]:Boolean" title="Permalink" target="_top">
@@ -389,7 +392,7 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">lastRow</span><span class="params">(<span name="cursor">cursor: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a></span>, <span name="buffer">buffer: <span class="extype" name="scala.Vector">Vector</span>[<a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Char" class="extype" target="_top">Char</a>]</span>, <span name="width">width: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
+        <span class="name">lastRow</span><span class="params">(<span name="cursor">cursor: <span class="extype" name="scala.Int">Int</span></span>, <span name="buffer">buffer: <span class="extype" name="scala.Vector">Vector</span>[<span class="extype" name="scala.Char">Char</span>]</span>, <span name="width">width: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.terminal.FilterTools$@lastRow(cursor:Int,buffer:Vector[Char],width:Int):Boolean" title="Permalink" target="_top">
@@ -406,7 +409,7 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">ne</span><span class="params">(<span name="arg0">arg0: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
+        <span class="name">ne</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.terminal.FilterTools$@ne(x$1:AnyRef):Boolean" title="Permalink" target="_top">
@@ -423,7 +426,7 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">notify</span><span class="params">()</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
+        <span class="name">notify</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.terminal.FilterTools$@notify():Unit" title="Permalink" target="_top">
@@ -440,7 +443,7 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">notifyAll</span><span class="params">()</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
+        <span class="name">notifyAll</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.terminal.FilterTools$@notifyAll():Unit" title="Permalink" target="_top">
@@ -457,7 +460,7 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">offsetIndex</span><span class="params">(<span name="buffer">buffer: <span class="extype" name="scala.Vector">Vector</span>[<a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Char" class="extype" target="_top">Char</a>]</span>, <span name="in">in: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a></span>
+        <span class="name">offsetIndex</span><span class="params">(<span name="buffer">buffer: <span class="extype" name="scala.Vector">Vector</span>[<span class="extype" name="scala.Char">Char</span>]</span>, <span name="in">in: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.terminal.FilterTools$@offsetIndex(buffer:Vector[Char],in:Int):Int" title="Permalink" target="_top">
@@ -508,7 +511,7 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">wait</span><span class="params">()</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
+        <span class="name">wait</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.terminal.FilterTools$@wait():Unit" title="Permalink" target="_top">
@@ -531,7 +534,7 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Long" class="extype" target="_top">Long</a></span>, <span name="arg1">arg1: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.terminal.FilterTools$@wait(x$1:Long,x$2:Int):Unit" title="Permalink" target="_top">
@@ -554,7 +557,7 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Long" class="extype" target="_top">Long</a></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.terminal.FilterTools$@wait(x$1:Long):Unit" title="Permalink" target="_top">
@@ -578,9 +581,9 @@
 
         <div id="inheritedMembers">
         <div class="parent" name="scala.AnyRef">
-              <h3>Inherited from <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></h3>
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
             </div><div class="parent" name="scala.Any">
-              <h3>Inherited from <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Any" class="extype" target="_top">Any</a></h3>
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
             </div>
         
         </div>
