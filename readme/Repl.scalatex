@@ -288,7 +288,7 @@
       mutable.Seq(x) // doesn't work
                   ^
       @@ import ammonite.ops._
-      @@ load.module("script.scala")
+      @@ load.module(cwd / "script.scala")
       Welcome to the XYZ custom REPL!!
 
       @@ mutable.Seq(x) // works
