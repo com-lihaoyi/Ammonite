@@ -1,6 +1,10 @@
 package ammonite.ops
 
+
+import java.nio.charset.StandardCharsets
+
 import scala.annotation.tailrec
+import scala.io.Codec
 import scala.language.dynamics
 
 /**
@@ -115,7 +119,7 @@ class Bytes(val array: Array[Byte]){
     case otherBytes: Bytes => java.util.Arrays.equals(array, otherBytes.array)
     case _ => false
   }
-  override def toString = new String(array)
+  override def toString = new String(array, java.nio.charset.StandardCharsets.UTF_8)
 }
 /**
   * Contains the accumulated output for the invocation of a subprocess command.
@@ -166,14 +170,14 @@ case class ShelloutException(result: CommandResult) extends Exception(result.toS
 case class StreamValue(chunks: Seq[Bytes]){
   def bytes = chunks.iterator.map(_.array).toArray.flatten
 
-  lazy val string: String = string("UTF-8")
-  def string(codec: String): String = new String(bytes, codec)
+  lazy val string: String = string(StandardCharsets.UTF_8)
+  def string(codec: Codec): String = new String(bytes, codec.charSet)
 
   lazy val trim: String = string.trim
-  def trim(codec: String): String = string(codec).trim
+  def trim(codec: Codec): String = string(codec).trim
 
   lazy val lines: Vector[String] = string.lines.toVector
-  def lines(codec: String): Vector[String] = string(codec).lines.toVector
+  def lines(codec: Codec): Vector[String] = string(codec).lines.toVector
 }
 /**
  * An implicit wrapper defining the things that can

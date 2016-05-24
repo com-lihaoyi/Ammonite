@@ -142,7 +142,13 @@ class TestRepl {
       case _ =>
     }
     interp.handleOutput(processed)
-    (processed, outBuffer.mkString, warningBuffer.mkString("\n"), errorBuffer.mkString("\n"), infoBuffer.mkString("\n"))
+    (
+      processed,
+      outBuffer.mkString,
+      warningBuffer.mkString("\n"),
+      errorBuffer.mkString("\n"),
+      infoBuffer.mkString("\n")
+    )
   }
 
 

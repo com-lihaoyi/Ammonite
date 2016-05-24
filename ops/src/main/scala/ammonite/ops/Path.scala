@@ -5,6 +5,8 @@ import java.nio.charset.Charset
 
 import acyclic.file
 
+import scala.io.Codec
+
 /**
   * Enforces a standard interface for constructing [[BasePath]]-like things
   * from java types of various sorts
@@ -290,8 +292,8 @@ extends FilePath with BasePathImpl with Readable{
   override def getBytes = java.nio.file.Files.readAllBytes(toNIO)
   import collection.JavaConversions._
 
-  override def getLines(charSet: String) = {
-    java.nio.file.Files.readAllLines(toNIO, Charset.forName(charSet)).toVector
+  override def getLines(charSet: Codec) = {
+    java.nio.file.Files.readAllLines(toNIO, charSet.charSet).toVector
   }
 }
 

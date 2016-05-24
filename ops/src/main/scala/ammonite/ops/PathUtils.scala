@@ -5,6 +5,8 @@ import java.nio.charset.Charset
 
 import acyclic.file
 
+import scala.io.Codec
+
 
 
 /**
@@ -25,12 +27,12 @@ trait Readable{
     is.close()
     out.toByteArray
   }
-  protected[ops] def getLineIterator(charSet: String): Iterator[String] = {
+  protected[ops] def getLineIterator(charSet: Codec): Iterator[String] = {
     val is = getInputStream
-    val s = io.Source.fromInputStream(is, charSet)
+    val s = io.Source.fromInputStream(is)(charSet)
     new SelfClosingIterator(s.getLines, () => s.close())
   }
-  protected[ops] def getLines(charSet: String): Vector[String] = {
+  protected[ops] def getLines(charSet: Codec): Vector[String] = {
     getLineIterator(charSet).toVector
   }
 }
