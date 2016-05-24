@@ -2,19 +2,21 @@ package ammonite.terminal
 
 import utest._
 
-import scala.Console.{
-  RED => R, 
-  GREEN => G, 
-  BLUE => B,
-  YELLOW => Y,
-  UNDERLINED => UND, 
-  REVERSED => REV, 
-  RESET => RES
-}
 
 object AnsiStrTests extends TestSuite{
   import Ansi.Str.parse
-
+  // Alias a bunch of rendered attributes to short names
+  // to use in all our test cases
+  val R = Ansi.Color.Red.escape
+  val G = Ansi.Color.Green.escape
+  val B = Ansi.Color.Blue.escape
+  val Y = Ansi.Color.Yellow.escape
+  val UND = Ansi.Underlined.On.escape
+  val DUND = Ansi.Underlined.Off.escape
+  val REV = Ansi.Reversed.On.escape
+  val DREV = Ansi.Reversed.Off.escape
+  val DCOL = Ansi.Color.Reset.escape
+  val RES = Ansi.Attr.Reset.escape
   /**
     * ANSI escape sequence to reset text color
     */
@@ -87,7 +89,7 @@ object AnsiStrTests extends TestSuite{
       'mixedResetUnderline{
         val resetty = s"+$RES++$R--$RES-$UND$G***$B///"
         val overlayed = resetty.overlay(Ansi.Color.Yellow, 4, 7).render toVector
-        val expected = s"+++$R-$Y--$UND*$G**$B///$RES" toVector
+        val expected = s"+++$R-$Y--$UND*$G**$B///$DCOL$DUND" toVector
 
         assert(overlayed == expected)
       }
@@ -95,47 +97,65 @@ object AnsiStrTests extends TestSuite{
         val resetty = s"$UND#$RES    $UND#$RES"
         'underlineBug{
           val overlayed = resetty.overlay(Ansi.Reversed.On, 0, 2).render
-          val expected = s"$UND$REV#$RES$REV $RES   $UND#$RES"
+          val expected = s"$UND$REV#$DUND $DREV   $UND#$DUND"
           assert(overlayed == expected)
         }
         'barelyOverlapping{
           val overlayed = resetty.overlay(Ansi.Reversed.On, 0, 1).render
-          val expected = s"$UND$REV#$RES    $UND#$RES"
+          val expected = s"$UND$REV#$DUND$DREV    $UND#$DUND"
           assert(overlayed == expected)
         }
         'endOfLine{
           val overlayed = resetty.overlay(Ansi.Reversed.On, 5, 6).render
-          val expected = s"$UND#$RES    $UND$REV#$RES"
+          val expected = s"$UND#$DUND    $UND$REV#$DUND$DREV"
           assert(overlayed == expected)
         }
         'overshoot{
           val overlayed = resetty.overlay(Ansi.Reversed.On, 5, 10).render.toVector
-          val expected = s"$UND#$RES    $UND$REV#$RES".toVector
+          val expected = s"$UND#$DUND    $UND$REV#$DUND$DREV".toVector
           assert(overlayed == expected)
         }
         'empty{
           val overlayed = resetty.overlay(Ansi.Reversed.On, 0, 0).render
-          val expected = s"$UND#$RES    $UND#$RES"
+          val expected = s"$UND#$DUND    $UND#$DUND"
           assert(overlayed == expected)
         }
         'singleContent{
           val overlayed = resetty.overlay(Ansi.Reversed.On, 2, 4).render
-          val expected = s"$UND#$RES $REV  $RES $UND#$RES"
+          val expected = s"$UND#$DUND $REV  $DREV $UND#$DUND"
           assert(overlayed == expected)
 
         }
       }
     }
-    'colors{
-      'reset - Ansi.Color.Reset
-      'black - Ansi.Color.Black
-      'red - Ansi.Color.Red
-      'green - Ansi.Color.Green
-      'yellow - Ansi.Color.Yellow
-      'blue - Ansi.Color.Blue
-      'magenta - Ansi.Color.Magenta
-      'cyan - Ansi.Color.Cyan
-      'white - Ansi.Color.White
+    'attributes{
+      * - {
+        Console.RESET + Ansi.Underlined.On
+      }
+      * - {
+        Console.RESET + (Ansi.Underlined.On("Reset ") ++ Ansi.Underlined.Off("Underlined"))
+      }
+      * - {
+        Console.RESET + Ansi.Bold.On
+      }
+      * - {
+        Console.RESET + (Ansi.Bold.On("Reset ") ++ Ansi.Bold.Off("Bold"))
+      }
+      * - {
+        Console.RESET + Ansi.Reversed.On
+      }
+      * - {
+        Console.RESET + (Ansi.Reversed.On("Reset ") ++ Ansi.Reversed.Off("Reversed"))
+      }
     }
+    def tabulate(all: Seq[Ansi.Attr]) = {
+      all.map(attr => attr.toString + " " * (25 - attr.name.length))
+         .grouped(3)
+         .map(_.mkString)
+         .mkString("\n")
+    }
+
+    'colors - tabulate(Ansi.Color.all)
+    'backgrounds - tabulate(Ansi.Back.all)
   }
 }

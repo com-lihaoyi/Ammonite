@@ -2,24 +2,44 @@ package ammonite.terminal
 
 import acyclic.file
 
+/**
+  * Many of the codes were stolen shamelessly from
+  *
+  * http://misc.flogisoft.com/bash/tip_colors_and_formatting
+  */
 object Ansi {
-
   /**
     * Represents a single, atomic ANSI escape sequence that results in a
     * color, background or decoration being added to the output.
-    *
-    * @param escape the actual ANSI escape sequence corresponding to this Attr
     */
-  case class Attr private[Ansi](escape: Option[String], resetMask: Int, applyMask: Int)
-                               (implicit name: sourcecode.Name) {
-    override def toString = escape.getOrElse("") + name.value + Console.RESET
-    def transform(state: Short) = ((state & ~resetMask) | applyMask).toShort
 
-    def matches(state: Short) = (state & resetMask) == applyMask
+  sealed trait Attr{
+    /**
+      * escapeOpt the actual ANSI escape sequence corresponding to this Attr
+      */
+    def escapeOpt: Option[String]
+    def resetMask: Int
+    def applyMask: Int
+    def transform(state: Int) = (state & ~resetMask) | applyMask
+
+    def name: String
+    def matches(state: Int) = (state & resetMask) == applyMask
     def apply(s: Ansi.Str) = s.overlay(this, 0, s.length)
   }
+  case class SomeAttr private[Ansi](escape: String, resetMask: Int, applyMask: Int)
+                                   (implicit sourceName: sourcecode.Name) extends Attr{
+    def escapeOpt = Some(escape)
+    val name = sourceName.value
+    override def toString = escape + name + Console.RESET
+  }
+  case class NoneAttr private[Ansi](resetMask: Int, applyMask: Int)
+                                   (implicit sourceName: sourcecode.Name) extends Attr{
+    def escapeOpt = None
+    val name = sourceName.value
+    override def toString = name
+  }
   object Attr {
-    val Reset = new Attr(Some(Console.RESET), Short.MaxValue, 0)
+    val Reset = new SomeAttr(Console.RESET, Int.MaxValue, 0)
 
     /**
       * Quickly convert string-colors into [[Ansi.Attr]]s
@@ -28,83 +48,128 @@ object Ansi {
       val pairs = for {
         cat <- categories
         color <- cat.all
-        str <- color.escape
+        str <- color.escapeOpt
       } yield (str, color)
       (pairs :+ (Console.RESET -> Reset)).toMap
     }
   }
 
+
+  /**
+    * An [[Ansi.Str]]'s `color`s array is filled with Ints, each representing
+    * the ANSI state of one character encoded in its bits. Each [[Attr]] belongs
+    * to a [[Category]] that occupies a range of bits within each int:
+    *
+    *   ... 22 21 20 19 18 17 16 15 14 13 12 11 10  9  8  7  6  5  4  3  2  1  0
+    *  |--------|  |-----------------------|  |-----------------------|  |  |  |bold
+    *           |                          |                          |  |  |reversed
+    *           |                          |                          |  |underlined
+    *           |                          |                          |foreground-color
+    *           |                          |background-color
+    *           |unused
+    *
+    *
+    * The `0000 0000 0000 0000` int corresponds to plain text with no decoration
+    *
+    */
+  type State = Int
+
   /**
     * Represents a set of [[Ansi.Attr]]s all occupying the same bit-space
-    * in the state `Short`
+    * in the state `Int`
     */
-  sealed abstract class Category(implicit catName: sourcecode.Name){
-    val mask: Int
+  sealed abstract class Category(offset: Int, width: Int)(implicit catName: sourcecode.Name){
+    def mask = ((1 << width) - 1) << offset
     val all: Seq[Attr]
     lazy val bitsMap = all.map{ m => m.applyMask -> m}.toMap
-    def makeAttr(s: Option[String], applyMask: Int)(implicit name: sourcecode.Name) = {
-      new Attr(s, mask, applyMask)(catName.value + "." + name.value)
+    def makeAttr(s: String, applyValue: Int)(implicit name: sourcecode.Name) = {
+      new SomeAttr(s, mask, applyValue << offset)(catName.value + "." + name.value)
+    }
+    def makeNoneAttr(applyValue: Int)(implicit name: sourcecode.Name) = {
+      new NoneAttr(mask, applyValue << offset)(catName.value + "." + name.value)
     }
   }
 
-  object Color extends Category{
+  object Bold extends Category(offset = 0, width = 1){
 
-    val mask = 15 << 7
-    val Reset     = makeAttr(Some("\u001b[39m"),     0 << 7)
-    val Black     = makeAttr(Some(Console.BLACK),    1 << 7)
-    val Red       = makeAttr(Some(Console.RED),      2 << 7)
-    val Green     = makeAttr(Some(Console.GREEN),    3 << 7)
-    val Yellow    = makeAttr(Some(Console.YELLOW),   4 << 7)
-    val Blue      = makeAttr(Some(Console.BLUE),     5 << 7)
-    val Magenta   = makeAttr(Some(Console.MAGENTA),  6 << 7)
-    val Cyan      = makeAttr(Some(Console.CYAN),     7 << 7)
-    val White     = makeAttr(Some(Console.WHITE),    8 << 7)
+    val On  = makeAttr(Console.BOLD, 1)
+    val Off = makeNoneAttr(          0)
+    val all = Seq(On, Off)
+  }
+
+  object Reversed extends Category(offset = 1, width = 1){
+    val On  = makeAttr(Console.REVERSED,   1)
+    val Off = makeAttr("\u001b[27m",       0)
+    val all = Seq(On, Off)
+  }
+
+  object Underlined extends Category(offset = 2, width = 1){
+    val On  = makeAttr(Console.UNDERLINED, 1)
+    val Off = makeAttr("\u001b[24m",       0)
+    val all = Seq(On, Off)
+  }
+
+  object Color extends Category(offset = 3, width = 9){
+
+    val Reset        = makeAttr("\u001b[39m",     0)
+    val Black        = makeAttr(Console.BLACK,    1)
+    val Red          = makeAttr(Console.RED,      2)
+    val Green        = makeAttr(Console.GREEN,    3)
+    val Yellow       = makeAttr(Console.YELLOW,   4)
+    val Blue         = makeAttr(Console.BLUE,     5)
+    val Magenta      = makeAttr(Console.MAGENTA,  6)
+    val Cyan         = makeAttr(Console.CYAN,     7)
+    val LightGray    = makeAttr("\u001b[37m",     8)
+    val DarkGray     = makeAttr("\u001b[90m",     9)
+    val LightRed     = makeAttr("\u001b[91m",    10)
+    val LightGreen   = makeAttr("\u001b[92m",    11)
+    val LightYellow  = makeAttr("\u001b[93m",    12)
+    val LightBlue    = makeAttr("\u001b[94m",    13)
+    val LightMagenta = makeAttr("\u001b[95m",    14)
+    val LightCyan    = makeAttr("\u001b[96m",    15)
+    val White        = makeAttr("\u001b[97m",    16)
+
+    val Full =
+      for(x <- 0 to 256)
+      yield makeAttr(s"\u001b[38;5;${x}m", 17 + x)(s"Color.Full($x)")
 
     val all = Vector(
-      Reset, Black, Red, Green, Yellow,
-      Blue, Magenta, Cyan, White
-    )
+      Reset, Black, Red, Green, Yellow, Blue, Magenta, Cyan, LightGray, DarkGray,
+      LightRed, LightGreen, LightYellow, LightBlue, LightMagenta, LightCyan, White
+    ) ++ Full
   }
 
-  object Back extends Category{
-    val mask = 15 << 3
+  object Back extends Category(offset = 12, width = 9){
 
-    val Reset    = makeAttr(Some("\u001b[49m"),       0 << 3)
-    val Black    = makeAttr(Some(Console.BLACK_B),    1 << 3)
-    val Red      = makeAttr(Some(Console.RED_B),      2 << 3)
-    val Green    = makeAttr(Some(Console.GREEN_B),    3 << 3)
-    val Yellow   = makeAttr(Some(Console.YELLOW_B),   4 << 3)
-    val Blue     = makeAttr(Some(Console.BLUE_B),     5 << 3)
-    val Magenta  = makeAttr(Some(Console.MAGENTA_B),  6 << 3)
-    val Cyan     = makeAttr(Some(Console.CYAN_B),     7 << 3)
-    val White    = makeAttr(Some(Console.WHITE_B),    8 << 3)
+    val Reset        = makeAttr("\u001b[49m",       0)
+    val Black        = makeAttr(Console.BLACK_B,    1)
+    val Red          = makeAttr(Console.RED_B,      2)
+    val Green        = makeAttr(Console.GREEN_B,    3)
+    val Yellow       = makeAttr(Console.YELLOW_B,   4)
+    val Blue         = makeAttr(Console.BLUE_B,     5)
+    val Magenta      = makeAttr(Console.MAGENTA_B,  6)
+    val Cyan         = makeAttr(Console.CYAN_B,     7)
+    val LightGray    = makeAttr("\u001b[47m",       8)
+    val DarkGray     = makeAttr("\u001b[100m",      9)
+    val LightRed     = makeAttr("\u001b[101m",     10)
+    val LightGreen   = makeAttr("\u001b[102m",     11)
+    val LightYellow  = makeAttr("\u001b[103m",     12)
+    val LightBlue    = makeAttr("\u001b[104m",     13)
+    val LightMagenta = makeAttr("\u001b[105m",     14)
+    val LightCyan    = makeAttr("\u001b[106m",     15)
+    val White        = makeAttr("\u001b[107m",     16)
 
-    val all = Seq(
-      Reset, Black, Red, Green, Yellow,
-      Blue, Magenta, Cyan, White
-    )
-  }
-  object Bold extends Category{
-    val mask = 1 << 0
-    val On  = makeAttr(Some(Console.BOLD), 1 << 0)
-    val Off = makeAttr(None              , 0 << 0)
-    val all = Seq(On, Off)
-  }
+    val Full =
+      for(x <- 0 to 256)
+        yield makeAttr(s"\u001b[48;5;${x}m", 17 + x)(s"Back.Full($x)")
 
-  object Underlined extends Category{
-    val mask = 1 << 1
-    val On  = makeAttr(Some(Console.UNDERLINED), 1 << 1)
-    val Off = makeAttr(None,                     0 << 1)
-    val all = Seq(On, Off)
-  }
-  object Reversed extends Category{
-    val mask = 1 << 2
-    val On  = makeAttr(Some(Console.REVERSED),   1 << 2)
-    val Off = makeAttr(None,                     0 << 2)
-    val all = Seq(On, Off)
+    val all = Vector(
+      Reset, Black, Red, Green, Yellow, Blue, Magenta, Cyan, LightGray, DarkGray,
+      LightRed, LightGreen, LightYellow, LightBlue, LightMagenta, LightCyan, White
+    ) ++ Full
   }
 
-  val hardOffMask = Bold.mask | Underlined.mask | Reversed.mask
+  val hardOffMask = Bold.mask
   val categories = Vector(
     Color,
     Back,
@@ -120,9 +185,9 @@ object Ansi {
     implicit def parse(raw: CharSequence): Str = {
       // This will
       val chars = new Array[Char](raw.length)
-      val colors = new Array[Short](raw.length)
+      val colors = new Array[Int](raw.length)
       var currentIndex = 0
-      var currentColor = 0.toShort
+      var currentColor = 0
 
       val matches = ansiRegex.findAllMatchIn(raw)
       val indices = Seq(0) ++ matches.flatMap { m => Seq(m.start, m.end) } ++ Seq(raw.length)
@@ -150,24 +215,6 @@ object Ansi {
 
   }
 
-  /**
-    * An [[Ansi.Str]]'s `color`s array is filled with shorts, each representing
-    * the ANSI state of one character encoded in its bits. Each [[Attr]] belongs
-    * to a [[Category]] that occupies a range of bits within each short:
-    *
-    * 15 14 13 12 11 10  9  8  7  6  5  4  3  2  1  0
-    *  |-----------|  |--------|  |--------|  |  |  |bold
-    *              |           |           |  |  |reversed
-    *              |           |           |  |underlined
-    *              |           |           |foreground-color
-    *              |           |background-color
-    *              |unused
-    *
-    *
-    * The `0000 0000 0000 0000` short corresponds to plain text with no decoration
-    *
-    */
-  type State = Short
 
   /**
     * Encapsulates a string with associated ANSI colors and text decorations.
@@ -197,12 +244,12 @@ object Ansi {
       val output = new StringBuilder(chars.length + colors.length * 5)
 
 
-      var currentState = 0.toShort
+      var currentState = 0
       /**
         * Emit the ansi escapes necessary to transition
         * between two states, if necessary.
         */
-      def emitDiff(nextState: Short) = if (currentState != nextState){
+      def emitDiff(nextState: Int) = if (currentState != nextState){
         // Any of these transitions from 1 to 0 within the hardOffMask
         // categories cannot be done with a single ansi escape, and need
         // you to emit a RESET followed by re-building whatever ansi state
@@ -218,8 +265,8 @@ object Ansi {
           if ((cat.mask & currentState) != (cat.mask & nextState)){
             val attr = cat.bitsMap(nextState & cat.mask)
 
-            if (attr.escape.isDefined) {
-              output.append(attr.escape.get)
+            if (attr.escapeOpt.isDefined) {
+              output.append(attr.escapeOpt.get)
             }
           }
           categoryIndex += 1
@@ -251,7 +298,7 @@ object Ansi {
       require(end >= start,
         s"end:$end must be greater than start:$end in AnsiStr#overlay call"
       )
-      val colorsOut = new Array[Short](colors.length)
+      val colorsOut = new Array[Int](colors.length)
       var i = 0
       while(i < colors.length){
         if (i >= start && i < end) colorsOut(i) = overlayColor.transform(colors(i))
