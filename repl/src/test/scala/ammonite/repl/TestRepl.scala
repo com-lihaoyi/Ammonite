@@ -2,7 +2,7 @@ package ammonite.repl
 
 import ammonite.repl.frontend._
 import ammonite.repl.interp.Interpreter
-import utest._
+import utest.asserts._
 import acyclic.file
 
 import scala.collection.mutable
@@ -20,13 +20,15 @@ class TestRepl {
     java.nio.file.Files.createTempDirectory("ammonite-tester")
   )
 
-  val out = mutable.Buffer.empty[String]
-  val warning = mutable.Buffer.empty[String]
-  val error = mutable.Buffer.empty[String]
+  val outBuffer = mutable.Buffer.empty[String]
+  val warningBuffer = mutable.Buffer.empty[String]
+  val errorBuffer = mutable.Buffer.empty[String]
+  val infoBuffer = mutable.Buffer.empty[String]
   val printer = Printer(
-    out.append(_),
-    warning.append(_),
-    error.append(_)
+    outBuffer.append(_),
+    warningBuffer.append(_),
+    errorBuffer.append(_),
+    infoBuffer.append(_)
   )
   val interp = new Interpreter(
     Ref[String](""),
@@ -71,7 +73,7 @@ class TestRepl {
       val expected = resultLines.mkString("\n").trim
       allOutput += commandText.map("\n@ " + _).mkString("\n")
 
-      val (processed, out, warning, error) = run(commandText.mkString("\n"))
+      val (processed, out, warning, error, info) = run(commandText.mkString("\n"))
       interp.handleOutput(processed)
 
       if (expected.startsWith("error: ")) {
@@ -82,6 +84,10 @@ class TestRepl {
         val strippedExpected = expected.stripPrefix("warning: ")
         assert(warning.contains(strippedExpected))
 
+      }else if (expected.startsWith("info: ")){
+        val strippedExpected = expected.stripPrefix("info: ")
+        assert(info.contains(strippedExpected))
+
       }else if (expected == "") {
         assert(processed.isInstanceOf[Res.Success[_]] || processed.isInstanceOf[Res.Skip.type])
 
@@ -91,11 +97,23 @@ class TestRepl {
             // Strip trailing whitespace
             def normalize(s: String) = s.lines.map(_.replaceAll(" *$", "")).mkString("\n").trim()
             failLoudly(
-              assert{identity(error); identity(warning); normalize(out) == normalize(expected)}
+              assert{
+                identity(error)
+                identity(warning)
+                identity(info)
+                normalize(out) == normalize(expected)
+              }
             )
 
           case Res.Failure(ex, failureMsg) =>
-            assert({identity(error); identity(warning); identity(out); identity(expected); false})
+            assert{
+              identity(error)
+              identity(warning)
+              identity(out)
+              identity(info)
+              identity(expected)
+              false
+            }
           case Res.Exception(ex, failureMsg) =>
             val trace = Repl.showException(ex, "", "", "") + "\n" +  failureMsg
             assert({identity(trace); identity(expected); false})
@@ -109,9 +127,10 @@ class TestRepl {
 
   def run(input: String) = {
 
-    out.clear()
-    warning.clear()
-    error.clear()
+    outBuffer.clear()
+    warningBuffer.clear()
+    errorBuffer.clear()
+    infoBuffer.clear()
     val processed = interp.processLine(
       input,
       Parsers.split(input).get.get.value
@@ -123,13 +142,13 @@ class TestRepl {
       case _ =>
     }
     interp.handleOutput(processed)
-    (processed, out.mkString, warning.mkString("\n"), error.mkString("\n"))
+    (processed, outBuffer.mkString, warningBuffer.mkString("\n"), errorBuffer.mkString("\n"), infoBuffer.mkString("\n"))
   }
 
 
   def fail(input: String,
            failureCheck: String => Boolean = _ => true) = {
-    val (processed, out, warning, error) = run(input)
+    val (processed, out, warning, error, info) = run(input)
 
     processed match{
       case Res.Success(v) => assert({identity(v); identity(allOutput); false})
@@ -143,7 +162,7 @@ class TestRepl {
   }
 
   def result(input: String, expected: Res[Evaluated]) = {
-    val (processed, allOut, warning, error) = run(input)
+    val (processed, allOut, warning, error, info) = run(input)
     assert(processed == expected)
   }
   def failLoudly[T](t: => T) =

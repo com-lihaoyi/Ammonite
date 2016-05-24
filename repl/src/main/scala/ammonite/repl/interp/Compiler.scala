@@ -86,7 +86,8 @@ object Compiler{
   def initGlobalBits(classpath: Seq[java.io.File],
                      dynamicClasspath: VirtualDirectory,
                      errorLogger: => String => Unit,
-                     warningLogger: => String => Unit) = {
+                     warningLogger: => String => Unit,
+                     infoLogger: => String => Unit) = {
     val vd = new io.VirtualDirectory("(memory)", None)
     lazy val settings = new Settings
     val settingsX = settings
@@ -123,6 +124,8 @@ object Compiler{
             errorLogger(Position.formatMessage(pos, msg, false))
           case WARNING =>
             warningLogger(Position.formatMessage(pos, msg, false))
+          case INFO =>
+            infoLogger(Position.formatMessage(pos, msg, false))
         }
       }
 
@@ -170,12 +173,13 @@ object Compiler{
 
     var errorLogger: String => Unit = s => ()
     var warningLogger: String => Unit = s => ()
+    var infoLogger: String => Unit = s => ()
 
     var lastImports = Seq.empty[ImportData]
 
     val (vd, reporter, compiler) = {
       val (settings, reporter, vd, jcp) = initGlobalBits(
-        classpath, dynamicClasspath, errorLogger, warningLogger
+        classpath, dynamicClasspath, errorLogger, warningLogger, infoLogger
       )
       val scalac = new nsc.Global(settings, reporter) { g =>
         override lazy val plugins = List(new AmmonitePlugin(g, lastImports = _)) ++ {
@@ -249,6 +253,7 @@ object Compiler{
       compiler.reporter.reset()
       this.errorLogger = printer.error
       this.warningLogger = printer.warning
+      this.infoLogger = printer.info
       val singleFile = makeFile( src)
 
       val run = new compiler.Run()
@@ -283,8 +288,10 @@ object Compiler{
     def parse(line: String): Either[String, Seq[Global#Tree]]= {
       val errors = mutable.Buffer.empty[String]
       val warnings = mutable.Buffer.empty[String]
+      val infos = mutable.Buffer.empty[String]
       errorLogger = errors.append(_)
       warningLogger = warnings.append(_)
+      infoLogger = infos.append(_)
       reporter.reset()
       val parser = compiler.newUnitParser(line)
       val trees = CompilerCompatibility.trees(compiler)(parser)

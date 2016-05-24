@@ -114,6 +114,17 @@ object BuiltinTests extends TestSuite{
         warning: $fruitlessTypeTestWarningMessageBlahBlahBlah
       """)
     }
+    'infoLogging{
+      check.session("""
+        @ 1 + 1
+        res0: Int = 2
+
+        @ compiler.settings.debug.value = true
+
+        @ 1 + 1
+        info: [running phase parser on Main.scala]
+      """)
+    }
 
 
     'saveLoad {

@@ -24,13 +24,14 @@ class Repl(input: InputStream,
   var history = new History(Vector())
 
 
-  def printlnWithColor(color: String, s: String) = {
-    Seq(color, s, colors().reset(), "\n").foreach(errorPrintStream.print)
+  def printlnWithColor(color: String, endColor: String, s: String) = {
+    Seq(color, s, endColor, "\n").foreach(errorPrintStream.print)
   }
   val printer = Printer(
     _.foreach(printStream.print),
-    printlnWithColor(colors().warning(), _),
-    printlnWithColor(colors().error(), _)
+    printlnWithColor(colors().warning(), colors().reset(), _),
+    printlnWithColor(colors().error(), colors().reset(), _),
+    printlnWithColor("", "", _)
   )
   Timer("Repl init printer")
 

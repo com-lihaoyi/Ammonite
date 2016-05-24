@@ -189,6 +189,7 @@ object Pressy {
         classpath,
         dynamicClasspath,
         _ => (),
+        _ => (),
         _ => ()
       )
       new nsc.interactive.Global(settings, reporter) { g =>
