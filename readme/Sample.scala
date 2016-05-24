@@ -12,9 +12,9 @@ object Sample{
 //    s"Building documentation for versions ${ammonite.Constants.version} will result in " +
 //    "invalid maven coordinates; reset the version to the last non-SNAPSHOT before building"
 //  )
-  val replCurl = "$ curl -L -o amm https://git.io/vVfy5; chmod +x amm; ./amm"
+  val replCurl = "$ curl -L -o amm https://git.io/vro0u && chmod +x amm && ./amm"
   val filesystemCurl =
-    "$ mkdir ~/.ammonite; curl -L -o ~/.ammonite/predef.scala https://git.io/vVfyF"
+    "$ mkdir ~/.ammonite && curl -L -o ~/.ammonite/predef.scala https://git.io/vro0a"
   val cacheVersion = 6
   def cached(key: Any)(calc: => String) = {
     val path = cwd/'target/'cache/(key.hashCode + cacheVersion).toString

@@ -24,7 +24,9 @@ package object ops extends Extensions with RelPathStuff{
     * the temp file to stick around.
     */
   object tmp{
-
+    /**
+      * Creates a temporary directory
+      */
     def dir(dir: Path = null,
             prefix: String = null,
             deleteOnExit: Boolean = true): Path = {
@@ -35,6 +37,10 @@ package object ops extends Extensions with RelPathStuff{
       if (deleteOnExit) nioPath.toFile.deleteOnExit()
       Path(nioPath)
     }
+
+    /**
+      * Creates a temporary file with the provided contents
+      */
     def apply(contents: Internals.Writable = null,
               dir: Path = null,
               prefix: String = null,

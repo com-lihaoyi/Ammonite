@@ -125,8 +125,8 @@ lazy val repl = project
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
       "org.apache.ivy" % "ivy" % "2.4.0",
       "com.lihaoyi" %% "scalaparse" % "0.3.7",
-      "com.lihaoyi" %% "upickle" % "0.3.9",
-      "com.lihaoyi" %% "pprint" % "0.3.9",
+      "com.lihaoyi" %% "upickle" % "0.4.0",
+      "com.lihaoyi" %% "pprint" % "0.4.0",
       "com.github.scopt" %% "scopt" % "3.4.0"
     ),
     libraryDependencies ++= (
@@ -140,40 +140,7 @@ lazy val repl = project
         Seq("#!/usr/bin/env sh", """exec java -jar -XX:+UseG1GC "$0" "$@"""")
       )
     ),
-    assemblyJarName in assembly := s"${name.value}-${version.value}-${scalaVersion.value}",
-    sourceGenerators in Compile <+= sourceManaged in Compile map { dir =>
-      val file = dir/"ammonite"/"pprint"/"PPrintGen.scala"
-
-      val typeGen = for(i <- 2 to 22) yield {
-        val ts = (1 to i).map("T" + _).mkString(", ")
-        val tsBounded = (1 to i).map("T" + _ + ": Type").mkString(", ")
-        val tsGet = (1 to i).map("get[T" + _ + "](cfg)").mkString(" + \", \" + ")
-        s"""
-          implicit def F${i}TPrint[$tsBounded, R: Type] = make[($ts) => R](cfg =>
-            "(" + $tsGet + ") => " + get[R](cfg)
-          )
-          implicit def T${i}TPrint[$tsBounded] = make[($ts)](cfg =>
-            "(" + $tsGet + ")"
-          )
-
-        """
-      }
-      val output = s"""
-        package ammonite.repl.frontend
-
-        trait TPrintGen[Type[_], Cfg]{
-          def make[T](f: Cfg => String): Type[T]
-          def get[T: Type](cfg: Cfg): String
-          implicit def F0TPrint[R: Type] = make[() => R](cfg => "() => " + get[R](cfg))
-          implicit def F1TPrint[T1: Type, R: Type] = {
-            make[T1 => R](cfg => get[T1](cfg) + " => " + get[R](cfg))
-          }
-          ${typeGen.mkString("\n")}
-        }
-      """.stripMargin
-      IO.write(file, output)
-      Seq(file)
-    }
+    assemblyJarName in assembly := s"${name.value}-${version.value}-${scalaVersion.value}"
   )
 
 /**
@@ -185,8 +152,12 @@ lazy val shell = project
   .dependsOn(ops, repl % "compile->compile;test->test")
   .settings(
     sharedSettings,
+    macroSettings,
     name := "ammonite-shell",
-    libraryDependencies += "com.lihaoyi" %% "pprint" % "0.3.4",
+    libraryDependencies ++= {
+      if (!scalaVersion.value.startsWith("2.11.")) Nil
+      else Seq("com.geirsson" %% "scalafmt" % "0.2.5")
+    },
     (test in Test) <<= (test in Test).dependsOn(packageBin in Compile),
     (run in Test) <<= (run in Test).dependsOn(packageBin in Compile),
     (testOnly in Test) <<= (testOnly in Test).dependsOn(packageBin in Compile)

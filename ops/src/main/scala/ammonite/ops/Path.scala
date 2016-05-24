@@ -5,6 +5,8 @@ import java.nio.charset.Charset
 
 import acyclic.file
 
+import scala.io.Codec
+
 /**
   * Enforces a standard interface for constructing [[BasePath]]-like things
   * from java types of various sorts
@@ -15,97 +17,48 @@ sealed trait PathFactory[PathType <: BasePath] extends (String => PathType){
   def apply(f: java.nio.file.Path): PathType
 }
 
-object BasePath extends PathFactory[BasePath]{
-  def apply(f: java.nio.file.Path) = {
-    if (f.isAbsolute) Path(f)
-    else RelPath(f)
-  }
-  def invalidChars = Set('/')
-  def checkSegment(s: String) = {
-    if (s.exists(BasePath.invalidChars)) throw PathError.InvalidSegment(s)
-    if (s == "" || s == "." || s == "..") throw new PathError.InvalidSegment(s)
-  }
-  def chunkify(s: java.nio.file.Path) = {
-    import collection.JavaConversions._
-    s.iterator().map(_.toString).filter(_ != ".").toVector
-  }
-}
-
 /**
-  * A path that can be read from, either a [[Path]] or a [[ResourcePath]].
-  * Encapsulates the logic of how to read from it in various ways.
+  * A path which is either an absolute [[Path]], a relative [[RelPath]],
+  * or a [[ResourcePath]] with shared APIs and implementations.
+  *
+  * Most of the filesystem-independent path-manipulation logic that lets you
+  * splice paths together or navigate in and out of paths lives in this interface
   */
-trait Readable{
-  protected[ops] def getInputStream(): java.io.InputStream
-  protected[ops] def getBytes(): Array[Byte] = {
-    val is = getInputStream
-    val out = new java.io.ByteArrayOutputStream()
-    val buffer = new Array[Byte](1024 * 1024)
-    var r = 0
-    while (r != -1) {
-      r = is.read(buffer)
-      if (r != -1) out.write(buffer, 0, r)
-    }
-    is.close()
-    out.toByteArray
-  }
-  protected[ops] def getLineIterator(charSet: String): Iterator[String] = {
-    val is = getInputStream
-    val s = io.Source.fromInputStream(is, charSet)
-    new SelfClosingIterator(s.getLines, () => s.close())
-  }
-  protected[ops] def getLines(charSet: String): Vector[String] = {
-    getLineIterator(charSet).toVector
-  }
-}
-
-object Readable{
-  implicit class InputStreamToReadable(is: InputStream) extends Readable{
-    def getInputStream() = is
-  }
-}
-/**
- * A path which is either an absolute [[Path]] or a relative [[RelPath]],
- * with shared APIs and implementations.
- *
- * Most of the filesystem-independent path-manipulation logic that lets you
- * splice paths together or navigate in and out of paths lives in this interface
- */
 sealed trait BasePath{
   type ThisType <: BasePath
   /**
-   * The individual path segments of this path.
-   */
+    * The individual path segments of this path.
+    */
   def segments: Seq[String]
 
   /**
-   * Combines this path with the given relative path, returning
-   * a path of the same type as this one (e.g. `Path` returns `Path`,
-   * `RelPath` returns `RelPath`
-   */
+    * Combines this path with the given relative path, returning
+    * a path of the same type as this one (e.g. `Path` returns `Path`,
+    * `RelPath` returns `RelPath`
+    */
   def /(subpath: RelPath): ThisType
 
   /**
-   * Relativizes this path with the given `base` path, finding a
-   * relative path `p` such that base/p == this.
-   *
-   * Note that you can only relativize paths of the same type, e.g.
-   * `Path` & `Path` or `RelPath` & `RelPath`. In the case of `RelPath`,
-   * this can throw a [[PathError.NoRelativePath]] if there is no
-   * relative path that satisfies the above requirement in the general
-   * case.
-   */
+    * Relativizes this path with the given `base` path, finding a
+    * relative path `p` such that base/p == this.
+    *
+    * Note that you can only relativize paths of the same type, e.g.
+    * `Path` & `Path` or `RelPath` & `RelPath`. In the case of `RelPath`,
+    * this can throw a [[PathError.NoRelativePath]] if there is no
+    * relative path that satisfies the above requirement in the general
+    * case.
+    */
   def relativeTo(target: ThisType): RelPath
 
   /**
-   * This path starts with the target path, including if it's identical
-   */
+    * This path starts with the target path, including if it's identical
+    */
   def startsWith(target: ThisType): Boolean
 
   /**
-   * The last segment in this path. Very commonly used, e.g. it
-   * represents the name of the file/folder in filesystem paths
-   */
+    * The last segment in this path. Very commonly used, e.g. it
+    * represents the name of the file/folder in filesystem paths
+    */
   def last: String
 
   /**
@@ -113,8 +66,66 @@ sealed trait BasePath{
     * string if there is no extension
     */
   def ext: String
+}
+
+object BasePath {
+
+  def invalidChars = Set('/')
+  def checkSegment(s: String) = {
+    def fail(msg: String) = throw PathError.InvalidSegment(s, msg)
+    def considerStr =
+      "use the Path(...) or RelPath(...) constructor calls to convert them. "
+
+    s.find(BasePath.invalidChars) match{
+      case Some(c) => fail(
+        s"[$c] is not a valid character to appear in a path segment. " +
+          "If you want to parse an absolute or relative path that may have " +
+          "multiple segments, e.g. path-strings coming from external sources" +
+          considerStr
+      )
+      case None =>
+    }
+    def externalStr = "If you are dealing with path-strings coming from external sources, "
+    s match{
+      case "" =>
+        fail(
+          "Ammonite-Ops does not allow empty path segments " +
+            externalStr + considerStr
+        )
+      case "." =>
+        fail(
+          "Ammonite-Ops does not allow [.] as a path segment " +
+            externalStr + considerStr
+        )
+      case ".." =>
+        fail(
+          "Ammonite-Ops does not allow [..] as a path segment " +
+            externalStr +
+            considerStr +
+            "If you want to use the `..` segment manually to represent going up " +
+            "one level in the path, use the `up` segment from `ammonite.ops.up` " +
+            "e.g. an external path foo/bar/../baz translates into 'foo/'bar/up/'baz."
+        )
+      case _ =>
+    }
+  }
+  def chunkify(s: java.nio.file.Path) = {
+    import collection.JavaConversions._
+    s.iterator().map(_.toString).filter(_ != ".").toVector
+  }
+}
 
 
+/**
+  * Represents a value that is either an absolute [[Path]] or a
+  * relative [[ResourcePath]], and can be constructed from
+  */
+sealed trait FilePath extends BasePath
+object FilePath extends PathFactory[FilePath]{
+  def apply(f: java.nio.file.Path) = {
+    if (f.isAbsolute) Path(f)
+    else RelPath(f)
+  }
 }
 
 trait BasePathImpl extends BasePath{
@@ -135,29 +146,14 @@ trait BasePathImpl extends BasePath{
   def last = segments.last
 }
 
-object PathError{
-  type IAE = IllegalArgumentException
-  private[this] def errorMsg(s: String) =
-    s"[$s] is not a valid path segment. If you want to parse an absolute " +
-      "or relative path that may have multiple segments, consider using the " +
-      "Path(...) or RelPath(...) constructor calls"
-
-  case class InvalidSegment(segment: String) extends IAE(errorMsg(segment))
-
-  case object AbsolutePathOutsideRoot
-    extends IAE("The path created has enough ..s that it would start outside the root directory")
-
-  case class NoRelativePath(src: RelPath, base: RelPath)
-    extends IAE(s"Can't relativize relative paths $src from $base")
-}
-
 /**
  * An absolute path on the filesystem. Note that the path is
  * normalized and cannot contain any empty or ".". Parent ".."
  * segments can only occur at the left-end of the path, and
  * are collapsed into a single number [[ups]].
  */
-case class RelPath private[ops] (segments: Vector[String], ups: Int) extends BasePathImpl{
+case class RelPath private[ops] (segments: Vector[String], ups: Int)
+extends FilePath with BasePathImpl{
   type ThisType = RelPath
   require(ups >= 0)
   protected[this] def make(p: Seq[String], ups: Int) = new RelPath(p.toVector, ups + this.ups)
@@ -230,13 +226,13 @@ trait RelPathStuff{
 
 
 object Path extends PathFactory[Path]{
-  def apply(p: BasePath, base: Path) = p match{
+  def apply(p: FilePath, base: Path) = p match{
     case p: RelPath => base/p
     case p: Path => p
   }
-  def apply(f: java.io.File, base: Path): Path = apply(BasePath(f), base)
-  def apply(s: String, base: Path): Path = apply(BasePath(s), base)
-  def apply(f: java.nio.file.Path, base: Path): Path = apply(BasePath(f), base)
+  def apply(f: java.io.File, base: Path): Path = apply(FilePath(f), base)
+  def apply(s: String, base: Path): Path = apply(FilePath(s), base)
+  def apply(f: java.nio.file.Path, base: Path): Path = apply(FilePath(f), base)
   def apply(f: java.nio.file.Path): Path = {
     import collection.JavaConversions._
     val chunks = BasePath.chunkify(f)
@@ -258,7 +254,7 @@ object Path extends PathFactory[Path]{
  * normalized and cannot contain any empty `""`, `"."` or `".."` segments
  */
 case class Path private[ops] (root: java.nio.file.Path, segments: Vector[String])
-extends BasePathImpl with Readable{
+extends FilePath with BasePathImpl with Readable{
   protected[ops] def getInputStream = java.nio.file.Files.newInputStream(toNIO)
   type ThisType = Path
 
@@ -296,37 +292,12 @@ extends BasePathImpl with Readable{
   override def getBytes = java.nio.file.Files.readAllBytes(toNIO)
   import collection.JavaConversions._
 
-  override def getLines(charSet: String) = {
-    java.nio.file.Files.readAllLines(toNIO, Charset.forName(charSet)).toVector
+  override def getLines(charSet: Codec) = {
+    java.nio.file.Files.readAllLines(toNIO, charSet.charSet).toVector
   }
 }
 
-/**
-  * Represents a possible root where classpath resources can be loaded from;
-  * either a [[ResourceRoot.ClassLoader]] or a [[ResourceRoot.Class]]. Resources
-  * loaded from classloaders are always loaded via their absolute path, while
-  * resources loaded via classes are always loaded relatively.
-  */
-sealed trait ResourceRoot{
-  def getResourceAsStream(s: String): InputStream
-  def errorName: String
-}
-object ResourceRoot{
-  private[this] def renderClassloader(cl: java.lang.ClassLoader) = {
-    cl.getClass.getName + "@" + java.lang.Integer.toHexString(cl.hashCode())
-  }
-  implicit def classResourceRoot(cls: java.lang.Class[_]): ResourceRoot = Class(cls)
-  case class Class(cls: java.lang.Class[_]) extends ResourceRoot{
-    def getResourceAsStream(s: String) = cls.getResourceAsStream(s)
-    def errorName = renderClassloader(cls.getClassLoader) + ":" + cls.getName
-  }
-  implicit def classLoaderResourceRoot(cl: java.lang.ClassLoader): ResourceRoot = ClassLoader(cl)
-  case class ClassLoader(cl: java.lang.ClassLoader) extends ResourceRoot{
-    def getResourceAsStream(s: String) = cl.getResourceAsStream(s)
-    def errorName = renderClassloader(cl)
-  }
 
-}
 object ResourcePath{
   def resource(resRoot: ResourceRoot) = {
     ResourcePath(resRoot, Vector.empty)
@@ -382,31 +353,18 @@ case class ResourcePath private[ops](resRoot: ResourceRoot, segments: Vector[Str
   */
 case class ResourceNotFoundException(path: ResourcePath) extends Exception(path.toString)
 
-/**
-  * An iterator that can be closed, and closes itself after you exhaust it
-  * through iteration. Not quite totally safe, since you can leak filehandles
-  * by leaving half-consumed iterators, but at least common things like foreach,
-  * mkString, reduce, sum, etc. will all result in close() being called.
-  */
-class SelfClosingIterator[+A](val underlying: Iterator[A], val close: () => Unit)
-  extends Iterator[A]{
-  private[this] var alreadyClosed = false
-  def hasNext = {
-    if (alreadyClosed) false
-    else if (!underlying.hasNext){
-      close()
-      alreadyClosed = true
-      false
-    }else{
-      true
-    }
-  }
-  def next() = {
-    val n = underlying.next()
-    if (!underlying.hasNext) {
-      alreadyClosed = true
-      close()
-    }
-    n
-  }
+
+
+object PathError{
+  type IAE = IllegalArgumentException
+  private[this] def errorMsg(s: String, msg: String) =
+    s"[$s] is not a valid path segment. $msg"
+
+  case class InvalidSegment(segment: String, msg: String) extends IAE(errorMsg(segment, msg))
+
+  case object AbsolutePathOutsideRoot
+    extends IAE("The path created has enough ..s that it would start outside the root directory")
+
+  case class NoRelativePath(src: RelPath, base: RelPath)
+    extends IAE(s"Can't relativize relative paths $src from $base")
 }

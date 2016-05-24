@@ -6,12 +6,14 @@
  */
 package ammonite.ops
 
-import java.io.{OutputStream, File, InputStream}
+import java.io.{File, InputStream, OutputStream}
 import java.nio.charset.Charset
 import java.nio.file._
 import java.util.Objects
 
 import acyclic.file
+
+import scala.io.Codec
 
 
 object Internals{
@@ -39,7 +41,7 @@ object Internals{
 
   object Writable{
     implicit def WritableString(s: String) = new Writable(
-      Iterator(s.getBytes("UTF-8"))
+      Iterator(s.getBytes(java.nio.charset.StandardCharsets.UTF_8))
     )
     implicit def WritableBytes(a: Array[Byte]) = new Writable(Iterator(a))
     implicit def WritableArray[T](a: Array[T])(implicit f: T => Writable) = {
@@ -327,19 +329,20 @@ object read extends Function1[Readable, String]{
   def getInputStream(p: Readable) = p.getInputStream()
 
 //  def apply(arg: InputPath) = new String(arg.getBytes, Charset.forName("UTF-8"))
-  def apply(arg: Readable) = apply(arg, "utf-8")
-  def apply(arg: Readable, charSet: String) = new String(arg.getBytes, charSet)
+  def apply(arg: Readable) = apply(arg, java.nio.charset.StandardCharsets.UTF_8)
+  def apply(arg: Readable, charSet: Codec) = new String(arg.getBytes, charSet.charSet)
 
   object lines extends StreamableOp1[Readable, String, Vector[String]]{
     def materialize(src: Readable, i: Iterator[String]) = i.toVector
 
     object iter extends (Readable => Iterator[String]){
-      def apply(arg: Readable) = arg.getLineIterator("utf-8")
-      def apply(arg: Readable, charSet: String) = arg.getLineIterator(charSet)
+      def apply(arg: Readable) = arg.getLineIterator(java.nio.charset.StandardCharsets.UTF_8)
+
+      def apply(arg: Readable, charSet: Codec) = arg.getLineIterator(charSet)
     }
 
-    def apply(arg: Readable, charSet: String) = arg.getLines(charSet)
-    override def apply(arg: Readable) = apply(arg, "utf-8")
+    def apply(arg: Readable, charSet: Codec) = arg.getLines(charSet)
+    override def apply(arg: Readable) = apply(arg, java.nio.charset.StandardCharsets.UTF_8)
   }
   object bytes extends Function1[Readable, Array[Byte]]{
     def apply(arg: Readable) = arg.getBytes
@@ -375,10 +378,9 @@ object exists extends Function1[Path, Boolean]{
  * Kills the given process with the given signal, e.g.
  * `kill(9)! pid`
  */
-case class kill(signal: Int) extends Function1[Int, CommandResult]{
+case class kill(signal: Int)(implicit wd: Path) extends Function1[Int, CommandResult]{
   def apply(pid: Int): CommandResult = {
-
-    Shellout.%%('kill, "-" + signal, pid.toString)(wd = Path(new java.io.File("")))
+    Shellout.%%('kill, "-" + signal, pid.toString)
   }
 }
 

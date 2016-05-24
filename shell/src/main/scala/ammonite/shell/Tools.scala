@@ -4,10 +4,10 @@
  */
 package ammonite.shell
 
-import java.io.{InputStreamReader, BufferedReader}
+
+import java.io.{BufferedReader, InputStreamReader}
 
 import ammonite.ops._
-import ammonite.repl.Colors
 import ammonite.terminal.Strings
 
 import scala.collection.{GenTraversableOnce, mutable}
@@ -189,7 +189,6 @@ object browse{
   // R -> show ansi-colors as colors, M -> show current-browse-% bar
   val lessViewer = Seq("less", "-RM")
   def apply[T: pprint.PPrint](t: T,
-
                               viewer: Strings = lessViewer,
                               width: Integer = null,
                               height: Integer = null,

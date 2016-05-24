@@ -271,9 +271,12 @@ case class Bind[T](name: String, value: T)
   * Encapsulates the ways the Ammonite REPL prints things
   *
   * @param out How you want it to print streaming fragments of stdout
-  * @param warning How you want it to print a complete warning
-  * @param error How you want it to print a complete error
+  * @param warning How you want it to print a compile warning
+  * @param error How you want it to print a compile error
+  * @param info How you want to print compile info logging. *Not* the same
+  *             as `out`, which is used to print runtime output.
   */
 case class Printer(out: String => Unit,
                    warning: String => Unit,
-                   error: String => Unit)
+                   error: String => Unit,
+                   info: String => Unit)

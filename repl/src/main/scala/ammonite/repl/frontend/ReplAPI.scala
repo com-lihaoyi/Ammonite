@@ -235,11 +235,11 @@ abstract class FullReplAPI extends ReplAPI{
 
     /**
      * Kind of an odd signature, splitting out [[T]] and [[V]]. This is
-     * seemingly useless but necessary because when you add both [[TPrint]]
+     * seemingly useless but necessary because when you add both [[pprint.TPrint]]
      * and [[PPrint]] context bounds to the same type, Scala's type inference
      * gets confused and does the wrong thing
      */
-    def print[T: TPrint: WeakTypeTag, V: PPrint]
+    def print[T: pprint.TPrint: WeakTypeTag, V: PPrint]
              (value: => T, value2: => V, ident: String, custom: Option[String])
              (implicit cfg: Config): Iterator[String]
 
@@ -280,21 +280,21 @@ trait DefaultReplAPI extends FullReplAPI {
            .drop(1)
     }
 
-    def print[T: TPrint: WeakTypeTag, V: PPrint](value: => T,
+    def print[T: pprint.TPrint: WeakTypeTag, V: PPrint](value: => T,
                                                  value2: => V,
                                                  ident: String,
                                                  custom: Option[String])
                                                 (implicit cfg: pprint.Config) = {
       if (typeOf[T] =:= typeOf[Unit]) Iterator()
       else {
-        val pprint = implicitly[PPrint[V]]
+        val implicitPPrint = implicitly[PPrint[V]]
         val rhs = custom match {
-          case None => pprint.render(value2, cfg)
+          case None => implicitPPrint.render(value2, cfg)
           case Some(s) => Iterator(cfg.colors.literalColor, s, cfg.colors.endColor)
         }
         Iterator(
           colors().ident(), ident, colors().reset(), ": ",
-          implicitly[TPrint[T]].render(cfg), " = "
+          implicitly[pprint.TPrint[T]].render(cfg), " = "
         ) ++ rhs
       }
     }

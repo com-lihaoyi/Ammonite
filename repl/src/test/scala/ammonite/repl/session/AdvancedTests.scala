@@ -119,7 +119,7 @@ object AdvancedTests extends TestSuite{
         @ Array(1)
         res0: Array[Int] = Array(1)
 
-        @ import ammonite.repl.frontend.TPrint
+        @ import pprint.TPrint
 
         @ implicit def ArrayTPrint[T: TPrint]: TPrint[Array[T]] = TPrint.lambda( c =>
         @   implicitly[TPrint[T]].render(c) +
