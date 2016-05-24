@@ -57,7 +57,7 @@
         @li
           @hl.scala{Path.makeTemp} has been renamed @hl.scala{tmp()} and @hl.scala{tmp.dir()}
         @li
-          Arrow-keys now work properly in the previously odd case where they were creating @hl.scala("\u033O{A,B,C,D}")" codes instead of @hl.scala("\u033[{A,B,C,D}") codes
+          Arrow-keys now work properly in the previously odd case where they were creating @hl.scala("\\u033O{A,B,C,D}")" codes instead of @hl.scala("\\u033[{A,B,C,D}") codes
         @li
           Converted all string-encoding methods to take a @hl.scala{scala.io.Codec} instead of a @hl.scala{String} or @hl.scala{Charset}, letting you pass in either of those types and having it be implicitly converted.
 
