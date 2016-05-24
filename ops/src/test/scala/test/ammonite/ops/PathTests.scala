@@ -171,11 +171,15 @@ object PathTests extends TestSuite{
       'InvalidChars {
         val ex = intercept[PathError.InvalidSegment]('src/"Main/.scala")
 
-        val PathError.InvalidSegment("Main/.scala") = ex
+        val PathError.InvalidSegment("Main/.scala", msg1) = ex
+
+        assert(msg1.contains("[/] is not a valid character to appear in a path segment"))
 
         val ex2 = intercept[PathError.InvalidSegment](root/"hello"/".."/"world")
 
-        val PathError.InvalidSegment("..") = ex2
+        val PathError.InvalidSegment("..", msg2) = ex2
+
+        assert(msg2.contains("use the `up` segment from `ammonite.ops.up`"))
       }
       'InvalidSegments{
         intercept[PathError.InvalidSegment]{root/ "core/src/test"}
@@ -301,8 +305,8 @@ object PathTests extends TestSuite{
           val relStr = "hello/cow/world/.."
           val absStr = "/hello/world"
           assert(
-            BasePath(relStr) == 'hello/'cow,
-            BasePath(absStr) == root/'hello/'world
+            FilePath(relStr) == 'hello/'cow,
+            FilePath(absStr) == root/'hello/'world
           )
         }
       }
@@ -310,7 +314,7 @@ object PathTests extends TestSuite{
         if(Unix()){
           val relStr = "hello/cow/world/.."
           val absStr = "/hello/world"
-          val basePath: BasePath = BasePath(relStr)
+          val basePath: FilePath = FilePath(relStr)
           assert(
             Path(relStr, root/'base) == root/'base/'hello/'cow,
             Path(absStr, root/'base) == root/'hello/'world,

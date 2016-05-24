@@ -42,7 +42,7 @@ object Shellout{
 
     @tailrec def run(): Unit =
       try proc.waitFor()
-      catch {case e => run() }
+      catch {case e: Throwable => run() }
 
     run()
   }

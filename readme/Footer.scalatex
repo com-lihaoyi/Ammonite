@@ -50,7 +50,14 @@
           @hl.scala{write} no longer inserts newlines between items by default.
         @li
           Introduced the @sect.ref{browse} helper to @sect.ref{Ammonite-Shell}, letting you easily open up large data structures in external editors like Vim or Emacs to browse them without spamming the console
-
+        @li
+          Improved the error messages for invalid @hl.scala{Path} segments to make them more specific and suggest alternatives to what a user is trying to do.
+        @li
+          Broke out the @hl.scala{FilePath} sub-trait from the @hl.scala{BasePath} trait, to differentiate those @hl.scala{BasePath}s are filesystem paths and can be constructed from @hl.scala{java.nio.file.Path} or @hl.scala{java.io.File}s (@hl.scala{RelPath} and @hl.scala{Path})from those which can't (@hl.scala{ResourcePath})
+        @li
+          @hl.scala{Path.makeTemp} has been renamed @hl.scala{tmp()} and @hl.scala{tmp.dir()}
+        @li
+          Arrow-keys now work properly in the previously odd case where they were creating @hl.scala("\u033O{A,B,C,D}")" codes instead of @hl.scala("\u033[{A,B,C,D}") codes
     @sect{0.5.7}
       @ul
         @li
