@@ -1,5 +1,7 @@
 package ammonite.terminal
 
+import java.util
+
 import acyclic.file
 
 /**
@@ -65,7 +67,16 @@ object Ansi {
       * Concatenates two [[Ansi.Str]]s, preserving the colors in each one and
       * avoiding any interference between them
       */
-    def ++(other: Str) = Str(chars ++ other.chars, colors ++ other.colors)
+    def ++(other: Str) = {
+      val chars2 = new Array[Char](length + other.length)
+      val colors2 = new Array[State](length + other.length)
+      System.arraycopy(chars, 0, chars2, 0, length)
+      System.arraycopy(other.chars, 0, chars2, length, other.length)
+      System.arraycopy(colors, 0, colors2, 0, length)
+      System.arraycopy(other.colors, 0, colors2, length, other.length)
+
+      Str(chars2, colors2)
+    }
 
     /**
       * Splits an [[Ansi.Str]] into two sub-strings, preserving the colors in
@@ -74,11 +85,16 @@ object Ansi {
       * @param index the plain-text index of the point within the [[Ansi.Str]]
       *              you want to use to split it.
       */
-    def splitAt(index: Int) = {
-      val (leftChars, rightChars) = chars.splitAt(index)
-      val (leftColors, rightColors) = colors.splitAt(index)
-      (new Str(leftChars, leftColors), new Str(rightChars, rightColors))
-    }
+    def splitAt(index: Int) = (
+      new Str(
+        util.Arrays.copyOfRange(chars, 0, index),
+        util.Arrays.copyOfRange(colors, 0, index)
+      ),
+      new Str(
+        util.Arrays.copyOfRange(chars, index, length),
+        util.Arrays.copyOfRange(colors, index, length)
+      )
+    )
 
     /**
       * Returns an [[Ansi.Str]] which is a substring of this string,
@@ -86,8 +102,18 @@ object Ansi {
       * did
       */
     def substring(start: Int = 0, end: Int = length) = {
-      Str(chars.slice(start, end), colors.slice(start, end))
+      if (start < 0 || start >= length) throw new IllegalArgumentException(
+        s"substring start parameter [$start] must be between 0 and $length"
+      )
+      if (end < 0 || end >= length || end < start) throw new IllegalArgumentException(
+        s"substring end parameter [$end] must be between start $start and $length"
+      )
+      new Str(
+        util.Arrays.copyOfRange(chars, start, end),
+        util.Arrays.copyOfRange(colors, start, end)
+      )
     }
+
 
 
     /**
@@ -118,7 +144,7 @@ object Ansi {
       val output = new StringBuilder(chars.length + colors.length * 5)
 
 
-      var currentState = 0
+      var currentState: State = 0
       /**
         * Emit the ansi escapes necessary to transition
         * between two states, if necessary.
@@ -134,7 +160,7 @@ object Ansi {
           currentState = 0
         }
 
-        var categoryIndex = 0
+        var categoryIndex: State = 0
         while(categoryIndex < categories.length){
           val cat = categories(categoryIndex)
           if ((cat.mask & currentState) != (cat.mask & nextState)){

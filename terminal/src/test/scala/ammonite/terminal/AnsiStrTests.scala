@@ -20,7 +20,7 @@ object AnsiStrTests extends TestSuite{
   /**
     * ANSI escape sequence to reset text color
     */
-  val RTC = "\u001b[39m"
+  val RTC = Ansi.Color.Reset.escape
   val tests = TestSuite{
     val rgbOps = s"+++$R---$G***$B///"
     val rgb = s"$R$G$B"
@@ -42,10 +42,6 @@ object AnsiStrTests extends TestSuite{
 
     'split{
       val splits = Seq(
-        // Under-shot indexes just get clamped
-        (-99,  s"", s"+++$R---$G***$B///$RTC"),
-        (-1,  s"", s"+++$R---$G***$B///$RTC"),
-
         // These are the standard series
         (0,  s"", s"+++$R---$G***$B///$RTC"),
         (1,  s"+", s"++$R---$G***$B///$RTC"),
@@ -59,11 +55,7 @@ object AnsiStrTests extends TestSuite{
         (9,  s"+++$R---$G***$RTC", s"$B///$RTC"),
         (10, s"+++$R---$G***$B/$RTC", s"$B//$RTC"),
         (11, s"+++$R---$G***$B//$RTC", s"$B/$RTC"),
-        (12, s"+++$R---$G***$B///$RTC", s""),
-
-        // Overshoots just get clamped
-        (13, s"+++$R---$G***$B///$RTC", s""),
-        (99, s"+++$R---$G***$B///$RTC", s"")
+        (12, s"+++$R---$G***$B///$RTC", s"")
       )
       for((index, expectedLeft0, expectedRight0) <- splits){
         val (splitLeft, splitRight) = parse(rgbOps).splitAt(index)
@@ -72,6 +64,10 @@ object AnsiStrTests extends TestSuite{
         val right = splitRight.render
         assert((left, right) == (expectedLeft, expectedRight))
       }
+    }
+    'substring{
+      val substringed = parse(rgbOps).substring(4, 9).render
+      assert(substringed == s"$R--$G***$RTC")
     }
 
     'overlay{
@@ -158,36 +154,47 @@ object AnsiStrTests extends TestSuite{
     'colors - tabulate(Ansi.Color.all)
     'backgrounds - tabulate(Ansi.Back.all)
     'negative{
-      // Make sure that Ansi.parse throws on most common non-color
-      // Ansi terminal commands
-      //
-      // List of common non-color Ansi terminal commands taken from
-      // https://en.wikipedia.org/wiki/ANSI_escape_code#Non-CSI_codes
+      'parse{
+        // Make sure that Ansi.parse throws on most common non-color
+        // Ansi terminal commands
+        //
+        // List of common non-color Ansi terminal commands taken from
+        // https://en.wikipedia.org/wiki/ANSI_escape_code#Non-CSI_codes
 
-      def check(s: String, msg: String) ={
-        intercept[IllegalArgumentException]{ Ansi.parse(s) }
-//        assert(ex.getMessage.contains(msg))
+        def check(s: String, msg: String) ={
+          intercept[IllegalArgumentException]{ Ansi.parse(s) }
+  //        assert(ex.getMessage.contains(msg))
+        }
+
+        'cursorUp - check("Hello\u001b[2AWorld", "[2A")
+        'cursorDown- check("Hello\u001b[2BWorld", "[2B")
+        'cursorForward - check("Hello\u001b[2CWorld", "[2C")
+        'cursorBack - check("Hello\u001b[2DWorld", "[2D")
+        'cursorNextLine - check("Hello\u001b[2EWorld", "[2E")
+        'cursorPrevLine - check("Hello\u001b[2FWorld", "[2F")
+        'cursorHorizontalAbs - check("Hello\u001b[2GmWorld", "[2G")
+        'cursorPosition- check("Hello\u001b[2;2HmWorld", "[2;2H")
+        'eraseDisplay - check("Hello\u001b[2JWorld", "[2J")
+        'eraseLine - check("Hello\u001b[2KWorld", "[2K")
+        'scrollUp - check("Hello\u001b[2SWorld", "[2S")
+        'scrollDown - check("Hello\u001b[2TWorld", "[2T")
+        'horizontalVerticalPos - check("Hello\u001b[2;2fWorld", "[2;2f")
+        'selectGraphicRendition - check("Hello\u001b[2mWorld", "[2m")
+        'auxPortOn - check("Hello\u001b[5iWorld", "[5i")
+        'auxPortOff - check("Hello\u001b[4iWorld", "[4i")
+        'deviceStatusReport - check("Hello\u001b[6n", "[6n")
+        'saveCursor - check("Hello\u001b[s", "[s")
+        'restoreCursor - check("Hello\u001b[u", "[u")
+
       }
-
-      'cursorUp - check("Hello\u001b[2AWorld", "[2A")
-      'cursorDown- check("Hello\u001b[2BWorld", "[2B")
-      'cursorForward - check("Hello\u001b[2CWorld", "[2C")
-      'cursorBack - check("Hello\u001b[2DWorld", "[2D")
-      'cursorNextLine - check("Hello\u001b[2EWorld", "[2E")
-      'cursorPrevLine - check("Hello\u001b[2FWorld", "[2F")
-      'cursorHorizontalAbs - check("Hello\u001b[2GmWorld", "[2G")
-      'cursorPosition- check("Hello\u001b[2;2HmWorld", "[2;2H")
-      'eraseDisplay - check("Hello\u001b[2JWorld", "[2J")
-      'eraseLine - check("Hello\u001b[2KWorld", "[2K")
-      'scrollUp - check("Hello\u001b[2SWorld", "[2S")
-      'scrollDown - check("Hello\u001b[2TWorld", "[2T")
-      'horizontalVerticalPos - check("Hello\u001b[2;2fWorld", "[2;2f")
-      'selectGraphicRendition - check("Hello\u001b[2mWorld", "[2m")
-      'auxPortOn - check("Hello\u001b[5iWorld", "[5i")
-      'auxPortOff - check("Hello\u001b[4iWorld", "[4i")
-      'deviceStatusReport - check("Hello\u001b[6n", "[6n")
-      'saveCursor - check("Hello\u001b[s", "[s")
-      'restoreCursor - check("Hello\u001b[u", "[u")
+      'outOfBounds{
+        intercept[IllegalArgumentException]{ Ansi.parse("foo").splitAt(10) }
+        intercept[IllegalArgumentException]{ Ansi.parse("foo").splitAt(4) }
+        intercept[IllegalArgumentException]{ Ansi.parse("foo").splitAt(-1) }
+        intercept[IllegalArgumentException]{ Ansi.parse("foo").substring(0, 4)}
+        intercept[IllegalArgumentException]{ Ansi.parse("foo").substring(-1, 2)}
+        intercept[IllegalArgumentException]{ Ansi.parse("foo").substring(2, 1)}
+      }
     }
   }
 }
