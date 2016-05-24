@@ -61,7 +61,7 @@ object Main{
             case c => Console.UNDERLINED + c + Console.RESET
           }
           // and highlight the selection
-          val ansiBuffer = Ansi.Str.parse(hl(buffer))
+          val ansiBuffer = Ansi.parse(hl(buffer))
           val (newBuffer, cursorOffset) = SelectionFilter.mangleBuffer(
             selection, ansiBuffer, cursor, Ansi.Reversed.On
           )
