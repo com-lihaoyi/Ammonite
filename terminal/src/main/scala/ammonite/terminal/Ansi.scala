@@ -169,7 +169,7 @@ object Ansi {
     /**
       * Overlays the desired color over the specified range of the [[Ansi.Str]].
       */
-    def overlay(overlayColor: Attr, start: Int, end: Int) = {
+    def overlay(overlayColor: Attr, start: Int = 0, end: Int = length) = {
       require(end >= start,
         s"end:$end must be greater than start:$end in AnsiStr#overlay call"
       )
