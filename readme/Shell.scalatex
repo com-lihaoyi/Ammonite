@@ -417,6 +417,25 @@
       @p
         Apart from using @hl.scala{viewer="vim"}, we also set the @hl.scala{colors} to black and white because Vim by default doesn't display ANSI colors nicely. You can also pass in a @hl.scala{Seq} of strings to @hl.scala{viewer} if you want to pass additional flags to your editor, and of course use any other editor you would like such as @hl.scala{"emacs"} or @hl.scala{"nano"} or @hl.scala{"subl"}
 
+    @sect{desugar}
+      @img(src:="Browse.gif", display.block, marginLeft.auto, marginRight.auto, height := 495)
+
+      @p
+        @hl.scala{desugar} allows you to easily see what the compiler is doing with your code before it gets run. For example, in the above calls to @hl.scala{desugar}, you can see:
+
+      @ul
+        @li
+          @hl.scala{List(...)} being converted to @hl.scala{List.apply(...)}
+        @li
+          @hl.scala{true -> false} being converted to @hl.scala{Predef.ArrayAssoc(true).$minus$greater(false)}
+        @li
+          @hl.scala{default.write$default}, @hl.scala{default.SeqishW}, etc. being injected as implicits
+        @li
+          @hl.scala{for} comprehensions with @hl.scala{if} filters being converted into the relevant @hl.scala{withFilter} and @hl.scala{map} calls
+
+      @p
+        In general, if you are having trouble understanding the combination of implicit parameters, implicit conversions, macros, and other odd Scala features, @hl.scala{desugar} could you see what is left after all the magic happens.
+
   @sect{Design Decisions & Tradeoffs}
     @p
       Ammonite-Shell takes a fundamentally different architecture from traditional shells, or even more-modern shell-alternatives. Significant differences include:

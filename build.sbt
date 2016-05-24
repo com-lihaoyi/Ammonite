@@ -153,7 +153,7 @@ lazy val shell = project
   .settings(
     sharedSettings,
     name := "ammonite-shell",
-    libraryDependencies += "com.lihaoyi" %% "pprint" % "0.3.4",
+    libraryDependencies += "com.geirsson" %% "scalafmt" % "0.2.5",
     (test in Test) <<= (test in Test).dependsOn(packageBin in Compile),
     (run in Test) <<= (run in Test).dependsOn(packageBin in Compile),
     (testOnly in Test) <<= (testOnly in Test).dependsOn(packageBin in Compile)

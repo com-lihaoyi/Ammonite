@@ -45,6 +45,10 @@
     @sect{0.5.8}
       @ul
         @li
+          Introduced the @sect.ref{desugar} helper to @sect.ref{Ammonite-Shell}, letting you easily see what the compiler is transforming your code into before it gets run.
+    @sect{0.5.8}
+      @ul
+        @li
           @hl.scala{write} has been generalized to work on any combination of @hl.scala{Array}, @hl.scala{Traversable} and @hl.scala{Iterator}. e.g. @hl.scala{write(foo: Iterator[Iterator[Array[String]]])}
         @li
           @hl.scala{write} no longer inserts newlines between items by default.
