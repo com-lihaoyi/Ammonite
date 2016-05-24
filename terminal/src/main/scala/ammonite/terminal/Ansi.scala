@@ -182,7 +182,8 @@ object Ansi {
     * an [[Ansi.Str]], but also usable independently in your own code.
     */
 //  lazy val ansiRegex = "\u001B\\[[;\\d]*m".r
-  lazy val ansiRegex = "[\u001b\u009b][\\[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]".r
+  lazy val ansiRegex =
+    "[\u001b\u009b][\\[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]".r
 
   /**
     * Creates an [[Ansi.Str]] from a non-Ansi `java.lang.String` or other
