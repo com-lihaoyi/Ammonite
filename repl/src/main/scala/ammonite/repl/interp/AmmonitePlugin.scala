@@ -11,7 +11,9 @@ import scala.tools.nsc.plugins.{PluginComponent, Plugin}
  * to the `output` function. Needs to be a compiler plugin so we can hook in
  * immediately after the `typer`
  */
-class AmmonitePlugin(g: scala.tools.nsc.Global, output: Seq[ImportData] => Unit, importsLen: => Int) extends Plugin{
+class AmmonitePlugin(g: scala.tools.nsc.Global,
+                     output: Seq[ImportData] => Unit,
+                     importsLen: => Int) extends Plugin{
   val name: String = "AmmonitePlugin"
   val global: Global = g
   val description: String = "Extracts the names in scope for the Ammonite REPL to use"
@@ -44,7 +46,9 @@ class AmmonitePlugin(g: scala.tools.nsc.Global, output: Seq[ImportData] => Unit,
   )
 }
 object AmmonitePlugin{
-  def apply(g: Global)(unit: g.CompilationUnit, output: Seq[ImportData] => Unit, importsLen: => Int) = {
+  def apply(g: Global)(unit: g.CompilationUnit,
+                       output: Seq[ImportData] => Unit,
+                       importsLen: => Int) = {
 
     import g._
 
@@ -170,7 +174,9 @@ object AmmonitePlugin{
 
 
 object LineNumberModifier {
-  def apply(g: Global)(unit: g.CompilationUnit, output: Seq[ImportData] => Unit, importsLen: => Int) = {
+  def apply(g: Global)(unit: g.CompilationUnit,
+                       output: Seq[ImportData] => Unit,
+                       importsLen: => Int) = {
 
     import g._
 
@@ -180,7 +186,8 @@ object LineNumberModifier {
         tree.pos match {
           case s: scala.reflect.internal.util.OffsetPosition =>
             if(s.point > importsLen) {
-              val con = new scala.reflect.internal.util.BatchSourceFile(s.source.file, s.source.content.drop(importsLen))
+              val con = new scala.reflect.internal.util.BatchSourceFile(s.source.file,
+                s.source.content.drop(importsLen))
               val p = new scala.reflect.internal.util.OffsetPosition(con, s.point - importsLen)
               transformedTree.pos = p
             }

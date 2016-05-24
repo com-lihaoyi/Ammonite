@@ -139,7 +139,8 @@ object Evaluator{
     private var _compilationCount = 0
     def compilationCount = _compilationCount
 
-    def compileClass(code: (String, Int), printer: Printer): Res[(ClassFiles, Seq[ImportData])] = for {
+    def compileClass(code: (String, Int),
+                     printer: Printer): Res[(ClassFiles, Seq[ImportData])] = for {
       compiled <- Res.Success{
         val c = compile(code._1.getBytes, printer, code._2)
         c

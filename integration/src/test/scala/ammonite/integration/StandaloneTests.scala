@@ -137,7 +137,8 @@ object StandaloneTests extends TestSuite{
       }
       val expectedErrorMsg =
         """Main.scala:11: not found: value quicort
-          |    quicort(unsorted.filter(_ < pivot)):::List(pivot):::quicksort(unsorted.filter(_ > pivot))
+          |    quicort(unsorted.filter(_ < pivot)):::List(pivot)""" +
+        """:::quicksort(unsorted.filter(_ > pivot))
           |    ^""".stripMargin
 
       assert(e.toString.contains(expectedErrorMsg))

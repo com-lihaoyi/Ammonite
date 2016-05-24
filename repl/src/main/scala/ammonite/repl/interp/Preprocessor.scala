@@ -106,7 +106,9 @@ object Preprocessor{
       ObjectDef, ClassDef, TraitDef, DefDef, TypeDef, PatVarDef, Import, Expr
     )
 
-    def apply(stmts: Seq[String], wrapperId: String, comment: String = ""): Res[Preprocessor.Output] = {
+    def apply(stmts: Seq[String],
+              wrapperId: String,
+              comment: String = ""): Res[Preprocessor.Output] = {
       val unwrapped = stmts.flatMap{x => Parsers.unwrapBlock(x) match {
         case Some(contents) =>
           Parsers.split(contents).get.get.value
