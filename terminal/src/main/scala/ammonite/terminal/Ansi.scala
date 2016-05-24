@@ -266,12 +266,20 @@ object Ansi {
     def matches(state: Int) = (state & resetMask) == applyMask
     def apply(s: Ansi.Str) = s.overlay(this, 0, s.length)
   }
+
+  /**
+    * An [[Attr]] represented by an Ansi escape sequence
+    */
   case class EscapeAttr private[Ansi](escape: String, resetMask: Int, applyMask: Int)
                                      (implicit sourceName: sourcecode.Name) extends Attr{
     def escapeOpt = Some(escape)
     val name = sourceName.value
     override def toString = escape + name + Console.RESET
   }
+
+  /**
+    * An [[Attr]] for which no Ansi escape sequence exists
+    */
   case class ResetAttr private[Ansi](resetMask: Int, applyMask: Int)
                                     (implicit sourceName: sourcecode.Name) extends Attr{
     def escapeOpt = None
