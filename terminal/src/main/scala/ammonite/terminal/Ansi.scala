@@ -80,6 +80,15 @@ object Ansi {
       (new Str(leftChars, leftColors), new Str(rightChars, rightColors))
     }
 
+    /**
+      * Returns an [[Ansi.Str]] which is a substring of this string,
+      * and has the same colors as the original section of this string
+      * did
+      */
+    def substring(start: Int = 0, end: Int = length) = {
+      Str(chars.slice(start, end), colors.slice(start, end))
+    }
+
 
     /**
       * The plain-text length of this [[Ansi.Str]], in UTF-16 characters (same
