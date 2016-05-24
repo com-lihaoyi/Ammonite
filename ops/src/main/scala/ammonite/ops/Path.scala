@@ -22,8 +22,43 @@ object BasePath extends PathFactory[BasePath]{
   }
   def invalidChars = Set('/')
   def checkSegment(s: String) = {
-    if (s.exists(BasePath.invalidChars)) throw PathError.InvalidSegment(s)
-    if (s == "" || s == "." || s == "..") throw new PathError.InvalidSegment(s)
+    def fail(msg: String) = throw PathError.InvalidSegment(s, msg)
+    def considerStr =
+      "use the Path(...) or RelPath(...) constructor calls to convert them. "
+
+    s.find(BasePath.invalidChars) match{
+      case Some(c) => fail(
+        s"[$c] is not a valid character to appear in a path segment. " +
+        "If you want to parse an absolute " +
+        "or relative path that may have multiple segments, " +
+        "e.g. path-strings coming from external sources" +
+        considerStr
+      )
+      case None =>
+    }
+    def externalStr = "If you are dealing with path-strings coming from external sources, "
+    s match{
+      case "" =>
+        fail(
+          "Ammonite-Ops does not allow empty path segments " +
+          externalStr + considerStr
+        )
+      case "." =>
+        fail(
+          "Ammonite-Ops does not allow [.] as a path segment " +
+          externalStr + considerStr
+        )
+      case ".." =>
+        fail(
+          "Ammonite-Ops does not allow [..] as a path segment " +
+          externalStr +
+          considerStr +
+          "If you want to use the `..` segment manually to represent going up " +
+          "one level in the path, use the `up` segment from `ammonite.ops.up` " +
+          "e.g. an external path foo/bar/../baz translates into 'foo/'bar/up/'baz."
+        )
+      case _ =>
+    }
   }
   def chunkify(s: java.nio.file.Path) = {
     import collection.JavaConversions._
@@ -137,12 +172,10 @@ trait BasePathImpl extends BasePath{
 
 object PathError{
   type IAE = IllegalArgumentException
-  private[this] def errorMsg(s: String) =
-    s"[$s] is not a valid path segment. If you want to parse an absolute " +
-      "or relative path that may have multiple segments, consider using the " +
-      "Path(...) or RelPath(...) constructor calls"
+  private[this] def errorMsg(s: String, msg: String) =
+    s"[$s] is not a valid path segment. $msg"
 
-  case class InvalidSegment(segment: String) extends IAE(errorMsg(segment))
+  case class InvalidSegment(segment: String, msg: String) extends IAE(errorMsg(segment, msg))
 
   case object AbsolutePathOutsideRoot
     extends IAE("The path created has enough ..s that it would start outside the root directory")
