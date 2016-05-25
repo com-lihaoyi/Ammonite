@@ -222,6 +222,7 @@ object Ansi {
     "[\u001b\u009b][\\[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]".r
 
   object Str{
+    implicit def implicitApply(raw: CharSequence): Ansi.Str = apply(raw)
     /**
       * Creates an [[Ansi.Str]] from a non-Ansi `java.lang.String` or other
       * `CharSequence`.
@@ -229,8 +230,11 @@ object Ansi {
       * Note that this method is implicit, meaning you can pass in a
       * `java.lang.String` anywhere an `Ansi.Str` is required and it will be
       * automatically parsed and converted for you.
+      *
+      * @param strict throw an exception if an unrecognized Ansi sequence exists.
+      *               Off by default
       */
-    implicit def apply(raw: CharSequence): Ansi.Str = {
+    def apply(raw: CharSequence, strict: Boolean = false): Ansi.Str = {
 
       val chars = new Array[Char](raw.length)
       val colors = new Array[Int](raw.length)
@@ -247,7 +251,7 @@ object Ansi {
         val frag = raw.subSequence(start, end).toString
         if (frag.charAt(0) == '\u001b' || frag.charAt(0) == '\u009b') {
           if (ParseMap.contains(frag)) currentColor = ParseMap(frag).transform(currentColor)
-          else {
+          else if (strict){
             // If our regex found something that looks suspicious,
             // bail out and report it
             throw new IllegalArgumentException(
@@ -256,13 +260,14 @@ object Ansi {
             )
           }
         } else {
+
           var i = 0
           while(i < frag.length){
             chars(currentIndex) = frag(i)
             // If we found the start of an escape code that was missed by our
             // regex, also bail out and just report the index since that's all we
             // know about it
-            if (frag(i) == '\u001b' || frag(i) == '\u009b') {
+            if (strict && (frag(i) == '\u001b' || frag(i) == '\u009b')) {
               throw new IllegalArgumentException(
                 s"Unknown Ansi-escape at index $i inside string cannot be " +
                   "parsed into an Ansi.Str"

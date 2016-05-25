@@ -162,7 +162,7 @@ object AnsiStrTests extends TestSuite{
         // https://en.wikipedia.org/wiki/ANSI_escape_code#Non-CSI_codes
 
         def check(s: String, msg: String) ={
-          intercept[IllegalArgumentException]{ Ansi.Str(s) }
+          intercept[IllegalArgumentException]{ Ansi.Str(s, strict = true) }
   //        assert(ex.getMessage.contains(msg))
         }
 
