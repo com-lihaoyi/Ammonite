@@ -132,9 +132,9 @@ case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEn
           colors.keyword(),
           resetColor
         )
-        val highlighted = Ansi.Str.parse(Highlighter.flattenIndices(indices, buffer).mkString)
+        val highlighted = Ansi.parse(Highlighter.flattenIndices(indices, buffer).mkString)
         val (newBuffer, offset) = SelectionFilter.mangleBuffer(
-          selectionFilter, highlighted, cursor, Ansi.Attr.ParseMap(colors.selected())
+          selectionFilter, highlighted, cursor, Ansi.ParseMap(colors.selected())
         )
 
         val newNewBuffer = HistoryFilter.mangleBuffer(
