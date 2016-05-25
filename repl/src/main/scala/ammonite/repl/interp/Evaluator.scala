@@ -306,17 +306,17 @@ object $wrapperName{\n"""
     def processScriptBlock(code: String,
                            scriptImports: Seq[ImportData],
                            printer: Printer) = for {
-        (wrapperName, cls, newImports) <- cachedCompileBlock(
-          code, scriptImports, printer
-        )
-      } yield {
-        Timer("cachedCompileBlock")
-        evalMain(cls)
-        Timer("evalMain")
-        val res = evaluationResult(wrapperName, newImports)
-        Timer("evaluationResult")
-        res
-      }
+      (wrapperName, cls, newImports) <- cachedCompileBlock(
+        code, scriptImports, printer
+      )
+    } yield {
+      Timer("cachedCompileBlock")
+      evalMain(cls)
+      Timer("evalMain")
+      val res = evaluationResult(wrapperName, newImports)
+      Timer("evaluationResult")
+      res
+    }
 
 
     def update(newImports: Seq[ImportData]) = {

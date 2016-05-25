@@ -103,8 +103,8 @@ class Interpreter(prompt0: Ref[String],
   }
 
   def processModule(code: String) = processScript(
-      skipSheBangLine(code),
-      (code, imports) => withContextClassloader(eval.processScriptBlock(code, imports, printer))
+    skipSheBangLine(code),
+    (code, imports) => withContextClassloader(eval.processScriptBlock(code, imports, printer))
     )
 
 
@@ -136,17 +136,18 @@ class Interpreter(prompt0: Ref[String],
     s"Syntax Error: $msg\n$locationString"
   }
 
-  def processCorrectScript(rawParsedCode: Parsed.Success[Seq[( String, Seq[String])]],
+  def processCorrectScript(rawParsedCode: Parsed.Success[Seq[(String, Seq[String])]],
                            evaluate: EvaluateCallback): Seq[ImportData] = {
 
     var offset = 0
-    var parsedCode: Seq[( String, Seq[String])] = Seq()
+    var parsedCode: mutable.ArrayBuffer[( String, Seq[String])] = mutable.ArrayBuffer()
+
+    // comment holds comments or empty lines at above the code which is not caught along with code
     for( (comment, code) <- rawParsedCode.get.value ){
       val ncomment = comment + "\n"*offset
-      offset = offset + comment.count(_ == '\n') + code.foldLeft(0){ (z,x) =>
-        z + x.count(_ == '\n')
-      } + 1
 
+      // 1 is added as Separator parser eats up the '\n' following @
+      offset = offset + comment.count(_ == '\n') + code.map(_.count(_ == '\n')).sum + 1
       parsedCode = parsedCode :+ (ncomment, code)
     }
 

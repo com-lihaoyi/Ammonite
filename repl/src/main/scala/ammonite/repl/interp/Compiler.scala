@@ -35,7 +35,7 @@ trait Compiler{
   def compiler: nsc.Global
   def compile(src: Array[Byte],
               printer: Printer,
-              impLen: Int): Compiler.Output
+              importsLen0: Int): Compiler.Output
 
   def search(name: scala.reflect.runtime.universe.Type): Option[String]
   /**
@@ -248,17 +248,20 @@ object Compiler{
     }
     /**
      * Compiles a blob of bytes and spits of a list of classfiles
+      * importsLen0 is the length of topWrapper appended above code by wrappedCode function
+      * It is passed to AmmonitePlugin to decrease this much offset from each AST node
+      * corresponding to the actual code so as to correct the line numbers in error report
      */
     def compile(src: Array[Byte],
                 printer: Printer,
-                impLen: Int): Output = {
+                importsLen0: Int): Output = {
 
       compiler.reporter.reset()
       this.errorLogger = printer.error
       this.warningLogger = printer.warning
       this.infoLogger = printer.info
       val singleFile = makeFile( src)
-      this.importsLen = impLen
+      this.importsLen = importsLen0
       val run = new compiler.Run()
       vd.clear()
       run.compileFiles(List(singleFile))

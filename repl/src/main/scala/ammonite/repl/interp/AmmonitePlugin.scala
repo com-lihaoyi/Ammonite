@@ -5,6 +5,7 @@ import ammonite.repl.{Parsers, ImportData}
 import acyclic.file
 import scala.tools.nsc._
 import scala.tools.nsc.plugins.{PluginComponent, Plugin}
+import scala.reflect.internal.util.{OffsetPosition, BatchSourceFile}
 
 /**
  * Used to capture the names in scope after every execution, reporting them
@@ -13,7 +14,7 @@ import scala.tools.nsc.plugins.{PluginComponent, Plugin}
  */
 class AmmonitePlugin(g: scala.tools.nsc.Global,
                      output: Seq[ImportData] => Unit,
-                     importsLen: => Int) extends Plugin{
+                     topWrapperLen: => Int) extends Plugin{
   val name: String = "AmmonitePlugin"
   val global: Global = g
   val description: String = "Extracts the names in scope for the Ammonite REPL to use"
@@ -27,28 +28,30 @@ class AmmonitePlugin(g: scala.tools.nsc.Global,
 
       def newPhase(prev: Phase): Phase = new g.GlobalPhase(prev) {
         def name = phaseName
-        def apply(unit: g.CompilationUnit): Unit = AmmonitePlugin(g)(unit, output, importsLen)
+        def apply(unit: g.CompilationUnit): Unit = AmmonitePlugin(g)(unit, output, topWrapperLen)
       }
     },
 
-  new PluginComponent {
-    val global = g
+    new PluginComponent {
+      val global = g
 
-    val runsAfter = List("parser")
-    override val runsBefore = List("namer")
-    val phaseName = "FixLineNumbers"
+      val runsAfter = List("parser")
+      override val runsBefore = List("namer")
+      val phaseName = "FixLineNumbers"
 
-    def newPhase(prev: Phase): Phase = new g.GlobalPhase(prev) {
-      def name = phaseName
-      def apply(unit: g.CompilationUnit): Unit = LineNumberModifier(g)(unit, output, importsLen)
+      def newPhase(prev: Phase): Phase = new g.GlobalPhase(prev) {
+        def name = phaseName
+        def apply(unit: g.CompilationUnit): Unit = LineNumberModifier(g)(unit, topWrapperLen)
+      }
     }
-  }
   )
 }
+
+
 object AmmonitePlugin{
   def apply(g: Global)(unit: g.CompilationUnit,
                        output: Seq[ImportData] => Unit,
-                       importsLen: => Int) = {
+                       topWrapperLen: => Int) = {
 
     import g._
 
@@ -175,44 +178,30 @@ object AmmonitePlugin{
 
 object LineNumberModifier {
   def apply(g: Global)(unit: g.CompilationUnit,
-                       output: Seq[ImportData] => Unit,
-                       importsLen: => Int) = {
+                       topWrapperLen: => Int) = {
 
     import g._
 
-    class LineNumberCorrector(unit: CompilationUnit) extends Transformer {
+    object LineNumberCorrector extends Transformer {
       override def transform(tree: Tree) = {
         val transformedTree = super.transform(tree)
         tree.pos match {
           case s: scala.reflect.internal.util.OffsetPosition =>
-            if(s.point > importsLen) {
-              val con = new scala.reflect.internal.util.BatchSourceFile(s.source.file,
-                s.source.content.drop(importsLen))
-              val p = new scala.reflect.internal.util.OffsetPosition(con, s.point - importsLen)
+            if(s.point > topWrapperLen) {
+              val con = new BatchSourceFile(s.source.file,
+                s.source.content.drop(topWrapperLen))
+              val p = new OffsetPosition(con, s.point - topWrapperLen)
               transformedTree.pos = p
             }
           case _ =>    //for position  = NoPosition
         }
         transformedTree
       }
+
+      def apply(unit: CompilationUnit) = transform(unit.body)
     }
 
-    class TreePrinter(unit: CompilationUnit) extends Transformer {
-      override def transform(tree: Tree): Tree = {
-        val t = super.transform(tree)
-        t.pos match {
-          case s: scala.reflect.internal.util.OffsetPosition =>
-            println(tree + "____________" + s.line + " ------- " + s.line)
-
-          case _ =>
-            println(tree + "_________ NO POSITION ___________")
-        }
-        t
-      }
-    }
-
-    val t = (new LineNumberCorrector(unit)).transform(unit.body)
+    val t = LineNumberCorrector(unit)
     unit.body = t
-//  (new TreePrinter(unit)).transform(unit.body)
   }
 }
