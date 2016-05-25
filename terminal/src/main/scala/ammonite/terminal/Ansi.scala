@@ -10,7 +10,7 @@ import acyclic.file
   *
   * The main operations you need to know are:
   *
-  * - `Ansi.parse(raw: CharSequence): Ansi.String`, to construct colored
+  * - `Ansi.Str(raw: CharSequence): Ansi.String`, to construct colored
   *   Ansi strings from plain (or colored) text
   *
   * - `Ansi.Str`, the primary data-type that you will use to pass-around
@@ -215,69 +215,70 @@ object Ansi {
 
   /**
     * A regex that can be used to easily find the position of Ansi escapes
-    * with a `java.lang.String` or other `CharSequence`. Used to [[parse]]
+    * with a `java.lang.String` or other `CharSequence`. Used to parse
     * an [[Ansi.Str]], but also usable independently in your own code.
     */
-//  lazy val ansiRegex = "\u001B\\[[;\\d]*m".r
   lazy val ansiRegex =
     "[\u001b\u009b][\\[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]".r
 
-  /**
-    * Creates an [[Ansi.Str]] from a non-Ansi `java.lang.String` or other
-    * `CharSequence`.
-    *
-    * Note that this method is implicit, meaning you can pass in a
-    * `java.lang.String` anywhere an `Ansi.Str` is required and it will be
-    * automatically parsed and converted for you.
-    */
-  implicit def parse(raw: CharSequence): Ansi.Str = {
+  object Str{
+    /**
+      * Creates an [[Ansi.Str]] from a non-Ansi `java.lang.String` or other
+      * `CharSequence`.
+      *
+      * Note that this method is implicit, meaning you can pass in a
+      * `java.lang.String` anywhere an `Ansi.Str` is required and it will be
+      * automatically parsed and converted for you.
+      */
+    implicit def apply(raw: CharSequence): Ansi.Str = {
 
-    val chars = new Array[Char](raw.length)
-    val colors = new Array[Int](raw.length)
-    var currentIndex = 0
-    var currentColor = 0
+      val chars = new Array[Char](raw.length)
+      val colors = new Array[Int](raw.length)
+      var currentIndex = 0
+      var currentColor = 0
 
-    val matches = ansiRegex.findAllMatchIn(raw)
-    val indices = Seq(0) ++ matches.flatMap { m => Seq(m.start, m.end) } ++ Seq(raw.length)
+      val matches = ansiRegex.findAllMatchIn(raw)
+      val indices = Seq(0) ++ matches.flatMap { m => Seq(m.start, m.end) } ++ Seq(raw.length)
 
-    for {
-      Seq(start, end) <- indices.sliding(2).toSeq
-      if start != end
-    } {
-      val frag = raw.subSequence(start, end).toString
-      if (frag.charAt(0) == '\u001b' || frag.charAt(0) == '\u009b') {
-        if (ParseMap.contains(frag)) currentColor = ParseMap(frag).transform(currentColor)
-        else {
-          // If our regex found something that looks suspicious,
-          // bail out and report it
-          throw new IllegalArgumentException(
-            s"Unknown Ansi-escape ${frag.tail} inside string cannot be " +
-            "parsed into an Ansi.Str"
-          )
-        }
-      } else {
-        var i = 0
-        while(i < frag.length){
-          chars(currentIndex) = frag(i)
-          // If we found the start of an escape code that was missed by our
-          // regex, also bail out and just report the index since that's all we
-          // know about it
-          if (frag(i) == '\u001b' || frag(i) == '\u009b') {
+      for {
+        Seq(start, end) <- indices.sliding(2).toSeq
+        if start != end
+      } {
+        val frag = raw.subSequence(start, end).toString
+        if (frag.charAt(0) == '\u001b' || frag.charAt(0) == '\u009b') {
+          if (ParseMap.contains(frag)) currentColor = ParseMap(frag).transform(currentColor)
+          else {
+            // If our regex found something that looks suspicious,
+            // bail out and report it
             throw new IllegalArgumentException(
-              s"Unknown Ansi-escape at index $i inside string cannot be " +
-              "parsed into an Ansi.Str"
+              s"Unknown Ansi-escape ${frag.tail} inside string cannot be " +
+                "parsed into an Ansi.Str"
             )
           }
-          colors(currentIndex) = currentColor
-          i += 1
-          currentIndex += 1
+        } else {
+          var i = 0
+          while(i < frag.length){
+            chars(currentIndex) = frag(i)
+            // If we found the start of an escape code that was missed by our
+            // regex, also bail out and just report the index since that's all we
+            // know about it
+            if (frag(i) == '\u001b' || frag(i) == '\u009b') {
+              throw new IllegalArgumentException(
+                s"Unknown Ansi-escape at index $i inside string cannot be " +
+                  "parsed into an Ansi.Str"
+              )
+            }
+            colors(currentIndex) = currentColor
+            i += 1
+            currentIndex += 1
+          }
         }
       }
+
+      Str(chars.take(currentIndex), colors.take(currentIndex))
     }
 
-    Str(chars.take(currentIndex), colors.take(currentIndex))
   }
-
 
   /**
     * Represents a single, atomic ANSI escape sequence that results in a
