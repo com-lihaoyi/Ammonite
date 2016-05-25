@@ -105,7 +105,7 @@ object Terminal {
   type MsgAction = (Vector[Char], Int) => (Vector[Char], Int, String)
 
 
-  def noTransform(x: Vector[Char], i: Int) = (Ansi.parse(x), i)
+  def noTransform(x: Vector[Char], i: Int) = (Ansi.Str(x), i)
   /**
    * Blockingly reads a line from the given input stream and returns it.
    *
@@ -310,7 +310,7 @@ object Terminal {
 }
 object Prompt {
   implicit def construct(prompt: String): Prompt = {
-    val parsedPrompt = Ansi.parse(prompt)
+    val parsedPrompt = Ansi.Str(prompt)
     val index = parsedPrompt.plainText.lastIndexOf('\n')
     val (_, last) = parsedPrompt.splitAt(index+1)
     Prompt(parsedPrompt, last)

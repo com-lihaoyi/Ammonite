@@ -4,7 +4,7 @@ import utest._
 
 
 object AnsiStrTests extends TestSuite{
-  import Ansi.parse
+
   // Alias a bunch of rendered attributes to short names
   // to use in all our test cases
   val R = Ansi.Color.Red.escape
@@ -26,15 +26,15 @@ object AnsiStrTests extends TestSuite{
     val rgb = s"$R$G$B"
     'parsing{
       assert(
-        parse(rgbOps).plainText == "+++---***///",
-        parse(rgb).plainText == "",
-        parse(rgbOps).render == rgbOps + RTC,
-        parse(rgb).render == ""
+        Ansi.Str(rgbOps).plainText == "+++---***///",
+        Ansi.Str(rgb).plainText == "",
+        Ansi.Str(rgbOps).render == rgbOps + RTC,
+        Ansi.Str(rgb).render == ""
       )
     }
 
     'concat{
-      val concated = (parse(rgbOps) ++ parse(rgbOps)).render
+      val concated = (Ansi.Str(rgbOps) ++ Ansi.Str(rgbOps)).render
       val expected = rgbOps ++ RTC ++ rgbOps ++ RTC
 
       assert(concated == expected)
@@ -58,7 +58,7 @@ object AnsiStrTests extends TestSuite{
         (12, s"+++$R---$G***$B///$RTC", s"")
       )
       for((index, expectedLeft0, expectedRight0) <- splits){
-        val (splitLeft, splitRight) = parse(rgbOps).splitAt(index)
+        val (splitLeft, splitRight) = Ansi.Str(rgbOps).splitAt(index)
         val (expectedLeft, expectedRight) = (expectedLeft0, expectedRight0)
         val left = splitLeft.render
         val right = splitRight.render
@@ -66,25 +66,25 @@ object AnsiStrTests extends TestSuite{
       }
     }
     'substring{
-      val substringed = parse(rgbOps).substring(4, 9).render
+      val substringed = Ansi.Str(rgbOps).substring(4, 9).render
       assert(substringed == s"$R--$G***$RTC")
     }
 
     'overlay{
       'simple{
-        val overlayed = rgbOps.overlay(Ansi.Color.Yellow, 4, 7)
+        val overlayed = Ansi.Str(rgbOps).overlay(Ansi.Color.Yellow, 4, 7)
         val expected = s"+++$R-$Y--*$G**$B///$RTC"
         assert(overlayed.render == expected)
       }
       'resetty{
         val resetty = s"+$RES++$R--$RES-$RES$G***$B///"
-        val overlayed = resetty.overlay(Ansi.Color.Yellow, 4, 7).render
+        val overlayed = Ansi.Str(resetty).overlay(Ansi.Color.Yellow, 4, 7).render
         val expected = s"+++$R-$Y--*$G**$B///$RTC"
         assert(overlayed == expected)
       }
       'mixedResetUnderline{
         val resetty = s"+$RES++$R--$RES-$UND$G***$B///"
-        val overlayed = resetty.overlay(Ansi.Color.Yellow, 4, 7).render toVector
+        val overlayed = Ansi.Str(resetty).overlay(Ansi.Color.Yellow, 4, 7).render toVector
         val expected = s"+++$R-$Y--$UND*$G**$B///$DCOL$DUND" toVector
 
         assert(overlayed == expected)
@@ -92,32 +92,32 @@ object AnsiStrTests extends TestSuite{
       'underlines{
         val resetty = s"$UND#$RES    $UND#$RES"
         'underlineBug{
-          val overlayed = resetty.overlay(Ansi.Reversed.On, 0, 2).render
+          val overlayed = Ansi.Str(resetty).overlay(Ansi.Reversed.On, 0, 2).render
           val expected = s"$UND$REV#$DUND $DREV   $UND#$DUND"
           assert(overlayed == expected)
         }
         'barelyOverlapping{
-          val overlayed = resetty.overlay(Ansi.Reversed.On, 0, 1).render
+          val overlayed = Ansi.Str(resetty).overlay(Ansi.Reversed.On, 0, 1).render
           val expected = s"$UND$REV#$DUND$DREV    $UND#$DUND"
           assert(overlayed == expected)
         }
         'endOfLine{
-          val overlayed = resetty.overlay(Ansi.Reversed.On, 5, 6).render
+          val overlayed = Ansi.Str(resetty).overlay(Ansi.Reversed.On, 5, 6).render
           val expected = s"$UND#$DUND    $UND$REV#$DUND$DREV"
           assert(overlayed == expected)
         }
         'overshoot{
-          val overlayed = resetty.overlay(Ansi.Reversed.On, 5, 10).render.toVector
+          val overlayed = Ansi.Str(resetty).overlay(Ansi.Reversed.On, 5, 10).render.toVector
           val expected = s"$UND#$DUND    $UND$REV#$DUND$DREV".toVector
           assert(overlayed == expected)
         }
         'empty{
-          val overlayed = resetty.overlay(Ansi.Reversed.On, 0, 0).render
+          val overlayed = Ansi.Str(resetty).overlay(Ansi.Reversed.On, 0, 0).render
           val expected = s"$UND#$DUND    $UND#$DUND"
           assert(overlayed == expected)
         }
         'singleContent{
-          val overlayed = resetty.overlay(Ansi.Reversed.On, 2, 4).render
+          val overlayed = Ansi.Str(resetty).overlay(Ansi.Reversed.On, 2, 4).render
           val expected = s"$UND#$DUND $REV  $DREV $UND#$DUND"
           assert(overlayed == expected)
 
@@ -155,14 +155,14 @@ object AnsiStrTests extends TestSuite{
     'backgrounds - tabulate(Ansi.Back.all)
     'negative{
       'parse{
-        // Make sure that Ansi.parse throws on most common non-color
+        // Make sure that Ansi.Str throws on most common non-color
         // Ansi terminal commands
         //
         // List of common non-color Ansi terminal commands taken from
         // https://en.wikipedia.org/wiki/ANSI_escape_code#Non-CSI_codes
 
         def check(s: String, msg: String) ={
-          intercept[IllegalArgumentException]{ Ansi.parse(s) }
+          intercept[IllegalArgumentException]{ Ansi.Str(s) }
   //        assert(ex.getMessage.contains(msg))
         }
 
@@ -188,12 +188,12 @@ object AnsiStrTests extends TestSuite{
 
       }
       'outOfBounds{
-        intercept[IllegalArgumentException]{ Ansi.parse("foo").splitAt(10) }
-        intercept[IllegalArgumentException]{ Ansi.parse("foo").splitAt(4) }
-        intercept[IllegalArgumentException]{ Ansi.parse("foo").splitAt(-1) }
-        intercept[IllegalArgumentException]{ Ansi.parse("foo").substring(0, 4)}
-        intercept[IllegalArgumentException]{ Ansi.parse("foo").substring(-1, 2)}
-        intercept[IllegalArgumentException]{ Ansi.parse("foo").substring(2, 1)}
+        intercept[IllegalArgumentException]{ Ansi.Str("foo").splitAt(10) }
+        intercept[IllegalArgumentException]{ Ansi.Str("foo").splitAt(4) }
+        intercept[IllegalArgumentException]{ Ansi.Str("foo").splitAt(-1) }
+        intercept[IllegalArgumentException]{ Ansi.Str("foo").substring(0, 4)}
+        intercept[IllegalArgumentException]{ Ansi.Str("foo").substring(-1, 2)}
+        intercept[IllegalArgumentException]{ Ansi.Str("foo").substring(2, 1)}
       }
     }
   }
