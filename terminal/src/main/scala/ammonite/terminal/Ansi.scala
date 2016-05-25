@@ -59,6 +59,8 @@ object Ansi {
     * the [[Ansi.Str]]. [[render]] flattens it out into a `java.lang.String`
     * with all the colors present as ANSI escapes.
     *
+    * Avoids using Scala collections operations in favor of util.Arrays,
+    * giving 20% (on `++`) to 1300% (on `splitAt` and `subString`) speedups
     */
   case class Str private(private val chars: Array[Char], private val colors: Array[State]) {
     require(chars.length == colors.length)
