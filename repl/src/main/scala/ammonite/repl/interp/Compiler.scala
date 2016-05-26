@@ -87,9 +87,9 @@ object Compiler{
                      dynamicClasspath: VirtualDirectory,
                      errorLogger: => String => Unit,
                      warningLogger: => String => Unit,
-                     infoLogger: => String => Unit) = {
+                     infoLogger: => String => Unit,
+                     settings: Settings) = {
     val vd = new io.VirtualDirectory("(memory)", None)
-    lazy val settings = new Settings
     val settingsX = settings
     val jCtx = new JavaContext()
     val (dirDeps, jarDeps) = classpath.partition(_.isDirectory)
@@ -131,14 +131,15 @@ object Compiler{
 
       val settings = settingsX
     }
-    (settings, reporter, vd, jcp)
+    (reporter, vd, jcp)
   }
 
   def apply(classpath: Seq[java.io.File],
             dynamicClasspath: VirtualDirectory,
             evalClassloader: => ClassLoader,
             pluginClassloader: => ClassLoader,
-            shutdownPressy: () => Unit): Compiler = new Compiler{
+            shutdownPressy: () => Unit,
+            settings: Settings): Compiler = new Compiler{
 
     val PluginXML = "scalac-plugin.xml"
 
@@ -178,8 +179,8 @@ object Compiler{
     var lastImports = Seq.empty[ImportData]
 
     val (vd, reporter, compiler) = {
-      val (settings, reporter, vd, jcp) = initGlobalBits(
-        classpath, dynamicClasspath, errorLogger, warningLogger, infoLogger
+      val (reporter, vd, jcp) = initGlobalBits(
+        classpath, dynamicClasspath, errorLogger, warningLogger, infoLogger, settings
       )
       val scalac = new nsc.Global(settings, reporter) { g =>
         override lazy val plugins = List(new AmmonitePlugin(g, lastImports = _)) ++ {
