@@ -86,7 +86,7 @@ class Interpreter(prompt0: Ref[String],
                    printSnippet: Seq[String],
                    printer: Printer,
                    fileName: String,
-                   extraImports: Seq[ImportData] = Seq()) = withContextClassloader{
+                   extraImports: Seq[ImportData] = Seq() ) = withContextClassloader{
 
       eval.processLine(
         code,
@@ -145,7 +145,7 @@ class Interpreter(prompt0: Ref[String],
     var offset = 0
     var parsedCode: mutable.ArrayBuffer[( String, Seq[String])] = mutable.ArrayBuffer()
 
-    // comment holds comments or empty lines at above the code which is not caught along with code
+    // comment holds comments or empty lines above the code which is not caught along with code
     for( (comment, code) <- rawParsedCode.get.value ){
       val ncomment = comment + "\n"*offset
 
