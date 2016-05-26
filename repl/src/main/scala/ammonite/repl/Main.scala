@@ -145,7 +145,7 @@ object Main{
   }
 
   def runScript(repl: Repl, path: Path, args: Seq[String], kwargs: Map[String, String]): Unit = {
-    val imports = repl.interp.processModule(read(path),path.last)
+    val imports = repl.interp.processModule(read(path), path.last)
     repl.interp.init()
     imports.find(_.toName == "main").foreach { i =>
       val quotedArgs =

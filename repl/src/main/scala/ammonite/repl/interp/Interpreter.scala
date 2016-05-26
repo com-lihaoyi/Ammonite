@@ -86,7 +86,7 @@ class Interpreter(prompt0: Ref[String],
                    printSnippet: Seq[String],
                    printer: Printer,
                    fileName: String,
-                   extraImports: Seq[ImportData] = Seq()) = withContextClassloader{
+                   extraImports: Seq[ImportData] = Seq() ) = withContextClassloader{
 
       eval.processLine(
         code,
@@ -107,12 +107,19 @@ class Interpreter(prompt0: Ref[String],
 
   def processModule(code: String, fileName: String = "Main.scala") = processScript(
     skipSheBangLine(code),
-    (code, imports) => withContextClassloader(eval.processScriptBlock(code, imports, printer, fileName))
-    )
+    (code, imports) => withContextClassloader(eval.processScriptBlock(code,
+                                                                      imports,
+                                                                      printer,
+                                                                      fileName))
+  )
 
 
   def processExec(code: String) =
-    processScript(skipSheBangLine(code), { (c, i) => evaluateLine(c, Nil, printer,  "Main.scala", i) })
+    processScript(skipSheBangLine(code), { (c, i) => evaluateLine(c,
+                                                                  Nil,
+                                                                  printer,
+                                                                  "Main.scala",
+                                                                  i) })
 
 
   private def skipSheBangLine(code: String)= {
@@ -145,7 +152,7 @@ class Interpreter(prompt0: Ref[String],
     var offset = 0
     var parsedCode: mutable.ArrayBuffer[( String, Seq[String])] = mutable.ArrayBuffer()
 
-    // comment holds comments or empty lines at above the code which is not caught along with code
+    // comment holds comments or empty lines above the code which is not caught along with code
     for( (comment, code) <- rawParsedCode.get.value ){
       val ncomment = comment + "\n"*offset
 

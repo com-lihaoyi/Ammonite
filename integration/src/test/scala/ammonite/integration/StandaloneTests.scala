@@ -183,11 +183,11 @@ object StandaloneTests extends TestSuite{
       //Make sure correct line numbers are printed when an erroneous script is executed
       val name = "CompilationErrorLineNumberTest.scala"
       val e = interceptException(name)
-      val expectedErrorMsg = """CompilationErrorLineNumberTest.scala:7: not found: value noSuchObject
+      val expectedErrMsg = """CompilationErrorLineNumberTest.scala:7: not found: value noSuchObject
                                |  val x = noSuchObject.badFunction
                                |          ^""".stripMargin
 
-      assert(e.toString.contains(expectedErrorMsg))
+      assert(e.toString.contains(expectedErrMsg))
     }
 
     'RuntimeCompilationErrorLineNumberTest{

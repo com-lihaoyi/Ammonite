@@ -3,7 +3,7 @@
 
 object foo{
 
-  def f(i:Int):Double = 5/i
+  def f(i: Int): Double = 5/i
 
 }
 

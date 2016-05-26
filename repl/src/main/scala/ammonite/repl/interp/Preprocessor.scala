@@ -128,7 +128,7 @@ object Preprocessor{
       val errors = reParsed.collect{case (Left(e), _) => e }
       if (errors.length != 0) Res.Failure(None, errors.mkString("\n"))
       else {
-        var allDecls = for (((Right(trees @ x :: y), code), i) <- reParsed.zipWithIndex) yield {
+        val allDecls = for (((Right(trees @ x :: y), code), i) <- reParsed.zipWithIndex) yield {
           // Suffix the name of the result variable with the index of
           // the tree if there is more than one statement in this command
           val suffix = if (reParsed.length > 1) "_" + i else ""
