@@ -21,11 +21,11 @@ object desugar{
         ),
         runner = ScalafmtRunner.statement
       ).get.toVector,
-      Console.BLUE,
-      Console.GREEN,
-      Console.GREEN,
-      Console.YELLOW,
-      Console.RESET
+      fansi.Color.Blue,
+      fansi.Color.Green,
+      fansi.Color.Green,
+      fansi.Color.Yellow,
+      fansi.Attr.Reset
     ).mkString
   }
 

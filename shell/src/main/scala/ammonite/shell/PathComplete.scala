@@ -145,10 +145,10 @@ object PathComplete {
 
   def colorPath(path: Path) = {
     stat(path).fileType match{
-      case ammonite.ops.FileType.Dir => Console.CYAN
-      case ammonite.ops.FileType.File => Console.GREEN
-      case ammonite.ops.FileType.SymLink => Console.YELLOW
-      case ammonite.ops.FileType.Other => Console.RED
+      case ammonite.ops.FileType.Dir => fansi.Color.Cyan
+      case ammonite.ops.FileType.File => fansi.Color.Green
+      case ammonite.ops.FileType.SymLink => fansi.Color.Yellow
+      case ammonite.ops.FileType.Other => fansi.Color.Red
     }
   }
   def pathCompleteFilter(wd: => Path,
@@ -176,7 +176,7 @@ object PathComplete {
 
         val coloredCompletions = for((path, name) <- completions) yield{
           val color = colorPath(path)
-          color + name + colors.reset()
+          color(name).render
         }
 
 
