@@ -35,7 +35,8 @@ trait Compiler{
   def compiler: nsc.Global
   def compile(src: Array[Byte],
               printer: Printer,
-              importsLen0: Int): Compiler.Output
+              importsLen0: Int,
+              fileName: String): Compiler.Output
 
   def search(name: scala.reflect.runtime.universe.Type): Option[String]
   /**
@@ -254,13 +255,14 @@ object Compiler{
      */
     def compile(src: Array[Byte],
                 printer: Printer,
-                importsLen0: Int): Output = {
+                importsLen0: Int,
+                fileName: String): Output = {
 
       compiler.reporter.reset()
       this.errorLogger = printer.error
       this.warningLogger = printer.warning
       this.infoLogger = printer.info
-      val singleFile = makeFile( src)
+      val singleFile = makeFile(src, fileName)
       this.importsLen = importsLen0
       val run = new compiler.Run()
       vd.clear()

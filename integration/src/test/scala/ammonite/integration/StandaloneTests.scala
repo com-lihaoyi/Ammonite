@@ -139,7 +139,7 @@ object StandaloneTests extends TestSuite{
       val name = "compilationErrorWithCommentsAtTop.scala"
       val e = interceptException(name)
       val expectedErrorMsg =
-        """Main.scala:11: not found: value quicort
+        """compilationErrorWithCommentsAtTop.scala:11: not found: value quicort
           |    quicort(unsorted.filter(_ < pivot)):::List(pivot):::""".stripMargin +
           """quicksort(unsorted.filter(_ > pivot))"""
 
@@ -151,7 +151,7 @@ object StandaloneTests extends TestSuite{
       val name = "compilationErrorInSecondBlock.scala"
       val e = interceptException(name)
       val expectedErrorMsg =
-        """Main.scala:14: not found: value printnl
+        """compilationErrorInSecondBlock.scala:14: not found: value printnl
           |val res_0 = printnl("OK")
           |            ^""".stripMargin
 
@@ -163,7 +163,7 @@ object StandaloneTests extends TestSuite{
       val name = "compilationErrorInFourthBlock.scala"
       val e = interceptException(name)
       val expectedErrorMsg =
-        """Main.scala:30: not found: value prinntl
+        """compilationErrorInFourthBlock.scala:30: not found: value prinntl
           |val res = prinntl("Ammonite")
           |          ^""".stripMargin
 
@@ -174,7 +174,7 @@ object StandaloneTests extends TestSuite{
       //Make sure correct line numbers are printed when an erroneous script is executed
       val name = "compilationErrorInClass.scala"
       val e = interceptException(name)
-      val expectedErrorMsg = "Main.scala:17: value a is not a member of"
+      val expectedErrorMsg = "compilationErrorInClass.scala:17: value a is not a member of"
 
       assert(e.toString.contains(expectedErrorMsg))
     }
@@ -183,7 +183,7 @@ object StandaloneTests extends TestSuite{
       //Make sure correct line numbers are printed when an erroneous script is executed
       val name = "CompilationErrorLineNumberTest.scala"
       val e = interceptException(name)
-      val expectedErrorMsg = """Main.scala:7: not found: value noSuchObject
+      val expectedErrorMsg = """CompilationErrorLineNumberTest.scala:7: not found: value noSuchObject
                                |  val x = noSuchObject.badFunction
                                |          ^""".stripMargin
 
@@ -194,7 +194,7 @@ object StandaloneTests extends TestSuite{
       //Make sure correct line numbers are printed when an erroneous script is executed
       val name = "RuntimeCompilationErrorLineNumberTest.scala"
       val e = interceptException(name)
-      val expectedErrorMsg = "(Main.scala:6)"
+      val expectedErrorMsg = "(RuntimeCompilationErrorLineNumberTest.scala:6)"
 
       assert(e.toString.contains(expectedErrorMsg))
     }

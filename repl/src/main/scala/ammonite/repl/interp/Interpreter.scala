@@ -61,13 +61,14 @@ class Interpreter(prompt0: Ref[String],
   var lastException: Throwable = null
 
   def processLine(code: String,
-                  stmts: Seq[String]) = {
+                  stmts: Seq[String],
+                  fileName: String = "Main.scala") = {
     for{
       _ <- Catching { case ex =>
         Res.Exception(ex, "Something unexpected went wrong =(")
       }
       Preprocessor.Output(code, printSnippet) <- preprocess(stmts, eval.getCurrentLine)
-      out <- evaluateLine(code, printSnippet, printer)
+      out <- evaluateLine(code, printSnippet, printer, fileName)
     } yield out
   }
 
@@ -84,7 +85,8 @@ class Interpreter(prompt0: Ref[String],
   def evaluateLine(code: String,
                    printSnippet: Seq[String],
                    printer: Printer,
-                   extraImports: Seq[ImportData] = Seq() ) = withContextClassloader{
+                   fileName: String,
+                   extraImports: Seq[ImportData] = Seq()) = withContextClassloader{
 
       eval.processLine(
         code,
@@ -97,19 +99,20 @@ class Interpreter(prompt0: Ref[String],
                 .combinePrints(${printSnippet.mkString(", ")})
         """,
         printer,
+        fileName,
         extraImports
       )
 
   }
 
-  def processModule(code: String) = processScript(
+  def processModule(code: String, fileName: String = "Main.scala") = processScript(
     skipSheBangLine(code),
-    (code, imports) => withContextClassloader(eval.processScriptBlock(code, imports, printer))
+    (code, imports) => withContextClassloader(eval.processScriptBlock(code, imports, printer, fileName))
     )
 
 
   def processExec(code: String) =
-    processScript(skipSheBangLine(code), { (c, i) => evaluateLine(c, Nil, printer, i) })
+    processScript(skipSheBangLine(code), { (c, i) => evaluateLine(c, Nil, printer,  "Main.scala", i) })
 
 
   private def skipSheBangLine(code: String)= {
@@ -311,7 +314,7 @@ class Interpreter(prompt0: Ref[String],
       def exec(file: Path): Unit = apply(read(file))
 
       def module(file: Path): Unit = {
-        processModule(read(file))
+        processModule(read(file), file.last)
         init()
       }
 
