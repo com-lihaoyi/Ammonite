@@ -62,7 +62,7 @@ case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEn
             colors.`type`(),
             colors.literal(),
             colors.keyword(),
-            colors.reset()
+            fansi.Attr.Reset
           ).mkString
         }
 
@@ -70,7 +70,7 @@ case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEn
         val completions2 = for(comp <- completions) yield {
 
           val (left, right) = comp.splitAt(common.length)
-          colors.comment() + left + colors.reset() + right
+          (colors.comment()(left) ++ right).render
         }
         val stdout =
           FrontEndUtils.printCompletions(completions2, details2)
@@ -96,7 +96,7 @@ case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEn
     }
 
     val historyFilter = new HistoryFilter(
-      () => history.reverse, colors.comment(), colors.reset()
+      () => history.reverse, colors.comment()
     )
     val selectionFilter = GUILikeFilters.SelectionFilter(indent = 2)
 
@@ -122,7 +122,7 @@ case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEn
       writer,
       allFilters,
       displayTransform = { (buffer, cursor) =>
-        val resetColor = "\u001b[39m"
+
 
         val indices = Highlighter.defaultHighlightIndices(
           buffer,
@@ -130,15 +130,15 @@ case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEn
           colors.`type`(),
           colors.literal(),
           colors.keyword(),
-          resetColor
+          fansi.Attr.Reset
         )
-        val highlighted = Ansi.Str(Highlighter.flattenIndices(indices, buffer).mkString)
+        val highlighted = fansi.Str(Highlighter.flattenIndices(indices, buffer).mkString)
         val (newBuffer, offset) = SelectionFilter.mangleBuffer(
-          selectionFilter, highlighted, cursor, Ansi.ParseMap(colors.selected())
+          selectionFilter, highlighted, cursor, colors.selected()
         )
 
         val newNewBuffer = HistoryFilter.mangleBuffer(
-          historyFilter, newBuffer, cursor, Ansi.Underlined.On
+          historyFilter, newBuffer, cursor, fansi.Underlined.On
         )
         (newNewBuffer, offset)
       }

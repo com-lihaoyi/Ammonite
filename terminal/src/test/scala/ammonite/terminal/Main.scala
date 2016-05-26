@@ -32,8 +32,7 @@ object Main{
     val cutPaste = ReadlineFilters.CutPasteFilter()
     rec()
     @tailrec def rec(): Unit = {
-      val historyFilter = new HistoryFilter(
-        () => history.toVector, Console.BLUE, AnsiNav.resetForegroundColor)
+      val historyFilter = new HistoryFilter(() => history.toVector, fansi.Color.Blue)
       Terminal.readLine(
         Console.MAGENTA + (0 until 10).mkString + "\n@@@ " + Console.RESET,
         reader,
@@ -61,13 +60,13 @@ object Main{
             case c => Console.UNDERLINED + c + Console.RESET
           }
           // and highlight the selection
-          val ansiBuffer = Ansi.Str(hl(buffer))
+          val ansiBuffer = fansi.Str(hl(buffer))
           val (newBuffer, cursorOffset) = SelectionFilter.mangleBuffer(
-            selection, ansiBuffer, cursor, Ansi.Reversed.On
+            selection, ansiBuffer, cursor, fansi.Reversed.On
           )
           val newNewBuffer = HistoryFilter.mangleBuffer(
             historyFilter, newBuffer, cursor,
-            Ansi.Color.Green
+            fansi.Color.Green
           )
 
           (newNewBuffer, cursorOffset)

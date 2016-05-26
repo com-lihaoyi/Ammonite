@@ -71,7 +71,7 @@ case class UndoFilter(maxUndo: Int = 25) extends DelegateFilter{
     val (b1, c1) = currentUndo
     (b1, c1, msg)
   }
-  def wrap(bc: (Vector[Char], Int, Ansi.Str), rest: LazyList[Int]) = {
+  def wrap(bc: (Vector[Char], Int, fansi.Str), rest: LazyList[Int]) = {
     val (b, c, msg) = bc
     TS(rest, b, c, msg)
   }
@@ -140,8 +140,8 @@ object UndoState extends Enum{
 }
 
 object UndoFilter{
-  val undoMsg = Ansi.Color.Blue(" ...undoing last action, `Alt -` or `Esc -` to redo")
-  val cannotUndoMsg = Ansi.Color.Blue(" ...no more actions to undo")
-  val redoMsg = Ansi.Color.Blue(" ...redoing last action")
-  val cannotRedoMsg = Ansi.Color.Blue(" ...no more actions to redo")
+  val undoMsg = fansi.Color.Blue(" ...undoing last action, `Alt -` or `Esc -` to redo")
+  val cannotUndoMsg = fansi.Color.Blue(" ...no more actions to undo")
+  val redoMsg = fansi.Color.Blue(" ...redoing last action")
+  val cannotRedoMsg = fansi.Color.Blue(" ...no more actions to redo")
 }

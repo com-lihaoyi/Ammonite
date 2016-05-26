@@ -115,7 +115,9 @@ class TestRepl {
               false
             }
           case Res.Exception(ex, failureMsg) =>
-            val trace = Repl.showException(ex, "", "", "") + "\n" +  failureMsg
+            val trace = Repl.showException(
+              ex, fansi.Attrs.empty, fansi.Attrs.empty, fansi.Attrs.empty
+            ) + "\n" +  failureMsg
             assert({identity(trace); identity(expected); false})
           case _ => throw new Exception(
             s"Printed $out does not match what was expected: $expected"
@@ -138,7 +140,10 @@ class TestRepl {
     processed match{
       case Res.Failure(ex, s) => printer.error(s)
       case Res.Exception(throwable, msg) =>
-        printer.error(Repl.showException(throwable, "", "", ""))
+        printer.error(
+          Repl.showException(throwable, fansi.Attrs.empty, fansi.Attrs.empty, fansi.Attrs.empty)
+        )
+
       case _ =>
     }
     interp.handleOutput(processed)
@@ -161,7 +166,9 @@ class TestRepl {
       case Res.Failure(ex, s) =>
         failLoudly(assert(failureCheck(s)))
       case Res.Exception(ex, s) =>
-        val msg = Repl.showException(ex, "", "", "") + "\n" + s
+        val msg = Repl.showException(
+          ex, fansi.Attrs.empty, fansi.Attrs.empty, fansi.Attrs.empty
+        ) + "\n" + s
         failLoudly(assert(failureCheck(msg)))
       case _ => ???
     }

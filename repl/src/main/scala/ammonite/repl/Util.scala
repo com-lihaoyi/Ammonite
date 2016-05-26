@@ -229,35 +229,36 @@ object Timer{
  * @param prefix The Seq/Foo when printing a Seq(...) or case class Foo(...)
  * @param selected The color of text selected in the line-editor
  * @param error The color used to print error messages of all kinds
- * @param reset Whatever is necessary to get rid of residual coloring
  */
-case class Colors(prompt: Ref[String],
-                  ident: Ref[String],
-                  `type`: Ref[String],
-                  literal: Ref[String],
-                  prefix: Ref[String],
-                  comment: Ref[String],
-                  keyword: Ref[String],
-                  selected: Ref[String],
-                  error: Ref[String],
-                  warning: Ref[String],
-                  reset: Ref[String])
+case class Colors(prompt: Ref[fansi.Attrs],
+                  ident: Ref[fansi.Attrs],
+                  `type`: Ref[fansi.Attrs],
+                  literal: Ref[fansi.Attrs],
+                  prefix: Ref[fansi.Attrs],
+                  comment: Ref[fansi.Attrs],
+                  keyword: Ref[fansi.Attrs],
+                  selected: Ref[fansi.Attrs],
+                  error: Ref[fansi.Attrs],
+                  warning: Ref[fansi.Attrs])
 object Colors{
 
   def Default = Colors(
-    Console.MAGENTA,
-    Console.CYAN,
-    Console.GREEN,
-    pprint.Config.Colors.PPrintConfig.colors.literalColor,
-    pprint.Config.Colors.PPrintConfig.colors.prefixColor,
-    Console.BLUE,
-    Console.YELLOW,
-    Console.REVERSED,
-    Console.RED,
-    Console.YELLOW,
-    Console.RESET
+    fansi.Color.Magenta,
+    fansi.Color.Cyan,
+    fansi.Color.Green,
+    fansi.Color.Green,
+    fansi.Color.Yellow,
+    fansi.Color.Blue,
+    fansi.Color.Yellow,
+    fansi.Reversed.On,
+    fansi.Color.Red,
+    fansi.Color.Yellow
   )
-  def BlackWhite = Colors("", "", "", "", "", "", "", "", "", "", "")
+  def BlackWhite = Colors(
+    fansi.Attrs.empty, fansi.Attrs.empty, fansi.Attrs.empty, fansi.Attrs.empty,
+    fansi.Attrs.empty, fansi.Attrs.empty, fansi.Attrs.empty, fansi.Attrs.empty,
+    fansi.Attrs.empty, fansi.Attrs.empty
+  )
 }
 
 /**

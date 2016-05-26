@@ -8,15 +8,21 @@ object UnitTests extends TestSuite{
 
   def testHighlight(buffer: Vector[Char]) = Highlighter.defaultHighlight(
     buffer,
-    "<B|",
-    "<G|",
-    "<G|",
-    "<Y|",
-    ">"
+    fansi.Color.Blue,
+    fansi.Color.Green,
+    fansi.Color.Green,
+    fansi.Color.Yellow,
+    fansi.Attr.Reset
   )
 
   def test(source: String, expected: String) = {
-    val highlighted = testHighlight(source.toVector).mkString
+    val highlighted =
+      testHighlight(source.toVector)
+        .mkString
+        .replace(fansi.Color.Blue.escape, "<B|")
+        .replace(fansi.Color.Green.escape, "<G|")
+        .replace(fansi.Color.Yellow.escape, "<Y|")
+        .replace(fansi.Color.Reset.escape, ">")
     assert(highlighted == expected)
   }
   val tests = TestSuite {
@@ -35,14 +41,14 @@ object UnitTests extends TestSuite{
           val code = read! path
           val out = Highlighter.defaultHighlight(
             code.toVector,
-            Console.UNDERLINED,
-            Console.UNDERLINED,
-            Console.UNDERLINED,
-            Console.UNDERLINED,
-            Console.RESET
+            fansi.Underlined.On,
+            fansi.Underlined.On,
+            fansi.Underlined.On,
+            fansi.Underlined.On,
+            fansi.Attr.Reset
           ).mkString
-            .replace(Console.UNDERLINED, "")
-            .replace(Console.RESET, "")
+            .replace(fansi.Underlined.On.escape, "")
+            .replace(fansi.Underlined.Off.escape, "")
           val outLength = out.length
           val codeLength = code.length
 
@@ -51,21 +57,21 @@ object UnitTests extends TestSuite{
         }
         paths.length
       }
-      'comment - test("//a", "><B|//a>")
-      'type - test("x: y.type", ">x: <G|y>.<Y|type>")
-      'literal - test("1", "><G|1>")
-      'expressions - test("val (x, y) = 1 + 2 + 3", "><Y|val> (x, y) = <G|1> + <G|2> + <G|3>")
+      'comment - test("//a", "<B|//a>")
+      'type - test("x: y.type", "x: <G|y>.<Y|type>")
+      'literal - test("1", "<G|1>")
+      'expressions - test("val (x, y) = 1 + 2 + 3", "<Y|val> (x, y) = <G|1> + <G|2> + <G|3>")
       'interpolation - test(
         """(s"hello ${world + 1}")""",
-        """>(<G|s"hello >${world + <G|1>}<G|">)"""
+        """(<G|s"hello >${world + <G|1>}<G|">)"""
       )
       'runOff - test(
         """(1 + "Hello...""",
-        """>(<G|1> + <G|"Hello..."""
+        """(<G|1> + <G|"Hello...>"""
       )
       'underscore - test(
         """val _ = 1""",
-        """><Y|val> <Y|_> = <G|1>"""
+        """<Y|val> <Y|_> = <G|1>"""
       )
       'nonTrivial - test(
         """def processLine(stmts: Seq[String],
@@ -88,7 +94,7 @@ object UnitTests extends TestSuite{
               } finally Thread.currentThread().setContextClassLoader(oldClassloader)
             } yield out
         """,
-        """><Y|def> processLine(stmts: <G|Seq>[<G|String>],
+        """<Y|def> processLine(stmts: <G|Seq>[<G|String>],
                             saveHistory: (<G|String> => <G|Unit>, <G|String>) => <G|Unit>,
                             printer: <G|Iterator>[<G|String>] => <G|Unit>) = <Y|for>{
               <Y|_> <- Catching { <Y|case> Ex(x@<Y|_>*) =>

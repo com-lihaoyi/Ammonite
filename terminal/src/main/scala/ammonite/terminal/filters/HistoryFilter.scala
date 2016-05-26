@@ -12,8 +12,7 @@ import Filter._
   * & filter previous commands by entering a sub-string.
   */
 class HistoryFilter(history: () => IndexedSeq[String],
-                    commentStartColor: String,
-                    commentEndColor: String) extends DelegateFilter{
+                    commentStartColor: fansi.Attrs) extends DelegateFilter{
 
   /**
     * `-1` means we haven't started looking at history, `n >= 0` means we're
@@ -72,14 +71,14 @@ class HistoryFilter(history: () => IndexedSeq[String],
 
         val msg =
           if (i.nonEmpty) ""
-          else commentStartColor + HistoryFilter.cannotFindSearchMessage + commentEndColor
+          else commentStartColor(HistoryFilter.cannotFindSearchMessage).render
 
         (i, b1, msg, c)
 
       // We're searching for nothing in particular; in this case,
       // show a help message instead of an unhelpful, empty buffer
       case Some(b) if b.isEmpty =>
-        val msg = commentStartColor + HistoryFilter.emptySearchMessage + commentEndColor
+        val msg = commentStartColor(HistoryFilter.emptySearchMessage).render
         // The cursor in this case always goes to zero
         (Some(start), Vector(), msg, 0)
 
@@ -257,9 +256,9 @@ object HistoryFilter{
 
 
   def mangleBuffer(historyFilter: HistoryFilter,
-                   buffer: Ansi.Str,
+                   buffer: fansi.Str,
                    cursor: Int,
-                   startColor: Ansi.Attr) = {
+                   startColor: fansi.Attr) = {
     if (!historyFilter.activeSearch) buffer
     else {
       val (searchStart, searchEnd) =

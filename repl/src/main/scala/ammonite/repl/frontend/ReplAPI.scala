@@ -293,19 +293,19 @@ trait DefaultReplAPI extends FullReplAPI {
           case Some(s) => Iterator(cfg.colors.literalColor, s, cfg.colors.endColor)
         }
         Iterator(
-          colors().ident(), ident, colors().reset(), ": ",
+          colors().ident()(ident).render, ": ",
           implicitly[pprint.TPrint[T]].render(cfg), " = "
         ) ++ rhs
       }
     }
     def printDef(definitionLabel: String, ident: String) = {
       Iterator(
-        "defined ", colors().`type`(), definitionLabel, " ",
-        colors().ident(), ident, colors().reset()
+        "defined ", colors().`type`()(definitionLabel).render, " ",
+        colors().ident()(ident).render
       )
     }
     def printImport(imported: String) = {
-      Iterator(colors().`type`(), "import ", colors().ident(), imported, colors().reset())
+      Iterator(colors().`type`()("import ").render, colors().ident()(imported).render)
     }
   }
 }

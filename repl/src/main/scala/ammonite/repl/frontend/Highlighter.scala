@@ -13,33 +13,32 @@ object Highlighter {
   }
 
 
-  def flattenIndices(boundedIndices: Seq[(Int, String, Boolean)],
+  def flattenIndices(boundedIndices: Seq[(Int, fansi.Attrs, Boolean)],
                      buffer: Vector[Char]) = {
 
     boundedIndices
       .sliding(2)
-      .flatMap{case Seq((s, c1, _), (e, c2, _)) =>
+      .map{case Seq((s, c1, _), (e, c2, _)) =>
         assert(e >= s, s"s: $s e: $e")
-        c1 ++ buffer.slice(s, e)
-      }
-      .toVector
+        c1(fansi.Str(buffer.slice(s, e)))
+      }.reduce(_ ++ _).render.toVector
   }
 
   def defaultHighlight(buffer: Vector[Char],
-                       comment: String,
-                       `type`: String,
-                       literal: String,
-                       keyword: String,
-                       reset: String) = {
+                       comment: fansi.Attrs,
+                       `type`: fansi.Attrs,
+                       literal: fansi.Attrs,
+                       keyword: fansi.Attrs,
+                       reset: fansi.Attrs) = {
     val boundedIndices = defaultHighlightIndices(buffer, comment, `type`, literal, keyword, reset)
     flattenIndices(boundedIndices, buffer)
   }
   def defaultHighlightIndices(buffer: Vector[Char],
-                              comment: String,
-                              `type`: String,
-                              literal: String,
-                              keyword: String,
-                              reset: String) = Highlighter.highlightIndices(
+                              comment: fansi.Attrs,
+                              `type`: fansi.Attrs,
+                              literal: fansi.Attrs,
+                              keyword: fansi.Attrs,
+                              reset: fansi.Attrs) = Highlighter.highlightIndices(
     ammonite.repl.Parsers.Splitter,
     buffer,
     {
@@ -50,12 +49,12 @@ object Highlighter {
       case BackTicked(body)
         if alphaKeywords.contains(body) => keyword
     },
-    endColor = reset
+    reset
   )
   def highlightIndices[T](parser: fastparse.core.Parser[_],
                           buffer: Vector[Char],
                           ruleColors: PartialFunction[Rule[_], T],
-                          endColor: T) = {
+                          endColor: T): Seq[(Int, T, Boolean)] = {
     val indices = {
       var indices = collection.mutable.Buffer((0, endColor, false))
       var done = false
@@ -97,8 +96,8 @@ object Highlighter {
   }
   def highlight(parser: Parser[_],
                 buffer: Vector[Char],
-                ruleColors: PartialFunction[Rule[_], String],
-                endColor: String) = {
+                ruleColors: PartialFunction[Rule[_], fansi.Attrs],
+                endColor: fansi.Attrs) = {
     val boundedIndices = highlightIndices(parser, buffer, ruleColors, endColor)
     flattenIndices(boundedIndices, buffer)
   }

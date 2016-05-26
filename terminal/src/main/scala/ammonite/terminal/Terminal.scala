@@ -105,7 +105,7 @@ object Terminal {
   type MsgAction = (Vector[Char], Int) => (Vector[Char], Int, String)
 
 
-  def noTransform(x: Vector[Char], i: Int) = (Ansi.Str(x), i)
+  def noTransform(x: Vector[Char], i: Int) = (fansi.Str(x), i)
   /**
    * Blockingly reads a line from the given input stream and returns it.
    *
@@ -122,7 +122,7 @@ object Terminal {
                reader: java.io.Reader,
                writer: java.io.Writer,
                filters: Filter,
-               displayTransform: (Vector[Char], Int) => (Ansi.Str, Int) = noTransform)
+               displayTransform: (Vector[Char], Int) => (fansi.Str, Int) = noTransform)
                : Option[String] = {
 
     /**
@@ -134,7 +134,7 @@ object Terminal {
       * math all over the place, incredibly prone to off-by-ones, in order
       * to at the end of the day position the cursor in the right spot.
       */
-    def redrawLine(buffer: Ansi.Str,
+    def redrawLine(buffer: fansi.Str,
                    cursor: Int,
                    ups: Int,
                    rowLengths: Seq[Int],
@@ -250,7 +250,7 @@ object Terminal {
       def updateState(s: LazyList[Int],
                       b: Vector[Char],
                       c: Int,
-                      msg: Ansi.Str): (Int, TermState) = {
+                      msg: fansi.Str): (Int, TermState) = {
 
         val newCursor = math.max(math.min(c, b.length), 0)
         val nextUps =
@@ -310,14 +310,14 @@ object Terminal {
 }
 object Prompt {
   implicit def construct(prompt: String): Prompt = {
-    val parsedPrompt = Ansi.Str(prompt)
+    val parsedPrompt = fansi.Str(prompt)
     val index = parsedPrompt.plainText.lastIndexOf('\n')
     val (_, last) = parsedPrompt.splitAt(index+1)
     Prompt(parsedPrompt, last)
   }
 }
 
-case class Prompt(full: Ansi.Str, lastLine: Ansi.Str)
+case class Prompt(full: fansi.Str, lastLine: fansi.Str)
 
 
 

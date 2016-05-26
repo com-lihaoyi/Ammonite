@@ -33,23 +33,23 @@ object BuiltinTests extends TestSuite{
 
         @ // or one at a time:
 
-        @ repl.colors().prompt() = Console.RED
+        @ repl.colors().prompt() = fansi.Color.Red
 
-        @ repl.colors().ident() = Console.GREEN
+        @ repl.colors().ident() = fansi.Color.Green
 
-        @ repl.colors().`type`() = Console.YELLOW
+        @ repl.colors().`type`() = fansi.Color.Yellow
 
-        @ repl.colors().literal() = Console.MAGENTA
+        @ repl.colors().literal() = fansi.Color.Magenta
 
-        @ repl.colors().prefix() = Console.CYAN
+        @ repl.colors().prefix() = fansi.Color.Cyan
 
-        @ repl.colors().comment() = Console.RED
+        @ repl.colors().comment() = fansi.Color.Red
 
-        @ repl.colors().keyword() = Console.BOLD
+        @ repl.colors().keyword() = fansi.Bold.On
 
-        @ repl.colors().selected() = Console.UNDERLINED
+        @ repl.colors().selected() = fansi.Underlined.On
 
-        @ repl.colors().error() = Console.YELLOW
+        @ repl.colors().error() = fansi.Color.Yellow
       """)
     }
 

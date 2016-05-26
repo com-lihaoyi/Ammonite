@@ -24,14 +24,14 @@ class Repl(input: InputStream,
   var history = new History(Vector())
 
 
-  def printlnWithColor(color: String, endColor: String, s: String) = {
-    Seq(color, s, endColor, "\n").foreach(errorPrintStream.print)
+  def printlnWithColor(color: fansi.Attrs, s: String) = {
+    Seq(color(s).render, "\n").foreach(errorPrintStream.print)
   }
   val printer = Printer(
     _.foreach(printStream.print),
-    printlnWithColor(colors().warning(), colors().reset(), _),
-    printlnWithColor(colors().error(), colors().reset(), _),
-    printlnWithColor("", "", _)
+    printlnWithColor(colors().warning(), _),
+    printlnWithColor(colors().error(), _),
+    printlnWithColor(fansi.Attrs.empty, _)
   )
   Timer("Repl init printer")
 
@@ -57,7 +57,7 @@ class Repl(input: InputStream,
       input,
       reader,
       output,
-      colors().prompt() + prompt() + colors().reset(),
+      colors().prompt()(prompt()).render,
       colors(),
       interp.pressy.complete(_, interp.eval.previousImportBlock, _),
       storage().fullHistory(),
@@ -95,7 +95,7 @@ class Repl(input: InputStream,
         case Res.Failure(ex, msg) => printer.error(msg)
         case Res.Exception(ex, msg) =>
           printer.error(
-            Repl.showException(ex, colors().error(), colors().reset(), colors().literal())
+            Repl.showException(ex, colors().error(), fansi.Attr.Reset, colors().literal())
           )
           printer.error(msg)
         case _ =>
@@ -110,23 +110,26 @@ class Repl(input: InputStream,
 
 object Repl{
   def highlightFrame(f: StackTraceElement,
-                     error: String,
-                     highlightError: String,
-                     source: String) = {
+                     error: fansi.Attrs,
+                     highlightError: fansi.Attrs,
+                     source: fansi.Attrs) = {
     val src =
-      if (f.isNativeMethod) source + "Native Method" + error
-      else s"$source${f.getFileName}$error:$source${f.getLineNumber}$error"
+      if (f.isNativeMethod) source("Native Method")
+      else source(f.getFileName) ++ error(":") ++ source(f.getLineNumber.toString)
 
     val prefix :+ clsName = f.getClassName.split('.').toSeq
     val prefixString = prefix.map(_+'.').mkString("")
-    val clsNameString = clsName.replace("$", error+"$"+highlightError)
+    val clsNameString = clsName //.replace("$", error("$"))
     val method =
-      s"$error$prefixString$highlightError$clsNameString$error" +
-        s".$highlightError${f.getMethodName}$error"
+      error(prefixString) ++ highlightError(clsNameString) ++ error(".") ++
+        highlightError(f.getMethodName)
 
-    s"  $method($src)"
+    fansi.Str(s"  ") ++ method ++ "(" ++ src ++ ")"
   }
-  def showException(ex: Throwable, error: String, highlightError: String, source: String) = {
+  def showException(ex: Throwable,
+                    error: fansi.Attrs,
+                    highlightError: fansi.Attrs,
+                    source: fansi.Attrs) = {
     val cutoff = Set("$main", "evaluatorRunPrinter")
     val traces = Ex.unapplySeq(ex).get.map(exception =>
       error + exception.toString + "\n" +

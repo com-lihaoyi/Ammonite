@@ -88,6 +88,7 @@ lazy val ops = project
     name := "ammonite-ops"
   )
 
+
 lazy val prompt = shellPrompt in ThisBuild := { state =>
   val name = Project.extract(state).currentRef.project
   (if (name == "ammonite") "" else name) + "> "
@@ -102,7 +103,10 @@ lazy val terminal = project
   .settings(
     sharedSettings,
     name := "ammonite-terminal",
-    libraryDependencies += "com.lihaoyi" %% "sourcecode" % "0.1.1",
+    libraryDependencies ++= Seq(
+      "com.lihaoyi" %% "sourcecode" % "0.1.1",
+      "com.lihaoyi" %% "fansi" % "0.1.0"
+    ),
     macroSettings
   )
 
