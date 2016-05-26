@@ -107,12 +107,19 @@ class Interpreter(prompt0: Ref[String],
 
   def processModule(code: String, fileName: String = "Main.scala") = processScript(
     skipSheBangLine(code),
-    (code, imports) => withContextClassloader(eval.processScriptBlock(code, imports, printer, fileName))
-    )
+    (code, imports) => withContextClassloader(eval.processScriptBlock(code,
+                                                                      imports,
+                                                                      printer,
+                                                                      fileName))
+  )
 
 
   def processExec(code: String) =
-    processScript(skipSheBangLine(code), { (c, i) => evaluateLine(c, Nil, printer,  "Main.scala", i) })
+    processScript(skipSheBangLine(code), { (c, i) => evaluateLine(c,
+                                                                  Nil,
+                                                                  printer,
+                                                                  "Main.scala",
+                                                                  i) })
 
 
   private def skipSheBangLine(code: String)= {
