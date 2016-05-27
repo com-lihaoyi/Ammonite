@@ -27,10 +27,10 @@ case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEn
     val res = readLine(reader, output, prompt, colors, compilerComplete, history) match{
       case None => Res.Exit(())
       case Some(code) =>
-
         addHistory(code)
         Parsers.Splitter.parse(code) match{
-          case Parsed.Success(value, idx) => Res.Success((code, value))
+          case Parsed.Success(value, idx) =>
+            Res.Success((code, value))
           case Parsed.Failure(_, index, extra) => Res.Failure(
             None,
             fastparse.core.ParseError.msg(extra.input, extra.traced.expected, index)

@@ -67,19 +67,19 @@ object ProjectTests extends TestSuite{
             @ load.ivy("com.ambiata" %% "mundane" % "1.2.1-20141230225616-50fc792")
             error: IvyResolutionException
 
-            @ import ammonite.repl._, Resolvers._ 
-            
+            @ import ammonite.repl._, Resolvers._
+
             @ val oss = Resolver.Http(
             @   "ambiata-oss",
             @   "https://ambiata-oss.s3-ap-southeast-2.amazonaws.com",
             @   IvyPattern,
             @   false
             @ )
-            
+
             @ resolvers() = resolvers() :+ oss
 
             @ load.ivy("com.ambiata" %% "mundane" % "1.2.1-20141230225616-50fc792")
-                          
+
             @ import com.ambiata.mundane._
           """)
         }

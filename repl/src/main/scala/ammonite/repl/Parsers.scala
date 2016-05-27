@@ -29,7 +29,7 @@ object Parsers {
   val Statement =
     P( scalaparse.Scala.TopPkgSeq | scalaparse.Scala.Import | Prelude ~ BlockDef | StatCtx.Expr )
   def StatementBlock(blockSep: P0) =
-    P( Semis.? ~ (!blockSep ~ Statement).!.repX(sep=Semis) ~ Semis.? )
+    P( Semis.? ~ ((!blockSep ~ Statement) ~~ Semis.? ).!.repX  ~ Semis.?)
   val Splitter = P( StatementBlock(Fail) ~ WL ~ End)
 
   /**
@@ -42,7 +42,7 @@ object Parsers {
   }
 
   val Separator = P( WL ~ "@" ~~ CharIn(" \n").rep(1) )
-  val CompilationUnit = P( WL ~ StatementBlock(Separator) ~ WL )
+  val CompilationUnit = P( WL.! ~ StatementBlock(Separator) ~ WL )
   val ScriptSplitter = P( CompilationUnit.repX(1, Separator) ~ End)
   def splitScript(code: String) = ScriptSplitter.parse(code)
 

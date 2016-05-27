@@ -18,8 +18,8 @@ object FailureTests extends TestSuite{
 
         @ 1 + vale
         error: not found: value vale
-        1 + vale
-            ^
+        val res0 = 1 + vale
+                       ^
         Compilation Failed
 
         @ val x = 1 + vale

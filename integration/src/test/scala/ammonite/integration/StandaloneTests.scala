@@ -39,6 +39,17 @@ object StandaloneTests extends TestSuite{
       )
     }
 
+    def interceptException(name: String) = {
+      intercept[ShelloutException]{
+        %%bash(
+          executable,
+          "--predef-file",
+          emptyPrefdef,
+          replStandaloneResources / name
+          )
+      }
+    }
+
     'hello{
       val evaled = exec("Hello.scala")
       assert(evaled.out.trim == "Hello World")
@@ -101,7 +112,6 @@ object StandaloneTests extends TestSuite{
           |^""".stripMargin
 
       assert(e.toString.contains(expectedErrorMsg))
-
     }
 
     'multipleCompilationUnitErrorTest2{
@@ -124,6 +134,70 @@ object StandaloneTests extends TestSuite{
       assert(e.toString.contains(expectedErrorMsg))
     }
 
+    'compilationErrorWithCommentsAtTop{
+      //Make sure correct line numbers are printed when an erroneous script is executed
+      val name = "compilationErrorWithCommentsAtTop.scala"
+      val e = interceptException(name)
+      val expectedErrorMsg =
+        """compilationErrorWithCommentsAtTop.scala:11: not found: value quicort
+          |    quicort(unsorted.filter(_ < pivot)):::List(pivot):::""".stripMargin +
+          """quicksort(unsorted.filter(_ > pivot))"""
+
+      assert(e.toString.contains(expectedErrorMsg))
+    }
+
+    'compilationErrorInSecondBlock{
+      //Make sure correct line numbers are printed when an erroneous script is executed
+      val name = "compilationErrorInSecondBlock.scala"
+      val e = interceptException(name)
+      val expectedErrorMsg =
+        """compilationErrorInSecondBlock.scala:14: not found: value printnl
+          |val res_0 = printnl("OK")
+          |            ^""".stripMargin
+
+      assert(e.toString.contains(expectedErrorMsg))
+    }
+
+    'compilationErrorInFourthBlock{
+      //Make sure correct line numbers are printed when an erroneous script is executed
+      val name = "compilationErrorInFourthBlock.scala"
+      val e = interceptException(name)
+      val expectedErrorMsg =
+        """compilationErrorInFourthBlock.scala:30: not found: value prinntl
+          |val res = prinntl("Ammonite")
+          |          ^""".stripMargin
+
+      assert(e.toString.contains(expectedErrorMsg))
+    }
+
+    'compilationErrorInClass{
+      //Make sure correct line numbers are printed when an erroneous script is executed
+      val name = "compilationErrorInClass.scala"
+      val e = interceptException(name)
+      val expectedErrorMsg = "compilationErrorInClass.scala:17: value a is not a member of"
+
+      assert(e.toString.contains(expectedErrorMsg))
+    }
+
+    'CompilationErrorLineNumberTest{
+      //Make sure correct line numbers are printed when an erroneous script is executed
+      val name = "CompilationErrorLineNumberTest.scala"
+      val e = interceptException(name)
+      val expectedErrMsg = """CompilationErrorLineNumberTest.scala:7: not found: value noSuchObject
+                               |  val x = noSuchObject.badFunction
+                               |          ^""".stripMargin
+
+      assert(e.toString.contains(expectedErrMsg))
+    }
+
+    'RuntimeCompilationErrorLineNumberTest{
+      //Make sure correct line numbers are printed when an erroneous script is executed
+      val name = "RuntimeCompilationErrorLineNumberTest.scala"
+      val e = interceptException(name)
+      val expectedErrorMsg = "(RuntimeCompilationErrorLineNumberTest.scala:6)"
+
+      assert(e.toString.contains(expectedErrorMsg))
+    }
 
     'shell{
       // make sure you can load the example-predef.scala, have it pull stuff in
@@ -139,6 +213,7 @@ object StandaloneTests extends TestSuite{
           |@
           |println(wd relativeTo x)""".stripMargin
       )
+
 
       val output = res.out.trim
       assert(output == "repl/src")

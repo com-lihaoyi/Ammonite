@@ -34,12 +34,14 @@ trait Evaluator{
   def processLine(code: String,
                   printCode: String,
                   printer: Printer,
+                  fileName: String,
                   extraImports: Seq[ImportData] = Seq()
                  ): Res[Evaluated]
 
   def processScriptBlock(code: String,
                          scriptImports: Seq[ImportData],
-                         printer: Printer): Res[Evaluated]
+                         printer: Printer,
+                         fileName: String): Res[Evaluated]
 
   def previousImportBlock: String
 
@@ -55,7 +57,7 @@ object Evaluator{
 
 
   def apply(currentClassloader: ClassLoader,
-            compile: => (Array[Byte], Printer) => Compiler.Output,
+            compile: => (Array[Byte], Printer, Int, String) => Compiler.Output,
             startingLine: Int,
             cacheLoad: String => Option[CompileCache],
             cacheSave: (String, CompileCache) => Unit,
@@ -139,9 +141,11 @@ object Evaluator{
     private var _compilationCount = 0
     def compilationCount = _compilationCount
 
-    def compileClass(code: String, printer: Printer): Res[(ClassFiles, Seq[ImportData])] = for {
+    def compileClass(code: (String, Int),
+                     printer: Printer,
+                     fileName: String): Res[(ClassFiles, Seq[ImportData])] = for {
       compiled <- Res.Success{
-        val c = compile(code.getBytes, printer)
+        val c = compile(code._1.getBytes, printer, code._2, fileName)
         c
       }
       _ = _compilationCount += 1
@@ -215,6 +219,7 @@ object Evaluator{
     def processLine(code: String,
                     printCode: String,
                     printer: Printer,
+                    fileName: String,
                     extraImports: Seq[ImportData] = Seq()
                    ) = for {
       wrapperName <- Res.Success("cmd" + getCurrentLine)
@@ -226,7 +231,8 @@ object Evaluator{
           printCode,
           Frame.mergeImports(imports, extraImports)
         ),
-        printer
+        printer,
+        fileName
       )
       _ = Timer("eval.processLine compileClass end")
       cls <- loadClass(wrapperName, classFiles)
@@ -261,19 +267,25 @@ object Evaluator{
     def wrapCode(wrapperName: String,
                  code: String,
                  printCode: String,
-                 imports: Seq[ImportData]) = s"""
+                 imports: Seq[ImportData]) = {
+
+     val topWrapper = s"""
 ${importBlock(imports)}
 
-object $wrapperName{
-$code
-  def $$main() = { $printCode }
+object $wrapperName{\n"""
+
+     val bottomWrapper = s"""\ndef $$main() = { $printCode }
   override def toString = "$wrapperName"
 }
 """
+     val importsLen = topWrapper.length
+     (topWrapper + code + bottomWrapper, importsLen)
+    }
 
     def cachedCompileBlock(code: String,
                            imports: Seq[ImportData],
                            printer: Printer,
+                           fileName: String,
                            printCode: String = ""): Res[(String, Class[_], Seq[ImportData])] = {
       Timer("cachedCompileBlock 0")
       val wrapperName = cacheTag(code, imports, sess.frames.head.classloader.classpathHash)
@@ -285,7 +297,7 @@ $code
           addToCompilerClasspath(classFiles)
           Res.Success((classFiles, newImports))
         case None => for {
-          (classFiles, newImports) <- compileClass(wrappedCode, printer)
+          (classFiles, newImports) <- compileClass(wrappedCode, printer, fileName)
           _ = cacheSave(wrapperName, (classFiles, newImports))
         } yield (classFiles, newImports)
       }
@@ -299,9 +311,10 @@ $code
 
     def processScriptBlock(code: String,
                            scriptImports: Seq[ImportData],
-                           printer: Printer) = for {
+                           printer: Printer,
+                           fileName: String) = for {
       (wrapperName, cls, newImports) <- cachedCompileBlock(
-        code, scriptImports, printer
+        code, scriptImports,  printer, fileName
       )
     } yield {
       Timer("cachedCompileBlock")
@@ -311,6 +324,7 @@ $code
       Timer("evaluationResult")
       res
     }
+
 
     def update(newImports: Seq[ImportData]) = {
       frames.head.addImports(newImports)
