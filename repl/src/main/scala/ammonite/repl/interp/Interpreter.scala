@@ -5,6 +5,7 @@ import java.nio.file.NotDirectoryException
 import org.apache.ivy.plugins.resolver.RepositoryResolver
 
 import scala.collection.mutable
+import scala.tools.nsc.Settings
 import acyclic.file
 import fastparse.all._
 import ammonite.ops._
@@ -383,18 +384,21 @@ class Interpreter(prompt0: Ref[String],
   def evalClassloader = eval.sess.frames.head.classloader
   def init() = {
     Timer("Interpreter init init 0")
+    val settings = Option(compiler).fold(new Settings)(_.compiler.settings.copy)
     compiler = Compiler(
       Classpath.classpath ++ eval.sess.frames.head.classpath,
       dynamicClasspath,
       evalClassloader,
       eval.sess.frames.head.pluginClassloader,
-      () => pressy.shutdownPressy()
+      () => pressy.shutdownPressy(),
+      settings
     )
     Timer("Interpreter init init compiler")
     pressy = Pressy(
       Classpath.classpath ++ eval.sess.frames.head.classpath,
       dynamicClasspath,
-      evalClassloader
+      evalClassloader,
+      settings
     )
     Timer("Interpreter init init pressy")
   }

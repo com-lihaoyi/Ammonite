@@ -5,6 +5,7 @@ import acyclic.file
 import scala.reflect.internal.util.{Position, OffsetPosition, BatchSourceFile}
 import scala.reflect.io.VirtualDirectory
 import scala.tools.nsc
+import scala.tools.nsc.Settings
 import scala.tools.nsc.backend.JavaPlatform
 import scala.tools.nsc.interactive.Response
 import scala.tools.nsc.util._
@@ -180,17 +181,19 @@ object Pressy {
   }
   def apply(classpath: Seq[java.io.File],
             dynamicClasspath: VirtualDirectory,
-            evalClassloader: => ClassLoader): Pressy = new Pressy {
+            evalClassloader: => ClassLoader,
+            settings: Settings): Pressy = new Pressy {
 
     var cachedPressy: nsc.interactive.Global = null
 
     def initPressy = {
-      val (settings, reporter, _, jcp) = Compiler.initGlobalBits(
+      val (reporter, _, jcp) = Compiler.initGlobalBits(
         classpath,
         dynamicClasspath,
         _ => (),
         _ => (),
-        _ => ()
+        _ => (),
+        settings
       )
       new nsc.interactive.Global(settings, reporter) { g =>
         // Actually jcp, avoiding a path-dependent type issue in 2.10 here
