@@ -107,19 +107,18 @@ class Interpreter(prompt0: Ref[String],
 
   def processModule(code: String, fileName: String = "Main.scala") = processScript(
     skipSheBangLine(code),
-    (code, imports) => withContextClassloader(eval.processScriptBlock(code,
-                                                                      imports,
-                                                                      printer,
-                                                                      fileName))
+    (code, imports) =>
+      withContextClassloader(
+        eval.processScriptBlock(code, imports, printer, fileName)
+      )
   )
 
 
   def processExec(code: String) =
-    processScript(skipSheBangLine(code), { (c, i) => evaluateLine(c,
-                                                                  Nil,
-                                                                  printer,
-                                                                  "Main.scala",
-                                                                  i) })
+    processScript(
+      skipSheBangLine(code),
+      { (c, i) => evaluateLine(c, Nil, printer, "Main.scala", i) }
+    )
 
 
   private def skipSheBangLine(code: String)= {
@@ -150,7 +149,7 @@ class Interpreter(prompt0: Ref[String],
                            evaluate: EvaluateCallback): Seq[ImportData] = {
 
     var offset = 0
-    var parsedCode: mutable.ArrayBuffer[( String, Seq[String])] = mutable.ArrayBuffer()
+    var parsedCode: mutable.Buffer[( String, Seq[String])] = mutable.Buffer()
 
     // comment holds comments or empty lines above the code which is not caught along with code
     for( (comment, code) <- rawParsedCode.get.value ){
@@ -158,7 +157,7 @@ class Interpreter(prompt0: Ref[String],
 
       // 1 is added as Separator parser eats up the '\n' following @
       offset = offset + comment.count(_ == '\n') + code.map(_.count(_ == '\n')).sum + 1
-      parsedCode = parsedCode :+ (ncomment, code)
+      parsedCode.append((ncomment, code))
     }
 
     val parsedHardcodedPredef  = Parsers.splitScript(hardcodedPredef).get.value
