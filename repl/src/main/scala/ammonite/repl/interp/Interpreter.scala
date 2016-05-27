@@ -149,7 +149,7 @@ class Interpreter(prompt0: Ref[String],
                            evaluate: EvaluateCallback): Seq[ImportData] = {
 
     var offset = 0
-    var parsedCode: mutable.Buffer[( String, Seq[String])] = mutable.Buffer()
+    var parsedCode = mutable.Buffer[(String, Seq[String])]()
 
     // comment holds comments or empty lines above the code which is not caught along with code
     for( (comment, code) <- rawParsedCode.get.value ){
