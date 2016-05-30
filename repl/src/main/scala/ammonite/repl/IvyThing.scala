@@ -178,7 +178,7 @@ object Resolvers {
    Resolver.File(
      "local",
      "/.ivy2/local",
-     "/[organisation]/[module]/[revision]/jars/[artifact].[ext]",
+     "/[organisation]/[module]/[revision]/[type]s/[artifact](-[classifier]).[ext]",
      m2 = false
    ),
    Resolver.File(
