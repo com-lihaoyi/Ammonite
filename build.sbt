@@ -110,6 +110,7 @@ lazy val terminal = project
     macroSettings
   )
 
+
 /**
  * A better Scala REPL, which can be dropped in into any project or run
  * standalone in a Scala project to provide a better interactive experience

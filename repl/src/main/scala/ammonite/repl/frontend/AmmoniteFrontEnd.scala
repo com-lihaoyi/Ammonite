@@ -90,9 +90,7 @@ case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEn
       SpecialKeys.NewLine,
       ti => ammonite.repl.Parsers.split(ti.ts.buffer.mkString).isEmpty
     ){
-      case TermState(lb ~: rest, b, c, _) =>
-
-        BasicFilters.injectNewLine(b, c, rest)
+      case TermState(rest, b, c, _) => BasicFilters.injectNewLine(b, c, rest)
     }
 
     val historyFilter = new HistoryFilter(
