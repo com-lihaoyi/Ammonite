@@ -68,9 +68,13 @@ object BasicFilters {
     },
     partial{
       case TS(char ~: rest, b, c, _) =>
-  //      Debug("NORMAL CHAR " + char)
-        val (first, last) = b.splitAt(c)
-        TS(rest, (first :+ char.toChar) ++ last, c + 1)
+        if (!Character.isISOControl(char)){
+//          Debug("NORMAL CHAR " + char)
+          val (first, last) = b.splitAt(c)
+          TS(rest, (first :+ char.toChar) ++ last, c + 1)
+        }else{
+          TS(rest, b, c)
+        }
     }
   )
 
