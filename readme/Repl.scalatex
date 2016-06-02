@@ -327,6 +327,19 @@
 
     @p
       All types, values and imports defined in scripts are available to commands entered in REPL after loading the script.
+
+    @p
+      You can also make an Ammonite script self-executable by using a shebang @hl.scala{#!}. This is an example script named @hl.scala{hello}. There is no need to add the @hl.scala{.scala} extension. The @hl.scala{amm} command needs to be in the @hl.scala{PATH}:
+    @hl.sh
+      #!/usr/bin/env amm
+      
+      println("hello world")
+    @p
+      make it executable and run it from an external shell (e.g. bash):
+    @hl.sh
+      $ chmod +x /path/to/script
+      $ /path/to/script
+
     @sect{Script Arguments}
       @p
         Often when calling a script from the external command- line (e.g. Bash), you need to pass arguments to configure its behavior. With Ammonite, this is done by defining a @hl.scala{main} method, e.g.
