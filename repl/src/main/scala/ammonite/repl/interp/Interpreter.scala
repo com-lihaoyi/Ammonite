@@ -62,13 +62,14 @@ class Interpreter(prompt0: Ref[String],
   var lastException: Throwable = null
 
   def processLine(code: String,
-                  stmts: Seq[String]) = {
+                  stmts: Seq[String],
+                  fileName: String = "Main.scala") = {
     for{
       _ <- Catching { case ex =>
         Res.Exception(ex, "Something unexpected went wrong =(")
       }
       Preprocessor.Output(code, printSnippet) <- preprocess(stmts, eval.getCurrentLine)
-      out <- evaluateLine(code, printSnippet, printer)
+      out <- evaluateLine(code, printSnippet, printer, fileName)
     } yield out
   }
 
@@ -85,6 +86,7 @@ class Interpreter(prompt0: Ref[String],
   def evaluateLine(code: String,
                    printSnippet: Seq[String],
                    printer: Printer,
+                   fileName: String,
                    extraImports: Seq[ImportData] = Seq() ) = withContextClassloader{
 
       eval.processLine(
@@ -98,18 +100,26 @@ class Interpreter(prompt0: Ref[String],
                 .combinePrints(${printSnippet.mkString(", ")})
         """,
         printer,
+        fileName,
         extraImports
       )
 
   }
 
-  def processModule(code: String) = processScript(
+  def processModule(code: String, fileName: String = "Main.scala") = processScript(
     skipSheBangLine(code),
-    (code, imports) => withContextClassloader(eval.processScriptBlock(code, imports, printer))
+    (code, imports) =>
+      withContextClassloader(
+        eval.processScriptBlock(code, imports, printer, fileName)
+      )
   )
 
+
   def processExec(code: String) =
-    processScript(skipSheBangLine(code), { (c, i) => evaluateLine(c, Nil, printer, i)})
+    processScript(
+      skipSheBangLine(code),
+      { (c, i) => evaluateLine(c, Nil, printer, "Main.scala", i) }
+    )
 
 
   private def skipSheBangLine(code: String)= {
@@ -136,12 +146,27 @@ class Interpreter(prompt0: Ref[String],
     s"Syntax Error: $msg\n$locationString"
   }
 
-  def processCorrectScript(parsedCode: Parsed.Success[Seq[Seq[String]]],
+  def processCorrectScript(rawParsedCode: Parsed.Success[Seq[(String, Seq[String])]],
                            evaluate: EvaluateCallback): Seq[ImportData] = {
 
+    var offset = 0
+    var parsedCode = mutable.Buffer[(String, Seq[String])]()
 
-    val blocks0 = Parsers.splitScript(hardcodedPredef).get.value ++ parsedCode.get.value
-    val blocks = blocks0.map(preprocess(_, ""))
+    // comment holds comments or empty lines above the code which is not caught along with code
+    for( (comment, code) <- rawParsedCode.get.value ){
+      val ncomment = comment + "\n"*offset
+
+      // 1 is added as Separator parser eats up the '\n' following @
+      offset = offset + comment.count(_ == '\n') + code.map(_.count(_ == '\n')).sum + 1
+      parsedCode.append((ncomment, code))
+    }
+
+    val parsedHardcodedPredef  = Parsers.splitScript(hardcodedPredef).get.value
+    val blocks0 = parsedHardcodedPredef ++ parsedCode
+
+    val blocks = for{
+      (comment, code) <- blocks0
+    } yield preprocess(code,"",comment)
 
     Timer("processCorrectScript 1")
     val errors = blocks.collect { case Res.Failure(ex, err) => err }
@@ -171,7 +196,9 @@ class Interpreter(prompt0: Ref[String],
         val nestedScriptImports = mutable.Buffer.empty[ImportData]
         scriptImportCallback = { imports => nestedScriptImports ++= imports }
         // pretty printing results is disabled for scripts
+
         val Preprocessor.Output(code, _) = blocks.head
+
         Timer("processScript loop 1")
         val ev = evaluate(code, scriptImports)
         Timer("processScript loop 2")
@@ -201,12 +228,11 @@ class Interpreter(prompt0: Ref[String],
                     evaluate: (String, Seq[ImportData]) => Res[Evaluated]): Seq[ImportData] = {
 
     Timer("processScript 0a")
-
     Parsers.splitScript(code) match {
       case f: Parsed.Failure =>
         Timer("processScriptFailed 0b")
         throw new CompilationError(errMsg(f.msg, code, f.extra.traced.expected, f.index))
-      case s: Parsed.Success[Seq[Seq[String]]] =>
+      case s: Parsed.Success[Seq[(String, Seq[String])]] =>
         Timer("processCorrectScript 0b")
         processCorrectScript(s,evaluate)
     }
@@ -295,7 +321,7 @@ class Interpreter(prompt0: Ref[String],
       def exec(file: Path): Unit = apply(read(file))
 
       def module(file: Path): Unit = {
-        processModule(read(file))
+        processModule(read(file), file.last)
         init()
       }
 

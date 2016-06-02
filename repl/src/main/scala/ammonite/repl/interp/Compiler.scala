@@ -34,13 +34,16 @@ import scala.tools.nsc.util._
 trait Compiler{
   def compiler: nsc.Global
   def compile(src: Array[Byte],
-              printer: Printer): Compiler.Output
+              printer: Printer,
+              importsLen0: Int,
+              fileName: String): Compiler.Output
 
   def search(name: scala.reflect.runtime.universe.Type): Option[String]
   /**
    * Either the statements that were parsed or the error message
    */
   def parse(line: String): Either[String, Seq[Global#Tree]]
+  var importsLen = 0
 
   /**
    * Writes files to dynamicClasspath. Needed for loading cached classes.
@@ -142,7 +145,6 @@ object Compiler{
             settings: Settings): Compiler = new Compiler{
 
     val PluginXML = "scalac-plugin.xml"
-
     lazy val plugins0 = {
       import scala.collection.JavaConverters._
       val loader = pluginClassloader
@@ -183,7 +185,7 @@ object Compiler{
         classpath, dynamicClasspath, errorLogger, warningLogger, infoLogger, settings
       )
       val scalac = new nsc.Global(settings, reporter) { g =>
-        override lazy val plugins = List(new AmmonitePlugin(g, lastImports = _)) ++ {
+        override lazy val plugins = List(new AmmonitePlugin(g, lastImports = _, importsLen)) ++ {
           for {
             (name, cls) <- plugins0
             plugin = Plugin.instantiate(cls, g)
@@ -248,15 +250,21 @@ object Compiler{
     }
     /**
      * Compiles a blob of bytes and spits of a list of classfiles
+      * importsLen0 is the length of topWrapper appended above code by wrappedCode function
+      * It is passed to AmmonitePlugin to decrease this much offset from each AST node
+      * corresponding to the actual code so as to correct the line numbers in error report
      */
     def compile(src: Array[Byte],
-                printer: Printer): Output = {
+                printer: Printer,
+                importsLen0: Int,
+                fileName: String): Output = {
+
       compiler.reporter.reset()
       this.errorLogger = printer.error
       this.warningLogger = printer.warning
       this.infoLogger = printer.info
-      val singleFile = makeFile( src)
-
+      val singleFile = makeFile(src, fileName)
+      this.importsLen = importsLen0
       val run = new compiler.Run()
       vd.clear()
       run.compileFiles(List(singleFile))
