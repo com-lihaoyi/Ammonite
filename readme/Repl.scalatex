@@ -396,8 +396,7 @@
       Note that unlike the snippet given @sect.ref("Ammonite", "above"), we leave out the @hl.scala{% "test"} because we may want ammonite to be available within the "main" project, and not just in the unit tests. Then, anywhere within your program, you can place a breakpoint via:
 
     @hl.scala
-      import ammonite.repl.Main._
-      debug("name1" -> value1, "name2" -> value2, ...)
+      ammonite.repl.Main().debug("name1" -> value1, "name2" -> value2, ...)
 
     @p
       And when your program reaches that point, it will pause and open up an Ammonite REPL with the values you provided it bound to the names you gave it. From there, you can interact with those values as normal Scala values within the REPL. Use @code{Ctrl-D} or @hl.scala{exit} to exit the REPL and continue normal program execution. Note that the names given must be plain Scala identifiers.

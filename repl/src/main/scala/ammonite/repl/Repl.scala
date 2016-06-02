@@ -10,7 +10,7 @@ import scala.annotation.tailrec
 class Repl(input: InputStream,
            output: OutputStream,
            error: OutputStream,
-           storage: Ref[Storage],
+           storage: Storage,
            predef: String = "",
            replArgs: Seq[Bind[_]] = Nil) {
 
@@ -60,9 +60,9 @@ class Repl(input: InputStream,
       colors().prompt()(prompt()).render,
       colors(),
       interp.pressy.complete(_, interp.eval.previousImportBlock, _),
-      storage().fullHistory(),
+      storage.fullHistory(),
       addHistory = (code) => if (code != "") {
-        storage().fullHistory() = storage().fullHistory() :+ code
+        storage.fullHistory() = storage.fullHistory() :+ code
         history = history :+ code
       }
     )

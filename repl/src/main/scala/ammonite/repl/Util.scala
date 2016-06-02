@@ -3,8 +3,10 @@ package ammonite.repl
 import java.security.MessageDigest
 
 import acyclic.file
-import pprint.{PPrinter, PPrint}
+import fansi.Attrs
+import pprint.{PPrint, PPrinter}
 
+import scala.reflect.runtime.universe.TypeTag
 import scala.util.Try
 
 /**
@@ -217,6 +219,14 @@ object Timer{
 }
 
 
+trait CodeColors{
+  def ident: fansi.Attrs
+  def `type`: fansi.Attrs
+  def literal: fansi.Attrs
+  def comment: fansi.Attrs
+  def keyword: fansi.Attrs
+}
+
 /**
  * A set of colors used to highlight the miscellanious bits of the REPL.
  * Re-used all over the place in PPrint, TPrint, syntax highlighting,
@@ -267,7 +277,11 @@ object Colors{
  */
 case class Bind[T](name: String, value: T)
                   (implicit val typeTag: scala.reflect.runtime.universe.TypeTag[T])
-
+object Bind{
+  implicit def ammoniteReplArrowBinder[T](t: (String, T))(implicit typeTag: TypeTag[T]) = {
+    Bind(t._1, t._2)(typeTag)
+  }
+}
 /**
   * Encapsulates the ways the Ammonite REPL prints things
   *

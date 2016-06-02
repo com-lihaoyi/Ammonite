@@ -12,9 +12,8 @@ import scala.collection.mutable
  * you feed in lines or sessions programmatically and have it execute them.
  */
 class TestRepl {
-  def predef = ""
   var allOutput = ""
-
+  def predef = ""
 
   val tempDir = ammonite.ops.Path(
     java.nio.file.Files.createTempDirectory("ammonite-tester")
@@ -38,9 +37,9 @@ class TestRepl {
     pprint.Config.Defaults.PPrintConfig.copy(height = 15),
     Ref(Colors.BlackWhite),
     printer,
-    storage = Ref(Storage(tempDir, None)),
+    storage = Storage.Folder(tempDir),
     new History(Vector()),
-    predef = predef,
+    predef = ammonite.repl.Main.defaultPredefString + "\n" + predef,
     replArgs = Seq()
   )
 

@@ -2,9 +2,8 @@
  * User-facing tools. Rather specific, and although they could
  * be built upon as part of a larger program, they're
  */
-package ammonite.shell
-
-
+package ammonite.repl.tools
+import acyclic.file
 import java.io.{BufferedReader, InputStreamReader}
 
 import ammonite.ops._
@@ -12,6 +11,8 @@ import ammonite.terminal.Strings
 
 import scala.collection.{GenTraversableOnce, mutable}
 import scala.util.matching.Regex
+
+
 
 trait Grepper[T]{
   def apply[V: pprint.PPrint](t: T, s: V)(implicit c: pprint.Config): Option[GrepResult]

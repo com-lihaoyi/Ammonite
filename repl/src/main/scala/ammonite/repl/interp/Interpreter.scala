@@ -1,5 +1,5 @@
 package ammonite.repl.interp
-
+import ammonite.repl.tools.{IvyThing, Resolvers, Resolver}
 import java.io.File
 import java.nio.file.NotDirectoryException
 import org.apache.ivy.plugins.resolver.RepositoryResolver
@@ -28,7 +28,7 @@ class Interpreter(prompt0: Ref[String],
                   pprintConfig: pprint.Config,
                   colors0: Ref[Colors],
                   printer: Printer,
-                  storage: Ref[Storage],
+                  storage: Storage,
                   history: => History,
                   predef: String,
                   replArgs: Seq[Bind[_]]){ interp =>
@@ -36,25 +36,7 @@ class Interpreter(prompt0: Ref[String],
 
   val hardcodedPredef =
     """import ammonite.repl.frontend.ReplBridge.repl
-      |import ammonite.repl.frontend.ReplBridge.repl.{
-      |  notify => _,
-      |  wait => _,
-      |  equals => _,
-      |  asInstanceOf => _,
-      |  synchronized => _,
-      |  notifyAll => _,
-      |  isInstanceOf => _,
-      |  == => _,
-      |  Internal => _,
-      |  != => _,
-      |  getClass => _,
-      |  ne => _,
-      |  eq => _,
-      |  ## => _,
-      |  hashCode => _,
-      |  _
-      |}
-      |import ammonite.repl.IvyConstructor.{ArtifactIdExt, GroupIdExt}
+      |import ammonite.repl.frontend.ReplBridge.repl.{pprintConfig, derefPPrint}
       |""".stripMargin
 
   val SheBang = "#!"
@@ -267,13 +249,13 @@ class Interpreter(prompt0: Ref[String],
     def ivy(coordinates: (String, String, String), verbose: Boolean = true): Unit = {
       val (groupId, artifactId, version) = coordinates
       val psOpt =
-        storage().ivyCache()
+        storage.ivyCache()
                  .get((resolvers.hashCode.toString, groupId, artifactId, version))
                  .map(_.map(new java.io.File(_)))
                  .filter(_.forall(_.exists()))
 
       psOpt match{
-        case Some(ps) => ps.map(handleClasspath)
+        case Some(ps) => ps.foreach(handleClasspath)
         case None =>
           val resolved = ivyThing.resolveArtifact(
             groupId,
@@ -282,12 +264,12 @@ class Interpreter(prompt0: Ref[String],
             if (verbose) 2 else 1
           )
 
-          storage().ivyCache() = storage().ivyCache().updated(
+          storage.ivyCache() = storage.ivyCache().updated(
             (resolvers.hashCode.toString, groupId, artifactId, version),
             resolved.map(_.getAbsolutePath).toSet
           )
 
-          resolved.map(handleClasspath)
+          resolved.foreach(handleClasspath)
       }
 
       init()
@@ -335,6 +317,13 @@ class Interpreter(prompt0: Ref[String],
 
     }
 
+    implicit val codeColors = new CodeColors{
+      def comment = colors().comment()
+      def `type` = colors().`type`()
+      def literal = colors().literal()
+      def keyword = colors().keyword()
+      def ident = colors().ident()
+    }
     implicit lazy val pprintConfig: Ref[pprint.Config] = {
       Ref.live[pprint.Config](
         () => interp.pprintConfig.copy(
@@ -366,7 +355,7 @@ class Interpreter(prompt0: Ref[String],
     }
     def compiler = Interpreter.this.compiler.compiler
     def newCompiler() = init()
-    def fullHistory = storage().fullHistory()
+    def fullHistory = storage.fullHistory()
     def history = Interpreter.this.history
 
 
@@ -399,8 +388,8 @@ class Interpreter(prompt0: Ref[String],
     mainThread.getContextClassLoader,
     compiler.compile,
     0,
-    storage().compileCacheLoad,
-    storage().compileCacheSave,
+    storage.compileCacheLoad,
+    storage.compileCacheSave,
     compiler.addToClasspath
   )
 
@@ -464,7 +453,7 @@ class Interpreter(prompt0: Ref[String],
   processModule(hardcodedPredef)
   init()
 
-  processModule(storage().loadPredef + "\n" + predef + "\n" + argString)
+  processModule(storage.loadPredef + "\n" + predef + "\n" + argString)
   eval.sess.save()
   Timer("Interpreter init predef 0")
   init()

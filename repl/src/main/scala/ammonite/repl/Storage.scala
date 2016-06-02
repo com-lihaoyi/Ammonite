@@ -25,9 +25,30 @@ trait Storage{
 }
 
 object Storage{
+  case class InMemory() extends Storage{
+    var predef = ""
+    def loadPredef = predef
 
-  def apply(dir: Path, predefFile: Option[Path]): Storage = new Storage{
-    val predef = predefFile.getOrElse(dir/"predef.scala")
+    var _history = new History(Vector())
+    val fullHistory = new StableRef[History]{
+      def apply() = _history
+      def update(h: History): Unit = _history = h
+    }
+
+    var _ivyCache: IvyMap = Map.empty
+    val ivyCache = new StableRef[IvyMap]{
+      def apply() = _ivyCache
+      def update(value: IvyMap): Unit = _ivyCache = value
+    }
+
+    var compileCache: mutable.Map[String,CompileCache] = mutable.Map.empty
+    def compileCacheSave(tag: String, data: CompileCache): Unit = compileCache(tag) = data
+    def compileCacheLoad(tag: String) = compileCache.get(tag)
+  }
+
+
+  case class Folder(dir: Path) extends Storage{
+    val predef = dir/"predef.scala"
     // Each version puts its cache in a separate folder, to bust caches
     // on every version bump; otherwise binary-incompatible changes to
     // ReplAPI/Preprocessor/ammonite-ops will cause scripts to fail after

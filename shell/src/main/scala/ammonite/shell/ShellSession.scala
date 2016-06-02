@@ -80,7 +80,7 @@ object PPrints{
     }
 
   implicit val defaultHighlightColor = {
-    GrepResult.Color(Console.BLUE + Console.YELLOW_B, Console.RESET)
+    ammonite.repl.tools.GrepResult.Color(Console.BLUE + Console.YELLOW_B, Console.RESET)
   }
 }
 trait OpsAPI{

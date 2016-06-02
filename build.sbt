@@ -159,10 +159,6 @@ lazy val shell = project
     sharedSettings,
     macroSettings,
     name := "ammonite-shell",
-    libraryDependencies ++= {
-      if (!scalaVersion.value.startsWith("2.11.")) Nil
-      else Seq("com.geirsson" %% "scalafmt" % "0.2.5")
-    },
     (test in Test) <<= (test in Test).dependsOn(packageBin in Compile),
     (run in Test) <<= (run in Test).dependsOn(packageBin in Compile),
     (testOnly in Test) <<= (testOnly in Test).dependsOn(packageBin in Compile)

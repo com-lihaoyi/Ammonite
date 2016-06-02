@@ -1,7 +1,7 @@
 package ammonite.repl.frontend
 
 import java.io.File
-
+import ammonite.repl.tools.Resolver
 import ammonite.ops._
 import ammonite.repl._
 import ammonite.repl.interp.Frame
@@ -122,6 +122,7 @@ trait ReplAPI {
 
   implicit def derefPPrint(implicit t: Ref[pprint.Config]): pprint.Config = t()
 
+  implicit def codeColors: CodeColors
   /**
    * Current width of the terminal
    */

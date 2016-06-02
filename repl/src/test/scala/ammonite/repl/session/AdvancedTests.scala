@@ -292,6 +292,11 @@ object AdvancedTests extends TestSuite{
         @ assert(repl.prompt() == "B")
       """)
     }
-
+    'desugar{
+      if (!scala2_10) check.session("""
+        @ desugar{1 + 2 max 3}
+        res0: Desugared = scala.Predef.intWrapper(3).max(3)
+      """)
+    }
   }
 }

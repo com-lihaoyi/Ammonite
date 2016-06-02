@@ -45,7 +45,7 @@ object SshdRepl {
     val replSessionEnv = Environment(replServerClassLoader, in, out)
     Environment.withEnvironment(replSessionEnv) {
       try {
-        new Repl(in, out, out, Ref(Storage(homePath, None)), predef, replArgs).run()
+        new Repl(in, out, out, Storage.Folder(homePath), predef, replArgs).run()
       } catch {
         case any: Throwable =>
           val sshClientOutput = new PrintStream(out)
