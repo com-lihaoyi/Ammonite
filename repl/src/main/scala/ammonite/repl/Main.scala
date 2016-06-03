@@ -22,6 +22,9 @@ import reflect.macros.Context
   * implementation-related code and provides a more convenient set of
   * entry-points that a user can call.
   *
+  * Note that the [[instantiateRepl]] function generates a new [[Repl]]
+  * every time it is called!
+  *
   * @param predef Any additional code you want to run before the REPL session
   *               starts. Can contain multiple blocks separated by `@`s
   * @param defaultPredef Do you want to include the "standard" predef imports
@@ -41,11 +44,10 @@ case class Main(predef: String = "",
                 inputStream: InputStream = System.in,
                 outputStream: OutputStream = System.out,
                 errorStream: OutputStream = System.err){
-
   /**
     * Instantiates an ammonite.repl.Repl using the configuration
     */
-  val repl = {
+  def instantiateRepl() = {
     val augmentedPredef = Main.maybeDefaultPredef(defaultPredef, Main.defaultPredefString)
     new Repl(
       inputStream, outputStream, errorStream,
@@ -53,10 +55,9 @@ case class Main(predef: String = "",
       predef = augmentedPredef + "\n" + predef
     )
   }
-
   def run() = {
     Timer("Repl.run Start")
-    val res = repl.run()
+    val res = instantiateRepl().run()
     Timer("Repl.run End")
     res
   }
@@ -84,6 +85,7 @@ case class Main(predef: String = "",
     */
   def runScript(path: Path, args: Seq[String], kwargs: Map[String, String]): Unit = {
 
+    val repl = instantiateRepl()
     val imports = repl.interp.processModule(read(path), path.last)
     repl.interp.init()
     imports.find(_.toName == "main").foreach { i =>
@@ -120,7 +122,7 @@ case class Main(predef: String = "",
     * Run a snippet of code
     */
   def runCode(code: String) = {
-    repl.interp.replApi.load(code)
+    instantiateRepl().interp.replApi.load(code)
   }
 }
 
@@ -172,13 +174,12 @@ object Main{
     * The command-line entry point, which does all the argument parsing before
     * delegating to [[Main.run]]
     */
-  def main(args: Array[String]) = {
-
+  def main(args0: Array[String]) = {
     var fileToExecute: Option[Path] = None
     var codeToExecute: Option[String] = None
     var logTimings = false
     var ammoniteHome: Option[Path] = None
-    var args: Seq[String] = Vector.empty
+    var passThroughArgs: Seq[String] = Vector.empty
     var predefFile: Option[Path] = None
     val replParser = new scopt.OptionParser[Main]("ammonite") {
       // Primary arguments that correspond to the arguments of
@@ -206,7 +207,7 @@ object Main{
       arg[String]("<args>...")
         .optional()
         .unbounded()
-        .foreach{ x => args = args :+ x }
+        .foreach{ x => passThroughArgs = passThroughArgs :+ x }
         .text("Any arguments you want to pass to the Ammonite script file")
       opt[File]('h', "home")
         .valueName("<file>")
@@ -219,7 +220,7 @@ object Main{
     }
 
 
-    val (before, after) = args.splitAt(args.indexOf("--") match {
+    val (before, after) = args0.splitAt(passThroughArgs.indexOf("--") match {
       case -1 => Int.MaxValue
       case n => n
     })
@@ -230,7 +231,7 @@ object Main{
           |Invalid number of tokens: ${keywordTokens.length}""".stripMargin
     )
 
-    val kwargs = for(Seq(k, v) <- keywordTokens.grouped(2)) yield{
+    val kwargs = for(Array(k, v) <- keywordTokens.grouped(2)) yield{
 
       assert(
         k.startsWith("--") &&
@@ -260,10 +261,9 @@ object Main{
       )
       (fileToExecute, codeToExecute) match{
         case (None, None) => println("Loading..."); main.run()
-        case (Some(path), None) => main.runScript(path, args, kwargs.toMap)
+        case (Some(path), None) => main.runScript(path, passThroughArgs, kwargs.toMap)
         case (None, Some(code)) => main.runCode(code)
       }
-
     }
   }
 

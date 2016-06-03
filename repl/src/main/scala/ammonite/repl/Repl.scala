@@ -35,7 +35,7 @@ class Repl(input: InputStream,
   )
   Timer("Repl init printer")
 
-  
+
   val interp: Interpreter = new Interpreter(
     prompt,
     frontEnd,
