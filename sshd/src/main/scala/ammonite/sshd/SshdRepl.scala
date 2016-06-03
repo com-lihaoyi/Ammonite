@@ -21,9 +21,10 @@ import scala.language.postfixOps
  */
 class SshdRepl(sshConfig: SshServerConfig,
                predef: String = "",
+               defaultPredef: Boolean = true,
                replArgs: Seq[Bind[_]] = Nil) {
   private lazy val sshd = SshServer(sshConfig, shellServer =
-    SshdRepl.runRepl(sshConfig.ammoniteHome, predef, replArgs))
+    SshdRepl.runRepl(sshConfig.ammoniteHome, predef, defaultPredef, replArgs))
 
   def port = sshd.getPort
   def start(): Unit = sshd.start()
@@ -36,7 +37,7 @@ object SshdRepl {
   private def replServerClassLoader = SshdRepl.getClass.getClassLoader
 
   // Actually runs a repl inside of session serving a remote user shell.
-  private def runRepl(homePath: Path, predef: String, replArgs: Seq[Bind[_]])
+  private def runRepl(homePath: Path, predef: String, defaultPredef: Boolean, replArgs: Seq[Bind[_]])
                      (in: InputStream, out: OutputStream): Unit = {
     // since sshd server has it's own customised environment,
     // where things like System.out will output to the
@@ -45,7 +46,11 @@ object SshdRepl {
     val replSessionEnv = Environment(replServerClassLoader, in, out)
     Environment.withEnvironment(replSessionEnv) {
       try {
-        new Repl(in, out, out, Storage.Folder(homePath), predef, replArgs).run()
+        val augmentedPredef = ammonite.repl.Main.maybeDefaultPredef(
+          defaultPredef,
+          ammonite.repl.Main.defaultPredefString
+        )
+        new Repl(in, out, out, Storage.Folder(homePath), augmentedPredef, replArgs).run()
       } catch {
         case any: Throwable =>
           val sshClientOutput = new PrintStream(out)
