@@ -37,7 +37,10 @@ object SshdRepl {
   private def replServerClassLoader = SshdRepl.getClass.getClassLoader
 
   // Actually runs a repl inside of session serving a remote user shell.
-  private def runRepl(homePath: Path, predef: String, defaultPredef: Boolean, replArgs: Seq[Bind[_]])
+  private def runRepl(homePath: Path,
+                      predef: String,
+                      defaultPredef: Boolean,
+                      replArgs: Seq[Bind[_]])
                      (in: InputStream, out: OutputStream): Unit = {
     // since sshd server has it's own customised environment,
     // where things like System.out will output to the
