@@ -2,7 +2,7 @@ package ammonite.integration
 
 import ammonite.repl.Storage
 
-object Main {
+object TestMain {
   def main(args: Array[String]): Unit = {
     import ammonite.ops._
     ammonite.repl.Main(

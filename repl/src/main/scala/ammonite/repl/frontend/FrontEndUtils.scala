@@ -25,7 +25,7 @@ object FrontEndUtils {
 
     ammonite.repl.Util.transpose(grouped).iterator.flatMap{
       case first :+ last => first.map(
-        x => x ++ "" * (width / columns - x.length)
+        x => x ++ " " * (width / columns - x.length)
       ) :+ last :+ fansi.Str("\n")
     }.map(_.render)
   }

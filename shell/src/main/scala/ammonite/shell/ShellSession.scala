@@ -41,7 +41,7 @@ object PPrints{
 
   def reprSection(s: String, cfg: pprint.Config) = {
     val validIdentifier = "([a-zA-Z_][a-zA-Z_0-9]+)".r
-    if (validIdentifier.findFirstIn(s) == Some(s)){
+    if (validIdentifier.findFirstIn(s).contains(s)){
       implicitly[pprint.PPrinter[scala.Symbol]].render(Symbol(s), cfg)
     }else{
       implicitly[pprint.PPrinter[String]].render(s, cfg)

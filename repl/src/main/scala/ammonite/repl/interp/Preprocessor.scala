@@ -84,6 +84,7 @@ object Preprocessor{
     val Import = Processor{
       case (name, code, tree: G#Import) =>
         val Array(keyword, body) = code.split(" ", 2)
+        val tq = "\"\"\""
         Output(code, Seq(
           s"""
           _root_.ammonite
@@ -92,7 +93,7 @@ object Preprocessor{
                 .ReplBridge
                 .repl
                 .Internal
-                .printImport("$body")
+                .printImport($tq$body$tq)
           """
         ))
     }

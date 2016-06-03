@@ -142,7 +142,7 @@ class Interpreter(prompt0: Ref[String],
       parsedCode.append((ncomment, code))
     }
 
-    val parsedHardcodedPredef  = Parsers.splitScript(hardcodedPredef).get.value
+    val parsedHardcodedPredef  = Parsers.splitScript(hardcodedPredef + "\n" + predef).get.value
     val blocks0 = parsedHardcodedPredef ++ parsedCode
 
     val blocks = for{
@@ -437,7 +437,7 @@ class Interpreter(prompt0: Ref[String],
     bridgeCls.asInstanceOf[Class[ReplAPIHolder]],
     replApi
   )
-  Timer("Interpreterinit eval")
+  Timer("Interpreter init eval")
   init()
   Timer("Interpreter init init")
   val argString =
@@ -456,7 +456,7 @@ class Interpreter(prompt0: Ref[String],
             }
             .mkString("\n")
 
-  processModule(hardcodedPredef)
+  processModule(hardcodedPredef + "\n" + predef)
   init()
 
   processModule(predef + "\n" + storage.loadPredef + "\n" + argString)

@@ -126,7 +126,23 @@ case class Main(predef: String = "",
 
 object Main{
   val defaultPredefString = """
-    |import ammonite.ops.Extensions._
+    |import ammonite.ops.Extensions.{
+    |  notify => _,
+    |  wait => _,
+    |  equals => _,
+    |  asInstanceOf => _,
+    |  synchronized => _,
+    |  notifyAll => _,
+    |  isInstanceOf => _,
+    |  == => _,
+    |  != => _,
+    |  getClass => _,
+    |  ne => _,
+    |  eq => _,
+    |  ## => _,
+    |  hashCode => _,
+    |  _
+    |}
     |import ammonite.repl.tools._
     |import ammonite.repl.tools.IvyConstructor.{ArtifactIdExt, GroupIdExt}
     |import ammonite.repl.frontend.ReplBridge.repl.{
@@ -171,10 +187,9 @@ object Main{
       opt[String]('p', "predef")
         .action((x, c) => c.copy(predef = x))
         .text("Any commands you want to execute at the start of the REPL session")
-      opt[String]("no-default-predef")
+      opt[Unit]("no-default-predef")
         .action((x, c) => c.copy(defaultPredef = false))
-        .text("Any commands you want to execute at the start of the REPL session")
-
+        .text("Disable the default predef and run Ammonite with the minimal predef possible")
 
       // Secondary arguments that correspond to different methods of
       // the `Main` configuration arguments
