@@ -459,7 +459,7 @@ class Interpreter(prompt0: Ref[String],
   processModule(hardcodedPredef)
   init()
 
-  processModule(storage.loadPredef + "\n" + predef + "\n" + argString)
+  processModule(predef + "\n" + storage.loadPredef + "\n" + argString)
   eval.sess.save()
   Timer("Interpreter init predef 0")
   init()

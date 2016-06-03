@@ -125,9 +125,6 @@ case class Main(predef: String = "",
 }
 
 object Main{
-
-  def defaultFolderStorage(homePath: Path) = Storage.Folder(homePath)
-
   val defaultPredefString = """
     |import ammonite.ops.Extensions._
     |import ammonite.repl.tools._
@@ -238,7 +235,13 @@ object Main{
       val main = Main(
         c.predef,
         c.defaultPredef,
-        defaultFolderStorage(predefFile.getOrElse(defaultAmmoniteHome))
+        predefFile match{
+          case None => new Storage.Folder(ammoniteHome.getOrElse(defaultAmmoniteHome))
+          case Some(pf) =>
+            new Storage.Folder(ammoniteHome.getOrElse(defaultAmmoniteHome)){
+              override val predef = pf
+            }
+        }
       )
       (fileToExecute, codeToExecute) match{
         case (None, None) => println("Loading..."); main.run()
