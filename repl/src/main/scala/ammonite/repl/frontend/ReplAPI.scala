@@ -1,12 +1,13 @@
 package ammonite.repl.frontend
 
 import java.io.File
+
 import ammonite.repl.tools.Resolver
 import ammonite.ops._
 import ammonite.repl._
 import ammonite.repl.interp.Frame
 import org.apache.ivy.plugins.resolver.RepositoryResolver
-import pprint.{PPrinter, PPrint, Config}
+import pprint.{Config, PPrint, PPrinter, TPrintColors}
 
 import scala.collection.mutable
 import scala.reflect.runtime.universe._
@@ -121,6 +122,8 @@ trait ReplAPI {
   implicit val pprintConfig: Ref[pprint.Config]
 
   implicit def derefPPrint(implicit t: Ref[pprint.Config]): pprint.Config = t()
+
+  implicit def tprintColors: pprint.TPrintColors
 
   implicit def codeColors: CodeColors
   /**
@@ -242,7 +245,7 @@ abstract class FullReplAPI extends ReplAPI{
      */
     def print[T: pprint.TPrint: WeakTypeTag, V: PPrint]
              (value: => T, value2: => V, ident: String, custom: Option[String])
-             (implicit cfg: Config): Iterator[String]
+             (implicit cfg: Config, tcolors: pprint.TPrintColors): Iterator[String]
 
     def printDef(definitionLabel: String, ident: String): Iterator[String]
     def printImport(imported: String): Iterator[String]
@@ -285,17 +288,18 @@ trait DefaultReplAPI extends FullReplAPI {
                                                  value2: => V,
                                                  ident: String,
                                                  custom: Option[String])
-                                                (implicit cfg: pprint.Config) = {
+                                                (implicit cfg: pprint.Config,
+                                                 tcolors: pprint.TPrintColors) = {
       if (typeOf[T] =:= typeOf[Unit]) Iterator()
       else {
         val implicitPPrint = implicitly[PPrint[V]]
         val rhs = custom match {
           case None => implicitPPrint.render(value2, cfg)
-          case Some(s) => Iterator(cfg.colors.literalColor, s, cfg.colors.endColor)
+          case Some(s) => Iterator(cfg.colors.literalColor(s).render)
         }
         Iterator(
           colors().ident()(ident).render, ": ",
-          implicitly[pprint.TPrint[T]].render(cfg), " = "
+          implicitly[pprint.TPrint[T]].render(tcolors), " = "
         ) ++ rhs
       }
     }

@@ -136,9 +136,7 @@ object AdvancedTests extends TestSuite{
         @ implicit def ArrayTPrint[T: TPrint]: TPrint[Array[T]] = TPrint.lambda( c =>
         @   implicitly[TPrint[T]].render(c) +
         @   " " +
-        @   c.colors.literalColor +
-        @   "Array" +
-        @   c.colors.endColor
+        @   c.typeColor("Array").render
         @ )
 
         @ Array(1)

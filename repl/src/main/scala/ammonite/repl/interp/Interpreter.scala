@@ -25,7 +25,6 @@ class Interpreter(prompt0: Ref[String],
                   frontEnd0: Ref[FrontEnd],
                   width: => Int,
                   height: => Int,
-                  pprintConfig: pprint.Config,
                   colors0: Ref[Colors],
                   printer: Printer,
                   storage: Storage,
@@ -316,7 +315,9 @@ class Interpreter(prompt0: Ref[String],
       }
 
     }
-
+    implicit def tprintColors = pprint.TPrintColors(
+      typeColor = colors().`type`()
+    )
     implicit val codeColors = new CodeColors{
       def comment = colors().comment()
       def `type` = colors().`type`()
@@ -325,12 +326,17 @@ class Interpreter(prompt0: Ref[String],
       def ident = colors().ident()
     }
     implicit lazy val pprintConfig: Ref[pprint.Config] = {
-      Ref.live[pprint.Config](
-        () => interp.pprintConfig.copy(
+      Ref.live[pprint.Config]( () =>
+        pprint.Config.apply(
           width = width,
-          height = height / 2
+          height = height / 2,
+          colors = pprint.Colors(
+            colors().literal(),
+            colors().prefix()
+          )
         )
       )
+
     }
 
     def show[T: PPrint](implicit cfg: Config) = (t: T) => {

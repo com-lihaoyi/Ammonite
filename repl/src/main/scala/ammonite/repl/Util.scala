@@ -136,7 +136,7 @@ trait Ref[T] extends StableRef[T]{
 object Ref{
   implicit def refer[T](t: T): Ref[T] = Ref(t)
   implicit def refPPrint[T: PPrint]: PPrinter[Ref[T]] = PPrinter{ (ref, cfg) =>
-    Iterator(cfg.colors.prefixColor, "Ref", cfg.colors.endColor, "(") ++
+    Iterator(cfg.colors.prefixColor("Ref").render, "(") ++
     implicitly[PPrint[T]].pprinter.render(ref(), cfg) ++
     Iterator(")")
   }
@@ -265,9 +265,9 @@ object Colors{
     fansi.Color.Yellow
   )
   def BlackWhite = Colors(
-    fansi.Attrs.empty, fansi.Attrs.empty, fansi.Attrs.empty, fansi.Attrs.empty,
-    fansi.Attrs.empty, fansi.Attrs.empty, fansi.Attrs.empty, fansi.Attrs.empty,
-    fansi.Attrs.empty, fansi.Attrs.empty
+    fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty,
+    fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty,
+    fansi.Attrs.Empty, fansi.Attrs.Empty
   )
 }
 

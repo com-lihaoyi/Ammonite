@@ -105,7 +105,7 @@ lazy val terminal = project
     name := "ammonite-terminal",
     libraryDependencies ++= Seq(
       "com.lihaoyi" %% "sourcecode" % "0.1.1",
-      "com.lihaoyi" %% "fansi" % "0.1.2"
+      "com.lihaoyi" %% "fansi" % "0.1.3"
     ),
     macroSettings
   )
@@ -130,8 +130,8 @@ lazy val repl = project
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
       "org.apache.ivy" % "ivy" % "2.4.0",
       "com.lihaoyi" %% "scalaparse" % "0.3.7",
-      "com.lihaoyi" %% "upickle" % "0.4.0",
-      "com.lihaoyi" %% "pprint" % "0.4.0",
+      "com.lihaoyi" %% "upickle" % "0.4.1",
+      "com.lihaoyi" %% "pprint" % "0.4.1",
       "com.github.scopt" %% "scopt" % "3.4.0"
     ),
     libraryDependencies ++= (

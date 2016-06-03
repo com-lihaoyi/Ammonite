@@ -31,7 +31,7 @@ class Repl(input: InputStream,
     _.foreach(printStream.print),
     printlnWithColor(colors().warning(), _),
     printlnWithColor(colors().error(), _),
-    printlnWithColor(fansi.Attrs.empty, _)
+    printlnWithColor(fansi.Attrs.Empty, _)
   )
   Timer("Repl init printer")
 
@@ -41,7 +41,6 @@ class Repl(input: InputStream,
     frontEnd,
     frontEnd().width,
     frontEnd().height,
-    pprint.Config.Colors.PPrintConfig,
     colors,
     printer,
     storage,

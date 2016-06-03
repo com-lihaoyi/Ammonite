@@ -34,7 +34,6 @@ class TestRepl {
     Ref(null),
     80,
     80,
-    pprint.Config.Defaults.PPrintConfig.copy(height = 15),
     Ref(Colors.BlackWhite),
     printer,
     storage = Storage.Folder(tempDir),
@@ -115,7 +114,7 @@ class TestRepl {
             }
           case Res.Exception(ex, failureMsg) =>
             val trace = Repl.showException(
-              ex, fansi.Attrs.empty, fansi.Attrs.empty, fansi.Attrs.empty
+              ex, fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty
             ) + "\n" +  failureMsg
             assert({identity(trace); identity(expected); false})
           case _ => throw new Exception(
@@ -142,7 +141,7 @@ class TestRepl {
       case Res.Failure(ex, s) => printer.error(s)
       case Res.Exception(throwable, msg) =>
         printer.error(
-          Repl.showException(throwable, fansi.Attrs.empty, fansi.Attrs.empty, fansi.Attrs.empty)
+          Repl.showException(throwable, fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty)
         )
 
       case _ =>
@@ -168,7 +167,7 @@ class TestRepl {
         failLoudly(assert(failureCheck(s)))
       case Res.Exception(ex, s) =>
         val msg = Repl.showException(
-          ex, fansi.Attrs.empty, fansi.Attrs.empty, fansi.Attrs.empty
+          ex, fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty
         ) + "\n" + s
         failLoudly(assert(failureCheck(msg)))
       case _ => ???

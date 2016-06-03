@@ -27,95 +27,111 @@ object Grepper{
   implicit object Regex extends Grepper[Regex] {
     def apply[V: pprint.PPrint](t: Regex, s: V)(implicit c: pprint.Config) = {
       val txt = pprint.tokenize(s).mkString
-      val items = t.findAllIn(txt).matchData.toSeq
+      val fansiTxt = fansi.Str(txt, errorMode = fansi.ErrorMode.Sanitize)
+      val items = t.findAllIn(fansiTxt.plainText).matchData.toSeq
       if (items.isEmpty) None
-      else Some(new GrepResult(items.map(m => (m.start, m.end)), txt))
+      else Some(new GrepResult(items.map(m => (m.start, m.end)), fansiTxt))
     }
   }
 }
+
+case class GrepResult(spans: Seq[(Int, Int)], text: fansi.Str)
 
 object GrepResult{
-  case class Color(start: String, end: String)
+  case class Color(highlight: fansi.Attrs, dotDotDotColor: fansi.Attrs)
   object Color{
-    implicit val defaultColor = Color(Console.YELLOW_B + Console.BLUE, Console.RESET)
+    implicit val defaultColor = Color(
+      fansi.Back.Yellow ++ fansi.Color.Blue,
+      fansi.Attrs.Empty
+    )
   }
-  val ansiRegex = "\u001B\\[[;\\d]*.".r
+
   implicit def grepResultRepr(implicit highlightColor: Color) =
     pprint.PPrinter[GrepResult]{ (grepResult, cfg) =>
-      val spans = mutable.Buffer.empty[String]
-      var remaining = grepResult.spans.toList
+      val outputSnippets = mutable.Buffer.empty[fansi.Str]
+      val rangeBuffer = mutable.Buffer.empty[(Int, Int)]
+      var remainingSpans = grepResult.spans.toList
 
-      def color(i: Int) =
-        if(i % 2 == 1) highlightColor.end + cfg.colors.literalColor
-        else highlightColor.start
+      var lastEnd = 0 // Where the last generated snippet ended, to avoid overlap
 
-      val width = cfg.width - cfg.depth * 2 - 6 // 6 to leave space for ... at start and end
+      // 6 to leave space for ... at start and end
+      val width = cfg.width - cfg.depth * 2 - 6
 
-      def findColoredPoint(index: Int, count: Int, targetOffset: Int): Int = {
-        // Sanity checks
-        assert(index >= 0, s"index $index must be non-negative")
-        assert(count >= 0, s"count $count must be non-negative")
-        if (count >= targetOffset) index
-        else{
-          val subbed = grepResult.text.drop(index)
-          ansiRegex.findPrefixMatchOf(subbed) match{
-            case Some(matched) => findColoredPoint(index + matched.end, count, targetOffset)
-            case None  => findColoredPoint(index+1, count+1, targetOffset)
-          }
-        }
+      /**
+        * Consume all the matches that have been aggregated in `rangeBuffer` and
+        * generate a single result snippet to show the user. Multiple ranges
+        * can turn up in the same snippet if they are close enough, and we do
+        * some math to make sure snippets...
+        *
+        * - Do not overlap
+        * - Are at most `width` wide
+        * - Have `...` if they're truncated on the left or right
+        * - Are roughly centered on the ranges they contain, as far as possible
+        *   given the above.
+        */
+      def generateSnippet() = {
+        val start = rangeBuffer.head._1
+        val end = rangeBuffer.last._2
+
+        val middle = (end + start) / 2
+
+        // Range centered on the midpoint of the first/last indices in rangeBuffer
+        val naiveStart = middle - width / 2
+        val naiveEnd = middle + width / 2
+
+        val boundaryOffset =
+          if (naiveStart < lastEnd) lastEnd - naiveStart
+          else if (naiveEnd > grepResult.text.length) grepResult.text.length - naiveEnd
+          else 0
+
+        def cap(min: Int, n: Int, max: Int) =
+          if (n > max) max
+          else if (n < min) min
+          else n
+
+        // Range shifted to avoid over-running the start or end of the text
+        val shiftedStart = naiveStart + boundaryOffset
+        val shiftedEnd = naiveEnd + boundaryOffset
+
+        // Range clamped to 0, in case shifting it caused it to run off the end
+        // of the string
+        val wideStart = cap(0, shiftedStart, grepResult.text.length)
+        val wideEnd = cap(0, shiftedEnd, grepResult.text.length)
+
+        val colorRanges =
+          for((rangeStart, rangeEnd) <- rangeBuffer)
+          yield (highlightColor.highlight, rangeStart - wideStart, rangeEnd - wideStart)
+
+        val colored = grepResult.text.substring(wideStart, wideEnd).overlayAll(colorRanges)
+
+        val dotDotDot = highlightColor.dotDotDotColor("...")
+        val prefix = if (shiftedStart > 0) dotDotDot else fansi.Str("")
+        val suffix = if (shiftedEnd < grepResult.text.length) dotDotDot else fansi.Str("")
+
+        outputSnippets.append(prefix ++ colored ++ suffix)
+        lastEnd = wideEnd
+        rangeBuffer.clear()
       }
 
-      // String: |        S   E       S    E      |
-      // Cuts:   0       1 2 3 4     5 6  7 8     9
-      var previousEnd = 0
-      while(remaining.nonEmpty){
-        val (firstStart, firstEnd) = remaining.head
-        val (included, excluded) = remaining.partition{
-          case (_, end) => end - firstStart < width
+      // Keep chomping away at the remaining spans until the next span is beyond
+      // the acceptable width, and when that happens consume all the stored spans
+      // to generate a snippet. Generate one more snippet at the end too to use up
+      // any un-consumed spans
+      while(remainingSpans.nonEmpty){
+        val (start, end) = remainingSpans.head
+        remainingSpans = remainingSpans.tail
+        if (rangeBuffer.nonEmpty && end - rangeBuffer(0)._1 >= width) {
+          generateSnippet()
         }
-        remaining = excluded
-        val lastEnd = included.last._2
-        val middle = {
-          val offset = (lastEnd + firstStart) / 2 - firstStart
-          findColoredPoint(0, 0, firstStart + offset)
-        }
-
-        val blackWhiteMiddle = ansiRegex.replaceAllIn(grepResult.text.take(middle), "").length
-        val (showStart, showEnd) = {
-          if (blackWhiteMiddle - width / 2 < previousEnd) {
-            // If the range is clipping the start of string, take until full width
-            (previousEnd, findColoredPoint(previousEnd, 0, width))
-          } else if (blackWhiteMiddle + width / 2 >= grepResult.text.length) {
-            // If the range is clipping the end of string, start from the full width
-            (findColoredPoint(0, 0, grepResult.text.length - width), grepResult.text.length-1)
-          } else {
-            (
-              findColoredPoint(0, 0, blackWhiteMiddle - width / 2),
-              findColoredPoint(0, 0, blackWhiteMiddle + width / 2)
-            )
-          }
-        }
-        previousEnd = showEnd
-        val allIndices = included.flatMap{case (a, b) => Seq(a, b)}
-
-        val pairs = (showStart +: allIndices) zip (allIndices :+ showEnd)
-
-        val snippets = for(((a, b), i) <- pairs.zipWithIndex) yield {
-          grepResult.text.slice(a, b) + (if (i < pairs.length-1) color(i) else "")
-        }
-
-        val dots = cfg.colors.prefixColor + "..." + cfg.colors.endColor
-        val prefixDots = if (showStart > 0) dots else ""
-        val suffixDots = if (showEnd < grepResult.text.length - 1) dots else ""
-
-        spans.append(prefixDots + snippets.mkString + suffixDots)
+        rangeBuffer.append((start, end))
       }
+      generateSnippet()
 
-      Iterator(spans.mkString("\n"))
+      Iterator(outputSnippets.mkString("\n"))
     }
 }
 
-case class GrepResult(spans: Seq[(Int, Int)], text: String)
+
 /**
  * Lets you filter a list by searching for a matching string or
  * regex within the pretty-printed contents.
@@ -139,6 +155,7 @@ object grep {
                            : T => GenTraversableOnce[GrepResult] = {
       f.apply[T]
     }
+
     implicit def FunkyFunc2[T: pprint.PPrint]
                            (f: ![_])
                            (implicit c: pprint.Config)
