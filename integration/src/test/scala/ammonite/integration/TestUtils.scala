@@ -7,6 +7,7 @@ import ammonite.ops._
   */
 object TestUtils {
   val scalaVersion = scala.util.Properties.versionNumberString
+  val javaVersion = scala.util.Properties.javaVersion
   val ammVersion = ammonite.Constants.version
   val executableName = s"ammonite-repl-$ammVersion-$scalaVersion"
   val Seq(executable) = ls.rec! cwd |? (_.last == executableName)

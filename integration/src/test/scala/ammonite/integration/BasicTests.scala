@@ -15,7 +15,7 @@ import TestUtils._
  * they call the REPL programmatically
  */
 object BasicTests extends TestSuite{
-
+  override def utestTruncateLength = 60000
   println("StandaloneTests")
   val tests = TestSuite {
 
@@ -70,9 +70,11 @@ object BasicTests extends TestSuite{
       val evaled = exec('basic/"Resources.scala")
       assert(evaled.out.string.contains("1745"))
     }
-    'playframework{
-      val evaled = exec('basic/"PlayFramework.scala")
-      assert(evaled.out.string.contains("Hello bar"))
+    'playframework- {
+      if (scalaVersion.startsWith("2.11.") && javaVersion.startsWith("1.8.")){
+        val evaled = exec('basic/"PlayFramework.scala")
+        assert(evaled.out.string.contains("Hello bar"))
+      }
     }
     'args{
       'full{

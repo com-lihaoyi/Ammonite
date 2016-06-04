@@ -8,7 +8,10 @@ jdk:
 - oraclejdk8
 - openjdk7
 script:
-- sbt ++$TRAVIS_SCALA_VERSION tested/test
+# Need to manually shard this into two different commands otherwise
+# it gets whacked by the OOMkiller when run on Travis CI. Not sure why
+- sbt ++$TRAVIS_SCALA_VERSION "published/test-only -- --truncate=999"
+- sbt ++$TRAVIS_SCALA_VERSION "integration/test-only -- --truncate=999"
 # Tricks to avoid unnecessary cache updates, from
 # http://www.scala-sbt.org/0.13/docs/Travis-CI-with-sbt.html
 #- find $HOME/.sbt -name "*.lock" | xargs rm
