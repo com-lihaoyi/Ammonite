@@ -279,7 +279,7 @@ object ScriptTests extends TestSuite{
           Ref(Colors.BlackWhite),
           printer = Printer(_ => (), _ => (), _ => (), _ => ()),
           storage = storage,
-          new History(Vector()),
+          history = new History(Vector()),
           predef = "",
           wd = ammonite.ops.cwd,
           replArgs = Seq()

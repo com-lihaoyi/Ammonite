@@ -31,8 +31,8 @@ class Interpreter(prompt0: Ref[String],
                   history: => History,
                   predef: String,
                   wd: Path,
-                  replArgs: Seq[Bind[_]]){ interp =>
-
+                  replArgs: Seq[Bind[_]],
+                  classOutputDir: Option[String] = None){ interp =>
 
   val hardcodedPredef =
     """import ammonite.repl.frontend.ReplBridge.repl.{pprintConfig, derefPPrint}
@@ -436,7 +436,8 @@ class Interpreter(prompt0: Ref[String],
     0,
     storage.compileCacheLoad,
     storage.compileCacheSave,
-    compiler.addToClasspath
+    compiler.addToClasspath,
+    classOutputDir
   )
 
   val dynamicClasspath = new VirtualDirectory("(memory)", None)

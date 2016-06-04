@@ -40,6 +40,10 @@ import reflect.macros.Context
   * @param wd The working directory of the REPL; when it load scripts, where
   *           the scripts will be considered relative to when assigning them
   *           packages
+  * @param classOutputDir Where will all of Ammonite's closure classes get stored?
+  *                       This is useful if you want to make these available for
+  *                       other use cases, e.g., spark.  See
+  *                       https://github.com/lihaoyi/Ammonite/pull/389/
   */
 case class Main(predef: String = "",
                 defaultPredef: Boolean = true,
@@ -48,7 +52,8 @@ case class Main(predef: String = "",
                 welcomeBanner: Option[String] = Some(Main.defaultWelcomeBanner),
                 inputStream: InputStream = System.in,
                 outputStream: OutputStream = System.out,
-                errorStream: OutputStream = System.err){
+                errorStream: OutputStream = System.err,
+                classOutputDir: Option[String] = None){
   /**
     * Instantiates an ammonite.repl.Repl using the configuration
     */
@@ -61,6 +66,7 @@ case class Main(predef: String = "",
       wd = wd,
       welcomeBanner = welcomeBanner,
       replArgs = replArgs
+      classOutputDir = classOutputDir
     )
   }
   def run(replArgs: Bind[_]*) = {

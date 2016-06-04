@@ -11,10 +11,10 @@ class Repl(input: InputStream,
            output: OutputStream,
            error: OutputStream,
            storage: Storage,
-           predef: String,
            wd: ammonite.ops.Path,
            welcomeBanner: Option[String],
-           replArgs: Seq[Bind[_]] = Nil) {
+           replArgs: Seq[Bind[_]] = Nil,
+           classOutputDir: Option[String] = None) {
 
   val prompt = Ref("@ ")
 
@@ -49,7 +49,8 @@ class Repl(input: InputStream,
     history,
     predef,
     wd,
-    replArgs
+    replArgs,
+    classOutputDir = classOutputDir
   )
 
   Timer("Repl init interpreter")

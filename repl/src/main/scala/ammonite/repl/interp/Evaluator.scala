@@ -61,9 +61,10 @@ object Evaluator{
   def apply(currentClassloader: ClassLoader,
             compile: => (Array[Byte], Printer, Int, String) => Compiler.Output,
             startingLine: Int,
-            cacheLoad: (String, String) => Option[CompileCache],
-            cacheSave: (String, String, CompileCache) => Unit,
-            addToCompilerClasspath:  => ClassFiles => Unit): Evaluator = new Evaluator{ eval =>
+            cacheLoad: String => Option[CompileCache],
+            cacheSave: (String, CompileCache) => Unit,
+            addToCompilerClasspath:  => ClassFiles => Unit,
+            classOutputDir: Option[String] = None): Evaluator = new Evaluator{ eval =>
 
     /**
      * Imports which are required by earlier commands to the REPL. Imports
@@ -93,7 +94,7 @@ object Evaluator{
 
     def initialFrame = {
       val hash = SpecialClassLoader.initialClasspathHash(currentClassloader)
-      def special = new SpecialClassLoader(currentClassloader, hash)
+      def special = new SpecialClassLoader(currentClassloader, hash, classOutputDir)
       new Frame(
         special,
         special,
@@ -108,8 +109,8 @@ object Evaluator{
     object sess extends Session {
       def frames = eval.frames
       def childFrame(parent: Frame) = new Frame(
-        new SpecialClassLoader(parent.classloader, parent.classloader.classpathHash),
-        new SpecialClassLoader(parent.pluginClassloader, parent.pluginClassloader.classpathHash),
+        new SpecialClassLoader(parent.classloader, parent.classloader.classpathHash, classOutputDir),
+        new SpecialClassLoader(parent.pluginClassloader, parent.pluginClassloader.classpathHash, classOutputDir),
         parent.imports,
         parent.classpath
       )
@@ -160,7 +161,7 @@ object Evaluator{
     def loadClass(fullName: String, classFiles: ClassFiles): Res[Class[_]] = {
       Res[Class[_]](Try {
         for ((name, bytes) <- classFiles) {
-          sess.frames.head.classloader.newFileDict(name) = bytes
+          sess.frames.head.classloader.putClassBytes(name, bytes)
         }
         val names = classFiles.map(_._1)
         val res = Class.forName(fullName, true, sess.frames.head.classloader)

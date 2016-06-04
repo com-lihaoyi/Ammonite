@@ -289,5 +289,28 @@ object EvaluatorTests extends TestSuite{
         res10: Int = 123
       """)
     }
+    'classOutputDir {
+      check.session(
+        """
+          @ val x = Seq(1, 2, 3).map(_.toString)
+          x: Seq[String] = List("1", "2", "3")
+        """.stripMargin)
+      val classOutputDir = check.classOutputDir
+
+      import ammonite.ops._
+      // Ensure we have some files here.
+      val filesBefore: LsSeq = ls(classOutputDir)
+      val lenBefore = filesBefore.length
+      asserts.assert(lenBefore > 0)
+
+      check.session(
+        """
+          @ val x = Seq(1, 2, 3).map(_.toString)
+          x: Seq[String] = List("1", "2", "3")
+        """.stripMargin)
+      val filesAfter: LsSeq = ls(classOutputDir)
+      val lenAfter = filesAfter.length
+      asserts.assert(lenAfter > lenBefore)
+    }
   }
 }
