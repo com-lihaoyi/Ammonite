@@ -35,8 +35,7 @@ The Predef itself is made of several parts:
   manually via `--predef-file ...` at the CLI or subclassing the `Storage`
   object passed into the API
 
-
 Unlike script files, anything that is run in the predef is automatically made
 available to every executed script without needing to `load.module` or import 
-it manually.
+it manually. This includes any files being loaded in the predef itself.
   
