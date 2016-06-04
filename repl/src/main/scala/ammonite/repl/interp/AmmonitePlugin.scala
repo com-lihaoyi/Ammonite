@@ -49,12 +49,14 @@ class AmmonitePlugin(g: scala.tools.nsc.Global,
 
 
 object AmmonitePlugin{
-  def apply(g: Global)(unit: g.CompilationUnit,
-                       output: Seq[ImportData] => Unit,
-                       topWrapperLen: => Int) = {
+  def apply(g: Global)
+           (unit: g.CompilationUnit,
+            output: Seq[ImportData] => Unit,
+            topWrapperLen: => Int) = {
 
     import g._
-
+    pprint.log("AmmonitePlugin Analyzing")
+    pprint.log(unit.source.path)
     def decode(t: g.Tree) = {
       val sym = t.symbol
       (sym.isType, sym.decodedName, sym.decodedName, "")
@@ -101,7 +103,7 @@ object AmmonitePlugin{
           }
         }
         val prefix = rec(expr).reverseMap(x => Parsers.backtickWrap(x.decoded)).mkString(".")
-
+        pprint.log(prefix)
 
         /**
           * A map of each name importable from `expr`, to a `Seq[Boolean]`
@@ -168,10 +170,16 @@ object AmmonitePlugin{
         case Seq(false) => ImportData.Term
         case Seq(_, _) => ImportData.TermType
       }
+      pprint.log(importString)
       ImportData(fromName, toName, importString, importType)
     }
 
-    output(open.toVector)
+    // Send the recorded imports through a callback back to the Ammonite REPL.
+    // Make sure we sort the imports according to their prefix, so that when
+    // they later get rendered the same-prefix imports can be collapsed
+    // together v.s. having them by sent in the arbitrary-jumbled order they
+    // come out of the `grouped` map in
+    output(open.toVector.sortBy(_.prefix))
   }
 }
 

@@ -102,7 +102,7 @@ case class ImportData(fromName: String,
                       prefix: String,
                       importType: ImportData.ImportType)
 object ImportData{
-  case class ImportType(name: String)
+  sealed case class ImportType(name: String)
   val Type = ImportType("Type")
   val Term = ImportType("Term")
   val TermType = ImportType("TermType")

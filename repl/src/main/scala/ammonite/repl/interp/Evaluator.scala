@@ -155,6 +155,7 @@ object Evaluator{
         compiled,
         "Compilation Failed"
       )
+//      _ = pprint.log(imports)
     } yield (classfiles, imports)
 
     def loadClass(fullName: String, classFiles: ClassFiles): Res[Class[_]] = {
@@ -176,7 +177,7 @@ object Evaluator{
 
     def importBlock(importData: Seq[ImportData]) = {
       Timer("importBlock 0")
-
+//      pprint.log(importData)
       // Group the remaining imports into sliding groups according to their
       // prefix, while still maintaining their ordering
       val grouped = mutable.Buffer[mutable.Buffer[ImportData]]()
@@ -208,7 +209,6 @@ object Evaluator{
       val res = out.mkString
 
       Timer("importBlock 1")
-      pprint.log(res)
       res
     }
 
@@ -323,7 +323,7 @@ object $wrapperName{\n"""
       val x = for {
         (classFiles, newImports) <- compiled
         _ = Timer("cachedCompileBlock 4")
-        _ = pprint.log(newImports)
+//        _ = pprint.log(newImports)
         cls <- loadClass(pkgName + "." + wrapperName, classFiles)
       } yield (cls, newImports)
 
