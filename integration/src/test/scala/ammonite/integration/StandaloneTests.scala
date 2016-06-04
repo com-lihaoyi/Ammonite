@@ -37,7 +37,7 @@ object StandaloneTests extends TestSuite{
       )
     }
 
-    def interceptException(name: String) = {
+    def interceptException(name: RelPath) = {
       intercept[ShelloutException]{
         %%bash(
           executable,
@@ -74,7 +74,7 @@ object StandaloneTests extends TestSuite{
 
     'errorTest{
       //Make sure correct line numbers are printed when an erroneous script is executed
-      val name = "ErrorLineNumberTest.scala"
+      val name = 'lineNumbers/"ErrorLineNumberTest.scala"
       val e = intercept[ShelloutException]{
         %%bash(
           executable,
@@ -84,7 +84,7 @@ object StandaloneTests extends TestSuite{
           )
       }
       val expectedErrorMsg =
-        """ammonite.repl.CompilationError: Syntax Error: ("}" | `case`):5:24 ...")\n  }\n\n  d"
+        """Syntax Error: ("}" | `case`):5:24 ...")\n  }\n\n  d"
           |    printlnqs(unsorted))
           |                       ^""".stripMargin
 
@@ -94,7 +94,7 @@ object StandaloneTests extends TestSuite{
 
     'multipleCompilationUnitErrorTest1{
       //Make sure correct line numbers are printed when an erroneous script is executed
-      val file = "MultipleCompilationUnitErrorMsgTest1.scala"
+      val file = 'lineNumbers/"MultipleCompilationUnitErrorMsgTest1.scala"
 
       val e = intercept[ShelloutException]{
         %%bash(
@@ -105,7 +105,7 @@ object StandaloneTests extends TestSuite{
           )
       }
       val expectedErrorMsg =
-        """ammonite.repl.CompilationError: Syntax Error: End:5:1 ..."}"
+        """Syntax Error: End:5:1 ..."}"
           |}
           |^""".stripMargin
 
@@ -114,7 +114,7 @@ object StandaloneTests extends TestSuite{
 
     'multipleCompilationUnitErrorTest2{
       //Make sure correct line numbers are printed when an erroneous script is executed
-      val file = "MultipleCompilationUnitErrorMsgTest2.scala"
+      val file = 'lineNumbers/"MultipleCompilationUnitErrorMsgTest2.scala"
 
       val e = intercept[ShelloutException]{
         %%bash(
@@ -125,7 +125,7 @@ object StandaloneTests extends TestSuite{
           )
       }
       val expectedErrorMsg =
-        """ammonite.repl.CompilationError: Syntax Error: End:3:1 ..."}\n@\n1 + 1"
+        """Syntax Error: End:3:1 ..."}\n@\n1 + 1"
           |}
           |^""".stripMargin
 
@@ -134,7 +134,8 @@ object StandaloneTests extends TestSuite{
 
     'compilationErrorWithCommentsAtTop{
       //Make sure correct line numbers are printed when an erroneous script is executed
-      val name = "compilationErrorWithCommentsAtTop.scala"
+      val name = 'lineNumbers/"compilationErrorWithCommentsAtTop.scala"
+
       val e = interceptException(name)
       val expectedErrorMsg =
         """compilationErrorWithCommentsAtTop.scala:11: not found: value quicort
@@ -146,7 +147,7 @@ object StandaloneTests extends TestSuite{
 
     'compilationErrorInSecondBlock{
       //Make sure correct line numbers are printed when an erroneous script is executed
-      val name = "compilationErrorInSecondBlock.scala"
+      val name = 'lineNumbers/"compilationErrorInSecondBlock.scala"
       val e = interceptException(name)
       val expectedErrorMsg =
         """compilationErrorInSecondBlock.scala:14: not found: value printnl
@@ -158,7 +159,7 @@ object StandaloneTests extends TestSuite{
 
     'compilationErrorInFourthBlock{
       //Make sure correct line numbers are printed when an erroneous script is executed
-      val name = "compilationErrorInFourthBlock.scala"
+      val name = 'lineNumbers/"compilationErrorInFourthBlock.scala"
       val e = interceptException(name)
       val expectedErrorMsg =
         """compilationErrorInFourthBlock.scala:30: not found: value prinntl
@@ -170,7 +171,7 @@ object StandaloneTests extends TestSuite{
 
     'compilationErrorInClass{
       //Make sure correct line numbers are printed when an erroneous script is executed
-      val name = "compilationErrorInClass.scala"
+      val name = 'lineNumbers/"compilationErrorInClass.scala"
       val e = interceptException(name)
       val expectedErrorMsg = "compilationErrorInClass.scala:17: value a is not a member of"
 
@@ -179,7 +180,7 @@ object StandaloneTests extends TestSuite{
 
     'CompilationErrorLineNumberTest{
       //Make sure correct line numbers are printed when an erroneous script is executed
-      val name = "CompilationErrorLineNumberTest.scala"
+      val name = 'lineNumbers/"CompilationErrorLineNumberTest.scala"
       val e = interceptException(name)
       val expectedErrMsg = """CompilationErrorLineNumberTest.scala:7: not found: value noSuchObject
                                |  val x = noSuchObject.badFunction
@@ -190,7 +191,7 @@ object StandaloneTests extends TestSuite{
 
     'RuntimeCompilationErrorLineNumberTest{
       //Make sure correct line numbers are printed when an erroneous script is executed
-      val name = "RuntimeCompilationErrorLineNumberTest.scala"
+      val name = 'lineNumbers/"RuntimeCompilationErrorLineNumberTest.scala"
       val e = interceptException(name)
       val expectedErrorMsg = "(RuntimeCompilationErrorLineNumberTest.scala:6)"
 

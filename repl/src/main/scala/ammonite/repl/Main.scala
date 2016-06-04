@@ -100,25 +100,23 @@ case class Main(predef: String = "",
             val quotedKwargs =
               kwargs.mapValues(pprint.PPrinter.escape)
                 .map { case (k, s) => s"""$k=arg("$s")""" }
-            try{
-              repl.interp.processExec(
-                s"""|import ammonite.repl.ScriptInit.{arg, callMain, pathRead}
-                    |callMain{
-                    |  main(${(quotedArgs ++ quotedKwargs).mkString(", ")})
-                    |}
-                    |""".stripMargin).map(_ =>  imports)
-            }catch{
-              case e: ArgParseException =>
-                // For this semi-expected invalid-argument exception, chop off the
-                // irrelevant bits of the stack trace to reveal only the part which
-                // describes how parsing failed
+            repl.interp.processExec(
+              s"""|import ammonite.repl.ScriptInit.{arg, callMain, pathRead}
+                  |callMain{
+                  |  main(${(quotedArgs ++ quotedKwargs).mkString(", ")})
+                  |}
+                  |""".stripMargin
+            ) match {
+              case Res.Success(_) => Res.Success(imports)
+              case Res.Exception(e: ArgParseException, s) =>
                 e.setStackTrace(Array())
                 e.cause.setStackTrace(e.cause.getStackTrace.takeWhile( frame =>
                   frame.getClassName != "ammonite.repl.ScriptInit$" ||
-                    frame.getMethodName != "parseScriptArg"
+                  frame.getMethodName != "parseScriptArg"
                 ))
-                throw e
-          }
+                Res.Exception(e, s)
+              case x => x
+            }
         }
     }
   }
