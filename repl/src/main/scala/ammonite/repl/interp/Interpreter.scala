@@ -87,12 +87,16 @@ class Interpreter(prompt0: Ref[String],
 
   }
 
-  def processModule(code: String, fileName: String = "Main.scala"): Res[Seq[ImportData]] = {
+  def processModule(code: String,
+                    wrapperName: String,
+                    pkgName: String): Res[Seq[ImportData]] = {
     processScript(
       skipSheBangLine(code),
       (code, imports) =>
         withContextClassloader(
-          eval.processScriptBlock(code, imports, printer, fileName)
+          eval.processScriptBlock(
+            code, imports, printer, wrapperName, pkgName
+          )
         )
     )
   }
@@ -312,7 +316,10 @@ class Interpreter(prompt0: Ref[String],
       def exec(file: Path): Unit = apply(read(file))
 
       def module(file: Path): Unit = {
-        processModule(read(file), file.last) match{
+        pprint.log(file)
+        val (pkg, wrapper) = Util.pathToPackageWrapper(file)
+        pprint.log((pkg, wrapper))
+        processModule(read(file), wrapper, pkg) match{
           case Res.Failure(ex, s) => throw new CompilationError(s)
           case Res.Exception(t, s) => throw t
           case _ =>
@@ -470,9 +477,18 @@ class Interpreter(prompt0: Ref[String],
             }
             .mkString("\n")
 
-  processModule(hardcodedPredef + "\n" + predef)
+  processModule(
+    hardcodedPredef + "\n" + predef,
+    "HardcodedPredef",
+    "ammonite.predef"
+  )
+//  pprint.log(pred)
   init()
-  processModule(storage.loadPredef + "\n" + argString)
+  processModule(
+    storage.loadPredef + "\n" + argString,
+    "LoadedPredef",
+    "ammonite.predef"
+  )
   eval.sess.save()
   Timer("Interpreter init predef 0")
   init()

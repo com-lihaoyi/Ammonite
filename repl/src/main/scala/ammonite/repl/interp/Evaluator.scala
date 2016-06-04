@@ -41,7 +41,8 @@ trait Evaluator{
   def processScriptBlock(code: String,
                          scriptImports: Seq[ImportData],
                          printer: Printer,
-                         fileName: String): Res[Evaluated]
+                         wrapperName: String,
+                         pkgName: String): Res[Evaluated]
 
   def previousImportBlock: String
 
@@ -146,6 +147,7 @@ object Evaluator{
                      fileName: String): Res[(ClassFiles, Seq[ImportData])] = for {
       compiled <- Res.Success{
         val c = compile(code._1.getBytes, printer, code._2, fileName)
+//        pprint.log(c)
         c
       }
       _ = _compilationCount += 1
@@ -155,13 +157,14 @@ object Evaluator{
       )
     } yield (classfiles, imports)
 
-    def loadClass(wrapperName: String, classFiles: ClassFiles): Res[Class[_]] = {
+    def loadClass(fullName: String, classFiles: ClassFiles): Res[Class[_]] = {
       Res[Class[_]](Try {
         for ((name, bytes) <- classFiles) {
 //          println("loadClass " + name)
           sess.frames.head.classloader.newFileDict(name) = bytes
         }
-        Class.forName(wrapperName , true, sess.frames.head.classloader)
+        val res = Class.forName(fullName , true, sess.frames.head.classloader)
+        res
       }, e => "Failed to load compiled class " + e)
     }
 
@@ -205,6 +208,7 @@ object Evaluator{
       val res = out.mkString
 
       Timer("importBlock 1")
+      pprint.log(res)
       res
     }
 
@@ -239,8 +243,10 @@ object Evaluator{
                    ) = for {
       wrapperName <- Res.Success("cmd" + getCurrentLine)
       _ <- Catching{ case e: ThreadDeath => interrupted(e) }
+//      _ = pprint.log(this.imports)
       (classFiles, newImports) <- compileClass(
         wrapCode(
+          None,
           wrapperName,
           code,
           printCode,
@@ -264,13 +270,14 @@ object Evaluator{
       Timer("eval.processLine evaluatorRunPrinter end")
       evaluationResult(wrapperName, newImports)
     }
-    
-    def wrapCode(wrapperName: String,
+
+    def wrapCode(pkgName: Option[String],
+                 wrapperName: String,
                  code: String,
                  printCode: String,
                  imports: Seq[ImportData]) = {
-
-     val topWrapper = s"""
+      val topWrapper = s"""
+${pkgName.fold("")("package " + _)}
 ${importBlock(imports)}
 
 object $wrapperName{\n"""
@@ -286,36 +293,50 @@ object $wrapperName{\n"""
     def cachedCompileBlock(code: String,
                            imports: Seq[ImportData],
                            printer: Printer,
-                           fileName: String,
-                           printCode: String = ""): Res[(String, Class[_], Seq[ImportData])] = {
-      Timer("cachedCompileBlock 0")
-      val wrapperName = cacheTag(code, imports, sess.frames.head.classloader.classpathHash)
+                           wrapperName: String,
+                           pkgName: String,
+                           printCode: String = ""): Res[(Class[_], Seq[ImportData])] = {
+
       Timer("cachedCompileBlock 1")
-      val wrappedCode = wrapCode(wrapperName, code, printCode, imports)
+      val wrappedCode = wrapCode(
+        Some(pkgName), wrapperName, code, printCode, imports
+      )
       Timer("cachedCompileBlock 2")
-      val compiled = cacheLoad(wrapperName) match {
-        case Some((classFiles, newImports)) =>
+      val compiled = cacheLoad(pkgName + "." + wrapperName) match {
+        case Some((classFiles, newImports)) if false =>
+//          pprint.log("cacheLoad Some")
           addToCompilerClasspath(classFiles)
           Res.Success((classFiles, newImports))
-        case None => for {
-          (classFiles, newImports) <- compileClass(wrappedCode, printer, fileName)
-          _ = cacheSave(wrapperName, (classFiles, newImports))
-        } yield (classFiles, newImports)
+        case _ =>
+//          pprint.log("cacheLoad None")
+          val noneCalc = for {
+            (classFiles, newImports) <- compileClass(
+              wrappedCode, printer, wrapperName + ".scala"
+            )
+            _ = cacheSave(pkgName + "." + wrapperName, (classFiles, newImports))
+          } yield (classFiles, newImports)
+
+          noneCalc
       }
       Timer("cachedCompileBlock 3")
-      for {
+//      pprint.log(compiled)
+      val x = for {
         (classFiles, newImports) <- compiled
         _ = Timer("cachedCompileBlock 4")
-        cls <- loadClass(wrapperName, classFiles)
-      } yield (wrapperName, cls, newImports)
+        _ = pprint.log(newImports)
+        cls <- loadClass(pkgName + "." + wrapperName, classFiles)
+      } yield (cls, newImports)
+
+      x
     }
 
     def processScriptBlock(code: String,
                            scriptImports: Seq[ImportData],
                            printer: Printer,
-                           fileName: String) = for {
-      (wrapperName, cls, newImports) <- cachedCompileBlock(
-        code, scriptImports,  printer, fileName
+                           wrapperName: String,
+                           pkgName: String) = for {
+      (cls, newImports) <- cachedCompileBlock(
+        code, scriptImports,  printer, wrapperName, pkgName
       )
       _ <- Catching{userCodeExceptionHandler}
     } yield {

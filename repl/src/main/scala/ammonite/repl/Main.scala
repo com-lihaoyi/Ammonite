@@ -88,7 +88,8 @@ case class Main(predef: String = "",
                 kwargs: Map[String, String]): Res[Seq[ImportData]] = {
 
     val repl = instantiateRepl()
-    repl.interp.processModule(read(path), path.last) match{
+    val (pkg, wrapper) = Util.pathToPackageWrapper(path)
+    repl.interp.processModule(read(path), wrapper, pkg) match{
       case x: Res.Failing => x
       case Res.Success(imports) =>
         repl.interp.init()

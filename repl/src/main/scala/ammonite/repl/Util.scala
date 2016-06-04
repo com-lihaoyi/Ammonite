@@ -1,7 +1,7 @@
 package ammonite.repl
 
 import java.security.MessageDigest
-
+import ammonite.ops._
 import acyclic.file
 import fansi.Attrs
 import pprint.{PPrint, PPrinter}
@@ -185,6 +185,11 @@ object Ex{
 
 object Util{
 
+  def pathToPackageWrapper(path: Path) = {
+    val pkg = (path/up).segments.map(scala.reflect.NameTransformer.encode).mkString(".").toLowerCase
+    val wrapper = path.last.take(path.last.lastIndexOf('.'))
+    (pkg, wrapper)
+  }
   def md5Hash(data: Iterator[Array[Byte]]) = {
     val digest = MessageDigest.getInstance("MD5")
     data.foreach(digest.update)

@@ -272,17 +272,23 @@ object Compiler{
       else Some{
         shutdownPressy()
 
+        def rec(d: VirtualDirectory): Iterator[AbstractFile] = {
+          val (subs, files) = d.iterator.partition(_.isDirectory)
+          files ++ subs.map(_.asInstanceOf[VirtualDirectory]).flatMap(rec)
+        }
         val files = for{
-          x <- vd.iterator.to[collection.immutable.Traversable]
+          x <- rec(vd).toVector
           if x.name.endsWith(".class")
         } yield {
           val output = dynamicClasspath.fileNamed(x.name).output
           output.write(x.toByteArray)
           output.close()
-          (x.name.stripSuffix(".class"), x.toByteArray)
+          (x.path.stripPrefix("(memory)/").stripSuffix(".class").replace('/', '.'), x.toByteArray)
         }
         val imports = lastImports.toList
-        (files, imports)
+        val res = (files, imports)
+        val names = files.map(_._1)
+        res
       }
     }
 
