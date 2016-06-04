@@ -83,7 +83,9 @@ case class Main(predef: String = "",
     * Run a Scala script file! takes the path to the file as well as an array
     * of `args` and a map of keyword `kwargs` to pass to that file.
     */
-  def runScript(path: Path, args: Seq[String], kwargs: Map[String, String]): Res[Seq[ImportData]] = {
+  def runScript(path: Path,
+                args: Seq[String],
+                kwargs: Map[String, String]): Res[Seq[ImportData]] = {
 
     val repl = instantiateRepl()
     repl.interp.processModule(read(path), path.last) match{
