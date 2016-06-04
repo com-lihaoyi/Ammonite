@@ -3,7 +3,7 @@ package ammonite.repl
 import ammonite.ops._
 import ammonite.repl.frontend._
 import ammonite.repl.interp.Interpreter
-import ammonite.repl.IvyConstructor._
+import ammonite.repl.tools.IvyConstructor._
 import TestUtils.scala2_10
 import utest._
 import acyclic.file
@@ -276,10 +276,9 @@ object ScriptTests extends TestSuite{
           Ref(null),
           80,
           80,
-          pprint.Config.Defaults.PPrintConfig.copy(height = 15),
           Ref(Colors.BlackWhite),
           printer = Printer(_ => (), _ => (), _ => (), _ => ()),
-          storage = Ref(storage),
+          storage = storage,
           new History(Vector()),
           predef = "",
           replArgs = Seq()
@@ -288,7 +287,7 @@ object ScriptTests extends TestSuite{
         'blocks{
           val cases = Seq("OneBlock.scala" -> 3, "TwoBlocks.scala" -> 4, "ThreeBlocks.scala" -> 5)
           for((fileName, expected) <- cases){
-            val storage = new MemoryStorage
+            val storage = Storage.InMemory()
             val interp = createTestInterp(storage)
             val n0 = storage.compileCache.size
             assert(n0 == 2) // Predef + hardcodedPredef
@@ -303,8 +302,8 @@ object ScriptTests extends TestSuite{
             java.nio.file.Files.createTempDirectory("ammonite-tester-x")
           )
           println(tempDir)
-          val interp1 = createTestInterp(Storage(tempDir, None))
-          val interp2 = createTestInterp(Storage(tempDir, None))
+          val interp1 = createTestInterp(Storage.Folder(tempDir))
+          val interp2 = createTestInterp(Storage.Folder(tempDir))
           interp1.replApi.load.module(scriptPath/"OneBlock.scala")
           interp2.replApi.load.module(scriptPath/"OneBlock.scala")
           val n1 = interp1.eval.compilationCount
@@ -313,7 +312,7 @@ object ScriptTests extends TestSuite{
           assert(n2 == 0) // all three should be cached
         }
         'tags{
-          val storage = new MemoryStorage
+          val storage = Storage.InMemory()
           val interp = createTestInterp(storage)
           interp.replApi.load.module(scriptPath/"TagBase.scala")
           interp.replApi.load.module(scriptPath/"TagPrevCommand.scala")
@@ -334,7 +333,7 @@ object ScriptTests extends TestSuite{
             )
         }
         'noAutoIncrementWrapper{
-          val storage = new MemoryStorage
+          val storage = Storage.InMemory()
           val interp = createTestInterp(storage)
           interp.replApi.load.module(scriptPath/"ThreeBlocks.scala")
           try{

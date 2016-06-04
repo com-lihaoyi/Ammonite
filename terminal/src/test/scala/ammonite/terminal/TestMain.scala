@@ -18,7 +18,7 @@ import scala.annotation.tailrec
  * included as filters, but without any Scala/Ammonite specific logic
  * at all. Provides a minimal environment for manual testing
  */
-object Main{
+object TestMain{
 
   def main(args: Array[String]): Unit = {
     System.setProperty("ammonite-sbt-build", "true")

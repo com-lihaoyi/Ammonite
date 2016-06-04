@@ -34,11 +34,7 @@ object PPrints{
   implicit def lsSeqRepr: PPrinter[LsSeq] =
     PPrinter { (t: LsSeq, c: Config) =>
       val snippets = for(p <- t) yield {
-        val parts =
-          Iterator(c.colors.literalColor) ++
-          pprint.tokenize(p relativeTo t.base)(implicitly, c).mkString ++
-          Iterator(c.colors.endColor)
-        parts.mkString
+        c.colors.literalColor(pprint.tokenize(p relativeTo t.base)(implicitly, c).mkString)
       }
       Iterator("\n") ++ FrontEndUtils.tabulate(snippets,FrontEndUtils.width)
     }
@@ -66,9 +62,9 @@ object PPrints{
       x.chunks.iterator.flatMap { chunk =>
         val (color, s) = chunk match{
           case Left(s) => (c.colors.literalColor, s)
-          case Right(s) => (Console.RED, s)
+          case Right(s) => (fansi.Color.Red, s)
         }
-        Iterator("\n", color, new String(s.array), c.colors.endColor)
+        Iterator("\n", color(new String(s.array)).render)
       }
     )
   implicit def permissionPPrintConfig: PPrinter[PermSet] =
@@ -80,7 +76,10 @@ object PPrints{
     }
 
   implicit val defaultHighlightColor = {
-    GrepResult.Color(Console.BLUE + Console.YELLOW_B, Console.RESET)
+    ammonite.repl.tools.GrepResult.Color(
+      fansi.Color.Blue ++ fansi.Back.Yellow,
+      fansi.Color.Yellow
+    )
   }
 }
 trait OpsAPI{

@@ -1,4 +1,4 @@
-package ammonite.repl
+package ammonite.repl.tools
 
 import org.apache.ivy.Ivy
 import org.apache.ivy.core.module.descriptor.{DefaultDependencyDescriptor, DefaultModuleDescriptor}
@@ -11,7 +11,7 @@ import org.apache.ivy.util._
 import org.apache.ivy.plugins.resolver._
 import acyclic.file
 import IvyThing._
-import Resolvers._  
+
 
 object IvyConstructor extends IvyConstructor
 trait IvyConstructor{

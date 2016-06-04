@@ -10,7 +10,7 @@ import scala.annotation.tailrec
 class Repl(input: InputStream,
            output: OutputStream,
            error: OutputStream,
-           storage: Ref[Storage],
+           storage: Storage,
            predef: String = "",
            replArgs: Seq[Bind[_]] = Nil) {
 
@@ -31,17 +31,16 @@ class Repl(input: InputStream,
     _.foreach(printStream.print),
     printlnWithColor(colors().warning(), _),
     printlnWithColor(colors().error(), _),
-    printlnWithColor(fansi.Attrs.empty, _)
+    printlnWithColor(fansi.Attrs.Empty, _)
   )
   Timer("Repl init printer")
 
-  
+
   val interp: Interpreter = new Interpreter(
     prompt,
     frontEnd,
     frontEnd().width,
     frontEnd().height,
-    pprint.Config.Colors.PPrintConfig,
     colors,
     printer,
     storage,
@@ -60,9 +59,9 @@ class Repl(input: InputStream,
       colors().prompt()(prompt()).render,
       colors(),
       interp.pressy.complete(_, interp.eval.previousImportBlock, _),
-      storage().fullHistory(),
+      storage.fullHistory(),
       addHistory = (code) => if (code != "") {
-        storage().fullHistory() = storage().fullHistory() :+ code
+        storage.fullHistory() = storage.fullHistory() :+ code
         history = history :+ code
       }
     )

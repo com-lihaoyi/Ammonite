@@ -15,7 +15,6 @@ import ammonite.ops.ImplicitWd._
  * they call the REPL programmatically
  */
 object StandaloneTests extends TestSuite{
-  // Prepare standalone executable
   val scalaVersion = scala.util.Properties.versionNumberString
   println("StandaloneTests")
   val tests = TestSuite {
@@ -24,7 +23,6 @@ object StandaloneTests extends TestSuite{
     val Seq(executable) = ls.rec! cwd |? (_.last == executableName)
     val replStandaloneResources = cwd/'integration/'src/'test/'resources/'ammonite/'integration
     val shellAmmoniteResources = cwd/'shell/'src/'main/'resources/'ammonite/'shell
-    //use Symbol to wrap symbols with dashes.
     val emptyPrefdef = shellAmmoniteResources/"empty-predef.scala"
     val exampleBarePredef = shellAmmoniteResources/"example-predef-bare.scala"
 
@@ -34,7 +32,7 @@ object StandaloneTests extends TestSuite{
         executable,
         "--predef-file",
         emptyPrefdef,
-        replStandaloneResources/name,
+        replStandaloneResources / name,
         args
       )
     }

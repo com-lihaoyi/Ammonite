@@ -3,8 +3,10 @@ package ammonite.repl
 import java.security.MessageDigest
 
 import acyclic.file
-import pprint.{PPrinter, PPrint}
+import fansi.Attrs
+import pprint.{PPrint, PPrinter}
 
+import scala.reflect.runtime.universe.TypeTag
 import scala.util.Try
 
 /**
@@ -134,7 +136,7 @@ trait Ref[T] extends StableRef[T]{
 object Ref{
   implicit def refer[T](t: T): Ref[T] = Ref(t)
   implicit def refPPrint[T: PPrint]: PPrinter[Ref[T]] = PPrinter{ (ref, cfg) =>
-    Iterator(cfg.colors.prefixColor, "Ref", cfg.colors.endColor, "(") ++
+    Iterator(cfg.colors.prefixColor("Ref").render, "(") ++
     implicitly[PPrint[T]].pprinter.render(ref(), cfg) ++
     Iterator(")")
   }
@@ -217,6 +219,14 @@ object Timer{
 }
 
 
+trait CodeColors{
+  def ident: fansi.Attrs
+  def `type`: fansi.Attrs
+  def literal: fansi.Attrs
+  def comment: fansi.Attrs
+  def keyword: fansi.Attrs
+}
+
 /**
  * A set of colors used to highlight the miscellanious bits of the REPL.
  * Re-used all over the place in PPrint, TPrint, syntax highlighting,
@@ -255,9 +265,9 @@ object Colors{
     fansi.Color.Yellow
   )
   def BlackWhite = Colors(
-    fansi.Attrs.empty, fansi.Attrs.empty, fansi.Attrs.empty, fansi.Attrs.empty,
-    fansi.Attrs.empty, fansi.Attrs.empty, fansi.Attrs.empty, fansi.Attrs.empty,
-    fansi.Attrs.empty, fansi.Attrs.empty
+    fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty,
+    fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty,
+    fansi.Attrs.Empty, fansi.Attrs.Empty
   )
 }
 
@@ -267,7 +277,11 @@ object Colors{
  */
 case class Bind[T](name: String, value: T)
                   (implicit val typeTag: scala.reflect.runtime.universe.TypeTag[T])
-
+object Bind{
+  implicit def ammoniteReplArrowBinder[T](t: (String, T))(implicit typeTag: TypeTag[T]) = {
+    Bind(t._1, t._2)(typeTag)
+  }
+}
 /**
   * Encapsulates the ways the Ammonite REPL prints things
   *

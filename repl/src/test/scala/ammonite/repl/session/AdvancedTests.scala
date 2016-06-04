@@ -136,9 +136,7 @@ object AdvancedTests extends TestSuite{
         @ implicit def ArrayTPrint[T: TPrint]: TPrint[Array[T]] = TPrint.lambda( c =>
         @   implicitly[TPrint[T]].render(c) +
         @   " " +
-        @   c.colors.literalColor +
-        @   "Array" +
-        @   c.colors.endColor
+        @   c.typeColor("Array").render
         @ )
 
         @ Array(1)
@@ -292,6 +290,11 @@ object AdvancedTests extends TestSuite{
         @ assert(repl.prompt() == "B")
       """)
     }
-
+    'desugar{
+      if (!scala2_10) check.session("""
+        @ desugar{1 + 2 max 3}
+        res0: Desugared = scala.Predef.intWrapper(3).max(3)
+      """)
+    }
   }
 }

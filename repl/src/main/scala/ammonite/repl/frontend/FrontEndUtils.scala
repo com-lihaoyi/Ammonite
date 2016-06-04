@@ -12,10 +12,10 @@ import scala.annotation.tailrec
 object FrontEndUtils {
   def width = ammonite.terminal.TTY.consoleDim("cols")
   def height = ammonite.terminal.TTY.consoleDim("lines")
-  def tabulate(snippetsRaw: Seq[String], width: Int) = {
+  def tabulate(snippetsRaw: Seq[fansi.Str], width: Int): Iterator[String] = {
     val gap = 2
-    val snippets = if (snippetsRaw.isEmpty) Seq("") else snippetsRaw
-    val maxLength = snippets.maxBy(_.replaceAll("\u001B\\[[;\\d]*m", "").length).length + gap
+    val snippets = if (snippetsRaw.isEmpty) Seq(fansi.Str("")) else snippetsRaw
+    val maxLength = snippets.maxBy(_.length).length + gap
     val columns = math.max(1, width / maxLength)
 
     val grouped =
@@ -24,8 +24,10 @@ object FrontEndUtils {
               .toList
 
     ammonite.repl.Util.transpose(grouped).iterator.flatMap{
-      case first :+ last => first.map(_.padTo(width / columns, ' ')) :+ last :+ "\n"
-    }
+      case first :+ last => first.map(
+        x => x ++ " " * (width / columns - x.length)
+      ) :+ last :+ fansi.Str("\n")
+    }.map(_.render)
   }
 
   @tailrec def findPrefix(strings: Seq[String], i: Int = 0): String = {
@@ -44,12 +46,12 @@ object FrontEndUtils {
 
     val detailsText =
       if (details.length == 0) Nil
-      else FrontEndUtils.tabulate(details, FrontEndUtils.width)
+      else FrontEndUtils.tabulate(details.map(fansi.Str(_)), FrontEndUtils.width)
 
 
     val completionText =
       if (completions.length == 0) Nil
-      else FrontEndUtils.tabulate(completions, FrontEndUtils.width)
+      else FrontEndUtils.tabulate(completions.map(fansi.Str(_)), FrontEndUtils.width)
 
     prelude ++ detailsText ++ completionText
   }
