@@ -19,18 +19,6 @@ object BasicTests extends TestSuite{
   println("StandaloneTests")
   val tests = TestSuite {
 
-
-    //we use an empty predef file here to isolate the tests from external forces.
-    def exec(name: RelPath, args: String*) = {
-      %%bash(
-        executable,
-        "--predef-file",
-        emptyPrefdef,
-        replStandaloneResources / name,
-        args
-      )
-    }
-
     'hello{
       val evaled = exec('basic/"Hello.scala")
       assert(evaled.out.trim == "Hello World")

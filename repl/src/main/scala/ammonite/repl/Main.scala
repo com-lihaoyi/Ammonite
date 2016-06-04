@@ -269,9 +269,12 @@ object Main{
         case (Some(path), None) =>
           main.runScript(path, passThroughArgs, kwargs.toMap) match{
             case Res.Failure(exOpt, s) =>
-              sys.error(fansi.Color.Red(s).render)
-            case Res.Exception(ex, s) => throw ex
-            case Res.Success(_) => // do nothing on success, everything's already happened
+              sys.error(s)
+              System.exit(1)
+            case Res.Exception(ex, s) =>
+              throw ex
+            case Res.Success(_) =>
+            // do nothing on success, everything's already happened
           }
 
         case (None, Some(code)) => main.runCode(code)

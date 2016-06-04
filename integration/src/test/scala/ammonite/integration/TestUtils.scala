@@ -1,6 +1,7 @@
 package ammonite.integration
 
 import ammonite.ops._
+import ImplicitWd._
 
 /**
   * Created by haoyi on 6/4/16.
@@ -15,4 +16,15 @@ object TestUtils {
   val shellAmmoniteResources = cwd/'shell/'src/'main/'resources/'ammonite/'shell
   val emptyPrefdef = shellAmmoniteResources/"empty-predef.scala"
   val exampleBarePredef = shellAmmoniteResources/"example-predef-bare.scala"
+
+  //we use an empty predef file here to isolate the tests from external forces.
+  def exec(name: RelPath, args: String*) = {
+    %%bash(
+      executable,
+      "--predef-file",
+      emptyPrefdef,
+      replStandaloneResources / name,
+      args
+      )
+  }
 }
