@@ -131,12 +131,12 @@ object Repl{
                     source: fansi.Attrs) = {
     val cutoff = Set("$main", "evaluatorRunPrinter")
     val traces = Ex.unapplySeq(ex).get.map(exception =>
-      error + exception.toString + "\n" +
+      error(exception.toString + "\n" +
         exception
           .getStackTrace
           .takeWhile(x => !cutoff(x.getMethodName))
           .map(highlightFrame(_, error, highlightError, source))
-          .mkString("\n")
+          .mkString("\n"))
     )
     traces.mkString("\n")
   }

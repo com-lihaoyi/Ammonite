@@ -87,20 +87,23 @@ class Interpreter(prompt0: Ref[String],
 
   }
 
-  def processModule(code: String, fileName: String = "Main.scala") = processScript(
-    skipSheBangLine(code),
-    (code, imports) =>
-      withContextClassloader(
-        eval.processScriptBlock(code, imports, printer, fileName)
-      )
-  )
+  def processModule(code: String, fileName: String = "Main.scala"): Res[Seq[ImportData]] = {
+    processScript(
+      skipSheBangLine(code),
+      (code, imports) =>
+        withContextClassloader(
+          eval.processScriptBlock(code, imports, printer, fileName)
+        )
+    )
+  }
 
 
-  def processExec(code: String) =
+  def processExec(code: String): Res[Seq[ImportData]] = {
     processScript(
       skipSheBangLine(code),
       { (c, i) => evaluateLine(c, Nil, printer, "Main.scala", i) }
     )
+  }
 
 
   private def skipSheBangLine(code: String)= {
@@ -128,10 +131,11 @@ class Interpreter(prompt0: Ref[String],
   }
 
   def processCorrectScript(rawParsedCode: Parsed.Success[Seq[(String, Seq[String])]],
-                           evaluate: EvaluateCallback): Seq[ImportData] = {
+                           evaluate: EvaluateCallback)
+                          : Res[Seq[ImportData]] = {
 
     var offset = 0
-    var parsedCode = mutable.Buffer[(String, Seq[String])]()
+    val parsedCode = mutable.Buffer[(String, Seq[String])]()
 
     // comment holds comments or empty lines above the code which is not caught along with code
     for( (comment, code) <- rawParsedCode.get.value ){
@@ -165,12 +169,12 @@ class Interpreter(prompt0: Ref[String],
       */
     @tailrec def loop(blocks: Seq[Preprocessor.Output],
                       scriptImports: Seq[ImportData],
-                      lastImports: Seq[ImportData]): Seq[ImportData] = {
+                      lastImports: Seq[ImportData]): Res[Seq[ImportData]] = {
       if (blocks.isEmpty) {
         // No more blocks
         // if we have imports to pass to the upper layer we do that
         outerScriptImportCallback(lastImports)
-        lastImports
+        Res.Success(lastImports)
       } else {
         Timer("processScript loop 0")
         // imports from scripts loaded from this script block will end up in this buffer
@@ -184,8 +188,8 @@ class Interpreter(prompt0: Ref[String],
         val ev = evaluate(code, scriptImports)
         Timer("processScript loop 2")
         ev match {
-          case Res.Failure(ex, msg) => throw new CompilationError(msg)
-          case Res.Exception(throwable, msg) => throw throwable
+          case r: Res.Failure => r
+          case r: Res.Exception => r
           case Res.Success(ev) =>
             val last = Frame.mergeImports(ev.imports, nestedScriptImports)
             loop(blocks.tail, Frame.mergeImports(scriptImports, last), last)
@@ -194,10 +198,11 @@ class Interpreter(prompt0: Ref[String],
       }
     }
     try {
-      if (errors.isEmpty) loop(blocks.collect { case Res.Success(o) => o }, Seq(), Seq())
-      else {
+      if (errors.isEmpty) {
+        loop(blocks.collect { case Res.Success(o) => o }, Seq(), Seq())
+      } else {
         printer.error(errors.mkString("\n"))
-        Nil
+        Res.Success(Nil)
       }
 
     } finally {
@@ -206,16 +211,17 @@ class Interpreter(prompt0: Ref[String],
   }
   //common stuff in proccessModule and processExec
   def processScript(code: String,
-                    evaluate: (String, Seq[ImportData]) => Res[Evaluated]): Seq[ImportData] = {
+                    evaluate: (String, Seq[ImportData]) => Res[Evaluated])
+                    : Res[Seq[ImportData]] = {
 
     Timer("processScript 0a")
     Parsers.splitScript(code) match {
       case f: Parsed.Failure =>
         Timer("processScriptFailed 0b")
-        throw new CompilationError(errMsg(f.msg, code, f.extra.traced.expected, f.index))
+        Res.Failure(None, errMsg(f.msg, code, f.extra.traced.expected, f.index))
       case s: Parsed.Success[Seq[(String, Seq[String])]] =>
         Timer("processCorrectScript 0b")
-        processCorrectScript(s,evaluate)
+        processCorrectScript(s, evaluate)
     }
   }
 
@@ -297,12 +303,20 @@ class Interpreter(prompt0: Ref[String],
         evalClassloader.add(jar.toURI.toURL)
       }
 
-      def apply(line: String) = processExec(line)
+      def apply(line: String) = processExec(line) match{
+        case Res.Failure(ex, s) => throw new CompilationError(s)
+        case Res.Exception(t, s) => throw t
+        case _ =>
+      }
 
       def exec(file: Path): Unit = apply(read(file))
 
       def module(file: Path): Unit = {
-        processModule(read(file), file.last)
+        processModule(read(file), file.last) match{
+          case Res.Failure(ex, s) => throw new CompilationError(s)
+          case Res.Exception(t, s) => throw t
+          case _ =>
+        }
         init()
       }
 

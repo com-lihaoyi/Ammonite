@@ -83,38 +83,43 @@ case class Main(predef: String = "",
     * Run a Scala script file! takes the path to the file as well as an array
     * of `args` and a map of keyword `kwargs` to pass to that file.
     */
-  def runScript(path: Path, args: Seq[String], kwargs: Map[String, String]): Unit = {
+  def runScript(path: Path, args: Seq[String], kwargs: Map[String, String]): Res[Seq[ImportData]] = {
 
     val repl = instantiateRepl()
-    val imports = repl.interp.processModule(read(path), path.last)
-    repl.interp.init()
-    imports.find(_.toName == "main").foreach { i =>
-      val quotedArgs =
-        args.map(pprint.PPrinter.escape)
-          .map(s => s"""arg("$s")""")
+    repl.interp.processModule(read(path), path.last) match{
+      case x: Res.Failing => x
+      case Res.Success(imports) =>
+        repl.interp.init()
+        imports.find(_.toName == "main") match {
+          case None => Res.Success(imports)
+          case Some(i) =>
+            val quotedArgs =
+              args.map(pprint.PPrinter.escape)
+                .map(s => s"""arg("$s")""")
 
-      val quotedKwargs =
-        kwargs.mapValues(pprint.PPrinter.escape)
-          .map { case (k, s) => s"""$k=arg("$s")""" }
-      try{
-        repl.interp.replApi.load(
-          s"""|import ammonite.repl.ScriptInit.{arg, callMain, pathRead}
-              |callMain{
-              |  main(${(quotedArgs ++ quotedKwargs).mkString(", ")})
-              |}
-              |""".stripMargin)
-      }catch{
-        case e: ArgParseException =>
-          // For this semi-expected invalid-argument exception, chop off the
-          // irrelevant bits of the stack trace to reveal only the part which
-          // describes how parsing failed
-          e.setStackTrace(Array())
-          e.cause.setStackTrace(e.cause.getStackTrace.takeWhile( frame =>
-            frame.getClassName != "ammonite.repl.ScriptInit$" ||
-            frame.getMethodName != "parseScriptArg"
-          ))
-          throw e
-      }
+            val quotedKwargs =
+              kwargs.mapValues(pprint.PPrinter.escape)
+                .map { case (k, s) => s"""$k=arg("$s")""" }
+            try{
+              repl.interp.processExec(
+                s"""|import ammonite.repl.ScriptInit.{arg, callMain, pathRead}
+                    |callMain{
+                    |  main(${(quotedArgs ++ quotedKwargs).mkString(", ")})
+                    |}
+                    |""".stripMargin).map(_ =>  imports)
+            }catch{
+              case e: ArgParseException =>
+                // For this semi-expected invalid-argument exception, chop off the
+                // irrelevant bits of the stack trace to reveal only the part which
+                // describes how parsing failed
+                e.setStackTrace(Array())
+                e.cause.setStackTrace(e.cause.getStackTrace.takeWhile( frame =>
+                  frame.getClassName != "ammonite.repl.ScriptInit$" ||
+                    frame.getMethodName != "parseScriptArg"
+                ))
+                throw e
+          }
+        }
     }
   }
 
@@ -261,7 +266,14 @@ object Main{
       )
       (fileToExecute, codeToExecute) match{
         case (None, None) => println("Loading..."); main.run()
-        case (Some(path), None) => main.runScript(path, passThroughArgs, kwargs.toMap)
+        case (Some(path), None) =>
+          main.runScript(path, passThroughArgs, kwargs.toMap) match{
+            case Res.Failure(exOpt, s) =>
+              sys.error(fansi.Color.Red(s).render)
+            case Res.Exception(ex, s) => throw ex
+            case Res.Success(_) => // do nothing on success, everything's already happened
+          }
+
         case (None, Some(code)) => main.runCode(code)
       }
     }

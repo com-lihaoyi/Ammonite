@@ -216,6 +216,21 @@ object Evaluator{
     type InvEx = InvocationTargetException
     type InitEx = ExceptionInInitializerError
 
+    val userCodeExceptionHandler: PartialFunction[Throwable, Res.Failing] = {
+      // Exit
+      case Ex(_: InvEx, _: InitEx, ReplExit(value))  =>
+        Res.Exit(value)
+      // Interrupted during pretty-printing
+      case Ex(e: ThreadDeath)                 =>  interrupted(e)
+
+      // Interrupted during evaluation
+      case Ex(_: InvEx, e: ThreadDeath)       =>  interrupted(e)
+
+      case Ex(_: InvEx, _: InitEx, userEx@_*) =>   Res.Exception(userEx(0), "")
+      case Ex(_: InvEx, userEx@_*)            =>   Res.Exception(userEx(0), "")
+      case Ex(userEx@_*)                      =>   Res.Exception(userEx(0), "")
+
+    }
     def processLine(code: String,
                     printCode: String,
                     printer: Printer,
@@ -238,21 +253,7 @@ object Evaluator{
       cls <- loadClass(wrapperName, classFiles)
       _ = Timer("eval.processLine loadClass end")
       _ = currentLine += 1
-      _ <- Catching{
-        // Exit
-        case Ex(_: InvEx, _: InitEx, ReplExit(value))  =>
-          Res.Exit(value)
-        // Interrupted during pretty-printing
-        case Ex(e: ThreadDeath)                 =>  interrupted(e)
-
-        // Interrupted during evaluation
-        case Ex(_: InvEx, e: ThreadDeath)       =>  interrupted(e)
-
-        case Ex(_: InvEx, _: InitEx, userEx@_*) =>   Res.Exception(userEx(0), "")
-        case Ex(_: InvEx, userEx@_*)            =>   Res.Exception(userEx(0), "")
-        case Ex(userEx@_*)                      =>   Res.Exception(userEx(0), "")
-
-      }
+      _ <- Catching{userCodeExceptionHandler}
     } yield {
       // Exhaust the printer iterator now, before exiting the `Catching`
       // block, so any exceptions thrown get properly caught and handled
@@ -316,6 +317,7 @@ object $wrapperName{\n"""
       (wrapperName, cls, newImports) <- cachedCompileBlock(
         code, scriptImports,  printer, fileName
       )
+      _ <- Catching{userCodeExceptionHandler}
     } yield {
       Timer("cachedCompileBlock")
       evalMain(cls)
