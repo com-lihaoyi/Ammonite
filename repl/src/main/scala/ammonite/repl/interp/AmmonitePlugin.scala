@@ -49,14 +49,17 @@ class AmmonitePlugin(g: scala.tools.nsc.Global,
 
 
 object AmmonitePlugin{
+  var count = 0
   def apply(g: Global)
            (unit: g.CompilationUnit,
             output: Seq[ImportData] => Unit,
             topWrapperLen: => Int) = {
 
     import g._
-    pprint.log("AmmonitePlugin Analyzing")
+    count += 1
     pprint.log(unit.source.path)
+//    pprint.log(count)
+//    pprint.log(g.showCode(unit.body))
     def decode(t: g.Tree) = {
       val sym = t.symbol
       (sym.isType, sym.decodedName, sym.decodedName, "")
@@ -103,7 +106,7 @@ object AmmonitePlugin{
           }
         }
         val prefix = rec(expr).reverseMap(x => Parsers.backtickWrap(x.decoded)).mkString(".")
-        pprint.log(prefix)
+
 
         /**
           * A map of each name importable from `expr`, to a `Seq[Boolean]`
@@ -170,7 +173,7 @@ object AmmonitePlugin{
         case Seq(false) => ImportData.Term
         case Seq(_, _) => ImportData.TermType
       }
-      pprint.log(importString)
+
       ImportData(fromName, toName, importString, importType)
     }
 

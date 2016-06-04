@@ -92,10 +92,10 @@ class Interpreter(prompt0: Ref[String],
                     pkgName: String): Res[Seq[ImportData]] = {
     processScript(
       skipSheBangLine(code),
-      (code, imports) =>
+      (code, imports, index) =>
         withContextClassloader(
           eval.processScriptBlock(
-            code, imports, printer, wrapperName, pkgName
+            code, imports, printer, wrapperName + index, pkgName
           )
         )
     )
@@ -105,7 +105,7 @@ class Interpreter(prompt0: Ref[String],
   def processExec(code: String): Res[Seq[ImportData]] = {
     processScript(
       skipSheBangLine(code),
-      { (c, i) => evaluateLine(c, Nil, printer, "Main.scala", i) }
+      { (c, i, index) => evaluateLine(c, Nil, printer, s"Main$index.scala", i) }
     )
   }
 
@@ -121,7 +121,7 @@ class Interpreter(prompt0: Ref[String],
   //this variable keeps track of where should we put the imports resulting from scripts.
   private var scriptImportCallback: Seq[ImportData] => Unit = eval.update
 
-  type EvaluateCallback = (String, Seq[ImportData]) => Res[Evaluated]
+  type EvaluateCallback = (String, Seq[ImportData], Int) => Res[Evaluated]
 
   def errMsg(msg: String, code: String, expected: String, idx: Int): String = {
     val locationString = {
@@ -137,7 +137,6 @@ class Interpreter(prompt0: Ref[String],
   def processCorrectScript(rawParsedCode: Parsed.Success[Seq[(String, Seq[String])]],
                            evaluate: EvaluateCallback)
                           : Res[Seq[ImportData]] = {
-
     var offset = 0
     val parsedCode = mutable.Buffer[(String, Seq[String])]()
 
@@ -173,7 +172,8 @@ class Interpreter(prompt0: Ref[String],
       */
     @tailrec def loop(blocks: Seq[Preprocessor.Output],
                       scriptImports: Seq[ImportData],
-                      lastImports: Seq[ImportData]): Res[Seq[ImportData]] = {
+                      lastImports: Seq[ImportData],
+                      index: Int): Res[Seq[ImportData]] = {
       if (blocks.isEmpty) {
         // No more blocks
         // if we have imports to pass to the upper layer we do that
@@ -189,21 +189,21 @@ class Interpreter(prompt0: Ref[String],
         val Preprocessor.Output(code, _) = blocks.head
 
         Timer("processScript loop 1")
-        val ev = evaluate(code, scriptImports)
+        val ev = evaluate(code, scriptImports, index)
         Timer("processScript loop 2")
         ev match {
           case r: Res.Failure => r
           case r: Res.Exception => r
           case Res.Success(ev) =>
             val last = Frame.mergeImports(ev.imports, nestedScriptImports)
-            loop(blocks.tail, Frame.mergeImports(scriptImports, last), last)
-          case Res.Skip => loop(blocks.tail, scriptImports, lastImports)
+            loop(blocks.tail, Frame.mergeImports(scriptImports, last), last, index + 1)
+          case Res.Skip => loop(blocks.tail, scriptImports, lastImports, index + 1)
         }
       }
     }
     try {
       if (errors.isEmpty) {
-        loop(blocks.collect { case Res.Success(o) => o }, Seq(), Seq())
+        loop(blocks.collect { case Res.Success(o) => o }, Seq(), Seq(), 0)
       } else {
         printer.error(errors.mkString("\n"))
         Res.Success(Nil)
@@ -215,7 +215,7 @@ class Interpreter(prompt0: Ref[String],
   }
   //common stuff in proccessModule and processExec
   def processScript(code: String,
-                    evaluate: (String, Seq[ImportData]) => Res[Evaluated])
+                    evaluate: (String, Seq[ImportData], Int) => Res[Evaluated])
                     : Res[Seq[ImportData]] = {
 
     Timer("processScript 0a")
