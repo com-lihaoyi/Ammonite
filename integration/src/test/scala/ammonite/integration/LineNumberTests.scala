@@ -18,63 +18,70 @@ object LineNumberTests extends TestSuite{
     }
 
     'errorTest - checkErrorMessage(
-      'lineNumbers/"ErrorLineNumberTest.scala",
-      """Syntax Error: ("}" | `case`):5:24 ...")\n  }\n\n  d"
-        |    printlnqs(unsorted))
-        |                       ^""".stripMargin
+      file = 'lineNumbers/"ErrorLineNumberTest.scala",
+      expected =
+        """Syntax Error: ("}" | `case`):5:24 ...")\n  }\n\n  d"
+          |    printlnqs(unsorted))
+          |                       ^""".stripMargin
     )
 
     'multipleCompilationUnitErrorTest1 - checkErrorMessage(
-      'lineNumbers/"MultipleCompilationUnitErrorMsgTest1.scala",
-      """Syntax Error: End:5:1 ..."}"
-        |}
-        |^""".stripMargin
+      file = 'lineNumbers/"MultipleCompilationUnitErrorMsgTest1.scala",
+      expected =
+        """Syntax Error: End:5:1 ..."}"
+          |}
+          |^""".stripMargin
     )
 
 
     'multipleCompilationUnitErrorTest2 - checkErrorMessage(
-      'lineNumbers/"MultipleCompilationUnitErrorMsgTest2.scala",
-      """Syntax Error: End:3:1 ..."}\n@\n1 + 1"
-        |}
-        |^""".stripMargin
+      file = 'lineNumbers/"MultipleCompilationUnitErrorMsgTest2.scala",
+      expected =
+        """Syntax Error: End:3:1 ..."}\n@\n1 + 1"
+          |}
+          |^""".stripMargin
     )
 
     'compilationErrorWithCommentsAtTop - checkErrorMessage(
-      'lineNumbers/"compilationErrorWithCommentsAtTop.scala",
-      """compilationErrorWithCommentsAtTop.scala:11: not found: value quicort
-        |    quicort(unsorted.filter(_ < pivot)):::List(pivot):::""".stripMargin +
+      file = 'lineNumbers/"compilationErrorWithCommentsAtTop.scala",
+      expected =
+        """compilationErrorWithCommentsAtTop.scala:11: not found: value quicort
+          |    quicort(unsorted.filter(_ < pivot)):::List(pivot):::""".stripMargin +
         """quicksort(unsorted.filter(_ > pivot))"""
     )
 
     'compilationErrorInSecondBlock - checkErrorMessage(
-      'lineNumbers/"compilationErrorInSecondBlock.scala",
-      """compilationErrorInSecondBlock.scala:14: not found: value printnl
-        |val res_0 = printnl("OK")
-        |            ^""".stripMargin
+      file = 'lineNumbers/"compilationErrorInSecondBlock.scala",
+      expected =
+        """compilationErrorInSecondBlock.scala:14: not found: value printnl
+          |val res_0 = printnl("OK")
+          |            ^""".stripMargin
     )
 
     'compilationErrorInFourthBlock - checkErrorMessage(
-      'lineNumbers/"compilationErrorInFourthBlock.scala",
-      """compilationErrorInFourthBlock.scala:30: not found: value prinntl
-        |val res = prinntl("Ammonite")
-        |          ^""".stripMargin
+      file = 'lineNumbers/"compilationErrorInFourthBlock.scala",
+      expected =
+        """compilationErrorInFourthBlock.scala:30: not found: value prinntl
+          |val res = prinntl("Ammonite")
+          |          ^""".stripMargin
     )
 
     'compilationErrorInClass - checkErrorMessage(
-      'lineNumbers/"compilationErrorInClass.scala",
-      "compilationErrorInClass.scala:17: value a is not a member of"
+      file = 'lineNumbers/"compilationErrorInClass.scala",
+      expected = "compilationErrorInClass.scala:17: value a is not a member of"
     )
 
     'CompilationErrorLineNumberTest - checkErrorMessage(
-      'lineNumbers/"CompilationErrorLineNumberTest.scala",
-      """CompilationErrorLineNumberTest.scala:7: not found: value noSuchObject
-        |  val x = noSuchObject.badFunction
-        |          ^""".stripMargin
+      file = 'lineNumbers/"CompilationErrorLineNumberTest.scala",
+      expected =
+        """CompilationErrorLineNumberTest.scala:7: not found: value noSuchObject
+          |  val x = noSuchObject.badFunction
+          |          ^""".stripMargin
     )
 
     'RuntimeCompilationErrorLineNumberTest - checkErrorMessage(
-      'lineNumbers/"RuntimeCompilationErrorLineNumberTest.scala",
-      "(RuntimeCompilationErrorLineNumberTest.scala:6)"
+      file = 'lineNumbers/"RuntimeCompilationErrorLineNumberTest.scala",
+      expected = "(RuntimeCompilationErrorLineNumberTest.scala:6)"
     )
   }
 }

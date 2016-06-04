@@ -268,10 +268,13 @@ object Main{
         case (None, None) => println("Loading..."); main.run()
         case (Some(path), None) =>
           main.runScript(path, passThroughArgs, kwargs.toMap) match{
-            case Res.Failure(exOpt, s) =>
-              sys.error(s)
+            case Res.Failure(exOpt, msg) =>
+              Console.err.println(msg)
               System.exit(1)
             case Res.Exception(ex, s) =>
+              val trace = ex.getStackTrace
+              val i = trace.indexWhere(_.getMethodName == "$main") + 1
+              ex.setStackTrace(trace.take(i))
               throw ex
             case Res.Success(_) =>
             // do nothing on success, everything's already happened

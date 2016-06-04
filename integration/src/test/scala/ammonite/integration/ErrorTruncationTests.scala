@@ -13,19 +13,37 @@ import utest._
 object ErrorTruncationTests extends TestSuite{
   override def utestTruncateLength = 60000
   println("StandaloneTests")
+  def checkErrorMessage(file: RelPath, expected: String) = {
+    val e = fansi.Str(intercept[ShelloutException]{ exec(file) }.result.err.string).plainText
+    assert(e == expected)
+  }
   val tests = TestSuite {
 
-    'compileError{
-      val evaled = fansi.Str(
-        exec('errorTruncation/"compileError.scala").err.string
-      ).plainText
-      val expected =
+    'compileError - checkErrorMessage(
+      file = 'errorTruncation/"compileError.scala",
+      expected =
         """compileError.scala:1: not found: value doesntexist
           |val res = doesntexist
           |          ^
+          |Compilation Failed
           |""".stripMargin
+    )
 
-      assert(evaled == expected)
-    }
+    'parseError - checkErrorMessage(
+      file = 'errorTruncation/"parseError.scala",
+      expected =
+        """Syntax Error: End:1:1 ..."}\n"
+          |}
+          |^
+          |""".stripMargin
+    )
+    'runtimeError - checkErrorMessage(
+      file = 'errorTruncation/"runtimeError.scala",
+      expected =
+        """Syntax Error: End:1:1 ..."}\n"
+          |}
+          |^
+          |""".stripMargin
+    )
   }
 }
