@@ -130,9 +130,12 @@ object AmmonitePlugin{
         // of these cases or importing-from-an-existing import, both of which
         // should work without modification
         val headFullPath = symbolList.head.fullName.split('.')
-
+        // prefix package imports with `_root_` to try and stop random
+        // variables from interfering with them. If someone defines a value
+        // called `_root_`, this will still break, but that's their problem
+        val rootPrefix = if(symbolList.head.isPackage) Seq("_root_") else Nil
         val tailPath = nameList.tail.map(x => Parsers.backtickWrap(x.decoded))
-        val prefix = (headFullPath ++ tailPath).mkString(".")
+        val prefix = (rootPrefix ++ headFullPath ++ tailPath).mkString(".")
 
         /**
           * A map of each name importable from `expr`, to a `Seq[Boolean]`
