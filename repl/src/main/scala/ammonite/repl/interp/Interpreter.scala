@@ -86,16 +86,22 @@ class Interpreter(prompt0: Ref[String],
       )
 
   }
-
-  def processModule(code: String,
+  def processModule(code: String, wrapperName: String, pkgName: String) = {
+    processModule0(code, wrapperName, pkgName, predefImports)
+  }
+  def processModule0(code: String,
                     wrapperName: String,
-                    pkgName: String): Res[Seq[ImportData]] = {
+                    pkgName: String,
+                    startingImports: Seq[ImportData]): Res[Seq[ImportData]] = {
     processScript(
       skipSheBangLine(code),
-      (code, imports, index) =>
+      startingImports,
+      (code, imports, wrapperIndex) =>
         withContextClassloader(
           eval.processScriptBlock(
-            code, imports, printer, wrapperName + (if (index == 0) "" else index), pkgName
+            code, imports, printer,
+            wrapperName + (if (wrapperIndex == 1) "" else wrapperIndex),
+            wrapperName + ".scala", pkgName
           )
         )
     )
@@ -105,7 +111,8 @@ class Interpreter(prompt0: Ref[String],
   def processExec(code: String): Res[Seq[ImportData]] = {
     processScript(
       skipSheBangLine(code),
-      { (c, i, index) => evaluateLine(c, Nil, printer, s"Main$index.scala", i) }
+      predefImports,
+      { (c, i, wrapperIndex) => evaluateLine(c, Nil, printer, s"Main$wrapperIndex.scala", i) }
     )
   }
 
@@ -135,6 +142,7 @@ class Interpreter(prompt0: Ref[String],
   }
 
   def processCorrectScript(rawParsedCode: Parsed.Success[Seq[(String, Seq[String])]],
+                           startingImports: Seq[ImportData],
                            evaluate: EvaluateCallback)
                           : Res[Seq[ImportData]] = {
     var offset = 0
@@ -149,8 +157,8 @@ class Interpreter(prompt0: Ref[String],
       parsedCode.append((ncomment, code))
     }
 
-    val parsedHardcodedPredef  = Parsers.splitScript(hardcodedPredef + "\n" + predef).get.value
-    val blocks0 = parsedHardcodedPredef ++ parsedCode
+
+    val blocks0 = parsedCode
 
     val blocks = for{
       (comment, code) <- blocks0
@@ -173,7 +181,7 @@ class Interpreter(prompt0: Ref[String],
     @tailrec def loop(blocks: Seq[Preprocessor.Output],
                       scriptImports: Seq[ImportData],
                       lastImports: Seq[ImportData],
-                      index: Int): Res[Seq[ImportData]] = {
+                      wrapperIndex: Int): Res[Seq[ImportData]] = {
       if (blocks.isEmpty) {
         // No more blocks
         // if we have imports to pass to the upper layer we do that
@@ -182,28 +190,40 @@ class Interpreter(prompt0: Ref[String],
       } else {
         Timer("processScript loop 0")
         // imports from scripts loaded from this script block will end up in this buffer
-        val nestedScriptImports = mutable.Buffer.empty[ImportData]
-        scriptImportCallback = { imports => nestedScriptImports ++= imports }
+        var nestedScriptImports = Seq.empty[ImportData]
+        scriptImportCallback = { imports =>
+          nestedScriptImports = Frame.mergeImports(nestedScriptImports, imports)
+        }
         // pretty printing results is disabled for scripts
 
         val Preprocessor.Output(code, _) = blocks.head
 
         Timer("processScript loop 1")
-        val ev = evaluate(code, scriptImports, index)
+        val ev = evaluate(
+          code,
+          Frame.mergeImports(startingImports, scriptImports),
+          wrapperIndex
+        )
         Timer("processScript loop 2")
         ev match {
           case r: Res.Failure => r
           case r: Res.Exception => r
           case Res.Success(ev) =>
             val last = Frame.mergeImports(ev.imports, nestedScriptImports)
-            loop(blocks.tail, Frame.mergeImports(scriptImports, last), last, index + 1)
-          case Res.Skip => loop(blocks.tail, scriptImports, lastImports, index + 1)
+            loop(blocks.tail, Frame.mergeImports(scriptImports, last), last, wrapperIndex + 1)
+          case Res.Skip => loop(blocks.tail, scriptImports, lastImports, wrapperIndex + 1)
         }
       }
     }
     try {
       if (errors.isEmpty) {
-        loop(blocks.collect { case Res.Success(o) => o }, Seq(), Seq(), 0)
+        loop(
+          blocks.collect { case Res.Success(o) => o },
+          Seq(), Seq(),
+          // starts off as 1, so that consecutive wrappers can be named
+          // Wrapper, Wrapper2, Wrapper3, Wrapper4, ...
+          wrapperIndex = 1
+        )
       } else {
         printer.error(errors.mkString("\n"))
         Res.Success(Nil)
@@ -215,6 +235,7 @@ class Interpreter(prompt0: Ref[String],
   }
   //common stuff in proccessModule and processExec
   def processScript(code: String,
+                    startingImports: Seq[ImportData],
                     evaluate: (String, Seq[ImportData], Int) => Res[Evaluated])
                     : Res[Seq[ImportData]] = {
 
@@ -225,7 +246,7 @@ class Interpreter(prompt0: Ref[String],
         Res.Failure(None, errMsg(f.msg, code, f.extra.traced.expected, f.index))
       case s: Parsed.Success[Seq[(String, Seq[String])]] =>
         Timer("processCorrectScript 0b")
-        processCorrectScript(s, evaluate)
+        processCorrectScript(s, startingImports, evaluate)
     }
   }
 
@@ -475,17 +496,19 @@ class Interpreter(prompt0: Ref[String],
             }
             .mkString("\n")
 
-  processModule(
-    hardcodedPredef + "\n" + predef,
-    "HardcodedPredef",
-    "ammonite.predef"
+  val predefs = Seq(
+    (hardcodedPredef, "HardcodedPredef", "ammonite.predef"),
+    (predef, "Predef", "ammonite.predef"),
+    (storage.loadPredef, "LoadedPredef", "ammonite.predef"),
+    (argString, "ArgsPredef", "ammonite.predef")
   )
-  init()
-  val res = processModule(
-    storage.loadPredef + "\n" + argString,
-    "LoadedPredef",
-    "ammonite.predef"
-  )
+
+  val predefImports = predefs.foldLeft(Seq.empty[ImportData]){
+    case (prevImports, (sourceCode, wrapperName, pkgName)) =>
+      processModule0(sourceCode, wrapperName, pkgName, prevImports) match{
+        case Res.Success(imports) => Frame.mergeImports(prevImports, imports)
+      }
+  }
 
   eval.sess.save()
   Timer("Interpreter init predef 0")

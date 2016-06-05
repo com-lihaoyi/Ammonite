@@ -285,13 +285,13 @@ object ScriptTests extends TestSuite{
         )
 
         'blocks{
-          val cases = Seq("OneBlock.scala" -> 5, "TwoBlocks.scala" -> 6, "ThreeBlocks.scala" -> 7)
+          val cases = Seq("OneBlock.scala" -> 2, "TwoBlocks.scala" -> 3, "ThreeBlocks.scala" -> 4)
           for((fileName, expected) <- cases){
             val storage = Storage.InMemory()
             val interp = createTestInterp(storage)
             val n0 = storage.compileCache.size
 
-            assert(n0 == 3) // Predef + hardcodedPredef
+            assert(n0 == 1) // Predef + hardcodedPredef
             interp.replApi.load.module(scriptPath/fileName)
 
             val n = storage.compileCache.size
@@ -310,7 +310,7 @@ object ScriptTests extends TestSuite{
           interp2.replApi.load.module(scriptPath/"OneBlock.scala")
           val n1 = interp1.eval.compilationCount
           val n2 = interp2.eval.compilationCount
-          assert(n1 == 5) // hardcodedPredef + predef + first init
+          assert(n1 == 2) // hardcodedPredef + loadedPredef
           assert(n2 == 0) // all three should be cached
         }
         'tags{
@@ -321,7 +321,7 @@ object ScriptTests extends TestSuite{
           interp.replApi.load.ivy("com.lihaoyi" %% "scalatags" % "0.4.5")
           interp.replApi.load.module(scriptPath/"TagBase.scala")
           val n = storage.compileCache.size
-          assert(n == 9) // predef + two blocks for each loading
+          assert(n == 5) // predef + two blocks for initial load
         }
         'encapsulation{
           check.session(s"""

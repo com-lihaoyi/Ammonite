@@ -13,7 +13,7 @@ object Frame{
     * Figure out which imports will get stomped over by future imports
     * before they get used, and just ignore those.
     */
-  def mergeImports(importss: Seq[ImportData]*) = {
+  def mergeImports(importss: Seq[ImportData]*): Seq[ImportData] = {
     // We iterate over the combined reversed imports, keeping track of the
     // things that will-be-stomped-over-in-the-non-reversed-world in a map.
     // If an import's target destination will get stomped over we ignore it
