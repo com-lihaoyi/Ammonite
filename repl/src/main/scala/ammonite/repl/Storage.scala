@@ -95,7 +95,9 @@ object Storage{
       if(!exists(tagCacheDir)) None
       else for{
         metadataJson <- Try{read(tagCacheDir/metadataFile)}.toOption
-        (loadedTag, metadata) <- Try{upickle.default.read[(String, Seq[ImportData])](metadataJson)}.toOption
+        (loadedTag, metadata) <- Try{
+          upickle.default.read[(String, Seq[ImportData])](metadataJson)
+        }.toOption
         if tag == loadedTag
         classFiles <- loadClassFiles(tagCacheDir)
       } yield {

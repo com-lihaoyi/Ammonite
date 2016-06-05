@@ -95,7 +95,7 @@ class Interpreter(prompt0: Ref[String],
       (code, imports, index) =>
         withContextClassloader(
           eval.processScriptBlock(
-            code, imports, printer, wrapperName + index, pkgName
+            code, imports, printer, wrapperName + (if (index == 0) "" else index), pkgName
           )
         )
     )
