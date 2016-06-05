@@ -41,3 +41,9 @@ The distribution of responsibilities is
 
   Provides the nice external-API and CLI in a separate place from all the 
   messy `Repl` internals
+  
+  
+This is the ideal layering that we want to achieve. It's likely that the 
+current implementation does not entirely line up with this, and there is code
+living in places it shouldn't, but over time we should try to move it to this
+layering.
