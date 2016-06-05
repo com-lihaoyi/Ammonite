@@ -147,7 +147,6 @@ object Evaluator{
                      fileName: String): Res[(ClassFiles, Seq[ImportData])] = for {
       compiled <- Res.Success{
         val c = compile(code._1.getBytes, printer, code._2, fileName)
-//        pprint.log(c)
         c
       }
       _ = _compilationCount += 1
@@ -155,13 +154,11 @@ object Evaluator{
         compiled,
         "Compilation Failed"
       )
-//      _ = pprint.log(imports)
     } yield (classfiles, imports)
 
     def loadClass(fullName: String, classFiles: ClassFiles): Res[Class[_]] = {
       Res[Class[_]](Try {
         for ((name, bytes) <- classFiles) {
-//          println("loadClass " + name)
           sess.frames.head.classloader.newFileDict(name) = bytes
         }
         val res = Class.forName(fullName , true, sess.frames.head.classloader)
@@ -177,7 +174,6 @@ object Evaluator{
 
     def importBlock(importData: Seq[ImportData]) = {
       Timer("importBlock 0")
-//      pprint.log(importData)
       // Group the remaining imports into sliding groups according to their
       // prefix, while still maintaining their ordering
       val grouped = mutable.Buffer[mutable.Buffer[ImportData]]()
@@ -197,7 +193,6 @@ object Evaluator{
           else grouped.last.append(data)
         }
       }
-//      pprint.log(grouped)
       // Stringify everything
       val out = for(group <- grouped) yield {
         val printedGroup = for(item <- group) yield{
@@ -243,7 +238,6 @@ object Evaluator{
                    ) = for {
       wrapperName <- Res.Success("cmd" + getCurrentLine)
       _ <- Catching{ case e: ThreadDeath => interrupted(e) }
-//      _ = pprint.log(this.imports)
       (classFiles, newImports) <- compileClass(
         wrapCode(
           None,
@@ -304,11 +298,9 @@ object $wrapperName{\n"""
       Timer("cachedCompileBlock 2")
       val compiled = cacheLoad(pkgName + "." + wrapperName) match {
         case Some((classFiles, newImports)) if false =>
-//          pprint.log("cacheLoad Some")
           addToCompilerClasspath(classFiles)
           Res.Success((classFiles, newImports))
         case _ =>
-//          pprint.log("cacheLoad None")
           val noneCalc = for {
             (classFiles, newImports) <- compileClass(
               wrappedCode, printer, wrapperName + ".scala"
@@ -319,11 +311,9 @@ object $wrapperName{\n"""
           noneCalc
       }
       Timer("cachedCompileBlock 3")
-//      pprint.log(compiled)
       val x = for {
         (classFiles, newImports) <- compiled
         _ = Timer("cachedCompileBlock 4")
-//        _ = pprint.log(newImports)
         cls <- loadClass(pkgName + "." + wrapperName, classFiles)
       } yield (cls, newImports)
 
@@ -343,7 +333,7 @@ object $wrapperName{\n"""
       Timer("cachedCompileBlock")
       evalMain(cls)
       Timer("evalMain")
-      val res = evaluationResult(wrapperName, newImports)
+      val res = evaluationResult(pkgName + "." + wrapperName, newImports)
       Timer("evaluationResult")
       res
     }

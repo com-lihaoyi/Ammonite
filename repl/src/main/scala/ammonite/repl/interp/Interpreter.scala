@@ -316,13 +316,11 @@ class Interpreter(prompt0: Ref[String],
       def exec(file: Path): Unit = apply(read(file))
 
       def module(file: Path): Unit = {
-//        pprint.log(file)
         val (pkg, wrapper) = Util.pathToPackageWrapper(file)
-//        pprint.log((pkg, wrapper))
         processModule(read(file), wrapper, pkg) match{
           case Res.Failure(ex, s) => throw new CompilationError(s)
           case Res.Exception(t, s) => throw t
-          case _ =>
+          case x => //println(x)
         }
         init()
       }
@@ -482,7 +480,6 @@ class Interpreter(prompt0: Ref[String],
     "HardcodedPredef",
     "ammonite.predef"
   )
-//  pprint.log(pred)
   init()
   processModule(
     storage.loadPredef + "\n" + argString,

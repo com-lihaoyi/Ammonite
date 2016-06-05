@@ -127,7 +127,6 @@ class SpecialClassLoader(parent: ClassLoader, parentHash: Array[Byte])
     "ammonite.repl.frontend.ReplBridge$"
   )
   override def findClass(name: String): Class[_] = {
-    pprint.log(name)
     def loadedFromBytes =
       for(bytes <- newFileDict.get(name))
         yield defineClass(name, bytes, 0, bytes.length)

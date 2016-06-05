@@ -2,9 +2,12 @@ package ammonite.repl
 package interp
 
 
+import java.io.OutputStream
+
 import acyclic.file
 import ammonite.repl.ImportData
 import ammonite.repl.Util.ClassFiles
+
 import scala.collection.mutable
 import scala.reflect.internal.util.Position
 import scala.reflect.io
@@ -14,7 +17,6 @@ import scala.tools.nsc.{Global, Settings}
 import scala.tools.nsc.backend.JavaPlatform
 import scala.tools.nsc.interactive.Response
 import scala.tools.nsc.plugins.Plugin
-
 import scala.tools.nsc.reporters.AbstractReporter
 import scala.tools.nsc.util.ClassPath.JavaContext
 import scala.tools.nsc.util._
@@ -116,6 +118,7 @@ object Compiler{
     }
 
     settings.outputDirs.setSingleOutput(vd)
+
     settings.nowarnings.value = true
     val reporter = new AbstractReporter {
       def displayPrompt(): Unit = ???
@@ -259,6 +262,21 @@ object Compiler{
                 importsLen0: Int,
                 fileName: String): Output = {
 
+      def enumerateVdFiles(d: VirtualDirectory): Iterator[AbstractFile] = {
+        val (subs, files) = d.iterator.partition(_.isDirectory)
+        files ++ subs.map(_.asInstanceOf[VirtualDirectory]).flatMap(enumerateVdFiles)
+      }
+
+      def writeDeep(d: VirtualDirectory, path: List[String]): OutputStream = path match {
+        case head :: Nil => d.fileNamed(path.head).output
+        case head :: rest =>
+          writeDeep(
+            d.subdirectoryNamed(head).asInstanceOf[VirtualDirectory],
+            rest
+          )
+      }
+
+
       compiler.reporter.reset()
       this.errorLogger = printer.error
       this.warningLogger = printer.warning
@@ -267,20 +285,21 @@ object Compiler{
       this.importsLen = importsLen0
       val run = new compiler.Run()
       vd.clear()
+
       run.compileFiles(List(singleFile))
+
       if (reporter.hasErrors) None
       else Some{
         shutdownPressy()
 
-        def rec(d: VirtualDirectory): Iterator[AbstractFile] = {
-          val (subs, files) = d.iterator.partition(_.isDirectory)
-          files ++ subs.map(_.asInstanceOf[VirtualDirectory]).flatMap(rec)
-        }
+
         val files = for{
-          x <- rec(vd).toVector
+          x <- enumerateVdFiles(vd).toVector
           if x.name.endsWith(".class")
         } yield {
-          val output = dynamicClasspath.fileNamed(x.name).output
+
+          val segments = x.path.split("/").toList.tail
+          val output = writeDeep(dynamicClasspath, segments)
           output.write(x.toByteArray)
           output.close()
           (x.path.stripPrefix("(memory)/").stripSuffix(".class").replace('/', '.'), x.toByteArray)

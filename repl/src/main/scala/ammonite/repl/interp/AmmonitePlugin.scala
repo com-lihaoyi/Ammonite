@@ -57,9 +57,6 @@ object AmmonitePlugin{
 
     import g._
     count += 1
-    pprint.log(unit.source.path)
-//    pprint.log(count)
-//    pprint.log(g.showCode(unit.body))
     def decode(t: g.Tree) = {
       val sym = t.symbol
       (sym.isType, sym.decodedName, sym.decodedName, "")
