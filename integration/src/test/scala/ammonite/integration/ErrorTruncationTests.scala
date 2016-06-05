@@ -44,8 +44,8 @@ object ErrorTruncationTests extends TestSuite{
       file = 'errorTruncation/"runtimeError.scala",
       expected =
         s"""Exception in thread "main" java.lang.ArithmeticException: / by zero
-          |${tab}at $runtimeErrorResourcePackage.runtimeError$.<init>(runtimeError.scala:1)
-          |${tab}at $runtimeErrorResourcePackage.runtimeError$.<clinit>(runtimeError.scala)
+          |${tab}at $runtimeErrorResourcePackage.runtimeError$$.<init>(runtimeError.scala:1)
+          |${tab}at $runtimeErrorResourcePackage.runtimeError$$.<clinit>(runtimeError.scala)
           |${tab}at $runtimeErrorResourcePackage.runtimeError.$$main(runtimeError.scala)
           |""".stripMargin
     )

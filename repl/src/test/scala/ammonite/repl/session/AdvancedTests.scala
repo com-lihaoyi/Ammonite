@@ -4,14 +4,13 @@ import ammonite.repl.TestUtils._
 import ammonite.repl.{TestRepl, Res}
 import utest._
 
-import scala.collection.{immutable => imm}
 
 object AdvancedTests extends TestSuite{
   val tests = TestSuite{
     println("AdvancedTests")
     val check = new TestRepl()
     'pprint{
-      check.session("""
+      check.session(s"""
         @ Seq.fill(10)(Seq.fill(3)("Foo"))
         res0: Seq[Seq[String]] = List(
           List("Foo", "Foo", "Foo"),
@@ -30,14 +29,14 @@ object AdvancedTests extends TestSuite{
         defined class Foo
 
         @ Foo(1, "", Nil)
-        res2: Foo = Foo(1, "", List())
+        res2: ${sessionPrefix}Foo = Foo(1, "", List())
 
         @ Foo(
         @   1234567,
         @   "I am a cow, hear me moo",
         @   Seq("I weigh twice as much as you", "and I look good on the barbecue")
         @ )
-        res3: Foo = Foo(
+        res3: ${sessionPrefix}Foo = Foo(
           1234567,
           "I am a cow, hear me moo",
           List("I weigh twice as much as you", "and I look good on the barbecue")

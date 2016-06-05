@@ -304,7 +304,7 @@ object ScriptTests extends TestSuite{
           val tempDir = ammonite.ops.Path(
             java.nio.file.Files.createTempDirectory("ammonite-tester-x")
           )
-          println(tempDir)
+
           val interp1 = createTestInterp(Storage.Folder(tempDir))
           val interp2 = createTestInterp(Storage.Folder(tempDir))
           interp1.replApi.load.module(scriptPath/"OneBlock.scala")
