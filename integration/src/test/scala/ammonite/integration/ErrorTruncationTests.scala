@@ -37,14 +37,17 @@ object ErrorTruncationTests extends TestSuite{
           |^
           |""".stripMargin
     )
+    val tab = '\t'
+    val runtimeErrorResourcePackage =
+      "ammonite.scripts.integration.src.test.resources.ammonite.integration.errortruncation"
     'runtimeError - checkErrorMessage(
       file = 'errorTruncation/"runtimeError.scala",
       expected =
-        """Exception in thread "main" java.lang.ArithmeticException: / by zero
-          |\tat ammonite.scripts.integration.src.test.resources.ammonite.integration.errortruncation.runtimeError$.<init>(runtimeError.scala:1)
-          |\tat ammonite.scripts.integration.src.test.resources.ammonite.integration.errortruncation.runtimeError$.<clinit>(runtimeError.scala)
-          |\tat ammonite.scripts.integration.src.test.resources.ammonite.integration.errortruncation.runtimeError.$main(runtimeError.scala)
-          |""".stripMargin.replace("\\t", "\t")
+        s"""Exception in thread "main" java.lang.ArithmeticException: / by zero
+          |${tab}at $runtimeErrorResourcePackage.runtimeError$.<init>(runtimeError.scala:1)
+          |${tab}at $runtimeErrorResourcePackage.runtimeError$.<clinit>(runtimeError.scala)
+          |${tab}at $runtimeErrorResourcePackage.runtimeError.$$main(runtimeError.scala)
+          |""".stripMargin
     )
   }
 }
