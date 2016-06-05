@@ -187,7 +187,7 @@ object Util{
 
   def pathToPackageWrapper(path: Path) = {
     val pkg = (path/up).segments.map(scala.reflect.NameTransformer.encode).mkString(".").toLowerCase
-    val wrapper = path.last.take(path.last.lastIndexOf('.'))
+    val wrapper = scala.reflect.NameTransformer.encode(path.last.take(path.last.lastIndexOf('.')))
     (pkg, wrapper)
   }
   def md5Hash(data: Iterator[Array[Byte]]) = {
