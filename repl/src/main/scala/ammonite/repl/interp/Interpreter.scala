@@ -486,7 +486,7 @@ class Interpreter(prompt0: Ref[String],
     "LoadedPredef",
     "ammonite.predef"
   )
-  pprint.log(res)
+
   eval.sess.save()
   Timer("Interpreter init predef 0")
   init()

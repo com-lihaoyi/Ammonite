@@ -1,2 +1,5 @@
-println("Hello World")
-val wxyz = 1
+object Foo{
+  val x = new String("lololol")
+}
+import scala.reflect.runtime
+import runtime.universe

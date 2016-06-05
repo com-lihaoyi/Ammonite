@@ -293,11 +293,11 @@ object Compiler{
       this.importsLen = importsLen0
       val run = new compiler.Run()
       vd.clear()
-      pprint.log(enumerateVdFiles(dynamicClasspath).toVector)
+
       run.compileFiles(List(singleFile))
 
       val outputFiles = enumerateVdFiles(vd).toVector
-      pprint.log(outputFiles)
+
       if (reporter.hasErrors) None
       else Some{
         shutdownPressy()
@@ -310,17 +310,14 @@ object Compiler{
           (x.path.stripPrefix("(memory)/").stripSuffix(".class").replace('/', '.'), x.toByteArray)
         }
 
-        pprint.log(enumerateVdFiles(dynamicClasspath).toVector)
         val imports = lastImports.toList
         val res = (files, imports)
-        val names = files.map(_._1)
         res
       }
     }
 
     def addToClasspath(classFiles: Traversable[(String, Array[Byte])]): Unit = {
       val names = classFiles.map(_._1)
-      pprint.log(names)
       for((name, bytes) <- classFiles){
         val output = writeDeep(dynamicClasspath, name.split('.').toList, ".class")
         output.write(bytes)

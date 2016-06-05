@@ -102,15 +102,37 @@ object AmmonitePlugin{
       // `import` statements for which we make use of the typechecker to
       // resolve the imported names
       case (ctx, t @ g.Import(expr, selectors)) =>
-        def rec(expr: g.Tree): List[g.Name] = {
+
+        def rec(expr: g.Tree): List[(g.Name, g.Symbol)] = {
           expr match {
-            case g.Select(lhs, name) => name :: rec(lhs)
-            case g.Ident(name) => List(name)
-            case g.This(pkg) => List(pkg)
+            case s @ g.Select(lhs, name) => (name -> s.symbol) :: rec(lhs)
+            case i @ g.Ident(name) => List(name -> i.symbol)
+            case t @ g.This(pkg) => List(pkg -> t.symbol)
           }
         }
-        val prefix = rec(expr).reverseMap(x => Parsers.backtickWrap(x.decoded)).mkString(".")
+        val (nameList, symbolList) = rec(expr).reverse.unzip
 
+        // Note: we need to take the symbol on the left-most name and get it's
+        // `.fullName`. Otherwise if we're in
+        //
+        // ```
+        // package foo.bar.baz
+        // object Wrapper{val x = ...; import x._}
+        // ```
+        //
+        // The import will get treated as from `Wrapper.x`, but the person
+        // running that import will not be in package `foo.bar.baz` and will
+        // not be able to find `Wrapper`! Thus we need to get the full name.
+        // In cases where the left-most name is a top-level package,
+        // `.fullName` is basically a no-op and it works as intended.
+        //
+        // Apart from this, all other imports should resolve either to one
+        // of these cases or importing-from-an-existing import, both of which
+        // should work without modification
+        val headFullPath = symbolList.head.fullName.split('.')
+
+        val tailPath = nameList.tail.map(x => Parsers.backtickWrap(x.decoded))
+        val prefix = (headFullPath ++ tailPath).mkString(".")
 
         /**
           * A map of each name importable from `expr`, to a `Seq[Boolean]`
