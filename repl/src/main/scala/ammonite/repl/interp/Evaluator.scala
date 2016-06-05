@@ -307,7 +307,6 @@ object $indexedWrapperName{\n"""
           addToCompilerClasspath(classFiles)
           Res.Success((classFiles, newImports))
         case _ =>
-
           val noneCalc = for {
             (classFiles, newImports) <- compileClass(
               wrappedCode, printer, fileName
@@ -352,12 +351,27 @@ object $indexedWrapperName{\n"""
     }
 
     def evaluationResult(wrapperName: String,
-                         imports: Seq[ImportData]) = {
+                         imports: Seq[ImportData])(implicit l: sourcecode.Line, f: sourcecode.File) = {
+      println(f.value + ":" + l.value)
       Evaluated(
         wrapperName,
-        imports.map(id => id.copy(
-          prefix = if (id.prefix == "") wrapperName else id.prefix
-        ))
+        for(id <- imports) yield {
+          val filledPrefix =
+            if (id.prefix == "") {
+              // For some reason, for things not-in-packages you can't access
+              // them off of `_root_`
+              wrapperName
+            } else {
+              id.prefix
+            }
+          val rootedPrefix =
+            if (filledPrefix.contains('.') && !filledPrefix.startsWith("_root_.")) {
+              "_root_." + filledPrefix
+            } else {
+              filledPrefix
+            }
+          id.copy(prefix = rootedPrefix)
+        }
       )
     }
   }

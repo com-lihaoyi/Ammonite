@@ -507,6 +507,14 @@ class Interpreter(prompt0: Ref[String],
     case (prevImports, (sourceCode, wrapperName, pkgName)) =>
       processModule0(sourceCode, wrapperName, pkgName, prevImports) match{
         case Res.Success(imports) => Frame.mergeImports(prevImports, imports)
+        case Res.Failure(ex, msg) =>
+          ex match{
+            case Some(e) => throw new RuntimeException("Error during Predef: " + msg, e)
+            case None => throw new RuntimeException("Error during Predef: " + msg)
+          }
+
+        case Res.Exception(ex, msg) =>
+          throw new RuntimeException("Error during Predef: " + msg, ex)
       }
   }
 

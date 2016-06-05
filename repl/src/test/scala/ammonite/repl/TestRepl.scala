@@ -29,7 +29,7 @@ class TestRepl {
     errorBuffer.append(_),
     infoBuffer.append(_)
   )
-  val interp = new Interpreter(
+  val interp = try new Interpreter(
     Ref[String](""),
     Ref(null),
     80,
@@ -40,7 +40,13 @@ class TestRepl {
     new History(Vector()),
     predef = ammonite.repl.Main.defaultPredefString + "\n" + predef,
     replArgs = Seq()
-  )
+  ) catch{ case e =>
+    println(infoBuffer.mkString)
+    println(outBuffer.mkString)
+    println(warningBuffer.mkString)
+    println(errorBuffer.mkString)
+    throw e
+  }
 
   def session(sess: String): Unit = {
     // Remove the margin from the block and break
@@ -87,7 +93,18 @@ class TestRepl {
         assert(info.contains(strippedExpected))
 
       }else if (expected == "") {
-        assert(processed.isInstanceOf[Res.Success[_]] || processed.isInstanceOf[Res.Skip.type])
+        processed match{
+          case Res.Success(_) => // do nothing
+          case Res.Skip => // do nothing
+          case _: Res.Failing =>
+            assert{
+              identity(error)
+              identity(warning)
+              identity(out)
+              identity(info)
+              false
+            }
+        }
 
       }else {
         processed match {
