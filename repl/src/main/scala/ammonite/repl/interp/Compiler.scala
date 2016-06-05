@@ -254,6 +254,19 @@ object Compiler{
       }
       found
     }
+
+
+    def writeDeep(d: VirtualDirectory,
+                  path: List[String],
+                  suffix: String): OutputStream = path match {
+      case head :: Nil => d.fileNamed(path.head + suffix).output
+      case head :: rest =>
+        writeDeep(
+          d.subdirectoryNamed(head).asInstanceOf[VirtualDirectory],
+          rest, suffix
+        )
+    }
+
     /**
      * Compiles a blob of bytes and spits of a list of classfiles
       * importsLen0 is the length of topWrapper appended above code by wrappedCode function
@@ -270,14 +283,6 @@ object Compiler{
         files ++ subs.map(_.asInstanceOf[VirtualDirectory]).flatMap(enumerateVdFiles)
       }
 
-      def writeDeep(d: VirtualDirectory, path: List[String]): OutputStream = path match {
-        case head :: Nil => d.fileNamed(path.head).output
-        case head :: rest =>
-          writeDeep(
-            d.subdirectoryNamed(head).asInstanceOf[VirtualDirectory],
-            rest
-          )
-      }
 
 
       compiler.reporter.reset()
@@ -288,22 +293,24 @@ object Compiler{
       this.importsLen = importsLen0
       val run = new compiler.Run()
       vd.clear()
-
+      pprint.log(enumerateVdFiles(dynamicClasspath).toVector)
       run.compileFiles(List(singleFile))
 
       val outputFiles = enumerateVdFiles(vd).toVector
-
+      pprint.log(outputFiles)
       if (reporter.hasErrors) None
       else Some{
         shutdownPressy()
 
         val files = for(x <- outputFiles if x.name.endsWith(".class")) yield {
           val segments = x.path.split("/").toList.tail
-          val output = writeDeep(dynamicClasspath, segments)
+          val output = writeDeep(dynamicClasspath, segments, "")
           output.write(x.toByteArray)
           output.close()
           (x.path.stripPrefix("(memory)/").stripSuffix(".class").replace('/', '.'), x.toByteArray)
         }
+
+        pprint.log(enumerateVdFiles(dynamicClasspath).toVector)
         val imports = lastImports.toList
         val res = (files, imports)
         val names = files.map(_._1)
@@ -312,8 +319,10 @@ object Compiler{
     }
 
     def addToClasspath(classFiles: Traversable[(String, Array[Byte])]): Unit = {
+      val names = classFiles.map(_._1)
+      pprint.log(names)
       for((name, bytes) <- classFiles){
-        val output = dynamicClasspath.fileNamed(s"$name.class").output
+        val output = writeDeep(dynamicClasspath, name.split('.').toList, ".class")
         output.write(bytes)
         output.close()
       }

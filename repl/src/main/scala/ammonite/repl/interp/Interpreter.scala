@@ -481,11 +481,12 @@ class Interpreter(prompt0: Ref[String],
     "ammonite.predef"
   )
   init()
-  processModule(
+  val res = processModule(
     storage.loadPredef + "\n" + argString,
     "LoadedPredef",
     "ammonite.predef"
   )
+  pprint.log(res)
   eval.sess.save()
   Timer("Interpreter init predef 0")
   init()

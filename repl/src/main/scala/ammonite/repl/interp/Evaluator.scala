@@ -161,7 +161,9 @@ object Evaluator{
         for ((name, bytes) <- classFiles) {
           sess.frames.head.classloader.newFileDict(name) = bytes
         }
-        val res = Class.forName(fullName , true, sess.frames.head.classloader)
+        val names = classFiles.map(_._1)
+        pprint.log(names)
+        val res = Class.forName(fullName, true, sess.frames.head.classloader)
         res
       }, e => "Failed to load compiled class " + e)
     }
