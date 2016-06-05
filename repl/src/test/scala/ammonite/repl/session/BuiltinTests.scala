@@ -122,7 +122,7 @@ object BuiltinTests extends TestSuite{
         @ compiler.settings.debug.value = true
 
         @ 1 + 1
-        info: [running phase parser on Main.scala]
+        info: running phase parser on
       """)
     }
 

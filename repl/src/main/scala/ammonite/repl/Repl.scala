@@ -51,6 +51,7 @@ class Repl(input: InputStream,
 
   Timer("Repl init interpreter")
   val reader = new InputStreamReader(input)
+
   def action() = for{
     (code, stmts) <- frontEnd().action(
       input,
@@ -66,12 +67,13 @@ class Repl(input: InputStream,
       }
     )
     _ <- Signaller("INT") { interp.mainThread.stop() }
-    out <- interp.processLine(code, stmts)
+    out <- interp.processLine(code, stmts, s"cmd${interp.eval.getCurrentLine}.scala")
   } yield {
     Timer("interp.processLine end")
     printStream.println()
     out
   }
+
 
   def ammoniteVersion = ammonite.Constants.version
   def scalaVersion = scala.util.Properties.versionNumberString

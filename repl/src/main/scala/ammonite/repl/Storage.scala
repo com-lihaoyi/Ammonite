@@ -20,8 +20,8 @@ trait Storage{
   def loadPredef: String
   val fullHistory: StableRef[History]
   val ivyCache: StableRef[IvyMap]
-  def compileCacheSave(tag: String, data: CompileCache): Unit
-  def compileCacheLoad(tag: String): Option[CompileCache]
+  def compileCacheSave(path: String, tag: String, data: CompileCache): Unit
+  def compileCacheLoad(path: String, tag: String): Option[CompileCache]
 }
 
 object Storage{
@@ -41,9 +41,16 @@ object Storage{
       def update(value: IvyMap): Unit = _ivyCache = value
     }
 
-    var compileCache: mutable.Map[String,CompileCache] = mutable.Map.empty
-    def compileCacheSave(tag: String, data: CompileCache): Unit = compileCache(tag) = data
-    def compileCacheLoad(tag: String) = compileCache.get(tag)
+    var compileCache: mutable.Map[String, (String, CompileCache)] = mutable.Map.empty
+    def compileCacheSave(path: String, tag: String, data: CompileCache): Unit = {
+      compileCache(path) = (tag, data)
+    }
+    def compileCacheLoad(path: String, tag: String) = {
+      for {
+        (loadedTag, data) <- compileCache.get(path)
+        if loadedTag == tag
+      } yield data
+    }
   }
 
 
@@ -70,12 +77,12 @@ object Storage{
       }
     }
 
-    def compileCacheSave(tag: String, data: CompileCache): Unit = {
+    def compileCacheSave(path: String, tag: String, data: CompileCache): Unit = {
       val (classFiles, imports) = data
-      val tagCacheDir = compileCacheDir/tag
+      val tagCacheDir = compileCacheDir/path
       if(!exists(tagCacheDir)){
         mkdir(tagCacheDir)
-        val metadata = upickle.default.write(imports, indent = 4)
+        val metadata = upickle.default.write((tag, imports), indent = 4)
         write(tagCacheDir/metadataFile, metadata)
         classFiles.foreach{ case (name, bytes) =>
           write(tagCacheDir/s"$name.class", bytes)
@@ -83,12 +90,13 @@ object Storage{
       }
     }
 
-    def compileCacheLoad(tag: String): Option[CompileCache] = {
-      val tagCacheDir = compileCacheDir/tag
+    def compileCacheLoad(path: String, tag: String): Option[CompileCache] = {
+      val tagCacheDir = compileCacheDir/path
       if(!exists(tagCacheDir)) None
       else for{
         metadataJson <- Try{read(tagCacheDir/metadataFile)}.toOption
-        metadata <- Try{upickle.default.read[Seq[ImportData]](metadataJson)}.toOption
+        (loadedTag, metadata) <- Try{upickle.default.read[(String, Seq[ImportData])](metadataJson)}.toOption
+        if tag == loadedTag
         classFiles <- loadClassFiles(tagCacheDir)
       } yield {
         (classFiles, metadata)

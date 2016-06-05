@@ -60,8 +60,8 @@ object Evaluator{
   def apply(currentClassloader: ClassLoader,
             compile: => (Array[Byte], Printer, Int, String) => Compiler.Output,
             startingLine: Int,
-            cacheLoad: String => Option[CompileCache],
-            cacheSave: (String, CompileCache) => Unit,
+            cacheLoad: (String, String) => Option[CompileCache],
+            cacheSave: (String, String, CompileCache) => Unit,
             addToCompilerClasspath:  => ClassFiles => Unit): Evaluator = new Evaluator{ eval =>
 
     /**
@@ -295,17 +295,19 @@ object $wrapperName{\n"""
       val wrappedCode = wrapCode(
         Some(pkgName), wrapperName, code, printCode, imports
       )
+      val tag = cacheTag(code, imports, sess.frames.head.classloader.classpathHash)
       Timer("cachedCompileBlock 2")
-      val compiled = cacheLoad(pkgName + "." + wrapperName) match {
-        case Some((classFiles, newImports)) if false =>
+      val compiled = cacheLoad(pkgName + "." + wrapperName, tag) match {
+        case Some((classFiles, newImports)) =>
           addToCompilerClasspath(classFiles)
           Res.Success((classFiles, newImports))
         case _ =>
+
           val noneCalc = for {
             (classFiles, newImports) <- compileClass(
               wrappedCode, printer, wrapperName + ".scala"
             )
-            _ = cacheSave(pkgName + "." + wrapperName, (classFiles, newImports))
+            _ = cacheSave(pkgName + "." + wrapperName, tag, (classFiles, newImports))
           } yield (classFiles, newImports)
 
           noneCalc

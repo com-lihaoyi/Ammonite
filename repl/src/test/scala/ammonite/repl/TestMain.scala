@@ -7,8 +7,8 @@ object TestMain{
     System.setProperty("ammonite-sbt-build", "true")
     Main(
       storageBackend = new Storage.Folder(cwd/'target/'tempAmmoniteHome){
-        override def compileCacheSave(tag: String, data: CompileCache) = ()
-        override def compileCacheLoad(tag: String) = None
+        override def compileCacheSave(path: String, tag: String, data: CompileCache) = ()
+        override def compileCacheLoad(path: String, tag: String) = None
       }
     ).run()
   }

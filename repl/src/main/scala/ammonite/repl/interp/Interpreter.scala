@@ -44,7 +44,7 @@ class Interpreter(prompt0: Ref[String],
 
   def processLine(code: String,
                   stmts: Seq[String],
-                  fileName: String = "Main.scala") = {
+                  fileName: String) = {
     for{
       _ <- Catching { case ex =>
         Res.Exception(ex, "Something unexpected went wrong =(")

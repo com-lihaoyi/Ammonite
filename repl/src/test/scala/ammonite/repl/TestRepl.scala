@@ -50,7 +50,7 @@ class TestRepl {
 
     val steps = sess.replace("\n" + margin, "\n").replaceAll(" *\n", "\n").split("\n\n")
 
-    for(step <- steps){
+    for((step, index) <- steps.zipWithIndex){
       // Break the step into the command lines, starting with @,
       // and the result lines
       val (cmdLines, resultLines) =
@@ -71,7 +71,7 @@ class TestRepl {
       val expected = resultLines.mkString("\n").trim
       allOutput += commandText.map("\n@ " + _).mkString("\n")
 
-      val (processed, out, warning, error, info) = run(commandText.mkString("\n"))
+      val (processed, out, warning, error, info) = run(commandText.mkString("\n"), index)
       interp.handleOutput(processed)
 
       if (expected.startsWith("error: ")) {
@@ -127,7 +127,7 @@ class TestRepl {
 
 
 
-  def run(input: String) = {
+  def run(input: String, index: Int) = {
 
     outBuffer.clear()
     warningBuffer.clear()
@@ -135,7 +135,8 @@ class TestRepl {
     infoBuffer.clear()
     val processed = interp.processLine(
       input,
-      Parsers.split(input).get.get.value
+      Parsers.split(input).get.get.value,
+      s"Main$index.scala"
     )
     processed match{
       case Res.Failure(ex, s) => printer.error(s)
@@ -159,7 +160,7 @@ class TestRepl {
 
   def fail(input: String,
            failureCheck: String => Boolean = _ => true) = {
-    val (processed, out, warning, error, info) = run(input)
+    val (processed, out, warning, error, info) = run(input, 0)
 
     processed match{
       case Res.Success(v) => assert({identity(v); identity(allOutput); false})
@@ -174,8 +175,9 @@ class TestRepl {
     }
   }
 
+
   def result(input: String, expected: Res[Evaluated]) = {
-    val (processed, allOut, warning, error, info) = run(input)
+    val (processed, allOut, warning, error, info) = run(input, 0)
     assert(processed == expected)
   }
   def failLoudly[T](t: => T) =

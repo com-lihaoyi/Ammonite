@@ -28,7 +28,10 @@ class AmmonitePlugin(g: scala.tools.nsc.Global,
 
       def newPhase(prev: Phase): Phase = new g.GlobalPhase(prev) {
         def name = phaseName
-        def apply(unit: g.CompilationUnit): Unit = AmmonitePlugin(g)(unit, output, topWrapperLen)
+        def apply(unit: g.CompilationUnit): Unit = {
+          val things = global.currentRun.units.map(_.source.path).toList
+          AmmonitePlugin(g)(unit, output, topWrapperLen)
+        }
       }
     },
 
@@ -40,8 +43,12 @@ class AmmonitePlugin(g: scala.tools.nsc.Global,
       val phaseName = "FixLineNumbers"
 
       def newPhase(prev: Phase): Phase = new g.GlobalPhase(prev) {
+
         def name = phaseName
-        def apply(unit: g.CompilationUnit): Unit = LineNumberModifier(g)(unit, topWrapperLen)
+        def apply(unit: g.CompilationUnit): Unit = {
+          val things = global.currentRun.units.map(_.source.path).toList
+          LineNumberModifier(g)(unit, topWrapperLen)
+        }
       }
     }
   )

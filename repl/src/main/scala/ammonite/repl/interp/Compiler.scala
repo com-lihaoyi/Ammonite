@@ -162,6 +162,9 @@ object Compiler{
         elem = scala.xml.XML.load(url.openStream())
         name = (elem \\ "plugin" \ "name").text
         className = (elem \\ "plugin" \ "classname").text
+        // Hardcode exclusion of "com.lihaoyi" %% "acyclic", since that's
+        // pretty useless and can cause problems conflicting with other plugins
+        if className != "acyclic.plugin.RuntimePlugin"
         if name.nonEmpty && className.nonEmpty
         classOpt =
           try Some(loader.loadClass(className))
@@ -288,16 +291,13 @@ object Compiler{
 
       run.compileFiles(List(singleFile))
 
+      val outputFiles = enumerateVdFiles(vd).toVector
+
       if (reporter.hasErrors) None
       else Some{
         shutdownPressy()
 
-
-        val files = for{
-          x <- enumerateVdFiles(vd).toVector
-          if x.name.endsWith(".class")
-        } yield {
-
+        val files = for(x <- outputFiles if x.name.endsWith(".class")) yield {
           val segments = x.path.split("/").toList.tail
           val output = writeDeep(dynamicClasspath, segments)
           output.write(x.toByteArray)
