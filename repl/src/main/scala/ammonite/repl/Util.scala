@@ -185,8 +185,14 @@ object Ex{
 
 object Util{
 
-  def pathToPackageWrapper(path: Path) = {
-    val pkg = (path/up).segments.map(scala.reflect.NameTransformer.encode).mkString(".").toLowerCase
+  def pathToPackageWrapper(path: Path, wd: Path) = {
+    val pkg = {
+      val base = Seq("ammonite", "scripts")
+      val relPath = (path/up).relativeTo(wd)
+      val ups = Seq.fill(relPath.ups)("$up")
+      val rest = relPath.segments
+      (base ++ ups ++ rest).map(scala.reflect.NameTransformer.encode).mkString(".").toLowerCase
+    }
     val wrapper = scala.reflect.NameTransformer.encode(path.last.take(path.last.lastIndexOf('.')))
     (pkg, wrapper)
   }

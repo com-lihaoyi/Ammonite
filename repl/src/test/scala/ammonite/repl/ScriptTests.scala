@@ -281,6 +281,7 @@ object ScriptTests extends TestSuite{
           storage = storage,
           new History(Vector()),
           predef = "",
+          wd = ammonite.ops.cwd,
           replArgs = Seq()
         )
 

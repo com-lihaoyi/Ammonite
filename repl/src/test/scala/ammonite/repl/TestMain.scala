@@ -6,7 +6,6 @@ object TestMain{
   def main(args: Array[String]): Unit = {
     System.setProperty("ammonite-sbt-build", "true")
     Main(
-      defaultPredef = false,
       storageBackend = new Storage.Folder(cwd/'target/'tempAmmoniteHome)
     ).run()
   }

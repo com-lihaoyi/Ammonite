@@ -11,7 +11,8 @@ class Repl(input: InputStream,
            output: OutputStream,
            error: OutputStream,
            storage: Storage,
-           predef: String = "",
+           predef: String,
+           wd: ammonite.ops.Path,
            replArgs: Seq[Bind[_]] = Nil) {
 
   val prompt = Ref("@ ")
@@ -46,6 +47,7 @@ class Repl(input: InputStream,
     storage,
     history,
     predef,
+    wd,
     replArgs
   )
 

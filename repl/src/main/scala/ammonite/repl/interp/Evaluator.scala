@@ -242,7 +242,7 @@ object Evaluator{
       _ <- Catching{ case e: ThreadDeath => interrupted(e) }
       (classFiles, newImports) <- compileClass(
         wrapCode(
-          None,
+          "ammonite.session",
           wrapperName,
           code,
           printCode,
@@ -252,7 +252,7 @@ object Evaluator{
         fileName
       )
       _ = Timer("eval.processLine compileClass end")
-      cls <- loadClass(wrapperName, classFiles)
+      cls <- loadClass("ammonite.session." + wrapperName, classFiles)
       _ = Timer("eval.processLine loadClass end")
       _ = currentLine += 1
       _ <- Catching{userCodeExceptionHandler}
@@ -264,16 +264,16 @@ object Evaluator{
       Timer("eval.processLine evaluatorRunPrinter 1")
       evaluatorRunPrinter(iter.foreach(printer.out))
       Timer("eval.processLine evaluatorRunPrinter end")
-      evaluationResult(wrapperName, newImports)
+      evaluationResult("ammonite.session." + wrapperName, newImports)
     }
 
-    def wrapCode(pkgName: Option[String],
+    def wrapCode(pkgName: String,
                  indexedWrapperName: String,
                  code: String,
                  printCode: String,
                  imports: Seq[ImportData]) = {
       val topWrapper = s"""
-${pkgName.fold("")("package " + _)}
+package $pkgName
 ${importBlock(imports)}
 
 object $indexedWrapperName{\n"""
@@ -297,7 +297,7 @@ object $indexedWrapperName{\n"""
       Timer("cachedCompileBlock 1")
 
       val wrappedCode = wrapCode(
-        Some(pkgName), wrapperName, code, printCode, imports
+        pkgName, wrapperName, code, printCode, imports
       )
       val fullyQualifiedName = pkgName + "." + wrapperName
       val tag = cacheTag(code, imports, sess.frames.head.classloader.classpathHash)
@@ -351,8 +351,7 @@ object $indexedWrapperName{\n"""
     }
 
     def evaluationResult(wrapperName: String,
-                         imports: Seq[ImportData])(implicit l: sourcecode.Line, f: sourcecode.File) = {
-      println(f.value + ":" + l.value)
+                         imports: Seq[ImportData]) = {
       Evaluated(
         wrapperName,
         for(id <- imports) yield {
@@ -365,11 +364,9 @@ object $indexedWrapperName{\n"""
               id.prefix
             }
           val rootedPrefix =
-            if (filledPrefix.contains('.') && !filledPrefix.startsWith("_root_.")) {
-              "_root_." + filledPrefix
-            } else {
-              filledPrefix
-            }
+            if (filledPrefix.startsWith("_root_.")) filledPrefix
+            else "_root_." + filledPrefix
+
           id.copy(prefix = rootedPrefix)
         }
       )

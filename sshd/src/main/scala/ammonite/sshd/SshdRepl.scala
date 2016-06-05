@@ -22,9 +22,10 @@ import scala.language.postfixOps
 class SshdRepl(sshConfig: SshServerConfig,
                predef: String = "",
                defaultPredef: Boolean = true,
+               wd: Path = ammonite.ops.cwd,
                replArgs: Seq[Bind[_]] = Nil) {
   private lazy val sshd = SshServer(sshConfig, shellServer =
-    SshdRepl.runRepl(sshConfig.ammoniteHome, predef, defaultPredef, replArgs))
+    SshdRepl.runRepl(sshConfig.ammoniteHome, predef, defaultPredef, wd, replArgs))
 
   def port = sshd.getPort
   def start(): Unit = sshd.start()
@@ -40,6 +41,7 @@ object SshdRepl {
   private def runRepl(homePath: Path,
                       predef: String,
                       defaultPredef: Boolean,
+                      wd: Path,
                       replArgs: Seq[Bind[_]])
                      (in: InputStream, out: OutputStream): Unit = {
     // since sshd server has it's own customised environment,
@@ -53,7 +55,7 @@ object SshdRepl {
           defaultPredef,
           ammonite.repl.Main.defaultPredefString
         )
-        new Repl(in, out, out, Storage.Folder(homePath), augmentedPredef, replArgs).run()
+        new Repl(in, out, out, Storage.Folder(homePath), augmentedPredef, wd, replArgs).run()
       } catch {
         case any: Throwable =>
           val sshClientOutput = new PrintStream(out)

@@ -40,10 +40,11 @@ object ErrorTruncationTests extends TestSuite{
     'runtimeError - checkErrorMessage(
       file = 'errorTruncation/"runtimeError.scala",
       expected =
-        """Syntax Error: End:1:1 ..."}\n"
-          |}
-          |^
-          |""".stripMargin
+        """Exception in thread "main" java.lang.ArithmeticException: / by zero
+          |\tat ammonite.scripts.integration.src.test.resources.ammonite.integration.errortruncation.runtimeError$.<init>(runtimeError.scala:1)
+          |\tat ammonite.scripts.integration.src.test.resources.ammonite.integration.errortruncation.runtimeError$.<clinit>(runtimeError.scala)
+          |\tat ammonite.scripts.integration.src.test.resources.ammonite.integration.errortruncation.runtimeError.$main(runtimeError.scala)
+          |""".stripMargin.replace("\\t", "\t")
     )
   }
 }

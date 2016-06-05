@@ -39,6 +39,7 @@ class TestRepl {
     storage = Storage.Folder(tempDir),
     new History(Vector()),
     predef = ammonite.repl.Main.defaultPredefString + "\n" + predef,
+    wd = ammonite.ops.cwd,
     replArgs = Seq()
   ) catch{ case e =>
     println(infoBuffer.mkString)

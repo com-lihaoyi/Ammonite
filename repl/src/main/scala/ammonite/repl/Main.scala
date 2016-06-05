@@ -37,10 +37,14 @@ import reflect.macros.Context
   *                       compilation/ivy caches, etc.. Defaults include
   *                       [[Storage.Folder]] and [[Storage.InMemory]], though
   *                       you can create your own.
+  * @param wd The working directory of the REPL; when it load scripts, where
+  *           the scripts will be considered relative to when assigning them
+  *           packages
   */
 case class Main(predef: String = "",
                 defaultPredef: Boolean = true,
                 storageBackend: Storage = Storage.InMemory(),
+                wd: Path = ammonite.ops.cwd,
                 inputStream: InputStream = System.in,
                 outputStream: OutputStream = System.out,
                 errorStream: OutputStream = System.err){
@@ -52,7 +56,8 @@ case class Main(predef: String = "",
     new Repl(
       inputStream, outputStream, errorStream,
       storage = storageBackend,
-      predef = augmentedPredef + "\n" + predef
+      predef = augmentedPredef + "\n" + predef,
+      wd = wd
     )
   }
   def run() = {
@@ -73,6 +78,7 @@ case class Main(predef: String = "",
       System.in, System.out, System.err,
       storage = storageBackend,
       predef = Main.defaultPredefString,
+      wd = wd,
       replArgs
     )
 
@@ -88,7 +94,7 @@ case class Main(predef: String = "",
                 kwargs: Map[String, String]): Res[Seq[ImportData]] = {
 
     val repl = instantiateRepl()
-    val (pkg, wrapper) = Util.pathToPackageWrapper(path)
+    val (pkg, wrapper) = Util.pathToPackageWrapper(path, wd)
     repl.interp.processModule(read(path), wrapper, pkg) match{
       case x: Res.Failing => x
       case Res.Success(imports) =>

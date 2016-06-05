@@ -30,6 +30,7 @@ class Interpreter(prompt0: Ref[String],
                   storage: Storage,
                   history: => History,
                   predef: String,
+                  wd: Path,
                   replArgs: Seq[Bind[_]]){ interp =>
 
 
@@ -337,7 +338,7 @@ class Interpreter(prompt0: Ref[String],
       def exec(file: Path): Unit = apply(read(file))
 
       def module(file: Path): Unit = {
-        val (pkg, wrapper) = Util.pathToPackageWrapper(file)
+        val (pkg, wrapper) = Util.pathToPackageWrapper(file, wd)
         processModule(read(file), wrapper, pkg) match{
           case Res.Failure(ex, s) => throw new CompilationError(s)
           case Res.Exception(t, s) => throw t
