@@ -42,7 +42,7 @@
       Although it's best to read the documentation on this page to learn how to use these projects, the Scaladoc is still useful as a reference.
   
   @sect{Changelog}
-    @sect{master}
+    @sect{0.6.0}
       @ul
         @li
           Made @sect.ref{browse} use the process current working directory if there's no implicit path in scope, since most times it doesn't matter
