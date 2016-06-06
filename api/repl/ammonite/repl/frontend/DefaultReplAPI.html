@@ -112,7 +112,24 @@
 
         <div id="values" class="values members">
               <h3>Abstract Value Members</h3>
-              <ol><li name="ammonite.repl.frontend.ReplAPI#colors" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+              <ol><li name="ammonite.repl.frontend.ReplAPI#codeColors" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="codeColors:ammonite.repl.CodeColors"></a>
+      <a id="codeColors:CodeColors"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit abstract </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">codeColors</span><span class="result">: <a href="../CodeColors.html" class="extype" name="ammonite.repl.CodeColors">CodeColors</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.repl.frontend.DefaultReplAPI@codeColors:ammonite.repl.CodeColors" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ReplAPI.html" class="extype" name="ammonite.repl.frontend.ReplAPI">ReplAPI</a></dd></dl></div>
+    </li><li name="ammonite.repl.frontend.ReplAPI#colors" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
       <a id="colors:ammonite.repl.Ref[ammonite.repl.Colors]"></a>
       <a id="colors:Ref[Colors]"></a>
       <h4 class="signature">
@@ -319,7 +336,7 @@ when a Ctrl-C interrupt happened) via <code>lastException.printStackTrace</code>
         <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">pprintConfig</span><span class="result">: <a href="../Ref.html" class="extype" name="ammonite.repl.Ref">Ref</a>[<span class="extype" name="pprint.Config">Config</span>]</span>
+        <span class="name">pprintConfig</span><span class="result">: <a href="../Ref.html" class="extype" name="ammonite.repl.Ref">Ref</a>[<a href="https://oss.sonatype.org/service/local/repositories/releases/archive/com/lihaoyi/pprint_2.11/0.4.1/pprint_2.11-0.4.1-javadoc.jar/!/index.html#pprint.Config" class="extype" target="_top">Config</a>]</span>
       </span>
       </h4><span class="permalink">
       <a href="../../../index.html#ammonite.repl.frontend.DefaultReplAPI@pprintConfig:ammonite.repl.Ref[pprint.Config]" title="Permalink" target="_top">
@@ -366,7 +383,7 @@ REPL prompt at any time!
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ReplAPI.html" class="extype" name="ammonite.repl.frontend.ReplAPI">ReplAPI</a></dd></dl></div>
     </li><li name="ammonite.repl.frontend.ReplAPI#resolvers" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="resolvers:ammonite.repl.Ref[List[ammonite.repl.Resolver]]"></a>
+      <a id="resolvers:ammonite.repl.Ref[List[ammonite.repl.tools.Resolver]]"></a>
       <a id="resolvers:Ref[List[Resolver]]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -374,10 +391,10 @@ REPL prompt at any time!
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">resolvers</span><span class="result">: <a href="../Ref.html" class="extype" name="ammonite.repl.Ref">Ref</a>[<a href="../../../scala/package.html#List[+A]=List[A]" class="extmbr" name="scala.List">List</a>[<a href="../Resolver.html" class="extype" name="ammonite.repl.Resolver">Resolver</a>]]</span>
+        <span class="name">resolvers</span><span class="result">: <a href="../Ref.html" class="extype" name="ammonite.repl.Ref">Ref</a>[<a href="../../../scala/package.html#List[+A]=List[A]" class="extmbr" name="scala.List">List</a>[<a href="../tools/Resolver.html" class="extype" name="ammonite.repl.tools.Resolver">Resolver</a>]]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.frontend.DefaultReplAPI@resolvers:ammonite.repl.Ref[List[ammonite.repl.Resolver]]" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.frontend.DefaultReplAPI@resolvers:ammonite.repl.Ref[List[ammonite.repl.tools.Resolver]]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -421,7 +438,7 @@ on them if you really want them to go away.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">show</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="t">t: <span class="extype" name="ammonite.repl.frontend.ReplAPI.show.T">T</span></span>, <span name="width">width: <span class="extype" name="java.lang.Integer">Integer</span> = <span class="symbol">0</span></span>, <span name="height">height: <span class="extype" name="java.lang.Integer">Integer</span> = <span class="symbol">null</span></span>, <span name="indent">indent: <span class="extype" name="java.lang.Integer">Integer</span> = <span class="symbol">null</span></span>, <span name="colors">colors: <a href="https://oss.sonatype.org/service/local/repositories/releases/archive/com/lihaoyi/pprint_2.11/0.4.0/pprint_2.11-0.4.0-javadoc.jar/!/index.html#pprint.Colors" class="extype" target="_top">pprint.Colors</a> = <span class="symbol">null</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="https://oss.sonatype.org/service/local/repositories/releases/archive/com/lihaoyi/pprint_2.11/0.4.0/pprint_2.11-0.4.0-javadoc.jar/!/index.html#pprint.PPrint" class="extype" target="_top">PPrint</a>[<span class="extype" name="ammonite.repl.frontend.ReplAPI.show.T">T</span>]</span>, <span name="cfg">cfg: <span class="extype" name="pprint.Config">Config</span> = <span class="symbol">Config.Defaults.PPrintConfig</span></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
+        <span class="name">show</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="t">t: <span class="extype" name="ammonite.repl.frontend.ReplAPI.show.T">T</span></span>, <span name="width">width: <span class="extype" name="java.lang.Integer">Integer</span> = <span class="symbol">0</span></span>, <span name="height">height: <span class="extype" name="java.lang.Integer">Integer</span> = <span class="symbol">null</span></span>, <span name="indent">indent: <span class="extype" name="java.lang.Integer">Integer</span> = <span class="symbol">null</span></span>, <span name="colors">colors: <a href="https://oss.sonatype.org/service/local/repositories/releases/archive/com/lihaoyi/pprint_2.11/0.4.1/pprint_2.11-0.4.1-javadoc.jar/!/index.html#pprint.Colors" class="extype" target="_top">pprint.Colors</a> = <span class="symbol">null</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="https://oss.sonatype.org/service/local/repositories/releases/archive/com/lihaoyi/pprint_2.11/0.4.1/pprint_2.11-0.4.1-javadoc.jar/!/index.html#pprint.PPrint" class="extype" target="_top">PPrint</a>[<span class="extype" name="ammonite.repl.frontend.ReplAPI.show.T">T</span>]</span>, <span name="cfg">cfg: <a href="https://oss.sonatype.org/service/local/repositories/releases/archive/com/lihaoyi/pprint_2.11/0.4.1/pprint_2.11-0.4.1-javadoc.jar/!/index.html#pprint.Config" class="extype" target="_top">Config</a> = <span class="symbol">Config.Defaults.PPrintConfig</span></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
       </span>
       </h4><span class="permalink">
       <a href="../../../index.html#ammonite.repl.frontend.DefaultReplAPI@show[T](t:T,width:Integer,height:Integer,indent:Integer,colors:pprint.Colors)(implicitevidence$4:pprint.PPrint[T],implicitcfg:pprint.Config):Unit" title="Permalink" target="_top">
@@ -438,7 +455,7 @@ on them if you really want them to go away.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">show</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="https://oss.sonatype.org/service/local/repositories/releases/archive/com/lihaoyi/pprint_2.11/0.4.0/pprint_2.11-0.4.0-javadoc.jar/!/index.html#pprint.PPrint" class="extype" target="_top">PPrint</a>[<span class="extype" name="ammonite.repl.frontend.ReplAPI.show.T">T</span>]</span>, <span name="cfg">cfg: <span class="extype" name="pprint.Config">Config</span></span>)</span><span class="result">: (<span class="extype" name="ammonite.repl.frontend.ReplAPI.show.T">T</span>) ⇒ <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
+        <span class="name">show</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="https://oss.sonatype.org/service/local/repositories/releases/archive/com/lihaoyi/pprint_2.11/0.4.1/pprint_2.11-0.4.1-javadoc.jar/!/index.html#pprint.PPrint" class="extype" target="_top">PPrint</a>[<span class="extype" name="ammonite.repl.frontend.ReplAPI.show.T">T</span>]</span>, <span name="cfg">cfg: <a href="https://oss.sonatype.org/service/local/repositories/releases/archive/com/lihaoyi/pprint_2.11/0.4.1/pprint_2.11-0.4.1-javadoc.jar/!/index.html#pprint.Config" class="extype" target="_top">Config</a></span>)</span><span class="result">: (<span class="extype" name="ammonite.repl.frontend.ReplAPI.show.T">T</span>) ⇒ <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
       </span>
       </h4><span class="permalink">
       <a href="../../../index.html#ammonite.repl.frontend.DefaultReplAPI@show[T](implicitevidence$3:pprint.PPrint[T],implicitcfg:pprint.Config):T=&gt;Unit" title="Permalink" target="_top">
@@ -449,6 +466,23 @@ on them if you really want them to go away.
 disables truncation and prints the entire thing, but you can set other
 parameters as well if you want.
 </p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ReplAPI.html" class="extype" name="ammonite.repl.frontend.ReplAPI">ReplAPI</a></dd></dl></div>
+    </li><li name="ammonite.repl.frontend.ReplAPI#tprintColors" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="tprintColors:pprint.TPrintColors"></a>
+      <a id="tprintColors:TPrintColors"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit abstract </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">tprintColors</span><span class="result">: <a href="https://oss.sonatype.org/service/local/repositories/releases/archive/com/lihaoyi/pprint_2.11/0.4.1/pprint_2.11-0.4.1-javadoc.jar/!/index.html#pprint.TPrintColors" class="extype" target="_top">TPrintColors</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.repl.frontend.DefaultReplAPI@tprintColors:pprint.TPrintColors" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ReplAPI.html" class="extype" name="ammonite.repl.frontend.ReplAPI">ReplAPI</a></dd></dl></div>
     </li><li name="ammonite.repl.frontend.ReplAPI#width" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
       <a id="width:Int"></a>
       <a id="width:Int"></a>
@@ -590,7 +624,7 @@ parameters as well if you want.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">derefPPrint</span><span class="params">(<span class="implicit">implicit </span><span name="t">t: <a href="../Ref.html" class="extype" name="ammonite.repl.Ref">Ref</a>[<span class="extype" name="pprint.Config">Config</span>]</span>)</span><span class="result">: <span class="extype" name="pprint.Config">Config</span></span>
+        <span class="name">derefPPrint</span><span class="params">(<span class="implicit">implicit </span><span name="t">t: <a href="../Ref.html" class="extype" name="ammonite.repl.Ref">Ref</a>[<a href="https://oss.sonatype.org/service/local/repositories/releases/archive/com/lihaoyi/pprint_2.11/0.4.1/pprint_2.11-0.4.1-javadoc.jar/!/index.html#pprint.Config" class="extype" target="_top">Config</a>]</span>)</span><span class="result">: <a href="https://oss.sonatype.org/service/local/repositories/releases/archive/com/lihaoyi/pprint_2.11/0.4.1/pprint_2.11-0.4.1-javadoc.jar/!/index.html#pprint.Config" class="extype" target="_top">Config</a></span>
       </span>
       </h4><span class="permalink">
       <a href="../../../index.html#ammonite.repl.frontend.DefaultReplAPI@derefPPrint(implicitt:ammonite.repl.Ref[pprint.Config]):pprint.Config" title="Permalink" target="_top">

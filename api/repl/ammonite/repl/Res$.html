@@ -155,7 +155,7 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a href="Res$$Failure.html"><span class="name">Failure</span></a><span class="params">(<span name="ex">ex: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Option" class="extype" target="_top">Option</a>[<a href="../../scala/package.html#Throwable=Throwable" class="extmbr" name="scala.Throwable">Throwable</a>]</span>, <span name="s">s: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <a href="Res$$Failing.html" class="extype" name="ammonite.repl.Res.Failing">Failing</a> with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+        <a href="Res$$Failure.html"><span class="name">Failure</span></a><span class="params">(<span name="ex">ex: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Option" class="extype" target="_top">Option</a>[<a href="../../scala/package.html#Throwable=Throwable" class="extmbr" name="scala.Throwable">Throwable</a>]</span>, <span name="msg">msg: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <a href="Res$$Failing.html" class="extype" name="ammonite.repl.Res.Failing">Failing</a> with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.repl.Res$@FailureextendsRes.FailingwithProductwithSerializable" title="Permalink" target="_top">
@@ -165,7 +165,8 @@
       <p class="shortcomment cmt">A known failure occured, maybe caused by an exception
 (e.g.</p><div class="fullcomment"><div class="comment cmt"><p>A known failure occured, maybe caused by an exception
 (e.g. <code>ThreadDeath</code>) and maybe not (e.g. compile error)
-</p></div></div>
+</p></div><dl class="paramcmts block"><dt class="param">ex</dt><dd class="cmt"><p>is any exception that caused this known failure; currently
+          only used for the &quot;Interrupted!&quot; failures caused by Ctrl-C</p></dd><dt class="param">msg</dt><dd class="cmt"><p>the message we want to display on screen due to this failure</p></dd></dl></div>
     </li><li name="ammonite.repl.Res.Success" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="Success[+T]extendsRes[T]withProductwithSerializable"></a>
       <a id="Success[+T]:Success[T]"></a>

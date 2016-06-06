@@ -45,13 +45,14 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">Failure</span><span class="params">(<span name="ex">ex: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Option" class="extype" target="_top">Option</a>[<a href="../../scala/package.html#Throwable=Throwable" class="extmbr" name="scala.Throwable">Throwable</a>]</span>, <span name="s">s: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <a href="Res$$Failing.html" class="extype" name="ammonite.repl.Res.Failing">Failing</a> with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+        <span class="name">Failure</span><span class="params">(<span name="ex">ex: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Option" class="extype" target="_top">Option</a>[<a href="../../scala/package.html#Throwable=Throwable" class="extmbr" name="scala.Throwable">Throwable</a>]</span>, <span name="msg">msg: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <a href="Res$$Failing.html" class="extype" name="ammonite.repl.Res.Failing">Failing</a> with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
       </span>
       </h4>
       
           <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>A known failure occured, maybe caused by an exception
 (e.g. <code>ThreadDeath</code>) and maybe not (e.g. compile error)
-</p></div><div class="toggleContainer block">
+</p></div><dl class="paramcmts block"><dt class="param">ex</dt><dd class="cmt"><p>is any exception that caused this known failure; currently
+          only used for the &quot;Interrupted!&quot; failures caused by Ctrl-C</p></dd><dt class="param">msg</dt><dd class="cmt"><p>the message we want to display on screen due to this failure</p></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a>, <span class="extype" name="java.io.Serializable">Serializable</span>, <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Product" class="extype" target="_top">Product</a>, <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Equals" class="extype" target="_top">Equals</a>, <a href="Res$$Failing.html" class="extype" name="ammonite.repl.Res.Failing">Failing</a>, <a href="Res.html" class="extype" name="ammonite.repl.Res">Res</a>[<a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Nothing" class="extype" target="_top">Nothing</a>], <a href="../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a>, <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Any" class="extype" target="_top">Any</a></div>
         </div></div>
@@ -90,8 +91,8 @@
         <div id="allMembers">
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
-              <ol><li name="ammonite.repl.Res.Failure#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(ex:Option[Throwable],s:String):ammonite.repl.Res.Failure"></a>
+              <ol><li name="ammonite.repl.Res.Failure#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="&lt;init&gt;(ex:Option[Throwable],msg:String):ammonite.repl.Res.Failure"></a>
       <a id="&lt;init&gt;:Failure"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -99,14 +100,15 @@
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">Failure</span><span class="params">(<span name="ex">ex: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Option" class="extype" target="_top">Option</a>[<a href="../../scala/package.html#Throwable=Throwable" class="extmbr" name="scala.Throwable">Throwable</a>]</span>, <span name="s">s: <span class="extype" name="scala.Predef.String">String</span></span>)</span>
+        <span class="name">Failure</span><span class="params">(<span name="ex">ex: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Option" class="extype" target="_top">Option</a>[<a href="../../scala/package.html#Throwable=Throwable" class="extmbr" name="scala.Throwable">Throwable</a>]</span>, <span name="msg">msg: <span class="extype" name="scala.Predef.String">String</span></span>)</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#ammonite.repl.Res$$Failure@&lt;init&gt;(ex:Option[Throwable],s:String):ammonite.repl.Res.Failure" title="Permalink" target="_top">
+      <a href="../../index.html#ammonite.repl.Res$$Failure@&lt;init&gt;(ex:Option[Throwable],msg:String):ammonite.repl.Res.Failure" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt"></p><div class="fullcomment"><div class="comment cmt"></div><dl class="paramcmts block"><dt class="param">ex</dt><dd class="cmt"><p>is any exception that caused this known failure; currently
+          only used for the &quot;Interrupted!&quot; failures caused by Ctrl-C</p></dd><dt class="param">msg</dt><dd class="cmt"><p>the message we want to display on screen due to this failure</p></dd></dl></div>
     </li></ol>
             </div>
 
@@ -240,7 +242,8 @@
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">is any exception that caused this known failure; currently
+          only used for the &quot;Interrupted!&quot; failures caused by Ctrl-C</p>
     </li><li name="ammonite.repl.Res#filter" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="filter(f:T=&gt;Boolean):ammonite.repl.Res[T]"></a>
       <a id="filter((Nothing)⇒Boolean):Res[Nothing]"></a>
@@ -349,6 +352,23 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Res$$Failing.html" class="extype" name="ammonite.repl.Res.Failing">Failing</a> → <a href="Res.html" class="extype" name="ammonite.repl.Res">Res</a></dd></dl></div>
+    </li><li name="ammonite.repl.Res.Failure#msg" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="msg:String"></a>
+      <a id="msg:String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">msg</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.repl.Res$$Failure@msg:String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">the message we want to display on screen due to this failure</p>
     </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a>
       <a id="ne(AnyRef):Boolean"></a>
@@ -400,23 +420,6 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="ammonite.repl.Res.Failure#s" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="s:String"></a>
-      <a id="s:String"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">s</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.repl.Res$$Failure@s:String" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
     </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
       <a id="synchronized[T0](⇒T0):T0"></a>

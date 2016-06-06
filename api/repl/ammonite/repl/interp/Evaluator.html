@@ -167,18 +167,18 @@ need to get prepended to subsequent commands.
     </span>
       
     </li><li name="ammonite.repl.interp.Evaluator#processLine" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="processLine(code:String,printCode:String,printer:ammonite.repl.Printer,extraImports:Seq[ammonite.repl.ImportData]):ammonite.repl.Res[ammonite.repl.Evaluated]"></a>
-      <a id="processLine(String,String,Printer,Seq[ImportData]):Res[Evaluated]"></a>
+      <a id="processLine(code:String,printCode:String,printer:ammonite.repl.Printer,fileName:String,extraImports:Seq[ammonite.repl.ImportData]):ammonite.repl.Res[ammonite.repl.Evaluated]"></a>
+      <a id="processLine(String,String,Printer,String,Seq[ImportData]):Res[Evaluated]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier">abstract </span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">processLine</span><span class="params">(<span name="code">code: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="printCode">printCode: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="printer">printer: <a href="../Printer.html" class="extype" name="ammonite.repl.Printer">Printer</a></span>, <span name="extraImports">extraImports: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="../ImportData.html" class="extype" name="ammonite.repl.ImportData">ImportData</a>] = <span class="symbol">Seq()</span></span>)</span><span class="result">: <a href="../Res.html" class="extype" name="ammonite.repl.Res">Res</a>[<a href="../Evaluated.html" class="extype" name="ammonite.repl.Evaluated">Evaluated</a>]</span>
+        <span class="name">processLine</span><span class="params">(<span name="code">code: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="printCode">printCode: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="printer">printer: <a href="../Printer.html" class="extype" name="ammonite.repl.Printer">Printer</a></span>, <span name="fileName">fileName: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="extraImports">extraImports: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="../ImportData.html" class="extype" name="ammonite.repl.ImportData">ImportData</a>] = <span class="symbol">Seq()</span></span>)</span><span class="result">: <a href="../Res.html" class="extype" name="ammonite.repl.Res">Res</a>[<a href="../Evaluated.html" class="extype" name="ammonite.repl.Evaluated">Evaluated</a>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Evaluator@processLine(code:String,printCode:String,printer:ammonite.repl.Printer,extraImports:Seq[ammonite.repl.ImportData]):ammonite.repl.Res[ammonite.repl.Evaluated]" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.Evaluator@processLine(code:String,printCode:String,printer:ammonite.repl.Printer,fileName:String,extraImports:Seq[ammonite.repl.ImportData]):ammonite.repl.Res[ammonite.repl.Evaluated]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -190,18 +190,18 @@ passing in the callback ensures the printing is still done lazily, but within
 the exception-handling block of the <code>Evaluator</code>
 </p></div></div>
     </li><li name="ammonite.repl.interp.Evaluator#processScriptBlock" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
-      <a id="processScriptBlock(code:String,scriptImports:Seq[ammonite.repl.ImportData],printer:ammonite.repl.Printer):ammonite.repl.Res[ammonite.repl.Evaluated]"></a>
-      <a id="processScriptBlock(String,Seq[ImportData],Printer):Res[Evaluated]"></a>
+      <a id="processScriptBlock(code:String,scriptImports:Seq[ammonite.repl.ImportData],printer:ammonite.repl.Printer,wrapperName:String,fileName:String,pkgName:String):ammonite.repl.Res[ammonite.repl.Evaluated]"></a>
+      <a id="processScriptBlock(String,Seq[ImportData],Printer,String,String,String):Res[Evaluated]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier">abstract </span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">processScriptBlock</span><span class="params">(<span name="code">code: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="scriptImports">scriptImports: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="../ImportData.html" class="extype" name="ammonite.repl.ImportData">ImportData</a>]</span>, <span name="printer">printer: <a href="../Printer.html" class="extype" name="ammonite.repl.Printer">Printer</a></span>)</span><span class="result">: <a href="../Res.html" class="extype" name="ammonite.repl.Res">Res</a>[<a href="../Evaluated.html" class="extype" name="ammonite.repl.Evaluated">Evaluated</a>]</span>
+        <span class="name">processScriptBlock</span><span class="params">(<span name="code">code: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="scriptImports">scriptImports: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="../ImportData.html" class="extype" name="ammonite.repl.ImportData">ImportData</a>]</span>, <span name="printer">printer: <a href="../Printer.html" class="extype" name="ammonite.repl.Printer">Printer</a></span>, <span name="wrapperName">wrapperName: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="fileName">fileName: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="pkgName">pkgName: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="../Res.html" class="extype" name="ammonite.repl.Res">Res</a>[<a href="../Evaluated.html" class="extype" name="ammonite.repl.Evaluated">Evaluated</a>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Evaluator@processScriptBlock(code:String,scriptImports:Seq[ammonite.repl.ImportData],printer:ammonite.repl.Printer):ammonite.repl.Res[ammonite.repl.Evaluated]" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.Evaluator@processScriptBlock(code:String,scriptImports:Seq[ammonite.repl.ImportData],printer:ammonite.repl.Printer,wrapperName:String,fileName:String,pkgName:String):ammonite.repl.Res[ammonite.repl.Evaluated]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>

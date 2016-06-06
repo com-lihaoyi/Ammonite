@@ -92,7 +92,7 @@ real encapsulation for now.
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="ammonite.repl.interp.Interpreter#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(prompt0:ammonite.repl.Ref[String],frontEnd0:ammonite.repl.Ref[ammonite.repl.frontend.FrontEnd],width:=&gt;Int,height:=&gt;Int,pprintConfig:pprint.Config,colors0:ammonite.repl.Ref[ammonite.repl.Colors],printer:ammonite.repl.Printer,storage:ammonite.repl.Ref[ammonite.repl.Storage],history:=&gt;ammonite.repl.History,predef:String,replArgs:Seq[ammonite.repl.Bind[_]]):ammonite.repl.interp.Interpreter"></a>
+      <a id="&lt;init&gt;(prompt0:ammonite.repl.Ref[String],frontEnd0:ammonite.repl.Ref[ammonite.repl.frontend.FrontEnd],width:=&gt;Int,height:=&gt;Int,colors0:ammonite.repl.Ref[ammonite.repl.Colors],printer:ammonite.repl.Printer,storage:ammonite.repl.Storage,history:=&gt;ammonite.repl.History,predef:String,wd:ammonite.ops.Path,replArgs:Seq[ammonite.repl.Bind[_]]):ammonite.repl.interp.Interpreter"></a>
       <a id="&lt;init&gt;:Interpreter"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -100,10 +100,10 @@ real encapsulation for now.
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">Interpreter</span><span class="params">(<span name="prompt0">prompt0: <a href="../Ref.html" class="extype" name="ammonite.repl.Ref">Ref</a>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="frontEnd0">frontEnd0: <a href="../Ref.html" class="extype" name="ammonite.repl.Ref">Ref</a>[<a href="../frontend/FrontEnd.html" class="extype" name="ammonite.repl.frontend.FrontEnd">FrontEnd</a>]</span>, <span name="width">width: ⇒ <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a></span>, <span name="height">height: ⇒ <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a></span>, <span name="pprintConfig">pprintConfig: <span class="extype" name="pprint.Config">Config</span></span>, <span name="colors0">colors0: <a href="../Ref.html" class="extype" name="ammonite.repl.Ref">Ref</a>[<a href="../Colors.html" class="extype" name="ammonite.repl.Colors">Colors</a>]</span>, <span name="printer">printer: <a href="../Printer.html" class="extype" name="ammonite.repl.Printer">Printer</a></span>, <span name="storage">storage: <a href="../Ref.html" class="extype" name="ammonite.repl.Ref">Ref</a>[<a href="../Storage.html" class="extype" name="ammonite.repl.Storage">Storage</a>]</span>, <span name="history">history: ⇒ <a href="../History.html" class="extype" name="ammonite.repl.History">History</a></span>, <span name="predef">predef: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="replArgs">replArgs: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="../Bind.html" class="extype" name="ammonite.repl.Bind">Bind</a>[_]]</span>)</span>
+        <span class="name">Interpreter</span><span class="params">(<span name="prompt0">prompt0: <a href="../Ref.html" class="extype" name="ammonite.repl.Ref">Ref</a>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="frontEnd0">frontEnd0: <a href="../Ref.html" class="extype" name="ammonite.repl.Ref">Ref</a>[<a href="../frontend/FrontEnd.html" class="extype" name="ammonite.repl.frontend.FrontEnd">FrontEnd</a>]</span>, <span name="width">width: ⇒ <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a></span>, <span name="height">height: ⇒ <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a></span>, <span name="colors0">colors0: <a href="../Ref.html" class="extype" name="ammonite.repl.Ref">Ref</a>[<a href="../Colors.html" class="extype" name="ammonite.repl.Colors">Colors</a>]</span>, <span name="printer">printer: <a href="../Printer.html" class="extype" name="ammonite.repl.Printer">Printer</a></span>, <span name="storage">storage: <a href="../Storage.html" class="extype" name="ammonite.repl.Storage">Storage</a></span>, <span name="history">history: ⇒ <a href="../History.html" class="extype" name="ammonite.repl.History">History</a></span>, <span name="predef">predef: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="wd">wd: <span class="extype" name="ammonite.ops.Path">Path</span></span>, <span name="replArgs">replArgs: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="../Bind.html" class="extype" name="ammonite.repl.Bind">Bind</a>[_]]</span>)</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Interpreter@&lt;init&gt;(prompt0:ammonite.repl.Ref[String],frontEnd0:ammonite.repl.Ref[ammonite.repl.frontend.FrontEnd],width:=&gt;Int,height:=&gt;Int,pprintConfig:pprint.Config,colors0:ammonite.repl.Ref[ammonite.repl.Colors],printer:ammonite.repl.Printer,storage:ammonite.repl.Ref[ammonite.repl.Storage],history:=&gt;ammonite.repl.History,predef:String,replArgs:Seq[ammonite.repl.Bind[_]]):ammonite.repl.interp.Interpreter" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.Interpreter@&lt;init&gt;(prompt0:ammonite.repl.Ref[String],frontEnd0:ammonite.repl.Ref[ammonite.repl.frontend.FrontEnd],width:=&gt;Int,height:=&gt;Int,colors0:ammonite.repl.Ref[ammonite.repl.Colors],printer:ammonite.repl.Printer,storage:ammonite.repl.Storage,history:=&gt;ammonite.repl.History,predef:String,wd:ammonite.ops.Path,replArgs:Seq[ammonite.repl.Bind[_]]):ammonite.repl.interp.Interpreter" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -122,7 +122,7 @@ real encapsulation for now.
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <a href="Interpreter$DefaultLoadJar.html"><span class="name">DefaultLoadJar</span></a><span class="result"> extends <a href="../frontend/LoadJar.html" class="extype" name="ammonite.repl.frontend.LoadJar">LoadJar</a> with <a href="../Resolvers.html" class="extype" name="ammonite.repl.Resolvers">Resolvers</a></span>
+        <a href="Interpreter$DefaultLoadJar.html"><span class="name">DefaultLoadJar</span></a><span class="result"> extends <a href="../frontend/LoadJar.html" class="extype" name="ammonite.repl.frontend.LoadJar">LoadJar</a> with <a href="../tools/Resolvers.html" class="extype" name="ammonite.repl.tools.Resolvers">Resolvers</a></span>
       </span>
       </h4><span class="permalink">
       <a href="../../../index.html#ammonite.repl.interp.Interpreter@DefaultLoadJarextendsLoadJarwithResolvers" title="Permalink" target="_top">
@@ -131,7 +131,7 @@ real encapsulation for now.
     </span>
       
     </li><li name="ammonite.repl.interp.Interpreter.EvaluateCallback" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="EvaluateCallback=(String,Seq[ammonite.repl.ImportData])=&gt;ammonite.repl.Res[ammonite.repl.Evaluated]"></a>
+      <a id="EvaluateCallback=(String,Seq[ammonite.repl.ImportData],Int)=&gt;ammonite.repl.Res[ammonite.repl.Evaluated]"></a>
       <a id="EvaluateCallback:EvaluateCallback"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -139,10 +139,10 @@ real encapsulation for now.
         <span class="kind">type</span>
       </span>
       <span class="symbol">
-        <span class="name">EvaluateCallback</span><span class="result"> = (<span class="extype" name="scala.Predef.String">String</span>, <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="../ImportData.html" class="extype" name="ammonite.repl.ImportData">ImportData</a>]) ⇒ <a href="../Res.html" class="extype" name="ammonite.repl.Res">Res</a>[<a href="../Evaluated.html" class="extype" name="ammonite.repl.Evaluated">Evaluated</a>]</span>
+        <span class="name">EvaluateCallback</span><span class="result"> = (<span class="extype" name="scala.Predef.String">String</span>, <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="../ImportData.html" class="extype" name="ammonite.repl.ImportData">ImportData</a>], <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a>) ⇒ <a href="../Res.html" class="extype" name="ammonite.repl.Res">Res</a>[<a href="../Evaluated.html" class="extype" name="ammonite.repl.Evaluated">Evaluated</a>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Interpreter@EvaluateCallback=(String,Seq[ammonite.repl.ImportData])=&gt;ammonite.repl.Res[ammonite.repl.Evaluated]" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.Interpreter@EvaluateCallback=(String,Seq[ammonite.repl.ImportData],Int)=&gt;ammonite.repl.Res[ammonite.repl.Evaluated]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -416,18 +416,18 @@ real encapsulation for now.
     </span>
       
     </li><li name="ammonite.repl.interp.Interpreter#evaluateLine" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="evaluateLine(code:String,printSnippet:Seq[String],printer:ammonite.repl.Printer,extraImports:Seq[ammonite.repl.ImportData]):ammonite.repl.Res[ammonite.repl.Evaluated]"></a>
-      <a id="evaluateLine(String,Seq[String],Printer,Seq[ImportData]):Res[Evaluated]"></a>
+      <a id="evaluateLine(code:String,printSnippet:Seq[String],printer:ammonite.repl.Printer,fileName:String,extraImports:Seq[ammonite.repl.ImportData]):ammonite.repl.Res[ammonite.repl.Evaluated]"></a>
+      <a id="evaluateLine(String,Seq[String],Printer,String,Seq[ImportData]):Res[Evaluated]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">evaluateLine</span><span class="params">(<span name="code">code: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="printSnippet">printSnippet: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="printer">printer: <a href="../Printer.html" class="extype" name="ammonite.repl.Printer">Printer</a></span>, <span name="extraImports">extraImports: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="../ImportData.html" class="extype" name="ammonite.repl.ImportData">ImportData</a>] = <span class="symbol">Seq()</span></span>)</span><span class="result">: <a href="../Res.html" class="extype" name="ammonite.repl.Res">Res</a>[<a href="../Evaluated.html" class="extype" name="ammonite.repl.Evaluated">Evaluated</a>]</span>
+        <span class="name">evaluateLine</span><span class="params">(<span name="code">code: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="printSnippet">printSnippet: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="printer">printer: <a href="../Printer.html" class="extype" name="ammonite.repl.Printer">Printer</a></span>, <span name="fileName">fileName: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="extraImports">extraImports: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="../ImportData.html" class="extype" name="ammonite.repl.ImportData">ImportData</a>] = <span class="symbol">Seq()</span></span>)</span><span class="result">: <a href="../Res.html" class="extype" name="ammonite.repl.Res">Res</a>[<a href="../Evaluated.html" class="extype" name="ammonite.repl.Evaluated">Evaluated</a>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Interpreter@evaluateLine(code:String,printSnippet:Seq[String],printer:ammonite.repl.Printer,extraImports:Seq[ammonite.repl.ImportData]):ammonite.repl.Res[ammonite.repl.Evaluated]" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.Interpreter@evaluateLine(code:String,printSnippet:Seq[String],printer:ammonite.repl.Printer,fileName:String,extraImports:Seq[ammonite.repl.ImportData]):ammonite.repl.Res[ammonite.repl.Evaluated]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -642,6 +642,40 @@ real encapsulation for now.
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="ammonite.repl.interp.Interpreter#predefImports" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="predefImports:Seq[ammonite.repl.ImportData]"></a>
+      <a id="predefImports:Seq[ImportData]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">predefImports</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.collection.Seq" class="extype" target="_top">Seq</a>[<a href="../ImportData.html" class="extype" name="ammonite.repl.ImportData">ImportData</a>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.repl.interp.Interpreter@predefImports:Seq[ammonite.repl.ImportData]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="ammonite.repl.interp.Interpreter#predefs" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="predefs:Seq[(String,String,String)]"></a>
+      <a id="predefs:Seq[(String,String,String)]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">predefs</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.collection.Seq" class="extype" target="_top">Seq</a>[(<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="java.lang.String">String</span>, <span class="extype" name="java.lang.String">String</span>)]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.repl.interp.Interpreter@predefs:Seq[(String,String,String)]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
     </li><li name="ammonite.repl.interp.Interpreter#preprocess" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="preprocess:ammonite.repl.interp.Preprocessor"></a>
       <a id="preprocess:Preprocessor"></a>
@@ -677,86 +711,103 @@ real encapsulation for now.
     </span>
       
     </li><li name="ammonite.repl.interp.Interpreter#processCorrectScript" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="processCorrectScript(parsedCode:fastparse.all.Parsed.Success[Seq[Seq[String]]],evaluate:Interpreter.this.EvaluateCallback):Seq[ammonite.repl.ImportData]"></a>
-      <a id="processCorrectScript(Success[Seq[Seq[String]]],EvaluateCallback):Seq[ImportData]"></a>
+      <a id="processCorrectScript(rawParsedCode:fastparse.all.Parsed.Success[Seq[(String,Seq[String])]],startingImports:Seq[ammonite.repl.ImportData],evaluate:Interpreter.this.EvaluateCallback):ammonite.repl.Res[Seq[ammonite.repl.ImportData]]"></a>
+      <a id="processCorrectScript(Success[Seq[(String,Seq[String])]],Seq[ImportData],EvaluateCallback):Res[Seq[ImportData]]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">processCorrectScript</span><span class="params">(<span name="parsedCode">parsedCode: <span class="extype" name="fastparse.core.Parsed.Success">Success</span>[<a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<span class="extype" name="scala.Predef.String">String</span>]]]</span>, <span name="evaluate">evaluate: <a href="#EvaluateCallback=(String,Seq[ammonite.repl.ImportData])=&gt;ammonite.repl.Res[ammonite.repl.Evaluated]" class="extmbr" name="ammonite.repl.interp.Interpreter.EvaluateCallback">EvaluateCallback</a></span>)</span><span class="result">: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="../ImportData.html" class="extype" name="ammonite.repl.ImportData">ImportData</a>]</span>
+        <span class="name">processCorrectScript</span><span class="params">(<span name="rawParsedCode">rawParsedCode: <span class="extype" name="fastparse.core.Parsed.Success">Success</span>[<a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[(<span class="extype" name="scala.Predef.String">String</span>, <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<span class="extype" name="scala.Predef.String">String</span>])]]</span>, <span name="startingImports">startingImports: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="../ImportData.html" class="extype" name="ammonite.repl.ImportData">ImportData</a>]</span>, <span name="evaluate">evaluate: <a href="#EvaluateCallback=(String,Seq[ammonite.repl.ImportData],Int)=&gt;ammonite.repl.Res[ammonite.repl.Evaluated]" class="extmbr" name="ammonite.repl.interp.Interpreter.EvaluateCallback">EvaluateCallback</a></span>)</span><span class="result">: <a href="../Res.html" class="extype" name="ammonite.repl.Res">Res</a>[<a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="../ImportData.html" class="extype" name="ammonite.repl.ImportData">ImportData</a>]]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Interpreter@processCorrectScript(parsedCode:fastparse.all.Parsed.Success[Seq[Seq[String]]],evaluate:Interpreter.this.EvaluateCallback):Seq[ammonite.repl.ImportData]" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.Interpreter@processCorrectScript(rawParsedCode:fastparse.all.Parsed.Success[Seq[(String,Seq[String])]],startingImports:Seq[ammonite.repl.ImportData],evaluate:Interpreter.this.EvaluateCallback):ammonite.repl.Res[Seq[ammonite.repl.ImportData]]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
     </li><li name="ammonite.repl.interp.Interpreter#processExec" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="processExec(code:String):Seq[ammonite.repl.ImportData]"></a>
-      <a id="processExec(String):Seq[ImportData]"></a>
+      <a id="processExec(code:String):ammonite.repl.Res[Seq[ammonite.repl.ImportData]]"></a>
+      <a id="processExec(String):Res[Seq[ImportData]]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">processExec</span><span class="params">(<span name="code">code: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="../ImportData.html" class="extype" name="ammonite.repl.ImportData">ImportData</a>]</span>
+        <span class="name">processExec</span><span class="params">(<span name="code">code: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="../Res.html" class="extype" name="ammonite.repl.Res">Res</a>[<a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="../ImportData.html" class="extype" name="ammonite.repl.ImportData">ImportData</a>]]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Interpreter@processExec(code:String):Seq[ammonite.repl.ImportData]" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.Interpreter@processExec(code:String):ammonite.repl.Res[Seq[ammonite.repl.ImportData]]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
     </li><li name="ammonite.repl.interp.Interpreter#processLine" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="processLine(code:String,stmts:Seq[String]):ammonite.repl.Res[ammonite.repl.Evaluated]"></a>
-      <a id="processLine(String,Seq[String]):Res[Evaluated]"></a>
+      <a id="processLine(code:String,stmts:Seq[String],fileName:String):ammonite.repl.Res[ammonite.repl.Evaluated]"></a>
+      <a id="processLine(String,Seq[String],String):Res[Evaluated]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">processLine</span><span class="params">(<span name="code">code: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="stmts">stmts: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result">: <a href="../Res.html" class="extype" name="ammonite.repl.Res">Res</a>[<a href="../Evaluated.html" class="extype" name="ammonite.repl.Evaluated">Evaluated</a>]</span>
+        <span class="name">processLine</span><span class="params">(<span name="code">code: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="stmts">stmts: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="fileName">fileName: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="../Res.html" class="extype" name="ammonite.repl.Res">Res</a>[<a href="../Evaluated.html" class="extype" name="ammonite.repl.Evaluated">Evaluated</a>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Interpreter@processLine(code:String,stmts:Seq[String]):ammonite.repl.Res[ammonite.repl.Evaluated]" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.Interpreter@processLine(code:String,stmts:Seq[String],fileName:String):ammonite.repl.Res[ammonite.repl.Evaluated]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
     </li><li name="ammonite.repl.interp.Interpreter#processModule" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="processModule(code:String):Seq[ammonite.repl.ImportData]"></a>
-      <a id="processModule(String):Seq[ImportData]"></a>
+      <a id="processModule(code:String,wrapperName:String,pkgName:String):ammonite.repl.Res[Seq[ammonite.repl.ImportData]]"></a>
+      <a id="processModule(String,String,String):Res[Seq[ImportData]]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">processModule</span><span class="params">(<span name="code">code: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="../ImportData.html" class="extype" name="ammonite.repl.ImportData">ImportData</a>]</span>
+        <span class="name">processModule</span><span class="params">(<span name="code">code: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="wrapperName">wrapperName: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="pkgName">pkgName: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="../Res.html" class="extype" name="ammonite.repl.Res">Res</a>[<a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="../ImportData.html" class="extype" name="ammonite.repl.ImportData">ImportData</a>]]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Interpreter@processModule(code:String):Seq[ammonite.repl.ImportData]" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.Interpreter@processModule(code:String,wrapperName:String,pkgName:String):ammonite.repl.Res[Seq[ammonite.repl.ImportData]]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="ammonite.repl.interp.Interpreter#processModule0" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="processModule0(code:String,wrapperName:String,pkgName:String,startingImports:Seq[ammonite.repl.ImportData]):ammonite.repl.Res[Seq[ammonite.repl.ImportData]]"></a>
+      <a id="processModule0(String,String,String,Seq[ImportData]):Res[Seq[ImportData]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">processModule0</span><span class="params">(<span name="code">code: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="wrapperName">wrapperName: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="pkgName">pkgName: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="startingImports">startingImports: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="../ImportData.html" class="extype" name="ammonite.repl.ImportData">ImportData</a>]</span>)</span><span class="result">: <a href="../Res.html" class="extype" name="ammonite.repl.Res">Res</a>[<a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="../ImportData.html" class="extype" name="ammonite.repl.ImportData">ImportData</a>]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.repl.interp.Interpreter@processModule0(code:String,wrapperName:String,pkgName:String,startingImports:Seq[ammonite.repl.ImportData]):ammonite.repl.Res[Seq[ammonite.repl.ImportData]]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
     </li><li name="ammonite.repl.interp.Interpreter#processScript" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="processScript(code:String,evaluate:(String,Seq[ammonite.repl.ImportData])=&gt;ammonite.repl.Res[ammonite.repl.Evaluated]):Seq[ammonite.repl.ImportData]"></a>
-      <a id="processScript(String,(String,Seq[ImportData])⇒Res[Evaluated]):Seq[ImportData]"></a>
+      <a id="processScript(code:String,startingImports:Seq[ammonite.repl.ImportData],evaluate:(String,Seq[ammonite.repl.ImportData],Int)=&gt;ammonite.repl.Res[ammonite.repl.Evaluated]):ammonite.repl.Res[Seq[ammonite.repl.ImportData]]"></a>
+      <a id="processScript(String,Seq[ImportData],(String,Seq[ImportData],Int)⇒Res[Evaluated]):Res[Seq[ImportData]]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">processScript</span><span class="params">(<span name="code">code: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="evaluate">evaluate: (<span class="extype" name="scala.Predef.String">String</span>, <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="../ImportData.html" class="extype" name="ammonite.repl.ImportData">ImportData</a>]) ⇒ <a href="../Res.html" class="extype" name="ammonite.repl.Res">Res</a>[<a href="../Evaluated.html" class="extype" name="ammonite.repl.Evaluated">Evaluated</a>]</span>)</span><span class="result">: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="../ImportData.html" class="extype" name="ammonite.repl.ImportData">ImportData</a>]</span>
+        <span class="name">processScript</span><span class="params">(<span name="code">code: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="startingImports">startingImports: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="../ImportData.html" class="extype" name="ammonite.repl.ImportData">ImportData</a>]</span>, <span name="evaluate">evaluate: (<span class="extype" name="scala.Predef.String">String</span>, <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="../ImportData.html" class="extype" name="ammonite.repl.ImportData">ImportData</a>], <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a>) ⇒ <a href="../Res.html" class="extype" name="ammonite.repl.Res">Res</a>[<a href="../Evaluated.html" class="extype" name="ammonite.repl.Evaluated">Evaluated</a>]</span>)</span><span class="result">: <a href="../Res.html" class="extype" name="ammonite.repl.Res">Res</a>[<a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="../ImportData.html" class="extype" name="ammonite.repl.ImportData">ImportData</a>]]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Interpreter@processScript(code:String,evaluate:(String,Seq[ammonite.repl.ImportData])=&gt;ammonite.repl.Res[ammonite.repl.Evaluated]):Seq[ammonite.repl.ImportData]" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.Interpreter@processScript(code:String,startingImports:Seq[ammonite.repl.ImportData],evaluate:(String,Seq[ammonite.repl.ImportData],Int)=&gt;ammonite.repl.Res[ammonite.repl.Evaluated]):ammonite.repl.Res[Seq[ammonite.repl.ImportData]]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>

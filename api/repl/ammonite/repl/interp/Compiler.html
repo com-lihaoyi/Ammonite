@@ -120,18 +120,18 @@ you query source strings using an in-built presentation compiler
       <p class="shortcomment cmt">Writes files to dynamicClasspath.</p><div class="fullcomment"><div class="comment cmt"><p>Writes files to dynamicClasspath. Needed for loading cached classes.
 </p></div></div>
     </li><li name="ammonite.repl.interp.Compiler#compile" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
-      <a id="compile(src:Array[Byte],printer:ammonite.repl.Printer):ammonite.repl.interp.Compiler.Output"></a>
-      <a id="compile(Array[Byte],Printer):Output"></a>
+      <a id="compile(src:Array[Byte],printer:ammonite.repl.Printer,importsLen0:Int,fileName:String):ammonite.repl.interp.Compiler.Output"></a>
+      <a id="compile(Array[Byte],Printer,Int,String):Output"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier">abstract </span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">compile</span><span class="params">(<span name="src">src: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Array" class="extype" target="_top">Array</a>[<a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Byte" class="extype" target="_top">Byte</a>]</span>, <span name="printer">printer: <a href="../Printer.html" class="extype" name="ammonite.repl.Printer">Printer</a></span>)</span><span class="result">: <a href="Compiler$.html#Output=Option[(Traversable[(String,Array[Byte])],Seq[ammonite.repl.ImportData])]" class="extmbr" name="ammonite.repl.interp.Compiler.Output">Output</a></span>
+        <span class="name">compile</span><span class="params">(<span name="src">src: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Array" class="extype" target="_top">Array</a>[<a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Byte" class="extype" target="_top">Byte</a>]</span>, <span name="printer">printer: <a href="../Printer.html" class="extype" name="ammonite.repl.Printer">Printer</a></span>, <span name="importsLen0">importsLen0: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a></span>, <span name="fileName">fileName: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="Compiler$.html#Output=Option[(Traversable[(String,Array[Byte])],Seq[ammonite.repl.ImportData])]" class="extmbr" name="ammonite.repl.interp.Compiler.Output">Output</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Compiler@compile(src:Array[Byte],printer:ammonite.repl.Printer):ammonite.repl.interp.Compiler.Output" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.Compiler@compile(src:Array[Byte],printer:ammonite.repl.Printer,importsLen0:Int,fileName:String):ammonite.repl.interp.Compiler.Output" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -375,6 +375,23 @@ you query source strings using an in-built presentation compiler
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="ammonite.repl.interp.Compiler#importsLen" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="importsLen:Int"></a>
+      <a id="importsLen:Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">var</span>
+      </span>
+      <span class="symbol">
+        <span class="name">importsLen</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.repl.interp.Compiler@importsLen:Int" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
     </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <a id="isInstanceOf[T0]:Boolean"></a>

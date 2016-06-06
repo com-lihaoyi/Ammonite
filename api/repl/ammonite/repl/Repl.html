@@ -91,7 +91,7 @@
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="ammonite.repl.Repl#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(input:java.io.InputStream,output:java.io.OutputStream,error:java.io.OutputStream,storage:ammonite.repl.Ref[ammonite.repl.Storage],predef:String,replArgs:Seq[ammonite.repl.Bind[_]]):ammonite.repl.Repl"></a>
+      <a id="&lt;init&gt;(input:java.io.InputStream,output:java.io.OutputStream,error:java.io.OutputStream,storage:ammonite.repl.Storage,predef:String,wd:ammonite.ops.Path,replArgs:Seq[ammonite.repl.Bind[_]]):ammonite.repl.Repl"></a>
       <a id="&lt;init&gt;:Repl"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -99,10 +99,10 @@
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">Repl</span><span class="params">(<span name="input">input: <span class="extype" name="java.io.InputStream">InputStream</span></span>, <span name="output">output: <span class="extype" name="java.io.OutputStream">OutputStream</span></span>, <span name="error">error: <span class="extype" name="java.io.OutputStream">OutputStream</span></span>, <span name="storage">storage: <a href="Ref.html" class="extype" name="ammonite.repl.Ref">Ref</a>[<a href="Storage.html" class="extype" name="ammonite.repl.Storage">Storage</a>]</span>, <span name="predef">predef: <span class="extype" name="scala.Predef.String">String</span> = <span class="symbol">&quot;&quot;</span></span>, <span name="replArgs">replArgs: <a href="../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="Bind.html" class="extype" name="ammonite.repl.Bind">Bind</a>[_]] = <span class="symbol">Nil</span></span>)</span>
+        <span class="name">Repl</span><span class="params">(<span name="input">input: <span class="extype" name="java.io.InputStream">InputStream</span></span>, <span name="output">output: <span class="extype" name="java.io.OutputStream">OutputStream</span></span>, <span name="error">error: <span class="extype" name="java.io.OutputStream">OutputStream</span></span>, <span name="storage">storage: <a href="Storage.html" class="extype" name="ammonite.repl.Storage">Storage</a></span>, <span name="predef">predef: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="wd">wd: <span class="extype" name="ammonite.ops.Path">Path</span></span>, <span name="replArgs">replArgs: <a href="../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="Bind.html" class="extype" name="ammonite.repl.Bind">Bind</a>[_]] = <span class="symbol">Nil</span></span>)</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#ammonite.repl.Repl@&lt;init&gt;(input:java.io.InputStream,output:java.io.OutputStream,error:java.io.OutputStream,storage:ammonite.repl.Ref[ammonite.repl.Storage],predef:String,replArgs:Seq[ammonite.repl.Bind[_]]):ammonite.repl.Repl" title="Permalink" target="_top">
+      <a href="../../index.html#ammonite.repl.Repl@&lt;init&gt;(input:java.io.InputStream,output:java.io.OutputStream,error:java.io.OutputStream,storage:ammonite.repl.Storage,predef:String,wd:ammonite.ops.Path,replArgs:Seq[ammonite.repl.Bind[_]]):ammonite.repl.Repl" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -554,18 +554,18 @@
     </span>
       
     </li><li name="ammonite.repl.Repl#printlnWithColor" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="printlnWithColor(color:String,endColor:String,s:String):Unit"></a>
-      <a id="printlnWithColor(String,String,String):Unit"></a>
+      <a id="printlnWithColor(color:fansi.Attrs,s:String):Unit"></a>
+      <a id="printlnWithColor(Attrs,String):Unit"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">printlnWithColor</span><span class="params">(<span name="color">color: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="endColor">endColor: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="s">s: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
+        <span class="name">printlnWithColor</span><span class="params">(<span name="color">color: <a href="https://oss.sonatype.org/service/local/repositories/releases/archive/com/lihaoyi/fansi_2.11/0.1.3/fansi_2.11-0.1.3-javadoc.jar/!/index.html#fansi.Attrs" class="extype" target="_top">Attrs</a></span>, <span name="s">s: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#ammonite.repl.Repl@printlnWithColor(color:String,endColor:String,s:String):Unit" title="Permalink" target="_top">
+      <a href="../../index.html#ammonite.repl.Repl@printlnWithColor(color:fansi.Attrs,s:String):Unit" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>

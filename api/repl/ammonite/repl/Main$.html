@@ -28,10 +28,12 @@
         </head>
         <body class="value">
       <div id="definition">
-        <img alt="Object" src="../../lib/object_big.png" />
+        <a href="Main.html" title="See companion class"><img alt="Object/Class" src="../../lib/object_to_class_big.png" /></a>
         <p id="owner"><a href="../package.html" class="extype" name="ammonite">ammonite</a>.<a href="package.html" class="extype" name="ammonite.repl">repl</a></p>
-        <h1>Main</h1><h3><span class="morelinks"><div>Related Doc:
-            <a href="package.html" class="extype" name="ammonite.repl">package repl</a>
+        <h1><a href="Main.html" title="See companion class">Main</a></h1><h3><span class="morelinks"><div>
+            Related Docs:
+            <a href="Main.html" title="See companion class">class Main</a>
+            | <a href="package.html" class="extype" name="ammonite.repl">package repl</a>
           </div></span></h3><span class="permalink">
       <a href="../../index.html#ammonite.repl.Main$" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
@@ -45,14 +47,13 @@
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <span class="name">Main</span>
+        <span class="name">Main</span><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>The various entry-points to the Ammonite repl
-</p></div><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
-          <div class="superTypes hiddenContent"><a href="../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a>, <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Any" class="extype" target="_top">Any</a></div>
+          <div class="superTypes hiddenContent"><a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a>, <span class="extype" name="java.io.Serializable">Serializable</span>, <a href="../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a>, <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Any" class="extype" target="_top">Any</a></div>
         </div></div>
         
 
@@ -70,7 +71,7 @@
                 <span class="filtertype">Inherited<br />
                 </span>
                 <ol id="linearization">
-                  <li class="in" name="ammonite.repl.Main"><span>Main</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                  <li class="in" name="ammonite.repl.Main"><span>Main</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                 </ol>
               </div><div id="ancestors">
             <span class="filtertype"></span>
@@ -89,27 +90,7 @@
         <div id="allMembers">
         
 
-        <div id="types" class="types members">
-              <h3>Type Members</h3>
-              <ol><li name="ammonite.repl.Main.Config" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="ConfigextendsProductwithSerializable"></a>
-      <a id="Config:Config"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">case class</span>
-      </span>
-      <span class="symbol">
-        <a href="Main$$Config.html"><span class="name">Config</span></a><span class="params">(<span name="predef">predef: <span class="extype" name="scala.Predef.String">String</span> = <span class="symbol">&quot;&quot;</span></span>, <span name="predefFile">predefFile: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Option" class="extype" target="_top">Option</a>[<span class="extype" name="ammonite.ops.Path">Path</span>] = <span class="symbol"><span class="name"><a href="../../scala/package.html">None</a></span></span></span>, <span name="code">code: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Option" class="extype" target="_top">Option</a>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol"><span class="name"><a href="../../scala/package.html">None</a></span></span></span>, <span name="ammoniteHome">ammoniteHome: <span class="extype" name="ammonite.ops.Path">Path</span> = <span class="symbol"><span class="name"><a href="#defaultAmmoniteHome:ammonite.ops.Path">defaultAmmoniteHome</a></span></span></span>, <span name="file">file: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Option" class="extype" target="_top">Option</a>[<span class="extype" name="ammonite.ops.Path">Path</span>] = <span class="symbol"><span class="name"><a href="../../scala/package.html">None</a></span></span></span>, <span name="args">args: <a href="../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol"><span class="name"><a href="../../scala/package.html">Vector.empty</a></span></span></span>, <span name="kwargs">kwargs: <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol">Map.empty</span></span>, <span name="time">time: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Boolean" class="extype" target="_top">Boolean</a> = <span class="symbol">false</span></span>)</span><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.repl.Main$@ConfigextendsProductwithSerializable" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
-    </li></ol>
-            </div>
+        
 
         
 
@@ -166,23 +147,6 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="ammonite.repl.Main#ammoniteReplArrowBinder" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="ammoniteReplArrowBinder[T](t:(String,T))(implicittypeTag:reflect.runtime.universe.TypeTag[T]):ammonite.repl.Bind[T]"></a>
-      <a id="ammoniteReplArrowBinder[T]((String,T))(scala.reflect.api.JavaUniverse.TypeTag[T]):Bind[T]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier">implicit </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">ammoniteReplArrowBinder</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="t">t: (<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="ammonite.repl.Main.ammoniteReplArrowBinder.T">T</span>)</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="typeTag">typeTag: <span class="extype" name="scala.reflect.api.TypeTags.TypeTag">scala.reflect.api.JavaUniverse.TypeTag</span>[<span class="extype" name="ammonite.repl.Main.ammoniteReplArrowBinder.T">T</span>]</span>)</span><span class="result">: <a href="Bind.html" class="extype" name="ammonite.repl.Bind">Bind</a>[<span class="extype" name="ammonite.repl.Main.ammoniteReplArrowBinder.T">T</span>]</span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.repl.Main$@ammoniteReplArrowBinder[T](t:(String,T))(implicittypeTag:reflect.runtime.universe.TypeTag[T]):ammonite.repl.Bind[T]" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
     </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <a id="asInstanceOf[T0]:T0"></a>
@@ -223,25 +187,6 @@
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="ammonite.repl.Main#debug" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="debug(replArgs:ammonite.repl.Bind[_]*):Any"></a>
-      <a id="debug(Bind[_]*):Any"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">debug</span><span class="params">(<span name="replArgs">replArgs: <a href="Bind.html" class="extype" name="ammonite.repl.Bind">Bind</a>[_]*</span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Any" class="extype" target="_top">Any</a></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.repl.Main$@debug(replArgs:ammonite.repl.Bind[_]*):Any" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">The debug entry-point: embed this inside any Scala program to open up
-an ammonite REPL in-line with access to that program's variables for
-inspection.</p>
     </li><li name="ammonite.repl.Main#defaultAmmoniteHome" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="defaultAmmoniteHome:ammonite.ops.Path"></a>
       <a id="defaultAmmoniteHome:Path"></a>
@@ -255,6 +200,23 @@ inspection.</p>
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.repl.Main$@defaultAmmoniteHome:ammonite.ops.Path" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="ammonite.repl.Main#defaultPredefString" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="defaultPredefString:String"></a>
+      <a id="defaultPredefString:String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">defaultPredefString</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.repl.Main$@defaultPredefString:String" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -350,6 +312,23 @@ inspection.</p>
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="ammonite.repl.Main#ignoreUselessImports" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ignoreUselessImports:String"></a>
+      <a id="ignoreUselessImports:String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ignoreUselessImports</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.repl.Main$@ignoreUselessImports:String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
     </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <a id="isInstanceOf[T0]:Boolean"></a>
@@ -368,7 +347,7 @@ inspection.</p>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
     </li><li name="ammonite.repl.Main#main" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="main(args:Array[String]):Unit"></a>
+      <a id="main(args0:Array[String]):Unit"></a>
       <a id="main(Array[String]):Unit"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -376,16 +355,33 @@ inspection.</p>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">main</span><span class="params">(<span name="args">args: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Array" class="extype" target="_top">Array</a>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
+        <span class="name">main</span><span class="params">(<span name="args0">args0: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Array" class="extype" target="_top">Array</a>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#ammonite.repl.Main$@main(args:Array[String]):Unit" title="Permalink" target="_top">
+      <a href="../../index.html#ammonite.repl.Main$@main(args0:Array[String]):Unit" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <p class="shortcomment cmt">The command-line entry point, which does all the argument parsing before
-delegating to <a href="#run(predef:String,ammoniteHome:ammonite.ops.Path,code:Option[String],predefFile:Option[ammonite.ops.Path],file:Option[ammonite.ops.Path],args:Seq[String],kwargs:Map[String,String]):Unit" class="extmbr" name="ammonite.repl.Main#run">run</a>
+delegating to <a href="Main.html#run(replArgs:ammonite.repl.Bind[_]*):Any" class="extmbr" name="ammonite.repl.Main#run">Main.run</a>
 </p>
+    </li><li name="ammonite.repl.Main#maybeDefaultPredef" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="maybeDefaultPredef(enabled:Boolean,predef:String):String"></a>
+      <a id="maybeDefaultPredef(Boolean,String):String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">maybeDefaultPredef</span><span class="params">(<span name="enabled">enabled: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>, <span name="predef">predef: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.repl.Main$@maybeDefaultPredef(enabled:Boolean,predef:String):String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
     </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a>
       <a id="ne(AnyRef):Boolean"></a>
@@ -437,40 +433,6 @@ delegating to <a href="#run(predef:String,ammoniteHome:ammonite.ops.Path,code:Op
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="ammonite.repl.Main#run" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="run(predef:String,ammoniteHome:ammonite.ops.Path,code:Option[String],predefFile:Option[ammonite.ops.Path],file:Option[ammonite.ops.Path],args:Seq[String],kwargs:Map[String,String]):Unit"></a>
-      <a id="run(String,Path,Option[String],Option[Path],Option[Path],Seq[String],Map[String,String]):Unit"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">run</span><span class="params">(<span name="predef">predef: <span class="extype" name="scala.Predef.String">String</span> = <span class="symbol">&quot;&quot;</span></span>, <span name="ammoniteHome">ammoniteHome: <span class="extype" name="ammonite.ops.Path">Path</span> = <span class="symbol"><span class="name"><a href="#defaultAmmoniteHome:ammonite.ops.Path">defaultAmmoniteHome</a></span></span></span>, <span name="code">code: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Option" class="extype" target="_top">Option</a>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol"><span class="name"><a href="../../scala/package.html">None</a></span></span></span>, <span name="predefFile">predefFile: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Option" class="extype" target="_top">Option</a>[<span class="extype" name="ammonite.ops.Path">Path</span>] = <span class="symbol"><span class="name"><a href="../../scala/package.html">None</a></span></span></span>, <span name="file">file: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Option" class="extype" target="_top">Option</a>[<span class="extype" name="ammonite.ops.Path">Path</span>] = <span class="symbol"><span class="name"><a href="../../scala/package.html">None</a></span></span></span>, <span name="args">args: <a href="../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol"><span class="name"><a href="../../scala/package.html">Vector.empty</a></span></span></span>, <span name="kwargs">kwargs: <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol">Map.empty</span></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.repl.Main$@run(predef:String,ammoniteHome:ammonite.ops.Path,code:Option[String],predefFile:Option[ammonite.ops.Path],file:Option[ammonite.ops.Path],args:Seq[String],kwargs:Map[String,String]):Unit" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">The main entry-point after partial argument de-serialization.</p>
-    </li><li name="ammonite.repl.Main#runScript" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="runScript(repl:ammonite.repl.Repl,path:ammonite.ops.Path,args:Seq[String],kwargs:Map[String,String]):Unit"></a>
-      <a id="runScript(Repl,Path,Seq[String],Map[String,String]):Unit"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">runScript</span><span class="params">(<span name="repl">repl: <a href="Repl.html" class="extype" name="ammonite.repl.Repl">Repl</a></span>, <span name="path">path: <span class="extype" name="ammonite.ops.Path">Path</span></span>, <span name="args">args: <a href="../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="kwargs">kwargs: <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.repl.Main$@runScript(repl:ammonite.repl.Repl,path:ammonite.ops.Path,args:Seq[String],kwargs:Map[String,String]):Unit" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
     </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
       <a id="synchronized[T0](⇒T0):T0"></a>
@@ -583,7 +545,11 @@ delegating to <a href="#run(predef:String,ammoniteHome:ammonite.ops.Path,code:Op
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="scala.AnyRef">
+        <div class="parent" name="scala.Serializable">
+              <h3>Inherited from <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></h3>
+            </div><div class="parent" name="java.io.Serializable">
+              <h3>Inherited from <span class="extype" name="java.io.Serializable">Serializable</span></h3>
+            </div><div class="parent" name="scala.AnyRef">
               <h3>Inherited from <a href="../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></h3>
             </div><div class="parent" name="scala.Any">
               <h3>Inherited from <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Any" class="extype" target="_top">Any</a></h3>

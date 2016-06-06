@@ -58,7 +58,10 @@ to be able to run multiple Ammonite processes on the same system.
 </p></div><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><a href="../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a>, <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Any" class="extype" target="_top">Any</a></div>
-        </div></div>
+        </div><div class="toggleContainer block">
+            <span class="toggle">Known Subclasses</span>
+            <div class="subClasses hiddenContent"><a href="Storage$$Folder.html" class="extype" name="ammonite.repl.Storage.Folder">Folder</a>, <a href="Storage$$InMemory.html" class="extype" name="ammonite.repl.Storage.InMemory">InMemory</a></div>
+          </div></div>
         
 
       <div id="mbrsel">
@@ -99,35 +102,35 @@ to be able to run multiple Ammonite processes on the same system.
         <div id="values" class="values members">
               <h3>Abstract Value Members</h3>
               <ol><li name="ammonite.repl.Storage#compileCacheLoad" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
-      <a id="compileCacheLoad(tag:String):Option[ammonite.repl.Util.CompileCache]"></a>
-      <a id="compileCacheLoad(String):Option[CompileCache]"></a>
+      <a id="compileCacheLoad(path:String,tag:String):Option[ammonite.repl.Util.CompileCache]"></a>
+      <a id="compileCacheLoad(String,String):Option[CompileCache]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier">abstract </span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">compileCacheLoad</span><span class="params">(<span name="tag">tag: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Option" class="extype" target="_top">Option</a>[<a href="Util$.html#CompileCache=(ammonite.repl.Util.ClassFiles,Seq[ammonite.repl.ImportData])" class="extmbr" name="ammonite.repl.Util.CompileCache">CompileCache</a>]</span>
+        <span class="name">compileCacheLoad</span><span class="params">(<span name="path">path: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="tag">tag: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Option" class="extype" target="_top">Option</a>[<a href="Util$.html#CompileCache=(ammonite.repl.Util.ClassFiles,Seq[ammonite.repl.ImportData])" class="extmbr" name="ammonite.repl.Util.CompileCache">CompileCache</a>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#ammonite.repl.Storage@compileCacheLoad(tag:String):Option[ammonite.repl.Util.CompileCache]" title="Permalink" target="_top">
+      <a href="../../index.html#ammonite.repl.Storage@compileCacheLoad(path:String,tag:String):Option[ammonite.repl.Util.CompileCache]" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
     </li><li name="ammonite.repl.Storage#compileCacheSave" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
-      <a id="compileCacheSave(tag:String,data:ammonite.repl.Util.CompileCache):Unit"></a>
-      <a id="compileCacheSave(String,CompileCache):Unit"></a>
+      <a id="compileCacheSave(path:String,tag:String,data:ammonite.repl.Util.CompileCache):Unit"></a>
+      <a id="compileCacheSave(String,String,CompileCache):Unit"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier">abstract </span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">compileCacheSave</span><span class="params">(<span name="tag">tag: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="data">data: <a href="Util$.html#CompileCache=(ammonite.repl.Util.ClassFiles,Seq[ammonite.repl.ImportData])" class="extmbr" name="ammonite.repl.Util.CompileCache">CompileCache</a></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
+        <span class="name">compileCacheSave</span><span class="params">(<span name="path">path: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="tag">tag: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="data">data: <a href="Util$.html#CompileCache=(ammonite.repl.Util.ClassFiles,Seq[ammonite.repl.ImportData])" class="extmbr" name="ammonite.repl.Util.CompileCache">CompileCache</a></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#ammonite.repl.Storage@compileCacheSave(tag:String,data:ammonite.repl.Util.CompileCache):Unit" title="Permalink" target="_top">
+      <a href="../../index.html#ammonite.repl.Storage@compileCacheSave(path:String,tag:String,data:ammonite.repl.Util.CompileCache):Unit" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
