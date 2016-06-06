@@ -13,6 +13,7 @@ class Repl(input: InputStream,
            storage: Storage,
            predef: String,
            wd: ammonite.ops.Path,
+           welcomeBanner: Option[String],
            replArgs: Seq[Bind[_]] = Nil) {
 
   val prompt = Ref("@ ")
@@ -76,18 +77,8 @@ class Repl(input: InputStream,
     out
   }
 
-
-  def ammoniteVersion = ammonite.Constants.version
-  def scalaVersion = scala.util.Properties.versionNumberString
-  def javaVersion = System.getProperty("java.version")
-
-  def printBanner(): Unit = {
-    printStream.println(s"Welcome to the Ammonite Repl $ammoniteVersion")
-    printStream.println(s"(Scala $scalaVersion Java $javaVersion)")
-  }
-
   def run(): Any = {
-    printBanner()
+    welcomeBanner.foreach(printStream.println)
     @tailrec def loop(): Any = {
       val res = action()
       Timer("End Of Loop")

@@ -42,6 +42,12 @@
       Although it's best to read the documentation on this page to learn how to use these projects, the Scaladoc is still useful as a reference.
   
   @sect{Changelog}
+    @sect{master}
+      @ul
+        @li
+          Made @sect.ref{browse} use the process current working directory if there's no implicit path in scope, since most times it doesn't matter
+        @li
+          Make the welcome banner "Welcome to the Ammonite Repl..." customizable
     @sect{0.5.9}
       @ul
         @li
@@ -49,7 +55,7 @@
         @li
           Prefix @hl.scala{_root_} to imports from packages, which should reduce the chance of naming collisions
         @li
-          Improved source locations for error messages: now failures in scripts have a filename matching the name of the script (instead of @code{Main.scala}), and line numbers matching the original line numbers (instead of the line numbers in the synthetic code) thanks to thanks to @lnk("Abhishek Kumar", "https://github.com/coderabhishek")
+          Improved source locations for error messages: now failures in scripts have a filename matching the name of the script (instead of @code{Main.scala}), and line numbers matching the original line numbers (instead of the line numbers in the synthetic code) thanks to @lnk("Abhishek Kumar", "https://github.com/coderabhishek")
         @li
           Failures in scripts run using Ammonite from the command line or via @hl.scala{load.module} should show only the meaningful error and not irrelevant internal stacktraces
         @li

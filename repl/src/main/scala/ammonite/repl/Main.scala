@@ -45,6 +45,7 @@ case class Main(predef: String = "",
                 defaultPredef: Boolean = true,
                 storageBackend: Storage = Storage.InMemory(),
                 wd: Path = ammonite.ops.cwd,
+                welcomeBanner: Option[String] = Some(Main.defaultWelcomeBanner),
                 inputStream: InputStream = System.in,
                 outputStream: OutputStream = System.out,
                 errorStream: OutputStream = System.err){
@@ -58,6 +59,7 @@ case class Main(predef: String = "",
       storage = storageBackend,
       predef = augmentedPredef + "\n" + predef,
       wd = wd,
+      welcomeBanner = welcomeBanner,
       replArgs = replArgs
     )
   }
@@ -122,6 +124,13 @@ case class Main(predef: String = "",
 }
 
 object Main{
+  val defaultWelcomeBanner = {
+    def ammoniteVersion = ammonite.Constants.version
+    def scalaVersion = scala.util.Properties.versionNumberString
+    def javaVersion = System.getProperty("java.version")
+    s"""Welcome to the Ammonite Repl $ammoniteVersion
+       |(Scala $scalaVersion Java $javaVersion)""".stripMargin
+  }
   val ignoreUselessImports = """
     |notify => _,
     |  wait => _,

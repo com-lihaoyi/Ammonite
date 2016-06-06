@@ -212,7 +212,8 @@ object browse{
                               height: Integer = null,
                               indent: Integer = null,
                               colors: pprint.Colors = null)
-                             (implicit c: pprint.Config, wd: Path) = {
+                             (implicit c: pprint.Config,
+                              wd: Path = ammonite.ops.ImplicitWd.implicitCwd) = {
     %(
       viewer.values,
       tmp(

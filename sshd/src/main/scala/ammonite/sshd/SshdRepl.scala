@@ -55,7 +55,11 @@ object SshdRepl {
           defaultPredef,
           ammonite.repl.Main.defaultPredefString
         )
-        new Repl(in, out, out, Storage.Folder(homePath), augmentedPredef, wd, replArgs).run()
+        new Repl(
+          in, out, out,
+          Storage.Folder(homePath), augmentedPredef,
+          wd, Some(ammonite.repl.Main.defaultWelcomeBanner), replArgs
+        ).run()
       } catch {
         case any: Throwable =>
           val sshClientOutput = new PrintStream(out)
