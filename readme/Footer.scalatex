@@ -42,10 +42,28 @@
       Although it's best to read the documentation on this page to learn how to use these projects, the Scaladoc is still useful as a reference.
   
   @sect{Changelog}
-    @sect{0.5.8}
+    @sect{0.5.9}
       @ul
         @li
           Introduced the @sect.ref{desugar} helper to @sect.ref{Ammonite-Shell}, letting you easily see what the compiler is transforming your code into before it gets run.
+        @li
+          Prefix @hl.scala{_root_} to imports from packages, which should reduce the chance of naming collisions
+        @li
+          Improved source locations for error messages: now failures in scripts have a filename matching the name of the script (instead of @code{Main.scala}), and line numbers matching the original line numbers (instead of the line numbers in the synthetic code) thanks to thanks to @lnk("Abhishek Kumar", "https://github.com/coderabhishek")
+        @li
+          Wrapper names are now greatly simplified; now the names of wrapper objects for scripts match the name of the script (e.g. @code{MyScript}) rather than based on the code hash (e.g. @code{cache5a8890cd7c2ab07eea3fe8d605c7e188})
+        @li
+          Placed most synthetic code into packages; loaded scripts go into @hl.scala{ammonite.scripts} and code entered at the REPL goes in @hl.scala{ammonite.session}.
+        @li
+          Wrote some basic @lnk("Internals Documentation", "https://github.com/lihaoyi/Ammonite/tree/master/internals-docs") in case people want to read about the internal workings of Ammonite in a way that's easier than digging through tons of code.
+        @li
+          Changed the interface for calling Ammonite programmatically, from @hl.scala{ammonite.repl.Main.run(...lots of args...)} to @hl.scala{ammonite.repl.Main(...basic args...).run(...additional args...)}, with similar changes to @hl.scala{.debug} etc.. This should make configuring the Ammonite REPL before invoking it programmatically much more consistent.
+        @li
+          Moved tools such as @sect.ref{grep}, @sect.ref{time}, @sect.ref{browse} from @sect.ref{Ammonite-Shell} into the base @sect.ref{Ammonite-REPL}, and made them imported by default, so everyone can enjoy them by default.
+        @li
+          Imported the various @sect.ref("Extensions", "pipe operations") from @sect.ref{Ammonite-Ops}: aliasing @code{.map} as @code{|}, @code{.filter} as @code{|?}, etc. to make it more convenient to use tools like @sect.ref{grep} from the base REPL
+
+
     @sect{0.5.8}
       @ul
         @li

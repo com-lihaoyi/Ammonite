@@ -15,7 +15,7 @@ import reflect.macros.Context
   *
   * Configuration of the basic REPL is done by passing in arguments when
   * constructing the [[Main]] instance, and the various entrypoints such
-  * as [[run]] [[debug]] and so on are methods on that instance.
+  * as [[run]] [[runScript]] and so on are methods on that instance.
   *
   * It is more or less equivalent to the [[Repl]] object itself, and has
   * a similar set of parameters, but does not have any of the [[Repl]]'s
@@ -51,38 +51,21 @@ case class Main(predef: String = "",
   /**
     * Instantiates an ammonite.repl.Repl using the configuration
     */
-  def instantiateRepl() = {
+  def instantiateRepl(replArgs: Seq[Bind[_]] = Nil) = {
     val augmentedPredef = Main.maybeDefaultPredef(defaultPredef, Main.defaultPredefString)
     new Repl(
       inputStream, outputStream, errorStream,
       storage = storageBackend,
       predef = augmentedPredef + "\n" + predef,
-      wd = wd
+      wd = wd,
+      replArgs = replArgs
     )
   }
-  def run() = {
+  def run(replArgs: Bind[_]*) = {
     Timer("Repl.run Start")
-    val res = instantiateRepl().run()
+    val res = instantiateRepl(replArgs).run()
     Timer("Repl.run End")
     res
-  }
-
-  /**
-    * The debug entry-point: embed this inside any Scala program to open up
-    * an ammonite REPL in-line with access to that program's variables for
-    * inspection.
-    */
-  def debug(replArgs: Bind[_]*): Any = {
-
-    val repl = new Repl(
-      System.in, System.out, System.err,
-      storage = storageBackend,
-      predef = Main.defaultPredefString,
-      wd = wd,
-      replArgs
-    )
-
-    repl.run()
   }
 
   /**
@@ -139,9 +122,8 @@ case class Main(predef: String = "",
 }
 
 object Main{
-  val defaultPredefString = """
-    |import ammonite.ops.Extensions.{
-    |  notify => _,
+  val ignoreUselessImports = """
+    |notify => _,
     |  wait => _,
     |  equals => _,
     |  asInstanceOf => _,
@@ -156,26 +138,18 @@ object Main{
     |  ## => _,
     |  hashCode => _,
     |  _
+    |"""
+
+  val defaultPredefString = s"""
+    |import ammonite.repl.frontend.ReplBridge.repl
+    |import ammonite.ops.Extensions.{
+    |  $ignoreUselessImports
     |}
     |import ammonite.repl.tools._
     |import ammonite.repl.tools.IvyConstructor.{ArtifactIdExt, GroupIdExt}
     |import ammonite.repl.frontend.ReplBridge.repl.{
-    |  notify => _,
-    |  wait => _,
-    |  equals => _,
-    |  asInstanceOf => _,
-    |  synchronized => _,
-    |  notifyAll => _,
-    |  isInstanceOf => _,
-    |  == => _,
     |  Internal => _,
-    |  != => _,
-    |  getClass => _,
-    |  ne => _,
-    |  eq => _,
-    |  ## => _,
-    |  hashCode => _,
-    |  _
+    |  $ignoreUselessImports
     |}
     |""".stripMargin
 

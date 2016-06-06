@@ -35,8 +35,7 @@ class Interpreter(prompt0: Ref[String],
 
 
   val hardcodedPredef =
-    """import ammonite.repl.frontend.ReplBridge.repl
-      |import ammonite.repl.frontend.ReplBridge.repl.{pprintConfig, derefPPrint}
+    """import ammonite.repl.frontend.ReplBridge.repl.{pprintConfig, derefPPrint}
       |""".stripMargin
 
   val SheBang = "#!"

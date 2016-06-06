@@ -1,12 +1,14 @@
 package ammonite.repl
-import ammonite.ops._
-import ammonite.repl.Util.CompileCache
+
 
 object TestMain{
   def main(args: Array[String]): Unit = {
-    System.setProperty("ammonite-sbt-build", "true")
     Main(
-      storageBackend = new Storage.Folder(cwd/'target/'tempAmmoniteHome)
+      // Any arguments to configure the REPL here, e.g. changing the home
+      // folder from the default of ~/.ammonite to some local folder to avoid
+      // interference with other Ammonite REPLs running on your system
+      storageBackend =
+        new Storage.Folder(ammonite.ops.cwd/'target/'tempAmmoniteHome)
     ).run()
   }
 }

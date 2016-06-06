@@ -1,19 +1,14 @@
 package ammonite.integration
-
-import ammonite.repl.Storage
-
 object TestMain {
   def main(args: Array[String]): Unit = {
-    import ammonite.ops._
+    val hello = "Hello"
+    // Break into debug REPL with
     ammonite.repl.Main(
-      predef = "import ammonite.integration.Main._",
-      storageBackend = new Storage.Folder(cwd/'target/'tempAmmoniteHome){
-        override val predef = {
-          cwd/'shell/'src/'main/'resources/'ammonite/'shell/"example-predef-bare.scala"
-        }
-      }
-    ).run()
+      predef = "println(\"Starting Debugging!\")"
+    ).run(
+      "hello" -> hello,
+      "fooValue" -> foo()
+    )
   }
   def foo() = 1
-  def bar() = "two"
 }

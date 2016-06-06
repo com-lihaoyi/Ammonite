@@ -255,10 +255,125 @@
 
   @sect{Builtins}
     @p
-      Ammonite contains a range of useful built-ins implemented as normal functions. Everything inside the @hl.scala{ReplAPI} trait is imported by default and can be accessed directly by default to control the console.
+      The Ammonite REPL contains a bunch of built-in imports and definitions by default. This includes:
 
-    @hl.ref(replSource/'frontend/"ReplAPI.scala", "trait ReplAPI", "// End of ReplAPI")
+    @ul
+      @li
+        @sect.ref{Repl API}: the way you can interact with the REPL programmatically and access things like it's history, modify it's prompt, etc.
+      @li
+        @sect.ref{repl}: the object representing the Repl API, aliased as @hl.scala{repl} rather than it's full name @sect.ref{ammonite.repl.frontend.ReplBridge.repl}
+      @li
+        @sect.ref{Utilities}: tools such as @sect.ref{time}, @sect.ref{grep} or @sect.ref{browse} that are independent from the REPL, but are extremely useful to have in it.
+      @li
+        @sect.ref{Artifact Loading} implicits to provide the SBT-like syntax
+    @p
+      All of these are imported by default into any Ammonite REPL, in order to provide a rich and consistent REPL experience. If you want to disable these imports and run the REPL with a clean namespace (with only the core implicits needed for result pretty-printing/type-printing to work) pass in @hl.scala{defaultPredef = false} to the REPL's @hl.scala{Main} API or @hl.scala{--no-default-predef} to the REPL from the command-line.
 
+    @sect{Repl API}
+      @p
+        Ammonite contains a range of useful built-ins implemented as normal functions. Everything inside the @hl.scala{ReplAPI} trait is imported by default and can be accessed directly by default to control the console.
+
+      @hl.ref(replSource/'frontend/"ReplAPI.scala", "trait ReplAPI", "// End of ReplAPI")
+
+    @sect{Utilities}
+      @p
+        Apart from the core @sect.ref{Builtins} of the REPL, the Ammonite REPL also includes many helpers that are not strictly necessarily but are very useful in almost all REPL sessions. Here are a few of them
+
+      @ul
+        @li
+          @sect.ref{time}
+        @li
+          @sect.ref{grep}
+        @li
+          @sect.ref{browse}
+        @li
+          @sect.ref{desugar}
+
+    @p
+      The REPL also imports the @sect.ref("Extensions", "pipe-operators") from Ammonite-Ops by default to make it easy for you to use tools like @sect.ref{grep} interactively, and imports all the @sect.ref{Builtins} from the @hl.scala{repl
+
+    @p
+      These tools are useful but not strictly necessary;
+
+    @sect{time}
+      @compare("time ls -a", "time{ls!}")
+
+      @p
+        Just as bash provides a @code{time} command that you can use to see how long a command took to run, Ammonite-Shell provides a @hl.scala{time} function which serves the same purpose.
+      @p
+        While the bash version spits out the time in an ad-hoc table format, stuck together with the output of the command, Ammonite-Shell's @hl.scala{time} instead returns a tuple containing the expression that was evaluated, and the time taken to evaluate it.
+
+    @sect{grep}
+      @compare("ls -a . | grep re", """ls! wd || grep! "re" """)
+      @compare("ls -a . | grep re", """ls! wd |? grep! "re" """)
+
+      @p
+        Ammonite provides its own @hl.scala{grep} command, which lets you easily perform ad-hoc searches within a list.
+      @p
+        As shown above, Ammonite's @hl.scala{grep} can be used via @hl.scala{||} (@hl.scala{flatMap}) or @hl.scala{|?} (@hl.scala{filter}). In the case of @hl.scala{||}, it displays the matches found, highlighted, with some additional context before and after the match. When used with @hl.scala{|?}, it simply returns the relevant items. In general, @hl.scala{||} is useful for manual exploration, while @hl.scala{|?} is useful in scripts where you want to deal with the list of matched results later.
+      @p
+        By default, Ammonite's @hl.scala{grep} matches a string as a literal. If you want to match via a regex, append a @hl.scala{.r} to the string literal to turn it into a regex:
+
+      @compare("""ls -a . | grep -G "re[a-z]\+" """, """ls! wd || grep! "re[a-z]+".r """)
+
+      @p
+        Ammonite's @hl.scala{grep} isn't limited to "filesystem"-y things; @i{any} collection of objects can be piped through @hl.scala{grep}! For example, here's @hl.scala{grep} being used to quickly search through the JVM system properties:
+
+      @pre(ammSample(
+        """// I'm only interested in OS-related properties, show them to me!
+          |sys.props || grep! "os|OS".r""".stripMargin
+      ))
+
+      @p
+        You can even use Ammonite's @hl.scala{grep} to dig through the methods of an object, even large messy objects with far-too-many methods to go over by hand hunting for what you want:
+
+      @pre(ammSample(
+        """typeOf(compiler).members.size // Too many methods to dig through!
+          |// I forgot what I want but I think it has Raw in the name
+          |typeOf(compiler).members || grep! "Raw" """.stripMargin
+      ))
+      @p
+        In general, Ammonite's @hl.scala{grep} serves the same purpose of @code{grep} in the Bash shell: a quick and dirty way to explore large amounts of semi-structured data. You probably don't want to build your enterprise business logic on top of @hl.scala{grep}'s string matching. While you're working, though, @hl.scala{grep} can be a quick way to find items of interest in collections of things (anything!) too large to sift through by hand, when you're not yet sure exactly what you want.
+
+    @sect{browse}
+
+      @img(src:="Browse.gif", display.block, marginLeft.auto, marginRight.auto, height := 278)
+
+      @p
+        @hl.scala{browse} is a utility that lets you open up far-too-large data structures in the @code{less} pager, letting you page through large quantities of text, navigating around it and searching through it, without needing to spam your terminal output with its contents and losing your earlier work to the output-spam. Simple call @hl.scala{browse} on whatever value you want, e.g. this 50 thousand line @hl.scala{ls.rec} result show above.
+
+      @p
+        If you're dealing with large blobs of data that you want to dig through manually, you might normally format it nicely, write it to a file, and open it in @code{vim} or @code{less} or an editor such as Sublime Text. @hl.scala{browse} makes that process quick and convenient.
+
+      @p
+        You can customize the @hl.scala{browse} call like you would a @hl.scala{show} call or @hl.scala{pprint.pprintln} call, e.g. setting an optional @hl.scala{width}, @hl.scala{colors} or @hl.scala{indent}. You can also choose a @hl.scala{viewer} program in case you don't want to use @code{less}: e.g. here's a command that would open it up in @code{vim}:
+
+      @hl.scala
+        haoyi-Ammonite@@ browse(res0, viewer="vim", colors = pprint.Colors.BlackWhite)
+
+      @p
+        Apart from using @hl.scala{viewer="vim"}, we also set the @hl.scala{colors} to black and white because Vim by default doesn't display ANSI colors nicely. You can also pass in a @hl.scala{Seq} of strings to @hl.scala{viewer} if you want to pass additional flags to your editor, and of course use any other editor you would like such as @hl.scala{"emacs"} or @hl.scala{"nano"} or @hl.scala{"subl"}
+
+    @sect{desugar}
+      @img(src:="Browse.gif", display.block, marginLeft.auto, marginRight.auto, height := 495)
+
+      @p
+        @hl.scala{desugar} allows you to easily see what the compiler is doing with your code before it gets run. For example, in the above calls to @hl.scala{desugar}, you can see:
+
+      @ul
+        @li
+          @hl.scala{List(...)} being converted to @hl.scala{List.apply(...)}
+        @li
+          @hl.scala{true -> false} being converted to @hl.scala{Predef.ArrayAssoc(true).$minus$greater(false)}
+        @li
+          @hl.scala{default.write$default}, @hl.scala{default.SeqishW}, etc. being injected as implicits
+        @li
+          @hl.scala{for} comprehensions with @hl.scala{if} filters being converted into the relevant @hl.scala{withFilter} and @hl.scala{map} calls
+
+      @p
+        In general, if you are having trouble understanding the combination of implicit parameters, implicit conversions, macros, and other odd Scala features, @hl.scala{desugar} could you see what is left after all the magic happens.
+      @p
+        @hl.scala{desugar} only works in Scala 2.11.x and above, not in 2.10.x
   @sect{Script Files}
     @p
       Ammonite defines a format that allows you to load external scripts into the REPL; this can be used to save common functionality so it can be used at a later date. In the simplest case, a script file is simply a sequence of Scala statements, e.g.
@@ -398,33 +513,51 @@
       @p
         If you want these changes to always be present, place them in your @code{~/.ammonite/predef.scala}.
 
-
-  @sect{Debugging}
+  @sect{Embedding Ammonite}
     @p
-      Ammonite can be used as a tool to debug any other Scala program, by conveniently opening a REPL at any point within your program with which you can interact with live program data, similar to pdb/ipdb in Python. To do so, first add Ammonite to your classpath, e.g. through this SBT snippet:
-    @hl.scala
-      libraryDependencies += "com.lihaoyi" % "ammonite-repl" % "@ammonite.Constants.version" cross CrossVersion.full
+      The Ammonite REPL is just a plain-old-Scala-object, just like any other Scala object, and can be easily used within an existing Scala program. This is useful for things like interactive @sect.ref{Debugging} or hosting a @sect.ref{Remote REPL} to interact with a long-lived Scala process, or @sect.ref{Instantiating Ammonite} inside an existing program to serve as a powerful interactive console.
 
-    @p
-      Note that unlike the snippet given @sect.ref("Ammonite", "above"), we leave out the @hl.scala{% "test"} because we may want ammonite to be available within the "main" project, and not just in the unit tests. Then, anywhere within your program, you can place a breakpoint via:
+    @sect{Instantiating Ammonite}
+      @p
+        To use Ammonite inside an existing Scala program, you need to first add it to your dependencies:
 
-    @hl.scala
-      ammonite.repl.Main().debug("name1" -> value1, "name2" -> value2, ...)
+      @hl.scala
+        libraryDependencies += "com.lihaoyi" % "ammonite-repl" % "@ammonite.Constants.version" cross CrossVersion.full
 
-    @p
-      And when your program reaches that point, it will pause and open up an Ammonite REPL with the values you provided it bound to the names you gave it. From there, you can interact with those values as normal Scala values within the REPL. Use @code{Ctrl-D} or @hl.scala{exit} to exit the REPL and continue normal program execution. Note that the names given must be plain Scala identifiers.
+      @p
+        Then instantate it with this code anywhere within your program:
 
-    @p
-      Here's an example of it being used to debug changes to the @lnk("WootJS webserver", "https://github.com/d6y/wootjs"):
+      @hl.ref(ammoniteTests/"TestMain.scala")
 
-    @img(src:="Debugging.png", width:="100%")
-    @p
+      @p
+        You can configure the instantiated REPL by passing in arguments to the @hl.scala{Main()} call, e.g. to redirect the input/output streams or to run a @hl.scala{predef} to configure it further.
+
+    @sect{Debugging}
+      @p
+        Ammonite can be used as a tool to debug any other Scala program, by conveniently opening a REPL at any point within your program with which you can interact with live program data, similar to pdb/ipdb in Python. To do so, first add Ammonite to your classpath, e.g. through this SBT snippet:
+
+      @hl.scala
+        libraryDependencies += "com.lihaoyi" % "ammonite-repl" % "@ammonite.Constants.version" cross CrossVersion.full
+
+      @p
+        Note that unlike the snippet given @sect.ref("Ammonite", "above"), we leave out the @hl.scala{% "test"} because we may want ammonite to be available within the "main" project, and not just in the unit tests. Then, anywhere within your program, you can place a breakpoint via:
+
+      @hl.ref(wd/'integration/'src/'test/'scala/'ammonite/'integration/"TestMain.scala")
+
+      @p
+        And when your program reaches that point, it will pause and open up an Ammonite REPL with the values you provided it bound to the names you gave it. From there, you can interact with those values as normal Scala values within the REPL. Use @code{Ctrl-D} or @hl.scala{exit} to exit the REPL and continue normal program execution. Note that the names given must be plain Scala identifiers.
+
+      @p
+        Here's an example of it being used to debug changes to the @lnk("WootJS webserver", "https://github.com/d6y/wootjs"):
+
+      @img(src:="Debugging.png", width:="100%")
+      @p
       In this case, we added the @hl.scala{debug} statement within the websocket frame handler, so we can inspect the values that are taking part in the client-server data exchange. You can also put the @hl.scala{debug} statement inside a conditional, to make it break only when certain interesting situations (e.g. bugs) occur.
 
-    @p
-      As you can see, you can bind the values you're interested in to names inside the debug REPL, and once in the REPL are free to explore them interactively.
-    @p
-      The @hl.scala{debug()} call returns @hl.scala{: Any}; by default, this is @hl.scala{(): Unit}, but you can also return custom values by passing in an argument to @hl.scala{exit(...)} when you exit the REPL. This value will then be returned from @hl.scala{debug()}, and can be used in the rest of your Scala application.
+      @p
+        As you can see, you can bind the values you're interested in to names inside the debug REPL, and once in the REPL are free to explore them interactively.
+      @p
+        The @hl.scala{debug()} call returns @hl.scala{: Any}; by default, this is @hl.scala{(): Unit}, but you can also return custom values by passing in an argument to @hl.scala{exit(...)} when you exit the REPL. This value will then be returned from @hl.scala{debug()}, and can be used in the rest of your Scala application.
 
     @sect{Remote REPL}
 
