@@ -292,11 +292,11 @@
         @li
           @sect.ref{desugar}
 
-    @p
-      The REPL also imports the @sect.ref("Extensions", "pipe-operators") from Ammonite-Ops by default to make it easy for you to use tools like @sect.ref{grep} interactively, and imports all the @sect.ref{Builtins} from the @hl.scala{repl}.
+      @p
+        The REPL also imports the @sect.ref("Extensions", "pipe-operators") from Ammonite-Ops by default to make it easy for you to use tools like @sect.ref{grep} interactively, and imports all the @sect.ref{Builtins} from the @hl.scala{repl}.
 
-    @p
-      These tools are useful but not strictly necessary;
+      @p
+        These tools are useful but not strictly necessary;
 
       @sect{time}
         @compare("time ls -a", "time{ls!}")
