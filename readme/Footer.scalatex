@@ -57,7 +57,7 @@
         @li
           Wrote some basic @lnk("Internals Documentation", "https://github.com/lihaoyi/Ammonite/tree/master/internals-docs") in case people want to read about the internal workings of Ammonite in a way that's easier than digging through tons of code.
         @li
-          Changed the interface for calling Ammonite programmatically, from @hl.scala{ammonite.repl.Main.run(...lots of args...)} to @hl.scala{ammonite.repl.Main(...basic args...).run(...additional args...)}, with similar changes to @hl.scala{.debug} etc.. This should make configuring the Ammonite REPL before invoking it programmatically much more consistent.
+          Changed the interface for @sect.ref{Embedding Ammonite} to make configuring the Ammonite REPL before invoking it programmatically much more consistent.
         @li
           Moved tools such as @sect.ref{grep}, @sect.ref{time}, @sect.ref{browse} from @sect.ref{Ammonite-Shell} into the base @sect.ref{Ammonite-REPL}, and made them imported by default, so everyone can enjoy them by default.
         @li
