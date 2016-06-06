@@ -42,7 +42,7 @@
       @hl.scala
         libraryDependencies += "com.lihaoyi" % "ammonite-repl" % "@ammonite.Constants.version" % "test" cross CrossVersion.full
 
-        initialCommands in (Test, console) := """ammonite.repl.Main.run("")"""
+        initialCommands in (Test, console) := """ammonite.repl.Main().run()"""
 
       @p
         After that, simple hit
