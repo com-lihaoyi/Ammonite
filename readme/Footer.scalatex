@@ -51,6 +51,8 @@
         @li
           Improved source locations for error messages: now failures in scripts have a filename matching the name of the script (instead of @code{Main.scala}), and line numbers matching the original line numbers (instead of the line numbers in the synthetic code) thanks to thanks to @lnk("Abhishek Kumar", "https://github.com/coderabhishek")
         @li
+          Failures in scripts run using Ammonite from the command line or via @hl.scala{load.module} should show only the meaningful error and not irrelevant internal stacktraces
+        @li
           Wrapper names are now greatly simplified; now the names of wrapper objects for scripts match the name of the script (e.g. @code{MyScript}) rather than based on the code hash (e.g. @code{cache5a8890cd7c2ab07eea3fe8d605c7e188})
         @li
           Placed most synthetic code into packages; loaded scripts go into @hl.scala{ammonite.scripts} and code entered at the REPL goes in @hl.scala{ammonite.session}.
@@ -62,6 +64,8 @@
           Moved tools such as @sect.ref{grep}, @sect.ref{time}, @sect.ref{browse} from @sect.ref{Ammonite-Shell} into the base @sect.ref{Ammonite-REPL}, and made them imported by default, so everyone can enjoy them by default.
         @li
           Imported the various @sect.ref("Extensions", "pipe operations") from @sect.ref{Ammonite-Ops}: aliasing @code{.map} as @code{|}, @code{.filter} as @code{|?}, etc. to make it more convenient to use tools like @sect.ref{grep} from the base REPL
+        @li
+          Massive internal refactors to try and clean up the Ammonite codebase and get it ready for future work; if you find any bugs please report them!
 
 
     @sect{0.5.8}
