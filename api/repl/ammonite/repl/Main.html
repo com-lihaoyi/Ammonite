@@ -47,7 +47,7 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">Main</span><span class="params">(<span name="predef">predef: <span class="extype" name="scala.Predef.String">String</span> = <span class="symbol">&quot;&quot;</span></span>, <span name="defaultPredef">defaultPredef: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Boolean" class="extype" target="_top">Boolean</a> = <span class="symbol">true</span></span>, <span name="storageBackend">storageBackend: <a href="Storage.html" class="extype" name="ammonite.repl.Storage">Storage</a> = <span class="symbol"><span class="name"><a href="Storage$.html">Storage.InMemory()</a></span></span></span>, <span name="wd">wd: <span class="extype" name="ammonite.ops.Path">Path</span> = <span class="symbol"><span class="name"><a href="../package.html">ammonite.ops.cwd</a></span></span></span>, <span name="inputStream">inputStream: <span class="extype" name="java.io.InputStream">InputStream</span> = <span class="symbol">System.in</span></span>, <span name="outputStream">outputStream: <span class="extype" name="java.io.OutputStream">OutputStream</span> = <span class="symbol">System.out</span></span>, <span name="errorStream">errorStream: <span class="extype" name="java.io.OutputStream">OutputStream</span> = <span class="symbol">System.err</span></span>)</span><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+        <span class="name">Main</span><span class="params">(<span name="predef">predef: <span class="extype" name="scala.Predef.String">String</span> = <span class="symbol">&quot;&quot;</span></span>, <span name="defaultPredef">defaultPredef: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Boolean" class="extype" target="_top">Boolean</a> = <span class="symbol">true</span></span>, <span name="storageBackend">storageBackend: <a href="Storage.html" class="extype" name="ammonite.repl.Storage">Storage</a> = <span class="symbol"><span class="name"><a href="Storage$.html">Storage.InMemory()</a></span></span></span>, <span name="wd">wd: <span class="extype" name="ammonite.ops.Path">Path</span> = <span class="symbol"><span class="name"><a href="../package.html">ammonite.ops.cwd</a></span></span></span>, <span name="welcomeBanner">welcomeBanner: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Option" class="extype" target="_top">Option</a>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol"><span class="name"><a href="Main$.html">Some(Main.defaultWelcomeBanner)</a></span></span></span>, <span name="inputStream">inputStream: <span class="extype" name="java.io.InputStream">InputStream</span> = <span class="symbol">System.in</span></span>, <span name="outputStream">outputStream: <span class="extype" name="java.io.OutputStream">OutputStream</span> = <span class="symbol">System.out</span></span>, <span name="errorStream">errorStream: <span class="extype" name="java.io.OutputStream">OutputStream</span> = <span class="symbol">System.err</span></span>)</span><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
       </span>
       </h4>
       
@@ -109,7 +109,7 @@ every time it is called!
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="ammonite.repl.Main#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="&lt;init&gt;(predef:String,defaultPredef:Boolean,storageBackend:ammonite.repl.Storage,wd:ammonite.ops.Path,inputStream:java.io.InputStream,outputStream:java.io.OutputStream,errorStream:java.io.OutputStream):ammonite.repl.Main"></a>
+      <a id="&lt;init&gt;(predef:String,defaultPredef:Boolean,storageBackend:ammonite.repl.Storage,wd:ammonite.ops.Path,welcomeBanner:Option[String],inputStream:java.io.InputStream,outputStream:java.io.OutputStream,errorStream:java.io.OutputStream):ammonite.repl.Main"></a>
       <a id="&lt;init&gt;:Main"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -117,10 +117,10 @@ every time it is called!
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">Main</span><span class="params">(<span name="predef">predef: <span class="extype" name="scala.Predef.String">String</span> = <span class="symbol">&quot;&quot;</span></span>, <span name="defaultPredef">defaultPredef: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Boolean" class="extype" target="_top">Boolean</a> = <span class="symbol">true</span></span>, <span name="storageBackend">storageBackend: <a href="Storage.html" class="extype" name="ammonite.repl.Storage">Storage</a> = <span class="symbol"><span class="name"><a href="Storage$.html">Storage.InMemory()</a></span></span></span>, <span name="wd">wd: <span class="extype" name="ammonite.ops.Path">Path</span> = <span class="symbol"><span class="name"><a href="../package.html">ammonite.ops.cwd</a></span></span></span>, <span name="inputStream">inputStream: <span class="extype" name="java.io.InputStream">InputStream</span> = <span class="symbol">System.in</span></span>, <span name="outputStream">outputStream: <span class="extype" name="java.io.OutputStream">OutputStream</span> = <span class="symbol">System.out</span></span>, <span name="errorStream">errorStream: <span class="extype" name="java.io.OutputStream">OutputStream</span> = <span class="symbol">System.err</span></span>)</span>
+        <span class="name">Main</span><span class="params">(<span name="predef">predef: <span class="extype" name="scala.Predef.String">String</span> = <span class="symbol">&quot;&quot;</span></span>, <span name="defaultPredef">defaultPredef: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Boolean" class="extype" target="_top">Boolean</a> = <span class="symbol">true</span></span>, <span name="storageBackend">storageBackend: <a href="Storage.html" class="extype" name="ammonite.repl.Storage">Storage</a> = <span class="symbol"><span class="name"><a href="Storage$.html">Storage.InMemory()</a></span></span></span>, <span name="wd">wd: <span class="extype" name="ammonite.ops.Path">Path</span> = <span class="symbol"><span class="name"><a href="../package.html">ammonite.ops.cwd</a></span></span></span>, <span name="welcomeBanner">welcomeBanner: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Option" class="extype" target="_top">Option</a>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol"><span class="name"><a href="Main$.html">Some(Main.defaultWelcomeBanner)</a></span></span></span>, <span name="inputStream">inputStream: <span class="extype" name="java.io.InputStream">InputStream</span> = <span class="symbol">System.in</span></span>, <span name="outputStream">outputStream: <span class="extype" name="java.io.OutputStream">OutputStream</span> = <span class="symbol">System.out</span></span>, <span name="errorStream">errorStream: <span class="extype" name="java.io.OutputStream">OutputStream</span> = <span class="symbol">System.err</span></span>)</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#ammonite.repl.Main@&lt;init&gt;(predef:String,defaultPredef:Boolean,storageBackend:ammonite.repl.Storage,wd:ammonite.ops.Path,inputStream:java.io.InputStream,outputStream:java.io.OutputStream,errorStream:java.io.OutputStream):ammonite.repl.Main" title="Permalink" target="_top">
+      <a href="../../index.html#ammonite.repl.Main@&lt;init&gt;(predef:String,defaultPredef:Boolean,storageBackend:ammonite.repl.Storage,wd:ammonite.ops.Path,welcomeBanner:Option[String],inputStream:java.io.InputStream,outputStream:java.io.OutputStream,errorStream:java.io.OutputStream):ammonite.repl.Main" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -654,6 +654,23 @@ of <code>args</code> and a map of keyword <code>kwargs</code> to pass to that fi
       <p class="shortcomment cmt">The working directory of the REPL; when it load scripts, where
           the scripts will be considered relative to when assigning them
           packages</p>
+    </li><li name="ammonite.repl.Main#welcomeBanner" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="welcomeBanner:Option[String]"></a>
+      <a id="welcomeBanner:Option[String]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">welcomeBanner</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Option" class="extype" target="_top">Option</a>[<span class="extype" name="scala.Predef.String">String</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.repl.Main@welcomeBanner:Option[String]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
     </li></ol>
             </div>
 
