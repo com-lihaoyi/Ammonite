@@ -61,8 +61,8 @@ object Evaluator{
   def apply(currentClassloader: ClassLoader,
             compile: => (Array[Byte], Printer, Int, String) => Compiler.Output,
             startingLine: Int,
-            cacheLoad: String => Option[CompileCache],
-            cacheSave: (String, CompileCache) => Unit,
+            cacheLoad: (String, String) => Option[CompileCache],
+            cacheSave: (String, String, CompileCache) => Unit,
             addToCompilerClasspath:  => ClassFiles => Unit,
             classOutputDir: Option[String] = None): Evaluator = new Evaluator{ eval =>
 

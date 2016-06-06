@@ -11,6 +11,7 @@ class Repl(input: InputStream,
            output: OutputStream,
            error: OutputStream,
            storage: Storage,
+           predef: String,
            wd: ammonite.ops.Path,
            welcomeBanner: Option[String],
            replArgs: Seq[Bind[_]] = Nil,
@@ -47,9 +48,9 @@ class Repl(input: InputStream,
     printer,
     storage,
     history,
-    predef,
-    wd,
-    replArgs,
+    predef = predef,
+    wd = wd,
+    replArgs = replArgs,
     classOutputDir = classOutputDir
   )
 
@@ -110,6 +111,7 @@ object Repl{
                      source: fansi.Attrs) = {
     val src =
       if (f.isNativeMethod) source("Native Method")
+      else if (f.getFileName == null) source("(null)")
       else source(f.getFileName) ++ error(":") ++ source(f.getLineNumber.toString)
 
     val prefix :+ clsName = f.getClassName.split('.').toSeq

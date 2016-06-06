@@ -65,7 +65,7 @@ case class Main(predef: String = "",
       predef = augmentedPredef + "\n" + predef,
       wd = wd,
       welcomeBanner = welcomeBanner,
-      replArgs = replArgs
+      replArgs = replArgs,
       classOutputDir = classOutputDir
     )
   }

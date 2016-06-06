@@ -184,8 +184,20 @@ class SpecialClassLoader(parent: ClassLoader, parentHash: Array[Byte], classOutp
         if (!f.exists()) {
           f.mkdirs();
         }
+        val pkgDirs: Array[String] = name.split("\\.")
+        val baseName = pkgDirs(pkgDirs.length - 1)
+        var baseDir = outputDir
+        if (pkgDirs.length >= 2) {
+          // Create subdirectories to ensure a class named root.module.submodule.Class
+          // lies in outputDir/root/module/submodule.
+          val subdirs = pkgDirs
+            .slice(0, pkgDirs.length - 1)
+            .mkString("" + File.separatorChar)
+          new File(outputDir, subdirs).mkdirs();
+          baseDir = new File(outputDir, subdirs).getAbsolutePath
+        }
         try {
-          val classFile = new File(outputDir, s"$name.class")
+          val classFile = new File(baseDir, s"$baseName.class")
           val fout = new FileOutputStream(classFile)
           fout.write(bytes)
           fout.close()
@@ -200,7 +212,7 @@ class SpecialClassLoader(parent: ClassLoader, parentHash: Array[Byte], classOutp
   }
 
   override def getResourceAsStream(name: String): InputStream = {
-    val anonName = name.replaceAll("\\.class$", "")
+    val anonName = name.replaceAll("\\.class$", "").replaceAll("/", ".")
     if (newFileDict.contains(anonName)) {
       new ByteArrayInputStream(newFileDict.get(anonName).get)
     } else {
