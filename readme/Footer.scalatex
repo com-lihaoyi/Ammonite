@@ -48,6 +48,8 @@
           Made @sect.ref{browse} use the process current working directory if there's no implicit path in scope, since most times it doesn't matter
         @li
           Make the welcome banner "Welcome to the Ammonite Repl..." customizable
+        @li
+          Fixed bug where triggering autocomplete resulted in a broken REPL session
     @sect{0.5.9}
       @ul
         @li

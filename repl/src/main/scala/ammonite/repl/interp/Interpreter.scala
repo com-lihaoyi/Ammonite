@@ -445,6 +445,10 @@ class Interpreter(prompt0: Ref[String],
   def evalClassloader = eval.sess.frames.head.classloader
   def init() = {
     Timer("Interpreter init init 0")
+    // Note we not only make a copy of `settings` to pass to the compiler,
+    // we also make a *separate* copy to pass to the presentation compiler.
+    // Otherwise activating autocomplete makes the presentation compiler mangle
+    // the shared settings and makes the main compiler sad
     val settings = Option(compiler).fold(new Settings)(_.compiler.settings.copy)
     compiler = Compiler(
       Classpath.classpath ++ eval.sess.frames.head.classpath,
@@ -459,7 +463,8 @@ class Interpreter(prompt0: Ref[String],
       Classpath.classpath ++ eval.sess.frames.head.classpath,
       dynamicClasspath,
       evalClassloader,
-      settings
+
+      settings.copy()
     )
     Timer("Interpreter init init pressy")
   }
