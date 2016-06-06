@@ -261,7 +261,7 @@
       @li
         @sect.ref{Repl API}: the way you can interact with the REPL programmatically and access things like it's history, modify it's prompt, etc.
       @li
-        @sect.ref{repl}: the object representing the Repl API, aliased as @hl.scala{repl} rather than it's full name @sect.ref{ammonite.repl.frontend.ReplBridge.repl}. Although you can call them API methods directly (e.g. @hl.scala{history}) you can also call them via the @hl.scala{repl} object (e.g. @hl.scala{repl.history}) and you can use autocomplete or @hl.scala{typeOf} on the @hl.scala{repl} object to see what is available.
+        @hl.scala{repl}: the object representing the Repl API, aliased as @hl.scala{repl} rather than it's full name @hl.scala{ammonite.repl.frontend.ReplBridge.repl}. Although you can call them API methods directly (e.g. @hl.scala{history}) you can also call them via the @hl.scala{repl} object (e.g. @hl.scala{repl.history}) and you can use autocomplete or @hl.scala{typeOf} on the @hl.scala{repl} object to see what is available.
       @li
         @sect.ref{Utilities}: tools such as @sect.ref{time}, @sect.ref{grep} or @sect.ref{browse} that are independent from the REPL, but are extremely useful to have in it.
       @li
@@ -462,7 +462,7 @@
       @p
         Often when calling a script from the external command- line (e.g. Bash), you need to pass arguments to configure its behavior. With Ammonite, this is done by defining a @hl.scala{main} method, e.g.
 
-      @hl.ref(wd/'integration/'src/'test/'resources/'ammonite/'integration/"Args.scala")
+      @hl.ref(wd/'integration/'src/'test/'resources/'ammonite/'integration/'basic/"Args.scala")
 
       @p
         When the script is run from the command line:
@@ -530,7 +530,7 @@
       @p
         Then instantate it with this code anywhere within your program:
 
-      @hl.ref(ammoniteTests/"TestMain.scala")
+      @hl.ref('repl/'src/'test/'scala/'ammonite/'repl/"TestMain.scala")
 
       @p
         You can configure the instantiated REPL by passing in arguments to the @hl.scala{Main()} call, e.g. to redirect the input/output streams or to run a @hl.scala{predef} to configure it further.
