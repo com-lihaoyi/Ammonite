@@ -270,7 +270,8 @@ object HistoryFilter{
           (start, end)
         }
 
-      val newStr = buffer.overlay(startColor, searchStart, searchEnd)
+
+      val newStr = buffer.overlay(startColor, searchStart, math.min(buffer.length, searchEnd))
       newStr
     }
 
