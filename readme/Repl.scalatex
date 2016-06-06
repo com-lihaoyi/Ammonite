@@ -261,7 +261,7 @@
       @li
         @sect.ref{Repl API}: the way you can interact with the REPL programmatically and access things like it's history, modify it's prompt, etc.
       @li
-        @sect.ref{repl}: the object representing the Repl API, aliased as @hl.scala{repl} rather than it's full name @sect.ref{ammonite.repl.frontend.ReplBridge.repl}
+        @sect.ref{repl}: the object representing the Repl API, aliased as @hl.scala{repl} rather than it's full name @sect.ref{ammonite.repl.frontend.ReplBridge.repl}. Although you can call them API methods directly (e.g. @hl.scala{history}) you can also call them via the @hl.scala{repl} object (e.g. @hl.scala{repl.history}) and you can use autocomplete or @hl.scala{typeOf} on the @hl.scala{repl} object to see what is available.
       @li
         @sect.ref{Utilities}: tools such as @sect.ref{time}, @sect.ref{grep} or @sect.ref{browse} that are independent from the REPL, but are extremely useful to have in it.
       @li
@@ -274,6 +274,9 @@
         Ammonite contains a range of useful built-ins implemented as normal functions. Everything inside the @hl.scala{ReplAPI} trait is imported by default and can be accessed directly by default to control the console.
 
       @hl.ref(replSource/'frontend/"ReplAPI.scala", "trait ReplAPI", "// End of ReplAPI")
+
+      @p
+        All of these are also available as part of the @hl.scala{repl} object which is imported in scope by default.
 
     @sect{Utilities}
       @p
@@ -290,7 +293,7 @@
           @sect.ref{desugar}
 
     @p
-      The REPL also imports the @sect.ref("Extensions", "pipe-operators") from Ammonite-Ops by default to make it easy for you to use tools like @sect.ref{grep} interactively, and imports all the @sect.ref{Builtins} from the @hl.scala{repl
+      The REPL also imports the @sect.ref("Extensions", "pipe-operators") from Ammonite-Ops by default to make it easy for you to use tools like @sect.ref{grep} interactively, and imports all the @sect.ref{Builtins} from the @hl.scala{repl}.
 
     @p
       These tools are useful but not strictly necessary;
