@@ -1,8 +1,6 @@
 package ammonite.repl.interp
 import ammonite.repl.tools.{IvyThing, Resolvers, Resolver}
 import java.io.File
-import java.nio.file.NotDirectoryException
-import org.apache.ivy.plugins.resolver.RepositoryResolver
 import ammonite.repl.Res
 import scala.collection.mutable
 import scala.tools.nsc.Settings
@@ -67,61 +65,6 @@ class Interpreter(prompt0: Ref[String],
     }
   }
 
-  def importBlock(importData: Seq[ImportData]) = {
-    Timer("importBlock 0")
-    // Group the remaining imports into sliding groups according to their
-    // prefix, while still maintaining their ordering
-    val grouped = mutable.Buffer[mutable.Buffer[ImportData]]()
-    for(data <- importData){
-      if (grouped.isEmpty) grouped.append(mutable.Buffer(data))
-      else {
-        val last = grouped.last.last
-
-        // Start a new import if we're importing from somewhere else, or
-        // we're importing the same thing from the same place but aliasing
-        // it to a different name, since you can't import the same thing
-        // twice in a single import statement
-        val startNewImport =
-          last.prefix != data.prefix || grouped.last.exists(_.fromName == data.fromName)
-
-        if (startNewImport) grouped.append(mutable.Buffer(data))
-        else grouped.last.append(data)
-      }
-    }
-    // Stringify everything
-    val out = for(group <- grouped) yield {
-      val printedGroup = for(item <- group) yield{
-        if (item.fromName == item.toName) Parsers.backtickWrap(item.fromName)
-        else s"${Parsers.backtickWrap(item.fromName)} => ${Parsers.backtickWrap(item.toName)}"
-      }
-      "import " + group.head.prefix + ".{\n  " + printedGroup.mkString(",\n  ") + "\n}\n"
-    }
-    val res = out.mkString
-
-    Timer("importBlock 1")
-    res
-  }
-
-
-  def wrapCode(pkgName: String,
-               indexedWrapperName: String,
-               code: String,
-               printCode: String,
-               imports: Seq[ImportData]) = {
-    val topWrapper = s"""
-package $pkgName
-${importBlock(imports)}
-
-object $indexedWrapperName{\n"""
-
-    val bottomWrapper = s"""\ndef $$main() = { $printCode }
-  override def toString = "$indexedWrapperName"
-}
-"""
-    val importsLen = topWrapper.length
-    (topWrapper + code + bottomWrapper, importsLen)
-  }
-
   def compileClass(code: (String, Int),
                    printer: Printer,
                    fileName: String): Res[(Util.ClassFiles, Seq[ImportData])] = for {
@@ -145,7 +88,7 @@ object $indexedWrapperName{\n"""
     for{
       _ <- Catching{ case e: ThreadDeath => Evaluator.interrupted(e) }
       (classFiles, newImports) <- compileClass(
-        wrapCode(
+        Preprocessor.wrapCode(
           "ammonite.session",
           wrapperName,
           code,
@@ -214,7 +157,7 @@ object $indexedWrapperName{\n"""
 
     Timer("cachedCompileBlock 1")
 
-    val wrappedCode = wrapCode(
+    val wrappedCode = Preprocessor.wrapCode(
       pkgName, wrapperName, code, printCode, imports
     )
     val fullyQualifiedName = pkgName + "." + wrapperName
@@ -468,7 +411,7 @@ object $indexedWrapperName{\n"""
 
     def lastException = Interpreter.this.lastException
 
-    def imports = importBlock(eval.sess.frames.head.imports)
+    def imports = Preprocessor.importBlock(eval.sess.frames.head.imports)
     val colors = colors0
     val prompt = prompt0
     val frontEnd = frontEnd0

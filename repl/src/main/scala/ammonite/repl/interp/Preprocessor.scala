@@ -1,20 +1,87 @@
 package ammonite.repl.interp
 import acyclic.file
-import ammonite.repl.{Parsers, Res}
+import ammonite.repl.{ImportData, Parsers, Res, Timer}
 
 import scala.reflect.internal.Flags
 import scala.tools.nsc.{Global => G}
-
+import collection.mutable
 /**
- * Converts REPL-style snippets into full-fledged Scala source files,
- * ready to feed into the compiler. Each source-string is turned into
- * three things:
- */
+  * Responsible for all scala-source-code-munging that happens within the
+  * Ammonite REPL.
+  *
+  * Performs several tasks:
+  *
+  * - Takes top-level Scala expressions and assigns them to `res{1, 2, 3, ...}`
+  *   values so they can be accessed later in the REPL
+  *
+  * - Wraps the code snippet with an wrapper `object` since Scala doesn't allow
+  *   top-level expressions
+  *
+  * - Mangles imports from our [[ImportData]] data structure into a source
+  *   String
+  *
+  * - Combines all of these into a complete compilation unit ready to feed into
+  *   the Scala compiler
+  */
 trait Preprocessor{
   def apply(stmts: Seq[String], wrapperId: String, comment: String = ""): Res[Preprocessor.Output]
 }
 object Preprocessor{
+  def importBlock(importData: Seq[ImportData]) = {
+    Timer("importBlock 0")
+    // Group the remaining imports into sliding groups according to their
+    // prefix, while still maintaining their ordering
+    val grouped = mutable.Buffer[mutable.Buffer[ImportData]]()
+    for(data <- importData){
+      if (grouped.isEmpty) grouped.append(mutable.Buffer(data))
+      else {
+        val last = grouped.last.last
 
+        // Start a new import if we're importing from somewhere else, or
+        // we're importing the same thing from the same place but aliasing
+        // it to a different name, since you can't import the same thing
+        // twice in a single import statement
+        val startNewImport =
+          last.prefix != data.prefix || grouped.last.exists(_.fromName == data.fromName)
+
+        if (startNewImport) grouped.append(mutable.Buffer(data))
+        else grouped.last.append(data)
+      }
+    }
+    // Stringify everything
+    val out = for(group <- grouped) yield {
+      val printedGroup = for(item <- group) yield{
+        if (item.fromName == item.toName) Parsers.backtickWrap(item.fromName)
+        else s"${Parsers.backtickWrap(item.fromName)} => ${Parsers.backtickWrap(item.toName)}"
+      }
+      "import " + group.head.prefix + ".{\n  " + printedGroup.mkString(",\n  ") + "\n}\n"
+    }
+    val res = out.mkString
+
+    Timer("importBlock 1")
+    res
+  }
+
+  def wrapCode(pkgName: String,
+               indexedWrapperName: String,
+               code: String,
+               printCode: String,
+               imports: Seq[ImportData]) = {
+
+    val topWrapper = s"""
+package $pkgName
+${importBlock(imports)}
+
+object $indexedWrapperName{\n"""
+
+    val bottomWrapper = s"""\ndef $$main() = { $printCode }
+  override def toString = "$indexedWrapperName"
+}
+"""
+    val importsLen = topWrapper.length
+
+    (topWrapper + code + bottomWrapper, importsLen)
+  }
   case class Output(code: String, printer: Seq[String])
 
   def apply(parse: => String => Either[String, Seq[G#Tree]]): Preprocessor = new Preprocessor{
