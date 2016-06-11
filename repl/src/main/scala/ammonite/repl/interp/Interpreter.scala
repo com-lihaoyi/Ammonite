@@ -33,15 +33,113 @@ class Interpreter(prompt0: Ref[String],
 
 
   val hardcodedPredef =
-    """import ammonite.repl.frontend.ReplBridge.repl.{pprintConfig, derefPPrint}
-      |""".stripMargin
+    "import ammonite.repl.frontend.ReplBridge.repl.{pprintConfig, derefPPrint}"
 
-  val SheBang = "#!"
+
+  //this variable keeps track of where should we put the imports resulting from scripts.
+  private var scriptImportCallback: Seq[ImportData] => Unit = eval.update
 
   var lastException: Throwable = null
 
   private var _compilationCount = 0
   def compilationCount = _compilationCount
+
+
+  val mainThread = Thread.currentThread()
+  val eval = Evaluator(
+    mainThread.getContextClassLoader,
+    0
+  )
+
+  val dynamicClasspath = new VirtualDirectory("(memory)", None)
+  var compiler: Compiler = _
+  var pressy: Pressy = _
+  def evalClassloader = eval.sess.frames.head.classloader
+  def init() = {
+    Timer("Interpreter init init 0")
+    // Note we not only make a copy of `settings` to pass to the compiler,
+    // we also make a *separate* copy to pass to the presentation compiler.
+    // Otherwise activating autocomplete makes the presentation compiler mangle
+    // the shared settings and makes the main compiler sad
+    val settings = Option(compiler).fold(new Settings)(_.compiler.settings.copy)
+    compiler = Compiler(
+      Classpath.classpath ++ eval.sess.frames.head.classpath,
+      dynamicClasspath,
+      evalClassloader,
+      eval.sess.frames.head.pluginClassloader,
+      () => pressy.shutdownPressy(),
+      settings
+    )
+    Timer("Interpreter init init compiler")
+    pressy = Pressy(
+      Classpath.classpath ++ eval.sess.frames.head.classpath,
+      dynamicClasspath,
+      evalClassloader,
+
+      settings.copy()
+    )
+    Timer("Interpreter init init pressy")
+  }
+
+
+  val preprocess = Preprocessor(compiler.parse)
+
+  Timer("Interpreter init Preprocess")
+
+
+  evalClassloader.findClassPublic("ammonite.repl.frontend.ReplBridge$")
+  val bridgeCls = evalClassloader.findClassPublic("ammonite.repl.frontend.ReplBridge")
+
+  ReplAPI.initReplBridge(
+    bridgeCls.asInstanceOf[Class[ReplAPIHolder]],
+    replApi
+  )
+  Timer("Interpreter init eval")
+  init()
+  Timer("Interpreter init init")
+  val argString =
+    replArgs.zipWithIndex
+      .map{ case (b, idx) =>
+        s"""
+              val ${b.name} =
+                ammonite.repl
+                        .frontend
+                        .ReplBridge
+                        .repl
+                        .replArgs($idx)
+                        .value
+                        .asInstanceOf[${b.typeTag.tpe}]
+              """
+      }
+      .mkString("\n")
+
+  val predefs = Seq(
+    (hardcodedPredef, "HardcodedPredef", "ammonite.predef"),
+    (predef, "Predef", "ammonite.predef"),
+    (storage.loadPredef, "LoadedPredef", "ammonite.predef"),
+    (argString, "ArgsPredef", "ammonite.predef")
+  )
+
+  val predefImports = predefs.foldLeft(Seq.empty[ImportData]){
+    case (prevImports, (sourceCode, wrapperName, pkgName)) =>
+      processModule0(sourceCode, wrapperName, pkgName, prevImports) match{
+        case Res.Success(imports) => Frame.mergeImports(prevImports, imports)
+        case Res.Failure(ex, msg) =>
+          ex match{
+            case Some(e) => throw new RuntimeException("Error during Predef: " + msg, e)
+            case None => throw new RuntimeException("Error during Predef: " + msg)
+          }
+
+        case Res.Exception(ex, msg) =>
+          throw new RuntimeException("Error during Predef: " + msg, ex)
+      }
+  }
+
+  eval.sess.save()
+  Timer("Interpreter init predef 0")
+  init()
+  Timer("Interpreter init predef 1")
+
 
   def processLine(code: String,
                   stmts: Seq[String],
@@ -133,22 +231,6 @@ class Interpreter(prompt0: Ref[String],
   } yield res
 
 
-  /**
-    * This gives our cache tags for compile caching. The cache tags are a hash
-    * of classpath, previous commands (in-same-script), and the block-code.
-    * Previous commands are hashed in the wrapper names, which are contained
-    * in imports, so we don't need to pass them explicitly.
-    */
-  def cacheTag(code: String, imports: Seq[ImportData], classpathHash: Array[Byte]): String = {
-    val bytes = Util.md5Hash(Iterator(
-      Util.md5Hash(Iterator(code.getBytes)),
-      Util.md5Hash(imports.iterator.map(_.toString.getBytes)),
-      classpathHash
-    ))
-    "cache" + bytes.map("%02x".format(_)).mkString //add prefix to make sure it begins with a letter
-  }
-
-
   def cachedCompileBlock(wrappedCode: String,
                          importsLength: Int,
                          printer: Printer,
@@ -160,7 +242,7 @@ class Interpreter(prompt0: Ref[String],
     Timer("cachedCompileBlock 1")
 
     val fullyQualifiedName = pkgName + "." + wrapperName
-    val tag = cacheTag(wrappedCode, Nil, eval.sess.frames.head.classloader.classpathHash)
+    val tag = Interpreter.cacheTag(wrappedCode, Nil, eval.sess.frames.head.classloader.classpathHash)
     Timer("cachedCompileBlock 2")
     val compiled = storage.compileCacheLoad(fullyQualifiedName, tag) match {
       case Some((classFiles, newImports)) =>
@@ -187,18 +269,17 @@ class Interpreter(prompt0: Ref[String],
   }
 
   def processModule(code: String, wrapperName: String, pkgName: String) = {
+    println("Process Module " + pkgName + " " + wrapperName)
     processModule0(code, wrapperName, pkgName, predefImports)
   }
 
-  def indexWrapperName(wrapperName: String, wrapperIndex: Int) = {
-    wrapperName + (if (wrapperIndex == 1) "" else wrapperIndex)
-  }
+
   def processModule0(code: String,
                     wrapperName: String,
                     pkgName: String,
                     startingImports: Seq[ImportData]): Res[Seq[ImportData]] = {
     processScript(
-      skipSheBangLine(code),
+      Interpreter.skipSheBangLine(code),
       startingImports,
       pkgName,
       wrapperName,
@@ -206,17 +287,16 @@ class Interpreter(prompt0: Ref[String],
         withContextClassloader(
           processScriptBlock(
             wrappedCode, importsLength, printer,
-            indexWrapperName(wrapperName, wrapperIndex),
+            Interpreter.indexWrapperName(wrapperName, wrapperIndex),
             wrapperName + ".scala", pkgName
           )
         )
     )
   }
 
-
   def processExec(code: String): Res[Seq[ImportData]] = {
     processScript(
-      skipSheBangLine(code),
+      Interpreter.skipSheBangLine(code),
       predefImports,
       "ammonite.session",
       "cmd" + eval.getCurrentLine,
@@ -227,35 +307,13 @@ class Interpreter(prompt0: Ref[String],
   }
 
 
-  private def skipSheBangLine(code: String)= {
-    if (code.startsWith(SheBang))
-      code.substring(code.indexOf('\n'))
-     else
-      code
-  }
 
-
-  //this variable keeps track of where should we put the imports resulting from scripts.
-  private var scriptImportCallback: Seq[ImportData] => Unit = eval.update
-
-  type EvaluateCallback = (String, Int, Int) => Res[Evaluated]
-
-  def errMsg(msg: String, code: String, expected: String, idx: Int): String = {
-    val locationString = {
-      val (first, last) = code.splitAt(idx)
-      val lastSnippet = last.split('\n').headOption.getOrElse("")
-      val firstSnippet = first.reverse.split('\n').lift(0).getOrElse("").reverse
-      firstSnippet + lastSnippet + "\n" + (" " * firstSnippet.length) + "^"
-    }
-
-    s"Syntax Error: $msg\n$locationString"
-  }
 
   def processCorrectScript(rawParsedCode: Parsed.Success[Seq[(String, Seq[String])]],
                            startingImports: Seq[ImportData],
                            pkgName: String,
                            wrapperName: String,
-                           evaluate: EvaluateCallback)
+                           evaluate: Interpreter.EvaluateCallback)
                           : Res[Seq[ImportData]] = {
     var offset = 0
     val blocks = mutable.Buffer[(String, Seq[String])]()
@@ -308,7 +366,7 @@ class Interpreter(prompt0: Ref[String],
               "",
               blocks.head._1,
               pkgName,
-              indexWrapperName(wrapperName, wrapperIndex),
+              Interpreter.indexWrapperName(wrapperName, wrapperIndex),
               scriptImports,
               _ => ""
             )
@@ -333,7 +391,7 @@ class Interpreter(prompt0: Ref[String],
     try {
       loop(
         blocks,
-        Seq(), Seq(),
+        startingImports, Seq(),
         // starts off as 1, so that consecutive wrappers can be named
         // Wrapper, Wrapper2, Wrapper3, Wrapper4, ...
         wrapperIndex = 1
@@ -349,14 +407,14 @@ class Interpreter(prompt0: Ref[String],
                     startingImports: Seq[ImportData],
                     pkgName: String,
                     wrapperName: String,
-                    evaluate: EvaluateCallback)
+                    evaluate: Interpreter.EvaluateCallback)
                     : Res[Seq[ImportData]] = {
 
     Timer("processScript 0a")
     Parsers.splitScript(code) match {
       case f: Parsed.Failure =>
         Timer("processScriptFailed 0b")
-        Res.Failure(None, errMsg(f.msg, code, f.extra.traced.expected, f.index))
+        Res.Failure(None, Interpreter.errMsg(f.msg, code, f.extra.traced.expected, f.index))
       case s: Parsed.Success[Seq[(String, Seq[String])]] =>
         Timer("processCorrectScript 0b")
         processCorrectScript(s, startingImports, pkgName, wrapperName, evaluate)
@@ -542,98 +600,47 @@ class Interpreter(prompt0: Ref[String],
     }
   }
 
-  val mainThread = Thread.currentThread()
-  val eval = Evaluator(
-    mainThread.getContextClassLoader,
-    0
-  )
+}
+object Interpreter{
+  val SheBang = "#!"
 
-  val dynamicClasspath = new VirtualDirectory("(memory)", None)
-  var compiler: Compiler = _
-  var pressy: Pressy = _
-  def evalClassloader = eval.sess.frames.head.classloader
-  def init() = {
-    Timer("Interpreter init init 0")
-    // Note we not only make a copy of `settings` to pass to the compiler,
-    // we also make a *separate* copy to pass to the presentation compiler.
-    // Otherwise activating autocomplete makes the presentation compiler mangle
-    // the shared settings and makes the main compiler sad
-    val settings = Option(compiler).fold(new Settings)(_.compiler.settings.copy)
-    compiler = Compiler(
-      Classpath.classpath ++ eval.sess.frames.head.classpath,
-      dynamicClasspath,
-      evalClassloader,
-      eval.sess.frames.head.pluginClassloader,
-      () => pressy.shutdownPressy(),
-      settings
-    )
-    Timer("Interpreter init init compiler")
-    pressy = Pressy(
-      Classpath.classpath ++ eval.sess.frames.head.classpath,
-      dynamicClasspath,
-      evalClassloader,
 
-      settings.copy()
-    )
-    Timer("Interpreter init init pressy")
+  /**
+    * This gives our cache tags for compile caching. The cache tags are a hash
+    * of classpath, previous commands (in-same-script), and the block-code.
+    * Previous commands are hashed in the wrapper names, which are contained
+    * in imports, so we don't need to pass them explicitly.
+    */
+  def cacheTag(code: String, imports: Seq[ImportData], classpathHash: Array[Byte]): String = {
+    val bytes = Util.md5Hash(Iterator(
+      Util.md5Hash(Iterator(code.getBytes)),
+      Util.md5Hash(imports.iterator.map(_.toString.getBytes)),
+      classpathHash
+    ))
+    "cache" + bytes.map("%02x".format(_)).mkString //add prefix to make sure it begins with a letter
   }
 
-
-  val preprocess = Preprocessor(compiler.parse)
-
-  Timer("Interpreter init Preprocess")
-
-
-  evalClassloader.findClassPublic("ammonite.repl.frontend.ReplBridge$")
-  val bridgeCls = evalClassloader.findClassPublic("ammonite.repl.frontend.ReplBridge")
-
-  ReplAPI.initReplBridge(
-    bridgeCls.asInstanceOf[Class[ReplAPIHolder]],
-    replApi
-  )
-  Timer("Interpreter init eval")
-  init()
-  Timer("Interpreter init init")
-  val argString =
-    replArgs.zipWithIndex
-            .map{ case (b, idx) =>
-              s"""
-              val ${b.name} =
-                ammonite.repl
-                        .frontend
-                        .ReplBridge
-                        .repl
-                        .replArgs($idx)
-                        .value
-                        .asInstanceOf[${b.typeTag.tpe}]
-              """
-            }
-            .mkString("\n")
-
-  val predefs = Seq(
-    (hardcodedPredef, "HardcodedPredef", "ammonite.predef"),
-    (predef, "Predef", "ammonite.predef"),
-    (storage.loadPredef, "LoadedPredef", "ammonite.predef"),
-    (argString, "ArgsPredef", "ammonite.predef")
-  )
-
-  val predefImports = predefs.foldLeft(Seq.empty[ImportData]){
-    case (prevImports, (sourceCode, wrapperName, pkgName)) =>
-      processModule0(sourceCode, wrapperName, pkgName, prevImports) match{
-        case Res.Success(imports) => Frame.mergeImports(prevImports, imports)
-        case Res.Failure(ex, msg) =>
-          ex match{
-            case Some(e) => throw new RuntimeException("Error during Predef: " + msg, e)
-            case None => throw new RuntimeException("Error during Predef: " + msg)
-          }
-
-        case Res.Exception(ex, msg) =>
-          throw new RuntimeException("Error during Predef: " + msg, ex)
-      }
+  def skipSheBangLine(code: String)= {
+    if (code.startsWith(SheBang))
+      code.substring(code.indexOf('\n'))
+    else
+      code
   }
 
-  eval.sess.save()
-  Timer("Interpreter init predef 0")
-  init()
-  Timer("Interpreter init predef 1")
+  type EvaluateCallback = (String, Int, Int) => Res[Evaluated]
+
+  def indexWrapperName(wrapperName: String, wrapperIndex: Int) = {
+    wrapperName + (if (wrapperIndex == 1) "" else wrapperIndex)
+  }
+
+  def errMsg(msg: String, code: String, expected: String, idx: Int): String = {
+    val locationString = {
+      val (first, last) = code.splitAt(idx)
+      val lastSnippet = last.split('\n').headOption.getOrElse("")
+      val firstSnippet = first.reverse.split('\n').lift(0).getOrElse("").reverse
+      firstSnippet + lastSnippet + "\n" + (" " * firstSnippet.length) + "^"
+    }
+
+    s"Syntax Error: $msg\n$locationString"
+  }
 }
