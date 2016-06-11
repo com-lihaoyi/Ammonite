@@ -165,7 +165,10 @@ class Interpreter(prompt0: Ref[String],
                   .combinePrints($prints)
           """
       )
-      out <- evaluateLine(wrappedCode, importsLength, printer, fileName)
+      out <- evaluateLine(
+        wrappedCode, importsLength, printer,
+        fileName, "cmd" + eval.getCurrentLine
+      )
     } yield out
   }
 
@@ -198,7 +201,7 @@ class Interpreter(prompt0: Ref[String],
                    importsLength: Int,
                    printer: Printer,
                    fileName: String,
-                   extraImports: Seq[ImportData] = Seq() ): Res[Evaluated] = {
+                   indexedWrapperName: String): Res[Evaluated] = {
 
     for{
       _ <- Catching{ case e: ThreadDeath => Evaluator.interrupted(e) }
@@ -213,7 +216,7 @@ class Interpreter(prompt0: Ref[String],
           newImports,
           printer,
           fileName,
-          extraImports
+          indexedWrapperName
         )
 
       }
@@ -290,7 +293,7 @@ class Interpreter(prompt0: Ref[String],
       startingImports,
       pkgName,
       wrapperName,
-      (wrappedCode, importsLength, wrapperIndex) =>
+      (wrappedCode, importsLength, wrapperIndex, indexedWrapperName) =>
         withContextClassloader(
           processScriptBlock(
             wrappedCode, importsLength, printer,
@@ -307,8 +310,14 @@ class Interpreter(prompt0: Ref[String],
       predefImports,
       "ammonite.session",
       "cmd" + eval.getCurrentLine,
-      { (wrappedCode, importsLength, wrapperIndex) =>
-        evaluateLine(wrappedCode, importsLength, printer, s"Main$wrapperIndex.scala")
+      { (wrappedCode, importsLength, wrapperIndex, indexedWrapperName) =>
+        evaluateLine(
+          wrappedCode,
+          importsLength,
+          printer,
+          s"Main$wrapperIndex.scala",
+          indexedWrapperName
+        )
       }
     )
   }
@@ -364,7 +373,7 @@ class Interpreter(prompt0: Ref[String],
           nestedScriptImports = Frame.mergeImports(nestedScriptImports, imports)
         }
         // pretty printing results is disabled for scripts
-
+        val indexedWrapperName = Interpreter.indexWrapperName(wrapperName, wrapperIndex)
         val res = for{
           (wrappedCode, importsLength) <- {
 
@@ -373,7 +382,7 @@ class Interpreter(prompt0: Ref[String],
               "",
               blocks.head._1,
               pkgName,
-              Interpreter.indexWrapperName(wrapperName, wrapperIndex),
+              indexedWrapperName,
               scriptImports,
               _ => "scala.Iterator[String]()"
             )
@@ -381,7 +390,8 @@ class Interpreter(prompt0: Ref[String],
           ev <- evaluate(
             wrappedCode,
             importsLength,
-            wrapperIndex
+            wrapperIndex,
+            indexedWrapperName
           )
         } yield ev
 
@@ -634,10 +644,10 @@ object Interpreter{
       code
   }
 
-  type EvaluateCallback = (String, Int, Int) => Res[Evaluated]
+  type EvaluateCallback = (String, Int, Int, String) => Res[Evaluated]
 
   def indexWrapperName(wrapperName: String, wrapperIndex: Int) = {
-    wrapperName + (if (wrapperIndex == 1) "" else wrapperIndex)
+    wrapperName + (if (wrapperIndex == 1) "" else "_" + wrapperIndex)
   }
 
   def errMsg(msg: String, code: String, expected: String, idx: Int): String = {

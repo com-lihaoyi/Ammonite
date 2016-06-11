@@ -28,7 +28,7 @@ trait Evaluator{
                   newImports: Seq[ImportData],
                   printer: Printer,
                   fileName: String,
-                  extraImports: Seq[ImportData] = Seq()): Res[Evaluated]
+                  indexedWrapperName: String): Res[Evaluated]
 
   def processScriptBlock(cls: Class[_],
                          newImports: Seq[ImportData],
@@ -159,11 +159,10 @@ object Evaluator{
                     newImports: Seq[ImportData],
                     printer: Printer,
                     fileName: String,
-                    extraImports: Seq[ImportData] = Seq()) = {
-      val wrapperName = "cmd" + getCurrentLine
+                    indexedWrapperName: String) = {
       Timer("eval.processLine compileClass end")
       for {
-        cls <- loadClass("ammonite.session." + wrapperName, classFiles)
+        cls <- loadClass("ammonite.session." + indexedWrapperName, classFiles)
         _ = Timer("eval.processLine loadClass end")
         _ = currentLine += 1
         _ <- Catching{userCodeExceptionHandler}
@@ -175,7 +174,7 @@ object Evaluator{
         Timer("eval.processLine evaluatorRunPrinter 1")
         evaluatorRunPrinter(iter.foreach(printer.out))
         Timer("eval.processLine evaluatorRunPrinter end")
-        evaluationResult("ammonite.session." + wrapperName, newImports)
+        evaluationResult("ammonite.session." + indexedWrapperName, newImports)
       }
     }
 
