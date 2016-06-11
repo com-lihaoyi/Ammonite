@@ -25,8 +25,7 @@ import collection.mutable
   */
 trait Preprocessor{
   def transform(stmts: Seq[String],
-                wrapperId: String,
-                comment: String,
+                resultIndex: String,
                 pkgName: String,
                 indexedWrapperName: String,
                 imports: Seq[ImportData],
@@ -38,13 +37,12 @@ object Preprocessor{
   def apply(parse: => String => Either[String, Seq[G#Tree]]): Preprocessor = new Preprocessor{
 
     def transform(stmts: Seq[String],
-                  wrapperId: String,
-                  comment: String,
+                  resultIndex: String,
                   pkgName: String,
                   indexedWrapperName: String,
                   imports: Seq[ImportData],
                   printerTemplate: String => String) = for{
-      Preprocessor.Expanded(code, printer) <- expandStatements(stmts, wrapperId, comment)
+      Preprocessor.Expanded(code, printer) <- expandStatements(stmts, resultIndex)
       (wrappedCode, importsLength) = wrapCode(
         pkgName, indexedWrapperName, code,
         printerTemplate(printer.mkString(", ")),
@@ -139,8 +137,7 @@ object Preprocessor{
     )
 
     def expandStatements(stmts: Seq[String],
-                         wrapperId: String,
-                         comment: String = ""): Res[Preprocessor.Expanded] = {
+                         wrapperIndex: String): Res[Preprocessor.Expanded] = {
       val unwrapped = stmts.flatMap{x => Parsers.unwrapBlock(x) match {
         case Some(contents) =>
           Parsers.split(contents).get.get.value
@@ -150,12 +147,12 @@ object Preprocessor{
       unwrapped match{
         case Nil => Res.Skip
         case postSplit =>
-          complete(stmts.mkString(""), wrapperId, postSplit, comment)
+          complete(stmts.mkString(""), wrapperIndex, postSplit)
 
       }
     }
 
-    def complete(code: String, wrapperId: String, postSplit: Seq[String], comment: String) = {
+    def complete(code: String, resultIndex: String, postSplit: Seq[String]) = {
       val reParsed = postSplit.map(p => (parse(p), p))
       val errors = reParsed.collect{case (Left(e), _) => e }
       if (errors.length != 0) Res.Failure(None, errors.mkString("\n"))
@@ -167,7 +164,7 @@ object Preprocessor{
           // the tree if there is more than one statement in this command
           val suffix = if (reParsed.length > 1) "_" + i else ""
           def handleTree(t: G#Tree) = {
-            decls.iterator.flatMap(_.apply(code, "res" + wrapperId + suffix, t)).next()
+            decls.iterator.flatMap(_.apply(code, "res" + resultIndex + suffix, t)).next()
           }
           trees match {
             case Seq(tree) => handleTree(tree)
@@ -191,7 +188,7 @@ object Preprocessor{
         }
 
         val Seq(first, rest@_*) = allDecls
-        val allDeclsWithComments = Expanded(comment + first.code , first.printer) +: rest
+        val allDeclsWithComments = Expanded(first.code, first.printer) +: rest
         Res(
           allDeclsWithComments.reduceOption { (a, b) =>
             Expanded(
