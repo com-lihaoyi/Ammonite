@@ -85,8 +85,7 @@ class Interpreter(prompt0: Ref[String],
                    printer: Printer,
                    fileName: String): Res[(Util.ClassFiles, Seq[ImportData])] = for {
     compiled <- Res.Success{
-      val c = compiler.compile(code._1.getBytes, printer, code._2, fileName)
-      c
+      compiler.compile(code._1.getBytes, printer, code._2, fileName)
     }
     _ = _compilationCount += 1
     (classfiles, imports) <- Res[(Util.ClassFiles, Seq[ImportData])](
@@ -121,14 +120,14 @@ class Interpreter(prompt0: Ref[String],
     } yield res
   }
 
-  def processScriptBlock(code: String,
-                         scriptImports: Seq[ImportData],
+  def processScriptBlock(wrappedCode: String,
+                         importsLength: Int,
                          printer: Printer,
                          wrapperName: String,
                          fileName: String,
                          pkgName: String) = for {
     (cls, newImports) <- cachedCompileBlock(
-      code, scriptImports,  printer, wrapperName, fileName, pkgName
+      wrappedCode, importsLength, printer, wrapperName, fileName, pkgName
     )
     res <- eval.processScriptBlock(cls, newImports, wrapperName, pkgName)
   } yield res
@@ -150,8 +149,8 @@ class Interpreter(prompt0: Ref[String],
   }
 
 
-  def cachedCompileBlock(code: String,
-                         imports: Seq[ImportData],
+  def cachedCompileBlock(wrappedCode: String,
+                         importsLength: Int,
                          printer: Printer,
                          wrapperName: String,
                          fileName: String,
@@ -160,11 +159,8 @@ class Interpreter(prompt0: Ref[String],
 
     Timer("cachedCompileBlock 1")
 
-    val wrappedCode = Preprocessor.wrapCode(
-      pkgName, wrapperName, code, printCode, imports
-    )
     val fullyQualifiedName = pkgName + "." + wrapperName
-    val tag = cacheTag(code, imports, eval.sess.frames.head.classloader.classpathHash)
+    val tag = cacheTag(wrappedCode, Nil, eval.sess.frames.head.classloader.classpathHash)
     Timer("cachedCompileBlock 2")
     val compiled = storage.compileCacheLoad(fullyQualifiedName, tag) match {
       case Some((classFiles, newImports)) =>
@@ -173,7 +169,7 @@ class Interpreter(prompt0: Ref[String],
       case _ =>
         val noneCalc = for {
           (classFiles, newImports) <- compileClass(
-            wrappedCode, printer, fileName
+            (wrappedCode, importsLength), printer, fileName
           )
           _ = storage.compileCacheSave(fullyQualifiedName, tag, (classFiles, newImports))
         } yield (classFiles, newImports)
@@ -193,6 +189,10 @@ class Interpreter(prompt0: Ref[String],
   def processModule(code: String, wrapperName: String, pkgName: String) = {
     processModule0(code, wrapperName, pkgName, predefImports)
   }
+
+  def indexWrapperName(wrapperName: String, wrapperIndex: Int) = {
+    wrapperName + (if (wrapperIndex == 1) "" else wrapperIndex)
+  }
   def processModule0(code: String,
                     wrapperName: String,
                     pkgName: String,
@@ -200,11 +200,13 @@ class Interpreter(prompt0: Ref[String],
     processScript(
       skipSheBangLine(code),
       startingImports,
-      (code, imports, wrapperIndex) =>
+      pkgName,
+      wrapperName,
+      (wrappedCode, importsLength, wrapperIndex) =>
         withContextClassloader(
           processScriptBlock(
-            code, imports, printer,
-            wrapperName + (if (wrapperIndex == 1) "" else wrapperIndex),
+            wrappedCode, importsLength, printer,
+            indexWrapperName(wrapperName, wrapperIndex),
             wrapperName + ".scala", pkgName
           )
         )
@@ -216,16 +218,10 @@ class Interpreter(prompt0: Ref[String],
     processScript(
       skipSheBangLine(code),
       predefImports,
-      { (c, i, wrapperIndex) =>
-        val wrapperName = "cmd" + eval.getCurrentLine
-        val (wrappedCode, importsLength) = Preprocessor.wrapCode(
-          "ammonite.session",
-          wrapperName,
-          c,
-          "",
-          Frame.mergeImports(eval.sess.frames.head.imports, i)
-        )
-        evaluateLine(wrappedCode, importsLength, printer, s"Main$wrapperIndex.scala", i)
+      "ammonite.session",
+      "cmd" + eval.getCurrentLine,
+      { (wrappedCode, importsLength, wrapperIndex) =>
+        evaluateLine(wrappedCode, importsLength, printer, s"Main$wrapperIndex.scala")
       }
     )
   }
@@ -242,7 +238,7 @@ class Interpreter(prompt0: Ref[String],
   //this variable keeps track of where should we put the imports resulting from scripts.
   private var scriptImportCallback: Seq[ImportData] => Unit = eval.update
 
-  type EvaluateCallback = (String, Seq[ImportData], Int) => Res[Evaluated]
+  type EvaluateCallback = (String, Int, Int) => Res[Evaluated]
 
   def errMsg(msg: String, code: String, expected: String, idx: Int): String = {
     val locationString = {
@@ -257,10 +253,12 @@ class Interpreter(prompt0: Ref[String],
 
   def processCorrectScript(rawParsedCode: Parsed.Success[Seq[(String, Seq[String])]],
                            startingImports: Seq[ImportData],
+                           pkgName: String,
+                           wrapperName: String,
                            evaluate: EvaluateCallback)
                           : Res[Seq[ImportData]] = {
     var offset = 0
-    val parsedCode = mutable.Buffer[(String, Seq[String])]()
+    val blocks = mutable.Buffer[(String, Seq[String])]()
 
     // comment holds comments or empty lines above the code which is not caught along with code
     for( (comment, code) <- rawParsedCode.get.value ){
@@ -268,19 +266,11 @@ class Interpreter(prompt0: Ref[String],
 
       // 1 is added as Separator parser eats up the '\n' following @
       offset = offset + comment.count(_ == '\n') + code.map(_.count(_ == '\n')).sum + 1
-      parsedCode.append((ncomment, code))
+      blocks.append((ncomment, code))
     }
 
 
-    val blocks0 = parsedCode
-
-    val blocks = for{
-      (comment, code) <- blocks0
-    } yield preprocess.expandStatements(code,"",comment)
-
     Timer("processCorrectScript 1")
-    val errors = blocks.collect { case Res.Failure(ex, err) => err }
-    Timer("processCorrectScript 2")
     // we store the old value, because we will reassign this in the loop
     val outerScriptImportCallback = scriptImportCallback
 
@@ -292,7 +282,7 @@ class Interpreter(prompt0: Ref[String],
       * script within its blocks, but at the end we only want to expose the
       * imports generated by the last block to who-ever loaded the script
       */
-    @tailrec def loop(blocks: Seq[Preprocessor.Output],
+    @tailrec def loop(blocks: Seq[(String, Seq[String])],
                       scriptImports: Seq[ImportData],
                       lastImports: Seq[ImportData],
                       wrapperIndex: Int): Res[Seq[ImportData]] = {
@@ -310,16 +300,27 @@ class Interpreter(prompt0: Ref[String],
         }
         // pretty printing results is disabled for scripts
 
-        val Preprocessor.Output(code, _) = blocks.head
+        val res = for{
+          (wrappedCode, importsLength) <- {
 
-        Timer("processScript loop 1")
-        val ev = evaluate(
-          code,
-          Frame.mergeImports(startingImports, scriptImports),
-          wrapperIndex
-        )
-        Timer("processScript loop 2")
-        ev match {
+            preprocess.transform(
+              blocks.head._2,
+              "",
+              blocks.head._1,
+              pkgName,
+              indexWrapperName(wrapperName, wrapperIndex),
+              scriptImports,
+              _ => ""
+            )
+          }
+          ev <- evaluate(
+            wrappedCode,
+            importsLength,
+            wrapperIndex
+          )
+        } yield ev
+
+        res match {
           case r: Res.Failure => r
           case r: Res.Exception => r
           case Res.Success(ev) =>
@@ -330,18 +331,14 @@ class Interpreter(prompt0: Ref[String],
       }
     }
     try {
-      if (errors.isEmpty) {
-        loop(
-          blocks.collect { case Res.Success(o) => o },
-          Seq(), Seq(),
-          // starts off as 1, so that consecutive wrappers can be named
-          // Wrapper, Wrapper2, Wrapper3, Wrapper4, ...
-          wrapperIndex = 1
-        )
-      } else {
-        printer.error(errors.mkString("\n"))
-        Res.Success(Nil)
-      }
+      loop(
+        blocks,
+        Seq(), Seq(),
+        // starts off as 1, so that consecutive wrappers can be named
+        // Wrapper, Wrapper2, Wrapper3, Wrapper4, ...
+        wrapperIndex = 1
+      )
+
 
     } finally {
       scriptImportCallback = outerScriptImportCallback
@@ -350,7 +347,9 @@ class Interpreter(prompt0: Ref[String],
   //common stuff in proccessModule and processExec
   def processScript(code: String,
                     startingImports: Seq[ImportData],
-                    evaluate: (String, Seq[ImportData], Int) => Res[Evaluated])
+                    pkgName: String,
+                    wrapperName: String,
+                    evaluate: EvaluateCallback)
                     : Res[Seq[ImportData]] = {
 
     Timer("processScript 0a")
@@ -360,7 +359,7 @@ class Interpreter(prompt0: Ref[String],
         Res.Failure(None, errMsg(f.msg, code, f.extra.traced.expected, f.index))
       case s: Parsed.Success[Seq[(String, Seq[String])]] =>
         Timer("processCorrectScript 0b")
-        processCorrectScript(s, startingImports, evaluate)
+        processCorrectScript(s, startingImports, pkgName, wrapperName, evaluate)
     }
   }
 

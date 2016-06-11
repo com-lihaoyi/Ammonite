@@ -24,10 +24,6 @@ import collection.mutable
   *   the Scala compiler
   */
 trait Preprocessor{
-  def expandStatements(stmts: Seq[String],
-                       wrapperId: String,
-                       comment: String = ""): Res[Preprocessor.Output]
-
   def transform(stmts: Seq[String],
                 wrapperId: String,
                 comment: String,
@@ -37,65 +33,23 @@ trait Preprocessor{
                 printerTemplate: String => String): Res[(String, Int)]
 }
 object Preprocessor{
-  def importBlock(importData: Seq[ImportData]) = {
-    Timer("importBlock 0")
-    // Group the remaining imports into sliding groups according to their
-    // prefix, while still maintaining their ordering
-    val grouped = mutable.Buffer[mutable.Buffer[ImportData]]()
-    for(data <- importData){
-      if (grouped.isEmpty) grouped.append(mutable.Buffer(data))
-      else {
-        val last = grouped.last.last
-
-        // Start a new import if we're importing from somewhere else, or
-        // we're importing the same thing from the same place but aliasing
-        // it to a different name, since you can't import the same thing
-        // twice in a single import statement
-        val startNewImport =
-          last.prefix != data.prefix || grouped.last.exists(_.fromName == data.fromName)
-
-        if (startNewImport) grouped.append(mutable.Buffer(data))
-        else grouped.last.append(data)
-      }
-    }
-    // Stringify everything
-    val out = for(group <- grouped) yield {
-      val printedGroup = for(item <- group) yield{
-        if (item.fromName == item.toName) Parsers.backtickWrap(item.fromName)
-        else s"${Parsers.backtickWrap(item.fromName)} => ${Parsers.backtickWrap(item.toName)}"
-      }
-      "import " + group.head.prefix + ".{\n  " + printedGroup.mkString(",\n  ") + "\n}\n"
-    }
-    val res = out.mkString
-
-    Timer("importBlock 1")
-    res
-  }
-
-  def wrapCode(pkgName: String,
-               indexedWrapperName: String,
-               code: String,
-               printCode: String,
-               imports: Seq[ImportData]) = {
-
-    val topWrapper = s"""
-package $pkgName
-${importBlock(imports)}
-
-object $indexedWrapperName{\n"""
-
-    val bottomWrapper = s"""\ndef $$main() = { $printCode }
-  override def toString = "$indexedWrapperName"
-}
-"""
-    val importsLen = topWrapper.length
-
-    (topWrapper + code + bottomWrapper, importsLen)
-  }
   case class Output(code: String, printer: Seq[String])
 
   def apply(parse: => String => Either[String, Seq[G#Tree]]): Preprocessor = new Preprocessor{
 
+    def transform(stmts: Seq[String],
+                  wrapperId: String,
+                  comment: String,
+                  pkgName: String,
+                  indexedWrapperName: String,
+                  imports: Seq[ImportData],
+                  printerTemplate: String => String) = for{
+      Preprocessor.Output(code, printer) <- expandStatements(stmts, wrapperId, comment)
+      (wrappedCode, importsLength) = wrapCode(
+        pkgName, indexedWrapperName, code,
+        printerTemplate(printer.mkString(", ")),
+        imports)
+    } yield (wrappedCode, importsLength)
     def Processor(cond: PartialFunction[(String, String, G#Tree), Preprocessor.Output]) = {
       (code: String, name: String, tree: G#Tree) => cond.lift(name, code, tree)
     }
@@ -184,20 +138,6 @@ object $indexedWrapperName{\n"""
       ObjectDef, ClassDef, TraitDef, DefDef, TypeDef, PatVarDef, Import, Expr
     )
 
-    def transform(stmts: Seq[String],
-                  wrapperId: String,
-                  comment: String,
-                  pkgName: String,
-                  indexedWrapperName: String,
-                  imports: Seq[ImportData],
-                  printerTemplate: String => String) = for{
-      Preprocessor.Output(code, printer) <- expandStatements(stmts, wrapperId, comment)
-      (wrappedCode, importsLength) = wrapCode(
-        pkgName, indexedWrapperName, code,
-        printerTemplate(printer.mkString(", ")),
-        imports)
-    } yield (wrappedCode, importsLength)
-
     def expandStatements(stmts: Seq[String],
                          wrapperId: String,
                          comment: String = ""): Res[Preprocessor.Output] = {
@@ -265,5 +205,63 @@ object $indexedWrapperName{\n"""
       }
     }
   }
+
+
+  def importBlock(importData: Seq[ImportData]) = {
+    Timer("importBlock 0")
+    // Group the remaining imports into sliding groups according to their
+    // prefix, while still maintaining their ordering
+    val grouped = mutable.Buffer[mutable.Buffer[ImportData]]()
+    for(data <- importData){
+      if (grouped.isEmpty) grouped.append(mutable.Buffer(data))
+      else {
+        val last = grouped.last.last
+
+        // Start a new import if we're importing from somewhere else, or
+        // we're importing the same thing from the same place but aliasing
+        // it to a different name, since you can't import the same thing
+        // twice in a single import statement
+        val startNewImport =
+          last.prefix != data.prefix || grouped.last.exists(_.fromName == data.fromName)
+
+        if (startNewImport) grouped.append(mutable.Buffer(data))
+        else grouped.last.append(data)
+      }
+    }
+    // Stringify everything
+    val out = for(group <- grouped) yield {
+      val printedGroup = for(item <- group) yield{
+        if (item.fromName == item.toName) Parsers.backtickWrap(item.fromName)
+        else s"${Parsers.backtickWrap(item.fromName)} => ${Parsers.backtickWrap(item.toName)}"
+      }
+      "import " + group.head.prefix + ".{\n  " + printedGroup.mkString(",\n  ") + "\n}\n"
+    }
+    val res = out.mkString
+
+    Timer("importBlock 1")
+    res
+  }
+
+  def wrapCode(pkgName: String,
+               indexedWrapperName: String,
+               code: String,
+               printCode: String,
+               imports: Seq[ImportData]) = {
+
+    val topWrapper = s"""
+package $pkgName
+${importBlock(imports)}
+
+object $indexedWrapperName{\n"""
+
+    val bottomWrapper = s"""\ndef $$main() = { $printCode }
+  override def toString = "$indexedWrapperName"
+}
+"""
+    val importsLen = topWrapper.length
+
+    (topWrapper + code + bottomWrapper, importsLen)
+  }
+
 }
 
