@@ -148,7 +148,7 @@ class Interpreter(prompt0: Ref[String],
       _ <- Catching { case ex =>
         Res.Exception(ex, "Something unexpected went wrong =(")
       }
-      (wrappedCode, importsLength) <- preprocess.transform(
+      processed <- preprocess.transform(
         stmts,
         eval.getCurrentLine,
         "",
@@ -166,7 +166,7 @@ class Interpreter(prompt0: Ref[String],
           """
       )
       out <- evaluateLine(
-        wrappedCode, importsLength, printer,
+        processed, printer,
         fileName, "cmd" + eval.getCurrentLine
       )
     } yield out
@@ -182,11 +182,11 @@ class Interpreter(prompt0: Ref[String],
     }
   }
 
-  def compileClass(code: (String, Int),
+  def compileClass(processed: Preprocessor.Output,
                    printer: Printer,
                    fileName: String): Res[(Util.ClassFiles, Seq[ImportData])] = for {
     compiled <- Res.Success{
-      compiler.compile(code._1.getBytes, printer, code._2, fileName)
+      compiler.compile(processed.code.getBytes, printer, processed.prefixCharLength, fileName)
     }
     _ = _compilationCount += 1
     (classfiles, imports) <- Res[(Util.ClassFiles, Seq[ImportData])](
@@ -197,8 +197,9 @@ class Interpreter(prompt0: Ref[String],
     (classfiles, imports)
   }
 
-  def evaluateLine(code: String,
-                   importsLength: Int,
+
+
+  def evaluateLine(processed: Preprocessor.Output,
                    printer: Printer,
                    fileName: String,
                    indexedWrapperName: String): Res[Evaluated] = {
@@ -206,7 +207,7 @@ class Interpreter(prompt0: Ref[String],
     for{
       _ <- Catching{ case e: ThreadDeath => Evaluator.interrupted(e) }
       (classFiles, newImports) <- compileClass(
-        (code, importsLength),
+        processed,
         printer,
         fileName
       )
@@ -223,15 +224,13 @@ class Interpreter(prompt0: Ref[String],
     } yield res
   }
 
-  def processScriptBlock(wrappedCode: String,
-                         importsLength: Int,
+  def processScriptBlock(processed: Preprocessor.Output,
                          printer: Printer,
                          wrapperName: String,
                          fileName: String,
                          pkgName: String) = for {
     (cls, newImports) <- cachedCompileBlock(
-      wrappedCode,
-      importsLength,
+      processed,
       printer,
       wrapperName,
       fileName,
@@ -242,8 +241,7 @@ class Interpreter(prompt0: Ref[String],
   } yield res
 
 
-  def cachedCompileBlock(wrappedCode: String,
-                         importsLength: Int,
+  def cachedCompileBlock(processed: Preprocessor.Output,
                          printer: Printer,
                          wrapperName: String,
                          fileName: String,
@@ -253,7 +251,7 @@ class Interpreter(prompt0: Ref[String],
     Timer("cachedCompileBlock 1")
 
     val fullyQualifiedName = pkgName + "." + wrapperName
-    val tag = Interpreter.cacheTag(wrappedCode, Nil, eval.sess.frames.head.classloader.classpathHash)
+    val tag = Interpreter.cacheTag(processed.code, Nil, eval.sess.frames.head.classloader.classpathHash)
     Timer("cachedCompileBlock 2")
     val compiled = storage.compileCacheLoad(fullyQualifiedName, tag) match {
       case Some((classFiles, newImports)) =>
@@ -262,7 +260,7 @@ class Interpreter(prompt0: Ref[String],
       case _ =>
         val noneCalc = for {
           (classFiles, newImports) <- compileClass(
-            (wrappedCode, importsLength), printer, fileName
+            processed, printer, fileName
           )
           _ = storage.compileCacheSave(fullyQualifiedName, tag, (classFiles, newImports))
         } yield (classFiles, newImports)
@@ -285,18 +283,18 @@ class Interpreter(prompt0: Ref[String],
 
 
   def processModule0(code: String,
-                    wrapperName: String,
-                    pkgName: String,
-                    startingImports: Seq[ImportData]): Res[Seq[ImportData]] = {
+                     wrapperName: String,
+                     pkgName: String,
+                     startingImports: Seq[ImportData]): Res[Seq[ImportData]] = {
     processScript(
       Interpreter.skipSheBangLine(code),
       startingImports,
       pkgName,
       wrapperName,
-      (wrappedCode, importsLength, wrapperIndex, indexedWrapperName) =>
+      (processed, wrapperIndex, indexedWrapperName) =>
         withContextClassloader(
           processScriptBlock(
-            wrappedCode, importsLength, printer,
+            processed, printer,
             Interpreter.indexWrapperName(wrapperName, wrapperIndex),
             wrapperName + ".scala", pkgName
           )
@@ -310,10 +308,9 @@ class Interpreter(prompt0: Ref[String],
       predefImports,
       "ammonite.session",
       "cmd" + eval.getCurrentLine,
-      { (wrappedCode, importsLength, wrapperIndex, indexedWrapperName) =>
+      { (processed, wrapperIndex, indexedWrapperName) =>
         evaluateLine(
-          wrappedCode,
-          importsLength,
+          processed,
           printer,
           s"Main$wrapperIndex.scala",
           indexedWrapperName
@@ -375,7 +372,7 @@ class Interpreter(prompt0: Ref[String],
         // pretty printing results is disabled for scripts
         val indexedWrapperName = Interpreter.indexWrapperName(wrapperName, wrapperIndex)
         val res = for{
-          (wrappedCode, importsLength) <- {
+          processed <- {
 
             preprocess.transform(
               blocks.head._2,
@@ -388,8 +385,7 @@ class Interpreter(prompt0: Ref[String],
             )
           }
           ev <- evaluate(
-            wrappedCode,
-            importsLength,
+            processed,
             wrapperIndex,
             indexedWrapperName
           )
@@ -644,7 +640,7 @@ object Interpreter{
       code
   }
 
-  type EvaluateCallback = (String, Int, Int, String) => Res[Evaluated]
+  type EvaluateCallback = (Preprocessor.Output, Int, String) => Res[Evaluated]
 
   def indexWrapperName(wrapperName: String, wrapperIndex: Int) = {
     wrapperName + (if (wrapperIndex == 1) "" else "_" + wrapperIndex)

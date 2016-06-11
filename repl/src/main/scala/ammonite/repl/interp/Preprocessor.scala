@@ -30,11 +30,11 @@ trait Preprocessor{
                 pkgName: String,
                 indexedWrapperName: String,
                 imports: Seq[ImportData],
-                printerTemplate: String => String): Res[(String, Int)]
+                printerTemplate: String => String): Res[Preprocessor.Output]
 }
 object Preprocessor{
-  case class Output(code: String, printer: Seq[String])
-
+  private case class Expanded(code: String, printer: Seq[String])
+  case class Output(code: String, prefixCharLength: Int)
   def apply(parse: => String => Either[String, Seq[G#Tree]]): Preprocessor = new Preprocessor{
 
     def transform(stmts: Seq[String],
@@ -44,13 +44,13 @@ object Preprocessor{
                   indexedWrapperName: String,
                   imports: Seq[ImportData],
                   printerTemplate: String => String) = for{
-      Preprocessor.Output(code, printer) <- expandStatements(stmts, wrapperId, comment)
+      Preprocessor.Expanded(code, printer) <- expandStatements(stmts, wrapperId, comment)
       (wrappedCode, importsLength) = wrapCode(
         pkgName, indexedWrapperName, code,
         printerTemplate(printer.mkString(", ")),
         imports)
-    } yield (wrappedCode, importsLength)
-    def Processor(cond: PartialFunction[(String, String, G#Tree), Preprocessor.Output]) = {
+    } yield Preprocessor.Output(wrappedCode, importsLength)
+    def Processor(cond: PartialFunction[(String, String, G#Tree), Preprocessor.Expanded]) = {
       (code: String, name: String, tree: G#Tree) => cond.lift(name, code, tree)
     }
 
@@ -86,7 +86,7 @@ object Preprocessor{
     def DefProc(definitionLabel: String)(cond: PartialFunction[G#Tree, G#Name]) =
       (code: String, name: String, tree: G#Tree) =>
         cond.lift(tree).map{ name =>
-          Preprocessor.Output(
+          Preprocessor.Expanded(
             code,
             Seq(definedStr(definitionLabel, Parsers.backtickWrap(name.decoded)))
           )
@@ -99,7 +99,7 @@ object Preprocessor{
     val TypeDef = DefProc("type"){ case m: G#TypeDef => m.name }
 
     val PatVarDef = Processor { case (name, code, t: G#ValDef) =>
-      Output(
+      Expanded(
         //Only wrap rhs in function if it is not a function
         //Wrapping functions causes type inference errors.
         code,
@@ -116,7 +116,7 @@ object Preprocessor{
       case (name, code, tree: G#Import) =>
         val Array(keyword, body) = code.split(" ", 2)
         val tq = "\"\"\""
-        Output(code, Seq(
+        Expanded(code, Seq(
           s"""
           _root_.ammonite
                 .repl
@@ -131,16 +131,16 @@ object Preprocessor{
 
     val Expr = Processor{
       //Expressions are lifted to anon function applications so they will be JITed
-      case (name, code, tree) => Output(s"val $name = $code", Seq(pprint(name)))
+      case (name, code, tree) => Expanded(s"val $name = $code", Seq(pprint(name)))
     }
 
-    val decls = Seq[(String, String, G#Tree) => Option[Preprocessor.Output]](
+    val decls = Seq[(String, String, G#Tree) => Option[Preprocessor.Expanded]](
       ObjectDef, ClassDef, TraitDef, DefDef, TypeDef, PatVarDef, Import, Expr
     )
 
     def expandStatements(stmts: Seq[String],
                          wrapperId: String,
-                         comment: String = ""): Res[Preprocessor.Output] = {
+                         comment: String = ""): Res[Preprocessor.Expanded] = {
       val unwrapped = stmts.flatMap{x => Parsers.unwrapBlock(x) match {
         case Some(contents) =>
           Parsers.split(contents).get.get.value
@@ -154,7 +154,7 @@ object Preprocessor{
 
       }
     }
-    
+
     def complete(code: String, wrapperId: String, postSplit: Seq[String], comment: String) = {
       val reParsed = postSplit.map(p => (parse(p), p))
       val errors = reParsed.collect{case (Left(e), _) => e }
@@ -182,19 +182,19 @@ object Preprocessor{
               val printers = for {
                 tree <- trees
                 if tree.isInstanceOf[G#ValDef]
-                Preprocessor.Output(_, printers) = handleTree(tree)
+                Preprocessor.Expanded(_, printers) = handleTree(tree)
                 printer <- printers
               } yield printer
 
-              Preprocessor.Output(code, printers)
+              Preprocessor.Expanded(code, printers)
           }
         }
 
         val Seq(first, rest@_*) = allDecls
-        val allDeclsWithComments = Output(comment + first.code , first.printer) +: rest
+        val allDeclsWithComments = Expanded(comment + first.code , first.printer) +: rest
         Res(
           allDeclsWithComments.reduceOption { (a, b) =>
-            Output(
+            Expanded(
               a.code + ";" + b.code,
               a.printer ++ b.printer
             )
