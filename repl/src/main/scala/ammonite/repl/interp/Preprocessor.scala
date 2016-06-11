@@ -24,7 +24,17 @@ import collection.mutable
   *   the Scala compiler
   */
 trait Preprocessor{
-  def apply(stmts: Seq[String], wrapperId: String, comment: String = ""): Res[Preprocessor.Output]
+  def expandStatements(stmts: Seq[String],
+                       wrapperId: String,
+                       comment: String = ""): Res[Preprocessor.Output]
+
+  def transform(stmts: Seq[String],
+                wrapperId: String,
+                comment: String,
+                pkgName: String,
+                indexedWrapperName: String,
+                imports: Seq[ImportData],
+                printerTemplate: String => String): Res[(String, Int)]
 }
 object Preprocessor{
   def importBlock(importData: Seq[ImportData]) = {
@@ -174,9 +184,23 @@ object $indexedWrapperName{\n"""
       ObjectDef, ClassDef, TraitDef, DefDef, TypeDef, PatVarDef, Import, Expr
     )
 
-    def apply(stmts: Seq[String],
-              wrapperId: String,
-              comment: String = ""): Res[Preprocessor.Output] = {
+    def transform(stmts: Seq[String],
+                  wrapperId: String,
+                  comment: String,
+                  pkgName: String,
+                  indexedWrapperName: String,
+                  imports: Seq[ImportData],
+                  printerTemplate: String => String) = for{
+      Preprocessor.Output(code, printer) <- expandStatements(stmts, wrapperId, comment)
+      (wrappedCode, importsLength) = wrapCode(
+        pkgName, indexedWrapperName, code,
+        printerTemplate(printer.mkString(", ")),
+        imports)
+    } yield (wrappedCode, importsLength)
+
+    def expandStatements(stmts: Seq[String],
+                         wrapperId: String,
+                         comment: String = ""): Res[Preprocessor.Output] = {
       val unwrapped = stmts.flatMap{x => Parsers.unwrapBlock(x) match {
         case Some(contents) =>
           Parsers.split(contents).get.get.value

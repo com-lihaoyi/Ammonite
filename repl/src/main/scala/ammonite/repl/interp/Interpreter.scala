@@ -50,8 +50,24 @@ class Interpreter(prompt0: Ref[String],
       _ <- Catching { case ex =>
         Res.Exception(ex, "Something unexpected went wrong =(")
       }
-      Preprocessor.Output(code, printSnippet) <- preprocess(stmts, eval.getCurrentLine)
-      out <- evaluateLine(code, printSnippet, printer, fileName)
+      (wrappedCode, importsLength) <- preprocess.transform(
+        stmts,
+        eval.getCurrentLine,
+        "",
+        "ammonite.session",
+        "cmd" + eval.getCurrentLine,
+        eval.sess.frames.head.imports,
+        prints =>
+        s"""
+          ammonite.repl
+                  .frontend
+                  .ReplBridge
+                  .repl
+                  .Internal
+                  .combinePrints($prints)
+          """
+      )
+      out <- evaluateLine(wrappedCode, importsLength, printer, fileName)
     } yield out
   }
 
@@ -80,28 +96,15 @@ class Interpreter(prompt0: Ref[String],
   } yield (classfiles, imports)
 
   def evaluateLine(code: String,
-                   printSnippet: Seq[String],
+                   importsLength: Int,
                    printer: Printer,
                    fileName: String,
                    extraImports: Seq[ImportData] = Seq() ): Res[Evaluated] = {
-    val wrapperName = "cmd" + eval.getCurrentLine
+
     for{
       _ <- Catching{ case e: ThreadDeath => Evaluator.interrupted(e) }
       (classFiles, newImports) <- compileClass(
-        Preprocessor.wrapCode(
-          "ammonite.session",
-          wrapperName,
-          code,
-          s"""
-        ammonite.repl
-                .frontend
-                .ReplBridge
-                .repl
-                .Internal
-                .combinePrints(${printSnippet.mkString(", ")})
-        """,
-          Frame.mergeImports(eval.sess.frames.head.imports, extraImports)
-        ),
+        (code, importsLength),
         printer,
         fileName
       )
@@ -213,7 +216,17 @@ class Interpreter(prompt0: Ref[String],
     processScript(
       skipSheBangLine(code),
       predefImports,
-      { (c, i, wrapperIndex) => evaluateLine(c, Nil, printer, s"Main$wrapperIndex.scala", i) }
+      { (c, i, wrapperIndex) =>
+        val wrapperName = "cmd" + eval.getCurrentLine
+        val (wrappedCode, importsLength) = Preprocessor.wrapCode(
+          "ammonite.session",
+          wrapperName,
+          c,
+          "",
+          Frame.mergeImports(eval.sess.frames.head.imports, i)
+        )
+        evaluateLine(wrappedCode, importsLength, printer, s"Main$wrapperIndex.scala", i)
+      }
     )
   }
 
@@ -263,7 +276,7 @@ class Interpreter(prompt0: Ref[String],
 
     val blocks = for{
       (comment, code) <- blocks0
-    } yield preprocess(code,"",comment)
+    } yield preprocess.expandStatements(code,"",comment)
 
     Timer("processCorrectScript 1")
     val errors = blocks.collect { case Res.Failure(ex, err) => err }
