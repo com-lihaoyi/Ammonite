@@ -3,7 +3,7 @@ import ammonite.repl.tools.{IvyThing, Resolvers, Resolver}
 import java.io.File
 import java.nio.file.NotDirectoryException
 import org.apache.ivy.plugins.resolver.RepositoryResolver
-
+import ammonite.repl.Res
 import scala.collection.mutable
 import scala.tools.nsc.Settings
 import acyclic.file
@@ -42,9 +42,12 @@ class Interpreter(prompt0: Ref[String],
 
   var lastException: Throwable = null
 
+  private var _compilationCount = 0
+  def compilationCount = _compilationCount
+
   def processLine(code: String,
                   stmts: Seq[String],
-                  fileName: String) = {
+                  fileName: String): Res[Evaluated] = {
     for{
       _ <- Catching { case ex =>
         Res.Exception(ex, "Something unexpected went wrong =(")
@@ -64,15 +67,89 @@ class Interpreter(prompt0: Ref[String],
     }
   }
 
+  def importBlock(importData: Seq[ImportData]) = {
+    Timer("importBlock 0")
+    // Group the remaining imports into sliding groups according to their
+    // prefix, while still maintaining their ordering
+    val grouped = mutable.Buffer[mutable.Buffer[ImportData]]()
+    for(data <- importData){
+      if (grouped.isEmpty) grouped.append(mutable.Buffer(data))
+      else {
+        val last = grouped.last.last
+
+        // Start a new import if we're importing from somewhere else, or
+        // we're importing the same thing from the same place but aliasing
+        // it to a different name, since you can't import the same thing
+        // twice in a single import statement
+        val startNewImport =
+          last.prefix != data.prefix || grouped.last.exists(_.fromName == data.fromName)
+
+        if (startNewImport) grouped.append(mutable.Buffer(data))
+        else grouped.last.append(data)
+      }
+    }
+    // Stringify everything
+    val out = for(group <- grouped) yield {
+      val printedGroup = for(item <- group) yield{
+        if (item.fromName == item.toName) Parsers.backtickWrap(item.fromName)
+        else s"${Parsers.backtickWrap(item.fromName)} => ${Parsers.backtickWrap(item.toName)}"
+      }
+      "import " + group.head.prefix + ".{\n  " + printedGroup.mkString(",\n  ") + "\n}\n"
+    }
+    val res = out.mkString
+
+    Timer("importBlock 1")
+    res
+  }
+
+
+  def wrapCode(pkgName: String,
+               indexedWrapperName: String,
+               code: String,
+               printCode: String,
+               imports: Seq[ImportData]) = {
+    val topWrapper = s"""
+package $pkgName
+${importBlock(imports)}
+
+object $indexedWrapperName{\n"""
+
+    val bottomWrapper = s"""\ndef $$main() = { $printCode }
+  override def toString = "$indexedWrapperName"
+}
+"""
+    val importsLen = topWrapper.length
+    (topWrapper + code + bottomWrapper, importsLen)
+  }
+
+  def compileClass(code: (String, Int),
+                   printer: Printer,
+                   fileName: String): Res[(Util.ClassFiles, Seq[ImportData])] = for {
+    compiled <- Res.Success{
+      val c = compiler.compile(code._1.getBytes, printer, code._2, fileName)
+      c
+    }
+    _ = _compilationCount += 1
+    (classfiles, imports) <- Res[(Util.ClassFiles, Seq[ImportData])](
+      compiled,
+      "Compilation Failed"
+    )
+  } yield (classfiles, imports)
+
   def evaluateLine(code: String,
                    printSnippet: Seq[String],
                    printer: Printer,
                    fileName: String,
-                   extraImports: Seq[ImportData] = Seq() ) = withContextClassloader{
-
-      eval.processLine(
-        code,
-        s"""
+                   extraImports: Seq[ImportData] = Seq() ): Res[Evaluated] = {
+    val wrapperName = "cmd" + eval.getCurrentLine
+    for{
+      _ <- Catching{ case e: ThreadDeath => Evaluator.interrupted(e) }
+      (classFiles, newImports) <- compileClass(
+        wrapCode(
+          "ammonite.session",
+          wrapperName,
+          code,
+          s"""
         ammonite.repl
                 .frontend
                 .ReplBridge
@@ -80,12 +157,93 @@ class Interpreter(prompt0: Ref[String],
                 .Internal
                 .combinePrints(${printSnippet.mkString(", ")})
         """,
+          Frame.mergeImports(eval.sess.frames.head.imports, extraImports)
+        ),
         printer,
-        fileName,
-        extraImports
+        fileName
       )
+      res <- withContextClassloader{
+        eval.processLine(
+          classFiles,
+          newImports,
+          printer,
+          fileName,
+          extraImports
+        )
 
+      }
+    } yield res
   }
+
+  def processScriptBlock(code: String,
+                         scriptImports: Seq[ImportData],
+                         printer: Printer,
+                         wrapperName: String,
+                         fileName: String,
+                         pkgName: String) = for {
+    (cls, newImports) <- cachedCompileBlock(
+      code, scriptImports,  printer, wrapperName, fileName, pkgName
+    )
+    res <- eval.processScriptBlock(cls, newImports, wrapperName, pkgName)
+  } yield res
+
+
+  /**
+    * This gives our cache tags for compile caching. The cache tags are a hash
+    * of classpath, previous commands (in-same-script), and the block-code.
+    * Previous commands are hashed in the wrapper names, which are contained
+    * in imports, so we don't need to pass them explicitly.
+    */
+  def cacheTag(code: String, imports: Seq[ImportData], classpathHash: Array[Byte]): String = {
+    val bytes = Util.md5Hash(Iterator(
+      Util.md5Hash(Iterator(code.getBytes)),
+      Util.md5Hash(imports.iterator.map(_.toString.getBytes)),
+      classpathHash
+    ))
+    "cache" + bytes.map("%02x".format(_)).mkString //add prefix to make sure it begins with a letter
+  }
+
+
+  def cachedCompileBlock(code: String,
+                         imports: Seq[ImportData],
+                         printer: Printer,
+                         wrapperName: String,
+                         fileName: String,
+                         pkgName: String,
+                         printCode: String = ""): Res[(Class[_], Seq[ImportData])] = {
+
+    Timer("cachedCompileBlock 1")
+
+    val wrappedCode = wrapCode(
+      pkgName, wrapperName, code, printCode, imports
+    )
+    val fullyQualifiedName = pkgName + "." + wrapperName
+    val tag = cacheTag(code, imports, eval.sess.frames.head.classloader.classpathHash)
+    Timer("cachedCompileBlock 2")
+    val compiled = storage.compileCacheLoad(fullyQualifiedName, tag) match {
+      case Some((classFiles, newImports)) =>
+        compiler.addToClasspath(classFiles)
+        Res.Success((classFiles, newImports))
+      case _ =>
+        val noneCalc = for {
+          (classFiles, newImports) <- compileClass(
+            wrappedCode, printer, fileName
+          )
+          _ = storage.compileCacheSave(fullyQualifiedName, tag, (classFiles, newImports))
+        } yield (classFiles, newImports)
+
+        noneCalc
+    }
+    Timer("cachedCompileBlock 3")
+    val x = for {
+      (classFiles, newImports) <- compiled
+      _ = Timer("cachedCompileBlock 4")
+      cls <- eval.loadClass(fullyQualifiedName, classFiles)
+    } yield (cls, newImports)
+
+    x
+  }
+
   def processModule(code: String, wrapperName: String, pkgName: String) = {
     processModule0(code, wrapperName, pkgName, predefImports)
   }
@@ -98,7 +256,7 @@ class Interpreter(prompt0: Ref[String],
       startingImports,
       (code, imports, wrapperIndex) =>
         withContextClassloader(
-          eval.processScriptBlock(
+          processScriptBlock(
             code, imports, printer,
             wrapperName + (if (wrapperIndex == 1) "" else wrapperIndex),
             wrapperName + ".scala", pkgName
@@ -310,7 +468,7 @@ class Interpreter(prompt0: Ref[String],
 
     def lastException = Interpreter.this.lastException
 
-    def imports = interp.eval.previousImportBlock
+    def imports = importBlock(eval.sess.frames.head.imports)
     val colors = colors0
     val prompt = prompt0
     val frontEnd = frontEnd0
@@ -432,11 +590,7 @@ class Interpreter(prompt0: Ref[String],
   val mainThread = Thread.currentThread()
   val eval = Evaluator(
     mainThread.getContextClassLoader,
-    compiler.compile,
-    0,
-    storage.compileCacheLoad,
-    storage.compileCacheSave,
-    compiler.addToClasspath
+    0
   )
 
   val dynamicClasspath = new VirtualDirectory("(memory)", None)
