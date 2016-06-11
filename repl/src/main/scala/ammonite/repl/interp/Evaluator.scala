@@ -13,24 +13,17 @@ import scala.collection.mutable
 import scala.util.Try
 
 /**
- * Takes source code and, with the help of a compiler and preprocessor,
- * evaluates it and returns a `Result[(output: String, imports: String)]`
- * where `output` is what gets printed and `imports` are any imports that
- * need to get prepended to subsequent commands.
+ * Evaluates already-compiled Bytecode.
+  *
+  * Deals with all the munging of `Classloader`s, `Class[_]` objects,
+  * and `Array[Byte]`s representing class files, and reflection necessary
+  * to take the already-compile Scala bytecode and execute it in our process.
  */
 trait Evaluator{
   def loadClass(wrapperName: String, classFiles: ClassFiles): Res[Class[_]]
   def getCurrentLine: String
   def update(newImports: Seq[ImportData]): Unit
 
-  /**
-   * Takes the preprocessed `code` and `printCode` and compiles/evals/runs/etc.
-   * it to provide a result. Takes `printer` as a callback, instead of returning
-   * the `Iterator` as part of the output, because printing can cause side effects
-   * (e.g. for Streams which are lazily printed) and can fail with an exception!
-   * passing in the callback ensures the printing is still done lazily, but within
-   * the exception-handling block of the `Evaluator`
-   */
   def processLine(classFiles: Util.ClassFiles,
                   newImports: Seq[ImportData],
                   printer: Printer,
@@ -56,14 +49,6 @@ object Evaluator{
   def apply(currentClassloader: ClassLoader,
             startingLine: Int): Evaluator = new Evaluator{ eval =>
 
-    /**
-     * Imports which are required by earlier commands to the REPL. Imports
-     * have a specified key, so that later imports of the same name (e.g.
-     * defining a variable twice) can kick the earlier import out of the
-     * map. Otherwise if you import the same name twice you get compile
-     * errors instead of the desired shadowing.
-     */
-    def imports = frames.head.imports
 
     /**
      * The current line number of the REPL, used to make sure every snippet
