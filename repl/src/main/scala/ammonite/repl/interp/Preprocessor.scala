@@ -26,6 +26,7 @@ import collection.mutable
 trait Preprocessor{
   def transform(stmts: Seq[String],
                 resultIndex: String,
+                leadingSpaces: String,
                 pkgName: String,
                 indexedWrapperName: String,
                 imports: Seq[ImportData],
@@ -38,13 +39,14 @@ object Preprocessor{
 
     def transform(stmts: Seq[String],
                   resultIndex: String,
+                  leadingSpaces: String,
                   pkgName: String,
                   indexedWrapperName: String,
                   imports: Seq[ImportData],
                   printerTemplate: String => String) = for{
       Preprocessor.Expanded(code, printer) <- expandStatements(stmts, resultIndex)
       (wrappedCode, importsLength) = wrapCode(
-        pkgName, indexedWrapperName, code,
+        pkgName, indexedWrapperName, leadingSpaces + code,
         printerTemplate(printer.mkString(", ")),
         imports)
     } yield Preprocessor.Output(wrappedCode, importsLength)
