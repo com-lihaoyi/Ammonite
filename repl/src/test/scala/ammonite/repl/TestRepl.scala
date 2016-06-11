@@ -18,6 +18,9 @@ class TestRepl {
   val tempDir = ammonite.ops.Path(
     java.nio.file.Files.createTempDirectory("ammonite-tester")
   )
+  val classOutputDir = ammonite.ops.Path(
+    java.nio.file.Files.createTempDirectory("ammonite-tester-classes")
+  )
 
   val outBuffer = mutable.Buffer.empty[String]
   val warningBuffer = mutable.Buffer.empty[String]
@@ -37,10 +40,11 @@ class TestRepl {
     Ref(Colors.BlackWhite),
     printer,
     storage = Storage.Folder(tempDir),
-    new History(Vector()),
+    history = new History(Vector()),
     predef = ammonite.repl.Main.defaultPredefString + "\n" + predef,
     wd = ammonite.ops.cwd,
-    replArgs = Seq()
+    replArgs = Seq(),
+    classOutputDir = Some(classOutputDir.toString)
   ) catch{ case e =>
     println(infoBuffer.mkString)
     println(outBuffer.mkString)

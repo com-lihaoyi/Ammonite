@@ -9,8 +9,8 @@ import utest._
 import acyclic.file
 object ScriptTests extends TestSuite{
   val tests = TestSuite{
-    println("ScriptTests")
     val check = new TestRepl()
+    println(s"ScriptTests -- classOutputDir ${check.classOutputDir}")
 
     val scriptPath = cwd/'repl/'src/'test/'resources/'scripts
     val printedScriptPath = """cwd/'repl/'src/'test/'resources/'scripts"""
@@ -29,6 +29,19 @@ object ScriptTests extends TestSuite{
             <a href="www.google.com">omg</a>
             ${"\"\"\""}
             """)
+        }
+        'spark - retry(3){
+          check.session(
+            s"""
+                @ import ammonite.ops._
+
+                @ val classOutputDir = "${check.classOutputDir}"
+
+                @ load.exec($printedScriptPath/"Spark.scala")
+
+                @ val r = result
+                r: Array[Int] = Array(10, 20, 30, 40, 50)
+             """)
         }
         'preserveImports{
           val typeString =
@@ -279,7 +292,7 @@ object ScriptTests extends TestSuite{
           Ref(Colors.BlackWhite),
           printer = Printer(_ => (), _ => (), _ => (), _ => ()),
           storage = storage,
-          new History(Vector()),
+          history = new History(Vector()),
           predef = "",
           wd = ammonite.ops.cwd,
           replArgs = Seq()

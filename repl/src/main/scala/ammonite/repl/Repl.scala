@@ -14,7 +14,8 @@ class Repl(input: InputStream,
            predef: String,
            wd: ammonite.ops.Path,
            welcomeBanner: Option[String],
-           replArgs: Seq[Bind[_]] = Nil) {
+           replArgs: Seq[Bind[_]] = Nil,
+           classOutputDir: Option[String] = None) {
 
   val prompt = Ref("@ ")
 
@@ -47,9 +48,10 @@ class Repl(input: InputStream,
     printer,
     storage,
     history,
-    predef,
-    wd,
-    replArgs
+    predef = predef,
+    wd = wd,
+    replArgs = replArgs,
+    classOutputDir = classOutputDir
   )
 
   Timer("Repl init interpreter")
@@ -109,6 +111,7 @@ object Repl{
                      source: fansi.Attrs) = {
     val src =
       if (f.isNativeMethod) source("Native Method")
+      else if (f.getFileName == null) source("(null)")
       else source(f.getFileName) ++ error(":") ++ source(f.getLineNumber.toString)
 
     val prefix :+ clsName = f.getClassName.split('.').toSeq

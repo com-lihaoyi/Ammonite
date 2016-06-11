@@ -1,5 +1,6 @@
 package ammonite.repl.interp
 
+import java.io.{FileOutputStream, File, InputStream, ByteArrayInputStream}
 import java.net.{URL, URLClassLoader}
 import java.nio.file
 import java.security.MessageDigest
@@ -113,7 +114,7 @@ object SpecialClassLoader{
   *
   * http://stackoverflow.com/questions/3544614/how-is-the-control-flow-to-findclass-of
   */
-class SpecialClassLoader(parent: ClassLoader, parentHash: Array[Byte])
+class SpecialClassLoader(parent: ClassLoader, parentHash: Array[Byte], classOutputDir: Option[String] = None)
   extends URLClassLoader(Array(), parent){
 
   /**
@@ -171,6 +172,52 @@ class SpecialClassLoader(parent: ClassLoader, parentHash: Array[Byte])
     }
 
     digest.digest()
+  }
+
+  def putClassBytes(name: String, bytes: Array[Byte]) = {
+    newFileDict(name) = bytes
+
+    classOutputDir match {
+      case Some(outputDir) =>
+        val f = new File(outputDir)
+        // Create the tmp directory and save class file there.
+        if (!f.exists()) {
+          f.mkdirs();
+        }
+        val pkgDirs: Array[String] = name.split("\\.")
+        val baseName = pkgDirs(pkgDirs.length - 1)
+        var baseDir = outputDir
+        if (pkgDirs.length >= 2) {
+          // Create subdirectories to ensure a class named root.module.submodule.Class
+          // lies in outputDir/root/module/submodule.
+          val subdirs = pkgDirs
+            .slice(0, pkgDirs.length - 1)
+            .mkString("" + File.separatorChar)
+          new File(outputDir, subdirs).mkdirs();
+          baseDir = new File(outputDir, subdirs).getAbsolutePath
+        }
+        try {
+          val classFile = new File(baseDir, s"$baseName.class")
+          val fout = new FileOutputStream(classFile)
+          fout.write(bytes)
+          fout.close()
+        } catch {
+          case _: Throwable =>
+          // Error, just move on.
+        }
+
+      case None =>
+      // Ignore.
+    }
+  }
+
+  override def getResourceAsStream(name: String): InputStream = {
+    val anonName = name.replaceAll("\\.class$", "").replaceAll("/", ".")
+    if (newFileDict.contains(anonName)) {
+      new ByteArrayInputStream(newFileDict.get(anonName).get)
+    } else {
+      super.getResourceAsStream(name)
+    }
   }
 
   def initialClasspathHash = parentHash
