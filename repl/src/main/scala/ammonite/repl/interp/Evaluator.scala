@@ -180,8 +180,6 @@ object Evaluator{
     }
 
 
-
-
     def processScriptBlock(cls: Class[_],
                            newImports: Seq[ImportData],
                            wrapperName: String,

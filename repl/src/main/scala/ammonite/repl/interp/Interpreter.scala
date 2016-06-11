@@ -190,7 +190,9 @@ class Interpreter(prompt0: Ref[String],
       compiled,
       "Compilation Failed"
     )
-  } yield (classfiles, imports)
+  } yield {
+    (classfiles, imports)
+  }
 
   def evaluateLine(code: String,
                    importsLength: Int,
@@ -225,7 +227,13 @@ class Interpreter(prompt0: Ref[String],
                          fileName: String,
                          pkgName: String) = for {
     (cls, newImports) <- cachedCompileBlock(
-      wrappedCode, importsLength, printer, wrapperName, fileName, pkgName
+      wrappedCode,
+      importsLength,
+      printer,
+      wrapperName,
+      fileName,
+      pkgName,
+      "scala.Iterator[String]()"
     )
     res <- eval.processScriptBlock(cls, newImports, wrapperName, pkgName)
   } yield res
@@ -237,7 +245,7 @@ class Interpreter(prompt0: Ref[String],
                          wrapperName: String,
                          fileName: String,
                          pkgName: String,
-                         printCode: String = ""): Res[(Class[_], Seq[ImportData])] = {
+                         printCode: String): Res[(Class[_], Seq[ImportData])] = {
 
     Timer("cachedCompileBlock 1")
 
@@ -269,7 +277,6 @@ class Interpreter(prompt0: Ref[String],
   }
 
   def processModule(code: String, wrapperName: String, pkgName: String) = {
-    println("Process Module " + pkgName + " " + wrapperName)
     processModule0(code, wrapperName, pkgName, predefImports)
   }
 
@@ -368,7 +375,7 @@ class Interpreter(prompt0: Ref[String],
               pkgName,
               Interpreter.indexWrapperName(wrapperName, wrapperIndex),
               scriptImports,
-              _ => ""
+              _ => "scala.Iterator[String]()"
             )
           }
           ev <- evaluate(
