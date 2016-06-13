@@ -27,7 +27,7 @@ The layout of the repository is roughly:
 - `readme/` is the source code for the [Documentation](https://lihaoyi.github.io/Ammonite/#Ammonite-Ops), written in [Scalatex](https://lihaoyi.github.io/Scalatex/).
 - `published/` is a synthetic project used for publishing, excluding the readme and integration tests
 
-For more detailed information, check out the internals documentation for high-level overviews of the project
+For more detailed information, check out the internals documentation for high-level overviews of some facets the codebase
 
 - [Internals Documentation](https://github.com/lihaoyi/Ammonite/tree/master/internals-docs)
 
