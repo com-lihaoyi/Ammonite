@@ -22,16 +22,16 @@ import scala.util.Try
 trait Evaluator{
   def loadClass(wrapperName: String, classFiles: ClassFiles): Res[Class[_]]
   def getCurrentLine: String
-  def update(newImports: Seq[ImportData]): Unit
+  def update(newImports: Imports): Unit
 
   def processLine(classFiles: Util.ClassFiles,
-                  newImports: Seq[ImportData],
+                  newImports: Imports,
                   printer: Printer,
                   fileName: String,
                   indexedWrapperName: String): Res[Evaluated]
 
   def processScriptBlock(cls: Class[_],
-                         newImports: Seq[ImportData],
+                         newImports: Imports,
                          wrapperName: String,
                          pkgName: String): Res[Evaluated]
 
@@ -73,7 +73,7 @@ object Evaluator{
       new Frame(
         special,
         special,
-        Seq.empty[ImportData],
+        Imports(Nil),
         Seq()
       )
     }
@@ -156,7 +156,7 @@ object Evaluator{
     }
 
     def processLine(classFiles: Util.ClassFiles,
-                    newImports: Seq[ImportData],
+                    newImports: Imports,
                     printer: Printer,
                     fileName: String,
                     indexedWrapperName: String) = {
@@ -180,7 +180,7 @@ object Evaluator{
 
 
     def processScriptBlock(cls: Class[_],
-                           newImports: Seq[ImportData],
+                           newImports: Imports,
                            wrapperName: String,
                            pkgName: String) = for {
       _ <- Catching{userCodeExceptionHandler}
@@ -194,29 +194,31 @@ object Evaluator{
     }
 
 
-    def update(newImports: Seq[ImportData]) = {
+    def update(newImports: Imports) = {
       frames.head.addImports(newImports)
     }
 
     def evaluationResult(wrapperName: String,
-                         imports: Seq[ImportData]) = {
+                         imports: Imports) = {
       Evaluated(
         wrapperName,
-        for(id <- imports) yield {
-          val filledPrefix =
-            if (id.prefix == "") {
-              // For some reason, for things not-in-packages you can't access
-              // them off of `_root_`
-              wrapperName
-            } else {
-              id.prefix
-            }
-          val rootedPrefix =
-            if (filledPrefix.startsWith("_root_.")) filledPrefix
-            else "_root_." + filledPrefix
+        Imports(
+          for(id <- imports.value) yield {
+            val filledPrefix =
+              if (id.prefix == "") {
+                // For some reason, for things not-in-packages you can't access
+                // them off of `_root_`
+                wrapperName
+              } else {
+                id.prefix
+              }
+            val rootedPrefix =
+              if (filledPrefix.startsWith("_root_.")) filledPrefix
+              else "_root_." + filledPrefix
 
-          id.copy(prefix = rootedPrefix)
-        }
+            id.copy(prefix = rootedPrefix)
+          }
+        )
       )
     }
   }

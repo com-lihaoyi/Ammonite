@@ -57,7 +57,7 @@ object Compiler{
    * If the Option is None, it means compilation failed
    * Otherwise it's a Traversable of (filename, bytes) tuples
    */
-  type Output = Option[(Traversable[(String, Array[Byte])], Seq[ImportData])]
+  type Output = Option[(Traversable[(String, Array[Byte])], Imports)]
 
   /**
    * Converts a bunch of bytes into Scalac's weird VirtualFile class
@@ -299,7 +299,8 @@ object Compiler{
       val outputFiles = enumerateVdFiles(vd).toVector
 
       if (reporter.hasErrors) None
-      else Some{
+      else {
+
         shutdownPressy()
 
         val files = for(x <- outputFiles if x.name.endsWith(".class")) yield {
@@ -311,8 +312,8 @@ object Compiler{
         }
 
         val imports = lastImports.toList
-        val res = (files, imports)
-        res
+        Some( (files, Imports(imports)) )
+
       }
     }
 

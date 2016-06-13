@@ -5,39 +5,11 @@ import java.nio.file
 import java.security.MessageDigest
 
 import ammonite.ops._
-import ammonite.repl.{ImportData, Util}
+import ammonite.repl.{ImportData, Imports, Util}
+
 import scala.collection.mutable
 
-object Frame{
-  /**
-    * Figure out which imports will get stomped over by future imports
-    * before they get used, and just ignore those.
-    */
-  def mergeImports(importss: Seq[ImportData]*): Seq[ImportData] = {
-    // We iterate over the combined reversed imports, keeping track of the
-    // things that will-be-stomped-over-in-the-non-reversed-world in a map.
-    // If an import's target destination will get stomped over we ignore it
-    //
-    // At the end of the day we re-reverse the trimmed list and return it.
-    val importData = importss.flatten
-    val stompedTypes = mutable.Set.empty[String]
-    val stompedTerms = mutable.Set.empty[String]
-    val out = mutable.Buffer.empty[ImportData]
-    for(data <- importData.reverseIterator){
-      val stomped = data.importType match{
-        case ImportData.Term => Seq(stompedTerms)
-        case ImportData.Type => Seq(stompedTypes)
-        case ImportData.TermType => Seq(stompedTerms, stompedTypes)
-      }
-      if (!stomped.exists(_(data.toName))){
-        out.append(data)
-        stomped.foreach(_.add(data.toName))
-        stompedTerms.remove(data.prefix)
-      }
-    }
-    out.reverse
-  }
-}
+
 
 
 /**
@@ -49,12 +21,12 @@ object Frame{
   */
 class Frame(val classloader: SpecialClassLoader,
             val pluginClassloader: SpecialClassLoader,
-            private[this] var imports0: Seq[ImportData],
+            private[this] var imports0: Imports,
             private[this] var classpath0: Seq[java.io.File]){
   def imports = imports0
   def classpath = classpath0
-  def addImports(additional: Seq[ImportData]) = {
-    imports0 = Frame.mergeImports(imports0, additional)
+  def addImports(additional: Imports) = {
+    imports0 = imports0 ++ additional
   }
   def addClasspath(additional: Seq[java.io.File]) = {
     classpath0 = classpath0 ++ additional

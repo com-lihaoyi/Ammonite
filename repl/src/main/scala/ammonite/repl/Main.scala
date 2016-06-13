@@ -76,7 +76,7 @@ case class Main(predef: String = "",
     */
   def runScript(path: Path,
                 args: Seq[String],
-                kwargs: Map[String, String]): Res[Seq[ImportData]] = {
+                kwargs: Map[String, String]): Res[Imports] = {
 
     val repl = instantiateRepl()
     val (pkg, wrapper) = Util.pathToPackageWrapper(path, wd)
@@ -84,7 +84,7 @@ case class Main(predef: String = "",
       case x: Res.Failing => x
       case Res.Success(imports) =>
         repl.interp.init()
-        imports.find(_.toName == "main") match {
+        imports.value.find(_.toName == "main") match {
           case None => Res.Success(imports)
           case Some(i) =>
             val quotedArgs =

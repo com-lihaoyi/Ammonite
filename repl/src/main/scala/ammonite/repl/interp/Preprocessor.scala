@@ -1,6 +1,6 @@
 package ammonite.repl.interp
 import acyclic.file
-import ammonite.repl.{ImportData, Parsers, Res, Timer}
+import ammonite.repl._
 import fastparse.all._
 
 import scala.reflect.internal.Flags
@@ -30,7 +30,7 @@ trait Preprocessor{
                 leadingSpaces: String,
                 pkgName: String,
                 indexedWrapperName: String,
-                imports: Seq[ImportData],
+                imports: Imports,
                 printerTemplate: String => String): Res[Preprocessor.Output]
 }
 object Preprocessor{
@@ -79,13 +79,14 @@ object Preprocessor{
                   leadingSpaces: String,
                   pkgName: String,
                   indexedWrapperName: String,
-                  imports: Seq[ImportData],
+                  imports: Imports,
                   printerTemplate: String => String) = for{
       Preprocessor.Expanded(code, printer) <- expandStatements(stmts, resultIndex)
       (wrappedCode, importsLength) = wrapCode(
         pkgName, indexedWrapperName, leadingSpaces + code,
         printerTemplate(printer.mkString(", ")),
-        imports)
+        imports
+      )
     } yield Preprocessor.Output(wrappedCode, importsLength)
     def Processor(cond: PartialFunction[(String, String, G#Tree), Preprocessor.Expanded]) = {
       (code: String, name: String, tree: G#Tree) => cond.lift(name, code, tree)
@@ -243,12 +244,12 @@ object Preprocessor{
   }
 
 
-  def importBlock(importData: Seq[ImportData]) = {
+  def importBlock(importData: Imports) = {
     Timer("importBlock 0")
     // Group the remaining imports into sliding groups according to their
     // prefix, while still maintaining their ordering
     val grouped = mutable.Buffer[mutable.Buffer[ImportData]]()
-    for(data <- importData){
+    for(data <- importData.value){
       if (grouped.isEmpty) grouped.append(mutable.Buffer(data))
       else {
         val last = grouped.last.last
@@ -282,7 +283,7 @@ object Preprocessor{
                indexedWrapperName: String,
                code: String,
                printCode: String,
-               imports: Seq[ImportData]) = {
+               imports: Imports) = {
 
     val topWrapper = s"""
 package $pkgName

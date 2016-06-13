@@ -1,40 +1,27 @@
 package ammonite.repl
 
 import java.security.MessageDigest
+
 import ammonite.ops._
 import acyclic.file
 import fansi.Attrs
 import pprint.{PPrint, PPrinter}
 
+import scala.collection.mutable
 import scala.reflect.runtime.universe.TypeTag
 import scala.util.Try
 
 /**
- * The result of a single pass through the ammonite REPL.
- */
+  * The result of a single pass through the ammonite REPL. Results in a single
+  * [[T]], or of one of a fixed number of failures that are common for anyone
+  * who is evaluating code via the REPL.
+  */
 sealed abstract class Res[+T]{
   def flatMap[V](f: T => Res[V]): Res[V]
   def map[V](f: T => V): Res[V]
   def filter(f: T => Boolean): Res[T] = this
 }
 
-/**
- * Exception for reporting script compilation failures
- */ 
-class CompilationError(message: String) extends Exception(message)
-
-/**
- * Fake for-comprehension generator to catch errors and turn
- * them into [[Res.Failure]]s
- */
-case class Catching(handler: PartialFunction[Throwable, Res.Failing]) {
-
-  def foreach[T](t: Unit => T): T = t(())
-  def flatMap[T](t: Unit => Res[T]): Res[T] =
-    try{t(())} catch handler
-  def map[T](t: Unit => T): Res[T] =
-    try Res.Success(t(())) catch handler
-}
 
 
 object Res{
@@ -94,13 +81,98 @@ object Res{
 }
 
 
-case class Evaluated(wrapper: String,
-                     imports: Seq[ImportData])
+/**
+  * Exception for reporting script compilation failures
+  */
+class CompilationError(message: String) extends Exception(message)
 
+/**
+  * Fake for-comprehension generator to catch errors and turn
+  * them into [[Res.Failure]]s
+  */
+case class Catching(handler: PartialFunction[Throwable, Res.Failing]) {
+
+  def foreach[T](t: Unit => T): T = t(())
+  def flatMap[T](t: Unit => Res[T]): Res[T] =
+    try{t(())} catch handler
+  def map[T](t: Unit => T): Res[T] =
+    try Res.Success(t(())) catch handler
+}
+
+case class Evaluated(wrapper: String,
+                     imports: Imports)
+
+/**
+  * Represents the importing of a single name in the Ammonite REPL, of the
+  * form
+  *
+  * {{{
+  * import $prefix.{$fromName => $toName}
+  * }}}
+  *
+  * All imports are reduced to this form; `import $prefix.$name` is results in
+  * the `fromName` and `toName` being the same, while `import $prefix._` or
+  * `import $prefix.{foo, bar, baz}` are split into multiple distinct
+  * [[ImportData]] objects.
+  *
+  * Note that imports can be of one of three distinct `ImportType`s: importing
+  * a type, a term, or both. This lets us properly deal with shadowing correctly
+  * if we import the type and term of the same name from different places
+  */
 case class ImportData(fromName: String,
                       toName: String,
                       prefix: String,
                       importType: ImportData.ImportType)
+
+/**
+  * Represents the imports that occur before a piece of user code in the
+  * Ammonite REPL. It's basically a `Seq[ImportData]`, except we really want
+  * it to be always in a "canonical" form without shadowed/duplicate imports.
+  *
+  * Thus we only expose an `apply` method which performs this de-duplication,
+  * and a `++` operator that combines two sets of imports while performing
+  * de-duplication.
+  */
+class Imports private (val value: Seq[ImportData]){
+  def ++(others: Imports) = Imports(this.value, others.value)
+}
+
+object Imports{
+  // This isn't called directly, but we need to define it so uPickle can know
+  // how to read/write imports
+  def unapply(s: Imports): Option[Seq[ImportData]] = Some(s.value)
+  /**
+    * Constructs an `Imports` object from one or more loose sequence of imports
+    *
+    * Figures out which imports will get stomped over by future imports
+    * before they get used, and just ignore those.
+    */
+  def apply(importss: Seq[ImportData]*): Imports = {
+    // We iterate over the combined reversed imports, keeping track of the
+    // things that will-be-stomped-over-in-the-non-reversed-world in a map.
+    // If an import's target destination will get stomped over we ignore it
+    //
+    // At the end of the day we re-reverse the trimmed list and return it.
+    val importData = importss.flatten
+    val stompedTypes = mutable.Set.empty[String]
+    val stompedTerms = mutable.Set.empty[String]
+    val out = mutable.Buffer.empty[ImportData]
+    for(data <- importData.reverseIterator){
+      val stomped = data.importType match{
+        case ImportData.Term => Seq(stompedTerms)
+        case ImportData.Type => Seq(stompedTypes)
+        case ImportData.TermType => Seq(stompedTerms, stompedTypes)
+      }
+      if (!stomped.exists(_(data.toName))){
+        out.append(data)
+        stomped.foreach(_.add(data.toName))
+        stompedTerms.remove(data.prefix)
+      }
+    }
+    new Imports(out.reverse)
+  }
+}
+
 object ImportData{
   sealed case class ImportType(name: String)
   val Type = ImportType("Type")
@@ -154,20 +226,7 @@ object Ref{
   }
   def apply[T](value0: T) = live(() => value0)
 }
-trait Cell[T]{
-  def apply(): T
-  def update(): Unit
-}
-object Cell{
-  class LazyHolder[T](t: => T){
-    lazy val value = t
-  }
-  def apply[T](t: => T) = new Cell[T] {
-    var inner: LazyHolder[T] = new LazyHolder(t)
-    def update() = inner = new LazyHolder(t)
-    def apply() = inner.value
-  }
-}
+
 /**
  * Nice pattern matching for chained exceptions
  */
@@ -201,9 +260,12 @@ object Util{
     data.foreach(digest.update)
     digest.digest()
   }
+
+  // Type aliases for common things
   type IvyMap = Map[(String, String, String, String), Set[String]]
   type ClassFiles = Traversable[(String, Array[Byte])]
-  type CompileCache = (ClassFiles, Seq[ImportData])
+  type CompileCache = (ClassFiles, Imports)
+
 
   def transpose[A](xs: List[List[A]]): List[List[A]] = {
     @scala.annotation.tailrec
@@ -298,7 +360,8 @@ object Bind{
   }
 }
 /**
-  * Encapsulates the ways the Ammonite REPL prints things
+  * Encapsulates the ways the Ammonite REPL prints things. Does not print
+  * a trailing newline by default; you have to add one yourself.
   *
   * @param out How you want it to print streaming fragments of stdout
   * @param warning How you want it to print a compile warning
