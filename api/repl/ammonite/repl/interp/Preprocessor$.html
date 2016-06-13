@@ -101,7 +101,7 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a href="Preprocessor$$Output.html"><span class="name">Output</span></a><span class="params">(<span name="code">code: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="printer">printer: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+        <a href="Preprocessor$$Output.html"><span class="name">Output</span></a><span class="params">(<span name="code">code: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="prefixCharLength">prefixCharLength: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a></span>)</span><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
       </span>
       </h4><span class="permalink">
       <a href="../../../index.html#ammonite.repl.interp.Preprocessor$@OutputextendsProductwithSerializable" title="Permalink" target="_top">
@@ -258,6 +258,23 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="ammonite.repl.interp.Preprocessor#errMsg" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="errMsg(msg:String,code:String,expected:String,idx:Int):String"></a>
+      <a id="errMsg(String,String,String,Int):String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">errMsg</span><span class="params">(<span name="msg">msg: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="code">code: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="expected">expected: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="idx">idx: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a></span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.repl.interp.Preprocessor$@errMsg(msg:String,code:String,expected:String,idx:Int):String" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
     </li><li name="scala.AnyRef#finalize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
       <a id="finalize():Unit"></a>
@@ -315,6 +332,23 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="ammonite.repl.interp.Preprocessor#importBlock" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="importBlock(importData:ammonite.repl.Imports):String"></a>
+      <a id="importBlock(Imports):String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">importBlock</span><span class="params">(<span name="importData">importData: <a href="../Imports.html" class="extype" name="ammonite.repl.Imports">Imports</a></span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.repl.interp.Preprocessor$@importBlock(importData:ammonite.repl.Imports):String" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
     </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <a id="isInstanceOf[T0]:Boolean"></a>
@@ -383,6 +417,23 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="ammonite.repl.interp.Preprocessor#splitScript" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="splitScript(rawCode:String):ammonite.repl.Res[Seq[(String,Seq[String])]]"></a>
+      <a id="splitScript(String):Res[Seq[(String,Seq[String])]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">splitScript</span><span class="params">(<span name="rawCode">rawCode: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="../Res.html" class="extype" name="ammonite.repl.Res">Res</a>[<a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[(<span class="extype" name="scala.Predef.String">String</span>, <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<span class="extype" name="scala.Predef.String">String</span>])]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.repl.interp.Preprocessor$@splitScript(rawCode:String):ammonite.repl.Res[Seq[(String,Seq[String])]]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
     </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
       <a id="synchronized[T0](⇒T0):T0"></a>
@@ -486,6 +537,23 @@
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="ammonite.repl.interp.Preprocessor#wrapCode" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="wrapCode(pkgName:String,indexedWrapperName:String,code:String,printCode:String,imports:ammonite.repl.Imports):(String,Int)"></a>
+      <a id="wrapCode(String,String,String,String,Imports):(String,Int)"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wrapCode</span><span class="params">(<span name="pkgName">pkgName: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="indexedWrapperName">indexedWrapperName: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="code">code: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="printCode">printCode: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="imports">imports: <a href="../Imports.html" class="extype" name="ammonite.repl.Imports">Imports</a></span>)</span><span class="result">: (<span class="extype" name="java.lang.String">String</span>, <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a>)</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.repl.interp.Preprocessor$@wrapCode(pkgName:String,indexedWrapperName:String,code:String,printCode:String,imports:ammonite.repl.Imports):(String,Int)" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
     </li></ol>
             </div>
 

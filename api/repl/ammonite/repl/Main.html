@@ -53,7 +53,7 @@
       
           <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Contains the various entry points to the Ammonite REPL.</p><p>Configuration of the basic REPL is done by passing in arguments when
 constructing the <a href="" class="extype" name="ammonite.repl.Main">Main</a> instance, and the various entrypoints such
-as <a href="#run(replArgs:ammonite.repl.Bind[_]*):Any" class="extmbr" name="ammonite.repl.Main#run">run</a> <a href="#runScript(path:ammonite.ops.Path,args:Seq[String],kwargs:Map[String,String]):ammonite.repl.Res[Seq[ammonite.repl.ImportData]]" class="extmbr" name="ammonite.repl.Main#runScript">runScript</a> and so on are methods on that instance.</p><p>It is more or less equivalent to the <a href="Repl.html" class="extype" name="ammonite.repl.Repl">Repl</a> object itself, and has
+as <a href="#run(replArgs:ammonite.repl.Bind[_]*):Any" class="extmbr" name="ammonite.repl.Main#run">run</a> <a href="#runScript(path:ammonite.ops.Path,args:Seq[String],kwargs:Map[String,String]):ammonite.repl.Res[ammonite.repl.Imports]" class="extmbr" name="ammonite.repl.Main#runScript">runScript</a> and so on are methods on that instance.</p><p>It is more or less equivalent to the <a href="Repl.html" class="extype" name="ammonite.repl.Repl">Repl</a> object itself, and has
 a similar set of parameters, but does not have any of the <a href="Repl.html" class="extype" name="ammonite.repl.Repl">Repl</a>'s
 implementation-related code and provides a more convenient set of
 entry-points that a user can call.</p><p>Note that the <a href="#instantiateRepl(replArgs:Seq[ammonite.repl.Bind[_]]):ammonite.repl.Repl" class="extmbr" name="ammonite.repl.Main#instantiateRepl">instantiateRepl</a> function generates a new <a href="Repl.html" class="extype" name="ammonite.repl.Repl">Repl</a>
@@ -509,18 +509,18 @@ every time it is called!
       <p class="shortcomment cmt">Run a snippet of code
 </p>
     </li><li name="ammonite.repl.Main#runScript" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="runScript(path:ammonite.ops.Path,args:Seq[String],kwargs:Map[String,String]):ammonite.repl.Res[Seq[ammonite.repl.ImportData]]"></a>
-      <a id="runScript(Path,Seq[String],Map[String,String]):Res[Seq[ImportData]]"></a>
+      <a id="runScript(path:ammonite.ops.Path,args:Seq[String],kwargs:Map[String,String]):ammonite.repl.Res[ammonite.repl.Imports]"></a>
+      <a id="runScript(Path,Seq[String],Map[String,String]):Res[Imports]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">runScript</span><span class="params">(<span name="path">path: <span class="extype" name="ammonite.ops.Path">Path</span></span>, <span name="args">args: <a href="../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="kwargs">kwargs: <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result">: <a href="Res.html" class="extype" name="ammonite.repl.Res">Res</a>[<a href="../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="ImportData.html" class="extype" name="ammonite.repl.ImportData">ImportData</a>]]</span>
+        <span class="name">runScript</span><span class="params">(<span name="path">path: <span class="extype" name="ammonite.ops.Path">Path</span></span>, <span name="args">args: <a href="../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="kwargs">kwargs: <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result">: <a href="Res.html" class="extype" name="ammonite.repl.Res">Res</a>[<a href="Imports.html" class="extype" name="ammonite.repl.Imports">Imports</a>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#ammonite.repl.Main@runScript(path:ammonite.ops.Path,args:Seq[String],kwargs:Map[String,String]):ammonite.repl.Res[Seq[ammonite.repl.ImportData]]" title="Permalink" target="_top">
+      <a href="../../index.html#ammonite.repl.Main@runScript(path:ammonite.ops.Path,args:Seq[String],kwargs:Map[String,String]):ammonite.repl.Res[ammonite.repl.Imports]" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>

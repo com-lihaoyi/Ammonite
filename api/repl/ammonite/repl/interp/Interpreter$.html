@@ -1,9 +1,9 @@
 <!DOCTYPE html >
 <html>
         <head>
-          <title>Evaluator - ammonite.repl.interp.Evaluator</title>
-          <meta name="description" content="Evaluator - ammonite.repl.interp.Evaluator" />
-          <meta name="keywords" content="Evaluator ammonite.repl.interp.Evaluator" />
+          <title>Interpreter - ammonite.repl.interp.Interpreter</title>
+          <meta name="description" content="Interpreter - ammonite.repl.interp.Interpreter" />
+          <meta name="keywords" content="Interpreter ammonite.repl.interp.Interpreter" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
@@ -16,7 +16,7 @@
       <script type="text/javascript">
          if(top === self) {
             var url = '../../../index.html';
-            var hash = 'ammonite.repl.interp.Evaluator';
+            var hash = 'ammonite.repl.interp.Interpreter$';
             var anchor = window.location.hash;
             var anchor_opt = '';
             if (anchor.length >= 1)
@@ -26,16 +26,16 @@
    	  </script>
     
         </head>
-        <body class="type">
+        <body class="value">
       <div id="definition">
-        <a href="Evaluator$.html" title="See companion object"><img alt="Trait/Object" src="../../../lib/trait_to_object_big.png" /></a>
+        <a href="Interpreter.html" title="See companion class"><img alt="Object/Class" src="../../../lib/object_to_class_big.png" /></a>
         <p id="owner"><a href="../../package.html" class="extype" name="ammonite">ammonite</a>.<a href="../package.html" class="extype" name="ammonite.repl">repl</a>.<a href="package.html" class="extype" name="ammonite.repl.interp">interp</a></p>
-        <h1><a href="Evaluator$.html" title="See companion object">Evaluator</a></h1><h3><span class="morelinks"><div>
+        <h1><a href="Interpreter.html" title="See companion class">Interpreter</a></h1><h3><span class="morelinks"><div>
             Related Docs:
-            <a href="Evaluator$.html" title="See companion object">object Evaluator</a>
+            <a href="Interpreter.html" title="See companion class">class Interpreter</a>
             | <a href="package.html" class="extype" name="ammonite.repl.interp">package interp</a>
           </div></span></h3><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Evaluator" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.Interpreter$" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -44,17 +44,14 @@
       <h4 id="signature" class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">trait</span>
+        <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <span class="name">Evaluator</span><span class="result"> extends <a href="../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>
+        <span class="name">Interpreter</span>
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Evaluates already-compiled Bytecode.</p><p>Deals with all the munging of <code>Classloader</code>s, <code>Class[_]</code> objects,
-and <code>Array[Byte]</code>s representing class files, and reflection necessary
-to take the already-compile Scala bytecode and execute it in our process.
-</p></div><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><a href="../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a>, <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Any" class="extype" target="_top">Any</a></div>
         </div></div>
@@ -74,7 +71,7 @@ to take the already-compile Scala bytecode and execute it in our process.
                 <span class="filtertype">Inherited<br />
                 </span>
                 <ol id="linearization">
-                  <li class="in" name="ammonite.repl.interp.Evaluator"><span>Evaluator</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                  <li class="in" name="ammonite.repl.interp.Interpreter"><span>Interpreter</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                 </ol>
               </div><div id="ancestors">
             <span class="filtertype"></span>
@@ -93,108 +90,21 @@ to take the already-compile Scala bytecode and execute it in our process.
         <div id="allMembers">
         
 
-        
-
-        <div id="values" class="values members">
-              <h3>Abstract Value Members</h3>
-              <ol><li name="ammonite.repl.interp.Evaluator#getCurrentLine" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
-      <a id="getCurrentLine:String"></a>
-      <a id="getCurrentLine:String"></a>
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="ammonite.repl.interp.Interpreter.EvaluateCallback" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="EvaluateCallback=(ammonite.repl.interp.Preprocessor.Output,Int,String)=&gt;ammonite.repl.Res[ammonite.repl.Evaluated]"></a>
+      <a id="EvaluateCallback:EvaluateCallback"></a>
       <h4 class="signature">
       <span class="modifier_kind">
-        <span class="modifier">abstract </span>
-        <span class="kind">def</span>
+        <span class="modifier"></span>
+        <span class="kind">type</span>
       </span>
       <span class="symbol">
-        <span class="name">getCurrentLine</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+        <span class="name">EvaluateCallback</span><span class="result"> = (<a href="Preprocessor$$Output.html" class="extype" name="ammonite.repl.interp.Preprocessor.Output">Output</a>, <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a>, <span class="extype" name="scala.Predef.String">String</span>) ⇒ <a href="../Res.html" class="extype" name="ammonite.repl.Res">Res</a>[<a href="../Evaluated.html" class="extype" name="ammonite.repl.Evaluated">Evaluated</a>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Evaluator@getCurrentLine:String" title="Permalink" target="_top">
-        <img src="../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
-    </li><li name="ammonite.repl.interp.Evaluator#loadClass" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
-      <a id="loadClass(wrapperName:String,classFiles:ammonite.repl.Util.ClassFiles):ammonite.repl.Res[Class[_]]"></a>
-      <a id="loadClass(String,ClassFiles):Res[Class[_]]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier">abstract </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">loadClass</span><span class="params">(<span name="wrapperName">wrapperName: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="classFiles">classFiles: <a href="../Util$.html#ClassFiles=Traversable[(String,Array[Byte])]" class="extmbr" name="ammonite.repl.Util.ClassFiles">ClassFiles</a></span>)</span><span class="result">: <a href="../Res.html" class="extype" name="ammonite.repl.Res">Res</a>[<span class="extype" name="scala.Predef.Class">Class</span>[_]]</span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Evaluator@loadClass(wrapperName:String,classFiles:ammonite.repl.Util.ClassFiles):ammonite.repl.Res[Class[_]]" title="Permalink" target="_top">
-        <img src="../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
-    </li><li name="ammonite.repl.interp.Evaluator#processLine" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
-      <a id="processLine(classFiles:ammonite.repl.Util.ClassFiles,newImports:ammonite.repl.Imports,printer:ammonite.repl.Printer,fileName:String,indexedWrapperName:String):ammonite.repl.Res[ammonite.repl.Evaluated]"></a>
-      <a id="processLine(ClassFiles,Imports,Printer,String,String):Res[Evaluated]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier">abstract </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">processLine</span><span class="params">(<span name="classFiles">classFiles: <a href="../Util$.html#ClassFiles=Traversable[(String,Array[Byte])]" class="extmbr" name="ammonite.repl.Util.ClassFiles">ClassFiles</a></span>, <span name="newImports">newImports: <a href="../Imports.html" class="extype" name="ammonite.repl.Imports">Imports</a></span>, <span name="printer">printer: <a href="../Printer.html" class="extype" name="ammonite.repl.Printer">Printer</a></span>, <span name="fileName">fileName: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="indexedWrapperName">indexedWrapperName: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="../Res.html" class="extype" name="ammonite.repl.Res">Res</a>[<a href="../Evaluated.html" class="extype" name="ammonite.repl.Evaluated">Evaluated</a>]</span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Evaluator@processLine(classFiles:ammonite.repl.Util.ClassFiles,newImports:ammonite.repl.Imports,printer:ammonite.repl.Printer,fileName:String,indexedWrapperName:String):ammonite.repl.Res[ammonite.repl.Evaluated]" title="Permalink" target="_top">
-        <img src="../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
-    </li><li name="ammonite.repl.interp.Evaluator#processScriptBlock" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
-      <a id="processScriptBlock(cls:Class[_],newImports:ammonite.repl.Imports,wrapperName:String,pkgName:String):ammonite.repl.Res[ammonite.repl.Evaluated]"></a>
-      <a id="processScriptBlock(Class[_],Imports,String,String):Res[Evaluated]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier">abstract </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">processScriptBlock</span><span class="params">(<span name="cls">cls: <span class="extype" name="scala.Predef.Class">Class</span>[_]</span>, <span name="newImports">newImports: <a href="../Imports.html" class="extype" name="ammonite.repl.Imports">Imports</a></span>, <span name="wrapperName">wrapperName: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="pkgName">pkgName: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="../Res.html" class="extype" name="ammonite.repl.Res">Res</a>[<a href="../Evaluated.html" class="extype" name="ammonite.repl.Evaluated">Evaluated</a>]</span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Evaluator@processScriptBlock(cls:Class[_],newImports:ammonite.repl.Imports,wrapperName:String,pkgName:String):ammonite.repl.Res[ammonite.repl.Evaluated]" title="Permalink" target="_top">
-        <img src="../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
-    </li><li name="ammonite.repl.interp.Evaluator#sess" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
-      <a id="sess:ammonite.repl.frontend.Session"></a>
-      <a id="sess:Session"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier">abstract </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">sess</span><span class="result">: <a href="../frontend/Session.html" class="extype" name="ammonite.repl.frontend.Session">Session</a></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Evaluator@sess:ammonite.repl.frontend.Session" title="Permalink" target="_top">
-        <img src="../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
-    </li><li name="ammonite.repl.interp.Evaluator#update" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
-      <a id="update(newImports:ammonite.repl.Imports):Unit"></a>
-      <a id="update(Imports):Unit"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier">abstract </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">update</span><span class="params">(<span name="newImports">newImports: <a href="../Imports.html" class="extype" name="ammonite.repl.Imports">Imports</a></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Evaluator@update(newImports:ammonite.repl.Imports):Unit" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.Interpreter$@EvaluateCallback=(ammonite.repl.interp.Preprocessor.Output,Int,String)=&gt;ammonite.repl.Res[ammonite.repl.Evaluated]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -202,8 +112,10 @@ to take the already-compile Scala bytecode and execute it in our process.
     </li></ol>
             </div>
 
+        
+
         <div id="values" class="values members">
-              <h3>Concrete Value Members</h3>
+              <h3>Value Members</h3>
               <ol><li name="scala.AnyRef#!=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="!=(x$1:Any):Boolean"></a>
       <a id="!=(Any):Boolean"></a>
@@ -216,7 +128,7 @@ to take the already-compile Scala bytecode and execute it in our process.
         <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Any" class="extype" target="_top">Any</a></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Evaluator@!=(x$1:Any):Boolean" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.Interpreter$@!=(x$1:Any):Boolean" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -233,7 +145,7 @@ to take the already-compile Scala bytecode and execute it in our process.
         <span title="gt4s: $hash$hash" class="name">##</span><span class="params">()</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Evaluator@##():Int" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.Interpreter$@##():Int" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -250,11 +162,28 @@ to take the already-compile Scala bytecode and execute it in our process.
         <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Any" class="extype" target="_top">Any</a></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Evaluator@==(x$1:Any):Boolean" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.Interpreter$@==(x$1:Any):Boolean" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="ammonite.repl.interp.Interpreter#SheBang" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="SheBang:String"></a>
+      <a id="SheBang:String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">SheBang</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.repl.interp.Interpreter$@SheBang:String" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
     </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <a id="asInstanceOf[T0]:T0"></a>
@@ -267,11 +196,32 @@ to take the already-compile Scala bytecode and execute it in our process.
         <span class="name">asInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Any.asInstanceOf.T0">T0</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Evaluator@asInstanceOf[T0]:T0" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.Interpreter$@asInstanceOf[T0]:T0" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="ammonite.repl.interp.Interpreter#cacheTag" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="cacheTag(code:String,imports:Seq[ammonite.repl.ImportData],classpathHash:Array[Byte]):String"></a>
+      <a id="cacheTag(String,Seq[ImportData],Array[Byte]):String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">cacheTag</span><span class="params">(<span name="code">code: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="imports">imports: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="../ImportData.html" class="extype" name="ammonite.repl.ImportData">ImportData</a>]</span>, <span name="classpathHash">classpathHash: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Array" class="extype" target="_top">Array</a>[<a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Byte" class="extype" target="_top">Byte</a>]</span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.repl.interp.Interpreter$@cacheTag(code:String,imports:Seq[ammonite.repl.ImportData],classpathHash:Array[Byte]):String" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This gives our cache tags for compile caching.</p><div class="fullcomment"><div class="comment cmt"><p>This gives our cache tags for compile caching. The cache tags are a hash
+of classpath, previous commands (in-same-script), and the block-code.
+Previous commands are hashed in the wrapper names, which are contained
+in imports, so we don't need to pass them explicitly.
+</p></div></div>
     </li><li name="scala.AnyRef#clone" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a>
       <a id="clone():AnyRef"></a>
@@ -284,7 +234,7 @@ to take the already-compile Scala bytecode and execute it in our process.
         <span class="name">clone</span><span class="params">()</span><span class="result">: <a href="../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Evaluator@clone():Object" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.Interpreter$@clone():Object" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -307,7 +257,7 @@ to take the already-compile Scala bytecode and execute it in our process.
         <span class="name">eq</span><span class="params">(<span name="arg0">arg0: <a href="../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Evaluator@eq(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.Interpreter$@eq(x$1:AnyRef):Boolean" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -324,7 +274,7 @@ to take the already-compile Scala bytecode and execute it in our process.
         <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Any" class="extype" target="_top">Any</a></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Evaluator@equals(x$1:Any):Boolean" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.Interpreter$@equals(x$1:Any):Boolean" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -341,7 +291,7 @@ to take the already-compile Scala bytecode and execute it in our process.
         <span class="name">finalize</span><span class="params">()</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Evaluator@finalize():Unit" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.Interpreter$@finalize():Unit" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -364,7 +314,7 @@ to take the already-compile Scala bytecode and execute it in our process.
         <span class="name">getClass</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.Class">Class</span>[_]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Evaluator@getClass():Class[_]" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.Interpreter$@getClass():Class[_]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -381,11 +331,28 @@ to take the already-compile Scala bytecode and execute it in our process.
         <span class="name">hashCode</span><span class="params">()</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Evaluator@hashCode():Int" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.Interpreter$@hashCode():Int" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="ammonite.repl.interp.Interpreter#indexWrapperName" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="indexWrapperName(wrapperName:String,wrapperIndex:Int):String"></a>
+      <a id="indexWrapperName(String,Int):String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">indexWrapperName</span><span class="params">(<span name="wrapperName">wrapperName: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="wrapperIndex">wrapperIndex: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a></span>)</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.repl.interp.Interpreter$@indexWrapperName(wrapperName:String,wrapperIndex:Int):String" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
     </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <a id="isInstanceOf[T0]:Boolean"></a>
@@ -398,7 +365,7 @@ to take the already-compile Scala bytecode and execute it in our process.
         <span class="name">isInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Evaluator@isInstanceOf[T0]:Boolean" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.Interpreter$@isInstanceOf[T0]:Boolean" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -415,7 +382,7 @@ to take the already-compile Scala bytecode and execute it in our process.
         <span class="name">ne</span><span class="params">(<span name="arg0">arg0: <a href="../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Evaluator@ne(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.Interpreter$@ne(x$1:AnyRef):Boolean" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -432,7 +399,7 @@ to take the already-compile Scala bytecode and execute it in our process.
         <span class="name">notify</span><span class="params">()</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Evaluator@notify():Unit" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.Interpreter$@notify():Unit" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -449,11 +416,28 @@ to take the already-compile Scala bytecode and execute it in our process.
         <span class="name">notifyAll</span><span class="params">()</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Evaluator@notifyAll():Unit" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.Interpreter$@notifyAll():Unit" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="ammonite.repl.interp.Interpreter#skipSheBangLine" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="skipSheBangLine(code:String):String"></a>
+      <a id="skipSheBangLine(String):String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">skipSheBangLine</span><span class="params">(<span name="code">code: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#ammonite.repl.interp.Interpreter$@skipSheBangLine(code:String):String" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
     </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
       <a id="synchronized[T0](⇒T0):T0"></a>
@@ -466,7 +450,7 @@ to take the already-compile Scala bytecode and execute it in our process.
         <span class="name">synchronized</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="params">(<span name="arg0">arg0: ⇒ <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>)</span><span class="result">: <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Evaluator@synchronized[T0](x$1:=&gt;T0):T0" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.Interpreter$@synchronized[T0](x$1:=&gt;T0):T0" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -483,7 +467,7 @@ to take the already-compile Scala bytecode and execute it in our process.
         <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Evaluator@toString():String" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.Interpreter$@toString():String" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -500,7 +484,7 @@ to take the already-compile Scala bytecode and execute it in our process.
         <span class="name">wait</span><span class="params">()</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Evaluator@wait():Unit" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.Interpreter$@wait():Unit" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -523,7 +507,7 @@ to take the already-compile Scala bytecode and execute it in our process.
         <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Long" class="extype" target="_top">Long</a></span>, <span name="arg1">arg1: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Evaluator@wait(x$1:Long,x$2:Int):Unit" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.Interpreter$@wait(x$1:Long,x$2:Int):Unit" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -546,7 +530,7 @@ to take the already-compile Scala bytecode and execute it in our process.
         <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Long" class="extype" target="_top">Long</a></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Evaluator@wait(x$1:Long):Unit" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.Interpreter$@wait(x$1:Long):Unit" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>

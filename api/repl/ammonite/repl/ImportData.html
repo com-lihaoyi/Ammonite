@@ -51,7 +51,14 @@
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Represents the importing of a single name in the Ammonite REPL, of the
+form</p><pre><span class="kw">import</span> $prefix.{$fromName <span class="kw">=&gt;</span> $toName}</pre><p>All imports are reduced to this form; <code>import $prefix.$name</code> is results in
+the <code>fromName</code> and <code>toName</code> being the same, while <code>import $prefix._</code> or
+<code>import $prefix.{foo, bar, baz}</code> are split into multiple distinct
+<a href="" class="extype" name="ammonite.repl.ImportData">ImportData</a> objects.</p><p>Note that imports can be of one of three distinct <code>ImportType</code>s: importing
+a type, a term, or both. This lets us properly deal with shadowing correctly
+if we import the type and term of the same name from different places
+</p></div><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a>, <span class="extype" name="java.io.Serializable">Serializable</span>, <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Product" class="extype" target="_top">Product</a>, <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Equals" class="extype" target="_top">Equals</a>, <a href="../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a>, <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Any" class="extype" target="_top">Any</a></div>
         </div></div>

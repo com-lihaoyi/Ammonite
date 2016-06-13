@@ -28,12 +28,10 @@
         </head>
         <body class="type">
       <div id="definition">
-        <a href="Frame$.html" title="See companion object"><img alt="Class/Object" src="../../../lib/class_to_object_big.png" /></a>
+        <img alt="Class" src="../../../lib/class_big.png" />
         <p id="owner"><a href="../../package.html" class="extype" name="ammonite">ammonite</a>.<a href="../package.html" class="extype" name="ammonite.repl">repl</a>.<a href="package.html" class="extype" name="ammonite.repl.interp">interp</a></p>
-        <h1><a href="Frame$.html" title="See companion object">Frame</a></h1><h3><span class="morelinks"><div>
-            Related Docs:
-            <a href="Frame$.html" title="See companion object">object Frame</a>
-            | <a href="package.html" class="extype" name="ammonite.repl.interp">package interp</a>
+        <h1>Frame</h1><h3><span class="morelinks"><div>Related Doc:
+            <a href="package.html" class="extype" name="ammonite.repl.interp">package interp</a>
           </div></span></h3><span class="permalink">
       <a href="../../../index.html#ammonite.repl.interp.Frame" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
@@ -94,7 +92,7 @@ while <code>classpath</code> can only be added to.
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="ammonite.repl.interp.Frame#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(classloader:ammonite.repl.interp.SpecialClassLoader,pluginClassloader:ammonite.repl.interp.SpecialClassLoader,imports0:Seq[ammonite.repl.ImportData],classpath0:Seq[java.io.File]):ammonite.repl.interp.Frame"></a>
+      <a id="&lt;init&gt;(classloader:ammonite.repl.interp.SpecialClassLoader,pluginClassloader:ammonite.repl.interp.SpecialClassLoader,imports0:ammonite.repl.Imports,classpath0:Seq[java.io.File]):ammonite.repl.interp.Frame"></a>
       <a id="&lt;init&gt;:Frame"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -102,10 +100,10 @@ while <code>classpath</code> can only be added to.
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">Frame</span><span class="params">(<span name="classloader">classloader: <a href="SpecialClassLoader.html" class="extype" name="ammonite.repl.interp.SpecialClassLoader">SpecialClassLoader</a></span>, <span name="pluginClassloader">pluginClassloader: <a href="SpecialClassLoader.html" class="extype" name="ammonite.repl.interp.SpecialClassLoader">SpecialClassLoader</a></span>, <span name="imports0">imports0: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="../ImportData.html" class="extype" name="ammonite.repl.ImportData">ImportData</a>]</span>, <span name="classpath0">classpath0: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<span class="extype" name="java.io.File">File</span>]</span>)</span>
+        <span class="name">Frame</span><span class="params">(<span name="classloader">classloader: <a href="SpecialClassLoader.html" class="extype" name="ammonite.repl.interp.SpecialClassLoader">SpecialClassLoader</a></span>, <span name="pluginClassloader">pluginClassloader: <a href="SpecialClassLoader.html" class="extype" name="ammonite.repl.interp.SpecialClassLoader">SpecialClassLoader</a></span>, <span name="imports0">imports0: <a href="../Imports.html" class="extype" name="ammonite.repl.Imports">Imports</a></span>, <span name="classpath0">classpath0: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<span class="extype" name="java.io.File">File</span>]</span>)</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Frame@&lt;init&gt;(classloader:ammonite.repl.interp.SpecialClassLoader,pluginClassloader:ammonite.repl.interp.SpecialClassLoader,imports0:Seq[ammonite.repl.ImportData],classpath0:Seq[java.io.File]):ammonite.repl.interp.Frame" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.Frame@&lt;init&gt;(classloader:ammonite.repl.interp.SpecialClassLoader,pluginClassloader:ammonite.repl.interp.SpecialClassLoader,imports0:ammonite.repl.Imports,classpath0:Seq[java.io.File]):ammonite.repl.interp.Frame" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -188,18 +186,18 @@ while <code>classpath</code> can only be added to.
     </span>
       
     </li><li name="ammonite.repl.interp.Frame#addImports" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="addImports(additional:Seq[ammonite.repl.ImportData]):Unit"></a>
-      <a id="addImports(Seq[ImportData]):Unit"></a>
+      <a id="addImports(additional:ammonite.repl.Imports):Unit"></a>
+      <a id="addImports(Imports):Unit"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">addImports</span><span class="params">(<span name="additional">additional: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="../ImportData.html" class="extype" name="ammonite.repl.ImportData">ImportData</a>]</span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
+        <span class="name">addImports</span><span class="params">(<span name="additional">additional: <a href="../Imports.html" class="extype" name="ammonite.repl.Imports">Imports</a></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Frame@addImports(additional:Seq[ammonite.repl.ImportData]):Unit" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.Frame@addImports(additional:ammonite.repl.Imports):Unit" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -370,18 +368,18 @@ while <code>classpath</code> can only be added to.
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="ammonite.repl.interp.Frame#imports" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="imports:Seq[ammonite.repl.ImportData]"></a>
-      <a id="imports:Seq[ImportData]"></a>
+      <a id="imports:ammonite.repl.Imports"></a>
+      <a id="imports:Imports"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">imports</span><span class="result">: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<a href="../ImportData.html" class="extype" name="ammonite.repl.ImportData">ImportData</a>]</span>
+        <span class="name">imports</span><span class="result">: <a href="../Imports.html" class="extype" name="ammonite.repl.Imports">Imports</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Frame@imports:Seq[ammonite.repl.ImportData]" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.Frame@imports:ammonite.repl.Imports" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>

@@ -51,9 +51,12 @@
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Converts REPL-style snippets into full-fledged Scala source files,
-ready to feed into the compiler. Each source-string is turned into
-three things:
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Responsible for all scala-source-code-munging that happens within the
+Ammonite REPL.</p><p>Performs several tasks:</p><p>- Takes top-level Scala expressions and assigns them to <code>res{1, 2, 3, ...}</code>
+  values so they can be accessed later in the REPL</p><p>- Wraps the code snippet with an wrapper <code>object</code> since Scala doesn't allow
+  top-level expressions</p><p>- Mangles imports from our <a href="../ImportData.html" class="extype" name="ammonite.repl.ImportData">ImportData</a> data structure into a source
+  String</p><p>- Combines all of these into a complete compilation unit ready to feed into
+  the Scala compiler
 </p></div><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><a href="../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a>, <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Any" class="extype" target="_top">Any</a></div>
@@ -97,19 +100,19 @@ three things:
 
         <div id="values" class="values members">
               <h3>Abstract Value Members</h3>
-              <ol><li name="ammonite.repl.interp.Preprocessor#apply" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
-      <a id="apply(stmts:Seq[String],wrapperId:String,comment:String):ammonite.repl.Res[ammonite.repl.interp.Preprocessor.Output]"></a>
-      <a id="apply(Seq[String],String,String):Res[Output]"></a>
+              <ol><li name="ammonite.repl.interp.Preprocessor#transform" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="transform(stmts:Seq[String],resultIndex:String,leadingSpaces:String,pkgName:String,indexedWrapperName:String,imports:ammonite.repl.Imports,printerTemplate:String=&gt;String):ammonite.repl.Res[ammonite.repl.interp.Preprocessor.Output]"></a>
+      <a id="transform(Seq[String],String,String,String,String,Imports,(String)⇒String):Res[Output]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier">abstract </span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">apply</span><span class="params">(<span name="stmts">stmts: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="wrapperId">wrapperId: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="comment">comment: <span class="extype" name="scala.Predef.String">String</span> = <span class="symbol">&quot;&quot;</span></span>)</span><span class="result">: <a href="../Res.html" class="extype" name="ammonite.repl.Res">Res</a>[<a href="Preprocessor$$Output.html" class="extype" name="ammonite.repl.interp.Preprocessor.Output">Output</a>]</span>
+        <span class="name">transform</span><span class="params">(<span name="stmts">stmts: <a href="../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="resultIndex">resultIndex: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="leadingSpaces">leadingSpaces: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="pkgName">pkgName: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="indexedWrapperName">indexedWrapperName: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="imports">imports: <a href="../Imports.html" class="extype" name="ammonite.repl.Imports">Imports</a></span>, <span name="printerTemplate">printerTemplate: (<span class="extype" name="scala.Predef.String">String</span>) ⇒ <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="../Res.html" class="extype" name="ammonite.repl.Res">Res</a>[<a href="Preprocessor$$Output.html" class="extype" name="ammonite.repl.interp.Preprocessor.Output">Output</a>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.Preprocessor@apply(stmts:Seq[String],wrapperId:String,comment:String):ammonite.repl.Res[ammonite.repl.interp.Preprocessor.Output]" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.Preprocessor@transform(stmts:Seq[String],resultIndex:String,leadingSpaces:String,pkgName:String,indexedWrapperName:String,imports:ammonite.repl.Imports,printerTemplate:String=&gt;String):ammonite.repl.Res[ammonite.repl.interp.Preprocessor.Output]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>

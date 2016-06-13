@@ -136,7 +136,7 @@ run.</p><p>Turns source-strings into the bytes of classfiles, possibly more than
 classfile per source-string (e.g. inner classes, or lambdas). Also lets
 you query source strings using an in-built presentation compiler
 </p></div></div>
-    </li><li name="ammonite.repl.interp.Evaluator" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+    </li><li name="ammonite.repl.interp.Evaluator" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
       <a id="EvaluatorextendsAnyRef"></a>
       <a id="Evaluator:Evaluator"></a>
       <h4 class="signature">
@@ -152,10 +152,10 @@ you query source strings using an in-built presentation compiler
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Takes source code and, with the help of a compiler and preprocessor,
-evaluates it and returns a <code>Result[(output: String, imports: String)]</code>
-where <code>output</code> is what gets printed and <code>imports</code> are any imports that
-need to get prepended to subsequent commands.</p>
+      <p class="shortcomment cmt">Evaluates already-compiled Bytecode.</p><div class="fullcomment"><div class="comment cmt"><p>Evaluates already-compiled Bytecode.</p><p>Deals with all the munging of <code>Classloader</code>s, <code>Class[_]</code> objects,
+and <code>Array[Byte]</code>s representing class files, and reflection necessary
+to take the already-compile Scala bytecode and execute it in our process.
+</p></div></div>
     </li><li name="ammonite.repl.interp.Frame" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="FrameextendsAnyRef"></a>
       <a id="Frame:Frame"></a>
@@ -213,10 +213,13 @@ real encapsulation for now.
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Converts REPL-style snippets into full-fledged Scala source files,
-ready to feed into the compiler.</p><div class="fullcomment"><div class="comment cmt"><p>Converts REPL-style snippets into full-fledged Scala source files,
-ready to feed into the compiler. Each source-string is turned into
-three things:
+      <p class="shortcomment cmt">Responsible for all scala-source-code-munging that happens within the
+Ammonite REPL.</p><div class="fullcomment"><div class="comment cmt"><p>Responsible for all scala-source-code-munging that happens within the
+Ammonite REPL.</p><p>Performs several tasks:</p><p>- Takes top-level Scala expressions and assigns them to <code>res{1, 2, 3, ...}</code>
+  values so they can be accessed later in the REPL</p><p>- Wraps the code snippet with an wrapper <code>object</code> since Scala doesn't allow
+  top-level expressions</p><p>- Mangles imports from our <a href="../ImportData.html" class="extype" name="ammonite.repl.ImportData">ImportData</a> data structure into a source
+  String</p><p>- Combines all of these into a complete compilation unit ready to feed into
+  the Scala compiler
 </p></div></div>
     </li><li name="ammonite.repl.interp.Pressy" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
       <a id="PressyextendsAnyRef"></a>
@@ -350,19 +353,19 @@ scala-compile and scalajs-tools
       </a>
     </span>
       
-    </li><li name="ammonite.repl.interp.Frame" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="Frame"></a>
-      <a id="Frame:Frame"></a>
+    </li><li name="ammonite.repl.interp.Interpreter" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Interpreter"></a>
+      <a id="Interpreter:Interpreter"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <a href="Frame$.html"><span class="name">Frame</span></a>
+        <a href="Interpreter$.html"><span class="name">Interpreter</span></a>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#ammonite.repl.interp.package@Frame" title="Permalink" target="_top">
+      <a href="../../../index.html#ammonite.repl.interp.package@Interpreter" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
