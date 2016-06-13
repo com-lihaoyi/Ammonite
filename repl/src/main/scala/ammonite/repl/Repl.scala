@@ -30,7 +30,7 @@ class Repl(input: InputStream,
     Seq(color(s).render, "\n").foreach(errorPrintStream.print)
   }
   val printer = Printer(
-    _.foreach(printStream.print),
+    printStream.print,
     printlnWithColor(colors().warning(), _),
     printlnWithColor(colors().error(), _),
     printlnWithColor(fansi.Attrs.Empty, _)
@@ -80,9 +80,12 @@ class Repl(input: InputStream,
   def run(): Any = {
     welcomeBanner.foreach(printStream.println)
     @tailrec def loop(): Any = {
-      val res = action()
+      val actionResult = action()
       Timer("End Of Loop")
-      val res2 = res match{
+      interp.handleOutput(actionResult)
+
+      if (!actionResult.isInstanceOf[Res.Exit]) loop()
+      else actionResult match{
         case Res.Exit(value) =>
           printStream.println("Bye!")
           value
@@ -94,9 +97,6 @@ class Repl(input: InputStream,
           printer.error(msg)
         case _ =>
       }
-
-      if (interp.handleOutput(res)) loop()
-      else res2
     }
     loop()
   }

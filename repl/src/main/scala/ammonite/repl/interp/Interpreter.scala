@@ -46,10 +46,7 @@ class Interpreter(prompt0: Ref[String],
 
 
   val mainThread = Thread.currentThread()
-  val eval = Evaluator(
-    mainThread.getContextClassLoader,
-    0
-  )
+  val eval = Evaluator(mainThread.getContextClassLoader, 0  )
 
   val dynamicClasspath = new VirtualDirectory("(memory)", None)
   var compiler: Compiler = _
@@ -97,21 +94,12 @@ class Interpreter(prompt0: Ref[String],
   Timer("Interpreter init eval")
   init()
   Timer("Interpreter init init")
-  val argString =
-    replArgs.zipWithIndex
-      .map{ case (b, idx) =>
-        s"""
-              val ${b.name} =
-                ammonite.repl
-                        .frontend
-                        .ReplBridge
-                        .repl
-                        .replArgs($idx)
-                        .value
-                        .asInstanceOf[${b.typeTag.tpe}]
-              """
-      }
-      .mkString("\n")
+  val argString = replArgs.zipWithIndex.map{ case (b, idx) =>
+    s"""
+    val ${b.name} =
+      ammonite.repl.frontend.ReplBridge.repl.replArgs($idx).value.asInstanceOf[${b.typeTag.tpe}]
+    """
+  }.mkString("\n")
 
   val predefs = Seq(
     (hardcodedPredef, "HardcodedPredef", "ammonite.predef"),
@@ -141,36 +129,25 @@ class Interpreter(prompt0: Ref[String],
   Timer("Interpreter init predef 1")
 
 
-  def processLine(code: String,
-                  stmts: Seq[String],
-                  fileName: String): Res[Evaluated] = {
-    for{
-      _ <- Catching { case ex =>
-        Res.Exception(ex, "Something unexpected went wrong =(")
-      }
-      processed <- preprocess.transform(
-        stmts,
-        eval.getCurrentLine,
-        "",
-        "ammonite.session",
-        "cmd" + eval.getCurrentLine,
-        eval.sess.frames.head.imports,
-        prints =>
-        s"""
-          ammonite.repl
-                  .frontend
-                  .ReplBridge
-                  .repl
-                  .Internal
-                  .combinePrints($prints)
-          """
-      )
-      out <- evaluateLine(
-        processed, printer,
-        fileName, "cmd" + eval.getCurrentLine
-      )
-    } yield out
-  }
+  def processLine(code: String, stmts: Seq[String], fileName: String): Res[Evaluated] = for{
+    _ <- Catching { case ex =>
+      Res.Exception(ex, "Something unexpected went wrong =(")
+    }
+    processed <- preprocess.transform(
+      stmts,
+      eval.getCurrentLine,
+      "",
+      "ammonite.session",
+      "cmd" + eval.getCurrentLine,
+      eval.sess.frames.head.imports,
+      prints => s"ammonite.repl.frontend.ReplBridge.repl.Internal.combinePrints($prints)"
+    )
+    out <- evaluateLine(
+      processed, printer,
+      fileName, "cmd" + eval.getCurrentLine
+    )
+  } yield out
+
 
   def withContextClassloader[T](t: => T) = {
     val oldClassloader = Thread.currentThread().getContextClassLoader
@@ -363,23 +340,17 @@ class Interpreter(prompt0: Ref[String],
         val indexedWrapperName = Interpreter.indexWrapperName(wrapperName, wrapperIndex)
         val (leadingSpaces, stmts) = blocks.head
         val res = for{
-          processed <- {
-            preprocess.transform(
-              stmts,
-              "",
-              leadingSpaces,
-              pkgName,
-              indexedWrapperName,
-              scriptImports,
-              _ => "scala.Iterator[String]()"
-            )
-          }
-
-          ev <- evaluate(
-            processed,
-            wrapperIndex,
-            indexedWrapperName
+          processed <- preprocess.transform(
+            stmts,
+            "",
+            leadingSpaces,
+            pkgName,
+            indexedWrapperName,
+            scriptImports,
+            _ => "scala.Iterator[String]()"
           )
+
+          ev <- evaluate(processed, wrapperIndex, indexedWrapperName)
         } yield ev
 
         res match {
@@ -392,19 +363,10 @@ class Interpreter(prompt0: Ref[String],
         }
       }
     }
-    try {
-      loop(
-        blocks,
-        startingImports, Seq(),
-        // starts off as 1, so that consecutive wrappers can be named
-        // Wrapper, Wrapper2, Wrapper3, Wrapper4, ...
-        wrapperIndex = 1
-      )
-
-
-    } finally {
-      scriptImportCallback = outerScriptImportCallback
-    }
+    // wrapperIndex starts off as 1, so that consecutive wrappers can be named
+    // Wrapper, Wrapper2, Wrapper3, Wrapper4, ...
+    try loop(blocks, startingImports, Seq(), wrapperIndex = 1 )
+    finally scriptImportCallback = outerScriptImportCallback
   }
 
   def handleOutput(res: Res[Evaluated]) = {
@@ -416,10 +378,12 @@ class Interpreter(prompt0: Ref[String],
       case Res.Success(ev) =>
         eval.update(ev.imports)
         true
-      case Res.Failure(ex, msg) =>    lastException = ex.getOrElse(lastException)
-                                  true
-      case Res.Exception(ex, msg) =>  lastException = ex
-                                      true
+      case Res.Failure(ex, msg) =>
+        lastException = ex.getOrElse(lastException)
+        true
+      case Res.Exception(ex, msg) =>
+        lastException = ex
+        true
     }
   }
 
@@ -537,8 +501,8 @@ class Interpreter(prompt0: Ref[String],
     }
 
     def show[T: PPrint](implicit cfg: Config) = (t: T) => {
-      pprint.tokenize(t, height = 0)(implicitly[PPrint[T]], cfg).foreach(print)
-      println()
+      pprint.tokenize(t, height = 0)(implicitly[PPrint[T]], cfg).foreach(printer.out)
+      printer.out("\n")
     }
     def show[T: PPrint](t: T,
                         width: Integer = null,
@@ -549,8 +513,8 @@ class Interpreter(prompt0: Ref[String],
 
 
       pprint.tokenize(t, width, height, indent, colors)(implicitly[PPrint[T]], cfg)
-            .foreach(print)
-      println()
+            .foreach(printer.out)
+      printer.out("\n")
     }
 
     def search(target: scala.reflect.runtime.universe.Type) = {
