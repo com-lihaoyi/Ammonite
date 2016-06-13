@@ -14,9 +14,9 @@ down the relationship between these classes:
          |               |
          |              FrontEnd
          |
-        Interpreter---------------------
-         |               |              |
-         |              Compiler       Pressy
+        Interpreter-----------------------------------
+         |               |              |             |
+         |              Compiler       Pressy        Preprocessor
          |
         Evaluator
 ```
@@ -30,7 +30,8 @@ The distribution of responsibilities is
 - `Interpreter`: runs Scala source code
   
   Made up of `Evaluator` + `Compiler` (and `Pressy`). Runs source code by 
-  compiling it via `Compiler` and sending it to `Evaluator` to execute 
+  transforming it via `Preprocessor`, compiling it to bytecode via `Compiler` 
+  and sending it to `Evaluator` to execute 
  
 - `Repl`: runs user-input
 

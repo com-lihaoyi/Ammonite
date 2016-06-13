@@ -309,8 +309,8 @@ object ScriptTests extends TestSuite{
           val interp2 = createTestInterp(Storage.Folder(tempDir))
           interp1.replApi.load.module(scriptPath/"OneBlock.scala")
           interp2.replApi.load.module(scriptPath/"OneBlock.scala")
-          val n1 = interp1.eval.compilationCount
-          val n2 = interp2.eval.compilationCount
+          val n1 = interp1.compilationCount
+          val n2 = interp2.compilationCount
           assert(n1 == 2) // hardcodedPredef + loadedPredef
           assert(n2 == 0) // all three should be cached
         }
