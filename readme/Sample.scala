@@ -5,13 +5,10 @@ import java.io.{InputStreamReader, BufferedReader}
 import ammonite.ops._
 import scala.collection.mutable
 import scalatags.Text.all._
+import scalatags.Text.all._
+import collection.mutable
 
 object Sample{
-//  assert(
-//    !ammonite.Constants.version.endsWith("-SNAPSHOT"),
-//    s"Building documentation for versions ${ammonite.Constants.version} will result in " +
-//    "invalid maven coordinates; reset the version to the last non-SNAPSHOT before building"
-//  )
   val replCurl = "$ curl -L -o amm https://git.io/voU0F && chmod +x amm && ./amm"
   val filesystemCurl =
     "$ mkdir ~/.ammonite && curl -L -o ~/.ammonite/predef.scala https://git.io/voU0p"
@@ -26,29 +23,7 @@ object Sample{
     }
   }
 
-  val ansiRegex = "\u001B\\[[;\\d]*."
-  // http://flatuicolors.com/
-  val red = "#c0392b"
-  val green = "#27ae60"
-  val yellow = "#f39c12"
-  val blue = "#2980b9"
-  val magenta = "#8e44ad"
-  val cyan = "#16a085"
-  val black = "#000"
-  val white = "#fff"
-  val colors = Map(
-    Console.BLACK.tail -> black,
-    Console.RED.tail -> red,
-    Console.GREEN.tail -> green,
-    Console.YELLOW.tail -> yellow,
-    Console.BLUE.tail -> blue,
-    Console.MAGENTA.tail -> magenta,
-    Console.CYAN.tail -> cyan,
-    Console.WHITE.tail -> white
-  )
-  val backgrounds = Map(
-    Console.YELLOW_B.tail -> yellow
-  )
+
   def ammSample(ammoniteCode: String) = {
     val scalaVersion = scala.util.Properties.versionNumberString
     val ammVersion = ammonite.Constants.version
@@ -59,35 +34,75 @@ object Sample{
 //    val out = read! wd/'target/'cache/"-1080873603"
     val lines = out.lines.toSeq.drop(3).dropRight(2).mkString("\n")
 //    println("ammSample " + lines)
-    val ammOutput = lines.split("\u001b")
+//    val ammOutput = lines.split("\u001b")
 
-    var bufferedColor: Option[Modifier] = None
-    var bufferedBackground: Option[Modifier] = None
-    val wrapped = mutable.Buffer.empty[Tag]
-    for(snippet <- ammOutput) {
-      if (snippet.startsWith(Console.RESET.tail)) {
-        bufferedColor = None
-        bufferedBackground = None
-      }
-      if (snippet.startsWith("[39m")) { // reset foreground color
-        bufferedColor = None
-      }
-      colors.find(snippet startsWith _._1).foreach{
-        case (ansiCode, cssColor) =>
-          bufferedColor = Some(color := cssColor)
-      }
-      backgrounds.find(snippet startsWith _._1).foreach{
-        case (ansiCode, cssColor) =>
-          bufferedBackground = Some(backgroundColor := cssColor)
-      }
 
-      val frag = span(bufferedColor, bufferedBackground, snippet.replaceFirst(ansiRegex.tail, ""))
-      wrapped.append(frag)
+    raw(ansiToHtml(lines).render.replaceAll("\r\n|\n\r", "\n"))
+  }
+
+  // http://flatuicolors.com/
+  val red = "#c0392b"
+  val green = "#27ae60"
+  val yellow = "#f39c12"
+  val blue = "#2980b9"
+  val magenta = "#8e44ad"
+  val cyan = "#16a085"
+  val black = "#000"
+  val white = "#fff"
+
+  val foregrounds = Map[fansi.Attr, String](
+    fansi.Color.Black -> black,
+    fansi.Color.Red -> red,
+    fansi.Color.Green-> green,
+    fansi.Color.Yellow-> yellow,
+    fansi.Color.Blue -> blue,
+    fansi.Color.Magenta-> magenta,
+    fansi.Color.Cyan -> cyan,
+    fansi.Color.White -> white
+  )
+  val backgrounds = Map[fansi.Attr, String](
+    fansi.Back.Black -> black,
+    fansi.Back.Red -> red,
+    fansi.Back.Green-> green,
+    fansi.Back.Yellow-> yellow,
+    fansi.Back.Blue -> blue,
+    fansi.Back.Magenta-> magenta,
+    fansi.Back.Cyan -> cyan,
+    fansi.Back.White -> white
+  )
+  def ansiToHtml(ansiInput: String): Frag = {
+    val wrapped = mutable.Buffer.empty[scalatags.Text.Frag]
+    val parsed = fansi.Str(ansiInput, errorMode = fansi.ErrorMode.Strip)
+    val chars = parsed.getChars
+    val colors = parsed.getColors
+
+    var i = 0
+    var previousColor = 0
+    val snippetBuffer = new mutable.StringBuilder()
+
+    def createSnippet() = {
+      val foreground = fansi.Color.lookupAttr(previousColor & fansi.Color.mask)
+      val background = fansi.Back.lookupAttr(previousColor & fansi.Back.mask)
+      val snippet = snippetBuffer.toString
+      snippetBuffer.clear()
+      wrapped.append(span(
+        foregrounds.get(foreground).map(color := _),
+        backgrounds.get(background).map(backgroundColor := _),
+        snippet
+      ))
     }
 
-    write.over(cwd/"temp.html", wrapped.render.replaceAll("\r\n|\n\r", "\n"))
-    raw(wrapped.render.replaceAll("\r\n|\n\r", "\n"))
+    while(i < parsed.length){
+      if (colors(i) != previousColor && snippetBuffer.nonEmpty) createSnippet()
+      previousColor = colors(i)
+      snippetBuffer += chars(i)
+      i += 1
+    }
+    createSnippet()
+    wrapped.toVector
   }
+
+
   def exec(command: Seq[String], input: String): String = cached(("exec", command, input)){
 
     val pb = new ProcessBuilder(command:_*)

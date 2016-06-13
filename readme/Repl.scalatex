@@ -948,3 +948,25 @@
 
       @p
         Obviously we did not go very deep into the field. If you did, it would definitely be a lot more reading and understanding than just blindly following tutorials like I did above, and you probably would find it worth the time to set up a proper project. Nevertheless, this quick 5-minute run through of how to perform the basics of NLP is a fun way to get started whether or not you decide to take it further, and is only possible because of the Ammonite REPL!
+
+    @sect{Play Framework Server}
+      @hl.ref('integration/'src/'test/'resources/'ammonite/'integration/'basic/"PlayFramework.scala")
+
+      @p
+        Ammonite's script-running capabilities can also be used as a way to set up lightweight Scala projects without needing SBT or an IDE to get started. For example, here is a single-file @lnk("Play Framework", "https://www.playframework.com/") test that
+
+      @ul
+        @li
+          Spins up a HTTP server and
+        @li
+          Makes a single HTTP request against it and prints the response
+        @li
+          Shuts down the server.
+      @p
+        And can be run via
+
+      @code
+        ./amm PlayFramework.scala
+
+      @p
+        Although this is just a hello world example, you can easily keep the server running (instead of exiting after a test request) and extend it with more functionality, possibly splitting it into multiple @sect.ref{Script Files}.

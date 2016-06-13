@@ -210,6 +210,7 @@ lazy val readme = ScalatexReadme(
 ).settings(
   dontPublishSettings,
   scalaVersion := "2.11.8",
+  libraryDependencies += "com.lihaoyi" %% "fansi" % "0.1.3",
   (run in Compile) <<= (run in Compile).dependsOn(
     assembly in repl,
     packageBin in (shell, Compile),
