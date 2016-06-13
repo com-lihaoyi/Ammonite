@@ -369,21 +369,13 @@ class Interpreter(prompt0: Ref[String],
     finally scriptImportCallback = outerScriptImportCallback
   }
 
-  def handleOutput(res: Res[Evaluated]) = {
+  def handleOutput(res: Res[Evaluated]): Unit = {
     res match{
-      case Res.Skip => true
-      case Res.Exit(value) =>
-        pressy.shutdownPressy()
-        false
-      case Res.Success(ev) =>
-        eval.update(ev.imports)
-        true
-      case Res.Failure(ex, msg) =>
-        lastException = ex.getOrElse(lastException)
-        true
-      case Res.Exception(ex, msg) =>
-        lastException = ex
-        true
+      case Res.Skip => // do nothing
+      case Res.Exit(value) => pressy.shutdownPressy()
+      case Res.Success(ev) => eval.update(ev.imports)
+      case Res.Failure(ex, msg) => lastException = ex.getOrElse(lastException)
+      case Res.Exception(ex, msg) => lastException = ex
     }
   }
 
