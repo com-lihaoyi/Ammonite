@@ -1,6 +1,7 @@
 package ammonite.repl.interp
 import acyclic.file
 import ammonite.repl.{ImportData, Parsers, Res, Timer}
+import fastparse.all._
 
 import scala.reflect.internal.Flags
 import scala.tools.nsc.{Global => G}
@@ -35,6 +36,42 @@ trait Preprocessor{
 object Preprocessor{
   private case class Expanded(code: String, printer: Seq[String])
   case class Output(code: String, prefixCharLength: Int)
+
+  def errMsg(msg: String, code: String, expected: String, idx: Int): String = {
+    val locationString = {
+      val (first, last) = code.splitAt(idx)
+      val lastSnippet = last.split('\n').headOption.getOrElse("")
+      val firstSnippet = first.reverse.split('\n').lift(0).getOrElse("").reverse
+      firstSnippet + lastSnippet + "\n" + (" " * firstSnippet.length) + "^"
+    }
+
+    s"Syntax Error: $msg\n$locationString"
+  }
+
+  def splitScript(rawCode: String): Res[Seq[(String, Seq[String])]] = {
+    Parsers.splitScript(rawCode) match {
+      case f: Parsed.Failure =>
+        Timer("processScriptFailed 0b")
+        Res.Failure(None, errMsg(f.msg, rawCode, f.extra.traced.expected, f.index))
+      case s: Parsed.Success[Seq[(String, Seq[String])]] =>
+        Timer("processCorrectScript 0b")
+
+        var offset = 0
+        val blocks = mutable.Buffer[(String, Seq[String])]()
+
+        // comment holds comments or empty lines above the code which is not caught along with code
+        for( (comment, code) <- s.value){
+          val ncomment = comment + "\n"*offset
+
+          // 1 is added as Separator parser eats up the '\n' following @
+          offset = offset + comment.count(_ == '\n') + code.map(_.count(_ == '\n')).sum + 1
+          blocks.append((ncomment, code))
+        }
+
+        Res.Success(blocks)
+    }
+  }
+
   def apply(parse: => String => Either[String, Seq[G#Tree]]): Preprocessor = new Preprocessor{
 
     def transform(stmts: Seq[String],

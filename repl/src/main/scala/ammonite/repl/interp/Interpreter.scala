@@ -287,9 +287,10 @@ class Interpreter(prompt0: Ref[String],
   def processModule0(code: String,
                      wrapperName: String,
                      pkgName: String,
-                     startingImports: Seq[ImportData]): Res[Seq[ImportData]] = {
-    processScript(
-      Interpreter.skipSheBangLine(code),
+                     startingImports: Seq[ImportData]): Res[Seq[ImportData]] = for{
+    blocks <- Preprocessor.splitScript(Interpreter.skipSheBangLine(code))
+    res <- processCorrectScript(
+      blocks,
       startingImports,
       pkgName,
       wrapperName,
@@ -302,11 +303,12 @@ class Interpreter(prompt0: Ref[String],
           )
         )
     )
-  }
+  } yield res
 
-  def processExec(code: String): Res[Seq[ImportData]] = {
-    processScript(
-      Interpreter.skipSheBangLine(code),
+  def processExec(code: String): Res[Seq[ImportData]] = for {
+    blocks <- Preprocessor.splitScript(Interpreter.skipSheBangLine(code))
+    res <- processCorrectScript(
+      blocks,
       eval.sess.frames.head.imports,
       "ammonite.session",
       "cmd" + eval.getCurrentLine,
@@ -319,26 +321,15 @@ class Interpreter(prompt0: Ref[String],
         )
       }
     )
-  }
+  } yield res
 
 
-  def processCorrectScript(rawParsedCode: Seq[(String, Seq[String])],
+  def processCorrectScript(blocks: Seq[(String, Seq[String])],
                            startingImports: Seq[ImportData],
                            pkgName: String,
                            wrapperName: String,
                            evaluate: Interpreter.EvaluateCallback)
                           : Res[Seq[ImportData]] = {
-    var offset = 0
-    val blocks = mutable.Buffer[(String, Seq[String])]()
-
-    // comment holds comments or empty lines above the code which is not caught along with code
-    for( (comment, code) <- rawParsedCode){
-      val ncomment = comment + "\n"*offset
-
-      // 1 is added as Separator parser eats up the '\n' following @
-      offset = offset + comment.count(_ == '\n') + code.map(_.count(_ == '\n')).sum + 1
-      blocks.append((ncomment, code))
-    }
 
     Timer("processCorrectScript 1")
     // we store the old value, because we will reassign this in the loop
@@ -413,24 +404,6 @@ class Interpreter(prompt0: Ref[String],
 
     } finally {
       scriptImportCallback = outerScriptImportCallback
-    }
-  }
-  //common stuff in proccessModule and processExec
-  def processScript(code: String,
-                    startingImports: Seq[ImportData],
-                    pkgName: String,
-                    wrapperName: String,
-                    evaluate: Interpreter.EvaluateCallback)
-                    : Res[Seq[ImportData]] = {
-
-    Timer("processScript 0a")
-    Parsers.splitScript(code) match {
-      case f: Parsed.Failure =>
-        Timer("processScriptFailed 0b")
-        Res.Failure(None, Interpreter.errMsg(f.msg, code, f.extra.traced.expected, f.index))
-      case s: Parsed.Success[Seq[(String, Seq[String])]] =>
-        Timer("processCorrectScript 0b")
-        processCorrectScript(s.value, startingImports, pkgName, wrapperName, evaluate)
     }
   }
 
@@ -646,14 +619,5 @@ object Interpreter{
     wrapperName + (if (wrapperIndex == 1) "" else "_" + wrapperIndex)
   }
 
-  def errMsg(msg: String, code: String, expected: String, idx: Int): String = {
-    val locationString = {
-      val (first, last) = code.splitAt(idx)
-      val lastSnippet = last.split('\n').headOption.getOrElse("")
-      val firstSnippet = first.reverse.split('\n').lift(0).getOrElse("").reverse
-      firstSnippet + lastSnippet + "\n" + (" " * firstSnippet.length) + "^"
-    }
 
-    s"Syntax Error: $msg\n$locationString"
-  }
 }
