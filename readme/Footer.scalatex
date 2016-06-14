@@ -49,6 +49,8 @@
         @li
           Fixed #398: by default, using Ammonite inside a SBT project uses the old `~/.ammonite/` storage folder, not the `InMemory` storage system. This restores the pre-0.5.9 behavior
         @li
+          Fix regression causing BACKSPACE to not work while performing a history-search
+        @li
           More internal refactoring
 
     @sect{0.6.0}
