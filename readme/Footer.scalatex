@@ -42,7 +42,7 @@
       Although it's best to read the documentation on this page to learn how to use these projects, the Scaladoc is still useful as a reference.
   
   @sect{Changelog}
-    @sect{0.6.1-SNAPSHOT}
+    @sect{0.6.1}
       @ul
         @li
           Fixed #400: load.exec in predef.scala causes NPE in 0.5.9 or 0.6.0
