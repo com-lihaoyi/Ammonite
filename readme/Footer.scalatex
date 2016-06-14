@@ -42,6 +42,15 @@
       Although it's best to read the documentation on this page to learn how to use these projects, the Scaladoc is still useful as a reference.
   
   @sect{Changelog}
+    @sect{0.6.1-SNAPSHOT}
+      @ul
+        @li
+          Fixed #400: load.exec in predef.scala causes NPE in 0.5.9 or 0.6.0
+        @li
+          Fixed #398: by default, using Ammonite inside a SBT project uses the old `~/.ammonite/` storage folder, not the `InMemory` storage system. This restores the pre-0.5.9 behavior
+        @li
+          More internal refactoring
+
     @sect{0.6.0}
       @ul
         @li
