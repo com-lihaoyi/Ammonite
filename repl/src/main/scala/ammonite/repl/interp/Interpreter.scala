@@ -108,19 +108,24 @@ class Interpreter(prompt0: Ref[String],
     (argString, "ArgsPredef", "ammonite.predef")
   )
 
-  val predefImports = predefs.foldLeft(Imports(Nil)){
-    case (prevImports, (sourceCode, wrapperName, pkgName)) =>
-      processModule0(sourceCode, wrapperName, pkgName, prevImports) match{
-        case Res.Success(imports) => prevImports ++ imports
-        case Res.Failure(ex, msg) =>
-          ex match{
-            case Some(e) => throw new RuntimeException("Error during Predef: " + msg, e)
-            case None => throw new RuntimeException("Error during Predef: " + msg)
-          }
+  // Use a var and a for-loop instead of a fold, because when running
+  // `processModule0` user code may end up calling `processModule` which depends
+  // on `predefImports`, and we should be able to provide the "current" imports
+  // to it even if it's half built
+  var predefImports = Imports(Nil)
+  for( (sourceCode, wrapperName, pkgName) <- predefs) {
+    processModule0(sourceCode, wrapperName, pkgName, predefImports) match{
+      case Res.Success(imports) =>
+        predefImports = predefImports ++ imports
+      case Res.Failure(ex, msg) =>
+        ex match{
+          case Some(e) => throw new RuntimeException("Error during Predef: " + msg, e)
+          case None => throw new RuntimeException("Error during Predef: " + msg)
+        }
 
-        case Res.Exception(ex, msg) =>
-          throw new RuntimeException("Error during Predef: " + msg, ex)
-      }
+      case Res.Exception(ex, msg) =>
+        throw new RuntimeException("Error during Predef: " + msg, ex)
+    }
   }
 
   eval.sess.save()

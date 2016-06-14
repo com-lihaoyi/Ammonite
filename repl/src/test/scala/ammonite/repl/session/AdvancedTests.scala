@@ -295,5 +295,27 @@ object AdvancedTests extends TestSuite{
         res0: Desugared = scala.Predef.intWrapper(3).max(3)
       """)
     }
+    'loadingModulesInPredef{
+      import ammonite.ops._
+      val dir = cwd/'repl/'src/'test/'resources/'scripts/'predefWithLoad
+      'loadExec {
+        val c1 = new TestRepl() {
+          override def predef = read ! dir / "PredefLoadExec.scala"
+        }
+        c1.session("""
+          @ val previouslyLoaded = predefDefinedValue
+          previouslyLoaded: Int = 1337
+        """)
+      }
+      'loadModule{
+        val c2 = new TestRepl(){
+          override def predef = read! dir/"PredefLoadModule.scala"
+        }
+        c2.session("""
+          @ val previouslyLoaded = predefDefinedValue
+          previouslyLoaded: Int = 1337
+        """)
+      }
+    }
   }
 }
