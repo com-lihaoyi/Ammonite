@@ -1,5 +1,6 @@
 package ammonite.repl.interp
 import acyclic.file
+import ammonite.repl.Parsers.ImportTree
 import ammonite.repl._
 import fastparse.all._
 
@@ -35,7 +36,8 @@ trait Preprocessor{
 }
 object Preprocessor{
   private case class Expanded(code: String, printer: Seq[String])
-  case class Output(code: String, prefixCharLength: Int)
+  case class Output(code: String,
+                    prefixCharLength: Int)
 
   def errMsg(msg: String, code: String, expected: String, idx: Int): String = {
     val locationString = {
@@ -48,6 +50,12 @@ object Preprocessor{
     s"Syntax Error: $msg\n$locationString"
   }
 
+  /**
+    * Splits up a script file into its constituent blocks, each of which
+    * is a tuple of (leading-whitespace, statements). Leading whitespace
+    * is returned separately so we can later manipulate the statements e.g.
+    * by adding `val res2 = ` without the whitespace getting in the way
+    */
   def splitScript(rawCode: String): Res[Seq[(String, Seq[String])]] = {
     Parsers.splitScript(rawCode) match {
       case f: Parsed.Failure =>
@@ -55,6 +63,7 @@ object Preprocessor{
         Res.Failure(None, errMsg(f.msg, rawCode, f.extra.traced.expected, f.index))
       case s: Parsed.Success[Seq[(String, Seq[String])]] =>
         Timer("processCorrectScript 0b")
+
 
         var offset = 0
         val blocks = mutable.Buffer[(String, Seq[String])]()
@@ -178,12 +187,12 @@ object Preprocessor{
 
     def expandStatements(stmts: Seq[String],
                          wrapperIndex: String): Res[Preprocessor.Expanded] = {
-      val unwrapped = stmts.flatMap{x => Parsers.unwrapBlock(x) match {
-        case Some(contents) =>
-          Parsers.split(contents).get.get.value
-
-        case None => Seq(x)
-      }}
+      val unwrapped = stmts.flatMap{x =>
+        Parsers.unwrapBlock(x) match {
+          case Some(contents) => Parsers.split(contents).get.get.value
+          case None => Seq(x)
+        }
+      }
       unwrapped match{
         case Nil => Res.Skip
         case postSplit =>

@@ -246,7 +246,7 @@ object Util{
 
   def pathToPackageWrapper(path: Path, wd: Path) = {
     val pkg = {
-      val base = Seq("ammonite", "scripts")
+      val base = Seq("$script")
       val relPath = (path/up).relativeTo(wd)
       val ups = Seq.fill(relPath.ups)("$up")
       val rest = relPath.segments

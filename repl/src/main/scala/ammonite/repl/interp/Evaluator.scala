@@ -162,7 +162,7 @@ object Evaluator{
                     indexedWrapperName: String) = {
       Timer("eval.processLine compileClass end")
       for {
-        cls <- loadClass("ammonite.session." + indexedWrapperName, classFiles)
+        cls <- loadClass("$sess." + indexedWrapperName, classFiles)
         _ = Timer("eval.processLine loadClass end")
         _ = currentLine += 1
         _ <- Catching{userCodeExceptionHandler}
@@ -174,7 +174,7 @@ object Evaluator{
         Timer("eval.processLine evaluatorRunPrinter 1")
         evaluatorRunPrinter(iter.foreach(printer.out))
         Timer("eval.processLine evaluatorRunPrinter end")
-        evaluationResult("ammonite.session." + indexedWrapperName, newImports)
+        evaluationResult("$sess." + indexedWrapperName, newImports)
       }
     }
 

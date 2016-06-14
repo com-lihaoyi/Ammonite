@@ -9,6 +9,25 @@ object Parsers {
   import scalaparse.Scala._
   import WhitespaceApi._
 
+  // For some reason Scala doesn't import this by default
+  val `_` = scalaparse.Scala.`_`
+  type ImportMapping = Seq[(String, Option[String])]
+  case class ImportTree(prefix: Seq[String], mappings: Option[ImportMapping])
+  val ImportSplitter: P[Seq[ImportTree]] = {
+    val IdParser = P( (Id | `_` ).! ).map(
+      s => if(s(0) == '`') s.drop(1).dropRight(1) else s
+    )
+    val Selector = P( IdParser ~ (`=>` ~/ IdParser).? )
+    val Selectors = P( "{" ~/ Selector.rep(sep = ",".~/) ~ "}" )
+    val BulkImport = P( "." ~/ `_`).map(
+      _ => Seq("_" -> None)
+    )
+    val ImportExpr: P[ImportTree] = P( StableId.! ~ (BulkImport | Selectors).? ).map{
+      case (idString, selectors) => ImportTree(idString.split('.'), selectors)
+    }
+    P( `import` ~/ ImportExpr.rep(1, sep = ",".~/) )
+  }
+
   val PatVarSplitter = {
     val Prefixes = P(Prelude ~ (`var` | `val`))
     val Lhs = P( Prefixes ~/ BindPattern.rep(1, "," ~/ Pass) ~ (`:` ~/ Type).? )

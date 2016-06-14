@@ -1,13 +1,17 @@
 package ammonite.repl.interp
-import ammonite.repl.tools.{IvyThing, Resolvers, Resolver}
+import ammonite.repl.tools.{IvyThing, Resolver, Resolvers}
 import java.io.File
+
 import ammonite.repl.Res
+
 import scala.collection.mutable
 import scala.tools.nsc.Settings
 import acyclic.file
 import fastparse.all._
 import ammonite.ops._
+import ammonite.repl.Parsers.ImportTree
 import pprint.{Config, PPrint}
+
 import annotation.tailrec
 import ammonite.repl._
 import ammonite.repl.frontend._
@@ -133,25 +137,63 @@ class Interpreter(prompt0: Ref[String],
   init()
   Timer("Interpreter init predef 1")
 
+  def resolveImportHooks(stmts: Seq[String]): Res[_] = {
+    println("Resolving Import Hook")
+    val importTrees =
+      stmts.map(Parsers.ImportSplitter.parse(_))
+           .collect{case Parsed.Success(v, _) => v }
+           .flatten
+           .filter(_.prefix(0)(0) == '$')
 
-  def processLine(code: String, stmts: Seq[String], fileName: String): Res[Evaluated] = for{
-    _ <- Catching { case ex =>
-      Res.Exception(ex, "Something unexpected went wrong =(")
+    def resolve(importTrees: Seq[ImportTree]): Res[_] = importTrees match{
+      case Nil => Res.Success(())
+      case Seq(next, rest @ _*) =>
+        def find(targetScript: Path, importSegments: Seq[String]): Option[(Path, Seq[String])] = {
+          val possibleScriptPath = targetScript / up / s"${targetScript.last}.scala"
+          if (exists! possibleScriptPath) Some((possibleScriptPath, importSegments))
+          else importSegments match {
+            case Seq() => None
+            case Seq(first, rest@_*) => find(targetScript / first, rest)
+          }
+        }
+
+        find(wd, next.prefix.drop(1)) match {
+          case None => throw new Exception("Cannot resolve import " + next.prefix)
+          case Some((scriptPath, remainingSegments)) =>
+            val (pkg, wrapper) = Util.pathToPackageWrapper(scriptPath, wd)
+            val res = processModule(read(scriptPath), wrapper, pkg)
+            init()
+            res
+
+        }
     }
-    processed <- preprocess.transform(
-      stmts,
-      eval.getCurrentLine,
-      "",
-      "ammonite.session",
-      "cmd" + eval.getCurrentLine,
-      eval.sess.frames.head.imports,
-      prints => s"ammonite.repl.frontend.ReplBridge.repl.Internal.combinePrints($prints)"
-    )
-    out <- evaluateLine(
-      processed, printer,
-      fileName, "cmd" + eval.getCurrentLine
-    )
-  } yield out
+    resolve(importTrees)
+  }
+//  val loadedScriptSet = mutable.Set[String]
+  def processLine(code: String, stmts: Seq[String], fileName: String): Res[Evaluated] = {
+
+    resolveImportHooks(stmts)
+
+    for{
+      _ <- Catching { case ex =>
+        Res.Exception(ex, "Something unexpected went wrong =(")
+      }
+
+      processed <- preprocess.transform(
+        stmts,
+        eval.getCurrentLine,
+        "",
+        "$sess",
+        "cmd" + eval.getCurrentLine,
+        eval.sess.frames.head.imports,
+        prints => s"ammonite.repl.frontend.ReplBridge.repl.Internal.combinePrints($prints)"
+      )
+      out <- evaluateLine(
+        processed, printer,
+        fileName, "cmd" + eval.getCurrentLine
+      )
+    } yield out
+  }
 
 
   def withContextClassloader[T](t: => T) = {
@@ -262,15 +304,17 @@ class Interpreter(prompt0: Ref[String],
   }
 
   def processModule(code: String, wrapperName: String, pkgName: String) = {
+    println(s"Processing Module $wrapperName $pkgName")
+    println(code)
     processModule0(code, wrapperName, pkgName, predefImports)
   }
-
 
   def processModule0(code: String,
                      wrapperName: String,
                      pkgName: String,
                      startingImports: Imports): Res[Imports] = for{
     blocks <- Preprocessor.splitScript(Interpreter.skipSheBangLine(code))
+    _ <- resolveImportHooks(blocks.flatMap(_._2))
     res <- processCorrectScript(
       blocks,
       startingImports,
@@ -289,10 +333,11 @@ class Interpreter(prompt0: Ref[String],
 
   def processExec(code: String): Res[Imports] = for {
     blocks <- Preprocessor.splitScript(Interpreter.skipSheBangLine(code))
+    _ <- resolveImportHooks(blocks.flatMap(_._2))
     res <- processCorrectScript(
       blocks,
       eval.sess.frames.head.imports,
-      "ammonite.session",
+      "$sess",
       "cmd" + eval.getCurrentLine,
       { (processed, wrapperIndex, indexedWrapperName) =>
         evaluateLine(
