@@ -18,6 +18,36 @@ import ammonite.repl.frontend._
 
 import scala.reflect.io.VirtualDirectory
 
+
+trait ImportHook{
+  def handle(tree: ImportTree, interp: Interpreter): ImportHook.Result
+}
+object ImportHook{
+  case class Result(code: String, wrapper: String, pkg: String)
+  object File extends ImportHook {
+    def handle(tree: ImportTree, interp: Interpreter): Result = {
+      def find(targetScript: Path, importSegments: Seq[String]): Option[Path] = {
+        val possibleScriptPath = targetScript / up / s"${targetScript.last}.scala"
+        if (exists ! possibleScriptPath) Some(possibleScriptPath)
+        else importSegments match {
+          case Seq() => None
+          case Seq(first, rest@_*) => find(targetScript / first, rest)
+        }
+      }
+
+      find(interp.wd, tree.prefix) match {
+        case None => throw new Exception("Cannot resolve import " + tree.prefix.mkString("."))
+        case Some(scriptPath) =>
+          val (pkg, wrapper) = Util.pathToPackageWrapper(scriptPath, interp.wd)
+          val res = interp.processModule(read(scriptPath), wrapper, pkg)
+          interp.init()
+          Result(read(scriptPath), wrapper, pkg)
+      }
+    }
+  }
+}
+
+
 /**
  * A convenient bundle of all the functionality necessary
  * to interpret Scala code. Doesn't attempt to provide any
@@ -32,7 +62,7 @@ class Interpreter(prompt0: Ref[String],
                   storage: Storage,
                   history: => History,
                   predef: String,
-                  wd: Path,
+                  val wd: Path,
                   replArgs: Seq[Bind[_]]){ interp =>
 
 
@@ -137,8 +167,10 @@ class Interpreter(prompt0: Ref[String],
   init()
   Timer("Interpreter init predef 1")
 
+  val importHooks = Ref(Map[String, ImportHook]("script" -> ImportHook.File))
+
   def resolveImportHooks(stmts: Seq[String]): Res[_] = {
-    println("Resolving Import Hook")
+
     val importTrees =
       stmts.map(Parsers.ImportSplitter.parse(_))
            .collect{case Parsed.Success(v, _) => v }
@@ -147,25 +179,14 @@ class Interpreter(prompt0: Ref[String],
 
     def resolve(importTrees: Seq[ImportTree]): Res[_] = importTrees match{
       case Nil => Res.Success(())
-      case Seq(next, rest @ _*) =>
-        def find(targetScript: Path, importSegments: Seq[String]): Option[(Path, Seq[String])] = {
-          val possibleScriptPath = targetScript / up / s"${targetScript.last}.scala"
-          if (exists! possibleScriptPath) Some((possibleScriptPath, importSegments))
-          else importSegments match {
-            case Seq() => None
-            case Seq(first, rest@_*) => find(targetScript / first, rest)
-          }
+      case Seq(tree, rest @ _*) =>
+        importHooks().get(tree.prefix.head.stripPrefix("$")) match{
+          case None => resolve(importTrees.tail)
+          case Some(hook) =>
+            val res = hook.handle(tree.copy(prefix = tree.prefix.drop(1)), this)
+            processModule(res.code, res.wrapper, res.pkg)
         }
 
-        find(wd, next.prefix.drop(1)) match {
-          case None => throw new Exception("Cannot resolve import " + next.prefix)
-          case Some((scriptPath, remainingSegments)) =>
-            val (pkg, wrapper) = Util.pathToPackageWrapper(scriptPath, wd)
-            val res = processModule(read(scriptPath), wrapper, pkg)
-            init()
-            res
-
-        }
     }
     resolve(importTrees)
   }
@@ -304,8 +325,6 @@ class Interpreter(prompt0: Ref[String],
   }
 
   def processModule(code: String, wrapperName: String, pkgName: String) = {
-    println(s"Processing Module $wrapperName $pkgName")
-    println(code)
     processModule0(code, wrapperName, pkgName, predefImports)
   }
 

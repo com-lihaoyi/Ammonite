@@ -30,15 +30,15 @@ Each of these has its own unit tests, along with the integration suite in
 Lastly, there are the packages which aren't visible in the source code but 
 contain code that is generated at runtime by Ammonite
 
-- `ammonite.workspace`: contains the wrapper-objects that contains any code 
+- `$sess`: contains the wrapper-objects that contains any code 
   a user enters into the REPL. Any values, functions, classes, etc. you write
   into the REPL are wraNpped in a wrapper object and placed in this package
   
-- `ammonite.scripts`: contains the code that results from loading Ammonite
+- `$file`: contains the code that results from loading Ammonite
   script files into the REPL, or running them using Ammonite from the 
-  command-line. Any scripts are placed in `ammonite.scripts.foo.bar.baz`
+  command-line. Any scripts are placed in `$file.foo.bar.baz`
   for a script in folder `foo/bar/baz/` relative to the current working
   directory; scripts outside the current working directory have the 
-  corresponding number of `$up` packages e.g. `ammonite.scripts.$up.foo.bar`
+  corresponding number of `$up` packages e.g. `$file.$up.foo.bar`
   to represent a script in the folder `../foo/bar/` relative to the working
   directory.
