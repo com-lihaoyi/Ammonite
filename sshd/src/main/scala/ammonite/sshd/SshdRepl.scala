@@ -57,7 +57,7 @@ object SshdRepl {
         )
         new Repl(
           in, out, out,
-          Storage.Folder(homePath), augmentedPredef,
+          new Storage.Folder(homePath), augmentedPredef,
           wd, Some(ammonite.repl.Main.defaultWelcomeBanner), replArgs
         ).run()
       } catch {
