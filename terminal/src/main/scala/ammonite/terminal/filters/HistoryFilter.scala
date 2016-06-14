@@ -215,7 +215,7 @@ class HistoryFilter(history: () => IndexedSeq[String],
     // letting it fall through and dropping you out of history-mode if you try to make
     // edits
     action(SpecialKeys.Backspace, ti => activeSearch)(
-      ts => wrap(ts.inputs, down(ts.buffer, ts.cursor))
+      ts => wrap(ts.inputs, backspace(ts.buffer, ts.cursor))
     ),
     partial{
       // Any other control characters drop you out of search mode, but only the
