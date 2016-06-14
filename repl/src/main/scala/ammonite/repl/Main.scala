@@ -43,7 +43,7 @@ import reflect.macros.Context
   */
 case class Main(predef: String = "",
                 defaultPredef: Boolean = true,
-                storageBackend: Storage = Storage.InMemory(),
+                storageBackend: Storage = new Storage.Folder(Main.defaultAmmoniteHome),
                 wd: Path = ammonite.ops.cwd,
                 welcomeBanner: Option[String] = Some(Main.defaultWelcomeBanner),
                 inputStream: InputStream = System.in,

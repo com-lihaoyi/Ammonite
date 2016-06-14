@@ -36,7 +36,7 @@ class TestRepl {
     80,
     Ref(Colors.BlackWhite),
     printer,
-    storage = Storage.Folder(tempDir),
+    storage = new Storage.Folder(tempDir),
     new History(Vector()),
     predef = ammonite.repl.Main.defaultPredefString + "\n" + predef,
     wd = ammonite.ops.cwd,

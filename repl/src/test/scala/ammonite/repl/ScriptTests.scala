@@ -305,8 +305,8 @@ object ScriptTests extends TestSuite{
             java.nio.file.Files.createTempDirectory("ammonite-tester-x")
           )
 
-          val interp1 = createTestInterp(Storage.Folder(tempDir))
-          val interp2 = createTestInterp(Storage.Folder(tempDir))
+          val interp1 = createTestInterp(new Storage.Folder(tempDir))
+          val interp2 = createTestInterp(new Storage.Folder(tempDir))
           interp1.replApi.load.module(scriptPath/"OneBlock.scala")
           interp2.replApi.load.module(scriptPath/"OneBlock.scala")
           val n1 = interp1.compilationCount

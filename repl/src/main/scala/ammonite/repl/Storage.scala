@@ -54,7 +54,7 @@ object Storage{
   }
 
 
-  case class Folder(dir: Path) extends Storage{
+  class Folder(val dir: Path) extends Storage{
     val predef = dir/"predef.scala"
     // Each version puts its cache in a separate folder, to bust caches
     // on every version bump; otherwise binary-incompatible changes to

@@ -9,10 +9,9 @@ object TestMain {
   val examplePredef = "shell/src/main/resources/ammonite/shell/example-predef-bare.scala"
   def main(args: Array[String]): Unit = {
     System.setProperty("ammonite-sbt-build", "true")
-    ammonite.repl.Main(
-      storageBackend = new Storage.Folder(cwd/'target/'tempAmmoniteHome){
-        override val predef = cwd/RelPath(examplePredef)
-      }
-    ).run()
+    ammonite.repl.Main.main(args ++ Array(
+      "--home", "target/tempAmmoniteHome",
+      "--predef-file", examplePredef
+    ))
   }
 }
