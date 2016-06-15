@@ -42,6 +42,11 @@
       Although it's best to read the documentation on this page to learn how to use these projects, the Scaladoc is still useful as a reference.
   
   @sect{Changelog}
+    @sect{0.6.2}
+      @ul
+        @li
+          Fix #403: Errors are silently swallowed in 0.6.1
+
     @sect{0.6.1}
       @ul
         @li

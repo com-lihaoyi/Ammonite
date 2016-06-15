@@ -25,7 +25,6 @@ class Repl(input: InputStream,
   val errorPrintStream = new PrintStream(error, true)
   var history = new History(Vector())
 
-
   def printlnWithColor(color: fansi.Attrs, s: String) = {
     Seq(color(s).render, "\n").foreach(errorPrintStream.print)
   }
