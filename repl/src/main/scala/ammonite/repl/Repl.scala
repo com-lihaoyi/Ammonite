@@ -84,18 +84,20 @@ class Repl(input: InputStream,
       Timer("End Of Loop")
       interp.handleOutput(actionResult)
 
-      if (!actionResult.isInstanceOf[Res.Exit]) loop()
-      else actionResult match{
+      actionResult match{
         case Res.Exit(value) =>
           printStream.println("Bye!")
           value
         case Res.Failure(ex, msg) => printer.error(msg)
+          loop()
         case Res.Exception(ex, msg) =>
           printer.error(
             Repl.showException(ex, colors().error(), fansi.Attr.Reset, colors().literal())
           )
           printer.error(msg)
+          loop()
         case _ =>
+          loop()
       }
     }
     loop()
