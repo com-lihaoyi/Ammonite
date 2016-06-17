@@ -4,16 +4,18 @@ import utest._
 import ammonite.ops._
 import ammonite.ops.ImplicitWd._
 import TestUtils._
+
 /**
- * Run a small number of scripts using the Ammonite standalone executable,
- * to make sure that this works. Otherwise it tends to break since the
- * standalone executable has a pretty different classloading environment
- * from the "run in SBT on raw class files" that the rest of the tests use.
- *
- * These are also the only tests that cover all the argument-parsing
- * and configuration logic inside, which the unit tests don't cover since
- * they call the REPL programmatically
- */
+  * Run a small number of scripts using the Ammonite standalone executable,
+  * to make sure that this works. Otherwise it tends to break since the
+  * standalone executable has a pretty different classloading environment
+  * from the "run in SBT on raw class files" that the rest of the tests use.
+  *
+  * These are also the only tests that cover all the argument-parsing
+  * and configuration logic inside, which the unit tests don't cover since
+  * they call the REPL programmatically
+  */
+
 object BasicTests extends TestSuite{
   override def utestTruncateLength = 60000
   println("StandaloneTests")
@@ -44,7 +46,7 @@ object BasicTests extends TestSuite{
           |cd! 'repl/'src
           |@
           |println(wd relativeTo x)""".stripMargin
-      )
+        )
 
 
       val output = res.out.trim
@@ -76,10 +78,9 @@ object BasicTests extends TestSuite{
       // Need a way for `%%` to capture stderr before we can specify these
       // tests a bit more tightly; currently the error just goes to stdout
       // and there's no way to inspect/validate it =/
+
       'tooFew{
-        val errorMsg = intercept[ShelloutException]{
-          exec('basic/"Args.scala", "3")
-        }.result.err.string
+        val errorMsg = exec('basic / "Args.scala", "3").err.string
         assert(errorMsg.contains("Unspecified value parameter s"))
       }
       'cantParse{
@@ -94,7 +95,7 @@ object BasicTests extends TestSuite{
       }
     }
 
-    'load_script{
+    'loadScript{
       val name = 'basic/"QuickSort.scala"
       val res = %%bash(
         executable,
@@ -106,6 +107,21 @@ object BasicTests extends TestSuite{
       println("Time analysis of loading qs.scala(test script)\n\n")
       res.out.lines.foreach { println }
       println("\n-------------------------")
+    }
+
+    'scriptCache{
+      val scripts = List('scriptLevelCaching/"testLoadModule.scala",
+        'scriptLevelCaching/"scriptTwo.scala",
+        'scriptLevelCaching/"scriptOne.scala",
+        'scriptLevelCaching/"QuickSort.scala")
+      scripts.map(exec(_,""))
+      var scriptsFinishedWithoutCompiler = 0
+      scripts.foreach{ s=>
+        val output = exec(s,"-t")
+        if(output.out.string.contains("Compilation Count: 0"))
+          scriptsFinishedWithoutCompiler += 1
+      }
+      assert(scriptsFinishedWithoutCompiler == scripts.size)
     }
   }
 }

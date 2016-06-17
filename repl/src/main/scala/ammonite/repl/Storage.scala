@@ -2,7 +2,8 @@ package ammonite.repl
 
 import acyclic.file
 import ammonite.ops._
-import ammonite.repl.Util.{IvyMap, CompileCache, ClassFiles}
+import ammonite.repl.Util.{IvyMap, ClassFiles, CompileCache}
+import ammonite.repl.ImportData
 import org.apache.ivy.plugins.resolver.RepositoryResolver
 
 import scala.util.Try
@@ -62,6 +63,7 @@ object Storage{
     // someone upgrades Ammonite.
     val cacheDir = dir/'cache/ammonite.Constants.version
     val compileCacheDir = cacheDir/'compile
+    val classFilesOrder = "classFilesOrder.json"
     val ivyCacheFile = cacheDir/"ivycache.json"
     val metadataFile = "metadata.json"
     val historyFile = dir/'history
@@ -87,6 +89,41 @@ object Storage{
         classFiles.foreach{ case (name, bytes) =>
           write(tagCacheDir/s"$name.class", bytes)
         }
+      }
+    }
+
+    def classFilesListSave(pkg: String,
+                           wrapper: String,
+                           dataList: List[(String, String)],
+                           tag: String): Unit = {
+      val dir = pkg + "." + wrapper + "0"
+      val codeCacheDir = compileCacheDir/dir
+      if(!exists(codeCacheDir)) {
+        mkdir(codeCacheDir)
+        write(codeCacheDir/classFilesOrder,
+          upickle.default.write((tag, dataList.reverse), indent = 4))
+      }
+    }
+
+    def classFilesListLoad(pkg: String,
+                           wrapper: String,
+                           cacheTag: String): Seq[CompileCache] = {
+      val dir = pkg + "." + wrapper + "0"
+      val codeCacheDir = compileCacheDir/dir
+      if(!exists(codeCacheDir)) Seq[CompileCache]()
+      else {
+        val metadataJson = Try {
+          read(codeCacheDir/classFilesOrder)
+        }.toOption
+        val (loadedTag, classFilesList) =
+          upickle.default.read[(String, Seq[(String, String)])](metadataJson.getOrElse(""))
+        if (cacheTag == loadedTag){
+          val res = {
+            for(cachedPkg <- classFilesList) yield compileCacheLoad(cachedPkg._1, cachedPkg._2)
+          }.flatten
+          res
+        }
+        else Seq[CompileCache]()
       }
     }
 

@@ -40,7 +40,8 @@ class TestRepl {
     new History(Vector()),
     predef = ammonite.repl.Main.defaultPredefString + "\n" + predef,
     wd = ammonite.ops.cwd,
-    replArgs = Seq()
+    replArgs = Seq(),
+    true
   ) catch{ case e =>
     println(infoBuffer.mkString)
     println(outBuffer.mkString)

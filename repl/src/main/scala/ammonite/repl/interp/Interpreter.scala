@@ -1,6 +1,9 @@
 package ammonite.repl.interp
 import ammonite.repl.tools.{IvyThing, Resolvers, Resolver}
 import java.io.File
+import java.nio.file.NotDirectoryException
+import org.apache.ivy.plugins.resolver.RepositoryResolver
+
 import ammonite.repl.Res
 import scala.collection.mutable
 import scala.tools.nsc.Settings
@@ -11,6 +14,8 @@ import pprint.{Config, PPrint}
 import annotation.tailrec
 import ammonite.repl._
 import ammonite.repl.frontend._
+import Util._
+import ammonite.terminal.Filter
 
 import scala.reflect.io.VirtualDirectory
 
@@ -29,13 +34,17 @@ class Interpreter(prompt0: Ref[String],
                   history: => History,
                   predef: String,
                   wd: Path,
-                  replArgs: Seq[Bind[_]]){ interp =>
-
+                  replArgs: Seq[Bind[_]],
+                  withCompiler: Boolean = true){ interp =>
 
   val hardcodedPredef =
     "import ammonite.repl.frontend.ReplBridge.repl.{pprintConfig, derefPPrint}"
 
-
+  // Should script as a whole be cached or not
+  val scriptCaching = storage match {
+    case s: Storage.InMemory => false
+    case _ => true
+  }
   //this variable keeps track of where should we put the imports resulting from scripts.
   private var scriptImportCallback: Imports => Unit = eval.update
 
@@ -79,8 +88,6 @@ class Interpreter(prompt0: Ref[String],
   }
 
 
-  val preprocess = Preprocessor(compiler.parse)
-
   Timer("Interpreter init Preprocess")
 
 
@@ -92,7 +99,8 @@ class Interpreter(prompt0: Ref[String],
     replApi
   )
   Timer("Interpreter init eval")
-  init()
+  if(withCompiler) init()
+
   Timer("Interpreter init init")
   val argString = replArgs.zipWithIndex.map{ case (b, idx) =>
     s"""
@@ -114,27 +122,42 @@ class Interpreter(prompt0: Ref[String],
   // to it even if it's half built
   var predefImports = Imports(Nil)
   for( (sourceCode, wrapperName, pkgName) <- predefs) {
-    processModule0(sourceCode, wrapperName, pkgName, predefImports) match{
-      case Res.Success(imports) =>
-        predefImports = predefImports ++ imports
-      case Res.Failure(ex, msg) =>
-        ex match{
-          case Some(e) => throw new RuntimeException("Error during Predef: " + msg, e)
-          case None => throw new RuntimeException("Error during Predef: " + msg)
-        }
+    // If withCompiler flag is false load predefs from cache without using compiler
+    withCompiler match {
+      case true =>
+        processModule0(sourceCode, wrapperName, pkgName, predefImports) match {
+          case Res.Success(data) =>
+            predefImports = predefImports ++ data._1
+          case Res.Failure(ex, msg) =>
+            ex match {
+              case Some(e) => throw new RuntimeException("Error during Predef: " + msg, e)
+              case None => throw new RuntimeException("Error during Predef: " + msg)
+            }
 
-      case Res.Exception(ex, msg) =>
-        throw new RuntimeException("Error during Predef: " + msg, ex)
+          case Res.Exception(ex, msg) =>
+            throw new RuntimeException("Error during Predef: " + msg, ex)
+        }
+      case false =>
+        val emptyCachedData = (Traversable[(String, Array[Byte])](), Imports(Seq()))
+        val folderStorage = storage.asInstanceOf[Storage.Folder]
+        val loc = pkgName + "." + wrapperName
+        val d = folderStorage.compileCacheLoad(loc, "predef").getOrElse(emptyCachedData)
+        predefImports = predefImports ++ d._2
     }
   }
 
   eval.sess.save()
   Timer("Interpreter init predef 0")
-  init()
+    if(withCompiler) init()
   Timer("Interpreter init predef 1")
 
 
-  def processLine(code: String, stmts: Seq[String], fileName: String): Res[Evaluated] = for{
+  def processLine(code: String,
+                  stmts: Seq[String],
+                  fileName: String,
+                  preprocess: Preprocessor = Preprocessor(compiler.parse)
+                 ): Res[Evaluated] ={
+    val resV = for{
     _ <- Catching { case ex =>
       Res.Exception(ex, "Something unexpected went wrong =(")
     }
@@ -152,6 +175,8 @@ class Interpreter(prompt0: Ref[String],
       fileName, "cmd" + eval.getCurrentLine
     )
   } yield out
+  resV.map(_._1)
+  }
 
 
   def withContextClassloader[T](t: => T) = {
@@ -184,9 +209,7 @@ class Interpreter(prompt0: Ref[String],
   def evaluateLine(processed: Preprocessor.Output,
                    printer: Printer,
                    fileName: String,
-                   indexedWrapperName: String): Res[Evaluated] = {
-
-    for{
+                   indexedWrapperName: String): Res[(Evaluated, String)] = for{
       _ <- Catching{ case e: ThreadDeath => Evaluator.interrupted(e) }
       (classFiles, newImports) <- compileClass(
         processed,
@@ -203,32 +226,32 @@ class Interpreter(prompt0: Ref[String],
         )
 
       }
-    } yield res
-  }
+    // empty quotes to serve as a dummy cacheTag for repl commands which are not to be cached
+    } yield (res, "")
+
 
   def processScriptBlock(processed: Preprocessor.Output,
                          printer: Printer,
                          wrapperName: String,
                          fileName: String,
                          pkgName: String) = for {
-    (cls, newImports) <- cachedCompileBlock(
-      processed,
-      printer,
-      wrapperName,
-      fileName,
-      pkgName,
-      "scala.Iterator[String]()"
-    )
-    res <- eval.processScriptBlock(cls, newImports, wrapperName, pkgName)
-  } yield res
-
+      (cls, newImports, tag) <- cachedCompileBlock(
+        processed,
+        printer,
+        wrapperName,
+        fileName,
+        pkgName,
+        "scala.Iterator[String]()"
+      )
+      res <- eval.processScriptBlock(cls, newImports, wrapperName, pkgName)
+    } yield (res, tag)
 
   def cachedCompileBlock(processed: Preprocessor.Output,
                          printer: Printer,
                          wrapperName: String,
                          fileName: String,
                          pkgName: String,
-                         printCode: String): Res[(Class[_], Imports)] = {
+                         printCode: String): Res[(Class[_], Imports, String)] = {
 
     Timer("cachedCompileBlock 1")
 
@@ -256,7 +279,7 @@ class Interpreter(prompt0: Ref[String],
       (classFiles, newImports) <- compiled
       _ = Timer("cachedCompileBlock 4")
       cls <- eval.loadClass(fullyQualifiedName, classFiles)
-    } yield (cls, newImports)
+    } yield (cls, newImports, tag)
 
     x
   }
@@ -269,7 +292,7 @@ class Interpreter(prompt0: Ref[String],
   def processModule0(code: String,
                      wrapperName: String,
                      pkgName: String,
-                     startingImports: Imports): Res[Imports] = for{
+                     startingImports: Imports): Res[(Imports, List[CacheDetails])] = for{
     blocks <- Preprocessor.splitScript(Interpreter.skipSheBangLine(code))
     res <- processCorrectScript(
       blocks,
@@ -287,36 +310,40 @@ class Interpreter(prompt0: Ref[String],
     )
   } yield res
 
-  def processExec(code: String): Res[Imports] = for {
-    blocks <- Preprocessor.splitScript(Interpreter.skipSheBangLine(code))
-    res <- processCorrectScript(
-      blocks,
-      eval.sess.frames.head.imports,
-      "ammonite.session",
-      "cmd" + eval.getCurrentLine,
-      { (processed, wrapperIndex, indexedWrapperName) =>
-        evaluateLine(
-          processed,
-          printer,
-          s"Main$wrapperIndex.scala",
-          indexedWrapperName
-        )
-      }
-    )
-  } yield res
+  def processExec(code: String): Res[Imports] = {
+    val resV = for {
+      blocks <- Preprocessor.splitScript(Interpreter.skipSheBangLine(code))
+      res <- processCorrectScript(
+        blocks,
+        eval.sess.frames.head.imports,
+        "ammonite.session",
+        "cmd" + eval.getCurrentLine,
+        { (processed, wrapperIndex, indexedWrapperName) =>
+          evaluateLine(
+            processed,
+            printer,
+            s"Main$wrapperIndex.scala",
+            indexedWrapperName
+          )
+        }
+      )
+    } yield res
+  resV.map(_._1)
+  }
+
 
 
   def processCorrectScript(blocks: Seq[(String, Seq[String])],
                            startingImports: Imports,
                            pkgName: String,
                            wrapperName: String,
-                           evaluate: Interpreter.EvaluateCallback)
-                          : Res[Imports] = {
+                           evaluate: Interpreter.EvaluateCallback,
+                           preprocess: Preprocessor = Preprocessor(compiler.parse))
+                          : Res[(Imports, List[CacheDetails])] = {
 
     Timer("processCorrectScript 1")
     // we store the old value, because we will reassign this in the loop
     val outerScriptImportCallback = scriptImportCallback
-
     /**
       * Iterate over the blocks of a script keeping track of imports.
       *
@@ -328,12 +355,15 @@ class Interpreter(prompt0: Ref[String],
     @tailrec def loop(blocks: Seq[(String, Seq[String])],
                       scriptImports: Imports,
                       lastImports: Imports,
-                      wrapperIndex: Int): Res[Imports] = {
+                      wrapperIndex: Int,
+                      compiledData: List[CacheDetails]
+                     ): Res[(Imports, List[CacheDetails])] = {
       if (blocks.isEmpty) {
+        // No more blocks
         // No more blocks
         // if we have imports to pass to the upper layer we do that
         outerScriptImportCallback(lastImports)
-        Res.Success(lastImports)
+        Res.Success(lastImports, compiledData)
       } else {
         Timer("processScript loop 0")
         // imports from scripts loaded from this script block will end up in this buffer
@@ -361,16 +391,25 @@ class Interpreter(prompt0: Ref[String],
         res match {
           case r: Res.Failure => r
           case r: Res.Exception => r
-          case Res.Success(ev) =>
+          case Res.Success((ev, tag)) =>
             val last = ev.imports ++ nestedScriptImports
-            loop(blocks.tail, scriptImports ++ last, last, wrapperIndex + 1)
-          case Res.Skip => loop(blocks.tail, scriptImports, lastImports, wrapperIndex + 1)
+            loop(blocks.tail,
+              scriptImports ++ last,
+              last,
+              wrapperIndex + 1,
+              (ev.wrapper, tag) :: compiledData)
+          case Res.Skip => loop(blocks.tail,
+            scriptImports,
+            lastImports,
+            wrapperIndex + 1,
+            compiledData
+          )
         }
       }
     }
     // wrapperIndex starts off as 1, so that consecutive wrappers can be named
     // Wrapper, Wrapper2, Wrapper3, Wrapper4, ...
-    try loop(blocks, startingImports, Imports(Nil), wrapperIndex = 1 )
+    try loop(blocks, startingImports, Imports(Nil), wrapperIndex = 1, List[(String, String)]())
     finally scriptImportCallback = outerScriptImportCallback
   }
 
@@ -454,14 +493,63 @@ class Interpreter(prompt0: Ref[String],
 
       def exec(file: Path): Unit = apply(read(file))
 
-      def module(file: Path): Unit = {
+      def loadModule(file: Path, storage: Storage, cacheTag: String): Unit ={
+        val code = read(file)
         val (pkg, wrapper) = Util.pathToPackageWrapper(file, wd)
-        processModule(read(file), wrapper, pkg) match{
+        processModule(code, wrapper, pkg) match {
           case Res.Failure(ex, s) => throw new CompilationError(s)
           case Res.Exception(t, s) => throw t
-          case x => //println(x)
+          case Res.Success(data) =>
+            if(scriptCaching) {
+              val files = for (d <- data._2) yield (d._1, d._2)
+              storage.asInstanceOf[Storage.Folder]classFilesListSave(pkg, wrapper, files, cacheTag)
+            }
         }
         init()
+      }
+
+      // Try loading script from cache
+      def cachedModule(path: Path) = {
+        Timer.startTime = System.nanoTime()
+
+        val code: String = read(path)
+        val (pkg, wrapper) = Util.pathToPackageWrapper(path, wd)
+        val cacheTag = "cache" + Util.md5Hash(Iterator(code.getBytes))
+          .map("%02x".format(_)).mkString
+        if(!code.contains("load(")) {
+          storage.asInstanceOf[Storage.Folder].classFilesListLoad(pkg, wrapper, cacheTag) match {
+            case Seq() =>
+              loadModule(path, storage.asInstanceOf[Storage.Folder], cacheTag)
+            case cachedData =>
+              def evalMain(cls: Class[_]) =
+                cls.getDeclaredMethod("$main").invoke(null)
+
+              var blockNumber = 1
+              def getBlockNumber = blockNumber match {
+                case 1 => ""
+                case _ => "_" + blockNumber.toString
+              }
+              cachedData.foreach { d => {
+                for {
+                  cls <- interp.eval.loadClass(pkg + "." + wrapper + getBlockNumber, d._1)
+                } yield {
+                  evalMain(cls)
+                }
+                blockNumber += 1
+              }
+              }
+          }
+        } else loadModule(path, storage.asInstanceOf[Storage.Folder], cacheTag)
+      }
+
+      def module(file: Path): Unit = {
+        if (!withCompiler)
+          cachedModule(file)
+        else {
+          val cacheTag = "cache" + Util.md5Hash(Iterator(read(file).getBytes))
+            .map("%02x".format(_)).mkString
+          loadModule(file, storage, cacheTag)
+        }
       }
 
       object plugin extends DefaultLoadJar {
@@ -518,7 +606,7 @@ class Interpreter(prompt0: Ref[String],
       Interpreter.this.compiler.search(target)
     }
     def compiler = Interpreter.this.compiler.compiler
-    def newCompiler() = init()
+    def newCompiler() = null
     def fullHistory = storage.fullHistory()
     def history = Interpreter.this.history
 
@@ -551,7 +639,6 @@ class Interpreter(prompt0: Ref[String],
 object Interpreter{
   val SheBang = "#!"
 
-
   /**
     * This gives our cache tags for compile caching. The cache tags are a hash
     * of classpath, previous commands (in-same-script), and the block-code.
@@ -574,7 +661,7 @@ object Interpreter{
       code
   }
 
-  type EvaluateCallback = (Preprocessor.Output, Int, String) => Res[Evaluated]
+  type EvaluateCallback = (Preprocessor.Output, Int, String) => Res[(Evaluated, String)]
 
   def indexWrapperName(wrapperName: String, wrapperIndex: Int) = {
     wrapperName + (if (wrapperIndex == 1) "" else "_" + wrapperIndex)

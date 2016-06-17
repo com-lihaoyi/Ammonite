@@ -81,7 +81,8 @@ object Preprocessor{
                   indexedWrapperName: String,
                   imports: Imports,
                   printerTemplate: String => String) = for{
-      Preprocessor.Expanded(code, printer) <- expandStatements(stmts, resultIndex)
+            Preprocessor.Expanded(code, printer) <- expandStatements(stmts, resultIndex)
+
       (wrappedCode, importsLength) = wrapCode(
         pkgName, indexedWrapperName, leadingSpaces + code,
         printerTemplate(printer.mkString(", ")),
@@ -186,14 +187,13 @@ object Preprocessor{
       }}
       unwrapped match{
         case Nil => Res.Skip
-        case postSplit =>
-          complete(stmts.mkString(""), wrapperIndex, postSplit)
-
+        case postSplit => complete(stmts.mkString(""), wrapperIndex, postSplit)
       }
     }
 
     def complete(code: String, resultIndex: String, postSplit: Seq[String]) = {
       val reParsed = postSplit.map(p => (parse(p), p))
+
       val errors = reParsed.collect{case (Left(e), _) => e }
       if (errors.length != 0) Res.Failure(None, errors.mkString("\n"))
       else {

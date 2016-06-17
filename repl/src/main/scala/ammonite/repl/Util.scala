@@ -262,6 +262,9 @@ object Util{
   }
 
   // Type aliases for common things
+
+  type CacheDetails = (String, String)
+  //                   Wrapper HashVal
   type IvyMap = Map[(String, String, String, String), Set[String]]
   type ClassFiles = Traversable[(String, Array[Byte])]
   type CompileCache = (ClassFiles, Imports)
@@ -283,6 +286,7 @@ object Util{
 object Timer{
   var current = 0L
   var show = false
+  var startTime = System.nanoTime()
   def reset() = current = System.nanoTime()
   /**
    * Prints the time, in millis, that has passed

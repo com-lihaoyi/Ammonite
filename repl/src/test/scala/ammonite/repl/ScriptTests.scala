@@ -282,7 +282,8 @@ object ScriptTests extends TestSuite{
           new History(Vector()),
           predef = "",
           wd = ammonite.ops.cwd,
-          replArgs = Seq()
+          replArgs = Seq(),
+          true
         )
 
         'blocks{

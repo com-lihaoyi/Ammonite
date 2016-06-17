@@ -4,10 +4,20 @@ import java.io.{File, InputStream, OutputStream}
 
 import ammonite.ops._
 
+import scala.reflect.io.VirtualDirectory
 import scala.reflect.internal.annotations.compileTimeOnly
 import scala.reflect.runtime.universe.TypeTag
 import language.experimental.macros
 import reflect.macros.Context
+import Util.CompileCache
+import ammonite.repl.frontend.{Session, _}
+import ammonite.repl.interp.{Evaluator, Interpreter}
+import ammonite.repl.tools.{Resolver, Resolvers}
+import ammonite.terminal.Filter
+import pprint.{Config, PPrint}
+
+import scala.collection.mutable
+import scala.util._
 
 
 /**
@@ -70,21 +80,104 @@ case class Main(predef: String = "",
     res
   }
 
+
+  def runScriptLevelCache(path: Path, args: Seq[String] = Vector.empty,
+                          kwargs: Map[String, String] = Map.empty,
+                          storage: Storage) = {
+    Timer.startTime = System.nanoTime()
+    val code: String = read(path)
+    val (pkg, wrapper) = Util.pathToPackageWrapper(path, wd)
+    val cacheTag = "cache" + Util.md5Hash(Iterator(code.getBytes)).map("%02x".format(_)).mkString
+    // check if script takes args or loads code as they will need compiler
+    storage match {
+      case s: Storage.InMemory => runScript(path, args, kwargs, storage, cacheTag, false)
+      case _ =>
+        if (args == Seq() || !code.contains("load(")) {
+          storage.asInstanceOf[Storage.Folder].classFilesListLoad(pkg, wrapper, cacheTag) match {
+            case Seq() =>
+              runScript(path, args, kwargs, storage, cacheTag)
+            case cachedData =>
+              val outBuffer = mutable.Buffer.empty[String]
+              val warningBuffer = mutable.Buffer.empty[String]
+              val errorBuffer = mutable.Buffer.empty[String]
+              val infoBuffer = mutable.Buffer.empty[String]
+              val prompt = Ref("@ ")
+              val colors = Ref[Colors](Colors.Default)
+              val frontEnd = Ref[FrontEnd](AmmoniteFrontEnd(Filter.empty))
+              val printer = Printer(
+                outBuffer.append(_),
+                warningBuffer.append(_),
+                errorBuffer.append(_),
+                infoBuffer.append(_)
+              )
+              val predef = Main.maybeDefaultPredef(defaultPredef, Main.defaultPredefString)
+
+              val interp: Interpreter = new Interpreter(
+                prompt,
+                frontEnd,
+                frontEnd().width,
+                frontEnd().height,
+                colors,
+                printer,
+                storage,
+                new History(Vector()),
+                predef,
+                wd,
+                Nil,
+                false
+              )
+              
+              def evalMain(cls: Class[_]) =
+                cls.getDeclaredMethod("$main").invoke(null)
+
+              var blockNumber = 1;
+              def getBlockNumber = blockNumber match {
+                case 1 => ""
+                case _ => "_" + blockNumber.toString
+              }
+
+              // Iterate through cached blocks and execute classFiles
+              // blockNumber keeps track of blockIndex
+              cachedData.foreach { d =>
+                for {
+                  cls <- interp.eval.loadClass(pkg + "." + wrapper + getBlockNumber, d._1)
+                } yield evalMain(cls)
+                blockNumber += 1
+              }
+
+              if (Timer.show)
+                println("Compilation Count: " + interp.compilationCount)
+          }
+        }
+        else {
+          runScript(path, args, kwargs, storage, cacheTag)
+        }
+    }
+  }
+
+
+
   /**
     * Run a Scala script file! takes the path to the file as well as an array
     * of `args` and a map of keyword `kwargs` to pass to that file.
     */
   def runScript(path: Path,
                 args: Seq[String],
-                kwargs: Map[String, String]): Res[Imports] = {
-
+                kwargs: Map[String, String],
+                storage: Storage,
+                cacheTag: String,
+                cacheScript: Boolean = true): Res[Seq[ImportData]] = {
     val repl = instantiateRepl()
     val (pkg, wrapper) = Util.pathToPackageWrapper(path, wd)
-    repl.interp.processModule(read(path), wrapper, pkg) match{
+    repl.interp.processModule(read(path), wrapper, pkg) match {
       case x: Res.Failing => x
-      case Res.Success(imports) =>
+      case Res.Success(data) =>
+        val Imports(imports)  = data._1
+        val files = for(d <- data._2) yield (d._1, d._2)
         repl.interp.init()
-        imports.value.find(_.toName == "main") match {
+        if(imports.count(_.toName == "main") == 0 && cacheScript)
+          storage.asInstanceOf[Storage.Folder].classFilesListSave(pkg, wrapper, files, cacheTag)
+        imports.find(_.toName == "main") match {
           case None => Res.Success(imports)
           case Some(i) =>
             val quotedArgs =
@@ -104,12 +197,12 @@ case class Main(predef: String = "",
               case Res.Success(_) => Res.Success(imports)
               case Res.Exception(e: ArgParseException, s) =>
                 e.setStackTrace(Array())
-                e.cause.setStackTrace(e.cause.getStackTrace.takeWhile( frame =>
+                e.cause.setStackTrace(e.cause.getStackTrace.takeWhile(frame =>
                   frame.getClassName != "ammonite.repl.ScriptInit$" ||
-                  frame.getMethodName != "parseScriptArg"
+                    frame.getMethodName != "parseScriptArg"
                 ))
                 Res.Exception(e, s)
-              case x => x
+              case x => Res.Success(imports)
             }
         }
     }
@@ -257,7 +350,10 @@ object Main{
       (fileToExecute, codeToExecute) match{
         case (None, None) => println("Loading..."); main.run()
         case (Some(path), None) =>
-          main.runScript(path, passThroughArgs, kwargs.toMap) match{
+          main.runScriptLevelCache(path,
+            passThroughArgs,
+            kwargs.toMap,
+            main.storageBackend) match{
             case Res.Failure(exOpt, msg) =>
               Console.err.println(msg)
               System.exit(1)
@@ -266,7 +362,9 @@ object Main{
               val i = trace.indexWhere(_.getMethodName == "$main") + 1
               ex.setStackTrace(trace.take(i))
               throw ex
-            case Res.Success(_) =>
+            case _ =>
+
+            // "_" for Res.Success or nothing( if classFiles are loaded from cache )
             // do nothing on success, everything's already happened
           }
 
