@@ -15,15 +15,15 @@ object Parsers {
   case class ImportTree(prefix: Seq[String], mappings: Option[ImportMapping])
   val ImportSplitter: P[Seq[ImportTree]] = {
     val IdParser = P( (Id | `_` ).! ).map(
-      s => if(s(0) == '`') s.drop(1).dropRight(1) else s
+      s => if (s(0) == '`') s.drop(1).dropRight(1) else s
     )
     val Selector = P( IdParser ~ (`=>` ~/ IdParser).? )
     val Selectors = P( "{" ~/ Selector.rep(sep = ",".~/) ~ "}" )
     val BulkImport = P( "." ~/ `_`).map(
       _ => Seq("_" -> None)
     )
-    val ImportExpr: P[ImportTree] = P( StableId.! ~ (BulkImport | Selectors).? ).map{
-      case (idString, selectors) => ImportTree(idString.split('.'), selectors)
+    val ImportExpr: P[ImportTree] = P( IdParser.rep(1, sep = ".") ~ (BulkImport | Selectors).? ).map{
+      case (idSeq, selectors) => ImportTree(idSeq, selectors)
     }
     P( `import` ~/ ImportExpr.rep(1, sep = ",".~/) )
   }

@@ -7,3 +7,10 @@
 package $file{
   private object `_`
 }
+
+/**
+  * Package that gets filled with ivy artifacts the user loads
+  */
+package $ivy{
+  private object `_`
+}

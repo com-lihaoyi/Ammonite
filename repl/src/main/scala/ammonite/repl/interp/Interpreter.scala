@@ -4,7 +4,6 @@ import java.io.File
 
 import ammonite.repl.Res
 
-import scala.collection.mutable
 import scala.tools.nsc.Settings
 import acyclic.file
 import fastparse.all._
@@ -20,12 +19,18 @@ import scala.reflect.io.VirtualDirectory
 
 
 trait ImportHook{
-  def handle(tree: ImportTree, interp: Interpreter): ImportHook.Result
+  def handle(tree: ImportTree, interp: Interpreter): Set[ImportHook.Result]
 }
+
 object ImportHook{
-  case class Result(code: String, wrapper: String, pkg: String)
+  sealed trait Result
+  object Result{
+    case class Source(code: String, wrapper: String, pkg: String) extends Result
+    case class Jar(file: Path) extends Result
+  }
   object File extends ImportHook {
-    def handle(tree: ImportTree, interp: Interpreter): Result = {
+    // import $file.foo.Bar, to import the file `foo/Bar.scala`
+    def handle(tree: ImportTree, interp: Interpreter) = {
       def find(targetScript: Path, importSegments: Seq[String]): Option[Path] = {
         val possibleScriptPath = targetScript / up / s"${targetScript.last}.scala"
         if (exists ! possibleScriptPath) Some(possibleScriptPath)
@@ -39,10 +44,32 @@ object ImportHook{
         case None => throw new Exception("Cannot resolve import " + tree.prefix.mkString("."))
         case Some(scriptPath) =>
           val (pkg, wrapper) = Util.pathToPackageWrapper(scriptPath, interp.wd)
-          val res = interp.processModule(read(scriptPath), wrapper, pkg)
           interp.init()
-          Result(read(scriptPath), wrapper, pkg)
+          Set(Result.Source(read(scriptPath), wrapper, pkg))
       }
+    }
+  }
+
+  object Http extends ImportHook{
+    // import $url.{ `http://www.google.com` => foo }
+    def handle(tree: ImportTree, interp: Interpreter) = {
+      for ((k, v) <- tree.mappings.get.toSet) yield {
+        val res = scalaj.http.Http(k).asString
+        if (!res.is2xx) throw new RuntimeException("$url import failed for " + k)
+        else Result.Source(res.body, k, "$url")
+      }
+    }
+  }
+
+  object Ivy extends ImportHook{
+    def handle(tree: ImportTree, interp: Interpreter) = {
+      // import $ivy.`com.lihaoyi:scalatags_2.11:0.5.4`
+      val Array(a, b, c) = tree.prefix.head.split(':')
+      val jars = interp.loadIvy((a, b, c))
+      // Code-gen a stub file so the original import has something it can
+      // pretend to import
+      val stub = Result.Source("def x = ()", tree.prefix.head, "$ivy")
+      jars.map(Path(_)).map(Result.Jar) ++ Seq(stub)
     }
   }
 }
@@ -167,10 +194,13 @@ class Interpreter(prompt0: Ref[String],
   init()
   Timer("Interpreter init predef 1")
 
-  val importHooks = Ref(Map[String, ImportHook]("script" -> ImportHook.File))
+  val importHooks = Ref(Map[String, ImportHook](
+    "script" -> ImportHook.File,
+    "url" -> ImportHook.Http,
+    "ivy" -> ImportHook.Ivy
+  ))
 
   def resolveImportHooks(stmts: Seq[String]): Res[_] = {
-
     val importTrees =
       stmts.map(Parsers.ImportSplitter.parse(_))
            .collect{case Parsed.Success(v, _) => v }
@@ -183,8 +213,18 @@ class Interpreter(prompt0: Ref[String],
         importHooks().get(tree.prefix.head.stripPrefix("$")) match{
           case None => resolve(importTrees.tail)
           case Some(hook) =>
-            val res = hook.handle(tree.copy(prefix = tree.prefix.drop(1)), this)
-            processModule(res.code, res.wrapper, res.pkg)
+            hook.handle(tree.copy(prefix = tree.prefix.drop(1)), this)
+                .foldLeft[Res[_]](Res.Success(())) {
+              case (f: Res.Failing, _) => f
+              case (_, res: ImportHook.Result.Source) =>
+                processModule(res.code, res.wrapper, res.pkg)
+              case (_, res: ImportHook.Result.Jar) =>
+                eval.sess.frames.head.addClasspath(Seq(res.file.toIO))
+                evalClassloader.add(res.file.toIO.toURI.toURL)
+                init()
+                Res.Success(())
+            }
+
         }
 
     }
@@ -447,7 +487,25 @@ class Interpreter(prompt0: Ref[String],
       case Res.Exception(ex, msg) => lastException = ex
     }
   }
+  def loadIvy(coordinates: (String, String, String), verbose: Boolean = true): Set[File] = {
+    val (groupId, artifactId, version) = coordinates
+    val psOpt =
+      storage.ivyCache()
+        .get((replApi.resolvers.hashCode.toString, groupId, artifactId, version))
+        .map(_.map(new java.io.File(_)))
+        .filter(_.forall(_.exists()))
 
+    psOpt match{
+      case Some(ps) => ps
+      case None =>
+        IvyThing(() => replApi.resolvers()).resolveArtifact(
+          groupId,
+          artifactId,
+          version,
+          if (verbose) 2 else 1
+        ).toSet
+    }
+  }
   abstract class DefaultLoadJar extends LoadJar with Resolvers {
     
     lazy val ivyThing = IvyThing(() => resolvers)
@@ -459,30 +517,15 @@ class Interpreter(prompt0: Ref[String],
       init()
     }
     def ivy(coordinates: (String, String, String), verbose: Boolean = true): Unit = {
+      val resolved = loadIvy(coordinates, verbose)
       val (groupId, artifactId, version) = coordinates
-      val psOpt =
-        storage.ivyCache()
-                 .get((resolvers.hashCode.toString, groupId, artifactId, version))
-                 .map(_.map(new java.io.File(_)))
-                 .filter(_.forall(_.exists()))
+      storage.ivyCache() = storage.ivyCache().updated(
+        (resolvers.hashCode.toString, groupId, artifactId, version),
+        resolved.map(_.getAbsolutePath).toSet
+      )
 
-      psOpt match{
-        case Some(ps) => ps.foreach(handleClasspath)
-        case None =>
-          val resolved = ivyThing.resolveArtifact(
-            groupId,
-            artifactId,
-            version,
-            if (verbose) 2 else 1
-          )
+      resolved.foreach(handleClasspath)
 
-          storage.ivyCache() = storage.ivyCache().updated(
-            (resolvers.hashCode.toString, groupId, artifactId, version),
-            resolved.map(_.getAbsolutePath).toSet
-          )
-
-          resolved.foreach(handleClasspath)
-      }
 
       init()
     }

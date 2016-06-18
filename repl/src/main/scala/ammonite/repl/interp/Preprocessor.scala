@@ -298,7 +298,7 @@ object Preprocessor{
 package $pkgName
 ${importBlock(imports)}
 
-object $indexedWrapperName{\n"""
+object ${Parsers.backtickWrap(indexedWrapperName)}{\n"""
 
     val bottomWrapper = s"""\ndef $$main() = { $printCode }
   override def toString = "$indexedWrapperName"
