@@ -18,6 +18,7 @@
 
     @hl.sh
       @replCurl
+      (alternatively ```brew install ammonite-repl``` can be used on macOS)
 
     @p
       This will give you access to Ammonite for Scala:
