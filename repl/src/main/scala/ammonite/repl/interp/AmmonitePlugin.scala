@@ -1,11 +1,12 @@
 package ammonite.repl.interp
 
 
-import ammonite.repl.{Parsers, ImportData}
+import ammonite.repl.{ImportData, Parsers, Identifier}
 import acyclic.file
+
 import scala.tools.nsc._
-import scala.tools.nsc.plugins.{PluginComponent, Plugin}
-import scala.reflect.internal.util.{OffsetPosition, BatchSourceFile}
+import scala.tools.nsc.plugins.{Plugin, PluginComponent}
+import scala.reflect.internal.util.{BatchSourceFile, OffsetPosition}
 
 /**
  * Used to capture the names in scope after every execution, reporting them
@@ -66,7 +67,7 @@ object AmmonitePlugin{
     count += 1
     def decode(t: g.Tree) = {
       val sym = t.symbol
-      (sym.isType, sym.decodedName, sym.decodedName, "")
+      (sym.isType, sym.decodedName, sym.decodedName, Seq())
     }
     val ignoredSyms = Set(
       "package class-use",
@@ -96,7 +97,7 @@ object AmmonitePlugin{
 
     val stats = unit.body.children.last.asInstanceOf[g.ModuleDef].impl.body
     val symbols = stats.filter(x => !Option(x.symbol).exists(_.isPrivate))
-                       .foldLeft(List.empty[(Boolean, String, String, String)]){
+                       .foldLeft(List.empty[(Boolean, String, String, Seq[Identifier])]){
       // These are all the ways we want to import names from previous
       // executions into the current one. Most are straightforward, except
       // `import` statements for which we make use of the typechecker to
@@ -129,14 +130,14 @@ object AmmonitePlugin{
         // Apart from this, all other imports should resolve either to one
         // of these cases or importing-from-an-existing import, both of which
         // should work without modification
-        val headFullPath = symbolList.head.fullName.split('.')
+        val headFullPath = symbolList.head.fullName.split('.').map(x => x: Identifier)
         // prefix package imports with `_root_` to try and stop random
         // variables from interfering with them. If someone defines a value
         // called `_root_`, this will still break, but that's their problem
-        val rootPrefix = if(symbolList.head.isPackage) Seq("_root_") else Nil
-        val tailPath = nameList.tail.map(x => Parsers.backtickWrap(x.decoded))
+        val rootPrefix = if(symbolList.head.isPackage) Seq("_root_": Identifier) else Nil
+        val tailPath = nameList.tail.map(_.decoded: Identifier)
 
-        val prefix = (rootPrefix ++ headFullPath ++ tailPath).mkString(".")
+        val prefix = (rootPrefix ++ headFullPath ++ tailPath)
 
         /**
           * A map of each name importable from `expr`, to a `Seq[Boolean]`
@@ -214,7 +215,7 @@ object AmmonitePlugin{
     // together v.s. having them by sent in the arbitrary-jumbled order they
     // come out of the `grouped` map in
 
-    output(open.toVector.sortBy(_.prefix))
+    output(open.toVector.sortBy(_.prefix.map(_.raw).mkString(".")))
   }
 }
 

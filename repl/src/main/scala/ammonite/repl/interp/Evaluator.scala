@@ -28,12 +28,12 @@ trait Evaluator{
                   newImports: Imports,
                   printer: Printer,
                   fileName: String,
-                  indexedWrapperName: String): Res[Evaluated]
+                  indexedWrapperName: Identifier): Res[Evaluated]
 
   def processScriptBlock(cls: Class[_],
                          newImports: Imports,
-                         wrapperName: String,
-                         pkgName: String): Res[Evaluated]
+                         wrapperName: Identifier,
+                         pkgName: Seq[Identifier]): Res[Evaluated]
 
   def sess: Session
 
@@ -160,10 +160,10 @@ object Evaluator{
                     newImports: Imports,
                     printer: Printer,
                     fileName: String,
-                    indexedWrapperName: String) = {
+                    indexedWrapperName: Identifier) = {
       Timer("eval.processLine compileClass end")
       for {
-        cls <- loadClass("$sess." + indexedWrapperName, classFiles)
+        cls <- loadClass("$sess." + indexedWrapperName.backticked, classFiles)
         _ = Timer("eval.processLine loadClass end")
         _ = currentLine += 1
         _ <- Catching{userCodeExceptionHandler}
@@ -175,21 +175,21 @@ object Evaluator{
         Timer("eval.processLine evaluatorRunPrinter 1")
         evaluatorRunPrinter(iter.foreach(printer.out))
         Timer("eval.processLine evaluatorRunPrinter end")
-        evaluationResult("$sess." + indexedWrapperName, newImports)
+        evaluationResult(Seq[Identifier]("$sess", indexedWrapperName), newImports)
       }
     }
 
 
     def processScriptBlock(cls: Class[_],
                            newImports: Imports,
-                           wrapperName: String,
-                           pkgName: String) = for {
+                           wrapperName: Identifier,
+                           pkgName: Seq[Identifier]) = for {
       _ <- Catching{userCodeExceptionHandler}
     } yield {
       Timer("cachedCompileBlock")
       evalMain(cls)
       Timer("evalMain")
-      val res = evaluationResult(pkgName + "." + Parsers.backtickWrap(wrapperName), newImports)
+      val res = evaluationResult(pkgName :+ wrapperName, newImports)
       Timer("evaluationResult")
       res
     }
@@ -199,23 +199,23 @@ object Evaluator{
       frames.head.addImports(newImports)
     }
 
-    def evaluationResult(wrapperName: String,
+    def evaluationResult(wrapperName: Seq[Identifier],
                          imports: Imports) = {
       Evaluated(
         wrapperName,
         Imports(
           for(id <- imports.value) yield {
             val filledPrefix =
-              if (id.prefix == "") {
+              if (id.prefix.isEmpty) {
                 // For some reason, for things not-in-packages you can't access
                 // them off of `_root_`
                 wrapperName
               } else {
                 id.prefix
               }
-            val rootedPrefix =
-              if (filledPrefix.startsWith("_root_.")) filledPrefix
-              else "_root_." + filledPrefix
+            val rootedPrefix: Seq[Identifier] =
+              if (filledPrefix.headOption.exists(_.backticked == "_root_")) filledPrefix
+              else Seq[Identifier]("_root_") ++ filledPrefix
 
             id.copy(prefix = rootedPrefix)
           }

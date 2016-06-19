@@ -8,6 +8,7 @@ import fansi.Attrs
 import pprint.{PPrint, PPrinter}
 
 import scala.collection.mutable
+import scala.reflect.NameTransformer
 import scala.reflect.runtime.universe.TypeTag
 import scala.util.Try
 
@@ -122,7 +123,7 @@ case class Catching(handler: PartialFunction[Throwable, Res.Failing]) {
     try Res.Success(t(())) catch handler
 }
 
-case class Evaluated(wrapper: String,
+case class Evaluated(wrapper: Seq[Identifier],
                      imports: Imports)
 
 /**
@@ -144,8 +145,16 @@ case class Evaluated(wrapper: String,
   */
 case class ImportData(fromName: String,
                       toName: String,
-                      prefix: String,
+                      prefix: Seq[Identifier],
                       importType: ImportData.ImportType)
+
+
+object ImportData{
+  sealed case class ImportType(name: String)
+  val Type = ImportType("Type")
+  val Term = ImportType("Term")
+  val TermType = ImportType("TermType")
+}
 
 /**
   * Represents the imports that occur before a piece of user code in the
@@ -189,20 +198,31 @@ object Imports{
       if (!stomped.exists(_(data.toName))){
         out.append(data)
         stomped.foreach(_.add(data.toName))
-        stompedTerms.remove(data.prefix)
+        data.prefix.headOption.map(_.backticked).foreach(stompedTerms.remove)
       }
     }
     new Imports(out.reverse)
   }
 }
 
-object ImportData{
-  sealed case class ImportType(name: String)
-  val Type = ImportType("Type")
-  val Term = ImportType("Term")
-  val TermType = ImportType("TermType")
+/**
+  * Represents a single identifier in Scala source code, e.g. "scala" or
+  * "println" or "`Hello-World`".
+  *
+  * Holds the value "raw", with all special characters intact, e.g.
+  * "Hello-World". Can be used [[backticked]] e.g. "`Hello-World`", useful for
+  * embedding in Scala source code, or [[encoded]] e.g. "Hello$minusWorld",
+  * useful for accessing names as-seen-from the Java/JVM side of thigns
+  */
+case class Identifier(raw: String){
+  assert(raw.charAt(0) != '`', "Cannot create already-backticked identifiers")
+  override def toString = s"Identifier($backticked)"
+  def encoded = NameTransformer.encode(raw)
+  def backticked = Parsers.backtickWrap(raw)
 }
-
+object Identifier{
+  implicit def create(s: String): Identifier = new Identifier(s)
+}
 /**
  * Encapsulates a read-write cell that can be passed around
  */
@@ -267,13 +287,13 @@ object Ex{
 
 object Util{
 
-  def pathToPackageWrapper(path: Path, wd: Path) = {
+  def pathToPackageWrapper(path: Path, wd: Path): (Seq[Identifier], Identifier) = {
     val pkg = {
       val base = Seq("$script")
       val relPath = (path/up).relativeTo(wd)
       val ups = Seq.fill(relPath.ups)("$up")
       val rest = relPath.segments
-      (base ++ ups ++ rest).map(scala.reflect.NameTransformer.encode).mkString(".").toLowerCase
+      (base ++ ups ++ rest).map(Identifier(_))
     }
     val wrapper = scala.reflect.NameTransformer.encode(path.last.take(path.last.lastIndexOf('.')))
     (pkg, wrapper)

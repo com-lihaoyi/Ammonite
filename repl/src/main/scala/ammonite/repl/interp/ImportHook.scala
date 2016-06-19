@@ -5,7 +5,7 @@ import acyclic.file
 import ammonite.ops.{Path, exists, read, up}
 import ammonite.repl.Parsers.ImportTree
 import ammonite.repl.tools.IvyThing
-import ammonite.repl.{Res, Util}
+import ammonite.repl.{Res, Util, Identifier}
 
 
 trait ImportHook{
@@ -19,7 +19,7 @@ object ImportHook{
   }
   sealed trait Result
   object Result{
-    case class Source(code: String, wrapper: String, pkg: String) extends Result
+    case class Source(code: String, wrapper: Identifier, pkg: Seq[Identifier]) extends Result
     case class Jar(file: Path) extends Result
   }
   object File extends ImportHook {
@@ -52,7 +52,10 @@ object ImportHook{
           Res.map(tree.mappings.get.toSet){ case (k, v) =>
             val res = scalaj.http.Http(k).asString
             if (!res.is2xx) Res.Failure(None, "$url import failed for " + k)
-            else Res.Success(Result.Source(res.body, k, "$url"))
+            else {
+              val resx = Result.Source(res.body, k, Seq("$url"))
+              Res.Success(resx)
+            }
           }
       }
     }
@@ -86,7 +89,7 @@ object ImportHook{
     } yield {
       // Code-gen a stub file so the original import has something it can
       // pretend to import
-      val stub = Result.Source("def x = ()", tree.prefix.head, "$ivy")
+      val stub = Result.Source("def x = ()", tree.prefix.head, Seq("$ivy"))
       val jars: Set[Result.Jar] = resolved.flatten.map(Path(_)).map(Result.Jar).toSet
       jars ++ Set(stub)
     }

@@ -29,8 +29,8 @@ trait Preprocessor{
   def transform(stmts: Seq[String],
                 resultIndex: String,
                 leadingSpaces: String,
-                pkgName: String,
-                indexedWrapperName: String,
+                pkgName: Seq[Identifier],
+                indexedWrapperName: Identifier,
                 imports: Imports,
                 printerTemplate: String => String): Res[Preprocessor.Output]
 }
@@ -86,8 +86,8 @@ object Preprocessor{
     def transform(stmts: Seq[String],
                   resultIndex: String,
                   leadingSpaces: String,
-                  pkgName: String,
-                  indexedWrapperName: String,
+                  pkgName: Seq[Identifier],
+                  indexedWrapperName: Identifier,
                   imports: Imports,
                   printerTemplate: String => String) = for{
       Preprocessor.Expanded(code, printer) <- expandStatements(stmts, resultIndex)
@@ -280,25 +280,26 @@ object Preprocessor{
         if (item.fromName == item.toName) Parsers.backtickWrap(item.fromName)
         else s"${Parsers.backtickWrap(item.fromName)} => ${Parsers.backtickWrap(item.toName)}"
       }
-      "import " + group.head.prefix + ".{\n  " + printedGroup.mkString(",\n  ") + "\n}\n"
+      "import " + group.head.prefix.map(_.backticked).mkString(".") + ".{\n  " + printedGroup.mkString(",\n  ") + "\n}\n"
     }
     val res = out.mkString
 
     Timer("importBlock 1")
+
     res
   }
 
-  def wrapCode(pkgName: String,
-               indexedWrapperName: String,
+  def wrapCode(pkgName: Seq[Identifier],
+               indexedWrapperName: Identifier,
                code: String,
                printCode: String,
                imports: Imports) = {
 
     val topWrapper = s"""
-package $pkgName
+package ${pkgName.map(_.backticked).mkString(".")}
 ${importBlock(imports)}
 
-object ${Parsers.backtickWrap(indexedWrapperName)}{\n"""
+object ${indexedWrapperName.backticked}{\n"""
 
     val bottomWrapper = s"""\ndef $$main() = { $printCode }
   override def toString = "$indexedWrapperName"
