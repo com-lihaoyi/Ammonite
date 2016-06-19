@@ -279,7 +279,8 @@ object Preprocessor{
         if (item.fromName == item.toName) Parsers.backtickWrap(item.fromName)
         else s"${Parsers.backtickWrap(item.fromName)} => ${Parsers.backtickWrap(item.toName)}"
       }
-      "import " + group.head.prefix.map(_.backticked).mkString(".") + ".{\n  " + printedGroup.mkString(",\n  ") + "\n}\n"
+      val pkgString = group.head.prefix.map(_.backticked).mkString(".")
+      "import " + pkgString + ".{\n  " + printedGroup.mkString(",\n  ") + "\n}\n"
     }
     val res = out.mkString
 
