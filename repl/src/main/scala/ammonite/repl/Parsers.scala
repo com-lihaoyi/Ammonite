@@ -19,10 +19,12 @@ object Parsers {
     )
     val Selector = P( IdParser ~ (`=>` ~/ IdParser).? )
     val Selectors = P( "{" ~/ Selector.rep(sep = ",".~/) ~ "}" )
-    val BulkImport = P( "." ~/ `_`).map(
+    val BulkImport = P( `_`).map(
       _ => Seq("_" -> None)
     )
-    val ImportExpr: P[ImportTree] = P( IdParser.rep(1, sep = ".") ~ (BulkImport | Selectors).? ).map{
+    val Prefix = P( IdParser.rep(1, sep = ".") )
+    val Suffix = P( "." ~/ (BulkImport | Selectors) )
+    val ImportExpr: P[ImportTree] = P( Prefix ~ Suffix.? ).map{
       case (idSeq, selectors) => ImportTree(idSeq, selectors)
     }
     P( `import` ~/ ImportExpr.rep(1, sep = ",".~/) )

@@ -15,64 +15,9 @@ import annotation.tailrec
 import ammonite.repl._
 import ammonite.repl.frontend._
 
+
 import scala.reflect.io.VirtualDirectory
 
-
-trait ImportHook{
-  def handle(tree: ImportTree, interp: Interpreter): Set[ImportHook.Result]
-}
-
-object ImportHook{
-  sealed trait Result
-  object Result{
-    case class Source(code: String, wrapper: String, pkg: String) extends Result
-    case class Jar(file: Path) extends Result
-  }
-  object File extends ImportHook {
-    // import $file.foo.Bar, to import the file `foo/Bar.scala`
-    def handle(tree: ImportTree, interp: Interpreter) = {
-      def find(targetScript: Path, importSegments: Seq[String]): Option[Path] = {
-        val possibleScriptPath = targetScript / up / s"${targetScript.last}.scala"
-        if (exists ! possibleScriptPath) Some(possibleScriptPath)
-        else importSegments match {
-          case Seq() => None
-          case Seq(first, rest@_*) => find(targetScript / first, rest)
-        }
-      }
-
-      find(interp.wd, tree.prefix) match {
-        case None => throw new Exception("Cannot resolve import " + tree.prefix.mkString("."))
-        case Some(scriptPath) =>
-          val (pkg, wrapper) = Util.pathToPackageWrapper(scriptPath, interp.wd)
-          interp.init()
-          Set(Result.Source(read(scriptPath), wrapper, pkg))
-      }
-    }
-  }
-
-  object Http extends ImportHook{
-    // import $url.{ `http://www.google.com` => foo }
-    def handle(tree: ImportTree, interp: Interpreter) = {
-      for ((k, v) <- tree.mappings.get.toSet) yield {
-        val res = scalaj.http.Http(k).asString
-        if (!res.is2xx) throw new RuntimeException("$url import failed for " + k)
-        else Result.Source(res.body, k, "$url")
-      }
-    }
-  }
-
-  object Ivy extends ImportHook{
-    def handle(tree: ImportTree, interp: Interpreter) = {
-      // import $ivy.`com.lihaoyi:scalatags_2.11:0.5.4`
-      val Array(a, b, c) = tree.prefix.head.split(':')
-      val jars = interp.loadIvy((a, b, c))
-      // Code-gen a stub file so the original import has something it can
-      // pretend to import
-      val stub = Result.Source("def x = ()", tree.prefix.head, "$ivy")
-      jars.map(Path(_)).map(Result.Jar) ++ Seq(stub)
-    }
-  }
-}
 
 
 /**
@@ -90,7 +35,8 @@ class Interpreter(prompt0: Ref[String],
                   history: => History,
                   predef: String,
                   val wd: Path,
-                  replArgs: Seq[Bind[_]]){ interp =>
+                  replArgs: Seq[Bind[_]])
+  extends ImportHook.InterpreterInterface{ interp =>
 
 
   val hardcodedPredef =
@@ -213,49 +159,45 @@ class Interpreter(prompt0: Ref[String],
         importHooks().get(tree.prefix.head.stripPrefix("$")) match{
           case None => resolve(importTrees.tail)
           case Some(hook) =>
-            hook.handle(tree.copy(prefix = tree.prefix.drop(1)), this)
-                .foldLeft[Res[_]](Res.Success(())) {
-              case (f: Res.Failing, _) => f
-              case (_, res: ImportHook.Result.Source) =>
-                processModule(res.code, res.wrapper, res.pkg)
-              case (_, res: ImportHook.Result.Jar) =>
-                eval.sess.frames.head.addClasspath(Seq(res.file.toIO))
-                evalClassloader.add(res.file.toIO.toURI.toURL)
-                init()
-                Res.Success(())
-            }
-
+            for{
+              hooked <- hook.handle(tree.copy(prefix = tree.prefix.drop(1)), this)
+              hookResults <- Res.map(hooked){
+                case res: ImportHook.Result.Source =>
+                  processModule(res.code, res.wrapper, res.pkg)
+                case res: ImportHook.Result.Jar =>
+                  eval.sess.frames.head.addClasspath(Seq(res.file.toIO))
+                  evalClassloader.add(res.file.toIO.toURI.toURL)
+                  init()
+                  Res.Success(())
+              }
+            } yield hookResults
         }
 
     }
     resolve(importTrees)
   }
-//  val loadedScriptSet = mutable.Set[String]
-  def processLine(code: String, stmts: Seq[String], fileName: String): Res[Evaluated] = {
 
-    resolveImportHooks(stmts)
+  def processLine(code: String, stmts: Seq[String], fileName: String): Res[Evaluated] = for{
+    _ <- Catching { case ex =>
+      Res.Exception(ex, "Something unexpected went wrong =(")
+    }
 
-    for{
-      _ <- Catching { case ex =>
-        Res.Exception(ex, "Something unexpected went wrong =(")
-      }
+    _ <- resolveImportHooks(stmts)
 
-      processed <- preprocess.transform(
-        stmts,
-        eval.getCurrentLine,
-        "",
-        "$sess",
-        "cmd" + eval.getCurrentLine,
-        eval.sess.frames.head.imports,
-        prints => s"ammonite.repl.frontend.ReplBridge.repl.Internal.combinePrints($prints)"
-      )
-      out <- evaluateLine(
-        processed, printer,
-        fileName, "cmd" + eval.getCurrentLine
-      )
-    } yield out
-  }
-
+    processed <- preprocess.transform(
+      stmts,
+      eval.getCurrentLine,
+      "",
+      "$sess",
+      "cmd" + eval.getCurrentLine,
+      eval.sess.frames.head.imports,
+      prints => s"ammonite.repl.frontend.ReplBridge.repl.Internal.combinePrints($prints)"
+    )
+    out <- evaluateLine(
+      processed, printer,
+      fileName, "cmd" + eval.getCurrentLine
+    )
+  } yield out
 
   def withContextClassloader[T](t: => T) = {
     val oldClassloader = Thread.currentThread().getContextClassLoader
@@ -487,7 +429,7 @@ class Interpreter(prompt0: Ref[String],
       case Res.Exception(ex, msg) => lastException = ex
     }
   }
-  def loadIvy(coordinates: (String, String, String), verbose: Boolean = true): Set[File] = {
+  def loadIvy(coordinates: (String, String, String), verbose: Boolean = true) = {
     val (groupId, artifactId, version) = coordinates
     val psOpt =
       storage.ivyCache()
@@ -521,7 +463,7 @@ class Interpreter(prompt0: Ref[String],
       val (groupId, artifactId, version) = coordinates
       storage.ivyCache() = storage.ivyCache().updated(
         (resolvers.hashCode.toString, groupId, artifactId, version),
-        resolved.map(_.getAbsolutePath).toSet
+        resolved.map(_.getAbsolutePath)
       )
 
       resolved.foreach(handleClasspath)
