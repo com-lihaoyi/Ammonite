@@ -323,7 +323,7 @@ class Interpreter(prompt0: Ref[String],
           processScriptBlock(
             processed, printer,
             Interpreter.indexWrapperName(wrapperName, wrapperIndex),
-            wrapperName + ".scala", pkgName
+            wrapperName.raw + ".scala", pkgName
           )
         )
     )
