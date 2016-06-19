@@ -277,7 +277,7 @@ class Interpreter(prompt0: Ref[String],
 
     Timer("cachedCompileBlock 1")
 
-    val fullyQualifiedName = pkgName + "." + wrapperName
+    val fullyQualifiedName = pkgName + "." + scala.reflect.NameTransformer.encode(wrapperName)
     val tag = Interpreter.cacheTag(
       processed.code, Nil, eval.sess.frames.head.classloader.classpathHash
     )
@@ -400,7 +400,6 @@ class Interpreter(prompt0: Ref[String],
             scriptImports,
             _ => "scala.Iterator[String]()"
           )
-
           ev <- evaluate(processed, wrapperIndex, indexedWrapperName)
         } yield ev
 

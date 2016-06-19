@@ -125,6 +125,7 @@ object Evaluator{
           sess.frames.head.classloader.newFileDict(name) = bytes
         }
         val names = classFiles.map(_._1)
+
         val res = Class.forName(fullName, true, sess.frames.head.classloader)
         res
       }, e => "Failed to load compiled class " + e)
@@ -188,7 +189,7 @@ object Evaluator{
       Timer("cachedCompileBlock")
       evalMain(cls)
       Timer("evalMain")
-      val res = evaluationResult(pkgName + "." + wrapperName, newImports)
+      val res = evaluationResult(pkgName + "." + Parsers.backtickWrap(wrapperName), newImports)
       Timer("evaluationResult")
       res
     }

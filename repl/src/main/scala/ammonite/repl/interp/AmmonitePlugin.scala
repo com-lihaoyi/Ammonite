@@ -135,6 +135,7 @@ object AmmonitePlugin{
         // called `_root_`, this will still break, but that's their problem
         val rootPrefix = if(symbolList.head.isPackage) Seq("_root_") else Nil
         val tailPath = nameList.tail.map(x => Parsers.backtickWrap(x.decoded))
+
         val prefix = (rootPrefix ++ headFullPath ++ tailPath).mkString(".")
 
         /**
@@ -157,6 +158,7 @@ object AmmonitePlugin{
         } yield Option(rename).map(x => name.decoded ->  (isType, x.decoded))
 
         val renameMap = renamings.flatten.map(_.swap).toMap
+
         val info = new g.analyzer.ImportInfo(t, 0)
 
         val symNames = for {
@@ -211,6 +213,7 @@ object AmmonitePlugin{
     // they later get rendered the same-prefix imports can be collapsed
     // together v.s. having them by sent in the arbitrary-jumbled order they
     // come out of the `grouped` map in
+
     output(open.toVector.sortBy(_.prefix))
   }
 }

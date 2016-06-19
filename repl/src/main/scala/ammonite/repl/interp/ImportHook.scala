@@ -46,10 +46,14 @@ object ImportHook{
   object Http extends ImportHook{
     // import $url.{ `http://www.google.com` => foo }
     def handle(tree: ImportTree, interp: InterpreterInterface) = {
-      Res.map(tree.mappings.get.toSet){ case (k, v) =>
-        val res = scalaj.http.Http(k).asString
-        if (!res.is2xx) Res.Failure(None, "$url import failed for " + k)
-        else Res.Success(Result.Source(res.body, k, "$url"))
+      tree.mappings match{
+        case None => Res.Failure(None, "$url import failed for " + tree)
+        case Some(mappings) =>
+          Res.map(tree.mappings.get.toSet){ case (k, v) =>
+            val res = scalaj.http.Http(k).asString
+            if (!res.is2xx) Res.Failure(None, "$url import failed for " + k)
+            else Res.Success(Result.Source(res.body, k, "$url"))
+          }
       }
     }
   }

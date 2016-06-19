@@ -14,3 +14,10 @@ package $file{
 package $ivy{
   private object `_`
 }
+
+/**
+  * Package that gets filled with any web scripts people load from http URLs
+  */
+package $url{
+  private object `_`
+}

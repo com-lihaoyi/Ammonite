@@ -79,7 +79,7 @@ object Storage{
 
     def compileCacheSave(path: String, tag: String, data: CompileCache): Unit = {
       val (classFiles, imports) = data
-      val tagCacheDir = compileCacheDir/path
+      val tagCacheDir = compileCacheDir/path.replace("/", "$div").replace(":", "$colon")
       if(!exists(tagCacheDir)){
         mkdir(tagCacheDir)
         val metadata = upickle.default.write((tag, imports), indent = 4)
@@ -91,7 +91,7 @@ object Storage{
     }
 
     def compileCacheLoad(path: String, tag: String): Option[CompileCache] = {
-      val tagCacheDir = compileCacheDir/path
+      val tagCacheDir = compileCacheDir/path.replace("/", "$div").replace(":", "$colon")
       if(!exists(tagCacheDir)) None
       else for{
         metadataJson <- Try{read(tagCacheDir/metadataFile)}.toOption
