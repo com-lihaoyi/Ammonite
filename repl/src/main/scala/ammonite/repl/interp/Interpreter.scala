@@ -103,11 +103,11 @@ class Interpreter(prompt0: Ref[String],
     """
   }.mkString("\n")
 
-  val predefs = Seq[(String, Identifier, Seq[Identifier])](
-    (hardcodedPredef, "HardcodedPredef", Seq("ammonite", "predef")),
-    (predef, "Predef", Seq("ammonite", "predef")),
-    (storage.loadPredef, "LoadedPredef", Seq("ammonite", "predef")),
-    (argString, "ArgsPredef", Seq("ammonite", "predef"))
+  val predefs = Seq(
+    (hardcodedPredef, Name("HardcodedPredef")),
+    (predef, Name("Predef")),
+    (storage.loadPredef, Name("LoadedPredef")),
+    (argString, Name("ArgsPredef"))
   )
 
   // Use a var and a for-loop instead of a fold, because when running
@@ -115,7 +115,8 @@ class Interpreter(prompt0: Ref[String],
   // on `predefImports`, and we should be able to provide the "current" imports
   // to it even if it's half built
   var predefImports = Imports(Nil)
-  for( (sourceCode, wrapperName, pkgName) <- predefs) {
+  for( (sourceCode, wrapperName) <- predefs) {
+    val pkgName = Seq(Name("ammonite"), Name("predef"))
     processModule0(sourceCode, wrapperName, pkgName, predefImports) match{
       case Res.Success(imports) =>
         predefImports = predefImports ++ imports
@@ -183,14 +184,14 @@ class Interpreter(prompt0: Ref[String],
       stmts,
       eval.getCurrentLine,
       "",
-      Seq("$sess"),
-      "cmd" + eval.getCurrentLine,
+      Seq(Name("$sess")),
+      Name("cmd" + eval.getCurrentLine),
       eval.sess.frames.head.imports,
       prints => s"ammonite.repl.frontend.ReplBridge.repl.Internal.combinePrints($prints)"
     )
     out <- evaluateLine(
       processed, printer,
-      fileName, "cmd" + eval.getCurrentLine
+      fileName, Name("cmd" + eval.getCurrentLine)
     )
   } yield out
 
@@ -225,7 +226,7 @@ class Interpreter(prompt0: Ref[String],
   def evaluateLine(processed: Preprocessor.Output,
                    printer: Printer,
                    fileName: String,
-                   indexedWrapperName: Identifier): Res[Evaluated] = {
+                   indexedWrapperName: Name): Res[Evaluated] = {
 
     for{
       _ <- Catching{ case e: ThreadDeath => Evaluator.interrupted(e) }
@@ -249,9 +250,9 @@ class Interpreter(prompt0: Ref[String],
 
   def processScriptBlock(processed: Preprocessor.Output,
                          printer: Printer,
-                         wrapperName: Identifier,
+                         wrapperName: Name,
                          fileName: String,
-                         pkgName: Seq[Identifier]) = for {
+                         pkgName: Seq[Name]) = for {
     (cls, newImports) <- cachedCompileBlock(
       processed,
       printer,
@@ -266,9 +267,9 @@ class Interpreter(prompt0: Ref[String],
 
   def cachedCompileBlock(processed: Preprocessor.Output,
                          printer: Printer,
-                         wrapperName: Identifier,
+                         wrapperName: Name,
                          fileName: String,
-                         pkgName: Seq[Identifier],
+                         pkgName: Seq[Name],
                          printCode: String): Res[(Class[_], Imports)] = {
 
     Timer("cachedCompileBlock 1")
@@ -302,13 +303,13 @@ class Interpreter(prompt0: Ref[String],
     x
   }
 
-  def processModule(code: String, wrapperName: Identifier, pkgName: Seq[Identifier]) = {
+  def processModule(code: String, wrapperName: Name, pkgName: Seq[Name]) = {
     processModule0(code, wrapperName, pkgName, predefImports)
   }
 
   def processModule0(code: String,
-                     wrapperName: Identifier,
-                     pkgName: Seq[Identifier],
+                     wrapperName: Name,
+                     pkgName: Seq[Name],
                      startingImports: Imports): Res[Imports] = for{
     blocks <- Preprocessor.splitScript(Interpreter.skipSheBangLine(code))
     _ <- resolveImportHooks(blocks.flatMap(_._2))
@@ -334,8 +335,8 @@ class Interpreter(prompt0: Ref[String],
     res <- processCorrectScript(
       blocks,
       eval.sess.frames.head.imports,
-      Seq("$sess"),
-      "cmd" + eval.getCurrentLine,
+      Seq(Name("$sess")),
+      Name("cmd" + eval.getCurrentLine),
       { (processed, wrapperIndex, indexedWrapperName) =>
         evaluateLine(
           processed,
@@ -350,8 +351,8 @@ class Interpreter(prompt0: Ref[String],
 
   def processCorrectScript(blocks: Seq[(String, Seq[String])],
                            startingImports: Imports,
-                           pkgName: Seq[Identifier],
-                           wrapperName: Identifier,
+                           pkgName: Seq[Name],
+                           wrapperName: Name,
                            evaluate: Interpreter.EvaluateCallback)
                           : Res[Imports] = {
 
@@ -619,10 +620,10 @@ object Interpreter{
       code
   }
 
-  type EvaluateCallback = (Preprocessor.Output, Int, Identifier) => Res[Evaluated]
+  type EvaluateCallback = (Preprocessor.Output, Int, Name) => Res[Evaluated]
 
-  def indexWrapperName(wrapperName: Identifier, wrapperIndex: Int): Identifier = {
-    wrapperName.raw + (if (wrapperIndex == 1) "" else "_" + wrapperIndex)
+  def indexWrapperName(wrapperName: Name, wrapperIndex: Int): Name = {
+    Name(wrapperName.raw + (if (wrapperIndex == 1) "" else "_" + wrapperIndex))
   }
 
 

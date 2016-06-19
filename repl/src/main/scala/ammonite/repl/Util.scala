@@ -123,7 +123,7 @@ case class Catching(handler: PartialFunction[Throwable, Res.Failing]) {
     try Res.Success(t(())) catch handler
 }
 
-case class Evaluated(wrapper: Seq[Identifier],
+case class Evaluated(wrapper: Seq[Name],
                      imports: Imports)
 
 /**
@@ -145,7 +145,7 @@ case class Evaluated(wrapper: Seq[Identifier],
   */
 case class ImportData(fromName: String,
                       toName: String,
-                      prefix: Seq[Identifier],
+                      prefix: Seq[Name],
                       importType: ImportData.ImportType)
 
 
@@ -214,14 +214,11 @@ object Imports{
   * embedding in Scala source code, or [[encoded]] e.g. "Hello$minusWorld",
   * useful for accessing names as-seen-from the Java/JVM side of thigns
   */
-case class Identifier(raw: String){
+case class Name(raw: String){
   assert(raw.charAt(0) != '`', "Cannot create already-backticked identifiers")
   override def toString = s"Identifier($backticked)"
   def encoded = NameTransformer.encode(raw)
   def backticked = Parsers.backtickWrap(raw)
-}
-object Identifier{
-  implicit def create(s: String): Identifier = new Identifier(s)
 }
 /**
  * Encapsulates a read-write cell that can be passed around
@@ -287,16 +284,16 @@ object Ex{
 
 object Util{
 
-  def pathToPackageWrapper(path: Path, wd: Path): (Seq[Identifier], Identifier) = {
+  def pathToPackageWrapper(path: Path, wd: Path): (Seq[Name], Name) = {
     val pkg = {
       val base = Seq("$script")
       val relPath = (path/up).relativeTo(wd)
       val ups = Seq.fill(relPath.ups)("$up")
       val rest = relPath.segments
-      (base ++ ups ++ rest).map(Identifier(_))
+      (base ++ ups ++ rest).map(Name(_))
     }
-    val wrapper = scala.reflect.NameTransformer.encode(path.last.take(path.last.lastIndexOf('.')))
-    (pkg, wrapper)
+    val wrapper = path.last.take(path.last.lastIndexOf('.'))
+    (pkg, Name(wrapper))
   }
   def md5Hash(data: Iterator[Array[Byte]]) = {
     val digest = MessageDigest.getInstance("MD5")

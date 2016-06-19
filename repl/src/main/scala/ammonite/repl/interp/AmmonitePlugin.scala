@@ -1,7 +1,7 @@
 package ammonite.repl.interp
 
 
-import ammonite.repl.{ImportData, Parsers, Identifier}
+import ammonite.repl.{ImportData, Parsers, Name}
 import acyclic.file
 
 import scala.tools.nsc._
@@ -63,7 +63,7 @@ object AmmonitePlugin{
             output: Seq[ImportData] => Unit,
             topWrapperLen: => Int) = {
 
-    import g._
+
     count += 1
     def decode(t: g.Tree) = {
       val sym = t.symbol
@@ -97,7 +97,7 @@ object AmmonitePlugin{
 
     val stats = unit.body.children.last.asInstanceOf[g.ModuleDef].impl.body
     val symbols = stats.filter(x => !Option(x.symbol).exists(_.isPrivate))
-                       .foldLeft(List.empty[(Boolean, String, String, Seq[Identifier])]){
+                       .foldLeft(List.empty[(Boolean, String, String, Seq[Name])]){
       // These are all the ways we want to import names from previous
       // executions into the current one. Most are straightforward, except
       // `import` statements for which we make use of the typechecker to
@@ -130,12 +130,12 @@ object AmmonitePlugin{
         // Apart from this, all other imports should resolve either to one
         // of these cases or importing-from-an-existing import, both of which
         // should work without modification
-        val headFullPath = symbolList.head.fullName.split('.').map(x => x: Identifier)
+        val headFullPath = symbolList.head.fullName.split('.').map(Name)
         // prefix package imports with `_root_` to try and stop random
         // variables from interfering with them. If someone defines a value
         // called `_root_`, this will still break, but that's their problem
-        val rootPrefix = if(symbolList.head.isPackage) Seq("_root_": Identifier) else Nil
-        val tailPath = nameList.tail.map(_.decoded: Identifier)
+        val rootPrefix = if(symbolList.head.isPackage) Seq(Name("_root_")) else Nil
+        val tailPath = nameList.tail.map(_.decoded).map(Name)
 
         val prefix = (rootPrefix ++ headFullPath ++ tailPath)
 
@@ -223,10 +223,8 @@ object LineNumberModifier {
   def apply(g: Global)(unit: g.CompilationUnit,
                        topWrapperLen: => Int) = {
 
-    import g._
-
-    object LineNumberCorrector extends Transformer {
-      override def transform(tree: Tree) = {
+    object LineNumberCorrector extends g.Transformer {
+      override def transform(tree: g.Tree) = {
         val transformedTree = super.transform(tree)
         tree.pos match {
           case s: scala.reflect.internal.util.OffsetPosition =>
@@ -241,7 +239,7 @@ object LineNumberModifier {
         transformedTree
       }
 
-      def apply(unit: CompilationUnit) = transform(unit.body)
+      def apply(unit: g.CompilationUnit) = transform(unit.body)
     }
 
     val t = LineNumberCorrector(unit)

@@ -29,8 +29,8 @@ trait Preprocessor{
   def transform(stmts: Seq[String],
                 resultIndex: String,
                 leadingSpaces: String,
-                pkgName: Seq[Identifier],
-                indexedWrapperName: Identifier,
+                pkgName: Seq[Name],
+                indexedWrapperName: Name,
                 imports: Imports,
                 printerTemplate: String => String): Res[Preprocessor.Output]
 }
@@ -85,8 +85,8 @@ object Preprocessor{
     def transform(stmts: Seq[String],
                   resultIndex: String,
                   leadingSpaces: String,
-                  pkgName: Seq[Identifier],
-                  indexedWrapperName: Identifier,
+                  pkgName: Seq[Name],
+                  indexedWrapperName: Name,
                   imports: Imports,
                   printerTemplate: String => String) = for{
       Preprocessor.Expanded(code, printer) <- expandStatements(stmts, resultIndex)
@@ -289,8 +289,8 @@ object Preprocessor{
     res
   }
 
-  def wrapCode(pkgName: Seq[Identifier],
-               indexedWrapperName: Identifier,
+  def wrapCode(pkgName: Seq[Name],
+               indexedWrapperName: Name,
                code: String,
                printCode: String,
                imports: Imports) = {

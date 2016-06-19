@@ -28,12 +28,12 @@ trait Evaluator{
                   newImports: Imports,
                   printer: Printer,
                   fileName: String,
-                  indexedWrapperName: Identifier): Res[Evaluated]
+                  indexedWrapperName: Name): Res[Evaluated]
 
   def processScriptBlock(cls: Class[_],
                          newImports: Imports,
-                         wrapperName: Identifier,
-                         pkgName: Seq[Identifier]): Res[Evaluated]
+                         wrapperName: Name,
+                         pkgName: Seq[Name]): Res[Evaluated]
 
   def sess: Session
 
@@ -159,7 +159,7 @@ object Evaluator{
                     newImports: Imports,
                     printer: Printer,
                     fileName: String,
-                    indexedWrapperName: Identifier) = {
+                    indexedWrapperName: Name) = {
       Timer("eval.processLine compileClass end")
       for {
         cls <- loadClass("$sess." + indexedWrapperName.backticked, classFiles)
@@ -174,15 +174,15 @@ object Evaluator{
         Timer("eval.processLine evaluatorRunPrinter 1")
         evaluatorRunPrinter(iter.foreach(printer.out))
         Timer("eval.processLine evaluatorRunPrinter end")
-        evaluationResult(Seq[Identifier]("$sess", indexedWrapperName), newImports)
+        evaluationResult(Seq(Name("$sess"), indexedWrapperName), newImports)
       }
     }
 
 
     def processScriptBlock(cls: Class[_],
                            newImports: Imports,
-                           wrapperName: Identifier,
-                           pkgName: Seq[Identifier]) = for {
+                           wrapperName: Name,
+                           pkgName: Seq[Name]) = for {
       _ <- Catching{userCodeExceptionHandler}
     } yield {
       Timer("cachedCompileBlock")
@@ -198,7 +198,7 @@ object Evaluator{
       frames.head.addImports(newImports)
     }
 
-    def evaluationResult(wrapperName: Seq[Identifier],
+    def evaluationResult(wrapperName: Seq[Name],
                          imports: Imports) = {
       Evaluated(
         wrapperName,
@@ -212,9 +212,9 @@ object Evaluator{
               } else {
                 id.prefix
               }
-            val rootedPrefix: Seq[Identifier] =
+            val rootedPrefix: Seq[Name] =
               if (filledPrefix.headOption.exists(_.backticked == "_root_")) filledPrefix
-              else Seq[Identifier]("_root_") ++ filledPrefix
+              else Seq(Name("_root_")) ++ filledPrefix
 
             id.copy(prefix = rootedPrefix)
           }
