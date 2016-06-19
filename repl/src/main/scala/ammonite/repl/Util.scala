@@ -2,40 +2,53 @@ package ammonite.repl
 
 import java.security.MessageDigest
 
+import ammonite.ops._
 import acyclic.file
-import pprint.{PPrinter, PPrint}
+import fansi.Attrs
+import pprint.{PPrint, PPrinter}
 
+import scala.collection.mutable
+import scala.reflect.NameTransformer
+import scala.reflect.runtime.universe.TypeTag
 import scala.util.Try
 
 /**
- * The result of a single pass through the ammonite REPL.
- */
+  * The result of a single pass through the ammonite REPL. Results in a single
+  * [[T]], or of one of a fixed number of failures that are common for anyone
+  * who is evaluating code via the REPL.
+  */
 sealed abstract class Res[+T]{
   def flatMap[V](f: T => Res[V]): Res[V]
   def map[V](f: T => V): Res[V]
   def filter(f: T => Boolean): Res[T] = this
 }
 
-/**
- * Exception for reporting script compilation failures
- */ 
-class CompilationError(message: String) extends Exception(message)
-
-/**
- * Fake for-comprehension generator to catch errors and turn
- * them into [[Res.Failure]]s
- */
-case class Catching(handler: PartialFunction[Throwable, Res.Failing]) {
-
-  def foreach[T](t: Unit => T): T = t(())
-  def flatMap[T](t: Unit => Res[T]): Res[T] =
-    try{t(())} catch handler
-  def map[T](t: Unit => T): Res[T] =
-    try Res.Success(t(())) catch handler
-}
 
 
 object Res{
+  /**
+    * Maps a Res-returning function across a collection `M[T]`, failing fast and
+    * bailing out if any individual element fails.
+    */
+  def map[M[_] <: Traversable[_], T, V](inputs: M[T])(f: T => Res[V])
+                                       (implicit cbf: collection.generic.CanBuildFrom[_, V, M[V]])
+                                       : Res[M[V]] = {
+    val builder = cbf.apply()
+
+    inputs.foldLeft[Res[Unit]](Res.Success()){
+      case (f: Failing, _) => f
+      case (Res.Success(prev), x: T) =>
+        f(x) match{
+          case f: Failing => f
+          case Success(x) =>
+            builder += x
+            Res.Success(())
+        }
+    } match{
+      case Success(_) => Res.Success(builder.result())
+      case f: Failing => f
+    }
+  }
   def apply[T](o: Option[T], errMsg: => String) = o match{
     case Some(s) => Success(s)
     case None => Failure(None, errMsg)
@@ -68,8 +81,12 @@ object Res{
   /**
     * A known failure occured, maybe caused by an exception
     * (e.g. `ThreadDeath`) and maybe not (e.g. compile error)
+    *
+    * @param ex is any exception that caused this known failure; currently
+    *           only used for the "Interrupted!" failures caused by Ctrl-C
+    * @param msg the message we want to display on screen due to this failure
     */
-  case class Failure(ex: Option[Throwable], s: String) extends Failing
+  case class Failure(ex: Option[Throwable], msg: String) extends Failing
 
   /**
     * An unknown exception was thrown when the command was being run
@@ -88,20 +105,121 @@ object Res{
 }
 
 
-case class Evaluated(wrapper: String,
-                     imports: Seq[ImportData])
+/**
+  * Exception for reporting script compilation failures
+  */
+class CompilationError(message: String) extends Exception(message)
 
+/**
+  * Fake for-comprehension generator to catch errors and turn
+  * them into [[Res.Failure]]s
+  */
+case class Catching(handler: PartialFunction[Throwable, Res.Failing]) {
+
+  def foreach[T](t: Unit => T): T = t(())
+  def flatMap[T](t: Unit => Res[T]): Res[T] =
+    try{t(())} catch handler
+  def map[T](t: Unit => T): Res[T] =
+    try Res.Success(t(())) catch handler
+}
+
+case class Evaluated(wrapper: Seq[Name],
+                     imports: Imports)
+
+/**
+  * Represents the importing of a single name in the Ammonite REPL, of the
+  * form
+  *
+  * {{{
+  * import $prefix.{$fromName => $toName}
+  * }}}
+  *
+  * All imports are reduced to this form; `import $prefix.$name` is results in
+  * the `fromName` and `toName` being the same, while `import $prefix._` or
+  * `import $prefix.{foo, bar, baz}` are split into multiple distinct
+  * [[ImportData]] objects.
+  *
+  * Note that imports can be of one of three distinct `ImportType`s: importing
+  * a type, a term, or both. This lets us properly deal with shadowing correctly
+  * if we import the type and term of the same name from different places
+  */
 case class ImportData(fromName: String,
                       toName: String,
-                      prefix: String,
+                      prefix: Seq[Name],
                       importType: ImportData.ImportType)
+
+
 object ImportData{
-  case class ImportType(name: String)
+  sealed case class ImportType(name: String)
   val Type = ImportType("Type")
   val Term = ImportType("Term")
   val TermType = ImportType("TermType")
 }
 
+/**
+  * Represents the imports that occur before a piece of user code in the
+  * Ammonite REPL. It's basically a `Seq[ImportData]`, except we really want
+  * it to be always in a "canonical" form without shadowed/duplicate imports.
+  *
+  * Thus we only expose an `apply` method which performs this de-duplication,
+  * and a `++` operator that combines two sets of imports while performing
+  * de-duplication.
+  */
+class Imports private (val value: Seq[ImportData]){
+  def ++(others: Imports) = Imports(this.value, others.value)
+}
+
+object Imports{
+  // This isn't called directly, but we need to define it so uPickle can know
+  // how to read/write imports
+  def unapply(s: Imports): Option[Seq[ImportData]] = Some(s.value)
+  /**
+    * Constructs an `Imports` object from one or more loose sequence of imports
+    *
+    * Figures out which imports will get stomped over by future imports
+    * before they get used, and just ignore those.
+    */
+  def apply(importss: Seq[ImportData]*): Imports = {
+    // We iterate over the combined reversed imports, keeping track of the
+    // things that will-be-stomped-over-in-the-non-reversed-world in a map.
+    // If an import's target destination will get stomped over we ignore it
+    //
+    // At the end of the day we re-reverse the trimmed list and return it.
+    val importData = importss.flatten
+    val stompedTypes = mutable.Set.empty[String]
+    val stompedTerms = mutable.Set.empty[String]
+    val out = mutable.Buffer.empty[ImportData]
+    for(data <- importData.reverseIterator){
+      val stomped = data.importType match{
+        case ImportData.Term => Seq(stompedTerms)
+        case ImportData.Type => Seq(stompedTypes)
+        case ImportData.TermType => Seq(stompedTerms, stompedTypes)
+      }
+      if (!stomped.exists(_(data.toName))){
+        out.append(data)
+        stomped.foreach(_.add(data.toName))
+        data.prefix.headOption.map(_.backticked).foreach(stompedTerms.remove)
+      }
+    }
+    new Imports(out.reverse)
+  }
+}
+
+/**
+  * Represents a single identifier in Scala source code, e.g. "scala" or
+  * "println" or "`Hello-World`".
+  *
+  * Holds the value "raw", with all special characters intact, e.g.
+  * "Hello-World". Can be used [[backticked]] e.g. "`Hello-World`", useful for
+  * embedding in Scala source code, or [[encoded]] e.g. "Hello$minusWorld",
+  * useful for accessing names as-seen-from the Java/JVM side of thigns
+  */
+case class Name(raw: String){
+  assert(raw.charAt(0) != '`', "Cannot create already-backticked identifiers")
+  override def toString = s"Name($backticked)"
+  def encoded = NameTransformer.encode(raw)
+  def backticked = Parsers.backtickWrap(raw)
+}
 /**
  * Encapsulates a read-write cell that can be passed around
  */
@@ -134,7 +252,7 @@ trait Ref[T] extends StableRef[T]{
 object Ref{
   implicit def refer[T](t: T): Ref[T] = Ref(t)
   implicit def refPPrint[T: PPrint]: PPrinter[Ref[T]] = PPrinter{ (ref, cfg) =>
-    Iterator(cfg.colors.prefixColor, "Ref", cfg.colors.endColor, "(") ++
+    Iterator(cfg.colors.prefixColor("Ref").render, "(") ++
     implicitly[PPrint[T]].pprinter.render(ref(), cfg) ++
     Iterator(")")
   }
@@ -148,20 +266,7 @@ object Ref{
   }
   def apply[T](value0: T) = live(() => value0)
 }
-trait Cell[T]{
-  def apply(): T
-  def update(): Unit
-}
-object Cell{
-  class LazyHolder[T](t: => T){
-    lazy val value = t
-  }
-  def apply[T](t: => T) = new Cell[T] {
-    var inner: LazyHolder[T] = new LazyHolder(t)
-    def update() = inner = new LazyHolder(t)
-    def apply() = inner.value
-  }
-}
+
 /**
  * Nice pattern matching for chained exceptions
  */
@@ -179,14 +284,28 @@ object Ex{
 
 object Util{
 
+  def pathToPackageWrapper(path: Path, wd: Path): (Seq[Name], Name) = {
+    val pkg = {
+      val base = Seq("$file")
+      val relPath = (path/up).relativeTo(wd)
+      val ups = Seq.fill(relPath.ups)("$up")
+      val rest = relPath.segments
+      (base ++ ups ++ rest).map(Name(_))
+    }
+    val wrapper = path.last.take(path.last.lastIndexOf('.'))
+    (pkg, Name(wrapper))
+  }
   def md5Hash(data: Iterator[Array[Byte]]) = {
     val digest = MessageDigest.getInstance("MD5")
     data.foreach(digest.update)
     digest.digest()
   }
+
+  // Type aliases for common things
   type IvyMap = Map[(String, String, String, String), Set[String]]
   type ClassFiles = Traversable[(String, Array[Byte])]
-  type CompileCache = (ClassFiles, Seq[ImportData])
+  type CompileCache = (ClassFiles, Imports)
+
 
   def transpose[A](xs: List[List[A]]): List[List[A]] = {
     @scala.annotation.tailrec
@@ -216,6 +335,14 @@ object Timer{
   }
 }
 
+
+trait CodeColors{
+  def ident: fansi.Attrs
+  def `type`: fansi.Attrs
+  def literal: fansi.Attrs
+  def comment: fansi.Attrs
+  def keyword: fansi.Attrs
+}
 
 /**
  * A set of colors used to highlight the miscellanious bits of the REPL.
@@ -255,9 +382,9 @@ object Colors{
     fansi.Color.Yellow
   )
   def BlackWhite = Colors(
-    fansi.Attrs.empty, fansi.Attrs.empty, fansi.Attrs.empty, fansi.Attrs.empty,
-    fansi.Attrs.empty, fansi.Attrs.empty, fansi.Attrs.empty, fansi.Attrs.empty,
-    fansi.Attrs.empty, fansi.Attrs.empty
+    fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty,
+    fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty,
+    fansi.Attrs.Empty, fansi.Attrs.Empty
   )
 }
 
@@ -267,9 +394,14 @@ object Colors{
  */
 case class Bind[T](name: String, value: T)
                   (implicit val typeTag: scala.reflect.runtime.universe.TypeTag[T])
-
+object Bind{
+  implicit def ammoniteReplArrowBinder[T](t: (String, T))(implicit typeTag: TypeTag[T]) = {
+    Bind(t._1, t._2)(typeTag)
+  }
+}
 /**
-  * Encapsulates the ways the Ammonite REPL prints things
+  * Encapsulates the ways the Ammonite REPL prints things. Does not print
+  * a trailing newline by default; you have to add one yourself.
   *
   * @param out How you want it to print streaming fragments of stdout
   * @param warning How you want it to print a compile warning

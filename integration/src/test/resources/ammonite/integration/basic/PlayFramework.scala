@@ -1,6 +1,5 @@
 /**
-  * Single-file play framework application! Make sure everything
-  * works, as this is the test case that un-earthed #371
+  * Single-file play framework application!
   */
 load.ivy("com.typesafe.play" %% "play" % "2.5.0")
 load.ivy("com.typesafe.play" %% "play-netty-server" % "2.5.0")

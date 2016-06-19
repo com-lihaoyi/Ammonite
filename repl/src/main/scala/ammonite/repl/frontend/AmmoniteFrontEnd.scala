@@ -56,6 +56,7 @@ case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEn
       case TermState(rest, b, c, _) =>
         val (newCursor, completions, details) = compilerComplete(c, b.mkString)
         val details2 = for (d <- details) yield {
+
           Highlighter.defaultHighlight(
             d.toVector,
             colors.comment(),
@@ -90,9 +91,7 @@ case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEn
       SpecialKeys.NewLine,
       ti => ammonite.repl.Parsers.split(ti.ts.buffer.mkString).isEmpty
     ){
-      case TermState(lb ~: rest, b, c, _) =>
-
-        BasicFilters.injectNewLine(b, c, rest)
+      case TermState(rest, b, c, _) => BasicFilters.injectNewLine(b, c, rest)
     }
 
     val historyFilter = new HistoryFilter(

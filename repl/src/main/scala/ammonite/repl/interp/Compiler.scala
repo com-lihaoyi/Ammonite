@@ -2,9 +2,12 @@ package ammonite.repl
 package interp
 
 
+import java.io.OutputStream
+
 import acyclic.file
 import ammonite.repl.ImportData
 import ammonite.repl.Util.ClassFiles
+
 import scala.collection.mutable
 import scala.reflect.internal.util.Position
 import scala.reflect.io
@@ -14,7 +17,6 @@ import scala.tools.nsc.{Global, Settings}
 import scala.tools.nsc.backend.JavaPlatform
 import scala.tools.nsc.interactive.Response
 import scala.tools.nsc.plugins.Plugin
-
 import scala.tools.nsc.reporters.AbstractReporter
 import scala.tools.nsc.util.ClassPath.JavaContext
 import scala.tools.nsc.util._
@@ -55,7 +57,7 @@ object Compiler{
    * If the Option is None, it means compilation failed
    * Otherwise it's a Traversable of (filename, bytes) tuples
    */
-  type Output = Option[(Traversable[(String, Array[Byte])], Seq[ImportData])]
+  type Output = Option[(Traversable[(String, Array[Byte])], Imports)]
 
   /**
    * Converts a bunch of bytes into Scalac's weird VirtualFile class
@@ -116,6 +118,7 @@ object Compiler{
     }
 
     settings.outputDirs.setSingleOutput(vd)
+
     settings.nowarnings.value = true
     val reporter = new AbstractReporter {
       def displayPrompt(): Unit = ???
@@ -159,6 +162,9 @@ object Compiler{
         elem = scala.xml.XML.load(url.openStream())
         name = (elem \\ "plugin" \ "name").text
         className = (elem \\ "plugin" \ "classname").text
+        // Hardcode exclusion of "com.lihaoyi" %% "acyclic", since that's
+        // pretty useless and can cause problems conflicting with other plugins
+        if className != "acyclic.plugin.RuntimePlugin"
         if name.nonEmpty && className.nonEmpty
         classOpt =
           try Some(loader.loadClass(className))
@@ -248,6 +254,19 @@ object Compiler{
       }
       found
     }
+
+
+    def writeDeep(d: VirtualDirectory,
+                  path: List[String],
+                  suffix: String): OutputStream = path match {
+      case head :: Nil => d.fileNamed(path.head + suffix).output
+      case head :: rest =>
+        writeDeep(
+          d.subdirectoryNamed(head).asInstanceOf[VirtualDirectory],
+          rest, suffix
+        )
+    }
+
     /**
      * Compiles a blob of bytes and spits of a list of classfiles
       * importsLen0 is the length of topWrapper appended above code by wrappedCode function
@@ -259,6 +278,13 @@ object Compiler{
                 importsLen0: Int,
                 fileName: String): Output = {
 
+      def enumerateVdFiles(d: VirtualDirectory): Iterator[AbstractFile] = {
+        val (subs, files) = d.iterator.partition(_.isDirectory)
+        files ++ subs.map(_.asInstanceOf[VirtualDirectory]).flatMap(enumerateVdFiles)
+      }
+
+
+
       compiler.reporter.reset()
       this.errorLogger = printer.error
       this.warningLogger = printer.warning
@@ -267,28 +293,34 @@ object Compiler{
       this.importsLen = importsLen0
       val run = new compiler.Run()
       vd.clear()
+
       run.compileFiles(List(singleFile))
+
+      val outputFiles = enumerateVdFiles(vd).toVector
+
       if (reporter.hasErrors) None
-      else Some{
+      else {
+
         shutdownPressy()
 
-        val files = for{
-          x <- vd.iterator.to[collection.immutable.Traversable]
-          if x.name.endsWith(".class")
-        } yield {
-          val output = dynamicClasspath.fileNamed(x.name).output
+        val files = for(x <- outputFiles if x.name.endsWith(".class")) yield {
+          val segments = x.path.split("/").toList.tail
+          val output = writeDeep(dynamicClasspath, segments, "")
           output.write(x.toByteArray)
           output.close()
-          (x.name.stripSuffix(".class"), x.toByteArray)
+          (x.path.stripPrefix("(memory)/").stripSuffix(".class").replace('/', '.'), x.toByteArray)
         }
+
         val imports = lastImports.toList
-        (files, imports)
+        Some( (files, Imports(imports)) )
+
       }
     }
 
     def addToClasspath(classFiles: Traversable[(String, Array[Byte])]): Unit = {
+      val names = classFiles.map(_._1)
       for((name, bytes) <- classFiles){
-        val output = dynamicClasspath.fileNamed(s"$name.class").output
+        val output = writeDeep(dynamicClasspath, name.split('.').toList, ".class")
         output.write(bytes)
         output.close()
       }

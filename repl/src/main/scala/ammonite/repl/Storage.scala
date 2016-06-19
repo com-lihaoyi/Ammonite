@@ -20,14 +20,42 @@ trait Storage{
   def loadPredef: String
   val fullHistory: StableRef[History]
   val ivyCache: StableRef[IvyMap]
-  def compileCacheSave(tag: String, data: CompileCache): Unit
-  def compileCacheLoad(tag: String): Option[CompileCache]
+  def compileCacheSave(path: String, tag: String, data: CompileCache): Unit
+  def compileCacheLoad(path: String, tag: String): Option[CompileCache]
 }
 
 object Storage{
+  case class InMemory() extends Storage{
+    var predef = ""
+    def loadPredef = predef
 
-  def apply(dir: Path, predefFile: Option[Path]): Storage = new Storage{
-    val predef = predefFile.getOrElse(dir/"predef.scala")
+    var _history = new History(Vector())
+    val fullHistory = new StableRef[History]{
+      def apply() = _history
+      def update(h: History): Unit = _history = h
+    }
+
+    var _ivyCache: IvyMap = Map.empty
+    val ivyCache = new StableRef[IvyMap]{
+      def apply() = _ivyCache
+      def update(value: IvyMap): Unit = _ivyCache = value
+    }
+
+    var compileCache: mutable.Map[String, (String, CompileCache)] = mutable.Map.empty
+    def compileCacheSave(path: String, tag: String, data: CompileCache): Unit = {
+      compileCache(path) = (tag, data)
+    }
+    def compileCacheLoad(path: String, tag: String) = {
+      for {
+        (loadedTag, data) <- compileCache.get(path)
+        if loadedTag == tag
+      } yield data
+    }
+  }
+
+
+  class Folder(val dir: Path) extends Storage{
+    val predef = dir/"predef.scala"
     // Each version puts its cache in a separate folder, to bust caches
     // on every version bump; otherwise binary-incompatible changes to
     // ReplAPI/Preprocessor/ammonite-ops will cause scripts to fail after
@@ -49,12 +77,12 @@ object Storage{
       }
     }
 
-    def compileCacheSave(tag: String, data: CompileCache): Unit = {
+    def compileCacheSave(path: String, tag: String, data: CompileCache): Unit = {
       val (classFiles, imports) = data
-      val tagCacheDir = compileCacheDir/tag
+      val tagCacheDir = compileCacheDir/path.replace("/", "$div").replace(":", "$colon")
       if(!exists(tagCacheDir)){
         mkdir(tagCacheDir)
-        val metadata = upickle.default.write(imports, indent = 4)
+        val metadata = upickle.default.write((tag, imports), indent = 4)
         write(tagCacheDir/metadataFile, metadata)
         classFiles.foreach{ case (name, bytes) =>
           write(tagCacheDir/s"$name.class", bytes)
@@ -62,12 +90,15 @@ object Storage{
       }
     }
 
-    def compileCacheLoad(tag: String): Option[CompileCache] = {
-      val tagCacheDir = compileCacheDir/tag
+    def compileCacheLoad(path: String, tag: String): Option[CompileCache] = {
+      val tagCacheDir = compileCacheDir/path.replace("/", "$div").replace(":", "$colon")
       if(!exists(tagCacheDir)) None
       else for{
         metadataJson <- Try{read(tagCacheDir/metadataFile)}.toOption
-        metadata <- Try{upickle.default.read[Seq[ImportData]](metadataJson)}.toOption
+        (loadedTag, metadata) <- Try{
+          upickle.default.read[(String, Imports)](metadataJson)
+        }.toOption
+        if tag == loadedTag
         classFiles <- loadClassFiles(tagCacheDir)
       } yield {
         (classFiles, metadata)

@@ -12,9 +12,8 @@ import scala.collection.mutable
  * you feed in lines or sessions programmatically and have it execute them.
  */
 class TestRepl {
-  def predef = ""
   var allOutput = ""
-
+  def predef = ""
 
   val tempDir = ammonite.ops.Path(
     java.nio.file.Files.createTempDirectory("ammonite-tester")
@@ -30,19 +29,25 @@ class TestRepl {
     errorBuffer.append(_),
     infoBuffer.append(_)
   )
-  val interp = new Interpreter(
+  val interp = try new Interpreter(
     Ref[String](""),
     Ref(null),
     80,
     80,
-    pprint.Config.Defaults.PPrintConfig.copy(height = 15),
     Ref(Colors.BlackWhite),
     printer,
-    storage = Ref(Storage(tempDir, None)),
+    storage = new Storage.Folder(tempDir),
     new History(Vector()),
-    predef = predef,
+    predef = ammonite.repl.Main.defaultPredefString + "\n" + predef,
+    wd = ammonite.ops.cwd,
     replArgs = Seq()
-  )
+  ) catch{ case e =>
+    println(infoBuffer.mkString)
+    println(outBuffer.mkString)
+    println(warningBuffer.mkString)
+    println(errorBuffer.mkString)
+    throw e
+  }
 
   def session(sess: String): Unit = {
     // Remove the margin from the block and break
@@ -52,7 +57,7 @@ class TestRepl {
 
     val steps = sess.replace("\n" + margin, "\n").replaceAll(" *\n", "\n").split("\n\n")
 
-    for(step <- steps){
+    for((step, index) <- steps.zipWithIndex){
       // Break the step into the command lines, starting with @,
       // and the result lines
       val (cmdLines, resultLines) =
@@ -73,7 +78,7 @@ class TestRepl {
       val expected = resultLines.mkString("\n").trim
       allOutput += commandText.map("\n@ " + _).mkString("\n")
 
-      val (processed, out, warning, error, info) = run(commandText.mkString("\n"))
+      val (processed, out, warning, error, info) = run(commandText.mkString("\n"), index)
       interp.handleOutput(processed)
 
       if (expected.startsWith("error: ")) {
@@ -89,7 +94,18 @@ class TestRepl {
         assert(info.contains(strippedExpected))
 
       }else if (expected == "") {
-        assert(processed.isInstanceOf[Res.Success[_]] || processed.isInstanceOf[Res.Skip.type])
+        processed match{
+          case Res.Success(_) => // do nothing
+          case Res.Skip => // do nothing
+          case _: Res.Failing =>
+            assert{
+              identity(error)
+              identity(warning)
+              identity(out)
+              identity(info)
+              false
+            }
+        }
 
       }else {
         processed match {
@@ -116,7 +132,7 @@ class TestRepl {
             }
           case Res.Exception(ex, failureMsg) =>
             val trace = Repl.showException(
-              ex, fansi.Attrs.empty, fansi.Attrs.empty, fansi.Attrs.empty
+              ex, fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty
             ) + "\n" +  failureMsg
             assert({identity(trace); identity(expected); false})
           case _ => throw new Exception(
@@ -129,7 +145,7 @@ class TestRepl {
 
 
 
-  def run(input: String) = {
+  def run(input: String, index: Int) = {
 
     outBuffer.clear()
     warningBuffer.clear()
@@ -137,13 +153,14 @@ class TestRepl {
     infoBuffer.clear()
     val processed = interp.processLine(
       input,
-      Parsers.split(input).get.get.value
+      Parsers.split(input).get.get.value,
+      s"Main$index.scala"
     )
     processed match{
       case Res.Failure(ex, s) => printer.error(s)
       case Res.Exception(throwable, msg) =>
         printer.error(
-          Repl.showException(throwable, fansi.Attrs.empty, fansi.Attrs.empty, fansi.Attrs.empty)
+          Repl.showException(throwable, fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty)
         )
 
       case _ =>
@@ -161,7 +178,7 @@ class TestRepl {
 
   def fail(input: String,
            failureCheck: String => Boolean = _ => true) = {
-    val (processed, out, warning, error, info) = run(input)
+    val (processed, out, warning, error, info) = run(input, 0)
 
     processed match{
       case Res.Success(v) => assert({identity(v); identity(allOutput); false})
@@ -169,15 +186,16 @@ class TestRepl {
         failLoudly(assert(failureCheck(s)))
       case Res.Exception(ex, s) =>
         val msg = Repl.showException(
-          ex, fansi.Attrs.empty, fansi.Attrs.empty, fansi.Attrs.empty
+          ex, fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty
         ) + "\n" + s
         failLoudly(assert(failureCheck(msg)))
       case _ => ???
     }
   }
 
+
   def result(input: String, expected: Res[Evaluated]) = {
-    val (processed, allOut, warning, error, info) = run(input)
+    val (processed, allOut, warning, error, info) = run(input, 0)
     assert(processed == expected)
   }
   def failLoudly[T](t: => T) =

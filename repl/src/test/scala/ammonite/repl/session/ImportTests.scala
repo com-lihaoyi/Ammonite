@@ -165,7 +165,7 @@ object ImportTests extends TestSuite{
         // Make sure that you can have a term and a type of the same name
         // coming from different places and they don't stomp over each other
         // (#199) and both are accessible.
-        * - check.session("""
+        * - check.session(s"""
           @ val Foo = 1
 
           @ type Foo = Int
@@ -174,11 +174,11 @@ object ImportTests extends TestSuite{
           res2: Int = 1
 
           @ 2: Foo
-          res3: Foo = 2
+          res3: ${sessionPrefix}Foo = 2
         """)
 
         * - {
-          val pkg2 = if (scala2_10) "pkg2." else ""
+          val pkg2 = if (scala2_10) sessionPrefix + "pkg2." else ""
           check.session(s"""
             @ object pkg1{ val Order = "lolz" }
 
@@ -230,9 +230,9 @@ object ImportTests extends TestSuite{
         val prefix1 = if (scala2_10) "ammonite.repl.testcode.paulp1." else ""
         val prefix2 = if (scala2_10) "ammonite.repl.testcode.paulp2." else ""
         val prefix3 = if (scala2_10) "ammonite.repl.testcode.paulp3." else ""
-        val prefix4 = if (scala2_10) "Paulp4." else ""
-        val prefix5 = if (scala2_10) "Paulp5." else ""
-        val prefix6 = if (scala2_10) "Paulp6." else ""
+        val prefix4 = if (scala2_10) "$sess.Paulp4." else ""
+        val prefix5 = if (scala2_10) "$sess.Paulp5." else ""
+        val prefix6 = if (scala2_10) "$sess.Paulp6." else ""
         'paulp - {
 
           check.session(s"""

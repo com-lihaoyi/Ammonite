@@ -34,11 +34,16 @@ object ReadlineFilters {
   // Alt-Backspace  <- cut word
   // Ctrl-y     paste last cut
 
+  // Furthermore, Ctrl-p and Ctrl-n are used as aliases for up/down, though
+  // this is not strictly readline, it's relatively common as described in
+  // https://github.com/lihaoyi/Ammonite/issues/291
   /**
    * Basic readline-style navigation, using all the obscure alphabet 
    * hotkeys rather than using arrows
    */
   lazy val navFilter = Filter.merge(
+    simple(Ctrl('p'))((b, c, m) => BasicFilters.moveUp(b, c, m.width)),
+    simple(Ctrl('n'))((b, c, m) => BasicFilters.moveDown(b, c, m.width)),
     simple(Ctrl('b'))((b, c, m) => (b, c - 1)), // <- one char
     simple(Ctrl('f'))((b, c, m) => (b, c + 1)), // -> one char
     simple(Alt + "b")((b, c, m) => GUILikeFilters.wordLeft(b, c)), // <- one word

@@ -63,10 +63,10 @@ object Filter{
              filter: TermInfo => Boolean = _ => true)
             (action: TermState => TermAction = x => x)
             (implicit i: sourcecode.Enclosing, line: sourcecode.Line) = new Filter{
-    def op(ti: TermInfo) = if(!filter(ti)) None else {
+    def op(ti: TermInfo) = {
       prefixes.values.iterator
         .map{prefix => ti.ts.inputs.dropPrefix(prefix.map(_.toInt)) }
-        .collectFirst { case Some(rest) => action(ti.ts.copy(inputs = rest)) }
+        .collectFirst { case Some(rest) if filter(ti) => action(ti.ts.copy(inputs = rest)) }
     }
     def identifier: String = i.value + ":" + line.value
   }

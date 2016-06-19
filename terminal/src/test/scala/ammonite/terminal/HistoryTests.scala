@@ -15,7 +15,7 @@ object HistoryTests extends TestSuite{
         "abcdefg",
         "abcdefghi"
       ),
-      fansi.Attrs.empty
+      fansi.Attrs.Empty
     )
     def checker(start: String)= Checker(
       width = 50,

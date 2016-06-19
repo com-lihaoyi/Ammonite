@@ -1,6 +1,7 @@
 package ammonite.repl.session
 
 import ammonite.repl.TestRepl
+import ammonite.repl.TestUtils._
 import utest._
 
 import scala.collection.{immutable => imm}
@@ -101,18 +102,18 @@ object EvaluatorTests extends TestSuite{
       """)
     }
     'types{
-      check.session("""
+      check.session(s"""
         @ type Funky = Array[Array[String]]
         defined type Funky
 
         @ val arr: Funky = Array(Array("Hello!"))
-        arr: Funky = Array(Array("Hello!"))
+        arr: ${sessionPrefix}Funky = Array(Array("Hello!"))
 
         @ type Funky2[T] = Array[Array[T]]
         defined type Funky2
 
         @ val arr: Funky2[Int] = Array(Array(123))
-        arr: Funky2[Int] = Array(Array(123))
+        arr: ${sessionPrefix}Funky2[Int] = Array(Array(123))
       """)
     }
     'library{
@@ -129,36 +130,36 @@ object EvaluatorTests extends TestSuite{
     }
 
     'classes{
-      check.session("""
+      check.session(s"""
         @ class C{override def toString() = "Ceee"}
         defined class C
 
         @ new C
-        res1: C = Ceee
+        res1: ${sessionPrefix}C = Ceee
 
         @ case object CO
         defined object CO
 
         @ CO
-        res3: CO.type = CO
+        res3: ${sessionPrefix}CO.type = CO
 
         @ case class CC()
         defined class CC
 
         @ CC()
-        res5: CC = CC()
+        res5: ${sessionPrefix}CC = CC()
 
         @ CO
-        res6: CO.type = CO
+        res6: ${sessionPrefix}CO.type = CO
 
         @ case class CO()
         defined class CO
 
         @ CO
-        res8: CO.type = CO
+        res8: ${sessionPrefix}CO.type = CO
 
         @ CO()
-        res9: CO = CO()
+        res9: ${sessionPrefix}CO = CO()
       """)
     }
 
@@ -192,7 +193,7 @@ object EvaluatorTests extends TestSuite{
       """)
     }
     'multistatement{
-      check.session("""
+      check.session(s"""
         @ ;1; 2L; '3';
         res0_0: Int = 1
         res0_1: Long = 2L
@@ -212,7 +213,7 @@ object EvaluatorTests extends TestSuite{
         res3_2: Int = 3
 
         @ C()
-        res4: C = C(0)
+        res4: ${sessionPrefix}C = C(0)
       """)
     }
 

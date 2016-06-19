@@ -1,6 +1,6 @@
 package ammonite.repl
 
-import java.io.File
+import java.io.{File, InputStream, OutputStream}
 
 import ammonite.ops._
 
@@ -8,55 +8,214 @@ import scala.reflect.internal.annotations.compileTimeOnly
 import scala.reflect.runtime.universe.TypeTag
 import language.experimental.macros
 import reflect.macros.Context
+
+
 /**
-  * The various entry-points to the Ammonite repl
+  * Contains the various entry points to the Ammonite REPL.
+  *
+  * Configuration of the basic REPL is done by passing in arguments when
+  * constructing the [[Main]] instance, and the various entrypoints such
+  * as [[run]] [[runScript]] and so on are methods on that instance.
+  *
+  * It is more or less equivalent to the [[Repl]] object itself, and has
+  * a similar set of parameters, but does not have any of the [[Repl]]'s
+  * implementation-related code and provides a more convenient set of
+  * entry-points that a user can call.
+  *
+  * Note that the [[instantiateRepl]] function generates a new [[Repl]]
+  * every time it is called!
+  *
+  * @param predef Any additional code you want to run before the REPL session
+  *               starts. Can contain multiple blocks separated by `@`s
+  * @param defaultPredef Do you want to include the "standard" predef imports
+  *                      provided by Ammonite? These include tools like `time`,
+  *                      `grep`, the `|` `||` `|?` pipes from ammonite-ops, and
+  *                      other helpers. Can be disabled to give a clean
+  *                      namespace for you to fill using your own predef.
+  * @param storageBackend Where will all of Ammonite's persistent data get
+  *                       stored? Things like any `predef.scala` file,
+  *                       compilation/ivy caches, etc.. Defaults include
+  *                       [[Storage.Folder]] and [[Storage.InMemory]], though
+  *                       you can create your own.
+  * @param wd The working directory of the REPL; when it load scripts, where
+  *           the scripts will be considered relative to when assigning them
+  *           packages
   */
+case class Main(predef: String = "",
+                defaultPredef: Boolean = true,
+                storageBackend: Storage = new Storage.Folder(Main.defaultAmmoniteHome),
+                wd: Path = ammonite.ops.cwd,
+                welcomeBanner: Option[String] = Some(Main.defaultWelcomeBanner),
+                inputStream: InputStream = System.in,
+                outputStream: OutputStream = System.out,
+                errorStream: OutputStream = System.err){
+  /**
+    * Instantiates an ammonite.repl.Repl using the configuration
+    */
+  def instantiateRepl(replArgs: Seq[Bind[_]] = Nil) = {
+    val augmentedPredef = Main.maybeDefaultPredef(defaultPredef, Main.defaultPredefString)
+    new Repl(
+      inputStream, outputStream, errorStream,
+      storage = storageBackend,
+      predef = augmentedPredef + "\n" + predef,
+      wd = wd,
+      welcomeBanner = welcomeBanner,
+      replArgs = replArgs
+    )
+  }
+  def run(replArgs: Bind[_]*) = {
+    Timer("Repl.run Start")
+    val res = instantiateRepl(replArgs).run()
+    Timer("Repl.run End")
+    res
+  }
+
+  /**
+    * Run a Scala script file! takes the path to the file as well as an array
+    * of `args` and a map of keyword `kwargs` to pass to that file.
+    */
+  def runScript(path: Path,
+                args: Seq[String],
+                kwargs: Map[String, String]): Res[Imports] = {
+
+    val repl = instantiateRepl()
+    val (pkg, wrapper) = Util.pathToPackageWrapper(path, wd)
+    repl.interp.processModule(read(path), wrapper, pkg) match{
+      case x: Res.Failing => x
+      case Res.Success(imports) =>
+        repl.interp.init()
+        imports.value.find(_.toName == "main") match {
+          case None => Res.Success(imports)
+          case Some(i) =>
+            val quotedArgs =
+              args.map(pprint.PPrinter.escape)
+                .map(s => s"""arg("$s")""")
+
+            val quotedKwargs =
+              kwargs.mapValues(pprint.PPrinter.escape)
+                .map { case (k, s) => s"""$k=arg("$s")""" }
+            repl.interp.processExec(
+              s"""|import ammonite.repl.ScriptInit.{arg, callMain, pathRead}
+                  |callMain{
+                  |  main(${(quotedArgs ++ quotedKwargs).mkString(", ")})
+                  |}
+                  |""".stripMargin
+            ) match {
+              case Res.Success(_) => Res.Success(imports)
+              case Res.Exception(e: ArgParseException, s) =>
+                e.setStackTrace(Array())
+                e.cause.setStackTrace(e.cause.getStackTrace.takeWhile( frame =>
+                  frame.getClassName != "ammonite.repl.ScriptInit$" ||
+                  frame.getMethodName != "parseScriptArg"
+                ))
+                Res.Exception(e, s)
+              case x => x
+            }
+        }
+    }
+  }
+
+  /**
+    * Run a snippet of code
+    */
+  def runCode(code: String) = {
+    instantiateRepl().interp.replApi.load(code)
+  }
+}
+
 object Main{
-  case class Config(predef: String = "",
-                    predefFile: Option[Path] = None,
-                    code: Option[String] = None,
-                    ammoniteHome: Path = defaultAmmoniteHome,
-                    file: Option[Path] = None,
-                    args: Seq[String] = Vector.empty,
-                    kwargs: Map[String, String] = Map.empty,
-                    time: Boolean = false)
+  val defaultWelcomeBanner = {
+    def ammoniteVersion = ammonite.Constants.version
+    def scalaVersion = scala.util.Properties.versionNumberString
+    def javaVersion = System.getProperty("java.version")
+    s"""Welcome to the Ammonite Repl $ammoniteVersion
+       |(Scala $scalaVersion Java $javaVersion)""".stripMargin
+  }
+  val ignoreUselessImports = """
+    |notify => _,
+    |  wait => _,
+    |  equals => _,
+    |  asInstanceOf => _,
+    |  synchronized => _,
+    |  notifyAll => _,
+    |  isInstanceOf => _,
+    |  == => _,
+    |  != => _,
+    |  getClass => _,
+    |  ne => _,
+    |  eq => _,
+    |  ## => _,
+    |  hashCode => _,
+    |  _
+    |"""
+
+  val defaultPredefString = s"""
+    |import ammonite.repl.frontend.ReplBridge.repl
+    |import ammonite.ops.Extensions.{
+    |  $ignoreUselessImports
+    |}
+    |import ammonite.repl.tools._
+    |import ammonite.repl.tools.IvyConstructor.{ArtifactIdExt, GroupIdExt}
+    |import ammonite.repl.frontend.ReplBridge.repl.{
+    |  Internal => _,
+    |  $ignoreUselessImports
+    |}
+    |""".stripMargin
+
 
   def defaultAmmoniteHome = Path(System.getProperty("user.home"))/".ammonite"
 
   /**
     * The command-line entry point, which does all the argument parsing before
-    * delegating to [[run]]
+    * delegating to [[Main.run]]
     */
-  def main(args: Array[String]) = {
-    val parser = new scopt.OptionParser[Config]("ammonite") {
+  def main(args0: Array[String]) = {
+    var fileToExecute: Option[Path] = None
+    var codeToExecute: Option[String] = None
+    var logTimings = false
+    var ammoniteHome: Option[Path] = None
+    var passThroughArgs: Seq[String] = Vector.empty
+    var predefFile: Option[Path] = None
+    val replParser = new scopt.OptionParser[Main]("ammonite") {
+      // Primary arguments that correspond to the arguments of
+      // the `Main` configuration object
       head("ammonite", ammonite.Constants.version)
       opt[String]('p', "predef")
         .action((x, c) => c.copy(predef = x))
         .text("Any commands you want to execute at the start of the REPL session")
-      opt[String]('f', "predef-file")
-        .action((x, c) => c.copy(predefFile = Some(Path(x, cwd))))
-        .text("Lets you load your predef from a custom location")
-      opt[String]('c', "code")
-        .action((x, c) => c.copy(code = Some(x)))
-        .text("Pass in code to be run immediately in the REPL")
-      opt[Unit]('t', "time")
-        .action((_, c) => c.copy(time = true))
-        .text("Print time taken for each step")
-      opt[File]('h', "home")
-        .valueName("<file>")
-        .action((x, c) => c.copy(ammoniteHome = Path(x, cwd)))
-        .text("The home directory of the REPL; where it looks for config and caches")
+      opt[Unit]("no-default-predef")
+        .action((x, c) => c.copy(defaultPredef = false))
+        .text("Disable the default predef and run Ammonite with the minimal predef possible")
+
+      // Secondary arguments that correspond to different methods of
+      // the `Main` configuration arguments
       arg[String]("<file-args>...")
         .optional()
-        .action { (x, c) => c.copy(file = Some(Path(x, cwd))) }
+        .foreach{ x => fileToExecute = Some(Path(x, cwd)) }
         .text("The Ammonite script file you want to execute")
+      opt[String]('c', "code")
+        .foreach(x => codeToExecute = Some(x))
+        .text("Pass in code to be run immediately in the REPL")
+      opt[Unit]('t', "time")
+        .foreach(_ => logTimings = true)
+        .text("Print time taken for each step")
       arg[String]("<args>...")
         .optional()
         .unbounded()
-        .action { (x, c) => c.copy(args = c.args :+ x) }
+        .foreach{ x => passThroughArgs = passThroughArgs :+ x }
         .text("Any arguments you want to pass to the Ammonite script file")
+      opt[File]('h', "home")
+        .valueName("<file>")
+        .foreach( x => ammoniteHome = Some(Path(x, cwd)))
+        .text("The home directory of the REPL; where it looks for config and caches")
+      opt[String]('f', "predef-file")
+        .foreach(x => predefFile = Some(Path(x, cwd)))
+        .text("Lets you load your predef from a custom location")
+
     }
-    val (before, after) = args.splitAt(args.indexOf("--") match {
+
+
+    val (before, after) = args0.splitAt(passThroughArgs.indexOf("--") match {
       case -1 => Int.MaxValue
       case n => n
     })
@@ -82,101 +241,46 @@ object Main{
       (k.stripPrefix("--"), v)
     }
 
-    for(c <- parser.parse(before, Config())){
-      Timer.show = c.time
-      run(
+    for(c <- replParser.parse(before, Main())){
+      Timer.show = logTimings
+      val main = Main(
         c.predef,
-        c.ammoniteHome,
-        c.code,
-        c.predefFile,
-        c.file,
-        c.args,
-        kwargs.toMap
+        c.defaultPredef,
+        predefFile match{
+          case None => new Storage.Folder(ammoniteHome.getOrElse(defaultAmmoniteHome))
+          case Some(pf) =>
+            new Storage.Folder(ammoniteHome.getOrElse(defaultAmmoniteHome)){
+              override val predef = pf
+            }
+        }
       )
-    }
-  }
+      (fileToExecute, codeToExecute) match{
+        case (None, None) => println("Loading..."); main.run()
+        case (Some(path), None) =>
+          main.runScript(path, passThroughArgs, kwargs.toMap) match{
+            case Res.Failure(exOpt, msg) =>
+              Console.err.println(msg)
+              System.exit(1)
+            case Res.Exception(ex, s) =>
+              val trace = ex.getStackTrace
+              val i = trace.indexWhere(_.getMethodName == "$main") + 1
+              ex.setStackTrace(trace.take(i))
+              throw ex
+            case Res.Success(_) =>
+            // do nothing on success, everything's already happened
+          }
 
-  implicit def ammoniteReplArrowBinder[T](t: (String, T))(implicit typeTag: TypeTag[T]) = {
-    Bind(t._1, t._2)(typeTag)
-  }
-
-  /**
-    * The debug entry-point: embed this inside any Scala program to open up
-    * an ammonite REPL in-line with access to that program's variables for
-    * inspection.
-    */
-  def debug(replArgs: Bind[_]*): Any = {
-
-    val storage = Storage(defaultAmmoniteHome, None)
-    val repl = new Repl(
-      System.in, System.out, System.err,
-      storage = Ref(storage),
-      predef = "",
-      replArgs
-    )
-
-    repl.run()
-  }
-
-  /**
-    * The main entry-point after partial argument de-serialization.
-    */
-  def run(predef: String = "",
-          ammoniteHome: Path = defaultAmmoniteHome,
-          code: Option[String] = None,
-          predefFile: Option[Path] = None,
-          file: Option[Path] = None,
-          args: Seq[String] = Vector.empty,
-          kwargs: Map[String, String] = Map.empty) = {
-
-    Timer("Repl.run Start")
-    def storage = Storage(ammoniteHome, predefFile)
-    lazy val repl = new Repl(
-      System.in, System.out, System.err,
-      storage = Ref(storage),
-      predef = predef
-    )
-    (file, code) match{
-      case (None, None) => println("Loading..."); repl.run()
-      case (Some(path), None) => runScript(repl, path, args, kwargs)
-      case (None, Some(code)) => repl.interp.replApi.load(code)
-    }
-    Timer("Repl.run End")
-  }
-
-  def runScript(repl: Repl, path: Path, args: Seq[String], kwargs: Map[String, String]): Unit = {
-    val imports = repl.interp.processModule(read(path), path.last)
-    repl.interp.init()
-    imports.find(_.toName == "main").foreach { i =>
-      val quotedArgs =
-        args.map(pprint.PPrinter.escape)
-            .map(s => s"""arg("$s")""")
-
-      val quotedKwargs =
-        kwargs.mapValues(pprint.PPrinter.escape)
-          .map { case (k, s) => s"""$k=arg("$s")""" }
-      try{
-        repl.interp.replApi.load(s"""
-          |import ammonite.repl.ScriptInit.{arg, callMain, pathRead}
-          |callMain{
-          |main(${(quotedArgs ++ quotedKwargs).mkString(", ")})
-          |}
-        """.stripMargin)
-      }catch{
-        case e: ArgParseException =>
-          // For this semi-expected invalid-argument exception, chop off the
-          // irrelevant bits of the stack trace to reveal only the part which
-          // describes how parsing failed
-          e.setStackTrace(Array())
-          e.cause.setStackTrace(e.cause.getStackTrace.takeWhile( frame =>
-            frame.getClassName != "ammonite.repl.ScriptInit$" ||
-            frame.getMethodName != "parseScriptArg"
-          ))
-          throw e
+        case (None, Some(code)) => main.runCode(code)
       }
     }
   }
+
+  def maybeDefaultPredef(enabled: Boolean, predef: String) =
+    if (enabled) predef else ""
+
 }
+
+case class EntryConfig(file: Option[Path])
 
 case class ArgParseException(name: String,
                              value: String,

@@ -105,10 +105,11 @@ lazy val terminal = project
     name := "ammonite-terminal",
     libraryDependencies ++= Seq(
       "com.lihaoyi" %% "sourcecode" % "0.1.1",
-      "com.lihaoyi" %% "fansi" % "0.1.1"
+      "com.lihaoyi" %% "fansi" % "0.1.3"
     ),
     macroSettings
   )
+
 
 /**
  * A better Scala REPL, which can be dropped in into any project or run
@@ -129,9 +130,10 @@ lazy val repl = project
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
       "org.apache.ivy" % "ivy" % "2.4.0",
       "com.lihaoyi" %% "scalaparse" % "0.3.7",
-      "com.lihaoyi" %% "upickle" % "0.4.0",
-      "com.lihaoyi" %% "pprint" % "0.4.0",
-      "com.github.scopt" %% "scopt" % "3.4.0"
+      "com.lihaoyi" %% "upickle" % "0.4.1",
+      "com.lihaoyi" %% "pprint" % "0.4.1",
+      "com.github.scopt" %% "scopt" % "3.4.0",
+      "org.scalaj" %% "scalaj-http" % "2.3.0"
     ),
     libraryDependencies ++= (
       if (scalaVersion.value startsWith "2.10.") Nil
@@ -158,10 +160,6 @@ lazy val shell = project
     sharedSettings,
     macroSettings,
     name := "ammonite-shell",
-    libraryDependencies ++= {
-      if (!scalaVersion.value.startsWith("2.11.")) Nil
-      else Seq("com.geirsson" %% "scalafmt" % "0.2.5")
-    },
     (test in Test) <<= (test in Test).dependsOn(packageBin in Compile),
     (run in Test) <<= (run in Test).dependsOn(packageBin in Compile),
     (testOnly in Test) <<= (testOnly in Test).dependsOn(packageBin in Compile)
@@ -205,6 +203,7 @@ lazy val sshd = project
       )
   )
 
+
 lazy val readme = ScalatexReadme(
   projectId = "readme",
   wd = file(""),
@@ -213,6 +212,7 @@ lazy val readme = ScalatexReadme(
 ).settings(
   dontPublishSettings,
   scalaVersion := "2.11.8",
+  libraryDependencies += "com.lihaoyi" %% "fansi" % "0.1.3",
   (run in Compile) <<= (run in Compile).dependsOn(
     assembly in repl,
     packageBin in (shell, Compile),

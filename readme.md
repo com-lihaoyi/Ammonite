@@ -25,7 +25,11 @@ The layout of the repository is roughly:
 - `shell/` is [Ammonite-Shell](https://lihaoyi.github.io/Ammonite/#Ammonite-Shell)
 - `terminal/` is the JLine re-implementation used by Ammonite-REPL to provide syntax highlighting and multiline editing
 - `readme/` is the source code for the [Documentation](https://lihaoyi.github.io/Ammonite/#Ammonite-Ops), written in [Scalatex](https://lihaoyi.github.io/Scalatex/).
-- `modules/` is a synthetic project used for publishing, purely intended to exclude the readme
+- `published/` is a synthetic project used for publishing, excluding the readme and integration tests
+
+For more detailed information, check out the internals documentation for high-level overviews of some facets of the codebase
+
+- [Internals Documentation](https://github.com/lihaoyi/Ammonite/tree/master/internals-docs)
 
 ## Common Commands
 

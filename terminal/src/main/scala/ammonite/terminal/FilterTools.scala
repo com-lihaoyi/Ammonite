@@ -6,24 +6,6 @@ import acyclic.file
  * A collection of helpers that to simpify the common case of building filters
  */
 object FilterTools {
-  val ansiRegex = "\u001B\\[[;\\d]*."
-
-  def offsetIndex(buffer: Vector[Char], in: Int) = {
-    var splitIndex = 0
-    var length = 0
-
-    while(length < in){
-      ansiRegex.r.findPrefixOf(buffer.drop(splitIndex)) match{
-        case None =>
-          splitIndex += 1
-          length += 1
-        case Some(s) =>
-          splitIndex += s.length
-      }
-    }
-    splitIndex
-  }
-
 
   /**
    * Shorthand for pattern matching on [[TermState]]
