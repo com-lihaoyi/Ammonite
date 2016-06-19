@@ -64,7 +64,6 @@ object Preprocessor{
       case s: Parsed.Success[Seq[(String, Seq[String])]] =>
         Timer("processCorrectScript 0b")
 
-
         var offset = 0
         val blocks = mutable.Buffer[(String, Seq[String])]()
 

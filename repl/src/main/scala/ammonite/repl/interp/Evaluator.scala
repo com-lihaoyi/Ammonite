@@ -125,7 +125,6 @@ object Evaluator{
           sess.frames.head.classloader.newFileDict(name) = bytes
         }
         val names = classFiles.map(_._1)
-
         val res = Class.forName(fullName, true, sess.frames.head.classloader)
         res
       }, e => "Failed to load compiled class " + e)

@@ -114,12 +114,7 @@ class SpecialClassLoader(parent: ClassLoader, parentHash: Array[Byte])
 
         Some(defineClass(name, bytes, 0, bytes.length))
       }
-//    println("XXX")
-//    println(this.findLoadedClass(name))
-//    println(loadedFromBytes)
-//    println(special)
-//    println(super.findClass(name))
-//    println("YYY")
+
     Option(this.findLoadedClass(name))
       .orElse(loadedFromBytes)
       .orElse(special)

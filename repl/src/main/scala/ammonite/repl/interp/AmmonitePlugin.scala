@@ -159,7 +159,6 @@ object AmmonitePlugin{
         } yield Option(rename).map(x => name.decoded ->  (isType, x.decoded))
 
         val renameMap = renamings.flatten.map(_.swap).toMap
-
         val info = new g.analyzer.ImportInfo(t, 0)
 
         val symNames = for {

@@ -1,24 +1,19 @@
 package ammonite.repl.interp
 import ammonite.repl.tools.{IvyThing, Resolver, Resolvers}
 import java.io.File
-
 import ammonite.repl.Res
-
+import scala.collection.mutable
 import scala.tools.nsc.Settings
 import acyclic.file
 import fastparse.all._
 import ammonite.ops._
 import ammonite.repl.Parsers.ImportTree
 import pprint.{Config, PPrint}
-
 import annotation.tailrec
 import ammonite.repl._
 import ammonite.repl.frontend._
 
-
 import scala.reflect.io.VirtualDirectory
-
-
 
 /**
  * A convenient bundle of all the functionality necessary
@@ -198,6 +193,7 @@ class Interpreter(prompt0: Ref[String],
       fileName, "cmd" + eval.getCurrentLine
     )
   } yield out
+
 
   def withContextClassloader[T](t: => T) = {
     val oldClassloader = Thread.currentThread().getContextClassLoader
@@ -400,6 +396,7 @@ class Interpreter(prompt0: Ref[String],
             scriptImports,
             _ => "scala.Iterator[String]()"
           )
+
           ev <- evaluate(processed, wrapperIndex, indexedWrapperName)
         } yield ev
 
