@@ -286,7 +286,7 @@ object Util{
 
   def pathToPackageWrapper(path: Path, wd: Path): (Seq[Name], Name) = {
     val pkg = {
-      val base = Seq("$script")
+      val base = Seq("$file")
       val relPath = (path/up).relativeTo(wd)
       val ups = Seq.fill(relPath.ups)("$up")
       val rest = relPath.segments
