@@ -53,10 +53,8 @@
   @p
     Each of those projects is usable standalone; click on the links to jump
     straight to their docs, or scroll around and browse through the navigation
-    bar on the left.
-
-  @p
-    If you're wondering what you can do @i{with} Ammonite, there is an
+    bar on the left. If you're wondering what you can do @i{with} Ammonite,
+    there is an
 
   @ul
     @li
@@ -72,10 +70,8 @@
       @sect.ref{In the Wild}
 
   @p
-    To see what people are doing with it.
-
-  @p
-    For a video overview of the project and it's motivation, check out this talk:
+    To see what people are doing with it. For a video overview of the project
+    and it's motivation, check out this talk:
 
   @iframe(
     src := "https://player.vimeo.com/video/148552858",

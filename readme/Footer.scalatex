@@ -51,6 +51,9 @@
         "http://yeghishe.github.io/2016/06/05/ammonite-modules.html") project
         that tries to assemble common "modules" to be loaded into the Ammonite
         REPL
+      @li
+        @lnk("Jupyter-Scala", "https://github.com/alexarchambault/jupyter-scala"),
+        by Alex Archambault, uses a fork of Ammonite as its Jupyter kernel
 
   @sect{Scaladoc}
     @p
