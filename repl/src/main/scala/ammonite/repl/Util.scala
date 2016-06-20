@@ -167,6 +167,7 @@ object ImportData{
   */
 class Imports private (val value: Seq[ImportData]){
   def ++(others: Imports) = Imports(this.value, others.value)
+  override def toString() = s"Imports(${value.toString})"
 }
 
 object Imports{

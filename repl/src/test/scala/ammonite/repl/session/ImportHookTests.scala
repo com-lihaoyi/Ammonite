@@ -87,9 +87,10 @@ object ImportHookTests extends TestSuite{
           @ import $$url.`$scriptUrl`
           error: $$url import failed
 
-          @ import $$url.{`$scriptUrl` => remote}; remote.product(1, List(2, 3, 4))
-          import $$url.{`$scriptUrl` => remote};
-          res0_1: Int = 24
+          @ import $$url.{`$scriptUrl` => remote}; val x = remote.product(1, List(2, 3, 4))
+
+          @ x
+          res1: Int = 24
         """)
       }
     }

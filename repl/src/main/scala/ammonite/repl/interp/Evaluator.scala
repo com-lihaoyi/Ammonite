@@ -73,7 +73,7 @@ object Evaluator{
       new Frame(
         special,
         special,
-        Imports(Nil),
+        Imports(),
         Seq()
       )
     }

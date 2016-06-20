@@ -3,6 +3,7 @@ package ammonite.repl
 import java.io.{File, InputStream, OutputStream}
 
 import ammonite.ops._
+import ammonite.repl.interp.ImportHook
 
 import scala.reflect.internal.annotations.compileTimeOnly
 import scala.reflect.runtime.universe.TypeTag
@@ -80,7 +81,7 @@ case class Main(predef: String = "",
 
     val repl = instantiateRepl()
     val (pkg, wrapper) = Util.pathToPackageWrapper(path, wd)
-    repl.interp.processModule(read(path), wrapper, pkg) match{
+    repl.interp.processModule(ImportHook.Source.File(path), read(path), wrapper, pkg) match{
       case x: Res.Failing => x
       case Res.Success(imports) =>
         repl.interp.init()

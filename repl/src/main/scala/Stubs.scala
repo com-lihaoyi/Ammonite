@@ -21,3 +21,10 @@ package $ivy{
 package $url{
   private object `_`
 }
+
+/**
+  * Package to import from when you don't want to import anything
+  */
+package $stub{
+  private object `_`
+}

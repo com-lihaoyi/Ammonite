@@ -114,10 +114,10 @@ class Interpreter(prompt0: Ref[String],
   // `processModule0` user code may end up calling `processModule` which depends
   // on `predefImports`, and we should be able to provide the "current" imports
   // to it even if it's half built
-  var predefImports = Imports(Nil)
+  var predefImports = Imports()
   for( (sourceCode, wrapperName) <- predefs) {
     val pkgName = Seq(Name("ammonite"), Name("predef"))
-    processModule0(sourceCode, wrapperName, pkgName, predefImports) match{
+    processModule0(ImportHook.Source.File(wd/"<console>"), sourceCode, wrapperName, pkgName, predefImports) match{
       case Res.Success(imports) =>
         predefImports = predefImports ++ imports
       case Res.Failure(ex, msg) =>
@@ -142,7 +142,7 @@ class Interpreter(prompt0: Ref[String],
     "ivy" -> ImportHook.Ivy
   ))
 
-  def resolveImportHooks(stmts: Seq[String]): Res[(Imports, Seq[String])] = {
+  def resolveImportHooks(source: ImportHook.Source, stmts: Seq[String]): Res[(Imports, Seq[String])] = {
     val hookedStmts = mutable.Buffer.empty[String]
     val importTrees = mutable.Buffer.empty[ImportTree]
     for(stmt <- stmts) {
@@ -152,10 +152,9 @@ class Interpreter(prompt0: Ref[String],
           var currentStmt = stmt
           for(importTree <- parsedTrees){
             if (importTree.prefix(0)(0) == '$') {
+              val length = importTree.end - importTree.start
               currentStmt = currentStmt.patch(
-                importTree.start,
-                "scala._".padTo(importTree.end - importTree.start, ' '),
-                importTree.end
+                importTree.start, "$stub._".padTo(length, ' '), length
               )
               importTrees.append(importTree)
             }
@@ -168,20 +167,23 @@ class Interpreter(prompt0: Ref[String],
       hookImports <- Res.map(importTrees){ tree =>
         val hook = importHooks()(tree.prefix.head.stripPrefix("$"))
         for{
-          hooked <- hook.handle(tree.copy(prefix = tree.prefix.drop(1)), this)
+          hooked <- hook.handle(source, tree.copy(prefix = tree.prefix.drop(1)), this)
           hookResults <- Res.map(hooked){
             case res: ImportHook.Result.Source =>
-              processModule(res.code, res.wrapper, res.pkg)
-              Res.Success(Imports(Nil))
+              processModule(res.source, res.code, res.wrapper, res.pkg).map(_ => res.imports)
+
             case res: ImportHook.Result.ClassPath =>
               eval.sess.frames.head.addClasspath(Seq(res.file.toIO))
               evalClassloader.add(res.file.toIO.toURI.toURL)
               init()
-              Res.Success(Imports(Nil))
+              Res.Success(Imports())
           }
         } yield hookResults
       }
-    } yield (Imports(hookImports.flatten.flatMap(_.value)), stmts)
+    } yield {
+      val imports = Imports(hookImports.flatten.flatMap(_.value))
+      (imports, hookedStmts)
+    }
   }
 
   def processLine(code: String, stmts: Seq[String], fileName: String): Res[Evaluated] = for{
@@ -189,8 +191,7 @@ class Interpreter(prompt0: Ref[String],
       Res.Exception(ex, "Something unexpected went wrong =(")
     }
 
-    (hookImports, hookedStmts) <- resolveImportHooks(stmts)
-
+    (hookImports, hookedStmts) <- resolveImportHooks(ImportHook.Source.File(wd/"<console>"), stmts)
     processed <- preprocess.transform(
       hookedStmts,
       eval.getCurrentLine,
@@ -205,7 +206,7 @@ class Interpreter(prompt0: Ref[String],
       processed, printer,
       fileName, Name("cmd" + eval.getCurrentLine)
     )
-  } yield out
+  } yield out.copy(imports = out.imports ++ hookImports)
 
 
   def withContextClassloader[T](t: => T) = {
@@ -313,21 +314,23 @@ class Interpreter(prompt0: Ref[String],
     } yield (cls, newImports)
   }
 
-  def processModule(code: String, wrapperName: Name, pkgName: Seq[Name]) = {
-    processModule0(code, wrapperName, pkgName, predefImports)
+  def processModule(source: ImportHook.Source, code: String, wrapperName: Name, pkgName: Seq[Name]) = {
+
+    processModule0(source, code, wrapperName, pkgName, predefImports)
   }
 
-  def preprocessScript(code: String) = for{
+  def preprocessScript(source: ImportHook.Source, code: String) = for{
     blocks <- Preprocessor.splitScript(Interpreter.skipSheBangLine(code))
-    hooked <- Res.map(blocks){case (prelude, stmts) => resolveImportHooks(stmts) }
+    hooked <- Res.map(blocks){case (prelude, stmts) => resolveImportHooks(source, stmts) }
     (hookImports, hookBlocks) = hooked.unzip
   } yield (blocks.map(_._1).zip(hookBlocks), Imports(hookImports.flatMap(_.value)))
 
-  def processModule0(code: String,
+  def processModule0(source: ImportHook.Source,
+                     code: String,
                      wrapperName: Name,
                      pkgName: Seq[Name],
                      startingImports: Imports): Res[Imports] = for{
-    (processedBlocks, hookImports) <- preprocessScript(code)
+    (processedBlocks, hookImports) <- preprocessScript(source, code)
     res <- processCorrectScript(
       processedBlocks,
       startingImports ++ hookImports,
@@ -342,10 +345,10 @@ class Interpreter(prompt0: Ref[String],
           )
         )
     )
-  } yield res
+  } yield res ++ hookImports
 
   def processExec(code: String): Res[Imports] = for {
-    (processedBlocks, hookImports) <- preprocessScript(code)
+    (processedBlocks, hookImports) <- preprocessScript(ImportHook.Source.File(wd/"<console>"), code)
     res <- processCorrectScript(
       processedBlocks,
       eval.sess.frames.head.imports ++ hookImports,
@@ -360,7 +363,7 @@ class Interpreter(prompt0: Ref[String],
         )
       }
     )
-  } yield res
+  } yield res ++ hookImports
 
 
   def processCorrectScript(blocks: Seq[(String, Seq[String])],
@@ -394,7 +397,7 @@ class Interpreter(prompt0: Ref[String],
       } else {
         Timer("processScript loop 0")
         // imports from scripts loaded from this script block will end up in this buffer
-        var nestedScriptImports = Imports(Nil)
+        var nestedScriptImports = Imports()
         scriptImportCallback = { imports =>
           nestedScriptImports = nestedScriptImports ++ imports
         }
@@ -427,7 +430,7 @@ class Interpreter(prompt0: Ref[String],
     }
     // wrapperIndex starts off as 1, so that consecutive wrappers can be named
     // Wrapper, Wrapper2, Wrapper3, Wrapper4, ...
-    try loop(blocks, startingImports, Imports(Nil), wrapperIndex = 1 )
+    try loop(blocks, startingImports, Imports(), wrapperIndex = 1 )
     finally scriptImportCallback = outerScriptImportCallback
   }
 
@@ -516,7 +519,7 @@ class Interpreter(prompt0: Ref[String],
 
       def module(file: Path): Unit = {
         val (pkg, wrapper) = Util.pathToPackageWrapper(file, wd)
-        processModule(read(file), wrapper, pkg) match{
+        processModule(ImportHook.Source.File(wd/"<console>"), read(file), wrapper, pkg) match{
           case Res.Failure(ex, s) => throw new CompilationError(s)
           case Res.Exception(t, s) => throw t
           case x => //println(x)

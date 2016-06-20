@@ -1,3 +1,3 @@
-import $file.repl.src.test.resources.importHooks.Basic
+import $file.Basic
 
 val fileImportVal = Basic.basicValue + 1
