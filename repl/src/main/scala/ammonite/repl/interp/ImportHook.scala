@@ -10,6 +10,13 @@ import ammonite.repl._
 import scala.annotation.tailrec
 
 
+/**
+  * An extensible hook into the Ammonite REPL's import system; allows the end
+  * user to hook into `import $foo.bar.{baz, qux => qua}` syntax, and in
+  * response load jars or process source files before the "current" compilation
+  * unit is run. Can be used to load script files, ivy dependencies, jars, or
+  * files from the web.
+  */
 trait ImportHook{
   def handle(source: ImportHook.Source,
              tree: ImportTree,
@@ -18,6 +25,11 @@ trait ImportHook{
 
 object ImportHook{
 
+  /**
+    * The minimal interface that is exposed to the import hooks from the
+    * Interpreter. Open for extension, if someone needs more stuff, but by
+    * default this is what is available.
+    */
   trait InterpreterInterface{
     def wd: Path
     def loadIvy(coordinates: (String, String, String), verbose: Boolean = true): Set[File]
