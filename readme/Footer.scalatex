@@ -31,6 +31,10 @@
         @lnk("Beyond Bash: shell scripting in a typed, OO language",
         "https://www.youtube.com/watch?v=dP5tkmWAhjg"), at Scala by the Bay
         2015. @lnk("Slides", "https://tinyurl.com/beyondbash")
+      @li
+        Maxim Novak gave a talk @lnk("Rock solid shell-scripting with Ammonite",
+        "http://www.slideshare.net/maximnovak/rocksolid-shell-scripting-with-ammonite")
+        at Scalapeno 2016 in Tel Aviv.
 
   @sect{In the Wild}
     @ul
@@ -54,6 +58,17 @@
       @li
         @lnk("Jupyter-Scala", "https://github.com/alexarchambault/jupyter-scala"),
         by Alex Archambault, uses a fork of Ammonite as its Jupyter kernel
+      @li
+        The @lnk("DynaML", "http://mandar2812.github.io/DynaML/#documentation")
+        Machine-Learning REPL uses Ammonite as it's REPL
+      @li
+        The @lnk("Shapeless", "https://github.com/milessabin/shapeless") project
+        has a @lnk("try-shapeless.sh", "https://github.com/milessabin/shapeless#try-shapeless-with-an-ammonite-instant-repl")
+        instant-REPL built using Ammonite
+      @li
+        Seems Twitter @lnk("now uses Ammonite",
+        "https://twitter.com/bd/status/724297737525596160") within their
+        monorepo (monorepi?) codebase
 
   @sect{Scaladoc}
     @p
