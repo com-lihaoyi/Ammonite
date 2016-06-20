@@ -154,18 +154,45 @@ object ImportHookTests extends TestSuite{
         @ FileImport.fileImportVal
         res1: Int = 31338
        """)
+
       'indirectFile - check.session("""
         @ import $file.repl.src.test.resources.importHooks.IndirectFileImport
 
         @ IndirectFileImport.indirectFileImportVal
         res1: Int = 31339
        """)
+
       'ivy - check.session("""
         @ import $file.repl.src.test.resources.importHooks.IvyImport
 
         @ IvyImport.rendered
         res1: String = "<div>Moo</div>"
        """)
+
+      'deepImport - check.session("""
+        @ import $file.repl.src.test.resources.importHooks.DeepImport.deepValueImported
+
+        @ deepValueImported
+        res1: String = "deeeep"
+      """)
+      'deepImportRenamed - check.session("""
+        @ import $file.repl.src.test.resources.importHooks.DeepRenamedOne.deepValueImported
+
+        @ deepValueImported
+        res1: String = "deeeep"
+      """)
+      'deepImportRenamedTwo - check.session("""
+        @ import $file.repl.src.test.resources.importHooks.DeepRenamedTwo.deepValueImported
+
+        @ deepValueImported
+        res1: String = "deeeep"
+      """)
+      'deepImportRenamedTwo - check.session("""
+        @ import $file.repl.src.test.resources.importHooks.DeepRenamedThree.deepValueImported
+
+        @ deepValueImported
+        res1: String = "deeeep"
+      """)
     }
   }
 }
