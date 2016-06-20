@@ -28,12 +28,14 @@ object ImportHookTests extends TestSuite{
           @ basicValue
           res1: Int = 31337
         """)
+
         'partiallyQualified - check.session("""
           @ import $file.repl.src.test.resources.importHooks.Basic
 
           @ Basic.basicValue
           res1: Int = 31337
         """)
+
         'multiImport - check.session("""
           @ import $file.repl.src.test.resources.importHooks.{Basic, BasicTwo}
 
@@ -52,6 +54,19 @@ object ImportHookTests extends TestSuite{
 
           @ BasicToo.basicValueTwo
           res2: Int = 1337
+        """)
+
+        'deep - check.session("""
+          @ import $file.repl.src.test.resources.importHooks.Deep.DeepObject.DeepInner.deepValue
+
+          @ deepValue
+          res1: Int = "deeeep"
+
+          @ DeepObject
+          error: not found: value DeepObject
+
+          @ DeepInner
+          error: not found: value DeepInner
         """)
       }
       'ivy{

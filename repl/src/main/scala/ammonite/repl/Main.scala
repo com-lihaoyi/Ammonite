@@ -81,7 +81,13 @@ case class Main(predef: String = "",
 
     val repl = instantiateRepl()
     val (pkg, wrapper) = Util.pathToPackageWrapper(path, wd)
-    repl.interp.processModule(ImportHook.Source.File(path), read(path), wrapper, pkg) match{
+    repl.interp.processModule(
+      ImportHook.Source.File(path),
+      read(path),
+      wrapper,
+      pkg,
+      autoImport = true
+    ) match{
       case x: Res.Failing => x
       case Res.Success(imports) =>
         repl.interp.init()

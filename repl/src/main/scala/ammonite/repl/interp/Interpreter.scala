@@ -118,11 +118,12 @@ class Interpreter(prompt0: Ref[String],
   for( (sourceCode, wrapperName) <- predefs) {
     val pkgName = Seq(Name("ammonite"), Name("predef"))
     processModule0(
-      ImportHook.Source.File(wd/"<console>"),
+      ImportHook.Source.File(wd/"Main.scala"),
       sourceCode,
       wrapperName,
       pkgName,
-      predefImports
+      predefImports,
+      autoImport = true
     ) match{
       case Res.Success(imports) =>
         predefImports = predefImports ++ imports
@@ -177,8 +178,9 @@ class Interpreter(prompt0: Ref[String],
           hooked <- hook.handle(source, tree.copy(prefix = tree.prefix.drop(1)), this)
           hookResults <- Res.map(hooked){
             case res: ImportHook.Result.Source =>
-              processModule(res.source, res.code, res.wrapper, res.pkg).map(_ => res.imports)
-
+              for{
+                _ <- processModule(res.source, res.code, res.wrapper, res.pkg, autoImport = false)
+              } yield res.imports
             case res: ImportHook.Result.ClassPath =>
               eval.sess.frames.head.addClasspath(Seq(res.file.toIO))
               evalClassloader.add(res.file.toIO.toURI.toURL)
@@ -198,7 +200,9 @@ class Interpreter(prompt0: Ref[String],
       Res.Exception(ex, "Something unexpected went wrong =(")
     }
 
-    (hookImports, hookedStmts) <- resolveImportHooks(ImportHook.Source.File(wd/"<console>"), stmts)
+    (hookImports, hookedStmts) <- resolveImportHooks(
+      ImportHook.Source.File(wd/"Main.scala"), stmts
+    )
     processed <- preprocess.transform(
       hookedStmts,
       eval.getCurrentLine,
@@ -321,9 +325,13 @@ class Interpreter(prompt0: Ref[String],
     } yield (cls, newImports)
   }
 
-  def processModule(source: ImportHook.Source, code: String, wrapperName: Name, pkgName: Seq[Name]) = {
+  def processModule(source: ImportHook.Source,
+                    code: String,
+                    wrapperName: Name,
+                    pkgName: Seq[Name],
+                    autoImport: Boolean) = {
 
-    processModule0(source, code, wrapperName, pkgName, predefImports)
+    processModule0(source, code, wrapperName, pkgName, predefImports, autoImport)
   }
 
   def preprocessScript(source: ImportHook.Source, code: String) = for{
@@ -336,7 +344,8 @@ class Interpreter(prompt0: Ref[String],
                      code: String,
                      wrapperName: Name,
                      pkgName: Seq[Name],
-                     startingImports: Imports): Res[Imports] = for{
+                     startingImports: Imports,
+                     autoImport: Boolean): Res[Imports] = for{
     (processedBlocks, hookImports) <- preprocessScript(source, code)
     res <- processCorrectScript(
       processedBlocks,
@@ -350,13 +359,14 @@ class Interpreter(prompt0: Ref[String],
             Interpreter.indexWrapperName(wrapperName, wrapperIndex),
             wrapperName.raw + ".scala", pkgName
           )
-        )
+        ),
+      autoImport
     )
   } yield res ++ hookImports
 
   def processExec(code: String): Res[Imports] = for {
     (processedBlocks, hookImports) <- preprocessScript(
-      ImportHook.Source.File(wd/"<console>"), code
+      ImportHook.Source.File(wd/"Main.scala"), code
     )
     res <- processCorrectScript(
       processedBlocks,
@@ -370,7 +380,8 @@ class Interpreter(prompt0: Ref[String],
           s"Main$wrapperIndex.scala",
           indexedWrapperName
         )
-      }
+      },
+      autoImport = true
     )
   } yield res ++ hookImports
 
@@ -379,7 +390,9 @@ class Interpreter(prompt0: Ref[String],
                            startingImports: Imports,
                            pkgName: Seq[Name],
                            wrapperName: Name,
-                           evaluate: Interpreter.EvaluateCallback)
+                           evaluate: Interpreter.EvaluateCallback,
+                           autoImport: Boolean
+                          )
                           : Res[Imports] = {
 
     Timer("processCorrectScript 1")
@@ -401,7 +414,7 @@ class Interpreter(prompt0: Ref[String],
       if (blocks.isEmpty) {
         // No more blocks
         // if we have imports to pass to the upper layer we do that
-        outerScriptImportCallback(lastImports)
+        if (autoImport) outerScriptImportCallback(lastImports)
         Res.Success(lastImports)
       } else {
         Timer("processScript loop 0")
@@ -528,7 +541,13 @@ class Interpreter(prompt0: Ref[String],
 
       def module(file: Path): Unit = {
         val (pkg, wrapper) = Util.pathToPackageWrapper(file, wd)
-        processModule(ImportHook.Source.File(wd/"<console>"), read(file), wrapper, pkg) match{
+        processModule(
+          ImportHook.Source.File(wd/"Main.scala"),
+          read(file),
+          wrapper,
+          pkg,
+          true
+        ) match{
           case Res.Failure(ex, s) => throw new CompilationError(s)
           case Res.Exception(t, s) => throw t
           case x => //println(x)

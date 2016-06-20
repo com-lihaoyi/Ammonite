@@ -67,17 +67,43 @@ object ImportHook{
             .reduce(_/_)
 
       source match{
-        case Source.File(path) =>
+        case Source.File(currentScriptPath) =>
+
+          /**
+            * # console
+            * import $file.foo.bar.Baz
+            *
+            * # foo/bar/Baz.scala
+            * import $file.zod.Quz
+            *
+            *
+            * # generated
+            * import $file.foo.bar.zod.Qux
+            *
+            *
+            *
+            * # console
+            * import $file.foo.bar.Baz
+            *
+            * # foo/bar/Baz.scala
+            * import $file.$up.Qux
+            *
+            * # generated
+            * import $file.foo.Qux
+            */
+
           /**
             * Tail-recursively attempt to resolve this `tree: ImportTree` into
             * a series of files, or a series of paths it cannot resolve.
             */
           @tailrec def find(targetScript: Path,
                             importSegments: Seq[String])
-                           : Either[Seq[String], Seq[(Path, String)]] = {
+                           : Either[Seq[String], Seq[(Path, String, Seq[String])]] = {
+
             val possibleScriptPath = targetScript/up/s"${targetScript.last}.scala"
-            if (exists! possibleScriptPath) Right(Seq(possibleScriptPath -> targetScript.last))
-            else importSegments match {
+            if (exists! possibleScriptPath) {
+              Right(Seq((possibleScriptPath, targetScript.last, importSegments)))
+            } else importSegments match {
               case Seq(first, rest@_*) => find(targetScript/first, rest)
               case Seq() =>
                 tree.mappings match {
@@ -89,26 +115,46 @@ object ImportHook{
                     if (missing.nonEmpty) {
                       Left(missing.map{case (k, v) => (tree.prefix :+ k).mkString(".")})
                     } else {
-                      Right(matched.map{case (k, v) => (targetScript/s"$k.scala", v.getOrElse(k))})
+                      Right(matched.map{
+                        case (k, v) => (targetScript/s"$k.scala", v.getOrElse(k), importSegments)
+                      })
                     }
 
                 }
             }
           }
 
-          find(path/up/relative.copy(segments = Vector()), relative.segments) match {
+//          val (existingPkg, existingWrapper) = Util.pathToPackageWrapper(
+//            currentScriptPath, interp.wd
+//          )
+
+          find(currentScriptPath/up/relative.copy(segments = Vector()), relative.segments) match {
             case Left(failures) => Res.Failure(None, "Cannot resolve import " + failures)
             case Right(files) =>
               Res.Success(
-                for((path, name) <- files) yield {
+                for((path, name, remaining) <- files) yield {
                   val (pkg, wrapper) = Util.pathToPackageWrapper(path, interp.wd)
-                  val importData = ImportData(wrapper.raw, name, pkg, ImportData.TermType)
+                  val pkgPrefix = pkg.map(_.raw) ++ (relative.segments :+ name.stripSuffix(".scala")).takeRight(remaining.length)
+                  val importData = tree.mappings match{
+                    case None =>
+                      Seq(ImportData(
+                        tree.prefix.last, tree.prefix.last,
+                        pkgPrefix.map(Name), ImportData.TermType
+                      ))
+
+                    case Some(mappings) =>
+                      for((k, v) <- mappings) yield ImportData(
+                        k, v.getOrElse(k),
+                        pkgPrefix.map(Name), ImportData.TermType
+                      )
+                  }
+
                   Result.Source(
                     read(path),
                     wrapper,
                     pkg,
                     ImportHook.Source.File(path),
-                    Imports(Seq(importData))
+                    Imports(importData)
                   )
                 }
               )
