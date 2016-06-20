@@ -2,8 +2,8 @@
 
 import ammonite.ops._
 println("Script starts!!")
-val scriptDir = cwd/'integration/'src/'test/'resources/'ammonite/'integration/'scriptLevelCaching
-load.module(scriptDir/"scriptToBeLoaded.scala")
+val scriptDir = 'integration/'src/'test/'resources/'ammonite/'integration/'scriptLevelCaching
+load.module(Path("/home/abhishek/Amm_Master")/scriptDir)
 
 @
 

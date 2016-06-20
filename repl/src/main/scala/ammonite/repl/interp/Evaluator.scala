@@ -120,11 +120,14 @@ object Evaluator{
 
 
     def loadClass(fullName: String, classFiles: ClassFiles): Res[Class[_]] = {
+      println("FullNmae ==> " + fullName)
       Res[Class[_]](Try {
         for ((name, bytes) <- classFiles) {
           sess.frames.head.classloader.newFileDict(name) = bytes
         }
+        println("sess => " + sess.frames.head.classloader.newFileDict)
         val names = classFiles.map(_._1)
+        println("Names =>" + names +" ||")
         val res = Class.forName(fullName, true, sess.frames.head.classloader)
         res
       }, e => "Failed to load compiled class " + e)

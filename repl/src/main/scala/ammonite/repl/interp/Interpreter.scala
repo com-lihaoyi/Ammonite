@@ -13,7 +13,10 @@ import ammonite.repl.Parsers.ImportTree
 
 import annotation.tailrec
 import ammonite.repl._
+import fastparse.all._
 import ammonite.repl.frontend._
+import pprint.{Config, PPrinter, PPrint}
+
 import Util._
 import ammonite.terminal.Filter
 
@@ -33,7 +36,7 @@ class Interpreter(prompt0: Ref[String],
                   storage: Storage,
                   history: => History,
                   predef: String,
-                  wd: Path,
+                  val wd: Path,
                   replArgs: Seq[Bind[_]],
                   withCompiler: Boolean = true)
   extends ImportHook.InterpreterInterface{ interp =>
@@ -130,7 +133,8 @@ class Interpreter(prompt0: Ref[String],
       // If withCompiler flag is false load predefs from cache without using compiler
       withCompiler match {
         case true =>
-          processModule0(sourceCode, wrapperName, pkgName, predefImports) match {
+          println("GOOOD")
+          processModule0(ImportHook.Source.File(wd/"<console>"), sourceCode, Name(wrapperName), pkgName.split(".").map(Name(_)), predefImports) match {
             case Res.Success(data) =>
               predefImports = predefImports ++ data._1
             case Res.Failure(ex, msg) =>
@@ -232,9 +236,9 @@ class Interpreter(prompt0: Ref[String],
       processed, printer,
       fileName, Name("cmd" + eval.getCurrentLine)
     )
-    } yield out.copy(imports = out.imports ++ hookImports)
+    } yield out._1.copy(imports = out._1.imports ++ hookImports)
 
-    resV.map(_._1)
+    resV
   }
 
 
@@ -269,7 +273,7 @@ class Interpreter(prompt0: Ref[String],
   def evaluateLine(processed: Preprocessor.Output,
                    printer: Printer,
                    fileName: String,
-                   indexedWrapperName: String): Res[(Evaluated, String)] = for{
+                   indexedWrapperName: Name): Res[(Evaluated, String)] = for{
 
       _ <- Catching{ case e: ThreadDeath => Evaluator.interrupted(e) }
       (classFiles, newImports) <- compileClass(
@@ -295,7 +299,7 @@ class Interpreter(prompt0: Ref[String],
                          printer: Printer,
                          wrapperName: Name,
                          fileName: String,
-                         pkgName: String) = for {
+                         pkgName: Seq[Name]) = for {
       (cls, newImports, tag) <- cachedCompileBlock(
         processed,
         printer,
@@ -312,7 +316,7 @@ class Interpreter(prompt0: Ref[String],
                          printer: Printer,
                          wrapperName: Name,
                          fileName: String,
-                         pkgName: String,
+                         pkgName: Seq[Name],
                          printCode: String): Res[(Class[_], Imports, String)] = {
 
 
@@ -343,8 +347,6 @@ class Interpreter(prompt0: Ref[String],
       _ = Timer("cachedCompileBlock 4")
       cls <- eval.loadClass(fullyQualifiedName, classFiles)
     } yield (cls, newImports, tag)
-
-    x
 
   }
 
@@ -404,13 +406,13 @@ class Interpreter(prompt0: Ref[String],
 
   def processCorrectScript(blocks: Seq[(String, Seq[String])],
                            startingImports: Imports,
-                           pkgName: String,
-                           wrapperName: String,
+                           pkgName: Seq[Name],
+                           wrapperName: Name,
                            evaluate: Interpreter.EvaluateCallback,
                            preprocess: Preprocessor = Preprocessor(compiler.parse))
                           : Res[(Imports, List[CacheDetails])] = {
 
-
+      println("AAAAAAAAAAAAAAAAAAAA")
     Timer("processCorrectScript 1")
     // we store the old value, because we will reassign this in the loop
     val outerScriptImportCallback = scriptImportCallback
@@ -466,7 +468,7 @@ class Interpreter(prompt0: Ref[String],
               scriptImports ++ last,
               last,
               wrapperIndex + 1,
-              (ev.wrapper, tag) :: compiledData)
+              (ev.wrapper.map(_.backticked).mkString("."), tag) :: compiledData)
           case Res.Skip => loop(blocks.tail,
             scriptImports,
             lastImports,
@@ -565,14 +567,14 @@ class Interpreter(prompt0: Ref[String],
 
       def exec(file: Path): Unit = apply(read(file))
 
-      def app(code: String, wrapper: String, pkg: String, initC: Boolean) = initC match {
+      def app(code: String, wrapper: Name, pkg: Seq[Name], initC: Boolean) = initC match {
         case true =>
           if (initC) {
           init()
             initPredef(true)
       }
-      processModule(code, wrapper, pkg)
-          case false => processModule(code, wrapper, pkg)
+      processModule(ImportHook.Source.File(wd/"<console>"), code, wrapper, pkg)
+          case false => processModule(ImportHook.Source.File(wd/"<console>"), code, wrapper, pkg)
         }
 
 
@@ -587,7 +589,7 @@ class Interpreter(prompt0: Ref[String],
           case Res.Success(data) =>
             if(scriptCaching) {
               val files = for (d <- data._2) yield (d._1, d._2)
-              storage.asInstanceOf[Storage.Folder]classFilesListSave(pkg, wrapper, files, cacheTag)
+              storage.asInstanceOf[Storage.Folder]classFilesListSave(pkg.map(_.backticked).mkString("."), wrapper.backticked, files, cacheTag)
             }
         }
         init()
@@ -602,7 +604,7 @@ class Interpreter(prompt0: Ref[String],
         val cacheTag = "cache" + Util.md5Hash(Iterator(code.getBytes))
           .map("%02x".format(_)).mkString
         if(!code.contains("load(")) {
-          storage.asInstanceOf[Storage.Folder].classFilesListLoad(pkg, wrapper, cacheTag) match {
+          storage.asInstanceOf[Storage.Folder].classFilesListLoad(pkg.map(_.backticked).mkString("."), wrapper.backticked, cacheTag) match {
             case Seq() =>
               loadModule(path, storage.asInstanceOf[Storage.Folder], cacheTag, true)
             case cachedData =>
@@ -746,7 +748,7 @@ object Interpreter{
       code
   }
 
-  type EvaluateCallback = (Preprocessor.Output, Int, String) => Res[(Evaluated, String)]
+  type EvaluateCallback = (Preprocessor.Output, Int, Name) => Res[(Evaluated, String)]
 
 
   def indexWrapperName(wrapperName: Name, wrapperIndex: Int): Name = {

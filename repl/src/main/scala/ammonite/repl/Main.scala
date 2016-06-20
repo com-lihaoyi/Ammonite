@@ -94,7 +94,7 @@ case class Main(predef: String = "",
       case s: Storage.InMemory => runScript(path, args, kwargs, storage, cacheTag, false)
       case _ =>
         if (args == Seq() || !code.contains("load(")) {
-          storage.asInstanceOf[Storage.Folder].classFilesListLoad(pkg, wrapper, cacheTag) match {
+          storage.asInstanceOf[Storage.Folder].classFilesListLoad(pkg.map(_.backticked).mkString("."), wrapper.backticked, cacheTag) match {
             case Seq() =>
               runScript(path, args, kwargs, storage, cacheTag)
             case cachedData =>
@@ -180,7 +180,7 @@ case class Main(predef: String = "",
         val files = for(d <- data._2) yield (d._1, d._2)
         repl.interp.init()
         if(imports.count(_.toName == "main") == 0 && cacheScript)
-          storage.asInstanceOf[Storage.Folder].classFilesListSave(pkg, wrapper, files, cacheTag)
+          storage.asInstanceOf[Storage.Folder].classFilesListSave(pkg.map(_.backticked).mkString("."), wrapper.backticked, files, cacheTag)
         imports.find(_.toName == "main") match {
           case None => Res.Success(imports)
           case Some(i) =>
