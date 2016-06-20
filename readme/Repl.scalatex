@@ -372,6 +372,56 @@
         Each block of typing, deletes, or navigation counts as one undo. This
         should make it much more convenient to recover from botched copy-pastes
         or bulk-deletions.
+  @sect{Import Hooks}
+    @p
+      Ammonite provides a set of magic imports that let you load additional
+      code into a REPL session
+
+    @sect{import $file}
+      @p
+        This lets you load @sect.ref{Ammonite-Scripts} into the REPL. For
+        example given a small script defining one value we want
+      @hl.scala
+        // MyScript.scala
+        val elite = 31337
+
+      @p
+        We can load it into our REPL session using:
+      @hl.scala
+        @@ import $file.MyScript
+        import $file.$
+
+        @@ MyScript.elite
+        res1: Int = 31337
+
+      @p
+        Or if we want to import the contents of the script in one go:
+
+      @hl.scala
+        @@ import $file.MyScript, MyScript._
+        import $file.$
+
+        @@ elite
+        res1: Int = 31337
+
+      @p
+        While this is a trivial example, your @code{MyScript.scala} file can
+        contain anything you want, not just @hl.scala{val}s: function
+        @hl.scala{def}s, @hl.scala{class}es @hl.scala{object}s or
+        @hl.scala{trait}s, or imports from @i{other} scripts. For more
+        documentation on how these scripts work, check out the
+        @sect.ref{Ammonite-Scripts} section.
+    @sect{import $exec}
+      @p
+        This is similar to @hl.scala{import $file}, except that it dumps the
+        definitions and imports from the script into your REPL session. This is
+        useful if you are using a script to hold a set of common imports, the
+        docs for @sect.ref{Ammonite-Scripts} has more on this.
+
+    @sect{import $ivy}
+      @p
+        Lets you import Ivy dependencies from Maven Central, or anywhere else.
+        It's usage is shown in the @sect.ref{Artifact Loading} section.
 
   @sect{Builtins}
     @p
@@ -578,58 +628,6 @@
           all the magic happens.
         @p
           @hl.scala{desugar} only works in Scala 2.11.x and above, not in 2.10.x
-
-  @sect{Import Hooks}
-    @p
-      Ammonite provides a set of magic imports that let you load additional
-      code into a REPL session
-
-    @sect{import $file}
-      @p
-        This lets you load @sect.ref{Ammonite-Scripts} into the REPL. For
-        example given a small script defining one value we want
-      @hl.scala
-        // MyScript.scala
-        val elite = 31337
-
-      @p
-        We can load it into our REPL session using:
-      @hl.scala
-        @@ import $file.MyScript
-        import $file.$
-
-        @@ MyScript.elite
-        res1: Int = 31337
-
-      @p
-        Or if we want to import the contents of the script in one go:
-
-      @hl.scala
-        @@ import $file.MyScript, MyScript._
-        import $file.$
-
-        @@ elite
-        res1: Int = 31337
-
-      @p
-        While this is a trivial example, your @code{MyScript.scala} file can
-        contain anything you want, not just @hl.scala{val}s: function
-        @hl.scala{def}s, @hl.scala{class}es @hl.scala{object}s or
-        @hl.scala{trait}s, or imports from @i{other} scripts. For more
-        documentation on how these scripts work, check out the
-        @sect.ref{Ammonite-Scripts} section.
-    @sect{import $exec}
-      @p
-        This is similar to @hl.scala{import $file}, except that it dumps the
-        definitions and imports from the script into your REPL session. This is
-        useful if you are using a script to hold a set of common imports, the
-        docs for @sect.ref{Ammonite-Scripts} has more on this.
-
-    @sect{import $ivy}
-      @p
-        Lets you import Ivy dependencies from Maven Central, or anywhere else.
-        It's usage is shown in the @sect.ref{Artifact Loading} section.
-
 
   @sect{Configuration}
     @p
