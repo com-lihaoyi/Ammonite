@@ -13,14 +13,20 @@ import scala.annotation.tailrec
 trait ImportHook{
   def handle(source: ImportHook.Source,
              tree: ImportTree,
-             interp: ImportHook.InterpreterInterface): Res[Set[ImportHook.Result]]
+             interp: ImportHook.InterpreterInterface): Res[Seq[ImportHook.Result]]
 }
 
 object ImportHook{
+
   trait InterpreterInterface{
     def wd: Path
     def loadIvy(coordinates: (String, String, String), verbose: Boolean = true): Set[File]
   }
+
+  /**
+    * The result of processing an [[ImportHook]]. Can be either a source-file
+    * to evaluate, or additional files/folders/jars to put on the classpath
+    */
   sealed trait Result
   object Result{
     case class Source(code: String,
@@ -30,6 +36,11 @@ object ImportHook{
                       imports: Imports) extends Result
     case class ClassPath(file: Path) extends Result
   }
+
+  /**
+    * Where a script can "come from". Used to resolve relative $file imports
+    * relative to the importing script.
+    */
   sealed trait Source
   object Source{
     case class File(path: Path) extends Source
@@ -45,45 +56,52 @@ object ImportHook{
 
       source match{
         case Source.File(path) =>
-          @tailrec def find(targetScript: Path, importSegments: Seq[String]): Option[Path] = {
+          /**
+            * Tail-recursively attempt to resolve this `tree: ImportTree` into
+            * a series of files, or a series of paths it cannot resolve.
+            */
+          @tailrec def find(targetScript: Path,
+                            importSegments: Seq[String])
+                           : Either[Seq[String], Seq[(Path, String)]] = {
             val possibleScriptPath = targetScript/up/s"${targetScript.last}.scala"
-            if (exists ! possibleScriptPath) Some(possibleScriptPath)
+            if (exists! possibleScriptPath) Right(Seq(possibleScriptPath -> targetScript.last))
             else importSegments match {
-              case Seq() => None
-              case Seq(first, rest@_*) => find(targetScript / first, rest)
+              case Seq(first, rest@_*) => find(targetScript/first, rest)
+              case Seq() =>
+                tree.mappings match {
+                  case None => Left(Seq(tree.prefix.mkString(".")))
+                  case Some(mappings) =>
+                    val (matched, missing) = mappings.partition{
+                      case (k, v) => exists! targetScript/s"$k.scala"
+                    }
+                    if (missing.nonEmpty) {
+                      Left(missing.map{case (k, v) => (tree.prefix :+ k).mkString(".")})
+                    } else {
+                      Right(matched.map{case (k, v) => (targetScript/s"$k.scala", v.getOrElse(k))})
+                    }
+
+                }
             }
           }
 
           find(path/up/relative.copy(segments = Vector()), relative.segments) match {
-            case None => Res.Failure(None, "Cannot resolve import " + tree.prefix.mkString("."))
-            case Some(prefixPath) =>
-              tree.mappings match{
-                case None =>
-                  val (pkg, wrapper) = Util.pathToPackageWrapper(prefixPath, interp.wd)
-                  val importData = ImportData(wrapper.raw, wrapper.raw, pkg, ImportData.TermType)
-
-                  Res.Success(Set(Result.Source(
-                    read(prefixPath),
+            case Left(failures) => Res.Failure(None, "Cannot resolve import " + failures)
+            case Right(files) =>
+              Res.Success(
+                for((path, name) <- files) yield {
+                  val (pkg, wrapper) = Util.pathToPackageWrapper(path, interp.wd)
+                  val importData = ImportData(wrapper.raw, name, pkg, ImportData.TermType)
+                  Result.Source(
+                    read(path),
                     wrapper,
                     pkg,
-                    ImportHook.Source.File(prefixPath),
+                    ImportHook.Source.File(path),
                     Imports(Seq(importData))
-                  )))
-              }
-
+                  )
+                }
+              )
           }
-        case Source.URL(path) =>
-          val Array(protocol, _, host, segments @ _*) = path.split("/", -1)
-          val suffix = segments.last.split('.') match{
-            case Array() => ""
-            case parts => "." + parts.last
-          }
-          val relativized = ammonite.ops.empty/segments/relative/up
-          if (relativized.ups > 0) Res.Failure(None, "")
-          else Http.resolveHttp(
-            protocol + "//" + host + "/" + segments.mkString("/") + suffix,
-            ???
-          ).map(Set(_))
+        case Source.URL(path) => ???
       }
     }
   }
@@ -106,7 +124,7 @@ object ImportHook{
       tree.mappings match{
         case None => Res.Failure(None, "$url import failed for " + tree)
         case Some(mappings) =>
-          Res.map(tree.mappings.get.toSet){ case (k, v) => resolveHttp(k, v.getOrElse(k)) }
+          Res.map(tree.mappings.get){ case (k, v) => resolveHttp(k, v.getOrElse(k)) }
       }
     }
   }
@@ -147,8 +165,8 @@ object ImportHook{
         ImportHook.Source.File(interp.wd),
         Imports()
       )
-      val jars: Set[Result.ClassPath] = resolved.flatten.map(Path(_)).map(Result.ClassPath).toSet
-      jars ++ Set(stub)
+      val jars = resolved.flatten.map(Path(_)).map(Result.ClassPath)
+      jars ++ Seq(stub)
     }
   }
 }

@@ -34,6 +34,25 @@ object ImportHookTests extends TestSuite{
           @ Basic.basicValue
           res1: Int = 31337
         """)
+        'multiImport - check.session("""
+          @ import $file.repl.src.test.resources.importHooks.{Basic, BasicTwo}
+
+          @ Basic.basicValue
+          res1: Int = 31337
+
+          @ BasicTwo.basicValueTwo
+          res2: Int = 1337
+        """)
+
+        'rename - check.session("""
+          @ import $file.repl.src.test.resources.importHooks.{Basic, BasicTwo => BasicToo}
+
+          @ Basic.basicValue
+          res1: Int = 31337
+
+          @ BasicToo.basicValueTwo
+          res2: Int = 1337
+        """)
       }
       'ivy{
         'basic - check.session("""
@@ -100,6 +119,12 @@ object ImportHookTests extends TestSuite{
 
         @ FileImport.fileImportVal
         res1: Int = 31338
+       """)
+      'indirectFile - check.session("""
+        @ import $file.repl.src.test.resources.importHooks.IndirectFileImport
+
+        @ IndirectFileImport.indirectFileImportVal
+        res1: Int = 31339
        """)
       'ivy - check.session("""
         @ import $file.repl.src.test.resources.importHooks.IvyImport
