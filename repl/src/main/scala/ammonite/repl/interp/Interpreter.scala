@@ -137,7 +137,7 @@ class Interpreter(prompt0: Ref[String],
   Timer("Interpreter init predef 1")
 
   val importHooks = Ref(Map[String, ImportHook](
-    "script" -> ImportHook.File,
+    "file" -> ImportHook.File,
     "url" -> ImportHook.Http,
     "ivy" -> ImportHook.Ivy
   ))
