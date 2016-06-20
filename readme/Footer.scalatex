@@ -206,7 +206,7 @@
         @li
           Fixed edge cases around import shadowing and sequencing (#199, #248)
         @li
-          Started the @sect.ref{REPL Cookbook}, examples of using the Ammonite REPL to do useful work.
+          Started the @sect.ref{Ammonite-Cookbook}, examples of using the Ammonite REPL to do useful work.
   
   
     @sect{0.5.2}

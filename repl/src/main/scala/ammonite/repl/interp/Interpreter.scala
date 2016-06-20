@@ -145,6 +145,7 @@ class Interpreter(prompt0: Ref[String],
 
   val importHooks = Ref(Map[String, ImportHook](
     "file" -> ImportHook.File,
+    "exec" -> ImportHook.Exec,
     "url" -> ImportHook.Http,
     "ivy" -> ImportHook.Ivy
   ))
@@ -178,9 +179,15 @@ class Interpreter(prompt0: Ref[String],
           hooked <- hook.handle(source, tree.copy(prefix = tree.prefix.drop(1)), this)
           hookResults <- Res.map(hooked){
             case res: ImportHook.Result.Source =>
-              for{
-                _ <- processModule(res.source, res.code, res.wrapper, res.pkg, autoImport = false)
-              } yield res.imports
+              val r = for{
+                moduleImports <- processModule(res.source, res.code, res.wrapper, res.pkg, autoImport = false)
+              } yield {
+                if (!res.exec) res.imports
+                else moduleImports ++ res.imports
+
+              }
+              init()
+              r
             case res: ImportHook.Result.ClassPath =>
               eval.sess.frames.head.addClasspath(Seq(res.file.toIO))
               evalClassloader.add(res.file.toIO.toURI.toURL)

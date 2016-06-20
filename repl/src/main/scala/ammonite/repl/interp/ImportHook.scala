@@ -42,7 +42,8 @@ object ImportHook{
                       wrapper: Name,
                       pkg: Seq[Name],
                       source: ImportHook.Source,
-                      imports: Imports) extends Result
+                      imports: Imports,
+                      exec: Boolean) extends Result
     case class ClassPath(file: Path) extends Result
   }
 
@@ -55,7 +56,9 @@ object ImportHook{
     case class File(path: Path) extends Source
     case class URL(path: String) extends Source
   }
-  object File extends ImportHook {
+  object File extends SourceHook(false)
+  object Exec extends SourceHook(true)
+  class SourceHook(exec: Boolean) extends ImportHook {
     // import $file.foo.Bar, to import the file `foo/Bar.scala`
     def handle(source: ImportHook.Source, tree: ImportTree, interp: InterpreterInterface) = {
       val relative =
@@ -93,7 +96,8 @@ object ImportHook{
                   wrapper,
                   pkg,
                   ImportHook.Source.File(filePath),
-                  Imports(importData)
+                  Imports(importData),
+                  exec
                 )
               }
             )
@@ -113,7 +117,8 @@ object ImportHook{
         Name(url),
         Seq(Name("$url")),
         ImportHook.Source.URL(url),
-        Imports(Seq(ImportData(url, target, Seq(Name("$url")), ImportData.Term)))
+        Imports(Seq(ImportData(url, target, Seq(Name("$url")), ImportData.Term))),
+        false
       ))
     }
     // import $url.{ `http://www.google.com` => foo }
@@ -153,17 +158,8 @@ object ImportHook{
       parts <- splitImportTree(tree)
       resolved <- Res.map(parts)(resolve(interp, _))
     } yield {
-      // Code-gen a stub file so the original import has something it can
-      // pretend to import
-      val stub = Result.Source(
-        "def x = ()",
-        Name(tree.prefix.head),
-        Seq(Name("$ivy")),
-        ImportHook.Source.File(interp.wd),
-        Imports()
-      )
       val jars = resolved.flatten.map(Path(_)).map(Result.ClassPath)
-      jars ++ Seq(stub)
+      jars
     }
   }
 }

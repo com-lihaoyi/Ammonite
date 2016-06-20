@@ -1,0 +1,216 @@
+@import Main._
+@import readme.Sample._
+@import ammonite.ops._
+@val ammoniteTests = 'repl/'src/'test/'scala/'ammonite/'repl/'session
+@val replSource = 'repl/'src/'main/'scala/'ammonite/'repl
+@val advancedTests = ammoniteTests/"AdvancedTests.scala"
+@sect("Ammonite-Scripts", "Zero-overhead Programming in Scala")
+  @p
+    Ammonite allows you to write Scala scripts that can be directly run from
+    the command line. Unlike normal Scala projects, Ammonite scripts let you
+    save and run code without setting up a "build-file" or "project".
+    Ammonite-Scripts are useful as something in between the REPL and a
+    full-fledged Scala/SBT project: more permanent than a REPL session, but
+    more lightweight and easier to set up than a SBT project.
+  @p
+    Creating an Ammonite Script is just a matter of creating a
+    @hl.scala{MyScript.scala} with some Scala code in it, and running it from
+    within the Ammonite REPL or @sect.ref("Running Scripts from Bash",
+    "from Bash"). Writing Scala code doesn't get much easier than that!
+
+  @sect{Script Files}
+    @p
+      Ammonite defines a format that allows you to load external scripts into
+      the REPL; this can be used to save common functionality so it can be
+      used at a later date. In the simplest case, a script file is simply a
+      sequence of Scala statements, e.g.
+  
+    @hl.scala
+      // MyScript.scala
+      // print banner
+      println("Welcome to the XYZ custom REPL!!")
+
+      // common imports
+      import sys.process._
+      import collection.mutable
+
+      // common initialization code
+      val x = 123
+      ...
+    @p
+      You can write any Scala code you want in an Ammonite script, including
+      top-level statements and definitions (e.g. the @code{println} and
+      @hl.scala{val x = 123} above) that are not valid in "normal" Scala
+      projects. After that, it's a matter of running the script
+      @sect.ref("Running Scripts from the REPL", "from the REPL") or
+      @sect.ref("Running Scripts from Bash", "from Bash")
+
+  @sect{Running Scripts from the REPL}
+    @p
+      You can load any script into the Ammonite REPL using the
+      @hl.scala{import $file} syntax, for example here we import the above
+      @hl.scala{MyScript.scala} file to access its @hl.scala{x} value:
+
+    @hl.scala
+      @@ x // doesn't work yet
+      Compilation Failed
+      cmd0.scala:1: not found: value x
+      val res0 = x // doesn't work yet
+                 ^
+      @@ import $file.MyScript
+      Welcome to the XYZ custom REPL!!
+  
+      @@ MyScript.x // You can refer to definitions from that module
+      res1: Int = 123
+
+      @@ import MyScript._
+
+      @@ x // works
+      res2: Int = 123
+
+    @p
+      You can also import the module, and any associated definitions you want,
+      in the same import:
+
+    @hl.scala
+      @@ x // doesn't work yet
+      Compilation Failed
+      cmd0.scala:1: not found: value x
+      val res0 = x // doesn't work yet
+                 ^
+      @@ import $file.MyScript, MyScript._
+      Welcome to the XYZ custom REPL!!
+
+      @@ x
+      res1: Int = 123
+
+    @p
+      Note that by default, scripts imported via @code{$file} are
+      @i{encapsulated}, so any imports inside that @code{MyScript} performs are
+      not available outside of @code{MyScript.scala}:
+
+    @hl.scala
+      @@ import $file.MyScript, MyScript._
+      Welcome to the XYZ custom REPL!!
+      import $file.$
+      @@ mutable.Buffer(x)
+      cmd1.scala:1: not found: value mutable
+      val res1 = mutable.Buffer(x)
+                 ^
+      Compilation Failed
+    @p
+      As you can see, even though @code{collection.mutable} was imported inside
+      @code{MyScript.scala}, you cannot use them outside after importing it.
+
+    @p
+      If you want to make everything (both imports and definitions) available
+      by default after importing, you can use an @code{$exec} import instead of
+      @code{$file}:
+
+    @hl.scala
+      @@ import $exec.MyScript
+      Welcome to the XYZ custom REPL!!
+      import $exec.$
+      @@ mutable.Buffer(x)
+      res1: mutable.Buffer[Int] = ArrayBuffer(123)
+    @p
+      As you can see, now @code{mutable} is available, and so is @code{x} even
+      though we did not directly import it.
+
+    @p
+      While @code{$file} imports are useful for defining re-usable modules with
+      common functions and definitions, @code{$exec} imports are useful as
+      aliases for common setup to get your REPL environment just the way you
+      want it. Of course, any files you import via @hl.scala{import $file} or
+      @hl.scala{import $exec} can themselves import other Scala scripts in the
+      same way, and the same rules apply.
+
+  @sect{Running Scripts from Bash}
+    @p
+      Apart from loading scripts within the @sect.ref{Ammonite-REPL}, You can
+      also run scripts using the Ammonite executable from an external shell
+      (e.g. bash):
+    @hl.scala
+      bash$ ./amm path/to/script.scala
+
+    @p
+      All types, values and imports defined in scripts are available to
+      commands entered in REPL after loading the script.
+
+    @p
+      You can also make an Ammonite script self-executable by using a shebang
+      @hl.scala{#!}. This is an example script named @hl.scala{hello}. There
+      is no need to add the @hl.scala{.scala} extension. The @hl.scala{amm}
+      command needs to be in the @hl.scala{PATH}:
+    @hl.sh
+      #!/usr/bin/env amm
+
+      println("hello world")
+    @p
+      make it executable and run it from an external shell (e.g. bash):
+    @hl.sh
+      $ chmod +x /path/to/script
+      $ /path/to/script
+
+  @sect{Multi-stage Scripts}
+    @p
+      By default, everything in a script is compiled and executed as a single
+      block. That means that if you want to perform classpath-modifying
+      operations, such as @hl.scala{load.cp} or @hl.scala{load.ivy}, its
+      results will not be available within the same script if you want to use
+      methods, values or packages defined in the loaded code. To make this
+      work, break the script up into multiple compilation units with an @@
+      sign, e.g.
+  
+    @hl.scala
+      // print banner
+      println("Welcome to the XYZ custom REPL!!")
+  
+      load.ivy("org.scalaz" %% "scalaz-core" % "7.1.1")
+  
+      @@
+  
+      // common imports
+      import scalaz._
+      import Scalaz._
+  
+      // common initialization code
+      ...
+
+    @p
+      @hl.scala{load.module} and @hl.scala{load.exec} are the dynamic
+      equivalents to @hl.scala{import $file} and $hl.scala{import $exec}
+      described above. While the magic imports can only import a fixed script,
+  
+  @sect{Script Arguments}
+    @p
+      Often when calling a script from the external command- line (e.g.
+      Bash), you need to pass arguments to configure its behavior. With
+      Ammonite, this is done by defining a @hl.scala{main} method, e.g.
+
+    @hl.ref(wd/'integration/'src/'test/'resources/'ammonite/'integration/'basic/"Args.scala")
+
+    @p
+      When the script is run from the command line:
+    @hl.sh
+      ~/amm Args.scala 3 Moo
+    @p
+      The top-level definitions execute first (e.g. setting @hl.scala{x}),
+      and then the @hl.scala{main} method is called with the arguments you
+      passed in.
+    @p
+      Default arguments behave as you would expect (i.e. they allow you to
+      omit it when calling) and arguments are parsed using the
+      @hl.scala{scopt.Read} typeclass, which provides parsers for primitives
+      like @code{Int}, @code{Double}, @code{String}, as well as basic
+      data-structures like @code{Seq}s (taken as a comma-separated list) and
+      common types like @sect.ref{Paths}.
+    @p
+      If you pass in the wrong number of arguments, or if an argument fails
+      to deserialize, the script will fail with an exception.
+
+    @p
+      The @hl.scala{main} method does not get automatically called when you
+      @hl.scala{load.module} or @hl.scala{load.exec} a script from @i{within}
+      the Ammonite REPL. It gets imported into scope like any other method or
+      value defined in the script, and you can just call it normally.

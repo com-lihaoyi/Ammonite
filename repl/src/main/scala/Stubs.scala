@@ -9,6 +9,13 @@ package $file{
 }
 
 /**
+  * Package that gets filled with any script files that the user imports
+  */
+package $exec{
+  object $
+}
+
+/**
   * Package that gets filled with ivy artifacts the user loads
   */
 package $ivy{
