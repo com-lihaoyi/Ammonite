@@ -4,7 +4,7 @@
 @val ammoniteTests = 'repl/'src/'test/'scala/'ammonite/'repl/'session
 @val replSource = 'repl/'src/'main/'scala/'ammonite/'repl
 @val advancedTests = ammoniteTests/"AdvancedTests.scala"
-@sect("Ammonite-Scripts", "Zero-overhead Programming in Scala")
+@sect("Ammonite-Scripts", "Lightweight Programming in Scala")
   @p
     Ammonite allows you to write Scala scripts that can be directly run from
     the command line. Unlike normal Scala projects, Ammonite scripts let you

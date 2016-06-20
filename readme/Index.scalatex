@@ -25,20 +25,58 @@
     margin-bottom: 10px;
   }
 
-@sect{Ammonite}
+@sect("Ammonite", "Scala Scripting")
   @p
-    Ammonite enables shell-like scripting in the @lnk("Scala programming language", "https://www.scala-lang.org/"). It is made of a few subprojects:
+    Ammonite lets you use the @lnk("Scala programming language",
+    "https://www.scala-lang.org/") for scripting purposes: in the
+    @sect.ref("Ammonite-REPL", "REPL"), as @sect.ref("Ammonite-Scripts",
+    "scripts"), in @sect.ref("Ammonite-Ops", "existing projects") or as a
+    standalone @sect.ref("Ammonite-Shell", "systems shell"). It is
+    made of a few subprojects:
 
   @ul
     @li
-      @sect.ref{Ammonite-REPL}: A Modernized Scala REPL, with tons of @sect.ref("Features", "bug fixes and features")
+      @sect.ref{Ammonite-REPL}: a Modernized Scala REPL, with tons of
+      @sect.ref("Features", "bug fixes and features")
+
     @li
-      @sect.ref{Ammonite-Ops}: A Scala Library for convenient, rock-solid Filesystem Operations
+      @sect.ref{Ammonite-Scripts}: a format for Lightweight Programming in Scala
+
     @li
-      @sect.ref{Ammonite-Shell}: A modern replacement for the @lnk("Bash", "https://en.wikipedia.org/wiki/Bash_(Unix_shell)") system shell
+      @sect.ref{Ammonite-Ops}: a Scala Library for convenient, rock-solid
+      Filesystem Operations
+
+    @li
+      @sect.ref{Ammonite-Shell}: a modern replacement for the @lnk("Bash",
+      "https://en.wikipedia.org/wiki/Bash_(Unix_shell)") system shell
 
   @p
-    Depending on why you are here, click on the above links to jump straight to the documentation that interests you. For an overview of the project and it's motivation, check out this talk:
+    Each of those projects is usable standalone; click on the links to jump
+    straight to their docs, or scroll around and browse through the navigation
+    bar on the left.
+
+  @p
+    If you're wondering what you can do @i{with} Ammonite, there is an
+
+  @ul
+    @li
+      @sect.ref{Ammonite-Cookbook}
+
+  @p
+    Which contains a bunch of fun things that you can do, whether in the
+    interactive @sect.ref{Ammonite-REPL} or in some @sect.ref{Ammonite-Scripts}.
+    You can also take a look at how people are using Ammonite in the wild:
+
+  @ul
+    @li
+      @sect.ref{In the Wild}
+
+  @p
+    To see what people are doing with it.
+
+  @p
+    For a video overview of the project and it's motivation, check out this talk:
+
   @iframe(
     src := "https://player.vimeo.com/video/148552858",
     width := 800,
@@ -48,6 +86,13 @@
     "mozallowfullscreen".attr := 1,
     "allowfullscreen".attr := 1
   )
+
+  @p
+    And there are more talks available below:
+
+  @ul
+    @li
+      @sect.ref{Talks}
 
 @Repl()
 @Scripts()

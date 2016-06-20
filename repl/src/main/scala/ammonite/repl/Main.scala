@@ -30,7 +30,7 @@ import reflect.macros.Context
   *               starts. Can contain multiple blocks separated by `@`s
   * @param defaultPredef Do you want to include the "standard" predef imports
   *                      provided by Ammonite? These include tools like `time`,
-  *                      `grep`, the `|` `||` `|?` pipes from ammonite-ops, and
+  *                      `grep`, the `|` or `|?` pipes from ammonite-ops, and
   *                      other helpers. Can be disabled to give a clean
   *                      namespace for you to fill using your own predef.
   * @param storageBackend Where will all of Ammonite's persistent data get
