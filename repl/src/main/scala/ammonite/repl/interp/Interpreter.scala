@@ -152,7 +152,6 @@ class Interpreter(prompt0: Ref[String],
           var currentStmt = stmt
           for(importTree <- parsedTrees){
             if (importTree.prefix(0)(0) == '$') {
-              pprint.log(importTree)
               currentStmt = currentStmt.patch(
                 importTree.start,
                 "scala._".padTo(importTree.end - importTree.start, ' '),
@@ -326,10 +325,11 @@ class Interpreter(prompt0: Ref[String],
                      pkgName: Seq[Name],
                      startingImports: Imports): Res[Imports] = for{
     blocks <- Preprocessor.splitScript(Interpreter.skipSheBangLine(code))
-    (hookImports, hookedStmts) <- resolveImportHooks(blocks.flatMap(_._2))
+    hooked <- Res.map(blocks){case (prelude, stmts) => resolveImportHooks(stmts) }
+    (hookImports, hookBlocks) = hooked.unzip
     res <- processCorrectScript(
-      blocks,
-      startingImports ++ hookImports,
+      blocks.map(_._1).zip(hookBlocks),
+      Imports(startingImports.value ++ hookImports.flatMap(_.value)),
       pkgName,
       wrapperName,
       (processed, wrapperIndex, indexedWrapperName) =>
@@ -345,10 +345,11 @@ class Interpreter(prompt0: Ref[String],
 
   def processExec(code: String): Res[Imports] = for {
     blocks <- Preprocessor.splitScript(Interpreter.skipSheBangLine(code))
-    (hookImports, hookedStmts) <- resolveImportHooks(blocks.flatMap(_._2))
+    hooked <- Res.map(blocks){case (prelude, stmts) => resolveImportHooks(stmts) }
+    (hookImports, hookBlocks) = hooked.unzip
     res <- processCorrectScript(
-      blocks,
-      eval.sess.frames.head.imports ++ hookImports,
+      blocks.map(_._1).zip(hookBlocks),
+      Imports(eval.sess.frames.head.imports.value ++ hookImports.flatMap(_.value)),
       Seq(Name("$sess")),
       Name("cmd" + eval.getCurrentLine),
       { (processed, wrapperIndex, indexedWrapperName) =>

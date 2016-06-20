@@ -302,13 +302,12 @@ ${importBlock(imports)}
 object ${indexedWrapperName.backticked}{\n"""
 
     val bottomWrapper = s"""\ndef $$main() = { $printCode }
-  override def toString = "$indexedWrapperName"
+  override def toString = "${indexedWrapperName.raw}"
 }
 """
     val importsLen = topWrapper.length
 
     (topWrapper + code + bottomWrapper, importsLen)
   }
-
 }
 
