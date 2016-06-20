@@ -306,30 +306,31 @@ class Interpreter(prompt0: Ref[String],
         noneCalc
     }
     Timer("cachedCompileBlock 3")
-    val x = for {
+    for {
       (classFiles, newImports) <- compiled
       _ = Timer("cachedCompileBlock 4")
       cls <- eval.loadClass(fullyQualifiedName, classFiles)
     } yield (cls, newImports)
-
-    x
   }
 
   def processModule(code: String, wrapperName: Name, pkgName: Seq[Name]) = {
-
     processModule0(code, wrapperName, pkgName, predefImports)
   }
+
+  def preprocessScript(code: String) = for{
+    blocks <- Preprocessor.splitScript(Interpreter.skipSheBangLine(code))
+    hooked <- Res.map(blocks){case (prelude, stmts) => resolveImportHooks(stmts) }
+    (hookImports, hookBlocks) = hooked.unzip
+  } yield (blocks.map(_._1).zip(hookBlocks), Imports(hookImports.flatMap(_.value)))
 
   def processModule0(code: String,
                      wrapperName: Name,
                      pkgName: Seq[Name],
                      startingImports: Imports): Res[Imports] = for{
-    blocks <- Preprocessor.splitScript(Interpreter.skipSheBangLine(code))
-    hooked <- Res.map(blocks){case (prelude, stmts) => resolveImportHooks(stmts) }
-    (hookImports, hookBlocks) = hooked.unzip
+    (processedBlocks, hookImports) <- preprocessScript(code)
     res <- processCorrectScript(
-      blocks.map(_._1).zip(hookBlocks),
-      Imports(startingImports.value ++ hookImports.flatMap(_.value)),
+      processedBlocks,
+      startingImports ++ hookImports,
       pkgName,
       wrapperName,
       (processed, wrapperIndex, indexedWrapperName) =>
@@ -344,12 +345,10 @@ class Interpreter(prompt0: Ref[String],
   } yield res
 
   def processExec(code: String): Res[Imports] = for {
-    blocks <- Preprocessor.splitScript(Interpreter.skipSheBangLine(code))
-    hooked <- Res.map(blocks){case (prelude, stmts) => resolveImportHooks(stmts) }
-    (hookImports, hookBlocks) = hooked.unzip
+    (processedBlocks, hookImports) <- preprocessScript(code)
     res <- processCorrectScript(
-      blocks.map(_._1).zip(hookBlocks),
-      Imports(eval.sess.frames.head.imports.value ++ hookImports.flatMap(_.value)),
+      processedBlocks,
+      eval.sess.frames.head.imports ++ hookImports,
       Seq(Name("$sess")),
       Name("cmd" + eval.getCurrentLine),
       { (processed, wrapperIndex, indexedWrapperName) =>
