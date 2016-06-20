@@ -147,7 +147,7 @@ object ImportHook{
                     case Some(mappings) =>
                       for((k, v) <- mappings) yield ImportData(
                         k, v.getOrElse(k),
-                        fullPrefix.dropRight(1).map(Name), ImportData.TermType
+                        fullPrefix.map(Name), ImportData.TermType
                       )
                   }
 

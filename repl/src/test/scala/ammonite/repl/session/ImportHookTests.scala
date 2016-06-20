@@ -68,6 +68,25 @@ object ImportHookTests extends TestSuite{
           @ DeepInner
           error: not found: value DeepInner
         """)
+
+
+        'deepRenamed - check.session("""
+          @ import $file.repl.src.test.resources.importHooks.Deep.{DeepObject => DeepRenamed}
+
+          @ DeepRenamed.DeepInner.deepValue
+          res1: String = "deeeep"
+
+          @ import $file.repl.src.test.resources.importHooks.Deep.DeepObject.{DeepInner => RenamedInner}
+
+          @ RenamedInner.deepValue
+          res3: String = "deeeep"
+
+          @ import $file.repl.src.test.resources.importHooks.Deep.DeepObject.DeepInner.{deepValue => renamedValue}
+
+          @ renamedValue
+          res5: String = "deeeep"
+         """)
+
       }
       'ivy{
         'basic - check.session("""
