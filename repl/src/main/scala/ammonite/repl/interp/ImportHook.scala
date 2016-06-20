@@ -28,7 +28,6 @@ object ImportHook{
     * default this is what is available.
     */
   trait InterpreterInterface{
-    def wd: Path
     def loadIvy(coordinates: (String, String, String), verbose: Boolean = true): Set[File]
   }
 
@@ -80,7 +79,7 @@ object ImportHook{
           } else {
             Res.Success(
               for(((relativeModule, rename), filePath) <- relativeModules.zip(files)) yield {
-                val (pkg, wrapper) = Util.pathToPackageWrapper(filePath, interp.wd)
+                val (pkg, wrapper) = Util.pathToPackageWrapper(filePath)
                 val fullPrefix = pkg.map(_.raw) ++ Seq(wrapper.raw)
 
                 val importData = Seq(ImportData(
@@ -155,15 +154,8 @@ object ImportHook{
     } yield {
       // Code-gen a stub file so the original import has something it can
       // pretend to import
-      val stub = Result.Source(
-        "def x = ()",
-        Name(tree.prefix.head),
-        Seq(Name("$ivy")),
-        ImportHook.Source.File(interp.wd),
-        Imports()
-      )
       val jars = resolved.flatten.map(Path(_)).map(Result.ClassPath)
-      jars ++ Seq(stub)
+      jars
     }
   }
 }

@@ -58,13 +58,13 @@ object ImportHookTests extends TestSuite{
 
         'deep - check.session("""
           @ import $file.repl.src.test.resources.importHooks.Deep.DeepObject.DeepInner.deepValue
-          error: Cannot resolve imports
+          error: Cannot resolve $file import
         """)
 
 
         'deepRenamed - check.session("""
           @ import $file.repl.src.test.resources.importHooks.Deep.{DeepObject => DeepRenamed}
-          error: Cannot resolve imports
+          error: Cannot resolve $file import
          """)
 
       }
@@ -151,7 +151,7 @@ object ImportHookTests extends TestSuite{
 
       'deepImport - check.session("""
         @ import $file.repl.src.test.resources.importHooks.DeepImport.deepValueImported
-        error: Cannot resolve imports
+        error: Cannot resolve $file import
 
         @ import $file.repl.src.test.resources.importHooks.DeepImport,DeepImport.deepValueImported
 

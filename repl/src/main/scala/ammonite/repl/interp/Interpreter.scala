@@ -29,7 +29,7 @@ class Interpreter(prompt0: Ref[String],
                   storage: Storage,
                   history: => History,
                   predef: String,
-                  val wd: Path,
+                  wd: Path,
                   replArgs: Seq[Bind[_]])
   extends ImportHook.InterpreterInterface{ interp =>
 
@@ -540,7 +540,7 @@ class Interpreter(prompt0: Ref[String],
       def exec(file: Path): Unit = apply(read(file))
 
       def module(file: Path): Unit = {
-        val (pkg, wrapper) = Util.pathToPackageWrapper(file, wd)
+        val (pkg, wrapper) = Util.pathToPackageWrapper(file)
         processModule(
           ImportHook.Source.File(wd/"Main.scala"),
           read(file),
