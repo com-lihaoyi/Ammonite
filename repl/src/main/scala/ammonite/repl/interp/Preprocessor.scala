@@ -1,5 +1,6 @@
 package ammonite.repl.interp
 import acyclic.file
+import ammonite.repl.Parsers.ImportTree
 import ammonite.repl._
 import fastparse.all._
 
@@ -28,14 +29,15 @@ trait Preprocessor{
   def transform(stmts: Seq[String],
                 resultIndex: String,
                 leadingSpaces: String,
-                pkgName: String,
-                indexedWrapperName: String,
+                pkgName: Seq[Name],
+                indexedWrapperName: Name,
                 imports: Imports,
                 printerTemplate: String => String): Res[Preprocessor.Output]
 }
 object Preprocessor{
   private case class Expanded(code: String, printer: Seq[String])
-  case class Output(code: String, prefixCharLength: Int)
+  case class Output(code: String,
+                    prefixCharLength: Int)
 
   def errMsg(msg: String, code: String, expected: String, idx: Int): String = {
     val locationString = {
@@ -48,6 +50,12 @@ object Preprocessor{
     s"Syntax Error: $msg\n$locationString"
   }
 
+  /**
+    * Splits up a script file into its constituent blocks, each of which
+    * is a tuple of (leading-whitespace, statements). Leading whitespace
+    * is returned separately so we can later manipulate the statements e.g.
+    * by adding `val res2 = ` without the whitespace getting in the way
+    */
   def splitScript(rawCode: String): Res[Seq[(String, Seq[String])]] = {
     Parsers.splitScript(rawCode) match {
       case f: Parsed.Failure =>
@@ -77,8 +85,8 @@ object Preprocessor{
     def transform(stmts: Seq[String],
                   resultIndex: String,
                   leadingSpaces: String,
-                  pkgName: String,
-                  indexedWrapperName: String,
+                  pkgName: Seq[Name],
+                  indexedWrapperName: Name,
                   imports: Imports,
                   printerTemplate: String => String) = for{
             Preprocessor.Expanded(code, printer) <- expandStatements(stmts, resultIndex)
@@ -179,12 +187,12 @@ object Preprocessor{
 
     def expandStatements(stmts: Seq[String],
                          wrapperIndex: String): Res[Preprocessor.Expanded] = {
-      val unwrapped = stmts.flatMap{x => Parsers.unwrapBlock(x) match {
-        case Some(contents) =>
-          Parsers.split(contents).get.get.value
-
-        case None => Seq(x)
-      }}
+      val unwrapped = stmts.flatMap{x =>
+        Parsers.unwrapBlock(x) match {
+          case Some(contents) => Parsers.split(contents).get.get.value
+          case None => Seq(x)
+        }
+      }
       unwrapped match{
         case Nil => Res.Skip
         case postSplit => complete(stmts.mkString(""), wrapperIndex, postSplit)
@@ -271,34 +279,35 @@ object Preprocessor{
         if (item.fromName == item.toName) Parsers.backtickWrap(item.fromName)
         else s"${Parsers.backtickWrap(item.fromName)} => ${Parsers.backtickWrap(item.toName)}"
       }
-      "import " + group.head.prefix + ".{\n  " + printedGroup.mkString(",\n  ") + "\n}\n"
+      val pkgString = group.head.prefix.map(_.backticked).mkString(".")
+      "import " + pkgString + ".{\n  " + printedGroup.mkString(",\n  ") + "\n}\n"
     }
     val res = out.mkString
 
     Timer("importBlock 1")
+
     res
   }
 
-  def wrapCode(pkgName: String,
-               indexedWrapperName: String,
+  def wrapCode(pkgName: Seq[Name],
+               indexedWrapperName: Name,
                code: String,
                printCode: String,
                imports: Imports) = {
 
     val topWrapper = s"""
-package $pkgName
+package ${pkgName.map(_.backticked).mkString(".")}
 ${importBlock(imports)}
 
-object $indexedWrapperName{\n"""
+object ${indexedWrapperName.backticked}{\n"""
 
     val bottomWrapper = s"""\ndef $$main() = { $printCode }
-  override def toString = "$indexedWrapperName"
+  override def toString = "${indexedWrapperName.raw}"
 }
 """
     val importsLen = topWrapper.length
 
     (topWrapper + code + bottomWrapper, importsLen)
   }
-
 }
 

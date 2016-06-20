@@ -26,7 +26,7 @@ object SpecialKeys {
   val FnDelete = Alt + "[3~"
 
   val Tab = 9.toChar.toString
-  val NewLine = Seq("\n", "\r", "\n\r", "\r\n")
+  val NewLine = Seq("\n", "\r")
 
   val DefaultUp = Alt+"[A"
   val DefaultDown = Alt+"[B"

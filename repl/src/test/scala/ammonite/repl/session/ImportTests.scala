@@ -230,9 +230,9 @@ object ImportTests extends TestSuite{
         val prefix1 = if (scala2_10) "ammonite.repl.testcode.paulp1." else ""
         val prefix2 = if (scala2_10) "ammonite.repl.testcode.paulp2." else ""
         val prefix3 = if (scala2_10) "ammonite.repl.testcode.paulp3." else ""
-        val prefix4 = if (scala2_10) "ammonite.session.Paulp4." else ""
-        val prefix5 = if (scala2_10) "ammonite.session.Paulp5." else ""
-        val prefix6 = if (scala2_10) "ammonite.session.Paulp6." else ""
+        val prefix4 = if (scala2_10) "$sess.Paulp4." else ""
+        val prefix5 = if (scala2_10) "$sess.Paulp5." else ""
+        val prefix6 = if (scala2_10) "$sess.Paulp6." else ""
         'paulp - {
 
           check.session(s"""

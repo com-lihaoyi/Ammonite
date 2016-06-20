@@ -39,7 +39,7 @@ object ErrorTruncationTests extends TestSuite{
     )
     val tab = '\t'
     val runtimeErrorResourcePackage =
-      "ammonite.scripts.integration.src.test.resources.ammonite.integration.errortruncation"
+      "$file.integration.src.test.resources.ammonite.integration.errorTruncation"
     'runtimeError - checkErrorMessage(
       file = 'errorTruncation/"runtimeError.scala",
       expected =

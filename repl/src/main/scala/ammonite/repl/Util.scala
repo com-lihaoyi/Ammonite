@@ -8,6 +8,7 @@ import fansi.Attrs
 import pprint.{PPrint, PPrinter}
 
 import scala.collection.mutable
+import scala.reflect.NameTransformer
 import scala.reflect.runtime.universe.TypeTag
 import scala.util.Try
 
@@ -25,6 +26,29 @@ sealed abstract class Res[+T]{
 
 
 object Res{
+  /**
+    * Maps a Res-returning function across a collection `M[T]`, failing fast and
+    * bailing out if any individual element fails.
+    */
+  def map[M[_] <: Traversable[_], T, V](inputs: M[T])(f: T => Res[V])
+                                       (implicit cbf: collection.generic.CanBuildFrom[_, V, M[V]])
+                                       : Res[M[V]] = {
+    val builder = cbf.apply()
+
+    inputs.foldLeft[Res[Unit]](Res.Success()){
+      case (f: Failing, _) => f
+      case (Res.Success(prev), x: T) =>
+        f(x) match{
+          case f: Failing => f
+          case Success(x) =>
+            builder += x
+            Res.Success(())
+        }
+    } match{
+      case Success(_) => Res.Success(builder.result())
+      case f: Failing => f
+    }
+  }
   def apply[T](o: Option[T], errMsg: => String) = o match{
     case Some(s) => Success(s)
     case None => Failure(None, errMsg)
@@ -99,7 +123,7 @@ case class Catching(handler: PartialFunction[Throwable, Res.Failing]) {
     try Res.Success(t(())) catch handler
 }
 
-case class Evaluated(wrapper: String,
+case class Evaluated(wrapper: Seq[Name],
                      imports: Imports)
 
 /**
@@ -121,8 +145,16 @@ case class Evaluated(wrapper: String,
   */
 case class ImportData(fromName: String,
                       toName: String,
-                      prefix: String,
+                      prefix: Seq[Name],
                       importType: ImportData.ImportType)
+
+
+object ImportData{
+  sealed case class ImportType(name: String)
+  val Type = ImportType("Type")
+  val Term = ImportType("Term")
+  val TermType = ImportType("TermType")
+}
 
 /**
   * Represents the imports that occur before a piece of user code in the
@@ -135,6 +167,7 @@ case class ImportData(fromName: String,
   */
 class Imports private (val value: Seq[ImportData]){
   def ++(others: Imports) = Imports(this.value, others.value)
+  override def toString() = s"Imports(${value.toString})"
 }
 
 object Imports{
@@ -166,20 +199,28 @@ object Imports{
       if (!stomped.exists(_(data.toName))){
         out.append(data)
         stomped.foreach(_.add(data.toName))
-        stompedTerms.remove(data.prefix)
+        data.prefix.headOption.map(_.backticked).foreach(stompedTerms.remove)
       }
     }
     new Imports(out.reverse)
   }
 }
 
-object ImportData{
-  sealed case class ImportType(name: String)
-  val Type = ImportType("Type")
-  val Term = ImportType("Term")
-  val TermType = ImportType("TermType")
+/**
+  * Represents a single identifier in Scala source code, e.g. "scala" or
+  * "println" or "`Hello-World`".
+  *
+  * Holds the value "raw", with all special characters intact, e.g.
+  * "Hello-World". Can be used [[backticked]] e.g. "`Hello-World`", useful for
+  * embedding in Scala source code, or [[encoded]] e.g. "Hello$minusWorld",
+  * useful for accessing names as-seen-from the Java/JVM side of thigns
+  */
+case class Name(raw: String){
+  assert(raw.charAt(0) != '`', "Cannot create already-backticked identifiers")
+  override def toString = s"Name($backticked)"
+  def encoded = NameTransformer.encode(raw)
+  def backticked = Parsers.backtickWrap(raw)
 }
-
 /**
  * Encapsulates a read-write cell that can be passed around
  */
@@ -244,16 +285,16 @@ object Ex{
 
 object Util{
 
-  def pathToPackageWrapper(path: Path, wd: Path) = {
+  def pathToPackageWrapper(path: Path, wd: Path): (Seq[Name], Name) = {
     val pkg = {
-      val base = Seq("ammonite", "scripts")
+      val base = Seq("$file")
       val relPath = (path/up).relativeTo(wd)
       val ups = Seq.fill(relPath.ups)("$up")
       val rest = relPath.segments
-      (base ++ ups ++ rest).map(scala.reflect.NameTransformer.encode).mkString(".").toLowerCase
+      (base ++ ups ++ rest).map(Name(_))
     }
-    val wrapper = scala.reflect.NameTransformer.encode(path.last.take(path.last.lastIndexOf('.')))
-    (pkg, wrapper)
+    val wrapper = path.last.take(path.last.lastIndexOf('.'))
+    (pkg, Name(wrapper))
   }
   def md5Hash(data: Iterator[Array[Byte]]) = {
     val digest = MessageDigest.getInstance("MD5")
