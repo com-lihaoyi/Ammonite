@@ -142,35 +142,47 @@ class Interpreter(prompt0: Ref[String],
     "ivy" -> ImportHook.Ivy
   ))
 
-  def resolveImportHooks(stmts: Seq[String]): Res[_] = {
-    val importTrees =
-      stmts.map(Parsers.ImportSplitter.parse(_))
-           .collect{case Parsed.Success(v, _) => v }
-           .flatten
-           .filter(_.prefix(0)(0) == '$')
-
-    def resolve(importTrees: Seq[ImportTree]): Res[_] = importTrees match{
-      case Nil => Res.Success(())
-      case Seq(tree, rest @ _*) =>
-        importHooks().get(tree.prefix.head.stripPrefix("$")) match{
-          case None => resolve(importTrees.tail)
-          case Some(hook) =>
-            for{
-              hooked <- hook.handle(tree.copy(prefix = tree.prefix.drop(1)), this)
-              hookResults <- Res.map(hooked){
-                case res: ImportHook.Result.Source =>
-                  processModule(res.code, res.wrapper, res.pkg)
-                case res: ImportHook.Result.ClassPath =>
-                  eval.sess.frames.head.addClasspath(Seq(res.file.toIO))
-                  evalClassloader.add(res.file.toIO.toURI.toURL)
-                  init()
-                  Res.Success(())
-              }
-            } yield hookResults
-        }
-
+  def resolveImportHooks(stmts: Seq[String]): Res[(Imports, Seq[String])] = {
+    val hookedStmts = mutable.Buffer.empty[String]
+    val importTrees = mutable.Buffer.empty[ImportTree]
+    for(stmt <- stmts) {
+      Parsers.ImportSplitter.parse(stmt) match{
+        case f: Parsed.Failure => hookedStmts.append(stmt)
+        case Parsed.Success(parsedTrees, _) =>
+          var currentStmt = stmt
+          for(importTree <- parsedTrees){
+            if (importTree.prefix(0)(0) == '$') {
+              pprint.log(importTree)
+              currentStmt = currentStmt.patch(
+                importTree.start,
+                "scala._".padTo(importTree.end - importTree.start, ' '),
+                importTree.end
+              )
+              importTrees.append(importTree)
+            }
+          }
+          hookedStmts.append(currentStmt)
+      }
     }
-    resolve(importTrees)
+
+    for {
+      hookImports <- Res.map(importTrees){ tree =>
+        val hook = importHooks()(tree.prefix.head.stripPrefix("$"))
+        for{
+          hooked <- hook.handle(tree.copy(prefix = tree.prefix.drop(1)), this)
+          hookResults <- Res.map(hooked){
+            case res: ImportHook.Result.Source =>
+              processModule(res.code, res.wrapper, res.pkg)
+              Res.Success(Imports(Nil))
+            case res: ImportHook.Result.ClassPath =>
+              eval.sess.frames.head.addClasspath(Seq(res.file.toIO))
+              evalClassloader.add(res.file.toIO.toURI.toURL)
+              init()
+              Res.Success(Imports(Nil))
+          }
+        } yield hookResults
+      }
+    } yield (Imports(hookImports.flatten.flatMap(_.value)), stmts)
   }
 
   def processLine(code: String, stmts: Seq[String], fileName: String): Res[Evaluated] = for{
@@ -178,17 +190,18 @@ class Interpreter(prompt0: Ref[String],
       Res.Exception(ex, "Something unexpected went wrong =(")
     }
 
-    _ <- resolveImportHooks(stmts)
+    (hookImports, hookedStmts) <- resolveImportHooks(stmts)
 
     processed <- preprocess.transform(
-      stmts,
+      hookedStmts,
       eval.getCurrentLine,
       "",
       Seq(Name("$sess")),
       Name("cmd" + eval.getCurrentLine),
-      eval.sess.frames.head.imports,
+      eval.sess.frames.head.imports ++ hookImports,
       prints => s"ammonite.repl.frontend.ReplBridge.repl.Internal.combinePrints($prints)"
     )
+
     out <- evaluateLine(
       processed, printer,
       fileName, Name("cmd" + eval.getCurrentLine)
@@ -304,6 +317,7 @@ class Interpreter(prompt0: Ref[String],
   }
 
   def processModule(code: String, wrapperName: Name, pkgName: Seq[Name]) = {
+
     processModule0(code, wrapperName, pkgName, predefImports)
   }
 
@@ -312,10 +326,10 @@ class Interpreter(prompt0: Ref[String],
                      pkgName: Seq[Name],
                      startingImports: Imports): Res[Imports] = for{
     blocks <- Preprocessor.splitScript(Interpreter.skipSheBangLine(code))
-    _ <- resolveImportHooks(blocks.flatMap(_._2))
+    (hookImports, hookedStmts) <- resolveImportHooks(blocks.flatMap(_._2))
     res <- processCorrectScript(
       blocks,
-      startingImports,
+      startingImports ++ hookImports,
       pkgName,
       wrapperName,
       (processed, wrapperIndex, indexedWrapperName) =>
@@ -331,10 +345,10 @@ class Interpreter(prompt0: Ref[String],
 
   def processExec(code: String): Res[Imports] = for {
     blocks <- Preprocessor.splitScript(Interpreter.skipSheBangLine(code))
-    _ <- resolveImportHooks(blocks.flatMap(_._2))
+    (hookImports, hookedStmts) <- resolveImportHooks(blocks.flatMap(_._2))
     res <- processCorrectScript(
       blocks,
-      eval.sess.frames.head.imports,
+      eval.sess.frames.head.imports ++ hookImports,
       Seq(Name("$sess")),
       Name("cmd" + eval.getCurrentLine),
       { (processed, wrapperIndex, indexedWrapperName) =>

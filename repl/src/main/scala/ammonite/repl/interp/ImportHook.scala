@@ -61,8 +61,8 @@ object ImportHook{
   object Ivy extends ImportHook{
     def splitImportTree(tree: ImportTree): Res[Seq[String]] = {
       tree match{
-        case ImportTree(Seq(part), None) => Res.Success(Seq(part))
-        case ImportTree(Nil, Some(mapping)) if mapping.map(_._2).forall(_.isEmpty) =>
+        case ImportTree(Seq(part), None, _, _) => Res.Success(Seq(part))
+        case ImportTree(Nil, Some(mapping), _, _) if mapping.map(_._2).forall(_.isEmpty) =>
           Res.Success(mapping.map(_._1))
         case _ => Res.Failure(None, "Invalid $ivy import " + tree)
       }

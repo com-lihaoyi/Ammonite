@@ -34,7 +34,6 @@ object ImportHookTests extends TestSuite{
           @ Basic.basicValue
           res1: Int = 31337
         """)
-
       }
       'ivy{
         'basic - check.session("""
