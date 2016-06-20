@@ -160,7 +160,7 @@ class Interpreter(prompt0: Ref[String],
               hookResults <- Res.map(hooked){
                 case res: ImportHook.Result.Source =>
                   processModule(res.code, res.wrapper, res.pkg)
-                case res: ImportHook.Result.Jar =>
+                case res: ImportHook.Result.ClassPath =>
                   eval.sess.frames.head.addClasspath(Seq(res.file.toIO))
                   evalClassloader.add(res.file.toIO.toURI.toURL)
                   init()
@@ -446,7 +446,7 @@ class Interpreter(prompt0: Ref[String],
     }
   }
   abstract class DefaultLoadJar extends LoadJar with Resolvers {
-    
+
     lazy val ivyThing = IvyThing(() => resolvers)
 
     def handleClasspath(jar: File): Unit

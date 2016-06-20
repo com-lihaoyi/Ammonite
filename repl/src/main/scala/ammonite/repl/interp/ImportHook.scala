@@ -20,7 +20,7 @@ object ImportHook{
   sealed trait Result
   object Result{
     case class Source(code: String, wrapper: Name, pkg: Seq[Name]) extends Result
-    case class Jar(file: Path) extends Result
+    case class ClassPath(file: Path) extends Result
   }
   object File extends ImportHook {
     // import $file.foo.Bar, to import the file `foo/Bar.scala`
@@ -52,10 +52,7 @@ object ImportHook{
           Res.map(tree.mappings.get.toSet){ case (k, v) =>
             val res = scalaj.http.Http(k).asString
             if (!res.is2xx) Res.Failure(None, "$url import failed for " + k)
-            else {
-              val resx = Result.Source(res.body, Name(k), Seq(Name("$url")))
-              Res.Success(resx)
-            }
+            else Res.Success(Result.Source(res.body, Name(k), Seq(Name("$url"))))
           }
       }
     }
@@ -82,6 +79,7 @@ object ImportHook{
         }
       }
     } yield jars
+
     def handle(tree: ImportTree, interp: InterpreterInterface) = for{
     // import $ivy.`com.lihaoyi:scalatags_2.11:0.5.4`
       parts <- splitImportTree(tree)
@@ -94,7 +92,7 @@ object ImportHook{
         Name(tree.prefix.head),
         Seq(Name("$ivy"))
       )
-      val jars: Set[Result.Jar] = resolved.flatten.map(Path(_)).map(Result.Jar).toSet
+      val jars: Set[Result.ClassPath] = resolved.flatten.map(Path(_)).map(Result.ClassPath).toSet
       jars ++ Set(stub)
     }
   }
