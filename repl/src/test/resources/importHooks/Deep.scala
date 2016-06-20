@@ -1,6 +1,6 @@
 object DeepObject{
   object DeepInner {
-    val deepContents = "deeeep"
+    val deepValue = "deeeep"
   }
 }
 

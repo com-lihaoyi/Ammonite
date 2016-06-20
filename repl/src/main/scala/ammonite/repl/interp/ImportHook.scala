@@ -134,18 +134,20 @@ object ImportHook{
               Res.Success(
                 for((path, name, remaining) <- files) yield {
                   val (pkg, wrapper) = Util.pathToPackageWrapper(path, interp.wd)
-                  val pkgPrefix = pkg.map(_.raw) ++ (relative.segments :+ name.stripSuffix(".scala")).takeRight(remaining.length)
+
+                  val fullPrefix = pkg.map(_.raw) ++ relative.segments.takeRight(remaining.length + 1)
+
                   val importData = tree.mappings match{
                     case None =>
                       Seq(ImportData(
-                        tree.prefix.last, tree.prefix.last,
-                        pkgPrefix.map(Name), ImportData.TermType
+                        fullPrefix.last, fullPrefix.last,
+                        fullPrefix.dropRight(1).map(Name), ImportData.TermType
                       ))
 
                     case Some(mappings) =>
                       for((k, v) <- mappings) yield ImportData(
                         k, v.getOrElse(k),
-                        pkgPrefix.map(Name), ImportData.TermType
+                        fullPrefix.dropRight(1).map(Name), ImportData.TermType
                       )
                   }
 

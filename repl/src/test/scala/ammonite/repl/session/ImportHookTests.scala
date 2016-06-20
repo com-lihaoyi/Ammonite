@@ -60,7 +60,7 @@ object ImportHookTests extends TestSuite{
           @ import $file.repl.src.test.resources.importHooks.Deep.DeepObject.DeepInner.deepValue
 
           @ deepValue
-          res1: Int = "deeeep"
+          res1: String = "deeeep"
 
           @ DeepObject
           error: not found: value DeepObject
