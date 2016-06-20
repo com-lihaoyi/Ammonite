@@ -68,6 +68,7 @@ class Interpreter(prompt0: Ref[String],
     // Otherwise activating autocomplete makes the presentation compiler mangle
     // the shared settings and makes the main compiler sad
     val settings = Option(compiler).fold(new Settings)(_.compiler.settings.copy)
+
     compiler = Compiler(
       Classpath.classpath ++ eval.sess.frames.head.classpath,
       dynamicClasspath,
@@ -109,40 +110,44 @@ class Interpreter(prompt0: Ref[String],
     """
   }.mkString("\n")
 
-  val predefs = Seq(
-    (hardcodedPredef, "HardcodedPredef", "ammonite.predef"),
-    (predef, "Predef", "ammonite.predef"),
-    (storage.loadPredef, "LoadedPredef", "ammonite.predef"),
-    (argString, "ArgsPredef", "ammonite.predef")
-  )
-
-  // Use a var and a for-loop instead of a fold, because when running
-  // `processModule0` user code may end up calling `processModule` which depends
-  // on `predefImports`, and we should be able to provide the "current" imports
-  // to it even if it's half built
   var predefImports = Imports(Nil)
-  for( (sourceCode, wrapperName, pkgName) <- predefs) {
-    // If withCompiler flag is false load predefs from cache without using compiler
-    withCompiler match {
-      case true =>
-        processModule0(sourceCode, wrapperName, pkgName, predefImports) match {
-          case Res.Success(data) =>
-            predefImports = predefImports ++ data._1
-          case Res.Failure(ex, msg) =>
-            ex match {
-              case Some(e) => throw new RuntimeException("Error during Predef: " + msg, e)
-              case None => throw new RuntimeException("Error during Predef: " + msg)
-            }
+  initPredef()
+  def initPredef(withCompiler: Boolean = withCompiler): Unit = {
 
-          case Res.Exception(ex, msg) =>
-            throw new RuntimeException("Error during Predef: " + msg, ex)
-        }
-      case false =>
-        val emptyCachedData = (Traversable[(String, Array[Byte])](), Imports(Seq()))
-        val folderStorage = storage.asInstanceOf[Storage.Folder]
-        val loc = pkgName + "." + wrapperName
-        val d = folderStorage.compileCacheLoad(loc, "predef").getOrElse(emptyCachedData)
-        predefImports = predefImports ++ d._2
+    val predefs = Seq(
+      (hardcodedPredef, "HardcodedPredef", "ammonite.predef"),
+      (predef, "Predef", "ammonite.predef"),
+      (storage.loadPredef, "LoadedPredef", "ammonite.predef"),
+      (argString, "ArgsPredef", "ammonite.predef")
+    )
+
+    // Use a var and a for-loop instead of a fold, because when running
+    // `processModule0` user code may end up calling `processModule` which depends
+    // on `predefImports`, and we should be able to provide the "current" imports
+    // to it even if it's half built
+    for ((sourceCode, wrapperName, pkgName) <- predefs) {
+      // If withCompiler flag is false load predefs from cache without using compiler
+      withCompiler match {
+        case true =>
+          processModule0(sourceCode, wrapperName, pkgName, predefImports) match {
+            case Res.Success(data) =>
+              predefImports = predefImports ++ data._1
+            case Res.Failure(ex, msg) =>
+              ex match {
+                case Some(e) => throw new RuntimeException("Error during Predef: " + msg, e)
+                case None => throw new RuntimeException("Error during Predef: " + msg)
+              }
+
+            case Res.Exception(ex, msg) =>
+              throw new RuntimeException("Error during Predef: " + msg, ex)
+          }
+        case false =>
+          val emptyCachedData = (Traversable[(String, Array[Byte])](), Imports(Seq()))
+          val folderStorage = storage.asInstanceOf[Storage.Folder]
+          val loc = pkgName + "." + wrapperName
+          val d = folderStorage.compileCacheLoad(loc, "predef").getOrElse(emptyCachedData)
+          predefImports = predefImports ++ d._2
+      }
     }
   }
 
@@ -384,7 +389,6 @@ class Interpreter(prompt0: Ref[String],
             scriptImports,
             _ => "scala.Iterator[String]()"
           )
-
           ev <- evaluate(processed, wrapperIndex, indexedWrapperName)
         } yield ev
 
@@ -493,10 +497,36 @@ class Interpreter(prompt0: Ref[String],
 
       def exec(file: Path): Unit = apply(read(file))
 
-      def loadModule(file: Path, storage: Storage, cacheTag: String): Unit ={
+      def app(code: String, wrapper: String, pkg: String, initC: Boolean) = initC match {
+        case true =>
+          //          case true => val _interp = new Interpreter(
+          //            prompt,
+          //            frontEnd,
+          //            frontEnd().width,
+          //            frontEnd().height,
+          //            colors,
+          //            printer,
+          //            storage,
+          //            history,
+          //            predef,
+          //            wd,
+          //            replArgs
+          //          )
+          //            _interp.processModule(code, wrapper, pkg)
+          if (initC) {
+          init()
+            initPredef(true)
+      }
+      processModule(code, wrapper, pkg)
+          case false => processModule(code, wrapper, pkg)
+        }
+
+
+
+      def loadModule(file: Path, storage: Storage, cacheTag: String, initC: Boolean = false): Unit ={
         val code = read(file)
         val (pkg, wrapper) = Util.pathToPackageWrapper(file, wd)
-        processModule(code, wrapper, pkg) match {
+         app(code, wrapper, pkg, initC) match {
           case Res.Failure(ex, s) => throw new CompilationError(s)
           case Res.Exception(t, s) => throw t
           case Res.Success(data) =>
@@ -519,7 +549,7 @@ class Interpreter(prompt0: Ref[String],
         if(!code.contains("load(")) {
           storage.asInstanceOf[Storage.Folder].classFilesListLoad(pkg, wrapper, cacheTag) match {
             case Seq() =>
-              loadModule(path, storage.asInstanceOf[Storage.Folder], cacheTag)
+              loadModule(path, storage.asInstanceOf[Storage.Folder], cacheTag, true)
             case cachedData =>
               def evalMain(cls: Class[_]) =
                 cls.getDeclaredMethod("$main").invoke(null)
@@ -539,7 +569,7 @@ class Interpreter(prompt0: Ref[String],
               }
               }
           }
-        } else loadModule(path, storage.asInstanceOf[Storage.Folder], cacheTag)
+        } else loadModule(path, storage.asInstanceOf[Storage.Folder], cacheTag, true)
       }
 
       def module(file: Path): Unit = {

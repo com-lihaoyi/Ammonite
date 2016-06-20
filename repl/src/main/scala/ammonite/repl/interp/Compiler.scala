@@ -124,6 +124,7 @@ object Compiler{
       def displayPrompt(): Unit = ???
 
       def display(pos: Position, msg: String, severity: Severity) = {
+        println("Pos-->" + pos + "msg --> " + msg + "severity -->" + severity)
         severity match{
           case ERROR =>
             Classpath.traceClasspathProblem(s"ERROR: $msg")
@@ -277,7 +278,6 @@ object Compiler{
                 printer: Printer,
                 importsLen0: Int,
                 fileName: String): Output = {
-
       def enumerateVdFiles(d: VirtualDirectory): Iterator[AbstractFile] = {
         val (subs, files) = d.iterator.partition(_.isDirectory)
         files ++ subs.map(_.asInstanceOf[VirtualDirectory]).flatMap(enumerateVdFiles)
@@ -296,8 +296,8 @@ object Compiler{
 
       run.compileFiles(List(singleFile))
 
-      val outputFiles = enumerateVdFiles(vd).toVector
 
+      val outputFiles = enumerateVdFiles(vd).toVector
       if (reporter.hasErrors) None
       else {
 

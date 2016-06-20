@@ -139,13 +139,15 @@ case class Main(predef: String = "",
               // Iterate through cached blocks and execute classFiles
               // blockNumber keeps track of blockIndex
               cachedData.foreach { d =>
+                println("DATA => " + d + "\n" + blockNumber + "\n\n||||||||||||||||||||||||||||")
                 for {
                   cls <- interp.eval.loadClass(pkg + "." + wrapper + getBlockNumber, d._1)
-                } yield evalMain(cls)
+                } yield {
+                  evalMain(cls)
+                }
                 blockNumber += 1
               }
-
-              if (Timer.show)
+//              if (Timer.show)
                 println("Compilation Count: " + interp.compilationCount)
           }
         }
