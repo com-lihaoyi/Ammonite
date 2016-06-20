@@ -18,6 +18,12 @@
 
     @hl.sh
       @replCurl
+    
+    @p
+      Alternatively, on macOS you can also brew install:
+
+    @hl.sh
+      $ brew install ammonite-repl
 
     @p
       This will give you access to Ammonite for Scala:
