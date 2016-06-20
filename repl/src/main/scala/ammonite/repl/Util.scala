@@ -285,10 +285,16 @@ object Ex{
 
 object Util{
 
-  def pathToPackageWrapper(path: Path): (Seq[Name], Name) = {
-    val pkg = Seq("$file") ++ path.segments
+  def pathToPackageWrapper(path: Path, wd: Path): (Seq[Name], Name) = {
+    val pkg = {
+      val base = Seq("$file")
+      val relPath = (path/up).relativeTo(wd)
+      val ups = Seq.fill(relPath.ups)("$up")
+      val rest = relPath.segments
+      (base ++ ups ++ rest).map(Name(_))
+    }
     val wrapper = path.last.take(path.last.lastIndexOf('.'))
-    (pkg.map(Name), Name(wrapper))
+    (pkg, Name(wrapper))
   }
   def md5Hash(data: Iterator[Array[Byte]]) = {
     val digest = MessageDigest.getInstance("MD5")

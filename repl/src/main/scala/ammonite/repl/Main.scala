@@ -80,7 +80,7 @@ case class Main(predef: String = "",
                 kwargs: Map[String, String]): Res[Imports] = {
 
     val repl = instantiateRepl()
-    val (pkg, wrapper) = Util.pathToPackageWrapper(path)
+    val (pkg, wrapper) = Util.pathToPackageWrapper(path, wd)
     repl.interp.processModule(
       ImportHook.Source.File(path),
       read(path),
