@@ -76,7 +76,7 @@ object ImportHook{
           val missing = files.filter(!exists(_))
 
           if (missing.nonEmpty) {
-            Res.Failure(None, "Cannot resolve imports " + missing.mkString(","))
+            Res.Failure(None, "Cannot resolve $file import: " + missing.mkString(","))
           } else {
             Res.Success(
               for(((relativeModule, rename), filePath) <- relativeModules.zip(files)) yield {
