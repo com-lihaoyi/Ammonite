@@ -117,7 +117,13 @@ class Interpreter(prompt0: Ref[String],
   var predefImports = Imports()
   for( (sourceCode, wrapperName) <- predefs) {
     val pkgName = Seq(Name("ammonite"), Name("predef"))
-    processModule0(ImportHook.Source.File(wd/"<console>"), sourceCode, wrapperName, pkgName, predefImports) match{
+    processModule0(
+      ImportHook.Source.File(wd/"<console>"),
+      sourceCode,
+      wrapperName,
+      pkgName,
+      predefImports
+    ) match{
       case Res.Success(imports) =>
         predefImports = predefImports ++ imports
       case Res.Failure(ex, msg) =>
@@ -142,7 +148,8 @@ class Interpreter(prompt0: Ref[String],
     "ivy" -> ImportHook.Ivy
   ))
 
-  def resolveImportHooks(source: ImportHook.Source, stmts: Seq[String]): Res[(Imports, Seq[String])] = {
+  def resolveImportHooks(source: ImportHook.Source,
+                         stmts: Seq[String]): Res[(Imports, Seq[String])] = {
     val hookedStmts = mutable.Buffer.empty[String]
     val importTrees = mutable.Buffer.empty[ImportTree]
     for(stmt <- stmts) {
@@ -348,7 +355,9 @@ class Interpreter(prompt0: Ref[String],
   } yield res ++ hookImports
 
   def processExec(code: String): Res[Imports] = for {
-    (processedBlocks, hookImports) <- preprocessScript(ImportHook.Source.File(wd/"<console>"), code)
+    (processedBlocks, hookImports) <- preprocessScript(
+      ImportHook.Source.File(wd/"<console>"), code
+    )
     res <- processCorrectScript(
       processedBlocks,
       eval.sess.frames.head.imports ++ hookImports,
