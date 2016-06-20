@@ -68,33 +68,10 @@ object ImportHook{
 
       source match{
         case Source.File(currentScriptPath) =>
-
-          /**
-            * # console
-            * import $file.foo.bar.Baz
-            *
-            * # foo/bar/Baz.scala
-            * import $file.zod.Quz
-            *
-            *
-            * # generated
-            * import $file.foo.bar.zod.Qux
-            *
-            *
-            *
-            * # console
-            * import $file.foo.bar.Baz
-            *
-            * # foo/bar/Baz.scala
-            * import $file.$up.Qux
-            *
-            * # generated
-            * import $file.foo.Qux
-            */
-
           /**
             * Tail-recursively attempt to resolve this `tree: ImportTree` into
-            * a series of files, or a series of paths it cannot resolve.
+            * a series of files, or a series of paths it cannot resolve. On
+            * success, it returns triple of (filePath, renamed)
             */
           @tailrec def find(targetScript: Path,
                             importSegments: Seq[String])
@@ -102,7 +79,19 @@ object ImportHook{
 
             val possibleScriptPath = targetScript/up/s"${targetScript.last}.scala"
             if (exists! possibleScriptPath) {
-              Right(Seq((possibleScriptPath, targetScript.last, importSegments)))
+              Right(
+                tree.mappings match{
+                  case None => Seq((
+                    possibleScriptPath,
+                    importSegments.lastOption.getOrElse(targetScript.last),
+                    importSegments
+                    ))
+                  case Some(mappings) =>
+                    mappings.map{
+                      case (k, v) => (possibleScriptPath, v.getOrElse(k), importSegments :+ k)
+                    }
+                }
+              )
             } else importSegments match {
               case Seq(first, rest@_*) => find(targetScript/first, rest)
               case Seq() =>
@@ -124,38 +113,24 @@ object ImportHook{
             }
           }
 
-//          val (existingPkg, existingWrapper) = Util.pathToPackageWrapper(
-//            currentScriptPath, interp.wd
-//          )
-
           find(currentScriptPath/up/relative.copy(segments = Vector()), relative.segments) match {
             case Left(failures) => Res.Failure(None, "Cannot resolve import " + failures)
             case Right(files) =>
               Res.Success(
-                for((path, name, remaining) <- files) yield {
-                  val (pkg, wrapper) = Util.pathToPackageWrapper(path, interp.wd)
+                for((filePath, rename, unusedSegments) <- files) yield {
+                  val (pkg, wrapper) = Util.pathToPackageWrapper(filePath, interp.wd)
+                  val fullPrefix = pkg.map(_.raw) ++ Seq(wrapper.raw) ++ unusedSegments
 
-                  val fullPrefix = pkg.map(_.raw) ++ relative.segments.takeRight(remaining.length + 1)
-
-                  val importData = tree.mappings match{
-                    case None =>
-                      Seq(ImportData(
-                        fullPrefix.last, fullPrefix.last,
-                        fullPrefix.dropRight(1).map(Name), ImportData.TermType
-                      ))
-
-                    case Some(mappings) =>
-                      for((k, v) <- mappings) yield ImportData(
-                        k, v.getOrElse(k),
-                        fullPrefix.map(Name), ImportData.TermType
-                      )
-                  }
+                  val importData = Seq(ImportData(
+                    fullPrefix.last, rename,
+                    fullPrefix.dropRight(1).map(Name), ImportData.TermType
+                  ))
 
                   Result.Source(
-                    read(path),
+                    read(filePath),
                     wrapper,
                     pkg,
-                    ImportHook.Source.File(path),
+                    ImportHook.Source.File(filePath),
                     Imports(importData)
                   )
                 }
