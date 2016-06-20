@@ -183,19 +183,19 @@ object ImportHookTests extends TestSuite{
         @ import $file.repl.src.test.resources.importHooks.DeepImportRenameOne.deepValueImported
 
         @ deepValueImported
-        res1: String = "deeeep"
+        res1: String = "deeeepOne"
       """)
       'deepImportRenameTwo - check.session("""
         @ import $file.repl.src.test.resources.importHooks.DeepImportRenameTwo.deepValueImported
 
         @ deepValueImported
-        res1: String = "deeeep"
+        res1: String = "deeeepTwo"
       """)
       'deepImportRenameThree - check.session("""
         @ import $file.repl.src.test.resources.importHooks.DeepImportRenameThree.deepValueImported
 
         @ deepValueImported
-        res1: String = "deeeep"
+        res1: String = "deeeepThree"
       """)
     }
   }

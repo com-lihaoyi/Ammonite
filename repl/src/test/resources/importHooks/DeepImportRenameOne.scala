@@ -1,4 +1,4 @@
 
 import $file.Deep.{DeepObject => DeepRenamed}
 
-val deepValueImported = DeepRenamed.DeepInner.deepValue
+val deepValueImported = DeepRenamed.DeepInner.deepValue + "One"
