@@ -162,7 +162,7 @@ class Interpreter(prompt0: Ref[String],
             if (importTree.prefix(0)(0) == '$') {
               val length = importTree.end - importTree.start
               currentStmt = currentStmt.patch(
-                importTree.start, "$stub._".padTo(length, ' '), length
+                importTree.start, (importTree.prefix(0) + ".$").padTo(length, ' '), length
               )
               importTrees.append(importTree)
             }

@@ -2,13 +2,10 @@ package ammonite.repl.interp
 import java.io.File
 
 import acyclic.file
-import ammonite.ops.{Path, exists, read, up}
+import ammonite.ops.{read, _}
 import ammonite.repl.Parsers.ImportTree
 import ammonite.repl.tools.IvyThing
 import ammonite.repl._
-
-import scala.annotation.tailrec
-
 
 /**
   * An extensible hook into the Ammonite REPL's import system; allows the end
@@ -66,75 +63,40 @@ object ImportHook{
             .map{case "$up" => up; case x => ammonite.ops.empty/x}
             .reduce(_/_)
 
+
       source match{
         case Source.File(currentScriptPath) =>
-          /**
-            * Tail-recursively attempt to resolve this `tree: ImportTree` into
-            * a series of files, or a series of paths it cannot resolve. On
-            * success, it returns triple of (filePath, renamed)
-            */
-          @tailrec def find(targetScript: Path,
-                            importSegments: Seq[String])
-                           : Either[Seq[String], Seq[(Path, String, Seq[String])]] = {
 
-            val possibleScriptPath = targetScript/up/s"${targetScript.last}.scala"
-            if (exists! possibleScriptPath) {
-              Right(
-                tree.mappings match{
-                  case None => Seq((
-                    possibleScriptPath,
-                    importSegments.lastOption.getOrElse(targetScript.last),
-                    importSegments
-                    ))
-                  case Some(mappings) =>
-                    mappings.map{
-                      case (k, v) => (possibleScriptPath, v.getOrElse(k), importSegments :+ k)
-                    }
-                }
-              )
-            } else importSegments match {
-              case Seq(first, rest@_*) => find(targetScript/first, rest)
-              case Seq() =>
-                tree.mappings match {
-                  case None => Left(Seq(tree.prefix.mkString(".")))
-                  case Some(mappings) =>
-                    val (matched, missing) = mappings.partition{
-                      case (k, v) => exists! targetScript/s"$k.scala"
-                    }
-                    if (missing.nonEmpty) {
-                      Left(missing.map{case (k, v) => (tree.prefix :+ k).mkString(".")})
-                    } else {
-                      Right(matched.map{
-                        case (k, v) => (targetScript/s"$k.scala", v.getOrElse(k), importSegments)
-                      })
-                    }
-
-                }
-            }
+          val relativeModules = tree.mappings match{
+            case None => Seq(relative -> None)
+            case Some(mappings) => for((k, v) <- mappings) yield relative/k -> v
           }
+          def relToFile(x: RelPath) = currentScriptPath/up/x/up/s"${x.last}.scala"
+          val files = relativeModules.map(x => relToFile(x._1))
+          val missing = files.filter(!exists(_))
 
-          find(currentScriptPath/up/relative.copy(segments = Vector()), relative.segments) match {
-            case Left(failures) => Res.Failure(None, "Cannot resolve import " + failures)
-            case Right(files) =>
-              Res.Success(
-                for((filePath, rename, unusedSegments) <- files) yield {
-                  val (pkg, wrapper) = Util.pathToPackageWrapper(filePath, interp.wd)
-                  val fullPrefix = pkg.map(_.raw) ++ Seq(wrapper.raw) ++ unusedSegments
+          if (missing.nonEmpty) {
+            Res.Failure(None, "Cannot resolve imports " + missing.mkString(","))
+          } else {
+            Res.Success(
+              for(((relativeModule, rename), filePath) <- relativeModules.zip(files)) yield {
+                val (pkg, wrapper) = Util.pathToPackageWrapper(filePath, interp.wd)
+                val fullPrefix = pkg.map(_.raw) ++ Seq(wrapper.raw)
 
-                  val importData = Seq(ImportData(
-                    fullPrefix.last, rename,
-                    fullPrefix.dropRight(1).map(Name), ImportData.TermType
-                  ))
+                val importData = Seq(ImportData(
+                  fullPrefix.last, rename.getOrElse(relativeModule.last),
+                  fullPrefix.dropRight(1).map(Name), ImportData.TermType
+                ))
 
-                  Result.Source(
-                    read(filePath),
-                    wrapper,
-                    pkg,
-                    ImportHook.Source.File(filePath),
-                    Imports(importData)
-                  )
-                }
-              )
+                Result.Source(
+                  read(filePath),
+                  wrapper,
+                  pkg,
+                  ImportHook.Source.File(filePath),
+                  Imports(importData)
+                )
+              }
+            )
           }
         case Source.URL(path) => ???
       }

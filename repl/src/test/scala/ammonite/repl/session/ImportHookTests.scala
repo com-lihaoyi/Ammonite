@@ -16,9 +16,9 @@ object ImportHookTests extends TestSuite{
     'repl{
       'file{
         'basic - check.session("""
-          @ import $file.repl.src.test.resources.importHooks.Basic.basicValue
+          @ import $file.repl.src.test.resources.importHooks.Basic
 
-          @ basicValue
+          @ Basic.basicValue
           res1: Int = 31337
         """)
 
@@ -58,37 +58,13 @@ object ImportHookTests extends TestSuite{
 
         'deep - check.session("""
           @ import $file.repl.src.test.resources.importHooks.Deep.DeepObject.DeepInner.deepValue
-
-          @ deepValue
-          res1: String = "deeeep"
-
-          @ DeepObject
-          error: not found: value DeepObject
-
-          @ DeepInner
-          error: not found: value DeepInner
+          error: Cannot resolve imports
         """)
 
 
         'deepRenamed - check.session("""
           @ import $file.repl.src.test.resources.importHooks.Deep.{DeepObject => DeepRenamed}
-
-          @ DeepRenamed.DeepInner.deepValue
-          res1: String = "deeeep"
-
-          @ import $file.repl.src.test.resources.importHooks.Deep.DeepObject.{
-          @   DeepInner => RenamedInner
-          @ }
-
-          @ RenamedInner.deepValue
-          res3: String = "deeeep"
-
-          @ import $file.repl.src.test.resources.importHooks.Deep.DeepObject.DeepInner.{
-          @   deepValue => renamedValue
-          @ }
-
-          @ renamedValue
-          res5: String = "deeeep"
+          error: Cannot resolve imports
          """)
 
       }
@@ -175,27 +151,12 @@ object ImportHookTests extends TestSuite{
 
       'deepImport - check.session("""
         @ import $file.repl.src.test.resources.importHooks.DeepImport.deepValueImported
+        error: Cannot resolve imports
+
+        @ import $file.repl.src.test.resources.importHooks.DeepImport,DeepImport.deepValueImported
 
         @ deepValueImported
         res1: String = "deeeep"
-      """)
-      'deepImportRenameOne - check.session("""
-        @ import $file.repl.src.test.resources.importHooks.DeepImportRenameOne.deepValueImported
-
-        @ deepValueImported
-        res1: String = "deeeepOne"
-      """)
-      'deepImportRenameTwo - check.session("""
-        @ import $file.repl.src.test.resources.importHooks.DeepImportRenameTwo.deepValueImported
-
-        @ deepValueImported
-        res1: String = "deeeepTwo"
-      """)
-      'deepImportRenameThree - check.session("""
-        @ import $file.repl.src.test.resources.importHooks.DeepImportRenameThree.deepValueImported
-
-        @ deepValueImported
-        res1: String = "deeeepThree"
       """)
     }
   }

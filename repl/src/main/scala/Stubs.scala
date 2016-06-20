@@ -5,26 +5,26 @@
   * Package that gets filled with any script files that the user imports
   */
 package $file{
-  private object `_`
+  object $
 }
 
 /**
   * Package that gets filled with ivy artifacts the user loads
   */
 package $ivy{
-  private object `_`
+  object $
 }
 
 /**
   * Package that gets filled with any web scripts people load from http URLs
   */
 package $url{
-  private object `_`
+  object $
 }
 
 /**
   * Package to import from when you don't want to import anything
   */
 package $stub{
-  private object `_`
+  object $
 }
