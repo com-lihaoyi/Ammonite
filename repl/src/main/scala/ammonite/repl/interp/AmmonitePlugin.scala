@@ -1,9 +1,10 @@
 package ammonite.repl.interp
 
 
-import ammonite.repl.{ImportData, Parsers, Name}
+import ammonite.repl.{ImportData, Name, Parsers}
 import acyclic.file
 
+import scala.reflect.NameTransformer
 import scala.tools.nsc._
 import scala.tools.nsc.plugins.{Plugin, PluginComponent}
 import scala.reflect.internal.util.{BatchSourceFile, OffsetPosition}
@@ -130,7 +131,8 @@ object AmmonitePlugin{
         // Apart from this, all other imports should resolve either to one
         // of these cases or importing-from-an-existing import, both of which
         // should work without modification
-        val headFullPath = symbolList.head.fullName.split('.').map(Name)
+
+        val headFullPath = NameTransformer.decode(symbolList.head.fullName).split('.').map(Name)
         // prefix package imports with `_root_` to try and stop random
         // variables from interfering with them. If someone defines a value
         // called `_root_`, this will still break, but that's their problem

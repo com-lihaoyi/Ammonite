@@ -180,7 +180,9 @@ class Interpreter(prompt0: Ref[String],
           hookResults <- Res.map(hooked){
             case res: ImportHook.Result.Source =>
               val r = for{
-                moduleImports <- processModule(res.source, res.code, res.wrapper, res.pkg, autoImport = false)
+                moduleImports <- processModule(
+                  res.source, res.code, res.wrapper, res.pkg, autoImport = false
+                )
               } yield {
                 if (!res.exec) res.imports
                 else moduleImports ++ res.imports
