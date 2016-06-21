@@ -276,8 +276,8 @@ object Preprocessor{
     // Stringify everything
     val out = for(group <- grouped) yield {
       val printedGroup = for(item <- group) yield{
-        if (item.fromName == item.toName) Parsers.backtickWrap(item.fromName)
-        else s"${Parsers.backtickWrap(item.fromName)} => ${Parsers.backtickWrap(item.toName)}"
+        if (item.fromName == item.toName) item.fromName.backticked
+        else s"${item.fromName.backticked} => ${item.toName.backticked}"
       }
       val pkgString = group.head.prefix.map(_.backticked).mkString(".")
       "import " + pkgString + ".{\n  " + printedGroup.mkString(",\n  ") + "\n}\n"

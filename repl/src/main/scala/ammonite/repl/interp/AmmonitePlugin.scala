@@ -205,7 +205,7 @@ object AmmonitePlugin{
         case Seq(_, _) => ImportData.TermType
       }
 
-      ImportData(fromName, toName, importString, importType)
+      ImportData(Name(fromName), Name(toName), importString, importType)
     }
 
     // Send the recorded imports through a callback back to the Ammonite REPL.
@@ -214,7 +214,7 @@ object AmmonitePlugin{
     // together v.s. having them by sent in the arbitrary-jumbled order they
     // come out of the `grouped` map in
 
-    output(open.toVector.sortBy(_.prefix.map(_.raw).mkString(".")))
+    output(open.toVector.sortBy(_.prefix.map(_.backticked).mkString(".")))
   }
 }
 

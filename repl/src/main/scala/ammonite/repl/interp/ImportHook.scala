@@ -84,11 +84,11 @@ object ImportHook{
             Res.Success(
               for(((relativeModule, rename), filePath) <- relativeModules.zip(files)) yield {
                 val (pkg, wrapper) = Util.pathToPackageWrapper(filePath, interp.wd)
-                val fullPrefix = pkg.map(_.raw) ++ Seq(wrapper.raw)
+                val fullPrefix = pkg ++ Seq(wrapper)
 
                 val importData = Seq(ImportData(
-                  fullPrefix.last, rename.getOrElse(relativeModule.last),
-                  fullPrefix.dropRight(1).map(Name), ImportData.TermType
+                  fullPrefix.last, Name(rename.getOrElse(relativeModule.last)),
+                  fullPrefix.dropRight(1), ImportData.TermType
                 ))
 
                 Result.Source(
@@ -117,7 +117,7 @@ object ImportHook{
         Name(url),
         Seq(Name("$url")),
         ImportHook.Source.URL(url),
-        Imports(Seq(ImportData(url, target, Seq(Name("$url")), ImportData.Term))),
+        Imports(Seq(ImportData(Name(url), Name(target), Seq(Name("$url")), ImportData.Term))),
         false
       ))
     }

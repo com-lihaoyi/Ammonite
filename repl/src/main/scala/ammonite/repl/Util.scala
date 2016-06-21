@@ -143,8 +143,8 @@ case class Evaluated(wrapper: Seq[Name],
   * a type, a term, or both. This lets us properly deal with shadowing correctly
   * if we import the type and term of the same name from different places
   */
-case class ImportData(fromName: String,
-                      toName: String,
+case class ImportData(fromName: Name,
+                      toName: Name,
                       prefix: Seq[Name],
                       importType: ImportData.ImportType)
 
@@ -187,8 +187,8 @@ object Imports{
     //
     // At the end of the day we re-reverse the trimmed list and return it.
     val importData = importss.flatten
-    val stompedTypes = mutable.Set.empty[String]
-    val stompedTerms = mutable.Set.empty[String]
+    val stompedTypes = mutable.Set.empty[Name]
+    val stompedTerms = mutable.Set.empty[Name]
     val out = mutable.Buffer.empty[ImportData]
     for(data <- importData.reverseIterator){
       val stomped = data.importType match{
@@ -199,7 +199,7 @@ object Imports{
       if (!stomped.exists(_(data.toName))){
         out.append(data)
         stomped.foreach(_.add(data.toName))
-        data.prefix.headOption.map(_.backticked).foreach(stompedTerms.remove)
+        data.prefix.headOption.foreach(stompedTerms.remove)
       }
     }
     new Imports(out.reverse)
@@ -216,6 +216,10 @@ object Imports{
   * useful for accessing names as-seen-from the Java/JVM side of thigns
   */
 case class Name(raw: String){
+  assert(
+    NameTransformer.decode(raw) == raw,
+    "Name() must be created with un-encoded text"
+  )
   assert(raw.charAt(0) != '`', "Cannot create already-backticked identifiers")
   override def toString = s"Name($backticked)"
   def encoded = NameTransformer.encode(raw)
