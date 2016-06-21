@@ -91,7 +91,7 @@ case class Main(predef: String = "",
       case x: Res.Failing => x
       case Res.Success(imports) =>
         repl.interp.init()
-        imports.value.find(_.toName == "main") match {
+        imports.value.find(_.toName == Name("main")) match {
           case None => Res.Success(imports)
           case Some(i) =>
             val quotedArgs =

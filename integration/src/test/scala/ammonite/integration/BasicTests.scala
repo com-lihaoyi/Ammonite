@@ -52,7 +52,8 @@ object BasicTests extends TestSuite{
     }
     'main{
       val evaled = exec('basic/"Main.scala")
-      assert(evaled.out.string.contains("Hello! 1"))
+      val out = evaled.out.string
+      assert(out.contains("Hello! 1"))
     }
     'classloaders{
       val evaled = exec('basic/"Resources.scala")
