@@ -110,6 +110,7 @@ object Storage{
                            cacheTag: String): Seq[CompileCache] = {
       val dir = pkg + "." + wrapper + "0"
       val codeCacheDir = compileCacheDir/dir
+
       if(!exists(codeCacheDir)) Seq[CompileCache]()
       else {
         val metadataJson = Try {
@@ -121,6 +122,7 @@ object Storage{
           val res = {
             for(cachedPkg <- classFilesList) yield compileCacheLoad(cachedPkg._1, cachedPkg._2)
           }.flatten
+          println(res)
           res
         }
         else Seq[CompileCache]()

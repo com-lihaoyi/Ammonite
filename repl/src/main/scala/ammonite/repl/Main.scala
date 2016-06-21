@@ -96,8 +96,10 @@ case class Main(predef: String = "",
         if (args == Seq() || !code.contains("load(")) {
           storage.asInstanceOf[Storage.Folder].classFilesListLoad(pkg.map(_.backticked).mkString("."), wrapper.backticked, cacheTag) match {
             case Seq() =>
+              println("Not cached!!")
               runScript(path, args, kwargs, storage, cacheTag)
             case cachedData =>
+              println("Cached!!!!")
               val outBuffer = mutable.Buffer.empty[String]
               val warningBuffer = mutable.Buffer.empty[String]
               val errorBuffer = mutable.Buffer.empty[String]

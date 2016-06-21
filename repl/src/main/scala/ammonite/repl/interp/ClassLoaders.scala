@@ -99,12 +99,9 @@ class SpecialClassLoader(parent: ClassLoader, parentHash: Array[Byte])
     "ammonite.repl.frontend.ReplBridge$"
   )
   override def findClass(name: String): Class[_] = {
-    println("FindClass " + name + "||")
-    println("NewFileDict=>" + newFileDict + "||")
     def loadedFromBytes =
       for(bytes <- newFileDict.get(name))
         yield defineClass(name, bytes, 0, bytes.length)
-    println("loadeBytes =>" + loadedFromBytes)
 
     def special =
       if (!specialLocalClasses(name)) None
@@ -116,7 +113,6 @@ class SpecialClassLoader(parent: ClassLoader, parentHash: Array[Byte])
 
         Some(defineClass(name, bytes, 0, bytes.length))
       }
-      println("Special ==>" + special)
     Option(this.findLoadedClass(name))
       .orElse(loadedFromBytes)
       .orElse(special)

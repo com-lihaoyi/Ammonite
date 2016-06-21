@@ -133,8 +133,7 @@ class Interpreter(prompt0: Ref[String],
       // If withCompiler flag is false load predefs from cache without using compiler
       withCompiler match {
         case true =>
-          println("GOOOD")
-          processModule0(ImportHook.Source.File(wd/"<console>"), sourceCode, Name(wrapperName), pkgName.split(".").map(Name(_)), predefImports) match {
+          processModule0(ImportHook.Source.File(wd/"<console>"), sourceCode, Name(wrapperName), pkgName.split('.').map(Name(_)), predefImports) match {
             case Res.Success(data) =>
               predefImports = predefImports ++ data._1
             case Res.Failure(ex, msg) =>
@@ -321,7 +320,6 @@ class Interpreter(prompt0: Ref[String],
 
 
     Timer("cachedCompileBlock 1")
-
     val fullyQualifiedName = (pkgName :+ wrapperName).map(_.encoded).mkString(".")
     val tag = Interpreter.cacheTag(
       processed.code, Nil, eval.sess.frames.head.classloader.classpathHash
@@ -412,7 +410,6 @@ class Interpreter(prompt0: Ref[String],
                            preprocess: Preprocessor = Preprocessor(compiler.parse))
                           : Res[(Imports, List[CacheDetails])] = {
 
-      println("AAAAAAAAAAAAAAAAAAAA")
     Timer("processCorrectScript 1")
     // we store the old value, because we will reassign this in the loop
     val outerScriptImportCallback = scriptImportCallback
