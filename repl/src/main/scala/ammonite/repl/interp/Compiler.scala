@@ -124,7 +124,7 @@ object Compiler{
       def displayPrompt(): Unit = ???
 
       def display(pos: Position, msg: String, severity: Severity) = {
-        println("Pos-->" + pos + "msg --> " + msg + "severity -->" + severity)
+        println("Pos-->" + pos + "  msg --> " + msg + "  severity -->" + severity)
         severity match{
           case ERROR =>
             Classpath.traceClasspathProblem(s"ERROR: $msg")

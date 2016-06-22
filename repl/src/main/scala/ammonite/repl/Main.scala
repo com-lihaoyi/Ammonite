@@ -82,86 +82,6 @@ case class Main(predef: String = "",
   }
 
 
-  def runScriptLevelCache(path: Path, args: Seq[String] = Vector.empty,
-                          kwargs: Map[String, String] = Map.empty,
-                          storage: Storage) = {
-    Timer.startTime = System.nanoTime()
-    val code: String = read(path)
-    val (pkg, wrapper) = Util.pathToPackageWrapper(path, wd)
-    val cacheTag = "cache" + Util.md5Hash(Iterator(code.getBytes)).map("%02x".format(_)).mkString
-    // check if script takes args or loads code as they will need compiler
-    storage match {
-      case s: Storage.InMemory => runScript(path, args, kwargs, storage, cacheTag, false)
-      case _ =>
-        if (args == Seq() || !code.contains("load(")) {
-          storage.asInstanceOf[Storage.Folder].classFilesListLoad(pkg.map(_.backticked).mkString("."), wrapper.backticked, cacheTag) match {
-            case Seq() =>
-              println("Not cached!!")
-              runScript(path, args, kwargs, storage, cacheTag)
-            case cachedData =>
-              println("Cached!!!!")
-              val outBuffer = mutable.Buffer.empty[String]
-              val warningBuffer = mutable.Buffer.empty[String]
-              val errorBuffer = mutable.Buffer.empty[String]
-              val infoBuffer = mutable.Buffer.empty[String]
-              val prompt = Ref("@ ")
-              val colors = Ref[Colors](Colors.Default)
-              val frontEnd = Ref[FrontEnd](AmmoniteFrontEnd(Filter.empty))
-              val printer = Printer(
-                outBuffer.append(_),
-                warningBuffer.append(_),
-                errorBuffer.append(_),
-                infoBuffer.append(_)
-              )
-              val predef = Main.maybeDefaultPredef(defaultPredef, Main.defaultPredefString)
-
-              val interp: Interpreter = new Interpreter(
-                prompt,
-                frontEnd,
-                frontEnd().width,
-                frontEnd().height,
-                colors,
-                printer,
-                storage,
-                new History(Vector()),
-                predef,
-                wd,
-                Nil,
-                false
-              )
-              
-              def evalMain(cls: Class[_]) =
-                cls.getDeclaredMethod("$main").invoke(null)
-
-              var blockNumber = 1;
-              def getBlockNumber = blockNumber match {
-                case 1 => ""
-                case _ => "_" + blockNumber.toString
-              }
-
-              // Iterate through cached blocks and execute classFiles
-              // blockNumber keeps track of blockIndex
-              cachedData.foreach { d =>
-                println("DATA => " + d + "\n" + blockNumber + "\n\n||||||||||||||||||||||||||||")
-                for {
-                  cls <- interp.eval.loadClass(pkg + "." + wrapper + getBlockNumber, d._1)
-                } yield {
-                  evalMain(cls)
-                }
-                blockNumber += 1
-              }
-//              if (Timer.show)
-                println("Compilation Count: " + interp.compilationCount)
-          }
-        }
-        else {
-          runScript(path, args, kwargs, storage, cacheTag)
-        }
-    }
-  }
-
-
-
   /**
     * Run a Scala script file! takes the path to the file as well as an array
     * of `args` and a map of keyword `kwargs` to pass to that file.
@@ -169,20 +89,43 @@ case class Main(predef: String = "",
   def runScript(path: Path,
                 args: Seq[String],
                 kwargs: Map[String, String],
-                storage: Storage,
-                cacheTag: String,
-                cacheScript: Boolean = true): Res[Seq[ImportData]] = {
-    val repl = instantiateRepl()
-    val (pkg, wrapper) = Util.pathToPackageWrapper(path, wd)
+                storage: Storage): Res[Seq[ImportData]] = {
+    val outBuffer = mutable.Buffer.empty[String]
+    val warningBuffer = mutable.Buffer.empty[String]
+    val errorBuffer = mutable.Buffer.empty[String]
+    val infoBuffer = mutable.Buffer.empty[String]
+    val prompt = Ref("@ ")
+    val colors = Ref[Colors](Colors.Default)
+    val frontEnd = Ref[FrontEnd](AmmoniteFrontEnd(Filter.empty))
+    val printer = Printer(
+      outBuffer.append(_),
+      warningBuffer.append(_),
+      errorBuffer.append(_),
+      infoBuffer.append(_)
+    )
+    val predef = Main.maybeDefaultPredef(defaultPredef, Main.defaultPredefString)
 
-    repl.interp.processModule(ImportHook.Source.File(path), read(path), wrapper, pkg) match{
+    val interp: Interpreter = new Interpreter(
+      prompt,
+      frontEnd,
+      frontEnd().width,
+      frontEnd().height,
+      colors,
+      printer,
+      storage,
+      new History(Vector()),
+      predef,
+      wd,
+      Nil
+    )
+    val (pkg, wrapper) = Util.pathToPackageWrapper(path, wd)
+    interp.processModule(ImportHook.Source.File(path), read(path), wrapper, pkg) match {
       case x: Res.Failing => x
-      case Res.Success(data) =>
-        val Imports(imports)  = data._1
-        val files = for(d <- data._2) yield (d._1, d._2)
-        repl.interp.init()
-        if(imports.count(_.toName == "main") == 0 && cacheScript)
-          storage.asInstanceOf[Storage.Folder].classFilesListSave(pkg.map(_.backticked).mkString("."), wrapper.backticked, files, cacheTag)
+      case Res.Success(processedData) =>
+        val Imports(imports) = processedData
+
+        interp.init()
+        println("++++++++++++++++++++ COMPILATION COUNT:==> " + interp.compilationCount)
         imports.find(_.toName == "main") match {
           case None => Res.Success(imports)
           case Some(i) =>
@@ -193,23 +136,28 @@ case class Main(predef: String = "",
             val quotedKwargs =
               kwargs.mapValues(pprint.PPrinter.escape)
                 .map { case (k, s) => s"""$k=arg("$s")""" }
-            repl.interp.processExec(
+            interp.processExec(
               s"""|import ammonite.repl.ScriptInit.{arg, callMain, pathRead}
                   |callMain{
                   |  main(${(quotedArgs ++ quotedKwargs).mkString(", ")})
                   |}
                   |""".stripMargin
             ) match {
-              case Res.Success(_) => Res.Success(imports)
-              case Res.Exception(e: ArgParseException, s) =>
-                e.setStackTrace(Array())
-                e.cause.setStackTrace(e.cause.getStackTrace.takeWhile(frame =>
-                  frame.getClassName != "ammonite.repl.ScriptInit$" ||
-                    frame.getMethodName != "parseScriptArg"
-                ))
-                Res.Exception(e, s)
-              case x => Res.Success(imports)
-            }
+            case Res.Success(_) => Res.
+              Success(imports)
+            case Res.Exception(e:
+              ArgParseException, s) =>
+              e.setStackTrace(Array())
+              e.cause.setStackTrace(e.
+                cause.getStackTrace.takeWhile(frame =>
+                frame.getClassName != "ammonite.repl.ScriptInit$" ||
+                  frame.getMethodName !=
+                    "parseScriptArg"
+              ))
+              Res.Exception(e
+                , s)
+            case x => Res.Success(imports)
+          }
         }
     }
   }
@@ -356,7 +304,7 @@ object Main{
       (fileToExecute, codeToExecute) match{
         case (None, None) => println("Loading..."); main.run()
         case (Some(path), None) =>
-          main.runScriptLevelCache(path,
+          main.runScript(path,
             passThroughArgs,
             kwargs.toMap,
             main.storageBackend) match{

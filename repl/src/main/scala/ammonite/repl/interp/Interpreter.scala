@@ -37,8 +37,7 @@ class Interpreter(prompt0: Ref[String],
                   history: => History,
                   predef: String,
                   val wd: Path,
-                  replArgs: Seq[Bind[_]],
-                  withCompiler: Boolean = true)
+                  replArgs: Seq[Bind[_]])
   extends ImportHook.InterpreterInterface{ interp =>
 
   val hardcodedPredef =
@@ -49,6 +48,7 @@ class Interpreter(prompt0: Ref[String],
     case s: Storage.InMemory => false
     case _ => true
   }
+
   //this variable keeps track of where should we put the imports resulting from scripts.
   private var scriptImportCallback: Imports => Unit = eval.update
 
@@ -103,8 +103,8 @@ class Interpreter(prompt0: Ref[String],
     bridgeCls.asInstanceOf[Class[ReplAPIHolder]],
     replApi
   )
-  Timer("Interpreter init eval")
-  if(withCompiler) init()
+//  Timer("Interpreter init eval")
+//  if(withCompiler) init()
 
   Timer("Interpreter init init")
   val argString = replArgs.zipWithIndex.map{ case (b, idx) =>
@@ -116,7 +116,9 @@ class Interpreter(prompt0: Ref[String],
 
   var predefImports = Imports(Nil)
   initPredef()
-  def initPredef(withCompiler: Boolean = withCompiler): Unit = {
+  def initPredef(): Unit = {
+
+    println("CompilationCount1:=" + compilationCount)
 
     val predefs = Seq(
       (hardcodedPredef, "HardcodedPredef", "ammonite.predef"),
@@ -130,12 +132,18 @@ class Interpreter(prompt0: Ref[String],
     // on `predefImports`, and we should be able to provide the "current" imports
     // to it even if it's half built
     for ((sourceCode, wrapperName, pkgName) <- predefs) {
-      // If withCompiler flag is false load predefs from cache without using compiler
-      withCompiler match {
-        case true =>
-          processModule0(ImportHook.Source.File(wd/"<console>"), sourceCode, Name(wrapperName), pkgName.split('.').map(Name(_)), predefImports) match {
-            case Res.Success(data) =>
-              predefImports = predefImports ++ data._1
+//      val emptyCachedData = (Traversable[(String, Array[Byte])](), Imports(Seq()))
+//      val loc = pkgName + "." + wrapperName
+//      storage.asInstanceOf[Storage.Folder].compileCacheLoad(loc, "predef") match {
+//        case None =>
+//          println("CompilationCount2 Import cached not found:=" + compilationCount)
+//
+//          init()
+//          println("CompilationCount3 Import cached not found:=" + compilationCount)
+
+      processModule(ImportHook.Source.File(wd / "<console>"), sourceCode, Name(wrapperName), pkgName.split('.').map(Name(_))) match {
+            case Res.Success(imports) =>
+              predefImports = predefImports ++ imports
             case Res.Failure(ex, msg) =>
               ex match {
                 case Some(e) => throw new RuntimeException("Error during Predef: " + msg, e)
@@ -145,19 +153,16 @@ class Interpreter(prompt0: Ref[String],
             case Res.Exception(ex, msg) =>
               throw new RuntimeException("Error during Predef: " + msg, ex)
           }
-        case false =>
-          val emptyCachedData = (Traversable[(String, Array[Byte])](), Imports(Seq()))
-          val folderStorage = storage.asInstanceOf[Storage.Folder]
-          val loc = pkgName + "." + wrapperName
-          val d = folderStorage.compileCacheLoad(loc, "predef").getOrElse(emptyCachedData)
-          predefImports = predefImports ++ d._2
-      }
+//        case d =>
+//          println("CompilationCount4 Import cached FOUND!!:=" + compilationCount)
+//          predefImports = predefImports ++ d.getOrElse(emptyCachedData)._2
+//          println("CompilationCount5 Import cached FOUND!!:=" + compilationCount)
+//      }
     }
   }
 
   eval.sess.save()
   Timer("Interpreter init predef 0")
-    if(withCompiler) init()
   Timer("Interpreter init predef 1")
 
   val importHooks = Ref(Map[String, ImportHook](
@@ -348,9 +353,59 @@ class Interpreter(prompt0: Ref[String],
 
   }
 
-  def processModule(source: ImportHook.Source, code: String, wrapperName: Name, pkgName: Seq[Name]) = {
-    processModule0(source, code, wrapperName, pkgName, predefImports)
+
+  def evalCachedClassFiles(cachedData: Seq[CompileCache], pkg: String, wrapper: String): Unit = {
+
+    def evalMain(cls: Class[_]) =
+      cls.getDeclaredMethod("$main").invoke(null)
+
+    var blockNumber = 1;
+    def getBlockNumber = blockNumber match {
+      case 1 => ""
+      case _ => "_" + blockNumber.toString
+    }
+
+    // Iterate through cached blocks and execute classFiles
+    // blockNumber keeps track of blockIndex
+    cachedData.foreach { d =>
+      for {
+        cls <- eval.loadClass(pkg + "." + wrapper + getBlockNumber, d._1)
+      } yield {
+        evalMain(cls)
+      }
+      blockNumber += 1
+    }
   }
+
+
+  def processModule(source: ImportHook.Source,
+                    code: String,
+                    wrapperName: Name,
+                    pkgName: Seq[Name]
+                   ): Res[Imports] = if(scriptCaching) {
+    val cacheTag = "cache" + Util.md5Hash(Iterator(code.getBytes)).map("%02x".format(_)).mkString
+    storage.asInstanceOf[Storage.Folder].classFilesListLoad(pkgName.map(_.backticked).mkString("."), wrapperName.backticked, cacheTag) match {
+      case Seq() =>
+        init()
+        val res = processModule0(source, code, wrapperName, pkgName, predefImports)
+       res match{
+         case Res.Success(data) =>
+           val Imports(imports) = data._1
+           val files = for (d <- data._2) yield (d._1, d._2)
+           if (imports.count(_.toName == "main") == 0)
+             storage.asInstanceOf[Storage.Folder].classFilesListSave(pkgName.map(_.backticked).mkString("."), wrapperName.backticked, files, cacheTag)
+           res.map(_._1)
+         case r => res.asInstanceOf[Res[Imports]]
+       }
+      case cachedData =>
+        evalCachedClassFiles(cachedData, pkgName.map(_.backticked).mkString("."), wrapperName.backticked)
+        Res.Success(Imports(Seq()))
+    }
+  } else {
+    init()
+    processModule0(source, code, wrapperName, pkgName, predefImports).map(_._1)
+  }
+
 
 
 
@@ -365,22 +420,23 @@ class Interpreter(prompt0: Ref[String],
                      wrapperName: Name,
                      pkgName: Seq[Name],
                      startingImports: Imports): Res[(Imports, List[CacheDetails])] = for{
-    (processedBlocks, hookImports) <- preprocessScript(source, code)
-    res <- processCorrectScript(
-      processedBlocks,
-      startingImports ++ hookImports,
-      pkgName,
-      wrapperName,
-      (processed, wrapperIndex, indexedWrapperName) =>
-        withContextClassloader(
-          processScriptBlock(
-            processed, printer,
-            Interpreter.indexWrapperName(wrapperName, wrapperIndex),
-            wrapperName.raw + ".scala", pkgName
+      (processedBlocks, hookImports) <- preprocessScript(source, code)
+      res <- processCorrectScript(
+        processedBlocks,
+        startingImports ++ hookImports,
+        pkgName,
+        wrapperName,
+        (processed, wrapperIndex, indexedWrapperName) =>
+          withContextClassloader(
+            processScriptBlock(
+              processed, printer,
+              Interpreter.indexWrapperName(wrapperName, wrapperIndex),
+              wrapperName.raw + ".scala", pkgName
+            )
           )
-        )
-    )
-  } yield (res._1 ++ hookImports, res._2)
+      )
+    } yield (res._1 ++ hookImports, res._2)
+
 
 
   def processExec(code: String): Res[Imports] = for {
@@ -564,77 +620,18 @@ class Interpreter(prompt0: Ref[String],
 
       def exec(file: Path): Unit = apply(read(file))
 
-      def app(code: String, wrapper: Name, pkg: Seq[Name], initC: Boolean) = initC match {
-        case true =>
-          if (initC) {
-          init()
-            initPredef(true)
-      }
-      processModule(ImportHook.Source.File(wd/"<console>"), code, wrapper, pkg)
-          case false => processModule(ImportHook.Source.File(wd/"<console>"), code, wrapper, pkg)
-        }
 
-
-
-      def loadModule(file: Path, storage: Storage, cacheTag: String, initC: Boolean = false): Unit ={
-        val code = read(file)
+      def module(file: Path) = {
         val (pkg, wrapper) = Util.pathToPackageWrapper(file, wd)
-         app(code, wrapper, pkg, initC) match {
-//        processModule(ImportHook.Source.File(wd/"<console>"), read(file), wrapper, pkg) match{
+        processModule(ImportHook.Source.File(wd / "<console>"), read(file), wrapper, pkg) match {
           case Res.Failure(ex, s) => throw new CompilationError(s)
           case Res.Exception(t, s) => throw t
-          case Res.Success(data) =>
-            if(scriptCaching) {
-              val files = for (d <- data._2) yield (d._1, d._2)
-              storage.asInstanceOf[Storage.Folder]classFilesListSave(pkg.map(_.backticked).mkString("."), wrapper.backticked, files, cacheTag)
-            }
+          case x => //println(x)
         }
         init()
       }
 
-      // Try loading script from cache
-      def cachedModule(path: Path) = {
-        Timer.startTime = System.nanoTime()
 
-        val code: String = read(path)
-        val (pkg, wrapper) = Util.pathToPackageWrapper(path, wd)
-        val cacheTag = "cache" + Util.md5Hash(Iterator(code.getBytes))
-          .map("%02x".format(_)).mkString
-        if(!code.contains("load(")) {
-          storage.asInstanceOf[Storage.Folder].classFilesListLoad(pkg.map(_.backticked).mkString("."), wrapper.backticked, cacheTag) match {
-            case Seq() =>
-              loadModule(path, storage.asInstanceOf[Storage.Folder], cacheTag, true)
-            case cachedData =>
-              def evalMain(cls: Class[_]) =
-                cls.getDeclaredMethod("$main").invoke(null)
-
-              var blockNumber = 1
-              def getBlockNumber = blockNumber match {
-                case 1 => ""
-                case _ => "_" + blockNumber.toString
-              }
-              cachedData.foreach { d => {
-                for {
-                  cls <- interp.eval.loadClass(pkg + "." + wrapper + getBlockNumber, d._1)
-                } yield {
-                  evalMain(cls)
-                }
-                blockNumber += 1
-              }
-              }
-          }
-        } else loadModule(path, storage.asInstanceOf[Storage.Folder], cacheTag, true)
-      }
-
-      def module(file: Path): Unit = {
-        if (!withCompiler)
-          cachedModule(file)
-        else {
-          val cacheTag = "cache" + Util.md5Hash(Iterator(read(file).getBytes))
-            .map("%02x".format(_)).mkString
-          loadModule(file, storage, cacheTag)
-        }
-      }
 
       object plugin extends DefaultLoadJar {
         def resolvers: List[Resolver] =

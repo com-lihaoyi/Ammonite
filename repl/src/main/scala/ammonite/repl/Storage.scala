@@ -122,7 +122,6 @@ object Storage{
           val res = {
             for(cachedPkg <- classFilesList) yield compileCacheLoad(cachedPkg._1, cachedPkg._2)
           }.flatten
-          println(res)
           res
         }
         else Seq[CompileCache]()
