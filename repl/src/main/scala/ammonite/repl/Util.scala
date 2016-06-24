@@ -293,7 +293,7 @@ object Util{
     val pkg = {
       val base = Seq("$file")
       val relPath = (path/up).relativeTo(wd)
-      val ups = Seq.fill(relPath.ups)("$up")
+      val ups = Seq.fill(relPath.ups)("..")
       val rest = relPath.segments
       (base ++ ups ++ rest).map(Name(_))
     }

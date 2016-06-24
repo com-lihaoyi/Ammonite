@@ -390,12 +390,24 @@
 
       @p
         We can load it into our REPL session using:
+
       @hl.scala
         @@ import $file.MyScript
-        import $file.$
 
         @@ MyScript.elite
         res1: Int = 31337
+
+      @p
+        If the script is in a sub-folder, simply use:
+
+      @hl.scala
+        @@ import $file.myfolder.MyScript
+
+      @p
+        Or if the script is in an @i{outer} folder,
+
+      @hl.scala
+        @@ import $file.`..`.MyScript
 
       @p
         Or if we want to import the contents of the script in one go:

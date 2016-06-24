@@ -39,6 +39,6 @@ contain code that is generated at runtime by Ammonite
   command-line. Any scripts are placed in `$file.foo.bar.baz`
   for a script in folder `foo/bar/baz/` relative to the current working
   directory; scripts outside the current working directory have the 
-  corresponding number of `$up` packages e.g. `$file.$up.foo.bar`
+  corresponding number of `..` packages e.g. `$file.`..`.foo.bar`
   to represent a script in the folder `../foo/bar/` relative to the working
   directory.

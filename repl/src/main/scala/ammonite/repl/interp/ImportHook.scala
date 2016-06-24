@@ -63,7 +63,7 @@ object ImportHook{
     def handle(source: ImportHook.Source, tree: ImportTree, interp: InterpreterInterface) = {
       val relative =
         tree.prefix
-            .map{case "$up" => up; case x => ammonite.ops.empty/x}
+            .map{case ".." => up; case x => ammonite.ops.empty/x}
             .reduce(_/_)
 
 
