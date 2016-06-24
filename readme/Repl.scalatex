@@ -372,10 +372,13 @@
         Each block of typing, deletes, or navigation counts as one undo. This
         should make it much more convenient to recover from botched copy-pastes
         or bulk-deletions.
-  @sect{Import Hooks}
+
+  @sect{Magic Imports}
     @p
       Ammonite provides a set of magic imports that let you load additional
-      code into a REPL session
+      code into a REPL session: these are imports which start with a @code{$},
+      and are *top-level* inside the REPL command or your
+      @sect.ref{Ammonite-Scripts}.
 
     @sect{import $file}
       @p
@@ -411,6 +414,70 @@
         @hl.scala{trait}s, or imports from @i{other} scripts. For more
         documentation on how these scripts work, check out the
         @sect.ref{Ammonite-Scripts} section.
+
+      @p
+        There are some subtleties when dealing with @hl.scala{$file} imports
+        that are worth remembering
+      @ul
+        @li
+          @sect.ref{Imported Scripts are Re-used}
+        @li
+          @sect.ref{Cannot directly import from inside a Script}
+        @li
+          @sect.ref{Renamed-scripts and multiple-scripts}
+
+      @sect{Imported Scripts are Re-used}
+        @p
+          Note that script files imported multiple times are re-used; even if
+          the same script is imported multiple times, it will only be compiled
+          once, and its top-level definitions or statements will only be
+          evaluated once. If you want to run code over and over, @hl.scala{def}
+          a function in the script you are importing and you can call it
+          repeatedly.
+        @p
+          If you want to re-load a script, you should use Ammonite's
+          @sect.ref{Save/Load Session} functionality to @hl.scala{sess.save()}
+          the session before importing the script, and @hl.scala{sess.load()}ing
+          to reset the script before re-@hl.scala{import}ing it.
+
+      @sect{Cannot directly import from inside a Script}
+        @p
+           You cannot import things from "inside" that script in
+          one chain:
+
+        @hl.scala
+          @@ import $file.MyScript._
+
+        @p
+          Rather, you must always import the script-object first, and then import
+          things from the script object after:
+
+        @hl.scala
+          @@ import $file.MyScript, MyScript._
+
+      @sect{Renamed-scripts and multiple-scripts}
+
+        @p
+          You can re-name scripts on-import if you find their names are
+          colliding:
+
+        @hl.scala
+          @@ import $file.{MyScript => FooBarScript}, FooBarScript._
+
+        @p
+          Or import multiple scripts at once
+
+        @hl.scala
+          @@ import $file.{MyScript, MyOtherScript}
+
+        @p
+          These behave as you would expect imports to work. Note that when
+          importing multiple scripts, you have to name them explicitly and
+          cannot use wildcard `._` imports:
+
+        @hl.scala
+          @@ import $file._ // doesn't work
+
     @sect{import $exec}
       @p
         This is similar to @hl.scala{import $file}, except that it dumps the
@@ -421,7 +488,21 @@
     @sect{import $ivy}
       @p
         Lets you import Ivy dependencies from Maven Central, or anywhere else.
-        It's usage is shown in the @sect.ref{Artifact Loading} section.
+        It's usage is shown in the @sect.ref{Artifact Loading} section. For
+        example, here is loading @lnk("Scalaz",
+        "https://github.com/scalaz/scalaz") and using it in the Ammonite-REPL:
+
+      @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("'scalaz", "@"))
+
+      @p
+        Note that the different portions of the @hl.scala{$ivy} import are
+        in a @code{org::library:version} format; the @code{::} is used to represent
+        Scala dependencies, similar to @hl.scala{%%} in SBT's dependency syntax.
+        If you want Java dependencies, you can load them using the
+        @code{org:library:version} format, e.g. here we load the
+        @lnk("Google Guava", "https://github.com/google/guava") Java library
+
+      @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("'guava", "@"))
 
   @sect{Builtins}
     @p
@@ -639,7 +720,7 @@
     @p
       Anything that you put in @code{predef.scala} will be executed when you
       load the Ammonite REPL. This is a handy place to put common imports,
-      setup code, or even call @hl.scala{load.ivy} to
+      setup code, or even call @hl.scala{import $ivy} to
       @sect.ref("Artifact Loading", "load third-party jars"). The compilation
       of the predef is cached, so after the first run it should not noticeably
       slow down the initialization of your REPL.

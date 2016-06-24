@@ -97,7 +97,7 @@
           Fixed a performance regression and greatly sped up pasting text into
           the REPL
         @li
-          Import hooks now exist!
+          @sect.ref{Magic Imports} now exist!
         @li
           @hl.scala{load.module}, @hl.scala{load.exec}, @hl.scala{load.ivy} are
           now largely superseded by @hl.scala{import $file},

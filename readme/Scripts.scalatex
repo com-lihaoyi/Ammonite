@@ -15,8 +15,8 @@
   @p
     Creating an Ammonite Script is just a matter of creating a
     @hl.scala{MyScript.scala} with some Scala code in it, and running it from
-    within the Ammonite REPL or @sect.ref("Running Scripts from Bash",
-    "from Bash"). Writing Scala code doesn't get much easier than that!
+    within the Ammonite REPL or @sect.ref{From Bash}. Writing Scala code
+    doesn't get much easier than that!
 
   @sect{Script Files}
     @p
@@ -41,132 +41,223 @@
       You can write any Scala code you want in an Ammonite script, including
       top-level statements and definitions (e.g. the @code{println} and
       @hl.scala{val x = 123} above) that are not valid in "normal" Scala
-      projects. After that, it's a matter of running the script
-      @sect.ref("Running Scripts from the REPL", "from the REPL") or
-      @sect.ref("Running Scripts from Bash", "from Bash")
+      projects. You do not need to wrap these sorts of top-level statements
+      or expressions in boilerplate @hl.scala("object Foo{...}") wrappers:
+      this is all done automatically for you by Ammonite.
 
-  @sect{Running Scripts from the REPL}
     @p
-      You can load any script into the Ammonite REPL using the
-      @hl.scala{import $file} syntax, for example here we import the above
-      @hl.scala{MyScript.scala} file to access its @hl.scala{x} value:
+      After that, it's a matter of running the script
+      @sect.ref{From the REPL} or @sect.ref{From Bash}
 
-    @hl.scala
-      @@ x // doesn't work yet
-      Compilation Failed
-      cmd0.scala:1: not found: value x
-      val res0 = x // doesn't work yet
-                 ^
-      @@ import $file.MyScript
-      Welcome to the XYZ custom REPL!!
+  @sect{Running Scripts}
+    @p
+      There are two way main ways to run Ammonite scripts:
+      @sect.ref{From the REPL} and @sect.ref{From Bash}.
+
+    @sect{From the REPL}
+      @p
+        You can load any script into the Ammonite REPL using the
+        @hl.scala{import $file} syntax, for example here we import the above
+        @hl.scala{MyScript.scala} file to access its @hl.scala{x} value:
+
+      @hl.scala
+        @@ x // doesn't work yet
+        Compilation Failed
+        cmd0.scala:1: not found: value x
+        val res0 = x // doesn't work yet
+                   ^
+        @@ import $file.MyScript
+        Welcome to the XYZ custom REPL!!
+
+        @@ MyScript.x // You can refer to definitions from that module
+        res1: Int = 123
+
+        @@ import MyScript._
+
+        @@ x // works
+        res2: Int = 123
+
+      @p
+        You can also import the module, and any associated definitions you want,
+        in the same import:
+
+      @hl.scala
+        @@ x // doesn't work yet
+        Compilation Failed
+        cmd0.scala:1: not found: value x
+        val res0 = x // doesn't work yet
+                   ^
+        @@ import $file.MyScript, MyScript._
+        Welcome to the XYZ custom REPL!!
+
+        @@ x
+        res1: Int = 123
+
+      @p
+        Note that by default, scripts imported via @code{$file} are
+        @i{encapsulated}, so any imports inside that @code{MyScript} performs are
+        not available outside of @code{MyScript.scala}:
+
+      @hl.scala
+        @@ import $file.MyScript, MyScript._
+        Welcome to the XYZ custom REPL!!
+        import $file.$
+        @@ mutable.Buffer(x)
+        cmd1.scala:1: not found: value mutable
+        val res1 = mutable.Buffer(x)
+                   ^
+        Compilation Failed
+      @p
+        As you can see, even though @code{collection.mutable} was imported inside
+        @code{MyScript.scala}, you cannot use them outside after importing it.
+
+      @p
+        If you want to make everything (both imports and definitions) available
+        by default after importing, you can use an @code{$exec} import instead of
+        @code{$file}:
+
+      @hl.scala
+        @@ import $exec.MyScript
+        Welcome to the XYZ custom REPL!!
+        import $exec.$
+        @@ mutable.Buffer(x)
+        res1: mutable.Buffer[Int] = ArrayBuffer(123)
+      @p
+        As you can see, now @code{mutable} is available, and so is @code{x} even
+        though we did not directly import it.
+
+      @p
+        While @code{$file} imports are useful for defining re-usable modules with
+        common functions and definitions, @code{$exec} imports are useful as
+        aliases for common setup to get your REPL environment just the way you
+        want it. Of course, any files you import via @hl.scala{import $file} or
+        @hl.scala{import $exec} can themselves import other Scala scripts in the
+        same way, and the same rules apply.
+
+    @sect{From Bash}
+      @p
+        Apart from loading scripts within the @sect.ref{Ammonite-REPL}, You can
+        also run scripts using the Ammonite executable from an external shell
+        (e.g. bash):
+      @hl.scala
+        bash$ ./amm path/to/script.scala
   
-      @@ MyScript.x // You can refer to definitions from that module
-      res1: Int = 123
+      @p
+        All types, values and imports defined in scripts are available to
+        commands entered in REPL after loading the script.
+  
+      @p
+        You can also make an Ammonite script self-executable by using a shebang
+        @hl.scala{#!}. This is an example script named @hl.scala{hello}. There
+        is no need to add the @hl.scala{.scala} extension. The @hl.scala{amm}
+        command needs to be in the @hl.scala{PATH}:
+      @hl.sh
+        #!/usr/bin/env amm
+  
+        println("hello world")
+      @p
+        make it executable and run it from an external shell (e.g. bash):
+      @hl.sh
+        $ chmod +x /path/to/script
+        $ /path/to/script
 
-      @@ import MyScript._
-
-      @@ x // works
-      res2: Int = 123
+  @sect{Script Imports}
+    @p
+      No code stands alone; scripts depend on other scripts. Often they depend
+      on third party libraries, as there's so much code out there already
+      written it doesn't make sense to re-invent everything yourself.
 
     @p
-      You can also import the module, and any associated definitions you want,
-      in the same import:
+      Ammonite Scripts allow you to import @sect.ref{Other Scripts}, just like
+      any Bash or Python scripts do. Furthermore, they let you cleanly depend
+      on third party libraries: since Ammonite runs on the @lnk("JVM",
+      "https://en.wikipedia.org/wiki/Java_virtual_machine"), this means
+      @sect.ref{Ivy Dependencies}. Ammonite will ensure that the relevant
+      dependencies are always downloaded and used, and you never need to worry
+      about remembering to "install" things before running your scripts!
 
-    @hl.scala
-      @@ x // doesn't work yet
-      Compilation Failed
-      cmd0.scala:1: not found: value x
-      val res0 = x // doesn't work yet
-                 ^
-      @@ import $file.MyScript, MyScript._
-      Welcome to the XYZ custom REPL!!
+    @sect{Other Scripts}
+      @p
+        Like other scripting languages, Ammonite Scripts allow you to break your
+        script into multiple files, and import them from each other in order to
+        use what is in each file. Unlike "Normal" Scala projects, there is no
+        need to set up a @code{src/main/scala} folder, and create a build file,
+        and all these other things: simply split your script into two files, and
+        import one from the other using @sect.ref{import $file}:
+  
+      @hl.ref('repl/'src/'test/'resources/'importHooks/"Basic.scala")
+  
+      @hl.ref('repl/'src/'test/'resources/'importHooks/"FileImport.scala")
+  
+      @p
+        Here, we are defining a simple @hl.scala{val} in @code{Basic.scala}, and
+        then importing it from @code{FileImport.scala}. And of course, we can
+        use what we defined in @code{FileImport.scala} and import it in another
+        file
+  
+      @hl.ref('repl/'src/'test/'resources/'importHooks/"IndirectFileImport.scala")
+  
+      @p
+        And so on, importing files as many or as deep as you want.
+  
+      @p
+        @hl.scala{$file} imports inside Ammonite-Scripts behave the same as
+        @hl.scala{$file} imports @sect.ref("import $file",
+        "within the Ammonite-REPL"), and have the same characteristics:
 
-      @@ x
-      res1: Int = 123
+      @ul
+        @li
+          @sect.ref{Imported Scripts are Re-used}
+        @li
+          @sect.ref{Cannot directly import from inside a Script}
+        @li
+          @sect.ref{Renamed-scripts and multiple-scripts}
 
-    @p
-      Note that by default, scripts imported via @code{$file} are
-      @i{encapsulated}, so any imports inside that @code{MyScript} performs are
-      not available outside of @code{MyScript.scala}:
 
-    @hl.scala
-      @@ import $file.MyScript, MyScript._
-      Welcome to the XYZ custom REPL!!
-      import $file.$
-      @@ mutable.Buffer(x)
-      cmd1.scala:1: not found: value mutable
-      val res1 = mutable.Buffer(x)
-                 ^
-      Compilation Failed
-    @p
-      As you can see, even though @code{collection.mutable} was imported inside
-      @code{MyScript.scala}, you cannot use them outside after importing it.
+    @sect{Ivy Dependencies}
+      @p
+        You can easily make use of external Ivy artifacts right in your
+        scripts, without needing to set up a separate build file. Simply use a
+        @sect.ref{import $ivy}, just as you would in the
+        @sect.ref{Ammonite-REPL}, and it will be available in the script for you
+        to use, e.g. here we make use of the @lnk("Scalatags",
+        "http://www.lihaoyi.com/scalatags/") library:
 
-    @p
-      If you want to make everything (both imports and definitions) available
-      by default after importing, you can use an @code{$exec} import instead of
-      @code{$file}:
-
-    @hl.scala
-      @@ import $exec.MyScript
-      Welcome to the XYZ custom REPL!!
-      import $exec.$
-      @@ mutable.Buffer(x)
-      res1: mutable.Buffer[Int] = ArrayBuffer(123)
-    @p
-      As you can see, now @code{mutable} is available, and so is @code{x} even
-      though we did not directly import it.
-
-    @p
-      While @code{$file} imports are useful for defining re-usable modules with
-      common functions and definitions, @code{$exec} imports are useful as
-      aliases for common setup to get your REPL environment just the way you
-      want it. Of course, any files you import via @hl.scala{import $file} or
-      @hl.scala{import $exec} can themselves import other Scala scripts in the
-      same way, and the same rules apply.
-
-  @sect{Running Scripts from Bash}
-    @p
-      Apart from loading scripts within the @sect.ref{Ammonite-REPL}, You can
-      also run scripts using the Ammonite executable from an external shell
-      (e.g. bash):
-    @hl.scala
-      bash$ ./amm path/to/script.scala
-
-    @p
-      All types, values and imports defined in scripts are available to
-      commands entered in REPL after loading the script.
-
-    @p
-      You can also make an Ammonite script self-executable by using a shebang
-      @hl.scala{#!}. This is an example script named @hl.scala{hello}. There
-      is no need to add the @hl.scala{.scala} extension. The @hl.scala{amm}
-      command needs to be in the @hl.scala{PATH}:
-    @hl.sh
-      #!/usr/bin/env amm
-
-      println("hello world")
-    @p
-      make it executable and run it from an external shell (e.g. bash):
-    @hl.sh
-      $ chmod +x /path/to/script
-      $ /path/to/script
+      @hl.ref('repl/'src/'test/'resources/'importHooks/"IvyImport.scala")
 
   @sect{Multi-stage Scripts}
     @p
       By default, everything in a script is compiled and executed as a single
-      block. That means that if you want to perform classpath-modifying
-      operations, such as @hl.scala{load.cp} or @hl.scala{load.ivy}, its
-      results will not be available within the same script if you want to use
-      methods, values or packages defined in the loaded code. To make this
-      work, break the script up into multiple compilation units with an @@
-      sign, e.g.
+      block. While you can use @sect.ref{Magic Imports} to load other scripts
+      or Ivy artifacts before your script runs, those can only load "hardcoded"
+      scripts or artifacts, and cannot e.g. load different scripts depending on
+      some runtime variables.
+
+    @p
+      If you want to load different scripts or ivy artifacts depending on
+      runtime values, you can use the runtime-equivalent of magic imports:
+
+    @ul
+      @li
+        @hl.scala{import $cp} becomes @hl.scala{load.cp}
+      @li
+        @hl.scala{import $file} becomes @hl.scala{load.module}
+      @li
+        @hl.scala{import $ivy} becomes @hl.scala{load.ivy}
+
+    @p
+      These are plain-old-Scala-functions that let you pass in a
+      @hl.scala{Path} to a script to load, or load different Ivy artifacts
+      depending on runtime values. However, since these functions get run
+      *after* the current compilation block is compiled, you need to split
+      your script into two compilation blocks, and can only use the results
+      of the @hl.scala{load}ed code in subsequent blocks:
   
     @hl.scala
       // print banner
       println("Welcome to the XYZ custom REPL!!")
-  
-      load.ivy("org.scalaz" %% "scalaz-core" % "7.1.1")
+      val scalazVersion = "7.1.1"
+      load.ivy("org.scalaz" %% "scalaz-core" % scalazVersion)
   
       @@
   
@@ -174,13 +265,15 @@
       import scalaz._
       import Scalaz._
   
-      // common initialization code
+      // use Scalaz!
       ...
 
     @p
-      @hl.scala{load.module} and @hl.scala{load.exec} are the dynamic
-      equivalents to @hl.scala{import $file} and $hl.scala{import $exec}
-      described above. While the magic imports can only import a fixed script,
+      In general, this should not be necessary very often: usually you should
+      be able to load what you want using @sect.ref{Magic Imports}.
+      Nevertheless, sometimes you may find yourself needing to get "under the
+      hood" and use these @hl.scala{load}ing functions directly. When that
+      happens, using @sect.ref{Multi-stage Scripts} is the way to go.
   
   @sect{Script Arguments}
     @p

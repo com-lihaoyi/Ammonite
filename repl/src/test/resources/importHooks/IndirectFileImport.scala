@@ -1,3 +1,4 @@
+// IndirectFileImport.scala
 import $file.FileImport
 
 val indirectFileImportVal = FileImport.fileImportVal + 1
