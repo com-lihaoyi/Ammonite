@@ -370,7 +370,7 @@
         @li
           Fixed edge cases around import shadowing and sequencing (#199, #248)
         @li
-          Started the @sect.ref{Ammonite-Cookbook}, examples of using the
+          Started the @sect.ref{Scala-Scripting Cookbook}, examples of using the
           Ammonite REPL to do useful work.
   
   
@@ -593,7 +593,7 @@
           Re-added support for 2.10.x, minus features that don't work in it
           (e.g. scope-aware type-printing)
         @li
-          Added a @sect.ref("Ammonite", "standalone distributable") that comes
+          Added a @sect.ref("Ammonite-REPL", "standalone distributable") that comes
           bundled with Scala 2.10.4 or 2.11.7, letting you quickly load and
           experiment with libraries without SBT
         @li

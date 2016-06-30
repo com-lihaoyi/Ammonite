@@ -94,7 +94,7 @@ object ImportHook{
           )
 
           if (missing.nonEmpty) {
-            Res.Failure(None, "Cannot resolve $file import: " + missing.mkString(","))
+            Res.Failure(None, "Cannot resolve $file import: " + missing.mkString(", "))
           } else {
             Res.Success(
               for(((relativeModule, rename), filePath) <- relativeModules.zip(files)) yield {
@@ -188,7 +188,7 @@ object ImportHook{
           )
 
           if (missing.nonEmpty) {
-            Res.Failure(None, "Cannot resolve $cp import: " + missing.mkString(","))
+            Res.Failure(None, "Cannot resolve $cp import: " + missing.mkString(", "))
           } else Res.Success(
             for(((relativeModule, rename), filePath) <- relativeModules.zip(files))
             yield Result.ClassPath(filePath, plugin)

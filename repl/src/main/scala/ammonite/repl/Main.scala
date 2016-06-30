@@ -4,11 +4,11 @@ import java.io.{File, InputStream, OutputStream}
 
 import ammonite.ops._
 import ammonite.repl.interp.ImportHook
+import fastparse.Utils.literalize
+import Parsers.backtickWrap
+import ammonite.repl.Router.{ArgSig, EntryPoint}
 
-import scala.reflect.internal.annotations.compileTimeOnly
-import scala.reflect.runtime.universe.TypeTag
 import language.experimental.macros
-import reflect.macros.Context
 
 
 /**
@@ -76,8 +76,9 @@ case class Main(predef: String = "",
     * of `args` and a map of keyword `kwargs` to pass to that file.
     */
   def runScript(path: Path,
+                mainMethodName: Option[String],
                 args: Seq[String],
-                kwargs: Map[String, String]): Res[Imports] = {
+                kwargs: Seq[(String, String)]): Res[Imports] = {
 
     val repl = instantiateRepl()
     val (pkg, wrapper) = Util.pathToPackageWrapper(path, wd)
@@ -91,33 +92,74 @@ case class Main(predef: String = "",
       case x: Res.Failing => x
       case Res.Success(imports) =>
         repl.interp.init()
-        imports.value.find(_.toName == Name("main")) match {
-          case None => Res.Success(imports)
-          case Some(i) =>
-            val quotedArgs =
-              args.map(pprint.PPrinter.escape)
-                .map(s => s"""arg("$s")""")
 
-            val quotedKwargs =
-              kwargs.mapValues(pprint.PPrinter.escape)
-                .map { case (k, s) => s"""$k=arg("$s")""" }
-            repl.interp.processExec(
-              s"""|import ammonite.repl.ScriptInit.{arg, callMain, pathRead}
-                  |callMain{
-                  |  main(${(quotedArgs ++ quotedKwargs).mkString(", ")})
-                  |}
-                  |""".stripMargin
-            ) match {
-              case Res.Success(_) => Res.Success(imports)
-              case Res.Exception(e: ArgParseException, s) =>
-                e.setStackTrace(Array())
-                e.cause.setStackTrace(e.cause.getStackTrace.takeWhile( frame =>
-                  frame.getClassName != "ammonite.repl.ScriptInit$" ||
-                  frame.getMethodName != "parseScriptArg"
-                ))
-                Res.Exception(e, s)
-              case x => x
+        val fullName = (pkg :+ wrapper).map(_.backticked).mkString(".")
+        repl.interp.processModule(
+          ImportHook.Source.File(cwd/"<console>"),
+          s"val routes = ammonite.repl.Router.generateRoutes[$fullName.type]($fullName)",
+          Name("MainRouter"),
+          Seq(Name("$sess")),
+          autoImport = false
+        ) match {
+          case Res.Success(_) =>
+            val entryPoints =
+              repl.interp
+                  .eval
+                  .sess
+                  .frames
+                  .head
+                  .classloader
+                  .loadClass("$sess.MainRouter")
+                  .getMethods
+                  .find(_.getName == "routes")
+                  .get
+                  .invoke(null)
+                  .asInstanceOf[Seq[Router.EntryPoint]]
+                  .filter(_.name != "$main")
+
+            mainMethodName match {
+              case None =>
+                entryPoints.find(_.name == "main") match {
+                  case None => Res.Success(imports)
+                  case Some(entry) =>
+                    Main.runEntryPoint(entry, args, kwargs).getOrElse(Res.Success(imports))
+                }
+              case Some(s) =>
+                entryPoints.find(_.name == s) match{
+                  case None =>
+                    val suffix =
+                      if (entryPoints.isEmpty) ""
+                      else{
+                        val methods = for(ep <- entryPoints) yield{
+                          val args = ep.argSignatures.map(Main.renderArg).mkString(", ")
+                          val details = Main.entryDetails(ep)
+                          s"def ${ep.name}($args)$details"
+                        }
+                        s"""
+                         |
+                         |Existing methods:
+                         |
+                         |${methods.mkString("\n\n")}
+                        """.stripMargin
+                      }
+                    Res.Failure(
+                      None,
+                      s"Unable to find method: ${backtickWrap(s)}" + suffix
+                    )
+                  case Some(entry) =>
+                    Main.runEntryPoint(entry, args, kwargs).getOrElse(Res.Success(imports))
+                }
             }
+
+
+          case Res.Exception(e: ArgParseException, s) =>
+            e.setStackTrace(Array())
+            e.cause.setStackTrace(e.cause.getStackTrace.takeWhile( frame =>
+              frame.getClassName != "ammonite.repl.ScriptInit$" ||
+              frame.getMethodName != "parseScriptArg"
+            ))
+            Res.Exception(e, s)
+          case x => x
         }
     }
   }
@@ -131,6 +173,58 @@ case class Main(predef: String = "",
 }
 
 object Main{
+  def renderArg(arg: ArgSig) = backtickWrap(arg.name) + ": " + arg.typeString
+  def entryDetails(ep: EntryPoint) = {
+    ep.argSignatures.collect{
+      case ArgSig(name, tpe, Some(doc), default) =>
+        "\n" + name + " // " + doc
+    }.mkString
+  }
+  def runEntryPoint(entry: Router.EntryPoint,
+                    args: Seq[String],
+                    kwargs: Seq[(String, String)]): Option[Res.Failing] = {
+
+    def expectedMsg = {
+      val commaSeparated =
+        entry.argSignatures
+          .map(renderArg)
+          .mkString(", ")
+      val details = entryDetails(entry)
+      "(" + commaSeparated + ")" + details
+    }
+
+    entry.invoke(args, kwargs) match{
+      case Router.Result.Success(x) => None
+      case Router.Result.Error.Exception(x) => Some(Res.Exception(x, ""))
+      case Router.Result.Error.TooManyArguments(x) =>
+        Some(Res.Failure(
+          None,
+          s"""Too many args were passed to this script: ${x.map(literalize(_)).mkString(", ")}
+             |expected arguments $expectedMsg""".stripMargin
+
+        ))
+      case Router.Result.Error.RedundantArguments(x) =>
+        Some(Res.Failure(
+          None,
+          s"""Redundant values were passed for arguments: ${x.map(literalize(_)).mkString(", ")}
+             |expected arguments: $expectedMsg""".stripMargin
+        ))
+      case Router.Result.Error.InvalidArguments(x) =>
+        Some(Res.Failure(
+          None,
+          "The following arguments failed to be parsed:\n" +
+          x.map{
+            case Router.Result.ParamError.Missing(p) =>
+              s"(${renderArg(p)}) was missing"
+            case Router.Result.ParamError.Invalid(p, v, ex) =>
+              s"(${renderArg(p)}) failed to parse input ${literalize(v)} with $ex"
+            case Router.Result.ParamError.DefaultFailed(p, ex) =>
+              s"(${renderArg(p)})'s default value failed to evaluate with $ex"
+          }.mkString("\n") + "\n" + s"expected arguments: $expectedMsg"
+        ))
+    }
+  }
+
   val defaultWelcomeBanner = {
     def ammoniteVersion = ammonite.Constants.version
     def scalaVersion = scala.util.Properties.versionNumberString
@@ -167,6 +261,8 @@ object Main{
     |  Internal => _,
     |  $ignoreUselessImports
     |}
+    |import ammonite.repl.Router.{doc, export}
+    |import ammonite.repl.Main.pathScoptRead
     |""".stripMargin
 
 
@@ -183,6 +279,7 @@ object Main{
     var ammoniteHome: Option[Path] = None
     var passThroughArgs: Seq[String] = Vector.empty
     var predefFile: Option[Path] = None
+    var mainMethodName: Option[String] = None
     val replParser = new scopt.OptionParser[Main]("ammonite") {
       // Primary arguments that correspond to the arguments of
       // the `Main` configuration object
@@ -206,6 +303,21 @@ object Main{
       opt[Unit]('t', "time")
         .foreach(_ => logTimings = true)
         .text("Print time taken for each step")
+      opt[String]('x', "execute")
+        .foreach{ x => mainMethodName = Some(x)}
+        .text(
+          """What main method you want to execute, if any. Defaults to a `main`
+            |method if it exists, but you can also run other methods defined in
+            |the script.
+            |
+            |This flag must come last among the flags passed to Ammonite, and any
+            |further arguments, both positional and named (e.g. `--foo bar`) are
+            |forwarded to the script you are running.
+            |
+            |You can also use `--` as a shorthand for `-x main`, to pass arguments
+            |to the main method
+          """.stripMargin.replace("\n", "\n" + " " * 8)
+        )
       arg[String]("<args>...")
         .optional()
         .unbounded()
@@ -221,31 +333,31 @@ object Main{
 
     }
 
+    val (take, drop) = args0.indexOf("--") match {
+      case -1 =>
+        args0.indexOf("-x") match {
+          case -1 =>
+            args0.indexOf("--execute") match {
+              case -1 => (Int.MaxValue, Int.MaxValue)
+              case n => (n+2, n+2)
+            }
+          case n => (n+2, n+2)
+        }
+      case n => (n, n+1)
+    }
 
-    val (before, after) = args0.splitAt(passThroughArgs.indexOf("--") match {
-      case -1 => Int.MaxValue
-      case n => n
-    })
-    val keywordTokens = after.drop(1)
-    assert(
-      keywordTokens.length % 2 == 0,
-      s"""Only pairs of keyword arguments can come after `--`.
-          |Invalid number of tokens: ${keywordTokens.length}""".stripMargin
-    )
+    val before = args0.take(take)
+    var keywordTokens = args0.drop(drop).toList
+    var kwargs = Vector.empty[(String, String)]
 
-    val kwargs = for(Array(k, v) <- keywordTokens.grouped(2)) yield{
-
-      assert(
-        k.startsWith("--") &&
-          scalaparse.syntax
-            .Identifiers
-            .Id
-            .parse(k.stripPrefix("--"))
-            .isInstanceOf[fastparse.core.Parsed.Success[_]],
-        s"""Only pairs of keyword arguments can come after `--`.
-            |Invalid keyword: $k""".stripMargin
-      )
-      (k.stripPrefix("--"), v)
+    while(keywordTokens.nonEmpty){
+      if (keywordTokens(0).startsWith("--")){
+        kwargs = kwargs :+ (keywordTokens(0).drop(2), keywordTokens(1))
+        keywordTokens = keywordTokens.drop(2)
+      }else{
+        passThroughArgs = passThroughArgs :+ keywordTokens(0)
+        keywordTokens = keywordTokens.drop(1)
+      }
     }
 
     for(c <- replParser.parse(before, Main())){
@@ -264,7 +376,7 @@ object Main{
       (fileToExecute, codeToExecute) match{
         case (None, None) => println("Loading..."); main.run()
         case (Some(path), None) =>
-          main.runScript(path, passThroughArgs, kwargs.toMap) match{
+          main.runScript(path, mainMethodName, passThroughArgs, kwargs.toSeq) match{
             case Res.Failure(exOpt, msg) =>
               Console.err.println(msg)
               System.exit(1)
@@ -285,6 +397,10 @@ object Main{
   def maybeDefaultPredef(enabled: Boolean, predef: String) =
     if (enabled) predef else ""
 
+  /**
+    * Additional [[scopt.Read]] instance to teach it how to read Ammonite paths
+    */
+  implicit def pathScoptRead: scopt.Read[Path] = scopt.Read.stringRead.map(Path(_, cwd))
 }
 
 case class EntryConfig(file: Option[Path])
@@ -299,58 +415,4 @@ case class ArgParseException(name: String,
     s"into arg `$name: $typeName`",
     cause
   )
-/**
-  * Code used to de-serialize command-line arguments when calling an Ammonite
-  * script. Basically looks for a [[scopt.Read]] for the type of each argument
-  * and uses that to de-serialize the given [[String]] into that argument.
-  *
-  * Needs a bit of macro magic to work.
-  */
-object ScriptInit{
 
-  def parseScriptArg[T: scopt.Read: TypeTag](name: String, value: String) = try {
-    implicitly[scopt.Read[T]].reads(value)
-  } catch{ case e: Throwable =>
-    val typeName = implicitly[TypeTag[T]].tpe.toString
-    throw ArgParseException(name, value, typeName, e)
-  }
-
-
-  /**
-    * Dummy marker method used to make the compiler happy, at least until the [[callMain]]
-    * macro swoops in and rewrites things to use the real deserialization calls to the
-    * real expected types.
-    */
-  @compileTimeOnly("This is a marker function and should not exist after macro expansion")
-  def arg(s: String): Nothing = ???
-
-  /**
-    * Takes the call to the main method, with [[arg]]s wrapping every argument,
-    * and converts them to the relevant [[scopt.Read]] calls to properly
-    * de-serialize them
-    */
-  def callMain[T](t: T): T = macro callMainImpl[T]
-
-
-  def callMainImpl[T](c: Context)(t: c.Expr[T]): c.Expr[T] = {
-    import c.universe._
-    val apply = t.tree.asInstanceOf[Apply]
-    val paramSymbols = apply.symbol.typeSignature.asInstanceOf[MethodType].params
-    val reads = paramSymbols.zip(apply.args).map{ case (param, term) =>
-      val assign = term match{
-        case q"ammonite.repl.ScriptInit.arg($inner)" =>
-
-          val newPrefix = q"ammonite.repl.ScriptInit.parseScriptArg"
-          q"$newPrefix[${param.typeSignature}](${param.name.decoded}, $inner)"
-        case x => x // This case should only be for default args, which we leave unchanged
-      }
-      assign
-    }
-    c.Expr[T](q"${apply.fun}(..$reads)")
-  }
-
-  /**
-    * Additional [[scopt.Read]] instance to teach it how to read Ammonite paths
-    */
-  implicit def pathRead: scopt.Read[Path] = scopt.Read.stringRead.map(Path(_, cwd))
-}

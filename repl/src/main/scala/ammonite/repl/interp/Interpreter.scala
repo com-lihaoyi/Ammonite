@@ -484,21 +484,33 @@ class Interpreter(prompt0: Ref[String],
   }
   def loadIvy(coordinates: (String, String, String), verbose: Boolean = true) = {
     val (groupId, artifactId, version) = coordinates
-    val psOpt =
+    val cacheKey = (replApi.resolvers().hashCode.toString, groupId, artifactId, version)
+
+    val fetched =
       storage.ivyCache()
-        .get((replApi.resolvers.hashCode.toString, groupId, artifactId, version))
+        .get(cacheKey)
+
+    val psOpt =
+      fetched
         .map(_.map(new java.io.File(_)))
         .filter(_.forall(_.exists()))
 
     psOpt match{
       case Some(ps) => ps
       case None =>
-        IvyThing(() => replApi.resolvers()).resolveArtifact(
+        val resolved = IvyThing(() => replApi.resolvers()).resolveArtifact(
           groupId,
           artifactId,
           version,
           if (verbose) 2 else 1
         ).toSet
+
+        storage.ivyCache() = storage.ivyCache().updated(
+          cacheKey,
+          resolved.map(_.getAbsolutePath)
+        )
+
+        resolved
     }
   }
   abstract class DefaultLoadJar extends LoadJar {
@@ -514,10 +526,7 @@ class Interpreter(prompt0: Ref[String],
     def ivy(coordinates: (String, String, String), verbose: Boolean = true): Unit = {
       val resolved = loadIvy(coordinates, verbose)
       val (groupId, artifactId, version) = coordinates
-      storage.ivyCache() = storage.ivyCache().updated(
-        (replApi.resolvers().hashCode.toString, groupId, artifactId, version),
-        resolved.map(_.getAbsolutePath)
-      )
+
 
       resolved.foreach(handleClasspath)
 

@@ -81,13 +81,22 @@ object BasicTests extends TestSuite{
         val errorMsg = intercept[ShelloutException]{
           exec('basic/"Args.scala", "3")
         }.result.err.string
-        assert(errorMsg.contains("Unspecified value parameter s"))
+        assert(errorMsg.contains(
+          """The following arguments failed to be parsed:
+            |(s: String) was missing
+            |expected arguments: (i: Int, s: String, path: ammonite.ops.Path)""".stripMargin
+        ))
       }
       'cantParse{
         val errorMsg = intercept[ShelloutException]{
           exec('basic/"Args.scala", "foo", "moo")
         }.result.err.string
-        assert(errorMsg.contains("Cannot parse value \"foo\" into arg `i: Int`"))
+        val exMsg = """java.lang.NumberFormatException: For input string: "foo""""
+        assert(errorMsg.contains(
+          s"""The following arguments failed to be parsed:
+             |(i: Int) failed to parse input "foo" with $exMsg
+             |expected arguments: (i: Int, s: String, path: ammonite.ops.Path)""".stripMargin
+        ))
         // Ensure we're properly truncating the random stuff we don't care about
         // which means that the error stack that gets printed is short-ish
         assert(errorMsg.lines.length < 12)

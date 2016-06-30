@@ -2,8 +2,10 @@ package ammonite.repl
 
 import ammonite.repl.frontend.Highlighter
 import utest._
-
 import acyclic.file
+import ammonite.repl.Router.{ArgSig, doc, export}
+import ammonite.repl.Router.Result.Error.{InvalidArguments, RedundantArguments, TooManyArguments}
+import ammonite.repl.Router.Result.ParamError
 object UnitTests extends TestSuite{
 
   def testHighlight(buffer: Vector[Char]) = Highlighter.defaultHighlight(
@@ -115,6 +117,89 @@ object UnitTests extends TestSuite{
             } <Y|yield> out
         """
       )
+    }
+    'router{
+      case object MyException extends Exception
+      object Target{
+        @export
+        def foo() = 1
+        @export
+        def bar(i: Int) = i
+        @export
+        def qux(i: Int,
+                @doc("Pass in a custom `s` to override it")
+                s: String = "lols") = s * i
+        @export
+        def ex() = throw MyException
+
+        def notExported() = ???
+
+        val baz = "bazzz"
+      }
+      val routes = Router.generateRoutes(Target)
+
+
+      'basicModelling{
+        assert(
+          routes.map(_.name) == Seq("foo", "bar", "qux", "ex")
+        )
+        val evaledArgs = routes.map(_.argSignatures.map{
+          case Router.ArgSig(name, tpe, docs, None) => (name, tpe, docs, None)
+          case Router.ArgSig(name, tpe, docs, Some(default)) => (name, tpe, docs, Some(default()))
+        })
+        assert(
+          evaledArgs == List(
+            List(),
+            List(("i", "Int", None, None)),
+            List(
+              ("i", "Int", None, None),
+              ("s", "String", Some("Pass in a custom `s` to override it"), Some("lols"))
+            ),
+            List()
+          )
+        )
+      }
+      'invoke - assert(
+        routes(0).invoke(Seq.empty, Seq.empty) == Router.Result.Success(1),
+        routes(1).invoke(Seq.empty, Seq("i" -> "2")) == Router.Result.Success(2),
+        routes(2).invoke(Seq.empty, Seq("i" -> "2")) == Router.Result.Success("lolslols"),
+        routes(2).invoke(Seq.empty, Seq("i" -> "3", "s" -> "x")) == Router.Result.Success("xxx")
+      )
+
+      'failures{
+        'missingParams - {
+          assertMatch(routes(1).invoke(Seq.empty, Seq.empty)){
+            case InvalidArguments(
+              Seq(ParamError.Missing(ArgSig("i", _, _, _)))
+            ) =>
+          }
+          assertMatch(routes(2).invoke(Seq.empty, Seq("s" -> "omg"))){
+            case InvalidArguments(
+              Seq(ParamError.Missing(ArgSig("i", _, _, _)))
+            ) =>
+          }
+        }
+        'invalidParams - assertMatch(routes(1).invoke(Seq("lol"), Seq.empty)) {
+          case InvalidArguments(
+            Seq(ParamError.Invalid(ArgSig("i", _, _, _), "lol", _))
+          ) =>
+        }
+
+        'tooManyParams - assert(
+          routes(0).invoke(Seq("1", "2"), Seq.empty) ==
+          TooManyArguments(Seq("1", "2"))
+        )
+
+        'redundantParams - assert(
+          routes(1).invoke(Seq("1"), Seq("i" -> "2")) ==
+          RedundantArguments(Seq("i"))
+        )
+
+        'failing - assert(
+          routes(3).invoke(Seq(), Seq()) ==
+          Router.Result.Error.Exception(MyException)
+        )
+      }
     }
   }
 }

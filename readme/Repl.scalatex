@@ -7,7 +7,7 @@
 @sect("Ammonite-REPL", "A Modernized Scala REPL")
 
   @p
-    Ammonite contains an improved Scala REPL, re-implemented from first
+    The @b{Ammonite-REPL} is an improved Scala REPL, re-implemented from first
     principles. It is much more featureful than the default REPL and comes
     with a lot of @sect.ref("Features", "ergonomic improvements") and
     @sect.ref("Configuration", "configurability") that may be familiar to
@@ -19,7 +19,7 @@
     systems shell, but also can be used alone as a @sect.ref("Features",
     "superior") version of the default Scala REPL, or as a
     @sect.ref("Debugging", "debugging tool"), or for many other
-    @sect.ref("Ammonite-Cookbook", "fun and interesting things")!
+    @sect.ref("Scala-Scripting Cookbook", "fun and interesting things")!
 
 
   @p
@@ -30,7 +30,7 @@
     @replCurl
 
   @p
-    This will give you access to Ammonite for Scala:
+    This will give you access to the Ammonite-REPL:
 
   @img(src:="GettingStarted.png", width:="100%")
 
@@ -43,7 +43,7 @@
   @p
     If you want to use Ammonite as a filesystem shell, take a look at
     @sect.ref{Ammonite-Shell}. If you're not sure what to do with Ammonite,
-    check out the @sect.ref{Ammonite-Cookbook} for some fun ideas!
+    check out the @sect.ref{Scala-Scripting Cookbook} for some fun ideas!
 
   @p
     If you want some initialization code available to the REPL, you can add
@@ -234,11 +234,11 @@
         Ammonite provides a set of magic imports that let you load additional
         code into a REPL session: these are imports which start with a @code{$},
         and are *top-level* inside the REPL command or your
-        @sect.ref{Ammonite-Scripts}.
+        @sect.ref{Scala Scripts}.
 
       @sect{import $file}
         @p
-          This lets you load @sect.ref{Ammonite-Scripts} into the REPL. For
+          This lets you load @sect.ref{Scala Scripts} into the REPL. For
           example given a small script defining one value we want
         @hl.scala
           // MyScript.scala
@@ -281,7 +281,7 @@
           @hl.scala{def}s, @hl.scala{class}es @hl.scala{object}s or
           @hl.scala{trait}s, or imports from @i{other} scripts. For more
           documentation on how these scripts work, check out the
-          @sect.ref{Ammonite-Scripts} section.
+          @sect.ref{Scala Scripts} section.
 
         @p
           There are some subtleties when dealing with @hl.scala{$file} imports
@@ -351,7 +351,7 @@
           This is similar to @hl.scala{import $file}, except that it dumps the
           definitions and imports from the script into your REPL session. This is
           useful if you are using a script to hold a set of common imports, the
-          docs for @sect.ref{Ammonite-Scripts} has more on this.
+          docs for @sect.ref{Scala Scripts} has more on this.
 
       @sect{import $ivy}
         @p
@@ -809,7 +809,7 @@
         libraryDependencies += "com.lihaoyi" % "ammonite-repl" % "@ammonite.Constants.version" cross CrossVersion.full
 
       @p
-        Note that unlike the snippet given @sect.ref("Ammonite", "above"), we
+        Note that unlike the snippet given @sect.ref("Ammonite-REPL", "above"), we
         leave out the @hl.scala{% "test"} because we may want ammonite to be
         available within the "main" project, and not just in the unit tests.
         Then, anywhere within your program, you can place a breakpoint via:
