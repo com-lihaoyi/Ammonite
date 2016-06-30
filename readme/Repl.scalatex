@@ -7,9 +7,9 @@
 @sect("Ammonite-REPL", "A Modernized Scala REPL")
 
   @p
-    Ammonite is an improved Scala REPL, re-implemented from first principles.
-    It is much more featureful than the default REPL and comes with a lot of
-    @sect.ref("Features", "ergonomic improvements") and
+    Ammonite contains an improved Scala REPL, re-implemented from first
+    principles. It is much more featureful than the default REPL and comes
+    with a lot of @sect.ref("Features", "ergonomic improvements") and
     @sect.ref("Configuration", "configurability") that may be familiar to
     people coming from IDEs or other REPLs such as @lnk("IPython",
     "https://ipython.org/") or @lnk("Zsh", "http://www.zsh.org/").

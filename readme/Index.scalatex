@@ -31,8 +31,18 @@
     "https://www.scala-lang.org/") for scripting purposes: in the
     @sect.ref("Ammonite-REPL", "REPL"), as @sect.ref("Ammonite-Scripts",
     "scripts"), in @sect.ref("Ammonite-Ops", "existing projects") or as a
-    standalone @sect.ref("Ammonite-Shell", "systems shell"). It is
-    made of a few subprojects:
+    standalone @sect.ref("Ammonite-Shell", "systems shell").
+
+  @p
+    The goal of Ammonite is to liberate your Scala code from heavyweight
+    "projects": if you want to run some Scala, open the
+    @sect.ref{Ammonite-REPL} and run it, interactively! If you want to run it
+    later, save it into some @sect.ref{Ammonite-Scripts} and run those. At no
+    point do you need to mess around with build-files or project-layouts:
+    Ammonite lets you just write Scala code and run it, simple as that!
+
+  @p
+    Ammonite can be used in multiple ways:
 
   @ul
     @li
