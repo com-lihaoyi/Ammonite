@@ -171,13 +171,10 @@ class Interpreter(prompt0: Ref[String],
 
           }
         case res: ImportHook.Result.ClassPath =>
-          eval.sess.frames.head.addClasspath(Seq(res.file.toIO))
-          println(res)
-          val classloader =
-            if (!res.plugin) evalClassloader
-            else eval.sess.frames.head.pluginClassloader
 
-          classloader.add(res.file.toIO.toURI.toURL)
+          if (res.plugin) handlePluginClasspath(res.file.toIO)
+          else handleEvalClasspath(res.file.toIO)
+
           Res.Success(Imports())
       }
     } yield {
@@ -504,9 +501,9 @@ class Interpreter(prompt0: Ref[String],
         ).toSet
     }
   }
-  abstract class DefaultLoadJar extends LoadJar with Resolvers {
+  abstract class DefaultLoadJar extends LoadJar {
 
-    lazy val ivyThing = IvyThing(() => resolvers)
+    lazy val ivyThing = IvyThing(() => replApi.resolvers())
 
     def handleClasspath(jar: File): Unit
 
@@ -518,7 +515,7 @@ class Interpreter(prompt0: Ref[String],
       val resolved = loadIvy(coordinates, verbose)
       val (groupId, artifactId, version) = coordinates
       storage.ivyCache() = storage.ivyCache().updated(
-        (resolvers.hashCode.toString, groupId, artifactId, version),
+        (replApi.resolvers().hashCode.toString, groupId, artifactId, version),
         resolved.map(_.getAbsolutePath)
       )
 
@@ -529,6 +526,13 @@ class Interpreter(prompt0: Ref[String],
     }
   }
 
+  def handleEvalClasspath(jar: File) = {
+    eval.sess.frames.head.addClasspath(Seq(jar))
+    evalClassloader.add(jar.toURI.toURL)
+  }
+  def handlePluginClasspath(jar: File) = {
+    replApi.sess.frames.head.pluginClassloader.add(jar.toURI.toURL)
+  }
   lazy val replApi: ReplAPI = new DefaultReplAPI { outer =>
 
     def lastException = Interpreter.this.lastException
@@ -543,13 +547,7 @@ class Interpreter(prompt0: Ref[String],
 
     object load extends DefaultLoadJar with Load {
 
-      def resolvers: List[Resolver] =
-        outer.resolvers()
-
-      def handleClasspath(jar: File) = {
-        eval.sess.frames.head.addClasspath(Seq(jar))
-        evalClassloader.add(jar.toURI.toURL)
-      }
+      def handleClasspath(jar: File) = handleEvalClasspath(jar)
 
       def apply(line: String) = processExec(line) match{
         case Res.Failure(ex, s) => throw new CompilationError(s)
@@ -576,11 +574,7 @@ class Interpreter(prompt0: Ref[String],
       }
 
       object plugin extends DefaultLoadJar {
-        def resolvers: List[Resolver] =
-          outer.resolvers()
-
-        def handleClasspath(jar: File) =
-          sess.frames.head.pluginClassloader.add(jar.toURI.toURL)
+        def handleClasspath(jar: File) = handlePluginClasspath(jar)
       }
 
     }

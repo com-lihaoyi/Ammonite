@@ -140,9 +140,6 @@ object IvyThing {
   
 }
 
-trait Resolvers {
- def resolvers: List[Resolver]
-}
 
 object Resolvers {
 
