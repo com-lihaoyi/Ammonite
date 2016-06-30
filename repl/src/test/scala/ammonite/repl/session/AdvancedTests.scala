@@ -243,7 +243,7 @@ object AdvancedTests extends TestSuite{
       check.session("""
         @ // Make sure plugins from eval class loader are not loaded
 
-        @ load.ivy("org.spire-math" %% "kind-projector" % "0.6.3")
+        @ import $ivy.`org.spire-math::kind-projector:0.6.3`
 
         @ trait TC0[F[_]]
         defined trait TC0
@@ -253,7 +253,7 @@ object AdvancedTests extends TestSuite{
 
         @ // This one must be loaded
 
-        @ load.plugin.ivy("org.spire-math" %% "kind-projector" % "0.6.3")
+        @ import $plugin.$ivy.`org.spire-math::kind-projector:0.6.3`
 
         @ trait TC[F[_]]
         defined trait TC

@@ -44,7 +44,7 @@ object ImportHook{
                       source: ImportHook.Source,
                       imports: Imports,
                       exec: Boolean) extends Result
-    case class ClassPath(file: Path) extends Result
+    case class ClassPath(file: Path, plugin: Boolean) extends Result
   }
 
   /**
@@ -58,25 +58,40 @@ object ImportHook{
   }
   object File extends SourceHook(false)
   object Exec extends SourceHook(true)
+
+  def resolveFiles(tree: ImportTree, currentScriptPath: Path, extensions: Seq[String])
+                  : (Seq[(RelPath, Option[String])], Seq[Path], Seq[Path]) = {
+    val relative =
+      tree.prefix
+        .map{case ".." => up; case x => ammonite.ops.empty/x}
+        .reduce(_/_)
+    val relativeModules = tree.mappings match{
+      case None => Seq(relative -> None)
+      case Some(mappings) => for((k, v) <- mappings) yield relative/k -> v
+    }
+    def relToFile(x: RelPath) = {
+      val base = currentScriptPath/up/x/up/x.last
+      extensions.find(ext => exists! base/up/(x.last + ext)) match{
+        case Some(p) => Right(base/up/(x.last + p): Path)
+        case None => Left(base)
+      }
+
+    }
+    val resolved = relativeModules.map(x => relToFile(x._1))
+    val missing = resolved.collect{case Left(p) => p}
+    val files = resolved.collect{case Right(p) => p}
+    (relativeModules, files, missing)
+  }
   class SourceHook(exec: Boolean) extends ImportHook {
     // import $file.foo.Bar, to import the file `foo/Bar.scala`
     def handle(source: ImportHook.Source, tree: ImportTree, interp: InterpreterInterface) = {
-      val relative =
-        tree.prefix
-            .map{case ".." => up; case x => ammonite.ops.empty/x}
-            .reduce(_/_)
-
 
       source match{
         case Source.File(currentScriptPath) =>
 
-          val relativeModules = tree.mappings match{
-            case None => Seq(relative -> None)
-            case Some(mappings) => for((k, v) <- mappings) yield relative/k -> v
-          }
-          def relToFile(x: RelPath) = currentScriptPath/up/x/up/s"${x.last}.scala"
-          val files = relativeModules.map(x => relToFile(x._1))
-          val missing = files.filter(!exists(_))
+          val (relativeModules, files, missing) = resolveFiles(
+            tree, currentScriptPath, Seq(".scala")
+          )
 
           if (missing.nonEmpty) {
             Res.Failure(None, "Cannot resolve $file import: " + missing.mkString(","))
@@ -130,8 +145,9 @@ object ImportHook{
       }
     }
   }
-
-  object Ivy extends ImportHook{
+  object Ivy extends BaseIvy(plugin = false)
+  object PluginIvy extends BaseIvy(plugin = true)
+  class BaseIvy(plugin: Boolean) extends ImportHook{
     def splitImportTree(tree: ImportTree): Res[Seq[String]] = {
       tree match{
         case ImportTree(Seq(part), None, _, _) => Res.Success(Seq(part))
@@ -158,8 +174,27 @@ object ImportHook{
       parts <- splitImportTree(tree)
       resolved <- Res.map(parts)(resolve(interp, _))
     } yield {
-      val jars = resolved.flatten.map(Path(_)).map(Result.ClassPath)
-      jars
+      resolved.flatten.map(Path(_)).map(Result.ClassPath(_, plugin))
+    }
+  }
+  object Classpath extends BaseClasspath(plugin = false)
+  object PluginClasspath extends BaseClasspath(plugin = true)
+  class BaseClasspath(plugin: Boolean) extends ImportHook{
+    def handle(source: ImportHook.Source, tree: ImportTree, interp: InterpreterInterface) = {
+      source match{
+        case Source.File(currentScriptPath) =>
+          val (relativeModules, files, missing) = resolveFiles(
+            tree, currentScriptPath, Seq(".jar", "")
+          )
+
+          if (missing.nonEmpty) {
+            Res.Failure(None, "Cannot resolve $cp import: " + missing.mkString(","))
+          } else Res.Success(
+            for(((relativeModule, rename), filePath) <- relativeModules.zip(files))
+            yield Result.ClassPath(filePath, plugin)
+          )
+        case Source.URL(path) => ???
+      }
     }
   }
 }

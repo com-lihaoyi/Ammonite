@@ -35,3 +35,17 @@ package $url{
 package $stub{
   object $
 }
+
+/**
+  * Package to import from when you don't want to import anything
+  */
+package $cp{
+  object $
+}
+
+/**
+  * Package to import from when you don't want to import anything
+  */
+package $plugin{
+  object $
+}

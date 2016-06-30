@@ -21,104 +21,71 @@
     @sect.ref("Debugging", "debugging tool"), or for many other
     @sect.ref("Ammonite-Cookbook", "fun and interesting things")!
 
-  @sect{Getting Started}
-    @p
-      If you want to use Ammonite as a plain Scala shell, download the
-      standalone executable:
 
-    @hl.sh
-      @replCurl
+  @p
+    If you want to use Ammonite as a plain Scala shell, download the
+    standalone executable:
 
-    @p
-      This will give you access to Ammonite for Scala:
+  @hl.sh
+    @replCurl
 
-    @img(src:="GettingStarted.png", width:="100%")
+  @p
+    This will give you access to Ammonite for Scala:
 
-    @p
-      With @sect.ref("Pretty-printed output", "Pretty Printing"),
-      @sect.ref{Syntax Highlighting} for input and output,
-      @sect.ref{Artifact Loading} in-REPL, and all the other nice
-      @sect.ref{Features}!
+  @img(src:="GettingStarted.png", width:="100%")
 
-    @p
-      If you want to use Ammonite as a filesystem shell, take a look at
-      @sect.ref{Ammonite-Shell}. If you're not sure what to do with Ammonite,
-      check out the @sect.ref{Ammonite-Cookbook} for some fun ideas!
+  @p
+    With @sect.ref("Pretty-printed output", "Pretty Printing"),
+    @sect.ref{Syntax Highlighting} for input and output,
+    @sect.ref("import $ivy", "Artifact Loading") in-REPL, and all the other nice
+    @sect.ref{Features}!
 
-    @p
-      If you want some initialization code available to the REPL, you can add
-      it to your @code{~/.ammonite/predef.scala}.
-    @p
-      If you have any questions, come hang out on the @sect.ref("Community",
-       "mailing list or gitter channel") and get help!
+  @p
+    If you want to use Ammonite as a filesystem shell, take a look at
+    @sect.ref{Ammonite-Shell}. If you're not sure what to do with Ammonite,
+    check out the @sect.ref{Ammonite-Cookbook} for some fun ideas!
 
-    @sect{Ammonite-REPL in SBT}
-      @p
-        You can also try out Ammonite in an existing SBT project, add the
-        following to your @code{build.sbt}
+  @p
+    If you want some initialization code available to the REPL, you can add
+    it to your @code{~/.ammonite/predef.scala}.
+  @p
+    If you have any questions, come hang out on the @sect.ref("Community",
+     "mailing list or gitter channel") and get help!
 
-      @hl.scala
-        libraryDependencies += "com.lihaoyi" % "ammonite-repl" % "@ammonite.Constants.version" % "test" cross CrossVersion.full
 
-        initialCommands in (Test, console) := """ammonite.repl.Main().run()"""
+  @p
+    You can also try out Ammonite in an existing SBT project, add the
+    following to your @code{build.sbt}
 
-      @p
-        After that, simple hit
-      @code
-        sbt projectName/test:console
-      @p
-        To activate the Ammonite REPL
+  @hl.scala
+    libraryDependencies += "com.lihaoyi" % "ammonite-repl" % "@ammonite.Constants.version" % "test" cross CrossVersion.full
 
-      @p
-        You can also pass a string to the @code{Main} call containing any
-        commands or imports you want executed at the start of every run, along
-        with @lnk("other configuration",
-        "http://www.lihaoyi.com/Ammonite/api/repl/index.html#ammonite.repl.Main").
-        If you want Ammonite to be available in all projects, simply add the
-        above snippet to a new file @code{~/.sbt/0.13/global.sbt}.
+    initialCommands in (Test, console) := """ammonite.repl.Main().run()"""
 
-      @p
-        Note: Ammonite-REPL does @i{not} support Windows, even though
-        @sect.ref{Ammonite-Ops} does. See @lnk("#119",
-        "https://github.com/lihaoyi/Ammonite/issues/119") if you are interested
-        in details or want to try your hand at making it work.
+  @p
+    After that, simple hit
+  @code
+    sbt projectName/test:console
+  @p
+    To activate the Ammonite REPL
+
+  @p
+    You can also pass a string to the @code{Main} call containing any
+    commands or imports you want executed at the start of every run, along
+    with @lnk("other configuration",
+    "http://www.lihaoyi.com/Ammonite/api/repl/index.html#ammonite.repl.Main").
+    If you want Ammonite to be available in all projects, simply add the
+    above snippet to a new file @code{~/.sbt/0.13/global.sbt}.
+
+  @p
+    Note: Ammonite-REPL does @i{not} support Windows, even though
+    @sect.ref{Ammonite-Ops} does. See @lnk("#119",
+    "https://github.com/lihaoyi/Ammonite/issues/119") if you are interested
+    in details or want to try your hand at making it work.
 
   @sect{Features}
     @p
       Ammonite-REPL supports many more features than the default REPL, including:
-
-    @sect{Artifact Loading}
-
-      @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("standalone", "@"), "\"\"\"")
-
-      @p
-        Ammonite allows you to load artifacts directly from maven central by
-        copy & pasting their SBT ivy-coordinate-snippet. In addition, you can
-        also load in jars as @hl.scala{java.io.File}s to be included in the
-        session or simple @hl.scala{String}s to be executed using the
-        @hl.scala{load} command.
-
-      @p
-        This makes Ammonite ideal for trying out new libraries or tools. You
-        can pull down projects like @lnk("Scalaz",
-        "https://github.com/scalaz/scalaz") or @lnk("Shapeless",
-        "https://github.com/milessabin/shapeless") and immediately start
-        working with them in the REPL:
-
-      @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("shapeless", "@"), "\"\"\"")
-
-      @p
-        Even non-trivial web frameworks like Finagle or Akka-HTTP can be
-        simply pulled down and run in the REPL!
-
-      @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("finagle", "@"), "\"\"\"")
-
-
-      @p
-        Ammonite-REPL is configured with a set of default resolvers but you
-        can add your own
-        
-        @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("resolvers", "@"), "\"\"\"") 
 
     @sect{Pretty-printed output}
 
@@ -135,14 +102,501 @@
         @hl.scala{height = ...} parameter to control how much you want to show
         before truncation.
 
-    @sect{Configurable Truncation}
-      @hl.ref(advancedTests, Seq("'truncation", "@"), "\"\"\"")
+      @sect{Configurable Truncation}
+        @hl.ref(advancedTests, Seq("'truncation", "@"), "\"\"\"")
+
+        @p
+          Ammonite-REPL intelligently truncates your output when it's beyond a
+          certain size. You can request for the full output to be printed
+          on-demand, print a certain number of lines, or even change the implicit
+          @code{pprintConfig} so subsequent lines all use your new configuration.
+
+    @sect{Editing}
+      @p
+        Ammonite by default ships with a custom implementation of readline, which
+        provides...
+
+      @sect{Syntax Highlighting}
+        @img(src:="Highlighting.png", width:="100%")
+        @p
+          Ammonite syntax highlights both the code you're entering as well as any
+          output being echoed in response. This should make it much easier to
+          work with larger snippets of input.
+        @p
+          All colors are configurable, and you can easily turn off colors entirely
+          via the @sect.ref{Configuration}.
+        @p
+          Stack traces are similarly highlighted, for easier reading:
+
+        @img(src:="ColoredTraces.png", width:="100%")
+      @sect{Multi-line editing}
+
+        @p
+          You can use the @b{Up} and @b{Down} arrows to navigate between lines
+          within your snippet. @code{Enter} only executes the code when you're
+          on the last line of a multi-line snippet, meaning you can take your
+          time, space out your code nicely, and fix any mistakes anywhere in your
+          snippet. History is multi-line too, meaning re-running a multi-line
+          snippet is trivial, even with tweaks.
+
+        @p
+          Long gone are the days where you're desperately trying to cram
+          everything in a single line, or curse quietly when you notice a mistake
+          in an earlier line you are no longer able to fix. No more painstakingly
+          crafting a multi-line snippet, and then having to painstakingly fish it
+          line by individual line out of the history so you can run it again!
+
+      @sect{Desktop key-bindings}
+        @img(src:="Editing.gif", display.block, marginLeft.auto, marginRight.auto, height := 172)
+        @p
+          You can use @b{Alt-Left}/@b{Right} to move forward/backwards by one
+          word at a time or hold down @b{Shift} to select text to delete. These
+          compose as you'd be used to: e.g. @b{Shift-Up} selects all the text
+          between your current cursor and the same column one row up.
+
+        @p
+          @code{Tab} and @code{Shift-Tab} now work to block-indent and -dedent
+          sections of code, as you'd expect in any desktop editor like Sublime
+          Text or IntelliJ. This further enhances the multi-line editing
+          experience, letting your nicely lay-out your more-complex REPL commands
+          the same way you'd format code in any other editor.
+
+      @sect{Console key-bindings}
+        @p
+          All the readline-style navigation hotkeys like @b{Ctrl-W} to delete a
+          word or @b{Esc-Left}/@b{Right} to navigate one word left/right still
+          work. If you're comfortable with consoles like Bash, Python, IPython or
+          even the default Scala console, you should have no trouble as all the
+          exact same hotkeys work in Ammonite
+
+      @sect{History Search}
+
+        @img(src:="HistorySearch.gif", width:="445px", marginRight.auto, marginLeft.auto, display.block)
+
+        @p
+          Apart from browsing your command-line history with @code{UP}, you can
+          also perform a history search by entering some search term and @i{then}
+          pressing @code{UP}. That will pull up the most recent history line with
+          that term in it, underlined. You can continue to press @code{UP} or
+          @code{DOWN} to cycle through the matches, or @code{Backspace} or
+          continue typing characters to refine your search to what you want.
+        @p
+          You can press @code{TAB}, or any other command character (@code{LEFT},
+          @code{RIGHT}, ...) to end the search and let you continue working with
+          the currently-displayed command. Pressing @code{ENTER} will end the
+          search and immediately submit the command to be run.
+        @p
+          You can also kick off a history search using @code{Ctrl-R}, and use
+          @code{Ctrl-R} to cycle through the matches.
+
+      @sect{Block Input}
+        @p
+          To enter block input (many independent lines all at once) into the
+          Ammonite-REPL, simply wrap the multiple lines in curly braces
+          @hl.scala("{ ... }"), and Ammonite will wait until you close it before
+          evaluating the contents:
+
+        @hl.ref(advancedTests, Seq("'unwrapping", "@"))
+
+        @p
+          As you can see, the contents of the @hl.scala("{ ... }") block are
+          unwrapped and evaluated as top-level statements. You can use this to
+          e.g. declare mutually recursive functions or classes &
+          companion-objects without being forced to squeeze everything onto a
+          single line.
+
+        @p
+          If you don't want this un-wrapping behavior, simply add another set of
+          curlies and the block will be evaluated as a normal block, to a single
+          expression:
+
+        @hl.ref(advancedTests, Seq("'forceWrapping", "@"))
+
+      @sect{Undo & Redo}
+        @img(src:="UndoRedo.gif", display.block, marginLeft.auto, marginRight.auto, height := 154)
+        @p
+          The Ammonite command-line editor allows you to undo and re-do portions
+          of your edits:
+        @ul
+          @li
+            @code{Ctrl -}: Undo last change
+          @li
+            @code{Alt/Esc -}: Redo last change
+
+        @p
+          Each block of typing, deletes, or navigation counts as one undo. This
+          should make it much more convenient to recover from botched copy-pastes
+          or bulk-deletions.
+        
+    
+    @sect{Magic Imports}
+      @p
+        Ammonite provides a set of magic imports that let you load additional
+        code into a REPL session: these are imports which start with a @code{$},
+        and are *top-level* inside the REPL command or your
+        @sect.ref{Ammonite-Scripts}.
+
+      @sect{import $file}
+        @p
+          This lets you load @sect.ref{Ammonite-Scripts} into the REPL. For
+          example given a small script defining one value we want
+        @hl.scala
+          // MyScript.scala
+          val elite = 31337
+
+        @p
+          We can load it into our REPL session using:
+
+        @hl.scala
+          @@ import $file.MyScript
+
+          @@ MyScript.elite
+          res1: Int = 31337
+
+        @p
+          If the script is in a sub-folder, simply use:
+
+        @hl.scala
+          @@ import $file.myfolder.MyScript
+
+        @p
+          Or if the script is in an @i{outer} folder,
+
+        @hl.scala
+          @@ import $file.`..`.MyScript
+
+        @p
+          Or if we want to import the contents of the script in one go:
+
+        @hl.scala
+          @@ import $file.MyScript, MyScript._
+          import $file.$
+
+          @@ elite
+          res1: Int = 31337
+
+        @p
+          While this is a trivial example, your @code{MyScript.scala} file can
+          contain anything you want, not just @hl.scala{val}s: function
+          @hl.scala{def}s, @hl.scala{class}es @hl.scala{object}s or
+          @hl.scala{trait}s, or imports from @i{other} scripts. For more
+          documentation on how these scripts work, check out the
+          @sect.ref{Ammonite-Scripts} section.
+
+        @p
+          There are some subtleties when dealing with @hl.scala{$file} imports
+          that are worth remembering
+        @ul
+          @li
+            @sect.ref{Imported Scripts are Re-used}
+          @li
+            @sect.ref{Cannot directly import from inside a Script}
+          @li
+            @sect.ref{Renamed-scripts and multiple-scripts}
+
+        @sect{Imported Scripts are Re-used}
+          @p
+            Note that script files imported multiple times are re-used; even if
+            the same script is imported multiple times, it will only be compiled
+            once, and its top-level definitions or statements will only be
+            evaluated once. If you want to run code over and over, @hl.scala{def}
+            a function in the script you are importing and you can call it
+            repeatedly.
+          @p
+            If you want to re-load a script, you should use Ammonite's
+            @sect.ref{Save/Load Session} functionality to @hl.scala{sess.save()}
+            the session before importing the script, and @hl.scala{sess.load()}ing
+            to reset the script before re-@hl.scala{import}ing it.
+
+        @sect{Cannot directly import from inside a Script}
+          @p
+             You cannot import things from "inside" that script in
+            one chain:
+
+          @hl.scala
+            @@ import $file.MyScript._
+
+          @p
+            Rather, you must always import the script-object first, and then import
+            things from the script object after:
+
+          @hl.scala
+            @@ import $file.MyScript, MyScript._
+
+        @sect{Renamed-scripts and multiple-scripts}
+
+          @p
+            You can re-name scripts on-import if you find their names are
+            colliding:
+
+          @hl.scala
+            @@ import $file.{MyScript => FooBarScript}, FooBarScript._
+
+          @p
+            Or import multiple scripts at once
+
+          @hl.scala
+            @@ import $file.{MyScript, MyOtherScript}
+
+          @p
+            These behave as you would expect imports to work. Note that when
+            importing multiple scripts, you have to name them explicitly and
+            cannot use wildcard `._` imports:
+
+          @hl.scala
+            @@ import $file._ // doesn't work
+
+      @sect{import $exec}
+        @p
+          This is similar to @hl.scala{import $file}, except that it dumps the
+          definitions and imports from the script into your REPL session. This is
+          useful if you are using a script to hold a set of common imports, the
+          docs for @sect.ref{Ammonite-Scripts} has more on this.
+
+      @sect{import $ivy}
+        @p
+          Lets you import Ivy dependencies from Maven Central, or anywhere else.
+          For example, here is loading @lnk("Scalaz",
+          "https://github.com/scalaz/scalaz") and using it in the Ammonite-REPL:
+
+        @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("'scalaz", "@"))
+
+        @p
+          Note that the different portions of the @hl.scala{$ivy} import are
+          in a @code{org::library:version} format; the @code{::} is used to represent
+          Scala dependencies, similar to @hl.scala{%%} in SBT's dependency syntax.
+          If you want Java dependencies, you can load them using the
+          @code{org:library:version} format, e.g. here we load the
+          @lnk("Google Guava", "https://github.com/google/guava") Java library
+
+        @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("'guava", "@"))
+
+        @p
+          This makes Ammonite ideal for trying out new libraries or tools. You
+          can pull down projects like @lnk("Scalaz",
+          "https://github.com/scalaz/scalaz") or @lnk("Shapeless",
+          "https://github.com/milessabin/shapeless") and immediately start
+          working with them in the REPL:
+  
+        @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("shapeless", "@"), "\"\"\"")
+  
+        @p
+          Even non-trivial web frameworks like Finagle or Akka-HTTP can be
+          simply pulled down and run in the REPL!
+  
+        @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("finagle", "@"), "\"\"\"")
+
 
       @p
-        Ammonite-REPL intelligently truncates your output when it's beyond a
-        certain size. You can request for the full output to be printed
-        on-demand, print a certain number of lines, or even change the implicit
-        @code{pprintConfig} so subsequent lines all use your new configuration.
+        Ammonite-REPL is configured with a set of default resolvers but you
+        can add your own
+        
+      @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("resolvers", "@"), "\"\"\"")
+
+    @sect{Builtins}
+      @p
+        The Ammonite REPL contains a bunch of built-in imports and definitions by
+        default. This includes:
+
+      @ul
+        @li
+          @sect.ref{Repl API}: the way you can interact with the REPL
+          programmatically and access things like it's history, modify it's
+          prompt, etc.
+        @li
+          @hl.scala{repl}: the object representing the Repl API, aliased as
+          @hl.scala{repl} rather than it's full name
+          @hl.scala{ammonite.repl.frontend.ReplBridge.repl}. Although you can
+          call them API methods directly (e.g. @hl.scala{history}) you can also
+          all them via the @hl.scala{repl} object (e.g. @hl.scala{repl.history})
+          and you can use autocomplete or @hl.scala{typeOf} on the
+          @hl.scala{repl} object to see what is available.
+        @li
+          @sect.ref{Utilities}: tools such as @sect.ref{time}, @sect.ref{grep}
+          or @sect.ref{browse} that are independent from the REPL, but are
+          extremely useful to have in it.
+
+      @p
+        All of these are imported by default into any Ammonite REPL, in order to
+        provide a rich and consistent REPL experience. If you want to disable
+        these imports and run the REPL with a clean namespace (with only the core
+        implicits needed for result pretty-printing/type-printing to work) pass
+        in @hl.scala{defaultPredef = false} to the REPL's @hl.scala{Main} API or
+        @hl.scala{--no-default-predef} to the REPL from the command-line.
+
+      @sect{Repl API}
+        @p
+          Ammonite contains a range of useful built-ins implemented as normal
+          functions. Everything inside the @hl.scala{ReplAPI} trait is imported
+          by default and can be accessed directly by default to control the
+          console.
+
+        @hl.ref(replSource/'frontend/"ReplAPI.scala", "trait ReplAPI", "// End of ReplAPI")
+
+        @p
+          All of these are also available as part of the @hl.scala{repl} object
+          which is imported in scope by default.
+
+      @sect{Utilities}
+        @p
+          Apart from the core @sect.ref{Builtins} of the REPL, the Ammonite REPL
+          also includes many helpers that are not strictly necessarily but are
+          very useful in almost all REPL sessions. Here are a few of them
+
+        @ul
+          @li
+            @sect.ref{time}
+          @li
+            @sect.ref{grep}
+          @li
+            @sect.ref{browse}
+          @li
+            @sect.ref{desugar}
+
+        @p
+          The REPL also imports the @sect.ref("Extensions", "pipe-operators")
+          from Ammonite-Ops by default to make it easy for you to use tools like
+          @sect.ref{grep} interactively, and imports all the @sect.ref{Builtins}
+          from the @hl.scala{repl}.
+
+        @p
+          These tools are useful but not strictly necessary;
+
+        @sect{time}
+          @compare("time ls -a", "time{ls!}")
+
+          @p
+            Just as bash provides a @code{time} command that you can use to see
+            how long a command took to run, Ammonite-Shell provides a
+            @hl.scala{time} function which serves the same purpose.
+          @p
+            While the bash version spits out the time in an ad-hoc table format,
+            stuck together with the output of the command, Ammonite-Shell's
+            @hl.scala{time} instead returns a tuple containing the expression
+            that was evaluated, and the time taken to evaluate it.
+
+        @sect{grep}
+          @compare("ls -a . | grep re", """ls! wd || grep! "re" """)
+          @compare("ls -a . | grep re", """ls! wd |? grep! "re" """)
+
+          @p
+            Ammonite provides its own @hl.scala{grep} command, which lets you
+            easily perform ad-hoc searches within a list.
+          @p
+            As shown above, Ammonite's @hl.scala{grep} can be used via
+            @hl.scala{||} (@hl.scala{flatMap}) or @hl.scala{|?}
+            (@hl.scala{filter}). In the case of @hl.scala{||}, it displays the
+            matches found, highlighted, with some additional context before and
+            after the match. When used with @hl.scala{|?}, it simply returns the
+            relevant items. In general, @hl.scala{||} is useful for manual
+            exploration, while @hl.scala{|?} is useful in scripts where you want
+            to deal with the list of matched results later.
+          @p
+            By default, Ammonite's @hl.scala{grep} matches a string as a literal.
+            If you want to match via a regex, append a @hl.scala{.r} to the
+            string literal to turn it into a regex:
+
+          @compare("""ls -a . | grep -G "re[a-z]\+" """, """ls! wd || grep! "re[a-z]+".r """)
+
+          @p
+            Ammonite's @hl.scala{grep} isn't limited to "filesystem"-y things;
+            @i{any} collection of objects can be piped through @hl.scala{grep}!
+            For example, here's @hl.scala{grep} being used to quickly search
+            through the JVM system properties:
+
+          @pre(ammSample(
+            """// I'm only interested in OS-related properties, show them to me!
+              |sys.props || grep! "os|OS".r""".stripMargin
+          ))
+
+          @p
+            You can even use Ammonite's @hl.scala{grep} to dig through the
+            methods of an object, even large messy objects with far-too-many
+            methods to go over by hand hunting for what you want:
+
+          @pre(ammSample(
+            """typeOf(compiler).members.size // Too many methods to dig through!
+              |// I forgot what I want but I think it has Raw in the name
+              |typeOf(compiler).members || grep! "Raw" """.stripMargin
+          ))
+          @p
+            In general, Ammonite's @hl.scala{grep} serves the same purpose of
+            @code{grep} in the Bash shell: a quick and dirty way to explore large
+            amounts of semi-structured data. You probably don't want to build
+            your enterprise business logic on top of @hl.scala{grep}'s string
+            matching. While you're working, though, @hl.scala{grep} can be a
+            quick way to find items of interest in collections of things
+            (anything!) too large to sift through by hand, when you're not yet
+            sure exactly what you want.
+
+        @sect{browse}
+
+          @img(src:="Browse.gif", display.block, marginLeft.auto, marginRight.auto, height := 278)
+
+          @p
+            @hl.scala{browse} is a utility that lets you open up far-too-large
+            data structures in the @code{less} pager, letting you page through
+            large quantities of text, navigating around it and searching through
+            it, without needing to spam your terminal output with its contents
+            and losing your earlier work to the output-spam. Simple call
+            @hl.scala{browse} on whatever value you want, e.g. this 50 thousand
+            line @hl.scala{ls.rec} result show above.
+
+          @p
+            If you're dealing with large blobs of data that you want to dig
+            through manually, you might normally format it nicely, write it to
+            a file, and open it in @code{vim} or @code{less} or an editor such
+            as Sublime Text. @hl.scala{browse} makes that process quick and
+            convenient.
+
+          @p
+            You can customize the @hl.scala{browse} call like you would a
+            @hl.scala{show} call or @hl.scala{pprint.pprintln} call, e.g. setting
+            an optional @hl.scala{width}, @hl.scala{colors} or @hl.scala{indent}.
+            You can also choose a @hl.scala{viewer} program in case you don't
+            want to use @code{less}: e.g. here's a command that would open it up
+            in @code{vim}:
+
+          @hl.scala
+            haoyi-Ammonite@@ browse(res0, viewer="vim", colors = pprint.Colors.BlackWhite)
+
+          @p
+            Apart from using @hl.scala{viewer="vim"}, we also set the
+            @hl.scala{colors} to black and white because Vim by default doesn't
+            display ANSI colors nicely. You can also pass in a @hl.scala{Seq} of
+            strings to @hl.scala{viewer} if you want to pass additional flags to
+            your editor, and of course use any other editor you would like such
+            as @hl.scala{"emacs"} or @hl.scala{"nano"} or @hl.scala{"subl"}
+
+        @sect{desugar}
+          @img(src:="Desugar.png", display.block, marginLeft.auto, marginRight.auto, height := 495)
+
+          @p
+            @hl.scala{desugar} allows you to easily see what the compiler is
+            doing with your code before it gets run. For example, in the above
+            calls to @hl.scala{desugar}, you can see:
+
+          @ul
+            @li
+              @hl.scala{List(...)} being converted to @hl.scala{List.apply(...)}
+            @li
+              @hl.scala{true -> false} being converted to
+              @hl.scala{Predef.ArrayAssoc(true).$minus$greater(false)}
+            @li
+              @hl.scala{default.write$default}, @hl.scala{default.SeqishW}, etc.
+              being injected as implicits
+            @li
+              @hl.scala{for} comprehensions with @hl.scala{if} filters being
+              converted into the relevant @hl.scala{withFilter} and @hl.scala{map}
+              calls
+
+          @p
+            In general, if you are having trouble understanding the combination
+            of implicit parameters, implicit conversions, macros, and other odd
+            Scala features, @hl.scala{desugar} could you see what is left after
+            all the magic happens.
+          @p
+            @hl.scala{desugar} only works in Scala 2.11.x and above, not in 2.10.x
 
     @sect{Save/Load Session}
       @p
@@ -255,473 +709,7 @@
           @li(a("SI-"+bug, href:="https://issues.scala-lang.org/browse/SI-"+bug))
         }
 
-  @sect{Editing}
-
-    @p
-      Ammonite by default ships with a custom implementation of readline, which
-      provides...
-
-    @sect{Syntax Highlighting}
-      @img(src:="Highlighting.png", width:="100%")
-      @p
-        Ammonite syntax highlights both the code you're entering as well as any
-        output being echoed in response. This should make it much easier to
-        work with larger snippets of input.
-      @p
-        All colors are configurable, and you can easily turn off colors entirely
-        via the @sect.ref{Configuration}.
-      @p
-        Stack traces are similarly highlighted, for easier reading:
-
-      @img(src:="ColoredTraces.png", width:="100%")
-    @sect{Multi-line editing}
-
-      @p
-        You can use the @b{Up} and @b{Down} arrows to navigate between lines
-        within your snippet. @code{Enter} only executes the code when you're
-        on the last line of a multi-line snippet, meaning you can take your
-        time, space out your code nicely, and fix any mistakes anywhere in your
-        snippet. History is multi-line too, meaning re-running a multi-line
-        snippet is trivial, even with tweaks.
-
-      @p
-        Long gone are the days where you're desperately trying to cram
-        everything in a single line, or curse quietly when you notice a mistake
-        in an earlier line you are no longer able to fix. No more painstakingly
-        crafting a multi-line snippet, and then having to painstakingly fish it
-        line by individual line out of the history so you can run it again!
-
-    @sect{Desktop key-bindings}
-      @img(src:="Editing.gif", display.block, marginLeft.auto, marginRight.auto, height := 172)
-      @p
-        You can use @b{Alt-Left}/@b{Right} to move forward/backwards by one
-        word at a time or hold down @b{Shift} to select text to delete. These
-        compose as you'd be used to: e.g. @b{Shift-Up} selects all the text
-        between your current cursor and the same column one row up.
-
-      @p
-        @code{Tab} and @code{Shift-Tab} now work to block-indent and -dedent
-        sections of code, as you'd expect in any desktop editor like Sublime
-        Text or IntelliJ. This further enhances the multi-line editing
-        experience, letting your nicely lay-out your more-complex REPL commands
-        the same way you'd format code in any other editor.
-
-    @sect{Console key-bindings}
-      @p
-        All the readline-style navigation hotkeys like @b{Ctrl-W} to delete a
-        word or @b{Esc-Left}/@b{Right} to navigate one word left/right still
-        work. If you're comfortable with consoles like Bash, Python, IPython or
-        even the default Scala console, you should have no trouble as all the
-        exact same hotkeys work in Ammonite
-
-    @sect{History Search}
-
-      @img(src:="HistorySearch.gif", width:="445px", marginRight.auto, marginLeft.auto, display.block)
-
-      @p
-        Apart from browsing your command-line history with @code{UP}, you can
-        also perform a history search by entering some search term and @i{then}
-        pressing @code{UP}. That will pull up the most recent history line with
-        that term in it, underlined. You can continue to press @code{UP} or
-        @code{DOWN} to cycle through the matches, or @code{Backspace} or
-        continue typing characters to refine your search to what you want.
-      @p
-        You can press @code{TAB}, or any other command character (@code{LEFT},
-        @code{RIGHT}, ...) to end the search and let you continue working with
-        the currently-displayed command. Pressing @code{ENTER} will end the
-        search and immediately submit the command to be run.
-      @p
-        You can also kick off a history search using @code{Ctrl-R}, and use
-        @code{Ctrl-R} to cycle through the matches.
-
-    @sect{Block Input}
-      @p
-        To enter block input (many independent lines all at once) into the
-        Ammonite-REPL, simply wrap the multiple lines in curly braces
-        @hl.scala("{ ... }"), and Ammonite will wait until you close it before
-        evaluating the contents:
-
-      @hl.ref(advancedTests, Seq("'unwrapping", "@"))
-
-      @p
-        As you can see, the contents of the @hl.scala("{ ... }") block are
-        unwrapped and evaluated as top-level statements. You can use this to
-        e.g. declare mutually recursive functions or classes &
-        companion-objects without being forced to squeeze everything onto a
-        single line.
-
-      @p
-        If you don't want this un-wrapping behavior, simply add another set of
-        curlies and the block will be evaluated as a normal block, to a single
-        expression:
-
-      @hl.ref(advancedTests, Seq("'forceWrapping", "@"))
-
-    @sect{Undo & Redo}
-      @img(src:="UndoRedo.gif", display.block, marginLeft.auto, marginRight.auto, height := 154)
-      @p
-        The Ammonite command-line editor allows you to undo and re-do portions
-        of your edits:
-      @ul
-        @li
-          @code{Ctrl -}: Undo last change
-        @li
-          @code{Alt/Esc -}: Redo last change
-
-      @p
-        Each block of typing, deletes, or navigation counts as one undo. This
-        should make it much more convenient to recover from botched copy-pastes
-        or bulk-deletions.
-
-  @sect{Magic Imports}
-    @p
-      Ammonite provides a set of magic imports that let you load additional
-      code into a REPL session: these are imports which start with a @code{$},
-      and are *top-level* inside the REPL command or your
-      @sect.ref{Ammonite-Scripts}.
-
-    @sect{import $file}
-      @p
-        This lets you load @sect.ref{Ammonite-Scripts} into the REPL. For
-        example given a small script defining one value we want
-      @hl.scala
-        // MyScript.scala
-        val elite = 31337
-
-      @p
-        We can load it into our REPL session using:
-
-      @hl.scala
-        @@ import $file.MyScript
-
-        @@ MyScript.elite
-        res1: Int = 31337
-
-      @p
-        If the script is in a sub-folder, simply use:
-
-      @hl.scala
-        @@ import $file.myfolder.MyScript
-
-      @p
-        Or if the script is in an @i{outer} folder,
-
-      @hl.scala
-        @@ import $file.`..`.MyScript
-
-      @p
-        Or if we want to import the contents of the script in one go:
-
-      @hl.scala
-        @@ import $file.MyScript, MyScript._
-        import $file.$
-
-        @@ elite
-        res1: Int = 31337
-
-      @p
-        While this is a trivial example, your @code{MyScript.scala} file can
-        contain anything you want, not just @hl.scala{val}s: function
-        @hl.scala{def}s, @hl.scala{class}es @hl.scala{object}s or
-        @hl.scala{trait}s, or imports from @i{other} scripts. For more
-        documentation on how these scripts work, check out the
-        @sect.ref{Ammonite-Scripts} section.
-
-      @p
-        There are some subtleties when dealing with @hl.scala{$file} imports
-        that are worth remembering
-      @ul
-        @li
-          @sect.ref{Imported Scripts are Re-used}
-        @li
-          @sect.ref{Cannot directly import from inside a Script}
-        @li
-          @sect.ref{Renamed-scripts and multiple-scripts}
-
-      @sect{Imported Scripts are Re-used}
-        @p
-          Note that script files imported multiple times are re-used; even if
-          the same script is imported multiple times, it will only be compiled
-          once, and its top-level definitions or statements will only be
-          evaluated once. If you want to run code over and over, @hl.scala{def}
-          a function in the script you are importing and you can call it
-          repeatedly.
-        @p
-          If you want to re-load a script, you should use Ammonite's
-          @sect.ref{Save/Load Session} functionality to @hl.scala{sess.save()}
-          the session before importing the script, and @hl.scala{sess.load()}ing
-          to reset the script before re-@hl.scala{import}ing it.
-
-      @sect{Cannot directly import from inside a Script}
-        @p
-           You cannot import things from "inside" that script in
-          one chain:
-
-        @hl.scala
-          @@ import $file.MyScript._
-
-        @p
-          Rather, you must always import the script-object first, and then import
-          things from the script object after:
-
-        @hl.scala
-          @@ import $file.MyScript, MyScript._
-
-      @sect{Renamed-scripts and multiple-scripts}
-
-        @p
-          You can re-name scripts on-import if you find their names are
-          colliding:
-
-        @hl.scala
-          @@ import $file.{MyScript => FooBarScript}, FooBarScript._
-
-        @p
-          Or import multiple scripts at once
-
-        @hl.scala
-          @@ import $file.{MyScript, MyOtherScript}
-
-        @p
-          These behave as you would expect imports to work. Note that when
-          importing multiple scripts, you have to name them explicitly and
-          cannot use wildcard `._` imports:
-
-        @hl.scala
-          @@ import $file._ // doesn't work
-
-    @sect{import $exec}
-      @p
-        This is similar to @hl.scala{import $file}, except that it dumps the
-        definitions and imports from the script into your REPL session. This is
-        useful if you are using a script to hold a set of common imports, the
-        docs for @sect.ref{Ammonite-Scripts} has more on this.
-
-    @sect{import $ivy}
-      @p
-        Lets you import Ivy dependencies from Maven Central, or anywhere else.
-        It's usage is shown in the @sect.ref{Artifact Loading} section. For
-        example, here is loading @lnk("Scalaz",
-        "https://github.com/scalaz/scalaz") and using it in the Ammonite-REPL:
-
-      @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("'scalaz", "@"))
-
-      @p
-        Note that the different portions of the @hl.scala{$ivy} import are
-        in a @code{org::library:version} format; the @code{::} is used to represent
-        Scala dependencies, similar to @hl.scala{%%} in SBT's dependency syntax.
-        If you want Java dependencies, you can load them using the
-        @code{org:library:version} format, e.g. here we load the
-        @lnk("Google Guava", "https://github.com/google/guava") Java library
-
-      @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("'guava", "@"))
-
-  @sect{Builtins}
-    @p
-      The Ammonite REPL contains a bunch of built-in imports and definitions by
-      default. This includes:
-
-    @ul
-      @li
-        @sect.ref{Repl API}: the way you can interact with the REPL
-        programmatically and access things like it's history, modify it's
-        prompt, etc.
-      @li
-        @hl.scala{repl}: the object representing the Repl API, aliased as
-        @hl.scala{repl} rather than it's full name
-        @hl.scala{ammonite.repl.frontend.ReplBridge.repl}. Although you can
-        call them API methods directly (e.g. @hl.scala{history}) you can also
-        all them via the @hl.scala{repl} object (e.g. @hl.scala{repl.history})
-        and you can use autocomplete or @hl.scala{typeOf} on the
-        @hl.scala{repl} object to see what is available.
-      @li
-        @sect.ref{Utilities}: tools such as @sect.ref{time}, @sect.ref{grep}
-        or @sect.ref{browse} that are independent from the REPL, but are
-        extremely useful to have in it.
-      @li
-        @sect.ref{Artifact Loading} implicits to provide the SBT-like syntax
-    @p
-      All of these are imported by default into any Ammonite REPL, in order to
-      provide a rich and consistent REPL experience. If you want to disable
-      these imports and run the REPL with a clean namespace (with only the core
-      implicits needed for result pretty-printing/type-printing to work) pass
-      in @hl.scala{defaultPredef = false} to the REPL's @hl.scala{Main} API or
-      @hl.scala{--no-default-predef} to the REPL from the command-line.
-
-    @sect{Repl API}
-      @p
-        Ammonite contains a range of useful built-ins implemented as normal
-        functions. Everything inside the @hl.scala{ReplAPI} trait is imported
-        by default and can be accessed directly by default to control the
-        console.
-
-      @hl.ref(replSource/'frontend/"ReplAPI.scala", "trait ReplAPI", "// End of ReplAPI")
-
-      @p
-        All of these are also available as part of the @hl.scala{repl} object
-        which is imported in scope by default.
-
-    @sect{Utilities}
-      @p
-        Apart from the core @sect.ref{Builtins} of the REPL, the Ammonite REPL
-        also includes many helpers that are not strictly necessarily but are
-        very useful in almost all REPL sessions. Here are a few of them
-
-      @ul
-        @li
-          @sect.ref{time}
-        @li
-          @sect.ref{grep}
-        @li
-          @sect.ref{browse}
-        @li
-          @sect.ref{desugar}
-
-      @p
-        The REPL also imports the @sect.ref("Extensions", "pipe-operators")
-        from Ammonite-Ops by default to make it easy for you to use tools like
-        @sect.ref{grep} interactively, and imports all the @sect.ref{Builtins}
-        from the @hl.scala{repl}.
-
-      @p
-        These tools are useful but not strictly necessary;
-
-      @sect{time}
-        @compare("time ls -a", "time{ls!}")
-
-        @p
-          Just as bash provides a @code{time} command that you can use to see
-          how long a command took to run, Ammonite-Shell provides a
-          @hl.scala{time} function which serves the same purpose.
-        @p
-          While the bash version spits out the time in an ad-hoc table format,
-          stuck together with the output of the command, Ammonite-Shell's
-          @hl.scala{time} instead returns a tuple containing the expression
-          that was evaluated, and the time taken to evaluate it.
-
-      @sect{grep}
-        @compare("ls -a . | grep re", """ls! wd || grep! "re" """)
-        @compare("ls -a . | grep re", """ls! wd |? grep! "re" """)
-
-        @p
-          Ammonite provides its own @hl.scala{grep} command, which lets you
-          easily perform ad-hoc searches within a list.
-        @p
-          As shown above, Ammonite's @hl.scala{grep} can be used via
-          @hl.scala{||} (@hl.scala{flatMap}) or @hl.scala{|?}
-          (@hl.scala{filter}). In the case of @hl.scala{||}, it displays the
-          matches found, highlighted, with some additional context before and
-          after the match. When used with @hl.scala{|?}, it simply returns the
-          relevant items. In general, @hl.scala{||} is useful for manual
-          exploration, while @hl.scala{|?} is useful in scripts where you want
-          to deal with the list of matched results later.
-        @p
-          By default, Ammonite's @hl.scala{grep} matches a string as a literal.
-          If you want to match via a regex, append a @hl.scala{.r} to the
-          string literal to turn it into a regex:
-
-        @compare("""ls -a . | grep -G "re[a-z]\+" """, """ls! wd || grep! "re[a-z]+".r """)
-
-        @p
-          Ammonite's @hl.scala{grep} isn't limited to "filesystem"-y things;
-          @i{any} collection of objects can be piped through @hl.scala{grep}!
-          For example, here's @hl.scala{grep} being used to quickly search
-          through the JVM system properties:
-
-        @pre(ammSample(
-          """// I'm only interested in OS-related properties, show them to me!
-            |sys.props || grep! "os|OS".r""".stripMargin
-        ))
-
-        @p
-          You can even use Ammonite's @hl.scala{grep} to dig through the
-          methods of an object, even large messy objects with far-too-many
-          methods to go over by hand hunting for what you want:
-
-        @pre(ammSample(
-          """typeOf(compiler).members.size // Too many methods to dig through!
-            |// I forgot what I want but I think it has Raw in the name
-            |typeOf(compiler).members || grep! "Raw" """.stripMargin
-        ))
-        @p
-          In general, Ammonite's @hl.scala{grep} serves the same purpose of
-          @code{grep} in the Bash shell: a quick and dirty way to explore large
-          amounts of semi-structured data. You probably don't want to build
-          your enterprise business logic on top of @hl.scala{grep}'s string
-          matching. While you're working, though, @hl.scala{grep} can be a
-          quick way to find items of interest in collections of things
-          (anything!) too large to sift through by hand, when you're not yet
-          sure exactly what you want.
-
-      @sect{browse}
-
-        @img(src:="Browse.gif", display.block, marginLeft.auto, marginRight.auto, height := 278)
-
-        @p
-          @hl.scala{browse} is a utility that lets you open up far-too-large
-          data structures in the @code{less} pager, letting you page through
-          large quantities of text, navigating around it and searching through
-          it, without needing to spam your terminal output with its contents
-          and losing your earlier work to the output-spam. Simple call
-          @hl.scala{browse} on whatever value you want, e.g. this 50 thousand
-          line @hl.scala{ls.rec} result show above.
-
-        @p
-          If you're dealing with large blobs of data that you want to dig
-          through manually, you might normally format it nicely, write it to
-          a file, and open it in @code{vim} or @code{less} or an editor such
-          as Sublime Text. @hl.scala{browse} makes that process quick and
-          convenient.
-
-        @p
-          You can customize the @hl.scala{browse} call like you would a
-          @hl.scala{show} call or @hl.scala{pprint.pprintln} call, e.g. setting
-          an optional @hl.scala{width}, @hl.scala{colors} or @hl.scala{indent}.
-          You can also choose a @hl.scala{viewer} program in case you don't
-          want to use @code{less}: e.g. here's a command that would open it up
-          in @code{vim}:
-
-        @hl.scala
-          haoyi-Ammonite@@ browse(res0, viewer="vim", colors = pprint.Colors.BlackWhite)
-
-        @p
-          Apart from using @hl.scala{viewer="vim"}, we also set the
-          @hl.scala{colors} to black and white because Vim by default doesn't
-          display ANSI colors nicely. You can also pass in a @hl.scala{Seq} of
-          strings to @hl.scala{viewer} if you want to pass additional flags to
-          your editor, and of course use any other editor you would like such
-          as @hl.scala{"emacs"} or @hl.scala{"nano"} or @hl.scala{"subl"}
-
-      @sect{desugar}
-        @img(src:="Desugar.png", display.block, marginLeft.auto, marginRight.auto, height := 495)
-
-        @p
-          @hl.scala{desugar} allows you to easily see what the compiler is
-          doing with your code before it gets run. For example, in the above
-          calls to @hl.scala{desugar}, you can see:
-
-        @ul
-          @li
-            @hl.scala{List(...)} being converted to @hl.scala{List.apply(...)}
-          @li
-            @hl.scala{true -> false} being converted to
-            @hl.scala{Predef.ArrayAssoc(true).$minus$greater(false)}
-          @li
-            @hl.scala{default.write$default}, @hl.scala{default.SeqishW}, etc.
-            being injected as implicits
-          @li
-            @hl.scala{for} comprehensions with @hl.scala{if} filters being
-            converted into the relevant @hl.scala{withFilter} and @hl.scala{map}
-            calls
-
-        @p
-          In general, if you are having trouble understanding the combination
-          of implicit parameters, implicit conversions, macros, and other odd
-          Scala features, @hl.scala{desugar} could you see what is left after
-          all the magic happens.
-        @p
-          @hl.scala{desugar} only works in Scala 2.11.x and above, not in 2.10.x
-
+ 
   @sect{Configuration}
     @p
       Ammonite is configured via Scala code, that can live in the
@@ -733,7 +721,7 @@
       Anything that you put in @code{predef.scala} will be executed when you
       load the Ammonite REPL. This is a handy place to put common imports,
       setup code, or even call @hl.scala{import $ivy} to
-      @sect.ref("Artifact Loading", "load third-party jars"). The compilation
+      @sect.ref("import $ivy", "load third-party jars"). The compilation
       of the predef is cached, so after the first run it should not noticeably
       slow down the initialization of your REPL.
 

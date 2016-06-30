@@ -8,7 +8,7 @@
   @p
     The Ammonite Scala REPL and Scripts are meant to be extended: you can load
     in arbitary Java/Scala modules from the internet via
-    @sect.ref("Artifact Loading", "load.ivy"). Using this third-party code, you
+    @sect.ref{import $ivy}. Using this third-party code, you
     extend the REPL to do anything you wish to do, and tools like
     @sect.ref{Ammonite-Shell} are simply modules like any other. Simple
     install Java, @sect.ref("Ammonite-REPL", "download Ammonite") onto any

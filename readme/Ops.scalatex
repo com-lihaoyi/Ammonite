@@ -279,161 +279,161 @@
 
       @hl.ref(opsExamples, Seq("noLongLines", ""))
 
-  @sect{Reading Resources}
-    @p
-      In addition to manipulating paths on the filesystem, you can also manipulate @code{resource} paths in order to read resources off of the Java classpath. By default, the path used to load resources is absolute, using the @hl.scala{Thread.currentThread().getContextClassLoader}. You can also pass in a classloader explicitly to the @hl.scala{resource} call:
-
-    @hl.ref(opsTests/"OpTests.scala", Seq("readResource", "absolute", ""))
-
-    @p
-      If you want to load resources relative to a particular class, pass in a class for the resource to be relative, or @hl.scala{getClass} to get something relative to the current class.
-
-    @hl.ref(opsTests/"OpTests.scala", Seq("readResource", "relative", ""))
-
-    @p
-      In both cases, reading resources is performed as if you did not pass a leading slash into the @hl.scala{getResource("foo/bar")} call. In the case of @hl.scala{ClassLoader#getResource}, passing in a leading slash is never valid, and in the case of @hl.scala{Class#getResource}, passing in a leading slash is equivalent to calling @hl.scala{getResource} on the @hl.scala{ClassLoader}.
-    @p
-      Ammonite-Ops ensures you only use the two valid cases in the API, without a leading slash, and not the two cases with a leading slash which are redundant (in the case of @hl.scala{Class#getResource}, which can be replaced by @hl.scala{ClassLoader#getResource}) or invalid (a leading slash with @hl.scala{ClassLoader#getResource})
-    @p
-      Note that you can only @hl.scala{read!} from paths; you can't write to them or perform any other filesystem operations on them, since they're not really files.
-    @p
-      Note also that resources belong to classloaders, and you may have multiple classloaders in your application e.g. if you are running in a servlet or REPL. Make sure you use the correct classloader (or a class belonging to the correct classloader) to load the resources you want, or else it might not find them.
-
-  @sect{Spawning Subprocesses}
-    @p
-      Ammonite-Ops provides easy syntax for anyone who wants to spawn sub-processes, e.g. commands like @code{ls} or @code{git commit -am "wip"}. This is provided through the @hl.scala{%} and @hl.scala{%%} operators, which are used as follows:
-
-    @hl.scala
-      @@ import ammonite.ops._
-      @@ import ammonite.ops.ImplicitWd._
-      @@ %ls
-      build.sbt	log		ops		readme		repl		terminal
-      echo		modules		project		readme.md	target		shell
-      res2: Int = 0
-      @@ %%('ls)
-      res3: CommandResult =
-      build.sbt
-      echo
-      log
-      modules
-      ops
-      project
-      readme
-      readme.md
-      repl
-      target
-      terminal
-      ...
-
-    @p
-      In short, @hl.scala{%} lets you run a command as you would in bash, and dumps the output to standard-out in a similar way, returning the return-code. This lets you run @code{git} commands, edit files via @code{vim}, open @code{ssh} sessions or even start @code{SBT} or @code{Python} shells right from your Scala REPL!
-    @p
-      @hl.scala{%%} on the other hand is intended for programmatic usage: rather than printing to stdout, it returns a @hl.scala{CommandResult}, which contains the standard output @hl.scala{.out} and standard error @hl.scala{.err} of the subprocess. These provide helper methods to retrieve the stdout or stderr as a list of lines
-
-    @hl.ref(opsTests/"ShelloutTests.scala", Seq("'lines", ""))
-
-    @p
-      Or as a single string:
-
-    @hl.ref(opsTests/"ShelloutTests.scala", Seq("'string", ""))
-
-    @p
-      Or as an array of bytes:
-
-    @hl.ref(opsTests/"ShelloutTests.scala", Seq("'bytes", ""))
-
-    @p
-      @hl.scala{%%} throws an @hl.scala{ShelloutException} containig the @hl.scala{CommandResult} if the return-code is non-zero.
-
-    @hl.ref(opsTests/"ShelloutTests.scala", Seq("'failures", ""))
-
-    @p
-      In both cases, you end up with a @hl.scala{CommandResult} can then be used however you like.
-    @p
-      You can also use backticks to execute commands which aren't valid Scala identifiers, e.g.
-
-    @hl.scala
-      @@ %`ssh-add`
-      Enter passphrase for /Users/haoyi/.ssh/id_rsa:
-
-    @p
-      Lastly, you can also pass arguments into these subprocess calls, as Strings, Symbols or Seqs of Strings:
-    @hl.scala
-      @@ %git 'branch
-        gh-pages
-        history
-      * master
-        speedip
-      res4: Int = 0
-
-      @@ %%('git, 'branch)
-      res5: CommandResult =
-        gh-pages
-        history
-      * master
-        speedip
-
-      @@ %%('git, checkout, "master")
-      Already on 'master'
-      res6: CommandResult =
-      M	readme/Index.scalatex
-      Your branch is up-to-date with 'origin/master'.
-
-      @@ %git("checkout", 'master)
-      M	readme/Index.scalatex
-      Already on 'master'
-      Your branch is up-to-date with 'origin/master'.
-      res8: Int = 0
-
-      @@ val stuff = List("readme.md", "build.sbt")
-      stuff: List[String] = List("readme.md", "build.sbt")
-      @@ %('ls, '".gitignore", stuff)
-      .gitignore	build.sbt	readme.md
-    @p
-      Ammonite-Ops currently does not provide many convenient ways of piping together multiple processes, but support may come in future if someone finds it useful enough to implement.
-
-    @p
-      @hl.scala{%} calls subprocesses in a way that is compatible with a normal terminal. That means you can easily call things like @hl.scala{%vim} to open a text editor, @hl.scala{%python} to open up a Python terminal, or @hl.scala{%sbt} to open up the SBT prompt!
-    @hl.scala
-      @@ %python
-      Python 2.7.6 (default, Sep  9 2014, 15:04:36)
-      [GCC 4.2.1 Compatible Apple LLVM 6.0 (clang-600.0.39)] on darwin
-      Type "help", "copyright", "credits" or "license" for more information.
-      >>> print "Hello %s%s" % ("World", "!"*3)
-      Hello World!!!
-      >>> ^D
-      res3: Int = 0
-
-      @@ %sbt
-      [info] Loading global plugins from /Users/haoyi/.sbt/0.13/plugins
-      [info] Updating {file:/Users/haoyi/.sbt/0.13/plugins/}global-plugins...
-      [info] Resolving org.fusesource.jansi#jansi;1.4 ...
-      [info] Done updating.
-      [info] Set current project to haoyi (in build file:/Users/haoyi/)
-      >
-
-    @p
-      @hl.scala{%%} does not do this.
-
-    @sect{Environment Variables}
+    @sect{Reading Resources}
       @p
-        Ammonite lets you pass in environment variables to subprocess calls; just pass them in as named arguments when you invoke the subprocess ia @code{%} or @code{%%}:
-
-      @hl.ref(opsTests/"ShelloutTests.scala", Seq("'envArgs", "val"))
-
-    @sect{Invoking Files}
+        In addition to manipulating paths on the filesystem, you can also manipulate @code{resource} paths in order to read resources off of the Java classpath. By default, the path used to load resources is absolute, using the @hl.scala{Thread.currentThread().getContextClassLoader}. You can also pass in a classloader explicitly to the @hl.scala{resource} call:
+  
+      @hl.ref(opsTests/"OpTests.scala", Seq("readResource", "absolute", ""))
+  
       @p
-        You can invoke files on disk using @code{%} and @code{%%} the same way you can invoke shell commands:
-
-      @hl.ref(opsTests/"ShelloutTests.scala", Seq("'filebased", "val"))
-
-    @sect{Current Working Directory}
+        If you want to load resources relative to a particular class, pass in a class for the resource to be relative, or @hl.scala{getClass} to get something relative to the current class.
+  
+      @hl.ref(opsTests/"OpTests.scala", Seq("readResource", "relative", ""))
+  
       @p
-        In Ammonite the current working directory is not a side-effect unlike in bash. Instead it is an argument to the command you are invoking. It can be passed in explicitly or implicitly.
-
-      @hl.ref(opsTests/"ShelloutTests.scala", Seq("'customWorkingDir", ""))
-
+        In both cases, reading resources is performed as if you did not pass a leading slash into the @hl.scala{getResource("foo/bar")} call. In the case of @hl.scala{ClassLoader#getResource}, passing in a leading slash is never valid, and in the case of @hl.scala{Class#getResource}, passing in a leading slash is equivalent to calling @hl.scala{getResource} on the @hl.scala{ClassLoader}.
       @p
-        Note how passing it inexplicitly, you need to use a @code{.} before the command-name in order for it to parse properly. That's a limitation of the Scala syntax that isn't likely to change. Another limitation is that when invoking a file, you need to call @code{.apply} explicitly rather than relying on the plain-function-call syntax:
-
-      @hl.ref(opsTests/"ShelloutTests.scala", Seq("'fileCustomWorkingDir", ""))
+        Ammonite-Ops ensures you only use the two valid cases in the API, without a leading slash, and not the two cases with a leading slash which are redundant (in the case of @hl.scala{Class#getResource}, which can be replaced by @hl.scala{ClassLoader#getResource}) or invalid (a leading slash with @hl.scala{ClassLoader#getResource})
+      @p
+        Note that you can only @hl.scala{read!} from paths; you can't write to them or perform any other filesystem operations on them, since they're not really files.
+      @p
+        Note also that resources belong to classloaders, and you may have multiple classloaders in your application e.g. if you are running in a servlet or REPL. Make sure you use the correct classloader (or a class belonging to the correct classloader) to load the resources you want, or else it might not find them.
+  
+    @sect{Spawning Subprocesses}
+      @p
+        Ammonite-Ops provides easy syntax for anyone who wants to spawn sub-processes, e.g. commands like @code{ls} or @code{git commit -am "wip"}. This is provided through the @hl.scala{%} and @hl.scala{%%} operators, which are used as follows:
+  
+      @hl.scala
+        @@ import ammonite.ops._
+        @@ import ammonite.ops.ImplicitWd._
+        @@ %ls
+        build.sbt	log		ops		readme		repl		terminal
+        echo		modules		project		readme.md	target		shell
+        res2: Int = 0
+        @@ %%('ls)
+        res3: CommandResult =
+        build.sbt
+        echo
+        log
+        modules
+        ops
+        project
+        readme
+        readme.md
+        repl
+        target
+        terminal
+        ...
+  
+      @p
+        In short, @hl.scala{%} lets you run a command as you would in bash, and dumps the output to standard-out in a similar way, returning the return-code. This lets you run @code{git} commands, edit files via @code{vim}, open @code{ssh} sessions or even start @code{SBT} or @code{Python} shells right from your Scala REPL!
+      @p
+        @hl.scala{%%} on the other hand is intended for programmatic usage: rather than printing to stdout, it returns a @hl.scala{CommandResult}, which contains the standard output @hl.scala{.out} and standard error @hl.scala{.err} of the subprocess. These provide helper methods to retrieve the stdout or stderr as a list of lines
+  
+      @hl.ref(opsTests/"ShelloutTests.scala", Seq("'lines", ""))
+  
+      @p
+        Or as a single string:
+  
+      @hl.ref(opsTests/"ShelloutTests.scala", Seq("'string", ""))
+  
+      @p
+        Or as an array of bytes:
+  
+      @hl.ref(opsTests/"ShelloutTests.scala", Seq("'bytes", ""))
+  
+      @p
+        @hl.scala{%%} throws an @hl.scala{ShelloutException} containig the @hl.scala{CommandResult} if the return-code is non-zero.
+  
+      @hl.ref(opsTests/"ShelloutTests.scala", Seq("'failures", ""))
+  
+      @p
+        In both cases, you end up with a @hl.scala{CommandResult} can then be used however you like.
+      @p
+        You can also use backticks to execute commands which aren't valid Scala identifiers, e.g.
+  
+      @hl.scala
+        @@ %`ssh-add`
+        Enter passphrase for /Users/haoyi/.ssh/id_rsa:
+  
+      @p
+        Lastly, you can also pass arguments into these subprocess calls, as Strings, Symbols or Seqs of Strings:
+      @hl.scala
+        @@ %git 'branch
+          gh-pages
+          history
+        * master
+          speedip
+        res4: Int = 0
+  
+        @@ %%('git, 'branch)
+        res5: CommandResult =
+          gh-pages
+          history
+        * master
+          speedip
+  
+        @@ %%('git, checkout, "master")
+        Already on 'master'
+        res6: CommandResult =
+        M	readme/Index.scalatex
+        Your branch is up-to-date with 'origin/master'.
+  
+        @@ %git("checkout", 'master)
+        M	readme/Index.scalatex
+        Already on 'master'
+        Your branch is up-to-date with 'origin/master'.
+        res8: Int = 0
+  
+        @@ val stuff = List("readme.md", "build.sbt")
+        stuff: List[String] = List("readme.md", "build.sbt")
+        @@ %('ls, '".gitignore", stuff)
+        .gitignore	build.sbt	readme.md
+      @p
+        Ammonite-Ops currently does not provide many convenient ways of piping together multiple processes, but support may come in future if someone finds it useful enough to implement.
+  
+      @p
+        @hl.scala{%} calls subprocesses in a way that is compatible with a normal terminal. That means you can easily call things like @hl.scala{%vim} to open a text editor, @hl.scala{%python} to open up a Python terminal, or @hl.scala{%sbt} to open up the SBT prompt!
+      @hl.scala
+        @@ %python
+        Python 2.7.6 (default, Sep  9 2014, 15:04:36)
+        [GCC 4.2.1 Compatible Apple LLVM 6.0 (clang-600.0.39)] on darwin
+        Type "help", "copyright", "credits" or "license" for more information.
+        >>> print "Hello %s%s" % ("World", "!"*3)
+        Hello World!!!
+        >>> ^D
+        res3: Int = 0
+  
+        @@ %sbt
+        [info] Loading global plugins from /Users/haoyi/.sbt/0.13/plugins
+        [info] Updating {file:/Users/haoyi/.sbt/0.13/plugins/}global-plugins...
+        [info] Resolving org.fusesource.jansi#jansi;1.4 ...
+        [info] Done updating.
+        [info] Set current project to haoyi (in build file:/Users/haoyi/)
+        >
+  
+      @p
+        @hl.scala{%%} does not do this.
+  
+      @sect{Environment Variables}
+        @p
+          Ammonite lets you pass in environment variables to subprocess calls; just pass them in as named arguments when you invoke the subprocess ia @code{%} or @code{%%}:
+  
+        @hl.ref(opsTests/"ShelloutTests.scala", Seq("'envArgs", "val"))
+  
+      @sect{Invoking Files}
+        @p
+          You can invoke files on disk using @code{%} and @code{%%} the same way you can invoke shell commands:
+  
+        @hl.ref(opsTests/"ShelloutTests.scala", Seq("'filebased", "val"))
+  
+      @sect{Current Working Directory}
+        @p
+          In Ammonite the current working directory is not a side-effect unlike in bash. Instead it is an argument to the command you are invoking. It can be passed in explicitly or implicitly.
+  
+        @hl.ref(opsTests/"ShelloutTests.scala", Seq("'customWorkingDir", ""))
+  
+        @p
+          Note how passing it inexplicitly, you need to use a @code{.} before the command-name in order for it to parse properly. That's a limitation of the Scala syntax that isn't likely to change. Another limitation is that when invoking a file, you need to call @code{.apply} explicitly rather than relying on the plain-function-call syntax:
+  
+        @hl.ref(opsTests/"ShelloutTests.scala", Seq("'fileCustomWorkingDir", ""))

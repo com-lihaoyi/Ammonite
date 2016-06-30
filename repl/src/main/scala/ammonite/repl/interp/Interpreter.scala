@@ -143,13 +143,48 @@ class Interpreter(prompt0: Ref[String],
   init()
   Timer("Interpreter init predef 1")
 
-  val importHooks = Ref(Map[String, ImportHook](
-    "file" -> ImportHook.File,
-    "exec" -> ImportHook.Exec,
-    "url" -> ImportHook.Http,
-    "ivy" -> ImportHook.Ivy
+  val importHooks = Ref(Map[Seq[String], ImportHook](
+    Seq("file") -> ImportHook.File,
+    Seq("exec") -> ImportHook.Exec,
+    Seq("url") -> ImportHook.Http,
+    Seq("ivy") -> ImportHook.Ivy,
+    Seq("cp") -> ImportHook.Classpath,
+    Seq("plugin", "ivy") -> ImportHook.PluginIvy,
+    Seq("plugin", "cp") -> ImportHook.PluginClasspath
   ))
 
+  def resolveSingleImportHook(source: ImportHook.Source, tree: ImportTree) = {
+    val strippedPrefix = tree.prefix.takeWhile(_(0) == '$').map(_.stripPrefix("$"))
+    val hookOpt = importHooks().collectFirst{case (k, v) if strippedPrefix.startsWith(k) => (k, v)}
+    for{
+      (hookPrefix, hook) <- Res(hookOpt, "Import Hook could not be resolved")
+      hooked <- hook.handle(source, tree.copy(prefix = tree.prefix.drop(hookPrefix.length)), this)
+      hookResults <- Res.map(hooked){
+        case res: ImportHook.Result.Source =>
+          for{
+            moduleImports <- processModule(
+              res.source, res.code, res.wrapper, res.pkg, autoImport = false
+            )
+          } yield {
+            if (!res.exec) res.imports
+            else moduleImports ++ res.imports
+
+          }
+        case res: ImportHook.Result.ClassPath =>
+          eval.sess.frames.head.addClasspath(Seq(res.file.toIO))
+          println(res)
+          val classloader =
+            if (!res.plugin) evalClassloader
+            else eval.sess.frames.head.pluginClassloader
+
+          classloader.add(res.file.toIO.toURI.toURL)
+          Res.Success(Imports())
+      }
+    } yield {
+      init()
+      hookResults
+    }
+  }
   def resolveImportHooks(source: ImportHook.Source,
                          stmts: Seq[String]): Res[(Imports, Seq[String])] = {
     val hookedStmts = mutable.Buffer.empty[String]
@@ -173,31 +208,7 @@ class Interpreter(prompt0: Ref[String],
     }
 
     for {
-      hookImports <- Res.map(importTrees){ tree =>
-        val hook = importHooks()(tree.prefix.head.stripPrefix("$"))
-        for{
-          hooked <- hook.handle(source, tree.copy(prefix = tree.prefix.drop(1)), this)
-          hookResults <- Res.map(hooked){
-            case res: ImportHook.Result.Source =>
-              val r = for{
-                moduleImports <- processModule(
-                  res.source, res.code, res.wrapper, res.pkg, autoImport = false
-                )
-              } yield {
-                if (!res.exec) res.imports
-                else moduleImports ++ res.imports
-
-              }
-              init()
-              r
-            case res: ImportHook.Result.ClassPath =>
-              eval.sess.frames.head.addClasspath(Seq(res.file.toIO))
-              evalClassloader.add(res.file.toIO.toURI.toURL)
-              init()
-              Res.Success(Imports())
-          }
-        } yield hookResults
-      }
+      hookImports <- Res.map(importTrees)(resolveSingleImportHook(source, _))
     } yield {
       val imports = Imports(hookImports.flatten.flatMap(_.value))
       (imports, hookedStmts)

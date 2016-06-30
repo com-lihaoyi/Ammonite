@@ -55,17 +55,17 @@ object BuiltinTests extends TestSuite{
 
     'loadCP{
       check.session("""
-        @ import ammonite.ops._
+        @ import ammonite.ops._, ImplicitWd._
 
-        @ import ammonite.ops.ImplicitWd._
+        @ val javaSrc = cwd/'repl/'src/'test/'resources/'loadable/'hello/"Hello.java"
 
-        @ val scalaVersion = ("scala-"+scala.util.Properties.versionNumberString.dropRight(2))
+        @ mkdir! cwd/'target/'loadCP/'hello
 
-        @ val dest = cwd/'repl/'target/scalaVersion/  "test-classes"/'loadable
+        @ cp.over(javaSrc, cwd/'target/'loadCP/'hello/"Hello.java")
 
-        @ %javac dest/'hello/"Hello.java"
+        @ %javac 'target/'loadCP/'hello/"Hello.java"
 
-        @ load.cp(dest)
+        @ import $cp.target.loadCP
 
         @ hello.Hello.hello()
         res6: String = "Hello!"
