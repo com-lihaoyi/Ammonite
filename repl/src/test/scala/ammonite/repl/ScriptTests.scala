@@ -15,6 +15,7 @@ object ScriptTests extends TestSuite{
     val scriptPath = cwd/'repl/'src/'test/'resources/'scripts
     val printedScriptPath = """cwd/'repl/'src/'test/'resources/'scripts"""
 
+    val resourcesPath = cwd/'repl/'src/'test/'resources
 
     'exec{
       'compilationBlocks{
@@ -170,12 +171,12 @@ object ScriptTests extends TestSuite{
             """)
         }
         'preserveImports{
-            val typeString =
-              if (!scala2_10)
-                """Left[String, Nothing]"""
-              else
-                """util.Left[String,Nothing]"""
-            check.session(s"""
+          val typeString =
+            if (!scala2_10)
+              """Left[String, Nothing]"""
+            else
+              """util.Left[String,Nothing]"""
+          check.session(s"""
               @ import ammonite.ops._
 
               @ load.module($printedScriptPath/"PreserveImports.scala")
@@ -187,7 +188,7 @@ object ScriptTests extends TestSuite{
         }
         'annotation{
           if (!scala2_10) //buggy in 2.10
-          check.session(s"""
+            check.session(s"""
             @ import ammonite.ops._
 
             @ load.module($printedScriptPath/"Annotation.scala")
@@ -252,7 +253,7 @@ object ScriptTests extends TestSuite{
             @ load.exec($printedScriptPath/"notHere")
             error: java.nio.file.NoSuchFileException
             """
-            )
+          )
         }
         'multiBlockError{
           check.session(s"""
@@ -271,7 +272,7 @@ object ScriptTests extends TestSuite{
       }
       'caching{
 
-        def createTestInterp(storage: Storage) = new Interpreter(
+        def createTestInterp(storage: Storage, predef: String = "") = new Interpreter(
           Ref[String](""),
           Ref(null),
           80,
@@ -280,9 +281,12 @@ object ScriptTests extends TestSuite{
           printer = Printer(_ => (), _ => (), _ => (), _ => ()),
           storage = storage,
           new History(Vector()),
-          predef = "",
+          predef = predef,
           wd = ammonite.ops.cwd,
           replArgs = Seq()
+        )
+        val tempDir = ammonite.ops.Path(
+          java.nio.file.Files.createTempDirectory("ammonite-tester")
         )
 
         'blocks{
@@ -299,6 +303,58 @@ object ScriptTests extends TestSuite{
             assert(n == expected)
           }
         }
+
+        'processModuleCaching{
+          def check(script: RelPath){
+            val storage = new Storage.Folder(tempDir)
+            val interp1 = createTestInterp(
+              storage,
+              ammonite.repl.Main.defaultPredefString
+            )
+            interp1.replApi.load.module(resourcesPath/script)
+            assert(interp1.compiler != null)
+            val interp2 = createTestInterp(
+              storage,
+              ammonite.repl.Main.defaultPredefString
+            )
+            assert(interp2.compiler == null)
+            interp2.replApi.load.module(resourcesPath/script)
+            assert(interp2.compiler == null)
+          }
+
+          'testOne - check('scriptLevelCaching/"scriptTwo.scala")
+          'testTwo - check('scriptLevelCaching/"scriptOne.scala")
+          'testThree - check('scriptLevelCaching/"QuickSort.scala")
+          'testLoadModule - check('scriptLevelCaching/"testLoadModule.scala")
+          'testFileImport - check('scriptLevelCaching/"testFileImport.scala")
+          'testIvyImport - check('scriptLevelCaching/"ivyCacheTest.scala")
+
+        }
+
+        'testRunTimeExceptionForCachedScripts{
+          val storage = new Storage.Folder(tempDir)
+          val numFile = cwd/'repl/'target/'test/'resources/'scriptLevelCaching/"num.value"
+          rm(numFile)
+          write(numFile, "1")
+          val interp1 = createTestInterp(
+            storage,
+            ammonite.repl.Main.defaultPredefString
+          )
+          interp1.replApi.load.module(resourcesPath/'scriptLevelCaching/"runTimeExceptions.scala")
+          val interp2 = createTestInterp(
+            storage,
+            ammonite.repl.Main.defaultPredefString
+          )
+          val res = intercept[java.lang.ArithmeticException]{
+            interp2.replApi.load.module(
+              resourcesPath/'scriptLevelCaching/"runTimeExceptions.scala"
+            )
+          }
+
+          assert(interp2.compiler == null &&
+            res.toString == "java.lang.ArithmeticException: / by zero")
+        }
+
         'persistence{
 
           val tempDir = ammonite.ops.Path(
@@ -333,7 +389,7 @@ object ScriptTests extends TestSuite{
             @ load.module($printedScriptPath/"Encapsulation.scala")
             error: not found: value asd
             """
-            )
+          )
         }
         'noAutoIncrementWrapper{
           val storage = Storage.InMemory()

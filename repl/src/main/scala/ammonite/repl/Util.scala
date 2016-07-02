@@ -6,6 +6,7 @@ import ammonite.ops._
 import acyclic.file
 import fansi.Attrs
 import pprint.{PPrint, PPrinter}
+import ammonite.repl.Parsers.ImportTree
 
 import scala.collection.mutable
 import scala.reflect.NameTransformer
@@ -124,7 +125,8 @@ case class Catching(handler: PartialFunction[Throwable, Res.Failing]) {
 }
 
 case class Evaluated(wrapper: Seq[Name],
-                     imports: Imports)
+                     imports: Imports,
+                     tag: String)
 
 /**
   * Represents the importing of a single name in the Ammonite REPL, of the
@@ -307,8 +309,12 @@ object Util{
   }
 
   // Type aliases for common things
+
+  type CacheDetails = (String, String)
+  //                   Wrapper HashVal
   type IvyMap = Map[(String, String, String, String), Set[String]]
   type ClassFiles = Traversable[(String, Array[Byte])]
+  type CacheOutput = (Seq[String], Seq[ClassFiles], Imports, Seq[ImportTree])
   type CompileCache = (ClassFiles, Imports)
 
 
