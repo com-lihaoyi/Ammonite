@@ -27,9 +27,9 @@ object BuiltinTests extends TestSuite{
 
         @ // Changing the colors used by Ammonite; all at once:
 
-        @ repl.colors() = ammonite.Colors.BlackWhite
+        @ repl.colors() = ammonite.util.Colors.BlackWhite
 
-        @ repl.colors() = ammonite.Colors.Default
+        @ repl.colors() = ammonite.util.Colors.Default
 
         @ // or one at a time:
 
