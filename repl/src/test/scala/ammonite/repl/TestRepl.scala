@@ -1,10 +1,10 @@
-package ammonite.repl
+package ammonite
 
-import ammonite.repl.frontend._
-import ammonite.repl.interp.Interpreter
+import ammonite.frontend._
+import ammonite.interp.Interpreter
 import utest.asserts._
 import acyclic.file
-import ammonite.repl.util._
+import ammonite.util._
 
 import scala.collection.mutable
 
@@ -40,7 +40,7 @@ class TestRepl {
       printer,
       storage = new Storage.Folder(tempDir),
       new History(Vector()),
-      predef = ammonite.repl.Main.defaultPredefString + "\n" + predef,
+      predef = ammonite.Main.defaultPredefString + "\n" + predef,
       wd = ammonite.ops.cwd,
       replArgs = Seq()
     )

@@ -1,11 +1,12 @@
-package ammonite.repl.interp
+package ammonite.interp
+
 import java.io.File
 
 import acyclic.file
 import ammonite.ops.{read, _}
-import ammonite.repl.tools.IvyThing
-import ammonite.repl.util._
-import ammonite.repl.util.Parsers.ImportTree
+import ammonite.tools.IvyThing
+import ammonite.util._
+import ammonite.util.Parsers.ImportTree
 
 /**
   * An extensible hook into the Ammonite REPL's import system; allows the end

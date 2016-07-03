@@ -1,12 +1,12 @@
-package ammonite.repl.interp
+package ammonite.interp
 
 import java.lang.reflect.InvocationTargetException
 
 import acyclic.file
-import ammonite.repl.frontend.{ReplExit, Session, SessionChanged}
-import ammonite.repl._
+import ammonite.frontend.{ReplExit, Session, SessionChanged}
+import ammonite._
 import util.Util.{ClassFiles, CompileCache}
-import ammonite.repl.util._
+import ammonite.util._
 
 import scala.collection.immutable.ListMap
 import scala.reflect.io.VirtualDirectory

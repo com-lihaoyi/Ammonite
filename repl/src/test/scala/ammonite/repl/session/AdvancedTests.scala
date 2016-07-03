@@ -1,8 +1,8 @@
-package ammonite.repl.session
+package ammonite.session
 
-import ammonite.repl.TestUtils._
-import ammonite.repl.TestRepl
-import ammonite.repl.util.Res
+import ammonite.TestUtils._
+import ammonite.TestRepl
+import ammonite.util.Res
 import utest._
 
 

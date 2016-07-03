@@ -1,11 +1,11 @@
-package ammonite.repl
+package ammonite
 
 import acyclic.file
 import ammonite.ops._
-import ammonite.repl.util.Parsers.ImportTree
+import ammonite.util.Parsers.ImportTree
 import util.Util.{CacheOutput, ClassFiles, CompileCache, IvyMap}
-import ammonite.repl.util.{Imports, Parsers, StableRef}
-import ammonite.repl.util.Util.{CacheOutput, ClassFiles, CompileCache, IvyMap}
+import ammonite.util.{Imports, Parsers, StableRef}
+import ammonite.util.Util.{CacheOutput, ClassFiles, CompileCache, IvyMap}
 import org.apache.ivy.plugins.resolver.RepositoryResolver
 
 import scala.util.Try

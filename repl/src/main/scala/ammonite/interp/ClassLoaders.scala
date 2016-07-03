@@ -1,11 +1,11 @@
-package ammonite.repl.interp
+package ammonite.interp
 
 import java.net.{URL, URLClassLoader}
 import java.nio.file
 import java.security.MessageDigest
 
 import ammonite.ops._
-import ammonite.repl.util.{ImportData, Imports, Util}
+import ammonite.util.{ImportData, Imports, Util}
 
 import scala.collection.mutable
 
@@ -95,8 +95,8 @@ class SpecialClassLoader(parent: ClassLoader, parentHash: Array[Byte])
   val newFileDict = mutable.Map.empty[String, Array[Byte]]
   def findClassPublic(name: String) = findClass(name)
   val specialLocalClasses = Set(
-    "ammonite.repl.frontend.ReplBridge",
-    "ammonite.repl.frontend.ReplBridge$"
+    "ammonite.frontend.ReplBridge",
+    "ammonite.frontend.ReplBridge$"
   )
   override def findClass(name: String): Class[_] = {
     def loadedFromBytes =

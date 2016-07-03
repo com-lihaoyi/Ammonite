@@ -1,7 +1,7 @@
-package ammonite.repl.session
+package ammonite.session
 
-import ammonite.repl.TestRepl
-import ammonite.repl.TestUtils._
+import ammonite.TestRepl
+import ammonite.TestUtils._
 import utest._
 
 import scala.collection.{immutable => imm}
@@ -227,16 +227,16 @@ object ImportTests extends TestSuite{
           error: Compilation Failed
         """)
         // Prefix things properly in Scala-2.10 where the type printer is dumb
-        val prefix1 = if (scala2_10) "ammonite.repl.testcode.paulp1." else ""
-        val prefix2 = if (scala2_10) "ammonite.repl.testcode.paulp2." else ""
-        val prefix3 = if (scala2_10) "ammonite.repl.testcode.paulp3." else ""
+        val prefix1 = if (scala2_10) "ammonite.testcode.paulp1." else ""
+        val prefix2 = if (scala2_10) "ammonite.testcode.paulp2." else ""
+        val prefix3 = if (scala2_10) "ammonite.testcode.paulp3." else ""
         val prefix4 = if (scala2_10) "$sess.Paulp4." else ""
         val prefix5 = if (scala2_10) "$sess.Paulp5." else ""
         val prefix6 = if (scala2_10) "$sess.Paulp6." else ""
         'paulp - {
 
           check.session(s"""
-          @ import ammonite.repl.testcode.paulp1._, ammonite.repl.testcode.paulp2._
+          @ import ammonite.testcode.paulp1._, ammonite.testcode.paulp2._
 
           @ new Paulp; Paulp // Paulp's example in #199
           res1_0: ${prefix1}Paulp = paulp1.Paulp1
@@ -271,13 +271,13 @@ object ImportTests extends TestSuite{
           @ new Paulp
           res11: ${prefix5}Paulp = Paulp5
 
-          @ import ammonite.repl.testcode.paulp1._ // individually import & shadow...
+          @ import ammonite.testcode.paulp1._ // individually import & shadow...
 
           @ new Paulp; Paulp
           res13_0: ${prefix1}Paulp = paulp1.Paulp1
           res13_1: ${prefix4}Paulp.type = Paulp4
 
-          @ import ammonite.repl.testcode.paulp2._ // one at a time...
+          @ import ammonite.testcode.paulp2._ // one at a time...
 
           @ new Paulp; Paulp
           res15_0: ${prefix1}Paulp = paulp1.Paulp1
@@ -309,7 +309,7 @@ object ImportTests extends TestSuite{
           check.session(s"""
           @ type Paulp = Int
 
-          @ import ammonite.repl.testcode.paulp3.Paulp
+          @ import ammonite.testcode.paulp3.Paulp
 
           @ new Paulp
           res2: ${prefix3}Paulp = paulp3.Paulp-class

@@ -1,8 +1,8 @@
-package ammonite.repl.session
+package ammonite.session
 
-import ammonite.repl.TestRepl
-import ammonite.repl.TestUtils._
-import ammonite.repl.tools.IvyThing
+import ammonite.TestRepl
+import ammonite.TestUtils._
+import ammonite.tools.IvyThing
 import utest._
 
 import scala.collection.{immutable => imm}

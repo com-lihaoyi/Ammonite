@@ -1,18 +1,18 @@
-package ammonite.repl.frontend
+package ammonite.frontend
 
 import java.io.File
 
-import ammonite.repl.tools.Resolver
+import ammonite.tools.Resolver
 import ammonite.ops._
-import ammonite.repl.util.{Bind, CodeColors, Colors, Ref}
-import ammonite.repl.interp.Frame
+import ammonite.util.{Bind, CodeColors, Colors, Ref}
+import ammonite.interp.Frame
 import org.apache.ivy.plugins.resolver.RepositoryResolver
 import pprint.{Config, PPrint, PPrinter, TPrintColors}
 
 import scala.collection.mutable
 import scala.reflect.runtime.universe._
 import acyclic.file
-import ammonite.repl.History
+import ammonite.History
 
 import scala.util.control.ControlThrowable
 
@@ -315,7 +315,7 @@ trait DefaultReplAPI extends FullReplAPI {
     }
   }
 }
-object ReplBridge extends ammonite.repl.frontend.ReplAPIHolder{}
+object ReplBridge extends ammonite.frontend.ReplAPIHolder{}
 
 case class SessionChanged(removedImports: Set[scala.Symbol],
                           addedImports: Set[scala.Symbol],

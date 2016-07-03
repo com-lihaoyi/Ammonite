@@ -1,7 +1,8 @@
-package ammonite.repl.interp
+package ammonite.interp
+
 import acyclic.file
-import ammonite.repl._
-import ammonite.repl.util._
+import ammonite._
+import ammonite.util._
 import fastparse.all._
 
 import scala.reflect.internal.Flags
@@ -19,7 +20,7 @@ import collection.mutable
   * - Wraps the code snippet with an wrapper `object` since Scala doesn't allow
   *   top-level expressions
   *
-  * - Mangles imports from our [[ammonite.repl.util.ImportData]] data structure into a source
+  * - Mangles imports from our [[ammonite.util.ImportData]] data structure into a source
   *   String
   *
   * - Combines all of these into a complete compilation unit ready to feed into

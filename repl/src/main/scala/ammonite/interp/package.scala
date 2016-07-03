@@ -1,4 +1,4 @@
-package ammonite.repl
+package ammonite
 
 /**
   * What actually lets us compile and execute code in the Ammonite REPL; deals

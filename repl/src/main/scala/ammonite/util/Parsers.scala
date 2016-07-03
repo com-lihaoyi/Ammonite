@@ -1,4 +1,4 @@
-package ammonite.repl.util
+package ammonite.util
 
 object Parsers {
 

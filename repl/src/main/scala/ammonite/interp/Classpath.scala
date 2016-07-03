@@ -1,4 +1,4 @@
-package ammonite.repl.interp
+package ammonite.interp
 
 import java.io.File
 import java.util.zip.ZipFile

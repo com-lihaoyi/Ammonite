@@ -1,6 +1,6 @@
-package ammonite.repl
+package ammonite
 
-import ammonite.repl.TestUtils._
+import ammonite.TestUtils._
 import utest._
 import acyclic.file
 

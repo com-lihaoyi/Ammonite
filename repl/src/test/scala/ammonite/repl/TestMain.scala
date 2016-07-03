@@ -1,4 +1,4 @@
-package ammonite.repl
+package ammonite
 
 
 object TestMain{

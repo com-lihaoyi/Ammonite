@@ -1,4 +1,4 @@
-package ammonite.repl.main
+package ammonite.main
 
 import sourcecode.Compat.Context
 
@@ -223,7 +223,7 @@ class Router [C <: Context](val c: C) {
         case Some(s) => q"scala.Some($s)"
       }
       val argSig = q"""
-        ammonite.repl.main.Router.ArgSig(
+        ammonite.main.Router.ArgSig(
           ${arg.name.toString},
           ${arg.typeSignature.toString},
           $docTree,
@@ -233,7 +233,7 @@ class Router [C <: Context](val c: C) {
 
 
       val reader = q"""
-      ammonite.repl.main.Router.read[${arg.typeSignature}](
+      ammonite.main.Router.read[${arg.typeSignature}](
         $argListSymbol,
         $default,
         $argSig,
@@ -249,13 +249,13 @@ class Router [C <: Context](val c: C) {
     ).unzip
 
      q"""
-    ammonite.repl.main.Router.EntryPoint(
+    ammonite.main.Router.EntryPoint(
       ${meth.name.toString},
       scala.Seq(..$argSigs),
       ($argListSymbol: Map[String, String]) =>
-        ammonite.repl.main.Router.validate(Seq(..$readArgs)) match{
-          case ammonite.repl.main.Router.Result.Success(List(..$argNames)) =>
-            ammonite.repl.main.Router.Result.Success($target.${meth.name.toTermName}(..$argNameCasts))
+        ammonite.main.Router.validate(Seq(..$readArgs)) match{
+          case ammonite.main.Router.Result.Success(List(..$argNames)) =>
+            ammonite.main.Router.Result.Success($target.${meth.name.toTermName}(..$argNameCasts))
           case x => x
         }
     )

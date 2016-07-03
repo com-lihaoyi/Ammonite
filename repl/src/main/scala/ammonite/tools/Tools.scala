@@ -2,7 +2,8 @@
  * User-facing tools. Rather specific, and although they could
  * be built upon as part of a larger program, they're
  */
-package ammonite.repl.tools
+package ammonite.tools
+
 import acyclic.file
 import java.io.{BufferedReader, InputStreamReader}
 

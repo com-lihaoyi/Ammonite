@@ -1,5 +1,6 @@
-package ammonite.repl.interp
-import ammonite.repl.tools.{IvyThing, Resolver, Resolvers}
+package ammonite.interp
+
+import ammonite.tools.{IvyThing, Resolver, Resolvers}
 import java.io.{File, OutputStream}
 import java.nio.file.NotDirectoryException
 
@@ -11,11 +12,11 @@ import ammonite.ops._
 import fastparse.all._
 
 import annotation.tailrec
-import ammonite.repl._
-import ammonite.repl.frontend._
-import ammonite.repl.util.Parsers.ImportTree
-import ammonite.repl.util.Util.CacheDetails
-import ammonite.repl.util._
+import ammonite._
+import ammonite.frontend._
+import ammonite.util.Parsers.ImportTree
+import ammonite.util.Util.CacheDetails
+import ammonite.util._
 import pprint.{Config, PPrint, PPrinter}
 import ammonite.terminal.Filter
 
@@ -42,7 +43,7 @@ class Interpreter(prompt0: Ref[String],
 
 
   val hardcodedPredef =
-    "import ammonite.repl.frontend.ReplBridge.repl.{pprintConfig, derefPPrint}"
+    "import ammonite.frontend.ReplBridge.repl.{pprintConfig, derefPPrint}"
 
 
   //this variable keeps track of where should we put the imports resulting from scripts.
@@ -97,8 +98,8 @@ class Interpreter(prompt0: Ref[String],
   Timer("Interpreter init Preprocess")
 
 
-  evalClassloader.findClassPublic("ammonite.repl.frontend.ReplBridge$")
-  val bridgeCls = evalClassloader.findClassPublic("ammonite.repl.frontend.ReplBridge")
+  evalClassloader.findClassPublic("ammonite.frontend.ReplBridge$")
+  val bridgeCls = evalClassloader.findClassPublic("ammonite.frontend.ReplBridge")
 
   ReplAPI.initReplBridge(
     bridgeCls.asInstanceOf[Class[ReplAPIHolder]],
@@ -109,7 +110,7 @@ class Interpreter(prompt0: Ref[String],
   val argString = replArgs.zipWithIndex.map{ case (b, idx) =>
     s"""
     val ${b.name} =
-      ammonite.repl.frontend.ReplBridge.repl.replArgs($idx).value.asInstanceOf[${b.typeTag.tpe}]
+      ammonite.frontend.ReplBridge.repl.replArgs($idx).value.asInstanceOf[${b.typeTag.tpe}]
     """
   }.mkString("\n")
 
@@ -240,7 +241,7 @@ class Interpreter(prompt0: Ref[String],
         Seq(Name("$sess")),
         Name("cmd" + eval.getCurrentLine),
         predefImports ++ eval.sess.frames.head.imports ++ hookImports,
-        prints => s"ammonite.repl.frontend.ReplBridge.repl.Internal.combinePrints($prints)"
+        prints => s"ammonite.frontend.ReplBridge.repl.Internal.combinePrints($prints)"
       )
       out <- evaluateLine(
         processed, printer,

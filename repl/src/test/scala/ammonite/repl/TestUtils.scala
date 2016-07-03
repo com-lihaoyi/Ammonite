@@ -1,4 +1,4 @@
-package ammonite.repl
+package ammonite
 
 object TestUtils {
   val sessionPrefix = if (scala2_10) "$sess." else ""

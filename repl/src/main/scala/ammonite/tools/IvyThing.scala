@@ -1,4 +1,4 @@
-package ammonite.repl.tools
+package ammonite.tools
 
 import org.apache.ivy.Ivy
 import org.apache.ivy.core.module.descriptor.{DefaultDependencyDescriptor, DefaultModuleDescriptor}

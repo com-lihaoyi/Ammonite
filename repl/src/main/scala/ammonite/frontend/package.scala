@@ -1,4 +1,4 @@
-package ammonite.repl
+package ammonite
 
 /**
   * Everything to do with the interaction of the Ammonite REPL with the user

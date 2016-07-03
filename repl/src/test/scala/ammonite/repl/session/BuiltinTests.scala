@@ -1,6 +1,6 @@
-package ammonite.repl.session
+package ammonite.session
 
-import ammonite.repl.TestRepl
+import ammonite.TestRepl
 import utest._
 
 import scala.collection.{immutable => imm}
@@ -19,17 +19,17 @@ object BuiltinTests extends TestSuite{
 
         @ // Ammonite on Linux/OSX and JLineWindows on Windows
 
-        @ repl.frontEnd() = ammonite.repl.frontend.FrontEnd.JLineUnix
+        @ repl.frontEnd() = ammonite.frontend.FrontEnd.JLineUnix
 
-        @ repl.frontEnd() = ammonite.repl.frontend.FrontEnd.JLineWindows
+        @ repl.frontEnd() = ammonite.frontend.FrontEnd.JLineWindows
 
-        @ repl.frontEnd() = ammonite.repl.frontend.AmmoniteFrontEnd()
+        @ repl.frontEnd() = ammonite.frontend.AmmoniteFrontEnd()
 
         @ // Changing the colors used by Ammonite; all at once:
 
-        @ repl.colors() = ammonite.repl.Colors.BlackWhite
+        @ repl.colors() = ammonite.Colors.BlackWhite
 
-        @ repl.colors() = ammonite.repl.Colors.Default
+        @ repl.colors() = ammonite.Colors.Default
 
         @ // or one at a time:
 

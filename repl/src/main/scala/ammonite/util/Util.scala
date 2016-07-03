@@ -1,4 +1,4 @@
-package ammonite.repl.util
+package ammonite.util
 
 import java.security.MessageDigest
 
@@ -7,7 +7,7 @@ import acyclic.file
 import fansi.Attrs
 import pprint.{PPrint, PPrinter}
 import Parsers.ImportTree
-import ammonite.repl.util.Parsers
+import ammonite.util.Parsers
 
 import scala.collection.mutable
 import scala.reflect.NameTransformer

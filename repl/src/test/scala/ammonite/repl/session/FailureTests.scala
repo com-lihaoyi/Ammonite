@@ -1,6 +1,6 @@
-package ammonite.repl.session
+package ammonite.session
 
-import ammonite.repl.TestRepl
+import ammonite.TestRepl
 import utest._
 
 import scala.collection.{immutable => imm}

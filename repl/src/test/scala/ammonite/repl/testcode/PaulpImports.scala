@@ -1,4 +1,4 @@
-package ammonite.repl.testcode
+package ammonite.testcode
 
 package paulp1 {
   class Paulp{

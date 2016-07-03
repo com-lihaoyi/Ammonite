@@ -1,12 +1,12 @@
-package ammonite.repl.frontend
+package ammonite.frontend
 
 import java.io.{InputStream, OutputStream}
 
-import ammonite.repl._
+import ammonite._
 import fastparse.core.Parsed
 import jline.console.{ConsoleReader, completer}
 import acyclic.file
-import ammonite.repl.util.{Colors, Parsers, Catching, Res}
+import ammonite.util.{Colors, Parsers, Catching, Res}
 
 import scala.annotation.tailrec
 import scala.tools.nsc.interpreter.JList

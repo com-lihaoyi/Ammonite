@@ -1,7 +1,7 @@
-package ammonite.repl
+package ammonite
 
 import ammonite.ops._
-import ammonite.repl.tools._
+import ammonite.tools._
 import utest._
 
 
@@ -12,7 +12,7 @@ object ToolsTests extends TestSuite{
     /**
       * Convert the highlighter colors into angle brackets for easy testing
       */
-    implicit val defaultHighlightColor = ammonite.repl.tools.GrepResult.Color(
+    implicit val defaultHighlightColor = ammonite.tools.GrepResult.Color(
       fansi.Color.Red, fansi.Attrs.Empty
     )
 

@@ -1,12 +1,10 @@
-package ammonite.repl
-package interp
-
+package ammonite.interp
 
 import java.io.OutputStream
 
 import acyclic.file
-import ammonite.repl.util.{ImportData, Imports, Printer}
-import ammonite.repl.util.Util.ClassFiles
+import ammonite.util.{ImportData, Imports, Printer}
+import ammonite.util.Util.ClassFiles
 
 import scala.collection.mutable
 import scala.reflect.internal.util.Position

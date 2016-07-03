@@ -1,15 +1,15 @@
-package ammonite.repl
+package ammonite
 
 import java.io.{File, InputStream, OutputStream}
 
 import ammonite.ops._
-import ammonite.repl.interp.ImportHook
+import ammonite.interp.ImportHook
 import fastparse.Utils.literalize
 
-import ammonite.repl.main.Router
-import ammonite.repl.main.Router.{ArgSig, EntryPoint}
-import ammonite.repl.util.Parsers.backtickWrap
-import ammonite.repl.util._
+import ammonite.main.Router
+import ammonite.main.Router.{ArgSig, EntryPoint}
+import ammonite.util.Parsers.backtickWrap
+import ammonite.util._
 
 
 
@@ -53,7 +53,7 @@ case class Main(predef: String = "",
                 outputStream: OutputStream = System.out,
                 errorStream: OutputStream = System.err){
   /**
-    * Instantiates an ammonite.repl.Repl using the configuration
+    * Instantiates an ammonite.Repl using the configuration
     */
   def instantiateRepl(replArgs: Seq[Bind[_]] = Nil) = {
     val augmentedPredef = Main.maybeDefaultPredef(defaultPredef, Main.defaultPredefString)
@@ -98,7 +98,7 @@ case class Main(predef: String = "",
         val fullName = (pkg :+ wrapper).map(_.backticked).mkString(".")
         repl.interp.processModule(
           ImportHook.Source.File(cwd/"<console>"),
-          s"val routes = ammonite.repl.main.Router.generateRoutes[$fullName.type]($fullName)",
+          s"val routes = ammonite.main.Router.generateRoutes[$fullName.type]($fullName)",
           Name("MainRouter"),
           Seq(Name("$sess")),
           autoImport = false
@@ -241,18 +241,18 @@ object Main{
     |"""
 
   val defaultPredefString = s"""
-    |import ammonite.repl.frontend.ReplBridge.repl
+    |import ammonite.frontend.ReplBridge.repl
     |import ammonite.ops.Extensions.{
     |  $ignoreUselessImports
     |}
-    |import ammonite.repl.tools._
-    |import ammonite.repl.tools.IvyConstructor.{ArtifactIdExt, GroupIdExt}
-    |import ammonite.repl.frontend.ReplBridge.repl.{
+    |import ammonite.tools._
+    |import ammonite.tools.IvyConstructor.{ArtifactIdExt, GroupIdExt}
+    |import ammonite.frontend.ReplBridge.repl.{
     |  Internal => _,
     |  $ignoreUselessImports
     |}
-    |import ammonite.repl.main.Router.{doc, export}
-    |import ammonite.repl.Main.pathScoptRead
+    |import ammonite.main.Router.{doc, export}
+    |import ammonite.Main.pathScoptRead
     |""".stripMargin
 
 

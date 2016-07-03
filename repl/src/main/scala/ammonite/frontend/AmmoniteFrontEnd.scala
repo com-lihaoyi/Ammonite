@@ -1,4 +1,4 @@
-package ammonite.repl.frontend
+package ammonite.frontend
 
 import java.io.{InputStream, OutputStream, OutputStreamWriter}
 
@@ -10,7 +10,7 @@ import fastparse.core.Parsed
 
 import scala.annotation.tailrec
 import Filter._
-import ammonite.repl.util.{Colors, Parsers, Res, Timer}
+import ammonite.util.{Colors, Parsers, Res, Timer}
 case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEnd{
 
   def width = FrontEndUtils.width

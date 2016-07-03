@@ -1,7 +1,7 @@
-package ammonite.repl.session
+package ammonite.session
 
-import ammonite.repl.TestRepl
-import ammonite.repl.TestUtils._
+import ammonite.TestRepl
+import ammonite.TestUtils._
 import utest._
 
 import scala.collection.{immutable => imm}
@@ -67,7 +67,7 @@ object ProjectTests extends TestSuite{
             @ import $ivy.`com.ambiata::mundane:1.2.1-20141230225616-50fc792`
             error: IvyResolutionException
 
-            @ import ammonite.repl._, Resolvers._
+            @ import ammonite._, Resolvers._
 
             @ val oss = Resolver.Http(
             @   "ambiata-oss",
