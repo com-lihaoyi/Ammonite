@@ -43,7 +43,7 @@ object Defaults{
     |  $ignoreUselessImports
     |}
     |import ammonite.main.Router.{doc, export}
-    |import ammonite.Main.pathScoptRead
+    |import ammonite.main.Scripts.pathScoptRead
     |""".stripMargin
 
 

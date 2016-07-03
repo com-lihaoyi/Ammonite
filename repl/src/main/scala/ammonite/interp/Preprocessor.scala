@@ -105,7 +105,6 @@ object Preprocessor{
       val customCode = customMsg.fold("_root_.scala.None")(x => s"""_root_.scala.Some("$x")""")
       s"""
       _root_.ammonite
-            .repl
             .frontend
             .ReplBridge
             .repl
@@ -116,7 +115,6 @@ object Preprocessor{
     def definedStr(definitionLabel: String, name: String) =
       s"""
       _root_.ammonite
-            .repl
             .frontend
             .ReplBridge
             .repl
@@ -166,7 +164,6 @@ object Preprocessor{
         Expanded(code, Seq(
           s"""
           _root_.ammonite
-                .repl
                 .frontend
                 .ReplBridge
                 .repl
