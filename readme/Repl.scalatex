@@ -1,8 +1,8 @@
 @import Main._
 @import readme.Sample._
 @import ammonite.ops._
-@val ammoniteTests = 'repl/'src/'test/'scala/'ammonite/'session
-@val replSource = 'repl/'src/'main/'scala/'ammonite
+@val ammoniteTests = 'ammonite/'src/'test/'scala/'ammonite/'session
+@val replSource = 'ammonite/'src/'main/'scala/'ammonite
 @val advancedTests = ammoniteTests/"AdvancedTests.scala"
 @sect("Ammonite-REPL", "A Modernized Scala REPL")
 
@@ -790,7 +790,7 @@
       @p
         Then instantate it with this code anywhere within your program:
 
-      @hl.ref('repl/'src/'test/'scala/'ammonite/"TestMain.scala")
+      @hl.ref('ammonite/'src/'test/'scala/'ammonite/"TestMain.scala")
 
       @p
         You can configure the instantiated REPL by passing in arguments to the

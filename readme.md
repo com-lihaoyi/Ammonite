@@ -21,7 +21,7 @@ If you want to learn more about Ammonite or how to use it, check out the links a
 The layout of the repository is roughly:
 
 - `ops/` is [Ammonite-Ops](https://lihaoyi.github.io/Ammonite/#Ammonite-Ops)
-- `repl/` is [Ammonite-REPL](https://lihaoyi.github.io/Ammonite)
+- `ammonite/` is [Ammonite](https://lihaoyi.github.io/Ammonite)'s core, REPL and script runner
 - `shell/` is [Ammonite-Shell](https://lihaoyi.github.io/Ammonite/#Ammonite-Shell)
 - `terminal/` is the JLine re-implementation used by Ammonite-REPL to provide syntax highlighting and multiline editing
 - `readme/` is the source code for the [Documentation](https://lihaoyi.github.io/Ammonite/#Ammonite-Ops), written in [Scalatex](https://lihaoyi.github.io/Scalatex/).
@@ -38,26 +38,26 @@ For more detailed information, check out the internals documentation for high-le
 Although most features should be unit tested, it's still useful to fire up a REPL from the current codebase to see things work (or not). There are a variety of shells you can spin up for testing different things:
 
 - `sbt ~terminal/test:run` is useful for manual testing the terminal interaction; it basically contains a minimal echo-anything terminal, with multiline input based on the count of open- and closed-parentheses. This lets you test all terminal interactions without all the complexity of the Scala compiler, classloaders, etc. that comes in `repl/`
-- `sbt ~repl/test:run` brings up the Ammonite-REPL using the source code in the repository, and automatically restarts it on-exit if you have made a change to the code. Useful for manual testing both of `repl/` as well as `ops/`, since you can just `import ammonite.ops._` and start using them. Note that this does not bring in filesystem utilities like the `wd` variable, `cd!` command.
+- `sbt ~ammonite/test:run` brings up the Ammonite-REPL using the source code in the repository, and automatically restarts it on-exit if you have made a change to the code. Useful for manual testing both of `ammonite/` as well as `ops/`, since you can just `import ammonite.ops._` and start using them. Note that this does not bring in filesystem utilities like the `wd` variable, `cd!` command. You can also pass in the path to a `.scala` file to run it using Ammonite's script runner
 - `sbt ~shell/test:run` brings up a fully-loaded shell with all filesystem utilities included: `wd`, `cd!`, autocomplete for filesystem paths, and more. This uses `readme/resources/example-predef.scala` instead of your default predef, for easier experimentation and development.
 - `sbt ~integration/test:run` runs the trivial main method in the `integration` subproject, letting you manually test running Ammonite programmatically, whether through `run` or `debug`
 - `sbt ~integration/test:console` brings up a console in the `integration` subproject, loading Ammonite-REPL as a test console, as described in the readme. Similar to `integration/test:run` but useful for verifying the different classloader/execution environment we get by starting Ammonite inside the Scala REPL doesn't break things
 
 ### Automated Testing
 
-While working on a arbitrary `xyz` subproject, `sbt ~xyz/test` runs tests after every change. `repl/test` can be a bit slow because of the amount of code it compiles, so you may want to specify the test manually via `repl/test-only -- ammonite.TestObject.path.to.test`.
+While working on a arbitrary `xyz` subproject, `sbt ~xyz/test` runs tests after every change. `ammonite/test` can be a bit slow because of the amount of code it compiles, so you may want to specify the test manually via `ammonite/test-only -- ammonite.TestObject.path.to.test`.
 
 - `ops/test` tests the filesystem operations, without any REPL present
-- `repl/test` tests the Ammonite-REPL, without filesystem-shell integration.
+- `ammonite/test` tests the Ammonite-REPL/Script-runner, without filesystem-shell integration.
 - `terminal/test` tests the readline re-implementation: keyboard navigation, shortcuts, editing, without any filesystem/scala-repl logic
-- `shell/test` tests the integration between the standalone `ops/` and `repl/` projects: features like `cd!`/`wd`, path-completion, ops-related pretty-printing and tools
-- `integration/test` kicks off the integration tests, which bundle `repl/` and `shell/` into their respective jars and invoke them as subprocesses. Somewhat slow, but exercises all the command-line-parsing stuff that the other unit tests do not exercise, and makes sure that everything works when run from `.jar`s instead of loose class-files
+- `shell/test` tests the integration between the standalone `ops/` and `ammonite/` projects: features like `cd!`/`wd`, path-completion, ops-related pretty-printing and tools
+- `integration/test` kicks off the integration tests, which bundle `ammonite/` and `shell/` into their respective jars and invoke them as subprocesses. Somewhat slow, but exercises all the command-line-parsing stuff that the other unit tests do not exercise, and makes sure that everything works when run from `.jar`s instead of loose class-files
 
 ### Publishing
 
 - `git clean -xdf` to make sure you're building from a clean project
 - Update the `project/Constants.scala` version number to the new version
-- `sbt ++2.11.8 repl/assembly ++2.10.5 repl/assembly` to bundle the REPL as a standalone distribution
+- `sbt ++2.11.8 ammonite/assembly ++2.10.5 ammonite/assembly` to bundle the REPL as a standalone distribution
 - `sbt +published/publishLocal` or `sbt +published/publishSigned` is used for publishing.
 - Create a new release on https://github.com/lihaoyi/Ammonite/releases and upload the two executables for 2.11.8 and 2.10.5, as well as the `shell/src/main/resources/ammonite/shell/example-predef.scala` file.
 - Create short URLs for the 2.11.8 executable download and the `example-predef.scala` file and fix the readme code in `readme/Sample.scala` to use these short URLs

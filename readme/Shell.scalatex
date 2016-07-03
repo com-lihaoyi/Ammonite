@@ -136,7 +136,7 @@
 
       @compare(
         "find ./repl/src -ls | sort -nrk 7 | head -3",
-        "ls.rec! wd/'repl/'src | (x => x.size -> x.last) sortBy (-_._1) take 3"
+        "ls.rec! wd/'ammonite/'src | (x => x.size -> x.last) sortBy (-_._1) take 3"
       )
 
       @p

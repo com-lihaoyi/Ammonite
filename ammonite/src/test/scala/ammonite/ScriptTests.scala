@@ -13,10 +13,10 @@ object ScriptTests extends TestSuite{
     println("ScriptTests")
     val check = new TestRepl()
 
-    val scriptPath = cwd/'repl/'src/'test/'resources/'scripts
-    val printedScriptPath = """cwd/'repl/'src/'test/'resources/'scripts"""
+    val scriptPath = cwd/'ammonite/'src/'test/'resources/'scripts
+    val printedScriptPath = """cwd/'ammonite/'src/'test/'resources/'scripts"""
 
-    val resourcesPath = cwd/'repl/'src/'test/'resources
+    val resourcesPath = cwd/'ammonite/'src/'test/'resources
 
     'exec{
       'compilationBlocks{
@@ -334,7 +334,7 @@ object ScriptTests extends TestSuite{
 
         'testRunTimeExceptionForCachedScripts{
           val storage = new Storage.Folder(tempDir)
-          val numFile = cwd/'repl/'target/'test/'resources/'scriptLevelCaching/"num.value"
+          val numFile = cwd/'ammonite/'target/'test/'resources/'scriptLevelCaching/"num.value"
           rm(numFile)
           write(numFile, "1")
           val interp1 = createTestInterp(

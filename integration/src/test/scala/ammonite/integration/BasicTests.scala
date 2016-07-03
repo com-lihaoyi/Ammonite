@@ -41,7 +41,7 @@ object BasicTests extends TestSuite{
         "-c",
         """val x = wd
           |@
-          |cd! 'repl/'src
+          |cd! 'ammonite/'src
           |@
           |println(wd relativeTo x)""".stripMargin
       )

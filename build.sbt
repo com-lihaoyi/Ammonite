@@ -115,14 +115,14 @@ lazy val terminal = project
  * standalone in a Scala project to provide a better interactive experience
  * for Scala
  */
-lazy val repl = project
+lazy val ammonite = project
   .dependsOn(terminal, ops)
   .settings(
     macroSettings,
     sharedSettings,
     crossVersion := CrossVersion.full,
     test in assembly := {},
-    name := "ammonite-repl",
+    name := "ammonite",
     libraryDependencies ++= Seq(
       "org.scala-lang" % "scala-compiler" % scalaVersion.value,
       "jline" % "jline" % "2.12",
@@ -149,12 +149,12 @@ lazy val repl = project
   )
 
 /**
- * Project that binds together [[ops]] and [[repl]], turning them into a
+ * Project that binds together [[ops]] and [[ammonite]], turning them into a
  * credible systems shell that can be used to replace bash/zsh/etc. for
  * common housekeeping tasks
  */
 lazy val shell = project
-  .dependsOn(ops, repl % "compile->compile;test->test")
+  .dependsOn(ops, ammonite % "compile->compile;test->test")
   .settings(
     sharedSettings,
     macroSettings,
@@ -165,12 +165,12 @@ lazy val shell = project
   )
 
 val integrationTasks = Seq(
-  assembly in repl,
+  assembly in ammonite,
   packageBin in (shell, Compile)
 )
 lazy val integration = project
   .dependsOn(ops)
-  .dependsOn(repl)
+  .dependsOn(ammonite)
   .settings(
     sharedSettings,
     (test in Test) <<= (test in Test).dependsOn(integrationTasks:_*),
@@ -187,7 +187,7 @@ lazy val integration = project
  * Plug into any app environment for live hacking on a live application.
  */
 lazy val sshd = project
-    .dependsOn(repl)
+    .dependsOn(ammonite)
     .settings(
       sharedSettings,
       crossVersion := CrossVersion.full,
@@ -213,11 +213,11 @@ lazy val readme = ScalatexReadme(
   scalaVersion := "2.11.8",
   libraryDependencies += "com.lihaoyi" %% "fansi" % "0.1.3",
   (run in Compile) <<= (run in Compile).dependsOn(
-    assembly in repl,
+    assembly in ammonite,
     packageBin in (shell, Compile),
     doc in (ops, Compile),
     doc in (terminal, Compile),
-    doc in (repl, Compile),
+    doc in (ammonite, Compile),
     doc in (sshd, Compile),
     doc in (shell, Compile)
   ),
@@ -226,7 +226,7 @@ lazy val readme = ScalatexReadme(
     val copies = Seq(
       (doc in (ops, Compile)).value -> "ops",
       (doc in (terminal, Compile)).value -> "terminal",
-      (doc in (repl, Compile)).value -> "repl",
+      (doc in (ammonite, Compile)).value -> "ammonite",
       (doc in (sshd, Compile)).value -> "sshd",
       (doc in (shell, Compile)).value -> "shell"
     )
@@ -244,5 +244,5 @@ lazy val tested = project
 
 lazy val published = project
   .in(file("target/published"))
-  .aggregate(ops, shell, terminal, repl, sshd)
+  .aggregate(ops, shell, terminal, ammonite, sshd)
   .settings(dontPublishSettings)

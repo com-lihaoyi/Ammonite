@@ -298,7 +298,7 @@ object AdvancedTests extends TestSuite{
     }
     'loadingModulesInPredef{
       import ammonite.ops._
-      val dir = cwd/'repl/'src/'test/'resources/'scripts/'predefWithLoad
+      val dir = cwd/'ammonite/'src/'test/'resources/'scripts/'predefWithLoad
       'loadExec {
         val c1 = new TestRepl() {
           override def predef = read ! dir / "PredefLoadExec.scala"

@@ -1,8 +1,8 @@
 @import Main._
 @import readme.Sample._
 @import ammonite.ops._
-@val ammoniteTests = 'repl/'src/'test/'scala/'ammonite/'session
-@val replSource = 'repl/'src/'main/'scala/'ammonite
+@val ammoniteTests = 'ammonite/'src/'test/'scala/'ammonite/'session
+@val replSource = 'ammonite/'src/'main/'scala/'ammonite
 @val advancedTests = ammoniteTests/"AdvancedTests.scala"
 @sect("Ammonite Cookbook", "Fun with Scala-Scriping!")
   @p
@@ -188,7 +188,7 @@
       @@ import org.apache.poi.xwpf.usermodel._ // Bring Ms-Word APIs into scope
       @@ import collection.JavaConversions._    // Make use of Java collections easier
 
-      @@ val path = cwd/'repl/'src/'test/'resources/'testdata/"Resume.docx"
+      @@ val path = cwd/'ammonite/'src/'test/'resources/'testdata/"Resume.docx"
 
       @@ val docx = new XWPFDocument(new java.io.ByteArrayInputStream(read.bytes(path)))
 
@@ -249,7 +249,7 @@
       @@ import net.coobird.thumbnailator._
       import net.coobird.thumbnailator._
 
-      @@ val images = ls! cwd/'repl/'src/'test/'resources/'testdata/'images
+      @@ val images = ls! cwd/'ammonite/'src/'test/'resources/'testdata/'images
       images: LsSeq = LsSeq(
         /Users/haoyi/Dropbox (Personal)/Workspace/Ammonite/repl/src/test/resources/testdata/images/GettingStarted.png,
         /Users/haoyi/Dropbox (Personal)/Workspace/Ammonite/repl/src/test/resources/testdata/images/Highlighting.png,
