@@ -5,10 +5,12 @@ import java.lang.reflect.InvocationTargetException
 import acyclic.file
 import ammonite.repl.frontend.{SessionChanged, Session, ReplExit}
 import ammonite.repl._
+import Parsers.ImportTree
 
 import Util.{CompileCache, ClassFiles}
 
 import scala.collection.immutable.ListMap
+import scala.reflect.io.VirtualDirectory
 import scala.collection.mutable
 import scala.util.Try
 
@@ -21,6 +23,7 @@ import scala.util.Try
  */
 trait Evaluator{
   def loadClass(wrapperName: String, classFiles: ClassFiles): Res[Class[_]]
+  def evalMain(cls: Class[_]): Any
   def getCurrentLine: String
   def update(newImports: Imports): Unit
 
@@ -33,9 +36,16 @@ trait Evaluator{
   def processScriptBlock(cls: Class[_],
                          newImports: Imports,
                          wrapperName: Name,
-                         pkgName: Seq[Name]): Res[Evaluated]
+                         pkgName: Seq[Name],
+                         tag: String): Res[Evaluated]
 
   def sess: Session
+
+  def evalCachedClassFiles(cachedData: Seq[ClassFiles],
+                           pkg: String,
+                           wrapper: String,
+                           dynamicClasspath: VirtualDirectory,
+                           classFilesList: Seq[String]): Res[Seq[_]]
 
 }
 
@@ -174,7 +184,9 @@ object Evaluator{
         Timer("eval.processLine evaluatorRunPrinter 1")
         evaluatorRunPrinter(iter.foreach(printer.out))
         Timer("eval.processLine evaluatorRunPrinter end")
-        evaluationResult(Seq(Name("$sess"), indexedWrapperName), newImports)
+
+        // "" Empty string as cache tag of repl code
+        evaluationResult(Seq(Name("$sess"), indexedWrapperName), newImports, "")
       }
     }
 
@@ -182,24 +194,45 @@ object Evaluator{
     def processScriptBlock(cls: Class[_],
                            newImports: Imports,
                            wrapperName: Name,
-                           pkgName: Seq[Name]) = for {
+                           pkgName: Seq[Name],
+                           tag: String) = for {
       _ <- Catching{userCodeExceptionHandler}
     } yield {
       Timer("cachedCompileBlock")
       evalMain(cls)
       Timer("evalMain")
-      val res = evaluationResult(pkgName :+ wrapperName, newImports)
+      val res = evaluationResult(pkgName :+ wrapperName, newImports, tag)
       Timer("evaluationResult")
       res
     }
 
+    def evalCachedClassFiles(cachedData: Seq[ClassFiles],
+                             pkg: String,
+                             wrapper: String,
+                             dynamicClasspath: VirtualDirectory,
+                             classFilesList: Seq[String]): Res[Seq[_]] = {
+
+      val res = Res.map(cachedData.zipWithIndex) {
+        case (clsFiles, index) =>
+          Compiler.addToClasspath(clsFiles, dynamicClasspath)
+          eval.loadClass(classFilesList(index), clsFiles)
+      }
+
+      try {
+        for {
+          r <- res
+        } yield r.map(eval.evalMain(_))
+      }
+      catch {userCodeExceptionHandler}
+    }
 
     def update(newImports: Imports) = {
       frames.head.addImports(newImports)
     }
 
     def evaluationResult(wrapperName: Seq[Name],
-                         imports: Imports) = {
+                         imports: Imports,
+                         tag: String) = {
       Evaluated(
         wrapperName,
         Imports(
@@ -218,7 +251,8 @@ object Evaluator{
 
             id.copy(prefix = rootedPrefix)
           }
-        )
+        ),
+        tag
       )
     }
   }

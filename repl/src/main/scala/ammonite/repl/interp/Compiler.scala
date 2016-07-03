@@ -47,10 +47,6 @@ trait Compiler{
   def parse(line: String): Either[String, Seq[Global#Tree]]
   var importsLen = 0
 
-  /**
-   * Writes files to dynamicClasspath. Needed for loading cached classes.
-   */ 
-  def addToClasspath(classFiles: ClassFiles): Unit
 }
 object Compiler{
   /**
@@ -138,6 +134,30 @@ object Compiler{
       val settings = settingsX
     }
     (reporter, vd, jcp)
+  }
+
+  def writeDeep(d: VirtualDirectory,
+                path: List[String],
+                suffix: String): OutputStream = path match {
+    case head :: Nil => d.fileNamed(path.head + suffix).output
+    case head :: rest =>
+      writeDeep(
+        d.subdirectoryNamed(head).asInstanceOf[VirtualDirectory],
+        rest, suffix
+      )
+  }
+
+  /**
+    * Writes files to dynamicClasspath. Needed for loading cached classes.
+    */
+  def addToClasspath(classFiles: Traversable[(String, Array[Byte])],
+                     dynamicClasspath: VirtualDirectory): Unit = {
+    val names = classFiles.map(_._1)
+    for((name, bytes) <- classFiles){
+      val output = writeDeep(dynamicClasspath, name.split('.').toList, ".class")
+      output.write(bytes)
+      output.close()
+    }
   }
 
   def apply(classpath: Seq[java.io.File],
@@ -256,16 +276,6 @@ object Compiler{
     }
 
 
-    def writeDeep(d: VirtualDirectory,
-                  path: List[String],
-                  suffix: String): OutputStream = path match {
-      case head :: Nil => d.fileNamed(path.head + suffix).output
-      case head :: rest =>
-        writeDeep(
-          d.subdirectoryNamed(head).asInstanceOf[VirtualDirectory],
-          rest, suffix
-        )
-    }
 
     /**
      * Compiles a blob of bytes and spits of a list of classfiles
@@ -317,14 +327,6 @@ object Compiler{
       }
     }
 
-    def addToClasspath(classFiles: Traversable[(String, Array[Byte])]): Unit = {
-      val names = classFiles.map(_._1)
-      for((name, bytes) <- classFiles){
-        val output = writeDeep(dynamicClasspath, name.split('.').toList, ".class")
-        output.write(bytes)
-        output.close()
-      }
-    }
 
     def parse(line: String): Either[String, Seq[Global#Tree]]= {
       val errors = mutable.Buffer.empty[String]
