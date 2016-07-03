@@ -4,7 +4,7 @@ import java.io.File
 
 import ammonite.repl.tools.Resolver
 import ammonite.ops._
-import ammonite.repl._
+import ammonite.repl.util.{Bind, CodeColors, Colors, Ref}
 import ammonite.repl.interp.Frame
 import org.apache.ivy.plugins.resolver.RepositoryResolver
 import pprint.{Config, PPrint, PPrinter, TPrintColors}
@@ -12,6 +12,7 @@ import pprint.{Config, PPrint, PPrinter, TPrintColors}
 import scala.collection.mutable
 import scala.reflect.runtime.universe._
 import acyclic.file
+import ammonite.repl.History
 
 import scala.util.control.ControlThrowable
 
@@ -135,7 +136,7 @@ trait ReplAPI {
    */
   def height: Int
 
-  def replArgs: Vector[ammonite.repl.Bind[_]]
+  def replArgs: Vector[Bind[_]]
 
   /**
    * Lets you configure the pretty-printing of a value. By default, it simply

@@ -2,13 +2,15 @@ package ammonite.repl
 
 import acyclic.file
 import ammonite.ops._
-import Parsers.ImportTree
-import ammonite.repl.Util.{IvyMap, CompileCache, ClassFiles, CacheOutput}
+import ammonite.repl.util.Parsers.ImportTree
+import util.Util.{CacheOutput, ClassFiles, CompileCache, IvyMap}
+import ammonite.repl.util.{Imports, Parsers, StableRef}
+import ammonite.repl.util.Util.{CacheOutput, ClassFiles, CompileCache, IvyMap}
 import org.apache.ivy.plugins.resolver.RepositoryResolver
 
 import scala.util.Try
 import scala.collection.generic.CanBuildFrom
-import scala.collection.{mutable, IndexedSeqLike}
+import scala.collection.{IndexedSeqLike, mutable}
 
 
 /**

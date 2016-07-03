@@ -5,14 +5,11 @@ import java.io.{File, InputStream, OutputStream}
 import ammonite.ops._
 import ammonite.repl.interp.ImportHook
 import fastparse.Utils.literalize
-import Parsers.backtickWrap
-import ammonite.repl.Router.{ArgSig, EntryPoint}
 
-import language.experimental.macros
-import reflect.macros.Context
-import scala.collection.mutable
-import scala.util._
-import Util.CompileCache
+import ammonite.repl.main.Router
+import ammonite.repl.main.Router.{ArgSig, EntryPoint}
+import ammonite.repl.util.Parsers.backtickWrap
+import ammonite.repl.util._
 
 
 
@@ -101,7 +98,7 @@ case class Main(predef: String = "",
         val fullName = (pkg :+ wrapper).map(_.backticked).mkString(".")
         repl.interp.processModule(
           ImportHook.Source.File(cwd/"<console>"),
-          s"val routes = ammonite.repl.Router.generateRoutes[$fullName.type]($fullName)",
+          s"val routes = ammonite.repl.main.Router.generateRoutes[$fullName.type]($fullName)",
           Name("MainRouter"),
           Seq(Name("$sess")),
           autoImport = false
@@ -254,7 +251,7 @@ object Main{
     |  Internal => _,
     |  $ignoreUselessImports
     |}
-    |import ammonite.repl.Router.{doc, export}
+    |import ammonite.repl.main.Router.{doc, export}
     |import ammonite.repl.Main.pathScoptRead
     |""".stripMargin
 

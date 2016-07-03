@@ -1,10 +1,12 @@
 package ammonite.shell
 
 import java.io.OutputStreamWriter
+
 import ammonite.terminal._
 import Filter._
-import ammonite.repl.Colors
+import ammonite.repl.{Colors, util}
 import ammonite.repl.frontend.{FrontEndUtils, Highlighter}
+import ammonite.repl.util.Parsers
 import ammonite.terminal._
 import ammonite.terminal.LazyList.~:
 /**
@@ -52,7 +54,7 @@ object PathComplete {
    */
   def findPathLiteral(snippet: String, cursor: Int): Option[PathLiteralInfo] = {
     val indices = Highlighter.highlightIndices(
-      ammonite.repl.Parsers.Splitter,
+      Parsers.Splitter,
       snippet.toVector,
       {
         case scalaparse.Scala.Id => Interval.Id
@@ -166,8 +168,8 @@ object PathComplete {
         val fragPrefix = frag.getOrElse("")
 
         def wrap(s: String) =
-          if(fragPrefix.startsWith("\"")) ammonite.repl.Parsers.stringWrap(s)
-          else ammonite.repl.Parsers.stringSymWrap(s)
+          if(fragPrefix.startsWith("\"")) util.Parsers.stringWrap(s)
+          else util.Parsers.stringSymWrap(s)
         val options = (
           ls ! path | (x => (x, wrap(x.last)))
                     |? (_._2.startsWith(fragPrefix))

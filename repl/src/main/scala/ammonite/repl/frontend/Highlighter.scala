@@ -1,7 +1,9 @@
 package ammonite.repl.frontend
 import acyclic.file
+import ammonite.repl.util.Parsers
 import fastparse.all._
 import fastparse.parsers.Combinators.Rule
+
 import scalaparse.Scala._
 import scalaparse.syntax.Identifiers._
 object Highlighter {
@@ -39,7 +41,7 @@ object Highlighter {
                               literal: fansi.Attrs,
                               keyword: fansi.Attrs,
                               reset: fansi.Attrs) = Highlighter.highlightIndices(
-    ammonite.repl.Parsers.Splitter,
+    Parsers.Splitter,
     buffer,
     {
       case Literals.Expr.Interp | Literals.Pat.Interp => reset

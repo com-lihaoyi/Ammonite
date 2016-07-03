@@ -1,6 +1,4 @@
-package ammonite.repl
-
-import fastparse.all._
+package ammonite.repl.util
 
 object Parsers {
 

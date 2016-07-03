@@ -5,8 +5,8 @@ package interp
 import java.io.OutputStream
 
 import acyclic.file
-import ammonite.repl.ImportData
-import ammonite.repl.Util.ClassFiles
+import ammonite.repl.util.{ImportData, Imports, Printer}
+import ammonite.repl.util.Util.ClassFiles
 
 import scala.collection.mutable
 import scala.reflect.internal.util.Position
@@ -20,6 +20,7 @@ import scala.tools.nsc.plugins.Plugin
 import scala.tools.nsc.reporters.AbstractReporter
 import scala.tools.nsc.util.ClassPath.JavaContext
 import scala.tools.nsc.util._
+import scala.util.Try
 
 
 /**
@@ -265,7 +266,7 @@ object Compiler{
         thingsInScope = for {
           (sym, path) <- thingsInScope
           // No clue why this one blows up
-          m <- util.Try(sym.typeSignature.members).toOption.toSeq.flatten
+          m <- Try(sym.typeSignature.members).toOption.toSeq.flatten
         } yield (m, m.name :: path)
         thingsInScope.find(target.typeSymbol.fullName == _._1.fullName).foreach{ path =>
           level = 0

@@ -1,7 +1,7 @@
 package ammonite.repl.interp
 
 
-import ammonite.repl.{ImportData, Name, Parsers}
+import ammonite.repl.util.{ImportData, Name}
 import acyclic.file
 
 import scala.reflect.NameTransformer

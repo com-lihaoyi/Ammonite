@@ -1,4 +1,4 @@
-package ammonite.repl
+package ammonite.repl.main
 
 import sourcecode.Compat.Context
 
@@ -14,7 +14,7 @@ import scala.language.experimental.macros
 object Router{
   class doc(s: String) extends StaticAnnotation
   class export extends StaticAnnotation
-  def generateRoutes[T](t: T): Seq[ammonite.repl.Router.EntryPoint] = macro generateRoutesImpl[T]
+  def generateRoutes[T](t: T): Seq[Router.EntryPoint] = macro generateRoutesImpl[T]
   def generateRoutesImpl[T: c.WeakTypeTag](c: Context)(t: c.Expr[T]): c.Expr[Seq[EntryPoint]] = {
     import c.universe._
     val r = new Router(c)
@@ -212,7 +212,7 @@ class Router [C <: Context](val c: C) {
         case None => q"None"
       }
       val docs = for{
-        doc <- arg.annotations.find(_.tpe =:= typeOf[ammonite.repl.Router.doc])
+        doc <- arg.annotations.find(_.tpe =:= typeOf[Router.doc])
         if doc.scalaArgs.head.isInstanceOf[Literal]
         l =  doc.scalaArgs.head.asInstanceOf[Literal]
         if l.value.value.isInstanceOf[String]
@@ -223,7 +223,7 @@ class Router [C <: Context](val c: C) {
         case Some(s) => q"scala.Some($s)"
       }
       val argSig = q"""
-        ammonite.repl.Router.ArgSig(
+        ammonite.repl.main.Router.ArgSig(
           ${arg.name.toString},
           ${arg.typeSignature.toString},
           $docTree,
@@ -233,7 +233,7 @@ class Router [C <: Context](val c: C) {
 
 
       val reader = q"""
-      ammonite.repl.Router.read[${arg.typeSignature}](
+      ammonite.repl.main.Router.read[${arg.typeSignature}](
         $argListSymbol,
         $default,
         $argSig,
@@ -249,13 +249,13 @@ class Router [C <: Context](val c: C) {
     ).unzip
 
      q"""
-    ammonite.repl.Router.EntryPoint(
+    ammonite.repl.main.Router.EntryPoint(
       ${meth.name.toString},
       scala.Seq(..$argSigs),
       ($argListSymbol: Map[String, String]) =>
-        ammonite.repl.Router.validate(Seq(..$readArgs)) match{
-          case ammonite.repl.Router.Result.Success(List(..$argNames)) =>
-            ammonite.repl.Router.Result.Success($target.${meth.name.toTermName}(..$argNameCasts))
+        ammonite.repl.main.Router.validate(Seq(..$readArgs)) match{
+          case ammonite.repl.main.Router.Result.Success(List(..$argNames)) =>
+            ammonite.repl.main.Router.Result.Success($target.${meth.name.toTermName}(..$argNameCasts))
           case x => x
         }
     )
@@ -265,7 +265,7 @@ class Router [C <: Context](val c: C) {
   def getAllRoutesForClass(curCls: Type, target: c.Tree): Iterable[c.universe.Tree] = {
     for{
       t <- getValsOrMeths(curCls)
-      if t.annotations.exists(_.tpe =:= typeOf[ammonite.repl.Router.export])
+      if t.annotations.exists(_.tpe =:= typeOf[Router.export])
     }
     yield extractMethod(t, curCls, target)
   }

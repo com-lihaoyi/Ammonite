@@ -3,9 +3,9 @@ import java.io.File
 
 import acyclic.file
 import ammonite.ops.{read, _}
-import ammonite.repl.Parsers.ImportTree
 import ammonite.repl.tools.IvyThing
-import ammonite.repl._
+import ammonite.repl.util._
+import ammonite.repl.util.Parsers.ImportTree
 
 /**
   * An extensible hook into the Ammonite REPL's import system; allows the end

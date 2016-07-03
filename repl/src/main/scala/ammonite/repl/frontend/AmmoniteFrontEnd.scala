@@ -1,15 +1,16 @@
 package ammonite.repl.frontend
 
-import java.io.{OutputStreamWriter, OutputStream, InputStream}
+import java.io.{InputStream, OutputStream, OutputStreamWriter}
 
-import ammonite.repl._
 import ammonite.terminal.filters._
 import GUILikeFilters.SelectionFilter
 import ammonite.terminal.LazyList.~:
 import ammonite.terminal._
 import fastparse.core.Parsed
+
 import scala.annotation.tailrec
 import Filter._
+import ammonite.repl.util.{Colors, Parsers, Res, Timer}
 case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEnd{
 
   def width = FrontEndUtils.width
@@ -89,7 +90,7 @@ case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEn
     // Enter
     val multilineFilter = Filter.action(
       SpecialKeys.NewLine,
-      ti => ammonite.repl.Parsers.split(ti.ts.buffer.mkString).isEmpty
+      ti => Parsers.split(ti.ts.buffer.mkString).isEmpty
     ){
       case TermState(rest, b, c, _) => BasicFilters.injectNewLine(b, c, rest)
     }

@@ -3,9 +3,11 @@ package ammonite.repl
 import ammonite.repl.frontend.Highlighter
 import utest._
 import acyclic.file
-import ammonite.repl.Router.{ArgSig, doc, export}
-import ammonite.repl.Router.Result.Error.{InvalidArguments, RedundantArguments, TooManyArguments}
-import ammonite.repl.Router.Result.ParamError
+import ammonite.repl.main.Router
+import ammonite.repl.main.Router.{ArgSig, doc, export}
+import ammonite.repl.main.Router.Result.Error.{InvalidArguments, RedundantArguments, TooManyArguments}
+import ammonite.repl.main.Router.Result.ParamError
+import ammonite.repl.util.Util
 object UnitTests extends TestSuite{
 
   def testHighlight(buffer: Vector[Char]) = Highlighter.defaultHighlight(

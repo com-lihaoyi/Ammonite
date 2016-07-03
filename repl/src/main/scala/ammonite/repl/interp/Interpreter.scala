@@ -2,19 +2,21 @@ package ammonite.repl.interp
 import ammonite.repl.tools.{IvyThing, Resolver, Resolvers}
 import java.io.{File, OutputStream}
 import java.nio.file.NotDirectoryException
+
 import org.apache.ivy.plugins.resolver.RepositoryResolver
-import ammonite.repl.Res
+
 import scala.collection.mutable
 import scala.tools.nsc.Settings
 import ammonite.ops._
 import fastparse.all._
-import ammonite.repl.Parsers.ImportTree
 
 import annotation.tailrec
 import ammonite.repl._
 import ammonite.repl.frontend._
-import Util._
-import pprint.{Config, PPrinter, PPrint}
+import ammonite.repl.util.Parsers.ImportTree
+import ammonite.repl.util.Util.CacheDetails
+import ammonite.repl.util._
+import pprint.{Config, PPrint, PPrinter}
 import ammonite.terminal.Filter
 
 import scala.reflect.io.VirtualDirectory

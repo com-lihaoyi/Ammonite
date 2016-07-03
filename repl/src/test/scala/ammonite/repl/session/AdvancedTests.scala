@@ -1,7 +1,8 @@
 package ammonite.repl.session
 
 import ammonite.repl.TestUtils._
-import ammonite.repl.{TestRepl, Res}
+import ammonite.repl.TestRepl
+import ammonite.repl.util.Res
 import utest._
 
 

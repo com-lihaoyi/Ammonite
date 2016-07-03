@@ -4,6 +4,7 @@ import ammonite.repl.frontend._
 import ammonite.repl.interp.Interpreter
 import utest.asserts._
 import acyclic.file
+import ammonite.repl.util._
 
 import scala.collection.mutable
 

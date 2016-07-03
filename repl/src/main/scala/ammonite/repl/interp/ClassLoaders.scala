@@ -5,7 +5,7 @@ import java.nio.file
 import java.security.MessageDigest
 
 import ammonite.ops._
-import ammonite.repl.{ImportData, Imports, Util}
+import ammonite.repl.util.{ImportData, Imports, Util}
 
 import scala.collection.mutable
 

@@ -7,6 +7,7 @@ import ammonite.repl.tools.IvyConstructor._
 import TestUtils.scala2_10
 import utest._
 import acyclic.file
+import ammonite.repl.util.{Colors, Printer, Ref}
 object ScriptTests extends TestSuite{
   val tests = TestSuite{
     println("ScriptTests")

@@ -13,7 +13,7 @@ object desugar{
     c.Expr[Desugared](q"ammonite.repl.tools.desugar.impl(${showCode(expr.tree)})")
   }
 
-  def impl(s: String)(implicit colors: ammonite.repl.CodeColors): Desugared = {
+  def impl(s: String)(implicit colors: ammonite.repl.util.CodeColors): Desugared = {
 
     new Desugared(
       ammonite.repl.frontend.Highlighter.defaultHighlight(

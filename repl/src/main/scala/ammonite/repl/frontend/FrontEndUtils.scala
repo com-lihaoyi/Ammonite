@@ -23,7 +23,7 @@ object FrontEndUtils {
               .grouped(math.ceil(snippets.length * 1.0 / columns).toInt)
               .toList
 
-    ammonite.repl.Util.transpose(grouped).iterator.flatMap{
+    ammonite.repl.util.Util.transpose(grouped).iterator.flatMap{
       case first :+ last => first.map(
         x => x ++ " " * (width / columns - x.length)
       ) :+ last :+ fansi.Str("\n")

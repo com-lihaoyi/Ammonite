@@ -3,11 +3,10 @@ package ammonite.repl.interp
 import java.lang.reflect.InvocationTargetException
 
 import acyclic.file
-import ammonite.repl.frontend.{SessionChanged, Session, ReplExit}
+import ammonite.repl.frontend.{ReplExit, Session, SessionChanged}
 import ammonite.repl._
-import Parsers.ImportTree
-
-import Util.{CompileCache, ClassFiles}
+import util.Util.{ClassFiles, CompileCache}
+import ammonite.repl.util._
 
 import scala.collection.immutable.ListMap
 import scala.reflect.io.VirtualDirectory
@@ -27,7 +26,7 @@ trait Evaluator{
   def getCurrentLine: String
   def update(newImports: Imports): Unit
 
-  def processLine(classFiles: Util.ClassFiles,
+  def processLine(classFiles: ClassFiles,
                   newImports: Imports,
                   printer: Printer,
                   fileName: String,

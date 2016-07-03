@@ -1,9 +1,11 @@
 package ammonite.repl
 
-import java.io.{PrintStream, InputStream, OutputStream, InputStreamReader}
+import java.io.{InputStream, InputStreamReader, OutputStream, PrintStream}
+
 import ammonite.repl.frontend._
 import acyclic.file
 import ammonite.repl.interp.Interpreter
+import ammonite.repl.util._
 import ammonite.terminal.Filter
 
 import scala.annotation.tailrec
