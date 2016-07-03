@@ -45,7 +45,7 @@ Although most features should be unit tested, it's still useful to fire up a REP
 
 ### Automated Testing
 
-While working on a arbitrary `xyz` subproject, `sbt ~xyz/test` runs tests after every change. `repl/test` can be a bit slow because of the amount of code it compiles, so you may want to specify the test manually via `repl/test-only -- ammonite.repl.TestObject.path.to.test`.
+While working on a arbitrary `xyz` subproject, `sbt ~xyz/test` runs tests after every change. `repl/test` can be a bit slow because of the amount of code it compiles, so you may want to specify the test manually via `repl/test-only -- ammonite.TestObject.path.to.test`.
 
 - `ops/test` tests the filesystem operations, without any REPL present
 - `repl/test` tests the Ammonite-REPL, without filesystem-shell integration.

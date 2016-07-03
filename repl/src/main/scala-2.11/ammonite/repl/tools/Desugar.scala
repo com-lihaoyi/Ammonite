@@ -1,4 +1,4 @@
-package ammonite.repl.tools
+package ammonite.tools
 
 import sourcecode.Compat._
 import scala.language.experimental.macros
@@ -10,13 +10,13 @@ class Desugared(s: String){
 object desugar{
   def transformer(c: Context)(expr: c.Expr[Any]): c.Expr[Desugared] = {
     import c.universe._
-    c.Expr[Desugared](q"ammonite.repl.tools.desugar.impl(${showCode(expr.tree)})")
+    c.Expr[Desugared](q"ammonite.tools.desugar.impl(${showCode(expr.tree)})")
   }
 
-  def impl(s: String)(implicit colors: ammonite.repl.CodeColors): Desugared = {
+  def impl(s: String)(implicit colors: ammonite.util.CodeColors): Desugared = {
 
     new Desugared(
-      ammonite.repl.frontend.Highlighter.defaultHighlight(
+      ammonite.frontend.Highlighter.defaultHighlight(
         s.toVector,
         colors.comment,
         colors.`type`,

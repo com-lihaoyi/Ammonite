@@ -1,7 +1,7 @@
 package ammonite.shell
 
-import ammonite.repl.TestRepl
-import ammonite.repl.TestUtils._
+import ammonite.TestRepl
+import ammonite.TestUtils._
 import utest._
 
 /**

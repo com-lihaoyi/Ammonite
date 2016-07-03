@@ -1,4 +1,4 @@
-package ammonite.repl.interp
+package ammonite.interp
 
 import scala.tools.nsc.Global
 import scala.tools.nsc.interactive.{ Global => InteractiveGlobal }

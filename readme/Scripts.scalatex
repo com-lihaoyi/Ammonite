@@ -1,16 +1,16 @@
 @import Main._
 @import readme.Sample._
 @import ammonite.ops._
-@val ammoniteTests = 'repl/'src/'test/'scala/'ammonite/'repl/'session
-@val replSource = 'repl/'src/'main/'scala/'ammonite/'repl
+@val ammoniteTests = 'repl/'src/'test/'scala/'ammonite/'session
+@val replSource = 'repl/'src/'main/'scala/'ammonite
 @val advancedTests = ammoniteTests/"AdvancedTests.scala"
-@sect("Ammonite-Scripts", "Lightweight Programming in Scala")
+@sect("Scala Scripts", "Lightweight Programming in Scala")
   @p
-    Ammonite allows you to write Scala scripts that can be directly run from
-    the command line. Unlike normal Scala projects, Ammonite scripts let you
-    save and run code without setting up a "build-file" or "project".
-    Ammonite-Scripts are useful as something in between the REPL and a
-    full-fledged Scala/SBT project: more permanent than a REPL session, but
+    @b{Scala scripts} are lightweight files containing Scala code that
+    can be directly run from the command line. Unlike normal Scala projects,
+    Scala scripts let you save and run code without setting up a "build-file"
+    or "project". Scala Scripts are useful as something in between the REPL and
+    a full-fledged Scala/SBT project: more permanent than a REPL session, but
     more lightweight and easier to set up than a SBT project.
   @p
     Creating an Ammonite Script is just a matter of creating a
@@ -89,7 +89,7 @@
           And so on, importing files as many or as deep as you want.
     
         @p
-          @hl.scala{$file} imports inside Ammonite-Scripts behave the same as
+          @hl.scala{$file} imports inside Scala Scripts behave the same as
           @hl.scala{$file} imports @sect.ref("import $file",
           "within the Ammonite-REPL"), and have the same characteristics:
 
@@ -356,7 +356,7 @@
           The script is then compiled and executed.
 
       @p
-        In general, due to Scala's slow compiler, Ammonite-Scripts rely heavily
+        In general, due to Scala's slow compiler, Scala Scripts rely heavily
         on caching to achieve reasonable performance. While the first run of a
         modified script has a few-seconds overhead due to the Scala compiler,
         subsequent runs of the same script should be fast-ish, with only a few

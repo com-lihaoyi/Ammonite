@@ -27,20 +27,41 @@
 
 @sect("Ammonite", "Scala Scripting")
   @p
-    Ammonite lets you use the @lnk("Scala programming language",
-    "https://www.scala-lang.org/") for scripting purposes: in the
-    @sect.ref("Ammonite-REPL", "REPL"), as @sect.ref("Ammonite-Scripts",
-    "scripts"), in @sect.ref("Ammonite-Ops", "existing projects") or as a
-    standalone @sect.ref("Ammonite-Shell", "systems shell"). It is
-    made of a few subprojects:
+    Ammonite lets you use the
+    @lnk("Scala programming language", "https://www.scala-lang.org/") for
+    scripting purposes: in the @sect.ref("Ammonite-REPL", "REPL"), as
+    @sect.ref("Scala Scripts", "scripts"), as a @sect.ref("Ammonite-Ops",
+    "library to use in existing projects"), or as a standalone
+    @sect.ref("Ammonite-Shell", "systems shell").
+
+  @p
+    The goal of Ammonite is to liberate your Scala code from heavyweight
+    "projects", using the lightweight Ammonite runtime: if you want to run some
+    Scala, open the @sect.ref{Ammonite-REPL} and run it, interactively! If you
+    want to run it later, save it into some @sect.ref{Scala Scripts} and run
+    those via
+
+  @code
+    amm Script.scala
+  @p
+    And @sect.ref("Script Imports", "import other scripts") or
+    @sect.ref("Ivy Dependencies", "libraries") as you need them. At no point do
+    you need to mess around with build-files or project-layouts: You just write
+    Scala code and run it, simple as that! If you are already working in Scala,
+    you no longer have to drop down to Python or Bash for your scripting needs:
+    you can use @sect.ref{Scala Scripts} for your scripting needs, and avoid
+    the overhead of working in multiple languages.
+
+  @p
+    Ammonite provides four main tools:
 
   @ul
     @li
       @sect.ref{Ammonite-REPL}: a Modernized Scala REPL, with tons of
-      @sect.ref("Features", "bug fixes and features")
+      @sect.ref("Features", "usability improvements and features")
 
     @li
-      @sect.ref{Ammonite-Scripts}: a format for Lightweight Programming in Scala
+      @sect.ref{Scala Scripts}: a format for Lightweight Programming in Scala
 
     @li
       @sect.ref{Ammonite-Ops}: a Scala Library for convenient, rock-solid
@@ -58,11 +79,11 @@
 
   @ul
     @li
-      @sect.ref{Ammonite-Cookbook}
+      @sect.ref{Ammonite Cookbook}
 
   @p
     Which contains a bunch of fun things that you can do, whether in the
-    interactive @sect.ref{Ammonite-REPL} or in some @sect.ref{Ammonite-Scripts}.
+    interactive @sect.ref{Ammonite-REPL} or in some @sect.ref{Scala Scripts}.
     You can also take a look at how people are using Ammonite in the wild:
 
   @ul

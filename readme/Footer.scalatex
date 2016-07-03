@@ -370,7 +370,7 @@
         @li
           Fixed edge cases around import shadowing and sequencing (#199, #248)
         @li
-          Started the @sect.ref{Ammonite-Cookbook}, examples of using the
+          Started the @sect.ref{Ammonite Cookbook}, examples of using the
           Ammonite REPL to do useful work.
   
   
@@ -426,9 +426,9 @@
           Added support for word navigation with Ctrl+Arrow in Linux (#217),
           thanks to @lnk("Ian McIntosh", "https://github.com/cranst0n")
         @li
-          Moved the initialization calls from @hl.scala{ammonite.repl.Repl.run}
-          and @hl.scala{ammonite.repl.Repl.debug} into
-          @hl.scala{ammonite.repl.Main.run} and @hl.scala{ammonite.repl.Main.debug}
+          Moved the initialization calls from @hl.scala{ammonite.Repl.run}
+          and @hl.scala{ammonite.Repl.debug} into
+          @hl.scala{ammonite.Main.run} and @hl.scala{ammonite.Main.debug}
     @sect{0.5.0}
       @ul
         @li
@@ -593,7 +593,7 @@
           Re-added support for 2.10.x, minus features that don't work in it
           (e.g. scope-aware type-printing)
         @li
-          Added a @sect.ref("Ammonite", "standalone distributable") that comes
+          Added a @sect.ref("Ammonite-REPL", "standalone distributable") that comes
           bundled with Scala 2.10.4 or 2.11.7, letting you quickly load and
           experiment with libraries without SBT
         @li

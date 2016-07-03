@@ -21,7 +21,7 @@ The Predef itself is made of several parts:
 
 - `defaultPredefString`: brings in the default set of imports that 
   Ammonite starts with. This brings in Ammonite Ops' various `|` `|?` `|>`
-  pipes, `ammonite.repl.tools` like `grep` `time` and `browse`, implicits to
+  pipes, `ammonite.tools` like `grep` `time` and `browse`, implicits to
   add SBT-style syntax for loading stuff from `load.ivy`, and importing 
   everything from the `repl` object. This is loaded by default, but can
   be disabled by a `--no-default-predef` flag, or `defaultPredef = false` to
