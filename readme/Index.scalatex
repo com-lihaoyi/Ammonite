@@ -25,9 +25,9 @@
     margin-bottom: 10px;
   }
 
-@sect("Scala Scripting", "...with Ammonite")
+@sect("Ammonite", "Scala Scripting")
   @p
-    The Scala Scripting project lets you use the
+    Ammonite lets you use the
     @lnk("Scala programming language", "https://www.scala-lang.org/") for
     scripting purposes: in the @sect.ref("Ammonite-REPL", "REPL"), as
     @sect.ref("Scala Scripts", "scripts"), as a @sect.ref("Ammonite-Ops",
@@ -35,7 +35,7 @@
     @sect.ref("Ammonite-Shell", "systems shell").
 
   @p
-    The goal of Scala Scripting is to liberate your Scala code from heavyweight
+    The goal of Ammonite is to liberate your Scala code from heavyweight
     "projects", using the lightweight Ammonite runtime: if you want to run some
     Scala, open the @sect.ref{Ammonite-REPL} and run it, interactively! If you
     want to run it later, save it into some @sect.ref{Scala Scripts} and run
@@ -53,7 +53,7 @@
     the overhead of working in multiple languages.
 
   @p
-    Scala Scripting provides four main tools:
+    Ammonite provides four main tools:
 
   @ul
     @li
@@ -79,7 +79,7 @@
 
   @ul
     @li
-      @sect.ref{Scala-Scripting Cookbook}
+      @sect.ref{Ammonite Cookbook}
 
   @p
     Which contains a bunch of fun things that you can do, whether in the

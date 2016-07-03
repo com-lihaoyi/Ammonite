@@ -87,15 +87,15 @@ case class Main(predef: String = "",
 
     val repl = instantiateRepl()
     val (pkg, wrapper) = Util.pathToPackageWrapper(path, wd)
-    repl.interp.processModule(
-      ImportHook.Source.File(path),
-      read(path),
-      wrapper,
-      pkg,
-      autoImport = true
-    ) match{
-      case x: Res.Failing => x
-      case Res.Success(imports) =>
+    for{
+      imports <- repl.interp.processModule(
+        ImportHook.Source.File(path),
+        read(path),
+        wrapper,
+        pkg,
+        autoImport = true
+      )
+      _ <- {
         repl.interp.reInit()
 
         val fullName = (pkg :+ wrapper).map(_.backticked).mkString(".")
@@ -105,69 +105,56 @@ case class Main(predef: String = "",
           Name("MainRouter"),
           Seq(Name("$sess")),
           autoImport = false
-        ) match {
-          case Res.Success(_) =>
-            val entryPoints =
-              repl.interp
-                  .eval
-                  .sess
-                  .frames
-                  .head
-                  .classloader
-                  .loadClass("$sess.MainRouter")
-                  .getMethods
-                  .find(_.getName == "routes")
-                  .get
-                  .invoke(null)
-                  .asInstanceOf[Seq[Router.EntryPoint]]
-                  .filter(_.name != "$main")
-
-            mainMethodName match {
-              case None =>
-                entryPoints.find(_.name == "main") match {
-                  case None => Res.Success(imports)
-                  case Some(entry) =>
-                    Main.runEntryPoint(entry, args, kwargs).getOrElse(Res.Success(imports))
+        )
+      }
+      entryPoints =
+        repl.interp
+            .eval
+            .sess
+            .frames
+            .head
+            .classloader
+            .loadClass("$sess.MainRouter")
+            .getMethods
+            .find(_.getName == "routes")
+            .get
+            .invoke(null)
+            .asInstanceOf[Seq[Router.EntryPoint]]
+            .filter(_.name != "$main")
+      res <- mainMethodName match {
+        case None =>
+          entryPoints.find(_.name == "main") match {
+            case None => Res.Success(imports)
+            case Some(entry) =>
+              Main.runEntryPoint(entry, args, kwargs).getOrElse(Res.Success(imports))
+          }
+        case Some(s) =>
+          entryPoints.find(_.name == s) match{
+            case None =>
+              val suffix =
+                if (entryPoints.isEmpty) ""
+                else{
+                  val methods = for(ep <- entryPoints) yield{
+                    val args = ep.argSignatures.map(Main.renderArg).mkString(", ")
+                    val details = Main.entryDetails(ep)
+                    s"def ${ep.name}($args)$details"
+                  }
+                  s"""
+                     |
+                     |Existing methods:
+                     |
+                     |${methods.mkString("\n\n")}""".stripMargin
                 }
-              case Some(s) =>
-                entryPoints.find(_.name == s) match{
-                  case None =>
-                    val suffix =
-                      if (entryPoints.isEmpty) ""
-                      else{
-                        val methods = for(ep <- entryPoints) yield{
-                          val args = ep.argSignatures.map(Main.renderArg).mkString(", ")
-                          val details = Main.entryDetails(ep)
-                          s"def ${ep.name}($args)$details"
-                        }
-                        s"""
-                         |
-                         |Existing methods:
-                         |
-                         |${methods.mkString("\n\n")}
-                        """.stripMargin
-                      }
-                    Res.Failure(
-                      None,
-                      s"Unable to find method: ${backtickWrap(s)}" + suffix
-                    )
-                  case Some(entry) =>
-                    Main.runEntryPoint(entry, args, kwargs).getOrElse(Res.Success(imports))
-                }
+              Res.Failure(
+                None,
+                s"Unable to find method: ${backtickWrap(s)}" + suffix
+              )
+            case Some(entry) =>
+              Main.runEntryPoint(entry, args, kwargs).getOrElse(Res.Success(imports))
+          }
 
-            }
-
-
-          case Res.Exception(e: ArgParseException, s) =>
-            e.setStackTrace(Array())
-            e.cause.setStackTrace(e.cause.getStackTrace.takeWhile( frame =>
-              frame.getClassName != "ammonite.repl.ScriptInit$" ||
-              frame.getMethodName != "parseScriptArg"
-            ))
-            Res.Exception(e, s)
-          case x => x
-        }
-    }
+      }
+    } yield res
   }
 
   /**

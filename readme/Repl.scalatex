@@ -19,7 +19,7 @@
     systems shell, but also can be used alone as a @sect.ref("Features",
     "superior") version of the default Scala REPL, or as a
     @sect.ref("Debugging", "debugging tool"), or for many other
-    @sect.ref("Scala-Scripting Cookbook", "fun and interesting things")!
+    @sect.ref("Ammonite Cookbook", "fun and interesting things")!
 
 
   @p
@@ -43,7 +43,7 @@
   @p
     If you want to use Ammonite as a filesystem shell, take a look at
     @sect.ref{Ammonite-Shell}. If you're not sure what to do with Ammonite,
-    check out the @sect.ref{Scala-Scripting Cookbook} for some fun ideas!
+    check out the @sect.ref{Ammonite Cookbook} for some fun ideas!
 
   @p
     If you want some initialization code available to the REPL, you can add

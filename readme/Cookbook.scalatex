@@ -4,7 +4,7 @@
 @val ammoniteTests = 'repl/'src/'test/'scala/'ammonite/'repl/'session
 @val replSource = 'repl/'src/'main/'scala/'ammonite/'repl
 @val advancedTests = ammoniteTests/"AdvancedTests.scala"
-@sect("Scala-Scripting Cookbook", "Fun with Scala-Scriping!")
+@sect("Ammonite Cookbook", "Fun with Scala-Scriping!")
   @p
     The Ammonite Scala REPL and Scripts are meant to be extended: you can load
     in arbitary Java/Scala modules from the internet via
