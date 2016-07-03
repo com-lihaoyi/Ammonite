@@ -148,7 +148,7 @@ object Storage{
           codeCacheDir/classFilesOrder,
           upickle.default.write((tag, dataList.reverse), indent = 4)
         )
-        write(codeCacheDir/"imports.list", upickle.default.write(imports))
+        write(codeCacheDir/"imports.json", upickle.default.write(imports, indent = 4))
         write(codeCacheDir/"importTrees.json", upickle.default.write(importTreesList, indent = 4))
       }
     }
@@ -165,7 +165,7 @@ object Storage{
           read(codeCacheDir/classFilesOrder)
         }.toOption
         val impFile = Try {
-          read(codeCacheDir/"imports.list")
+          read(codeCacheDir/"imports.json")
         }.toOption
         val impTrees = Try{
           read(codeCacheDir/"importTrees.json")
