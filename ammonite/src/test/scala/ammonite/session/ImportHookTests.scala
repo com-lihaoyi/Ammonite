@@ -16,28 +16,28 @@ object ImportHookTests extends TestSuite{
     'repl{
       'file{
         'basic - check.session("""
-          @ import $file.repl.src.test.resources.importHooks.Basic
+          @ import $file.ammonite.src.test.resources.importHooks.Basic
 
           @ Basic.basicValue
           res1: Int = 31337
         """)
 
         'inline - check.session("""
-          @ import $file.repl.src.test.resources.importHooks.Basic, Basic.basicValue
+          @ import $file.ammonite.src.test.resources.importHooks.Basic, Basic.basicValue
 
           @ basicValue
           res1: Int = 31337
         """)
 
         'partiallyQualified - check.session("""
-          @ import $file.repl.src.test.resources.importHooks.Basic
+          @ import $file.ammonite.src.test.resources.importHooks.Basic
 
           @ Basic.basicValue
           res1: Int = 31337
         """)
 
         'multiImport - check.session("""
-          @ import $file.repl.src.test.resources.importHooks.{Basic, BasicTwo}
+          @ import $file.ammonite.src.test.resources.importHooks.{Basic, BasicTwo}
 
           @ Basic.basicValue
           res1: Int = 31337
@@ -47,7 +47,7 @@ object ImportHookTests extends TestSuite{
         """)
 
         'rename - check.session("""
-          @ import $file.repl.src.test.resources.importHooks.{Basic, BasicTwo => BasicToo}
+          @ import $file.ammonite.src.test.resources.importHooks.{Basic, BasicTwo => BasicToo}
 
           @ Basic.basicValue
           res1: Int = 31337
@@ -57,13 +57,13 @@ object ImportHookTests extends TestSuite{
         """)
 
         'deep - check.session("""
-          @ import $file.repl.src.test.resources.importHooks.Deep.DeepObject.DeepInner.deepValue
+          @ import $file.ammonite.src.test.resources.importHooks.Deep.DeepObject.DeepInner.deepValue
           error: Cannot resolve $file import
         """)
 
 
         'deepRenamed - check.session("""
-          @ import $file.repl.src.test.resources.importHooks.Deep.{DeepObject => DeepRenamed}
+          @ import $file.ammonite.src.test.resources.importHooks.Deep.{DeepObject => DeepRenamed}
           error: Cannot resolve $file import
          """)
 
@@ -129,31 +129,31 @@ object ImportHookTests extends TestSuite{
     }
     'scripts{
       'file - check.session("""
-        @ import $file.repl.src.test.resources.importHooks.FileImport
+        @ import $file.ammonite.src.test.resources.importHooks.FileImport
 
         @ FileImport.fileImportVal
         res1: Int = 31338
        """)
 
       'indirectFile - check.session("""
-        @ import $file.repl.src.test.resources.importHooks.IndirectFileImport
+        @ import $file.ammonite.src.test.resources.importHooks.IndirectFileImport
 
         @ IndirectFileImport.indirectFileImportVal
         res1: Int = 31339
        """)
 
       'ivy - check.session("""
-        @ import $file.repl.src.test.resources.importHooks.IvyImport
+        @ import $file.ammonite.src.test.resources.importHooks.IvyImport
 
         @ IvyImport.rendered
         res1: String = "<div>Moo</div>"
        """)
 
       'deepImport - check.session("""
-        @ import $file.repl.src.test.resources.importHooks.DeepImport.deepValueImported
+        @ import $file.ammonite.src.test.resources.importHooks.DeepImport.deepValueImported
         error: Cannot resolve $file import
 
-        @ import $file.repl.src.test.resources.importHooks.DeepImport,DeepImport.deepValueImported
+        @ import $file.ammonite.src.test.resources.importHooks.DeepImport,DeepImport.deepValueImported
 
         @ deepValueImported
         res1: String = "deeeep"
