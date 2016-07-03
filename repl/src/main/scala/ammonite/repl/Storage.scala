@@ -2,7 +2,8 @@ package ammonite.repl
 
 import acyclic.file
 import ammonite.ops._
-import ammonite.repl.Util.{IvyMap, CompileCache, ClassFiles}
+import Parsers.ImportTree
+import ammonite.repl.Util.{IvyMap, CompileCache, ClassFiles, CacheOutput}
 import org.apache.ivy.plugins.resolver.RepositoryResolver
 
 import scala.util.Try
@@ -22,6 +23,15 @@ trait Storage{
   val ivyCache: StableRef[IvyMap]
   def compileCacheSave(path: String, tag: String, data: CompileCache): Unit
   def compileCacheLoad(path: String, tag: String): Option[CompileCache]
+  def classFilesListSave(pkg: String,
+                         wrapper: String,
+                         dataList: Seq[(String, String)],
+                         imports: Imports,
+                         tag: String,
+                         importTreesList: Seq[ImportTree]): Unit
+  def classFilesListLoad(pkg: String,
+                         wrapper: String,
+                         cacheTag: String): Option[CacheOutput]
 }
 
 object Storage{
@@ -42,6 +52,9 @@ object Storage{
     }
 
     var compileCache: mutable.Map[String, (String, CompileCache)] = mutable.Map.empty
+    val classFilesListcache = {
+      mutable.Map.empty[String, (String, Seq[(String, String)], Imports, Seq[ImportTree])]
+    }
     def compileCacheSave(path: String, tag: String, data: CompileCache): Unit = {
       compileCache(path) = (tag, data)
     }
@@ -50,6 +63,35 @@ object Storage{
         (loadedTag, data) <- compileCache.get(path)
         if loadedTag == tag
       } yield data
+    }
+
+    def classFilesListSave(pkg: String,
+                           wrapper: String,
+                           dataList: Seq[(String, String)],
+                           imports: Imports,
+                           tag: String,
+                           importTreesList: Seq[ImportTree]): Unit = {
+      val dir = pkg + "." + wrapper
+      classFilesListcache(dir) = (tag, dataList.reverse, imports, importTreesList)
+    }
+
+    def classFilesListLoad(pkg: String,
+                           wrapper: String,
+                           cacheTag: String): Option[CacheOutput] = {
+      val dir = pkg + "." + wrapper
+      classFilesListcache.get(dir) match{
+        case None => None
+        case Some((loadedTag, classFilesList, imports, importTreesList)) =>
+          if (loadedTag == cacheTag) {
+            val res = {
+              for((path, tag) <- classFilesList) yield {
+                compileCacheLoad(path, tag)
+              }
+            }.flatten
+            Some((classFilesList.unzip._1, res.unzip._1, imports, importTreesList))
+          }
+          else None
+      }
     }
   }
 
@@ -62,6 +104,7 @@ object Storage{
     // someone upgrades Ammonite.
     val cacheDir = dir/'cache/ammonite.Constants.version
     val compileCacheDir = cacheDir/'compile
+    val classFilesOrder = "classFilesOrder.json"
     val ivyCacheFile = cacheDir/"ivycache.json"
     val metadataFile = "metadata.json"
     val historyFile = dir/'history
@@ -86,6 +129,62 @@ object Storage{
         write(tagCacheDir/metadataFile, metadata)
         classFiles.foreach{ case (name, bytes) =>
           write(tagCacheDir/s"$name.class", bytes)
+        }
+      }
+    }
+
+    def classFilesListSave(pkg: String,
+                           wrapper: String,
+                           dataList: Seq[(String, String)],
+                           imports: Imports,
+                           tag: String,
+                           importTreesList: Seq[ImportTree]): Unit = {
+      val dir = pkg.replace("/", "$div") + "." + wrapper.replace("/", "$div")
+      val codeCacheDir = compileCacheDir/'scriptCaches/dir
+      if(!exists(codeCacheDir)) {
+        mkdir(codeCacheDir)
+        write(
+          codeCacheDir/classFilesOrder,
+          upickle.default.write((tag, dataList.reverse), indent = 4)
+        )
+        write(codeCacheDir/"imports.list", upickle.default.write(imports))
+        write(codeCacheDir/"importTrees.json", upickle.default.write(importTreesList, indent = 4))
+      }
+    }
+
+    def classFilesListLoad(pkg: String,
+                           wrapper: String,
+                           cacheTag: String): Option[CacheOutput] = {
+
+      val dir = pkg.replace("/", "$div") + "." + wrapper.replace("/", "$div")
+      val codeCacheDir = compileCacheDir/'scriptCaches/dir
+      if(!exists(codeCacheDir)) None
+      else {
+        val metadataJson = Try {
+          read(codeCacheDir/classFilesOrder)
+        }.toOption
+        val impFile = Try {
+          read(codeCacheDir/"imports.list")
+        }.toOption
+        val impTrees = Try{
+          read(codeCacheDir/"importTrees.json")
+        }.toOption
+        (metadataJson, impFile, impTrees) match{
+          case (Some(metadata), Some(imp), Some(importTrees)) =>
+            val (loadedTag, classFilesList) =
+              upickle.default.read[(String, Seq[(String, String)])](metadata)
+            if (cacheTag == loadedTag){
+              val res = {
+                for((path, tag) <- classFilesList) yield {
+                  compileCacheLoad(path, tag)
+                }
+              }.flatten
+              val imports = upickle.default.read[Imports](imp)
+              val impTreeList = upickle.default.read[Seq[ImportTree]](importTrees)
+              Some((classFilesList.unzip._1, res.unzip._1, imports, impTreeList))
+            }
+            else None
+          case _ => None
         }
       }
     }

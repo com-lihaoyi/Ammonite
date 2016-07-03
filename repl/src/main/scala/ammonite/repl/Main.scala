@@ -9,6 +9,11 @@ import Parsers.backtickWrap
 import ammonite.repl.Router.{ArgSig, EntryPoint}
 
 import language.experimental.macros
+import reflect.macros.Context
+import scala.collection.mutable
+import scala.util._
+import Util.CompileCache
+
 
 
 /**
@@ -91,7 +96,7 @@ case class Main(predef: String = "",
     ) match{
       case x: Res.Failing => x
       case Res.Success(imports) =>
-        repl.interp.init()
+        repl.interp.reInit()
 
         val fullName = (pkg :+ wrapper).map(_.backticked).mkString(".")
         repl.interp.processModule(
@@ -149,6 +154,7 @@ case class Main(predef: String = "",
                   case Some(entry) =>
                     Main.runEntryPoint(entry, args, kwargs).getOrElse(Res.Success(imports))
                 }
+
             }
 
 

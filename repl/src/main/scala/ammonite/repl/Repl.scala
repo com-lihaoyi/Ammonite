@@ -78,6 +78,7 @@ class Repl(input: InputStream,
 
   def run(): Any = {
     welcomeBanner.foreach(printStream.println)
+    interp.init()
     @tailrec def loop(): Any = {
       val actionResult = action()
       Timer("End Of Loop")
