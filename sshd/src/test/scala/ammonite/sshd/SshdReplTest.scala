@@ -13,7 +13,10 @@ object SshdReplTest extends TestSuite {
   override val tests = TestSuite {
     'canExecuteRemoteCommand - retry(3){ // Flaky, not sure why
       withTmpDirectory { tmpDir =>
-        val repl = new SshdRepl(SshServerConfig("localhost", 0, testUsername, testPassword, tmpDir))
+        val repl = new SshdRepl(
+          SshServerConfig("localhost", 0, testUsername, testPassword, tmpDir),
+          predef = "val predefinedValue = \"Hello\""
+        )
         repl.start()
         val client = sshClient((testUsername, testPassword), "localhost", repl.port)
         client.connect()
@@ -25,6 +28,7 @@ object SshdReplTest extends TestSuite {
 
         shell.input.println("2 + 2")
         shell.input.println("import ammonite.sshd.SshdReplTest")
+        shell.input.println("predefinedValue")
         shell.input.println("SshdReplTest.remotePromise.success(true)")
         shell.input.println("exit")
 
@@ -35,6 +39,7 @@ object SshdReplTest extends TestSuite {
         val Seq(firstBannerLine, secondBannerLine) = outputLines.take(2)
         val Seq(mathTestPrompt, mathOutput) = outputLines.slice(2, 4)
         val Seq(importAppPackage, importResult) = outputLines.slice(4, 6)
+        val Seq(checkPredef, checkPredefResult) = outputLines.slice(6, 8)
 
         assert(
           firstBannerLine.startsWith("Welcome to the Ammonite Repl"),
@@ -50,6 +55,10 @@ object SshdReplTest extends TestSuite {
           importAppPackage.contains("import"),
           importAppPackage.contains("ammonite.sshd.SshdReplTest"),
           !importResult.toLowerCase.contains("error")
+        )
+        assert(
+          checkPredef.contains("predefinedValue"),
+          checkPredefResult.contains("Hello")
         )
       }
     }

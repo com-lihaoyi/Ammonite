@@ -59,7 +59,7 @@ object SshdRepl {
         )
         new Repl(
           in, out, out,
-          new Storage.Folder(homePath), augmentedPredef,
+          new Storage.Folder(homePath), augmentedPredef + "\n" + predef,
           wd, Some(ammonite.main.Defaults.welcomeBanner), replArgs
         ).run()
       } catch {
