@@ -57,7 +57,7 @@ object BuiltinTests extends TestSuite{
       check.session("""
         @ import ammonite.ops._, ImplicitWd._
 
-        @ val javaSrc = cwd/'ammonite/'src/'test/'resources/'loadable/'hello/"Hello.java"
+        @ val javaSrc = cwd/'amm/'src/'test/'resources/'loadable/'hello/"Hello.java"
 
         @ mkdir! cwd/'target/'loadCP/'hello
 

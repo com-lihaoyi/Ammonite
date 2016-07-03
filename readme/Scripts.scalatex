@@ -1,8 +1,8 @@
 @import Main._
 @import readme.Sample._
 @import ammonite.ops._
-@val ammoniteTests = 'ammonite/'src/'test/'scala/'ammonite/'session
-@val replSource = 'ammonite/'src/'main/'scala/'ammonite
+@val ammoniteTests = 'amm/'src/'test/'scala/'amm/'session
+@val replSource = 'amm/'src/'main/'scala/'amm
 @val advancedTests = ammoniteTests/"AdvancedTests.scala"
 @sect("Scala Scripts", "Lightweight Programming in Scala")
   @p
@@ -73,9 +73,9 @@
           and all these other things: simply split your script into two files, and
           import one from the other using @sect.ref{import $file}:
     
-        @hl.ref('ammonite/'src/'test/'resources/'importHooks/"Basic.scala")
+        @hl.ref('amm/'src/'test/'resources/'importHooks/"Basic.scala")
     
-        @hl.ref('ammonite/'src/'test/'resources/'importHooks/"FileImport.scala")
+        @hl.ref('amm/'src/'test/'resources/'importHooks/"FileImport.scala")
     
         @p
           Here, we are defining a simple @hl.scala{val} in @code{Basic.scala}, and
@@ -83,7 +83,7 @@
           use what we defined in @code{FileImport.scala} and import it in another
           file
     
-        @hl.ref('ammonite/'src/'test/'resources/'importHooks/"IndirectFileImport.scala")
+        @hl.ref('amm/'src/'test/'resources/'importHooks/"IndirectFileImport.scala")
     
         @p
           And so on, importing files as many or as deep as you want.
@@ -111,7 +111,7 @@
           to use, e.g. here we make use of the @lnk("Scalatags",
           "http://www.lihaoyi.com/scalatags/") library:
 
-        @hl.ref('ammonite/'src/'test/'resources/'importHooks/"IvyImport.scala")
+        @hl.ref('amm/'src/'test/'resources/'importHooks/"IvyImport.scala")
 
     @sect{Multi-stage Scripts}
       @p

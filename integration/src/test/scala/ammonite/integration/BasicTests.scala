@@ -41,14 +41,14 @@ object BasicTests extends TestSuite{
         "-c",
         """val x = wd
           |@
-          |cd! 'ammonite/'src
+          |cd! 'amm/'src
           |@
           |println(wd relativeTo x)""".stripMargin
       )
 
 
       val output = res.out.trim
-      assert(output == "repl/src")
+      assert(output == "amm/src")
     }
     'main{
       val evaled = exec('basic/"Main.scala")

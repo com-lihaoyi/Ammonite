@@ -1,7 +1,7 @@
 @import Main._
 @import readme.Sample._
 @import ammonite.ops._
-@val fileOps = read! cwd/'ops/'src/'main/'scala/'ammonite/'ops/"FileOps.scala"
+@val fileOps = read! cwd/'ops/'src/'main/'scala/'amm/'ops/"FileOps.scala"
 
 @sect("Ammonite-Ops", "Rock-solid Filesystem Operations")
   @p
@@ -15,9 +15,9 @@
   @p
     And you're all set! Here's an example of some common operations you can do with Ammonite-Ops
 
-  @val opsTests = 'ops/'src/'test/'scala/'test/'ammonite/'ops
+  @val opsTests = 'ops/'src/'test/'scala/'test/'amm/'ops
   @val opsExamples = opsTests/"ExampleTests.scala"
-  @val pathsScala = 'ops/'src/'main/'scala/'ammonite/'ops/"Path.scala"
+  @val pathsScala = 'ops/'src/'main/'scala/'amm/'ops/"Path.scala"
   @hl.ref(opsExamples, Seq("longExample", "import"), "assert(")
 
   @p
@@ -25,7 +25,7 @@
   @p
     As you can see, Ammonite-Ops replaces the common mess of boilerplate:
 
-  @hl.ref('ops/'src/'test/'scala/'test/'ammonite/'ops/"ExampleTests.scala", Seq("comparison", "def removeAll"), "assert(")
+  @hl.ref('ops/'src/'test/'scala/'test/'amm/'ops/"ExampleTests.scala", Seq("comparison", "def removeAll"), "assert(")
 
   @p
     With a single, sleek expression:
