@@ -13,7 +13,7 @@ The main static packages containing Ammonite code are:
 - `ammonite.terminal`: a standalone replacement for JLine, with more features
   such as syntax-highlighting, GUI-style keybindings and good multiline editing
   
-- `ammonite.repl`: the main Ammonite REPL
+- `ammonite`: the main Ammonite REPL
 
 - `ammonite.shell`: an extension package for the Ammonite REPL to configure it 
   for use as a system shell: a cwd-based-prompt, file-path-autocomplete, etc.

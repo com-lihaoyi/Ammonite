@@ -1,9 +1,8 @@
-package ammonite
+package ammonite.interp
 
 import acyclic.file
 import ammonite.ops._
 import ammonite.util.Parsers.ImportTree
-import util.Util.{CacheOutput, ClassFiles, CompileCache, IvyMap}
 import ammonite.util.{Imports, Parsers, StableRef}
 import ammonite.util.Util.{CacheOutput, ClassFiles, CompileCache, IvyMap}
 import org.apache.ivy.plugins.resolver.RepositoryResolver

@@ -4,9 +4,8 @@ import java.io.OutputStreamWriter
 
 import ammonite.terminal._
 import Filter._
-import ammonite.repl.{Colors, util}
-import ammonite.repl.frontend.{FrontEndUtils, Highlighter}
-import ammonite.repl.util.Parsers
+import ammonite.frontend.{FrontEndUtils, Highlighter}
+import ammonite.util.{Colors, Parsers}
 import ammonite.terminal._
 import ammonite.terminal.LazyList.~:
 /**
@@ -168,8 +167,8 @@ object PathComplete {
         val fragPrefix = frag.getOrElse("")
 
         def wrap(s: String) =
-          if(fragPrefix.startsWith("\"")) util.Parsers.stringWrap(s)
-          else util.Parsers.stringSymWrap(s)
+          if(fragPrefix.startsWith("\"")) Parsers.stringWrap(s)
+          else Parsers.stringSymWrap(s)
         val options = (
           ls ! path | (x => (x, wrap(x.last)))
                     |? (_._2.startsWith(fragPrefix))

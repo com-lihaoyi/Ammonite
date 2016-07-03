@@ -5,14 +5,14 @@ import java.io.File
 import ammonite.tools.Resolver
 import ammonite.ops._
 import ammonite.util.{Bind, CodeColors, Colors, Ref}
-import ammonite.interp.Frame
+import ammonite.interp.{Frame, History}
 import org.apache.ivy.plugins.resolver.RepositoryResolver
 import pprint.{Config, PPrint, PPrinter, TPrintColors}
 
 import scala.collection.mutable
 import scala.reflect.runtime.universe._
 import acyclic.file
-import ammonite.History
+
 
 import scala.util.control.ControlThrowable
 

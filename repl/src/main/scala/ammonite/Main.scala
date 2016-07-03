@@ -3,10 +3,9 @@ package ammonite
 import java.io.{File, InputStream, OutputStream}
 
 import ammonite.ops._
-import ammonite.interp.ImportHook
+import ammonite.interp.{ImportHook, Storage}
 import fastparse.Utils.literalize
-
-import ammonite.main.Router
+import ammonite.main.{Defaults, Repl, Router}
 import ammonite.main.Router.{ArgSig, EntryPoint}
 import ammonite.util.Parsers.backtickWrap
 import ammonite.util._
@@ -20,8 +19,8 @@ import ammonite.util._
   * constructing the [[Main]] instance, and the various entrypoints such
   * as [[run]] [[runScript]] and so on are methods on that instance.
   *
-  * It is more or less equivalent to the [[Repl]] object itself, and has
-  * a similar set of parameters, but does not have any of the [[Repl]]'s
+  * It is more or less equivalent to the [[ammonite.main.Repl]] object itself, and has
+  * a similar set of parameters, but does not have any of the [[ammonite.main.Repl]]'s
   * implementation-related code and provides a more convenient set of
   * entry-points that a user can call.
   *
@@ -46,9 +45,9 @@ import ammonite.util._
   */
 case class Main(predef: String = "",
                 defaultPredef: Boolean = true,
-                storageBackend: Storage = new Storage.Folder(Main.defaultAmmoniteHome),
+                storageBackend: Storage = new Storage.Folder(Defaults.ammoniteHome),
                 wd: Path = ammonite.ops.cwd,
-                welcomeBanner: Option[String] = Some(Main.defaultWelcomeBanner),
+                welcomeBanner: Option[String] = Some(Defaults.welcomeBanner),
                 inputStream: InputStream = System.in,
                 outputStream: OutputStream = System.out,
                 errorStream: OutputStream = System.err){
@@ -56,7 +55,7 @@ case class Main(predef: String = "",
     * Instantiates an ammonite.Repl using the configuration
     */
   def instantiateRepl(replArgs: Seq[Bind[_]] = Nil) = {
-    val augmentedPredef = Main.maybeDefaultPredef(defaultPredef, Main.defaultPredefString)
+    val augmentedPredef = Main.maybeDefaultPredef(defaultPredef, Defaults.predefString)
     new Repl(
       inputStream, outputStream, errorStream,
       storage = storageBackend,
@@ -83,75 +82,7 @@ case class Main(predef: String = "",
                 kwargs: Seq[(String, String)]): Res[Imports] = {
 
     val repl = instantiateRepl()
-    val (pkg, wrapper) = Util.pathToPackageWrapper(path, wd)
-    for{
-      imports <- repl.interp.processModule(
-        ImportHook.Source.File(path),
-        read(path),
-        wrapper,
-        pkg,
-        autoImport = true
-      )
-      _ <- {
-        repl.interp.reInit()
-
-        val fullName = (pkg :+ wrapper).map(_.backticked).mkString(".")
-        repl.interp.processModule(
-          ImportHook.Source.File(cwd/"<console>"),
-          s"val routes = ammonite.main.Router.generateRoutes[$fullName.type]($fullName)",
-          Name("MainRouter"),
-          Seq(Name("$sess")),
-          autoImport = false
-        )
-      }
-      entryPoints =
-        repl.interp
-            .eval
-            .sess
-            .frames
-            .head
-            .classloader
-            .loadClass("$sess.MainRouter")
-            .getMethods
-            .find(_.getName == "routes")
-            .get
-            .invoke(null)
-            .asInstanceOf[Seq[Router.EntryPoint]]
-            .filter(_.name != "$main")
-      res <- mainMethodName match {
-        case None =>
-          entryPoints.find(_.name == "main") match {
-            case None => Res.Success(imports)
-            case Some(entry) =>
-              Main.runEntryPoint(entry, args, kwargs).getOrElse(Res.Success(imports))
-          }
-        case Some(s) =>
-          entryPoints.find(_.name == s) match{
-            case None =>
-              val suffix =
-                if (entryPoints.isEmpty) ""
-                else{
-                  val methods = for(ep <- entryPoints) yield{
-                    val args = ep.argSignatures.map(Main.renderArg).mkString(", ")
-                    val details = Main.entryDetails(ep)
-                    s"def ${ep.name}($args)$details"
-                  }
-                  s"""
-                     |
-                     |Existing methods:
-                     |
-                     |${methods.mkString("\n\n")}""".stripMargin
-                }
-              Res.Failure(
-                None,
-                s"Unable to find method: ${backtickWrap(s)}" + suffix
-              )
-            case Some(entry) =>
-              Main.runEntryPoint(entry, args, kwargs).getOrElse(Res.Success(imports))
-          }
-
-      }
-    } yield res
+    main.Scripts.runScript(wd, path, repl, mainMethodName, args, kwargs)
   }
 
   /**
@@ -163,100 +94,6 @@ case class Main(predef: String = "",
 }
 
 object Main{
-  def renderArg(arg: ArgSig) = backtickWrap(arg.name) + ": " + arg.typeString
-  def entryDetails(ep: EntryPoint) = {
-    ep.argSignatures.collect{
-      case ArgSig(name, tpe, Some(doc), default) =>
-        "\n" + name + " // " + doc
-    }.mkString
-  }
-  def runEntryPoint(entry: Router.EntryPoint,
-                    args: Seq[String],
-                    kwargs: Seq[(String, String)]): Option[Res.Failing] = {
-
-    def expectedMsg = {
-      val commaSeparated =
-        entry.argSignatures
-          .map(renderArg)
-          .mkString(", ")
-      val details = entryDetails(entry)
-      "(" + commaSeparated + ")" + details
-    }
-
-    entry.invoke(args, kwargs) match{
-      case Router.Result.Success(x) => None
-      case Router.Result.Error.Exception(x) => Some(Res.Exception(x, ""))
-      case Router.Result.Error.TooManyArguments(x) =>
-        Some(Res.Failure(
-          None,
-          s"""Too many args were passed to this script: ${x.map(literalize(_)).mkString(", ")}
-             |expected arguments $expectedMsg""".stripMargin
-
-        ))
-      case Router.Result.Error.RedundantArguments(x) =>
-        Some(Res.Failure(
-          None,
-          s"""Redundant values were passed for arguments: ${x.map(literalize(_)).mkString(", ")}
-             |expected arguments: $expectedMsg""".stripMargin
-        ))
-      case Router.Result.Error.InvalidArguments(x) =>
-        Some(Res.Failure(
-          None,
-          "The following arguments failed to be parsed:\n" +
-          x.map{
-            case Router.Result.ParamError.Missing(p) =>
-              s"(${renderArg(p)}) was missing"
-            case Router.Result.ParamError.Invalid(p, v, ex) =>
-              s"(${renderArg(p)}) failed to parse input ${literalize(v)} with $ex"
-            case Router.Result.ParamError.DefaultFailed(p, ex) =>
-              s"(${renderArg(p)})'s default value failed to evaluate with $ex"
-          }.mkString("\n") + "\n" + s"expected arguments: $expectedMsg"
-        ))
-    }
-  }
-
-  val defaultWelcomeBanner = {
-    def ammoniteVersion = ammonite.Constants.version
-    def scalaVersion = scala.util.Properties.versionNumberString
-    def javaVersion = System.getProperty("java.version")
-    s"""Welcome to the Ammonite Repl $ammoniteVersion
-       |(Scala $scalaVersion Java $javaVersion)""".stripMargin
-  }
-  val ignoreUselessImports = """
-    |notify => _,
-    |  wait => _,
-    |  equals => _,
-    |  asInstanceOf => _,
-    |  synchronized => _,
-    |  notifyAll => _,
-    |  isInstanceOf => _,
-    |  == => _,
-    |  != => _,
-    |  getClass => _,
-    |  ne => _,
-    |  eq => _,
-    |  ## => _,
-    |  hashCode => _,
-    |  _
-    |"""
-
-  val defaultPredefString = s"""
-    |import ammonite.frontend.ReplBridge.repl
-    |import ammonite.ops.Extensions.{
-    |  $ignoreUselessImports
-    |}
-    |import ammonite.tools._
-    |import ammonite.tools.IvyConstructor.{ArtifactIdExt, GroupIdExt}
-    |import ammonite.frontend.ReplBridge.repl.{
-    |  Internal => _,
-    |  $ignoreUselessImports
-    |}
-    |import ammonite.main.Router.{doc, export}
-    |import ammonite.Main.pathScoptRead
-    |""".stripMargin
-
-
-  def defaultAmmoniteHome = Path(System.getProperty("user.home"))/".ammonite"
 
   /**
     * The command-line entry point, which does all the argument parsing before
@@ -356,9 +193,9 @@ object Main{
         c.predef,
         c.defaultPredef,
         predefFile match{
-          case None => new Storage.Folder(ammoniteHome.getOrElse(defaultAmmoniteHome))
+          case None => new Storage.Folder(ammoniteHome.getOrElse(Defaults.ammoniteHome))
           case Some(pf) =>
-            new Storage.Folder(ammoniteHome.getOrElse(defaultAmmoniteHome)){
+            new Storage.Folder(ammoniteHome.getOrElse(Defaults.ammoniteHome)){
               override val predef = pf
             }
         }
@@ -387,22 +224,5 @@ object Main{
   def maybeDefaultPredef(enabled: Boolean, predef: String) =
     if (enabled) predef else ""
 
-  /**
-    * Additional [[scopt.Read]] instance to teach it how to read Ammonite paths
-    */
-  implicit def pathScoptRead: scopt.Read[Path] = scopt.Read.stringRead.map(Path(_, cwd))
+
 }
-
-case class EntryConfig(file: Option[Path])
-
-case class ArgParseException(name: String,
-                             value: String,
-                             typeName: String,
-                             cause: Throwable)
-  extends Exception(
-    "\n" +
-    s"""Cannot parse value "${pprint.PPrinter.escape(value)}" """ +
-    s"into arg `$name: $typeName`",
-    cause
-  )
-

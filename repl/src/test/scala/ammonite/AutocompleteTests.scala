@@ -2,7 +2,6 @@ package ammonite
 
 import ammonite.TestUtils._
 import utest._
-import acyclic.file
 
 
 object AutocompleteTests extends TestSuite{

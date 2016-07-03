@@ -426,9 +426,9 @@
           Added support for word navigation with Ctrl+Arrow in Linux (#217),
           thanks to @lnk("Ian McIntosh", "https://github.com/cranst0n")
         @li
-          Moved the initialization calls from @hl.scala{ammonite.repl.Repl.run}
-          and @hl.scala{ammonite.repl.Repl.debug} into
-          @hl.scala{ammonite.repl.Main.run} and @hl.scala{ammonite.repl.Main.debug}
+          Moved the initialization calls from @hl.scala{ammonite.Repl.run}
+          and @hl.scala{ammonite.Repl.debug} into
+          @hl.scala{ammonite.Main.run} and @hl.scala{ammonite.Main.debug}
     @sect{0.5.0}
       @ul
         @li

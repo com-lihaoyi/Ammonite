@@ -1,13 +1,13 @@
 package ammonite
 
+import ammonite.TestUtils.scala2_10
+import ammonite.interp.{History, Interpreter, Storage}
+import ammonite.main.Defaults
 import ammonite.ops._
-import ammonite.frontend._
-import ammonite.interp.Interpreter
 import ammonite.tools.IvyConstructor._
-import TestUtils.scala2_10
-import utest._
-import acyclic.file
 import ammonite.util.{Colors, Printer, Ref}
+import utest._
+
 object ScriptTests extends TestSuite{
   val tests = TestSuite{
     println("ScriptTests")
@@ -310,13 +310,13 @@ object ScriptTests extends TestSuite{
             val storage = new Storage.Folder(tempDir)
             val interp1 = createTestInterp(
               storage,
-              ammonite.Main.defaultPredefString
+              Defaults.predefString
             )
             interp1.replApi.load.module(resourcesPath/script)
             assert(interp1.compiler != null)
             val interp2 = createTestInterp(
               storage,
-              ammonite.Main.defaultPredefString
+              Defaults.predefString
             )
             assert(interp2.compiler == null)
             interp2.replApi.load.module(resourcesPath/script)
@@ -339,12 +339,12 @@ object ScriptTests extends TestSuite{
           write(numFile, "1")
           val interp1 = createTestInterp(
             storage,
-            ammonite.Main.defaultPredefString
+            Defaults.predefString
           )
           interp1.replApi.load.module(resourcesPath/'scriptLevelCaching/"runTimeExceptions.scala")
           val interp2 = createTestInterp(
             storage,
-            ammonite.Main.defaultPredefString
+            Defaults.predefString
           )
           val res = intercept[java.lang.ArithmeticException]{
             interp2.replApi.load.module(

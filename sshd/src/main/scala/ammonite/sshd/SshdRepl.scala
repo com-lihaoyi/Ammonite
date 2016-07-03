@@ -5,7 +5,9 @@ import java.io.{InputStream, OutputStream, PrintStream}
 
 import ammonite.ops.Path
 import ammonite.sshd.util.Environment
-import ammonite.repl.{Bind, Ref, Repl, Storage}
+import ammonite.util.{Bind, Ref}
+import ammonite.interp.Storage
+import ammonite.main.Repl
 
 import scala.language.postfixOps
 
@@ -51,14 +53,14 @@ object SshdRepl {
     val replSessionEnv = Environment(replServerClassLoader, in, out)
     Environment.withEnvironment(replSessionEnv) {
       try {
-        val augmentedPredef = ammonite.repl.Main.maybeDefaultPredef(
+        val augmentedPredef = ammonite.Main.maybeDefaultPredef(
           defaultPredef,
-          ammonite.repl.Main.defaultPredefString
+          ammonite.main.Defaults.predefString
         )
         new Repl(
           in, out, out,
           new Storage.Folder(homePath), augmentedPredef,
-          wd, Some(ammonite.repl.Main.defaultWelcomeBanner), replArgs
+          wd, Some(ammonite.main.Defaults.welcomeBanner), replArgs
         ).run()
       } catch {
         case any: Throwable =>

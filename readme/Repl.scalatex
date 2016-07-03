@@ -60,7 +60,7 @@
   @hl.scala
     libraryDependencies += "com.lihaoyi" % "ammonite-repl" % "@ammonite.Constants.version" % "test" cross CrossVersion.full
 
-    initialCommands in (Test, console) := """ammonite.repl.Main().run()"""
+    initialCommands in (Test, console) := """ammonite.Main().run()"""
 
   @p
     After that, simple hit
@@ -73,7 +73,7 @@
     You can also pass a string to the @code{Main} call containing any
     commands or imports you want executed at the start of every run, along
     with @lnk("other configuration",
-    "http://www.lihaoyi.com/Ammonite/api/repl/index.html#ammonite.repl.Main").
+    "http://www.lihaoyi.com/Ammonite/api/repl/index.html#ammonite.Main").
     If you want Ammonite to be available in all projects, simply add the
     above snippet to a new file @code{~/.sbt/0.13/global.sbt}.
 
@@ -406,7 +406,7 @@
         @li
           @hl.scala{repl}: the object representing the Repl API, aliased as
           @hl.scala{repl} rather than it's full name
-          @hl.scala{ammonite.repl.frontend.ReplBridge.repl}. Although you can
+          @hl.scala{ammonite.frontend.ReplBridge.repl}. Although you can
           call them API methods directly (e.g. @hl.scala{history}) you can also
           all them via the @hl.scala{repl} object (e.g. @hl.scala{repl.history})
           and you can use autocomplete or @hl.scala{typeOf} on the

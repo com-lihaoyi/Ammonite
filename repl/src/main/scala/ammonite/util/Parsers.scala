@@ -1,5 +1,5 @@
 package ammonite.util
-
+import acyclic.file
 object Parsers {
 
   import fastparse.noApi._

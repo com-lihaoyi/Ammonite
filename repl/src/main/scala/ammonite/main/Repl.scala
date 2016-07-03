@@ -1,14 +1,14 @@
-package ammonite
-
+package ammonite.main
+import acyclic.file
 import java.io.{InputStream, InputStreamReader, OutputStream, PrintStream}
 
 import ammonite.frontend._
-import acyclic.file
-import ammonite.interp.Interpreter
-import ammonite.util._
+import ammonite.interp.{History, Interpreter, Storage}
 import ammonite.terminal.Filter
+import ammonite.util._
 
 import scala.annotation.tailrec
+
 class Repl(input: InputStream,
            output: OutputStream,
            error: OutputStream,
