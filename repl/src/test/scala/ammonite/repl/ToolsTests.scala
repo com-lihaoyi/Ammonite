@@ -38,12 +38,12 @@ object ToolsTests extends TestSuite{
           implicitly[pprint.Config]
           val displayed =
             for(g <- grepped)
-            yield {
-              pprint.tokenize(g)
-                    .mkString
-                    .replace(fansi.Color.Red.escape, "<")
-                    .replace(fansi.Color.Reset.escape, ">")
-            }
+              yield {
+                pprint.tokenize(g)
+                  .mkString
+                  .replace(fansi.Color.Red.escape, "<")
+                  .replace(fansi.Color.Reset.escape, ">")
+              }
           assert(displayed == expected)
         }
         'string{

@@ -9,6 +9,9 @@ import scala.reflect.internal.annotations.compileTimeOnly
 import scala.reflect.runtime.universe.TypeTag
 import language.experimental.macros
 import reflect.macros.Context
+import scala.collection.mutable
+import scala.util._
+import Util.CompileCache
 
 
 /**
@@ -90,7 +93,7 @@ case class Main(predef: String = "",
     ) match{
       case x: Res.Failing => x
       case Res.Success(imports) =>
-        repl.interp.init()
+        repl.interp.reInit()
         imports.value.find(_.toName == Name("main")) match {
           case None => Res.Success(imports)
           case Some(i) =>

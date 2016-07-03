@@ -107,7 +107,6 @@ class SpecialClassLoader(parent: ClassLoader, parentHash: Array[Byte])
       if (!specialLocalClasses(name)) None
       else{
         import ammonite.ops._
-        //          println("Custom finding class! " + name)
         val bytes = read.bytes(
           this.getResourceAsStream(name.replace('.', '/') + ".class")
         )
