@@ -1,4 +1,4 @@
-import $file.repl.src.test.resources.scriptLevelCaching.fileToBeImported
+import $file.ammonite.src.test.resources.scriptLevelCaching.fileToBeImported
 
 @
 
