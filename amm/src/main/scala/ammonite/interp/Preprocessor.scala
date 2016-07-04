@@ -60,10 +60,8 @@ object Preprocessor{
   def splitScript(rawCode: String): Res[Seq[(String, Seq[String])]] = {
     Parsers.splitScript(rawCode) match {
       case f: Parsed.Failure =>
-        Timer("processScriptFailed 0b")
         Res.Failure(None, errMsg(f.msg, rawCode, f.extra.traced.expected, f.index))
       case s: Parsed.Success[Seq[(String, Seq[String])]] =>
-        Timer("processCorrectScript 0b")
 
         var offset = 0
         val blocks = mutable.Buffer[(String, Seq[String])]()
@@ -133,7 +131,7 @@ object Preprocessor{
         cond.lift(tree).map{ name =>
           Preprocessor.Expanded(
             code,
-            Seq(definedStr(definitionLabel, Parsers.backtickWrap(name.decoded)))
+            Seq(definedStr(definitionLabel, Name.backtickWrap(name.decoded)))
           )
         }
 
@@ -152,8 +150,8 @@ object Preprocessor{
         // synthetic flags right now, because we're dumb-parsing it and not putting
         // it through a full compilation
         if (t.name.decoded.contains("$")) Nil
-        else if (!t.mods.hasFlag(Flags.LAZY)) Seq(pprint(Parsers.backtickWrap(t.name.decoded)))
-        else Seq(s"""${pprintSignature(Parsers.backtickWrap(t.name.decoded), Some("<lazy>"))}""")
+        else if (!t.mods.hasFlag(Flags.LAZY)) Seq(pprint(Name.backtickWrap(t.name.decoded)))
+        else Seq(s"""${pprintSignature(Name.backtickWrap(t.name.decoded), Some("<lazy>"))}""")
       )
     }
 
@@ -251,7 +249,6 @@ object Preprocessor{
 
 
   def importBlock(importData: Imports) = {
-    Timer("importBlock 0")
     // Group the remaining imports into sliding groups according to their
     // prefix, while still maintaining their ordering
     val grouped = mutable.Buffer[mutable.Buffer[ImportData]]()
@@ -282,7 +279,6 @@ object Preprocessor{
     }
     val res = out.mkString
 
-    Timer("importBlock 1")
 
     res
   }

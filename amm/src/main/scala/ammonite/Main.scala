@@ -7,7 +7,7 @@ import ammonite.interp.{ImportHook, Storage}
 import fastparse.Utils.literalize
 import ammonite.main.{Defaults, Repl, Router}
 import ammonite.main.Router.{ArgSig, EntryPoint}
-import ammonite.util.Parsers.backtickWrap
+import ammonite.util.Name.backtickWrap
 import ammonite.util._
 
 
@@ -54,7 +54,7 @@ case class Main(predef: String = "",
   /**
     * Instantiates an ammonite.Repl using the configuration
     */
-  def instantiateRepl(replArgs: Seq[Bind[_]] = Nil) = {
+  def instantiateRepl(replArgs: Seq[Bind[_]] = Nil) = Timer{
     val augmentedPredef = Main.maybeDefaultPredef(defaultPredef, Defaults.predefString)
     new Repl(
       inputStream, outputStream, errorStream,
@@ -65,11 +65,8 @@ case class Main(predef: String = "",
       replArgs = replArgs
     )
   }
-  def run(replArgs: Bind[_]*) = {
-    Timer("Repl.run Start")
-    val res = instantiateRepl(replArgs).run()
-    Timer("Repl.run End")
-    res
+  def run(replArgs: Bind[_]*) = Timer{
+    instantiateRepl(replArgs).run()
   }
 
   /**
@@ -79,7 +76,7 @@ case class Main(predef: String = "",
   def runScript(path: Path,
                 mainMethodName: Option[String],
                 args: Seq[String],
-                kwargs: Seq[(String, String)]): Res[Imports] = {
+                kwargs: Seq[(String, String)]): Res[Imports] = Timer{
 
     val repl = instantiateRepl()
     main.Scripts.runScript(wd, path, repl, mainMethodName, args, kwargs)
@@ -88,7 +85,7 @@ case class Main(predef: String = "",
   /**
     * Run a snippet of code
     */
-  def runCode(code: String) = {
+  def runCode(code: String) = Timer{
     instantiateRepl().interp.replApi.load(code)
   }
 }
@@ -100,6 +97,7 @@ object Main{
     * delegating to [[Main.run]]
     */
   def main(args0: Array[String]) = {
+    val startTime = System.nanoTime()
     var fileToExecute: Option[Path] = None
     var codeToExecute: Option[String] = None
     var logTimings = false
@@ -107,6 +105,7 @@ object Main{
     var passThroughArgs: Seq[String] = Vector.empty
     var predefFile: Option[Path] = None
     var mainMethodName: Option[String] = None
+    var continually = false
     val replParser = new scopt.OptionParser[Main]("ammonite") {
       // Primary arguments that correspond to the arguments of
       // the `Main` configuration object
@@ -157,6 +156,13 @@ object Main{
       opt[String]('f', "predef-file")
         .foreach(x => predefFile = Some(Path(x, cwd)))
         .text("Lets you load your predef from a custom location")
+      opt[Unit]('y', "continually")
+        .foreach(x => continually = true)
+        .text(
+          """Lets you run a file over and over, useful for benchmarking purposes
+            |since it lets you hook up a profiler to the long-lived process and
+            |see where all the time is being spent.
+          """.stripMargin)
 
     }
 
@@ -186,37 +192,45 @@ object Main{
         keywordTokens = keywordTokens.drop(1)
       }
     }
-
-    for(c <- replParser.parse(before, Main())){
+    def ifContinually[T](b: Boolean)(f: => T) = {
+      if (b) while(true) f
+      else f
+    }
+    for(c <- replParser.parse(before, Main())) ifContinually(continually){
       Timer.show = logTimings
-      val main = Main(
-        c.predef,
-        c.defaultPredef,
-        predefFile match{
-          case None => new Storage.Folder(ammoniteHome.getOrElse(Defaults.ammoniteHome))
-          case Some(pf) =>
-            new Storage.Folder(ammoniteHome.getOrElse(Defaults.ammoniteHome)){
-              override val predef = pf
-            }
-        }
-      )
-      (fileToExecute, codeToExecute) match{
-        case (None, None) => println("Loading..."); main.run()
-        case (Some(path), None) =>
-          main.runScript(path, mainMethodName, passThroughArgs, kwargs.toSeq) match{
-            case Res.Failure(exOpt, msg) =>
-              Console.err.println(msg)
-              System.exit(1)
-            case Res.Exception(ex, s) =>
-              val trace = ex.getStackTrace
-              val i = trace.indexWhere(_.getMethodName == "$main") + 1
-              ex.setStackTrace(trace.take(i))
-              throw ex
-            case Res.Success(_) =>
-            // do nothing on success, everything's already happened
+      val preTiming = System.nanoTime()
+      if (Timer.show) println("pre-timer:\t" + (preTiming - startTime) / 1000000.0)
+      Timer{
+        val main = Main(
+          c.predef,
+          c.defaultPredef,
+          predefFile match {
+            case None => new Storage.Folder(ammoniteHome.getOrElse(Defaults.ammoniteHome))
+            case Some(pf) =>
+              new Storage.Folder(ammoniteHome.getOrElse(Defaults.ammoniteHome)) {
+                override val predef = pf
+              }
           }
+        )
+        (fileToExecute, codeToExecute) match {
+          case (None, None) => println("Loading..."); main.run()
+          case (Some(path), None) =>
+            main.runScript(path, mainMethodName, passThroughArgs, kwargs.toSeq) match {
+              case Res.Failure(exOpt, msg) =>
+                Console.err.println(msg)
+                System.exit(1)
+              case Res.Exception(ex, s) =>
+                val trace = ex.getStackTrace
+                val i = trace.indexWhere(_.getMethodName == "$main") + 1
+                ex.setStackTrace(trace.take(i))
+                throw ex
+              case Res.Success(_) =>
+              // do nothing on success, everything's already happened
+            }
 
-        case (None, Some(code)) => main.runCode(code)
+          case (None, Some(code)) => main.runCode(code)
+
+        }
       }
     }
   }

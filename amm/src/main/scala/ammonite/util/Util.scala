@@ -13,14 +13,18 @@ object Timer{
   var current = 0L
   var show = false
   def reset() = current = System.nanoTime()
-  /**
-    * Prints the time, in millis, that has passed
-    * since the last time `reset` or `apply` was called
-    */
-  def apply(s: String) = {
-    val now = System.nanoTime()
-    if(show) println(s + ": " + (now - current) / 1000000.0)
-    current = now
+
+  var indents = 0
+  def apply[T](t: => T)(implicit n: sourcecode.Enclosing) = {
+    val start = System.nanoTime()
+    val gap = "    " * indents
+    if (show) println(gap + "+ " + n.value)
+    indents += 1
+    val res = t
+    indents -= 1
+    val end = System.nanoTime
+    if (show) println(gap + "- " + n.value + ":\t" + (end - start) / 1000000.0)
+    res
   }
 }
 

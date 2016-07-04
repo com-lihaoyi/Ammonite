@@ -36,7 +36,6 @@ class Repl(input: InputStream,
     printlnWithColor(colors().error(), _),
     printlnWithColor(fansi.Attrs.Empty, _)
   )
-  Timer("Repl init printer")
 
 
   val interp: Interpreter = new Interpreter(
@@ -53,7 +52,6 @@ class Repl(input: InputStream,
     replArgs
   )
 
-  Timer("Repl init interpreter")
   val reader = new InputStreamReader(input)
 
   def action() = for{
@@ -73,7 +71,6 @@ class Repl(input: InputStream,
     _ <- Signaller("INT") { interp.mainThread.stop() }
     out <- interp.processLine(code, stmts, s"cmd${interp.eval.getCurrentLine}.scala")
   } yield {
-    Timer("interp.processLine end")
     printStream.println()
     out
   }
@@ -83,7 +80,6 @@ class Repl(input: InputStream,
     interp.init()
     @tailrec def loop(): Any = {
       val actionResult = action()
-      Timer("End Of Loop")
       interp.handleOutput(actionResult)
 
       actionResult match{

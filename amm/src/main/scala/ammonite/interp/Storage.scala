@@ -3,7 +3,7 @@ package ammonite.interp
 import acyclic.file
 import ammonite.ops._
 import ammonite.util.Parsers.ImportTree
-import ammonite.util.{Imports, Parsers, StableRef}
+import ammonite.util.{Imports, Parsers, StableRef, Timer}
 import ammonite.util.Util.{CacheOutput, ClassFiles, CompileCache, IvyMap}
 import org.apache.ivy.plugins.resolver.RepositoryResolver
 
@@ -56,10 +56,10 @@ object Storage{
     val classFilesListcache = {
       mutable.Map.empty[String, (String, Seq[(String, String)], Imports, Seq[ImportTree])]
     }
-    def compileCacheSave(path: String, tag: String, data: CompileCache): Unit = {
+    def compileCacheSave(path: String, tag: String, data: CompileCache): Unit = Timer{
       compileCache(path) = (tag, data)
     }
-    def compileCacheLoad(path: String, tag: String) = {
+    def compileCacheLoad(path: String, tag: String) = Timer{
       for {
         (loadedTag, data) <- compileCache.get(path)
         if loadedTag == tag
@@ -71,14 +71,14 @@ object Storage{
                            dataList: Seq[(String, String)],
                            imports: Imports,
                            tag: String,
-                           importTreesList: Seq[ImportTree]): Unit = {
+                           importTreesList: Seq[ImportTree]): Unit = Timer{
       val dir = pkg + "." + wrapper
       classFilesListcache(dir) = (tag, dataList.reverse, imports, importTreesList)
     }
 
     def classFilesListLoad(pkg: String,
                            wrapper: String,
-                           cacheTag: String): Option[CacheOutput] = {
+                           cacheTag: String): Option[CacheOutput] = Timer{
       val dir = pkg + "." + wrapper
       classFilesListcache.get(dir) match{
         case None => None
@@ -110,20 +110,23 @@ object Storage{
     val metadataFile = "metadata.json"
     val historyFile = dir/'history
     val fullHistory = new StableRef[History]{
-      def apply(): History = try{
-        new History(upickle.default.read[Vector[String]](read(historyFile)))
-      }catch{case e: Exception =>
-        new History(Vector())
+      def apply(): History = Timer{
+        try{
+          new History(upickle.default.read[Vector[String]](read(historyFile)))
+        }catch{case e: Exception =>
+          new History(Vector())
+        }
       }
 
-      def update(t: History): Unit = {
+      def update(t: History): Unit = Timer{
         write.over(historyFile, upickle.default.write(t.toVector, indent = 4))
       }
     }
 
-    def compileCacheSave(path: String, tag: String, data: CompileCache): Unit = {
+    def compileCacheSave(path: String, tag: String, data: CompileCache): Unit = Timer{
       val (classFiles, imports) = data
-      val tagCacheDir = compileCacheDir/path.replace("/", "$div").replace(":", "$colon")
+      val tagCacheDir = compileCacheDir/path.replace("/", "$div").replace(":", "$colon")/tag
+
       if(!exists(tagCacheDir)){
         mkdir(tagCacheDir)
         val metadata = upickle.default.write((tag, imports), indent = 4)
@@ -131,6 +134,7 @@ object Storage{
         classFiles.foreach{ case (name, bytes) =>
           write(tagCacheDir/s"$name.class", bytes)
         }
+
       }
     }
 
@@ -139,50 +143,65 @@ object Storage{
                            dataList: Seq[(String, String)],
                            imports: Imports,
                            tag: String,
-                           importTreesList: Seq[ImportTree]): Unit = {
+                           importTreesList: Seq[ImportTree]): Unit = Timer{
       val dir = pkg.replace("/", "$div") + "." + wrapper.replace("/", "$div")
-      val codeCacheDir = compileCacheDir/'scriptCaches/dir
-      if(!exists(codeCacheDir)) {
+      val codeCacheDir = cacheDir/'scriptCaches/dir/tag
+      if (!exists(codeCacheDir)){
         mkdir(codeCacheDir)
         write(
           codeCacheDir/classFilesOrder,
           upickle.default.write((tag, dataList.reverse), indent = 4)
         )
-        write(codeCacheDir/"imports.json", upickle.default.write(imports, indent = 4))
-        write(codeCacheDir/"importTrees.json", upickle.default.write(importTreesList, indent = 4))
+        write(
+          codeCacheDir/"imports.json", upickle.default.write(imports, indent = 4)
+        )
+        write(
+          codeCacheDir/"importTrees.json", upickle.default.write(importTreesList, indent = 4)
+        )
+
       }
+    }
+
+    def readJson[T: upickle.default.Reader](path: Path): Option[T] = {
+      try {
+        val fileData = Timer{ammonite.ops.read(path)}
+        val parsed = Timer{upickle.default.read(fileData)}
+        Some(parsed)
+      }
+      catch{ case e => None }
     }
 
     def classFilesListLoad(pkg: String,
                            wrapper: String,
-                           cacheTag: String): Option[CacheOutput] = {
+                           cacheTag: String): Option[CacheOutput] = Timer{
 
       val dir = pkg.replace("/", "$div") + "." + wrapper.replace("/", "$div")
-      val codeCacheDir = compileCacheDir/'scriptCaches/dir
+      val codeCacheDir = cacheDir/'scriptCaches/dir/cacheTag
       if(!exists(codeCacheDir)) None
       else {
-        val metadataJson = Try {
-          read(codeCacheDir/classFilesOrder)
-        }.toOption
-        val impFile = Try {
-          read(codeCacheDir/"imports.json")
-        }.toOption
-        val impTrees = Try{
-          read(codeCacheDir/"importTrees.json")
-        }.toOption
+
+        val metadataJson = readJson[(String, Seq[(String, String)])](codeCacheDir/classFilesOrder)
+
+        val impFile = readJson[Imports](codeCacheDir/"imports.json")
+
+        val impTrees = readJson[Seq[ImportTree]](codeCacheDir/"importTrees.json")
+
         (metadataJson, impFile, impTrees) match{
-          case (Some(metadata), Some(imp), Some(importTrees)) =>
-            val (loadedTag, classFilesList) =
-              upickle.default.read[(String, Seq[(String, String)])](metadata)
+          case (Some(metadata), Some(imports), Some(importTrees)) =>
+
+            val (loadedTag, classFilesList) = metadata
+
             if (cacheTag == loadedTag){
               val res = {
                 for((path, tag) <- classFilesList) yield {
                   compileCacheLoad(path, tag)
                 }
               }.flatten
-              val imports = upickle.default.read[Imports](imp)
-              val impTreeList = upickle.default.read[Seq[ImportTree]](importTrees)
-              Some((classFilesList.unzip._1, res.unzip._1, imports, impTreeList))
+
+
+
+
+              Some((classFilesList.unzip._1, res.unzip._1, imports, importTrees))
             }
             else None
           case _ => None
@@ -190,14 +209,12 @@ object Storage{
       }
     }
 
-    def compileCacheLoad(path: String, tag: String): Option[CompileCache] = {
-      val tagCacheDir = compileCacheDir/path.replace("/", "$div").replace(":", "$colon")
+    def compileCacheLoad(path: String, tag: String): Option[CompileCache] = Timer{
+      val tagCacheDir = compileCacheDir/path.replace("/", "$div").replace(":", "$colon")/tag
       if(!exists(tagCacheDir)) None
       else for{
-        metadataJson <- Try{read(tagCacheDir/metadataFile)}.toOption
-        (loadedTag, metadata) <- Try{
-          upickle.default.read[(String, Imports)](metadataJson)
-        }.toOption
+        (loadedTag, metadata) <- readJson[(String, Imports)](tagCacheDir/metadataFile)
+
         if tag == loadedTag
         classFiles <- loadClassFiles(tagCacheDir)
       } yield {
@@ -205,7 +222,7 @@ object Storage{
       }
     }
 
-    def loadClassFiles(cacheDir: Path): Option[ClassFiles] = {
+    def loadClassFiles(cacheDir: Path): Option[ClassFiles] = Timer{
       val classFiles = ls(cacheDir).filter(_.ext == "class")
       Try{
         val data = classFiles.map{ case file =>
@@ -218,7 +235,7 @@ object Storage{
 
 
     val ivyCache = new StableRef[IvyMap]{
-      def apply() = {
+      def apply() = Timer{
         val json =
           try read(ivyCacheFile)
           catch{ case e: java.nio.file.NoSuchFileException => "[]" }
@@ -226,7 +243,7 @@ object Storage{
         try upickle.default.read[IvyMap](json)
         catch{ case e: Exception => Map.empty }
       }
-      def update(map: IvyMap) = {
+      def update(map: IvyMap) = Timer{
         write.over(ivyCacheFile, upickle.default.write(map, indent = 4))
       }
     }

@@ -140,11 +140,18 @@ lazy val amm = project
         Seq("#!/usr/bin/env sh", """exec java -jar -XX:+UseG1GC "$0" "$@"""")
       )
     ),
-    assemblyJarName in assembly := s"${name.value}-${version.value}-${scalaVersion.value}"
+    assemblyJarName in assembly := s"${name.value}-${version.value}-${scalaVersion.value}",
+    assembly in Test := {
+      val dest = assembly.value.getParentFile/"amm"
+      IO.copyFile(assembly.value, dest)
+      import sys.process._
+      Seq("chmod", "+x", dest.getAbsolutePath).!
+      dest
+    }
   )
 
 /**
- * Project that binds together [[ops]] and [[ammonite]], turning them into a
+ * Project that binds together [[ops]] and [[amm]], turning them into a
  * credible systems shell that can be used to replace bash/zsh/etc. for
  * common housekeeping tasks
  */

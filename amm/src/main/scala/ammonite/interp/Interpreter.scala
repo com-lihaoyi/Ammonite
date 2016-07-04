@@ -68,8 +68,7 @@ class Interpreter(prompt0: Ref[String],
       init()
   }
 
-  def init() = {
-    Timer("Interpreter init init 0")
+  def init() = Timer{
     // Note we not only make a copy of `settings` to pass to the compiler,
     // we also make a *separate* copy to pass to the presentation compiler.
     // Otherwise activating autocomplete makes the presentation compiler mangle
@@ -83,7 +82,6 @@ class Interpreter(prompt0: Ref[String],
       () => pressy.shutdownPressy(),
       settings
     )
-    Timer("Interpreter init init compiler")
     pressy = Pressy(
       Classpath.classpath ++ eval.sess.frames.head.classpath,
       dynamicClasspath,
@@ -91,11 +89,9 @@ class Interpreter(prompt0: Ref[String],
 
       settings.copy()
     )
-    Timer("Interpreter init init pressy")
   }
 
 
-  Timer("Interpreter init Preprocess")
 
 
   evalClassloader.findClassPublic("ammonite.frontend.ReplBridge$")
@@ -105,7 +101,6 @@ class Interpreter(prompt0: Ref[String],
     bridgeCls.asInstanceOf[Class[ReplAPIHolder]],
     replApi
   )
-  Timer("Interpreter init eval")
 
   val argString = replArgs.zipWithIndex.map{ case (b, idx) =>
     s"""
@@ -126,7 +121,7 @@ class Interpreter(prompt0: Ref[String],
   // on `predefImports`, and we should be able to provide the "current" imports
   // to it even if it's half built
   var predefImports = Imports()
-  for( (sourceCode, wrapperName) <- predefs) {
+  for( (sourceCode, wrapperName) <- predefs) Timer{
     val pkgName = Seq(Name("ammonite"), Name("predef"))
 
     processModule(
@@ -147,12 +142,10 @@ class Interpreter(prompt0: Ref[String],
       case Res.Exception(ex, msg) =>
         throw new RuntimeException("Error during Predef: " + msg, ex)
     }
-  }
+  }("loadingPredef " + wrapperName.backticked)
 
   eval.sess.save()
-  Timer("Interpreter init predef 0")
   reInit()
-  Timer("Interpreter init predef 1")
 
   val importHooks = Ref(Map[Seq[String], ImportHook](
     Seq("file") -> ImportHook.File,
@@ -194,36 +187,37 @@ class Interpreter(prompt0: Ref[String],
     }
   }
   def resolveImportHooks(source: ImportHook.Source,
-                         stmts: Seq[String]): Res[(Imports, Seq[String], Seq[ImportTree])] = {
-    val hookedStmts = mutable.Buffer.empty[String]
-    val importTrees = mutable.Buffer.empty[ImportTree]
-    for(stmt <- stmts) {
-      Parsers.ImportSplitter.parse(stmt) match{
-        case f: Parsed.Failure => hookedStmts.append(stmt)
-        case Parsed.Success(parsedTrees, _) =>
-          var currentStmt = stmt
-          for(importTree <- parsedTrees){
-            if (importTree.prefix(0)(0) == '$') {
-              val length = importTree.end - importTree.start
-              currentStmt = currentStmt.patch(
-                importTree.start, (importTree.prefix(0) + ".$").padTo(length, ' '), length
-              )
-              importTrees.append(importTree)
+                         stmts: Seq[String]): Res[(Imports, Seq[String], Seq[ImportTree])] =
+    Timer{
+      val hookedStmts = mutable.Buffer.empty[String]
+      val importTrees = mutable.Buffer.empty[ImportTree]
+      for(stmt <- stmts) {
+        Parsers.ImportSplitter.parse(stmt) match{
+          case f: Parsed.Failure => hookedStmts.append(stmt)
+          case Parsed.Success(parsedTrees, _) =>
+            var currentStmt = stmt
+            for(importTree <- parsedTrees){
+              if (importTree.prefix(0)(0) == '$') {
+                val length = importTree.end - importTree.start
+                currentStmt = currentStmt.patch(
+                  importTree.start, (importTree.prefix(0) + ".$").padTo(length, ' '), length
+                )
+                importTrees.append(importTree)
+              }
             }
-          }
-          hookedStmts.append(currentStmt)
+            hookedStmts.append(currentStmt)
+        }
+      }
+
+      for {
+        hookImports <- Res.map(importTrees)(resolveSingleImportHook(source, _))
+      } yield {
+        val imports = Imports(hookImports.flatten.flatMap(_.value))
+        (imports, hookedStmts, importTrees)
       }
     }
 
-    for {
-      hookImports <- Res.map(importTrees)(resolveSingleImportHook(source, _))
-    } yield {
-      val imports = Imports(hookImports.flatten.flatMap(_.value))
-      (imports, hookedStmts, importTrees)
-    }
-  }
-
-  def processLine(code: String, stmts: Seq[String], fileName: String): Res[Evaluated] ={
+  def processLine(code: String, stmts: Seq[String], fileName: String): Res[Evaluated] = Timer{
     val preprocess = Preprocessor(compiler.parse)
     for{
       _ <- Catching { case ex =>
@@ -284,8 +278,8 @@ class Interpreter(prompt0: Ref[String],
   def evaluateLine(processed: Preprocessor.Output,
                    printer: Printer,
                    fileName: String,
-                   indexedWrapperName: Name): Res[Evaluated] = for{
-
+                   indexedWrapperName: Name): Res[Evaluated] = Timer{
+    for{
       _ <- Catching{ case e: ThreadDeath => Evaluator.interrupted(e) }
       (classFiles, newImports) <- compileClass(
         processed,
@@ -303,23 +297,26 @@ class Interpreter(prompt0: Ref[String],
 
       }
     } yield res
+  }
 
 
   def processScriptBlock(processed: Preprocessor.Output,
                          printer: Printer,
                          wrapperName: Name,
                          fileName: String,
-                         pkgName: Seq[Name]) = for {
-    (cls, newImports, tag) <- cachedCompileBlock(
-      processed,
-      printer,
-      wrapperName,
-      fileName,
-      pkgName,
-      "scala.Iterator[String]()"
-    )
-    res <- eval.processScriptBlock(cls, newImports, wrapperName, pkgName, tag)
-  } yield res
+                         pkgName: Seq[Name]) = Timer{
+    for {
+      (cls, newImports, tag) <- cachedCompileBlock(
+        processed,
+        printer,
+        wrapperName,
+        fileName,
+        pkgName,
+        "scala.Iterator[String]()"
+      )
+      res <- eval.processScriptBlock(cls, newImports, wrapperName, pkgName, tag)
+    } yield res
+  }
 
 
   def cachedCompileBlock(processed: Preprocessor.Output,
@@ -327,44 +324,42 @@ class Interpreter(prompt0: Ref[String],
                          wrapperName: Name,
                          fileName: String,
                          pkgName: Seq[Name],
-                         printCode: String): Res[(Class[_], Imports, String)] = {
+                         printCode: String): Res[(Class[_], Imports, String)] =
+    Timer{
 
-    Timer("cachedCompileBlock 1")
 
-    val fullyQualifiedName = (pkgName :+ wrapperName).map(_.encoded).mkString(".")
-    val tag = Interpreter.cacheTag(
-      processed.code, Nil, eval.sess.frames.head.classloader.classpathHash
-    )
-    Timer("cachedCompileBlock 2")
-    val compiled = storage.compileCacheLoad(fullyQualifiedName, tag) match {
-      case Some((classFiles, newImports)) =>
-        Compiler.addToClasspath(classFiles, dynamicClasspath)
-        Res.Success((classFiles, newImports))
-      case _ =>
-        val noneCalc = for {
-          (classFiles, newImports) <- compileClass(
-            processed, printer, fileName
-          )
-          _ = storage.compileCacheSave(fullyQualifiedName, tag, (classFiles, newImports))
-        } yield (classFiles, newImports)
+      val fullyQualifiedName = (pkgName :+ wrapperName).map(_.encoded).mkString(".")
+      val tag = Interpreter.cacheTag(
+        processed.code, Nil, eval.sess.frames.head.classloader.classpathHash
+      )
+      val compiled = storage.compileCacheLoad(fullyQualifiedName, tag) match {
+        case Some((classFiles, newImports)) =>
+          Compiler.addToClasspath(classFiles, dynamicClasspath)
+          Res.Success((classFiles, newImports))
+        case _ =>
+          val noneCalc = for {
+            (classFiles, newImports) <- compileClass(
+              processed, printer, fileName
+            )
+            _ = storage.compileCacheSave(fullyQualifiedName, tag, (classFiles, newImports))
+          } yield (classFiles, newImports)
 
-        noneCalc
+          noneCalc
+      }
+      for {
+        (classFiles, newImports) <- compiled
+        cls <- eval.loadClass(fullyQualifiedName, classFiles)
+      } yield (cls, newImports, tag)
     }
-    Timer("cachedCompileBlock 3")
-    for {
-      (classFiles, newImports) <- compiled
-      _ = Timer("cachedCompileBlock 4")
-      cls <- eval.loadClass(fullyQualifiedName, classFiles)
-    } yield (cls, newImports, tag)
-  }
 
   def processModule(source: ImportHook.Source,
                     code: String,
                     wrapperName: Name,
                     pkgName: Seq[Name],
-                    autoImport: Boolean): Res[Imports] = {
+                    autoImport: Boolean): Res[Imports] = Timer{
 
     val cacheTag = Util.md5Hash(Iterator(code.getBytes)).map("%02x".format(_)).mkString
+
     storage.classFilesListLoad(
       pkgName.map(_.backticked).mkString("."),
       wrapperName.backticked,
@@ -417,28 +412,30 @@ class Interpreter(prompt0: Ref[String],
                      wrapperName: Name,
                      pkgName: Seq[Name],
                      startingImports: Imports,
-                     autoImport: Boolean): Res[Interpreter.ProcessedData] = for{
-    (processedBlocks, hookImports, importTrees) <- preprocessScript(source, code)
-    (imports, cacheData) <- processCorrectScript(
-      processedBlocks,
-      startingImports ++ hookImports,
-      pkgName,
-      wrapperName,
-      (processed, wrapperIndex, indexedWrapperName) =>
-        withContextClassloader(
-          processScriptBlock(
-            processed, printer,
-            Interpreter.indexWrapperName(wrapperName, wrapperIndex),
-            wrapperName.raw + ".scala", pkgName
-          )
-        ),
-      autoImport
-    )
-  } yield (imports ++ hookImports, cacheData, importTrees.flatten)
+                     autoImport: Boolean): Res[Interpreter.ProcessedData] = Timer{
+    for{
+      (processedBlocks, hookImports, importTrees) <- preprocessScript(source, code)
+      (imports, cacheData) <- processCorrectScript(
+        processedBlocks,
+        startingImports ++ hookImports,
+        pkgName,
+        wrapperName,
+        (processed, wrapperIndex, indexedWrapperName) =>
+          withContextClassloader(
+            processScriptBlock(
+              processed, printer,
+              Interpreter.indexWrapperName(wrapperName, wrapperIndex),
+              wrapperName.raw + ".scala", pkgName
+            )
+          ),
+        autoImport
+      )
+    } yield (imports ++ hookImports, cacheData, importTrees.flatten)
+  }
 
 
 
-  def processExec(code: String): Res[Imports] = {
+  def processExec(code: String): Res[Imports] = Timer{
     init()
     for {
       (processedBlocks, hookImports, _) <- preprocessScript(
@@ -471,10 +468,9 @@ class Interpreter(prompt0: Ref[String],
                            wrapperName: Name,
                            evaluate: Interpreter.EvaluateCallback,
                            autoImport: Boolean
-                          ): Res[Interpreter.CacheData] = {
+                          ): Res[Interpreter.CacheData] = Timer{
 
     val preprocess = Preprocessor(compiler.parse)
-    Timer("processCorrectScript 1")
     // we store the old value, because we will reassign this in the loop
     val outerScriptImportCallback = scriptImportCallback
 
@@ -497,7 +493,6 @@ class Interpreter(prompt0: Ref[String],
         if (autoImport) outerScriptImportCallback(lastImports)
         Res.Success(lastImports, compiledData)
       } else {
-        Timer("processScript loop 0")
         // imports from scripts loaded from this script block will end up in this buffer
         var nestedScriptImports = Imports()
         scriptImportCallback = { imports =>
@@ -557,7 +552,7 @@ class Interpreter(prompt0: Ref[String],
       case Res.Exception(ex, msg) => lastException = ex
     }
   }
-  def loadIvy(coordinates: (String, String, String), verbose: Boolean = true) = {
+  def loadIvy(coordinates: (String, String, String), verbose: Boolean = true) = Timer{
     val (groupId, artifactId, version) = coordinates
     val cacheKey = (replApi.resolvers().hashCode.toString, groupId, artifactId, version)
 

@@ -131,14 +131,14 @@ object AmmonitePlugin{
         // of these cases or importing-from-an-existing import, both of which
         // should work without modification
 
-        val headFullPath = NameTransformer.decode(symbolList.head.fullName).split('.').map(Name)
+        val headFullPath = NameTransformer.decode(symbolList.head.fullName).split('.').map(Name(_))
         // prefix package imports with `_root_` to try and stop random
         // variables from interfering with them. If someone defines a value
         // called `_root_`, this will still break, but that's their problem
         val rootPrefix = if(symbolList.head.isPackage) Seq(Name("_root_")) else Nil
-        val tailPath = nameList.tail.map(_.decoded).map(Name)
+        val tailPath = nameList.tail.map(_.decoded).map(Name(_))
 
-        val prefix = (rootPrefix ++ headFullPath ++ tailPath)
+        val prefix = rootPrefix ++ headFullPath ++ tailPath
 
         /**
           * A map of each name importable from `expr`, to a `Seq[Boolean]`

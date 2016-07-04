@@ -168,11 +168,9 @@ object Evaluator{
                     newImports: Imports,
                     printer: Printer,
                     fileName: String,
-                    indexedWrapperName: Name) = {
-      Timer("eval.processLine compileClass end")
+                    indexedWrapperName: Name) = Timer{
       for {
         cls <- loadClass("$sess." + indexedWrapperName.backticked, classFiles)
-        _ = Timer("eval.processLine loadClass end")
         _ = currentLine += 1
         _ <- Catching{userCodeExceptionHandler}
       } yield {
@@ -180,9 +178,7 @@ object Evaluator{
         // block, so any exceptions thrown get properly caught and handled
 
         val iter = evalMain(cls).asInstanceOf[Iterator[String]]
-        Timer("eval.processLine evaluatorRunPrinter 1")
         evaluatorRunPrinter(iter.foreach(printer.out))
-        Timer("eval.processLine evaluatorRunPrinter end")
 
         // "" Empty string as cache tag of repl code
         evaluationResult(Seq(Name("$sess"), indexedWrapperName), newImports, "")
@@ -194,35 +190,38 @@ object Evaluator{
                            newImports: Imports,
                            wrapperName: Name,
                            pkgName: Seq[Name],
-                           tag: String) = for {
-      _ <- Catching{userCodeExceptionHandler}
-    } yield {
-      Timer("cachedCompileBlock")
-      evalMain(cls)
-      Timer("evalMain")
-      val res = evaluationResult(pkgName :+ wrapperName, newImports, tag)
-      Timer("evaluationResult")
-      res
+                           tag: String) = Timer{
+      for {
+        _ <- Catching{userCodeExceptionHandler}
+      } yield {
+        evalMain(cls)
+        val res = evaluationResult(pkgName :+ wrapperName, newImports, tag)
+        res
+      }
     }
 
     def evalCachedClassFiles(cachedData: Seq[ClassFiles],
                              pkg: String,
                              wrapper: String,
                              dynamicClasspath: VirtualDirectory,
-                             classFilesList: Seq[String]): Res[Seq[_]] = {
-
-      val res = Res.map(cachedData.zipWithIndex) {
-        case (clsFiles, index) =>
-          Compiler.addToClasspath(clsFiles, dynamicClasspath)
-          eval.loadClass(classFilesList(index), clsFiles)
+                             classFilesList: Seq[String]): Res[Seq[_]] = Timer{
+      val res = Timer{
+        Res.map(cachedData.zipWithIndex) {
+          case (clsFiles, index) =>
+            Compiler.addToClasspath(clsFiles, dynamicClasspath)
+            eval.loadClass(classFilesList(index), clsFiles)
+        }
       }
 
-      try {
-        for {
-          r <- res
-        } yield r.map(eval.evalMain(_))
+      val evaled = Timer {
+        try {
+          for {
+            r <- res
+          } yield r.map(eval.evalMain(_))
+        }
+        catch userCodeExceptionHandler
       }
-      catch {userCodeExceptionHandler}
+      evaled
     }
 
     def update(newImports: Imports) = {
@@ -231,7 +230,7 @@ object Evaluator{
 
     def evaluationResult(wrapperName: Seq[Name],
                          imports: Imports,
-                         tag: String) = {
+                         tag: String) = Timer{
       Evaluated(
         wrapperName,
         Imports(

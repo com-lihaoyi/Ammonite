@@ -24,7 +24,6 @@ case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEn
              compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
              history: IndexedSeq[String],
              addHistory: String => Unit) = {
-    Timer("AmmoniteFrontEnd.action start")
     val res = readLine(reader, output, prompt, colors, compilerComplete, history) match{
       case None => Res.Exit(())
       case Some(code) =>
@@ -38,7 +37,6 @@ case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEn
           )
         }
     }
-    Timer("AmmoniteFrontEnd.action end")
     res
   }
 
@@ -50,7 +48,7 @@ case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEn
                colors: Colors,
                compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
                history: IndexedSeq[String]) = {
-    Timer("AmmoniteFrontEnd.readLine start")
+
     val writer = new OutputStreamWriter(output)
 
     val autocompleteFilter: Filter = Filter.action(SpecialKeys.Tab){
@@ -115,7 +113,6 @@ case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEn
     )
 
 
-    Timer("AmmoniteFrontEnd.readLine 1")
     val res = Terminal.readLine(
       prompt,
       reader,
@@ -143,7 +140,6 @@ case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEn
         (newNewBuffer, offset)
       }
     )
-    Timer("TermCore.readLine")
     res
   }
 }

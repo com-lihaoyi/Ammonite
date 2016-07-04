@@ -40,13 +40,7 @@ object Parsers {
     val Parsed.Success((lhs, rhs), _) = PatVarSplitter.parse(code)
     (lhs, rhs)
   }
-  val Id2 = P( Id ~ End )
-  def backtickWrap(s: String) = {
-    Id2.parse(s) match{
-      case _: Parsed.Success[_] => s
-      case _ => "`" + pprint.PPrinter.escape(s) + "`"
-    }
-  }
+
   val Prelude = P( (Annot ~ OneNLMax).rep ~ (Mod ~/ Pass).rep )
   val Statement =
     P( scalaparse.Scala.TopPkgSeq | scalaparse.Scala.Import | Prelude ~ BlockDef | StatCtx.Expr )

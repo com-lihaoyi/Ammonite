@@ -3,7 +3,7 @@ import acyclic.file
 import ammonite.interp.ImportHook
 import ammonite.main.Router.{ArgSig, EntryPoint}
 import ammonite.ops._
-import ammonite.util.Parsers._
+import ammonite.util.Name.backtickWrap
 import ammonite.util.{Name, Res, Util}
 import fastparse.Utils._
 
@@ -40,19 +40,19 @@ object Scripts {
         )
       }
       entryPoints =
-      repl.interp
-        .eval
-        .sess
-        .frames
-        .head
-        .classloader
-        .loadClass("$sess.MainRouter")
-        .getMethods
-        .find(_.getName == "routes")
-        .get
-        .invoke(null)
-        .asInstanceOf[Seq[Router.EntryPoint]]
-        .filter(_.name != "$main")
+        repl.interp
+            .eval
+            .sess
+            .frames
+            .head
+            .classloader
+            .loadClass("$sess.MainRouter")
+            .getMethods
+            .find(_.getName == "routes")
+            .get
+            .invoke(null)
+            .asInstanceOf[Seq[Router.EntryPoint]]
+            .filter(_.name != "$main")
       res <- mainMethodName match {
         case None =>
           entryPoints.find(_.name == "main") match {
