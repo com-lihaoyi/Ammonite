@@ -81,7 +81,8 @@ class Interpreter(prompt0: Ref[String],
       evalClassloader,
       eval.sess.frames.head.pluginClassloader,
       () => pressy.shutdownPressy(),
-      settings
+      settings,
+      timer
     )
     pressy = Pressy(
       Classpath.classpath ++ eval.sess.frames.head.classpath,

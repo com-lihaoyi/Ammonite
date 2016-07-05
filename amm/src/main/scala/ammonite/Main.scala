@@ -202,7 +202,7 @@ object Main{
       val preTiming = System.nanoTime()
       if (logTimings) println("pre-timer:\t" + (preTiming - startTime) / 1000000.0)
 
-      val timer = Timer()
+      val timer = if(logTimings) Timer() else Timer.none
       timer{
         val main = Main(
           c.predef,
