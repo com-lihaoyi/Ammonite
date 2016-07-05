@@ -94,8 +94,14 @@ object Evaluator{
     object sess extends Session {
       def frames = eval.frames
       def childFrame(parent: Frame) = new Frame(
-        new SpecialClassLoader(parent.classloader, parent.classloader.classpathSignature),
-        new SpecialClassLoader(parent.pluginClassloader, parent.pluginClassloader.classpathSignature),
+        new SpecialClassLoader(
+          parent.classloader,
+          parent.classloader.classpathSignature
+        ),
+        new SpecialClassLoader(
+          parent.pluginClassloader,
+          parent.pluginClassloader.classpathSignature
+        ),
         parent.imports,
         parent.classpath
       )
