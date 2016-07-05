@@ -118,7 +118,7 @@ class SpecialClassLoader(parent: ClassLoader, parentHash: Array[Byte])
   }
 
   private def jarSignature(url: URL) = {
-    val buffer = ByteBuffer.allocate(java.lang.Long.BYTES)
+    val buffer = ByteBuffer.allocate(8)
     buffer.putLong(Path(url.getFile, root).mtime.toMillis)
     buffer.array() ++ url.getFile.getBytes
   }
