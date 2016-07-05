@@ -332,7 +332,7 @@ class Interpreter(prompt0: Ref[String],
 
       val fullyQualifiedName = (pkgName :+ wrapperName).map(_.encoded).mkString(".")
       val tag = Interpreter.cacheTag(
-        processed.code, Nil, eval.sess.frames.head.classloader.classpathHash
+        processed.code, Nil, eval.sess.frames.head.classloader.classpathSignature
       )
       val compiled = storage.compileCacheLoad(fullyQualifiedName, tag) match {
         case Some((classFiles, newImports)) =>

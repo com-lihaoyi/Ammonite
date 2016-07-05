@@ -1,11 +1,10 @@
 package ammonite.interp
 
 import java.net.{URL, URLClassLoader}
-import java.nio.file
-import java.security.MessageDigest
+import java.nio.{ByteBuffer, file}
 
 import ammonite.ops._
-import ammonite.util.{ImportData, Imports, Util}
+import ammonite.util.{Imports, Util}
 
 import scala.collection.mutable
 
@@ -114,33 +113,19 @@ class SpecialClassLoader(parent: ClassLoader, parentHash: Array[Byte])
     } else super.findClass(name)
   }
   def add(url: URL) = {
-    _classpathHash = Util.md5Hash(Iterator(_classpathHash, jarHash(url)))
+    classpathSignature0 = Util.md5Hash(Iterator(classpathSignature0, jarSignature(url)))
     addURL(url)
   }
 
-  private def jarHash(url: URL) = {
-    val digest = MessageDigest.getInstance("MD5")
-    val is = url.openStream
-    try {
-      val byteChunk = new Array[Byte](32768)
-      while({
-        val n = is.read(byteChunk)
-        if (n <= 0) false
-        else {
-          digest.update(byteChunk, 0, n)
-          true
-        }
-      })()
-    } finally {
-      if (is != null) is.close()
-    }
-
-    digest.digest()
+  private def jarSignature(url: URL) = {
+    val buffer = ByteBuffer.allocate(java.lang.Long.BYTES)
+    buffer.putLong(Path(url.getFile, root).mtime.toMillis)
+    buffer.array() ++ url.getFile.getBytes
   }
 
   def initialClasspathHash = parentHash
-  private[this] var _classpathHash = initialClasspathHash
-  def classpathHash: Array[Byte] = _classpathHash
+  private[this] var classpathSignature0 = initialClasspathHash
+  def classpathSignature: Array[Byte] = classpathSignature0
   def allJars: Seq[URL] = {
     this.getURLs ++ ( parent match{
       case t: SpecialClassLoader => t.allJars
