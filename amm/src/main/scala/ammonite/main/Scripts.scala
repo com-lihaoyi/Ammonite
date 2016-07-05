@@ -53,6 +53,7 @@ object Scripts {
             .invoke(null)
             .asInstanceOf[Seq[Router.EntryPoint]]
             .filter(_.name != "$main")
+
       res <- mainMethodName match {
         case None =>
           entryPoints.find(_.name == "main") match {

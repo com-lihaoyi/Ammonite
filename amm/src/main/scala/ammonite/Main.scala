@@ -50,11 +50,12 @@ case class Main(predef: String = "",
                 welcomeBanner: Option[String] = Some(Defaults.welcomeBanner),
                 inputStream: InputStream = System.in,
                 outputStream: OutputStream = System.out,
-                errorStream: OutputStream = System.err){
+                errorStream: OutputStream = System.err,
+                timer: Timer = Timer.none){
   /**
     * Instantiates an ammonite.Repl using the configuration
     */
-  def instantiateRepl(replArgs: Seq[Bind[_]] = Nil) = Timer{
+  def instantiateRepl(replArgs: Seq[Bind[_]] = Nil) = timer{
     val augmentedPredef = Main.maybeDefaultPredef(defaultPredef, Defaults.predefString)
     new Repl(
       inputStream, outputStream, errorStream,
@@ -62,10 +63,11 @@ case class Main(predef: String = "",
       predef = augmentedPredef + "\n" + predef,
       wd = wd,
       welcomeBanner = welcomeBanner,
-      replArgs = replArgs
+      replArgs = replArgs,
+      timer = timer
     )
   }
-  def run(replArgs: Bind[_]*) = Timer{
+  def run(replArgs: Bind[_]*) = timer{
     instantiateRepl(replArgs).run()
   }
 
@@ -76,7 +78,7 @@ case class Main(predef: String = "",
   def runScript(path: Path,
                 mainMethodName: Option[String],
                 args: Seq[String],
-                kwargs: Seq[(String, String)]): Res[Imports] = Timer{
+                kwargs: Seq[(String, String)]): Res[Imports] = timer{
 
     val repl = instantiateRepl()
     main.Scripts.runScript(wd, path, repl, mainMethodName, args, kwargs)
@@ -85,7 +87,7 @@ case class Main(predef: String = "",
   /**
     * Run a snippet of code
     */
-  def runCode(code: String) = Timer{
+  def runCode(code: String) = timer{
     instantiateRepl().interp.replApi.load(code)
   }
 }
@@ -197,20 +199,22 @@ object Main{
       else f
     }
     for(c <- replParser.parse(before, Main())) ifContinually(continually){
-      Timer.show = logTimings
       val preTiming = System.nanoTime()
-      if (Timer.show) println("pre-timer:\t" + (preTiming - startTime) / 1000000.0)
-      Timer{
+      if (logTimings) println("pre-timer:\t" + (preTiming - startTime) / 1000000.0)
+
+      val timer = Timer()
+      timer{
         val main = Main(
           c.predef,
           c.defaultPredef,
           predefFile match {
-            case None => new Storage.Folder(ammoniteHome.getOrElse(Defaults.ammoniteHome))
+            case None => new Storage.Folder(ammoniteHome.getOrElse(Defaults.ammoniteHome), timer)
             case Some(pf) =>
-              new Storage.Folder(ammoniteHome.getOrElse(Defaults.ammoniteHome)) {
+              new Storage.Folder(ammoniteHome.getOrElse(Defaults.ammoniteHome), timer) {
                 override val predef = pf
               }
-          }
+          },
+          timer = timer
         )
         (fileToExecute, codeToExecute) match {
           case (None, None) => println("Loading..."); main.run()

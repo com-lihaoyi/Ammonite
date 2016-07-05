@@ -38,7 +38,8 @@ class Interpreter(prompt0: Ref[String],
                   history: => History,
                   predef: String,
                   val wd: Path,
-                  replArgs: Seq[Bind[_]])
+                  replArgs: Seq[Bind[_]],
+                  timer: Timer = Timer.none)
   extends ImportHook.InterpreterInterface{ interp =>
 
 
@@ -56,7 +57,7 @@ class Interpreter(prompt0: Ref[String],
 
 
   val mainThread = Thread.currentThread()
-  val eval = Evaluator(mainThread.getContextClassLoader, 0  )
+  val eval = Evaluator(mainThread.getContextClassLoader, 0, timer)
 
   val dynamicClasspath = new VirtualDirectory("(memory)", None)
   var compiler: Compiler = null
@@ -68,7 +69,7 @@ class Interpreter(prompt0: Ref[String],
       init()
   }
 
-  def init() = Timer{
+  def init() = timer{
     // Note we not only make a copy of `settings` to pass to the compiler,
     // we also make a *separate* copy to pass to the presentation compiler.
     // Otherwise activating autocomplete makes the presentation compiler mangle
@@ -121,7 +122,7 @@ class Interpreter(prompt0: Ref[String],
   // on `predefImports`, and we should be able to provide the "current" imports
   // to it even if it's half built
   var predefImports = Imports()
-  for( (sourceCode, wrapperName) <- predefs) Timer{
+  for( (sourceCode, wrapperName) <- predefs) timer{
     val pkgName = Seq(Name("ammonite"), Name("predef"))
 
     processModule(
@@ -188,7 +189,7 @@ class Interpreter(prompt0: Ref[String],
   }
   def resolveImportHooks(source: ImportHook.Source,
                          stmts: Seq[String]): Res[(Imports, Seq[String], Seq[ImportTree])] =
-    Timer{
+    timer{
       val hookedStmts = mutable.Buffer.empty[String]
       val importTrees = mutable.Buffer.empty[ImportTree]
       for(stmt <- stmts) {
@@ -217,7 +218,7 @@ class Interpreter(prompt0: Ref[String],
       }
     }
 
-  def processLine(code: String, stmts: Seq[String], fileName: String): Res[Evaluated] = Timer{
+  def processLine(code: String, stmts: Seq[String], fileName: String): Res[Evaluated] = timer{
     val preprocess = Preprocessor(compiler.parse)
     for{
       _ <- Catching { case ex =>
@@ -278,7 +279,7 @@ class Interpreter(prompt0: Ref[String],
   def evaluateLine(processed: Preprocessor.Output,
                    printer: Printer,
                    fileName: String,
-                   indexedWrapperName: Name): Res[Evaluated] = Timer{
+                   indexedWrapperName: Name): Res[Evaluated] = timer{
     for{
       _ <- Catching{ case e: ThreadDeath => Evaluator.interrupted(e) }
       (classFiles, newImports) <- compileClass(
@@ -304,7 +305,7 @@ class Interpreter(prompt0: Ref[String],
                          printer: Printer,
                          wrapperName: Name,
                          fileName: String,
-                         pkgName: Seq[Name]) = Timer{
+                         pkgName: Seq[Name]) = timer{
     for {
       (cls, newImports, tag) <- cachedCompileBlock(
         processed,
@@ -325,7 +326,7 @@ class Interpreter(prompt0: Ref[String],
                          fileName: String,
                          pkgName: Seq[Name],
                          printCode: String): Res[(Class[_], Imports, String)] =
-    Timer{
+    timer{
 
 
       val fullyQualifiedName = (pkgName :+ wrapperName).map(_.encoded).mkString(".")
@@ -356,7 +357,7 @@ class Interpreter(prompt0: Ref[String],
                     code: String,
                     wrapperName: Name,
                     pkgName: Seq[Name],
-                    autoImport: Boolean): Res[Imports] = Timer{
+                    autoImport: Boolean): Res[Imports] = timer{
 
     val cacheTag = Util.md5Hash(Iterator(code.getBytes)).map("%02x".format(_)).mkString
 
@@ -412,7 +413,7 @@ class Interpreter(prompt0: Ref[String],
                      wrapperName: Name,
                      pkgName: Seq[Name],
                      startingImports: Imports,
-                     autoImport: Boolean): Res[Interpreter.ProcessedData] = Timer{
+                     autoImport: Boolean): Res[Interpreter.ProcessedData] = timer{
     for{
       (processedBlocks, hookImports, importTrees) <- preprocessScript(source, code)
       (imports, cacheData) <- processCorrectScript(
@@ -435,7 +436,7 @@ class Interpreter(prompt0: Ref[String],
 
 
 
-  def processExec(code: String): Res[Imports] = Timer{
+  def processExec(code: String): Res[Imports] = timer{
     init()
     for {
       (processedBlocks, hookImports, _) <- preprocessScript(
@@ -468,7 +469,7 @@ class Interpreter(prompt0: Ref[String],
                            wrapperName: Name,
                            evaluate: Interpreter.EvaluateCallback,
                            autoImport: Boolean
-                          ): Res[Interpreter.CacheData] = Timer{
+                          ): Res[Interpreter.CacheData] = timer{
 
     val preprocess = Preprocessor(compiler.parse)
     // we store the old value, because we will reassign this in the loop
@@ -552,7 +553,7 @@ class Interpreter(prompt0: Ref[String],
       case Res.Exception(ex, msg) => lastException = ex
     }
   }
-  def loadIvy(coordinates: (String, String, String), verbose: Boolean = true) = Timer{
+  def loadIvy(coordinates: (String, String, String), verbose: Boolean = true) = timer{
     val (groupId, artifactId, version) = coordinates
     val cacheKey = (replApi.resolvers().hashCode.toString, groupId, artifactId, version)
 
