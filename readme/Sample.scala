@@ -112,7 +112,7 @@ object Sample{
     p.getOutputStream.write(input.getBytes)
     p.getOutputStream.flush()
 
-    val buffer = new Array[Byte](4096)
+    val buffer = new Array[Byte](32768)
     val bytes =
       Iterator.continually{
         println("reading ")
