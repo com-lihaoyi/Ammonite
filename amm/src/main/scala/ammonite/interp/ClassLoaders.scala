@@ -99,25 +99,19 @@ class SpecialClassLoader(parent: ClassLoader, parentHash: Array[Byte])
     "ammonite.frontend.ReplBridge$"
   )
   override def findClass(name: String): Class[_] = {
-    def loadedFromBytes =
-      for(bytes <- newFileDict.get(name))
-        yield defineClass(name, bytes, 0, bytes.length)
+    val loadedClass = this.findLoadedClass(name)
+    if (loadedClass != null) loadedClass
+    else if (newFileDict.contains(name)) {
+      val bytes = newFileDict(name)
+      defineClass(name, bytes, 0, bytes.length)
+    }else if (specialLocalClasses(name)) {
+      import ammonite.ops._
+      val bytes = read.bytes(
+        this.getResourceAsStream(name.replace('.', '/') + ".class")
+      )
 
-    def special =
-      if (!specialLocalClasses(name)) None
-      else{
-        import ammonite.ops._
-        val bytes = read.bytes(
-          this.getResourceAsStream(name.replace('.', '/') + ".class")
-        )
-
-        Some(defineClass(name, bytes, 0, bytes.length))
-      }
-
-    Option(this.findLoadedClass(name))
-      .orElse(loadedFromBytes)
-      .orElse(special)
-      .getOrElse(super.findClass(name))
+      defineClass(name, bytes, 0, bytes.length)
+    } else super.findClass(name)
   }
   def add(url: URL) = {
     _classpathHash = Util.md5Hash(Iterator(_classpathHash, jarHash(url)))
@@ -128,7 +122,7 @@ class SpecialClassLoader(parent: ClassLoader, parentHash: Array[Byte])
     val digest = MessageDigest.getInstance("MD5")
     val is = url.openStream
     try {
-      val byteChunk = new Array[Byte](8192)
+      val byteChunk = new Array[Byte](32768)
       while({
         val n = is.read(byteChunk)
         if (n <= 0) false
