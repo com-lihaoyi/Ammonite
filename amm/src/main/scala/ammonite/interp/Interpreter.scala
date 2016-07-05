@@ -39,7 +39,7 @@ class Interpreter(prompt0: Ref[String],
                   predef: String,
                   val wd: Path,
                   replArgs: Seq[Bind[_]],
-                  timer: Timer = Timer.none)
+                  timer: Timer)
   extends ImportHook.InterpreterInterface{ interp =>
 
 

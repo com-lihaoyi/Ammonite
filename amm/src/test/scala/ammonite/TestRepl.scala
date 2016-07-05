@@ -41,7 +41,8 @@ class TestRepl {
       new History(Vector()),
       predef = ammonite.main.Defaults.predefString + "\n" + predef,
       wd = ammonite.ops.cwd,
-      replArgs = Seq()
+      replArgs = Seq(),
+      timer = Timer.none
     )
     i.init()
     i

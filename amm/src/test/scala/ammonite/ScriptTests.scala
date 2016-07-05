@@ -5,7 +5,7 @@ import ammonite.interp.{History, Interpreter, Storage}
 import ammonite.main.Defaults
 import ammonite.ops._
 import ammonite.tools.IvyConstructor._
-import ammonite.util.{Colors, Printer, Ref}
+import ammonite.util.{Colors, Printer, Ref, Timer}
 import utest._
 
 object ScriptTests extends TestSuite{
@@ -284,7 +284,8 @@ object ScriptTests extends TestSuite{
           new History(Vector()),
           predef = predef,
           wd = ammonite.ops.cwd,
-          replArgs = Seq()
+          replArgs = Seq(),
+          timer = Timer.none
         )
         val tempDir = ammonite.ops.Path(
           java.nio.file.Files.createTempDirectory("ammonite-tester")
