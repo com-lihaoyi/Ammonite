@@ -332,7 +332,7 @@ class Interpreter(prompt0: Ref[String],
 
       val fullyQualifiedName = (pkgName :+ wrapperName).map(_.encoded).mkString(".")
       val tag = Interpreter.cacheTag(
-        processed.code, Nil, eval.sess.frames.head.classloader.classpathSignature
+        processed.code, Nil, eval.sess.frames.head.classloader.classpathHash
       )
       val compiled = storage.compileCacheLoad(fullyQualifiedName, tag) match {
         case Some((classFiles, newImports)) =>
@@ -360,12 +360,14 @@ class Interpreter(prompt0: Ref[String],
                     pkgName: Seq[Name],
                     autoImport: Boolean): Res[Imports] = timer{
 
-    val cacheTag = Util.md5Hash(Iterator(code.getBytes)).map("%02x".format(_)).mkString
+    val tag = Interpreter.cacheTag(
+      code, Nil, eval.sess.frames.head.classloader.classpathHash
+    )
 
     storage.classFilesListLoad(
       pkgName.map(_.backticked).mkString("."),
       wrapperName.backticked,
-      cacheTag
+      tag
     ) match {
       case None =>
         init()
@@ -379,7 +381,7 @@ class Interpreter(prompt0: Ref[String],
              wrapperName.backticked,
              cachedData,
              imports,
-             cacheTag,
+             tag,
              importTrees
            )
            res.map(_._1)

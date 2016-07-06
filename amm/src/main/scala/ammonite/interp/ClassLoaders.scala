@@ -28,6 +28,7 @@ class Frame(val classloader: SpecialClassLoader,
     imports0 = imports0 ++ additional
   }
   def addClasspath(additional: Seq[java.io.File]) = {
+    additional.map(_.toURL).foreach(classloader.add)
     classpath0 = classpath0 ++ additional
   }
 }
@@ -41,7 +42,7 @@ object SpecialClassLoader{
     * doesn't contain any non-package-identifier segments, and aggregates
     * their names and mtimes as a "signature" of the current classpath
     */
-  def initialClasspathHash(classloader: ClassLoader): Array[Byte] = {
+  def initialClasspathSignature(classloader: ClassLoader): Seq[(Path, Long)] = {
     val allClassloaders = {
       val all = mutable.Buffer.empty[ClassLoader]
       var current = classloader
@@ -68,14 +69,8 @@ object SpecialClassLoader{
                      .filter(java.nio.file.Files.isDirectory(_))
 
     val classFileMtimes = classpathFolders.flatMap(f => findMtimes(f))
+    classFileMtimes
 
-    val hashes = classFileMtimes.map{ case (name, mtime) =>
-      Util.md5Hash(Iterator(
-        name.toString.getBytes,
-        (0 until 64 by 8).iterator.map(mtime >> _).map(_.toByte).toArray
-      ))
-    }
-    Util.md5Hash(hashes.iterator)
   }
 }
 /**
@@ -84,7 +79,7 @@ object SpecialClassLoader{
   *
   * http://stackoverflow.com/questions/3544614/how-is-the-control-flow-to-findclass-of
   */
-class SpecialClassLoader(parent: ClassLoader, parentHash: Array[Byte])
+class SpecialClassLoader(parent: ClassLoader, parentSignature: Seq[(Path, Long)])
   extends URLClassLoader(Array(), parent){
 
   /**
@@ -92,6 +87,10 @@ class SpecialClassLoader(parent: ClassLoader, parentHash: Array[Byte])
     * classloader can get at them.
     */
   val newFileDict = mutable.Map.empty[String, Array[Byte]]
+  def addClassFile(name: String, bytes: Array[Byte]) = {
+    classpathSignature0 = classpathSignature0 ++ Seq(Path(name, root) -> bytes.sum.hashCode().toLong)
+    newFileDict(name) = bytes
+  }
   def findClassPublic(name: String) = findClass(name)
   val specialLocalClasses = Set(
     "ammonite.frontend.ReplBridge",
@@ -113,19 +112,27 @@ class SpecialClassLoader(parent: ClassLoader, parentHash: Array[Byte])
     } else super.findClass(name)
   }
   def add(url: URL) = {
-    classpathSignature0 = Util.md5Hash(Iterator(classpathSignature0, jarSignature(url)))
+    classpathSignature0 = classpathSignature0 ++ Seq(jarSignature(url))
     addURL(url)
   }
 
   private def jarSignature(url: URL) = {
-    val buffer = ByteBuffer.allocate(8)
-    buffer.putLong(Path(url.getFile, root).mtime.toMillis)
-    buffer.array() ++ url.getFile.getBytes
+    val path = Path(url.getFile, root)
+    path -> path.mtime.toMillis
   }
 
-  def initialClasspathHash = parentHash
-  private[this] var classpathSignature0 = initialClasspathHash
-  def classpathSignature: Array[Byte] = classpathSignature0
+  private[this] var classpathSignature0 = parentSignature
+  def classpathSignature = classpathSignature0
+  def classpathHash = {
+    Util.md5Hash(
+      classpathSignature0.sorted.iterator.map { case (path, long) =>
+        val buffer = ByteBuffer.allocate(8)
+        buffer.putLong(long)
+        path.toString.getBytes ++ buffer.array()
+      }
+    )
+
+  }
   def allJars: Seq[URL] = {
     this.getURLs ++ ( parent match{
       case t: SpecialClassLoader => t.allJars

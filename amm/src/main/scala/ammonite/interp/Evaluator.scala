@@ -78,7 +78,7 @@ object Evaluator{
      */
 
     def initialFrame = {
-      val hash = SpecialClassLoader.initialClasspathHash(currentClassloader)
+      val hash = SpecialClassLoader.initialClasspathSignature(currentClassloader)
       def special = new SpecialClassLoader(currentClassloader, hash)
       new Frame(
         special,
@@ -138,7 +138,7 @@ object Evaluator{
     def loadClass(fullName: String, classFiles: ClassFiles): Res[Class[_]] = {
       Res[Class[_]](Try {
         for ((name, bytes) <- classFiles) {
-          sess.frames.head.classloader.newFileDict(name) = bytes
+          sess.frames.head.classloader.addClassFile(name, bytes)
         }
         val names = classFiles.map(_._1)
         val res = Class.forName(fullName, true, sess.frames.head.classloader)
