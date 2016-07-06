@@ -21,10 +21,10 @@ object TestUtils {
   def exec(name: RelPath, args: String*) = {
     %%bash(
       executable,
-      "--predef-file",
-      emptyPrefdef,
+      "--home",
+      tmp.dir(),
       replStandaloneResources / name,
       args
-      )
+    )
   }
 }

@@ -1,0 +1,1 @@
+import $ivy.`com.lihaoyi::scalatags:0.5.4`, scalatags.Text.all._

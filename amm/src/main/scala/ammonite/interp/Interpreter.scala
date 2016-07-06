@@ -365,7 +365,6 @@ class Interpreter(prompt0: Ref[String],
     val tag = Interpreter.cacheTag(
       code, Nil, eval.sess.frames.head.classloader.classpathHash
     )
-
     storage.classFilesListLoad(
       pkgName.map(_.backticked).mkString("."),
       wrapperName.backticked,
