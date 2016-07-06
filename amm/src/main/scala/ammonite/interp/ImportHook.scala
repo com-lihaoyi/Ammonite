@@ -91,7 +91,7 @@ object ImportHook{
         case Source.File(currentScriptPath) =>
 
           val (relativeModules, files, missing) = resolveFiles(
-            tree, currentScriptPath, Seq(".scala")
+            tree, currentScriptPath, Seq(".sc")
           )
 
           if (missing.nonEmpty) {

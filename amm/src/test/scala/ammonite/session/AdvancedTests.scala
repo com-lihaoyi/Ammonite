@@ -301,7 +301,7 @@ object AdvancedTests extends TestSuite{
       val dir = cwd/'amm/'src/'test/'resources/'scripts/'predefWithLoad
       'loadExec {
         val c1 = new TestRepl() {
-          override def predef = read ! dir / "PredefLoadExec.scala"
+          override def predef = read ! dir / "PredefLoadExec.sc"
         }
         c1.session("""
           @ val previouslyLoaded = predefDefinedValue
@@ -310,7 +310,7 @@ object AdvancedTests extends TestSuite{
       }
       'loadModule{
         val c2 = new TestRepl(){
-          override def predef = read! dir/"PredefLoadModule.scala"
+          override def predef = read! dir/"PredefLoadModule.sc"
         }
         c2.session("""
           @ val previouslyLoaded = predefDefinedValue

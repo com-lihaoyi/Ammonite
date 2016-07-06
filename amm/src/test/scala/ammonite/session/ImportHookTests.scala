@@ -106,7 +106,7 @@ object ImportHookTests extends TestSuite{
       'url{
         val scriptUrl =
           "https://raw.githubusercontent.com/lihaoyi/Ammonite/" +
-          "master/amm/src/test/resources/scripts/Annotation.scala"
+          "master/amm/src/test/resources/scripts/Annotation.sc"
         'basic - check.session(s"""
           @ import $$url.`$scriptUrl`
           error: $$url import failed
