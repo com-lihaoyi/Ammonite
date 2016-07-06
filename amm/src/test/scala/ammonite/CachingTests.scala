@@ -30,9 +30,7 @@ object CachingTests extends TestSuite{
       replArgs = Seq(),
       timer = Timer.none
     )
-    val tempDir = ammonite.ops.Path(
-      java.nio.file.Files.createTempDirectory("ammonite-tester")
-    )
+    val tempDir = tmp.dir(prefix="ammonite-tester")
     'noAutoIncrementWrapper{
       val storage = Storage.InMemory()
       val interp = createTestInterp(storage)

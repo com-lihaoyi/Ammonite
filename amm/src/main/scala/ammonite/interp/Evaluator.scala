@@ -212,23 +212,13 @@ object Evaluator{
                              wrapper: String,
                              dynamicClasspath: VirtualDirectory,
                              classFilesList: Seq[String]): Res[Seq[_]] = timer{
-      val res = timer{
-        Res.map(cachedData.zipWithIndex) {
-          case (clsFiles, index) =>
-            Compiler.addToClasspath(clsFiles, dynamicClasspath)
-            eval.loadClass(classFilesList(index), clsFiles)
-        }
+      Res.map(cachedData.zipWithIndex) {
+        case (clsFiles, index) =>
+          Compiler.addToClasspath(clsFiles, dynamicClasspath)
+          val cls = eval.loadClass(classFilesList(index), clsFiles)
+          try cls.map(eval.evalMain(_))
+          catch userCodeExceptionHandler
       }
-
-      val evaled = timer{
-        try {
-          for {
-            r <- res
-          } yield r.map(eval.evalMain(_))
-        }
-        catch userCodeExceptionHandler
-      }
-      evaled
     }
 
     def update(newImports: Imports) = {
