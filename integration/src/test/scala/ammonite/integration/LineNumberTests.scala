@@ -18,7 +18,7 @@ object LineNumberTests extends TestSuite{
     }
 
     'errorTest - checkErrorMessage(
-      file = 'lineNumbers/"ErrorLineNumberTest.scala",
+      file = 'lineNumbers/"ErrorLineNumberTest.sc",
       expected =
         """Syntax Error: ("}" | `case`):5:24 ...")\n  }\n\n  d"
           |    printlnqs(unsorted))
@@ -26,7 +26,7 @@ object LineNumberTests extends TestSuite{
     )
 
     'multipleCompilationUnitErrorTest1 - checkErrorMessage(
-      file = 'lineNumbers/"MultipleCompilationUnitErrorMsgTest1.scala",
+      file = 'lineNumbers/"MultipleCompilationUnitErrorMsgTest1.sc",
       expected =
         """Syntax Error: End:5:1 ..."}"
           |}
@@ -35,7 +35,7 @@ object LineNumberTests extends TestSuite{
 
 
     'multipleCompilationUnitErrorTest2 - checkErrorMessage(
-      file = 'lineNumbers/"MultipleCompilationUnitErrorMsgTest2.scala",
+      file = 'lineNumbers/"MultipleCompilationUnitErrorMsgTest2.sc",
       expected =
         """Syntax Error: End:3:1 ..."}\n@\n1 + 1"
           |}
@@ -43,45 +43,45 @@ object LineNumberTests extends TestSuite{
     )
 
     'compilationErrorWithCommentsAtTop - checkErrorMessage(
-      file = 'lineNumbers/"compilationErrorWithCommentsAtTop.scala",
+      file = 'lineNumbers/"compilationErrorWithCommentsAtTop.sc",
       expected =
-        """compilationErrorWithCommentsAtTop.scala:11: not found: value quicort
+        """compilationErrorWithCommentsAtTop.sc:11: not found: value quicort
           |    quicort(unsorted.filter(_ < pivot)):::List(pivot):::""".stripMargin +
         """quicksort(unsorted.filter(_ > pivot))"""
     )
 
     'compilationErrorInSecondBlock - checkErrorMessage(
-      file = 'lineNumbers/"compilationErrorInSecondBlock.scala",
+      file = 'lineNumbers/"compilationErrorInSecondBlock.sc",
       expected =
-        """compilationErrorInSecondBlock.scala:14: not found: value printnl
+        """compilationErrorInSecondBlock.sc:14: not found: value printnl
           |val res_0 = printnl("OK")
           |            ^""".stripMargin
     )
 
     'compilationErrorInFourthBlock - checkErrorMessage(
-      file = 'lineNumbers/"compilationErrorInFourthBlock.scala",
+      file = 'lineNumbers/"compilationErrorInFourthBlock.sc",
       expected =
-        """compilationErrorInFourthBlock.scala:30: not found: value prinntl
+        """compilationErrorInFourthBlock.sc:30: not found: value prinntl
           |val res = prinntl("Ammonite")
           |          ^""".stripMargin
     )
 
     'compilationErrorInClass - checkErrorMessage(
-      file = 'lineNumbers/"compilationErrorInClass.scala",
-      expected = "compilationErrorInClass.scala:17: value a is not a member of"
+      file = 'lineNumbers/"compilationErrorInClass.sc",
+      expected = "compilationErrorInClass.sc:17: value a is not a member of"
     )
 
     'CompilationErrorLineNumberTest - checkErrorMessage(
-      file = 'lineNumbers/"CompilationErrorLineNumberTest.scala",
+      file = 'lineNumbers/"CompilationErrorLineNumberTest.sc",
       expected =
-        """CompilationErrorLineNumberTest.scala:7: not found: value noSuchObject
+        """CompilationErrorLineNumberTest.sc:7: not found: value noSuchObject
           |  val x = noSuchObject.badFunction
           |          ^""".stripMargin
     )
 
     'RuntimeCompilationErrorLineNumberTest - checkErrorMessage(
-      file = 'lineNumbers/"RuntimeCompilationErrorLineNumberTest.scala",
-      expected = "(RuntimeCompilationErrorLineNumberTest.scala:6)"
+      file = 'lineNumbers/"RuntimeCompilationErrorLineNumberTest.sc",
+      expected = "(RuntimeCompilationErrorLineNumberTest.sc:6)"
     )
   }
 }

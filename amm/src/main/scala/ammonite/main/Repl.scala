@@ -73,7 +73,7 @@ class Repl(input: InputStream,
       )
     }
     _ <- Signaller("INT") { interp.mainThread.stop() }
-    out <- interp.processLine(code, stmts, s"cmd${interp.eval.getCurrentLine}.scala")
+    out <- interp.processLine(code, stmts, s"cmd${interp.eval.getCurrentLine}.sc")
   } yield {
     printStream.println()
     out

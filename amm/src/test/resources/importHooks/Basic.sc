@@ -1,3 +1,3 @@
-// Basic.scala
+// Basic.sc
 val basicValue = 31337
 

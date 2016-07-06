@@ -14,8 +14,8 @@ object TestUtils {
   val Seq(executable) = ls.rec! cwd |? (_.last == executableName)
   val replStandaloneResources = cwd/'integration/'src/'test/'resources/'ammonite/'integration
   val shellAmmoniteResources = cwd/'shell/'src/'main/'resources/'ammonite/'shell
-  val emptyPrefdef = shellAmmoniteResources/"empty-predef.scala"
-  val exampleBarePredef = shellAmmoniteResources/"example-predef-bare.scala"
+  val emptyPrefdef = shellAmmoniteResources/"empty-predef.sc"
+  val exampleBarePredef = shellAmmoniteResources/"example-predef-bare.sc"
 
   //we use an empty predef file here to isolate the tests from external forces.
   def exec(name: RelPath, args: String*) = {

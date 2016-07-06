@@ -84,14 +84,14 @@ object ImportHook{
     (relativeModules, files, missing)
   }
   class SourceHook(exec: Boolean) extends ImportHook {
-    // import $file.foo.Bar, to import the file `foo/Bar.scala`
+    // import $file.foo.Bar, to import the file `foo/Bar.sc`
     def handle(source: ImportHook.Source, tree: ImportTree, interp: InterpreterInterface) = {
 
       source match{
         case Source.File(currentScriptPath) =>
 
           val (relativeModules, files, missing) = resolveFiles(
-            tree, currentScriptPath, Seq(".scala")
+            tree, currentScriptPath, Seq(".sc")
           )
 
           if (missing.nonEmpty) {

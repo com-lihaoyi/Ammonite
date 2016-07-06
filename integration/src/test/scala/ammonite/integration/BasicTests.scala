@@ -20,19 +20,19 @@ object BasicTests extends TestSuite{
   val tests = TestSuite {
 
     'hello{
-      val evaled = exec('basic/"Hello.scala")
+      val evaled = exec('basic/"Hello.sc")
       assert(evaled.out.trim == "Hello World")
     }
 
     'complex{
-      val evaled = exec('basic/"Complex.scala")
+      val evaled = exec('basic/"Complex.sc")
       assert(evaled.out.trim.contains("Spire Interval [0, 10]"))
     }
 
 
 
     'shell{
-      // make sure you can load the example-predef.scala, have it pull stuff in
+      // make sure you can load the example-predef.sc, have it pull stuff in
       // from ivy, and make use of `cd!` and `wd` inside the executed script.
       val res = %%bash(
         executable,
@@ -51,27 +51,27 @@ object BasicTests extends TestSuite{
       assert(output == "amm/src")
     }
     'main{
-      val evaled = exec('basic/"Main.scala")
+      val evaled = exec('basic/"Main.sc")
       val out = evaled.out.string
       assert(out.contains("Hello! 1"))
     }
     'classloaders{
-      val evaled = exec('basic/"Resources.scala")
+      val evaled = exec('basic/"Resources.sc")
       assert(evaled.out.string.contains("1745"))
     }
     'playframework- {
       if (scalaVersion.startsWith("2.11.") && javaVersion.startsWith("1.8.")){
-        val evaled = exec('basic/"PlayFramework.scala")
+        val evaled = exec('basic/"PlayFramework.sc")
         assert(evaled.out.string.contains("Hello bar"))
       }
     }
     'args{
       'full{
-        val evaled = exec('basic/"Args.scala", "3", "Moo", (cwd/'omg/'moo).toString)
+        val evaled = exec('basic/"Args.sc", "3", "Moo", (cwd/'omg/'moo).toString)
         assert(evaled.out.string.contains("Hello! MooMooMoo omg/moo."))
       }
       'default{
-        val evaled = exec('basic/"Args.scala", "3", "Moo")
+        val evaled = exec('basic/"Args.sc", "3", "Moo")
         assert(evaled.out.string.contains("Hello! MooMooMoo ."))
       }
       // Need a way for `%%` to capture stderr before we can specify these
@@ -79,7 +79,7 @@ object BasicTests extends TestSuite{
       // and there's no way to inspect/validate it =/
       'tooFew{
         val errorMsg = intercept[ShelloutException]{
-          exec('basic/"Args.scala", "3")
+          exec('basic/"Args.sc", "3")
         }.result.err.string
         assert(errorMsg.contains(
           """The following arguments failed to be parsed:
@@ -89,7 +89,7 @@ object BasicTests extends TestSuite{
       }
       'cantParse{
         val errorMsg = intercept[ShelloutException]{
-          exec('basic/"Args.scala", "foo", "moo")
+          exec('basic/"Args.sc", "foo", "moo")
         }.result.err.string
         val exMsg = """java.lang.NumberFormatException: For input string: "foo""""
         assert(errorMsg.contains(
@@ -105,7 +105,7 @@ object BasicTests extends TestSuite{
     }
 
     'load_script{
-      val name = 'basic/"QuickSort.scala"
+      val name = 'basic/"QuickSort.sc"
       val res = %%bash(
         executable,
         "--predef-file",
@@ -113,7 +113,7 @@ object BasicTests extends TestSuite{
         replStandaloneResources/name,
         "-t"
         )
-      println("Time analysis of loading qs.scala(test script)\n\n")
+      println("Time analysis of loading qs.sc(test script)\n\n")
       res.out.lines.foreach { println }
       println("\n-------------------------")
     }
