@@ -198,9 +198,6 @@ object Storage{
                 }
               }.flatten
 
-
-
-
               Some((classFilesList.unzip._1, res.unzip._1, imports, importTrees))
             }
             else None
@@ -223,14 +220,14 @@ object Storage{
     }
 
     def loadClassFiles(cacheDir: Path): Option[ClassFiles] = timer{
-      val classFiles = ls(cacheDir).filter(_.ext == "class")
+      val classFiles = ls(cacheDir).filter(_.ext == "class").toVector
       Try{
         val data = classFiles.map{ case file =>
           val className = (file relativeTo cacheDir).toString.stripSuffix(".class")
           (className, read.bytes(file))
         }
         data
-      }.toOption.map(_.toSeq)
+      }.toOption
     }
 
 

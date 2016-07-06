@@ -111,6 +111,16 @@ class Interpreter(prompt0: Ref[String],
     """
   }.mkString("\n")
 
+  val importHooks = Ref(Map[Seq[String], ImportHook](
+    Seq("file") -> ImportHook.File,
+    Seq("exec") -> ImportHook.Exec,
+    Seq("url") -> ImportHook.Http,
+    Seq("ivy") -> ImportHook.Ivy,
+    Seq("cp") -> ImportHook.Classpath,
+    Seq("plugin", "ivy") -> ImportHook.PluginIvy,
+    Seq("plugin", "cp") -> ImportHook.PluginClasspath
+  ))
+
   val predefs = Seq(
     (hardcodedPredef, Name("HardcodedPredef")),
     (predef, Name("Predef")),
@@ -149,15 +159,7 @@ class Interpreter(prompt0: Ref[String],
   eval.sess.save()
   reInit()
 
-  val importHooks = Ref(Map[Seq[String], ImportHook](
-    Seq("file") -> ImportHook.File,
-    Seq("exec") -> ImportHook.Exec,
-    Seq("url") -> ImportHook.Http,
-    Seq("ivy") -> ImportHook.Ivy,
-    Seq("cp") -> ImportHook.Classpath,
-    Seq("plugin", "ivy") -> ImportHook.PluginIvy,
-    Seq("plugin", "cp") -> ImportHook.PluginClasspath
-  ))
+
 
   def resolveSingleImportHook(source: ImportHook.Source, tree: ImportTree) = {
     val strippedPrefix = tree.prefix.takeWhile(_(0) == '$').map(_.stripPrefix("$"))

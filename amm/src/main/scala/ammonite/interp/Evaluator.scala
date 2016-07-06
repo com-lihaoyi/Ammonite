@@ -137,7 +137,7 @@ object Evaluator{
 
     def loadClass(fullName: String, classFiles: ClassFiles): Res[Class[_]] = {
       Res[Class[_]](Try {
-        for ((name, bytes) <- classFiles) {
+        for ((name, bytes) <- classFiles.sortBy(_._1)) {
           sess.frames.head.classloader.addClassFile(name, bytes)
         }
         val names = classFiles.map(_._1)

@@ -52,7 +52,7 @@ object Compiler{
    * If the Option is None, it means compilation failed
    * Otherwise it's a Traversable of (filename, bytes) tuples
    */
-  type Output = Option[(Traversable[(String, Array[Byte])], Imports)]
+  type Output = Option[(Vector[(String, Array[Byte])], Imports)]
 
   /**
    * Converts a bunch of bytes into Scalac's weird VirtualFile class

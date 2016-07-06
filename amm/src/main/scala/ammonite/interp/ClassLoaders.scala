@@ -88,7 +88,8 @@ class SpecialClassLoader(parent: ClassLoader, parentSignature: Seq[(Path, Long)]
     */
   val newFileDict = mutable.Map.empty[String, Array[Byte]]
   def addClassFile(name: String, bytes: Array[Byte]) = {
-    classpathSignature0 = classpathSignature0 ++ Seq(Path(name, root) -> bytes.sum.hashCode().toLong)
+    val tuple = Path(name, root) -> bytes.sum.hashCode().toLong
+    classpathSignature0 = classpathSignature0 ++ Seq(tuple)
     newFileDict(name) = bytes
   }
   def findClassPublic(name: String) = findClass(name)
@@ -125,7 +126,7 @@ class SpecialClassLoader(parent: ClassLoader, parentSignature: Seq[(Path, Long)]
   def classpathSignature = classpathSignature0
   def classpathHash = {
     Util.md5Hash(
-      classpathSignature0.sorted.iterator.map { case (path, long) =>
+      classpathSignature0.iterator.map { case (path, long) =>
         val buffer = ByteBuffer.allocate(8)
         buffer.putLong(long)
         path.toString.getBytes ++ buffer.array()
