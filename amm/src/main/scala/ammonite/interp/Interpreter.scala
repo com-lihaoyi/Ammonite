@@ -137,7 +137,7 @@ class Interpreter(prompt0: Ref[String],
     val pkgName = Seq(Name("ammonite"), Name("predef"))
 
     processModule(
-      ImportHook.Source.File(wd/"Main.scala"),
+      ImportHook.Source.File(wd/"Main.sc"),
       sourceCode,
       wrapperName,
       pkgName,
@@ -430,7 +430,7 @@ class Interpreter(prompt0: Ref[String],
             processScriptBlock(
               processed, printer,
               Interpreter.indexWrapperName(wrapperName, wrapperIndex),
-              wrapperName.raw + ".scala", pkgName
+              wrapperName.raw + ".sc", pkgName
             )
           ),
         autoImport
@@ -456,7 +456,7 @@ class Interpreter(prompt0: Ref[String],
           evaluateLine(
             processed,
             printer,
-            s"Main$wrapperIndex.scala",
+            s"Main$wrapperIndex.sc",
             indexedWrapperName
           )
         },
@@ -643,7 +643,7 @@ class Interpreter(prompt0: Ref[String],
       def module(file: Path) = {
         val (pkg, wrapper) = Util.pathToPackageWrapper(file, wd)
         processModule(
-          ImportHook.Source.File(wd/"Main.scala"),
+          ImportHook.Source.File(wd/"Main.sc"),
           read(file),
           wrapper,
           pkg,

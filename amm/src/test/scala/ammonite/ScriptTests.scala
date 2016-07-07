@@ -24,7 +24,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import ammonite.ops._
 
-            @ load.exec($printedScriptPath/"LoadIvy.scala")
+            @ load.exec($printedScriptPath/"LoadIvy.sc")
 
             @ val r = res
             r: String = ${"\"\"\""}
@@ -41,7 +41,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import ammonite.ops._
 
-            @ load.exec($printedScriptPath/"PreserveImports.scala")
+            @ load.exec($printedScriptPath/"PreserveImports.sc")
 
             @ val r = res
             r: $typeString = Left("asd")
@@ -51,7 +51,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import ammonite.ops._
 
-            @ load.exec($printedScriptPath/"Annotation.scala")
+            @ load.exec($printedScriptPath/"Annotation.sc")
 
             @ val r = res
             r: Int = 24
@@ -61,7 +61,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import ammonite.ops._
 
-            @ load.exec($printedScriptPath/"BlockSepSyntax.scala")
+            @ load.exec($printedScriptPath/"BlockSepSyntax.sc")
 
             @ val r = res
             r: Int = 24
@@ -71,7 +71,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import ammonite.ops._
 
-            @ load.exec($printedScriptPath/"LimitImports.scala")
+            @ load.exec($printedScriptPath/"LimitImports.sc")
 
             @ res
             error: not found: value res
@@ -83,7 +83,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import ammonite.ops._
 
-            @ load.exec($printedScriptPath/"SyntaxError.scala")
+            @ load.exec($printedScriptPath/"SyntaxError.sc")
             error: CompilationError
 
             @ val r = res
@@ -97,7 +97,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @  import ammonite.ops._
 
-            @ load.exec($printedScriptPath/"CompilationError.scala")
+            @ load.exec($printedScriptPath/"CompilationError.sc")
             error: Compilation Failed
 
             @ val r = res
@@ -120,7 +120,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import ammonite.ops._
 
-            @ load.exec($printedScriptPath/"MultiBlockError.scala")
+            @ load.exec($printedScriptPath/"MultiBlockError.sc")
             error: Compilation Failed
 
             @ val r2 = res2
@@ -135,7 +135,7 @@ object ScriptTests extends TestSuite{
         check.session(s"""
           @ import ammonite.ops._
 
-          @ load.exec($printedScriptPath/"NestedScripts.scala")
+          @ load.exec($printedScriptPath/"NestedScripts.sc")
 
           @ val a = asd
           error: not found: value asd
@@ -148,7 +148,7 @@ object ScriptTests extends TestSuite{
         check.session(s"""
             @  import ammonite.ops._
 
-            @ load.exec($printedScriptPath/"SheBang.scala")
+            @ load.exec($printedScriptPath/"SheBang.sc")
 
             @ val r = res
             r: Int = 42
@@ -163,7 +163,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import ammonite.ops._
 
-            @ load.module($printedScriptPath/"LoadIvy.scala")
+            @ load.module($printedScriptPath/"LoadIvy.sc")
 
             @ val r = res
             r: String = ${"\"\"\""}
@@ -180,7 +180,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
               @ import ammonite.ops._
 
-              @ load.module($printedScriptPath/"PreserveImports.scala")
+              @ load.module($printedScriptPath/"PreserveImports.sc")
 
               @ val r = res
               r: $typeString = Left("asd")
@@ -192,7 +192,7 @@ object ScriptTests extends TestSuite{
             check.session(s"""
             @ import ammonite.ops._
 
-            @ load.module($printedScriptPath/"Annotation.scala")
+            @ load.module($printedScriptPath/"Annotation.sc")
 
             @ val r = res
             r: Int = 24
@@ -202,7 +202,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import ammonite.ops._
 
-            @ load.module($printedScriptPath/"BlockSepSyntax.scala")
+            @ load.module($printedScriptPath/"BlockSepSyntax.sc")
 
             @ val r = res
             r: Int = 24
@@ -212,7 +212,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import ammonite.ops._
 
-            @ load.module($printedScriptPath/"LimitImports.scala")
+            @ load.module($printedScriptPath/"LimitImports.sc")
 
             @ res
             error: not found: value res
@@ -224,7 +224,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import ammonite.ops._
 
-            @ load.exec($printedScriptPath/"SyntaxError.scala")
+            @ load.exec($printedScriptPath/"SyntaxError.sc")
             error: CompilationError
 
             @ val r = res
@@ -238,7 +238,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import ammonite.ops._
 
-            @ load.module($printedScriptPath/"CompilationError.scala")
+            @ load.module($printedScriptPath/"CompilationError.sc")
             error: Compilation Failed
 
             @ val r = res
@@ -260,7 +260,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import ammonite.ops._
 
-            @ load.module($printedScriptPath/"MultiBlockError.scala")
+            @ load.module($printedScriptPath/"MultiBlockError.sc")
             error: Compilation Failed
 
             @ val r2 = res2
@@ -277,7 +277,7 @@ object ScriptTests extends TestSuite{
 
             @ val asd = "asd"
 
-            @ load.module($printedScriptPath/"Encapsulation.scala")
+            @ load.module($printedScriptPath/"Encapsulation.sc")
             error: not found: value asd
             """
         )
@@ -286,7 +286,7 @@ object ScriptTests extends TestSuite{
         check.session(s"""
           @ import ammonite.ops._
 
-          @ load.module($printedScriptPath/"NestedScripts.scala")
+          @ load.module($printedScriptPath/"NestedScripts.sc")
 
           @ val a = asd
           error: not found: value asd

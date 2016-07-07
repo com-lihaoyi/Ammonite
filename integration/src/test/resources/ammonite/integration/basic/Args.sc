@@ -1,4 +1,4 @@
-// Args.scala
+// Args.sc
 val x = 1
 import ammonite.ops._
 

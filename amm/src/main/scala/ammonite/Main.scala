@@ -35,7 +35,7 @@ import ammonite.util._
   *                      other helpers. Can be disabled to give a clean
   *                      namespace for you to fill using your own predef.
   * @param storageBackend Where will all of Ammonite's persistent data get
-  *                       stored? Things like any `predef.scala` file,
+  *                       stored? Things like any `predef.sc` file,
   *                       compilation/ivy caches, etc.. Defaults include
   *                       [[Storage.Folder]] and [[Storage.InMemory]], though
   *                       you can create your own.

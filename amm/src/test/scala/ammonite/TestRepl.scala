@@ -159,7 +159,7 @@ class TestRepl {
     val processed = interp.processLine(
       input,
       Parsers.split(input).get.get.value,
-      s"Main$index.scala"
+      s"Main$index.sc"
     )
     processed match{
       case Res.Failure(ex, s) => printer.error(s)

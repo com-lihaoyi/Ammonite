@@ -98,7 +98,7 @@ object Storage{
 
 
   class Folder(val dir: Path, timer: Timer = Timer.none) extends Storage{
-    val predef = dir/"predef.scala"
+    val predef = dir/"predef.sc"
     // Each version puts its cache in a separate folder, to bust caches
     // on every version bump; otherwise binary-incompatible changes to
     // ReplAPI/Preprocessor/ammonite-ops will cause scripts to fail after

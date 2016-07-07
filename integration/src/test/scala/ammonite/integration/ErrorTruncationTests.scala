@@ -20,9 +20,9 @@ object ErrorTruncationTests extends TestSuite{
   val tests = TestSuite {
 
     'compileError - checkErrorMessage(
-      file = 'errorTruncation/"compileError.scala",
+      file = 'errorTruncation/"compileError.sc",
       expected =
-        """compileError.scala:1: not found: value doesntexist
+        """compileError.sc:1: not found: value doesntexist
           |val res = doesntexist
           |          ^
           |Compilation Failed
@@ -30,7 +30,7 @@ object ErrorTruncationTests extends TestSuite{
     )
 
     'parseError - checkErrorMessage(
-      file = 'errorTruncation/"parseError.scala",
+      file = 'errorTruncation/"parseError.sc",
       expected =
         """Syntax Error: End:1:1 ..."}\n"
           |}
@@ -41,12 +41,12 @@ object ErrorTruncationTests extends TestSuite{
     val runtimeErrorResourcePackage =
       "$file.integration.src.test.resources.ammonite.integration.errorTruncation"
     'runtimeError - checkErrorMessage(
-      file = 'errorTruncation/"runtimeError.scala",
+      file = 'errorTruncation/"runtimeError.sc",
       expected =
         s"""Exception in thread "main" java.lang.ArithmeticException: / by zero
-          |${tab}at $runtimeErrorResourcePackage.runtimeError$$.<init>(runtimeError.scala:1)
-          |${tab}at $runtimeErrorResourcePackage.runtimeError$$.<clinit>(runtimeError.scala)
-          |${tab}at $runtimeErrorResourcePackage.runtimeError.$$main(runtimeError.scala)
+          |${tab}at $runtimeErrorResourcePackage.runtimeError$$.<init>(runtimeError.sc:1)
+          |${tab}at $runtimeErrorResourcePackage.runtimeError$$.<clinit>(runtimeError.sc)
+          |${tab}at $runtimeErrorResourcePackage.runtimeError.$$main(runtimeError.sc)
           |""".stripMargin
     )
   }
