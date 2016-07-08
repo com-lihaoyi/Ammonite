@@ -231,7 +231,6 @@ object Main{
               case Res.Success(_) =>
               // do nothing on success, everything's already happened
             }
-
           case (None, Some(code)) => main.runCode(code)
 
         }
