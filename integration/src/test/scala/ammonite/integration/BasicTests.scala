@@ -78,13 +78,11 @@ object BasicTests extends TestSuite{
         }
       }
     }
-
     'main{
       val evaled = exec('basic/"Main.sc")
       val out = evaled.out.string
       assert(out.contains("Hello! 1"))
     }
-
     'args{
       'full{
         val evaled = exec('basic/"Args.sc", "3", "Moo", (cwd/'omg/'moo).toString)
@@ -100,24 +98,26 @@ object BasicTests extends TestSuite{
       'tooFew{
         val errorMsg = intercept[ShelloutException]{
           exec('basic/"Args.sc", "3")
-
         }.result.err.string.replace("\r", "").replace("\n", System.lineSeparator())
         assert(errorMsg.contains(
           """The following arguments failed to be parsed:
             |(s: String) was missing
-            |expected arguments: (i: Int, s: String, path: ammonite.ops.Path)""".stripMargin.replace("\n", System.lineSeparator())
+            |expected arguments: (i: Int, s: String, path: ammonite.ops.Path)"""
+            .stripMargin
+            .replace("\n", System.lineSeparator())
         ))
       }
       'cantParse{
         val errorMsg = intercept[ShelloutException]{
           exec('basic/"Args.sc", "foo", "moo")
-
         }.result.err.string.replace("\r", "").replace("\n", System.lineSeparator())
         val exMsg = """java.lang.NumberFormatException: For input string: "foo""""
         assert(errorMsg.contains(
           s"""The following arguments failed to be parsed:
              |(i: Int) failed to parse input "foo" with $exMsg
-             |expected arguments: (i: Int, s: String, path: ammonite.ops.Path)""".stripMargin.replace("\n", System.lineSeparator())
+             |expected arguments: (i: Int, s: String, path: ammonite.ops.Path)"""
+            .stripMargin
+            .replace("\n", System.lineSeparator())
         ))
         // Ensure we're properly truncating the random stuff we don't care about
         // which means that the error stack that gets printed is short-ish

@@ -14,7 +14,9 @@ object ErrorTruncationTests extends TestSuite{
   override def utestTruncateLength = 60000
   println("StandaloneTests")
   def checkErrorMessage(file: RelPath, expected: String) = {
-    val e = fansi.Str(intercept[ShelloutException]{ exec(file) }.result.err.string).plainText.replace("\r", "").replace("\n", System.lineSeparator())
+    val e = fansi.Str(
+      intercept[ShelloutException]{ exec(file) }.result.err.string
+    ).plainText.replace("\r", "").replace("\n", System.lineSeparator())
     assert(e == expected)
   }
   val tests = TestSuite {
@@ -47,7 +49,6 @@ object ErrorTruncationTests extends TestSuite{
           |${tab}at $runtimeErrorResourcePackage.runtimeError$$.<init>(runtimeError.sc:1)
           |${tab}at $runtimeErrorResourcePackage.runtimeError$$.<clinit>(runtimeError.sc)
           |${tab}at $runtimeErrorResourcePackage.runtimeError.$$main(runtimeError.sc)
-
           |""".stripMargin.replace("\n", System.lineSeparator())
     )
   }

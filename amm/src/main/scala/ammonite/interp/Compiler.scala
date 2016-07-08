@@ -294,6 +294,7 @@ object Compiler{
       }
 
 
+
       compiler.reporter.reset()
       this.errorLogger = printer.error
       this.warningLogger = printer.warning
@@ -302,6 +303,7 @@ object Compiler{
       this.importsLen = importsLen0
       val run = new compiler.Run()
       vd.clear()
+
       run.compileFiles(List(singleFile))
 
       val outputFiles = enumerateVdFiles(vd).toVector
