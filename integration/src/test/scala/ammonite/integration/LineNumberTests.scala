@@ -13,8 +13,8 @@ object LineNumberTests extends TestSuite{
   val tests = this{
 
     def checkErrorMessage(file: RelPath, expected: String) = {
-      val e = intercept[ShelloutException]{ exec(file) }.result.err.string
-      assert(e.contains(expected))
+      val e = intercept[ShelloutException]{ exec(file) }.result.err.string.replace("\r", "").replace("\n", System.lineSeparator())
+      assert(e.contains(expected.replace("\n", System.lineSeparator())))
     }
 
     'errorTest - checkErrorMessage(

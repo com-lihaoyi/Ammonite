@@ -560,7 +560,6 @@ class Interpreter(prompt0: Ref[String],
   def loadIvy(coordinates: (String, String, String), verbose: Boolean = true) = timer{
     val (groupId, artifactId, version) = coordinates
     val cacheKey = (replApi.resolvers().hashCode.toString, groupId, artifactId, version)
-
     val fetched =
       storage.ivyCache()
         .get(cacheKey)
@@ -599,6 +598,8 @@ class Interpreter(prompt0: Ref[String],
       reInit()
     }
     def ivy(coordinates: (String, String, String), verbose: Boolean = true): Unit = {
+
+
       val resolved = loadIvy(coordinates, verbose)
       val (groupId, artifactId, version) = coordinates
 
