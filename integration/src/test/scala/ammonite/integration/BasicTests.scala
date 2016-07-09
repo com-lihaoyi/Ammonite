@@ -24,46 +24,64 @@ object BasicTests extends TestSuite{
       assert(evaled.out.trim == "Hello World")
     }
 
-    'complex{
-      val evaled = exec('basic/"Complex.sc")
-      assert(evaled.out.trim.contains("Spire Interval [0, 10]"))
-    }
+
+    val windowsPlatform = System.getProperty("os.name").startsWith("Windows")
+
+    //These tests currently do not pass on Windows, primarily for the reason that they all
+    //involve loading from ivy which has different settings for windows
+    //http://stackoverflow.com/questions/15487301/configure-apache-ant-and-ivy-on-windows-7
+    'linuxOnlyTests {
+
+      'complex {
+        if (!windowsPlatform) {
+          val evaled = exec('basic / "Complex.sc")
+          println("44444444444444" + evaled.out.trim + "4444")
+          assert(evaled.out.trim.contains("Spire Interval [0, 10]"))
+        }
+      }
 
 
+      'shell {
+        // make sure you can load the example-predef.sc, have it pull stuff in
+        // from ivy, and make use of `cd!` and `wd` inside the executed script.
+        if (!windowsPlatform) {
+          val res = %% bash(
+            executable,
+            "--predef-file",
+            exampleBarePredef,
+            "-c",
+            """val x = wd
+            |@
+            |cd! 'amm/'src
+            |@
+            |println(wd relativeTo x)""".stripMargin
+          )
 
-    'shell{
-      // make sure you can load the example-predef.sc, have it pull stuff in
-      // from ivy, and make use of `cd!` and `wd` inside the executed script.
-      val res = %%bash(
-        executable,
-        "--predef-file",
-        exampleBarePredef,
-        "-c",
-        """val x = wd
-          |@
-          |cd! 'amm/'src
-          |@
-          |println(wd relativeTo x)""".stripMargin
-      )
+          val output = res.out.trim
+          assert(output == "amm/src")
+        }
+      }
 
+      'classloaders{
+        if (!windowsPlatform) {
+          val evaled = exec('basic / "Resources.sc")
+          assert(evaled.out.string.contains("1745"))
+        }
+      }
 
-      val output = res.out.trim
-      assert(output == "amm/src")
+      'playframework- {
+        if (!windowsPlatform) {
+          if (scalaVersion.startsWith("2.11.") && javaVersion.startsWith("1.8.")){
+            val evaled = exec('basic/"PlayFramework.sc")
+            assert(evaled.out.string.contains("Hello bar"))
+          }
+        }
+      }
     }
     'main{
       val evaled = exec('basic/"Main.sc")
       val out = evaled.out.string
       assert(out.contains("Hello! 1"))
-    }
-    'classloaders{
-      val evaled = exec('basic/"Resources.sc")
-      assert(evaled.out.string.contains("1745"))
-    }
-    'playframework- {
-      if (scalaVersion.startsWith("2.11.") && javaVersion.startsWith("1.8.")){
-        val evaled = exec('basic/"PlayFramework.sc")
-        assert(evaled.out.string.contains("Hello bar"))
-      }
     }
     'args{
       'full{
@@ -80,22 +98,26 @@ object BasicTests extends TestSuite{
       'tooFew{
         val errorMsg = intercept[ShelloutException]{
           exec('basic/"Args.sc", "3")
-        }.result.err.string
+        }.result.err.string.replace("\r", "").replace("\n", System.lineSeparator())
         assert(errorMsg.contains(
           """The following arguments failed to be parsed:
             |(s: String) was missing
-            |expected arguments: (i: Int, s: String, path: ammonite.ops.Path)""".stripMargin
+            |expected arguments: (i: Int, s: String, path: ammonite.ops.Path)"""
+            .stripMargin
+            .replace("\n", System.lineSeparator())
         ))
       }
       'cantParse{
         val errorMsg = intercept[ShelloutException]{
           exec('basic/"Args.sc", "foo", "moo")
-        }.result.err.string
+        }.result.err.string.replace("\r", "").replace("\n", System.lineSeparator())
         val exMsg = """java.lang.NumberFormatException: For input string: "foo""""
         assert(errorMsg.contains(
           s"""The following arguments failed to be parsed:
              |(i: Int) failed to parse input "foo" with $exMsg
-             |expected arguments: (i: Int, s: String, path: ammonite.ops.Path)""".stripMargin
+             |expected arguments: (i: Int, s: String, path: ammonite.ops.Path)"""
+            .stripMargin
+            .replace("\n", System.lineSeparator())
         ))
         // Ensure we're properly truncating the random stuff we don't care about
         // which means that the error stack that gets printed is short-ish
