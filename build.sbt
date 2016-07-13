@@ -179,6 +179,7 @@ lazy val integration = project
     (run in Test) <<= (run in Test).dependsOn(integrationTasks:_*),
     (testOnly in Test) <<= (testOnly in Test).dependsOn(integrationTasks:_*),
     (console in Test) <<= (console in Test).dependsOn(integrationTasks:_*),
+    parallelExecution in Test := false,
     dontPublishSettings,
     initialCommands in (Test, console) := "ammonite.integration.Main.main(null)"
   )
