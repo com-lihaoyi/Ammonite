@@ -52,7 +52,7 @@ object Evaluator{
 
   def interrupted(e: Throwable) = {
     Thread.interrupted()
-    Res.Failure(Some(e), "\nInterrupted!")
+    Res.Failure(Some(e), System.lineSeparator() + "Interrupted!")
   }
 
   def apply(currentClassloader: ClassLoader,

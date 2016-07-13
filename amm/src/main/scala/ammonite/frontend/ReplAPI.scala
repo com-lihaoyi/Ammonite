@@ -281,7 +281,7 @@ trait DefaultReplAPI extends FullReplAPI {
     def combinePrints(iters: Iterator[String]*) = {
       iters.toIterator
            .filter(_.nonEmpty)
-           .flatMap(Iterator("\n") ++ _)
+           .flatMap(Iterator(System.lineSeparator()) ++ _)
            .drop(1)
     }
 
@@ -327,7 +327,7 @@ object SessionChanged{
       val output = mutable.Buffer.empty[String]
       def printDelta[T: PPrint](name: String, d: Iterable[T]) = {
         if (d.nonEmpty){
-          Iterator("\n", name, ": ") ++ pprint.tokenize(d)(implicitly, config)
+          Iterator(System.lineSeparator(), name, ": ") ++ pprint.tokenize(d)(implicitly, config)
         }else Iterator()
       }
       val res = Iterator(

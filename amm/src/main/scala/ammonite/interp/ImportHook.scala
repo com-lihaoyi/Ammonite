@@ -108,7 +108,7 @@ object ImportHook{
                 ))
 
                 Result.Source(
-                  read(filePath),
+                  read(filePath).replace("\r", "").replace("\n", System.lineSeparator()),
                   wrapper,
                   pkg,
                   ImportHook.Source.File(filePath),

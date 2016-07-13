@@ -25,7 +25,6 @@ object BasicTests extends TestSuite{
     }
 
 
-    val windowsPlatform = System.getProperty("os.name").startsWith("Windows")
 
     //These tests currently do not pass on Windows, primarily for the reason that they all
     //involve loading from ivy which has different settings for windows

@@ -4,7 +4,7 @@
 @
 //Another Comment
 
-def quicksort(unsorted : List[Int]) : List[Int] = {
+def quicksort(unsorted: List[Int]) : List[Int] = {
   if(unsorted.length <= 1) unsorted
   else{
     val pivot = unsorted.head

@@ -43,12 +43,12 @@ object Preprocessor{
   def errMsg(msg: String, code: String, expected: String, idx: Int): String = {
     val locationString = {
       val (first, last) = code.splitAt(idx)
-      val lastSnippet = last.split('\n').headOption.getOrElse("")
-      val firstSnippet = first.reverse.split('\n').lift(0).getOrElse("").reverse
-      firstSnippet + lastSnippet + "\n" + (" " * firstSnippet.length) + "^"
+      val lastSnippet = last.split(System.lineSeparator()).headOption.getOrElse("")
+      val firstSnippet = first.reverse.split(System.lineSeparator().reverse).lift(0).getOrElse("").reverse
+      firstSnippet + lastSnippet + System.lineSeparator() + (" " * firstSnippet.length) + "^"
     }
 
-    s"Syntax Error: $msg\n$locationString"
+    s"Syntax Error: $msg${System.lineSeparator()}$locationString"
   }
 
   /**
@@ -68,10 +68,19 @@ object Preprocessor{
 
         // comment holds comments or empty lines above the code which is not caught along with code
         for( (comment, code) <- s.value){
-          val ncomment = comment + "\n"*offset
 
-          // 1 is added as Separator parser eats up the '\n' following @
-          offset = offset + comment.count(_ == '\n') + code.map(_.count(_ == '\n')).sum + 1
+          //ncomment has required number of newLines appended based on OS and offset
+          //fastparse behaves differently for "\n" and "\r\n" thats why the `comment.substring(1)` thing is necessary
+          val ncomment = Util.windowsPlatform match {
+            case true =>
+              if(!blocks.isEmpty)
+                comment.substring(1) + System.lineSeparator() * offset
+              else comment + System.lineSeparator() * offset
+            case false => comment + System.lineSeparator() * offset
+          }
+
+          // 1 is added as Separator parser eats up the newLine char following @
+          offset = offset + (comment.split(System.lineSeparator(), -1).length - 1) + code.map(_.split(System.lineSeparator(), -1).length - 1).sum + 1
           blocks.append((ncomment, code))
         }
 
@@ -199,7 +208,7 @@ object Preprocessor{
     def complete(code: String, resultIndex: String, postSplit: Seq[String]) = {
       val reParsed = postSplit.map(p => (parse(p), p))
       val errors = reParsed.collect{case (Left(e), _) => e }
-      if (errors.length != 0) Res.Failure(None, errors.mkString("\n"))
+      if (errors.length != 0) Res.Failure(None, errors.mkString(System.lineSeparator()))
       else {
         val allDecls = for {
           ((Right(trees), code), i) <- reParsed.zipWithIndex if (trees.nonEmpty)
@@ -293,12 +302,12 @@ object Preprocessor{
 package ${pkgName.map(_.backticked).mkString(".")}
 ${importBlock(imports)}
 
-object ${indexedWrapperName.backticked}{\n"""
+object ${indexedWrapperName.backticked}{\n""".replace("\n", System.lineSeparator())
 
     val bottomWrapper = s"""\ndef $$main() = { $printCode }
   override def toString = "${indexedWrapperName.raw}"
 }
-"""
+""".replace("\n", System.lineSeparator())
     val importsLen = topWrapper.length
 
     (topWrapper + code + bottomWrapper, importsLen)

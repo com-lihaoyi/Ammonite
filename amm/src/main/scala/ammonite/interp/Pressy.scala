@@ -215,8 +215,8 @@ object Pressy {
      * the outside caller probably doesn't care.
      */
     def complete(snippetIndex: Int, previousImports: String, snippet: String) = {
-      val prefix = previousImports + "\nobject AutocompleteWrapper{\n"
-      val suffix = "\n}"
+      val prefix = previousImports + System.lineSeparator() + "object AutocompleteWrapper{" + System.lineSeparator()
+      val suffix = System.lineSeparator() + "}"
       val allCode = prefix + snippet + suffix
       val index = snippetIndex + prefix.length
       if (cachedPressy == null) cachedPressy = initPressy

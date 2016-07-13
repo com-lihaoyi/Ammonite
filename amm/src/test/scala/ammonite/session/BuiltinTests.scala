@@ -1,6 +1,7 @@
 package ammonite.session
 
 import ammonite.TestRepl
+import ammonite.util.Util.windowsPlatform
 import utest._
 
 import scala.collection.{immutable => imm}
@@ -128,8 +129,9 @@ object BuiltinTests extends TestSuite{
 
 
     'saveLoad {
-      check.session(
-        """
+      if(!windowsPlatform){
+        check.session(
+          """
         @ val veryImportant = 1
         veryImportant: Int = 1
 
@@ -165,7 +167,8 @@ object BuiltinTests extends TestSuite{
 
         @ import scalatags.Text.all._
         error: not found: value scalatags
-        """)
+          """)
+      }
     }
     'saveLoad2{
       check.session("""

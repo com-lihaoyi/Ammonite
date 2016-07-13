@@ -2,7 +2,7 @@ package ammonite.session
 
 import ammonite.TestUtils._
 import ammonite.TestRepl
-import ammonite.util.Res
+import ammonite.util.{Res, Util}
 import utest._
 
 
@@ -241,7 +241,8 @@ object AdvancedTests extends TestSuite{
       """)
     }
     'compilerPlugin{
-      check.session("""
+      if(!Util.windowsPlatform){
+        check.session("""
         @ // Make sure plugins from eval class loader are not loaded
 
         @ import $ivy.`org.spire-math::kind-projector:0.6.3`
@@ -268,7 +269,8 @@ object AdvancedTests extends TestSuite{
 
         @ import scalatags.Text
         error: not found: value scalatags
-      """)
+                      """)
+      }
     }
     'replApiUniqueness{
       // Make sure we can instantiate multiple copies of Interpreter, with each

@@ -2,6 +2,7 @@ package ammonite.session
 
 import ammonite.TestRepl
 import ammonite.TestUtils._
+import ammonite.util.Util.windowsPlatform
 import utest._
 
 import scala.collection.{immutable => imm}
@@ -12,9 +13,11 @@ object ProjectTests extends TestSuite{
     val check = new TestRepl()
     'load{
       'ivy{
-        'standalone - retry(3){ // ivy or maven central are flaky =/
-          val tq = "\"\"\""
-          check.session(s"""
+        'standalone - {
+          if(!windowsPlatform){
+            retry(3){ // ivy or maven central are flaky =/
+            val tq = "\"\"\""
+              check.session(s"""
             @ import scalatags.Text.all._
             error: not found: value scalatags
 
@@ -28,42 +31,48 @@ object ProjectTests extends TestSuite{
             <a href="www.google.com">omg</a>
             $tq
           """)
+            }
+          }
         }
         'akkahttp{
-          check.session("""
-            @ import $ivy.`com.typesafe.akka::akka-http-experimental:1.0-M3`
+          if(!windowsPlatform){
+            check.session("""
+              @ import $ivy.`com.typesafe.akka::akka-http-experimental:1.0-M3`
 
-            @ implicit val system = akka.actor.ActorSystem()
+              @ implicit val system = akka.actor.ActorSystem()
 
-            @ val serverBinding = akka.http.Http(system).bind(interface = "localhost", port = 31337)
+              @ val serverBinding = akka.http.Http(system).bind(interface = "localhost", port = 31337)
 
-            @ implicit val materializer = akka.stream.ActorFlowMaterializer()
+              @ implicit val materializer = akka.stream.ActorFlowMaterializer()
 
-            @ var set = false
+              @ var set = false
 
-            @ serverBinding.connections.runForeach { connection =>
-            @   set = true
-            @ }
+              @ serverBinding.connections.runForeach { connection =>
+              @   set = true
+              @ }
 
-            @ set
-            res6: Boolean = false
+              @ set
+              res6: Boolean = false
 
-            @ akka.stream.scaladsl.Source(
-            @   List(akka.http.model.HttpRequest(uri="/"))
-            @ ).via(
-            @   akka.http.Http().outgoingConnection("localhost", port=31337).flow
-            @ ).runForeach(println)
+              @ akka.stream.scaladsl.Source(
+              @   List(akka.http.model.HttpRequest(uri="/"))
+              @ ).via(
+              @   akka.http.Http().outgoingConnection("localhost", port=31337).flow
+              @ ).runForeach(println)
 
-            @ Thread.sleep(200)
+              @ Thread.sleep(200)
 
-            @ set
-            res9: Boolean = true
+              @ set
+              res9: Boolean = true
 
-            @ system.shutdown()
-          """)
+              @ system.shutdown()
+             """)
+          }
         }
-        'resolvers - retry(2){// ivy flakyness...
-          check.session("""
+        'resolvers - {
+          if(!windowsPlatform){
+            retry(2){// ivy flakyness...
+              check.session("""
             @ import $ivy.`com.ambiata::mundane:1.2.1-20141230225616-50fc792`
             error: IvyResolutionException
 
@@ -81,7 +90,9 @@ object ProjectTests extends TestSuite{
             @ import $ivy.`com.ambiata::mundane:1.2.1-20141230225616-50fc792`
 
             @ import com.ambiata.mundane._
-          """)
+                            """)
+            }
+          }
         }
       }
       'code{
