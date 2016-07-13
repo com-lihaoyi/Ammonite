@@ -109,7 +109,7 @@ class Interpreter(prompt0: Ref[String],
     val ${b.name} =
       ammonite.frontend.ReplBridge.repl.replArgs($idx).value.asInstanceOf[${b.typeTag.tpe}]
     """
-  }.mkString("\n")
+  }.mkString(System.lineSeparator())
 
   val importHooks = Ref(Map[Seq[String], ImportHook](
     Seq("file") -> ImportHook.File,
@@ -330,7 +330,6 @@ class Interpreter(prompt0: Ref[String],
                          pkgName: Seq[Name],
                          printCode: String): Res[(Class[_], Imports, String)] =
     timer{
-
 
       val fullyQualifiedName = (pkgName :+ wrapperName).map(_.encoded).mkString(".")
       val tag = Interpreter.cacheTag(
@@ -644,7 +643,7 @@ class Interpreter(prompt0: Ref[String],
         val (pkg, wrapper) = Util.pathToPackageWrapper(file, wd)
         processModule(
           ImportHook.Source.File(wd/"Main.sc"),
-          read(file),
+          read(file).replace("\r", "").replace("\n", System.lineSeparator()),
           wrapper,
           pkg,
           true
@@ -687,7 +686,7 @@ class Interpreter(prompt0: Ref[String],
 
     def show[T: PPrint](implicit cfg: Config) = (t: T) => {
       pprint.tokenize(t, height = 0)(implicitly[PPrint[T]], cfg).foreach(printer.out)
-      printer.out("\n")
+      printer.out(System.lineSeparator())
     }
     def show[T: PPrint](t: T,
                         width: Integer = null,
@@ -699,7 +698,7 @@ class Interpreter(prompt0: Ref[String],
 
       pprint.tokenize(t, width, height, indent, colors)(implicitly[PPrint[T]], cfg)
             .foreach(printer.out)
-      printer.out("\n")
+      printer.out(System.lineSeparator())
     }
 
     def search(target: scala.reflect.runtime.universe.Type) = {
@@ -757,7 +756,7 @@ object Interpreter{
 
   def skipSheBangLine(code: String)= {
     if (code.startsWith(SheBang))
-      code.substring(code.indexOf('\n'))
+      code.substring(code.indexOf(System.lineSeparator()))
     else
       code
   }

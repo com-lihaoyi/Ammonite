@@ -26,7 +26,7 @@ object FrontEndUtils {
     ammonite.util.Util.transpose(grouped).iterator.flatMap{
       case first :+ last => first.map(
         x => x ++ " " * (width / columns - x.length)
-      ) :+ last :+ fansi.Str("\n")
+      ) :+ last :+ fansi.Str(System.lineSeparator())
     }.map(_.render)
   }
 
@@ -41,7 +41,7 @@ object FrontEndUtils {
                        details: Seq[String]): List[String] = {
 
     val prelude =
-      if (details.length != 0 || completions.length != 0) List("\n")
+      if (details.length != 0 || completions.length != 0) List(System.lineSeparator())
       else Nil
 
     val detailsText =

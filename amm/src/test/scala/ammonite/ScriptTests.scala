@@ -5,7 +5,7 @@ import ammonite.interp.{History, Interpreter, Storage}
 import ammonite.main.Defaults
 import ammonite.ops._
 import ammonite.tools.IvyConstructor._
-import ammonite.util.{Colors, Printer, Ref, Timer}
+import ammonite.util.{Colors, Printer, Ref, Timer, Util}
 import utest._
 
 object ScriptTests extends TestSuite{
@@ -21,17 +21,19 @@ object ScriptTests extends TestSuite{
     'exec{
       'compilationBlocks{
         'loadIvy - retry(3){ // ivy or maven central seems to be flaky =/ =/ =/
-          check.session(s"""
-            @ import ammonite.ops._
+            if(!Util.windowsPlatform){
+              check.session(s"""
+              @ import ammonite.ops._
 
-            @ load.exec($printedScriptPath/"LoadIvy.sc")
+              @ load.exec($printedScriptPath/"LoadIvy.sc")
 
-            @ val r = res
-            r: String = ${"\"\"\""}
-            <a href="www.google.com">omg</a>
-            ${"\"\"\""}
-            """)
-        }
+              @ val r = res
+              r: String = ${"\"\"\""}
+              <a href="www.google.com">omg</a>
+              ${"\"\"\""}
+              """)
+            }
+          }
         'preserveImports{
           val typeString =
             if (!scala2_10)

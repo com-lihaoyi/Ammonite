@@ -128,7 +128,7 @@ object GrepResult{
       }
       generateSnippet()
 
-      Iterator(outputSnippets.mkString("\n"))
+      Iterator(outputSnippets.mkString(System.lineSeparator()))
     }
 }
 

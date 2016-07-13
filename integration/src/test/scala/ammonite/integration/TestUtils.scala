@@ -7,6 +7,11 @@ import ImplicitWd._
   * Created by haoyi on 6/4/16.
   */
 object TestUtils {
+  val windowsPlatform = System.getProperty("os.name").startsWith("Windows")
+  val newLine = windowsPlatform match{
+    case true => "\\r\\n"
+    case false => "\\n"
+  }
   val scalaVersion = scala.util.Properties.versionNumberString
   val javaVersion = scala.util.Properties.javaVersion
   val ammVersion = ammonite.Constants.version

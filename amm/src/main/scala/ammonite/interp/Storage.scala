@@ -280,7 +280,7 @@ object History{
   implicit val historyPPrint: pprint.PPrint[History] = pprint.PPrint(
     new pprint.PPrinter[History]{
       def render0(t: History, c: pprint.Config) = {
-        t.iterator.flatMap(Iterator("\n", _))
+        t.iterator.flatMap(Iterator(System.lineSeparator(), _))
       }
     }
   )

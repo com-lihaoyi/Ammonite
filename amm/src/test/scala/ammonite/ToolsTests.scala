@@ -82,7 +82,7 @@ object ToolsTests extends TestSuite{
           'farApart - check(
             longItems,
             "\"123|890\"".r,
-            Seq("<\"123>45678901234567...\n...45678901234567<890\">")
+            Seq("<\"123>45678901234567..." + System.lineSeparator() + "...45678901234567<890\">")
           )
 
           // Make sure that when the different matches are relatively close
@@ -90,7 +90,7 @@ object ToolsTests extends TestSuite{
           'noOverlap - check(
             longItems,
             "123",
-            Seq("\"<123>4567890<123>4567...\n...890<123>4567890\"")
+            Seq("\"<123>4567890<123>4567..." + System.lineSeparator() + "...890<123>4567890\"")
           )
         }
       }

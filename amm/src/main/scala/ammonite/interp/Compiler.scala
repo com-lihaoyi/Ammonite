@@ -338,7 +338,7 @@ object Compiler{
       reporter.reset()
       val parser = compiler.newUnitParser(line)
       val trees = CompilerCompatibility.trees(compiler)(parser)
-      if (reporter.hasErrors) Left(errors.mkString("\n"))
+      if (reporter.hasErrors) Left(errors.mkString(System.lineSeparator()))
       else Right(trees)
     }
   }

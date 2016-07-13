@@ -10,5 +10,5 @@ println(test.x)
 @
 
 def f = "Hello"
-println("\n\nIt has executed")
+println(System.lineSeparator()*2 + "It has executed")
 

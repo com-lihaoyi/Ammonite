@@ -60,7 +60,7 @@ case class Main(predef: String = "",
     new Repl(
       inputStream, outputStream, errorStream,
       storage = storageBackend,
-      predef = augmentedPredef + "\n" + predef,
+      predef = augmentedPredef + System.lineSeparator() + predef,
       wd = wd,
       welcomeBanner = welcomeBanner,
       replArgs = replArgs,
@@ -144,7 +144,7 @@ object Main{
             |
             |You can also use `--` as a shorthand for `-x main`, to pass arguments
             |to the main method
-          """.stripMargin.replace("\n", "\n" + " " * 8)
+          """.stripMargin.replace("\n", System.lineSeparator() + " " * 8)
         )
       arg[String]("<args>...")
         .optional()

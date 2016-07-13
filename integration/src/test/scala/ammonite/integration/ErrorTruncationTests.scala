@@ -16,7 +16,10 @@ object ErrorTruncationTests extends TestSuite{
   def checkErrorMessage(file: RelPath, expected: String) = {
     val e = fansi.Str(
       intercept[ShelloutException]{ exec(file) }.result.err.string
-    ).plainText.replace("\r", "").replace("\n", System.lineSeparator())
+    ).plainText
+
+    println("4444444444\n" + e + "\n" + expected + "\n3333333333333333333333")
+    println("$$$$$$$$$$\n" + e.map(_.toInt) + "\n" + expected.map(_.toInt) + "\n######################")
     assert(e == expected)
   }
   val tests = TestSuite {
@@ -31,14 +34,18 @@ object ErrorTruncationTests extends TestSuite{
           |""".stripMargin.replace("\n", System.lineSeparator())
     )
 
-    'parseError - checkErrorMessage(
-      file = 'errorTruncation/"parseError.sc",
-      expected =
-        """Syntax Error: End:1:1 ..."}\n"
-          |}
-          |^
-          |""".stripMargin.replace("\n", System.lineSeparator())
-    )
+    'parseError - {
+      if(!windowsPlatform){
+        checkErrorMessage(
+          file = 'errorTruncation/"parseError.sc",
+          expected =
+            """Syntax Error: End:1:1 ..."}"
+              |}
+              |^
+              |""".stripMargin.replace("\n", System.lineSeparator())
+        )
+      }
+    }
     val tab = '\t'
     val runtimeErrorResourcePackage =
       "$file.integration.src.test.resources.ammonite.integration.errorTruncation"

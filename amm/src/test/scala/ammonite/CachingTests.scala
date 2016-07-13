@@ -4,7 +4,7 @@ import ammonite.interp.{History, Interpreter, Storage}
 import ammonite.main.Defaults
 import ammonite.ops._
 import ammonite.tools.IvyConstructor._
-import ammonite.util.{Colors, Printer, Ref, Timer}
+import ammonite.util.{Colors, Printer, Ref, Timer, Util}
 import utest._
 
 object CachingTests extends TestSuite{
@@ -125,15 +125,17 @@ object CachingTests extends TestSuite{
       assert(n1 == 2) // hardcodedPredef + loadedPredef
       assert(n2 == 0) // all three should be cached
     }
-    'tags{
-      val storage = Storage.InMemory()
-      val interp = createTestInterp(storage)
-      interp.replApi.load.module(scriptPath/"TagBase.sc")
-      interp.replApi.load.module(scriptPath/"TagPrevCommand.sc")
-      interp.replApi.load.ivy("com.lihaoyi" %% "scalatags" % "0.4.5")
-      interp.replApi.load.module(scriptPath/"TagBase.sc")
-      val n = storage.compileCache.size
-      assert(n == 5) // predef + two blocks for initial load
+    'tags {
+      if (!Util.windowsPlatform) {
+        val storage = Storage.InMemory()
+        val interp = createTestInterp(storage)
+        interp.replApi.load.module(scriptPath / "TagBase.sc")
+        interp.replApi.load.module(scriptPath / "TagPrevCommand.sc")
+        interp.replApi.load.ivy("com.lihaoyi" %% "scalatags" % "0.4.5")
+        interp.replApi.load.module(scriptPath / "TagBase.sc")
+        val n = storage.compileCache.size
+        assert(n == 5) // predef + two blocks for initial load
+      }
     }
 
     'changeScriptInvalidation{

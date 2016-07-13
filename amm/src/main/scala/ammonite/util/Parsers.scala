@@ -57,7 +57,7 @@ object Parsers {
     case x => Some(x)
   }
 
-  val Separator = P( WL ~ "@" ~~ CharIn(" \n").rep(1) )
+  val Separator = P( WL ~ "@" ~~ CharIn(" " + System.lineSeparator()).rep(1) )
   val CompilationUnit = P( WL.! ~ StatementBlock(Separator) ~ WL )
   val ScriptSplitter = P( CompilationUnit.repX(1, Separator) ~ End)
   def splitScript(code: String) = ScriptSplitter.parse(code)

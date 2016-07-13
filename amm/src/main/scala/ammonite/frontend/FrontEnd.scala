@@ -104,7 +104,7 @@ object FrontEnd{
                   None,
                   fastparse.core.ParseError.msg(extra.input, extra.traced.expected, index)
                 )
-              case None => readCode(code + "\n")
+              case None => readCode(code + System.lineSeparator())
             }
         }
       }
