@@ -78,8 +78,8 @@ object Evaluator{
      */
 
     def initialFrame = {
-      val hash = SpecialClassLoader.initialClasspathSignature(currentClassloader)
-      def special = new SpecialClassLoader(currentClassloader, hash)
+      val hash = SpecialClassLoaderImpl.initialClasspathSignature(currentClassloader)
+      def special = new SpecialClassLoaderImpl(currentClassloader, hash)
       new FrameImpl(
         special,
         special,
@@ -94,11 +94,11 @@ object Evaluator{
     object sess extends Session {
       def frames = eval.frames
       def childFrame(parent: FrameImpl) = new FrameImpl(
-        new SpecialClassLoader(
+        new SpecialClassLoaderImpl(
           parent.classloader,
           parent.classloader.classpathSignature
         ),
-        new SpecialClassLoader(
+        new SpecialClassLoaderImpl(
           parent.pluginClassloader,
           parent.pluginClassloader.classpathSignature
         ),

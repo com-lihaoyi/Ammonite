@@ -33,7 +33,7 @@ class FrameImpl(val classloader: SpecialClassLoader,
   }
 }
 
-object SpecialClassLoader{
+object SpecialClassLoaderImpl{
   val simpleNameRegex = "[a-zA-Z0-9_]+".r
 
   /**
@@ -79,8 +79,8 @@ object SpecialClassLoader{
   *
   * http://stackoverflow.com/questions/3544614/how-is-the-control-flow-to-findclass-of
   */
-class SpecialClassLoader(parent: ClassLoader, parentSignature: Seq[(Path, Long)])
-  extends URLClassLoader(Array(), parent){
+class SpecialClassLoaderImpl(parent: ClassLoader, parentSignature: Seq[(Path, Long)])
+  extends URLClassLoader(Array(), parent) with SpecialClassLoader{
 
   /**
     * Files which have been compiled, stored so that our special
