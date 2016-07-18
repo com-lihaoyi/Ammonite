@@ -4,6 +4,7 @@ import pprint.PPrint
 
 import scala.reflect.runtime.universe._
 import acyclic.file
+import ammonite.tools.Desugared
 
 
 trait DefaultReplAPI extends FullReplAPI {
@@ -23,6 +24,20 @@ trait DefaultReplAPI extends FullReplAPI {
            .filter(_.nonEmpty)
            .flatMap(Iterator("\n") ++ _)
            .drop(1)
+    }
+
+    def desugar(s: String)(implicit colors: ammonite.util.CodeColors): Desugared = {
+
+      new Desugared(
+        ammonite.frontend.Highlighter.defaultHighlight(
+          s.toVector,
+          colors.comment,
+          colors.`type`,
+          colors.literal,
+          colors.keyword,
+          fansi.Attr.Reset
+        ).mkString
+      )
     }
 
     def print[T: pprint.TPrint: WeakTypeTag, V: PPrint](value: => T,

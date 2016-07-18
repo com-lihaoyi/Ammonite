@@ -13,6 +13,7 @@ import scala.collection.mutable
 import scala.reflect.runtime.universe._
 import acyclic.file
 
+import ammonite.tools.Desugared
 
 import scala.util.control.ControlThrowable
 
@@ -237,6 +238,8 @@ abstract class FullReplAPI extends ReplAPI{
   val Internal: Internal
   trait Internal{
     def combinePrints(iters: Iterator[String]*): Iterator[String]
+
+    def desugar(s: String)(implicit colors: ammonite.util.CodeColors): Desugared
 
     /**
      * Kind of an odd signature, splitting out [[T]] and [[V]]. This is
