@@ -4,6 +4,7 @@ import acyclic.file
 import ammonite.ops._
 import ammonite.util.Parsers.ImportTree
 import ammonite.util.{Imports, Parsers, StableRef, Timer}
+import ammonite.util.Codecs._
 import ammonite.util.Util.{CacheOutput, ClassFiles, CompileCache, IvyMap}
 import org.apache.ivy.plugins.resolver.RepositoryResolver
 
@@ -165,7 +166,7 @@ object Storage{
     def readJson[T: upickle.default.Reader](path: Path): Option[T] = {
       try {
         val fileData = timer{ammonite.ops.read(path)}
-        val parsed = timer{upickle.default.read(fileData)}
+        val parsed = timer{upickle.default.read[T](fileData)}
         Some(parsed)
       }
       catch{ case e => None }
