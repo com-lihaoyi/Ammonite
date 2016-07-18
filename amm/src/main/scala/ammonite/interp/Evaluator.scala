@@ -80,7 +80,7 @@ object Evaluator{
     def initialFrame = {
       val hash = SpecialClassLoader.initialClasspathSignature(currentClassloader)
       def special = new SpecialClassLoader(currentClassloader, hash)
-      new Frame(
+      new FrameImpl(
         special,
         special,
         Imports(),
@@ -89,11 +89,11 @@ object Evaluator{
     }
     var frames = List(initialFrame)
 
-    val namedFrames = mutable.Map.empty[String, List[Frame]]
+    val namedFrames = mutable.Map.empty[String, List[FrameImpl]]
 
     object sess extends Session {
       def frames = eval.frames
-      def childFrame(parent: Frame) = new Frame(
+      def childFrame(parent: FrameImpl) = new FrameImpl(
         new SpecialClassLoader(
           parent.classloader,
           parent.classloader.classpathSignature

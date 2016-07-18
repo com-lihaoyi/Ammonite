@@ -18,10 +18,10 @@ import scala.collection.mutable
   * in particular ways: `imports` can only be updated via `mergeImports`,
   * while `classpath` can only be added to.
   */
-class Frame(val classloader: SpecialClassLoader,
-            val pluginClassloader: SpecialClassLoader,
-            private[this] var imports0: Imports,
-            private[this] var classpath0: Seq[java.io.File]){
+class FrameImpl(val classloader: SpecialClassLoader,
+                val pluginClassloader: SpecialClassLoader,
+                private[this] var imports0: Imports,
+                private[this] var classpath0: Seq[java.io.File]) extends Frame {
   def imports = imports0
   def classpath = classpath0
   def addImports(additional: Imports) = {
