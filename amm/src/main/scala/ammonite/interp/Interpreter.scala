@@ -1,6 +1,6 @@
 package ammonite.interp
 
-import ammonite.tools.{IvyThing, Resolver, Resolvers}
+import ammonite.tools.{IvyThing, Resolvers}
 import java.io.{File, OutputStream}
 import java.nio.file.NotDirectoryException
 
@@ -14,7 +14,6 @@ import fastparse.all._
 import annotation.tailrec
 import ammonite._
 import ammonite.frontend._
-import ammonite.util.Parsers.ImportTree
 import ammonite.util.Util.CacheDetails
 import ammonite.util._
 import pprint.{Config, PPrint, PPrinter}
@@ -57,7 +56,8 @@ class Interpreter(prompt0: Ref[String],
 
 
   val mainThread = Thread.currentThread()
-  val eval = Evaluator(mainThread.getContextClassLoader, 0, timer)
+  def startClassLoader = Interpreter.startClassLoader(mainThread.getContextClassLoader)
+  val eval = new EvaluatorImpl(startClassLoader, 0, timer)
 
   val dynamicClasspath = new VirtualDirectory("(memory)", None)
   var compiler: Compiler = null
@@ -75,8 +75,9 @@ class Interpreter(prompt0: Ref[String],
     // Otherwise activating autocomplete makes the presentation compiler mangle
     // the shared settings and makes the main compiler sad
     val settings = Option(compiler).fold(new Settings)(_.compiler.settings.copy)
+    val initClasspath = Classpath.classpath(eval.sess.frames.head.classloader)
     compiler = Compiler(
-      Classpath.classpath ++ eval.sess.frames.head.classpath,
+      initClasspath ++ eval.sess.frames.head.classpath,
       dynamicClasspath,
       evalClassloader,
       eval.sess.frames.head.pluginClassloader,
@@ -85,7 +86,7 @@ class Interpreter(prompt0: Ref[String],
       timer
     )
     pressy = Pressy(
-      Classpath.classpath ++ eval.sess.frames.head.classpath,
+      initClasspath ++ eval.sess.frames.head.classpath,
       dynamicClasspath,
       evalClassloader,
 
@@ -112,13 +113,13 @@ class Interpreter(prompt0: Ref[String],
   }.mkString("\n")
 
   val importHooks = Ref(Map[Seq[String], ImportHook](
-    Seq("file") -> ImportHook.File,
-    Seq("exec") -> ImportHook.Exec,
-    Seq("url") -> ImportHook.Http,
-    Seq("ivy") -> ImportHook.Ivy,
-    Seq("cp") -> ImportHook.Classpath,
-    Seq("plugin", "ivy") -> ImportHook.PluginIvy,
-    Seq("plugin", "cp") -> ImportHook.PluginClasspath
+    Seq("file") -> ImportHooks.File,
+    Seq("exec") -> ImportHooks.Exec,
+    Seq("url") -> ImportHooks.Http,
+    Seq("ivy") -> ImportHooks.Ivy,
+    Seq("cp") -> ImportHooks.Classpath,
+    Seq("plugin", "ivy") -> ImportHooks.PluginIvy,
+    Seq("plugin", "cp") -> ImportHooks.PluginClasspath
   ))
 
   val predefs = Seq(
@@ -264,12 +265,12 @@ class Interpreter(prompt0: Ref[String],
 
   def compileClass(processed: Preprocessor.Output,
                    printer: Printer,
-                   fileName: String): Res[(Util.ClassFiles, Imports)] = for {
+                   fileName: String): Res[(ClassFiles, Imports)] = for {
     compiled <- Res.Success{
       compiler.compile(processed.code.getBytes, printer, processed.prefixCharLength, fileName)
     }
     _ = _compilationCount += 1
-    (classfiles, imports) <- Res[(Util.ClassFiles, Imports)](
+    (classfiles, imports) <- Res[(ClassFiles, Imports)](
       compiled,
       "Compilation Failed"
     )
@@ -284,7 +285,7 @@ class Interpreter(prompt0: Ref[String],
                    fileName: String,
                    indexedWrapperName: Name): Res[Evaluated] = timer{
     for{
-      _ <- Catching{ case e: ThreadDeath => Evaluator.interrupted(e) }
+      _ <- Catching{ case e: ThreadDeath => EvaluatorImpl.interrupted(e) }
       (classFiles, newImports) <- compileClass(
         processed,
         printer,
@@ -641,7 +642,7 @@ class Interpreter(prompt0: Ref[String],
       def exec(file: Path): Unit = apply(read(file))
 
       def module(file: Path) = {
-        val (pkg, wrapper) = Util.pathToPackageWrapper(file, wd)
+        val (pkg, wrapper) = pathToPackageWrapper(file, wd)
         processModule(
           ImportHook.Source.File(wd/"Main.sc"),
           read(file),
@@ -770,5 +771,28 @@ object Interpreter{
     Name(wrapperName.raw + (if (wrapperIndex == 1) "" else "_" + wrapperIndex))
   }
 
+  def startClassLoader(loader: ClassLoader): ClassLoader = {
+
+    def baseClassLoaderOpt(from: ClassLoader, id: String): Option[ClassLoader] =
+      if (from == null)
+        None
+      else {
+        val isBaseClassLoader = try {
+          val from0 = from.asInstanceOf[Object { def getIsolationTargets: Array[String] }]
+          from0.getIsolationTargets.contains(id)
+        } catch {
+          case e: Exception =>
+            false
+        }
+
+        if (isBaseClassLoader)
+          Some(from)
+        else
+          baseClassLoaderOpt(from.getParent, id)
+      }
+
+    baseClassLoaderOpt(loader, "ammonite")
+      .getOrElse(loader)
+  }
 
 }

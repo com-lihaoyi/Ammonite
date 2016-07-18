@@ -104,6 +104,42 @@ lazy val terminal = project
     macroSettings
   )
 
+val upicklePPrintVersion = "0.4.1"
+
+/**
+ * User-facing module - its dependencies and all that's in it is available
+ * to users in Ammonite sessions.
+ */
+lazy val `amm-api` = project
+  .dependsOn(ops)
+  .settings(
+    macroSettings,
+    sharedSettings,
+    crossVersion := CrossVersion.full,
+    name := "ammonite-api",
+    libraryDependencies ++= Seq(
+      "org.scala-lang" % "scala-compiler" % scalaVersion.value,
+      "org.scala-lang" % "scala-reflect" % scalaVersion.value,
+      "org.apache.ivy" % "ivy" % "2.4.0",
+      "com.lihaoyi" %% "pprint" % upicklePPrintVersion
+    )
+  )
+
+/**
+ * Extra tools available to users in Ammonite sessions. These are less
+ * essential and could be made optional.
+ */
+lazy val `amm-tools` = project
+  .dependsOn(`amm-api`, terminal, ops)
+  .settings(
+    macroSettings,
+    sharedSettings,
+    crossVersion := CrossVersion.full,
+    name := "ammonite-tools",
+    libraryDependencies ++= Seq(
+      "com.github.scopt" %% "scopt" % "3.4.0"
+    )
+  )
 
 /**
  * A better Scala REPL, which can be dropped in into any project or run
@@ -111,7 +147,7 @@ lazy val terminal = project
  * for Scala
  */
 lazy val amm = project
-  .dependsOn(terminal, ops)
+  .dependsOn(`amm-api`, `amm-tools`, terminal, ops)
   .settings(
     macroSettings,
     sharedSettings,
@@ -124,8 +160,8 @@ lazy val amm = project
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
       "org.apache.ivy" % "ivy" % "2.4.0",
       "com.lihaoyi" %% "scalaparse" % "0.3.7",
-      "com.lihaoyi" %% "upickle" % "0.4.1",
-      "com.lihaoyi" %% "pprint" % "0.4.1",
+      "com.lihaoyi" %% "upickle" % upicklePPrintVersion,
+      "com.lihaoyi" %% "pprint" % upicklePPrintVersion,
       "com.github.scopt" %% "scopt" % "3.4.0",
       "org.scalaj" %% "scalaj-http" % "2.3.0"
     ),
@@ -247,5 +283,5 @@ lazy val tested = project
 
 lazy val published = project
   .in(file("target/published"))
-  .aggregate(ops, shell, terminal, amm, sshd)
+  .aggregate(ops, shell, terminal, `amm-api`, `amm-tools`, amm, sshd)
   .settings(dontPublishSettings)

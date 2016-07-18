@@ -11,23 +11,7 @@ import ammonite.util.{Colors, Parsers, Catching, Res}
 import scala.annotation.tailrec
 import scala.tools.nsc.interpreter.JList
 
-/**
- * All the mucky JLine interfacing code
- */
-trait FrontEnd{
-  def width: Int
-  def height: Int
-  def action(input: InputStream,
-             reader: java.io.Reader,
-             output: OutputStream,
-             prompt: String,
-             colors: Colors,
-             compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
-             history: IndexedSeq[String],
-             addHistory: String => Unit): Res[(String, Seq[String])]
-}
-
-object FrontEnd{
+object FrontEnds {
   object JLineUnix extends JLineTerm(() => new jline.UnixTerminal())
   object JLineWindows extends JLineTerm(() => new jline.WindowsTerminal())
   class JLineTerm(makeTerm: () => jline.Terminal) extends FrontEnd{

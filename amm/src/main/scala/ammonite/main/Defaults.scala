@@ -38,6 +38,7 @@ object Defaults{
     |}
     |import ammonite.tools._
     |import ammonite.tools.IvyConstructor.{ArtifactIdExt, GroupIdExt}
+    |import ammonite.frontend.Resolver
     |import ammonite.frontend.ReplBridge.repl.{
     |  Internal => _,
     |  $ignoreUselessImports

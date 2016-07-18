@@ -11,13 +11,15 @@ import org.apache.ivy.util._
 import org.apache.ivy.plugins.resolver._
 import acyclic.file
 import IvyThing._
+import ammonite.frontend.Resolver
+import ammonite.util.scalaBinaryVersion
 
 
 object IvyConstructor extends IvyConstructor
 trait IvyConstructor{
   implicit class GroupIdExt(groupId: String){
     def %(artifactId: String) = (groupId, artifactId)
-    def %%(artifactId: String) = (groupId, artifactId + "_" + IvyThing.scalaBinaryVersion)
+    def %%(artifactId: String) = (groupId, artifactId + "_" + scalaBinaryVersion)
   }
   implicit class ArtifactIdExt(t: (String, String)){
     def %(version: String) = (t._1, t._2, version)
@@ -129,14 +131,6 @@ object IvyThing {
       // creates an Ivy instance with settings
       ivySettings
     }
-    
-  val scalaBinaryVersion =
-    scala.util.Properties
-              .versionString
-              .stripPrefix("version ")
-              .split('.')
-              .take(2)
-              .mkString(".")
   
 }
 
@@ -191,42 +185,4 @@ object Resolvers {
     true
    )
  )
-}
-
-/**
-  * A thin wrapper around [[RepositoryResolver]], which wraps them and provides
-  * hashability in order to set the cache tags. This lets us invalidate the ivy
-  * resolution cache if the set of resolvers changes
-  */
-sealed trait Resolver{
-  def apply(): RepositoryResolver
-}
-object Resolver{
-  case class File(name: String, root: String, pattern: String, m2: Boolean) extends Resolver{
-    def apply() = {
-      val testRepoDir = sys.props("user.home") + root
-      val repo = new FileRepository(new java.io.File(testRepoDir))
-
-      val res = new FileSystemResolver()
-      res.addIvyPattern(testRepoDir + pattern)
-      res.addArtifactPattern(testRepoDir + pattern)
-      res.setRepository(repo)
-      res.setM2compatible(m2)
-      res.setName(name)
-
-      res
-
-    }
-  }
-  case class Http(name: String, root: String, pattern: String, m2: Boolean) extends Resolver{
-    def apply() = {
-      val res = new IBiblioResolver()
-      res.setUsepoms(true)
-      res.setM2compatible(m2)
-      res.setName(name)
-      res.setRoot(root)
-      res.setPattern(pattern)
-      res
-    }
-  }
 }

@@ -1,67 +1,18 @@
 package ammonite.interp
 
-import java.io.File
-
 import acyclic.file
+import ammonite.interp.ImportHook.{InterpreterInterface, Result, Source}
 import ammonite.ops.{read, _}
-import ammonite.tools.IvyThing
 import ammonite.util._
-import ammonite.util.Parsers.ImportTree
+import ammonite.util.ImportTree
 
-/**
-  * An extensible hook into the Ammonite REPL's import system; allows the end
-  * user to hook into `import $foo.bar.{baz, qux => qua}` syntax, and in
-  * response load jars or process source files before the "current" compilation
-  * unit is run. Can be used to load script files, ivy dependencies, jars, or
-  * files from the web.
-  */
-trait ImportHook{
-  def handle(source: ImportHook.Source,
-             tree: ImportTree,
-             interp: ImportHook.InterpreterInterface): Res[Seq[ImportHook.Result]]
-}
+object ImportHooks{
 
-object ImportHook{
-
-  /**
-    * The minimal interface that is exposed to the import hooks from the
-    * Interpreter. Open for extension, if someone needs more stuff, but by
-    * default this is what is available.
-    */
-  trait InterpreterInterface{
-    def wd: Path
-    def loadIvy(coordinates: (String, String, String), verbose: Boolean = true): Set[File]
-  }
-
-  /**
-    * The result of processing an [[ImportHook]]. Can be either a source-file
-    * to evaluate, or additional files/folders/jars to put on the classpath
-    */
-  sealed trait Result
-  object Result{
-    case class Source(code: String,
-                      wrapper: Name,
-                      pkg: Seq[Name],
-                      source: ImportHook.Source,
-                      imports: Imports,
-                      exec: Boolean) extends Result
-    case class ClassPath(file: Path, plugin: Boolean) extends Result
-  }
-
-  /**
-    * Where a script can "come from". Used to resolve relative $file imports
-    * relative to the importing script.
-    */
-  sealed trait Source
-  object Source{
-    case class File(path: Path) extends Source
-    case class URL(path: String) extends Source
-  }
   object File extends SourceHook(false)
   object Exec extends SourceHook(true)
 
   def resolveFiles(tree: ImportTree, currentScriptPath: Path, extensions: Seq[String])
-                  : (Seq[(RelPath, Option[String])], Seq[Path], Seq[Path]) = {
+  : (Seq[(RelPath, Option[String])], Seq[Path], Seq[Path]) = {
     val relative =
       tree.prefix
         .map{case ".." => up; case x => ammonite.ops.empty/x}
@@ -99,7 +50,7 @@ object ImportHook{
           } else {
             Res.Success(
               for(((relativeModule, rename), filePath) <- relativeModules.zip(files)) yield {
-                val (pkg, wrapper) = Util.pathToPackageWrapper(filePath, interp.wd)
+                val (pkg, wrapper) = pathToPackageWrapper(filePath, interp.wd)
                 val fullPrefix = pkg ++ Seq(wrapper)
 
                 val importData = Seq(ImportData(
@@ -160,7 +111,7 @@ object ImportHook{
     def resolve(interp: InterpreterInterface, signature: String) = for{
       (a, b, c) <-  signature.split(':') match{
         case Array(a, b, c) => Res.Success((a, b, c))
-        case Array(a, "", b, c) => Res.Success((a, b + "_" + IvyThing.scalaBinaryVersion, c))
+        case Array(a, "", b, c) => Res.Success((a, b + "_" + scalaBinaryVersion, c))
         case _ => Res.Failure(None, s"Invalid $$ivy import: [$signature]")
       }
       jars <- {
@@ -192,7 +143,7 @@ object ImportHook{
             Res.Failure(None, "Cannot resolve $cp import: " + missing.mkString(", "))
           } else Res.Success(
             for(((relativeModule, rename), filePath) <- relativeModules.zip(files))
-            yield Result.ClassPath(filePath, plugin)
+              yield Result.ClassPath(filePath, plugin)
           )
         case Source.URL(path) => ???
       }

@@ -81,7 +81,7 @@ case class Main(predef: String = "",
                 kwargs: Seq[(String, String)]): Res[Imports] = timer{
 
     val repl = instantiateRepl()
-    main.Scripts.runScript(wd, path, repl, mainMethodName, args, kwargs)
+    main.Scripts.runScript(wd, path, repl.interp, mainMethodName, args, kwargs)
   }
 
   /**

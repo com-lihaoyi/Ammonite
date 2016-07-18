@@ -2,9 +2,9 @@ package ammonite.interp
 
 import acyclic.file
 import ammonite.ops._
-import ammonite.util.Parsers.ImportTree
-import ammonite.util.{Imports, Parsers, StableRef, Timer}
-import ammonite.util.Util.{CacheOutput, ClassFiles, CompileCache, IvyMap}
+import ammonite.util.{ClassFiles, Imports, ImportTree, Parsers, StableRef, Timer}
+import ammonite.util.Codecs._
+import ammonite.util.Util.{CacheOutput, CompileCache, IvyMap}
 import org.apache.ivy.plugins.resolver.RepositoryResolver
 
 import scala.util.Try
@@ -165,7 +165,7 @@ object Storage{
     def readJson[T: upickle.default.Reader](path: Path): Option[T] = {
       try {
         val fileData = timer{ammonite.ops.read(path)}
-        val parsed = timer{upickle.default.read(fileData)}
+        val parsed = timer{upickle.default.read[T](fileData)}
         Some(parsed)
       }
       catch{ case e => None }
@@ -252,38 +252,3 @@ object Storage{
     }
   }
 }
-
-class History(s: Vector[String])
-extends IndexedSeq[String]
-with IndexedSeqLike[String, History] {
-  def length: Int = s.length
-  def apply(idx: Int): String = s.apply(idx)
-  override def newBuilder = History.builder
-}
-
-object History{
-  def builder = new mutable.Builder[String, History] {
-    val buffer = mutable.Buffer.empty[String]
-    def +=(elem: String): this.type = {buffer += elem; this}
-
-    def result(): History = new History(buffer.toVector)
-
-    def clear(): Unit = buffer.clear()
-  }
-  implicit def cbf = new CanBuildFrom[History, String, History]{
-    def apply(from: History) = builder
-    def apply() = builder
-  }
-  implicit def toHistory(s: Seq[String]): History = new History(s.toVector)
-
-  import pprint._
-  implicit val historyPPrint: pprint.PPrint[History] = pprint.PPrint(
-    new pprint.PPrinter[History]{
-      def render0(t: History, c: pprint.Config) = {
-        t.iterator.flatMap(Iterator("\n", _))
-      }
-    }
-  )
-
-}
-

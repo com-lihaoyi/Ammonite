@@ -1,26 +1,59 @@
 package ammonite.main
 import acyclic.file
 import ammonite.interp.ImportHook
+import ammonite.interp.ImportHook.InterpreterInterface
 import ammonite.main.Router.{ArgSig, EntryPoint}
 import ammonite.ops._
 import ammonite.util.Name.backtickWrap
-import ammonite.util.{Name, Res, Util}
-import fastparse.Utils._
+import ammonite.util.{Name, pathToPackageWrapper, Res}
+
+import scala.annotation.switch
 
 /**
   * Logic around using Ammonite as a script-runner; invoking scripts via the
   * macro-generated [[Router]], and pretty-printing any output or error messages
   */
 object Scripts {
+
+
+  /**
+    * Convert a string to a C&P-able literal. Basically
+    * copied verbatim from the uPickle source code.
+    */
+  def literalize(s: String, unicode: Boolean = true) = {
+    val sb = new StringBuilder
+    sb.append('"')
+    var i = 0
+    val len = s.length
+    while (i < len) {
+      (s.charAt(i): @switch) match {
+        case '"' => sb.append("\\\"")
+        case '\\' => sb.append("\\\\")
+        case '\b' => sb.append("\\b")
+        case '\f' => sb.append("\\f")
+        case '\n' => sb.append("\\n")
+        case '\r' => sb.append("\\r")
+        case '\t' => sb.append("\\t")
+        case c =>
+          if (c < ' ' || (c > '~' && unicode)) sb.append("\\u%04x" format c.toInt)
+          else sb.append(c)
+      }
+      i += 1
+    }
+    sb.append('"')
+
+  }
+
+
   def runScript(wd: Path,
                 path: Path,
-                repl: ammonite.main.Repl,
+                intp: InterpreterInterface,
                 mainMethodName: Option[String],
                 args: Seq[String],
                 kwargs: Seq[(String, String)]) = {
-    val (pkg, wrapper) = Util.pathToPackageWrapper(path, wd)
+    val (pkg, wrapper) = pathToPackageWrapper(path, wd)
     for{
-      imports <- repl.interp.processModule(
+      imports <- intp.processModule(
         ImportHook.Source.File(path),
         read(path),
         wrapper,
@@ -28,10 +61,10 @@ object Scripts {
         autoImport = true
       )
       _ <- {
-        repl.interp.reInit()
+        intp.reInit()
 
         val fullName = (pkg :+ wrapper).map(_.backticked).mkString(".")
-        repl.interp.processModule(
+        intp.processModule(
           ImportHook.Source.File(cwd/"<console>"),
           s"val routes = ammonite.main.Router.generateRoutes[$fullName.type]($fullName)",
           Name("MainRouter"),
@@ -40,7 +73,7 @@ object Scripts {
         )
       }
       entryPoints =
-        repl.interp
+        intp
             .eval
             .sess
             .frames

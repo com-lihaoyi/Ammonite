@@ -18,10 +18,10 @@ import scala.collection.mutable
   * in particular ways: `imports` can only be updated via `mergeImports`,
   * while `classpath` can only be added to.
   */
-class Frame(val classloader: SpecialClassLoader,
-            val pluginClassloader: SpecialClassLoader,
-            private[this] var imports0: Imports,
-            private[this] var classpath0: Seq[java.io.File]){
+class FrameImpl(val classloader: SpecialClassLoader,
+                val pluginClassloader: SpecialClassLoader,
+                private[this] var imports0: Imports,
+                private[this] var classpath0: Seq[java.io.File]) extends Frame {
   def imports = imports0
   def classpath = classpath0
   def addImports(additional: Imports) = {
@@ -33,7 +33,7 @@ class Frame(val classloader: SpecialClassLoader,
   }
 }
 
-object SpecialClassLoader{
+object SpecialClassLoaderImpl{
   val simpleNameRegex = "[a-zA-Z0-9_]+".r
 
   /**
@@ -79,8 +79,8 @@ object SpecialClassLoader{
   *
   * http://stackoverflow.com/questions/3544614/how-is-the-control-flow-to-findclass-of
   */
-class SpecialClassLoader(parent: ClassLoader, parentSignature: Seq[(Path, Long)])
-  extends URLClassLoader(Array(), parent){
+class SpecialClassLoaderImpl(parent: ClassLoader, parentSignature: Seq[(Path, Long)])
+  extends URLClassLoader(Array(), parent) with SpecialClassLoader{
 
   /**
     * Files which have been compiled, stored so that our special
