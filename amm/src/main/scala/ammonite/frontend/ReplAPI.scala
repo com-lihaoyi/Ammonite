@@ -2,7 +2,6 @@ package ammonite.frontend
 
 import java.io.File
 
-import ammonite.tools.Resolver
 import ammonite.ops._
 import ammonite.util.{Bind, CodeColors, Colors, Ref}
 import ammonite.interp.{Frame, History}

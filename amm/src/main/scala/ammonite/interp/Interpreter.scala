@@ -1,6 +1,6 @@
 package ammonite.interp
 
-import ammonite.tools.{IvyThing, Resolver, Resolvers}
+import ammonite.tools.{IvyThing, Resolvers}
 import java.io.{File, OutputStream}
 import java.nio.file.NotDirectoryException
 
