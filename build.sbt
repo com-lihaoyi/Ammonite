@@ -126,12 +126,28 @@ lazy val `amm-api` = project
   )
 
 /**
+ * Extra tools available to users in Ammonite sessions. These are less
+ * essential and could be made optional.
+ */
+lazy val `amm-tools` = project
+  .dependsOn(`amm-api`, terminal, ops)
+  .settings(
+    macroSettings,
+    sharedSettings,
+    crossVersion := CrossVersion.full,
+    name := "ammonite-tools",
+    libraryDependencies ++= Seq(
+      "com.github.scopt" %% "scopt" % "3.4.0"
+    )
+  )
+
+/**
  * A better Scala REPL, which can be dropped in into any project or run
  * standalone in a Scala project to provide a better interactive experience
  * for Scala
  */
 lazy val amm = project
-  .dependsOn(`amm-api`, terminal, ops)
+  .dependsOn(`amm-api`, `amm-tools`, terminal, ops)
   .settings(
     macroSettings,
     sharedSettings,
@@ -267,5 +283,5 @@ lazy val tested = project
 
 lazy val published = project
   .in(file("target/published"))
-  .aggregate(ops, shell, terminal, `amm-api`, amm, sshd)
+  .aggregate(ops, shell, terminal, `amm-api`, `amm-tools`, amm, sshd)
   .settings(dontPublishSettings)
