@@ -19,9 +19,9 @@ object BuiltinTests extends TestSuite{
 
         @ // Ammonite on Linux/OSX and JLineWindows on Windows
 
-        @ repl.frontEnd() = ammonite.frontend.FrontEnd.JLineUnix
+        @ repl.frontEnd() = ammonite.frontend.FrontEnds.JLineUnix
 
-        @ repl.frontEnd() = ammonite.frontend.FrontEnd.JLineWindows
+        @ repl.frontEnd() = ammonite.frontend.FrontEnds.JLineWindows
 
         @ repl.frontEnd() = ammonite.frontend.AmmoniteFrontEnd()
 
