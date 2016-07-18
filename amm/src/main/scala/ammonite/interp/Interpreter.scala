@@ -56,7 +56,8 @@ class Interpreter(prompt0: Ref[String],
 
 
   val mainThread = Thread.currentThread()
-  val eval = new EvaluatorImpl(mainThread.getContextClassLoader, 0, timer)
+  def startClassLoader = Interpreter.startClassLoader(mainThread.getContextClassLoader)
+  val eval = new EvaluatorImpl(startClassLoader, 0, timer)
 
   val dynamicClasspath = new VirtualDirectory("(memory)", None)
   var compiler: Compiler = null
@@ -74,8 +75,9 @@ class Interpreter(prompt0: Ref[String],
     // Otherwise activating autocomplete makes the presentation compiler mangle
     // the shared settings and makes the main compiler sad
     val settings = Option(compiler).fold(new Settings)(_.compiler.settings.copy)
+    val initClasspath = Classpath.classpath(eval.sess.frames.head.classloader)
     compiler = Compiler(
-      Classpath.classpath ++ eval.sess.frames.head.classpath,
+      initClasspath ++ eval.sess.frames.head.classpath,
       dynamicClasspath,
       evalClassloader,
       eval.sess.frames.head.pluginClassloader,
@@ -84,7 +86,7 @@ class Interpreter(prompt0: Ref[String],
       timer
     )
     pressy = Pressy(
-      Classpath.classpath ++ eval.sess.frames.head.classpath,
+      initClasspath ++ eval.sess.frames.head.classpath,
       dynamicClasspath,
       evalClassloader,
 
@@ -769,5 +771,28 @@ object Interpreter{
     Name(wrapperName.raw + (if (wrapperIndex == 1) "" else "_" + wrapperIndex))
   }
 
+  def startClassLoader(loader: ClassLoader): ClassLoader = {
+
+    def baseClassLoaderOpt(from: ClassLoader, id: String): Option[ClassLoader] =
+      if (from == null)
+        None
+      else {
+        val isBaseClassLoader = try {
+          val from0 = from.asInstanceOf[Object { def getIsolationTargets: Array[String] }]
+          from0.getIsolationTargets.contains(id)
+        } catch {
+          case e: Exception =>
+            false
+        }
+
+        if (isBaseClassLoader)
+          Some(from)
+        else
+          baseClassLoaderOpt(from.getParent, id)
+      }
+
+    baseClassLoaderOpt(loader, "ammonite")
+      .getOrElse(loader)
+  }
 
 }
