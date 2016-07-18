@@ -57,7 +57,7 @@ class Interpreter(prompt0: Ref[String],
 
 
   val mainThread = Thread.currentThread()
-  val eval = Evaluator(mainThread.getContextClassLoader, 0, timer)
+  val eval = new EvaluatorImpl(mainThread.getContextClassLoader, 0, timer)
 
   val dynamicClasspath = new VirtualDirectory("(memory)", None)
   var compiler: Compiler = null
@@ -264,12 +264,12 @@ class Interpreter(prompt0: Ref[String],
 
   def compileClass(processed: Preprocessor.Output,
                    printer: Printer,
-                   fileName: String): Res[(Util.ClassFiles, Imports)] = for {
+                   fileName: String): Res[(ClassFiles, Imports)] = for {
     compiled <- Res.Success{
       compiler.compile(processed.code.getBytes, printer, processed.prefixCharLength, fileName)
     }
     _ = _compilationCount += 1
-    (classfiles, imports) <- Res[(Util.ClassFiles, Imports)](
+    (classfiles, imports) <- Res[(ClassFiles, Imports)](
       compiled,
       "Compilation Failed"
     )
@@ -284,7 +284,7 @@ class Interpreter(prompt0: Ref[String],
                    fileName: String,
                    indexedWrapperName: Name): Res[Evaluated] = timer{
     for{
-      _ <- Catching{ case e: ThreadDeath => Evaluator.interrupted(e) }
+      _ <- Catching{ case e: ThreadDeath => EvaluatorImpl.interrupted(e) }
       (classFiles, newImports) <- compileClass(
         processed,
         printer,

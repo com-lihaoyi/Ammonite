@@ -3,9 +3,9 @@ package ammonite.interp
 import acyclic.file
 import ammonite.ops._
 import ammonite.util.Parsers.ImportTree
-import ammonite.util.{Imports, Parsers, StableRef, Timer}
+import ammonite.util.{ClassFiles, Imports, Parsers, StableRef, Timer}
 import ammonite.util.Codecs._
-import ammonite.util.Util.{CacheOutput, ClassFiles, CompileCache, IvyMap}
+import ammonite.util.Util.{CacheOutput, CompileCache, IvyMap}
 import org.apache.ivy.plugins.resolver.RepositoryResolver
 
 import scala.util.Try

@@ -3,8 +3,7 @@ package ammonite.interp
 import java.io.OutputStream
 
 import acyclic.file
-import ammonite.util.{ImportData, Imports, Printer, Timer}
-import ammonite.util.Util.ClassFiles
+import ammonite.util.{ClassFiles, ImportData, Imports, Printer, Timer}
 
 import scala.collection.mutable
 import scala.reflect.internal.util.Position
