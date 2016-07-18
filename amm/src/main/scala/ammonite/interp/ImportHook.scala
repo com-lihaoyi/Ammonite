@@ -108,7 +108,7 @@ object ImportHook{
                 ))
 
                 Result.Source(
-                  read(filePath),
+                  Util.normalizeNewlines(read(filePath)),
                   wrapper,
                   pkg,
                   ImportHook.Source.File(filePath),

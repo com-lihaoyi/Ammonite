@@ -6,6 +6,7 @@ import ammonite.terminal.LazyList
 
 import scala.annotation.tailrec
 
+import ammonite.util.Util.newLine
 /**
  * Created by haoyi on 8/29/15.
  */
@@ -26,7 +27,7 @@ object FrontEndUtils {
     ammonite.util.Util.transpose(grouped).iterator.flatMap{
       case first :+ last => first.map(
         x => x ++ " " * (width / columns - x.length)
-      ) :+ last :+ fansi.Str("\n")
+      ) :+ last :+ fansi.Str(newLine)
     }.map(_.render)
   }
 
@@ -41,7 +42,7 @@ object FrontEndUtils {
                        details: Seq[String]): List[String] = {
 
     val prelude =
-      if (details.length != 0 || completions.length != 0) List("\n")
+      if (details.length != 0 || completions.length != 0) List(newLine)
       else Nil
 
     val detailsText =

@@ -4,7 +4,7 @@ import java.io.OutputStream
 
 import acyclic.file
 import ammonite.util.{ImportData, Imports, Printer, Timer}
-import ammonite.util.Util.ClassFiles
+import ammonite.util.Util.{ClassFiles, newLine}
 
 import scala.collection.mutable
 import scala.reflect.internal.util.Position
@@ -338,7 +338,7 @@ object Compiler{
       reporter.reset()
       val parser = compiler.newUnitParser(line)
       val trees = CompilerCompatibility.trees(compiler)(parser)
-      if (reporter.hasErrors) Left(errors.mkString("\n"))
+      if (reporter.hasErrors) Left(errors.mkString(newLine))
       else Right(trees)
     }
   }

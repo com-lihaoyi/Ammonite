@@ -9,6 +9,7 @@ import java.io.{BufferedReader, InputStreamReader}
 
 import ammonite.ops._
 import ammonite.terminal.Strings
+import ammonite.util.Util.newLine
 
 import scala.collection.{GenTraversableOnce, mutable}
 import scala.util.matching.Regex
@@ -128,7 +129,7 @@ object GrepResult{
       }
       generateSnippet()
 
-      Iterator(outputSnippets.mkString("\n"))
+      Iterator(outputSnippets.mkString(newLine))
     }
 }
 

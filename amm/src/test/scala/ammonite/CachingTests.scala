@@ -4,7 +4,7 @@ import ammonite.interp.{History, Interpreter, Storage}
 import ammonite.main.Defaults
 import ammonite.ops._
 import ammonite.tools.IvyConstructor._
-import ammonite.util.{Colors, Printer, Ref, Timer}
+import ammonite.util.{Colors, Printer, Ref, Timer, Util}
 import utest._
 
 object CachingTests extends TestSuite{
@@ -82,7 +82,11 @@ object CachingTests extends TestSuite{
       'testThree - check('scriptLevelCaching/"QuickSort.sc")
       'testLoadModule - check('scriptLevelCaching/"testLoadModule.sc")
       'testFileImport - check('scriptLevelCaching/"testFileImport.sc")
-      'testIvyImport - check('scriptLevelCaching/"ivyCacheTest.sc")
+      'testIvyImport -{
+        if(!Util.windowsPlatform){
+          check('scriptLevelCaching/"ivyCacheTest.sc")
+        }
+      }
 
     }
 
@@ -126,14 +130,16 @@ object CachingTests extends TestSuite{
       assert(n2 == 0) // all three should be cached
     }
     'tags{
-      val storage = Storage.InMemory()
-      val interp = createTestInterp(storage)
-      interp.replApi.load.module(scriptPath/"TagBase.sc")
-      interp.replApi.load.module(scriptPath/"TagPrevCommand.sc")
-      interp.replApi.load.ivy("com.lihaoyi" %% "scalatags" % "0.4.5")
-      interp.replApi.load.module(scriptPath/"TagBase.sc")
-      val n = storage.compileCache.size
-      assert(n == 5) // predef + two blocks for initial load
+      if (!Util.windowsPlatform){
+        val storage = Storage.InMemory()
+        val interp = createTestInterp(storage)
+        interp.replApi.load.module(scriptPath/"TagBase.sc")
+        interp.replApi.load.module(scriptPath/"TagPrevCommand.sc")
+        interp.replApi.load.ivy("com.lihaoyi" %% "scalatags" % "0.4.5")
+        interp.replApi.load.module(scriptPath/"TagBase.sc")
+        val n = storage.compileCache.size
+        assert(n == 5) // predef + two blocks for initial load
+      }
     }
 
     'changeScriptInvalidation{
@@ -143,49 +149,50 @@ object CachingTests extends TestSuite{
       // to the script being run. For each change, the caches should be
       // invalidated, and subsequently a single compile should be enough
       // to re-fill the caches
+      if(!Util.windowsPlatform){
+        val predefFile = tmp("""
+          val x = 1337
+          @
+          val y = x
+          import $ivy.`com.lihaoyi::scalatags:0.5.4`, scalatags.Text.all._
+          """)
+        val scriptFile = tmp("""div("<('.'<)", y).render""")
 
-      val predefFile = tmp("""
-      val x = 1337
-      @
-      val y = x
-      import $ivy.`com.lihaoyi::scalatags:0.5.4`, scalatags.Text.all._
-      """)
-      val scriptFile = tmp("""div("<('.'<)", y).render""")
+        def processAndCheckCompiler(f: ammonite.interp.Compiler => Boolean) ={
+          val interp = createTestInterp(
+            new Storage.Folder(tempDir){
+              override val predef = predefFile
+            },
+            Defaults.predefString
+          )
+          interp.replApi.load.module(scriptFile)
+          assert(f(interp.compiler))
+        }
 
-      def processAndCheckCompiler(f: ammonite.interp.Compiler => Boolean) = {
-        val interp = createTestInterp(
-          new Storage.Folder(tempDir){
-            override val predef = predefFile
-          },
-          Defaults.predefString
+        processAndCheckCompiler(_ != null)
+        processAndCheckCompiler(_ == null)
+
+        rm! predefFile
+        write(
+          predefFile,
+          """
+          import $ivy.`com.lihaoyi::scalatags:0.5.4`; import scalatags.Text.all._
+          val y = 31337
+          """
         )
-        interp.replApi.load.module(scriptFile)
-        assert(f(interp.compiler))
+
+        processAndCheckCompiler(_ != null)
+        processAndCheckCompiler(_ == null)
+
+        rm! scriptFile
+        write(
+          scriptFile,
+          """div("(>'.')>", y).render"""
+        )
+
+        processAndCheckCompiler(_ != null)
+        processAndCheckCompiler(_ == null)
       }
-
-      processAndCheckCompiler(_ != null)
-      processAndCheckCompiler(_ == null)
-
-      rm! predefFile
-      write(
-        predefFile,
-        """
-        import $ivy.`com.lihaoyi::scalatags:0.5.4`; import scalatags.Text.all._
-        val y = 31337
-        """
-      )
-
-      processAndCheckCompiler(_ != null)
-      processAndCheckCompiler(_ == null)
-
-      rm! scriptFile
-      write(
-        scriptFile,
-        """div("(>'.')>", y).render"""
-      )
-
-      processAndCheckCompiler(_ != null)
-      processAndCheckCompiler(_ == null)
     }
   }
 }

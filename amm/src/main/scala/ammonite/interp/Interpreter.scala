@@ -15,7 +15,7 @@ import annotation.tailrec
 import ammonite._
 import ammonite.frontend._
 import ammonite.util.Parsers.ImportTree
-import ammonite.util.Util.CacheDetails
+import ammonite.util.Util.{CacheDetails, newLine, normalizeNewlines}
 import ammonite.util._
 import pprint.{Config, PPrint, PPrinter}
 import ammonite.terminal.Filter
@@ -109,7 +109,7 @@ class Interpreter(prompt0: Ref[String],
     val ${b.name} =
       ammonite.frontend.ReplBridge.repl.replArgs($idx).value.asInstanceOf[${b.typeTag.tpe}]
     """
-  }.mkString("\n")
+  }.mkString(newLine)
 
   val importHooks = Ref(Map[Seq[String], ImportHook](
     Seq("file") -> ImportHook.File,
@@ -638,13 +638,13 @@ class Interpreter(prompt0: Ref[String],
         case _ =>
       }
 
-      def exec(file: Path): Unit = apply(read(file))
+      def exec(file: Path): Unit = apply(normalizeNewlines(read(file)))
 
       def module(file: Path) = {
         val (pkg, wrapper) = Util.pathToPackageWrapper(file, wd)
         processModule(
           ImportHook.Source.File(wd/"Main.sc"),
-          read(file),
+          normalizeNewlines(read(file)),
           wrapper,
           pkg,
           true
@@ -687,7 +687,7 @@ class Interpreter(prompt0: Ref[String],
 
     def show[T: PPrint](implicit cfg: Config) = (t: T) => {
       pprint.tokenize(t, height = 0)(implicitly[PPrint[T]], cfg).foreach(printer.out)
-      printer.out("\n")
+      printer.out(newLine)
     }
     def show[T: PPrint](t: T,
                         width: Integer = null,
@@ -699,7 +699,7 @@ class Interpreter(prompt0: Ref[String],
 
       pprint.tokenize(t, width, height, indent, colors)(implicitly[PPrint[T]], cfg)
             .foreach(printer.out)
-      printer.out("\n")
+      printer.out(newLine)
     }
 
     def search(target: scala.reflect.runtime.universe.Type) = {
@@ -757,7 +757,7 @@ object Interpreter{
 
   def skipSheBangLine(code: String)= {
     if (code.startsWith(SheBang))
-      code.substring(code.indexOf('\n'))
+      code.substring(code.indexOf(newLine))
     else
       code
   }

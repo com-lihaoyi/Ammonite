@@ -1,5 +1,6 @@
 package ammonite.integration
 import ammonite.ops._
+import ammonite.util.Util
 import utest._
 import TestUtils._
 
@@ -13,36 +14,51 @@ object LineNumberTests extends TestSuite{
   val tests = this{
 
     def checkErrorMessage(file: RelPath, expected: String) = {
-      val e = intercept[ShelloutException]{ 
+      val e = intercept[ShelloutException]{
         exec(file)
-      }.result.err.string.replace("\r", "").replace("\n", System.lineSeparator())
-      assert(e.contains(expected.replace("\n", System.lineSeparator())))
+      }.result.err.string
+      assert(e.contains(Util.normalizeNewlines(expected)))
     }
 
-    'errorTest - checkErrorMessage(
-      file = 'lineNumbers/"ErrorLineNumberTest.sc",
-      expected =
-        """Syntax Error: ("}" | `case`):5:24 ...")\n  }\n\n  d"
-          |    printlnqs(unsorted))
-          |                       ^""".stripMargin
-    )
+    //All Syntax Error tests currently don't pass on windows as fastparse gives out some 10
+    //surrounding chars which are different on windows and linux due to `\n` and `\r\n`
+    //as `\r\n` counts as 2 so less number of surrounding chars are shown on windows
+    'errorTest - {
+      if(!Util.windowsPlatform) {
+        checkErrorMessage(
+          file = 'lineNumbers / "ErrorLineNumberTest.sc",
+          expected =
+            """Syntax Error: ("}" | `case`):5:24 ...")\n  }\n\n  d"
+              |    printlnqs(unsorted))
+              |                       ^""".stripMargin
+        )
+      }
+    }
 
-    'multipleCompilationUnitErrorTest1 - checkErrorMessage(
-      file = 'lineNumbers/"MultipleCompilationUnitErrorMsgTest1.sc",
-      expected =
-        """Syntax Error: End:5:1 ..."}"
-          |}
-          |^""".stripMargin
-    )
+    'multipleCompilationUnitErrorTest1 - {
+      if(!Util.windowsPlatform) {
+        checkErrorMessage(
+          file = 'lineNumbers/"MultipleCompilationUnitErrorMsgTest1.sc",
+          expected =
+            """Syntax Error: End:5:1 ..."}"
+              |}
+              |^""".stripMargin
+        )
+      }
+    }
 
 
-    'multipleCompilationUnitErrorTest2 - checkErrorMessage(
-      file = 'lineNumbers/"MultipleCompilationUnitErrorMsgTest2.sc",
-      expected =
-        """Syntax Error: End:3:1 ..."}\n@\n1 + 1"
-          |}
-          |^""".stripMargin
-    )
+    'multipleCompilationUnitErrorTest2 - {
+      if(!Util.windowsPlatform) {
+        checkErrorMessage(
+          file = 'lineNumbers/"MultipleCompilationUnitErrorMsgTest2.sc",
+          expected =
+            """Syntax Error: End:3:1 ..."}\n@\n1 + 1"
+              |}
+              |^""".stripMargin
+        )
+      }
+    }
 
     'compilationErrorWithCommentsAtTop - checkErrorMessage(
       file = 'lineNumbers/"compilationErrorWithCommentsAtTop.sc",
