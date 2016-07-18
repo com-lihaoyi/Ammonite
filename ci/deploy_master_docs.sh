@@ -7,9 +7,7 @@ chmod 600 deploy_key
 ssh-add deploy_key
 
 # Generate the readme
-#sbt readme/run
-mkdir -p readme/target/scalatex
-echo "Hello" > readme/target/scalatex/index.html
+sbt readme/run
 
 # Set up git so we can actually do things with it
 git config --global user.email "haoyi.sg+travis@gmail.com"
