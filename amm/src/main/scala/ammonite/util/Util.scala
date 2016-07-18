@@ -6,7 +6,6 @@ package ammonite.util
 import java.security.MessageDigest
 import acyclic.file
 import ammonite.ops._
-import ammonite.util.Parsers.ImportTree
 
 trait Timer{
   def apply[T](t: => T)(implicit n: sourcecode.Enclosing): T
@@ -37,17 +36,6 @@ object Timer{
 
 object Util{
 
-  def pathToPackageWrapper(path: Path, wd: Path): (Seq[Name], Name) = {
-    val pkg = {
-      val base = Seq("$file")
-      val relPath = (path/up).relativeTo(wd)
-      val ups = Seq.fill(relPath.ups)("..")
-      val rest = relPath.segments
-      (base ++ ups ++ rest).map(Name(_))
-    }
-    val wrapper = path.last.take(path.last.lastIndexOf('.'))
-    (pkg, Name(wrapper))
-  }
   def md5Hash(data: Iterator[Array[Byte]]) = {
     val digest = MessageDigest.getInstance("MD5")
     data.foreach(digest.update)

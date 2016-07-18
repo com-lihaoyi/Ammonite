@@ -4,7 +4,7 @@ import ammonite.interp.ImportHook
 import ammonite.main.Router.{ArgSig, EntryPoint}
 import ammonite.ops._
 import ammonite.util.Name.backtickWrap
-import ammonite.util.{Name, Res, Util}
+import ammonite.util.{Name, pathToPackageWrapper, Res}
 
 import scala.annotation.switch
 
@@ -50,7 +50,7 @@ object Scripts {
                 mainMethodName: Option[String],
                 args: Seq[String],
                 kwargs: Seq[(String, String)]) = {
-    val (pkg, wrapper) = Util.pathToPackageWrapper(path, wd)
+    val (pkg, wrapper) = pathToPackageWrapper(path, wd)
     for{
       imports <- repl.interp.processModule(
         ImportHook.Source.File(path),

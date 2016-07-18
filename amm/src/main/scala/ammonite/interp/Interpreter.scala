@@ -14,7 +14,6 @@ import fastparse.all._
 import annotation.tailrec
 import ammonite._
 import ammonite.frontend._
-import ammonite.util.Parsers.ImportTree
 import ammonite.util.Util.CacheDetails
 import ammonite.util._
 import pprint.{Config, PPrint, PPrinter}
@@ -112,13 +111,13 @@ class Interpreter(prompt0: Ref[String],
   }.mkString("\n")
 
   val importHooks = Ref(Map[Seq[String], ImportHook](
-    Seq("file") -> ImportHook.File,
-    Seq("exec") -> ImportHook.Exec,
-    Seq("url") -> ImportHook.Http,
-    Seq("ivy") -> ImportHook.Ivy,
-    Seq("cp") -> ImportHook.Classpath,
-    Seq("plugin", "ivy") -> ImportHook.PluginIvy,
-    Seq("plugin", "cp") -> ImportHook.PluginClasspath
+    Seq("file") -> ImportHooks.File,
+    Seq("exec") -> ImportHooks.Exec,
+    Seq("url") -> ImportHooks.Http,
+    Seq("ivy") -> ImportHooks.Ivy,
+    Seq("cp") -> ImportHooks.Classpath,
+    Seq("plugin", "ivy") -> ImportHooks.PluginIvy,
+    Seq("plugin", "cp") -> ImportHooks.PluginClasspath
   ))
 
   val predefs = Seq(
@@ -641,7 +640,7 @@ class Interpreter(prompt0: Ref[String],
       def exec(file: Path): Unit = apply(read(file))
 
       def module(file: Path) = {
-        val (pkg, wrapper) = Util.pathToPackageWrapper(file, wd)
+        val (pkg, wrapper) = pathToPackageWrapper(file, wd)
         processModule(
           ImportHook.Source.File(wd/"Main.sc"),
           read(file),

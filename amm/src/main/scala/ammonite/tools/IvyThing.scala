@@ -12,13 +12,14 @@ import org.apache.ivy.plugins.resolver._
 import acyclic.file
 import IvyThing._
 import ammonite.frontend.Resolver
+import ammonite.util.scalaBinaryVersion
 
 
 object IvyConstructor extends IvyConstructor
 trait IvyConstructor{
   implicit class GroupIdExt(groupId: String){
     def %(artifactId: String) = (groupId, artifactId)
-    def %%(artifactId: String) = (groupId, artifactId + "_" + IvyThing.scalaBinaryVersion)
+    def %%(artifactId: String) = (groupId, artifactId + "_" + scalaBinaryVersion)
   }
   implicit class ArtifactIdExt(t: (String, String)){
     def %(version: String) = (t._1, t._2, version)
@@ -130,14 +131,6 @@ object IvyThing {
       // creates an Ivy instance with settings
       ivySettings
     }
-    
-  val scalaBinaryVersion =
-    scala.util.Properties
-              .versionString
-              .stripPrefix("version ")
-              .split('.')
-              .take(2)
-              .mkString(".")
   
 }
 

@@ -9,11 +9,6 @@ object Parsers {
 
   // For some reason Scala doesn't import this by default
   val `_` = scalaparse.Scala.`_`
-  type ImportMapping = Seq[(String, Option[String])]
-  case class ImportTree(prefix: Seq[String],
-                        mappings: Option[ImportMapping],
-                        start: Int,
-                        end: Int)
   val ImportSplitter: P[Seq[ImportTree]] = {
     val IdParser = P( (Id | `_` ).! ).map(
       s => if (s(0) == '`') s.drop(1).dropRight(1) else s
