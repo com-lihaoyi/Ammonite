@@ -1,8 +1,8 @@
 @import Main._
 @import readme.Sample._
 @import ammonite.ops._
-@val ammoniteTests = 'amm/'src/'test/'scala/'amm/'session
-@val replSource = 'amm/'src/'main/'scala/'amm
+@val ammoniteTests = 'amm/'src/'test/'scala/'ammonite/'session
+@val replSource = 'amm/'src/'main/'scala/'ammonite
 @val advancedTests = ammoniteTests/"AdvancedTests.scala"
 @sect("Ammonite Cookbook", "Fun with Scala-Scriping!")
   @p
@@ -353,7 +353,7 @@
       Obviously we did not go very deep into the field. If you did, it would definitely be a lot more reading and understanding than just blindly following tutorials like I did above, and you probably would find it worth the time to set up a proper project. Nevertheless, this quick 5-minute run through of how to perform the basics of NLP is a fun way to get started whether or not you decide to take it further, and is only possible because of the Ammonite REPL!
 
   @sect{Play Framework Server}
-    @hl.ref('integration/'src/'test/'resources/'ammonite/'integration/'basic/"PlayFramework.scala")
+    @hl.ref('integration/'src/'test/'resources/'ammonite/'integration/'basic/"PlayFramework.sc")
 
     @p
       Ammonite's script-running capabilities can also be used as a way to set up lightweight Scala projects without needing SBT or an IDE to get started. For example, here is a single-file @lnk("Play Framework", "https://www.playframework.com/") test that
