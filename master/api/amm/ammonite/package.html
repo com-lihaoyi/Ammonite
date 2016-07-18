@@ -1,0 +1,281 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <title>ammonite - ammonite</title>
+          <meta name="description" content="ammonite - ammonite" />
+          <meta name="keywords" content="ammonite ammonite" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../lib/template.js"></script>
+      <script type="text/javascript" src="../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../index.html';
+            var hash = 'ammonite.package';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <img alt="Package" src="../lib/package_big.png" />
+        
+        <h1>ammonite</h1><span class="permalink">
+      <a href="../index.html#ammonite.package" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ammonite</span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        
+        
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="ammonite.Main" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="MainextendsProductwithSerializable"></a>
+      <a id="Main:Main"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Main.html"><span class="name">Main</span></a><span class="params">(<span name="predef">predef: <span class="extype" name="scala.Predef.String">String</span> = <span class="symbol">&quot;&quot;</span></span>, <span name="defaultPredef">defaultPredef: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Boolean" class="extype" target="_top">Boolean</a> = <span class="symbol">true</span></span>, <span name="storageBackend">storageBackend: <a href="interp/Storage.html" class="extype" name="ammonite.interp.Storage">Storage</a> = <span class="defval" name='<span class="name"><a href="interp/Storage$.html">new Storage.Folder(Defaults.ammoniteHome)</a></span>'>...</span></span>, <span name="wd">wd: <span class="extype" name="ammonite.ops.Path">Path</span> = <span class="symbol"><span class="name"><a href="">ammonite.ops.cwd</a></span></span></span>, <span name="welcomeBanner">welcomeBanner: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Option" class="extype" target="_top">Option</a>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol"><span class="name"><a href="">Some(Defaults.welcomeBanner)</a></span></span></span>, <span name="inputStream">inputStream: <span class="extype" name="java.io.InputStream">InputStream</span> = <span class="symbol">System.in</span></span>, <span name="outputStream">outputStream: <span class="extype" name="java.io.OutputStream">OutputStream</span> = <span class="symbol">System.out</span></span>, <span name="errorStream">errorStream: <span class="extype" name="java.io.OutputStream">OutputStream</span> = <span class="symbol">System.err</span></span>, <span name="timer">timer: <a href="util/Timer.html" class="extype" name="ammonite.util.Timer">Timer</a> = <span class="symbol"><span class="name"><a href="">Timer.none</a></span></span></span>)</span><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#ammonite.package@MainextendsProductwithSerializable" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Contains the various entry points to the Ammonite REPL.</p><div class="fullcomment"><div class="comment cmt"><p>Contains the various entry points to the Ammonite REPL.</p><p>Configuration of the basic REPL is done by passing in arguments when
+constructing the <a href="Main.html" class="extype" name="ammonite.Main">Main</a> instance, and the various entrypoints such
+as <a href="Main.html#run(replArgs:ammonite.util.Bind[_]*):Any" class="extmbr" name="ammonite.Main#run">run</a> <a href="Main.html#runScript(path:ammonite.ops.Path,mainMethodName:Option[String],args:Seq[String],kwargs:Seq[(String,String)]):ammonite.util.Res[ammonite.util.Imports]" class="extmbr" name="ammonite.Main#runScript">runScript</a> and so on are methods on that instance.</p><p>It is more or less equivalent to the <a href="main/Repl.html" class="extype" name="ammonite.main.Repl">ammonite.main.Repl</a> object itself, and has
+a similar set of parameters, but does not have any of the <a href="main/Repl.html" class="extype" name="ammonite.main.Repl">ammonite.main.Repl</a>'s
+implementation-related code and provides a more convenient set of
+entry-points that a user can call.</p><p>Note that the <a href="Main.html#instantiateRepl(replArgs:Seq[ammonite.util.Bind[_]]):ammonite.main.Repl" class="extmbr" name="ammonite.Main#instantiateRepl">instantiateRepl</a> function generates a new <span class="extype" name="Repl">Repl</span>
+every time it is called!
+</p></div><dl class="paramcmts block"><dt class="param">predef</dt><dd class="cmt"><p>Any additional code you want to run before the REPL session
+              starts. Can contain multiple blocks separated by <code>@</code>s</p></dd><dt class="param">defaultPredef</dt><dd class="cmt"><p>Do you want to include the &quot;standard&quot; predef imports
+                     provided by Ammonite? These include tools like <code>time</code>,
+                     <code>grep</code>, the <code>|</code> or <code>|?</code> pipes from ammonite-ops, and
+                     other helpers. Can be disabled to give a clean
+                     namespace for you to fill using your own predef.</p></dd><dt class="param">storageBackend</dt><dd class="cmt"><p>Where will all of Ammonite's persistent data get
+                      stored? Things like any <code>predef.sc</code> file,
+                      compilation/ivy caches, etc.. Defaults include
+                      <span class="extype" name="Storage.Folder">Storage.Folder</span> and <span class="extype" name="Storage.InMemory">Storage.InMemory</span>, though
+                      you can create your own.</p></dd><dt class="param">wd</dt><dd class="cmt"><p>The working directory of the REPL; when it load scripts, where
+          the scripts will be considered relative to when assigning them
+          packages</p></dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        <div id="values" class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="ammonite.Constants" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Constants"></a>
+      <a id="Constants:Constants"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Constants$.html"><span class="name">Constants</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#ammonite.package@Constants" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="ammonite.Main" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Main"></a>
+      <a id="Main:Main"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Main$.html"><span class="name">Main</span></a><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#ammonite.package@Main" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="ammonite.frontend" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="frontend"></a>
+      <a id="frontend:frontend"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a href="frontend/package.html"><span class="name">frontend</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#ammonite.package@frontend" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Everything to do with the interaction of the Ammonite REPL with the user
+and the terminal.</p><div class="fullcomment"><div class="comment cmt"><p>Everything to do with the interaction of the Ammonite REPL with the user
+and the terminal. Interfacing with ammonite-terminal (or with JLine)
+</p></div></div>
+    </li><li name="ammonite.interp" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="interp"></a>
+      <a id="interp:interp"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a href="interp/package.html"><span class="name">interp</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#ammonite.package@interp" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">What actually lets us compile and execute code in the Ammonite REPL; deals
+with the Scala compiler, preprocessing the strings, JVM classloaders, etc.</p>
+    </li><li name="ammonite.main" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="main"></a>
+      <a id="main:main"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a href="main/package.html"><span class="name">main</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#ammonite.package@main" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Code related to invoking Ammonite from the outside world: default
+configuration, running scripts, printing error messages, etc.</p>
+    </li><li name="ammonite.ops" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ops"></a>
+      <a id="ops:ops"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a href="ops/package.html"><span class="name">ops</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#ammonite.package@ops" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="ammonite.tools" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="tools"></a>
+      <a id="tools:tools"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a href="tools/package.html"><span class="name">tools</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#ammonite.package@tools" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Things that are available inside the Ammonite REPL, are really convenient
+to have available.</p>
+    </li><li name="ammonite.util" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="util"></a>
+      <a id="util:util"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a href="util/package.html"><span class="name">util</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#ammonite.package@util" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>
