@@ -1,26 +1,33 @@
 language: scala
+
 scala:
 - 2.10.5
 - 2.11.4
 - 2.11.8
+
 jdk:
-- oraclejdk7
 - oraclejdk8
 - openjdk7
+
+env:
+- CI_SCRIPT=ci/run_tests.sh SBT_COMMAND=integration/test
+- CI_SCRIPT=ci/run_tests.sh SBT_COMMAND=published/test
+
+matrix:
+  include:
+  - env: CI_SCRIPT=ci/build_docs.sh
+    jdk: oraclejdk8
+    scala: 2.11.8
+
 script:
-# Need to manually shard this into two different commands otherwise
-# it gets whacked by the OOMkiller when run on Travis CI. Not sure why
-- sbt ++$TRAVIS_SCALA_VERSION published/compile
-- sbt ++$TRAVIS_SCALA_VERSION published/test
-- sbt ++$TRAVIS_SCALA_VERSION "integration/test-only -- --truncate=999"
-# Tricks to avoid unnecessary cache updates, from
-# http://www.scala-sbt.org/0.13/docs/Travis-CI-with-sbt.html
-#- find $HOME/.sbt -name "*.lock" | xargs rm
-#- find $HOME/.ivy2 -name "ivydata-*.properties" | xargs rm
-#- find $HOME/.ivy2/cache/com.lihaoyi -name "ammonite-*" | xargs rm -rf
+- $CI_SCRIPT
+# Tricks to avoid unnecessary cache updates
+- find $HOME/.sbt -name "*.lock" | xargs rm
+- find $HOME/.ivy2 -name "ivydata-*.properties" | xargs rm
+
 sudo: false
-# These directories are cached to S3 at the end of the build
-#cache:
-#  directories:
-#    - $HOME/.ivy2/cache
-#    - $HOME/.sbt/boot/
+
+cache:
+  directories:
+    - $HOME/.ivy2/cache
+    - $HOME/.sbt/boot/
