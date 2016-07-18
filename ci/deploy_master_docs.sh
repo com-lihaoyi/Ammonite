@@ -5,6 +5,7 @@ set -euxv
 eval "$(ssh-agent -s)"
 chmod 600 deploy_key
 ssh-add deploy_key
+rm deploy_key
 
 # Generate the readme
 sbt readme/run
