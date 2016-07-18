@@ -16,8 +16,8 @@ git fetch origin gh-pages:gh-pages
 
 # Do all the git-foo to push the readme to the relevant gh-pages folder
 git checkout gh-pages
-mkdir master
-cp -r readme/target/scalatex/* master
+mkdir -p $DOC_FOLDER
+cp -r readme/target/scalatex/* $DOC_FOLDER
 git add -A
 git commit -am $TRAVIS_COMMIT
 git push git@github.com:$TRAVIS_REPO_SLUG.git gh-pages:gh-pages
