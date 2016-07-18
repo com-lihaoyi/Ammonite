@@ -27,6 +27,13 @@ object ImportHook{
     * default this is what is available.
     */
   trait InterpreterInterface{
+    def eval: Evaluator
+    def processModule(source: ImportHook.Source,
+                      code: String,
+                      wrapperName: Name,
+                      pkgName: Seq[Name],
+                      autoImport: Boolean): Res[Imports]
+    def reInit(): Unit
     def wd: Path
     def loadIvy(coordinates: (String, String, String), verbose: Boolean = true): Set[File]
   }

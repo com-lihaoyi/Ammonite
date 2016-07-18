@@ -1,6 +1,7 @@
 package ammonite.main
 import acyclic.file
 import ammonite.interp.ImportHook
+import ammonite.interp.ImportHook.InterpreterInterface
 import ammonite.main.Router.{ArgSig, EntryPoint}
 import ammonite.ops._
 import ammonite.util.Name.backtickWrap
@@ -46,13 +47,13 @@ object Scripts {
 
   def runScript(wd: Path,
                 path: Path,
-                repl: ammonite.main.Repl,
+                intp: InterpreterInterface,
                 mainMethodName: Option[String],
                 args: Seq[String],
                 kwargs: Seq[(String, String)]) = {
     val (pkg, wrapper) = pathToPackageWrapper(path, wd)
     for{
-      imports <- repl.interp.processModule(
+      imports <- intp.processModule(
         ImportHook.Source.File(path),
         read(path),
         wrapper,
@@ -60,10 +61,10 @@ object Scripts {
         autoImport = true
       )
       _ <- {
-        repl.interp.reInit()
+        intp.reInit()
 
         val fullName = (pkg :+ wrapper).map(_.backticked).mkString(".")
-        repl.interp.processModule(
+        intp.processModule(
           ImportHook.Source.File(cwd/"<console>"),
           s"val routes = ammonite.main.Router.generateRoutes[$fullName.type]($fullName)",
           Name("MainRouter"),
@@ -72,7 +73,7 @@ object Scripts {
         )
       }
       entryPoints =
-        repl.interp
+        intp
             .eval
             .sess
             .frames
