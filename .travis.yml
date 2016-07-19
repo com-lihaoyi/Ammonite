@@ -25,4 +25,8 @@ matrix:
 script:
 - $CI_SCRIPT
 
+notifications:
+  email:
+    - haoyi.sg@gmail.com
+
 sudo: false
