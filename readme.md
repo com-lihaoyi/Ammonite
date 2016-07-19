@@ -16,6 +16,12 @@ This is where the code for the [Ammonite](https://lihaoyi.github.io/Ammonite) pr
 
 If you want to learn more about Ammonite or how to use it, check out the links above, or ask on the [Gitter Channel](https://gitter.im/lihaoyi/Ammonite). The remainder of this document is developer-docs for people who want to work on the Ammonite source code itself.
 
+If you are interested in living more "on the edge", we also publish artifacts and the doc-site every commit; the doc-site is available at
+
+- http://lihaoyi.github.io/Ammonite/master
+
+And contains instructions on how to download the per-commit executable or depend on the perf-commit maven artifact.
+
 # Developer Docs
 
 The layout of the repository is roughly:
