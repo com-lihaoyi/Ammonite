@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import os
-import subprocess
+from subprocess import check_call, check_output
 import json
 import sys
 
@@ -12,7 +12,7 @@ is_master_commit = (
 
 
 def update_version():
-    git_hash = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"]).strip()
+    git_hash = check_output(["git", "rev-parse", "--short", "HEAD"]).strip()
     version_txt = """
         package ammonite
         object Constants{
@@ -46,14 +46,18 @@ def publish_signed():
     open("pubring.asc", "w").write(
         json.loads('"' + os.environ['SONATYPE_PGP_PUB_KEY_CONTENTS'] + '"')
     )
-    subprocess.check_call([
-        "sbt",
-        "++2.10.5", "published/publishSigned",
-        "++2.11.8", "published/publishSigned",
-        "+amm/publishSigned",
-        "+sshd/publishSigned"
-    ])
-    subprocess.check_call(["sbt", "sonatypeReleaseAll"])
+    check_call(["sbt", "++2.10.4", "amm/publishSigned", "sshd/publishSigned"])
+    check_call(["sbt", "++2.10.5", "published/publishSigned"])
+    check_call(["sbt", "++2.10.6", "amm/publishSigned", "sshd/publishSigned"])
+
+    check_call(["sbt", "++2.11.3", "amm/publishSigned", "sshd/publishSigned"])
+    check_call(["sbt", "++2.11.4", "amm/publishSigned", "sshd/publishSigned"])
+    check_call(["sbt", "++2.11.5", "amm/publishSigned", "sshd/publishSigned"])
+    check_call(["sbt", "++2.11.6", "amm/publishSigned", "sshd/publishSigned"])
+    check_call(["sbt", "++2.11.7", "amm/publishSigned", "sshd/publishSigned"])
+    check_call(["sbt", "++2.11.8", "published/publishSigned"])
+
+    check_call(["sbt", "sonatypeReleaseAll"])
 
 
 def publish_docs():
@@ -64,7 +68,7 @@ def publish_docs():
         new_env = dict(os.environ, DOC_FOLDER=".")
     else:
         new_env = dict(os.environ, DOC_FOLDER="master")
-    subprocess.check_call("ci/deploy_master_docs.sh", env=new_env)
+    check_call("ci/deploy_master_docs.sh", env=new_env)
 
 
 if sys.argv[1] == "docs":
@@ -72,7 +76,7 @@ if sys.argv[1] == "docs":
         update_version()
         publish_docs()
     else:
-        subprocess.check_call(["sbt", "readme/run"])
+        check_call(["sbt", "readme/run"])
 
 elif sys.argv[1] == "artifacts":
     if is_master_commit:
