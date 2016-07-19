@@ -144,6 +144,24 @@
     @li
       @sect.ref{Talks}
 
+  @p
+    The page at:
+
+  @ul
+    @li
+      @lnk{http://lihaoyi.github.io/Ammonite}
+  @p
+    Is the documentation site for the last stable release of
+    Ammonite: @code{@ammonite.Constants.version}. The Ammonite project also
+    publishes per-commit snapshot builds, for people who are willing to
+    beta-test new features and improvements. For documentation for these
+    snapshot builds and instructions on installing these snapshot builds,
+    check out
+
+  @ul
+    @li
+      @lnk{http://lihaoyi.github.io/Ammonite/master}
+
 @Repl()
 @Scripts()
 @Ops()

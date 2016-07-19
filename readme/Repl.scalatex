@@ -58,7 +58,7 @@
     following to your @code{build.sbt}
 
   @hl.scala
-    libraryDependencies += "com.lihaoyi" % "ammonite-repl" % "@ammonite.Constants.version" % "test" cross CrossVersion.full
+    libraryDependencies += "com.lihaoyi" % "ammonite" % "@ammonite.Constants.version" % "test" cross CrossVersion.full
 
     initialCommands in (Test, console) := """ammonite.Main().run()"""
 
@@ -785,7 +785,7 @@
         it to your dependencies:
 
       @hl.scala
-        libraryDependencies += "com.lihaoyi" % "ammonite-repl" % "@ammonite.Constants.version" cross CrossVersion.full
+        libraryDependencies += "com.lihaoyi" % "ammonite" % "@ammonite.Constants.version" cross CrossVersion.full
 
       @p
         Then instantate it with this code anywhere within your program:
@@ -806,7 +806,7 @@
         snippet:
 
       @hl.scala
-        libraryDependencies += "com.lihaoyi" % "ammonite-repl" % "@ammonite.Constants.version" cross CrossVersion.full
+        libraryDependencies += "com.lihaoyi" % "ammonite" % "@ammonite.Constants.version" cross CrossVersion.full
 
       @p
         Note that unlike the snippet given @sect.ref("Ammonite-REPL", "above"), we

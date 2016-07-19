@@ -5,7 +5,7 @@ import acyclic.file
 import scala.annotation.tailrec
 
 /**
-  * Prints stuff to an ad-hoc logging file when running the ammonite-repl or
+  * Prints stuff to an ad-hoc logging file when running the ammonite repl or
   * ammonite-terminal in development mode in its SBT project.
   *
   * Very handy for the common case where you're debugging terminal interactions
