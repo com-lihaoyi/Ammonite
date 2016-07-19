@@ -34,63 +34,91 @@
     "library to use in existing projects"), or as a standalone
     @sect.ref("Ammonite-Shell", "systems shell").
 
+  @val logos = Seq(
+    (
+        "fa-refresh",
+        "Ammonite-REPL",
+        "A Modernized Scala REPL",
+        """
+        With syntax highlighting,
+        multi-line editing, the ability to load maven artifacts
+        directly in the REPL, and many other quality-of-life
+        improvements missing in the default Scala REPL.
+        """
+    ),
+    (
+        "fa-file-text-o",
+        "Scala Scripts",
+        "Lightweight Programming in Scala",
+        """
+        Create scripts that you can
+        run easily from the command line, without the overhead of
+        setting up a "project" or waiting for SBT's slow startup times.
+        """
 
-  @div(display.flex, flexDirection.row)
-    @div(display.flex)
-      @div
-        @i(cls := "fa fa-refresh", aria.hidden := "true")
-      @p
-        @sect.ref{Ammonite-REPL}
-    @div(display.flex)
-      @div
-        @i(cls := "fa fa-file-text-o", aria.hidden := "true")
-      @p
-        @sect.ref{Scala Scripts}
-    @div(display.flex)
-      @div
-        @i(cls := "fa fa-terminal", aria.hidden := "true")
-      @p
-        @sect.ref{Ammonite-Shell}
+    ),
+    (
+        "fa-gears",
+        "Ammonite-Ops",
+        "A Rock-solid Filesystem Library for Scala",
+        """
+        Deal with the filesystem
+        easily from your existing Scala projects or applications, as easily
+        as you would from a Bash or Python script.
+        """
+    ),
+    (
+        "fa-terminal",
+        "Ammonite-Shell",
+        "A modern replacement for the Bash system shell",
+        """
+        Provides a systems shell in the high-level Scala language, letting you
+        seamlessly mix system operations with real code without the hassle or
+        the frustration of trying to write complex code in Bash.
+        """
+    )
+  )
+
+  @table(marginTop := "16px")
+    @for(data <- logos)
+      @tr
+        @td(width := "200px", textAlign.center)
+          @div(marginTop := "24px")
+            @i(cls := s"fa ${data._1}", aria.hidden := "true", fontSize := "48px")
+
+          @h2(fontWeight := 300, color := "#ccc")
+            @sect.ref(data._2)
+        @td(p(b(data._3), ".", data._4))
+
+
 
   @p
     The goal of Ammonite is to liberate your Scala code from heavyweight
     "projects", using the lightweight Ammonite runtime: if you want to run some
     Scala, open the @sect.ref{Ammonite-REPL} and run it, interactively! If you
     want to run it later, save it into some @sect.ref{Scala Scripts} and run
-    those via
+    those later.
 
-  @code
-    amm Script.scala
   @p
-    And @sect.ref("Script Imports", "import other scripts") or
-    @sect.ref("Ivy Dependencies", "libraries") as you need them. At no point do
-    you need to mess around with build-files or project-layouts: You just write
-    Scala code and run it, simple as that! If you are already working in Scala,
+    For a video overview of the project and it's motivation, check out this talk:
+
+  @iframe(
+    src := "https://player.vimeo.com/video/148552858",
+    width := 800,
+    height := 600,
+    "frameborder".attr := 0,
+    "webkitallowfullscreen".attr := 1,
+    "mozallowfullscreen".attr := 1,
+    "allowfullscreen".attr := 1
+  )
+  @p
+    If you are already working in Scala,
     you no longer have to drop down to Python or Bash for your scripting needs:
     you can use @sect.ref{Scala Scripts} for your scripting needs, and avoid
     the overhead of working in multiple languages.
 
   @p
-    Ammonite provides four main tools:
-
-  @ul
-    @li
-      @sect.ref{Ammonite-REPL}: a Modernized Scala REPL, with tons of
-      @sect.ref("Features", "usability improvements and features")
-
-    @li
-      @sect.ref{Scala Scripts}: a format for Lightweight Programming in Scala
-
-    @li
-      @sect.ref{Ammonite-Ops}: a Scala Library for convenient, rock-solid
-      Filesystem Operations
-
-    @li
-      @sect.ref{Ammonite-Shell}: a modern replacement for the @lnk("Bash",
-      "https://en.wikipedia.org/wiki/Bash_(Unix_shell)") system shell
-
-  @p
-    Each of those projects is usable standalone; click on the links to jump
+    Each of the above projects is usable standalone; click on the links to jump
     straight to their docs, or scroll around and browse through the navigation
     bar on the left. If you're wondering what you can do @i{with} Ammonite,
     there is an
@@ -109,21 +137,8 @@
       @sect.ref{In the Wild}
 
   @p
-    To see what people are doing with it. For a video overview of the project
-    and it's motivation, check out this talk:
-
-  @iframe(
-    src := "https://player.vimeo.com/video/148552858",
-    width := 800,
-    height := 600,
-    "frameborder".attr := 0,
-    "webkitallowfullscreen".attr := 1,
-    "mozallowfullscreen".attr := 1,
-    "allowfullscreen".attr := 1
-  )
-
-  @p
-    And there are more talks available below:
+    To see what people are doing with it. And there are more talks available
+    below:
 
   @ul
     @li

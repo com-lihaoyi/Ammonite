@@ -3,7 +3,7 @@
 @import ammonite.ops._
 @val fileOps = read! cwd/'ops/'src/'main/'scala/'ammonite/'ops/"FileOps.scala"
 
-@sect("Ammonite-Ops", "Rock-solid Filesystem Operations")
+@sect("Ammonite-Ops", "A Rock-solid Filesystem Library for Scala")
   @p
     @b{Ammonite-Ops} is a library to make common filesystem operations in Scala as concise and easy-to-use as from the Bash shell, while being robust enough to use in large applications without getting messy. It lives in the same repo as the Ammonite REPL, but can easily be used stand-alone in a normal SBT/maven project.
 
