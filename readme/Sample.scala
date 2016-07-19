@@ -11,7 +11,7 @@ import collection.mutable
 object Sample{
   val replCurl = s"$$ curl -L -o amm ${ammonite.Constants.curlUrl} && chmod +x amm && ./amm"
   val filesystemCurl =
-    "$ mkdir ~/.ammonite && curl -L -o ~/.ammonite/predef.scala https://git.io/vo4wx"
+    "$ mkdir ~/.ammonite && curl -L -o ~/.ammonite/predef.sc https://git.io/vo4wx"
   val cacheVersion = 6
   def cached(key: Any)(calc: => String) = {
     val path = cwd/'target/'cache/(key.hashCode + cacheVersion).toString
