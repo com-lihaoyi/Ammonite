@@ -4,7 +4,7 @@ import acyclic.file
 import ammonite.ops._
 import ammonite.util.Parsers.ImportTree
 import ammonite.util.{Imports, Parsers, StableRef, Timer}
-import ammonite.util.Util.{CacheOutput, ClassFiles, CompileCache, IvyMap}
+import ammonite.util.Util.{CacheOutput, ClassFiles, CompileCache, IvyMap, newLine}
 import org.apache.ivy.plugins.resolver.RepositoryResolver
 
 import scala.util.Try
@@ -280,7 +280,7 @@ object History{
   implicit val historyPPrint: pprint.PPrint[History] = pprint.PPrint(
     new pprint.PPrinter[History]{
       def render0(t: History, c: pprint.Config) = {
-        t.iterator.flatMap(Iterator("\n", _))
+        t.iterator.flatMap(Iterator(newLine, _))
       }
     }
   )

@@ -6,6 +6,7 @@ import ammonite.frontend._
 import ammonite.interp.{History, Interpreter, Storage}
 import ammonite.terminal.Filter
 import ammonite.util._
+import ammonite.util.Util.newLine
 
 import scala.annotation.tailrec
 
@@ -29,7 +30,7 @@ class Repl(input: InputStream,
   var history = new History(Vector())
 
   def printlnWithColor(color: fansi.Attrs, s: String) = {
-    Seq(color(s).render, "\n").foreach(errorPrintStream.print)
+    Seq(color(s).render, newLine).foreach(errorPrintStream.print)
   }
   val printer = Printer(
     printStream.print,
@@ -130,13 +131,13 @@ object Repl{
                     source: fansi.Attrs) = {
     val cutoff = Set("$main", "evaluatorRunPrinter")
     val traces = Ex.unapplySeq(ex).get.map(exception =>
-      error(exception.toString + "\n" +
+      error(exception.toString + newLine +
         exception
           .getStackTrace
           .takeWhile(x => !cutoff(x.getMethodName))
           .map(highlightFrame(_, error, highlightError, source))
-          .mkString("\n"))
+          .mkString(newLine))
     )
-    traces.mkString("\n")
+    traces.mkString(newLine)
   }
 }

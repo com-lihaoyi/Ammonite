@@ -3,6 +3,7 @@ package ammonite.integration
 import utest._
 import ammonite.ops._
 import ammonite.ops.ImplicitWd._
+import ammonite.util.Util
 import TestUtils._
 /**
  * Run a small number of scripts using the Ammonite standalone executable,
@@ -25,7 +26,6 @@ object BasicTests extends TestSuite{
     }
 
 
-    val windowsPlatform = System.getProperty("os.name").startsWith("Windows")
 
     //These tests currently do not pass on Windows, primarily for the reason that they all
     //involve loading from ivy which has different settings for windows
@@ -33,9 +33,8 @@ object BasicTests extends TestSuite{
     'linuxOnlyTests {
 
       'complex {
-        if (!windowsPlatform) {
+        if (!Util.windowsPlatform) {
           val evaled = exec('basic / "Complex.sc")
-          println("44444444444444" + evaled.out.trim + "4444")
           assert(evaled.out.trim.contains("Spire Interval [0, 10]"))
         }
       }
@@ -44,7 +43,7 @@ object BasicTests extends TestSuite{
       'shell {
         // make sure you can load the example-predef.sc, have it pull stuff in
         // from ivy, and make use of `cd!` and `wd` inside the executed script.
-        if (!windowsPlatform) {
+        if (!Util.windowsPlatform) {
           val res = %% bash(
             executable,
             "--predef-file",
@@ -63,14 +62,14 @@ object BasicTests extends TestSuite{
       }
 
       'classloaders{
-        if (!windowsPlatform) {
+        if (!Util.windowsPlatform) {
           val evaled = exec('basic / "Resources.sc")
           assert(evaled.out.string.contains("1745"))
         }
       }
 
       'playframework- {
-        if (!windowsPlatform) {
+        if (!Util.windowsPlatform) {
           if (scalaVersion.startsWith("2.11.") && javaVersion.startsWith("1.8.")){
             val evaled = exec('basic/"PlayFramework.sc")
             assert(evaled.out.string.contains("Hello bar"))
@@ -98,26 +97,26 @@ object BasicTests extends TestSuite{
       'tooFew{
         val errorMsg = intercept[ShelloutException]{
           exec('basic/"Args.sc", "3")
-        }.result.err.string.replace("\r", "").replace("\n", System.lineSeparator())
+        }.result.err.string
         assert(errorMsg.contains(
           """The following arguments failed to be parsed:
             |(s: String) was missing
             |expected arguments: (i: Int, s: String, path: ammonite.ops.Path)"""
             .stripMargin
-            .replace("\n", System.lineSeparator())
+            .replace("\n", Util.newLine)
         ))
       }
       'cantParse{
         val errorMsg = intercept[ShelloutException]{
           exec('basic/"Args.sc", "foo", "moo")
-        }.result.err.string.replace("\r", "").replace("\n", System.lineSeparator())
+        }.result.err.string
         val exMsg = """java.lang.NumberFormatException: For input string: "foo""""
         assert(errorMsg.contains(
           s"""The following arguments failed to be parsed:
              |(i: Int) failed to parse input "foo" with $exMsg
              |expected arguments: (i: Int, s: String, path: ammonite.ops.Path)"""
             .stripMargin
-            .replace("\n", System.lineSeparator())
+            .replace("\n", Util.newLine)
         ))
         // Ensure we're properly truncating the random stuff we don't care about
         // which means that the error stack that gets printed is short-ish

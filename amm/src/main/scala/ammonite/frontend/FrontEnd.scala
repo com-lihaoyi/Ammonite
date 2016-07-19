@@ -7,6 +7,7 @@ import fastparse.core.Parsed
 import jline.console.{ConsoleReader, completer}
 import acyclic.file
 import ammonite.util.{Colors, Parsers, Catching, Res}
+import ammonite.util.Util.newLine
 
 import scala.annotation.tailrec
 import scala.tools.nsc.interpreter.JList
@@ -104,7 +105,7 @@ object FrontEnd{
                   None,
                   fastparse.core.ParseError.msg(extra.input, extra.traced.expected, index)
                 )
-              case None => readCode(code + "\n")
+              case None => readCode(code + newLine)
             }
         }
       }

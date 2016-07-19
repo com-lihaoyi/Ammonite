@@ -3,6 +3,7 @@ package ammonite.integration
 import ammonite.integration.TestUtils._
 import ammonite.ops.ImplicitWd._
 import ammonite.ops._
+import ammonite.util.Util
 import utest._
 
 /**
@@ -16,7 +17,7 @@ object ErrorTruncationTests extends TestSuite{
   def checkErrorMessage(file: RelPath, expected: String) = {
     val e = fansi.Str(
       intercept[ShelloutException]{ exec(file) }.result.err.string
-    ).plainText.replace("\r", "").replace("\n", System.lineSeparator())
+    ).plainText
     assert(e == expected)
   }
   val tests = TestSuite {
@@ -28,17 +29,21 @@ object ErrorTruncationTests extends TestSuite{
           |val res = doesntexist
           |          ^
           |Compilation Failed
-          |""".stripMargin.replace("\n", System.lineSeparator())
+          |""".stripMargin.replace("\n", Util.newLine)
     )
 
-    'parseError - checkErrorMessage(
-      file = 'errorTruncation/"parseError.sc",
-      expected =
-        """Syntax Error: End:1:1 ..."}\n"
-          |}
-          |^
-          |""".stripMargin.replace("\n", System.lineSeparator())
-    )
+    'parseError - {
+      if(!Util.windowsPlatform){
+        checkErrorMessage(
+          file = 'errorTruncation/"parseError.sc",
+          expected =
+            """Syntax Error: End:1:1 ..."}\n"
+              |}
+              |^
+              |""".stripMargin.replace("\n", Util.newLine)
+        )
+      }
+    }
     val tab = '\t'
     val runtimeErrorResourcePackage =
       "$file.integration.src.test.resources.ammonite.integration.errorTruncation"
@@ -49,7 +54,7 @@ object ErrorTruncationTests extends TestSuite{
           |${tab}at $runtimeErrorResourcePackage.runtimeError$$.<init>(runtimeError.sc:1)
           |${tab}at $runtimeErrorResourcePackage.runtimeError$$.<clinit>(runtimeError.sc)
           |${tab}at $runtimeErrorResourcePackage.runtimeError.$$main(runtimeError.sc)
-          |""".stripMargin.replace("\n", System.lineSeparator())
+          |""".stripMargin.replace("\n", Util.newLine)
     )
   }
 }

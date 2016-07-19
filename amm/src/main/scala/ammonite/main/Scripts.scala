@@ -22,7 +22,7 @@ object Scripts {
     for{
       imports <- repl.interp.processModule(
         ImportHook.Source.File(path),
-        read(path),
+        Util.normalizeNewlines(read(path)),
         wrapper,
         pkg,
         autoImport = true
@@ -76,7 +76,7 @@ object Scripts {
                      |
                      |Existing methods:
                      |
-                     |${methods.mkString("\n\n")}""".stripMargin
+                     |${methods.mkString(Util.newLine*2)}""".stripMargin
                 }
               Res.Failure(
                 None,
@@ -122,7 +122,7 @@ object Scripts {
       case Router.Result.Error.InvalidArguments(x) =>
         Some(Res.Failure(
           None,
-          "The following arguments failed to be parsed:\n" +
+          "The following arguments failed to be parsed:" + Util.newLine +
             x.map{
               case Router.Result.ParamError.Missing(p) =>
                 s"(${renderArg(p)}) was missing"
@@ -130,7 +130,7 @@ object Scripts {
                 s"(${renderArg(p)}) failed to parse input ${literalize(v)} with $ex"
               case Router.Result.ParamError.DefaultFailed(p, ex) =>
                 s"(${renderArg(p)})'s default value failed to evaluate with $ex"
-            }.mkString("\n") + "\n" + s"expected arguments: $expectedMsg"
+            }.mkString(Util.newLine) + Util.newLine + s"expected arguments: $expectedMsg"
         ))
     }
   }
@@ -141,7 +141,7 @@ object Scripts {
   def entryDetails(ep: EntryPoint) = {
     ep.argSignatures.collect{
       case ArgSig(name, tpe, Some(doc), default) =>
-        "\n" + name + " // " + doc
+        Util.newLine + name + " // " + doc
     }.mkString
   }
 
