@@ -5,6 +5,7 @@ import java.io.File
 import ammonite.tools.Resolver
 import ammonite.ops._
 import ammonite.util.{Bind, CodeColors, Colors, Ref}
+import ammonite.util.Util.newLine
 import ammonite.interp.{Frame, History}
 import org.apache.ivy.plugins.resolver.RepositoryResolver
 import pprint.{Config, PPrint, PPrinter, TPrintColors}
@@ -281,7 +282,7 @@ trait DefaultReplAPI extends FullReplAPI {
     def combinePrints(iters: Iterator[String]*) = {
       iters.toIterator
            .filter(_.nonEmpty)
-           .flatMap(Iterator("\n") ++ _)
+           .flatMap(Iterator(newLine) ++ _)
            .drop(1)
     }
 
@@ -327,7 +328,7 @@ object SessionChanged{
       val output = mutable.Buffer.empty[String]
       def printDelta[T: PPrint](name: String, d: Iterable[T]) = {
         if (d.nonEmpty){
-          Iterator("\n", name, ": ") ++ pprint.tokenize(d)(implicitly, config)
+          Iterator(newLine, name, ": ") ++ pprint.tokenize(d)(implicitly, config)
         }else Iterator()
       }
       val res = Iterator(

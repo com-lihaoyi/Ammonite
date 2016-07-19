@@ -39,7 +39,7 @@ class TestRepl {
       printer,
       storage = new Storage.Folder(tempDir),
       new History(Vector()),
-      predef = ammonite.main.Defaults.predefString + "\n" + predef,
+      predef = ammonite.main.Defaults.predefString + Util.newLine + predef,
       wd = ammonite.ops.cwd,
       replArgs = Seq(),
       timer = Timer.none
@@ -60,7 +60,9 @@ class TestRepl {
     val margin = sess.lines.filter(_.trim != "").map(_.takeWhile(_ == ' ').length).min
     // Strip margin & whitespace
 
-    val steps = sess.replace("\n" + margin, "\n").replaceAll(" *\n", "\n").split("\n\n")
+    val steps = sess.replace(
+      Util.newLine + margin, Util.newLine
+    ).replaceAll(" *\n", "\n").split("\n\n")
 
     for((step, index) <- steps.zipWithIndex){
       // Break the step into the command lines, starting with @,
@@ -75,15 +77,15 @@ class TestRepl {
       // Make sure all non-empty, non-complete command-line-fragments
       // are considered incomplete during the parse
       for (incomplete <- commandText.inits.toSeq.drop(1).dropRight(1)){
-        assert(Parsers.split(incomplete.mkString("\n")) == None)
+        assert(Parsers.split(incomplete.mkString(Util.newLine)) == None)
       }
 
       // Finally, actually run the complete command text through the
       // interpreter and make sure the output is what we expect
-      val expected = resultLines.mkString("\n").trim
-      allOutput += commandText.map("\n@ " + _).mkString("\n")
+      val expected = resultLines.mkString(Util.newLine).trim
+      allOutput += commandText.map(Util.newLine + "@ " + _).mkString(Util.newLine)
 
-      val (processed, out, warning, error, info) = run(commandText.mkString("\n"), index)
+      val (processed, out, warning, error, info) = run(commandText.mkString(Util.newLine), index)
       interp.handleOutput(processed)
 
       if (expected.startsWith("error: ")) {
@@ -116,7 +118,11 @@ class TestRepl {
         processed match {
           case Res.Success(str) =>
             // Strip trailing whitespace
-            def normalize(s: String) = s.lines.map(_.replaceAll(" *$", "")).mkString("\n").trim()
+            def normalize(s: String) =
+              s.lines
+                .map(_.replaceAll(" *$", ""))
+                .mkString(Util.newLine)
+                .trim()
             failLoudly(
               assert{
                 identity(error)
@@ -138,7 +144,7 @@ class TestRepl {
           case Res.Exception(ex, failureMsg) =>
             val trace = Repl.showException(
               ex, fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty
-            ) + "\n" +  failureMsg
+            ) + Util.newLine +  failureMsg
             assert({identity(trace); identity(expected); false})
           case _ => throw new Exception(
             s"Printed $out does not match what was expected: $expected"
@@ -174,9 +180,9 @@ class TestRepl {
     (
       processed,
       outBuffer.mkString,
-      warningBuffer.mkString("\n"),
-      errorBuffer.mkString("\n"),
-      infoBuffer.mkString("\n")
+      warningBuffer.mkString(Util.newLine),
+      errorBuffer.mkString(Util.newLine),
+      infoBuffer.mkString(Util.newLine)
     )
   }
 
@@ -192,7 +198,7 @@ class TestRepl {
       case Res.Exception(ex, s) =>
         val msg = Repl.showException(
           ex, fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty
-        ) + "\n" + s
+        ) + Util.newLine + s
         failLoudly(assert(failureCheck(msg)))
       case _ => ???
     }
@@ -206,7 +212,7 @@ class TestRepl {
   def failLoudly[T](t: => T) =
     try t
     catch{ case e: utest.AssertionError =>
-      println("FAILURE TRACE\n" + allOutput)
+      println("FAILURE TRACE" + Util.newLine + allOutput)
       throw e
     }
 

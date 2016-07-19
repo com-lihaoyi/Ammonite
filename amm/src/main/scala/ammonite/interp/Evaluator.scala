@@ -5,7 +5,7 @@ import java.lang.reflect.InvocationTargetException
 import acyclic.file
 import ammonite.frontend.{ReplExit, Session, SessionChanged}
 import ammonite._
-import util.Util.{ClassFiles, CompileCache}
+import util.Util.{ClassFiles, CompileCache, newLine}
 import ammonite.util._
 
 import scala.collection.immutable.ListMap
@@ -52,7 +52,7 @@ object Evaluator{
 
   def interrupted(e: Throwable) = {
     Thread.interrupted()
-    Res.Failure(Some(e), "\nInterrupted!")
+    Res.Failure(Some(e), newLine + "Interrupted!")
   }
 
   def apply(currentClassloader: ClassLoader,

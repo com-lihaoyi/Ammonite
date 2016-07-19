@@ -3,6 +3,7 @@ package ammonite.interp
 import acyclic.file
 import ammonite._
 import ammonite.util._
+import ammonite.util.Util.{windowsPlatform, newLine, normalizeNewlines}
 import fastparse.all._
 
 import scala.reflect.internal.Flags
@@ -43,12 +44,14 @@ object Preprocessor{
   def errMsg(msg: String, code: String, expected: String, idx: Int): String = {
     val locationString = {
       val (first, last) = code.splitAt(idx)
-      val lastSnippet = last.split('\n').headOption.getOrElse("")
-      val firstSnippet = first.reverse.split('\n').lift(0).getOrElse("").reverse
-      firstSnippet + lastSnippet + "\n" + (" " * firstSnippet.length) + "^"
+      val lastSnippet = last.split(newLine).headOption.getOrElse("")
+      val firstSnippet = first.reverse
+                              .split(newLine.reverse)
+                              .lift(0).getOrElse("").reverse
+      firstSnippet + lastSnippet + newLine + (" " * firstSnippet.length) + "^"
     }
 
-    s"Syntax Error: $msg\n$locationString"
+    s"Syntax Error: $msg${newLine}$locationString"
   }
 
   /**
@@ -68,10 +71,22 @@ object Preprocessor{
 
         // comment holds comments or empty lines above the code which is not caught along with code
         for( (comment, code) <- s.value){
-          val ncomment = comment + "\n"*offset
 
-          // 1 is added as Separator parser eats up the '\n' following @
-          offset = offset + comment.count(_ == '\n') + code.map(_.count(_ == '\n')).sum + 1
+          //ncomment has required number of newLines appended based on OS and offset
+          //since fastparse has hardcoded `\n`s, while parsing strings with `\r\n`s it
+          //gives out one extra `\r` after '@' i.e. block change
+          //which needs to be removed to get correct line number (It adds up one extra line)
+          //thats why the `comment.substring(1)` thing is necessary
+          val ncomment =
+            if(windowsPlatform && !blocks.isEmpty && !comment.isEmpty){
+              comment.substring(1) + newLine * offset
+            }else{
+              comment + newLine * offset
+            }
+
+          // 1 is added as Separator parser eats up the newLine char following @
+          offset = offset + (comment.split(newLine, -1).length - 1) +
+            code.map(_.split(newLine, -1).length - 1).sum + 1
           blocks.append((ncomment, code))
         }
 
@@ -199,7 +214,7 @@ object Preprocessor{
     def complete(code: String, resultIndex: String, postSplit: Seq[String]) = {
       val reParsed = postSplit.map(p => (parse(p), p))
       val errors = reParsed.collect{case (Left(e), _) => e }
-      if (errors.length != 0) Res.Failure(None, errors.mkString("\n"))
+      if (errors.length != 0) Res.Failure(None, errors.mkString(newLine))
       else {
         val allDecls = for {
           ((Right(trees), code), i) <- reParsed.zipWithIndex if (trees.nonEmpty)
@@ -275,7 +290,8 @@ object Preprocessor{
         else s"${item.fromName.backticked} => ${item.toName.backticked}"
       }
       val pkgString = group.head.prefix.map(_.backticked).mkString(".")
-      "import " + pkgString + ".{\n  " + printedGroup.mkString(",\n  ") + "\n}\n"
+      "import " + pkgString + s".{${newLine}  " +
+        printedGroup.mkString(s",${newLine}  ") + s"${newLine}}${newLine}"
     }
     val res = out.mkString
 
@@ -289,16 +305,18 @@ object Preprocessor{
                printCode: String,
                imports: Imports) = {
 
-    val topWrapper = s"""
+    //we need to normalize topWrapper and bottomWrapper in order to ensure
+    //the snippets always use the platform-specific newLine
+    val topWrapper = normalizeNewlines(s"""
 package ${pkgName.map(_.backticked).mkString(".")}
 ${importBlock(imports)}
 
-object ${indexedWrapperName.backticked}{\n"""
+object ${indexedWrapperName.backticked}{\n""")
 
-    val bottomWrapper = s"""\ndef $$main() = { $printCode }
+    val bottomWrapper = normalizeNewlines(s"""\ndef $$main() = { $printCode }
   override def toString = "${indexedWrapperName.raw}"
 }
-"""
+""")
     val importsLen = topWrapper.length
 
     (topWrapper + code + bottomWrapper, importsLen)

@@ -11,6 +11,7 @@ import scala.tools.nsc.interactive.Response
 import scala.tools.nsc.util._
 import scala.util.{Failure, Success, Try}
 
+import ammonite.util.Util.newLine
 /**
  * Nice wrapper for the presentation compiler.
  */
@@ -215,8 +216,8 @@ object Pressy {
      * the outside caller probably doesn't care.
      */
     def complete(snippetIndex: Int, previousImports: String, snippet: String) = {
-      val prefix = previousImports + "\nobject AutocompleteWrapper{\n"
-      val suffix = "\n}"
+      val prefix = previousImports + newLine + "object AutocompleteWrapper{" + newLine
+      val suffix = newLine + "}"
       val allCode = prefix + snippet + suffix
       val index = snippetIndex + prefix.length
       if (cachedPressy == null) cachedPressy = initPressy

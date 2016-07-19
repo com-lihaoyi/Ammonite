@@ -9,6 +9,7 @@ import ammonite.main.{Defaults, Repl, Router}
 import ammonite.main.Router.{ArgSig, EntryPoint}
 import ammonite.util.Name.backtickWrap
 import ammonite.util._
+import ammonite.util.Util.newLine
 
 
 
@@ -60,7 +61,7 @@ case class Main(predef: String = "",
     new Repl(
       inputStream, outputStream, errorStream,
       storage = storageBackend,
-      predef = augmentedPredef + "\n" + predef,
+      predef = augmentedPredef + newLine + predef,
       wd = wd,
       welcomeBanner = welcomeBanner,
       replArgs = replArgs,
@@ -144,7 +145,7 @@ object Main{
             |
             |You can also use `--` as a shorthand for `-x main`, to pass arguments
             |to the main method
-          """.stripMargin.replace("\n", "\n" + " " * 8)
+          """.stripMargin.replace("\n", newLine + " " * 8)
         )
       arg[String]("<args>...")
         .optional()

@@ -3,6 +3,7 @@ package ammonite
 import ammonite.ops._
 import ammonite.tools._
 import utest._
+import ammonite.util.Util.newLine
 
 
 object ToolsTests extends TestSuite{
@@ -82,7 +83,7 @@ object ToolsTests extends TestSuite{
           'farApart - check(
             longItems,
             "\"123|890\"".r,
-            Seq("<\"123>45678901234567...\n...45678901234567<890\">")
+            Seq("<\"123>45678901234567..." + newLine + "...45678901234567<890\">")
           )
 
           // Make sure that when the different matches are relatively close
@@ -90,7 +91,7 @@ object ToolsTests extends TestSuite{
           'noOverlap - check(
             longItems,
             "123",
-            Seq("\"<123>4567890<123>4567...\n...890<123>4567890\"")
+            Seq("\"<123>4567890<123>4567..." + newLine + "...890<123>4567890\"")
           )
         }
       }
