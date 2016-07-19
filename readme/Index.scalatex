@@ -34,6 +34,24 @@
     "library to use in existing projects"), or as a standalone
     @sect.ref("Ammonite-Shell", "systems shell").
 
+
+  @div(display.flex, flexDirection.row)
+    @div(display.flex)
+      @div
+        @i(cls := "fa fa-refresh", aria.hidden := "true")
+      @p
+        @sect.ref{Ammonite-REPL}
+    @div(display.flex)
+      @div
+        @i(cls := "fa fa-file-text-o", aria.hidden := "true")
+      @p
+        @sect.ref{Scala Scripts}
+    @div(display.flex)
+      @div
+        @i(cls := "fa fa-terminal", aria.hidden := "true")
+      @p
+        @sect.ref{Ammonite-Shell}
+
   @p
     The goal of Ammonite is to liberate your Scala code from heavyweight
     "projects", using the lightweight Ammonite runtime: if you want to run some
