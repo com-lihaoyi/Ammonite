@@ -21,13 +21,5 @@ matrix:
 
 script:
 - $CI_SCRIPT
-# Tricks to avoid unnecessary cache updates
-#- find $HOME/.sbt -name "*.lock" | xargs rm
-#- find $HOME/.ivy2 -name "ivydata-*.properties" | xargs rm
 
 sudo: false
-
-cache:
-  directories:
-    - $HOME/.ivy2/cache
-    - $HOME/.sbt/boot/
