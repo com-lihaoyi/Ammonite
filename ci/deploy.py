@@ -7,7 +7,7 @@ import sys
 
 is_master_commit = (
     os.environ['TRAVIS_PULL_REQUEST'] == "false" and
-    os.environ['TRAVIS_BRANCH'] == "test"
+    os.environ['TRAVIS_BRANCH'] == "master"
 )
 
 
