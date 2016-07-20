@@ -199,7 +199,7 @@ span.hljs-tag, span.hljs-symbol{
       <a href="http://lihaoyi.github.io/Ammonite">http://lihaoyi.github.io/Ammonite</a></li></ul>
   <p>
     Is the documentation site for the last stable release of
-    Ammonite: <code>COMMIT-2eae411</code>. The Ammonite project also
+    Ammonite: <code>COMMIT-6d5abe9</code>. The Ammonite project also
     publishes per-commit snapshot builds, for people who are willing to
     beta-test new features and improvements. For documentation for these
     snapshot builds and instructions on installing these snapshot builds,
@@ -259,7 +259,7 @@ span.hljs-tag, span.hljs-symbol{
     You can also try out Ammonite in an existing SBT project, add the
     following to your <code>build.sbt</code>
 </p>
-  <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;COMMIT-2eae411&quot; % &quot;test&quot; cross CrossVersion.full
+  <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;COMMIT-6d5abe9&quot; % &quot;test&quot; cross CrossVersion.full
 
 initialCommands in (Test, console) := &quot;&quot;&quot;ammonite.Main().run()&quot;&quot;&quot;
 </code></pre>
@@ -1055,7 +1055,7 @@ sys	0m0.001s</span></pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </s
 </span><span style="color: #27ae60;">'LICENSE</span><span>            </span><span style="color: #27ae60;">'integration</span><span>        </span><span style="color: #27ae60;">&quot;readme.md&quot;</span><span>
 </span><span style="color: #27ae60;">'amm</span><span>                </span><span style="color: #27ae60;">&quot;internals-docs&quot;</span><span>    </span><span style="color: #27ae60;">'shell</span><span>
 ,
-  273027956 nanoseconds
+  61726465 nanoseconds
 )</span></pre></div>
 
           <p>
@@ -1601,7 +1601,7 @@ warning: $fruitlessTypeTestWarningMessageBlahBlahBlah</code><a class=" scalatex-
         To use Ammonite inside an existing Scala program, you need to first add
         it to your dependencies:
 </p>
-      <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;COMMIT-2eae411&quot; cross CrossVersion.full
+      <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;COMMIT-6d5abe9&quot; cross CrossVersion.full
 </code></pre>
       <p>
         Then instantate it with this code anywhere within your program:
@@ -1627,7 +1627,7 @@ object TestMain{
         To do so, first add Ammonite to your classpath, e.g. through this SBT
         snippet:
 </p>
-      <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;COMMIT-2eae411&quot; cross CrossVersion.full
+      <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;COMMIT-6d5abe9&quot; cross CrossVersion.full
 </code></pre>
       <p>
         Note that unlike the snippet given <a href="#Ammonite-REPL">above</a>, we
@@ -1700,7 +1700,7 @@ object TestMain {
       <p>
         To do this, add ammonite-sshd to your classpath, for example with SBT:
 </p>
-      <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite-sshd&quot; % &quot;COMMIT-2eae411&quot; cross CrossVersion.full
+      <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite-sshd&quot; % &quot;COMMIT-6d5abe9&quot; cross CrossVersion.full
 </code></pre>
       <p>
         Now add repl server to your application:
@@ -2136,7 +2136,7 @@ object Qux{
   <p>
     To get started with Ammonite-Ops, add this to your <code>build.sbt</code>:
 </p>
-  <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">libraryDependencies += &quot;com.lihaoyi&quot; %% &quot;ammonite-ops&quot; % &quot;COMMIT-2eae411&quot;</code>
+  <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">libraryDependencies += &quot;com.lihaoyi&quot; %% &quot;ammonite-ops&quot; % &quot;COMMIT-6d5abe9&quot;</code>
 
   <p>
     And you're all set! Here's an example of some common operations you can do with Ammonite-Ops
@@ -3004,11 +3004,11 @@ val res2 = %ls</code><a class=" scalatex-site-Styles-headerLink" style="position
         You can navigate around the filesystem using <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">cd!</code>, instead of Bash's <code class="bash scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">cd</code>:
 </p>
       <div><pre><span style="color: #000;">/home/travis/build/lihaoyi/Ammonite
-]0;travis@testing-worker-linux-docker-7c0524fa-3444-linux-15: ~/build/lihaoyi/Ammonitetravis@testing-worker-linux-docker-7c0524fa-3444-linux-15:~/build/lihaoyi/Ammonitte$ cd target
-]0;travis@testing-worker-linux-docker-7c0524fa-3444-linux-15: ~/build/lihaoyi/Ammonite/targettravis@testing-worker-linux-docker-7c0524fa-3444-linux-15:~/build/lihaoyi/Ammonitte/target$ pwd
+]0;travis@testing-worker-linux-docker-5208b0aa-3448-linux-16: ~/build/lihaoyi/Ammonitetravis@testing-worker-linux-docker-5208b0aa-3448-linux-16:~/build/lihaoyi/Ammonitte$ cd target
+]0;travis@testing-worker-linux-docker-5208b0aa-3448-linux-16: ~/build/lihaoyi/Ammonite/targettravis@testing-worker-linux-docker-5208b0aa-3448-linux-16:~/build/lihaoyi/Ammonitte/target$ pwd
 /home/travis/build/lihaoyi/Ammonite/target
-]0;travis@testing-worker-linux-docker-7c0524fa-3444-linux-15: ~/build/lihaoyi/Ammonite/targettravis@testing-worker-linux-docker-7c0524fa-3444-linux-15:~/build/lihaoyi/Ammonitte/target$ cd ..
-]0;travis@testing-worker-linux-docker-7c0524fa-3444-linux-15: ~/build/lihaoyi/Ammonitetravis@testing-worker-linux-docker-7c0524fa-3444-linux-15:~/build/lihaoyi/Ammonitte$ pwd
+]0;travis@testing-worker-linux-docker-5208b0aa-3448-linux-16: ~/build/lihaoyi/Ammonite/targettravis@testing-worker-linux-docker-5208b0aa-3448-linux-16:~/build/lihaoyi/Ammonitte/target$ cd ..
+]0;travis@testing-worker-linux-docker-5208b0aa-3448-linux-16: ~/build/lihaoyi/Ammonitetravis@testing-worker-linux-docker-5208b0aa-3448-linux-16:~/build/lihaoyi/Ammonitte$ pwd
 /home/travis/build/lihaoyi/Ammonite</span></pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>wd 
 </span><span style="color: #16a085;">res0</span><span>: </span><span style="color: #27ae60;">Path</span><span> = root/</span><span style="color: #27ae60;">'home</span><span>/</span><span style="color: #27ae60;">'travis</span><span>/</span><span style="color: #27ae60;">'build</span><span>/</span><span style="color: #27ae60;">'lihaoyi</span><span>/</span><span style="color: #27ae60;">'Ammonite</span><span>
 </span><span style="color: #8e44ad;">travis-Ammonite@ </span><span>cd! </span><span style="color: #27ae60;">'target</span><span> 
@@ -3103,20 +3103,20 @@ ops/src/main/scala/ammonite/ops/package.scala</span></pre><pre><span style="colo
       <p>
         Ammonite-Shell uses <a href="#Ammonite-Ops">Ammonite-Ops</a> to provide a nice API to use filesystem operations. The default setup will <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">import ammonite.ops._</code> into your <a href="#Ammonite-REPL">Ammonite-REPL</a>, gives the nice path-completion shown above, and also provides some additional command-line-friendly functionality on top of the default <a href="#Ammonite-Ops">Ammonite-Ops</a> commands:
 </p>
-      <div><pre><span style="color: #000;">]0;travis@testing-worker-linux-docker-7c0524fa-3444-linux-15: ~/build/lihaoyi/Ammonitetravis@testing-worker-linux-docker-7c0524fa-3444-linux-15:~/build/lihaoyi/Ammonitte$ echo &quot;hello&quot; &gt; target/test/hello.txt
-]0;travis@testing-worker-linux-docker-7c0524fa-3444-linux-15: ~/build/lihaoyi/Ammonitetravis@testing-worker-linux-docker-7c0524fa-3444-linux-15:~/build/lihaoyi/Ammonitte$ cat target/test/hello.txt
+      <div><pre><span style="color: #000;">]0;travis@testing-worker-linux-docker-5208b0aa-3448-linux-16: ~/build/lihaoyi/Ammonitetravis@testing-worker-linux-docker-5208b0aa-3448-linux-16:~/build/lihaoyi/Ammonitte$ echo &quot;hello&quot; &gt; target/test/hello.txt
+]0;travis@testing-worker-linux-docker-5208b0aa-3448-linux-16: ~/build/lihaoyi/Ammonitetravis@testing-worker-linux-docker-5208b0aa-3448-linux-16:~/build/lihaoyi/Ammonitte$ cat target/test/hello.txt
 hello
-]0;travis@testing-worker-linux-docker-7c0524fa-3444-linux-15: ~/build/lihaoyi/Ammonitetravis@testing-worker-linux-docker-7c0524fa-3444-linux-15:~/build/lihaoyi/Ammonitte$ ls target/test
+]0;travis@testing-worker-linux-docker-5208b0aa-3448-linux-16: ~/build/lihaoyi/Ammonitetravis@testing-worker-linux-docker-5208b0aa-3448-linux-16:~/build/lihaoyi/Ammonitte$ ls target/test
 hello.txt
-]0;travis@testing-worker-linux-docker-7c0524fa-3444-linux-15: ~/build/lihaoyi/Ammonitetravis@testing-worker-linux-docker-7c0524fa-3444-linux-15:~/build/lihaoyi/Ammonitte$ cp target/test/hello.txt target/test/hello2.txt
-]0;travis@testing-worker-linux-docker-7c0524fa-3444-linux-15: ~/build/lihaoyi/Ammonitetravis@testing-worker-linux-docker-7c0524fa-3444-linux-15:~/build/lihaoyi/Ammonitte$ ls target/test
+]0;travis@testing-worker-linux-docker-5208b0aa-3448-linux-16: ~/build/lihaoyi/Ammonitetravis@testing-worker-linux-docker-5208b0aa-3448-linux-16:~/build/lihaoyi/Ammonitte$ cp target/test/hello.txt target/test/hello2.txt
+]0;travis@testing-worker-linux-docker-5208b0aa-3448-linux-16: ~/build/lihaoyi/Ammonitetravis@testing-worker-linux-docker-5208b0aa-3448-linux-16:~/build/lihaoyi/Ammonitte$ ls target/test
 hello2.txt
 hello.txt
-]0;travis@testing-worker-linux-docker-7c0524fa-3444-linux-15: ~/build/lihaoyi/Ammonitetravis@testing-worker-linux-docker-7c0524fa-3444-linux-15:~/build/lihaoyi/Ammonitte$ mv target/test/hello.txt target/test/hello3.txt
-]0;travis@testing-worker-linux-docker-7c0524fa-3444-linux-15: ~/build/lihaoyi/Ammonitetravis@testing-worker-linux-docker-7c0524fa-3444-linux-15:~/build/lihaoyi/Ammonitte$ ls target/test
+]0;travis@testing-worker-linux-docker-5208b0aa-3448-linux-16: ~/build/lihaoyi/Ammonitetravis@testing-worker-linux-docker-5208b0aa-3448-linux-16:~/build/lihaoyi/Ammonitte$ mv target/test/hello.txt target/test/hello3.txt
+]0;travis@testing-worker-linux-docker-5208b0aa-3448-linux-16: ~/build/lihaoyi/Ammonitetravis@testing-worker-linux-docker-5208b0aa-3448-linux-16:~/build/lihaoyi/Ammonitte$ ls target/test
 hello2.txt
 hello3.txt
-]0;travis@testing-worker-linux-docker-7c0524fa-3444-linux-15: ~/build/lihaoyi/Ammonitetravis@testing-worker-linux-docker-7c0524fa-3444-linux-15:~/build/lihaoyi/Ammonitte$ rm -rf target/test</span></pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>mkdir! </span><span style="color: #27ae60;">'target</span><span>/</span><span style="color: #27ae60;">'test</span><span> 
+]0;travis@testing-worker-linux-docker-5208b0aa-3448-linux-16: ~/build/lihaoyi/Ammonitetravis@testing-worker-linux-docker-5208b0aa-3448-linux-16:~/build/lihaoyi/Ammonitte$ rm -rf target/test</span></pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>mkdir! </span><span style="color: #27ae60;">'target</span><span>/</span><span style="color: #27ae60;">'test</span><span> 
 
 </span><span style="color: #8e44ad;">travis-Ammonite@ </span><span>write(</span><span style="color: #27ae60;">'target</span><span>/</span><span style="color: #27ae60;">'test</span><span>/</span><span style="color: #27ae60;">&quot;hello.txt&quot;</span><span>, </span><span style="color: #27ae60;">&quot;hello&quot;</span><span>) 
 
@@ -3218,13 +3218,13 @@ HELLO
       <p>
         If you are only passing a single argument, or no arguments, Scala allows you to leave off parentheses, as shown:
 </p>
-      <div><pre><span style="color: #000;">* (detached from 2eae411)
+      <div><pre><span style="color: #000;">* (detached from 6d5abe9)
   master</span></pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>%git </span><span style="color: #27ae60;">'branch</span><span> 
-* (detached from 2eae411)
+* (detached from 6d5abe9)
   master
 </span></pre></div>
-      <div><pre><span style="color: #000;">Tue Jul 19 23:37:23 UTC 2016</span></pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>%date 
-Tue Jul 19 23:37:34 UTC 2016
+      <div><pre><span style="color: #000;">Wed Jul 20 06:08:41 UTC 2016</span></pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>%date 
+Wed Jul 20 06:08:57 UTC 2016
 </span></pre></div>
 
       <p>
@@ -3416,9 +3416,9 @@ Hello from Java!
 </span><span style="color: #8e44ad;">travis-Ammonite@ </span><span style="color: #f39c12;">import</span><span> java.util.</span><span style="color: #f39c12;">_</span><span> 
 </span><span style="color: #27ae60;">import </span><span style="color: #16a085;">java.util._</span><span>
 </span><span style="color: #8e44ad;">travis-Ammonite@ </span><span style="color: #f39c12;">val</span><span> date = </span><span style="color: #f39c12;">new</span><span> </span><span style="color: #27ae60;">Date</span><span>() 
-</span><span style="color: #16a085;">date</span><span>: </span><span style="color: #27ae60;">Date</span><span> = Tue Jul 19 23:41:29 UTC 2016
+</span><span style="color: #16a085;">date</span><span>: </span><span style="color: #27ae60;">Date</span><span> = Wed Jul 20 06:13:23 UTC 2016
 </span><span style="color: #8e44ad;">travis-Ammonite@ </span><span>date.getDay() 
-</span><span style="color: #16a085;">res3</span><span>: </span><span style="color: #27ae60;">Int</span><span> = </span><span style="color: #27ae60;">2</span></pre>
+</span><span style="color: #16a085;">res3</span><span>: </span><span style="color: #27ae60;">Int</span><span> = </span><span style="color: #27ae60;">3</span></pre>
 
       <p>
         In fact, Ammonite-Shell allows you to ask for any published third-party Java/Scala library for usage in the shell, and have them downloaded, automatically cached, and made available for use. e.g. we can load popular libraries like <a href="https://github.com/google/guava">Google Guava</a> and using it in the shell:
@@ -3431,19 +3431,19 @@ import com.google.common.collect.ImmutableBiMap // Doesn't work
 </span><span style="color: #c0392b;">Compilation Failed</span><span>
 </span><span style="color: #8e44ad;">travis-Ammonite@ </span><span>
 load.ivy(</span><span style="color: #27ae60;">&quot;com.google.guava&quot;</span><span> % </span><span style="color: #27ae60;">&quot;guava&quot;</span><span> % </span><span style="color: #27ae60;">&quot;18.0&quot;</span><span>) </span><span style="color: #2980b9;">// Load from Maven Central</span><span> 
-:: loading settings :: url = jar:file:/home/travis/build/lihaoyi/Ammonite/amm/target/scala-2.11/ammonite-COMMIT-2eae411-2.11.8!/org/apache/ivy/core/settings/ivysettings.xml
+:: loading settings :: url = jar:file:/home/travis/build/lihaoyi/Ammonite/amm/target/scala-2.11/ammonite-COMMIT-6d5abe9-2.11.8!/org/apache/ivy/core/settings/ivysettings.xml
 :: resolving dependencies :: com.google.guava#guava-caller;working
 	confs: [default]
 	found com.google.guava#guava;18.0 in central
 	found com.google.code.findbugs#jsr305;1.3.9 in central
 downloading http://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0.jar ...
-	[SUCCESSFUL ] com.google.guava#guava;18.0!guava.jar(bundle) (345ms)
+	[SUCCESSFUL ] com.google.guava#guava;18.0!guava.jar(bundle) (75ms)
 downloading http://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0-javadoc.jar ...
-	[SUCCESSFUL ] com.google.guava#guava;18.0!guava.jar(javadoc) (139ms)
+	[SUCCESSFUL ] com.google.guava#guava;18.0!guava.jar(javadoc) (47ms)
 downloading http://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0-sources.jar ...
-	[SUCCESSFUL ] com.google.guava#guava;18.0!guava.jar(source) (49ms)
+	[SUCCESSFUL ] com.google.guava#guava;18.0!guava.jar(source) (14ms)
 downloading http://repo1.maven.org/maven2/com/google/code/findbugs/jsr305/1.3.9/jsr305-1.3.9.jar ...
-	[SUCCESSFUL ] com.google.code.findbugs#jsr305;1.3.9!jsr305.jar (45ms)
+	[SUCCESSFUL ] com.google.code.findbugs#jsr305;1.3.9!jsr305.jar (10ms)
 
 </span><span style="color: #8e44ad;">travis-Ammonite@ </span><span style="color: #f39c12;">import</span><span> com.google.common.collect.ImmutableBiMap </span><span style="color: #2980b9;">// Works now</span><span> 
 </span><span style="color: #27ae60;">import </span><span style="color: #16a085;">com.google.common.collect.ImmutableBiMap // Works now</span><span>
@@ -3458,19 +3458,19 @@ downloading http://repo1.maven.org/maven2/com/google/code/findbugs/jsr305/1.3.9/
         Or Joda Time:
 </p>
       <pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>load.ivy(</span><span style="color: #27ae60;">&quot;joda-time&quot;</span><span> % </span><span style="color: #27ae60;">&quot;joda-time&quot;</span><span> % </span><span style="color: #27ae60;">&quot;2.8.2&quot;</span><span>)  
-:: loading settings :: url = jar:file:/home/travis/build/lihaoyi/Ammonite/amm/target/scala-2.11/ammonite-COMMIT-2eae411-2.11.8!/org/apache/ivy/core/settings/ivysettings.xml
+:: loading settings :: url = jar:file:/home/travis/build/lihaoyi/Ammonite/amm/target/scala-2.11/ammonite-COMMIT-6d5abe9-2.11.8!/org/apache/ivy/core/settings/ivysettings.xml
 :: resolving dependencies :: joda-time#joda-time-caller;working
 	confs: [default]
 	found joda-time#joda-time;2.8.2 in central
 	found org.joda#joda-convert;1.2 in central
-downloading http://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2.jar ...
-	[SUCCESSFUL ] joda-time#joda-time;2.8.2!joda-time.jar (219ms)
 downloading http://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2-sources.jar ...
-	[SUCCESSFUL ] joda-time#joda-time;2.8.2!joda-time.jar(source) (89ms)
+	[SUCCESSFUL ] joda-time#joda-time;2.8.2!joda-time.jar(source) (206ms)
+downloading http://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2.jar ...
+	[SUCCESSFUL ] joda-time#joda-time;2.8.2!joda-time.jar (46ms)
 downloading http://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2-javadoc.jar ...
-	[SUCCESSFUL ] joda-time#joda-time;2.8.2!joda-time.jar(javadoc) (90ms)
+	[SUCCESSFUL ] joda-time#joda-time;2.8.2!joda-time.jar(javadoc) (96ms)
 downloading http://repo1.maven.org/maven2/org/joda/joda-convert/1.2/joda-convert-1.2.jar ...
-	[SUCCESSFUL ] org.joda#joda-convert;1.2!joda-convert.jar (44ms)
+	[SUCCESSFUL ] org.joda#joda-convert;1.2!joda-convert.jar (42ms)
 
 </span><span style="color: #8e44ad;">travis-Ammonite@ </span><span style="color: #f39c12;">import</span><span> org.joda.time.{DateTime, Period, Duration} 
 </span><span style="color: #27ae60;">import </span><span style="color: #16a085;">org.joda.time.{DateTime, Period, Duration}</span><span>
