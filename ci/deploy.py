@@ -10,6 +10,10 @@ is_master_commit = (
     os.environ['TRAVIS_BRANCH'] == "master"
 )
 
+all_versions = [
+    "2.10.4", "2.10.5", "2.10.6",
+    "2.11.3", "2.11.4", "2.11.5", "2.11.6", "2.11.7", "2.11.8"
+]
 
 def update_version():
     git_hash = check_output(["git", "rev-parse", "--short", "HEAD"]).strip()
@@ -47,16 +51,11 @@ def publish_signed():
     open("pubring.asc", "w").write(
         json.loads('"' + os.environ['SONATYPE_PGP_PUB_KEY_CONTENTS'] + '"')
     )
-    check_call(["sbt", "++2.10.4", "amm/publishSigned", "sshd/publishSigned"])
-    check_call(["sbt", "++2.10.5", "published/publishSigned"])
-    check_call(["sbt", "++2.10.6", "amm/publishSigned", "sshd/publishSigned"])
-
-    check_call(["sbt", "++2.11.3", "amm/publishSigned", "sshd/publishSigned"])
-    check_call(["sbt", "++2.11.4", "amm/publishSigned", "sshd/publishSigned"])
-    check_call(["sbt", "++2.11.5", "amm/publishSigned", "sshd/publishSigned"])
-    check_call(["sbt", "++2.11.6", "amm/publishSigned", "sshd/publishSigned"])
-    check_call(["sbt", "++2.11.7", "amm/publishSigned", "sshd/publishSigned"])
-    check_call(["sbt", "++2.11.8", "published/publishSigned"])
+    for version in all_versions:
+        if version in {"2.10.5", "2.11.8"}:
+            check_call(["sbt", "++"+version, "published/publishSigned"])
+        else:
+            check_call(["sbt", "++"+version, "amm/publishSigned", "sshd/publishSigned"])
 
     check_call(["sbt", "sonatypeReleaseAll"])
 
@@ -74,16 +73,21 @@ def publish_docs():
 
 if sys.argv[1] == "docs":
     if is_master_commit:
+        print "MASTER COMMIT: Updating version and publishing to Github Pages"
         update_version()
         publish_docs()
     else:
+        print "MISC COMMIT: Building readme for verification"
         check_call(["sbt", "readme/run"])
 
 elif sys.argv[1] == "artifacts":
     if is_master_commit:
+        print "MASTER COMMIT: Updating version and publishing to Maven Central"
         update_version()
         publish_signed()
     else:
-        print "Not deploying artifacts since not a commit on master"
+        print "MISC COMMIT: Compiling all Scala code across versions for verification"
+        for version in all_versions:
+            check_call(["sbt", "++" + version, "published/test:compile"])
 else:
     raise Exception("Unknown argument list %s" % sys.argv)
