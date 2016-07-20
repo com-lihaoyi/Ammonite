@@ -87,7 +87,7 @@ elif sys.argv[1] == "artifacts":
     else:
         print "MISC COMMIT: Compiling all Scala code across versions for verification"
         for version in all_versions:
-            check_call(["sbt", "++" + version, "published/test:compile"])
+            check_call(["sbt", "++" + version, "published/compile"])
 
 elif sys.argv[1] == "test":
     check_call(["sbt", "++" + os.environ["TRAVIS_SCALA_VERSION"], "published/compile"])
