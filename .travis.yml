@@ -1,22 +1,22 @@
 language: scala
 
-scala:
-- 2.10.5
-- 2.11.8
-
-jdk:
-- oraclejdk8
-- openjdk7
-
-env:
-- CI_SCRIPT=ci/run_tests.sh SBT_COMMAND=integration/test
-- CI_SCRIPT=ci/run_tests.sh SBT_COMMAND=published/test
+#scala:
+#- 2.10.5
+#- 2.11.8
+#
+#jdk:
+#- oraclejdk8
+#- openjdk7
+#
+#env:
+#- CI_SCRIPT=ci/run_tests.sh SBT_COMMAND=integration/test
+#- CI_SCRIPT=ci/run_tests.sh SBT_COMMAND=published/test
 
 matrix:
   include:
-  - env: CI_SCRIPT="ci/deploy.py docs"
-    jdk: oraclejdk8
-    scala: 2.11.8
+#  - env: CI_SCRIPT="ci/deploy.py docs"
+#    jdk: oraclejdk8
+#    scala: 2.11.8
 
   - env: CI_SCRIPT="ci/deploy.py artifacts"
     jdk: oraclejdk8
