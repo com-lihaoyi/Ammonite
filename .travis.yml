@@ -2,7 +2,20 @@ language: scala
 
 matrix:
   include:
-  - env: CI_SCRIPT="ci/deploy.py artifacts"
+  # The test matrix is manually spelled out, rather than relying
+  # on the "automatic" matrix-generation by specifying the different
+  # `scala`, `jdk`, and `env` values, because we want `artifacts` to
+  # run first and `docs` last. For the auto-generated matrix, the
+  # `artifacts` job will always run last with the `docs` job.
+
+  # We want `artifacts` to run first, because apart from being the
+  # slowest job of the lot, it also needs additional time for the
+  # artifacts to sync from sonatype to maven central. `docs` should
+  # be last to minimize the duration in which the new doc-site has
+  # been published, but artifacts that the doc-site instructs people
+  # to download are not yet present.
+
+  - env: CI_SCRIPT="ci/build.py artifacts"
     jdk: oraclejdk8
     scala: 2.11.8
 
@@ -37,7 +50,7 @@ matrix:
     scala: 2.11.8
 
 
-  - env: CI_SCRIPT="ci/deploy.py docs"
+  - env: CI_SCRIPT="ci/build.py docs"
     jdk: oraclejdk8
     scala: 2.11.8
 

@@ -70,7 +70,6 @@ def publish_docs():
         new_env = dict(os.environ, DOC_FOLDER="master")
     check_call("ci/deploy_master_docs.sh", env=new_env)
 
-
 if sys.argv[1] == "docs":
     if is_master_commit:
         print "MASTER COMMIT: Updating version and publishing to Github Pages"
@@ -89,5 +88,10 @@ elif sys.argv[1] == "artifacts":
         print "MISC COMMIT: Compiling all Scala code across versions for verification"
         for version in all_versions:
             check_call(["sbt", "++" + version, "published/test:compile"])
+
+elif sys.argv[1] == "test":
+    check_call(["sbt", "++" + os.environ["TRAVIS_SCALA_VERSION"], "published/compile"])
+    check_call(["sbt", "++" + os.environ["TRAVIS_SCALA_VERSION"], sys.argv[2]])
+
 else:
     raise Exception("Unknown argument list %s" % sys.argv)
