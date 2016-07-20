@@ -7,7 +7,7 @@ import sys
 
 is_master_commit = (
     os.environ['TRAVIS_PULL_REQUEST'] == "false" and
-    os.environ['TRAVIS_BRANCH'] == "test"
+    os.environ['TRAVIS_BRANCH'] == "master"
 )
 
 
@@ -47,7 +47,7 @@ def publish_signed():
     open("pubring.asc", "w").write(
         json.loads('"' + os.environ['SONATYPE_PGP_PUB_KEY_CONTENTS'] + '"')
     )
-    check_call(["sbt", "++2.10.4", "amm/publishSigned", "sshd/publishSigned", "sonatypeStagingRepositoryProfiles"])
+    check_call(["sbt", "++2.10.4", "amm/publishSigned", "sshd/publishSigned"])
     check_call(["sbt", "++2.10.5", "published/publishSigned"])
     check_call(["sbt", "++2.10.6", "amm/publishSigned", "sshd/publishSigned"])
 
@@ -56,9 +56,8 @@ def publish_signed():
     check_call(["sbt", "++2.11.5", "amm/publishSigned", "sshd/publishSigned"])
     check_call(["sbt", "++2.11.6", "amm/publishSigned", "sshd/publishSigned"])
     check_call(["sbt", "++2.11.7", "amm/publishSigned", "sshd/publishSigned"])
-    check_call(["sbt", "++2.11.8", "published/publishSigned", "sonatypeStagingRepositoryProfiles"])
+    check_call(["sbt", "++2.11.8", "published/publishSigned"])
 
-    check_call(["sbt", "sonatypeStagingRepositoryProfiles"])
     check_call(["sbt", "sonatypeReleaseAll"])
 
 
