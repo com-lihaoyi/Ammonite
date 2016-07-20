@@ -1,7 +1,6 @@
 package ammonite.session
 
 import ammonite.TestRepl
-import ammonite.util.Util.windowsPlatform
 import utest._
 
 import scala.collection.{immutable => imm}
@@ -45,12 +44,10 @@ object FailureTests extends TestSuite{
       """)
     }
     'ivyFail{
-      if(!windowsPlatform){
-        check.session("""
-          @ import $ivy.`com.lihaoyi::upickle:0.1.12312-DOESNT-EXIST`
-          error: failed to resolve ivy dependencies
-        """)
-      }
+      check.session("""
+        @ import $ivy.`com.lihaoyi::upickle:0.1.12312-DOESNT-EXIST`
+        error: failed to resolve ivy dependencies
+      """)
     }
 
     'exceptionHandling{

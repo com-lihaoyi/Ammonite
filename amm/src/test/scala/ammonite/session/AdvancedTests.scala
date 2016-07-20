@@ -241,36 +241,34 @@ object AdvancedTests extends TestSuite{
       """)
     }
     'compilerPlugin{
-      if(!Util.windowsPlatform){
-        check.session("""
-          @ // Make sure plugins from eval class loader are not loaded
+      check.session("""
+        @ // Make sure plugins from eval class loader are not loaded
 
-          @ import $ivy.`org.spire-math::kind-projector:0.6.3`
+        @ import $ivy.`org.spire-math::kind-projector:0.6.3`
 
-          @ trait TC0[F[_]]
-          defined trait TC0
+        @ trait TC0[F[_]]
+        defined trait TC0
 
-          @ type TC0EitherStr = TC0[Either[String, ?]]
-          error: not found: type ?
+        @ type TC0EitherStr = TC0[Either[String, ?]]
+        error: not found: type ?
 
-          @ // This one must be loaded
+        @ // This one must be loaded
 
-          @ import $plugin.$ivy.`org.spire-math::kind-projector:0.6.3`
+        @ import $plugin.$ivy.`org.spire-math::kind-projector:0.6.3`
 
-          @ trait TC[F[_]]
-          defined trait TC
+        @ trait TC[F[_]]
+        defined trait TC
 
-          @ type TCEitherStr = TC[Either[String, ?]]
-          defined type TCEitherStr
+        @ type TCEitherStr = TC[Either[String, ?]]
+        defined type TCEitherStr
 
-          @ // Useless - does not add plugins, and ignored by eval class loader
+        @ // Useless - does not add plugins, and ignored by eval class loader
 
-          @ import $plugin.$ivy.`com.lihaoyi::scalatags:0.4.5`
+        @ import $plugin.$ivy.`com.lihaoyi::scalatags:0.4.5`
 
-          @ import scalatags.Text
-          error: not found: value scalatags
-        """)
-      }
+        @ import scalatags.Text
+        error: not found: value scalatags
+      """)
     }
     'replApiUniqueness{
       // Make sure we can instantiate multiple copies of Interpreter, with each
