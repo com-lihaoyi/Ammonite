@@ -10,6 +10,7 @@ import org.apache.ivy.plugins.resolver.RepositoryResolver
 import scala.util.Try
 import scala.collection.generic.CanBuildFrom
 import scala.collection.{IndexedSeqLike, mutable}
+import scala.reflect.NameTransformer.encode
 
 
 /**
@@ -125,7 +126,7 @@ object Storage{
 
     def compileCacheSave(path: String, tag: String, data: CompileCache): Unit = timer{
       val (classFiles, imports) = data
-      val tagCacheDir = compileCacheDir/path.replace("/", "$div").replace(":", "$colon")/tag
+      val tagCacheDir = compileCacheDir/encode(path)/tag
 
       if(!exists(tagCacheDir)){
         mkdir(tagCacheDir)
@@ -144,7 +145,7 @@ object Storage{
                            imports: Imports,
                            tag: String,
                            importTreesList: Seq[ImportTree]): Unit = timer{
-      val dir = pkg.replace("/", "$div") + "." + wrapper.replace("/", "$div")
+      val dir = encode(pkg) + "." + encode(wrapper)
       val codeCacheDir = cacheDir/'scriptCaches/dir/tag
       if (!exists(codeCacheDir)){
         mkdir(codeCacheDir)
@@ -175,7 +176,7 @@ object Storage{
                            wrapper: String,
                            cacheTag: String): Option[CacheOutput] = timer{
 
-      val dir = pkg.replace("/", "$div") + "." + wrapper.replace("/", "$div")
+      val dir = encode(pkg) + "." + encode(wrapper)
       val codeCacheDir = cacheDir/'scriptCaches/dir/cacheTag
       if(!exists(codeCacheDir)) None
       else {
@@ -207,7 +208,7 @@ object Storage{
     }
 
     def compileCacheLoad(path: String, tag: String): Option[CompileCache] = timer{
-      val tagCacheDir = compileCacheDir/path.replace("/", "$div").replace(":", "$colon")/tag
+      val tagCacheDir = compileCacheDir/encode(path)/tag
       if(!exists(tagCacheDir)) None
       else for{
         (loadedTag, metadata) <- readJson[(String, Imports)](tagCacheDir/metadataFile)

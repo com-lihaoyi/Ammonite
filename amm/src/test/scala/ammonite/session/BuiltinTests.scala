@@ -1,7 +1,6 @@
 package ammonite.session
 
 import ammonite.TestRepl
-import ammonite.util.Util.windowsPlatform
 import utest._
 
 import scala.collection.{immutable => imm}
@@ -55,24 +54,22 @@ object BuiltinTests extends TestSuite{
     }
 
     'loadCP{
-      if(!windowsPlatform){
-        check.session("""
-          @ import ammonite.ops._, ImplicitWd._
+      check.session("""
+        @ import ammonite.ops._, ImplicitWd._
 
-          @ val javaSrc = cwd/'amm/'src/'test/'resources/'loadable/'hello/"Hello.java"
+        @ val javaSrc = cwd/'amm/'src/'test/'resources/'loadable/'hello/"Hello.java"
 
-          @ mkdir! cwd/'target/'loadCP/'hello
+        @ mkdir! cwd/'target/'loadCP/'hello
 
-          @ cp.over(javaSrc, cwd/'target/'loadCP/'hello/"Hello.java")
+        @ cp.over(javaSrc, cwd/'target/'loadCP/'hello/"Hello.java")
 
-          @ %javac 'target/'loadCP/'hello/"Hello.java"  //This line causes problems in windows
+        @ %javac 'target/'loadCP/'hello/"Hello.java"  //This line causes problems in windows
 
-          @ import $cp.target.loadCP  //This line causes problems in windows
+        @ import $cp.target.loadCP  //This line causes problems in windows
 
-          @ hello.Hello.hello()
-          res6: String = "Hello!"
-        """)
-      }
+        @ hello.Hello.hello()
+        res6: String = "Hello!"
+      """)
     }
     'settings{
       val fruitlessTypeTestWarningMessageBlahBlahBlah =
@@ -131,46 +128,44 @@ object BuiltinTests extends TestSuite{
 
 
     'saveLoad {
-      if(!windowsPlatform){
-        check.session(
-          """
-          @ val veryImportant = 1
-          veryImportant: Int = 1
+      check.session(
+        """
+        @ val veryImportant = 1
+        veryImportant: Int = 1
 
-          @ sess.save()
+        @ sess.save()
 
-          @ val oopsDontWantThis = 2
-          oopsDontWantThis: Int = 2
+        @ val oopsDontWantThis = 2
+        oopsDontWantThis: Int = 2
 
-          @ // Let's try this new cool new library
+        @ // Let's try this new cool new library
 
-          @ import $ivy.`com.lihaoyi::scalatags:0.5.3`
+        @ import $ivy.`com.lihaoyi::scalatags:0.5.3`
 
-          @ veryImportant
-          res4: Int = 1
+        @ veryImportant
+        res4: Int = 1
 
-          @ oopsDontWantThis
-          res5: Int = 2
+        @ oopsDontWantThis
+        res5: Int = 2
 
-          @ import scalatags.Text.all._
+        @ import scalatags.Text.all._
 
-          @ div("Hello").render
-          res7: String = "<div>Hello</div>"
+        @ div("Hello").render
+        res7: String = "<div>Hello</div>"
 
-          @ // Oh no, maybe we don't want scalatags!
+        @ // Oh no, maybe we don't want scalatags!
 
-          @ sess.load()
+        @ sess.load()
 
-          @ veryImportant
-          res9: Int = 1
+        @ veryImportant
+        res9: Int = 1
 
-          @ oopsDontWantThis
-          error: not found: value oopsDontWantThis
+        @ oopsDontWantThis
+        error: not found: value oopsDontWantThis
 
-          @ import scalatags.Text.all._
-          error: not found: value scalatags
-          """)
-      }
+        @ import scalatags.Text.all._
+        error: not found: value scalatags
+        """)
     }
     'saveLoad2{
       check.session("""

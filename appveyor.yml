@@ -1,6 +1,11 @@
 # Adapted from https://github.com/sbt/sbt-native-packager/blob/master/appveyor.yml
 version: '{build}'
 os: Windows Server 2012
+
+#  To make the extended ascii characters work on Windows
+#  we need to set string encoding for jvm to utf-8 on windows
+environment:
+        JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF8
 install:
   - ps: |
       Add-Type -AssemblyName System.IO.Compression.FileSystem
@@ -25,5 +30,6 @@ test_script:
 #  - sbt ++2.10.6 ops/test
 cache:
   - C:\sbt\
-  - C:\Users\appveyor\.ivy2
+  # Just to make sure ivy cache is updated 'cause otherwise few tests misbehave
+  - C:\Users\appveyor\.ivy2 -> appveyor.yml
   - C:\Users\appveyor\.sbt

@@ -18,7 +18,9 @@ object ErrorTruncationTests extends TestSuite{
     val e = fansi.Str(
       intercept[ShelloutException]{ exec(file) }.result.err.string
     ).plainText
-    assert(e == expected)
+    //This string gets included on windows due to environment variable set additionally
+    val extraStringOnWindows = "Picked up JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF8\n"
+    assert(e.replace(extraStringOnWindows, "") == expected)
   }
   val tests = TestSuite {
 

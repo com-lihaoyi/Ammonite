@@ -33,39 +33,33 @@ object BasicTests extends TestSuite{
     'linuxOnlyTests {
 
       'complex {
-        if (!Util.windowsPlatform) {
-          val evaled = exec('basic / "Complex.sc")
-          assert(evaled.out.trim.contains("Spire Interval [0, 10]"))
-        }
+        val evaled = exec('basic / "Complex.sc")
+        assert(evaled.out.trim.contains("Spire Interval [0, 10]"))
       }
 
 
       'shell {
         // make sure you can load the example-predef.sc, have it pull stuff in
         // from ivy, and make use of `cd!` and `wd` inside the executed script.
-        if (!Util.windowsPlatform) {
-          val res = %% bash(
-            executable,
-            "--predef-file",
-            exampleBarePredef,
-            "-c",
-            """val x = wd
-            |@
-            |cd! 'amm/'src
-            |@
-            |println(wd relativeTo x)""".stripMargin
-          )
+        val res = %% bash(
+          executable,
+          "--predef-file",
+          exampleBarePredef,
+          "-c",
+          """val x = wd
+          |@
+          |cd! 'amm/'src
+          |@
+          |println(wd relativeTo x)""".stripMargin
+        )
 
-          val output = res.out.trim
-          assert(output == "amm/src")
-        }
+        val output = res.out.trim
+        assert(output == "amm/src")
       }
 
       'classloaders{
-        if (!Util.windowsPlatform) {
-          val evaled = exec('basic / "Resources.sc")
-          assert(evaled.out.string.contains("1745"))
-        }
+        val evaled = exec('basic / "Resources.sc")
+        assert(evaled.out.string.contains("1745"))
       }
 
       'playframework- {

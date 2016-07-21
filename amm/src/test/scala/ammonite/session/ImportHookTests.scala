@@ -71,81 +71,70 @@ object ImportHookTests extends TestSuite{
       }
       'ivy{
         'basic - {
-          if(!Util.windowsPlatform){
-            check.session("""
-              @ import scalatags.Text.all._
-              error: not found: value scalatags
+          check.session("""
+            @ import scalatags.Text.all._
+            error: not found: value scalatags
 
-              @ import $ivy.`com.lihaoyi::scalatags:0.5.3`
+            @ import $ivy.`com.lihaoyi::scalatags:0.5.3`
 
-              @ import scalatags.Text.all._
+            @ import scalatags.Text.all._
 
-              @ div("Hello").render
-              res2: String = "<div>Hello</div>"
-             """)
-          }
+            @ div("Hello").render
+            res2: String = "<div>Hello</div>"
+           """)
         }
 
         'explicitBinaryVersion - {
-          if(!Util.windowsPlatform){
-            check.session(s"""
-              @ import scalatags.Text.all._
-              error: not found: value scalatags
+          check.session(s"""
+            @ import scalatags.Text.all._
+            error: not found: value scalatags
 
-              @ import $$ivy.`com.lihaoyi:scalatags_${IvyThing.scalaBinaryVersion}:0.5.3`
+            @ import $$ivy.`com.lihaoyi:scalatags_${IvyThing.scalaBinaryVersion}:0.5.3`
 
-              @ import scalatags.Text.all._
+            @ import scalatags.Text.all._
 
-              @ div("Hello").render
-              res2: String = "<div>Hello</div>"
-             """)
-          }
+            @ div("Hello").render
+            res2: String = "<div>Hello</div>"
+           """)
         }
 
         'inline - {
-          if(!Util.windowsPlatform){
-            check.session("""
-              @ import scalatags.Text.all._
-              error: not found: value scalatags
+          check.session("""
+            @ import scalatags.Text.all._
+            error: not found: value scalatags
 
-              @ import $ivy.`com.lihaoyi::scalatags:0.5.3`, scalatags.Text.all._
+            @ import $ivy.`com.lihaoyi::scalatags:0.5.3`, scalatags.Text.all._
 
-              @ div("Hello").render
-              res1: String = "<div>Hello</div>"
-             """)
-          }
+            @ div("Hello").render
+            res1: String = "<div>Hello</div>"
+           """)
         }
       }
       'url{
         val scriptUrl =
           "https://raw.githubusercontent.com/lihaoyi/Ammonite/" +
           "master/amm/src/test/resources/scripts/Annotation.sc"
-        //has some problem with path on windows most prolly windows can't handle `$` in path
         'basic - {
-          if (!Util.windowsPlatform) {
-            check.session(s"""
-            @ import $$url.`$scriptUrl`
-            error: $$url import failed
+          check.session(s"""
+          @ import $$url.`$scriptUrl`
+          error: $$url import failed
 
-            @ import $$url.{`$scriptUrl` => remote}
+          @ import $$url.{`$scriptUrl` => remote}
 
-            @ remote.product(1, List(2, 3, 4))
-            res1: Int = 24
-          """)
-          }
+          @ remote.product(1, List(2, 3, 4))
+          res1: Int = 24
+        """)
         }
         'inline - {
-          if (!Util.windowsPlatform) {
-            check.session(s"""
-            @ import $$url.`$scriptUrl`
-            error: $$url import failed
+          check.session(s"""
+          @ import $$url.`$scriptUrl`
+          error: $$url import failed
 
-            @ import $$url.{`$scriptUrl` => remote}; val x = remote.product(1, List(2, 3, 4))
+          @ import $$url.{`$scriptUrl` => remote}; val x = remote.product(1, List(2, 3, 4))
 
-            @ x
-            res1: Int = 24
-          """)
-          }
+          @ x
+          res1: Int = 24
+        """)
         }
       }
     }
@@ -165,14 +154,12 @@ object ImportHookTests extends TestSuite{
        """)
 
       'ivy - {
-        if(!Util.windowsPlatform){
-          check.session("""
-            @ import $file.amm.src.test.resources.importHooks.IvyImport
+        check.session("""
+          @ import $file.amm.src.test.resources.importHooks.IvyImport
 
-            @ IvyImport.rendered
-            res1: String = "<div>Moo</div>"
-           """)
-        }
+          @ IvyImport.rendered
+          res1: String = "<div>Moo</div>"
+         """)
       }
 
       'deepImport - check.session("""
