@@ -30,5 +30,6 @@ test_script:
 #  - sbt ++2.10.6 ops/test
 cache:
   - C:\sbt\
+  # Just to make sure ivy cache is updated 'cause otherwise few tests misbehave
   - C:\Users\appveyor\.ivy2 -> appveyor.yml
   - C:\Users\appveyor\.sbt
