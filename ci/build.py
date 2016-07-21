@@ -4,7 +4,7 @@ from subprocess import check_call, check_output
 import json
 import sys
 
-
+print "START TIME", datetime.datetime.now().isoformat()
 is_master_commit = (
     os.environ['TRAVIS_PULL_REQUEST'] == "false" and
     os.environ['TRAVIS_BRANCH'] == "master"
@@ -95,3 +95,5 @@ elif sys.argv[1] == "test":
 
 else:
     raise Exception("Unknown argument list %s" % sys.argv)
+
+print "END TIME", datetime.datetime.now().isoformat()
