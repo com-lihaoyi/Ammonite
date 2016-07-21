@@ -3,17 +3,23 @@ import os
 from subprocess import check_call, check_output
 import json
 import sys
+import datetime
+
 
 print "START TIME", datetime.datetime.now().isoformat()
+
+
 is_master_commit = (
     os.environ['TRAVIS_PULL_REQUEST'] == "false" and
     os.environ['TRAVIS_BRANCH'] == "master"
 )
 
+
 all_versions = [
     "2.10.4", "2.10.5", "2.10.6",
     "2.11.3", "2.11.4", "2.11.5", "2.11.6", "2.11.7", "2.11.8"
 ]
+
 
 def update_version():
     git_hash = check_output(["git", "rev-parse", "--short", "HEAD"]).strip()
