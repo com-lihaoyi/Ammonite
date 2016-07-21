@@ -241,7 +241,7 @@
           This lets you load @sect.ref{Scala Scripts} into the REPL. For
           example given a small script defining one value we want
         @hl.scala
-          // MyScript.scala
+          // MyScript.sc
           val elite = 31337
 
         @p
@@ -276,7 +276,7 @@
           res1: Int = 31337
 
         @p
-          While this is a trivial example, your @code{MyScript.scala} file can
+          While this is a trivial example, your @code{MyScript.sc} file can
           contain anything you want, not just @hl.scala{val}s: function
           @hl.scala{def}s, @hl.scala{class}es @hl.scala{object}s or
           @hl.scala{trait}s, or imports from @i{other} scripts. For more
@@ -713,7 +713,7 @@
   @sect{Configuration}
     @p
       Ammonite is configured via Scala code, that can live in the
-      @code{~/.ammonite/predef.scala} file, passed in through SBT's
+      @code{~/.ammonite/predef.sc} file, passed in through SBT's
       @hl.scala{initialCommands}, or passed to the command-line executable as
       @code{--predef='...'}.
 

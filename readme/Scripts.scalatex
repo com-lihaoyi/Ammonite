@@ -14,7 +14,7 @@
     more lightweight and easier to set up than a SBT project.
   @p
     Creating an Ammonite Script is just a matter of creating a
-    @hl.scala{MyScript.scala} with some Scala code in it, and running it from
+    @hl.scala{MyScript.sc} with some Scala code in it, and running it from
     within the Ammonite REPL or @sect.ref{From Bash}. Writing Scala code
     doesn't get much easier than that!
 
@@ -26,7 +26,7 @@
       sequence of Scala statements, e.g.
   
     @hl.scala
-      // MyScript.scala
+      // MyScript.sc
       // print banner
       println("Welcome to the XYZ custom REPL!!")
 
@@ -205,7 +205,7 @@
       @p
         You can load any script into the Ammonite REPL using the
         @hl.scala{import $file} syntax, for example here we import the above
-        @hl.scala{MyScript.scala} file to access its @hl.scala{x} value:
+        @hl.scala{MyScript.sc} file to access its @hl.scala{x} value:
 
       @hl.scala
         @@ x // doesn't work yet
@@ -243,7 +243,7 @@
       @p
         Note that by default, scripts imported via @code{$file} are
         @i{encapsulated}, so any imports inside that @code{MyScript} performs are
-        not available outside of @code{MyScript.scala}:
+        not available outside of @code{MyScript.sc}:
 
       @hl.scala
         @@ import $file.MyScript, MyScript._
@@ -256,7 +256,7 @@
         Compilation Failed
       @p
         As you can see, even though @code{collection.mutable} was imported inside
-        @code{MyScript.scala}, you cannot use them outside after importing it.
+        @code{MyScript.sc}, you cannot use them outside after importing it.
 
       @p
         If you want to make everything (both imports and definitions) available
