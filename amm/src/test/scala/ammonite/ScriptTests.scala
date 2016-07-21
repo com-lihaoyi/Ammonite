@@ -1,11 +1,7 @@
 package ammonite
 
 import ammonite.TestUtils.scala2_10
-import ammonite.interp.{History, Interpreter, Storage}
-import ammonite.main.Defaults
 import ammonite.ops._
-import ammonite.tools.IvyConstructor._
-import ammonite.util.{Colors, Printer, Ref, Timer, Util}
 import utest._
 
 object ScriptTests extends TestSuite{

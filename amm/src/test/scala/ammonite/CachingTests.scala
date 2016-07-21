@@ -4,7 +4,7 @@ import ammonite.interp.{History, Interpreter, Storage}
 import ammonite.main.Defaults
 import ammonite.ops._
 import ammonite.tools.IvyConstructor._
-import ammonite.util.{Colors, Printer, Ref, Timer, Util}
+import ammonite.util.{Colors, Printer, Ref, Util}
 import utest._
 
 object CachingTests extends TestSuite{
@@ -27,8 +27,7 @@ object CachingTests extends TestSuite{
       new History(Vector()),
       predef = predef,
       wd = ammonite.ops.cwd,
-      replArgs = Seq(),
-      timer = Timer.none
+      replArgs = Seq()
     )
     val tempDir = tmp.dir(prefix="ammonite-tester")
     'noAutoIncrementWrapper{

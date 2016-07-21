@@ -118,19 +118,5 @@ object BasicTests extends TestSuite{
 
       }
     }
-
-    'load_script{
-      val name = 'basic/"QuickSort.sc"
-      val res = %%bash(
-        executable,
-        "--predef-file",
-        emptyPrefdef,
-        replStandaloneResources/name,
-        "-t"
-        )
-      println("Time analysis of loading qs.sc(test script)\n\n")
-      res.out.lines.foreach { println }
-      println("\n-------------------------")
-    }
   }
 }

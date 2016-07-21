@@ -10,7 +10,7 @@ import fastparse.core.Parsed
 
 import scala.annotation.tailrec
 import Filter._
-import ammonite.util.{Colors, Parsers, Res, Timer}
+import ammonite.util.{Colors, Parsers, Res}
 case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEnd{
 
   def width = FrontEndUtils.width

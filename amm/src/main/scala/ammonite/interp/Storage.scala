@@ -3,7 +3,7 @@ package ammonite.interp
 import acyclic.file
 import ammonite.ops._
 import ammonite.util.Parsers.ImportTree
-import ammonite.util.{Imports, Parsers, StableRef, Timer}
+import ammonite.util.{Imports, Parsers, StableRef}
 import ammonite.util.Util.{CacheOutput, ClassFiles, CompileCache, IvyMap, newLine}
 import org.apache.ivy.plugins.resolver.RepositoryResolver
 
@@ -98,7 +98,7 @@ object Storage{
   }
 
 
-  class Folder(val dir: Path, timer: Timer = Timer.none) extends Storage{
+  class Folder(val dir: Path) extends Storage{
     val predef = dir/"predef.sc"
     // Each version puts its cache in a separate folder, to bust caches
     // on every version bump; otherwise binary-incompatible changes to
@@ -111,7 +111,7 @@ object Storage{
     val metadataFile = "metadata.json"
     val historyFile = dir/'history
     val fullHistory = new StableRef[History]{
-      def apply(): History = timer{
+      def apply(): History = {
         try{
           new History(upickle.default.read[Vector[String]](read(historyFile)))
         }catch{case e: Exception =>
@@ -119,12 +119,12 @@ object Storage{
         }
       }
 
-      def update(t: History): Unit = timer{
+      def update(t: History): Unit = {
         write.over(historyFile, upickle.default.write(t.toVector, indent = 4))
       }
     }
 
-    def compileCacheSave(path: String, tag: String, data: CompileCache): Unit = timer{
+    def compileCacheSave(path: String, tag: String, data: CompileCache): Unit = {
       val (classFiles, imports) = data
       val tagCacheDir = compileCacheDir/encode(path)/tag
 
@@ -144,7 +144,7 @@ object Storage{
                            dataList: Seq[(String, String)],
                            imports: Imports,
                            tag: String,
-                           importTreesList: Seq[ImportTree]): Unit = timer{
+                           importTreesList: Seq[ImportTree]): Unit = {
       val dir = encode(pkg) + "." + encode(wrapper)
       val codeCacheDir = cacheDir/'scriptCaches/dir/tag
       if (!exists(codeCacheDir)){
@@ -165,8 +165,8 @@ object Storage{
 
     def readJson[T: upickle.default.Reader](path: Path): Option[T] = {
       try {
-        val fileData = timer{ammonite.ops.read(path)}
-        val parsed = timer{upickle.default.read(fileData)}
+        val fileData = {ammonite.ops.read(path)}
+        val parsed = {upickle.default.read(fileData)}
         Some(parsed)
       }
       catch{ case e => None }
@@ -174,7 +174,7 @@ object Storage{
 
     def classFilesListLoad(pkg: String,
                            wrapper: String,
-                           cacheTag: String): Option[CacheOutput] = timer{
+                           cacheTag: String): Option[CacheOutput] = {
 
       val dir = encode(pkg) + "." + encode(wrapper)
       val codeCacheDir = cacheDir/'scriptCaches/dir/cacheTag
@@ -207,7 +207,7 @@ object Storage{
       }
     }
 
-    def compileCacheLoad(path: String, tag: String): Option[CompileCache] = timer{
+    def compileCacheLoad(path: String, tag: String): Option[CompileCache] = {
       val tagCacheDir = compileCacheDir/encode(path)/tag
       if(!exists(tagCacheDir)) None
       else for{
@@ -220,7 +220,7 @@ object Storage{
       }
     }
 
-    def loadClassFiles(cacheDir: Path): Option[ClassFiles] = timer{
+    def loadClassFiles(cacheDir: Path): Option[ClassFiles] = {
       val classFiles = ls(cacheDir).filter(_.ext == "class").toVector
       Try{
         val data = classFiles.map{ case file =>
@@ -233,7 +233,7 @@ object Storage{
 
 
     val ivyCache = new StableRef[IvyMap]{
-      def apply() = timer{
+      def apply() = {
         val json =
           try read(ivyCacheFile)
           catch{ case e: java.nio.file.NoSuchFileException => "[]" }
@@ -241,7 +241,7 @@ object Storage{
         try upickle.default.read[IvyMap](json)
         catch{ case e: Exception => Map.empty }
       }
-      def update(map: IvyMap) = timer{
+      def update(map: IvyMap) = {
         write.over(ivyCacheFile, upickle.default.write(map, indent = 4))
       }
     }

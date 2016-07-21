@@ -51,12 +51,11 @@ case class Main(predef: String = "",
                 welcomeBanner: Option[String] = Some(Defaults.welcomeBanner),
                 inputStream: InputStream = System.in,
                 outputStream: OutputStream = System.out,
-                errorStream: OutputStream = System.err,
-                timer: Timer = Timer.none){
+                errorStream: OutputStream = System.err){
   /**
     * Instantiates an ammonite.Repl using the configuration
     */
-  def instantiateRepl(replArgs: Seq[Bind[_]] = Nil) = timer{
+  def instantiateRepl(replArgs: Seq[Bind[_]] = Nil) = {
     val augmentedPredef = Main.maybeDefaultPredef(defaultPredef, Defaults.predefString)
     new Repl(
       inputStream, outputStream, errorStream,
@@ -64,11 +63,10 @@ case class Main(predef: String = "",
       predef = augmentedPredef + newLine + predef,
       wd = wd,
       welcomeBanner = welcomeBanner,
-      replArgs = replArgs,
-      timer = timer
+      replArgs = replArgs
     )
   }
-  def run(replArgs: Bind[_]*) = timer{
+  def run(replArgs: Bind[_]*) = {
     instantiateRepl(replArgs).run()
   }
 
@@ -79,7 +77,7 @@ case class Main(predef: String = "",
   def runScript(path: Path,
                 mainMethodName: Option[String],
                 args: Seq[String],
-                kwargs: Seq[(String, String)]): Res[Imports] = timer{
+                kwargs: Seq[(String, String)]): Res[Imports] = {
 
     val repl = instantiateRepl()
     main.Scripts.runScript(wd, path, repl, mainMethodName, args, kwargs)
@@ -88,7 +86,7 @@ case class Main(predef: String = "",
   /**
     * Run a snippet of code
     */
-  def runCode(code: String) = timer{
+  def runCode(code: String) = {
     instantiateRepl().interp.replApi.load(code)
   }
 }
@@ -100,10 +98,8 @@ object Main{
     * delegating to [[Main.run]]
     */
   def main(args0: Array[String]) = {
-    val startTime = System.nanoTime()
     var fileToExecute: Option[Path] = None
     var codeToExecute: Option[String] = None
-    var logTimings = false
     var ammoniteHome: Option[Path] = None
     var passThroughArgs: Seq[String] = Vector.empty
     var predefFile: Option[Path] = None
@@ -129,9 +125,7 @@ object Main{
       opt[String]('c', "code")
         .foreach(x => codeToExecute = Some(x))
         .text("Pass in code to be run immediately in the REPL")
-      opt[Unit]('t', "time")
-        .foreach(_ => logTimings = true)
-        .text("Print time taken for each step")
+
       opt[String]('x', "execute")
         .foreach{ x => mainMethodName = Some(x)}
         .text(
@@ -201,21 +195,18 @@ object Main{
     }
     for(c <- replParser.parse(before, Main())) ifContinually(continually){
       val preTiming = System.nanoTime()
-      if (logTimings) println("pre-timer:\t" + (preTiming - startTime) / 1000000.0)
 
-      val timer = if(logTimings) Timer() else Timer.none
-      timer{
+      {
         val main = Main(
           c.predef,
           c.defaultPredef,
           predefFile match {
-            case None => new Storage.Folder(ammoniteHome.getOrElse(Defaults.ammoniteHome), timer)
+            case None => new Storage.Folder(ammoniteHome.getOrElse(Defaults.ammoniteHome))
             case Some(pf) =>
-              new Storage.Folder(ammoniteHome.getOrElse(Defaults.ammoniteHome), timer) {
+              new Storage.Folder(ammoniteHome.getOrElse(Defaults.ammoniteHome)) {
                 override val predef = pf
               }
-          },
-          timer = timer
+          }
         )
         (fileToExecute, codeToExecute) match {
           case (None, None) => println("Loading..."); main.run()

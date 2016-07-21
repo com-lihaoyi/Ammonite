@@ -3,7 +3,7 @@ package ammonite.interp
 import java.io.OutputStream
 
 import acyclic.file
-import ammonite.util.{ImportData, Imports, Printer, Timer}
+import ammonite.util.{ImportData, Imports, Printer}
 import ammonite.util.Util.{ClassFiles, newLine}
 
 import scala.collection.mutable
@@ -164,11 +164,10 @@ object Compiler{
             evalClassloader: => ClassLoader,
             pluginClassloader: => ClassLoader,
             shutdownPressy: () => Unit,
-            settings: Settings,
-            timer: Timer): Compiler = new Compiler{
+            settings: Settings): Compiler = new Compiler{
 
     val PluginXML = "scalac-plugin.xml"
-    lazy val plugins0 = timer{
+    lazy val plugins0 = {
       import scala.collection.JavaConverters._
       val loader = pluginClassloader
 
@@ -206,7 +205,7 @@ object Compiler{
 
     var lastImports = Seq.empty[ImportData]
 
-    val (vd, reporter, compiler) = timer{
+    val (vd, reporter, compiler) = {
       val (reporter, vd, jcp) = initGlobalBits(
         classpath, dynamicClasspath, errorLogger, warningLogger, infoLogger, settings
       )
@@ -242,7 +241,7 @@ object Compiler{
       (vd, reporter, scalac)
     }
 
-    def search(target: scala.reflect.runtime.universe.Type) = timer{
+    def search(target: scala.reflect.runtime.universe.Type) = {
       def resolve(path: String*): compiler.Symbol = {
         var curr = path.toList
         var start: compiler.Symbol = compiler.RootClass
@@ -286,7 +285,7 @@ object Compiler{
     def compile(src: Array[Byte],
                 printer: Printer,
                 importsLen0: Int,
-                fileName: String): Output = timer{
+                fileName: String): Output = {
 
       def enumerateVdFiles(d: VirtualDirectory): Iterator[AbstractFile] = {
         val (subs, files) = d.iterator.partition(_.isDirectory)
@@ -328,7 +327,7 @@ object Compiler{
     }
 
 
-    def parse(line: String): Either[String, Seq[Global#Tree]] = timer{
+    def parse(line: String): Either[String, Seq[Global#Tree]] = {
       val errors = mutable.Buffer.empty[String]
       val warnings = mutable.Buffer.empty[String]
       val infos = mutable.Buffer.empty[String]

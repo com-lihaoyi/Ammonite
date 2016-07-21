@@ -56,8 +56,7 @@ object Evaluator{
   }
 
   def apply(currentClassloader: ClassLoader,
-            startingLine: Int,
-            timer: Timer): Evaluator = new Evaluator{ eval =>
+            startingLine: Int): Evaluator = new Evaluator{ eval =>
 
 
     /**
@@ -175,7 +174,7 @@ object Evaluator{
                     newImports: Imports,
                     printer: Printer,
                     fileName: String,
-                    indexedWrapperName: Name) = timer{
+                    indexedWrapperName: Name) = {
       for {
         cls <- loadClass("$sess." + indexedWrapperName.backticked, classFiles)
         _ = currentLine += 1
@@ -197,7 +196,7 @@ object Evaluator{
                            newImports: Imports,
                            wrapperName: Name,
                            pkgName: Seq[Name],
-                           tag: String) = timer{
+                           tag: String) = {
       for {
         _ <- Catching{userCodeExceptionHandler}
       } yield {
@@ -211,7 +210,7 @@ object Evaluator{
                              pkg: String,
                              wrapper: String,
                              dynamicClasspath: VirtualDirectory,
-                             classFilesList: Seq[String]): Res[Seq[_]] = timer{
+                             classFilesList: Seq[String]): Res[Seq[_]] = {
       Res.map(cachedData.zipWithIndex) {
         case (clsFiles, index) =>
           Compiler.addToClasspath(clsFiles, dynamicClasspath)
@@ -227,7 +226,7 @@ object Evaluator{
 
     def evaluationResult(wrapperName: Seq[Name],
                          imports: Imports,
-                         tag: String) = timer{
+                         tag: String) = {
       Evaluated(
         wrapperName,
         Imports(

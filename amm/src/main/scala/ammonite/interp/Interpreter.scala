@@ -38,8 +38,7 @@ class Interpreter(prompt0: Ref[String],
                   history: => History,
                   predef: String,
                   val wd: Path,
-                  replArgs: Seq[Bind[_]],
-                  timer: Timer)
+                  replArgs: Seq[Bind[_]])
   extends ImportHook.InterpreterInterface{ interp =>
 
 
@@ -57,7 +56,7 @@ class Interpreter(prompt0: Ref[String],
 
 
   val mainThread = Thread.currentThread()
-  val eval = Evaluator(mainThread.getContextClassLoader, 0, timer)
+  val eval = Evaluator(mainThread.getContextClassLoader, 0)
 
   val dynamicClasspath = new VirtualDirectory("(memory)", None)
   var compiler: Compiler = null
@@ -69,7 +68,7 @@ class Interpreter(prompt0: Ref[String],
       init()
   }
 
-  def init() = timer{
+  def init() = {
     // Note we not only make a copy of `settings` to pass to the compiler,
     // we also make a *separate* copy to pass to the presentation compiler.
     // Otherwise activating autocomplete makes the presentation compiler mangle
@@ -81,8 +80,7 @@ class Interpreter(prompt0: Ref[String],
       evalClassloader,
       eval.sess.frames.head.pluginClassloader,
       () => pressy.shutdownPressy(),
-      settings,
-      timer
+      settings
     )
     pressy = Pressy(
       Classpath.classpath ++ eval.sess.frames.head.classpath,
@@ -133,7 +131,7 @@ class Interpreter(prompt0: Ref[String],
   // on `predefImports`, and we should be able to provide the "current" imports
   // to it even if it's half built
   var predefImports = Imports()
-  for( (sourceCode, wrapperName) <- predefs) timer{
+  for( (sourceCode, wrapperName) <- predefs) {
     val pkgName = Seq(Name("ammonite"), Name("predef"))
 
     processModule(
@@ -154,7 +152,8 @@ class Interpreter(prompt0: Ref[String],
       case Res.Exception(ex, msg) =>
         throw new RuntimeException("Error during Predef: " + msg, ex)
     }
-  }("loadingPredef " + wrapperName.backticked)
+  }
+
 
   eval.sess.save()
   reInit()
@@ -191,8 +190,7 @@ class Interpreter(prompt0: Ref[String],
     }
   }
   def resolveImportHooks(source: ImportHook.Source,
-                         stmts: Seq[String]): Res[(Imports, Seq[String], Seq[ImportTree])] =
-    timer{
+                         stmts: Seq[String]): Res[(Imports, Seq[String], Seq[ImportTree])] = {
       val hookedStmts = mutable.Buffer.empty[String]
       val importTrees = mutable.Buffer.empty[ImportTree]
       for(stmt <- stmts) {
@@ -221,7 +219,7 @@ class Interpreter(prompt0: Ref[String],
       }
     }
 
-  def processLine(code: String, stmts: Seq[String], fileName: String): Res[Evaluated] = timer{
+  def processLine(code: String, stmts: Seq[String], fileName: String): Res[Evaluated] = {
     val preprocess = Preprocessor(compiler.parse)
     for{
       _ <- Catching { case ex =>
@@ -282,7 +280,7 @@ class Interpreter(prompt0: Ref[String],
   def evaluateLine(processed: Preprocessor.Output,
                    printer: Printer,
                    fileName: String,
-                   indexedWrapperName: Name): Res[Evaluated] = timer{
+                   indexedWrapperName: Name): Res[Evaluated] = {
     for{
       _ <- Catching{ case e: ThreadDeath => Evaluator.interrupted(e) }
       (classFiles, newImports) <- compileClass(
@@ -308,7 +306,7 @@ class Interpreter(prompt0: Ref[String],
                          printer: Printer,
                          wrapperName: Name,
                          fileName: String,
-                         pkgName: Seq[Name]) = timer{
+                         pkgName: Seq[Name]) = {
     for {
       (cls, newImports, tag) <- cachedCompileBlock(
         processed,
@@ -328,8 +326,7 @@ class Interpreter(prompt0: Ref[String],
                          wrapperName: Name,
                          fileName: String,
                          pkgName: Seq[Name],
-                         printCode: String): Res[(Class[_], Imports, String)] =
-    timer{
+                         printCode: String): Res[(Class[_], Imports, String)] = {
 
 
       val fullyQualifiedName = (pkgName :+ wrapperName).map(_.encoded).mkString(".")
@@ -360,7 +357,7 @@ class Interpreter(prompt0: Ref[String],
                     code: String,
                     wrapperName: Name,
                     pkgName: Seq[Name],
-                    autoImport: Boolean): Res[Imports] = timer{
+                    autoImport: Boolean): Res[Imports] = {
 
     val tag = Interpreter.cacheTag(
       code, Nil, eval.sess.frames.head.classloader.classpathHash
@@ -417,7 +414,7 @@ class Interpreter(prompt0: Ref[String],
                      wrapperName: Name,
                      pkgName: Seq[Name],
                      startingImports: Imports,
-                     autoImport: Boolean): Res[Interpreter.ProcessedData] = timer{
+                     autoImport: Boolean): Res[Interpreter.ProcessedData] = {
     for{
       (processedBlocks, hookImports, importTrees) <- preprocessScript(source, code)
       (imports, cacheData) <- processCorrectScript(
@@ -440,7 +437,7 @@ class Interpreter(prompt0: Ref[String],
 
 
 
-  def processExec(code: String): Res[Imports] = timer{
+  def processExec(code: String): Res[Imports] = {
     init()
     for {
       (processedBlocks, hookImports, _) <- preprocessScript(
@@ -473,7 +470,7 @@ class Interpreter(prompt0: Ref[String],
                            wrapperName: Name,
                            evaluate: Interpreter.EvaluateCallback,
                            autoImport: Boolean
-                          ): Res[Interpreter.CacheData] = timer{
+                          ): Res[Interpreter.CacheData] = {
 
     val preprocess = Preprocessor(compiler.parse)
     // we store the old value, because we will reassign this in the loop
@@ -557,7 +554,7 @@ class Interpreter(prompt0: Ref[String],
       case Res.Exception(ex, msg) => lastException = ex
     }
   }
-  def loadIvy(coordinates: (String, String, String), verbose: Boolean = true) = timer{
+  def loadIvy(coordinates: (String, String, String), verbose: Boolean = true) = {
     val (groupId, artifactId, version) = coordinates
     val cacheKey = (replApi.resolvers().hashCode.toString, groupId, artifactId, version)
 

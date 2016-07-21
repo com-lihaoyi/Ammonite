@@ -8,32 +8,6 @@ import acyclic.file
 import ammonite.ops._
 import ammonite.util.Parsers.ImportTree
 
-trait Timer{
-  def apply[T](t: => T)(implicit n: sourcecode.Enclosing): T
-}
-object Timer{
-  def none = new Timer{
-    def apply[T](t: => T)(implicit n: sourcecode.Enclosing) = t
-  }
-  def apply() = new Timer{
-    var current = 0L
-
-    def reset() = current = System.nanoTime()
-
-    var indents = 0
-    def apply[T](t: => T)(implicit n: sourcecode.Enclosing) = {
-      val start = System.nanoTime()
-      val gap = "    " * indents
-      println(gap + "+ " + n.value)
-      indents += 1
-      val res = t
-      indents -= 1
-      val end = System.nanoTime
-      println(gap + "- " + n.value + ":\t" + (end - start) / 1000000.0)
-      res
-    }
-  }
-}
 
 object Util{
 

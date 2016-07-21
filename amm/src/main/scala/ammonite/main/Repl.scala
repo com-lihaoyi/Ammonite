@@ -17,8 +17,7 @@ class Repl(input: InputStream,
            predef: String,
            wd: ammonite.ops.Path,
            welcomeBanner: Option[String],
-           replArgs: Seq[Bind[_]] = Nil,
-           timer: Timer = Timer.none) {
+           replArgs: Seq[Bind[_]] = Nil) {
 
   val prompt = Ref("@ ")
 
@@ -51,28 +50,25 @@ class Repl(input: InputStream,
     history,
     predef,
     wd,
-    replArgs,
-    timer = timer
+    replArgs
   )
 
   val reader = new InputStreamReader(input)
 
   def action() = for{
-    (code, stmts) <- timer{
-      frontEnd().action(
-        input,
-        reader,
-        output,
-        colors().prompt()(prompt()).render,
-        colors(),
-        interp.pressy.complete(_, interp.replApi.imports, _),
-        storage.fullHistory(),
-        addHistory = (code) => if (code != "") {
-          storage.fullHistory() = storage.fullHistory() :+ code
-          history = history :+ code
-        }
-      )
-    }
+    (code, stmts) <- frontEnd().action(
+      input,
+      reader,
+      output,
+      colors().prompt()(prompt()).render,
+      colors(),
+      interp.pressy.complete(_, interp.replApi.imports, _),
+      storage.fullHistory(),
+      addHistory = (code) => if (code != "") {
+        storage.fullHistory() = storage.fullHistory() :+ code
+        history = history :+ code
+      }
+    )
     _ <- Signaller("INT") { interp.mainThread.stop() }
     out <- interp.processLine(code, stmts, s"cmd${interp.eval.getCurrentLine}.sc")
   } yield {
