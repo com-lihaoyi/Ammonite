@@ -18,6 +18,15 @@
     within the Ammonite REPL or @sect.ref{From Bash}. Writing Scala code
     doesn't get much easier than that!
 
+  @p
+    To begin with, download the Ammonite script-runner:
+
+  @hl.sh
+    @replCurl
+
+  @p
+    And read on to learn about how Scala scripts work.
+
   @sect{Script Files}
     @p
       Ammonite defines a format that allows you to load external scripts into
@@ -286,6 +295,11 @@
         Apart from loading scripts within the @sect.ref{Ammonite-REPL}, You can
         also run scripts using the Ammonite executable from an external shell
         (e.g. bash):
+
+
+      @hl.sh
+        @replCurl
+
       @hl.scala
         bash$ ./amm path/to/script.scala
   
