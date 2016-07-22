@@ -4,7 +4,7 @@ import ammonite.frontend.Highlighter
 import ammonite.main.Router
 import ammonite.main.Router.Result.Error.{InvalidArguments, RedundantArguments, TooManyArguments}
 import ammonite.main.Router.Result.ParamError
-import ammonite.main.Router.{ArgSig, doc, export}
+import ammonite.main.Router.{ArgSig, doc, main}
 import ammonite.util.Util
 import utest._
 
@@ -123,15 +123,15 @@ object UnitTests extends TestSuite{
     'router{
       case object MyException extends Exception
       object Target{
-        @export
+        @main
         def foo() = 1
-        @export
+        @main
         def bar(i: Int) = i
-        @export
+        @main
         def qux(i: Int,
                 @doc("Pass in a custom `s` to override it")
                 s: String = "lols") = s * i
-        @export
+        @main
         def ex() = throw MyException
 
         def notExported() = ???

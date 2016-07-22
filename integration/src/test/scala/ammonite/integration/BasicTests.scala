@@ -26,56 +26,94 @@ object BasicTests extends TestSuite{
     }
 
 
-
-    //These tests currently do not pass on Windows, primarily for the reason that they all
-    //involve loading from ivy which has different settings for windows
-    //http://stackoverflow.com/questions/15487301/configure-apache-ant-and-ivy-on-windows-7
-    'linuxOnlyTests {
-
-      'complex {
-        val evaled = exec('basic / "Complex.sc")
-        assert(evaled.out.trim.contains("Spire Interval [0, 10]"))
-      }
+    'complex {
+      val evaled = exec('basic / "Complex.sc")
+      assert(evaled.out.trim.contains("Spire Interval [0, 10]"))
+    }
 
 
-      'shell {
-        // make sure you can load the example-predef.sc, have it pull stuff in
-        // from ivy, and make use of `cd!` and `wd` inside the executed script.
-        val res = %% bash(
-          executable,
-          "--predef-file",
-          exampleBarePredef,
-          "-c",
-          """val x = wd
-          |@
-          |cd! 'amm/'src
-          |@
-          |println(wd relativeTo x)""".stripMargin
-        )
+    'shell {
+      // make sure you can load the example-predef.sc, have it pull stuff in
+      // from ivy, and make use of `cd!` and `wd` inside the executed script.
+      val res = %% bash(
+        executable,
+        "--predef-file",
+        exampleBarePredef,
+        "-c",
+        """val x = wd
+        |@
+        |cd! 'amm/'src
+        |@
+        |println(wd relativeTo x)""".stripMargin
+      )
 
-        val output = res.out.trim
-        assert(output == "amm/src")
-      }
+      val output = res.out.trim
+      assert(output == "amm/src")
+    }
 
-      'classloaders{
-        val evaled = exec('basic / "Resources.sc")
-        assert(evaled.out.string.contains("1745"))
-      }
+    'classloaders{
+      val evaled = exec('basic / "Resources.sc")
+      assert(evaled.out.string.contains("1745"))
+    }
 
-      'playframework- {
-        if (!Util.windowsPlatform) {
-          if (scalaVersion.startsWith("2.11.") && javaVersion.startsWith("1.8.")){
-            val evaled = exec('basic/"PlayFramework.sc")
-            assert(evaled.out.string.contains("Hello bar"))
-          }
+    'playframework- {
+      if (!Util.windowsPlatform) {
+        if (scalaVersion.startsWith("2.11.") && javaVersion.startsWith("1.8.")){
+          val evaled = exec('basic/"PlayFramework.sc")
+          assert(evaled.out.string.contains("Hello bar"))
         }
       }
     }
     'main{
-      val evaled = exec('basic/"Main.sc")
-      val out = evaled.out.string
-      assert(out.contains("Hello! 1"))
+      'single{
+        val evaled = exec('basic/"Main.sc")
+        val out = evaled.out.string
+        assert(out.contains("Hello! 1"))
+      }
+      'multiple{
+        'positiveNoArgs{
+          val evaled = exec('basic/"MultiMain.sc", "noArgMain")
+          val out = evaled.out.string
+          assert(out == "Hello! 1\n")
+        }
+        'positiveArgs{
+          val evaled = exec('basic/"MultiMain.sc", "multiArgMain", "2", "foo")
+          val out = evaled.out.string
+          assert(out == "Hello! foofoo .\n")
+        }
+        'specifyMain{
+          val evaled = intercept[ShelloutException]{exec('basic/"MultiMain.sc")}.result
+          val out = evaled.err.string
+          val expected = Util.normalizeNewlines(
+            """Need to specify a main method to call when running MultiMain.sc
+              |
+              |Available main methods:
+              |
+              |def noArgMain()
+              |def multiArgMain(i: Int, s: String, path: ammonite.ops.Path)
+              |""".stripMargin
+          )
+          assert(out == expected)
+        }
+        'cantFindMain{
+          val evaled = intercept[ShelloutException]{
+            exec('basic/"MultiMain.sc", "doesntExist")
+          }.result
+          val out = evaled.err.string
+          val expected = Util.normalizeNewlines(
+            """Unable to find method: doesntExist
+              |
+              |Available main methods:
+              |
+              |def noArgMain()
+              |def multiArgMain(i: Int, s: String, path: ammonite.ops.Path)
+              |""".stripMargin
+          )
+          assert(out == expected)
+        }
+      }
     }
+
     'args{
       'full{
         val evaled = exec('basic/"Args.sc", "3", "Moo", (cwd/'omg/'moo).toString)
@@ -85,19 +123,28 @@ object BasicTests extends TestSuite{
         val evaled = exec('basic/"Args.sc", "3", "Moo")
         assert(evaled.out.string.contains("Hello! MooMooMoo ."))
       }
-      // Need a way for `%%` to capture stderr before we can specify these
-      // tests a bit more tightly; currently the error just goes to stdout
-      // and there's no way to inspect/validate it =/
       'tooFew{
         val errorMsg = intercept[ShelloutException]{
           exec('basic/"Args.sc", "3")
         }.result.err.string
         assert(errorMsg.contains(
-          """The following arguments failed to be parsed:
-            |(s: String) was missing
-            |expected arguments: (i: Int, s: String, path: ammonite.ops.Path)"""
-            .stripMargin
-            .replace("\n", Util.newLine)
+          Util.normalizeNewlines(
+            """The following arguments failed to be parsed:
+              |(s: String) was missing
+              |expected arguments: (i: Int, s: String, path: ammonite.ops.Path)"""
+              .stripMargin
+          )
+        ))
+      }
+      'tooMany{
+        val errorMsg = intercept[ShelloutException]{
+          exec('basic/"Args.sc", "3", "4", "5", "6")
+        }.result.err.string
+        assert(errorMsg.contains(
+          Util.normalizeNewlines(
+            """Too many args were passed to this script: "6"
+              |expected arguments: (i: Int, s: String, path: ammonite.ops.Path)""".stripMargin
+          )
         ))
       }
       'cantParse{
@@ -106,11 +153,12 @@ object BasicTests extends TestSuite{
         }.result.err.string
         val exMsg = """java.lang.NumberFormatException: For input string: "foo""""
         assert(errorMsg.contains(
-          s"""The following arguments failed to be parsed:
-             |(i: Int) failed to parse input "foo" with $exMsg
-             |expected arguments: (i: Int, s: String, path: ammonite.ops.Path)"""
-            .stripMargin
-            .replace("\n", Util.newLine)
+          Util.normalizeNewlines(
+            s"""The following arguments failed to be parsed:
+               |(i: Int) failed to parse input "foo" with $exMsg
+               |expected arguments: (i: Int, s: String, path: ammonite.ops.Path)"""
+              .stripMargin
+          )
         ))
         // Ensure we're properly truncating the random stuff we don't care about
         // which means that the error stack that gets printed is short-ish

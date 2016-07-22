@@ -1,6 +1,6 @@
 val x = 1
 
-@export
+@main
 def main() = {
   println("Hello! " + x)
 }

@@ -75,12 +75,11 @@ case class Main(predef: String = "",
     * of `args` and a map of keyword `kwargs` to pass to that file.
     */
   def runScript(path: Path,
-                mainMethodName: Option[String],
                 args: Seq[String],
                 kwargs: Seq[(String, String)]): Res[Imports] = {
 
     val repl = instantiateRepl()
-    main.Scripts.runScript(wd, path, repl, mainMethodName, args, kwargs)
+    main.Scripts.runScript(wd, path, repl, args, kwargs)
   }
 
   /**
@@ -103,7 +102,6 @@ object Main{
     var ammoniteHome: Option[Path] = None
     var passThroughArgs: Seq[String] = Vector.empty
     var predefFile: Option[Path] = None
-    var mainMethodName: Option[String] = None
     var continually = false
     val replParser = new scopt.OptionParser[Main]("ammonite") {
       // Primary arguments that correspond to the arguments of
@@ -126,20 +124,9 @@ object Main{
         .foreach(x => codeToExecute = Some(x))
         .text("Pass in code to be run immediately in the REPL")
 
-      opt[String]('x', "execute")
-        .foreach{ x => mainMethodName = Some(x)}
+      opt[Unit]('x', "execute")
         .text(
-          """What main method you want to execute, if any. Defaults to a `main`
-            |method if it exists, but you can also run other methods defined in
-            |the script.
-            |
-            |This flag must come last among the flags passed to Ammonite, and any
-            |further arguments, both positional and named (e.g. `--foo bar`) are
-            |forwarded to the script you are running.
-            |
-            |You can also use `--` as a shorthand for `-x main`, to pass arguments
-            |to the main method
-          """.stripMargin.replace("\n", newLine + " " * 8)
+          "Shim for backwards compatibility - will be removed"
         )
       arg[String]("<args>...")
         .optional()
@@ -164,15 +151,7 @@ object Main{
     }
 
     val (take, drop) = args0.indexOf("--") match {
-      case -1 =>
-        args0.indexOf("-x") match {
-          case -1 =>
-            args0.indexOf("--execute") match {
-              case -1 => (Int.MaxValue, Int.MaxValue)
-              case n => (n+2, n+2)
-            }
-          case n => (n+2, n+2)
-        }
+      case -1 => (Int.MaxValue, Int.MaxValue)
       case n => (n, n+1)
     }
 
@@ -211,7 +190,7 @@ object Main{
         (fileToExecute, codeToExecute) match {
           case (None, None) => println("Loading..."); main.run()
           case (Some(path), None) =>
-            main.runScript(path, mainMethodName, passThroughArgs, kwargs.toSeq) match {
+            main.runScript(path, passThroughArgs, kwargs.toSeq) match {
               case Res.Failure(exOpt, msg) =>
                 Console.err.println(msg)
                 System.exit(1)

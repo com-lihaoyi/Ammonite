@@ -152,7 +152,8 @@ object Name{
     * we're running a cached script, which shaves off 200-300ms of startup time.
     */
   def backtickWrap(s: String) = {
-    if (s(0) == '`' && s.last == '`') s
+    if (s.isEmpty) "``"
+    else if (s(0) == '`' && s.last == '`') s
     else {
       val chunks = s.split("_", -1)
       def validOperator(c: Char) = {

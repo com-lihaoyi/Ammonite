@@ -15,81 +15,85 @@ object Scripts {
   def runScript(wd: Path,
                 path: Path,
                 repl: ammonite.main.Repl,
-                mainMethodName: Option[String],
                 args: Seq[String],
                 kwargs: Seq[(String, String)]) = {
     val (pkg, wrapper) = Util.pathToPackageWrapper(path, wd)
+    val fullName = (pkg :+ wrapper).map(_.backticked).mkString(".")
     for{
       imports <- repl.interp.processModule(
         ImportHook.Source.File(path),
-        Util.normalizeNewlines(read(path)),
+        Util.normalizeNewlines(
+          read(path) + "\n\n" +
+          // Not sure why we need to wrap this in a separate `$routes` object,
+          // but if we don't do it for some reason the `generateRoutes` macro
+          // does not see the annotations on the methods of the outer-wrapper.
+          // It can inspect the type and its methods fine, it's just the
+          // `methodsymbol.annotations` ends up being empty.
+          s"""
+          object $$routes extends scala.Function0[scala.Seq[ammonite.main.Router.EntryPoint]]{
+            def apply() = ammonite.main.Router.generateRoutes[$fullName.type]($fullName) }
+          """
+        ),
         wrapper,
         pkg,
         autoImport = true
       )
-      _ <- {
-        repl.interp.reInit()
 
-        val fullName = (pkg :+ wrapper).map(_.backticked).mkString(".")
-        repl.interp.processModule(
-          ImportHook.Source.File(cwd/"<console>"),
-          s"val routes = ammonite.main.Router.generateRoutes[$fullName.type]($fullName)",
-          Name("MainRouter"),
-          Seq(Name("$sess")),
-          autoImport = false
-        )
-      }
-      entryPoints =
+      routesCls =
         repl.interp
-            .eval
-            .sess
-            .frames
-            .head
-            .classloader
-            .loadClass("$sess.MainRouter")
-            .getMethods
-            .find(_.getName == "routes")
-            .get
-            .invoke(null)
-            .asInstanceOf[Seq[Router.EntryPoint]]
-            .filter(_.name != "$main")
+          .eval
+          .sess
+          .frames
+          .head
+          .classloader
+          .loadClass(fullName + "$$routes$")
 
-      res <- mainMethodName match {
-        case None =>
-          entryPoints.find(_.name == "main") match {
-            case None => Res.Success(imports)
-            case Some(entry) =>
-              runEntryPoint(entry, args, kwargs).getOrElse(Res.Success(imports))
-          }
-        case Some(s) =>
-          entryPoints.find(_.name == s) match{
-            case None =>
-              val suffix =
-                if (entryPoints.isEmpty) ""
-                else{
-                  val methods = for(ep <- entryPoints) yield{
-                    val args = ep.argSignatures.map(renderArg).mkString(", ")
-                    val details = entryDetails(ep)
-                    s"def ${ep.name}($args)$details"
-                  }
-                  s"""
-                     |
-                     |Existing methods:
-                     |
-                     |${methods.mkString(Util.newLine*2)}""".stripMargin
-                }
+      entryPoints =
+        routesCls
+            .getField("MODULE$")
+            .get(null).asInstanceOf[() => Seq[Router.EntryPoint]]
+            .apply()
+
+      res <- entryPoints match {
+        case Seq() => Res.Success(imports)
+        case Seq(entry) => runEntryPoint(entry, args, kwargs).getOrElse(Res.Success(imports))
+        case entries =>
+          val suffix = formatMainMethods(entries)
+          args match{
+            case Seq() =>
               Res.Failure(
                 None,
-                s"Unable to find method: ${backtickWrap(s)}" + suffix
+                s"Need to specify a main method to call when running " + path.last + suffix
               )
-            case Some(entry) =>
-              runEntryPoint(entry, args, kwargs).getOrElse(Res.Success(imports))
+            case Seq(head, tail @ _*) =>
+              entries.find(_.name == head) match{
+                case None =>
+                  Res.Failure(
+                    None,
+                    s"Unable to find method: " + backtickWrap(head) + suffix
+                  )
+                case Some(entry) =>
+                  runEntryPoint(entry, tail, kwargs).getOrElse(Res.Success(imports))
+              }
           }
-
       }
     } yield res
   }
-
+  def formatMainMethods(entryPoints: Seq[Router.EntryPoint]) = {
+    if (entryPoints.isEmpty) ""
+    else{
+      val methods = for(ep <- entryPoints) yield{
+        val args = ep.argSignatures.map(renderArg).mkString(", ")
+        val details = entryDetails(ep)
+        s"def ${ep.name}($args)$details"
+      }
+      s"""
+         |
+         |Available main methods:
+         |
+         |${methods.mkString(Util.newLine)}""".stripMargin
+    }
+  }
   def runEntryPoint(entry: Router.EntryPoint,
                     args: Seq[String],
                     kwargs: Seq[(String, String)]): Option[Res.Failing] = {
@@ -110,7 +114,7 @@ object Scripts {
         Some(Res.Failure(
           None,
           s"""Too many args were passed to this script: ${x.map(literalize(_)).mkString(", ")}
-              |expected arguments $expectedMsg""".stripMargin
+              |expected arguments: $expectedMsg""".stripMargin
 
         ))
       case Router.Result.Error.RedundantArguments(x) =>

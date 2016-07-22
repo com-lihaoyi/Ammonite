@@ -26,23 +26,25 @@ object ErrorTruncationTests extends TestSuite{
 
     'compileError - checkErrorMessage(
       file = 'errorTruncation/"compileError.sc",
-      expected =
+      expected = Util.normalizeNewlines(
         """compileError.sc:1: not found: value doesntexist
           |val res = doesntexist
           |          ^
           |Compilation Failed
-          |""".stripMargin.replace("\n", Util.newLine)
+          |""".stripMargin
+      )
     )
 
     'parseError - {
       if(!Util.windowsPlatform){
         checkErrorMessage(
           file = 'errorTruncation/"parseError.sc",
-          expected =
+          expected = Util.normalizeNewlines(
             """Syntax Error: End:1:1 ..."}\n"
               |}
               |^
-              |""".stripMargin.replace("\n", Util.newLine)
+              |""".stripMargin
+          )
         )
       }
     }
@@ -51,12 +53,13 @@ object ErrorTruncationTests extends TestSuite{
       "$file.integration.src.test.resources.ammonite.integration.errorTruncation"
     'runtimeError - checkErrorMessage(
       file = 'errorTruncation/"runtimeError.sc",
-      expected =
+      expected = Util.normalizeNewlines(
         s"""Exception in thread "main" java.lang.ArithmeticException: / by zero
           |${tab}at $runtimeErrorResourcePackage.runtimeError$$.<init>(runtimeError.sc:1)
           |${tab}at $runtimeErrorResourcePackage.runtimeError$$.<clinit>(runtimeError.sc)
           |${tab}at $runtimeErrorResourcePackage.runtimeError.$$main(runtimeError.sc)
-          |""".stripMargin.replace("\n", Util.newLine)
+          |""".stripMargin
+      )
     )
   }
 }
