@@ -15,7 +15,7 @@ matrix:
   # been published, but artifacts that the doc-site instructs people
   # to download are not yet present.
 
-  - env: CI_SCRIPT="ci/build.py artifacts"
+  - env: CI_SCRIPT="ci/build.sc -x artifacts"
     jdk: oraclejdk8
     scala: 2.11.8
 
@@ -23,41 +23,45 @@ matrix:
   # `integration/test`; for some reason, running them on the same box is
   # flaky and `integration/test` ends up hanging, even if they are run in
   # separate, sequential processes.
-  - env: CI_SCRIPT="ci/build.py test published/test"
+  - env: CI_SCRIPT="ci/build.sc -x test published/test"
     jdk: openjdk7
     scala: 2.10.5
-  - env: CI_SCRIPT="ci/build.py test integration/test"
+  - env: CI_SCRIPT="ci/build.sc -x test integration/test"
     jdk: openjdk7
     scala: 2.10.5
 
-  - env: CI_SCRIPT="ci/build.py test published/test"
+  - env: CI_SCRIPT="ci/build.sc -x test published/test"
     jdk: oraclejdk8
     scala: 2.10.5
-  - env: CI_SCRIPT="ci/build.py test integration/test"
+  - env: CI_SCRIPT="ci/build.sc -x test integration/test"
     jdk: oraclejdk8
     scala: 2.10.5
 
 
-  - env: CI_SCRIPT="ci/build.py test published/test"
+  - env: CI_SCRIPT="ci/build.sc -x test published/test"
     jdk: openjdk7
     scala: 2.11.8
-  - env: CI_SCRIPT="ci/build.py test integration/test"
+  - env: CI_SCRIPT="ci/build.sc -x test integration/test"
     jdk: openjdk7
     scala: 2.11.8
 
-  - env: CI_SCRIPT="ci/build.py test published/test"
+  - env: CI_SCRIPT="ci/build.sc -x test published/test"
     jdk: oraclejdk8
     scala: 2.11.8
-  - env: CI_SCRIPT="ci/build.py test integration/test"
+  - env: CI_SCRIPT="ci/build.sc -x test integration/test"
     jdk: oraclejdk8
     scala: 2.11.8
 
 
-  - env: CI_SCRIPT="ci/build.py docs"
+  - env: CI_SCRIPT="ci/build.sc -x docs"
     jdk: oraclejdk8
     scala: 2.11.8
 
 script:
+- export PATH=~/bin/amm:$PATH
+- mkdir -p ~/bin
+- curl -L -o ~/bin/amm https://git.io/vKwA8 && chmod +x ~/bin/amm
+- which amm
 - $CI_SCRIPT
 
 notifications:

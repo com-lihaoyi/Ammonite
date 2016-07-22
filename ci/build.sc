@@ -1,0 +1,98 @@
+#!/usr/bin/env amm
+import ammonite.ops._
+import ammonite.ops.ImplicitWd._
+
+println("START TIME " + new java.util.Date().toString)
+
+val isMasterCommit =
+  sys.env.get("TRAVIS_PULL_REQUEST") == Some("false") &&
+  sys.env.get("TRAVIS_BRANCH") == Some("master")
+
+
+val allVersions = Seq(
+  "2.10.4", "2.10.5", "2.10.6",
+  "2.11.3", "2.11.4", "2.11.5", "2.11.6", "2.11.7", "2.11.8"
+)
+
+
+def update_version() = {
+  val gitHash = %%("git", "rev-parse", "--short", "HEAD").out.trim
+  val versionTxt = s"""
+    package ammonite
+    object Constants{
+      val version = "COMMIT-$gitHash"
+      val curlUrl = "https://git.io/vKwA8"
+    }
+  """
+  rm! cwd/'project/"Constants.scala"
+  write(cwd/'project/"Constants.scala", versionTxt)
+}
+
+def publish_signed() = {
+  val creds = s"""
+    (credentials in ThisBuild) += Credentials("Sonatype Nexus Repository Manager",
+        "oss.sonatype.org",
+        "${sys.env("SONATYPE_DEPLOY_USER")}",
+        "${sys.env("SONATYPE_DEPLOY_PASSWORD")}"
+    )
+    pgpPassphrase := Some("${sys.env("SONATYPE_PGP_PASSWORD")}".toArray)
+    pgpSecretRing := file("secring.asc")
+    pgpPublicRing := file("pubring.asc")
+    sonatypeProfileName := "com.lihaoyi"
+  """
+  write(cwd/"sonatype.sbt", creds)
+  write(cwd/"secring.asc", sys.env("SONATYPE_PGP_KEY_CONTENTS").replace("\\n", "\n"))
+  write(cwd/"pubring.asc", sys.env("SONATYPE_PGP_PUB_KEY_CONTENTS").replace("\\n", "\n"))
+
+
+  for (version <- allVersions) {
+    if (Set("2.10.5", "2.11.8").contains(version)) {
+      %sbt("++" + version, "published/publishSigned")
+    }else {
+      %sbt("++" + version, "amm/publishSigned", "sshd/publishSigned")
+    }
+  }
+  %sbt("sonatypeReleaseAll")
+}
+
+def publish_docs() = {
+  val deployKey = sys.env("DEPLOY_KEY").replace("\\n", "\n")
+  write(cwd/'deploy_key, deployKey)
+
+  if (sys.env.contains("TRAVIS_TAG")) {
+    %("ci/deploy_master_docs.sh", DOC_FOLDER=".")
+  }else{
+    %("ci/deploy_master_docs.sh", DOC_FOLDER="master")
+  }
+}
+
+@export
+def docs() = {
+  if (isMasterCommit){
+    println("MASTER COMMIT: Updating version and publishing to Github Pages")
+  }else{
+    println("MISC COMMIT: Building readme for verification")
+    %sbt "readme/run"
+  }
+}
+
+@export
+def artifacts() = {
+  if (isMasterCommit){
+    println("MASTER COMMIT: Updating version and publishing to Maven Central")
+    update_version()
+    publish_signed()
+  }else{
+    println("MISC COMMIT: Compiling all Scala code across versions for verification")
+    for (version <- allVersions) {
+      %sbt("++" + version, "published/compile")
+    }
+  }
+
+}
+
+@export
+def test(testCommand: String) = {
+  %sbt("++" + sys.env("TRAVIS_SCALA_VERSION"), "published/compile")
+  %sbt("++" + sys.env("TRAVIS_SCALA_VERSION"), testCommand)
+}
