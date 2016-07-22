@@ -17,7 +17,7 @@ object LineNumberTests extends TestSuite{
       val e = intercept[ShelloutException]{
         exec(file)
       }.result.err.string
-      assert(e.contains(Util.normalizeNewlines(expected)))
+      assert(e.contains(expected))
     }
 
     //All Syntax Error tests currently don't pass on windows as fastparse gives out some 10
@@ -27,10 +27,11 @@ object LineNumberTests extends TestSuite{
       if(!Util.windowsPlatform) {
         checkErrorMessage(
           file = 'lineNumbers / "ErrorLineNumberTest.sc",
-          expected =
+          expected = Util.normalizeNewlines(
             """Syntax Error: ("}" | `case`):5:24 ...")\n  }\n\n  d"
               |    printlnqs(unsorted))
               |                       ^""".stripMargin
+          )
         )
       }
     }
@@ -39,10 +40,11 @@ object LineNumberTests extends TestSuite{
       if(!Util.windowsPlatform) {
         checkErrorMessage(
           file = 'lineNumbers/"MultipleCompilationUnitErrorMsgTest1.sc",
-          expected =
+          expected = Util.normalizeNewlines(
             """Syntax Error: End:5:1 ..."}"
               |}
               |^""".stripMargin
+          )
         )
       }
     }
@@ -52,36 +54,40 @@ object LineNumberTests extends TestSuite{
       if(!Util.windowsPlatform) {
         checkErrorMessage(
           file = 'lineNumbers/"MultipleCompilationUnitErrorMsgTest2.sc",
-          expected =
+          expected = Util.normalizeNewlines(
             """Syntax Error: End:3:1 ..."}\n@\n1 + 1"
               |}
               |^""".stripMargin
+          )
         )
       }
     }
 
     'compilationErrorWithCommentsAtTop - checkErrorMessage(
       file = 'lineNumbers/"compilationErrorWithCommentsAtTop.sc",
-      expected =
+      expected = Util.normalizeNewlines(
         """compilationErrorWithCommentsAtTop.sc:11: not found: value quicort
           |    quicort(unsorted.filter(_ < pivot)):::List(pivot):::""".stripMargin +
         """quicksort(unsorted.filter(_ > pivot))"""
+      )
     )
 
     'compilationErrorInSecondBlock - checkErrorMessage(
       file = 'lineNumbers/"compilationErrorInSecondBlock.sc",
-      expected =
+      expected = Util.normalizeNewlines(
         """compilationErrorInSecondBlock.sc:14: not found: value printnl
           |val res_0 = printnl("OK")
           |            ^""".stripMargin
+      )
     )
 
     'compilationErrorInFourthBlock - checkErrorMessage(
       file = 'lineNumbers/"compilationErrorInFourthBlock.sc",
-      expected =
+      expected = Util.normalizeNewlines(
         """compilationErrorInFourthBlock.sc:30: not found: value prinntl
-          |val res = prinntl("Ammonite")
-          |          ^""".stripMargin
+          |val res_0 = prinntl("Ammonite")
+          |            ^""".stripMargin
+      )
     )
 
     'compilationErrorInClass - checkErrorMessage(
@@ -91,10 +97,11 @@ object LineNumberTests extends TestSuite{
 
     'CompilationErrorLineNumberTest - checkErrorMessage(
       file = 'lineNumbers/"CompilationErrorLineNumberTest.sc",
-      expected =
+      expected = Util.normalizeNewlines(
         """CompilationErrorLineNumberTest.sc:7: not found: value noSuchObject
           |  val x = noSuchObject.badFunction
           |          ^""".stripMargin
+      )
     )
 
     'RuntimeCompilationErrorLineNumberTest - checkErrorMessage(

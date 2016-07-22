@@ -1,6 +1,8 @@
 
 package ammonite.main
 
+import ammonite.util.Util
+
 /**
   * Constants used in the default configuration for the Ammonite REPL
   */
@@ -10,8 +12,10 @@ object Defaults{
     def ammoniteVersion = ammonite.Constants.version
     def scalaVersion = scala.util.Properties.versionNumberString
     def javaVersion = System.getProperty("java.version")
-    s"""Welcome to the Ammonite Repl $ammoniteVersion
-        |(Scala $scalaVersion Java $javaVersion)""".stripMargin
+    Util.normalizeNewlines(
+      s"""Welcome to the Ammonite Repl $ammoniteVersion
+          |(Scala $scalaVersion Java $javaVersion)""".stripMargin
+    )
   }
   val ignoreUselessImports = """
     |notify => _,

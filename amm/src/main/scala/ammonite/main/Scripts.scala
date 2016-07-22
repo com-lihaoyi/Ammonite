@@ -18,26 +18,38 @@ object Scripts {
                 args: Seq[String],
                 kwargs: Seq[(String, String)]) = {
     val (pkg, wrapper) = Util.pathToPackageWrapper(path, wd)
-    val fullName = (pkg :+ wrapper).map(_.backticked).mkString(".")
     for{
       imports <- repl.interp.processModule(
         ImportHook.Source.File(path),
         Util.normalizeNewlines(
-          read(path) + "\n\n" +
+          read(path) + Util.newLine +
           // Not sure why we need to wrap this in a separate `$routes` object,
           // but if we don't do it for some reason the `generateRoutes` macro
           // does not see the annotations on the methods of the outer-wrapper.
           // It can inspect the type and its methods fine, it's just the
           // `methodsymbol.annotations` ends up being empty.
           s"""
+          val $$routesOuter = this
           object $$routes extends scala.Function0[scala.Seq[ammonite.main.Router.EntryPoint]]{
-            def apply() = ammonite.main.Router.generateRoutes[$fullName.type]($fullName) }
+            def apply() = ammonite.main.Router.generateRoutes[$$routesOuter.type]($$routesOuter)
+          }
           """
         ),
         wrapper,
         pkg,
         autoImport = true
       )
+
+      // We need to search for the class name manually from the imports, since
+      // it might not the same as the `wrapper` that gets passed in
+      routeClsName =
+        imports
+          .value
+          .find(_.fromName.raw == "$routes")
+          .get
+          .prefix
+          .drop(1)
+          .map(_.encoded).mkString(".")
 
       routesCls =
         repl.interp
@@ -46,7 +58,7 @@ object Scripts {
           .frames
           .head
           .classloader
-          .loadClass(fullName + "$$routes$")
+          .loadClass(routeClsName + "$$routes$")
 
       entryPoints =
         routesCls
@@ -87,11 +99,13 @@ object Scripts {
         val details = entryDetails(ep)
         s"def ${ep.name}($args)$details"
       }
-      s"""
-         |
-         |Available main methods:
-         |
-         |${methods.mkString(Util.newLine)}""".stripMargin
+      Util.normalizeNewlines(
+        s"""
+           |
+           |Available main methods:
+           |
+           |${methods.mkString(Util.newLine)}""".stripMargin
+      )
     }
   }
   def runEntryPoint(entry: Router.EntryPoint,
@@ -113,15 +127,19 @@ object Scripts {
       case Router.Result.Error.TooManyArguments(x) =>
         Some(Res.Failure(
           None,
-          s"""Too many args were passed to this script: ${x.map(literalize(_)).mkString(", ")}
-              |expected arguments: $expectedMsg""".stripMargin
+          Util.normalizeNewlines(
+            s"""Too many args were passed to this script: ${x.map(literalize(_)).mkString(", ")}
+                |expected arguments: $expectedMsg""".stripMargin
+          )
 
         ))
       case Router.Result.Error.RedundantArguments(x) =>
         Some(Res.Failure(
           None,
-          s"""Redundant values were passed for arguments: ${x.map(literalize(_)).mkString(", ")}
-              |expected arguments: $expectedMsg""".stripMargin
+          Util.normalizeNewlines(
+            s"""Redundant values were passed for arguments: ${x.map(literalize(_)).mkString(", ")}
+                |expected arguments: $expectedMsg""".stripMargin
+          )
         ))
       case Router.Result.Error.InvalidArguments(x) =>
         Some(Res.Failure(

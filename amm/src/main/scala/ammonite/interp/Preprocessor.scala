@@ -290,8 +290,8 @@ object Preprocessor{
         else s"${item.fromName.backticked} => ${item.toName.backticked}"
       }
       val pkgString = group.head.prefix.map(_.backticked).mkString(".")
-      "import " + pkgString + s".{${newLine}  " +
-        printedGroup.mkString(s",${newLine}  ") + s"${newLine}}${newLine}"
+      "import " + pkgString + s".{$newLine  " +
+        printedGroup.mkString(s",$newLine  ") + s"$newLine}$newLine"
     }
     val res = out.mkString
 

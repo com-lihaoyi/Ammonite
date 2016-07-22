@@ -16,11 +16,16 @@ object ErrorTruncationTests extends TestSuite{
   println("StandaloneTests")
   def checkErrorMessage(file: RelPath, expected: String) = {
     val e = fansi.Str(
-      Util.normalizeNewlines(intercept[ShelloutException]{ exec(file) }.result.err.string)
+      Util.normalizeNewlines(
+        intercept[ShelloutException]{ exec(file) }
+          .result
+          .err
+          .string
+      )
     ).plainText
     //This string gets included on windows due to environment variable set additionally
-    val extraStringOnWindows = "Picked up JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF8\n"
-    assert(e.replace(extraStringOnWindows, "") == expected)
+
+    assert(e == expected)
   }
   val tests = TestSuite {
 
@@ -28,8 +33,8 @@ object ErrorTruncationTests extends TestSuite{
       file = 'errorTruncation/"compileError.sc",
       expected = Util.normalizeNewlines(
         """compileError.sc:1: not found: value doesntexist
-          |val res = doesntexist
-          |          ^
+          |val res_0 = doesntexist
+          |            ^
           |Compilation Failed
           |""".stripMargin
       )

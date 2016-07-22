@@ -33,7 +33,7 @@ object ProjectTests extends TestSuite{
         """)
           }
         }
-        'akkahttp{
+        'akkahttp - {
             check.session(
               """
               @ import $ivy.`com.typesafe.akka::akka-http-experimental:1.0-M3`
@@ -61,7 +61,7 @@ object ProjectTests extends TestSuite{
               @   akka.http.Http().outgoingConnection("localhost", port=31337).flow
               @ ).runForeach(println)
 
-              @ Thread.sleep(200)
+              @ Thread.sleep(1000)
 
               @ set
               res10: Boolean = true
