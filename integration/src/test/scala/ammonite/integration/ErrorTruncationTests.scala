@@ -16,7 +16,7 @@ object ErrorTruncationTests extends TestSuite{
   println("StandaloneTests")
   def checkErrorMessage(file: RelPath, expected: String) = {
     val e = fansi.Str(
-      intercept[ShelloutException]{ exec(file) }.result.err.string
+      Util.normalizeNewlines(intercept[ShelloutException]{ exec(file) }.result.err.string)
     ).plainText
     //This string gets included on windows due to environment variable set additionally
     val extraStringOnWindows = "Picked up JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF8\n"

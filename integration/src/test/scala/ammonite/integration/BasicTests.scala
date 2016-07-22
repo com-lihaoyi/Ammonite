@@ -83,7 +83,7 @@ object BasicTests extends TestSuite{
         }
         'specifyMain{
           val evaled = intercept[ShelloutException]{exec('basic/"MultiMain.sc")}.result
-          val out = evaled.err.string
+          val out = Util.normalizeNewlines(evaled.err.string)
           val expected = Util.normalizeNewlines(
             """Need to specify a main method to call when running MultiMain.sc
               |
@@ -99,7 +99,7 @@ object BasicTests extends TestSuite{
           val evaled = intercept[ShelloutException]{
             exec('basic/"MultiMain.sc", "doesntExist")
           }.result
-          val out = evaled.err.string
+          val out = Util.normalizeNewlines(evaled.err.string)
           val expected = Util.normalizeNewlines(
             """Unable to find method: doesntExist
               |
@@ -124,9 +124,11 @@ object BasicTests extends TestSuite{
         assert(evaled.out.string.contains("Hello! MooMooMoo ."))
       }
       'tooFew{
-        val errorMsg = intercept[ShelloutException]{
-          exec('basic/"Args.sc", "3")
-        }.result.err.string
+        val errorMsg = Util.normalizeNewlines(
+          intercept[ShelloutException]{
+            exec('basic/"Args.sc", "3")
+          }.result.err.string
+        )
         assert(errorMsg.contains(
           Util.normalizeNewlines(
             """The following arguments failed to be parsed:
@@ -137,9 +139,11 @@ object BasicTests extends TestSuite{
         ))
       }
       'tooMany{
-        val errorMsg = intercept[ShelloutException]{
-          exec('basic/"Args.sc", "3", "4", "5", "6")
-        }.result.err.string
+        val errorMsg = Util.normalizeNewlines(
+          intercept[ShelloutException]{
+            exec('basic/"Args.sc", "3", "4", "5", "6")
+          }.result.err.string
+        )
         assert(errorMsg.contains(
           Util.normalizeNewlines(
             """Too many args were passed to this script: "6"
@@ -148,9 +152,11 @@ object BasicTests extends TestSuite{
         ))
       }
       'cantParse{
-        val errorMsg = intercept[ShelloutException]{
-          exec('basic/"Args.sc", "foo", "moo")
-        }.result.err.string
+        val errorMsg = Util.normalizeNewlines(
+          intercept[ShelloutException]{
+            exec('basic/"Args.sc", "foo", "moo")
+          }.result.err.string
+        )
         val exMsg = """java.lang.NumberFormatException: For input string: "foo""""
         assert(errorMsg.contains(
           Util.normalizeNewlines(
