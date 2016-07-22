@@ -15,7 +15,7 @@ val allVersions = Seq(
 )
 
 
-def update_version() = {
+def updateVersion() = {
   val gitHash = %%("git", "rev-parse", "--short", "HEAD").out.trim
   val versionTxt = s"""
     package ammonite
@@ -28,7 +28,7 @@ def update_version() = {
   write(cwd/'project/"Constants.scala", versionTxt)
 }
 
-def publish_signed() = {
+def publishSigned() = {
   val creds = s"""
     (credentials in ThisBuild) += Credentials("Sonatype Nexus Repository Manager",
         "oss.sonatype.org",
@@ -56,8 +56,8 @@ def publish_signed() = {
 }
 
 def publish_docs() = {
-  val deployKey = sys.env("DEPLOY_KEY").replace("\\n", "\n")
-  write(cwd/'deploy_key, deployKey)
+  val publishDocs = sys.env("DEPLOY_KEY").replace("\\n", "\n")
+  write(cwd/'deploy_key, publishDocs)
 
   if (sys.env.contains("TRAVIS_TAG")) {
     %("ci/deploy_master_docs.sh", DOC_FOLDER=".")
@@ -70,6 +70,8 @@ def publish_docs() = {
 def docs() = {
   if (isMasterCommit){
     println("MASTER COMMIT: Updating version and publishing to Github Pages")
+    updateVersion()
+    publish_docs()
   }else{
     println("MISC COMMIT: Building readme for verification")
     %sbt "readme/run"
@@ -80,8 +82,8 @@ def docs() = {
 def artifacts() = {
   if (isMasterCommit){
     println("MASTER COMMIT: Updating version and publishing to Maven Central")
-    update_version()
-    publish_signed()
+    updateVersion()
+    publishSigned()
   }else{
     println("MISC COMMIT: Compiling all Scala code across versions for verification")
     for (version <- allVersions) {
