@@ -44,11 +44,13 @@ object Shellout{
     //   hanging around). Thus we simply don't let `Ctrl C` interrupt these
     //   fellas, and force you to use e.g. `q` to exit `less` gracefully.
 
-    @tailrec def run(): Unit =
+    @tailrec def run(): Int =
       try proc.waitFor()
       catch {case e: Throwable => run() }
 
-    run()
+    val exitCode = run()
+    if (exitCode == 0) ()
+    else throw InteractiveShelloutException()
   }
 
   def executeStream(wd: Path, cmd: Command[_]) = {
@@ -162,6 +164,8 @@ case class CommandResult(exitCode: Int,
   * loudly and won't get ignored unless intentionally caught
   */
 case class ShelloutException(result: CommandResult) extends Exception(result.toString)
+
+case class InteractiveShelloutException() extends Exception()
 
 /**
   * Encapsulates one of the output streams from a subprocess and provides

@@ -28,7 +28,7 @@
 @sect("Ammonite", "Scala Scripting")
   @p
     Ammonite lets you use the
-    @lnk("Scala programming language", "https://www.scala-lang.org/") for
+    @lnk("Scala language", "https://www.scala-lang.org/") for
     scripting purposes: in the @sect.ref("Ammonite-REPL", "REPL"), as
     @sect.ref("Scala Scripts", "scripts"), as a @sect.ref("Ammonite-Ops",
     "library to use in existing projects"), or as a standalone

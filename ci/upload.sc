@@ -2,7 +2,11 @@
 import ammonite.ops._
 import scalaj.http._
 
-def apply(tagName: String, uploadName: String, authKey: String): String = {
+@main
+def apply(uploadedFile: Path,
+          tagName: String,
+          uploadName: String,
+          authKey: String): String = {
   val parsed = upickle.json.read(
     Http("https://api.github.com/repos/lihaoyi/Ammonite/releases").asString.body
   )
@@ -21,7 +25,8 @@ def apply(tagName: String, uploadName: String, authKey: String): String = {
   val res = Http(uploadUrl)
     .header("Content-Type", "application/octet-stream")
     .header("Authorization", "token " + authKey)
-    .postData(read! cwd/"favicon.png")
+    .timeout(connTimeoutMs = 1000, readTimeoutMs = 30000)
+    .postData(read.bytes! uploadedFile)
     .asString
 
   val longUrl = upickle.json.read(res.body)("browser_download_url").str

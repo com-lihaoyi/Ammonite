@@ -9,7 +9,9 @@ import scalatags.Text.all._
 import collection.mutable
 
 object Sample{
+  println("Initializing Sample")
   val curlUrl = sys.env("CURL_URL")
+  println("Initialized Curl Url " + curlUrl)
   val replCurl =
     s"$$ sudo curl -L -o /usr/local/bin/amm " +
     curlUrl +

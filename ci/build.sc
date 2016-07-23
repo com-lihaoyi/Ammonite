@@ -65,18 +65,19 @@ def publish_docs() = {
   val travisTag = sys.env("TRAVIS_TAG")
 
   val shortUrl = upload(
+    cwd/'amm/'target/"scala-2.11"/'amm,
     if (travisTag != "") travisTag else "snapshot-commit-uploads",
     if (travisTag != "") travisTag else gitHash,
     sys.env("AMMONITE_BOT_AUTH_TOKEN")
   )
 
   // Generate the readme
-  %sbt("readme/run", CURL_URL = shortUrl)
+
 
   if (travisTag != "") {
-    %("ci/deploy_master_docs.sh", DOC_FOLDER=".")
+    %("ci/deploy_master_docs.sh", DOC_FOLDER=".", CURL_URL = shortUrl)
   }else{
-    %("ci/deploy_master_docs.sh", DOC_FOLDER="master")
+    %("ci/deploy_master_docs.sh", DOC_FOLDER="master", CURL_URL = shortUrl)
   }
 }
 
