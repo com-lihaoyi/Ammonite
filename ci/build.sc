@@ -74,12 +74,9 @@ def publish_docs() = {
 
   // Generate the readme
 
+  val docFolder = if (travisTag != "") "." else "master"
 
-  if (travisTag != "") {
-    %("ci/deploy_master_docs.sh", DOC_FOLDER=".", CURL_URL = shortUrl)
-  }else{
-    %("ci/deploy_master_docs.sh", DOC_FOLDER="master", CURL_URL = shortUrl)
-  }
+  %("ci/deploy_master_docs.sh", DOC_FOLDER = docFolder, CURL_URL = shortUrl)
 }
 
 @export
