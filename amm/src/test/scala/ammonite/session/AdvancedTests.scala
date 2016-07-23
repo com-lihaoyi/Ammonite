@@ -240,7 +240,7 @@ object AdvancedTests extends TestSuite{
         error: not found: value x
       """)
     }
-    'compilerPlugin{
+    'compilerPlugin - retry(3){
       check.session("""
         @ // Make sure plugins from eval class loader are not loaded
 
