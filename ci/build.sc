@@ -16,11 +16,12 @@ val allVersions = Seq(
 
 def getGitHash() = %%("git", "rev-parse", "--short", "HEAD").out.trim
 def updateVersion() = {
-  val gitHash = getGitHash()
+  val travisTag = sys.env("TRAVIS_TAG")
+  val version = if (travisTag == "") s"COMMIT-${getGitHash()}" else travisTag
   val versionTxt = s"""
     package ammonite
     object Constants{
-      val version = "COMMIT-$gitHash"
+      val version = "$version"
     }
   """
   rm! cwd/'project/"Constants.scala"
