@@ -33,8 +33,8 @@ object ErrorTruncationTests extends TestSuite{
       file = 'errorTruncation/"compileError.sc",
       expected = Util.normalizeNewlines(
         """compileError.sc:1: not found: value doesntexist
-          |val res_0 = doesntexist
-          |            ^
+          |val res = doesntexist
+          |          ^
           |Compilation Failed
           |""".stripMargin
       )

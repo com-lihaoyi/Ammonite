@@ -85,8 +85,8 @@ object LineNumberTests extends TestSuite{
       file = 'lineNumbers/"compilationErrorInFourthBlock.sc",
       expected = Util.normalizeNewlines(
         """compilationErrorInFourthBlock.sc:30: not found: value prinntl
-          |val res_0 = prinntl("Ammonite")
-          |            ^""".stripMargin
+          |val res = prinntl("Ammonite")
+          |          ^""".stripMargin
       )
     )
 

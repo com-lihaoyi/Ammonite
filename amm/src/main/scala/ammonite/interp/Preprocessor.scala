@@ -34,7 +34,8 @@ trait Preprocessor{
                 pkgName: Seq[Name],
                 indexedWrapperName: Name,
                 imports: Imports,
-                printerTemplate: String => String): Res[Preprocessor.Output]
+                printerTemplate: String => String,
+                extraCode: String): Res[Preprocessor.Output]
 }
 object Preprocessor{
   private case class Expanded(code: String, printer: Seq[String])
@@ -102,14 +103,16 @@ object Preprocessor{
                   pkgName: Seq[Name],
                   indexedWrapperName: Name,
                   imports: Imports,
-                  printerTemplate: String => String) = for{
+                  printerTemplate: String => String,
+                  extraCode: String) = for{
       Preprocessor.Expanded(code, printer) <- expandStatements(stmts, resultIndex)
       (wrappedCode, importsLength) = wrapCode(
         pkgName, indexedWrapperName, leadingSpaces + code,
         printerTemplate(printer.mkString(", ")),
-        imports
+        imports, extraCode
       )
     } yield Preprocessor.Output(wrappedCode, importsLength)
+
     def Processor(cond: PartialFunction[(String, String, G#Tree), Preprocessor.Expanded]) = {
       (code: String, name: String, tree: G#Tree) => cond.lift(name, code, tree)
     }
@@ -303,7 +306,8 @@ object Preprocessor{
                indexedWrapperName: Name,
                code: String,
                printCode: String,
-               imports: Imports) = {
+               imports: Imports,
+               extraCode: String) = {
 
     //we need to normalize topWrapper and bottomWrapper in order to ensure
     //the snippets always use the platform-specific newLine
@@ -315,6 +319,7 @@ object ${indexedWrapperName.backticked}{\n""")
 
     val bottomWrapper = normalizeNewlines(s"""\ndef $$main() = { $printCode }
   override def toString = "${indexedWrapperName.raw}"
+  $extraCode
 }
 """)
     val importsLen = topWrapper.length

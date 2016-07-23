@@ -19,37 +19,27 @@ object Scripts {
                 kwargs: Seq[(String, String)]) = {
     val (pkg, wrapper) = Util.pathToPackageWrapper(path, wd)
     for{
-      imports <- repl.interp.processModule(
+      (imports, wrapperHashes) <- repl.interp.processModule(
         ImportHook.Source.File(path),
-        Util.normalizeNewlines(
-          read(path) + Util.newLine +
+        read(path),
+        wrapper,
+        pkg,
+        autoImport = true,
+        extraCode =
           // Not sure why we need to wrap this in a separate `$routes` object,
           // but if we don't do it for some reason the `generateRoutes` macro
           // does not see the annotations on the methods of the outer-wrapper.
           // It can inspect the type and its methods fine, it's just the
           // `methodsymbol.annotations` ends up being empty.
           s"""
-          val $$routesOuter = this
-          object $$routes extends scala.Function0[scala.Seq[ammonite.main.Router.EntryPoint]]{
-            def apply() = ammonite.main.Router.generateRoutes[$$routesOuter.type]($$routesOuter)
-          }
-          """
-        ),
-        wrapper,
-        pkg,
-        autoImport = true
+          |val $$routesOuter = this
+          |object $$routes extends scala.Function0[scala.Seq[ammonite.main.Router.EntryPoint]]{
+          |  def apply() = ammonite.main.Router.generateRoutes[$$routesOuter.type]($$routesOuter)
+          |}
+          """.stripMargin
       )
 
-      // We need to search for the class name manually from the imports, since
-      // it might not the same as the `wrapper` that gets passed in
-      routeClsName =
-        imports
-          .value
-          .find(_.fromName.raw == "$routes")
-          .get
-          .prefix
-          .drop(1)
-          .map(_.encoded).mkString(".")
+      routeClsName = wrapperHashes.last._1
 
       routesCls =
         repl.interp

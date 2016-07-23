@@ -90,7 +90,7 @@ object Storage{
                 compileCacheLoad(path, tag)
               }
             }.flatten
-            Some((classFilesList.unzip._1, res.unzip._1, imports, importTreesList))
+            Some((classFilesList, res.unzip._1, imports, importTreesList))
           }
           else None
       }
@@ -199,7 +199,7 @@ object Storage{
                 }
               }.flatten
 
-              Some((classFilesList.unzip._1, res.unzip._1, imports, importTrees))
+              Some((classFilesList, res.unzip._1, imports, importTrees))
             }
             else None
           case _ => None

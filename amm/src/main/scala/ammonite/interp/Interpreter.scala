@@ -139,9 +139,10 @@ class Interpreter(prompt0: Ref[String],
       sourceCode,
       wrapperName,
       pkgName,
-      true
+      true,
+      ""
     ) match{
-      case Res.Success(imports) =>
+      case Res.Success((imports, wrapperHashes)) =>
         predefImports = predefImports ++ imports
       case Res.Failure(ex, msg) =>
         ex match{
@@ -169,8 +170,9 @@ class Interpreter(prompt0: Ref[String],
       hookResults <- Res.map(hooked){
         case res: ImportHook.Result.Source =>
           for{
-            moduleImports <- processModule(
-              res.source, res.code, res.wrapper, res.pkg, autoImport = false
+            (moduleImports, _) <- processModule(
+              res.source, res.code, res.wrapper, res.pkg,
+              autoImport = false, extraCode = ""
             )
           } yield {
             if (!res.exec) res.imports
@@ -237,7 +239,8 @@ class Interpreter(prompt0: Ref[String],
         Seq(Name("$sess")),
         Name("cmd" + eval.getCurrentLine),
         predefImports ++ eval.sess.frames.head.imports ++ hookImports,
-        prints => s"ammonite.frontend.ReplBridge.repl.Internal.combinePrints($prints)"
+        prints => s"ammonite.frontend.ReplBridge.repl.Internal.combinePrints($prints)",
+        extraCode = ""
       )
       out <- evaluateLine(
         processed, printer,
@@ -330,11 +333,14 @@ class Interpreter(prompt0: Ref[String],
 
 
       val fullyQualifiedName = (pkgName :+ wrapperName).map(_.encoded).mkString(".")
+
       val tag = Interpreter.cacheTag(
         processed.code, Nil, eval.sess.frames.head.classloader.classpathHash
       )
       val compiled = storage.compileCacheLoad(fullyQualifiedName, tag) match {
         case Some((classFiles, newImports)) =>
+          val clsFiles = classFiles.map(_._1)
+
           Compiler.addToClasspath(classFiles, dynamicClasspath)
           Res.Success((classFiles, newImports))
         case _ =>
@@ -343,7 +349,9 @@ class Interpreter(prompt0: Ref[String],
               processed, printer, fileName
             )
             _ = storage.compileCacheSave(fullyQualifiedName, tag, (classFiles, newImports))
-          } yield (classFiles, newImports)
+          } yield {
+            (classFiles, newImports)
+          }
 
           noneCalc
       }
@@ -357,7 +365,8 @@ class Interpreter(prompt0: Ref[String],
                     code: String,
                     wrapperName: Name,
                     pkgName: Seq[Name],
-                    autoImport: Boolean): Res[Imports] = {
+                    autoImport: Boolean,
+                    extraCode: String): Res[(Imports, Seq[(String, String)])] = {
 
     val tag = Interpreter.cacheTag(
       code, Nil, eval.sess.frames.head.classloader.classpathHash
@@ -369,34 +378,40 @@ class Interpreter(prompt0: Ref[String],
     ) match {
       case None =>
         init()
-        val res = processModule0(source, code, wrapperName, pkgName, predefImports, autoImport)
+        val res = processModule0(
+          source, code, wrapperName, pkgName,
+          predefImports, autoImport, extraCode
+        )
         res match{
          case Res.Success(data) =>
            reInit()
-           val (imports, cachedData, importTrees) = data
+           val (imports, wrapperHashes, importTrees) = data
            storage.classFilesListSave(
              pkgName.map(_.backticked).mkString("."),
              wrapperName.backticked,
-             cachedData,
+             wrapperHashes,
              imports,
              tag,
              importTrees
            )
-           res.map(_._1)
+           Res.Success((imports, wrapperHashes))
          case r: Res.Failing => r
        }
-      case Some((classFilesList, cachedData, imports, importsTrees)) =>
+      case Some((wrapperHashes, classFiles, imports, importsTrees)) =>
         importsTrees.map(resolveSingleImportHook(source, _))
+
+        val classFileNames = classFiles.map(_.map(_._1))
+
         eval.evalCachedClassFiles(
-          cachedData,
+          classFiles,
           pkgName.map(_.backticked).mkString("."),
           wrapperName.backticked,
           dynamicClasspath,
-          classFilesList
+          wrapperHashes.map(_._1)
         ) match {
           case Res.Success(_) =>
             eval.update(imports)
-            Res.Success(imports)
+            Res.Success((imports, wrapperHashes))
           case r: Res.Failing => r
         }
     }
@@ -414,7 +429,8 @@ class Interpreter(prompt0: Ref[String],
                      wrapperName: Name,
                      pkgName: Seq[Name],
                      startingImports: Imports,
-                     autoImport: Boolean): Res[Interpreter.ProcessedData] = {
+                     autoImport: Boolean,
+                     extraCode: String): Res[Interpreter.ProcessedData] = {
     for{
       (processedBlocks, hookImports, importTrees) <- preprocessScript(source, code)
       (imports, cacheData) <- processCorrectScript(
@@ -430,7 +446,8 @@ class Interpreter(prompt0: Ref[String],
               wrapperName.raw + ".sc", pkgName
             )
           ),
-        autoImport
+        autoImport,
+        extraCode
       )
     } yield (imports ++ hookImports, cacheData, importTrees.flatten)
   }
@@ -457,7 +474,8 @@ class Interpreter(prompt0: Ref[String],
             indexedWrapperName
           )
         },
-        autoImport = true
+        autoImport = true,
+        ""
       )
     } yield imports ++ hookImports
   }
@@ -469,7 +487,8 @@ class Interpreter(prompt0: Ref[String],
                            pkgName: Seq[Name],
                            wrapperName: Name,
                            evaluate: Interpreter.EvaluateCallback,
-                           autoImport: Boolean
+                           autoImport: Boolean,
+                           extraCode: String
                           ): Res[Interpreter.CacheData] = {
 
     val preprocess = Preprocessor(compiler.parse)
@@ -511,7 +530,8 @@ class Interpreter(prompt0: Ref[String],
             pkgName,
             indexedWrapperName,
             scriptImports,
-            _ => "scala.Iterator[String]()"
+            _ => "scala.Iterator[String]()",
+            extraCode = extraCode
           )
 
           ev <- evaluate(processed, wrapperIndex, indexedWrapperName)
@@ -644,7 +664,8 @@ class Interpreter(prompt0: Ref[String],
           normalizeNewlines(read(file)),
           wrapper,
           pkg,
-          true
+          true,
+          ""
         ) match{
           case Res.Failure(ex, s) => throw new CompilationError(s)
           case Res.Exception(t, s) => throw t
