@@ -9,9 +9,10 @@ import scalatags.Text.all._
 import collection.mutable
 
 object Sample{
+  val curlUrl = sys.env("CURL_URL")
   val replCurl =
     s"$$ sudo curl -L -o /usr/local/bin/amm " +
-    ammonite.Constants.curlUrl +
+    curlUrl +
     " && chmod +x /usr/local/bin/amm && amm"
 
   val filesystemCurl =

@@ -1,7 +1,7 @@
 #!/usr/bin/env amm
 import ammonite.ops._
 import ammonite.ops.ImplicitWd._
-
+import $file.upload
 println("START TIME " + new java.util.Date().toString)
 
 val isMasterCommit =
@@ -14,14 +14,13 @@ val allVersions = Seq(
   "2.11.3", "2.11.4", "2.11.5", "2.11.6", "2.11.7", "2.11.8"
 )
 
-
+def getGitHash() = %%("git", "rev-parse", "--short", "HEAD").out.trim
 def updateVersion() = {
-  val gitHash = %%("git", "rev-parse", "--short", "HEAD").out.trim
+  val gitHash = getGitHash()
   val versionTxt = s"""
     package ammonite
     object Constants{
       val version = "COMMIT-$gitHash"
-      val curlUrl = "https://git.io/vKwA8"
     }
   """
   rm! cwd/'project/"Constants.scala"
@@ -56,10 +55,25 @@ def publishSigned() = {
 }
 
 def publish_docs() = {
+  val gitHash = getGitHash()
   val publishDocs = sys.env("DEPLOY_KEY").replace("\\n", "\n")
   write(cwd/'deploy_key, publishDocs)
 
-  if (sys.env("TRAVIS_TAG") != "") {
+  //Prepare executable
+  %sbt "amm/test:assembly"
+
+  val travisTag = sys.env("TRAVIS_TAG")
+
+  val shortUrl = upload(
+    if (travisTag != "") travisTag else "snapshot-commit-uploads",
+    if (travisTag != "") travisTag else gitHash,
+    sys.env("AMMONITE_BOT_AUTH_TOKEN")
+  )
+
+  // Generate the readme
+  %sbt("readme/run", CURL_URL = shortUrl)
+
+  if (travisTag != "") {
     %("ci/deploy_master_docs.sh", DOC_FOLDER=".")
   }else{
     %("ci/deploy_master_docs.sh", DOC_FOLDER="master")

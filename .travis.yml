@@ -23,34 +23,34 @@ matrix:
   # `integration/test`; for some reason, running them on the same box is
   # flaky and `integration/test` ends up hanging, even if they are run in
   # separate, sequential processes.
-  - env: CI_SCRIPT="ci/build.sc test published/test"
-    jdk: openjdk7
-    scala: 2.10.5
-  - env: CI_SCRIPT="ci/build.sc test integration/test"
-    jdk: openjdk7
-    scala: 2.10.5
-
-  - env: CI_SCRIPT="ci/build.sc test published/test"
-    jdk: oraclejdk8
-    scala: 2.10.5
-  - env: CI_SCRIPT="ci/build.sc test integration/test"
-    jdk: oraclejdk8
-    scala: 2.10.5
-
-
-  - env: CI_SCRIPT="ci/build.sc test published/test"
-    jdk: openjdk7
-    scala: 2.11.8
-  - env: CI_SCRIPT="ci/build.sc test integration/test"
-    jdk: openjdk7
-    scala: 2.11.8
-
-  - env: CI_SCRIPT="ci/build.sc test published/test"
-    jdk: oraclejdk8
-    scala: 2.11.8
-  - env: CI_SCRIPT="ci/build.sc test integration/test"
-    jdk: oraclejdk8
-    scala: 2.11.8
+#  - env: CI_SCRIPT="ci/build.sc test published/test"
+#    jdk: openjdk7
+#    scala: 2.10.5
+#  - env: CI_SCRIPT="ci/build.sc test integration/test"
+#    jdk: openjdk7
+#    scala: 2.10.5
+#
+#  - env: CI_SCRIPT="ci/build.sc test published/test"
+#    jdk: oraclejdk8
+#    scala: 2.10.5
+#  - env: CI_SCRIPT="ci/build.sc test integration/test"
+#    jdk: oraclejdk8
+#    scala: 2.10.5
+#
+#
+#  - env: CI_SCRIPT="ci/build.sc test published/test"
+#    jdk: openjdk7
+#    scala: 2.11.8
+#  - env: CI_SCRIPT="ci/build.sc test integration/test"
+#    jdk: openjdk7
+#    scala: 2.11.8
+#
+#  - env: CI_SCRIPT="ci/build.sc test published/test"
+#    jdk: oraclejdk8
+#    scala: 2.11.8
+#  - env: CI_SCRIPT="ci/build.sc test integration/test"
+#    jdk: oraclejdk8
+#    scala: 2.11.8
 
 
   - env: CI_SCRIPT="ci/build.sc docs"
