@@ -9,7 +9,11 @@ import scalatags.Text.all._
 import collection.mutable
 
 object Sample{
-  val replCurl = s"$$ curl -L -o amm ${ammonite.Constants.curlUrl} && chmod +x amm && ./amm"
+  val replCurl =
+    s"$$ sudo curl -L -o /usr/local/bin/amm " +
+    ammonite.Constants.curlUrl +
+    " && chmod +x /usr/local/bin/amm && amm"
+
   val filesystemCurl =
     "$ mkdir ~/.ammonite && curl -L -o ~/.ammonite/predef.sc https://git.io/vo4wx"
   val cacheVersion = 6

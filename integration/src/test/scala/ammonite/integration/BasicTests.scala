@@ -72,12 +72,12 @@ object BasicTests extends TestSuite{
       }
       'multiple{
         'positiveNoArgs{
-          val evaled = exec('basic/"MultiMain.sc", "noArgMain")
+          val evaled = exec('basic/"MultiMain.sc", "mainA")
           val out = evaled.out.string
           assert(out == "Hello! 1" + Util.newLine)
         }
         'positiveArgs{
-          val evaled = exec('basic/"MultiMain.sc", "multiArgMain", "2", "foo")
+          val evaled = exec('basic/"MultiMain.sc", "functionB", "2", "foo")
           val out = evaled.out.string
           assert(out == "Hello! foofoo ." + Util.newLine)
         }
@@ -89,8 +89,8 @@ object BasicTests extends TestSuite{
               |
               |Available main methods:
               |
-              |def noArgMain()
-              |def multiArgMain(i: Int, s: String, path: ammonite.ops.Path)
+              |def mainA()
+              |def functionB(i: Int, s: String, path: ammonite.ops.Path)
               |""".stripMargin
           )
           assert(out == expected)
@@ -105,8 +105,8 @@ object BasicTests extends TestSuite{
               |
               |Available main methods:
               |
-              |def noArgMain()
-              |def multiArgMain(i: Int, s: String, path: ammonite.ops.Path)
+              |def mainA()
+              |def functionB(i: Int, s: String, path: ammonite.ops.Path)
               |""".stripMargin
           )
           assert(out == expected)

@@ -182,8 +182,10 @@
 
       @p
         When the script is run from the command line:
+
       @hl.sh
-        ~/amm Args.scala 3 Moo
+        amm Args.sc 3 Moo
+
       @p
         The top-level definitions execute first (e.g. setting @hl.scala{x}),
         and then the @hl.scala{main} method is called with the arguments you
@@ -204,6 +206,28 @@
         @hl.scala{load.module} or @hl.scala{load.exec} a script from @i{within}
         the Ammonite REPL. It gets imported into scope like any other method or
         value defined in the script, and you can just call it normally.
+
+    @sect{Multiple Main Methods}
+      @p
+        If you have only a single @hl.scala{@main} method, any arguments that
+        you pass to the script get used as arguments to that @hl.scala{@main}.
+        But if you have @i{multiple} @hl.scala{@main} methods, the first
+        argument to the script is used to select which @hl.scala{@main} method
+        to call. e.g. given:
+
+      @hl.ref(wd/'integration/'src/'test/'resources/'ammonite/'integration/'basic/"MultiMain.sc")
+
+      @p
+        You can call it via
+
+      @hl.sh
+        amm MultiMain.sc mainA
+
+      @p
+        Or
+
+      @hl.sh
+        amm MultiMain.sc functionB 2 "Hello"
 
   @sect{Running Scripts}
     @p

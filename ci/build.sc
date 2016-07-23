@@ -59,7 +59,7 @@ def publish_docs() = {
   val publishDocs = sys.env("DEPLOY_KEY").replace("\\n", "\n")
   write(cwd/'deploy_key, publishDocs)
 
-  if (sys.env.contains("TRAVIS_TAG")) {
+  if (sys.env("TRAVIS_TAG") != "") {
     %("ci/deploy_master_docs.sh", DOC_FOLDER=".")
   }else{
     %("ci/deploy_master_docs.sh", DOC_FOLDER="master")
