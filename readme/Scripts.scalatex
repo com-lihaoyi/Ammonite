@@ -209,10 +209,10 @@
 
     @sect{Multiple Main Methods}
       @p
-        If you have only a single @hl.scala{@main} method, any arguments that
-        you pass to the script get used as arguments to that @hl.scala{@main}.
-        But if you have @i{multiple} @hl.scala{@main} methods, the first
-        argument to the script is used to select which @hl.scala{@main} method
+        If you have only a single @hl.scala("@main") method, any arguments that
+        you pass to the script get used as arguments to that @hl.scala("@main").
+        But if you have @i{multiple} @hl.scala("@main") methods, the first
+        argument to the script is used to select which @hl.scala("@main") method
         to call. e.g. given:
 
       @hl.ref(wd/'integration/'src/'test/'resources/'ammonite/'integration/'basic/"MultiMain.sc")
