@@ -180,9 +180,9 @@
     
     @sect{Script Arguments}
       @p
-        Often when calling a script from the external command- line (e.g.
+        Often when calling a script from the external command-line (e.g.
         Bash), you need to pass arguments to configure its behavior. With
-        Ammonite, this is done by defining a @hl.scala{main} method, e.g.
+        Ammonite, this is done by defining a @hl.scala("@main") method, e.g.
 
       @hl.ref(wd/'integration/'src/'test/'resources/'ammonite/'integration/'basic/"Args.sc")
 
@@ -194,8 +194,13 @@
 
       @p
         The top-level definitions execute first (e.g. setting @hl.scala{x}),
-        and then the @hl.scala{main} method is called with the arguments you
-        passed in.
+        and then the @hl.scala("@main") method is called with the arguments you
+        passed in. You can also pass in named arguments using `--` to demarcate
+        them:
+
+      @hl.sh
+        amm Args.sc -- --i 3 --s Moo
+
       @p
         Default arguments behave as you would expect (i.e. they allow you to
         omit it when calling) and arguments are parsed using the
@@ -221,7 +226,10 @@
         argument to the script is used to select which @hl.scala("@main") method
         to call. e.g. given:
 
-      @hl.ref(wd/'integration/'src/'test/'resources/'ammonite/'integration/'basic/"MultiMain.sc")
+      @hl.ref(
+        wd/'integration/'src/'test/'resources/'ammonite/'integration/'basic/"MultiMain.sc",
+        className = "scala"
+      )
 
       @p
         You can call it via
