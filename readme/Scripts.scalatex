@@ -16,7 +16,13 @@
     Creating an Ammonite Script is just a matter of creating a
     @hl.scala{MyScript.sc} with some Scala code in it, and running it from
     within the Ammonite REPL or @sect.ref{From Bash}. Writing Scala code
-    doesn't get much easier than that!
+    doesn't get much easier than that! For example, Ammonite's own
+    @lnk("Continuous Integration Scripts", "https://github.com/lihaoyi/Ammonite/tree/master/ci")
+    are written as @code{.sc} Scala Scripts, as are @lnk("Haoyi's blog",
+    "https://github.com/lihaoyi/blog") and @lnk("resume",
+    "https://github.com/lihaoyi/Resume"). These are all examples of using
+    Scala Scripts to do some simple (or not so simple!) tasks in just a few
+    files, without the hassle of setting up a heavyweight SBT project.
 
   @p
     To begin with, download the Ammonite script-runner:
