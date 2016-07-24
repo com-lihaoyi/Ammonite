@@ -14,7 +14,6 @@ import scala.language.experimental.macros
 object Router{
   class doc(s: String) extends StaticAnnotation
   class main extends StaticAnnotation
-  type export = main // backwards compatibility shim
   def generateRoutes[T](t: T): Seq[Router.EntryPoint] = macro generateRoutesImpl[T]
   def generateRoutesImpl[T: c.WeakTypeTag](c: Context)(t: c.Expr[T]): c.Expr[Seq[EntryPoint]] = {
     import c.universe._

@@ -50,17 +50,22 @@ object Scripts {
           .classloader
           .loadClass(routeClsName + "$$routes$")
 
-      entryPoints =
+      scriptMains =
         routesCls
             .getField("MODULE$")
-            .get(null).asInstanceOf[() => Seq[Router.EntryPoint]]
+            .get(null)
+            .asInstanceOf[() => Seq[Router.EntryPoint]]
             .apply()
 
-      res <- entryPoints match {
+      res <- scriptMains match {
+        // If there are no @main methods, there's nothing to do
         case Seq() => Res.Success(imports)
-        case Seq(entry) => runEntryPoint(entry, args, kwargs).getOrElse(Res.Success(imports))
-        case entries =>
-          val suffix = formatMainMethods(entries)
+        // If there's one @main method, we run it with all args
+        case Seq(main) => runMainMethod(main, args, kwargs).getOrElse(Res.Success(imports))
+        // If there are multiple @main methods, we use the first arg to decide
+        // which method to run, and pass the rest to that main method
+        case mainMethods =>
+          val suffix = formatMainMethods(mainMethods)
           args match{
             case Seq() =>
               Res.Failure(
@@ -68,26 +73,26 @@ object Scripts {
                 s"Need to specify a main method to call when running " + path.last + suffix
               )
             case Seq(head, tail @ _*) =>
-              entries.find(_.name == head) match{
+              mainMethods.find(_.name == head) match{
                 case None =>
                   Res.Failure(
                     None,
                     s"Unable to find method: " + backtickWrap(head) + suffix
                   )
-                case Some(entry) =>
-                  runEntryPoint(entry, tail, kwargs).getOrElse(Res.Success(imports))
+                case Some(main) =>
+                  runMainMethod(main, tail, kwargs).getOrElse(Res.Success(imports))
               }
           }
       }
     } yield res
   }
-  def formatMainMethods(entryPoints: Seq[Router.EntryPoint]) = {
-    if (entryPoints.isEmpty) ""
+  def formatMainMethods(mainMethods: Seq[Router.EntryPoint]) = {
+    if (mainMethods.isEmpty) ""
     else{
-      val methods = for(ep <- entryPoints) yield{
-        val args = ep.argSignatures.map(renderArg).mkString(", ")
-        val details = entryDetails(ep)
-        s"def ${ep.name}($args)$details"
+      val methods = for(main <- mainMethods) yield{
+        val args = main.argSignatures.map(renderArg).mkString(", ")
+        val details = mainMethodDetails(main)
+        s"def ${main.name}($args)$details"
       }
       Util.normalizeNewlines(
         s"""
@@ -98,20 +103,20 @@ object Scripts {
       )
     }
   }
-  def runEntryPoint(entry: Router.EntryPoint,
+  def runMainMethod(mainMethod: Router.EntryPoint,
                     args: Seq[String],
                     kwargs: Seq[(String, String)]): Option[Res.Failing] = {
 
     def expectedMsg = {
       val commaSeparated =
-        entry.argSignatures
+        mainMethod.argSignatures
           .map(renderArg)
           .mkString(", ")
-      val details = entryDetails(entry)
+      val details = mainMethodDetails(mainMethod)
       "(" + commaSeparated + ")" + details
     }
 
-    entry.invoke(args, kwargs) match{
+    mainMethod.invoke(args, kwargs) match{
       case Router.Result.Success(x) => None
       case Router.Result.Error.Exception(x) => Some(Res.Exception(x, ""))
       case Router.Result.Error.TooManyArguments(x) =>
@@ -150,7 +155,7 @@ object Scripts {
   def renderArg(arg: ArgSig) = backtickWrap(arg.name) + ": " + arg.typeString
 
 
-  def entryDetails(ep: EntryPoint) = {
+  def mainMethodDetails(ep: EntryPoint) = {
     ep.argSignatures.collect{
       case ArgSig(name, tpe, Some(doc), default) =>
         Util.newLine + name + " // " + doc
