@@ -779,7 +779,7 @@
       download:
 
     @hl.sh
-      @ammonite.Constants.unstableCurlUrl
+      @readme.Sample.unstableCurl
 
     @p
       Or usage in an SBT project
