@@ -147,7 +147,7 @@
   @p
     The bulk of this page describes the latest stable release of Ammonite,
     @code{@ammonite.Constants.version}. If you're willing to live on the edge,
-    we also publish @sect{Unstable Versions} from any commits that get pushed
+    we also publish @sect.ref{Unstable Versions} from any commits that get pushed
     or pull-requests that land in the master branch:
 
   @ul
