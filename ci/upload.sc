@@ -3,6 +3,14 @@ import ammonite.ops._
 import scalaj.http._
 
 @main
+def shorten(longUrl: String) = {
+  Http("https://git.io")
+    .postForm(Seq("url" -> longUrl))
+    .asString
+    .headers("Location")
+    .head
+}
+@main
 def apply(uploadedFile: Path,
           tagName: String,
           uploadName: String,
@@ -33,11 +41,7 @@ def apply(uploadedFile: Path,
 
   println("Long Url " + longUrl)
 
-  val shortUrl = Http("https://git.io")
-    .postForm(Seq("url" -> longUrl))
-    .asString
-    .headers("Location")
-    .head
+  val shortUrl = shorten(longUrl)
 
   println("Short Url " + shortUrl)
   shortUrl

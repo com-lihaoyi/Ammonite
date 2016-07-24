@@ -14,14 +14,25 @@ val allVersions = Seq(
   "2.11.3", "2.11.4", "2.11.5", "2.11.6", "2.11.7", "2.11.8"
 )
 
+val buildVersion =
+  if (sys.env("TRAVIS_TAG") == "") s"COMMIT-${getGitHash()}"
+  else sys.env("TRAVIS_TAG")
+
+
 def getGitHash() = %%("git", "rev-parse", "--short", "HEAD").out.trim
-def updateVersion() = {
-  val travisTag = sys.env("TRAVIS_TAG")
-  val version = if (travisTag == "") s"COMMIT-${getGitHash()}" else travisTag
+
+
+def updateConstants(version: String = buildVersion,
+                    unstableVersion: String = "<fill-me-in-in-Constants.scala>",
+                    curlUrl: String = "<fill-me-in-in-Constants.scala>",
+                    unstableCurlUrl: String = "<fill-me-in-in-Constants.scala>") = {
   val versionTxt = s"""
     package ammonite
     object Constants{
       val version = "$version"
+      val unstableVersion = "$unstableVersion"
+      val curlUrl = "$curlUrl"
+      val unstableCurlUrl = "$unstableCurlUrl"
     }
   """
   rm! cwd/'project/"Constants.scala"
@@ -61,11 +72,12 @@ def publishDocs() = {
   write(cwd/'deploy_key, publishDocs)
 
   //Prepare executable
+  updateConstants()
   %sbt "amm/test:assembly"
 
   val travisTag = sys.env("TRAVIS_TAG")
 
-  val (shortUrl, docFolder) = if (travisTag != ""){
+  val shortUrl = if (travisTag != ""){
     import upickle.Js
     scalaj.http.Http("https://api.github.com/repos/lihaoyi/Ammonite/releases")
       .postData(
@@ -86,7 +98,7 @@ def publishDocs() = {
       travisTag,
       sys.env("AMMONITE_BOT_AUTH_TOKEN")
     )
-    (short, ".")
+    short
   }else{
     val short = upload(
       cwd/'amm/'target/"scala-2.11"/'amm,
@@ -94,18 +106,28 @@ def publishDocs() = {
       gitHash,
       sys.env("AMMONITE_BOT_AUTH_TOKEN")
     )
-    (short, "master")
+    short
   }
 
+  val latestTaggedVersion = %%('git, 'describe, "--abbrev=0", "--tags").out.trim
 
-  %("ci/deploy_master_docs.sh", DOC_FOLDER = docFolder, CURL_URL = shortUrl)
+  updateConstants(
+    latestTaggedVersion,
+    buildVersion,
+    upload.shorten(
+      s"https://github.com/lihaoyi/Ammonite/releases/" +
+      s"download/$latestTaggedVersion/$latestTaggedVersion"
+    ),
+    shortUrl
+  )
+  %("ci/deploy_master_docs.sh")
 }
 
 @main
 def docs() = {
   if (isMasterCommit){
     println("MASTER COMMIT: Updating version and publishing to Github Pages")
-    updateVersion()
+
     publishDocs()
   }else{
     println("MISC COMMIT: Building readme for verification")
@@ -117,7 +139,7 @@ def docs() = {
 def artifacts() = {
   if (isMasterCommit){
     println("MASTER COMMIT: Updating version and publishing to Maven Central")
-    updateVersion()
+    updateConstants()
     publishSigned()
   }else{
     println("MISC COMMIT: Compiling all Scala code across versions for verification")

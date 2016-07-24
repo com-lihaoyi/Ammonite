@@ -10,13 +10,14 @@ import collection.mutable
 
 object Sample{
   println("Initializing Sample")
-  val curlUrl = sys.env("CURL_URL")
-  println("Initialized Curl Url " + curlUrl)
-  val replCurl =
+
+
+  def curlCommand(curlUrl: String) =
     s"$$ sudo curl -L -o /usr/local/bin/amm " +
     curlUrl +
     " && chmod +x /usr/local/bin/amm && amm"
-
+  val replCurl = curlCommand(ammonite.Constants.curlUrl)
+  val unstableCurl = curlCommand(ammonite.Constants.unstableCurlUrl)
   val filesystemCurl =
     "$ mkdir ~/.ammonite && curl -L -o ~/.ammonite/predef.sc https://git.io/vo4wx"
   val cacheVersion = 6

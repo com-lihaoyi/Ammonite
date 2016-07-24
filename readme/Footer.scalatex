@@ -1,5 +1,5 @@
 @import Main._
-
+@import readme.Sample._
 @sect{Reference}
   @sect{Community}
     @p
@@ -138,15 +138,15 @@
         @li
           Started doing Continuous Deployment of the Ammonite project's
           artifacts and executables; now, any set of commits that get pushed
-          or merged into master will have their documentation published to
-          @lnk("http://www.lihaoyi.com/Ammonite/master/") immediately, with
-          download/installation instructions for both the standalone
-          executable (which gets uploaded under the release
-          @lnk("Snapshot Commit Releases", "https://github.com/lihaoyi/Ammonite/releases/tag/snapshot-commit-uploads")
-          and the Ivy/Maven artifacts which will get published to Maven
-          Central. Any PRs that get merged are published and become available
-          within an hour or two, so the author and anyone else can begin using
-          them.
+          or merged into master will be published immediately, with this
+          documentation-site being updated, the standalone executable being
+          uploaded to @lnk("Github Releases",
+          "https://github.com/lihaoyi/Ammonite/releases/tag/snapshot-commit-uploads"),
+          the Ivy artifacts being uploaded to maven central, and instructions
+          for downloading/installing it shown in the @sect.ref{Unstable Versions}
+          section below. Any PRs that get merged are published and become
+          available within an hour or two, so the author and anyone else can
+          begin using them.
 
     @sect{0.6.2}
       @ul
@@ -769,3 +769,22 @@
         @li
           Capture Exceptions and expose them to repl as repl.lastException
           including exceptions causing Failures
+
+  @sect{Unstable Versions}
+    @p
+      The page above contains the documentation for the latest stable version
+      of Ammonite, @code{@ammonite.Constants.version}. Ammonite also publishes
+      unstable versions, the latest of which is
+      @code{@ammonite.Constants.unstableVersion} and is available for direct
+      download:
+
+    @hl.sh
+      @ammonite.Constants.unstableCurlUrl
+
+    @p
+      Or usage in an SBT project
+
+    @hl.scala
+      libraryDependencies += "com.lihaoyi" % "ammonite" % "@ammonite.Constants.unstableVersion" % "test" cross CrossVersion.full
+
+      initialCommands in (Test, console) := """ammonite.Main().run()"""
