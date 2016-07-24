@@ -6,7 +6,7 @@ println("START TIME " + new java.util.Date().toString)
 
 val isMasterCommit =
   sys.env.get("TRAVIS_PULL_REQUEST") == Some("false") &&
-  sys.env.get("TRAVIS_BRANCH") == Some("master")
+  (sys.env.get("TRAVIS_BRANCH") == Some("master") || sys.env("TRAVIS_TAG") != "")
 
 
 val allVersions = Seq(
