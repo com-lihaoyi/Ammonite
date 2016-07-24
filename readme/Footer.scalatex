@@ -104,10 +104,12 @@
           much more aggressive and robust caching, thanks to
           @lnk("coderabhishek", "https://github.com/coderabhishek") who is
           working on this over GSOC
-
         @li
           Fixed a performance regression and greatly sped up pasting text into
           the REPL
+        @li
+          The behavior of @code{Ctrl p} and @code{Ctrl n} have been tweaked to
+          be more consistent with other readline implementations.
         @li
           @sect.ref{Magic Imports} now exist! This should provide a much more
           intuitive way of importing other files and depending on ivy
@@ -117,6 +119,10 @@
           @hl.scala{load.module}, @hl.scala{load.exec}, @hl.scala{load.ivy} are
           now largely superseded by @hl.scala{import $file},
           @hl.scala{import $exec}, and @hl.scala{import $ivy}
+        @li
+          The way you pass in @sect.ref{Script Arguments} to a script, has been
+          totally revamped, and should be faster, more intuitive, and provide
+          better error messages when things go wrong
         @li
           Added a new top-level doc-site chapter on @sect.ref{Scala Scripts}.
           This reflects their promotion from "quick hack that was a pain in
@@ -129,6 +135,19 @@
           interactive REPL using @code{AmmoniteFrontEnd}, thanks to
           @lnk("coderabhishek", "https://github.com/coderabhishek") who worked
           on this over GSOC.
+        @li
+          Started doing Continuous Deployment of the Ammonite project's
+          artifacts and executables; now, any set of commits that get pushed
+          or merged into master will have their documentation published to
+          @lnk("http://www.lihaoyi.com/Ammonite/master/") immediately, with
+          download/installation instructions for both the standalone
+          executable (which gets uploaded under the release
+          @lnk("Snapshot Commit Releases", "https://github.com/lihaoyi/Ammonite/releases/tag/snapshot-commit-uploads")
+          and the Ivy/Maven artifacts which will get published to Maven
+          Central. Any PRs that get merged are published and become available
+          within an hour or two, so the author and anyone else can begin using
+          them.
+
     @sect{0.6.2}
       @ul
         @li

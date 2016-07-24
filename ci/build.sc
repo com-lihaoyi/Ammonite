@@ -55,7 +55,7 @@ def publishSigned() = {
   %sbt("sonatypeReleaseAll")
 }
 
-def publish_docs() = {
+def publishDocs() = {
   val gitHash = getGitHash()
   val publishDocs = sys.env("DEPLOY_KEY").replace("\\n", "\n")
   write(cwd/'deploy_key, publishDocs)
@@ -101,19 +101,19 @@ def publish_docs() = {
   %("ci/deploy_master_docs.sh", DOC_FOLDER = docFolder, CURL_URL = shortUrl)
 }
 
-@export
+@main
 def docs() = {
   if (isMasterCommit){
     println("MASTER COMMIT: Updating version and publishing to Github Pages")
     updateVersion()
-    publish_docs()
+    publishDocs()
   }else{
     println("MISC COMMIT: Building readme for verification")
     %sbt("readme/run", CURL_URL="<dummy-url>")
   }
 }
 
-@export
+@main
 def artifacts() = {
   if (isMasterCommit){
     println("MASTER COMMIT: Updating version and publishing to Maven Central")
@@ -128,7 +128,7 @@ def artifacts() = {
 
 }
 
-@export
+@main
 def test(testCommand: String) = {
   %sbt("++" + sys.env("TRAVIS_SCALA_VERSION"), "published/compile")
   %sbt("++" + sys.env("TRAVIS_SCALA_VERSION"), testCommand)
