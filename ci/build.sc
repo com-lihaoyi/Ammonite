@@ -65,16 +65,38 @@ def publish_docs() = {
 
   val travisTag = sys.env("TRAVIS_TAG")
 
-  val shortUrl = upload(
-    cwd/'amm/'target/"scala-2.11"/'amm,
-    if (travisTag != "") travisTag else "snapshot-commit-uploads",
-    if (travisTag != "") travisTag else gitHash,
-    sys.env("AMMONITE_BOT_AUTH_TOKEN")
-  )
+  val (shortUrl, docFolder) = if (travisTag != ""){
+    import upickle.Js
+    scalaj.http.Http("https://api.github.com/repos/lihaoyi/Ammonite/releases")
+      .postData(
+        upickle.json.write(
+          Js.Obj(
+            "tag_name" -> Js.Str(travisTag),
+            "name" -> Js.Str(travisTag),
+            "body" -> Js.Str("http://www.lihaoyi.com/Ammonite/#" + travisTag)
+          )
+        )
+      )
+      .header("Authorization", "token " + sys.env("AMMONITE_BOT_AUTH_TOKEN"))
+      .asString
 
-  // Generate the readme
+    val short = upload(
+      cwd/'amm/'target/"scala-2.11"/'amm,
+      travisTag,
+      travisTag,
+      sys.env("AMMONITE_BOT_AUTH_TOKEN")
+    )
+    (short, ".")
+  }else{
+    val short = upload(
+      cwd/'amm/'target/"scala-2.11"/'amm,
+      "snapshot-commit-uploads",
+      gitHash,
+      sys.env("AMMONITE_BOT_AUTH_TOKEN")
+    )
+    (short, "master")
+  }
 
-  val docFolder = if (travisTag != "") "." else "master"
 
   %("ci/deploy_master_docs.sh", DOC_FOLDER = docFolder, CURL_URL = shortUrl)
 }

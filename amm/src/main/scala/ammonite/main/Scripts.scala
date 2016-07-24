@@ -21,22 +21,23 @@ object Scripts {
     for{
       (imports, wrapperHashes) <- repl.interp.processModule(
         ImportHook.Source.File(path),
-        read(path),
+        Util.normalizeNewlines(read(path)),
         wrapper,
         pkg,
         autoImport = true,
-        extraCode =
-          // Not sure why we need to wrap this in a separate `$routes` object,
-          // but if we don't do it for some reason the `generateRoutes` macro
-          // does not see the annotations on the methods of the outer-wrapper.
-          // It can inspect the type and its methods fine, it's just the
-          // `methodsymbol.annotations` ends up being empty.
+        // Not sure why we need to wrap this in a separate `$routes` object,
+        // but if we don't do it for some reason the `generateRoutes` macro
+        // does not see the annotations on the methods of the outer-wrapper.
+        // It can inspect the type and its methods fine, it's just the
+        // `methodsymbol.annotations` ends up being empty.
+        extraCode = Util.normalizeNewlines(
           s"""
           |val $$routesOuter = this
           |object $$routes extends scala.Function0[scala.Seq[ammonite.main.Router.EntryPoint]]{
           |  def apply() = ammonite.main.Router.generateRoutes[$$routesOuter.type]($$routesOuter)
           |}
           """.stripMargin
+        )
       )
 
       routeClsName = wrapperHashes.last._1
