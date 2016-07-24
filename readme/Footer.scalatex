@@ -788,3 +788,16 @@
       libraryDependencies += "com.lihaoyi" % "ammonite" % "@ammonite.Constants.unstableVersion" % "test" cross CrossVersion.full
 
       initialCommands in (Test, console) := """ammonite.Main().run()"""
+
+    @p
+      These unstable versions will contain any brand-new features that are
+      currently being worked on, with the caveat that they are unstable and
+      these features are subject to change or experimentation. They will
+      generally work - the automated test suite is pretty comprehensive - but
+      they are still more-likely to have bugs than numbered releases.
+    @p
+      Any pull-request that gets merged into master is published as an unstable
+      version automatically within an hour or two of being merged, so if you
+      notice some problem and know how to fix it, send a PR, get it merged, and
+      you can use the published unstable version with your fix until the next
+      numbered release.

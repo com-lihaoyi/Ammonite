@@ -145,22 +145,14 @@
       @sect.ref{Talks}
 
   @p
-    The page at:
+    The bulk of this page describes the latest stable release of Ammonite,
+    @code{@ammonite.Constants.version}. If you're willing to live on the edge,
+    we also publish @sect{Unstable Versions} from any commits that get pushed
+    or pull-requests that land in the master branch:
 
   @ul
     @li
-      @lnk{http://lihaoyi.github.io/Ammonite}
-  @p
-    Is the documentation site for the last stable release of
-    Ammonite. The Ammonite project also
-    publishes per-commit snapshot builds, for people who are willing to
-    beta-test new features and improvements. For documentation for these
-    snapshot builds and instructions on installing these snapshot builds,
-    check out
-
-  @ul
-    @li
-      @lnk{http://lihaoyi.github.io/Ammonite/master}
+      @sect.ref{Unstable Versions}
 
 @Repl()
 @Scripts()
