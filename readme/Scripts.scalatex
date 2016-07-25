@@ -246,10 +246,10 @@
     @sect{Bundled Libraries}
       @p
         While Ammonite allows you to load any Java or Scala library for use
-        via the @sect.ref("import $ivy", "http://www.lihaoyi.com/Ammonite/#IvyDependencies")
-        syntax, it also comes bundled with some basic libraries, e.g.
-        @lnk("Scalaj-HTTP", "https://github.com/scalaj/scalaj-http") for making
-        HTTP calls, or the @lnk("uPickle", "http://www.lihaoyi.com/upickle-pprint/upickle/")
+        via the @sect.ref{import $ivy} syntax, it also comes bundled with some
+        basic libraries, e.g. @lnk("Scalaj-HTTP", "https://github.com/scalaj/scalaj-http")
+        for making HTTP calls, or the
+        @lnk("uPickle", "http://www.lihaoyi.com/upickle-pprint/upickle/")
         library with it's @lnk("JSON Api", "http://www.lihaoyi.com/upickle-pprint/upickle/#JSONAPI")
         for dealing with the common JSON format.
 
@@ -273,16 +273,17 @@
         def shorten(longUrl: String)
         def listReleases(project: String)
       @p
-        And you can run the two functions via
+        And you can run the two functions (after using @code{chmod +x} to make
+        the file executable) via
 
       @hl.sh
-        > amm HttpApi.sc shorten https://www.github.com
+        > ./HttpApi.sc shorten https://www.github.com
         https://git.io/vDN6Ig
       @p
         Or
 
       @hl.sh
-        > amm HttpApi.sc listReleases lihaoyi/Ammonite
+        > ./HttpApi.sc listReleases lihaoyi/Ammonite
         0.7.0,Snaphot Commit Uploads,0.6.2,0.6.1,0.6.0,0.5.9,0.5.8,
         0.5.7,0.5.6,0.5.5,0.5.4,0.5.3,0.5.2,0.5.1,0.5.0,0.4.9,0.4.8,
         0.4.7,0.4.6,0.4.5,0.4.4,0.4.3,0.4.2,0.4.0
