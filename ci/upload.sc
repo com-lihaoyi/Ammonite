@@ -16,7 +16,9 @@ def apply(uploadedFile: Path,
           uploadName: String,
           authKey: String): String = {
   val parsed = upickle.json.read(
-    Http("https://api.github.com/repos/lihaoyi/Ammonite/releases").asString.body
+    Http("https://api.github.com/repos/lihaoyi/Ammonite/releases")
+      .header("Authorization", "token " + authKey)
+      .asString.body
   )
 
   val snapshotReleaseId =
