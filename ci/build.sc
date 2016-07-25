@@ -66,6 +66,41 @@ def publishSigned() = {
   %sbt("sonatypeReleaseAll")
 }
 
+
+
+def publishDocs() = {
+
+  val publishDocs = sys.env("DEPLOY_KEY").replace("\\n", "\n")
+  write(cwd / 'deploy_key, publishDocs)
+
+  val travisTag = sys.env("TRAVIS_TAG")
+
+  val latestTaggedVersion = %%('git, 'describe, "--abbrev=0", "--tags").out.trim
+
+  val (stableKey, unstableKey) =
+    if (travisTag != ""){
+      (
+        s"$latestTaggedVersion/$latestTaggedVersion",
+        s"$latestTaggedVersion/$latestTaggedVersion"
+      )
+    }else{
+      (
+        s"$latestTaggedVersion/$latestTaggedVersion",
+        s"snapshot-commit-uploads/$travisTag"
+      )
+    }
+  updateConstants(
+    latestTaggedVersion,
+    buildVersion,
+    upload.shorten(s"https://github.com/lihaoyi/Ammonite/releases/$stableKey"),
+    upload.shorten(s"https://github.com/lihaoyi/Ammonite/releases/$unstableKey")
+  )
+
+  %sbt "readme/run"
+
+  %("ci/deploy_master_docs.sh")
+}
+@main
 def executable() = {
   //Prepare executable
   updateConstants()
@@ -104,40 +139,6 @@ def executable() = {
     )
     short
   }
-}
-
-
-def publishDocs() = {
-
-  val publishDocs = sys.env("DEPLOY_KEY").replace("\\n", "\n")
-  write(cwd / 'deploy_key, publishDocs)
-
-  val travisTag = sys.env("TRAVIS_TAG")
-
-  val latestTaggedVersion = %%('git, 'describe, "--abbrev=0", "--tags").out.trim
-
-  val (stableKey, unstableKey) =
-    if (travisTag != ""){
-      (
-        s"$latestTaggedVersion/$latestTaggedVersion",
-        s"$latestTaggedVersion/$latestTaggedVersion"
-      )
-    }else{
-      (
-        s"$latestTaggedVersion/$latestTaggedVersion",
-        s"snapshot-commit-uploads/$travisTag"
-      )
-    }
-  updateConstants(
-    latestTaggedVersion,
-    buildVersion,
-    upload.shorten(s"https://github.com/lihaoyi/Ammonite/releases/$stableKey"),
-    upload.shorten(s"https://github.com/lihaoyi/Ammonite/releases/$unstableKey")
-  )
-
-  %sbt "readme/run"
-
-  %("ci/deploy_master_docs.sh")
 }
 
 @main
