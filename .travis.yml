@@ -12,6 +12,11 @@ matrix:
     jdk: oraclejdk8
     scala: 2.11.8
 
+
+  - env: CI_SCRIPT="ci/build.sc executable"
+    jdk: oraclejdk8
+    scala: 2.11.8
+
   - env: CI_SCRIPT="ci/build.sc docs"
     jdk: oraclejdk8
     scala: 2.11.8

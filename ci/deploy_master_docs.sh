@@ -7,8 +7,6 @@ chmod 600 deploy_key
 ssh-add deploy_key
 rm deploy_key
 
-sbt readme/run
-
 # Set up git so we can actually do things with it
 git config --global user.email "haoyi.sg+travis@gmail.com"
 git config --global user.name "Ammonite Travis Bot"
