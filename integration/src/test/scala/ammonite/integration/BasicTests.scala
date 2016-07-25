@@ -64,6 +64,7 @@ object BasicTests extends TestSuite{
         }
       }
     }
+
     'main{
       'single{
         val evaled = exec('basic/"Main.sc")
@@ -167,6 +168,17 @@ object BasicTests extends TestSuite{
         // which means that the error stack that gets printed is short-ish
         assert(errorMsg.lines.length < 12)
 
+      }
+    }
+    'http{
+      'shorten {
+        val res = exec('basic / "HttpApi.sc", "shorten", "https://www.github.com")
+        assert(res.out.trim.startsWith("https://git.io")) 
+      }
+      'releases{
+        val res = exec('basic / "HttpApi.sc", "listReleases", "lihaoyi/Ammonite")
+        assert(res.out.trim.contains("0.7.0"))
+        assert(res.out.trim.contains("0.4.0"))
       }
     }
   }

@@ -243,6 +243,50 @@
       @hl.sh
         amm MultiMain.sc functionB 2 "Hello"
 
+    @sect{Bundled Libraries}
+      @p
+        While Ammonite allows you to load any Java or Scala library for use
+        via the @sect.ref("import $ivy", "http://www.lihaoyi.com/Ammonite/#IvyDependencies")
+        syntax, it also comes bundled with some basic libraries, e.g.
+        @lnk("Scalaj-HTTP", "https://github.com/scalaj/scalaj-http") for making
+        HTTP calls, or the @lnk("uPickle", "http://www.lihaoyi.com/upickle-pprint/upickle/")
+        library with it's @lnk("JSON Api", "http://www.lihaoyi.com/upickle-pprint/upickle/#JSONAPI")
+        for dealing with the common JSON format.
+
+      @p
+        For example, here's a tiny script that offers two main methods, one
+        to shorten a github link using Scalaj-HTTP and the @code{git.io} API,
+        and one that pulls out a list of release-names from a given github
+        project using Scalaj-HTTP, uPickle's JSON package, and the Github API:
+
+      @hl.ref(wd/'integration/'src/'test/'resources/'ammonite/'integration/'basic/"HttpApi.sc")
+
+      @p
+        You can run @code{amm} on the script to see what it can do
+
+      @hl.sh
+        > amm HttpApi.sc
+        Need to specify a main method to call when running HttpApi.sc
+
+        Available main methods:
+
+        def shorten(longUrl: String)
+        def listReleases(project: String)
+      @p
+        And you can run the two functions via
+
+      @hl.sh
+        > amm HttpApi.sc shorten https://www.github.com
+        https://git.io/vDN6Ig
+      @p
+        Or
+
+      @hl.sh
+        > amm HttpApi.sc listReleases lihaoyi/Ammonite
+        0.7.0,Snaphot Commit Uploads,0.6.2,0.6.1,0.6.0,0.5.9,0.5.8,
+        0.5.7,0.5.6,0.5.5,0.5.4,0.5.3,0.5.2,0.5.1,0.5.0,0.4.9,0.4.8,
+        0.4.7,0.4.6,0.4.5,0.4.4,0.4.3,0.4.2,0.4.0
+
   @sect{Running Scripts}
     @p
       There are two way main ways to run Ammonite scripts:

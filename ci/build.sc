@@ -131,7 +131,7 @@ def docs() = {
     publishDocs()
   }else{
     println("MISC COMMIT: Building readme for verification")
-    %sbt("readme/run", CURL_URL="<dummy-url>")
+    %sbt "readme/run"
   }
 }
 
