@@ -18,7 +18,7 @@ If you want to learn more about Ammonite or how to use it, check out the links a
 
 If you are interested in living more "on the edge", we also publish artifacts and the doc-site every commit; the doc-site is available at
 
-- http://lihaoyi.github.io/Ammonite/master
+- http://www.lihaoyi.com/Ammonite/#UnstableVersions
 
 And contains instructions on how to download the per-commit executable or depend on the perf-commit maven artifact.
 
