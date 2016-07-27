@@ -92,8 +92,8 @@ def publishDocs() = {
   updateConstants(
     latestTaggedVersion,
     buildVersion,
-    upload.shorten(s"https://github.com/lihaoyi/Ammonite/releases/$stableKey"),
-    upload.shorten(s"https://github.com/lihaoyi/Ammonite/releases/$unstableKey")
+    upload.shorten(s"https://github.com/lihaoyi/Ammonite/releases/download/$stableKey"),
+    upload.shorten(s"https://github.com/lihaoyi/Ammonite/releases/download/$unstableKey")
   )
 
   %sbt "readme/run"
