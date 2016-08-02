@@ -35,8 +35,10 @@ def updateConstants(version: String = buildVersion,
       val unstableCurlUrl = "$unstableCurlUrl"
     }
   """
+  println("Writing Constants.scala")
   rm! cwd/'project/"Constants.scala"
   write(cwd/'project/"Constants.scala", versionTxt)
+  println(read! cwd/'project/"Constants.scala")
 }
 
 def publishSigned() = {
@@ -89,6 +91,8 @@ def publishDocs() = {
         s"snapshot-commit-uploads/$travisTag"
       )
     }
+  println("(stableKey, unstableKey)")
+  println((stableKey, unstableKey))
   updateConstants(
     latestTaggedVersion,
     buildVersion,
