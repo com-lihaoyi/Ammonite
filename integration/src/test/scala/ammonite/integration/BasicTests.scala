@@ -25,6 +25,33 @@ object BasicTests extends TestSuite{
       assert(evaled.out.trim == "Hello World")
     }
 
+    //make sure scripts with symbols in path names work fine
+    'scriptWithSymbols {
+      if (!Util.windowsPlatform){
+        val dirAddr =
+          cwd/'target/'test/'resources/'ammonite/'integration/'basic
+        val weirdScriptName = "script%#.@*+叉燒.sc"
+        val scriptAddr = dirAddr/weirdScriptName
+        rm(scriptAddr)
+        write(scriptAddr, """println("Script Worked!!")""")
+        val evaled = %%bash(
+          executable,
+          scriptAddr
+          )
+        assert(evaled.out.trim == "Script Worked!!" && evaled.err.string.isEmpty)
+      }
+    }
+
+    'scriptInSomeOtherDir{
+      val scriptAddr = tmp.dir()/"script.sc"
+      rm(scriptAddr)
+      write(scriptAddr, """println("Worked!!")""")
+      val evaled = %% bash(
+        executable,
+        scriptAddr
+        )
+      assert(evaled.out.trim == "Worked!!" && evaled.err.string.isEmpty)
+    }
 
     'complex {
       val evaled = exec('basic / "Complex.sc")

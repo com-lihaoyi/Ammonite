@@ -547,7 +547,7 @@ class Interpreter(prompt0: Ref[String],
               scriptImports ++ last,
               last,
               wrapperIndex + 1,
-              (ev.wrapper.map(_.backticked).mkString("."), ev.tag) :: compiledData
+              (ev.wrapper.map(_.encoded).mkString("."), ev.tag) :: compiledData
             )
           case Res.Skip => loop(
             blocks.tail,
