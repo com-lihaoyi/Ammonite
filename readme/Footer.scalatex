@@ -801,3 +801,15 @@
       notice some problem and know how to fix it, send a PR, get it merged, and
       you can use the published unstable version with your fix until the next
       numbered release.
+
+    @sect{Unstable Changlog}
+      @ul
+        @li
+          You can now use a @code{JAVA_OPTS} environment variable to pass flags
+          to the JVM when starting Ammonite, thanks to @lnk("Simon Scarduzio",
+          "https://github.com/sscarduzio")
+        @li
+          Running scripts outside the current working directory tree, as well as
+          scripts with non-alphanumeric symbols in their file path, now works
+          thanks to @lnk("coderabhishek", "https://github.com/coderabhishek")
+
