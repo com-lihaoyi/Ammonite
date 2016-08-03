@@ -35,8 +35,10 @@ def updateConstants(version: String = buildVersion,
       val unstableCurlUrl = "$unstableCurlUrl"
     }
   """
+  println("Writing Constants.scala")
   rm! cwd/'project/"Constants.scala"
   write(cwd/'project/"Constants.scala", versionTxt)
+  println(read! cwd/'project/"Constants.scala")
 }
 
 def publishSigned() = {
@@ -73,6 +75,8 @@ def publishDocs() = {
   val publishDocs = sys.env("DEPLOY_KEY").replace("\\n", "\n")
   write(cwd / 'deploy_key, publishDocs)
 
+  val gitHash = getGitHash()
+
   val travisTag = sys.env("TRAVIS_TAG")
 
   val latestTaggedVersion = %%('git, 'describe, "--abbrev=0", "--tags").out.trim
@@ -86,9 +90,11 @@ def publishDocs() = {
     }else{
       (
         s"$latestTaggedVersion/$latestTaggedVersion",
-        s"snapshot-commit-uploads/$travisTag"
+        s"snapshot-commit-uploads/$gitHash"
       )
     }
+  println("(stableKey, unstableKey)")
+  println((stableKey, unstableKey))
   updateConstants(
     latestTaggedVersion,
     buildVersion,
