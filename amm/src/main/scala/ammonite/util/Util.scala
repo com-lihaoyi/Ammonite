@@ -19,7 +19,10 @@ object Util{
       val rest = relPath.segments
       (base ++ ups ++ rest).map(Name(_))
     }
-    val wrapper = path.last.take(path.last.lastIndexOf('.'))
+    val wrapper = path.last.lastIndexOf('.') match{
+      case -1 => path.last
+      case i => path.last.take(i)
+    }
     (pkg, Name(wrapper))
   }
   def md5Hash(data: Iterator[Array[Byte]]) = {
