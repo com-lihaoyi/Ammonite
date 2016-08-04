@@ -1,8 +1,10 @@
 package ammonite
 
-import ammonite.TestUtils.scala2_10
+import ammonite.TestUtils._
 import ammonite.ops._
+import ammonite.main.Defaults
 import utest._
+import ammonite.interp.{Storage}
 
 object ScriptTests extends TestSuite{
   val tests = TestSuite{
@@ -251,6 +253,17 @@ object ScriptTests extends TestSuite{
             error: java.nio.file.NoSuchFileException
             """
           )
+        }
+        'scriptWithoutExtension{
+          val res = intercept[java.nio.file.NoSuchFileException]{
+            val storage = new Storage.Folder(tmp.dir(prefix="ammonite-tester"))
+            val interp2 = createTestInterp(
+              storage,
+              Defaults.predefString
+            )
+            interp2.replApi.load.module(cwd/"scriptWithoutExtension")
+          }.toString
+          assert(res.contains("java.nio.file.NoSuchFileException"))
         }
         'multiBlockError{
           check.session(s"""
