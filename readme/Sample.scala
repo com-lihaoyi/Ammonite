@@ -140,7 +140,7 @@ object Sample{
     val out = {
       val output = exec(Seq("bash", "-i"), s"\n${bashCode.trim}\nexit\n")
       output.lines
-        .drop(2)
+        .drop(1)
         .toVector
         .dropRight(2)
         .mkString("\n")
