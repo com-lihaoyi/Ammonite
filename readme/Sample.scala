@@ -140,7 +140,7 @@ object Sample{
     val out = {
       val output = exec(Seq("bash", "-i"), s"${bashCode.trim}\nexit\n")
       Seq[Frag](
-        span(color := magenta, "bash$"),
+        span(color := magenta, "bash$ "),
         output.dropWhile(_ != '$').drop(1)
           .lines
           .toVector
