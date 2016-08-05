@@ -812,4 +812,7 @@
           Running scripts outside the current working directory tree, as well as
           scripts with non-alphanumeric symbols in their file path, now works
           thanks to @lnk("coderabhishek", "https://github.com/coderabhishek")
+        @li
+          Scripts without the `.sc` can now be run directly from the command line
+          rather than throwing an `IndexOutOfBoundsException`.
 

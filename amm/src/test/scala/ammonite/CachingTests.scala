@@ -4,7 +4,7 @@ import ammonite.interp.{History, Interpreter, Storage}
 import ammonite.main.Defaults
 import ammonite.ops._
 import ammonite.tools.IvyConstructor._
-import ammonite.util.{Colors, Printer, Ref, Util}
+import ammonite.TestUtils._
 import utest._
 
 object CachingTests extends TestSuite{
@@ -16,19 +16,6 @@ object CachingTests extends TestSuite{
     val resourcesPath = cwd/'amm/'src/'test/'resources
 
 
-    def createTestInterp(storage: Storage, predef: String = "") = new Interpreter(
-      Ref[String](""),
-      Ref(null),
-      80,
-      80,
-      Ref(Colors.BlackWhite),
-      printer = Printer(_ => (), _ => (), _ => (), _ => ()),
-      storage = storage,
-      new History(Vector()),
-      predef = predef,
-      wd = ammonite.ops.cwd,
-      replArgs = Seq()
-    )
     val tempDir = tmp.dir(prefix="ammonite-tester")
     'noAutoIncrementWrapper{
       val storage = Storage.InMemory()
