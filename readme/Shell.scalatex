@@ -21,7 +21,7 @@
 
  
   @p
-    To begin using Ammonite-Shell, simply  download the default @code{predef.scala} to configure your REPL to be a usable systems shell before downloading the @sect.ref{Ammonite-REPL} executable (below):
+    To begin using Ammonite-Shell, simply  download the default @code{predef.sc} to configure your REPL to be a usable systems shell before downloading the @sect.ref{Ammonite-REPL} executable (below):
 
   @hl.sh
     @filesystemCurl
