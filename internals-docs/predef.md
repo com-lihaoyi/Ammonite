@@ -31,7 +31,7 @@ The Predef itself is made of several parts:
 
 - The assignment of any arguments to the `debug` entrypoint to local `val`s
 
-- Any predef file, which defaults `~/.ammonite/predef.scala`, but can be set
+- Any predef file, which defaults `~/.ammonite/predef.sc`, but can be set
   manually via `--predef-file ...` at the CLI or subclassing the `Storage`
   object passed into the API
 
