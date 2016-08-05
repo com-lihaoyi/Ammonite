@@ -139,12 +139,11 @@ object Sample{
   def compare(bashCode: String, ammoniteCode: String) = {
     val out = {
       val output = exec(Seq("bash", "-i"), s"\n${bashCode.trim}\nexit\n")
-      output.lines
-        .drop(1)
+      output.dropWhile(_ != '$').drop(1)
+        .lines
         .toVector
         .dropRight(2)
         .mkString("\n")
-        .split("bash-3\\.2\\$")
         .flatMap(s => Seq[Frag](span(color := magenta, "bash$"), span(color := black, s)))
         .drop(1)
     }
