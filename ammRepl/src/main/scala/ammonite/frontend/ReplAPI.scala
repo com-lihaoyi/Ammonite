@@ -1,19 +1,15 @@
 package ammonite.frontend
 
-import java.io.File
 
 import ammonite.tools.Resolver
-import ammonite.ops._
 import ammonite.util.{Bind, CodeColors, Colors, Ref}
 import ammonite.util.Util.newLine
-import ammonite.interp.{Frame, History}
-import org.apache.ivy.plugins.resolver.RepositoryResolver
 import pprint.{Config, PPrint, PPrinter, TPrintColors}
 
 import scala.collection.mutable
 import scala.reflect.runtime.universe._
 import acyclic.file
-
+import ammonite.interp.{Frame, History}
 
 import scala.util.control.ControlThrowable
 
@@ -87,16 +83,6 @@ trait ReplAPI {
    *
    */
   def typeOf[T: WeakTypeTag](t: => T): Type
-  
-  /**
-   * Tools related to loading external scripts and code into the REPL
-   */
-  def load: Load
-
-  /**
-   * resolvers to use when loading jars 
-   */
-  def resolvers: Ref[List[Resolver]]
 
   /**
    * The colors that will be used to render the Ammonite REPL in the terminal
@@ -199,37 +185,6 @@ trait Session{
   def delete(name: String): Unit
 }
 
-trait LoadJar {
-
-  /**
-   * Load a `.jar` file or directory into your JVM classpath
-   */
-  def cp(jar: Path): Unit
-  /**
-   * Load a library from its maven/ivy coordinates
-   */
-  def ivy(coordinates: (String, String, String), verbose: Boolean = true): Unit
-}
-trait Load extends (String => Unit) with LoadJar{
-  /**
-   * Loads a command into the REPL and
-   * evaluates them one after another
-   */
-  def apply(line: String): Unit
-
-  /**
-   * Loads and executes the scriptfile on the specified path.
-   * Compilation units separated by `@\n` are evaluated sequentially.
-   * If an error happens it prints an error message to the console.
-   */ 
-  def exec(path: Path): Unit
-
-  def module(path: Path): Unit
-
-  def plugin: LoadJar
-
-}
-
 // End of ReplAPI
 /**
  * Things that are part of the ReplAPI that aren't really "public"
@@ -256,15 +211,6 @@ abstract class FullReplAPI extends ReplAPI{
   def typeOf[T: WeakTypeTag](t: => T) = scala.reflect.runtime.universe.weakTypeOf[T]
 }
 
-object ReplAPI{
-  def initReplBridge(holder: Class[ReplAPIHolder], api: ReplAPI) = {
-    val method = holder
-      .getDeclaredMethods
-      .find(_.getName == "repl0_$eq")
-      .get
-    method.invoke(null, api)
-  }
-}
 
 
 trait DefaultReplAPI extends FullReplAPI {
@@ -316,7 +262,7 @@ trait DefaultReplAPI extends FullReplAPI {
     }
   }
 }
-object ReplBridge extends ammonite.frontend.ReplAPIHolder{}
+object ReplBridge extends ReplAPIHolder{}
 
 case class SessionChanged(removedImports: Set[scala.Symbol],
                           addedImports: Set[scala.Symbol],

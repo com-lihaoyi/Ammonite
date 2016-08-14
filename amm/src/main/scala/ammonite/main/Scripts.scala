@@ -45,7 +45,6 @@ object Scripts {
       routesCls =
         repl.interp
           .eval
-          .sess
           .frames
           .head
           .classloader

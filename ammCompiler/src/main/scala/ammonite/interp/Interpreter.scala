@@ -10,8 +10,6 @@ import ammonite.ops._
 import fastparse.all._
 
 import annotation.tailrec
-import ammonite._
-import ammonite.frontend._
 import ammonite.util.ImportTree
 import ammonite.util.Util.{CacheDetails, newLine, normalizeNewlines}
 import ammonite.util._
@@ -26,17 +24,17 @@ import scala.util.Try
  * to interpret Scala code. Doesn't attempt to provide any
  * real encapsulation for now.
  */
-class Interpreter(prompt0: Ref[String],
+class Interpreter(val prompt0: Ref[String],
 //                  frontEnd0: Ref[FrontEnd],
                   width: => Int,
                   height: => Int,
-                  colors0: Ref[Colors],
-                  printer: Printer,
-                  storage: Storage,
+                  val colors0: Ref[Colors],
+                  val printer: Printer,
+                  val storage: Storage,
                   history: => History,
-                  predef: String,
+                  val predef: String,
                   val wd: Path,
-                  replArgs: Seq[Bind[_]])
+                  val replArgs: Seq[Bind[_]])
   extends ImportHook.InterpreterInterface{ interp =>
 
 
@@ -59,7 +57,8 @@ class Interpreter(prompt0: Ref[String],
   val dynamicClasspath = new VirtualDirectory("(memory)", None)
   var compiler: Compiler = null
   var pressy: Pressy = _
-  def evalClassloader = eval.sess.frames.head.classloader
+
+  def evalClassloader = eval.frames.head.classloader
 
   def reInit() = {
     if(compiler != null)
@@ -73,15 +72,15 @@ class Interpreter(prompt0: Ref[String],
     // the shared settings and makes the main compiler sad
     val settings = Option(compiler).fold(new Settings)(_.compiler.settings.copy)
     compiler = Compiler(
-      Classpath.classpath ++ eval.sess.frames.head.classpath,
+      Classpath.classpath ++ eval.frames.head.classpath,
       dynamicClasspath,
       evalClassloader,
-      eval.sess.frames.head.pluginClassloader,
+      eval.frames.head.pluginClassloader,
       () => pressy.shutdownPressy(),
       settings
     )
     pressy = Pressy(
-      Classpath.classpath ++ eval.sess.frames.head.classpath,
+      Classpath.classpath ++ eval.frames.head.classpath,
       dynamicClasspath,
       evalClassloader,
 
@@ -92,13 +91,13 @@ class Interpreter(prompt0: Ref[String],
 
 
 
-  evalClassloader.findClassPublic("ammonite.frontend.ReplBridge$")
-  val bridgeCls = evalClassloader.findClassPublic("ammonite.frontend.ReplBridge")
-
-  ReplAPI.initReplBridge(
-    bridgeCls.asInstanceOf[Class[ReplAPIHolder]],
-    replApi
-  )
+  evalClassloader.findClassPublic("ammonite.interp.RuntimeBridge$")
+  evalClassloader.findClassPublic("ammonite.interp.RuntimeBridge")
+    .asInstanceOf[Class[RuntimeAPIHolder]]
+    .getDeclaredMethods
+    .find(_.getName == "repl0_$eq")
+    .get
+    .invoke(null, replApi)
 
   val argString = replArgs.zipWithIndex.map{ case (b, idx) =>
     s"""
@@ -154,7 +153,7 @@ class Interpreter(prompt0: Ref[String],
   }
 
 
-  eval.sess.save()
+
   reInit()
 
 
@@ -236,7 +235,7 @@ class Interpreter(prompt0: Ref[String],
         "",
         Seq(Name("$sess")),
         Name("cmd" + eval.getCurrentLine),
-        predefImports ++ eval.sess.frames.head.imports ++ hookImports,
+        predefImports ++ eval.frames.head.imports ++ hookImports,
         prints => s"ammonite.frontend.ReplBridge.repl.Internal.combinePrints($prints)",
         extraCode = ""
       )
@@ -333,7 +332,7 @@ class Interpreter(prompt0: Ref[String],
       val fullyQualifiedName = (pkgName :+ wrapperName).map(_.encoded).mkString(".")
 
       val tag = Interpreter.cacheTag(
-        processed.code, Nil, eval.sess.frames.head.classloader.classpathHash
+        processed.code, Nil, eval.frames.head.classloader.classpathHash
       )
       val compiled = storage.compileCacheLoad(fullyQualifiedName, tag) match {
         case Some((classFiles, newImports)) =>
@@ -367,7 +366,7 @@ class Interpreter(prompt0: Ref[String],
                     extraCode: String): Res[(Imports, Seq[(String, String)])] = {
 
     val tag = Interpreter.cacheTag(
-      code, Nil, eval.sess.frames.head.classloader.classpathHash
+      code, Nil, eval.frames.head.classloader.classpathHash
     )
     storage.classFilesListLoad(
       pkgName.map(_.backticked).mkString("."),
@@ -461,7 +460,7 @@ class Interpreter(prompt0: Ref[String],
       )
       (imports, _) <- processCorrectScript(
         processedBlocks,
-        eval.sess.frames.head.imports ++ hookImports,
+        eval.frames.head.imports ++ hookImports,
         Seq(Name("$sess")),
         Name("cmd" + eval.getCurrentLine),
         { (processed, wrapperIndex, indexedWrapperName) =>
@@ -625,21 +624,13 @@ class Interpreter(prompt0: Ref[String],
   }
 
   def handleEvalClasspath(jar: File) = {
-    eval.sess.frames.head.addClasspath(Seq(jar))
+    eval.frames.head.addClasspath(Seq(jar))
     evalClassloader.add(jar.toURI.toURL)
   }
   def handlePluginClasspath(jar: File) = {
-    replApi.sess.frames.head.pluginClassloader.add(jar.toURI.toURL)
+    eval.frames.head.pluginClassloader.add(jar.toURI.toURL)
   }
-  lazy val replApi: ReplAPI = new DefaultReplAPI { outer =>
-
-    def lastException = Interpreter.this.lastException
-
-    def imports = Preprocessor.importBlock(eval.sess.frames.head.imports)
-    val colors = colors0
-    val prompt = prompt0
-//    val frontEnd = frontEnd0
-
+  lazy val replApi: RuntimeAPI = new RuntimeAPI{ outer =>
     lazy val resolvers =
       Ref(ammonite.tools.Resolvers.defaultResolvers)
 
@@ -676,78 +667,6 @@ class Interpreter(prompt0: Ref[String],
         def handleClasspath(jar: File) = handlePluginClasspath(jar)
       }
 
-    }
-    implicit def tprintColors = pprint.TPrintColors(
-      typeColor = colors().`type`()
-    )
-    implicit val codeColors = new CodeColors{
-      def comment = colors().comment()
-      def `type` = colors().`type`()
-      def literal = colors().literal()
-      def keyword = colors().keyword()
-      def ident = colors().ident()
-    }
-    implicit lazy val pprintConfig: Ref[pprint.Config] = {
-      Ref.live[pprint.Config]( () =>
-        pprint.Config.apply(
-          width = width,
-          height = height / 2,
-          colors = pprint.Colors(
-            colors().literal(),
-            colors().prefix()
-          )
-        )
-      )
-
-    }
-
-    def show[T: PPrint](implicit cfg: Config) = (t: T) => {
-      pprint.tokenize(t, height = 0)(implicitly[PPrint[T]], cfg).foreach(printer.out)
-      printer.out(newLine)
-    }
-    def show[T: PPrint](t: T,
-                        width: Integer = null,
-                        height: Integer = 0,
-                        indent: Integer = null,
-                        colors: pprint.Colors = null)
-                       (implicit cfg: Config = Config.Defaults.PPrintConfig) = {
-
-
-      pprint.tokenize(t, width, height, indent, colors)(implicitly[PPrint[T]], cfg)
-            .foreach(printer.out)
-      printer.out(newLine)
-    }
-
-    def search(target: scala.reflect.runtime.universe.Type) = {
-      Interpreter.this.compiler.search(target)
-    }
-    def compiler = Interpreter.this.compiler.compiler
-    def newCompiler() = init()
-    def fullHistory = storage.fullHistory()
-    def history = Interpreter.this.history
-
-
-    def width = interp.width
-
-    def height = interp.height
-
-    override def replArgs = Interpreter.this.replArgs.toVector
-
-    object sess extends Session {
-      def frames = eval.sess.frames
-      def save(name: String) = eval.sess.save(name)
-      def delete(name: String) = eval.sess.delete(name)
-
-      def pop(num: Int = 1) = {
-        val res = eval.sess.pop(num)
-        reInit()
-        res
-      }
-      def load(name: String = "") = {
-        val res = eval.sess.load(name)
-        reInit()
-        res
-      }
     }
   }
 

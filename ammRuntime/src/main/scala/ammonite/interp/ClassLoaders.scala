@@ -95,7 +95,9 @@ class SpecialClassLoader(parent: ClassLoader, parentSignature: Seq[(Path, Long)]
   def findClassPublic(name: String) = findClass(name)
   val specialLocalClasses = Set(
     "ammonite.frontend.ReplBridge",
-    "ammonite.frontend.ReplBridge$"
+    "ammonite.frontend.ReplBridge$",
+    "ammonite.interp.RuntimeBridge",
+    "ammonite.interp.RuntimeBridge$"
   )
   override def findClass(name: String): Class[_] = {
     val loadedClass = this.findLoadedClass(name)

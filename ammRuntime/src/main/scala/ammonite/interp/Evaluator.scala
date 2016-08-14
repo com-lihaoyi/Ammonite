@@ -4,7 +4,6 @@ import java.io.OutputStream
 import java.lang.reflect.InvocationTargetException
 
 import acyclic.file
-import ammonite.frontend.{ReplExit, Session, SessionChanged}
 import ammonite._
 import util.Util.{ClassFiles, CompileCache, newLine}
 import ammonite.util._
@@ -39,7 +38,9 @@ trait Evaluator{
                          pkgName: Seq[Name],
                          tag: String): Res[Evaluated]
 
-  def sess: Session
+  def frames: List[Frame]
+
+  def frames_=(newValue: List[Frame]): Unit
 
   def evalCachedClassFiles(cachedData: Seq[ClassFiles],
                            pkg: String,
@@ -89,59 +90,15 @@ object Evaluator{
     }
     var frames = List(initialFrame)
 
-    val namedFrames = mutable.Map.empty[String, List[Frame]]
-
-    object sess extends Session {
-      def frames = eval.frames
-      def childFrame(parent: Frame) = new Frame(
-        new SpecialClassLoader(
-          parent.classloader,
-          parent.classloader.classpathSignature
-        ),
-        new SpecialClassLoader(
-          parent.pluginClassloader,
-          parent.pluginClassloader.classpathSignature
-        ),
-        parent.imports,
-        parent.classpath
-      )
-
-      def save(name: String = "") = {
-        if (name != "") namedFrames(name) = eval.frames
-        eval.frames = childFrame(frames.head) :: frames
-      }
-
-      def pop(num: Int = 1) = {
-        var next = eval.frames
-        for(i <- 0 until num){
-          if (next.tail != Nil) next = next.tail
-        }
-        val out = SessionChanged.delta(eval.frames.head, next.head)
-        eval.frames = childFrame(next.head) :: next
-        out
-      }
-      def load(name: String = "") = {
-        val next = if (name == "") eval.frames.tail else namedFrames(name)
-        val out = SessionChanged.delta(eval.frames.head, next.head)
-        eval.frames = childFrame(next.head) :: next
-        out
-      }
-
-      def delete(name: String) = {
-        namedFrames.remove(name)
-      }
-    }
-
-
 
 
     def loadClass(fullName: String, classFiles: ClassFiles): Res[Class[_]] = {
       Res[Class[_]](Try {
         for ((name, bytes) <- classFiles.sortBy(_._1)) {
-          sess.frames.head.classloader.addClassFile(name, bytes)
+          frames.head.classloader.addClassFile(name, bytes)
         }
         val names = classFiles.map(_._1)
-        val res = Class.forName(fullName, true, sess.frames.head.classloader)
+        val res = Class.forName(fullName, true, frames.head.classloader)
         res
       }, e => "Failed to load compiled class " + e)
     }

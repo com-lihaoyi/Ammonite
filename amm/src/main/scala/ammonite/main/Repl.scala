@@ -3,7 +3,7 @@ import acyclic.file
 import java.io.{InputStream, InputStreamReader, OutputStream, PrintStream}
 
 import ammonite.frontend._
-import ammonite.interp.{History, Interpreter, Storage}
+import ammonite.interp.{History, Interpreter, Preprocessor, Storage}
 import ammonite.terminal.Filter
 import ammonite.util._
 import ammonite.util.Util.newLine
@@ -62,7 +62,7 @@ class Repl(input: InputStream,
       output,
       colors().prompt()(prompt()).render,
       colors(),
-      interp.pressy.complete(_, interp.replApi.imports, _),
+      interp.pressy.complete(_, Preprocessor.importBlock(interp.eval.frames.head.imports), _),
       storage.fullHistory(),
       addHistory = (code) => if (code != "") {
         storage.fullHistory() = storage.fullHistory() :+ code

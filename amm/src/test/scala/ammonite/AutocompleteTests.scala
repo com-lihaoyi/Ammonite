@@ -1,6 +1,7 @@
 package ammonite
 
 import ammonite.TestUtils._
+import ammonite.interp.Preprocessor
 import utest._
 
 
@@ -17,7 +18,7 @@ object AutocompleteTests extends TestSuite{
 
         val (index, completions, signatures) = check.interp.pressy.complete(
           cursor,
-          check.interp.replApi.imports,
+          Preprocessor.importBlock(check.interp.eval.frames.head.imports),
           buf
         )
         val left = cmp(completions.toSet)
