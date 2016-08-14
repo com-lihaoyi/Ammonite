@@ -13,6 +13,7 @@ object TestUtils {
     predef = predef,
     wd = ammonite.ops.cwd,
     // Provide a custom predef so we can verify in tests that the predef gets cached
-    customPredefs = Seq("val customLolz = 1" -> Name("custom"))
+    customPredefs = Seq("val customLolz = 1" -> Name("custom")),
+    extraBridges = _ => Seq()
   )
 }

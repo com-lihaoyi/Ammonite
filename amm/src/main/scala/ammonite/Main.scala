@@ -75,6 +75,7 @@ case class Main(predef: String = "",
       storageBackend,
       predef,
       Seq(),
+      _ => Seq(),
       wd
     )
     interp

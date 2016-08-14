@@ -28,8 +28,7 @@ class Repl(input: InputStream,
   val (colors, printStream, errorPrintStream, printer) =
     Interpreter.initPrinters(output, error)
 
-  val hardcodedPredef =
-    "import ammonite.frontend.ReplBridge.value.{pprintConfig, derefPPrint}"
+
 
   val argString = replArgs.zipWithIndex.map{ case (b, idx) =>
     s"""
@@ -39,31 +38,30 @@ class Repl(input: InputStream,
   }.mkString(newLine)
 
 
+
+
+
   val interp: Interpreter = new Interpreter(
     printer,
     storage,
     predef,
     Seq(
-      (hardcodedPredef, Name("HardcodedPredef")),
+      (Repl.pprintPredef, Name("HardcodedPredef")),
       (argString, Name("ArgsPredef"))
     ),
-    wd
-  )
-
-  APIHolder.initBridge(
-    interp.evalClassloader,
-    "ammonite.frontend.ReplBridge",
-    new ReplApiImpl(
-      interp,
+    i => Seq("ammonite.frontend.ReplBridge" -> new ReplApiImpl(
+      i,
       frontEnd().width,
       frontEnd().height,
       colors,
       prompt,
       frontEnd,
       history,
-      new SessionApiImpl(interp.eval)
-    )
+      new SessionApiImpl(i.eval)
+    )),
+    wd
   )
+
 
 
   val reader = new InputStreamReader(input)
@@ -117,6 +115,9 @@ class Repl(input: InputStream,
 }
 
 object Repl{
+  val pprintPredef =
+    "import ammonite.frontend.ReplBridge.value.{pprintConfig, derefPPrint}"
+
   def highlightFrame(f: StackTraceElement,
                      error: fansi.Attrs,
                      highlightError: fansi.Attrs,

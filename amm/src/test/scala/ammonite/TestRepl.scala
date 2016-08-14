@@ -32,25 +32,24 @@ class TestRepl {
   )
   val interp = try {
 
-    val i = new Interpreter(
+    lazy val i: Interpreter = new Interpreter(
       printer,
       storage = new Storage.Folder(tempDir),
-      predef = ammonite.main.Defaults.predefString + Util.newLine + predef,
+      predef = Repl.pprintPredef + Util.newLine + ammonite.main.Defaults.predefString + Util.newLine + predef,
       wd = ammonite.ops.cwd,
-      customPredefs = Seq()
-    )
-    APIHolder.initBridge(
-      i.evalClassloader,
-      "ammonite.frontend.ReplBridge",
-      new ReplApiImpl(
-        i,
-        80,
-        80,
-        Colors.BlackWhite,
-        "@",
-        Ref(null),
-        new History(Vector()),
-        new SessionApiImpl(i.eval)
+      customPredefs = Seq(),
+      extraBridges = i => Seq(
+        "ammonite.frontend.ReplBridge" ->
+        new ReplApiImpl(
+          i,
+          80,
+          80,
+          Colors.BlackWhite,
+          "@",
+          Ref(null),
+          new History(Vector()),
+          new SessionApiImpl(i.eval)
+        )
       )
     )
     i.init()

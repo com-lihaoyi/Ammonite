@@ -112,8 +112,8 @@ object Evaluator{
 
     val userCodeExceptionHandler: PartialFunction[Throwable, Res.Failing] = {
       // Exit
-      case Ex(_: InvEx, _: InitEx, ReplExit(value))  =>
-        Res.Exit(value)
+      case Ex(_: InvEx, _: InitEx, ReplExit(value))  => Res.Exit(value)
+
       // Interrupted during pretty-printing
       case Ex(e: ThreadDeath)                 =>  interrupted(e)
 
@@ -123,7 +123,6 @@ object Evaluator{
       case Ex(_: InvEx, _: InitEx, userEx@_*) =>   Res.Exception(userEx(0), "")
       case Ex(_: InvEx, userEx@_*)            =>   Res.Exception(userEx(0), "")
       case Ex(userEx@_*)                      =>   Res.Exception(userEx(0), "")
-
     }
 
     def processLine(classFiles: Util.ClassFiles,

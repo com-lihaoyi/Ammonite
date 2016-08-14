@@ -24,6 +24,7 @@ class Interpreter(val printer: Printer,
                   val storage: Storage,
                   val predef: String,
                   customPredefs: Seq[(String, Name)],
+                  extraBridges: Interpreter => Seq[(String, AnyRef)],
                   val wd: Path)
   extends ImportHook.InterpreterInterface{ interp =>
 
@@ -82,7 +83,9 @@ class Interpreter(val printer: Printer,
     "ammonite.interp.InterpBridge",
     interpApi
   )
-
+  for ((name, bridge) <- extraBridges(this)){
+    APIHolder.initBridge(evalClassloader, name, bridge)
+  }
 
 
   val importHooks = Ref(Map[Seq[String], ImportHook](
@@ -129,7 +132,7 @@ class Interpreter(val printer: Printer,
     }
   }
 
-
+  pprint.log(predefImports)
 
   reInit()
 
@@ -258,7 +261,8 @@ class Interpreter(val printer: Printer,
                    printer: Printer,
                    fileName: String,
                    indexedWrapperName: Name): Res[Evaluated] = {
-
+    pprint.log(processed.code)
+    new Exception().printStackTrace()
     for{
       _ <- Catching{ case e: ThreadDeath => Evaluator.interrupted(e) }
       (classFiles, newImports) <- compileClass(
@@ -342,7 +346,8 @@ class Interpreter(val printer: Printer,
                     pkgName: Seq[Name],
                     autoImport: Boolean,
                     extraCode: String): Res[(Imports, Seq[(String, String)])] = {
-
+    pprint.log(source)
+    pprint.log(code)
     val tag = Interpreter.cacheTag(
       code, Nil, eval.frames.head.classloader.classpathHash
     )

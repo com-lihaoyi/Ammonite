@@ -78,11 +78,11 @@ object AdvancedTests extends TestSuite{
     'predefSettings{
       val check2 = new TestRepl{
         override def predef = """
-          compiler.settings.Xexperimental.value = true
+          interp.compiler.settings.Xexperimental.value = true
         """
       }
       check2.session("""
-        @ compiler.settings.Xexperimental.value
+        @ interp.compiler.settings.Xexperimental.value
         res0: Boolean = true
       """)
 
