@@ -69,43 +69,6 @@ class ReplApiImpl(val interp: Interpreter,
   val prompt = prompt0
   val frontEnd = frontEnd0
 
-  lazy val resolvers =
-    Ref(ammonite.tools.Resolvers.defaultResolvers)
-
-  object load extends DefaultLoadJar with Load {
-
-    def handleClasspath(jar: File) = handleEvalClasspath(jar)
-
-    def apply(line: String) = processExec(line) match{
-      case Res.Failure(ex, s) => throw new CompilationError(s)
-      case Res.Exception(t, s) => throw t
-      case _ =>
-    }
-
-    def exec(file: Path): Unit = apply(normalizeNewlines(read(file)))
-
-    def module(file: Path) = {
-      val (pkg, wrapper) = Util.pathToPackageWrapper(file, wd)
-      processModule(
-        ImportHook.Source.File(wd/"Main.sc"),
-        normalizeNewlines(read(file)),
-        wrapper,
-        pkg,
-        true,
-        ""
-      ) match{
-        case Res.Failure(ex, s) => throw new CompilationError(s)
-        case Res.Exception(t, s) => throw t
-        case x => //println(x)
-      }
-      reInit()
-    }
-
-    object plugin extends DefaultLoadJar {
-      def handleClasspath(jar: File) = handlePluginClasspath(jar)
-    }
-
-  }
   implicit def tprintColors = pprint.TPrintColors(
     typeColor = colors().`type`()
   )

@@ -2,8 +2,6 @@ package ammonite.interp
 
 import java.io.{File, OutputStream, PrintStream}
 
-import org.apache.ivy.plugins.resolver.RepositoryResolver
-
 import scala.collection.mutable
 import scala.tools.nsc.Settings
 import ammonite.ops._
@@ -13,11 +11,9 @@ import annotation.tailrec
 import ammonite.util.ImportTree
 import ammonite.util.Util.{CacheDetails, newLine, normalizeNewlines}
 import ammonite.util._
-import pprint.{Config, PPrint, PPrinter}
-//import ammonite.terminal.Filter
 
 import scala.reflect.io.VirtualDirectory
-import scala.util.Try
+
 
 /**
  * A convenient bundle of all the functionality necessary
@@ -99,11 +95,9 @@ class Interpreter(val printer: Printer,
     Seq("plugin", "cp") -> ImportHook.PluginClasspath
   ))
 
-  val predefs = Seq(
-
+  val predefs = customPredefs ++ Seq(
     (predef, Name("Predef")),
     (storage.loadPredef, Name("LoadedPredef"))
-
   )
 
   // Use a var and a for-loop instead of a fold, because when running

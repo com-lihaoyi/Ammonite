@@ -1,7 +1,7 @@
 package ammonite
 
 import ammonite.interp.{History, Interpreter, Storage}
-import ammonite.util.{Colors, Printer, Ref, Util}
+import ammonite.util._
 
 object TestUtils {
   val sessionPrefix = if (scala2_10) "$sess." else ""
@@ -12,6 +12,7 @@ object TestUtils {
     storage = storage,
     predef = predef,
     wd = ammonite.ops.cwd,
-    customPredefs = Seq()
+    // Provide a custom predef so we can verify in tests that the predef gets cached
+    customPredefs = Seq("val customLolz = 1" -> Name("custom"))
   )
 }

@@ -36,7 +36,7 @@ object CachingTests extends TestSuite{
         val interp = createTestInterp(storage)
         val n0 = storage.compileCache.size
 
-        assert(n0 == 1) // Predef + hardcodedPredef
+        assert(n0 == 1) // customLolz predef
         interp.interpApi.load.module(scriptPath/fileName)
 
         val n = storage.compileCache.size
@@ -108,8 +108,8 @@ object CachingTests extends TestSuite{
       interp2.interpApi.load.module(scriptPath/"OneBlock.sc")
       val n1 = interp1.compilationCount
       val n2 = interp2.compilationCount
-      assert(n1 == 2) // hardcodedPredef + loadedPredef
-      assert(n2 == 0) // all three should be cached
+      assert(n1 == 2) // customLolz predef + OneBlock.sc
+      assert(n2 == 0) // both should be cached
     }
     'tags{
       val storage = Storage.InMemory()
@@ -119,7 +119,7 @@ object CachingTests extends TestSuite{
       interp.interpApi.load.ivy("com.lihaoyi" %% "scalatags" % "0.4.5")
       interp.interpApi.load.module(scriptPath/"TagBase.sc")
       val n = storage.compileCache.size
-      assert(n == 5) // predef + two blocks for initial load
+      assert(n == 5) // customLolz predef + two blocks for each loaded file
     }
 
     'changeScriptInvalidation{

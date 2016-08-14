@@ -96,7 +96,7 @@ object ProjectTests extends TestSuite{
       }
       'code{
         check.session("""
-          @ load("val x = 1")
+          @ interp.load("val x = 1")
 
           @ x
           res2: Int = 1

@@ -22,7 +22,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import ammonite.ops._
 
-            @ load.exec($printedScriptPath/"LoadIvy.sc")
+            @ interp.load.exec($printedScriptPath/"LoadIvy.sc")
 
             @ val r = res
             r: String = ${"\"\"\""}
@@ -39,7 +39,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import ammonite.ops._
 
-            @ load.exec($printedScriptPath/"PreserveImports.sc")
+            @ interp.load.exec($printedScriptPath/"PreserveImports.sc")
 
             @ val r = res
             r: $typeString = Left("asd")
@@ -49,7 +49,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import ammonite.ops._
 
-            @ load.exec($printedScriptPath/"Annotation.sc")
+            @ interp.load.exec($printedScriptPath/"Annotation.sc")
 
             @ val r = res
             r: Int = 24
@@ -59,7 +59,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import ammonite.ops._
 
-            @ load.exec($printedScriptPath/"BlockSepSyntax.sc")
+            @ interp.load.exec($printedScriptPath/"BlockSepSyntax.sc")
 
             @ val r = res
             r: Int = 24
@@ -69,7 +69,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import ammonite.ops._
 
-            @ load.exec($printedScriptPath/"LimitImports.sc")
+            @ interp.load.exec($printedScriptPath/"LimitImports.sc")
 
             @ res
             error: not found: value res
@@ -81,7 +81,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import ammonite.ops._
 
-            @ load.exec($printedScriptPath/"SyntaxError.sc")
+            @ interp.load.exec($printedScriptPath/"SyntaxError.sc")
             error: CompilationError
 
             @ val r = res
@@ -95,7 +95,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @  import ammonite.ops._
 
-            @ load.exec($printedScriptPath/"CompilationError.sc")
+            @ interp.load.exec($printedScriptPath/"CompilationError.sc")
             error: Compilation Failed
 
             @ val r = res
@@ -109,7 +109,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import ammonite.ops._
 
-            @ load.exec($printedScriptPath/"notHere")
+            @ interp.load.exec($printedScriptPath/"notHere")
             error: java.nio.file.NoSuchFileException
             """
           )
@@ -118,7 +118,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import ammonite.ops._
 
-            @ load.exec($printedScriptPath/"MultiBlockError.sc")
+            @ interp.load.exec($printedScriptPath/"MultiBlockError.sc")
             error: Compilation Failed
 
             @ val r2 = res2
@@ -133,7 +133,7 @@ object ScriptTests extends TestSuite{
         check.session(s"""
           @ import ammonite.ops._
 
-          @ load.exec($printedScriptPath/"NestedScripts.sc")
+          @ interp.load.exec($printedScriptPath/"NestedScripts.sc")
 
           @ val a = asd
           error: not found: value asd
@@ -146,7 +146,7 @@ object ScriptTests extends TestSuite{
         check.session(s"""
             @  import ammonite.ops._
 
-            @ load.exec($printedScriptPath/"SheBang.sc")
+            @ interp.load.exec($printedScriptPath/"SheBang.sc")
 
             @ val r = res
             r: Int = 42
@@ -161,7 +161,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import ammonite.ops._
 
-            @ load.module($printedScriptPath/"LoadIvy.sc")
+            @ interp.load.module($printedScriptPath/"LoadIvy.sc")
 
             @ val r = res
             r: String = ${"\"\"\""}
@@ -178,7 +178,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
               @ import ammonite.ops._
 
-              @ load.module($printedScriptPath/"PreserveImports.sc")
+              @ interp.load.module($printedScriptPath/"PreserveImports.sc")
 
               @ val r = res
               r: $typeString = Left("asd")
@@ -190,7 +190,7 @@ object ScriptTests extends TestSuite{
             check.session(s"""
             @ import ammonite.ops._
 
-            @ load.module($printedScriptPath/"Annotation.sc")
+            @ interp.load.module($printedScriptPath/"Annotation.sc")
 
             @ val r = res
             r: Int = 24
@@ -200,7 +200,7 @@ object ScriptTests extends TestSuite{
             check.session(s"""
               @ import ammonite.ops._
 
-              @ load.module($printedScriptPath/"BlockSepSyntax.sc")
+              @ interp.load.module($printedScriptPath/"BlockSepSyntax.sc")
 
               @ val r = res
               r: Int = 24
@@ -210,7 +210,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import ammonite.ops._
 
-            @ load.module($printedScriptPath/"LimitImports.sc")
+            @ interp.load.module($printedScriptPath/"LimitImports.sc")
 
             @ res
             error: not found: value res
@@ -222,7 +222,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import ammonite.ops._
 
-            @ load.exec($printedScriptPath/"SyntaxError.sc")
+            @ interp.load.exec($printedScriptPath/"SyntaxError.sc")
             error: CompilationError
 
             @ val r = res
@@ -236,7 +236,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import ammonite.ops._
 
-            @ load.module($printedScriptPath/"CompilationError.sc")
+            @ interp.load.module($printedScriptPath/"CompilationError.sc")
             error: Compilation Failed
 
             @ val r = res
@@ -249,7 +249,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import ammonite.ops._
 
-            @ load.exec($printedScriptPath/"notHere")
+            @ interp.load.exec($printedScriptPath/"notHere")
             error: java.nio.file.NoSuchFileException
             """
           )
@@ -269,7 +269,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import ammonite.ops._
 
-            @ load.module($printedScriptPath/"MultiBlockError.sc")
+            @ interp.load.module($printedScriptPath/"MultiBlockError.sc")
             error: Compilation Failed
 
             @ val r2 = res2
@@ -286,7 +286,7 @@ object ScriptTests extends TestSuite{
 
             @ val asd = "asd"
 
-            @ load.module($printedScriptPath/"Encapsulation.sc")
+            @ interp.load.module($printedScriptPath/"Encapsulation.sc")
             error: not found: value asd
             """
         )
@@ -295,7 +295,7 @@ object ScriptTests extends TestSuite{
         check.session(s"""
           @ import ammonite.ops._
 
-          @ load.module($printedScriptPath/"NestedScripts.sc")
+          @ interp.load.module($printedScriptPath/"NestedScripts.sc")
 
           @ val a = asd
           error: not found: value asd
