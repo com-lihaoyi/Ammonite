@@ -44,10 +44,10 @@ trait ReplAPI {
    * REPL prompt at any time!
    */
   val prompt: Ref[String]
-  /**
-   * The front-end REPL used to take user input. Modifiable!
-   */
-  val frontEnd: Ref[FrontEnd]
+//  /**
+//   * The front-end REPL used to take user input. Modifiable!
+//   */
+//  val frontEnd: Ref[FrontEnd]
 
   /**
    * Display help text if you don't know how to use the REPL
@@ -108,10 +108,10 @@ trait ReplAPI {
    */
   def newCompiler(): Unit
 
-  /**
-   * Access the compiler to do crazy things if you really want to!
-   */
-  def compiler: scala.tools.nsc.Global
+//  /**
+//   * Access the compiler to do crazy things if you really want to!
+//   */
+//  def compiler: scala.tools.nsc.Global
 
   /**
    * Show all the imports that are used to execute commands going forward

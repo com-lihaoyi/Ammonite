@@ -1,5 +1,6 @@
 package ammonite.interp
 
+import java.io.OutputStream
 import java.lang.reflect.InvocationTargetException
 
 import acyclic.file
@@ -213,7 +214,7 @@ object Evaluator{
                              classFilesList: Seq[String]): Res[Seq[_]] = {
       Res.map(cachedData.zipWithIndex) {
         case (clsFiles, index) =>
-          Compiler.addToClasspath(clsFiles, dynamicClasspath)
+          addToClasspath(clsFiles, dynamicClasspath)
           val cls = eval.loadClass(classFilesList(index), clsFiles)
           try cls.map(eval.evalMain(_))
           catch userCodeExceptionHandler
@@ -259,5 +260,28 @@ object Evaluator{
   def evaluatorRunPrinter(f: => Unit) = f
 
 
+  def writeDeep(d: VirtualDirectory,
+                path: List[String],
+                suffix: String): OutputStream = path match {
+    case head :: Nil => d.fileNamed(path.head + suffix).output
+    case head :: rest =>
+      writeDeep(
+        d.subdirectoryNamed(head).asInstanceOf[VirtualDirectory],
+        rest, suffix
+      )
+  }
+
+  /**
+    * Writes files to dynamicClasspath. Needed for loading cached classes.
+    */
+  def addToClasspath(classFiles: Traversable[(String, Array[Byte])],
+                     dynamicClasspath: VirtualDirectory): Unit = {
+    val names = classFiles.map(_._1)
+    for((name, bytes) <- classFiles){
+      val output = writeDeep(dynamicClasspath, name.split('.').toList, ".class")
+      output.write(bytes)
+      output.close()
+    }
+  }
 
 }

@@ -135,29 +135,8 @@ object Compiler{
     (reporter, vd, jcp)
   }
 
-  def writeDeep(d: VirtualDirectory,
-                path: List[String],
-                suffix: String): OutputStream = path match {
-    case head :: Nil => d.fileNamed(path.head + suffix).output
-    case head :: rest =>
-      writeDeep(
-        d.subdirectoryNamed(head).asInstanceOf[VirtualDirectory],
-        rest, suffix
-      )
-  }
 
-  /**
-    * Writes files to dynamicClasspath. Needed for loading cached classes.
-    */
-  def addToClasspath(classFiles: Traversable[(String, Array[Byte])],
-                     dynamicClasspath: VirtualDirectory): Unit = {
-    val names = classFiles.map(_._1)
-    for((name, bytes) <- classFiles){
-      val output = writeDeep(dynamicClasspath, name.split('.').toList, ".class")
-      output.write(bytes)
-      output.close()
-    }
-  }
+
 
   def apply(classpath: Seq[java.io.File],
             dynamicClasspath: VirtualDirectory,
@@ -314,7 +293,7 @@ object Compiler{
 
         val files = for(x <- outputFiles if x.name.endsWith(".class")) yield {
           val segments = x.path.split("/").toList.tail
-          val output = writeDeep(dynamicClasspath, segments, "")
+          val output = Evaluator.writeDeep(dynamicClasspath, segments, "")
           output.write(x.toByteArray)
           output.close()
           (x.path.stripPrefix("(memory)/").stripSuffix(".class").replace('/', '.'), x.toByteArray)

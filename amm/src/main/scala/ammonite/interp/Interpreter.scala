@@ -341,7 +341,7 @@ class Interpreter(prompt0: Ref[String],
         case Some((classFiles, newImports)) =>
           val clsFiles = classFiles.map(_._1)
 
-          Compiler.addToClasspath(classFiles, dynamicClasspath)
+          Evaluator.addToClasspath(classFiles, dynamicClasspath)
           Res.Success((classFiles, newImports))
         case _ =>
           val noneCalc = for {
