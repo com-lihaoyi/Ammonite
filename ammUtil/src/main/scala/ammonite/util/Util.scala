@@ -6,7 +6,6 @@ package ammonite.util
 import java.security.MessageDigest
 import acyclic.file
 import ammonite.ops._
-import ammonite.util.Parsers.ImportTree
 
 
 object Util{
@@ -46,6 +45,7 @@ object Util{
   type ClassFiles = Vector[(String, Array[Byte])]
   type CacheOutput = (Seq[(String, String)], Seq[ClassFiles], Imports, Seq[ImportTree])
   type CompileCache = (ClassFiles, Imports)
+
 
 
   def transpose[A](xs: List[List[A]]): List[List[A]] = {

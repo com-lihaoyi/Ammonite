@@ -2,10 +2,9 @@ package ammonite.interp
 
 import acyclic.file
 import ammonite.ops._
-import ammonite.util.Parsers.ImportTree
-import ammonite.util.{Imports, Parsers, StableRef}
+import ammonite.util.ImportTree
+import ammonite.util.{Imports, StableRef}
 import ammonite.util.Util.{CacheOutput, ClassFiles, CompileCache, IvyMap, newLine}
-import org.apache.ivy.plugins.resolver.RepositoryResolver
 
 import scala.util.Try
 import scala.collection.generic.CanBuildFrom

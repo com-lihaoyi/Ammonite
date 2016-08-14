@@ -1,7 +1,7 @@
 package ammonite.frontend
 
 import acyclic.file
-import ammonite.util.Parsers
+import ammonite.interp.Parsers
 import fastparse.all._
 import fastparse.parsers.Combinators.Rule
 

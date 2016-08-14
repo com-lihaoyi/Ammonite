@@ -14,7 +14,7 @@ import fastparse.all._
 import annotation.tailrec
 import ammonite._
 import ammonite.frontend._
-import ammonite.util.Parsers.ImportTree
+import ammonite.util.ImportTree
 import ammonite.util.Util.{CacheDetails, newLine, normalizeNewlines}
 import ammonite.util._
 import pprint.{Config, PPrint, PPrinter}

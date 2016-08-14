@@ -323,3 +323,12 @@ case class Printer(out: String => Unit,
                    warning: String => Unit,
                    error: String => Unit,
                    info: String => Unit)
+
+case class ImportTree(prefix: Seq[String],
+                      mappings: Option[ImportTree.ImportMapping],
+                      start: Int,
+                      end: Int)
+
+object ImportTree{
+  type ImportMapping = Seq[(String, Option[String])]
+}

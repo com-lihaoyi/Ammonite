@@ -6,7 +6,6 @@ import acyclic.file
 import ammonite.ops.{read, _}
 import ammonite.tools.IvyThing
 import ammonite.util._
-import ammonite.util.Parsers.ImportTree
 
 /**
   * An extensible hook into the Ammonite REPL's import system; allows the end

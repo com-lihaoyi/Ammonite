@@ -76,7 +76,7 @@ class TestRepl {
       // Make sure all non-empty, non-complete command-line-fragments
       // are considered incomplete during the parse
       for (incomplete <- commandText.inits.toSeq.drop(1).dropRight(1)){
-        assert(Parsers.split(incomplete.mkString(Util.newLine)) == None)
+        assert(ammonite.interp.Parsers.split(incomplete.mkString(Util.newLine)) == None)
       }
 
       // Finally, actually run the complete command text through the
@@ -163,7 +163,7 @@ class TestRepl {
     infoBuffer.clear()
     val processed = interp.processLine(
       input,
-      Parsers.split(input).get.get.value,
+      ammonite.interp.Parsers.split(input).get.get.value,
       s"Main$index.sc"
     )
     processed match{
