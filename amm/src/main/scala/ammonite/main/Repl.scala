@@ -41,7 +41,7 @@ class Repl(input: InputStream,
 
   val interp: Interpreter = new Interpreter(
     prompt,
-    frontEnd,
+//    frontEnd,
     frontEnd().width,
     frontEnd().height,
     colors,

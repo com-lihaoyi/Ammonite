@@ -1,7 +1,6 @@
 package ammonite.interp
 
 import ammonite.util.{ImportData, Name}
-import acyclic.file
 
 import scala.reflect.NameTransformer
 import scala.tools.nsc._

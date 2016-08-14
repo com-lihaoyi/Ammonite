@@ -32,7 +32,7 @@ class TestRepl {
   val interp = try {
     val i = new Interpreter(
       Ref[String](""),
-      Ref(null),
+//      Ref(null),
       80,
       80,
       Ref(Colors.BlackWhite),

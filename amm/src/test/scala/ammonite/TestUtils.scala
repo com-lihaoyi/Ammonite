@@ -9,7 +9,7 @@ object TestUtils {
 
   def createTestInterp(storage: Storage, predef: String = "") = new Interpreter(
     Ref[String](""),
-    Ref(null),
+//    Ref(null),
     80,
     80,
     Ref(Colors.BlackWhite),

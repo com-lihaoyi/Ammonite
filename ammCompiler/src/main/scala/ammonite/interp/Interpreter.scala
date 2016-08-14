@@ -1,8 +1,6 @@
 package ammonite.interp
 
-import ammonite.tools.{IvyThing, Resolver, Resolvers}
-import java.io.{File, OutputStream}
-import java.nio.file.NotDirectoryException
+import java.io.File
 
 import org.apache.ivy.plugins.resolver.RepositoryResolver
 
@@ -29,7 +27,7 @@ import scala.util.Try
  * real encapsulation for now.
  */
 class Interpreter(prompt0: Ref[String],
-                  frontEnd0: Ref[FrontEnd],
+//                  frontEnd0: Ref[FrontEnd],
                   width: => Int,
                   height: => Int,
                   colors0: Ref[Colors],
@@ -590,7 +588,7 @@ class Interpreter(prompt0: Ref[String],
     psOpt match{
       case Some(ps) => ps
       case None =>
-        val resolved = IvyThing(() => replApi.resolvers()).resolveArtifact(
+        val resolved = ammonite.tools.IvyThing(() => replApi.resolvers()).resolveArtifact(
           groupId,
           artifactId,
           version,
@@ -607,7 +605,7 @@ class Interpreter(prompt0: Ref[String],
   }
   abstract class DefaultLoadJar extends LoadJar {
 
-    lazy val ivyThing = IvyThing(() => replApi.resolvers())
+    lazy val ivyThing = ammonite.tools.IvyThing(() => replApi.resolvers())
 
     def handleClasspath(jar: File): Unit
 
@@ -640,10 +638,10 @@ class Interpreter(prompt0: Ref[String],
     def imports = Preprocessor.importBlock(eval.sess.frames.head.imports)
     val colors = colors0
     val prompt = prompt0
-    val frontEnd = frontEnd0
+//    val frontEnd = frontEnd0
 
     lazy val resolvers =
-      Ref(Resolvers.defaultResolvers)
+      Ref(ammonite.tools.Resolvers.defaultResolvers)
 
     object load extends DefaultLoadJar with Load {
 
@@ -754,6 +752,7 @@ class Interpreter(prompt0: Ref[String],
   }
 
 }
+
 object Interpreter{
   val SheBang = "#!"
 

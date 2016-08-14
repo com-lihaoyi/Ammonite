@@ -112,7 +112,7 @@ lazy val terminal = project
  * for Scala
  */
 lazy val amm = project
-  .dependsOn(terminal, ops, ammUtil, ammRuntime)
+  .dependsOn(terminal, ops, ammUtil, ammRuntime, ammCompiler)
   .settings(
     macroSettings,
     sharedSettings,
@@ -175,6 +175,25 @@ lazy val ammRuntime = project
 
     name := "ammonite-runtime",
     libraryDependencies ++= Seq(
+      "org.apache.ivy" % "ivy" % "2.4.0",
+      "org.scalaj" %% "scalaj-http" % "2.3.0",
+      "com.lihaoyi" %% "upickle" % "0.4.1",
+      "com.lihaoyi" %% "pprint" % "0.4.1"
+    )
+  )
+
+
+lazy val ammCompiler = project
+  .dependsOn(terminal, ops, ammUtil, ammRuntime)
+  .settings(
+    macroSettings,
+    sharedSettings,
+    crossVersion := CrossVersion.full,
+
+    name := "ammonite-compiler",
+    libraryDependencies ++= Seq(
+      "org.scala-lang" % "scala-compiler" % scalaVersion.value,
+      "org.scala-lang" % "scala-reflect" % scalaVersion.value,
       "org.apache.ivy" % "ivy" % "2.4.0",
       "org.scalaj" %% "scalaj-http" % "2.3.0",
       "com.lihaoyi" %% "scalaparse" % "0.3.7",
