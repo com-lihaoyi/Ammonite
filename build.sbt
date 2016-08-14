@@ -123,15 +123,7 @@ lazy val amm = project
     test in assembly := {},
     name := "ammonite",
     libraryDependencies ++= Seq(
-      "org.scala-lang" % "scala-compiler" % scalaVersion.value,
-
-      "org.scala-lang" % "scala-reflect" % scalaVersion.value,
-
-      "com.lihaoyi" %% "scalaparse" % "0.3.7",
-      "com.lihaoyi" %% "upickle" % "0.4.1",
-      "com.lihaoyi" %% "pprint" % "0.4.1",
-      "com.github.scopt" %% "scopt" % "3.4.0",
-      "org.scalaj" %% "scalaj-http" % "2.3.0"
+      "com.github.scopt" %% "scopt" % "3.4.0"
     ),
     libraryDependencies ++= (
       if (scalaVersion.value startsWith "2.10.") Nil
@@ -155,7 +147,7 @@ lazy val amm = project
   )
 
 lazy val ammUtil = project
-  .dependsOn(terminal, ops)
+  .dependsOn(ops)
   .settings(
     macroSettings,
     sharedSettings,
@@ -170,7 +162,7 @@ lazy val ammUtil = project
 
 
 lazy val ammRuntime = project
-  .dependsOn(terminal, ops, ammUtil)
+  .dependsOn(ops, ammUtil)
   .settings(
     macroSettings,
     sharedSettings,
@@ -179,15 +171,13 @@ lazy val ammRuntime = project
     name := "ammonite-runtime",
     libraryDependencies ++= Seq(
       "org.apache.ivy" % "ivy" % "2.4.0",
-      "org.scalaj" %% "scalaj-http" % "2.3.0",
-      "com.lihaoyi" %% "upickle" % "0.4.1",
-      "com.lihaoyi" %% "pprint" % "0.4.1"
+      "org.scalaj" %% "scalaj-http" % "2.3.0"
     )
   )
 
 
 lazy val ammCompiler = project
-  .dependsOn(terminal, ops, ammUtil, ammRuntime)
+  .dependsOn(ops, ammUtil, ammRuntime)
   .settings(
     macroSettings,
     sharedSettings,
@@ -197,22 +187,17 @@ lazy val ammCompiler = project
     libraryDependencies ++= Seq(
       "org.scala-lang" % "scala-compiler" % scalaVersion.value,
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
-      "org.apache.ivy" % "ivy" % "2.4.0",
-      "org.scalaj" %% "scalaj-http" % "2.3.0",
-      "com.lihaoyi" %% "scalaparse" % "0.3.7",
-      "com.lihaoyi" %% "upickle" % "0.4.1",
-      "com.lihaoyi" %% "pprint" % "0.4.1"
+      "com.lihaoyi" %% "scalaparse" % "0.3.7"
     )
   )
 
 
 lazy val ammRepl = project
-  .dependsOn(terminal, ops, ammUtil, ammRuntime, ammCompiler)
+  .dependsOn(terminal, ammUtil, ammRuntime, ammCompiler)
   .settings(
     macroSettings,
     sharedSettings,
     crossVersion := CrossVersion.full,
-
     name := "ammonite-repl",
     libraryDependencies ++= Seq(
       "jline" % "jline" % "2.12"

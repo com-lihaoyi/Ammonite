@@ -8,7 +8,6 @@ import acyclic.file
 import java.io.{BufferedReader, InputStreamReader}
 
 import ammonite.ops._
-import ammonite.terminal.Strings
 import ammonite.util.Util.newLine
 
 import scala.collection.{GenTraversableOnce, mutable}
@@ -205,7 +204,13 @@ object time {
   }
 }
 
+
 object browse{
+  case class Strings(values: Seq[String])
+  object Strings{
+    implicit def stringPrefix(s: String) = Strings(Seq(s))
+    implicit def stringSeqPrefix(s: Seq[String]) = Strings(s)
+  }
   // R -> show ansi-colors as colors, M -> show current-browse-% bar
   val lessViewer = Seq("less", "-RM")
   def apply[T: pprint.PPrint](t: T,

@@ -16,7 +16,7 @@ import ammonite.util.ImportTree
 import ammonite.util.Util.{CacheDetails, newLine, normalizeNewlines}
 import ammonite.util._
 import pprint.{Config, PPrint, PPrinter}
-import ammonite.terminal.Filter
+//import ammonite.terminal.Filter
 
 import scala.reflect.io.VirtualDirectory
 import scala.util.Try
