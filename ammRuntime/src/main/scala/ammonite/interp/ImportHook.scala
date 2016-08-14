@@ -63,7 +63,7 @@ object ImportHook{
                   : (Seq[(RelPath, Option[String])], Seq[Path], Seq[Path]) = {
     val relative =
       tree.prefix
-        .map{case ".." => up; case x => ammonite.ops.empty/x}
+        .map{case ammonite.util.Util.upPathSegment => up; case x => ammonite.ops.empty/x}
         .reduce(_/_)
     val relativeModules = tree.mappings match{
       case None => Seq(relative -> None)

@@ -10,11 +10,12 @@ import ammonite.ops._
 
 object Util{
 
+  val upPathSegment = "^"
   def pathToPackageWrapper(path: Path, wd: Path): (Seq[Name], Name) = {
     val pkg = {
       val base = Seq("$file")
       val relPath = (path/up).relativeTo(wd)
-      val ups = Seq.fill(relPath.ups)("..")
+      val ups = Seq.fill(relPath.ups)(upPathSegment)
       val rest = relPath.segments
       (base ++ ups ++ rest).map(Name(_))
     }
