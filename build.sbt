@@ -112,7 +112,10 @@ lazy val terminal = project
  * for Scala
  */
 lazy val amm = project
-  .dependsOn(terminal, ops, ammUtil, ammRuntime, ammCompiler)
+  .dependsOn(
+    terminal, ops,
+    ammUtil, ammRuntime, ammCompiler, ammRepl
+  )
   .settings(
     macroSettings,
     sharedSettings,
@@ -121,7 +124,7 @@ lazy val amm = project
     name := "ammonite",
     libraryDependencies ++= Seq(
       "org.scala-lang" % "scala-compiler" % scalaVersion.value,
-      "jline" % "jline" % "2.12",
+
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
 
       "com.lihaoyi" %% "scalaparse" % "0.3.7",
@@ -199,6 +202,20 @@ lazy val ammCompiler = project
       "com.lihaoyi" %% "scalaparse" % "0.3.7",
       "com.lihaoyi" %% "upickle" % "0.4.1",
       "com.lihaoyi" %% "pprint" % "0.4.1"
+    )
+  )
+
+
+lazy val ammRepl = project
+  .dependsOn(terminal, ops, ammUtil, ammRuntime, ammCompiler)
+  .settings(
+    macroSettings,
+    sharedSettings,
+    crossVersion := CrossVersion.full,
+
+    name := "ammonite-repl",
+    libraryDependencies ++= Seq(
+      "jline" % "jline" % "2.12"
     )
   )
 
