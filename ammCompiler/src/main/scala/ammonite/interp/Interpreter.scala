@@ -264,6 +264,7 @@ class Interpreter(val printer: Printer,
                    printer: Printer,
                    fileName: String,
                    indexedWrapperName: Name): Res[Evaluated] = {
+
     for{
       _ <- Catching{ case e: ThreadDeath => Evaluator.interrupted(e) }
       (classFiles, newImports) <- compileClass(

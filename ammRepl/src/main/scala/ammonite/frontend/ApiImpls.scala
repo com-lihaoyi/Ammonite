@@ -57,6 +57,7 @@ class ReplApiImpl(val interp: Interpreter,
                   height0: => Int,
                   colors0: Ref[Colors],
                   prompt0: Ref[String],
+                  frontEnd0: Ref[FrontEnd],
                   history0: => History,
                   sess0: Session) extends DefaultReplAPI{
   import interp._
@@ -66,7 +67,7 @@ class ReplApiImpl(val interp: Interpreter,
   def imports = Preprocessor.importBlock(eval.frames.head.imports)
   val colors = colors0
   val prompt = prompt0
-  //    val frontEnd = frontEnd0
+  val frontEnd = frontEnd0
 
   lazy val resolvers =
     Ref(ammonite.tools.Resolvers.defaultResolvers)
@@ -155,9 +156,9 @@ class ReplApiImpl(val interp: Interpreter,
   def history = history0
 
 
-  def width = 0
+  def width = width0
 
-  def height = 0
+  def height = height0
 
   object sess extends Session {
     def frames = eval.frames

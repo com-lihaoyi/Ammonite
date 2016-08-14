@@ -59,6 +59,7 @@ class Repl(input: InputStream,
       frontEnd().height,
       colors,
       prompt,
+      frontEnd,
       history,
       new SessionApiImpl(interp.eval)
     )
