@@ -58,6 +58,7 @@ case class Main(predef: String = "",
     */
   def instantiateRepl(replArgs: Seq[Bind[_]] = Nil) = {
     val augmentedPredef = Main.maybeDefaultPredef(defaultPredef, Defaults.predefString)
+
     new Repl(
       inputStream, outputStream, errorStream,
       storage = storageBackend,
@@ -67,6 +68,7 @@ case class Main(predef: String = "",
       replArgs = replArgs
     )
   }
+
   def run(replArgs: Bind[_]*) = {
     val repl = instantiateRepl(replArgs)
 
@@ -77,6 +79,8 @@ case class Main(predef: String = "",
         repl.interp,
         repl.frontEnd().width,
         repl.frontEnd().height,
+        repl.colors,
+        repl.prompt,
         repl.history,
         new SessionApiImpl(repl.interp.eval)
       )
@@ -101,7 +105,7 @@ case class Main(predef: String = "",
     * Run a snippet of code
     */
   def runCode(code: String) = {
-    instantiateRepl().interp.runtimeApi.load(code)
+    instantiateRepl().interp.interpApi.load(code)
   }
 }
 

@@ -37,7 +37,7 @@ object Defaults{
 
   val predefString = s"""
     |import ammonite.frontend.ReplBridge.{value => repl}
-    |import ammonite.interp.RuntimeBridge.{value => interp}
+    |import ammonite.interp.InterpBridge.{value => interp}
     |import ammonite.ops.Extensions.{
     |  $ignoreUselessImports
     |}

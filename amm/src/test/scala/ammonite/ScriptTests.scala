@@ -261,7 +261,7 @@ object ScriptTests extends TestSuite{
               storage,
               Defaults.predefString
             )
-            interp2.runtimeApi.load.module(cwd/"scriptWithoutExtension")
+            interp2.interpApi.load.module(cwd/"scriptWithoutExtension")
           }.toString
           assert(res.contains("java.nio.file.NoSuchFileException"))
         }

@@ -31,17 +31,12 @@ class TestRepl {
   )
   val interp = try {
     val i = new Interpreter(
-      Ref[String](""),
-//      Ref(null),
-      80,
-      80,
-      Ref(Colors.BlackWhite),
       printer,
       storage = new Storage.Folder(tempDir),
       new History(Vector()),
       predef = ammonite.main.Defaults.predefString + Util.newLine + predef,
       wd = ammonite.ops.cwd,
-      replArgs = Seq()
+      customPredefs = Seq()
     )
     i.init()
     i

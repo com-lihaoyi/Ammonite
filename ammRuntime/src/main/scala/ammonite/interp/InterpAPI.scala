@@ -7,7 +7,7 @@ import ammonite.util.Ref
 import scala.util.control.ControlThrowable
 
 
-object RuntimeBridge extends APIHolder[RuntimeAPI]
+object InterpBridge extends APIHolder[InterpAPI]
 
 /**
  * Thrown to exit the REPL cleanly
@@ -15,7 +15,7 @@ object RuntimeBridge extends APIHolder[RuntimeAPI]
 case class ReplExit(value: Any) extends ControlThrowable
 
 
-trait RuntimeAPI {
+trait InterpAPI {
 
   /**
    * Tools related to loading external scripts and code into the REPL

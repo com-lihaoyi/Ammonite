@@ -55,6 +55,8 @@ class SessionApiImpl(eval: Evaluator) extends Session{
 class ReplApiImpl(val interp: Interpreter,
                   width0: => Int,
                   height0: => Int,
+                  colors0: Ref[Colors],
+                  prompt0: Ref[String],
                   history0: => History,
                   sess0: Session) extends DefaultReplAPI{
   import interp._
@@ -156,8 +158,6 @@ class ReplApiImpl(val interp: Interpreter,
   def width = 0
 
   def height = 0
-
-  override def replArgs = interp.replArgs.toVector
 
   object sess extends Session {
     def frames = eval.frames

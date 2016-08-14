@@ -39,18 +39,27 @@ class Repl(input: InputStream,
   )
 
 
+  val hardcodedPredef =
+    "import ammonite.frontend.ReplBridge.value.{pprintConfig, derefPPrint}"
+
+  val argString = replArgs.zipWithIndex.map{ case (b, idx) =>
+    s"""
+    val ${b.name} =
+      ammonite.frontend.ReplBridge.value.replArgs($idx).value.asInstanceOf[${b.typeTag.tpe}]
+    """
+  }.mkString(newLine)
+
+
   val interp: Interpreter = new Interpreter(
-    prompt,
-//    frontEnd,
-    frontEnd().width,
-    frontEnd().height,
-    colors,
     printer,
     storage,
     history,
     predef,
-    wd,
-    replArgs
+    Seq(
+      (hardcodedPredef, Name("HardcodedPredef")),
+      (argString, Name("ArgsPredef"))
+    ),
+    wd
   )
 
   val reader = new InputStreamReader(input)

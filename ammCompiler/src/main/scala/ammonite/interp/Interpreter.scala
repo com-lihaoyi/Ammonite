@@ -24,22 +24,14 @@ import scala.util.Try
  * to interpret Scala code. Doesn't attempt to provide any
  * real encapsulation for now.
  */
-class Interpreter(val prompt0: Ref[String],
-//                  frontEnd0: Ref[FrontEnd],
-                  width: => Int,
-                  height: => Int,
-                  val colors0: Ref[Colors],
-                  val printer: Printer,
+class Interpreter(val printer: Printer,
                   val storage: Storage,
                   history: => History,
                   val predef: String,
-                  val wd: Path,
-                  val replArgs: Seq[Bind[_]])
+                  customPredefs: Seq[(String, Name)],
+                  val wd: Path)
   extends ImportHook.InterpreterInterface{ interp =>
 
-
-  val hardcodedPredef =
-    "import ammonite.frontend.ReplBridge.value.{pprintConfig, derefPPrint}"
 
 
   //this variable keeps track of where should we put the imports resulting from scripts.
@@ -92,16 +84,11 @@ class Interpreter(val prompt0: Ref[String],
 
   APIHolder.initBridge(
     evalClassloader,
-    "ammonite.interp.RuntimeBridge",
-    runtimeApi
+    "ammonite.interp.InterpBridge",
+    interpApi
   )
 
-  val argString = replArgs.zipWithIndex.map{ case (b, idx) =>
-    s"""
-    val ${b.name} =
-      ammonite.frontend.ReplBridge.value.replArgs($idx).value.asInstanceOf[${b.typeTag.tpe}]
-    """
-  }.mkString(newLine)
+
 
   val importHooks = Ref(Map[Seq[String], ImportHook](
     Seq("file") -> ImportHook.File,
@@ -114,10 +101,10 @@ class Interpreter(val prompt0: Ref[String],
   ))
 
   val predefs = Seq(
-    (hardcodedPredef, Name("HardcodedPredef")),
+
     (predef, Name("Predef")),
-    (storage.loadPredef, Name("LoadedPredef")),
-    (argString, Name("ArgsPredef"))
+    (storage.loadPredef, Name("LoadedPredef"))
+
   )
 
   // Use a var and a for-loop instead of a fold, because when running
@@ -570,7 +557,7 @@ class Interpreter(val prompt0: Ref[String],
   }
   def loadIvy(coordinates: (String, String, String), verbose: Boolean = true) = {
     val (groupId, artifactId, version) = coordinates
-    val cacheKey = (runtimeApi.resolvers().hashCode.toString, groupId, artifactId, version)
+    val cacheKey = (interpApi.resolvers().hashCode.toString, groupId, artifactId, version)
 
     val fetched =
       storage.ivyCache()
@@ -584,7 +571,7 @@ class Interpreter(val prompt0: Ref[String],
     psOpt match{
       case Some(ps) => ps
       case None =>
-        val resolved = ammonite.tools.IvyThing(() => runtimeApi.resolvers()).resolveArtifact(
+        val resolved = ammonite.tools.IvyThing(() => interpApi.resolvers()).resolveArtifact(
           groupId,
           artifactId,
           version,
@@ -601,7 +588,7 @@ class Interpreter(val prompt0: Ref[String],
   }
   abstract class DefaultLoadJar extends LoadJar {
 
-    lazy val ivyThing = ammonite.tools.IvyThing(() => runtimeApi.resolvers())
+    lazy val ivyThing = ammonite.tools.IvyThing(() => interpApi.resolvers())
 
     def handleClasspath(jar: File): Unit
 
@@ -627,7 +614,7 @@ class Interpreter(val prompt0: Ref[String],
   def handlePluginClasspath(jar: File) = {
     eval.frames.head.pluginClassloader.add(jar.toURI.toURL)
   }
-  lazy val runtimeApi: RuntimeAPI = new RuntimeAPI{ outer =>
+  lazy val interpApi: InterpAPI = new InterpAPI{ outer =>
     lazy val resolvers =
       Ref(ammonite.tools.Resolvers.defaultResolvers)
 
