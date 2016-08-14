@@ -112,7 +112,7 @@ lazy val terminal = project
  * for Scala
  */
 lazy val amm = project
-  .dependsOn(terminal, ops)
+  .dependsOn(terminal, ops, ammUtil)
   .settings(
     macroSettings,
     sharedSettings,
@@ -149,6 +149,27 @@ lazy val amm = project
       Seq("chmod", "+x", dest.getAbsolutePath).!
       dest
     }
+  )
+
+lazy val ammUtil = project
+  .dependsOn(terminal, ops)
+  .settings(
+    macroSettings,
+    sharedSettings,
+    crossVersion := CrossVersion.full,
+
+    name := "ammonite-util",
+    libraryDependencies ++= Seq(
+      "org.scala-lang" % "scala-compiler" % scalaVersion.value,
+      "jline" % "jline" % "2.12",
+      "org.scala-lang" % "scala-reflect" % scalaVersion.value,
+      "org.apache.ivy" % "ivy" % "2.4.0",
+      "com.lihaoyi" %% "scalaparse" % "0.3.7",
+      "com.lihaoyi" %% "upickle" % "0.4.1",
+      "com.lihaoyi" %% "pprint" % "0.4.1",
+      "com.github.scopt" %% "scopt" % "3.4.0",
+      "org.scalaj" %% "scalaj-http" % "2.3.0"
+    )
   )
 
 /**

@@ -4,7 +4,6 @@
   */
 package ammonite.util
 
-
 import acyclic.file
 import pprint.{PPrint, PPrinter}
 
