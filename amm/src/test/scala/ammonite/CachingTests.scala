@@ -20,7 +20,7 @@ object CachingTests extends TestSuite{
     'noAutoIncrementWrapper{
       val storage = Storage.InMemory()
       val interp = createTestInterp(storage)
-      interp.replApi.load.module(scriptPath/"ThreeBlocks.sc")
+      interp.runtimeApi.load.module(scriptPath/"ThreeBlocks.sc")
       try{
         Class.forName("cmd0")
         assert(false)
@@ -37,7 +37,7 @@ object CachingTests extends TestSuite{
         val n0 = storage.compileCache.size
 
         assert(n0 == 1) // Predef + hardcodedPredef
-        interp.replApi.load.module(scriptPath/fileName)
+        interp.runtimeApi.load.module(scriptPath/fileName)
 
         val n = storage.compileCache.size
         assert(n == expected)
@@ -52,14 +52,14 @@ object CachingTests extends TestSuite{
           storage,
           Defaults.predefString
         )
-        interp1.replApi.load.module(resourcesPath/script)
+        interp1.runtimeApi.load.module(resourcesPath/script)
         assert(interp1.compiler != null)
         val interp2 = createTestInterp(
           storage,
           Defaults.predefString
         )
         assert(interp2.compiler == null)
-        interp2.replApi.load.module(resourcesPath/script)
+        interp2.runtimeApi.load.module(resourcesPath/script)
         assert(interp2.compiler == null)
       }
 
@@ -81,13 +81,13 @@ object CachingTests extends TestSuite{
         storage,
         Defaults.predefString
       )
-      interp1.replApi.load.module(resourcesPath/'scriptLevelCaching/"runTimeExceptions.sc")
+      interp1.runtimeApi.load.module(resourcesPath/'scriptLevelCaching/"runTimeExceptions.sc")
       val interp2 = createTestInterp(
         storage,
         Defaults.predefString
       )
       val res = intercept[java.lang.ArithmeticException]{
-        interp2.replApi.load.module(
+        interp2.runtimeApi.load.module(
           resourcesPath/'scriptLevelCaching/"runTimeExceptions.sc"
         )
       }
@@ -104,8 +104,8 @@ object CachingTests extends TestSuite{
 
       val interp1 = createTestInterp(new Storage.Folder(tempDir))
       val interp2 = createTestInterp(new Storage.Folder(tempDir))
-      interp1.replApi.load.module(scriptPath/"OneBlock.sc")
-      interp2.replApi.load.module(scriptPath/"OneBlock.sc")
+      interp1.runtimeApi.load.module(scriptPath/"OneBlock.sc")
+      interp2.runtimeApi.load.module(scriptPath/"OneBlock.sc")
       val n1 = interp1.compilationCount
       val n2 = interp2.compilationCount
       assert(n1 == 2) // hardcodedPredef + loadedPredef
@@ -114,10 +114,10 @@ object CachingTests extends TestSuite{
     'tags{
       val storage = Storage.InMemory()
       val interp = createTestInterp(storage)
-      interp.replApi.load.module(scriptPath/"TagBase.sc")
-      interp.replApi.load.module(scriptPath/"TagPrevCommand.sc")
-      interp.replApi.load.ivy("com.lihaoyi" %% "scalatags" % "0.4.5")
-      interp.replApi.load.module(scriptPath/"TagBase.sc")
+      interp.runtimeApi.load.module(scriptPath/"TagBase.sc")
+      interp.runtimeApi.load.module(scriptPath/"TagPrevCommand.sc")
+      interp.runtimeApi.load.ivy("com.lihaoyi" %% "scalatags" % "0.4.5")
+      interp.runtimeApi.load.module(scriptPath/"TagBase.sc")
       val n = storage.compileCache.size
       assert(n == 5) // predef + two blocks for initial load
     }
@@ -144,7 +144,7 @@ object CachingTests extends TestSuite{
           },
           Defaults.predefString
         )
-        interp.replApi.load.module(scriptFile)
+        interp.runtimeApi.load.module(scriptFile)
         assert(f(interp.compiler))
       }
 

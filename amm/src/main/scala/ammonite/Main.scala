@@ -2,8 +2,9 @@ package ammonite
 
 import java.io.{File, InputStream, OutputStream}
 
+import ammonite.frontend.{ReplApiImpl, SessionApiImpl}
 import ammonite.ops._
-import ammonite.interp.{ImportHook, Storage}
+import ammonite.interp.{APIHolder, Storage}
 import fastparse.Utils.literalize
 import ammonite.main.{Defaults, Repl, Router}
 import ammonite.main.Router.{ArgSig, EntryPoint}
@@ -67,7 +68,21 @@ case class Main(predef: String = "",
     )
   }
   def run(replArgs: Bind[_]*) = {
-    instantiateRepl(replArgs).run()
+    val repl = instantiateRepl(replArgs)
+
+    APIHolder.initBridge(
+      repl.interp.evalClassloader,
+      "ammonite.frontend.ReplBridge",
+      new ReplApiImpl(
+        repl.interp,
+        repl.frontEnd().width,
+        repl.frontEnd().height,
+        repl.history,
+        new SessionApiImpl(repl.interp.eval)
+      )
+    )
+
+    repl.run()
   }
 
   /**
@@ -86,7 +101,7 @@ case class Main(predef: String = "",
     * Run a snippet of code
     */
   def runCode(code: String) = {
-    instantiateRepl().interp.replApi.load(code)
+    instantiateRepl().interp.runtimeApi.load(code)
   }
 }
 

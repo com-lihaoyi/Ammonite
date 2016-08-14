@@ -123,7 +123,7 @@ object Preprocessor{
       _root_.ammonite
             .frontend
             .ReplBridge
-            .repl
+            .value
             .Internal
             .print($ident, $ident, "$ident", $customCode)
       """
@@ -133,7 +133,7 @@ object Preprocessor{
       _root_.ammonite
             .frontend
             .ReplBridge
-            .repl
+            .value
             .Internal
             .printDef("$definitionLabel", "$name")
       """
@@ -182,7 +182,7 @@ object Preprocessor{
           _root_.ammonite
                 .frontend
                 .ReplBridge
-                .repl
+                .value
                 .Internal
                 .printImport($tq$body$tq)
           """

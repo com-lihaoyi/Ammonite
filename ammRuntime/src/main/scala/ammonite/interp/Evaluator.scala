@@ -5,12 +5,10 @@ import java.lang.reflect.InvocationTargetException
 
 import acyclic.file
 import ammonite._
-import util.Util.{ClassFiles, CompileCache, newLine}
+import util.Util.{ClassFiles, newLine}
 import ammonite.util._
 
-import scala.collection.immutable.ListMap
 import scala.reflect.io.VirtualDirectory
-import scala.collection.mutable
 import scala.util.Try
 
 /**
@@ -104,9 +102,9 @@ object Evaluator{
     }
 
 
-    def evalMain(cls: Class[_]) =
+    def evalMain(cls: Class[_]) = {
       cls.getDeclaredMethod("$main").invoke(null)
-
+    }
 
 
     type InvEx = InvocationTargetException
@@ -140,7 +138,6 @@ object Evaluator{
       } yield {
         // Exhaust the printer iterator now, before exiting the `Catching`
         // block, so any exceptions thrown get properly caught and handled
-
         val iter = evalMain(cls).asInstanceOf[Iterator[String]]
         evaluatorRunPrinter(iter.foreach(printer.out))
 

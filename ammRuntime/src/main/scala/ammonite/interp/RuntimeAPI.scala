@@ -7,29 +7,12 @@ import ammonite.util.Ref
 import scala.util.control.ControlThrowable
 
 
-class RuntimeAPIHolder {
-  var repl0: RuntimeAPI = null
-  implicit lazy val repl = repl0
-}
-
-object RuntimeBridge extends RuntimeAPIHolder{}
+object RuntimeBridge extends APIHolder[RuntimeAPI]
 
 /**
  * Thrown to exit the REPL cleanly
  */
 case class ReplExit(value: Any) extends ControlThrowable
-
-
-
-object RuntimeAPI{
-  def initReplBridge(holder: Class[RuntimeAPIHolder], api: RuntimeAPI) = {
-    val method = holder
-      .getDeclaredMethods
-      .find(_.getName == "repl0_$eq")
-      .get
-    method.invoke(null, api)
-  }
-}
 
 
 trait RuntimeAPI {

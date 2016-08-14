@@ -9,15 +9,11 @@ import pprint.{Config, PPrint, PPrinter, TPrintColors}
 import scala.collection.mutable
 import scala.reflect.runtime.universe._
 import acyclic.file
-import ammonite.interp.{Frame, History}
+import ammonite.interp.{APIHolder, Frame, History}
 
 import scala.util.control.ControlThrowable
 
 
-class ReplAPIHolder {
-  var repl0: FullReplAPI = null
-  implicit lazy val repl = repl0
-}
 
 /**
  * Thrown to exit the REPL cleanly
@@ -262,7 +258,7 @@ trait DefaultReplAPI extends FullReplAPI {
     }
   }
 }
-object ReplBridge extends ReplAPIHolder{}
+object ReplBridge extends APIHolder[FullReplAPI]
 
 case class SessionChanged(removedImports: Set[scala.Symbol],
                           addedImports: Set[scala.Symbol],

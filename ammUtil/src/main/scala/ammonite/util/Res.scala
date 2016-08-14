@@ -78,12 +78,16 @@ object Res{
     *           only used for the "Interrupted!" failures caused by Ctrl-C
     * @param msg the message we want to display on screen due to this failure
     */
-  case class Failure(ex: Option[Throwable], msg: String) extends Failing
+  case class Failure(ex: Option[Throwable], msg: String) extends Failing{
+    ex.foreach(throw _)
+  }
 
   /**
     * An unknown exception was thrown when the command was being run
     */
-  case class Exception(t: Throwable, s: String) extends Failing
+  case class Exception(t: Throwable, s: String) extends Failing{
+    throw t
+  }
 
   /**
     * Nothing was entered

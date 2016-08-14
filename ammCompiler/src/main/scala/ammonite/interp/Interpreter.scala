@@ -39,7 +39,7 @@ class Interpreter(val prompt0: Ref[String],
 
 
   val hardcodedPredef =
-    "import ammonite.frontend.ReplBridge.repl.{pprintConfig, derefPPrint}"
+    "import ammonite.frontend.ReplBridge.value.{pprintConfig, derefPPrint}"
 
 
   //this variable keeps track of where should we put the imports resulting from scripts.
@@ -90,19 +90,16 @@ class Interpreter(val prompt0: Ref[String],
 
 
 
-
-  evalClassloader.findClassPublic("ammonite.interp.RuntimeBridge$")
-  evalClassloader.findClassPublic("ammonite.interp.RuntimeBridge")
-    .asInstanceOf[Class[RuntimeAPIHolder]]
-    .getDeclaredMethods
-    .find(_.getName == "repl0_$eq")
-    .get
-    .invoke(null, replApi)
+  APIHolder.initBridge(
+    evalClassloader,
+    "ammonite.interp.RuntimeBridge",
+    runtimeApi
+  )
 
   val argString = replArgs.zipWithIndex.map{ case (b, idx) =>
     s"""
     val ${b.name} =
-      ammonite.frontend.ReplBridge.repl.replArgs($idx).value.asInstanceOf[${b.typeTag.tpe}]
+      ammonite.frontend.ReplBridge.value.replArgs($idx).value.asInstanceOf[${b.typeTag.tpe}]
     """
   }.mkString(newLine)
 
@@ -236,7 +233,7 @@ class Interpreter(val prompt0: Ref[String],
         Seq(Name("$sess")),
         Name("cmd" + eval.getCurrentLine),
         predefImports ++ eval.frames.head.imports ++ hookImports,
-        prints => s"ammonite.frontend.ReplBridge.repl.Internal.combinePrints($prints)",
+        prints => s"ammonite.frontend.ReplBridge.value.Internal.combinePrints($prints)",
         extraCode = ""
       )
       out <- evaluateLine(
@@ -573,7 +570,7 @@ class Interpreter(val prompt0: Ref[String],
   }
   def loadIvy(coordinates: (String, String, String), verbose: Boolean = true) = {
     val (groupId, artifactId, version) = coordinates
-    val cacheKey = (replApi.resolvers().hashCode.toString, groupId, artifactId, version)
+    val cacheKey = (runtimeApi.resolvers().hashCode.toString, groupId, artifactId, version)
 
     val fetched =
       storage.ivyCache()
@@ -587,7 +584,7 @@ class Interpreter(val prompt0: Ref[String],
     psOpt match{
       case Some(ps) => ps
       case None =>
-        val resolved = ammonite.tools.IvyThing(() => replApi.resolvers()).resolveArtifact(
+        val resolved = ammonite.tools.IvyThing(() => runtimeApi.resolvers()).resolveArtifact(
           groupId,
           artifactId,
           version,
@@ -604,7 +601,7 @@ class Interpreter(val prompt0: Ref[String],
   }
   abstract class DefaultLoadJar extends LoadJar {
 
-    lazy val ivyThing = ammonite.tools.IvyThing(() => replApi.resolvers())
+    lazy val ivyThing = ammonite.tools.IvyThing(() => runtimeApi.resolvers())
 
     def handleClasspath(jar: File): Unit
 
@@ -630,7 +627,7 @@ class Interpreter(val prompt0: Ref[String],
   def handlePluginClasspath(jar: File) = {
     eval.frames.head.pluginClassloader.add(jar.toURI.toURL)
   }
-  lazy val replApi: RuntimeAPI = new RuntimeAPI{ outer =>
+  lazy val runtimeApi: RuntimeAPI = new RuntimeAPI{ outer =>
     lazy val resolvers =
       Ref(ammonite.tools.Resolvers.defaultResolvers)
 
