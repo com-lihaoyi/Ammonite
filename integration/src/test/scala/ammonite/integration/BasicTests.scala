@@ -20,6 +20,13 @@ object BasicTests extends TestSuite{
   println("StandaloneTests")
   val tests = TestSuite {
 
+    def execWithJAVA_OPTSset(name: RelPath, home: Path) = %%bash(
+      executable,
+      replStandaloneResources/name,
+      "-h",
+      home,
+      JAVA_OPTS = "-verbose:class"
+      )
     'hello{
       val evaled = exec('basic/"Hello.sc")
       assert(evaled.out.trim == "Hello World")
@@ -41,6 +48,38 @@ object BasicTests extends TestSuite{
         assert(evaled.out.trim == "Script Worked!!" && evaled.err.string.isEmpty)
       }
     }
+    'scalacNotLoadedByCachedScripts{
+      val tmpDir = tmp.dir()
+      val evaled1 = execWithJAVA_OPTSset(
+        'basic/"Print.sc",
+        tmpDir
+      )
+      val evaled2 = execWithJAVA_OPTSset(
+       'basic/"Print.sc",
+        tmpDir
+      )
+      val count1 = substrCount(evaled1.out.trim, "scala.tools.nsc")
+      val count2 = substrCount(evaled2.out.trim, "scala.tools.nsc")
+      //These numbers might fail in future but basic point is to keep count2
+      //very low whereas count1 will be inevitably bit higher
+      assert(count1 > 10)
+      assert(count2 < 5)
+    }
+    'fastparseNotLoadedByCachedScritps{
+      val tmpDir = tmp.dir()
+      val evaled1 = execWithJAVA_OPTSset(
+        'basic/"Print.sc",
+        tmpDir
+      )
+      assert(evaled1.out.trim.contains("fastparse"))
+
+      val evaled2 = execWithJAVA_OPTSset(
+        'basic/"Print.sc",
+        tmpDir
+        )
+      assert(!evaled2.out.trim.contains("fastparse"))
+    }
+
 
     'scriptInSomeOtherDir{
       val scriptAddr = tmp.dir()/"script.sc"

@@ -27,4 +27,14 @@ object TestUtils {
       args
     )
   }
+
+  /**
+    *Counts number of non-overlapping occurances of `subs` in `s`
+    */
+  def substrCount(s: String, subs: String, count: Int = 0, ptr: Int = 0): Int = {
+    s.indexOf(subs, ptr) match{
+      case -1 => count
+      case x => substrCount(s, subs, count+1, x + subs.length)
+    }
+  }
 }
