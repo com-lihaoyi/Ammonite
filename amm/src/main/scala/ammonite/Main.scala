@@ -4,11 +4,8 @@ import java.io.{File, InputStream, OutputStream}
 
 import ammonite.frontend.{ReplApiImpl, SessionApiImpl}
 import ammonite.ops._
-import ammonite.interp.{APIHolder, Storage}
-import fastparse.Utils.literalize
-import ammonite.main.{Defaults, Repl, Router}
-import ammonite.main.Router.{ArgSig, EntryPoint}
-import ammonite.util.Name.backtickWrap
+import ammonite.interp.{APIHolder, Interpreter, Storage}
+import ammonite.main.{Defaults, Repl}
 import ammonite.util._
 import ammonite.util.Util.newLine
 
@@ -69,23 +66,21 @@ case class Main(predef: String = "",
     )
   }
 
+  def instantiateInterpreter() = {
+    val (colors, printStream, errorPrintStream, printer) =
+      Interpreter.initPrinters(outputStream, errorStream)
+
+    val interp: Interpreter = new Interpreter(
+      printer,
+      storageBackend,
+      predef,
+      Seq(),
+      wd
+    )
+    interp
+  }
   def run(replArgs: Bind[_]*) = {
     val repl = instantiateRepl(replArgs)
-
-    APIHolder.initBridge(
-      repl.interp.evalClassloader,
-      "ammonite.frontend.ReplBridge",
-      new ReplApiImpl(
-        repl.interp,
-        repl.frontEnd().width,
-        repl.frontEnd().height,
-        repl.colors,
-        repl.prompt,
-        repl.history,
-        new SessionApiImpl(repl.interp.eval)
-      )
-    )
-
     repl.run()
   }
 
@@ -97,15 +92,16 @@ case class Main(predef: String = "",
                 args: Seq[String],
                 kwargs: Seq[(String, String)]): Res[Imports] = {
 
-    val repl = instantiateRepl()
-    main.Scripts.runScript(wd, path, repl, args, kwargs)
+    val interp = instantiateInterpreter()
+    main.Scripts.runScript(wd, path, interp, args, kwargs)
   }
 
   /**
     * Run a snippet of code
     */
   def runCode(code: String) = {
-    instantiateRepl().interp.interpApi.load(code)
+    val interp = instantiateInterpreter()
+    interp.interpApi.load(code)
   }
 }
 

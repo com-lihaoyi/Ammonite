@@ -14,12 +14,12 @@ import fastparse.Utils._
 object Scripts {
   def runScript(wd: Path,
                 path: Path,
-                repl: ammonite.main.Repl,
+                interp: ammonite.interp.Interpreter,
                 args: Seq[String],
                 kwargs: Seq[(String, String)]) = {
     val (pkg, wrapper) = Util.pathToPackageWrapper(path, wd)
     for{
-      (imports, wrapperHashes) <- repl.interp.processModule(
+      (imports, wrapperHashes) <- interp.processModule(
         ImportHook.Source.File(path),
         Util.normalizeNewlines(read(path)),
         wrapper,
@@ -43,7 +43,7 @@ object Scripts {
       routeClsName = wrapperHashes.last._1
 
       routesCls =
-        repl.interp
+        interp
           .eval
           .frames
           .head

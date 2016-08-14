@@ -1,6 +1,6 @@
 package ammonite.interp
 
-import java.io.File
+import java.io.{File, OutputStream, PrintStream}
 
 import org.apache.ivy.plugins.resolver.RepositoryResolver
 
@@ -26,7 +26,6 @@ import scala.util.Try
  */
 class Interpreter(val printer: Printer,
                   val storage: Storage,
-                  history: => History,
                   val predef: String,
                   customPredefs: Seq[(String, Name)],
                   val wd: Path)
@@ -690,5 +689,21 @@ object Interpreter{
     Name(wrapperName.raw + (if (wrapperIndex == 1) "" else "_" + wrapperIndex))
   }
 
+  def initPrinters(output: OutputStream, error: OutputStream) = {
+    val colors = Ref[Colors](Colors.Default)
+    val printStream = new PrintStream(output, true)
+    val errorPrintStream = new PrintStream(error, true)
 
+
+    def printlnWithColor(color: fansi.Attrs, s: String) = {
+      Seq(color(s).render, newLine).foreach(errorPrintStream.print)
+    }
+    val printer = Printer(
+      printStream.print,
+      printlnWithColor(colors().warning(), _),
+      printlnWithColor(colors().error(), _),
+      printlnWithColor(fansi.Attrs.Empty, _)
+    )
+    (colors, printStream, errorPrintStream, printer)
+  }
 }

@@ -10,7 +10,6 @@ object TestUtils {
   def createTestInterp(storage: Storage, predef: String = "") = new Interpreter(
     printer = Printer(_ => (), _ => (), _ => (), _ => ()),
     storage = storage,
-    new History(Vector()),
     predef = predef,
     wd = ammonite.ops.cwd,
     customPredefs = Seq()

@@ -33,7 +33,6 @@ class TestRepl {
     val i = new Interpreter(
       printer,
       storage = new Storage.Folder(tempDir),
-      new History(Vector()),
       predef = ammonite.main.Defaults.predefString + Util.newLine + predef,
       wd = ammonite.ops.cwd,
       customPredefs = Seq()

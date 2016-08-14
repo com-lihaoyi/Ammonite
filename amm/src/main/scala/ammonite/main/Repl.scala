@@ -3,7 +3,7 @@ import acyclic.file
 import java.io.{InputStream, InputStreamReader, OutputStream, PrintStream}
 
 import ammonite.frontend._
-import ammonite.interp.{History, Interpreter, Preprocessor, Storage}
+import ammonite.interp._
 import ammonite.terminal.Filter
 import ammonite.util._
 import ammonite.util.Util.newLine
@@ -21,23 +21,12 @@ class Repl(input: InputStream,
 
   val prompt = Ref("@ ")
 
-  val colors = Ref[Colors](Colors.Default)
   val frontEnd = Ref[FrontEnd](AmmoniteFrontEnd(Filter.empty))
 
-  val printStream = new PrintStream(output, true)
-  val errorPrintStream = new PrintStream(error, true)
   var history = new History(Vector())
 
-  def printlnWithColor(color: fansi.Attrs, s: String) = {
-    Seq(color(s).render, newLine).foreach(errorPrintStream.print)
-  }
-  val printer = Printer(
-    printStream.print,
-    printlnWithColor(colors().warning(), _),
-    printlnWithColor(colors().error(), _),
-    printlnWithColor(fansi.Attrs.Empty, _)
-  )
-
+  val (colors, printStream, errorPrintStream, printer) =
+    Interpreter.initPrinters(output, error)
 
   val hardcodedPredef =
     "import ammonite.frontend.ReplBridge.value.{pprintConfig, derefPPrint}"
@@ -53,7 +42,6 @@ class Repl(input: InputStream,
   val interp: Interpreter = new Interpreter(
     printer,
     storage,
-    history,
     predef,
     Seq(
       (hardcodedPredef, Name("HardcodedPredef")),
@@ -61,6 +49,21 @@ class Repl(input: InputStream,
     ),
     wd
   )
+
+  APIHolder.initBridge(
+    interp.evalClassloader,
+    "ammonite.frontend.ReplBridge",
+    new ReplApiImpl(
+      interp,
+      frontEnd().width,
+      frontEnd().height,
+      colors,
+      prompt,
+      history,
+      new SessionApiImpl(interp.eval)
+    )
+  )
+
 
   val reader = new InputStreamReader(input)
 
