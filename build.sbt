@@ -47,7 +47,7 @@ val sharedSettings = Seq(
   addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.4"),
   ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) },
   parallelExecution in Test := !scalaVersion.value.contains("2.10"),
-  (unmanagedSources in Compile) += baseDirectory.value/".."/"project"/"Constants.scala",
+  (unmanagedSources in Compile) += (baseDirectory in ThisBuild).value/"project"/"Constants.scala",
   mappings in (Compile, packageSrc) += {
     (baseDirectory.value/".."/"project"/"Constants.scala") -> "Constants.scala"
   },
@@ -147,6 +147,7 @@ lazy val amm = project
   )
 
 lazy val ammUtil = project
+  .in(file("amm/util"))
   .dependsOn(ops)
   .settings(
     macroSettings,
@@ -162,6 +163,7 @@ lazy val ammUtil = project
 
 
 lazy val ammRuntime = project
+  .in(file("amm/runtime"))
   .dependsOn(ops, ammUtil)
   .settings(
     macroSettings,
@@ -177,6 +179,7 @@ lazy val ammRuntime = project
 
 
 lazy val ammInterp = project
+  .in(file("amm/interp"))
   .dependsOn(ops, ammUtil, ammRuntime)
   .settings(
     macroSettings,
@@ -193,6 +196,7 @@ lazy val ammInterp = project
 
 
 lazy val ammRepl = project
+  .in(file("amm/repl"))
   .dependsOn(terminal, ammUtil, ammRuntime, ammInterp)
   .settings(
     macroSettings,

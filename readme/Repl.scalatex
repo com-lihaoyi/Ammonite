@@ -430,7 +430,7 @@
           by default and can be accessed directly by default to control the
           console.
 
-        @hl.ref('ammRepl/'src/'main/'scala/'ammonite/'repl/"ReplAPI.scala", "trait ReplAPI", "// End of ReplAPI")
+        @hl.ref('amm/'repl/'src/'main/'scala/'ammonite/'repl/"ReplAPI.scala", "trait ReplAPI", "// End of ReplAPI")
 
         @p
           All of these are also available as part of the @hl.scala{repl} object
@@ -734,7 +734,7 @@
         By default, all the values you're seeing here with the @code{()} after
         them are @hl.scala{Ref}s, defined as
 
-      @hl.ref('ammUtil/'src/'main/'scala/'ammonite/'util/"Model.scala", "trait StableRef", "object Ref")
+      @hl.ref('amm/'util/'src/'main/'scala/'ammonite/'util/"Model.scala", "trait StableRef", "object Ref")
 
       @p
         As you can see from the signature, you can basically interact with the

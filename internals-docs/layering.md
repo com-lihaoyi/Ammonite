@@ -5,23 +5,22 @@ The Ammonite codebase is laid out in the following modules, with arrows
 representing dependencies:
 
 ```
-            +-- ammRuntime <----------------+          +---------- shell
-            |        ^                      |          |
-            |        |                      |          |
-            |        +-----+                |          |
-            |               |               |          |
- ammUtil <--+--------- ammCompiler <--------+-- amm <--+---------- sshd
-            |               ^               |
-            |               |               |
-            |               +-----+         |
-            |                     |         |
-            +------------------- ammRepl <--+
+             +-- amm/runtime <----------------+          +---------- shell
+             |        ^                       |          |
+             |        |                       |          |
+             |        +-----+                 |          |
+             |               |                |          |
+ amm/util <--+--------- amm/interp <--------+-- amm <--+---------- sshd
+             |               ^                |
+             |               |                |
+             |               +-----+          |
+             |                     |          |
+             +------------------- amm/repl <--+
                                   |
                                   |
                                   |
                                   |
                    terminal <-----+
-
 ```
 
 `amm` is the entry point for the "main" Ammonite REPL. Internally it is
@@ -29,21 +28,21 @@ modularized into submodules to help maintain the layering, and e.g. avoid
 accidental use of unnecessary APIs (and paying their classloading/initialization
 cost) in the core codepaths.
 
-- `ammUtil`: basic data-structures and logic common throughout the codebase
+- `amm/util`: basic data-structures and logic common throughout the codebase
 
-- `ammRuntime`: everything necessary to run an Ammonite Scala Script that has
+- `amm/runtime`: everything necessary to run an Ammonite Scala Script that has
   already been compiled and cached. This code is the "critical path" for using
   Ammonite to run slow-changing scripts (i.e. most of them) and should be fast
   and without heavy dependencies like `scala-compiler`. Only provides a core
   `InterpAPI` for scripts to call, and is without the rich `ReplAPI` for use
   in the REPL
 
-- `ammCompiler`: everything necessary to run an Ammonite Scala Script that
+- `amm/interp`: everything necessary to run an Ammonite Scala Script that
   has *not* been compiled and cached; includes `scala-compiler` and `fastparse`
   and all the code necessary to preprocess Scala source code and compile it
   into Java bytecode. Does not contain any REPL-specific functionality
 
-- `ammRepl`: everything necessary to run an Ammonite REPL that takes in stdin
+- `amm/repl`: everything necessary to run an Ammonite REPL that takes in stdin
   and prints to stdout; includes JLine, `ammonite-terminal`, REPL-specific
   `ReplAPI`s, and other code specific to interactive REPL work
 
