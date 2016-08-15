@@ -22,7 +22,6 @@ import scala.reflect.io.VirtualDirectory
  */
 class Interpreter(val printer: Printer,
                   val storage: Storage,
-                  val predef: String,
                   customPredefs: Seq[(String, Name)],
                   extraBridges: Interpreter => Seq[(String, AnyRef)],
                   val wd: Path)
@@ -99,7 +98,6 @@ class Interpreter(val printer: Printer,
   ))
 
   val predefs = customPredefs ++ Seq(
-    (predef, Name("Predef")),
     (storage.loadPredef, Name("LoadedPredef"))
   )
 
@@ -131,8 +129,6 @@ class Interpreter(val printer: Printer,
         throw new RuntimeException("Error during Predef: " + msg, ex)
     }
   }
-
-  pprint.log(predefImports)
 
   reInit()
 
@@ -261,8 +257,7 @@ class Interpreter(val printer: Printer,
                    printer: Printer,
                    fileName: String,
                    indexedWrapperName: Name): Res[Evaluated] = {
-    pprint.log(processed.code)
-    new Exception().printStackTrace()
+
     for{
       _ <- Catching{ case e: ThreadDeath => Evaluator.interrupted(e) }
       (classFiles, newImports) <- compileClass(
@@ -346,8 +341,6 @@ class Interpreter(val printer: Printer,
                     pkgName: Seq[Name],
                     autoImport: Boolean,
                     extraCode: String): Res[(Imports, Seq[(String, String)])] = {
-    pprint.log(source)
-    pprint.log(code)
     val tag = Interpreter.cacheTag(
       code, Nil, eval.frames.head.classloader.classpathHash
     )

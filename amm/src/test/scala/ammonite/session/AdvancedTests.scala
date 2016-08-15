@@ -78,11 +78,11 @@ object AdvancedTests extends TestSuite{
     'predefSettings{
       val check2 = new TestRepl{
         override def predef = """
-          interp.compiler.settings.Xexperimental.value = true
+          repl.compiler.settings.Xexperimental.value = true
         """
       }
       check2.session("""
-        @ interp.compiler.settings.Xexperimental.value
+        @ repl.compiler.settings.Xexperimental.value
         res0: Boolean = true
       """)
 
@@ -313,7 +313,7 @@ object AdvancedTests extends TestSuite{
           override def predef = read! dir/"PredefLoadModule.sc"
         }
         c2.session("""
-          @ val previouslyLoaded = predefDefinedValue
+          @ val previouslyLoaded = 1337
           previouslyLoaded: Int = 1337
         """)
       }

@@ -67,14 +67,18 @@ case class Main(predef: String = "",
   }
 
   def instantiateInterpreter() = {
+    val augmentedPredef = Main.maybeDefaultPredef(defaultPredef, Defaults.predefString)
+
     val (colors, printStream, errorPrintStream, printer) =
       Interpreter.initPrinters(outputStream, errorStream)
 
     val interp: Interpreter = new Interpreter(
       printer,
       storageBackend,
-      predef,
-      Seq(),
+      Seq(
+        augmentedPredef -> Name("defaultPredef"),
+        predef -> Name("predef")
+      ),
       _ => Seq(),
       wd
     )

@@ -10,10 +10,12 @@ object TestUtils {
   def createTestInterp(storage: Storage, predef: String = "") = new Interpreter(
     printer = Printer(_ => (), _ => (), _ => (), _ => ()),
     storage = storage,
-    predef = predef,
     wd = ammonite.ops.cwd,
     // Provide a custom predef so we can verify in tests that the predef gets cached
-    customPredefs = Seq("val customLolz = 1" -> Name("custom")),
+    customPredefs = Seq(
+      predef -> Name("predef"),
+      "val customLolz = 1" -> Name("customPredef")
+    ),
     extraBridges = _ => Seq()
   )
 }

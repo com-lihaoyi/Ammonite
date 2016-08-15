@@ -35,9 +35,12 @@ class TestRepl {
     lazy val i: Interpreter = new Interpreter(
       printer,
       storage = new Storage.Folder(tempDir),
-      predef = Repl.pprintPredef + Util.newLine + ammonite.main.Defaults.predefString + Util.newLine + predef,
       wd = ammonite.ops.cwd,
-      customPredefs = Seq(),
+      customPredefs = Seq(
+        Repl.pprintPredef -> Name("pprintPredef"),
+        ammonite.main.Defaults.predefString -> Name("defaultPredef"),
+        predef -> Name("testPredef")
+      ),
       extraBridges = i => Seq(
         "ammonite.frontend.ReplBridge" ->
         new ReplApiImpl(

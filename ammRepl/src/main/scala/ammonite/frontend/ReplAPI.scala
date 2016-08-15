@@ -9,16 +9,12 @@ import pprint.{Config, PPrint, PPrinter, TPrintColors}
 import scala.collection.mutable
 import scala.reflect.runtime.universe._
 import acyclic.file
-import ammonite.interp.{APIHolder, Frame, History}
+import ammonite.interp.{APIHolder, Frame, History, ReplExit}
 
 import scala.util.control.ControlThrowable
 
 
 
-/**
- * Thrown to exit the REPL cleanly
- */
-case class ReplExit(value: Any) extends ControlThrowable
 
 trait ReplAPI {
   /**

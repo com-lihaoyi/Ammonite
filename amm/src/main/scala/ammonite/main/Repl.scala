@@ -44,10 +44,10 @@ class Repl(input: InputStream,
   val interp: Interpreter = new Interpreter(
     printer,
     storage,
-    predef,
     Seq(
       (Repl.pprintPredef, Name("HardcodedPredef")),
-      (argString, Name("ArgsPredef"))
+      (argString, Name("ArgsPredef")),
+      (predef, Name("predef"))
     ),
     i => Seq("ammonite.frontend.ReplBridge" -> new ReplApiImpl(
       i,

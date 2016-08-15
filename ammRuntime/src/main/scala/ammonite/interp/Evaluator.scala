@@ -120,9 +120,9 @@ object Evaluator{
       // Interrupted during evaluation
       case Ex(_: InvEx, e: ThreadDeath)       =>  interrupted(e)
 
-      case Ex(_: InvEx, _: InitEx, userEx@_*) =>   Res.Exception(userEx(0), "")
-      case Ex(_: InvEx, userEx@_*)            =>   Res.Exception(userEx(0), "")
-      case Ex(userEx@_*)                      =>   Res.Exception(userEx(0), "")
+      case Ex(_: InvEx, _: InitEx, userEx@_*) => Res.Exception(userEx(0), "")
+      case Ex(_: InvEx, userEx@_*)            => Res.Exception(userEx(0), "")
+      case Ex(userEx@_*)                      => Res.Exception(userEx(0), "")
     }
 
     def processLine(classFiles: Util.ClassFiles,
