@@ -305,5 +305,5 @@ lazy val tested = project
 
 lazy val published = project
   .in(file("target/published"))
-  .aggregate(ops, shell, terminal, amm, sshd)
+  .aggregate(ops, shell, terminal, amm, sshd, ammUtil, ammRuntime, ammInterp, ammRepl)
   .settings(dontPublishSettings)
