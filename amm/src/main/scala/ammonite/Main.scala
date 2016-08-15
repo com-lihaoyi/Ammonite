@@ -2,10 +2,10 @@ package ammonite
 
 import java.io.{File, InputStream, OutputStream}
 
-import ammonite.frontend.{ReplApiImpl, SessionApiImpl}
 import ammonite.ops._
-import ammonite.interp.{APIHolder, Interpreter, Storage}
-import ammonite.main.{Defaults, Repl}
+import ammonite.interp.{Interpreter, Storage}
+import ammonite.main.Defaults
+import ammonite.frontend.Repl
 import ammonite.util._
 import ammonite.util.Util.newLine
 

@@ -2,7 +2,6 @@ package ammonite.frontend
 
 import java.io.{InputStream, OutputStream}
 
-import ammonite._
 import fastparse.core.Parsed
 import jline.console.{ConsoleReader, completer}
 import acyclic.file

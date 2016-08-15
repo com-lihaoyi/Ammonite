@@ -1,8 +1,8 @@
 package ammonite.interp
 
 import java.net.{URL, URLClassLoader}
-import java.nio.{ByteBuffer, file}
-
+import java.nio.ByteBuffer
+import acyclic.file
 import ammonite.ops._
 import ammonite.util.{Imports, Util}
 
@@ -53,7 +53,7 @@ object SpecialClassLoader{
       all
     }
 
-    def findMtimes(d: file.Path): Seq[(Path, Long)] = {
+    def findMtimes(d: java.nio.file.Path): Seq[(Path, Long)] = {
       def skipSuspicious(path: Path) = {
         simpleNameRegex.findPrefixOf(path.last) == Some(path.last)
       }
@@ -120,7 +120,7 @@ class SpecialClassLoader(parent: ClassLoader, parentSignature: Seq[(Path, Long)]
   }
 
   private def jarSignature(url: URL) = {
-    val path = Path(file.Paths.get(url.toURI()).toFile(), root)
+    val path = Path(java.nio.file.Paths.get(url.toURI()).toFile(), root)
     path -> path.mtime.toMillis
   }
 

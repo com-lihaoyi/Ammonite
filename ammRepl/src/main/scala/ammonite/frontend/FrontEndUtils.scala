@@ -1,11 +1,6 @@
 package ammonite.frontend
-
-import java.io.OutputStreamWriter
-
-import ammonite.terminal.LazyList
-
 import scala.annotation.tailrec
-
+import acyclic.file
 import ammonite.util.Util.newLine
 /**
  * Created by haoyi on 8/29/15.

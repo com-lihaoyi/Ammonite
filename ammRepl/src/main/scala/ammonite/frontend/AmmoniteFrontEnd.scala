@@ -4,12 +4,9 @@ import java.io.{InputStream, OutputStream, OutputStreamWriter}
 
 import ammonite.terminal.filters._
 import GUILikeFilters.SelectionFilter
-import ammonite.terminal.LazyList.~:
 import ammonite.terminal._
 import fastparse.core.Parsed
-
-import scala.annotation.tailrec
-import Filter._
+import acyclic.file
 import ammonite.util.{Colors, Res}
 import ammonite.interp.Parsers
 case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEnd{

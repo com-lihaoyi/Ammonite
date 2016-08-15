@@ -1,4 +1,4 @@
-load.ivy("com.lihaoyi" %% "ammonite-shell" % ammonite.Constants.version)
+interp.load.ivy("com.lihaoyi" %% "ammonite-shell" % ammonite.Constants.version)
 @
 val shellSession = ammonite.shell.ShellSession()
 import shellSession._

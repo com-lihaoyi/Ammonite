@@ -1,8 +1,8 @@
 package ammonite
 
 import ammonite.frontend.{ReplApiImpl, SessionApiImpl}
-import ammonite.interp.{APIHolder, History, Interpreter, Storage}
-import ammonite.main.Repl
+import ammonite.interp.{History, Interpreter, Storage}
+import ammonite.frontend.Repl
 import ammonite.util._
 import utest.asserts._
 

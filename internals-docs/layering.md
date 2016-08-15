@@ -1,24 +1,51 @@
 Layering
 ========
 
+The Ammonite codebase is laid out in the following modules, with arrows
+representing dependencies:
+
+```
+            +-- ammRuntime <----------------+          +---------- shell
+            |        ^                      |          |
+            |        |                      |          |
+            |        +-----+                |          |
+            |               |               |          |
+ ammUtil <--+--------- ammCompiler <--------+-- amm <--+---------- sshd
+            |               ^               |
+            |               |               |
+            |               +-----+         |
+            |                     |         |
+            +------------------- ammRepl <--+
+                                  |
+                                  |
+                                  |
+                                  |
+                   terminal <-----+
+
+```
+
+
 There are many classes involved in the Ammonite REPL that can conceivably be
 thought of as "the thing which runs your code". This diagram roughly breaks
 down the relationship between these classes:
 
 ```
-        Main
-         |
-         |
-         |
-        Repl-------------
-         |               |
-         |              FrontEnd
-         |
-        Interpreter-----------------------------------
-         |               |              |             |
-         |              Compiler       Pressy        Preprocessor
-         |
-        Evaluator
+amm:             ----- Main
+                |       |
+                |       |
+                |       |
+                |       v
+ammRepl         |      Repl ------------
+                |       |               |
+                |       |               v
+                |       |              FrontEnd
+                |       v
+ammCompiler:     ----> Interpreter ----------------------------------
+                        |               |              |             |
+                        |               v              v             v
+                        |              Compiler       Pressy        Preprocessor
+                        v
+ammRuntime:            Evaluator
 ```
 
 The distribution of responsibilities is

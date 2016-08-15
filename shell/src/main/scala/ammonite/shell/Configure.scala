@@ -1,6 +1,6 @@
 package ammonite.shell
 
-import ammonite.interp.ReplAPI
+import ammonite.frontend.ReplAPI
 
 /**
  * Created by haoyi on 9/1/15.

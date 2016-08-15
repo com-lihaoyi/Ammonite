@@ -12,7 +12,7 @@ import acyclic.file
 import ammonite.interp.{APIHolder, Frame, History, ReplExit}
 
 import scala.util.control.ControlThrowable
-
+import acyclic.file
 
 
 

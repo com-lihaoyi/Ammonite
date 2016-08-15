@@ -1,6 +1,6 @@
 
 package ammonite.main
-
+import acyclic.file
 import ammonite.util.Util
 
 /**

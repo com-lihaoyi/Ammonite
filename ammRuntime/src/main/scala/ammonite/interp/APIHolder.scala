@@ -1,5 +1,5 @@
 package ammonite.interp
-
+import acyclic.file
 class APIHolder[T >: Null <: AnyRef] {
   var value0: T = null
   implicit lazy val value = value0

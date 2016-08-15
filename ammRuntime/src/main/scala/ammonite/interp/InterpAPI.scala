@@ -3,7 +3,7 @@ package ammonite.interp
 import ammonite.ops._
 import ammonite.tools.Resolver
 import ammonite.util.Ref
-
+import acyclic.file
 import scala.util.control.ControlThrowable
 
 

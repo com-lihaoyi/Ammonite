@@ -7,7 +7,7 @@ import ammonite.ops.Path
 import ammonite.sshd.util.Environment
 import ammonite.util.{Bind, Ref}
 import ammonite.interp.Storage
-import ammonite.main.Repl
+import ammonite.frontend.Repl
 
 import scala.language.postfixOps
 
