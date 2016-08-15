@@ -20,6 +20,7 @@ import scala.reflect.NameTransformer.encode
  */ 
 trait Storage{
   def loadPredef: String
+  def loadSharedPredef: String
   val fullHistory: StableRef[History]
   val ivyCache: StableRef[IvyMap]
   def compileCacheSave(path: String, tag: String, data: CompileCache): Unit
@@ -38,7 +39,9 @@ trait Storage{
 object Storage{
   case class InMemory() extends Storage{
     var predef = ""
+    var sharedPredef = ""
     def loadPredef = predef
+    def loadSharedPredef = sharedPredef
 
     var _history = new History(Vector())
     val fullHistory = new StableRef[History]{
@@ -97,8 +100,9 @@ object Storage{
   }
 
 
-  class Folder(val dir: Path) extends Storage{
-    val predef = dir/"predef.sc"
+  class Folder(val dir: Path, isRepl: Boolean = true) extends Storage{
+    def predef = if (isRepl) dir/"predef.sc" else dir/"predefScript.sc"
+    def predefShared = dir/"predefShared.sc"
     // Each version puts its cache in a separate folder, to bust caches
     // on every version bump; otherwise binary-incompatible changes to
     // ReplAPI/Preprocessor/ammonite-ops will cause scripts to fail after
@@ -247,6 +251,11 @@ object Storage{
 
     def loadPredef = try{
       read(predef)
+    } catch {
+      case e: java.nio.file.NoSuchFileException => ""
+    }
+    def loadSharedPredef = try{
+      read(predefShared)
     } catch {
       case e: java.nio.file.NoSuchFileException => ""
     }

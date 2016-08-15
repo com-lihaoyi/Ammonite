@@ -217,40 +217,36 @@ object Main{
       else f
     }
     for(c <- replParser.parse(before, Main())) ifContinually(continually){
-      val preTiming = System.nanoTime()
-
-      {
-        val main = Main(
-          c.predef,
-          c.defaultPredef,
-          predefFile match {
-            case None => new Storage.Folder(ammoniteHome.getOrElse(Defaults.ammoniteHome))
-            case Some(pf) =>
-              new Storage.Folder(ammoniteHome.getOrElse(Defaults.ammoniteHome)) {
-                override val predef = pf
-              }
+      def main(isRepl: Boolean) = Main(
+        c.predef,
+        c.defaultPredef,
+        new Storage.Folder(ammoniteHome.getOrElse(Defaults.ammoniteHome), isRepl) {
+          override def predef = predefFile match {
+            case None => super.predef
+            case Some(pf) => pf
           }
-        )
-        (fileToExecute, codeToExecute) match {
-          case (None, None) => println("Loading..."); main.run()
-          case (Some(path), None) =>
-            main.runScript(path, passThroughArgs, kwargs, replApi) match {
-              case Res.Failure(exOpt, msg) =>
-                Console.err.println(msg)
-                System.exit(1)
-              case Res.Exception(ex, s) =>
-                val trace = ex.getStackTrace
-                val i = trace.indexWhere(_.getMethodName == "$main") + 1
-                ex.setStackTrace(trace.take(i))
-                throw ex
-              case Res.Success(_) =>
-              // do nothing on success, everything's already happened
-            }
-
-          case (None, Some(code)) => main.runCode(code, replApi)
-
         }
+      )
+      (fileToExecute, codeToExecute) match {
+        case (None, None) => println("Loading..."); main(true).run()
+        case (Some(path), None) =>
+          main(false).runScript(path, passThroughArgs, kwargs, replApi) match {
+            case Res.Failure(exOpt, msg) =>
+              Console.err.println(msg)
+              System.exit(1)
+            case Res.Exception(ex, s) =>
+              val trace = ex.getStackTrace
+              val i = trace.indexWhere(_.getMethodName == "$main") + 1
+              ex.setStackTrace(trace.take(i))
+              throw ex
+            case Res.Success(_) =>
+            // do nothing on success, everything's already happened
+          }
+
+        case (None, Some(code)) => main(false).runCode(code, replApi)
+
       }
+
     }
   }
 

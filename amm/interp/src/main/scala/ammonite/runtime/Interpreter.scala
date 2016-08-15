@@ -105,6 +105,7 @@ class Interpreter(val printer: Printer,
   ))
 
   val predefs = bridgePredefs ++ customPredefs ++ Seq(
+    Name("SharedPredef") -> storage.loadSharedPredef,
     Name("LoadedPredef") -> storage.loadPredef
   )
 

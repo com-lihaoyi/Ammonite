@@ -31,9 +31,12 @@ The Predef itself is made of several parts:
 
 - The assignment of any arguments to the `debug` entrypoint to local `val`s
 
-- Any predef file, which defaults `~/.ammonite/predef.sc`, but can be set
-  manually via `--predef-file ...` at the CLI or subclassing the `Storage`
-  object passed into the API
+- Any predef file, which defaults `~/.ammonite/predef.sc` for the REPL and
+  `~/.ammonite/predefScript.sc` for scripts, but can be set manually via
+  `--predef-file ...`. This split allows you to e.g. put REPL-specific setup
+  code inside `predef.sc`, without it messing up scripts. Both the REPL and
+  scripts also run `~/.ammonite/predefShared.sc` for setup code you want to
+  apply to both
 
 Unlike script files, anything that is run in the predef is automatically made
 available to every executed script without needing to `load.module` or import 

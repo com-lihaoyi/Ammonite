@@ -835,6 +835,11 @@
           use @hl.scala{import interp._, repl._} to bring everything into scope
           again.
         @li
+          @code{predef.sc} now only applies to the interactive REPL. If you
+          want predef code that applies to scripts use @code{predefScript.sc},
+          or if you want predef code that applies to both you can use
+          @code{predefShared.sc}.
+        @li
           Added a version of @sect.ref{desugar} to Scala 2.10.x. It doesn't
           print things as prettily/accurately as the 2.11.x version, but it's
           better than nothing.
