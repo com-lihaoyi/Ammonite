@@ -14,6 +14,8 @@ val allVersions = Seq(
   "2.11.3", "2.11.4", "2.11.5", "2.11.6", "2.11.7", "2.11.8"
 )
 
+val latestVersions = Set("2.10.5", "2.11.8")
+
 val buildVersion =
   if (sys.env("TRAVIS_TAG") == "") s"COMMIT-${getGitHash()}"
   else sys.env("TRAVIS_TAG")
@@ -59,7 +61,7 @@ def publishSigned() = {
 
 
   for (version <- allVersions) {
-    if (Set("2.10.5", "2.11.8").contains(version)) {
+    if (latestVersions.contains(version)) {
       %sbt("++" + version, "published/publishSigned")
     }else {
       %sbt("++" + version, "amm/publishSigned", "sshd/publishSigned")
@@ -148,7 +150,10 @@ def executable() = {
       short
     }
   }else{
-    println("MISC COMMIT: Not Publishing Executable")
+    println("MISC COMMIT: generating executable but not publishing")
+    for (version <- latestVersions) {
+      %sbt("++" + version, "amm/test:assembly")
+    }
   }
 }
 
@@ -175,7 +180,8 @@ def artifacts() = {
   }else{
     println("MISC COMMIT: Compiling all Scala code across versions for verification")
     for (version <- allVersions) {
-      %sbt("++" + version, "published/compile")
+      %sbt("++" + version, "published/package")
+      %sbt("++" + version, "published/packageSrc")
     }
   }
 

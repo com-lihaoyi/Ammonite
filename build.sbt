@@ -49,7 +49,7 @@ val sharedSettings = Seq(
   parallelExecution in Test := !scalaVersion.value.contains("2.10"),
   (unmanagedSources in Compile) += (baseDirectory in ThisBuild).value/"project"/"Constants.scala",
   mappings in (Compile, packageSrc) += {
-    (baseDirectory.value/".."/"project"/"Constants.scala") -> "Constants.scala"
+    ((baseDirectory in ThisBuild).value/".."/"project"/"Constants.scala") -> "Constants.scala"
   },
   libraryDependencies ++= Seq(
     "com.lihaoyi" %% "acyclic" % "0.1.4" % "provided"
