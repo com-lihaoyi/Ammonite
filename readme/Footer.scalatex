@@ -815,4 +815,31 @@
         @li
           Scripts without the `.sc` can now be run directly from the command line
           rather than throwing an `IndexOutOfBoundsException`.
-
+        @li
+          Modularized Ammonite's internals; the main module `ammonite` has now
+          been broken into 5 smaller modules for maintainability. This in
+          itself should not be visible to the outside world, but be sure to
+          report any bugs!
+        @li
+          Hygienified the default namespace by avoiding importing all the
+          @sect.ref{Repl API} functions into local scope, instead leaving them
+          inside the @code{repl} object.
+        @li
+          Separated the APIs available from scripts (@code{load.*} and
+          @code{resolvers} in the @code{interp} object)
+          from those available from the REPL (in the @code{repl} object).
+          @code{repl} is not available when running scripts, unless you pass in
+          the @code{--repl-api} flag at the command line.
+        @li
+          If you want to maintain the old behavior, e.g. for backwards-compat,
+          use @hl.scala{import interp._, repl._} to bring everything into scope
+          again.
+        @li
+          Added a version of @sect.ref{desugar} to Scala 2.10.x. It doesn't
+          print things as prettily/accurately as the 2.11.x version, but it's
+          better than nothing.
+        @li
+          Changed the syntax for @hl.scala{import $file} segments outside your
+          current directory from @hl.scala{import $file.`..`.foo} to
+          @hl.scala{import $file.^.foo}. This makes it a lot shorter and
+          mitigates a problems caused by the file-name being too long.
