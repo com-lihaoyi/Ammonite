@@ -160,7 +160,7 @@
         // print banner
         println("Welcome to the XYZ custom REPL!!")
         val scalazVersion = "7.1.1"
-        load.ivy("org.scalaz" %% "scalaz-core" % scalazVersion)
+        interp.load.ivy("org.scalaz" %% "scalaz-core" % scalazVersion)
     
         @@
     

@@ -36,7 +36,7 @@
 
     @hl.scala
       Welcome to the Ammonite Repl
-      @@ load.ivy("org.scalaj" %% "scalaj-http" % "2.2.0")
+      @@ interp.load.ivy("org.scalaj" %% "scalaj-http" % "2.2.0")
       :: loading settings ::
       :: resolving dependencies ::
       ...
@@ -90,7 +90,7 @@
     @p
       Not every website has an API, and not every website is meant to be accessed programmatically. That doesn't mean you can't do it! Using libraries like @lnk("JSoup", "http://jsoup.org/"), you can quickly and easily get the computer to extract useful information from HTML that was meant to humans. Using the Ammonite REPL, you can do it interactively and without needing to set up annoying project scaffolding.
     @hl.scala
-      @@ load.ivy("org.jsoup" % "jsoup" % "1.7.2")
+      @@ interp.load.ivy("org.jsoup" % "jsoup" % "1.7.2")
 
       @@ import org.jsoup._ // import Jsoup
 
@@ -182,7 +182,7 @@
       Apart from writing code, you very often find yourself dealing with documents and spreadsheets of various sorts. This is often rather tedious. Wouldn't it be cool if you could deal with these things programmatically? It turns out that there are open-soure Java libraries such as @lnk("Apache POI", "https://poi.apache.org/") that let you do this, and with the Ammonite-REPL you can quickly and easily load these libraries and get to work on your favorite documents. Here's an example extracting some data from my old Resume, in @code{.docx} format:
 
     @hl.scala
-      @@ load.ivy("org.apache.poi" % "poi-ooxml" % "3.13")
+      @@ interp.load.ivy("org.apache.poi" % "poi-ooxml" % "3.13")
 
       @@ import ammonite.ops._                  // Prepare to deal with some files
       @@ import org.apache.poi.xwpf.usermodel._ // Bring Ms-Word APIs into scope
@@ -244,7 +244,7 @@
       There are also simple libraries like @lnk("Thumbnailator", "https://github.com/coobird/thumbnailator") if you're doing basic things like renaming/resizing/rotating and don't need pixel-per-pixel access. This is an example of using Thumbnailator to resize a folder of images and put them somewhere else:
 
     @hl.scala
-      @@ load.ivy("net.coobird" % "thumbnailator" % "0.4.8")
+      @@ interp.load.ivy("net.coobird" % "thumbnailator" % "0.4.8")
 
       @@ import net.coobird.thumbnailator._
       import net.coobird.thumbnailator._
@@ -284,11 +284,11 @@
       Here's one example of how you can get started using the @lnk("OpenNLP", "http://opennlp.apache.org/") project to do some natural-language processing in just a few minutes. The example was found @lnk("online", "http://www.programcreek.com/2012/05/opennlp-tutorial/#sentence detector"), and shows how to extract english names from a raw @code{String} using NLP:
 
     @hl.scala
-      @@ load.ivy("org.apache.opennlp" % "opennlp-tools" % "1.6.0") // load OpenNLP
+      @@ interp.load.ivy("org.apache.opennlp" % "opennlp-tools" % "1.6.0") // load OpenNLP
 
       @@ // Turns out you need training data, use Scalaj-HTTP to download it
 
-      @@ load.ivy("org.scalaj" %% "scalaj-http" % "2.2.0")
+      @@ interp.load.ivy("org.scalaj" %% "scalaj-http" % "2.2.0")
 
       @@ val tokenDataUrl = "http://opennlp.sourceforge.net/models-1.5/en-token.bin"
 
