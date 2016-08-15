@@ -19,11 +19,11 @@ object BuiltinTests extends TestSuite{
 
         @ // Ammonite on Linux/OSX and JLineWindows on Windows
 
-        @ repl.frontEnd() = ammonite.frontend.FrontEnd.JLineUnix
+        @ repl.frontEnd() = ammonite.repl.FrontEnd.JLineUnix
 
-        @ repl.frontEnd() = ammonite.frontend.FrontEnd.JLineWindows
+        @ repl.frontEnd() = ammonite.repl.FrontEnd.JLineWindows
 
-        @ repl.frontEnd() = ammonite.frontend.AmmoniteFrontEnd()
+        @ repl.frontEnd() = ammonite.repl.AmmoniteFrontEnd()
 
         @ // Changing the colors used by Ammonite; all at once:
 

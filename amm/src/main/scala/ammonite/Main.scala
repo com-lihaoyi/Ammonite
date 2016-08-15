@@ -3,9 +3,9 @@ package ammonite
 import java.io.{File, InputStream, OutputStream}
 
 import ammonite.ops._
-import ammonite.interp.{Interpreter, Storage}
+import ammonite.runtime.{Interpreter, Storage}
 import ammonite.main.Defaults
-import ammonite.frontend.Repl
+import ammonite.repl.Repl
 import ammonite.util._
 import ammonite.util.Util.newLine
 

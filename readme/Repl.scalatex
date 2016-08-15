@@ -430,7 +430,7 @@
           by default and can be accessed directly by default to control the
           console.
 
-        @hl.ref('ammRepl/'src/'main/'scala/'ammonite/'frontend/"ReplAPI.scala", "trait ReplAPI", "// End of ReplAPI")
+        @hl.ref('ammRepl/'src/'main/'scala/'ammonite/'repl/"ReplAPI.scala", "trait ReplAPI", "// End of ReplAPI")
 
         @p
           All of these are also available as part of the @hl.scala{repl} object

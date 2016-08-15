@@ -36,14 +36,15 @@ object Defaults{
     |"""
 
   val predefString = s"""
-    |import ammonite.frontend.ReplBridge.{value => repl}
-    |import ammonite.interp.InterpBridge.{value => interp}
+    |import ammonite.repl.ReplBridge.{value => repl}
+    |import ammonite.runtime.InterpBridge.{value => interp}
     |import ammonite.ops.Extensions.{
     |  $ignoreUselessImports
     |}
-    |import ammonite.tools._
-    |import ammonite.tools.IvyConstructor.{ArtifactIdExt, GroupIdExt}
-    |import ammonite.frontend.ReplBridge.value.{
+    |import ammonite.runtime.tools._
+    |import ammonite.repl.tools._
+    |import ammonite.runtime.tools.IvyConstructor.{ArtifactIdExt, GroupIdExt}
+    |import ammonite.repl.ReplBridge.value.{
     |  Internal => _,
     |  $ignoreUselessImports
     |}

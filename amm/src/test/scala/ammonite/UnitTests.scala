@@ -1,6 +1,6 @@
 package ammonite
 
-import ammonite.frontend.Highlighter
+import ammonite.repl.Highlighter
 import ammonite.main.Router
 import ammonite.main.Router.Result.Error.{InvalidArguments, RedundantArguments, TooManyArguments}
 import ammonite.main.Router.Result.ParamError

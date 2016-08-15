@@ -114,7 +114,7 @@ lazy val terminal = project
 lazy val amm = project
   .dependsOn(
     terminal, ops,
-    ammUtil, ammRuntime, ammCompiler, ammRepl
+    ammUtil, ammRuntime, ammInterp, ammRepl
   )
   .settings(
     macroSettings,
@@ -176,7 +176,7 @@ lazy val ammRuntime = project
   )
 
 
-lazy val ammCompiler = project
+lazy val ammInterp = project
   .dependsOn(ops, ammUtil, ammRuntime)
   .settings(
     macroSettings,
@@ -193,7 +193,7 @@ lazy val ammCompiler = project
 
 
 lazy val ammRepl = project
-  .dependsOn(terminal, ammUtil, ammRuntime, ammCompiler)
+  .dependsOn(terminal, ammUtil, ammRuntime, ammInterp)
   .settings(
     macroSettings,
     sharedSettings,

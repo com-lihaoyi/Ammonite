@@ -1,7 +1,7 @@
 package ammonite
 
 import ammonite.ops._
-import ammonite.tools._
+import ammonite.runtime.tools._
 import utest._
 import ammonite.util.Util.newLine
 
@@ -13,7 +13,7 @@ object ToolsTests extends TestSuite{
     /**
       * Convert the highlighter colors into angle brackets for easy testing
       */
-    implicit val defaultHighlightColor = ammonite.tools.GrepResult.Color(
+    implicit val defaultHighlightColor = ammonite.runtime.tools.GrepResult.Color(
       fansi.Color.Red, fansi.Attrs.Empty
     )
 

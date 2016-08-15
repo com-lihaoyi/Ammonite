@@ -6,8 +6,8 @@ import java.io.{InputStream, OutputStream, PrintStream}
 import ammonite.ops.Path
 import ammonite.sshd.util.Environment
 import ammonite.util.{Bind, Ref}
-import ammonite.interp.Storage
-import ammonite.frontend.Repl
+import ammonite.runtime.Storage
+import ammonite.repl.Repl
 
 import scala.language.postfixOps
 

@@ -4,9 +4,9 @@ import java.io.OutputStreamWriter
 
 import ammonite.terminal._
 import Filter._
-import ammonite.frontend.{FrontEndUtils, Highlighter}
+import ammonite.repl.{FrontEndUtils, Highlighter}
 import ammonite.util.Colors
-import ammonite.interp.Parsers
+import ammonite.runtime.Parsers
 import ammonite.terminal._
 import ammonite.terminal.LazyList.~:
 /**

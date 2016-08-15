@@ -4,7 +4,7 @@ import ammonite.TestUtils._
 import ammonite.ops._
 import ammonite.main.Defaults
 import utest._
-import ammonite.interp.{Storage}
+import ammonite.runtime.{Storage}
 
 object ScriptTests extends TestSuite{
   val tests = TestSuite{

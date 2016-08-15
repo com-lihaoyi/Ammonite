@@ -4,7 +4,7 @@ import java.nio.file.NotDirectoryException
 import java.nio.file.attribute.PosixFilePermission
 
 import ammonite.ops._
-import ammonite.frontend.FrontEndUtils
+import ammonite.repl.FrontEndUtils
 import pprint.{Config, PPrinter, PPrint}
 
 case class ShellSession() extends OpsAPI {
@@ -76,7 +76,7 @@ object PPrints{
     }
 
   implicit val defaultHighlightColor = {
-    ammonite.tools.GrepResult.Color(
+    ammonite.runtime.tools.GrepResult.Color(
       fansi.Color.Blue ++ fansi.Back.Yellow,
       fansi.Color.Yellow
     )

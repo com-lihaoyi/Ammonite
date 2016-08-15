@@ -1,6 +1,6 @@
 package ammonite.main
 import acyclic.file
-import ammonite.interp.ImportHook
+import ammonite.runtime.ImportHook
 import ammonite.main.Router.{ArgSig, EntryPoint}
 import ammonite.ops._
 import ammonite.util.Name.backtickWrap
@@ -14,7 +14,7 @@ import fastparse.Utils._
 object Scripts {
   def runScript(wd: Path,
                 path: Path,
-                interp: ammonite.interp.Interpreter,
+                interp: ammonite.runtime.Interpreter,
                 args: Seq[String],
                 kwargs: Seq[(String, String)]) = {
     val (pkg, wrapper) = Util.pathToPackageWrapper(path, wd)

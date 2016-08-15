@@ -1,8 +1,8 @@
 package ammonite
 
-import ammonite.frontend.{ReplApiImpl, SessionApiImpl}
-import ammonite.interp.{History, Interpreter, Storage}
-import ammonite.frontend.Repl
+import ammonite.repl.{ReplApiImpl, SessionApiImpl}
+import ammonite.runtime.{History, Interpreter, Storage}
+import ammonite.repl.Repl
 import ammonite.util._
 import utest.asserts._
 
@@ -42,7 +42,7 @@ class TestRepl {
         Name("testPredef") -> predef
       ),
       extraBridges = i => Seq(
-        "ammonite.frontend.ReplBridge" ->
+        "ammonite.repl.ReplBridge" ->
         new ReplApiImpl(
           i,
           80,
@@ -88,7 +88,7 @@ class TestRepl {
       // Make sure all non-empty, non-complete command-line-fragments
       // are considered incomplete during the parse
       for (incomplete <- commandText.inits.toSeq.drop(1).dropRight(1)){
-        assert(ammonite.interp.Parsers.split(incomplete.mkString(Util.newLine)) == None)
+        assert(ammonite.runtime.Parsers.split(incomplete.mkString(Util.newLine)) == None)
       }
 
       // Finally, actually run the complete command text through the
@@ -175,7 +175,7 @@ class TestRepl {
     infoBuffer.clear()
     val processed = interp.processLine(
       input,
-      ammonite.interp.Parsers.split(input).get.get.value,
+      ammonite.runtime.Parsers.split(input).get.get.value,
       s"Main$index.sc"
     )
     processed match{

@@ -1,6 +1,6 @@
 package ammonite
 
-import ammonite.interp.{History, Interpreter, Storage}
+import ammonite.runtime.{History, Interpreter, Storage}
 import ammonite.util._
 
 object TestUtils {
