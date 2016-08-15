@@ -10,7 +10,7 @@ representing dependencies:
              |        |                       |          |
              |        +-----+                 |          |
              |               |                |          |
- amm/util <--+--------- amm/interp <--------+-- amm <--+---------- sshd
+ amm/util <--+--------- amm/interp <----------+-- amm <--+---------- sshd
              |               ^                |
              |               |                |
              |               +-----+          |
@@ -60,17 +60,17 @@ amm:             ----- Main
                 |       |
                 |       |
                 |       v
-ammRepl         |      Repl ------------
+amm/repl        |      Repl ------------
                 |       |               |
                 |       |               v
                 |       |              FrontEnd
                 |       v
-ammCompiler:     ----> Interpreter ----------------------------------
+amm/compiler:    ----> Interpreter ----------------------------------
                         |               |              |             |
                         |               v              v             v
                         |              Compiler       Pressy        Preprocessor
                         v
-ammRuntime:            Evaluator
+amm/runtime:           Evaluator
 ```
 
 The distribution of responsibilities is
