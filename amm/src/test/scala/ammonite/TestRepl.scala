@@ -37,9 +37,9 @@ class TestRepl {
       storage = new Storage.Folder(tempDir),
       wd = ammonite.ops.cwd,
       customPredefs = Seq(
-        Repl.pprintPredef -> Name("pprintPredef"),
-        ammonite.main.Defaults.predefString -> Name("defaultPredef"),
-        predef -> Name("testPredef")
+        Name("pprintPredef") -> Repl.pprintPredef,
+        Name("defaultPredef") -> ammonite.main.Defaults.predefString,
+        Name("testPredef") -> predef
       ),
       extraBridges = i => Seq(
         "ammonite.frontend.ReplBridge" ->

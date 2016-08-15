@@ -45,9 +45,9 @@ class Repl(input: InputStream,
     printer,
     storage,
     Seq(
-      (Repl.pprintPredef, Name("HardcodedPredef")),
-      (argString, Name("ArgsPredef")),
-      (predef, Name("predef"))
+      Name("HardcodedPredef") -> Repl.pprintPredef,
+      Name("ArgsPredef") -> argString,
+      Name("predef") -> predef
     ),
     i => Seq("ammonite.frontend.ReplBridge" -> new ReplApiImpl(
       i,

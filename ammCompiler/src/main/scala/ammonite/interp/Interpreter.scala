@@ -22,7 +22,15 @@ import scala.reflect.io.VirtualDirectory
  */
 class Interpreter(val printer: Printer,
                   val storage: Storage,
-                  customPredefs: Seq[(String, Name)],
+                  customPredefs: Seq[(Name, String)],
+                  // Allows you to set up additional "bridges" between the REPL
+                  // world and the outside world, by passing in the full name
+                  // of the `APIHolder` object that will hold the bridge and
+                  // the object that will be placed there. Needs to be passed
+                  // in as a callback rather than run manually later as these
+                  // bridges need to be in place *before* the predef starts
+                  // running, so you can use them predef to e.g. configure
+                  // the REPL before it starts
                   extraBridges: Interpreter => Seq[(String, AnyRef)],
                   val wd: Path)
   extends ImportHook.InterpreterInterface{ interp =>
@@ -98,7 +106,7 @@ class Interpreter(val printer: Printer,
   ))
 
   val predefs = customPredefs ++ Seq(
-    (storage.loadPredef, Name("LoadedPredef"))
+    Name("LoadedPredef") -> storage.loadPredef
   )
 
   // Use a var and a for-loop instead of a fold, because when running
@@ -106,7 +114,7 @@ class Interpreter(val printer: Printer,
   // on `predefImports`, and we should be able to provide the "current" imports
   // to it even if it's half built
   var predefImports = Imports()
-  for( (sourceCode, wrapperName) <- predefs) {
+  for( (wrapperName, sourceCode) <- predefs) {
     val pkgName = Seq(Name("ammonite"), Name("predef"))
 
     processModule(

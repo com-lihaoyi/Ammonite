@@ -76,8 +76,8 @@ case class Main(predef: String = "",
       printer,
       storageBackend,
       Seq(
-        augmentedPredef -> Name("defaultPredef"),
-        predef -> Name("predef")
+        Name("defaultPredef") -> augmentedPredef,
+        Name("predef") -> predef
       ),
       _ => Seq(),
       wd
