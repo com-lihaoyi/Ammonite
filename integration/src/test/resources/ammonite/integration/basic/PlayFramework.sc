@@ -1,9 +1,9 @@
 /**
   * Single-file play framework application!
   */
-load.ivy("com.typesafe.play" %% "play" % "2.5.0")
-load.ivy("com.typesafe.play" %% "play-netty-server" % "2.5.0")
-load.ivy("org.scalaj" %% "scalaj-http" % "2.2.1")
+interp.load.ivy("com.typesafe.play" %% "play" % "2.5.0")
+interp.load.ivy("com.typesafe.play" %% "play-netty-server" % "2.5.0")
+interp.load.ivy("org.scalaj" %% "scalaj-http" % "2.2.1")
 
 @
 

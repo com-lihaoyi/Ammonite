@@ -3,9 +3,9 @@ package ammonite
 import java.io.{File, InputStream, OutputStream}
 
 import ammonite.ops._
-import ammonite.runtime.{Interpreter, Storage}
+import ammonite.runtime.{History, Interpreter, Storage}
 import ammonite.main.Defaults
-import ammonite.repl.Repl
+import ammonite.repl.{Repl, ReplApiImpl, SessionApiImpl}
 import ammonite.util._
 import ammonite.util.Util.newLine
 
@@ -66,11 +66,12 @@ case class Main(predef: String = "",
     )
   }
 
-  def instantiateInterpreter() = {
+  def instantiateInterpreter(replApi: Boolean) = {
     val augmentedPredef = Main.maybeDefaultPredef(defaultPredef, Defaults.predefString)
 
     val (colors, printStream, errorPrintStream, printer) =
       Interpreter.initPrinters(outputStream, errorStream)
+
 
     val interp: Interpreter = new Interpreter(
       printer,
@@ -79,7 +80,21 @@ case class Main(predef: String = "",
         Name("defaultPredef") -> augmentedPredef,
         Name("predef") -> predef
       ),
-      _ => Seq(),
+      i =>
+        if (!replApi) Nil
+        else {
+          val replApi = new ReplApiImpl(
+            i,
+            80,
+            80,
+            colors,
+            Ref(null),
+            Ref(null),
+            new History(Vector.empty),
+            new SessionApiImpl(i.eval)
+          )
+          Seq(("ammonite.repl.ReplBridge", "repl", replApi))
+        },
       wd
     )
     interp
@@ -95,17 +110,18 @@ case class Main(predef: String = "",
     */
   def runScript(path: Path,
                 args: Seq[String],
-                kwargs: Seq[(String, String)]): Res[Imports] = {
+                kwargs: Seq[(String, String)],
+                replApi: Boolean = false): Res[Imports] = {
 
-    val interp = instantiateInterpreter()
+    val interp = instantiateInterpreter(replApi)
     main.Scripts.runScript(wd, path, interp, args, kwargs)
   }
 
   /**
     * Run a snippet of code
     */
-  def runCode(code: String) = {
-    val interp = instantiateInterpreter()
+  def runCode(code: String, replApi: Boolean = false) = {
+    val interp = instantiateInterpreter(replApi)
     interp.interpApi.load(code)
   }
 }
@@ -123,6 +139,7 @@ object Main{
     var passThroughArgs: Seq[String] = Vector.empty
     var predefFile: Option[Path] = None
     var continually = false
+    var replApi = false
     val replParser = new scopt.OptionParser[Main]("ammonite") {
       // Primary arguments that correspond to the arguments of
       // the `Main` configuration object
@@ -167,6 +184,13 @@ object Main{
             |since it lets you hook up a profiler to the long-lived process and
             |see where all the time is being spent.
           """.stripMargin)
+      opt[Unit]("repl-api")
+        .foreach(x => replApi= true)
+        .text(
+          """Lets you run a script with the `repl` object present; this is
+            |normally not available in scripts and only provided in the
+            |interactive REpl
+          """.stripMargin)
 
     }
 
@@ -210,7 +234,7 @@ object Main{
         (fileToExecute, codeToExecute) match {
           case (None, None) => println("Loading..."); main.run()
           case (Some(path), None) =>
-            main.runScript(path, passThroughArgs, kwargs.toSeq) match {
+            main.runScript(path, passThroughArgs, kwargs, replApi) match {
               case Res.Failure(exOpt, msg) =>
                 Console.err.println(msg)
                 System.exit(1)
@@ -223,7 +247,7 @@ object Main{
               // do nothing on success, everything's already happened
             }
 
-          case (None, Some(code)) => main.runCode(code)
+          case (None, Some(code)) => main.runCode(code, replApi)
 
         }
       }

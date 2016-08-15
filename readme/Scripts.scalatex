@@ -142,11 +142,11 @@
 
       @ul
         @li
-          @hl.scala{import $cp} becomes @hl.scala{load.cp}
+          @hl.scala{import $cp} becomes @hl.scala{interp.load.cp}
         @li
-          @hl.scala{import $file} becomes @hl.scala{load.module}
+          @hl.scala{import $file} becomes @hl.scala{interp.load.module}
         @li
-          @hl.scala{import $ivy} becomes @hl.scala{load.ivy}
+          @hl.scala{import $ivy} becomes @hl.scala{interp.load.ivy}
 
       @p
         These are plain-old-Scala-functions that let you pass in a

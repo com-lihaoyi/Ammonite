@@ -1,4 +1,4 @@
 
 println("Test Script")
-println(repl)
+println(interp)
 

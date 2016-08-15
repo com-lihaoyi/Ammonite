@@ -1,20 +1,20 @@
 
-println(repl)
+println(interp)
 println("First Block")
 
 @
 
-println(repl)
+println(interp)
 println("Second Block")
 
 @
 
-println(repl)
+println(interp)
 println("Third Block")
 
 @
 
-println(repl)
+println(interp)
 println("Fourth Block")
 
-val x = repl
+val x = interp

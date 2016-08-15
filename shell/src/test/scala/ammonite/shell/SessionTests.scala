@@ -9,13 +9,16 @@ import utest._
  */
 object SessionTests extends TestSuite{
 
+  val bareSrc =
+    """cwd/'shell/'src/'main/'resources/'ammonite/'shell/"example-predef-bare.sc""""
+
   val tests = TestSuite{
     val check = new TestRepl()
     'workingDir{
       check.session(s"""
         @ import ammonite.ops._
 
-        @ interp.load.module(cwd/'shell/'src/'main/'resources/'ammonite/'shell/"example-predef-bare.sc")
+        @ interp.load.module($bareSrc)
 
         @ val originalWd = wd
 
@@ -46,7 +49,7 @@ object SessionTests extends TestSuite{
       check.session(s"""
         @ import ammonite.ops._
 
-        @ interp.load.module(cwd/'shell/'src/'main/'resources/'ammonite/'shell/"example-predef-bare.sc")
+        @ interp.load.module($bareSrc)
 
         @ import ammonite.shell.PPrints._
 

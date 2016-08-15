@@ -85,7 +85,7 @@ object ProjectTests extends TestSuite{
               @   false
               @ )
 
-              @ resolvers() = resolvers() :+ oss
+              @ interp.resolvers() = interp.resolvers() :+ oss
 
               @ import $ivy.`com.ambiata::mundane:1.2.1-20141230225616-50fc792`
 

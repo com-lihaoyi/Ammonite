@@ -41,9 +41,8 @@ class TestRepl {
         Name("defaultPredef") -> ammonite.main.Defaults.predefString,
         Name("testPredef") -> predef
       ),
-      extraBridges = i => Seq(
-        "ammonite.repl.ReplBridge" ->
-        new ReplApiImpl(
+      extraBridges = { i =>
+        val replApi = new ReplApiImpl(
           i,
           80,
           80,
@@ -53,7 +52,9 @@ class TestRepl {
           new History(Vector()),
           new SessionApiImpl(i.eval)
         )
-      )
+
+        Seq(("ammonite.repl.ReplBridge", "repl", replApi))
+      }
     )
     i.init()
     i

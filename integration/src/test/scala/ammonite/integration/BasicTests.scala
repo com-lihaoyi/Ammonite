@@ -62,8 +62,9 @@ object BasicTests extends TestSuite{
     'shell {
       // make sure you can load the example-predef.sc, have it pull stuff in
       // from ivy, and make use of `cd!` and `wd` inside the executed script.
-      val res = %% bash(
+      val res = %%bash(
         executable,
+        "--repl-api",
         "--predef-file",
         exampleBarePredef,
         "-c",

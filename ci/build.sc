@@ -154,7 +154,9 @@ def executable() = {
 
 @main
 def docs() = {
-  if (isMasterCommit){
+  // Disable doc auto-publishing for now, as the recent modularization means we
+  // need to make significant changes to the readme and that'll time.
+  if (false && isMasterCommit){
     println("MASTER COMMIT: Updating version and publishing to Github Pages")
 
     publishDocs()

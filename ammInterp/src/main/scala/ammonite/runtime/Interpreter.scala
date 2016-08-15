@@ -31,7 +31,7 @@ class Interpreter(val printer: Printer,
                   // bridges need to be in place *before* the predef starts
                   // running, so you can use them predef to e.g. configure
                   // the REPL before it starts
-                  extraBridges: Interpreter => Seq[(String, AnyRef)],
+                  extraBridges: Interpreter => Seq[(String, String, AnyRef)],
                   val wd: Path)
   extends ImportHook.InterpreterInterface{ interp =>
 
@@ -83,16 +83,15 @@ class Interpreter(val printer: Printer,
     )
   }
 
-
-
-  APIHolder.initBridge(
-    evalClassloader,
-    "ammonite.runtime.InterpBridge",
-    interpApi
-  )
-  for ((name, bridge) <- extraBridges(this)){
+  val bridges = extraBridges(this) :+ ("ammonite.runtime.InterpBridge", "interp", interpApi)
+  for ((name, shortName, bridge) <- bridges ){
     APIHolder.initBridge(evalClassloader, name, bridge)
   }
+  // import ammonite.repl.ReplBridge.{value => repl}
+  // import ammonite.runtime.InterpBridge.{value => interp}
+  val bridgePredefs =
+    for ((name, shortName, bridge) <- bridges)
+    yield Name(s"${shortName}Bridge") -> s"import $name.{value => $shortName}"
 
 
   val importHooks = Ref(Map[Seq[String], ImportHook](
@@ -105,7 +104,7 @@ class Interpreter(val printer: Printer,
     Seq("plugin", "cp") -> ImportHook.PluginClasspath
   ))
 
-  val predefs = customPredefs ++ Seq(
+  val predefs = bridgePredefs ++ customPredefs ++ Seq(
     Name("LoadedPredef") -> storage.loadPredef
   )
 

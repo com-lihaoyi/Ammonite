@@ -48,16 +48,19 @@ class Repl(input: InputStream,
       Name("ArgsPredef") -> argString,
       Name("predef") -> predef
     ),
-    i => Seq("ammonite.repl.ReplBridge" -> new ReplApiImpl(
-      i,
-      frontEnd().width,
-      frontEnd().height,
-      colors,
-      prompt,
-      frontEnd,
-      history,
-      new SessionApiImpl(i.eval)
-    )),
+    i => {
+      val replApi = new ReplApiImpl(
+        i,
+        frontEnd().width,
+        frontEnd().height,
+        colors,
+        prompt,
+        frontEnd,
+        history,
+        new SessionApiImpl(i.eval)
+      )
+      Seq(("ammonite.repl.ReplBridge", "repl", replApi))
+    },
     wd
   )
 

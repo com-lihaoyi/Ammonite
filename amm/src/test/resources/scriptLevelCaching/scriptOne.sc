@@ -3,7 +3,7 @@ object test{
 
 import scala.tools.nsc._
 
-val x = repl
+val x = interp
 }
 println(test.x)
 

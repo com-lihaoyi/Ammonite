@@ -1,4 +1,4 @@
-load.ivy("org.spire-math" %% "spire" % "0.10.1")
+interp.load.ivy("org.spire-math" %% "spire" % "0.10.1")
 
 @
 
