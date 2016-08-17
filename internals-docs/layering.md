@@ -55,17 +55,17 @@ thought of as "the thing which runs your code". This diagram roughly breaks
 down the relationship between these classes:
 
 ```
-amm:             ----- Main
-                |       |
-                |       |
-                |       |
-                |       v
-amm/repl        |      Repl ------------
-                |       |               |
-                |       |               v
-                |       |              FrontEnd
-                |       v
-amm/compiler:    ----> Interpreter ----------------------------------
+amm:                   Main
+                        |  \
+                        |   \
+                        |    \
+                        |     v
+amm/repl                |    Repl ------------
+                        |     /               |
+                        |    /                v
+                        |   /                FrontEnd
+                        v  v
+amm/compiler:          Interpreter ----------------------------------
                         |               |              |             |
                         |               v              v             v
                         |              Compiler       Pressy        Preprocessor
