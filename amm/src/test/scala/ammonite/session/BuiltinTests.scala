@@ -81,12 +81,12 @@ object BuiltinTests extends TestSuite{
         @ List(1, 2, 3) + "lol"
         res0: String = "List(1, 2, 3)lol"
 
-        @ compiler.settings.noimports.value = true
+        @ repl.compiler.settings.noimports.value = true
 
         @ List(1, 2, 3) + "lol" // predef imports disappear
         error: not found: value List
 
-        @ compiler.settings.noimports.value = false
+        @ repl.compiler.settings.noimports.value = false
 
         @ List(1, 2, 3) + "lol"
         res3: String = "List(1, 2, 3)lol"
@@ -96,7 +96,7 @@ object BuiltinTests extends TestSuite{
         @ object X extends Dynamic
         error: extension of type scala.Dynamic needs to be enabled
 
-        @ compiler.settings.language.tryToSet(List("dynamics"))
+        @ repl.compiler.settings.language.tryToSet(List("dynamics"))
 
         @ object X extends Dynamic
         defined object X
@@ -108,7 +108,7 @@ object BuiltinTests extends TestSuite{
         @ List(1) match { case _: List[Double] => 2 }
         res7: Int = 2
 
-        @ compiler.settings.nowarnings.value = false
+        @ repl.compiler.settings.nowarnings.value = false
 
         @ List(1) match { case _: List[Double] => 2 }
         warning: $fruitlessTypeTestWarningMessageBlahBlahBlah
@@ -119,7 +119,7 @@ object BuiltinTests extends TestSuite{
         @ 1 + 1
         res0: Int = 2
 
-        @ compiler.settings.debug.value = true
+        @ repl.compiler.settings.debug.value = true
 
         @ 1 + 1
         info: running phase parser on
@@ -133,7 +133,7 @@ object BuiltinTests extends TestSuite{
         @ val veryImportant = 1
         veryImportant: Int = 1
 
-        @ sess.save()
+        @ repl.sess.save()
 
         @ val oopsDontWantThis = 2
         oopsDontWantThis: Int = 2
@@ -155,7 +155,7 @@ object BuiltinTests extends TestSuite{
 
         @ // Oh no, maybe we don't want scalatags!
 
-        @ sess.load()
+        @ repl.sess.load()
 
         @ veryImportant
         res9: Int = 1
@@ -173,29 +173,29 @@ object BuiltinTests extends TestSuite{
         x: Int = 1
         y: Int = 2
 
-        @ sess.save("xy initialized")
+        @ repl.sess.save("xy initialized")
 
         @ val z = x + y
         z: Int = 3
 
-        @ sess.save("first z")
+        @ repl.sess.save("first z")
 
-        @ sess.load("xy initialized")
+        @ repl.sess.load("xy initialized")
 
         @ val z = x - y
         z: Int = -1
 
-        @ sess.save("second z")
+        @ repl.sess.save("second z")
 
         @ z
         res7: Int = -1
 
-        @ sess.load("first z")
+        @ repl.sess.load("first z")
 
         @ z
         res9: Int = 3
 
-        @ sess.load("second z")
+        @ repl.sess.load("second z")
 
         @ z
         res11: Int = -1

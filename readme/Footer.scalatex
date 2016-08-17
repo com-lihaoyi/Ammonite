@@ -91,9 +91,14 @@
       to use these projects, the Scaladoc is still useful as a reference.
   
   @sect{Changelog}
+    @sect{0.7.3}
+      @ul
+        @li
+          Actually avoid importing all the @sect.ref{Repl API} functions into
+          local scope, for reals
+
     @sect{0.7.2}
       @ul
-
         @li
           Hygienified the default namespace by avoiding importing all the
           @sect.ref{Repl API} functions into local scope, instead leaving them

@@ -399,15 +399,8 @@
 
       @ul
         @li
-          @sect.ref{Repl API}: the way you can interact with the REPL
-          programmatically and access things like it's history, modify it's
-          prompt, etc.
-        @li
           @hl.scala{repl}: the object representing the Repl API, aliased as
-          @hl.scala{repl} rather than it's full name
-          @hl.scala{ammonite.frontend.ReplBridge.repl}. Although you can
-          call them API methods directly (e.g. @hl.scala{history}) you can also
-          all them via the @hl.scala{repl} object (e.g. @hl.scala{repl.history})
+          @hl.scala{repl}. This allows you (e.g. @hl.scala{repl.history})
           and you can use autocomplete or @hl.scala{typeOf} on the
           @hl.scala{repl} object to see what is available.
         @li
@@ -426,15 +419,15 @@
       @sect{Repl API}
         @p
           Ammonite contains a range of useful built-ins implemented as normal
-          functions. Everything inside the @hl.scala{ReplAPI} trait is imported
-          by default and can be accessed directly by default to control the
-          console.
+          functions on the @code{repl} and @code{interp} objects, e.g.
+          @code{repl.history}, @code{repl.width}, @code{repl.frontEnd()} to
+          change the front-end terminal implementation, etc.:
 
         @hl.ref('amm/'repl/'src/'main/'scala/'ammonite/'repl/"ReplAPI.scala", "trait ReplAPI", "// End of ReplAPI")
 
         @p
-          All of these are also available as part of the @hl.scala{repl} object
-          which is imported in scope by default. This is in addition to the
+          All of these are available as part of the @hl.scala{repl} object
+          which is imported in scope by default. Additional
           functionality available under the @code{interp} object, which is also
           available in scripts:
 
@@ -626,14 +619,14 @@
 
 
       @p
-        Lastly, you have the @hl.scala{sess.pop()} function. Without any
-        arguments, it behaves the same as @hl.scala{sess.load()}, reseting you
+        Lastly, you have the @hl.scala{repl.sess.pop()} function. Without any
+        arguments, it behaves the same as @hl.scala{repl.sess.load()}, reseting you
         to your last savepoint. However, you can pass in a number of session
         frames which you'd like to pop, allow you to reset your session to even
-        earlier save points. @hl.scala{sess.pop(2)} would put you two
-        save-points ago, @hl.scala{sess.pop(3)} would put you three save-points
+        earlier save points. @hl.scala{repl.sess.pop(2)} would put you two
+        save-points ago, @hl.scala{repl.sess.pop(3)} would put you three save-points
         ago, letting you reach earlier save-points even if you did not give
-        them names. Passing in a large number like @hl.scala{sess.pop(999)}
+        them names. Passing in a large number like @hl.scala{repl.sess.pop(999)}
         would reset your session all the way until the start.
 
       @p
