@@ -43,7 +43,7 @@
     @hl.scala
       // MyScript.sc
       // print banner
-      println("Welcome to the XYZ custom REPL!!")
+      println("Hello World!!")
 
       // common imports
       import sys.process._
@@ -51,6 +51,7 @@
 
       // common initialization code
       val x = 123
+      println("x is " + 123)
       ...
     @p
       You can write any Scala code you want in an Ammonite script, including
@@ -62,7 +63,14 @@
 
     @p
       After that, it's a matter of running the script
-      @sect.ref{From the REPL} or @sect.ref{From Bash}
+      @sect.ref{From the REPL} or @sect.ref{From Bash}, e.g.
+
+    @hl.sh
+      bash$ amm MyScript.sc
+    @hl.sh
+      Hello World!!
+      x is 123
+      ...
   
     @sect{Script Imports}
       @p
@@ -101,7 +109,11 @@
         @hl.ref('amm/'src/'test/'resources/'importHooks/"IndirectFileImport.sc")
     
         @p
-          And so on, importing files as many or as deep as you want.
+          And so on, importing files as many or as deep as you want. You can
+          use @hl.scala{^} segments at the start of your @hl.scala{import $file}
+          to import things from outside your current working directory, e.g.
+          @hl.scala{import $file.^.^.foo} will import the script file
+          @code{../../foo.sc} and make it available for you to use.
     
         @p
           @hl.scala{$file} imports inside Scala Scripts behave the same as
@@ -195,7 +207,7 @@
       @p
         The top-level definitions execute first (e.g. setting @hl.scala{x}),
         and then the @hl.scala("@main") method is called with the arguments you
-        passed in. You can also pass in named arguments using `--` to demarcate
+        passed in. You can also pass in named arguments using @code{--} to demarcate
         them:
 
       @hl.sh
@@ -217,6 +229,26 @@
         @hl.scala{load.module} or @hl.scala{load.exec} a script from @i{within}
         the Ammonite REPL. It gets imported into scope like any other method or
         value defined in the script, and you can just call it normally.
+
+      @p
+        @hl.scala{vararg*} arguments work as you would expect as well, allowing one or
+        more arguments to be passed from the command-line and aggregated into
+        a @code{Seq} for your function to use. This also allows you to use a
+        custom argument-parser (e.g. @lnk("Eugene Yokota",
+        "https://github.com/eed3si9n")'s excellent @lnk("Scopt",
+        "https://github.com/scopt/scopt")) library by defining your function
+        as taking @hl.scala{String*}:
+
+      @hl.scala
+        @@main
+        def entrypoint(args: String*) = {
+          ...
+        }
+
+      @p
+        In which case Ammonite will take all arguments and forward them to your
+        main method un-checked and un-validated, from which point you can deal
+        with the raw @code{Seq[String]} however you wish.
 
     @sect{Multiple Main Methods}
       @p
@@ -288,10 +320,62 @@
         0.5.7,0.5.6,0.5.5,0.5.4,0.5.3,0.5.2,0.5.1,0.5.0,0.4.9,0.4.8,
         0.4.7,0.4.6,0.4.5,0.4.4,0.4.3,0.4.2,0.4.0
 
+    @sect{builtins}
+      @p
+        Apart from bundling some third-party libraries for convenience,
+        Ammonite also provides some builtins you can use from scripts to
+        inspect and manipulate the interpreter itself:
+
+      @hl.ref('amm/'runtime/'src/'main/'scala/'ammonite/'runtime/"InterpAPI.scala", "trait InterpAPI")
+
   @sect{Running Scripts}
     @p
       There are two way main ways to run Ammonite scripts:
       @sect.ref{From the REPL} and @sect.ref{From Bash}.
+
+
+    @sect{From Bash}
+      @p
+        Apart from loading scripts within the @sect.ref{Ammonite-REPL}, You can
+        also run scripts using the Ammonite executable from an external shell
+        (e.g. bash):
+
+
+      @hl.sh
+        @replCurl
+
+      @hl.scala
+        bash$ amm path/to/script.scala
+
+      @p
+        All types, values and imports defined in scripts are available to
+        commands entered in REPL after loading the script.
+
+      @p
+        You can also make an Ammonite script self-executable by using a shebang
+        @hl.scala{#!}. This is an example script named @hl.scala{hello}. There
+        is no need to add the @hl.scala{.scala} extension. The @hl.scala{amm}
+        command needs to be in the @hl.scala{PATH}:
+      @hl.sh
+        #!/usr/bin/env amm
+
+        println("hello world")
+      @p
+        make it executable and run it from an external shell (e.g. bash):
+      @hl.sh
+        $ chmod +x /path/to/script
+        $ /path/to/script
+
+      @p
+        Ammonite also supports the @code{JAVA_OPTS} environment variable for
+        passing arguments to the JVM that it runs inside, e.g. you can pass in
+        a custom memory limit via
+
+      @hl.scala
+        bash$ JAVA_OPTS="-Xmx1024m" amm path/to/script.scala
+
+      @p
+        To let it use only up to 1024 megabytes of memory
 
     @sect{From the REPL}
       @p
@@ -373,37 +457,6 @@
         @hl.scala{import $exec} can themselves import other Scala scripts in the
         same way, and the same rules apply.
 
-    @sect{From Bash}
-      @p
-        Apart from loading scripts within the @sect.ref{Ammonite-REPL}, You can
-        also run scripts using the Ammonite executable from an external shell
-        (e.g. bash):
-
-
-      @hl.sh
-        @replCurl
-
-      @hl.scala
-        bash$ ./amm path/to/script.scala
-  
-      @p
-        All types, values and imports defined in scripts are available to
-        commands entered in REPL after loading the script.
-  
-      @p
-        You can also make an Ammonite script self-executable by using a shebang
-        @hl.scala{#!}. This is an example script named @hl.scala{hello}. There
-        is no need to add the @hl.scala{.scala} extension. The @hl.scala{amm}
-        command needs to be in the @hl.scala{PATH}:
-      @hl.sh
-        #!/usr/bin/env amm
-  
-        println("hello world")
-      @p
-        make it executable and run it from an external shell (e.g. bash):
-      @hl.sh
-        $ chmod +x /path/to/script
-        $ /path/to/script
 
     @sect{Execution Model}
       @p

@@ -60,7 +60,7 @@
     @hl.ref(opsExamples, Seq("constructingPaths", "//"), "}")
 
     @p
-      Note that there are no in-built operations to change the `cwd`. In general you should not need to: simply defining a new path, e.g.
+      Note that there are no in-built operations to change the @code{cwd}. In general you should not need to: simply defining a new path, e.g.
 
     @hl.ref(opsExamples, Seq("newPath", "val"), "}")
 

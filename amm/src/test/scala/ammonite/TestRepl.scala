@@ -50,7 +50,8 @@ class TestRepl {
           "@",
           Ref(null),
           new History(Vector()),
-          new SessionApiImpl(i.eval)
+          new SessionApiImpl(i.eval),
+          Vector()
         )
 
         Seq(("ammonite.repl.ReplBridge", "repl", replApi))

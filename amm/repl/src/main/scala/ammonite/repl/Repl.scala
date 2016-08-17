@@ -57,7 +57,9 @@ class Repl(input: InputStream,
         prompt,
         frontEnd,
         history,
-        new SessionApiImpl(i.eval)
+        new SessionApiImpl(i.eval),
+        replArgs
+
       )
       Seq(("ammonite.repl.ReplBridge", "repl", replApi))
     },

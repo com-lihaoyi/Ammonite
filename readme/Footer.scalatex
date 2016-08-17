@@ -91,6 +91,56 @@
       to use these projects, the Scaladoc is still useful as a reference.
   
   @sect{Changelog}
+    @sect{0.7.1}
+      @ul
+
+        @li
+          Hygienified the default namespace by avoiding importing all the
+          @sect.ref{Repl API} functions into local scope, instead leaving them
+          inside the @code{repl} object. @b{This is a backwards incompatible
+          change!}
+        @li
+          Separated the APIs available from scripts (@code{load.*} and
+          @code{resolvers} in the @code{interp} object)
+          from those available from the REPL (in the @code{repl} object).
+          @code{repl} is not available when running scripts, unless you pass in
+          the @code{--repl-api} flag at the command line.
+        @li
+          If you want to maintain the old behavior, e.g. for backwards-compat,
+          put a @hl.scala{import repl._} in your @code{~/.ammonite/predef.sc} and
+          @hl.scala{import interp._} in your @code{~/.ammonite/predefShared.s} to
+          bring everything back into scope again.
+        @li
+          @code{predef.sc} now only applies to the interactive REPL. If you
+          want predef code that applies to scripts use @code{predefScript.sc},
+          or if you want predef code that applies to both you can use
+          @code{predefShared.sc}.
+        @li
+          Added a version of @sect.ref{desugar} to Scala 2.10.x. It doesn't
+          print things as prettily/accurately as the 2.11.x version, but it's
+          better than nothing.
+        @li
+          Changed the syntax for @hl.scala{import $file} segments outside your
+          current directory from @hl.scala{import $file.`..`.foo} to
+          @hl.scala{import $file.^.foo}. This makes it a lot shorter and
+          mitigates a problems caused by the file-name being too long.
+        @li
+          You can now use a @code{JAVA_OPTS} environment variable to pass flags
+          to the JVM when starting Ammonite, thanks to @lnk("Simon Scarduzio",
+          "https://github.com/sscarduzio")
+        @li
+          Running scripts outside the current working directory tree, as well as
+          scripts with non-alphanumeric symbols in their file path, now works
+          thanks to @lnk("coderabhishek", "https://github.com/coderabhishek")
+        @li
+          Scripts without the @code{.sc} can now be run directly from the command line
+          rather than throwing an @code{IndexOutOfBoundsException}.
+        @li
+          Modularized Ammonite's internals; the main module @code{ammonite} has now
+          been broken into 5 smaller modules for maintainability. This in
+          itself should not be visible to the outside world, but be sure to
+          report any bugs!
+
     @sect{0.7.0}
       @ul
         @li
@@ -159,7 +209,7 @@
           Fixed #400: load.exec in predef.scala causes NPE in 0.5.9 or 0.6.0
         @li
           Fixed #398: by default, using Ammonite inside a SBT project uses the
-          old `~/.ammonite/` storage folder, not the `InMemory` storage system.
+          old @code{~/.ammonite/} storage folder, not the @code{InMemory} storage system.
           This restores the pre-0.5.9 behavior
         @li
           Fix regression causing BACKSPACE to not work while performing a
@@ -804,47 +854,3 @@
 
     @sect{Unstable Changlog}
       @ul
-        @li
-          You can now use a @code{JAVA_OPTS} environment variable to pass flags
-          to the JVM when starting Ammonite, thanks to @lnk("Simon Scarduzio",
-          "https://github.com/sscarduzio")
-        @li
-          Running scripts outside the current working directory tree, as well as
-          scripts with non-alphanumeric symbols in their file path, now works
-          thanks to @lnk("coderabhishek", "https://github.com/coderabhishek")
-        @li
-          Scripts without the `.sc` can now be run directly from the command line
-          rather than throwing an `IndexOutOfBoundsException`.
-        @li
-          Modularized Ammonite's internals; the main module `ammonite` has now
-          been broken into 5 smaller modules for maintainability. This in
-          itself should not be visible to the outside world, but be sure to
-          report any bugs!
-        @li
-          Hygienified the default namespace by avoiding importing all the
-          @sect.ref{Repl API} functions into local scope, instead leaving them
-          inside the @code{repl} object.
-        @li
-          Separated the APIs available from scripts (@code{load.*} and
-          @code{resolvers} in the @code{interp} object)
-          from those available from the REPL (in the @code{repl} object).
-          @code{repl} is not available when running scripts, unless you pass in
-          the @code{--repl-api} flag at the command line.
-        @li
-          If you want to maintain the old behavior, e.g. for backwards-compat,
-          use @hl.scala{import interp._, repl._} to bring everything into scope
-          again.
-        @li
-          @code{predef.sc} now only applies to the interactive REPL. If you
-          want predef code that applies to scripts use @code{predefScript.sc},
-          or if you want predef code that applies to both you can use
-          @code{predefShared.sc}.
-        @li
-          Added a version of @sect.ref{desugar} to Scala 2.10.x. It doesn't
-          print things as prettily/accurately as the 2.11.x version, but it's
-          better than nothing.
-        @li
-          Changed the syntax for @hl.scala{import $file} segments outside your
-          current directory from @hl.scala{import $file.`..`.foo} to
-          @hl.scala{import $file.^.foo}. This makes it a lot shorter and
-          mitigates a problems caused by the file-name being too long.
