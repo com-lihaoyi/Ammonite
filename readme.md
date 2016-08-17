@@ -44,7 +44,7 @@ For more detailed information, check out the internals documentation for high-le
 Although most features should be unit tested, it's still useful to fire up a REPL from the current codebase to see things work (or not). There are a variety of shells you can spin up for testing different things:
 
 - `sbt ~terminal/test:run` is useful for manual testing the terminal interaction; it basically contains a minimal echo-anything terminal, with multiline input based on the count of open- and closed-parentheses. This lets you test all terminal interactions without all the complexity of the Scala compiler, classloaders, etc. that comes in `repl/`
-- `sbt ~amm/test:run` brings up the Ammonite-REPL using the source code in the repository, and automatically restarts it on-exit if you have made a change to the code. Useful for manual testing both of `amm/` as well as `ops/`, since you can just `import ammonite.ops._` and start using them. Note that this does not bring in filesystem utilities like the `wd` variable, `cd!` command. You can also pass in the path to a `.scala` file to run it using Ammonite's script runner
+- `sbt ~amm/test:run` brings up the Ammonite-REPL using the source code in the repository, and automatically restarts it on-exit if you have made a change to the code. Useful for manual testing both of `amm/` as well as `ops/`, since you can just `import ammonite.ops._` and start using them. Note that this does not bring in filesystem utilities like the `wd` variable, `cd!` command. You can also pass in the path to a `.sc` file to run it using Ammonite's script runner
 - `sbt ~shell/test:run` brings up a fully-loaded shell with all filesystem utilities included: `wd`, `cd!`, autocomplete for filesystem paths, and more. This uses `readme/resources/example-predef.scala` instead of your default predef, for easier experimentation and development.
 - `sbt ~integration/test:run` runs the trivial main method in the `integration` subproject, letting you manually test running Ammonite programmatically, whether through `run` or `debug`
 - `sbt ~integration/test:console` brings up a console in the `integration` subproject, loading Ammonite-REPL as a test console, as described in the readme. Similar to `integration/test:run` but useful for verifying the different classloader/execution environment we get by starting Ammonite inside the Scala REPL doesn't break things
@@ -62,17 +62,30 @@ While working on a arbitrary `xyz` subproject, `sbt ~xyz/test` runs tests after 
 
 ### Publishing
 
-- `git clean -xdf` to make sure you're building from a clean project
-- Update the `project/Constants.scala` version number to the new version
-- `sbt ++2.11.8 amm/assembly ++2.10.5 amm/assembly` to bundle the REPL as a standalone distribution
-- `sbt +published/publishLocal` or `sbt +published/publishSigned` is used for publishing.
-- Create a new release on https://github.com/lihaoyi/Ammonite/releases and upload the two executables for 2.11.8 and 2.10.5, as well as the `shell/src/main/resources/amm/shell/example-predef.scala` file.
-- Create short URLs for the 2.11.8 executable download and the `example-predef.scala` file and fix the readme code in `readme/Sample.scala` to use these short URLs
-- `sbt ~readme/run` builds the documentation inside its target folder, which you can view by opening `readme/target/scalatex/index.html` in your browser.
-- `git commit -am $VERSION` with the new version number, and `git tag $VERSION`
-- `git checkout gh-pages && cp -r readme/target/scalatex/* . && git add -A && git commit -am . && git push` will deploy the generated documentation to Github Pages
-- Swap `project/Constants.scala` to `$NEXT_VERSION-SNAPSHOT` and commit it
-- Wait 30 minutes for things to and run through the curl-download flow and make sure it works
+- Publishing is automatic, controlled by scripts in the @code{ci/} folder.
+
+- Every commit that lands in master will publish a new
+  [unstable version](http://www.lihaoyi.com/Ammonite/#UnstableVersions),
+  that you can already use and download. This includes publishing the unstable version
+  to maven central to the
+  [snapshot-commit-uploads](https://github.com/lihaoyi/Ammonite/releases/tag/snapshot-commit-uploads)
+  tag, and updating the documentation-site so it's
+  [Unstable Version](http://www.lihaoyi.com/Ammonite/#UnstableVersions) download
+  instructions to point to it, though the "main" download/install instructions
+  in the doc-site will not be changed.
+
+- Every commit that lands in master *with a tag* will re-publish a stable version
+  to maven central and upload a new versioned release (using the tag as the
+  version) and the doc-site is updated so the main download/install instructions
+  point at the new published stable version.
+
+In general, if you land a change in master, once CI completes (1-2hrs) you
+should be able to download it via the
+[Unstable Version](http://www.lihaoyi.com/Ammonite/#UnstableVersions)
+instructions and make use of your changes standalone or in an SBT project.
+
+Occassionally, the CI job building and publishing one of the above steps
+flakes and fails, and needs to be re-run through the travis web interface.
 
 ## Issue Tags
 

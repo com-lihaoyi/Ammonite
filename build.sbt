@@ -298,10 +298,6 @@ lazy val readme = ScalatexReadme(
   (unmanagedSources in Compile) += baseDirectory.value/".."/"project"/"Constants.scala"
 )
 
-lazy val tested = project
-  .in(file("target/tested"))
-  .aggregate(published, integration)
-  .settings(dontPublishSettings)
 
 lazy val published = project
   .in(file("target/published"))

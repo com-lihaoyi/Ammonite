@@ -152,6 +152,8 @@ def executable() = {
   }else{
     println("MISC COMMIT: generating executable but not publishing")
     for (version <- latestVersions) {
+      %sbt("++" + version, "published/test:compile")
+      %sbt("++" + version, "integration/test:compile")
       %sbt("++" + version, "amm/test:assembly")
     }
   }
@@ -161,7 +163,7 @@ def executable() = {
 def docs() = {
   // Disable doc auto-publishing for now, as the recent modularization means we
   // need to make significant changes to the readme and that'll time.
-  if (false && isMasterCommit){
+  if (isMasterCommit){
     println("MASTER COMMIT: Updating version and publishing to Github Pages")
 
     publishDocs()

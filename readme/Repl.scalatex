@@ -434,7 +434,11 @@
 
         @p
           All of these are also available as part of the @hl.scala{repl} object
-          which is imported in scope by default.
+          which is imported in scope by default. This is in addition to the
+          functionality available under the @code{interp} object, which is also
+          available in scripts:
+
+        @hl.ref('amm/'runtime/'src/'main/'scala/'ammonite/'runtime/"InterpAPI.scala", "trait InterpAPI")
 
       @sect{Utilities}
         @p
@@ -769,6 +773,18 @@
         If you want these changes to always be present, place them in your
         @code{~/.ammonite/predef.scala}.
 
+    @sect{JVM Flags}
+      @p
+        Ammonite also supports the @code{JAVA_OPTS} environment variable for
+        passing arguments to the JVM that it runs inside, e.g. you can pass in
+        a custom memory limit via
+
+      @hl.scala
+        bash$ JAVA_OPTS="-Xmx1024m" amm
+
+      @p
+        To start the REPL while letting it use only up to 1024 megabytes of memory
+
   @sect{Embedding}
     @p
       The Ammonite REPL is just a plain-old-Scala-object, just like any other
@@ -789,7 +805,7 @@
       @p
         Then instantate it with this code anywhere within your program:
 
-      @hl.ref('amm/'src/'test/'scala/'ammonite/"TestMain.scala")
+      @hl.ref('integration/'src/'test/'scala/'ammonite/'integration/"TestMain.scala")
 
       @p
         You can configure the instantiated REPL by passing in arguments to the

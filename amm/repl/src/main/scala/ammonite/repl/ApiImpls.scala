@@ -59,7 +59,8 @@ class ReplApiImpl(val interp: Interpreter,
                   prompt0: Ref[String],
                   frontEnd0: Ref[FrontEnd],
                   history0: => History,
-                  sess0: Session) extends DefaultReplAPI{
+                  sess0: Session,
+                  replArgs0: Seq[Bind[_]]) extends DefaultReplAPI{
   import interp._
 
   def lastException = interp.lastException
@@ -120,7 +121,7 @@ class ReplApiImpl(val interp: Interpreter,
 
 
   def width = width0
-
+  def replArgs = replArgs0.toVector
   def height = height0
 
   object sess extends Session {
