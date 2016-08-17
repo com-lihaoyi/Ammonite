@@ -320,11 +320,15 @@
         0.5.7,0.5.6,0.5.5,0.5.4,0.5.3,0.5.2,0.5.1,0.5.0,0.4.9,0.4.8,
         0.4.7,0.4.6,0.4.5,0.4.4,0.4.3,0.4.2,0.4.0
 
-    @sect{builtins}
+    @sect{Script Builtins}
       @p
         Apart from bundling some third-party libraries for convenience,
         Ammonite also provides some builtins you can use from scripts to
-        inspect and manipulate the interpreter itself:
+        inspect and manipulate the interpreter itself. Note that this is
+        a much smaller set of functionality than the set of
+        @sect.ref{Builtins} available to the REPL: it won't have things
+        like the @code{repl.prompt}, @code{repl.history}, and other things
+        that only really make sense in the interactive REPL.
 
       @hl.ref('amm/'runtime/'src/'main/'scala/'ammonite/'runtime/"InterpAPI.scala", "trait InterpAPI")
 
