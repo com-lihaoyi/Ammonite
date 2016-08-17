@@ -193,7 +193,7 @@ span.hljs-tag, span.hljs-symbol{
 </li></ul>
   <p>
     The bulk of this page describes the latest stable release of Ammonite,
-    <code>0.7.0</code>. If you're willing to live on the edge,
+    <code>0.7.2</code>. If you're willing to live on the edge,
     we also publish <a href="#UnstableVersions">Unstable Versions</a> from any commits that get pushed
     or pull-requests that land in the master branch:
 </p>
@@ -222,7 +222,7 @@ span.hljs-tag, span.hljs-symbol{
     If you want to use Ammonite as a plain Scala shell, download the
     standalone executable:
 </p>
-  <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/vKSOR &amp;&amp; chmod +x /usr/local/bin/amm &amp;&amp; amm
+  <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/v6rSq &amp;&amp; chmod +x /usr/local/bin/amm &amp;&amp; amm
 </code></pre>
   <p>
     This will give you access to the Ammonite-REPL:
@@ -251,7 +251,7 @@ span.hljs-tag, span.hljs-symbol{
     You can also try out Ammonite in an existing SBT project, add the
     following to your <code>build.sbt</code>
 </p>
-  <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;0.7.0&quot; % &quot;test&quot; cross CrossVersion.full
+  <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;0.7.2&quot; % &quot;test&quot; cross CrossVersion.full
 
 initialCommands in (Test, console) := &quot;&quot;&quot;ammonite.Main().run()&quot;&quot;&quot;
 </code></pre>
@@ -739,7 +739,7 @@ error: IvyResolutionException
 @   false
 @ )
 
-@ resolvers() = resolvers() :+ oss
+@ interp.resolvers() = interp.resolvers() :+ oss
 
 @ import $ivy.`com.ambiata::mundane:1.2.1-20141230225616-50fc792`
 
@@ -842,16 +842,6 @@ error: IvyResolutionException
    *
    */
   def typeOf[T: WeakTypeTag](t: =&gt; T): Type
-  
-  /**
-   * Tools related to loading external scripts and code into the REPL
-   */
-  def load: Load
-
-  /**
-   * resolvers to use when loading jars 
-   */
-  def resolvers: Ref[List[Resolver]]
 
   /**
    * The colors that will be used to render the Ammonite REPL in the terminal
@@ -891,8 +881,6 @@ error: IvyResolutionException
    * Current height of the terminal
    */
   def height: Int
-
-  def replArgs: Vector[Bind[_]]
 
   /**
    * Lets you configure the pretty-printing of a value. By default, it simply
@@ -952,7 +940,28 @@ trait Session{
     * is no longer accessible.
     */
   def delete(name: String): Unit
+}</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/amm/repl/src/main/scala/ammonite/repl/ReplAPI.scala#L18-L177" target="_blank"><i class="fa fa-link "></i></a></pre>
+
+        <p>
+          All of these are also available as part of the <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">repl</code> object
+          which is imported in scope by default. This is in addition to the
+          functionality available under the <code>interp</code> object, which is also
+          available in scripts:
+</p>
+        <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">trait InterpAPI {
+
+  /**
+   * Tools related to loading external scripts and code into the REPL
+   */
+  def load: Load
+
+  /**
+   * resolvers to use when loading jars 
+   */
+  def resolvers: Ref[List[Resolver]]
+
 }
+
 
 trait LoadJar {
 
@@ -965,6 +974,7 @@ trait LoadJar {
    */
   def ivy(coordinates: (String, String, String), verbose: Boolean = true): Unit
 }
+
 trait Load extends (String =&gt; Unit) with LoadJar{
   /**
    * Loads a command into the REPL and
@@ -983,12 +993,8 @@ trait Load extends (String =&gt; Unit) with LoadJar{
 
   def plugin: LoadJar
 
-}</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/amm/src/main/scala/ammonite/frontend/ReplAPI.scala#L30-L232" target="_blank"><i class="fa fa-link "></i></a></pre>
+}</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/amm/runtime/src/main/scala/ammonite/runtime/InterpAPI.scala#L17-L63" target="_blank"><i class="fa fa-link "></i></a></pre>
 
-        <p>
-          All of these are also available as part of the <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">repl</code> object
-          which is imported in scope by default.
-</p>
       <h2 id="Utilities" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#Utilities" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Utilities</h2>
         <p>
           Apart from the core <a href="#Builtins">Builtins</a> of the REPL, the Ammonite REPL
@@ -1039,16 +1045,8 @@ terminal
 .travis.yml
 
 real	0m0.002s
-user	0m0.002s
-sys	0m0.000s</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>time{ls!} 
-</span><span style="color: #16a085;">res0</span><span>: (</span><span style="color: #27ae60;">LsSeq</span><span>, </span><span style="color: #27ae60;">concurrent</span><span>.</span><span style="color: #27ae60;">duration</span><span>.</span><span style="color: #27ae60;">FiniteDuration</span><span>) = (
-  
-</span><span style="color: #27ae60;">&quot;.git&quot;</span><span>              </span><span style="color: #27ae60;">&quot;appveyor.yml&quot;</span><span>      </span><span style="color: #27ae60;">&quot;internals-docs&quot;</span><span>    </span><span style="color: #27ae60;">'shell</span><span>
-</span><span style="color: #27ae60;">&quot;.gitignore&quot;</span><span>        </span><span style="color: #27ae60;">&quot;build.sbt&quot;</span><span>         </span><span style="color: #27ae60;">'ops</span><span>                </span><span style="color: #27ae60;">'sshd</span><span>
-</span><span style="color: #27ae60;">&quot;.travis.yml&quot;</span><span>       </span><span style="color: #27ae60;">'ci</span><span>                 </span><span style="color: #27ae60;">'project</span><span>            </span><span style="color: #27ae60;">'target</span><span>
-</span><span style="color: #27ae60;">'LICENSE</span><span>            </span><span style="color: #27ae60;">'deploy_key</span><span>         </span><span style="color: #27ae60;">'readme</span><span>             </span><span style="color: #27ae60;">'terminal</span><span>
-</span><span style="color: #27ae60;">'amm</span><span>                </span><span style="color: #27ae60;">'integration</span><span>        </span><span style="color: #27ae60;">&quot;readme.md&quot;</span><span>
-,</span></pre></div>
+user	0m0.000s
+sys	0m0.001s</pre><pre><span></span></pre></div>
 
           <p>
             Just as bash provides a <code>time</code> command that you can use to see
@@ -1064,21 +1062,11 @@ sys	0m0.000s</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><sp
           <div><pre><span style="color: #8e44ad;">bash$ </span>ls -a . | grep re
 .gitignore
 readme
-readme.md</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>ls! wd || grep! </span><span style="color: #27ae60;">&quot;re&quot;</span><span> 
-</span><span style="color: #16a085;">res0</span><span>: </span><span style="color: #27ae60;">Seq</span><span>[</span><span style="color: #27ae60;">GrepResult</span><span>] = </span><span style="color: #f39c12;">List</span><span>(
-  root/</span><span style="color: #27ae60;">'home</span><span>/</span><span style="color: #27ae60;">'travis</span><span>/</span><span style="color: #27ae60;">'build</span><span>/</span><span style="color: #27ae60;">'lihaoyi</span><span>/</span><span style="color: #27ae60;">'Ammonite</span><span>/</span><span style="color: #27ae60;">&quot;.gitigno</span><span style="color: #2980b9;background-color: #f39c12;">re</span><span style="color: #27ae60;">&quot;</span><span>,
-  root/</span><span style="color: #27ae60;">'home</span><span>/</span><span style="color: #27ae60;">'travis</span><span>/</span><span style="color: #27ae60;">'build</span><span>/</span><span style="color: #27ae60;">'lihaoyi</span><span>/</span><span style="color: #27ae60;">'Ammonite</span><span>/</span><span style="color: #27ae60;">'</span><span style="color: #2980b9;background-color: #f39c12;">re</span><span style="color: #27ae60;">adme</span><span>,
-  root/</span><span style="color: #27ae60;">'home</span><span>/</span><span style="color: #27ae60;">'travis</span><span>/</span><span style="color: #27ae60;">'build</span><span>/</span><span style="color: #27ae60;">'lihaoyi</span><span>/</span><span style="color: #27ae60;">'Ammonite</span><span>/</span><span style="color: #27ae60;">&quot;</span><span style="color: #2980b9;background-color: #f39c12;">re</span><span style="color: #27ae60;">adme.md&quot;</span><span>
-)</span></pre></div>
+readme.md</pre><pre><span></span></pre></div>
           <div><pre><span style="color: #8e44ad;">bash$ </span>ls -a . | grep re
 .gitignore
 readme
-readme.md</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>ls! wd |? grep! </span><span style="color: #27ae60;">&quot;re&quot;</span><span> 
-</span><span style="color: #16a085;">res0</span><span>: </span><span style="color: #27ae60;">Seq</span><span>[</span><span style="color: #27ae60;">Path</span><span>] = </span><span style="color: #f39c12;">List</span><span>(
-  root/</span><span style="color: #27ae60;">'home</span><span>/</span><span style="color: #27ae60;">'travis</span><span>/</span><span style="color: #27ae60;">'build</span><span>/</span><span style="color: #27ae60;">'lihaoyi</span><span>/</span><span style="color: #27ae60;">'Ammonite</span><span>/</span><span style="color: #27ae60;">&quot;.gitignore&quot;</span><span>,
-  root/</span><span style="color: #27ae60;">'home</span><span>/</span><span style="color: #27ae60;">'travis</span><span>/</span><span style="color: #27ae60;">'build</span><span>/</span><span style="color: #27ae60;">'lihaoyi</span><span>/</span><span style="color: #27ae60;">'Ammonite</span><span>/</span><span style="color: #27ae60;">'readme</span><span>,
-  root/</span><span style="color: #27ae60;">'home</span><span>/</span><span style="color: #27ae60;">'travis</span><span>/</span><span style="color: #27ae60;">'build</span><span>/</span><span style="color: #27ae60;">'lihaoyi</span><span>/</span><span style="color: #27ae60;">'Ammonite</span><span>/</span><span style="color: #27ae60;">&quot;readme.md&quot;</span><span>
-)</span></pre></div>
+readme.md</pre><pre><span></span></pre></div>
 
           <p>
             Ammonite provides its own <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">grep</code> command, which lets you
@@ -1099,11 +1087,7 @@ readme.md</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>
 </p>
           <div><pre><span style="color: #8e44ad;">bash$ </span>ls -a . | grep -G &quot;re[a-z]\+&quot;
 readme
-readme.md</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>ls! wd || grep! </span><span style="color: #27ae60;">&quot;re[a-z]+&quot;</span><span>.r 
-</span><span style="color: #16a085;">res0</span><span>: </span><span style="color: #27ae60;">Seq</span><span>[</span><span style="color: #27ae60;">GrepResult</span><span>] = </span><span style="color: #f39c12;">List</span><span>(
-  root/</span><span style="color: #27ae60;">'home</span><span>/</span><span style="color: #27ae60;">'travis</span><span>/</span><span style="color: #27ae60;">'build</span><span>/</span><span style="color: #27ae60;">'lihaoyi</span><span>/</span><span style="color: #27ae60;">'Ammonite</span><span>/</span><span style="color: #27ae60;">'</span><span style="color: #2980b9;background-color: #f39c12;">readme</span><span>,
-  root/</span><span style="color: #27ae60;">'home</span><span>/</span><span style="color: #27ae60;">'travis</span><span>/</span><span style="color: #27ae60;">'build</span><span>/</span><span style="color: #27ae60;">'lihaoyi</span><span>/</span><span style="color: #27ae60;">'Ammonite</span><span>/</span><span style="color: #27ae60;">&quot;</span><span style="color: #2980b9;background-color: #f39c12;">readme</span><span style="color: #27ae60;">.md&quot;</span><span>
-)</span></pre></div>
+readme.md</pre><pre><span></span></pre></div>
 
           <p>
             Ammonite's <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">grep</code> isn't limited to &quot;filesystem&quot;-y things;
@@ -1452,11 +1436,11 @@ res1: Int = 2</code><a class=" scalatex-site-Styles-headerLink" style="position:
 
 @ // Ammonite on Linux/OSX and JLineWindows on Windows
 
-@ repl.frontEnd() = ammonite.frontend.FrontEnd.JLineUnix
+@ repl.frontEnd() = ammonite.repl.FrontEnd.JLineUnix
 
-@ repl.frontEnd() = ammonite.frontend.FrontEnd.JLineWindows
+@ repl.frontEnd() = ammonite.repl.FrontEnd.JLineWindows
 
-@ repl.frontEnd() = ammonite.frontend.AmmoniteFrontEnd()
+@ repl.frontEnd() = ammonite.repl.AmmoniteFrontEnd()
 
 @ // Changing the colors used by Ammonite; all at once:
 
@@ -1513,7 +1497,7 @@ trait Ref[T] extends StableRef[T]{
    * argument `t`, at any point in time
    */
   def bind(t: =&gt; T): Unit
-}</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/amm/src/main/scala/ammonite/util/Model.scala#L187-L213" target="_blank"><i class="fa fa-link "></i></a></pre>
+}</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/amm/util/src/main/scala/ammonite/util/Model.scala#L186-L212" target="_blank"><i class="fa fa-link "></i></a></pre>
 
       <p>
         As you can see from the signature, you can basically interact with the
@@ -1582,6 +1566,17 @@ warning: $fruitlessTypeTestWarningMessageBlahBlahBlah</code><a class=" scalatex-
         If you want these changes to always be present, place them in your
         <code>~/.ammonite/predef.scala</code>.
 </p>
+    <h1 id="JVMFlags" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#JVMFlags" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>JVM Flags</h1>
+      <p>
+        Ammonite also supports the <code>JAVA_OPTS</code> environment variable for
+        passing arguments to the JVM that it runs inside, e.g. you can pass in
+        a custom memory limit via
+</p>
+      <pre><code class="scala scalatex-site-Styles-highlightMe">bash$ JAVA_OPTS=&quot;-Xmx1024m&quot; amm
+</code></pre>
+      <p>
+        To start the REPL while letting it use only up to 1024 megabytes of memory
+</p>
   <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="Embedding" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Embedding<a class=" scalatex-site-Styles-headerLink" href="#Embedding" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
     <p>
       The Ammonite REPL is just a plain-old-Scala-object, just like any other
@@ -1596,18 +1591,25 @@ warning: $fruitlessTypeTestWarningMessageBlahBlahBlah</code><a class=" scalatex-
         To use Ammonite inside an existing Scala program, you need to first add
         it to your dependencies:
 </p>
-      <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;0.7.0&quot; cross CrossVersion.full
+      <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;0.7.2&quot; cross CrossVersion.full
 </code></pre>
       <p>
         Then instantate it with this code anywhere within your program:
 </p>
-      <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">package ammonite
-
-object TestMain{
+      <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">package ammonite.integration
+object TestMain {
   def main(args: Array[String]): Unit = {
-    Main.main(Array(&quot;--home&quot;, &quot;target/tempAmmoniteHome&quot;) ++ args)
+    val hello = &quot;Hello&quot;
+    // Break into debug REPL with
+    ammonite.Main(
+      predef = &quot;println(\&quot;Starting Debugging!\&quot;)&quot;
+    ).run(
+      &quot;hello&quot; -&gt; hello,
+      &quot;fooValue&quot; -&gt; foo()
+    )
   }
-}</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/amm/src/test/scala/ammonite/TestMain.scala#L0-L7" target="_blank"><i class="fa fa-link "></i></a></pre>
+  def foo() = 1
+}</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/integration/src/test/scala/ammonite/integration/TestMain.scala#L0-L14" target="_blank"><i class="fa fa-link "></i></a></pre>
 
       <p>
         You can configure the instantiated REPL by passing in arguments to the
@@ -1622,7 +1624,7 @@ object TestMain{
         To do so, first add Ammonite to your classpath, e.g. through this SBT
         snippet:
 </p>
-      <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;0.7.0&quot; cross CrossVersion.full
+      <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;0.7.2&quot; cross CrossVersion.full
 </code></pre>
       <p>
         Note that unlike the snippet given <a href="#Ammonite-REPL">above</a>, we
@@ -1695,7 +1697,7 @@ object TestMain {
       <p>
         To do this, add ammonite-sshd to your classpath, for example with SBT:
 </p>
-      <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite-sshd&quot; % &quot;0.7.0&quot; cross CrossVersion.full
+      <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite-sshd&quot; % &quot;0.7.2&quot; cross CrossVersion.full
 </code></pre>
       <p>
         Now add repl server to your application:
@@ -1770,7 +1772,7 @@ replServer.start()
   <p>
     To begin with, download the Ammonite script-runner:
 </p>
-  <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/vKSOR &amp;&amp; chmod +x /usr/local/bin/amm &amp;&amp; amm
+  <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/v6rSq &amp;&amp; chmod +x /usr/local/bin/amm &amp;&amp; amm
 </code></pre>
   <p>
     And read on to learn about how Scala scripts work.
@@ -1784,7 +1786,7 @@ replServer.start()
   </p>
     <pre><code class="scala scalatex-site-Styles-highlightMe">// MyScript.sc
 // print banner
-println(&quot;Welcome to the XYZ custom REPL!!&quot;)
+println(&quot;Hello World!!&quot;)
 
 // common imports
 import sys.process._
@@ -1792,6 +1794,7 @@ import collection.mutable
 
 // common initialization code
 val x = 123
+println(&quot;x is &quot; + 123)
 ...</code></pre>
     <p>
       You can write any Scala code you want in an Ammonite script, including
@@ -1803,8 +1806,13 @@ val x = 123
 </p>
     <p>
       After that, it's a matter of running the script
-      <a href="#FromtheREPL">From the REPL</a> or <a href="#FromBash">From Bash</a>
-  </p>
+      <a href="#FromtheREPL">From the REPL</a> or <a href="#FromBash">From Bash</a>, e.g.
+</p>
+    <pre><code class="bash scalatex-site-Styles-highlightMe">bash$ amm MyScript.sc</code></pre>
+    <pre><code class="bash scalatex-site-Styles-highlightMe">Hello World!!
+x is 123
+...
+</code></pre>
     <h1 id="ScriptImports" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#ScriptImports" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Script Imports</h1>
       <p>
         No code stands alone; scripts depend on other scripts. Often they depend
@@ -1848,7 +1856,11 @@ import $file.FileImport
 val indirectFileImportVal = FileImport.fileImportVal + 1</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/amm/src/test/resources/importHooks/IndirectFileImport.sc#L0-L4" target="_blank"><i class="fa fa-link "></i></a></pre>
     
         <p>
-          And so on, importing files as many or as deep as you want.
+          And so on, importing files as many or as deep as you want. You can
+          use <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">^</code> segments at the start of your <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">import $file</code>
+          to import things from outside your current working directory, e.g.
+          <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">import $file.^.^.foo</code> will import the script file
+          <code>../../foo.sc</code> and make it available for you to use.
     </p>
         <p>
           <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">$file</code> imports inside Scala Scripts behave the same as
@@ -1889,11 +1901,11 @@ val rendered = div(&quot;Moo&quot;).render</code><a class=" scalatex-site-Styles
 </p>
       <ul>
         <li>
-          <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">import $cp</code> becomes <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">load.cp</code></li>
+          <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">import $cp</code> becomes <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">interp.load.cp</code></li>
         <li>
-          <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">import $file</code> becomes <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">load.module</code></li>
+          <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">import $file</code> becomes <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">interp.load.module</code></li>
         <li>
-          <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">import $ivy</code> becomes <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">load.ivy</code>
+          <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">import $ivy</code> becomes <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">interp.load.ivy</code>
 </li></ul>
       <p>
         These are plain-old-Scala-functions that let you pass in a
@@ -1906,7 +1918,7 @@ val rendered = div(&quot;Moo&quot;).render</code><a class=" scalatex-site-Styles
       <pre><code class="scala scalatex-site-Styles-highlightMe">// print banner
 println(&quot;Welcome to the XYZ custom REPL!!&quot;)
 val scalazVersion = &quot;7.1.1&quot;
-load.ivy(&quot;org.scalaz&quot; %% &quot;scalaz-core&quot; % scalazVersion)
+interp.load.ivy(&quot;org.scalaz&quot; %% &quot;scalaz-core&quot; % scalazVersion)
 
 @
 
@@ -1947,7 +1959,7 @@ def main(i: Int, s: String, path: Path = cwd) = {
       <p>
         The top-level definitions execute first (e.g. setting <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">x</code>),
         and then the <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">@main</code> method is called with the arguments you
-        passed in. You can also pass in named arguments using `--` to demarcate
+        passed in. You can also pass in named arguments using <code>--</code> to demarcate
         them:
 </p>
       <pre><code class="bash scalatex-site-Styles-highlightMe">amm Args.sc -- --i 3 --s Moo
@@ -1968,6 +1980,23 @@ def main(i: Int, s: String, path: Path = cwd) = {
         <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">load.module</code> or <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">load.exec</code> a script from <i>within</i>
         the Ammonite REPL. It gets imported into scope like any other method or
         value defined in the script, and you can just call it normally.
+</p>
+      <p>
+        <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">vararg*</code> arguments work as you would expect as well, allowing one or
+        more arguments to be passed from the command-line and aggregated into
+        a <code>Seq</code> for your function to use. This also allows you to use a
+        custom argument-parser (e.g. <a href="https://github.com/eed3si9n">Eugene Yokota</a>'s excellent <a href="https://github.com/scopt/scopt">Scopt</a>) library by defining your function
+        as taking <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">String*</code>:
+</p>
+      <pre><code class="scala scalatex-site-Styles-highlightMe">@main
+def entrypoint(args: String*) = {
+  ...
+}
+</code></pre>
+      <p>
+        In which case Ammonite will take all arguments and forward them to your
+        main method un-checked and un-validated, from which point you can deal
+        with the raw <code>Seq[String]</code> however you wish.
 </p>
     <h1 id="MultipleMainMethods" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#MultipleMainMethods" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Multiple Main Methods</h1>
       <p>
@@ -2076,10 +2105,102 @@ https://git.io/vDN6Ig</code></pre>
 0.5.7,0.5.6,0.5.5,0.5.4,0.5.3,0.5.2,0.5.1,0.5.0,0.4.9,0.4.8,
 0.4.7,0.4.6,0.4.5,0.4.4,0.4.3,0.4.2,0.4.0
 </code></pre>
+    <h1 id="builtins" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#builtins" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>builtins</h1>
+      <p>
+        Apart from bundling some third-party libraries for convenience,
+        Ammonite also provides some builtins you can use from scripts to
+        inspect and manipulate the interpreter itself:
+</p>
+      <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">trait InterpAPI {
+
+  /**
+   * Tools related to loading external scripts and code into the REPL
+   */
+  def load: Load
+
+  /**
+   * resolvers to use when loading jars 
+   */
+  def resolvers: Ref[List[Resolver]]
+
+}
+
+
+trait LoadJar {
+
+  /**
+   * Load a `.jar` file or directory into your JVM classpath
+   */
+  def cp(jar: Path): Unit
+  /**
+   * Load a library from its maven/ivy coordinates
+   */
+  def ivy(coordinates: (String, String, String), verbose: Boolean = true): Unit
+}
+
+trait Load extends (String =&gt; Unit) with LoadJar{
+  /**
+   * Loads a command into the REPL and
+   * evaluates them one after another
+   */
+  def apply(line: String): Unit
+
+  /**
+   * Loads and executes the scriptfile on the specified path.
+   * Compilation units separated by `@\n` are evaluated sequentially.
+   * If an error happens it prints an error message to the console.
+   */ 
+  def exec(path: Path): Unit
+
+  def module(path: Path): Unit
+
+  def plugin: LoadJar
+
+}</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/amm/runtime/src/main/scala/ammonite/runtime/InterpAPI.scala#L17-L63" target="_blank"><i class="fa fa-link "></i></a></pre>
+
   <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="RunningScripts" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Running Scripts<a class=" scalatex-site-Styles-headerLink" href="#RunningScripts" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
     <p>
       There are two way main ways to run Ammonite scripts:
       <a href="#FromtheREPL">From the REPL</a> and <a href="#FromBash">From Bash</a>.
+
+</p>
+    <h1 id="FromBash" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#FromBash" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>From Bash</h1>
+      <p>
+        Apart from loading scripts within the <a href="#Ammonite-REPL">Ammonite-REPL</a>, You can
+        also run scripts using the Ammonite executable from an external shell
+        (e.g. bash):
+
+</p>
+      <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/v6rSq &amp;&amp; chmod +x /usr/local/bin/amm &amp;&amp; amm
+</code></pre>
+      <pre><code class="scala scalatex-site-Styles-highlightMe">bash$ amm path/to/script.scala
+</code></pre>
+      <p>
+        All types, values and imports defined in scripts are available to
+        commands entered in REPL after loading the script.
+</p>
+      <p>
+        You can also make an Ammonite script self-executable by using a shebang
+        <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">#!</code>. This is an example script named <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">hello</code>. There
+        is no need to add the <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">.scala</code> extension. The <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">amm</code>
+        command needs to be in the <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">PATH</code>:</p>
+      <pre><code class="bash scalatex-site-Styles-highlightMe">#!/usr/bin/env amm
+
+println(&quot;hello world&quot;)</code></pre>
+      <p>
+        make it executable and run it from an external shell (e.g. bash):</p>
+      <pre><code class="bash scalatex-site-Styles-highlightMe">$ chmod +x /path/to/script
+$ /path/to/script
+</code></pre>
+      <p>
+        Ammonite also supports the <code>JAVA_OPTS</code> environment variable for
+        passing arguments to the JVM that it runs inside, e.g. you can pass in
+        a custom memory limit via
+</p>
+      <pre><code class="scala scalatex-site-Styles-highlightMe">bash$ JAVA_OPTS=&quot;-Xmx1024m&quot; amm path/to/script.scala
+</code></pre>
+      <p>
+        To let it use only up to 1024 megabytes of memory
 </p>
     <h1 id="FromtheREPL" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#FromtheREPL" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>From the REPL</h1>
       <p>
@@ -2156,35 +2277,8 @@ res1: mutable.Buffer[Int] = ArrayBuffer(123)</code></pre>
         want it. Of course, any files you import via <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">import $file</code> or
         <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">import $exec</code> can themselves import other Scala scripts in the
         same way, and the same rules apply.
-</p>
-    <h1 id="FromBash" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#FromBash" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>From Bash</h1>
-      <p>
-        Apart from loading scripts within the <a href="#Ammonite-REPL">Ammonite-REPL</a>, You can
-        also run scripts using the Ammonite executable from an external shell
-        (e.g. bash):
 
 </p>
-      <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/vKSOR &amp;&amp; chmod +x /usr/local/bin/amm &amp;&amp; amm
-</code></pre>
-      <pre><code class="scala scalatex-site-Styles-highlightMe">bash$ ./amm path/to/script.scala
-</code></pre>
-      <p>
-        All types, values and imports defined in scripts are available to
-        commands entered in REPL after loading the script.
-  </p>
-      <p>
-        You can also make an Ammonite script self-executable by using a shebang
-        <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">#!</code>. This is an example script named <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">hello</code>. There
-        is no need to add the <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">.scala</code> extension. The <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">amm</code>
-        command needs to be in the <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">PATH</code>:</p>
-      <pre><code class="bash scalatex-site-Styles-highlightMe">#!/usr/bin/env amm
-
-println(&quot;hello world&quot;)</code></pre>
-      <p>
-        make it executable and run it from an external shell (e.g. bash):</p>
-      <pre><code class="bash scalatex-site-Styles-highlightMe">$ chmod +x /path/to/script
-$ /path/to/script
-</code></pre>
     <h1 id="ExecutionModel" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#ExecutionModel" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Execution Model</h1>
       <p>
         Ammonite's Scala Scripts run as normal Scala code, though with some
@@ -2260,7 +2354,7 @@ object Qux{
   <p>
     To get started with Ammonite-Ops, add this to your <code>build.sbt</code>:
 </p>
-  <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">libraryDependencies += &quot;com.lihaoyi&quot; %% &quot;ammonite-ops&quot; % &quot;0.7.0&quot;</code>
+  <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">libraryDependencies += &quot;com.lihaoyi&quot; %% &quot;ammonite-ops&quot; % &quot;0.7.2&quot;</code>
 
   <p>
     And you're all set! Here's an example of some common operations you can do with Ammonite-Ops
@@ -2375,7 +2469,7 @@ wd/up
 wd/up/up</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/test/scala/test/ammonite/ops/ExampleTests.scala#L220-L239" target="_blank"><i class="fa fa-link "></i></a></pre>
 
     <p>
-      Note that there are no in-built operations to change the `cwd`. In general you should not need to: simply defining a new path, e.g.
+      Note that there are no in-built operations to change the <code>cwd</code>. In general you should not need to: simply defining a new path, e.g.
 </p>
     <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">val target = cwd/'target</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/test/scala/test/ammonite/ops/ExampleTests.scala#L241-L242" target="_blank"><i class="fa fa-link "></i></a></pre>
 
@@ -3104,7 +3198,7 @@ val res2 = %ls</code><a class=" scalatex-site-Styles-headerLink" style="position
     To begin using Ammonite-Shell, simply  download the default <code>predef.sc</code> to configure your REPL to be a usable systems shell before downloading the <a href="#Ammonite-REPL">Ammonite-REPL</a> executable (below):
 </p>
   <pre><code class="bash scalatex-site-Styles-highlightMe">$ mkdir ~/.ammonite &amp;&amp; curl -L -o ~/.ammonite/predef.sc https://git.io/vo4wx</code></pre>
-  <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/vKSOR &amp;&amp; chmod +x /usr/local/bin/amm &amp;&amp; amm
+  <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/v6rSq &amp;&amp; chmod +x /usr/local/bin/amm &amp;&amp; amm
 </code></pre>
   <p>
     You can then start using Ammonite as a replacement for Bash:
@@ -3130,11 +3224,11 @@ val res2 = %ls</code><a class=" scalatex-site-Styles-headerLink" style="position
 </p>
       <div><pre><span style="color: #8e44ad;">bash$ </span>pwd
 /home/travis/build/lihaoyi/Ammonite
-]0;travis@testing-worker-linux-docker-4ac561d3-3446-linux-7: ~/build/lihaoyi/Ammonitetravis@testing-worker-linux-docker-4ac561d3-3446-linux-7:~/build/lihaoyi/Ammonitee$ cd target
-]0;travis@testing-worker-linux-docker-4ac561d3-3446-linux-7: ~/build/lihaoyi/Ammonite/targettravis@testing-worker-linux-docker-4ac561d3-3446-linux-7:~/build/lihaoyi/Ammonitee/target$ pwd
+]0;travis@testing-worker-linux-docker-41388dd8-3438-linux-7: ~/build/lihaoyi/Ammonitetravis@testing-worker-linux-docker-41388dd8-3438-linux-7:~/build/lihaoyi/Ammonitee$ cd target
+]0;travis@testing-worker-linux-docker-41388dd8-3438-linux-7: ~/build/lihaoyi/Ammonite/targettravis@testing-worker-linux-docker-41388dd8-3438-linux-7:~/build/lihaoyi/Ammonitee/target$ pwd
 /home/travis/build/lihaoyi/Ammonite/target
-]0;travis@testing-worker-linux-docker-4ac561d3-3446-linux-7: ~/build/lihaoyi/Ammonite/targettravis@testing-worker-linux-docker-4ac561d3-3446-linux-7:~/build/lihaoyi/Ammonitee/target$ cd ..
-]0;travis@testing-worker-linux-docker-4ac561d3-3446-linux-7: ~/build/lihaoyi/Ammonitetravis@testing-worker-linux-docker-4ac561d3-3446-linux-7:~/build/lihaoyi/Ammonitee$ pwd
+]0;travis@testing-worker-linux-docker-41388dd8-3438-linux-7: ~/build/lihaoyi/Ammonite/targettravis@testing-worker-linux-docker-41388dd8-3438-linux-7:~/build/lihaoyi/Ammonitee/target$ cd ..
+]0;travis@testing-worker-linux-docker-41388dd8-3438-linux-7: ~/build/lihaoyi/Ammonitetravis@testing-worker-linux-docker-41388dd8-3438-linux-7:~/build/lihaoyi/Ammonitee$ pwd
 /home/travis/build/lihaoyi/Ammonite</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>wd 
 </span><span style="color: #16a085;">res0</span><span>: </span><span style="color: #27ae60;">Path</span><span> = root/</span><span style="color: #27ae60;">'home</span><span>/</span><span style="color: #27ae60;">'travis</span><span>/</span><span style="color: #27ae60;">'build</span><span>/</span><span style="color: #27ae60;">'lihaoyi</span><span>/</span><span style="color: #27ae60;">'Ammonite</span><span>
 </span><span style="color: #8e44ad;">travis-Ammonite@ </span><span>cd! </span><span style="color: #27ae60;">'target</span><span> 
@@ -3235,20 +3329,20 @@ ops/src/main/scala/ammonite/ops/package.scala</pre><pre><span style="color: #8e4
         Ammonite-Shell uses <a href="#Ammonite-Ops">Ammonite-Ops</a> to provide a nice API to use filesystem operations. The default setup will <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">import ammonite.ops._</code> into your <a href="#Ammonite-REPL">Ammonite-REPL</a>, gives the nice path-completion shown above, and also provides some additional command-line-friendly functionality on top of the default <a href="#Ammonite-Ops">Ammonite-Ops</a> commands:
 </p>
       <div><pre><span style="color: #8e44ad;">bash$ </span>mkdir target/test
-]0;travis@testing-worker-linux-docker-4ac561d3-3446-linux-7: ~/build/lihaoyi/Ammonitetravis@testing-worker-linux-docker-4ac561d3-3446-linux-7:~/build/lihaoyi/Ammonitee$ echo &quot;hello&quot; &gt; target/test/hello.txt
-]0;travis@testing-worker-linux-docker-4ac561d3-3446-linux-7: ~/build/lihaoyi/Ammonitetravis@testing-worker-linux-docker-4ac561d3-3446-linux-7:~/build/lihaoyi/Ammonitee$ cat target/test/hello.txt
+]0;travis@testing-worker-linux-docker-41388dd8-3438-linux-7: ~/build/lihaoyi/Ammonitetravis@testing-worker-linux-docker-41388dd8-3438-linux-7:~/build/lihaoyi/Ammonitee$ echo &quot;hello&quot; &gt; target/test/hello.txt
+]0;travis@testing-worker-linux-docker-41388dd8-3438-linux-7: ~/build/lihaoyi/Ammonitetravis@testing-worker-linux-docker-41388dd8-3438-linux-7:~/build/lihaoyi/Ammonitee$ cat target/test/hello.txt
 hello
-]0;travis@testing-worker-linux-docker-4ac561d3-3446-linux-7: ~/build/lihaoyi/Ammonitetravis@testing-worker-linux-docker-4ac561d3-3446-linux-7:~/build/lihaoyi/Ammonitee$ ls target/test
+]0;travis@testing-worker-linux-docker-41388dd8-3438-linux-7: ~/build/lihaoyi/Ammonitetravis@testing-worker-linux-docker-41388dd8-3438-linux-7:~/build/lihaoyi/Ammonitee$ ls target/test
 hello.txt
-]0;travis@testing-worker-linux-docker-4ac561d3-3446-linux-7: ~/build/lihaoyi/Ammonitetravis@testing-worker-linux-docker-4ac561d3-3446-linux-7:~/build/lihaoyi/Ammonitee$ cp target/test/hello.txt target/test/hello2.txt
-]0;travis@testing-worker-linux-docker-4ac561d3-3446-linux-7: ~/build/lihaoyi/Ammonitetravis@testing-worker-linux-docker-4ac561d3-3446-linux-7:~/build/lihaoyi/Ammonitee$ ls target/test
+]0;travis@testing-worker-linux-docker-41388dd8-3438-linux-7: ~/build/lihaoyi/Ammonitetravis@testing-worker-linux-docker-41388dd8-3438-linux-7:~/build/lihaoyi/Ammonitee$ cp target/test/hello.txt target/test/hello2.txt
+]0;travis@testing-worker-linux-docker-41388dd8-3438-linux-7: ~/build/lihaoyi/Ammonitetravis@testing-worker-linux-docker-41388dd8-3438-linux-7:~/build/lihaoyi/Ammonitee$ ls target/test
 hello2.txt
 hello.txt
-]0;travis@testing-worker-linux-docker-4ac561d3-3446-linux-7: ~/build/lihaoyi/Ammonitetravis@testing-worker-linux-docker-4ac561d3-3446-linux-7:~/build/lihaoyi/Ammonitee$ mv target/test/hello.txt target/test/hello3.txt
-]0;travis@testing-worker-linux-docker-4ac561d3-3446-linux-7: ~/build/lihaoyi/Ammonitetravis@testing-worker-linux-docker-4ac561d3-3446-linux-7:~/build/lihaoyi/Ammonitee$ ls target/test
+]0;travis@testing-worker-linux-docker-41388dd8-3438-linux-7: ~/build/lihaoyi/Ammonitetravis@testing-worker-linux-docker-41388dd8-3438-linux-7:~/build/lihaoyi/Ammonitee$ mv target/test/hello.txt target/test/hello3.txt
+]0;travis@testing-worker-linux-docker-41388dd8-3438-linux-7: ~/build/lihaoyi/Ammonitetravis@testing-worker-linux-docker-41388dd8-3438-linux-7:~/build/lihaoyi/Ammonitee$ ls target/test
 hello2.txt
 hello3.txt
-]0;travis@testing-worker-linux-docker-4ac561d3-3446-linux-7: ~/build/lihaoyi/Ammonitetravis@testing-worker-linux-docker-4ac561d3-3446-linux-7:~/build/lihaoyi/Ammonitee$ rm -rf target/test</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>mkdir! </span><span style="color: #27ae60;">'target</span><span>/</span><span style="color: #27ae60;">'test</span><span> 
+]0;travis@testing-worker-linux-docker-41388dd8-3438-linux-7: ~/build/lihaoyi/Ammonitetravis@testing-worker-linux-docker-41388dd8-3438-linux-7:~/build/lihaoyi/Ammonitee$ rm -rf target/test</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>mkdir! </span><span style="color: #27ae60;">'target</span><span>/</span><span style="color: #27ae60;">'test</span><span> 
 
 </span><span style="color: #8e44ad;">travis-Ammonite@ </span><span>write(</span><span style="color: #27ae60;">'target</span><span>/</span><span style="color: #27ae60;">'test</span><span>/</span><span style="color: #27ae60;">&quot;hello.txt&quot;</span><span>, </span><span style="color: #27ae60;">&quot;hello&quot;</span><span>) 
 
@@ -3261,14 +3355,6 @@ hello3.txt
 </span><span style="color: #8e44ad;">travis-Ammonite@ </span><span>ls! </span><span style="color: #27ae60;">'target</span><span>/</span><span style="color: #27ae60;">'test</span><span> 
 </span><span style="color: #16a085;">res4</span><span>: </span><span style="color: #27ae60;">LsSeq</span><span> = 
 </span><span style="color: #27ae60;">&quot;hello.txt&quot;</span><span>     </span><span style="color: #27ae60;">&quot;hello2.txt&quot;</span><span>
-
-</span><span style="color: #8e44ad;">travis-Ammonite@ </span><span>mv(</span><span style="color: #27ae60;">'target</span><span>/</span><span style="color: #27ae60;">'test</span><span>/</span><span style="color: #27ae60;">&quot;hello.txt&quot;</span><span>, </span><span style="color: #27ae60;">'target</span><span>/</span><span style="color: #27ae60;">'test</span><span>/</span><span style="color: #27ae60;">&quot;hello3.txt&quot;</span><span>) 
-
-</span><span style="color: #8e44ad;">travis-Ammonite@ </span><span>ls! </span><span style="color: #27ae60;">'target</span><span>/</span><span style="color: #27ae60;">'test</span><span> 
-</span><span style="color: #16a085;">res6</span><span>: </span><span style="color: #27ae60;">LsSeq</span><span> = 
-</span><span style="color: #27ae60;">&quot;hello2.txt&quot;</span><span>    </span><span style="color: #27ae60;">&quot;hello3.txt&quot;</span><span>
-
-</span><span style="color: #8e44ad;">travis-Ammonite@ </span><span>rm! </span><span style="color: #27ae60;">'target</span><span>/</span><span style="color: #27ae60;">'test</span><span> 
 </span></pre></div>
     <h1 id="Piping" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#Piping" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Piping</h1>
       <p>
@@ -3355,14 +3441,12 @@ HELLO
         If you are only passing a single argument, or no arguments, Scala allows you to leave off parentheses, as shown:
 </p>
       <div><pre><span style="color: #8e44ad;">bash$ </span>git branch
-* (detached from d2e00a9)
-  master</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>%git </span><span style="color: #27ae60;">'branch</span><span> 
-* (detached from d2e00a9)
-  master
+* (no branch)</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>%git </span><span style="color: #27ae60;">'branch</span><span> 
+* (no branch)
 </span></pre></div>
       <div><pre><span style="color: #8e44ad;">bash$ </span>date
-Sun Aug 14 03:09:03 UTC 2016</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>%date 
-Sun Aug 14 03:09:15 UTC 2016
+Wed Aug 17 11:40:57 UTC 2016</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>%date 
+Wed Aug 17 11:41:07 UTC 2016
 </span></pre></div>
 
       <p>
@@ -3554,9 +3638,9 @@ Hello from Java!
 </span><span style="color: #8e44ad;">travis-Ammonite@ </span><span style="color: #f39c12;">import</span><span> java.util.</span><span style="color: #f39c12;">_</span><span> 
 </span><span style="color: #27ae60;">import </span><span style="color: #16a085;">java.util._</span><span>
 </span><span style="color: #8e44ad;">travis-Ammonite@ </span><span style="color: #f39c12;">val</span><span> date = </span><span style="color: #f39c12;">new</span><span> </span><span style="color: #27ae60;">Date</span><span>() 
-</span><span style="color: #16a085;">date</span><span>: </span><span style="color: #27ae60;">Date</span><span> = Sun Aug 14 03:13:02 UTC 2016
+</span><span style="color: #16a085;">date</span><span>: </span><span style="color: #27ae60;">Date</span><span> = Wed Aug 17 11:45:10 UTC 2016
 </span><span style="color: #8e44ad;">travis-Ammonite@ </span><span>date.getDay() 
-</span><span style="color: #16a085;">res3</span><span>: </span><span style="color: #27ae60;">Int</span><span> = </span><span style="color: #27ae60;">0</span></pre>
+</span><span style="color: #16a085;">res3</span><span>: </span><span style="color: #27ae60;">Int</span><span> = </span><span style="color: #27ae60;">3</span></pre>
 
       <p>
         In fact, Ammonite-Shell allows you to ask for any published third-party Java/Scala library for usage in the shell, and have them downloaded, automatically cached, and made available for use. e.g. we can load popular libraries like <a href="https://github.com/google/guava">Google Guava</a> and using it in the shell:
@@ -3568,48 +3652,42 @@ import com.google.common.collect.ImmutableBiMap // Doesn't work
            ^</span><span>
 </span><span style="color: #c0392b;">Compilation Failed</span><span>
 </span><span style="color: #8e44ad;">travis-Ammonite@ </span><span>
-load.ivy(</span><span style="color: #27ae60;">&quot;com.google.guava&quot;</span><span> % </span><span style="color: #27ae60;">&quot;guava&quot;</span><span> % </span><span style="color: #27ae60;">&quot;18.0&quot;</span><span>) </span><span style="color: #2980b9;">// Load from Maven Central</span><span> 
-:: loading settings :: url = jar:file:/home/travis/build/lihaoyi/Ammonite/amm/target/scala-2.11/ammonite-0.7.0-2.11.8!/org/apache/ivy/core/settings/ivysettings.xml
+</span><span style="color: #f39c12;">import</span><span> $ivy.`com.google.guava:guava:18.0` </span><span style="color: #2980b9;">// Load from Maven Central</span><span> 
+:: loading settings :: url = jar:file:/home/travis/build/lihaoyi/Ammonite/amm/target/scala-2.11/ammonite-0.7.2-2.11.8!/org/apache/ivy/core/settings/ivysettings.xml
 :: resolving dependencies :: com.google.guava#guava-caller;working
 	confs: [default]
 	found com.google.guava#guava;18.0 in central
 	found com.google.code.findbugs#jsr305;1.3.9 in central
-downloading http://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0.jar ...
-	[SUCCESSFUL ] com.google.guava#guava;18.0!guava.jar(bundle) (83ms)
 downloading http://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0-javadoc.jar ...
-	[SUCCESSFUL ] com.google.guava#guava;18.0!guava.jar(javadoc) (30ms)
+	[SUCCESSFUL ] com.google.guava#guava;18.0!guava.jar(javadoc) (78ms)
+downloading http://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0.jar ...
+	[SUCCESSFUL ] com.google.guava#guava;18.0!guava.jar(bundle) (25ms)
 downloading http://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0-sources.jar ...
-	[SUCCESSFUL ] com.google.guava#guava;18.0!guava.jar(source) (15ms)
+	[SUCCESSFUL ] com.google.guava#guava;18.0!guava.jar(source) (17ms)
 downloading http://repo1.maven.org/maven2/com/google/code/findbugs/jsr305/1.3.9/jsr305-1.3.9.jar ...
-	[SUCCESSFUL ] com.google.code.findbugs#jsr305;1.3.9!jsr305.jar (9ms)
-
+	[SUCCESSFUL ] com.google.code.findbugs#jsr305;1.3.9!jsr305.jar (11ms)
+</span><span style="color: #27ae60;">import </span><span style="color: #16a085;">$ivy.$                                                       </span><span>
 </span><span style="color: #8e44ad;">travis-Ammonite@ </span><span style="color: #f39c12;">import</span><span> com.google.common.collect.ImmutableBiMap </span><span style="color: #2980b9;">// Works now</span><span> 
-</span><span style="color: #27ae60;">import </span><span style="color: #16a085;">com.google.common.collect.ImmutableBiMap // Works now</span><span>
-</span><span style="color: #8e44ad;">travis-Ammonite@ </span><span style="color: #f39c12;">val</span><span> bimap = ImmutableBiMap.of(</span><span style="color: #27ae60;">1</span><span>, </span><span style="color: #27ae60;">&quot;one&quot;</span><span>, </span><span style="color: #27ae60;">2</span><span>, </span><span style="color: #27ae60;">&quot;two&quot;</span><span>, </span><span style="color: #27ae60;">3</span><span>, </span><span style="color: #27ae60;">&quot;three&quot;</span><span>) 
-</span><span style="color: #16a085;">bimap</span><span>: </span><span style="color: #27ae60;">ImmutableBiMap</span><span>[</span><span style="color: #27ae60;">Int</span><span>, </span><span style="color: #27ae60;">String</span><span>] = {1=one, 2=two, 3=three}
-</span><span style="color: #8e44ad;">travis-Ammonite@ </span><span>bimap.get(</span><span style="color: #27ae60;">1</span><span>) 
-</span><span style="color: #16a085;">res3</span><span>: </span><span style="color: #27ae60;">String</span><span> = </span><span style="color: #27ae60;">&quot;one&quot;</span><span>
-</span><span style="color: #8e44ad;">travis-Ammonite@ </span><span>bimap.inverse.get(</span><span style="color: #27ae60;">&quot;two&quot;</span><span>) 
-</span><span style="color: #16a085;">res4</span><span>: </span><span style="color: #27ae60;">Int</span><span> = </span><span style="color: #27ae60;">2</span></pre>
+</span><span style="color: #27ae60;">import </span><span style="color: #16a085;">com.google.common.collect.ImmutableBiMap // Works now</span></pre>
 
       <p>
         Or Joda Time:
 </p>
-      <pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>load.ivy(</span><span style="color: #27ae60;">&quot;joda-time&quot;</span><span> % </span><span style="color: #27ae60;">&quot;joda-time&quot;</span><span> % </span><span style="color: #27ae60;">&quot;2.8.2&quot;</span><span>)  
-:: loading settings :: url = jar:file:/home/travis/build/lihaoyi/Ammonite/amm/target/scala-2.11/ammonite-0.7.0-2.11.8!/org/apache/ivy/core/settings/ivysettings.xml
+      <pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span style="color: #f39c12;">import</span><span> $ivy.`joda-time:joda-time:2.8.2` 
+:: loading settings :: url = jar:file:/home/travis/build/lihaoyi/Ammonite/amm/target/scala-2.11/ammonite-0.7.2-2.11.8!/org/apache/ivy/core/settings/ivysettings.xml
 :: resolving dependencies :: joda-time#joda-time-caller;working
 	confs: [default]
 	found joda-time#joda-time;2.8.2 in central
 	found org.joda#joda-convert;1.2 in central
-downloading http://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2-sources.jar ...
-	[SUCCESSFUL ] joda-time#joda-time;2.8.2!joda-time.jar(source) (63ms)
 downloading http://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2.jar ...
-	[SUCCESSFUL ] joda-time#joda-time;2.8.2!joda-time.jar (14ms)
+	[SUCCESSFUL ] joda-time#joda-time;2.8.2!joda-time.jar (40ms)
+downloading http://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2-sources.jar ...
+	[SUCCESSFUL ] joda-time#joda-time;2.8.2!joda-time.jar(source) (18ms)
 downloading http://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2-javadoc.jar ...
-	[SUCCESSFUL ] joda-time#joda-time;2.8.2!joda-time.jar(javadoc) (21ms)
+	[SUCCESSFUL ] joda-time#joda-time;2.8.2!joda-time.jar(javadoc) (31ms)
 downloading http://repo1.maven.org/maven2/org/joda/joda-convert/1.2/joda-convert-1.2.jar ...
-	[SUCCESSFUL ] org.joda#joda-convert;1.2!joda-convert.jar (10ms)
-
+	[SUCCESSFUL ] org.joda#joda-convert;1.2!joda-convert.jar (18ms)
+</span><span style="color: #27ae60;">import </span><span style="color: #16a085;">$ivy.$                          </span><span>
 </span><span style="color: #8e44ad;">travis-Ammonite@ </span><span style="color: #f39c12;">import</span><span> org.joda.time.{DateTime, Period, Duration} 
 </span><span style="color: #27ae60;">import </span><span style="color: #16a085;">org.joda.time.{DateTime, Period, Duration}</span><span>
 </span><span style="color: #8e44ad;">travis-Ammonite@ </span><span style="color: #f39c12;">val</span><span> dt = </span><span style="color: #f39c12;">new</span><span> </span><span style="color: #27ae60;">DateTime</span><span>(</span><span style="color: #27ae60;">2005</span><span>, </span><span style="color: #27ae60;">3</span><span>, </span><span style="color: #27ae60;">26</span><span>, </span><span style="color: #27ae60;">12</span><span>, </span><span style="color: #27ae60;">0</span><span>, </span><span style="color: #27ae60;">0</span><span>, </span><span style="color: #27ae60;">0</span><span>) 
@@ -3624,7 +3702,7 @@ downloading http://repo1.maven.org/maven2/org/joda/joda-convert/1.2/joda-convert
 </p>
     <h1 id="Writing/LoadingScripts" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#Writing/LoadingScripts" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Writing/Loading Scripts</h1>
       <p>
-        You can write scripts in the same way you write commants, and load them using the <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">load.script(...)</code> and <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">load.module(...)</code> methods. To read more about this, check out the documentation on <a href="#ScriptFiles">Script Files</a>.
+        You can write scripts in the same way you write commands, and load them using <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">import $file</code>. To read more about this, check out the documentation on <a href="#ScriptFiles">Script Files</a>.
 
 </p>
   <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="DesignDecisions&amp;Tradeoffs" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Design Decisions &amp; Tradeoffs<a class=" scalatex-site-Styles-headerLink" href="#DesignDecisions&amp;Tradeoffs" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
@@ -3683,7 +3761,7 @@ downloading http://repo1.maven.org/maven2/org/joda/joda-convert/1.2/joda-convert
         <li>
           Ammonite can make use of any JVM APIs, and there are a lot of them! The JVM is a general-purpose platform for a general purpose language (Java), and thus has APIs for doing all sorts of things: dealing with <a href="https://docs.oracle.com/javase/8/docs/api/java/time/package-summary.html">dates and times</a>, <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Math.html">math</a>, <a href="https://docs.oracle.com/javase/8/docs/api/java/net/package-summary.html">networks</a>, <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Thread.html">threads</a>, and many other things. While you may not always need all of these capabilities, it is nice to have them at your disposal where necessary.</li>
         <li>
-          Ammonite can make use of any Java/JVM libraries, and the excelent infrastructure used by Java developers to download and manage them! Any library is just a <a href="#import$ivy">import $ivy</a> away. Need to parse Python source into an AST? Load <a href="https://search.maven.org/#search%7Cga%7C1%7Ca%3A%22jython-standalone%22">Jython</a> and just do it. Need a high-performance web server? Load <a href="http://doc.akka.io/docs/akka-stream-and-http-experimental/1.0-M2/scala/http/">Akka-HTTP</a>. Need some data someone stored in a YAML file? Load <a href="https://bitbucket.org/asomov/snakeyaml">SnakeYAML</a> and parse it. You don't even need to download and manage these libraries yourself: just <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">load.ivy</code> them from Ammonite, and Java's excellent dependency-management infrastructure will download them (along with any transitive dependencies!), cache them locally, and make them available to your code.
+          Ammonite can make use of any Java/JVM libraries, and the excelent infrastructure used by Java developers to download and manage them! Any library is just a <a href="#import$ivy">import $ivy</a> away. Need to parse Python source into an AST? Load <a href="https://search.maven.org/#search%7Cga%7C1%7Ca%3A%22jython-standalone%22">Jython</a> and just do it. Need a high-performance web server? Load <a href="http://doc.akka.io/docs/akka-stream-and-http-experimental/1.0-M2/scala/http/">Akka-HTTP</a>. Need some data someone stored in a YAML file? Load <a href="https://bitbucket.org/asomov/snakeyaml">SnakeYAML</a> and parse it. You don't even need to download and manage these libraries yourself: just <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">import $ivy</code> them from Ammonite, and Java's excellent dependency-management infrastructure will download them (along with any transitive dependencies!), cache them locally, and make them available to your code.
 </li></ul>
       <p>
         There are both pros and cons with running Ammonite on the JVM: we gain its heavy startup/memory overhead, but also get access to its high-performance <a href="https://en.wikipedia.org/wiki/Just-in-time_compilation">JIT</a>, massive ecosystem of available packages.
@@ -3746,7 +3824,7 @@ downloading http://repo1.maven.org/maven2/org/joda/joda-convert/1.2/joda-convert
       Ammonite does not come with a built-in way to make HTTP requests, but there are Java /Scala modules that do this quite well! Here's an example:
 </p>
     <pre><code class="scala scalatex-site-Styles-highlightMe">Welcome to the Ammonite Repl
-@ load.ivy(&quot;org.scalaj&quot; %% &quot;scalaj-http&quot; % &quot;2.2.0&quot;)
+@ interp.load.ivy(&quot;org.scalaj&quot; %% &quot;scalaj-http&quot; % &quot;2.2.0&quot;)
 :: loading settings ::
 :: resolving dependencies ::
 ...
@@ -3799,7 +3877,7 @@ res6: LsSeq = LsSeq(
   <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="ScrapingHTML" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Scraping HTML<a class=" scalatex-site-Styles-headerLink" href="#ScrapingHTML" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
     <p>
       Not every website has an API, and not every website is meant to be accessed programmatically. That doesn't mean you can't do it! Using libraries like <a href="http://jsoup.org/">JSoup</a>, you can quickly and easily get the computer to extract useful information from HTML that was meant to humans. Using the Ammonite REPL, you can do it interactively and without needing to set up annoying project scaffolding.</p>
-    <pre><code class="scala scalatex-site-Styles-highlightMe">@ load.ivy(&quot;org.jsoup&quot; % &quot;jsoup&quot; % &quot;1.7.2&quot;)
+    <pre><code class="scala scalatex-site-Styles-highlightMe">@ import $ivy.`org.jsoup:jsoup:1.7.2`
 
 @ import org.jsoup._ // import Jsoup
 
@@ -3887,7 +3965,7 @@ res12: Int = 6</code></pre>
     <p>
       Apart from writing code, you very often find yourself dealing with documents and spreadsheets of various sorts. This is often rather tedious. Wouldn't it be cool if you could deal with these things programmatically? It turns out that there are open-soure Java libraries such as <a href="https://poi.apache.org/">Apache POI</a> that let you do this, and with the Ammonite-REPL you can quickly and easily load these libraries and get to work on your favorite documents. Here's an example extracting some data from my old Resume, in <code>.docx</code> format:
 </p>
-    <pre><code class="scala scalatex-site-Styles-highlightMe">@ load.ivy(&quot;org.apache.poi&quot; % &quot;poi-ooxml&quot; % &quot;3.13&quot;)
+    <pre><code class="scala scalatex-site-Styles-highlightMe">@ import $ivy.`org.apache.poi:poi-ooxml:3.13`
 
 @ import ammonite.ops._                  // Prepare to deal with some files
 @ import org.apache.poi.xwpf.usermodel._ // Bring Ms-Word APIs into scope
@@ -3948,7 +4026,7 @@ res27: Array[String] = Array(
     <p>
       There are also simple libraries like <a href="https://github.com/coobird/thumbnailator">Thumbnailator</a> if you're doing basic things like renaming/resizing/rotating and don't need pixel-per-pixel access. This is an example of using Thumbnailator to resize a folder of images and put them somewhere else:
 </p>
-    <pre><code class="scala scalatex-site-Styles-highlightMe">@ load.ivy(&quot;net.coobird&quot; % &quot;thumbnailator&quot; % &quot;0.4.8&quot;)
+    <pre><code class="scala scalatex-site-Styles-highlightMe">@ import $ivy.`net.coobird:thumbnailator:0.4.8`
 
 @ import net.coobird.thumbnailator._
 import net.coobird.thumbnailator._
@@ -3987,11 +4065,8 @@ res45: Seq[Long] = List(11129L, 11790L, 11893L)</code></pre>
     <p>
       Here's one example of how you can get started using the <a href="http://opennlp.apache.org/">OpenNLP</a> project to do some natural-language processing in just a few minutes. The example was found <a href="http://www.programcreek.com/2012/05/opennlp-tutorial/#sentence detector">online</a>, and shows how to extract english names from a raw <code>String</code> using NLP:
 </p>
-    <pre><code class="scala scalatex-site-Styles-highlightMe">@ load.ivy(&quot;org.apache.opennlp&quot; % &quot;opennlp-tools&quot; % &quot;1.6.0&quot;) // load OpenNLP
+    <pre><code class="scala scalatex-site-Styles-highlightMe">@ import $ivy.`org.apache.opennlp:opennlp-tools:1.6.0` // load OpenNLP
 
-@ // Turns out you need training data, use Scalaj-HTTP to download it
-
-@ load.ivy(&quot;org.scalaj&quot; %% &quot;scalaj-http&quot; % &quot;2.2.0&quot;)
 
 @ val tokenDataUrl = &quot;http://opennlp.sourceforge.net/models-1.5/en-token.bin&quot;
 
@@ -4059,9 +4134,9 @@ res96: Array[String] = Array(&quot;Mike&quot;, &quot;Peter Smith&quot;)
     <pre class=" scalatex-site-Styles-hoverContainer"><code class="sc scalatex-site-Styles-highlightMe">/**
   * Single-file play framework application!
   */
-load.ivy(&quot;com.typesafe.play&quot; %% &quot;play&quot; % &quot;2.5.0&quot;)
-load.ivy(&quot;com.typesafe.play&quot; %% &quot;play-netty-server&quot; % &quot;2.5.0&quot;)
-load.ivy(&quot;org.scalaj&quot; %% &quot;scalaj-http&quot; % &quot;2.2.1&quot;)
+interp.load.ivy(&quot;com.typesafe.play&quot; %% &quot;play&quot; % &quot;2.5.0&quot;)
+interp.load.ivy(&quot;com.typesafe.play&quot; %% &quot;play-netty-server&quot; % &quot;2.5.0&quot;)
+interp.load.ivy(&quot;org.scalaj&quot; %% &quot;scalaj-http&quot; % &quot;2.2.1&quot;)
 
 @
 
@@ -4191,6 +4266,55 @@ try {
       to use these projects, the Scaladoc is still useful as a reference.
   </p>
   <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="Changelog" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Changelog<a class=" scalatex-site-Styles-headerLink" href="#Changelog" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
+    <h1 id="0.7.2" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#0.7.2" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>0.7.2</h1>
+      <ul>
+
+        <li>
+          Hygienified the default namespace by avoiding importing all the
+          <a href="#ReplAPI">Repl API</a> functions into local scope, instead leaving them
+          inside the <code>repl</code> object. <b>This is a backwards incompatible
+          change!</b></li>
+        <li>
+          Separated the APIs available from scripts (<code>load.*</code> and
+          <code>resolvers</code> in the <code>interp</code> object)
+          from those available from the REPL (in the <code>repl</code> object).
+          <code>repl</code> is not available when running scripts, unless you pass in
+          the <code>--repl-api</code> flag at the command line.</li>
+        <li>
+          If you want to maintain the old behavior, e.g. for backwards-compat,
+          put a <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">import repl._</code> in your <code>~/.ammonite/predef.sc</code> and
+          <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">import interp._</code> in your <code>~/.ammonite/predefShared.s</code> to
+          bring everything back into scope again.</li>
+        <li>
+          <code>predef.sc</code> now only applies to the interactive REPL. If you
+          want predef code that applies to scripts use <code>predefScript.sc</code>,
+          or if you want predef code that applies to both you can use
+          <code>predefShared.sc</code>.</li>
+        <li>
+          Added a version of <a href="#desugar">desugar</a> to Scala 2.10.x. It doesn't
+          print things as prettily/accurately as the 2.11.x version, but it's
+          better than nothing.</li>
+        <li>
+          Changed the syntax for <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">import $file</code> segments outside your
+          current directory from <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">import $file.`..`.foo</code> to
+          <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">import $file.^.foo</code>. This makes it a lot shorter and
+          mitigates a problems caused by the file-name being too long.</li>
+        <li>
+          You can now use a <code>JAVA_OPTS</code> environment variable to pass flags
+          to the JVM when starting Ammonite, thanks to <a href="https://github.com/sscarduzio">Simon Scarduzio</a></li>
+        <li>
+          Running scripts outside the current working directory tree, as well as
+          scripts with non-alphanumeric symbols in their file path, now works
+          thanks to <a href="https://github.com/coderabhishek">coderabhishek</a></li>
+        <li>
+          Scripts without the <code>.sc</code> can now be run directly from the command line
+          rather than throwing an <code>IndexOutOfBoundsException</code>.</li>
+        <li>
+          Modularized Ammonite's internals; the main module <code>ammonite</code> has now
+          been broken into 5 smaller modules for maintainability. This in
+          itself should not be visible to the outside world, but be sure to
+          report any bugs!
+</li></ul>
     <h1 id="0.7.0" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#0.7.0" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>0.7.0</h1>
       <ul>
         <li>
@@ -4258,7 +4382,7 @@ try {
           Fixed #400: load.exec in predef.scala causes NPE in 0.5.9 or 0.6.0</li>
         <li>
           Fixed #398: by default, using Ammonite inside a SBT project uses the
-          old `~/.ammonite/` storage folder, not the `InMemory` storage system.
+          old <code>~/.ammonite/</code> storage folder, not the <code>InMemory</code> storage system.
           This restores the pre-0.5.9 behavior</li>
         <li>
           Fix regression causing BACKSPACE to not work while performing a
@@ -4857,17 +4981,17 @@ try {
   <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="UnstableVersions" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Unstable Versions<a class=" scalatex-site-Styles-headerLink" href="#UnstableVersions" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
     <p>
       The page above contains the documentation for the latest stable version
-      of Ammonite, <code>0.7.0</code>. Ammonite also publishes
+      of Ammonite, <code>0.7.2</code>. Ammonite also publishes
       unstable versions, the latest of which is
-      <code>COMMIT-d2e00a9</code> and is available for direct
+      <code>0.7.2</code> and is available for direct
       download:
 </p>
-    <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/v6zUw &amp;&amp; chmod +x /usr/local/bin/amm &amp;&amp; amm
+    <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/v6rSq &amp;&amp; chmod +x /usr/local/bin/amm &amp;&amp; amm
 </code></pre>
     <p>
       Or usage in an SBT project
 </p>
-    <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;COMMIT-d2e00a9&quot; % &quot;test&quot; cross CrossVersion.full
+    <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;0.7.2&quot; % &quot;test&quot; cross CrossVersion.full
 
 initialCommands in (Test, console) := &quot;&quot;&quot;ammonite.Main().run()&quot;&quot;&quot;
 </code></pre>
@@ -4885,22 +5009,11 @@ initialCommands in (Test, console) := &quot;&quot;&quot;ammonite.Main().run()&qu
       numbered release.
 </p>
     <h1 id="UnstableChanglog" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#UnstableChanglog" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Unstable Changlog</h1>
-      <ul>
-        <li>
-          You can now use a <code>JAVA_OPTS</code> environment variable to pass flags
-          to the JVM when starting Ammonite, thanks to <a href="https://github.com/sscarduzio">Simon Scarduzio</a></li>
-        <li>
-          Running scripts outside the current working directory tree, as well as
-          scripts with non-alphanumeric symbols in their file path, now works
-          thanks to <a href="https://github.com/coderabhishek">coderabhishek</a></li>
-        <li>
-          Scripts without the `.sc` can now be run directly from the command line
-          rather than throwing an `IndexOutOfBoundsException`.
-</li></ul></div>
+      <ul></ul></div>
 
 </div><script>
     scalatex.scrollspy.Controller().main(
-      [{"value":"Ammonite","children":[]},{"value":"Ammonite-REPL","children":[{"value":"Features","children":[{"value":"Pretty-printed output","children":[{"value":"Configurable Truncation","children":[]}]},{"value":"Editing","children":[{"value":"Syntax Highlighting","children":[]},{"value":"Multi-line editing","children":[]},{"value":"Desktop key-bindings","children":[]},{"value":"Console key-bindings","children":[]},{"value":"History Search","children":[]},{"value":"Block Input","children":[]},{"value":"Undo & Redo","children":[]}]},{"value":"Magic Imports","children":[{"value":"import $file","children":[{"value":"Imported Scripts are Re-used","children":[]},{"value":"Cannot directly import from inside a Script","children":[]},{"value":"Renamed-scripts and multiple-scripts","children":[]}]},{"value":"import $exec","children":[]},{"value":"import $ivy","children":[]}]},{"value":"Builtins","children":[{"value":"Repl API","children":[]},{"value":"Utilities","children":[{"value":"time","children":[]},{"value":"grep","children":[]},{"value":"browse","children":[]},{"value":"desugar","children":[]}]}]},{"value":"Save/Load Session","children":[]},{"value":"Superior Autocomplete","children":[]},{"value":"Interrupting run-away execution with Ctrl-C","children":[]},{"value":"Compiler-crash Robustness","children":[]},{"value":"Other Fixes","children":[]}]},{"value":"Configuration","children":[{"value":"Refs","children":[]},{"value":"Compiler Flags","children":[]}]},{"value":"Embedding","children":[{"value":"Instantiating Ammonite","children":[]},{"value":"Debugging","children":[]},{"value":"Remote REPL","children":[]}]}]},{"value":"Scala Scripts","children":[{"value":"Script Files","children":[{"value":"Script Imports","children":[{"value":"Other Scripts","children":[]},{"value":"Ivy Dependencies","children":[]}]},{"value":"Multi-stage Scripts","children":[]},{"value":"Script Arguments","children":[]},{"value":"Multiple Main Methods","children":[]},{"value":"Bundled Libraries","children":[]}]},{"value":"Running Scripts","children":[{"value":"From the REPL","children":[]},{"value":"From Bash","children":[]},{"value":"Execution Model","children":[]}]}]},{"value":"Ammonite-Ops","children":[{"value":"Paths","children":[{"value":"RelPaths","children":[]},{"value":"Path Operations","children":[]},{"value":"Constructing Paths","children":[]}]},{"value":"Operations","children":[{"value":"Operator Reference","children":[]},{"value":"Extensions","children":[{"value":"Traversable","children":[]},{"value":"Pipeable","children":[]},{"value":"Callable","children":[]}]},{"value":"Chaining","children":[]},{"value":"Reading Resources","children":[]},{"value":"Spawning Subprocesses","children":[{"value":"Environment Variables","children":[]},{"value":"Invoking Files","children":[]},{"value":"Current Working Directory","children":[]}]}]}]},{"value":"Ammonite-Shell","children":[{"value":"Shell Basics","children":[{"value":"Working Directory","children":[]},{"value":"Listing Files","children":[]},{"value":"Filesystem Operations","children":[]},{"value":"Piping","children":[]},{"value":"Subprocesses","children":[]}]},{"value":"Scripting","children":[{"value":"Scala Scripting","children":[]},{"value":"Typed Values","children":[]},{"value":"Scala/Java APIs","children":[]},{"value":"Writing/Loading Scripts","children":[]}]},{"value":"Design Decisions & Tradeoffs","children":[{"value":"Scala as the Language","children":[]},{"value":"Running on the JVM","children":[]},{"value":"Goals of Ammonite-Shell","children":[]}]}]},{"value":"Ammonite Cookbook","children":[{"value":"HTTP Requests","children":[]},{"value":"Scraping HTML","children":[]},{"value":"GUI Applications","children":[]},{"value":"Office Automation","children":[]},{"value":"Image Processing","children":[]},{"value":"Machine Learning","children":[]},{"value":"Play Framework Server","children":[]}]},{"value":"Reference","children":[{"value":"Community","children":[]},{"value":"Talks","children":[]},{"value":"In the Wild","children":[]},{"value":"Scaladoc","children":[]},{"value":"Changelog","children":[{"value":"0.7.0","children":[]},{"value":"0.6.2","children":[]},{"value":"0.6.1","children":[]},{"value":"0.6.0","children":[]},{"value":"0.5.9","children":[]},{"value":"0.5.8","children":[]},{"value":"0.5.7","children":[]},{"value":"0.5.6","children":[]},{"value":"0.5.5","children":[]},{"value":"0.5.4","children":[]},{"value":"0.5.3","children":[]},{"value":"0.5.2","children":[]},{"value":"0.5.1","children":[]},{"value":"0.5.0","children":[]},{"value":"0.4.9","children":[]},{"value":"0.4.8","children":[]},{"value":"0.4.7","children":[]},{"value":"0.4.6","children":[]},{"value":"0.4.5","children":[]},{"value":"0.4.4","children":[]},{"value":"0.4.3","children":[]},{"value":"0.4.2","children":[]},{"value":"0.4.1","children":[]},{"value":"0.4.0","children":[]},{"value":"0.3.2","children":[]},{"value":"0.3.1","children":[]},{"value":"0.3.0","children":[]},{"value":"0.2.9","children":[]},{"value":"0.2.8","children":[]}]},{"value":"Unstable Versions","children":[{"value":"Unstable Changlog","children":[]}]}]}]
+      [{"value":"Ammonite","children":[]},{"value":"Ammonite-REPL","children":[{"value":"Features","children":[{"value":"Pretty-printed output","children":[{"value":"Configurable Truncation","children":[]}]},{"value":"Editing","children":[{"value":"Syntax Highlighting","children":[]},{"value":"Multi-line editing","children":[]},{"value":"Desktop key-bindings","children":[]},{"value":"Console key-bindings","children":[]},{"value":"History Search","children":[]},{"value":"Block Input","children":[]},{"value":"Undo & Redo","children":[]}]},{"value":"Magic Imports","children":[{"value":"import $file","children":[{"value":"Imported Scripts are Re-used","children":[]},{"value":"Cannot directly import from inside a Script","children":[]},{"value":"Renamed-scripts and multiple-scripts","children":[]}]},{"value":"import $exec","children":[]},{"value":"import $ivy","children":[]}]},{"value":"Builtins","children":[{"value":"Repl API","children":[]},{"value":"Utilities","children":[{"value":"time","children":[]},{"value":"grep","children":[]},{"value":"browse","children":[]},{"value":"desugar","children":[]}]}]},{"value":"Save/Load Session","children":[]},{"value":"Superior Autocomplete","children":[]},{"value":"Interrupting run-away execution with Ctrl-C","children":[]},{"value":"Compiler-crash Robustness","children":[]},{"value":"Other Fixes","children":[]}]},{"value":"Configuration","children":[{"value":"Refs","children":[]},{"value":"Compiler Flags","children":[]},{"value":"JVM Flags","children":[]}]},{"value":"Embedding","children":[{"value":"Instantiating Ammonite","children":[]},{"value":"Debugging","children":[]},{"value":"Remote REPL","children":[]}]}]},{"value":"Scala Scripts","children":[{"value":"Script Files","children":[{"value":"Script Imports","children":[{"value":"Other Scripts","children":[]},{"value":"Ivy Dependencies","children":[]}]},{"value":"Multi-stage Scripts","children":[]},{"value":"Script Arguments","children":[]},{"value":"Multiple Main Methods","children":[]},{"value":"Bundled Libraries","children":[]},{"value":"builtins","children":[]}]},{"value":"Running Scripts","children":[{"value":"From Bash","children":[]},{"value":"From the REPL","children":[]},{"value":"Execution Model","children":[]}]}]},{"value":"Ammonite-Ops","children":[{"value":"Paths","children":[{"value":"RelPaths","children":[]},{"value":"Path Operations","children":[]},{"value":"Constructing Paths","children":[]}]},{"value":"Operations","children":[{"value":"Operator Reference","children":[]},{"value":"Extensions","children":[{"value":"Traversable","children":[]},{"value":"Pipeable","children":[]},{"value":"Callable","children":[]}]},{"value":"Chaining","children":[]},{"value":"Reading Resources","children":[]},{"value":"Spawning Subprocesses","children":[{"value":"Environment Variables","children":[]},{"value":"Invoking Files","children":[]},{"value":"Current Working Directory","children":[]}]}]}]},{"value":"Ammonite-Shell","children":[{"value":"Shell Basics","children":[{"value":"Working Directory","children":[]},{"value":"Listing Files","children":[]},{"value":"Filesystem Operations","children":[]},{"value":"Piping","children":[]},{"value":"Subprocesses","children":[]}]},{"value":"Scripting","children":[{"value":"Scala Scripting","children":[]},{"value":"Typed Values","children":[]},{"value":"Scala/Java APIs","children":[]},{"value":"Writing/Loading Scripts","children":[]}]},{"value":"Design Decisions & Tradeoffs","children":[{"value":"Scala as the Language","children":[]},{"value":"Running on the JVM","children":[]},{"value":"Goals of Ammonite-Shell","children":[]}]}]},{"value":"Ammonite Cookbook","children":[{"value":"HTTP Requests","children":[]},{"value":"Scraping HTML","children":[]},{"value":"GUI Applications","children":[]},{"value":"Office Automation","children":[]},{"value":"Image Processing","children":[]},{"value":"Machine Learning","children":[]},{"value":"Play Framework Server","children":[]}]},{"value":"Reference","children":[{"value":"Community","children":[]},{"value":"Talks","children":[]},{"value":"In the Wild","children":[]},{"value":"Scaladoc","children":[]},{"value":"Changelog","children":[{"value":"0.7.2","children":[]},{"value":"0.7.0","children":[]},{"value":"0.6.2","children":[]},{"value":"0.6.1","children":[]},{"value":"0.6.0","children":[]},{"value":"0.5.9","children":[]},{"value":"0.5.8","children":[]},{"value":"0.5.7","children":[]},{"value":"0.5.6","children":[]},{"value":"0.5.5","children":[]},{"value":"0.5.4","children":[]},{"value":"0.5.3","children":[]},{"value":"0.5.2","children":[]},{"value":"0.5.1","children":[]},{"value":"0.5.0","children":[]},{"value":"0.4.9","children":[]},{"value":"0.4.8","children":[]},{"value":"0.4.7","children":[]},{"value":"0.4.6","children":[]},{"value":"0.4.5","children":[]},{"value":"0.4.4","children":[]},{"value":"0.4.3","children":[]},{"value":"0.4.2","children":[]},{"value":"0.4.1","children":[]},{"value":"0.4.0","children":[]},{"value":"0.3.2","children":[]},{"value":"0.3.1","children":[]},{"value":"0.3.0","children":[]},{"value":"0.2.9","children":[]},{"value":"0.2.8","children":[]}]},{"value":"Unstable Versions","children":[{"value":"Unstable Changlog","children":[]}]}]}]
   )</script><script>
     ['DOMContentLoaded', 'load'].forEach(function(ev){
       addEventListener(ev, function(){
@@ -4910,4 +5023,4 @@ initialCommands in (Test, console) := &quot;&quot;&quot;ammonite.Main().run()&qu
         );
       })
     })
-  </script></body></html>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
+  </script></body></html>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
