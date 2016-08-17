@@ -50,11 +50,12 @@ object Router{
     */
   case class EntryPoint(name: String,
                         argSignatures: Seq[ArgSig],
-                        invoke0: (Map[String, String]) => Result[Any]){
+                        varargs: Boolean,
+                        invoke0: (Map[String, String], Seq[String]) => Result[Any]){
     def invoke(args: Seq[String], kwargs: Seq[(String, String)]): Result[Any] = {
       val (usedArgs, leftoverArgs) = args.splitAt(argSignatures.length)
-      if (leftoverArgs.nonEmpty) Result.Error.TooManyArguments(leftoverArgs)
-      else{
+      if (leftoverArgs.nonEmpty && !varargs) Result.Error.TooManyArguments(leftoverArgs)
+      else {
         val implicitlyNamedArgs = argSignatures.map(_.name).zip(usedArgs).toMap
         val redundantKeys =
           (implicitlyNamedArgs.keys.toSeq ++ kwargs.map(_._1))
@@ -64,7 +65,7 @@ object Router{
         if(redundantKeys.nonEmpty) {
           Result.Error.RedundantArguments(redundantKeys.keysIterator.toSeq)
         } else {
-          try invoke0(implicitlyNamedArgs ++ kwargs)
+          try invoke0(implicitlyNamedArgs ++ kwargs, leftoverArgs)
           catch{case e: Throwable =>
             Result.Error.Exception(e)
           }
@@ -76,17 +77,36 @@ object Router{
   def read[T](dict: Map[String, String],
               default: => Option[Any],
               arg: ArgSig,
-              thunk: String => T): FailMaybe = {
+              thunk: String => T,
+              extras: Option[Seq[String]]): FailMaybe = {
     dict.get(arg.name) match{
       case None =>
         try default match{
-          case None => Left(Result.ParamError.Missing(arg))
+          case None => Left(Seq(Result.ParamError.Missing(arg)))
           case Some(v) => Right(v)
-        } catch {case e => Left(Result.ParamError.DefaultFailed(arg, e)) }
+        } catch {case e => Left(Seq(Result.ParamError.DefaultFailed(arg, e))) }
 
       case Some(x) =>
-      try Right(thunk(x))
-      catch {case e => Left(Result.ParamError.Invalid(arg, x, e)) }
+
+        extras match{
+          case None =>
+            try Right(thunk(x))
+            catch {case e => Left(Seq(Result.ParamError.Invalid(arg, x, e))) }
+
+          case Some(extraItems) =>
+            val attempts: Seq[Either[Result.ParamError.Invalid, T]] = (x +: extraItems).map{ item =>
+              try Right(thunk(item))
+              catch {case e => Left(Result.ParamError.Invalid(arg, item, e)) }
+            }
+
+            val bad = attempts.collect{ case Left(x) => x}
+            if (bad.nonEmpty) Left(bad)
+            else {
+              val good = Right(attempts.collect{case Right(x) => x})
+              good
+            }
+        }
+
     }
   }
 
@@ -158,11 +178,11 @@ object Router{
   }
 
 
-  type FailMaybe = Either[Result.ParamError, Any]
+  type FailMaybe = Either[Seq[Result.ParamError], Any]
   type FailAll = Either[Seq[Result.ParamError], Seq[Any]]
 
   def validate(args: Seq[FailMaybe]): Result[Seq[Any]] = {
-    val lefts = args.collect{case Left(x) => x}
+    val lefts = args.collect{case Left(x) => x}.flatten
     if (lefts.nonEmpty) Result.Error.InvalidArguments(lefts)
     else Result.Success(args.collect{case Right(x) => x})
   }
@@ -204,13 +224,28 @@ class Router [C <: Context](val c: C) {
     val defaults = for ((arg, i) <- flattenedArgLists.zipWithIndex) yield {
       hasDefault(i).map(defaultName => q"() => $target.${newTermName(defaultName)}")
     }
+
+    def unwrapVarargType(arg: Symbol) = {
+      val vararg = arg.typeSignature.typeSymbol == definitions.RepeatedParamClass
+      val unwrappedType =
+        if (!vararg) arg.typeSignature
+        else arg.typeSignature.asInstanceOf[TypeRef].args(0)
+
+      (vararg, unwrappedType)
+    }
     val readArgSigs = for(
       ((arg, defaultOpt), i) <- flattenedArgLists.zip(defaults).zipWithIndex
     ) yield {
-      val default = defaultOpt match {
-        case Some(defaultExpr) => q"Some($defaultExpr())"
-        case None => q"None"
-      }
+
+      val (vararg, unwrappedType) = unwrapVarargType(arg)
+
+      val default =
+        if (vararg) q"scala.Some(scala.Nil)"
+        else defaultOpt match {
+          case Some(defaultExpr) => q"scala.Some($defaultExpr())"
+          case None => q"scala.None"
+        }
+
       val docs = for{
         doc <- arg.annotations.find(_.tpe =:= typeOf[Router.doc])
         if doc.scalaArgs.head.isInstanceOf[Literal]
@@ -231,28 +266,36 @@ class Router [C <: Context](val c: C) {
         )
       """
 
-
+      val extraArg = if(vararg) q"scala.Some(extras)" else q"None"
       val reader = q"""
-      ammonite.main.Router.read[${arg.typeSignature}](
+      ammonite.main.Router.read[$unwrappedType](
         $argListSymbol,
         $default,
         $argSig,
-        implicitly[scopt.Read[${arg.typeSignature}]].reads(_)
+        implicitly[scopt.Read[$unwrappedType]].reads(_),
+        $extraArg
       )
       """
-      (reader, argSig)
+      (reader, argSig, vararg)
     }
 
-    val (readArgs, argSigs) = readArgSigs.unzip
-    val (argNames, argNameCasts) = flattenedArgLists.map(arg =>
-      (pq"${arg.name.toTermName}", q"${arg.name.toTermName}.asInstanceOf[${arg.typeSignature}]")
-    ).unzip
+    val (readArgs, argSigs, varargs) = readArgSigs.unzip3
+    val (argNames, argNameCasts) = flattenedArgLists.map { arg =>
+      val (vararg, unwrappedType) = unwrapVarargType(arg)
+      (
+        pq"${arg.name.toTermName}",
+        if (!vararg) q"${arg.name.toTermName}.asInstanceOf[$unwrappedType]"
+        else q"${arg.name.toTermName}.asInstanceOf[Seq[$unwrappedType]]: _*"
 
-     q"""
+        )
+    }.unzip
+
+    q"""
     ammonite.main.Router.EntryPoint(
       ${meth.name.toString},
       scala.Seq(..$argSigs),
-      ($argListSymbol: Map[String, String]) =>
+      ${varargs.contains(true)},
+      ($argListSymbol: Map[String, String], extras: Seq[String]) =>
         ammonite.main.Router.validate(Seq(..$readArgs)) match{
           case ammonite.main.Router.Result.Success(List(..$argNames)) =>
             ammonite.main.Router.Result.Success($target.${meth.name.toTermName}(..$argNameCasts))

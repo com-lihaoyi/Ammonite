@@ -137,13 +137,19 @@ object UnitTests extends TestSuite{
         def notExported() = ???
 
         val baz = "bazzz"
+
+        @main
+        def pureVariadic(nums: Int*) = nums.sum
+
+        @main
+        def mixedVariadic(first: Int, args: String*) = first + args.mkString
       }
       val routes = Router.generateRoutes(Target)
 
 
       'basicModelling{
         assert(
-          routes.map(_.name) == Seq("foo", "bar", "qux", "ex")
+          routes.map(_.name) == Seq("foo", "bar", "qux", "ex", "pureVariadic", "mixedVariadic")
         )
         val evaledArgs = routes.map(_.argSignatures.map{
           case Router.ArgSig(name, tpe, docs, None) => (name, tpe, docs, None)
@@ -157,16 +163,63 @@ object UnitTests extends TestSuite{
               ("i", "Int", None, None),
               ("s", "String", Some("Pass in a custom `s` to override it"), Some("lols"))
             ),
-            List()
+            List(),
+            List(("nums", "Int*", None, None)),
+            List(("first", "Int", None, None), ("args", "String*", None, None))
           )
         )
       }
+
       'invoke - assert(
         routes(0).invoke(Seq.empty, Seq.empty) == Router.Result.Success(1),
         routes(1).invoke(Seq.empty, Seq("i" -> "2")) == Router.Result.Success(2),
         routes(2).invoke(Seq.empty, Seq("i" -> "2")) == Router.Result.Success("lolslols"),
         routes(2).invoke(Seq.empty, Seq("i" -> "3", "s" -> "x")) == Router.Result.Success("xxx")
       )
+      'varargs{
+        'happyPathPasses - assert(
+          routes(4).invoke(Seq("1", "2", "3"), Seq()) == Router.Result.Success(6),
+          routes(5).invoke(Seq("1", "2", "3", "4", "5"), Seq()) == Router.Result.Success("12345")
+        )
+        'emptyVarargsPasses - assert(
+          routes(4).invoke(Seq(), Seq()) == Router.Result.Success(0),
+          routes(5).invoke(Seq("1"), Seq()) == Router.Result.Success("1")
+        )
+        'namedVarargAlonePasses - assert(
+          routes(4).invoke(Seq(), Seq("nums" -> "31337")) == Router.Result.Success(31337),
+          routes(5).invoke(Seq("1"), Seq("args" -> "foo")) == Router.Result.Success("1foo")
+        )
+        'duplicatePositionalAndNamedVarargsFails{
+          assertMatch(routes(4).invoke(Seq("1", "2", "3"), Seq("nums" -> "4"))){
+            case RedundantArguments(Seq("nums")) =>
+          }
+        }
+
+        'notEnoughNormalArgsStillFails{
+          assertMatch(routes(5).invoke(Seq(), Seq())){
+            case InvalidArguments(
+              Seq(ParamError.Missing(ArgSig("first", _, _, _)))
+            )=>
+          }
+        }
+        'multipleVarargParseFailures{
+          assertMatch(routes(4).invoke(Seq("aa", "bb", "3"), Seq())){
+            case InvalidArguments(
+              Seq(
+                ParamError.Invalid(ArgSig("nums", "Int*", _, _), "aa", _: NumberFormatException),
+                ParamError.Invalid(ArgSig("nums", "Int*", _, _), "bb", _: NumberFormatException)
+              )
+            )=>
+          }
+          assertMatch(routes(5).invoke(Seq("aa", "bb", "3"), Seq())){
+            case InvalidArguments(
+              Seq(
+                ParamError.Invalid(ArgSig("first", "Int", _, _), "aa", _: NumberFormatException)
+              )
+            )=>
+          }
+        }
+      }
 
       'failures{
         'missingParams - {
