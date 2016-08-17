@@ -91,6 +91,11 @@
       to use these projects, the Scaladoc is still useful as a reference.
   
   @sect{Changelog}
+    @sect{0.7.4}
+      @ul
+        @li
+          Fix publication of artifacts for non-{2.11.8, 2.10.5} Ammonite versions
+
     @sect{0.7.3}
       @ul
         @li

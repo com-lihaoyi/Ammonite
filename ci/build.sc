@@ -61,11 +61,7 @@ def publishSigned() = {
 
 
   for (version <- allVersions) {
-    if (latestVersions.contains(version)) {
-      %sbt("++" + version, "published/publishSigned")
-    }else {
-      %sbt("++" + version, "amm/publishSigned", "sshd/publishSigned")
-    }
+    %sbt("++" + version, "published/publishSigned")
   }
   %sbt("sonatypeReleaseAll")
 }
