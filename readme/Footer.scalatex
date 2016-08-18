@@ -118,7 +118,7 @@
         @li
           If you want to maintain the old behavior, e.g. for backwards-compat,
           put a @hl.scala{import repl._} in your @code{~/.ammonite/predef.sc} and
-          @hl.scala{import interp._} in your @code{~/.ammonite/predefShared.s} to
+          @hl.scala{import interp._} in your @code{~/.ammonite/predefShared.sc} to
           bring everything back into scope again.
         @li
           @code{predef.sc} now only applies to the interactive REPL. If you
@@ -144,7 +144,8 @@
           thanks to @lnk("coderabhishek", "https://github.com/coderabhishek")
         @li
           Scripts without the @code{.sc} can now be run directly from the command line
-          rather than throwing an @code{IndexOutOfBoundsException}.
+          rather than throwing an @code{IndexOutOfBoundsException}, thanks to
+          @lnk("coderabhishek", "https://github.com/coderabhishek")
         @li
           Modularized Ammonite's internals; the main module @code{ammonite} has now
           been broken into 5 smaller modules for maintainability. This in
