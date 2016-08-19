@@ -66,7 +66,7 @@ case class Main(predef: String = "",
     )
   }
 
-  def instantiateInterpreter(replApi: Boolean) = {
+  def instantiateInterpreter(replApi: Boolean, args: Seq[String] = Vector()) = {
     val augmentedPredef = Main.maybeDefaultPredef(defaultPredef, Defaults.predefString)
 
     val (colors, printStream, errorPrintStream, printer) =
@@ -96,7 +96,8 @@ case class Main(predef: String = "",
           )
           Seq(("ammonite.repl.ReplBridge", "repl", replApi))
         },
-      wd
+      wd,
+      args
     )
     interp
   }
@@ -114,7 +115,7 @@ case class Main(predef: String = "",
                 kwargs: Seq[(String, String)],
                 replApi: Boolean = false): Res[Imports] = {
 
-    val interp = instantiateInterpreter(replApi)
+    val interp = instantiateInterpreter(replApi, args)
     main.Scripts.runScript(wd, path, interp, args, kwargs)
   }
 

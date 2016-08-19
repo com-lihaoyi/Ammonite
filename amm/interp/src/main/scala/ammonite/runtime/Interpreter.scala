@@ -32,7 +32,8 @@ class Interpreter(val printer: Printer,
                   // running, so you can use them predef to e.g. configure
                   // the REPL before it starts
                   extraBridges: Interpreter => Seq[(String, String, AnyRef)],
-                  val wd: Path)
+                  val wd: Path,
+                  val args: Seq[String] = Vector())
   extends ImportHook.InterpreterInterface{ interp =>
 
 
@@ -652,6 +653,7 @@ class Interpreter(val printer: Printer,
       }
 
     }
+    lazy val args = Interpreter.this.args
   }
 
 }
