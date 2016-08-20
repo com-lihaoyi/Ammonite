@@ -32,7 +32,8 @@ class Interpreter(val printer: Printer,
                   // running, so you can use them predef to e.g. configure
                   // the REPL before it starts
                   extraBridges: Interpreter => Seq[(String, String, AnyRef)],
-                  val wd: Path)
+                  val wd: Path,
+                  verboseIvy: Boolean = true)
   extends ImportHook.InterpreterInterface{ interp =>
 
 
@@ -571,7 +572,11 @@ class Interpreter(val printer: Printer,
     psOpt match{
       case Some(ps) => ps
       case None =>
-        val resolved = ammonite.runtime.tools.IvyThing(() => interpApi.resolvers()).resolveArtifact(
+        val resolved = ammonite.runtime.tools.IvyThing(
+          () => interpApi.resolvers(),
+          printer,
+          verboseIvy
+        ).resolveArtifact(
           groupId,
           artifactId,
           version,
@@ -588,7 +593,11 @@ class Interpreter(val printer: Printer,
   }
   abstract class DefaultLoadJar extends LoadJar {
 
-    lazy val ivyThing = ammonite.runtime.tools.IvyThing(() => interpApi.resolvers())
+    lazy val ivyThing = ammonite.runtime.tools.IvyThing(
+      () => interpApi.resolvers(),
+      printer,
+      verboseIvy
+    )
 
     def handleClasspath(jar: File): Unit
 

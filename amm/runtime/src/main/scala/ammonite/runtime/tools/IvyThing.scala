@@ -10,6 +10,9 @@ import org.apache.ivy.util._
 
 import org.apache.ivy.plugins.resolver._
 import acyclic.file
+import ammonite.util.Printer
+import ammonite.util.Util.newLine
+import java.io.{File, OutputStream, PrintStream}
 import IvyThing._
 
 
@@ -31,17 +34,21 @@ trait IvyConstructor{
  *
  * And transliterated into Scala. I have no idea how or why it works.
  */
-case class IvyThing(resolvers: () => List[Resolver]) {
+case class IvyThing(resolvers: () => List[Resolver], printer: Printer, verboseIvy: Boolean) {
 
   case class IvyResolutionException(failed: Seq[String]) extends Exception(
     "failed to resolve ivy dependencies " + failed.mkString(", ")
   )
 
   var maxLevel = 2
+  var silentIvyLogs: String = ""
   Message.setDefaultLogger(new AbstractMessageLogger {
     def doEndProgress(msg: String) = Console.err.println("Done")
     def doProgress() = Console.err.print(".")
-    def log(msg: String, level: Int) =  if (level <= maxLevel) Console.err.println(msg)
+    def log(msg: String, level: Int) =  if (level <= maxLevel) verboseIvy match {
+      case true => printer.error(msg)
+      case false => silentIvyLogs += msg
+    }
     def rawlog(msg: String, level: Int) = log(msg, level)
   })
 
@@ -96,7 +103,12 @@ case class IvyThing(resolvers: () => List[Resolver]) {
 //          .foreach(_.printStackTrace())
 //
 //    println(report.getUnresolvedDependencies.map(_.getProblemMessage).toSeq)
-    if (unresolved.size == 0) report.getAllArtifactsReports.map(_.getLocalFile)
+    if (unresolved.size == 0) {
+      val artifacts = report.getAllArtifactsReports.map(_.getLocalFile)
+      if(artifacts.length == 0)
+        throw new Exception(silentIvyLogs)
+      else artifacts
+    }
     else throw IvyResolutionException(unresolved.toSeq.map(_.toString))
   }
 

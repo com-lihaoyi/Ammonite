@@ -49,7 +49,9 @@ case class Main(predef: String = "",
                 welcomeBanner: Option[String] = Some(Defaults.welcomeBanner),
                 inputStream: InputStream = System.in,
                 outputStream: OutputStream = System.out,
-                errorStream: OutputStream = System.err){
+                errorStream: OutputStream = System.err,
+                verboseIvy: Boolean = true
+               ){
   /**
     * Instantiates an ammonite.Repl using the configuration
     */
@@ -96,7 +98,8 @@ case class Main(predef: String = "",
           )
           Seq(("ammonite.repl.ReplBridge", "repl", replApi))
         },
-      wd
+      wd,
+      verboseIvy
     )
     interp
   }
@@ -136,6 +139,7 @@ object Main{
   def main(args0: Array[String]) = {
     var fileToExecute: Option[Path] = None
     var codeToExecute: Option[String] = None
+    var verboseIvy: Boolean = true
     var ammoniteHome: Option[Path] = None
     var passThroughArgs: Seq[String] = Vector.empty
     var predefFile: Option[Path] = None
@@ -185,6 +189,11 @@ object Main{
             |since it lets you hook up a profiler to the long-lived process and
             |see where all the time is being spent.
           """.stripMargin)
+      opt[Unit]('s', "silent")
+        .foreach(x => verboseIvy = false)
+        .text(
+          "Make ivy logs go silent instead of printing though failures will still throw exception"
+        )
       opt[Unit]("repl-api")
         .foreach(x => replApi= true)
         .text(
@@ -226,7 +235,8 @@ object Main{
             case None => super.predef
             case Some(pf) => pf
           }
-        }
+        },
+        verboseIvy = verboseIvy
       )
       (fileToExecute, codeToExecute) match {
         case (None, None) => println("Loading..."); main(true).run()
