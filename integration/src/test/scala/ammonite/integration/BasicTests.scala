@@ -17,8 +17,9 @@ import TestUtils._
  */
 object BasicTests extends TestSuite{
   override def utestTruncateLength = 60000
-  println("StandaloneTests")
+  println("BasicTests")
   val tests = TestSuite {
+    println("Running BasicTest")
 
     def execWithJAVA_OPTSset(name: RelPath, home: Path) = %%bash(
       executable,
