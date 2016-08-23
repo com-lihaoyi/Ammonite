@@ -865,3 +865,7 @@
 
     @sect{Unstable Changlog}
       @ul
+        @li
+          @code{-s} cmd line switch makes ivy logs silent though failures will still be thrown as exception, thanks to @lnk("coderabhishek", "https://github.com/coderabhishek").
+        @li
+          Added @code{show} back into the default REPL imports, since it is pretty useful
