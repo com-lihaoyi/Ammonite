@@ -85,7 +85,7 @@ object Sample{
     val colors = parsed.getColors
 
     var i = 0
-    var previousColor = 0
+    var previousColor = 0L
     val snippetBuffer = new mutable.StringBuilder()
 
     def createSnippet() = {
