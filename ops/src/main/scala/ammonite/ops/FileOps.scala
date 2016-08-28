@@ -315,7 +315,7 @@ object write extends Function2[Path, Internals.Writable, Unit]{
   object over extends Function2[Path, Internals.Writable, Unit]{
     def apply(target: Path, data: Internals.Writable) = {
       mkdir(target/RelPath.up)
-      write(target, data, StandardOpenOption.CREATE)
+      write(target, data, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
     }
   }
 }

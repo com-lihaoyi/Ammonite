@@ -242,8 +242,8 @@ object OpTests extends TestSuite{
         'writeOver{
           write.over(d/"append.txt", "Hello")
           assert(read(d/"append.txt") == "Hello")
-          write.over(d/"append.txt", " World")
-          assert(read(d/"append.txt") == " World")
+          write.over(d/"append.txt", " Wor")
+          assert(read(d/"append.txt") == " Wor")
         }
       }
       'Failures{
