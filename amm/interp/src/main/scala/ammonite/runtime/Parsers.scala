@@ -42,7 +42,7 @@ object Parsers {
   val Statement =
     P( scalaparse.Scala.TopPkgSeq | scalaparse.Scala.Import | Prelude ~ BlockDef | StatCtx.Expr )
   def StatementBlock(blockSep: P0) =
-    P( Semis.? ~ ((!blockSep ~ Statement) ~~ Semis.? ).!.repX  ~ Semis.?)
+    P( Semis.? ~ (!blockSep ~ Statement ~~ WS ~~ (Semis | End)).!.repX)
   val Splitter = P( StatementBlock(Fail) ~ WL ~ End)
 
   /**
