@@ -13,7 +13,7 @@ import utest._
  */
 object ErrorTruncationTests extends TestSuite{
   override def utestTruncateLength = 60000
-  println("StandaloneTests")
+
   def checkErrorMessage(file: RelPath, expected: String) = {
     val e = fansi.Str(
       Util.normalizeNewlines(
@@ -28,13 +28,23 @@ object ErrorTruncationTests extends TestSuite{
     assert(e == expected)
   }
   val tests = TestSuite {
-
+    println("ErrorTruncationTests")
     'compileError - checkErrorMessage(
       file = 'errorTruncation/"compileError.sc",
       expected = Util.normalizeNewlines(
         """compileError.sc:1: not found: value doesntexist
           |val res = doesntexist
           |          ^
+          |Compilation Failed
+          |""".stripMargin
+      )
+    )
+    'multiExpressionError - checkErrorMessage(
+      file = 'errorTruncation/"compileErrorMultiExpr.sc",
+      expected = Util.normalizeNewlines(
+        """compileErrorMultiExpr.sc:11: not found: value doesntexist
+          |val res_4 = doesntexist
+          |            ^
           |Compilation Failed
           |""".stripMargin
       )

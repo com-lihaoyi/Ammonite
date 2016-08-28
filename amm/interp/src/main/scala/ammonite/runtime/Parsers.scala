@@ -22,8 +22,14 @@ object Parsers {
     )
     val Prefix = P( IdParser.rep(1, sep = ".") )
     val Suffix = P( "." ~/ (BulkImport | Selectors) )
-    val ImportExpr: P[ammonite.util.ImportTree] = P( Index ~ Prefix ~ Suffix.? ~ Index ).map{
-      case (start, idSeq, selectors, end) => ammonite.util.ImportTree(idSeq, selectors, start, end)
+    val ImportExpr: P[ammonite.util.ImportTree] = {
+      // Manually use `WL0` parser here, instead of relying on WhitespaceApi, as
+      // we do not want the whitespace to be consumed even if the WL0 parser parses
+      // to the end of the input (which is the default behavior for WhitespaceApi)
+      P( Index ~~ Prefix ~~ (WL0 ~~ Suffix).? ~~ Index).map{
+        case (start, idSeq, selectors, end) =>
+          ammonite.util.ImportTree(idSeq, selectors, start, end)
+      }
     }
     P( `import` ~/ ImportExpr.rep(1, sep = ",".~/) )
   }
