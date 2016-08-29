@@ -511,9 +511,9 @@
             methods to go over by hand hunting for what you want:
 
           @pre(ammSample(
-            """typeOf(compiler).members.size // Too many methods to dig through!
+            """typeOf(repl.compiler).members.size // Too many methods to dig through!
               |// I forgot what I want but I think it has Raw in the name
-              |typeOf(compiler).members || grep! "Raw" """.stripMargin
+              |typeOf(repl.compiler).members || grep! "Raw" """.stripMargin
           ))
           @p
             In general, Ammonite's @hl.scala{grep} serves the same purpose of

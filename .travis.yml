@@ -34,21 +34,6 @@ matrix:
 
   - env: CI_SCRIPT="ci/build.sc test published/test"
     jdk: oraclejdk8
-    scala: 2.10.5
-  - env: CI_SCRIPT="ci/build.sc test integration/test"
-    jdk: oraclejdk8
-    scala: 2.10.5
-
-
-  - env: CI_SCRIPT="ci/build.sc test published/test"
-    jdk: openjdk7
-    scala: 2.11.8
-  - env: CI_SCRIPT="ci/build.sc test integration/test"
-    jdk: openjdk7
-    scala: 2.11.8
-
-  - env: CI_SCRIPT="ci/build.sc test published/test"
-    jdk: oraclejdk8
     scala: 2.11.8
   - env: CI_SCRIPT="ci/build.sc test integration/test"
     jdk: oraclejdk8
@@ -61,7 +46,8 @@ script:
 - mkdir -p ~/bin
 - curl -L -o ~/bin/amm https://git.io/vKSOR && chmod +x ~/bin/amm
 - which amm
-- $CI_SCRIPT
+# Memory-limit the CI script to avoid things being OOMKilled by Travis
+- java -jar -Xmx400m $(which amm) $CI_SCRIPT
 
 notifications:
   email:

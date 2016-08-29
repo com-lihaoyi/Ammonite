@@ -1,8 +1,9 @@
 package readme
 
-import java.io.{InputStreamReader, BufferedReader}
+import java.io.{BufferedReader, ByteArrayOutputStream, InputStreamReader}
 
 import ammonite.ops._
+
 import scala.collection.mutable
 import scalatags.Text.all._
 import scalatags.Text.all._
@@ -111,43 +112,57 @@ object Sample{
   }
 
 
-  def exec(command: Seq[String], input: String): String = cached(("exec", command, input)){
+  def exec(command: Seq[String],
+           input: String,
+           args: Map[String, String] = Map.empty): String = cached(("exec", command, input, args)){
 
+    println("====================EXECUTING====================")
+    println(command)
+    println(input)
+    println(args)
     val pb = new ProcessBuilder(command:_*)
+    for((k, v) <- args) pb.environment().put(k, v)
+
     pb.redirectErrorStream(true)
     val p = pb.start()
 
     p.getOutputStream.write(input.getBytes)
     p.getOutputStream.flush()
-
-    val buffer = new Array[Byte](32768)
-    val bytes =
-      Iterator.continually{
-        println("reading ")
-        val res = p.getInputStream.read(buffer)
-        println(res)
-        println(new String(buffer.take(res)))
-        if(res == -1) None else Some(buffer.take(res))
-      }
-      .takeWhile(_.isDefined)
-      .toArray
-      .flatten
-      .flatten
     p.waitFor()
-    new String(bytes)
+    val output = new ByteArrayOutputStream()
+    var length = 0
+    while({
+      val buffer = new Array[Byte](2048)
+      val count = p.getInputStream.read(buffer, 0, buffer.length)
+      if (count != -1){
+        println(s"====================CHUNK length:${count}====================")
+        println(new String(buffer.take(count)))
+        output.write(buffer, 0, count)
+        true
+      }else false
+    })()
+
+
+    val result = new String(output.toByteArray)
+    println(s"====================RESULT ${p.exitValue()}====================")
+    println(result)
+    println("========================================")
+
+
+    result
   }
   def compare(bashCode: String, ammoniteCode: String) = {
     val out = {
-      val output = exec(Seq("bash", "-i"), s"${bashCode.trim}\nexit\n")
-      Seq[Frag](
-        span(color := magenta, "bash$ "),
-        output.dropWhile(_ != '$').drop(1)
-          .lines
-          .toVector
-          .dropRight(2)
-          .mkString("\n")
-          .drop(1)
+      val customPrompt = "__bash__"
+      val output = exec(
+        Seq("bash", "-i"),
+        s"PS1=$customPrompt\n${bashCode.trim}\nexit\n"
       )
+      for(chunk <- output.split("\n" + customPrompt, -1).drop(1).dropRight(1)) yield{
+        Seq[Frag](span(color := magenta, "\nbash$ "), chunk)
+      }
+
+
     }
 
     div(

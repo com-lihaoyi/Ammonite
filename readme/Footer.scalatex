@@ -1,5 +1,8 @@
 @import Main._
 @import readme.Sample._
+@def issue(n: Int) = {
+  a("#", n, href := s"https://github.com/lihaoyi/Ammonite/issues/$n")
+}
 @sect{Reference}
   @sect{Community}
     @p
@@ -91,6 +94,29 @@
       to use these projects, the Scaladoc is still useful as a reference.
   
   @sect{Changelog}
+    @sect{0.7.5}
+      @ul
+        @li
+          @code{-s} cmd line switch makes ivy logs silent, though failures
+          will still be thrown as exception. Thanks to @lnk("coderabhishek",
+          "https://github.com/coderabhishek").
+        @li
+          Added @code{show} and @code{typeOf} back into the default REPL
+          imports, since they are pretty useful
+        @li
+          @code{write.over} in @sect.ref{Ammonite-Ops} should now properly
+          truncate files if the thing being written is shorter than the
+          original @issue(441)
+        @li
+          Ammonite no longer incorrectly allows multiple expressions to be
+          evaluated on the same line @issue(446)
+        @li
+          Compilation errors when there are multiple statements in a block
+          will no longer have redundant semicolons prefixed onto them @issue(439)
+        @li
+          Improved the line-number-reporting in certain cases where you use
+          @hl.scala{import $file.*}
+
     @sect{0.7.4}
       @ul
         @li
@@ -212,14 +238,14 @@
     @sect{0.6.2}
       @ul
         @li
-          Fix #403: Errors are silently swallowed in 0.6.1
+          Fix @issue(403): Errors are silently swallowed in 0.6.1
 
     @sect{0.6.1}
       @ul
         @li
-          Fixed #400: load.exec in predef.scala causes NPE in 0.5.9 or 0.6.0
+          Fixed @issue(400): load.exec in predef.scala causes NPE in 0.5.9 or 0.6.0
         @li
-          Fixed #398: by default, using Ammonite inside a SBT project uses the
+          Fixed @issue(398): by default, using Ammonite inside a SBT project uses the
           old @code{~/.ammonite/} storage folder, not the @code{InMemory} storage system.
           This restores the pre-0.5.9 behavior
         @li
@@ -289,13 +315,13 @@
           and get it ready for future work; if you find any bugs please report
           them!
         @li
-          Fixed #393: REPL requires two carriage returns to move to a new line
+          Fixed @issue(393): REPL requires two carriage returns to move to a new line
         @li
           Compiler settings set in the predef now get preserved when the
           session starts, and when replacing compilers, thanks to
           @lnk("Rob Norris", "https://github.com/tpolecat")
         @li
-          Fixed #395: Fixed resolver pattern for local ivy, thanks to
+          Fixed @issue(395): Fixed resolver pattern for local ivy, thanks to
           @lnk("Aish Fenton", "https://github.com/aishfenton")
         @li
           Fixed the @hl.scala{kill} command in Ammonite-Ops, thanks to
@@ -344,7 +370,7 @@
       @ul
         @li
           Improved performance of various @hl.scala{read!} commands to be
-          competitive with @hl.scala{java.nio} (#362)
+          competitive with @hl.scala{java.nio} (@issue(362))
         @li
           @hl.scala{read!} and @hl.scala{read.lines!} now take an optional
           charset, passed via @hl.scala{read(file, charSet: String)} or
@@ -353,7 +379,7 @@
         @li
           Make @hl.scala{read! resource} read from the
           @hl.scala{Thread.currentThread.getContextClassLoader} by default,
-          fixing #348
+          fixing @issue(348)
         @li
           Re-organize @sect.ref{Reading Resources} in Ammonite-Ops to allow
           proper handling of absolute and relative resources by passing in
@@ -372,15 +398,15 @@
     @sect{0.5.6}
       @ul
         @li
-          Fixed #341: stack overflow when @code{ls}ing large directories
+          Fixed @issue(341): stack overflow when @code{ls}ing large directories
         @li
           Fixed regression preventing you from running scripts via
-          @code{./amm} using relative paths #353
+          @code{./amm} using relative paths @issue(353)
         @li
           Ammonite should be more robust when interacting with other compiler
           plugins
         @li
-          Fixed #352: imports now don't get improperly collapsed, and defining
+          Fixed @issue(352): imports now don't get improperly collapsed, and defining
           a value called @code{repl} no longer borks your session.
         @li
           Improved readline-emulation of @code{AmmoniteFrontEnd}: @code{Ctrl-T}
@@ -405,10 +431,10 @@
           Experimental support for Ammonite-Ops in Windows! I haven't tested
           it but basic CI passes @lnk("here",
           "https://ci.appveyor.com/project/lihaoyi/ammonite"), so try it out
-          and let me know if there are problems (#120)
+          and let me know if there are problems (@issue(120))
         @li
           Changes around Ammonite-Ops's definition of @hl.scala{Path}s: they
-          now wrap a @code{java.nio.file.Path} (#346), and thus can be used on
+          now wrap a @code{java.nio.file.Path} (@issue(346)), and thus can be used on
           Windows, on multiple drives, or with virtual filesystems such as
           @lnk("JimFS", "https://github.com/google/jimfs").
         @li
@@ -421,61 +447,61 @@
           @hl.scala{read! resource/'foo}
         @li
           Parser improvements which fix bugs when trying to write some
-          multi-line snippets #343
+          multi-line snippets @issue(343)
         @li
           @hl.scala{cp} and @hl.scala{mv} now have @hl.scala{.into} and
-          @hl.scala{.over} modes #206
+          @hl.scala{.over} modes @issue(206)
         @li
           Wrapping content is automatically shifted onto a new line, to avoid
-          problems when copying and pasting #205
+          problems when copying and pasting @issue(205)
         @li
           Thrown exceptions are now made available to you in the REPL under
-          the @code{lastException} variable #289, in case you need more
+          the @code{lastException} variable @issue(289), in case you need more
           metadata from it or you want the stack-trace of a
           non-printed-by-default exception (e.g. @code{ThreadDeath} due to
           @code{Ctrl-C}). Thanks to @lnk("coderabhishek",
           "https://github.com/coderabhishek")!
         @li
-          Fixed #280: Ammonite REPL confused by singleton types
+          Fixed @issue(280): Ammonite REPL confused by singleton types
     @sect{0.5.4}
       @ul
         @li
-          Improve the pretty-printing for @hl.scala{Range.Inclusive} #337,
+          Improve the pretty-printing for @hl.scala{Range.Inclusive} @issue(337),
           thanks to @lnk("Saheb", "https://github.com/Saheb")
         @li
           More fixes to shadowing behavior of @hl.scala{type}s and
-          @hl.scala{val}s #199
+          @hl.scala{val}s @issue(199)
         @li
           Pressing @code{BACKSPACE} now drops you out of history-browsing
           properly, preserving your edits if you then press @code{ENTER}
-          without entering any other characters #338
+          without entering any other characters @issue(338)
     @sect{0.5.3}
       @ul
         @li
           Added support for multi-line prompts, thanks to
           @lnk("thirstycrow", "https://github.com/thirstycrow")
         @li
-          Fix #312 lsing empty directory gives error, thanks to
+          Fix @issue(312) lsing empty directory gives error, thanks to
           @lnk("coderabhishek", "https://github.com/coderabhishek")
         @li
           Implemented @sect.ref{History Search}, also known as
           reverse-i-search/Ctrl-R
         @li
-          Fixed #325: error due to function types with by-name parameters
+          Fixed @issue(325): error due to function types with by-name parameters
         @li
-          Fixed #258: java.util.NoSuchElementException: head of empty list
+          Fixed @issue(258): java.util.NoSuchElementException: head of empty list
           in Ammonite-REPL
         @li
-          Fixed #198: NoSuchElementException thrown in REPL when using a type
+          Fixed @issue(198): NoSuchElementException thrown in REPL when using a type
           alias to refer to a shapeless coproduct
         @li
           Warnings can now be enabled with the flag
           @hl.scala{compiler.settings.nowarn.value = false}
         @li
           Stopped Ivy from spitting out countless useless @code{unknown
-          resolver null} warnings when resolving dependencies (#144)
+          resolver null} warnings when resolving dependencies (@issue(144))
         @li
-          Fixed edge cases around import shadowing and sequencing (#199, #248)
+          Fixed edge cases around import shadowing and sequencing (@issue(199), @issue(248))
         @li
           Started the @sect.ref{Ammonite Cookbook}, examples of using the
           Ammonite REPL to do useful work.
@@ -484,21 +510,21 @@
     @sect{0.5.2}
       @ul
         @li
-          Fixed @lnk("#80: Support artifact resolvers to load libraries not published to maven central",
+          Fixed @lnk("@issue(80): Support artifact resolvers to load libraries not published to maven central",
           "https://github.com/lihaoyi/Ammonite/issues/80"), by
           @lnk("Eric Torreborre", "https://github.com/etorreborre")
         @li
-          Fixed @lnk("#310: java.util.NoSuchElementException: None.get on Shift+Tab without selection",
+          Fixed @lnk("@issue(310): java.util.NoSuchElementException: None.get on Shift+Tab without selection",
           "https://github.com/lihaoyi/Ammonite/issues/301"), by
           @lnk("senia-psm", "https://github.com/senia-psm")
     @sect{0.5.1}
       @ul
         @li
           Fix performance regression causing slowness when C&Ping large
-          snippets #274
+          snippets @issue(274)
         @li
           Added the ability to pass @sect.ref{Script Arguments} to Ammonite
-          scripts from an external command line (e.g. bash) #277
+          scripts from an external command line (e.g. bash) @issue(277)
         @li
           Iterator-returning commands like @hl.scala{ls!!} @hl.scala{ls.rec!!}
           and @hl.scala{read.lines!!} have been renamed @hl.scala{ls.iter!}
@@ -514,7 +540,7 @@
           of results
         @li
           @hl.scala{Path}s and @hl.scala{RelPath}s no longer permit
-          @hl.scala{"."} or @hl.scala{".."} as a path segment #215
+          @hl.scala{"."} or @hl.scala{".."} as a path segment @issue(215)
         @li
           @hl.scala{Path}s and @hl.scala{RelPath}s now us
           @hl.scala{Vector[String]} instead of @hl.scala{Seq[String]} as the
@@ -522,15 +548,15 @@
           semantics
         @li
           Pretty-printing of the results of @hl.scala{ls!} now properly gets
-          truncated when too large #209
+          truncated when too large @issue(209)
         @li
-          Cross-build for 2.10.6 #282
+          Cross-build for 2.10.6 @issue(282)
         @li
-          Refactor of the @hl.scala{CommandResult} type being returned from the @hl.scala{%%} operator, to now properly capture the raw byte output, stdout, stderr, exit code. See @sect.ref{Spawning Subprocesses} for details. #207
+          Refactor of the @hl.scala{CommandResult} type being returned from the @hl.scala{%%} operator, to now properly capture the raw byte output, stdout, stderr, exit code. See @sect.ref{Spawning Subprocesses} for details. @issue(207)
         @li
           Added a new @sect.ref{grep} command.
         @li
-          Added support for word navigation with Ctrl+Arrow in Linux (#217),
+          Added support for word navigation with Ctrl+Arrow in Linux (@issue(217)),
           thanks to @lnk("Ian McIntosh", "https://github.com/cranst0n")
         @li
           Moved the initialization calls from @hl.scala{ammonite.Repl.run}
@@ -539,7 +565,7 @@
     @sect{0.5.0}
       @ul
         @li
-          Fixed @hl.scala{def<tab>} auto-complete crasher #257, thanks to
+          Fixed @hl.scala{def<tab>} auto-complete crasher @issue(257), thanks to
           @lnk("Matthew Edwards", "https://github.com/edwardsmatt")!
         @li
           Fixed input-height bug around multi-line selection that would
@@ -557,7 +583,7 @@
           project-code while using Ammonite as a REPL for an existing SBT project.
         @li
           Simplify the way shelling to to run files as subprocesses works,
-          and align with documentation (#234)
+          and align with documentation (@issue(234))
   
   
     @sect{0.4.9}
@@ -568,14 +594,14 @@
           Fix for perennial classpath problems, thanks to
           @lnk("Johannes Rudolph", "https://github.com/jrudolph")!
         @li
-          Fix wildcard-imports from Java libraries like Joda or Guava #213
+          Fix wildcard-imports from Java libraries like Joda or Guava @issue(213)
         @li
           Added an MIT license
         @li
-          Slightly more robust tab completion #252, thanks to
+          Slightly more robust tab completion @issue(252), thanks to
           @lnk("Sanjiv Sahayam", "https://github.com/ssanj")!
         @li
-          Properly handly EOF in standard input #242, thanks to
+          Properly handly EOF in standard input @issue(242), thanks to
           @lnk("Patrick Premont", "https://github.com/patrick-premont")!
     @sect{0.4.8}
       @ul
@@ -637,10 +663,10 @@
           Fix a file-handle-leak for most usages of @code{read.lines} and
           @code{ls}/@code{ls.rec}
         @li
-          Fix bugs @lnk("#186", "https://github.com/lihaoyi/Ammonite/issues/186"),
-          @lnk("#152", "https://github.com/lihaoyi/Ammonite/issues/152"),
-          @lnk("#149", "https://github.com/lihaoyi/Ammonite/issues/149"),
-          @lnk("#180", "https://github.com/lihaoyi/Ammonite/issues/180")
+          Fix bugs @lnk("@issue(186)", "https://github.com/lihaoyi/Ammonite/issues/186"),
+          @lnk("@issue(152)", "https://github.com/lihaoyi/Ammonite/issues/152"),
+          @lnk("@issue(149)", "https://github.com/lihaoyi/Ammonite/issues/149"),
+          @lnk("@issue(180)", "https://github.com/lihaoyi/Ammonite/issues/180")
     @sect{0.4.5}
       @ul
         @li
@@ -650,7 +676,7 @@
           Support for HOME and END keys, thanks to @lnk("Johannes Rudolph",
           "https://github.com/jrudolph")
         @li
-          Fix for incorrect syntax highlighting (@lnk("#159",
+          Fix for incorrect syntax highlighting (@lnk("@issue(159)",
           "https://github.com/lihaoyi/Ammonite/issues/159"))
         @li
           Support for loading compiler plugins, thanks to
@@ -681,12 +707,12 @@
           Fix @code{pathSeparator} so Ammonite-REPL is at least
           basically-runnable on windows, although buggy
         @li
-          Update to more robust version of pprint to fix @lnk("#140",
+          Update to more robust version of pprint to fix @lnk("@issue(140)",
           "https://github.com/lihaoyi/Ammonite/issues/140")
     @sect{0.4.2}
       @ul
         @li
-          Fix @lnk("#139: Can't fix typos?",
+          Fix @lnk("@issue(139): Can't fix typos?",
           "https://github.com/lihaoyi/Ammonite/issues/139")
         @li
           Fix bad wrapping of long lines in ammonite-repl
@@ -817,14 +843,14 @@
     @sect{0.2.8}
       @ul
         @li
-          Fix #47: PPrint derivation fails with nested case class
+          Fix @issue(47): PPrint derivation fails with nested case class
         @li
-          Fix #14: Exception when trying to use Ammonite REPL #15 by cross
+          Fix @issue(14): Exception when trying to use Ammonite REPL @issue(15) by cross
           building against Scala 2.10.{3,4,5} and 2.11.{3,4,5,6}
         @li
-          Autocomplete results are sorted alphabetically (Fixed #42)
+          Autocomplete results are sorted alphabetically (Fixed @issue(42))
         @li
-          Fix #39: nothing echoed on multiple import
+          Fix @issue(39): nothing echoed on multiple import
         @li
           Importing things from Java packages now works properly
         @li
@@ -865,7 +891,3 @@
 
     @sect{Unstable Changlog}
       @ul
-        @li
-          @code{-s} cmd line switch makes ivy logs silent though failures will still be thrown as exception, thanks to @lnk("coderabhishek", "https://github.com/coderabhishek").
-        @li
-          Added @code{show} back into the default REPL imports, since it is pretty useful

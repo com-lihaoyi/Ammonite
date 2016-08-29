@@ -140,7 +140,7 @@
       )
 
       @p
-        And lastly, here is how to performa recursive line count of all the Scala files in your current directory tree:
+        And lastly, here is how to perform a recursive line count of all the Scala files in your current directory tree:
 
       @compare(
         "find ./ops/src/main -name '*.scala' | xargs wc -l",

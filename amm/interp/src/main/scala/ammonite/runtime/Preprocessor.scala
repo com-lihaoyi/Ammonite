@@ -254,7 +254,11 @@ object Preprocessor{
         Res(
           allDeclsWithComments.reduceOption { (a, b) =>
             Expanded(
-              a.code + ";" + b.code,
+              // We do not need to separate the code with our own semi-colons
+              // or newlines, as each expanded code snippet itself comes with
+              // it's own trailing newline/semicolons as a result of the
+              // initial split
+              a.code + b.code,
               a.printer ++ b.printer
             )
           },
