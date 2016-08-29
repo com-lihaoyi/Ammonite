@@ -46,7 +46,7 @@ case class IvyThing(resolvers: () => List[Resolver], printer: Printer, verboseIv
     def doEndProgress(msg: String) = Console.err.println("Done")
     def doProgress() = Console.err.print(".")
     def log(msg: String, level: Int) =  if (level <= maxLevel) verboseIvy match {
-      case true => printer.error(msg)
+      case true => printer.info(msg)
       case false => silentIvyLogs += msg
     }
     def rawlog(msg: String, level: Int) = log(msg, level)
