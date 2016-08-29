@@ -401,7 +401,7 @@
         @li
           @hl.scala{repl}: the object representing the Repl API, aliased as
           @hl.scala{repl}. This allows you (e.g. @hl.scala{repl.history})
-          and you can use autocomplete or @hl.scala{typeOf} on the
+          and you can use autocomplete or @hl.scala{repl.typeOf} on the
           @hl.scala{repl} object to see what is available.
         @li
           @sect.ref{Utilities}: tools such as @sect.ref{time}, @sect.ref{grep}
@@ -511,9 +511,9 @@
             methods to go over by hand hunting for what you want:
 
           @pre(ammSample(
-            """typeOf(compiler).members.size // Too many methods to dig through!
+            """repl.typeOf(repl.compiler).members.size // Too many methods to dig through!
               |// I forgot what I want but I think it has Raw in the name
-              |typeOf(compiler).members || grep! "Raw" """.stripMargin
+              |repl.typeOf(repl.compiler).members || grep! "Raw" """.stripMargin
           ))
           @p
             In general, Ammonite's @hl.scala{grep} serves the same purpose of
