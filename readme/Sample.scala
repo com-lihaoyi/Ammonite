@@ -128,7 +128,7 @@ object Sample{
 
     p.getOutputStream.write(input.getBytes)
     p.getOutputStream.flush()
-
+    p.waitFor()
     val output = new ByteArrayOutputStream()
     var length = 0
     while({
@@ -142,7 +142,7 @@ object Sample{
       }else false
     })()
 
-    p.waitFor()
+
     val result = new String(output.toByteArray)
     println("====================RESULT====================")
     println(result)
@@ -153,14 +153,13 @@ object Sample{
   }
   def compare(bashCode: String, ammoniteCode: String) = {
     val out = {
-      val customPrompt = "<<bash>>"
+      val customPrompt = "[[bash]]"
       val output = exec(
         Seq("bash", "-i"),
-        s"${bashCode.trim}\nexit\n",
-        args = Map("PS1" -> customPrompt)
+        s"PS1=$customPrompt\n${bashCode.trim}\nexit\n"
       )
-      for(chunk <- output.split(customPrompt, -1).drop(1).dropRight(1)) yield{
-        Seq[Frag](span(color := magenta, "bash$ "), chunk)
+      for(chunk <- output.split("\n" + customPrompt, -1).drop(1).dropRight(1)) yield{
+        Seq[Frag](span(color := magenta, "\nbash$ "), chunk)
       }
 
 
