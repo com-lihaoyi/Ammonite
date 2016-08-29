@@ -46,7 +46,8 @@ script:
 - mkdir -p ~/bin
 - curl -L -o ~/bin/amm https://git.io/vKSOR && chmod +x ~/bin/amm
 - which amm
-- $CI_SCRIPT
+# Memory-limit the CI script to avoid things being OOMKilled by Travis
+- java -jar -Xmx200m $(which amm) $CI_SCRIPT
 
 notifications:
   email:
