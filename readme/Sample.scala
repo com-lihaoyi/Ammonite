@@ -111,9 +111,13 @@ object Sample{
   }
 
 
-  def exec(command: Seq[String], input: String): String = cached(("exec", command, input)){
+  def exec(command: Seq[String],
+           input: String,
+           args: Map[String, String] = Map.empty): String = cached(("exec", command, input, args)){
 
     val pb = new ProcessBuilder(command:_*)
+    for((k, v) <- args) pb.environment().put(k, v)
+
     pb.redirectErrorStream(true)
     val p = pb.start()
 
@@ -138,16 +142,17 @@ object Sample{
   }
   def compare(bashCode: String, ammoniteCode: String) = {
     val out = {
-      val output = exec(Seq("bash", "-i"), s"${bashCode.trim}\nexit\n")
-      Seq[Frag](
-        span(color := magenta, "bash$ "),
-        output.dropWhile(_ != '$').drop(1)
-          .lines
-          .toVector
-          .dropRight(2)
-          .mkString("\n")
-          .drop(1)
+      val customPrompt = "<<bash>>"
+      val output = exec(
+        Seq("bash", "-i"),
+        s"${bashCode.trim}\nexit\n",
+        args = Map("PS1" -> customPrompt)
       )
+      for(chunk <- output.split(customPrompt, -1).drop(1).dropRight(1)) yield{
+        Seq[Frag](span(color := magenta, "bash$ "), chunk)
+      }
+
+
     }
 
     div(
