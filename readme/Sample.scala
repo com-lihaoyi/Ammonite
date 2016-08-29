@@ -1,8 +1,9 @@
 package readme
 
-import java.io.{InputStreamReader, BufferedReader}
+import java.io.{BufferedReader, ByteArrayOutputStream, InputStreamReader}
 
 import ammonite.ops._
+
 import scala.collection.mutable
 import scalatags.Text.all._
 import scalatags.Text.all._
@@ -115,6 +116,10 @@ object Sample{
            input: String,
            args: Map[String, String] = Map.empty): String = cached(("exec", command, input, args)){
 
+    println("====================EXECUTING====================")
+    println(command)
+    println(input)
+    println(args)
     val pb = new ProcessBuilder(command:_*)
     for((k, v) <- args) pb.environment().put(k, v)
 
@@ -124,21 +129,27 @@ object Sample{
     p.getOutputStream.write(input.getBytes)
     p.getOutputStream.flush()
 
-    val buffer = new Array[Byte](32768)
-    val bytes =
-      Iterator.continually{
-        println("reading ")
-        val res = p.getInputStream.read(buffer)
-        println(res)
-        println(new String(buffer.take(res)))
-        if(res == -1) None else Some(buffer.take(res))
-      }
-      .takeWhile(_.isDefined)
-      .toArray
-      .flatten
-      .flatten
+    val output = new ByteArrayOutputStream()
+    var length = 0
+    while({
+      val buffer = new Array[Byte](2048)
+      val count = p.getInputStream.read(buffer, 0, buffer.length)
+      if (count != -1){
+        println("====================CHUNK====================")
+        println(new String(buffer.take(count)))
+        output.write(buffer, 0, count)
+        true
+      }else false
+    })()
+
     p.waitFor()
-    new String(bytes)
+    val result = new String(output.toByteArray)
+    println("====================RESULT====================")
+    println(result)
+    println("========================================")
+
+
+    result
   }
   def compare(bashCode: String, ammoniteCode: String) = {
     val out = {
