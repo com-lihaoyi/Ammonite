@@ -135,7 +135,7 @@ object Sample{
       val buffer = new Array[Byte](2048)
       val count = p.getInputStream.read(buffer, 0, buffer.length)
       if (count != -1){
-        println("====================CHUNK====================")
+        println(s"====================CHUNK length:${count}====================")
         println(new String(buffer.take(count)))
         output.write(buffer, 0, count)
         true
@@ -144,7 +144,7 @@ object Sample{
 
 
     val result = new String(output.toByteArray)
-    println("====================RESULT====================")
+    println(s"====================RESULT ${p.exitValue()}====================")
     println(result)
     println("========================================")
 
