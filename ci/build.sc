@@ -4,8 +4,8 @@ import $file.upload
 println("START TIME " + new java.util.Date().toString)
 
 val isMasterCommit =
-  sys.env.get("TRAVIS_PULL_REQUEST").contains("false") &&
-  (sys.env.get("TRAVIS_BRANCH").contains("master") || sys.env.get("TRAVIS_TAG").exists(_ != ""))
+  sys.env.get("TRAVIS_PULL_REQUEST") == Some("false") &&
+  (sys.env.get("TRAVIS_BRANCH") == Some("master") || sys.env("TRAVIS_TAG") != "")
 
 
 val allVersions = Seq(
@@ -16,8 +16,8 @@ val allVersions = Seq(
 val latestVersions = Set("2.10.5", "2.11.8")
 
 val buildVersion =
-  if (sys.env.get("TRAVIS_TAG").exists(_ != "")) s"COMMIT-${getGitHash()}"
-  else sys.env.getOrElse("TRAVIS_TAG", "untagged")
+  if (sys.env("TRAVIS_TAG") == "") s"COMMIT-${getGitHash()}"
+  else sys.env("TRAVIS_TAG")
 
 
 def getGitHash() = %%("git", "rev-parse", "--short", "HEAD").out.trim
