@@ -153,7 +153,7 @@ object Sample{
   }
   def compare(bashCode: String, ammoniteCode: String) = {
     val out = {
-      val customPrompt = "[[bash]]"
+      val customPrompt = "__bash__"
       val output = exec(
         Seq("bash", "-i"),
         s"PS1=$customPrompt\n${bashCode.trim}\nexit\n"
