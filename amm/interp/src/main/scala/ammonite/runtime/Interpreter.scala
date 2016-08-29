@@ -583,10 +583,13 @@ class Interpreter(val printer: Printer,
           if (verbose) 2 else 1
         ).toSet
 
-        storage.ivyCache() = storage.ivyCache().updated(
-          cacheKey,
-          resolved.map(_.getAbsolutePath)
-        )
+        // #433 only non-snapshot versions are cached
+        if (!version.endsWith("SNAPSHOT")) {
+          storage.ivyCache() = storage.ivyCache().updated(
+            cacheKey,
+            resolved.map(_.getAbsolutePath)
+          )
+        }
 
         resolved
     }
