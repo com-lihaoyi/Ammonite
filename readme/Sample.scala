@@ -39,7 +39,11 @@ object Sample{
     val executableName = s"ammonite-$ammVersion-$scalaVersion"
     val ammExec = "amm/target/scala-2.11/" + executableName
     val predef = "shell/src/main/resources/ammonite/shell/example-predef-bare.sc"
-    val out = exec(Seq(ammExec, "--predef-file", predef), s"${ammoniteCode.trim}\nexit\n")
+    val out = exec(
+      Seq(ammExec, "--predef-file", predef),
+      s"${ammoniteCode.trim}\nexit\n",
+      args = Map("JAVA_OPTS" -> "-Xmx600m")
+    )
 //    val out = read! wd/'target/'cache/"-1080873603"
     val lines = out.lines.toSeq.drop(3).dropRight(2).mkString("\n")
 //    println("ammSample " + lines)
@@ -147,7 +151,7 @@ object Sample{
     println(s"====================RESULT ${p.exitValue()}====================")
     println(result)
     println("========================================")
-
+    assert(p.exitValue() == 0, "Non-zero exit value for subprocess: " + p.exitValue())
 
     result
   }
