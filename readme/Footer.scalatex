@@ -97,6 +97,29 @@
     @sect{0.7.4}
       @ul
         @li
+          @code{-s} cmd line switch makes ivy logs silent, though failures
+          will still be thrown as exception. Thanks to @lnk("coderabhishek",
+          "https://github.com/coderabhishek").
+        @li
+          Added @code{show} and @code{typeOf} back into the default REPL
+          imports, since they are pretty useful
+        @li
+          @code{write.over} in @sect.ref{Ammonite-Ops} should now properly
+          truncate files if the thing being written is shorter than the
+          original @issue(441)
+        @li
+          Ammonite no longer incorrectly allows multiple expressions to be
+          evaluated on the same line @issue(446)
+        @li
+          Compilation errors when there are multiple statements in a block
+          will no longer have redundant semicolons prefixed onto them @issue(439)
+        @li
+          Improved the line-number-reporting in certain cases where you use
+          @hl.scala{import $file.*}
+
+    @sect{0.7.4}
+      @ul
+        @li
           Fix publication of artifacts for non-{2.11.8, 2.10.5} Ammonite versions
 
     @sect{0.7.3}
@@ -868,23 +891,3 @@
 
     @sect{Unstable Changlog}
       @ul
-        @li
-          @code{-s} cmd line switch makes ivy logs silent though failures
-          will still be thrown as exception, thanks to @lnk("coderabhishek",
-          "https://github.com/coderabhishek").
-        @li
-          Added @code{show} back into the default REPL imports, since it is
-          pretty useful
-        @li
-          @code{write.over} in @sect.ref{Ammonite-Ops} should now properly
-          truncate files if the thing being written is shorter than the
-          original @issue(441)
-        @li
-          Ammonite no longer incorrectly allows multiple expressions to be
-          evaluated on the same line @issue(446)
-        @li
-          Compilation errors when there are multiple statements in a block
-          will no longer have redundant semicolons prefixed onto them @issue(439)
-        @li
-          Improved the line-number-reporting in certain cases where you use
-          @hl.scala{import $file.*}
