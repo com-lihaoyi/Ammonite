@@ -4,38 +4,40 @@ matrix:
   include:
   # The test matrix is manually spelled out, rather than relying
   # on the "automatic" matrix-generation by specifying the different
-  # `scala`, `jdk`, and `env` values, because we want `artifacts` and
-  # `docs` to run first. For the auto-generated matrix, `artifacts` and `docs`
-  # jobs will always run last
+  # `scala`, `jdk`, and `env` values, because we want `artifacts` to
+  # run first, but docs to run last since the artifacts need time to
+  # sync to maven central before becoming available
 
   - env: CI_SCRIPT="ci/build.sc artifacts"
     jdk: oraclejdk8
     scala: 2.11.8
 
 
-  - env: CI_SCRIPT="ci/build.sc executable"
-    jdk: oraclejdk8
-    scala: 2.11.8
-
-  - env: CI_SCRIPT="ci/build.sc docs"
-    jdk: oraclejdk8
-    scala: 2.11.8
-
   # Each `test` call is manually sharded out into `published/test` and
   # `integration/test`; for some reason, running them on the same box is
   # flaky and `integration/test` ends up hanging, even if they are run in
   # separate, sequential processes.
   - env: CI_SCRIPT="ci/build.sc test published/test"
+    jdk: oraclejdk8
+    scala: 2.11.8
+  - env: CI_SCRIPT="ci/build.sc test integration/test"
+    jdk: oraclejdk8
+    scala: 2.11.8
+
+  - env: CI_SCRIPT="ci/build.sc test published/test"
     jdk: openjdk7
     scala: 2.10.5
   - env: CI_SCRIPT="ci/build.sc test integration/test"
     jdk: openjdk7
     scala: 2.10.5
 
-  - env: CI_SCRIPT="ci/build.sc test published/test"
+
+  # These are relatively (?) quick so put them last
+  - env: CI_SCRIPT="ci/build.sc docs"
     jdk: oraclejdk8
     scala: 2.11.8
-  - env: CI_SCRIPT="ci/build.sc test integration/test"
+
+  - env: CI_SCRIPT="ci/build.sc executable"
     jdk: oraclejdk8
     scala: 2.11.8
 
