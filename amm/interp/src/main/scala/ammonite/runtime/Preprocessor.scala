@@ -200,13 +200,7 @@ object Preprocessor{
 
     def expandStatements(stmts: Seq[String],
                          wrapperIndex: String): Res[Preprocessor.Expanded] = {
-      val unwrapped = stmts.flatMap{x =>
-        Parsers.unwrapBlock(x) match {
-          case Some(contents) => Parsers.split(contents).get.get.value
-          case None => Seq(x)
-        }
-      }
-      unwrapped match{
+      stmts match{
         case Nil => Res.Skip
         case postSplit =>
           complete(stmts.mkString(""), wrapperIndex, postSplit)
