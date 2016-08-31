@@ -61,7 +61,9 @@ package object ops extends Extensions with RelPathStuff{
   /**
    * The current working directory for this process.
    */
-  lazy val cwd = ops.Path(new java.io.File("").getCanonicalPath)
+  lazy val pwd = ops.Path(new java.io.File("").getCanonicalPath)
+  @deprecated("replaced by pwd","0.7.5")
+  lazy val cwd = pwd
 
   /**
     * If you want to call subprocesses using [[%]] or [[%%]] and don't care
@@ -72,14 +74,14 @@ package object ops extends Extensions with RelPathStuff{
     * To make them use the process's working directory for each subprocess
     */
   object ImplicitWd{
-    implicit lazy val implicitCwd = ops.cwd
+    implicit lazy val implicitCwd = ops.pwd
   }
 
   /**
     * Extractor to let you easily pattern match on [[ops.Path]]s. Lets you do
     *
     * {{{
-    *   @ val base/segment/filename = cwd
+    *   @ val base/segment/filename = pwd
     *   base: Path = Path(Vector("Users", "haoyi", "Dropbox (Personal)"))
     *   segment: String = "Workspace"
     *   filename: String = "Ammonite"

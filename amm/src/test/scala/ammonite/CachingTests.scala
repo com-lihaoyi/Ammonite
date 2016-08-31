@@ -11,9 +11,9 @@ object CachingTests extends TestSuite{
   val tests = TestSuite{
     println("ScriptTests")
 
-    val scriptPath = cwd/'amm/'src/'test/'resources/'scripts
+    val scriptPath = pwd/'amm/'src/'test/'resources/'scripts
 
-    val resourcesPath = cwd/'amm/'src/'test/'resources
+    val resourcesPath = pwd/'amm/'src/'test/'resources
 
 
     val tempDir = tmp.dir(prefix="ammonite-tester")
@@ -74,7 +74,7 @@ object CachingTests extends TestSuite{
 
     'testRunTimeExceptionForCachedScripts{
       val storage = new Storage.Folder(tempDir)
-      val numFile = cwd/'amm/'target/'test/'resources/'scriptLevelCaching/"num.value"
+      val numFile = pwd/'amm/'target/'test/'resources/'scriptLevelCaching/"num.value"
       rm(numFile)
       write(numFile, "1")
       val interp1 = createTestInterp(

@@ -24,7 +24,7 @@ import scala.language.postfixOps
 class SshdRepl(sshConfig: SshServerConfig,
                predef: String = "",
                defaultPredef: Boolean = true,
-               wd: Path = ammonite.ops.cwd,
+               wd: Path = ammonite.ops.pwd,
                replArgs: Seq[Bind[_]] = Nil) {
   private lazy val sshd = SshServer(sshConfig, shellServer =
     SshdRepl.runRepl(sshConfig.ammoniteHome, predef, defaultPredef, wd, replArgs))

@@ -9,7 +9,7 @@ import utest._
 object OpTests extends TestSuite{
 
   val tests = TestSuite {
-    val res = cwd/'ops/'src/'test/'resources/'testdata
+    val res = pwd/'ops/'src/'test/'resources/'testdata
     'ls - assert(
       ls(res).toSet == Set(res/'folder1, res/'folder2, res/"File.txt"),
       ls(res/'folder2).toSet == Set(
@@ -21,7 +21,7 @@ object OpTests extends TestSuite{
     )
     'lsR{
       ls.rec(res).foreach(println)
-      intercept[java.nio.file.NoSuchFileException](ls.rec(cwd/'target/'nonexistent))
+      intercept[java.nio.file.NoSuchFileException](ls.rec(pwd/'target/'nonexistent))
       assert(
         ls.rec(res/'folder2/'folder2b) == Seq(res/'folder2/'folder2b/"b.txt"),
         ls.rec(res/'folder2) == Seq(
@@ -80,10 +80,10 @@ object OpTests extends TestSuite{
     }
     'rm{
       // shouldn't crash
-      rm! cwd/'target/'nonexistent
+      rm! pwd/'target/'nonexistent
     }
     'Mutating{
-      val test = cwd/'target/'test
+      val test = pwd/'target/'test
       rm! test
       mkdir! test
       'cp{

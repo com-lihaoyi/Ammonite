@@ -1,5 +1,5 @@
 interp.load.module(
-  ammonite.ops.cwd/'amm/'src/'test/'resources/'scripts/'predefWithLoad/"Loaded.sc"
+  ammonite.ops.pwd/'amm/'src/'test/'resources/'scripts/'predefWithLoad/"Loaded.sc"
 )
 
 @

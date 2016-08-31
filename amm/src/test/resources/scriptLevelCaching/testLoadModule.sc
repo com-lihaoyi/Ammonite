@@ -2,7 +2,7 @@
 
 import ammonite.ops._
 println("Script starts!!")
-val scriptDir = cwd/'amm/'src/'test/'resources/'scriptLevelCaching
+val scriptDir = pwd/'amm/'src/'test/'resources/'scriptLevelCaching
 interp.load.module(scriptDir/"scriptToBeLoaded.sc")
 
 @

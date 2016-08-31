@@ -16,7 +16,7 @@ The main static packages containing Ammonite code are:
 - `ammonite`: the main Ammonite REPL
 
 - `ammonite.shell`: an extension package for the Ammonite REPL to configure it 
-  for use as a system shell: a cwd-based-prompt, file-path-autocomplete, etc.
+  for use as a system shell: a pwd-based-prompt, file-path-autocomplete, etc.
   
 - `ammonite.sshd`: spin up an Ammonite server in any existing process you can
   connect to via SSH

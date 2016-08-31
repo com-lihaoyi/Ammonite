@@ -45,7 +45,7 @@ import ammonite.util.Util.newLine
 case class Main(predef: String = "",
                 defaultPredef: Boolean = true,
                 storageBackend: Storage = new Storage.Folder(Defaults.ammoniteHome),
-                wd: Path = ammonite.ops.cwd,
+                wd: Path = ammonite.ops.pwd,
                 welcomeBanner: Option[String] = Some(Defaults.welcomeBanner),
                 inputStream: InputStream = System.in,
                 outputStream: OutputStream = System.out,
@@ -160,7 +160,7 @@ object Main{
       // the `Main` configuration arguments
       arg[String]("<file-args>...")
         .optional()
-        .foreach{ x => fileToExecute = Some(Path(x, cwd)) }
+        .foreach{ x => fileToExecute = Some(Path(x, pwd)) }
         .text("The Ammonite script file you want to execute")
       opt[String]('c', "code")
         .foreach(x => codeToExecute = Some(x))
@@ -177,10 +177,10 @@ object Main{
         .text("Any arguments you want to pass to the Ammonite script file")
       opt[File]('h', "home")
         .valueName("<file>")
-        .foreach( x => ammoniteHome = Some(Path(x, cwd)))
+        .foreach( x => ammoniteHome = Some(Path(x, pwd)))
         .text("The home directory of the REPL; where it looks for config and caches")
       opt[String]('f', "predef-file")
-        .foreach(x => predefFile = Some(Path(x, cwd)))
+        .foreach(x => predefFile = Some(Path(x, pwd)))
         .text("Lets you load your predef from a custom location")
       opt[Unit]('y', "continually")
         .foreach(x => continually = true)

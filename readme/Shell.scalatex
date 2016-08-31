@@ -127,7 +127,7 @@
       @p
         For example, this is how you can get the dot-files in the current directory:
 
-      @compare("""ls -a | grep "^\." """, "ls! cwd |? (_.last(0) == '.')")
+      @compare("""ls -a | grep "^\." """, "ls! pwd |? (_.last(0) == '.')")
 
       @p
         Here, we're using the @hl.scala{|?} pipe, which basically performs a filter on the paths coming in on the left. In this case, we're checking that for each path, the first character of the last segment of that path is the character @hl.scala{'.'}. This is slightly more verbose than Bash the bash equivalent shown above, but not by too much.

@@ -35,7 +35,7 @@ class TestRepl {
     lazy val i: Interpreter = new Interpreter(
       printer,
       storage = new Storage.Folder(tempDir),
-      wd = ammonite.ops.cwd,
+      wd = ammonite.ops.pwd,
       customPredefs = Seq(
         Name("pprintPredef") -> Repl.pprintPredef,
         Name("defaultPredef") -> ammonite.main.Defaults.predefString,
