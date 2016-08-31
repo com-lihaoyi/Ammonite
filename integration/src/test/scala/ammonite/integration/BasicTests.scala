@@ -37,7 +37,7 @@ object BasicTests extends TestSuite{
     'scriptWithSymbols {
       if (!Util.windowsPlatform){
         val dirAddr =
-          cwd/'target/'test/'resources/'ammonite/'integration/'basic
+          pwd/'target/'test/'resources/'ammonite/'integration/'basic
         val weirdScriptName = "script%#.@*+叉燒.sc"
         val scriptAddr = dirAddr/weirdScriptName
         rm(scriptAddr)
@@ -139,8 +139,9 @@ object BasicTests extends TestSuite{
       assert(errorMsg.contains("IvyThing$IvyResolutionException"))
     }
     'testIvySnapshotNoCache{
+      // test disabled on windows because sbt not available
       if (!Util.windowsPlatform) {
-        val buildRoot = cwd/'target/"some-dummy-library"
+        val buildRoot = pwd/'target/"some-dummy-library"
         cp.over(intTestResources/"some-dummy-library", buildRoot)
         val dummyScala = buildRoot/'src/'main/'scala/'dummy/"Dummy.scala"
 
@@ -150,6 +151,7 @@ object BasicTests extends TestSuite{
             s"""package dummy
               object Dummy{def thing="$theThing"}
            """.stripMargin)
+
           // 2. build & publish code locally
           %%("sbt", "+package", "+publishLocal")(buildRoot)
 
@@ -224,7 +226,7 @@ object BasicTests extends TestSuite{
 
     'args{
       'full{
-        val evaled = exec('basic/"Args.sc", "3", "Moo", (cwd/'omg/'moo).toString)
+        val evaled = exec('basic/"Args.sc", "3", "Moo", (pwd/'omg/'moo).toString)
         assert(evaled.out.string.contains("Hello! MooMooMoo omg/moo."))
       }
       'default{

@@ -12,7 +12,7 @@ object ExampleTests extends TestSuite{
       import ammonite.ops._
 
       // Let's pick our working directory
-      val wd: Path = cwd/'ops/'target/"scala-2.11"/"test-classes"/'example3
+      val wd: Path = pwd/'ops/'target/"scala-2.11"/"test-classes"/'example3
 
       // And make sure it's empty
       rm! wd
@@ -122,7 +122,7 @@ object ExampleTests extends TestSuite{
 
       // Pick the directory you want to work with,
       // relative to the process working dir
-      val wd = cwd/'ops/'target/"scala-2.11"/"test-classes"/'example2
+      val wd = pwd/'ops/'target/"scala-2.11"/"test-classes"/'example2
 
       // Delete a file or folder, if it exists
       rm! wd
@@ -193,8 +193,8 @@ object ExampleTests extends TestSuite{
       )
     }
     'comparison{
-      rm! cwd/'target/'folder/'thing/'file
-      write(cwd/'target/'folder/'thing/'file, "Hello!")
+      rm! pwd/'target/'folder/'thing/'file
+      write(pwd/'target/'folder/'thing/'file, "Hello!")
 
       def removeAll(path: String) = {
         def getRecursively(f: java.io.File): Seq[java.io.File] = {
@@ -209,19 +209,19 @@ object ExampleTests extends TestSuite{
       }
       removeAll("target/folder/thing")
 
-      assert(ls(cwd/'target/'folder).toSeq == Nil)
+      assert(ls(pwd/'target/'folder).toSeq == Nil)
 
-      write(cwd/'target/'folder/'thing/'file, "Hello!")
+      write(pwd/'target/'folder/'thing/'file, "Hello!")
 
-      rm! cwd/'target/'folder/'thing
-      assert(ls(cwd/'target/'folder).toSeq == Nil)
+      rm! pwd/'target/'folder/'thing
+      assert(ls(pwd/'target/'folder).toSeq == Nil)
     }
 
     'constructingPaths{
       // Get the process' Current Working Directory. As a convention
       // the directory that "this" code cares about (which may differ
-      // from the cwd) is called `wd`
-      val wd = cwd
+      // from the pwd) is called `wd`
+      val wd = pwd
 
       // A path nested inside `wd`
       wd/'folder/'file
@@ -239,7 +239,7 @@ object ExampleTests extends TestSuite{
       wd/up/up
     }
     'newPath{
-      val target = cwd/'target
+      val target = pwd/'target
     }
     'relPaths{
       // The path "folder/file"
@@ -250,11 +250,11 @@ object ExampleTests extends TestSuite{
       val rel3 = 'file
 
       // The relative difference between two paths
-      val target = cwd/'target/'file
-      assert((target relativeTo cwd) == 'target/'file)
+      val target = pwd/'target/'file
+      assert((target relativeTo pwd) == 'target/'file)
 
       // `up`s get resolved automatically
-      val minus = cwd relativeTo target
+      val minus = pwd relativeTo target
       val ups = up/up
       assert(minus == ups)
       rel1: RelPath
@@ -262,8 +262,8 @@ object ExampleTests extends TestSuite{
       rel3: RelPath
     }
     'relPathCombine{
-      val target = cwd/'target/'file
-      val rel = target relativeTo cwd
+      val target = pwd/'target/'file
+      val rel = target relativeTo pwd
       val newBase = root/'code/'server
       assert(newBase/rel == root/'code/'server/'target/'file)
     }
@@ -280,7 +280,7 @@ object ExampleTests extends TestSuite{
       // not "folder/file/.."
     }}
     'findWc{
-      val wd = cwd/'ops/'src/'test/'resources/'testdata
+      val wd = pwd/'ops/'src/'test/'resources/'testdata
 
       // find . -name '*.txt' | xargs wc -l
       val lines = ls.rec(wd) |? (_.ext == "txt") | read.lines | (_.length) sum
@@ -288,10 +288,10 @@ object ExampleTests extends TestSuite{
       assert(lines == 20)
     }
     'addUpScalaSize{
-      ls.rec! cwd |? (_.ext == "scala") | (_.size) |& (_ + _)
+      ls.rec! pwd |? (_.ext == "scala") | (_.size) |& (_ + _)
     }
     'concatAll{if (Unix()){
-      ls.rec! cwd |? (_.ext == "scala") | read |> write! cwd/'target/'test/"omg.txt"
+      ls.rec! pwd |? (_.ext == "scala") | read |> write! pwd/'target/'test/"omg.txt"
     }}
 
     'noLongLines{
@@ -303,7 +303,7 @@ object ExampleTests extends TestSuite{
         (p, read.lines(p).zipWithIndex |? (_._1.length > 100) | (_._2))
 
       val filesWithTooLongLines = (
-        ls.rec! cwd |? (_.ext == "scala")
+        ls.rec! pwd |? (_.ext == "scala")
                     | longLines
                     |? (_._2.length > 0)
                     |? (!_._1.segments.contains("src_managed"))
@@ -317,10 +317,10 @@ object ExampleTests extends TestSuite{
 //      ls! wd |? (_.ext == "scala") | (x => mv! x ! x.pref)
     }
     'allSubpathsResolveCorrectly{
-      for(abs <- ls.rec! cwd){
-        val rel = abs relativeTo cwd
+      for(abs <- ls.rec! pwd){
+        val rel = abs relativeTo pwd
         assert(rel.ups == 0)
-        assert(cwd / rel == abs)
+        assert(pwd / rel == abs)
       }
     }
   }

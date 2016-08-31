@@ -4,7 +4,7 @@ import ammonite.ops._
 import utest._
 
 object ShelloutTests extends TestSuite{
-  val scriptFolder = cwd/'ops/'src/'test/'resources/'scripts
+  val scriptFolder = pwd/'ops/'src/'test/'resources/'scripts
 
   val tests = TestSuite {
     'implicitWd{
@@ -28,7 +28,7 @@ object ShelloutTests extends TestSuite{
       'chained{
         assert(%%('git, 'init).out.string.contains("Reinitialized existing Git repository"))
         assert(%%('git, "init").out.string.contains("Reinitialized existing Git repository"))
-        assert(%%('ls, cwd).out.string.contains("readme.md"))
+        assert(%%('ls, pwd).out.string.contains("readme.md"))
       }
       'basicList{
         val files = List("readme.md", "build.sbt")
@@ -85,7 +85,7 @@ object ShelloutTests extends TestSuite{
 
     }
     'workingDirectory{
-      implicit var wd = cwd
+      implicit var wd = pwd
       val listed1 = %%('ls)
 
       wd /= up
@@ -95,7 +95,7 @@ object ShelloutTests extends TestSuite{
       assert(listed2 != listed1)
     }
     'customWorkingDir{
-      val res1 = %.ls()(cwd) // explicitly
+      val res1 = %.ls()(pwd) // explicitly
       // or implicitly
       import ammonite.ops.ImplicitWd._
       val res2 = %ls

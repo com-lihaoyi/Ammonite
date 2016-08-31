@@ -40,7 +40,7 @@ object UnitTests extends TestSuite{
       'fuzz - {
         import ammonite.ops._
 
-        val paths = ls.rec! cwd |? (_.ext == "scala")
+        val paths = ls.rec! pwd |? (_.ext == "scala")
         for(path <- paths){
           val code = read! path
           val out = Highlighter.defaultHighlight(

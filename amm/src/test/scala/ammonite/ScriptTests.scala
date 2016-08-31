@@ -11,10 +11,10 @@ object ScriptTests extends TestSuite{
     println("ScriptTests")
     val check = new TestRepl()
 
-    val scriptPath = cwd/'amm/'src/'test/'resources/'scripts
-    val printedScriptPath = """cwd/'amm/'src/'test/'resources/'scripts"""
+    val scriptPath = pwd/'amm/'src/'test/'resources/'scripts
+    val printedScriptPath = """pwd/'amm/'src/'test/'resources/'scripts"""
 
-    val resourcesPath = cwd/'amm/'src/'test/'resources
+    val resourcesPath = pwd/'amm/'src/'test/'resources
 
     'exec{
       'compilationBlocks{
@@ -261,7 +261,7 @@ object ScriptTests extends TestSuite{
               storage,
               Defaults.predefString
             )
-            interp2.interpApi.load.module(cwd/"scriptWithoutExtension")
+            interp2.interpApi.load.module(pwd/"scriptWithoutExtension")
           }.toString
           assert(res.contains("java.nio.file.NoSuchFileException"))
         }

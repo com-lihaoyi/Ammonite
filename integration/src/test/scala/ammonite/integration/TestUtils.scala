@@ -11,10 +11,10 @@ object TestUtils {
   val javaVersion = scala.util.Properties.javaVersion
   val ammVersion = ammonite.Constants.version
   val executableName = s"ammonite-$ammVersion-$scalaVersion"
-  val Seq(executable) = ls.rec! cwd |? (_.last == executableName)
-  val intTestResources = cwd/'integration/'src/'test/'resources
+  val Seq(executable) = ls.rec! pwd |? (_.last == executableName)
+  val intTestResources = pwd/'integration/'src/'test/'resources
   val replStandaloneResources = intTestResources/'ammonite/'integration
-  val shellAmmoniteResources = cwd/'shell/'src/'main/'resources/'ammonite/'shell
+  val shellAmmoniteResources = pwd/'shell/'src/'main/'resources/'ammonite/'shell
   val emptyPrefdef = shellAmmoniteResources/"empty-predef.sc"
   val exampleBarePredef = shellAmmoniteResources/"example-predef-bare.sc"
 

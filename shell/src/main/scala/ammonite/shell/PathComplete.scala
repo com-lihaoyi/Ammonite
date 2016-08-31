@@ -45,7 +45,7 @@ object PathComplete {
    *   (possibly half-complete) Symbol/String literal to become the `frag`,
    *   gobble up any `/`s followed by `ups` or Symbol/String literals to
    *   form the path, and stop if you reach a absolute path "literal"
-   *   `wd`/`cwd`/`home`/`root` or if you can't parse anything anymore.
+   *   `wd`/`pwd`/`home`/`root` or if you can't parse anything anymore.
    *
    * @param snippet The entire code snippet in which we are requesting
    *                autocomplete
@@ -140,7 +140,7 @@ object PathComplete {
   val rootMap = Map[Option[String], Path => Path](
     None -> (wd => wd),
     Some("wd") -> (wd => wd),
-    Some("cwd") -> (wd => cwd),
+    Some("pwd") -> (wd => pwd),
     Some("root") -> (wd => root),
     Some("home") -> (wd => home)
   )
