@@ -214,8 +214,14 @@ class Interpreter(val printer: Printer,
         ImportHook.Source.File(wd/"<console>"),
         stmts
       )
+      unwrappedStmts = hookedStmts.flatMap{x =>
+        Parsers.unwrapBlock(x) match {
+          case Some(contents) => Parsers.split(contents).get.get.value
+          case None => Seq(x)
+        }
+      }
       processed <- preprocess.transform(
-        hookedStmts,
+        unwrappedStmts,
         eval.getCurrentLine,
         "",
         Seq(Name("$sess")),

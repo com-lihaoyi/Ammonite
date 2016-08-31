@@ -304,6 +304,19 @@ object ScriptTests extends TestSuite{
           b: Int = 1
           """)
       }
+      'noUnWrapping{
+        check.session(s"""
+        @ import ammonite.ops._
+
+        @ interp.load.module($printedScriptPath/"ScriptDontUnwrap.sc")
+
+        @ foo
+        res2: String = "foo def"
+
+        @ wrappedValue
+        error: not found: value wrappedValue
+        """)
+      }
     }
   }
 }

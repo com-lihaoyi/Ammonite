@@ -99,6 +99,7 @@ def publishDocs() = {
     upload.shorten(s"https://github.com/lihaoyi/Ammonite/releases/download/$unstableKey")
   )
 
+  %sbt "readme/compile"
   %sbt "readme/run"
 
   %("ci/deploy_master_docs.sh")
@@ -164,6 +165,7 @@ def docs() = {
     publishDocs()
   }else{
     println("MISC COMMIT: Building readme for verification")
+    %sbt "readme/compile"
     %sbt "readme/run"
   }
 }
