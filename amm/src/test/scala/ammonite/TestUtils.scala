@@ -10,7 +10,7 @@ object TestUtils {
   def createTestInterp(storage: Storage, predef: String = "") = new Interpreter(
     printer = Printer(_ => (), _ => (), _ => (), _ => ()),
     storage = storage,
-    wd = ammonite.ops.cwd,
+    wd = ammonite.ops.pwd,
     // Provide a custom predef so we can verify in tests that the predef gets cached
     customPredefs = Seq(
       Name("predef") -> predef

@@ -1,7 +1,7 @@
 @import Main._
 @import readme.Sample._
 @import ammonite.ops._
-@val fileOps = read! cwd/'ops/'src/'main/'scala/'ammonite/'ops/"FileOps.scala"
+@val fileOps = read! pwd/'ops/'src/'main/'scala/'ammonite/'ops/"FileOps.scala"
 
 @sect("Ammonite-Ops", "A Rock-solid Filesystem Library for Scala")
   @p
@@ -60,7 +60,7 @@
     @hl.ref(opsExamples, Seq("constructingPaths", "//"), "}")
 
     @p
-      Note that there are no in-built operations to change the @code{cwd}. In general you should not need to: simply defining a new path, e.g.
+      Note that there are no in-built operations to change the @code{pwd}. In general you should not need to: simply defining a new path, e.g.
 
     @hl.ref(opsExamples, Seq("newPath", "val"), "}")
 
@@ -68,11 +68,11 @@
       Should be sufficient for most needs.
 
     @p
-      Above, we made use of the @hl.scala{cwd} built-in path. There are a number of @hl.scala{Path}s built into Ammonite:
+      Above, we made use of the @hl.scala{pwd} built-in path. There are a number of @hl.scala{Path}s built into Ammonite:
 
     @ul
       @li
-        @hl.scala{cwd}: The current working directory of the process. This can't be changed in Java, so if you need another path to work with the convention is to define a @hl.scala{wd} variable.
+        @hl.scala{pwd}: The current working directory of the process. This can't be changed in Java, so if you need another path to work with the convention is to define a @hl.scala{wd} variable.
       @li
         @hl.scala{root}: The root of the filesystem.
       @li
@@ -134,7 +134,7 @@
 
     @sect{Constructing Paths}
       @p
-        Apart from built-ins like @hl.scala{cwd} or @hl.scala{root} or @hl.scala{home}, you can also construct Ammonite's @hl.scala{Path}s from @hl.scala{String}s, @hl.scala{java.io.File}s or @hl.scala{java.nio.file.Path}s:
+        Apart from built-ins like @hl.scala{pwd} or @hl.scala{root} or @hl.scala{home}, you can also construct Ammonite's @hl.scala{Path}s from @hl.scala{String}s, @hl.scala{java.io.File}s or @hl.scala{java.nio.file.Path}s:
 
       @hl.ref(opsTests/"PathTests.scala", Seq("construction", "success", "", ""))
 
@@ -156,7 +156,7 @@
       @hl.ref(opsTests/"PathTests.scala", Seq("construction", "based", "", ""))
 
       @p
-        For example, if you wanted the common behavior of converting relative paths to absolute based on your current working directory, you can pass in @hl.scala{cwd} as the second argument to @hl.scala{Path(...)}. Apart from passing in @hl.scala{String}s or @hl.scala{java.io.File}s or @hl.scala{java.nio.file.Path}s, you can also pass in @hl.scala{BasePath}s you parsed early as a convenient way of converting it to a absolute path, if it isn't already one.
+        For example, if you wanted the common behavior of converting relative paths to absolute based on your current working directory, you can pass in @hl.scala{pwd} as the second argument to @hl.scala{Path(...)}. Apart from passing in @hl.scala{String}s or @hl.scala{java.io.File}s or @hl.scala{java.nio.file.Path}s, you can also pass in @hl.scala{BasePath}s you parsed early as a convenient way of converting it to a absolute path, if it isn't already one.
 
       @hr
 

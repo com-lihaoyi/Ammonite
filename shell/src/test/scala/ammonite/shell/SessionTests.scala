@@ -10,7 +10,7 @@ import utest._
 object SessionTests extends TestSuite{
 
   val bareSrc =
-    """cwd/'shell/'src/'main/'resources/'ammonite/'shell/"example-predef-bare.sc""""
+    """pwd/'shell/'src/'main/'resources/'ammonite/'shell/"example-predef-bare.sc""""
 
   val tests = TestSuite{
     val check = new TestRepl()

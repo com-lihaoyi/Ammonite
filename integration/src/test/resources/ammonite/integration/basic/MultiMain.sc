@@ -9,6 +9,6 @@ def mainA() = {
 }
 
 @main
-def functionB(i: Int, s: String, path: Path = cwd) = {
-  println(s"Hello! ${s * i} ${path.relativeTo(cwd)}.")
+def functionB(i: Int, s: String, path: Path = pwd) = {
+  println(s"Hello! ${s * i} ${path.relativeTo(pwd)}.")
 }

@@ -8,7 +8,7 @@ import ammonite.repl.FrontEndUtils
 import pprint.{Config, PPrinter, PPrint}
 
 case class ShellSession() extends OpsAPI {
-  var wd0 = cwd
+  var wd0 = pwd
   /**
    * The current working directory of the shell, that will get picked up by
    * any ammonite.ops commands you use

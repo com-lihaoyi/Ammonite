@@ -37,7 +37,7 @@ object BasicTests extends TestSuite{
     'scriptWithSymbols {
       if (!Util.windowsPlatform){
         val dirAddr =
-          cwd/'target/'test/'resources/'ammonite/'integration/'basic
+          pwd/'target/'test/'resources/'ammonite/'integration/'basic
         val weirdScriptName = "script%#.@*+叉燒.sc"
         val scriptAddr = dirAddr/weirdScriptName
         rm(scriptAddr)
@@ -200,7 +200,7 @@ object BasicTests extends TestSuite{
 
     'args{
       'full{
-        val evaled = exec('basic/"Args.sc", "3", "Moo", (cwd/'omg/'moo).toString)
+        val evaled = exec('basic/"Args.sc", "3", "Moo", (pwd/'omg/'moo).toString)
         assert(evaled.out.string.contains("Hello! MooMooMoo omg/moo."))
       }
       'default{
