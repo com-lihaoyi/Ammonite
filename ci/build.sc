@@ -37,9 +37,9 @@ def updateConstants(version: String = buildVersion,
     }
   """
   println("Writing Constants.scala")
-  rm! pwd/'project/"Constants.scala"
-  write(pwd/'project/"Constants.scala", versionTxt)
-  println(read! pwd/'project/"Constants.scala")
+  rm! cwd/'project/"Constants.scala"
+  write(cwd/'project/"Constants.scala", versionTxt)
+  println(read! cwd/'project/"Constants.scala")
 }
 
 def publishSigned() = {
@@ -54,9 +54,9 @@ def publishSigned() = {
     pgpPublicRing := file("pubring.asc")
     sonatypeProfileName := "com.lihaoyi"
   """
-  write(pwd/"sonatype.sbt", creds)
-  write(pwd/"secring.asc", sys.env("SONATYPE_PGP_KEY_CONTENTS").replace("\\n", "\n"))
-  write(pwd/"pubring.asc", sys.env("SONATYPE_PGP_PUB_KEY_CONTENTS").replace("\\n", "\n"))
+  write(cwd/"sonatype.sbt", creds)
+  write(cwd/"secring.asc", sys.env("SONATYPE_PGP_KEY_CONTENTS").replace("\\n", "\n"))
+  write(cwd/"pubring.asc", sys.env("SONATYPE_PGP_PUB_KEY_CONTENTS").replace("\\n", "\n"))
 
 
   for (version <- allVersions) {
@@ -70,7 +70,7 @@ def publishSigned() = {
 def publishDocs() = {
 
   val publishDocs = sys.env("DEPLOY_KEY").replace("\\n", "\n")
-  write(pwd / 'deploy_key, publishDocs)
+  write(cwd / 'deploy_key, publishDocs)
 
   val gitHash = getGitHash()
 
@@ -130,7 +130,7 @@ def executable() = {
         .asString
 
       val short = upload(
-        pwd/'amm/'target/"scala-2.11"/'amm,
+        cwd/'amm/'target/"scala-2.11"/'amm,
         travisTag,
         travisTag,
         sys.env("AMMONITE_BOT_AUTH_TOKEN")
@@ -138,7 +138,7 @@ def executable() = {
       short
     }else{
       val short = upload(
-        pwd/'amm/'target/"scala-2.11"/'amm,
+        cwd/'amm/'target/"scala-2.11"/'amm,
         "snapshot-commit-uploads",
         gitHash,
         sys.env("AMMONITE_BOT_AUTH_TOKEN")
