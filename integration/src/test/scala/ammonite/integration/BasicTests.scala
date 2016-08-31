@@ -148,11 +148,10 @@ object BasicTests extends TestSuite{
         // 1. edit code
         write.over(dummyScala,
           s"""package dummy
-             |object Dummy{def thing="$theThing"}
+              object Dummy{def thing="$theThing"}
            """.stripMargin)
         // 2. build & publish code locally
-        val sbtRes = %%bash("-c", s"cd $buildRoot && sbt +package +publishLocal")
-        assert(sbtRes.exitCode == 0)
+        %%.applyDynamic("sbt")("+package", "+publishLocal")(buildRoot)
 
         // 3. use published artifact in a script
         val evaled = exec('basic/"ivyResolveSnapshot.sc")
