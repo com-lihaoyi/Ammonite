@@ -1038,7 +1038,7 @@ target
 terminal
 .travis.yml
 
-real	0m0.002s
+real	0m0.001s
 user	0m0.000s
 sys	0m0.001s</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>time{ls!} 
 </span><span style="color: #16a085;">res0</span><span>: (</span><span style="color: #27ae60;">LsSeq</span><span>, </span><span style="color: #27ae60;">concurrent</span><span>.</span><span style="color: #27ae60;">duration</span><span>.</span><span style="color: #27ae60;">FiniteDuration</span><span>) = (
@@ -1049,7 +1049,7 @@ sys	0m0.001s</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><sp
 </span><span style="color: #27ae60;">'LICENSE</span><span>            </span><span style="color: #27ae60;">'deploy_key</span><span>         </span><span style="color: #27ae60;">'readme</span><span>             </span><span style="color: #27ae60;">'terminal</span><span>
 </span><span style="color: #27ae60;">'amm</span><span>                </span><span style="color: #27ae60;">'integration</span><span>        </span><span style="color: #27ae60;">&quot;readme.md&quot;</span><span>
 ,
-  48234533 nanoseconds
+  29737570 nanoseconds
 )</span></pre></div>
 
           <p>
@@ -1968,8 +1968,8 @@ val x = 1
 import ammonite.ops._
 
 @main
-def main(i: Int, s: String, path: Path = cwd) = {
-  println(s&quot;Hello! ${s * i} ${path.relativeTo(cwd)}.&quot;)
+def main(i: Int, s: String, path: Path = pwd) = {
+  println(s&quot;Hello! ${s * i} ${path.relativeTo(pwd)}.&quot;)
 }</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/integration/src/test/resources/ammonite/integration/basic/Args.sc#L0-L8" target="_blank"><i class="fa fa-link "></i></a></pre>
 
       <p>
@@ -2038,8 +2038,8 @@ def mainA() = {
 }
 
 @main
-def functionB(i: Int, s: String, path: Path = cwd) = {
-  println(s&quot;Hello! ${s * i} ${path.relativeTo(cwd)}.&quot;)
+def functionB(i: Int, s: String, path: Path = pwd) = {
+  println(s&quot;Hello! ${s * i} ${path.relativeTo(pwd)}.&quot;)
 }</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/integration/src/test/resources/ammonite/integration/basic/MultiMain.sc#L0-L14" target="_blank"><i class="fa fa-link "></i></a></pre>
 
       <p>
@@ -2389,7 +2389,7 @@ object Qux{
 
 // Pick the directory you want to work with,
 // relative to the process working dir
-val wd = cwd/'ops/'target/&quot;scala-2.11&quot;/&quot;test-classes&quot;/'example2
+val wd = pwd/'ops/'target/&quot;scala-2.11&quot;/&quot;test-classes&quot;/'example2
 
 // Delete a file or folder, if it exists
 rm! wd
@@ -2446,7 +2446,7 @@ removeAll(&quot;target/folder/thing&quot;)</code><a class=" scalatex-site-Styles
   <p>
     With a single, sleek expression:
 </p>
-  <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">rm! cwd/'target/'folder/'thing</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/test/scala/test/ammonite/ops/ExampleTests.scala#L215-L216" target="_blank"><i class="fa fa-link "></i></a></pre>
+  <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">rm! pwd/'target/'folder/'thing</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/test/scala/test/ammonite/ops/ExampleTests.scala#L215-L216" target="_blank"><i class="fa fa-link "></i></a></pre>
 
   <p>
     That handles the common case for you: recursively deleting folders, not-failing if the file doesn't exist, etc.
@@ -2475,8 +2475,8 @@ removeAll(&quot;target/folder/thing&quot;)</code><a class=" scalatex-site-Styles
 </p>
     <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">// Get the process' Current Working Directory. As a convention
 // the directory that &quot;this&quot; code cares about (which may differ
-// from the cwd) is called `wd`
-val wd = cwd
+// from the pwd) is called `wd`
+val wd = pwd
 
 // A path nested inside `wd`
 wd/'folder/'file
@@ -2494,19 +2494,19 @@ wd/up
 wd/up/up</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/test/scala/test/ammonite/ops/ExampleTests.scala#L220-L239" target="_blank"><i class="fa fa-link "></i></a></pre>
 
     <p>
-      Note that there are no in-built operations to change the <code>cwd</code>. In general you should not need to: simply defining a new path, e.g.
+      Note that there are no in-built operations to change the <code>pwd</code>. In general you should not need to: simply defining a new path, e.g.
 </p>
-    <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">val target = cwd/'target</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/test/scala/test/ammonite/ops/ExampleTests.scala#L241-L242" target="_blank"><i class="fa fa-link "></i></a></pre>
+    <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">val target = pwd/'target</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/test/scala/test/ammonite/ops/ExampleTests.scala#L241-L242" target="_blank"><i class="fa fa-link "></i></a></pre>
 
     <p>
       Should be sufficient for most needs.
 </p>
     <p>
-      Above, we made use of the <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">cwd</code> built-in path. There are a number of <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Path</code>s built into Ammonite:
+      Above, we made use of the <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">pwd</code> built-in path. There are a number of <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Path</code>s built into Ammonite:
 </p>
     <ul>
       <li>
-        <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">cwd</code>: The current working directory of the process. This can't be changed in Java, so if you need another path to work with the convention is to define a <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">wd</code> variable.</li>
+        <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">pwd</code>: The current working directory of the process. This can't be changed in Java, so if you need another path to work with the convention is to define a <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">wd</code> variable.</li>
       <li>
         <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">root</code>: The root of the filesystem.</li>
       <li>
@@ -2531,19 +2531,19 @@ val rel2 = 'folder/'file
 val rel3 = 'file
 
 // The relative difference between two paths
-val target = cwd/'target/'file
-assert((target relativeTo cwd) == 'target/'file)
+val target = pwd/'target/'file
+assert((target relativeTo pwd) == 'target/'file)
 
 // `up`s get resolved automatically
-val minus = cwd relativeTo target
+val minus = pwd relativeTo target
 val ups = up/up
 assert(minus == ups)</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/test/scala/test/ammonite/ops/ExampleTests.scala#L244-L259" target="_blank"><i class="fa fa-link "></i></a></pre>
 
       <p>
         In general, very few APIs take relative paths. Their main purpose is to be combined with absolute paths in order to create new absolute paths. e.g.
 </p>
-      <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">val target = cwd/'target/'file
-val rel = target relativeTo cwd
+      <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">val target = pwd/'target/'file
+val rel = target relativeTo pwd
 val newBase = root/'code/'server
 assert(newBase/rel == root/'code/'server/'target/'file)</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/test/scala/test/ammonite/ops/ExampleTests.scala#L264-L268" target="_blank"><i class="fa fa-link "></i></a></pre>
 
@@ -2685,7 +2685,7 @@ object BasePath {
 </li></ul>
     <h1 id="ConstructingPaths" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#ConstructingPaths" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Constructing Paths</h1>
       <p>
-        Apart from built-ins like <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">cwd</code> or <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">root</code> or <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">home</code>, you can also construct Ammonite's <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Path</code>s from <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">String</code>s, <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">java.io.File</code>s or <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">java.nio.file.Path</code>s:
+        Apart from built-ins like <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">pwd</code> or <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">root</code> or <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">home</code>, you can also construct Ammonite's <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Path</code>s from <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">String</code>s, <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">java.io.File</code>s or <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">java.nio.file.Path</code>s:
 </p>
       <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">val relStr = &quot;hello/cow/world/..&quot;
 val absStr = &quot;/hello/world&quot;
@@ -2750,7 +2750,7 @@ assert(
 )</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/test/scala/test/ammonite/ops/PathTests.scala#L314-L322" target="_blank"><i class="fa fa-link "></i></a></pre>
 
       <p>
-        For example, if you wanted the common behavior of converting relative paths to absolute based on your current working directory, you can pass in <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">cwd</code> as the second argument to <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Path(...)</code>. Apart from passing in <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">String</code>s or <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">java.io.File</code>s or <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">java.nio.file.Path</code>s, you can also pass in <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">BasePath</code>s you parsed early as a convenient way of converting it to a absolute path, if it isn't already one.
+        For example, if you wanted the common behavior of converting relative paths to absolute based on your current working directory, you can pass in <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">pwd</code> as the second argument to <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Path(...)</code>. Apart from passing in <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">String</code>s or <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">java.io.File</code>s or <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">java.nio.file.Path</code>s, you can also pass in <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">BasePath</code>s you parsed early as a convenient way of converting it to a absolute path, if it isn't already one.
 </p>
       <hr />
 
@@ -2766,7 +2766,7 @@ assert(
     <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">import ammonite.ops._
 
 // Let's pick our working directory
-val wd: Path = cwd/'ops/'target/&quot;scala-2.11&quot;/&quot;test-classes&quot;/'example3
+val wd: Path = pwd/'ops/'target/&quot;scala-2.11&quot;/&quot;test-classes&quot;/'example3
 
 // And make sure it's empty
 rm! wd
@@ -2995,7 +2995,7 @@ def longLines(p: Path) =
   (p, read.lines(p).zipWithIndex |? (_._1.length &gt; 100) | (_._2))
 
 val filesWithTooLongLines = (
-  ls.rec! cwd |? (_.ext == &quot;scala&quot;)
+  ls.rec! pwd |? (_.ext == &quot;scala&quot;)
               | longLines
               |? (_._2.length &gt; 0)
               |? (!_._1.segments.contains(&quot;src_managed&quot;))
@@ -3186,7 +3186,7 @@ assert(res.out.string.trim == &quot;Hello123&quot;)</code><a class=" scalatex-si
         <p>
           In Ammonite the current working directory is not a side-effect unlike in bash. Instead it is an argument to the command you are invoking. It can be passed in explicitly or implicitly.
   </p>
-        <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">val res1 = %.ls()(cwd) // explicitly
+        <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">val res1 = %.ls()(pwd) // explicitly
 // or implicitly
 import ammonite.ops.ImplicitWd._
 val res2 = %ls</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/ops/src/test/scala/test/ammonite/ops/ShelloutTests.scala#L97-L101" target="_blank"><i class="fa fa-link "></i></a></pre>
@@ -3420,7 +3420,7 @@ bash$ </span>ls -a | grep &quot;^\.&quot;
 ..
 .git
 .gitignore
-.travis.yml</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>ls! cwd |? (</span><span style="color: #f39c12;">_</span><span>.last(</span><span style="color: #27ae60;">0</span><span>) == </span><span style="color: #27ae60;">'.'</span><span>) 
+.travis.yml</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>ls! pwd |? (</span><span style="color: #f39c12;">_</span><span>.last(</span><span style="color: #27ae60;">0</span><span>) == </span><span style="color: #27ae60;">'.'</span><span>) 
 </span><span style="color: #16a085;">res0</span><span>: </span><span style="color: #27ae60;">Seq</span><span>[</span><span style="color: #27ae60;">Path</span><span>] = </span><span style="color: #f39c12;">List</span><span>(
   root/</span><span style="color: #27ae60;">'home</span><span>/</span><span style="color: #27ae60;">'travis</span><span>/</span><span style="color: #27ae60;">'build</span><span>/</span><span style="color: #27ae60;">'lihaoyi</span><span>/</span><span style="color: #27ae60;">'Ammonite</span><span>/</span><span style="color: #27ae60;">&quot;.git&quot;</span><span>,
   root/</span><span style="color: #27ae60;">'home</span><span>/</span><span style="color: #27ae60;">'travis</span><span>/</span><span style="color: #27ae60;">'build</span><span>/</span><span style="color: #27ae60;">'lihaoyi</span><span>/</span><span style="color: #27ae60;">'Ammonite</span><span>/</span><span style="color: #27ae60;">&quot;.gitignore&quot;</span><span>,
@@ -3453,10 +3453,10 @@ bash$ </span>find ./ops/src/main -name '*.scala' | xargs wc -l
   369 ./ops/src/main/scala/ammonite/ops/Path.scala
   101 ./ops/src/main/scala/ammonite/ops/PathUtils.scala
   198 ./ops/src/main/scala/ammonite/ops/Shellout.scala
-  119 ./ops/src/main/scala/ammonite/ops/package.scala
- 1485 total</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>
+  121 ./ops/src/main/scala/ammonite/ops/package.scala
+ 1487 total</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>
 ls.rec! wd/</span><span style="color: #27ae60;">'ops</span><span>/</span><span style="color: #27ae60;">'src</span><span>/</span><span style="color: #27ae60;">'main</span><span> |? (</span><span style="color: #f39c12;">_</span><span>.ext == </span><span style="color: #27ae60;">&quot;scala&quot;</span><span>) | read.lines | (</span><span style="color: #f39c12;">_</span><span>.size) sum 
-</span><span style="color: #16a085;">res0</span><span>: </span><span style="color: #27ae60;">Int</span><span> = </span><span style="color: #27ae60;">1487</span></pre></div>
+</span><span style="color: #16a085;">res0</span><span>: </span><span style="color: #27ae60;">Int</span><span> = </span><span style="color: #27ae60;">1489</span></pre></div>
 
       <p>
         For more examples of how to use Ammonite's pipes, check out the section on <a href="#Extensions">Extensions</a> and <a href="#Chaining">Chaining</a></p>
@@ -3486,15 +3486,15 @@ HELLO
 </p>
       <div><pre><span style="color: #8e44ad;">
 bash$ </span>git branch
-* (detached from 0df7f24)
+* (detached from cd50520)
   master</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>%git </span><span style="color: #27ae60;">'branch</span><span> 
-* (detached from 0df7f24)
+* (detached from cd50520)
   master
 </span></pre></div>
       <div><pre><span style="color: #8e44ad;">
 bash$ </span>date
-Tue Aug 30 11:07:01 UTC 2016</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>%date 
-Tue Aug 30 11:07:13 UTC 2016
+Wed Aug 31 19:37:02 UTC 2016</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>%date 
+Wed Aug 31 19:37:17 UTC 2016
 </span></pre></div>
 
       <p>
@@ -3686,9 +3686,9 @@ Hello from Java!
 </span><span style="color: #8e44ad;">travis-Ammonite@ </span><span style="color: #f39c12;">import</span><span> java.util.</span><span style="color: #f39c12;">_</span><span> 
 </span><span style="color: #27ae60;">import </span><span style="color: #16a085;">java.util._</span><span>
 </span><span style="color: #8e44ad;">travis-Ammonite@ </span><span style="color: #f39c12;">val</span><span> date = </span><span style="color: #f39c12;">new</span><span> </span><span style="color: #27ae60;">Date</span><span>() 
-</span><span style="color: #16a085;">date</span><span>: </span><span style="color: #27ae60;">Date</span><span> = Tue Aug 30 11:12:27 UTC 2016
+</span><span style="color: #16a085;">date</span><span>: </span><span style="color: #27ae60;">Date</span><span> = Wed Aug 31 19:41:32 UTC 2016
 </span><span style="color: #8e44ad;">travis-Ammonite@ </span><span>date.getDay() 
-</span><span style="color: #16a085;">res3</span><span>: </span><span style="color: #27ae60;">Int</span><span> = </span><span style="color: #27ae60;">2</span></pre>
+</span><span style="color: #16a085;">res3</span><span>: </span><span style="color: #27ae60;">Int</span><span> = </span><span style="color: #27ae60;">3</span></pre>
 
       <p>
         In fact, Ammonite-Shell allows you to ask for any published third-party Java/Scala library for usage in the shell, and have them downloaded, automatically cached, and made available for use. e.g. we can load popular libraries like <a href="https://github.com/google/guava">Google Guava</a> and using it in the shell:
@@ -3707,13 +3707,13 @@ import com.google.common.collect.ImmutableBiMap // Doesn't work
 	found com.google.guava#guava;18.0 in central
 	found com.google.code.findbugs#jsr305;1.3.9 in central
 downloading http://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0-javadoc.jar ...
-	[SUCCESSFUL ] com.google.guava#guava;18.0!guava.jar(javadoc) (90ms)
+	[SUCCESSFUL ] com.google.guava#guava;18.0!guava.jar(javadoc) (87ms)
 downloading http://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0.jar ...
-	[SUCCESSFUL ] com.google.guava#guava;18.0!guava.jar(bundle) (19ms)
+	[SUCCESSFUL ] com.google.guava#guava;18.0!guava.jar(bundle) (20ms)
 downloading http://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0-sources.jar ...
-	[SUCCESSFUL ] com.google.guava#guava;18.0!guava.jar(source) (16ms)
+	[SUCCESSFUL ] com.google.guava#guava;18.0!guava.jar(source) (15ms)
 downloading http://repo1.maven.org/maven2/com/google/code/findbugs/jsr305/1.3.9/jsr305-1.3.9.jar ...
-	[SUCCESSFUL ] com.google.code.findbugs#jsr305;1.3.9!jsr305.jar (10ms)
+	[SUCCESSFUL ] com.google.code.findbugs#jsr305;1.3.9!jsr305.jar (12ms)
 </span><span style="color: #27ae60;">import </span><span style="color: #16a085;">$ivy.$                             // Load from Maven Central</span><span>
 </span><span style="color: #8e44ad;">travis-Ammonite@ </span><span style="color: #f39c12;">import</span><span> com.google.common.collect.ImmutableBiMap </span><span style="color: #2980b9;">// Works now</span><span> 
 </span><span style="color: #27ae60;">import </span><span style="color: #16a085;">com.google.common.collect.ImmutableBiMap // Works now</span><span>
@@ -3734,13 +3734,13 @@ downloading http://repo1.maven.org/maven2/com/google/code/findbugs/jsr305/1.3.9/
 	found joda-time#joda-time;2.8.2 in central
 	found org.joda#joda-convert;1.2 in central
 downloading http://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2-sources.jar ...
-	[SUCCESSFUL ] joda-time#joda-time;2.8.2!joda-time.jar(source) (39ms)
+	[SUCCESSFUL ] joda-time#joda-time;2.8.2!joda-time.jar(source) (40ms)
 downloading http://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2.jar ...
 	[SUCCESSFUL ] joda-time#joda-time;2.8.2!joda-time.jar (13ms)
 downloading http://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2-javadoc.jar ...
-	[SUCCESSFUL ] joda-time#joda-time;2.8.2!joda-time.jar(javadoc) (23ms)
+	[SUCCESSFUL ] joda-time#joda-time;2.8.2!joda-time.jar(javadoc) (19ms)
 downloading http://repo1.maven.org/maven2/org/joda/joda-convert/1.2/joda-convert-1.2.jar ...
-	[SUCCESSFUL ] org.joda#joda-convert;1.2!joda-convert.jar (24ms)
+	[SUCCESSFUL ] org.joda#joda-convert;1.2!joda-convert.jar (13ms)
 </span><span style="color: #27ae60;">import </span><span style="color: #16a085;">$ivy.$                          </span><span>
 </span><span style="color: #8e44ad;">travis-Ammonite@ </span><span style="color: #f39c12;">import</span><span> org.joda.time.{DateTime, Period, Duration} 
 </span><span style="color: #27ae60;">import </span><span style="color: #16a085;">org.joda.time.{DateTime, Period, Duration}</span><span>
@@ -3913,9 +3913,9 @@ parsed: upickle.Js.Obj = Obj(
           (&quot;login&quot;, Str(&quot;scala&quot;)),
 ...
 
-@ for((k, v) &lt;- parsed.value) write(cwd/'target/'temp/k, upickle.json.write(v))
+@ for((k, v) &lt;- parsed.value) write(pwd/'target/'temp/k, upickle.json.write(v))
 
-@ ls! cwd/'target/'temp
+@ ls! pwd/'target/'temp
 res6: LsSeq = LsSeq(
   /Users/haoyi/Dropbox (Personal)/Workspace/Ammonite/target/temp/archive_url,
   /Users/haoyi/Dropbox (Personal)/Workspace/Ammonite/target/temp/assignees_url,
@@ -4025,7 +4025,7 @@ res12: Int = 6</code></pre>
 @ import org.apache.poi.xwpf.usermodel._ // Bring Ms-Word APIs into scope
 @ import collection.JavaConversions._    // Make use of Java collections easier
 
-@ val path = cwd/'amm/'src/'test/'resources/'testdata/&quot;Resume.docx&quot;
+@ val path = pwd/'amm/'src/'test/'resources/'testdata/&quot;Resume.docx&quot;
 
 @ val docx = new XWPFDocument(new java.io.ByteArrayInputStream(read.bytes(path)))
 
@@ -4085,13 +4085,13 @@ res27: Array[String] = Array(
 @ import net.coobird.thumbnailator._
 import net.coobird.thumbnailator._
 
-@ val images = ls! cwd/'amm/'src/'test/'resources/'testdata/'images
+@ val images = ls! pwd/'amm/'src/'test/'resources/'testdata/'images
 images: LsSeq = LsSeq(
   /Users/haoyi/Dropbox (Personal)/Workspace/Ammonite/repl/src/test/resources/testdata/images/GettingStarted.png,
   /Users/haoyi/Dropbox (Personal)/Workspace/Ammonite/repl/src/test/resources/testdata/images/Highlighting.png,
   /Users/haoyi/Dropbox (Personal)/Workspace/Ammonite/repl/src/test/resources/testdata/images/SystemShell.png
 )
-@ val dest = cwd/'target/'thumbnails
+@ val dest = pwd/'target/'thumbnails
 dest: Path = /Users/haoyi/Dropbox (Personal)/Workspace/Ammonite/target/thumbnails
 
 @ mkdir! dest
@@ -5070,15 +5070,15 @@ try {
       The page above contains the documentation for the latest stable version
       of Ammonite, <code>0.7.5</code>. Ammonite also publishes
       unstable versions, the latest of which is
-      <code>COMMIT-0df7f24</code> and is available for direct
+      <code>COMMIT-cd50520</code> and is available for direct
       download:
 </p>
-    <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/vif4e &amp;&amp; chmod +x /usr/local/bin/amm &amp;&amp; amm
+    <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/vikKX &amp;&amp; chmod +x /usr/local/bin/amm &amp;&amp; amm
 </code></pre>
     <p>
       Or usage in an SBT project
 </p>
-    <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;COMMIT-0df7f24&quot; % &quot;test&quot; cross CrossVersion.full
+    <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;COMMIT-cd50520&quot; % &quot;test&quot; cross CrossVersion.full
 
 initialCommands in (Test, console) := &quot;&quot;&quot;ammonite.Main().run()&quot;&quot;&quot;
 </code></pre>
