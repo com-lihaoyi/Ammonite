@@ -140,17 +140,18 @@ object BasicTests extends TestSuite{
     }
     'testIvySnapshotNoCache{
 
-      val dummyScala = intTestResources/"some-dummy-library"/'src/'main/'scala/'dummy/"Dummy.scala"
+      val buildRoot = cwd/'target/"some-dummy-library"
+      cp.over(intTestResources/"some-dummy-library", buildRoot)
+      val dummyScala = buildRoot/'src/'main/'scala/'dummy/"Dummy.scala"
 
       def publishJarAndRunScript(theThing: String) = {
         // 1. edit code
         write.over(dummyScala,
           s"""package dummy
-             |/*** DON'T CHECK ME IN ***/
              |object Dummy{def thing="$theThing"}
            """.stripMargin)
         // 2. build & publish code locally
-        val sbtRes = %%bash("-c", "cd integration/src/test/resources/some-dummy-library && sbt package publishLocal")
+        val sbtRes = %%bash("-c", s"cd $buildRoot && sbt +package +publishLocal")
         assert(sbtRes.exitCode == 0)
 
         // 3. use published artifact in a script
@@ -158,12 +159,8 @@ object BasicTests extends TestSuite{
         assert(evaled.out.string.contains(theThing))
       }
 
-      try {
-        publishJarAndRunScript("thing1")
-        publishJarAndRunScript("thing2")
-      } finally {
-        rm! dummyScala
-      }
+      publishJarAndRunScript("thing1")
+      publishJarAndRunScript("thing2")
     }
 
     'playframework- {

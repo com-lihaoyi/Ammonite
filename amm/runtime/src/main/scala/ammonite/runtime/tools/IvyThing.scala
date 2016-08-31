@@ -126,12 +126,17 @@ object IvyThing {
 
       // add maven repo resolver
       val chainResolver = new ChainResolver
+
       // #433 changingPattern, changingMatcher and checkModified are required so that updates to
       // SNAPSHOT versions are pulled in
       // see: https://ant.apache.org/ivy/history/2.3.0/concept.html#change
-      chainResolver.setChangingPattern(".*SNAPSHOT") // look for changes to SNAPSHOT versions
-      chainResolver.setChangingMatcher("regexp") // the above pattern is a regex
-      chainResolver.setCheckmodified(true) // check if ivy metadata has been modified (required for above to work)
+
+      // look for changes to SNAPSHOT versions
+      chainResolver.setChangingPattern(".*SNAPSHOT")
+      // the above pattern is a regex
+      chainResolver.setChangingMatcher("regexp")
+      // check if ivy metadata has been modified (required for above to work)
+      chainResolver.setCheckmodified(true)
       chainResolver.setName("chain-resolver")
       chainResolver.setReturnFirst(true)
       resolvers().map(_()).foreach(chainResolver.add)
