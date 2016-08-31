@@ -23,7 +23,7 @@ object Sample{
     "$ mkdir ~/.ammonite && curl -L -o ~/.ammonite/predef.sc https://git.io/v6r5y"
   val cacheVersion = 6
   def cached(key: Any)(calc: => String) = {
-    val path = pwd/'target/'cache/(key.hashCode + cacheVersion).toString
+    val path = cwd/'target/'cache/(key.hashCode + cacheVersion).toString
     try read! path
     catch{ case e =>
       val newValue = calc

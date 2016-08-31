@@ -1,7 +1,7 @@
 @import Main._
 @import readme.Sample._
 @import ammonite.ops._
-@val fileOps = read! pwd/'ops/'src/'main/'scala/'ammonite/'ops/"FileOps.scala"
+@val fileOps = read! cwd/'ops/'src/'main/'scala/'ammonite/'ops/"FileOps.scala"
 
 @sect("Ammonite-Ops", "A Rock-solid Filesystem Library for Scala")
   @p
