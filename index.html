@@ -1038,7 +1038,7 @@ target
 terminal
 .travis.yml
 
-real	0m0.001s
+real	0m0.002s
 user	0m0.000s
 sys	0m0.001s</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>time{ls!} 
 </span><span style="color: #16a085;">res0</span><span>: (</span><span style="color: #27ae60;">LsSeq</span><span>, </span><span style="color: #27ae60;">concurrent</span><span>.</span><span style="color: #27ae60;">duration</span><span>.</span><span style="color: #27ae60;">FiniteDuration</span><span>) = (
@@ -1049,7 +1049,7 @@ sys	0m0.001s</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><sp
 </span><span style="color: #27ae60;">'LICENSE</span><span>            </span><span style="color: #27ae60;">'deploy_key</span><span>         </span><span style="color: #27ae60;">'readme</span><span>             </span><span style="color: #27ae60;">'terminal</span><span>
 </span><span style="color: #27ae60;">'amm</span><span>                </span><span style="color: #27ae60;">'integration</span><span>        </span><span style="color: #27ae60;">&quot;readme.md&quot;</span><span>
 ,
-  29737570 nanoseconds
+  36005204 nanoseconds
 )</span></pre></div>
 
           <p>
@@ -3486,15 +3486,15 @@ HELLO
 </p>
       <div><pre><span style="color: #8e44ad;">
 bash$ </span>git branch
-* (detached from cd50520)
+* (detached from 81da8b4)
   master</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>%git </span><span style="color: #27ae60;">'branch</span><span> 
-* (detached from cd50520)
+* (detached from 81da8b4)
   master
 </span></pre></div>
       <div><pre><span style="color: #8e44ad;">
 bash$ </span>date
-Wed Aug 31 19:37:02 UTC 2016</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>%date 
-Wed Aug 31 19:37:17 UTC 2016
+Thu Sep  1 01:06:55 UTC 2016</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>%date 
+Thu Sep  1 01:07:06 UTC 2016
 </span></pre></div>
 
       <p>
@@ -3686,9 +3686,9 @@ Hello from Java!
 </span><span style="color: #8e44ad;">travis-Ammonite@ </span><span style="color: #f39c12;">import</span><span> java.util.</span><span style="color: #f39c12;">_</span><span> 
 </span><span style="color: #27ae60;">import </span><span style="color: #16a085;">java.util._</span><span>
 </span><span style="color: #8e44ad;">travis-Ammonite@ </span><span style="color: #f39c12;">val</span><span> date = </span><span style="color: #f39c12;">new</span><span> </span><span style="color: #27ae60;">Date</span><span>() 
-</span><span style="color: #16a085;">date</span><span>: </span><span style="color: #27ae60;">Date</span><span> = Wed Aug 31 19:41:32 UTC 2016
+</span><span style="color: #16a085;">date</span><span>: </span><span style="color: #27ae60;">Date</span><span> = Thu Sep 01 01:10:55 UTC 2016
 </span><span style="color: #8e44ad;">travis-Ammonite@ </span><span>date.getDay() 
-</span><span style="color: #16a085;">res3</span><span>: </span><span style="color: #27ae60;">Int</span><span> = </span><span style="color: #27ae60;">3</span></pre>
+</span><span style="color: #16a085;">res3</span><span>: </span><span style="color: #27ae60;">Int</span><span> = </span><span style="color: #27ae60;">4</span></pre>
 
       <p>
         In fact, Ammonite-Shell allows you to ask for any published third-party Java/Scala library for usage in the shell, and have them downloaded, automatically cached, and made available for use. e.g. we can load popular libraries like <a href="https://github.com/google/guava">Google Guava</a> and using it in the shell:
@@ -3707,11 +3707,11 @@ import com.google.common.collect.ImmutableBiMap // Doesn't work
 	found com.google.guava#guava;18.0 in central
 	found com.google.code.findbugs#jsr305;1.3.9 in central
 downloading http://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0-javadoc.jar ...
-	[SUCCESSFUL ] com.google.guava#guava;18.0!guava.jar(javadoc) (87ms)
-downloading http://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0.jar ...
-	[SUCCESSFUL ] com.google.guava#guava;18.0!guava.jar(bundle) (20ms)
+	[SUCCESSFUL ] com.google.guava#guava;18.0!guava.jar(javadoc) (89ms)
 downloading http://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0-sources.jar ...
-	[SUCCESSFUL ] com.google.guava#guava;18.0!guava.jar(source) (15ms)
+	[SUCCESSFUL ] com.google.guava#guava;18.0!guava.jar(source) (16ms)
+downloading http://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0.jar ...
+	[SUCCESSFUL ] com.google.guava#guava;18.0!guava.jar(bundle) (26ms)
 downloading http://repo1.maven.org/maven2/com/google/code/findbugs/jsr305/1.3.9/jsr305-1.3.9.jar ...
 	[SUCCESSFUL ] com.google.code.findbugs#jsr305;1.3.9!jsr305.jar (12ms)
 </span><span style="color: #27ae60;">import </span><span style="color: #16a085;">$ivy.$                             // Load from Maven Central</span><span>
@@ -3734,13 +3734,13 @@ downloading http://repo1.maven.org/maven2/com/google/code/findbugs/jsr305/1.3.9/
 	found joda-time#joda-time;2.8.2 in central
 	found org.joda#joda-convert;1.2 in central
 downloading http://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2-sources.jar ...
-	[SUCCESSFUL ] joda-time#joda-time;2.8.2!joda-time.jar(source) (40ms)
+	[SUCCESSFUL ] joda-time#joda-time;2.8.2!joda-time.jar(source) (44ms)
 downloading http://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2.jar ...
-	[SUCCESSFUL ] joda-time#joda-time;2.8.2!joda-time.jar (13ms)
+	[SUCCESSFUL ] joda-time#joda-time;2.8.2!joda-time.jar (11ms)
 downloading http://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2-javadoc.jar ...
 	[SUCCESSFUL ] joda-time#joda-time;2.8.2!joda-time.jar(javadoc) (19ms)
 downloading http://repo1.maven.org/maven2/org/joda/joda-convert/1.2/joda-convert-1.2.jar ...
-	[SUCCESSFUL ] org.joda#joda-convert;1.2!joda-convert.jar (13ms)
+	[SUCCESSFUL ] org.joda#joda-convert;1.2!joda-convert.jar (10ms)
 </span><span style="color: #27ae60;">import </span><span style="color: #16a085;">$ivy.$                          </span><span>
 </span><span style="color: #8e44ad;">travis-Ammonite@ </span><span style="color: #f39c12;">import</span><span> org.joda.time.{DateTime, Period, Duration} 
 </span><span style="color: #27ae60;">import </span><span style="color: #16a085;">org.joda.time.{DateTime, Period, Duration}</span><span>
@@ -5070,15 +5070,15 @@ try {
       The page above contains the documentation for the latest stable version
       of Ammonite, <code>0.7.5</code>. Ammonite also publishes
       unstable versions, the latest of which is
-      <code>COMMIT-cd50520</code> and is available for direct
+      <code>COMMIT-81da8b4</code> and is available for direct
       download:
 </p>
-    <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/vikKX &amp;&amp; chmod +x /usr/local/bin/amm &amp;&amp; amm
+    <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/viIni &amp;&amp; chmod +x /usr/local/bin/amm &amp;&amp; amm
 </code></pre>
     <p>
       Or usage in an SBT project
 </p>
-    <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;COMMIT-cd50520&quot; % &quot;test&quot; cross CrossVersion.full
+    <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;COMMIT-81da8b4&quot; % &quot;test&quot; cross CrossVersion.full
 
 initialCommands in (Test, console) := &quot;&quot;&quot;ammonite.Main().run()&quot;&quot;&quot;
 </code></pre>
