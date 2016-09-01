@@ -142,7 +142,7 @@ object Main{
     var verboseIvy: Boolean = true
     var ammoniteHome: Option[Path] = None
     var passThroughArgs: Seq[String] = Vector.empty
-    var predefFile: Option[Path] = None
+    var predefFiles: Seq[Path] = Vector.empty
     var continually = false
     var replApi = false
     val replParser = new scopt.OptionParser[Main]("ammonite") {
@@ -180,7 +180,8 @@ object Main{
         .foreach( x => ammoniteHome = Some(Path(x, pwd)))
         .text("The home directory of the REPL; where it looks for config and caches")
       opt[String]('f', "predef-file")
-        .foreach(x => predefFile = Some(Path(x, pwd)))
+        .unbounded()
+        .foreach{ x => predefFiles = predefFiles :+ Path(x, pwd) }
         .text("Lets you load your predef from a custom location")
       opt[Unit]('y', "continually")
         .foreach(x => continually = true)
@@ -231,9 +232,15 @@ object Main{
         c.predef,
         c.defaultPredef,
         new Storage.Folder(ammoniteHome.getOrElse(Defaults.ammoniteHome), isRepl) {
-          override def predef = predefFile match {
-            case None => super.predef
-            case Some(pf) => pf
+          override def loadPredef: String = {
+            if (predefFiles.isEmpty)
+              super.loadPredef
+            else
+              try {
+                predefFiles.map(f => read(f)).mkString("\n")
+              } catch {
+                case e: java.nio.file.NoSuchFileException => ""
+              }
           }
         },
         verboseIvy = verboseIvy
