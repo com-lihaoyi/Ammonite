@@ -30,7 +30,7 @@ trait IvyConstructor{
  *
  * And transliterated into Scala. I have no idea how or why it works.
  */
-case class IvyThing(resolvers: () => List[Resolver], printer: Printer, verboseIvy: Boolean) {
+case class IvyThing(resolvers: () => List[Resolver], printer: Printer, verboseOutput: Boolean) {
 
   case class IvyResolutionException(failed: Seq[String]) extends Exception(
     "failed to resolve ivy dependencies " + failed.mkString(", ")
@@ -41,7 +41,7 @@ case class IvyThing(resolvers: () => List[Resolver], printer: Printer, verboseIv
   Message.setDefaultLogger(new AbstractMessageLogger {
     def doEndProgress(msg: String) = Console.err.println("Done")
     def doProgress() = Console.err.print(".")
-    def log(msg: String, level: Int) =  if (level <= maxLevel) verboseIvy match {
+    def log(msg: String, level: Int) =  if (level <= maxLevel) verboseOutput match {
       case true => printer.info(msg)
       case false => silentIvyLogs += msg
     }

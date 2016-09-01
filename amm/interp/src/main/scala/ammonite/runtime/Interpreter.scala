@@ -33,7 +33,7 @@ class Interpreter(val printer: Printer,
                   // the REPL before it starts
                   extraBridges: Interpreter => Seq[(String, String, AnyRef)],
                   val wd: Path,
-                  verboseIvy: Boolean = true)
+                  verboseOutput: Boolean = true)
   extends ImportHook.InterpreterInterface{ interp =>
 
 
@@ -365,6 +365,13 @@ class Interpreter(val printer: Printer,
       tag
     ) match {
       case None =>
+        (source, verboseOutput) match {
+          case (ImportHook.Source.File(fName), true) =>
+            printer.out("Compiling " + fName.last + "\n")
+          case (ImportHook.Source.URL(url), true) => 
+            printer.out("Compiling " + url + "\n")
+          case _ =>
+        }
         init()
         val res = processModule0(
           source, code, wrapperName, pkgName,
@@ -581,7 +588,7 @@ class Interpreter(val printer: Printer,
         val resolved = ammonite.runtime.tools.IvyThing(
           () => interpApi.resolvers(),
           printer,
-          verboseIvy
+          verboseOutput
         ).resolveArtifact(
           groupId,
           artifactId,
@@ -605,7 +612,7 @@ class Interpreter(val printer: Printer,
     lazy val ivyThing = ammonite.runtime.tools.IvyThing(
       () => interpApi.resolvers(),
       printer,
-      verboseIvy
+      verboseOutput
     )
 
     def handleClasspath(jar: File): Unit
@@ -708,7 +715,7 @@ object Interpreter{
     Name(wrapperName.raw + (if (wrapperIndex == 1) "" else "_" + wrapperIndex))
   }
 
-  def initPrinters(output: OutputStream, error: OutputStream) = {
+  def initPrinters(output: OutputStream, error: OutputStream, verboseOutput: Boolean) = {
     val colors = Ref[Colors](Colors.Default)
     val printStream = new PrintStream(output, true)
     val errorPrintStream = new PrintStream(error, true)
