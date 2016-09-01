@@ -1,19 +1,15 @@
 package ammonite.runtime.tools
 
+import ammonite.runtime.tools.IvyThing._
+import ammonite.util.Printer
 import org.apache.ivy.Ivy
 import org.apache.ivy.core.module.descriptor.{DefaultDependencyDescriptor, DefaultModuleDescriptor}
 import org.apache.ivy.core.module.id.ModuleRevisionId
-import org.apache.ivy.core.resolve.{ResolveOptions}
+import org.apache.ivy.core.resolve.ResolveOptions
 import org.apache.ivy.core.settings.IvySettings
 import org.apache.ivy.plugins.repository.file.FileRepository
-import org.apache.ivy.util._
-
 import org.apache.ivy.plugins.resolver._
-import acyclic.file
-import ammonite.util.Printer
-import ammonite.util.Util.newLine
-import java.io.{File, OutputStream, PrintStream}
-import IvyThing._
+import org.apache.ivy.util._
 
 
 object IvyConstructor extends IvyConstructor
@@ -130,6 +126,17 @@ object IvyThing {
 
       // add maven repo resolver
       val chainResolver = new ChainResolver
+
+      // #433 changingPattern, changingMatcher and checkModified are required so that updates to
+      // SNAPSHOT versions are pulled in
+      // see: https://ant.apache.org/ivy/history/2.3.0/concept.html#change
+
+      // look for changes to SNAPSHOT versions
+      chainResolver.setChangingPattern(".*SNAPSHOT")
+      // the above pattern is a regex
+      chainResolver.setChangingMatcher("regexp")
+      // check if ivy metadata has been modified (required for above to work)
+      chainResolver.setCheckmodified(true)
       chainResolver.setName("chain-resolver")
       chainResolver.setReturnFirst(true)
       resolvers().map(_()).foreach(chainResolver.add)
@@ -173,18 +180,6 @@ object Resolvers {
 
  lazy val defaultResolvers: List[Resolver] = List(
    Resolver.File(
-     "ivy-cache",
-     "/.ivy2/cache",
-     "/[organisation]/[module]/jars/[artifact]-[revision].[ext]",
-     m2 = false
-   ),
-   Resolver.File(
-     "cache",
-     "/.ivy2/cache",
-     "/[organisation]/[module]/jars/[artifact]-[revision].[ext]",
-     m2 = false
-   ),
-   Resolver.File(
      "local",
      "/.ivy2/local",
      "/[organisation]/[module]/[revision]/[type]s/[artifact](-[classifier]).[ext]",
@@ -200,7 +195,7 @@ object Resolvers {
      "central",
      "http://repo1.maven.org/maven2/",
      MavenPattern,
-    true
+     m2 = true
    )
  )
 }
@@ -225,6 +220,10 @@ object Resolver{
       res.setRepository(repo)
       res.setM2compatible(m2)
       res.setName(name)
+      // #433 required so that updates to SNAPSHOT versions are pulled in
+      res.setChangingPattern(".*SNAPSHOT")
+      res.setChangingMatcher("regexp")
+      res.setCheckmodified(true)
 
       res
 

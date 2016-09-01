@@ -138,6 +138,32 @@ object BasicTests extends TestSuite{
 
       assert(errorMsg.contains("IvyThing$IvyResolutionException"))
     }
+    'testIvySnapshotNoCache{
+      // test disabled on windows because sbt not available
+      if (!Util.windowsPlatform) {
+        val buildRoot = pwd/'target/"some-dummy-library"
+        cp.over(intTestResources/"some-dummy-library", buildRoot)
+        val dummyScala = buildRoot/'src/'main/'scala/'dummy/"Dummy.scala"
+
+        def publishJarAndRunScript(theThing: String) = {
+          // 1. edit code
+          write.over(dummyScala,
+            s"""package dummy
+              object Dummy{def thing="$theThing"}
+           """.stripMargin)
+
+          // 2. build & publish code locally
+          %%("sbt", "+package", "+publishLocal")(buildRoot)
+
+          // 3. use published artifact in a script
+          val evaled = exec('basic/"ivyResolveSnapshot.sc")
+          assert(evaled.out.string.contains(theThing))
+        }
+
+        publishJarAndRunScript("thing1")
+        publishJarAndRunScript("thing2")
+      }
+    }
 
     'playframework- {
       if (!Util.windowsPlatform) {
