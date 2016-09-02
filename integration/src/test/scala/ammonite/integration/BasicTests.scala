@@ -29,7 +29,7 @@ object BasicTests extends TestSuite{
       JAVA_OPTS = "-verbose:class"
       )
     'hello{
-      val evaled = exec('basic/"Hello.sc")
+      val evaled = exec('basic/"Hello.sc", "-s")
       assert(evaled.out.trim == "Hello World")
     }
 
@@ -44,7 +44,8 @@ object BasicTests extends TestSuite{
         write(scriptAddr, """println("Script Worked!!")""")
         val evaled = %%bash(
           executable,
-          scriptAddr
+          scriptAddr,
+          "-s"
           )
         assert(evaled.out.trim == "Script Worked!!" && evaled.err.string.isEmpty)
       }
@@ -88,7 +89,8 @@ object BasicTests extends TestSuite{
       write(scriptAddr, """println("Worked!!")""")
       val evaled = %% bash(
         executable,
-        scriptAddr
+        scriptAddr,
+        "-s"
         )
       assert(evaled.out.trim == "Worked!!" && evaled.err.string.isEmpty)
     }
@@ -112,7 +114,8 @@ object BasicTests extends TestSuite{
         |@
         |cd! 'amm/'src
         |@
-        |println(wd relativeTo x)""".stripMargin
+        |println(wd relativeTo x)""".stripMargin,
+        "-s"
       )
 
       val output = res.out.trim
@@ -131,9 +134,24 @@ object BasicTests extends TestSuite{
       //make sure ivy is not printing logs as expected from `-s` flag
       assert(!evaled2.err.string.contains("resolving dependencies"))
     }
+    'testSilentScriptRunning{
+      val evaled1 = exec('basic/"Hello.sc")
+      //check Compiling Script is being printed
+      assert(evaled1.out.string.contains("Compiling Hello.sc"))
+      val evaled2 = exec('basic/"Hello.sc", "-s")
+      //make sure with `-s` flag script running is silent
+      assert(!evaled2.out.string.contains("Compiling"))
+    }
+    'testSilentRunningWithExceptions{
+      val errorMsg = intercept[ShelloutException]{
+        exec('basic/"Failure.sc")
+      }.result.err.string
+
+      assert(errorMsg.contains("not found: value x"))
+    }
     'testSilentIvyExceptions{
       val errorMsg = intercept[ShelloutException]{
-        exec('basic/"wrongIvyCordinates.sc", "-s")
+        exec('basic/"wrongIvyCordinates.sc")
       }.result.err.string
 
       assert(errorMsg.contains("IvyThing$IvyResolutionException"))
@@ -182,17 +200,19 @@ object BasicTests extends TestSuite{
       }
       'multiple{
         'positiveNoArgs{
-          val evaled = exec('basic/"MultiMain.sc", "mainA")
+          val evaled = exec('basic/"MultiMain.sc", "mainA", "-s")
           val out = evaled.out.string
           assert(out == "Hello! 1" + Util.newLine)
         }
         'positiveArgs{
-          val evaled = exec('basic/"MultiMain.sc", "functionB", "2", "foo")
+          val evaled = exec('basic/"MultiMain.sc", "functionB", "2", "foo", "-s")
           val out = evaled.out.string
           assert(out == "Hello! foofoo ." + Util.newLine)
         }
         'specifyMain{
-          val evaled = intercept[ShelloutException]{exec('basic/"MultiMain.sc")}.result
+          val evaled = intercept[ShelloutException]{
+            exec('basic/"MultiMain.sc")
+          }.result
           val out = evaled.err.string
           val expected = Util.normalizeNewlines(
             """Need to specify a main method to call when running MultiMain.sc
@@ -281,11 +301,11 @@ object BasicTests extends TestSuite{
     }
     'http{
       'shorten {
-        val res = exec('basic / "HttpApi.sc", "shorten", "https://www.github.com")
-        assert(res.out.trim.startsWith("https://git.io")) 
+        val res = exec('basic / "HttpApi.sc", "shorten", "https://www.github.com", "-s")
+        assert(res.out.trim.startsWith("https://git.io"))
       }
       'releases{
-        val res = exec('basic / "HttpApi.sc", "listReleases", "lihaoyi/Ammonite")
+        val res = exec('basic / "HttpApi.sc", "listReleases", "lihaoyi/Ammonite", "-s")
         assert(res.out.trim.contains("0.7.0"))
         assert(res.out.trim.contains("0.4.0"))
       }

@@ -25,7 +25,7 @@ class Repl(input: InputStream,
   var history = new History(Vector())
 
   val (colors, printStream, errorPrintStream, printer) =
-    Interpreter.initPrinters(output, error)
+    Interpreter.initPrinters(output, error, true)
 
 
 

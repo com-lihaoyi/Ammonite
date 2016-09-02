@@ -50,7 +50,7 @@ case class Main(predef: String = "",
                 inputStream: InputStream = System.in,
                 outputStream: OutputStream = System.out,
                 errorStream: OutputStream = System.err,
-                verboseIvy: Boolean = true
+                verboseOutput: Boolean = true
                ){
   /**
     * Instantiates an ammonite.Repl using the configuration
@@ -72,7 +72,7 @@ case class Main(predef: String = "",
     val augmentedPredef = Main.maybeDefaultPredef(defaultPredef, Defaults.predefString)
 
     val (colors, printStream, errorPrintStream, printer) =
-      Interpreter.initPrinters(outputStream, errorStream)
+      Interpreter.initPrinters(outputStream, errorStream, verboseOutput)
 
 
     val interp: Interpreter = new Interpreter(
@@ -99,7 +99,7 @@ case class Main(predef: String = "",
           Seq(("ammonite.repl.ReplBridge", "repl", replApi))
         },
       wd,
-      verboseIvy
+      verboseOutput
     )
     interp
   }
@@ -139,7 +139,7 @@ object Main{
   def main(args0: Array[String]) = {
     var fileToExecute: Option[Path] = None
     var codeToExecute: Option[String] = None
-    var verboseIvy: Boolean = true
+    var verboseOutput: Boolean = true
     var ammoniteHome: Option[Path] = None
     var passThroughArgs: Seq[String] = Vector.empty
     var predefFile: Option[Path] = None
@@ -190,7 +190,7 @@ object Main{
             |see where all the time is being spent.
           """.stripMargin)
       opt[Unit]('s', "silent")
-        .foreach(x => verboseIvy = false)
+        .foreach(x => verboseOutput = false)
         .text(
           "Make ivy logs go silent instead of printing though failures will still throw exception"
         )
@@ -236,7 +236,7 @@ object Main{
             case Some(pf) => pf
           }
         },
-        verboseIvy = verboseIvy
+        verboseOutput = verboseOutput
       )
       (fileToExecute, codeToExecute) match {
         case (None, None) => println("Loading..."); main(true).run()
