@@ -92,14 +92,48 @@
     @p
       Although it's best to read the documentation on this page to learn how
       to use these projects, the Scaladoc is still useful as a reference.
-  
+
+  @val coderAbhishek = lnk("coderabhishek", "https://github.com/coderabhishek")
+
+
   @sect{Changelog}
+    @sect{0.7.6}
+      @ul
+        @li
+          When running scripts, Ammonite now prints out a "Compiling foo.sc..."
+          message if they're being compiled for the first time. If you want
+          this to not be the case, you can silence it using the same @code{-s}
+          switch, thanks to @coderAbhishek
+        @li
+          The @code{--predef-file} switch now allows multiple inputs, allowing
+          you to pass in multiple files that all get evaluated as the predef
+
+        @li
+          @hl.scala{import.$ivy} no longer caches @code{-SNAPSHOT} versions,
+          thanks to @lnk("Julie Pitt", "https://github.com/yakticus")
+        @li
+          @issue(448) Deprecate @code{ammonite.ops.cwd} in preference to @code{ammonite.ops.pwd},
+          to help clear up confusion between @code{cwd} and local @code{wd}s,
+          thanks to @lnk("Julie Pitt", "https://github.com/yakticus")
+
+        @li
+          Set a default heap limit of 500 megabytes to the @code{amm} standalone
+          executable, so it no longer grows to the "default" of 1/4 your system
+          memory (typically multiple gigabytes) unnecessarily. If you need to
+          give it more memory, start it with @code{JAVA_OPTS=-Xmx1500M amm}
+
+        @li
+          @issue(453) Avoid un-wrapping @code("{...}") blocks in scripts, leaving
+          the unwrapping of @sect.ref{Block Input} only a feature of the interactive
+          REPL
+
+
+
     @sect{0.7.5}
       @ul
         @li
           @code{-s} cmd line switch makes ivy logs silent, though failures
-          will still be thrown as exception. Thanks to @lnk("coderabhishek",
-          "https://github.com/coderabhishek").
+          will still be thrown as exception. Thanks to @coderAbhishek.
         @li
           Added @code{show} and @code{typeOf} back into the default REPL
           imports, since they are pretty useful
@@ -167,11 +201,11 @@
         @li
           Running scripts outside the current working directory tree, as well as
           scripts with non-alphanumeric symbols in their file path, now works
-          thanks to @lnk("coderabhishek", "https://github.com/coderabhishek")
+          thanks to @coderAbhishek
         @li
           Scripts without the @code{.sc} can now be run directly from the command line
           rather than throwing an @code{IndexOutOfBoundsException}, thanks to
-          @lnk("coderabhishek", "https://github.com/coderabhishek")
+          @coderAbhishek
         @li
           Modularized Ammonite's internals; the main module @code{ammonite} has now
           been broken into 5 smaller modules for maintainability. This in
@@ -188,8 +222,7 @@
         @li
           Script files vastly faster to run once cached (~0.5s fixed overhead,
           instead of ~5s I was seeing before): faster classpath scanning, with
-          much more aggressive and robust caching, thanks to
-          @lnk("coderabhishek", "https://github.com/coderabhishek") who is
+          much more aggressive and robust caching, thanks to @coderAbhishek who is
           working on this over GSOC
         @li
           Fixed a performance regression and greatly sped up pasting text into
@@ -220,7 +253,7 @@
         @li
           Most of Ammonite now works on Windows, with the exception of the
           interactive REPL using @code{AmmoniteFrontEnd}, thanks to
-          @lnk("coderabhishek", "https://github.com/coderabhishek") who worked
+          @coderAbhishek who worked
           on this over GSOC.
         @li
           Started doing Continuous Deployment of the Ammonite project's
@@ -277,7 +310,7 @@
           scripts have a filename matching the name of the script (instead of
           @code{Main.scala}), and line numbers matching the original line
           numbers (instead of the line numbers in the synthetic code) thanks
-          to @lnk("Abhishek Kumar", "https://github.com/coderabhishek")
+          to @coderAbhishek
         @li
           Failures in scripts run using Ammonite from the command line or via
           @hl.scala{load.module} should show only the meaningful error and not
@@ -459,8 +492,7 @@
           the @code{lastException} variable @issue(289), in case you need more
           metadata from it or you want the stack-trace of a
           non-printed-by-default exception (e.g. @code{ThreadDeath} due to
-          @code{Ctrl-C}). Thanks to @lnk("coderabhishek",
-          "https://github.com/coderabhishek")!
+          @code{Ctrl-C}). Thanks to @coderAbhishek!
         @li
           Fixed @issue(280): Ammonite REPL confused by singleton types
     @sect{0.5.4}
@@ -482,7 +514,7 @@
           @lnk("thirstycrow", "https://github.com/thirstycrow")
         @li
           Fix @issue(312) lsing empty directory gives error, thanks to
-          @lnk("coderabhishek", "https://github.com/coderabhishek")
+          @coderAbhishek
         @li
           Implemented @sect.ref{History Search}, also known as
           reverse-i-search/Ctrl-R
@@ -510,12 +542,12 @@
     @sect{0.5.2}
       @ul
         @li
-          Fixed @lnk("@issue(80): Support artifact resolvers to load libraries not published to maven central",
-          "https://github.com/lihaoyi/Ammonite/issues/80"), by
+          Fixed @issue(80) Support artifact resolvers to load libraries not
+          published to maven central , by
           @lnk("Eric Torreborre", "https://github.com/etorreborre")
         @li
-          Fixed @lnk("@issue(310): java.util.NoSuchElementException: None.get on Shift+Tab without selection",
-          "https://github.com/lihaoyi/Ammonite/issues/301"), by
+          Fixed @issue(310): java.util.NoSuchElementException: None.get
+          on Shift+Tab without selection f, by
           @lnk("senia-psm", "https://github.com/senia-psm")
     @sect{0.5.1}
       @ul
@@ -663,10 +695,7 @@
           Fix a file-handle-leak for most usages of @code{read.lines} and
           @code{ls}/@code{ls.rec}
         @li
-          Fix bugs @lnk("@issue(186)", "https://github.com/lihaoyi/Ammonite/issues/186"),
-          @lnk("@issue(152)", "https://github.com/lihaoyi/Ammonite/issues/152"),
-          @lnk("@issue(149)", "https://github.com/lihaoyi/Ammonite/issues/149"),
-          @lnk("@issue(180)", "https://github.com/lihaoyi/Ammonite/issues/180")
+          Fix bugs @issue(186), @issue(152), @issue(149), @issue(180)
     @sect{0.4.5}
       @ul
         @li
@@ -676,8 +705,7 @@
           Support for HOME and END keys, thanks to @lnk("Johannes Rudolph",
           "https://github.com/jrudolph")
         @li
-          Fix for incorrect syntax highlighting (@lnk("@issue(159)",
-          "https://github.com/lihaoyi/Ammonite/issues/159"))
+          Fix for incorrect syntax highlighting (@issue(159))
         @li
           Support for loading compiler plugins, thanks to
           @lnk("Alexandre Archambault", "https://github.com/alexarchambault")
@@ -707,13 +735,11 @@
           Fix @code{pathSeparator} so Ammonite-REPL is at least
           basically-runnable on windows, although buggy
         @li
-          Update to more robust version of pprint to fix @lnk("@issue(140)",
-          "https://github.com/lihaoyi/Ammonite/issues/140")
+          Update to more robust version of pprint to fix @issue(140)
     @sect{0.4.2}
       @ul
         @li
-          Fix @lnk("@issue(139): Can't fix typos?",
-          "https://github.com/lihaoyi/Ammonite/issues/139")
+          Fix @issue(139): Can't fix typos?
         @li
           Fix bad wrapping of long lines in ammonite-repl
     @sect{0.4.1}

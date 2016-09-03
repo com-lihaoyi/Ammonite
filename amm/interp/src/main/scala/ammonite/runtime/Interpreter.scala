@@ -119,7 +119,7 @@ class Interpreter(val printer: Printer,
     val pkgName = Seq(Name("ammonite"), Name("predef"))
 
     processModule(
-      ImportHook.Source.File(wd/"Main.sc"),
+      ImportHook.Source.File(wd/s"${wrapperName.raw}.sc"),
       sourceCode,
       wrapperName,
       pkgName,
