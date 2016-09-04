@@ -1,6 +1,7 @@
 import scalatex.ScalatexReadme
 import sbtassembly.AssemblyPlugin.defaultShellScript
 
+fork := true
 
 scalaVersion := "2.11.8"
 
@@ -129,6 +130,7 @@ lazy val amm = project
       if (scalaVersion.value startsWith "2.10.") Nil
       else Seq("com.chuusai" %% "shapeless" % "2.1.0" % "test")
     ),
+    fork := true,
     javaOptions += "-Xmx4G",
     assemblyOption in assembly := (assemblyOption in assembly).value.copy(
       prependShellScript = Some(

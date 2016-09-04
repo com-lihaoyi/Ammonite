@@ -4,7 +4,7 @@ import java.io.OutputStreamWriter
 
 import ammonite.terminal._
 import Filter._
-import ammonite.repl.{FrontEndUtils, Highlighter}
+import ammonite.repl.FrontEndUtils
 import ammonite.util.Colors
 import ammonite.runtime.Parsers
 import ammonite.terminal._
@@ -52,83 +52,84 @@ object PathComplete {
    * @param cursor The position of the cursor when the user hits Tab
    * @return `None` if no autocomplete is possible, otherwise a [[PathLiteralInfo]]
    */
-  def findPathLiteral(snippet: String, cursor: Int): Option[PathLiteralInfo] = {
-    val indices = Highlighter.highlightIndices(
-      Parsers.Splitter,
-      snippet.toVector,
-      {
-        case scalaparse.Scala.Id => Interval.Id
-        case scalaparse.Scala.Literals.Expr.String => Interval.String
-        case scalaparse.Scala.Literals.Symbol => Interval.Symbol
-      },
-      Interval.End
-    )
+  def findPathLiteral(snippet: String, cursor: Int): Option[PathLiteralInfo] = None 
+  // {
+  //   val indices = Highlighter.highlightIndices(
+  //     Parsers.Splitter,
+  //     snippet.toVector,
+  //     {
+  //       case scalaparse.Scala.Id => Interval.Id
+  //       case scalaparse.Scala.Literals.Expr.String => Interval.String
+  //       case scalaparse.Scala.Literals.Symbol => Interval.Symbol
+  //     },
+  //     Interval.End
+  //   )
 
-    val spans =
-      indices
-        .drop(1)
-        // Weird hack to get around other weird hack in Highlighter, where it
-        // uses 999999 to represent incomplete input
-        .map{case (a, b, c) if a > 9999 => (cursor, b, c) case x => x}
-        .grouped(2)
-        .collect{
-          case Seq((s, Interval.Id, _), (e, Interval.End, _)) => Span.Id(s, e)
-          case Seq((s, Interval.String, _), (e, Interval.End, _)) => Span.String(s, e)
-          case Seq((s, Interval.Symbol, _), (e, Interval.End, _)) => Span.Symbol(s, e)
-        }
-        .toVector
-        .reverse
+  //   val spans =
+  //     indices
+  //       .drop(1)
+  //       // Weird hack to get around other weird hack in Highlighter, where it
+  //       // uses 999999 to represent incomplete input
+  //       .map{case (a, b, c) if a > 9999 => (cursor, b, c) case x => x}
+  //       .grouped(2)
+  //       .collect{
+  //         case Seq((s, Interval.Id, _), (e, Interval.End, _)) => Span.Id(s, e)
+  //         case Seq((s, Interval.String, _), (e, Interval.End, _)) => Span.String(s, e)
+  //         case Seq((s, Interval.Symbol, _), (e, Interval.End, _)) => Span.Symbol(s, e)
+  //       }
+  //       .toVector
+  //       .reverse
 
-    spans.headOption match{
-      case None => None
-      case Some(head) =>
-        // None means we're not in a path autocomplete, Some(None) means
-        // we are but there is no incomplete segment before the cursor
-        val (frag: Option[Option[String]], prev0: Int) =
-          head match{
-            case span: Span.Id =>
-              if (snippet.substring(span.start, span.end) == "/") (Some(None), cursor)
-              else (None, 0)
-            case span: Span.String if span.end == cursor =>
-              (Some(Some(snippet.slice(span.start, span.end))), span.start)
-            case span: Span.Symbol if span.end == cursor =>
-              (Some(Some(snippet.slice(span.start, span.end))), span.start)
-            case _ => (None, 0)
-          }
+  //   spans.headOption match{
+  //     case None => None
+  //     case Some(head) =>
+  //       // None means we're not in a path autocomplete, Some(None) means
+  //       // we are but there is no incomplete segment before the cursor
+  //       val (frag: Option[Option[String]], prev0: Int) =
+  //         head match{
+  //           case span: Span.Id =>
+  //             if (snippet.substring(span.start, span.end) == "/") (Some(None), cursor)
+  //             else (None, 0)
+  //           case span: Span.String if span.end == cursor =>
+  //             (Some(Some(snippet.slice(span.start, span.end))), span.start)
+  //           case span: Span.Symbol if span.end == cursor =>
+  //             (Some(Some(snippet.slice(span.start, span.end))), span.start)
+  //           case _ => (None, 0)
+  //         }
 
-        def rec(prev: Int,
-                spans: List[Span],
-                segments: List[Option[String]]): (Seq[Option[String]], Option[String]) = {
+  //       def rec(prev: Int,
+  //               spans: List[Span],
+  //               segments: List[Option[String]]): (Seq[Option[String]], Option[String]) = {
 
-          spans match{
-            case Span.Id(start, end) :: next :: rest
-              if snippet.slice(start, end) == "/"
-                && snippet.slice(end, prev).trim() == ""
-                && snippet.slice(next.end, start).trim() == "" =>
+  //         spans match{
+  //           case Span.Id(start, end) :: next :: rest
+  //             if snippet.slice(start, end) == "/"
+  //               && snippet.slice(end, prev).trim() == ""
+  //               && snippet.slice(next.end, start).trim() == "" =>
 
-              (next, snippet.slice(next.start, next.end)) match{
-                case (_: Span.Id, "up") => rec(next.start, rest, None :: segments)
-                case (_: Span.Id, x) if rootMap.keySet.flatten.contains(x) => (segments, Some(x))
-                case (_: Span.String, v) =>
-                  val mangled = v.drop(1).dropRight(1).replace("\\\"", "\"").replace("\\\\", "\\")
-                  rec(next.start, rest, Some(mangled) :: segments)
-                case (_: Span.Symbol, v) => rec(next.start, rest, Some(v.drop(1)) :: segments)
-                case _ => (segments, None)
-              }
-            case _ => (segments, None)
-          }
-        }
-        for {
-          frag <- frag
-          (body, base) = rec(
-            prev0,
-            if (frag.isDefined) spans.toList.drop(1) else spans.toList,
-            Nil
-          )
-          if !(body ++ frag ++ base).isEmpty
-        } yield PathLiteralInfo(base, body, frag, cursor - prev0)
-    }
-  }
+  //             (next, snippet.slice(next.start, next.end)) match{
+  //               case (_: Span.Id, "up") => rec(next.start, rest, None :: segments)
+  //               case (_: Span.Id, x) if rootMap.keySet.flatten.contains(x) => (segments, Some(x))
+  //               case (_: Span.String, v) =>
+  //                 val mangled = v.drop(1).dropRight(1).replace("\\\"", "\"").replace("\\\\", "\\")
+  //                 rec(next.start, rest, Some(mangled) :: segments)
+  //               case (_: Span.Symbol, v) => rec(next.start, rest, Some(v.drop(1)) :: segments)
+  //               case _ => (segments, None)
+  //             }
+  //           case _ => (segments, None)
+  //         }
+  //       }
+  //       for {
+  //         frag <- frag
+  //         (body, base) = rec(
+  //           prev0,
+  //           if (frag.isDefined) spans.toList.drop(1) else spans.toList,
+  //           Nil
+  //         )
+  //         if !(body ++ frag ++ base).isEmpty
+  //       } yield PathLiteralInfo(base, body, frag, cursor - prev0)
+  //   }
+  // }
 
   import ammonite.ops._
 

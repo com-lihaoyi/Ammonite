@@ -52,17 +52,6 @@ case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEn
     val autocompleteFilter: Filter = Filter.action(SpecialKeys.Tab){
       case TermState(rest, b, c, _) =>
         val (newCursor, completions, details) = compilerComplete(c, b.mkString)
-        val details2 = for (d <- details) yield {
-
-          Highlighter.defaultHighlight(
-            d.toVector,
-            colors.comment(),
-            colors.`type`(),
-            colors.literal(),
-            colors.keyword(),
-            fansi.Attr.Reset
-          ).mkString
-        }
 
         lazy val common = FrontEndUtils.findPrefix(completions, 0)
         val completions2 = for(comp <- completions) yield {
@@ -70,9 +59,7 @@ case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEn
           val (left, right) = comp.splitAt(common.length)
           (colors.comment()(left) ++ right).render
         }
-        val stdout =
-          FrontEndUtils.printCompletions(completions2, details2)
-                       .mkString
+        val stdout = FrontEndUtils.printCompletions(completions2, details).mkString
 
         if (details.nonEmpty || completions.isEmpty)
           Printing(TermState(rest, b, c), stdout)
@@ -110,34 +97,6 @@ case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEn
       BasicFilters.all
     )
 
-
-    val res = Terminal.readLine(
-      prompt,
-      reader,
-      writer,
-      allFilters,
-      displayTransform = { (buffer, cursor) =>
-
-
-        val indices = Highlighter.defaultHighlightIndices(
-          buffer,
-          colors.comment(),
-          colors.`type`(),
-          colors.literal(),
-          colors.keyword(),
-          fansi.Attr.Reset
-        )
-        val highlighted = fansi.Str(Highlighter.flattenIndices(indices, buffer).mkString)
-        val (newBuffer, offset) = SelectionFilter.mangleBuffer(
-          selectionFilter, highlighted, cursor, colors.selected()
-        )
-
-        val newNewBuffer = HistoryFilter.mangleBuffer(
-          historyFilter, newBuffer, cursor, fansi.Underlined.On
-        )
-        (newNewBuffer, offset)
-      }
-    )
-    res
+    Terminal.readLine(prompt, reader, writer, allFilters)
   }
 }
