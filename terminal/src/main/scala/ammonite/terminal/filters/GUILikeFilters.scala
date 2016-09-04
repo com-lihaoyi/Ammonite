@@ -6,14 +6,15 @@ import ammonite.terminal.SpecialKeys._
 import ammonite.terminal.DelegateFilter
 import ammonite.terminal._
 import Filter._
+
 /**
- * Filters have hook into the various {Ctrl,Shift,Fn,Alt}x{Up,Down,Left,Right}
- * combination keys, and make them behave similarly as they would on a normal
- * GUI text editor: alt-{left, right} for word movement, hold-down-shift for
- * text selection, etc.
- */
+  * Filters have hook into the various {Ctrl,Shift,Fn,Alt}x{Up,Down,Left,Right}
+  * combination keys, and make them behave similarly as they would on a normal
+  * GUI text editor: alt-{left, right} for word movement, hold-down-shift for
+  * text selection, etc.
+  */
 object GUILikeFilters {
-  case class SelectionFilter(indent: Int) extends DelegateFilter{
+  case class SelectionFilter(indent: Int) extends DelegateFilter {
     var mark: Option[Int] = None
     def setMark(c: Int) = {
       Debug("setMark\t" + mark + "\t->\t" + c)
@@ -33,10 +34,10 @@ object GUILikeFilters {
 
       var firstOffset = 0
       val broken =
-        for((Seq(l, r), i) <- frags) yield {
+        for ((Seq(l, r), i) <- frags) yield {
           val slice = b.slice(l, r)
           if (i == 0) slice
-          else{
+          else {
             val cut = slicer(slice)
 
             if (i == 1) firstOffset = cut
@@ -57,27 +58,47 @@ object GUILikeFilters {
     }
 
     def filter = Filter.merge(
-
-      simple(ShiftUp){(b, c, m) => setMark(c); BasicFilters.moveUp(b, c, m.width)},
-      simple(ShiftDown){(b, c, m) => setMark(c); BasicFilters.moveDown(b, c, m.width)},
-      simple(ShiftRight){(b, c, m) => setMark(c); (b, c + 1)},
-      simple(ShiftLeft){(b, c, m) => setMark(c); (b, c - 1)},
-      simple(AltShiftUp){(b, c, m) => setMark(c); BasicFilters.moveUp(b, c, m.width)},
-      simple(AltShiftDown){(b, c, m) => setMark(c); BasicFilters.moveDown(b, c, m.width)},
-      simple(AltShiftRight){(b, c, m) => setMark(c); wordRight(b, c)},
-      simple(AltShiftLeft){(b, c, m) => setMark(c); wordLeft(b, c)},
-      simple(FnShiftRight){(b, c, m) => setMark(c); BasicFilters.moveEnd(b, c, m.width)},
-      simple(FnShiftLeft){(b, c, m) => setMark(c); BasicFilters.moveStart(b, c, m.width)},
-      partial{
+      simple(ShiftUp) { (b, c, m) =>
+        setMark(c); BasicFilters.moveUp(b, c, m.width)
+      },
+      simple(ShiftDown) { (b, c, m) =>
+        setMark(c); BasicFilters.moveDown(b, c, m.width)
+      },
+      simple(ShiftRight) { (b, c, m) =>
+        setMark(c); (b, c + 1)
+      },
+      simple(ShiftLeft) { (b, c, m) =>
+        setMark(c); (b, c - 1)
+      },
+      simple(AltShiftUp) { (b, c, m) =>
+        setMark(c); BasicFilters.moveUp(b, c, m.width)
+      },
+      simple(AltShiftDown) { (b, c, m) =>
+        setMark(c); BasicFilters.moveDown(b, c, m.width)
+      },
+      simple(AltShiftRight) { (b, c, m) =>
+        setMark(c); wordRight(b, c)
+      },
+      simple(AltShiftLeft) { (b, c, m) =>
+        setMark(c); wordLeft(b, c)
+      },
+      simple(FnShiftRight) { (b, c, m) =>
+        setMark(c); BasicFilters.moveEnd(b, c, m.width)
+      },
+      simple(FnShiftLeft) { (b, c, m) =>
+        setMark(c); BasicFilters.moveStart(b, c, m.width)
+      },
+      partial {
         case TS(27 ~: 91 ~: 90 ~: rest, b, c, _) if mark.isDefined =>
-          doIndent(b, c, rest,
-            slice => -math.min(slice.iterator.takeWhile(_ == ' ').size, indent)
-          )
+          doIndent(
+            b,
+            c,
+            rest,
+            slice =>
+              -math.min(slice.iterator.takeWhile(_ == ' ').size, indent))
 
         case TS(9 ~: rest, b, c, _) if mark.isDefined => // Tab
-          doIndent(b, c, rest,
-            slice => indent
-          )
+          doIndent(b, c, rest, slice => indent)
 
         // Intercept every other character.
         case TS(char ~: inputs, buffer, cursor, _) if mark.isDefined =>
@@ -85,10 +106,10 @@ object GUILikeFilters {
           if (char.toChar.isControl &&
               char != 127 /*backspace*/ &&
               char != 13 /*enter*/ &&
-              char != 10 /*enter*/) {
+              char != 10 /*enter*/ ) {
             mark = None
             TS(char ~: inputs, buffer, cursor)
-          }else{
+          } else {
             // If it's a  printable character, delete the current
             // selection and write the printable character.
             val Seq(min, max) = Seq(mark.get, cursor).sorted
@@ -102,12 +123,12 @@ object GUILikeFilters {
       }
     )
   }
-  object SelectionFilter{
+  object SelectionFilter {
     def mangleBuffer(selectionFilter: SelectionFilter,
                      string: fansi.Str,
                      cursor: Int,
                      startColor: fansi.Attrs) = {
-      selectionFilter.mark match{
+      selectionFilter.mark match {
         case Some(mark) if mark != cursor =>
           val Seq(min, max) = Seq(cursor, mark).sorted
           val displayOffset = if (cursor < mark) 0 else -1
@@ -125,28 +146,47 @@ object GUILikeFilters {
     simple(FnLeft)((b, c, m) => BasicFilters.moveStart(b, c, m.width))
   )
   val altFilter = Filter.merge(
-    simple(AltUp){(b, c, m) => BasicFilters.moveUp(b, c, m.width)},
-    simple(AltDown){(b, c, m) => BasicFilters.moveDown(b, c, m.width)},
-    simple(AltRight){(b, c, m) => wordRight(b, c)},
-    simple(AltLeft){(b, c, m) => wordLeft(b, c)}
+    simple(AltUp) { (b, c, m) =>
+      BasicFilters.moveUp(b, c, m.width)
+    },
+    simple(AltDown) { (b, c, m) =>
+      BasicFilters.moveDown(b, c, m.width)
+    },
+    simple(AltRight) { (b, c, m) =>
+      wordRight(b, c)
+    },
+    simple(AltLeft) { (b, c, m) =>
+      wordLeft(b, c)
+    }
   )
 
   val fnAltFilter = Filter.merge(
-    simple(FnAltUp){(b, c, m) => (b, c)},
-    simple(FnAltDown){(b, c, m) => (b, c)},
-    simple(FnAltRight){(b, c, m) => (b, c)},
-    simple(FnAltLeft){(b, c, m) => (b, c)}
+    simple(FnAltUp) { (b, c, m) =>
+      (b, c)
+    },
+    simple(FnAltDown) { (b, c, m) =>
+      (b, c)
+    },
+    simple(FnAltRight) { (b, c, m) =>
+      (b, c)
+    },
+    simple(FnAltLeft) { (b, c, m) =>
+      (b, c)
+    }
   )
   val fnAltShiftFilter = Filter.merge(
-    simple(FnAltShiftRight){(b, c, m) => (b, c)},
-    simple(FnAltShiftLeft){(b, c, m) => (b, c)}
+    simple(FnAltShiftRight) { (b, c, m) =>
+      (b, c)
+    },
+    simple(FnAltShiftLeft) { (b, c, m) =>
+      (b, c)
+    }
   )
-
 
   def consumeWord(b: Vector[Char], c: Int, delta: Int, offset: Int) = {
     var current = c
-    while(b.isDefinedAt(current) && !b(current).isLetterOrDigit) current += delta
-    while(b.isDefinedAt(current) && b(current).isLetterOrDigit) current += delta
+    while (b.isDefinedAt(current) && !b(current).isLetterOrDigit) current += delta
+    while (b.isDefinedAt(current) && b(current).isLetterOrDigit) current += delta
     current + offset
   }
 

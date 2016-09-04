@@ -4,6 +4,7 @@ import sourcecode.Compat.Context
 
 import scala.annotation.StaticAnnotation
 import scala.language.experimental.macros
+
 /**
   * More or less a minimal version of Autowire's Server that lets you generate
   * a set of "routes" from the methods defined in an object, and call them
@@ -11,17 +12,21 @@ import scala.language.experimental.macros
   * generate/compile code or use Scala reflection. This saves us spinning up
   * the Scala compiler and greatly reduces the startup time of cached scripts.
   */
-object Router{
+object Router {
   class doc(s: String) extends StaticAnnotation
   class main extends StaticAnnotation
-  def generateRoutes[T](t: T): Seq[Router.EntryPoint] = macro generateRoutesImpl[T]
-  def generateRoutesImpl[T: c.WeakTypeTag](c: Context)(t: c.Expr[T]): c.Expr[Seq[EntryPoint]] = {
+  def generateRoutes[T](t: T): Seq[Router.EntryPoint] =
+    macro generateRoutesImpl[T]
+  def generateRoutesImpl[T: c.WeakTypeTag](c: Context)(
+      t: c.Expr[T]): c.Expr[Seq[EntryPoint]] = {
     import c.universe._
     val r = new Router(c)
-    val allRoutes = r.getAllRoutesForClass(
-      weakTypeOf[T].asInstanceOf[r.c.Type],
-      t.tree.asInstanceOf[r.c.Tree]
-    ).asInstanceOf[Iterable[c.Tree]]
+    val allRoutes = r
+      .getAllRoutesForClass(
+        weakTypeOf[T].asInstanceOf[r.c.Type],
+        t.tree.asInstanceOf[r.c.Tree]
+      )
+      .asInstanceOf[Iterable[c.Tree]]
 
     val res = q"_root_.scala.Seq(..$allRoutes)"
 //    println(res)
@@ -51,23 +56,26 @@ object Router{
   case class EntryPoint(name: String,
                         argSignatures: Seq[ArgSig],
                         varargs: Boolean,
-                        invoke0: (Map[String, String], Seq[String]) => Result[Any]){
+                        invoke0: (Map[String, String],
+                                  Seq[String]) => Result[Any]) {
     def invoke(args: Seq[String], kwargs: Seq[(String, String)]): Result[Any] = {
       val (usedArgs, leftoverArgs) = args.splitAt(argSignatures.length)
-      if (leftoverArgs.nonEmpty && !varargs) Result.Error.TooManyArguments(leftoverArgs)
+      if (leftoverArgs.nonEmpty && !varargs)
+        Result.Error.TooManyArguments(leftoverArgs)
       else {
         val implicitlyNamedArgs = argSignatures.map(_.name).zip(usedArgs).toMap
         val redundantKeys =
           (implicitlyNamedArgs.keys.toSeq ++ kwargs.map(_._1))
-            .groupBy(x=>x)
+            .groupBy(x => x)
             .filter(_._2.size > 1)
 
-        if(redundantKeys.nonEmpty) {
+        if (redundantKeys.nonEmpty) {
           Result.Error.RedundantArguments(redundantKeys.keysIterator.toSeq)
         } else {
           try invoke0(implicitlyNamedArgs ++ kwargs, leftoverArgs)
-          catch{case e: Throwable =>
-            Result.Error.Exception(e)
+          catch {
+            case e: Throwable =>
+              Result.Error.Exception(e)
           }
         }
       }
@@ -79,30 +87,34 @@ object Router{
               arg: ArgSig,
               thunk: String => T,
               extras: Option[Seq[String]]): FailMaybe = {
-    dict.get(arg.name) match{
+    dict.get(arg.name) match {
       case None =>
-        try default match{
+        try default match {
           case None => Left(Seq(Result.ParamError.Missing(arg)))
           case Some(v) => Right(v)
-        } catch {case e => Left(Seq(Result.ParamError.DefaultFailed(arg, e))) }
+        } catch {
+          case e => Left(Seq(Result.ParamError.DefaultFailed(arg, e)))
+        }
 
       case Some(x) =>
-
-        extras match{
+        extras match {
           case None =>
             try Right(thunk(x))
-            catch {case e => Left(Seq(Result.ParamError.Invalid(arg, x, e))) }
+            catch { case e => Left(Seq(Result.ParamError.Invalid(arg, x, e))) }
 
           case Some(extraItems) =>
-            val attempts: Seq[Either[Result.ParamError.Invalid, T]] = (x +: extraItems).map{ item =>
-              try Right(thunk(item))
-              catch {case e => Left(Result.ParamError.Invalid(arg, item, e)) }
-            }
+            val attempts: Seq[Either[Result.ParamError.Invalid, T]] =
+              (x +: extraItems).map { item =>
+                try Right(thunk(item))
+                catch {
+                  case e => Left(Result.ParamError.Invalid(arg, item, e))
+                }
+              }
 
-            val bad = attempts.collect{ case Left(x) => x}
+            val bad = attempts.collect { case Left(x) => x }
             if (bad.nonEmpty) Left(bad)
             else {
-              val good = Right(attempts.collect{case Right(x) => x})
+              val good = Right(attempts.collect { case Right(x) => x })
               good
             }
         }
@@ -115,7 +127,7 @@ object Router{
     * Could succeed with a value, but could fail in many different ways.
     */
   sealed trait Result[+T]
-  object Result{
+  object Result {
 
     /**
       * Invoking the [[EntryPoint]] was totally successful, and returned a
@@ -127,18 +139,20 @@ object Router{
       * Invoking the [[EntryPoint]] was not successful
       */
     sealed trait Error extends Result[Nothing]
-    object Error{
+    object Error {
 
       /**
         * Invoking the [[EntryPoint]] failed with an exception while executing
         * code within it.
         */
       case class Exception(t: Throwable) extends Error
+
       /**
         * Invoking the [[EntryPoint]] failed as there were too many positional
         * arguments passed in, more than what is expected by the [[EntryPoint]]
         */
       case class TooManyArguments(values: Seq[String]) extends Error
+
       /**
         * Invoking the [[EntryPoint]] failed as the same argument was passed
         * in more than once; possibly as a keyword-argument that was repeated,
@@ -160,15 +174,19 @@ object Router{
       */
     sealed trait ParamError
     object ParamError {
+
       /**
         * Some parameter was missing from the input.
         */
       case class Missing(arg: ArgSig) extends ParamError
+
       /**
         * Something went wrong trying to de-serialize the input parameter;
         * the thrown exception is stored in [[ex]]
         */
-      case class Invalid(arg: ArgSig, value: String, ex: Throwable) extends ParamError
+      case class Invalid(arg: ArgSig, value: String, ex: Throwable)
+          extends ParamError
+
       /**
         * Something went wrong trying to evaluate the default value
         * for this input parameter
@@ -177,17 +195,16 @@ object Router{
     }
   }
 
-
   type FailMaybe = Either[Seq[Result.ParamError], Any]
   type FailAll = Either[Seq[Result.ParamError], Seq[Any]]
 
   def validate(args: Seq[FailMaybe]): Result[Seq[Any]] = {
-    val lefts = args.collect{case Left(x) => x}.flatten
+    val lefts = args.collect { case Left(x) => x }.flatten
     if (lefts.nonEmpty) Result.Error.InvalidArguments(lefts)
-    else Result.Success(args.collect{case Right(x) => x})
+    else Result.Success(args.collect { case Right(x) => x })
   }
 }
-class Router [C <: Context](val c: C) {
+class Router[C <: Context](val c: C) {
   import c.universe._
   def getValsOrMeths(curCls: Type): Iterable[MethodSymbol] = {
     def isAMemberOfAnyRef(member: Symbol) =
@@ -201,9 +218,10 @@ class Router [C <: Context](val c: C) {
       memTerm = member.asTerm
       if memTerm.isMethod
     } yield memTerm.asMethod
-    extractableMembers flatMap { case memTerm =>
-      if (memTerm.isSetter || memTerm.isConstructor || memTerm.isGetter) Nil
-      else Seq(memTerm)
+    extractableMembers flatMap {
+      case memTerm =>
+        if (memTerm.isSetter || memTerm.isConstructor || memTerm.isGetter) Nil
+        else Seq(memTerm)
 
     }
   }
@@ -222,7 +240,8 @@ class Router [C <: Context](val c: C) {
     }
     val argListSymbol = q"${c.fresh[TermName]("argsList")}"
     val defaults = for ((arg, i) <- flattenedArgLists.zipWithIndex) yield {
-      hasDefault(i).map(defaultName => q"() => $target.${newTermName(defaultName)}")
+      hasDefault(i).map(defaultName =>
+        q"() => $target.${newTermName(defaultName)}")
     }
 
     def unwrapVarargType(arg: Symbol) = {
@@ -233,27 +252,28 @@ class Router [C <: Context](val c: C) {
 
       (vararg, unwrappedType)
     }
-    val readArgSigs = for(
-      ((arg, defaultOpt), i) <- flattenedArgLists.zip(defaults).zipWithIndex
-    ) yield {
+    val readArgSigs = for (((arg, defaultOpt), i) <- flattenedArgLists
+                             .zip(defaults)
+                             .zipWithIndex) yield {
 
       val (vararg, unwrappedType) = unwrapVarargType(arg)
 
       val default =
         if (vararg) q"scala.Some(scala.Nil)"
-        else defaultOpt match {
-          case Some(defaultExpr) => q"scala.Some($defaultExpr())"
-          case None => q"scala.None"
-        }
+        else
+          defaultOpt match {
+            case Some(defaultExpr) => q"scala.Some($defaultExpr())"
+            case None => q"scala.None"
+          }
 
-      val docs = for{
+      val docs = for {
         doc <- arg.annotations.find(_.tpe =:= typeOf[Router.doc])
         if doc.scalaArgs.head.isInstanceOf[Literal]
-        l =  doc.scalaArgs.head.asInstanceOf[Literal]
+        l = doc.scalaArgs.head.asInstanceOf[Literal]
         if l.value.value.isInstanceOf[String]
       } yield l.value.value.asInstanceOf[String]
 
-      val docTree = docs match{
+      val docTree = docs match {
         case None => q"scala.None"
         case Some(s) => q"scala.Some($s)"
       }
@@ -266,7 +286,7 @@ class Router [C <: Context](val c: C) {
         )
       """
 
-      val extraArg = if(vararg) q"scala.Some(extras)" else q"None"
+      val extraArg = if (vararg) q"scala.Some(extras)" else q"None"
       val reader = q"""
       ammonite.main.Router.read[$unwrappedType](
         $argListSymbol,
@@ -286,8 +306,7 @@ class Router [C <: Context](val c: C) {
         pq"${arg.name.toTermName}",
         if (!vararg) q"${arg.name.toTermName}.asInstanceOf[$unwrappedType]"
         else q"${arg.name.toTermName}.asInstanceOf[Seq[$unwrappedType]]: _*"
-
-        )
+      )
     }.unzip
 
     q"""
@@ -305,9 +324,10 @@ class Router [C <: Context](val c: C) {
     """
   }
 
-  def getAllRoutesForClass(curCls: Type, target: c.Tree): Iterable[c.universe.Tree] = for{
-    t <- getValsOrMeths(curCls)
-    if t.annotations.exists(_.tpe =:= typeOf[Router.main])
-  } yield extractMethod(t, curCls, target)
+  def getAllRoutesForClass(curCls: Type,
+                           target: c.Tree): Iterable[c.universe.Tree] =
+    for {
+      t <- getValsOrMeths(curCls)
+      if t.annotations.exists(_.tpe =:= typeOf[Router.main])
+    } yield extractMethod(t, curCls, target)
 }
-

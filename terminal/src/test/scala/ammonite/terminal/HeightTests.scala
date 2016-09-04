@@ -4,8 +4,8 @@ import utest._
 
 import scala.collection.{immutable => imm}
 
-object HeightTests extends TestSuite{
-  val tests = TestSuite{
+object HeightTests extends TestSuite {
+  val tests = TestSuite {
 
     'a - {
       val height = Terminal.calculateHeight0(
@@ -72,8 +72,6 @@ object HeightTests extends TestSuite{
       //cd
       //_
     }
-   
-
 
   }
 }

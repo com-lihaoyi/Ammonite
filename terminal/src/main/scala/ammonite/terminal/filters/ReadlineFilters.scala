@@ -1,14 +1,14 @@
 package ammonite.terminal.filters
 
-
 import ammonite.terminal.Filter._
 import ammonite.terminal.SpecialKeys._
 import ammonite.terminal.{DelegateFilter, Filter, Terminal}
 import acyclic.file
+
 /**
- * Filters for injection of readline-specific hotkeys, the sort that
- * are available in bash, python and most other interactive command-lines
- */
+  * Filters for injection of readline-specific hotkeys, the sort that
+  * are available in bash, python and most other interactive command-lines
+  */
 object ReadlineFilters {
   // www.bigsmoke.us/readline/shortcuts
   // Ctrl-b     <- one char
@@ -38,9 +38,9 @@ object ReadlineFilters {
   // this is not strictly readline, it's relatively common as described in
   // https://github.com/lihaoyi/Ammonite/issues/291
   /**
-   * Basic readline-style navigation, using all the obscure alphabet 
-   * hotkeys rather than using arrows
-   */
+    * Basic readline-style navigation, using all the obscure alphabet
+    * hotkeys rather than using arrows
+    */
   lazy val navFilter = Filter.merge(
     simple(Ctrl('p'))((b, c, m) => BasicFilters.moveUp(b, c, m.width)),
     simple(Ctrl('n'))((b, c, m) => BasicFilters.moveDown(b, c, m.width)),
@@ -67,7 +67,7 @@ object ReadlineFilters {
     // If there's no letter before the cursor to transpose, don't do anything
     if (c == 0) (b, c)
     else if (c == b.length) (b.dropRight(2) ++ b.takeRight(2).reverse, c)
-    else (b.patch(c-1, b.slice(c-1, c+1).reverse, 2), c + 1)
+    else (b.patch(c - 1, b.slice(c - 1, c + 1).reverse, 2), c + 1)
   }
 
   def transposeWord(b: Vector[Char], c: Int) = {
@@ -82,11 +82,11 @@ object ReadlineFilters {
       val (leftStart, leftEnd) =
         // If there is no word to the *right* to transpose,
         // transpose the two words to the left instead
-        if (leftEnd0 == b.length && rightEnd == b.length){
+        if (leftEnd0 == b.length && rightEnd == b.length) {
           val leftStart = GUILikeFilters.consumeWord(b, leftStart0 - 1, -1, 1)
           val leftEnd = GUILikeFilters.consumeWord(b, leftStart, 1, 0)
           (leftStart, leftEnd)
-        }else (leftStart0, leftEnd0)
+        } else (leftStart0, leftEnd0)
 
       val newB =
         b.slice(0, leftStart) ++
@@ -99,10 +99,10 @@ object ReadlineFilters {
   }
 
   /**
-   * All the cut-pasting logic, though for many people they simply
-   * use these shortcuts for deleting and don't use paste much at all.
-   */
-  case class CutPasteFilter() extends DelegateFilter{
+    * All the cut-pasting logic, though for many people they simply
+    * use these shortcuts for deleting and don't use paste much at all.
+    */
+  case class CutPasteFilter() extends DelegateFilter {
     var accumulating = false
     var currentCut = Vector.empty[Char]
     def prepend(b: Vector[Char]) = {
@@ -117,7 +117,7 @@ object ReadlineFilters {
     }
     def cutCharLeft(b: Vector[Char], c: Int) = {
       /* Do not edit current cut. Zsh(zle) & Bash(readline) do not edit the yank ring for Ctrl-h */
-      (b patch(from = c - 1, patch = Nil, replaced = 1), c - 1)
+      (b patch (from = c - 1, patch = Nil, replaced = 1), c - 1)
     }
 
     def cutAllLeft(b: Vector[Char], c: Int) = {
@@ -158,7 +158,9 @@ object ReadlineFilters {
 
       // If some command goes through that's not appending/prepending to the
       // kill ring, stop appending and allow the next kill to override it
-      Filter.wrap{_ => accumulating = false; None},
+      Filter.wrap { _ =>
+        accumulating = false; None
+      },
       simple(Ctrl('h'))((b, c, m) => cutCharLeft(b, c)),
       simple(Ctrl('y'))((b, c, m) => paste(b, c))
     )

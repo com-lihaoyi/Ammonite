@@ -11,7 +11,7 @@ import scala.io.Codec
   * Enforces a standard interface for constructing [[BasePath]]-like things
   * from java types of various sorts
   */
-sealed trait PathFactory[PathType <: BasePath] extends (String => PathType){
+sealed trait PathFactory[PathType <: BasePath] extends (String => PathType) {
   def apply(f: java.io.File): PathType = apply(f.getPath)
   def apply(s: String): PathType = apply(java.nio.file.Paths.get(s))
   def apply(f: java.nio.file.Path): PathType
@@ -24,8 +24,9 @@ sealed trait PathFactory[PathType <: BasePath] extends (String => PathType){
   * Most of the filesystem-independent path-manipulation logic that lets you
   * splice paths together or navigate in and out of paths lives in this interface
   */
-sealed trait BasePath{
+sealed trait BasePath {
   type ThisType <: BasePath
+
   /**
     * The individual path segments of this path.
     */
@@ -76,17 +77,19 @@ object BasePath {
     def considerStr =
       "use the Path(...) or RelPath(...) constructor calls to convert them. "
 
-    s.find(BasePath.invalidChars) match{
-      case Some(c) => fail(
-        s"[$c] is not a valid character to appear in a path segment. " +
-          "If you want to parse an absolute or relative path that may have " +
-          "multiple segments, e.g. path-strings coming from external sources" +
-          considerStr
-      )
+    s.find(BasePath.invalidChars) match {
+      case Some(c) =>
+        fail(
+          s"[$c] is not a valid character to appear in a path segment. " +
+            "If you want to parse an absolute or relative path that may have " +
+            "multiple segments, e.g. path-strings coming from external sources" +
+            considerStr
+        )
       case None =>
     }
-    def externalStr = "If you are dealing with path-strings coming from external sources, "
-    s match{
+    def externalStr =
+      "If you are dealing with path-strings coming from external sources, "
+    s match {
       case "" =>
         fail(
           "Ammonite-Ops does not allow empty path segments " +
@@ -115,20 +118,19 @@ object BasePath {
   }
 }
 
-
 /**
   * Represents a value that is either an absolute [[Path]] or a
   * relative [[ResourcePath]], and can be constructed from
   */
 sealed trait FilePath extends BasePath
-object FilePath extends PathFactory[FilePath]{
+object FilePath extends PathFactory[FilePath] {
   def apply(f: java.nio.file.Path) = {
     if (f.isAbsolute) Path(f)
     else RelPath(f)
   }
 }
 
-trait BasePathImpl extends BasePath{
+trait BasePathImpl extends BasePath {
   def segments: Seq[String]
 
   protected[this] def make(p: Seq[String], ups: Int): ThisType
@@ -147,16 +149,18 @@ trait BasePathImpl extends BasePath{
 }
 
 /**
- * An absolute path on the filesystem. Note that the path is
- * normalized and cannot contain any empty or ".". Parent ".."
- * segments can only occur at the left-end of the path, and
- * are collapsed into a single number [[ups]].
- */
+  * An absolute path on the filesystem. Note that the path is
+  * normalized and cannot contain any empty or ".". Parent ".."
+  * segments can only occur at the left-end of the path, and
+  * are collapsed into a single number [[ups]].
+  */
 case class RelPath private[ops] (segments: Vector[String], ups: Int)
-extends FilePath with BasePathImpl{
+    extends FilePath
+    with BasePathImpl {
   type ThisType = RelPath
   require(ups >= 0)
-  protected[this] def make(p: Seq[String], ups: Int) = new RelPath(p.toVector, ups + this.ups)
+  protected[this] def make(p: Seq[String], ups: Int) =
+    new RelPath(p.toVector, ups + this.ups)
   def relativeTo(base: RelPath): RelPath = {
     if (base.ups < ups) {
       new RelPath(segments, ups + base.segments.length)
@@ -164,7 +168,7 @@ extends FilePath with BasePathImpl{
       val commonPrefix = {
         val maxSize = scala.math.min(segments.length, base.segments.length)
         var i = 0
-        while ( i < maxSize && segments(i) == base.segments(i)) i += 1
+        while (i < maxSize && segments(i) == base.segments(i)) i += 1
         i
       }
       val newUps = base.segments.length - commonPrefix
@@ -185,7 +189,7 @@ extends FilePath with BasePathImpl{
   }
 }
 
-object RelPath extends RelPathStuff with PathFactory[RelPath]{
+object RelPath extends RelPathStuff with PathFactory[RelPath] {
   def apply(f: java.nio.file.Path): RelPath = {
 
     import collection.JavaConversions._
@@ -204,30 +208,30 @@ object RelPath extends RelPathStuff with PathFactory[RelPath]{
   }
 
   implicit def SeqPath[T](s: Seq[T])(implicit conv: T => RelPath): RelPath = {
-    s.foldLeft(empty){_ / _}
+    s.foldLeft(empty) { _ / _ }
   }
 
-  implicit def ArrayPath[T](s: Array[T])(implicit conv: T => RelPath): RelPath = SeqPath(s)
-
+  implicit def ArrayPath[T](s: Array[T])(
+      implicit conv: T => RelPath): RelPath = SeqPath(s)
 
   implicit val relPathOrdering: Ordering[RelPath] =
-    Ordering.by((rp: RelPath) => (rp.ups, rp.segments.length, rp.segments.toIterable))
+    Ordering.by((rp: RelPath) =>
+      (rp.ups, rp.segments.length, rp.segments.toIterable))
 }
-trait RelPathStuff{
+trait RelPathStuff {
   val up: RelPath = new RelPath(Vector.empty, 1)
   val empty: RelPath = new RelPath(Vector.empty, 0)
-  implicit class RelPathStart(p1: String){
-    def /(subpath: RelPath) = empty/p1/subpath
+  implicit class RelPathStart(p1: String) {
+    def /(subpath: RelPath) = empty / p1 / subpath
   }
-  implicit class RelPathStart2(p1: Symbol){
-    def /(subpath: RelPath) = empty/p1/subpath
+  implicit class RelPathStart2(p1: Symbol) {
+    def /(subpath: RelPath) = empty / p1 / subpath
   }
 }
 
-
-object Path extends PathFactory[Path]{
-  def apply(p: FilePath, base: Path) = p match{
-    case p: RelPath => base/p
+object Path extends PathFactory[Path] {
+  def apply(p: FilePath, base: Path) = p match {
+    case p: RelPath => base / p
     case p: Path => p
   }
   def apply(f: java.io.File, base: Path): Path = apply(FilePath(f), base)
@@ -236,7 +240,8 @@ object Path extends PathFactory[Path]{
   def apply(f: java.nio.file.Path): Path = {
     import collection.JavaConversions._
     val chunks = BasePath.chunkify(f)
-    if (chunks.count(_ == "..") > chunks.size / 2) throw PathError.AbsolutePathOutsideRoot
+    if (chunks.count(_ == "..") > chunks.size / 2)
+      throw PathError.AbsolutePathOutsideRoot
 
     require(f.isAbsolute, f + " is not an absolute path")
     Path(f.getRoot, BasePath.chunkify(f.normalize()))
@@ -250,18 +255,21 @@ object Path extends PathFactory[Path]{
 }
 
 /**
- * An absolute path on the filesystem. Note that the path is
- * normalized and cannot contain any empty `""`, `"."` or `".."` segments
- */
-case class Path private[ops] (root: java.nio.file.Path, segments: Vector[String])
-extends FilePath with BasePathImpl with Readable{
+  * An absolute path on the filesystem. Note that the path is
+  * normalized and cannot contain any empty `""`, `"."` or `".."` segments
+  */
+case class Path private[ops] (root: java.nio.file.Path,
+                              segments: Vector[String])
+    extends FilePath
+    with BasePathImpl
+    with Readable {
   protected[ops] def getInputStream = java.nio.file.Files.newInputStream(toNIO)
   type ThisType = Path
 
   def toNIO = root.resolve(segments.mkString(root.getFileSystem.getSeparator))
 
   protected[this] def make(p: Seq[String], ups: Int) = {
-    if (ups > 0){
+    if (ups > 0) {
       throw PathError.AbsolutePathOutsideRoot
     }
     new Path(root, p.toVector)
@@ -280,7 +288,7 @@ extends FilePath with BasePathImpl with Readable{
     var newUps = 0
     var s2 = base.segments
 
-    while(!segments.startsWith(s2)){
+    while (!segments.startsWith(s2)) {
       s2 = s2.dropRight(1)
       newUps += 1
     }
@@ -297,8 +305,7 @@ extends FilePath with BasePathImpl with Readable{
   }
 }
 
-
-object ResourcePath{
+object ResourcePath {
   def resource(resRoot: ResourceRoot) = {
     ResourcePath(resRoot, Vector.empty)
   }
@@ -310,19 +317,21 @@ object ResourcePath{
   * @param resRoot
   * @param segments
   */
-case class ResourcePath private[ops](resRoot: ResourceRoot, segments: Vector[String])
-  extends BasePathImpl with Readable{
+case class ResourcePath private[ops] (resRoot: ResourceRoot,
+                                      segments: Vector[String])
+    extends BasePathImpl
+    with Readable {
   type ThisType = ResourcePath
   override def toString = resRoot.errorName + "/" + segments.mkString("/")
 
   protected[ops] def getInputStream = {
-    resRoot.getResourceAsStream(segments.mkString("/")) match{
+    resRoot.getResourceAsStream(segments.mkString("/")) match {
       case null => throw new ResourceNotFoundException(this)
       case stream => stream
     }
   }
   protected[this] def make(p: Seq[String], ups: Int) = {
-    if (ups > 0){
+    if (ups > 0) {
       throw PathError.AbsolutePathOutsideRoot
     }
     new ResourcePath(resRoot, p.toVector)
@@ -332,13 +341,12 @@ case class ResourcePath private[ops](resRoot: ResourceRoot, segments: Vector[Str
     var newUps = 0
     var s2 = base.segments
 
-    while(!segments.startsWith(s2)){
+    while (!segments.startsWith(s2)) {
       s2 = s2.dropRight(1)
       newUps += 1
     }
     RelPath(segments.drop(s2.length), newUps)
   }
-
 
   def startsWith(target: ResourcePath) = {
     segments.startsWith(target.segments)
@@ -346,25 +354,25 @@ case class ResourcePath private[ops](resRoot: ResourceRoot, segments: Vector[Str
 
 }
 
-
 /**
   * Thrown when you try to read from a resource that doesn't exist.
   * @param path
   */
-case class ResourceNotFoundException(path: ResourcePath) extends Exception(path.toString)
+case class ResourceNotFoundException(path: ResourcePath)
+    extends Exception(path.toString)
 
-
-
-object PathError{
+object PathError {
   type IAE = IllegalArgumentException
   private[this] def errorMsg(s: String, msg: String) =
     s"[$s] is not a valid path segment. $msg"
 
-  case class InvalidSegment(segment: String, msg: String) extends IAE(errorMsg(segment, msg))
+  case class InvalidSegment(segment: String, msg: String)
+      extends IAE(errorMsg(segment, msg))
 
   case object AbsolutePathOutsideRoot
-    extends IAE("The path created has enough ..s that it would start outside the root directory")
+      extends IAE(
+        "The path created has enough ..s that it would start outside the root directory")
 
   case class NoRelativePath(src: RelPath, base: RelPath)
-    extends IAE(s"Can't relativize relative paths $src from $base")
+      extends IAE(s"Can't relativize relative paths $src from $base")
 }

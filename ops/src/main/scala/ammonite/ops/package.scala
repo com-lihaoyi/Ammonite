@@ -1,21 +1,22 @@
 package ammonite
 
-
-package object ops extends Extensions with RelPathStuff{
+package object ops extends Extensions with RelPathStuff {
   implicit val postfixOps = scala.language.postfixOps
 
   /**
-   * The root of the filesystem
-   */
+    * The root of the filesystem
+    */
   val root = ops.Path.root
 
-  def resource(implicit resRoot: ResourceRoot = Thread.currentThread().getContextClassLoader) ={
+  def resource(
+      implicit resRoot: ResourceRoot =
+        Thread.currentThread().getContextClassLoader) = {
     ops.ResourcePath.resource(resRoot)
   }
 
   /**
-   * The user's home directory
-   */
+    * The user's home directory
+    */
   val home = Path(System.getProperty("user.home"))
 
   /**
@@ -23,14 +24,15 @@ package object ops extends Extensions with RelPathStuff{
     * `java.io.File.deleteOnExit`. Pass in `deleteOnExit = false` if you want
     * the temp file to stick around.
     */
-  object tmp{
+  object tmp {
+
     /**
       * Creates a temporary directory
       */
     def dir(dir: Path = null,
             prefix: String = null,
             deleteOnExit: Boolean = true): Path = {
-      val nioPath = dir match{
+      val nioPath = dir match {
         case null => java.nio.file.Files.createTempDirectory(prefix)
         case _ => java.nio.file.Files.createTempDirectory(dir.toNIO, prefix)
       }
@@ -47,7 +49,7 @@ package object ops extends Extensions with RelPathStuff{
               suffix: String = null,
               deleteOnExit: Boolean = true): Path = {
 
-      val nioPath = dir match{
+      val nioPath = dir match {
         case null => java.nio.file.Files.createTempFile(prefix, suffix)
         case _ => java.nio.file.Files.createTempFile(dir.toNIO, prefix, suffix)
       }
@@ -59,10 +61,10 @@ package object ops extends Extensions with RelPathStuff{
   }
 
   /**
-   * The current working directory for this process.
-   */
+    * The current working directory for this process.
+    */
   lazy val pwd = ops.Path(new java.io.File("").getCanonicalPath)
-  @deprecated("replaced by pwd","0.7.5")
+  @deprecated("replaced by pwd", "0.7.5")
   lazy val cwd = pwd
 
   /**
@@ -73,7 +75,7 @@ package object ops extends Extensions with RelPathStuff{
     *
     * To make them use the process's working directory for each subprocess
     */
-  object ImplicitWd{
+  object ImplicitWd {
     implicit lazy val implicitCwd = ops.pwd
   }
 
@@ -89,7 +91,7 @@ package object ops extends Extensions with RelPathStuff{
     *
     * To break apart a path and extract various pieces of it.
     */
-  object /{
+  object / {
     def unapply[T <: BasePath](p: T): Option[(p.ThisType, String)] = {
       if (p.segments.length > 0)
         Some((p / up, p.last))
@@ -111,6 +113,7 @@ package object ops extends Extensions with RelPathStuff{
     * `%ssh "www.google.com"` or `%sbt`.
     */
   val % = Shellout.%
+
   /**
     * Spawns a subprocess non-interactively, waiting for it to complete and
     * collecting all output into a [[CommandResult]] which exposes it in a

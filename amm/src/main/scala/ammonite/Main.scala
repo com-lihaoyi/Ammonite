@@ -9,8 +9,6 @@ import ammonite.repl.{Repl, ReplApiImpl, SessionApiImpl}
 import ammonite.util._
 import ammonite.util.Util.newLine
 
-
-
 /**
   * Contains the various entry points to the Ammonite REPL.
   *
@@ -44,22 +42,26 @@ import ammonite.util.Util.newLine
   */
 case class Main(predef: String = "",
                 defaultPredef: Boolean = true,
-                storageBackend: Storage = new Storage.Folder(Defaults.ammoniteHome),
+                storageBackend: Storage =
+                  new Storage.Folder(Defaults.ammoniteHome),
                 wd: Path = ammonite.ops.pwd,
                 welcomeBanner: Option[String] = Some(Defaults.welcomeBanner),
                 inputStream: InputStream = System.in,
                 outputStream: OutputStream = System.out,
                 errorStream: OutputStream = System.err,
-                verboseOutput: Boolean = true
-               ){
+                verboseOutput: Boolean = true) {
+
   /**
     * Instantiates an ammonite.Repl using the configuration
     */
   def instantiateRepl(replArgs: Seq[Bind[_]] = Nil) = {
-    val augmentedPredef = Main.maybeDefaultPredef(defaultPredef, Defaults.predefString)
+    val augmentedPredef =
+      Main.maybeDefaultPredef(defaultPredef, Defaults.predefString)
 
     new Repl(
-      inputStream, outputStream, errorStream,
+      inputStream,
+      outputStream,
+      errorStream,
       storage = storageBackend,
       predef = augmentedPredef + newLine + predef,
       wd = wd,
@@ -69,11 +71,11 @@ case class Main(predef: String = "",
   }
 
   def instantiateInterpreter(replApi: Boolean) = {
-    val augmentedPredef = Main.maybeDefaultPredef(defaultPredef, Defaults.predefString)
+    val augmentedPredef =
+      Main.maybeDefaultPredef(defaultPredef, Defaults.predefString)
 
     val (colors, printStream, errorPrintStream, printer) =
       Interpreter.initPrinters(outputStream, errorStream, verboseOutput)
-
 
     val interp: Interpreter = new Interpreter(
       printer,
@@ -97,7 +99,7 @@ case class Main(predef: String = "",
             Vector()
           )
           Seq(("ammonite.repl.ReplBridge", "repl", replApi))
-        },
+      },
       wd,
       verboseOutput
     )
@@ -130,7 +132,7 @@ case class Main(predef: String = "",
   }
 }
 
-object Main{
+object Main {
 
   /**
     * The command-line entry point, which does all the argument parsing before
@@ -151,42 +153,48 @@ object Main{
       head("ammonite", ammonite.Constants.version)
       opt[String]('p', "predef")
         .action((x, c) => c.copy(predef = x))
-        .text("Any commands you want to execute at the start of the REPL session")
+        .text(
+          "Any commands you want to execute at the start of the REPL session")
       opt[Unit]("no-default-predef")
         .action((x, c) => c.copy(defaultPredef = false))
-        .text("Disable the default predef and run Ammonite with the minimal predef possible")
+        .text(
+          "Disable the default predef and run Ammonite with the minimal predef possible")
 
       // Secondary arguments that correspond to different methods of
       // the `Main` configuration arguments
       arg[String]("<file-args>...")
         .optional()
-        .foreach{ x => fileToExecute = Some(Path(x, pwd)) }
+        .foreach { x =>
+          fileToExecute = Some(Path(x, pwd))
+        }
         .text("The Ammonite script file you want to execute")
       opt[String]('c', "code")
         .foreach(x => codeToExecute = Some(x))
         .text("Pass in code to be run immediately in the REPL")
 
-      opt[Unit]('x', "execute")
-        .text(
-          "Shim for backwards compatibility - will be removed"
-        )
+      opt[Unit]('x', "execute").text(
+        "Shim for backwards compatibility - will be removed"
+      )
       arg[String]("<args>...")
         .optional()
         .unbounded()
-        .foreach{ x => passThroughArgs = passThroughArgs :+ x }
+        .foreach { x =>
+          passThroughArgs = passThroughArgs :+ x
+        }
         .text("Any arguments you want to pass to the Ammonite script file")
       opt[File]('h', "home")
         .valueName("<file>")
-        .foreach( x => ammoniteHome = Some(Path(x, pwd)))
+        .foreach(x => ammoniteHome = Some(Path(x, pwd)))
         .text("The home directory of the REPL; where it looks for config and caches")
       opt[String]('f', "predef-file")
         .unbounded()
-        .foreach{ x => predefFiles = predefFiles :+ Path(x, pwd) }
+        .foreach { x =>
+          predefFiles = predefFiles :+ Path(x, pwd)
+        }
         .text("Lets you load your predef from a custom location")
       opt[Unit]('y', "continually")
         .foreach(x => continually = true)
-        .text(
-          """Lets you run a file over and over, useful for benchmarking purposes
+        .text("""Lets you run a file over and over, useful for benchmarking purposes
             |since it lets you hook up a profiler to the long-lived process and
             |see where all the time is being spent.
           """.stripMargin)
@@ -196,9 +204,8 @@ object Main{
           "Make ivy logs go silent instead of printing though failures will still throw exception"
         )
       opt[Unit]("repl-api")
-        .foreach(x => replApi= true)
-        .text(
-          """Lets you run a script with the `repl` object present; this is
+        .foreach(x => replApi = true)
+        .text("""Lets you run a script with the `repl` object present; this is
             |normally not available in scripts and only provided in the
             |interactive REpl
           """.stripMargin)
@@ -207,31 +214,32 @@ object Main{
 
     val (take, drop) = args0.indexOf("--") match {
       case -1 => (Int.MaxValue, Int.MaxValue)
-      case n => (n, n+1)
+      case n => (n, n + 1)
     }
 
     val before = args0.take(take)
     var keywordTokens = args0.drop(drop).toList
     var kwargs = Vector.empty[(String, String)]
 
-    while(keywordTokens.nonEmpty){
-      if (keywordTokens(0).startsWith("--")){
+    while (keywordTokens.nonEmpty) {
+      if (keywordTokens(0).startsWith("--")) {
         kwargs = kwargs :+ (keywordTokens(0).drop(2), keywordTokens(1))
         keywordTokens = keywordTokens.drop(2)
-      }else{
+      } else {
         passThroughArgs = passThroughArgs :+ keywordTokens(0)
         keywordTokens = keywordTokens.drop(1)
       }
     }
     def ifContinually[T](b: Boolean)(f: => T) = {
-      if (b) while(true) f
+      if (b) while (true) f
       else f
     }
-    for(c <- replParser.parse(before, Main())) ifContinually(continually){
+    for (c <- replParser.parse(before, Main())) ifContinually(continually) {
       def main(isRepl: Boolean) = Main(
         c.predef,
         c.defaultPredef,
-        new Storage.Folder(ammoniteHome.getOrElse(Defaults.ammoniteHome), isRepl) {
+        new Storage.Folder(ammoniteHome.getOrElse(Defaults.ammoniteHome),
+                           isRepl) {
           override def loadPredef: String = {
             if (predefFiles.isEmpty)
               super.loadPredef
@@ -270,6 +278,5 @@ object Main{
 
   def maybeDefaultPredef(enabled: Boolean, predef: String) =
     if (enabled) predef else ""
-
 
 }

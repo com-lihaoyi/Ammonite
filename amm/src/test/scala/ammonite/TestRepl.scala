@@ -9,9 +9,9 @@ import utest.asserts._
 import scala.collection.mutable
 
 /**
- * A test REPL which does not read from stdin or stdout files, but instead lets
- * you feed in lines or sessions programmatically and have it execute them.
- */
+  * A test REPL which does not read from stdin or stdout files, but instead lets
+  * you feed in lines or sessions programmatically and have it execute them.
+  */
 class TestRepl {
   var allOutput = ""
   def predef = ""
@@ -59,66 +59,75 @@ class TestRepl {
     )
     i.init()
     i
-  }catch{ case e =>
-    println(infoBuffer.mkString)
-    println(outBuffer.mkString)
-    println(warningBuffer.mkString)
-    println(errorBuffer.mkString)
-    throw e
+  } catch {
+    case e =>
+      println(infoBuffer.mkString)
+      println(outBuffer.mkString)
+      println(warningBuffer.mkString)
+      println(errorBuffer.mkString)
+      throw e
   }
 
   def session(sess: String): Unit = {
     // Remove the margin from the block and break
     // it into blank-line-delimited steps
-    val margin = sess.lines.filter(_.trim != "").map(_.takeWhile(_ == ' ').length).min
+    val margin =
+      sess.lines.filter(_.trim != "").map(_.takeWhile(_ == ' ').length).min
     // Strip margin & whitespace
 
-    val steps = sess.replace(
-      Util.newLine + margin, Util.newLine
-    ).replaceAll(" *\n", "\n").split("\n\n")
+    val steps = sess
+      .replace(
+        Util.newLine + margin,
+        Util.newLine
+      )
+      .replaceAll(" *\n", "\n")
+      .split("\n\n")
 
-    for((step, index) <- steps.zipWithIndex){
+    for ((step, index) <- steps.zipWithIndex) {
       // Break the step into the command lines, starting with @,
       // and the result lines
       val (cmdLines, resultLines) =
-        step.lines
-            .map(_.drop(margin))
-            .partition(_.startsWith("@"))
+        step.lines.map(_.drop(margin)).partition(_.startsWith("@"))
 
       val commandText = cmdLines.map(_.stripPrefix("@ ")).toVector
 
       // Make sure all non-empty, non-complete command-line-fragments
       // are considered incomplete during the parse
-      for (incomplete <- commandText.inits.toSeq.drop(1).dropRight(1)){
-        assert(ammonite.runtime.Parsers.split(incomplete.mkString(Util.newLine)) == None)
+      for (incomplete <- commandText.inits.toSeq.drop(1).dropRight(1)) {
+        assert(
+          ammonite.runtime.Parsers
+            .split(incomplete.mkString(Util.newLine)) == None)
       }
 
       // Finally, actually run the complete command text through the
       // interpreter and make sure the output is what we expect
       val expected = resultLines.mkString(Util.newLine).trim
-      allOutput += commandText.map(Util.newLine + "@ " + _).mkString(Util.newLine)
+      allOutput += commandText
+        .map(Util.newLine + "@ " + _)
+        .mkString(Util.newLine)
 
-      val (processed, out, warning, error, info) = run(commandText.mkString(Util.newLine), index)
+      val (processed, out, warning, error, info) =
+        run(commandText.mkString(Util.newLine), index)
       interp.handleOutput(processed)
 
       if (expected.startsWith("error: ")) {
         val strippedExpected = expected.stripPrefix("error: ")
         assert(error.contains(strippedExpected))
 
-      }else if (expected.startsWith("warning: ")){
+      } else if (expected.startsWith("warning: ")) {
         val strippedExpected = expected.stripPrefix("warning: ")
         assert(warning.contains(strippedExpected))
 
-      }else if (expected.startsWith("info: ")){
+      } else if (expected.startsWith("info: ")) {
         val strippedExpected = expected.stripPrefix("info: ")
         assert(info.contains(strippedExpected))
 
-      }else if (expected == "") {
-        processed match{
+      } else if (expected == "") {
+        processed match {
           case Res.Success(_) => // do nothing
           case Res.Skip => // do nothing
           case _: Res.Failing =>
-            assert{
+            assert {
               identity(error)
               identity(warning)
               identity(out)
@@ -127,7 +136,7 @@ class TestRepl {
             }
         }
 
-      }else {
+      } else {
         processed match {
           case Res.Success(str) =>
             // Strip trailing whitespace
@@ -137,7 +146,7 @@ class TestRepl {
                 .mkString(Util.newLine)
                 .trim()
             failLoudly(
-              assert{
+              assert {
                 identity(error)
                 identity(warning)
                 identity(info)
@@ -146,7 +155,7 @@ class TestRepl {
             )
 
           case Res.Failure(ex, failureMsg) =>
-            assert{
+            assert {
               identity(error)
               identity(warning)
               identity(out)
@@ -156,18 +165,20 @@ class TestRepl {
             }
           case Res.Exception(ex, failureMsg) =>
             val trace = Repl.showException(
-              ex, fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty
-            ) + Util.newLine +  failureMsg
-            assert({identity(trace); identity(expected); false})
-          case _ => throw new Exception(
-            s"Printed $out does not match what was expected: $expected"
-          )
+                ex,
+                fansi.Attrs.Empty,
+                fansi.Attrs.Empty,
+                fansi.Attrs.Empty
+              ) + Util.newLine + failureMsg
+            assert({ identity(trace); identity(expected); false })
+          case _ =>
+            throw new Exception(
+              s"Printed $out does not match what was expected: $expected"
+            )
         }
       }
     }
   }
-
-
 
   def run(input: String, index: Int) = {
 
@@ -180,11 +191,14 @@ class TestRepl {
       ammonite.runtime.Parsers.split(input).get.get.value,
       s"Main$index.sc"
     )
-    processed match{
+    processed match {
       case Res.Failure(ex, s) => printer.error(s)
       case Res.Exception(throwable, msg) =>
         printer.error(
-          Repl.showException(throwable, fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty)
+          Repl.showException(throwable,
+                             fansi.Attrs.Empty,
+                             fansi.Attrs.Empty,
+                             fansi.Attrs.Empty)
         )
 
       case _ =>
@@ -199,24 +213,25 @@ class TestRepl {
     )
   }
 
-
-  def fail(input: String,
-           failureCheck: String => Boolean = _ => true) = {
+  def fail(input: String, failureCheck: String => Boolean = _ => true) = {
     val (processed, out, warning, error, info) = run(input, 0)
 
-    processed match{
-      case Res.Success(v) => assert({identity(v); identity(allOutput); false})
+    processed match {
+      case Res.Success(v) =>
+        assert({ identity(v); identity(allOutput); false })
       case Res.Failure(ex, s) =>
         failLoudly(assert(failureCheck(s)))
       case Res.Exception(ex, s) =>
         val msg = Repl.showException(
-          ex, fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty
-        ) + Util.newLine + s
+            ex,
+            fansi.Attrs.Empty,
+            fansi.Attrs.Empty,
+            fansi.Attrs.Empty
+          ) + Util.newLine + s
         failLoudly(assert(failureCheck(msg)))
       case _ => ???
     }
   }
-
 
   def result(input: String, expected: Res[Evaluated]) = {
     val (processed, allOut, warning, error, info) = run(input, 0)
@@ -224,9 +239,10 @@ class TestRepl {
   }
   def failLoudly[T](t: => T) =
     try t
-    catch{ case e: utest.AssertionError =>
-      println("FAILURE TRACE" + Util.newLine + allOutput)
-      throw e
+    catch {
+      case e: utest.AssertionError =>
+        println("FAILURE TRACE" + Util.newLine + allOutput)
+        throw e
     }
 
 }

@@ -18,7 +18,7 @@ object Scripts {
                 args: Seq[String],
                 kwargs: Seq[(String, String)]) = {
     val (pkg, wrapper) = Util.pathToPackageWrapper(path, wd)
-    for{
+    for {
       (imports, wrapperHashes) <- interp.processModule(
         ImportHook.Source.File(path),
         Util.normalizeNewlines(read(path)),
@@ -42,45 +42,41 @@ object Scripts {
 
       routeClsName = wrapperHashes.last._1
 
-      routesCls =
-        interp
-          .eval
-          .frames
-          .head
-          .classloader
-          .loadClass(routeClsName + "$$routes$")
+      routesCls = interp.eval.frames.head.classloader
+        .loadClass(routeClsName + "$$routes$")
 
-      scriptMains =
-        routesCls
-            .getField("MODULE$")
-            .get(null)
-            .asInstanceOf[() => Seq[Router.EntryPoint]]
-            .apply()
+      scriptMains = routesCls
+        .getField("MODULE$")
+        .get(null)
+        .asInstanceOf[() => Seq[Router.EntryPoint]]
+        .apply()
 
       res <- scriptMains match {
         // If there are no @main methods, there's nothing to do
         case Seq() => Res.Success(imports)
         // If there's one @main method, we run it with all args
-        case Seq(main) => runMainMethod(main, args, kwargs).getOrElse(Res.Success(imports))
+        case Seq(main) =>
+          runMainMethod(main, args, kwargs).getOrElse(Res.Success(imports))
         // If there are multiple @main methods, we use the first arg to decide
         // which method to run, and pass the rest to that main method
         case mainMethods =>
           val suffix = formatMainMethods(mainMethods)
-          args match{
+          args match {
             case Seq() =>
               Res.Failure(
                 None,
                 s"Need to specify a main method to call when running " + path.last + suffix
               )
-            case Seq(head, tail @ _*) =>
-              mainMethods.find(_.name == head) match{
+            case Seq(head, tail @ _ *) =>
+              mainMethods.find(_.name == head) match {
                 case None =>
                   Res.Failure(
                     None,
                     s"Unable to find method: " + backtickWrap(head) + suffix
                   )
                 case Some(main) =>
-                  runMainMethod(main, tail, kwargs).getOrElse(Res.Success(imports))
+                  runMainMethod(main, tail, kwargs).getOrElse(
+                    Res.Success(imports))
               }
           }
       }
@@ -88,8 +84,8 @@ object Scripts {
   }
   def formatMainMethods(mainMethods: Seq[Router.EntryPoint]) = {
     if (mainMethods.isEmpty) ""
-    else{
-      val methods = for(main <- mainMethods) yield{
+    else {
+      val methods = for (main <- mainMethods) yield {
         val args = main.argSignatures.map(renderArg).mkString(", ")
         val details = mainMethodDetails(main)
         s"def ${main.name}($args)$details"
@@ -109,38 +105,41 @@ object Scripts {
 
     def expectedMsg = {
       val commaSeparated =
-        mainMethod.argSignatures
-          .map(renderArg)
-          .mkString(", ")
+        mainMethod.argSignatures.map(renderArg).mkString(", ")
       val details = mainMethodDetails(mainMethod)
       "(" + commaSeparated + ")" + details
     }
 
-    mainMethod.invoke(args, kwargs) match{
+    mainMethod.invoke(args, kwargs) match {
       case Router.Result.Success(x) => None
       case Router.Result.Error.Exception(x) => Some(Res.Exception(x, ""))
       case Router.Result.Error.TooManyArguments(x) =>
-        Some(Res.Failure(
-          None,
-          Util.normalizeNewlines(
-            s"""Too many args were passed to this script: ${x.map(literalize(_)).mkString(", ")}
+        Some(
+          Res.Failure(
+            None,
+            Util.normalizeNewlines(
+              s"""Too many args were passed to this script: ${x
+                   .map(literalize(_))
+                   .mkString(", ")}
                 |expected arguments: $expectedMsg""".stripMargin
-          )
-
-        ))
+            )
+          ))
       case Router.Result.Error.RedundantArguments(x) =>
-        Some(Res.Failure(
-          None,
-          Util.normalizeNewlines(
-            s"""Redundant values were passed for arguments: ${x.map(literalize(_)).mkString(", ")}
+        Some(
+          Res.Failure(
+            None,
+            Util.normalizeNewlines(
+              s"""Redundant values were passed for arguments: ${x
+                   .map(literalize(_))
+                   .mkString(", ")}
                 |expected arguments: $expectedMsg""".stripMargin
-          )
-        ))
+            )
+          ))
       case Router.Result.Error.InvalidArguments(x) =>
         Some(Res.Failure(
           None,
           "The following arguments failed to be parsed:" + Util.newLine +
-            x.map{
+            x.map {
               case Router.Result.ParamError.Missing(p) =>
                 s"(${renderArg(p)}) was missing"
               case Router.Result.ParamError.Invalid(p, v, ex) =>
@@ -154,9 +153,8 @@ object Scripts {
 
   def renderArg(arg: ArgSig) = backtickWrap(arg.name) + ": " + arg.typeString
 
-
   def mainMethodDetails(ep: EntryPoint) = {
-    ep.argSignatures.collect{
+    ep.argSignatures.collect {
       case ArgSig(name, tpe, Some(doc), default) =>
         Util.newLine + name + " // " + doc
     }.mkString
@@ -165,6 +163,7 @@ object Scripts {
   /**
     * Additional [[scopt.Read]] instance to teach it how to read Ammonite paths
     */
-  implicit def pathScoptRead: scopt.Read[Path] = scopt.Read.stringRead.map(Path(_, pwd))
+  implicit def pathScoptRead: scopt.Read[Path] =
+    scopt.Read.stringRead.map(Path(_, pwd))
 
 }

@@ -1,40 +1,40 @@
 package ammonite.terminal
 
-
 import acyclic.file
 
 import scala.annotation.tailrec
 import scala.collection.mutable
 
 /**
- * The core logic around a terminal; it defines the base `filters` API
- * through which anything (including basic cursor-navigation and typing)
- * interacts with the terminal.
- *
- * Maintains basic invariants, such as "cursor should always be within
- * the buffer", and "ansi terminal should reflect most up to date TermState"
- */
+  * The core logic around a terminal; it defines the base `filters` API
+  * through which anything (including basic cursor-navigation and typing)
+  * interacts with the terminal.
+  *
+  * Maintains basic invariants, such as "cursor should always be within
+  * the buffer", and "ansi terminal should reflect most up to date TermState"
+  */
 object Terminal {
 
   /**
-   * Computes how tall a line of text is when wrapped at `width`.
-   *
-   * Even 0-character lines still take up one row!
-   *
-   * width = 2
-   * 0 -> 1
-   * 1 -> 1
-   * 2 -> 1
-   * 3 -> 2
-   * 4 -> 2
-   * 5 -> 3
-   */
-  def fragHeight(length: Int, width: Int) = math.max(1, (length - 1) / width + 1)
+    * Computes how tall a line of text is when wrapped at `width`.
+    *
+    * Even 0-character lines still take up one row!
+    *
+    * width = 2
+    * 0 -> 1
+    * 1 -> 1
+    * 2 -> 1
+    * 3 -> 2
+    * 4 -> 2
+    * 5 -> 3
+    */
+  def fragHeight(length: Int, width: Int) =
+    math.max(1, (length - 1) / width + 1)
 
   def splitBuffer(buffer: Vector[Char]) = {
     val frags = mutable.Buffer.empty[Int]
     frags.append(0)
-    for(c <- buffer){
+    for (c <- buffer) {
       if (c == '\n') frags.append(0)
       else frags(frags.length - 1) = frags.last + 1
     }
@@ -49,18 +49,14 @@ object Terminal {
   }
 
   /**
-   * Given a buffer with characters and newlines, calculates how high
-   * the buffer is and where the cursor goes inside of it.
-   */
-  def calculateHeight0(rowLengths: Seq[Int],
-                       width: Int): Seq[Int] = {
+    * Given a buffer with characters and newlines, calculates how high
+    * the buffer is and where the cursor goes inside of it.
+    */
+  def calculateHeight0(rowLengths: Seq[Int], width: Int): Seq[Int] = {
     val fragHeights =
-      rowLengths
-        .inits
-        .toVector
-        .reverse // We want shortest-to-longest, inits gives longest-to-shortest
+      rowLengths.inits.toVector.reverse // We want shortest-to-longest, inits gives longest-to-shortest
         .filter(_.nonEmpty) // Without the first empty prefix
-        .map{ x =>
+        .map { x =>
           fragHeight(
             // If the frag barely fits on one line, give it
             // an extra spot for the cursor on the next line
@@ -82,7 +78,7 @@ object Terminal {
     var done = false
     // Don't check if the cursor exceeds the last chunk, because
     // even if it does there's nowhere else for it to go
-    for(i <- 0 until rowLengths.length -1 if !done) {
+    for (i <- 0 until rowLengths.length - 1 if !done) {
       // length of frag and the '\n' after it
       val delta = rowLengths(i) + 1
       //      Debug("delta " + delta)
@@ -91,7 +87,7 @@ object Terminal {
         //        Debug("nextCursor " + nextCursor)
         leftoverCursor = nextCursor
         totalPreHeight += fragHeights(i)
-      }else done = true
+      } else done = true
     }
 
     val cursorY = totalPreHeight + leftoverCursor / width
@@ -100,30 +96,29 @@ object Terminal {
     (cursorY, cursorX)
   }
 
-
   type Action = (Vector[Char], Int) => (Vector[Char], Int)
   type MsgAction = (Vector[Char], Int) => (Vector[Char], Int, String)
 
-
   def noTransform(x: Vector[Char], i: Int) = (fansi.Str(x), i)
+
   /**
-   * Blockingly reads a line from the given input stream and returns it.
-   *
-   * @param prompt The prompt to display when requesting input
-   * @param reader The input-stream where characters come in, e.g. System.in
-   * @param writer The output-stream where print-outs go, e.g. System.out
-   * @param filters A set of actions that can be taken depending on the input,
-   *                to manipulate the internal state of the terminal.
-   * @param displayTransform code to manipulate the display of the buffer and
-   *                         cursor, without actually changing the logical
-   *                         values inside them.
-   */
+    * Blockingly reads a line from the given input stream and returns it.
+    *
+    * @param prompt The prompt to display when requesting input
+    * @param reader The input-stream where characters come in, e.g. System.in
+    * @param writer The output-stream where print-outs go, e.g. System.out
+    * @param filters A set of actions that can be taken depending on the input,
+    *                to manipulate the internal state of the terminal.
+    * @param displayTransform code to manipulate the display of the buffer and
+    *                         cursor, without actually changing the logical
+    *                         values inside them.
+    */
   def readLine(prompt: Prompt,
                reader: java.io.Reader,
                writer: java.io.Writer,
                filters: Filter,
-               displayTransform: (Vector[Char], Int) => (fansi.Str, Int) = noTransform)
-               : Option[String] = {
+               displayTransform: (Vector[Char], Int) => (fansi.Str, Int) =
+                 noTransform): Option[String] = {
 
     /**
       * Erases the previous line and re-draws it with the new buffer and
@@ -141,21 +136,19 @@ object Terminal {
                    fullPrompt: Boolean = true,
                    newlinePrompt: Boolean = false) = {
 
-
       // Enable this in certain cases (e.g. cursor near the value you are
       // interested into) see what's going on with all the ansi screen-cursor
       // movement
-      def debugDelay() = if (false){
+      def debugDelay() = if (false) {
         Thread.sleep(200)
         writer.flush()
       }
-
 
       val promptLine =
         if (fullPrompt) prompt.full
         else prompt.lastLine
 
-      val promptWidth = if(newlinePrompt) 0 else prompt.lastLine.length
+      val promptWidth = if (newlinePrompt) 0 else prompt.lastLine.length
       val actualWidth = width - promptWidth
 
       ansi.up(ups)
@@ -185,11 +178,11 @@ object Terminal {
           Array(lineStuffer, '\n')
         } else {
           val indent = " " * prompt.lastLine.length
-          Array('\n', indent:_*)
+          Array('\n', indent: _*)
         }
 
       writer.write(
-        buffer.render.flatMap{
+        buffer.render.flatMap {
           case '\n' => newlineReplacement
           case x => Array(x)
         }.toArray
@@ -213,7 +206,9 @@ object Terminal {
     }
 
     @tailrec
-    def readChar(lastState: TermState, ups: Int, fullPrompt: Boolean = true): Option[String] = {
+    def readChar(lastState: TermState,
+                 ups: Int,
+                 fullPrompt: Boolean = true): Option[String] = {
       val moreInputComing = reader.ready()
 
       lazy val (transformedBuffer0, cursorOffset) = displayTransform(
@@ -224,21 +219,22 @@ object Terminal {
       lazy val transformedBuffer = transformedBuffer0 ++ lastState.msg
       lazy val lastOffsetCursor = lastState.cursor + cursorOffset
       lazy val rowLengths = splitBuffer(
-        lastState.buffer ++ lastState.msg.plainText
+        lastState.buffer ++ lastState.msg
       )
       val narrowWidth = width - prompt.lastLine.length
       val newlinePrompt = rowLengths.exists(_ >= narrowWidth)
-      val promptWidth = if(newlinePrompt) 0 else prompt.lastLine.length
+      val promptWidth = if (newlinePrompt) 0 else prompt.lastLine.length
       val actualWidth = width - promptWidth
       val newlineUp = if (newlinePrompt) 1 else 0
-      if (!moreInputComing) redrawLine(
-        transformedBuffer,
-        lastOffsetCursor,
-        ups,
-        rowLengths,
-        fullPrompt,
-        newlinePrompt
-      )
+      if (!moreInputComing)
+        redrawLine(
+          transformedBuffer,
+          lastOffsetCursor,
+          ups,
+          rowLengths,
+          fullPrompt,
+          newlinePrompt
+        )
 
       lazy val (oldCursorY, _) = positionCursor(
         lastOffsetCursor,
@@ -276,8 +272,12 @@ object Terminal {
 
         case Result(s) =>
           redrawLine(
-            transformedBuffer, lastState.buffer.length,
-            oldCursorY + newlineUp, rowLengths, false, newlinePrompt
+            transformedBuffer,
+            lastState.buffer.length,
+            oldCursorY + newlineUp,
+            rowLengths,
+            false,
+            newlinePrompt
           )
           writer.write(10)
           writer.write(13)
@@ -296,8 +296,10 @@ object Terminal {
     lazy val ansi = new AnsiNav(writer)
     lazy val (width, _, initialConfig) = TTY.init()
     try {
-      readChar(TermState(LazyList.continually(reader.read()), Vector.empty, 0, ""), 0)
-    }finally{
+      readChar(
+        TermState(LazyList.continually(reader.read()), Vector.empty, 0, ""),
+        0)
+    } finally {
 
       // Don't close these! Closing these closes stdin/stdout,
       // which seems to kill the entire program
@@ -312,12 +314,9 @@ object Prompt {
   implicit def construct(prompt: String): Prompt = {
     val parsedPrompt = fansi.Str(prompt)
     val index = parsedPrompt.plainText.lastIndexOf('\n')
-    val (_, last) = parsedPrompt.splitAt(index+1)
+    val (_, last) = parsedPrompt.splitAt(index + 1)
     Prompt(parsedPrompt, last)
   }
 }
 
 case class Prompt(full: fansi.Str, lastLine: fansi.Str)
-
-
-

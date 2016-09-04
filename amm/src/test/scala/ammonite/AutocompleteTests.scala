@@ -3,8 +3,6 @@
 // import ammonite.TestUtils._
 // import ammonite.runtime.Preprocessor
 // import utest._
-
-
 // object AutocompleteTests extends TestSuite{
 //   val tests = TestSuite {
 //     println("AutocompleteTests")
@@ -137,8 +135,6 @@
 //             "def >(x: Byte): Boolean"
 //           ) ^
 //         )
-
-
 //         // https://issues.scala-lang.org/browse/SI-9153
 //         //
 //         //      complete("""val x = 123; x + x.m<caret>""",
@@ -165,4 +161,3 @@
 //     }
 //   }
 // }
-

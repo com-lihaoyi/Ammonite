@@ -11,20 +11,18 @@ import scala.util.Try
   * Simple enum with the possible filesystem objects a path can resolve to
   */
 sealed trait FileType
-object FileType{
+object FileType {
   case object File extends FileType
   case object Dir extends FileType
   case object SymLink extends FileType
   case object Other extends FileType
 }
-object PermSet{
-
-}
+object PermSet {}
 
 /**
   * A set of permissions
   */
-class PermSet(s: Set[PosixFilePermission]) extends Set[PosixFilePermission]{
+class PermSet(s: Set[PosixFilePermission]) extends Set[PosixFilePermission] {
   def contains(elem: PosixFilePermission) = s.contains(elem)
   def +(elem: PosixFilePermission) = new PermSet(s + elem)
   def -(elem: PosixFilePermission) = new PermSet(s - elem)
@@ -32,8 +30,7 @@ class PermSet(s: Set[PosixFilePermission]) extends Set[PosixFilePermission]{
 
 }
 
-
-object stat extends Function1[ops.Path, ops.stat]{
+object stat extends Function1[ops.Path, ops.stat] {
   def apply(p: ops.Path) = ops.stat.make(
     // Don't blow up if we stat `root`
     p.segments.lastOption.getOrElse("/"),
@@ -42,13 +39,16 @@ object stat extends Function1[ops.Path, ops.stat]{
       classOf[BasicFileAttributes],
       LinkOption.NOFOLLOW_LINKS
     ),
-    Try(Files.readAttributes(
-      Paths.get(p.toString),
-      classOf[PosixFileAttributes],
-      LinkOption.NOFOLLOW_LINKS
-    )).toOption
+    Try(
+      Files.readAttributes(
+        Paths.get(p.toString),
+        classOf[PosixFileAttributes],
+        LinkOption.NOFOLLOW_LINKS
+      )).toOption
   )
-  def make(name: String, attrs: BasicFileAttributes, posixAttrs: Option[PosixFileAttributes]) = {
+  def make(name: String,
+           attrs: BasicFileAttributes,
+           posixAttrs: Option[PosixFileAttributes]) = {
     import collection.JavaConversions._
     new stat(
       name,
@@ -71,13 +71,16 @@ object stat extends Function1[ops.Path, ops.stat]{
         classOf[BasicFileAttributes],
         LinkOption.NOFOLLOW_LINKS
       ),
-      Try(Files.readAttributes(
-        Paths.get(p.toString),
-        classOf[PosixFileAttributes],
-        LinkOption.NOFOLLOW_LINKS
-      )).toOption
+      Try(
+        Files.readAttributes(
+          Paths.get(p.toString),
+          classOf[PosixFileAttributes],
+          LinkOption.NOFOLLOW_LINKS
+        )).toOption
     )
-    def make(name: String, attrs: BasicFileAttributes, posixAttrs: Option[PosixFileAttributes]) = {
+    def make(name: String,
+             attrs: BasicFileAttributes,
+             posixAttrs: Option[PosixFileAttributes]) = {
       import collection.JavaConversions._
       new full(
         name,
@@ -110,7 +113,7 @@ object stat extends Function1[ops.Path, ops.stat]{
                   group: GroupPrincipal,
                   owner: UserPrincipal,
                   permissions: PermSet,
-                  fileType: FileType){
+                  fileType: FileType) {
     override def productPrefix = "stat.full"
     def isDir = fileType == FileType.Dir
     def isSymLink = fileType == FileType.SymLink
@@ -130,7 +133,7 @@ case class stat(name: String,
                 mtime: FileTime,
                 owner: UserPrincipal,
                 permissions: PermSet,
-                fileType: FileType){
+                fileType: FileType) {
   def isDir = fileType == FileType.Dir
   def isSymLink = fileType == FileType.SymLink
   def isFile = fileType == FileType.File

@@ -6,10 +6,11 @@ import ammonite.terminal.SpecialKeys._
 import ammonite.terminal.Filter
 import ammonite.terminal._
 import Filter._
+
 /**
- * Filters for simple operation of a terminal: cursor-navigation
- * (including with all the modifier keys), enter/ctrl-c-exit, etc.
- */
+  * Filters for simple operation of a terminal: cursor-navigation
+  * (including with all the modifier keys), enter/ctrl-c-exit, etc.
+  */
 object BasicFilters {
   def all = Filter.merge(
     navFilter,
@@ -25,7 +26,6 @@ object BasicFilters {
     TermState(rest, (first :+ '\n') ++ last, c + 1)
   }
 
-
   def navFilter = Filter.merge(
     simple(Up)((b, c, m) => moveUp(b, c, m.width)),
     simple(Down)((b, c, m) => moveDown(b, c, m.width)),
@@ -38,14 +38,16 @@ object BasicFilters {
     val chunkCol = c - chunkStarts(chunkIndex)
     val spacesToInject = indent - (chunkCol % indent)
     val (lhs, rhs) = b.splitAt(c)
-    TS(rest, lhs ++ Vector.fill(spacesToInject)(' ') ++ rhs, c + spacesToInject)
+    TS(rest,
+       lhs ++ Vector.fill(spacesToInject)(' ') ++ rhs,
+       c + spacesToInject)
   }
 
-  def tabFilter(indent: Int): Filter = partial{
+  def tabFilter(indent: Int): Filter = partial {
     case TS(9 ~: rest, b, c, _) => tabColumn(indent, b, c, rest)
   }
 
-  def loggingFilter: Filter = partial{
+  def loggingFilter: Filter = partial {
     case TS(Ctrl('q') ~: rest, b, c, _) =>
       println("Char Display Mode Enabled! Ctrl-C to exit")
       var curr = rest
@@ -56,23 +58,23 @@ object BasicFilters {
       TS(curr, b, c)
   }
   def typingFilter: Filter = Filter.merge(
-    action(SpecialKeys.FnDelete){
+    action(SpecialKeys.FnDelete) {
       case TermState(rest, b, c, _) =>
         val (first, last) = b.splitAt(c)
         TS(rest, first ++ last.drop(1), c)
     },
-    action(SpecialKeys.Backspace){
+    action(SpecialKeys.Backspace) {
       case TermState(rest, b, c, _) =>
         val (first, last) = b.splitAt(c)
         TS(rest, first.dropRight(1) ++ last, c - 1)
     },
-    partial{
+    partial {
       case TS(char ~: rest, b, c, _) =>
-        if (!Character.isISOControl(char)){
+        if (!Character.isISOControl(char)) {
 //          Debug("NORMAL CHAR " + char)
           val (first, last) = b.splitAt(c)
           TS(rest, (first :+ char.toChar) ++ last, c + 1)
-        }else{
+        } else {
           TS(rest, b, c)
         }
     }
@@ -84,55 +86,49 @@ object BasicFilters {
     else injectNewLine(b, c, rest)
   }
 
-  def enterFilter: Filter = action(SpecialKeys.NewLine){
+  def enterFilter: Filter = action(SpecialKeys.NewLine) {
     case TS(rest, b, c, _) => doEnter(b, c, rest) // Enter
   }
 
   def exitFilter: Filter = Filter.merge(
     action(Ctrl('c'))(_ => Result("")),
-    action(Ctrl('d')){case TS(rest, b, c, _) =>
-      // only exit if the line is empty, otherwise, behave like
-      // "delete" (i.e. delete one char to the right)
-      if (b.isEmpty) Exit
-      else {
-        val (first, last) = b.splitAt(c)
-        TS(rest, first ++ last.drop(1), c)
-      }
+    action(Ctrl('d')) {
+      case TS(rest, b, c, _) =>
+        // only exit if the line is empty, otherwise, behave like
+        // "delete" (i.e. delete one char to the right)
+        if (b.isEmpty) Exit
+        else {
+          val (first, last) = b.splitAt(c)
+          TS(rest, first ++ last.drop(1), c)
+        }
     },
     // java.io.Reader.read() produces -1 on EOF
     action((-1).toChar.toString)(_ => Exit)
   )
   def clearFilter: Filter =
-    action(Ctrl('l')){case TS(rest, b, c, _) => ClearScreen(TS(rest, b, c))}
+    action(Ctrl('l')) { case TS(rest, b, c, _) => ClearScreen(TS(rest, b, c)) }
 
-
-  def moveStart(b: Vector[Char],
-                c: Int,
-                w: Int) = {
+  def moveStart(b: Vector[Char], c: Int, w: Int) = {
     val (_, chunkStarts, chunkIndex) = findChunks(b, c)
     val currentColumn = (c - chunkStarts(chunkIndex)) % w
     b -> (c - currentColumn)
 
   }
-  def moveEnd(b: Vector[Char],
-              c: Int,
-              w: Int) = {
+  def moveEnd(b: Vector[Char], c: Int, w: Int) = {
     val (chunks, chunkStarts, chunkIndex) = findChunks(b, c)
     val currentColumn = (c - chunkStarts(chunkIndex)) % w
-    val c1 = chunks.lift(chunkIndex + 1) match{
+    val c1 = chunks.lift(chunkIndex + 1) match {
       case Some(next) =>
         val boundary = chunkStarts(chunkIndex + 1) - 1
         if ((boundary - c) > (w - currentColumn)) {
-          val delta= w - currentColumn
+          val delta = w - currentColumn
           c + delta
-        }
-        else boundary
+        } else boundary
       case None =>
         c + 1 * 9999
     }
     b -> c1
   }
-
 
   def moveUpDown(b: Vector[Char],
                  c: Int,
@@ -145,15 +141,16 @@ object BasicFilters {
     val (chunks, chunkStarts, chunkIndex) = findChunks(b, c)
     val offset = chunkStarts(chunkIndex + boundaryOffset)
     if (check(checkRes, offset)) checkRes
-    else chunks.lift(chunkIndex + nextChunkOffset) match{
-      case None => c + nextChunkOffset * 9999
-      case Some(next) =>
-        val boundary = chunkStarts(chunkIndex + boundaryOffset)
-        val currentColumn = (c - chunkStarts(chunkIndex)) % w
+    else
+      chunks.lift(chunkIndex + nextChunkOffset) match {
+        case None => c + nextChunkOffset * 9999
+        case Some(next) =>
+          val boundary = chunkStarts(chunkIndex + boundaryOffset)
+          val currentColumn = (c - chunkStarts(chunkIndex)) % w
 
-        if (isDown) boundary + math.min(currentColumn, next)
-        else boundary + math.min(currentColumn - next % w, 0) - 1
-    }
+          if (isDown) boundary + math.min(currentColumn, next)
+          else boundary + math.min(currentColumn - next % w, 0) - 1
+      }
   }
   def moveUp(b: Vector[Char], c: Int, w: Int) = {
     b -> moveUpDown(b, c, w, 0, -1, c - w, _ > _, false)

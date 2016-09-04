@@ -12,7 +12,7 @@ import SshTestingUtils._
 
 object SshServerTests extends TestSuite with ScalaCheckSupport {
   override val tests = TestSuite {
-    'canConnectAndAuthenticate{
+    'canConnectAndAuthenticate {
       withTmpDirectory { implicit tmpDir =>
         check {
           forAll(genCreds) { user =>
@@ -25,7 +25,7 @@ object SshServerTests extends TestSuite with ScalaCheckSupport {
         }
       }
     }
-    'cantConnectWithInvalidCredentials{
+    'cantConnectWithInvalidCredentials {
       withTmpDirectory { implicit tmpDir =>
         check {
           forAll(genNonMatchingCredsPair) { credsPair =>
@@ -41,7 +41,7 @@ object SshServerTests extends TestSuite with ScalaCheckSupport {
         }
       }
     }
-    'thenConnectedExecutesShellTerminalTask{
+    'thenConnectedExecutesShellTerminalTask {
       withTmpDirectory { implicit tmpDir =>
         val remoteShellGetsExecuted = Promise[Unit]()
         def shellSession = () => remoteShellGetsExecuted.success((): Unit)
@@ -54,14 +54,15 @@ object SshServerTests extends TestSuite with ScalaCheckSupport {
         }
       }
     }
-    'cantOpenWildChannel{
+    'cantOpenWildChannel {
       withTmpDirectory { implicit tmpDir =>
         withTestSshServer(testUser) { server =>
           val client = sshClient(testUser, server)
           client.connect()
           assert(client.isConnected)
-          for (channel <- rejectedChannelTypes) cantConnectToChannel(client, channel)
-          check(forAll { randomChannel:String =>
+          for (channel <- rejectedChannelTypes)
+            cantConnectToChannel(client, channel)
+          check(forAll { randomChannel: String =>
             cantConnectToChannel(client, randomChannel)
           })
         }
@@ -70,12 +71,17 @@ object SshServerTests extends TestSuite with ScalaCheckSupport {
   }
 
   private lazy val rejectedChannelTypes = Seq(
-    "exec", "env", "x11-req", "x11",
-    "subsystem", "exit-signal", "auth-agent-req@openssh.com"
+    "exec",
+    "env",
+    "x11-req",
+    "x11",
+    "subsystem",
+    "exit-signal",
+    "auth-agent-req@openssh.com"
   )
 
-  private def cantConnectToChannel(client: Session, channel: String)
-                                  (implicit dir: Path): Unit = {
+  private def cantConnectToChannel(client: Session, channel: String)(
+      implicit dir: Path): Unit = {
     assert(client.isConnected)
     Option(client.openChannel(channel)) match {
       case Some(shell) =>

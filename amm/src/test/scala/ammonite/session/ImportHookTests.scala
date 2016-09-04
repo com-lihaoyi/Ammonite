@@ -61,8 +61,6 @@
 //           @ import $file.amm.src.test.resources.importHooks.Deep.DeepObject.DeepInner.deepValue
 //           error: Cannot resolve $file import
 //         """)
-
-
 //         'deepRenamed - check.session("""
 //           @ import $file.amm.src.test.resources.importHooks.Deep.{DeepObject => DeepRenamed}
 //           error: Cannot resolve $file import

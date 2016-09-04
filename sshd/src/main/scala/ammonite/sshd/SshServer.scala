@@ -14,8 +14,8 @@ import org.apache.sshd.server.{Command, CommandFactory, PasswordAuthenticator}
 import org.apache.sshd.{SshServer => SshServerImpl}
 
 /**
- * A factory to simplify creation of ssh server
- */
+  * A factory to simplify creation of ssh server
+  */
 object SshServer {
   def apply(options: SshServerConfig, shellServer: ShellSession.Server) = {
     val sshServer = SshServerImpl.setUpDefaultServer()
@@ -61,10 +61,10 @@ object SshServer {
   // this is a user-safe options.
   // Server should have stable key
   // to not violate the user under threat of MITM attack
-  private def fallbackHostkeyFilePath(options:SshServerConfig) =
-    options.ammoniteHome/'cache/'ssh/'hostkeys
+  private def fallbackHostkeyFilePath(options: SshServerConfig) =
+    options.ammoniteHome / 'cache / 'ssh / 'hostkeys
 
-  def touch(file:Path):Path = {
+  def touch(file: Path): Path = {
     import ammonite.ops._
     if (!exists(file)) {
       write(file, Array.empty[Byte])
@@ -76,7 +76,8 @@ object SshServer {
                                     correctPassword: String) =
     new PasswordAuthenticator {
       override def authenticate(username: String,
-                                password: String, session: ServerSession) =
+                                password: String,
+                                session: ServerSession) =
         username == correctUsername && password == correctPassword
     }
 }

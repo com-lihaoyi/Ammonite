@@ -15,14 +15,15 @@ import scala.annotation.tailrec
   * want without affecting the primary terminal you're using to interact with
   * Ammonite.
   */
-object Debug{
+object Debug {
   lazy val debugOutput = {
     if (System.getProperty("ammonite-sbt-build") != "true") ???
     else new java.io.FileOutputStream(new java.io.File("terminal/target/log"))
   }
   def apply(s: Any) = {
     if (System.getProperty("ammonite-sbt-build") == "true")
-      debugOutput.write((System.currentTimeMillis() + "\t\t" + s + "\n").getBytes)
+      debugOutput.write(
+        (System.currentTimeMillis() + "\t\t" + s + "\n").getBytes)
   }
 }
 
@@ -31,63 +32,69 @@ object Debug{
   * your companion object and define the items via `val a, b, c = Item(...)`
   * passing in your enum class constructor in place of `...`.
   */
-abstract class Enum(implicit enumName: sourcecode.Name){
-  protected[this] def Item[T](constructor: String => T)
-                             (implicit i: sourcecode.Name): T = {
+abstract class Enum(implicit enumName: sourcecode.Name) {
+  protected[this] def Item[T](constructor: String => T)(
+      implicit i: sourcecode.Name): T = {
     constructor(enumName.value + "." + i.value)
   }
 }
 
-class AnsiNav(output: Writer){
+class AnsiNav(output: Writer) {
   def control(n: Int, c: Char) = output.write(s"\033[" + n + c)
 
   /**
-   * Move up `n` squares
-   */
+    * Move up `n` squares
+    */
   def up(n: Int) = if (n == 0) "" else control(n, 'A')
+
   /**
-   * Move down `n` squares
-   */
+    * Move down `n` squares
+    */
   def down(n: Int) = if (n == 0) "" else control(n, 'B')
+
   /**
-   * Move right `n` squares
-   */
+    * Move right `n` squares
+    */
   def right(n: Int) = if (n == 0) "" else control(n, 'C')
+
   /**
-   * Move left `n` squares
-   */
+    * Move left `n` squares
+    */
   def left(n: Int) = if (n == 0) "" else control(n, 'D')
 
   /**
-   * Clear the screen
-   *
-   * n=0: clear from cursor to end of screen
-   * n=1: clear from cursor to start of screen
-   * n=2: clear entire screen
-   */
+    * Clear the screen
+    *
+    * n=0: clear from cursor to end of screen
+    * n=1: clear from cursor to start of screen
+    * n=2: clear entire screen
+    */
   def clearScreen(n: Int) = control(n, 'J')
+
   /**
-   * Clear the current line
-   *
-   * n=0: clear from cursor to end of line
-   * n=1: clear from cursor to start of line
-   * n=2: clear entire line
-   */
+    * Clear the current line
+    *
+    * n=0: clear from cursor to end of line
+    * n=1: clear from cursor to start of line
+    * n=2: clear entire line
+    */
   def clearLine(n: Int) = control(n, 'K')
 }
-object AnsiNav{
+object AnsiNav {
   val resetUnderline = "\u001b[24m"
   val resetForegroundColor = "\u001b[39m"
   val resetBackgroundColor = "\u001b[49m"
 }
 
-object TTY{
+object TTY {
 
   // Prefer standard tools. Not sure why we need to do this, but for some
   // reason the version installed by gnu-coreutils blows up sometimes giving
   // "unable to perform all requested operations"
-  val pathedTput = if (new java.io.File("/usr/bin/tput").exists()) "/usr/bin/tput" else "tput"
-  val pathedStty = if (new java.io.File("/bin/stty").exists()) "/bin/stty" else "stty"
+  val pathedTput =
+    if (new java.io.File("/usr/bin/tput").exists()) "/usr/bin/tput" else "tput"
+  val pathedStty =
+    if (new java.io.File("/bin/stty").exists()) "/bin/stty" else "stty"
 
   def consoleDim(s: String) = {
     import sys.process._
@@ -131,9 +138,9 @@ object TTY{
 }
 
 /**
- * A truly-lazy implementation of scala.Stream
- */
-case class LazyList[T](headThunk: () => T, tailThunk: () => LazyList[T]){
+  * A truly-lazy implementation of scala.Stream
+  */
+case class LazyList[T](headThunk: () => T, tailThunk: () => LazyList[T]) {
   var rendered = false
   lazy val head = {
     rendered = true
@@ -160,27 +167,29 @@ case class LazyList[T](headThunk: () => T, tailThunk: () => LazyList[T]){
   }
   def ~:(other: => T) = LazyList(() => other, () => this)
 }
-object LazyList{
-  object ~:{
+object LazyList {
+  object ~: {
     def unapply[T](x: LazyList[T]) = Some((x.head, x.tail))
   }
-  def continually[T](t: => T): LazyList[T] = LazyList(() => t, () =>continually(t))
+  def continually[T](t: => T): LazyList[T] =
+    LazyList(() => t, () => continually(t))
 
-  implicit class CS(ctx: StringContext){
+  implicit class CS(ctx: StringContext) {
     val base = ctx.parts.mkString
-    object p{
+    object p {
       def unapply(s: LazyList[Int]): Option[LazyList[Int]] = {
         s.dropPrefix(base.map(_.toInt))
       }
     }
   }
 }
+
 /**
   * Implicitly instantiated class letting you pass in a single string or a
   * sequence of strings anywhere a set of prefixes is required
   */
 case class Strings(values: Seq[String])
-object Strings{
+object Strings {
   implicit def stringPrefix(s: String) = Strings(Seq(s))
   implicit def stringSeqPrefix(s: Seq[String]) = Strings(s)
 }

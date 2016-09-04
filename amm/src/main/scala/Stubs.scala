@@ -4,48 +4,48 @@
 /**
   * Package that gets filled with any script files that the user imports
   */
-package $file{
+package $file {
   object $
 }
 
 /**
   * Package that gets filled with any script files that the user imports
   */
-package $exec{
+package $exec {
   object $
 }
 
 /**
   * Package that gets filled with ivy artifacts the user loads
   */
-package $ivy{
+package $ivy {
   object $
 }
 
 /**
   * Package that gets filled with any web scripts people load from http URLs
   */
-package $url{
+package $url {
   object $
 }
 
 /**
   * Package to import from when you don't want to import anything
   */
-package $stub{
+package $stub {
   object $
 }
 
 /**
   * Package to import from when you don't want to import anything
   */
-package $cp{
+package $cp {
   object $
 }
 
 /**
   * Package to import from when you don't want to import anything
   */
-package $plugin{
+package $plugin {
   object $
 }

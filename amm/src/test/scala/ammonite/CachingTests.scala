@@ -14,8 +14,6 @@
 //     val scriptPath = pwd/'amm/'src/'test/'resources/'scripts
 
 //     val resourcesPath = pwd/'amm/'src/'test/'resources
-
-
 //     val tempDir = tmp.dir(prefix="ammonite-tester")
 //     'noAutoIncrementWrapper{
 //       val storage = Storage.InMemory()

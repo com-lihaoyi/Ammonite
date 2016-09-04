@@ -8,9 +8,6 @@ import ammonite.util.{Imports, Util}
 
 import scala.collection.mutable
 
-
-
-
 /**
   * Represents a single "frame" of the `sess.save`/`sess.load` stack/tree.
   *
@@ -21,7 +18,7 @@ import scala.collection.mutable
 class Frame(val classloader: SpecialClassLoader,
             val pluginClassloader: SpecialClassLoader,
             private[this] var imports0: Imports,
-            private[this] var classpath0: Seq[java.io.File]){
+            private[this] var classpath0: Seq[java.io.File]) {
   def imports = imports0
   def classpath = classpath0
   def addImports(additional: Imports) = {
@@ -33,7 +30,7 @@ class Frame(val classloader: SpecialClassLoader,
   }
 }
 
-object SpecialClassLoader{
+object SpecialClassLoader {
   val simpleNameRegex = "[a-zA-Z0-9_]+".r
 
   /**
@@ -46,7 +43,7 @@ object SpecialClassLoader{
     val allClassloaders = {
       val all = mutable.Buffer.empty[ClassLoader]
       var current = classloader
-      while(current != null){
+      while (current != null) {
         all.append(current)
         current = current.getParent
       }
@@ -57,30 +54,33 @@ object SpecialClassLoader{
       def skipSuspicious(path: Path) = {
         simpleNameRegex.findPrefixOf(path.last) == Some(path.last)
       }
-      ls.rec(skip = skipSuspicious)! Path(d) | (x => (x, x.mtime.toMillis))
+      ls.rec(skip = skipSuspicious) ! Path(d) | (x => (x, x.mtime.toMillis))
     }
 
     val classpathFolders =
-      allClassloaders.collect{case cl: java.net.URLClassLoader => cl.getURLs}
-                     .flatten
-                     .filter(_.getProtocol == "file")
-                     .map(_.toURI)
-                     .map(java.nio.file.Paths.get)
-                     .filter(java.nio.file.Files.isDirectory(_))
+      allClassloaders.collect {
+        case cl: java.net.URLClassLoader => cl.getURLs
+      }.flatten
+        .filter(_.getProtocol == "file")
+        .map(_.toURI)
+        .map(java.nio.file.Paths.get)
+        .filter(java.nio.file.Files.isDirectory(_))
 
     val classFileMtimes = classpathFolders.flatMap(f => findMtimes(f))
     classFileMtimes
 
   }
 }
+
 /**
   * Classloader used to implement the jar-downloading
   * command-evaluating logic in Ammonite.
   *
   * http://stackoverflow.com/questions/3544614/how-is-the-control-flow-to-findclass-of
   */
-class SpecialClassLoader(parent: ClassLoader, parentSignature: Seq[(Path, Long)])
-  extends URLClassLoader(Array(), parent){
+class SpecialClassLoader(parent: ClassLoader,
+                         parentSignature: Seq[(Path, Long)])
+    extends URLClassLoader(Array(), parent) {
 
   /**
     * Files which have been compiled, stored so that our special
@@ -105,14 +105,15 @@ class SpecialClassLoader(parent: ClassLoader, parentSignature: Seq[(Path, Long)]
     else if (newFileDict.contains(name)) {
       val bytes = newFileDict(name)
       defineClass(name, bytes, 0, bytes.length)
-    }else if (specialLocalClasses(name)) {
+    } else if (specialLocalClasses(name)) {
       import ammonite.ops._
-      val resource = this.getResourceAsStream(name.replace('.', '/') + ".class")
-      if (resource != null){
+      val resource =
+        this.getResourceAsStream(name.replace('.', '/') + ".class")
+      if (resource != null) {
         val bytes = read.bytes(resource)
 
         defineClass(name, bytes, 0, bytes.length)
-      }else{
+      } else {
         super.findClass(name)
       }
 
@@ -132,16 +133,17 @@ class SpecialClassLoader(parent: ClassLoader, parentSignature: Seq[(Path, Long)]
   def classpathSignature = classpathSignature0
   def classpathHash = {
     Util.md5Hash(
-      classpathSignature0.iterator.map { case (path, long) =>
-        val buffer = ByteBuffer.allocate(8)
-        buffer.putLong(long)
-        path.toString.getBytes ++ buffer.array()
+      classpathSignature0.iterator.map {
+        case (path, long) =>
+          val buffer = ByteBuffer.allocate(8)
+          buffer.putLong(long)
+          path.toString.getBytes ++ buffer.array()
       }
     )
 
   }
   def allJars: Seq[URL] = {
-    this.getURLs ++ ( parent match{
+    this.getURLs ++ (parent match {
       case t: SpecialClassLoader => t.allJars
       case _ => Nil
     })

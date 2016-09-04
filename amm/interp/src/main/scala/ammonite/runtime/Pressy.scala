@@ -12,10 +12,11 @@ import scala.tools.nsc.util._
 import scala.util.{Failure, Success, Try}
 
 import ammonite.util.Util.newLine
+
 /**
- * Nice wrapper for the presentation compiler.
- */
-trait Pressy{
+  * Nice wrapper for the presentation compiler.
+  */
+trait Pressy {
   def complete(snippetIndex: Int,
                previousImports: String,
                snippet: String): (Int, Seq[String], Seq[String])
@@ -24,17 +25,17 @@ trait Pressy{
 object Pressy {
 
   /**
-   * Encapsulates all the logic around a single instance of
-   * `nsc.interactive.Global` and other data specific to a single completion
-   */
+    * Encapsulates all the logic around a single instance of
+    * `nsc.interactive.Global` and other data specific to a single completion
+    */
   class Run(val pressy: nsc.interactive.Global,
             currentFile: BatchSourceFile,
             allCode: String,
-            index: Int){
+            index: Int) {
 
     /**
-     * Dumb things that turn up in the autocomplete that nobody needs or wants
-     */
+      * Dumb things that turn up in the autocomplete that nobody needs or wants
+      */
     def blacklisted(s: pressy.Symbol) = {
       val blacklist = Set(
         "scala.Predef.any2stringadd.+",
@@ -68,16 +69,18 @@ object Pressy {
     val r = new Response[pressy.Tree]
     pressy.askTypeAt(new OffsetPosition(currentFile, index), r)
     val tree = r.get.fold(x => x, e => throw e)
+
     /**
-     * Search for terms to autocomplete not just from the local scope,
-     * but from any packages and package objects accessible from the
-     * local scope
-     */
+      * Search for terms to autocomplete not just from the local scope,
+      * but from any packages and package objects accessible from the
+      * local scope
+      */
     def deepCompletion(name: String) = {
       def rec(t: pressy.Symbol): Seq[pressy.Symbol] = {
         val children =
           if (t.hasPackageFlag || t.isPackageObject) {
-            pressy.ask(() => t.typeSignature.members.filter(_ != t).flatMap(rec))
+            pressy.ask(() =>
+              t.typeSignature.members.filter(_ != t).flatMap(rec))
           } else Nil
 
         t +: children.toSeq
@@ -89,33 +92,34 @@ object Pressy {
         // sketchy name munging because I don't know how to do this properly
         strippedName = sym.nameString.stripPrefix("package$").stripSuffix("$")
         if strippedName.startsWith(name)
-        (pref, _) = sym.fullNameString.splitAt(sym.fullNameString.lastIndexOf('.') + 1)
+        (pref, _) = sym.fullNameString.splitAt(
+          sym.fullNameString.lastIndexOf('.') + 1)
         out = pref + strippedName
         if out != ""
       } yield (out, None)
     }
     def handleTypeCompletion(position: Int, decoded: String, offset: Int) = {
 
-      val r = ask(position,  pressy.askTypeCompletion)
+      val r = ask(position, pressy.askTypeCompletion)
       val prefix = if (decoded == "<error>") "" else decoded
       (position + offset, handleCompletion(r, prefix))
     }
 
-    def handleCompletion(r: List[pressy.Member], prefix: String) = pressy.ask{ () =>
-      r.filter(_.sym.name.decoded.startsWith(prefix))
-        .filter(m => !blacklisted(m.sym))
-        .map{ x  =>
-          (
-            x.sym.name.decoded,
-            if (x.sym.name.decoded != prefix) None
-            else Some(x.sym.defString)
-          )
-        }
+    def handleCompletion(r: List[pressy.Member], prefix: String) = pressy.ask {
+      () =>
+        r.filter(_.sym.name.decoded.startsWith(prefix))
+          .filter(m => !blacklisted(m.sym))
+          .map { x =>
+            (
+              x.sym.name.decoded,
+              if (x.sym.name.decoded != prefix) None
+              else Some(x.sym.defString)
+            )
+          }
     }
 
     def prefixed: (Int, Seq[(String, Option[String])]) = tree match {
       case t @ pressy.Select(qualifier, name) =>
-
         val dotOffset = if (qualifier.pos.point == t.pos.point) 0 else 1
 
         //In scala 2.10.x if we call pos.end on a scala.reflect.internal.util.Position
@@ -129,26 +133,28 @@ object Pressy {
           (0, Seq.empty)
         }
 
-      case t @ pressy.Import(expr, selectors)  =>
+      case t @ pressy.Import(expr, selectors) =>
         // If the selectors haven't been defined yet...
         if (selectors.head.name.toString == "<error>") {
           if (expr.tpe.toString == "<error>") {
-              // If the expr is badly typed, try to scope complete it
-              if (expr.isInstanceOf[pressy.Ident]) {
-                val exprName =  expr.asInstanceOf[pressy.Ident].name.decoded
-                expr.pos.point -> handleCompletion(
-                  ask(expr.pos.point, pressy.askScopeCompletion),
-                  // if it doesn't have a name at all, accept anything
-                  if (exprName == "<error>") "" else exprName
-                )
-              } else (expr.pos.point, Seq.empty)
+            // If the expr is badly typed, try to scope complete it
+            if (expr.isInstanceOf[pressy.Ident]) {
+              val exprName = expr.asInstanceOf[pressy.Ident].name.decoded
+              expr.pos.point -> handleCompletion(
+                ask(expr.pos.point, pressy.askScopeCompletion),
+                // if it doesn't have a name at all, accept anything
+                if (exprName == "<error>") "" else exprName
+              )
+            } else (expr.pos.point, Seq.empty)
           } else {
             // If the expr is well typed, type complete
             // the next thing
             handleTypeCompletion(expr.pos.end, "", 1)
           }
-        }else {// I they're been defined, just use typeCompletion
-          handleTypeCompletion(selectors.last.namePos, selectors.last.name.decoded, 0)
+        } else { // I they're been defined, just use typeCompletion
+          handleTypeCompletion(selectors.last.namePos,
+                               selectors.last.name.decoded,
+                               0)
         }
       case t @ pressy.Ident(name) =>
         lazy val shallow = handleCompletion(
@@ -165,14 +171,16 @@ object Pressy {
         val comps = ask(index, pressy.askScopeCompletion)
 
         index -> pressy.ask(() =>
-          comps.filter(m => !blacklisted(m.sym))
-               .map { s => (s.sym.name.decoded, None) }
-        )
+          comps.filter(m => !blacklisted(m.sym)).map { s =>
+            (s.sym.name.decoded, None)
+        })
     }
-    def ask(index: Int, query: (Position, Response[List[pressy.Member]]) => Unit) = {
+    def ask(index: Int,
+            query: (Position, Response[List[pressy.Member]]) => Unit) = {
       val position = new OffsetPosition(currentFile, index)
       //if a match can't be found awaitResponse throws an Exception.
-      val result = Try(Compiler.awaitResponse[List[pressy.Member]](query(position, _)))
+      val result = Try(
+        Compiler.awaitResponse[List[pressy.Member]](query(position, _)))
       result match {
         case Success(scopes) => scopes.filter(_.accessible)
         case Failure(error) => List.empty[pressy.Member]
@@ -205,16 +213,17 @@ object Pressy {
 
           override def classPath = jcp
         }
-        override lazy val analyzer = CompilerCompatibility.interactiveAnalyzer(g, evalClassloader)
+        override lazy val analyzer =
+          CompilerCompatibility.interactiveAnalyzer(g, evalClassloader)
       }
     }
 
     /**
-     * Ask for autocompletion at a particular spot in the code, returning
-     * possible things that can be completed at that location. May try various
-     * different completions depending on where the `index` is placed, but
-     * the outside caller probably doesn't care.
-     */
+      * Ask for autocompletion at a particular spot in the code, returning
+      * possible things that can be completed at that location. May try various
+      * different completions depending on where the `index` is placed, but
+      * the outside caller probably doesn't care.
+      */
     def complete(snippetIndex: Int, previousImports: String, snippet: String) = {
       val prefix = previousImports + newLine + "object AutocompleteWrapper{" + newLine
       val suffix = newLine + "}"
@@ -240,7 +249,8 @@ object Pressy {
 
       val allNames = all.collect { case (name, None) => name }.sorted.distinct
 
-      val signatures = all.collect { case (name, Some(defn)) => defn }.sorted.distinct
+      val signatures =
+        all.collect { case (name, Some(defn)) => defn }.sorted.distinct
 
       (i - prefix.length, allNames, signatures)
     }

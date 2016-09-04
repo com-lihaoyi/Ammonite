@@ -5,16 +5,16 @@ import ammonite.TestUtils._
 import utest._
 
 /**
- * Created by haoyi on 8/30/15.
- */
-object SessionTests extends TestSuite{
+  * Created by haoyi on 8/30/15.
+  */
+object SessionTests extends TestSuite {
 
   val bareSrc =
     """pwd/'shell/'src/'main/'resources/'ammonite/'shell/"example-predef-bare.sc""""
 
-  val tests = TestSuite{
+  val tests = TestSuite {
     val check = new TestRepl()
-    'workingDir{
+    'workingDir {
       check.session(s"""
         @ import ammonite.ops._
 
@@ -39,7 +39,7 @@ object SessionTests extends TestSuite{
         @ assert(originalLs2 != (ls!))
       """)
     }
-    'specialPPrint{
+    'specialPPrint {
       // Make sure these various "special" data structures get pretty-printed
       // correctly, i.e. not as their underlying type but as something more
       // pleasantly human-readable

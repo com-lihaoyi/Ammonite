@@ -5,16 +5,16 @@ class APIHolder[T >: Null <: AnyRef] {
   implicit lazy val value = value0
 }
 
-object APIHolder{
+object APIHolder {
   def initBridge[T >: Null <: AnyRef](classloader: SpecialClassLoader,
-                    name: String,
-                    t: T) = {
+                                      name: String,
+                                      t: T) = {
     classloader.findClassPublic(name + "$")
-    classloader.findClassPublic(name)
+    classloader
+      .findClassPublic(name)
       .getDeclaredMethods
       .find(_.getName == "value0_$eq")
       .get
       .invoke(null, t)
   }
 }
-

@@ -2,11 +2,10 @@ package ammonite.terminal
 
 import utest._
 
+object NavigationTests extends TestSuite {
 
-object NavigationTests extends TestSuite{
-
-  val tests = TestSuite{
-    'simple{
+  val tests = TestSuite {
+    'simple {
       // Tests for a simple, not-wrap-around
       // grid of characters
       val check = Checker(
@@ -16,7 +15,6 @@ object NavigationTests extends TestSuite{
           e_fgh
           ijkl
         """
-
       )
 
       import check._
@@ -30,7 +28,7 @@ object NavigationTests extends TestSuite{
         (g, v) => (g, v)
       )
 
-      'upsAndDowns{
+      'upsAndDowns {
 
         'down - check(
           """
@@ -54,7 +52,8 @@ object NavigationTests extends TestSuite{
           e_fgh
           ijkl
           """,
-          up, down
+          up,
+          down
         )
         'upup - check(
           """
@@ -62,15 +61,17 @@ object NavigationTests extends TestSuite{
           efgh
           ijkl
           """,
-          up, up
+          up,
+          up
         )
-        'downdown- check(
+        'downdown - check(
           """
           abcd
           efgh
           ijkl_
           """,
-          down, down
+          down,
+          down
         )
         'upupdown - check(
           """
@@ -78,7 +79,9 @@ object NavigationTests extends TestSuite{
           _efgh
           ijkl
           """,
-          up, up, down
+          up,
+          up,
+          down
         )
         'downdownup - check(
           """
@@ -86,10 +89,12 @@ object NavigationTests extends TestSuite{
           efgh_
           ijkl
           """,
-          down, down, up
+          down,
+          down,
+          up
         )
       }
-      'startEnd{
+      'startEnd {
         'end - check(
           """
           abcd
@@ -108,7 +113,7 @@ object NavigationTests extends TestSuite{
         )
       }
     }
-    'jagged{
+    'jagged {
       // tests where the lines of characters
       // are of uneven lengths
       val check = Checker(
@@ -132,7 +137,8 @@ object NavigationTests extends TestSuite{
         s
         t_uvwxyz
         """,
-        down, down
+        down,
+        down
       )
       'truncateBackUp - check(
         """
@@ -142,9 +148,12 @@ object NavigationTests extends TestSuite{
         s
         tuvwxyz
         """,
-        down, down, up, up
+        down,
+        down,
+        up,
+        up
       )
-      'upup- check(
+      'upup - check(
         """
         ab_cdefg
         hijk
@@ -152,9 +161,10 @@ object NavigationTests extends TestSuite{
         s
         tuvwxyz
         """,
-        up, up
+        up,
+        up
       )
-      'endup- check(
+      'endup - check(
         """
         abcdefg
         hijk_
@@ -162,10 +172,11 @@ object NavigationTests extends TestSuite{
         s
         tuvwxyz
         """,
-        end, up
+        end,
+        up
       )
     }
-    'wrapping{
+    'wrapping {
       // tests where some lines are so long that they start
       // wrapping onto the next ones. Navigating around they
       // should behave like separate lines
@@ -180,7 +191,7 @@ object NavigationTests extends TestSuite{
         """
       )
       import check._
-      'updown{
+      'updown {
         * - {
           check
             .run(up)
@@ -206,30 +217,30 @@ object NavigationTests extends TestSuite{
         }
         * - {
           check
-          .run(down)
-          .check(
-            """
+            .run(down)
+            .check(
+              """
             abcdefg\
             hijk
             lmnopqr\
             s_
             tuvwxyz
             """
-          )
-          .run(down)
-          .check(
-            """
+            )
+            .run(down)
+            .check(
+              """
             abcdefg\
             hijk
             lmnopqr\
             s
             t_uvwxyz
             """
-          )
+            )
         }
 
       }
-      'startend{
+      'startend {
 
         * - check(
           """
@@ -259,7 +270,8 @@ object NavigationTests extends TestSuite{
           s
           tuvwxyz
           """,
-          up, home
+          up,
+          home
         )
         * - check(
           """
@@ -269,7 +281,10 @@ object NavigationTests extends TestSuite{
           s
           tuvwxyz
           """,
-          up, home, home, home
+          up,
+          home,
+          home,
+          home
         )
         * - check(
           """
@@ -279,11 +294,13 @@ object NavigationTests extends TestSuite{
           s
           tuvwxyz
           """,
-          up, up, end
+          up,
+          up,
+          end
         )
       }
     }
-    'wordnav{
+    'wordnav {
       // Tests of word-by-word navigation
       val check = Checker(
         width = 10,
@@ -296,7 +313,6 @@ object NavigationTests extends TestSuite{
         """
       )
       import check._
-
 
       'leftRight - check
         .run(wordLeft)
@@ -352,7 +368,6 @@ object NavigationTests extends TestSuite{
           """
         )
 
-
       'manyRight - check
         .run(wordRight)
         .check(
@@ -406,7 +421,7 @@ object NavigationTests extends TestSuite{
         )
 
       'oneOffs - check
-        .run((b, c) => (b, c+2))
+        .run((b, c) => (b, c + 2))
         .check(
           """
           s.dropPref\
@@ -436,7 +451,7 @@ object NavigationTests extends TestSuite{
           )
           """
         )
-        .run((b, c) => (b, c-2))
+        .run((b, c) => (b, c - 2))
         .check(
           """
           s.dropPref\

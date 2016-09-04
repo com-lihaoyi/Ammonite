@@ -3,28 +3,27 @@ package ammonite.terminal
 import ammonite.terminal.filters.HistoryFilter
 import utest._
 
+object HistoryTests extends TestSuite {
 
-object HistoryTests extends TestSuite{
-
-
-  val tests = TestSuite{
+  val tests = TestSuite {
     val history = new HistoryFilter(
-      () => Vector(
-        "abcde",
-        "abcdefg",
-        "abcdefg",
-        "abcdefghi"
+      () =>
+        Vector(
+          "abcde",
+          "abcdefg",
+          "abcdefg",
+          "abcdefghi"
       ),
       fansi.Attrs.Empty
     )
-    def checker(start: String)= Checker(
+    def checker(start: String) = Checker(
       width = 50,
       grid = start
     )
 
     // When you page up with something that doesn't exist in history, it
     // should preserve the current line and move your cursor to the end
-    'noHistory{
+    'noHistory {
       checker("Hell_o")
         .runMsg(history.startHistory)
         .check("Hello_")
@@ -34,10 +33,9 @@ object HistoryTests extends TestSuite{
         .checkMsg(HistoryFilter.cannotFindSearchMessage)
     }
 
-
     'ctrlR {
       // If you hit Ctrl-R on an empty line, it shows a nice help message
-      'empty{
+      'empty {
         checker("_")
           .runMsg(history.ctrlR)
           .check("_")
@@ -48,7 +46,7 @@ object HistoryTests extends TestSuite{
           .check("_")
           .checkMsg(HistoryFilter.emptySearchMessage)
       }
-      'nonEmpty{
+      'nonEmpty {
         checker("cd_")
           .runMsg(history.ctrlR)
           .check("abcd_e")
@@ -61,7 +59,7 @@ object HistoryTests extends TestSuite{
           .check("abcdefgh_i")
       }
     }
-    'historyNoSearch{
+    'historyNoSearch {
       checker("_")
         .runMsg(history.startHistory)
         .check("abcde_")
@@ -73,7 +71,7 @@ object HistoryTests extends TestSuite{
 
     // When you page up with something that doesn't exist in history, it
     // should preserve the current line and move your cursor to the end
-    'ups{
+    'ups {
       checker("abc_")
         .runMsg(history.startHistory)
         .check("abc_de")
@@ -91,7 +89,7 @@ object HistoryTests extends TestSuite{
         .runMsg(history.up)
         .check("abc_de")
     }
-    'upsTyping{
+    'upsTyping {
       checker("de_")
         .runMsg(history.startHistory)
         .check("abcde_")
@@ -121,7 +119,7 @@ object HistoryTests extends TestSuite{
         .check("abcdefghi_")
 
     }
-    'cannotFindSearch{
+    'cannotFindSearch {
       checker("abcde_")
         .runMsg(history.startHistory)
         .check("abcde_")
@@ -129,7 +127,7 @@ object HistoryTests extends TestSuite{
         .check("abcdeZ_")
         .checkMsg(HistoryFilter.cannotFindSearchMessage)
     }
-    'down{
+    'down {
       checker("abc_")
         .runMsg(history.startHistory)
         .check("abc_de")
@@ -140,7 +138,6 @@ object HistoryTests extends TestSuite{
         .check("abc_")
 
     }
-
 
   }
 }

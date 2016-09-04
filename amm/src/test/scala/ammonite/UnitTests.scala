@@ -41,8 +41,6 @@
 //         def mixedVariadic(first: Int, args: String*) = first + args.mkString
 //       }
 //       val routes = Router.generateRoutes(Target)
-
-
 //       'basicModelling{
 //         assert(
 //           routes.map(_.name) == Seq("foo", "bar", "qux", "ex", "pureVariadic", "mixedVariadic")

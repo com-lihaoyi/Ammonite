@@ -21,7 +21,8 @@ import Filter._
   *
   * @param maxUndo: the maximum number of undo-frames that are stored.
   */
-case class UndoFilter(maxUndo: Int = 25) extends DelegateFilter{
+case class UndoFilter(maxUndo: Int = 25) extends DelegateFilter {
+
   /**
     * The current stack of states that undo/redo would cycle through.
     *
@@ -38,6 +39,7 @@ case class UndoFilter(maxUndo: Int = 25) extends DelegateFilter{
     * The current position in the undoStack that the terminal is currently in.
     */
   var undoIndex = 0
+
   /**
     * An enum representing what the user is "currently" doing. Used to
     * collapse sequential actions into one undo step: e.g. 10 plain
@@ -71,7 +73,7 @@ case class UndoFilter(maxUndo: Int = 25) extends DelegateFilter{
     val (b1, c1) = currentUndo
     (b1, c1, msg)
   }
-  def wrap(bc: (Vector[Char], Int, fansi.Str), rest: LazyList[Int]) = {
+  def wrap(bc: (Vector[Char], Int, String), rest: LazyList[Int]) = {
     val (b, c, msg) = bc
     TS(rest, b, c, msg)
   }
@@ -87,14 +89,17 @@ case class UndoFilter(maxUndo: Int = 25) extends DelegateFilter{
     // about, since they're all result in either 0 or 1 chars being different
     // between old and new buffers.
     val newState =
-    // Nothing changed means nothing changed
+      // Nothing changed means nothing changed
       if (lastC == c && lastB == b) state
       // if cursor advanced 1, and buffer grew by 1 at the cursor, we're typing
-      else if (lastC + 1 == c && lastB == b.patch(c-1, Nil, 1)) UndoState.Typing
+      else if (lastC + 1 == c && lastB == b.patch(c - 1, Nil, 1))
+        UndoState.Typing
       // cursor moved left 1, and buffer lost 1 char at that point, we're deleting
-      else if (lastC - 1 == c && lastB.patch(c, Nil, 1) == b) UndoState.Deleting
+      else if (lastC - 1 == c && lastB.patch(c, Nil, 1) == b)
+        UndoState.Deleting
       // cursor didn't move, and buffer lost 1 char at that point, we're also deleting
-      else if (lastC == c && lastB.patch(c - 1, Nil, 1) == b) UndoState.Deleting
+      else if (lastC == c && lastB.patch(c - 1, Nil, 1) == b)
+        UndoState.Deleting
       // cursor moved around but buffer didn't change, we're navigating
       else if (lastC != c && lastB == b) UndoState.Navigating
       // otherwise, sit in the "Default" state where every change is recorded.
@@ -111,10 +116,10 @@ case class UndoFilter(maxUndo: Int = 25) extends DelegateFilter{
       undoBuffer.remove(undoBuffer.length - undoIndex, undoIndex)
       undoIndex = 0
 
-      if(undoBuffer.length == maxUndo) undoBuffer.remove(0)
+      if (undoBuffer.length == maxUndo) undoBuffer.remove(0)
 
       undoBuffer.append(b -> c)
-    }else if (undoIndex == 0 && (b, c) != undoBuffer(undoBuffer.length - 1)) {
+    } else if (undoIndex == 0 && (b, c) != undoBuffer(undoBuffer.length - 1)) {
       undoBuffer(undoBuffer.length - 1) = (b, c)
     }
 
@@ -122,25 +127,29 @@ case class UndoFilter(maxUndo: Int = 25) extends DelegateFilter{
   }
 
   def filter = Filter.merge(
-    Filter.wrap{
+    Filter.wrap {
       case TS(q ~: rest, b, c, _) =>
         pushUndos(b, c)
         None
     },
-    action(Ctrl('-')){ case TS(rest, b, c, _) => wrap(undo(b, c), rest) },
-    action(SpecialKeys.Alt + 'r'){ case TS(rest, b, c, _) => wrap(undo(b, c), rest) },
-    action(SpecialKeys.Alt + '-'){ case TS(rest, b, c, _) => wrap(redo(b, c), rest) }
+    action(Ctrl('-')) { case TS(rest, b, c, _) => wrap(undo(b, c), rest) },
+    action(SpecialKeys.Alt + 'r') {
+      case TS(rest, b, c, _) => wrap(undo(b, c), rest)
+    },
+    action(SpecialKeys.Alt + '-') {
+      case TS(rest, b, c, _) => wrap(redo(b, c), rest)
+    }
   )
 }
 
-
 sealed class UndoState(override val toString: String)
-object UndoState extends Enum{
+object UndoState extends Enum {
   val Default, Typing, Deleting, Navigating = Item(new UndoState(_))
 }
 
-object UndoFilter{
-  val undoMsg = fansi.Color.Blue(" ...undoing last action, `Alt -` or `Esc -` to redo")
+object UndoFilter {
+  val undoMsg =
+    fansi.Color.Blue(" ...undoing last action, `Alt -` or `Esc -` to redo")
   val cannotUndoMsg = fansi.Color.Blue(" ...no more actions to undo")
   val redoMsg = fansi.Color.Blue(" ...redoing last action")
   val cannotRedoMsg = fansi.Color.Blue(" ...no more actions to redo")

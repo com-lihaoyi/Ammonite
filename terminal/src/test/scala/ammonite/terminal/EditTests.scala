@@ -3,10 +3,9 @@ package ammonite.terminal
 import ammonite.terminal.filters.ReadlineFilters
 import utest._
 
+object EditTests extends TestSuite {
 
-object EditTests extends TestSuite{
-
-  val tests = TestSuite{
+  val tests = TestSuite {
     val check = Checker(
       width = 5,
       grid = """
@@ -17,7 +16,7 @@ object EditTests extends TestSuite{
     )
 
     import check._
-    'cutting{
+    'cutting {
 
       * - check(
         """
@@ -68,7 +67,7 @@ object EditTests extends TestSuite{
         wordLeft
       )
 
-      * - check (
+      * - check(
         """
         abcd
         _fgh
@@ -76,8 +75,8 @@ object EditTests extends TestSuite{
         """,
         edit.cutCharLeft
       )
-      
-      * - check (
+
+      * - check(
         """
         abc_fgh
         ijkl
@@ -87,7 +86,7 @@ object EditTests extends TestSuite{
         edit.cutCharLeft
       )
     }
-    'pasting{
+    'pasting {
 
       * - check(
         """
@@ -129,8 +128,8 @@ object EditTests extends TestSuite{
         edit.paste,
         edit.paste
       )
-      
-      * - check (
+
+      * - check(
         """
         abcd
         fgh_
@@ -141,7 +140,7 @@ object EditTests extends TestSuite{
         edit.paste
       )
     }
-    'transpose{
+    'transpose {
       val check = Checker(
         width = 7,
         """
@@ -152,17 +151,17 @@ object EditTests extends TestSuite{
           tuvwxyz
         """
       )
-      'words{
+      'words {
         // Trying to transpose something at the start of the input does nothing
         'start - Checker(width = 20, "_abc  defg    hijkl")
           .run(ReadlineFilters.transposeWord)
           .check("_abc  defg    hijkl")
-          .run((b, c) => (b, c+2))
+          .run((b, c) => (b, c + 2))
           // even if not at the start, but in the first word, still do nothing
           .check("ab_c  defg    hijkl")
           .run(ReadlineFilters.transposeWord)
           .check("ab_c  defg    hijkl")
-          .run((b, c) => (b, c+1))
+          .run((b, c) => (b, c + 1))
           .check("abc_  defg    hijkl")
           // only at end of first word do we start transposing
           .run(ReadlineFilters.transposeWord)
@@ -183,7 +182,7 @@ object EditTests extends TestSuite{
           .run(ReadlineFilters.transposeWord)
           .check("defg  hijkl    abc_")
       }
-      'letter{
+      'letter {
         // Trying to transpose something at the start of the input does nothing
         'start - Checker(width = 20, "_abcd")
           .run(ReadlineFilters.transposeLetter)
@@ -204,7 +203,7 @@ object EditTests extends TestSuite{
           .check("bcda_")
 
         'middling - check
-          // single movement
+        // single movement
           .run(ReadlineFilters.transposeLetter)
           .check("""
             abcdefg\
@@ -214,11 +213,10 @@ object EditTests extends TestSuite{
             tuvwxyz
           """)
           .run( // move more
-            ReadlineFilters.transposeLetter,
-            ReadlineFilters.transposeLetter,
-            ReadlineFilters.transposeLetter,
-            ReadlineFilters.transposeLetter
-          )
+               ReadlineFilters.transposeLetter,
+               ReadlineFilters.transposeLetter,
+               ReadlineFilters.transposeLetter,
+               ReadlineFilters.transposeLetter)
           .check("""
             abcdefg\
             hijk

@@ -1,6 +1,5 @@
 package ammonite.runtime
 
-
 import acyclic.file
 import ammonite.util.{ImportData, Imports, Printer}
 import ammonite.util.Util.newLine
@@ -19,19 +18,18 @@ import scala.tools.nsc.util.ClassPath.JavaContext
 import scala.tools.nsc.util._
 import scala.util.Try
 
-
 /**
- * Encapsulates (almost) all the ickiness of Scalac so it doesn't leak into
- * the rest of the codebase. Makes use of a good amount of mutable state
- * for things like the log-output-forwarder or compiler-plugin-output because
- * These things are hard-coded into Scalac and can't be passed in from run to
- * run.
- *
- * Turns source-strings into the bytes of classfiles, possibly more than one
- * classfile per source-string (e.g. inner classes, or lambdas). Also lets
- * you query source strings using an in-built presentation compiler
- */
-trait Compiler{
+  * Encapsulates (almost) all the ickiness of Scalac so it doesn't leak into
+  * the rest of the codebase. Makes use of a good amount of mutable state
+  * for things like the log-output-forwarder or compiler-plugin-output because
+  * These things are hard-coded into Scalac and can't be passed in from run to
+  * run.
+  *
+  * Turns source-strings into the bytes of classfiles, possibly more than one
+  * classfile per source-string (e.g. inner classes, or lambdas). Also lets
+  * you query source strings using an in-built presentation compiler
+  */
+trait Compiler {
   def compiler: nsc.Global
   def compile(src: Array[Byte],
               printer: Printer,
@@ -39,23 +37,25 @@ trait Compiler{
               fileName: String): Compiler.Output
 
   def search(name: scala.reflect.runtime.universe.Type): Option[String]
+
   /**
-   * Either the statements that were parsed or the error message
-   */
+    * Either the statements that were parsed or the error message
+    */
   def parse(line: String): Either[String, Seq[Global#Tree]]
   var importsLen = 0
 
 }
-object Compiler{
+object Compiler {
+
   /**
-   * If the Option is None, it means compilation failed
-   * Otherwise it's a Traversable of (filename, bytes) tuples
-   */
+    * If the Option is None, it means compilation failed
+    * Otherwise it's a Traversable of (filename, bytes) tuples
+    */
   type Output = Option[(Vector[(String, Array[Byte])], Imports)]
 
   /**
-   * Converts a bunch of bytes into Scalac's weird VirtualFile class
-   */
+    * Converts a bunch of bytes into Scalac's weird VirtualFile class
+    */
   def makeFile(src: Array[Byte], name: String = "Main.sc") = {
     val singleFile = new io.VirtualFile(name)
     val output = singleFile.output
@@ -65,9 +65,9 @@ object Compiler{
   }
 
   /**
-   * Converts Scalac's weird Future type
-   * into a standard scala.concurrent.Future
-   */
+    * Converts Scalac's weird Future type
+    * into a standard scala.concurrent.Future
+    */
   def awaitResponse[T](func: Response[T] => Unit): T = {
     val r = new Response[T]
     func(r)
@@ -78,10 +78,10 @@ object Compiler{
   }
 
   /**
-   * Code to initialize random bits and pieces that are needed
-   * for the Scala compiler to function, common between the
-   * normal and presentation compiler
-   */
+    * Code to initialize random bits and pieces that are needed
+    * for the Scala compiler to function, common between the
+    * normal and presentation compiler
+    */
   def initGlobalBits(classpath: Seq[java.io.File],
                      dynamicClasspath: VirtualDirectory,
                      errorLogger: => String => Unit,
@@ -94,12 +94,15 @@ object Compiler{
     val (dirDeps, jarDeps) = classpath.partition(_.isDirectory)
 
     val jarCP =
-      jarDeps.filter(x => x.getName.endsWith(".jar") || Classpath.canBeOpenedAsJar(x))
-             .map(x => new DirectoryClassPath(new FileZipArchive(x), jCtx))
-             .toVector
+      jarDeps
+        .filter(x =>
+          x.getName.endsWith(".jar") || Classpath.canBeOpenedAsJar(x))
+        .map(x => new DirectoryClassPath(new FileZipArchive(x), jCtx))
+        .toVector
 
     val dirCP =
-      dirDeps.map(x => new DirectoryClassPath(new PlainDirectory(new Directory(x)), jCtx))
+      dirDeps.map(x =>
+        new DirectoryClassPath(new PlainDirectory(new Directory(x)), jCtx))
 
     val dynamicCP = Seq(new DirectoryClassPath(dynamicClasspath, jCtx))
     val jcp = new JavaClassPath(jarCP ++ dirCP ++ dynamicCP, jCtx)
@@ -118,7 +121,7 @@ object Compiler{
       def displayPrompt(): Unit = ???
 
       def display(pos: Position, msg: String, severity: Severity) = {
-        severity match{
+        severity match {
           case ERROR =>
             Classpath.traceClasspathProblem(s"ERROR: $msg")
             errorLogger(Position.formatMessage(pos, msg, false))
@@ -134,25 +137,19 @@ object Compiler{
     (reporter, vd, jcp)
   }
 
-
-
-
   def apply(classpath: Seq[java.io.File],
             dynamicClasspath: VirtualDirectory,
             evalClassloader: => ClassLoader,
             pluginClassloader: => ClassLoader,
             shutdownPressy: () => Unit,
-            settings: Settings): Compiler = new Compiler{
+            settings: Settings): Compiler = new Compiler {
 
     val PluginXML = "scalac-plugin.xml"
     lazy val plugins0 = {
       import scala.collection.JavaConverters._
       val loader = pluginClassloader
 
-      val urls = loader
-        .getResources(PluginXML)
-        .asScala
-        .toVector
+      val urls = loader.getResources(PluginXML).asScala.toVector
 
       val plugins = for {
         url <- urls
@@ -163,18 +160,20 @@ object Compiler{
         // pretty useless and can cause problems conflicting with other plugins
         if className != "acyclic.plugin.RuntimePlugin"
         if name.nonEmpty && className.nonEmpty
-        classOpt =
-          try Some(loader.loadClass(className))
-          catch { case _: ClassNotFoundException => None }
+        classOpt = try Some(loader.loadClass(className))
+        catch { case _: ClassNotFoundException => None }
       } yield (name, className, classOpt)
 
-      val notFound = plugins.collect{case (name, className, None) => (name, className) }
+      val notFound = plugins.collect {
+        case (name, className, None) => (name, className)
+      }
       if (notFound.nonEmpty) {
         for ((name, className) <- notFound.sortBy(_._1))
-          Console.err.println(s"Implementation $className of plugin $name not found.")
+          Console.err.println(
+            s"Implementation $className of plugin $name not found.")
       }
 
-      plugins.collect{case (name, _, Some(cls)) => name -> cls }
+      plugins.collect { case (name, _, Some(cls)) => name -> cls }
     }
 
     var errorLogger: String => Unit = s => ()
@@ -185,30 +184,39 @@ object Compiler{
 
     val (vd, reporter, compiler) = {
       val (reporter, vd, jcp) = initGlobalBits(
-        classpath, dynamicClasspath, errorLogger, warningLogger, infoLogger, settings
+        classpath,
+        dynamicClasspath,
+        errorLogger,
+        warningLogger,
+        infoLogger,
+        settings
       )
       val scalac = new nsc.Global(settings, reporter) { g =>
-        override lazy val plugins = List(new AmmonitePlugin(g, lastImports = _, importsLen)) ++ {
+        override lazy val plugins = List(
+            new AmmonitePlugin(g, lastImports = _, importsLen)) ++ {
           for {
             (name, cls) <- plugins0
             plugin = Plugin.instantiate(cls, g)
-            initOk =
-              try CompilerCompatibility.pluginInit(plugin, Nil, g.globalError)
-              catch { case ex: Exception =>
-                Console.err.println(s"Warning: disabling plugin $name, initialization failed: $ex")
+            initOk = try CompilerCompatibility
+              .pluginInit(plugin, Nil, g.globalError)
+            catch {
+              case ex: Exception =>
+                Console.err.println(
+                  s"Warning: disabling plugin $name, initialization failed: $ex")
                 false
-              }
+            }
             if initOk
           } yield plugin
         }
 
         // Actually jcp, avoiding a path-dependent type issue in 2.10 here
         override def classPath = platform.classPath
-        override lazy val platform: ThisPlatform = new JavaPlatform{
+        override lazy val platform: ThisPlatform = new JavaPlatform {
           val global: g.type = g
           override def classPath = jcp
         }
-        override lazy val analyzer = CompilerCompatibility.analyzer(g, evalClassloader)
+        override lazy val analyzer =
+          CompilerCompatibility.analyzer(g, evalClassloader)
       }
       // Initialize scalac to the parser phase immediately, so we can start
       // using Compiler#parse even if we haven't compiled any compilation
@@ -223,7 +231,7 @@ object Compiler{
       def resolve(path: String*): compiler.Symbol = {
         var curr = path.toList
         var start: compiler.Symbol = compiler.RootClass
-        while(curr != Nil){
+        while (curr != Nil) {
           val head :: rest = curr
           start = start.typeSignature.member(compiler.newTermName(head))
           curr = rest
@@ -238,28 +246,28 @@ object Compiler{
       )
       var level = 5
       var found: Option[String] = None
-      while(level > 0){
+      while (level > 0) {
         thingsInScope = for {
           (sym, path) <- thingsInScope
           // No clue why this one blows up
           m <- Try(sym.typeSignature.members).toOption.toSeq.flatten
         } yield (m, m.name :: path)
-        thingsInScope.find(target.typeSymbol.fullName == _._1.fullName).foreach{ path =>
-          level = 0
-          found = Some(path._2.mkString("."))
-        }
+        thingsInScope
+          .find(target.typeSymbol.fullName == _._1.fullName)
+          .foreach { path =>
+            level = 0
+            found = Some(path._2.mkString("."))
+          }
       }
       found
     }
 
-
-
     /**
-     * Compiles a blob of bytes and spits of a list of classfiles
+      * Compiles a blob of bytes and spits of a list of classfiles
       * importsLen0 is the length of topWrapper appended above code by wrappedCode function
       * It is passed to AmmonitePlugin to decrease this much offset from each AST node
       * corresponding to the actual code so as to correct the line numbers in error report
-     */
+      */
     def compile(src: Array[Byte],
                 printer: Printer,
                 importsLen0: Int,
@@ -267,10 +275,10 @@ object Compiler{
 
       def enumerateVdFiles(d: VirtualDirectory): Iterator[AbstractFile] = {
         val (subs, files) = d.iterator.partition(_.isDirectory)
-        files ++ subs.map(_.asInstanceOf[VirtualDirectory]).flatMap(enumerateVdFiles)
+        files ++ subs
+          .map(_.asInstanceOf[VirtualDirectory])
+          .flatMap(enumerateVdFiles)
       }
-
-
 
       compiler.reporter.reset()
       this.errorLogger = printer.error
@@ -290,20 +298,23 @@ object Compiler{
 
         shutdownPressy()
 
-        val files = for(x <- outputFiles if x.name.endsWith(".class")) yield {
+        val files = for (x <- outputFiles if x.name.endsWith(".class")) yield {
           val segments = x.path.split("/").toList.tail
           val output = Evaluator.writeDeep(dynamicClasspath, segments, "")
           output.write(x.toByteArray)
           output.close()
-          (x.path.stripPrefix("(memory)/").stripSuffix(".class").replace('/', '.'), x.toByteArray)
+          (x.path
+             .stripPrefix("(memory)/")
+             .stripSuffix(".class")
+             .replace('/', '.'),
+           x.toByteArray)
         }
 
         val imports = lastImports.toList
-        Some( (files, Imports(imports)) )
+        Some((files, Imports(imports)))
 
       }
     }
-
 
     def parse(line: String): Either[String, Seq[Global#Tree]] = {
       val errors = mutable.Buffer.empty[String]

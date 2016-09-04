@@ -1,6 +1,5 @@
 package ammonite.repl
 
-
 import ammonite.runtime.tools.Resolver
 import ammonite.util.{Bind, CodeColors, Colors, Ref}
 import ammonite.util.Util.newLine
@@ -14,32 +13,32 @@ import ammonite.runtime.{APIHolder, Frame, History, ReplExit}
 import scala.util.control.ControlThrowable
 import acyclic.file
 
-
-
 trait ReplAPI {
+
   /**
-   * Exit the Ammonite REPL. You can also use Ctrl-D to exit
-   */
+    * Exit the Ammonite REPL. You can also use Ctrl-D to exit
+    */
   def exit = throw ReplExit(())
+
   /**
-   * Exit the Ammonite REPL. You can also use Ctrl-D to exit
-   */
+    * Exit the Ammonite REPL. You can also use Ctrl-D to exit
+    */
   def exit(value: Any) = throw ReplExit(value)
 
+  /**
+    * Read/writable prompt for the shell. Use this to change the
+    * REPL prompt at any time!
+    */
+  val prompt: Ref[String]
 
   /**
-   * Read/writable prompt for the shell. Use this to change the
-   * REPL prompt at any time!
-   */
-  val prompt: Ref[String]
-  /**
-   * The front-end REPL used to take user input. Modifiable!
-   */
+    * The front-end REPL used to take user input. Modifiable!
+    */
   val frontEnd: Ref[FrontEnd]
 
   /**
-   * Display help text if you don't know how to use the REPL
-   */
+    * Display help text if you don't know how to use the REPL
+    */
   def help: String
 
   /**
@@ -51,54 +50,56 @@ trait ReplAPI {
     * when a Ctrl-C interrupt happened) via `lastException.printStackTrace`.
     */
   def lastException: Throwable
+
   /**
-   * History of commands that have been entered into the shell, including
-   * previous sessions
-   */
+    * History of commands that have been entered into the shell, including
+    * previous sessions
+    */
   def fullHistory: History
 
   /**
-   * History of commands that have been entered into the shell during the
-   * current session
-   */
+    * History of commands that have been entered into the shell during the
+    * current session
+    */
   def history: History
 
   /**
-   * Get the `Type` object of [[T]]. Useful for finding
-   * what its methods are and what you can do with it
-   */
+    * Get the `Type` object of [[T]]. Useful for finding
+    * what its methods are and what you can do with it
+    */
   def typeOf[T: WeakTypeTag]: Type
 
   /**
-   * Get the `Type` object representing the type of `t`. Useful
-   * for finding what its methods are and what you can do with it
-   *
-   */
+    * Get the `Type` object representing the type of `t`. Useful
+    * for finding what its methods are and what you can do with it
+    *
+    */
   def typeOf[T: WeakTypeTag](t: => T): Type
 
   /**
-   * The colors that will be used to render the Ammonite REPL in the terminal
-   */
+    * The colors that will be used to render the Ammonite REPL in the terminal
+    */
   val colors: Ref[Colors]
 
   /**
-   * Throw away the current scala.tools.nsc.Global and get a new one
-   */
+    * Throw away the current scala.tools.nsc.Global and get a new one
+    */
   def newCompiler(): Unit
 
   /**
-   * Access the compiler to do crazy things if you really want to!
-   */
+    * Access the compiler to do crazy things if you really want to!
+    */
   def compiler: scala.tools.nsc.Global
 
   /**
-   * Show all the imports that are used to execute commands going forward
-   */
+    * Show all the imports that are used to execute commands going forward
+    */
   def imports: String
+
   /**
-   * Controls how things are pretty-printed in the REPL. Feel free
-   * to shadow this with your own definition to change how things look
-   */
+    * Controls how things are pretty-printed in the REPL. Feel free
+    * to shadow this with your own definition to change how things look
+    */
   implicit val pprintConfig: Ref[pprint.Config]
 
   implicit def derefPPrint(implicit t: Ref[pprint.Config]): pprint.Config = t()
@@ -106,27 +107,30 @@ trait ReplAPI {
   implicit def tprintColors: pprint.TPrintColors
 
   implicit def codeColors: CodeColors
+
   /**
-   * Current width of the terminal
-   */
+    * Current width of the terminal
+    */
   def width: Int
+
   /**
-   * Current height of the terminal
-   */
+    * Current height of the terminal
+    */
   def height: Int
 
   /**
-   * Lets you configure the pretty-printing of a value. By default, it simply
-   * disables truncation and prints the entire thing, but you can set other
-   * parameters as well if you want.
-   */
+    * Lets you configure the pretty-printing of a value. By default, it simply
+    * disables truncation and prints the entire thing, but you can set other
+    * parameters as well if you want.
+    */
   def show[T: PPrint](implicit cfg: Config): T => Unit
   def show[T: PPrint](t: T,
                       width: Integer = 0,
                       height: Integer = null,
                       indent: Integer = null,
-                      colors: pprint.Colors = null)
-                     (implicit cfg: Config = Config.Defaults.PPrintConfig): Unit
+                      colors: pprint.Colors = null)(
+      implicit cfg: Config = Config.Defaults.PPrintConfig): Unit
+
   /**
     * Functions that can be used to manipulate the current REPL session:
     * check-pointing progress, reverting to earlier checkpoints, or deleting
@@ -144,11 +148,13 @@ trait ReplAPI {
     */
   def sess: Session
 }
-trait Session{
+trait Session {
+
   /**
     * The current stack of frames
     */
   def frames: List[Frame]
+
   /**
     * Checkpoints your current work, placing all future work into its own
     * frames. If a name is provided, it can be used to quickly recover
@@ -168,6 +174,7 @@ trait Session{
     * you to that many savepoints since the last one.
     */
   def pop(num: Int = 1): SessionChanged
+
   /**
     * Deletes a named checkpoint, allowing it to be garbage collected if it
     * is no longer accessible.
@@ -177,33 +184,35 @@ trait Session{
 
 // End of ReplAPI
 /**
- * Things that are part of the ReplAPI that aren't really "public"
- */
-abstract class FullReplAPI extends ReplAPI{
+  * Things that are part of the ReplAPI that aren't really "public"
+  */
+abstract class FullReplAPI extends ReplAPI {
 
   val Internal: Internal
-  trait Internal{
+  trait Internal {
     def combinePrints(iters: Iterator[String]*): Iterator[String]
 
     /**
-     * Kind of an odd signature, splitting out [[T]] and [[V]]. This is
-     * seemingly useless but necessary because when you add both [[pprint.TPrint]]
-     * and [[PPrint]] context bounds to the same type, Scala's type inference
-     * gets confused and does the wrong thing
-     */
-    def print[T: pprint.TPrint: WeakTypeTag, V: PPrint]
-             (value: => T, value2: => V, ident: String, custom: Option[String])
-             (implicit cfg: Config, tcolors: pprint.TPrintColors): Iterator[String]
+      * Kind of an odd signature, splitting out [[T]] and [[V]]. This is
+      * seemingly useless but necessary because when you add both [[pprint.TPrint]]
+      * and [[PPrint]] context bounds to the same type, Scala's type inference
+      * gets confused and does the wrong thing
+      */
+    def print[T: pprint.TPrint: WeakTypeTag, V: PPrint](
+        value: => T,
+        value2: => V,
+        ident: String,
+        custom: Option[String])(implicit cfg: Config,
+                                tcolors: pprint.TPrintColors): Iterator[String]
 
     def printDef(definitionLabel: String, ident: String): Iterator[String]
     def printImport(imported: String): Iterator[String]
   }
   def typeOf[T: WeakTypeTag] = scala.reflect.runtime.universe.weakTypeOf[T]
-  def typeOf[T: WeakTypeTag](t: => T) = scala.reflect.runtime.universe.weakTypeOf[T]
+  def typeOf[T: WeakTypeTag](t: => T) =
+    scala.reflect.runtime.universe.weakTypeOf[T]
   def replArgs: Vector[Bind[_]]
 }
-
-
 
 trait DefaultReplAPI extends FullReplAPI {
 
@@ -216,20 +225,20 @@ trait DefaultReplAPI extends FullReplAPI {
       |For a list of REPL built-ins and configuration, use `repl.<tab>`. For a more detailed
       |description of how to use the REPL, check out https://lihaoyi.github.io/Ammonite
     """.stripMargin.trim
-  object Internal extends Internal{
+  object Internal extends Internal {
     def combinePrints(iters: Iterator[String]*) = {
       iters.toIterator
-           .filter(_.nonEmpty)
-           .flatMap(Iterator(newLine) ++ _)
-           .drop(1)
+        .filter(_.nonEmpty)
+        .flatMap(Iterator(newLine) ++ _)
+        .drop(1)
     }
 
-    def print[T: pprint.TPrint: WeakTypeTag, V: PPrint](value: => T,
-                                                 value2: => V,
-                                                 ident: String,
-                                                 custom: Option[String])
-                                                (implicit cfg: pprint.Config,
-                                                 tcolors: pprint.TPrintColors) = {
+    def print[T: pprint.TPrint: WeakTypeTag, V: PPrint](
+        value: => T,
+        value2: => V,
+        ident: String,
+        custom: Option[String])(implicit cfg: pprint.Config,
+                                tcolors: pprint.TPrintColors) = {
       if (typeOf[T] =:= typeOf[Unit]) Iterator()
       else {
         val implicitPPrint = implicitly[PPrint[V]]
@@ -238,19 +247,24 @@ trait DefaultReplAPI extends FullReplAPI {
           case Some(s) => Iterator(cfg.colors.literalColor(s).render)
         }
         Iterator(
-          colors().ident()(ident).render, ": ",
-          implicitly[pprint.TPrint[T]].render(tcolors), " = "
+          colors().ident()(ident).render,
+          ": ",
+          implicitly[pprint.TPrint[T]].render(tcolors),
+          " = "
         ) ++ rhs
       }
     }
     def printDef(definitionLabel: String, ident: String) = {
       Iterator(
-        "defined ", colors().`type`()(definitionLabel).render, " ",
+        "defined ",
+        colors().`type`()(definitionLabel).render,
+        " ",
         colors().ident()(ident).render
       )
     }
     def printImport(imported: String) = {
-      Iterator(colors().`type`()("import ").render, colors().ident()(imported).render)
+      Iterator(colors().`type`()("import ").render,
+               colors().ident()(imported).render)
     }
   }
 }
@@ -260,14 +274,15 @@ case class SessionChanged(removedImports: Set[scala.Symbol],
                           addedImports: Set[scala.Symbol],
                           removedJars: Set[java.net.URL],
                           addedJars: Set[java.net.URL])
-object SessionChanged{
-  implicit val pprinter: PPrinter[SessionChanged] = PPrinter[SessionChanged]{
+object SessionChanged {
+  implicit val pprinter: PPrinter[SessionChanged] = PPrinter[SessionChanged] {
     (data, config) =>
       val output = mutable.Buffer.empty[String]
       def printDelta[T: PPrint](name: String, d: Iterable[T]) = {
-        if (d.nonEmpty){
-          Iterator(newLine, name, ": ") ++ pprint.tokenize(d)(implicitly, config)
-        }else Iterator()
+        if (d.nonEmpty) {
+          Iterator(newLine, name, ": ") ++ pprint.tokenize(d)(implicitly,
+                                                              config)
+        } else Iterator()
       }
       val res = Iterator(
         printDelta("Removed Imports", data.removedImports),
@@ -278,7 +293,8 @@ object SessionChanged{
       res.flatten
   }
   def delta(oldFrame: Frame, newFrame: Frame): SessionChanged = {
-    def frameSymbols(f: Frame) = f.imports.value.map(_.toName.backticked).map(Symbol(_)).toSet
+    def frameSymbols(f: Frame) =
+      f.imports.value.map(_.toName.backticked).map(Symbol(_)).toSet
     new SessionChanged(
       frameSymbols(oldFrame) -- frameSymbols(newFrame),
       frameSymbols(newFrame) -- frameSymbols(oldFrame),

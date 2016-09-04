@@ -10,19 +10,18 @@ import utest._
   * Make sure that if we run Scala scripts using the Ammonite executable, and
   * they, fail with "expected" failure modes, don't show useless stack traces
   * and just show what the user did wrong
- */
-object ErrorTruncationTests extends TestSuite{
+  */
+object ErrorTruncationTests extends TestSuite {
   override def utestTruncateLength = 60000
 
   def checkErrorMessage(file: RelPath, expected: String) = {
-    val e = fansi.Str(
-      Util.normalizeNewlines(
-        intercept[ShelloutException]{ exec(file) }
-          .result
-          .err
-          .string
+    val e = fansi
+      .Str(
+        Util.normalizeNewlines(
+          intercept[ShelloutException] { exec(file) }.result.err.string
+        )
       )
-    ).plainText
+      .plainText
     //This string gets included on windows due to environment variable set additionally
 
     assert(e == expected)
@@ -30,7 +29,7 @@ object ErrorTruncationTests extends TestSuite{
   val tests = TestSuite {
     println("ErrorTruncationTests")
     'compileError - checkErrorMessage(
-      file = 'errorTruncation/"compileError.sc",
+      file = 'errorTruncation / "compileError.sc",
       expected = Util.normalizeNewlines(
         """compileError.sc:1: not found: value doesntexist
           |val res = doesntexist
@@ -40,7 +39,7 @@ object ErrorTruncationTests extends TestSuite{
       )
     )
     'multiExpressionError - checkErrorMessage(
-      file = 'errorTruncation/"compileErrorMultiExpr.sc",
+      file = 'errorTruncation / "compileErrorMultiExpr.sc",
       expected = Util.normalizeNewlines(
         """compileErrorMultiExpr.sc:11: not found: value doesntexist
           |val res_4 = doesntexist
@@ -51,9 +50,9 @@ object ErrorTruncationTests extends TestSuite{
     )
 
     'parseError - {
-      if(!Util.windowsPlatform){
+      if (!Util.windowsPlatform) {
         checkErrorMessage(
-          file = 'errorTruncation/"parseError.sc",
+          file = 'errorTruncation / "parseError.sc",
           expected = Util.normalizeNewlines(
             """Syntax Error: End:1:1 ..."}\n"
               |}
@@ -67,7 +66,7 @@ object ErrorTruncationTests extends TestSuite{
     val runtimeErrorResourcePackage =
       "$file.integration.src.test.resources.ammonite.integration.errorTruncation"
     'runtimeError - checkErrorMessage(
-      file = 'errorTruncation/"runtimeError.sc",
+      file = 'errorTruncation / "runtimeError.sc",
       expected = Util.normalizeNewlines(
         s"""Exception in thread "main" java.lang.ArithmeticException: / by zero
           |${tab}at $runtimeErrorResourcePackage.runtimeError$$.<init>(runtimeError.sc:1)

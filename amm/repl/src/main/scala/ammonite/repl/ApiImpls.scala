@@ -10,7 +10,7 @@ import pprint.{Config, PPrint}
 
 import scala.collection.mutable
 
-class SessionApiImpl(eval: Evaluator) extends Session{
+class SessionApiImpl(eval: Evaluator) extends Session {
   val namedFrames = mutable.Map.empty[String, List[Frame]]
   def frames = eval.frames
   def childFrame(parent: Frame) = new Frame(
@@ -33,7 +33,7 @@ class SessionApiImpl(eval: Evaluator) extends Session{
 
   def pop(num: Int = 1) = {
     var next = eval.frames
-    for(i <- 0 until num){
+    for (i <- 0 until num) {
       if (next.tail != Nil) next = next.tail
     }
     val out = SessionChanged.delta(eval.frames.head, next.head)
@@ -60,7 +60,8 @@ class ReplApiImpl(val interp: Interpreter,
                   frontEnd0: Ref[FrontEnd],
                   history0: => History,
                   sess0: Session,
-                  replArgs0: Seq[Bind[_]]) extends DefaultReplAPI{
+                  replArgs0: Seq[Bind[_]])
+    extends DefaultReplAPI {
   import interp._
 
   def lastException = interp.lastException
@@ -73,7 +74,7 @@ class ReplApiImpl(val interp: Interpreter,
   implicit def tprintColors = pprint.TPrintColors(
     typeColor = colors().`type`()
   )
-  implicit val codeColors = new CodeColors{
+  implicit val codeColors = new CodeColors {
     def comment = colors().comment()
     def `type` = colors().`type`()
     def literal = colors().literal()
@@ -81,32 +82,34 @@ class ReplApiImpl(val interp: Interpreter,
     def ident = colors().ident()
   }
   implicit lazy val pprintConfig: Ref[pprint.Config] = {
-    Ref.live[pprint.Config]( () =>
-      pprint.Config.apply(
-        width = width,
-        height = height / 2,
-        colors = pprint.Colors(
-          colors().literal(),
-          colors().prefix()
-        )
-      )
-    )
+    Ref.live[pprint.Config](
+      () =>
+        pprint.Config.apply(
+          width = width,
+          height = height / 2,
+          colors = pprint.Colors(
+            colors().literal(),
+            colors().prefix()
+          )
+      ))
 
   }
 
   def show[T: PPrint](implicit cfg: Config) = (t: T) => {
-    pprint.tokenize(t, height = 0)(implicitly[PPrint[T]], cfg).foreach(printer.out)
+    pprint
+      .tokenize(t, height = 0)(implicitly[PPrint[T]], cfg)
+      .foreach(printer.out)
     printer.out(newLine)
   }
   def show[T: PPrint](t: T,
                       width: Integer = null,
                       height: Integer = 0,
                       indent: Integer = null,
-                      colors: pprint.Colors = null)
-                     (implicit cfg: Config = Config.Defaults.PPrintConfig) = {
+                      colors: pprint.Colors = null)(
+      implicit cfg: Config = Config.Defaults.PPrintConfig) = {
 
-
-    pprint.tokenize(t, width, height, indent, colors)(implicitly[PPrint[T]], cfg)
+    pprint
+      .tokenize(t, width, height, indent, colors)(implicitly[PPrint[T]], cfg)
       .foreach(printer.out)
     printer.out(newLine)
   }
@@ -118,7 +121,6 @@ class ReplApiImpl(val interp: Interpreter,
   def newCompiler() = init()
   def fullHistory = storage.fullHistory()
   def history = history0
-
 
   def width = width0
   def replArgs = replArgs0.toVector

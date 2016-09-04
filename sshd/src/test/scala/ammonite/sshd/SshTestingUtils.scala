@@ -16,38 +16,41 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 object SshTestingUtils {
   def alphaNumStr = Gen.listOf(Gen.alphaNumChar).map(_.mkString)
-  def nonEmptyAlphaNumStr = Gen.nonEmptyListOf(Gen.alphaNumChar).map(_.mkString)
+  def nonEmptyAlphaNumStr =
+    Gen.nonEmptyListOf(Gen.alphaNumChar).map(_.mkString)
 
   lazy val testUsername = "test"
   lazy val testPassword = Random.alphanumeric.take(10).mkString
   lazy val testUser = (testUsername, testPassword)
 
-  def genCreds = for {
-    login ← nonEmptyAlphaNumStr
-    password ← alphaNumStr
-  } yield (login, password)
+  def genCreds =
+    for {
+      login ← nonEmptyAlphaNumStr
+      password ← alphaNumStr
+    } yield (login, password)
 
-  def genCredsPair = for {
-    creds1 ← genCreds
-    creds2 ← genCreds
-  } yield (creds1, creds2)
+  def genCredsPair =
+    for {
+      creds1 ← genCreds
+      creds2 ← genCreds
+    } yield (creds1, creds2)
 
   def nonShellChannel = Gen.alphaStr.suchThat(_ != "shell")
 
-  def genNonMatchingCredsPair = genCredsPair.suchThat(pair => pair._1 != pair._2)
+  def genNonMatchingCredsPair =
+    genCredsPair.suchThat(pair => pair._1 != pair._2)
 
-
-  def withTmpDirectory[T](block: Path => T):T = {
+  def withTmpDirectory[T](block: Path => T): T = {
     lazy val tmpDir = tmp.dir()
     try {
       block(tmpDir)
     } finally {
-      rm! tmpDir
+      rm ! tmpDir
     }
   }
 
-  def testSshServer(user: (String, String), shell: ShellSession.Server)
-                   (implicit dir: Path) = {
+  def testSshServer(user: (String, String), shell: ShellSession.Server)(
+      implicit dir: Path) = {
     def config = SshServerConfig(
       "localhost",
       port = 0,
@@ -58,9 +61,9 @@ object SshTestingUtils {
     SshServer(config, shell)
   }
 
-  def withTestSshServer[T](user: (String, String), testShell: () => Any = () => ???)
-                          (test: org.apache.sshd.SshServer => T)
-                          (implicit dir: Path): T = {
+  def withTestSshServer[T](user: (String, String),
+                           testShell: () => Any = () => ???)(
+      test: org.apache.sshd.SshServer => T)(implicit dir: Path): T = {
     val server = testSshServer(user, (_, _) => testShell.apply())
     server.start()
     try {
@@ -70,8 +73,11 @@ object SshTestingUtils {
     }
   }
 
-  def sshClient(creds: (String, String), sshServer: org.apache.sshd.SshServer): Session = {
-    sshClient(creds, Option(sshServer.getHost).getOrElse("localhost"), sshServer.getPort)
+  def sshClient(creds: (String, String),
+                sshServer: org.apache.sshd.SshServer): Session = {
+    sshClient(creds,
+              Option(sshServer.getHost).getOrElse("localhost"),
+              sshServer.getPort)
   }
 
   def sshClient(creds: (String, String), host: String, port: Int): Session = {
@@ -92,9 +98,8 @@ object SshTestingUtils {
     override def getPassphrase: String = ???
   }
 
-
   /* helper class for imitating user working with ssh shell session channel */
-  class Shell private(shell: Channel) {
+  class Shell private (shell: Channel) {
     def this(sshClient: Session) = this(sshClient.openChannel("shell"))
 
     val input = {
@@ -149,16 +154,18 @@ object SshTestingUtils {
       def currentTime = System.currentTimeMillis()
       val startTime = currentTime
       def elapsedTime = (currentTime - startTime).millis
-      @tailrec def awaitImpl():Unit = if (elapsedTime < duration) {
-        if (isConnected) {
-          Thread.sleep(100)
-          awaitImpl()
+      @tailrec def awaitImpl(): Unit =
+        if (elapsedTime < duration) {
+          if (isConnected) {
+            Thread.sleep(100)
+            awaitImpl()
+          } else {
+            /* exit loop */
+          }
         } else {
-          /* exit loop */
+          throw new TimeoutException(
+            "Timed out while waiting for channel to disconnect")
         }
-      } else {
-        throw new TimeoutException("Timed out while waiting for channel to disconnect")
-      }
       awaitImpl()
     }
   }

@@ -6,8 +6,6 @@
 //   val tests = TestSuite{
 //     println("EulerTests")
 //     val check = new TestRepl()
-
-
 //     // Taken from https://pavelfatin.com/scala-for-project-euler/
 //     // Thanks Pavel!
 //     'p1{
@@ -387,8 +385,6 @@
 //         res3: Int = 21124
 //       """)
 //     }
-
-
 //     'p18 {
 //       // Find the maximum sum travelling from the top of the triangle to the base.*
 //       val data = """75

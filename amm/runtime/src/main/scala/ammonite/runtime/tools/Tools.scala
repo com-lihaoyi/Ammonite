@@ -1,7 +1,7 @@
 /**
- * User-facing tools. Rather specific, and although they could
- * be built upon as part of a larger program, they're
- */
+  * User-facing tools. Rather specific, and although they could
+  * be built upon as part of a larger program, they're
+  */
 package ammonite.runtime.tools
 
 import acyclic.file
@@ -13,12 +13,11 @@ import ammonite.util.Util.newLine
 import scala.collection.{GenTraversableOnce, mutable}
 import scala.util.matching.Regex
 
-
-
-trait Grepper[T]{
-  def apply[V: pprint.PPrint](t: T, s: V)(implicit c: pprint.Config): Option[GrepResult]
+trait Grepper[T] {
+  def apply[V: pprint.PPrint](t: T, s: V)(
+      implicit c: pprint.Config): Option[GrepResult]
 }
-object Grepper{
+object Grepper {
   implicit object Str extends Grepper[String] {
     def apply[V: pprint.PPrint](t: String, s: V)(implicit c: pprint.Config) = {
       Regex.apply(java.util.regex.Pattern.quote(t).r, s)
@@ -38,9 +37,9 @@ object Grepper{
 
 case class GrepResult(spans: Seq[(Int, Int)], text: fansi.Str)
 
-object GrepResult{
+object GrepResult {
   case class Color(highlight: fansi.Attrs, dotDotDotColor: fansi.Attrs)
-  object Color{
+  object Color {
     implicit val defaultColor = Color(
       fansi.Back.Yellow ++ fansi.Color.Blue,
       fansi.Attrs.Empty
@@ -48,7 +47,7 @@ object GrepResult{
   }
 
   implicit def grepResultRepr(implicit highlightColor: Color) =
-    pprint.PPrinter[GrepResult]{ (grepResult, cfg) =>
+    pprint.PPrinter[GrepResult] { (grepResult, cfg) =>
       val outputSnippets = mutable.Buffer.empty[fansi.Str]
       val rangeBuffer = mutable.Buffer.empty[(Int, Int)]
       var remainingSpans = grepResult.spans.toList
@@ -82,7 +81,8 @@ object GrepResult{
 
         val boundaryOffset =
           if (naiveStart < lastEnd) lastEnd - naiveStart
-          else if (naiveEnd > grepResult.text.length) grepResult.text.length - naiveEnd
+          else if (naiveEnd > grepResult.text.length)
+            grepResult.text.length - naiveEnd
           else 0
 
         def cap(min: Int, n: Int, max: Int) =
@@ -100,14 +100,19 @@ object GrepResult{
         val wideEnd = cap(0, shiftedEnd, grepResult.text.length)
 
         val colorRanges =
-          for((rangeStart, rangeEnd) <- rangeBuffer)
-          yield (highlightColor.highlight, rangeStart - wideStart, rangeEnd - wideStart)
+          for ((rangeStart, rangeEnd) <- rangeBuffer)
+            yield
+              (highlightColor.highlight,
+               rangeStart - wideStart,
+               rangeEnd - wideStart)
 
-        val colored = grepResult.text.substring(wideStart, wideEnd).overlayAll(colorRanges)
+        val colored =
+          grepResult.text.substring(wideStart, wideEnd).overlayAll(colorRanges)
 
         val dotDotDot = highlightColor.dotDotDotColor("...")
         val prefix = if (shiftedStart > 0) dotDotDot else fansi.Str("")
-        val suffix = if (shiftedEnd < grepResult.text.length) dotDotDot else fansi.Str("")
+        val suffix =
+          if (shiftedEnd < grepResult.text.length) dotDotDot else fansi.Str("")
 
         outputSnippets.append(prefix ++ colored ++ suffix)
         lastEnd = wideEnd
@@ -118,7 +123,7 @@ object GrepResult{
       // the acceptable width, and when that happens consume all the stored spans
       // to generate a snippet. Generate one more snippet at the end too to use up
       // any un-consumed spans
-      while(remainingSpans.nonEmpty){
+      while (remainingSpans.nonEmpty) {
         val (start, end) = remainingSpans.head
         remainingSpans = remainingSpans.tail
         if (rangeBuffer.nonEmpty && end - rangeBuffer(0)._1 >= width) {
@@ -132,49 +137,44 @@ object GrepResult{
     }
 }
 
-
 /**
- * Lets you filter a list by searching for a matching string or
- * regex within the pretty-printed contents.
- */
+  * Lets you filter a list by searching for a matching string or
+  * regex within the pretty-printed contents.
+  */
 object grep {
-  def apply[T: Grepper, V: pprint.PPrint]
-           (pat: T, str: V)
-           (implicit c: pprint.Config)
-           : Option[GrepResult] = {
+  def apply[T: Grepper, V: pprint.PPrint](pat: T, str: V)(
+      implicit c: pprint.Config): Option[GrepResult] = {
     implicitly[Grepper[T]].apply(pat, str)
   }
 
   /**
-   * Magic implicits used to turn the [T: PPrint](t: T) => Option[T]
-   * into a real T => Option[T] by materializing PPrint[T] for various values of T
-   */
-  object !{
-    implicit def FunkyFunc1[T: pprint.PPrint]
-                           (f: ![_])
-                           (implicit c: pprint.Config)
-                           : T => GenTraversableOnce[GrepResult] = {
+    * Magic implicits used to turn the [T: PPrint](t: T) => Option[T]
+    * into a real T => Option[T] by materializing PPrint[T] for various values of T
+    */
+  object ! {
+    implicit def FunkyFunc1[T: pprint.PPrint](f: ![_])(
+        implicit c: pprint.Config): T => GenTraversableOnce[GrepResult] = {
       f.apply[T]
     }
 
-    implicit def FunkyFunc2[T: pprint.PPrint]
-                           (f: ![_])
-                           (implicit c: pprint.Config)
-                           : T => Boolean = {
-      x => f.apply[T](x).isDefined
+    implicit def FunkyFunc2[T: pprint.PPrint](f: ![_])(
+        implicit c: pprint.Config): T => Boolean = { x =>
+      f.apply[T](x).isDefined
     }
   }
 
-  case class ![T: Grepper](pat: T){
-    def apply[V: pprint.PPrint](str: V)(implicit c: pprint.Config) = grep.this.apply(pat, str)
+  case class ![T: Grepper](pat: T) {
+    def apply[V: pprint.PPrint](str: V)(implicit c: pprint.Config) =
+      grep.this.apply(pat, str)
   }
 }
 
-case class tail(interval: Int, prefix: Int) extends Function[Path, Iterator[String]]{
+case class tail(interval: Int, prefix: Int)
+    extends Function[Path, Iterator[String]] {
   def apply(arg: Path): Iterator[String] = {
     val is = java.nio.file.Files.newInputStream(arg.toNIO)
     val br = new BufferedReader(new InputStreamReader(is))
-    Iterator.continually{
+    Iterator.continually {
       val line = br.readLine()
       if (line == null) Thread.sleep(interval)
       Option(line)
@@ -184,11 +184,12 @@ case class tail(interval: Int, prefix: Int) extends Function[Path, Iterator[Stri
 }
 
 /**
- * Follows a file as it is written, handy e.g. for log files.
- * Returns an iterator which you can then print to standard out
- * or use for other things.
- */
+  * Follows a file as it is written, handy e.g. for log files.
+  * Returns an iterator which you can then print to standard out
+  * or use for other things.
+  */
 object tail extends tail(100, 50)
+
 /**
   * Records how long the given computation takes to run, returning the duration
   * in addition to the return value of that computation
@@ -204,10 +205,9 @@ object time {
   }
 }
 
-
-object browse{
+object browse {
   case class Strings(values: Seq[String])
-  object Strings{
+  object Strings {
     implicit def stringPrefix(s: String) = Strings(Seq(s))
     implicit def stringSeqPrefix(s: Seq[String]) = Strings(s)
   }
@@ -218,9 +218,9 @@ object browse{
                               width: Integer = null,
                               height: Integer = null,
                               indent: Integer = null,
-                              colors: pprint.Colors = null)
-                             (implicit c: pprint.Config,
-                              wd: Path = ammonite.ops.ImplicitWd.implicitCwd) = {
+                              colors: pprint.Colors = null)(
+      implicit c: pprint.Config,
+      wd: Path = ammonite.ops.ImplicitWd.implicitCwd) = {
     %(
       viewer.values,
       tmp(

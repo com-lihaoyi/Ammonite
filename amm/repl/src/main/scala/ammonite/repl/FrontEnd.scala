@@ -13,9 +13,9 @@ import scala.annotation.tailrec
 import scala.tools.nsc.interpreter.JList
 
 /**
- * All the mucky JLine interfacing code
- */
-trait FrontEnd{
+  * All the mucky JLine interfacing code
+  */
+trait FrontEnd {
   def width: Int
   def height: Int
   def action(input: InputStream,
@@ -23,7 +23,8 @@ trait FrontEnd{
              output: OutputStream,
              prompt: String,
              colors: Colors,
-             compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
+             compilerComplete: (Int,
+                                String) => (Int, Seq[String], Seq[String]),
              history: IndexedSeq[String],
              addHistory: String => Unit): Res[(String, Seq[String])]
 }

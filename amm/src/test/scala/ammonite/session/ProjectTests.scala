@@ -6,8 +6,8 @@ import utest._
 
 import scala.collection.{immutable => imm}
 
-object ProjectTests extends TestSuite{
-  val tests = TestSuite{
+object ProjectTests extends TestSuite {
+  val tests = TestSuite {
     println("ProjectTests")
     val check = new TestRepl()
     'load {
@@ -16,8 +16,7 @@ object ProjectTests extends TestSuite{
           retry(3) {
             // ivy or maven central are flaky =/
             val tq = "\"\"\""
-            check.session(
-              s"""
+            check.session(s"""
           @ import scalatags.Text.all._
           error: not found: value scalatags
 
@@ -70,9 +69,10 @@ object ProjectTests extends TestSuite{
         //      """)
         // }
         'resolvers - {
-          retry(2){
+          retry(2) {
             // ivy flakyness...
-            check.session("""
+            check.session(
+              """
               @ import $ivy.`com.ambiata::mundane:1.2.1-20141230225616-50fc792`
               error: IvyResolutionException
 
@@ -94,7 +94,7 @@ object ProjectTests extends TestSuite{
           }
         }
       }
-      'code{
+      'code {
         check.session("""
           @ interp.load("val x = 1")
 
@@ -106,7 +106,9 @@ object ProjectTests extends TestSuite{
 
     'shapeless {
       // Shapeless 2.1.0 isn't published for scala 2.10
-      if (!scala2_10) check.session("""
+      if (!scala2_10)
+        check.session(
+          """
         @ import $ivy.`com.chuusai::shapeless:2.2.5`, shapeless._
 
         @ (1 :: "lol" :: List(1, 2, 3) :: HNil)
@@ -122,16 +124,18 @@ object ProjectTests extends TestSuite{
       """)
     }
 
-    'scalaz{
-      check.session("""
+    'scalaz {
+      check.session(
+        """
         @ import $ivy.`org.scalaz::scalaz-core:7.1.1`, scalaz._, Scalaz._
 
         @ (Option(1) |@| Option(2))(_ + _)
         res1: Option[Int] = Some(3)
       """)
     }
-    'guava{
-      check.session("""
+    'guava {
+      check.session(
+        """
         @ import $ivy.`com.google.guava:guava:18.0`, com.google.common.collect._
 
         @ val bimap = ImmutableBiMap.of(1, "one", 2, "two", 3, "three")
@@ -143,8 +147,9 @@ object ProjectTests extends TestSuite{
         res3: Int = 2
       """)
     }
-    'resources{
-      check.session("""
+    'resources {
+      check.session(
+        """
         @ import ammonite.ops._
 
         @ val path = resource/'org/'apache/'jackrabbit/'oak/'plugins/'blob/"blobstore.properties"
@@ -157,7 +162,7 @@ object ProjectTests extends TestSuite{
         @ read! path // Should work now
       """)
     }
-    'scalaparse{
+    'scalaparse {
       // For some reason this blows up in 2.11.x
       // Prevent regressions when wildcard-importing things called `macro` or `_`
       if (!scala2_10) ()
@@ -176,9 +181,10 @@ object ProjectTests extends TestSuite{
         """)
     }
 
-    'finagle{
+    'finagle {
       // Prevent regressions when wildcard-importing things called `macro` or `_`
-      check.session("""
+      check.session(
+        """
         @ import $ivy.`com.twitter::finagle-httpx:6.26.0`
 
         @ import com.twitter.finagle._, com.twitter.util._
@@ -221,7 +227,7 @@ object ProjectTests extends TestSuite{
         @ server.close()
       """)
     }
-    'spire{
+    'spire {
       // Prevent regressions when wildcard-importing things called `macro` or `_`
       if (!scala2_10) //buggy in 2.10
         check.session(s"""
@@ -293,4 +299,3 @@ object ProjectTests extends TestSuite{
 
   }
 }
-

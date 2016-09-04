@@ -1,4 +1,3 @@
-
 package ammonite.main
 import acyclic.file
 import ammonite.util.Util
@@ -6,7 +5,7 @@ import ammonite.util.Util
 /**
   * Constants used in the default configuration for the Ammonite REPL
   */
-object Defaults{
+object Defaults {
 
   val welcomeBanner = {
     def ammoniteVersion = ammonite.Constants.version
@@ -47,7 +46,7 @@ object Defaults{
     |import ammonite.main.Scripts.pathScoptRead
     |""".stripMargin
 
-
-  def ammoniteHome = ammonite.ops.Path(System.getProperty("user.home"))/".ammonite"
+  def ammoniteHome =
+    ammonite.ops.Path(System.getProperty("user.home")) / ".ammonite"
 
 }

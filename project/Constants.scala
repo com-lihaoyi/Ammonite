@@ -1,6 +1,6 @@
 package ammonite
 
-object Constants{
+object Constants {
   val version = "version-SNAPSHOT"
   val unstableVersion = "unstableVersion-SNAPSHOT"
   val curlUrl = "<curlUrl-set-me-in-Constants.scala>"
