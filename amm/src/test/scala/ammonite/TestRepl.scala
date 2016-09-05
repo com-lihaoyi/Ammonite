@@ -44,7 +44,6 @@ class TestRepl {
       extraBridges = { i =>
         val replApi = new ReplApiImpl(
           i,
-          Colors.BlackWhite,
           "@",
           null,
           new History(Vector()),

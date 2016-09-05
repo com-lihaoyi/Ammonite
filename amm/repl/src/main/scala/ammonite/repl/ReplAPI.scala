@@ -92,10 +92,6 @@ trait ReplAPI {
 
   implicit def derefPPrint(implicit t: Ref[pprint.Config]): pprint.Config = t()
 
-  implicit def tprintColors: pprint.TPrintColors
-
-  implicit def codeColors: CodeColors
-
   /**
     * Lets you configure the pretty-printing of a value. By default, it simply
     * disables truncation and prints the entire thing, but you can set other

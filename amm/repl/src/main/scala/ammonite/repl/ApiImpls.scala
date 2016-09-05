@@ -51,7 +51,6 @@ class SessionApiImpl(eval: Evaluator) extends Session {
 }
 
 class ReplApiImpl(val interp: Interpreter,
-                  colors0: Ref[Colors],
                   prompt0: String,
                   frontEnd0: FrontEnd,
                   history0: => History,
@@ -63,30 +62,11 @@ class ReplApiImpl(val interp: Interpreter,
   def lastException = interp.lastException
 
   def imports = Preprocessor.importBlock(eval.frames.head.imports)
-  val colors = colors0
   val prompt = prompt0
   val frontEnd = frontEnd0
 
-  implicit def tprintColors = pprint.TPrintColors(
-    typeColor = colors().`type`()
-  )
-  implicit val codeColors = new CodeColors {
-    def comment = colors().comment()
-    def `type` = colors().`type`()
-    def literal = colors().literal()
-    def keyword = colors().keyword()
-    def ident = colors().ident()
-  }
   implicit lazy val pprintConfig: Ref[pprint.Config] = {
-    Ref.live[pprint.Config](
-      () =>
-        pprint.Config.apply(
-          colors = pprint.Colors(
-            colors().literal(),
-            colors().prefix()
-          )
-      ))
-
+    Ref.live[pprint.Config](() => pprint.Config.apply())
   }
 
   def show[T: PPrint](implicit cfg: Config) = (t: T) => {

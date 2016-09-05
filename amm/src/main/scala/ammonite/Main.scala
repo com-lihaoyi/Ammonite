@@ -73,7 +73,7 @@ case class Main(predef: String = "",
     val augmentedPredef =
       Main.maybeDefaultPredef(defaultPredef, Defaults.predefString)
 
-    val (colors, _, _, printer) =
+    val (_, _, _, printer) =
       Interpreter.initPrinters(outputStream, errorStream, verboseOutput)
 
     val interp: Interpreter = new Interpreter(
@@ -88,7 +88,6 @@ case class Main(predef: String = "",
         else {
           val replApi = new ReplApiImpl(
             i,
-            colors,
             "",
             null,
             new History(Vector.empty),
