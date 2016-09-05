@@ -1,5 +1,5 @@
 package ammonite.main
-import acyclic.file
+
 import sourcecode.Compat.Context
 
 import scala.annotation.StaticAnnotation
@@ -86,21 +86,21 @@ object Router {
           case None => Left(Seq(Result.ParamError.Missing(arg)))
           case Some(v) => Right(v)
         } catch {
-          case e => Left(Seq(Result.ParamError.DefaultFailed(arg, e)))
+          case e : Throwable => Left(Seq(Result.ParamError.DefaultFailed(arg, e)))
         }
 
       case Some(x) =>
         extras match {
           case None =>
             try Right(thunk(x))
-            catch { case e => Left(Seq(Result.ParamError.Invalid(arg, x, e))) }
+            catch { case e : Throwable => Left(Seq(Result.ParamError.Invalid(arg, x, e))) }
 
           case Some(extraItems) =>
             val attempts: Seq[Either[Result.ParamError.Invalid, T]] =
               (x +: extraItems).map { item =>
                 try Right(thunk(item))
                 catch {
-                  case e => Left(Result.ParamError.Invalid(arg, item, e))
+                  case e : Throwable => Left(Result.ParamError.Invalid(arg, item, e))
                 }
               }
 
@@ -255,7 +255,7 @@ class Router[C <: Context](val c: C) {
 
       val docs = for {
         doc <- arg.annotations.find(_.tpe =:= typeOf[Router.doc])
-        if doc.scalaArgs.head.isInstanceOf[Literal]
+        //if doc.scalaArgs.head.isInstanceOf[Literal]
         l = doc.scalaArgs.head.asInstanceOf[Literal]
         if l.value.value.isInstanceOf[String]
       } yield l.value.value.asInstanceOf[String]

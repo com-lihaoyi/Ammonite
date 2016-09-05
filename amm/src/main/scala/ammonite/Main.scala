@@ -73,7 +73,7 @@ case class Main(predef: String = "",
     val augmentedPredef =
       Main.maybeDefaultPredef(defaultPredef, Defaults.predefString)
 
-    val (colors, printStream, errorPrintStream, printer) =
+    val (colors, _, _, printer) =
       Interpreter.initPrinters(outputStream, errorStream, verboseOutput)
 
     val interp: Interpreter = new Interpreter(
@@ -246,10 +246,10 @@ object Main {
         },
         verboseOutput = verboseOutput
       )
-      (fileToExecute, codeToExecute) match {
+      ((fileToExecute, codeToExecute) : @unchecked) match {
         case (None, None) => println("Loading..."); main(true).run()
         case (Some(path), None) =>
-          main(false).runScript(path, passThroughArgs, kwargs, replApi) match {
+          (main(false).runScript(path, passThroughArgs, kwargs, replApi) : @unchecked) match {
             case Res.Failure(exOpt, msg) =>
               Console.err.println(msg)
               System.exit(1)

@@ -1,6 +1,5 @@
 package ammonite.sshd
 
-import acyclic.file
 import ammonite.main.Defaults
 import ammonite.ops.Path
 

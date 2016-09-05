@@ -4,7 +4,6 @@
   */
 package ammonite.util
 
-import acyclic.file
 import pprint.{PPrint, PPrinter}
 
 import scala.collection.mutable
@@ -80,7 +79,7 @@ object Imports {
     val stompedTerms = mutable.Set.empty[Name]
     val out = mutable.Buffer.empty[ImportData]
     for (data <- importData.reverseIterator) {
-      val stomped = data.importType match {
+      val stomped = (data.importType : @unchecked) match {
         case ImportData.Term => Seq(stompedTerms)
         case ImportData.Type => Seq(stompedTypes)
         case ImportData.TermType => Seq(stompedTerms, stompedTypes)

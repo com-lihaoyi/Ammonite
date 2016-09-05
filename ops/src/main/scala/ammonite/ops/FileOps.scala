@@ -6,12 +6,8 @@
   */
 package ammonite.ops
 
-import java.io.{File, InputStream, OutputStream}
-import java.nio.charset.Charset
+import java.io.File
 import java.nio.file._
-import java.util.Objects
-
-import acyclic.file
 
 import scala.io.Codec
 

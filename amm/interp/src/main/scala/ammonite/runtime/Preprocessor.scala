@@ -1,7 +1,5 @@
 package ammonite.runtime
 
-import acyclic.file
-import ammonite._
 import ammonite.util._
 import ammonite.util.Util.{windowsPlatform, newLine, normalizeNewlines}
 import fastparse.all._
@@ -106,7 +104,8 @@ object Preprocessor {
                     extraCode: String) =
         for {
           Preprocessor.Expanded(code, printer) <- expandStatements(stmts, resultIndex)
-          (wrappedCode, importsLength) = wrapCode(
+        } yield {
+           val (wrappedCode, importsLength) = wrapCode(
             pkgName,
             indexedWrapperName,
             leadingSpaces + code,
@@ -114,7 +113,8 @@ object Preprocessor {
             imports,
             extraCode
           )
-        } yield Preprocessor.Output(wrappedCode, importsLength)
+          Preprocessor.Output(wrappedCode, importsLength)
+        }
 
       def Processor(cond: PartialFunction[(String, String, G#Tree), Preprocessor.Expanded]) = {
         (code: String, name: String, tree: G#Tree) =>
@@ -185,7 +185,7 @@ object Preprocessor {
 
       val Import = Processor {
         case (name, code, tree: G#Import) =>
-          val Array(keyword, body) = code.split(" ", 2)
+          val Array(_, body) = code.split(" ", 2)
           val tq = "\"\"\""
           Expanded(code,
                    Seq(

@@ -1,9 +1,6 @@
 package ammonite.repl
 
-import java.io.File
-
 import ammonite.runtime._
-import ammonite.ops.{Path, read}
 import ammonite.util.Util._
 import ammonite.util._
 import pprint.{Config, PPrint}

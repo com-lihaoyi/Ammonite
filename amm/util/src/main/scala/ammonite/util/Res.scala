@@ -1,6 +1,5 @@
 package ammonite.util
 
-import acyclic.file
 import scala.util.Try
 
 /**

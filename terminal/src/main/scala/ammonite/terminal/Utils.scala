@@ -1,7 +1,6 @@
 package ammonite.terminal
 
-import java.io.{OutputStream, ByteArrayOutputStream, Writer}
-import acyclic.file
+import java.io.Writer
 import scala.annotation.tailrec
 
 /**

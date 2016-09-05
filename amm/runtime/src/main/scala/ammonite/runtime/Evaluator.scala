@@ -3,7 +3,6 @@ package ammonite.runtime
 import java.io.OutputStream
 import java.lang.reflect.InvocationTargetException
 
-import acyclic.file
 import ammonite._
 import util.Util.{ClassFiles, newLine}
 import ammonite.util._
@@ -92,7 +91,6 @@ object Evaluator {
           for ((name, bytes) <- classFiles.sortBy(_._1)) {
             frames.head.classloader.addClassFile(name, bytes)
           }
-          val names = classFiles.map(_._1)
           val res = Class.forName(fullName, true, frames.head.classloader)
           res
         }, e => "Failed to load compiled class " + e)
@@ -202,7 +200,7 @@ object Evaluator {
     */
   def evaluatorRunPrinter(f: => Unit) = f
 
-  def writeDeep(d: VirtualDirectory, path: List[String], suffix: String): OutputStream = path match {
+  def writeDeep(d: VirtualDirectory, path: List[String], suffix: String): OutputStream = (path : @unchecked) match {
     case head :: Nil => d.fileNamed(path.head + suffix).output
     case head :: rest =>
       writeDeep(
@@ -216,7 +214,6 @@ object Evaluator {
     * Writes files to dynamicClasspath. Needed for loading cached classes.
     */
   def addToClasspath(classFiles: Traversable[(String, Array[Byte])], dynamicClasspath: VirtualDirectory): Unit = {
-    val names = classFiles.map(_._1)
     for ((name, bytes) <- classFiles) {
       val output =
         writeDeep(dynamicClasspath, name.split('.').toList, ".class")

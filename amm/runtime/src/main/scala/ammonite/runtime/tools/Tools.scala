@@ -4,7 +4,6 @@
   */
 package ammonite.runtime.tools
 
-import acyclic.file
 import java.io.{BufferedReader, InputStreamReader}
 
 import ammonite.ops._

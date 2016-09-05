@@ -3,7 +3,6 @@ package ammonite.runtime
 import ammonite.ops._
 import ammonite.runtime.tools.Resolver
 import ammonite.util.Ref
-import acyclic.file
 import scala.util.control.ControlThrowable
 
 object InterpBridge extends APIHolder[InterpAPI]

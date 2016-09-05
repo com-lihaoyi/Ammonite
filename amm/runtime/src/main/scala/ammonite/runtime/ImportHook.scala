@@ -2,7 +2,6 @@ package ammonite.runtime
 
 import java.io.File
 
-import acyclic.file
 import ammonite.ops.{read, _}
 import ammonite.runtime.tools.IvyThing
 import ammonite.util._
@@ -178,8 +177,7 @@ object ImportHook {
         jars <- {
           try Res.Success(interp.loadIvy((a, b, c)))
           catch {
-            case ex =>
-              Res.Exception(ex, "")
+            case ex : Throwable => Res.Exception(ex, "")
           }
         }
       } yield jars

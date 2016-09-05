@@ -1,10 +1,10 @@
 package ammonite.main
-import acyclic.file
+
 import ammonite.runtime.ImportHook
 import ammonite.main.Router.{ArgSig, EntryPoint}
 import ammonite.ops._
 import ammonite.util.Name.backtickWrap
-import ammonite.util.{Name, Res, Util}
+import ammonite.util.{Res, Util}
 import fastparse.Utils._
 
 /**

@@ -1,8 +1,5 @@
 package ammonite.terminal
 
-import acyclic.file
-
-import scala.annotation.tailrec
 import scala.collection.mutable
 
 /**
@@ -132,16 +129,9 @@ object Terminal {
                    cursor: Int,
                    ups: Int,
                    rowLengths: Seq[Int],
-                   fullPrompt: Boolean = true,
-                   newlinePrompt: Boolean = false) = {
+                   fullPrompt: Boolean,
+                   newlinePrompt: Boolean) = {
 
-      // Enable this in certain cases (e.g. cursor near the value you are
-      // interested into) see what's going on with all the ansi screen-cursor
-      // movement
-      def debugDelay() = if (false) {
-        Thread.sleep(200)
-        writer.flush()
-      }
 
       val promptLine =
         if (fullPrompt) prompt.full
@@ -222,9 +212,6 @@ object Terminal {
       )
       val narrowWidth = width - prompt.lastLine.length
       val newlinePrompt = rowLengths.exists(_ >= narrowWidth)
-      val promptWidth = if (newlinePrompt) 0 else prompt.lastLine.length
-      val actualWidth = width - promptWidth
-      val newlineUp = if (newlinePrompt) 1 else 0
       if (!moreInputComing)
         redrawLine(
           transformedBuffer,
@@ -235,27 +222,6 @@ object Terminal {
           newlinePrompt
         )
 
-      lazy val (oldCursorY, _) = positionCursor(
-        lastOffsetCursor,
-        rowLengths,
-        calculateHeight0(rowLengths, actualWidth),
-        actualWidth
-      )
-
-      def updateState(s: LazyList[Int],
-                      b: Vector[Char],
-                      c: Int,
-                      msg: String): (Int, TermState) = {
-
-        val newCursor = math.max(math.min(c, b.length), 0)
-        val nextUps =
-          if (moreInputComing) ups
-          else oldCursorY + newlineUp
-
-        val newState = TermState(s, b, newCursor, msg)
-
-        (nextUps, newState)
-      }
       None
     }
 

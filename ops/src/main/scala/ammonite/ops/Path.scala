@@ -1,10 +1,5 @@
 package ammonite.ops
 
-import java.io.InputStream
-import java.nio.charset.Charset
-
-import acyclic.file
-
 import scala.io.Codec
 
 /**
@@ -192,7 +187,6 @@ case class RelPath private[ops] (segments: Vector[String], ups: Int)
 object RelPath extends RelPathStuff with PathFactory[RelPath] {
   def apply(f: java.nio.file.Path): RelPath = {
 
-    import collection.JavaConversions._
     require(!f.isAbsolute, f + " is not an relative path")
 
     val segments = BasePath.chunkify(f.normalize())
@@ -238,7 +232,6 @@ object Path extends PathFactory[Path] {
   def apply(s: String, base: Path): Path = apply(FilePath(s), base)
   def apply(f: java.nio.file.Path, base: Path): Path = apply(FilePath(f), base)
   def apply(f: java.nio.file.Path): Path = {
-    import collection.JavaConversions._
     val chunks = BasePath.chunkify(f)
     if (chunks.count(_ == "..") > chunks.size / 2)
       throw PathError.AbsolutePathOutsideRoot

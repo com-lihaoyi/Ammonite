@@ -54,40 +54,14 @@ val sharedSettings = Seq(
   },
   scalafmtConfig := Some(file(".scalafmt")),
   testFrameworks := Seq(new TestFramework("utest.runner.Framework")),
-  scalacOptions ++= Seq("-target:jvm-1.7", "-Ywarn-unused"),
+  scalacOptions ++= Seq("-target:jvm-1.7", "-Ywarn-unused", "-Ywarn-unused-import", "-Ywarn-inaccessible", "-Ywarn-dead-code"),
   autoCompilerPlugins := true,
-  addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.4"),
   ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) },
   parallelExecution in Test := !scalaVersion.value.contains("2.10"),
   (unmanagedSources in Compile) += (baseDirectory in ThisBuild).value / "project" / "Constants.scala",
   mappings in (Compile, packageSrc) += {
     ((baseDirectory in ThisBuild).value / ".." / "project" / "Constants.scala") -> "Constants.scala"
-  },
-  libraryDependencies ++= Seq(
-    "com.lihaoyi" %% "acyclic" % "0.1.4" % "provided"
-  ),
-  publishTo := Some(
-    "releases" at "https://oss.sonatype.org/service/local/staging/deploy/maven2"
-  ),
-  pomExtra :=
-    <url>https://github.com/lihaoyi/Ammonite</url>
-      <licenses>
-        <license>
-          <name>MIT license</name>
-          <url>http://www.opensource.org/licenses/mit-license.php</url>
-        </license>
-      </licenses>
-      <scm>
-        <url>git://github.com/lihaoyi/Ammonite.git</url>
-        <connection>scm:git://github.com/lihaoyi/Ammonite.git</connection>
-      </scm>
-      <developers>
-        <developer>
-          <id>lihaoyi</id>
-          <name>Li Haoyi</name>
-          <url>https://github.com/lihaoyi</url>
-        </developer>
-      </developers>
+  }
 )
 
 /**

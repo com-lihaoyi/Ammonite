@@ -1,17 +1,11 @@
 package ammonite.repl
 
-import ammonite.runtime.tools.Resolver
-import ammonite.util.{Bind, CodeColors, Colors, Ref}
+import ammonite.util.{Bind, CodeColors, Ref}
 import ammonite.util.Util.newLine
-import pprint.{Config, PPrint, PPrinter, TPrintColors}
+import pprint.{Config, PPrint, PPrinter}
 
-import scala.collection.mutable
 import scala.reflect.runtime.universe._
-import acyclic.file
 import ammonite.runtime.{APIHolder, Frame, History, ReplExit}
-
-import scala.util.control.ControlThrowable
-import acyclic.file
 
 trait ReplAPI {
 
@@ -263,7 +257,6 @@ case class SessionChanged(removedImports: Set[scala.Symbol],
                           addedJars: Set[java.net.URL])
 object SessionChanged {
   implicit val pprinter: PPrinter[SessionChanged] = PPrinter[SessionChanged] { (data, config) =>
-    val output = mutable.Buffer.empty[String]
     def printDelta[T: PPrint](name: String, d: Iterable[T]) = {
       if (d.nonEmpty) {
         Iterator(newLine, name, ": ") ++ pprint.tokenize(d)(implicitly, config)

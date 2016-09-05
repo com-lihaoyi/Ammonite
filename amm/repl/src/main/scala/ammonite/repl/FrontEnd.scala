@@ -2,15 +2,7 @@ package ammonite.repl
 
 import java.io.{InputStream, OutputStream}
 
-import fastparse.core.Parsed
-import jline.console.{ConsoleReader, completer}
-import acyclic.file
-import ammonite.util.{Colors, Catching, Res}
-import ammonite.runtime.Parsers
-import ammonite.util.Util.newLine
-
-import scala.annotation.tailrec
-import scala.tools.nsc.interpreter.JList
+import ammonite.util.{Colors, Res}
 
 /**
   * All the mucky JLine interfacing code

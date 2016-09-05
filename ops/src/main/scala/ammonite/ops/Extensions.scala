@@ -1,5 +1,5 @@
 package ammonite.ops
-import acyclic.file
+
 import scala.collection.{Seq, GenTraversableOnce, TraversableLike}
 
 import scala.collection.generic.{

@@ -4,7 +4,6 @@ import java.io.{InputStream, OutputStream, OutputStreamWriter}
 
 import ammonite.terminal._
 import fastparse.core.Parsed
-import acyclic.file
 import ammonite.util.{Colors, Res}
 import ammonite.runtime.Parsers
 

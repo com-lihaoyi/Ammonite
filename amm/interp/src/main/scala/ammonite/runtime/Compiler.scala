@@ -1,6 +1,5 @@
 package ammonite.runtime
 
-import acyclic.file
 import ammonite.util.{ImportData, Imports, Printer}
 import ammonite.util.Util.newLine
 

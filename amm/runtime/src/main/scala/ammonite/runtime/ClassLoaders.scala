@@ -2,7 +2,6 @@ package ammonite.runtime
 
 import java.net.{URL, URLClassLoader}
 import java.nio.ByteBuffer
-import acyclic.file
 import ammonite.ops._
 import ammonite.util.{Imports, Util}
 

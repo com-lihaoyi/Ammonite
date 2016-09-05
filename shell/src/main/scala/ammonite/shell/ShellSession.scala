@@ -5,7 +5,7 @@ import java.nio.file.attribute.PosixFilePermission
 
 import ammonite.ops._
 import ammonite.repl.FrontEndUtils
-import pprint.{Config, PPrinter, PPrint}
+import pprint.{Config, PPrinter}
 
 case class ShellSession() extends OpsAPI {
   var wd0 = pwd

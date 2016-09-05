@@ -1,7 +1,5 @@
 package ammonite.runtime
 
-import acyclic.file
-
 import scala.reflect.internal.util.{Position, OffsetPosition, BatchSourceFile}
 import scala.reflect.io.VirtualDirectory
 import scala.tools.nsc

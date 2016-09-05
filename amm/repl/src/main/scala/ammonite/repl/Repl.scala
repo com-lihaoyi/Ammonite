@@ -5,7 +5,6 @@ import java.io.{InputStream, InputStreamReader, OutputStream}
 import ammonite.runtime._
 import ammonite.util.Util.newLine
 import ammonite.util._
-import acyclic.file
 import scala.annotation.tailrec
 
 class ReplKernel(input: InputStream,

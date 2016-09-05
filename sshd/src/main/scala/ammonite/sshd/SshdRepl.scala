@@ -1,15 +1,13 @@
 package ammonite.sshd
 
-import acyclic.file
 import java.io.{InputStream, OutputStream, PrintStream}
 
 import ammonite.ops.Path
 import ammonite.sshd.util.Environment
-import ammonite.util.{Bind, Ref}
+import ammonite.util.Bind
 import ammonite.runtime.Storage
 import ammonite.repl.Repl
 
-import scala.language.postfixOps
 
 /**
   * An ssh server which serves ammonite repl as it's shell channel.

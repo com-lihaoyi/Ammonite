@@ -114,14 +114,14 @@ class Interpreter(val printer: Printer,
   for ((wrapperName, sourceCode) <- predefs) {
     val pkgName = Seq(Name("ammonite"), Name("predef"))
 
-    processModule(
+    (processModule(
       ImportHook.Source.File(wd / s"${wrapperName.raw}.sc"),
       sourceCode,
       wrapperName,
       pkgName,
       true,
       ""
-    ) match {
+    ) : @unchecked) match {
       case Res.Success((imports, wrapperHashes)) =>
         predefImports = predefImports ++ imports
       case Res.Failure(ex, msg) =>
@@ -330,8 +330,6 @@ class Interpreter(val printer: Printer,
     )
     val compiled = storage.compileCacheLoad(fullyQualifiedName, tag) match {
       case Some((classFiles, newImports)) =>
-        val clsFiles = classFiles.map(_._1)
-
         Evaluator.addToClasspath(classFiles, dynamicClasspath)
         Res.Success((classFiles, newImports))
       case _ =>
@@ -406,8 +404,6 @@ class Interpreter(val printer: Printer,
       case Some((wrapperHashes, classFiles, imports, importsTrees)) =>
         importsTrees.map(resolveSingleImportHook(source, _))
 
-        val classFileNames = classFiles.map(_.map(_._1))
-
         eval.evalCachedClassFiles(
           classFiles,
           pkgName.map(_.backticked).mkString("."),
@@ -430,8 +426,10 @@ class Interpreter(val printer: Printer,
       hooked <- Res.map(blocks) {
         case (prelude, stmts) => resolveImportHooks(source, stmts)
       }
-      (hookImports, hookBlocks, importTrees) = hooked.unzip3
-    } yield (blocks.map(_._1).zip(hookBlocks), Imports(hookImports.flatMap(_.value)), importTrees)
+    } yield {
+      val (hookImports, hookBlocks, importTrees) = hooked.unzip3
+       (blocks.map(_._1).zip(hookBlocks), Imports(hookImports.flatMap(_.value)), importTrees)
+      }
 
   def processModule0(source: ImportHook.Source,
                      code: String,
@@ -544,7 +542,7 @@ class Interpreter(val printer: Printer,
           ev <- evaluate(processed, wrapperIndex, indexedWrapperName)
         } yield ev
 
-        res match {
+        (res: @unchecked) match {
           case r: Res.Failure => r
           case r: Res.Exception => r
           case Res.Success(ev) =>
@@ -639,10 +637,7 @@ class Interpreter(val printer: Printer,
     }
     def ivy(coordinates: (String, String, String), verbose: Boolean = true): Unit = {
       val resolved = loadIvy(coordinates, verbose)
-      val (groupId, artifactId, version) = coordinates
-
       resolved.foreach(handleClasspath)
-
       reInit()
     }
   }

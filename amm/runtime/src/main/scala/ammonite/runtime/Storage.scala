@@ -1,6 +1,5 @@
 package ammonite.runtime
 
-import acyclic.file
 import ammonite.ops._
 import ammonite.util.ImportTree
 import ammonite.util.{Imports, StableRef}
@@ -169,7 +168,7 @@ object Storage {
         val fileData = { ammonite.ops.read(path) }
         val parsed = { upickle.default.read(fileData) }
         Some(parsed)
-      } catch { case e => None }
+      } catch { case e : Throwable => None }
     }
 
     def classFilesListLoad(pkg: String, wrapper: String, cacheTag: String): Option[CacheOutput] = {
@@ -280,7 +279,6 @@ object History {
   }
   implicit def toHistory(s: Seq[String]): History = new History(s.toVector)
 
-  import pprint._
   implicit val historyPPrint: pprint.PPrint[History] = pprint.PPrint(
     new pprint.PPrinter[History] {
       def render0(t: History, c: pprint.Config) = {

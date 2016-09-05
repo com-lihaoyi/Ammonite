@@ -1,9 +1,6 @@
 package ammonite.ops
 
 import java.io.InputStream
-import java.nio.charset.Charset
-
-import acyclic.file
 
 import scala.io.Codec
 

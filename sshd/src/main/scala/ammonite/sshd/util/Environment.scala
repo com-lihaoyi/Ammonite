@@ -1,6 +1,5 @@
 package ammonite.sshd.util
 
-import acyclic.file
 import java.io.{InputStream, OutputStream, PrintStream}
 
 /**

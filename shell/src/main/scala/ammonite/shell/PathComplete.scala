@@ -1,14 +1,5 @@
 package ammonite.shell
 
-import java.io.OutputStreamWriter
-
-import ammonite.terminal._
-import ammonite.repl.FrontEndUtils
-import ammonite.util.Colors
-import ammonite.runtime.Parsers
-import ammonite.terminal._
-import ammonite.terminal.LazyList.~:
-
 /**
   * Logic to find path "literals" so we can attempt to autocomplete them based
   * on what's actually on the filesystem.
