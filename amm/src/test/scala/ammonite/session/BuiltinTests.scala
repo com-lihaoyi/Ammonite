@@ -9,36 +9,6 @@ object BuiltinTests extends TestSuite {
   val tests = TestSuite {
     println("EvaluatorTests")
     val check = new TestRepl()
-    'basicConfig {
-      check.session("""
-        @ // Changing the colors used by Ammonite; all at once:
-
-        @ repl.colors() = ammonite.util.Colors.BlackWhite
-
-        @ repl.colors() = ammonite.util.Colors.Default
-
-        @ // or one at a time:
-
-        @ repl.colors().prompt() = fansi.Color.Red
-
-        @ repl.colors().ident() = fansi.Color.Green
-
-        @ repl.colors().`type`() = fansi.Color.Yellow
-
-        @ repl.colors().literal() = fansi.Color.Magenta
-
-        @ repl.colors().prefix() = fansi.Color.Cyan
-
-        @ repl.colors().comment() = fansi.Color.Red
-
-        @ repl.colors().keyword() = fansi.Bold.On
-
-        @ repl.colors().selected() = fansi.Underlined.On
-
-        @ repl.colors().error() = fansi.Color.Yellow
-      """)
-    }
-
     'loadCP {
       check.session("""
         @ import ammonite.ops._, ImplicitWd._

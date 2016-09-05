@@ -76,11 +76,6 @@ trait ReplAPI {
   def typeOf[T: WeakTypeTag](t: => T): Type
 
   /**
-    * The colors that will be used to render the Ammonite REPL in the terminal
-    */
-  val colors: Ref[Colors]
-
-  /**
     * Throw away the current scala.tools.nsc.Global and get a new one
     */
   def newCompiler(): Unit
@@ -240,7 +235,7 @@ trait DefaultReplAPI extends FullReplAPI {
           case Some(s) => Iterator(cfg.colors.literalColor(s).render)
         }
         Iterator(
-          colors().ident()(ident).render,
+          ident,
           ": ",
           implicitly[pprint.TPrint[T]].render(tcolors),
           " = "
@@ -250,13 +245,13 @@ trait DefaultReplAPI extends FullReplAPI {
     def printDef(definitionLabel: String, ident: String) = {
       Iterator(
         "defined ",
-        colors().`type`()(definitionLabel).render,
+        definitionLabel,
         " ",
-        colors().ident()(ident).render
+        ident
       )
     }
     def printImport(imported: String) = {
-      Iterator(colors().`type`()("import ").render, colors().ident()(imported).render)
+      Iterator("import ", imported)
     }
   }
 }
