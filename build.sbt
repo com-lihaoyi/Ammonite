@@ -31,9 +31,10 @@ val sharedSettings = Seq(
   version := _root_.ammonite.Constants.version,
   libraryDependencies ++= Seq(
      "org.scala-lang" % "scala-compiler" % scalaVersion.value % "provided",
+     "org.scalatest" %% "scalatest" % "3.0.0" % "test",
     "com.lihaoyi" %% "utest" % "0.4.3" % "test"),
   scalafmtConfig := Some(file(".scalafmt")),
-  testFrameworks := Seq(new TestFramework("utest.runner.Framework")),
+  testFrameworks ++= Seq(new TestFramework("utest.runner.Framework")),
   scalacOptions ++= Seq("-target:jvm-1.7", "-Ywarn-unused", "-Ywarn-unused-import", "-Ywarn-inaccessible", "-Ywarn-dead-code", "-Xlint"),
   autoCompilerPlugins := true,
   ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) },

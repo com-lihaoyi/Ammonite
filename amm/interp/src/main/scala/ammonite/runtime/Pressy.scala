@@ -14,10 +14,48 @@ import ammonite.util.Util.newLine
 /**
   * Nice wrapper for the presentation compiler.
   */
-trait Pressy {
-  def complete(snippetIndex: Int, previousImports: String, snippet: String): (Int, Seq[String], Seq[String])
-  def shutdownPressy(): Unit
+class Pressy(pressy: => nsc.interactive.Global) {
+
+  import Pressy._
+
+   /**
+      * Ask for autocompletion at a particular spot in the code, returning
+      * possible things that can be completed at that location. May try various
+      * different completions depending on where the `index` is placed, but
+      * the outside caller probably doesn't care.
+      */
+    def complete(snippetIndex: Int, previousImports: String, snippet: String) = {
+      val prefix = previousImports + newLine + "object AutocompleteWrapper{" + newLine
+      val suffix = newLine + "}"
+      val allCode = prefix + snippet + suffix
+      val index = snippetIndex + prefix.length
+
+      val currentFile = new BatchSourceFile(Compiler.makeFile(allCode.getBytes, name = "Current.sc"), allCode)
+
+      val r = new Response[Unit]
+      pressy.askReload(List(currentFile), r)
+      r.get.fold(x => x, e => throw e)
+
+      val run = Try(new Run(pressy, currentFile, allCode, index))
+
+      val (i, all): (Int, Seq[(String, Option[String])]) = run match {
+        case Success(runSuccess) => runSuccess.prefixed
+        case Failure(throwable) => (0, Seq.empty)
+      }
+
+      val allNames = all.collect { case (name, None) => name }.sorted.distinct
+
+      val signatures =
+        all.collect { case (name, Some(defn)) => defn }.sorted.distinct
+
+      (i - prefix.length, allNames, signatures)
+    }
+
+    def shutdownPressy() = {
+      pressy.askShutdown()
+    }
 }
+
 object Pressy {
 
   /**
@@ -29,7 +67,7 @@ object Pressy {
     /**
       * Dumb things that turn up in the autocomplete that nobody needs or wants
       */
-    def blacklisted(s: pressy.Symbol) = {
+    private def blacklisted(s: pressy.Symbol) = {
       val blacklist = Set(
         "scala.Predef.any2stringadd.+",
         "scala.Any.##",
@@ -59,16 +97,16 @@ object Pressy {
       s.decodedName == "<init>" ||
       s.decodedName.contains('$')
     }
-    val r = new Response[pressy.Tree]
+    private val r = new Response[pressy.Tree]
     pressy.askTypeAt(new OffsetPosition(currentFile, index), r)
-    val tree = r.get.fold(x => x, e => throw e)
+    private val tree = r.get.fold(x => x, e => throw e)
 
     /**
       * Search for terms to autocomplete not just from the local scope,
       * but from any packages and package objects accessible from the
       * local scope
       */
-    def deepCompletion(name: String) = {
+    private def deepCompletion(name: String) = {
       def rec(t: pressy.Symbol): Seq[pressy.Symbol] = {
         val children =
           if (t.hasPackageFlag || t.isPackageObject) {
@@ -89,14 +127,15 @@ object Pressy {
         if out != ""
       } yield (out, None)
     }
-    def handleTypeCompletion(position: Int, decoded: String, offset: Int) = {
+
+    private def handleTypeCompletion(position: Int, decoded: String, offset: Int) = {
 
       val r = ask(position, pressy.askTypeCompletion)
       val prefix = if (decoded == "<error>") "" else decoded
       (position + offset, handleCompletion(r, prefix))
     }
 
-    def handleCompletion(r: List[pressy.Member], prefix: String) = pressy.ask { () =>
+    private def handleCompletion(r: List[pressy.Member], prefix: String) = pressy.ask { () =>
       r.filter(_.sym.name.decoded.startsWith(prefix)).filter(m => !blacklisted(m.sym)).map { x =>
         (
           x.sym.name.decoded,
@@ -161,7 +200,7 @@ object Pressy {
             (s.sym.name.decoded, None)
         })
     }
-    def ask(index: Int, query: (Position, Response[List[pressy.Member]]) => Unit) = {
+    private def ask(index: Int, query: (Position, Response[List[pressy.Member]]) => Unit) = {
       val position = new OffsetPosition(currentFile, index)
       //if a match can't be found awaitResponse throws an Exception.
       val result = Try(Compiler.awaitResponse[List[pressy.Member]](query(position, _)))
@@ -175,9 +214,7 @@ object Pressy {
   def apply(classpath: Seq[java.io.File],
             dynamicClasspath: VirtualDirectory,
             evalClassloader: => ClassLoader,
-            settings: Settings): Pressy = new Pressy {
-
-    var cachedPressy: nsc.interactive.Global = null
+            settings: Settings): Pressy = {
 
     def initPressy = {
       val (reporter, _, jcp) = Compiler.initGlobalBits(
@@ -202,44 +239,6 @@ object Pressy {
       }
     }
 
-    /**
-      * Ask for autocompletion at a particular spot in the code, returning
-      * possible things that can be completed at that location. May try various
-      * different completions depending on where the `index` is placed, but
-      * the outside caller probably doesn't care.
-      */
-    override def complete(snippetIndex: Int, previousImports: String, snippet: String) = {
-      val prefix = previousImports + newLine + "object AutocompleteWrapper{" + newLine
-      val suffix = newLine + "}"
-      val allCode = prefix + snippet + suffix
-      val index = snippetIndex + prefix.length
-      if (cachedPressy == null) cachedPressy = initPressy
-
-      val pressy = cachedPressy
-      val currentFile = new BatchSourceFile(Compiler.makeFile(allCode.getBytes, name = "Current.sc"), allCode)
-
-      val r = new Response[Unit]
-      pressy.askReload(List(currentFile), r)
-      r.get.fold(x => x, e => throw e)
-
-      val run = Try(new Run(pressy, currentFile, allCode, index))
-
-      val (i, all): (Int, Seq[(String, Option[String])]) = run match {
-        case Success(runSuccess) => runSuccess.prefixed
-        case Failure(throwable) => (0, Seq.empty)
-      }
-
-      val allNames = all.collect { case (name, None) => name }.sorted.distinct
-
-      val signatures =
-        all.collect { case (name, Some(defn)) => defn }.sorted.distinct
-
-      (i - prefix.length, allNames, signatures)
-    }
-
-    override def shutdownPressy() = {
-      Option(cachedPressy).foreach(_.askShutdown())
-      cachedPressy = null
-    }
+    new Pressy(initPressy)
   }
 }

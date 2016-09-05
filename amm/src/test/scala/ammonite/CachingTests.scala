@@ -5,17 +5,19 @@ import ammonite.main.Defaults
 import ammonite.ops._
 import ammonite.runtime.tools.IvyConstructor._
 import ammonite.TestUtils._
-import utest._
+//import utest._
+import org.scalatest.FreeSpec
 
-object CachingTests extends TestSuite {
-  val tests = TestSuite {
-    println("ScriptTests")
 
-    val scriptPath = pwd / 'src / 'test / 'resources / 'scripts
+class CachingTests extends FreeSpec {
 
-    val resourcesPath = pwd / 'src / 'test / 'resources
-    val tempDir = tmp.dir(prefix = "ammonite-tester")
-    'noAutoIncrementWrapper {
+  val scriptPath = pwd / 'src / 'test / 'resources / 'scripts
+
+  val resourcesPath = pwd / 'src / 'test / 'resources
+  val tempDir = tmp.dir(prefix = "ammonite-tester")
+
+  "CachingTests" - {
+    "noAutoIncrementWrapper" in {
       val storage = Storage.InMemory()
       val interp = createTestInterp(storage)
       interp.interpApi.load.module(scriptPath / "ThreeBlocks.sc")
@@ -27,9 +29,8 @@ object CachingTests extends TestSuite {
         case e: Exception => assert(false)
       }
     }
-    'blocks {
-      val cases =
-        Seq("OneBlock.sc" -> 2, "TwoBlocks.sc" -> 3, "ThreeBlocks.sc" -> 4)
+    "blocks" in  {
+      val cases = Seq("OneBlock.sc" -> 2, "TwoBlocks.sc" -> 3, "ThreeBlocks.sc" -> 4)
       for ((fileName, expected) <- cases) {
         val storage = Storage.InMemory()
         val interp = createTestInterp(storage)
@@ -43,7 +44,7 @@ object CachingTests extends TestSuite {
       }
     }
 
-    'processModuleCaching {
+    "processModuleCaching" - {
       def check(script: RelPath) {
         val storage = new Storage.Folder(tempDir)
 
@@ -62,41 +63,30 @@ object CachingTests extends TestSuite {
         assert(interp2.compiler == null)
       }
 
-      'testOne - check('scriptLevelCaching / "scriptTwo.sc")
-      'testTwo - check('scriptLevelCaching / "scriptOne.sc")
-      'testThree - check('scriptLevelCaching / "QuickSort.sc")
-      'testLoadModule - check('scriptLevelCaching / "testLoadModule.sc")
-      'testFileImport - check('scriptLevelCaching / "testFileImport.sc")
-      'testIvyImport - check('scriptLevelCaching / "ivyCacheTest.sc")
-
+      "testOne" in check('scriptLevelCaching / "scriptTwo.sc")
+      "testTwo" in  check('scriptLevelCaching / "scriptOne.sc")
+      "testThree" in check('scriptLevelCaching / "QuickSort.sc")
+      "testLoadModule" in check('scriptLevelCaching / "testLoadModule.sc")
+      "testFileImport" in check('scriptLevelCaching / "testFileImport.sc")
+      "testIvyImport" in check('scriptLevelCaching / "ivyCacheTest.sc")
     }
 
-    'testRunTimeExceptionForCachedScripts {
+    "testRunTimeExceptionForCachedScripts" in {
       val storage = new Storage.Folder(tempDir)
       val numFile = pwd / 'target / 'test / 'resources / 'scriptLevelCaching / "num.value"
       rm(numFile)
       write(numFile, "1")
-      val interp1 = createTestInterp(
-        storage,
-        Defaults.predefString
-      )
-      interp1.interpApi.load.module(resourcesPath / 'scriptLevelCaching / "runTimeExceptions.sc")
-      val interp2 = createTestInterp(
-        storage,
-        Defaults.predefString
-      )
-      val res = intercept[java.lang.ArithmeticException] {
-        interp2.interpApi.load.module(
-          resourcesPath / 'scriptLevelCaching / "runTimeExceptions.sc"
-        )
+      val interp1 = createTestInterp(storage,Defaults.predefString)
+      assertThrows[java.lang.ArithmeticException] {
+        interp1.interpApi.load.module(resourcesPath / 'scriptLevelCaching / "runTimeExceptions.sc")
       }
-
-      assert(
-        interp2.compiler == null &&
-          res.toString == "java.lang.ArithmeticException: / by zero")
+      val interp2 = createTestInterp(storage,Defaults.predefString)
+      assertThrows[java.lang.ArithmeticException] {
+        interp2.interpApi.load.module(resourcesPath / 'scriptLevelCaching / "runTimeExceptions.sc")
+      }
     }
 
-    'persistence {
+  "persistence" in {
 
       val tempDir = ammonite.ops.Path(
         java.nio.file.Files.createTempDirectory("ammonite-tester-x")
@@ -111,7 +101,8 @@ object CachingTests extends TestSuite {
       assert(n1 == 2) // customLolz predef + OneBlock.sc
       assert(n2 == 0) // both should be cached
     }
-    'tags {
+
+    "tags" in {
       val storage = Storage.InMemory()
       val interp = createTestInterp(storage)
       interp.interpApi.load.module(scriptPath / "TagBase.sc")
@@ -122,7 +113,7 @@ object CachingTests extends TestSuite {
       assert(n == 5) // customLolz predef + two blocks for each loaded file
     }
 
-    'changeScriptInvalidation {
+       "changeScriptInvalidation" in {
       // This makes sure that the compile caches are properly utilized, and
       // flushed, in a variety of circumstances: changes to the number of
       // blocks in the predef, predefs containing magic imports, and changes
@@ -174,4 +165,5 @@ object CachingTests extends TestSuite {
       processAndCheckCompiler(_ == null)
     }
   }
+
 }
