@@ -25,33 +25,13 @@ val dontPublishSettings = Seq(
 
 dontPublishSettings
 
-val macroSettings = Seq(
-  libraryDependencies ++= Seq(
-    "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided"
-  ) ++ (
-    if (scalaVersion.value startsWith "2.11.") Nil
-    else
-      Seq(
-        compilerPlugin(
-          "org.scalamacros" % s"paradise" % "2.0.1" cross CrossVersion.full),
-        "org.scalamacros" %% s"quasiquotes" % "2.0.1"
-      )
-  )
-)
-
 val sharedSettings = Seq(
   scalaVersion := "2.11.8",
   organization := "com.lihaoyi",
   version := _root_.ammonite.Constants.version,
-  libraryDependencies += "com.lihaoyi" %% "utest" % "0.4.3" % "test",
-  // Needed for acyclic to work...
-  libraryDependencies ++= {
-    if (scalaVersion.value startsWith "2.11.") Nil
-    else
-      Seq(
-        "org.scala-lang" % "scala-compiler" % scalaVersion.value % "provided"
-      )
-  },
+  libraryDependencies ++= Seq(
+     "org.scala-lang" % "scala-compiler" % scalaVersion.value % "provided",
+    "com.lihaoyi" %% "utest" % "0.4.3" % "test"),
   scalafmtConfig := Some(file(".scalafmt")),
   testFrameworks := Seq(new TestFramework("utest.runner.Framework")),
   scalacOptions ++= Seq("-target:jvm-1.7", "-Ywarn-unused", "-Ywarn-unused-import", "-Ywarn-inaccessible", "-Ywarn-dead-code"),
@@ -83,8 +63,7 @@ lazy val terminal = project.settings(
   name := "ammonite-terminal",
   libraryDependencies ++= Seq(
     "com.lihaoyi" %% "sourcecode" % "0.1.2"
-  ),
-  macroSettings
+  )
 )
 
 /**
@@ -102,7 +81,6 @@ lazy val amm = project
     ammRepl
   )
   .settings(
-    macroSettings,
     sharedSettings,
     crossVersion := CrossVersion.full,
     test in assembly := {},
@@ -137,7 +115,6 @@ lazy val ammUtil = project
   .in(file("amm/util"))
   .dependsOn(ops)
   .settings(
-    macroSettings,
     sharedSettings,
     crossVersion := CrossVersion.full,
     name := "ammonite-util",
@@ -151,7 +128,6 @@ lazy val ammRuntime = project
   .in(file("amm/runtime"))
   .dependsOn(ops, ammUtil)
   .settings(
-    macroSettings,
     sharedSettings,
     crossVersion := CrossVersion.full,
     name := "ammonite-runtime",
@@ -165,7 +141,6 @@ lazy val ammInterp = project
   .in(file("amm/interp"))
   .dependsOn(ops, ammUtil, ammRuntime)
   .settings(
-    macroSettings,
     sharedSettings,
     crossVersion := CrossVersion.full,
     name := "ammonite-compiler",
@@ -180,7 +155,6 @@ lazy val ammRepl = project
   .in(file("amm/repl"))
   .dependsOn(terminal, ammUtil, ammRuntime, ammInterp)
   .settings(
-    macroSettings,
     sharedSettings,
     crossVersion := CrossVersion.full,
     name := "ammonite-repl",
@@ -198,7 +172,6 @@ lazy val shell = project
   .dependsOn(ops, amm % "compile->compile;test->test")
   .settings(
     sharedSettings,
-    macroSettings,
     name := "ammonite-shell",
     (test in Test) <<= (test in Test).dependsOn(packageBin in Compile),
     (run in Test) <<= (run in Test).dependsOn(packageBin in Compile),
@@ -242,40 +215,6 @@ lazy val sshd = project
       "org.scalacheck" %% "scalacheck" % "1.12.4" % "test"
     )
   )
-
-// lazy val readme = ScalatexReadme(
-//   projectId = "readme",
-//   wd = file(""),
-//   url = "https://github.com/lihaoyi/ammonite/tree/master",
-//   source = "Index"
-// ).settings(
-//   dontPublishSettings,
-//   scalaVersion := "2.11.8",
-//   libraryDependencies += "com.lihaoyi" %% "fansi" % "0.2.0",
-//   (run in Compile) <<= (run in Compile).dependsOn(
-//     assembly in amm,
-//     packageBin in (shell, Compile),
-//     doc in (ops, Compile),
-//     doc in (terminal, Compile),
-//     doc in (amm, Compile),
-//     doc in (sshd, Compile),
-//     doc in (shell, Compile)
-//   ),
-//   (run in Compile) <<= (run in Compile).dependsOn(Def.task {
-//     val apiFolder = (target in Compile).value / "scalatex" / "api"
-//     val copies = Seq(
-//       (doc in (ops, Compile)).value -> "ops",
-//       (doc in (terminal, Compile)).value -> "terminal",
-//       (doc in (amm, Compile)).value -> "amm",
-//       (doc in (sshd, Compile)).value -> "sshd",
-//       (doc in (shell, Compile)).value -> "shell"
-//     )
-//     for ((folder, name) <- copies) {
-//       sbt.IO.copyDirectory(folder, apiFolder / name, overwrite = true)
-//     }
-//   }),
-//   (unmanagedSources in Compile) += baseDirectory.value / ".." / "project" / "Constants.scala"
-// )
 
 lazy val published = project
   .in(file("target/published"))
