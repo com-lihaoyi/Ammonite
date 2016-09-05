@@ -99,7 +99,7 @@ object Terminal {
   type Action = (Vector[Char], Int) => (Vector[Char], Int)
   type MsgAction = (Vector[Char], Int) => (Vector[Char], Int, String)
 
-  def noTransform(x: Vector[Char], i: Int) = (fansi.Str(x), i)
+  def noTransform(x: Vector[Char], i: Int) = (x.mkString(""), i)
 
   /**
     * Blockingly reads a line from the given input stream and returns it.
@@ -117,7 +117,7 @@ object Terminal {
                reader: java.io.Reader,
                writer: java.io.Writer,
                filters: Filter,
-               displayTransform: (Vector[Char], Int) => (fansi.Str, Int) =
+               displayTransform: (Vector[Char], Int) => (String, Int) =
                  noTransform): Option[String] = {
 
     /**
@@ -129,7 +129,7 @@ object Terminal {
       * math all over the place, incredibly prone to off-by-ones, in order
       * to at the end of the day position the cursor in the right spot.
       */
-    def redrawLine(buffer: fansi.Str,
+    def redrawLine(buffer: String,
                    cursor: Int,
                    ups: Int,
                    rowLengths: Seq[Int],
@@ -182,7 +182,7 @@ object Terminal {
         }
 
       writer.write(
-        buffer.render.flatMap {
+        buffer.flatMap {
           case '\n' => newlineReplacement
           case x => Array(x)
         }.toArray
@@ -246,7 +246,7 @@ object Terminal {
       def updateState(s: LazyList[Int],
                       b: Vector[Char],
                       c: Int,
-                      msg: fansi.Str): (Int, TermState) = {
+                      msg: String): (Int, TermState) = {
 
         val newCursor = math.max(math.min(c, b.length), 0)
         val nextUps =
@@ -312,11 +312,10 @@ object Terminal {
 }
 object Prompt {
   implicit def construct(prompt: String): Prompt = {
-    val parsedPrompt = fansi.Str(prompt)
-    val index = parsedPrompt.plainText.lastIndexOf('\n')
-    val (_, last) = parsedPrompt.splitAt(index + 1)
-    Prompt(parsedPrompt, last)
+    val index = prompt.lastIndexOf('\n')
+    val (_, last) = prompt.splitAt(index + 1)
+    Prompt(prompt, last)
   }
 }
 
-case class Prompt(full: fansi.Str, lastLine: fansi.Str)
+case class Prompt(full: String, lastLine: String)

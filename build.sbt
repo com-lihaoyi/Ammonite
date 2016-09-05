@@ -108,8 +108,7 @@ lazy val terminal = project.settings(
   sharedSettings,
   name := "ammonite-terminal",
   libraryDependencies ++= Seq(
-    "com.lihaoyi" %% "sourcecode" % "0.1.2",
-    "com.lihaoyi" %% "fansi" % "0.2.0"
+    "com.lihaoyi" %% "sourcecode" % "0.1.2"
   ),
   macroSettings
 )

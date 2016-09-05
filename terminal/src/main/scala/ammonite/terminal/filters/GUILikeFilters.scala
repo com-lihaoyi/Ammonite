@@ -125,15 +125,13 @@ object GUILikeFilters {
   }
   object SelectionFilter {
     def mangleBuffer(selectionFilter: SelectionFilter,
-                     string: fansi.Str,
-                     cursor: Int,
-                     startColor: fansi.Attrs) = {
+                     string: String,
+                     cursor: Int) = {
       selectionFilter.mark match {
         case Some(mark) if mark != cursor =>
           val Seq(min, max) = Seq(cursor, mark).sorted
           val displayOffset = if (cursor < mark) 0 else -1
-          val newStr = string.overlay(startColor, min, max)
-          (newStr, displayOffset)
+          (string, displayOffset)
         case _ => (string, 0)
       }
     }

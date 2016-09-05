@@ -11,8 +11,7 @@ import Filter._
   * as history-search functionality (`Ctrl R` in bash) letting you quickly find
   * & filter previous commands by entering a sub-string.
   */
-class HistoryFilter(history: () => IndexedSeq[String],
-                    commentStartColor: fansi.Attrs) extends DelegateFilter{
+class HistoryFilter(history: () => IndexedSeq[String]) extends DelegateFilter{
 
   /**
     * `-1` means we haven't started looking at history, `n >= 0` means we're
@@ -69,16 +68,14 @@ class HistoryFilter(history: () => IndexedSeq[String],
       case Some(b) if b.nonEmpty =>
         val (i, b1, c) = nextHistoryIndexFor(b)
 
-        val msg =
-          if (i.nonEmpty) ""
-          else commentStartColor(HistoryFilter.cannotFindSearchMessage).render
+        val msg = if (i.nonEmpty) "" else HistoryFilter.cannotFindSearchMessage
 
         (i, b1, msg, c)
 
       // We're searching for nothing in particular; in this case,
       // show a help message instead of an unhelpful, empty buffer
       case Some(b) if b.isEmpty =>
-        val msg = commentStartColor(HistoryFilter.emptySearchMessage).render
+        val msg = HistoryFilter.emptySearchMessage
         // The cursor in this case always goes to zero
         (Some(start), Vector(), msg, 0)
 
@@ -256,23 +253,19 @@ object HistoryFilter{
 
 
   def mangleBuffer(historyFilter: HistoryFilter,
-                   buffer: fansi.Str,
-                   cursor: Int,
-                   startColor: fansi.Attr) = {
+                   buffer: String,
+                   cursor: Int) = {
     if (!historyFilter.activeSearch) buffer
     else {
       val (searchStart, searchEnd) =
         if (historyFilter.searchTerm.get.isEmpty) (cursor, cursor+1)
         else {
-          val start = buffer.plainText.indexOfSlice(historyFilter.searchTerm.get)
+          val start = buffer.indexOfSlice(historyFilter.searchTerm.get)
 
           val end = start + (historyFilter.searchTerm.get.length max 1)
           (start, end)
         }
-
-
-      val newStr = buffer.overlay(startColor, searchStart, math.min(buffer.length, searchEnd))
-      newStr
+        buffer
     }
 
   }

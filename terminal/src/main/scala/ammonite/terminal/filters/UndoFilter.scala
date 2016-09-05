@@ -4,7 +4,6 @@ import ammonite.terminal.FilterTools._
 import ammonite.terminal.LazyList.~:
 import ammonite.terminal.SpecialKeys.Ctrl
 import ammonite.terminal._
-import acyclic.file
 import scala.collection.mutable
 import Filter._
 
@@ -137,7 +136,8 @@ case class UndoFilter(maxUndo: Int = 25) extends DelegateFilter {
       case TS(rest, b, c, _) => wrap(undo(b, c), rest)
     },
     action(SpecialKeys.Alt + '-') {
-      case TS(rest, b, c, _) => wrap(redo(b, c), rest)
+      case TS(rest, b, c, _) =>
+        wrap(redo(b, c), rest)
     }
   )
 }
@@ -148,9 +148,8 @@ object UndoState extends Enum {
 }
 
 object UndoFilter {
-  val undoMsg =
-    fansi.Color.Blue(" ...undoing last action, `Alt -` or `Esc -` to redo")
-  val cannotUndoMsg = fansi.Color.Blue(" ...no more actions to undo")
-  val redoMsg = fansi.Color.Blue(" ...redoing last action")
-  val cannotRedoMsg = fansi.Color.Blue(" ...no more actions to redo")
+  val undoMsg = " ...undoing last action, `Alt -` or `Esc -` to redo"
+  val cannotUndoMsg = " ...no more actions to undo"
+  val redoMsg = " ...redoing last action"
+  val cannotRedoMsg = " ...no more actions to redo"
 }

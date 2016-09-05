@@ -13,8 +13,7 @@ object HistoryTests extends TestSuite {
           "abcdefg",
           "abcdefg",
           "abcdefghi"
-      ),
-      fansi.Attrs.Empty
+      )
     )
     def checker(start: String) = Checker(
       width = 50,

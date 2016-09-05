@@ -90,10 +90,7 @@ case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty)
       case TermState(rest, b, c, _) => BasicFilters.injectNewLine(b, c, rest)
     }
 
-    val historyFilter = new HistoryFilter(
-      () => history.reverse,
-      colors.comment()
-    )
+    val historyFilter = new HistoryFilter(() => history.reverse)
     val selectionFilter = GUILikeFilters.SelectionFilter(indent = 2)
 
     val allFilters = Filter.merge(

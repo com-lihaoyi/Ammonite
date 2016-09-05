@@ -30,7 +30,7 @@ object TestMain {
     rec()
     @tailrec def rec(): Unit = {
       val historyFilter =
-        new HistoryFilter(() => history.toVector, fansi.Color.Blue)
+        new HistoryFilter(() => history.toVector)
       Terminal.readLine(
         Console.MAGENTA + (0 until 10).mkString + "\n@@@ " + Console.RESET,
         reader,
@@ -58,18 +58,16 @@ object TestMain {
             case c => Console.UNDERLINED + c + Console.RESET
           }
           // and highlight the selection
-          val ansiBuffer = fansi.Str(hl(buffer))
+          val ansiBuffer = hl(buffer)
           val (newBuffer, cursorOffset) = SelectionFilter.mangleBuffer(
             selection,
-            ansiBuffer,
-            cursor,
-            fansi.Reversed.On
+            ansiBuffer.mkString(""),
+            cursor
           )
           val newNewBuffer = HistoryFilter.mangleBuffer(
             historyFilter,
             newBuffer,
-            cursor,
-            fansi.Color.Green
+            cursor
           )
 
           (newNewBuffer, cursorOffset)
