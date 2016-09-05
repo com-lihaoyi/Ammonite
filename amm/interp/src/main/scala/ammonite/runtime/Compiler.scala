@@ -174,7 +174,12 @@ object Compiler{
           Console.err.println(s"Implementation $className of plugin $name not found.")
       }
 
-      plugins.collect{case (name, _, Some(cls)) => name -> cls }
+      /*
+       * If there's also a '-sources' jar for the plugin in the classpath,
+       * there will be >= 1 plugins registered which may cause cryptic error messages
+       * and break the REPL completely, so `.distinct` is called.
+       */
+      plugins.collect{case (name, _, Some(cls)) => name -> cls }.distinct
     }
 
     var errorLogger: String => Unit = s => ()
