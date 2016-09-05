@@ -1,6 +1,6 @@
 package ammonite
 
-import ammonite.runtime.{History, Interpreter, Storage}
+import ammonite.runtime.Storage
 import ammonite.main.Defaults
 import ammonite.ops._
 import ammonite.runtime.tools.IvyConstructor._

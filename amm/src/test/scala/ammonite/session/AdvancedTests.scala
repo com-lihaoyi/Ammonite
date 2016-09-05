@@ -2,8 +2,11 @@ package ammonite.session
 
 import ammonite.TestUtils._
 import ammonite.TestRepl
-import ammonite.util.{Res, Util}
+import ammonite.util.Res
 import utest._
+
+import ammonite.ops._
+
 object AdvancedTests extends TestSuite {
   val tests = TestSuite {
     println("AdvancedTests")
@@ -278,7 +281,6 @@ object AdvancedTests extends TestSuite {
       """)
     }
     'loadingModulesInPredef {
-      import ammonite.ops._
       val dir = pwd / 'src / 'test / 'resources / 'scripts / 'predefWithLoad
       'loadExec {
         val c1 = new TestRepl() {

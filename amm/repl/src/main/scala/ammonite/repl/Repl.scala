@@ -43,8 +43,6 @@ class ReplKernel(input: InputStream,
     i => {
       val replApi = new ReplApiImpl(
         i,
-        frontEnd.width,
-        frontEnd.height,
         colors,
         prompt,
         frontEnd,
@@ -66,9 +64,6 @@ class ReplKernel(input: InputStream,
         reader,
         output,
         colors().prompt()(prompt).render,
-        colors(),
-        interp.pressy.complete(_, Preprocessor.importBlock(interp.eval.frames.head.imports), _),
-        storage.fullHistory(),
         addHistory = (code) =>
           if (code != "") {
             storage.fullHistory() = storage.fullHistory() :+ code

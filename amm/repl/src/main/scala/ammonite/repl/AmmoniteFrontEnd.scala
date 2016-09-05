@@ -4,7 +4,7 @@ import java.io.{InputStream, OutputStream, OutputStreamWriter}
 
 import ammonite.terminal._
 import fastparse.core.Parsed
-import ammonite.util.{Colors, Res}
+import ammonite.util.Res
 import ammonite.runtime.Parsers
 
 class AmmoniteFrontEnd extends FrontEnd {
@@ -16,9 +16,6 @@ class AmmoniteFrontEnd extends FrontEnd {
              reader: java.io.Reader,
              output: OutputStream,
              prompt: String,
-             colors: Colors,
-             compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
-             history: IndexedSeq[String],
              addHistory: String => Unit) = {
     val res = readLine(reader, output, prompt) match {
       case None => Res.Exit(())

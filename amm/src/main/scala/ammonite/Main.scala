@@ -88,8 +88,6 @@ case class Main(predef: String = "",
         else {
           val replApi = new ReplApiImpl(
             i,
-            80,
-            80,
             colors,
             "",
             null,

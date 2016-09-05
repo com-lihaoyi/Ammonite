@@ -4,8 +4,6 @@ import ammonite.TestRepl
 import ammonite.TestUtils._
 import utest._
 
-import scala.collection.{immutable => imm}
-
 object ProjectTests extends TestSuite {
   val tests = TestSuite {
     println("ProjectTests")

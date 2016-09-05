@@ -8,8 +8,6 @@ import ammonite.util.Util.newLine
 object ToolsTests extends TestSuite {
 
   val tests = TestSuite {
-    var wd = pwd
-
     /**
       * Convert the highlighter colors into angle brackets for easy testing
       */

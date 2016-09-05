@@ -44,8 +44,6 @@ class TestRepl {
       extraBridges = { i =>
         val replApi = new ReplApiImpl(
           i,
-          80,
-          80,
           Colors.BlackWhite,
           "@",
           null,
@@ -60,7 +58,7 @@ class TestRepl {
     i.init()
     i
   } catch {
-    case e =>
+    case e : Throwable =>
       println(infoBuffer.mkString)
       println(outBuffer.mkString)
       println(warningBuffer.mkString)
@@ -204,7 +202,7 @@ class TestRepl {
   }
 
   def fail(input: String, failureCheck: String => Boolean = _ => true) = {
-    val (processed, out, warning, error, info) = run(input, 0)
+    val (processed, _, _, _, _) = run(input, 0)
 
     processed match {
       case Res.Success(v) =>
@@ -224,7 +222,7 @@ class TestRepl {
   }
 
   def result(input: String, expected: Res[Evaluated]) = {
-    val (processed, allOut, warning, error, info) = run(input, 0)
+    val (processed, _, _, _, _) = run(input, 0)
     assert(processed == expected)
   }
   def failLoudly[T](t: => T) =

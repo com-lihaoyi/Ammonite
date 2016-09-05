@@ -51,8 +51,6 @@ class SessionApiImpl(eval: Evaluator) extends Session {
 }
 
 class ReplApiImpl(val interp: Interpreter,
-                  width0: => Int,
-                  height0: => Int,
                   colors0: Ref[Colors],
                   prompt0: String,
                   frontEnd0: FrontEnd,
@@ -83,8 +81,6 @@ class ReplApiImpl(val interp: Interpreter,
     Ref.live[pprint.Config](
       () =>
         pprint.Config.apply(
-          width = width,
-          height = height / 2,
           colors = pprint.Colors(
             colors().literal(),
             colors().prefix()
@@ -115,9 +111,7 @@ class ReplApiImpl(val interp: Interpreter,
   def fullHistory = storage.fullHistory()
   def history = history0
 
-  def width = width0
   def replArgs = replArgs0.toVector
-  def height = height0
 
   object sess extends Session {
     def frames = eval.frames

@@ -14,7 +14,7 @@ object AutocompleteTests extends TestSuite {
         val cursor = caretCode.indexOf("<caret>")
         val buf = caretCode.replace("<caret>", "")
 
-        val (index, completions, signatures) = check.interp.pressy.complete(
+        val (_, completions, signatures) = check.interp.pressy.complete(
           cursor,
           Preprocessor.importBlock(check.interp.eval.frames.head.imports),
           buf

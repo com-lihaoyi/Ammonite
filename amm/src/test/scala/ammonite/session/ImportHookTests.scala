@@ -1,13 +1,8 @@
 package ammonite.session
 
 import ammonite.TestRepl
-import ammonite.TestUtils._
 import ammonite.runtime.tools.IvyThing
 import utest._
-
-import scala.collection.{immutable => imm}
-import scala.util.Properties
-import ammonite.util.Util
 
 object ImportHookTests extends TestSuite {
 

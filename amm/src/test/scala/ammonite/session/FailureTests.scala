@@ -3,7 +3,6 @@ package ammonite.session
 import ammonite.TestRepl
 import utest._
 
-import scala.collection.{immutable => imm}
 object FailureTests extends TestSuite {
   val tests = TestSuite {
     println("FailureTests")

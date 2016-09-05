@@ -97,16 +97,6 @@ trait ReplAPI {
   implicit def codeColors: CodeColors
 
   /**
-    * Current width of the terminal
-    */
-  def width: Int
-
-  /**
-    * Current height of the terminal
-    */
-  def height: Int
-
-  /**
     * Lets you configure the pretty-printing of a value. By default, it simply
     * disables truncation and prints the entire thing, but you can set other
     * parameters as well if you want.
