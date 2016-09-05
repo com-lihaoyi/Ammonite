@@ -11,14 +11,6 @@ object BuiltinTests extends TestSuite {
     val check = new TestRepl()
     'basicConfig {
       check.session("""
-        @ // Set the shell prompt to be something else
-
-        @ repl.prompt() = ">"
-
-        @ // Change the terminal front end; the default is
-
-        @ // Ammonite on Linux/OSX and JLineWindows on Windows
-
         @ // Changing the colors used by Ammonite; all at once:
 
         @ repl.colors() = ammonite.util.Colors.BlackWhite

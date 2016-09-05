@@ -10,12 +10,5 @@ object Configure {
     repl.frontEnd() = ammonite.repl.AmmoniteFrontEnd(
       ammonite.shell.PathComplete.pathCompleteFilter(wd, repl.colors())
     )
-
-    repl.prompt.bind(
-      sys.props("user.name") +
-        "-" +
-        wd.segments.lastOption.getOrElse("") +
-        "@ "
-    )
   }
 }

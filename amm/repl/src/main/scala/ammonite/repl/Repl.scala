@@ -17,7 +17,7 @@ class ReplKernel(input: InputStream,
                  wd: ammonite.ops.Path,
                  replArgs: Seq[Bind[_]]) {
 
-  val prompt = Ref("@ ")
+  val prompt = "@ "
 
   val argString = replArgs.zipWithIndex.map {
     case (b, idx) =>
@@ -67,7 +67,7 @@ class ReplKernel(input: InputStream,
         input,
         reader,
         output,
-        colors().prompt()(prompt()).render,
+        colors().prompt()(prompt).render,
         colors(),
         interp.pressy.complete(_, Preprocessor.importBlock(interp.eval.frames.head.imports), _),
         storage.fullHistory(),

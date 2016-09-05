@@ -270,26 +270,6 @@ object AdvancedTests extends TestSuite {
         error: not found: value scalatags
       """)
     }
-    'replApiUniqueness {
-      // Make sure we can instantiate multiple copies of Interpreter, with each
-      // one getting its own `ReplBridge`. This ensures that the various
-      // Interpreters are properly encapsulated and don't interfere with each
-      // other.
-      val c1 = new TestRepl()
-      val c2 = new TestRepl()
-      c1.session("""
-        @ repl.prompt() = "A"
-      """)
-      c2.session("""
-        @ repl.prompt() = "B"
-      """)
-      c1.session("""
-        @ assert(repl.prompt() == "A")
-      """)
-      c2.session("""
-        @ assert(repl.prompt() == "B")
-      """)
-    }
     'desugar {
       if (!scala2_10)
         check.session("""

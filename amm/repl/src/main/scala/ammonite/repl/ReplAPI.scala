@@ -26,10 +26,9 @@ trait ReplAPI {
   def exit(value: Any) = throw ReplExit(value)
 
   /**
-    * Read/writable prompt for the shell. Use this to change the
-    * REPL prompt at any time!
+    * Read/writable prompt for the shell. 
     */
-  val prompt: Ref[String]
+  val prompt: String
 
   /**
     * The front-end REPL used to take user input. Modifiable!
