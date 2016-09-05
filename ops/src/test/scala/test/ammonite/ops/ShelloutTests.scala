@@ -26,8 +26,12 @@ object ShelloutTests extends TestSuite {
         }
       }
       'chained {
-        assert(%%('git, 'init).out.string.contains("Reinitialized existing Git repository"))
-        assert(%%('git, "init").out.string.contains("Reinitialized existing Git repository"))
+        assert(
+          %%('git, 'init).out.string
+            .contains("Reinitialized existing Git repository"))
+        assert(
+          %%('git, "init").out.string
+            .contains("Reinitialized existing Git repository"))
         assert(%%('ls, pwd).out.string.contains("readme.md"))
       }
       'basicList {
@@ -38,7 +42,9 @@ object ShelloutTests extends TestSuite {
       'listMixAndMatch {
         val stuff = List("I", "am", "bovine")
         val result = %%('echo, "Hello,", stuff, "hear me roar")
-        assert(result.out.string.contains("Hello, " + stuff.mkString(" ") + " hear me roar"))
+        assert(
+          result.out.string
+            .contains("Hello, " + stuff.mkString(" ") + " hear me roar"))
       }
       'failures {
         val ex = intercept[ShelloutException] { %%('ls, "does-not-exist") }
@@ -51,10 +57,14 @@ object ShelloutTests extends TestSuite {
 
       'filebased {
         if (Unix()) {
-          assert(%%(scriptFolder / 'echo, 'HELLO).out.lines.mkString == "HELLO")
+          assert(
+            %%(scriptFolder / 'echo, 'HELLO).out.lines.mkString == "HELLO")
 
           val res: CommandResult =
-            %%(root / 'bin / 'bash, "-c", "echo 'Hello'$ENV_ARG", ENV_ARG = 123)
+            %%(root / 'bin / 'bash,
+               "-c",
+               "echo 'Hello'$ENV_ARG",
+               ENV_ARG = 123)
 
           assert(res.out.string.trim == "Hello123")
         }

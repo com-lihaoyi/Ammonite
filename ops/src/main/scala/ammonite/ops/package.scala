@@ -8,7 +8,9 @@ package object ops extends Extensions with RelPathStuff {
     */
   val root = ops.Path.root
 
-  def resource(implicit resRoot: ResourceRoot = Thread.currentThread().getContextClassLoader) = {
+  def resource(
+      implicit resRoot: ResourceRoot =
+        Thread.currentThread().getContextClassLoader) = {
     ops.ResourcePath.resource(resRoot)
   }
 
@@ -27,7 +29,9 @@ package object ops extends Extensions with RelPathStuff {
     /**
       * Creates a temporary directory
       */
-    def dir(dir: Path = null, prefix: String = null, deleteOnExit: Boolean = true): Path = {
+    def dir(dir: Path = null,
+            prefix: String = null,
+            deleteOnExit: Boolean = true): Path = {
       val nioPath = dir match {
         case null => java.nio.file.Files.createTempDirectory(prefix)
         case _ => java.nio.file.Files.createTempDirectory(dir.toNIO, prefix)

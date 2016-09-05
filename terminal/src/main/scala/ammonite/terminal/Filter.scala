@@ -37,8 +37,10 @@ object Filter {
     * switching on the prefix of the input stream and want to run some
     * transformation on the buffer/cursor
     */
-  def simple(prefixes: Strings)(f: (Vector[Char], Int, TermInfo) => (Vector[Char], Int))(implicit l: sourcecode.Line,
-                                                                                         enc: sourcecode.Enclosing) =
+  def simple(prefixes: Strings)(f: (Vector[Char], Int,
+                                    TermInfo) => (Vector[Char], Int))(
+      implicit l: sourcecode.Line,
+      enc: sourcecode.Enclosing) =
     new Filter {
       def op(ti: TermInfo) = {
         val matchingPrefixOpt =
@@ -58,7 +60,9 @@ object Filter {
       def identifier = enc.value + ":" + l.value
     }
   def action(prefixes: Strings, filter: TermInfo => Boolean = _ => true)(
-      action: TermState => TermAction = x => x)(implicit i: sourcecode.Enclosing, line: sourcecode.Line) = new Filter {
+      action: TermState => TermAction = x => x)(
+      implicit i: sourcecode.Enclosing,
+      line: sourcecode.Line) = new Filter {
     def op(ti: TermInfo) = {
       prefixes.values.iterator.map { prefix =>
         ti.ts.inputs.dropPrefix(prefix.map(_.toInt))
@@ -68,13 +72,15 @@ object Filter {
     }
     def identifier: String = i.value + ":" + line.value
   }
-  def partial(f: PartialFunction[TermInfo, TermAction])(implicit i: sourcecode.Enclosing): Filter =
+  def partial(f: PartialFunction[TermInfo, TermAction])(
+      implicit i: sourcecode.Enclosing): Filter =
     new Filter {
       def op(ti: TermInfo) = f.lift(ti)
       def identifier = i.value
     }
 
-  def wrap(f: TermInfo => Option[TermAction])(implicit i: sourcecode.Enclosing): Filter =
+  def wrap(f: TermInfo => Option[TermAction])(
+      implicit i: sourcecode.Enclosing): Filter =
     new Filter {
       def op(ti: TermInfo) = f(ti)
       def identifier = i.value
@@ -98,7 +104,8 @@ object Filter {
   * providing a reasonable "place" inside the inheriting class/object to put
   * state or helpers or other logic associated with the filter.
   */
-abstract class DelegateFilter(implicit val enclosing: sourcecode.Enclosing) extends Filter {
+abstract class DelegateFilter(implicit val enclosing: sourcecode.Enclosing)
+    extends Filter {
   def filter: Filter
   def op(ti: TermInfo) = filter.op(ti)
   def identifier = enclosing.value

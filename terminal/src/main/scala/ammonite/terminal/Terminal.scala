@@ -40,7 +40,9 @@ object Terminal {
     }
     frags
   }
-  def calculateHeight(buffer: Vector[Char], width: Int, prompt: String): Seq[Int] = {
+  def calculateHeight(buffer: Vector[Char],
+                      width: Int,
+                      prompt: String): Seq[Int] = {
     val rowLengths = splitBuffer(buffer)
 
     calculateHeight0(rowLengths, width - prompt.length)
@@ -66,7 +68,10 @@ object Terminal {
     fragHeights
   }
 
-  def positionCursor(cursor: Int, rowLengths: Seq[Int], fragHeights: Seq[Int], width: Int) = {
+  def positionCursor(cursor: Int,
+                     rowLengths: Seq[Int],
+                     fragHeights: Seq[Int],
+                     width: Int) = {
     var leftoverCursor = cursor
     //    Debug("leftoverCursor " + leftoverCursor)
     var totalPreHeight = 0
@@ -112,7 +117,8 @@ object Terminal {
                reader: java.io.Reader,
                writer: java.io.Writer,
                filters: Filter,
-               displayTransform: (Vector[Char], Int) => (String, Int) = noTransform): Option[String] = {
+               displayTransform: (Vector[Char], Int) => (String, Int) =
+                 noTransform): Option[String] = {
 
     /**
       * Erases the previous line and re-draws it with the new buffer and
@@ -200,7 +206,9 @@ object Terminal {
     }
 
     @tailrec
-    def readChar(lastState: TermState, ups: Int, fullPrompt: Boolean = true): Option[String] = {
+    def readChar(lastState: TermState,
+                 ups: Int,
+                 fullPrompt: Boolean = true): Option[String] = {
       val moreInputComing = reader.ready()
 
       lazy val (transformedBuffer0, cursorOffset) = displayTransform(
@@ -235,7 +243,10 @@ object Terminal {
         actualWidth
       )
 
-      def updateState(s: LazyList[Int], b: Vector[Char], c: Int, msg: String): (Int, TermState) = {
+      def updateState(s: LazyList[Int],
+                      b: Vector[Char],
+                      c: Int,
+                      msg: String): (Int, TermState) = {
 
         val newCursor = math.max(math.min(c, b.length), 0)
         val nextUps =
@@ -285,7 +296,9 @@ object Terminal {
     lazy val ansi = new AnsiNav(writer)
     lazy val (width, _, initialConfig) = TTY.init()
     try {
-      readChar(TermState(LazyList.continually(reader.read()), Vector.empty, 0, ""), 0)
+      readChar(
+        TermState(LazyList.continually(reader.read()), Vector.empty, 0, ""),
+        0)
     } finally {
 
       // Don't close these! Closing these closes stdin/stdout,

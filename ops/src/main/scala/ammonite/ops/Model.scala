@@ -46,7 +46,9 @@ object stat extends Function1[ops.Path, ops.stat] {
         LinkOption.NOFOLLOW_LINKS
       )).toOption
   )
-  def make(name: String, attrs: BasicFileAttributes, posixAttrs: Option[PosixFileAttributes]) = {
+  def make(name: String,
+           attrs: BasicFileAttributes,
+           posixAttrs: Option[PosixFileAttributes]) = {
     import collection.JavaConversions._
     new stat(
       name,
@@ -76,7 +78,9 @@ object stat extends Function1[ops.Path, ops.stat] {
           LinkOption.NOFOLLOW_LINKS
         )).toOption
     )
-    def make(name: String, attrs: BasicFileAttributes, posixAttrs: Option[PosixFileAttributes]) = {
+    def make(name: String,
+             attrs: BasicFileAttributes,
+             posixAttrs: Option[PosixFileAttributes]) = {
       import collection.JavaConversions._
       new full(
         name,

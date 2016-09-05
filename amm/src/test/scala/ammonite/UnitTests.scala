@@ -1,11 +1,7 @@
 package ammonite
 
 import ammonite.main.Router
-import ammonite.main.Router.Result.Error.{
-  InvalidArguments,
-  RedundantArguments,
-  TooManyArguments
-}
+import ammonite.main.Router.Result.Error.{InvalidArguments, RedundantArguments, TooManyArguments}
 import ammonite.main.Router.Result.ParamError
 import ammonite.main.Router.{ArgSig, doc, main}
 import ammonite.util.Util
@@ -18,9 +14,7 @@ object UnitTests extends TestSuite {
     'transpose {
       // Make sure this doesn't stack-overflow
       val inner = List.fill(1000000)(1)
-      assert(
-        Util.transpose(List.fill(10)(inner)) == List.fill(1000000)(
-          List.fill(10)(1)))
+      assert(Util.transpose(List.fill(10)(inner)) == List.fill(1000000)(List.fill(10)(1)))
     }
     'router {
       case object MyException extends Exception
@@ -30,9 +24,7 @@ object UnitTests extends TestSuite {
         @main
         def bar(i: Int) = i
         @main
-        def qux(
-            i: Int,
-            @doc("Pass in a custom `s` to override it") s: String = "lols") =
+        def qux(i: Int, @doc("Pass in a custom `s` to override it") s: String = "lols") =
           s * i
         @main
         def ex() = throw MyException
@@ -50,12 +42,7 @@ object UnitTests extends TestSuite {
       val routes = Router.generateRoutes(Target)
       'basicModelling {
         assert(
-          routes.map(_.name) == Seq("foo",
-                                    "bar",
-                                    "qux",
-                                    "ex",
-                                    "pureVariadic",
-                                    "mixedVariadic")
+          routes.map(_.name) == Seq("foo", "bar", "qux", "ex", "pureVariadic", "mixedVariadic")
         )
         val evaledArgs = routes.map(_.argSignatures.map {
           case Router.ArgSig(name, tpe, docs, None) => (name, tpe, docs, None)
@@ -68,10 +55,7 @@ object UnitTests extends TestSuite {
             List(("i", "Int", None, None)),
             List(
               ("i", "Int", None, None),
-              ("s",
-               "String",
-               Some("Pass in a custom `s` to override it"),
-               Some("lols"))
+              ("s", "String", Some("Pass in a custom `s` to override it"), Some("lols"))
             ),
             List(),
             List(("nums", "Int*", None, None)),
@@ -82,31 +66,22 @@ object UnitTests extends TestSuite {
 
       'invoke - assert(
         routes(0).invoke(Seq.empty, Seq.empty) == Router.Result.Success(1),
-        routes(1).invoke(Seq.empty, Seq("i" -> "2")) == Router.Result.Success(
-          2),
-        routes(2).invoke(Seq.empty, Seq("i" -> "2")) == Router.Result.Success(
-          "lolslols"),
-        routes(2)
-          .invoke(Seq.empty, Seq("i" -> "3", "s" -> "x")) == Router.Result
-          .Success("xxx")
+        routes(1).invoke(Seq.empty, Seq("i" -> "2")) == Router.Result.Success(2),
+        routes(2).invoke(Seq.empty, Seq("i" -> "2")) == Router.Result.Success("lolslols"),
+        routes(2).invoke(Seq.empty, Seq("i" -> "3", "s" -> "x")) == Router.Result.Success("xxx")
       )
       'varargs {
         'happyPathPasses - assert(
-          routes(4).invoke(Seq("1", "2", "3"), Seq()) == Router.Result.Success(
-            6),
-          routes(5)
-            .invoke(Seq("1", "2", "3", "4", "5"), Seq()) == Router.Result
-            .Success("12345")
+          routes(4).invoke(Seq("1", "2", "3"), Seq()) == Router.Result.Success(6),
+          routes(5).invoke(Seq("1", "2", "3", "4", "5"), Seq()) == Router.Result.Success("12345")
         )
         'emptyVarargsPasses - assert(
           routes(4).invoke(Seq(), Seq()) == Router.Result.Success(0),
           routes(5).invoke(Seq("1"), Seq()) == Router.Result.Success("1")
         )
         'namedVarargAlonePasses - assert(
-          routes(4).invoke(Seq(), Seq("nums" -> "31337")) == Router.Result
-            .Success(31337),
-          routes(5).invoke(Seq("1"), Seq("args" -> "foo")) == Router.Result
-            .Success("1foo")
+          routes(4).invoke(Seq(), Seq("nums" -> "31337")) == Router.Result.Success(31337),
+          routes(5).invoke(Seq("1"), Seq("args" -> "foo")) == Router.Result.Success("1foo")
         )
         'duplicatePositionalAndNamedVarargsFails {
           assertMatch(routes(4).invoke(Seq("1", "2", "3"), Seq("nums" -> "4"))) {
@@ -125,21 +100,15 @@ object UnitTests extends TestSuite {
           assertMatch(routes(4).invoke(Seq("aa", "bb", "3"), Seq())) {
             case InvalidArguments(
                 Seq(
-                ParamError.Invalid(ArgSig("nums", "Int*", _, _),
-                                   "aa",
-                                   _: NumberFormatException),
-                ParamError.Invalid(ArgSig("nums", "Int*", _, _),
-                                   "bb",
-                                   _: NumberFormatException)
+                ParamError.Invalid(ArgSig("nums", "Int*", _, _), "aa", _: NumberFormatException),
+                ParamError.Invalid(ArgSig("nums", "Int*", _, _), "bb", _: NumberFormatException)
                 )
                 ) =>
           }
           assertMatch(routes(5).invoke(Seq("aa", "bb", "3"), Seq())) {
             case InvalidArguments(
                 Seq(
-                ParamError.Invalid(ArgSig("first", "Int", _, _),
-                                   "aa",
-                                   _: NumberFormatException)
+                ParamError.Invalid(ArgSig("first", "Int", _, _), "aa", _: NumberFormatException)
                 )
                 ) =>
           }

@@ -21,9 +21,11 @@ object OpTests extends TestSuite {
     )
     'lsR {
       ls.rec(res).foreach(println)
-      intercept[java.nio.file.NoSuchFileException](ls.rec(pwd / 'target / 'nonexistent))
+      intercept[java.nio.file.NoSuchFileException](
+        ls.rec(pwd / 'target / 'nonexistent))
       assert(
-        ls.rec(res / 'folder2 / 'folder2b) == Seq(res / 'folder2 / 'folder2b / "b.txt"),
+        ls.rec(res / 'folder2 / 'folder2b) == Seq(
+          res / 'folder2 / 'folder2b / "b.txt"),
         ls.rec(res / 'folder2) == Seq(
           res / 'folder2 / 'folder2a,
           res / 'folder2 / 'folder2b,
@@ -50,7 +52,8 @@ object OpTests extends TestSuite {
           assert(contents.contains("file contents lols"))
 
           val cl = getClass.getClassLoader
-          val contents2 = read(resource(cl) / 'test / 'ammonite / 'ops / 'folder / "file.txt")
+          val contents2 = read(
+            resource(cl) / 'test / 'ammonite / 'ops / 'folder / "file.txt")
           assert(contents2.contains("file contents lols"))
         }
 
@@ -69,10 +72,12 @@ object OpTests extends TestSuite {
         }
 
         * - intercept[ResourceNotFoundException] {
-          read(resource(classOf[test.ammonite.ops.Testing]) / 'test / 'ammonite / 'ops / 'folder / "file.txt")
+          read(
+            resource(classOf[test.ammonite.ops.Testing]) / 'test / 'ammonite / 'ops / 'folder / "file.txt")
         }
         * - intercept[ResourceNotFoundException] {
-          read(resource(getClass) / 'test / 'ammonite / 'ops / 'folder / "file.txt")
+          read(
+            resource(getClass) / 'test / 'ammonite / 'ops / 'folder / "file.txt")
         }
         * - intercept[ResourceNotFoundException] {
           read(resource(getClass.getClassLoader) / 'folder / "file.txt")
@@ -207,7 +212,8 @@ object OpTests extends TestSuite {
           assert(
             ls(nested) == Seq(nested / 'inner),
             ls(nested / 'inner) == Seq(nested / 'inner / 'innerer),
-            ls(nested / 'inner / 'innerer) == Seq(nested / 'inner / 'innerer / 'innerest)
+            ls(nested / 'inner / 'innerer) == Seq(
+              nested / 'inner / 'innerer / 'innerest)
           )
           rm ! nested / 'inner
           assert(ls(nested) == Seq())
@@ -232,7 +238,8 @@ object OpTests extends TestSuite {
           write(d / 'concat1, Seq("a", "b", "c"))
           assert(read(d / 'concat1) == "abc")
           write(d / 'concat2, Array(Array[Byte](1, 2), Array[Byte](3, 4)))
-          assert(read.bytes(d / 'concat2).toSeq == Array[Byte](1, 2, 3, 4).toSeq)
+          assert(
+            read.bytes(d / 'concat2).toSeq == Array[Byte](1, 2, 3, 4).toSeq)
         }
         'writeAppend {
           write.append(d / "append.txt", "Hello")
@@ -253,16 +260,22 @@ object OpTests extends TestSuite {
         'nonexistant {
           * - intercept[nio.NoSuchFileException](ls ! d / 'nonexistent)
           * - intercept[nio.NoSuchFileException](read ! d / 'nonexistent)
-          * - intercept[ResourceNotFoundException](read ! resource / 'failures / 'nonexistent)
-          * - intercept[nio.NoSuchFileException](cp ! d / 'nonexistent ! d / 'yolo)
-          * - intercept[nio.NoSuchFileException](mv ! d / 'nonexistent ! d / 'yolo)
+          * - intercept[ResourceNotFoundException](
+            read ! resource / 'failures / 'nonexistent)
+          * - intercept[nio.NoSuchFileException](
+            cp ! d / 'nonexistent ! d / 'yolo)
+          * - intercept[nio.NoSuchFileException](
+            mv ! d / 'nonexistent ! d / 'yolo)
         }
         'collisions {
           mkdir ! d / 'folder
           write ! d / 'file ! "lolol"
-          * - intercept[nio.FileAlreadyExistsException](mv(d / 'file, d / 'folder))
-          * - intercept[nio.FileAlreadyExistsException](cp(d / 'file, d / 'folder))
-          * - intercept[nio.FileAlreadyExistsException](write(d / 'file, "lols"))
+          * - intercept[nio.FileAlreadyExistsException](
+            mv(d / 'file, d / 'folder))
+          * - intercept[nio.FileAlreadyExistsException](
+            cp(d / 'file, d / 'folder))
+          * - intercept[nio.FileAlreadyExistsException](
+            write(d / 'file, "lols"))
         }
       }
     }

@@ -63,7 +63,8 @@ object Shellout {
            util.Try(process.exitValue).isFailure ||
            stdout.available() > 0 ||
            stderr.available() > 0) {
-      for ((std, wrapper) <- Seq(stdout -> (Left(_: Bytes)), stderr -> (Right(_: Bytes)))) {
+      for ((std, wrapper) <- Seq(stdout -> (Left(_: Bytes)),
+                                 stderr -> (Right(_: Bytes)))) {
         while (std.available() > 0) {
           val array = new Array[Byte](std.available())
           val actuallyRead = std.read(array)
@@ -85,9 +86,12 @@ object Shellout {
 /**
   * A staged sub-process command that has yet to be executed.
   */
-case class Command[T](cmd: Vector[String], envArgs: Map[String, String], execute: (Path, Command[_]) => T)
+case class Command[T](cmd: Vector[String],
+                      envArgs: Map[String, String],
+                      execute: (Path, Command[_]) => T)
     extends Dynamic {
-  def extend(cmd2: Traversable[String], envArgs2: Traversable[(String, String)]) =
+  def extend(cmd2: Traversable[String],
+             envArgs2: Traversable[(String, String)]) =
     new Command(cmd ++ cmd2, envArgs ++ envArgs2, execute)
   def selectDynamic(name: String)(implicit wd: Path) =
     execute(wd, extend(Vector(name), Map()))
@@ -97,8 +101,10 @@ case class Command[T](cmd: Vector[String], envArgs: Map[String, String], execute
 
     execute(wd, this.extend(opArg(op) ++ args.flatMap(_.s), Map()))
   }
-  def applyDynamicNamed(op: String)(args: (String, Shellable)*)(implicit wd: Path): T = {
-    val (namedArgs, posArgs) = args.map { case (k, v) => (k, v.s) }.partition(_._1 != "")
+  def applyDynamicNamed(op: String)(args: (String, Shellable)*)(
+      implicit wd: Path): T = {
+    val (namedArgs, posArgs) = args.map { case (k, v) => (k, v.s) }
+      .partition(_._1 != "")
     execute(wd, this.extend(opArg(op) ++ posArgs.flatMap(_._2), namedArgs.map {
       case (k, v) => (k, v.head)
     }))
@@ -158,7 +164,8 @@ case class CommandResult(exitCode: Int, chunks: Seq[Either[Bytes, Bytes]]) {
   * that is normally returned, but ensures that failures in subprocesses happen
   * loudly and won't get ignored unless intentionally caught
   */
-case class ShelloutException(result: CommandResult) extends Exception(result.toString)
+case class ShelloutException(result: CommandResult)
+    extends Exception(result.toString)
 
 case class InteractiveShelloutException() extends Exception()
 
