@@ -1,10 +1,6 @@
 package ammonite.terminal
 
-import ammonite.terminal.filters.{
-  GUILikeFilters,
-  BasicFilters,
-  ReadlineFilters
-}
+import ammonite.terminal.filters.{GUILikeFilters, BasicFilters, ReadlineFilters}
 import utest._
 object Checker {
   def normalize(s: String) = {
@@ -13,12 +9,7 @@ object Checker {
     else {
       val lines = s.lines.toVector
       val min = lines.map(_.indexWhere(_ != ' ')).filter(_ != -1).min
-      lines
-        .drop(1)
-        .dropRight(1)
-        .map(_.drop(min))
-        .mkString("\n")
-        .replace("\\\n", "")
+      lines.drop(1).dropRight(1).map(_.drop(min)).mkString("\n").replace("\\\n", "")
 
     }
   }

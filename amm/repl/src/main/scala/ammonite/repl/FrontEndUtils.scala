@@ -16,7 +16,9 @@ object FrontEndUtils {
     val columns = math.max(1, width / maxLength)
 
     val grouped =
-      snippets.toList.grouped(math.ceil(snippets.length * 1.0 / columns).toInt).toList
+      snippets.toList
+        .grouped(math.ceil(snippets.length * 1.0 / columns).toInt)
+        .toList
 
     ammonite.util.Util
       .transpose(grouped)
@@ -37,7 +39,8 @@ object FrontEndUtils {
     else findPrefix(strings, i + 1)
   }
 
-  def printCompletions(completions: Seq[String], details: Seq[String]): List[String] = {
+  def printCompletions(completions: Seq[String],
+                       details: Seq[String]): List[String] = {
 
     val prelude =
       if (details.length != 0 || completions.length != 0) List(newLine)
@@ -51,7 +54,8 @@ object FrontEndUtils {
     val completionText =
       if (completions.length == 0) Nil
       else
-        FrontEndUtils.tabulate(completions.map(fansi.Str(_)), FrontEndUtils.width)
+        FrontEndUtils
+          .tabulate(completions.map(fansi.Str(_)), FrontEndUtils.width)
 
     prelude ++ detailsText ++ completionText
   }

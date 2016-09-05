@@ -46,14 +46,12 @@ object Internals {
         a.iterator.map(f(_).writeableData).flatten
       )
     }
-    implicit def WritableTraversable[T](a: Traversable[T])(
-        implicit f: T => Writable) = {
+    implicit def WritableTraversable[T](a: Traversable[T])(implicit f: T => Writable) = {
       new Writable(
         a.toIterator.map(f(_).writeableData).flatten
       )
     }
-    implicit def WritableIterator[T](a: Iterator[T])(
-        implicit f: T => Writable) = {
+    implicit def WritableIterator[T](a: Iterator[T])(implicit f: T => Writable) = {
       new Writable(a.map(f(_).writeableData).flatten)
     }
   }
@@ -111,10 +109,7 @@ trait CopyMove extends Function2[Path, Path, Unit] {
   *
   * Creates any necessary directories
   */
-object mv
-    extends Function2[Path, Path, Unit]
-    with Internals.Mover
-    with CopyMove {
+object mv extends Function2[Path, Path, Unit] with Internals.Mover with CopyMove {
   def apply(from: Path, to: Path) = {
     require(
       !to.startsWith(from),
@@ -233,8 +228,7 @@ object ls extends StreamableOp1[Path, Path, LsSeq] with ImplicitOp[LsSeq] {
     *                 you want `preOrder` to be `true` so the folder gets
     *                 created first.
     */
-  case class Walker(skip: Path => Boolean = _ => false,
-                    preOrder: Boolean = false)
+  case class Walker(skip: Path => Boolean = _ => false, preOrder: Boolean = false)
       extends StreamableOp1[Path, Path, LsSeq]
       with ImplicitOp[LsSeq] {
 
@@ -275,9 +269,7 @@ object write extends Function2[Path, Internals.Writable, Unit] {
     * from `java.nio.file.Files.write` so we could re-use it properly for
     * different combinations of flags and all sorts of [[Internals.Writable]]s
     */
-  def write(target: Path,
-            data: Internals.Writable,
-            flags: StandardOpenOption*) = {
+  def write(target: Path, data: Internals.Writable, flags: StandardOpenOption*) = {
 
     val out = Files.newOutputStream(target.toNIO, flags: _*)
     try {
@@ -318,10 +310,7 @@ object write extends Function2[Path, Internals.Writable, Unit] {
   object over extends Function2[Path, Internals.Writable, Unit] {
     def apply(target: Path, data: Internals.Writable) = {
       mkdir(target / RelPath.up)
-      write(target,
-            data,
-            StandardOpenOption.CREATE,
-            StandardOpenOption.TRUNCATE_EXISTING)
+      write(target, data, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
     }
   }
 }
@@ -385,8 +374,7 @@ object exists extends Function1[Path, Boolean] {
   * Kills the given process with the given signal, e.g.
   * `kill(9)! pid`
   */
-case class kill(signal: Int)(implicit wd: Path)
-    extends Function1[Int, CommandResult] {
+case class kill(signal: Int)(implicit wd: Path) extends Function1[Int, CommandResult] {
   def apply(pid: Int): CommandResult = {
     Shellout.%%('kill, "-" + signal, pid.toString)
   }
@@ -402,8 +390,7 @@ object ln extends Function2[Path, Path, Unit] {
   }
   object s extends Function2[Path, Path, Unit] {
     def apply(src: Path, dest: Path) = {
-      Files
-        .createSymbolicLink(Paths.get(dest.toString), Paths.get(src.toString))
+      Files.createSymbolicLink(Paths.get(dest.toString), Paths.get(src.toString))
     }
   }
 }

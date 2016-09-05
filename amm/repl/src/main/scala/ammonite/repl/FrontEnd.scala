@@ -23,7 +23,8 @@ trait FrontEnd {
              output: OutputStream,
              prompt: String,
              colors: Colors,
-             compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
+             compilerComplete: (Int,
+                                String) => (Int, Seq[String], Seq[String]),
              history: IndexedSeq[String],
              addHistory: String => Unit): Res[(String, Seq[String])]
 }

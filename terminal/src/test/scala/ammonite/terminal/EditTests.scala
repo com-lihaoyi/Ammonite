@@ -184,9 +184,7 @@ object EditTests extends TestSuite {
       }
       'letter {
         // Trying to transpose something at the start of the input does nothing
-        'start - Checker(width = 20, "_abcd")
-          .run(ReadlineFilters.transposeLetter)
-          .check("_abcd")
+        'start - Checker(width = 20, "_abcd").run(ReadlineFilters.transposeLetter).check("_abcd")
 
         // Trying to transpose at the end of the input transposes the *two*
         // previous characters, rather than the 1 char before and 1 char after

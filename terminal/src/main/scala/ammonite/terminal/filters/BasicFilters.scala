@@ -38,9 +38,7 @@ object BasicFilters {
     val chunkCol = c - chunkStarts(chunkIndex)
     val spacesToInject = indent - (chunkCol % indent)
     val (lhs, rhs) = b.splitAt(c)
-    TS(rest,
-       lhs ++ Vector.fill(spacesToInject)(' ') ++ rhs,
-       c + spacesToInject)
+    TS(rest, lhs ++ Vector.fill(spacesToInject)(' ') ++ rhs, c + spacesToInject)
   }
 
   def tabFilter(indent: Int): Filter = partial {

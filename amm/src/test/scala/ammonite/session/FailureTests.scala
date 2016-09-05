@@ -32,7 +32,8 @@ object FailureTests extends TestSuite {
     'compilerCrash {
       // Make sure compiler crashes provide the appropiate error
       // messaging, and the REPL continues functioning after
-      check.session("""
+      check.session(
+        """
         @ val x = 1
         x: Int = 1
 

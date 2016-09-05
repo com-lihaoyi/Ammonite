@@ -22,8 +22,7 @@ object Debug {
   }
   def apply(s: Any) = {
     if (System.getProperty("ammonite-sbt-build") == "true")
-      debugOutput.write(
-        (System.currentTimeMillis() + "\t\t" + s + "\n").getBytes)
+      debugOutput.write((System.currentTimeMillis() + "\t\t" + s + "\n").getBytes)
   }
 }
 
@@ -33,8 +32,7 @@ object Debug {
   * passing in your enum class constructor in place of `...`.
   */
 abstract class Enum(implicit enumName: sourcecode.Name) {
-  protected[this] def Item[T](constructor: String => T)(
-      implicit i: sourcecode.Name): T = {
+  protected[this] def Item[T](constructor: String => T)(implicit i: sourcecode.Name): T = {
     constructor(enumName.value + "." + i.value)
   }
 }

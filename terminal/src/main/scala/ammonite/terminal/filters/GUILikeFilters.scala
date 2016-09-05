@@ -20,10 +20,7 @@ object GUILikeFilters {
       Debug("setMark\t" + mark + "\t->\t" + c)
       if (mark == None) mark = Some(c)
     }
-    def doIndent(b: Vector[Char],
-                 c: Int,
-                 rest: LazyList[Int],
-                 slicer: Vector[Char] => Int) = {
+    def doIndent(b: Vector[Char], c: Int, rest: LazyList[Int], slicer: Vector[Char] => Int) = {
 
       val markValue = mark.get
       val (chunks, chunkStarts, chunkIndex) = FilterTools.findChunks(b, c)
@@ -90,12 +87,7 @@ object GUILikeFilters {
       },
       partial {
         case TS(27 ~: 91 ~: 90 ~: rest, b, c, _) if mark.isDefined =>
-          doIndent(
-            b,
-            c,
-            rest,
-            slice =>
-              -math.min(slice.iterator.takeWhile(_ == ' ').size, indent))
+          doIndent(b, c, rest, slice => -math.min(slice.iterator.takeWhile(_ == ' ').size, indent))
 
         case TS(9 ~: rest, b, c, _) if mark.isDefined => // Tab
           doIndent(b, c, rest, slice => indent)
@@ -124,9 +116,7 @@ object GUILikeFilters {
     )
   }
   object SelectionFilter {
-    def mangleBuffer(selectionFilter: SelectionFilter,
-                     string: String,
-                     cursor: Int) = {
+    def mangleBuffer(selectionFilter: SelectionFilter, string: String, cursor: Int) = {
       selectionFilter.mark match {
         case Some(mark) if mark != cursor =>
           val Seq(min, max) = Seq(cursor, mark).sorted

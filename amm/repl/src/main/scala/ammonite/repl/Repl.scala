@@ -9,23 +9,15 @@ import ammonite.util._
 import acyclic.file
 import scala.annotation.tailrec
 
-class Repl(input: InputStream,
-           output: OutputStream,
-           error: OutputStream,
-           storage: Storage,
-           predef: String,
-           wd: ammonite.ops.Path,
-           welcomeBanner: Option[String],
-           replArgs: Seq[Bind[_]] = Nil) {
+class ReplKernel(input: InputStream,
+                 output: OutputStream,
+                 error: OutputStream,
+                 storage: Storage,
+                 predef: String,
+                 wd: ammonite.ops.Path,
+                 replArgs: Seq[Bind[_]]) {
 
   val prompt = Ref("@ ")
-
-  val frontEnd = Ref[FrontEnd](AmmoniteFrontEnd(Filter.empty))
-
-  var history = new History(Vector())
-
-  val (colors, printStream, errorPrintStream, printer) =
-    Interpreter.initPrinters(output, error, true)
 
   val argString = replArgs.zipWithIndex.map {
     case (b, idx) =>
@@ -34,6 +26,13 @@ class Repl(input: InputStream,
       ammonite.repl.ReplBridge.value.replArgs($idx).value.asInstanceOf[${b.typeTag.tpe}]
     """
   }.mkString(newLine)
+
+  val frontEnd = Ref[FrontEnd](AmmoniteFrontEnd(Filter.empty))
+
+  var history = new History(Vector())
+
+  val (colors, printStream, errorPrintStream, printer) =
+    Interpreter.initPrinters(output, error, true)
 
   val interp: Interpreter = new Interpreter(
     printer,
@@ -84,6 +83,18 @@ class Repl(input: InputStream,
       printStream.println()
       out
     }
+
+}
+
+class Repl(input: InputStream,
+           output: OutputStream,
+           error: OutputStream,
+           storage: Storage,
+           predef: String,
+           wd: ammonite.ops.Path,
+           welcomeBanner: Option[String],
+           replArgs: Seq[Bind[_]] = Nil)
+    extends ReplKernel(input, output, error, storage, predef, wd, replArgs) {
 
   def run(): Any = {
     welcomeBanner.foreach(printStream.println)

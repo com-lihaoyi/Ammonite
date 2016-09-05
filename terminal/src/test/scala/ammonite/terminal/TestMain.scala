@@ -21,8 +21,7 @@ object TestMain {
     var history = List.empty[String]
     val selection = GUILikeFilters.SelectionFilter(indent = 4)
     def multilineFilter: Filter = Filter.partial {
-      case TermState(13 ~: rest, b, c, _)
-          if b.count(_ == '(') != b.count(_ == ')') =>
+      case TermState(13 ~: rest, b, c, _) if b.count(_ == '(') != b.count(_ == ')') =>
         BasicFilters.injectNewLine(b, c, rest)
     }
     val reader = new java.io.InputStreamReader(System.in)

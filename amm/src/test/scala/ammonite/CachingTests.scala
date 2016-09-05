@@ -80,7 +80,8 @@ object CachingTests extends TestSuite {
         storage,
         Defaults.predefString
       )
-      interp1.interpApi.load.module(resourcesPath / 'scriptLevelCaching / "runTimeExceptions.sc")
+      interp1.interpApi.load
+        .module(resourcesPath / 'scriptLevelCaching / "runTimeExceptions.sc")
       val interp2 = createTestInterp(
         storage,
         Defaults.predefString

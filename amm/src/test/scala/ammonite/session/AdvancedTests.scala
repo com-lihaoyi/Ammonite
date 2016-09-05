@@ -126,7 +126,8 @@ object AdvancedTests extends TestSuite {
       """)
     }
     'customTypePrinter {
-      check.session("""
+      check.session(
+        """
         @ Array(1)
         res0: Array[Int] = Array(1)
 
@@ -241,7 +242,8 @@ object AdvancedTests extends TestSuite {
       """)
     }
     'compilerPlugin - retry(3) {
-      check.session("""
+      check.session(
+        """
         @ // Make sure plugins from eval class loader are not loaded
 
         @ import $ivy.`org.spire-math::kind-projector:0.6.3`

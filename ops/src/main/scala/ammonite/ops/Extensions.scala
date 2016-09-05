@@ -2,11 +2,7 @@ package ammonite.ops
 import acyclic.file
 import scala.collection.{Seq, GenTraversableOnce, TraversableLike}
 
-import scala.collection.generic.{
-  CanBuildFrom => CBF,
-  GenericTraversableTemplate,
-  SeqFactory
-}
+import scala.collection.generic.{CanBuildFrom => CBF, GenericTraversableTemplate, SeqFactory}
 
 trait Extensions {
   implicit def Pipeable[T](t: T) = new Pipeable(t)
@@ -23,11 +19,9 @@ trait Extensions {
     * Allows you to pipe sequences into other sequences to convert them,
     * e.g. Seq(1, 2, 3) |> Vector
     */
-  implicit def SeqFactoryFunc[
-      T,
-      CC[X] <: Seq[X] with GenericTraversableTemplate[X, CC]](
-      s: SeqFactory[CC]) = { (t: Seq[T]) =>
-    s(t: _*)
+  implicit def SeqFactoryFunc[T, CC[X] <: Seq[X] with GenericTraversableTemplate[X, CC]](s: SeqFactory[CC]) = {
+    (t: Seq[T]) =>
+      s(t: _*)
   }
 
   implicit def ChainableConversions[T, T1, V](f: T => V)(implicit i: T1 => T) =
@@ -84,8 +78,7 @@ class FilterMapExt[+T, Repr](i: TraversableLike[T, Repr]) {
   /**
     * Alias for `flatMap`
     */
-  def ||[B, That](f: T => GenTraversableOnce[B])(
-      implicit bf: CBF[Repr, B, That]): That = {
+  def ||[B, That](f: T => GenTraversableOnce[B])(implicit bf: CBF[Repr, B, That]): That = {
     i.flatMap(f)
   }
 

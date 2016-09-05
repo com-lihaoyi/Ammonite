@@ -16,28 +16,32 @@ object ImportHookTests extends TestSuite {
     val check = new TestRepl()
     'repl {
       'file {
-        'basic - check.session("""
+        'basic - check.session(
+          """
           @ import $file.src.test.resources.importHooks.Basic
 
           @ Basic.basicValue
           res1: Int = 31337
         """)
 
-        'inline - check.session("""
+        'inline - check.session(
+          """
           @ import $file.src.test.resources.importHooks.Basic, Basic.basicValue
 
           @ basicValue
           res1: Int = 31337
         """)
 
-        'partiallyQualified - check.session("""
+        'partiallyQualified - check.session(
+          """
           @ import $file.src.test.resources.importHooks.Basic
 
           @ Basic.basicValue
           res1: Int = 31337
         """)
 
-        'multiImport - check.session("""
+        'multiImport - check.session(
+          """
           @ import $file.src.test.resources.importHooks.{Basic, BasicTwo}
 
           @ Basic.basicValue
@@ -47,7 +51,8 @@ object ImportHookTests extends TestSuite {
           res2: Int = 1337
         """)
 
-        'rename - check.session("""
+        'rename - check.session(
+          """
           @ import $file.src.test.resources.importHooks.{Basic, BasicTwo => BasicToo}
 
           @ Basic.basicValue
@@ -57,11 +62,13 @@ object ImportHookTests extends TestSuite {
           res2: Int = 1337
         """)
 
-        'deep - check.session("""
+        'deep - check.session(
+          """
           @ import $file.src.test.resources.importHooks.Deep.DeepObject.DeepInner.deepValue
           error: Cannot resolve $file import
         """)
-        'deepRenamed - check.session("""
+        'deepRenamed - check.session(
+          """
           @ import $file.src.test.resources.importHooks.Deep.{DeepObject => DeepRenamed}
           error: Cannot resolve $file import
          """)
@@ -97,7 +104,8 @@ object ImportHookTests extends TestSuite {
         }
 
         'inline - {
-          check.session("""
+          check.session(
+            """
             @ import scalatags.Text.all._
             error: not found: value scalatags
 
@@ -137,14 +145,16 @@ object ImportHookTests extends TestSuite {
       // }
     }
     'scripts {
-      'file - check.session("""
+      'file - check.session(
+        """
         @ import $file.src.test.resources.importHooks.FileImport
 
         @ FileImport.fileImportVal
         res1: Int = 31338
        """)
 
-      'indirectFile - check.session("""
+      'indirectFile - check.session(
+        """
         @ import $file.src.test.resources.importHooks.IndirectFileImport
 
         @ IndirectFileImport.indirectFileImportVal
@@ -160,7 +170,8 @@ object ImportHookTests extends TestSuite {
          """)
       }
 
-      'deepImport - check.session("""
+      'deepImport - check.session(
+        """
         @ import $file.src.test.resources.importHooks.DeepImport.deepValueImported
         error: Cannot resolve $file import
 

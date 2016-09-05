@@ -9,7 +9,8 @@ import fastparse.core.Parsed
 import acyclic.file
 import ammonite.util.{Colors, Res}
 import ammonite.runtime.Parsers
-case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEnd {
+case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty)
+    extends FrontEnd {
 
   def width = FrontEndUtils.width
   def height = FrontEndUtils.height
@@ -19,10 +20,16 @@ case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEn
              output: OutputStream,
              prompt: String,
              colors: Colors,
-             compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
+             compilerComplete: (Int,
+                                String) => (Int, Seq[String], Seq[String]),
              history: IndexedSeq[String],
              addHistory: String => Unit) = {
-    val res = readLine(reader, output, prompt, colors, compilerComplete, history) match {
+    val res = readLine(reader,
+                       output,
+                       prompt,
+                       colors,
+                       compilerComplete,
+                       history) match {
       case None => Res.Exit(())
       case Some(code) =>
         addHistory(code)
@@ -32,7 +39,8 @@ case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEn
           case Parsed.Failure(_, index, extra) =>
             Res.Failure(
               None,
-              fastparse.core.ParseError.msg(extra.input, extra.traced.expected, index)
+              fastparse.core.ParseError
+                .msg(extra.input, extra.traced.expected, index)
             )
         }
     }
@@ -45,7 +53,8 @@ case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEn
                output: OutputStream,
                prompt: String,
                colors: Colors,
-               compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
+               compilerComplete: (Int,
+                                  String) => (Int, Seq[String], Seq[String]),
                history: IndexedSeq[String]) = {
 
     val writer = new OutputStreamWriter(output)
@@ -67,7 +76,8 @@ case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEn
           Printing(TermState(rest, b, c), stdout)
         else {
           val newBuffer = b.take(newCursor) ++ common ++ b.drop(c)
-          Printing(TermState(rest, newBuffer, newCursor + common.length), stdout)
+          Printing(TermState(rest, newBuffer, newCursor + common.length),
+                   stdout)
         }
 
     }
