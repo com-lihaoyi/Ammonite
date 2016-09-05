@@ -3,7 +3,6 @@ package ammonite.shell
 import java.io.OutputStreamWriter
 
 import ammonite.terminal._
-import Filter._
 import ammonite.repl.FrontEndUtils
 import ammonite.util.Colors
 import ammonite.runtime.Parsers
@@ -155,49 +154,49 @@ object PathComplete {
       case ammonite.ops.FileType.Other => fansi.Color.Red
     }
   }
-  def pathCompleteFilter(wd: => Path, colors: => Colors): Filter = partial {
-    case TermInfo(TermState(9 ~: rest, b, c, _), width) if PathComplete.findPathLiteral(b.mkString, c).isDefined =>
-      val Some(PathComplete.PathLiteralInfo(base, seq, frag, cursorOffset)) =
-        PathComplete.findPathLiteral(b.mkString, c)
+  // def pathCompleteFilter(wd: => Path, colors: => Colors): Filter = partial {
+  //   case TermInfo(TermState(9 ~: rest, b, c, _), width) if PathComplete.findPathLiteral(b.mkString, c).isDefined =>
+  //     val Some(PathComplete.PathLiteralInfo(base, seq, frag, cursorOffset)) =
+  //       PathComplete.findPathLiteral(b.mkString, c)
 
-      val path = rootMap(base)(wd) / seq.map {
-        case None => up; case Some(s) => s: RelPath
-      }
+  //     val path = rootMap(base)(wd) / seq.map {
+  //       case None => up; case Some(s) => s: RelPath
+  //     }
 
-      if (!exists(path)) TermState(rest, b, c)
-      else {
-        val fragPrefix = frag.getOrElse("")
+  //     if (!exists(path)) TermState(rest, b, c)
+  //     else {
+  //       val fragPrefix = frag.getOrElse("")
 
-        def wrap(s: String) =
-          if (fragPrefix.startsWith("\"")) Parsers.stringWrap(s)
-          else Parsers.stringSymWrap(s)
-        val options = (
-            ls ! path | (x => (x, wrap(x.last)))
-              |? (_._2.startsWith(fragPrefix))
-          )
-        val (completions, details) = options.partition(_._2 != fragPrefix)
+  //       def wrap(s: String) =
+  //         if (fragPrefix.startsWith("\"")) Parsers.stringWrap(s)
+  //         else Parsers.stringSymWrap(s)
+  //       val options = (
+  //           ls ! path | (x => (x, wrap(x.last)))
+  //             |? (_._2.startsWith(fragPrefix))
+  //         )
+  //       val (completions, details) = options.partition(_._2 != fragPrefix)
 
-        val coloredCompletions = for ((path, name) <- completions) yield {
-          val color = colorPath(path)
-          color(name).render
-        }
+  //       val coloredCompletions = for ((path, name) <- completions) yield {
+  //         val color = colorPath(path)
+  //         color(name).render
+  //       }
 
-        import pprint.Config.Colors.PPrintConfig
+  //       import pprint.Config.Colors.PPrintConfig
 
-        val details2 = details.map(x => pprint.tokenize(stat(x._1)).mkString)
+  //       val details2 = details.map(x => pprint.tokenize(stat(x._1)).mkString)
 
-        val stdout =
-          FrontEndUtils.printCompletions(coloredCompletions, details2).mkString
+  //       val stdout =
+  //         FrontEndUtils.printCompletions(coloredCompletions, details2).mkString
 
-        if (details.length != 0 || completions.length == 0)
-          Printing(TermState(rest, b, c), stdout)
-        else {
-          val common = FrontEndUtils.findPrefix(completions.map(_._2), 0)
-          val newBuffer = b.take(c - cursorOffset) ++ common ++ b.drop(c)
-          Printing(TermState(rest, newBuffer, c - cursorOffset + common.length + 1), stdout)
-        }
-      }
-  }
+  //       if (details.length != 0 || completions.length == 0)
+  //         Printing(TermState(rest, b, c), stdout)
+  //       else {
+  //         val common = FrontEndUtils.findPrefix(completions.map(_._2), 0)
+  //         val newBuffer = b.take(c - cursorOffset) ++ common ++ b.drop(c)
+  //         Printing(TermState(rest, newBuffer, c - cursorOffset + common.length + 1), stdout)
+  //       }
+  //     }
+  // }
 
   /**
     * Enum used to tag the indices being returned by [[Highlighter]]

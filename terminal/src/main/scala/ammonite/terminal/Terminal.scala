@@ -116,7 +116,6 @@ object Terminal {
   def readLine(prompt: Prompt,
                reader: java.io.Reader,
                writer: java.io.Writer,
-               filters: Filter,
                displayTransform: (Vector[Char], Int) => (String, Int) =
                  noTransform): Option[String] = {
 
@@ -205,7 +204,7 @@ object Terminal {
       writer.flush()
     }
 
-    @tailrec
+    //@tailrec
     def readChar(lastState: TermState,
                  ups: Int,
                  fullPrompt: Boolean = true): Option[String] = {
@@ -257,40 +256,7 @@ object Terminal {
 
         (nextUps, newState)
       }
-      // `.get` because we assume that *some* filter is going to match each
-      // character, even if only to dump the character to the screen. If nobody
-      // matches the character then we can feel free to blow up
-      filters.op(TermInfo(lastState, actualWidth)).get match {
-        case Printing(TermState(s, b, c, msg), stdout) =>
-          writer.write(stdout)
-          val (nextUps, newState) = updateState(s, b, c, msg)
-          readChar(newState, nextUps)
-
-        case TermState(s, b, c, msg) =>
-          val (nextUps, newState) = updateState(s, b, c, msg)
-          readChar(newState, nextUps, false)
-
-        case Result(s) =>
-          redrawLine(
-            transformedBuffer,
-            lastState.buffer.length,
-            oldCursorY + newlineUp,
-            rowLengths,
-            false,
-            newlinePrompt
-          )
-          writer.write(10)
-          writer.write(13)
-          writer.flush()
-          Some(s)
-        case ClearScreen(ts) =>
-          ansi.clearScreen(2)
-          ansi.up(9999)
-          ansi.left(9999)
-          readChar(ts, ups)
-        case Exit =>
-          None
-      }
+      None
     }
 
     lazy val ansi = new AnsiNav(writer)

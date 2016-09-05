@@ -3,7 +3,6 @@ package ammonite.repl
 import java.io.{InputStream, InputStreamReader, OutputStream}
 
 import ammonite.runtime._
-import ammonite.terminal.Filter
 import ammonite.util.Util.newLine
 import ammonite.util._
 import acyclic.file
@@ -27,7 +26,7 @@ class ReplKernel(input: InputStream,
     """
   }.mkString(newLine)
 
-  val frontEnd = AmmoniteFrontEnd(Filter.empty)
+  val frontEnd = new AmmoniteFrontEnd
 
   var history = new History(Vector())
 
