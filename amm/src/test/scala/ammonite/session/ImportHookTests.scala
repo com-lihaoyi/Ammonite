@@ -9,13 +9,13 @@ import scala.collection.{immutable => imm}
 import scala.util.Properties
 import ammonite.util.Util
 
-object ImportHookTests extends TestSuite{
+object ImportHookTests extends TestSuite {
 
-  val tests = TestSuite{
+  val tests = TestSuite {
     println("ImportHookTests")
     val check = new TestRepl()
-    'repl{
-      'file{
+    'repl {
+      'file {
         'basic - check.session("""
           @ import $file.src.test.resources.importHooks.Basic
 
@@ -67,7 +67,7 @@ object ImportHookTests extends TestSuite{
          """)
 
       }
-      'ivy{
+      'ivy {
         'basic - {
           check.session("""
             @ import scalatags.Text.all._
@@ -136,7 +136,7 @@ object ImportHookTests extends TestSuite{
       //   }
       // }
     }
-    'scripts{
+    'scripts {
       'file - check.session("""
         @ import $file.src.test.resources.importHooks.FileImport
 

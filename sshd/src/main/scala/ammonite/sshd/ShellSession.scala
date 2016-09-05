@@ -10,8 +10,7 @@ import org.apache.sshd.server._
   * @param remoteShell actual shell implementation,
   *                    which will serve remote user's shell session.
   */
-private[sshd] class ShellSession(remoteShell: ShellSession.Server)
-    extends Command {
+private[sshd] class ShellSession(remoteShell: ShellSession.Server) extends Command {
   var in: InputStream = _
   var out: OutputStream = _
   var exit: ExitCallback = _

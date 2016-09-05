@@ -6,14 +6,14 @@ import utest._
 
 import scala.collection.{immutable => imm}
 
-object ImportTests extends TestSuite{
+object ImportTests extends TestSuite {
 
-  val tests = TestSuite{
+  val tests = TestSuite {
     println("ImportTests")
     val check = new TestRepl()
 
     'basic {
-      'hello{
+      'hello {
         check.session("""
           @ import math.abs
           import math.abs
@@ -45,7 +45,7 @@ object ImportTests extends TestSuite{
           res4: Boolean = true
         """)
       }
-      'multi{
+      'multi {
         check.session("""
           @ import math._, Thread._
           import math._, Thread._
@@ -58,7 +58,7 @@ object ImportTests extends TestSuite{
         """)
       }
 
-      'renaming{
+      'renaming {
         check.session("""
           @ import math.{abs => sba}
 
@@ -86,8 +86,8 @@ object ImportTests extends TestSuite{
         """)
       }
     }
-    'shadowing{
-      'sameName{
+    'shadowing {
+      'sameName {
         check.session("""
           @ val abs = 'a'
           abs: Char = 'a'
@@ -120,7 +120,7 @@ object ImportTests extends TestSuite{
           res9: Int = 4
         """)
       }
-      'shadowPrefix{
+      'shadowPrefix {
         * - check.session("""
           @ object importing_issue {
           @   object scala {
@@ -161,7 +161,7 @@ object ImportTests extends TestSuite{
 
       }
 
-      'typeTermSeparation{
+      'typeTermSeparation {
         // Make sure that you can have a term and a type of the same name
         // coming from different places and they don't stomp over each other
         // (#199) and both are accessible.
@@ -305,7 +305,7 @@ object ImportTests extends TestSuite{
           @ Paulp
           """)
         }
-        'paulpTypeRegression{
+        'paulpTypeRegression {
           check.session(s"""
           @ type Paulp = Int
 
@@ -317,7 +317,7 @@ object ImportTests extends TestSuite{
         }
       }
     }
-    'collapsing{
+    'collapsing {
       check.session("""
         @ object Foo{ val bar = 1 }
 

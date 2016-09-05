@@ -12,9 +12,7 @@ import scala.reflect.internal.util.{BatchSourceFile, OffsetPosition}
   * to the `output` function. Needs to be a compiler plugin so we can hook in
   * immediately after the `typer`
   */
-class AmmonitePlugin(g: scala.tools.nsc.Global,
-                     output: Seq[ImportData] => Unit,
-                     topWrapperLen: => Int)
+class AmmonitePlugin(g: scala.tools.nsc.Global, output: Seq[ImportData] => Unit, topWrapperLen: => Int)
     extends Plugin {
   val name: String = "AmmonitePlugin"
   val global: Global = g
@@ -57,9 +55,7 @@ class AmmonitePlugin(g: scala.tools.nsc.Global,
 
 object AmmonitePlugin {
   var count = 0
-  def apply(g: Global)(unit: g.CompilationUnit,
-                       output: Seq[ImportData] => Unit,
-                       topWrapperLen: => Int) = {
+  def apply(g: Global)(unit: g.CompilationUnit, output: Seq[ImportData] => Unit, topWrapperLen: => Int) = {
 
     count += 1
     def decode(t: g.Tree) = {
@@ -128,10 +124,7 @@ object AmmonitePlugin {
           // of these cases or importing-from-an-existing import, both of which
           // should work without modification
 
-          val headFullPath = NameTransformer
-            .decode(symbolList.head.fullName)
-            .split('.')
-            .map(Name(_))
+          val headFullPath = NameTransformer.decode(symbolList.head.fullName).split('.').map(Name(_))
           // prefix package imports with `_root_` to try and stop random
           // variables from interfering with them. If someone defines a value
           // called `_root_`, this will still break, but that's their problem
@@ -148,15 +141,11 @@ object AmmonitePlugin {
             * non-type symbols that are importable for that name
             */
           val importableIsTypes =
-            expr.tpe.members
-              .filter(saneSym(_))
-              .groupBy(_.name.decoded)
-              .mapValues(_.map(_.isType).toVector)
+            expr.tpe.members.filter(saneSym(_)).groupBy(_.name.decoded).mapValues(_.map(_.isType).toVector)
 
           val renamings = for {
             t @ g.ImportSelector(name, _, rename, _) <- selectors
-            isType <- importableIsTypes
-              .getOrElse(name.decode, Nil) // getOrElse just in case...
+            isType <- importableIsTypes.getOrElse(name.decode, Nil) // getOrElse just in case...
           } yield Option(rename).map(x => name.decoded -> (isType, x.decoded))
 
           val renameMap = renamings.flatten.map(_.swap).toMap
@@ -191,8 +180,7 @@ object AmmonitePlugin {
       }
 
     val grouped =
-      symbols.distinct.groupBy { case (a, b, c, d) => (b, c, d) }
-        .mapValues(_.map(_._1))
+      symbols.distinct.groupBy { case (a, b, c, d) => (b, c, d) }.mapValues(_.map(_._1))
 
     val open = for {
       ((fromName, toName, importString), items) <- grouped
@@ -226,9 +214,7 @@ object LineNumberModifier {
         tree.pos match {
           case s: scala.reflect.internal.util.OffsetPosition =>
             if (s.point > topWrapperLen) {
-              val con = new BatchSourceFile(
-                s.source.file,
-                s.source.content.drop(topWrapperLen))
+              val con = new BatchSourceFile(s.source.file, s.source.content.drop(topWrapperLen))
               val p = new OffsetPosition(con, s.point - topWrapperLen)
               transformedTree.pos = p
             }

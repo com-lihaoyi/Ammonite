@@ -6,11 +6,7 @@ object PathCompleteTests extends TestSuite {
   val tests = TestSuite {
     'path {
       'parse {
-        def check(s: String,
-                  expected: (Option[String],
-                             Seq[Option[String]],
-                             Option[String],
-                             Int)) = {
+        def check(s: String, expected: (Option[String], Seq[Option[String]], Option[String], Int)) = {
           val cursor = s.indexOf("<caret>")
           val value = PathComplete.findPathLiteral(s.take(cursor), cursor).get
           assert(value == PathComplete.PathLiteralInfo.tupled(expected))
@@ -23,8 +19,7 @@ object PathCompleteTests extends TestSuite {
         'pos {
           check("""'hello/<caret>""", (None, Seq(Some("hello")), None, 0))
           check("""'hello / <caret>""", (None, Seq(Some("hello")), None, 0))
-          check("""'hello / 'worl<caret>""",
-                (None, Seq(Some("hello")), Some("'worl"), 5))
+          check("""'hello / 'worl<caret>""", (None, Seq(Some("hello")), Some("'worl"), 5))
           check(
             """'hello / "world" / <caret>""",
             (None, Seq(Some("hello"), Some("world")), None, 0)
@@ -44,10 +39,7 @@ object PathCompleteTests extends TestSuite {
 
           check(
             """wd / up / 'hello / up / "\"" / "foo<caret>""",
-            (Some("wd"),
-             Seq(None, Some("hello"), None, Some("\"")),
-             Some("\"foo"),
-             4)
+            (Some("wd"), Seq(None, Some("hello"), None, Some("\"")), Some("\"foo"), 4)
           )
 
           check("""home/'fi<caret>""", (Some("home"), Nil, Some("'fi"), 3))

@@ -14,8 +14,7 @@ import scala.collection.{GenTraversableOnce, mutable}
 import scala.util.matching.Regex
 
 trait Grepper[T] {
-  def apply[V: pprint.PPrint](t: T, s: V)(
-      implicit c: pprint.Config): Option[GrepResult]
+  def apply[V: pprint.PPrint](t: T, s: V)(implicit c: pprint.Config): Option[GrepResult]
 }
 object Grepper {
   implicit object Str extends Grepper[String] {
@@ -101,10 +100,7 @@ object GrepResult {
 
         val colorRanges =
           for ((rangeStart, rangeEnd) <- rangeBuffer)
-            yield
-              (highlightColor.highlight,
-               rangeStart - wideStart,
-               rangeEnd - wideStart)
+            yield (highlightColor.highlight, rangeStart - wideStart, rangeEnd - wideStart)
 
         val colored =
           grepResult.text.substring(wideStart, wideEnd).overlayAll(colorRanges)
@@ -142,8 +138,7 @@ object GrepResult {
   * regex within the pretty-printed contents.
   */
 object grep {
-  def apply[T: Grepper, V: pprint.PPrint](pat: T, str: V)(
-      implicit c: pprint.Config): Option[GrepResult] = {
+  def apply[T: Grepper, V: pprint.PPrint](pat: T, str: V)(implicit c: pprint.Config): Option[GrepResult] = {
     implicitly[Grepper[T]].apply(pat, str)
   }
 
@@ -157,8 +152,7 @@ object grep {
       f.apply[T]
     }
 
-    implicit def FunkyFunc2[T: pprint.PPrint](f: ![_])(
-        implicit c: pprint.Config): T => Boolean = { x =>
+    implicit def FunkyFunc2[T: pprint.PPrint](f: ![_])(implicit c: pprint.Config): T => Boolean = { x =>
       f.apply[T](x).isDefined
     }
   }
@@ -169,8 +163,7 @@ object grep {
   }
 }
 
-case class tail(interval: Int, prefix: Int)
-    extends Function[Path, Iterator[String]] {
+case class tail(interval: Int, prefix: Int) extends Function[Path, Iterator[String]] {
   def apply(arg: Path): Iterator[String] = {
     val is = java.nio.file.Files.newInputStream(arg.toNIO)
     val br = new BufferedReader(new InputStreamReader(is))
@@ -213,14 +206,13 @@ object browse {
   }
   // R -> show ansi-colors as colors, M -> show current-browse-% bar
   val lessViewer = Seq("less", "-RM")
-  def apply[T: pprint.PPrint](t: T,
-                              viewer: Strings = lessViewer,
-                              width: Integer = null,
-                              height: Integer = null,
-                              indent: Integer = null,
-                              colors: pprint.Colors = null)(
-      implicit c: pprint.Config,
-      wd: Path = ammonite.ops.ImplicitWd.implicitCwd) = {
+  def apply[T: pprint.PPrint](
+      t: T,
+      viewer: Strings = lessViewer,
+      width: Integer = null,
+      height: Integer = null,
+      indent: Integer = null,
+      colors: pprint.Colors = null)(implicit c: pprint.Config, wd: Path = ammonite.ops.ImplicitWd.implicitCwd) = {
     %(
       viewer.values,
       tmp(

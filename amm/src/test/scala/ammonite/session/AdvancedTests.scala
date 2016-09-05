@@ -4,11 +4,11 @@ import ammonite.TestUtils._
 import ammonite.TestRepl
 import ammonite.util.{Res, Util}
 import utest._
-object AdvancedTests extends TestSuite{
-  val tests = TestSuite{
+object AdvancedTests extends TestSuite {
+  val tests = TestSuite {
     println("AdvancedTests")
     val check = new TestRepl()
-    'pprint{
+    'pprint {
       check.session(s"""
         @ Seq.fill(10)(Seq.fill(3)("Foo"))
         res0: Seq[Seq[String]] = List(
@@ -43,15 +43,15 @@ object AdvancedTests extends TestSuite{
       """)
     }
 
-    'exit{
+    'exit {
       check.result("exit", Res.Exit())
     }
-    'skip{
+    'skip {
       check.result("", Res.Skip)
     }
 
-    'predef{
-      val check2 = new TestRepl{
+    'predef {
+      val check2 = new TestRepl {
         override def predef = """
           import math.abs
           val x = 1
@@ -73,8 +73,8 @@ object AdvancedTests extends TestSuite{
       """)
 
     }
-    'predefSettings{
-      val check2 = new TestRepl{
+    'predefSettings {
+      val check2 = new TestRepl {
         override def predef = """
           repl.compiler.settings.Xexperimental.value = true
         """
@@ -85,7 +85,7 @@ object AdvancedTests extends TestSuite{
       """)
 
     }
-    'macros{
+    'macros {
       check.session("""
         @ import language.experimental.macros
 
@@ -104,9 +104,10 @@ object AdvancedTests extends TestSuite{
         res4: String = "Hello!"
       """)
     }
-    'typeScope{
+    'typeScope {
       // Fancy type-printing isn't implemented at all in 2.10.x
-      if (!scala2_10) check.session("""
+      if (!scala2_10)
+        check.session("""
         @ collection.mutable.Buffer(1)
         res0: collection.mutable.Buffer[Int] = ArrayBuffer(1)
 
@@ -124,7 +125,7 @@ object AdvancedTests extends TestSuite{
         res5: Buffer[Int] = ArrayBuffer(1)
       """)
     }
-    'customTypePrinter{
+    'customTypePrinter {
       check.session("""
         @ Array(1)
         res0: Array[Int] = Array(1)
@@ -141,7 +142,7 @@ object AdvancedTests extends TestSuite{
         res3: Int Array = Array(1)
       """)
     }
-    'unwrapping{
+    'unwrapping {
       check.session("""
         @ {
         @   val x = 1
@@ -153,7 +154,7 @@ object AdvancedTests extends TestSuite{
         res0_2: Int = 3
       """)
     }
-    'forceWrapping{
+    'forceWrapping {
       check.session("""
         @ {{
         @   val x = 1
@@ -165,7 +166,8 @@ object AdvancedTests extends TestSuite{
     }
     'truncation {
       // Need a way to capture stdout in tests to make these tests work
-      if(false) check.session("""
+      if (false)
+        check.session("""
         @ Seq.fill(20)(100)
         res0: Seq[Int] = List(
           100,
@@ -225,7 +227,7 @@ object AdvancedTests extends TestSuite{
         ...
       """)
     }
-    'private{
+    'private {
       check.session("""
         @ private val x = 1; val y = x + 1
         x: Int = 1
@@ -238,7 +240,7 @@ object AdvancedTests extends TestSuite{
         error: not found: value x
       """)
     }
-    'compilerPlugin - retry(3){
+    'compilerPlugin - retry(3) {
       check.session("""
         @ // Make sure plugins from eval class loader are not loaded
 
@@ -268,7 +270,7 @@ object AdvancedTests extends TestSuite{
         error: not found: value scalatags
       """)
     }
-    'replApiUniqueness{
+    'replApiUniqueness {
       // Make sure we can instantiate multiple copies of Interpreter, with each
       // one getting its own `ReplBridge`. This ensures that the various
       // Interpreters are properly encapsulated and don't interfere with each
@@ -288,15 +290,16 @@ object AdvancedTests extends TestSuite{
         @ assert(repl.prompt() == "B")
       """)
     }
-    'desugar{
-      if (!scala2_10) check.session("""
+    'desugar {
+      if (!scala2_10)
+        check.session("""
         @ desugar{1 + 2 max 3}
         res0: Desugared = scala.Predef.intWrapper(3).max(3)
       """)
     }
-    'loadingModulesInPredef{
+    'loadingModulesInPredef {
       import ammonite.ops._
-      val dir = pwd/'src/'test/'resources/'scripts/'predefWithLoad
+      val dir = pwd / 'src / 'test / 'resources / 'scripts / 'predefWithLoad
       'loadExec {
         val c1 = new TestRepl() {
           override def predef = read ! dir / "PredefLoadExec.sc"
@@ -306,9 +309,9 @@ object AdvancedTests extends TestSuite{
           previouslyLoaded: Int = 1337
         """)
       }
-      'loadModule{
-        val c2 = new TestRepl(){
-          override def predef = read! dir/"PredefLoadModule.sc"
+      'loadModule {
+        val c2 = new TestRepl() {
+          override def predef = read ! dir / "PredefLoadModule.sc"
         }
         c2.session("""
           @ val previouslyLoaded = 1337

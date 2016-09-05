@@ -18,14 +18,10 @@ case class Environment(thread: Thread,
                        systemErr: PrintStream)
 
 object Environment {
-  def apply(classLoader: ClassLoader,
-            in: InputStream,
-            out: PrintStream): Environment =
+  def apply(classLoader: ClassLoader, in: InputStream, out: PrintStream): Environment =
     apply(Thread.currentThread(), classLoader, in, out, out)
 
-  def apply(classLoader: ClassLoader,
-            in: InputStream,
-            out: OutputStream): Environment =
+  def apply(classLoader: ClassLoader, in: InputStream, out: OutputStream): Environment =
     apply(classLoader, in, new PrintStream(out))
 
   /**

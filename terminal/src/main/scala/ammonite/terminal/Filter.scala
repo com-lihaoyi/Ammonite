@@ -40,24 +40,25 @@ object Filter {
   def simple(prefixes: Strings)(f: (Vector[Char], Int,
                                     TermInfo) => (Vector[Char], Int))(
       implicit l: sourcecode.Line,
-      enc: sourcecode.Enclosing) = new Filter {
-    def op(ti: TermInfo) = {
-      val matchingPrefixOpt =
-        prefixes.values.iterator.map { s =>
-          ti.ts.inputs.dropPrefix(s.map(_.toInt))
-        }.collectFirst { case Some(s) => s }
-      matchingPrefixOpt.map { rest =>
-        val (buffer1, cursor1) = f(ti.ts.buffer, ti.ts.cursor, ti)
-        TermState(
-          rest,
-          buffer1,
-          cursor1
-        )
+      enc: sourcecode.Enclosing) =
+    new Filter {
+      def op(ti: TermInfo) = {
+        val matchingPrefixOpt =
+          prefixes.values.iterator.map { s =>
+            ti.ts.inputs.dropPrefix(s.map(_.toInt))
+          }.collectFirst { case Some(s) => s }
+        matchingPrefixOpt.map { rest =>
+          val (buffer1, cursor1) = f(ti.ts.buffer, ti.ts.cursor, ti)
+          TermState(
+            rest,
+            buffer1,
+            cursor1
+          )
 
+        }
       }
+      def identifier = enc.value + ":" + l.value
     }
-    def identifier = enc.value + ":" + l.value
-  }
   def action(prefixes: Strings, filter: TermInfo => Boolean = _ => true)(
       action: TermState => TermAction = x => x)(
       implicit i: sourcecode.Enclosing,

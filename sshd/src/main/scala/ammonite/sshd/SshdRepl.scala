@@ -26,10 +26,8 @@ class SshdRepl(sshConfig: SshServerConfig,
                defaultPredef: Boolean = true,
                wd: Path = ammonite.ops.pwd,
                replArgs: Seq[Bind[_]] = Nil) {
-  private lazy val sshd = SshServer(
-    sshConfig,
-    shellServer = SshdRepl
-      .runRepl(sshConfig.ammoniteHome, predef, defaultPredef, wd, replArgs))
+  private lazy val sshd =
+    SshServer(sshConfig, shellServer = SshdRepl.runRepl(sshConfig.ammoniteHome, predef, defaultPredef, wd, replArgs))
 
   def port = sshd.getPort
   def start(): Unit = sshd.start()
@@ -41,12 +39,9 @@ object SshdRepl {
   private def replServerClassLoader = SshdRepl.getClass.getClassLoader
 
   // Actually runs a repl inside of session serving a remote user shell.
-  private def runRepl(
-      homePath: Path,
-      predef: String,
-      defaultPredef: Boolean,
-      wd: Path,
-      replArgs: Seq[Bind[_]])(in: InputStream, out: OutputStream): Unit = {
+  private def runRepl(homePath: Path, predef: String, defaultPredef: Boolean, wd: Path, replArgs: Seq[Bind[_]])(
+      in: InputStream,
+      out: OutputStream): Unit = {
     // since sshd server has it's own customised environment,
     // where things like System.out will output to the
     // server's console, we need to prepare individual environment
@@ -71,8 +66,7 @@ object SshdRepl {
       } catch {
         case any: Throwable =>
           val sshClientOutput = new PrintStream(out)
-          sshClientOutput.println(
-            "What a terrible failure, the REPL just blow up!")
+          sshClientOutput.println("What a terrible failure, the REPL just blow up!")
           any.printStackTrace(sshClientOutput)
       }
     }

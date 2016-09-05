@@ -49,8 +49,7 @@ object SshTestingUtils {
     }
   }
 
-  def testSshServer(user: (String, String), shell: ShellSession.Server)(
-      implicit dir: Path) = {
+  def testSshServer(user: (String, String), shell: ShellSession.Server)(implicit dir: Path) = {
     def config = SshServerConfig(
       "localhost",
       port = 0,
@@ -61,8 +60,7 @@ object SshTestingUtils {
     SshServer(config, shell)
   }
 
-  def withTestSshServer[T](user: (String, String),
-                           testShell: () => Any = () => ???)(
+  def withTestSshServer[T](user: (String, String), testShell: () => Any = () => ???)(
       test: org.apache.sshd.SshServer => T)(implicit dir: Path): T = {
     val server = testSshServer(user, (_, _) => testShell.apply())
     server.start()
@@ -73,11 +71,8 @@ object SshTestingUtils {
     }
   }
 
-  def sshClient(creds: (String, String),
-                sshServer: org.apache.sshd.SshServer): Session = {
-    sshClient(creds,
-              Option(sshServer.getHost).getOrElse("localhost"),
-              sshServer.getPort)
+  def sshClient(creds: (String, String), sshServer: org.apache.sshd.SshServer): Session = {
+    sshClient(creds, Option(sshServer.getHost).getOrElse("localhost"), sshServer.getPort)
   }
 
   def sshClient(creds: (String, String), host: String, port: Int): Session = {
@@ -163,8 +158,7 @@ object SshTestingUtils {
             /* exit loop */
           }
         } else {
-          throw new TimeoutException(
-            "Timed out while waiting for channel to disconnect")
+          throw new TimeoutException("Timed out while waiting for channel to disconnect")
         }
       awaitImpl()
     }

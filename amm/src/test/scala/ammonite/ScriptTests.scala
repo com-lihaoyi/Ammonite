@@ -6,19 +6,19 @@ import ammonite.main.Defaults
 import utest._
 import ammonite.runtime.{Storage}
 
-object ScriptTests extends TestSuite{
-  val tests = TestSuite{
+object ScriptTests extends TestSuite {
+  val tests = TestSuite {
     println("ScriptTests")
     val check = new TestRepl()
 
-    val scriptPath = pwd/'src/'test/'resources/'scripts
+    val scriptPath = pwd / 'src / 'test / 'resources / 'scripts
     val printedScriptPath = """pwd/'src/'test/'resources/'scripts"""
 
-    val resourcesPath = pwd/'src/'test/'resources
+    val resourcesPath = pwd / 'src / 'test / 'resources
 
-    'exec{
-      'compilationBlocks{
-        'loadIvy - retry(3){ // ivy or maven central seems to be flaky =/ =/ =/
+    'exec {
+      'compilationBlocks {
+        'loadIvy - retry(3) { // ivy or maven central seems to be flaky =/ =/ =/
           check.session(s"""
             @ import ammonite.ops._
 
@@ -29,8 +29,8 @@ object ScriptTests extends TestSuite{
             <a href="www.google.com">omg</a>
             ${"\"\"\""}
             """)
-          }
-        'preserveImports{
+        }
+        'preserveImports {
           val typeString =
             if (!scala2_10)
               """Left[String, Nothing]"""
@@ -45,7 +45,7 @@ object ScriptTests extends TestSuite{
             r: $typeString = Left("asd")
             """)
         }
-        'annotation{
+        'annotation {
           check.session(s"""
             @ import ammonite.ops._
 
@@ -55,7 +55,7 @@ object ScriptTests extends TestSuite{
             r: Int = 24
             """)
         }
-        'syntax{
+        'syntax {
           check.session(s"""
             @ import ammonite.ops._
 
@@ -65,7 +65,7 @@ object ScriptTests extends TestSuite{
             r: Int = 24
             """)
         }
-        'limitImports{
+        'limitImports {
           check.session(s"""
             @ import ammonite.ops._
 
@@ -76,8 +76,8 @@ object ScriptTests extends TestSuite{
             """)
         }
       }
-      'failures{
-        'syntaxError{
+      'failures {
+        'syntaxError {
           check.session(s"""
             @ import ammonite.ops._
 
@@ -91,7 +91,7 @@ object ScriptTests extends TestSuite{
             Compilation Failed
             """)
         }
-        'compilationError{
+        'compilationError {
           check.session(s"""
             @  import ammonite.ops._
 
@@ -105,16 +105,15 @@ object ScriptTests extends TestSuite{
             Compilation Failed
             """)
         }
-        'nofile{
+        'nofile {
           check.session(s"""
             @ import ammonite.ops._
 
             @ interp.load.exec($printedScriptPath/"notHere")
             error: java.nio.file.NoSuchFileException
-            """
-          )
+            """)
         }
-        'multiBlockError{
+        'multiBlockError {
           check.session(s"""
             @ import ammonite.ops._
 
@@ -129,7 +128,7 @@ object ScriptTests extends TestSuite{
             """)
         }
       }
-      'nestedScripts{
+      'nestedScripts {
         check.session(s"""
           @ import ammonite.ops._
 
@@ -142,7 +141,7 @@ object ScriptTests extends TestSuite{
           b: Int = 1
           """)
       }
-      'sheBang{
+      'sheBang {
         check.session(s"""
             @  import ammonite.ops._
 
@@ -155,9 +154,9 @@ object ScriptTests extends TestSuite{
 
     }
 
-    'module{
-      'compilationBlocks{
-        'loadIvy{
+    'module {
+      'compilationBlocks {
+        'loadIvy {
           check.session(s"""
             @ import ammonite.ops._
 
@@ -169,7 +168,7 @@ object ScriptTests extends TestSuite{
             ${"\"\"\""}
            """)
         }
-        'preserveImports{
+        'preserveImports {
           val typeString =
             if (!scala2_10)
               """Left[String, Nothing]"""
@@ -185,7 +184,7 @@ object ScriptTests extends TestSuite{
               """)
 
         }
-        'annotation{
+        'annotation {
           if (!scala2_10) //buggy in 2.10
             check.session(s"""
             @ import ammonite.ops._
@@ -196,8 +195,8 @@ object ScriptTests extends TestSuite{
             r: Int = 24
             """)
         }
-        'syntax{
-            check.session(s"""
+        'syntax {
+          check.session(s"""
               @ import ammonite.ops._
 
               @ interp.load.module($printedScriptPath/"BlockSepSyntax.sc")
@@ -206,7 +205,7 @@ object ScriptTests extends TestSuite{
               r: Int = 24
             """)
         }
-        'limitImports{
+        'limitImports {
           check.session(s"""
             @ import ammonite.ops._
 
@@ -217,8 +216,8 @@ object ScriptTests extends TestSuite{
             """)
         }
       }
-      'failures{
-        'syntaxError{
+      'failures {
+        'syntaxError {
           check.session(s"""
             @ import ammonite.ops._
 
@@ -232,7 +231,7 @@ object ScriptTests extends TestSuite{
             Compilation Failed
             """)
         }
-        'compilationError{
+        'compilationError {
           check.session(s"""
             @ import ammonite.ops._
 
@@ -245,27 +244,27 @@ object ScriptTests extends TestSuite{
                     ^
             Compilation Failed""")
         }
-        'nofile{
+        'nofile {
           check.session(s"""
             @ import ammonite.ops._
 
             @ interp.load.exec($printedScriptPath/"notHere")
             error: java.nio.file.NoSuchFileException
-            """
-          )
+            """)
         }
-        'scriptWithoutExtension{
-          val res = intercept[java.nio.file.NoSuchFileException]{
-            val storage = new Storage.Folder(tmp.dir(prefix="ammonite-tester"))
+        'scriptWithoutExtension {
+          val res = intercept[java.nio.file.NoSuchFileException] {
+            val storage =
+              new Storage.Folder(tmp.dir(prefix = "ammonite-tester"))
             val interp2 = createTestInterp(
               storage,
               Defaults.predefString
             )
-            interp2.interpApi.load.module(pwd/"scriptWithoutExtension")
+            interp2.interpApi.load.module(pwd / "scriptWithoutExtension")
           }.toString
           assert(res.contains("java.nio.file.NoSuchFileException"))
         }
-        'multiBlockError{
+        'multiBlockError {
           check.session(s"""
             @ import ammonite.ops._
 
@@ -280,7 +279,7 @@ object ScriptTests extends TestSuite{
             """)
         }
       }
-      'encapsulation{
+      'encapsulation {
         check.session(s"""
             @ import ammonite.ops._
 
@@ -288,10 +287,9 @@ object ScriptTests extends TestSuite{
 
             @ interp.load.module($printedScriptPath/"Encapsulation.sc")
             error: not found: value asd
-            """
-        )
+            """)
       }
-      'nestedScripts{
+      'nestedScripts {
         check.session(s"""
           @ import ammonite.ops._
 
@@ -304,7 +302,7 @@ object ScriptTests extends TestSuite{
           b: Int = 1
           """)
       }
-      'noUnWrapping{
+      'noUnWrapping {
         check.session(s"""
         @ import ammonite.ops._
 

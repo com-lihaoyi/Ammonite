@@ -26,10 +26,7 @@ object PathComplete {
     *             just before the cursor
     * @param offset
     */
-  case class PathLiteralInfo(base: Option[String],
-                             body: Seq[Option[String]],
-                             frag: Option[String],
-                             offset: Int)
+  case class PathLiteralInfo(base: Option[String], body: Seq[Option[String]], frag: Option[String], offset: Int)
 
   /**
     * Searches the current snippet for path-like forms ending at the
@@ -159,8 +156,7 @@ object PathComplete {
     }
   }
   def pathCompleteFilter(wd: => Path, colors: => Colors): Filter = partial {
-    case TermInfo(TermState(9 ~: rest, b, c, _), width)
-        if PathComplete.findPathLiteral(b.mkString, c).isDefined =>
+    case TermInfo(TermState(9 ~: rest, b, c, _), width) if PathComplete.findPathLiteral(b.mkString, c).isDefined =>
       val Some(PathComplete.PathLiteralInfo(base, seq, frag, cursorOffset)) =
         PathComplete.findPathLiteral(b.mkString, c)
 
@@ -198,9 +194,7 @@ object PathComplete {
         else {
           val common = FrontEndUtils.findPrefix(completions.map(_._2), 0)
           val newBuffer = b.take(c - cursorOffset) ++ common ++ b.drop(c)
-          Printing(
-            TermState(rest, newBuffer, c - cursorOffset + common.length + 1),
-            stdout)
+          Printing(TermState(rest, newBuffer, c - cursorOffset + common.length + 1), stdout)
         }
       }
   }

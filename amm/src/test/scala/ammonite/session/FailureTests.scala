@@ -4,8 +4,8 @@ import ammonite.TestRepl
 import utest._
 
 import scala.collection.{immutable => imm}
-object FailureTests extends TestSuite{
-  val tests = TestSuite{
+object FailureTests extends TestSuite {
+  val tests = TestSuite {
     println("FailureTests")
     val check = new TestRepl()
     'compileFailure {
@@ -29,7 +29,7 @@ object FailureTests extends TestSuite{
         Compilation Failed
       """)
     }
-    'compilerCrash{
+    'compilerCrash {
       // Make sure compiler crashes provide the appropiate error
       // messaging, and the REPL continues functioning after
       check.session("""
@@ -43,22 +43,22 @@ object FailureTests extends TestSuite{
         res1: Int = 2
       """)
     }
-    'ivyFail{
+    'ivyFail {
       check.session("""
         @ import $ivy.`com.lihaoyi::upickle:0.1.12312-DOESNT-EXIST`
         error: failed to resolve ivy dependencies
       """)
     }
 
-    'exceptionHandling{
-      check.fail("""throw new Exception("lol", new Exception("hoho"))""", x =>
-        // It contains the things we want
-        x.contains("java.lang.Exception: lol") &&
-        x.contains("java.lang.Exception: hoho") &&
-        // and none of the stuff we don't want
-        x.lines.length == 6 &&
-        !x.contains("Something unexpected went wrong =(")
-      )
+    'exceptionHandling {
+      check.fail("""throw new Exception("lol", new Exception("hoho"))""",
+                 x =>
+                   // It contains the things we want
+                   x.contains("java.lang.Exception: lol") &&
+                     x.contains("java.lang.Exception: hoho") &&
+                     // and none of the stuff we don't want
+                     x.lines.length == 6 &&
+                     !x.contains("Something unexpected went wrong =("))
     }
   }
 }

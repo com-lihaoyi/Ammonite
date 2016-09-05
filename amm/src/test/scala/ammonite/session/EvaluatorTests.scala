@@ -6,12 +6,12 @@ import utest._
 
 import scala.collection.{immutable => imm}
 
-object EvaluatorTests extends TestSuite{
+object EvaluatorTests extends TestSuite {
 
-  val tests = TestSuite{
+  val tests = TestSuite {
     println("EvaluatorTests")
     val check = new TestRepl()
-    'simpleExpressions{
+    'simpleExpressions {
       check.session("""
         @ 1 + 2
         res0: Int = 3
@@ -23,7 +23,7 @@ object EvaluatorTests extends TestSuite{
         res2: Int = 6
       """)
     }
-    'vals{
+    'vals {
       check.session("""
         @ val x = 10L
         x: Long = 10L
@@ -44,7 +44,7 @@ object EvaluatorTests extends TestSuite{
         res5: String = "class"
       """)
     }
-    'lazyvals{
+    'lazyvals {
       // It actually appears when I ask for it, and the
       // actual evaluation happens in the correct order
       check.session("""
@@ -74,7 +74,7 @@ object EvaluatorTests extends TestSuite{
       """)
     }
 
-    'vars{
+    'vars {
       check.session("""
         @ var x: Int = 10
         x: Int = 10
@@ -89,7 +89,7 @@ object EvaluatorTests extends TestSuite{
       """)
     }
 
-    'defs{
+    'defs {
       check.session("""
         @ def sumItAll[T: Numeric](i: Seq[T]): T = {i.sum}
         defined function sumItAll
@@ -101,7 +101,7 @@ object EvaluatorTests extends TestSuite{
         res2: Long = 15L
       """)
     }
-    'types{
+    'types {
       check.session(s"""
         @ type Funky = Array[Array[String]]
         defined type Funky
@@ -116,7 +116,7 @@ object EvaluatorTests extends TestSuite{
         arr: ${sessionPrefix}Funky2[Int] = Array(Array(123))
       """)
     }
-    'library{
+    'library {
       check.session("""
         @ val x = Iterator.continually(1)
         x: Iterator[Int] = non-empty iterator
@@ -129,7 +129,7 @@ object EvaluatorTests extends TestSuite{
       """)
     }
 
-    'classes{
+    'classes {
       check.session(s"""
         @ class C{override def toString() = "Ceee"}
         defined class C
@@ -163,7 +163,7 @@ object EvaluatorTests extends TestSuite{
       """)
     }
 
-    'packageImport{
+    'packageImport {
       check.session("""
         @ import pprint._
 
@@ -171,7 +171,7 @@ object EvaluatorTests extends TestSuite{
       """)
     }
 
-    'nesting{
+    'nesting {
       check.session("""
         @ val x = 1
         x: Int = 1
@@ -192,7 +192,7 @@ object EvaluatorTests extends TestSuite{
         res5: Int = 2
       """)
     }
-    'multistatement{
+    'multistatement {
       check.session(s"""
         @ ;1; 2L; '3';
         res0_0: Int = 1
@@ -217,7 +217,7 @@ object EvaluatorTests extends TestSuite{
       """)
     }
 
-    'multiassign{
+    'multiassign {
       check.session("""
         @ val (a, b) = (1, 2)
         a: Int = 1
@@ -233,7 +233,7 @@ object EvaluatorTests extends TestSuite{
         d: Int = 4
       """)
     }
-    'parsingProblems{
+    'parsingProblems {
       check.session("""
         @ (1 + 1)
         res0: Int = 2
@@ -255,7 +255,7 @@ object EvaluatorTests extends TestSuite{
         res3: Seq[Int] = List(1)
       """)
     }
-    'backticks{
+    'backticks {
       check.session("""
         @ val `1+1` = 1
         `1+1`: Int = 1

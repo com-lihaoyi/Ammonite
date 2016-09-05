@@ -37,8 +37,7 @@ object PPrints {
   implicit def lsSeqRepr: PPrinter[LsSeq] =
     PPrinter { (t: LsSeq, c: Config) =>
       val snippets = for (p <- t) yield {
-        c.colors.literalColor(
-          pprint.tokenize(p relativeTo t.base)(implicitly, c).mkString)
+        c.colors.literalColor(pprint.tokenize(p relativeTo t.base)(implicitly, c).mkString)
       }
       Iterator("\n") ++ FrontEndUtils.tabulate(snippets, FrontEndUtils.width)
     }
@@ -54,14 +53,12 @@ object PPrints {
 
   implicit val relPathRepr = pprint.PPrinter[ammonite.ops.RelPath] { (p, c) =>
     Iterator(
-      (Seq.fill(p.ups)("up") ++ p.segments.map(reprSection(_, c).mkString))
-        .mkString("/")
+      (Seq.fill(p.ups)("up") ++ p.segments.map(reprSection(_, c).mkString)).mkString("/")
     )
   }
 
   implicit def pathRepr = pprint.PPrinter[ammonite.ops.Path] { (p, c) =>
-    Iterator("root") ++ p.segments.iterator
-      .map("/" + reprSection(_, c).mkString)
+    Iterator("root") ++ p.segments.iterator.map("/" + reprSection(_, c).mkString)
   }
   implicit def commandResultRepr: PPrinter[CommandResult] =
     PPrinter[CommandResult]((x, c) =>

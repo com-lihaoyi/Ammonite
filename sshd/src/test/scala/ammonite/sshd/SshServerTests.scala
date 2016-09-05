@@ -80,8 +80,7 @@ object SshServerTests extends TestSuite with ScalaCheckSupport {
     "auth-agent-req@openssh.com"
   )
 
-  private def cantConnectToChannel(client: Session, channel: String)(
-      implicit dir: Path): Unit = {
+  private def cantConnectToChannel(client: Session, channel: String)(implicit dir: Path): Unit = {
     assert(client.isConnected)
     Option(client.openChannel(channel)) match {
       case Some(shell) =>

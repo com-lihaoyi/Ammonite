@@ -48,8 +48,7 @@ object BasicTests extends TestSuite {
             scriptAddr,
             "-s"
           )
-        assert(
-          evaled.out.trim == "Script Worked!!" && evaled.err.string.isEmpty)
+        assert(evaled.out.trim == "Script Worked!!" && evaled.err.string.isEmpty)
       }
     }
     'scalacNotLoadedByCachedScripts {
@@ -305,10 +304,7 @@ object BasicTests extends TestSuite {
     }
     'http {
       'shorten {
-        val res = exec('basic / "HttpApi.sc",
-                       "shorten",
-                       "https://www.github.com",
-                       "-s")
+        val res = exec('basic / "HttpApi.sc", "shorten", "https://www.github.com", "-s")
         assert(res.out.trim.startsWith("https://git.io"))
       }
       'releases {

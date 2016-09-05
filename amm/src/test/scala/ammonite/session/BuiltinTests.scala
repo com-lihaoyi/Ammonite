@@ -4,12 +4,12 @@ import ammonite.TestRepl
 import utest._
 
 import scala.collection.{immutable => imm}
-object BuiltinTests extends TestSuite{
+object BuiltinTests extends TestSuite {
 
-  val tests = TestSuite{
+  val tests = TestSuite {
     println("EvaluatorTests")
     val check = new TestRepl()
-    'basicConfig{
+    'basicConfig {
       check.session("""
         @ // Set the shell prompt to be something else
 
@@ -47,7 +47,7 @@ object BuiltinTests extends TestSuite{
       """)
     }
 
-    'loadCP{
+    'loadCP {
       check.session("""
         @ import ammonite.ops._, ImplicitWd._
 
@@ -65,7 +65,7 @@ object BuiltinTests extends TestSuite{
         res6: String = "Hello!"
       """)
     }
-    'settings{
+    'settings {
       val fruitlessTypeTestWarningMessageBlahBlahBlah =
         "fruitless type test: a value of type List[Int] cannot also be a List[Double]"
 
@@ -108,7 +108,7 @@ object BuiltinTests extends TestSuite{
         warning: $fruitlessTypeTestWarningMessageBlahBlahBlah
       """)
     }
-    'infoLogging{
+    'infoLogging {
       check.session("""
         @ 1 + 1
         res0: Int = 2
@@ -120,8 +120,7 @@ object BuiltinTests extends TestSuite{
       """)
     }
     'saveLoad {
-      check.session(
-        """
+      check.session("""
         @ val veryImportant = 1
         veryImportant: Int = 1
 
@@ -159,7 +158,7 @@ object BuiltinTests extends TestSuite{
         error: not found: value scalatags
         """)
     }
-    'saveLoad2{
+    'saveLoad2 {
       check.session("""
         @ val (x, y) = (1, 2)
         x: Int = 1

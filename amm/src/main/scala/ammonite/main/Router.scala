@@ -17,8 +17,7 @@ object Router {
   class main extends StaticAnnotation
   def generateRoutes[T](t: T): Seq[Router.EntryPoint] =
     macro generateRoutesImpl[T]
-  def generateRoutesImpl[T: c.WeakTypeTag](c: Context)(
-      t: c.Expr[T]): c.Expr[Seq[EntryPoint]] = {
+  def generateRoutesImpl[T: c.WeakTypeTag](c: Context)(t: c.Expr[T]): c.Expr[Seq[EntryPoint]] = {
     import c.universe._
     val r = new Router(c)
     val allRoutes = r
@@ -39,10 +38,7 @@ object Router {
     * (just for logging and reading, not a replacement for a `TypeTag`) and
     * possible a function that can compute its default value
     */
-  case class ArgSig(name: String,
-                    typeString: String,
-                    doc: Option[String],
-                    default: Option[() => Any])
+  case class ArgSig(name: String, typeString: String, doc: Option[String], default: Option[() => Any])
 
   /**
     * What is known about a single endpoint for our routes. It has a [[name]],
@@ -56,8 +52,7 @@ object Router {
   case class EntryPoint(name: String,
                         argSignatures: Seq[ArgSig],
                         varargs: Boolean,
-                        invoke0: (Map[String, String],
-                                  Seq[String]) => Result[Any]) {
+                        invoke0: (Map[String, String], Seq[String]) => Result[Any]) {
     def invoke(args: Seq[String], kwargs: Seq[(String, String)]): Result[Any] = {
       val (usedArgs, leftoverArgs) = args.splitAt(argSignatures.length)
       if (leftoverArgs.nonEmpty && !varargs)
@@ -65,9 +60,7 @@ object Router {
       else {
         val implicitlyNamedArgs = argSignatures.map(_.name).zip(usedArgs).toMap
         val redundantKeys =
-          (implicitlyNamedArgs.keys.toSeq ++ kwargs.map(_._1))
-            .groupBy(x => x)
-            .filter(_._2.size > 1)
+          (implicitlyNamedArgs.keys.toSeq ++ kwargs.map(_._1)).groupBy(x => x).filter(_._2.size > 1)
 
         if (redundantKeys.nonEmpty) {
           Result.Error.RedundantArguments(redundantKeys.keysIterator.toSeq)
@@ -184,8 +177,7 @@ object Router {
         * Something went wrong trying to de-serialize the input parameter;
         * the thrown exception is stored in [[ex]]
         */
-      case class Invalid(arg: ArgSig, value: String, ex: Throwable)
-          extends ParamError
+      case class Invalid(arg: ArgSig, value: String, ex: Throwable) extends ParamError
 
       /**
         * Something went wrong trying to evaluate the default value
@@ -226,9 +218,7 @@ class Router[C <: Context](val c: C) {
     }
   }
 
-  def extractMethod(meth: MethodSymbol,
-                    curCls: c.universe.Type,
-                    target: c.Tree): c.universe.Tree = {
+  def extractMethod(meth: MethodSymbol, curCls: c.universe.Type, target: c.Tree): c.universe.Tree = {
     val flattenedArgLists = meth.paramss.flatten
     def hasDefault(i: Int) = {
       val defaultName = s"${meth.name}$$default$$${i + 1}"
@@ -240,8 +230,7 @@ class Router[C <: Context](val c: C) {
     }
     val argListSymbol = q"${c.fresh[TermName]("argsList")}"
     val defaults = for ((arg, i) <- flattenedArgLists.zipWithIndex) yield {
-      hasDefault(i).map(defaultName =>
-        q"() => $target.${newTermName(defaultName)}")
+      hasDefault(i).map(defaultName => q"() => $target.${newTermName(defaultName)}")
     }
 
     def unwrapVarargType(arg: Symbol) = {
@@ -252,9 +241,7 @@ class Router[C <: Context](val c: C) {
 
       (vararg, unwrappedType)
     }
-    val readArgSigs = for (((arg, defaultOpt), i) <- flattenedArgLists
-                             .zip(defaults)
-                             .zipWithIndex) yield {
+    val readArgSigs = for (((arg, defaultOpt), i) <- flattenedArgLists.zip(defaults).zipWithIndex) yield {
 
       val (vararg, unwrappedType) = unwrapVarargType(arg)
 
@@ -324,8 +311,7 @@ class Router[C <: Context](val c: C) {
     """
   }
 
-  def getAllRoutesForClass(curCls: Type,
-                           target: c.Tree): Iterable[c.universe.Tree] =
+  def getAllRoutesForClass(curCls: Type, target: c.Tree): Iterable[c.universe.Tree] =
     for {
       t <- getValsOrMeths(curCls)
       if t.annotations.exists(_.tpe =:= typeOf[Router.main])

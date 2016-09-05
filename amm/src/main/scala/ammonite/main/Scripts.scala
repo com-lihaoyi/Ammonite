@@ -42,14 +42,9 @@ object Scripts {
 
       routeClsName = wrapperHashes.last._1
 
-      routesCls = interp.eval.frames.head.classloader
-        .loadClass(routeClsName + "$$routes$")
+      routesCls = interp.eval.frames.head.classloader.loadClass(routeClsName + "$$routes$")
 
-      scriptMains = routesCls
-        .getField("MODULE$")
-        .get(null)
-        .asInstanceOf[() => Seq[Router.EntryPoint]]
-        .apply()
+      scriptMains = routesCls.getField("MODULE$").get(null).asInstanceOf[() => Seq[Router.EntryPoint]].apply()
 
       res <- scriptMains match {
         // If there are no @main methods, there's nothing to do
@@ -75,8 +70,7 @@ object Scripts {
                     s"Unable to find method: " + backtickWrap(head) + suffix
                   )
                 case Some(main) =>
-                  runMainMethod(main, tail, kwargs).getOrElse(
-                    Res.Success(imports))
+                  runMainMethod(main, tail, kwargs).getOrElse(Res.Success(imports))
               }
           }
       }
@@ -118,9 +112,7 @@ object Scripts {
           Res.Failure(
             None,
             Util.normalizeNewlines(
-              s"""Too many args were passed to this script: ${x
-                   .map(literalize(_))
-                   .mkString(", ")}
+              s"""Too many args were passed to this script: ${x.map(literalize(_)).mkString(", ")}
                 |expected arguments: $expectedMsg""".stripMargin
             )
           ))
@@ -129,25 +121,24 @@ object Scripts {
           Res.Failure(
             None,
             Util.normalizeNewlines(
-              s"""Redundant values were passed for arguments: ${x
-                   .map(literalize(_))
-                   .mkString(", ")}
+              s"""Redundant values were passed for arguments: ${x.map(literalize(_)).mkString(", ")}
                 |expected arguments: $expectedMsg""".stripMargin
             )
           ))
       case Router.Result.Error.InvalidArguments(x) =>
-        Some(Res.Failure(
-          None,
-          "The following arguments failed to be parsed:" + Util.newLine +
-            x.map {
-              case Router.Result.ParamError.Missing(p) =>
-                s"(${renderArg(p)}) was missing"
-              case Router.Result.ParamError.Invalid(p, v, ex) =>
-                s"(${renderArg(p)}) failed to parse input ${literalize(v)} with $ex"
-              case Router.Result.ParamError.DefaultFailed(p, ex) =>
-                s"(${renderArg(p)})'s default value failed to evaluate with $ex"
-            }.mkString(Util.newLine) + Util.newLine + s"expected arguments: $expectedMsg"
-        ))
+        Some(
+          Res.Failure(
+            None,
+            "The following arguments failed to be parsed:" + Util.newLine +
+              x.map {
+                case Router.Result.ParamError.Missing(p) =>
+                  s"(${renderArg(p)}) was missing"
+                case Router.Result.ParamError.Invalid(p, v, ex) =>
+                  s"(${renderArg(p)}) failed to parse input ${literalize(v)} with $ex"
+                case Router.Result.ParamError.DefaultFailed(p, ex) =>
+                  s"(${renderArg(p)})'s default value failed to evaluate with $ex"
+              }.mkString(Util.newLine) + Util.newLine + s"expected arguments: $expectedMsg"
+          ))
     }
   }
 

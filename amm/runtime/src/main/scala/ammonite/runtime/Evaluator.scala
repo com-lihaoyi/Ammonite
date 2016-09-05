@@ -127,8 +127,7 @@ object Evaluator {
                       fileName: String,
                       indexedWrapperName: Name) = {
         for {
-          cls <- loadClass("$sess." + indexedWrapperName.backticked,
-                           classFiles)
+          cls <- loadClass("$sess." + indexedWrapperName.backticked, classFiles)
           _ = currentLine += 1
           _ <- Catching { userCodeExceptionHandler }
         } yield {
@@ -138,17 +137,11 @@ object Evaluator {
           evaluatorRunPrinter(iter.foreach(printer.out))
 
           // "" Empty string as cache tag of repl code
-          evaluationResult(Seq(Name("$sess"), indexedWrapperName),
-                           newImports,
-                           "")
+          evaluationResult(Seq(Name("$sess"), indexedWrapperName), newImports, "")
         }
       }
 
-      def processScriptBlock(cls: Class[_],
-                             newImports: Imports,
-                             wrapperName: Name,
-                             pkgName: Seq[Name],
-                             tag: String) = {
+      def processScriptBlock(cls: Class[_], newImports: Imports, wrapperName: Name, pkgName: Seq[Name], tag: String) = {
         for {
           _ <- Catching { userCodeExceptionHandler }
         } yield {
@@ -176,9 +169,7 @@ object Evaluator {
         frames.head.addImports(newImports)
       }
 
-      def evaluationResult(wrapperName: Seq[Name],
-                           imports: Imports,
-                           tag: String) = {
+      def evaluationResult(wrapperName: Seq[Name], imports: Imports, tag: String) = {
         Evaluated(
           wrapperName,
           Imports(
@@ -211,9 +202,7 @@ object Evaluator {
     */
   def evaluatorRunPrinter(f: => Unit) = f
 
-  def writeDeep(d: VirtualDirectory,
-                path: List[String],
-                suffix: String): OutputStream = path match {
+  def writeDeep(d: VirtualDirectory, path: List[String], suffix: String): OutputStream = path match {
     case head :: Nil => d.fileNamed(path.head + suffix).output
     case head :: rest =>
       writeDeep(
@@ -226,8 +215,7 @@ object Evaluator {
   /**
     * Writes files to dynamicClasspath. Needed for loading cached classes.
     */
-  def addToClasspath(classFiles: Traversable[(String, Array[Byte])],
-                     dynamicClasspath: VirtualDirectory): Unit = {
+  def addToClasspath(classFiles: Traversable[(String, Array[Byte])], dynamicClasspath: VirtualDirectory): Unit = {
     val names = classFiles.map(_._1)
     for ((name, bytes) <- classFiles) {
       val output =

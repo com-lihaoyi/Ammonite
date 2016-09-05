@@ -9,8 +9,7 @@ class Desugared(s: String) {
 object desugar {
   def transformer(c: Context)(expr: c.Expr[Any]): c.Expr[Desugared] = {
     import c.universe._
-    c.Expr[Desugared](
-      q"ammonite.repl.tools.desugar.impl(${expr.tree.toString})")
+    c.Expr[Desugared](q"ammonite.repl.tools.desugar.impl(${expr.tree.toString})")
   }
 
   def impl(s: String): Desugared = new Desugared(s)

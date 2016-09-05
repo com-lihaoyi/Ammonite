@@ -70,10 +70,7 @@ class Repl(input: InputStream,
         output,
         colors().prompt()(prompt()).render,
         colors(),
-        interp.pressy.complete(
-          _,
-          Preprocessor.importBlock(interp.eval.frames.head.imports),
-          _),
+        interp.pressy.complete(_, Preprocessor.importBlock(interp.eval.frames.head.imports), _),
         storage.fullHistory(),
         addHistory = (code) =>
           if (code != "") {
@@ -82,8 +79,7 @@ class Repl(input: InputStream,
         }
       )
       _ <- Signaller("INT") { interp.mainThread.stop() }
-      out <- interp
-        .processLine(code, stmts, s"cmd${interp.eval.getCurrentLine}.sc")
+      out <- interp.processLine(code, stmts, s"cmd${interp.eval.getCurrentLine}.sc")
     } yield {
       printStream.println()
       out
@@ -105,10 +101,7 @@ class Repl(input: InputStream,
           loop()
         case Res.Exception(ex, msg) =>
           printer.error(
-            Repl.showException(ex,
-                               colors().error(),
-                               fansi.Attr.Reset,
-                               colors().literal())
+            Repl.showException(ex, colors().error(), fansi.Attr.Reset, colors().literal())
           )
           printer.error(msg)
           loop()
@@ -124,10 +117,7 @@ object Repl {
   val pprintPredef =
     "import ammonite.repl.ReplBridge.value.{pprintConfig, derefPPrint}"
 
-  def highlightFrame(f: StackTraceElement,
-                     error: fansi.Attrs,
-                     highlightError: fansi.Attrs,
-                     source: fansi.Attrs) = {
+  def highlightFrame(f: StackTraceElement, error: fansi.Attrs, highlightError: fansi.Attrs, source: fansi.Attrs) = {
     val src =
       if (f.isNativeMethod) source("Native Method")
       else
@@ -142,10 +132,7 @@ object Repl {
 
     fansi.Str(s"  ") ++ method ++ "(" ++ src ++ ")"
   }
-  def showException(ex: Throwable,
-                    error: fansi.Attrs,
-                    highlightError: fansi.Attrs,
-                    source: fansi.Attrs) = {
+  def showException(ex: Throwable, error: fansi.Attrs, highlightError: fansi.Attrs, source: fansi.Attrs) = {
     val cutoff = Set("$main", "evaluatorRunPrinter")
     val traces = Ex
       .unapplySeq(ex)

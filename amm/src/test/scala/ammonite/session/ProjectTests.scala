@@ -71,8 +71,7 @@ object ProjectTests extends TestSuite {
         'resolvers - {
           retry(2) {
             // ivy flakyness...
-            check.session(
-              """
+            check.session("""
               @ import $ivy.`com.ambiata::mundane:1.2.1-20141230225616-50fc792`
               error: IvyResolutionException
 
@@ -107,8 +106,7 @@ object ProjectTests extends TestSuite {
     'shapeless {
       // Shapeless 2.1.0 isn't published for scala 2.10
       if (!scala2_10)
-        check.session(
-          """
+        check.session("""
         @ import $ivy.`com.chuusai::shapeless:2.2.5`, shapeless._
 
         @ (1 :: "lol" :: List(1, 2, 3) :: HNil)
@@ -125,8 +123,7 @@ object ProjectTests extends TestSuite {
     }
 
     'scalaz {
-      check.session(
-        """
+      check.session("""
         @ import $ivy.`org.scalaz::scalaz-core:7.1.1`, scalaz._, Scalaz._
 
         @ (Option(1) |@| Option(2))(_ + _)
@@ -134,8 +131,7 @@ object ProjectTests extends TestSuite {
       """)
     }
     'guava {
-      check.session(
-        """
+      check.session("""
         @ import $ivy.`com.google.guava:guava:18.0`, com.google.common.collect._
 
         @ val bimap = ImmutableBiMap.of(1, "one", 2, "two", 3, "three")
@@ -148,8 +144,7 @@ object ProjectTests extends TestSuite {
       """)
     }
     'resources {
-      check.session(
-        """
+      check.session("""
         @ import ammonite.ops._
 
         @ val path = resource/'org/'apache/'jackrabbit/'oak/'plugins/'blob/"blobstore.properties"
@@ -183,8 +178,7 @@ object ProjectTests extends TestSuite {
 
     'finagle {
       // Prevent regressions when wildcard-importing things called `macro` or `_`
-      check.session(
-        """
+      check.session("""
         @ import $ivy.`com.twitter::finagle-httpx:6.26.0`
 
         @ import com.twitter.finagle._, com.twitter.util._

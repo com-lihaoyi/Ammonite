@@ -42,8 +42,7 @@ import ammonite.util.Util.newLine
   */
 case class Main(predef: String = "",
                 defaultPredef: Boolean = true,
-                storageBackend: Storage =
-                  new Storage.Folder(Defaults.ammoniteHome),
+                storageBackend: Storage = new Storage.Folder(Defaults.ammoniteHome),
                 wd: Path = ammonite.ops.pwd,
                 welcomeBanner: Option[String] = Some(Defaults.welcomeBanner),
                 inputStream: InputStream = System.in,
@@ -114,10 +113,7 @@ case class Main(predef: String = "",
     * Run a Scala script file! takes the path to the file as well as an array
     * of `args` and a map of keyword `kwargs` to pass to that file.
     */
-  def runScript(path: Path,
-                args: Seq[String],
-                kwargs: Seq[(String, String)],
-                replApi: Boolean = false): Res[Imports] = {
+  def runScript(path: Path, args: Seq[String], kwargs: Seq[(String, String)], replApi: Boolean = false): Res[Imports] = {
 
     val interp = instantiateInterpreter(replApi)
     main.Scripts.runScript(wd, path, interp, args, kwargs)
@@ -153,12 +149,10 @@ object Main {
       head("ammonite", ammonite.Constants.version)
       opt[String]('p', "predef")
         .action((x, c) => c.copy(predef = x))
-        .text(
-          "Any commands you want to execute at the start of the REPL session")
+        .text("Any commands you want to execute at the start of the REPL session")
       opt[Unit]("no-default-predef")
         .action((x, c) => c.copy(defaultPredef = false))
-        .text(
-          "Disable the default predef and run Ammonite with the minimal predef possible")
+        .text("Disable the default predef and run Ammonite with the minimal predef possible")
 
       // Secondary arguments that correspond to different methods of
       // the `Main` configuration arguments
@@ -238,8 +232,7 @@ object Main {
       def main(isRepl: Boolean) = Main(
         c.predef,
         c.defaultPredef,
-        new Storage.Folder(ammoniteHome.getOrElse(Defaults.ammoniteHome),
-                           isRepl) {
+        new Storage.Folder(ammoniteHome.getOrElse(Defaults.ammoniteHome), isRepl) {
           override def loadPredef: String = {
             if (predefFiles.isEmpty)
               super.loadPredef
