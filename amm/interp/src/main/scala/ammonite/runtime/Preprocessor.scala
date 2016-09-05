@@ -118,7 +118,7 @@ object Preprocessor {
 
       def Processor(cond: PartialFunction[(String, String, G#Tree), Preprocessor.Expanded]) = {
         (code: String, name: String, tree: G#Tree) =>
-          cond.lift(name, code, tree)
+          cond.lift((name, code, tree))
       }
 
       def pprintSignature(ident: String, customMsg: Option[String]) = {

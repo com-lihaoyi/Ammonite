@@ -34,7 +34,7 @@ val sharedSettings = Seq(
     "com.lihaoyi" %% "utest" % "0.4.3" % "test"),
   scalafmtConfig := Some(file(".scalafmt")),
   testFrameworks := Seq(new TestFramework("utest.runner.Framework")),
-  scalacOptions ++= Seq("-target:jvm-1.7", "-Ywarn-unused", "-Ywarn-unused-import", "-Ywarn-inaccessible", "-Ywarn-dead-code"),
+  scalacOptions ++= Seq("-target:jvm-1.7", "-Ywarn-unused", "-Ywarn-unused-import", "-Ywarn-inaccessible", "-Ywarn-dead-code", "-Xlint"),
   autoCompilerPlugins := true,
   ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) },
   parallelExecution in Test := !scalaVersion.value.contains("2.10"),

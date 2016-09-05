@@ -80,7 +80,7 @@ class Interpreter(val printer: Printer,
     )
   }
 
-  val bridges = extraBridges(this) :+ ("ammonite.runtime.InterpBridge", "interp", interpApi)
+  val bridges = extraBridges(this) :+ (("ammonite.runtime.InterpBridge", "interp", interpApi))
   for ((name, shortName, bridge) <- bridges) {
     APIHolder.initBridge(evalClassloader, name, bridge)
   }
@@ -516,7 +516,7 @@ class Interpreter(val printer: Printer,
         // No more blocks
         // if we have imports to pass to the upper layer we do that
         if (autoImport) outerScriptImportCallback(lastImports)
-        Res.Success(lastImports, compiledData)
+        Res.Success((lastImports, compiledData))
       } else {
         // imports from scripts loaded from this script block will end up in this buffer
         var nestedScriptImports = Imports()

@@ -164,7 +164,7 @@ case class LazyList[T](headThunk: () => T, tailThunk: () => LazyList[T]) {
     }
     s"LazyList(${(rec(this, Nil).reverse ++ Seq("...")).mkString(",")})"
   }
-  def ~:(other: => T) = LazyList(() => other, () => this)
+  def ~:(other: T) = LazyList(() => other, () => this)
 }
 object LazyList {
   object ~: {

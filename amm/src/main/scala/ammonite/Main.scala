@@ -214,7 +214,7 @@ object Main {
 
     while (keywordTokens.nonEmpty) {
       if (keywordTokens(0).startsWith("--")) {
-        kwargs = kwargs :+ (keywordTokens(0).drop(2), keywordTokens(1))
+        kwargs = kwargs :+ ((keywordTokens(0).drop(2), keywordTokens(1)))
         keywordTokens = keywordTokens.drop(2)
       } else {
         passThroughArgs = passThroughArgs :+ keywordTokens(0)

@@ -132,15 +132,15 @@ object ImportHook {
   object Http extends ImportHook {
     def resolveHttp(url: String, target: String) = {
       val res = scalaj.http.Http(url).asString
-      if (!res.is2xx) Res.Failure(None, "$url import failed for " + url)
+      if (!res.is2xx) Res.Failure(None, s"$url import failed for " + url)
       else
         Res.Success(
           Result.Source(
             res.body,
             Name(url),
-            Seq(Name("$url")),
+            Seq(Name(s"$url")),
             ImportHook.Source.URL(url),
-            Imports(Seq(ImportData(Name(url), Name(target), Seq(Name("$url")), ImportData.Term))),
+            Imports(Seq(ImportData(Name(url), Name(target), Seq(Name(s"$url")), ImportData.Term))),
             false
           ))
     }
@@ -204,7 +204,7 @@ object ImportHook {
           )
 
           if (missing.nonEmpty) {
-            Res.Failure(None, "Cannot resolve $cp import: " + missing.mkString(", "))
+            Res.Failure(None, s"Cannot resolve $cp import: " + missing.mkString(", "))
           } else
             Res.Success(
               for (((relativeModule, rename), filePath) <- relativeModules.zip(files))

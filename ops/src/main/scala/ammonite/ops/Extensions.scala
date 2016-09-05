@@ -34,7 +34,7 @@ trait Extensions {
     i andThen f
 
   implicit class iterShow[T](t: Iterator[T]) {
-    def !! = t.foreach(println)
+    def !!() = t.foreach(println)
   }
 
   implicit def RegexContextMaker(s: StringContext) = new RegexContext(s)

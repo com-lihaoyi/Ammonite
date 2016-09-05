@@ -1,6 +1,6 @@
 package ammonite.repl
 
-import ammonite.util.{Bind, CodeColors, Ref}
+import ammonite.util.{Bind, Ref}
 import ammonite.util.Util.newLine
 import pprint.{Config, PPrint, PPrinter}
 

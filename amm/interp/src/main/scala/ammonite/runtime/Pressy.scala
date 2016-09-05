@@ -208,7 +208,7 @@ object Pressy {
       * different completions depending on where the `index` is placed, but
       * the outside caller probably doesn't care.
       */
-    def complete(snippetIndex: Int, previousImports: String, snippet: String) = {
+    override def complete(snippetIndex: Int, previousImports: String, snippet: String) = {
       val prefix = previousImports + newLine + "object AutocompleteWrapper{" + newLine
       val suffix = newLine + "}"
       val allCode = prefix + snippet + suffix
@@ -237,7 +237,7 @@ object Pressy {
       (i - prefix.length, allNames, signatures)
     }
 
-    def shutdownPressy() = {
+    override def shutdownPressy() = {
       Option(cachedPressy).foreach(_.askShutdown())
       cachedPressy = null
     }
