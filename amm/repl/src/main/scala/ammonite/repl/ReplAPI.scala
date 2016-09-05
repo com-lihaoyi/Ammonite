@@ -31,9 +31,9 @@ trait ReplAPI {
   val prompt: String
 
   /**
-    * The front-end REPL used to take user input. Modifiable!
+    * The front-end REPL used to take user input
     */
-  val frontEnd: Ref[FrontEnd]
+  val frontEnd: FrontEnd
 
   /**
     * Display help text if you don't know how to use the REPL

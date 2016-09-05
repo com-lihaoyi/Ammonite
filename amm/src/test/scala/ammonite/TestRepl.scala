@@ -48,7 +48,7 @@ class TestRepl {
           80,
           Colors.BlackWhite,
           "@",
-          Ref(null),
+          null,
           new History(Vector()),
           new SessionApiImpl(i.eval),
           Vector()

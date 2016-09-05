@@ -92,7 +92,7 @@ case class Main(predef: String = "",
             80,
             colors,
             "",
-            Ref(null),
+            null,
             new History(Vector.empty),
             new SessionApiImpl(i.eval),
             Vector()

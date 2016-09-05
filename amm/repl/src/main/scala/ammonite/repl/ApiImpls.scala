@@ -52,12 +52,13 @@ class SessionApiImpl(eval: Evaluator) extends Session {
   }
   save()
 }
+
 class ReplApiImpl(val interp: Interpreter,
                   width0: => Int,
                   height0: => Int,
                   colors0: Ref[Colors],
                   prompt0: String,
-                  frontEnd0: Ref[FrontEnd],
+                  frontEnd0: FrontEnd,
                   history0: => History,
                   sess0: Session,
                   replArgs0: Seq[Bind[_]])

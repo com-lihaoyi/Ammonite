@@ -27,7 +27,7 @@ class ReplKernel(input: InputStream,
     """
   }.mkString(newLine)
 
-  val frontEnd = Ref[FrontEnd](AmmoniteFrontEnd(Filter.empty))
+  val frontEnd = AmmoniteFrontEnd(Filter.empty)
 
   var history = new History(Vector())
 
@@ -45,8 +45,8 @@ class ReplKernel(input: InputStream,
     i => {
       val replApi = new ReplApiImpl(
         i,
-        frontEnd().width,
-        frontEnd().height,
+        frontEnd.width,
+        frontEnd.height,
         colors,
         prompt,
         frontEnd,
@@ -63,7 +63,7 @@ class ReplKernel(input: InputStream,
 
   def action() =
     for {
-      (code, stmts) <- frontEnd().action(
+      (code, stmts) <- frontEnd.action(
         input,
         reader,
         output,
