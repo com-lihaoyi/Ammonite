@@ -52,9 +52,9 @@ class SessionApiImpl(eval: Evaluator) extends Session {
 
 class ReplApiImpl(val interp: Interpreter,
                   history0: => History,
-                  sess0: Session,
-                  replArgs0: Seq[Bind[_]])
+                  sess0: Session)
     extends DefaultReplAPI {
+      
   import interp._
 
   def imports = Preprocessor.importBlock(eval.frames.head.imports)
@@ -84,8 +84,6 @@ class ReplApiImpl(val interp: Interpreter,
   def newCompiler() = init()
   def fullHistory = storage.fullHistory()
   def history = history0
-
-  def replArgs = replArgs0.toVector
 
   object sess extends Session {
     def frames = eval.frames

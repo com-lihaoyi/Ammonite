@@ -1,8 +1,8 @@
 package ammonite
 
-import ammonite.repl.{ReplApiImpl, SessionApiImpl}
-import ammonite.runtime.{History, Interpreter, Storage}
-import ammonite.repl.{ReplKernel, Repl}
+import ammonite.runtime.Storage
+import ammonite.repl.Repl
+import ammonite.kernel.ReplKernel
 import ammonite.util._
 import utest.asserts._
 
@@ -24,7 +24,7 @@ class TestRepl {
   val warningBuffer = mutable.Buffer.empty[String]
   val errorBuffer = mutable.Buffer.empty[String]
   val infoBuffer = mutable.Buffer.empty[String]
-  val printer = Printer(
+  val printer = new PrinterX(
     outBuffer.append(_),
     warningBuffer.append(_),
     errorBuffer.append(_),

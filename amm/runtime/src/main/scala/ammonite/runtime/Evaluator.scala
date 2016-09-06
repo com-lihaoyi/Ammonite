@@ -18,14 +18,18 @@ import scala.util.Try
   * to take the already-compile Scala bytecode and execute it in our process.
   */
 trait Evaluator {
+
   def loadClass(wrapperName: String, classFiles: ClassFiles): Res[Class[_]]
+  
   def evalMain(cls: Class[_]): Any
+  
   def getCurrentLine: String
+  
   def update(newImports: Imports): Unit
 
   def processLine(classFiles: ClassFiles,
                   newImports: Imports,
-                  printer: Printer,
+                  printer: PrinterX,
                   fileName: String,
                   indexedWrapperName: Name): Res[Evaluated]
 
@@ -67,7 +71,7 @@ object Evaluator {
         * Weird indirection only necessary because of
         * https://issues.scala-lang.org/browse/SI-7085
         */
-      def getCurrentLine = currentLine.toString.replace("-", "_")
+      override def getCurrentLine = currentLine.toString.replace("-", "_")
 
       /**
         * Performs the conversion of our pre-compiled `Array[Byte]`s into
@@ -84,9 +88,10 @@ object Evaluator {
           Seq()
         )
       }
-      var frames = List(initialFrame)
 
-      def loadClass(fullName: String, classFiles: ClassFiles): Res[Class[_]] = {
+      override var frames = List(initialFrame)
+
+      override def loadClass(fullName: String, classFiles: ClassFiles): Res[Class[_]] = {
         Res[Class[_]](Try {
           for ((name, bytes) <- classFiles.sortBy(_._1)) {
             frames.head.classloader.addClassFile(name, bytes)
@@ -96,7 +101,7 @@ object Evaluator {
         }, e => "Failed to load compiled class " + e)
       }
 
-      def evalMain(cls: Class[_]) = {
+      override def evalMain(cls: Class[_]) = {
         cls.getDeclaredMethod("$main").invoke(null)
       }
 
@@ -119,9 +124,9 @@ object Evaluator {
         case Ex(userEx @ _ *) => Res.Exception(userEx(0), "")
       }
 
-      def processLine(classFiles: Util.ClassFiles,
+      override def processLine(classFiles: Util.ClassFiles,
                       newImports: Imports,
-                      printer: Printer,
+                      printer: PrinterX,
                       fileName: String,
                       indexedWrapperName: Name) = {
         for {
@@ -139,7 +144,7 @@ object Evaluator {
         }
       }
 
-      def processScriptBlock(cls: Class[_], newImports: Imports, wrapperName: Name, pkgName: Seq[Name], tag: String) = {
+      override def processScriptBlock(cls: Class[_], newImports: Imports, wrapperName: Name, pkgName: Seq[Name], tag: String) = {
         for {
           _ <- Catching { userCodeExceptionHandler }
         } yield {
@@ -149,7 +154,7 @@ object Evaluator {
         }
       }
 
-      def evalCachedClassFiles(cachedData: Seq[ClassFiles],
+      override def evalCachedClassFiles(cachedData: Seq[ClassFiles],
                                pkg: String,
                                wrapper: String,
                                dynamicClasspath: VirtualDirectory,
@@ -163,7 +168,7 @@ object Evaluator {
         }
       }
 
-      def update(newImports: Imports) = {
+      override def update(newImports: Imports) = {
         frames.head.addImports(newImports)
       }
 

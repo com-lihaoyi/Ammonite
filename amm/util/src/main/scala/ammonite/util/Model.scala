@@ -367,7 +367,9 @@ object Bind {
   * @param info How you want to print compile info logging. *Not* the same
   *             as `out`, which is used to print runtime output.
   */
-case class Printer(out: String => Unit, warning: String => Unit, error: String => Unit, info: String => Unit)
+class Printer(val warning: String => Unit, val error: String => Unit, val info: String => Unit)
+
+class PrinterX(val out: String => Unit, warning: String => Unit, error: String => Unit, info: String => Unit) extends Printer(warning, error, info)
 
 case class ImportTree(prefix: Seq[String], mappings: Option[ImportTree.ImportMapping], start: Int, end: Int)
 

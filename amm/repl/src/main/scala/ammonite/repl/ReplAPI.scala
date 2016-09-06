@@ -1,6 +1,6 @@
 package ammonite.repl
 
-import ammonite.util.{Bind, Ref}
+import ammonite.util.Ref
 import ammonite.util.Util.newLine
 import pprint.{Config, PPrint, PPrinter}
 
@@ -158,7 +158,6 @@ abstract class FullReplAPI extends ReplAPI {
   def typeOf[T: WeakTypeTag] = scala.reflect.runtime.universe.weakTypeOf[T]
   def typeOf[T: WeakTypeTag](t: => T) =
     scala.reflect.runtime.universe.weakTypeOf[T]
-  def replArgs: Vector[Bind[_]]
 }
 
 trait DefaultReplAPI extends FullReplAPI {

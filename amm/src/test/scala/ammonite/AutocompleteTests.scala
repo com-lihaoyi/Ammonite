@@ -1,7 +1,6 @@
 package ammonite
 
 import ammonite.TestUtils._
-import ammonite.runtime.Preprocessor
 
 import org.scalatest.FreeSpec
 
@@ -14,11 +13,7 @@ class AutocompleteTests extends FreeSpec {
     val cursor = caretCode.indexOf("<caret>")
     val buf = caretCode.replace("<caret>", "")
 
-    val (_, completions, signatures) = check.kernel.interp.pressy.complete(
-      cursor,
-      Preprocessor.importBlock(check.kernel.interp.eval.frames.head.imports),
-      buf
-    )
+    val (_, completions, signatures) = check.kernel.complete(buf, cursor)
     if(signatures.nonEmpty){
       println(s"autocomplete called with $caretCode resulting in completions: $completions, signatures: $signatures")
     }
