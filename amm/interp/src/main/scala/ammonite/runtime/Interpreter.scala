@@ -206,7 +206,7 @@ class Interpreter(val printer: Printer,
     }
   }
 
-  def processLine(code: String, stmts: Seq[String], fileName: String): Res[Evaluated] = {
+  def processLine(stmts: Seq[String], fileName: String): Res[Evaluated] = {
     val preprocess = Preprocessor(compiler.parse)
     for {
       _ <- Catching {

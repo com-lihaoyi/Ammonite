@@ -2,7 +2,7 @@ package ammonite
 
 import ammonite.repl.{ReplApiImpl, SessionApiImpl}
 import ammonite.runtime.{History, Interpreter, Storage}
-import ammonite.repl.Repl
+import ammonite.repl.{ReplKernel, Repl}
 import ammonite.util._
 import utest.asserts._
 
@@ -30,44 +30,21 @@ class TestRepl {
     errorBuffer.append(_),
     infoBuffer.append(_)
   )
-  val interp = try {
 
-    lazy val i: Interpreter = new Interpreter(
-      printer,
-      storage = new Storage.Folder(tempDir),
-      wd = ammonite.ops.pwd,
-      customPredefs = Seq(
+  val storage = new Storage.Folder(tempDir)
+
+  val predefs = Seq(
         Name("pprintPredef") -> Repl.pprintPredef,
         Name("defaultPredef") -> ammonite.main.Defaults.predefString,
         Name("testPredef") -> predef
-      ),
-      extraBridges = { i =>
-        val replApi = new ReplApiImpl(
-          i,
-          new History(Vector()),
-          new SessionApiImpl(i.eval),
-          Vector()
-        )
+      )
 
-        Seq(("ammonite.repl.ReplBridge", "repl", replApi))
-      }
-    )
-    i.init()
-    i
-  } catch {
-    case e : Throwable =>
-      println(infoBuffer.mkString)
-      println(outBuffer.mkString)
-      println(warningBuffer.mkString)
-      println(errorBuffer.mkString)
-      throw e
-  }
+  val kernel = new ReplKernel(printer, storage, predefs, ammonite.ops.pwd)
 
   def session(sess: String): Unit = {
     // Remove the margin from the block and break
     // it into blank-line-delimited steps
-    val margin =
-      sess.lines.filter(_.trim != "").map(_.takeWhile(_ == ' ').length).min
+    val margin = sess.lines.filter(_.trim != "").map(_.takeWhile(_ == ' ').length).min
     // Strip margin & whitespace
 
     val steps = sess
@@ -81,8 +58,7 @@ class TestRepl {
     for ((step, index) <- steps.zipWithIndex) {
       // Break the step into the command lines, starting with @,
       // and the result lines
-      val (cmdLines, resultLines) =
-        step.lines.map(_.drop(margin)).partition(_.startsWith("@"))
+      val (cmdLines, resultLines) = step.lines.map(_.drop(margin)).partition(_.startsWith("@"))
 
       val commandText = cmdLines.map(_.stripPrefix("@ ")).toVector
 
@@ -97,9 +73,8 @@ class TestRepl {
       val expected = resultLines.mkString(Util.newLine).trim
       allOutput += commandText.map(Util.newLine + "@ " + _).mkString(Util.newLine)
 
-      val (processed, out, warning, error, info) =
-        run(commandText.mkString(Util.newLine), index)
-      interp.handleOutput(processed)
+      val (processed, out, warning, error, info) = run(commandText.mkString(Util.newLine))
+      kernel.interp.handleOutput(processed)
 
       if (expected.startsWith("error: ")) {
         val strippedExpected = expected.stripPrefix("error: ")
@@ -168,27 +143,21 @@ class TestRepl {
     }
   }
 
-  def run(input: String, index: Int) = {
+  def run(input: String) = {
 
     outBuffer.clear()
     warningBuffer.clear()
     errorBuffer.clear()
     infoBuffer.clear()
-    val processed = interp.processLine(
-      input,
-      ammonite.runtime.Parsers.split(input).get.get.value,
-      s"Main$index.sc"
-    )
+    val processed = kernel.process(input)
     processed match {
       case Res.Failure(ex, s) => printer.error(s)
       case Res.Exception(throwable, msg) =>
         printer.error(
           Repl.showException(throwable, fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty)
         )
-
       case _ =>
     }
-    interp.handleOutput(processed)
     (
       processed,
       outBuffer.mkString,
@@ -199,7 +168,7 @@ class TestRepl {
   }
 
   def fail(input: String, failureCheck: String => Boolean = _ => true) = {
-    val (processed, _, _, _, _) = run(input, 0)
+    val (processed, _, _, _, _) = run(input)
 
     processed match {
       case Res.Success(v) =>
@@ -219,7 +188,7 @@ class TestRepl {
   }
 
   def result(input: String, expected: Res[Evaluated]) = {
-    val (processed, _, _, _, _) = run(input, 0)
+    val (processed, _, _, _, _) = run(input)
     assert(processed == expected)
   }
   def failLoudly[T](t: => T) =

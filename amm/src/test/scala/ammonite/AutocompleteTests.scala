@@ -14,9 +14,9 @@ class AutocompleteTests extends FreeSpec {
     val cursor = caretCode.indexOf("<caret>")
     val buf = caretCode.replace("<caret>", "")
 
-    val (_, completions, signatures) = check.interp.pressy.complete(
+    val (_, completions, signatures) = check.kernel.interp.pressy.complete(
       cursor,
-      Preprocessor.importBlock(check.interp.eval.frames.head.imports),
+      Preprocessor.importBlock(check.kernel.interp.eval.frames.head.imports),
       buf
     )
     if(signatures.nonEmpty){
