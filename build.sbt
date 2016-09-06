@@ -55,26 +55,12 @@ lazy val ops = project.settings(
 )
 
 /**
-  * A standalone re-implementation of a composable readline-style REPL,
-  * without any behavior associated with it. Contains an echo-repl that
-  * can be run to test the REPL interactions
-  */
-lazy val terminal = project.settings(
-  sharedSettings,
-  name := "ammonite-terminal",
-  libraryDependencies ++= Seq(
-    "com.lihaoyi" %% "sourcecode" % "0.1.2"
-  )
-)
-
-/**
   * A better Scala REPL, which can be dropped in into any project or run
   * standalone in a Scala project to provide a better interactive experience
   * for Scala
   */
 lazy val amm = project
   .dependsOn(
-    terminal,
     ops,
     ammUtil,
     ammRuntime,
@@ -154,7 +140,10 @@ lazy val ammInterp = project
 
 lazy val ammRepl = project
   .in(file("amm/repl"))
-  .dependsOn(terminal, ammUtil, ammRuntime, ammInterp)
+  .dependsOn(
+    ammUtil, 
+    ammRuntime, 
+    ammInterp)
   .settings(
     sharedSettings,
     crossVersion := CrossVersion.full,
@@ -221,7 +210,6 @@ lazy val published = project
   .in(file("target/published"))
   .aggregate(ops,
              shell,
-             terminal,
              amm,
              sshd,
              ammUtil,
