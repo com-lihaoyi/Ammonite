@@ -290,6 +290,15 @@ object AdvancedTests extends TestSuite{
         @ assert(repl.prompt() == "B")
       """)
     }
+    'macroParadiseWorks{
+      val c1 = new TestRepl()
+      c1.session("""
+        @ interp.load.plugin.ivy("org.scalamacros" % "paradise_2.11.8" % "2.1.0")
+      """)
+      c1.session("""
+        @ val x = 1
+      """)
+    }
     'desugar{
       if (!scala2_10) check.session("""
         @ desugar{1 + 2 max 3}
