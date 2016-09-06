@@ -122,32 +122,32 @@ class Repl(input: InputStream,
            replArgs: Seq[Bind[_]] = Nil)
     extends ReplKernel(input, output, error, storage, predef, wd, replArgs) {
 
-  def run(): Any = {
-    welcomeBanner.foreach(printStream.println)
-    interp.init()
-    @tailrec def loop(): Any = {
-      val actionResult = action()
-      interp.handleOutput(actionResult)
+  // def run(): Any = {
+  //   welcomeBanner.foreach(printStream.println)
+  //   interp.init()
+  //   @tailrec def loop(): Any = {
+  //     val actionResult = action()
+  //     interp.handleOutput(actionResult)
 
-      actionResult match {
-        case Res.Exit(value) =>
-          printStream.println("Bye!")
-          value
-        case Res.Failure(ex, msg) =>
-          printer.error(msg)
-          loop()
-        case Res.Exception(ex, msg) =>
-          printer.error(
-            Repl.showException(ex, colors().error(), fansi.Attr.Reset, colors().literal())
-          )
-          printer.error(msg)
-          loop()
-        case _ =>
-          loop()
-      }
-    }
-    loop()
-  }
+  //     actionResult match {
+  //       case Res.Exit(value) =>
+  //         printStream.println("Bye!")
+  //         value
+  //       case Res.Failure(ex, msg) =>
+  //         printer.error(msg)
+  //         loop()
+  //       case Res.Exception(ex, msg) =>
+  //         printer.error(
+  //           Repl.showException(ex, colors().error(), fansi.Attr.Reset, colors().literal())
+  //         )
+  //         printer.error(msg)
+  //         loop()
+  //       case _ =>
+  //         loop()
+  //     }
+  //   }
+  //   loop()
+  // }
 }
 
 object Repl {

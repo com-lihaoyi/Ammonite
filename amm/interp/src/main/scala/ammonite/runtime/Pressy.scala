@@ -14,9 +14,11 @@ import ammonite.util.Util.newLine
 /**
   * Nice wrapper for the presentation compiler.
   */
-class Pressy(pressy: => nsc.interactive.Global) {
+class Pressy(nscGen: => nsc.interactive.Global) {
 
   import Pressy._
+
+  private lazy val nscGlobal = nscGen
 
    /**
       * Ask for autocompletion at a particular spot in the code, returning
@@ -33,10 +35,10 @@ class Pressy(pressy: => nsc.interactive.Global) {
       val currentFile = new BatchSourceFile(Compiler.makeFile(allCode.getBytes, name = "Current.sc"), allCode)
 
       val r = new Response[Unit]
-      pressy.askReload(List(currentFile), r)
+      nscGlobal.askReload(List(currentFile), r)
       r.get.fold(x => x, e => throw e)
 
-      val run = Try(new Run(pressy, currentFile, allCode, index))
+      val run = Try(new Run(nscGlobal, currentFile, allCode, index))
 
       val (i, all): (Int, Seq[(String, Option[String])]) = run match {
         case Success(runSuccess) => runSuccess.prefixed
@@ -52,7 +54,7 @@ class Pressy(pressy: => nsc.interactive.Global) {
     }
 
     def shutdownPressy() = {
-      pressy.askShutdown()
+      nscGlobal.askShutdown()
     }
 }
 
