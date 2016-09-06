@@ -291,9 +291,10 @@ object AdvancedTests extends TestSuite{
       """)
     }
     'macroParadiseWorks{
-      val c1 = new TestRepl()
-      c1.session("""
-        @ interp.load.plugin.ivy("org.scalamacros" % "paradise_2.11.8" % "2.1.0")
+      val scalaVersion: String = scala.util.Properties.versionNumberString
+      val c1: TestRepl = new TestRepl()
+      c1.session(s"""
+        @ interp.load.plugin.ivy("org.scalamacros" % "paradise_${scalaVersion}" % "2.1.0")
       """)
       c1.session("""
         @ val x = 1
