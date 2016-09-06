@@ -88,8 +88,6 @@ case class Main(predef: String = "",
         else {
           val replApi = new ReplApiImpl(
             i,
-            "",
-            null,
             new History(Vector.empty),
             new SessionApiImpl(i.eval),
             Vector()

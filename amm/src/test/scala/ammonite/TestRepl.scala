@@ -44,8 +44,6 @@ class TestRepl {
       extraBridges = { i =>
         val replApi = new ReplApiImpl(
           i,
-          "@",
-          null,
           new History(Vector()),
           new SessionApiImpl(i.eval),
           Vector()

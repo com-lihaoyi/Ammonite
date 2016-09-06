@@ -7,6 +7,15 @@ import ammonite.util.Util.newLine
 import ammonite.util._
 import scala.annotation.tailrec
 
+
+import java.io.{InputStream, OutputStream, OutputStreamWriter}
+
+import ammonite.terminal._
+import fastparse.core.Parsed
+import ammonite.util.Res
+import ammonite.runtime.Parsers
+
+
 class ReplKernel(input: InputStream,
                  output: OutputStream,
                  error: OutputStream,
@@ -25,9 +34,36 @@ class ReplKernel(input: InputStream,
     """
   }.mkString(newLine)
 
-  val frontEnd = new AmmoniteFrontEnd
-
   var history = new History(Vector())
+
+    def frontEnd(input: InputStream,
+             reader: java.io.Reader,
+             output: OutputStream,
+             prompt: String,
+             addHistory: String => Unit) = {
+    val res = readLine(reader, output, prompt) match {
+      case None => Res.Exit(())
+      case Some(code) =>
+        addHistory(code)
+        Parsers.Splitter.parse(code) match {
+          case Parsed.Success(value, idx) =>
+            Res.Success((code, value))
+          case Parsed.Failure(_, index, extra) =>
+            Res.Failure(
+              None,
+              fastparse.core.ParseError.msg(extra.input, extra.traced.expected, index)
+            )
+        }
+    }
+    res
+  }
+
+  def readLine(reader: java.io.Reader,
+               output: OutputStream,
+               prompt: String) = {
+    val writer = new OutputStreamWriter(output)
+    Terminal.readLine(prompt, reader, writer)
+  }
 
   val (colors, printStream, errorPrintStream, printer) =
     Interpreter.initPrinters(output, error, true)
@@ -43,8 +79,6 @@ class ReplKernel(input: InputStream,
     i => {
       val replApi = new ReplApiImpl(
         i,
-        prompt,
-        frontEnd,
         history,
         new SessionApiImpl(i.eval),
         replArgs
@@ -58,7 +92,7 @@ class ReplKernel(input: InputStream,
 
   def action() =
     for {
-      (code, stmts) <- frontEnd.action(
+      (code, stmts) <- frontEnd(
         input,
         reader,
         output,

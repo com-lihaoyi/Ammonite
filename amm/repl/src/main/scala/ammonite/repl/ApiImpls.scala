@@ -51,19 +51,13 @@ class SessionApiImpl(eval: Evaluator) extends Session {
 }
 
 class ReplApiImpl(val interp: Interpreter,
-                  prompt0: String,
-                  frontEnd0: FrontEnd,
                   history0: => History,
                   sess0: Session,
                   replArgs0: Seq[Bind[_]])
     extends DefaultReplAPI {
   import interp._
 
-  def lastException = interp.lastException
-
   def imports = Preprocessor.importBlock(eval.frames.head.imports)
-  val prompt = prompt0
-  val frontEnd = frontEnd0
 
   implicit lazy val pprintConfig: Ref[pprint.Config] = {
     Ref.live[pprint.Config](() => pprint.Config.apply())

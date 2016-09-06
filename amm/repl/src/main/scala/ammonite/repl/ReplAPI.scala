@@ -20,31 +20,6 @@ trait ReplAPI {
   def exit(value: Any) = throw ReplExit(value)
 
   /**
-    * Read/writable prompt for the shell. 
-    */
-  val prompt: String
-
-  /**
-    * The front-end REPL used to take user input
-    */
-  val frontEnd: FrontEnd
-
-  /**
-    * Display help text if you don't know how to use the REPL
-    */
-  def help: String
-
-  /**
-    * The last exception that was thrown in the REPL; `null` if nothing has
-    * yet been thrown. Useful if you want additional information from the
-    * thrown exception than the printed stack trace (e.g. many exceptions have
-    * additional metadata attached) or if you want to show the stack trace
-    * on an exception that doesn't normally print it (e.g. seeing the stack
-    * when a Ctrl-C interrupt happened) via `lastException.printStackTrace`.
-    */
-  def lastException: Throwable
-
-  /**
     * History of commands that have been entered into the shell, including
     * previous sessions
     */
@@ -188,15 +163,6 @@ abstract class FullReplAPI extends ReplAPI {
 
 trait DefaultReplAPI extends FullReplAPI {
 
-  def help =
-    """Welcome to the Ammonite Scala REPL! Enter a Scala expression and it will be evaluated.
-      |All your standard Bash hotkeys should work for navigating around or editing the line
-      |being entered, as well as some GUI hotkeys like alt-shift-left/right to select words
-      |to replace. Hit <tab> to autocomplete possible names.
-      |
-      |For a list of REPL built-ins and configuration, use `repl.<tab>`. For a more detailed
-      |description of how to use the REPL, check out https://lihaoyi.github.io/Ammonite
-    """.stripMargin.trim
   object Internal extends Internal {
     def combinePrints(iters: Iterator[String]*) = {
       iters.toIterator.filter(_.nonEmpty).flatMap(Iterator(newLine) ++ _).drop(1)

@@ -19,6 +19,9 @@ class AutocompleteTests extends FreeSpec {
       Preprocessor.importBlock(check.interp.eval.frames.head.imports),
       buf
     )
+    if(signatures.nonEmpty){
+      println(s"autocomplete called with $caretCode resulting in completions: $completions, signatures: $signatures")
+    }
     val left = cmp(completions.toSet)
     assert(left == Set())
     val sigLeft = sigs(signatures.toSet)
@@ -45,7 +48,7 @@ class AutocompleteTests extends FreeSpec {
   "AutocompleteTests" - {
     
     "import" in {
-      complete("""import <caret>""", Set("java", "javax", "scala") -- _)
+      //complete("""import <caret>""", Set("java", "javax", "scala") -- _)
       complete("""import j<caret>""", Set("java", "javax", "jline", "jawn") -- _)
       complete("""import ja<caret>""", x => Set("java", "javax", "jawn") ^ (x - "javafx"))
       complete("""import java.<caret>""", Set("lang", "util") -- _)
