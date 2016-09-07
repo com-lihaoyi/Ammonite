@@ -46,7 +46,7 @@ class AutocompleteTests extends FreeSpec {
     "import" in {
       //complete("""import <caret>""", Set("java", "javax", "scala") -- _)
       complete("""import j<caret>""",
-               Set("java", "javax", "jline", "jawn") -- _)
+               Set("java", "javax", "jawn") -- _)
       complete("""import ja<caret>""",
                x => Set("java", "javax", "jawn") ^ (x - "javafx"))
       complete("""import java.<caret>""", Set("lang", "util") -- _)

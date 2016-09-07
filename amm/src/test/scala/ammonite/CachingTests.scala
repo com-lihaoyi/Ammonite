@@ -15,7 +15,6 @@ class CachingTests extends FreeSpec {
   val resourcesPath = pwd / 'src / 'test / 'resources
   val tempDir = tmp.dir(prefix = "ammonite-tester")
 
-  "CachingTests" - {
     "noAutoIncrementWrapper" in {
       val storage = Storage.InMemory()
       val interp = createTestInterp(storage)
@@ -28,6 +27,7 @@ class CachingTests extends FreeSpec {
         case e: Exception => assert(false)
       }
     }
+
     "blocks" in {
       val cases =
         Seq("OneBlock.sc" -> 2, "TwoBlocks.sc" -> 3, "ThreeBlocks.sc" -> 4)
@@ -75,11 +75,10 @@ class CachingTests extends FreeSpec {
       val storage = new Storage.Folder(tempDir)
       val numFile = pwd / 'target / 'test / 'resources / 'scriptLevelCaching / "num.value"
       rm(numFile)
-      write(numFile, "1")
+      write(numFile, "0")
       val interp1 = createTestInterp(storage, Defaults.predefString)
       assertThrows[java.lang.ArithmeticException] {
-        interp1.interpApi.load
-          .module(resourcesPath / 'scriptLevelCaching / "runTimeExceptions.sc")
+        interp1.interpApi.load.module(resourcesPath / 'scriptLevelCaching / "runTimeExceptions.sc")
       }
       val interp2 = createTestInterp(storage, Defaults.predefString)
       assertThrows[java.lang.ArithmeticException] {
@@ -166,6 +165,6 @@ class CachingTests extends FreeSpec {
       processAndCheckCompiler(_ != null)
       processAndCheckCompiler(_ == null)
     }
-  }
+  
 
 }

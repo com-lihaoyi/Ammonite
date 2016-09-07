@@ -65,20 +65,21 @@ lazy val ops = project.settings(
   * for Scala
   */
 lazy val amm = project
-  .dependsOn(
-    ops,
-    ammUtil,
-    ammRuntime,
-    ammInterp,
-    ammRepl
-  )
+  .dependsOn(ops)
   .settings(
     sharedSettings,
     crossVersion := CrossVersion.full,
     test in assembly := {},
     name := "ammonite",
     libraryDependencies ++= Seq(
-      "com.github.scopt" %% "scopt" % "3.4.0"
+      "com.github.scopt" %% "scopt" % "3.4.0",
+      "com.lihaoyi" %% "upickle" % "0.4.2",
+      "com.lihaoyi" %% "pprint" % "0.4.2",
+      "org.apache.ivy" % "ivy" % "2.4.0",
+      "org.scalaj" %% "scalaj-http" % "2.3.0",
+      "org.scala-lang" % "scala-compiler" % scalaVersion.value,
+      "org.scala-lang" % "scala-reflect" % scalaVersion.value,
+      "com.lihaoyi" %% "scalaparse" % "0.3.7"
     ),
     libraryDependencies ++= (
       if (scalaVersion.value startsWith "2.10.") Nil
@@ -101,58 +102,6 @@ lazy val amm = project
       Seq("chmod", "+x", dest.getAbsolutePath).!
       dest
     }
-  )
-
-lazy val ammUtil = project
-  .in(file("amm/util"))
-  .dependsOn(ops)
-  .settings(
-    sharedSettings,
-    crossVersion := CrossVersion.full,
-    name := "ammonite-util",
-    libraryDependencies ++= Seq(
-      "com.lihaoyi" %% "upickle" % "0.4.2",
-      "com.lihaoyi" %% "pprint" % "0.4.2"
-    )
-  )
-
-lazy val ammRuntime = project
-  .in(file("amm/runtime"))
-  .dependsOn(ops, ammUtil)
-  .settings(
-    sharedSettings,
-    crossVersion := CrossVersion.full,
-    name := "ammonite-runtime",
-    libraryDependencies ++= Seq(
-      "org.apache.ivy" % "ivy" % "2.4.0",
-      "org.scalaj" %% "scalaj-http" % "2.3.0"
-    )
-  )
-
-lazy val ammInterp = project
-  .in(file("amm/interp"))
-  .dependsOn(ops, ammUtil, ammRuntime)
-  .settings(
-    sharedSettings,
-    crossVersion := CrossVersion.full,
-    name := "ammonite-compiler",
-    libraryDependencies ++= Seq(
-      "org.scala-lang" % "scala-compiler" % scalaVersion.value,
-      "org.scala-lang" % "scala-reflect" % scalaVersion.value,
-      "com.lihaoyi" %% "scalaparse" % "0.3.7"
-    )
-  )
-
-lazy val ammRepl = project
-  .in(file("amm/repl"))
-  .dependsOn(ammUtil, ammRuntime, ammInterp)
-  .settings(
-    sharedSettings,
-    crossVersion := CrossVersion.full,
-    name := "ammonite-repl",
-    libraryDependencies ++= Seq(
-      "jline" % "jline" % "2.12"
-    )
   )
 
 /**
@@ -210,5 +159,5 @@ lazy val sshd = project
 
 lazy val published = project
   .in(file("target/published"))
-  .aggregate(ops, shell, amm, sshd, ammUtil, ammRuntime, ammInterp, ammRepl)
+  .aggregate(ops, shell, amm, sshd)
   .settings(dontPublishSettings)
