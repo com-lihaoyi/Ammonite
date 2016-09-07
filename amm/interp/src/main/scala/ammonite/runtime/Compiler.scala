@@ -154,7 +154,7 @@ object Compiler{
         .asScala
         .toVector
 
-      val plugins = for {
+      val pluginNames = for {
         url <- urls
         elem = scala.xml.XML.load(url.openStream())
         name = (elem \\ "plugin" \ "name").text
@@ -163,6 +163,15 @@ object Compiler{
         // pretty useless and can cause problems conflicting with other plugins
         if className != "acyclic.plugin.RuntimePlugin"
         if name.nonEmpty && className.nonEmpty
+      } yield (name, className)
+
+      /*
+       * If there's also a '-sources' jar for the plugin in the classpath,
+       * there will be >= 1 plugins registered which may cause cryptic error messages
+       * and break the REPL completely, so `.distinct` is called on pluginNames
+       */
+      val plugins = for {
+        (name, className) <- pluginNames.distinct
         classOpt =
           try Some(loader.loadClass(className))
           catch { case _: ClassNotFoundException => None }

@@ -290,6 +290,16 @@ object AdvancedTests extends TestSuite{
         @ assert(repl.prompt() == "B")
       """)
     }
+    'macroParadiseWorks{
+      val scalaVersion: String = scala.util.Properties.versionNumberString
+      val c1: TestRepl = new TestRepl()
+      c1.session(s"""
+        @ interp.load.plugin.ivy("org.scalamacros" % "paradise_${scalaVersion}" % "2.1.0")
+      """)
+      c1.session("""
+        @ val x = 1
+      """)
+    }
     'desugar{
       if (!scala2_10) check.session("""
         @ desugar{1 + 2 max 3}
