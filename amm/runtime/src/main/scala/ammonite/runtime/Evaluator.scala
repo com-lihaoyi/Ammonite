@@ -31,14 +31,13 @@ class Evaluator(currentClassloader: ClassLoader, startingLine: Int) {
     }, e => "Failed to load compiled class " + e)
   }
 
-  def evalMain(cls: Class[_]): Any =
-    cls.getDeclaredMethod("$main").invoke(null)
+  private def evalMain(cls: Class[_]): Any = cls.getDeclaredMethod("$main").invoke(null)
 
   /**
     * The current line number of the REPL, used to make sure every snippet
     * evaluated can have a distinct name that doesn't collide.
     */
-  var currentLine = startingLine
+  private var currentLine = startingLine
 
   /**
     * Weird indirection only necessary because of
