@@ -2,7 +2,6 @@ package ammonite.util
 
 import scala.reflect.NameTransformer
 
-
 /**
   * Represents a single identifier in Scala source code, e.g. "scala" or
   * "println" or "`Hello-World`".
@@ -17,13 +16,13 @@ case class Name(raw: String) {
     NameTransformer.decode(raw) == raw,
     "Name() must be created with un-encoded text"
   )
-  
+
   assert(raw.charAt(0) != '`', "Cannot create already-backticked identifiers")
-  
+
   override def toString = s"Name($backticked)"
-  
+
   def encoded = NameTransformer.encode(raw)
-  
+
   def backticked = Name.backtickWrap(raw)
 }
 
@@ -124,8 +123,7 @@ object Name {
               !(chunks.lift(index - 1).exists(_ == "") && index - 1 == 0))
       }
 
-      val firstLetterValid = s(0).isLetter || s(0) == '_' || s(0) == '$' || validOperator(
-          s(0))
+      val firstLetterValid = s(0).isLetter || s(0) == '_' || s(0) == '$' || validOperator(s(0))
       val valid =
         validChunks &&
           firstLetterValid &&

@@ -67,20 +67,15 @@ class TestRepl {
       // Make sure all non-empty, non-complete command-line-fragments
       // are considered incomplete during the parse
       for (incomplete <- commandText.inits.toSeq.drop(1).dropRight(1)) {
-        assert(
-          ammonite.runtime.Parsers
-            .split(incomplete.mkString(Util.newLine)) == None)
+        assert(ammonite.runtime.Parsers.split(incomplete.mkString(Util.newLine)) == None)
       }
 
       // Finally, actually run the complete command text through the
       // interpreter and make sure the output is what we expect
       val expected = resultLines.mkString(Util.newLine).trim
-      allOutput += commandText
-        .map(Util.newLine + "@ " + _)
-        .mkString(Util.newLine)
+      allOutput += commandText.map(Util.newLine + "@ " + _).mkString(Util.newLine)
 
-      val (processed, out, warning, error, info) = run(
-        commandText.mkString(Util.newLine))
+      val (processed, out, warning, error, info) = run(commandText.mkString(Util.newLine))
       kernel.interp.handleOutput(processed)
 
       if (expected.startsWith("error: ")) {
@@ -114,10 +109,7 @@ class TestRepl {
           case Res.Success(str) =>
             // Strip trailing whitespace
             def normalize(s: String) =
-              s.lines
-                .map(_.replaceAll(" *$", ""))
-                .mkString(Util.newLine)
-                .trim()
+              s.lines.map(_.replaceAll(" *$", "")).mkString(Util.newLine).trim()
             failLoudly(
               assert {
                 identity(error)
@@ -164,10 +156,7 @@ class TestRepl {
       case Res.Failure(ex, s) => printer.error(s)
       case Res.Exception(throwable, msg) =>
         printer.error(
-          Repl.showException(throwable,
-                             fansi.Attrs.Empty,
-                             fansi.Attrs.Empty,
-                             fansi.Attrs.Empty)
+          Repl.showException(throwable, fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty)
         )
       case _ =>
     }

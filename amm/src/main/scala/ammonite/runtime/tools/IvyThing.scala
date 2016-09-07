@@ -3,10 +3,7 @@ package ammonite.runtime.tools
 import ammonite.runtime.tools.IvyThing._
 import ammonite.util.Printer
 import org.apache.ivy.Ivy
-import org.apache.ivy.core.module.descriptor.{
-  DefaultDependencyDescriptor,
-  DefaultModuleDescriptor
-}
+import org.apache.ivy.core.module.descriptor.{DefaultDependencyDescriptor, DefaultModuleDescriptor}
 import org.apache.ivy.core.module.id.ModuleRevisionId
 import org.apache.ivy.core.resolve.ResolveOptions
 import org.apache.ivy.core.settings.IvySettings
@@ -33,9 +30,7 @@ trait IvyConstructor {
   *
   * And transliterated into Scala. I have no idea how or why it works.
   */
-case class IvyThing(resolvers: () => List[Resolver],
-                    printer: Printer,
-                    verboseOutput: Boolean) {
+case class IvyThing(resolvers: () => List[Resolver], printer: Printer, verboseOutput: Boolean) {
 
   case class IvyResolutionException(failed: Seq[String])
       extends Exception(
@@ -55,10 +50,7 @@ case class IvyThing(resolvers: () => List[Resolver],
     def rawlog(msg: String, level: Int) = log(msg, level)
   })
 
-  def resolveArtifact(groupId: String,
-                      artifactId: String,
-                      version: String,
-                      verbosity: Int = 2) = synchronized {
+  def resolveArtifact(groupId: String, artifactId: String, version: String, verbosity: Int = 2) = synchronized {
     maxLevel = verbosity
     val ivy = ivyInstance(resolvers)
 
@@ -83,10 +75,7 @@ case class IvyThing(resolvers: () => List[Resolver],
       desc
     }
 
-    val options = new ResolveOptions()
-      .setConfs(Array("default"))
-      .setRefresh(true)
-      .setOutputReport(false)
+    val options = new ResolveOptions().setConfs(Array("default")).setRefresh(true).setOutputReport(false)
 
     //init resolve report
     val report = ivy.resolve(md, options)
@@ -156,11 +145,7 @@ object IvyThing {
   }
 
   val scalaBinaryVersion =
-    scala.util.Properties.versionString
-      .stripPrefix("version ")
-      .split('.')
-      .take(2)
-      .mkString(".")
+    scala.util.Properties.versionString.stripPrefix("version ").split('.').take(2).mkString(".")
 
 }
 
@@ -211,8 +196,7 @@ sealed trait Resolver {
   def apply(): RepositoryResolver
 }
 object Resolver {
-  case class File(name: String, root: String, pattern: String, m2: Boolean)
-      extends Resolver {
+  case class File(name: String, root: String, pattern: String, m2: Boolean) extends Resolver {
     def apply() = {
       val testRepoDir = sys.props("user.home") + root
       val repo = new FileRepository(new java.io.File(testRepoDir))
@@ -232,8 +216,7 @@ object Resolver {
 
     }
   }
-  case class Http(name: String, root: String, pattern: String, m2: Boolean)
-      extends Resolver {
+  case class Http(name: String, root: String, pattern: String, m2: Boolean) extends Resolver {
     def apply() = {
       val res = new IBiblioResolver()
       res.setUsepoms(true)

@@ -133,9 +133,7 @@ object Evaluator {
     case Ex(userEx @ _ *) => Res.Exception(userEx(0), "")
   }
 
-  private def evaluationResult(wrapperName: Seq[Name],
-                               imports: Imports,
-                               tag: String) = {
+  private def evaluationResult(wrapperName: Seq[Name], imports: Imports, tag: String) = {
     Evaluated(
       wrapperName,
       Imports(
@@ -176,9 +174,7 @@ object Evaluator {
 
   private type InitEx = ExceptionInInitializerError
 
-  def writeDeep(d: VirtualDirectory,
-                path: List[String],
-                suffix: String): OutputStream = (path: @unchecked) match {
+  def writeDeep(d: VirtualDirectory, path: List[String], suffix: String): OutputStream = (path: @unchecked) match {
     case head :: Nil => d.fileNamed(path.head + suffix).output
     case head :: rest =>
       writeDeep(
@@ -191,8 +187,7 @@ object Evaluator {
   /**
     * Writes files to dynamicClasspath. Needed for loading cached classes.
     */
-  def addToClasspath(classFiles: Traversable[(String, Array[Byte])],
-                     dynamicClasspath: VirtualDirectory): Unit = {
+  def addToClasspath(classFiles: Traversable[(String, Array[Byte])], dynamicClasspath: VirtualDirectory): Unit = {
     for ((name, bytes) <- classFiles) {
       val output =
         writeDeep(dynamicClasspath, name.split('.').toList, ".class")

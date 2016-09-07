@@ -19,10 +19,7 @@ import collection.mutable
   * a type, a term, or both. This lets us properly deal with shadowing correctly
   * if we import the type and term of the same name from different places
   */
-case class ImportData(fromName: Name,
-                      toName: Name,
-                      prefix: Seq[Name],
-                      importType: ImportData.ImportType)
+case class ImportData(fromName: Name, toName: Name, prefix: Seq[Name], importType: ImportData.ImportType)
 
 object ImportData {
   sealed case class ImportType(name: String)
@@ -82,10 +79,7 @@ object Imports {
   }
 }
 
-case class ImportTree(prefix: Seq[String],
-                      mappings: Option[ImportTree.ImportMapping],
-                      start: Int,
-                      end: Int)
+case class ImportTree(prefix: Seq[String], mappings: Option[ImportTree.ImportMapping], start: Int, end: Int)
 
 object ImportTree {
   type ImportMapping = Seq[(String, Option[String])]

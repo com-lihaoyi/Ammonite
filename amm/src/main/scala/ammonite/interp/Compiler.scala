@@ -30,10 +30,7 @@ import scala.util.Try
   */
 trait Compiler {
   def compiler: nsc.Global
-  def compile(src: Array[Byte],
-              printer: Printer,
-              importsLen0: Int,
-              fileName: String): Compiler.Output
+  def compile(src: Array[Byte], printer: Printer, importsLen0: Int, fileName: String): Compiler.Output
 
   def search(name: scala.reflect.runtime.universe.Type): Option[String]
 
@@ -94,14 +91,12 @@ object Compiler {
 
     val jarCP =
       jarDeps
-        .filter(x =>
-          x.getName.endsWith(".jar") || Classpath.canBeOpenedAsJar(x))
+        .filter(x => x.getName.endsWith(".jar") || Classpath.canBeOpenedAsJar(x))
         .map(x => new DirectoryClassPath(new FileZipArchive(x), jCtx))
         .toVector
 
     val dirCP =
-      dirDeps.map(x =>
-        new DirectoryClassPath(new PlainDirectory(new Directory(x)), jCtx))
+      dirDeps.map(x => new DirectoryClassPath(new PlainDirectory(new Directory(x)), jCtx))
 
     val dynamicCP = Seq(new DirectoryClassPath(dynamicClasspath, jCtx))
     val jcp = new JavaClassPath(jarCP ++ dirCP ++ dynamicCP, jCtx)
@@ -168,8 +163,7 @@ object Compiler {
       }
       if (notFound.nonEmpty) {
         for ((name, className) <- notFound.sortBy(_._1))
-          Console.err.println(
-            s"Implementation $className of plugin $name not found.")
+          Console.err.println(s"Implementation $className of plugin $name not found.")
       }
 
       plugins.collect { case (name, _, Some(cls)) => name -> cls }
@@ -191,17 +185,14 @@ object Compiler {
         settings
       )
       val scalac = new nsc.Global(settings, reporter) { g =>
-        override lazy val plugins = List(
-            new AmmonitePlugin(g, lastImports = _, importsLen)) ++ {
+        override lazy val plugins = List(new AmmonitePlugin(g, lastImports = _, importsLen)) ++ {
           for {
             (name, cls) <- plugins0
             plugin = Plugin.instantiate(cls, g)
-            initOk = try CompilerCompatibility
-              .pluginInit(plugin, Nil, g.globalError)
+            initOk = try CompilerCompatibility.pluginInit(plugin, Nil, g.globalError)
             catch {
               case ex: Exception =>
-                Console.err.println(
-                  s"Warning: disabling plugin $name, initialization failed: $ex")
+                Console.err.println(s"Warning: disabling plugin $name, initialization failed: $ex")
                 false
             }
             if initOk
@@ -251,12 +242,10 @@ object Compiler {
           // No clue why this one blows up
           m <- Try(sym.typeSignature.members).toOption.toSeq.flatten
         } yield (m, m.name :: path)
-        thingsInScope
-          .find(target.typeSymbol.fullName == _._1.fullName)
-          .foreach { path =>
-            level = 0
-            found = Some(path._2.mkString("."))
-          }
+        thingsInScope.find(target.typeSymbol.fullName == _._1.fullName).foreach { path =>
+          level = 0
+          found = Some(path._2.mkString("."))
+        }
       }
       found
     }
@@ -267,16 +256,11 @@ object Compiler {
       * It is passed to AmmonitePlugin to decrease this much offset from each AST node
       * corresponding to the actual code so as to correct the line numbers in error report
       */
-    def compile(src: Array[Byte],
-                printer: Printer,
-                importsLen0: Int,
-                fileName: String): Output = {
+    def compile(src: Array[Byte], printer: Printer, importsLen0: Int, fileName: String): Output = {
 
       def enumerateVdFiles(d: VirtualDirectory): Iterator[AbstractFile] = {
         val (subs, files) = d.iterator.partition(_.isDirectory)
-        files ++ subs
-          .map(_.asInstanceOf[VirtualDirectory])
-          .flatMap(enumerateVdFiles)
+        files ++ subs.map(_.asInstanceOf[VirtualDirectory]).flatMap(enumerateVdFiles)
       }
 
       compiler.reporter.reset()
@@ -302,11 +286,7 @@ object Compiler {
           val output = Evaluator.writeDeep(dynamicClasspath, segments, "")
           output.write(x.toByteArray)
           output.close()
-          (x.path
-             .stripPrefix("(memory)/")
-             .stripSuffix(".class")
-             .replace('/', '.'),
-           x.toByteArray)
+          (x.path.stripPrefix("(memory)/").stripSuffix(".class").replace('/', '.'), x.toByteArray)
         }
 
         val imports = lastImports.toList

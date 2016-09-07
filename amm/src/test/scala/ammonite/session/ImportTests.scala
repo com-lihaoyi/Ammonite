@@ -119,8 +119,7 @@ object ImportTests extends TestSuite {
         """)
       }
       'shadowPrefix {
-        * - check.session(
-          """
+        * - check.session("""
           @ object importing_issue {
           @   object scala {
           @     def evilThing = ???

@@ -61,8 +61,7 @@ object Preprocessor {
   def splitScript(rawCode: String): Res[Seq[(String, Seq[String])]] = {
     Parsers.splitScript(rawCode) match {
       case f: Parsed.Failure =>
-        Res.Failure(None,
-                    errMsg(f.msg, rawCode, f.extra.traced.expected, f.index))
+        Res.Failure(None, errMsg(f.msg, rawCode, f.extra.traced.expected, f.index))
       case s: Parsed.Success[Seq[(String, Seq[String])]] =>
         var offset = 0
         val blocks = mutable.Buffer[(String, Seq[String])]()
@@ -104,8 +103,7 @@ object Preprocessor {
                     printerTemplate: String => String,
                     extraCode: String) =
         for {
-          Preprocessor
-            .Expanded(code, printer) <- expandStatements(stmts, resultIndex)
+          Preprocessor.Expanded(code, printer) <- expandStatements(stmts, resultIndex)
         } yield {
           val (wrappedCode, importsLength) = wrapCode(
             pkgName,
@@ -118,16 +116,13 @@ object Preprocessor {
           Preprocessor.Output(wrappedCode, importsLength)
         }
 
-      def Processor(
-          cond: PartialFunction[(String, String, G#Tree),
-                                Preprocessor.Expanded]) = {
+      def Processor(cond: PartialFunction[(String, String, G#Tree), Preprocessor.Expanded]) = {
         (code: String, name: String, tree: G#Tree) =>
           cond.lift((name, code, tree))
       }
 
       def pprintSignature(ident: String, customMsg: Option[String]) = {
-        val customCode = customMsg.fold("_root_.scala.None")(x =>
-          s"""_root_.scala.Some("$x")""")
+        val customCode = customMsg.fold("_root_.scala.None")(x => s"""_root_.scala.Some("$x")""")
         s"""
       _root_.ammonite
             .repl
@@ -152,8 +147,7 @@ object Preprocessor {
       /**
         * Processors for declarations which all have the same shape
         */
-      def DefProc(definitionLabel: String)(
-          cond: PartialFunction[G#Tree, G#Name]) =
+      def DefProc(definitionLabel: String)(cond: PartialFunction[G#Tree, G#Name]) =
         (code: String, name: String, tree: G#Tree) =>
           cond.lift(tree).map { name =>
             Preprocessor.Expanded(
@@ -185,8 +179,7 @@ object Preprocessor {
             else if (!t.mods.hasFlag(Flags.LAZY))
               Seq(pprint(Name.backtickWrap(t.name.decoded)))
             else
-              Seq(s"""${pprintSignature(Name.backtickWrap(t.name.decoded),
-                                        Some("<lazy>"))}""")
+              Seq(s"""${pprintSignature(Name.backtickWrap(t.name.decoded), Some("<lazy>"))}""")
           )
       }
 
@@ -225,9 +218,7 @@ object Preprocessor {
           Expr
         )
 
-      def expandStatements(
-          stmts: Seq[String],
-          wrapperIndex: String): Res[Preprocessor.Expanded] = {
+      def expandStatements(stmts: Seq[String], wrapperIndex: String): Res[Preprocessor.Expanded] = {
         stmts match {
           case Nil => Res.Skip
           case postSplit =>
@@ -249,9 +240,7 @@ object Preprocessor {
             // the tree if there is more than one statement in this command
             val suffix = if (reParsed.length > 1) "_" + i else ""
             def handleTree(t: G#Tree) = {
-              decls.iterator
-                .flatMap(_.apply(code, "res" + resultIndex + suffix, t))
-                .next()
+              decls.iterator.flatMap(_.apply(code, "res" + resultIndex + suffix, t)).next()
             }
             trees match {
               case Seq(tree) => handleTree(tree)
@@ -309,8 +298,7 @@ object Preprocessor {
         // it to a different name, since you can't import the same thing
         // twice in a single import statement
         val startNewImport =
-          last.prefix != data.prefix || grouped.last.exists(
-            _.fromName == data.fromName)
+          last.prefix != data.prefix || grouped.last.exists(_.fromName == data.fromName)
 
         if (startNewImport) grouped.append(mutable.Buffer(data))
         else grouped.last.append(data)

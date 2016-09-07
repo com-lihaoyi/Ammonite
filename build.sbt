@@ -16,8 +16,7 @@ crossScalaVersions := Seq(
 
 val dontPublishSettings = Seq(
   publishArtifact := false,
-  publishTo := Some(
-    Resolver.file("Unused transient repository", file("target/unusedrepo")))
+  publishTo := Some(Resolver.file("Unused transient repository", file("target/unusedrepo")))
 )
 
 dontPublishSettings
@@ -26,10 +25,9 @@ val sharedSettings = Seq(
   scalaVersion := "2.11.8",
   organization := "com.lihaoyi",
   version := _root_.ammonite.Constants.version,
-  libraryDependencies ++= Seq(
-    "org.scala-lang" % "scala-compiler" % scalaVersion.value % "provided",
-    "org.scalatest" %% "scalatest" % "3.0.0" % "test",
-    "com.lihaoyi" %% "utest" % "0.4.3" % "test"),
+  libraryDependencies ++= Seq("org.scala-lang" % "scala-compiler" % scalaVersion.value % "provided",
+                              "org.scalatest" %% "scalatest" % "3.0.0" % "test",
+                              "com.lihaoyi" %% "utest" % "0.4.3" % "test"),
   testFrameworks ++= Seq(new TestFramework("utest.runner.Framework")),
   scalacOptions ++= Seq("-target:jvm-1.7",
                         "-Ywarn-unused",
@@ -85,8 +83,7 @@ lazy val amm = project
     assemblyOption in assembly := (assemblyOption in assembly).value.copy(
       prependShellScript = Some(
         // G1 Garbage Collector is awesome https://github.com/lihaoyi/Ammonite/issues/216
-        Seq("#!/usr/bin/env sh",
-            """exec java -jar -Xmx500m -XX:+UseG1GC $JAVA_OPTS "$0" "$@"""")
+        Seq("#!/usr/bin/env sh", """exec java -jar -Xmx500m -XX:+UseG1GC $JAVA_OPTS "$0" "$@"""")
       )
     ),
     assemblyJarName in assembly := s"${name.value}-${version.value}-${scalaVersion.value}",

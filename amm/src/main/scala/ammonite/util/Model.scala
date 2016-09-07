@@ -15,7 +15,6 @@ class CompilationError(message: String) extends Exception(message)
 
 case class Evaluated(wrapper: Seq[Name], imports: Imports, tag: String)
 
-
 /**
   * Encapsulates a read-write cell that can be passed around
   */
@@ -49,11 +48,10 @@ trait Ref[T] extends StableRef[T] {
 
 object Ref {
   implicit def refer[T](t: T): Ref[T] = Ref(t)
-  implicit def refPPrint[T: PPrint]: PPrinter[Ref[T]] = PPrinter {
-    (ref, cfg) =>
-      Iterator(cfg.colors.prefixColor("Ref").render, "(") ++
-        implicitly[PPrint[T]].pprinter.render(ref(), cfg) ++
-        Iterator(")")
+  implicit def refPPrint[T: PPrint]: PPrinter[Ref[T]] = PPrinter { (ref, cfg) =>
+    Iterator(cfg.colors.prefixColor("Ref").render, "(") ++
+      implicitly[PPrint[T]].pprinter.render(ref(), cfg) ++
+      Iterator(")")
   }
   def live[T](value0: () => T) = new Ref[T] {
     var value: () => T = value0
@@ -144,11 +142,9 @@ object Colors {
   * Models a binding of a value to a typed name, and is passed into the
   * REPL so it can re-create the bindings inside the REPL's scope
   */
-case class Bind[T](name: String, value: T)(
-    implicit val typeTag: scala.reflect.runtime.universe.TypeTag[T])
+case class Bind[T](name: String, value: T)(implicit val typeTag: scala.reflect.runtime.universe.TypeTag[T])
 object Bind {
-  implicit def ammoniteReplArrowBinder[T](t: (String, T))(
-      implicit typeTag: TypeTag[T]) = {
+  implicit def ammoniteReplArrowBinder[T](t: (String, T))(implicit typeTag: TypeTag[T]) = {
     Bind(t._1, t._2)(typeTag)
   }
 }
@@ -163,12 +159,7 @@ object Bind {
   * @param info How you want to print compile info logging. *Not* the same
   *             as `out`, which is used to print runtime output.
   */
-class Printer(val warning: String => Unit,
-              val error: String => Unit,
-              val info: String => Unit)
+class Printer(val warning: String => Unit, val error: String => Unit, val info: String => Unit)
 
-class PrinterX(val out: String => Unit,
-               warning: String => Unit,
-               error: String => Unit,
-               info: String => Unit)
+class PrinterX(val out: String => Unit, warning: String => Unit, error: String => Unit, info: String => Unit)
     extends Printer(warning, error, info)

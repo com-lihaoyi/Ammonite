@@ -77,8 +77,7 @@ object SpecialClassLoader {
   *
   * http://stackoverflow.com/questions/3544614/how-is-the-control-flow-to-findclass-of
   */
-class SpecialClassLoader(parent: ClassLoader,
-                         parentSignature: Seq[(Path, Long)])
+class SpecialClassLoader(parent: ClassLoader, parentSignature: Seq[(Path, Long)])
     extends URLClassLoader(Array(), parent) {
 
   /**

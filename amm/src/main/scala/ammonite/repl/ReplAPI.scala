@@ -77,8 +77,7 @@ trait ReplAPI {
                       width: Integer = 0,
                       height: Integer = null,
                       indent: Integer = null,
-                      colors: pprint.Colors = null)(
-      implicit cfg: Config = Config.Defaults.PPrintConfig): Unit
+                      colors: pprint.Colors = null)(implicit cfg: Config = Config.Defaults.PPrintConfig): Unit
 
   /**
     * Functions that can be used to manipulate the current REPL session:
@@ -151,8 +150,7 @@ abstract class FullReplAPI extends ReplAPI {
         value: => T,
         value2: => V,
         ident: String,
-        custom: Option[String])(implicit cfg: Config,
-                                tcolors: pprint.TPrintColors): Iterator[String]
+        custom: Option[String])(implicit cfg: Config, tcolors: pprint.TPrintColors): Iterator[String]
 
     def printDef(definitionLabel: String, ident: String): Iterator[String]
     def printImport(imported: String): Iterator[String]
@@ -166,18 +164,14 @@ trait DefaultReplAPI extends FullReplAPI {
 
   object Internal extends Internal {
     def combinePrints(iters: Iterator[String]*) = {
-      iters.toIterator
-        .filter(_.nonEmpty)
-        .flatMap(Iterator(newLine) ++ _)
-        .drop(1)
+      iters.toIterator.filter(_.nonEmpty).flatMap(Iterator(newLine) ++ _).drop(1)
     }
 
     def print[T: pprint.TPrint: WeakTypeTag, V: PPrint](
         value: => T,
         value2: => V,
         ident: String,
-        custom: Option[String])(implicit cfg: pprint.Config,
-                                tcolors: pprint.TPrintColors) = {
+        custom: Option[String])(implicit cfg: pprint.Config, tcolors: pprint.TPrintColors) = {
       if (typeOf[T] =:= typeOf[Unit]) Iterator()
       else {
         val implicitPPrint = implicitly[PPrint[V]]
@@ -213,21 +207,19 @@ case class SessionChanged(removedImports: Set[scala.Symbol],
                           removedJars: Set[java.net.URL],
                           addedJars: Set[java.net.URL])
 object SessionChanged {
-  implicit val pprinter: PPrinter[SessionChanged] = PPrinter[SessionChanged] {
-    (data, config) =>
-      def printDelta[T: PPrint](name: String, d: Iterable[T]) = {
-        if (d.nonEmpty) {
-          Iterator(newLine, name, ": ") ++ pprint.tokenize(d)(implicitly,
-                                                              config)
-        } else Iterator()
-      }
-      val res = Iterator(
-        printDelta("Removed Imports", data.removedImports),
-        printDelta("Added Imports", data.addedImports),
-        printDelta("Removed Jars", data.removedJars),
-        printDelta("Added Jars", data.addedJars)
-      )
-      res.flatten
+  implicit val pprinter: PPrinter[SessionChanged] = PPrinter[SessionChanged] { (data, config) =>
+    def printDelta[T: PPrint](name: String, d: Iterable[T]) = {
+      if (d.nonEmpty) {
+        Iterator(newLine, name, ": ") ++ pprint.tokenize(d)(implicitly, config)
+      } else Iterator()
+    }
+    val res = Iterator(
+      printDelta("Removed Imports", data.removedImports),
+      printDelta("Added Imports", data.addedImports),
+      printDelta("Removed Jars", data.removedJars),
+      printDelta("Added Jars", data.addedJars)
+    )
+    res.flatten
   }
   def delta(oldFrame: Frame, newFrame: Frame): SessionChanged = {
     def frameSymbols(f: Frame) =
