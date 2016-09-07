@@ -1,157 +1,160 @@
-// package ammonite.session
+package ammonite.session
 
-// import ammonite.TestRepl
-// import utest._
+import ammonite.TestRepl
+import org.scalatest.FreeSpec
 
-// object BuiltinTests extends TestSuite {
+class BuiltinTests extends FreeSpec {
 
-//   val tests = TestSuite {
-//     println("EvaluatorTests")
-//     val check = new TestRepl()
-//     'loadCP {
-//       check.session("""
-//         @ import ammonite.ops._, ImplicitWd._
+  def check = new TestRepl()
 
-//         @ val javaSrc = pwd/'src/'test/'resources/'loadable/'hello/"Hello.java"
+  "loadCP" in {
+    check.session("""
+        @ import ammonite.ops._, ImplicitWd._
 
-//         @ mkdir! pwd/'target/'loadCP/'hello
+        @ val javaSrc = pwd/'src/'test/'resources/'loadable/'hello/"Hello.java"
 
-//         @ cp.over(javaSrc, pwd/'target/'loadCP/'hello/"Hello.java")
+        @ mkdir! pwd/'target/'loadCP/'hello
 
-//         @ %javac 'target/'loadCP/'hello/"Hello.java"  //This line causes problems in windows
+        @ cp.over(javaSrc, pwd/'target/'loadCP/'hello/"Hello.java")
 
-//         @ import $cp.target.loadCP  //This line causes problems in windows
+        @ %javac 'target/'loadCP/'hello/"Hello.java"  //This line causes problems in windows
 
-//         @ hello.Hello.hello()
-//         res6: String = "Hello!"
-//       """)
-//     }
-//     'settings {
-//       val fruitlessTypeTestWarningMessageBlahBlahBlah =
-//         "fruitless type test: a value of type List[Int] cannot also be a List[Double]"
+        @ import $cp.target.loadCP  //This line causes problems in windows
 
-//       check.session(s"""
-//         @ // Disabling default Scala imports
+        @ hello.Hello.hello()
+        res6: String = "Hello!"
+      """)
+  }
 
-//         @ List(1, 2, 3) + "lol"
-//         res0: String = "List(1, 2, 3)lol"
+  "settings" in {
+    val fruitlessTypeTestWarningMessageBlahBlahBlah =
+      "fruitless type test: a value of type List[Int] cannot also be a List[Double]"
 
-//         @ repl.compiler.settings.noimports.value = true
+    check.session(s"""
+        @ // Disabling default Scala imports
 
-//         @ List(1, 2, 3) + "lol" // predef imports disappear
-//         error: not found: value List
+        @ List(1, 2, 3) + "lol"
+        res0: String = "List(1, 2, 3)lol"
 
-//         @ repl.compiler.settings.noimports.value = false
+        @ repl.compiler.settings.noimports.value = true
 
-//         @ List(1, 2, 3) + "lol"
-//         res3: String = "List(1, 2, 3)lol"
+        @ List(1, 2, 3) + "lol" // predef imports disappear
+        error: not found: value List
 
-//         @ // Disabling Scala language-import enforcement
+        @ repl.compiler.settings.noimports.value = false
 
-//         @ object X extends Dynamic
-//         error: extension of type scala.Dynamic needs to be enabled
+        @ List(1, 2, 3) + "lol"
+        res3: String = "List(1, 2, 3)lol"
 
-//         @ repl.compiler.settings.language.tryToSet(List("dynamics"))
+        @ // Disabling Scala language-import enforcement
 
-//         @ object X extends Dynamic
-//         defined object X
+        @ object X extends Dynamic
+        error: extension of type scala.Dynamic needs to be enabled
 
-//         @ 1 + 1 // other things still work
+        @ repl.compiler.settings.language.tryToSet(List("dynamics"))
 
-//         @ // Enabling warnings (which are disabled by default)
+        @ object X extends Dynamic
+        defined object X
 
-//         @ List(1) match { case _: List[Double] => 2 }
-//         res7: Int = 2
+        @ 1 + 1 // other things still work
 
-//         @ repl.compiler.settings.nowarnings.value = false
+        @ // Enabling warnings (which are disabled by default)
 
-//         @ List(1) match { case _: List[Double] => 2 }
-//         warning: $fruitlessTypeTestWarningMessageBlahBlahBlah
-//       """)
-//     }
-//     'infoLogging {
-//       check.session("""
-//         @ 1 + 1
-//         res0: Int = 2
+        @ List(1) match { case _: List[Double] => 2 }
+        res7: Int = 2
 
-//         @ repl.compiler.settings.debug.value = true
+        @ repl.compiler.settings.nowarnings.value = false
 
-//         @ 1 + 1
-//         info: running phase parser on
-//       """)
-//     }
-//     'saveLoad {
-//       check.session("""
-//         @ val veryImportant = 1
-//         veryImportant: Int = 1
+        @ List(1) match { case _: List[Double] => 2 }
+        warning: $fruitlessTypeTestWarningMessageBlahBlahBlah
+      """)
+  }
 
-//         @ repl.sess.save()
+  "infoLogging" in {
+    check.session("""
+        @ 1 + 1
+        res0: Int = 2
 
-//         @ val oopsDontWantThis = 2
-//         oopsDontWantThis: Int = 2
+        @ repl.compiler.settings.debug.value = true
 
-//         @ // Let's try this new cool new library
+        @ 1 + 1
+        info: running phase parser on
+      """)
+  }
 
-//         @ import $ivy.`com.lihaoyi::scalatags:0.5.3`
+  "saveLoad" in {
+    check.session("""
+        @ val veryImportant = 1
+        veryImportant: Int = 1
 
-//         @ veryImportant
-//         res4: Int = 1
+        @ repl.sess.save()
 
-//         @ oopsDontWantThis
-//         res5: Int = 2
+        @ val oopsDontWantThis = 2
+        oopsDontWantThis: Int = 2
 
-//         @ import scalatags.Text.all._
+        @ // Let's try this new cool new library
 
-//         @ div("Hello").render
-//         res7: String = "<div>Hello</div>"
+        @ import $ivy.`com.lihaoyi::scalatags:0.5.3`
 
-//         @ // Oh no, maybe we don't want scalatags!
+        @ veryImportant
+        res4: Int = 1
 
-//         @ repl.sess.load()
+        @ oopsDontWantThis
+        res5: Int = 2
 
-//         @ veryImportant
-//         res9: Int = 1
+        @ import scalatags.Text.all._
 
-//         @ oopsDontWantThis
-//         error: not found: value oopsDontWantThis
+        @ div("Hello").render
+        res7: String = "<div>Hello</div>"
 
-//         @ import scalatags.Text.all._
-//         error: not found: value scalatags
-//         """)
-//     }
-//     'saveLoad2 {
-//       check.session("""
-//         @ val (x, y) = (1, 2)
-//         x: Int = 1
-//         y: Int = 2
+        @ // Oh no, maybe we don't want scalatags!
 
-//         @ repl.sess.save("xy initialized")
+        @ repl.sess.load()
 
-//         @ val z = x + y
-//         z: Int = 3
+        @ veryImportant
+        res9: Int = 1
 
-//         @ repl.sess.save("first z")
+        @ oopsDontWantThis
+        error: not found: value oopsDontWantThis
 
-//         @ repl.sess.load("xy initialized")
+        @ import scalatags.Text.all._
+        error: not found: value scalatags
+        """)
+  }
 
-//         @ val z = x - y
-//         z: Int = -1
+  "saveLoad2" in {
+    check.session("""
+        @ val (x, y) = (1, 2)
+        x: Int = 1
+        y: Int = 2
 
-//         @ repl.sess.save("second z")
+        @ repl.sess.save("xy initialized")
 
-//         @ z
-//         res7: Int = -1
+        @ val z = x + y
+        z: Int = 3
 
-//         @ repl.sess.load("first z")
+        @ repl.sess.save("first z")
 
-//         @ z
-//         res9: Int = 3
+        @ repl.sess.load("xy initialized")
 
-//         @ repl.sess.load("second z")
+        @ val z = x - y
+        z: Int = -1
 
-//         @ z
-//         res11: Int = -1
-//                     """)
-//     }
-//   }
-// }
+        @ repl.sess.save("second z")
+
+        @ z
+        res7: Int = -1
+
+        @ repl.sess.load("first z")
+
+        @ z
+        res9: Int = 3
+
+        @ repl.sess.load("second z")
+
+        @ z
+        res11: Int = -1
+                    """)
+  }
+
+}

@@ -291,7 +291,7 @@ class AdvancedTests extends FreeSpec {
 
   "loadingModulesInPredef" - {
     val dir = pwd / 'src / 'test / 'resources / 'scripts / 'predefWithLoad
-    "loadExec"  in {
+    "loadExec" in {
       val c1 = new TestRepl() {
         override def predef = read ! dir / "PredefLoadExec.sc"
       }
