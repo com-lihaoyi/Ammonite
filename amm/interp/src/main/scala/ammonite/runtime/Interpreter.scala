@@ -44,7 +44,7 @@ class Interpreter(val printer: PrinterX,
   def compilationCount = _compilationCount
 
   private val mainThread = Thread.currentThread()
-  val eval = Evaluator(mainThread.getContextClassLoader, 0)
+  val eval = new Evaluator(mainThread.getContextClassLoader, 0)
 
   private val dynamicClasspath = new VirtualDirectory("(memory)", None)
   var compiler: Compiler = null
