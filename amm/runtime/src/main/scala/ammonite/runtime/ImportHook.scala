@@ -14,9 +14,10 @@ import ammonite.util._
   * files from the web.
   */
 trait ImportHook {
-  def handle(source: ImportHook.Source,
-             tree: ImportTree,
-             interp: ImportHook.InterpreterInterface): Res[Seq[ImportHook.Result]]
+  def handle(
+      source: ImportHook.Source,
+      tree: ImportTree,
+      interp: ImportHook.InterpreterInterface): Res[Seq[ImportHook.Result]]
 }
 
 object ImportHook {
@@ -28,7 +29,8 @@ object ImportHook {
     */
   trait InterpreterInterface {
     def wd: Path
-    def loadIvy(coordinates: (String, String, String), verbose: Boolean = true): Set[File]
+    def loadIvy(coordinates: (String, String, String),
+                verbose: Boolean = true): Set[File]
   }
 
   /**
@@ -61,7 +63,8 @@ object ImportHook {
 
   def resolveFiles(tree: ImportTree,
                    currentScriptPath: Path,
-                   extensions: Seq[String]): (Seq[(RelPath, Option[String])], Seq[Path], Seq[Path]) = {
+                   extensions: Seq[String])
+    : (Seq[(RelPath, Option[String])], Seq[Path], Seq[Path]) = {
     val relative =
       tree.prefix.map {
         case ammonite.util.Util.upPathSegment => up;
@@ -86,7 +89,9 @@ object ImportHook {
   }
   class SourceHook(exec: Boolean) extends ImportHook {
     // import $file.foo.Bar, to import the file `foo/Bar.sc`
-    def handle(source: ImportHook.Source, tree: ImportTree, interp: InterpreterInterface) = {
+    def handle(source: ImportHook.Source,
+               tree: ImportTree,
+               interp: InterpreterInterface) = {
 
       source match {
         case Source.File(currentScriptPath) =>
@@ -97,10 +102,13 @@ object ImportHook {
           )
 
           if (missing.nonEmpty) {
-            Res.Failure(None, "Cannot resolve $file import: " + missing.mkString(", "))
+            Res.Failure(
+              None,
+              "Cannot resolve $file import: " + missing.mkString(", "))
           } else {
             Res.Success(
-              for (((relativeModule, rename), filePath) <- relativeModules.zip(files)) yield {
+              for (((relativeModule, rename), filePath) <- relativeModules.zip(
+                     files)) yield {
                 val (pkg, wrapper) =
                   Util.pathToPackageWrapper(filePath, interp.wd)
                 val fullPrefix = pkg ++ Seq(wrapper)
@@ -140,12 +148,19 @@ object ImportHook {
             Name(url),
             Seq(Name(s"$url")),
             ImportHook.Source.URL(url),
-            Imports(Seq(ImportData(Name(url), Name(target), Seq(Name(s"$url")), ImportData.Term))),
+            Imports(
+              Seq(
+                ImportData(Name(url),
+                           Name(target),
+                           Seq(Name(s"$url")),
+                           ImportData.Term))),
             false
           ))
     }
     // import $url.{ `http://www.google.com` => foo }
-    def handle(source: ImportHook.Source, tree: ImportTree, interp: InterpreterInterface) = {
+    def handle(source: ImportHook.Source,
+               tree: ImportTree,
+               interp: InterpreterInterface) = {
       tree.mappings match {
         case None => Res.Failure(None, "$url import failed for " + tree)
         case Some(mappings) =>
@@ -161,7 +176,8 @@ object ImportHook {
     def splitImportTree(tree: ImportTree): Res[Seq[String]] = {
       tree match {
         case ImportTree(Seq(part), None, _, _) => Res.Success(Seq(part))
-        case ImportTree(Nil, Some(mapping), _, _) if mapping.map(_._2).forall(_.isEmpty) =>
+        case ImportTree(Nil, Some(mapping), _, _)
+            if mapping.map(_._2).forall(_.isEmpty) =>
           Res.Success(mapping.map(_._1))
         case _ => Res.Failure(None, "Invalid $ivy import " + tree)
       }
@@ -182,7 +198,9 @@ object ImportHook {
         }
       } yield jars
 
-    def handle(source: ImportHook.Source, tree: ImportTree, interp: InterpreterInterface) =
+    def handle(source: ImportHook.Source,
+               tree: ImportTree,
+               interp: InterpreterInterface) =
       for {
         // import $ivy.`com.lihaoyi:scalatags_2.11:0.5.4`
         parts <- splitImportTree(tree)
@@ -194,7 +212,9 @@ object ImportHook {
   object Classpath extends BaseClasspath(plugin = false)
   object PluginClasspath extends BaseClasspath(plugin = true)
   class BaseClasspath(plugin: Boolean) extends ImportHook {
-    def handle(source: ImportHook.Source, tree: ImportTree, interp: InterpreterInterface) = {
+    def handle(source: ImportHook.Source,
+               tree: ImportTree,
+               interp: InterpreterInterface) = {
       source match {
         case Source.File(currentScriptPath) =>
           val (relativeModules, files, missing) = resolveFiles(
@@ -204,10 +224,13 @@ object ImportHook {
           )
 
           if (missing.nonEmpty) {
-            Res.Failure(None, s"Cannot resolve $cp import: " + missing.mkString(", "))
+            Res.Failure(
+              None,
+              s"Cannot resolve $cp import: " + missing.mkString(", "))
           } else
             Res.Success(
-              for (((relativeModule, rename), filePath) <- relativeModules.zip(files))
+              for (((relativeModule, rename), filePath) <- relativeModules.zip(
+                     files))
                 yield Result.ClassPath(filePath, plugin)
             )
         case Source.URL(path) => ???

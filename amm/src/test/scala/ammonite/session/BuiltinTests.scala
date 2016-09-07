@@ -9,7 +9,8 @@ object BuiltinTests extends TestSuite {
     println("EvaluatorTests")
     val check = new TestRepl()
     'loadCP {
-      check.session("""
+      check.session(
+        """
         @ import ammonite.ops._, ImplicitWd._
 
         @ val javaSrc = pwd/'src/'test/'resources/'loadable/'hello/"Hello.java"

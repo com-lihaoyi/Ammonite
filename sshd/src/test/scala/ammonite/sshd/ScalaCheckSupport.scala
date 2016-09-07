@@ -10,7 +10,8 @@ trait ScalaCheckSupport {
   def check(minSuccessfulTests: Int)(prop: Prop): Unit = {
     val resultHolder = new ResultHolder
     prop.check {
-      _.withTestCallback(resultHolder).withMinSuccessfulTests(minSuccessfulTests)
+      _.withTestCallback(resultHolder)
+        .withMinSuccessfulTests(minSuccessfulTests)
     }
     val result = resultHolder.result
     result.status match {

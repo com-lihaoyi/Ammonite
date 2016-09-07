@@ -7,7 +7,10 @@ object Repl {
   val pprintPredef =
     "import ammonite.repl.ReplBridge.value.{pprintConfig, derefPPrint}"
 
-  def highlightFrame(f: StackTraceElement, error: fansi.Attrs, highlightError: fansi.Attrs, source: fansi.Attrs) = {
+  def highlightFrame(f: StackTraceElement,
+                     error: fansi.Attrs,
+                     highlightError: fansi.Attrs,
+                     source: fansi.Attrs) = {
     val src =
       if (f.isNativeMethod) source("Native Method")
       else
@@ -22,7 +25,10 @@ object Repl {
 
     fansi.Str(s"  ") ++ method ++ "(" ++ src ++ ")"
   }
-  def showException(ex: Throwable, error: fansi.Attrs, highlightError: fansi.Attrs, source: fansi.Attrs) = {
+  def showException(ex: Throwable,
+                    error: fansi.Attrs,
+                    highlightError: fansi.Attrs,
+                    source: fansi.Attrs) = {
     val cutoff = Set("$main", "evaluatorRunPrinter")
     val traces = Ex
       .unapplySeq(ex)

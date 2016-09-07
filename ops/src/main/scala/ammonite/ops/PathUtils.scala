@@ -58,8 +58,7 @@ object ResourceRoot {
     def getResourceAsStream(s: String) = cls.getResourceAsStream(s)
     def errorName = renderClassloader(cls.getClassLoader) + ":" + cls.getName
   }
-  implicit def classLoaderResourceRoot(
-      cl: java.lang.ClassLoader): ResourceRoot = ClassLoader(cl)
+  implicit def classLoaderResourceRoot(cl: java.lang.ClassLoader): ResourceRoot = ClassLoader(cl)
   case class ClassLoader(cl: java.lang.ClassLoader) extends ResourceRoot {
     def getResourceAsStream(s: String) = cl.getResourceAsStream(s)
     def errorName = renderClassloader(cl)
@@ -73,9 +72,7 @@ object ResourceRoot {
   * by leaving half-consumed iterators, but at least common things like foreach,
   * mkString, reduce, sum, etc. will all result in close() being called.
   */
-class SelfClosingIterator[+A](val underlying: Iterator[A],
-                              val close: () => Unit)
-    extends Iterator[A] {
+class SelfClosingIterator[+A](val underlying: Iterator[A], val close: () => Unit) extends Iterator[A] {
   private[this] var alreadyClosed = false
   def hasNext = {
     if (alreadyClosed) false

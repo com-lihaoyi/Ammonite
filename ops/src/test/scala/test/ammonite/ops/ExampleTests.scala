@@ -70,10 +70,7 @@ object ExampleTests extends TestSuite {
 
       // `ls` provides a listing of every direct child of the given folder.
       // Both files and folders are included
-      ls ! wd ==> Seq(wd / "file1.txt",
-                      wd / "file2.txt",
-                      wd / 'file3,
-                      wd / 'this)
+      ls ! wd ==> Seq(wd / "file1.txt", wd / "file2.txt", wd / 'file3, wd / 'this)
 
       // `ls.rec` does the same thing recursively
       ls.rec ! deep ==> Seq(deep / 'deeeep, deep / 'deeeep / "file.txt")
@@ -200,9 +197,7 @@ object ExampleTests extends TestSuite {
 
       def removeAll(path: String) = {
         def getRecursively(f: java.io.File): Seq[java.io.File] = {
-          f.listFiles
-            .filter(_.isDirectory)
-            .flatMap(getRecursively) ++ f.listFiles
+          f.listFiles.filter(_.isDirectory).flatMap(getRecursively) ++ f.listFiles
         }
         getRecursively(new java.io.File(path)).foreach { f =>
           println(f)

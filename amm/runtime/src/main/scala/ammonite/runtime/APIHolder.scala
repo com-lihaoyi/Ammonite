@@ -6,8 +6,15 @@ class APIHolder[T >: Null <: AnyRef] {
 }
 
 object APIHolder {
-  def initBridge[T >: Null <: AnyRef](classloader: SpecialClassLoader, name: String, t: T) = {
+  def initBridge[T >: Null <: AnyRef](classloader: SpecialClassLoader,
+                                      name: String,
+                                      t: T) = {
     classloader.findClassPublic(name + "$")
-    classloader.findClassPublic(name).getDeclaredMethods.find(_.getName == "value0_$eq").get.invoke(null, t)
+    classloader
+      .findClassPublic(name)
+      .getDeclaredMethods
+      .find(_.getName == "value0_$eq")
+      .get
+      .invoke(null, t)
   }
 }

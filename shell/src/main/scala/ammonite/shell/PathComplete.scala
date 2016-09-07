@@ -16,7 +16,10 @@ object PathComplete {
     *             just before the cursor
     * @param offset
     */
-  case class PathLiteralInfo(base: Option[String], body: Seq[Option[String]], frag: Option[String], offset: Int)
+  case class PathLiteralInfo(base: Option[String],
+                             body: Seq[Option[String]],
+                             frag: Option[String],
+                             offset: Int)
 
   /**
     * Searches the current snippet for path-like forms ending at the

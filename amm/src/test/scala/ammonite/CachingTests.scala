@@ -78,11 +78,13 @@ class CachingTests extends FreeSpec {
       write(numFile, "1")
       val interp1 = createTestInterp(storage, Defaults.predefString)
       assertThrows[java.lang.ArithmeticException] {
-        interp1.interpApi.load.module(resourcesPath / 'scriptLevelCaching / "runTimeExceptions.sc")
+        interp1.interpApi.load
+          .module(resourcesPath / 'scriptLevelCaching / "runTimeExceptions.sc")
       }
       val interp2 = createTestInterp(storage, Defaults.predefString)
       assertThrows[java.lang.ArithmeticException] {
-        interp2.interpApi.load.module(resourcesPath / 'scriptLevelCaching / "runTimeExceptions.sc")
+        interp2.interpApi.load
+          .module(resourcesPath / 'scriptLevelCaching / "runTimeExceptions.sc")
       }
     }
 

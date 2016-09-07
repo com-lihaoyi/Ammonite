@@ -22,7 +22,10 @@ object Classpath {
   var current = Thread.currentThread().getContextClassLoader
   val files = collection.mutable.Buffer.empty[java.io.File]
   files.appendAll(
-    System.getProperty("sun.boot.class.path").split(java.io.File.pathSeparator).map(new java.io.File(_))
+    System
+      .getProperty("sun.boot.class.path")
+      .split(java.io.File.pathSeparator)
+      .map(new java.io.File(_))
   )
   while (current != null) {
     current match {

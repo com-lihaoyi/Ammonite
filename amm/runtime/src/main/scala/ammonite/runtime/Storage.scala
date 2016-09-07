@@ -3,7 +3,13 @@ package ammonite.runtime
 import ammonite.ops._
 import ammonite.util.ImportTree
 import ammonite.util.{Imports, StableRef}
-import ammonite.util.Util.{CacheOutput, ClassFiles, CompileCache, IvyMap, newLine}
+import ammonite.util.Util.{
+  CacheOutput,
+  ClassFiles,
+  CompileCache,
+  IvyMap,
+  newLine
+}
 
 import scala.util.Try
 import scala.collection.generic.CanBuildFrom
@@ -29,7 +35,9 @@ trait Storage {
                          imports: Imports,
                          tag: String,
                          importTreesList: Seq[ImportTree]): Unit
-  def classFilesListLoad(pkg: String, wrapper: String, cacheTag: String): Option[CacheOutput]
+  def classFilesListLoad(pkg: String,
+                         wrapper: String,
+                         cacheTag: String): Option[CacheOutput]
 }
 
 object Storage {
@@ -54,7 +62,9 @@ object Storage {
     var compileCache: mutable.Map[String, (String, CompileCache)] =
       mutable.Map.empty
     val classFilesListcache = {
-      mutable.Map.empty[String, (String, Seq[(String, String)], Imports, Seq[ImportTree])]
+      mutable.Map
+        .empty[String,
+               (String, Seq[(String, String)], Imports, Seq[ImportTree])]
     }
     def compileCacheSave(path: String, tag: String, data: CompileCache): Unit = {
       compileCache(path) = (tag, data)
@@ -73,10 +83,13 @@ object Storage {
                            tag: String,
                            importTreesList: Seq[ImportTree]): Unit = {
       val dir = pkg + "." + wrapper
-      classFilesListcache(dir) = (tag, dataList.reverse, imports, importTreesList)
+      classFilesListcache(dir) =
+        (tag, dataList.reverse, imports, importTreesList)
     }
 
-    def classFilesListLoad(pkg: String, wrapper: String, cacheTag: String): Option[CacheOutput] = {
+    def classFilesListLoad(pkg: String,
+                           wrapper: String,
+                           cacheTag: String): Option[CacheOutput] = {
       val dir = pkg + "." + wrapper
       classFilesListcache.get(dir) match {
         case None => None
@@ -171,14 +184,17 @@ object Storage {
       } catch { case e: Throwable => None }
     }
 
-    def classFilesListLoad(pkg: String, wrapper: String, cacheTag: String): Option[CacheOutput] = {
+    def classFilesListLoad(pkg: String,
+                           wrapper: String,
+                           cacheTag: String): Option[CacheOutput] = {
 
       val dir = encode(pkg) + "." + encode(wrapper)
       val codeCacheDir = cacheDir / 'scriptCaches / dir / cacheTag
       if (!exists(codeCacheDir)) None
       else {
 
-        val metadataJson = readJson[(String, Seq[(String, String)])](codeCacheDir / classFilesOrder)
+        val metadataJson = readJson[(String, Seq[(String, String)])](
+          codeCacheDir / classFilesOrder)
 
         val impFile = readJson[Imports](codeCacheDir / "imports.json")
 
@@ -208,7 +224,8 @@ object Storage {
       if (!exists(tagCacheDir)) None
       else
         for {
-          (loadedTag, metadata) <- readJson[(String, Imports)](tagCacheDir / metadataFile)
+          (loadedTag, metadata) <- readJson[(String, Imports)](
+            tagCacheDir / metadataFile)
           if tag == loadedTag
           classFiles <- loadClassFiles(tagCacheDir)
         } yield {
@@ -258,7 +275,9 @@ object Storage {
   }
 }
 
-class History(s: Vector[String]) extends IndexedSeq[String] with IndexedSeqLike[String, History] {
+class History(s: Vector[String])
+    extends IndexedSeq[String]
+    with IndexedSeqLike[String, History] {
   def length: Int = s.length
   def apply(idx: Int): String = s.apply(idx)
   override def newBuilder = History.builder

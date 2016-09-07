@@ -85,10 +85,8 @@ object PathTests extends TestSuite {
           * - eq('omg / 'bbq relativeTo 'omg / 'bbq / 'wtf, up)
           * - eq('omg / 'bbq / 'wtf relativeTo 'omg / 'bbq, empty / 'wtf)
           * - eq('omg / 'bbq relativeTo 'omg / 'bbq / 'wtf, up)
-          * - eq(up / 'omg / 'bbq relativeTo 'omg / 'bbq,
-                 up / up / up / 'omg / 'bbq)
-          * - intercept[PathError.NoRelativePath](
-            'omg / 'bbq relativeTo up / 'omg / 'bbq)
+          * - eq(up / 'omg / 'bbq relativeTo 'omg / 'bbq, up / up / up / 'omg / 'bbq)
+          * - intercept[PathError.NoRelativePath]('omg / 'bbq relativeTo up / 'omg / 'bbq)
         }
       }
       'AbsPath {
@@ -103,15 +101,11 @@ object PathTests extends TestSuite {
         }
         'Relativize {
           def eq[T](p: T, q: T) = assert(p == q)
-          * - eq(
-            root / 'omg / 'bbq / 'wtf relativeTo root / 'omg / 'bbq / 'wtf,
-            empty)
+          * - eq(root / 'omg / 'bbq / 'wtf relativeTo root / 'omg / 'bbq / 'wtf, empty)
           * - eq(root / 'omg / 'bbq relativeTo root / 'omg / 'bbq / 'wtf, up)
-          * - eq(root / 'omg / 'bbq / 'wtf relativeTo root / 'omg / 'bbq,
-                 empty / 'wtf)
+          * - eq(root / 'omg / 'bbq / 'wtf relativeTo root / 'omg / 'bbq, empty / 'wtf)
           * - eq(root / 'omg / 'bbq relativeTo root / 'omg / 'bbq / 'wtf, up)
-          * - intercept[PathError.NoRelativePath](
-            'omg / 'bbq relativeTo up / 'omg / 'bbq)
+          * - intercept[PathError.NoRelativePath]('omg / 'bbq relativeTo up / 'omg / 'bbq)
         }
       }
       'Ups {
@@ -177,9 +171,7 @@ object PathTests extends TestSuite {
 
         val PathError.InvalidSegment("Main/.scala", msg1) = ex
 
-        assert(
-          msg1.contains(
-            "[/] is not a valid character to appear in a path segment"))
+        assert(msg1.contains("[/] is not a valid character to appear in a path segment"))
 
         val ex2 =
           intercept[PathError.InvalidSegment](root / "hello" / ".." / "world")
@@ -277,10 +269,7 @@ object PathTests extends TestSuite {
     }
     'sorting {
       assert(
-        Seq(root / 'c, root, root / 'b, root / 'a).sorted == Seq(root,
-                                                                 root / 'a,
-                                                                 root / 'b,
-                                                                 root / 'c),
+        Seq(root / 'c, root, root / 'b, root / 'a).sorted == Seq(root, root / 'a, root / 'b, root / 'c),
         Seq(up / 'c, up / up / 'c, 'b / 'c, 'a / 'c, 'a / 'd).sorted ==
           Seq('a / 'c, 'a / 'd, 'b / 'c, up / 'c, up / up / 'c)
       )

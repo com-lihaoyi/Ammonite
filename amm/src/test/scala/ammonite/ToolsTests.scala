@@ -35,14 +35,20 @@ object ToolsTests extends TestSuite {
       'flatMap {
         implicit def pprintConfig =
           pprint.Config.Defaults.PPrintConfig.copy(width = 25)
-        def check[T: Grepper, V: pprint.PPrint](items: Seq[V], regex: T, expected: Seq[String]) = {
+        def check[T: Grepper, V: pprint.PPrint](items: Seq[V],
+                                                regex: T,
+                                                expected: Seq[String]) = {
 
           val grepped = items || grep ! regex
           implicitly[pprint.Config]
           val displayed =
             for (g <- grepped)
               yield {
-                pprint.tokenize(g).mkString.replace(fansi.Color.Red.escape, "<").replace(fansi.Color.Reset.escape, ">")
+                pprint
+                  .tokenize(g)
+                  .mkString
+                  .replace(fansi.Color.Red.escape, "<")
+                  .replace(fansi.Color.Reset.escape, ">")
               }
           assert(displayed == expected)
         }
@@ -82,7 +88,8 @@ object ToolsTests extends TestSuite {
           'farApart - check(
             longItems,
             "\"123|890\"".r,
-            Seq("<\"123>45678901234567..." + newLine + "...45678901234567<890\">")
+            Seq(
+              "<\"123>45678901234567..." + newLine + "...45678901234567<890\">")
           )
 
           // Make sure that when the different matches are relatively close
@@ -90,7 +97,8 @@ object ToolsTests extends TestSuite {
           'noOverlap - check(
             longItems,
             "123",
-            Seq("\"<123>4567890<123>4567..." + newLine + "...890<123>4567890\"")
+            Seq(
+              "\"<123>4567890<123>4567..." + newLine + "...890<123>4567890\"")
           )
         }
       }

@@ -149,9 +149,7 @@ trait BasePathImpl extends BasePath {
   * segments can only occur at the left-end of the path, and
   * are collapsed into a single number [[ups]].
   */
-case class RelPath private[ops] (segments: Vector[String], ups: Int)
-    extends FilePath
-    with BasePathImpl {
+case class RelPath private[ops] (segments: Vector[String], ups: Int) extends FilePath with BasePathImpl {
   type ThisType = RelPath
   require(ups >= 0)
   protected[this] def make(p: Seq[String], ups: Int) =
@@ -205,12 +203,10 @@ object RelPath extends RelPathStuff with PathFactory[RelPath] {
     s.foldLeft(empty) { _ / _ }
   }
 
-  implicit def ArrayPath[T](s: Array[T])(
-      implicit conv: T => RelPath): RelPath = SeqPath(s)
+  implicit def ArrayPath[T](s: Array[T])(implicit conv: T => RelPath): RelPath = SeqPath(s)
 
   implicit val relPathOrdering: Ordering[RelPath] =
-    Ordering.by((rp: RelPath) =>
-      (rp.ups, rp.segments.length, rp.segments.toIterable))
+    Ordering.by((rp: RelPath) => (rp.ups, rp.segments.length, rp.segments.toIterable))
 }
 trait RelPathStuff {
   val up: RelPath = new RelPath(Vector.empty, 1)
@@ -251,8 +247,7 @@ object Path extends PathFactory[Path] {
   * An absolute path on the filesystem. Note that the path is
   * normalized and cannot contain any empty `""`, `"."` or `".."` segments
   */
-case class Path private[ops] (root: java.nio.file.Path,
-                              segments: Vector[String])
+case class Path private[ops] (root: java.nio.file.Path, segments: Vector[String])
     extends FilePath
     with BasePathImpl
     with Readable {
@@ -310,8 +305,7 @@ object ResourcePath {
   * @param resRoot
   * @param segments
   */
-case class ResourcePath private[ops] (resRoot: ResourceRoot,
-                                      segments: Vector[String])
+case class ResourcePath private[ops] (resRoot: ResourceRoot, segments: Vector[String])
     extends BasePathImpl
     with Readable {
   type ThisType = ResourcePath
@@ -351,20 +345,17 @@ case class ResourcePath private[ops] (resRoot: ResourceRoot,
   * Thrown when you try to read from a resource that doesn't exist.
   * @param path
   */
-case class ResourceNotFoundException(path: ResourcePath)
-    extends Exception(path.toString)
+case class ResourceNotFoundException(path: ResourcePath) extends Exception(path.toString)
 
 object PathError {
   type IAE = IllegalArgumentException
   private[this] def errorMsg(s: String, msg: String) =
     s"[$s] is not a valid path segment. $msg"
 
-  case class InvalidSegment(segment: String, msg: String)
-      extends IAE(errorMsg(segment, msg))
+  case class InvalidSegment(segment: String, msg: String) extends IAE(errorMsg(segment, msg))
 
   case object AbsolutePathOutsideRoot
-      extends IAE(
-        "The path created has enough ..s that it would start outside the root directory")
+      extends IAE("The path created has enough ..s that it would start outside the root directory")
 
   case class NoRelativePath(src: RelPath, base: RelPath)
       extends IAE(s"Can't relativize relative paths $src from $base")

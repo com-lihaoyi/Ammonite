@@ -71,9 +71,12 @@ object SshServer {
     file
   }
 
-  private def passwordAuthenticator(correctUsername: String, correctPassword: String) =
+  private def passwordAuthenticator(correctUsername: String,
+                                    correctPassword: String) =
     new PasswordAuthenticator {
-      override def authenticate(username: String, password: String, session: ServerSession) =
+      override def authenticate(username: String,
+                                password: String,
+                                session: ServerSession) =
         username == correctUsername && password == correctPassword
     }
 }

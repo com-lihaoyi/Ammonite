@@ -50,7 +50,10 @@ class SessionApiImpl(eval: Evaluator) extends Session {
   save()
 }
 
-class ReplApiImpl(val interp: Interpreter, history0: => History, sess0: Session) extends DefaultReplAPI {
+class ReplApiImpl(val interp: Interpreter,
+                  history0: => History,
+                  sess0: Session)
+    extends DefaultReplAPI {
 
   import interp._
 
@@ -61,16 +64,21 @@ class ReplApiImpl(val interp: Interpreter, history0: => History, sess0: Session)
   }
 
   def show[T: PPrint](implicit cfg: Config) = (t: T) => {
-    pprint.tokenize(t, height = 0)(implicitly[PPrint[T]], cfg).foreach(printer.out)
+    pprint
+      .tokenize(t, height = 0)(implicitly[PPrint[T]], cfg)
+      .foreach(printer.out)
     printer.out(newLine)
   }
   def show[T: PPrint](t: T,
                       width: Integer = null,
                       height: Integer = 0,
                       indent: Integer = null,
-                      colors: pprint.Colors = null)(implicit cfg: Config = Config.Defaults.PPrintConfig) = {
+                      colors: pprint.Colors = null)(
+      implicit cfg: Config = Config.Defaults.PPrintConfig) = {
 
-    pprint.tokenize(t, width, height, indent, colors)(implicitly[PPrint[T]], cfg).foreach(printer.out)
+    pprint
+      .tokenize(t, width, height, indent, colors)(implicitly[PPrint[T]], cfg)
+      .foreach(printer.out)
     printer.out(newLine)
   }
 

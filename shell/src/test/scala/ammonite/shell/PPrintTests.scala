@@ -12,11 +12,14 @@ object PPrintTests extends TestSuite {
     'paths {
       'pprint {
         import pprint.Config.Defaults._
-        check(pprint.tokenize(root / 'hello / 'world).mkString, "root/'hello/'world")
+        check(pprint.tokenize(root / 'hello / 'world).mkString,
+              "root/'hello/'world")
         check(pprint.tokenize('hello / 'world).mkString, "'hello/'world")
         check(pprint.tokenize(empty / 'world).mkString, "'world")
-        check(pprint.tokenize(empty / 'hello / 'world).mkString, "'hello/'world")
-        check(pprint.tokenize(empty / "hello world").mkString, "\"hello world\"")
+        check(pprint.tokenize(empty / 'hello / 'world).mkString,
+              "'hello/'world")
+        check(pprint.tokenize(empty / "hello world").mkString,
+              "\"hello world\"")
 
       }
     }
