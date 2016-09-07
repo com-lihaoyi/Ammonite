@@ -23,6 +23,7 @@ libraryDependencies ++= Seq("com.github.scopt" %% "scopt" % "3.4.0",
                             "org.scala-lang" % "scala-compiler" % scalaVersion.value,
                             "org.scala-lang" % "scala-reflect" % scalaVersion.value,
                             "com.lihaoyi" %% "scalaparse" % "0.3.7",
+                            "com.lihaoyi" %% "ammonite-ops" % "0.7.6",
                             "com.chuusai" %% "shapeless" % "2.1.0" % "test",
                             "org.scala-lang" % "scala-compiler" % scalaVersion.value % "provided",
                             "org.scalatest" %% "scalatest" % "3.0.0" % "test",
@@ -30,11 +31,7 @@ libraryDependencies ++= Seq("com.github.scopt" %% "scopt" % "3.4.0",
 
 testFrameworks ++= Seq(new TestFramework("utest.runner.Framework"))
 
-scalacOptions ++= Seq("-Ywarn-unused",
-                      "-Ywarn-unused-import",
-                      "-Ywarn-inaccessible",
-                      "-Ywarn-dead-code",
-                      "-Xlint")
+scalacOptions ++= Seq("-Ywarn-unused", "-Ywarn-unused-import", "-Ywarn-inaccessible", "-Ywarn-dead-code", "-Xlint")
 
 autoCompilerPlugins := true
 
