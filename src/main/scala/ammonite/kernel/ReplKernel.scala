@@ -16,8 +16,7 @@ class ReplKernel(printer: PrinterX, storage: Storage, predefs: Seq[(Name, String
     i => {
       val replApi = new ReplApiImpl(
         i,
-        history,
-        new SessionApiImpl(i.eval)
+        history
       )
       Seq(("ammonite.repl.ReplBridge", "repl", replApi))
     },

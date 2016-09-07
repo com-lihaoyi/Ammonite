@@ -2,10 +2,10 @@ package ammonite.repl
 
 import ammonite.util.Ref
 import ammonite.util.Util.newLine
-import pprint.{Config, PPrint, PPrinter}
+import pprint.{Config, PPrint}
 
 import scala.reflect.runtime.universe._
-import ammonite.runtime.{APIHolder, Frame, History, ReplExit}
+import ammonite.runtime.{APIHolder, History, ReplExit}
 
 trait ReplAPI {
 
@@ -79,55 +79,6 @@ trait ReplAPI {
                       indent: Integer = null,
                       colors: pprint.Colors = null)(implicit cfg: Config = Config.Defaults.PPrintConfig): Unit
 
-  /**
-    * Functions that can be used to manipulate the current REPL session:
-    * check-pointing progress, reverting to earlier checkpoints, or deleting
-    * checkpoints by name.
-    *
-    * Frames get pushed on a stack; by default, a saved frame is
-    * accessible simply by calling `load`. If you provide a name
-    * when `save`ing a checkpoint, it can later be `load`ed directly
-    * by providing the same name to `load`
-    *
-    * Un-named checkpoints are garbage collected, together with their
-    * classloader and associated data, when they are no longer accessible
-    * due to `restore`. Named checkpoints are kept forever; call `delete`
-    * on them if you really want them to go away.
-    */
-  def sess: Session
-}
-trait Session {
-
-  /**
-    * The current stack of frames
-    */
-  def frames: List[Frame]
-
-  /**
-    * Checkpoints your current work, placing all future work into its own
-    * frames. If a name is provided, it can be used to quickly recover
-    * that checkpoint later.
-    */
-  def save(name: String = ""): Unit
-
-  /**
-    * Discards the last frames, effectively reverting your session to
-    * the last `save`-ed checkpoint. If a name is provided, it instead reverts
-    * your session to the checkpoint with that name.
-    */
-  def load(name: String = ""): SessionChanged
-
-  /**
-    * Resets you to the last save point. If you pass in `num`, it resets
-    * you to that many savepoints since the last one.
-    */
-  def pop(num: Int = 1): SessionChanged
-
-  /**
-    * Deletes a named checkpoint, allowing it to be garbage collected if it
-    * is no longer accessible.
-    */
-  def delete(name: String): Unit
 }
 
 // End of ReplAPI
@@ -200,35 +151,5 @@ trait DefaultReplAPI extends FullReplAPI {
     }
   }
 }
-object ReplBridge extends APIHolder[FullReplAPI]
 
-case class SessionChanged(removedImports: Set[scala.Symbol],
-                          addedImports: Set[scala.Symbol],
-                          removedJars: Set[java.net.URL],
-                          addedJars: Set[java.net.URL])
-object SessionChanged {
-  implicit val pprinter: PPrinter[SessionChanged] = PPrinter[SessionChanged] { (data, config) =>
-    def printDelta[T: PPrint](name: String, d: Iterable[T]) = {
-      if (d.nonEmpty) {
-        Iterator(newLine, name, ": ") ++ pprint.tokenize(d)(implicitly, config)
-      } else Iterator()
-    }
-    val res = Iterator(
-      printDelta("Removed Imports", data.removedImports),
-      printDelta("Added Imports", data.addedImports),
-      printDelta("Removed Jars", data.removedJars),
-      printDelta("Added Jars", data.addedJars)
-    )
-    res.flatten
-  }
-  def delta(oldFrame: Frame, newFrame: Frame): SessionChanged = {
-    def frameSymbols(f: Frame) =
-      f.imports.value.map(_.toName.backticked).map(Symbol(_)).toSet
-    new SessionChanged(
-      frameSymbols(oldFrame) -- frameSymbols(newFrame),
-      frameSymbols(newFrame) -- frameSymbols(oldFrame),
-      oldFrame.classloader.allJars.toSet -- newFrame.classloader.allJars.toSet,
-      newFrame.classloader.allJars.toSet -- oldFrame.classloader.allJars.toSet
-    )
-  }
-}
+object ReplBridge extends APIHolder[FullReplAPI]

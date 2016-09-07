@@ -5,52 +5,7 @@ import ammonite.util.Util._
 import ammonite.util._
 import pprint.{Config, PPrint}
 
-import scala.collection.mutable
-
-class SessionApiImpl(eval: Evaluator) extends Session {
-  val namedFrames = mutable.Map.empty[String, List[Frame]]
-  def frames = eval.frames
-  def childFrame(parent: Frame) = new Frame(
-    new SpecialClassLoader(
-      parent.classloader,
-      parent.classloader.classpathSignature
-    ),
-    new SpecialClassLoader(
-      parent.pluginClassloader,
-      parent.pluginClassloader.classpathSignature
-    ),
-    parent.imports,
-    parent.classpath
-  )
-
-  def save(name: String = "") = {
-    if (name != "") namedFrames(name) = eval.frames
-    eval.frames = childFrame(frames.head) :: frames
-  }
-
-  def pop(num: Int = 1) = {
-    var next = eval.frames
-    for (i <- 0 until num) {
-      if (next.tail != Nil) next = next.tail
-    }
-    val out = SessionChanged.delta(eval.frames.head, next.head)
-    eval.frames = childFrame(next.head) :: next
-    out
-  }
-  def load(name: String = "") = {
-    val next = if (name == "") eval.frames.tail else namedFrames(name)
-    val out = SessionChanged.delta(eval.frames.head, next.head)
-    eval.frames = childFrame(next.head) :: next
-    out
-  }
-
-  def delete(name: String) = {
-    namedFrames.remove(name)
-  }
-  save()
-}
-
-class ReplApiImpl(val interp: Interpreter, history0: => History, sess0: Session) extends DefaultReplAPI {
+class ReplApiImpl(val interp: Interpreter, history0: => History) extends DefaultReplAPI {
 
   import interp._
 
@@ -81,22 +36,5 @@ class ReplApiImpl(val interp: Interpreter, history0: => History, sess0: Session)
   def newCompiler() = init()
   def fullHistory = storage.fullHistory()
   def history = history0
-
-  object sess extends Session {
-    def frames = eval.frames
-    def save(name: String) = sess0.save(name)
-    def delete(name: String) = sess0.delete(name)
-
-    def pop(num: Int = 1) = {
-      val res = sess0.pop(num)
-      reInit()
-      res
-    }
-    def load(name: String = "") = {
-      val res = sess0.load(name)
-      reInit()
-      res
-    }
-  }
 
 }
