@@ -24,12 +24,7 @@ libraryDependencies ++= Seq("com.github.scopt" %% "scopt" % "3.4.0",
                             "org.scala-lang" % "scala-reflect" % scalaVersion.value,
                             "com.lihaoyi" %% "scalaparse" % "0.3.7",
                             "com.lihaoyi" %% "ammonite-ops" % "0.7.6",
-                            "com.chuusai" %% "shapeless" % "2.1.0" % "test",
-                            "org.scala-lang" % "scala-compiler" % scalaVersion.value % "provided",
-                            "org.scalatest" %% "scalatest" % "3.0.0" % "test",
-                            "com.lihaoyi" %% "utest" % "0.4.3" % "test")
-
-testFrameworks ++= Seq(new TestFramework("utest.runner.Framework"))
+                            "org.scalatest" %% "scalatest" % "3.0.0" % "test")
 
 scalacOptions ++= Seq("-Ywarn-unused", "-Ywarn-unused-import", "-Ywarn-inaccessible", "-Ywarn-dead-code", "-Xlint")
 
@@ -44,3 +39,8 @@ mappings in (Compile, packageSrc) += {
 }
 
 javaOptions += "-Xmx4G"
+
+logBuffered in Test := false
+
+testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-oD")
+

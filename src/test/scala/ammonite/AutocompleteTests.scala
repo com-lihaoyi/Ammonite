@@ -1,7 +1,5 @@
 package ammonite
 
-import ammonite.TestUtils._
-
 import org.scalatest.FreeSpec
 
 class AutocompleteTests extends FreeSpec {

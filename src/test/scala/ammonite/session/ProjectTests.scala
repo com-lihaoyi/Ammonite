@@ -1,293 +1,252 @@
-// package ammonite.session
-
-// import ammonite.TestRepl
-// import ammonite.TestUtils._
-// import utest._
-
-// object ProjectTests extends TestSuite {
-//   val tests = TestSuite {
-//     println("ProjectTests")
-//     val check = new TestRepl()
-//     'load {
-//       'ivy {
-//         'standalone - {
-//           retry(3) {
-//             // ivy or maven central are flaky =/
-//             val tq = "\"\"\""
-//             check.session(s"""
-//           @ import scalatags.Text.all._
-//           error: not found: value scalatags
-
-//           @ import $$ivy.`com.lihaoyi::scalatags:0.5.4`
-
-//           @ import scalatags.Text.all._
-//           import scalatags.Text.all._
-
-//           @ a("omg", href:="www.google.com").render
-//           res2: String = $tq
-//           <a href="www.google.com">omg</a>
-//           $tq
-//         """)
-//           }
-//         }
-//         // 'akkahttp - {
-//         //     check.session(
-//         //       """
-//         //       @ import $ivy.`com.typesafe.akka::akka-http-experimental:1.0`
-
-//         //       @ implicit val system = akka.actor.ActorSystem()
-
-//         //       @ val akkaSystem = akka.http.Http(system)
-
-//         //       @ val serverBinding = akkaSystem.bind(interface = "localhost", port = 31337)
-
-//         //       @ implicit val materializer = akka.stream.ActorFlowMaterializer()
-
-//         //       @ var set = false
-
-//         //       @ serverBinding.connections.runForeach { connection =>
-//         //       @   set = true
-//         //       @ }
-
-//         //       @ set
-//         //       res7: Boolean = false
-
-//         //       @ akka.stream.scaladsl.Source(
-//         //       @   List(akka.http.model.HttpRequest(uri="/"))
-//         //       @ ).via(
-//         //       @   akka.http.Http().outgoingConnection("localhost", port=31337).flow
-//         //       @ ).runForeach(println)
-
-//         //       @ Thread.sleep(1000)
-
-//         //       @ set
-//         //       res10: Boolean = true
-
-//         //       @ system.shutdown()
-//         //      """)
-//         // }
-//         'resolvers - {
-//           retry(2) {
-//             // ivy flakyness...
-//             check.session("""
-//               @ import $ivy.`com.ambiata::mundane:1.2.1-20141230225616-50fc792`
-//               error: IvyResolutionException
-
-//               @ import ammonite._, Resolvers._
-
-//               @ val oss = Resolver.Http(
-//               @   "ambiata-oss",
-//               @   "https://ambiata-oss.s3-ap-southeast-2.amazonaws.com",
-//               @   IvyPattern,
-//               @   false
-//               @ )
-
-//               @ interp.resolvers() = interp.resolvers() :+ oss
-
-//               @ import $ivy.`com.ambiata::mundane:1.2.1-20141230225616-50fc792`
-
-//               @ import com.ambiata.mundane._
-//             """)
-//           }
-//         }
-//       }
-//       'code {
-//         check.session("""
-//           @ interp.load("val x = 1")
-
-//           @ x
-//           res2: Int = 1
-//         """)
-//       }
-//     }
+package ammonite.session
 
-//     'shapeless {
-//       // Shapeless 2.1.0 isn't published for scala 2.10
-//       if (!scala2_10)
-//         check.session("""
-//         @ import $ivy.`com.chuusai::shapeless:2.2.5`, shapeless._
+import ammonite.TestRepl
+import org.scalatest.FreeSpec
 
-//         @ (1 :: "lol" :: List(1, 2, 3) :: HNil)
-//         res1: Int :: String :: List[Int] :: HNil = 1 :: lol :: List(1, 2, 3) :: HNil
+class ProjectTests extends FreeSpec {
 
-//         @ res1(1)
-//         res2: String = "lol"
+  def check = new TestRepl()
 
-//         @ import shapeless.syntax.singleton._
+  "load" - {
+    "ivy" - {
+      "standalone" in {
+        // ivy or maven central are flaky =/
+        val tq = "\"\"\""
+        check.session(s"""
+          @ import scalatags.Text.all._
+          error: not found: value scalatags
 
-//         @ 2.narrow
-//         res4: 2 = 2
-//       """)
-//     }
+          @ import $$ivy.`com.lihaoyi::scalatags:0.5.4`
 
-//     'scalaz {
-//       check.session("""
-//         @ import $ivy.`org.scalaz::scalaz-core:7.1.1`, scalaz._, Scalaz._
+          @ import scalatags.Text.all._
+          import scalatags.Text.all._
 
-//         @ (Option(1) |@| Option(2))(_ + _)
-//         res1: Option[Int] = Some(3)
-//       """)
-//     }
-//     'guava {
-//       check.session("""
-//         @ import $ivy.`com.google.guava:guava:18.0`, com.google.common.collect._
+          @ a("omg", href:="www.google.com").render
+          res2: String = $tq
+          <a href="www.google.com">omg</a>
+          $tq
+        """)
 
-//         @ val bimap = ImmutableBiMap.of(1, "one", 2, "two", 3, "three")
+      }
+      // 'akkahttp - {
+      //     check.session(
+      //       """
+      //       @ import $ivy.`com.typesafe.akka::akka-http-experimental:1.0`
 
-//         @ bimap.get(1)
-//         res2: String = "one"
+      //       @ implicit val system = akka.actor.ActorSystem()
 
-//         @ bimap.inverse.get("two")
-//         res3: Int = 2
-//       """)
-//     }
-//     'resources {
-//       check.session("""
-//         @ import ammonite.ops._
+      //       @ val akkaSystem = akka.http.Http(system)
 
-//         @ val path = resource/'org/'apache/'jackrabbit/'oak/'plugins/'blob/"blobstore.properties"
+      //       @ val serverBinding = akkaSystem.bind(interface = "localhost", port = 31337)
 
-//         @ read! path
-//         error: ResourceNotFoundException
+      //       @ implicit val materializer = akka.stream.ActorFlowMaterializer()
 
-//         @ import $ivy.`org.apache.jackrabbit:oak-core:1.3.16`
+      //       @ var set = false
 
-//         @ read! path // Should work now
-//       """)
-//     }
-//     'scalaparse {
-//       // For some reason this blows up in 2.11.x
-//       // Prevent regressions when wildcard-importing things called `macro` or `_`
-//       if (!scala2_10) ()
-//       else
-//         check.session(s"""
-//           @ import scalaparse.Scala._
+      //       @ serverBinding.connections.runForeach { connection =>
+      //       @   set = true
+      //       @ }
 
-//           @ 1
-//           res1: Int = 1
+      //       @ set
+      //       res7: Boolean = false
 
-//           @ ExprCtx.Parened.parse("1 + 1") // for some reason the tuple isn't pprinted
-//           res2: fastparse.core.Parsed[Unit] = Failure("(":1:1 ..."1 + 1")
+      //       @ akka.stream.scaladsl.Source(
+      //       @   List(akka.http.model.HttpRequest(uri="/"))
+      //       @ ).via(
+      //       @   akka.http.Http().outgoingConnection("localhost", port=31337).flow
+      //       @ ).runForeach(println)
 
-//           @ ExprCtx.Parened.parse("(1 + 1)")
-//           res3: fastparse.core.Parsed[Unit] = Success((),7)
-//         """)
-//     }
+      //       @ Thread.sleep(1000)
 
-//     'finagle {
-//       // Prevent regressions when wildcard-importing things called `macro` or `_`
-//       check.session("""
-//         @ import $ivy.`com.twitter::finagle-httpx:6.26.0`
+      //       @ set
+      //       res10: Boolean = true
 
-//         @ import com.twitter.finagle._, com.twitter.util._
+      //       @ system.shutdown()
+      //      """)
+      // }
+      "resolvers" in {
+        check.session("""
+              @ import $ivy.`com.ambiata::mundane:1.2.1-20141230225616-50fc792`
+              error: IvyResolutionException
 
-//         @ var serverCount = 0
+              @ import ammonite._, Resolvers._
 
-//         @ var clientResponse = 0
+              @ val oss = Resolver.Http(
+              @   "ambiata-oss",
+              @   "https://ambiata-oss.s3-ap-southeast-2.amazonaws.com",
+              @   IvyPattern,
+              @   false
+              @ )
 
-//         @ val service = new Service[httpx.Request, httpx.Response] {
-//         @   def apply(req: httpx.Request): Future[httpx.Response] = {
-//         @     serverCount += 1
-//         @     Future.value(
-//         @       httpx.Response(req.version, httpx.Status.Ok)
-//         @     )
-//         @   }
-//         @ }
+              @ interp.resolvers() = interp.resolvers() :+ oss
 
-//         @ val server = Httpx.serve(":8080", service)
+              @ import $ivy.`com.ambiata::mundane:1.2.1-20141230225616-50fc792`
 
-//         @ val client: Service[httpx.Request, httpx.Response] = Httpx.newService(":8080")
+              @ import com.ambiata.mundane._
+            """)
+      }
 
-//         @ val request = httpx.Request(httpx.Method.Get, "/")
+    }
+    "code" in {
+      check.session("""
+          @ interp.load("val x = 1")
 
-//         @ request.host = "www.scala-lang.org"
+          @ x
+          res2: Int = 1
+        """)
+    }
+  }
 
-//         @ val response: Future[httpx.Response] = client(request)
+  "shapeless" in {
+    check.session("""
+        @ import $ivy.`com.chuusai::shapeless:2.2.5`, shapeless._
 
-//         @ response.onSuccess { resp: httpx.Response =>
-//         @   clientResponse = resp.getStatusCode
-//         @ }
+        @ (1 :: "lol" :: List(1, 2, 3) :: HNil)
+        res1: Int :: String :: List[Int] :: HNil = 1 :: lol :: List(1, 2, 3) :: HNil
 
-//         @ Await.ready(response)
+        @ res1(1)
+        res2: String = "lol"
 
-//         @ serverCount
-//         res12: Int = 1
+        @ import shapeless.syntax.singleton._
 
-//         @ clientResponse
-//         res13: Int = 200
+        @ 2.narrow
+        res4: 2 = 2
+      """)
+  }
 
-//         @ server.close()
-//       """)
-//     }
-//     'spire {
-//       // Prevent regressions when wildcard-importing things called `macro` or `_`
-//       if (!scala2_10) //buggy in 2.10
-//         check.session(s"""
-//           @ import $$ivy.`org.spire-math::spire:0.11.0`
+  "scalaz" in {
+    check.session("""
+        @ import $ivy.`org.scalaz::scalaz-core:7.1.1`, scalaz._, Scalaz._
 
-//           @ import spire.implicits._
+        @ (Option(1) |@| Option(2))(_ + _)
+        res1: Option[Int] = Some(3)
+      """)
+  }
 
-//           @ import spire.math._
+  "guava" in {
+    check.session("""
+        @ import $ivy.`com.google.guava:guava:18.0`, com.google.common.collect._
 
-//           @ def euclidGcd[A: Integral](x: A, y: A): A = {
-//           @   if (y == 0) x
-//           @   else euclidGcd(y, x % y)
-//           @ }
+        @ val bimap = ImmutableBiMap.of(1, "one", 2, "two", 3, "three")
 
-//           @ euclidGcd(42, 96)
-//           res4: Int = 6
+        @ bimap.get(1)
+        res2: String = "one"
 
-//           @ euclidGcd(42L, 96L)
-//           res5: Long = 6L
+        @ bimap.inverse.get("two")
+        res3: Int = 2
+      """)
+  }
 
-//           @ euclidGcd(BigInt(42), BigInt(96))
-//           res6: BigInt = 6
+  "resources" in {
+    check.session("""
+        @ import ammonite.ops._
 
-//           @ def mean[A: Fractional](xs: A*): A = xs.reduceLeft(_ + _) / xs.size
+        @ val path = resource/'org/'apache/'jackrabbit/'oak/'plugins/'blob/"blobstore.properties"
 
-//           @ mean(0.5, 1.5, 0.0, -0.5)
-//           res8: Double = 0.375
+        @ read! path
+        error: ResourceNotFoundException
 
-//           @ Interval(0, 10)
-//           res9: Interval[Int] = [0, 10]
-//         """)
-//       else
-//         check.session(s"""
-//           @ import $$ivy.`org.spire-math::spire:0.11.0`
+        @ import $ivy.`org.apache.jackrabbit:oak-core:1.3.16`
 
-//           @ import spire.implicits._
+        @ read! path // Should work now
+      """)
+  }
 
-//           @ import spire.math._
+  "scalaparse" in {
+    // For some reason this blows up in 2.11.x
+    // Prevent regressions when wildcard-importing things called `macro` or `_`
+    check.session(s"""
+          @ import scalaparse.Scala._
 
-//           @ def euclidGcd[A: Integral](x: A, y: A): A = {
-//           @   if (y == 0) x
-//           @   else euclidGcd(y, x % y)
-//           @ }
+          @ 1
+          res1: Int = 1
 
-//           @ euclidGcd(42, 96)
-//           res4: Int = 6
+          @ ExprCtx.Parened.parse("1 + 1") // for some reason the tuple isn't pprinted
+          res2: fastparse.core.Parsed[Unit] = Failure("(":1:1 ..."1 + 1")
 
-//           @ euclidGcd(42L, 96L)
-//           res5: Long = 6L
+          @ ExprCtx.Parened.parse("(1 + 1)")
+          res3: fastparse.core.Parsed[Unit] = Success((), 7)
+        """)
+  }
 
-//           @ euclidGcd(BigInt(42), BigInt(96))
-//           res6: math.BigInt = 6
+  "finagle" in {
+    // Prevent regressions when wildcard-importing things called `macro` or `_`
+    check.session("""
+        @ import $ivy.`com.twitter::finagle-httpx:6.26.0`
 
-//           @ def mean[A: Fractional](xs: A*): A = xs.reduceLeft(_ + _) / xs.size
+        @ import com.twitter.finagle._, com.twitter.util._
 
-//           @ mean(0.5, 1.5, 0.0, -0.5)
-//           res8: Double = 0.375
+        @ var serverCount = 0
 
-//           @ Interval(0, 10)
-//           res9: spire.math.Interval[Int] = [0, 10]
-//         """)
+        @ var clientResponse = 0
 
-//       // This fella is misbehaving but I can't figure out why :/
-//       //
-//       //          @ mean(Rational(1, 2), Rational(3, 2), Rational(0))
-//       //      res9: spire.math.Rational = 2/3
+        @ val service = new Service[httpx.Request, httpx.Response] {
+        @   def apply(req: httpx.Request): Future[httpx.Response] = {
+        @     serverCount += 1
+        @     Future.value(
+        @       httpx.Response(req.version, httpx.Status.Ok)
+        @     )
+        @   }
+        @ }
 
-//     }
+        @ val server = Httpx.serve(":8080", service)
 
-//   }
-// }
+        @ val client: Service[httpx.Request, httpx.Response] = Httpx.newService(":8080")
+
+        @ val request = httpx.Request(httpx.Method.Get, "/")
+
+        @ request.host = "www.scala-lang.org"
+
+        @ val response: Future[httpx.Response] = client(request)
+
+        @ response.onSuccess { resp: httpx.Response =>
+        @   clientResponse = resp.getStatusCode
+        @ }
+
+        @ Await.ready(response)
+
+        @ serverCount
+        res12: Int = 1
+
+        @ clientResponse
+        res13: Int = 200
+
+        @ server.close()
+      """)
+  }
+
+  "spire" in {
+    // Prevent regressions when wildcard-importing things called `macro` or `_`
+    check.session(s"""
+          @ import $$ivy.`org.spire-math::spire:0.11.0`
+
+          @ import spire.implicits._
+
+          @ import spire.math._
+
+          @ def euclidGcd[A: Integral](x: A, y: A): A = {
+          @   if (y == 0) x
+          @   else euclidGcd(y, x % y)
+          @ }
+
+          @ euclidGcd(42, 96)
+          res4: Int = 6
+
+          @ euclidGcd(42L, 96L)
+          res5: Long = 6L
+
+          @ euclidGcd(BigInt(42), BigInt(96))
+          res6: BigInt = 6
+
+          @ def mean[A: Fractional](xs: A*): A = xs.reduceLeft(_ + _) / xs.size
+
+          @ mean(0.5, 1.5, 0.0, -0.5)
+          res8: Double = 0.375
+
+          @ Interval(0, 10)
+          res9: Interval[Int] = [0, 10]
+        """)
+
+  }
+
+}

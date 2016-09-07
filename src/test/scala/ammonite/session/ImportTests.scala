@@ -6,11 +6,11 @@ import org.scalatest.FreeSpec
 
 class ImportTests extends FreeSpec {
 
-    def check = new TestRepl()
+  def check = new TestRepl()
 
-    "basic" - {
-      "hello" in {
-        check.session("""
+  "basic" - {
+    "hello" in {
+      check.session("""
           @ import math.abs
           import math.abs
 
@@ -21,9 +21,9 @@ class ImportTests extends FreeSpec {
           res2: Long = 123L
         """)
 
-      }
-      "java" in {
-        check.session("""
+    }
+    "java" in {
+      check.session("""
           @ import Thread._
           import Thread._
 
@@ -39,9 +39,9 @@ class ImportTests extends FreeSpec {
           @ getRuntime.isInstanceOf[java.lang.Runtime]
           res4: Boolean = true
         """)
-      }
-      "multi" in {
-        check.session("""
+    }
+    "multi" in {
+      check.session("""
           @ import math._, Thread._
           import math._, Thread._
 
@@ -51,9 +51,9 @@ class ImportTests extends FreeSpec {
           @ currentThread.isAlive
           res2: Boolean = true
         """)
-      }
-      "renaming" in {
-        check.session("""
+    }
+    "renaming" in {
+      check.session("""
           @ import math.{abs => sba}
 
           @ sba(-123)
@@ -78,11 +78,11 @@ class ImportTests extends FreeSpec {
           @ min
           error: not found: value min
         """)
-      }
     }
-    "shadowing" - {
-      "sameName" in {
-        check.session("""
+  }
+  "shadowing" - {
+    "sameName" in {
+      check.session("""
           @ val abs = 'a'
           abs: Char = 'a'
 
@@ -113,9 +113,9 @@ class ImportTests extends FreeSpec {
           @ abs(-4)
           res9: Int = 4
         """)
-      }
-      "shadowPrefix" in {
-        check.session("""
+    }
+    "shadowPrefix" in {
+      check.session("""
           @ object importing_issue {
           @   object scala {
           @     def evilThing = ???
@@ -134,13 +134,13 @@ class ImportTests extends FreeSpec {
           @ Duration.Inf // This fails due to a compiler bug SI-6039
           error: Compilation Failed
         """)
-        // This failed kinda non-deterministically in 0.5.2 (#248); it depended
-        // on what ordering the imports were generated in, which depended
-        // on the ordering of the `scala.Map` they were stored in, which
-        // is arbitrary. Choosing different identifiers for `foo` `bar` and
-        // `baz` affected this ordering and whether or not it fail.
-        // Nevertheless, here's a test case that used to fail, but now doesn't
-        check.session("""
+      // This failed kinda non-deterministically in 0.5.2 (#248); it depended
+      // on what ordering the imports were generated in, which depended
+      // on the ordering of the `scala.Map` they were stored in, which
+      // is arbitrary. Choosing different identifiers for `foo` `bar` and
+      // `baz` affected this ordering and whether or not it fail.
+      // Nevertheless, here's a test case that used to fail, but now doesn't
+      check.session("""
           @ object baz { val foo = 1 }
 
           @ object foo { val bar = 2 }
@@ -152,13 +152,13 @@ class ImportTests extends FreeSpec {
           @ bar
           res4: Int = 2
         """)
-      }
+    }
 
-      "typeTermSeparation" - {
-        // Make sure that you can have a term and a type of the same name
-        // coming from different places and they don't stomp over each other
-        // (#199) and both are accessible.
-        "case1" in check.session(s"""
+    "typeTermSeparation" - {
+      // Make sure that you can have a term and a type of the same name
+      // coming from different places and they don't stomp over each other
+      // (#199) and both are accessible.
+      "case1" in check.session(s"""
           @ val Foo = 1
 
           @ type Foo = Int
@@ -170,8 +170,7 @@ class ImportTests extends FreeSpec {
           res3: ${sessionPrefix}Foo = 2
         """)
 
-        
-        "case2" in check.session(s"""
+      "case2" in check.session(s"""
             @ object pkg1{ val Order = "lolz" }
 
             @ object pkg2{ type Order[+T] = Seq[T] }
@@ -189,21 +188,20 @@ class ImportTests extends FreeSpec {
             @ Seq(Order): Order[String]
             res6: Order[String] = List("lolz")
           """)
-        
 
-        // Even though you can import the same-named type and term from different
-        // places and have it work, if you import them both from the same place,
-        // a single type or term of the same name will stomp over both of them.
-        //
-        // This is basically impossible to avoid in Scala unless we want to
-        // generate forwarder objects to import from which is very difficult
-        // (e.g. we would need to generate forwarder-methods for arbitrarily
-        // complex method signatures) or generate ever-more-nested wrapper
-        // objects for imports to make the later imports take priority (which
-        // results in a quadratic number of class files)
-        //
-        // This is sufficiently edge-casey that I'm gonna call this a wontfix
-        "case3" in check.session("""
+      // Even though you can import the same-named type and term from different
+      // places and have it work, if you import them both from the same place,
+      // a single type or term of the same name will stomp over both of them.
+      //
+      // This is basically impossible to avoid in Scala unless we want to
+      // generate forwarder objects to import from which is very difficult
+      // (e.g. we would need to generate forwarder-methods for arbitrarily
+      // complex method signatures) or generate ever-more-nested wrapper
+      // objects for imports to make the later imports take priority (which
+      // results in a quadratic number of class files)
+      //
+      // This is sufficiently edge-casey that I'm gonna call this a wontfix
+      "case3" in check.session("""
           @ object bar { val foo = 1; type foo = Int }
 
           @ object baz { val foo = 2 }
@@ -219,9 +217,9 @@ class ImportTests extends FreeSpec {
           error: Compilation Failed
         """)
 
-        "paulp" in {
+      "paulp" in {
 
-          check.session(s"""
+        check.session(s"""
           @ import ammonite.testcode.paulp1._, ammonite.testcode.paulp2._
 
           @ new Paulp; Paulp // Paulp's example in #199
@@ -290,9 +288,9 @@ class ImportTests extends FreeSpec {
 
           @ Paulp
           """)
-        }
-        "paulpTypeRegression" in {
-          check.session(s"""
+      }
+      "paulpTypeRegression" in {
+        check.session(s"""
           @ type Paulp = Int
 
           @ import ammonite.testcode.paulp3.Paulp
@@ -300,11 +298,11 @@ class ImportTests extends FreeSpec {
           @ new Paulp
           res2: Paulp = paulp3.Paulp-class
         """)
-        }
       }
     }
-    "collapsing" in {
-      check.session("""
+  }
+  "collapsing" in {
+    check.session("""
         @ object Foo{ val bar = 1 }
 
         @ import Foo.bar
@@ -314,6 +312,6 @@ class ImportTests extends FreeSpec {
         @ bar
         res3: Int = 1
       """)
-    }
-  
+  }
+
 }
