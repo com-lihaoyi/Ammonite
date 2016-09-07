@@ -69,23 +69,23 @@ object SessionTests extends TestSuite{
 
         @ interp.load.module($bareSrc)
 
-        @ rm! 'destSymLink
-
         @ val originalWd = wd
 
-        @ val srcDir0 = tmp.dir()
+        @ val tmpdir = tmp.dir()
 
-        @ ln.s!(srcDir0)! 'destSymLink
+        @ cd! tmpdir
+
+        @ mkdir! 'srcDir0
+
+        @ ln.s!('srcDir0)! 'destSymLink
 
         @ cd! 'destSymLink
 
-        @ assert(srcDir0.name == wd.name)
+        @ assert("srcDir0" == wd.name)
 
-        @ rm! 'destSymLink
+        @ cd! originalWd
 
-        @ cd! up
-
-        @ rm! srcDir0
+        @ rm! tmpdir
       """)
     }
   }
