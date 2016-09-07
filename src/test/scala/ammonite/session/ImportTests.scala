@@ -1,331 +1,319 @@
-// package ammonite.session
+package ammonite.session
 
-// import ammonite.TestRepl
-// import ammonite.TestUtils._
-// import utest._
+import ammonite.TestRepl
+import ammonite.TestUtils._
+import org.scalatest.FreeSpec
 
-// object ImportTests extends TestSuite {
+class ImportTests extends FreeSpec {
 
-//   val tests = TestSuite {
-//     println("ImportTests")
-//     val check = new TestRepl()
+    def check = new TestRepl()
 
-//     'basic {
-//       'hello {
-//         check.session("""
-//           @ import math.abs
-//           import math.abs
+    "basic" - {
+      "hello" in {
+        check.session("""
+          @ import math.abs
+          import math.abs
 
-//           @ val abs = 123L
-//           abs: Long = 123L
+          @ val abs = 123L
+          abs: Long = 123L
 
-//           @ abs
-//           res2: Long = 123L
-//         """)
+          @ abs
+          res2: Long = 123L
+        """)
+
+      }
+      "java" in {
+        check.session("""
+          @ import Thread._
+          import Thread._
 
-//       }
+          @ currentThread.isAlive
+          res1: Boolean = true
 
-//       'java {
-//         check.session("""
-//           @ import Thread._
-//           import Thread._
+          @ import java.lang.Runtime.getRuntime
+          import java.lang.Runtime.getRuntime
 
-//           @ currentThread.isAlive
-//           res1: Boolean = true
+          @ getRuntime.isInstanceOf[Boolean]
+          res3: Boolean = false
 
-//           @ import java.lang.Runtime.getRuntime
-//           import java.lang.Runtime.getRuntime
+          @ getRuntime.isInstanceOf[java.lang.Runtime]
+          res4: Boolean = true
+        """)
+      }
+      "multi" in {
+        check.session("""
+          @ import math._, Thread._
+          import math._, Thread._
+
+          @ abs(-1)
+          res1: Int = 1
 
-//           @ getRuntime.isInstanceOf[Boolean]
-//           res3: Boolean = false
+          @ currentThread.isAlive
+          res2: Boolean = true
+        """)
+      }
+      "renaming" in {
+        check.session("""
+          @ import math.{abs => sba}
 
-//           @ getRuntime.isInstanceOf[java.lang.Runtime]
-//           res4: Boolean = true
-//         """)
-//       }
-//       'multi {
-//         check.session("""
-//           @ import math._, Thread._
-//           import math._, Thread._
+          @ sba(-123)
+          res1: Int = 123
 
-//           @ abs(-1)
-//           res1: Int = 1
+          @ abs
+          error: not found: value abs
 
-//           @ currentThread.isAlive
-//           res2: Boolean = true
-//         """)
-//       }
+          @ import math.{abs, max => xam}
 
-//       'renaming {
-//         check.session("""
-//           @ import math.{abs => sba}
+          @ abs(-234)
+          res3: Int = 234
 
-//           @ sba(-123)
-//           res1: Int = 123
+          @ xam(1, 2)
+          res4: Int = 2
 
-//           @ abs
-//           error: not found: value abs
+          @ import math.{min => _, _}
 
-//           @ import math.{abs, max => xam}
+          @ max(2, 3)
+          res6: Int = 3
 
-//           @ abs(-234)
-//           res3: Int = 234
+          @ min
+          error: not found: value min
+        """)
+      }
+    }
+    "shadowing" - {
+      "sameName" in {
+        check.session("""
+          @ val abs = 'a'
+          abs: Char = 'a'
 
-//           @ xam(1, 2)
-//           res4: Int = 2
+          @ abs
+          res1: Char = 'a'
 
-//           @ import math.{min => _, _}
+          @ val abs = 123L
+          abs: Long = 123L
 
-//           @ max(2, 3)
-//           res6: Int = 3
+          @ abs
+          res3: Long = 123L
 
-//           @ min
-//           error: not found: value min
-//         """)
-//       }
-//     }
-//     'shadowing {
-//       'sameName {
-//         check.session("""
-//           @ val abs = 'a'
-//           abs: Char = 'a'
+          @ import math.abs
+          import math.abs
 
-//           @ abs
-//           res1: Char = 'a'
+          @ abs(-10)
+          res5: Int = 10
+
+          @ val abs = 123L
+          abs: Long = 123L
+
+          @ abs
+          res7: Long = 123L
+
+          @ import java.lang.Math._
+          import java.lang.Math._
+
+          @ abs(-4)
+          res9: Int = 4
+        """)
+      }
+      "shadowPrefix" in {
+        check.session("""
+          @ object importing_issue {
+          @   object scala {
+          @     def evilThing = ???
+          @   }
+          @ }
 
-//           @ val abs = 123L
-//           abs: Long = 123L
+          @ import scala.concurrent.duration._
 
-//           @ abs
-//           res3: Long = 123L
+          @ Duration.Inf
 
-//           @ import math.abs
-//           import math.abs
+          @ import importing_issue._
 
-//           @ abs(-10)
-//           res5: Int = 10
+          @ "foo" // Make sure this still works
+          res4: String = "foo"
 
-//           @ val abs = 123L
-//           abs: Long = 123L
+          @ Duration.Inf // This fails due to a compiler bug SI-6039
+          error: Compilation Failed
+        """)
+        // This failed kinda non-deterministically in 0.5.2 (#248); it depended
+        // on what ordering the imports were generated in, which depended
+        // on the ordering of the `scala.Map` they were stored in, which
+        // is arbitrary. Choosing different identifiers for `foo` `bar` and
+        // `baz` affected this ordering and whether or not it fail.
+        // Nevertheless, here's a test case that used to fail, but now doesn't
+        check.session("""
+          @ object baz { val foo = 1 }
 
-//           @ abs
-//           res7: Long = 123L
+          @ object foo { val bar = 2 }
 
-//           @ import java.lang.Math._
-//           import java.lang.Math._
+          @ import foo.bar
 
-//           @ abs(-4)
-//           res9: Int = 4
-//         """)
-//       }
-//       'shadowPrefix {
-//         * - check.session("""
-//           @ object importing_issue {
-//           @   object scala {
-//           @     def evilThing = ???
-//           @   }
-//           @ }
+          @ import baz.foo
 
-//           @ import scala.concurrent.duration._
+          @ bar
+          res4: Int = 2
+        """)
+      }
 
-//           @ Duration.Inf
+      "typeTermSeparation" - {
+        // Make sure that you can have a term and a type of the same name
+        // coming from different places and they don't stomp over each other
+        // (#199) and both are accessible.
+        "case1" in check.session(s"""
+          @ val Foo = 1
 
-//           @ import importing_issue._
-
-//           @ "foo" // Make sure this still works
-//           res4: String = "foo"
+          @ type Foo = Int
 
-//           @ Duration.Inf // This fails due to a compiler bug SI-6039
-//           error: Compilation Failed
-//         """)
-//         // This failed kinda non-deterministically in 0.5.2 (#248); it depended
-//         // on what ordering the imports were generated in, which depended
-//         // on the ordering of the `scala.Map` they were stored in, which
-//         // is arbitrary. Choosing different identifiers for `foo` `bar` and
-//         // `baz` affected this ordering and whether or not it fail.
-//         // Nevertheless, here's a test case that used to fail, but now doesn't
-//         * - check.session("""
-//           @ object baz { val foo = 1 }
+          @ Foo
+          res2: Int = 1
 
-//           @ object foo { val bar = 2 }
+          @ 2: Foo
+          res3: ${sessionPrefix}Foo = 2
+        """)
 
-//           @ import foo.bar
+        
+        "case2" in check.session(s"""
+            @ object pkg1{ val Order = "lolz" }
 
-//           @ import baz.foo
+            @ object pkg2{ type Order[+T] = Seq[T] }
 
-//           @ bar
-//           res4: Int = 2
-//         """)
+            @ import pkg1._
 
-//       }
+            @ Order
+            res3: String = "lolz"
 
-//       'typeTermSeparation {
-//         // Make sure that you can have a term and a type of the same name
-//         // coming from different places and they don't stomp over each other
-//         // (#199) and both are accessible.
-//         * - check.session(s"""
-//           @ val Foo = 1
+            @ import pkg2._
 
-//           @ type Foo = Int
+            @ Seq(1): Order[Int]
+            res5: Order[Int] = List(1)
 
-//           @ Foo
-//           res2: Int = 1
+            @ Seq(Order): Order[String]
+            res6: Order[String] = List("lolz")
+          """)
+        
 
-//           @ 2: Foo
-//           res3: ${sessionPrefix}Foo = 2
-//         """)
+        // Even though you can import the same-named type and term from different
+        // places and have it work, if you import them both from the same place,
+        // a single type or term of the same name will stomp over both of them.
+        //
+        // This is basically impossible to avoid in Scala unless we want to
+        // generate forwarder objects to import from which is very difficult
+        // (e.g. we would need to generate forwarder-methods for arbitrarily
+        // complex method signatures) or generate ever-more-nested wrapper
+        // objects for imports to make the later imports take priority (which
+        // results in a quadratic number of class files)
+        //
+        // This is sufficiently edge-casey that I'm gonna call this a wontfix
+        "case3" in check.session("""
+          @ object bar { val foo = 1; type foo = Int }
 
-//         * - {
-//           val pkg2 = if (scala2_10) sessionPrefix + "pkg2." else ""
-//           check.session(s"""
-//             @ object pkg1{ val Order = "lolz" }
+          @ object baz { val foo = 2 }
 
-//             @ object pkg2{ type Order[+T] = Seq[T] }
+          @ import bar.foo
 
-//             @ import pkg1._
+          @ import baz.foo
 
-//             @ Order
-//             res3: String = "lolz"
+          @ foo
+          res4: Int = 2
 
-//             @ import pkg2._
+          @ 1: foo
+          error: Compilation Failed
+        """)
 
-//             @ Seq(1): Order[Int]
-//             res5: ${pkg2}Order[Int] = List(1)
+        "paulp" in {
 
-//             @ Seq(Order): Order[String]
-//             res6: ${pkg2}Order[String] = List("lolz")
-//           """)
-//         }
+          check.session(s"""
+          @ import ammonite.testcode.paulp1._, ammonite.testcode.paulp2._
 
-//         // Even though you can import the same-named type and term from different
-//         // places and have it work, if you import them both from the same place,
-//         // a single type or term of the same name will stomp over both of them.
-//         //
-//         // This is basically impossible to avoid in Scala unless we want to
-//         // generate forwarder objects to import from which is very difficult
-//         // (e.g. we would need to generate forwarder-methods for arbitrarily
-//         // complex method signatures) or generate ever-more-nested wrapper
-//         // objects for imports to make the later imports take priority (which
-//         // results in a quadratic number of class files)
-//         //
-//         // This is sufficiently edge-casey that I'm gonna call this a wontfix
-//         * - check.session("""
-//           @ object bar { val foo = 1; type foo = Int }
+          @ new Paulp; Paulp // Paulp's example in #199
+          res1_0: Paulp = paulp1.Paulp1
+          res1_1: Paulp.type = paulp2.Paulp2
 
-//           @ object baz { val foo = 2 }
+          @ val Paulp = 123 // Shadow the term but not the type
 
-//           @ import bar.foo
+          @ new Paulp; Paulp // Shouldn't change
+          res3_0: Paulp = paulp1.Paulp1
+          res3_1: Int = 123
 
-//           @ import baz.foo
+          @ object Paulp3{
+          @   val Paulp = 1
+          @   type Paulp = Array[Int]
+          @ }
 
-//           @ foo
-//           res4: Int = 2
+          @ import Paulp3._ // Actually shadow them now
 
-//           @ 1: foo
-//           error: Compilation Failed
-//         """)
-//         // Prefix things properly in Scala-2.10 where the type printer is dumb
-//         val prefix1 = if (scala2_10) "ammonite.testcode.paulp1." else ""
-//         val prefix2 = if (scala2_10) "ammonite.testcode.paulp2." else ""
-//         val prefix3 = if (scala2_10) "ammonite.testcode.paulp3." else ""
-//         val prefix4 = if (scala2_10) "$sess.Paulp4." else ""
-//         val prefix5 = if (scala2_10) "$sess.Paulp5." else ""
-//         val prefix6 = if (scala2_10) "$sess.Paulp6." else ""
-//         'paulp - {
+          @ (new Paulp(0)).length; Paulp
+          res6_0: Int = 0
+          res6_1: Int = 1
 
-//           check.session(s"""
-//           @ import ammonite.testcode.paulp1._, ammonite.testcode.paulp2._
+          @ object Paulp4{ object Paulp{override def toString = "Paulp4"}}
 
-//           @ new Paulp; Paulp // Paulp's example in #199
-//           res1_0: ${prefix1}Paulp = paulp1.Paulp1
-//           res1_1: ${prefix2}Paulp.type = paulp2.Paulp2
+          @ object Paulp5{ class Paulp{override def toString = "Paulp5"}}
 
-//           @ val Paulp = 123 // Shadow the term but not the type
+          @ import Paulp4.Paulp, Paulp5.Paulp // cross import, shadow both
 
-//           @ new Paulp; Paulp // Shouldn't change
-//           res3_0: ${prefix1}Paulp = paulp1.Paulp1
-//           res3_1: Int = 123
+          @ Paulp
+          res10: Paulp.type = Paulp4
 
-//           @ object Paulp3{
-//           @   val Paulp = 1
-//           @   type Paulp = Array[Int]
-//           @ }
+          @ new Paulp
+          res11: Paulp = Paulp5
 
-//           @ import Paulp3._ // Actually shadow them now
+          @ import ammonite.testcode.paulp1._ // individually import & shadow...
 
-//           @ (new Paulp(0)).length; Paulp
-//           res6_0: Int = 0
-//           res6_1: Int = 1
+          @ new Paulp; Paulp
+          res13_0: Paulp = paulp1.Paulp1
+          res13_1: Paulp.type = Paulp4
 
-//           @ object Paulp4{ object Paulp{override def toString = "Paulp4"}}
+          @ import ammonite.testcode.paulp2._ // one at a time...
 
-//           @ object Paulp5{ class Paulp{override def toString = "Paulp5"}}
+          @ new Paulp; Paulp
+          res15_0: Paulp = paulp1.Paulp1
+          res15_1: Paulp.type = paulp2.Paulp2
 
-//           @ import Paulp4.Paulp, Paulp5.Paulp // cross import, shadow both
+          @ object Paulp6{ val Paulp = 1; type Paulp = Int }
 
-//           @ Paulp
-//           res10: ${prefix4}Paulp.type = Paulp4
+          @ import Paulp6._ // This should shadow both
 
-//           @ new Paulp
-//           res11: ${prefix5}Paulp = Paulp5
+          @ Paulp: Paulp
+          res18: Paulp = 1
 
-//           @ import ammonite.testcode.paulp1._ // individually import & shadow...
+          @ import Paulp4._
 
-//           @ new Paulp; Paulp
-//           res13_0: ${prefix1}Paulp = paulp1.Paulp1
-//           res13_1: ${prefix4}Paulp.type = Paulp4
+          @ Paulp
+          res20: Paulp.type = Paulp4
 
-//           @ import ammonite.testcode.paulp2._ // one at a time...
+          @ Paulp: Paulp // Improper shadowing! This is a known issue but hard to fix
+          error: not found: type Paulp
 
-//           @ new Paulp; Paulp
-//           res15_0: ${prefix1}Paulp = paulp1.Paulp1
-//           res15_1: ${prefix2}Paulp.type = paulp2.Paulp2
+          @ val Paulp = 12345
 
-//           @ object Paulp6{ val Paulp = 1; type Paulp = Int }
+          @ import Paulp6.Paulp
 
-//           @ import Paulp6._ // This should shadow both
+          @ Paulp
+          """)
+        }
+        "paulpTypeRegression" in {
+          check.session(s"""
+          @ type Paulp = Int
 
-//           @ Paulp: Paulp
-//           res18: ${prefix6}Paulp = 1
+          @ import ammonite.testcode.paulp3.Paulp
 
-//           @ import Paulp4._
+          @ new Paulp
+          res2: Paulp = paulp3.Paulp-class
+        """)
+        }
+      }
+    }
+    "collapsing" in {
+      check.session("""
+        @ object Foo{ val bar = 1 }
 
-//           @ Paulp
-//           res20: ${prefix4}Paulp.type = Paulp4
+        @ import Foo.bar
 
-//           @ Paulp: Paulp // Improper shadowing! This is a known issue but hard to fix
-//           error: not found: type Paulp
+        @ import Foo.{bar => _}
 
-//           @ val Paulp = 12345
-
-//           @ import Paulp6.Paulp
-
-//           @ Paulp
-//           """)
-//         }
-//         'paulpTypeRegression {
-//           check.session(s"""
-//           @ type Paulp = Int
-
-//           @ import ammonite.testcode.paulp3.Paulp
-
-//           @ new Paulp
-//           res2: ${prefix3}Paulp = paulp3.Paulp-class
-//         """)
-//         }
-//       }
-//     }
-//     'collapsing {
-//       check.session("""
-//         @ object Foo{ val bar = 1 }
-
-//         @ import Foo.bar
-
-//         @ import Foo.{bar => _}
-
-//         @ bar
-//         res3: Int = 1
-//       """)
-//     }
-//   }
-// }
+        @ bar
+        res3: Int = 1
+      """)
+    }
+  
+}
