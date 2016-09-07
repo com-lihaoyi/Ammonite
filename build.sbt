@@ -6,9 +6,6 @@ fork := true
 scalaVersion := "2.11.8"
 
 crossScalaVersions := Seq(
-  "2.10.4",
-  "2.10.5",
-  "2.10.6",
   "2.11.3",
   "2.11.4",
   "2.11.5",
@@ -33,7 +30,6 @@ val sharedSettings = Seq(
     "org.scala-lang" % "scala-compiler" % scalaVersion.value % "provided",
     "org.scalatest" %% "scalatest" % "3.0.0" % "test",
     "com.lihaoyi" %% "utest" % "0.4.3" % "test"),
-  scalafmtConfig := Some(file(".scalafmt")),
   testFrameworks ++= Seq(new TestFramework("utest.runner.Framework")),
   scalacOptions ++= Seq("-target:jvm-1.7",
                         "-Ywarn-unused",
@@ -43,7 +39,6 @@ val sharedSettings = Seq(
                         "-Xlint"),
   autoCompilerPlugins := true,
   ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) },
-  parallelExecution in Test := !scalaVersion.value.contains("2.10"),
   (unmanagedSources in Compile) += (baseDirectory in ThisBuild).value / "project" / "Constants.scala",
   mappings in (Compile, packageSrc) += {
     ((baseDirectory in ThisBuild).value / ".." / "project" / "Constants.scala") -> "Constants.scala"
@@ -103,61 +98,3 @@ lazy val amm = project
       dest
     }
   )
-
-/**
-  * Project that binds together [[ops]] and [[amm]], turning them into a
-  * credible systems shell that can be used to replace bash/zsh/etc. for
-  * common housekeeping tasks
-  */
-lazy val shell = project
-  .dependsOn(ops, amm % "compile->compile;test->test")
-  .settings(
-    sharedSettings,
-    name := "ammonite-shell",
-    (test in Test) <<= (test in Test).dependsOn(packageBin in Compile),
-    (run in Test) <<= (run in Test).dependsOn(packageBin in Compile),
-    (testOnly in Test) <<= (testOnly in Test).dependsOn(packageBin in Compile)
-  )
-
-val integrationTasks = Seq(
-  assembly in amm,
-  packageBin in (shell, Compile)
-)
-lazy val integration = project
-  .dependsOn(ops)
-  .dependsOn(amm)
-  .settings(
-    sharedSettings,
-    (test in Test) <<= (test in Test).dependsOn(integrationTasks: _*),
-    (run in Test) <<= (run in Test).dependsOn(integrationTasks: _*),
-    (testOnly in Test) <<= (testOnly in Test).dependsOn(integrationTasks: _*),
-    (console in Test) <<= (console in Test).dependsOn(integrationTasks: _*),
-    parallelExecution in Test := false,
-    dontPublishSettings,
-    initialCommands in (Test, console) := "ammonite.integration.Main.main(null)"
-  )
-
-/**
-  * REPL available via remote ssh access.
-  * Plug into any app environment for live hacking on a live application.
-  */
-lazy val sshd = project
-  .dependsOn(amm)
-  .settings(
-    sharedSettings,
-    crossVersion := CrossVersion.full,
-    name := "ammonite-sshd",
-    libraryDependencies ++= Seq(
-      "org.apache.sshd" % "sshd-core" % "0.14.0",
-      //-- test --//
-      // slf4j-nop makes sshd server use logger that writes into the void
-      "org.slf4j" % "slf4j-nop" % "1.7.12" % "test",
-      "com.jcraft" % "jsch" % "0.1.53" % "test",
-      "org.scalacheck" %% "scalacheck" % "1.12.4" % "test"
-    )
-  )
-
-lazy val published = project
-  .in(file("target/published"))
-  .aggregate(ops, shell, amm, sshd)
-  .settings(dontPublishSettings)
