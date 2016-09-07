@@ -12,9 +12,6 @@ class AutocompleteTests extends FreeSpec {
     val buf = caretCode.replace("<caret>", "")
 
     val (_, completions, signatures) = check.kernel.complete(buf, cursor)
-    if (signatures.nonEmpty) {
-      println(s"autocomplete called with $caretCode resulting in completions: $completions, signatures: $signatures")
-    }
     val left = cmp(completions.toSet)
     assert(left == Set())
     val sigLeft = sigs(signatures.toSet)
