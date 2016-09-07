@@ -84,7 +84,7 @@ should be able to download it via the
 [Unstable Version](http://www.lihaoyi.com/Ammonite/#UnstableVersions)
 instructions and make use of your changes standalone or in an SBT project.
 
-Occassionally, the CI job building and publishing one of the above steps
+Occasionally, the CI job building and publishing one of the above steps
 flakes and fails, and needs to be re-run through the travis web interface.
 
 ## Issue Tags

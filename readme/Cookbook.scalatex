@@ -7,7 +7,7 @@
 @sect("Ammonite Cookbook", "Fun with Scala-Scriping!")
   @p
     The Ammonite Scala REPL and Scripts are meant to be extended: you can load
-    in arbitary Java/Scala modules from the internet via
+    in arbitrary Java/Scala modules from the internet via
     @sect.ref{import $ivy}. Using this third-party code, you
     extend the REPL to do anything you wish to do, and tools like
     @sect.ref{Ammonite-Shell} are simply modules like any other. Simple
@@ -179,7 +179,7 @@
 
   @sect{Office Automation}
     @p
-      Apart from writing code, you very often find yourself dealing with documents and spreadsheets of various sorts. This is often rather tedious. Wouldn't it be cool if you could deal with these things programmatically? It turns out that there are open-soure Java libraries such as @lnk("Apache POI", "https://poi.apache.org/") that let you do this, and with the Ammonite-REPL you can quickly and easily load these libraries and get to work on your favorite documents. Here's an example extracting some data from my old Resume, in @code{.docx} format:
+      Apart from writing code, you very often find yourself dealing with documents and spreadsheets of various sorts. This is often rather tedious. Wouldn't it be cool if you could deal with these things programmatically? It turns out that there are open-source Java libraries such as @lnk("Apache POI", "https://poi.apache.org/") that let you do this, and with the Ammonite-REPL you can quickly and easily load these libraries and get to work on your favorite documents. Here's an example extracting some data from my old Resume, in @code{.docx} format:
 
     @hl.scala
       @@ import $ivy.`org.apache.poi:poi-ooxml:3.13`
@@ -232,14 +232,14 @@
         "http://www.github.com/lihaoyi"
       )
     @p
-      As you can see, loading the Apache POI library is just a single command, reading in my resume file is just one or two more, and then you can immediate start exploring the document's data model to see what inside interests you. You even get tab-completion on the methods of the document, making it really easy for you to interactively explore all the things that a word document has to offer!
+      As you can see, loading the Apache POI library is just a single command, reading in my resume file is just one or two more, and then you can immediately start exploring the document's data model to see what inside interests you. You even get tab-completion on the methods of the document, making it really easy for you to interactively explore all the things that a word document has to offer!
     @p
       This is just a small example, but you can easily do more things in the same vein: Apache POI lets you create/modify/save @code{.docx} files in addition to reading from them, meaning you can automatically perform batch operations on large numbers of documents. The library also provides mechanisms to load in Excel spreadsheets and Powerpoint slide decks, meaning you have easy, programmable access to the great bulk of any Microsoft-Office files you find yourself dealing with.
 
 
   @sect{Image Processing}
     @p
-      You can perform lots of image operations in Java. You can use @lnk("BufferedImagee", "https://docs.oracle.com/javase/7/docs/api/java/awt/image/BufferedImage.html") if you want to access the low-level details or read/write individual pixels, and using @lnk("Java2D", "http://zetcode.com/gfx/java2d/") you can draw shapes, perform transforms, or do anything you could possibly want to do with the images.
+      You can perform lots of image operations in Java. You can use @lnk("BufferedImage", "https://docs.oracle.com/javase/7/docs/api/java/awt/image/BufferedImage.html") if you want to access the low-level details or read/write individual pixels, and using @lnk("Java2D", "http://zetcode.com/gfx/java2d/") you can draw shapes, perform transforms, or do anything you could possibly want to do with the images.
     @p
       There are also simple libraries like @lnk("Thumbnailator", "https://github.com/coobird/thumbnailator") if you're doing basic things like renaming/resizing/rotating and don't need pixel-per-pixel access. This is an example of using Thumbnailator to resize a folder of images and put them somewhere else:
 
@@ -281,7 +281,7 @@
       The word "Machine Learning" sounds big and intimidating, like something you'd need to spend 6 years getting a PhD before you understand. What if you could "do some machine-learning" (whatever that means) in your spare time, in a minute or two? It turns out there are many Java libraries that can help you with basics, and with the Ammonite REPL getting started is easy.
 
     @p
-      Here's one example of how you can get started using the @lnk("OpenNLP", "http://opennlp.apache.org/") project to do some natural-language processing in just a few minutes. The example was found @lnk("online", "http://www.programcreek.com/2012/05/opennlp-tutorial/#sentence detector"), and shows how to extract english names from a raw @code{String} using NLP:
+      Here's one example of how you can get started using the @lnk("OpenNLP", "http://opennlp.apache.org/") project to do some natural-language processing in just a few minutes. The example was found @lnk("online", "http://www.programcreek.com/2012/05/opennlp-tutorial/#sentence detector"), and shows how to extract English names from a raw @code{String} using NLP:
 
     @hl.scala
       @@ import $ivy.`org.apache.opennlp:opennlp-tools:1.6.0` // load OpenNLP
@@ -344,7 +344,7 @@
       res96: Array[String] = Array("Mike", "Peter Smith")
 
     @p
-      This took a while, but only in comparison to the earlier cookbook recipes: this one is still less than 20 steps, which is not bad for something that installs multiple third-party modules, pulls down training data off the internet, and then does natural language processing to extract the english names from a text blob!
+      This took a while, but only in comparison to the earlier cookbook recipes: this one is still less than 20 steps, which is not bad for something that installs multiple third-party modules, pulls down training data off the internet, and then does natural language processing to extract the English names from a text blob!
 
     @p
       Obviously we did not go very deep into the field. If you did, it would definitely be a lot more reading and understanding than just blindly following tutorials like I did above, and you probably would find it worth the time to set up a proper project. Nevertheless, this quick 5-minute run through of how to perform the basics of NLP is a fun way to get started whether or not you decide to take it further, and is only possible because of the Ammonite REPL!
