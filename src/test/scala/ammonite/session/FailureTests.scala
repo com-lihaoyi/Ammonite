@@ -1,63 +1,65 @@
-// package ammonite.session
+package ammonite.session
 
-// import ammonite.TestRepl
-// import utest._
+import ammonite.TestRepl
+import org.scalatest.FreeSpec
 
-// object FailureTests extends TestSuite {
-//   val tests = TestSuite {
-//     println("FailureTests")
-//     val check = new TestRepl()
-//     'compileFailure {
-//       check.session("""
-//         @ doesnt_exist
-//         error: not found: value doesnt_exist
+class FailureTests extends FreeSpec {
 
-//         @ java
-//         error: package java is not a value
+  def check = new TestRepl()
 
-//         @ 1 + vale
-//         error: not found: value vale
-//         val res0 = 1 + vale
-//                        ^
-//         Compilation Failed
+  "compileFailure" in {
+    check.session("""
+        @ doesnt_exist
+        error: not found: value doesnt_exist
 
-//         @ val x = 1 + vale
-//         error: not found: value vale
-//         val x = 1 + vale
-//                     ^
-//         Compilation Failed
-//       """)
-//     }
-//     'compilerCrash {
-//       // Make sure compiler crashes provide the appropiate error
-//       // messaging, and the REPL continues functioning after
-//       check.session("""
-//         @ val x = 1
-//         x: Int = 1
+        @ java
+        error: package java is not a value
 
-//         @ /* trigger compiler crash */ trait Bar { super[Object].hashCode }
-//         error: java.lang.AssertionError: assertion failed
+        @ 1 + vale
+        error: not found: value vale
+        val res0 = 1 + vale
+                       ^
+        Compilation Failed
 
-//         @ 1 + x
-//         res1: Int = 2
-//       """)
-//     }
-//     'ivyFail {
-//       check.session("""
-//         @ import $ivy.`com.lihaoyi::upickle:0.1.12312-DOESNT-EXIST`
-//         error: failed to resolve ivy dependencies
-//       """)
-//     }
+        @ val x = 1 + vale
+        error: not found: value vale
+        val x = 1 + vale
+                    ^
+        Compilation Failed
+      """)
+  }
 
-//     'exceptionHandling {
-//       check.fail("""throw new Exception("lol", new Exception("hoho"))""",
-//                  x =>
-//                    // It contains the things we want
-//                    x.contains("java.lang.Exception: lol") &&
-//                      x.contains("java.lang.Exception: hoho") &&
-//                      // and none of the stuff we don't want
-//                      x.lines.length == 6 &&
-//                      !x.contains("Something unexpected went wrong =("))
-//     }
-//   }
-// }
+  "compilerCrash" in {
+    // Make sure compiler crashes provide the appropiate error
+    // messaging, and the REPL continues functioning after
+    check.session("""
+        @ val x = 1
+        x: Int = 1
+
+        @ /* trigger compiler crash */ trait Bar { super[Object].hashCode }
+        error: java.lang.AssertionError: assertion failed
+
+        @ 1 + x
+        res1: Int = 2
+      """)
+  }
+
+  "ivyFail" in {
+    check.session("""
+        @ import $ivy.`com.lihaoyi::upickle:0.1.12312-DOESNT-EXIST`
+        error: failed to resolve ivy dependencies
+      """)
+  }
+
+  "exceptionHandling" in {
+    check.fail("""throw new Exception("lol", new Exception("hoho"))""",
+               x =>
+                 // It contains the things we want
+                 x.contains("java.lang.Exception: lol") &&
+                   x.contains("java.lang.Exception: hoho") &&
+                   // and none of the stuff we don't want
+                   x.lines.length == 6 &&
+                   !x.contains("Something unexpected went wrong =("))
+  }
+
+}
