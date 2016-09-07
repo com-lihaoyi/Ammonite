@@ -1,169 +1,170 @@
-// package ammonite.session
+package ammonite.session
 
-// import ammonite.TestRepl
-// import ammonite.runtime.tools.IvyThing
-// import utest._
+import ammonite.TestRepl
+import ammonite.runtime.tools.IvyThing
+import org.scalatest.FreeSpec
 
-// object ImportHookTests extends TestSuite {
+class ImportHookTests extends FreeSpec {
 
-//   val tests = TestSuite {
-//     println("ImportHookTests")
-//     val check = new TestRepl()
-//     'repl {
-//       'file {
-//         'basic - check.session("""
-//           @ import $file.src.test.resources.importHooks.Basic
+    def check = new TestRepl()
+    
+    "repl" - {
+      "file" - {
+        "basic" in check.session("""
+          @ import $file.src.test.resources.importHooks.Basic
 
-//           @ Basic.basicValue
-//           res1: Int = 31337
-//         """)
+          @ Basic.basicValue
+          res1: Int = 31337
+        """)
 
-//         'inline - check.session("""
-//           @ import $file.src.test.resources.importHooks.Basic, Basic.basicValue
+        "inline" in check.session("""
+          @ import $file.src.test.resources.importHooks.Basic, Basic.basicValue
 
-//           @ basicValue
-//           res1: Int = 31337
-//         """)
+          @ basicValue
+          res1: Int = 31337
+        """)
 
-//         'partiallyQualified - check.session("""
-//           @ import $file.src.test.resources.importHooks.Basic
+        "partiallyQualified" in check.session("""
+          @ import $file.src.test.resources.importHooks.Basic
 
-//           @ Basic.basicValue
-//           res1: Int = 31337
-//         """)
+          @ Basic.basicValue
+          res1: Int = 31337
+        """)
 
-//         'multiImport - check.session("""
-//           @ import $file.src.test.resources.importHooks.{Basic, BasicTwo}
+        "multiImport" in check.session("""
+          @ import $file.src.test.resources.importHooks.{Basic, BasicTwo}
 
-//           @ Basic.basicValue
-//           res1: Int = 31337
+          @ Basic.basicValue
+          res1: Int = 31337
 
-//           @ BasicTwo.basicValueTwo
-//           res2: Int = 1337
-//         """)
+          @ BasicTwo.basicValueTwo
+          res2: Int = 1337
+        """)
 
-//         'rename - check.session("""
-//           @ import $file.src.test.resources.importHooks.{Basic, BasicTwo => BasicToo}
+        "rename" in check.session("""
+          @ import $file.src.test.resources.importHooks.{Basic, BasicTwo => BasicToo}
 
-//           @ Basic.basicValue
-//           res1: Int = 31337
+          @ Basic.basicValue
+          res1: Int = 31337
 
-//           @ BasicToo.basicValueTwo
-//           res2: Int = 1337
-//         """)
+          @ BasicToo.basicValueTwo
+          res2: Int = 1337
+        """)
 
-//         'deep - check.session("""
-//           @ import $file.src.test.resources.importHooks.Deep.DeepObject.DeepInner.deepValue
-//           error: Cannot resolve $file import
-//         """)
-//         'deepRenamed - check.session("""
-//           @ import $file.src.test.resources.importHooks.Deep.{DeepObject => DeepRenamed}
-//           error: Cannot resolve $file import
-//          """)
+        "deep" in check.session("""
+          @ import $file.src.test.resources.importHooks.Deep.DeepObject.DeepInner.deepValue
+          error: Cannot resolve $file import
+        """)
 
-//       }
-//       'ivy {
-//         'basic - {
-//           check.session("""
-//             @ import scalatags.Text.all._
-//             error: not found: value scalatags
+        "deepRenamed" in check.session("""
+          @ import $file.src.test.resources.importHooks.Deep.{DeepObject => DeepRenamed}
+          error: Cannot resolve $file import
+         """)
+      }
 
-//             @ import $ivy.`com.lihaoyi::scalatags:0.5.3`
+      "ivy" - {
+        "basic" in {
+          check.session("""
+            @ import scalatags.Text.all._
+            error: not found: value scalatags
 
-//             @ import scalatags.Text.all._
+            @ import $ivy.`com.lihaoyi::scalatags:0.5.3`
 
-//             @ div("Hello").render
-//             res2: String = "<div>Hello</div>"
-//            """)
-//         }
+            @ import scalatags.Text.all._
 
-//         'explicitBinaryVersion - {
-//           check.session(s"""
-//             @ import scalatags.Text.all._
-//             error: not found: value scalatags
+            @ div("Hello").render
+            res2: String = "<div>Hello</div>"
+           """)
+        }
 
-//             @ import $$ivy.`com.lihaoyi:scalatags_${IvyThing.scalaBinaryVersion}:0.5.3`
+        "explicitBinaryVersion" in {
+          check.session(s"""
+            @ import scalatags.Text.all._
+            error: not found: value scalatags
 
-//             @ import scalatags.Text.all._
+            @ import $$ivy.`com.lihaoyi:scalatags_${IvyThing.scalaBinaryVersion}:0.5.3`
 
-//             @ div("Hello").render
-//             res2: String = "<div>Hello</div>"
-//            """)
-//         }
+            @ import scalatags.Text.all._
 
-//         'inline - {
-//           check.session("""
-//             @ import scalatags.Text.all._
-//             error: not found: value scalatags
+            @ div("Hello").render
+            res2: String = "<div>Hello</div>"
+           """)
+        }
 
-//             @ import $ivy.`com.lihaoyi::scalatags:0.5.3`, scalatags.Text.all._
+        "inline" in {
+          check.session("""
+            @ import scalatags.Text.all._
+            error: not found: value scalatags
 
-//             @ div("Hello").render
-//             res1: String = "<div>Hello</div>"
-//            """)
-//         }
-//       }
-//       // 'url{
-//       //   val scriptUrl =
-//       //     "https://raw.githubusercontent.com/lihaoyi/Ammonite/" +
-//       //     "master/amm/src/test/resources/scripts/Annotation.sc"
-//       //   'basic - {
-//       //     check.session(s"""
-//       //     @ import $$url.`$scriptUrl`
-//       //     error: $$url import failed
+            @ import $ivy.`com.lihaoyi::scalatags:0.5.3`, scalatags.Text.all._
 
-//       //     @ import $$url.{`$scriptUrl` => remote}
+            @ div("Hello").render
+            res1: String = "<div>Hello</div>"
+           """)
+        }
+      }
+      // 'url{
+      //   val scriptUrl =
+      //     "https://raw.githubusercontent.com/lihaoyi/Ammonite/" +
+      //     "master/amm/src/test/resources/scripts/Annotation.sc"
+      //   'basic - {
+      //     check.session(s"""
+      //     @ import $$url.`$scriptUrl`
+      //     error: $$url import failed
 
-//       //     @ remote.product(1, List(2, 3, 4))
-//       //     res1: Int = 24
-//       //   """)
-//       //   }
-//       //   'inline - {
-//       //     check.session(s"""
-//       //     @ import $$url.`$scriptUrl`
-//       //     error: $$url import failed
+      //     @ import $$url.{`$scriptUrl` => remote}
 
-//       //     @ import $$url.{`$scriptUrl` => remote}; val x = remote.product(1, List(2, 3, 4))
+      //     @ remote.product(1, List(2, 3, 4))
+      //     res1: Int = 24
+      //   """)
+      //   }
+      //   'inline - {
+      //     check.session(s"""
+      //     @ import $$url.`$scriptUrl`
+      //     error: $$url import failed
 
-//       //     @ x
-//       //     res1: Int = 24
-//       //   """)
-//       //   }
-//       // }
-//     }
-//     'scripts {
-//       'file - check.session("""
-//         @ import $file.src.test.resources.importHooks.FileImport
+      //     @ import $$url.{`$scriptUrl` => remote}; val x = remote.product(1, List(2, 3, 4))
 
-//         @ FileImport.fileImportVal
-//         res1: Int = 31338
-//        """)
+      //     @ x
+      //     res1: Int = 24
+      //   """)
+      //   }
+      // }
+    }
 
-//       'indirectFile - check.session("""
-//         @ import $file.src.test.resources.importHooks.IndirectFileImport
+    "scripts" - {
+      "file" in check.session("""
+        @ import $file.src.test.resources.importHooks.FileImport
 
-//         @ IndirectFileImport.indirectFileImportVal
-//         res1: Int = 31339
-//        """)
+        @ FileImport.fileImportVal
+        res1: Int = 31338
+       """)
 
-//       'ivy - {
-//         check.session("""
-//           @ import $file.src.test.resources.importHooks.IvyImport
+      "indirectFile" in check.session("""
+        @ import $file.src.test.resources.importHooks.IndirectFileImport
 
-//           @ IvyImport.rendered
-//           res1: String = "<div>Moo</div>"
-//          """)
-//       }
+        @ IndirectFileImport.indirectFileImportVal
+        res1: Int = 31339
+       """)
 
-//       'deepImport - check.session("""
-//         @ import $file.src.test.resources.importHooks.DeepImport.deepValueImported
-//         error: Cannot resolve $file import
+      "ivy" in {
+        check.session("""
+          @ import $file.src.test.resources.importHooks.IvyImport
 
-//         @ import $file.src.test.resources.importHooks.DeepImport,DeepImport.deepValueImported
+          @ IvyImport.rendered
+          res1: String = "<div>Moo</div>"
+         """)
+      }
 
-//         @ deepValueImported
-//         res1: String = "deeeep"
-//       """)
-//     }
-//   }
-// }
+      "deepImport" in check.session("""
+        @ import $file.src.test.resources.importHooks.DeepImport.deepValueImported
+        error: Cannot resolve $file import
+
+        @ import $file.src.test.resources.importHooks.DeepImport,DeepImport.deepValueImported
+
+        @ deepValueImported
+        res1: String = "deeeep"
+      """)
+    }
+  
+}
