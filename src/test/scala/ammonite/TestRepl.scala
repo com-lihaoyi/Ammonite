@@ -4,7 +4,7 @@ import ammonite.runtime.Storage
 import ammonite.repl.Repl
 import ammonite.kernel.ReplKernel
 import ammonite.util._
-import utest.asserts._
+import org.scalatest.Assertions._
 
 import scala.collection.mutable
 
@@ -44,23 +44,15 @@ class TestRepl {
   def session(sess: String): Unit = {
     // Remove the margin from the block and break
     // it into blank-line-delimited steps
-    val margin =
-      sess.lines.filter(_.trim != "").map(_.takeWhile(_ == ' ').length).min
+    val margin = sess.lines.filter(_.trim != "").map(_.takeWhile(_ == ' ').length).min
     // Strip margin & whitespace
 
-    val steps = sess
-      .replace(
-        Util.newLine + margin,
-        Util.newLine
-      )
-      .replaceAll(" *\n", "\n")
-      .split("\n\n")
+    val steps = sess.replace(Util.newLine + margin, Util.newLine).replaceAll(" *\n", "\n").split("\n\n")
 
     for ((step, index) <- steps.zipWithIndex) {
       // Break the step into the command lines, starting with @,
       // and the result lines
-      val (cmdLines, resultLines) =
-        step.lines.map(_.drop(margin)).partition(_.startsWith("@"))
+      val (cmdLines, resultLines) = step.lines.map(_.drop(margin)).partition(_.startsWith("@"))
 
       val commandText = cmdLines.map(_.stripPrefix("@ ")).toVector
 
@@ -108,8 +100,7 @@ class TestRepl {
         processed match {
           case Res.Success(str) =>
             // Strip trailing whitespace
-            def normalize(s: String) =
-              s.lines.map(_.replaceAll(" *$", "")).mkString(Util.newLine).trim()
+            def normalize(s: String) = s.lines.map(_.replaceAll(" *$", "")).mkString(Util.newLine).trim()
             failLoudly(
               assert {
                 identity(error)

@@ -269,6 +269,7 @@ object Compiler {
       this.infoLogger = printer.info
       val singleFile = makeFile(src, fileName)
       this.importsLen = importsLen0
+
       val run = new compiler.Run()
       vd.clear()
 
@@ -290,6 +291,7 @@ object Compiler {
         }
 
         val imports = lastImports.toList
+
         Some((files, Imports(imports)))
 
       }
