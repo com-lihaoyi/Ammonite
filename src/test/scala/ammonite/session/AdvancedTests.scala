@@ -78,18 +78,18 @@ class AdvancedTests extends FreeSpec {
 
   }
 
-  "predefSettings" in {
-    val check2 = new TestRepl {
-      override def predef = """
-          repl.compiler.settings.Xexperimental.value = true
-        """
-    }
-    check2.session("""
-        @ repl.compiler.settings.Xexperimental.value
-        res0: Boolean = true
-      """)
+  // "predefSettings" in {
+  //   val check2 = new TestRepl {
+  //     override def predef = """
+  //         repl.compiler.settings.Xexperimental.value = true
+  //       """
+  //   }
+  //   check2.session("""
+  //       @ repl.compiler.settings.Xexperimental.value
+  //       res0: Boolean = true
+  //     """)
 
-  }
+  // }
 
   "macros" in {
     check.session("""

@@ -5,7 +5,7 @@ import ammonite.util.Util.newLine
 import pprint.{Config, PPrint}
 
 import scala.reflect.runtime.universe._
-import ammonite.runtime.{APIHolder, History, ReplExit}
+import ammonite.runtime.{APIHolder, ReplExit}
 
 trait ReplAPI {
 
@@ -19,23 +19,11 @@ trait ReplAPI {
     */
   def exit(value: Any) = throw ReplExit(value)
 
-  /**
-    * History of commands that have been entered into the shell, including
-    * previous sessions
-    */
-  def fullHistory: History
-
-  /**
-    * History of commands that have been entered into the shell during the
-    * current session
-    */
-  def history: History
-
-  /**
-    * Get the `Type` object of [[T]]. Useful for finding
-    * what its methods are and what you can do with it
-    */
-  def typeOf[T: WeakTypeTag]: Type
+  // /**
+  //   * Get the `Type` object of [[T]]. Useful for finding
+  //   * what its methods are and what you can do with it
+  //   */
+  // def typeOf[T: WeakTypeTag]: Type
 
   /**
     * Get the `Type` object representing the type of `t`. Useful
@@ -43,21 +31,6 @@ trait ReplAPI {
     *
     */
   def typeOf[T: WeakTypeTag](t: => T): Type
-
-  /**
-    * Throw away the current scala.tools.nsc.Global and get a new one
-    */
-  def newCompiler(): Unit
-
-  /**
-    * Access the compiler to do crazy things if you really want to!
-    */
-  def compiler: scala.tools.nsc.Global
-
-  /**
-    * Show all the imports that are used to execute commands going forward
-    */
-  def imports: String
 
   /**
     * Controls how things are pretty-printed in the REPL. Feel free

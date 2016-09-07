@@ -87,6 +87,10 @@ class TestRepl {
           case Res.Success(_) => // do nothing
           case Res.Skip => // do nothing
           case _: Res.Failing =>
+            println(identity(error))
+            println(identity(warning))
+            println(identity(out))
+            println(identity(info))
             assert {
               identity(error)
               identity(warning)

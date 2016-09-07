@@ -5,11 +5,9 @@ import ammonite.util.Util._
 import ammonite.util._
 import pprint.{Config, PPrint}
 
-class ReplApiImpl(val interp: Interpreter, history0: => History) extends DefaultReplAPI {
+class ReplApiImpl(val interp: Interpreter) extends DefaultReplAPI {
 
   import interp._
-
-  def imports = Preprocessor.importBlock(eval.frames.head.imports)
 
   implicit lazy val pprintConfig: Ref[pprint.Config] = {
     Ref.live[pprint.Config](() => pprint.Config.apply())
@@ -28,13 +26,5 @@ class ReplApiImpl(val interp: Interpreter, history0: => History) extends Default
     pprint.tokenize(t, width, height, indent, colors)(implicitly[PPrint[T]], cfg).foreach(printer.out)
     printer.out(newLine)
   }
-
-  def search(target: scala.reflect.runtime.universe.Type) = {
-    interp.compiler.search(target)
-  }
-  def compiler = interp.compiler.compiler
-  def newCompiler() = init()
-  def fullHistory = storage.fullHistory()
-  def history = history0
 
 }
