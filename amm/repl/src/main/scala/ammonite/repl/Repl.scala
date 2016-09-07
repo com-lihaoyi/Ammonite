@@ -3,7 +3,6 @@ package ammonite.repl
 import ammonite.util.Util.newLine
 import ammonite.util._
 
-
 object Repl {
   val pprintPredef =
     "import ammonite.repl.ReplBridge.value.{pprintConfig, derefPPrint}"

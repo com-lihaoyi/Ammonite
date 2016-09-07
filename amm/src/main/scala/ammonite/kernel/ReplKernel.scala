@@ -5,10 +5,7 @@ import fastparse.core.{Parsed, ParseError}
 import ammonite.util._
 import ammonite.repl._
 
-class ReplKernel(printer: PrinterX,
-                 storage: Storage,
-                 predefs: Seq[(Name, String)],
-                 wd: ammonite.ops.Path) {
+class ReplKernel(printer: PrinterX, storage: Storage, predefs: Seq[(Name, String)], wd: ammonite.ops.Path) {
 
   var history = new History(Vector())
 
@@ -28,16 +25,17 @@ class ReplKernel(printer: PrinterX,
   )
 
   def process(code: String) = Parsers.Splitter.parse(code) match {
-    case Parsed.Success(statements, _) => 
-      val processed = interp.processLine(statements, s"Main${interp.eval.getCurrentLine}.sc")
+    case Parsed.Success(statements, _) =>
+      val processed =
+        interp.processLine(statements, s"Main${interp.eval.getCurrentLine}.sc")
       interp.handleOutput(processed)
       processed
-    case Parsed.Failure(_, index, extra) => 
+    case Parsed.Failure(_, index, extra) =>
       Res.Failure(None, ParseError.msg(extra.input, extra.traced.expected, index))
   }
- 
+
   def complete(text: String, position: Int) = {
     interp.pressy.complete(text, position, Preprocessor.importBlock(interp.eval.frames.head.imports))
-  } 
+  }
 
 }

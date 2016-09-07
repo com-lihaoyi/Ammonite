@@ -79,7 +79,7 @@ object Imports {
     val stompedTerms = mutable.Set.empty[Name]
     val out = mutable.Buffer.empty[ImportData]
     for (data <- importData.reverseIterator) {
-      val stomped = (data.importType : @unchecked) match {
+      val stomped = (data.importType: @unchecked) match {
         case ImportData.Term => Seq(stompedTerms)
         case ImportData.Type => Seq(stompedTypes)
         case ImportData.TermType => Seq(stompedTerms, stompedTypes)
@@ -369,7 +369,8 @@ object Bind {
   */
 class Printer(val warning: String => Unit, val error: String => Unit, val info: String => Unit)
 
-class PrinterX(val out: String => Unit, warning: String => Unit, error: String => Unit, info: String => Unit) extends Printer(warning, error, info)
+class PrinterX(val out: String => Unit, warning: String => Unit, error: String => Unit, info: String => Unit)
+    extends Printer(warning, error, info)
 
 case class ImportTree(prefix: Seq[String], mappings: Option[ImportTree.ImportMapping], start: Int, end: Int)
 

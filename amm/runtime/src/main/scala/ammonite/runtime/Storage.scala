@@ -168,7 +168,7 @@ object Storage {
         val fileData = { ammonite.ops.read(path) }
         val parsed = { upickle.default.read(fileData) }
         Some(parsed)
-      } catch { case e : Throwable => None }
+      } catch { case e: Throwable => None }
     }
 
     def classFilesListLoad(pkg: String, wrapper: String, cacheTag: String): Option[CacheOutput] = {

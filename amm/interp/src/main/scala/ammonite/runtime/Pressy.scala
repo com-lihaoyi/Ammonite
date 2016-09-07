@@ -20,42 +20,42 @@ class Pressy(nscGen: => nsc.interactive.Global) {
 
   private lazy val nscGlobal = nscGen
 
-   /**
-      * Ask for autocompletion at a particular spot in the code, returning
-      * possible things that can be completed at that location. May try various
-      * different completions depending on where the `index` is placed, but
-      * the outside caller probably doesn't care.
-      */
-    def complete(snippet: String, snippetIndex: Int, previousImports: String) = {
-      val prefix = previousImports + newLine + "object AutocompleteWrapper{" + newLine
-      val suffix = newLine + "}"
-      val allCode = prefix + snippet + suffix
-      val index = snippetIndex + prefix.length
+  /**
+    * Ask for autocompletion at a particular spot in the code, returning
+    * possible things that can be completed at that location. May try various
+    * different completions depending on where the `index` is placed, but
+    * the outside caller probably doesn't care.
+    */
+  def complete(snippet: String, snippetIndex: Int, previousImports: String) = {
+    val prefix = previousImports + newLine + "object AutocompleteWrapper{" + newLine
+    val suffix = newLine + "}"
+    val allCode = prefix + snippet + suffix
+    val index = snippetIndex + prefix.length
 
-      val currentFile = new BatchSourceFile(Compiler.makeFile(allCode.getBytes, name = "Current.sc"), allCode)
+    val currentFile = new BatchSourceFile(Compiler.makeFile(allCode.getBytes, name = "Current.sc"), allCode)
 
-      val r = new Response[Unit]
-      nscGlobal.askReload(List(currentFile), r)
-      r.get.fold(x => x, e => throw e)
+    val r = new Response[Unit]
+    nscGlobal.askReload(List(currentFile), r)
+    r.get.fold(x => x, e => throw e)
 
-      val run = Try(new Run(nscGlobal, currentFile, allCode, index))
+    val run = Try(new Run(nscGlobal, currentFile, allCode, index))
 
-      val (i, all): (Int, Seq[(String, Option[String])]) = run match {
-        case Success(runSuccess) => runSuccess.prefixed
-        case Failure(throwable) => (0, Seq.empty)
-      }
-
-      val allNames = all.collect { case (name, None) => name }.sorted.distinct
-
-      val signatures =
-        all.collect { case (name, Some(defn)) => defn }.sorted.distinct
-
-      (i - prefix.length, allNames, signatures)
+    val (i, all): (Int, Seq[(String, Option[String])]) = run match {
+      case Success(runSuccess) => runSuccess.prefixed
+      case Failure(throwable) => (0, Seq.empty)
     }
 
-    def shutdownPressy() = {
-      nscGlobal.askShutdown()
-    }
+    val allNames = all.collect { case (name, None) => name }.sorted.distinct
+
+    val signatures =
+      all.collect { case (name, Some(defn)) => defn }.sorted.distinct
+
+    (i - prefix.length, allNames, signatures)
+  }
+
+  def shutdownPressy() = {
+    nscGlobal.askShutdown()
+  }
 }
 
 object Pressy {
@@ -137,15 +137,16 @@ object Pressy {
       (position + offset, handleCompletion(r, prefix))
     }
 
-    private def handleCompletion(r: List[pressy.Member], prefix: String) = pressy.ask { () =>
-      r.filter(_.sym.name.decoded.startsWith(prefix)).filter(m => !blacklisted(m.sym)).map { x =>
-        (
-          x.sym.name.decoded,
-          if (x.sym.name.decoded != prefix) None
-          else Some(x.sym.defString)
-        )
+    private def handleCompletion(r: List[pressy.Member], prefix: String) =
+      pressy.ask { () =>
+        r.filter(_.sym.name.decoded.startsWith(prefix)).filter(m => !blacklisted(m.sym)).map { x =>
+          (
+            x.sym.name.decoded,
+            if (x.sym.name.decoded != prefix) None
+            else Some(x.sym.defString)
+          )
+        }
       }
-    }
 
     def prefixed: (Int, Seq[(String, Option[String])]) = tree match {
       case t @ pressy.Select(qualifier, name) =>

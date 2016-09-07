@@ -34,17 +34,18 @@ class TestRepl {
   val storage = new Storage.Folder(tempDir)
 
   val predefs = Seq(
-        Name("pprintPredef") -> Repl.pprintPredef,
-        Name("defaultPredef") -> ammonite.main.Defaults.predefString,
-        Name("testPredef") -> predef
-      )
+    Name("pprintPredef") -> Repl.pprintPredef,
+    Name("defaultPredef") -> ammonite.main.Defaults.predefString,
+    Name("testPredef") -> predef
+  )
 
   val kernel = new ReplKernel(printer, storage, predefs, ammonite.ops.pwd)
 
   def session(sess: String): Unit = {
     // Remove the margin from the block and break
     // it into blank-line-delimited steps
-    val margin = sess.lines.filter(_.trim != "").map(_.takeWhile(_ == ' ').length).min
+    val margin =
+      sess.lines.filter(_.trim != "").map(_.takeWhile(_ == ' ').length).min
     // Strip margin & whitespace
 
     val steps = sess
@@ -58,7 +59,8 @@ class TestRepl {
     for ((step, index) <- steps.zipWithIndex) {
       // Break the step into the command lines, starting with @,
       // and the result lines
-      val (cmdLines, resultLines) = step.lines.map(_.drop(margin)).partition(_.startsWith("@"))
+      val (cmdLines, resultLines) =
+        step.lines.map(_.drop(margin)).partition(_.startsWith("@"))
 
       val commandText = cmdLines.map(_.stripPrefix("@ ")).toVector
 

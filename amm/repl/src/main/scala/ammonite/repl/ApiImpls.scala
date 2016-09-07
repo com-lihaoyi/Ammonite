@@ -50,11 +50,8 @@ class SessionApiImpl(eval: Evaluator) extends Session {
   save()
 }
 
-class ReplApiImpl(val interp: Interpreter,
-                  history0: => History,
-                  sess0: Session)
-    extends DefaultReplAPI {
-      
+class ReplApiImpl(val interp: Interpreter, history0: => History, sess0: Session) extends DefaultReplAPI {
+
   import interp._
 
   def imports = Preprocessor.importBlock(eval.frames.head.imports)

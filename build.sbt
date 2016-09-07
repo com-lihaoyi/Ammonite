@@ -30,12 +30,17 @@ val sharedSettings = Seq(
   organization := "com.lihaoyi",
   version := _root_.ammonite.Constants.version,
   libraryDependencies ++= Seq(
-     "org.scala-lang" % "scala-compiler" % scalaVersion.value % "provided",
-     "org.scalatest" %% "scalatest" % "3.0.0" % "test",
+    "org.scala-lang" % "scala-compiler" % scalaVersion.value % "provided",
+    "org.scalatest" %% "scalatest" % "3.0.0" % "test",
     "com.lihaoyi" %% "utest" % "0.4.3" % "test"),
   scalafmtConfig := Some(file(".scalafmt")),
   testFrameworks ++= Seq(new TestFramework("utest.runner.Framework")),
-  scalacOptions ++= Seq("-target:jvm-1.7", "-Ywarn-unused", "-Ywarn-unused-import", "-Ywarn-inaccessible", "-Ywarn-dead-code", "-Xlint"),
+  scalacOptions ++= Seq("-target:jvm-1.7",
+                        "-Ywarn-unused",
+                        "-Ywarn-unused-import",
+                        "-Ywarn-inaccessible",
+                        "-Ywarn-dead-code",
+                        "-Xlint"),
   autoCompilerPlugins := true,
   ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) },
   parallelExecution in Test := !scalaVersion.value.contains("2.10"),
@@ -140,10 +145,7 @@ lazy val ammInterp = project
 
 lazy val ammRepl = project
   .in(file("amm/repl"))
-  .dependsOn(
-    ammUtil, 
-    ammRuntime, 
-    ammInterp)
+  .dependsOn(ammUtil, ammRuntime, ammInterp)
   .settings(
     sharedSettings,
     crossVersion := CrossVersion.full,
@@ -208,12 +210,5 @@ lazy val sshd = project
 
 lazy val published = project
   .in(file("target/published"))
-  .aggregate(ops,
-             shell,
-             amm,
-             sshd,
-             ammUtil,
-             ammRuntime,
-             ammInterp,
-             ammRepl)
+  .aggregate(ops, shell, amm, sshd, ammUtil, ammRuntime, ammInterp, ammRepl)
   .settings(dontPublishSettings)

@@ -177,7 +177,7 @@ object ImportHook {
         jars <- {
           try Res.Success(interp.loadIvy((a, b, c)))
           catch {
-            case ex : Throwable => Res.Exception(ex, "")
+            case ex: Throwable => Res.Exception(ex, "")
           }
         }
       } yield jars

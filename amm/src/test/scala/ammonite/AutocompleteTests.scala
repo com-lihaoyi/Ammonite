@@ -7,14 +7,12 @@ import org.scalatest.FreeSpec
 class AutocompleteTests extends FreeSpec {
 
   val check = new TestRepl()
-  def complete(caretCode: String,
-               cmp: (Set[String]) => Set[String],
-               sigs: (Set[String]) => Set[String] = _ => Set()) = {
+  def complete(caretCode: String, cmp: (Set[String]) => Set[String], sigs: (Set[String]) => Set[String] = _ => Set()) = {
     val cursor = caretCode.indexOf("<caret>")
     val buf = caretCode.replace("<caret>", "")
 
     val (_, completions, signatures) = check.kernel.complete(buf, cursor)
-    if(signatures.nonEmpty){
+    if (signatures.nonEmpty) {
       println(s"autocomplete called with $caretCode resulting in completions: $completions, signatures: $signatures")
     }
     val left = cmp(completions.toSet)
@@ -41,7 +39,7 @@ class AutocompleteTests extends FreeSpec {
   }
 
   "AutocompleteTests" - {
-    
+
     "import" in {
       //complete("""import <caret>""", Set("java", "javax", "scala") -- _)
       complete("""import j<caret>""", Set("java", "javax", "jline", "jawn") -- _)
@@ -91,15 +89,15 @@ class AutocompleteTests extends FreeSpec {
     }
 
     "dot" in {
-      
-        complete("""java.math.<caret>""", Set("MathContext", "BigDecimal", "BigInteger", "RoundingMode") ^)
 
-        complete("""scala.Option.<caret>""", (anyCompletion ++ Set("apply", "empty")) ^)
+      complete("""java.math.<caret>""", Set("MathContext", "BigDecimal", "BigInteger", "RoundingMode") ^)
 
-        complete("""Seq(1, 2, 3).map(_.<caret>)""", (anyCompletion ++ Set("+", "-", "*", "/")) -- _)
+      complete("""scala.Option.<caret>""", (anyCompletion ++ Set("apply", "empty")) ^)
 
-        complete("""val x = 1; x + (x.<caret>)""", Set("-", "+", "*", "/") -- _)
-      
+      complete("""Seq(1, 2, 3).map(_.<caret>)""", (anyCompletion ++ Set("+", "-", "*", "/")) -- _)
+
+      complete("""val x = 1; x + (x.<caret>)""", Set("-", "+", "*", "/") -- _)
+
     }
 
     "deep" in {
@@ -134,5 +132,5 @@ class AutocompleteTests extends FreeSpec {
       complete("""new Array<caret>""", Set() ^)
     }
   }
-  
+
 }

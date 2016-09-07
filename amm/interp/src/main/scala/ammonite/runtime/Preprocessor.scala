@@ -105,7 +105,7 @@ object Preprocessor {
         for {
           Preprocessor.Expanded(code, printer) <- expandStatements(stmts, resultIndex)
         } yield {
-           val (wrappedCode, importsLength) = wrapCode(
+          val (wrappedCode, importsLength) = wrapCode(
             pkgName,
             indexedWrapperName,
             leadingSpaces + code,

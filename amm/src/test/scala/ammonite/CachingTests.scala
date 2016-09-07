@@ -8,7 +8,6 @@ import ammonite.TestUtils._
 //import utest._
 import org.scalatest.FreeSpec
 
-
 class CachingTests extends FreeSpec {
 
   val scriptPath = pwd / 'src / 'test / 'resources / 'scripts
@@ -29,8 +28,9 @@ class CachingTests extends FreeSpec {
         case e: Exception => assert(false)
       }
     }
-    "blocks" in  {
-      val cases = Seq("OneBlock.sc" -> 2, "TwoBlocks.sc" -> 3, "ThreeBlocks.sc" -> 4)
+    "blocks" in {
+      val cases =
+        Seq("OneBlock.sc" -> 2, "TwoBlocks.sc" -> 3, "ThreeBlocks.sc" -> 4)
       for ((fileName, expected) <- cases) {
         val storage = Storage.InMemory()
         val interp = createTestInterp(storage)
@@ -64,7 +64,7 @@ class CachingTests extends FreeSpec {
       }
 
       "testOne" in check('scriptLevelCaching / "scriptTwo.sc")
-      "testTwo" in  check('scriptLevelCaching / "scriptOne.sc")
+      "testTwo" in check('scriptLevelCaching / "scriptOne.sc")
       "testThree" in check('scriptLevelCaching / "QuickSort.sc")
       "testLoadModule" in check('scriptLevelCaching / "testLoadModule.sc")
       "testFileImport" in check('scriptLevelCaching / "testFileImport.sc")
@@ -76,17 +76,17 @@ class CachingTests extends FreeSpec {
       val numFile = pwd / 'target / 'test / 'resources / 'scriptLevelCaching / "num.value"
       rm(numFile)
       write(numFile, "1")
-      val interp1 = createTestInterp(storage,Defaults.predefString)
+      val interp1 = createTestInterp(storage, Defaults.predefString)
       assertThrows[java.lang.ArithmeticException] {
         interp1.interpApi.load.module(resourcesPath / 'scriptLevelCaching / "runTimeExceptions.sc")
       }
-      val interp2 = createTestInterp(storage,Defaults.predefString)
+      val interp2 = createTestInterp(storage, Defaults.predefString)
       assertThrows[java.lang.ArithmeticException] {
         interp2.interpApi.load.module(resourcesPath / 'scriptLevelCaching / "runTimeExceptions.sc")
       }
     }
 
-  "persistence" in {
+    "persistence" in {
 
       val tempDir = ammonite.ops.Path(
         java.nio.file.Files.createTempDirectory("ammonite-tester-x")
@@ -113,7 +113,7 @@ class CachingTests extends FreeSpec {
       assert(n == 5) // customLolz predef + two blocks for each loaded file
     }
 
-       "changeScriptInvalidation" in {
+    "changeScriptInvalidation" in {
       // This makes sure that the compile caches are properly utilized, and
       // flushed, in a variety of circumstances: changes to the number of
       // blocks in the predef, predefs containing magic imports, and changes
