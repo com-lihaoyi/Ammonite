@@ -60,7 +60,33 @@ object SessionTests extends TestSuite{
         src
         target
       """)
+    }
 
+    'cdIntoDirSymlink {
+      check.session(
+        s"""
+        @ import ammonite.ops._
+
+        @ interp.load.module($bareSrc)
+
+        @ rm! 'destSymLink
+
+        @ val originalWd = wd
+
+        @ val srcDir0 = tmp.dir()
+
+        @ ln.s!(srcDir0)! 'destSymLink
+
+        @ cd! 'destSymLink
+
+        @ assert(srcDir0.name == wd.name)
+
+        @ rm! 'destSymLink
+
+        @ cd! up
+
+        @ rm! srcDir0
+      """)
     }
   }
 }
