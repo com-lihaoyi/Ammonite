@@ -7,9 +7,7 @@ import ammonite.repl._
 
 class ReplKernel(printer: PrinterX, storage: Storage, predefs: Seq[(Name, String)], wd: ammonite.ops.Path) {
 
-  var history = new History(Vector())
-
-  val interp: Interpreter = new Interpreter(
+  private val interp: Interpreter = new Interpreter(
     printer,
     storage,
     predefs,

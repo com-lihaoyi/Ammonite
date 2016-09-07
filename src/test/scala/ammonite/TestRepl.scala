@@ -68,7 +68,7 @@ class TestRepl {
       allOutput += commandText.map(Util.newLine + "@ " + _).mkString(Util.newLine)
 
       val (processed, out, warning, error, info) = run(commandText.mkString(Util.newLine))
-      kernel.interp.handleOutput(processed)
+//      kernel.interp.handleOutput(processed)
 
       if (expected.startsWith("error: ")) {
         val strippedExpected = expected.stripPrefix("error: ")
