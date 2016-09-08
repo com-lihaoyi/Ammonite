@@ -19,7 +19,7 @@ case class ShellSession() extends OpsAPI {
    * gets appended on to the current `wd`, if it's absolute it replaces.
    */
   val cd = (arg: Path) => {
-    if (!stat(arg.followLinks).isDir) throw new NotDirectoryException(arg.toString)
+    if (!stat(arg).isDir) throw new NotDirectoryException(arg.toString)
     else {
       wd0 = arg
       wd0

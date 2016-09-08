@@ -287,8 +287,6 @@ extends FilePath with BasePathImpl with Readable{
     RelPath(segments.drop(s2.length), newUps)
   }
 
-  def followLinks = Path(toIO.getCanonicalPath)
-
   def toIO = toNIO.toFile
 
   override def getBytes = java.nio.file.Files.readAllBytes(toNIO)
