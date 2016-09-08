@@ -1038,7 +1038,7 @@ target
 terminal
 .travis.yml
 
-real	0m0.002s
+real	0m0.001s
 user	0m0.000s
 sys	0m0.001s</pre><pre><span>Compiling HardcodedPredef.sc
 Compiling ArgsPredef.sc
@@ -1056,7 +1056,7 @@ Welcome to the Ammonite Repl 0.7.6
 </span><span style="color: #27ae60;">'LICENSE</span><span>            </span><span style="color: #27ae60;">'deploy_key</span><span>         </span><span style="color: #27ae60;">'readme</span><span>             </span><span style="color: #27ae60;">'terminal</span><span>
 </span><span style="color: #27ae60;">'amm</span><span>                </span><span style="color: #27ae60;">'integration</span><span>        </span><span style="color: #27ae60;">&quot;readme.md&quot;</span><span>
 ,
-  38262317 nanoseconds
+  51932898 nanoseconds
 )</span></pre></div>
 
           <p>
@@ -3341,11 +3341,11 @@ ops/src/main/scala/ammonite
 ops/src/main/scala/ammonite/ops
 ops/src/main/scala/ammonite/ops/Extensions.scala
 ops/src/main/scala/ammonite/ops/FileOps.scala
-ops/src/main/scala/ammonite/ops/Model.scala
 ops/src/main/scala/ammonite/ops/Path.scala
 ops/src/main/scala/ammonite/ops/PathUtils.scala
 ops/src/main/scala/ammonite/ops/Shellout.scala
-ops/src/main/scala/ammonite/ops/package.scala</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>ls.rec! </span><span style="color: #27ae60;">'ops</span><span>/</span><span style="color: #27ae60;">'src</span><span>/</span><span style="color: #27ae60;">'main</span><span> 
+ops/src/main/scala/ammonite/ops/package.scala
+ops/src/main/scala/ammonite/ops/Model.scala</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>ls.rec! </span><span style="color: #27ae60;">'ops</span><span>/</span><span style="color: #27ae60;">'src</span><span>/</span><span style="color: #27ae60;">'main</span><span> 
 </span><span style="color: #16a085;">res0</span><span>: </span><span style="color: #27ae60;">LsSeq</span><span> = 
 </span><span style="color: #27ae60;">'scala</span><span>
 </span><span style="color: #27ae60;">'scala/'ammonite</span><span>
@@ -3456,11 +3456,11 @@ ls.rec! wd/</span><span style="color: #27ae60;">'amm</span><span>/</span><span s
 bash$ </span>find ./ops/src/main -name '*.scala' | xargs wc -l
   143 ./ops/src/main/scala/ammonite/ops/Extensions.scala
   418 ./ops/src/main/scala/ammonite/ops/FileOps.scala
-  137 ./ops/src/main/scala/ammonite/ops/Model.scala
   369 ./ops/src/main/scala/ammonite/ops/Path.scala
   101 ./ops/src/main/scala/ammonite/ops/PathUtils.scala
   198 ./ops/src/main/scala/ammonite/ops/Shellout.scala
   121 ./ops/src/main/scala/ammonite/ops/package.scala
+  137 ./ops/src/main/scala/ammonite/ops/Model.scala
  1487 total</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>
 ls.rec! wd/</span><span style="color: #27ae60;">'ops</span><span>/</span><span style="color: #27ae60;">'src</span><span>/</span><span style="color: #27ae60;">'main</span><span> |? (</span><span style="color: #f39c12;">_</span><span>.ext == </span><span style="color: #27ae60;">&quot;scala&quot;</span><span>) | read.lines | (</span><span style="color: #f39c12;">_</span><span>.size) sum 
 </span><span style="color: #16a085;">res0</span><span>: </span><span style="color: #27ae60;">Int</span><span> = </span><span style="color: #27ae60;">1489</span></pre></div>
@@ -3493,15 +3493,15 @@ HELLO
 </p>
       <div><pre><span style="color: #8e44ad;">
 bash$ </span>git branch
-* (detached from 849e5e7)
+* (detached from 2ab8633)
   master</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>%git </span><span style="color: #27ae60;">'branch</span><span> 
-* (detached from 849e5e7)
+* (detached from 2ab8633)
   master
 </span></pre></div>
       <div><pre><span style="color: #8e44ad;">
 bash$ </span>date
-Wed Sep  7 06:23:46 UTC 2016</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>%date 
-Wed Sep  7 06:24:02 UTC 2016
+Thu Sep  8 04:23:29 UTC 2016</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>%date 
+Thu Sep  8 04:23:41 UTC 2016
 </span></pre></div>
 
       <p>
@@ -3693,9 +3693,9 @@ Hello from Java!
 </span><span style="color: #8e44ad;">travis-Ammonite@ </span><span style="color: #f39c12;">import</span><span> java.util.</span><span style="color: #f39c12;">_</span><span> 
 </span><span style="color: #27ae60;">import </span><span style="color: #16a085;">java.util._</span><span>
 </span><span style="color: #8e44ad;">travis-Ammonite@ </span><span style="color: #f39c12;">val</span><span> date = </span><span style="color: #f39c12;">new</span><span> </span><span style="color: #27ae60;">Date</span><span>() 
-</span><span style="color: #16a085;">date</span><span>: </span><span style="color: #27ae60;">Date</span><span> = Wed Sep 07 06:29:22 UTC 2016
+</span><span style="color: #16a085;">date</span><span>: </span><span style="color: #27ae60;">Date</span><span> = Thu Sep 08 04:27:21 UTC 2016
 </span><span style="color: #8e44ad;">travis-Ammonite@ </span><span>date.getDay() 
-</span><span style="color: #16a085;">res3</span><span>: </span><span style="color: #27ae60;">Int</span><span> = </span><span style="color: #27ae60;">3</span></pre>
+</span><span style="color: #16a085;">res3</span><span>: </span><span style="color: #27ae60;">Int</span><span> = </span><span style="color: #27ae60;">4</span></pre>
 
       <p>
         In fact, Ammonite-Shell allows you to ask for any published third-party Java/Scala library for usage in the shell, and have them downloaded, automatically cached, and made available for use. e.g. we can load popular libraries like <a href="https://github.com/google/guava">Google Guava</a> and using it in the shell:
@@ -3714,13 +3714,13 @@ import com.google.common.collect.ImmutableBiMap // Doesn't work
 	found com.google.guava#guava;18.0 in central
 	found com.google.code.findbugs#jsr305;1.3.9 in central
 downloading http://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0.jar ...
-	[SUCCESSFUL ] com.google.guava#guava;18.0!guava.jar(bundle) (258ms)
+	[SUCCESSFUL ] com.google.guava#guava;18.0!guava.jar(bundle) (59ms)
 downloading http://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0-javadoc.jar ...
-	[SUCCESSFUL ] com.google.guava#guava;18.0!guava.jar(javadoc) (179ms)
+	[SUCCESSFUL ] com.google.guava#guava;18.0!guava.jar(javadoc) (36ms)
 downloading http://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0-sources.jar ...
-	[SUCCESSFUL ] com.google.guava#guava;18.0!guava.jar(source) (29ms)
+	[SUCCESSFUL ] com.google.guava#guava;18.0!guava.jar(source) (17ms)
 downloading http://repo1.maven.org/maven2/com/google/code/findbugs/jsr305/1.3.9/jsr305-1.3.9.jar ...
-	[SUCCESSFUL ] com.google.code.findbugs#jsr305;1.3.9!jsr305.jar (29ms)
+	[SUCCESSFUL ] com.google.code.findbugs#jsr305;1.3.9!jsr305.jar (8ms)
 </span><span style="color: #27ae60;">import </span><span style="color: #16a085;">$ivy.$                             // Load from Maven Central</span><span>
 </span><span style="color: #8e44ad;">travis-Ammonite@ </span><span style="color: #f39c12;">import</span><span> com.google.common.collect.ImmutableBiMap </span><span style="color: #2980b9;">// Works now</span><span> 
 </span><span style="color: #27ae60;">import </span><span style="color: #16a085;">com.google.common.collect.ImmutableBiMap // Works now</span><span>
@@ -3741,13 +3741,13 @@ downloading http://repo1.maven.org/maven2/com/google/code/findbugs/jsr305/1.3.9/
 	found joda-time#joda-time;2.8.2 in central
 	found org.joda#joda-convert;1.2 in central
 downloading http://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2-sources.jar ...
-	[SUCCESSFUL ] joda-time#joda-time;2.8.2!joda-time.jar(source) (64ms)
-downloading http://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2.jar ...
-	[SUCCESSFUL ] joda-time#joda-time;2.8.2!joda-time.jar (40ms)
+	[SUCCESSFUL ] joda-time#joda-time;2.8.2!joda-time.jar(source) (39ms)
 downloading http://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2-javadoc.jar ...
-	[SUCCESSFUL ] joda-time#joda-time;2.8.2!joda-time.jar(javadoc) (79ms)
+	[SUCCESSFUL ] joda-time#joda-time;2.8.2!joda-time.jar(javadoc) (18ms)
+downloading http://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2.jar ...
+	[SUCCESSFUL ] joda-time#joda-time;2.8.2!joda-time.jar (11ms)
 downloading http://repo1.maven.org/maven2/org/joda/joda-convert/1.2/joda-convert-1.2.jar ...
-	[SUCCESSFUL ] org.joda#joda-convert;1.2!joda-convert.jar (10ms)
+	[SUCCESSFUL ] org.joda#joda-convert;1.2!joda-convert.jar (15ms)
 </span><span style="color: #27ae60;">import </span><span style="color: #16a085;">$ivy.$                          </span><span>
 </span><span style="color: #8e44ad;">travis-Ammonite@ </span><span style="color: #f39c12;">import</span><span> org.joda.time.{DateTime, Period, Duration} 
 </span><span style="color: #27ae60;">import </span><span style="color: #16a085;">org.joda.time.{DateTime, Period, Duration}</span><span>
@@ -3857,7 +3857,7 @@ downloading http://repo1.maven.org/maven2/org/joda/joda-convert/1.2/joda-convert
 <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="AmmoniteCookbook" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Ammonite Cookbook<a class=" scalatex-site-Styles-headerLink" href="#AmmoniteCookbook" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /><h2 style="font-weight: 300;color: #ccc;padding: 0px;margin-top: 0px;">Fun with Scala-Scriping!</h2></div><div class=" scalatex-site-Styles-content">
   <p>
     The Ammonite Scala REPL and Scripts are meant to be extended: you can load
-    in arbitary Java/Scala modules from the internet via
+    in arbitrary Java/Scala modules from the internet via
     <a href="#import$ivy">import $ivy</a>. Using this third-party code, you
     extend the REPL to do anything you wish to do, and tools like
     <a href="#Ammonite-Shell">Ammonite-Shell</a> are simply modules like any other. Simple
@@ -4024,7 +4024,7 @@ res12: Int = 6</code></pre>
 </p>
   <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="OfficeAutomation" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Office Automation<a class=" scalatex-site-Styles-headerLink" href="#OfficeAutomation" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
     <p>
-      Apart from writing code, you very often find yourself dealing with documents and spreadsheets of various sorts. This is often rather tedious. Wouldn't it be cool if you could deal with these things programmatically? It turns out that there are open-soure Java libraries such as <a href="https://poi.apache.org/">Apache POI</a> that let you do this, and with the Ammonite-REPL you can quickly and easily load these libraries and get to work on your favorite documents. Here's an example extracting some data from my old Resume, in <code>.docx</code> format:
+      Apart from writing code, you very often find yourself dealing with documents and spreadsheets of various sorts. This is often rather tedious. Wouldn't it be cool if you could deal with these things programmatically? It turns out that there are open-source Java libraries such as <a href="https://poi.apache.org/">Apache POI</a> that let you do this, and with the Ammonite-REPL you can quickly and easily load these libraries and get to work on your favorite documents. Here's an example extracting some data from my old Resume, in <code>.docx</code> format:
 </p>
     <pre><code class="scala scalatex-site-Styles-highlightMe">@ import $ivy.`org.apache.poi:poi-ooxml:3.13`
 
@@ -4076,14 +4076,14 @@ res27: Array[String] = Array(
   &quot;http://www.github.com/lihaoyi&quot;
 )</code></pre>
     <p>
-      As you can see, loading the Apache POI library is just a single command, reading in my resume file is just one or two more, and then you can immediate start exploring the document's data model to see what inside interests you. You even get tab-completion on the methods of the document, making it really easy for you to interactively explore all the things that a word document has to offer!</p>
+      As you can see, loading the Apache POI library is just a single command, reading in my resume file is just one or two more, and then you can immediately start exploring the document's data model to see what inside interests you. You even get tab-completion on the methods of the document, making it really easy for you to interactively explore all the things that a word document has to offer!</p>
     <p>
       This is just a small example, but you can easily do more things in the same vein: Apache POI lets you create/modify/save <code>.docx</code> files in addition to reading from them, meaning you can automatically perform batch operations on large numbers of documents. The library also provides mechanisms to load in Excel spreadsheets and Powerpoint slide decks, meaning you have easy, programmable access to the great bulk of any Microsoft-Office files you find yourself dealing with.
 
 </p>
   <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="ImageProcessing" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Image Processing<a class=" scalatex-site-Styles-headerLink" href="#ImageProcessing" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
     <p>
-      You can perform lots of image operations in Java. You can use <a href="https://docs.oracle.com/javase/7/docs/api/java/awt/image/BufferedImage.html">BufferedImagee</a> if you want to access the low-level details or read/write individual pixels, and using <a href="http://zetcode.com/gfx/java2d/">Java2D</a> you can draw shapes, perform transforms, or do anything you could possibly want to do with the images.</p>
+      You can perform lots of image operations in Java. You can use <a href="https://docs.oracle.com/javase/7/docs/api/java/awt/image/BufferedImage.html">BufferedImage</a> if you want to access the low-level details or read/write individual pixels, and using <a href="http://zetcode.com/gfx/java2d/">Java2D</a> you can draw shapes, perform transforms, or do anything you could possibly want to do with the images.</p>
     <p>
       There are also simple libraries like <a href="https://github.com/coobird/thumbnailator">Thumbnailator</a> if you're doing basic things like renaming/resizing/rotating and don't need pixel-per-pixel access. This is an example of using Thumbnailator to resize a folder of images and put them somewhere else:
 </p>
@@ -4124,7 +4124,7 @@ res45: Seq[Long] = List(11129L, 11790L, 11893L)</code></pre>
       The word &quot;Machine Learning&quot; sounds big and intimidating, like something you'd need to spend 6 years getting a PhD before you understand. What if you could &quot;do some machine-learning&quot; (whatever that means) in your spare time, in a minute or two? It turns out there are many Java libraries that can help you with basics, and with the Ammonite REPL getting started is easy.
 </p>
     <p>
-      Here's one example of how you can get started using the <a href="http://opennlp.apache.org/">OpenNLP</a> project to do some natural-language processing in just a few minutes. The example was found <a href="http://www.programcreek.com/2012/05/opennlp-tutorial/#sentence detector">online</a>, and shows how to extract english names from a raw <code>String</code> using NLP:
+      Here's one example of how you can get started using the <a href="http://opennlp.apache.org/">OpenNLP</a> project to do some natural-language processing in just a few minutes. The example was found <a href="http://www.programcreek.com/2012/05/opennlp-tutorial/#sentence detector">online</a>, and shows how to extract English names from a raw <code>String</code> using NLP:
 </p>
     <pre><code class="scala scalatex-site-Styles-highlightMe">@ import $ivy.`org.apache.opennlp:opennlp-tools:1.6.0` // load OpenNLP
 
@@ -4186,7 +4186,7 @@ names: Array[opennlp.tools.util.Span] = Array([8..9) person, [15..17) person)
 res96: Array[String] = Array(&quot;Mike&quot;, &quot;Peter Smith&quot;)
 </code></pre>
     <p>
-      This took a while, but only in comparison to the earlier cookbook recipes: this one is still less than 20 steps, which is not bad for something that installs multiple third-party modules, pulls down training data off the internet, and then does natural language processing to extract the english names from a text blob!
+      This took a while, but only in comparison to the earlier cookbook recipes: this one is still less than 20 steps, which is not bad for something that installs multiple third-party modules, pulls down training data off the internet, and then does natural language processing to extract the English names from a text blob!
 </p>
     <p>
       Obviously we did not go very deep into the field. If you did, it would definitely be a lot more reading and understanding than just blindly following tutorials like I did above, and you probably would find it worth the time to set up a proper project. Nevertheless, this quick 5-minute run through of how to perform the basics of NLP is a fun way to get started whether or not you decide to take it further, and is only possible because of the Ammonite REPL!
@@ -5110,15 +5110,15 @@ try {
       The page above contains the documentation for the latest stable version
       of Ammonite, <code>0.7.6</code>. Ammonite also publishes
       unstable versions, the latest of which is
-      <code>COMMIT-849e5e7</code> and is available for direct
+      <code>COMMIT-2ab8633</code> and is available for direct
       download:
 </p>
-    <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/vinjF &amp;&amp; chmod +x /usr/local/bin/amm &amp;&amp; amm
+    <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/viWrc &amp;&amp; chmod +x /usr/local/bin/amm &amp;&amp; amm
 </code></pre>
     <p>
       Or usage in an SBT project
 </p>
-    <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;COMMIT-849e5e7&quot; % &quot;test&quot; cross CrossVersion.full
+    <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;COMMIT-2ab8633&quot; % &quot;test&quot; cross CrossVersion.full
 
 initialCommands in (Test, console) := &quot;&quot;&quot;ammonite.Main().run()&quot;&quot;&quot;
 </code></pre>
