@@ -28,7 +28,7 @@ case class ShellSession() extends OpsAPI {
      */
     val realPath = Option(arg)
       .filter(_.isDir)
-      .orElse(Try(arg.followLinks).toOption.filter(_.isDir))
+      .orElse(arg.tryFollowLinks.filter(_.isDir))
 
     realPath match {
       case None => throw new NotDirectoryException(arg.toString)

@@ -6,6 +6,7 @@ import java.nio.charset.Charset
 import acyclic.file
 
 import scala.io.Codec
+import scala.util.Try
 
 /**
   * Enforces a standard interface for constructing [[BasePath]]-like things
@@ -276,7 +277,11 @@ extends FilePath with BasePathImpl with Readable{
 
   def startsWith(target: Path) = this.segments.startsWith(target.segments)
 
-  def followLinks: Path = Path(toNIO.toRealPath())
+  /**
+    * Obtain the final path to a file by resolving symlinks if any.
+    * @return Some(path) or else None if the symlink is invalid or other error.
+    */
+  def tryFollowLinks: Option[Path] = Try(Path(toNIO.toRealPath())).toOption
 
   def relativeTo(base: Path): RelPath = {
     var newUps = 0

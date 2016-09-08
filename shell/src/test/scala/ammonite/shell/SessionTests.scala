@@ -81,13 +81,24 @@ object SessionTests extends TestSuite{
 
         @ cd! 'destSymLink
 
-        @ assert("srcDir0" == wd.followLinks.name)
+        @ assert("srcDir0" == wd.tryFollowLinks.get.name)
 
         @ assert("destSymLink" == wd.name)
 
         @ cd! originalWd
 
         @ rm! tmpdir
+      """)
+    }
+
+    'nestedSymlinks {
+      check.session(
+        s"""
+        @ import ammonite.ops._
+
+        @ interp.load.module($bareSrc)
+
+        @ val originalWd = wd
 
         @ val names = Seq('test123, 'test124, 'test125, 'test126)
 
@@ -103,13 +114,17 @@ object SessionTests extends TestSuite{
 
         @ cd! 'test126
 
-        @ assert(wd.followLinks == originalWd/'test123)
+        @ assert(wd.tryFollowLinks.get == originalWd/'test123)
 
         @ assert(wd == originalWd/'test126)
 
         @ cd! originalWd
 
         @ assert(wd == originalWd)
+
+        @ rm! 'test123
+
+        @ assert( (wd / 'test126).tryFollowLinks == None )
 
         @ names.foreach(p => rm! wd/p)
 

@@ -3,7 +3,6 @@ package test.ammonite.ops
 import java.nio.file.Paths
 
 import ammonite.ops._
-
 import utest._
 object PathTests extends TestSuite{
   val tests = TestSuite {
@@ -338,6 +337,42 @@ object PathTests extends TestSuite{
           intercept[PathError.AbsolutePathOutsideRoot.type]{
             Path(tooManyUpsStr)
           }
+        }
+      }
+      'symlinks{
+        'nestedSymlinks{
+          if(Unix()) {
+            val names = Seq('test123, 'test124, 'test125, 'test126)
+            names.foreach(p => rm ! pwd / p)
+            mkdir ! pwd / 'test123
+            ln.s(pwd / 'test123, pwd / 'test124)
+            ln.s(pwd / 'test124, pwd / 'test125)
+            ln.s(pwd / 'test125, pwd / 'test126)
+
+            assert((pwd / 'test126).tryFollowLinks.get == pwd / 'test123)
+
+            names.foreach(p => rm ! pwd / p)
+            names.foreach(p => assert(!exists(pwd / p)))
+          }
+
+        }
+        'danglingSymlink{
+          if(Unix()) {
+            val names = Seq('test123, 'test124, 'test125, 'test126)
+            names.foreach(p => rm ! pwd / p)
+            mkdir ! pwd / 'test123
+            ln.s(pwd / 'test123, pwd / 'test124)
+            ln.s(pwd / 'test124, pwd / 'test125)
+            ln.s(pwd / 'test125, pwd / 'test126)
+
+            rm ! pwd / 'test123
+
+            assert( (pwd / 'test126).tryFollowLinks.isEmpty)
+
+            names.foreach(p => rm ! pwd / p)
+            names.foreach(p => assert(!exists(pwd / p)))
+          }
+
         }
       }
     }
