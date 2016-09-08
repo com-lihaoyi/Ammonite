@@ -8,8 +8,10 @@ import scala.tools.nsc.backend.JavaPlatform
 import scala.tools.nsc.interactive.Response
 import scala.tools.nsc.util._
 import scala.util.{Failure, Success, Try}
-
+import com.typesafe.scalalogging.LazyLogging
 import ammonite.util.Util.newLine
+import scala.tools.nsc.reporters.AbstractReporter
+
 
 /**
   * Nice wrapper for the presentation compiler.
@@ -58,7 +60,7 @@ class Pressy(nscGen: => nsc.interactive.Global) {
   }
 }
 
-object Pressy {
+object Pressy extends LazyLogging{
 
   /**
     * Encapsulates all the logic around a single instance of
@@ -220,14 +222,30 @@ object Pressy {
             settings: Settings): Pressy = {
 
     def initPressy = {
-      val (reporter, _, jcp) = Compiler.initGlobalBits(
+      val (_, jcp) = Compiler.initGlobalBits(
         classpath,
         dynamicClasspath,
-        _ => (),
-        _ => (),
-        _ => (),
         settings
       )
+      val settingsX = settings
+      val reporter = new AbstractReporter{
+
+        override def displayPrompt(): Unit = ()
+
+        override def display(pos: Position, msg: String, severity: Severity) = severity match {
+          case ERROR => 
+            Classpath.traceClasspathProblem(msg)
+            logger.error(Position.formatMessage(pos, msg, false))
+          case WARNING => 
+            logger.warn(Position.formatMessage(pos, msg, false))
+          case INFO =>
+            logger.info(Position.formatMessage(pos, msg, false))
+        }
+
+
+        override val settings = settingsX
+      }
+
       new nsc.interactive.Global(settings, reporter) { g =>
         // Actually jcp, avoiding a path-dependent type issue in 2.10 here
         override def classPath = platform.classPath

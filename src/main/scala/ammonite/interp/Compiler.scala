@@ -12,10 +12,11 @@ import scala.tools.nsc.{Global, Settings}
 import scala.tools.nsc.backend.JavaPlatform
 import scala.tools.nsc.interactive.Response
 import scala.tools.nsc.plugins.Plugin
-import scala.tools.nsc.reporters.AbstractReporter
+import scala.tools.nsc.reporters.{AbstractReporter, StoreReporter}
 import scala.tools.nsc.util.ClassPath.JavaContext
 import scala.tools.nsc.util._
 import scala.util.Try
+import com.typesafe.scalalogging.LazyLogging
 
 /**
   * Encapsulates (almost) all the ickiness of Scalac so it doesn't leak into
@@ -80,9 +81,6 @@ object Compiler {
     */
   def initGlobalBits(classpath: Seq[java.io.File],
                      dynamicClasspath: VirtualDirectory,
-                     errorLogger: => String => Unit,
-                     warningLogger: => String => Unit,
-                     infoLogger: => String => Unit,
                      settings: Settings) = {
     val vd = new io.VirtualDirectory("(memory)", None)
     val settingsX = settings
@@ -111,24 +109,7 @@ object Compiler {
     settings.outputDirs.setSingleOutput(vd)
 
     settings.nowarnings.value = true
-    val reporter = new AbstractReporter {
-      def displayPrompt(): Unit = ???
-
-      def display(pos: Position, msg: String, severity: Severity) = {
-        severity match {
-          case ERROR =>
-            Classpath.traceClasspathProblem(s"ERROR: $msg")
-            errorLogger(Position.formatMessage(pos, msg, false))
-          case WARNING =>
-            warningLogger(Position.formatMessage(pos, msg, false))
-          case INFO =>
-            infoLogger(Position.formatMessage(pos, msg, false))
-        }
-      }
-
-      val settings = settingsX
-    }
-    (reporter, vd, jcp)
+    (vd, jcp)
   }
 
   def apply(classpath: Seq[java.io.File],
@@ -169,22 +150,15 @@ object Compiler {
       plugins.collect { case (name, _, Some(cls)) => name -> cls }
     }
 
-    var errorLogger: String => Unit = s => ()
-    var warningLogger: String => Unit = s => ()
-    var infoLogger: String => Unit = s => ()
-
     var lastImports = Seq.empty[ImportData]
 
-    val (vd, reporter, compiler) = {
-      val (reporter, vd, jcp) = initGlobalBits(
+    val (vd, compiler) = {
+      val (vd, jcp) = initGlobalBits(
         classpath,
         dynamicClasspath,
-        errorLogger,
-        warningLogger,
-        infoLogger,
         settings
       )
-      val scalac = new nsc.Global(settings, reporter) { g =>
+      val scalac = new nsc.Global(settings) { g =>
         override lazy val plugins = List(new AmmonitePlugin(g, lastImports = _, importsLen)) ++ {
           for {
             (name, cls) <- plugins0
@@ -214,7 +188,7 @@ object Compiler {
       val run = new scalac.Run()
       scalac.phase = run.parserPhase
       run.cancel()
-      (vd, reporter, scalac)
+      (vd, scalac)
     }
 
     def search(target: scala.reflect.runtime.universe.Type) = {
@@ -257,18 +231,20 @@ object Compiler {
       * corresponding to the actual code so as to correct the line numbers in error report
       */
     def compile(src: Array[Byte], printer: Printer, importsLen0: Int, fileName: String): Output = {
-
       def enumerateVdFiles(d: VirtualDirectory): Iterator[AbstractFile] = {
         val (subs, files) = d.iterator.partition(_.isDirectory)
         files ++ subs.map(_.asInstanceOf[VirtualDirectory]).flatMap(enumerateVdFiles)
       }
 
-      compiler.reporter.reset()
-      this.errorLogger = printer.error
-      this.warningLogger = printer.warning
-      this.infoLogger = printer.info
+      //compiler.reporter.reset()
+      //this.errorLogger = x => {printer.error(x); println(s"${"#" * 40} error: $x")}
+      //this.warningLogger = x => {printer.warning(x); println(s"${"#" * 40} warning: $x")}
+      //this.infoLogger = x => {printer.info(x); println(s"${"#" * 40} info: $x")}
       val singleFile = makeFile(src, fileName)
       this.importsLen = importsLen0
+
+      val newReporter = new StoreReporter
+      compiler.reporter = newReporter
 
       val run = new compiler.Run()
       vd.clear()
@@ -277,9 +253,23 @@ object Compiler {
 
       val outputFiles = enumerateVdFiles(vd).toVector
 
-      if (reporter.hasErrors) None
-      else {
-
+      if (newReporter.hasErrors) {
+        for (info <- newReporter.infos) {
+          import info._
+          import newReporter._
+          severity match {
+            case ERROR =>
+              Classpath.traceClasspathProblem(s"ERROR: $msg")
+              printer.error(Position.formatMessage(pos, msg, false))
+            case WARNING =>
+              printer.warning(Position.formatMessage(pos, msg, false))
+            case INFO =>
+              printer.info(Position.formatMessage(pos, msg, false))
+          }
+        }
+        compiler.reporter = null
+        None
+      } else {
         shutdownPressy()
 
         val files = for (x <- outputFiles if x.name.endsWith(".class")) yield {
@@ -299,16 +289,30 @@ object Compiler {
 
     def parse(line: String): Either[String, Seq[Global#Tree]] = {
       val errors = mutable.Buffer.empty[String]
-      val warnings = mutable.Buffer.empty[String]
-      val infos = mutable.Buffer.empty[String]
-      errorLogger = errors.append(_)
-      warningLogger = warnings.append(_)
-      infoLogger = infos.append(_)
-      reporter.reset()
+      // val warnings = mutable.Buffer.empty[String]
+      // val infos = mutable.Buffer.empty[String]
+      // errorLogger = errors.append(_)
+      // warningLogger = warnings.append(_)
+      // infoLogger = infos.append(_)
+      // reporter.reset()
+      val reporter = new StoreReporter
+      compiler.reporter = reporter
       val parser = compiler.newUnitParser(line)
       val trees = CompilerCompatibility.trees(compiler)(parser)
-      if (reporter.hasErrors) Left(errors.mkString(newLine))
-      else Right(trees)
+      val res = if (reporter.hasErrors){
+      for (info <- reporter.infos) {
+          import info._
+          import reporter._
+          severity match {
+            case ERROR =>
+              Classpath.traceClasspathProblem(s"ERROR: $msg")
+              errors.append(Position.formatMessage(pos, msg, false))
+            case _ => ()
+          }
+        }
+         Left(errors.mkString(newLine)) }else Right(trees)
+      compiler.reporter = null
+      res
     }
   }
 }
