@@ -12,7 +12,6 @@ import com.typesafe.scalalogging.LazyLogging
 import ammonite.util.Util.newLine
 import scala.tools.nsc.reporters.AbstractReporter
 
-
 /**
   * Nice wrapper for the presentation compiler.
   */
@@ -60,7 +59,7 @@ class Pressy(nscGen: => nsc.interactive.Global) {
   }
 }
 
-object Pressy extends LazyLogging{
+object Pressy extends LazyLogging {
 
   /**
     * Encapsulates all the logic around a single instance of
@@ -228,20 +227,19 @@ object Pressy extends LazyLogging{
         settings
       )
       val settingsX = settings
-      val reporter = new AbstractReporter{
+      val reporter = new AbstractReporter {
 
         override def displayPrompt(): Unit = ()
 
         override def display(pos: Position, msg: String, severity: Severity) = severity match {
-          case ERROR => 
+          case ERROR =>
             Classpath.traceClasspathProblem(msg)
             logger.error(Position.formatMessage(pos, msg, false))
-          case WARNING => 
+          case WARNING =>
             logger.warn(Position.formatMessage(pos, msg, false))
           case INFO =>
             logger.info(Position.formatMessage(pos, msg, false))
         }
-
 
         override val settings = settingsX
       }

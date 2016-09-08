@@ -24,7 +24,7 @@ class ReplKernel(printer: PrinterX, storage: Storage, predefs: Seq[(Name, String
 
 }
 
-object ReplKernel{
+object ReplKernel {
 
   def process(code: String, interp: Interpreter) = Parsers.Splitter.parse(code) match {
     case Parsed.Success(statements, _) =>
