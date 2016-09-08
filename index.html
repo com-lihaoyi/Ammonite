@@ -1056,7 +1056,7 @@ Welcome to the Ammonite Repl 0.7.6
 </span><span style="color: #27ae60;">'LICENSE</span><span>            </span><span style="color: #27ae60;">'deploy_key</span><span>         </span><span style="color: #27ae60;">'readme</span><span>             </span><span style="color: #27ae60;">'terminal</span><span>
 </span><span style="color: #27ae60;">'amm</span><span>                </span><span style="color: #27ae60;">'integration</span><span>        </span><span style="color: #27ae60;">&quot;readme.md&quot;</span><span>
 ,
-  39678806 nanoseconds
+  58015944 nanoseconds
 )</span></pre></div>
 
           <p>
@@ -3341,11 +3341,11 @@ ops/src/main/scala/ammonite
 ops/src/main/scala/ammonite/ops
 ops/src/main/scala/ammonite/ops/Extensions.scala
 ops/src/main/scala/ammonite/ops/FileOps.scala
+ops/src/main/scala/ammonite/ops/Model.scala
 ops/src/main/scala/ammonite/ops/Path.scala
 ops/src/main/scala/ammonite/ops/PathUtils.scala
 ops/src/main/scala/ammonite/ops/Shellout.scala
-ops/src/main/scala/ammonite/ops/package.scala
-ops/src/main/scala/ammonite/ops/Model.scala</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>ls.rec! </span><span style="color: #27ae60;">'ops</span><span>/</span><span style="color: #27ae60;">'src</span><span>/</span><span style="color: #27ae60;">'main</span><span> 
+ops/src/main/scala/ammonite/ops/package.scala</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>ls.rec! </span><span style="color: #27ae60;">'ops</span><span>/</span><span style="color: #27ae60;">'src</span><span>/</span><span style="color: #27ae60;">'main</span><span> 
 </span><span style="color: #16a085;">res0</span><span>: </span><span style="color: #27ae60;">LsSeq</span><span> = 
 </span><span style="color: #27ae60;">'scala</span><span>
 </span><span style="color: #27ae60;">'scala/'ammonite</span><span>
@@ -3456,11 +3456,11 @@ ls.rec! wd/</span><span style="color: #27ae60;">'amm</span><span>/</span><span s
 bash$ </span>find ./ops/src/main -name '*.scala' | xargs wc -l
   143 ./ops/src/main/scala/ammonite/ops/Extensions.scala
   418 ./ops/src/main/scala/ammonite/ops/FileOps.scala
+  137 ./ops/src/main/scala/ammonite/ops/Model.scala
   369 ./ops/src/main/scala/ammonite/ops/Path.scala
   101 ./ops/src/main/scala/ammonite/ops/PathUtils.scala
   198 ./ops/src/main/scala/ammonite/ops/Shellout.scala
   121 ./ops/src/main/scala/ammonite/ops/package.scala
-  137 ./ops/src/main/scala/ammonite/ops/Model.scala
  1487 total</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>
 ls.rec! wd/</span><span style="color: #27ae60;">'ops</span><span>/</span><span style="color: #27ae60;">'src</span><span>/</span><span style="color: #27ae60;">'main</span><span> |? (</span><span style="color: #f39c12;">_</span><span>.ext == </span><span style="color: #27ae60;">&quot;scala&quot;</span><span>) | read.lines | (</span><span style="color: #f39c12;">_</span><span>.size) sum 
 </span><span style="color: #16a085;">res0</span><span>: </span><span style="color: #27ae60;">Int</span><span> = </span><span style="color: #27ae60;">1489</span></pre></div>
@@ -3493,15 +3493,15 @@ HELLO
 </p>
       <div><pre><span style="color: #8e44ad;">
 bash$ </span>git branch
-* (detached from c2f90da)
+* (detached from a8021a4)
   master</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>%git </span><span style="color: #27ae60;">'branch</span><span> 
-* (detached from c2f90da)
+* (detached from a8021a4)
   master
 </span></pre></div>
       <div><pre><span style="color: #8e44ad;">
 bash$ </span>date
-Thu Sep  8 05:44:45 UTC 2016</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>%date 
-Thu Sep  8 05:44:57 UTC 2016
+Thu Sep  8 06:23:19 UTC 2016</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>%date 
+Thu Sep  8 06:23:35 UTC 2016
 </span></pre></div>
 
       <p>
@@ -3693,7 +3693,7 @@ Hello from Java!
 </span><span style="color: #8e44ad;">travis-Ammonite@ </span><span style="color: #f39c12;">import</span><span> java.util.</span><span style="color: #f39c12;">_</span><span> 
 </span><span style="color: #27ae60;">import </span><span style="color: #16a085;">java.util._</span><span>
 </span><span style="color: #8e44ad;">travis-Ammonite@ </span><span style="color: #f39c12;">val</span><span> date = </span><span style="color: #f39c12;">new</span><span> </span><span style="color: #27ae60;">Date</span><span>() 
-</span><span style="color: #16a085;">date</span><span>: </span><span style="color: #27ae60;">Date</span><span> = Thu Sep 08 05:49:28 UTC 2016
+</span><span style="color: #16a085;">date</span><span>: </span><span style="color: #27ae60;">Date</span><span> = Thu Sep 08 06:27:58 UTC 2016
 </span><span style="color: #8e44ad;">travis-Ammonite@ </span><span>date.getDay() 
 </span><span style="color: #16a085;">res3</span><span>: </span><span style="color: #27ae60;">Int</span><span> = </span><span style="color: #27ae60;">4</span></pre>
 
@@ -3713,14 +3713,14 @@ import com.google.common.collect.ImmutableBiMap // Doesn't work
 	confs: [default]
 	found com.google.guava#guava;18.0 in central
 	found com.google.code.findbugs#jsr305;1.3.9 in central
-downloading http://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0-javadoc.jar ...
-	[SUCCESSFUL ] com.google.guava#guava;18.0!guava.jar(javadoc) (72ms)
-downloading http://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0-sources.jar ...
-	[SUCCESSFUL ] com.google.guava#guava;18.0!guava.jar(source) (12ms)
 downloading http://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0.jar ...
-	[SUCCESSFUL ] com.google.guava#guava;18.0!guava.jar(bundle) (15ms)
+	[SUCCESSFUL ] com.google.guava#guava;18.0!guava.jar(bundle) (62ms)
+downloading http://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0-javadoc.jar ...
+	[SUCCESSFUL ] com.google.guava#guava;18.0!guava.jar(javadoc) (37ms)
+downloading http://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0-sources.jar ...
+	[SUCCESSFUL ] com.google.guava#guava;18.0!guava.jar(source) (22ms)
 downloading http://repo1.maven.org/maven2/com/google/code/findbugs/jsr305/1.3.9/jsr305-1.3.9.jar ...
-	[SUCCESSFUL ] com.google.code.findbugs#jsr305;1.3.9!jsr305.jar (9ms)
+	[SUCCESSFUL ] com.google.code.findbugs#jsr305;1.3.9!jsr305.jar (10ms)
 </span><span style="color: #27ae60;">import </span><span style="color: #16a085;">$ivy.$                             // Load from Maven Central</span><span>
 </span><span style="color: #8e44ad;">travis-Ammonite@ </span><span style="color: #f39c12;">import</span><span> com.google.common.collect.ImmutableBiMap </span><span style="color: #2980b9;">// Works now</span><span> 
 </span><span style="color: #27ae60;">import </span><span style="color: #16a085;">com.google.common.collect.ImmutableBiMap // Works now</span><span>
@@ -3741,11 +3741,11 @@ downloading http://repo1.maven.org/maven2/com/google/code/findbugs/jsr305/1.3.9/
 	found joda-time#joda-time;2.8.2 in central
 	found org.joda#joda-convert;1.2 in central
 downloading http://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2-sources.jar ...
-	[SUCCESSFUL ] joda-time#joda-time;2.8.2!joda-time.jar(source) (72ms)
+	[SUCCESSFUL ] joda-time#joda-time;2.8.2!joda-time.jar(source) (47ms)
 downloading http://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2.jar ...
-	[SUCCESSFUL ] joda-time#joda-time;2.8.2!joda-time.jar (45ms)
+	[SUCCESSFUL ] joda-time#joda-time;2.8.2!joda-time.jar (12ms)
 downloading http://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2-javadoc.jar ...
-	[SUCCESSFUL ] joda-time#joda-time;2.8.2!joda-time.jar(javadoc) (57ms)
+	[SUCCESSFUL ] joda-time#joda-time;2.8.2!joda-time.jar(javadoc) (21ms)
 downloading http://repo1.maven.org/maven2/org/joda/joda-convert/1.2/joda-convert-1.2.jar ...
 	[SUCCESSFUL ] org.joda#joda-convert;1.2!joda-convert.jar (10ms)
 </span><span style="color: #27ae60;">import </span><span style="color: #16a085;">$ivy.$                          </span><span>
@@ -5110,15 +5110,15 @@ try {
       The page above contains the documentation for the latest stable version
       of Ammonite, <code>0.7.6</code>. Ammonite also publishes
       unstable versions, the latest of which is
-      <code>COMMIT-c2f90da</code> and is available for direct
+      <code>COMMIT-a8021a4</code> and is available for direct
       download:
 </p>
-    <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/viWis &amp;&amp; chmod +x /usr/local/bin/amm &amp;&amp; amm
+    <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/viWX2 &amp;&amp; chmod +x /usr/local/bin/amm &amp;&amp; amm
 </code></pre>
     <p>
       Or usage in an SBT project
 </p>
-    <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;COMMIT-c2f90da&quot; % &quot;test&quot; cross CrossVersion.full
+    <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;COMMIT-a8021a4&quot; % &quot;test&quot; cross CrossVersion.full
 
 initialCommands in (Test, console) := &quot;&quot;&quot;ammonite.Main().run()&quot;&quot;&quot;
 </code></pre>
