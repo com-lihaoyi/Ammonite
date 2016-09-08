@@ -81,11 +81,39 @@ object SessionTests extends TestSuite{
 
         @ cd! 'destSymLink
 
-        @ assert("srcDir0" == wd.name)
+        @ assert("srcDir0" == wd.followLinks.name)
+
+        @ assert("destSymLink" == wd.name)
 
         @ cd! originalWd
 
         @ rm! tmpdir
+
+        @ val names = Seq('test123, 'test124, 'test125, 'test126)
+
+        @ names.foreach(p => rm! wd/p)
+
+        @ mkdir! wd/'test123
+
+        @ ln.s(wd/'test123, wd/'test124)
+
+        @ ln.s(wd/'test124, wd/'test125)
+
+        @ ln.s(wd/'test125, wd/'test126)
+
+        @ cd! 'test126
+
+        @ assert(wd.followLinks == originalWd/'test123)
+
+        @ assert(wd == originalWd/'test126)
+
+        @ cd! originalWd
+
+        @ assert(wd == originalWd)
+
+        @ names.foreach(p => rm! wd/p)
+
+        @ names.foreach(p => assert(!exists(wd/p)))
       """)
     }
   }

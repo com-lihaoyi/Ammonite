@@ -28,11 +28,11 @@ case class ShellSession() extends OpsAPI {
      */
     val realPath = Option(arg)
       .filter(_.isDir)
-      .orElse(Try(Path(arg.toNIO.toRealPath())).toOption.filter(_.isDir))
+      .orElse(Try(arg.followLinks).toOption.filter(_.isDir))
 
     realPath match {
       case None => throw new NotDirectoryException(arg.toString)
-      case Some(path) => wd0 = path; wd0
+      case Some(path) => wd0 = arg; wd0
     }
   }
 
