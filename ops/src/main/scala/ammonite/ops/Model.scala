@@ -65,7 +65,7 @@ object stat extends Function1[ops.Path, ops.stat]{
   }
   object full extends Function1[ops.Path, ops.stat.full] {
     def apply(p: ops.Path) = ops.stat.full.make(
-      p.last,
+      p.segments.lastOption.getOrElse("/"),
       Files.readAttributes(
         Paths.get(p.toString),
         classOf[BasicFileAttributes],
