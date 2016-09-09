@@ -7,8 +7,12 @@ object Parsers {
   import scalaparse.Scala._
   import WhitespaceApi._
 
+  val Splitter = {
+    P(StatementBlock(Fail) ~ WL ~ End)
+  }
+
   // For some reason Scala doesn't import this by default
-  val `_` = scalaparse.Scala.`_`
+  private val `_` = scalaparse.Scala.`_`
 
   val ImportSplitter: P[Seq[ammonite.util.ImportTree]] = {
     val IdParser = P((Id | `_`).!).map(
@@ -33,22 +37,17 @@ object Parsers {
     P(`import` ~/ ImportExpr.rep(1, sep = ",".~/))
   }
 
-  val PatVarSplitter = {
+  private val PatVarSplitter = {
     val Prefixes = P(Prelude ~ (`var` | `val`))
     val Lhs = P(Prefixes ~/ BindPattern.rep(1, "," ~/ Pass) ~ (`:` ~/ Type).?)
     P(Lhs.! ~ (`=` ~/ WL ~ StatCtx.Expr.!) ~ End)
   }
-  def patVarSplit(code: String) = {
-    val Parsed.Success((lhs, rhs), _) = PatVarSplitter.parse(code)
-    (lhs, rhs)
-  }
 
-  val Prelude = P((Annot ~ OneNLMax).rep ~ (Mod ~/ Pass).rep)
-  val Statement =
-    P(scalaparse.Scala.TopPkgSeq | scalaparse.Scala.Import | Prelude ~ BlockDef | StatCtx.Expr)
-  def StatementBlock(blockSep: P0) =
-    P(Semis.? ~ (!blockSep ~ Statement ~~ WS ~~ (Semis | End)).!.repX)
-  val Splitter = P(StatementBlock(Fail) ~ WL ~ End)
+  private val Prelude = P((Annot ~ OneNLMax).rep ~ (Mod ~/ Pass).rep)
+
+  private val Statement = P(scalaparse.Scala.TopPkgSeq | scalaparse.Scala.Import | Prelude ~ BlockDef | StatCtx.Expr)
+
+  private def StatementBlock(blockSep: P0) = P(Semis.? ~ (!blockSep ~ Statement ~~ WS ~~ (Semis | End)).!.repX)
 
   /**
     * Attempts to break a code blob into multiple statements. Returns `None` if
@@ -61,12 +60,16 @@ object Parsers {
       case x => Some(x)
     }
 
-  val Separator = P(WL ~ "@" ~~ CharIn(" " + System.lineSeparator).rep(1))
-  val CompilationUnit = P(WL.! ~ StatementBlock(Separator) ~ WL)
-  val ScriptSplitter = P(CompilationUnit.repX(1, Separator) ~ End)
+  private val Separator = P(WL ~ "@" ~~ CharIn(" " + System.lineSeparator).rep(1))
+
+  private val CompilationUnit = P(WL.! ~ StatementBlock(Separator) ~ WL)
+
+  private val ScriptSplitter = P(CompilationUnit.repX(1, Separator) ~ End)
+
   def splitScript(code: String) = ScriptSplitter.parse(code)
 
-  val BlockUnwrapper = P("{" ~ Block.! ~ "}" ~ End)
+  private val BlockUnwrapper = P("{" ~ Block.! ~ "}" ~ End)
+
   def unwrapBlock(code: String) = {
     BlockUnwrapper.parse(code) match {
       case Parsed.Success(contents, _) => Some(contents)
@@ -74,13 +77,4 @@ object Parsers {
     }
   }
 
-  def stringWrap(s: String) = "\"" + pprint.PPrinter.escape(s) + "\""
-  def stringSymWrap(s: String) = {
-    if (s == "") "'"
-    else
-      (scalaparse.syntax.Identifiers.Id ~ End).parse(s, 0) match {
-        case Parsed.Success(v, _) => "'" + s
-        case f: Parsed.Failure => stringWrap(s)
-      }
-  }
 }

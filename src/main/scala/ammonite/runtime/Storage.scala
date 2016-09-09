@@ -3,7 +3,8 @@ package ammonite.runtime
 import ammonite.ops._
 import ammonite.util.ImportTree
 import ammonite.util.{Imports, StableRef}
-import ammonite.util.Util.{CacheOutput, ClassFiles, CompileCache, IvyMap, newLine}
+import ammonite.util.Util.{CacheOutput, CompileCache, IvyMap, newLine}
+import ammonite.kernel.kernel.ClassFiles
 
 import scala.util.Try
 import scala.collection.generic.CanBuildFrom

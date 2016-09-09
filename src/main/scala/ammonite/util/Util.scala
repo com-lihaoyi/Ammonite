@@ -6,6 +6,8 @@ package ammonite.util
 import java.security.MessageDigest
 import ammonite.ops._
 
+import ammonite.kernel.kernel.ClassFiles
+
 object Util {
 
   val upPathSegment = "^"
@@ -40,7 +42,6 @@ object Util {
   type CacheDetails = (String, String)
   //                   Wrapper HashVal
   type IvyMap = Map[(String, String, String, String), Set[String]]
-  type ClassFiles = Vector[(String, Array[Byte])]
   type CacheOutput =
     (Seq[(String, String)], Seq[ClassFiles], Imports, Seq[ImportTree])
   type CompileCache = (ClassFiles, Imports)

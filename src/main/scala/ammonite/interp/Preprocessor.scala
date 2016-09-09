@@ -2,11 +2,16 @@ package ammonite.runtime
 
 import ammonite.util._
 import ammonite.util.Util.{windowsPlatform, newLine, normalizeNewlines}
-import fastparse.all._
+//import fastparse.all._
 
 import scala.reflect.internal.Flags
 import scala.tools.nsc.{Global => G}
 import collection.mutable
+import ammonite.kernel.LogError
+
+import scalaz.{Name => _, _}
+import Scalaz._
+import Validation.FlatMap._
 
 /**
   * Responsible for all scala-source-code-munging that happens within the
@@ -26,104 +31,93 @@ import collection.mutable
   * - Combines all of these into a complete compilation unit ready to feed into
   *   the Scala compiler
   */
-trait Preprocessor {
-  def transform(stmts: Seq[String],
-                resultIndex: String,
-                leadingSpaces: String,
-                pkgName: Seq[Name],
-                indexedWrapperName: Name,
-                imports: Imports,
-                printerTemplate: String => String,
-                extraCode: String): Res[Preprocessor.Output]
-}
+// trait Preprocessor {
+
+//   def transform(stmts: Seq[String],
+//                 resultIndex: String,
+//                 leadingSpaces: String,
+//                 pkgName: Seq[Name],
+//                 indexedWrapperName: Name,
+//                 imports: Imports,
+//                 printerTemplate: String => String,
+//                 extraCode: String): Res[Preprocessor.Output]
+// }
+
 object Preprocessor {
+
   private case class Expanded(code: String, printer: Seq[String])
+
   case class Output(code: String, prefixCharLength: Int)
 
-  def errMsg(msg: String, code: String, expected: String, idx: Int): String = {
-    val locationString = {
-      val (first, last) = code.splitAt(idx)
-      val lastSnippet = last.split(newLine).headOption.getOrElse("")
-      val firstSnippet =
-        first.reverse.split(newLine.reverse).lift(0).getOrElse("").reverse
-      firstSnippet + lastSnippet + newLine + (" " * firstSnippet.length) + "^"
+  // private def errMsg(msg: String, code: String, expected: String, idx: Int): String = {
+  //   val locationString = {
+  //     val (first, last) = code.splitAt(idx)
+  //     val lastSnippet = last.split(newLine).headOption.getOrElse("")
+  //     val firstSnippet =
+  //       first.reverse.split(newLine.reverse).lift(0).getOrElse("").reverse
+  //     firstSnippet + lastSnippet + newLine + (" " * firstSnippet.length) + "^"
+  //   }
+
+  //   s"Syntax Error: $msg${newLine}$locationString"
+  // }
+
+  // /**
+  //   * Splits up a script file into its constituent blocks, each of which
+  //   * is a tuple of (leading-whitespace, statements). Leading whitespace
+  //   * is returned separately so we can later manipulate the statements e.g.
+  //   * by adding `val res2 = ` without the whitespace getting in the way
+  //   */
+  // def splitScript(rawCode: String): Res[Seq[(String, Seq[String])]] = {
+  //   Parsers.splitScript(rawCode) match {
+  //     case f: Parsed.Failure =>
+  //       Res.Failure(None, errMsg(f.msg, rawCode, f.extra.traced.expected, f.index))
+  //     case s: Parsed.Success[Seq[(String, Seq[String])]] =>
+  //       var offset = 0
+  //       val blocks = mutable.Buffer[(String, Seq[String])]()
+
+  //       // comment holds comments or empty lines above the code which is not caught along with code
+  //       for ((comment, code) <- s.value) {
+
+  //         //ncomment has required number of newLines appended based on OS and offset
+  //         //since fastparse has hardcoded `\n`s, while parsing strings with `\r\n`s it
+  //         //gives out one extra `\r` after '@' i.e. block change
+  //         //which needs to be removed to get correct line number (It adds up one extra line)
+  //         //thats why the `comment.substring(1)` thing is necessary
+  //         val ncomment =
+  //           if (windowsPlatform && !blocks.isEmpty && !comment.isEmpty) {
+  //             comment.substring(1) + newLine * offset
+  //           } else {
+  //             comment + newLine * offset
+  //           }
+
+  //         // 1 is added as Separator parser eats up the newLine char following @
+  //         offset = offset + (comment.split(newLine, -1).length - 1) +
+  //             code.map(_.split(newLine, -1).length - 1).sum + 1
+  //         blocks.append((ncomment, code))
+  //       }
+
+  //       Res.Success(blocks)
+  //   }
+  // }
+
+  def apply(parse: => String => ValidationNel[LogError, Seq[G#Tree]],
+            stmts: NonEmptyList[String],
+            resultIndex: String,
+            leadingSpaces: String,
+            pkgName: Seq[Name],
+            indexedWrapperName: Name,
+            imports: Imports,
+            printerTemplate: String => String,
+            extraCode: String): ValidationNel[LogError, Output] = {
+
+    def Processor(cond: PartialFunction[(String, String, G#Tree), Preprocessor.Expanded]) = {
+      (code: String, name: String, tree: G#Tree) =>
+        cond.lift((name, code, tree))
     }
 
-    s"Syntax Error: $msg${newLine}$locationString"
-  }
-
-  /**
-    * Splits up a script file into its constituent blocks, each of which
-    * is a tuple of (leading-whitespace, statements). Leading whitespace
-    * is returned separately so we can later manipulate the statements e.g.
-    * by adding `val res2 = ` without the whitespace getting in the way
-    */
-  def splitScript(rawCode: String): Res[Seq[(String, Seq[String])]] = {
-    Parsers.splitScript(rawCode) match {
-      case f: Parsed.Failure =>
-        Res.Failure(None, errMsg(f.msg, rawCode, f.extra.traced.expected, f.index))
-      case s: Parsed.Success[Seq[(String, Seq[String])]] =>
-        var offset = 0
-        val blocks = mutable.Buffer[(String, Seq[String])]()
-
-        // comment holds comments or empty lines above the code which is not caught along with code
-        for ((comment, code) <- s.value) {
-
-          //ncomment has required number of newLines appended based on OS and offset
-          //since fastparse has hardcoded `\n`s, while parsing strings with `\r\n`s it
-          //gives out one extra `\r` after '@' i.e. block change
-          //which needs to be removed to get correct line number (It adds up one extra line)
-          //thats why the `comment.substring(1)` thing is necessary
-          val ncomment =
-            if (windowsPlatform && !blocks.isEmpty && !comment.isEmpty) {
-              comment.substring(1) + newLine * offset
-            } else {
-              comment + newLine * offset
-            }
-
-          // 1 is added as Separator parser eats up the newLine char following @
-          offset = offset + (comment.split(newLine, -1).length - 1) +
-              code.map(_.split(newLine, -1).length - 1).sum + 1
-          blocks.append((ncomment, code))
-        }
-
-        Res.Success(blocks)
-    }
-  }
-
-  def apply(parse: => String => Either[String, Seq[G#Tree]]): Preprocessor =
-    new Preprocessor {
-
-      def transform(stmts: Seq[String],
-                    resultIndex: String,
-                    leadingSpaces: String,
-                    pkgName: Seq[Name],
-                    indexedWrapperName: Name,
-                    imports: Imports,
-                    printerTemplate: String => String,
-                    extraCode: String) =
-        for {
-          Preprocessor.Expanded(code, printer) <- expandStatements(stmts, resultIndex)
-        } yield {
-          val (wrappedCode, importsLength) = wrapCode(
-            pkgName,
-            indexedWrapperName,
-            leadingSpaces + code,
-            printerTemplate(printer.mkString(", ")),
-            imports,
-            extraCode
-          )
-          Preprocessor.Output(wrappedCode, importsLength)
-        }
-
-      def Processor(cond: PartialFunction[(String, String, G#Tree), Preprocessor.Expanded]) = {
-        (code: String, name: String, tree: G#Tree) =>
-          cond.lift((name, code, tree))
-      }
-
-      def pprintSignature(ident: String, customMsg: Option[String]) = {
-        val customCode = customMsg.fold("_root_.scala.None")(x => s"""_root_.scala.Some("$x")""")
-        s"""
+    def pprintSignature(ident: String, customMsg: Option[String]) = {
+      val customCode = customMsg.fold("_root_.scala.None")(x => s"""_root_.scala.Some("$x")""")
+      s"""
       _root_.ammonite
             .repl
             .ReplBridge
@@ -131,9 +125,9 @@ object Preprocessor {
             .Internal
             .print($ident, $ident, "$ident", $customCode)
       """
-      }
-      def definedStr(definitionLabel: String, name: String) =
-        s"""
+    }
+    def definedStr(definitionLabel: String, name: String) =
+      s"""
       _root_.ammonite
             .repl
             .ReplBridge
@@ -142,7 +136,9 @@ object Preprocessor {
             .printDef("$definitionLabel", "$name")
       """
 
-      def pprint(ident: String) = pprintSignature(ident, None)
+    def pprint(ident: String) = pprintSignature(ident, None)
+
+    val decls: List[(String, String, G#Tree) => Option[Preprocessor.Expanded]] = {
 
       /**
         * Processors for declarations which all have the same shape
@@ -156,15 +152,25 @@ object Preprocessor {
             )
         }
 
-      val ObjectDef = DefProc("object") { case m: G#ModuleDef => m.name }
+      val ObjectDef = DefProc("object") {
+        case m: G#ModuleDef => m.name
+      }
+
       val ClassDef = DefProc("class") {
         case m: G#ClassDef if !m.mods.isTrait => m.name
       }
+
       val TraitDef = DefProc("trait") {
         case m: G#ClassDef if m.mods.isTrait => m.name
       }
-      val DefDef = DefProc("function") { case m: G#DefDef => m.name }
-      val TypeDef = DefProc("type") { case m: G#TypeDef => m.name }
+
+      val DefDef = DefProc("function") {
+        case m: G#DefDef => m.name
+      }
+
+      val TypeDef = DefProc("type") {
+        case m: G#TypeDef => m.name
+      }
 
       val PatVarDef = Processor {
         case (name, code, t: G#ValDef) =>
@@ -202,87 +208,69 @@ object Preprocessor {
 
       val Expr = Processor {
         //Expressions are lifted to anon function applications so they will be JITed
-        case (name, code, tree) =>
-          Expanded(s"val $name = $code", Seq(pprint(name)))
+        case (name, code, tree) => Expanded(s"val $name = $code", Seq(pprint(name)))
       }
 
-      val decls =
-        Seq[(String, String, G#Tree) => Option[Preprocessor.Expanded]](
-          ObjectDef,
-          ClassDef,
-          TraitDef,
-          DefDef,
-          TypeDef,
-          PatVarDef,
-          Import,
-          Expr
-        )
-
-      def expandStatements(stmts: Seq[String], wrapperIndex: String): Res[Preprocessor.Expanded] = {
-        stmts match {
-          case Nil => Res.Skip
-          case postSplit =>
-            complete(stmts.mkString(""), wrapperIndex, postSplit)
-
-        }
-      }
-
-      def complete(code: String, resultIndex: String, postSplit: Seq[String]) = {
-        val reParsed = postSplit.map(p => (parse(p), p))
-        val errors = reParsed.collect { case (Left(e), _) => e }
-        if (errors.length != 0) Res.Failure(None, errors.mkString(newLine))
-        else {
-          val allDecls = for {
-            ((Right(trees), code), i) <- reParsed.zipWithIndex
-            if (trees.nonEmpty)
-          } yield {
-            // Suffix the name of the result variable with the index of
-            // the tree if there is more than one statement in this command
-            val suffix = if (reParsed.length > 1) "_" + i else ""
-            def handleTree(t: G#Tree) = {
-              decls.iterator.flatMap(_.apply(code, "res" + resultIndex + suffix, t)).next()
-            }
-            trees match {
-              case Seq(tree) => handleTree(tree)
-
-              // This handles the multi-import case `import a.b, c.d`
-              case trees if trees.forall(_.isInstanceOf[G#Import]) =>
-                handleTree(trees(0))
-
-              // AFAIK this can only happen for pattern-matching multi-assignment,
-              // which for some reason parse into a list of statements. In such a
-              // scenario, aggregate all their printers, but only output the code once
-              case trees =>
-                val printers = for {
-                  tree <- trees
-                  if tree.isInstanceOf[G#ValDef]
-                  Preprocessor.Expanded(_, printers) = handleTree(tree)
-                  printer <- printers
-                } yield printer
-
-                Preprocessor.Expanded(code, printers)
-            }
-          }
-
-          val Seq(first, rest @ _ *) = allDecls
-          val allDeclsWithComments = Expanded(first.code, first.printer) +: rest
-          Res(
-            allDeclsWithComments.reduceOption { (a, b) =>
-              Expanded(
-                // We do not need to separate the code with our own semi-colons
-                // or newlines, as each expanded code snippet itself comes with
-                // it's own trailing newline/semicolons as a result of the
-                // initial split
-                a.code + b.code,
-                a.printer ++ b.printer
-              )
-            },
-            "Don't know how to handle " + code
-          )
-
-        }
-      }
+      List(
+        ObjectDef,
+        ClassDef,
+        TraitDef,
+        DefDef,
+        TypeDef,
+        PatVarDef,
+        Import,
+        Expr
+      )
     }
+
+    // type signatures are added below for documentation
+
+    val composed: String => ValidationNel[LogError, (Seq[G#Tree], String)] = x => parse(x) map (y => (y, x))
+
+    val parsed: ValidationNel[LogError, NonEmptyList[(Seq[G#Tree], String)]] = stmts.traverseU(composed)
+
+    def declParser(inp: ((Seq[G#Tree], String), Int)): ValidationNel[LogError, Expanded] = inp match {
+      case ((trees, code), i) =>
+        def handleTree(t: G#Tree): ValidationNel[LogError, Expanded] = {
+          val parsedDecls: List[Expanded] = decls flatMap (x => x(code, "res" + resultIndex + "_" + i, t))
+          parsedDecls match {
+            case h :: t => Success(h)
+            case Nil => Failure(NonEmptyList(LogError(s"Dont know how to handle $code")))
+          }
+        }
+        trees match {
+          case Seq(h) => handleTree(h)
+          case _ if trees.nonEmpty && trees.forall(_.isInstanceOf[G#Import]) => handleTree(trees.head)
+          case _ =>
+            val filteredSeq = trees filter (_.isInstanceOf[G#ValDef])
+            val handleTreeComposed: G#Tree => ValidationNel[LogError, Seq[String]] = handleTree(_) map (_.printer)
+            val cumulativePrinter: ValidationNel[LogError, List[String]] =
+              filteredSeq.toList.traverseU(handleTreeComposed).map(_.flatten)
+            cumulativePrinter map (printer => Expanded(code, printer))
+        }
+    }
+
+    val declTraversed: ValidationNel[LogError, NonEmptyList[Expanded]] =
+      parsed.map(_.zipWithIndex).flatMap(_.traverseU(declParser))
+
+    val expanded = declTraversed map {
+      case NonEmptyList(h, tl) =>
+        tl.foldLeft(h) {
+          case (acc, v) => Expanded(acc.code ++ v.code, acc.printer ++ v.printer)
+        }
+    }
+
+    expanded map {
+      case Expanded(code, printer) =>
+        wrapCode(pkgName,
+                 indexedWrapperName,
+                 leadingSpaces + code,
+                 printerTemplate(printer.mkString(", ")),
+                 imports,
+                 extraCode)
+    }
+
+  }
 
   def importBlock(importData: Imports) = {
     // Group the remaining imports into sliding groups according to their
@@ -319,12 +307,12 @@ object Preprocessor {
     res
   }
 
-  def wrapCode(pkgName: Seq[Name],
-               indexedWrapperName: Name,
-               code: String,
-               printCode: String,
-               imports: Imports,
-               extraCode: String) = {
+  private def wrapCode(pkgName: Seq[Name],
+                       indexedWrapperName: Name,
+                       code: String,
+                       printCode: String,
+                       imports: Imports,
+                       extraCode: String): Output = {
 
     //we need to normalize topWrapper and bottomWrapper in order to ensure
     //the snippets always use the platform-specific newLine
@@ -341,6 +329,6 @@ object ${indexedWrapperName.backticked}{\n""")
 """)
     val importsLen = topWrapper.length
 
-    (topWrapper + code + bottomWrapper, importsLen)
+    Output(topWrapper + code + bottomWrapper, importsLen)
   }
 }

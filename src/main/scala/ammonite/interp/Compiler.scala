@@ -1,9 +1,9 @@
 package ammonite.runtime
 
-import ammonite.util.{ImportData, Imports, Printer}
-import ammonite.util.Util.newLine
+import ammonite.util.{ImportData, Imports}
+//import ammonite.util.Util.newLine
 
-import scala.collection.mutable
+//import scala.collection.mutable
 import scala.reflect.internal.util.Position
 import scala.reflect.io
 import scala.reflect.io._
@@ -15,7 +15,11 @@ import scala.tools.nsc.plugins.Plugin
 import scala.tools.nsc.reporters.StoreReporter
 import scala.tools.nsc.util.ClassPath.JavaContext
 import scala.tools.nsc.util._
-import scala.util.Try
+import ammonite.kernel._
+
+import scalaz._
+
+import ammonite.kernel.kernel._
 
 /**
   * Encapsulates (almost) all the ickiness of Scalac so it doesn't leak into
@@ -33,11 +37,12 @@ final class Compiler(classpath: Seq[java.io.File],
                      evalClassloader: => ClassLoader,
                      pluginClassloader: => ClassLoader,
                      shutdownPressy: () => Unit,
-                     settings: Settings) {
+                     val settings: Settings) {
 
   import Compiler._
 
   var importsLen = 0
+  var lastImports = Seq.empty[ImportData]
 
   val PluginXML = "scalac-plugin.xml"
   lazy val plugins0 = {
@@ -70,14 +75,13 @@ final class Compiler(classpath: Seq[java.io.File],
     plugins.collect { case (name, _, Some(cls)) => name -> cls }
   }
 
-  var lastImports = Seq.empty[ImportData]
+  private val (vd, jcp) = initGlobalBits(
+    classpath,
+    dynamicClasspath,
+    settings
+  )
 
-  val (vd, compiler) = {
-    val (vd, jcp) = initGlobalBits(
-      classpath,
-      dynamicClasspath,
-      settings
-    )
+  private val compiler = {
     val scalac = new nsc.Global(settings) { g =>
       override lazy val plugins = List(new AmmonitePlugin(g, lastImports = _, importsLen)) ++ {
         for {
@@ -108,40 +112,7 @@ final class Compiler(classpath: Seq[java.io.File],
     val run = new scalac.Run()
     scalac.phase = run.parserPhase
     run.cancel()
-    (vd, scalac)
-  }
-
-  def search(target: scala.reflect.runtime.universe.Type) = {
-    def resolve(path: String*): compiler.Symbol = {
-      var curr = path.toList
-      var start: compiler.Symbol = compiler.RootClass
-      while (curr != Nil) {
-        val head :: rest = curr
-        start = start.typeSignature.member(compiler.newTermName(head))
-        curr = rest
-      }
-      start
-    }
-    var thingsInScope = Map[compiler.Symbol, List[compiler.Name]](
-      resolve() -> List(),
-      resolve("java", "lang") -> List(),
-      resolve("scala") -> List(),
-      resolve("scala", "Predef") -> List()
-    )
-    var level = 5
-    var found: Option[String] = None
-    while (level > 0) {
-      thingsInScope = for {
-        (sym, path) <- thingsInScope
-        // No clue why this one blows up
-        m <- Try(sym.typeSignature.members).toOption.toSeq.flatten
-      } yield (m, m.name :: path)
-      thingsInScope.find(target.typeSymbol.fullName == _._1.fullName).foreach { path =>
-        level = 0
-        found = Some(path._2.mkString("."))
-      }
-    }
-    found
+    scalac
   }
 
   /**
@@ -150,100 +121,74 @@ final class Compiler(classpath: Seq[java.io.File],
     * It is passed to AmmonitePlugin to decrease this much offset from each AST node
     * corresponding to the actual code so as to correct the line numbers in error report
     */
-  def compile(src: Array[Byte], printer: Printer, importsLen0: Int, fileName: String): Output = {
+  def compile(src: Array[Byte], importsLen0: Int, fileName: String): CompilerOutput = {
     def enumerateVdFiles(d: VirtualDirectory): Iterator[AbstractFile] = {
       val (subs, files) = d.iterator.partition(_.isDirectory)
       files ++ subs.map(_.asInstanceOf[VirtualDirectory]).flatMap(enumerateVdFiles)
     }
 
-    //compiler.reporter.reset()
-    //this.errorLogger = x => {printer.error(x); println(s"${"#" * 40} error: $x")}
-    //this.warningLogger = x => {printer.warning(x); println(s"${"#" * 40} warning: $x")}
-    //this.infoLogger = x => {printer.info(x); println(s"${"#" * 40} info: $x")}
-    val singleFile = makeFile(src, fileName)
     this.importsLen = importsLen0
+    val singleFile = makeFile(src, fileName)
 
-    val newReporter = new StoreReporter
-    compiler.reporter = newReporter
+    val reporter = new StoreReporter
+    compiler.reporter = reporter
 
     val run = new compiler.Run()
     vd.clear()
-
     run.compileFiles(List(singleFile))
-
     val outputFiles = enumerateVdFiles(vd).toVector
+    compiler.reporter = null
 
-    if (newReporter.hasErrors) {
-      for (info <- newReporter.infos) {
-        import info._
-        import newReporter._
-        severity match {
-          case ERROR =>
-            Classpath.traceClasspathProblem(s"ERROR: $msg")
-            printer.error(Position.formatMessage(pos, msg, false))
-          case WARNING =>
-            printer.warning(Position.formatMessage(pos, msg, false))
-          case INFO =>
-            printer.info(Position.formatMessage(pos, msg, false))
-        }
-      }
-      compiler.reporter = null
-      None
-    } else {
-      shutdownPressy()
-
-      val files = for (x <- outputFiles if x.name.endsWith(".class")) yield {
-        val segments = x.path.split("/").toList.tail
-        val output = Evaluator.writeDeep(dynamicClasspath, segments, "")
-        output.write(x.toByteArray)
-        output.close()
-        (x.path.stripPrefix("(memory)/").stripSuffix(".class").replace('/', '.'), x.toByteArray)
-      }
-
-      val imports = lastImports.toList
-
-      Some((files, Imports(imports)))
-
+    val (errorMessages, otherMessages) = reporter.infos.foldLeft((List[LogError](), List[LogMessage]())) {
+      case ((error, other), reporter.Info(pos, msg, reporter.ERROR)) =>
+        (LogError(Position.formatMessage(pos, msg, false)) :: error, other)
+      case ((error, other), reporter.Info(pos, msg, reporter.WARNING)) =>
+        (error, LogWarning(Position.formatMessage(pos, msg, false)) :: other)
+      case ((error, other), reporter.Info(pos, msg, reporter.INFO)) =>
+        (error, LogInfo(Position.formatMessage(pos, msg, false)) :: other)
     }
+
+    (errorMessages) match {
+      case h :: t =>
+        val errorNel = NonEmptyList(h, t: _*)
+        Failure(errorNel)
+      case Nil =>
+        shutdownPressy()
+        val files = for (x <- outputFiles if x.name.endsWith(".class")) yield {
+          val segments = x.path.split("/").toList.tail
+          val output = Evaluator.writeDeep(dynamicClasspath, segments, "")
+          output.write(x.toByteArray)
+          output.close()
+          (x.path.stripPrefix("(memory)/").stripSuffix(".class").replace('/', '.'), x.toByteArray)
+        }
+
+        val imports = lastImports.toList
+        Success((otherMessages, files, Imports(imports)))
+    }
+
   }
 
-  def parse(line: String): Either[String, Seq[Global#Tree]] = {
-    val errors = mutable.Buffer.empty[String]
-    // val warnings = mutable.Buffer.empty[String]
-    // val infos = mutable.Buffer.empty[String]
-    // errorLogger = errors.append(_)
-    // warningLogger = warnings.append(_)
-    // infoLogger = infos.append(_)
-    // reporter.reset()
+  def parse(line: String): ValidationNel[LogError, Seq[Global#Tree]] = {
     val reporter = new StoreReporter
     compiler.reporter = reporter
     val parser = compiler.newUnitParser(line)
     val trees = CompilerCompatibility.trees(compiler)(parser)
-    val res = if (reporter.hasErrors) {
-      for (info <- reporter.infos) {
-        import info._
-        import reporter._
-        severity match {
-          case ERROR =>
-            Classpath.traceClasspathProblem(s"ERROR: $msg")
-            errors.append(Position.formatMessage(pos, msg, false))
-          case _ => ()
-        }
-      }
-      Left(errors.mkString(newLine))
-    } else Right(trees)
     compiler.reporter = null
-    res
+    val errors: List[LogError] = reporter.infos.toList collect {
+      case reporter.Info(pos, msg, reporter.ERROR) => LogError(Position.formatMessage(pos, msg, false))
+    }
+    (errors) match {
+      case h :: t =>
+        val errorNel = NonEmptyList(h, t: _*)
+        Failure(errorNel)
+      case Nil =>
+        Success(trees)
+    }
   }
 
 }
-object Compiler {
 
-  /**
-    * If the Option is None, it means compilation failed
-    * Otherwise it's a Traversable of (filename, bytes) tuples
-    */
-  type Output = Option[(Vector[(String, Array[Byte])], Imports)]
+object Compiler {
 
   /**
     * Converts a bunch of bytes into Scalac's weird VirtualFile class
@@ -304,11 +249,4 @@ object Compiler {
     (vd, jcp)
   }
 
-  def apply(classpath: Seq[java.io.File],
-            dynamicClasspath: VirtualDirectory,
-            evalClassloader: => ClassLoader,
-            pluginClassloader: => ClassLoader,
-            shutdownPressy: () => Unit,
-            settings: Settings): Compiler =
-    new Compiler(classpath, dynamicClasspath, evalClassloader, pluginClassloader, shutdownPressy, settings)
 }

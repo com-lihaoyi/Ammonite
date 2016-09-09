@@ -1,7 +1,6 @@
 package ammonite.kernel
 
 import ammonite.runtime._
-import fastparse.core.{Parsed, ParseError}
 import ammonite.util._
 import ammonite.repl._
 
@@ -26,14 +25,12 @@ class ReplKernel(printer: PrinterX, storage: Storage, predefs: Seq[(Name, String
 
 object ReplKernel {
 
-  def process(code: String, interp: Interpreter) = Parsers.Splitter.parse(code) match {
-    case Parsed.Success(statements, _) =>
-      val processed =
-        interp.processLine(statements, s"Main${interp.eval.getCurrentLine}.sc")
-      interp.handleOutput(processed)
+  def process(code: String, interp: Interpreter) = ParserKernel.parseCode(code) map { validation =>
+    validation map { statements =>
+      val processed = interp.processLine(statements, s"Main${interp.eval.getCurrentLine}.sc")
+      processed foreach (x => interp.handleOutput(x._2))
       processed
-    case Parsed.Failure(_, index, extra) =>
-      Res.Failure(None, ParseError.msg(extra.input, extra.traced.expected, index))
+    }
   }
 
   def complete(text: String, position: Int, interp: Interpreter) = {

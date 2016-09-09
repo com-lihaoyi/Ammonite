@@ -4,11 +4,17 @@ import java.io.OutputStream
 import java.lang.reflect.InvocationTargetException
 
 import ammonite._
-import util.Util.{ClassFiles, newLine}
+import util.Util.newLine
 import ammonite.util._
+import ammonite.kernel.kernel.ClassFiles
 
 import scala.reflect.io.VirtualDirectory
-import scala.util.Try
+
+import scalaz.{Name => _, _}
+import Scalaz._
+import ammonite.kernel.LogError
+
+import java.io.{StringWriter, PrintWriter}
 
 /**
   * Evaluates already-compiled Bytecode.
@@ -21,14 +27,24 @@ class Evaluator(currentClassloader: ClassLoader, startingLine: Int) {
 
   import Evaluator._
 
-  def loadClass(fullName: String, classFiles: ClassFiles): Res[Class[_]] = {
-    Res[Class[_]](Try {
+  private def evaluatorLoadError(t: Throwable): LogError = {
+    val sw = new StringWriter();
+    val pw = new PrintWriter(sw);
+    t.printStackTrace(pw);
+    val msg = sw.toString();
+    sw.close()
+    pw.close()
+    LogError(msg)
+  }
+
+  def loadClass(fullName: String, classFiles: ClassFiles): Validation[LogError, Class[_]] = {
+    val raw = Validation.fromTryCatchNonFatal {
       for ((name, bytes) <- classFiles.sortBy(_._1)) {
         frames.head.classloader.addClassFile(name, bytes)
       }
-      val res = Class.forName(fullName, true, frames.head.classloader)
-      res
-    }, e => "Failed to load compiled class " + e)
+      Class.forName(fullName, true, frames.head.classloader)
+    }
+    raw leftMap evaluatorLoadError
   }
 
   private def evalMain(cls: Class[_]): Any = cls.getDeclaredMethod("$main").invoke(null)
@@ -51,18 +67,15 @@ class Evaluator(currentClassloader: ClassLoader, startingLine: Int) {
                   newImports: Imports,
                   printer: PrinterX,
                   fileName: String,
-                  indexedWrapperName: Name): Res[Evaluated] = {
-    for {
-      cls <- loadClass("$sess." + indexedWrapperName.backticked, classFiles)
-      _ = currentLine += 1
-      _ <- Catching { userCodeExceptionHandler }
-    } yield {
-      // Exhaust the printer iterator now, before exiting the `Catching`
-      // block, so any exceptions thrown get properly caught and handled
+                  indexedWrapperName: Name): Validation[LogError, Evaluated] = {
+
+    val loadedClass = loadClass("$sess." + indexedWrapperName.backticked, classFiles)
+    if (loadedClass.isSuccess) {
+      currentLine += 1
+    }
+    loadedClass map { cls =>
       val iter = evalMain(cls).asInstanceOf[Iterator[String]]
       evaluatorRunPrinter(iter.foreach(printer.out))
-
-      // "" Empty string as cache tag of repl code
       evaluationResult(Seq(Name("$sess"), indexedWrapperName), newImports, "")
     }
   }
@@ -103,14 +116,15 @@ class Evaluator(currentClassloader: ClassLoader, startingLine: Int) {
                            pkg: String,
                            wrapper: String,
                            dynamicClasspath: VirtualDirectory,
-                           classFilesList: Seq[String]): Res[Seq[_]] = {
-    Res.map(cachedData.zipWithIndex) {
-      case (clsFiles, index) =>
-        addToClasspath(clsFiles, dynamicClasspath)
-        val cls = loadClass(classFilesList(index), clsFiles)
-        try cls.map(evalMain(_))
-        catch userCodeExceptionHandler
+                           classFilesList: Seq[String]): ValidationNel[LogError, Seq[Any]] = {
+
+    def composedFunction(classFiles: ClassFiles, idx: Int): ValidationNel[LogError, Any] = {
+      addToClasspath(classFiles, dynamicClasspath)
+      val evaluated = loadClass(classFilesList(idx), classFiles) map (evalMain _)
+      evaluated.toValidationNel
     }
+
+    cachedData.zipWithIndex.toList.traverseU(x => composedFunction(x._1, x._2))
   }
 
 }
