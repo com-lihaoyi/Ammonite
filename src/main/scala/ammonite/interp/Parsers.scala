@@ -37,11 +37,11 @@ object Parsers {
     P(`import` ~/ ImportExpr.rep(1, sep = ",".~/))
   }
 
-  private val PatVarSplitter = {
-    val Prefixes = P(Prelude ~ (`var` | `val`))
-    val Lhs = P(Prefixes ~/ BindPattern.rep(1, "," ~/ Pass) ~ (`:` ~/ Type).?)
-    P(Lhs.! ~ (`=` ~/ WL ~ StatCtx.Expr.!) ~ End)
-  }
+  // private val PatVarSplitter = {
+  //   val Prefixes = P(Prelude ~ (`var` | `val`))
+  //   val Lhs = P(Prefixes ~/ BindPattern.rep(1, "," ~/ Pass) ~ (`:` ~/ Type).?)
+  //   P(Lhs.! ~ (`=` ~/ WL ~ StatCtx.Expr.!) ~ End)
+  // }
 
   private val Prelude = P((Annot ~ OneNLMax).rep ~ (Mod ~/ Pass).rep)
 

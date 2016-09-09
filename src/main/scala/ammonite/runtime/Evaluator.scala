@@ -80,19 +80,19 @@ class Evaluator(currentClassloader: ClassLoader, startingLine: Int) {
     }
   }
 
-  def processScriptBlock(cls: Class[_],
-                         newImports: Imports,
-                         wrapperName: Name,
-                         pkgName: Seq[Name],
-                         tag: String): Res[Evaluated] = {
-    for {
-      _ <- Catching { userCodeExceptionHandler }
-    } yield {
-      evalMain(cls)
-      val res = evaluationResult(pkgName :+ wrapperName, newImports, tag)
-      res
-    }
-  }
+  // def processScriptBlock(cls: Class[_],
+  //                        newImports: Imports,
+  //                        wrapperName: Name,
+  //                        pkgName: Seq[Name],
+  //                        tag: String): Res[Evaluated] = {
+  //   for {
+  //     _ <- Catching { userCodeExceptionHandler }
+  //   } yield {
+  //     evalMain(cls)
+  //     val res = evaluationResult(pkgName :+ wrapperName, newImports, tag)
+  //     res
+  //   }
+  // }
 
   /**
     * Performs the conversion of our pre-compiled `Array[Byte]`s into
@@ -131,21 +131,21 @@ class Evaluator(currentClassloader: ClassLoader, startingLine: Int) {
 
 object Evaluator {
 
-  private val userCodeExceptionHandler: PartialFunction[Throwable, Res.Failing] = {
-    // Exit
-    case Ex(_: InvEx, _: InitEx, ReplExit(value)) => Res.Exit(value)
+  // private val userCodeExceptionHandler: PartialFunction[Throwable, Res.Failing] = {
+  //   // Exit
+  //   case Ex(_: InvEx, _: InitEx, ReplExit(value)) => Res.Exit(value)
 
-    // Interrupted during pretty-printing
-    case Ex(e: ThreadDeath) => interrupted(e)
+  //   // Interrupted during pretty-printing
+  //   case Ex(e: ThreadDeath) => interrupted(e)
 
-    // Interrupted during evaluation
-    case Ex(_: InvEx, e: ThreadDeath) => interrupted(e)
+  //   // Interrupted during evaluation
+  //   case Ex(_: InvEx, e: ThreadDeath) => interrupted(e)
 
-    case Ex(_: InvEx, _: InitEx, userEx @ _ *) =>
-      Res.Exception(userEx(0), "")
-    case Ex(_: InvEx, userEx @ _ *) => Res.Exception(userEx(0), "")
-    case Ex(userEx @ _ *) => Res.Exception(userEx(0), "")
-  }
+  //   case Ex(_: InvEx, _: InitEx, userEx @ _ *) =>
+  //     Res.Exception(userEx(0), "")
+  //   case Ex(_: InvEx, userEx @ _ *) => Res.Exception(userEx(0), "")
+  //   case Ex(userEx @ _ *) => Res.Exception(userEx(0), "")
+  // }
 
   private def evaluationResult(wrapperName: Seq[Name], imports: Imports, tag: String) = {
     Evaluated(
@@ -179,14 +179,14 @@ object Evaluator {
     */
   private def evaluatorRunPrinter(f: => Unit) = f
 
-  def interrupted(e: Throwable) = {
-    Thread.interrupted()
-    Res.Failure(Some(e), newLine + "Interrupted!")
-  }
+  // def interrupted(e: Throwable) = {
+  //   Thread.interrupted()
+  //   Res.Failure(Some(e), newLine + "Interrupted!")
+  // }
 
-  private type InvEx = InvocationTargetException
+  // private type InvEx = InvocationTargetException
 
-  private type InitEx = ExceptionInInitializerError
+  // private type InitEx = ExceptionInInitializerError
 
   def writeDeep(d: VirtualDirectory, path: List[String], suffix: String): OutputStream = (path: @unchecked) match {
     case head :: Nil => d.fileNamed(path.head + suffix).output
