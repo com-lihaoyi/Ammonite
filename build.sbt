@@ -100,7 +100,7 @@ lazy val terminal = project
     name := "ammonite-terminal",
     libraryDependencies ++= Seq(
       "com.lihaoyi" %% "sourcecode" % "0.1.2",
-      "com.lihaoyi" %% "fansi" % "0.2.0"
+      "com.lihaoyi" %% "fansi" % "0.2.1"
     ),
     macroSettings
   )
@@ -272,7 +272,7 @@ lazy val readme = ScalatexReadme(
 ).settings(
   dontPublishSettings,
   scalaVersion := "2.11.8",
-  libraryDependencies += "com.lihaoyi" %% "fansi" % "0.2.0",
+  libraryDependencies += "com.lihaoyi" %% "fansi" % "0.2.1",
   (run in Compile) <<= (run in Compile).dependsOn(
     assembly in amm,
     packageBin in (shell, Compile),
