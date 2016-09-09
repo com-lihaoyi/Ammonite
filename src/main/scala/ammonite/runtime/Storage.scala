@@ -11,6 +11,8 @@ import scala.collection.generic.CanBuildFrom
 import scala.collection.{IndexedSeqLike, mutable}
 import scala.reflect.NameTransformer.encode
 
+import language.implicitConversions
+
 /**
   * Trait for the interface of common persistent storage. This handles history
   * and persistent caches. Right now it is not threadsafe nor does it handle

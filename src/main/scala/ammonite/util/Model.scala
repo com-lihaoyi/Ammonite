@@ -8,6 +8,8 @@ import pprint.{PPrint, PPrinter}
 
 import scala.reflect.runtime.universe.TypeTag
 
+import language.implicitConversions
+
 /**
   * Exception for reporting script compilation failures
   */

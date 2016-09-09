@@ -12,6 +12,8 @@ import ammonite.util.Util.newLine
 import scala.collection.{GenTraversableOnce, mutable}
 import scala.util.matching.Regex
 
+import language.implicitConversions
+
 trait Grepper[T] {
   def apply[V: pprint.PPrint](t: T, s: V)(implicit c: pprint.Config): Option[GrepResult]
 }

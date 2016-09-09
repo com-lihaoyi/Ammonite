@@ -29,7 +29,7 @@ libraryDependencies ++= Seq("com.github.scopt" %% "scopt" % "3.4.0",
                             "com.typesafe.scala-logging" %% "scala-logging" % "3.4.0",
                             "org.scalatest" %% "scalatest" % "3.0.0" % "test")
 
-scalacOptions ++= Seq("-Ywarn-unused", "-Ywarn-unused-import", "-Ywarn-inaccessible", "-Ywarn-dead-code", "-Xlint")
+scalacOptions ++= Seq("-Ywarn-unused", "-Ywarn-unused-import", "-Ywarn-inaccessible", "-Ywarn-dead-code", "-Xlint", "-deprecation", "-feature", "-unchecked")
 
 autoCompilerPlugins := true
 

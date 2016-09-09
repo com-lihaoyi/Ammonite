@@ -127,7 +127,7 @@ object AmmonitePlugin {
           // variables from interfering with them. If someone defines a value
           // called `_root_`, this will still break, but that's their problem
           val rootPrefix =
-            if (symbolList.head.isPackage) Seq(Name("_root_")) else Nil
+            if (symbolList.head.hasPackageFlag) Seq(Name("_root_")) else Nil
           val tailPath = nameList.tail.map(_.decoded).map(Name(_))
 
           val prefix = rootPrefix ++ headFullPath ++ tailPath

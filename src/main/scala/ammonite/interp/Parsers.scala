@@ -68,13 +68,13 @@ object Parsers {
 
   def splitScript(code: String) = ScriptSplitter.parse(code)
 
-  private val BlockUnwrapper = P("{" ~ Block.! ~ "}" ~ End)
+//  private val BlockUnwrapper = P("{" ~ Block.! ~ "}" ~ End)
 
-  def unwrapBlock(code: String) = {
-    BlockUnwrapper.parse(code) match {
-      case Parsed.Success(contents, _) => Some(contents)
-      case _ => None
-    }
-  }
+  // def unwrapBlock(code: String) = {
+  //   BlockUnwrapper.parse(code) match {
+  //     case Parsed.Success(contents, _) => Some(contents)
+  //     case _ => None
+  //   }
+  // }
 
 }

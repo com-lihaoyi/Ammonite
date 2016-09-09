@@ -21,6 +21,8 @@ import scalaz._
 
 import ammonite.kernel.kernel._
 
+import language.existentials
+
 /**
   * Encapsulates (almost) all the ickiness of Scalac so it doesn't leak into
   * the rest of the codebase. Makes use of a good amount of mutable state

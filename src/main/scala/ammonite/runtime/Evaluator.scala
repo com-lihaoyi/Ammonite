@@ -1,10 +1,10 @@
 package ammonite.runtime
 
 import java.io.OutputStream
-import java.lang.reflect.InvocationTargetException
+//import java.lang.reflect.InvocationTargetException
 
 import ammonite._
-import util.Util.newLine
+//import util.Util.newLine
 import ammonite.util._
 import ammonite.kernel.kernel.ClassFiles
 
@@ -15,6 +15,7 @@ import Scalaz._
 import ammonite.kernel.LogError
 
 import java.io.{StringWriter, PrintWriter}
+import language.existentials
 
 /**
   * Evaluates already-compiled Bytecode.
