@@ -4,16 +4,16 @@
   */
 package ammonite.util
 
-import pprint.{PPrint, PPrinter}
+//import pprint.{PPrint, PPrinter}
 
 import scala.reflect.runtime.universe.TypeTag
 
 import language.implicitConversions
 
-/**
-  * Exception for reporting script compilation failures
-  */
-class CompilationError(message: String) extends Exception(message)
+// /**
+//   * Exception for reporting script compilation failures
+//   */
+// class CompilationError(message: String) extends Exception(message)
 
 case class Evaluated(wrapper: Seq[Name], imports: Imports, tag: String, value: Any)
 
@@ -49,12 +49,12 @@ trait Ref[T] extends StableRef[T] {
 }
 
 object Ref {
-  implicit def refer[T](t: T): Ref[T] = Ref(t)
-  implicit def refPPrint[T: PPrint]: PPrinter[Ref[T]] = PPrinter { (ref, cfg) =>
-    Iterator(cfg.colors.prefixColor("Ref").render, "(") ++
-      implicitly[PPrint[T]].pprinter.render(ref(), cfg) ++
-      Iterator(")")
-  }
+  // implicit def refer[T](t: T): Ref[T] = Ref(t)
+  // implicit def refPPrint[T: PPrint]: PPrinter[Ref[T]] = PPrinter { (ref, cfg) =>
+  //   Iterator(cfg.colors.prefixColor("Ref").render, "(") ++
+  //     implicitly[PPrint[T]].pprinter.render(ref(), cfg) ++
+  //     Iterator(")")
+  // }
   def live[T](value0: () => T) = new Ref[T] {
     var value: () => T = value0
     def live() = value
@@ -81,64 +81,64 @@ object Ex {
   }
 }
 
-trait CodeColors {
-  def ident: fansi.Attrs
-  def `type`: fansi.Attrs
-  def literal: fansi.Attrs
-  def comment: fansi.Attrs
-  def keyword: fansi.Attrs
-}
+// trait CodeColors {
+//   def ident: fansi.Attrs
+//   def `type`: fansi.Attrs
+//   def literal: fansi.Attrs
+//   def comment: fansi.Attrs
+//   def keyword: fansi.Attrs
+// }
 
-/**
-  * A set of colors used to highlight the miscellanious bits of the REPL.
-  * Re-used all over the place in PPrint, TPrint, syntax highlighting,
-  * command-echoes, etc. in order to keep things consistent
-  *
-  * @param prompt The command prompt
-  * @param ident Definition of top-level identifiers
-  * @param `type` Definition of types
-  * @param literal Strings, integers and other literal expressions
-  * @param prefix The Seq/Foo when printing a Seq(...) or case class Foo(...)
-  * @param selected The color of text selected in the line-editor
-  * @param error The color used to print error messages of all kinds
-  */
-case class Colors(prompt: Ref[fansi.Attrs],
-                  ident: Ref[fansi.Attrs],
-                  `type`: Ref[fansi.Attrs],
-                  literal: Ref[fansi.Attrs],
-                  prefix: Ref[fansi.Attrs],
-                  comment: Ref[fansi.Attrs],
-                  keyword: Ref[fansi.Attrs],
-                  selected: Ref[fansi.Attrs],
-                  error: Ref[fansi.Attrs],
-                  warning: Ref[fansi.Attrs])
-object Colors {
+// /**
+//   * A set of colors used to highlight the miscellanious bits of the REPL.
+//   * Re-used all over the place in PPrint, TPrint, syntax highlighting,
+//   * command-echoes, etc. in order to keep things consistent
+//   *
+//   * @param prompt The command prompt
+//   * @param ident Definition of top-level identifiers
+//   * @param `type` Definition of types
+//   * @param literal Strings, integers and other literal expressions
+//   * @param prefix The Seq/Foo when printing a Seq(...) or case class Foo(...)
+//   * @param selected The color of text selected in the line-editor
+//   * @param error The color used to print error messages of all kinds
+//   */
+// case class Colors(prompt: Ref[fansi.Attrs],
+//                   ident: Ref[fansi.Attrs],
+//                   `type`: Ref[fansi.Attrs],
+//                   literal: Ref[fansi.Attrs],
+//                   prefix: Ref[fansi.Attrs],
+//                   comment: Ref[fansi.Attrs],
+//                   keyword: Ref[fansi.Attrs],
+//                   selected: Ref[fansi.Attrs],
+//                   error: Ref[fansi.Attrs],
+//                   warning: Ref[fansi.Attrs])
+// object Colors {
 
-  def Default = Colors(
-    fansi.Color.Magenta,
-    fansi.Color.Cyan,
-    fansi.Color.Green,
-    fansi.Color.Green,
-    fansi.Color.Yellow,
-    fansi.Color.Blue,
-    fansi.Color.Yellow,
-    fansi.Reversed.On,
-    fansi.Color.Red,
-    fansi.Color.Yellow
-  )
-  def BlackWhite = Colors(
-    fansi.Attrs.Empty,
-    fansi.Attrs.Empty,
-    fansi.Attrs.Empty,
-    fansi.Attrs.Empty,
-    fansi.Attrs.Empty,
-    fansi.Attrs.Empty,
-    fansi.Attrs.Empty,
-    fansi.Attrs.Empty,
-    fansi.Attrs.Empty,
-    fansi.Attrs.Empty
-  )
-}
+//   def Default = Colors(
+//     fansi.Color.Magenta,
+//     fansi.Color.Cyan,
+//     fansi.Color.Green,
+//     fansi.Color.Green,
+//     fansi.Color.Yellow,
+//     fansi.Color.Blue,
+//     fansi.Color.Yellow,
+//     fansi.Reversed.On,
+//     fansi.Color.Red,
+//     fansi.Color.Yellow
+//   )
+//   def BlackWhite = Colors(
+//     fansi.Attrs.Empty,
+//     fansi.Attrs.Empty,
+//     fansi.Attrs.Empty,
+//     fansi.Attrs.Empty,
+//     fansi.Attrs.Empty,
+//     fansi.Attrs.Empty,
+//     fansi.Attrs.Empty,
+//     fansi.Attrs.Empty,
+//     fansi.Attrs.Empty,
+//     fansi.Attrs.Empty
+//   )
+// }
 
 /**
   * Models a binding of a value to a typed name, and is passed into the

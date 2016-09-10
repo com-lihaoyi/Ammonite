@@ -1,7 +1,7 @@
 package ammonite
 
 import ammonite.runtime.Storage
-import ammonite.repl.Repl
+//import ammonite.repl.Repl
 import ammonite.kernel.ReplKernel
 import ammonite.util._
 //import org.scalatest.Assertions._
@@ -20,10 +20,10 @@ class TestRepl {
     java.nio.file.Files.createTempDirectory("ammonite-tester")
   )
 
-  val storage = new Storage.Folder(tempDir)
+  val storage = new Storage.InMemory
 
   val predefs = Seq(
-    Name("pprintPredef") -> Repl.pprintPredef,
+//    Name("pprintPredef") -> Repl.pprintPredef,
     Name("defaultPredef") -> ammonite.main.Defaults.predefString,
     Name("testPredef") -> predef
   )

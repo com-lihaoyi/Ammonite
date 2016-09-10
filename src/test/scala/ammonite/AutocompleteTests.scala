@@ -16,11 +16,9 @@ class AutocompleteTests extends FreeSpec {
     assert(sigLeft == Set())
   }
 
-  // Not sure why clone and finalize don't appear in this list
   val anyCompletion = Set(
     "!=",
     "==",
-    //"|>",
     "toString",
     "equals",
     "hashCode",
@@ -34,9 +32,8 @@ class AutocompleteTests extends FreeSpec {
   }
 
   "import" in {
-    //complete("""import <caret>""", Set("java", "javax", "scala") -- _)
-    complete("""import j<caret>""", Set("java", "javax", "jawn") -- _)
-    complete("""import ja<caret>""", x => Set("java", "javax", "jawn") ^ (x - "javafx"))
+    complete("""import j<caret>""", Set("java", "javax", "javafx", "jdk") -- _)
+    complete("""import ja<caret>""", x => Set("java", "javax") ^ (x - "javafx"))
     complete("""import java.<caret>""", Set("lang", "util") -- _)
     complete("""import java.u<caret>""", Set("util") ^ _)
     complete("""import java.util.<caret>""", Set("LinkedHashMap", "LinkedHashSet") -- _)
