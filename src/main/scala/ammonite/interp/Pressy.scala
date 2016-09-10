@@ -8,7 +8,6 @@ import scala.tools.nsc.backend.JavaPlatform
 import scala.tools.nsc.interactive.Response
 import scala.tools.nsc.util._
 import scala.util.{Failure, Success, Try}
-import com.typesafe.scalalogging.LazyLogging
 import ammonite.util.Util.newLine
 import scala.tools.nsc.reporters.AbstractReporter
 
@@ -59,7 +58,7 @@ class Pressy(nscGen: => nsc.interactive.Global) {
   }
 }
 
-object Pressy extends LazyLogging {
+object Pressy {
 
   /**
     * Encapsulates all the logic around a single instance of
@@ -231,15 +230,7 @@ object Pressy extends LazyLogging {
 
         override def displayPrompt(): Unit = ()
 
-        override def display(pos: Position, msg: String, severity: Severity) = severity match {
-          case ERROR =>
-            Classpath.traceClasspathProblem(msg)
-            logger.error(Position.formatMessage(pos, msg, false))
-          case WARNING =>
-            logger.warn(Position.formatMessage(pos, msg, false))
-          case INFO =>
-            logger.info(Position.formatMessage(pos, msg, false))
-        }
+        override def display(pos: Position, msg: String, severity: Severity) =  ()
 
         override val settings = settingsX
       }

@@ -24,9 +24,7 @@ libraryDependencies ++= Seq("com.github.scopt" %% "scopt" % "3.4.0",
                             "org.scala-lang" % "scala-reflect" % scalaVersion.value,
                             "com.lihaoyi" %% "scalaparse" % "0.3.7",
                             "com.lihaoyi" %% "ammonite-ops" % "0.7.6",
-                            "ch.qos.logback" % "logback-classic" % "1.1.7",
                             "org.scalaz" %% "scalaz-core" % "7.2.6",
-                            "com.typesafe.scala-logging" %% "scala-logging" % "3.4.0",
                             "org.scalatest" %% "scalatest" % "3.0.0" % "test")
 
 scalacOptions ++= Seq("-Ywarn-unused",

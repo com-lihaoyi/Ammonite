@@ -203,11 +203,10 @@ class Interpreter(val storage: Storage, customPredefs: Seq[(Name, String)]) { in
   // }
 
   def processLine(statements: NonEmptyList[String], fileName: String): InterpreterOutput = {
-    val processed: ValidationNel[LogError, Preprocessor.Output] = Preprocessor(
+    val processed: ValidationNel[LogError, MungedOutput] = Munger(
       compiler.parse,
       statements,
       eval.getCurrentLine,
-      "",
       Seq(Name("$sess")),
       Name("cmd" + eval.getCurrentLine),
       predefImports ++ eval.frames.head.imports /*++ hookImports*/
@@ -269,7 +268,7 @@ class Interpreter(val storage: Storage, customPredefs: Seq[(Name, String)]) { in
     }
   }
 
-  private def compileClass(processed: Preprocessor.Output, fileName: String): CompilerOutput = {
+  private def compileClass(processed: MungedOutput, fileName: String): CompilerOutput = {
     val compilationResult = compiler.compile(processed.code.getBytes, processed.prefixCharLength, fileName)
     if (compilationResult.isSuccess) {
       _compilationCount += 1
@@ -277,7 +276,7 @@ class Interpreter(val storage: Storage, customPredefs: Seq[(Name, String)]) { in
     compilationResult
   }
 
-  private def evaluateLine(processed: Preprocessor.Output,
+  private def evaluateLine(processed: MungedOutput,
                            fileName: String,
                            indexedWrapperName: Name): InterpreterOutput = {
 
