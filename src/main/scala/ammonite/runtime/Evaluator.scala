@@ -174,13 +174,6 @@ object Evaluator {
     )
   }
 
-  /**
-    * Dummy function used to mark this method call in the stack trace,
-    * so we can easily cut out the irrelevant part of the trace when
-    * showing it to the user.
-    */
-  private def evaluatorRunPrinter(f: => Unit) = f
-
   // def interrupted(e: Throwable) = {
   //   Thread.interrupted()
   //   Res.Failure(Some(e), newLine + "Interrupted!")

@@ -45,7 +45,7 @@ import Validation.FlatMap._
 
 object Preprocessor {
 
-  private case class Expanded(code: String, printer: Seq[String])
+    // private case class Expanded(code: String)
 
   case class Output(code: String, prefixCharLength: Int)
 
@@ -110,7 +110,7 @@ object Preprocessor {
             printerTemplate: String => String,
             extraCode: String): ValidationNel[LogError, Output] = {
 
-    def Processor(cond: PartialFunction[(String, String, G#Tree), Preprocessor.Expanded]) = {
+    def Processor(cond: PartialFunction[(String, String, G#Tree), String]) = {
       (code: String, name: String, tree: G#Tree) =>
         cond.lift((name, code, tree))
     }
@@ -139,7 +139,7 @@ object Preprocessor {
 
     def pprint(ident: String) = pprintSignature(ident, None)
 
-    type DCT = (String, String, G#Tree) => Option[Preprocessor.Expanded]
+    type DCT = (String, String, G#Tree) => Option[String]
 
     val decls: List[DCT] = {
 
@@ -148,12 +148,7 @@ object Preprocessor {
         */
       def DefProc(definitionLabel: String)(cond: PartialFunction[G#Tree, G#Name]): DCT =
         (code: String, name: String, tree: G#Tree) =>
-          cond.lift(tree).map { name =>
-            Preprocessor.Expanded(
-              code,
-              Seq(definedStr(definitionLabel, Name.backtickWrap(name.decoded)))
-            )
-        }
+          cond.lift(tree).map { name => code}
 
       val ObjectDef = DefProc("object") {
         case m: G#ModuleDef => m.name
@@ -176,42 +171,16 @@ object Preprocessor {
       }
 
       val PatVarDef = Processor {
-        case (name, code, t: G#ValDef) =>
-          Expanded(
-            //Only wrap rhs in function if it is not a function
-            //Wrapping functions causes type inference errors.
-            code,
-            // Try to leave out all synthetics; we don't actually have proper
-            // synthetic flags right now, because we're dumb-parsing it and not putting
-            // it through a full compilation
-            if (t.name.decoded.contains("$")) Nil
-            else if (!t.mods.hasFlag(Flags.LAZY))
-              Seq(pprint(Name.backtickWrap(t.name.decoded)))
-            else
-              Seq(s"""${pprintSignature(Name.backtickWrap(t.name.decoded), Some("<lazy>"))}""")
-          )
+        case (name, code, t: G#ValDef) => code
       }
 
       val Import = Processor {
-        case (name, code, tree: G#Import) =>
-          val Array(_, body) = code.split(" ", 2)
-          val tq = "\"\"\""
-          Expanded(code,
-                   Seq(
-                     s"""
-          _root_.ammonite
-                .repl
-                .ReplBridge
-                .value
-                .Internal
-                .printImport($tq$body$tq)
-          """
-                   ))
+        case (name, code, tree: G#Import) => code
       }
 
       val Expr = Processor {
         //Expressions are lifted to anon function applications so they will be JITed
-        case (name, code, tree) => Expanded(s"val $name = $code", Seq(pprint(name)))
+        case (name, code, tree) => s"val $name = $code"
       }
 
       List(
@@ -232,10 +201,10 @@ object Preprocessor {
 
     val parsed: ValidationNel[LogError, NonEmptyList[(Seq[G#Tree], String)]] = stmts.traverseU(composed)
 
-    def declParser(inp: ((Seq[G#Tree], String), Int)): ValidationNel[LogError, Expanded] = inp match {
+    def declParser(inp: ((Seq[G#Tree], String), Int)): ValidationNel[LogError, String] = inp match {
       case ((trees, code), i) =>
-        def handleTree(t: G#Tree): ValidationNel[LogError, Expanded] = {
-          val parsedDecls: List[Expanded] = decls flatMap (x => x(code, "res" + resultIndex + "_" + i, t))
+        def handleTree(t: G#Tree): ValidationNel[LogError, String] = {
+          val parsedDecls: List[String] = decls flatMap (x => x(code, "res" + resultIndex + "_" + i, t))
           parsedDecls match {
             case h :: t => Success(h)
             case Nil => Failure(NonEmptyList(LogError(s"Dont know how to handle $code")))
@@ -246,32 +215,21 @@ object Preprocessor {
           case _ if trees.nonEmpty && trees.forall(_.isInstanceOf[G#Import]) => handleTree(trees.head)
           case _ =>
             val filteredSeq = trees filter (_.isInstanceOf[G#ValDef])
-            val handleTreeComposed: G#Tree => ValidationNel[LogError, Seq[String]] = handleTree(_) map (_.printer)
-            val cumulativePrinter: ValidationNel[LogError, List[String]] =
-              filteredSeq.toList.traverseU(handleTreeComposed).map(_.flatten)
-            cumulativePrinter map (printer => Expanded(code, printer))
+            filteredSeq.toList.traverseU(handleTree).map(_ => code)
         }
     }
 
-    val declTraversed: ValidationNel[LogError, NonEmptyList[Expanded]] =
+    val declTraversed: ValidationNel[LogError, NonEmptyList[String]] =
       parsed.map(_.zipWithIndex).flatMap(_.traverseU(declParser))
 
-    val expanded = declTraversed map {
+    val expandedCode: ValidationNel[LogError, String] = declTraversed map {
       case NonEmptyList(h, tl) =>
         tl.foldLeft(h) {
-          case (acc, v) => Expanded(acc.code ++ v.code, acc.printer ++ v.printer)
+          case (acc, v) => acc ++ v
         }
     }
 
-    expanded map {
-      case Expanded(code, printer) =>
-        wrapCode(pkgName,
-                 indexedWrapperName,
-                 leadingSpaces + code,
-                 printerTemplate(printer.mkString(", ")),
-                 imports,
-                 extraCode)
-    }
+    expandedCode map {code => wrapCode(pkgName, indexedWrapperName, leadingSpaces + code, imports, extraCode)}
 
   }
 
@@ -313,16 +271,14 @@ object Preprocessor {
   private def wrapCode(pkgName: Seq[Name],
                        indexedWrapperName: Name,
                        code: String,
-                       printCode: String,
                        imports: Imports,
                        extraCode: String): Output = {
-    println("#" * 50)
-    println(s"pkgName: $pkgName")
-    println(s"code: $code")
-    println(s"printCode: $printCode")
-    println(s"imports: $imports")
-    println(s"extraCode: $extraCode")
-    println("#" * 50)
+    // println("#" * 50)
+    // println(s"pkgName: $pkgName")
+    // println(s"code: $code")
+    // println(s"imports: $imports")
+    // println(s"extraCode: $extraCode")
+    // println("#" * 50)
 
     //we need to normalize topWrapper and bottomWrapper in order to ensure
     //the snippets always use the platform-specific newLine
