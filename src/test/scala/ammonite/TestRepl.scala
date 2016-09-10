@@ -28,7 +28,7 @@ class TestRepl {
     Name("testPredef") -> predef
   )
 
-  val kernel = new ReplKernel(storage, predefs, ammonite.ops.pwd)
+  val kernel = new ReplKernel(storage, predefs)
 
 //   def session(sess: String): Unit = {
 //     // Remove the margin from the block and break

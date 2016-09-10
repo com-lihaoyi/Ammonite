@@ -12,6 +12,7 @@ import ammonite.kernel.LogError
 import scalaz.{Name => _, _}
 import Scalaz._
 import Validation.FlatMap._
+import ammonite.kernel.kernel.{previousIden, generatedMain}
 
 /**
   * Responsible for all scala-source-code-munging that happens within the
@@ -45,9 +46,9 @@ import Validation.FlatMap._
 
 object Preprocessor {
 
-    // private case class Expanded(code: String)
-
   case class Output(code: String, prefixCharLength: Int)
+
+  private case class Transform(code: String, resIden: Option[String])
 
   // private def errMsg(msg: String, code: String, expected: String, idx: Int): String = {
   //   val locationString = {
@@ -106,11 +107,10 @@ object Preprocessor {
             leadingSpaces: String,
             pkgName: Seq[Name],
             indexedWrapperName: Name,
-            imports: Imports,
-            printerTemplate: String => String,
-            extraCode: String): ValidationNel[LogError, Output] = {
+            imports: Imports): ValidationNel[LogError, Output] = {
 
-    def Processor(cond: PartialFunction[(String, String, G#Tree), String]) = {
+    def Processor(
+        cond: PartialFunction[(String, String, G#Tree), Transform]): (String, String, G#Tree) => Option[Transform] = {
       (code: String, name: String, tree: G#Tree) =>
         cond.lift((name, code, tree))
     }
@@ -139,7 +139,7 @@ object Preprocessor {
 
     // def pprint(ident: String) = pprintSignature(ident, None)
 
-    type DCT = (String, String, G#Tree) => Option[String]
+    type DCT = (String, String, G#Tree) => Option[Transform]
 
     val decls: List[DCT] = {
 
@@ -148,7 +148,9 @@ object Preprocessor {
         */
       def DefProc(definitionLabel: String)(cond: PartialFunction[G#Tree, G#Name]): DCT =
         (code: String, name: String, tree: G#Tree) =>
-          cond.lift(tree).map { name => code}
+          cond.lift(tree).map { name =>
+            Transform(code, None)
+        }
 
       val ObjectDef = DefProc("object") {
         case m: G#ModuleDef => m.name
@@ -171,16 +173,16 @@ object Preprocessor {
       }
 
       val PatVarDef = Processor {
-        case (name, code, t: G#ValDef) => code
+        case (name, code, t: G#ValDef) => Transform(code, None)
       }
 
       val Import = Processor {
-        case (name, code, tree: G#Import) => code
+        case (name, code, tree: G#Import) => Transform(code, None)
       }
 
       val Expr = Processor {
         //Expressions are lifted to anon function applications so they will be JITed
-        case (name, code, tree) => s"val $name = $code"
+        case (name, code, tree) => Transform(s"private val $name = $code", Some(name))
       }
 
       List(
@@ -201,10 +203,10 @@ object Preprocessor {
 
     val parsed: ValidationNel[LogError, NonEmptyList[(Seq[G#Tree], String)]] = stmts.traverseU(composed)
 
-    def declParser(inp: ((Seq[G#Tree], String), Int)): ValidationNel[LogError, String] = inp match {
+    def declParser(inp: ((Seq[G#Tree], String), Int)): ValidationNel[LogError, Transform] = inp match {
       case ((trees, code), i) =>
-        def handleTree(t: G#Tree): ValidationNel[LogError, String] = {
-          val parsedDecls: List[String] = decls flatMap (x => x(code, "res" + resultIndex + "_" + i, t))
+        def handleTree(t: G#Tree): ValidationNel[LogError, Transform] = {
+          val parsedDecls: List[Transform] = decls flatMap (x => x(code, "res" + resultIndex + "_" + i, t))
           parsedDecls match {
             case h :: t => Success(h)
             case Nil => Failure(NonEmptyList(LogError(s"Dont know how to handle $code")))
@@ -215,21 +217,44 @@ object Preprocessor {
           case _ if trees.nonEmpty && trees.forall(_.isInstanceOf[G#Import]) => handleTree(trees.head)
           case _ =>
             val filteredSeq = trees filter (_.isInstanceOf[G#ValDef])
-            filteredSeq.toList.traverseU(handleTree).map(_ => code)
+            filteredSeq.toList.traverseU(handleTree).map { transforms =>
+              transforms.lastOption match {
+                case Some(Transform(_, resIden)) => Transform(code, resIden)
+                case None => Transform(code, None)
+              }
+            }
         }
     }
 
-    val declTraversed: ValidationNel[LogError, NonEmptyList[String]] =
+    val declTraversed: ValidationNel[LogError, NonEmptyList[Transform]] =
       parsed.map(_.zipWithIndex).flatMap(_.traverseU(declParser))
 
-    val expandedCode: ValidationNel[LogError, String] = declTraversed map {
+    val expandedCode: ValidationNel[LogError, Transform] = declTraversed map {
       case NonEmptyList(h, tl) =>
         tl.foldLeft(h) {
-          case (acc, v) => acc ++ v
+          case (acc, v) => Transform(acc.code ++ v.code, v.resIden)
         }
     }
 
-    expandedCode map {code => wrapCode(pkgName, indexedWrapperName, leadingSpaces + code, imports, extraCode)}
+    expandedCode map {
+      case Transform(code, resIden) =>
+        val previousIdenStr = resIden.fold("()")(identity(_))
+
+        val topWrapper = normalizeNewlines(s"""
+          | package ${pkgName.map(_.backticked).mkString(".")}
+          | ${importBlock(imports)}
+          | object ${indexedWrapperName.backticked}{\n""".stripMargin)
+
+        val bottomWrapper = normalizeNewlines(s"""
+          | val $previousIden = $previousIdenStr
+          | def $generatedMain = { $previousIden }
+          | override def toString = "${indexedWrapperName.raw}"
+          | }""".stripMargin)
+
+        val importsLen = topWrapper.length
+
+        Output(topWrapper + (leadingSpaces + code) + bottomWrapper, importsLen)
+    }
 
   }
 
@@ -268,33 +293,29 @@ object Preprocessor {
     res
   }
 
-  private def wrapCode(pkgName: Seq[Name],
-                       indexedWrapperName: Name,
-                       code: String,
-                       imports: Imports,
-                       extraCode: String): Output = {
-    // println("#" * 50)
-    // println(s"pkgName: $pkgName")
-    // println(s"code: $code")
-    // println(s"imports: $imports")
-    // println(s"extraCode: $extraCode")
-    // println("#" * 50)
+//   private def wrapCode(pkgName: Seq[Name], indexedWrapperName: Name, code: String, imports: Imports): Output = {
+//     // println("#" * 50)
+//     // println(s"pkgName: $pkgName")
+//     // println(s"code: $code")
+//     // println(s"imports: $imports")
+//     // println(s"extraCode: $extraCode")
+//     // println("#" * 50)
 
-    //we need to normalize topWrapper and bottomWrapper in order to ensure
-    //the snippets always use the platform-specific newLine
-    val topWrapper = normalizeNewlines(s"""
-package ${pkgName.map(_.backticked).mkString(".")}
-${importBlock(imports)}
+//     //we need to normalize topWrapper and bottomWrapper in order to ensure
+//     //the snippets always use the platform-specific newLine
+//     val topWrapper = normalizeNewlines(s"""
+// package ${pkgName.map(_.backticked).mkString(".")}
+// ${importBlock(imports)}
 
-object ${indexedWrapperName.backticked}{\n""")
+// object ${indexedWrapperName.backticked}{\n""")
 
-    val bottomWrapper = normalizeNewlines(s"""\ndef $$main() = { 42 }
-  override def toString = "${indexedWrapperName.raw}"
-  $extraCode
-}
-""")
-    val importsLen = topWrapper.length
+//     val bottomWrapper = normalizeNewlines(s"""\ndef $$main() = { 42 }
+//   override def toString = "${indexedWrapperName.raw}"
+//   $extraCode
+// }
+// """)
+//     val importsLen = topWrapper.length
 
-    Output(topWrapper + code + bottomWrapper, importsLen)
-  }
+//     Output(topWrapper + code + bottomWrapper, importsLen)
+//   }
 }

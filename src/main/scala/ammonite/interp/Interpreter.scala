@@ -4,7 +4,7 @@ package ammonite.runtime
 
 //import scala.collection.mutable
 import scala.tools.nsc.Settings
-import ammonite.ops._
+//import ammonite.ops._
 //import fastparse.all._
 
 //import annotation.tailrec
@@ -24,17 +24,7 @@ import Validation.FlatMap._
   * to interpret Scala code. Doesn't attempt to provide any
   * real encapsulation for now.
   */
-class Interpreter(val storage: Storage,
-                  customPredefs: Seq[(Name, String)],
-                  // Allows you to set up additional "bridges" between the REPL
-                  // world and the outside world, by passing in the full name
-                  // of the `APIHolder` object that will hold the bridge and
-                  // the object that will be placed there. Needs to be passed
-                  // in as a callback rather than run manually later as these
-                  // bridges need to be in place *before* the predef starts
-                  // running, so you can use them predef to e.g. configure
-                  // the REPL before it starts
-                  val wd: Path) { interp =>
+class Interpreter(val storage: Storage, customPredefs: Seq[(Name, String)]) { interp =>
 
   // //this variable keeps track of where should we put the imports resulting from scripts.
   // private var scriptImportCallback: Imports => Unit = eval.update
@@ -220,16 +210,14 @@ class Interpreter(val storage: Storage,
       "",
       Seq(Name("$sess")),
       Name("cmd" + eval.getCurrentLine),
-      predefImports ++ eval.frames.head.imports /*++ hookImports*/,
-      prints => s"ammonite.repl.ReplBridge.value.Internal.combinePrints($prints)",
-      ""
+      predefImports ++ eval.frames.head.imports /*++ hookImports*/
     )
     println(s"processed: $processed")
-    val output: InterpreterOutput = processed flatMap {preprocessed => 
+    val output: InterpreterOutput = processed flatMap { preprocessed =>
       evaluateLine(preprocessed, fileName, Name("cmd" + eval.getCurrentLine))
     }
     output map {
-      case (logMessages, output) => (logMessages, output.copy(imports = output.imports /*++ hookImports*/))
+      case (logMessages, output) => (logMessages, output.copy(imports = output.imports /*++ hookImports*/ ))
     }
 
     // for {

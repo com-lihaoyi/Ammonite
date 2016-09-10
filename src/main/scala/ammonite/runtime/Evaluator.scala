@@ -3,7 +3,7 @@ package ammonite.runtime
 import java.io.OutputStream
 //import java.lang.reflect.InvocationTargetException
 
-import ammonite._
+//import ammonite._
 //import util.Util.newLine
 import ammonite.util._
 import ammonite.kernel.kernel.ClassFiles
@@ -13,6 +13,7 @@ import scala.reflect.io.VirtualDirectory
 import scalaz.{Name => _, _}
 import Scalaz._
 import ammonite.kernel.LogError
+import ammonite.kernel.kernel.generatedMain
 
 import java.io.{StringWriter, PrintWriter}
 import language.existentials
@@ -48,7 +49,9 @@ class Evaluator(currentClassloader: ClassLoader, startingLine: Int) {
     raw leftMap evaluatorLoadError
   }
 
-  private def evalMain(cls: Class[_]): Any = cls.getDeclaredMethod("$main").invoke(null)
+  private def evalMain(cls: Class[_]): Any = {
+    Option(cls.getDeclaredMethod(s"$generatedMain").invoke(null)).getOrElse(())
+  }
 
   /**
     * The current line number of the REPL, used to make sure every snippet
