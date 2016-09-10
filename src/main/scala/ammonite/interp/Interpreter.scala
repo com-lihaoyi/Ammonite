@@ -56,10 +56,10 @@ class Interpreter(val printer: PrinterX,
 
   private def evalClassloader = eval.frames.head.classloader
 
-  def reInit() = {
-    if (compiler != null)
-      init()
-  }
+  // def reInit() = {
+  //   if (compiler != null)
+  //     init()
+  // }
 
   def init() = {
     // Note we not only make a copy of `settings` to pass to the compiler,
@@ -142,7 +142,9 @@ class Interpreter(val printer: PrinterX,
   //   }
   // }
 
-  reInit()
+  //reInit()
+
+  init()
 
   // private def resolveSingleImportHook(source: ImportHook.Source, tree: ImportTree) = {
   //   val strippedPrefix =
@@ -225,6 +227,7 @@ class Interpreter(val printer: PrinterX,
       prints => s"ammonite.repl.ReplBridge.value.Internal.combinePrints($prints)",
       ""
     )
+    println(s"processed: $processed")
     val output: InterpreterOutput = processed flatMap {preprocessed => 
       evaluateLine(preprocessed, printer, fileName, Name("cmd" + eval.getCurrentLine))
     }

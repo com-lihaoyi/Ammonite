@@ -75,9 +75,9 @@ class Evaluator(currentClassloader: ClassLoader, startingLine: Int) {
       currentLine += 1
     }
     loadedClass map { cls =>
-      val iter = evalMain(cls).asInstanceOf[Iterator[String]]
-      evaluatorRunPrinter(iter.foreach(printer.out))
-      evaluationResult(Seq(Name("$sess"), indexedWrapperName), newImports, "")
+      // val iter = evalMain(cls).asInstanceOf[Iterator[String]]
+      // evaluatorRunPrinter(iter.foreach(printer.out))
+      evaluationResult(Seq(Name("$sess"), indexedWrapperName), newImports, "", evalMain(cls))
     }
   }
 
@@ -148,7 +148,7 @@ object Evaluator {
   //   case Ex(userEx @ _ *) => Res.Exception(userEx(0), "")
   // }
 
-  private def evaluationResult(wrapperName: Seq[Name], imports: Imports, tag: String) = {
+  private def evaluationResult(wrapperName: Seq[Name], imports: Imports, tag: String, value: Any) = {
     Evaluated(
       wrapperName,
       Imports(
@@ -169,7 +169,8 @@ object Evaluator {
           id.copy(prefix = rootedPrefix)
         }
       ),
-      tag
+      tag,
+      value
     )
   }
 

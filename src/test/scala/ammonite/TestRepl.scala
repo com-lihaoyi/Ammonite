@@ -1,45 +1,45 @@
-// package ammonite
+package ammonite
 
-// import ammonite.runtime.Storage
-// import ammonite.repl.Repl
-// import ammonite.kernel.ReplKernel
-// import ammonite.util._
-// import org.scalatest.Assertions._
+import ammonite.runtime.Storage
+import ammonite.repl.Repl
+import ammonite.kernel.ReplKernel
+import ammonite.util._
+import org.scalatest.Assertions._
 
-// import scala.collection.mutable
+import scala.collection.mutable
 
-// /**
-//   * A test REPL which does not read from stdin or stdout files, but instead lets
-//   * you feed in lines or sessions programmatically and have it execute them.
-//   */
-// class TestRepl {
-//   var allOutput = ""
-//   def predef = ""
+/**
+  * A test REPL which does not read from stdin or stdout files, but instead lets
+  * you feed in lines or sessions programmatically and have it execute them.
+  */
+class TestRepl {
+  var allOutput = ""
+  def predef = ""
 
-//   val tempDir = ammonite.ops.Path(
-//     java.nio.file.Files.createTempDirectory("ammonite-tester")
-//   )
+  val tempDir = ammonite.ops.Path(
+    java.nio.file.Files.createTempDirectory("ammonite-tester")
+  )
 
-//   val outBuffer = mutable.Buffer.empty[String]
-//   val warningBuffer = mutable.Buffer.empty[String]
-//   val errorBuffer = mutable.Buffer.empty[String]
-//   val infoBuffer = mutable.Buffer.empty[String]
-//   val printer = new PrinterX(
-//     outBuffer.append(_),
-//     warningBuffer.append(_),
-//     errorBuffer.append(_),
-//     infoBuffer.append(_)
-//   )
+  val outBuffer = mutable.Buffer.empty[String]
+  val warningBuffer = mutable.Buffer.empty[String]
+  val errorBuffer = mutable.Buffer.empty[String]
+  val infoBuffer = mutable.Buffer.empty[String]
+  val printer = new PrinterX(
+    outBuffer.append(_),
+    warningBuffer.append(_),
+    errorBuffer.append(_),
+    infoBuffer.append(_)
+  )
 
-//   val storage = new Storage.Folder(tempDir)
+  val storage = new Storage.Folder(tempDir)
 
-//   val predefs = Seq(
-//     Name("pprintPredef") -> Repl.pprintPredef,
-//     Name("defaultPredef") -> ammonite.main.Defaults.predefString,
-//     Name("testPredef") -> predef
-//   )
+  val predefs = Seq(
+    Name("pprintPredef") -> Repl.pprintPredef,
+    Name("defaultPredef") -> ammonite.main.Defaults.predefString,
+    Name("testPredef") -> predef
+  )
 
-//   val kernel = new ReplKernel(printer, storage, predefs, ammonite.ops.pwd)
+  val kernel = new ReplKernel(printer, storage, predefs, ammonite.ops.pwd)
 
 //   def session(sess: String): Unit = {
 //     // Remove the margin from the block and break
@@ -140,60 +140,60 @@
 //     }
 //   }
 
-//   def run(input: String) = {
+  def run(input: String) = {
 
-//     outBuffer.clear()
-//     warningBuffer.clear()
-//     errorBuffer.clear()
-//     infoBuffer.clear()
-//     val processed = kernel.process(input)
-//     processed match {
-//       case Res.Failure(ex, s) => printer.error(s)
-//       case Res.Exception(throwable, msg) =>
-//         printer.error(
-//           Repl.showException(throwable, fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty)
-//         )
-//       case _ =>
-//     }
-//     (
-//       processed,
-//       outBuffer.mkString,
-//       warningBuffer.mkString(Util.newLine),
-//       errorBuffer.mkString(Util.newLine),
-//       infoBuffer.mkString(Util.newLine)
-//     )
-//   }
+    outBuffer.clear()
+    warningBuffer.clear()
+    errorBuffer.clear()
+    infoBuffer.clear()
+    kernel.process(input)
+    // processed match {
+    //   case Res.Failure(ex, s) => printer.error(s)
+    //   case Res.Exception(throwable, msg) =>
+    //     printer.error(
+    //       Repl.showException(throwable, fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty)
+    //     )
+    //   case _ =>
+    // }
+    // (
+    //   processed,
+    //   outBuffer.mkString,
+    //   warningBuffer.mkString(Util.newLine),
+    //   errorBuffer.mkString(Util.newLine),
+    //   infoBuffer.mkString(Util.newLine)
+    // )
+  }
 
-//   def fail(input: String, failureCheck: String => Boolean = _ => true) = {
-//     val (processed, _, _, _, _) = run(input)
+  // def fail(input: String, failureCheck: String => Boolean = _ => true) = {
+  //   val (processed, _, _, _, _) = run(input)
 
-//     processed match {
-//       case Res.Success(v) =>
-//         assert({ identity(v); identity(allOutput); false })
-//       case Res.Failure(ex, s) =>
-//         failLoudly(assert(failureCheck(s)))
-//       case Res.Exception(ex, s) =>
-//         val msg = Repl.showException(
-//             ex,
-//             fansi.Attrs.Empty,
-//             fansi.Attrs.Empty,
-//             fansi.Attrs.Empty
-//           ) + Util.newLine + s
-//         failLoudly(assert(failureCheck(msg)))
-//       case _ => ???
-//     }
-//   }
+  //   processed match {
+  //     case Res.Success(v) =>
+  //       assert({ identity(v); identity(allOutput); false })
+  //     case Res.Failure(ex, s) =>
+  //       failLoudly(assert(failureCheck(s)))
+  //     case Res.Exception(ex, s) =>
+  //       val msg = Repl.showException(
+  //           ex,
+  //           fansi.Attrs.Empty,
+  //           fansi.Attrs.Empty,
+  //           fansi.Attrs.Empty
+  //         ) + Util.newLine + s
+  //       failLoudly(assert(failureCheck(msg)))
+  //     case _ => ???
+  //   }
+  // }
 
-//   def result(input: String, expected: Res[Evaluated]) = {
-//     val (processed, _, _, _, _) = run(input)
-//     assert(processed == expected)
-//   }
-//   def failLoudly[T](t: => T) =
-//     try t
-//     catch {
-//       case e: Throwable =>
-//         println("FAILURE TRACE" + Util.newLine + allOutput)
-//         throw e
-//     }
+  // def result(input: String, expected: Res[Evaluated]) = {
+  //   val (processed, _, _, _, _) = run(input)
+  //   assert(processed == expected)
+  // }
+  // def failLoudly[T](t: => T) =
+  //   try t
+  //   catch {
+  //     case e: Throwable =>
+  //       println("FAILURE TRACE" + Util.newLine + allOutput)
+  //       throw e
+  //   }
 
-// }
+}

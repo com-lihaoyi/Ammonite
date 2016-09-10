@@ -15,7 +15,7 @@ import language.implicitConversions
   */
 class CompilationError(message: String) extends Exception(message)
 
-case class Evaluated(wrapper: Seq[Name], imports: Imports, tag: String)
+case class Evaluated(wrapper: Seq[Name], imports: Imports, tag: String, value: Any)
 
 /**
   * Encapsulates a read-write cell that can be passed around

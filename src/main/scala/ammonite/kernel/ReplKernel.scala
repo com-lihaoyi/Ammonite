@@ -3,6 +3,10 @@ package ammonite.kernel
 import ammonite.runtime._
 import ammonite.util._
 import ammonite.repl._
+import kernel._
+import scalaz.{Name => _, _}
+import Scalaz._
+import Validation.FlatMap._
 
 class ReplKernel(printer: PrinterX, storage: Storage, predefs: Seq[(Name, String)], wd: ammonite.ops.Path) {
 
@@ -25,11 +29,15 @@ class ReplKernel(printer: PrinterX, storage: Storage, predefs: Seq[(Name, String
 
 object ReplKernel {
 
-  def process(code: String, interp: Interpreter) = ParserKernel.parseCode(code) map { validation =>
-    validation map { statements =>
-      val processed = interp.processLine(statements, s"Main${interp.eval.getCurrentLine}.sc")
-      processed foreach (x => interp.handleOutput(x._2))
-      processed
+  def process(code: String, interp: Interpreter): Option[InterpreterOutput] = {
+    val parsed: Option[Validation[LogError, NonEmptyList[String]]] = ParserKernel.parseCode(code)
+    parsed map { validation =>
+      val validationNel = validation.toValidationNel
+      validationNel flatMap { statements =>
+        val processed = interp.processLine(statements, s"Main${interp.eval.getCurrentLine}.sc")
+        processed foreach (x => interp.handleOutput(x._2))
+        processed
+      }
     }
   }
 

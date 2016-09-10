@@ -117,14 +117,15 @@ object Preprocessor {
 
     def pprintSignature(ident: String, customMsg: Option[String]) = {
       val customCode = customMsg.fold("_root_.scala.None")(x => s"""_root_.scala.Some("$x")""")
-      s"""
-      _root_.ammonite
-            .repl
-            .ReplBridge
-            .value
-            .Internal
-            .print($ident, $ident, "$ident", $customCode)
-      """
+      s"ident: $ident, customMsg: $customCode"
+      // s"""
+      // _root_.ammonite
+      //       .repl
+      //       .ReplBridge
+      //       .value
+      //       .Internal
+      //       .print($ident, $ident, "$ident", $customCode)
+      // """
     }
     def definedStr(definitionLabel: String, name: String) =
       s"""
@@ -138,12 +139,14 @@ object Preprocessor {
 
     def pprint(ident: String) = pprintSignature(ident, None)
 
-    val decls: List[(String, String, G#Tree) => Option[Preprocessor.Expanded]] = {
+    type DCT = (String, String, G#Tree) => Option[Preprocessor.Expanded]
+
+    val decls: List[DCT] = {
 
       /**
         * Processors for declarations which all have the same shape
         */
-      def DefProc(definitionLabel: String)(cond: PartialFunction[G#Tree, G#Name]) =
+      def DefProc(definitionLabel: String)(cond: PartialFunction[G#Tree, G#Name]): DCT =
         (code: String, name: String, tree: G#Tree) =>
           cond.lift(tree).map { name =>
             Preprocessor.Expanded(
@@ -313,6 +316,13 @@ object Preprocessor {
                        printCode: String,
                        imports: Imports,
                        extraCode: String): Output = {
+    println("#" * 50)
+    println(s"pkgName: $pkgName")
+    println(s"code: $code")
+    println(s"printCode: $printCode")
+    println(s"imports: $imports")
+    println(s"extraCode: $extraCode")
+    println("#" * 50)
 
     //we need to normalize topWrapper and bottomWrapper in order to ensure
     //the snippets always use the platform-specific newLine
@@ -322,7 +332,7 @@ ${importBlock(imports)}
 
 object ${indexedWrapperName.backticked}{\n""")
 
-    val bottomWrapper = normalizeNewlines(s"""\ndef $$main() = { $printCode }
+    val bottomWrapper = normalizeNewlines(s"""\ndef $$main() = { 42 }
   override def toString = "${indexedWrapperName.raw}"
   $extraCode
 }
