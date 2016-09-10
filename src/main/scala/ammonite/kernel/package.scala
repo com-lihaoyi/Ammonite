@@ -15,6 +15,10 @@ package object kernel {
 
   type InterpreterOutput = ValidationNel[LogError, SuccessfulInterpretation]
 
+  type SuccessfulExecution = (List[LogMessage], Any)
+
+  type KernelOutput = Option[ValidationNel[LogError, SuccessfulExecution]]
+
   protected[ammonite] val previousIden = "_id"
 
   protected[ammonite] val generatedMain = "$main"
