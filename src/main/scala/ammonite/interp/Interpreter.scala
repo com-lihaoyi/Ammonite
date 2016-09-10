@@ -24,8 +24,7 @@ import Validation.FlatMap._
   * to interpret Scala code. Doesn't attempt to provide any
   * real encapsulation for now.
   */
-class Interpreter(val printer: PrinterX,
-                  val storage: Storage,
+class Interpreter(val storage: Storage,
                   customPredefs: Seq[(Name, String)],
                   // Allows you to set up additional "bridges" between the REPL
                   // world and the outside world, by passing in the full name
@@ -35,9 +34,7 @@ class Interpreter(val printer: PrinterX,
                   // bridges need to be in place *before* the predef starts
                   // running, so you can use them predef to e.g. configure
                   // the REPL before it starts
-                  extraBridges: Interpreter => Seq[(String, String, AnyRef)],
-                  val wd: Path,
-                  verboseOutput: Boolean = true) { interp =>
+                  val wd: Path) { interp =>
 
   // //this variable keeps track of where should we put the imports resulting from scripts.
   // private var scriptImportCallback: Imports => Unit = eval.update
@@ -84,10 +81,10 @@ class Interpreter(val printer: PrinterX,
     )
   }
 
-  private val bridges = extraBridges(this) /* :+ (("ammonite.runtime.InterpBridge", "interp", interpApi)) */
-  for ((name, shortName, bridge) <- bridges) {
-    APIHolder.initBridge(evalClassloader, name, bridge)
-  }
+//  private val bridges = extraBridges(this) /* :+ (("ammonite.runtime.InterpBridge", "interp", interpApi)) */
+  // for ((name, shortName, bridge) <- bridges) {
+  //   APIHolder.initBridge(evalClassloader, name, bridge)
+  // }
   // import ammonite.repl.ReplBridge.{value => repl}
   // import ammonite.runtime.InterpBridge.{value => interp}
   // private val bridgePredefs =
@@ -229,7 +226,7 @@ class Interpreter(val printer: PrinterX,
     )
     println(s"processed: $processed")
     val output: InterpreterOutput = processed flatMap {preprocessed => 
-      evaluateLine(preprocessed, printer, fileName, Name("cmd" + eval.getCurrentLine))
+      evaluateLine(preprocessed, fileName, Name("cmd" + eval.getCurrentLine))
     }
     output map {
       case (logMessages, output) => (logMessages, output.copy(imports = output.imports /*++ hookImports*/))
@@ -293,16 +290,14 @@ class Interpreter(val printer: PrinterX,
   }
 
   private def evaluateLine(processed: Preprocessor.Output,
-                           printer: PrinterX,
                            fileName: String,
                            indexedWrapperName: Name): InterpreterOutput = {
 
     val compilationResult = compileClass(processed, fileName)
-    compilationResult match {
-      case Failure(compilationErrors) => Validation.failure(compilationErrors)
-      case Success((logMessages, classFiles, imports)) =>
+    compilationResult flatMap {
+      case (logMessages, classFiles, imports) =>
         val processed = withContextClassloader {
-          eval.processLine(classFiles, imports, printer, fileName, indexedWrapperName)
+          eval.processLine(classFiles, imports, fileName, indexedWrapperName)
         }
         val mapped = processed map (x => (logMessages, x))
         mapped.toValidationNel

@@ -66,7 +66,6 @@ class Evaluator(currentClassloader: ClassLoader, startingLine: Int) {
 
   def processLine(classFiles: ClassFiles,
                   newImports: Imports,
-                  printer: PrinterX,
                   fileName: String,
                   indexedWrapperName: Name): Validation[LogError, Evaluated] = {
 

@@ -4,9 +4,9 @@ import ammonite.runtime.Storage
 import ammonite.repl.Repl
 import ammonite.kernel.ReplKernel
 import ammonite.util._
-import org.scalatest.Assertions._
+//import org.scalatest.Assertions._
 
-import scala.collection.mutable
+//import scala.collection.mutable
 
 /**
   * A test REPL which does not read from stdin or stdout files, but instead lets
@@ -20,17 +20,6 @@ class TestRepl {
     java.nio.file.Files.createTempDirectory("ammonite-tester")
   )
 
-  val outBuffer = mutable.Buffer.empty[String]
-  val warningBuffer = mutable.Buffer.empty[String]
-  val errorBuffer = mutable.Buffer.empty[String]
-  val infoBuffer = mutable.Buffer.empty[String]
-  val printer = new PrinterX(
-    outBuffer.append(_),
-    warningBuffer.append(_),
-    errorBuffer.append(_),
-    infoBuffer.append(_)
-  )
-
   val storage = new Storage.Folder(tempDir)
 
   val predefs = Seq(
@@ -39,7 +28,7 @@ class TestRepl {
     Name("testPredef") -> predef
   )
 
-  val kernel = new ReplKernel(printer, storage, predefs, ammonite.ops.pwd)
+  val kernel = new ReplKernel(storage, predefs, ammonite.ops.pwd)
 
 //   def session(sess: String): Unit = {
 //     // Remove the margin from the block and break
@@ -141,11 +130,6 @@ class TestRepl {
 //   }
 
   def run(input: String) = {
-
-    outBuffer.clear()
-    warningBuffer.clear()
-    errorBuffer.clear()
-    infoBuffer.clear()
     kernel.process(input)
     // processed match {
     //   case Res.Failure(ex, s) => printer.error(s)

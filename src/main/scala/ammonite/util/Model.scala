@@ -151,17 +151,17 @@ object Bind {
   }
 }
 
-/**
-  * Encapsulates the ways the Ammonite REPL prints things. Does not print
-  * a trailing newline by default; you have to add one yourself.
-  *
-  * @param out How you want it to print streaming fragments of stdout
-  * @param warning How you want it to print a compile warning
-  * @param error How you want it to print a compile error
-  * @param info How you want to print compile info logging. *Not* the same
-  *             as `out`, which is used to print runtime output.
-  */
-class Printer(val warning: String => Unit, val error: String => Unit, val info: String => Unit)
+// /**
+//   * Encapsulates the ways the Ammonite REPL prints things. Does not print
+//   * a trailing newline by default; you have to add one yourself.
+//   *
+//   * @param out How you want it to print streaming fragments of stdout
+//   * @param warning How you want it to print a compile warning
+//   * @param error How you want it to print a compile error
+//   * @param info How you want to print compile info logging. *Not* the same
+//   *             as `out`, which is used to print runtime output.
+//   */
+// class Printer(val warning: String => Unit, val error: String => Unit, val info: String => Unit)
 
-class PrinterX(val out: String => Unit, warning: String => Unit, error: String => Unit, info: String => Unit)
-    extends Printer(warning, error, info)
+// class PrinterX(val out: String => Unit, warning: String => Unit, error: String => Unit, info: String => Unit)
+//     extends Printer(warning, error, info)

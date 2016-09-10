@@ -1,10 +1,10 @@
 package ammonite.runtime
 
 import ammonite.util._
-import ammonite.util.Util.{windowsPlatform, newLine, normalizeNewlines}
+import ammonite.util.Util.{newLine, normalizeNewlines}
 //import fastparse.all._
 
-import scala.reflect.internal.Flags
+//import scala.reflect.internal.Flags
 import scala.tools.nsc.{Global => G}
 import collection.mutable
 import ammonite.kernel.LogError
@@ -115,29 +115,29 @@ object Preprocessor {
         cond.lift((name, code, tree))
     }
 
-    def pprintSignature(ident: String, customMsg: Option[String]) = {
-      val customCode = customMsg.fold("_root_.scala.None")(x => s"""_root_.scala.Some("$x")""")
-      s"ident: $ident, customMsg: $customCode"
-      // s"""
-      // _root_.ammonite
-      //       .repl
-      //       .ReplBridge
-      //       .value
-      //       .Internal
-      //       .print($ident, $ident, "$ident", $customCode)
-      // """
-    }
-    def definedStr(definitionLabel: String, name: String) =
-      s"""
-      _root_.ammonite
-            .repl
-            .ReplBridge
-            .value
-            .Internal
-            .printDef("$definitionLabel", "$name")
-      """
+    // def pprintSignature(ident: String, customMsg: Option[String]) = {
+    //   val customCode = customMsg.fold("_root_.scala.None")(x => s"""_root_.scala.Some("$x")""")
+    //   s"ident: $ident, customMsg: $customCode"
+    //   // s"""
+    //   // _root_.ammonite
+    //   //       .repl
+    //   //       .ReplBridge
+    //   //       .value
+    //   //       .Internal
+    //   //       .print($ident, $ident, "$ident", $customCode)
+    //   // """
+    // }
+    // def definedStr(definitionLabel: String, name: String) =
+    //   s"""
+    //   _root_.ammonite
+    //         .repl
+    //         .ReplBridge
+    //         .value
+    //         .Internal
+    //         .printDef("$definitionLabel", "$name")
+    //   """
 
-    def pprint(ident: String) = pprintSignature(ident, None)
+    // def pprint(ident: String) = pprintSignature(ident, None)
 
     type DCT = (String, String, G#Tree) => Option[String]
 
