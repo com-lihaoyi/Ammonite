@@ -13,7 +13,7 @@ import kernel.{previousIden, generatedMain}
 case class MungedOutput(code: String, prefixCharLength: Int)
 
 /** Munges input statements into a form that can be fed into scalac
-*/
+  */
 object Munger {
 
   private case class Transform(code: String, resIden: Option[String])

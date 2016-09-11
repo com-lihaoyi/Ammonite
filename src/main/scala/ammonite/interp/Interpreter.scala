@@ -276,9 +276,7 @@ class Interpreter(val storage: Storage, customPredefs: Seq[(Name, String)]) { in
     compilationResult
   }
 
-  private def evaluateLine(processed: MungedOutput,
-                           fileName: String,
-                           indexedWrapperName: Name): InterpreterOutput = {
+  private def evaluateLine(processed: MungedOutput, fileName: String, indexedWrapperName: Name): InterpreterOutput = {
 
     val compilationResult = compileClass(processed, fileName)
     compilationResult flatMap {

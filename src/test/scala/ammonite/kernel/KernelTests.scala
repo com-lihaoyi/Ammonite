@@ -1,35 +1,53 @@
-package ammonite
+package ammonite.kernel
 
 import ammonite.runtime.Storage
 //import ammonite.repl.Repl
-import ammonite.kernel.ReplKernel
 import ammonite.util._
-//import org.scalatest.Assertions._
+import scalaz.{Name => _, _}
+import kernel._
+import org.scalatest.Assertions._
 
 //import scala.collection.mutable
 
-/**
-  * A test REPL which does not read from stdin or stdout files, but instead lets
-  * you feed in lines or sessions programmatically and have it execute them.
-  */
-class TestRepl {
-  var allOutput = ""
-  def predef = ""
+object KernelTests {
 
-  val tempDir = ammonite.ops.Path(
-    java.nio.file.Files.createTempDirectory("ammonite-tester")
+  private val defaultPredef = Seq(
+    Name("defaultPredef") -> ammonite.main.Defaults.predefString
   )
 
-  val storage = new Storage.InMemory
+  def buildKernel(predefs: Seq[(Name, String)] = defaultPredef) = new ReplKernel(new Storage.InMemory, predefs)
 
-  val predefs = Seq(
-//    Name("pprintPredef") -> Repl.pprintPredef,
-    Name("defaultPredef") -> ammonite.main.Defaults.predefString,
-    Name("testPredef") -> predef
-  )
+  def check(checks: Vector[(String, KernelOutput => Boolean)]) = {
+    val kernel = buildKernel()
+    val res = checks.foldLeft(true) {
+      case (res, (code, opTest)) => res && opTest(kernel.process(code))
+    }
+    assert(res)
+  }
 
-  val kernel = new ReplKernel(storage, predefs)
+  def checkSuccess(checks: Vector[(String, Any => Boolean)]) = {
+    val modifiedChecks: Vector[(String, KernelOutput => Boolean)] = checks map {
+      case (code, fn) =>
+        val modified: KernelOutput => Boolean = {
+          case Some(Success((_, x))) => fn(x)
+          case _ => false
+        }
+        (code, modified)
+    }
+    check(modifiedChecks)
+  }
 
+  def checkFailure(checks: Vector[(String, NonEmptyList[LogError] => Boolean)]) = {
+    val modifiedChecks: Vector[(String, KernelOutput => Boolean)] = checks map {
+      case (code, fn) =>
+        val modified: KernelOutput => Boolean = {
+          case Some(Failure(errors)) => fn(errors)
+          case _ => false
+        }
+        (code, modified)
+    }
+    check(modifiedChecks)
+  }
 //   def session(sess: String): Unit = {
 //     // Remove the margin from the block and break
 //     // it into blank-line-delimited steps
@@ -129,24 +147,24 @@ class TestRepl {
 //     }
 //   }
 
-  def run(input: String) = {
-    kernel.process(input)
-    // processed match {
-    //   case Res.Failure(ex, s) => printer.error(s)
-    //   case Res.Exception(throwable, msg) =>
-    //     printer.error(
-    //       Repl.showException(throwable, fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty)
-    //     )
-    //   case _ =>
-    // }
-    // (
-    //   processed,
-    //   outBuffer.mkString,
-    //   warningBuffer.mkString(Util.newLine),
-    //   errorBuffer.mkString(Util.newLine),
-    //   infoBuffer.mkString(Util.newLine)
-    // )
-  }
+  // def run(input: String) = {
+  //   kernel.process(input)
+  //   // processed match {
+  //   //   case Res.Failure(ex, s) => printer.error(s)
+  //   //   case Res.Exception(throwable, msg) =>
+  //   //     printer.error(
+  //   //       Repl.showException(throwable, fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty)
+  //   //     )
+  //   //   case _ =>
+  //   // }
+  //   // (
+  //   //   processed,
+  //   //   outBuffer.mkString,
+  //   //   warningBuffer.mkString(Util.newLine),
+  //   //   errorBuffer.mkString(Util.newLine),
+  //   //   infoBuffer.mkString(Util.newLine)
+  //   // )
+  // }
 
   // def fail(input: String, failureCheck: String => Boolean = _ => true) = {
   //   val (processed, _, _, _, _) = run(input)

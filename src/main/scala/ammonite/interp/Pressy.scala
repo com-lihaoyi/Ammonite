@@ -230,7 +230,7 @@ object Pressy {
 
         override def displayPrompt(): Unit = ()
 
-        override def display(pos: Position, msg: String, severity: Severity) =  ()
+        override def display(pos: Position, msg: String, severity: Severity) = ()
 
         override val settings = settingsX
       }

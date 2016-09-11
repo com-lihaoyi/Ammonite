@@ -1,15 +1,16 @@
-package ammonite
+package ammonite.kernel
 
 import language.postfixOps
 import org.scalatest.FreeSpec
 
 class AutocompleteTests extends FreeSpec {
 
-  val check = new TestRepl()
+  val kernel = KernelTests.buildKernel()
+
   def complete(caretCode: String, cmp: (Set[String]) => Set[String], sigs: (Set[String]) => Set[String] = _ => Set()) = {
     val cursor = caretCode.indexOf("<caret>")
     val buf = caretCode.replace("<caret>", "")
-    val (_, completions, signatures) = check.kernel.complete(buf, cursor)
+    val (_, completions, signatures) = kernel.complete(buf, cursor)
     val left = cmp(completions.toSet)
     assert(left == Set())
     val sigLeft = sigs(signatures.toSet)
@@ -80,7 +81,7 @@ class AutocompleteTests extends FreeSpec {
 
   "dot" in {
 
-   complete("""java.math.<caret>""", Set("MathContext", "BigDecimal", "BigInteger", "RoundingMode") ^)
+    complete("""java.math.<caret>""", Set("MathContext", "BigDecimal", "BigInteger", "RoundingMode") ^)
 
     complete("""scala.Option.<caret>""", (anyCompletion ++ Set("apply", "empty")) ^)
 
