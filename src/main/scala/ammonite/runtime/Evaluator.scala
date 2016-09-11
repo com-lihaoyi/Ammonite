@@ -14,6 +14,8 @@ import scalaz.{Name => _, _}
 import Scalaz._
 import ammonite.kernel.LogError
 import ammonite.kernel.kernel.generatedMain
+import language.existentials
+import Validation.FlatMap._
 
 import java.io.{StringWriter, PrintWriter}
 
@@ -39,18 +41,20 @@ class Evaluator(currentClassloader: ClassLoader, startingLine: Int) {
   }
 
   def loadClass(fullName: String, classFiles: ClassFiles): Validation[LogError, Class[_]] = {
-    try {
+    val raw = Validation.fromTryCatchNonFatal{
       for ((name, bytes) <- classFiles.sortBy(_._1)) {
         frames.head.classloader.addClassFile(name, bytes)
       }
-      Success(Class.forName(fullName, true, frames.head.classloader))
-    } catch {
-      case ex: Throwable => Failure(evaluatorLoadError(ex))
+      Class.forName(fullName, true, frames.head.classloader)
     }
+    raw leftMap (evaluatorLoadError(_))
   }
 
-  private def evalMain(cls: Class[_]): Any = {
-    Option(cls.getDeclaredMethod(s"$generatedMain").invoke(null)).getOrElse(())
+  private def evalMain(cls: Class[_]): Validation[LogError, Any] = {
+    val raw = Validation.fromTryCatchNonFatal{
+      Option(cls.getDeclaredMethod(s"$generatedMain").invoke(null)).getOrElse(())
+    }
+    raw leftMap (evaluatorLoadError(_))
   }
 
   /**
@@ -76,10 +80,10 @@ class Evaluator(currentClassloader: ClassLoader, startingLine: Int) {
     if (loadedClass.isSuccess) {
       currentLine += 1
     }
-    loadedClass map { cls =>
+    loadedClass flatMap { cls =>
       // val iter = evalMain(cls).asInstanceOf[Iterator[String]]
       // evaluatorRunPrinter(iter.foreach(printer.out))
-      evaluationResult(Seq(Name("$sess"), indexedWrapperName), newImports, "", evalMain(cls))
+      evalMain(cls) map (evaluationResult(Seq(Name("$sess"), indexedWrapperName), newImports, "", _))
     }
   }
 
