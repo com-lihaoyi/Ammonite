@@ -39,6 +39,11 @@ object KernelTests {
     case _ => false
   }
 
+  def checkBoolean(b: Boolean): Any => Boolean = {
+    case x: Boolean => x == b
+    case _ => false
+  }
+
   def check(kernel: ReplKernel, checks: Vector[(String, KernelOutput => Boolean)]) = {
     val (res, idx) = checks.zipWithIndex.foldLeft((true, -1)) {
       case ((res, resIdx), ((code, opTest), idx)) => {
