@@ -3,7 +3,6 @@ package test.ammonite.ops
 import java.nio.file.Paths
 
 import ammonite.ops._
-
 import utest._
 object PathTests extends TestSuite{
   val tests = TestSuite {
@@ -337,6 +336,40 @@ object PathTests extends TestSuite{
           val tooManyUpsStr = "/hello/../.."
           intercept[PathError.AbsolutePathOutsideRoot.type]{
             Path(tooManyUpsStr)
+          }
+        }
+      }
+      'symlinks{
+
+        val names = Seq('test123, 'test124, 'test125, 'test126)
+        val twd = tmp.dir()
+
+        'nestedSymlinks{
+          if(Unix()) {
+            names.foreach(p => rm ! twd/p)
+            mkdir ! twd/'test123
+            ln.s(twd/'test123, twd/'test124)
+            ln.s(twd/'test124, twd/'test125)
+            ln.s(twd/'test125, twd/'test126)
+            assert((twd/'test126).tryFollowLinks.get == (twd/'test123).tryFollowLinks.get)
+            names.foreach(p => rm ! twd/p)
+            names.foreach(p => assert(!exists(twd/p)))
+          }
+        }
+
+        'danglingSymlink{
+          if(Unix()) {
+            names.foreach(p => rm ! twd/p)
+            mkdir ! twd/'test123
+            ln.s(twd/'test123, twd/'test124)
+            ln.s(twd/'test124, twd/'test125)
+            ln.s(twd/'test125, twd/'test126)
+            rm ! twd / 'test123
+            assert( (twd / 'test126).tryFollowLinks.isEmpty)
+            names.foreach(p => rm ! twd / p)
+            names.foreach(p => assert(!exists(twd / p)))
+            names.foreach(p => rm ! twd/p)
+            names.foreach(p => assert(!exists(twd/p)))
           }
         }
       }
