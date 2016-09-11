@@ -145,7 +145,6 @@ final class Compiler(classpath: Seq[java.io.File],
     val compilationResultMapped = compilationResult leftMap (LogMessage.fromThrowable(_))
 
     compilationResultMapped.toValidationNel flatMap { _ =>
-      
       val outputFiles = enumerateVdFiles(vd).toVector
 
       val (errorMessages, otherMessages) = reporter.infos.foldLeft((List[LogError](), List[LogMessage]())) {

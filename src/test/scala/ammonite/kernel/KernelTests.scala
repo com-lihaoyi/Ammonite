@@ -17,8 +17,7 @@ object KernelTests {
 
   def buildKernel(predefs: Seq[(Name, String)] = defaultPredef) = new ReplKernel(new Storage.InMemory, predefs)
 
-  def check(checks: Vector[(String, KernelOutput => Boolean)]) = {
-    val kernel = buildKernel()
+  def check(kernel: ReplKernel, checks: Vector[(String, KernelOutput => Boolean)]) = {
     val (res, idx) = checks.zipWithIndex.foldLeft((true, -1)) {
       case ((res, resIdx), ((code, opTest), idx)) => {
         if (res) {
@@ -37,7 +36,7 @@ object KernelTests {
     assert(res, msg)
   }
 
-  def checkSuccess(checks: Vector[(String, Any => Boolean)]) = {
+  def checkSuccess(kernel: ReplKernel, checks: Vector[(String, Any => Boolean)]) = {
     val modifiedChecks: Vector[(String, KernelOutput => Boolean)] = checks map {
       case (code, fn) =>
         val modified: KernelOutput => Boolean = {
@@ -46,10 +45,10 @@ object KernelTests {
         }
         (code, modified)
     }
-    check(modifiedChecks)
+    check(kernel, modifiedChecks)
   }
 
-  def checkFailure(checks: Vector[(String, NonEmptyList[LogError] => Boolean)]) = {
+  def checkFailure(kernel: ReplKernel, checks: Vector[(String, NonEmptyList[LogError] => Boolean)]) = {
     val modifiedChecks: Vector[(String, KernelOutput => Boolean)] = checks map {
       case (code, fn) =>
         val modified: KernelOutput => Boolean = {
@@ -58,7 +57,7 @@ object KernelTests {
         }
         (code, modified)
     }
-    check(modifiedChecks)
+    check(kernel, modifiedChecks)
   }
 //   def session(sess: String): Unit = {
 //     // Remove the margin from the block and break

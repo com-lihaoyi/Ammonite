@@ -7,11 +7,13 @@ import scalaz._
 
 class FailureTests extends FreeSpec {
 
+  val kernel = buildKernel()
+
   "compileFailure" in {
-    checkFailure(
+    checkFailure(kernel, 
       Vector(
         (s"$previousIden", {
-          case NonEmptyList(h, tl) => tl.isEmpty && h.msg.contains("not found: value _it")
+          case NonEmptyList(h, tl) => tl.isEmpty && h.msg.contains(s"not found: value $previousIden")
         }),
         ("java", {
           case NonEmptyList(h, tl) => tl.isEmpty && h.msg.contains("package java is not a value")
@@ -37,20 +39,32 @@ class FailureTests extends FreeSpec {
       ))
   }
 
-  // "compilerCrash" in {
-  //   // Make sure compiler crashes provide the appropiate error
-  //   // messaging, and the REPL continues functioning after
-  //   check.session("""
-  //       @ val x = 1
-  //       x: Int = 1
-
-  //       @ /* trigger compiler crash */ trait Bar { super[Object].hashCode }
-  //       error: java.lang.AssertionError: assertion failed
-
-  //       @ 1 + x
-  //       res1: Int = 2
-  //     """)
-  // }
+  "compilerCrash" in {
+    check(kernel, 
+      Vector(
+        ("val x = 1", {
+          case Some(Success((_, x))) =>
+            x match {
+              case _: Unit => true
+              case _ => false
+            }
+          case _ => false
+        }),
+        ("trait Bar { super[Object].hashCode}", {
+          case Some(Failure(NonEmptyList(h, tl))) if tl.isEmpty =>
+            h.msg.contains("java.lang.AssertionError: assertion failed")
+          case _ => false
+        }),
+        ("1 + x", {
+          case Some(Success((_, x))) =>
+            x match {
+              case y: Int => y == 2
+              case _ => false
+            }
+          case _ => false
+        })
+      ))
+  }
 
   // "ivyFail" in {
   //   check.session("""
@@ -59,15 +73,14 @@ class FailureTests extends FreeSpec {
   //     """)
   // }
 
-  // "exceptionHandling" in {
-  //   check.fail("""throw new Exception("lol", new Exception("hoho"))""",
-  //              x =>
-  //                // It contains the things we want
-  //                x.contains("java.lang.Exception: lol") &&
-  //                  x.contains("java.lang.Exception: hoho") &&
-  //                  // and none of the stuff we don't want
-  //                  x.lines.length == 6 &&
-  //                  !x.contains("Something unexpected went wrong =("))
-  // }
+  "exceptionHandling" in {
+    checkFailure(kernel, 
+      Vector(
+        ("""throw new Exception("lol", new Exception("hoho"))""", {
+          case NonEmptyList(h, tl) =>
+            tl.isEmpty && (h.msg.contains("java.lang.Exception: lol")) && (h.msg.contains("java.lang.Exception: hoho"))
+        })
+      ))
+  }
 
 }
