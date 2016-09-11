@@ -12,12 +12,10 @@ import scala.reflect.io.VirtualDirectory
 
 import scalaz.{Name => _, _}
 import Scalaz._
-import ammonite.kernel.LogError
+import ammonite.kernel._
 import ammonite.kernel.kernel.generatedMain
 import language.existentials
 import Validation.FlatMap._
-
-import java.io.{StringWriter, PrintWriter}
 
 /**
   * Evaluates already-compiled Bytecode.
@@ -30,31 +28,21 @@ class Evaluator(currentClassloader: ClassLoader, startingLine: Int) {
 
   import Evaluator._
 
-  private def evaluatorLoadError(t: Throwable): LogError = {
-    val sw = new StringWriter();
-    val pw = new PrintWriter(sw);
-    t.printStackTrace(pw);
-    val msg = sw.toString();
-    sw.close()
-    pw.close()
-    LogError(msg)
-  }
-
   def loadClass(fullName: String, classFiles: ClassFiles): Validation[LogError, Class[_]] = {
-    val raw = Validation.fromTryCatchNonFatal{
+    val raw = Validation.fromTryCatchNonFatal {
       for ((name, bytes) <- classFiles.sortBy(_._1)) {
         frames.head.classloader.addClassFile(name, bytes)
       }
       Class.forName(fullName, true, frames.head.classloader)
     }
-    raw leftMap (evaluatorLoadError(_))
+    raw leftMap (LogMessage.fromThrowable(_))
   }
 
   private def evalMain(cls: Class[_]): Validation[LogError, Any] = {
-    val raw = Validation.fromTryCatchNonFatal{
+    val raw = Validation.fromTryCatchNonFatal {
       Option(cls.getDeclaredMethod(s"$generatedMain").invoke(null)).getOrElse(())
     }
-    raw leftMap (evaluatorLoadError(_))
+    raw leftMap (LogMessage.fromThrowable(_))
   }
 
   /**

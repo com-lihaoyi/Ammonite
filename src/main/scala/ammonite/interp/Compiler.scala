@@ -18,6 +18,8 @@ import scala.tools.nsc.util._
 import ammonite.kernel._
 
 import scalaz._
+import Scalaz._
+import Validation.FlatMap._
 
 import ammonite.kernel.kernel._
 
@@ -137,37 +139,42 @@ final class Compiler(classpath: Seq[java.io.File],
 
     val run = new compiler.Run()
     vd.clear()
-    run.compileFiles(List(singleFile))
-    val outputFiles = enumerateVdFiles(vd).toVector
+    val compilationResult = Validation.fromTryCatchNonFatal(run.compileFiles(List(singleFile)))
     compiler.reporter = null
 
-    val (errorMessages, otherMessages) = reporter.infos.foldLeft((List[LogError](), List[LogMessage]())) {
-      case ((error, other), reporter.Info(pos, msg, reporter.ERROR)) =>
-        (LogError(Position.formatMessage(pos, msg, false)) :: error, other)
-      case ((error, other), reporter.Info(pos, msg, reporter.WARNING)) =>
-        (error, LogWarning(Position.formatMessage(pos, msg, false)) :: other)
-      case ((error, other), reporter.Info(pos, msg, reporter.INFO)) =>
-        (error, LogInfo(Position.formatMessage(pos, msg, false)) :: other)
+    val compilationResultMapped = compilationResult leftMap (LogMessage.fromThrowable(_))
+
+    compilationResultMapped.toValidationNel flatMap { _ =>
+      
+      val outputFiles = enumerateVdFiles(vd).toVector
+
+      val (errorMessages, otherMessages) = reporter.infos.foldLeft((List[LogError](), List[LogMessage]())) {
+        case ((error, other), reporter.Info(pos, msg, reporter.ERROR)) =>
+          (LogError(Position.formatMessage(pos, msg, false)) :: error, other)
+        case ((error, other), reporter.Info(pos, msg, reporter.WARNING)) =>
+          (error, LogWarning(Position.formatMessage(pos, msg, false)) :: other)
+        case ((error, other), reporter.Info(pos, msg, reporter.INFO)) =>
+          (error, LogInfo(Position.formatMessage(pos, msg, false)) :: other)
+      }
+
+      (errorMessages) match {
+        case h :: t =>
+          val errorNel = NonEmptyList(h, t: _*)
+          Failure(errorNel)
+        case Nil =>
+          shutdownPressy()
+          val files = for (x <- outputFiles if x.name.endsWith(".class")) yield {
+            val segments = x.path.split("/").toList.tail
+            val output = Evaluator.writeDeep(dynamicClasspath, segments, "")
+            output.write(x.toByteArray)
+            output.close()
+            (x.path.stripPrefix("(memory)/").stripSuffix(".class").replace('/', '.'), x.toByteArray)
+          }
+
+          val imports = lastImports.toList
+          Success((otherMessages, files, Imports(imports)))
+      }
     }
-
-    (errorMessages) match {
-      case h :: t =>
-        val errorNel = NonEmptyList(h, t: _*)
-        Failure(errorNel)
-      case Nil =>
-        shutdownPressy()
-        val files = for (x <- outputFiles if x.name.endsWith(".class")) yield {
-          val segments = x.path.split("/").toList.tail
-          val output = Evaluator.writeDeep(dynamicClasspath, segments, "")
-          output.write(x.toByteArray)
-          output.close()
-          (x.path.stripPrefix("(memory)/").stripSuffix(".class").replace('/', '.'), x.toByteArray)
-        }
-
-        val imports = lastImports.toList
-        Success((otherMessages, files, Imports(imports)))
-    }
-
   }
 
   def parse(line: String): ValidationNel[LogError, Seq[Global#Tree]] = {

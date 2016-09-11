@@ -35,25 +35,6 @@ class FailureTests extends FreeSpec {
             }
         })
       ))
-    // check.session("""
-    //     @ doesnt_exist
-    //     error: not found: value doesnt_exist
-
-    //     @ java
-    //     error: package java is not a value
-
-    //     @ 1 + vale
-    //     error: not found: value vale
-    //     val res0 = 1 + vale
-    //                    ^
-    //     Compilation Failed
-
-    //     @ val x = 1 + vale
-    //     error: not found: value vale
-    //     val x = 1 + vale
-    //                 ^
-    //     Compilation Failed
-    //   """)
   }
 
   // "compilerCrash" in {
