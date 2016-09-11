@@ -25,16 +25,17 @@ object ReplKernel {
 
   def process(code: String, interp: Interpreter): KernelOutput = {
     val parsed: Option[Validation[LogError, NonEmptyList[String]]] = ParserKernel.parseCode(code)
-    parsed map { validation =>
+    val withReversedErrors = parsed map { validation =>
       val validationNel = validation.toValidationNel
       validationNel flatMap { statements =>
         val processed = interp.processLine(statements, s"Main${interp.eval.getCurrentLine}.sc")
         processed foreach (x => interp.handleOutput(x._2))
         processed map {
-          case (logMessages, evaluated) => (logMessages, evaluated.value)
+          case (logMessages, evaluated) => (logMessages.reverse, evaluated.value)
         }
       }
     }
+    withReversedErrors.map(_.leftMap(_.reverse))
   }
 
   def complete(text: String, position: Int, interp: Interpreter) = {

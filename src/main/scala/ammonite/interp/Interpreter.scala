@@ -211,7 +211,6 @@ class Interpreter(val storage: Storage, customPredefs: Seq[(Name, String)]) { in
       Name("cmd" + eval.getCurrentLine),
       predefImports ++ eval.frames.head.imports /*++ hookImports*/
     )
-    println(s"processed: $processed")
     val output: InterpreterOutput = processed flatMap { preprocessed =>
       evaluateLine(preprocessed, fileName, Name("cmd" + eval.getCurrentLine))
     }

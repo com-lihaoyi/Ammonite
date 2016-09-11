@@ -16,7 +16,6 @@ import ammonite.kernel.LogError
 import ammonite.kernel.kernel.generatedMain
 
 import java.io.{StringWriter, PrintWriter}
-import language.existentials
 
 /**
   * Evaluates already-compiled Bytecode.
@@ -40,13 +39,14 @@ class Evaluator(currentClassloader: ClassLoader, startingLine: Int) {
   }
 
   def loadClass(fullName: String, classFiles: ClassFiles): Validation[LogError, Class[_]] = {
-    val raw = Validation.fromTryCatchNonFatal {
+    try {
       for ((name, bytes) <- classFiles.sortBy(_._1)) {
         frames.head.classloader.addClassFile(name, bytes)
       }
-      Class.forName(fullName, true, frames.head.classloader)
+      Success(Class.forName(fullName, true, frames.head.classloader))
+    } catch {
+      case ex: Throwable => Failure(evaluatorLoadError(ex))
     }
-    raw leftMap evaluatorLoadError
   }
 
   private def evalMain(cls: Class[_]): Any = {

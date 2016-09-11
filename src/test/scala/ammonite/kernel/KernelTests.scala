@@ -19,10 +19,22 @@ object KernelTests {
 
   def check(checks: Vector[(String, KernelOutput => Boolean)]) = {
     val kernel = buildKernel()
-    val res = checks.foldLeft(true) {
-      case (res, (code, opTest)) => res && opTest(kernel.process(code))
+    val (res, idx) = checks.zipWithIndex.foldLeft((true, -1)) {
+      case ((res, resIdx), ((code, opTest), idx)) => {
+        if (res) {
+          val currRes = opTest(kernel.process(code))
+          if (currRes) {
+            (currRes, -1)
+          } else {
+            (currRes, idx)
+          }
+        } else {
+          (res, resIdx)
+        }
+      }
     }
-    assert(res)
+    val msg = if (idx != -1) s"failed for input: ${checks(idx)._1}"
+    assert(res, msg)
   }
 
   def checkSuccess(checks: Vector[(String, Any => Boolean)]) = {

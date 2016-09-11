@@ -76,12 +76,12 @@ object Munger {
 
       val Expr = Processor {
         //Expressions are lifted to anon function applications so they will be JITed
-        case (name, code, tree) => 
-          if(code.trim == previousIden){
-              Transform("", Some(NoIden))
-            }else {
-              Transform(s"private val $name = $code", Some(PreviousIden(name)))
-            }
+        case (name, code, tree) =>
+          if (code.trim == previousIden) {
+            Transform("", Some(NoIden))
+          } else {
+            Transform(s"private val $name = $code", Some(PreviousIden(name)))
+          }
       }
 
       List(
