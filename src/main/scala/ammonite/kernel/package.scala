@@ -19,7 +19,7 @@ package object kernel {
 
   type KernelOutput = Option[ValidationNel[LogError, SuccessfulExecution]]
 
-  protected[ammonite] val previousIden = "_id"
+  protected[ammonite] val previousIden = "_it"
 
   protected[ammonite] val generatedMain = "$main"
 
