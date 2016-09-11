@@ -19,8 +19,6 @@ package object kernel {
 
   type KernelOutput = Option[ValidationNel[LogError, SuccessfulExecution]]
 
-  val previousIden = "_it"
-
   val generatedMain = "$main"
 
 }

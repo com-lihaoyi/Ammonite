@@ -12,9 +12,6 @@ class FailureTests extends FreeSpec {
   "compileFailure" in {
     checkFailure(kernel, 
       Vector(
-        (s"$previousIden", {
-          case NonEmptyList(h, tl) => tl.isEmpty && h.msg.contains(s"not found: value $previousIden")
-        }),
         ("java", {
           case NonEmptyList(h, tl) => tl.isEmpty && h.msg.contains("package java is not a value")
         }),

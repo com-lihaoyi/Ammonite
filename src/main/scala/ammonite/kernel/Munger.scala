@@ -8,7 +8,7 @@ import collection.mutable
 import scalaz.{Name => _, _}
 import Scalaz._
 import Validation.FlatMap._
-import kernel.{previousIden, generatedMain}
+import kernel.generatedMain
 
 case class MungedOutput(code: String, prefixCharLength: Int)
 
@@ -16,11 +16,7 @@ case class MungedOutput(code: String, prefixCharLength: Int)
   */
 object Munger {
 
-  private sealed trait PreviousGen
-  private final case class PreviousIden(iden: String) extends PreviousGen
-  private case object NoIden extends PreviousGen
-
-  private case class Transform(code: String, resIden: Option[PreviousGen])
+  private case class Transform(code: String, resIden: Option[String])
 
   private type DCT = (String, String, G#Tree) => Option[Transform]
 
@@ -76,12 +72,7 @@ object Munger {
 
       val Expr = Processor {
         //Expressions are lifted to anon function applications so they will be JITed
-        case (name, code, tree) =>
-          if (code.trim == previousIden) {
-            Transform("", Some(NoIden))
-          } else {
-            Transform(s"private val $name = $code", Some(PreviousIden(name)))
-          }
+        case (name, code, tree) => Transform(s"private val $name = $code", Some(name))
       }
 
       List(
@@ -140,14 +131,12 @@ object Munger {
           | ${importBlock(imports)}
           | object ${indexedWrapperName.backticked}{\n""".stripMargin)
 
-        val previousIdenRes = resIden match {
-          case None => s"val $previousIden = ()"
-          case Some(PreviousIden(iden)) => s"val $previousIden = $iden"
-          case _ => ""
+        val previousIden = resIden match {
+          case None => s"()"
+          case Some(iden) => iden
         }
 
         val bottomWrapper = normalizeNewlines(s"""
-          | $previousIdenRes
           | def $generatedMain = { $previousIden }
           | override def toString = "${indexedWrapperName.raw}"
           | }""".stripMargin)
