@@ -15,12 +15,12 @@ object KernelTests {
   def buildKernel(predefs: Seq[(Name, String)] = defaultPredef) = new ReplKernel(new Storage.InMemory, predefs)
 
   val checkUnit: Any => Boolean = {
-    case _ : Unit => true
+    case _: Unit => true
     case _ => false
   }
 
   def checkInt(i: Int): Any => Boolean = {
-    case x : Int => x == i
+    case x: Int => x == i
     case _ => false
   }
 
