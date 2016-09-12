@@ -12,7 +12,7 @@ object KernelTests {
     Name("defaultPredef") -> ammonite.main.Defaults.predefString
   )
 
-  def buildKernel(predefs: Seq[(Name, String)] = defaultPredef) = new ReplKernel(new Storage.InMemory, predefs)
+  def buildKernel(predefs: Seq[(Name, String)] = defaultPredef) = new ReplKernel(predefs)
 
   val checkUnit: Any => Boolean = {
     case _: Unit => true

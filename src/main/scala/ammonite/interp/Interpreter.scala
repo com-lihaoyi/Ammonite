@@ -24,7 +24,7 @@ import Validation.FlatMap._
   * to interpret Scala code. Doesn't attempt to provide any
   * real encapsulation for now.
   */
-class Interpreter(val storage: Storage, customPredefs: Seq[(Name, String)]) { interp =>
+class Interpreter(customPredefs: Seq[(Name, String)]) { interp =>
 
   // //this variable keeps track of where should we put the imports resulting from scripts.
   // private var scriptImportCallback: Imports => Unit = eval.update
