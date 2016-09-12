@@ -12,7 +12,16 @@ class ReplKernel() {
 
   private val interp: Interpreter = new Interpreter()
 
-  def process(code: String): KernelOutput = ReplKernel.process(code, interp)
+  private var state = ReplKernel.KernelState(0)
+
+  def process(code: String): KernelOutput = {
+    val res = ReplKernel.process(code, interp, state.evaluationIndex)
+    res match {
+      case Some(Success(_)) => state = state.copy(evaluationIndex = state.evaluationIndex + 1)
+      case _ => ()
+    }
+    res
+  }
 
   def complete(text: String, position: Int) = ReplKernel.complete(text, position, interp)
 
@@ -20,12 +29,12 @@ class ReplKernel() {
 
 object ReplKernel {
 
-  def process(code: String, interp: Interpreter): KernelOutput = {
+  def process(code: String, interp: Interpreter, evaluationIndex: Int): KernelOutput = {
     val parsed: Option[Validation[LogError, NonEmptyList[String]]] = ParserKernel.parseCode(code)
     val withReversedErrors = parsed map { validation =>
       val validationNel = validation.toValidationNel
       validationNel flatMap { statements =>
-        val processed = interp.processLine(statements, s"Main${interp.eval.getCurrentLine}.sc")
+        val processed = interp.processLine(statements, s"Main$evaluationIndex.sc", evaluationIndex)
         processed foreach (x => interp.handleOutput(x._2))
         processed map {
           case (logMessages, evaluated) => (logMessages.reverse, evaluated.value)
@@ -38,5 +47,7 @@ object ReplKernel {
   def complete(text: String, position: Int, interp: Interpreter) = {
     interp.pressy.complete(text, position, Munger.importBlock(interp.eval.frame.imports))
   }
+
+  private case class KernelState(val evaluationIndex: Int)
 
 }

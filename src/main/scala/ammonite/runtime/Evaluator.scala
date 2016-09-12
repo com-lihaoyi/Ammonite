@@ -24,17 +24,11 @@ import Validation.FlatMap._
   * and `Array[Byte]`s representing class files, and reflection necessary
   * to take the already-compile Scala bytecode and execute it in our process.
   */
-class Evaluator(currentClassloader: ClassLoader, startingLine: Int) {
+class Evaluator(currentClassloader: ClassLoader) {
 
   import Evaluator._
   
   var frame = initialFrame
-
-  /**
-    * The current line number of the REPL, used to make sure every snippet
-    * evaluated can have a distinct name that doesn't collide.
-    */
-  private var currentLine = startingLine
 
   def loadClass(fullName: String, classFiles: ClassFiles): Validation[LogError, Class[_]] = {
     val raw = Validation.fromTryCatchNonFatal {
@@ -58,7 +52,7 @@ class Evaluator(currentClassloader: ClassLoader, startingLine: Int) {
     * Weird indirection only necessary because of
     * https://issues.scala-lang.org/browse/SI-7085
     */
-  def getCurrentLine = currentLine.toString.replace("-", "_")
+  //def getCurrentLine = currentLine.toString.replace("-", "_")
 
   def update(newImports: Imports): Unit = frame.addImports(newImports)
 
@@ -68,9 +62,6 @@ class Evaluator(currentClassloader: ClassLoader, startingLine: Int) {
                   indexedWrapperName: Name): Validation[LogError, Evaluated] = {
 
     val loadedClass = loadClass("$sess." + indexedWrapperName.backticked, classFiles)
-    if (loadedClass.isSuccess) {
-      currentLine += 1
-    }
     loadedClass flatMap { cls =>
       // val iter = evalMain(cls).asInstanceOf[Iterator[String]]
       // evaluatorRunPrinter(iter.foreach(printer.out))

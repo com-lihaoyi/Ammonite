@@ -30,7 +30,7 @@ class Interpreter() { interp =>
   // private var scriptImportCallback: Imports => Unit = eval.update
 
   private val mainThread = Thread.currentThread()
-  val eval = new Evaluator(mainThread.getContextClassLoader, 0)
+  val eval = new Evaluator(mainThread.getContextClassLoader)
 
   private val dynamicClasspath = new VirtualDirectory("(memory)", None)
   var compiler: Compiler = null
@@ -97,7 +97,7 @@ class Interpreter() { interp =>
   // on `predefImports`, and we should be able to provide the "current" imports
   // to it even if it's half built
 
-  private var predefImports = Imports()
+  //private var predefImports = Imports()
   // for ((wrapperName, sourceCode) <- predefs) {
   //   val pkgName = Seq(Name("ammonite"), Name("predef"))
 
@@ -197,17 +197,17 @@ class Interpreter() { interp =>
   //   }
   // }
 
-  def processLine(statements: NonEmptyList[String], fileName: String): InterpreterOutput = {
+  def processLine(statements: NonEmptyList[String], fileName: String, evaluationIndex: Int): InterpreterOutput = {
     val processed: ValidationNel[LogError, MungedOutput] = Munger(
       compiler.parse,
       statements,
-      eval.getCurrentLine,
+      s"$evaluationIndex",
       Seq(Name("$sess")),
-      Name("cmd" + eval.getCurrentLine),
-      predefImports ++ eval.frame.imports /*++ hookImports*/
+      Name(s"cmd$evaluationIndex"),
+      eval.frame.imports /*++ hookImports*/
     )
     val output: InterpreterOutput = processed flatMap { preprocessed =>
-      evaluateLine(preprocessed, fileName, Name("cmd" + eval.getCurrentLine))
+      evaluateLine(preprocessed, fileName, Name(s"cmd$evaluationIndex"))
     }
     output map {
       case (logMessages, output) => (logMessages, output.copy(imports = output.imports /*++ hookImports*/ ))
