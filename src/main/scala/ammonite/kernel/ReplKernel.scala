@@ -8,11 +8,9 @@ import scalaz.{Name => _, _}
 import Scalaz._
 import Validation.FlatMap._
 
-class ReplKernel(predefs: Seq[(Name, String)]) {
+class ReplKernel() {
 
-  private val interp: Interpreter = new Interpreter(
-    predefs
-  )
+  private val interp: Interpreter = new Interpreter()
 
   def process(code: String): KernelOutput = ReplKernel.process(code, interp)
 

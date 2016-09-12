@@ -2,7 +2,6 @@ package ammonite.kernel
 
 import org.scalatest.FreeSpec
 import KernelTests._
-import kernel._
 import scalaz._
 
 class FailureTests extends FreeSpec {

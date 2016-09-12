@@ -24,15 +24,10 @@ import Validation.FlatMap._
   * to interpret Scala code. Doesn't attempt to provide any
   * real encapsulation for now.
   */
-class Interpreter(customPredefs: Seq[(Name, String)]) { interp =>
+class Interpreter() { interp =>
 
   // //this variable keeps track of where should we put the imports resulting from scripts.
   // private var scriptImportCallback: Imports => Unit = eval.update
-
-  var lastException: Throwable = null
-
-  private var _compilationCount = 0
-  def compilationCount = _compilationCount
 
   private val mainThread = Thread.currentThread()
   val eval = new Evaluator(mainThread.getContextClassLoader, 0)
@@ -268,11 +263,7 @@ class Interpreter(customPredefs: Seq[(Name, String)]) { interp =>
   }
 
   private def compileClass(processed: MungedOutput, fileName: String): CompilerOutput = {
-    val compilationResult = compiler.compile(processed.code.getBytes, processed.prefixCharLength, fileName)
-    if (compilationResult.isSuccess) {
-      _compilationCount += 1
-    }
-    compilationResult
+    compiler.compile(processed.code.getBytes, processed.prefixCharLength, fileName)
   }
 
   private def evaluateLine(processed: MungedOutput, fileName: String, indexedWrapperName: Name): InterpreterOutput = {

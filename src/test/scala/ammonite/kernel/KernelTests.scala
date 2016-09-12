@@ -1,6 +1,6 @@
 package ammonite.kernel
 
-import ammonite.runtime.Storage
+//import ammonite.runtime.Storage
 import ammonite.util._
 import scalaz.{Name => _, _}
 import kernel._
@@ -8,11 +8,7 @@ import org.scalatest.Assertions._
 
 object KernelTests {
 
-  private val defaultPredef = Seq(
-    Name("defaultPredef") -> ammonite.main.Defaults.predefString
-  )
-
-  def buildKernel(predefs: Seq[(Name, String)] = defaultPredef) = new ReplKernel(predefs)
+  def buildKernel() = new ReplKernel()
 
   val checkUnit: Any => Boolean = {
     case _: Unit => true
