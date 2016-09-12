@@ -126,10 +126,14 @@ object Munger {
 
     expandedCode map {
       case Transform(code, resIden) =>
+      
+        // can't use strip Margin below because holier-than-thou libraries like shapeless and scalaz use weird 
+        // characters for identifiers
+
         val topWrapper = normalizeNewlines(s"""
-          | package ${pkgName.map(_.backticked).mkString(".")}
-          | ${importBlock(imports)}
-          | object ${indexedWrapperName.backticked}{\n""".stripMargin)
+           package ${pkgName.map(_.backticked).mkString(".")}
+           ${importBlock(imports)}
+           object ${indexedWrapperName.backticked}{\n""")
 
         val previousIden = resIden match {
           case None => s"()"
@@ -137,9 +141,9 @@ object Munger {
         }
 
         val bottomWrapper = normalizeNewlines(s"""
-          | def $generatedMain = { $previousIden }
-          | override def toString = "${indexedWrapperName.raw}"
-          | }""".stripMargin)
+          def $generatedMain = { $previousIden }
+          override def toString = "${indexedWrapperName.raw}"
+          }""")
 
         val importsLen = topWrapper.length
 
@@ -178,9 +182,7 @@ object Munger {
       "import " + pkgString + s".{$newLine  " +
         printedGroup.mkString(s",$newLine  ") + s"$newLine}$newLine"
     }
-    val res = out.mkString
-
-    res
+    out.mkString
   }
 
 }
