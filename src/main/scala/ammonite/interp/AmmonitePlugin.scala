@@ -29,7 +29,7 @@ class AmmonitePlugin(g: scala.tools.nsc.Global, output: Seq[ImportData] => Unit,
       def newPhase(prev: Phase): Phase = new g.GlobalPhase(prev) {
         def name = phaseName
         def apply(unit: g.CompilationUnit): Unit = {
-          AmmonitePlugin(g)(unit, output, topWrapperLen)
+          AmmonitePlugin(g)(unit, output)
         }
       }
     },
@@ -53,7 +53,7 @@ class AmmonitePlugin(g: scala.tools.nsc.Global, output: Seq[ImportData] => Unit,
 
 object AmmonitePlugin {
   var count = 0
-  def apply(g: Global)(unit: g.CompilationUnit, output: Seq[ImportData] => Unit, topWrapperLen: => Int) = {
+  def apply(g: Global)(unit: g.CompilationUnit, output: Seq[ImportData] => Unit) = {
 
     count += 1
     def decode(t: g.Tree) = {

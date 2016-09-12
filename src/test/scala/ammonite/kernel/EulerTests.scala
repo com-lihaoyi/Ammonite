@@ -9,74 +9,84 @@ class EulerTests extends FreeSpec {
 
   "p1" in {
     // Add all the natural numbers below one thousand that are multiples of 3 or 5.*
-    checkSuccess(kernel, Vector(
-      ("(1 until 1000).view.filter(n => n % 3 == 0 || n % 5 == 0).sum", checkInt(233168))
-      ))
+    checkSuccess(kernel,
+                 Vector(
+                   ("(1 until 1000).view.filter(n => n % 3 == 0 || n % 5 == 0).sum", checkInt(233168))
+                 ))
   }
 
   "p2" in {
     // Find the sum of all the even-valued terms in the
     // Fibonacci sequence which do not exceed four million.*
-    checkSuccess(kernel, Vector(
-      ("lazy val fs: Stream[Int] = 0 #:: 1 #:: fs.zip(fs.tail).map(p => p._1 + p._2)", checkUnit),
-      ("fs.view.takeWhile(_ <= 4000000).filter(_ % 2 == 0).sum", checkInt(4613732))
-      ))
+    checkSuccess(kernel,
+                 Vector(
+                   ("lazy val fs: Stream[Int] = 0 #:: 1 #:: fs.zip(fs.tail).map(p => p._1 + p._2)", checkUnit),
+                   ("fs.view.takeWhile(_ <= 4000000).filter(_ % 2 == 0).sum", checkInt(4613732))
+                 ))
   }
 
   "p3" in {
     // Find the largest prime factor of a composite number.
-    checkSuccess(kernel, Vector(
-      ("""
+    checkSuccess(kernel,
+                 Vector(
+                   ("""
         def factors(n: Long): List[Long] = {
           (2 to math.sqrt(n).toInt)
           .find(n % _ == 0)
           .map(i => i.toLong :: factors(n / i)).getOrElse(List(n))
         }
-        """, checkUnit),
-      ("factors(600851475143L).last", checkLong(6857L))
-      ))
+        """,
+                    checkUnit),
+                   ("factors(600851475143L).last", checkLong(6857L))
+                 ))
   }
 
   "p4" in {
     // Find the largest palindrome made from the product of two 3-digit numbers.*
-    checkSuccess(kernel, Vector(
-      ("""
+    checkSuccess(kernel,
+                 Vector(
+                   ("""
         {
     (100 to 999).view
                 .flatMap(i => (i to 999).map(i *))
                 .filter(n => n.toString == n.toString.reverse)
                 .max
     }
-        """, checkInt(906609))
-      ))
+        """,
+                    checkInt(906609))
+                 ))
   }
 
   "p5" in {
     // What is the smallest number divisible by each of the numbers 1 to 20?*
-    checkSuccess(kernel, Vector(
-      ("Range(20, Int.MaxValue).find(n => Range(2, 21).forall(n % _ == 0)).get", checkInt(232792560))
-      ))
+    checkSuccess(kernel,
+                 Vector(
+                   ("Range(20, Int.MaxValue).find(n => Range(2, 21).forall(n % _ == 0)).get", checkInt(232792560))
+                 ))
   }
 
   "p6" in {
     // What is the difference between the sum of the squares and the
     // square of the sums?*
-    checkSuccess(kernel, Vector(
-      ("val numbers = 1 to 100", checkUnit),
-      ("def square(n: Int) = n * n", checkUnit),
-      ("square(numbers.sum) - numbers.map(square).sum", checkInt(25164150))
-      ))
+    checkSuccess(kernel,
+                 Vector(
+                   ("val numbers = 1 to 100", checkUnit),
+                   ("def square(n: Int) = n * n", checkUnit),
+                   ("square(numbers.sum) - numbers.map(square).sum", checkInt(25164150))
+                 ))
   }
 
   "p7" in {
     // Find the 10001st prime.*
-    checkSuccess(kernel, Vector(
-      ("""
+    checkSuccess(kernel,
+                 Vector(
+                   ("""
         lazy val ps: Stream[Int] = 2 #:: Stream.from(3).filter(i =>
           ps.takeWhile(j => j * j <= i).forall(i % _ > 0))
-        """, checkUnit),
-      ("ps(10000)", checkInt(104743))
-      ))
+        """,
+                    checkUnit),
+                   ("ps(10000)", checkInt(104743))
+                 ))
   }
 
   "p8" in {
@@ -103,26 +113,29 @@ class EulerTests extends FreeSpec {
           |05886116467109405077541002256983155200055935729725
           |71636269561882670428252483600823257530420752963450""".stripMargin.replace("\n", "")
 
-    checkSuccess(kernel, Vector(
-      (s"""val s = "$data" """, checkUnit),
-      ("""
+    checkSuccess(kernel,
+                 Vector(
+                   (s"""val s = "$data" """, checkUnit),
+                   ("""
         {
         s.filter(_.isDigit)
          .map(_.asDigit)
          .sliding(5)
          .map(_.product).max
         }
-        """, checkInt(40824))
-      ))
+        """,
+                    checkInt(40824))
+                 ))
 
   }
 
   "p9" in {
     // Find the only Pythagorean triplet, {a, b, c}, for which a + b + c = 1000.*
-    checkSuccess(kernel, Vector(
-      ("val limit = (1 to 1000).find(n => n + math.sqrt(n) >= 1000).get", checkUnit),
-      ("limit", checkInt(969)),
-      ("""
+    checkSuccess(kernel,
+                 Vector(
+                   ("val limit = (1 to 1000).find(n => n + math.sqrt(n) >= 1000).get", checkUnit),
+                   ("limit", checkInt(969)),
+                   ("""
         for{
           b <- 2 until limit
           a <- 1 until b
@@ -130,21 +143,23 @@ class EulerTests extends FreeSpec {
           if a * a + b * b  == c * c
         } yield a * b * c
         """, {
-          case x: IndexedSeq[_] => x == Vector(31875000)
-          case _ => false
-          })
-      ))
+                      case x: IndexedSeq[_] => x == Vector(31875000)
+                      case _ => false
+                    })
+                 ))
   }
 
   "p10" in {
     // Calculate the sum of all the primes below two million.*
-    checkSuccess(kernel, Vector(
-      ("""
+    checkSuccess(kernel,
+                 Vector(
+                   ("""
         lazy val ps: Stream[Int] = 2 #:: Stream.from(3).filter(i =>
            ps.takeWhile(j => j * j <= i).forall(i % _ > 0))
-        """, checkUnit),
-      ("ps.view.takeWhile(_ < 2000000).foldLeft(0L)(_ + _)", checkLong(142913828922L))
-      ))
+        """,
+                    checkUnit),
+                   ("ps.view.takeWhile(_ < 2000000).foldLeft(0L)(_ + _)", checkLong(142913828922L))
+                 ))
   }
 
   "p11" in {
@@ -172,38 +187,43 @@ class EulerTests extends FreeSpec {
           |20 73 35 29 78 31 90 01 74 31 49 71 48 86 81 16 23 57 05 54
           |01 70 54 71 83 51 54 69 16 92 33 48 61 43 52 01 89 19 67 48
         """.stripMargin.replace("\n", " ")
-    checkSuccess(kernel, Vector(
-      (s"""val s = "$data" """, checkUnit),
-      (s"""val ns = s.split("${"""\\s+"""}").map(_.toInt)""", checkUnit),
-      ("def m(i: Int, p: Int, c: Int): Int = if(c > 0) ns(i) * m(i + p, p, c - 1) else 1", checkUnit),
-      ("""
+    checkSuccess(kernel,
+                 Vector(
+                   (s"""val s = "$data" """, checkUnit),
+                   (s"""val ns = s.split("${"""\\s+"""}").map(_.toInt)""", checkUnit),
+                   ("def m(i: Int, p: Int, c: Int): Int = if(c > 0) ns(i) * m(i + p, p, c - 1) else 1", checkUnit),
+                   ("""
         def ms(xs: Seq[Int], ys: Seq[Int], p: Int) = {
           ys.flatMap(y => xs.map(x => m(20 * y + x, p, 4)))
         }
-        """, checkUnit),
-      ("""
+        """,
+                    checkUnit),
+                   ("""
         val ps = (
           ms(0 to 19, 0 to 15, 20) ++ ms(0 to 15, 0 to 19, 1) ++
           ms(0 to 15, 0 to 15, 21) ++ ms(3 to 19, 0 to 15, 19)
         )
-        """, checkUnit),
-      ("ps.max", checkInt(70600674))
-      ))
+        """,
+                    checkUnit),
+                   ("ps.max", checkInt(70600674))
+                 ))
   }
 
   "p12" in {
     // What is the value of the first triangle number to have over five hundred divisors?
-    checkSuccess(kernel, Vector(
-      ("lazy val ts: Stream[Int] = 0 #:: ts.zipWithIndex.map(p => p._1 + p._2 + 1)", checkUnit),
-      ("""
+    checkSuccess(kernel,
+                 Vector(
+                   ("lazy val ts: Stream[Int] = 0 #:: ts.zipWithIndex.map(p => p._1 + p._2 + 1)", checkUnit),
+                   ("""
         def p(t: Int) = {
           Range(1, Int.MaxValue)
             .takeWhile(n => n * n <= t)
             .foldLeft(0)((s, n) => if(t % n == 0) s + 2 else s)
         }
-        """, checkUnit),
-      ("ts.find(p(_) > 500).get", checkInt(76576500))
-      ))
+        """,
+                    checkUnit),
+                   ("ts.find(p(_) > 500).get", checkInt(76576500))
+                 ))
   }
 
   "p13" in {
@@ -308,56 +328,65 @@ class EulerTests extends FreeSpec {
                    |72107838435069186155435662884062257473692284509516
                    |20849603980134001723930671666823555245252804609722
                    |53503534226472524250874054075591789781264330331690"""
-    checkSuccess(kernel, Vector(
-      (s"""val s = "${data.stripMargin.replace("\n", " ")}" """, checkUnit),
-      (s"""s.split("${"""\\s+"""}").map(_.take(11).toLong).sum.toString.take(10).toLong""", checkLong(5537376230L))
+    checkSuccess(
+      kernel,
+      Vector(
+        (s"""val s = "${data.stripMargin.replace("\n", " ")}" """, checkUnit),
+        (s"""s.split("${"""\\s+"""}").map(_.take(11).toLong).sum.toString.take(10).toLong""", checkLong(5537376230L))
       ))
   }
 
   "p14" in {
     // Find the longest sequence using a starting number under one million.*
-    checkSuccess(kernel, Vector(
-      ("""
+    checkSuccess(kernel,
+                 Vector(
+                   ("""
         def from(n: Long, c: Int = 0): Int =
           if(n == 1) c + 1 else
           from(if(n % 2 == 0) n / 2 else 3 * n + 1, c + 1)
-        """, checkUnit),
-      ("""
+        """,
+                    checkUnit),
+                   ("""
         (
         (1 until 1000000).view.map(n => (n, from(n)))
              .reduceLeft((a, b) => if(a._2 > b._2) a else b)._1
         )
-        """, checkInt(837799))
-      ))
+        """,
+                    checkInt(837799))
+                 ))
   }
 
   "p15" in {
     // Starting in the top left corner in a 20 by 20 grid,
     // how many routes are there to the bottom right corner?*
-    checkSuccess(kernel, Vector(
-      ("""
+    checkSuccess(kernel,
+                 Vector(
+                   ("""
         def f(row: Seq[Long], c: Int): Long =
              if (c == 0) row.last else f(row.scan(0L)(_ + _), c - 1)
-        """, checkUnit),
-      ("def r(n: Int) = f(Seq.fill(n + 1)(1L), n)", checkUnit),
-      ("r(20)", checkLong(137846528820L))
-      ))
+        """,
+                    checkUnit),
+                   ("def r(n: Int) = f(Seq.fill(n + 1)(1L), n)", checkUnit),
+                   ("r(20)", checkLong(137846528820L))
+                 ))
   }
 
   "p16" in {
     // What is the sum of the digits of the number 2^1000?*
-    checkSuccess(kernel, Vector(
-      (" BigInt(2).pow(1000).toString.view.map(_.asDigit).sum", checkInt(1366))
-      ))
+    checkSuccess(kernel,
+                 Vector(
+                   (" BigInt(2).pow(1000).toString.view.map(_.asDigit).sum", checkInt(1366))
+                 ))
   }
 
   "p17" in {
     // How many letters would be needed to write all
     // the numbers in words from 1 to 1000?*
-    checkSuccess(kernel, Vector(
-      ("val units = Array(0, 3, 3, 5, 4, 4, 3, 5, 5, 4, 3, 6, 6, 8, 8, 7, 7, 9, 8, 8)", checkUnit),
-      ("val tens = Array(0, 0, 6, 6, 5, 5, 5, 7, 6, 6)", checkUnit),
-      ("""
+    checkSuccess(kernel,
+                 Vector(
+                   ("val units = Array(0, 3, 3, 5, 4, 4, 3, 5, 5, 4, 3, 6, 6, 8, 8, 7, 7, 9, 8, 8)", checkUnit),
+                   ("val tens = Array(0, 0, 6, 6, 5, 5, 5, 7, 6, 6)", checkUnit),
+                   ("""
         lazy val name: Int => Int = {
           case n if(n < 20) => units(n)
           case n if(n < 100) =>
@@ -366,9 +395,10 @@ class EulerTests extends FreeSpec {
           name(n / 100) + 7 + (if(n % 100 > 0) 3 + name(n % 100) else 0)
           case 1000 => 11
         }
-        """, checkUnit),
-      ("(1 to 1000).map(name).sum", checkInt(21124))
-      ))
+        """,
+                    checkUnit),
+                   ("(1 to 1000).map(name).sum", checkInt(21124))
+                 ))
   }
 
   "p18" in {
@@ -389,60 +419,68 @@ class EulerTests extends FreeSpec {
                    |63 66 04 68 89 53 67 30 73 16 69 87 40 31
                    |04 62 98 27 23 09 70 98 73 93 38 53 60 04 23""".stripMargin.replace("\n", "|")
 
-    checkSuccess(kernel, Vector(
-      (s"""val s =  "$data" """, checkUnit),
-      (s"""val grid = s.trim.split("\\\\|").map(_.split(" ").map(_.toInt))""", checkUnit),
-      ("""
+    checkSuccess(kernel,
+                 Vector(
+                   (s"""val s =  "$data" """, checkUnit),
+                   (s"""val grid = s.trim.split("\\\\|").map(_.split(" ").map(_.toInt))""", checkUnit),
+                   ("""
         def f(rows: Array[Array[Int]], bottom: Seq[Int]): Int = {
          val ms = bottom.zip(bottom.tail).map(p => p._1 max p._2)
          val ss = rows.last.zip(ms).map(p => p._1 + p._2)
          if (ss.size == 1) ss.head else f(rows.init, ss)
         }
-        """, checkUnit),
-      ("f(grid.init, grid.last)", checkInt(1074))
-      ))
+        """,
+                    checkUnit),
+                   ("f(grid.init, grid.last)", checkInt(1074))
+                 ))
   }
 
   "p19" in {
     //How many Sundays fell on the first of the month during the twentieth century?*
-    checkSuccess(kernel, Vector(
-      ("val lengths = Array(31, 0, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)", checkUnit),
-      ("""
+    checkSuccess(kernel,
+                 Vector(
+                   ("val lengths = Array(31, 0, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)", checkUnit),
+                   ("""
         val ls = for(y <- 1900 to 2000; m <- 1 to 12) yield {
          if(m == 2)
            if (y % 4 == 0 && (y % 100 != 0 || y % 400 == 0)) 29 else 28
          else
            lengths(m - 1)
         }
-        """, checkUnit),
-      ("val fs = ls.scanLeft(1)((ws, l) => (ws + l) % 7)", checkUnit),
-      ("fs.drop(12).take(1200).count(_ == 0)", checkInt(171))
-      ))
+        """,
+                    checkUnit),
+                   ("val fs = ls.scanLeft(1)((ws, l) => (ws + l) % 7)", checkUnit),
+                   ("fs.drop(12).take(1200).count(_ == 0)", checkInt(171))
+                 ))
   }
 
   "p20" in {
     // Find the sum of digits in 100!*
-    checkSuccess(kernel, Vector(
-      ("def f(n: BigInt): BigInt = if(n < 2) 1 else n * f(n - 1)", checkUnit),
-      ("f(100).toString.view.map(_.asDigit).sum", checkInt(648))
-      ))
+    checkSuccess(kernel,
+                 Vector(
+                   ("def f(n: BigInt): BigInt = if(n < 2) 1 else n * f(n - 1)", checkUnit),
+                   ("f(100).toString.view.map(_.asDigit).sum", checkInt(648))
+                 ))
   }
 
   "p21" in {
     // Evaluate the sum of all amicable pairs under 10000.*
-    checkSuccess(kernel, Vector(
-      ("""
+    checkSuccess(kernel,
+                 Vector(
+                   ("""
         val ds = (0 until 10000).view.map(
          n => (1 to (n / 2)).filter(n % _ == 0).sum
         )
-        """, checkUnit),
-      ("""
+        """,
+                    checkUnit),
+                   ("""
         val as = ds.zipWithIndex.collect {
           case (n, i) if n < 10000 && ds(n) != n && ds(n) == i => i
         }
-        """, checkUnit),
-      ("as.sum", checkInt(31626))
-      ))
+        """,
+                    checkUnit),
+                   ("as.sum", checkInt(31626))
+                 ))
   }
 
   "p22" in {
@@ -486,8 +524,9 @@ class EulerTests extends FreeSpec {
         "LENA","CHRISTY","DEANNA","PATSY","HILDA","GWENDOLYN","JENNIE"
       """.replaceAll(" |\\n", "") + "\"\"\""
     // What is the total of all the name scores in the file of first names?*
-    checkSuccess(kernel, Vector(
-      (s"""
+    checkSuccess(kernel,
+                 Vector(
+                   (s"""
         {
          $data
            .mkString
@@ -495,15 +534,17 @@ class EulerTests extends FreeSpec {
            .map(_.init.tail).sorted.map(_.map(_ - 64).sum)
            .zipWithIndex.map(p => p._1 * (p._2 + 1)).sum
         }
-        """, checkInt(2260261))
-      ))
+        """,
+                    checkInt(2260261))
+                 ))
   }
 
-   "p23" in {
-     // Find the sum of all the positive integers which cannot
-     // be written as the sum of two abundant numbers.*
-     checkSuccess(kernel, Vector(
-      ("""
+  "p23" in {
+    // Find the sum of all the positive integers which cannot
+    // be written as the sum of two abundant numbers.*
+    checkSuccess(kernel,
+                 Vector(
+                   ("""
         val as = {
        (0 to 28123).map(n => (1 to (n / 2))
                    .filter(n % _ == 0).sum)
@@ -511,61 +552,70 @@ class EulerTests extends FreeSpec {
                    .filter(p => p._1 > p._2)
                    .map(_._2)
        }
-        """, checkUnit),
-      ("""
+        """,
+                    checkUnit),
+                   ("""
         {
          val exc = as.flatMap { a =>
            as.takeWhile(_ <= (28123 - a)).map(a +)
          }
          (1 to 28123 diff exc).sum
        }
-        """, checkInt(4179871))
-      ))
-   }
+        """,
+                    checkInt(4179871))
+                 ))
+  }
 
   "p24" in {
     // What is the millionth lexicographic permutation of the digits
     // 0, 1, 2, 3, 4, 5, 6, 7, 8 and 9?*
-    checkSuccess(kernel, Vector(
-      ("""
+    checkSuccess(kernel,
+                 Vector(
+                   ("""
         def ps(s: String): Iterator[String] = {
           if (s.length == 1) Iterator(s)
           else s.toIterator.flatMap(c => ps(s.filter(c !=)).map(c +))
         }
-        """, checkUnit),
-      ("""ps("0123456789").drop(999999).next().toLong""", checkLong(2783915460L))
-      ))
+        """,
+                    checkUnit),
+                   ("""ps("0123456789").drop(999999).next().toLong""", checkLong(2783915460L))
+                 ))
   }
 
   "p25" in {
     // What is the first term in the Fibonacci sequence to contain 1000 digits?*
-    checkSuccess(kernel, Vector(
-      ("""
+    checkSuccess(kernel,
+                 Vector(
+                   ("""
         lazy val fs: Stream[BigInt] =
          0 #:: 1 #:: fs.zip(fs.tail).map(p => p._1 + p._2)
-        """, checkUnit),
-      ("fs.view.takeWhile(_.toString.length < 1000).size", checkInt(4782))
-      ))
+        """,
+                    checkUnit),
+                   ("fs.view.takeWhile(_.toString.length < 1000).size", checkInt(4782))
+                 ))
   }
 
   "p26" in {
     // Find the value of d < 1000 for which 1/d contains the longest recurring cycle.*
-    checkSuccess(kernel, Vector(
-      ("""
+    checkSuccess(kernel,
+                 Vector(
+                   ("""
                 val ps = {
           (2 until 1000).map(i => (1 to 2000)
                         .find(BigInt(10).modPow(_, i) == 1))
         }
-        """, checkUnit),
-      ("2 + ps.indexOf(Some(ps.flatten.max))", checkInt(983))
-      ))
+        """,
+                    checkUnit),
+                   ("2 + ps.indexOf(Some(ps.flatten.max))", checkInt(983))
+                 ))
   }
 
   "p27" in {
     // Find a quadratic formula that produces the maximum number of
     // primes for consecutive values of n.*
-    checkSuccess(kernel, Vector(
-      ("""
+    checkSuccess(kernel,
+                 Vector(
+                   ("""
         {
           lazy val ps: Stream[Int] = 2 #:: Stream.from(3).filter(i =>
             ps.takeWhile(j => j * j <= i).forall(i % _ > 0))
@@ -577,83 +627,94 @@ class EulerTests extends FreeSpec {
           val t = ns.reduceLeft((a, b) => if(a._3 > b._3) a else b)
           t._1 * t._2
         }
-        """, checkInt(-59231))
-      ))
+        """,
+                    checkInt(-59231))
+                 ))
   }
 
   "p28" in {
     // What is the sum of both diagonals in a 1001 by 1001 spiral?*
-    checkSuccess(kernel, Vector(
-      ("def cs(n: Int, p: Int): Stream[Int] = (n * 4 + p * 10) #:: cs(n + p * 4, p + 2)", checkUnit),
-      ("1 + cs(1, 2).take(500).sum", checkInt(669171001))
-      ))
+    checkSuccess(kernel,
+                 Vector(
+                   ("def cs(n: Int, p: Int): Stream[Int] = (n * 4 + p * 10) #:: cs(n + p * 4, p + 2)", checkUnit),
+                   ("1 + cs(1, 2).take(500).sum", checkInt(669171001))
+                 ))
   }
 
   "p29" in {
     // How many distinct terms are in the sequence generated by ab
     // for 2 ≤ a ≤ 100 and 2 ≤ b ≤ 100?*
-    checkSuccess(kernel, Vector(
-      ("""
+    checkSuccess(kernel,
+                 Vector(
+                   ("""
         {
           (2 to 100).flatMap(a => (2 to 100)
                     .map(b => BigInt(a).pow(b)))
                     .distinct
                     .size
         }
-        """, checkInt(9183))
-      ))
+        """,
+                    checkInt(9183))
+                 ))
   }
 
   "p30" in {
     // Find the sum of all the numbers that can be written as
     // the sum of fifth powers of their digits.*
-    checkSuccess(kernel, Vector(
-      ("def max(d: Int) = math.pow(10, d).toInt - 1", checkUnit),
-      ("def sum(n: Int) = n.toString.map(_.asDigit).map(math.pow(_, 5).toInt).sum", checkUnit),
-      ("val limit = Stream.from(1).find(d => max(d) > sum(max(d))).get", checkUnit),
-      ("(2 to max(limit)).view.filter(n => n == sum(n)).sum", checkInt(443839))
-      ))
+    checkSuccess(kernel,
+                 Vector(
+                   ("def max(d: Int) = math.pow(10, d).toInt - 1", checkUnit),
+                   ("def sum(n: Int) = n.toString.map(_.asDigit).map(math.pow(_, 5).toInt).sum", checkUnit),
+                   ("val limit = Stream.from(1).find(d => max(d) > sum(max(d))).get", checkUnit),
+                   ("(2 to max(limit)).view.filter(n => n == sum(n)).sum", checkInt(443839))
+                 ))
   }
 
   "p31" in {
     // Investigating combinations of English currency denominations.*
-    checkSuccess(kernel, Vector(
-      ("""
+    checkSuccess(kernel,
+                 Vector(
+                   ("""
         def f(ms: List[Int], n: Int): Int = ms match {
           case h :: t =>
             if (h > n) 0 else if (n == h) 1 else f(ms, n - h) + f(t, n)
           case _ => 0
         }
-        """, checkUnit),
-      ("f(List(1, 2, 5, 10, 20, 50, 100, 200), 200)", checkInt(73682))
-      ))
+        """,
+                    checkUnit),
+                   ("f(List(1, 2, 5, 10, 20, 50, 100, 200), 200)", checkInt(73682))
+                 ))
   }
 
   "p32" in {
     // Find the sum of all numbers that can be written as pandigital products.*
-    checkSuccess(kernel, Vector(
-      ("""
+    checkSuccess(kernel,
+                 Vector(
+                   ("""
         val ms = for {
           a <- 2 to 10000; b <- 2 to 10000 / a
           m = a * b; s = a.toString + b + m
           if s.length == 9 && (1 to 9).mkString.forall(s.contains(_))
         } yield m
-        """, checkUnit),
-      ("ms.distinct.sum", checkInt(45228))
-      ))
+        """,
+                    checkUnit),
+                   ("ms.distinct.sum", checkInt(45228))
+                 ))
   }
 
   "p33" in {
-     // Discover all the fractions with an unorthodox cancelling method.*
-     checkSuccess(kernel, Vector(
-      ("""
+    // Discover all the fractions with an unorthodox cancelling method.*
+    checkSuccess(kernel,
+                 Vector(
+                   ("""
         val rs = for(i <- 1 to 9; j <- (i + 1) to 9; k <- 1 to 9;
                     if k * (9 * i + j) == 10 * i * j) yield (10 * i + j, 10 * j + k)
-        """, checkUnit),
-      ("val p = rs.reduceLeft((n, d) => (n._1 * d._1, n._2 * d._2))", checkUnit),
-      ("def gcd(n: Int, d: Int): Int = if (d == 0) n else gcd(d, n % d)", checkUnit),
-      ("p._2 / gcd(p._1, p._2)", checkInt(100))
-      ))
-   }
+        """,
+                    checkUnit),
+                   ("val p = rs.reduceLeft((n, d) => (n._1 * d._1, n._2 * d._2))", checkUnit),
+                   ("def gcd(n: Int, d: Int): Int = if (d == 0) n else gcd(d, n % d)", checkUnit),
+                   ("p._2 / gcd(p._1, p._2)", checkInt(100))
+                 ))
+  }
 
 }

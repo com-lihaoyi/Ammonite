@@ -18,6 +18,8 @@ import ammonite.kernel.kernel._
 import ammonite.kernel._
 import scalaz.{Name => _, _}
 import Validation.FlatMap._
+import java.io.OutputStream
+
 
 /**
   * A convenient bundle of all the functionality necessary
@@ -29,8 +31,15 @@ class Interpreter() { interp =>
   // //this variable keeps track of where should we put the imports resulting from scripts.
   // private var scriptImportCallback: Imports => Unit = eval.update
 
-  private val mainThread = Thread.currentThread()
-  val eval = new Evaluator(mainThread.getContextClassLoader)
+  var frame = {
+    val currentClassLoader = Thread.currentThread().getContextClassLoader
+    val hash = SpecialClassLoader.initialClasspathSignature(currentClassLoader)
+    def special = new SpecialClassLoader(currentClassLoader, hash)
+    new Frame(special, special, Imports(), Seq())
+  }
+
+  // private val mainThread = Thread.currentThread()
+  // val eval = new Evaluator(mainThread.getContextClassLoader)
 
   private val dynamicClasspath = new VirtualDirectory("(memory)", None)
   var compiler: Compiler = null
@@ -51,16 +60,16 @@ class Interpreter() { interp =>
     val settings =
       Option(compiler).fold(new Settings)(_.settings.copy)
     compiler = new Compiler(
-      Classpath.classpath ++ eval.frame.classpath,
+      Classpath.classpath ++ frame.classpath,
       dynamicClasspath,
-      eval.frame.classloader,
-      eval.frame.pluginClassloader,
+      frame.classloader,
+      frame.pluginClassloader,
       settings
     )
     pressy = Pressy(
-      Classpath.classpath ++ eval.frame.classpath,
+      Classpath.classpath ++ frame.classpath,
       dynamicClasspath,
-      eval.frame.classloader,
+      frame.classloader,
       settings.copy()
     )
   }
@@ -197,20 +206,45 @@ class Interpreter() { interp =>
   // }
 
   def processLine(statements: NonEmptyList[String], fileName: String, evaluationIndex: Int): InterpreterOutput = {
-    val processed: ValidationNel[LogError, MungedOutput] = Munger(
+    val indexedWrapperName = Name(s"cmd$evaluationIndex")
+
+    val munged: ValidationNel[LogError, MungedOutput] = Munger(
       compiler.parse,
       statements,
       s"$evaluationIndex",
       Seq(Name("$sess")),
-      Name(s"cmd$evaluationIndex"),
-      eval.frame.imports /*++ hookImports*/
+      indexedWrapperName,
+      frame.imports
     )
-    val output: InterpreterOutput = processed flatMap { preprocessed =>
-      evaluateLine(preprocessed, fileName, Name(s"cmd$evaluationIndex"))
+
+    munged flatMap { processed =>
+      val compilationResult = compiler.compile(processed.code.getBytes, processed.prefixCharLength, fileName)
+
+      compilationResult flatMap {
+        case (logMessages, classFiles, imports) =>
+          val loadedClass: Validation[LogError, Class[_]] = Validation.fromTryCatchNonFatal {
+            for ((name, bytes) <- classFiles.sortBy(_._1)) {
+              frame.classloader.addClassFile(name, bytes)
+            }
+            Class.forName("$sess." + indexedWrapperName.backticked, true, frame.classloader)
+          } leftMap (LogMessage.fromThrowable(_))
+
+          val processed = loadedClass flatMap { cls =>
+            val evaluated: Validation[LogError, Any] = Validation.fromTryCatchNonFatal {
+              Option(cls.getDeclaredMethod(s"$generatedMain").invoke(null)).getOrElse(())
+            } leftMap (LogMessage.fromThrowable(_))
+
+            evaluated map (Interpreter.evaluationResult(Seq(Name("$sess"), indexedWrapperName), imports, "", _))
+          }
+
+          val mapped = processed map (x => (logMessages, x))
+
+          mapped.toValidationNel
+      }
     }
-    output map {
-      case (logMessages, output) => (logMessages, output.copy(imports = output.imports /*++ hookImports*/ ))
-    }
+    // output map {
+    //   case (logMessages, output) => (logMessages, output.copy(imports = output.imports /*++ hookImports*/ ))
+    // }
 
     // for {
     //   _ <- Catching {
@@ -251,33 +285,29 @@ class Interpreter() { interp =>
 
   }
 
-  private def withContextClassloader[T](t: => T) = {
-    val oldClassloader = Thread.currentThread().getContextClassLoader
-    try {
-      Thread.currentThread().setContextClassLoader(eval.frame.classloader)
-      t
-    } finally {
-      Thread.currentThread().setContextClassLoader(oldClassloader)
-    }
-  }
+  // private def withContextClassloader[T](t: => T) = {
+  //   val oldClassloader = Thread.currentThread().getContextClassLoader
+  //   try {
+  //     Thread.currentThread().setContextClassLoader(eval.frame.classloader)
+  //     t
+  //   } finally {
+  //     Thread.currentThread().setContextClassLoader(oldClassloader)
+  //   }
+  // }
 
-  private def compileClass(processed: MungedOutput, fileName: String): CompilerOutput = {
-    compiler.compile(processed.code.getBytes, processed.prefixCharLength, fileName)
-  }
+  // private def evaluateLine(processed: MungedOutput, fileName: String, indexedWrapperName: Name): InterpreterOutput = {
 
-  private def evaluateLine(processed: MungedOutput, fileName: String, indexedWrapperName: Name): InterpreterOutput = {
+  //   val compilationResult = compiler.compile(processed.code.getBytes, processed.prefixCharLength, fileName)
+  //   compilationResult flatMap {
+  //     case (logMessages, classFiles, imports) =>
+  //       val processed = withContextClassloader {
+  //         eval.processLine(classFiles, imports, fileName, indexedWrapperName)
+  //       }
+  //       val mapped = processed map (x => (logMessages, x))
+  //       mapped.toValidationNel
+  //   }
 
-    val compilationResult = compileClass(processed, fileName)
-    compilationResult flatMap {
-      case (logMessages, classFiles, imports) =>
-        val processed = withContextClassloader {
-          eval.processLine(classFiles, imports, fileName, indexedWrapperName)
-        }
-        val mapped = processed map (x => (logMessages, x))
-        mapped.toValidationNel
-    }
-
-  }
+  // }
 
   // private def processScriptBlock(processed: Preprocessor.Output,
   //                                printer: Printer,
@@ -554,7 +584,7 @@ class Interpreter() { interp =>
   //   finally scriptImportCallback = outerScriptImportCallback
   // }
 
-  def handleOutput(ev: Evaluated): Unit = eval.update(ev.imports)
+  def handleOutput(ev: Evaluated): Unit = frame.addImports(ev.imports)
 
   // def loadIvy(coordinates: (String, String, String), verbose: Boolean = true) = {
   //   val (groupId, artifactId, version) = coordinates
@@ -672,6 +702,31 @@ class Interpreter() { interp =>
 object Interpreter {
   val SheBang = "#!"
 
+  private def evaluationResult(wrapperName: Seq[Name], imports: Imports, tag: String, value: Any) = {
+    Evaluated(
+      wrapperName,
+      Imports(
+        for (id <- imports.value) yield {
+          val filledPrefix =
+            if (id.prefix.isEmpty) {
+              // For some reason, for things not-in-packages you can't access
+              // them off of `_root_`
+              wrapperName
+            } else {
+              id.prefix
+            }
+          val rootedPrefix: Seq[Name] =
+            if (filledPrefix.headOption.exists(_.backticked == "_root_"))
+              filledPrefix
+            else Seq(Name("_root_")) ++ filledPrefix
+
+          id.copy(prefix = rootedPrefix)
+        }
+      ),
+      tag,
+      value
+    )
+  }
   // /**
   //   * This gives our cache tags for compile caching. The cache tags are a hash
   //   * of classpath, previous commands (in-same-script), and the block-code.
@@ -704,5 +759,27 @@ object Interpreter {
   // private def indexWrapperName(wrapperName: Name, wrapperIndex: Int): Name = {
   //   Name(wrapperName.raw + (if (wrapperIndex == 1) "" else "_" + wrapperIndex))
   // }
+
+  def writeDeep(d: VirtualDirectory, path: List[String], suffix: String): OutputStream = (path: @unchecked) match {
+    case head :: Nil => d.fileNamed(path.head + suffix).output
+    case head :: rest =>
+      writeDeep(
+        d.subdirectoryNamed(head).asInstanceOf[VirtualDirectory],
+        rest,
+        suffix
+      )
+  }
+
+  /**
+    * Writes files to dynamicClasspath. Needed for loading cached classes.
+    */
+  def addToClasspath(classFiles: Traversable[(String, Array[Byte])], dynamicClasspath: VirtualDirectory): Unit = {
+    for ((name, bytes) <- classFiles) {
+      val output =
+        writeDeep(dynamicClasspath, name.split('.').toList, ".class")
+      output.write(bytes)
+      output.close()
+    }
+  }
 
 }

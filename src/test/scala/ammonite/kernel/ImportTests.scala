@@ -9,63 +9,69 @@ class ImportTests extends FreeSpec {
 
   "basic" - {
     "hello" in {
-      checkSuccess(kernel, Vector(
-        ("import math.abs", checkUnit),
-        ("val abs = 123L", checkUnit),
-        ("abs", checkLong(123L))
-        ))
+      checkSuccess(kernel,
+                   Vector(
+                     ("import math.abs", checkUnit),
+                     ("val abs = 123L", checkUnit),
+                     ("abs", checkLong(123L))
+                   ))
     }
     "java" in {
-      checkSuccess(kernel, Vector(
-        ("import Thread._", checkUnit),
-        ("currentThread.isAlive", checkBoolean(true)),
-        ("import java.lang.Runtime.getRuntime", checkUnit),
-        ("getRuntime.isInstanceOf[Boolean]", checkBoolean(false)),
-        ("getRuntime.isInstanceOf[java.lang.Runtime]", checkBoolean(true))
-        ))
+      checkSuccess(kernel,
+                   Vector(
+                     ("import Thread._", checkUnit),
+                     ("currentThread.isAlive", checkBoolean(true)),
+                     ("import java.lang.Runtime.getRuntime", checkUnit),
+                     ("getRuntime.isInstanceOf[Boolean]", checkBoolean(false)),
+                     ("getRuntime.isInstanceOf[java.lang.Runtime]", checkBoolean(true))
+                   ))
     }
     "multi" in {
-      checkSuccess(kernel, Vector(
-        ("import math._, Thread._", checkUnit),
-        ("abs(-1)", checkInt(1)),
-        ("currentThread.isAlive", checkBoolean(true))
-        ))
+      checkSuccess(kernel,
+                   Vector(
+                     ("import math._, Thread._", checkUnit),
+                     ("abs(-1)", checkInt(1)),
+                     ("currentThread.isAlive", checkBoolean(true))
+                   ))
     }
     "renaming" in {
-      checkSuccess(kernel, Vector(
-        ("import math.{abs => sba}", checkUnit),
-        ("sba(-123)", checkInt(123)),
-        ("import math.{abs, max => xam}", checkUnit),
-        ("abs(-234)", checkInt(234)),
-        ("xam(1, 2)", checkInt(2)),
-        ("import math.{min => _, _}", checkUnit),
-        ("max(2, 3)", checkInt(3))
-        ))
+      checkSuccess(kernel,
+                   Vector(
+                     ("import math.{abs => sba}", checkUnit),
+                     ("sba(-123)", checkInt(123)),
+                     ("import math.{abs, max => xam}", checkUnit),
+                     ("abs(-234)", checkInt(234)),
+                     ("xam(1, 2)", checkInt(2)),
+                     ("import math.{min => _, _}", checkUnit),
+                     ("max(2, 3)", checkInt(3))
+                   ))
     }
   }
   "shadowing" - {
     "sameName" in {
-      checkSuccess(kernel, Vector(
-        ("val abs = 'a'", checkUnit),
-        ("abs", checkChar('a')),
-        ("val abs = 123L", checkUnit),
-        ("abs", checkLong(123L)),
-        ("import math.abs", checkUnit),
-        ("abs(-10)", checkInt(10)),
-        ("val abs = 123L", checkUnit),
-        ("abs", checkLong(123L)),
-        ("import java.lang.Math._", checkUnit),
-        ("abs(-4)", checkInt(4))
-        ))
+      checkSuccess(kernel,
+                   Vector(
+                     ("val abs = 'a'", checkUnit),
+                     ("abs", checkChar('a')),
+                     ("val abs = 123L", checkUnit),
+                     ("abs", checkLong(123L)),
+                     ("import math.abs", checkUnit),
+                     ("abs(-10)", checkInt(10)),
+                     ("val abs = 123L", checkUnit),
+                     ("abs", checkLong(123L)),
+                     ("import java.lang.Math._", checkUnit),
+                     ("abs(-4)", checkInt(4))
+                   ))
     }
     "shadowPrefix" in {
-      checkSuccess(kernel, Vector(
-        ("object baz {val foo = 1}", checkUnit),
-        ("object foo {val bar = 2}", checkUnit),
-        ("import foo.bar", checkUnit),
-        ("import baz.foo", checkUnit),
-        ("bar", checkInt(2))
-        ))
+      checkSuccess(kernel,
+                   Vector(
+                     ("object baz {val foo = 1}", checkUnit),
+                     ("object foo {val bar = 2}", checkUnit),
+                     ("import foo.bar", checkUnit),
+                     ("import baz.foo", checkUnit),
+                     ("bar", checkInt(2))
+                   ))
     }
 
     // "typeTermSeparation" - {
@@ -216,12 +222,13 @@ class ImportTests extends FreeSpec {
     // }
   }
   "collapsing" - {
-    checkSuccess(kernel, Vector(
-      ("object Foo{val bar = 1}", checkUnit),
-      ("import Foo.bar", checkUnit),
-      ("import Foo.{bar => _}", checkUnit),
-      ("bar", checkInt(1))
-      ))
+    checkSuccess(kernel,
+                 Vector(
+                   ("object Foo{val bar = 1}", checkUnit),
+                   ("import Foo.bar", checkUnit),
+                   ("import Foo.{bar => _}", checkUnit),
+                   ("bar", checkInt(1))
+                 ))
   }
 
 }

@@ -45,7 +45,7 @@ object ReplKernel {
   }
 
   def complete(text: String, position: Int, interp: Interpreter) = {
-    interp.pressy.complete(text, position, Munger.importBlock(interp.eval.frame.imports))
+    interp.pressy.complete(text, position, Munger.importBlock(interp.frame.imports))
   }
 
   private case class KernelState(val evaluationIndex: Int)

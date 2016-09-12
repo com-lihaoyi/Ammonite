@@ -44,11 +44,11 @@ final class Compiler(classpath: Seq[java.io.File],
 
   import Compiler._
 
-  var importsLen = 0
-  var lastImports = Seq.empty[ImportData]
+  private[this] var importsLen = 0
+  private[this] var lastImports = Seq.empty[ImportData]
 
-  val PluginXML = "scalac-plugin.xml"
-  lazy val plugins0 = {
+  private[this] val PluginXML = "scalac-plugin.xml"
+  private[this] lazy val plugins0 = {
     import scala.collection.JavaConverters._
     val loader = pluginClassloader
 
@@ -59,9 +59,6 @@ final class Compiler(classpath: Seq[java.io.File],
       elem = scala.xml.XML.load(url.openStream())
       name = (elem \\ "plugin" \ "name").text
       className = (elem \\ "plugin" \ "classname").text
-      // Hardcode exclusion of "com.lihaoyi" %% "acyclic", since that's
-      // pretty useless and can cause problems conflicting with other plugins
-      if className != "acyclic.plugin.RuntimePlugin"
       if name.nonEmpty && className.nonEmpty
       classOpt = try Some(loader.loadClass(className))
       catch { case _: ClassNotFoundException => None }
@@ -78,13 +75,13 @@ final class Compiler(classpath: Seq[java.io.File],
     plugins.collect { case (name, _, Some(cls)) => name -> cls }
   }
 
-  private val (vd, jcp) = initGlobalBits(
+  private[this] val (vd, jcp) = initGlobalBits(
     classpath,
     dynamicClasspath,
     settings
   )
 
-  private val compiler = {
+  private[this] val compiler = {
     val scalac = new nsc.Global(settings) { g =>
       override lazy val plugins = List(new AmmonitePlugin(g, lastImports = _, importsLen)) ++ {
         for {
@@ -125,10 +122,6 @@ final class Compiler(classpath: Seq[java.io.File],
     * corresponding to the actual code so as to correct the line numbers in error report
     */
   def compile(src: Array[Byte], importsLen0: Int, fileName: String): CompilerOutput = {
-    def enumerateVdFiles(d: VirtualDirectory): Iterator[AbstractFile] = {
-      val (subs, files) = d.iterator.partition(_.isDirectory)
-      files ++ subs.map(_.asInstanceOf[VirtualDirectory]).flatMap(enumerateVdFiles)
-    }
 
     this.importsLen = importsLen0
     val singleFile = makeFile(src, fileName)
@@ -163,7 +156,7 @@ final class Compiler(classpath: Seq[java.io.File],
           //shutdownPressy()
           val files = for (x <- outputFiles if x.name.endsWith(".class")) yield {
             val segments = x.path.split("/").toList.tail
-            val output = Evaluator.writeDeep(dynamicClasspath, segments, "")
+            val output = Interpreter.writeDeep(dynamicClasspath, segments, "")
             output.write(x.toByteArray)
             output.close()
             (x.path.stripPrefix("(memory)/").stripSuffix(".class").replace('/', '.'), x.toByteArray)
@@ -196,6 +189,11 @@ final class Compiler(classpath: Seq[java.io.File],
 }
 
 object Compiler {
+
+  private def enumerateVdFiles(d: VirtualDirectory): Iterator[AbstractFile] = {
+    val (subs, files) = d.iterator.partition(_.isDirectory)
+    files ++ subs.map(_.asInstanceOf[VirtualDirectory]).flatMap(enumerateVdFiles)
+  }
 
   /**
     * Converts a bunch of bytes into Scalac's weird VirtualFile class
