@@ -36,7 +36,7 @@ class Interpreter() { interp =>
   var compiler: Compiler = null
   var pressy: Pressy = _
 
-  private def evalClassloader = eval.frame.classloader
+  //private def evalClassloader = eval.frame.classloader
 
   // def reInit() = {
   //   if (compiler != null)
@@ -53,15 +53,14 @@ class Interpreter() { interp =>
     compiler = new Compiler(
       Classpath.classpath ++ eval.frame.classpath,
       dynamicClasspath,
-      evalClassloader,
+      eval.frame.classloader,
       eval.frame.pluginClassloader,
-      () => pressy.shutdownPressy(),
       settings
     )
     pressy = Pressy(
       Classpath.classpath ++ eval.frame.classpath,
       dynamicClasspath,
-      evalClassloader,
+      eval.frame.classloader,
       settings.copy()
     )
   }
@@ -255,7 +254,7 @@ class Interpreter() { interp =>
   private def withContextClassloader[T](t: => T) = {
     val oldClassloader = Thread.currentThread().getContextClassLoader
     try {
-      Thread.currentThread().setContextClassLoader(evalClassloader)
+      Thread.currentThread().setContextClassLoader(eval.frame.classloader)
       t
     } finally {
       Thread.currentThread().setContextClassLoader(oldClassloader)

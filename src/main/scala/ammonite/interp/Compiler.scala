@@ -40,7 +40,6 @@ final class Compiler(classpath: Seq[java.io.File],
                      dynamicClasspath: VirtualDirectory,
                      evalClassloader: => ClassLoader,
                      pluginClassloader: => ClassLoader,
-                     shutdownPressy: () => Unit,
                      val settings: Settings) {
 
   import Compiler._
@@ -161,7 +160,7 @@ final class Compiler(classpath: Seq[java.io.File],
           val errorNel = NonEmptyList(h, t: _*)
           Failure(errorNel)
         case Nil =>
-          shutdownPressy()
+          //shutdownPressy()
           val files = for (x <- outputFiles if x.name.endsWith(".class")) yield {
             val segments = x.path.split("/").toList.tail
             val output = Evaluator.writeDeep(dynamicClasspath, segments, "")

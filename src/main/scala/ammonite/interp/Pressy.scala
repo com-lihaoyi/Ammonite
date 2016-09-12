@@ -53,9 +53,10 @@ class Pressy(nscGen: => nsc.interactive.Global) {
     (i - prefix.length, allNames, signatures)
   }
 
-  def shutdownPressy() = {
+  override def finalize(): Unit = {
     nscGlobal.askShutdown()
   }
+
 }
 
 object Pressy {
