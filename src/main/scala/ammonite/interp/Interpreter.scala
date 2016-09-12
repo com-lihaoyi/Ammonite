@@ -41,7 +41,7 @@ class Interpreter(val storage: Storage, customPredefs: Seq[(Name, String)]) { in
   var compiler: Compiler = null
   var pressy: Pressy = _
 
-  private def evalClassloader = eval.frames.head.classloader
+  private def evalClassloader = eval.frame.classloader
 
   // def reInit() = {
   //   if (compiler != null)
@@ -56,15 +56,15 @@ class Interpreter(val storage: Storage, customPredefs: Seq[(Name, String)]) { in
     val settings =
       Option(compiler).fold(new Settings)(_.settings.copy)
     compiler = new Compiler(
-      Classpath.classpath ++ eval.frames.head.classpath,
+      Classpath.classpath ++ eval.frame.classpath,
       dynamicClasspath,
       evalClassloader,
-      eval.frames.head.pluginClassloader,
+      eval.frame.pluginClassloader,
       () => pressy.shutdownPressy(),
       settings
     )
     pressy = Pressy(
-      Classpath.classpath ++ eval.frames.head.classpath,
+      Classpath.classpath ++ eval.frame.classpath,
       dynamicClasspath,
       evalClassloader,
       settings.copy()
@@ -209,7 +209,7 @@ class Interpreter(val storage: Storage, customPredefs: Seq[(Name, String)]) { in
       eval.getCurrentLine,
       Seq(Name("$sess")),
       Name("cmd" + eval.getCurrentLine),
-      predefImports ++ eval.frames.head.imports /*++ hookImports*/
+      predefImports ++ eval.frame.imports /*++ hookImports*/
     )
     val output: InterpreterOutput = processed flatMap { preprocessed =>
       evaluateLine(preprocessed, fileName, Name("cmd" + eval.getCurrentLine))

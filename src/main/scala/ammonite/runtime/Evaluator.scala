@@ -27,13 +27,21 @@ import Validation.FlatMap._
 class Evaluator(currentClassloader: ClassLoader, startingLine: Int) {
 
   import Evaluator._
+  
+  var frame = initialFrame
+
+  /**
+    * The current line number of the REPL, used to make sure every snippet
+    * evaluated can have a distinct name that doesn't collide.
+    */
+  private var currentLine = startingLine
 
   def loadClass(fullName: String, classFiles: ClassFiles): Validation[LogError, Class[_]] = {
     val raw = Validation.fromTryCatchNonFatal {
       for ((name, bytes) <- classFiles.sortBy(_._1)) {
-        frames.head.classloader.addClassFile(name, bytes)
+        frame.classloader.addClassFile(name, bytes)
       }
-      Class.forName(fullName, true, frames.head.classloader)
+      Class.forName(fullName, true, frame.classloader)
     }
     raw leftMap (LogMessage.fromThrowable(_))
   }
@@ -45,11 +53,6 @@ class Evaluator(currentClassloader: ClassLoader, startingLine: Int) {
     raw leftMap (LogMessage.fromThrowable(_))
   }
 
-  /**
-    * The current line number of the REPL, used to make sure every snippet
-    * evaluated can have a distinct name that doesn't collide.
-    */
-  private var currentLine = startingLine
 
   /**
     * Weird indirection only necessary because of
@@ -57,7 +60,7 @@ class Evaluator(currentClassloader: ClassLoader, startingLine: Int) {
     */
   def getCurrentLine = currentLine.toString.replace("-", "_")
 
-  def update(newImports: Imports): Unit = frames.head.addImports(newImports)
+  def update(newImports: Imports): Unit = frame.addImports(newImports)
 
   def processLine(classFiles: ClassFiles,
                   newImports: Imports,
@@ -105,22 +108,21 @@ class Evaluator(currentClassloader: ClassLoader, startingLine: Int) {
     )
   }
 
-  var frames = List(initialFrame)
 
-  def evalCachedClassFiles(cachedData: Seq[ClassFiles],
-                           pkg: String,
-                           wrapper: String,
-                           dynamicClasspath: VirtualDirectory,
-                           classFilesList: Seq[String]): ValidationNel[LogError, Seq[Any]] = {
+  // def evalCachedClassFiles(cachedData: Seq[ClassFiles],
+  //                          pkg: String,
+  //                          wrapper: String,
+  //                          dynamicClasspath: VirtualDirectory,
+  //                          classFilesList: Seq[String]): ValidationNel[LogError, Seq[Any]] = {
 
-    def composedFunction(classFiles: ClassFiles, idx: Int): ValidationNel[LogError, Any] = {
-      addToClasspath(classFiles, dynamicClasspath)
-      val evaluated = loadClass(classFilesList(idx), classFiles) map (evalMain _)
-      evaluated.toValidationNel
-    }
+  //   def composedFunction(classFiles: ClassFiles, idx: Int): ValidationNel[LogError, Any] = {
+  //     addToClasspath(classFiles, dynamicClasspath)
+  //     val evaluated = loadClass(classFilesList(idx), classFiles) map (evalMain _)
+  //     evaluated.toValidationNel
+  //   }
 
-    cachedData.zipWithIndex.toList.traverseU(x => composedFunction(x._1, x._2))
-  }
+  //   cachedData.zipWithIndex.toList.traverseU(x => composedFunction(x._1, x._2))
+  // }
 
 }
 
