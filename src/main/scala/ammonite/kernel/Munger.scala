@@ -126,8 +126,7 @@ object Munger {
 
     expandedCode map {
       case Transform(code, resIden) =>
-      
-        // can't use strip Margin below because holier-than-thou libraries like shapeless and scalaz use weird 
+        // can't use strip Margin below because holier-than-thou libraries like shapeless and scalaz use weird
         // characters for identifiers
 
         val topWrapper = normalizeNewlines(s"""

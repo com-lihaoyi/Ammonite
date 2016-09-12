@@ -1,21 +1,46 @@
 package ammonite.kernel
 
 import ammonite.runtime._
-import ammonite.util._
-//import ammonite.repl._
 import kernel._
 import scalaz.{Name => _, _}
 import Scalaz._
 import Validation.FlatMap._
+import ammonite.runtime.Parsers
+import fastparse.core.{Parsed, ParseError}
+import ammonite.util.Imports
 
-class ReplKernel() {
+class ReplKernel private (private[this] var state: ReplKernel.KernelState) {
 
   private val interp: Interpreter = new Interpreter()
 
-  private var state = ReplKernel.KernelState(0)
-
   def process(code: String): KernelOutput = {
-    val res = ReplKernel.process(code, interp, state.evaluationIndex)
+
+    val evaluationIndex = state.evaluationIndex
+
+    val parsed = Parsers.Splitter.parse(code) match {
+      case Parsed.Success(statements, _) =>
+        statements.toList match {
+          case h :: t =>
+            val nel = NonEmptyList(h, t: _*)
+            Some(Validation.success(nel))
+          case Nil => None
+        }
+      case Parsed.Failure(_, index, extra) =>
+        Some(Validation.failure(LogError(ParseError.msg(extra.input, extra.traced.expected, index))))
+    }
+
+    val withReversedErrors = parsed map { validation =>
+      val validationNel = validation.toValidationNel
+      validationNel flatMap { statements =>
+        val processed = interp.processLine(statements, s"_ReplKernel$evaluationIndex.sc", evaluationIndex)
+        processed map {
+          case (logMessages, evaluated) => (logMessages.reverse, evaluated.value)
+        }
+      }
+    }
+
+    val res = withReversedErrors.map(_.leftMap(_.reverse))
+
     res match {
       case Some(Success(_)) => state = state.copy(evaluationIndex = state.evaluationIndex + 1)
       case _ => ()
@@ -23,31 +48,24 @@ class ReplKernel() {
     res
   }
 
-  def complete(text: String, position: Int) = ReplKernel.complete(text, position, interp)
+  def complete(text: String, position: Int) = {
+    interp.pressy.complete(text, position, Munger.importBlock(interp.frame.imports))
+  }
 
 }
 
 object ReplKernel {
 
-  def process(code: String, interp: Interpreter, evaluationIndex: Int): KernelOutput = {
-    val parsed: Option[Validation[LogError, NonEmptyList[String]]] = ParserKernel.parseCode(code)
-    val withReversedErrors = parsed map { validation =>
-      val validationNel = validation.toValidationNel
-      validationNel flatMap { statements =>
-        val processed = interp.processLine(statements, s"Main$evaluationIndex.sc", evaluationIndex)
-        processed foreach (x => interp.handleOutput(x._2))
-        processed map {
-          case (logMessages, evaluated) => (logMessages.reverse, evaluated.value)
-        }
-      }
+  private case class KernelState(evaluationIndex: Int, frame: Frame)
+
+  def apply(): ReplKernel = {
+    val frame = {
+      val currentClassLoader = Thread.currentThread().getContextClassLoader
+      val hash = SpecialClassLoader.initialClasspathSignature(currentClassLoader)
+      def special = new SpecialClassLoader(currentClassLoader, hash)
+      new Frame(special, special, Imports(), Seq())
     }
-    withReversedErrors.map(_.leftMap(_.reverse))
+    new ReplKernel(KernelState(0, frame))
   }
-
-  def complete(text: String, position: Int, interp: Interpreter) = {
-    interp.pressy.complete(text, position, Munger.importBlock(interp.frame.imports))
-  }
-
-  private case class KernelState(val evaluationIndex: Int)
 
 }

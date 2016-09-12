@@ -1,11 +1,12 @@
 package ammonite.runtime
 
+import fastparse.noApi._
+
+import scalaparse.Scala._
+import WhitespaceApi._
+import Parsed.Failure
+
 object Parsers {
-
-  import fastparse.noApi._
-
-  import scalaparse.Scala._
-  import WhitespaceApi._
 
   val Splitter = {
     P(StatementBlock(Fail) ~ WL ~ End)
@@ -55,8 +56,7 @@ object Parsers {
     */
   def split(code: String): Option[fastparse.core.Parsed[Seq[String]]] =
     Splitter.parse(code) match {
-      case Parsed.Failure(_, index, extra) if code.drop(index).trim() == "" =>
-        None
+      case Failure(_, index, extra) if code.drop(index).trim() == "" => None
       case x => Some(x)
     }
 

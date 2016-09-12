@@ -1,14 +1,12 @@
 package ammonite.kernel
 
-//import ammonite.runtime.Storage
-import ammonite.util._
 import scalaz.{Name => _, _}
 import kernel._
 import org.scalatest.Assertions._
 
 object KernelTests {
 
-  def buildKernel() = new ReplKernel()
+  def buildKernel() = ReplKernel()
 
   val checkUnit: Any => Boolean = {
     case _: Unit => true

@@ -20,7 +20,6 @@ import scalaz.{Name => _, _}
 import Validation.FlatMap._
 import java.io.OutputStream
 
-
 /**
   * A convenient bundle of all the functionality necessary
   * to interpret Scala code. Doesn't attempt to provide any
@@ -31,7 +30,7 @@ class Interpreter() { interp =>
   // //this variable keeps track of where should we put the imports resulting from scripts.
   // private var scriptImportCallback: Imports => Unit = eval.update
 
-  var frame = {
+  val frame = {
     val currentClassLoader = Thread.currentThread().getContextClassLoader
     val hash = SpecialClassLoader.initialClasspathSignature(currentClassLoader)
     def special = new SpecialClassLoader(currentClassLoader, hash)
@@ -207,6 +206,7 @@ class Interpreter() { interp =>
 
   def processLine(statements: NonEmptyList[String], fileName: String, evaluationIndex: Int): InterpreterOutput = {
     val indexedWrapperName = Name(s"cmd$evaluationIndex")
+    val wrapperName =  Seq(Name("$sess"), indexedWrapperName)
 
     val munged: ValidationNel[LogError, MungedOutput] = Munger(
       compiler.parse,
@@ -234,7 +234,26 @@ class Interpreter() { interp =>
               Option(cls.getDeclaredMethod(s"$generatedMain").invoke(null)).getOrElse(())
             } leftMap (LogMessage.fromThrowable(_))
 
-            evaluated map (Interpreter.evaluationResult(Seq(Name("$sess"), indexedWrapperName), imports, "", _))
+            val newImports = Imports(
+              for (id <- imports.value) yield {
+                val filledPrefix =
+                  if (id.prefix.isEmpty) {
+                   wrapperName
+                  } else {
+                    id.prefix
+                  }
+                val rootedPrefix: Seq[Name] =
+                  if (filledPrefix.headOption.exists(_.backticked == "_root_"))
+                    filledPrefix
+                  else Seq(Name("_root_")) ++ filledPrefix
+
+                id.copy(prefix = rootedPrefix)
+              }
+            )
+            frame.addImports(newImports)
+
+            evaluated map (Evaluated(wrapperName, newImports, _))
+            //evaluated map (Interpreter.evaluationResult(Seq(Name("$sess"), indexedWrapperName), imports, "", _))
           }
 
           val mapped = processed map (x => (logMessages, x))
@@ -242,6 +261,8 @@ class Interpreter() { interp =>
           mapped.toValidationNel
       }
     }
+    //res foreach (x => frame.addImports(x._2.imports))
+    //res
     // output map {
     //   case (logMessages, output) => (logMessages, output.copy(imports = output.imports /*++ hookImports*/ ))
     // }
@@ -584,7 +605,7 @@ class Interpreter() { interp =>
   //   finally scriptImportCallback = outerScriptImportCallback
   // }
 
-  def handleOutput(ev: Evaluated): Unit = frame.addImports(ev.imports)
+  //def handleOutput(ev: Evaluated): Unit = frame.addImports(ev.imports)
 
   // def loadIvy(coordinates: (String, String, String), verbose: Boolean = true) = {
   //   val (groupId, artifactId, version) = coordinates
@@ -700,33 +721,32 @@ class Interpreter() { interp =>
 }
 
 object Interpreter {
-  val SheBang = "#!"
+  // val SheBang = "#!"
 
-  private def evaluationResult(wrapperName: Seq[Name], imports: Imports, tag: String, value: Any) = {
-    Evaluated(
-      wrapperName,
-      Imports(
-        for (id <- imports.value) yield {
-          val filledPrefix =
-            if (id.prefix.isEmpty) {
-              // For some reason, for things not-in-packages you can't access
-              // them off of `_root_`
-              wrapperName
-            } else {
-              id.prefix
-            }
-          val rootedPrefix: Seq[Name] =
-            if (filledPrefix.headOption.exists(_.backticked == "_root_"))
-              filledPrefix
-            else Seq(Name("_root_")) ++ filledPrefix
+  // private def evaluationResult(wrapperName: Seq[Name], imports: Imports, tag: String, value: Any) = {
+  //   Evaluated(
+  //     wrapperName,
+  //     Imports(
+  //       for (id <- imports.value) yield {
+  //         val filledPrefix =
+  //           if (id.prefix.isEmpty) {
+  //             // For some reason, for things not-in-packages you can't access
+  //             // them off of `_root_`
+  //             wrapperName
+  //           } else {
+  //             id.prefix
+  //           }
+  //         val rootedPrefix: Seq[Name] =
+  //           if (filledPrefix.headOption.exists(_.backticked == "_root_"))
+  //             filledPrefix
+  //           else Seq(Name("_root_")) ++ filledPrefix
 
-          id.copy(prefix = rootedPrefix)
-        }
-      ),
-      tag,
-      value
-    )
-  }
+  //         id.copy(prefix = rootedPrefix)
+  //       }
+  //     ),
+  //     value
+  //   )
+  // }
   // /**
   //   * This gives our cache tags for compile caching. The cache tags are a hash
   //   * of classpath, previous commands (in-same-script), and the block-code.
