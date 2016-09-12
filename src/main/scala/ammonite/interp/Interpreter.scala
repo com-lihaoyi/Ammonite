@@ -59,14 +59,14 @@ class Interpreter() { interp =>
     val settings =
       Option(compiler).fold(new Settings)(_.settings.copy)
     compiler = new Compiler(
-      Classpath.classpath ++ frame.classpath,
+      Classpath.classpath,
       dynamicClasspath,
       frame.classloader,
       frame.pluginClassloader,
       settings
     )
     pressy = Pressy(
-      Classpath.classpath ++ frame.classpath,
+      Classpath.classpath,
       dynamicClasspath,
       frame.classloader,
       settings.copy()
@@ -206,7 +206,7 @@ class Interpreter() { interp =>
 
   def processLine(statements: NonEmptyList[String], fileName: String, evaluationIndex: Int): InterpreterOutput = {
     val indexedWrapperName = Name(s"cmd$evaluationIndex")
-    val wrapperName =  Seq(Name("$sess"), indexedWrapperName)
+    val wrapperName = Seq(Name("$sess"), indexedWrapperName)
 
     val munged: ValidationNel[LogError, MungedOutput] = Munger(
       compiler.parse,
@@ -229,7 +229,7 @@ class Interpreter() { interp =>
             Class.forName("$sess." + indexedWrapperName.backticked, true, frame.classloader)
           } leftMap (LogMessage.fromThrowable(_))
 
-          val processed = loadedClass flatMap { cls =>
+          val processed: Validation[LogError, Evaluated] = loadedClass flatMap { cls =>
             val evaluated: Validation[LogError, Any] = Validation.fromTryCatchNonFatal {
               Option(cls.getDeclaredMethod(s"$generatedMain").invoke(null)).getOrElse(())
             } leftMap (LogMessage.fromThrowable(_))
@@ -238,7 +238,7 @@ class Interpreter() { interp =>
               for (id <- imports.value) yield {
                 val filledPrefix =
                   if (id.prefix.isEmpty) {
-                   wrapperName
+                    wrapperName
                   } else {
                     id.prefix
                   }
@@ -253,10 +253,9 @@ class Interpreter() { interp =>
             frame.addImports(newImports)
 
             evaluated map (Evaluated(wrapperName, newImports, _))
-            //evaluated map (Interpreter.evaluationResult(Seq(Name("$sess"), indexedWrapperName), imports, "", _))
           }
 
-          val mapped = processed map (x => (logMessages, x))
+          val mapped: Validation[LogError, SuccessfulInterpretation] = processed map (x => (logMessages, x))
 
           mapped.toValidationNel
       }

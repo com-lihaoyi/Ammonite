@@ -19,8 +19,15 @@ object Classpath {
     * memory but is better than reaching all over the filesystem every time we
     * want to do something.
     */
-  var current = Thread.currentThread().getContextClassLoader
-  val files = collection.mutable.Buffer.empty[java.io.File]
+  private val thread = {
+    val tmp = new Thread {
+      override def run() = ()
+    }
+    tmp.start
+  }
+
+  private var current = Thread.currentThread().getContextClassLoader
+  private val files = collection.mutable.Buffer.empty[java.io.File]
   files.appendAll(
     System.getProperty("sun.boot.class.path").split(java.io.File.pathSeparator).map(new java.io.File(_))
   )
