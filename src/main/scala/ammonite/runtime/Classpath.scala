@@ -14,34 +14,6 @@ object Classpath {
   val traceClasspathIssues =
     sys.props.get("ammonite.trace-classpath").exists(_.toLowerCase == "true")
 
-  /**
-    * In memory cache of all the jars used in the compiler. This takes up some
-    * memory but is better than reaching all over the filesystem every time we
-    * want to do something.
-    */
-  private val thread = {
-    val tmp = new Thread {
-      override def run() = ()
-    }
-    tmp.start
-  }
-
-  private var current = Thread.currentThread().getContextClassLoader
-  private val files = collection.mutable.Buffer.empty[java.io.File]
-  files.appendAll(
-    System.getProperty("sun.boot.class.path").split(java.io.File.pathSeparator).map(new java.io.File(_))
-  )
-  while (current != null) {
-    current match {
-      case t: java.net.URLClassLoader =>
-        files.appendAll(t.getURLs.map(u => new java.io.File(u.toURI)))
-      case _ =>
-    }
-    current = current.getParent
-  }
-
-  val classpath = files.toVector.filter(_.exists)
-
   def canBeOpenedAsJar(file: File): Boolean =
     try {
       val zf = new ZipFile(file)

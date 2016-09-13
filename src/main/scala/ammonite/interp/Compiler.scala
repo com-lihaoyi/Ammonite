@@ -41,7 +41,7 @@ final class Compiler(classpath: Seq[java.io.File],
                      dynamicClasspath: VirtualDirectory,
                      evalClassloader: => ClassLoader,
                      pluginClassloader: => ClassLoader,
-                     val settings: Settings) {
+                     settings: Settings) {
 
   import Compiler._
 

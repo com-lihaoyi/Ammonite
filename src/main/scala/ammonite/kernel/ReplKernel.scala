@@ -11,16 +11,16 @@ import ammonite.util.Imports
 import scala.tools.nsc.Settings
 import scala.reflect.io.VirtualDirectory
 import ammonite.util.Name
+import java.io.File
+import collection.mutable
+import annotation.tailrec
+import java.net.URLClassLoader
 
 class ReplKernel private (private[this] var state: ReplKernel.KernelState) {
 
   def process(code: String): KernelOutput = {
 
-    val evaluationIndex = state.evaluationIndex
-    val compiler = state.compiler
-    val frame = state.frame
-
-    // comments have been included below for documentation
+    // type signatures have been included below for documentation
 
     val parsed: Option[Validation[LogError, NonEmptyList[String]]] = Parsers.Splitter.parse(code) match {
       case Parsed.Success(statements, _) =>
@@ -38,30 +38,30 @@ class ReplKernel private (private[this] var state: ReplKernel.KernelState) {
       val validationNel = validation.toValidationNel
 
       validationNel flatMap { statements =>
-        val indexedWrapperName = Name(s"cmd$evaluationIndex")
+        val indexedWrapperName = Name(s"cmd${state.evaluationIndex}")
         val wrapperName = Seq(Name("$sess"), indexedWrapperName)
 
         val munged: ValidationNel[LogError, MungedOutput] = Munger(
-          compiler.parse,
+          state.compiler.parse,
           statements,
-          s"$evaluationIndex",
+          s"${state.evaluationIndex}",
           Seq(Name("$sess")),
           indexedWrapperName,
           state.imports
         )
 
-        /*val compiledAndLoaded: ValidationNel[LogError, (List[LogMessage], Imports, Any)] = */
         munged flatMap { processed =>
-          val compilationResult =
-            compiler.compile(processed.code.getBytes, processed.prefixCharLength, s"_ReplKernel$evaluationIndex.sc")
+          val compilationResult = state.compiler.compile(processed.code.getBytes,
+                                                         processed.prefixCharLength,
+                                                         s"_ReplKernel${state.evaluationIndex}.sc")
 
           compilationResult flatMap {
             case (logMessages, classFiles, imports) =>
               val loadedClass: Validation[LogError, Class[_]] = Validation.fromTryCatchNonFatal {
                 for ((name, bytes) <- classFiles.sortBy(_._1)) {
-                  frame.classloader.addClassFile(name, bytes)
+                  state.frame.classloader.addClassFile(name, bytes)
                 }
-                Class.forName("$sess." + indexedWrapperName.backticked, true, frame.classloader)
+                Class.forName("$sess." + indexedWrapperName.backticked, true, state.frame.classloader)
               } leftMap (LogMessage.fromThrowable(_))
 
               val processed: Validation[LogError, (Imports, Any)] = loadedClass flatMap { cls =>
@@ -94,9 +94,6 @@ class ReplKernel private (private[this] var state: ReplKernel.KernelState) {
           }
         }
 
-      // compiledAndLoaded map {
-      //   case (logMessages, _, value) => (logMessages, value)
-      // }
       } leftMap (_.reverse)
     }
 
@@ -119,33 +116,59 @@ class ReplKernel private (private[this] var state: ReplKernel.KernelState) {
 
 object ReplKernel {
 
-  private case class KernelState(evaluationIndex: Int, frame: Frame, imports: Imports, compiler: Compiler, pressy: Pressy)
+  private case class KernelState(evaluationIndex: Int,
+                                 frame: Frame,
+                                 imports: Imports,
+                                 compiler: Compiler,
+                                 pressy: Pressy)
 
   def apply(settings: Settings = new Settings()): ReplKernel = {
+
     val currentClassLoader = Thread.currentThread().getContextClassLoader
     val hash = SpecialClassLoader.initialClasspathSignature(currentClassLoader)
     def special = new SpecialClassLoader(currentClassLoader, hash)
 
-    val frame = new Frame(special, Seq())
+    val initialClasspath: List[File] = {
+      val res = mutable.ListBuffer[File]()
+      res.appendAll(
+        System.getProperty("sun.boot.class.path").split(java.io.File.pathSeparator).map(new java.io.File(_))
+      )
+
+      @tailrec
+      def go(classLoader: ClassLoader): Unit =
+        if (classLoader == null) ()
+        else {
+          classLoader match {
+            case t: URLClassLoader =>
+              res.appendAll(t.getURLs.map(u => new File(u.toURI)))
+            case _ => ()
+          }
+          go(classLoader.getParent)
+        }
+
+      go(currentClassLoader)
+
+      res.toList.filter(_.exists)
+    }
 
     val dynamicClasspath = new VirtualDirectory("(memory)", None)
 
     val compiler = new Compiler(
-      Classpath.classpath,
+      initialClasspath,
       dynamicClasspath,
       special,
       special,
-      settings
+      settings.copy()
     )
 
     val pressy = Pressy(
-      Classpath.classpath,
+      initialClasspath,
       dynamicClasspath,
       special,
       settings.copy()
     )
 
-    new ReplKernel(KernelState(0, frame, Imports(), compiler, pressy))
+    new ReplKernel(KernelState(0, new Frame(special, Seq()), Imports(), compiler, pressy))
   }
 
 }

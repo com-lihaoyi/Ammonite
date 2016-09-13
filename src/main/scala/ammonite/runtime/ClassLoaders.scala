@@ -3,19 +3,11 @@ package ammonite.runtime
 import java.net.{URL, URLClassLoader}
 import java.nio.ByteBuffer
 import ammonite.ops._
-import ammonite.util.{Imports, Util}
+import ammonite.util.Util
 
 import scala.collection.mutable
 
-/**
-  * Represents a single "frame" of the `sess.save`/`sess.load` stack/tree.
-  *
-  * Exposes `imports` and `classpath` as readable but only writable
-  * in particular ways: `imports` can only be updated via `mergeImports`,
-  * while `classpath` can only be added to.
-  */
-class Frame(val classloader: SpecialClassLoader,
-            private[this] var classpath0: Seq[java.io.File]) {
+class Frame(val classloader: SpecialClassLoader, private[this] var classpath0: Seq[java.io.File]) {
   def classpath = classpath0
   def addClasspath(additional: Seq[java.io.File]) = {
     additional.map(_.toURI.toURL).foreach(classloader.add)
