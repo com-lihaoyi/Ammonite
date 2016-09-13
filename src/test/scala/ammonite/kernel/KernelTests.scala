@@ -53,7 +53,7 @@ object KernelTests {
         }
       }
     }
-    val msg = if (idx != -1) s"failed for input: ${checks(idx)._1}"
+    val msg: Any = if (idx != -1) s"failed for input: ${checks(idx)._1}"
     assert(res, msg)
   }
 

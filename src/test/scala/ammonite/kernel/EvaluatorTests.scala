@@ -11,8 +11,8 @@ class EvaluatorTests extends FreeSpec {
     checkSuccess(kernel,
                  Vector(
                    ("val x = 1 + 2", checkUnit),
-                   (s"x", checkInt(3)),
-                   (s"x + x", checkInt(6))
+                   ("x", checkInt(3)),
+                   ("x + x", checkInt(6))
                  ))
   }
 
