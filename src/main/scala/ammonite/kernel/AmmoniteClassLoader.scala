@@ -12,47 +12,37 @@ import collection.mutable
   *
   * http://stackoverflow.com/questions/3544614/how-is-the-control-flow-to-findclass-of
   */
-final class AmmoniteClassLoader(parent: ClassLoader, parentSignature: Seq[(Path, Long)])
+private[kernel] final class AmmoniteClassLoader(parent: ClassLoader, parentSignature: Seq[(Path, Long)])
     extends URLClassLoader(Array(), parent) {
 
   /**
     * Files which have been compiled, stored so that our special
     * classloader can get at them.
     */
-  val newFileDict = mutable.Map.empty[String, Array[Byte]]
-  def addClassFile(name: String, bytes: Array[Byte]) = {
+  
+  val newFileDict: mutable.Map[String, Array[Byte]] = mutable.Map.empty
+  
+  def addClassFile(name: String, bytes: Array[Byte]): Unit = {
     val tuple = Path(name, root) -> bytes.sum.hashCode().toLong
     classpathSignature0 = classpathSignature0 ++ Seq(tuple)
     newFileDict(name) = bytes
   }
-  def findClassPublic(name: String) = findClass(name)
-  val specialLocalClasses = Set(
-    "ammonite.repl.ReplBridge",
-    "ammonite.repl.ReplBridge$",
-    "ammonite.runtime.InterpBridge",
-    "ammonite.runtime.InterpBridge$"
-  )
+
+  def findClassPublic(name: String): Class[_] = findClass(name)
+   
   override def findClass(name: String): Class[_] = {
     val loadedClass = this.findLoadedClass(name)
-    if (loadedClass != null) loadedClass
+    if (loadedClass != null) {
+      loadedClass
+    }
     else if (newFileDict.contains(name)) {
       val bytes = newFileDict(name)
       defineClass(name, bytes, 0, bytes.length)
-    } else if (specialLocalClasses(name)) {
-      import ammonite.ops._
-      val resource =
-        this.getResourceAsStream(name.replace('.', '/') + ".class")
-      if (resource != null) {
-        val bytes = read.bytes(resource)
-
-        defineClass(name, bytes, 0, bytes.length)
-      } else {
-        super.findClass(name)
-      }
-
-    } else super.findClass(name)
+    } else {
+      super.findClass(name)
+    }
   }
-  def add(url: URL) = {
+  def add(url: URL): Unit = {
     classpathSignature0 = classpathSignature0 ++ Seq(jarSignature(url))
     addURL(url)
   }
@@ -83,14 +73,13 @@ final class AmmoniteClassLoader(parent: ClassLoader, parentSignature: Seq[(Path,
   }
 }
 
-object AmmoniteClassLoader {
+private[kernel] object AmmoniteClassLoader {
 
   private def md5Hash(data: Iterator[Array[Byte]]) = {
     val digest = MessageDigest.getInstance("MD5")
     data.foreach(digest.update)
     digest.digest()
   }
-
 
   val simpleNameRegex = "[a-zA-Z0-9_]+".r
 

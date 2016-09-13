@@ -1,3 +1,5 @@
+package ammonite.interp
+
 // package ammonite.runtime
 
 // //import java.io.File

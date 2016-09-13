@@ -193,7 +193,7 @@ class EvaluatorTests extends FreeSpec {
         )""",
                     checkChar('{')),
                    ("Seq(0) map {_ + 1}", {
-                     case x: Seq[_] => x == List(1)
+                     case x: Seq[_] => x == Seq[Any](1)
                      case _ => false
                    })
                  ))

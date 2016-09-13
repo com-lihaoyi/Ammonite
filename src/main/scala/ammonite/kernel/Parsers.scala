@@ -6,10 +6,10 @@ import scalaparse.Scala._
 import WhitespaceApi._
 import Parsed.Failure
 
-object Parsers {
+private[kernel] object Parsers {
 
   val Splitter = {
-    P(StatementBlock(Fail) ~ WL ~ End)
+    P(statementBlocl(Fail) ~ WL ~ End)
   }
 
   // For some reason Scala doesn't import this by default
@@ -41,7 +41,7 @@ object Parsers {
 
   private val Statement = P(scalaparse.Scala.TopPkgSeq | scalaparse.Scala.Import | Prelude ~ BlockDef | StatCtx.Expr)
 
-  private def StatementBlock(blockSep: P0) = P(Semis.? ~ (!blockSep ~ Statement ~~ WS ~~ (Semis | End)).!.repX)
+  private def statementBlocl(blockSep: P0) = P(Semis.? ~ (!blockSep ~ Statement ~~ WS ~~ (Semis | End)).!.repX)
 
   /**
     * Attempts to break a code blob into multiple statements. Returns `None` if
@@ -52,13 +52,5 @@ object Parsers {
       case Failure(_, index, extra) if code.drop(index).trim() == "" => None
       case x => Some(x)
     }
-
-  private val Separator = P(WL ~ "@" ~~ CharIn(" " + System.lineSeparator).rep(1))
-
-  private val CompilationUnit = P(WL.! ~ StatementBlock(Separator) ~ WL)
-
-  private val ScriptSplitter = P(CompilationUnit.repX(1, Separator) ~ End)
-
-  def splitScript(code: String) = ScriptSplitter.parse(code)
 
 }

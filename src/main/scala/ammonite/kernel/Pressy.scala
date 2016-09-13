@@ -14,7 +14,7 @@ import kernel.newLine
 /**
   * Nice wrapper for the presentation compiler.
   */
-final class Pressy(nscGen: => nsc.interactive.Global) {
+private[kernel] final class Pressy(nscGen: => nsc.interactive.Global) {
 
   import Pressy._
 
@@ -28,32 +28,33 @@ final class Pressy(nscGen: => nsc.interactive.Global) {
     * different completions depending on where the `index` is placed, but
     * the outside caller probably doesn't care.
     */
-  def complete(snippet: String, snippetIndex: Int, previousImports: String) = lock.synchronized {
-    val prefix = previousImports + newLine + "object AutocompleteWrapper{" + newLine
-    val suffix = newLine + "}"
-    val allCode = prefix + snippet + suffix
-    val index = snippetIndex + prefix.length
+  def complete(snippet: String, snippetIndex: Int, previousImports: String): (Int, Seq[String], Seq[String]) =
+    lock.synchronized {
+      val prefix = previousImports + newLine + "object AutocompleteWrapper{" + newLine
+      val suffix = newLine + "}"
+      val allCode = prefix + snippet + suffix
+      val index = snippetIndex + prefix.length
 
-    val currentFile = new BatchSourceFile(Compiler.makeFile(allCode.getBytes, name = "Current.sc"), allCode)
+      val currentFile = new BatchSourceFile(Compiler.makeFile(allCode.getBytes, name = "Current.sc"), allCode)
 
-    val r = new Response[Unit]
-    nscGlobal.askReload(List(currentFile), r)
-    r.get.fold(x => x, e => throw e)
+      val r = new Response[Unit]
+      nscGlobal.askReload(List(currentFile), r)
+      r.get.fold(x => x, e => throw e)
 
-    val run = Try(new Run(nscGlobal, currentFile, allCode, index))
+      val run = Try(new Run(nscGlobal, currentFile, allCode, index))
 
-    val (i, all): (Int, Seq[(String, Option[String])]) = run match {
-      case Success(runSuccess) => runSuccess.prefixed
-      case Failure(throwable) => (0, Seq.empty)
+      val (i, all): (Int, Seq[(String, Option[String])]) = run match {
+        case Success(runSuccess) => runSuccess.prefixed
+        case Failure(throwable) => (0, Seq.empty)
+      }
+
+      val allNames = all.collect { case (name, None) => name }.sorted.distinct
+
+      val signatures =
+        all.collect { case (name, Some(defn)) => defn }.sorted.distinct
+
+      (i - prefix.length, allNames, signatures)
     }
-
-    val allNames = all.collect { case (name, None) => name }.sorted.distinct
-
-    val signatures =
-      all.collect { case (name, Some(defn)) => defn }.sorted.distinct
-
-    (i - prefix.length, allNames, signatures)
-  }
 
   override def finalize(): Unit = {
     nscGlobal.askShutdown()
@@ -61,7 +62,7 @@ final class Pressy(nscGen: => nsc.interactive.Global) {
 
 }
 
-object Pressy {
+private[kernel] object Pressy {
 
   /**
     * Encapsulates all the logic around a single instance of
@@ -116,7 +117,9 @@ object Pressy {
         val children =
           if (t.hasPackageFlag || t.isPackageObject) {
             pressy.ask(() => t.typeSignature.members.filter(_ != t).flatMap(rec))
-          } else Nil
+          } else {
+            Nil
+          }
 
         t +: children.toSeq
       }
@@ -145,8 +148,9 @@ object Pressy {
         r.filter(_.sym.name.decoded.startsWith(prefix)).filter(m => !blacklisted(m.sym)).map { x =>
           (
             x.sym.name.decoded,
-            if (x.sym.name.decoded != prefix) None
-            else Some(x.sym.defString)
+            if (x.sym.name.decoded != prefix) { None } else {
+              Some(x.sym.defString)
+            }
           )
         }
       }
@@ -178,7 +182,9 @@ object Pressy {
                 // if it doesn't have a name at all, accept anything
                 if (exprName == "<error>") "" else exprName
               )
-            } else (expr.pos.point, Seq.empty)
+            } else {
+              (expr.pos.point, Seq.empty)
+            }
           } else {
             // If the expr is well typed, type complete
             // the next thing
@@ -194,9 +200,13 @@ object Pressy {
         )
         lazy val deep = deepCompletion(name.decoded).distinct
 
-        if (shallow.nonEmpty) (t.pos.start, shallow)
-        else if (deep.length == 1) (t.pos.start, deep)
-        else (t.pos.end, deep :+ ("" -> None))
+        if (shallow.nonEmpty) {
+          (t.pos.start, shallow)
+        } else if (deep.length == 1) {
+          (t.pos.start, deep)
+        } else {
+          (t.pos.end, deep :+ ("" -> None))
+        }
 
       case t =>
         val comps = ask(index, pressy.askScopeCompletion)

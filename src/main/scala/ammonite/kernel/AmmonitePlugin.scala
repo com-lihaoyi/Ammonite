@@ -10,48 +10,62 @@ import scala.reflect.internal.util.{BatchSourceFile, OffsetPosition}
   * to the `output` function. Needs to be a compiler plugin so we can hook in
   * immediately after the `typer`
   */
-final class AmmonitePlugin(g: scala.tools.nsc.Global, output: Seq[ImportData] => Unit, topWrapperLen: => Int)
+private[kernel] final class AmmonitePlugin(override val global: Global,
+                                           output: Seq[ImportData] => Unit,
+                                           topWrapperLen: => Int)
     extends Plugin {
+
   val name: String = "AmmonitePlugin"
-  val global: Global = g
-  val description: String =
-    "Extracts the names in scope for the Ammonite REPL to use"
+
+  val description: String = "Extracts the names in scope for the Ammonite REPL to use"
+  
   val components: List[PluginComponent] = List(
     new PluginComponent {
-      val global = g
+     
+      override val global = AmmonitePlugin.this.global
 
-      val runsAfter = List("typer")
+      override val runsAfter = List("typer")
+      
       override val runsBefore = List("patmat")
-      val phaseName = "AmmonitePhase"
+      
+      override val phaseName = "AmmonitePhase"
 
-      def newPhase(prev: Phase): Phase = new g.GlobalPhase(prev) {
-        def name = phaseName
-        def apply(unit: g.CompilationUnit): Unit = {
-          AmmonitePlugin(g)(unit, output)
+      override def newPhase(prev: Phase): Phase = new global.GlobalPhase(prev) {
+        
+        override def name: String = phaseName
+        
+        override def apply(unit: global.CompilationUnit): Unit = {
+          AmmonitePlugin(global)(unit, output)
         }
       }
     },
     new PluginComponent {
-      val global = g
+      
+      override val global = AmmonitePlugin.this.global
 
-      val runsAfter = List("parser")
+      override val runsAfter = List("parser")
+
       override val runsBefore = List("namer")
-      val phaseName = "FixLineNumbers"
+      
+      override val phaseName = "FixLineNumbers"
 
-      def newPhase(prev: Phase): Phase = new g.GlobalPhase(prev) {
+      override def newPhase(prev: Phase): Phase = new global.GlobalPhase(prev) {
 
-        def name = phaseName
-        def apply(unit: g.CompilationUnit): Unit = {
-          LineNumberModifier(g)(unit, topWrapperLen)
+        override def name: String = phaseName
+      
+        override def apply(unit: global.CompilationUnit): Unit = {
+          LineNumberModifier(global)(unit, topWrapperLen)
         }
       }
     }
   )
 }
 
-object AmmonitePlugin {
-  var count = 0
-  def apply(g: Global)(unit: g.CompilationUnit, output: Seq[ImportData] => Unit) = {
+private[kernel] object AmmonitePlugin {
+
+  var count: Int = 0
+  
+  def apply(g: Global)(unit: g.CompilationUnit, output: Seq[ImportData] => Unit): Unit = {
 
     count += 1
     def decode(t: g.Tree) = {
@@ -130,12 +144,10 @@ object AmmonitePlugin {
 
           val prefix = rootPrefix ++ headFullPath ++ tailPath
 
-          /**
-            * A map of each name importable from `expr`, to a `Seq[Boolean]`
-            * containing a `true` if there's a type-symbol you can import, `false`
-            * if there's a non-type symbol and both if there are both type and
-            * non-type symbols that are importable for that name
-            */
+          // A map of each name importable from `expr`, to a `Seq[Boolean]`
+          // containing a `true` if there's a type-symbol you can import, `false`
+          // if there's a non-type symbol and both if there are both type and
+          // non-type symbols that are importable for that name
           val importableIsTypes =
             expr.tpe.members.filter(saneSym(_)).groupBy(_.name.decoded).mapValues(_.map(_.isType).toVector)
 
@@ -201,8 +213,9 @@ object AmmonitePlugin {
   }
 }
 
-object LineNumberModifier {
-  def apply(g: Global)(unit: g.CompilationUnit, topWrapperLen: => Int) = {
+private[kernel] object LineNumberModifier {
+
+  def apply(g: Global)(unit: g.CompilationUnit, topWrapperLen: => Int): Unit = {
 
     object LineNumberCorrector extends g.Transformer {
       override def transform(tree: g.Tree) = {

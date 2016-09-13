@@ -143,7 +143,7 @@ class EulerTests extends FreeSpec {
           if a * a + b * b  == c * c
         } yield a * b * c
         """, {
-                      case x: IndexedSeq[_] => x == Vector(31875000)
+                      case x: IndexedSeq[_] => x == IndexedSeq[Any](31875000)
                       case _ => false
                     })
                  ))

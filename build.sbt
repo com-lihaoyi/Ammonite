@@ -13,7 +13,7 @@ crossScalaVersions := Seq(
 
 organization := "com.lihaoyi"
 
-version := _root_.ammonite.Constants.version
+version := "0.1"
 
 libraryDependencies ++= Seq("com.github.scopt" %% "scopt" % "3.4.0",
                             "org.apache.ivy" % "ivy" % "2.4.0",
@@ -23,29 +23,36 @@ libraryDependencies ++= Seq("com.github.scopt" %% "scopt" % "3.4.0",
                             "com.lihaoyi" %% "scalaparse" % "0.3.7",
                             "com.lihaoyi" %% "ammonite-ops" % "0.7.6",
                             "org.scalaz" %% "scalaz-core" % "7.2.6",
+                            "ch.qos.logback" % "logback-classic" % "1.1.7",
+                            "com.typesafe.scala-logging" %% "scala-logging" % "3.4.0",
                             "org.scalatest" %% "scalatest" % "3.0.0" % "test")
 
 scalacOptions ++= Seq("-Ywarn-unused",
                       "-Ywarn-unused-import",
                       "-Ywarn-inaccessible",
                       "-Ywarn-dead-code",
+                      "-explaintypes",
+                      "-Xlog-reflective-calls",
+                      "-Ywarn-value-discard",
                       "-Xlint",
                       "-deprecation",
+                      "-Ywarn-nullary-override",
+                      "-Ywarn-nullary-unit",
                       "-feature",
                       "-unchecked",
                       "-Xfuture")
+
+scalacOptions in (Compile, doc) ++= Seq(
+  "-author",
+  "-groups",
+  "-implicits"
+)
 
 autoCompilerPlugins := true
 
 addCompilerPlugin("org.psywerx.hairyfotr" %% "linter" % "0.1.15")
 
 ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) }
-
-(unmanagedSources in Compile) += (baseDirectory in ThisBuild).value / "project" / "Constants.scala"
-
-mappings in (Compile, packageSrc) += {
-  ((baseDirectory in ThisBuild).value / ".." / "project" / "Constants.scala") -> "Constants.scala"
-}
 
 javaOptions += "-Xmx4G"
 

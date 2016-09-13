@@ -19,6 +19,7 @@ import ammonite.kernel.kernel._
 
 import language.existentials
 import util.Try
+import com.typesafe.scalalogging.LazyLogging
 
 /**
   * Encapsulates (almost) all the ickiness of Scalac so it doesn't leak into
@@ -31,11 +32,12 @@ import util.Try
   * classfile per source-string (e.g. inner classes, or lambdas). Also lets
   * you query source strings using an in-built presentation compiler
   */
-final class Compiler(classpath: Seq[java.io.File],
-                     dynamicClasspath: VirtualDirectory,
-                     evalClassloader: => ClassLoader,
-                     pluginClassloader: => ClassLoader,
-                     settings: Settings) {
+private[kernel] final class Compiler(classpath: Seq[java.io.File],
+                                     dynamicClasspath: VirtualDirectory,
+                                     evalClassloader: => ClassLoader,
+                                     pluginClassloader: => ClassLoader,
+                                     settings: Settings)
+    extends LazyLogging {
 
   import Compiler._
 
@@ -66,7 +68,7 @@ final class Compiler(classpath: Seq[java.io.File],
     }
     if (notFound.nonEmpty) {
       for ((name, className) <- notFound.sortBy(_._1))
-        Console.err.println(s"Implementation $className of plugin $name not found.")
+        logger.error(s"Implementation $className of plugin $name not found.")
     }
 
     plugins.collect { case (name, _, Some(cls)) => name -> cls }
@@ -87,7 +89,7 @@ final class Compiler(classpath: Seq[java.io.File],
           initOk = try CompilerCompatibility.pluginInit(plugin, Nil, g.globalError)
           catch {
             case ex: Exception =>
-              Console.err.println(s"Warning: disabling plugin $name, initialization failed: $ex")
+              logger.error(s"Warning: disabling plugin $name, initialization failed: $ex")
               false
           }
           if initOk
@@ -129,7 +131,6 @@ final class Compiler(classpath: Seq[java.io.File],
     val run = new compiler.Run()
     vd.clear()
     val compilationResult = Validation.fromTryCatchNonFatal(run.compileFiles(List(singleFile)))
-    compiler.reporter = null
 
     val compilationResultMapped = compilationResult leftMap (LogMessage.fromThrowable(_))
 
@@ -170,7 +171,6 @@ final class Compiler(classpath: Seq[java.io.File],
     compiler.reporter = reporter
     val parser = compiler.newUnitParser(line)
     val trees = CompilerCompatibility.trees(compiler)(parser)
-    compiler.reporter = null
     val errors: List[LogError] = reporter.infos.toList collect {
       case reporter.Info(pos, msg, reporter.ERROR) => LogError(Position.formatMessage(pos, msg, false))
     }
@@ -185,7 +185,7 @@ final class Compiler(classpath: Seq[java.io.File],
 
 }
 
-object Compiler {
+private[kernel] object Compiler {
 
   private def writeDeep(d: VirtualDirectory, path: List[String], suffix: String): OutputStream =
     (path: @unchecked) match {
@@ -206,7 +206,7 @@ object Compiler {
   /**
     * Converts a bunch of bytes into Scalac's weird VirtualFile class
     */
-  def makeFile(src: Array[Byte], name: String = "Main.sc") = {
+  def makeFile(src: Array[Byte], name: String = "Main.sc"): VirtualFile = {
     val singleFile = new VirtualFile(name)
     val output = singleFile.output
     output.write(src)
@@ -232,7 +232,9 @@ object Compiler {
     * for the Scala compiler to function, common between the
     * normal and presentation compiler
     */
-  def initGlobalBits(classpath: Seq[java.io.File], dynamicClasspath: VirtualDirectory, settings: Settings) = {
+  def initGlobalBits(classpath: Seq[java.io.File],
+                     dynamicClasspath: VirtualDirectory,
+                     settings: Settings): (VirtualDirectory, JavaClassPath) = {
     val vd = new VirtualDirectory("(memory)", None)
     val jCtx = new JavaContext()
     val (dirDeps, jarDeps) = classpath.partition(_.isDirectory)

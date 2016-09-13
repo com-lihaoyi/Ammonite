@@ -19,13 +19,20 @@ import collection.mutable
   * a type, a term, or both. This lets us properly deal with shadowing correctly
   * if we import the type and term of the same name from different places
   */
-case class ImportData(fromName: Name, toName: Name, prefix: Seq[Name], importType: ImportData.ImportType)
+private[kernel] case class ImportData(fromName: Name,
+                                      toName: Name,
+                                      prefix: Seq[Name],
+                                      importType: ImportData.ImportType)
 
-object ImportData {
-  sealed case class ImportType(name: String)
-  val Type = ImportType("Type")
-  val Term = ImportType("Term")
-  val TermType = ImportType("TermType")
+private[kernel] object ImportData {
+
+  sealed class ImportType(name: String)
+ 
+  case object Type extends ImportType("Type")
+
+  case object Term extends ImportType("Term")
+
+  case object TermType extends ImportType("TermType")
 }
 
 /**
@@ -37,15 +44,14 @@ object ImportData {
   * and a `++` operator that combines two sets of imports while performing
   * de-duplication.
   */
-class Imports private (val value: Seq[ImportData]) {
-  def ++(others: Imports) = Imports(this.value, others.value)
-  override def toString() = s"Imports(${value.toString})"
+private[kernel] class Imports private (val value: Seq[ImportData]) {
+  
+  def ++(others: Imports): Imports = Imports(this.value, others.value)
+  
+  override def toString(): String = s"Imports(${value.toString})"
 }
 
-object Imports {
-  // This isn't called directly, but we need to define it so uPickle can know
-  // how to read/write imports
-  def unapply(s: Imports): Option[Seq[ImportData]] = Some(s.value)
+private[kernel] object Imports {
 
   /**
     * Constructs an `Imports` object from one or more loose sequence of imports
@@ -79,8 +85,11 @@ object Imports {
   }
 }
 
-case class ImportTree(prefix: Seq[String], mappings: Option[ImportTree.ImportMapping], start: Int, end: Int)
+private[kernel] case class ImportTree(prefix: Seq[String],
+                                      mappings: Option[ImportTree.ImportMapping],
+                                      start: Int,
+                                      end: Int)
 
-object ImportTree {
+private[kernel] object ImportTree {
   type ImportMapping = Seq[(String, Option[String])]
 }

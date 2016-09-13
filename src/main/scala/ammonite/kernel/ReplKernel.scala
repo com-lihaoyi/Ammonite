@@ -76,9 +76,11 @@ final class ReplKernel private (private[this] var state: ReplKernel.KernelState)
                         id.prefix
                       }
                     val rootedPrefix: Seq[Name] =
-                      if (filledPrefix.headOption.exists(_.backticked == "_root_"))
+                      if (filledPrefix.headOption.exists(_.backticked == "_root_")) {
                         filledPrefix
-                      else Seq(Name("_root_")) ++ filledPrefix
+                      } else {
+                        Seq(Name("_root_")) ++ filledPrefix
+                      }
 
                     id.copy(prefix = rootedPrefix)
                   }
@@ -106,7 +108,7 @@ final class ReplKernel private (private[this] var state: ReplKernel.KernelState)
     op
   }
 
-  def complete(text: String, position: Int) = lock.synchronized {
+  def complete(text: String, position: Int): (Int, Seq[String], Seq[String]) = lock.synchronized {
     state.pressy.complete(text, position, Munger.importBlock(state.imports))
   }
 
@@ -114,9 +116,9 @@ final class ReplKernel private (private[this] var state: ReplKernel.KernelState)
 
 object ReplKernel {
 
-  private class Frame(val classloader: AmmoniteClassLoader, private[this] var classpath0: Seq[java.io.File]) {
-    def classpath = classpath0
-    def addClasspath(additional: Seq[java.io.File]) = {
+  private class Frame(val classloader: AmmoniteClassLoader, private[this] var classpath0: Seq[File]) {
+    def classpath: Seq[File] = classpath0
+    def addClasspath(additional: Seq[File]): Unit = {
       additional.map(_.toURI.toURL).foreach(classloader.add)
       classpath0 = classpath0 ++ additional
     }
@@ -142,8 +144,9 @@ object ReplKernel {
 
       @tailrec
       def go(classLoader: ClassLoader): Unit =
-        if (classLoader == null) ()
-        else {
+        if (classLoader == null) {
+          ()
+        } else {
           classLoader match {
             case t: URLClassLoader =>
               res.appendAll(t.getURLs.map(u => new File(u.toURI)))

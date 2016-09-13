@@ -2,16 +2,7 @@ package ammonite.kernel
 
 import scala.reflect.NameTransformer
 
-/**
-  * Represents a single identifier in Scala source code, e.g. "scala" or
-  * "println" or "`Hello-World`".
-  *
-  * Holds the value "raw", with all special characters intact, e.g.
-  * "Hello-World". Can be used [[backticked]] e.g. "`Hello-World`", useful for
-  * embedding in Scala source code, or [[encoded]] e.g. "Hello$minusWorld",
-  * useful for accessing names as-seen-from the Java/JVM side of thigns
-  */
-case class Name(raw: String) {
+private[kernel] final case class Name(raw: String) {
   assert(
     NameTransformer.decode(raw) == raw,
     "Name() must be created with un-encoded text"
@@ -19,14 +10,14 @@ case class Name(raw: String) {
 
   assert(raw.charAt(0) != '`', "Cannot create already-backticked identifiers")
 
-  override def toString = s"Name($backticked)"
+  override def toString: String = s"Name($backticked)"
 
-  def encoded = NameTransformer.encode(raw)
+  def encoded: String = NameTransformer.encode(raw)
 
-  def backticked = Name.backtickWrap(raw)
+  def backticked: String = Name.backtickWrap(raw)
 }
 
-object Name {
+private[kernel] object Name {
 
   val alphaKeywords = Set(
     "abstract",
@@ -92,10 +83,13 @@ object Name {
     * version. This lets us avoid loading FastParse and ScalaParse entirely if
     * we're running a cached script, which shaves off 200-300ms of startup time.
     */
-  def backtickWrap(s: String) = {
-    if (s.isEmpty) "``"
-    else if (s(0) == '`' && s.last == '`') s
-    else {
+  def backtickWrap(s: String): String = {
+    if (s.isEmpty) {
+      "``"
+    }
+    else if (s(0) == '`' && s.last == '`') {
+      s
+    } else {
       val chunks = s.split("_", -1)
       def validOperator(c: Char) = {
         c.getType == Character.MATH_SYMBOL ||
@@ -119,7 +113,11 @@ object Name {
           !alphaKeywords.contains(s) &&
           !symbolKeywords.contains(s)
 
-      if (valid) s else '`' + s + '`'
+      if (valid) {
+        s
+      } else {
+        '`' + s + '`'
+      }
     }
   }
 }

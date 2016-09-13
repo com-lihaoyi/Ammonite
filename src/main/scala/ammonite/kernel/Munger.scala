@@ -7,11 +7,11 @@ import Scalaz._
 import Validation.FlatMap._
 import kernel.{generatedMain, newLine}
 
-final case class MungedOutput(code: String, prefixCharLength: Int)
+private[kernel] final case class MungedOutput(code: String, prefixCharLength: Int)
 
 /** Munges input statements into a form that can be fed into scalac
   */
-object Munger {
+private[kernel] object Munger {
 
   private case class Transform(code: String, resIden: Option[String])
 
@@ -28,46 +28,46 @@ object Munger {
 
     val decls: List[DCT] = {
 
-      def DefProc(cond: PartialFunction[G#Tree, G#Name]): DCT =
+      def defProc(cond: PartialFunction[G#Tree, G#Name]): DCT =
         (code: String, name: String, tree: G#Tree) =>
           cond.lift(tree).map { name =>
             Transform(code, None)
         }
 
-      def Processor(cond: PartialFunction[(String, String, G#Tree), Transform]): DCT = {
+      def processor(cond: PartialFunction[(String, String, G#Tree), Transform]): DCT = {
         (code: String, name: String, tree: G#Tree) =>
           cond.lift((name, code, tree))
       }
 
-      val ObjectDef = DefProc {
+      val ObjectDef = defProc {
         case m: G#ModuleDef => m.name
       }
 
-      val ClassDef = DefProc {
+      val ClassDef = defProc {
         case m: G#ClassDef if !m.mods.isTrait => m.name
       }
 
-      val TraitDef = DefProc {
+      val TraitDef = defProc {
         case m: G#ClassDef if m.mods.isTrait => m.name
       }
 
-      val DefDef = DefProc {
+      val DefDef = defProc {
         case m: G#DefDef => m.name
       }
 
-      val TypeDef = DefProc {
+      val TypeDef = defProc {
         case m: G#TypeDef => m.name
       }
 
-      val PatVarDef = Processor {
+      val PatVarDef = processor {
         case (name, code, t: G#ValDef) => Transform(code, None)
       }
 
-      val Import = Processor {
+      val Import = processor {
         case (name, code, tree: G#Import) => Transform(code, None)
       }
 
-      val Expr = Processor {
+      val Expr = processor {
         //Expressions are lifted to anon function applications so they will be JITed
         case (name, code, tree) => Transform(s"private val $name = $code", Some(name))
       }
@@ -145,12 +145,14 @@ object Munger {
 
   }
 
-  def importBlock(importData: Imports) = {
+  def importBlock(importData: Imports): String = {
     // Group the remaining imports into sliding groups according to their
     // prefix, while still maintaining their ordering
     val grouped = mutable.Buffer[mutable.Buffer[ImportData]]()
     for (data <- importData.value) {
-      if (grouped.isEmpty) grouped.append(mutable.Buffer(data))
+      if (grouped.isEmpty) {
+        grouped.append(mutable.Buffer(data))
+      }
       else {
         val last = grouped.last.last
 
@@ -161,15 +163,23 @@ object Munger {
         val startNewImport =
           last.prefix != data.prefix || grouped.last.exists(_.fromName == data.fromName)
 
-        if (startNewImport) grouped.append(mutable.Buffer(data))
-        else grouped.last.append(data)
+        if (startNewImport) {
+          grouped.append(mutable.Buffer(data))
+        }
+        else {
+          grouped.last.append(data)
+        }
       }
     }
     // Stringify everything
     val out = for (group <- grouped) yield {
       val printedGroup = for (item <- group) yield {
-        if (item.fromName == item.toName) item.fromName.backticked
-        else s"${item.fromName.backticked} => ${item.toName.backticked}"
+        if (item.fromName == item.toName) {
+          item.fromName.backticked
+        }
+        else {
+          s"${item.fromName.backticked} => ${item.toName.backticked}"
+        }
       }
       val pkgString = group.head.prefix.map(_.backticked).mkString(".")
       "import " + pkgString + s".{$newLine  " +

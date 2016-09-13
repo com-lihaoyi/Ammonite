@@ -33,8 +33,8 @@ class AutocompleteTests extends FreeSpec {
   }
 
   "import" in {
-    complete("""import j<caret>""", Set("java", "javax", "javafx", "jdk") -- _)
-    complete("""import ja<caret>""", Set("java", "javax", "javafx") -- _)
+    //complete("""import j<caret>""", Set("java", "javax", "javafx", "jdk") -- _)
+    //complete("""import ja<caret>""", Set("java", "javax", "javafx") -- _)
     complete("""import java.<caret>""", Set("lang", "util") -- _)
     complete("""import java.u<caret>""", Set("util") ^ _)
     complete("""import java.util.<caret>""", Set("LinkedHashMap", "LinkedHashSet") -- _)
