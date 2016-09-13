@@ -1,7 +1,6 @@
 package ammonite.kernel
 
-import ammonite.util.Imports
-import scalaz._
+import scalaz.ValidationNel
 
 package object kernel {
 
@@ -16,5 +15,7 @@ package object kernel {
   type KernelOutput = Option[ValidationNel[LogError, SuccessfulExecution]]
 
   val generatedMain = "$main"
+
+  val newLine = System.lineSeparator()
 
 }

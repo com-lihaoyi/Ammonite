@@ -1,4 +1,4 @@
-package ammonite.util
+package ammonite.kernel
 
 import collection.mutable
 

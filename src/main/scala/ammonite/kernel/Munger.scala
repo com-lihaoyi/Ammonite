@@ -1,16 +1,13 @@
 package ammonite.kernel
 
-import ammonite.util._
-import ammonite.util.Util.newLine
 import scala.tools.nsc.{Global => G}
 import collection.mutable
-
 import scalaz.{Name => _, _}
 import Scalaz._
 import Validation.FlatMap._
-import kernel.generatedMain
+import kernel.{generatedMain, newLine}
 
-case class MungedOutput(code: String, prefixCharLength: Int)
+final case class MungedOutput(code: String, prefixCharLength: Int)
 
 /** Munges input statements into a form that can be fed into scalac
   */

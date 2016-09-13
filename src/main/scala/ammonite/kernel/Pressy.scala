@@ -8,13 +8,13 @@ import scala.tools.nsc.backend.JavaPlatform
 import scala.tools.nsc.interactive.Response
 import scala.tools.nsc.util._
 import scala.util.{Failure, Success, Try}
-import ammonite.util.Util.newLine
 import scala.tools.nsc.reporters.AbstractReporter
+import kernel.newLine
 
 /**
   * Nice wrapper for the presentation compiler.
   */
-class Pressy(nscGen: => nsc.interactive.Global) {
+final class Pressy(nscGen: => nsc.interactive.Global) {
 
   import Pressy._
 

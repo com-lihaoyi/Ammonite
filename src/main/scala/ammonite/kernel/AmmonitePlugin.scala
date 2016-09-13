@@ -1,7 +1,5 @@
 package ammonite.kernel
 
-import ammonite.util.{ImportData, Name}
-
 import scala.reflect.NameTransformer
 import scala.tools.nsc.{Global, Phase}
 import scala.tools.nsc.plugins.{Plugin, PluginComponent}
@@ -12,7 +10,7 @@ import scala.reflect.internal.util.{BatchSourceFile, OffsetPosition}
   * to the `output` function. Needs to be a compiler plugin so we can hook in
   * immediately after the `typer`
   */
-class AmmonitePlugin(g: scala.tools.nsc.Global, output: Seq[ImportData] => Unit, topWrapperLen: => Int)
+final class AmmonitePlugin(g: scala.tools.nsc.Global, output: Seq[ImportData] => Unit, topWrapperLen: => Int)
     extends Plugin {
   val name: String = "AmmonitePlugin"
   val global: Global = g

@@ -1,6 +1,5 @@
 package ammonite.kernel
 
-import ammonite.util.{ImportData, Imports}
 import scala.reflect.internal.util.Position
 import scala.reflect.io.{VirtualDirectory, VirtualFile, FileZipArchive, PlainDirectory, Directory, AbstractFile}
 import scala.tools.nsc.{Global, Settings}

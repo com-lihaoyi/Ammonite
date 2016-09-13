@@ -1,21 +1,18 @@
 package ammonite.kernel
 
-import ammonite.runtime._
 import kernel._
 import scalaz.{Name => _, _}
 import Scalaz._
 import Validation.FlatMap._
 import fastparse.core.{Parsed, ParseError}
-import ammonite.util.Imports
 import scala.tools.nsc.Settings
 import scala.reflect.io.VirtualDirectory
-import ammonite.util.Name
 import java.io.File
 import collection.mutable
 import annotation.tailrec
 import java.net.URLClassLoader
 
-class ReplKernel private (private[this] var state: ReplKernel.KernelState) {
+final class ReplKernel private (private[this] var state: ReplKernel.KernelState) {
 
   private[this] val lock = new AnyRef
 
@@ -117,6 +114,14 @@ class ReplKernel private (private[this] var state: ReplKernel.KernelState) {
 
 object ReplKernel {
 
+  private class Frame(val classloader: AmmoniteClassLoader, private[this] var classpath0: Seq[java.io.File]) {
+    def classpath = classpath0
+    def addClasspath(additional: Seq[java.io.File]) = {
+      additional.map(_.toURI.toURL).foreach(classloader.add)
+      classpath0 = classpath0 ++ additional
+    }
+  }
+
   private case class KernelState(evaluationIndex: Int,
                                  frame: Frame,
                                  imports: Imports,
@@ -126,8 +131,8 @@ object ReplKernel {
   def apply(settings: Settings = new Settings()): ReplKernel = {
 
     val currentClassLoader = Thread.currentThread().getContextClassLoader
-    val hash = SpecialClassLoader.initialClasspathSignature(currentClassLoader)
-    def special = new SpecialClassLoader(currentClassLoader, hash)
+    val hash = AmmoniteClassLoader.initialClasspathSignature(currentClassLoader)
+    def special = new AmmoniteClassLoader(currentClassLoader, hash)
 
     val initialClasspath: List[File] = {
       val res = mutable.ListBuffer[File]()
