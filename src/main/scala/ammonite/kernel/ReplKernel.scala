@@ -18,7 +18,9 @@ import java.net.URLClassLoader
 
 class ReplKernel private (private[this] var state: ReplKernel.KernelState) {
 
-  def process(code: String): KernelOutput = {
+  private[this] val lock = new AnyRef
+
+  def process(code: String): KernelOutput = lock.synchronized {
 
     // type signatures have been included below for documentation
 
@@ -108,7 +110,7 @@ class ReplKernel private (private[this] var state: ReplKernel.KernelState) {
     op
   }
 
-  def complete(text: String, position: Int) = {
+  def complete(text: String, position: Int) = lock.synchronized {
     state.pressy.complete(text, position, Munger.importBlock(state.imports))
   }
 

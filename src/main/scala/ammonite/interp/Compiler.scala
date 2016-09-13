@@ -45,6 +45,8 @@ final class Compiler(classpath: Seq[java.io.File],
 
   import Compiler._
 
+  private[this] val lock = new AnyRef
+
   private[this] var importsLen = 0
   private[this] var lastImports = Seq.empty[ImportData]
 
@@ -122,7 +124,7 @@ final class Compiler(classpath: Seq[java.io.File],
     * It is passed to AmmonitePlugin to decrease this much offset from each AST node
     * corresponding to the actual code so as to correct the line numbers in error report
     */
-  def compile(src: Array[Byte], importsLen0: Int, fileName: String): CompilerOutput = {
+  def compile(src: Array[Byte], importsLen0: Int, fileName: String): CompilerOutput = lock.synchronized {
 
     this.importsLen = importsLen0
     val singleFile = makeFile(src, fileName)
@@ -169,7 +171,7 @@ final class Compiler(classpath: Seq[java.io.File],
     }
   }
 
-  def parse(line: String): ValidationNel[LogError, Seq[Global#Tree]] = {
+  def parse(line: String): ValidationNel[LogError, Seq[Global#Tree]] = lock.synchronized {
     val reporter = new StoreReporter
     compiler.reporter = reporter
     val parser = compiler.newUnitParser(line)

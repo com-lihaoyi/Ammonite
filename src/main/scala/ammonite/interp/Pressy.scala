@@ -18,6 +18,8 @@ class Pressy(nscGen: => nsc.interactive.Global) {
 
   import Pressy._
 
+  private[this] val lock = new AnyRef
+
   private lazy val nscGlobal = nscGen
 
   /**
@@ -26,7 +28,7 @@ class Pressy(nscGen: => nsc.interactive.Global) {
     * different completions depending on where the `index` is placed, but
     * the outside caller probably doesn't care.
     */
-  def complete(snippet: String, snippetIndex: Int, previousImports: String) = {
+  def complete(snippet: String, snippetIndex: Int, previousImports: String) = lock.synchronized {
     val prefix = previousImports + newLine + "object AutocompleteWrapper{" + newLine
     val suffix = newLine + "}"
     val allCode = prefix + snippet + suffix
