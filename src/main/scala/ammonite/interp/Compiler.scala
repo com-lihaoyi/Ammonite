@@ -191,16 +191,16 @@ final class Compiler(classpath: Seq[java.io.File],
 
 object Compiler {
 
-  private def writeDeep(d: VirtualDirectory, path: List[String], suffix: String): OutputStream = (path: @unchecked) match {
-    case head :: Nil => d.fileNamed(path.head + suffix).output
-    case head :: rest =>
-      writeDeep(
-        d.subdirectoryNamed(head).asInstanceOf[VirtualDirectory],
-        rest,
-        suffix
-      )
-  }
-
+  private def writeDeep(d: VirtualDirectory, path: List[String], suffix: String): OutputStream =
+    (path: @unchecked) match {
+      case head :: Nil => d.fileNamed(path.head + suffix).output
+      case head :: rest =>
+        writeDeep(
+          d.subdirectoryNamed(head).asInstanceOf[VirtualDirectory],
+          rest,
+          suffix
+        )
+    }
 
   private def enumerateVdFiles(d: VirtualDirectory): Iterator[AbstractFile] = {
     val (subs, files) = d.iterator.partition(_.isDirectory)

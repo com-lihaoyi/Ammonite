@@ -15,13 +15,8 @@ import scala.collection.mutable
   * while `classpath` can only be added to.
   */
 class Frame(val classloader: SpecialClassLoader,
-            private[this] var imports0: Imports,
             private[this] var classpath0: Seq[java.io.File]) {
-  def imports = imports0
   def classpath = classpath0
-  def addImports(additional: Imports) = {
-    imports0 = imports0 ++ additional
-  }
   def addClasspath(additional: Seq[java.io.File]) = {
     additional.map(_.toURI.toURL).foreach(classloader.add)
     classpath0 = classpath0 ++ additional

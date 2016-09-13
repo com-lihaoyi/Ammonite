@@ -1,6 +1,6 @@
 package ammonite.kernel
 
-import ammonite.util.{Imports, Evaluated}
+import ammonite.util.Imports
 import scalaz._
 
 package object kernel {
@@ -10,10 +10,6 @@ package object kernel {
   type SuccessfulCompilation = (List[LogMessage], ClassFiles, Imports)
 
   type CompilerOutput = ValidationNel[LogError, SuccessfulCompilation]
-
-  type SuccessfulInterpretation = (List[LogMessage], Evaluated)
-
-  type InterpreterOutput = ValidationNel[LogError, SuccessfulInterpretation]
 
   type SuccessfulExecution = (List[LogMessage], Any)
 

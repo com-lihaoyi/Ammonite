@@ -34,7 +34,7 @@ class ReplKernel private (private[this] var state: ReplKernel.KernelState) {
         Some(Validation.failure(LogError(ParseError.msg(extra.input, extra.traced.expected, index))))
     }
 
-    val res: KernelOutput = parsed map { validation =>
+    val res = parsed map { validation =>
       val validationNel = validation.toValidationNel
 
       validationNel flatMap { statements =>
@@ -47,10 +47,11 @@ class ReplKernel private (private[this] var state: ReplKernel.KernelState) {
           s"$evaluationIndex",
           Seq(Name("$sess")),
           indexedWrapperName,
-          frame.imports
+          state.imports
         )
 
-        val compiledAndLoaded: ValidationNel[LogError, (List[LogMessage], Imports, Any)] = munged flatMap { processed =>
+        /*val compiledAndLoaded: ValidationNel[LogError, (List[LogMessage], Imports, Any)] = */
+        munged flatMap { processed =>
           val compilationResult =
             compiler.compile(processed.code.getBytes, processed.prefixCharLength, s"_ReplKernel$evaluationIndex.sc")
 
@@ -84,8 +85,6 @@ class ReplKernel private (private[this] var state: ReplKernel.KernelState) {
                     id.copy(prefix = rootedPrefix)
                   }
                 )
-                frame.addImports(newImports)
-
                 evaluated map ((newImports, _))
               }
 
@@ -95,39 +94,39 @@ class ReplKernel private (private[this] var state: ReplKernel.KernelState) {
           }
         }
 
-        compiledAndLoaded map {
-          case (logMessages, _, value) => (logMessages, value)
-        }
+      // compiledAndLoaded map {
+      //   case (logMessages, _, value) => (logMessages, value)
+      // }
       } leftMap (_.reverse)
     }
 
     // state mutation
-    res match {
-      case Some(Success(_)) => state = state.copy(evaluationIndex = state.evaluationIndex + 1)
-      case _ => ()
+    val op = res map { validation =>
+      validation map {
+        case (logMessages, newImports, value) =>
+          state = state.copy(evaluationIndex = state.evaluationIndex + 1, imports = state.imports ++ newImports)
+          (logMessages, value)
+      }
     }
-
-    res
+    op
   }
 
   def complete(text: String, position: Int) = {
-    state.pressy.complete(text, position, Munger.importBlock(state.frame.imports))
+    state.pressy.complete(text, position, Munger.importBlock(state.imports))
   }
 
 }
 
 object ReplKernel {
 
-  private case class KernelState(evaluationIndex: Int, frame: Frame, compiler: Compiler, pressy: Pressy)
+  private case class KernelState(evaluationIndex: Int, frame: Frame, imports: Imports, compiler: Compiler, pressy: Pressy)
 
   def apply(settings: Settings = new Settings()): ReplKernel = {
     val currentClassLoader = Thread.currentThread().getContextClassLoader
     val hash = SpecialClassLoader.initialClasspathSignature(currentClassLoader)
     def special = new SpecialClassLoader(currentClassLoader, hash)
 
-    val frame = {
-      new Frame(special, Imports(), Seq())
-    }
+    val frame = new Frame(special, Seq())
 
     val dynamicClasspath = new VirtualDirectory("(memory)", None)
 
@@ -146,7 +145,7 @@ object ReplKernel {
       settings.copy()
     )
 
-    new ReplKernel(KernelState(0, frame, compiler, pressy))
+    new ReplKernel(KernelState(0, frame, Imports(), compiler, pressy))
   }
 
 }
