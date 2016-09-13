@@ -3,7 +3,7 @@ package ammonite.runtime
 import ammonite.util.{ImportData, Name}
 
 import scala.reflect.NameTransformer
-import scala.tools.nsc._
+import scala.tools.nsc.{Global, Phase}
 import scala.tools.nsc.plugins.{Plugin, PluginComponent}
 import scala.reflect.internal.util.{BatchSourceFile, OffsetPosition}
 

@@ -38,12 +38,6 @@ object Parsers {
     P(`import` ~/ ImportExpr.rep(1, sep = ",".~/))
   }
 
-  // private val PatVarSplitter = {
-  //   val Prefixes = P(Prelude ~ (`var` | `val`))
-  //   val Lhs = P(Prefixes ~/ BindPattern.rep(1, "," ~/ Pass) ~ (`:` ~/ Type).?)
-  //   P(Lhs.! ~ (`=` ~/ WL ~ StatCtx.Expr.!) ~ End)
-  // }
-
   private val Prelude = P((Annot ~ OneNLMax).rep ~ (Mod ~/ Pass).rep)
 
   private val Statement = P(scalaparse.Scala.TopPkgSeq | scalaparse.Scala.Import | Prelude ~ BlockDef | StatCtx.Expr)
@@ -67,14 +61,5 @@ object Parsers {
   private val ScriptSplitter = P(CompilationUnit.repX(1, Separator) ~ End)
 
   def splitScript(code: String) = ScriptSplitter.parse(code)
-
-//  private val BlockUnwrapper = P("{" ~ Block.! ~ "}" ~ End)
-
-  // def unwrapBlock(code: String) = {
-  //   BlockUnwrapper.parse(code) match {
-  //     case Parsed.Success(contents, _) => Some(contents)
-  //     case _ => None
-  //   }
-  // }
 
 }

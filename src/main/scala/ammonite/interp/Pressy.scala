@@ -67,7 +67,7 @@ object Pressy {
     * Encapsulates all the logic around a single instance of
     * `nsc.interactive.Global` and other data specific to a single completion
     */
-  class Run(val pressy: nsc.interactive.Global, currentFile: BatchSourceFile, allCode: String, index: Int) {
+  private class Run(val pressy: nsc.interactive.Global, currentFile: BatchSourceFile, allCode: String, index: Int) {
 
     /**
       * Dumb things that turn up in the autocomplete that nobody needs or wants

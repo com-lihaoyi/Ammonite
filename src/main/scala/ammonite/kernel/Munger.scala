@@ -1,7 +1,7 @@
 package ammonite.kernel
 
 import ammonite.util._
-import ammonite.util.Util.{newLine, normalizeNewlines}
+import ammonite.util.Util.newLine
 import scala.tools.nsc.{Global => G}
 import collection.mutable
 
@@ -128,17 +128,17 @@ object Munger {
         // can't use strip Margin below because holier-than-thou libraries like shapeless and scalaz use weird
         // characters for identifiers
 
-        val topWrapper = normalizeNewlines(s"""
+        val topWrapper = s"""
            package ${pkgName.map(_.backticked).mkString(".")}
            ${importBlock(imports)}
-           object ${indexedWrapperName.backticked}{\n""")
+           object ${indexedWrapperName.backticked}{\n"""
 
         val previousIden = resIden.getOrElse("()")
 
-        val bottomWrapper = normalizeNewlines(s"""
+        val bottomWrapper = s"""
           def $generatedMain = { $previousIden }
           override def toString = "${indexedWrapperName.raw}"
-          }""")
+          }"""
 
         val importsLen = topWrapper.length
 

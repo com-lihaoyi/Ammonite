@@ -1,13 +1,8 @@
 package ammonite.runtime
 
 import ammonite.util.{ImportData, Imports}
-//import ammonite.util.Util.newLine
-
-//import scala.collection.mutable
 import scala.reflect.internal.util.Position
-import scala.reflect.io
-import scala.reflect.io._
-import scala.tools.nsc
+import scala.reflect.io.{VirtualDirectory, VirtualFile, FileZipArchive, PlainDirectory, Directory, AbstractFile}
 import scala.tools.nsc.{Global, Settings}
 import scala.tools.nsc.backend.JavaPlatform
 import scala.tools.nsc.interactive.Response
@@ -85,7 +80,7 @@ final class Compiler(classpath: Seq[java.io.File],
   )
 
   private[this] val compiler = {
-    val scalac = new nsc.Global(settings) { g =>
+    val scalac = new Global(settings) { g =>
       override lazy val plugins = List(new AmmonitePlugin(g, lastImports = _, importsLen)) ++ {
         for {
           (name, cls) <- plugins0
@@ -213,7 +208,7 @@ object Compiler {
     * Converts a bunch of bytes into Scalac's weird VirtualFile class
     */
   def makeFile(src: Array[Byte], name: String = "Main.sc") = {
-    val singleFile = new io.VirtualFile(name)
+    val singleFile = new VirtualFile(name)
     val output = singleFile.output
     output.write(src)
     output.close()
@@ -239,7 +234,7 @@ object Compiler {
     * normal and presentation compiler
     */
   def initGlobalBits(classpath: Seq[java.io.File], dynamicClasspath: VirtualDirectory, settings: Settings) = {
-    val vd = new io.VirtualDirectory("(memory)", None)
+    val vd = new VirtualDirectory("(memory)", None)
     val jCtx = new JavaContext()
     val (dirDeps, jarDeps) = classpath.partition(_.isDirectory)
 

@@ -31,10 +31,6 @@ object Util {
     digest.digest()
   }
 
-  //normalizes strings to have new line of the OS program is being run on
-  //irrespective of the OS on which script was written
-  def normalizeNewlines(s: String) = s.replace("\r", "").replace("\n", newLine)
-
   val windowsPlatform = System.getProperty("os.name").startsWith("Windows")
   val newLine = System.lineSeparator()
   // Type aliases for common things
