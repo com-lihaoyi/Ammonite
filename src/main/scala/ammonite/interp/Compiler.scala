@@ -20,6 +20,7 @@ import ammonite.kernel._
 import scalaz._
 import Scalaz._
 import Validation.FlatMap._
+import java.io.OutputStream
 
 import ammonite.kernel.kernel._
 
@@ -156,7 +157,7 @@ final class Compiler(classpath: Seq[java.io.File],
           //shutdownPressy()
           val files = for (x <- outputFiles if x.name.endsWith(".class")) yield {
             val segments = x.path.split("/").toList.tail
-            val output = Interpreter.writeDeep(dynamicClasspath, segments, "")
+            val output = writeDeep(dynamicClasspath, segments, "")
             output.write(x.toByteArray)
             output.close()
             (x.path.stripPrefix("(memory)/").stripSuffix(".class").replace('/', '.'), x.toByteArray)
@@ -189,6 +190,17 @@ final class Compiler(classpath: Seq[java.io.File],
 }
 
 object Compiler {
+
+  private def writeDeep(d: VirtualDirectory, path: List[String], suffix: String): OutputStream = (path: @unchecked) match {
+    case head :: Nil => d.fileNamed(path.head + suffix).output
+    case head :: rest =>
+      writeDeep(
+        d.subdirectoryNamed(head).asInstanceOf[VirtualDirectory],
+        rest,
+        suffix
+      )
+  }
+
 
   private def enumerateVdFiles(d: VirtualDirectory): Iterator[AbstractFile] = {
     val (subs, files) = d.iterator.partition(_.isDirectory)

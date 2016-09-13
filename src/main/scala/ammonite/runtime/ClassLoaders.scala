@@ -15,7 +15,6 @@ import scala.collection.mutable
   * while `classpath` can only be added to.
   */
 class Frame(val classloader: SpecialClassLoader,
-            val pluginClassloader: SpecialClassLoader,
             private[this] var imports0: Imports,
             private[this] var classpath0: Seq[java.io.File]) {
   def imports = imports0

@@ -10,7 +10,7 @@ import fastparse.core.{Parsed, ParseError}
 import ammonite.util.Imports
 import scala.tools.nsc.Settings
 import scala.reflect.io.VirtualDirectory
-import ammonite.util.{Name, Evaluated}
+import ammonite.util.Name
 
 class ReplKernel private (private[this] var state: ReplKernel.KernelState) {
 
@@ -50,7 +50,7 @@ class ReplKernel private (private[this] var state: ReplKernel.KernelState) {
           frame.imports
         )
 
-        val compiledAndLoaded: ValidationNel[LogError, (List[LogMessage], Evaluated)] = munged flatMap { processed =>
+        val compiledAndLoaded: ValidationNel[LogError, (List[LogMessage], Imports, Any)] = munged flatMap { processed =>
           val compilationResult =
             compiler.compile(processed.code.getBytes, processed.prefixCharLength, s"_ReplKernel$evaluationIndex.sc")
 
@@ -63,7 +63,7 @@ class ReplKernel private (private[this] var state: ReplKernel.KernelState) {
                 Class.forName("$sess." + indexedWrapperName.backticked, true, frame.classloader)
               } leftMap (LogMessage.fromThrowable(_))
 
-              val processed: Validation[LogError, Evaluated] = loadedClass flatMap { cls =>
+              val processed: Validation[LogError, (Imports, Any)] = loadedClass flatMap { cls =>
                 val evaluated: Validation[LogError, Any] = Validation.fromTryCatchNonFatal {
                   Option(cls.getDeclaredMethod(s"$generatedMain").invoke(null)).getOrElse(())
                 } leftMap (LogMessage.fromThrowable(_))
@@ -86,19 +86,19 @@ class ReplKernel private (private[this] var state: ReplKernel.KernelState) {
                 )
                 frame.addImports(newImports)
 
-                evaluated map (Evaluated(wrapperName, newImports, _))
+                evaluated map ((newImports, _))
               }
 
-              val mapped: Validation[LogError, SuccessfulInterpretation] = processed map (x => (logMessages, x))
+              val mapped = processed map (x => (logMessages, x._1, x._2))
 
               mapped.toValidationNel
           }
         }
 
         compiledAndLoaded map {
-          case (logMessages, evaluated) => (logMessages, evaluated.value)
+          case (logMessages, _, value) => (logMessages, value)
         }
-      } leftMap( _.reverse)
+      } leftMap (_.reverse)
     }
 
     // state mutation
@@ -121,11 +121,12 @@ object ReplKernel {
   private case class KernelState(evaluationIndex: Int, frame: Frame, compiler: Compiler, pressy: Pressy)
 
   def apply(settings: Settings = new Settings()): ReplKernel = {
+    val currentClassLoader = Thread.currentThread().getContextClassLoader
+    val hash = SpecialClassLoader.initialClasspathSignature(currentClassLoader)
+    def special = new SpecialClassLoader(currentClassLoader, hash)
+
     val frame = {
-      val currentClassLoader = Thread.currentThread().getContextClassLoader
-      val hash = SpecialClassLoader.initialClasspathSignature(currentClassLoader)
-      def special = new SpecialClassLoader(currentClassLoader, hash)
-      new Frame(special, special, Imports(), Seq())
+      new Frame(special, Imports(), Seq())
     }
 
     val dynamicClasspath = new VirtualDirectory("(memory)", None)
@@ -133,15 +134,15 @@ object ReplKernel {
     val compiler = new Compiler(
       Classpath.classpath,
       dynamicClasspath,
-      frame.classloader,
-      frame.pluginClassloader,
+      special,
+      special,
       settings
     )
 
     val pressy = Pressy(
       Classpath.classpath,
       dynamicClasspath,
-      frame.classloader,
+      special,
       settings.copy()
     )
 
