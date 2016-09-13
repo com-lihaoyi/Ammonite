@@ -1,4 +1,4 @@
-package ammonite.runtime
+package ammonite.kernel
 
 import ammonite.util.{ImportData, Name}
 

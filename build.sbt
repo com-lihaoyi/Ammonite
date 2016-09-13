@@ -16,8 +16,6 @@ organization := "com.lihaoyi"
 version := _root_.ammonite.Constants.version
 
 libraryDependencies ++= Seq("com.github.scopt" %% "scopt" % "3.4.0",
-                            //"com.lihaoyi" %% "upickle" % "0.4.2",
-                            //"com.lihaoyi" %% "pprint" % "0.4.2",
                             "org.apache.ivy" % "ivy" % "2.4.0",
                             "org.scalaj" %% "scalaj-http" % "2.3.0",
                             "org.scala-lang" % "scala-compiler" % scalaVersion.value,

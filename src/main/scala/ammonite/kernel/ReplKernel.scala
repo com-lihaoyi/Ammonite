@@ -5,7 +5,6 @@ import kernel._
 import scalaz.{Name => _, _}
 import Scalaz._
 import Validation.FlatMap._
-import ammonite.runtime.Parsers
 import fastparse.core.{Parsed, ParseError}
 import ammonite.util.Imports
 import scala.tools.nsc.Settings

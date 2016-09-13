@@ -1,4 +1,4 @@
-package ammonite.runtime
+package ammonite.kernel
 
 import scala.reflect.internal.util.{Position, OffsetPosition, BatchSourceFile}
 import scala.reflect.io.VirtualDirectory

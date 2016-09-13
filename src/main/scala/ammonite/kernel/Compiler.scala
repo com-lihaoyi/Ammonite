@@ -1,4 +1,4 @@
-package ammonite.runtime
+package ammonite.kernel
 
 import ammonite.util.{ImportData, Imports}
 import scala.reflect.internal.util.Position
@@ -10,16 +10,16 @@ import scala.tools.nsc.plugins.Plugin
 import scala.tools.nsc.reporters.StoreReporter
 import scala.tools.nsc.util.ClassPath.JavaContext
 import scala.tools.nsc.util._
-import ammonite.kernel._
-
 import scalaz._
 import Scalaz._
 import Validation.FlatMap._
-import java.io.OutputStream
+import java.io.{OutputStream, File}
+import java.util.zip.ZipFile
 
 import ammonite.kernel.kernel._
 
 import language.existentials
+import util.Try
 
 /**
   * Encapsulates (almost) all the ickiness of Scalac so it doesn't leak into
@@ -238,9 +238,11 @@ object Compiler {
     val jCtx = new JavaContext()
     val (dirDeps, jarDeps) = classpath.partition(_.isDirectory)
 
+    def canBeOpenedAsJar(file: File): Boolean = (Try((new ZipFile(file)).close())).isSuccess
+
     val jarCP =
       jarDeps
-        .filter(x => x.getName.endsWith(".jar") || Classpath.canBeOpenedAsJar(x))
+        .filter(x => x.getName.endsWith(".jar") || canBeOpenedAsJar(x))
         .map(x => new DirectoryClassPath(new FileZipArchive(x), jCtx))
         .toVector
 
@@ -249,13 +251,6 @@ object Compiler {
 
     val dynamicCP = Seq(new DirectoryClassPath(dynamicClasspath, jCtx))
     val jcp = new JavaClassPath(jarCP ++ dirCP ++ dynamicCP, jCtx)
-
-    if (Classpath.traceClasspathIssues) {
-      settings.Ylogcp.value = true
-      println("jardeps")
-      jarDeps.foreach(p => println(s"${p.getName.takeRight(4)} $p"))
-      println("finished")
-    }
 
     settings.outputDirs.setSingleOutput(vd)
 

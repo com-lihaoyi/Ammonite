@@ -1,4 +1,4 @@
-package ammonite.runtime
+package ammonite.kernel
 
 import fastparse.noApi._
 

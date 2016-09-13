@@ -38,7 +38,8 @@ object Munger {
         }
 
       def Processor(cond: PartialFunction[(String, String, G#Tree), Transform]): DCT = {
-        (code: String, name: String, tree: G#Tree) => cond.lift((name, code, tree))
+        (code: String, name: String, tree: G#Tree) =>
+          cond.lift((name, code, tree))
       }
 
       val ObjectDef = DefProc {
