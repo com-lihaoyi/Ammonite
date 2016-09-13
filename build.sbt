@@ -39,6 +39,8 @@ scalacOptions ++= Seq("-Ywarn-unused",
 
 autoCompilerPlugins := true
 
+addCompilerPlugin("org.psywerx.hairyfotr" %% "linter" % "0.1.15")
+
 ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) }
 
 (unmanagedSources in Compile) += (baseDirectory in ThisBuild).value / "project" / "Constants.scala"

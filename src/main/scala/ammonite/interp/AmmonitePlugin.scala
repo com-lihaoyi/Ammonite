@@ -128,7 +128,7 @@ object AmmonitePlugin {
           // called `_root_`, this will still break, but that's their problem
           val rootPrefix =
             if (symbolList.head.hasPackageFlag) Seq(Name("_root_")) else Nil
-          val tailPath = nameList.tail.map(_.decoded).map(Name(_))
+          val tailPath = nameList.tail.map(x => Name(x.decoded))
 
           val prefix = rootPrefix ++ headFullPath ++ tailPath
 

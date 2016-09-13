@@ -192,7 +192,7 @@ object Pressy {
         )
         lazy val deep = deepCompletion(name.decoded).distinct
 
-        if (shallow.length > 0) (t.pos.start, shallow)
+        if (shallow.nonEmpty) (t.pos.start, shallow)
         else if (deep.length == 1) (t.pos.start, deep)
         else (t.pos.end, deep :+ ("" -> None))
 

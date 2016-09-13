@@ -120,7 +120,7 @@ object Name {
               // operators can only come last
               index == chunks.length - 1 &&
               // but cannot be preceded by only a _
-              !(chunks.lift(index - 1).exists(_ == "") && index - 1 == 0))
+              !(chunks.lift(index - 1).contains("") && index - 1 == 0))
       }
 
       val firstLetterValid = s(0).isLetter || s(0) == '_' || s(0) == '$' || validOperator(s(0))

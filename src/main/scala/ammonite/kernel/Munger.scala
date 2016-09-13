@@ -31,34 +31,33 @@ object Munger {
 
     val decls: List[DCT] = {
 
-      def DefProc(definitionLabel: String)(cond: PartialFunction[G#Tree, G#Name]): DCT =
+      def DefProc(cond: PartialFunction[G#Tree, G#Name]): DCT =
         (code: String, name: String, tree: G#Tree) =>
           cond.lift(tree).map { name =>
             Transform(code, None)
         }
 
       def Processor(cond: PartialFunction[(String, String, G#Tree), Transform]): DCT = {
-        (code: String, name: String, tree: G#Tree) =>
-          cond.lift((name, code, tree))
+        (code: String, name: String, tree: G#Tree) => cond.lift((name, code, tree))
       }
 
-      val ObjectDef = DefProc("object") {
+      val ObjectDef = DefProc {
         case m: G#ModuleDef => m.name
       }
 
-      val ClassDef = DefProc("class") {
+      val ClassDef = DefProc {
         case m: G#ClassDef if !m.mods.isTrait => m.name
       }
 
-      val TraitDef = DefProc("trait") {
+      val TraitDef = DefProc {
         case m: G#ClassDef if m.mods.isTrait => m.name
       }
 
-      val DefDef = DefProc("function") {
+      val DefDef = DefProc {
         case m: G#DefDef => m.name
       }
 
-      val TypeDef = DefProc("type") {
+      val TypeDef = DefProc {
         case m: G#TypeDef => m.name
       }
 
@@ -134,10 +133,7 @@ object Munger {
            ${importBlock(imports)}
            object ${indexedWrapperName.backticked}{\n""")
 
-        val previousIden = resIden match {
-          case None => s"()"
-          case Some(iden) => iden
-        }
+        val previousIden = resIden.getOrElse("()")
 
         val bottomWrapper = normalizeNewlines(s"""
           def $generatedMain = { $previousIden }
