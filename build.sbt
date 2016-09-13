@@ -15,8 +15,7 @@ organization := "com.lihaoyi"
 
 version := "0.1"
 
-libraryDependencies ++= Seq("com.github.scopt" %% "scopt" % "3.4.0",
-                            "org.apache.ivy" % "ivy" % "2.4.0",
+libraryDependencies ++= Seq("org.apache.ivy" % "ivy" % "2.4.0",
                             "org.scalaj" %% "scalaj-http" % "2.3.0",
                             "org.scala-lang" % "scala-compiler" % scalaVersion.value,
                             "org.scala-lang" % "scala-reflect" % scalaVersion.value,

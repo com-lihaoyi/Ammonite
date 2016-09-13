@@ -26,7 +26,7 @@ private[kernel] case class ImportData(fromName: Name,
 
 private[kernel] object ImportData {
 
-  sealed class ImportType(name: String)
+  sealed abstract class ImportType(name: String)
  
   case object Type extends ImportType("Type")
 
