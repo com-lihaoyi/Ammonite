@@ -1,9 +1,7 @@
 package ammonite.kernel
 
 import java.net.{URL, URLClassLoader}
-import java.nio.ByteBuffer
 import ammonite.ops._
-import java.security.MessageDigest
 
 import collection.mutable
 
@@ -19,15 +17,13 @@ private[kernel] final class AmmoniteClassLoader(parent: ClassLoader, parentSigna
     * Files which have been compiled, stored so that our special
     * classloader can get at them.
     */
-  val newFileDict: mutable.Map[String, Array[Byte]] = mutable.Map.empty
+  private val newFileDict: mutable.Map[String, Array[Byte]] = mutable.Map.empty
 
   def addClassFile(name: String, bytes: Array[Byte]): Unit = {
     val tuple = Path(name, root) -> bytes.sum.hashCode().toLong
     classpathSignature0 = classpathSignature0 ++ Seq(tuple)
     newFileDict(name) = bytes
   }
-
-  def findClassPublic(name: String): Class[_] = findClass(name)
 
   override def findClass(name: String): Class[_] = {
     val loadedClass = this.findLoadedClass(name)
@@ -40,6 +36,7 @@ private[kernel] final class AmmoniteClassLoader(parent: ClassLoader, parentSigna
       super.findClass(name)
     }
   }
+
   def add(url: URL): Unit = {
     classpathSignature0 = classpathSignature0 ++ Seq(jarSignature(url))
     addURL(url)
@@ -51,19 +48,8 @@ private[kernel] final class AmmoniteClassLoader(parent: ClassLoader, parentSigna
   }
 
   private[this] var classpathSignature0 = parentSignature
-  def classpathSignature = classpathSignature0
-  def classpathHash = {
-    AmmoniteClassLoader.md5Hash(
-      classpathSignature0.iterator.map {
-        case (path, long) =>
-          val buffer = ByteBuffer.allocate(8)
-          buffer.putLong(long)
-          path.toString.getBytes ++ buffer.array()
-      }
-    )
-
-  }
-  def allJars: Seq[URL] = {
+  
+  private def allJars: Seq[URL] = {
     this.getURLs ++ (parent match {
       case t: AmmoniteClassLoader => t.allJars
       case _ => Nil
@@ -73,13 +59,7 @@ private[kernel] final class AmmoniteClassLoader(parent: ClassLoader, parentSigna
 
 private[kernel] object AmmoniteClassLoader {
 
-  private def md5Hash(data: Iterator[Array[Byte]]) = {
-    val digest = MessageDigest.getInstance("MD5")
-    data.foreach(digest.update)
-    digest.digest()
-  }
-
-  val simpleNameRegex = "[a-zA-Z0-9_]+".r
+  private val simpleNameRegex = "[a-zA-Z0-9_]+".r
 
   /**
     * Stats all loose class-files in the current classpath that could
