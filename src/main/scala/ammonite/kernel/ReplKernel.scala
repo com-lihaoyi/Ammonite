@@ -147,6 +147,13 @@ final class ReplKernel private (private[this] var state: ReplKernel.KernelState)
 
           localArtifacts map { jars =>
             state.frame.addClasspath(jars)
+            state = ReplKernel.genState(state.evaluationIndex,
+                             state.imports,
+                             state.frame.classpath,
+                             state.repositories,
+                             state.dynamicClasspath,
+                             state.frame.classloader,
+                             state.compiler.settings)
           }
       }
 
@@ -177,6 +184,7 @@ object ReplKernel {
                                  imports: Imports,
                                  compiler: Compiler,
                                  pressy: Pressy,
+                                 dynamicClasspath: VirtualDirectory,
                                  repositories: List[Repository])
 
   def apply(settings: Settings = new Settings(),
@@ -232,7 +240,13 @@ object ReplKernel {
       settings.copy()
     )
 
-    KernelState(evaluationIndex, new Frame(classLoader, initialClasspath), imports, compiler, pressy, repositories)
+    KernelState(evaluationIndex,
+                new Frame(classLoader, initialClasspath),
+                imports,
+                compiler,
+                pressy,
+                dynamicClasspath,
+                repositories)
   }
 
 }

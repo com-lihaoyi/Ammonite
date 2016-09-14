@@ -36,7 +36,7 @@ private[kernel] final class Compiler(classpath: Seq[java.io.File],
                                      dynamicClasspath: VirtualDirectory,
                                      evalClassloader: => ClassLoader,
                                      pluginClassloader: => ClassLoader,
-                                     settings: Settings)
+                                     val settings: Settings)
     extends LazyLogging {
 
   import Compiler._
