@@ -48,7 +48,7 @@ private[kernel] final class AmmoniteClassLoader(parent: ClassLoader, parentSigna
   }
 
   private[this] var classpathSignature0 = parentSignature
-  
+
   private def allJars: Seq[URL] = {
     this.getURLs ++ (parent match {
       case t: AmmoniteClassLoader => t.allJars
