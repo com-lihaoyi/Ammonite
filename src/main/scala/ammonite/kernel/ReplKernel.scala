@@ -148,12 +148,12 @@ final class ReplKernel private (private[this] var state: ReplKernel.KernelState)
           localArtifacts map { jars =>
             state.frame.addClasspath(jars)
             state = ReplKernel.genState(state.evaluationIndex,
-                             state.imports,
-                             state.frame.classpath,
-                             state.repositories,
-                             state.dynamicClasspath,
-                             state.frame.classloader,
-                             state.compiler.settings)
+                                        state.imports,
+                                        state.frame.classpath,
+                                        state.repositories,
+                                        state.dynamicClasspath,
+                                        state.frame.classloader,
+                                        state.compiler.settings)
           }
       }
     }
