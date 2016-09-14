@@ -86,8 +86,7 @@ private[kernel] object Name {
   def backtickWrap(s: String): String = {
     if (s.isEmpty) {
       "``"
-    }
-    else if (s(0) == '`' && s.last == '`') {
+    } else if (s(0) == '`' && s.last == '`') {
       s
     } else {
       val chunks = s.split("_", -1)

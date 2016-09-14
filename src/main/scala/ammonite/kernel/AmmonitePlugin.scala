@@ -18,41 +18,41 @@ private[kernel] final class AmmonitePlugin(override val global: Global,
   val name: String = "AmmonitePlugin"
 
   val description: String = "Extracts the names in scope for the Ammonite REPL to use"
-  
+
   val components: List[PluginComponent] = List(
     new PluginComponent {
-     
+
       override val global = AmmonitePlugin.this.global
 
       override val runsAfter = List("typer")
-      
+
       override val runsBefore = List("patmat")
-      
+
       override val phaseName = "AmmonitePhase"
 
       override def newPhase(prev: Phase): Phase = new global.GlobalPhase(prev) {
-        
+
         override def name: String = phaseName
-        
+
         override def apply(unit: global.CompilationUnit): Unit = {
           AmmonitePlugin(global)(unit, output)
         }
       }
     },
     new PluginComponent {
-      
+
       override val global = AmmonitePlugin.this.global
 
       override val runsAfter = List("parser")
 
       override val runsBefore = List("namer")
-      
+
       override val phaseName = "FixLineNumbers"
 
       override def newPhase(prev: Phase): Phase = new global.GlobalPhase(prev) {
 
         override def name: String = phaseName
-      
+
         override def apply(unit: global.CompilationUnit): Unit = {
           LineNumberModifier(global)(unit, topWrapperLen)
         }
@@ -64,7 +64,7 @@ private[kernel] final class AmmonitePlugin(override val global: Global,
 private[kernel] object AmmonitePlugin {
 
   var count: Int = 0
-  
+
   def apply(g: Global)(unit: g.CompilationUnit, output: Seq[ImportData] => Unit): Unit = {
 
     count += 1

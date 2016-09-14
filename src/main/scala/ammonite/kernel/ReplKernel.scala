@@ -1,7 +1,10 @@
 package ammonite.kernel
 
+import coursier._
+import coursier.core.Repository
 import kernel._
 import scalaz.{Name => _, _}
+import scalaz.concurrent.Task
 import Scalaz._
 import Validation.FlatMap._
 import fastparse.core.{Parsed, ParseError}
@@ -98,18 +101,63 @@ final class ReplKernel private (private[this] var state: ReplKernel.KernelState)
     }
 
     // state mutation
-    val op = res map { validation =>
+    res map { validation =>
       validation map {
         case (logMessages, newImports, value) =>
           state = state.copy(evaluationIndex = state.evaluationIndex + 1, imports = state.imports ++ newImports)
           (logMessages, value)
       }
     }
-    op
   }
 
   def complete(text: String, position: Int): (Int, Seq[String], Seq[String]) = lock.synchronized {
     state.pressy.complete(text, position, Munger.importBlock(state.imports))
+  }
+
+  def loadIvy(groupId: String, artifactId: String, version: String): ValidationNel[LogError, Unit] =
+    lock.synchronized {
+      val start = Resolution(
+        Set(
+          Dependency(Module(groupId, artifactId), version)
+        )
+      )
+      val fetch = Fetch.from(state.repositories, Cache.fetch())
+      val resolution = start.process.run(fetch).unsafePerformSync
+
+      resolution.errors.toList match {
+        case h :: t =>
+          def forDependency(dependency: (Dependency, Seq[String])): LogError = {
+            val str =
+              s"${dependency._1.module.organization} :: ${dependency._1.module.name} :: ${dependency._1.version}"
+            val msg = s"$str: ${dependency._2.mkString(", ")}"
+            LogError(msg)
+          }
+          Failure(NonEmptyList(forDependency(h), (t map (forDependency(_))): _*))
+        case Nil =>
+          val localArtifacts: ValidationNel[LogError, Seq[File]] = Task
+            .gatherUnordered(
+              resolution.artifacts.map(Cache.file(_).run)
+            )
+            .unsafePerformSync
+            .map(_.validationNel)
+            .foldLeft(Seq.empty[File].successNel[FileError]) {
+              case (acc, v) => (acc |@| v)(_ :+ _)
+            }
+            .leftMap(x => x map (y => LogError(y.describe)))
+
+          localArtifacts map { jars =>
+            state.frame.addClasspath(jars)
+          }
+      }
+
+      // println(resolution.errors)
+
+      // localArtifacts
+
+    }
+
+  def addRepository(repository: Repository): Unit = lock.synchronized {
+    state = state.copy(repositories = (repository :: state.repositories))
   }
 
 }
@@ -128,9 +176,12 @@ object ReplKernel {
                                  frame: Frame,
                                  imports: Imports,
                                  compiler: Compiler,
-                                 pressy: Pressy)
+                                 pressy: Pressy,
+                                 repositories: List[Repository])
 
-  def apply(settings: Settings = new Settings()): ReplKernel = {
+  def apply(settings: Settings = new Settings(),
+            repositories: List[Repository] = List(Cache.ivy2Local, MavenRepository("https://repo1.maven.org/maven2")))
+    : ReplKernel = {
 
     val currentClassLoader = Thread.currentThread().getContextClassLoader
     val hash = AmmoniteClassLoader.initialClasspathSignature(currentClassLoader)
@@ -162,22 +213,26 @@ object ReplKernel {
 
     val dynamicClasspath = new VirtualDirectory("(memory)", None)
 
-    val compiler = new Compiler(
-      initialClasspath,
-      dynamicClasspath,
-      special,
-      special,
-      settings.copy()
-    )
+    new ReplKernel(genState(0, Imports(), initialClasspath, repositories, dynamicClasspath, special, settings))
+  }
 
+  private def genState(evaluationIndex: Int,
+                       imports: Imports,
+                       initialClasspath: Seq[File],
+                       repositories: List[Repository],
+                       dynamicClasspath: VirtualDirectory,
+                       classLoader: => AmmoniteClassLoader,
+                       settings: Settings): KernelState = {
+
+    val compiler = new Compiler(initialClasspath, dynamicClasspath, classLoader, classLoader, settings.copy())
     val pressy = Pressy(
       initialClasspath,
       dynamicClasspath,
-      special,
+      classLoader,
       settings.copy()
     )
 
-    new ReplKernel(KernelState(0, new Frame(special, Seq()), Imports(), compiler, pressy))
+    KernelState(evaluationIndex, new Frame(classLoader, initialClasspath), imports, compiler, pressy, repositories)
   }
 
 }

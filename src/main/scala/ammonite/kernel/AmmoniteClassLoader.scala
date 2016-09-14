@@ -19,9 +19,8 @@ private[kernel] final class AmmoniteClassLoader(parent: ClassLoader, parentSigna
     * Files which have been compiled, stored so that our special
     * classloader can get at them.
     */
-  
   val newFileDict: mutable.Map[String, Array[Byte]] = mutable.Map.empty
-  
+
   def addClassFile(name: String, bytes: Array[Byte]): Unit = {
     val tuple = Path(name, root) -> bytes.sum.hashCode().toLong
     classpathSignature0 = classpathSignature0 ++ Seq(tuple)
@@ -29,13 +28,12 @@ private[kernel] final class AmmoniteClassLoader(parent: ClassLoader, parentSigna
   }
 
   def findClassPublic(name: String): Class[_] = findClass(name)
-   
+
   override def findClass(name: String): Class[_] = {
     val loadedClass = this.findLoadedClass(name)
     if (loadedClass != null) {
       loadedClass
-    }
-    else if (newFileDict.contains(name)) {
+    } else if (newFileDict.contains(name)) {
       val bytes = newFileDict(name)
       defineClass(name, bytes, 0, bytes.length)
     } else {

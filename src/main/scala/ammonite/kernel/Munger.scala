@@ -152,8 +152,7 @@ private[kernel] object Munger {
     for (data <- importData.value) {
       if (grouped.isEmpty) {
         grouped.append(mutable.Buffer(data))
-      }
-      else {
+      } else {
         val last = grouped.last.last
 
         // Start a new import if we're importing from somewhere else, or
@@ -165,8 +164,7 @@ private[kernel] object Munger {
 
         if (startNewImport) {
           grouped.append(mutable.Buffer(data))
-        }
-        else {
+        } else {
           grouped.last.append(data)
         }
       }
@@ -176,8 +174,7 @@ private[kernel] object Munger {
       val printedGroup = for (item <- group) yield {
         if (item.fromName == item.toName) {
           item.fromName.backticked
-        }
-        else {
+        } else {
           s"${item.fromName.backticked} => ${item.toName.backticked}"
         }
       }

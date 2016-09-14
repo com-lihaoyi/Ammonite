@@ -27,7 +27,7 @@ private[kernel] case class ImportData(fromName: Name,
 private[kernel] object ImportData {
 
   sealed abstract class ImportType(name: String)
- 
+
   case object Type extends ImportType("Type")
 
   case object Term extends ImportType("Term")
@@ -45,9 +45,9 @@ private[kernel] object ImportData {
   * de-duplication.
   */
 private[kernel] class Imports private (val value: Seq[ImportData]) {
-  
+
   def ++(others: Imports): Imports = Imports(this.value, others.value)
-  
+
   override def toString(): String = s"Imports(${value.toString})"
 }
 

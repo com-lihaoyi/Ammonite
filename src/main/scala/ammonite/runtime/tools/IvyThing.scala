@@ -11,18 +11,6 @@
 // import org.apache.ivy.plugins.resolver._
 // import org.apache.ivy.util._
 
-// object IvyConstructor extends IvyConstructor
-// trait IvyConstructor {
-//   implicit class GroupIdExt(groupId: String) {
-//     def %(artifactId: String) = (groupId, artifactId)
-//     def %%(artifactId: String) =
-//       (groupId, artifactId + "_" + IvyThing.scalaBinaryVersion)
-//   }
-//   implicit class ArtifactIdExt(t: (String, String)) {
-//     def %(version: String) = (t._1, t._2, version)
-//   }
-// }
-
 // /**
 //   * Resolve artifacts from Ivy. Originally taken from
 //   *
@@ -30,25 +18,25 @@
 //   *
 //   * And transliterated into Scala. I have no idea how or why it works.
 //   */
-// case class IvyThing(resolvers: () => List[Resolver], printer: Printer, verboseOutput: Boolean) {
+// case class IvyThing(resolvers: List[Resolver]) {
 
 //   case class IvyResolutionException(failed: Seq[String])
 //       extends Exception(
 //         "failed to resolve ivy dependencies " + failed.mkString(", ")
 //       )
 
-//   var maxLevel = 2
-//   var silentIvyLogs: String = ""
-//   Message.setDefaultLogger(new AbstractMessageLogger {
-//     def doEndProgress(msg: String) = Console.err.println("Done")
-//     def doProgress() = Console.err.print(".")
-//     def log(msg: String, level: Int) =
-//       if (level <= maxLevel) verboseOutput match {
-//         case true => printer.info(msg)
-//         case false => silentIvyLogs += msg
-//       }
-//     def rawlog(msg: String, level: Int) = log(msg, level)
-//   })
+//   // var maxLevel = 2
+//   // var silentIvyLogs: String = ""
+//   // Message.setDefaultLogger(new AbstractMessageLogger {
+//   //   def doEndProgress(msg: String) = Console.err.println("Done")
+//   //   def doProgress() = Console.err.print(".")
+//   //   def log(msg: String, level: Int) =
+//   //     if (level <= maxLevel) verboseOutput match {
+//   //       case true => printer.info(msg)
+//   //       case false => silentIvyLogs += msg
+//   //     }
+//   //   def rawlog(msg: String, level: Int) = log(msg, level)
+//   // })
 
 //   def resolveArtifact(groupId: String, artifactId: String, version: String, verbosity: Int = 2) = synchronized {
 //     maxLevel = verbosity
