@@ -1,3 +1,0 @@
-def tagBase = "asd"
-@
-tagBase
