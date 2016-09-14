@@ -156,11 +156,6 @@ final class ReplKernel private (private[this] var state: ReplKernel.KernelState)
                              state.compiler.settings)
           }
       }
-
-      // println(resolution.errors)
-
-      // localArtifacts
-
     }
 
   def addRepository(repository: Repository): Unit = lock.synchronized {
