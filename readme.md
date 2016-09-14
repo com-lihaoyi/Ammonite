@@ -29,6 +29,8 @@ The project exposes a class, called a `ReplKernel` that does three things:
 2. Provide semantic code completion, given a string and a caret position
 3. Dynamically add Jars and repositories. 
 
+Coupled mutable state is localized to single classes and appropriate mutexes have been placed to guarantee consistency. Static state leakage 
+has also been eliminated.  
 
 All other features provided by ammonite can be expressed as a combination of these three and mechanisms to read input and pretty print output
 
