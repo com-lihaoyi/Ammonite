@@ -5,7 +5,7 @@ import ammonite.main.Router.{ArgSig, EntryPoint}
 import ammonite.ops._
 import ammonite.util.Name.backtickWrap
 import ammonite.util.{Name, Res, Util}
-import fastparse.Utils._
+import fastparse.utils.Utils._
 
 /**
   * Logic around using Ammonite as a script-runner; invoking scripts via the

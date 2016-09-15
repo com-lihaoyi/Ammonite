@@ -55,7 +55,7 @@ object Parsers {
    * Attempts to break a code blob into multiple statements. Returns `None` if
    * it thinks the code blob is "incomplete" and requires more input
    */
-  def split(code: String): Option[fastparse.core.Parsed[Seq[String]]] = Splitter.parse(code) match{
+  def split(code: String): Option[Parsed[Seq[String]]] = Splitter.parse(code) match{
     case Parsed.Failure(_, index, extra) if code.drop(index).trim() == "" => None
     case x => Some(x)
   }

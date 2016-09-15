@@ -3,7 +3,6 @@ package ammonite.repl
 import acyclic.file
 import ammonite.runtime.Parsers
 import fastparse.all._
-import fastparse.parsers.Combinators.Rule
 
 import scalaparse.Scala._
 import scalaparse.syntax.Identifiers._
@@ -54,16 +53,16 @@ object Highlighter {
     },
     reset
   )
-  def highlightIndices[T](parser: fastparse.core.Parser[_],
+  def highlightIndices[T](parser: Parser[_],
                           buffer: Vector[Char],
-                          ruleColors: PartialFunction[Rule[_], T],
+                          ruleColors: PartialFunction[Parser[_], T],
                           endColor: T): Seq[(Int, T, Boolean)] = {
     val indices = {
       var indices = collection.mutable.Buffer((0, endColor, false))
       var done = false
       val input = buffer.mkString
       parser.parse(input, instrument = (rule, idx, res) => {
-        for(color <- ruleColors.lift(rule.asInstanceOf[Rule[_]])){
+        for(color <- ruleColors.lift(rule)){
           val closeColor = indices.last._2
           val startIndex = indices.length
           indices += ((idx, color, true))
@@ -99,7 +98,7 @@ object Highlighter {
   }
   def highlight(parser: Parser[_],
                 buffer: Vector[Char],
-                ruleColors: PartialFunction[Rule[_], fansi.Attrs],
+                ruleColors: PartialFunction[Parser[_], fansi.Attrs],
                 endColor: fansi.Attrs) = {
     val boundedIndices = highlightIndices(parser, buffer, ruleColors, endColor)
     flattenIndices(boundedIndices, buffer)
