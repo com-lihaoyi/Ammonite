@@ -172,7 +172,7 @@ object ProjectTests extends TestSuite{
           res2: fastparse.core.Parsed[Unit,Char,String] = Failure("(":1:1 ..."1 + 1")
 
           @ ExprCtx.Parened.parse("(1 + 1)")
-          res3: fastparse.core.Parsed[Unit,Char,String] = Success((),7)
+          res3: fastparse.core.Parsed[Unit,Char,String] = Success((), 7)
         """)
     }
 
