@@ -44,8 +44,7 @@ lazy val root = Project(
         logBuffered in Test := false,
         testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-oD"),
         testFrameworks += scalaMeterFramework,
-        parallelExecution in Benchmark := false,
-        testOptions in ThisBuild += Tests.Argument(scalaMeterFramework, "-silent")
+        parallelExecution in Benchmark := false
       )
   ) configs (
     Benchmark

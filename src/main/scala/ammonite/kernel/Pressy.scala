@@ -17,7 +17,6 @@ import util.{Failure, Success, Try}
   */
 private[kernel] final class Pressy(nscGen: => Global) {
 
-
   private[this] val lock = new AnyRef
 
   private lazy val nscGlobal = nscGen

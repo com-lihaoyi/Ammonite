@@ -40,7 +40,6 @@ private[kernel] final class Compiler(classpath: Seq[java.io.File],
                                      val settings: Settings)
     extends LazyLogging {
 
-
   private[this] val lock = new AnyRef
 
   private[this] var importsLen = 0
@@ -87,7 +86,7 @@ private[kernel] final class Compiler(classpath: Seq[java.io.File],
           plugin = Plugin.instantiate(cls, g)
           initOk = try CompilerCompatibility.pluginInit(plugin, Nil, g.globalError)
           catch {
-            case NonFatal(ex)  =>
+            case NonFatal(ex) =>
               logger.error(s"Warning: disabling plugin $name, initialization failed: $ex")
               false
           }

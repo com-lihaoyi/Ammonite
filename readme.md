@@ -4,6 +4,10 @@ Ammonite-Kernel
 A stripped-down fork of [Ammonite](https://github.com/lihaoyi/Ammonite) designed for applications that need an embedded 
 REPL-like environment.
 
+[![Build Status](https://travis-ci.org/harshad-deo/Ammonite.svg?branch=master)](https://travis-ci.org/harshad-deo/Ammonite)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/e249028e7b5c445982d5d39d97d1e371)](https://www.codacy.com/app/subterranean-hominid/Ammonite?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=harshad-deo/Ammonite&amp;utm_campaign=Badge_Grade)
+[![Gitter](https://badges.gitter.im/harshad-deo/typequux.svg)](https://gitter.im/harshad-deo/typequux?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+
 Need
 ---
 
