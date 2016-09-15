@@ -1,8 +1,8 @@
 package ammonite.kernel
 
 import kernel.rootStr
-import reflect.NameTransformer
 import reflect.internal.util.{BatchSourceFile, OffsetPosition}
+import reflect.NameTransformer
 import tools.nsc.{Global, Phase}
 import tools.nsc.plugins.{Plugin, PluginComponent}
 

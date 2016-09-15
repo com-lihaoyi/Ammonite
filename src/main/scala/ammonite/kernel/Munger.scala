@@ -1,7 +1,7 @@
 package ammonite.kernel
 
-import scala.tools.nsc.{Global => G}
 import collection.mutable
+import scala.tools.nsc.{Global => G}
 import scalaz.{Name => _, _}
 import Scalaz._
 import Validation.FlatMap._
@@ -17,12 +17,12 @@ private[kernel] object Munger {
 
   private type DCT = (String, String, G#Tree) => Option[Transform]
 
-  def apply(parse: => String => ValidationNel[LogError, Seq[G#Tree]],
-            stmts: NonEmptyList[String],
+  def apply(stmts: NonEmptyList[String],
             resultIndex: String,
             pkgName: Seq[Name],
             indexedWrapperName: Name,
-            imports: Imports): ValidationNel[LogError, MungedOutput] = {
+            imports: Imports,
+            parse: => String => ValidationNel[LogError, Seq[G#Tree]]): ValidationNel[LogError, MungedOutput] = {
 
     // type signatures are added below for documentation
 
@@ -63,7 +63,7 @@ private[kernel] object Munger {
         case (name, code, t: G#ValDef) => Transform(code, None)
       }
 
-      val `import` = processor {
+      val importDef = processor {
         case (name, code, tree: G#Import) => Transform(code, None)
       }
 
@@ -79,7 +79,7 @@ private[kernel] object Munger {
         defDef,
         typeDef,
         patVarDef,
-        `import`,
+        importDef,
         expr
       )
     }

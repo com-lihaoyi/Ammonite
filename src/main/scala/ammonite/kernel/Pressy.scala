@@ -234,7 +234,7 @@ private[kernel] object Pressy {
             evalClassloader: => ClassLoader,
             settings: Settings): Pressy = {
 
-    def initPressy = {
+    def initialize = {
       val (_, jcp) = Compiler.initGlobalBits(
         classpath,
         dynamicClasspath,
@@ -264,6 +264,6 @@ private[kernel] object Pressy {
       }
     }
 
-    new Pressy(initPressy)
+    new Pressy(initialize)
   }
 }

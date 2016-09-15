@@ -9,8 +9,8 @@ import java.io.File
 import java.net.URLClassLoader
 import kernel._
 import reflect.io.VirtualDirectory
-import scalaz.{Name => _, _}
 import scalaz.concurrent.Task
+import scalaz.{Name => _, _}
 import Scalaz._
 import tools.nsc.Settings
 import Validation.FlatMap._
@@ -43,12 +43,12 @@ final class ReplKernel private (private[this] var state: ReplKernel.KernelState)
         val wrapperName = Seq(Name(s"$sessionNameStr"), indexedWrapperName)
 
         val munged: ValidationNel[LogError, MungedOutput] = Munger(
-          state.compiler.parse,
           statements,
           s"${state.evaluationIndex}",
           Seq(Name(s"$sessionNameStr")),
           indexedWrapperName,
-          state.imports
+          state.imports,
+          state.compiler.parse
         )
 
         munged flatMap { processed =>

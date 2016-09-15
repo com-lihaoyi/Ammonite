@@ -1,8 +1,8 @@
 package ammonite.kernel
 
 import collection.JavaConverters._
-import Compiler._
 import com.typesafe.scalalogging.LazyLogging
+import Compiler._
 import java.io.{OutputStream, File}
 import java.util.zip.ZipFile
 import kernel._

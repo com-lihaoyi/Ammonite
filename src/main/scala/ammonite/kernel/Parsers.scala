@@ -11,9 +11,6 @@ private[kernel] object Parsers {
     P(statementBlocl(Fail) ~ WL ~ End)
   }
 
-  // For some reason Scala doesn't import this by default
-  private val underscore = scalaparse.Scala.`_`
-
   private val prelude = P((Annot ~ OneNLMax).rep ~ (Mod ~/ Pass).rep)
 
   private val statement = P(scalaparse.Scala.TopPkgSeq | scalaparse.Scala.Import | prelude ~ BlockDef | StatCtx.Expr)
