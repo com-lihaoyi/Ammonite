@@ -23,7 +23,7 @@ final class ReplKernel private (private[this] var state: ReplKernel.KernelState)
 
     // type signatures have been included below for documentation
 
-    val parsed: Option[Validation[LogError, NonEmptyList[String]]] = Parsers.Splitter.parse(code) match {
+    val parsed: Option[Validation[LogError, NonEmptyList[String]]] = Parsers.splitter.parse(code) match {
       case Parsed.Success(statements, _) =>
         statements.toList match {
           case h :: t =>

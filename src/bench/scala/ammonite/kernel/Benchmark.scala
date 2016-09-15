@@ -4,10 +4,10 @@ import org.scalameter.api._
 import org.scalameter.picklers.Implicits._
 import reflect.runtime._
 import tools.reflect.ToolBox
+import BenchmarkConstants._
 
 object AmmoniteBenchmarks extends Bench.OfflineReport {
 
-  import BenchmarkConstants._
 
   val gen = Gen.single("TestString")(staticString)
 

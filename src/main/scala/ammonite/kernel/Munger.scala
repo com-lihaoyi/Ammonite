@@ -39,48 +39,48 @@ private[kernel] object Munger {
           cond.lift((name, code, tree))
       }
 
-      val ObjectDef = defProc {
+      val objectDef = defProc {
         case m: G#ModuleDef => m.name
       }
 
-      val ClassDef = defProc {
+      val classDef = defProc {
         case m: G#ClassDef if !m.mods.isTrait => m.name
       }
 
-      val TraitDef = defProc {
+      val traitDef = defProc {
         case m: G#ClassDef if m.mods.isTrait => m.name
       }
 
-      val DefDef = defProc {
+      val defDef = defProc {
         case m: G#DefDef => m.name
       }
 
-      val TypeDef = defProc {
+      val typeDef = defProc {
         case m: G#TypeDef => m.name
       }
 
-      val PatVarDef = processor {
+      val patVarDef = processor {
         case (name, code, t: G#ValDef) => Transform(code, None)
       }
 
-      val Import = processor {
+      val `import` = processor {
         case (name, code, tree: G#Import) => Transform(code, None)
       }
 
-      val Expr = processor {
+      val expr = processor {
         //Expressions are lifted to anon function applications so they will be JITed
         case (name, code, tree) => Transform(s"private val $name = $code", Some(name))
       }
 
       List(
-        ObjectDef,
-        ClassDef,
-        TraitDef,
-        DefDef,
-        TypeDef,
-        PatVarDef,
-        Import,
-        Expr
+        objectDef,
+        classDef,
+        traitDef,
+        defDef,
+        typeDef,
+        patVarDef,
+        `import`,
+        expr
       )
     }
 

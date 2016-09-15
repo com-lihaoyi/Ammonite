@@ -16,10 +16,13 @@ import java.io.{OutputStream, File}
 import java.util.zip.ZipFile
 
 import ammonite.kernel.kernel._
+import scala.collection.JavaConverters._
 
 import language.existentials
 import util.Try
 import com.typesafe.scalalogging.LazyLogging
+import Compiler._
+import util.control.NonFatal
 
 /**
   * Encapsulates (almost) all the ickiness of Scalac so it doesn't leak into
@@ -39,19 +42,17 @@ private[kernel] final class Compiler(classpath: Seq[java.io.File],
                                      val settings: Settings)
     extends LazyLogging {
 
-  import Compiler._
 
   private[this] val lock = new AnyRef
 
   private[this] var importsLen = 0
   private[this] var lastImports = Seq.empty[ImportData]
 
-  private[this] val PluginXML = "scalac-plugin.xml"
+  private[this] val pluginXml = "scalac-plugin.xml"
   private[this] lazy val plugins0 = {
-    import scala.collection.JavaConverters._
     val loader = pluginClassloader
 
-    val urls = loader.getResources(PluginXML).asScala.toVector
+    val urls = loader.getResources(pluginXml).asScala.toVector
 
     val plugins = for {
       url <- urls
@@ -88,7 +89,7 @@ private[kernel] final class Compiler(classpath: Seq[java.io.File],
           plugin = Plugin.instantiate(cls, g)
           initOk = try CompilerCompatibility.pluginInit(plugin, Nil, g.globalError)
           catch {
-            case ex: Exception =>
+            case NonFatal(ex)  =>
               logger.error(s"Warning: disabling plugin $name, initialization failed: $ex")
               false
           }

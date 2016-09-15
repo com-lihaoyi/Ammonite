@@ -10,13 +10,14 @@ import scala.tools.nsc.util._
 import scala.util.{Failure, Success, Try}
 import scala.tools.nsc.reporters.AbstractReporter
 import kernel.newLine
+import Pressy._
+import java.io.File
 
 /**
   * Nice wrapper for the presentation compiler.
   */
 private[kernel] final class Pressy(nscGen: => nsc.interactive.Global) {
 
-  import Pressy._
 
   private[this] val lock = new AnyRef
 
@@ -227,7 +228,7 @@ private[kernel] object Pressy {
     }
 
   }
-  def apply(classpath: Seq[java.io.File],
+  def apply(classpath: Seq[File],
             dynamicClasspath: VirtualDirectory,
             evalClassloader: => ClassLoader,
             settings: Settings): Pressy = {
