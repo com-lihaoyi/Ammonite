@@ -97,6 +97,19 @@
 
 
   @sect{Changelog}
+
+    @sect{0.7.7}
+      @ul
+        @li
+          @issue(461) avoid loading the same compiler plugin more than once,
+          thanks to @lnk("Roman Tklalenko", "https://github.com/tkroman")
+        @li
+          Allow @code{cd!}ing into sym-links, thanks to
+          @lnk("Roman Tklalenko", "https://github.com/tkroman") and
+          @lnk("Sergei Winitzki", "https://github.com/winitzki")
+        @li
+          Bump Fansi dependency to 0.2.1 and bump Fastparse dependency to 0.4.0
+
     @sect{0.7.6}
       @ul
         @li
