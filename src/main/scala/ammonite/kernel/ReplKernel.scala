@@ -1,19 +1,19 @@
 package ammonite.kernel
 
+import annotation.tailrec
+import collection.mutable
 import coursier._
 import coursier.core.Repository
+import fastparse.core.{Parsed, ParseError}
+import java.io.File
+import java.net.URLClassLoader
 import kernel._
+import reflect.io.VirtualDirectory
 import scalaz.{Name => _, _}
 import scalaz.concurrent.Task
 import Scalaz._
+import tools.nsc.Settings
 import Validation.FlatMap._
-import fastparse.core.{Parsed, ParseError}
-import scala.tools.nsc.Settings
-import scala.reflect.io.VirtualDirectory
-import java.io.File
-import collection.mutable
-import annotation.tailrec
-import java.net.URLClassLoader
 
 final class ReplKernel private (private[this] var state: ReplKernel.KernelState) {
 
@@ -40,13 +40,13 @@ final class ReplKernel private (private[this] var state: ReplKernel.KernelState)
 
       validationNel flatMap { statements =>
         val indexedWrapperName = Name(s"cmd${state.evaluationIndex}")
-        val wrapperName = Seq(Name("$sess"), indexedWrapperName)
+        val wrapperName = Seq(Name(s"$sessionNameStr"), indexedWrapperName)
 
         val munged: ValidationNel[LogError, MungedOutput] = Munger(
           state.compiler.parse,
           statements,
           s"${state.evaluationIndex}",
-          Seq(Name("$sess")),
+          Seq(Name(s"$sessionNameStr")),
           indexedWrapperName,
           state.imports
         )
@@ -62,7 +62,7 @@ final class ReplKernel private (private[this] var state: ReplKernel.KernelState)
                 for ((name, bytes) <- classFiles.sortBy(_._1)) {
                   state.frame.classloader.addClassFile(name, bytes)
                 }
-                Class.forName("$sess." + indexedWrapperName.backticked, true, state.frame.classloader)
+                Class.forName(s"$sessionNameStr." + indexedWrapperName.backticked, true, state.frame.classloader)
               } leftMap (LogMessage.fromThrowable(_))
 
               val processed: Validation[LogError, (Imports, Any)] = loadedClass flatMap { cls =>
@@ -79,10 +79,10 @@ final class ReplKernel private (private[this] var state: ReplKernel.KernelState)
                         id.prefix
                       }
                     val rootedPrefix: Seq[Name] =
-                      if (filledPrefix.headOption.exists(_.backticked == "_root_")) {
+                      if (filledPrefix.headOption.exists(_.backticked == rootStr)) {
                         filledPrefix
                       } else {
-                        Seq(Name("_root_")) ++ filledPrefix
+                        Seq(Name(rootStr)) ++ filledPrefix
                       }
 
                     id.copy(prefix = rootedPrefix)

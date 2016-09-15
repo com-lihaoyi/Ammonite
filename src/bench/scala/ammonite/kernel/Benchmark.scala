@@ -1,10 +1,10 @@
 package ammonite.kernel
 
+import BenchmarkConstants._
 import org.scalameter.api._
 import org.scalameter.picklers.Implicits._
 import reflect.runtime._
 import tools.reflect.ToolBox
-import BenchmarkConstants._
 
 object AmmoniteBenchmarks extends Bench.OfflineReport {
 

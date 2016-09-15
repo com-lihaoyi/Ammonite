@@ -1,28 +1,26 @@
 package ammonite.kernel
 
-import scala.reflect.internal.util.Position
-import scala.reflect.io.{VirtualDirectory, VirtualFile, FileZipArchive, PlainDirectory, Directory, AbstractFile}
-import scala.tools.nsc.{Global, Settings}
-import scala.tools.nsc.backend.JavaPlatform
-import scala.tools.nsc.interactive.Response
-import scala.tools.nsc.plugins.Plugin
-import scala.tools.nsc.reporters.StoreReporter
-import scala.tools.nsc.util.ClassPath.JavaContext
-import scala.tools.nsc.util._
-import scalaz._
-import Scalaz._
-import Validation.FlatMap._
+import collection.JavaConverters._
+import Compiler._
+import com.typesafe.scalalogging.LazyLogging
 import java.io.{OutputStream, File}
 import java.util.zip.ZipFile
-
-import ammonite.kernel.kernel._
-import scala.collection.JavaConverters._
-
+import kernel._
 import language.existentials
+import reflect.internal.util.Position
+import reflect.io.{VirtualDirectory, VirtualFile, FileZipArchive, PlainDirectory, Directory, AbstractFile}
+import scalaz._
+import Scalaz._
+import tools.nsc.{Global, Settings}
+import tools.nsc.backend.JavaPlatform
+import tools.nsc.interactive.Response
+import tools.nsc.plugins.Plugin
+import tools.nsc.reporters.StoreReporter
+import tools.nsc.util.ClassPath.JavaContext
+import tools.nsc.util._
 import util.Try
-import com.typesafe.scalalogging.LazyLogging
-import Compiler._
 import util.control.NonFatal
+import Validation.FlatMap._
 
 /**
   * Encapsulates (almost) all the ickiness of Scalac so it doesn't leak into
@@ -57,8 +55,8 @@ private[kernel] final class Compiler(classpath: Seq[java.io.File],
     val plugins = for {
       url <- urls
       elem = scala.xml.XML.load(url.openStream())
-      name = (elem \\ "plugin" \ "name").text
-      className = (elem \\ "plugin" \ "classname").text
+      name = (elem \\ pluginStr \ "name").text
+      className = (elem \\ pluginStr \ "classname").text
       if name.nonEmpty && className.nonEmpty
       classOpt = try Some(loader.loadClass(className))
       catch { case _: ClassNotFoundException => None }
@@ -153,12 +151,12 @@ private[kernel] final class Compiler(classpath: Seq[java.io.File],
           Failure(errorNel)
         case Nil =>
           //shutdownPressy()
-          val files = for (x <- outputFiles if x.name.endsWith(".class")) yield {
+          val files = for (x <- outputFiles if x.name.endsWith(classStr)) yield {
             val segments = x.path.split("/").toList.tail
             val output = writeDeep(dynamicClasspath, segments, "")
             output.write(x.toByteArray)
             output.close()
-            (x.path.stripPrefix("(memory)/").stripSuffix(".class").replace('/', '.'), x.toByteArray)
+            (x.path.stripPrefix("(memory)/").stripSuffix(classStr).replace('/', '.'), x.toByteArray)
           }
 
           val imports = lastImports.toList
@@ -187,6 +185,10 @@ private[kernel] final class Compiler(classpath: Seq[java.io.File],
 }
 
 private[kernel] object Compiler {
+
+  private val pluginStr = "plugin"
+
+  private val classStr = ".class"
 
   private def writeDeep(d: VirtualDirectory, path: List[String], suffix: String): OutputStream =
     (path: @unchecked) match {

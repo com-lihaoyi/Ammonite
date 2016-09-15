@@ -1,22 +1,21 @@
 package ammonite.kernel
 
-import scala.reflect.internal.util.{Position, OffsetPosition, BatchSourceFile}
-import scala.reflect.io.VirtualDirectory
-import scala.tools.nsc
-import scala.tools.nsc.Settings
-import scala.tools.nsc.backend.JavaPlatform
-import scala.tools.nsc.interactive.Response
-import scala.tools.nsc.util._
-import scala.util.{Failure, Success, Try}
-import scala.tools.nsc.reporters.AbstractReporter
+import java.io.File
 import kernel.newLine
 import Pressy._
-import java.io.File
+import reflect.internal.util.{Position, OffsetPosition, BatchSourceFile}
+import reflect.io.VirtualDirectory
+import tools.nsc.backend.JavaPlatform
+import tools.nsc.interactive.{Global, Response}
+import tools.nsc.reporters.AbstractReporter
+import tools.nsc.Settings
+import tools.nsc.util._
+import util.{Failure, Success, Try}
 
 /**
   * Nice wrapper for the presentation compiler.
   */
-private[kernel] final class Pressy(nscGen: => nsc.interactive.Global) {
+private[kernel] final class Pressy(nscGen: => Global) {
 
 
   private[this] val lock = new AnyRef
@@ -65,11 +64,13 @@ private[kernel] final class Pressy(nscGen: => nsc.interactive.Global) {
 
 private[kernel] object Pressy {
 
+  private val errorStr = "<error>"
+
   /**
     * Encapsulates all the logic around a single instance of
     * `nsc.interactive.Global` and other data specific to a single completion
     */
-  private class Run(val pressy: nsc.interactive.Global, currentFile: BatchSourceFile, allCode: String, index: Int) {
+  private class Run(val pressy: Global, currentFile: BatchSourceFile, allCode: String, index: Int) {
 
     /**
       * Dumb things that turn up in the autocomplete that nobody needs or wants
@@ -140,7 +141,7 @@ private[kernel] object Pressy {
     private def handleTypeCompletion(position: Int, decoded: String, offset: Int) = {
 
       val r = ask(position, pressy.askTypeCompletion)
-      val prefix = if (decoded == "<error>") "" else decoded
+      val prefix = if (decoded == errorStr) "" else decoded
       (position + offset, handleCompletion(r, prefix))
     }
 
@@ -173,15 +174,15 @@ private[kernel] object Pressy {
 
       case t @ pressy.Import(expr, selectors) =>
         // If the selectors haven't been defined yet...
-        if (selectors.head.name.toString == "<error>") {
-          if (expr.tpe.toString == "<error>") {
+        if (selectors.head.name.toString == errorStr) {
+          if (expr.tpe.toString == errorStr) {
             // If the expr is badly typed, try to scope complete it
             if (expr.isInstanceOf[pressy.Ident]) {
               val exprName = expr.asInstanceOf[pressy.Ident].name.decoded
               expr.pos.point -> handleCompletion(
                 ask(expr.pos.point, pressy.askScopeCompletion),
                 // if it doesn't have a name at all, accept anything
-                if (exprName == "<error>") "" else exprName
+                if (exprName == errorStr) "" else exprName
               )
             } else {
               (expr.pos.point, Seq.empty)
@@ -249,7 +250,7 @@ private[kernel] object Pressy {
         override val settings = settingsX
       }
 
-      new nsc.interactive.Global(settings, reporter) { g =>
+      new Global(settings, reporter) { g =>
         // Actually jcp, avoiding a path-dependent type issue in 2.10 here
         override def classPath = platform.classPath
 

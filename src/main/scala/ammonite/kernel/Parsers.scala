@@ -1,10 +1,9 @@
 package ammonite.kernel
 
 import fastparse.noApi._
-
+import Parsed.Failure
 import scalaparse.Scala._
 import WhitespaceApi._
-import Parsed.Failure
 
 private[kernel] object Parsers {
 
@@ -13,7 +12,7 @@ private[kernel] object Parsers {
   }
 
   // For some reason Scala doesn't import this by default
-  private val `_` = scalaparse.Scala.`_`
+  private val underscore = scalaparse.Scala.`_`
 
   private val prelude = P((Annot ~ OneNLMax).rep ~ (Mod ~/ Pass).rep)
 

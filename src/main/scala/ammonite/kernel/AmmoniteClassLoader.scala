@@ -1,9 +1,9 @@
 package ammonite.kernel
 
-import java.net.{URL, URLClassLoader}
 import ammonite.ops._
-
 import collection.mutable
+import java.net.{URL, URLClassLoader}
+
 
 /**
   * Classloader used to implement the jar-downloading command-evaluating logic in Ammonite.

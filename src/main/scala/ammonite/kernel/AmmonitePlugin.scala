@@ -1,9 +1,10 @@
 package ammonite.kernel
 
-import scala.reflect.NameTransformer
-import scala.tools.nsc.{Global, Phase}
-import scala.tools.nsc.plugins.{Plugin, PluginComponent}
-import scala.reflect.internal.util.{BatchSourceFile, OffsetPosition}
+import kernel.rootStr
+import reflect.NameTransformer
+import reflect.internal.util.{BatchSourceFile, OffsetPosition}
+import tools.nsc.{Global, Phase}
+import tools.nsc.plugins.{Plugin, PluginComponent}
 
 /**
   * Used to capture the names in scope after every execution, reporting them
@@ -138,8 +139,10 @@ private[kernel] object AmmonitePlugin {
           // prefix package imports with `_root_` to try and stop random
           // variables from interfering with them. If someone defines a value
           // called `_root_`, this will still break, but that's their problem
-          val rootPrefix =
-            if (symbolList.head.hasPackageFlag) Seq(Name("_root_")) else Nil
+          val rootPrefix = symbolList match {
+            case h :: _ if h.hasPackageFlag => List(Name(rootStr))
+            case Nil => Nil
+          }
           val tailPath = nameList.tail.map(x => Name(x.decoded))
 
           val prefix = rootPrefix ++ headFullPath ++ tailPath
