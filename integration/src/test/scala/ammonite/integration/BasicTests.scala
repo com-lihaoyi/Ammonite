@@ -307,7 +307,7 @@ object BasicTests extends TestSuite{
       'releases{
         val res = exec('basic / "HttpApi.sc", "listReleases", "lihaoyi/Ammonite", "-s")
         assert(res.out.trim.contains("0.7.0"))
-        assert(res.out.trim.contains("0.4.0"))
+        assert(res.out.trim.contains("0.7.7"))
       }
     }
   }

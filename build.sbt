@@ -190,7 +190,7 @@ lazy val ammInterp = project
     libraryDependencies ++= Seq(
       "org.scala-lang" % "scala-compiler" % scalaVersion.value,
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
-      "com.lihaoyi" %% "scalaparse" % "0.4.0"
+      "com.lihaoyi" %% "scalaparse" % "0.4.1"
     )
   )
 
