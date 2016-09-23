@@ -233,8 +233,8 @@ object Pressy {
 
       val run = Try(new Run(pressy, currentFile, allCode, index))
 
-      val (i, all): (Int, Seq[(String, Option[String])]) = run match {
-        case Success(runSuccess) => runSuccess.prefixed
+      val (i, all): (Int, Seq[(String, Option[String])]) = run.map(_.prefixed) match {
+        case Success(prefixed) => prefixed
         case Failure(throwable) => (0, Seq.empty)
       }
 
