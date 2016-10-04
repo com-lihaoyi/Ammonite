@@ -59,6 +59,7 @@ object AutocompleteTests extends TestSuite{
         complete(
           """import scala.colltion.<caret>""", Set.empty[String] -- _
         )
+        complete("""object X { import y<caret> ; def y(z: Int)""", Set.empty[String] -- _)
       }
 
       'scope {
