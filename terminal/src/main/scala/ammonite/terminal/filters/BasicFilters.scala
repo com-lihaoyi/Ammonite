@@ -100,7 +100,7 @@ object BasicFilters {
       }
     },
     // java.io.Reader.read() produces -1 on EOF
-    action((-1).toChar.toString)(_ => Exit)
+    wrap(ti => ti.ts.inputs.dropPrefix(Seq(-1)).map(_ => Exit))
   )
   def clearFilter: Filter =
     action(Ctrl('l')){case TS(rest, b, c, _) => ClearScreen(TS(rest, b, c))}
