@@ -20,7 +20,7 @@ object Sample{
   val replCurl = curlCommand(ammonite.Constants.curlUrl)
   val unstableCurl = curlCommand(ammonite.Constants.unstableCurlUrl)
   val filesystemCurl =
-    "$ mkdir ~/.ammonite && curl -L -o ~/.ammonite/predef.sc https://git.io/v6r5y"
+    "$ mkdir -p ~/.ammonite && curl -L -o ~/.ammonite/predef.sc https://git.io/v6r5y"
   val cacheVersion = 6
   def cached(key: Any)(calc: => String) = {
     val path = cwd/'target/'cache/(key.hashCode + cacheVersion).toString
