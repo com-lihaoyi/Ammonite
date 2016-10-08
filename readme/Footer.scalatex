@@ -98,6 +98,15 @@
 
   @sect{Changelog}
 
+    @sect{0.7.8}
+      @ul
+        @li
+          Fix @issue(397) and @issue(430), thanks to 
+          @lnk("Roman Tklalenko", "https://github.com/tkroman")
+        @li
+          Upgrade to Fansi 0.2.2, which should reduce memory usage by 134mb
+        @li
+          Update FastParse/Scalaparse dependency to 0.4.1
     @sect{0.7.7}
       @ul
         @li
