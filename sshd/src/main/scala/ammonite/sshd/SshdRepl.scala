@@ -20,14 +20,16 @@ import scala.language.postfixOps
  *                  such as users credentials or port to be listening to
  * @param predef predef that will be installed on repl instances served by this server
  * @param replArgs arguments to pass to ammonite repl on initialization of the session
+ * @param classloader classloader for ammonite to use
  */
 class SshdRepl(sshConfig: SshServerConfig,
                predef: String = "",
                defaultPredef: Boolean = true,
                wd: Path = ammonite.ops.pwd,
-               replArgs: Seq[Bind[_]] = Nil) {
+               replArgs: Seq[Bind[_]] = Nil,
+               classLoader: ClassLoader = SshdRepl.getClass.getClassLoader) {
   private lazy val sshd = SshServer(sshConfig, shellServer =
-    SshdRepl.runRepl(sshConfig.ammoniteHome, predef, defaultPredef, wd, replArgs))
+    SshdRepl.runRepl(sshConfig.ammoniteHome, predef, defaultPredef, wd, replArgs, classLoader))
 
   def port = sshd.getPort
   def start(): Unit = sshd.start()
@@ -37,14 +39,13 @@ class SshdRepl(sshConfig: SshServerConfig,
 
 
 object SshdRepl {
-  private def replServerClassLoader = SshdRepl.getClass.getClassLoader
-
   // Actually runs a repl inside of session serving a remote user shell.
   private def runRepl(homePath: Path,
                       predef: String,
                       defaultPredef: Boolean,
                       wd: Path,
-                      replArgs: Seq[Bind[_]])
+                      replArgs: Seq[Bind[_]],
+                      replServerClassLoader: ClassLoader)
                      (in: InputStream, out: OutputStream): Unit = {
     // since sshd server has it's own customised environment,
     // where things like System.out will output to the
