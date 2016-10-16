@@ -1,7 +1,6 @@
 package ammonite.ops
 
 import java.io.InputStream
-import java.nio.charset.Charset
 
 import acyclic.file
 
@@ -27,11 +26,12 @@ trait Readable{
     is.close()
     out.toByteArray
   }
-  protected[ops] def getLineIterator(charSet: Codec): Iterator[String] = {
+  protected[ops] def getLineIterator(charSet: Codec) = geny.Generator.selfClosing{
     val is = getInputStream
     val s = io.Source.fromInputStream(is)(charSet)
-    new SelfClosingIterator(s.getLines, () => s.close())
+    (s.getLines(), () => s.close())
   }
+
   protected[ops] def getLines(charSet: Codec): Vector[String] = {
     getLineIterator(charSet).toVector
   }
@@ -71,31 +71,3 @@ object ResourceRoot{
 
 }
 
-/**
-  * An iterator that can be closed, and closes itself after you exhaust it
-  * through iteration. Not quite totally safe, since you can leak filehandles
-  * by leaving half-consumed iterators, but at least common things like foreach,
-  * mkString, reduce, sum, etc. will all result in close() being called.
-  */
-class SelfClosingIterator[+A](val underlying: Iterator[A], val close: () => Unit)
-  extends Iterator[A]{
-  private[this] var alreadyClosed = false
-  def hasNext = {
-    if (alreadyClosed) false
-    else if (!underlying.hasNext){
-      close()
-      alreadyClosed = true
-      false
-    }else{
-      true
-    }
-  }
-  def next() = {
-    val n = underlying.next()
-    if (!underlying.hasNext) {
-      alreadyClosed = true
-      close()
-    }
-    n
-  }
-}

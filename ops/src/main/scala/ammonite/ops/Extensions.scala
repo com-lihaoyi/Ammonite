@@ -12,6 +12,7 @@ trait Extensions{
    */
   implicit def FilterMapArrays[T](a: Array[T]) = FilterMapExt(a)
   implicit def FilterMapIterators[T](a: Iterator[T]) = new FilterMapExt2(a)
+  implicit def FilterMapGenerators[T](a: geny.Generator[T]) = new FilterMapExtGen(a)
 
   /**
    * Allows you to pipe sequences into other sequences to convert them,
@@ -108,6 +109,37 @@ class FilterMapExt2[+T](i: Iterator[T]){
    * Alias for `flatMap`
    */
   def ||[B, That](f: T => GenTraversableOnce[B]) = i.flatMap(f)
+
+  /**
+   * Alias for `foreach`
+   */
+  def |![B, That](f: T => Unit) = i.foreach(f)
+
+  /**
+   * Alias for `filter`
+   */
+  def |?(p: T => Boolean) = i.filter(p)
+
+  /**
+   * Alias for `reduce`
+   */
+  def |&[A1 >: T](op: (A1, A1) => A1): A1 = i.reduceLeft(op)
+}
+/**
+ * Extends collections to give short aliases for the commonly
+ * used operations, so we can make it easy to use from the
+ * command line.
+ */
+class FilterMapExtGen[+T](i: geny.Generator[T]){
+  /**
+   * Alias for `map`
+   */
+  def |[B, That](f: T => B) = i.map(f)
+
+  /**
+   * Alias for `flatMap`
+   */
+  def ||[B, That](f: T => Iterable[B]) = i.flatMap(f(_))
 
   /**
    * Alias for `foreach`
