@@ -66,13 +66,13 @@ object Internals{
  * the iterator however you wish
  */
 trait StreamableOp1[T1, R, C <: Seq[R]] extends Function1[T1, C]{
-  def materialize(src: T1, i: Iterator[R]): C
+  def materialize(src: T1, i: geny.Generator[R]): C
   def apply(arg: T1) = materialize(arg, iter(arg))
 
   /**
     * Returns a lazy [[Iterator]] instead of an eager sequence of results.
     */
-  val iter: T1 => Iterator[R]
+  val iter: T1 => geny.Generator[R]
 }
 
 
@@ -203,18 +203,15 @@ trait ImplicitOp[V] extends Function1[Path, V]{
   * to cause your recursion to skip certain files or folders.
   */
 object ls extends StreamableOp1[Path, Path, LsSeq] with ImplicitOp[LsSeq]{
-  def materialize(src: Path, i: Iterator[Path]) =
+  def materialize(src: Path, i: geny.Generator[Path]) =
     new LsSeq(src, i.map(_ relativeTo src).toVector.sorted:_*)
 
 
-  object iter extends (Path => Iterator[Path]){
-    def apply(arg: Path) = {
-      import scala.collection.JavaConverters._
+  object iter extends (Path => geny.Generator[Path]){
+    def apply(arg: Path) = geny.Generator.selfClosing{
       val dirStream = Files.newDirectoryStream(arg.toNIO)
-      new SelfClosingIterator(
-        dirStream.iterator().asScala.map(x => Path(x)),
-        () => dirStream.close()
-      )
+      import collection.JavaConverters._
+      (dirStream.iterator().asScala.map(Path(_)), () => dirStream.close())
     }
   }
 
@@ -239,23 +236,23 @@ object ls extends StreamableOp1[Path, Path, LsSeq] with ImplicitOp[LsSeq]{
                     preOrder: Boolean = false)
   extends StreamableOp1[Path, Path, LsSeq] with ImplicitOp[LsSeq]{
 
-    def materialize(src: Path, i: Iterator[Path]) = ls.this.materialize(src, i)
-    def recursiveListFiles(p: Path): Iterator[Path] = {
+    def materialize(src: Path, i: geny.Generator[Path]) = ls.this.materialize(src, i)
+    def recursiveListFiles(p: Path): geny.Generator[Path] = {
       def these = ls.iter(p)
       for{
         thing <- these
         if !skip(thing)
         sub <- {
-          if (!stat(thing).isDir) Iterator(thing)
+          if (!stat(thing).isDir) geny.Generator(thing)
           else{
             val children = recursiveListFiles(thing)
-            if (preOrder) Iterator(thing) ++ children
-            else children ++ Iterator(thing)
+            if (preOrder) geny.Generator(thing) ++ children
+            else children ++ geny.Generator(thing)
           }
         }
       } yield sub
     }
-    object iter extends (Path => Iterator[Path]){
+    object iter extends (Path => geny.Generator[Path]){
       def apply(arg: Path) = recursiveListFiles(arg)
     }
 
@@ -333,9 +330,9 @@ object read extends Function1[Readable, String]{
   def apply(arg: Readable, charSet: Codec) = new String(arg.getBytes, charSet.charSet)
 
   object lines extends StreamableOp1[Readable, String, Vector[String]]{
-    def materialize(src: Readable, i: Iterator[String]) = i.toVector
+    def materialize(src: Readable, i: geny.Generator[String]) = i.toVector
 
-    object iter extends (Readable => Iterator[String]){
+    object iter extends (Readable => geny.Generator[String]){
       def apply(arg: Readable) = arg.getLineIterator(java.nio.charset.StandardCharsets.UTF_8)
 
       def apply(arg: Readable, charSet: Codec) = arg.getLineIterator(charSet)
