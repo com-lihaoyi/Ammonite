@@ -331,6 +331,25 @@ command line.</p>
       <p class="shortcomment cmt">Extends collections to give short aliases for the commonly
 used operations, so we can make it easy to use from the
 command line.</p>
+    </li><li name="ammonite.ops.FilterMapExtGen" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="FilterMapExtGen[+T]extendsAnyRef"></a>
+      <a id="FilterMapExtGen[+T]:FilterMapExtGen[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="FilterMapExtGen.html"><span class="name">FilterMapExtGen</span></a><span class="tparams">[<span name="T">+T</span>]</span><span class="result"> extends <a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.ops.package@FilterMapExtGen[+T]extendsAnyRef" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Extends collections to give short aliases for the commonly
+used operations, so we can make it easy to use from the
+command line.</p>
     </li><li name="ammonite.ops.ImplicitOp" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
       <a id="ImplicitOp[V]extendsammonite.ops.Path=&gt;V"></a>
       <a id="ImplicitOp[V]:ImplicitOp[V]"></a>
@@ -623,28 +642,6 @@ either a <a href="ResourceRoot$$ClassLoader.html" class="extype" name="ammonite.
 either a <a href="ResourceRoot$$ClassLoader.html" class="extype" name="ammonite.ops.ResourceRoot.ClassLoader">ResourceRoot.ClassLoader</a> or a <a href="ResourceRoot$$Class.html" class="extype" name="ammonite.ops.ResourceRoot.Class">ResourceRoot.Class</a>. Resources
 loaded from classloaders are always loaded via their absolute path, while
 resources loaded via classes are always loaded relatively.
-</p></div></div>
-    </li><li name="ammonite.ops.SelfClosingIterator" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="SelfClosingIterator[+A]extendsIterator[A]"></a>
-      <a id="SelfClosingIterator[+A]:SelfClosingIterator[A]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">class</span>
-      </span>
-      <span class="symbol">
-        <a href="SelfClosingIterator.html"><span class="name">SelfClosingIterator</span></a><span class="tparams">[<span name="A">+A</span>]</span><span class="result"> extends <span class="extype" name="scala.Iterator">Iterator</span>[<span class="extype" name="ammonite.ops.SelfClosingIterator.A">A</span>]</span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.ops.package@SelfClosingIterator[+A]extendsIterator[A]" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">An iterator that can be closed, and closes itself after you exhaust it
-through iteration.</p><div class="fullcomment"><div class="comment cmt"><p>An iterator that can be closed, and closes itself after you exhaust it
-through iteration. Not quite totally safe, since you can leak filehandles
-by leaving half-consumed iterators, but at least common things like foreach,
-mkString, reduce, sum, etc. will all result in close() being called.
 </p></div></div>
     </li><li name="ammonite.ops.Shellable" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="ShellableextendsProductwithSerializable"></a>
@@ -1002,6 +999,23 @@ filename: <span class="std">String</span> = <span class="lit">"Ammonite"</span><
       </span>
       </h4><span class="permalink">
       <a href="../../index.html#ammonite.ops.package@FilterMapExt[T,Repr](i:scala.collection.TraversableLike[T,Repr]):ammonite.ops.FilterMapExt[T,Repr]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Extensions.html" class="extype" name="ammonite.ops.Extensions">Extensions</a></dd></dl></div>
+    </li><li name="ammonite.ops.Extensions#FilterMapGenerators" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="FilterMapGenerators[T](a:geny.Generator[T]):ammonite.ops.FilterMapExtGen[T]"></a>
+      <a id="FilterMapGenerators[T](Generator[T]):FilterMapExtGen[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">FilterMapGenerators</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="a">a: <span class="extype" name="geny.Generator">Generator</span>[<span class="extype" name="ammonite.ops.Extensions.FilterMapGenerators.T">T</span>]</span>)</span><span class="result">: <a href="FilterMapExtGen.html" class="extype" name="ammonite.ops.FilterMapExtGen">FilterMapExtGen</a>[<span class="extype" name="ammonite.ops.Extensions.FilterMapGenerators.T">T</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#ammonite.ops.package@FilterMapGenerators[T](a:geny.Generator[T]):ammonite.ops.FilterMapExtGen[T]" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
