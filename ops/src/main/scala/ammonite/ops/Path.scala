@@ -112,7 +112,7 @@ object BasePath {
   }
   def chunkify(s: java.nio.file.Path) = {
     import collection.JavaConversions._
-    s.iterator().map(_.toString).filter(_ != ".").toVector
+    s.iterator().map(_.toString).filter(_ != ".").filter(_ != "").toVector
   }
 }
 

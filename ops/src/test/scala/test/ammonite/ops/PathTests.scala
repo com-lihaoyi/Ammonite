@@ -317,7 +317,8 @@ object PathTests extends TestSuite{
           assert(
             Path(relStr, root/'base) == root/'base/'hello/'cow,
             Path(absStr, root/'base) == root/'hello/'world,
-            Path(basePath, root/'base) == root/'base/'hello/'cow
+            Path(basePath, root/'base) == root/'base/'hello/'cow,
+            Path(".", pwd).last != ""
           )
         }
       }
