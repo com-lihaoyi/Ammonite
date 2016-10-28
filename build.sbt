@@ -255,7 +255,7 @@ lazy val sshd = project
       crossVersion := CrossVersion.full,
       name := "ammonite-sshd",
       libraryDependencies ++= Seq(
-        "org.apache.sshd" % "sshd-core" % "0.14.0",
+        "org.apache.sshd" % "sshd-core" % "1.3.0",
         //-- test --//
         // slf4j-nop makes sshd server use logger that writes into the void
         "org.slf4j" % "slf4j-nop" % "1.7.12" % "test",

@@ -59,7 +59,7 @@ object SshTestingUtils {
   }
 
   def withTestSshServer[T](user: (String, String), testShell: () => Any = () => ???)
-                          (test: org.apache.sshd.SshServer => T)
+                          (test: org.apache.sshd.server.SshServer => T)
                           (implicit dir: Path): T = {
     val server = testSshServer(user, (_, _) => testShell.apply())
     server.start()
@@ -70,7 +70,7 @@ object SshTestingUtils {
     }
   }
 
-  def sshClient(creds: (String, String), sshServer: org.apache.sshd.SshServer): Session = {
+  def sshClient(creds: (String, String), sshServer: org.apache.sshd.server.SshServer): Session = {
     sshClient(creds, Option(sshServer.getHost).getOrElse("localhost"), sshServer.getPort)
   }
 
