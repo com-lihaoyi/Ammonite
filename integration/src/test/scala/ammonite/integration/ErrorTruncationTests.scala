@@ -27,12 +27,15 @@ object ErrorTruncationTests extends TestSuite{
 
     assert(e == expected)
   }
+  def scriptFile(name: String): Path =
+    replStandaloneResources/'errorTruncation/name
+
   val tests = TestSuite {
     println("ErrorTruncationTests")
     'compileError - checkErrorMessage(
       file = 'errorTruncation/"compileError.sc",
       expected = Util.normalizeNewlines(
-        """compileError.sc:1: not found: value doesntexist
+        s"""${scriptFile("compileError.sc")}:1: not found: value doesntexist
           |val res = doesntexist
           |          ^
           |Compilation Failed
@@ -42,7 +45,7 @@ object ErrorTruncationTests extends TestSuite{
     'multiExpressionError - checkErrorMessage(
       file = 'errorTruncation/"compileErrorMultiExpr.sc",
       expected = Util.normalizeNewlines(
-        """compileErrorMultiExpr.sc:11: not found: value doesntexist
+        s"""${scriptFile("compileErrorMultiExpr.sc")}:11: not found: value doesntexist
           |val res_4 = doesntexist
           |            ^
           |Compilation Failed
@@ -66,13 +69,14 @@ object ErrorTruncationTests extends TestSuite{
     val tab = '\t'
     val runtimeErrorResourcePackage =
       "$file.integration.src.test.resources.ammonite.integration.errorTruncation"
+    val runtimeErrorSc = scriptFile("runtimeError.sc")
     'runtimeError - checkErrorMessage(
       file = 'errorTruncation/"runtimeError.sc",
       expected = Util.normalizeNewlines(
         s"""Exception in thread "main" java.lang.ArithmeticException: / by zero
-          |${tab}at $runtimeErrorResourcePackage.runtimeError$$.<init>(runtimeError.sc:1)
-          |${tab}at $runtimeErrorResourcePackage.runtimeError$$.<clinit>(runtimeError.sc)
-          |${tab}at $runtimeErrorResourcePackage.runtimeError.$$main(runtimeError.sc)
+          |${tab}at $runtimeErrorResourcePackage.runtimeError$$.<init>($runtimeErrorSc:1)
+          |${tab}at $runtimeErrorResourcePackage.runtimeError$$.<clinit>($runtimeErrorSc)
+          |${tab}at $runtimeErrorResourcePackage.runtimeError.$$main($runtimeErrorSc)
           |""".stripMargin
       )
     )

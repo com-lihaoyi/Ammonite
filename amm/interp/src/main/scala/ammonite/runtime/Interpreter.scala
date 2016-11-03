@@ -438,7 +438,11 @@ class Interpreter(val printer: Printer,
             processScriptBlock(
               processed, printer,
               Interpreter.indexWrapperName(wrapperName, wrapperIndex),
-              wrapperName.raw + ".sc", pkgName
+              source match {
+                case ImportHook.Source.File(fname) => fname.toString
+                case _ => wrapperName.raw + ".sc"
+              },
+              pkgName
             )
           ),
         autoImport,
