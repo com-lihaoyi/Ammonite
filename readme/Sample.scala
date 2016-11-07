@@ -36,8 +36,8 @@ object Sample{
   def ammSample(ammoniteCode: String) = {
     val scalaVersion = scala.util.Properties.versionNumberString
     val ammVersion = ammonite.Constants.version
-    val executableName = s"ammonite-$ammVersion-$scalaVersion"
-    val ammExec = "amm/target/scala-2.11/" + executableName
+    val executableName = s"amm"
+    val ammExec = "amm/target/scala-2.12/" + executableName
     val predef = "shell/src/main/resources/ammonite/shell/example-predef-bare.sc"
     val out = exec(
       Seq(ammExec, "--predef-file", predef),

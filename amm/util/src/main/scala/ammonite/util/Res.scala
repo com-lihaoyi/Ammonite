@@ -13,6 +13,7 @@ sealed abstract class Res[+T]{
   def flatMap[V](f: T => Res[V]): Res[V]
   def map[V](f: T => V): Res[V]
   def filter(f: T => Boolean): Res[T] = this
+  def withFilter(f: T => Boolean): Res[T] = filter(f)
 }
 
 

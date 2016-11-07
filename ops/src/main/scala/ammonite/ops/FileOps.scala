@@ -239,6 +239,9 @@ object ls extends StreamableOp1[Path, Path, LsSeq] with ImplicitOp[LsSeq]{
     def materialize(src: Path, i: geny.Generator[Path]) = ls.this.materialize(src, i)
     def recursiveListFiles(p: Path): geny.Generator[Path] = {
       def these = ls.iter(p)
+      implicit class withFilterable[T](x: geny.Generator[T]){
+        def withFilter(p: T => Boolean) = x.filter(p)
+      }
       for{
         thing <- these
         if !skip(thing)

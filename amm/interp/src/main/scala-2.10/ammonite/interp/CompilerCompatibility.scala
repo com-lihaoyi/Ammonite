@@ -24,4 +24,5 @@ object CompilerCompatibility {
     plugin.processOptions(options, error)
     true
   }
+
 }

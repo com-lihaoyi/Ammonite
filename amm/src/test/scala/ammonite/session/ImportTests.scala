@@ -121,7 +121,10 @@ object ImportTests extends TestSuite{
         """)
       }
       'shadowPrefix{
-        * - check.session("""
+        * - {
+          // fixed in 2.12
+          if (!scala2_12) check.session(
+            """
           @ object importing_issue {
           @   object scala {
           @     def evilThing = ???
@@ -140,6 +143,7 @@ object ImportTests extends TestSuite{
           @ Duration.Inf // This fails due to a compiler bug SI-6039
           error: Compilation Failed
         """)
+          }
         // This failed kinda non-deterministically in 0.5.2 (#248); it depended
         // on what ordering the imports were generated in, which depended
         // on the ordering of the `scala.Map` they were stored in, which

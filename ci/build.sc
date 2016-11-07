@@ -10,10 +10,11 @@ val isMasterCommit =
 
 val allVersions = Seq(
   "2.10.4", "2.10.5", "2.10.6",
-  "2.11.3", "2.11.4", "2.11.5", "2.11.6", "2.11.7", "2.11.8"
+  "2.11.3", "2.11.4", "2.11.5", "2.11.6", "2.11.7", "2.11.8",
+  "2.12.0"
 )
 
-val latestVersions = Set("2.10.5", "2.11.8")
+val latestVersions = Set("2.10.5", "2.11.8", "2.12.0")
 
 val buildVersion =
   if (sys.env("TRAVIS_TAG") == "") s"COMMIT-${getGitHash()}"
@@ -30,6 +31,7 @@ def updateConstants(version: String = buildVersion,
   val versionTxt = s"""
     package ammonite
     object Constants{
+      val scalaVersion = "2.12.0"
       val version = "$version"
       val unstableVersion = "$unstableVersion"
       val curlUrl = "$curlUrl"
@@ -99,6 +101,7 @@ def publishDocs() = {
     upload.shorten(s"https://github.com/lihaoyi/Ammonite/releases/download/$unstableKey")
   )
 
+
   %sbt "readme/compile"
   %sbt "readme/run"
 
@@ -110,7 +113,7 @@ def executable() = {
     println("MASTER COMMIT: Publishing Executable")
     //Prepare executable
     updateConstants()
-    %sbt "amm/test:assembly"
+    %sbt("++2.12.0", "amm/test:assembly")
 
     val travisTag = sys.env("TRAVIS_TAG")
     val gitHash = getGitHash()
@@ -130,7 +133,7 @@ def executable() = {
         .asString
 
       val short = upload(
-        cwd/'amm/'target/"scala-2.11"/'amm,
+        cwd/'amm/'target/"scala-2.12"/'amm,
         travisTag,
         travisTag,
         sys.env("AMMONITE_BOT_AUTH_TOKEN")
@@ -138,7 +141,7 @@ def executable() = {
       short
     }else{
       val short = upload(
-        cwd/'amm/'target/"scala-2.11"/'amm,
+        cwd/'amm/'target/"scala-2.12"/'amm,
         "snapshot-commit-uploads",
         gitHash,
         sys.env("AMMONITE_BOT_AUTH_TOKEN")

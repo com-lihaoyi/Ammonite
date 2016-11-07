@@ -96,8 +96,11 @@ object BasicTests extends TestSuite{
     }
 
     'complex {
-      val evaled = exec('basic / "Complex.sc")
-      assert(evaled.out.trim.contains("Spire Interval [0, 10]"))
+      // Spire not published for 2.12
+      if (!scala.util.Properties.versionNumberString.contains("2.12")) {
+        val evaled = exec('basic / "Complex.sc")
+        assert(evaled.out.trim.contains("Spire Interval [0, 10]"))
+      }
     }
 
 
@@ -157,8 +160,9 @@ object BasicTests extends TestSuite{
       assert(errorMsg.contains("IvyThing$IvyResolutionException"))
     }
     'testIvySnapshotNoCache{
+
       // test disabled on windows because sbt not available
-      if (!Util.windowsPlatform) {
+      if (!Util.windowsPlatform && !scala.util.Properties.versionNumberString.contains("2.12")) {
         val buildRoot = pwd/'target/"some-dummy-library"
         cp.over(intTestResources/"some-dummy-library", buildRoot)
         val dummyScala = buildRoot/'src/'main/'scala/'dummy/"Dummy.scala"

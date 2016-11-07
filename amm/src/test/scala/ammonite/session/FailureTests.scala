@@ -1,6 +1,6 @@
 package ammonite.session
 
-import ammonite.TestRepl
+import ammonite.{TestRepl, TestUtils}
 import utest._
 
 import scala.collection.{immutable => imm}
@@ -32,7 +32,7 @@ object FailureTests extends TestSuite{
     'compilerCrash{
       // Make sure compiler crashes provide the appropiate error
       // messaging, and the REPL continues functioning after
-      check.session("""
+      if (!TestUtils.scala2_12) check.session("""
         @ val x = 1
         x: Int = 1
 

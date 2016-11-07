@@ -241,7 +241,7 @@ object AdvancedTests extends TestSuite{
       """)
     }
     'compilerPlugin - retry(3){
-      check.session("""
+      if (!scala2_12) check.session("""
         @ // Make sure plugins from eval class loader are not loaded
 
         @ import $ivy.`org.spire-math::kind-projector:0.6.3`
@@ -264,7 +264,7 @@ object AdvancedTests extends TestSuite{
 
         @ // Useless - does not add plugins, and ignored by eval class loader
 
-        @ import $plugin.$ivy.`com.lihaoyi::scalatags:0.4.5`
+        @ import $plugin.$ivy.`com.lihaoyi::scalatags:0.6.2`
 
         @ import scalatags.Text
         error: not found: value scalatags
