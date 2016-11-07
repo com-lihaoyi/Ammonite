@@ -2,7 +2,7 @@ import scalatex.ScalatexReadme
 import sbtassembly.AssemblyPlugin.defaultShellScript
 
 
-scalaVersion := "2.11.6"
+scalaVersion := "2.12.0"
 
 crossScalaVersions := Seq(
   "2.10.4", "2.10.5", "2.10.6", "2.11.3",
@@ -20,7 +20,7 @@ val macroSettings = Seq(
   libraryDependencies ++= Seq(
     "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided"
   ) ++ (
-    if (scalaVersion.value startsWith "2.11.") Nil
+    if (!scalaVersion.value.startsWith("2.10.")) Nil
     else Seq(
       compilerPlugin("org.scalamacros" % s"paradise" % "2.0.1" cross CrossVersion.full),
       "org.scalamacros" %% s"quasiquotes" % "2.0.1"
@@ -30,10 +30,10 @@ val macroSettings = Seq(
 
 val sharedSettings = Seq(
 
-  scalaVersion := "2.11.8",
+  scalaVersion := "2.12.0",
   organization := "com.lihaoyi",
   version := _root_.ammonite.Constants.version,
-  libraryDependencies += "com.lihaoyi" %% "utest" % "0.4.3" % "test",
+  libraryDependencies += "com.lihaoyi" %% "utest" % "0.4.4" % "test",
   // Needed for acyclic to work...
   libraryDependencies ++= {
     if (scalaVersion.value startsWith "2.11.") Nil
@@ -44,7 +44,7 @@ val sharedSettings = Seq(
   testFrameworks := Seq(new TestFramework("utest.runner.Framework")),
   scalacOptions += "-target:jvm-1.7",
   autoCompilerPlugins := true,
-  addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.4"),
+  addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.5"),
   ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) },
   parallelExecution in Test := !scalaVersion.value.contains("2.10"),
   (unmanagedSources in Compile) += (baseDirectory in ThisBuild).value/"project"/"Constants.scala",
@@ -52,7 +52,7 @@ val sharedSettings = Seq(
     ((baseDirectory in ThisBuild).value/".."/"project"/"Constants.scala") -> "Constants.scala"
   },
   libraryDependencies ++= Seq(
-    "com.lihaoyi" %% "acyclic" % "0.1.4" % "provided"
+    "com.lihaoyi" %% "acyclic" % "0.1.5" % "provided"
   ) ,
   publishTo := Some(
     "releases" at "https://oss.sonatype.org/service/local/staging/deploy/maven2"
@@ -85,7 +85,7 @@ val sharedSettings = Seq(
 lazy val ops = project
   .settings(
     sharedSettings,
-    libraryDependencies += "com.lihaoyi" %% "geny" % "0.1.0",
+    libraryDependencies += "com.lihaoyi" %% "geny" % "0.1.1",
     name := "ammonite-ops"
   )
 
@@ -100,8 +100,8 @@ lazy val terminal = project
     sharedSettings,
     name := "ammonite-terminal",
     libraryDependencies ++= Seq(
-      "com.lihaoyi" %% "sourcecode" % "0.1.2",
-      "com.lihaoyi" %% "fansi" % "0.2.2"
+      "com.lihaoyi" %% "sourcecode" % "0.1.3",
+      "com.lihaoyi" %% "fansi" % "0.2.3"
     ),
     macroSettings
   )
@@ -124,11 +124,11 @@ lazy val amm = project
     test in assembly := {},
     name := "ammonite",
     libraryDependencies ++= Seq(
-      "com.github.scopt" %% "scopt" % "3.4.0"
+      "com.github.scopt" %% "scopt" % "3.5.0"
     ),
     libraryDependencies ++= (
       if (scalaVersion.value startsWith "2.10.") Nil
-      else Seq("com.chuusai" %% "shapeless" % "2.1.0" % "test")
+      else Seq("com.chuusai" %% "shapeless" % "2.3.2" % "test")
     ),
     javaOptions += "-Xmx4G",
     assemblyOption in assembly := (assemblyOption in assembly).value.copy(
@@ -157,8 +157,8 @@ lazy val ammUtil = project
 
     name := "ammonite-util",
     libraryDependencies ++= Seq(
-      "com.lihaoyi" %% "upickle" % "0.4.2",
-      "com.lihaoyi" %% "pprint" % "0.4.2"
+      "com.lihaoyi" %% "upickle" % "0.4.4",
+      "com.lihaoyi" %% "pprint" % "0.4.4"
     )
   )
 
@@ -191,7 +191,7 @@ lazy val ammInterp = project
     libraryDependencies ++= Seq(
       "org.scala-lang" % "scala-compiler" % scalaVersion.value,
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
-      "com.lihaoyi" %% "scalaparse" % "0.4.1"
+      "com.lihaoyi" %% "scalaparse" % "0.4.2"
     )
   )
 
@@ -260,7 +260,7 @@ lazy val sshd = project
         // slf4j-nop makes sshd server use logger that writes into the void
         "org.slf4j" % "slf4j-nop" % "1.7.12" % "test",
         "com.jcraft" % "jsch" % "0.1.53" % "test",
-        "org.scalacheck" %% "scalacheck" % "1.12.4" % "test"
+        "org.scalacheck" %% "scalacheck" % "1.12.6" % "test"
       )
   )
 
