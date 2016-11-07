@@ -264,7 +264,7 @@ object AdvancedTests extends TestSuite{
 
         @ // Useless - does not add plugins, and ignored by eval class loader
 
-        @ import $plugin.$ivy.`com.lihaoyi::scalatags:0.4.5`
+        @ import $plugin.$ivy.`com.lihaoyi::scalatags:0.6.2`
 
         @ import scalatags.Text
         error: not found: value scalatags

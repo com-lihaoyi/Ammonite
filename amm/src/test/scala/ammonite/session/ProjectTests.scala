@@ -21,7 +21,7 @@ object ProjectTests extends TestSuite{
           @ import scalatags.Text.all._
           error: not found: value scalatags
 
-          @ import $$ivy.`com.lihaoyi::scalatags:0.5.4`
+          @ import $$ivy.`com.lihaoyi::scalatags:0.6.2`
 
           @ import scalatags.Text.all._
           import scalatags.Text.all._
@@ -107,7 +107,7 @@ object ProjectTests extends TestSuite{
     'shapeless {
       // Shapeless 2.1.0 isn't published for scala 2.10
       if (!scala2_10) check.session("""
-        @ import $ivy.`com.chuusai::shapeless:2.2.5`, shapeless._
+        @ import $ivy.`com.chuusai::shapeless:2.3.2`, shapeless._
 
         @ (1 :: "lol" :: List(1, 2, 3) :: HNil)
         res1: Int :: String :: List[Int] :: HNil = 1 :: lol :: List(1, 2, 3) :: HNil
@@ -124,7 +124,7 @@ object ProjectTests extends TestSuite{
 
     'scalaz{
       check.session("""
-        @ import $ivy.`org.scalaz::scalaz-core:7.1.1`, scalaz._, Scalaz._
+        @ import $ivy.`org.scalaz::scalaz-core:7.2.y`, scalaz._, Scalaz._
 
         @ (Option(1) |@| Option(2))(_ + _)
         res1: Option[Int] = Some(3)

@@ -12,10 +12,10 @@ import scala.reflect.io._
 import scala.tools.nsc
 import scala.tools.nsc.{Global, Settings}
 import scala.tools.nsc.backend.JavaPlatform
+import scala.tools.nsc.classpath.{AggregateClassPath, DirectoryClassPath, VirtualDirectoryClassPath, ZipAndJarClassPathFactory}
 import scala.tools.nsc.interactive.Response
 import scala.tools.nsc.plugins.Plugin
 import scala.tools.nsc.reporters.AbstractReporter
-import scala.tools.nsc.util.ClassPath.JavaContext
 import scala.tools.nsc.util._
 import scala.util.Try
 
@@ -90,19 +90,18 @@ object Compiler{
                      settings: Settings) = {
     val vd = new io.VirtualDirectory("(memory)", None)
     val settingsX = settings
-    val jCtx = new JavaContext()
+
     val (dirDeps, jarDeps) = classpath.partition(_.isDirectory)
 
     val jarCP =
       jarDeps.filter(x => x.getName.endsWith(".jar") || Classpath.canBeOpenedAsJar(x))
-             .map(x => new DirectoryClassPath(new FileZipArchive(x), jCtx))
+             .map(x => ZipAndJarClassPathFactory.create(new FileZipArchive(x), settingsX))
              .toVector
 
-    val dirCP =
-      dirDeps.map(x => new DirectoryClassPath(new PlainDirectory(new Directory(x)), jCtx))
+    val dirCP = dirDeps.map(x => new DirectoryClassPath(x))
 
-    val dynamicCP = Seq(new DirectoryClassPath(dynamicClasspath, jCtx))
-    val jcp = new JavaClassPath(jarCP ++ dirCP ++ dynamicCP, jCtx)
+    val dynamicCP = Seq(new VirtualDirectoryClassPath(dynamicClasspath))
+    val jcp = new AggregateClassPath(jarCP ++ dirCP ++ dynamicCP)
 
     if (Classpath.traceClasspathIssues) {
       settings.Ylogcp.value = true
@@ -212,11 +211,8 @@ object Compiler{
         }
 
         // Actually jcp, avoiding a path-dependent type issue in 2.10 here
-        override def classPath = platform.classPath
-        override lazy val platform: ThisPlatform = new JavaPlatform{
-          val global: g.type = g
-          override def classPath = jcp
-        }
+        override def classPath = jcp
+
         override lazy val analyzer = CompilerCompatibility.analyzer(g, evalClassloader)
       }
       // Initialize scalac to the parser phase immediately, so we can start
