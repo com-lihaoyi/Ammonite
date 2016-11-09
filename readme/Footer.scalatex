@@ -98,10 +98,25 @@
 
   @sect{Changelog}
 
+    @sect{0.7.9}
+      @ul
+        @li
+          Fix @issue(496) by properly setting context classloader when running
+          cached scripts
+        @li
+          Make @code{.iter} versions of file operations return
+          @lnk("geny", "https://github.com/lihaoyi/geny") @code{Generator}s
+          rather than @code{Iterator}s, which should avoid problems with
+          leaking file handles
+
+        @li
+          Fix a hole in @code{ammonite.ops.Path} that was allowing invalid
+          paths with empty segments to be constructed.
+
     @sect{0.7.8}
       @ul
         @li
-          Fix @issue(397) and @issue(430), thanks to 
+          Fix @issue(397) and @issue(430), thanks to
           @lnk("Roman Tklalenko", "https://github.com/tkroman")
         @li
           Upgrade to Fansi 0.2.2, which should reduce memory usage by 134mb
