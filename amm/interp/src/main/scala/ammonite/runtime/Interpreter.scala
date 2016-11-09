@@ -396,19 +396,20 @@ class Interpreter(val printer: Printer,
         importsTrees.map(resolveSingleImportHook(source, _))
 
         val classFileNames = classFiles.map(_.map(_._1))
-
-        eval.evalCachedClassFiles(
-          classFiles,
-          pkgName.map(_.backticked).mkString("."),
-          wrapperName.backticked,
-          dynamicClasspath,
-          wrapperHashes.map(_._1)
-        ) match {
-          case Res.Success(_) =>
-            eval.update(imports)
-            Res.Success((imports, wrapperHashes))
-          case r: Res.Failing => r
-        }
+        withContextClassloader(
+          eval.evalCachedClassFiles(
+            classFiles,
+            pkgName.map(_.backticked).mkString("."),
+            wrapperName.backticked,
+            dynamicClasspath,
+            wrapperHashes.map(_._1)
+          ) match {
+            case Res.Success(_) =>
+              eval.update(imports)
+              Res.Success((imports, wrapperHashes))
+            case r: Res.Failing => r
+          }
+        )
     }
 
   }

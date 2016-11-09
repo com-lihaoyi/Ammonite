@@ -69,6 +69,7 @@ object CachingTests extends TestSuite{
       'testLoadModule - check('scriptLevelCaching/"testLoadModule.sc")
       'testFileImport - check('scriptLevelCaching/"testFileImport.sc")
       'testIvyImport - check('scriptLevelCaching/"ivyCacheTest.sc")
+      'testIvyResource- check('scriptLevelCaching/"ivyCachedResourceTest.sc")
 
     }
 
