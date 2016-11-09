@@ -78,6 +78,11 @@ object SshTestingUtils {
     val client = new JSch
     val session = client.getSession(creds._1, host, port)
     session.setPassword(creds._2)
+    session.setConfig("server_host_key", Seq(
+        "ecdsa-sha2-nistp256",
+        "ecdsa-sha2-nistp384",
+        "ecdsa-sha2-nistp521",
+        "ssh-rsa").mkString(","))
     session.setUserInfo(autoAcceptHostKeyUser(creds._2))
     session
   }

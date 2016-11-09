@@ -35,7 +35,7 @@ object SshServer {
     val hostKeyFile = touch(
       options.hostKeyFile.getOrElse(fallbackHostkeyFilePath(options))
     )
-    new SimpleGeneratorHostKeyProvider(hostKeyFile.toString())
+    new SimpleGeneratorHostKeyProvider(hostKeyFile.toString(), "RSA")
   }
 
   private def disableUnsupportedChannels(sshServer: SshServerImpl) = {
