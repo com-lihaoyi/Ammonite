@@ -35,9 +35,21 @@ object Defaults{
     |  _
     |"""
 
+  // Need to import stuff from ammonite.ops manually, rather than from the
+  // ammonite.ops.Extensions bundle, because otherwise they result in ambiguous
+  // imports if someone else imports maunally
   val predefString = s"""
-    |import ammonite.ops.Extensions.{
-    |  $ignoreUselessImports
+    |import ammonite.ops.{
+    |  Pipeable,
+    |  FilterMapExt,
+    |  FilterMapArrays,
+    |  FilterMapIterators,
+    |  FilterMapGenerators,
+    |  SeqFactoryFunc,
+    |  ChainableConversions,
+    |  RegexContextMaker,
+    |  Callable1,
+    |  Callable2
     |}
     |import ammonite.runtime.tools._
     |import ammonite.repl.tools._
