@@ -128,6 +128,7 @@ object Repl{
                      source: fansi.Attrs) = {
     val src =
       if (f.isNativeMethod) source("Native Method")
+      else if (f.getFileName == null) source("Unknown Source")
       else source(f.getFileName) ++ error(":") ++ source(f.getLineNumber.toString)
 
     val prefix :+ clsName = f.getClassName.split('.').toSeq
