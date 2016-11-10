@@ -23,6 +23,20 @@ object ImportHookTests extends TestSuite{
           res1: Int = 31337
         """)
 
+        'upSegment1 - check.session("""
+          @ import $file.amm.src.`^`.src.test.resources.importHooks.Basic
+
+          @ Basic.basicValue
+          res1: Int = 31337
+        """)
+
+        'upSegment2 - check.session("""
+          @ import $file.amm.src.`..`.src.test.resources.importHooks.Basic
+
+          @ Basic.basicValue
+          res1: Int = 31337
+        """)
+
         'inline - check.session("""
           @ import $file.amm.src.test.resources.importHooks.Basic, Basic.basicValue
 
