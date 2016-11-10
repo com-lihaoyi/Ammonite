@@ -97,7 +97,14 @@
 
 
   @sect{Changelog}
-
+    @sect{0.8.0}
+      @ul
+        @li
+          Tweak default imports to avoid ambiguous imports reported in @issue(500)
+        @li
+          Allow configuration of SSHD console classloader @issue(486)
+        @li
+          Use RSA host keys instead of DSA @issue(485)
     @sect{0.7.9}
       @ul
         @li
