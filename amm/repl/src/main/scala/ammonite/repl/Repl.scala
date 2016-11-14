@@ -38,10 +38,6 @@ class Repl(input: InputStream,
     """
   }.mkString(newLine)
 
-
-
-
-
   val interp: Interpreter = new Interpreter(
     printer,
     storage,
@@ -61,14 +57,19 @@ class Repl(input: InputStream,
         history,
         new SessionApiImpl(i.eval),
         replArgs
-
       )
       Seq(("ammonite.repl.ReplBridge", "repl", replApi))
     },
     wd
   )
 
-
+  // Call `session.save` _after_ the interpreter is fully instantiated and
+  // imports are loaded. We only need to do this in `Repl` and not in
+  // `Interpreter`, as using sess.save or load inside scripts is sketchy and
+  // probably not something we can support
+  interp.bridges.collectFirst {
+    case ("ammonite.repl.ReplBridge", _, r: ReplAPI) => r
+  }.foreach(_.sess.save())
 
   val reader = new InputStreamReader(input)
 
