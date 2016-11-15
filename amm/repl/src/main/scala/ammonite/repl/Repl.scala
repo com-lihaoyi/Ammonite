@@ -36,10 +36,6 @@ class Repl(input: InputStream,
     """
   }.mkString(newLine)
 
-
-
-
-
   val interp: Interpreter = new Interpreter(
     printer,
     storage,
@@ -59,14 +55,16 @@ class Repl(input: InputStream,
         history,
         new SessionApiImpl(i.eval),
         replArgs
-
       )
       Seq(("ammonite.repl.ReplBridge", "repl", replApi))
     },
     wd
   )
 
-
+  // call `session.save` _after_ the interpreter is fully instantiated and imports are loaded
+  interp.bridges.collectFirst {
+    case ("ammonite.repl.ReplBridge", _, r: ReplAPI) => r
+  }.foreach(_.sess.save())
 
   val reader = new InputStreamReader(input)
 

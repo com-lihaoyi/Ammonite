@@ -40,6 +40,7 @@ class SessionApiImpl(eval: Evaluator) extends Session{
     eval.frames = childFrame(next.head) :: next
     out
   }
+  
   def load(name: String = "") = {
     val next = if (name == "") eval.frames.tail else namedFrames(name)
     val out = SessionChanged.delta(eval.frames.head, next.head)
@@ -50,7 +51,6 @@ class SessionApiImpl(eval: Evaluator) extends Session{
   def delete(name: String) = {
     namedFrames.remove(name)
   }
-  save()
 }
 class ReplApiImpl(val interp: Interpreter,
                   width0: => Int,
