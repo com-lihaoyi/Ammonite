@@ -42,7 +42,7 @@ object GlobalInitCompat{
                             evalClassloader: ClassLoader) = {
     new nsc.interactive.Global(settings, reporter) { g =>
       // Actually jcp, avoiding a path-dependent type issue in 2.10 here
-      override def classPath = platform.classPath
+      override def classPath = jcp
 
       override lazy val analyzer = CompilerCompatibility.interactiveAnalyzer(g, evalClassloader)
     }
