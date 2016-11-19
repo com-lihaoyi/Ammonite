@@ -97,7 +97,7 @@ object BasicTests extends TestSuite{
 
     'complex {
       // Spire not published for 2.12
-      if (!ammonite.TestUtils.scala2_12) {
+      if (!scala.util.Properties.versionNumberString.contains("2.12")) {
         val evaled = exec('basic / "Complex.sc")
         assert(evaled.out.trim.contains("Spire Interval [0, 10]"))
       }
@@ -162,7 +162,7 @@ object BasicTests extends TestSuite{
     'testIvySnapshotNoCache{
 
       // test disabled on windows because sbt not available
-      if (!Util.windowsPlatform && !ammonite.TestUtils.scala2_12) {
+      if (!Util.windowsPlatform && !scala.util.Properties.versionNumberString.contains("2.12")) {
         val buildRoot = pwd/'target/"some-dummy-library"
         cp.over(intTestResources/"some-dummy-library", buildRoot)
         val dummyScala = buildRoot/'src/'main/'scala/'dummy/"Dummy.scala"
