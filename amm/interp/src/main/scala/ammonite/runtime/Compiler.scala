@@ -12,7 +12,13 @@ import scala.reflect.io._
 import scala.tools.nsc
 import scala.tools.nsc.{Global, Settings}
 import scala.tools.nsc.backend.JavaPlatform
-import scala.tools.nsc.classpath.{AggregateClassPath, DirectoryClassPath, VirtualDirectoryClassPath, ZipAndJarClassPathFactory}
+import scala.tools.nsc.classpath.{
+  FileUtils,
+  AggregateClassPath,
+  DirectoryClassPath,
+  VirtualDirectoryClassPath,
+  ZipAndJarClassPathFactory
+}
 import scala.tools.nsc.interactive.Response
 import scala.tools.nsc.plugins.Plugin
 import scala.tools.nsc.reporters.AbstractReporter
@@ -99,9 +105,46 @@ object Compiler{
              .toVector
 
     val dirCP = dirDeps.map(x => new DirectoryClassPath(x))
+    val dynamicCP = new VirtualDirectoryClassPath(dynamicClasspath){
 
-    val dynamicCP = Seq(new VirtualDirectoryClassPath(dynamicClasspath))
-    val jcp = new AggregateClassPath(jarCP ++ dirCP ++ dynamicCP)
+      override def getSubDir(packageDirName: String): Option[AbstractFile] = {
+        val pathParts = packageDirName.split('/')
+        var file: AbstractFile = dir
+        for (dirPart <- pathParts) {
+          file = file.lookupName(dirPart, directory = true)
+          if (file == null) return None
+        }
+        Some(file)
+
+      }
+      override def findClassFile(className: String): Option[AbstractFile] = {
+        pprint.log(className)
+        val relativePath = FileUtils.dirPath(className)
+        val pathParts = relativePath.split('/')
+        var file: AbstractFile = dir
+        for (dirPart <- pathParts.init) {
+          file = file.lookupName(dirPart, directory = true)
+          if (file == null) return None
+        }
+
+        file.lookupName(pathParts.last + ".class", directory = false) match {
+          case null => None
+          case file => Some(file)
+        }
+      }
+
+    }
+
+    def enumerateVdFiles(d: VirtualDirectory): Iterator[AbstractFile] = {
+      val (subs, files) = d.iterator.partition(_.isDirectory)
+      files ++ subs.map(_.asInstanceOf[VirtualDirectory]).flatMap(x =>
+        Iterator(x) ++ enumerateVdFiles(x)
+      )
+    }
+//    pprint.log(classpath)
+//    pprint.log(dynamicClasspath.lookupName("$file/amm", directory = true))
+//dir.lookupName(packageDirName, directory = true)
+    val jcp = new AggregateClassPath(jarCP ++ dirCP ++ Seq(dynamicCP))
 
     if (Classpath.traceClasspathIssues) {
       settings.Ylogcp.value = true

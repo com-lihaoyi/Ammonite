@@ -638,6 +638,7 @@ class Interpreter(val printer: Printer,
   }
 
   def handleEvalClasspath(jar: File) = {
+    pprint.log(jar)
     eval.frames.head.addClasspath(Seq(jar))
     evalClassloader.add(jar.toURI.toURL)
   }

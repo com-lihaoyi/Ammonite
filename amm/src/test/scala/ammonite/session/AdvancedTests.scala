@@ -241,7 +241,7 @@ object AdvancedTests extends TestSuite{
       """)
     }
     'compilerPlugin - retry(3){
-      check.session("""
+      if (!scala2_12) check.session("""
         @ // Make sure plugins from eval class loader are not loaded
 
         @ import $ivy.`org.spire-math::kind-projector:0.6.3`

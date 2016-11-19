@@ -89,7 +89,7 @@ object ImportHookTests extends TestSuite{
             @ import scalatags.Text.all._
             error: not found: value scalatags
 
-            @ import $$ivy.`com.lihaoyi:scalatags_${IvyThing.scalaBinaryVersion}:0.5.3`
+            @ import $$ivy.`com.lihaoyi:scalatags_${IvyThing.scalaBinaryVersion}:0.6.2`
 
             @ import scalatags.Text.all._
 
