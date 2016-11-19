@@ -165,8 +165,8 @@ def docs() = {
     publishDocs()
   }else{
     println("MISC COMMIT: Building readme for verification")
-    %sbt "readme/compile"
-    %sbt "readme/run"
+    %sbt("++2.11.8", "readme/compile")
+    %sbt("++2.11.8", "readme/run")
   }
 }
 
