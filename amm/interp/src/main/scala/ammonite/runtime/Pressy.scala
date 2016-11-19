@@ -188,7 +188,7 @@ object Pressy {
     var cachedPressy: nsc.interactive.Global = null
 
     def initPressy = {
-      val (reporter, _, jcp) = Compiler.initGlobalBits(
+      val (reporter, _, jcp) = GlobalInitCompat.initGlobalBits(
         classpath,
         dynamicClasspath,
         _ => (),
@@ -196,12 +196,7 @@ object Pressy {
         _ => (),
         settings
       )
-      new nsc.interactive.Global(settings, reporter) { g =>
-        // Actually jcp, avoiding a path-dependent type issue in 2.10 here
-        override def classPath = jcp
-
-        override lazy val analyzer = CompilerCompatibility.interactiveAnalyzer(g, evalClassloader)
-      }
+      GlobalInitCompat.initInteractiveGlobal(settings, reporter, jcp, evalClassloader)
     }
 
     /**

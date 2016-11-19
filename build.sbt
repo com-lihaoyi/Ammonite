@@ -192,7 +192,13 @@ lazy val ammInterp = project
       "org.scala-lang" % "scala-compiler" % scalaVersion.value,
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
       "com.lihaoyi" %% "scalaparse" % "0.4.2"
-    )
+    ),
+    unmanagedSourceDirectories in Compile ++= {
+      if (Set("2.10", "2.11").contains(scalaBinaryVersion.value))
+        Seq(baseDirectory.value / "src" / "main" / "scala-2.10_2.11")
+      else
+        Seq()
+    }
   )
 
 
