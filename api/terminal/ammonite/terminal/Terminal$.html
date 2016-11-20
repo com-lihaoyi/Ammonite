@@ -1,42 +1,293 @@
 <!DOCTYPE html >
 <html>
         <head>
-          <title>Terminal - ammonite.terminal.Terminal</title>
-          <meta name="description" content="Terminal - ammonite.terminal.Terminal" />
-          <meta name="keywords" content="Terminal ammonite.terminal.Terminal" />
+          <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+          <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+          <title></title>
+          <meta name="description" content="" />
+          <meta name="keywords" content="" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
+      <link href="../../lib/index.css" media="screen" type="text/css" rel="stylesheet" />
       <link href="../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
       <link href="../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
-      <script type="text/javascript" src="../../lib/jquery.js" id="jquery-js"></script>
-      <script type="text/javascript" src="../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../lib/jquery.js"></script>
+      <script type="text/javascript" src="../../lib/jquery.panzoom.min.js"></script>
+      <script type="text/javascript" src="../../lib/jquery.mousewheel.min.js"></script>
+      <script type="text/javascript" src="../../lib/index.js"></script>
+      <script type="text/javascript" src="../../index.js"></script>
+      <script type="text/javascript" src="../../lib/scheduler.js"></script>
       <script type="text/javascript" src="../../lib/template.js"></script>
       <script type="text/javascript" src="../../lib/tools.tooltip.js"></script>
       
       <script type="text/javascript">
-         if(top === self) {
-            var url = '../../index.html';
-            var hash = 'ammonite.terminal.Terminal$';
-            var anchor = window.location.hash;
-            var anchor_opt = '';
-            if (anchor.length >= 1)
-              anchor_opt = '@' + anchor.substring(1);
-            window.location.href = url + '#' + hash + anchor_opt;
-         }
-   	  </script>
+        /* this variable can be used by the JS to determine the path to the root document */
+        var toRoot = '../../';
+      </script>
     
         </head>
-        <body class="value">
-      <div id="definition">
-        <img alt="Object" src="../../lib/object_big.png" />
-        <p id="owner"><a href="../package.html" class="extype" name="ammonite">ammonite</a>.<a href="package.html" class="extype" name="ammonite.terminal">terminal</a></p>
-        <h1>Terminal</h1><h3><span class="morelinks"><div>Related Doc:
-            <a href="package.html" class="extype" name="ammonite.terminal">package terminal</a>
-          </div></span></h3><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Terminal$" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
+        <body>
+      <div id="search">
+        <span id="doc-title"><span id="doc-version"></span></span>
+        <span class="close-results"><span class="left">&lt;</span> Back</span>
+        <div id="textfilter">
+          <span class="input">
+            <input autocapitalize="none" placeholder="Search" id="index-input" type="text" accesskey="/" />
+            <i class="clear material-icons"></i>
+            <i id="search-icon" class="material-icons"></i>
+          </span>
+        </div>
+    </div>
+      <div id="search-results">
+        <div id="search-progress">
+          <div id="progress-fill"></div>
+        </div>
+        <div id="results-content">
+          <div id="entity-results"></div>
+          <div id="member-results"></div>
+        </div>
+      </div>
+      <div id="content-scroll-container" style="-webkit-overflow-scrolling: touch;">
+        <div id="content-container" style="-webkit-overflow-scrolling: touch;">
+          <div id="subpackage-spacer">
+            <div id="packages">
+              <h1>Packages</h1>
+              <ul>
+                <li name="_root_.root" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="_root_"></a><a id="root:_root_"></a>
+      <span class="permalink">
+      <a href="index.html#_root_" title="Permalink">
+        <i class="material-icons"></i>
       </a>
     </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="../../index.html">
+              <span class="name">root</span>
+            </a>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../index.html" class="extype" name="_root_">root</a></dd></dl></div>
+    </li><li name="_root_.ammonite" visbl="pub" class="indented1 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ammonite"></a><a id="ammonite:ammonite"></a>
+      <span class="permalink">
+      <a href="index.html#ammonite" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="../index.html">
+              <span class="name">ammonite</span>
+            </a>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../index.html" class="extype" name="_root_">root</a></dd></dl></div>
+    </li><li name="ammonite.terminal" visbl="pub" class="indented2 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="terminal"></a><a id="terminal:terminal"></a>
+      <span class="permalink">
+      <a href="../ammonite/index.html#terminal" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="index.html">
+              <span class="name">terminal</span>
+            </a>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="ammonite">ammonite</a></dd></dl></div>
+    </li><li name="ammonite.terminal.filters" visbl="pub" class="indented3 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="filters"></a><a id="filters:filters"></a>
+      <span class="permalink">
+      <a href="../../ammonite/terminal/index.html#filters" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="filters/index.html">
+              <span class="name">filters</span>
+            </a>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="index.html" class="extype" name="ammonite.terminal">terminal</a></dd></dl></div>
+    </li><li class="current-entities indented2">
+                        <a class="object" href="AnsiNav$.html" title=""></a>
+                        <a class="class" href="AnsiNav.html" title=""></a>
+                        <a href="AnsiNav.html" title="">
+                          AnsiNav
+                        </a>
+                      </li><li class="current-entities indented2">
+                        <span class="separator"></span>
+                        <a class="class" href="ClearScreen.html" title=""></a>
+                        <a href="ClearScreen.html" title="">
+                          ClearScreen
+                        </a>
+                      </li><li class="current-entities indented2">
+                        <span class="separator"></span>
+                        <a class="object" href="Debug$.html" title="Prints stuff to an ad-hoc logging file when running the ammonite repl or
+ammonite-terminal in development mode in its SBT project."></a>
+                        <a href="Debug$.html" title="Prints stuff to an ad-hoc logging file when running the ammonite repl or
+ammonite-terminal in development mode in its SBT project.">
+                          Debug
+                        </a>
+                      </li><li class="current-entities indented2">
+                        <span class="separator"></span>
+                        <a class="class" href="DelegateFilter.html" title="A filter as an abstract class, letting you provide a filter instead of
+an op, automatically providing a good .toString for debugging, and
+providing a reasonable &quot;place&quot; inside the inheriting class/object to put
+state or helpers or other logic associated with the filter."></a>
+                        <a href="DelegateFilter.html" title="A filter as an abstract class, letting you provide a filter instead of
+an op, automatically providing a good .toString for debugging, and
+providing a reasonable &quot;place&quot; inside the inheriting class/object to put
+state or helpers or other logic associated with the filter.">
+                          DelegateFilter
+                        </a>
+                      </li><li class="current-entities indented2">
+                        <span class="separator"></span>
+                        <a class="class" href="Enum.html" title="A small helper class to quickly define enumerations: extend this class in
+your companion object and define the items via val a, b, c = Item(...)
+passing in your enum class constructor in place of ...."></a>
+                        <a href="Enum.html" title="A small helper class to quickly define enumerations: extend this class in
+your companion object and define the items via val a, b, c = Item(...)
+passing in your enum class constructor in place of ....">
+                          Enum
+                        </a>
+                      </li><li class="current-entities indented2">
+                        <span class="separator"></span>
+                        <a class="object" href="Exit$.html" title=""></a>
+                        <a href="Exit$.html" title="">
+                          Exit
+                        </a>
+                      </li><li class="current-entities indented2">
+                        <a class="object" href="Filter$.html" title="Convenience constructors to create Filter instances in a bunch of
+different ways
+"></a>
+                        <a class="trait" href="Filter.html" title="The way you configure your terminal behavior; a trivial wrapper around a
+function, though you should provide a good .toString method to make
+debugging easier."></a>
+                        <a href="Filter.html" title="The way you configure your terminal behavior; a trivial wrapper around a
+function, though you should provide a good .toString method to make
+debugging easier.">
+                          Filter
+                        </a>
+                      </li><li class="current-entities indented2">
+                        <span class="separator"></span>
+                        <a class="object" href="FilterTools$.html" title="A collection of helpers that to simpify the common case of building filters
+"></a>
+                        <a href="FilterTools$.html" title="A collection of helpers that to simpify the common case of building filters
+">
+                          FilterTools
+                        </a>
+                      </li><li class="current-entities indented2">
+                        <a class="object" href="LazyList$.html" title=""></a>
+                        <a class="class" href="LazyList.html" title="A truly-lazy implementation of scala.Stream
+"></a>
+                        <a href="LazyList.html" title="A truly-lazy implementation of scala.Stream
+">
+                          LazyList
+                        </a>
+                      </li><li class="current-entities indented2">
+                        <span class="separator"></span>
+                        <a class="class" href="Printing.html" title=""></a>
+                        <a href="Printing.html" title="">
+                          Printing
+                        </a>
+                      </li><li class="current-entities indented2">
+                        <a class="object" href="Prompt$.html" title=""></a>
+                        <a class="class" href="Prompt.html" title=""></a>
+                        <a href="Prompt.html" title="">
+                          Prompt
+                        </a>
+                      </li><li class="current-entities indented2">
+                        <span class="separator"></span>
+                        <a class="class" href="Result.html" title=""></a>
+                        <a href="Result.html" title="">
+                          Result
+                        </a>
+                      </li><li class="current-entities indented2">
+                        <span class="separator"></span>
+                        <a class="object" href="SpecialKeys$.html" title="One place to assign all the esotic control key input snippets to
+easy-to-remember names
+"></a>
+                        <a href="SpecialKeys$.html" title="One place to assign all the esotic control key input snippets to
+easy-to-remember names
+">
+                          SpecialKeys
+                        </a>
+                      </li><li class="current-entities indented2">
+                        <a class="object" href="Strings$.html" title=""></a>
+                        <a class="class" href="Strings.html" title="Implicitly instantiated class letting you pass in a single string or a
+sequence of strings anywhere a set of prefixes is required
+"></a>
+                        <a href="Strings.html" title="Implicitly instantiated class letting you pass in a single string or a
+sequence of strings anywhere a set of prefixes is required
+">
+                          Strings
+                        </a>
+                      </li><li class="current-entities indented2">
+                        <span class="separator"></span>
+                        <a class="object" href="TTY$.html" title=""></a>
+                        <a href="TTY$.html" title="">
+                          TTY
+                        </a>
+                      </li><li class="current-entities indented2">
+                        <span class="separator"></span>
+                        <a class="trait" href="TermAction.html" title=""></a>
+                        <a href="TermAction.html" title="">
+                          TermAction
+                        </a>
+                      </li><li class="current-entities indented2">
+                        <span class="separator"></span>
+                        <a class="class" href="TermInfo.html" title=""></a>
+                        <a href="TermInfo.html" title="">
+                          TermInfo
+                        </a>
+                      </li><li class="current-entities indented2">
+                        <a class="object" href="TermState$.html" title=""></a>
+                        <a class="class" href="TermState.html" title=""></a>
+                        <a href="TermState.html" title="">
+                          TermState
+                        </a>
+                      </li><li class="current-entities indented2">
+                        <span class="separator"></span>
+                        <a class="object" href="" title="The core logic around a terminal; it defines the base filters API
+through which anything (including basic cursor-navigation and typing)
+interacts with the terminal."></a>
+                        <a href="" title="The core logic around a terminal; it defines the base filters API
+through which anything (including basic cursor-navigation and typing)
+interacts with the terminal.">
+                          Terminal
+                        </a>
+                      </li>
+              </ul>
+            </div>
+          </div>
+          <div id="content">
+            <body class="object value">
+      <div id="definition">
+        <div class="big-circle object">o</div>
+        <p id="owner"><a href="../index.html" class="extype" name="ammonite">ammonite</a>.<a href="index.html" class="extype" name="ammonite.terminal">terminal</a></p>
+        <h1>Terminal<span class="permalink">
+      <a href="../../ammonite/terminal/Terminal$.html" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span></h1>
+        <h3><span class="morelinks"></span></h3>
       </div>
 
       <h4 id="signature" class="signature">
@@ -48,44 +299,56 @@
         <span class="name">Terminal</span>
       </span>
       </h4>
+
       
           <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>The core logic around a terminal; it defines the base <code>filters</code> API
 through which anything (including basic cursor-navigation and typing)
 interacts with the terminal.</p><p>Maintains basic invariants, such as &quot;cursor should always be within
 the buffer&quot;, and &quot;ansi terminal should reflect most up to date TermState&quot;
 </p></div><div class="toggleContainer block">
-          <span class="toggle">Linear Supertypes</span>
-          <div class="superTypes hiddenContent"><a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a>, <a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Any" class="extype" target="_top">Any</a></div>
+          <span class="toggle">
+            Linear Supertypes
+          </span>
+          <div class="superTypes hiddenContent"><a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a>, <a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Any" class="extype" target="_top">Any</a></div>
         </div></div>
         
 
       <div id="mbrsel">
-        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
-        <div id="order">
-              <span class="filtertype">Ordering</span>
-              <ol>
-                
-                <li class="alpha in"><span>Alphabetic</span></li>
-                <li class="inherit out"><span>By Inheritance</span></li>
-              </ol>
-            </div>
-        <div id="ancestors">
-                <span class="filtertype">Inherited<br />
-                </span>
-                <ol id="linearization">
-                  <li class="in" name="ammonite.terminal.Terminal"><span>Terminal</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
-                </ol>
-              </div><div id="ancestors">
-            <span class="filtertype"></span>
+        <div class="toggle"></div>
+        <div id="memberfilter">
+          <i class="material-icons arrow"></i>
+          <span class="input">
+            <input id="mbrsel-input" placeholder="Filter all members" type="text" accesskey="/" />
+          </span>
+          <i class="clear material-icons"></i>
+        </div>
+        <div id="filterby">
+          <div id="order">
+            <span class="filtertype">Ordering</span>
             <ol>
-              <li class="hideall out"><span>Hide All</span></li>
-              <li class="showall in"><span>Show All</span></li>
+              
+              <li class="alpha in"><span>Alphabetic</span></li>
+              <li class="inherit out"><span>By Inheritance</span></li>
             </ol>
           </div>
-        <div id="visbl">
-            <span class="filtertype">Visibility</span>
-            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
-          </div>
+          <div class="ancestors">
+                  <span class="filtertype">Inherited<br />
+                  </span>
+                  <ol id="linearization">
+                    <li class="in" name="ammonite.terminal.Terminal"><span>Terminal</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                  </ol>
+                </div><div class="ancestors">
+              <span class="filtertype"></span>
+              <ol>
+                <li class="hideall out"><span>Hide All</span></li>
+                <li class="showall in"><span>Show All</span></li>
+              </ol>
+            </div>
+          <div id="visbl">
+              <span class="filtertype">Visibility</span>
+              <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+            </div>
+        </div>
       </div>
 
       <div id="template">
@@ -94,102 +357,101 @@ the buffer&quot;, and &quot;ansi terminal should reflect most up to date TermSta
 
         <div id="types" class="types members">
               <h3>Type Members</h3>
-              <ol><li name="ammonite.terminal.Terminal.Action" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="Action=(Vector[Char],Int)=&gt;(Vector[Char],Int)"></a>
-      <a id="Action:Action"></a>
-      <h4 class="signature">
+              <ol><li name="ammonite.terminal.Terminal.Action" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Action=(Vector[Char],Int)=&gt;(Vector[Char],Int)"></a><a id="Action:Action"></a>
+      <span class="permalink">
+      <a href="../../ammonite/terminal/Terminal$.html#Action=(Vector[Char],Int)=&gt;(Vector[Char],Int)" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">type</span>
       </span>
       <span class="symbol">
-        <span class="name">Action</span><span class="result"> = (<span class="extype" name="scala.Vector">Vector</span>[<a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Char" class="extype" target="_top">Char</a>], <a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a>) ⇒ (<span class="extype" name="scala.Vector">Vector</span>[<a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Char" class="extype" target="_top">Char</a>], <a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a>)</span>
+        <span class="name">Action</span><span class="result alias"> = (<span class="extype" name="scala.Vector">Vector</span>[<a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Char" class="extype" target="_top">Char</a>], <a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Int" class="extype" target="_top">Int</a>) ⇒ (<span class="extype" name="scala.Vector">Vector</span>[<a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Char" class="extype" target="_top">Char</a>], <a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Int" class="extype" target="_top">Int</a>)</span>
       </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Terminal$@Action=(Vector[Char],Int)=&gt;(Vector[Char],Int)" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
       
-    </li><li name="ammonite.terminal.Terminal.MsgAction" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="MsgAction=(Vector[Char],Int)=&gt;(Vector[Char],Int,String)"></a>
-      <a id="MsgAction:MsgAction"></a>
-      <h4 class="signature">
+      
+    </li><li name="ammonite.terminal.Terminal.MsgAction" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="MsgAction=(Vector[Char],Int)=&gt;(Vector[Char],Int,String)"></a><a id="MsgAction:MsgAction"></a>
+      <span class="permalink">
+      <a href="../../ammonite/terminal/Terminal$.html#MsgAction=(Vector[Char],Int)=&gt;(Vector[Char],Int,String)" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">type</span>
       </span>
       <span class="symbol">
-        <span class="name">MsgAction</span><span class="result"> = (<span class="extype" name="scala.Vector">Vector</span>[<a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Char" class="extype" target="_top">Char</a>], <a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a>) ⇒ (<span class="extype" name="scala.Vector">Vector</span>[<a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Char" class="extype" target="_top">Char</a>], <a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a>, <span class="extype" name="scala.Predef.String">String</span>)</span>
+        <span class="name">MsgAction</span><span class="result alias"> = (<span class="extype" name="scala.Vector">Vector</span>[<a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Char" class="extype" target="_top">Char</a>], <a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Int" class="extype" target="_top">Int</a>) ⇒ (<span class="extype" name="scala.Vector">Vector</span>[<a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Char" class="extype" target="_top">Char</a>], <a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Int" class="extype" target="_top">Int</a>, <span class="extype" name="scala.Predef.String">String</span>)</span>
       </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Terminal$@MsgAction=(Vector[Char],Int)=&gt;(Vector[Char],Int,String)" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
+      
       
     </li></ol>
             </div>
 
         
 
-        <div id="values" class="values members">
+        <div class="values members">
               <h3>Value Members</h3>
-              <ol><li name="scala.AnyRef#!=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="!=(x$1:Any):Boolean"></a>
-      <a id="!=(Any):Boolean"></a>
-      <h4 class="signature">
+              <ol>
+                <li name="scala.AnyRef#!=" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="!=(x$1:Any):Boolean"></a><a id="!=(Any):Boolean"></a>
+      <span class="permalink">
+      <a href="../../ammonite/terminal/Terminal$.html#!=(x$1:Any):Boolean" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
       <span class="modifier_kind">
         <span class="modifier">final </span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Any" class="extype" target="_top">Any</a></span>)</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Any" class="extype" target="_top">Any</a></span>)</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
       </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Terminal$@!=(x$1:Any):Boolean" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
+      
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="scala.AnyRef###" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+    </li><li name="scala.AnyRef###" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="##():Int"></a>
-      <a id="##():Int"></a>
-      <h4 class="signature">
+      <span class="permalink">
+      <a href="../../ammonite/terminal/Terminal$.html###():Int" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
       <span class="modifier_kind">
         <span class="modifier">final </span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span title="gt4s: $hash$hash" class="name">##</span><span class="params">()</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a></span>
+        <span title="gt4s: $hash$hash" class="name">##</span><span class="params">()</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Int" class="extype" target="_top">Int</a></span>
       </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Terminal$@##():Int" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#==" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="==(x$1:Any):Boolean"></a><a id="==(Any):Boolean"></a>
+      <span class="permalink">
+      <a href="../../ammonite/terminal/Terminal$.html#==(x$1:Any):Boolean" title="Permalink">
+        <i class="material-icons"></i>
       </a>
     </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="scala.AnyRef#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="==(x$1:Any):Boolean"></a>
-      <a id="==(Any):Boolean"></a>
-      <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier">final </span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Any" class="extype" target="_top">Any</a></span>)</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Any" class="extype" target="_top">Any</a></span>)</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
       </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Terminal$@==(x$1:Any):Boolean" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.Any#asInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="asInstanceOf[T0]:T0"></a>
+      <span class="permalink">
+      <a href="../../ammonite/terminal/Terminal$.html#asInstanceOf[T0]:T0" title="Permalink">
+        <i class="material-icons"></i>
       </a>
     </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="asInstanceOf[T0]:T0"></a>
-      <a id="asInstanceOf[T0]:T0"></a>
-      <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier">final </span>
         <span class="kind">def</span>
@@ -197,63 +459,56 @@ the buffer&quot;, and &quot;ansi terminal should reflect most up to date TermSta
       <span class="symbol">
         <span class="name">asInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Any.asInstanceOf.T0">T0</span></span>
       </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Terminal$@asInstanceOf[T0]:T0" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="ammonite.terminal.Terminal#calculateHeight" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="calculateHeight(buffer:Vector[Char],width:Int,prompt:String):Seq[Int]"></a>
-      <a id="calculateHeight(Vector[Char],Int,String):Seq[Int]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">calculateHeight</span><span class="params">(<span name="buffer">buffer: <span class="extype" name="scala.Vector">Vector</span>[<a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Char" class="extype" target="_top">Char</a>]</span>, <span name="width">width: <a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a></span>, <span name="prompt">prompt: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Seq">Seq</span>[<a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a>]</span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Terminal$@calculateHeight(buffer:Vector[Char],width:Int,prompt:String):Seq[Int]" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
       
-    </li><li name="ammonite.terminal.Terminal#calculateHeight0" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="calculateHeight0(rowLengths:Seq[Int],width:Int):Seq[Int]"></a>
-      <a id="calculateHeight0(Seq[Int],Int):Seq[Int]"></a>
-      <h4 class="signature">
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="ammonite.terminal.Terminal#calculateHeight" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="calculateHeight(buffer:Vector[Char],width:Int,prompt:String):Seq[Int]"></a><a id="calculateHeight(Vector[Char],Int,String):Seq[Int]"></a>
+      <span class="permalink">
+      <a href="../../ammonite/terminal/Terminal$.html#calculateHeight(buffer:Vector[Char],width:Int,prompt:String):Seq[Int]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">calculateHeight0</span><span class="params">(<span name="rowLengths">rowLengths: <span class="extype" name="scala.Seq">Seq</span>[<a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a>]</span>, <span name="width">width: <a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a></span>)</span><span class="result">: <span class="extype" name="scala.Seq">Seq</span>[<a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a>]</span>
+        <span class="name">calculateHeight</span><span class="params">(<span name="buffer">buffer: <span class="extype" name="scala.Vector">Vector</span>[<a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Char" class="extype" target="_top">Char</a>]</span>, <span name="width">width: <a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Int" class="extype" target="_top">Int</a></span>, <span name="prompt">prompt: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Seq">Seq</span>[<a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Int" class="extype" target="_top">Int</a>]</span>
       </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Terminal$@calculateHeight0(rowLengths:Seq[Int],width:Int):Seq[Int]" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
+      
+      
+    </li><li name="ammonite.terminal.Terminal#calculateHeight0" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="calculateHeight0(rowLengths:Seq[Int],width:Int):Seq[Int]"></a><a id="calculateHeight0(Seq[Int],Int):Seq[Int]"></a>
+      <span class="permalink">
+      <a href="../../ammonite/terminal/Terminal$.html#calculateHeight0(rowLengths:Seq[Int],width:Int):Seq[Int]" title="Permalink">
+        <i class="material-icons"></i>
       </a>
     </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">calculateHeight0</span><span class="params">(<span name="rowLengths">rowLengths: <span class="extype" name="scala.Seq">Seq</span>[<a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Int" class="extype" target="_top">Int</a>]</span>, <span name="width">width: <a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Int" class="extype" target="_top">Int</a></span>)</span><span class="result">: <span class="extype" name="scala.Seq">Seq</span>[<a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Int" class="extype" target="_top">Int</a>]</span>
+      </span>
+      
       <p class="shortcomment cmt">Given a buffer with characters and newlines, calculates how high
 the buffer is and where the cursor goes inside of it.</p>
-    </li><li name="scala.AnyRef#clone" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="clone():Object"></a>
-      <a id="clone():AnyRef"></a>
-      <h4 class="signature">
+    </li><li name="scala.AnyRef#clone" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="clone():Object"></a><a id="clone():AnyRef"></a>
+      <span class="permalink">
+      <a href="../../ammonite/terminal/Terminal$.html#clone():Object" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">clone</span><span class="params">()</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>
+        <span class="name">clone</span><span class="params">()</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>
       </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Terminal$@clone():Object" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
+      
       <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
                 <span class="name">@throws</span><span class="args">(<span>
       
@@ -261,56 +516,53 @@ the buffer is and where the cursor goes inside of it.</p>
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="eq(x$1:AnyRef):Boolean"></a>
-      <a id="eq(AnyRef):Boolean"></a>
-      <h4 class="signature">
+    </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
+      <span class="permalink">
+      <a href="../../ammonite/terminal/Terminal$.html#eq(x$1:AnyRef):Boolean" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
       <span class="modifier_kind">
         <span class="modifier">final </span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">eq</span><span class="params">(<span name="arg0">arg0: <a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>)</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
+        <span class="name">eq</span><span class="params">(<span name="arg0">arg0: <a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>)</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
       </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Terminal$@eq(x$1:AnyRef):Boolean" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
+      
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="scala.AnyRef#equals" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="equals(x$1:Any):Boolean"></a>
-      <a id="equals(Any):Boolean"></a>
-      <h4 class="signature">
+    </li><li name="scala.AnyRef#equals" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="equals(x$1:Any):Boolean"></a><a id="equals(Any):Boolean"></a>
+      <span class="permalink">
+      <a href="../../ammonite/terminal/Terminal$.html#equals(x$1:Any):Boolean" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Any" class="extype" target="_top">Any</a></span>)</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
+        <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Any" class="extype" target="_top">Any</a></span>)</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
       </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Terminal$@equals(x$1:Any):Boolean" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
+      
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="scala.AnyRef#finalize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+    </li><li name="scala.AnyRef#finalize" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
-      <a id="finalize():Unit"></a>
-      <h4 class="signature">
+      <span class="permalink">
+      <a href="../../ammonite/terminal/Terminal$.html#finalize():Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">finalize</span><span class="params">()</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
+        <span class="name">finalize</span><span class="params">()</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
       </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Terminal$@finalize():Unit" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
+      
       <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
                 <span class="name">@throws</span><span class="args">(<span>
       
@@ -318,22 +570,21 @@ the buffer is and where the cursor goes inside of it.</p>
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="ammonite.terminal.Terminal#fragHeight" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="fragHeight(length:Int,width:Int):Int"></a>
-      <a id="fragHeight(Int,Int):Int"></a>
-      <h4 class="signature">
+    </li><li name="ammonite.terminal.Terminal#fragHeight" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="fragHeight(length:Int,width:Int):Int"></a><a id="fragHeight(Int,Int):Int"></a>
+      <span class="permalink">
+      <a href="../../ammonite/terminal/Terminal$.html#fragHeight(length:Int,width:Int):Int" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">fragHeight</span><span class="params">(<span name="length">length: <a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a></span>, <span name="width">width: <a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a></span>)</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a></span>
+        <span class="name">fragHeight</span><span class="params">(<span name="length">length: <a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Int" class="extype" target="_top">Int</a></span>, <span name="width">width: <a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Int" class="extype" target="_top">Int</a></span>)</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Int" class="extype" target="_top">Int</a></span>
       </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Terminal$@fragHeight(length:Int,width:Int):Int" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
+      
       <p class="shortcomment cmt">Computes how tall a line of text is when wrapped at <code>width</code>.</p><div class="fullcomment"><div class="comment cmt"><p>Computes how tall a line of text is when wrapped at <code>width</code>.</p><p>Even 0-character lines still take up one row!</p><p>width = 2
 0 -&gt; 1
 1 -&gt; 1
@@ -342,10 +593,13 @@ the buffer is and where the cursor goes inside of it.</p>
 4 -&gt; 2
 5 -&gt; 3
 </p></div></div>
-    </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+    </li><li name="scala.AnyRef#getClass" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
-      <a id="getClass():Class[_]"></a>
-      <h4 class="signature">
+      <span class="permalink">
+      <a href="../../ammonite/terminal/Terminal$.html#getClass():Class[_]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
       <span class="modifier_kind">
         <span class="modifier">final </span>
         <span class="kind">def</span>
@@ -353,173 +607,163 @@ the buffer is and where the cursor goes inside of it.</p>
       <span class="symbol">
         <span class="name">getClass</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.Class">Class</span>[_]</span>
       </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Terminal$@getClass():Class[_]" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#hashCode" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="hashCode():Int"></a>
+      <span class="permalink">
+      <a href="../../ammonite/terminal/Terminal$.html#hashCode():Int" title="Permalink">
+        <i class="material-icons"></i>
       </a>
     </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="scala.AnyRef#hashCode" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="hashCode():Int"></a>
-      <a id="hashCode():Int"></a>
-      <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">hashCode</span><span class="params">()</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a></span>
+        <span class="name">hashCode</span><span class="params">()</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Int" class="extype" target="_top">Int</a></span>
       </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Terminal$@hashCode():Int" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.Any#isInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <span class="permalink">
+      <a href="../../ammonite/terminal/Terminal$.html#isInstanceOf[T0]:Boolean" title="Permalink">
+        <i class="material-icons"></i>
       </a>
     </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="isInstanceOf[T0]:Boolean"></a>
-      <a id="isInstanceOf[T0]:Boolean"></a>
-      <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier">final </span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">isInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
+        <span class="name">isInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
       </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Terminal$@isInstanceOf[T0]:Boolean" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
+      
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="ne(x$1:AnyRef):Boolean"></a>
-      <a id="ne(AnyRef):Boolean"></a>
-      <h4 class="signature">
+    </li><li name="scala.AnyRef#ne" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
+      <span class="permalink">
+      <a href="../../ammonite/terminal/Terminal$.html#ne(x$1:AnyRef):Boolean" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
       <span class="modifier_kind">
         <span class="modifier">final </span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">ne</span><span class="params">(<span name="arg0">arg0: <a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>)</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
+        <span class="name">ne</span><span class="params">(<span name="arg0">arg0: <a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>)</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
       </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Terminal$@ne(x$1:AnyRef):Boolean" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="ammonite.terminal.Terminal#noTransform" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="noTransform(x:Vector[Char],i:Int):(fansi.Str,Int)"></a>
-      <a id="noTransform(Vector[Char],Int):(Str,Int)"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">noTransform</span><span class="params">(<span name="x">x: <span class="extype" name="scala.Vector">Vector</span>[<a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Char" class="extype" target="_top">Char</a>]</span>, <span name="i">i: <a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a></span>)</span><span class="result">: (<span class="extype" name="fansi.Str">Str</span>, <a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a>)</span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Terminal$@noTransform(x:Vector[Char],i:Int):(fansi.Str,Int)" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
       
-    </li><li name="scala.AnyRef#notify" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="notify():Unit"></a>
-      <a id="notify():Unit"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier">final </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">notify</span><span class="params">()</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Terminal$@notify():Unit" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="ammonite.terminal.Terminal#noTransform" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="noTransform(x:Vector[Char],i:Int):(fansi.Str,Int)"></a><a id="noTransform(Vector[Char],Int):(Str,Int)"></a>
+      <span class="permalink">
+      <a href="../../ammonite/terminal/Terminal$.html#noTransform(x:Vector[Char],i:Int):(fansi.Str,Int)" title="Permalink">
+        <i class="material-icons"></i>
       </a>
     </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="scala.AnyRef#notifyAll" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="notifyAll():Unit"></a>
-      <a id="notifyAll():Unit"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier">final </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">notifyAll</span><span class="params">()</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Terminal$@notifyAll():Unit" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="ammonite.terminal.Terminal#positionCursor" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="positionCursor(cursor:Int,rowLengths:Seq[Int],fragHeights:Seq[Int],width:Int):(Int,Int)"></a>
-      <a id="positionCursor(Int,Seq[Int],Seq[Int],Int):(Int,Int)"></a>
-      <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">positionCursor</span><span class="params">(<span name="cursor">cursor: <a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a></span>, <span name="rowLengths">rowLengths: <span class="extype" name="scala.Seq">Seq</span>[<a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a>]</span>, <span name="fragHeights">fragHeights: <span class="extype" name="scala.Seq">Seq</span>[<a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a>]</span>, <span name="width">width: <a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a></span>)</span><span class="result">: (<a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a>, <a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a>)</span>
+        <span class="name">noTransform</span><span class="params">(<span name="x">x: <span class="extype" name="scala.Vector">Vector</span>[<a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Char" class="extype" target="_top">Char</a>]</span>, <span name="i">i: <a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Int" class="extype" target="_top">Int</a></span>)</span><span class="result">: (<span class="extype" name="fansi.Str">Str</span>, <a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Int" class="extype" target="_top">Int</a>)</span>
       </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Terminal$@positionCursor(cursor:Int,rowLengths:Seq[Int],fragHeights:Seq[Int],width:Int):(Int,Int)" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
       
-    </li><li name="ammonite.terminal.Terminal#readLine" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="readLine(prompt:ammonite.terminal.Prompt,reader:java.io.Reader,writer:java.io.Writer,filters:ammonite.terminal.Filter,displayTransform:(Vector[Char],Int)=&gt;(fansi.Str,Int)):Option[String]"></a>
-      <a id="readLine(Prompt,Reader,Writer,Filter,(Vector[Char],Int)⇒(Str,Int)):Option[String]"></a>
-      <h4 class="signature">
+      
+    </li><li name="scala.AnyRef#notify" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notify():Unit"></a>
+      <span class="permalink">
+      <a href="../../ammonite/terminal/Terminal$.html#notify():Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notify</span><span class="params">()</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notifyAll" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notifyAll():Unit"></a>
+      <span class="permalink">
+      <a href="../../ammonite/terminal/Terminal$.html#notifyAll():Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notifyAll</span><span class="params">()</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="ammonite.terminal.Terminal#positionCursor" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="positionCursor(cursor:Int,rowLengths:Seq[Int],fragHeights:Seq[Int],width:Int):(Int,Int)"></a><a id="positionCursor(Int,Seq[Int],Seq[Int],Int):(Int,Int)"></a>
+      <span class="permalink">
+      <a href="../../ammonite/terminal/Terminal$.html#positionCursor(cursor:Int,rowLengths:Seq[Int],fragHeights:Seq[Int],width:Int):(Int,Int)" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">readLine</span><span class="params">(<span name="prompt">prompt: <a href="Prompt.html" class="extype" name="ammonite.terminal.Prompt">Prompt</a></span>, <span name="reader">reader: <span class="extype" name="java.io.Reader">Reader</span></span>, <span name="writer">writer: <span class="extype" name="java.io.Writer">Writer</span></span>, <span name="filters">filters: <a href="Filter.html" class="extype" name="ammonite.terminal.Filter">Filter</a></span>, <span name="displayTransform">displayTransform: (<span class="extype" name="scala.Vector">Vector</span>[<a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Char" class="extype" target="_top">Char</a>], <a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a>) ⇒ (<span class="extype" name="fansi.Str">Str</span>, <a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a>) = <span class="symbol"><span class="name"><a href="#noTransform(x:Vector[Char],i:Int):(fansi.Str,Int)">noTransform</a></span></span></span>)</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Option" class="extype" target="_top">Option</a>[<span class="extype" name="scala.Predef.String">String</span>]</span>
+        <span class="name">positionCursor</span><span class="params">(<span name="cursor">cursor: <a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Int" class="extype" target="_top">Int</a></span>, <span name="rowLengths">rowLengths: <span class="extype" name="scala.Seq">Seq</span>[<a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Int" class="extype" target="_top">Int</a>]</span>, <span name="fragHeights">fragHeights: <span class="extype" name="scala.Seq">Seq</span>[<a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Int" class="extype" target="_top">Int</a>]</span>, <span name="width">width: <a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Int" class="extype" target="_top">Int</a></span>)</span><span class="result">: (<a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Int" class="extype" target="_top">Int</a>, <a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Int" class="extype" target="_top">Int</a>)</span>
       </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Terminal$@readLine(prompt:ammonite.terminal.Prompt,reader:java.io.Reader,writer:java.io.Writer,filters:ammonite.terminal.Filter,displayTransform:(Vector[Char],Int)=&gt;(fansi.Str,Int)):Option[String]" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
+      
+      
+    </li><li name="ammonite.terminal.Terminal#readLine" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="readLine(prompt:ammonite.terminal.Prompt,reader:java.io.Reader,writer:java.io.Writer,filters:ammonite.terminal.Filter,displayTransform:(Vector[Char],Int)=&gt;(fansi.Str,Int)):Option[String]"></a><a id="readLine(Prompt,Reader,Writer,Filter,(Vector[Char],Int)⇒(Str,Int)):Option[String]"></a>
+      <span class="permalink">
+      <a href="../../ammonite/terminal/Terminal$.html#readLine(prompt:ammonite.terminal.Prompt,reader:java.io.Reader,writer:java.io.Writer,filters:ammonite.terminal.Filter,displayTransform:(Vector[Char],Int)=&gt;(fansi.Str,Int)):Option[String]" title="Permalink">
+        <i class="material-icons"></i>
       </a>
     </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">readLine</span><span class="params">(<span name="prompt">prompt: <a href="Prompt.html" class="extype" name="ammonite.terminal.Prompt">Prompt</a></span>, <span name="reader">reader: <span class="extype" name="java.io.Reader">Reader</span></span>, <span name="writer">writer: <span class="extype" name="java.io.Writer">Writer</span></span>, <span name="filters">filters: <a href="Filter.html" class="extype" name="ammonite.terminal.Filter">Filter</a></span>, <span name="displayTransform">displayTransform: (<span class="extype" name="scala.Vector">Vector</span>[<a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Char" class="extype" target="_top">Char</a>], <a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Int" class="extype" target="_top">Int</a>) ⇒ (<span class="extype" name="fansi.Str">Str</span>, <a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Int" class="extype" target="_top">Int</a>) = <span class="symbol"><span class="name"><a href="#noTransform(x:Vector[Char],i:Int):(fansi.Str,Int)">noTransform</a></span></span></span>)</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Option" class="extype" target="_top">Option</a>[<span class="extype" name="scala.Predef.String">String</span>]</span>
+      </span>
+      
       <p class="shortcomment cmt">Blockingly reads a line from the given input stream and returns it.</p><div class="fullcomment"><div class="comment cmt"><p>Blockingly reads a line from the given input stream and returns it.
 </p></div><dl class="paramcmts block"><dt class="param">prompt</dt><dd class="cmt"><p>The prompt to display when requesting input</p></dd><dt class="param">reader</dt><dd class="cmt"><p>The input-stream where characters come in, e.g. System.in</p></dd><dt class="param">writer</dt><dd class="cmt"><p>The output-stream where print-outs go, e.g. System.out</p></dd><dt class="param">filters</dt><dd class="cmt"><p>A set of actions that can be taken depending on the input,
                to manipulate the internal state of the terminal.</p></dd><dt class="param">displayTransform</dt><dd class="cmt"><p>code to manipulate the display of the buffer and
                         cursor, without actually changing the logical
                         values inside them.</p></dd></dl></div>
-    </li><li name="ammonite.terminal.Terminal#splitBuffer" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="splitBuffer(buffer:Vector[Char]):scala.collection.mutable.Buffer[Int]"></a>
-      <a id="splitBuffer(Vector[Char]):Buffer[Int]"></a>
-      <h4 class="signature">
+    </li><li name="ammonite.terminal.Terminal#splitBuffer" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="splitBuffer(buffer:Vector[Char]):scala.collection.mutable.Buffer[Int]"></a><a id="splitBuffer(Vector[Char]):Buffer[Int]"></a>
+      <span class="permalink">
+      <a href="../../ammonite/terminal/Terminal$.html#splitBuffer(buffer:Vector[Char]):scala.collection.mutable.Buffer[Int]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">splitBuffer</span><span class="params">(<span name="buffer">buffer: <span class="extype" name="scala.Vector">Vector</span>[<a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Char" class="extype" target="_top">Char</a>]</span>)</span><span class="result">: <span class="extype" name="scala.collection.mutable.Buffer">Buffer</span>[<a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a>]</span>
+        <span class="name">splitBuffer</span><span class="params">(<span name="buffer">buffer: <span class="extype" name="scala.Vector">Vector</span>[<a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Char" class="extype" target="_top">Char</a>]</span>)</span><span class="result">: <span class="extype" name="scala.collection.mutable.Buffer">Buffer</span>[<a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Int" class="extype" target="_top">Int</a>]</span>
       </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Terminal$@splitBuffer(buffer:Vector[Char]):scala.collection.mutable.Buffer[Int]" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
+      
+      
+    </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
+      <span class="permalink">
+      <a href="../../ammonite/terminal/Terminal$.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
+        <i class="material-icons"></i>
       </a>
     </span>
-      
-    </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
-      <a id="synchronized[T0](⇒T0):T0"></a>
-      <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier">final </span>
         <span class="kind">def</span>
@@ -527,16 +771,15 @@ the buffer is and where the cursor goes inside of it.</p>
       <span class="symbol">
         <span class="name">synchronized</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="params">(<span name="arg0">arg0: ⇒ <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>)</span><span class="result">: <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>
       </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Terminal$@synchronized[T0](x$1:=&gt;T0):T0" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#toString" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="toString():String"></a>
+      <span class="permalink">
+      <a href="../../ammonite/terminal/Terminal$.html#toString():String" title="Permalink">
+        <i class="material-icons"></i>
       </a>
     </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="scala.AnyRef#toString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="toString():String"></a>
-      <a id="toString():String"></a>
-      <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
@@ -544,28 +787,23 @@ the buffer is and where the cursor goes inside of it.</p>
       <span class="symbol">
         <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
       </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Terminal$@toString():String" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
+      
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+    </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
-      <a id="wait():Unit"></a>
-      <h4 class="signature">
+      <span class="permalink">
+      <a href="../../ammonite/terminal/Terminal$.html#wait():Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
       <span class="modifier_kind">
         <span class="modifier">final </span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">wait</span><span class="params">()</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
+        <span class="name">wait</span><span class="params">()</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
       </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Terminal$@wait():Unit" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
+      
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
                 <span class="name">@throws</span><span class="args">(<span>
       
@@ -573,22 +811,21 @@ the buffer is and where the cursor goes inside of it.</p>
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="wait(x$1:Long,x$2:Int):Unit"></a>
-      <a id="wait(Long,Int):Unit"></a>
-      <h4 class="signature">
+    </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long,x$2:Int):Unit"></a><a id="wait(Long,Int):Unit"></a>
+      <span class="permalink">
+      <a href="../../ammonite/terminal/Terminal$.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
       <span class="modifier_kind">
         <span class="modifier">final </span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Long" class="extype" target="_top">Long</a></span>, <span name="arg1">arg1: <a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Int" class="extype" target="_top">Int</a></span>)</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Long" class="extype" target="_top">Long</a></span>, <span name="arg1">arg1: <a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Int" class="extype" target="_top">Int</a></span>)</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
       </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Terminal$@wait(x$1:Long,x$2:Int):Unit" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
+      
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
                 <span class="name">@throws</span><span class="args">(<span>
       
@@ -596,22 +833,21 @@ the buffer is and where the cursor goes inside of it.</p>
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="wait(x$1:Long):Unit"></a>
-      <a id="wait(Long):Unit"></a>
-      <h4 class="signature">
+    </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long):Unit"></a><a id="wait(Long):Unit"></a>
+      <span class="permalink">
+      <a href="../../ammonite/terminal/Terminal$.html#wait(x$1:Long):Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
       <span class="modifier_kind">
         <span class="modifier">final </span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Long" class="extype" target="_top">Long</a></span>)</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Long" class="extype" target="_top">Long</a></span>)</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
       </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#ammonite.terminal.Terminal$@wait(x$1:Long):Unit" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
+      
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
                 <span class="name">@throws</span><span class="args">(<span>
       
@@ -619,7 +855,8 @@ the buffer is and where the cursor goes inside of it.</p>
     </span>)</span>
               
         </dd></dl></div>
-    </li></ol>
+    </li>
+              </ol>
             </div>
 
         
@@ -629,9 +866,9 @@ the buffer is and where the cursor goes inside of it.</p>
 
         <div id="inheritedMembers">
         <div class="parent" name="scala.AnyRef">
-              <h3>Inherited from <a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></h3>
+              <h3>Inherited from <a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></h3>
             </div><div class="parent" name="scala.Any">
-              <h3>Inherited from <a href="http://scala-lang.org/files/archive/api/2.11.8/index.html#scala.Any" class="extype" target="_top">Any</a></h3>
+              <h3>Inherited from <a href="http://scala-lang.org/files/archive/api/2.12.0/index.html#scala.Any" class="extype" target="_top">Any</a></h3>
             </div>
         
         </div>
@@ -648,7 +885,9 @@ the buffer is and where the cursor goes inside of it.</p>
       <div id="tooltip"></div>
 
       <div id="footer">  </div>
-
-
+    </body>
+          </div>
+        </div>
+      </div>
     </body>
       </html>
