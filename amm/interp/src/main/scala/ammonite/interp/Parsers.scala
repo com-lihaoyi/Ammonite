@@ -1,4 +1,4 @@
-package ammonite.runtime
+package ammonite.interp
 
 object Parsers {
 

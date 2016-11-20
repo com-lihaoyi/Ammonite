@@ -2,6 +2,7 @@ package ammonite.repl
 
 import java.io.File
 
+import ammonite.interp.{Interpreter, Preprocessor}
 import ammonite.runtime._
 import ammonite.ops.{Path, read}
 import ammonite.util.Util._

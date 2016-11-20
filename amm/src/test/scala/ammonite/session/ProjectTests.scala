@@ -76,7 +76,7 @@ object ProjectTests extends TestSuite{
               @ import $ivy.`com.ambiata::mundane:1.2.1-20141230225616-50fc792`
               error: IvyResolutionException
 
-              @ import ammonite._, Resolvers._
+              @ import Resolvers._
 
               @ val oss = Resolver.Http(
               @   "ambiata-oss",

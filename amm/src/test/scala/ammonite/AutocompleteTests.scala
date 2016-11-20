@@ -1,7 +1,7 @@
 package ammonite
 
 import ammonite.TestUtils._
-import ammonite.runtime.Preprocessor
+import ammonite.interp.Preprocessor
 import utest._
 
 

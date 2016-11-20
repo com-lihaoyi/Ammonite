@@ -1,10 +1,11 @@
-package ammonite.runtime
+package ammonite.interp
 
 import java.io.{File, OutputStream, PrintStream}
 
 import scala.collection.mutable
 import scala.tools.nsc.Settings
 import ammonite.ops._
+import ammonite.runtime._
 import fastparse.all._
 
 import annotation.tailrec

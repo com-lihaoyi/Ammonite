@@ -1,7 +1,8 @@
 package ammonite.repl
 
 import acyclic.file
-import ammonite.runtime.Parsers
+import ammonite.interp.Parsers
+
 import fastparse.all._
 
 import scalaparse.Scala._

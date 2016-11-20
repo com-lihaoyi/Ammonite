@@ -1,4 +1,4 @@
-package ammonite.runtime
+package ammonite.interp
 
 
 import scala.tools.nsc.Global

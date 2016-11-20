@@ -1,6 +1,7 @@
 package ammonite
 
-import ammonite.runtime.{History, Interpreter, Storage}
+import ammonite.runtime.{History, Storage}
+import ammonite.interp.Interpreter
 import ammonite.main.Defaults
 import ammonite.ops._
 import ammonite.runtime.tools.IvyConstructor._
@@ -140,7 +141,7 @@ object CachingTests extends TestSuite{
         """)
       val scriptFile = tmp("""div("<('.'<)", y).render""")
 
-      def processAndCheckCompiler(f: ammonite.runtime.Compiler => Boolean) ={
+      def processAndCheckCompiler(f: ammonite.interp.Compiler => Boolean) ={
         val interp = createTestInterp(
           new Storage.Folder(tempDir){
             override val predef = predefFile

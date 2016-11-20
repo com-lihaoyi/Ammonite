@@ -1,4 +1,4 @@
-package ammonite.runtime
+package ammonite.interp
 
 import acyclic.file
 import ammonite._

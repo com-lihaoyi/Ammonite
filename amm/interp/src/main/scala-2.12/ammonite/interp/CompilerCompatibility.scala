@@ -1,5 +1,6 @@
-package ammonite.runtime
+package ammonite.interp
 
+import ammonite.runtime.Classpath
 import ammonite.util.ImportData
 
 import scala.reflect.internal.util.Position

@@ -1,4 +1,4 @@
-package ammonite.runtime
+package ammonite.interp
 
 import ammonite.util.ImportData
 
@@ -15,6 +15,7 @@ import scala.tools.nsc.util._
 import scala.reflect.io._
 import scala.tools.nsc
 import scala.tools.nsc.backend.JavaPlatform
+import ammonite.runtime.Classpath
 object GlobalInitCompat {
   def initInteractiveGlobal(settings: Settings,
                             reporter: AbstractReporter,
@@ -40,7 +41,9 @@ object GlobalInitCompat {
                  importsLen: => Int,
                  updateLastImports: Seq[ImportData] => Unit): nsc.Global = {
     new nsc.Global(settings, reporter) { g =>
-      override lazy val plugins = List(new AmmonitePlugin(g, updateLastImports, importsLen)) ++ {
+      override lazy val plugins = List(
+        new ammonite.interp.AmmonitePlugin(g, updateLastImports, importsLen)
+      ) ++ {
         for {
           (name, cls) <- plugins0
           plugin = Plugin.instantiate(cls, g)

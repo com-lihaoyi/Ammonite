@@ -8,7 +8,7 @@ import ammonite.terminal._
 import fastparse.core.Parsed
 import acyclic.file
 import ammonite.util.{Colors, Res}
-import ammonite.runtime.Parsers
+import ammonite.interp.Parsers
 case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEnd{
 
   def width = FrontEndUtils.width

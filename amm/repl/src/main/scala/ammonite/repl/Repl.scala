@@ -7,6 +7,8 @@ import ammonite.terminal.Filter
 import ammonite.util.Util.newLine
 import ammonite.util._
 import acyclic.file
+import ammonite.interp.{Interpreter, Preprocessor}
+
 import scala.annotation.tailrec
 
 class Repl(input: InputStream,

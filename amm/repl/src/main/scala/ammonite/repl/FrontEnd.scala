@@ -6,7 +6,7 @@ import fastparse.core.Parsed
 import jline.console.{ConsoleReader, completer}
 import acyclic.file
 import ammonite.util.{Colors, Catching, Res}
-import ammonite.runtime.Parsers
+import ammonite.interp.Parsers
 import ammonite.util.Util.newLine
 
 import scala.annotation.tailrec
