@@ -530,3 +530,30 @@
         traverse the filesystem and work on multiple files all within the same
         process, which avoids duplicating the startup overhead on all the files
         you are manipulating.
+
+
+    @sect{SBT Integration}
+      @p
+        If you have an existing SBT project and you'd like to access those
+        classes from an ammonite script, you can achieve this by running
+        your script through SBT itself. This requires adding ammonite to your
+        SBT project and creating a "bridge" class to pass arguments from SBT
+        into an ammonite @hl.scala{Main} class.
+
+      @p
+        Add the ammonite dependency to @code{build.sbt}:
+
+      @hl.scala
+        libraryDependencies += "com.lihaoyi" % "ammonite" % "@ammonite.Constants.version" cross CrossVersion.full
+
+      @p
+        In your test directory, create a class like:
+
+      @hl.ref('integration/'src/'test/'scala/'ammonite/'integration/"AmmoniteBridge.scala")
+
+      @p
+        Run your script using @code{sbt "$ test:run /path/to/script.sc arg1 arg2 arg3"}.
+
+      @p
+        If you have already started an SBT repl, then you can run the above without the quotes:
+        @code{[sbt] $ test:run /path/to/script.sc arg1 arg2 arg3}
