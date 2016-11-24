@@ -544,7 +544,7 @@
         Add the ammonite dependency to @code{build.sbt}:
 
       @hl.scala
-        libraryDependencies += "com.lihaoyi" % "ammonite" % "@ammonite.Constants.version" cross CrossVersion.full
+        libraryDependencies += "com.lihaoyi" % "ammonite" % "@ammonite.Constants.version" % "test" cross CrossVersion.full
 
       @p
         In your test directory, create a class like:
@@ -552,8 +552,8 @@
       @hl.ref('integration/'src/'test/'scala/'ammonite/'integration/"AmmoniteBridge.scala")
 
       @p
-        Run your script using @code{sbt "$ test:run /path/to/script.sc arg1 arg2 arg3"}.
+        Run your script using @code{sbt "test:run /path/to/script.sc arg1 arg2 arg3"}.
 
       @p
         If you have already started an SBT repl, then you can run the above without the quotes:
-        @code{[sbt] $ test:run /path/to/script.sc arg1 arg2 arg3}
+        @code{test:run /path/to/script.sc arg1 arg2 arg3}
