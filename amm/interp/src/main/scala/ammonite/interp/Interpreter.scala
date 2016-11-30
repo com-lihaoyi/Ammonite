@@ -690,7 +690,7 @@ class Interpreter(val printer: Printer,
 
 object Interpreter{
   val SheBang = "#!"
-  val HeaderPattern = Pattern.compile(s"""((?m)^!#.*)$newLine""")
+  val SheBangEndPattern = Pattern.compile(s"""((?m)^!#.*)$newLine""")
 
 
   /**
@@ -710,7 +710,7 @@ object Interpreter{
 
   def skipSheBangLine(code: String)= {
     if (code.startsWith(SheBang)) {
-      val matcher = HeaderPattern matcher code
+      val matcher = SheBangEndPattern matcher code
       val shebangEnd = if (matcher.find) matcher.end else code.indexOf(newLine)
       val numberOfStrippedLines = newLine.r.findAllMatchIn( code.substring(0, shebangEnd) ).length
       (newLine * numberOfStrippedLines) + code.substring(shebangEnd)
