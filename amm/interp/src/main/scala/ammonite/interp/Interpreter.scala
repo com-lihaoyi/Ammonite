@@ -636,7 +636,7 @@ class Interpreter(val printer: Printer,
 
       resolved.foreach(handleClasspath)
 
-      if (verboseOutput) {
+      if (verbose) {
         val newJar = resolved.filter(_.getName contains artifactId)
         newJar.foreach { jar =>
           val loadedPackages = getPackages(jar).mkString(", ")
