@@ -1,6 +1,7 @@
 package ammonite.interp
 
-import java.io.{File, OutputStream, PrintStream}
+import java.io.{File, FileInputStream, OutputStream, PrintStream}
+import java.util.zip.ZipInputStream
 
 import scala.collection.mutable
 import scala.tools.nsc.Settings
@@ -627,6 +628,7 @@ class Interpreter(val printer: Printer,
       handleClasspath(new java.io.File(jar.toString))
       reInit()
     }
+
     def ivy(coordinates: (String, String, String), verbose: Boolean = true): Unit = {
       val resolved = loadIvy(coordinates, verbose)
       val (groupId, artifactId, version) = coordinates
@@ -634,8 +636,30 @@ class Interpreter(val printer: Printer,
 
       resolved.foreach(handleClasspath)
 
+      if (verboseOutput) {
+        val newJar = resolved.filter(_.getName contains artifactId)
+        newJar.foreach { jar =>
+          val loadedPackages = getPackages(jar)
+          if (loadedPackages.nonEmpty)
+            printer.out(s"Loaded $artifactId $version, with packages: ${loadedPackages.mkString(", ")}\n")
+        }
+      }
+
       reInit()
     }
+
+    def getPackages(jar: File) = {
+      val zip = new ZipInputStream(new FileInputStream(jar))
+      def packageName(filePath: String) = filePath.split("/").dropRight(1).mkString(".")
+      Stream
+        .continually(zip.getNextEntry)
+        .takeWhile(_ != null)
+        .map(_.getName)
+        .filter(_ endsWith ".class")
+        .map(packageName)
+        .distinct
+    }
+
   }
 
   def handleEvalClasspath(jar: File) = {
