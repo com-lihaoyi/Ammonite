@@ -639,9 +639,9 @@ class Interpreter(val printer: Printer,
       if (verboseOutput) {
         val newJar = resolved.filter(_.getName contains artifactId)
         newJar.foreach { jar =>
-          val loadedPackages = getPackages(jar)
+          val loadedPackages = getPackages(jar).mkString(", ")
           if (loadedPackages.nonEmpty)
-            printer.out(s"Loaded $artifactId $version, with packages: ${loadedPackages.mkString(", ")}\n")
+            printer.out(s"Loaded $artifactId $version, with packages: $loadedPackages\n")
         }
       }
 
