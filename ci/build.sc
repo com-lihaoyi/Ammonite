@@ -11,10 +11,10 @@ val isMasterCommit =
 val allVersions = Seq(
   "2.10.4", "2.10.5", "2.10.6",
   "2.11.3", "2.11.4", "2.11.5", "2.11.6", "2.11.7", "2.11.8",
-  "2.12.0"
+  "2.12.0", "2.12.1"
 )
 
-val latestVersions = Set("2.10.5", "2.11.8", "2.12.0")
+val latestVersions = Set("2.10.5", "2.11.8", "2.12.1")
 
 val buildVersion =
   if (sys.env("TRAVIS_TAG") == "") s"COMMIT-${getGitHash()}"
@@ -31,7 +31,7 @@ def updateConstants(version: String = buildVersion,
   val versionTxt = s"""
     package ammonite
     object Constants{
-      val scalaVersion = "2.12.0"
+      val scalaVersion = "2.12.1"
       val version = "$version"
       val unstableVersion = "$unstableVersion"
       val curlUrl = "$curlUrl"
@@ -113,7 +113,7 @@ def executable() = {
     println("MASTER COMMIT: Publishing Executable")
     //Prepare executable
     updateConstants()
-    %sbt("++2.12.0", "amm/test:assembly")
+    %sbt("++2.12.1", "amm/test:assembly")
 
     val travisTag = sys.env("TRAVIS_TAG")
     val gitHash = getGitHash()

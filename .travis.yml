@@ -19,10 +19,10 @@ matrix:
   # separate, sequential processes.
   - env: CI_SCRIPT="ci/build.sc test published/test"
     jdk: oraclejdk8
-    scala: 2.12.0
+    scala: 2.12.1
   - env: CI_SCRIPT="ci/build.sc test integration/test"
     jdk: oraclejdk8
-    scala: 2.12.0
+    scala: 2.12.1
 
   - env: CI_SCRIPT="ci/build.sc test published/test"
     jdk: oraclejdk8

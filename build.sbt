@@ -2,7 +2,7 @@ import scalatex.ScalatexReadme
 import sbtassembly.AssemblyPlugin.defaultShellScript
 
 
-scalaVersion := "2.12.0"
+scalaVersion := "2.12.1"
 
 crossScalaVersions := Seq(
   "2.10.4", "2.10.5", "2.10.6", "2.11.3",
@@ -30,7 +30,7 @@ val macroSettings = Seq(
 
 val sharedSettings = Seq(
 
-  scalaVersion := "2.12.0",
+  scalaVersion := "2.12.1",
   organization := "com.lihaoyi",
   version := _root_.ammonite.Constants.version,
   libraryDependencies += "com.lihaoyi" %% "utest" % "0.4.4" % "test",
