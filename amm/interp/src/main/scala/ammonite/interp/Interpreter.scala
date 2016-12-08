@@ -589,7 +589,7 @@ class Interpreter(val printer: Printer,
         .map(_.map(new java.io.File(_)))
         .filter(_.forall(_.exists()))
 
-    psOpt match{
+    val resolved = psOpt match{
       case Some(ps) => ps
       case None =>
         val resolved = ammonite.runtime.tools.IvyThing(
@@ -613,7 +613,33 @@ class Interpreter(val printer: Printer,
 
         resolved
     }
+
+    if (verbose) printLoadedPackages(resolved, artifactId, version)
+
+    resolved
   }
+
+  def printLoadedPackages(jars: Set[File], artifactId: String, version: String): Unit = {
+    def getPackages(jar: File) = {
+      val zip = new ZipInputStream(new FileInputStream(jar))
+      def packageName(filePath: String) = filePath.split("/").dropRight(1).mkString(".")
+      Stream
+        .continually(zip.getNextEntry)
+        .takeWhile(_ != null)
+        .map(_.getName)
+        .filter(_ endsWith ".class")
+        .map(packageName)
+        .distinct
+    }
+
+    val newJar = jars.filter(_.getName contains artifactId)
+    newJar.foreach { jar =>
+      val loadedPackages = getPackages(jar).mkString(", ")
+      if (loadedPackages.nonEmpty)
+        printer.out(s"Loaded $artifactId $version, with packages: $loadedPackages\n")
+    }
+  }
+
   abstract class DefaultLoadJar extends LoadJar {
 
     lazy val ivyThing = ammonite.runtime.tools.IvyThing(
@@ -636,28 +662,7 @@ class Interpreter(val printer: Printer,
 
       resolved.foreach(handleClasspath)
 
-      if (verbose) {
-        val newJar = resolved.filter(_.getName contains artifactId)
-        newJar.foreach { jar =>
-          val loadedPackages = getPackages(jar).mkString(", ")
-          if (loadedPackages.nonEmpty)
-            printer.out(s"Loaded $artifactId $version, with packages: $loadedPackages\n")
-        }
-      }
-
       reInit()
-    }
-
-    def getPackages(jar: File) = {
-      val zip = new ZipInputStream(new FileInputStream(jar))
-      def packageName(filePath: String) = filePath.split("/").dropRight(1).mkString(".")
-      Stream
-        .continually(zip.getNextEntry)
-        .takeWhile(_ != null)
-        .map(_.getName)
-        .filter(_ endsWith ".class")
-        .map(packageName)
-        .distinct
     }
 
   }
