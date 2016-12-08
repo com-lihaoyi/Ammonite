@@ -44,7 +44,7 @@
       @li
         Ammonite's terminal module is being used as a base for the
         @lnk("Dotty REPL", "https://github.com/lampepfl/dotty/pull/1233"),
-        which is the
+        which is the finishing school for new Scala concepts.
       @li
         Michael Pilquist used Ammonite for his
         @lnk("Introduction to Functional Streams for Scala",
