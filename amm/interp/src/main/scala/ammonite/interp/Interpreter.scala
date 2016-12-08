@@ -12,6 +12,7 @@ import annotation.tailrec
 import ammonite.util.ImportTree
 import ammonite.util.Util.{CacheDetails, newLine, normalizeNewlines}
 import ammonite.util._
+import fastparse.core
 
 import scala.reflect.io.VirtualDirectory
 
@@ -207,8 +208,9 @@ class Interpreter(val printer: Printer,
   def processLine(code: String, stmts: Seq[String], fileName: String): Res[Evaluated] = {
     val preprocess = Preprocessor(compiler.parse)
     for{
-      _ <- Catching { case ex =>
-        Res.Exception(ex, "Something unexpected went wrong =(")
+      _ <- Catching {
+        case ex: core.ParseError[_, _] => Res.Failure(Some(ex), ex.getMessage)
+        case ex => Res.Exception(ex, "Something unexpected went wrong =(")
       }
 
       (hookImports, hookedStmts, _) <- resolveImportHooks(
