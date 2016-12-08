@@ -25,40 +25,24 @@ object Environment {
   def apply(classLoader: ClassLoader, in: InputStream, out: OutputStream): Environment =
     apply(classLoader, in, new PrintStream(out))
 
-
-  /**
-   * Collects information about current environment
-   */
-  def collect() = Environment(
-    Thread.currentThread(),
-    Thread.currentThread().getContextClassLoader,
-    System.in,
-    System.out,
-    System.err
-  )
-
   /**
    * Runs your code with supplied environment installed.
    * After execution of supplied code block will restore original environment
    */
-  def withEnvironment(env:Environment)(code: ⇒ Any):Any = {
-    val oldEnv = collect()
+  def withEnvironment(env: Environment)(code: ⇒ Any): Any = {
+    val oldClassLoader = env.thread.getContextClassLoader
     try {
-      install(env)
-      code
+      env.thread.setContextClassLoader(env.contextClassLoader)
+      Console.withIn(env.systemIn) {
+        Console.withOut(env.systemOut) {
+          Console.withErr(env.systemErr) {
+            code
+          }
+        }
+      }
     } finally {
-      install(oldEnv)
+      env.thread.setContextClassLoader(oldClassLoader)
     }
   }
 
-  /**
-   * Resets execution environment from parameters saved to Environment container passed in
-   * @param env environment to reset to
-   */
-  def install(env: Environment): Unit = {
-    env.thread.setContextClassLoader(env.contextClassLoader)
-    System.setIn(env.systemIn)
-    System.setOut(env.systemOut)
-    System.setErr(env.systemErr)
-  }
 }
