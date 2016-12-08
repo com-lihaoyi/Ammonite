@@ -1,6 +1,7 @@
 package ammonite.interp
 
-import java.io.{File, OutputStream, PrintStream}
+import java.io.{File, FileInputStream, OutputStream, PrintStream}
+import java.util.zip.ZipInputStream
 
 import scala.collection.mutable
 import scala.tools.nsc.Settings
@@ -588,7 +589,7 @@ class Interpreter(val printer: Printer,
         .map(_.map(new java.io.File(_)))
         .filter(_.forall(_.exists()))
 
-    psOpt match{
+    val resolved = psOpt match{
       case Some(ps) => ps
       case None =>
         val resolved = ammonite.runtime.tools.IvyThing(
@@ -612,7 +613,33 @@ class Interpreter(val printer: Printer,
 
         resolved
     }
+
+    if (verbose) printLoadedPackages(resolved, artifactId, version)
+
+    resolved
   }
+
+  def printLoadedPackages(jars: Set[File], artifactId: String, version: String): Unit = {
+    def getPackages(jar: File) = {
+      val zip = new ZipInputStream(new FileInputStream(jar))
+      def packageName(filePath: String) = filePath.split("/").dropRight(1).mkString(".")
+      Stream
+        .continually(zip.getNextEntry)
+        .takeWhile(_ != null)
+        .map(_.getName)
+        .filter(_ endsWith ".class")
+        .map(packageName)
+        .distinct
+    }
+
+    val newJar = jars.filter(_.getName contains artifactId)
+    newJar.foreach { jar =>
+      val loadedPackages = getPackages(jar).mkString(", ")
+      if (loadedPackages.nonEmpty)
+        printer.out(s"Loaded $artifactId $version, with packages: $loadedPackages\n")
+    }
+  }
+
   abstract class DefaultLoadJar extends LoadJar {
 
     lazy val ivyThing = ammonite.runtime.tools.IvyThing(
@@ -627,6 +654,7 @@ class Interpreter(val printer: Printer,
       handleClasspath(new java.io.File(jar.toString))
       reInit()
     }
+
     def ivy(coordinates: (String, String, String), verbose: Boolean = true): Unit = {
       val resolved = loadIvy(coordinates, verbose)
       val (groupId, artifactId, version) = coordinates
@@ -636,6 +664,7 @@ class Interpreter(val printer: Printer,
 
       reInit()
     }
+
   }
 
   def handleEvalClasspath(jar: File) = {
