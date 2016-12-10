@@ -291,7 +291,15 @@ object ProjectTests extends TestSuite{
       //      res9: spire.math.Rational = 2/3
 
     }
+    'pegdown{
+      check.session(
+        s"""
+           @ import $$ivy.`org.pegdown:pegdown:1.6.0`
 
+           @ org.pegdown.ast.SimpleNode.Type.HRule
+           res1: org.pegdown.ast.SimpleNode.Type = HRule
+         """)
+    }
   }
 }
 
