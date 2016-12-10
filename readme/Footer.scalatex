@@ -97,6 +97,20 @@
 
 
   @sect{Changelog}
+    @sect{0.8.1}
+      @ul
+        @li
+          Cross-published for Scala 2.12, with the help of 
+          @lnk("Roman Tkalenko", "https://github.com/tkroman") who 
+          investigated and fixed a gnarly classpath bug @issue(515)
+        @li
+          Handle multi-line shebang lines, thanks to @lnk("Greg Dorrell", "https://github.com/Grogs")
+        @li
+          Fix @code{NullPointerException} on no-save-then-load situation in REPL, 
+          thanks to @lnk("Roman Tkalenko", "https://github.com/tkroman")
+        @li
+          Use Console for SSHD stream redirection to avoid inter-thread spillage
+          of stdout, thanks to @lnk("Timothy Dettrick", "https://github.com/tjdett")
     @sect{0.8.0}
       @ul
         @li
@@ -961,7 +975,3 @@
 
     @sect{Unstable Changlog}
       @ul
-        @li
-          Cross-published for Scala 2.12; if you want to use Ammonite with
-          Scala 2.12, whether in an SBT project or standalone, use the latest 
-          unstable version as shown above.
