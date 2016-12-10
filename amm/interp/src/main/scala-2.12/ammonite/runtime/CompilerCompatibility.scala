@@ -1,59 +1,72 @@
 package ammonite.runtime
 
 import ammonite.util.ImportData
-
 import scala.reflect.internal.util.Position
 import scala.reflect.io
 import scala.reflect.io.{AbstractFile, FileZipArchive, VirtualDirectory}
 import scala.tools.nsc
 import scala.tools.nsc.backend.JavaPlatform
 import scala.tools.nsc.classpath._
-import scala.tools.nsc.{Global, Settings}
+import scala.tools.nsc.{Global, GlobalSymbolLoaders, Settings}
 import scala.tools.nsc.interactive.{Global => InteractiveGlobal}
 import scala.tools.nsc.plugins.Plugin
 import scala.tools.nsc.reporters.AbstractReporter
+import scala.tools.nsc.symtab.BrowsingLoaders
 import scala.tools.nsc.typechecker.Analyzer
 
 object CompilerCompatibility {
-  def analyzer(g: Global, cl: ClassLoader): Analyzer { val global: g.type } =
+  def analyzer(g: Global, cl: ClassLoader): Analyzer { val global: g.type } = {
     new { val global: g.type = g } with Analyzer {
       override def findMacroClassLoader() = cl
     }
+  }
 
   type InteractiveAnalyzer = scala.tools.nsc.interactive.InteractiveAnalyzer
 
-  def interactiveAnalyzer(g: InteractiveGlobal, cl: ClassLoader)
-                         : InteractiveAnalyzer { val global: g.type } =
+  def interactiveAnalyzer(g: InteractiveGlobal,
+                          cl: ClassLoader): InteractiveAnalyzer { val global: g.type } = {
     new { val global: g.type = g } with InteractiveAnalyzer {
       override def findMacroClassLoader() = cl
     }
+  }
 
-  def trees(g: Global)(parser: g.syntaxAnalyzer.UnitParser): Seq[Global#Tree] =
+  def trees(g: Global)(parser: g.syntaxAnalyzer.UnitParser): Seq[Global#Tree] = {
     parser.parseStatsOrPackages()
+  }
 
-  def pluginInit(plugin: Plugin, options: List[String], error: String => Unit): Boolean =
+  def pluginInit(plugin: Plugin, options: List[String], error: String => Unit): Boolean = {
     plugin.init(options, error)
-
+  }
 }
+
 object GlobalInitCompat{
+
   def initInteractiveGlobal(settings: Settings,
                             reporter: AbstractReporter,
                             jcp: AggregateClassPath,
-                            evalClassloader: ClassLoader) = {
+                            evalClassloader: ClassLoader): InteractiveGlobal = {
     new nsc.interactive.Global(settings, reporter) { g =>
       // Actually jcp, avoiding a path-dependent type issue in 2.10 here
       override def classPath = jcp
 
+      override lazy val platform: ThisPlatform = new GlobalPlatform {
+        override val global = g
+        override val settings = g.settings
+        override val classPath = jcp
+      }
+
       override lazy val analyzer = CompilerCompatibility.interactiveAnalyzer(g, evalClassloader)
     }
   }
+
   def initGlobal(settings: Settings,
                  reporter: AbstractReporter,
                  plugins0: Vector[(String, Class[_])],
                  jcp: AggregateClassPath,
                  evalClassloader: ClassLoader,
                  importsLen: => Int,
-                 updateLastImports: Seq[ImportData] => Unit) = {
+                 updateLastImports: Seq[ImportData] => Unit): Global = {
+
     new nsc.Global(settings, reporter) { g =>
       override lazy val plugins = List(new AmmonitePlugin(g, updateLastImports, importsLen)) ++ {
         for {
@@ -72,9 +85,16 @@ object GlobalInitCompat{
       // Actually jcp, avoiding a path-dependent type issue in 2.10 here
       override def classPath = jcp
 
+      override lazy val platform: ThisPlatform = new GlobalPlatform {
+        override val global = g
+        override val settings = g.settings
+        override val classPath = jcp
+      }
+
       override lazy val analyzer = CompilerCompatibility.analyzer(g, evalClassloader)
     }
   }
+
   /**
     * Code to initialize random bits and pieces that are needed
     * for the Scala compiler to function, common between the
