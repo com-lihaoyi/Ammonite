@@ -1,7 +1,8 @@
 package ammonite
 
 import java.io.{File, InputStream, OutputStream}
-
+import java.nio.file.Files
+import scala.util.Try
 import ammonite.interp.Interpreter
 import ammonite.ops._
 import ammonite.runtime.{History, Storage}
@@ -248,7 +249,7 @@ object Main{
       )
       (fileToExecute, codeToExecute) match {
         case (None, None) => println("Loading..."); main(true).run()
-        case (Some(path), None) =>
+        case (Some(path), None) if isValidForExecution(path) =>
           main(false).runScript(path, passThroughArgs, kwargs, replApi) match {
             case Res.Failure(exOpt, msg) =>
               Console.err.println(msg)
@@ -261,12 +262,22 @@ object Main{
             case Res.Success(_) =>
             // do nothing on success, everything's already happened
           }
-
+        case (Some(path), None) =>
+          val errInRed = fansi.Color.Red("error").render
+          println(s"[$errInRed] '$path' does not exist or is inaccessible.")
         case (None, Some(code)) => main(false).runCode(code, replApi)
 
       }
 
     }
+  }
+
+  private def isValidForExecution(path: Path) = {
+    // will test for existence, accessibility and target being file or symlink
+    val nioPath = path.toNIO
+    Try(Files.exists(nioPath) && !Files.isDirectory(nioPath))
+      .filter(identity)
+      .isSuccess
   }
 
   def maybeDefaultPredef(enabled: Boolean, predef: String) =
