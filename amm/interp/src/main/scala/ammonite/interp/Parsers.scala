@@ -55,9 +55,15 @@ object Parsers {
    * Attempts to break a code blob into multiple statements. Returns `None` if
    * it thinks the code blob is "incomplete" and requires more input
    */
-  def split(code: String): Option[Parsed[Seq[String]]] = Splitter.parse(code) match{
-    case Parsed.Failure(_, index, extra) if code.drop(index).trim() == "" => None
-    case x => Some(x)
+  def split(code: String): Option[Parsed[Seq[String]]] = {
+    def restIsInsignificant(index: Int) = Semi.?.parse(code.drop(index).trim()) match {
+      case s: Parsed.Success[_] => true
+      case f: Parsed.Failure    => false
+    }
+    Splitter.parse(code) match {
+      case Parsed.Failure(_, index, _) if restIsInsignificant(index) => None
+      case x => Some(x)
+    }
   }
 
   val Separator = P( WL ~ "@" ~~ CharIn(" " + System.lineSeparator).rep(1) )
