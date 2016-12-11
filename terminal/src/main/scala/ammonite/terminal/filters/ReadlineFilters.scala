@@ -21,15 +21,15 @@ object ReadlineFilters {
 
   // Backspace  <- delete char
   // Del        -> delete char
-  // Ctrl-u     <- delete all
-  // Ctrl-k     -> delete all
+  // Ctrl-u     <- delete characters on line before cursor
+  // Ctrl-k     -> delete up to newline (or only newline)
   // Alt-d      -> delete word
   // Ctrl-w     <- delete word
 
   // Ctrl-u/-   Undo
   // Ctrl-l     clear screen
 
-  // Ctrl-k     -> cut all
+  // Ctrl-k     -> cut up to newline (or only newline)
   // Alt-d      -> cut word
   // Alt-Backspace  <- cut word
   // Ctrl-y     paste last cut
@@ -38,7 +38,7 @@ object ReadlineFilters {
   // this is not strictly readline, it's relatively common as described in
   // https://github.com/lihaoyi/Ammonite/issues/291
   /**
-   * Basic readline-style navigation, using all the obscure alphabet 
+   * Basic readline-style navigation, using all the obscure alphabet
    * hotkeys rather than using arrows
    */
   lazy val navFilter = Filter.merge(
@@ -120,13 +120,53 @@ object ReadlineFilters {
       (b patch(from = c - 1, patch = Nil, replaced = 1), c - 1)
     }
 
-    def cutAllLeft(b: Vector[Char], c: Int) = {
-      prepend(b.take(c))
-      (b.drop(c), 0)
+    def cutLineLeft(b: Vector[Char], c: Int) = {
+      val (allBeforeCursor, allAfterCursor) = b.splitAt(c)
+      val previousNewlineIndex = allBeforeCursor.lastIndexWhere(_ == '\n')
+      if (previousNewlineIndex == -1) {
+        // beginning of input. no leading newline
+        prepend(allBeforeCursor)
+        (allAfterCursor, 0)
+      } else {
+        val (allBeforeLine, lineBeforeCursor) = allBeforeCursor.splitAt(
+          previousNewlineIndex
+        )
+        val charsBeforeCursorOnLine = lineBeforeCursor.length
+        if (charsBeforeCursorOnLine == 1) {
+          // if only a newline before cursor on line, cut it
+          prepend(lineBeforeCursor)
+          (allBeforeLine ++ allAfterCursor, c - 1)
+        } else {
+          // if there's more on the line before cursor, cut to beginning of line
+          prepend(lineBeforeCursor.tail)
+          val buffer = allBeforeLine ++ "\n" ++ allAfterCursor
+          val cursor = c - (charsBeforeCursorOnLine - 1)
+          (buffer, cursor)
+        }
+      }
     }
-    def cutAllRight(b: Vector[Char], c: Int) = {
-      append(b.drop(c))
-      (b.take(c), c)
+
+    def cutLineRight(b: Vector[Char], c: Int) = {
+      val (allBeforeCursor, allAfterCursor) = b.splitAt(c)
+      val nextNewlineIndex = allAfterCursor.indexWhere(_ == '\n')
+      if (nextNewlineIndex == -1) {
+        // end of input. no trailing newline
+        append(allAfterCursor)
+        (allBeforeCursor, c)
+      } else {
+        allAfterCursor.splitAt(
+          nextNewlineIndex
+        ) match {
+          case (Vector(), Vector('\n', allAfterNewline @ _*)) =>
+            // if there's only a newline after cursor on line, cut it
+            append(Vector('\n'))
+            (allBeforeCursor ++ allAfterNewline, c)
+          case (restOfLine, allAfterLine) =>
+            // if there's more on the line after cursor, cut to end of line
+            append(restOfLine)
+            (allBeforeCursor ++ allAfterLine, c)
+        }
+      }
     }
 
     def cutWordRight(b: Vector[Char], c: Int) = {
@@ -147,8 +187,8 @@ object ReadlineFilters {
     }
 
     def filter = Filter.merge(
-      simple(Ctrl('u'))((b, c, m) => cutAllLeft(b, c)),
-      simple(Ctrl('k'))((b, c, m) => cutAllRight(b, c)),
+      simple(Ctrl('u'))((b, c, m) => cutLineLeft(b, c)),
+      simple(Ctrl('k'))((b, c, m) => cutLineRight(b, c)),
       simple(Alt + "d")((b, c, m) => cutWordRight(b, c)),
       simple(Ctrl('w'))((b, c, m) => cutWordLeft(b, c)),
       simple(Alt + "\u007f")((b, c, m) => cutWordLeft(b, c)),
