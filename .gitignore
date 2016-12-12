@@ -8,3 +8,4 @@ target/
 .sbtserver
 project/.sbtserver
 tags
+nohup.out
