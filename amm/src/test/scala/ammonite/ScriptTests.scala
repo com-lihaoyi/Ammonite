@@ -143,7 +143,8 @@ object ScriptTests extends TestSuite{
           """)
       }
       'sheBang{
-        check.session(s"""
+        'singleLine{
+          check.session(s"""
             @  import ammonite.ops._
 
             @ interp.load.exec($printedScriptPath/"SheBang.sc")
@@ -151,6 +152,18 @@ object ScriptTests extends TestSuite{
             @ val r = res
             r: Int = 42
             """)
+        }
+        'multiLine {
+          check.session(
+            s"""
+            @  import ammonite.ops._
+
+            @ interp.load.exec($printedScriptPath/"MultilineSheBang.sc")
+
+            @ val r = res
+            r: Int = 42
+            """)
+        }
       }
 
     }

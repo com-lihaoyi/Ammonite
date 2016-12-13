@@ -2,6 +2,7 @@ package ammonite.interp
 
 import java.io.{File, FileInputStream, OutputStream, PrintStream}
 import java.util.zip.ZipInputStream
+import java.util.regex.Pattern
 
 import scala.collection.mutable
 import scala.tools.nsc.Settings
@@ -718,6 +719,7 @@ class Interpreter(val printer: Printer,
 
 object Interpreter{
   val SheBang = "#!"
+  val SheBangEndPattern = Pattern.compile(s"""((?m)^!#.*)$newLine""")
 
 
   /**
@@ -736,9 +738,12 @@ object Interpreter{
   }
 
   def skipSheBangLine(code: String)= {
-    if (code.startsWith(SheBang))
-      code.substring(code.indexOf(newLine))
-    else
+    if (code.startsWith(SheBang)) {
+      val matcher = SheBangEndPattern matcher code
+      val shebangEnd = if (matcher.find) matcher.end else code.indexOf(newLine)
+      val numberOfStrippedLines = newLine.r.findAllMatchIn( code.substring(0, shebangEnd) ).length
+      (newLine * numberOfStrippedLines) + code.substring(shebangEnd)
+    } else
       code
   }
 
