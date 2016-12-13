@@ -146,12 +146,12 @@ class Interpreter(val printer: Printer,
 
 
 
-  def resolveSingleImportHook(source: ImportHook.Source, tree: ImportTree) = {
+  def resolveSingleImportHook(source: ImportHook.Source, tree: ImportTree, interactive: Boolean) = {
     val strippedPrefix = tree.prefix.takeWhile(_(0) == '$').map(_.stripPrefix("$"))
     val hookOpt = importHooks().collectFirst{case (k, v) if strippedPrefix.startsWith(k) => (k, v)}
     for{
       (hookPrefix, hook) <- Res(hookOpt, "Import Hook could not be resolved")
-      hooked <- hook.handle(source, tree.copy(prefix = tree.prefix.drop(hookPrefix.length)), this)
+      hooked <- hook.handle(source, tree.copy(prefix = tree.prefix.drop(hookPrefix.length)), this, interactive)
       hookResults <- Res.map(hooked){
         case res: ImportHook.Result.Source =>
           for{
@@ -177,7 +177,8 @@ class Interpreter(val printer: Printer,
     }
   }
   def resolveImportHooks(source: ImportHook.Source,
-                         stmts: Seq[String]): Res[(Imports, Seq[String], Seq[ImportTree])] = {
+                         stmts: Seq[String],
+                         interactive: Boolean): Res[(Imports, Seq[String], Seq[ImportTree])] = {
       val hookedStmts = mutable.Buffer.empty[String]
       val importTrees = mutable.Buffer.empty[ImportTree]
       for(stmt <- stmts) {
@@ -199,7 +200,7 @@ class Interpreter(val printer: Printer,
       }
 
       for {
-        hookImports <- Res.map(importTrees)(resolveSingleImportHook(source, _))
+        hookImports <- Res.map(importTrees)(resolveSingleImportHook(source, _, interactive))
       } yield {
         val imports = Imports(hookImports.flatten.flatMap(_.value))
         (imports, hookedStmts, importTrees)
@@ -215,7 +216,8 @@ class Interpreter(val printer: Printer,
 
       (hookImports, hookedStmts, _) <- resolveImportHooks(
         ImportHook.Source.File(wd/"<console>"),
-        stmts
+        stmts,
+        interactive = true
       )
       unwrappedStmts = hookedStmts.flatMap{x =>
         Parsers.unwrapBlock(x) match {
@@ -396,7 +398,7 @@ class Interpreter(val printer: Printer,
          case r: Res.Failing => r
        }
       case Some((wrapperHashes, classFiles, imports, importsTrees)) =>
-        importsTrees.map(resolveSingleImportHook(source, _))
+        importsTrees.map(resolveSingleImportHook(source, _, interactive = false))
 
         val classFileNames = classFiles.map(_.map(_._1))
         withContextClassloader(
@@ -419,7 +421,7 @@ class Interpreter(val printer: Printer,
 
   def preprocessScript(source: ImportHook.Source, code: String) = for{
     blocks <- Preprocessor.splitScript(Interpreter.skipSheBangLine(code))
-    hooked <- Res.map(blocks){case (prelude, stmts) => resolveImportHooks(source, stmts) }
+    hooked <- Res.map(blocks){case (prelude, stmts) => resolveImportHooks(source, stmts, interactive = false) }
     (hookImports, hookBlocks, importTrees) = hooked.unzip3
   } yield (blocks.map(_._1).zip(hookBlocks), Imports(hookImports.flatMap(_.value)), importTrees)
 
@@ -577,7 +579,7 @@ class Interpreter(val printer: Printer,
       case Res.Exception(ex, msg) => lastException = ex
     }
   }
-  def loadIvy(coordinates: (String, String, String), verbose: Boolean = true) = {
+  def loadIvy(coordinates: (String, String, String), interactive: Boolean, verbose: Boolean = true) = {
     val (groupId, artifactId, version) = coordinates
     val cacheKey = (interpApi.resolvers().hashCode.toString, groupId, artifactId, version)
 
@@ -615,7 +617,7 @@ class Interpreter(val printer: Printer,
         resolved
     }
 
-    if (verbose) printLoadedPackages(resolved, artifactId, version)
+    if (interactive) printLoadedPackages(resolved, artifactId, version)
 
     resolved
   }
@@ -656,8 +658,8 @@ class Interpreter(val printer: Printer,
       reInit()
     }
 
-    def ivy(coordinates: (String, String, String), verbose: Boolean = true): Unit = {
-      val resolved = loadIvy(coordinates, verbose)
+    def ivy(coordinates: (String, String, String), interactive: Boolean = false, verbose: Boolean = true): Unit = {
+      val resolved = loadIvy(coordinates, interactive, verbose)
       val (groupId, artifactId, version) = coordinates
 
 

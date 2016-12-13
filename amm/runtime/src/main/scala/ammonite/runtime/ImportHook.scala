@@ -17,6 +17,11 @@ import ammonite.util._
 trait ImportHook{
   def handle(source: ImportHook.Source,
              tree: ImportTree,
+             interp: ImportHook.InterpreterInterface,
+             interactive: Boolean): Res[Seq[ImportHook.Result]] = handle(source, tree, interp)
+
+  def handle(source: ImportHook.Source,
+             tree: ImportTree,
              interp: ImportHook.InterpreterInterface): Res[Seq[ImportHook.Result]]
 }
 
@@ -29,7 +34,7 @@ object ImportHook{
     */
   trait InterpreterInterface{
     def wd: Path
-    def loadIvy(coordinates: (String, String, String), verbose: Boolean = true): Set[File]
+    def loadIvy(coordinates: (String, String, String), interactive: Boolean, verbose: Boolean = true): Set[File]
   }
 
   /**
@@ -156,26 +161,32 @@ object ImportHook{
         case _ => Res.Failure(None, "Invalid $ivy import " + tree)
       }
     }
-    def resolve(interp: InterpreterInterface, signature: String) = for{
+    def resolve(interp: InterpreterInterface, signature: String, interactive: Boolean) = for{
       (a, b, c) <-  signature.split(':') match{
         case Array(a, b, c) => Res.Success((a, b, c))
         case Array(a, "", b, c) => Res.Success((a, b + "_" + IvyThing.scalaBinaryVersion, c))
         case _ => Res.Failure(None, s"Invalid $$ivy import: [$signature]")
       }
       jars <- {
-        try Res.Success(interp.loadIvy((a, b, c))) catch {case ex =>
+        try Res.Success(interp.loadIvy((a, b, c), interactive)) catch {case ex =>
           Res.Exception(ex, "")
         }
       }
     } yield jars
 
-    def handle(source: ImportHook.Source, tree: ImportTree, interp: InterpreterInterface) = for{
+    override def handle(source: ImportHook.Source,
+                        tree: ImportTree,
+                        interp: InterpreterInterface,
+                        interactive: Boolean) = for {
     // import $ivy.`com.lihaoyi:scalatags_2.11:0.5.4`
       parts <- splitImportTree(tree)
-      resolved <- Res.map(parts)(resolve(interp, _))
+      resolved <- Res.map(parts)(resolve(interp, _, interactive))
     } yield {
       resolved.flatten.map(Path(_)).map(Result.ClassPath(_, plugin))
     }
+
+    override def handle(source: Source, tree: ImportTree, interp: InterpreterInterface): Res[Seq[Result]] =
+      handle(source, tree, interp)
   }
   object Classpath extends BaseClasspath(plugin = false)
   object PluginClasspath extends BaseClasspath(plugin = true)
