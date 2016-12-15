@@ -46,26 +46,53 @@ object EditTests extends TestSuite{
       )
       * - check(
         """
+        abcd
         _fgh
         ijkl
         """,
-        edit.cutAllLeft
+        edit.cutLineLeft
+      )
+      * - check(
+        """
+        abcd_fgh
+        ijkl
+        """,
+        edit.cutLineLeft,
+        edit.cutLineLeft
+      )
+      * - check(
+        """
+        _fgh
+        ijkl
+        """,
+        edit.cutLineLeft,
+        edit.cutLineLeft,
+        edit.cutLineLeft
+      )
+      * - check(
+        """
+        abcd
+        e_
+        ijkl
+        """,
+        edit.cutLineRight
+      )
+      * - check(
+        """
+        abcd
+        e_ijkl
+        """,
+        edit.cutLineRight,
+        edit.cutLineRight
       )
       * - check(
         """
         abcd
         e_
         """,
-        edit.cutAllRight
-      )
-
-      * - check(
-        """
-        abcd
-        _e
-        """,
-        edit.cutAllRight,
-        wordLeft
+        edit.cutLineRight,
+        edit.cutLineRight,
+        edit.cutLineRight
       )
 
       * - check (
@@ -76,7 +103,7 @@ object EditTests extends TestSuite{
         """,
         edit.cutCharLeft
       )
-      
+
       * - check (
         """
         abc_fgh
@@ -129,7 +156,7 @@ object EditTests extends TestSuite{
         edit.paste,
         edit.paste
       )
-      
+
       * - check (
         """
         abcd
@@ -138,6 +165,66 @@ object EditTests extends TestSuite{
         """,
         edit.cutWordRight,
         edit.cutCharLeft,
+        edit.paste
+      )
+      * - check(
+        """
+        abcd
+        e_fgh
+        ijkl
+        """,
+        edit.cutLineLeft,
+        edit.paste
+      )
+      * - check(
+        """
+        abcd
+        e_fgh
+        ijkl
+        """,
+        edit.cutLineLeft,
+        edit.cutLineLeft,
+        edit.paste
+      )
+      * - check(
+        """
+        abcd
+        e_fgh
+        ijkl
+        """,
+        edit.cutLineLeft,
+        edit.cutLineLeft,
+        edit.cutLineLeft,
+        edit.paste
+      )
+      * - check(
+        """
+        abcd
+        efgh_
+        ijkl
+        """,
+        edit.cutLineRight,
+        edit.paste
+      )
+      * - check(
+        """
+        abcd
+        efgh
+        _ijkl
+        """,
+        edit.cutLineRight,
+        edit.cutLineRight,
+        edit.paste
+      )
+      * - check(
+        """
+        abcd
+        efgh
+        ijkl_
+        """,
+        edit.cutLineRight,
+        edit.cutLineRight,
+        edit.cutLineRight,
         edit.paste
       )
     }
