@@ -16,7 +16,7 @@ object Sample{
   def curlCommand(curlUrl: String) =
     s"$$ sudo curl -L -o /usr/local/bin/amm " +
     curlUrl +
-    " && chmod +x /usr/local/bin/amm && amm"
+    " && sudo chmod +x /usr/local/bin/amm && amm"
   val replCurl = curlCommand(ammonite.Constants.curlUrl)
   val unstableCurl = curlCommand(ammonite.Constants.unstableCurlUrl)
   val filesystemCurl =
