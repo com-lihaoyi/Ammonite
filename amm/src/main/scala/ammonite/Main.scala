@@ -137,7 +137,7 @@ object Main{
     * The command-line entry point, which does all the argument parsing before
     * delegating to [[Main.run]]
     */
-  def main(args0: Array[String]) = {
+  def main(allArgs: Array[String]) = {
     var fileToExecute: Option[Path] = None
     var codeToExecute: Option[String] = None
     var verboseOutput: Boolean = true
@@ -214,15 +214,16 @@ object Main{
           """.stripMargin)
     }
 
-    val (take, drop) = args0.indexOf("--") match {
-      case -1 => (Int.MaxValue, Int.MaxValue)
-      case n => (n, n+1)
+    // Split command line arguments to before '--' and after '--'
+    // Anything after '--' won't be parsed as ammonite arguments
+    val (argumentsBefore, argumentsToParse) = allArgs.indexOf("--") match {
+      case -1 => (allArgs, Seq.empty[String])
+      case idx => {
+        val (before, after) = allArgs.splitAt(idx)
+        // need to drop '--' itself from list of arguments to parse
+        (before, after.drop(1).toSeq)
+      }
     }
-
-    // arguments before the lone '--' used to separate the
-    // ammonite arguments & script arguments
-    val argumentsBefore = args0.take(take)
-    val argumentsToParse = args0.drop(drop).toList
 
     def ifContinually[T](b: Boolean)(f: => T) = {
       if (b) while(true) f
@@ -277,21 +278,25 @@ object Main{
   def maybeDefaultPredef(enabled: Boolean, predef: String) =
     if (enabled) predef else ""
 
+  /**
+    * Parse arguments into flags ("passThroughArgs") and keyword args
+    * e.g. input: "-d -f --name john" will parse into (Seq("d", "f"), Seq("name", "john"))
+    */
   def parseScriptArguments(argumentsToParse: Seq[String]): (Seq[String], Vector[(String, String)]) = {
     var keywordTokens = argumentsToParse
     var kwargs = Vector.empty[(String, String)]
-    var additionalPassThroughArgs = Seq.empty[String]
+    var passThroughArgs = Seq.empty[String]
 
     while (keywordTokens.nonEmpty) {
       if (keywordTokens(0).startsWith("--")) {
         kwargs = kwargs :+ (keywordTokens(0).drop(2), keywordTokens(1))
         keywordTokens = keywordTokens.drop(2)
       } else {
-        additionalPassThroughArgs = additionalPassThroughArgs :+ keywordTokens(0)
+        passThroughArgs = passThroughArgs :+ keywordTokens(0)
         keywordTokens = keywordTokens.drop(1)
       }
     }
-    (additionalPassThroughArgs, kwargs)
+    (passThroughArgs, kwargs)
   }
 
 
