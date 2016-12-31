@@ -146,6 +146,7 @@ object Main{
     var predefFiles: Seq[Path] = Vector.empty
     var continually = false
     var replApi = false
+    var shouldParseScriptArguments = true
     val replParser = new scopt.OptionParser[Main]("ammonite") {
       // Primary arguments that correspond to the arguments of
       // the `Main` configuration object
@@ -203,7 +204,14 @@ object Main{
             |normally not available in scripts and only provided in the
             |interactive REpl
           """.stripMargin)
-
+      opt[Unit]('n', "no-arg-parse")
+        .foreach {_ =>
+          shouldParseScriptArguments = false}
+        .text(
+          """Do not use Ammonite's default argument parser to parse
+            |any arguments after '--'. If you use this option, the main method
+            |of your script should expect a String* as its only parameter
+          """.stripMargin)
     }
 
     val (take, drop) = args0.indexOf("--") match {
@@ -211,24 +219,16 @@ object Main{
       case n => (n, n+1)
     }
 
-    val before = args0.take(take)
-    var keywordTokens = args0.drop(drop).toList
-    var kwargs = Vector.empty[(String, String)]
+    // arguments before the lone '--' used to separate the
+    // ammonite arguments & script arguments
+    val argumentsBefore = args0.take(take)
+    val argumentsToParse = args0.drop(drop).toList
 
-    while(keywordTokens.nonEmpty){
-      if (keywordTokens(0).startsWith("--")){
-        kwargs = kwargs :+ (keywordTokens(0).drop(2), keywordTokens(1))
-        keywordTokens = keywordTokens.drop(2)
-      }else{
-        passThroughArgs = passThroughArgs :+ keywordTokens(0)
-        keywordTokens = keywordTokens.drop(1)
-      }
-    }
     def ifContinually[T](b: Boolean)(f: => T) = {
       if (b) while(true) f
       else f
     }
-    for(c <- replParser.parse(before, Main())) ifContinually(continually){
+    for(c <- replParser.parse(argumentsBefore, Main())) ifContinually(continually){
       def main(isRepl: Boolean) = Main(
         c.predef,
         c.defaultPredef,
@@ -248,8 +248,12 @@ object Main{
       )
       (fileToExecute, codeToExecute) match {
         case (None, None) => println("Loading..."); main(true).run()
-        case (Some(path), None) =>
-          main(false).runScript(path, passThroughArgs, kwargs, replApi) match {
+        case (Some(path), None) => {
+          val (additionalPassThroughArgs, kwargs) = if (shouldParseScriptArguments) {
+            parseScriptArguments(argumentsToParse)
+          }
+          else (Seq.empty[String], Vector.empty[(String, String)])
+          main(false).runScript(path, passThroughArgs ++ additionalPassThroughArgs, kwargs, replApi) match {
             case Res.Failure(exOpt, msg) =>
               Console.err.println(msg)
               System.exit(1)
@@ -261,6 +265,7 @@ object Main{
             case Res.Success(_) =>
             // do nothing on success, everything's already happened
           }
+        }
 
         case (None, Some(code)) => main(false).runCode(code, replApi)
 
@@ -271,6 +276,23 @@ object Main{
 
   def maybeDefaultPredef(enabled: Boolean, predef: String) =
     if (enabled) predef else ""
+
+  def parseScriptArguments(argumentsToParse: Seq[String]): (Seq[String], Vector[(String, String)]) = {
+    var keywordTokens = argumentsToParse
+    var kwargs = Vector.empty[(String, String)]
+    var additionalPassThroughArgs = Seq.empty[String]
+
+    while (keywordTokens.nonEmpty) {
+      if (keywordTokens(0).startsWith("--")) {
+        kwargs = kwargs :+ (keywordTokens(0).drop(2), keywordTokens(1))
+        keywordTokens = keywordTokens.drop(2)
+      } else {
+        additionalPassThroughArgs = additionalPassThroughArgs :+ keywordTokens(0)
+        keywordTokens = keywordTokens.drop(1)
+      }
+    }
+    (additionalPassThroughArgs, kwargs)
+  }
 
 
 }
