@@ -228,10 +228,10 @@
         The @hl.scala{main} method does not get automatically called when you
         @hl.scala{load.module} or @hl.scala{load.exec} a script from @i{within}
         the Ammonite REPL. It gets imported into scope like any other method or
-        value defined in tmhe script, and you can just call it normally.
+        value defined in the script, and you can just call it normally.
 
       @p
-        By making your main method receive @hl.scala{vararg*} arguments and running
+        By making your main method receive a vararg @hl.scala{String*} argument and running
         Ammonite with the @code{-n / --no-arg-parse} flag, Ammonite will not attempt
         to parse the arguments for the script but instead pass them through to the main
         method. This allows you to use a custom argument-parser (e.g. @lnk("Eugene Yokota",
@@ -244,14 +244,9 @@
       @hl.scala
         @@main
         def entrypoint(args: String*) = {
-          // args == Array("--custom", "-f", "hi")
+          // args == Seq("--custom", "-f", "hi")
           ...
         }
-
-      @p
-        In which case Ammonite will take all arguments and forward them to your
-        main method un-checked and un-validated, from which point you can deal
-        with the raw @code{Seq[String]} however you wish.
 
     @sect{Multiple Main Methods}
       @p
