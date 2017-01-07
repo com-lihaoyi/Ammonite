@@ -230,7 +230,26 @@ trait DefaultReplAPI extends FullReplAPI {
                                                  custom: Option[String])
                                                 (implicit cfg: pprint.Config,
                                                  tcolors: pprint.TPrintColors) = {
-      if (typeOf[T] =:= typeOf[Unit]) Iterator()
+      // This type check was originally written as just typeOf[T] =:= typeOf[Unit].
+      // However, due to a bug in Scala's reflection when applied to certain
+      // class annotations in Hadoop jars, the type check would consistently
+      // throw an exception.
+      //
+      // The solution is to catch exceptions thrown by the typeOf check and fallback
+      // to checking the value against Unit's boxed form.
+      //
+      // Why not just check the value? Because that would force evaluzation of `lazy val`'s
+      // which breaks the ammonite.session.EvaluatorTests(lazyvals) test.
+      //
+      // See https://issues.scala-lang.org/browse/SI-10129 for additional details.
+      val isUnit = try {
+        typeOf[T] =:= typeOf[Unit]
+      } catch {
+        case _: Throwable =>
+          value2 == scala.runtime.BoxedUnit.UNIT
+      }
+
+      if (isUnit) Iterator()
       else {
         val implicitPPrint = implicitly[PPrint[V]]
         val rhs = custom match {
