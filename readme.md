@@ -63,7 +63,7 @@ While working on a arbitrary `xyz` subproject, `sbt ~xyz/test` runs tests after 
 
 ### Publishing
 
-- Publishing is automatic, controlled by scripts in the @code{ci/} folder.
+- Publishing is automatic, controlled by scripts in the `ci/` folder.
 
 - Every commit that lands in master will publish a new
   [unstable version](http://www.lihaoyi.com/Ammonite/#UnstableVersions),
