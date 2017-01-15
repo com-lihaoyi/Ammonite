@@ -18,7 +18,8 @@ class Repl(input: InputStream,
            predef: String,
            wd: ammonite.ops.Path,
            welcomeBanner: Option[String],
-           replArgs: Seq[Bind[_]] = Nil) {
+           replArgs: Seq[Bind[_]] = Nil,
+           interpArgs: Seq[String] = Nil) {
 
   val prompt = Ref("@ ")
 
@@ -60,7 +61,8 @@ class Repl(input: InputStream,
       )
       Seq(("ammonite.repl.ReplBridge", "repl", replApi))
     },
-    wd
+    wd,
+    args = interpArgs
   )
 
   // Call `session.save` _after_ the interpreter is fully instantiated and

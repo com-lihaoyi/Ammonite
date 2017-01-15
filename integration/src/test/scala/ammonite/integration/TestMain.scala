@@ -5,7 +5,7 @@ object TestMain {
     // Break into debug REPL with
     ammonite.Main(
       predef = "println(\"Starting Debugging!\")"
-    ).run(
+    ).run(Nil,
       "hello" -> hello,
       "fooValue" -> foo()
     )
