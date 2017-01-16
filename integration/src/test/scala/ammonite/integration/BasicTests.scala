@@ -303,6 +303,25 @@ object BasicTests extends TestSuite{
 
       }
     }
+
+    'interpArgs {
+      'none {
+        val evaled = exec('basic/"InterpArgs.sc", "-s")
+        assert(evaled.out.string.contains("List()"))
+      }
+      'noneWithDDash {
+        val evaled = exec('basic/"InterpArgs.sc", "-s", "--")
+        assert(evaled.out.string.contains("List()"))
+      }
+      'some {
+        val evaled = exec('basic/"InterpArgs.sc", "-s", "--",
+          "arg1", "--opt1", "value1", "--opt2", "arg2", "--", "arg3")
+        assert(evaled.out.string.contains(
+          """List(arg1, --opt1, value1, --opt2, arg2, --, arg3)"""
+        ))
+      }
+    }
+
     'http{
       'shorten {
         val res = exec('basic / "HttpApi.sc", "shorten", "https://www.github.com", "-s")
