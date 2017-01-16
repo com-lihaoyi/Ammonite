@@ -328,5 +328,21 @@ object AdvancedTests extends TestSuite{
         """)
       }
     }
+    'bytecodeForReplClasses{
+      check.session("""
+        @ case class Child(name: String)
+
+        @ val cls = classOf[Child]
+
+        @ val resName = cls.getName.replace('.', '/') + ".class"
+        resName: String = "$sess/cmd0$Child.class"
+
+        @ cls.getClassLoader.getResource(resName)
+        res3: java.net.URL = memory:$sess/cmd0$Child.class
+
+        @ cls.getClassLoader.getResourceAsStream(resName) != null
+        res4: Boolean = true
+      """)
+    }
   }
 }
