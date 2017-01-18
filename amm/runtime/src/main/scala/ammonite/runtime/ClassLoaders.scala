@@ -1,7 +1,10 @@
 package ammonite.runtime
 
-import java.net.{URL, URLClassLoader}
+import java.io.ByteArrayInputStream
+import java.net.{URL, URLClassLoader, URLConnection, URLStreamHandler}
 import java.nio.ByteBuffer
+import java.util.{Collections, Enumeration}
+
 import acyclic.file
 import ammonite.ops._
 import ammonite.util.{Imports, Util}
@@ -154,4 +157,25 @@ class SpecialClassLoader(parent: ClassLoader, parentSignature: Seq[(Path, Long)]
       case _ => Nil
     })
   }
+
+  override def findResource(name: String) =
+    getURLFromFileDict(name).getOrElse(super.findResource(name))
+
+  override def findResources(name: String) = getURLFromFileDict(name) match {
+    case Some(u) => Collections.enumeration(Collections.singleton(u))
+    case None    => super.findResources(name)
+  }
+
+  private def getURLFromFileDict(name: String) = {
+    val className = name.stripSuffix(".class").replace('/', '.')
+    newFileDict.get(className) map { x =>
+      new URL(null, s"memory:${name}", new URLStreamHandler {
+        override def openConnection(url: URL): URLConnection = new URLConnection(url) {
+          override def connect() = ()
+          override def getInputStream = new ByteArrayInputStream(x)
+        }
+      })
+    }
+  }
+
 }
