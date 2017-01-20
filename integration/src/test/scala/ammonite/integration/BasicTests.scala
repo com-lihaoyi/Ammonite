@@ -303,15 +303,15 @@ object BasicTests extends TestSuite{
 
       }
     }
-    'http{
-      'shorten {
-        val res = exec('basic / "HttpApi.sc", "shorten", "https://www.github.com", "-s")
-        assert(res.out.trim.startsWith("https://git.io"))
+    'httpApi{
+      'addPost {
+        val res = exec('basic / "HttpApi.sc", "addPost", "title", "some text", "-s")
+        assert(res.out.trim.startsWith("101"))
       }
-      'releases{
-        val res = exec('basic / "HttpApi.sc", "listReleases", "lihaoyi/Ammonite", "-s")
-        assert(res.out.trim.contains("0.7.0"))
-        assert(res.out.trim.contains("0.7.7"))
+      'comments{
+        val res = exec('basic / "HttpApi.sc", "comments", "40", "-s")
+        assert(res.out.trim.contains("totam vel saepe aut"))
+        assert(res.out.trim.contains("aperiam et omnis totam"))
       }
     }
   }
