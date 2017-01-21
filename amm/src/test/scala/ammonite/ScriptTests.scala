@@ -165,6 +165,32 @@ object ScriptTests extends TestSuite{
             """)
         }
       }
+      'interpArgs {
+        'none {
+          check.session(s"""
+            @  import ammonite.ops._
+
+            @ interp.load.exec($printedScriptPath/"InterpArgs.sc")
+
+            @ val r = res
+            r: Seq[String] = List()
+            """.stripMargin
+          )
+        }
+        'some {
+          val args = Seq("arg1", "--opt1", "value1", "--opt2", "arg2", "--", "arg3")
+          val checkArgs = new TestRepl(args)
+          checkArgs.session(s"""
+            @  import ammonite.ops._
+
+            @ interp.load.exec($printedScriptPath/"InterpArgs.sc")
+
+            @ val r = res
+            r: Seq[String] = List("arg1", "--opt1", "value1", "--opt2", "arg2", "--", "arg3")
+            """.stripMargin
+          )
+        }
+      }
 
     }
 

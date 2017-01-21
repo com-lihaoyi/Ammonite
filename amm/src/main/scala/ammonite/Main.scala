@@ -56,7 +56,7 @@ case class Main(predef: String = "",
   /**
     * Instantiates an ammonite.Repl using the configuration
     */
-  def instantiateRepl(replArgs: Seq[Bind[_]] = Nil) = {
+  def instantiateRepl(replArgs: Seq[Bind[_]] = Nil, interpArgs: Seq[String] = Nil) = {
     val augmentedPredef = Main.maybeDefaultPredef(defaultPredef, Defaults.predefString)
 
     new Repl(
@@ -65,11 +65,12 @@ case class Main(predef: String = "",
       predef = augmentedPredef + newLine + predef,
       wd = wd,
       welcomeBanner = welcomeBanner,
-      replArgs = replArgs
+      replArgs = replArgs,
+      interpArgs = interpArgs
     )
   }
 
-  def instantiateInterpreter(replApi: Boolean) = {
+  def instantiateInterpreter(replApi: Boolean, args: Seq[String] = Nil) = {
     val augmentedPredef = Main.maybeDefaultPredef(defaultPredef, Defaults.predefString)
 
     val (colors, printStream, errorPrintStream, printer) =
@@ -100,12 +101,13 @@ case class Main(predef: String = "",
           Seq(("ammonite.repl.ReplBridge", "repl", replApi))
         },
       wd,
+      args,
       verboseOutput
     )
     interp
   }
-  def run(replArgs: Bind[_]*) = {
-    val repl = instantiateRepl(replArgs)
+  def run(interpArgs: Seq[String], replArgs: Bind[_]*) = {
+    val repl = instantiateRepl(replArgs, interpArgs)
     repl.run()
   }
 
@@ -116,17 +118,18 @@ case class Main(predef: String = "",
   def runScript(path: Path,
                 args: Seq[String],
                 kwargs: Seq[(String, String)],
+                interpArgs: Seq[String],
                 replApi: Boolean = false): Res[Imports] = {
 
-    val interp = instantiateInterpreter(replApi)
+    val interp = instantiateInterpreter(replApi, interpArgs)
     main.Scripts.runScript(wd, path, interp, args, kwargs)
   }
 
   /**
     * Run a snippet of code
     */
-  def runCode(code: String, replApi: Boolean = false) = {
-    val interp = instantiateInterpreter(replApi)
+  def runCode(code: String, interpArgs: Seq[String], replApi: Boolean = false) = {
+    val interp = instantiateInterpreter(replApi, interpArgs)
     interp.interpApi.load(code)
   }
 }
@@ -212,7 +215,9 @@ object Main{
     }
 
     val before = args0.take(take)
-    var keywordTokens = args0.drop(drop).toList
+    val interpArgs = args0.drop(drop).toList
+    // Parse interpreter arguments to link to possible script @main entry points
+    var keywordTokens = interpArgs
     var kwargs = Vector.empty[(String, String)]
 
     while(keywordTokens.nonEmpty){
@@ -247,9 +252,9 @@ object Main{
         verboseOutput = verboseOutput
       )
       (fileToExecute, codeToExecute) match {
-        case (None, None) => println("Loading..."); main(true).run()
+        case (None, None) => println("Loading..."); main(true).run(interpArgs)
         case (Some(path), None) =>
-          main(false).runScript(path, passThroughArgs, kwargs, replApi) match {
+          main(false).runScript(path, passThroughArgs, kwargs, interpArgs, replApi) match {
             case Res.Failure(exOpt, msg) =>
               Console.err.println(msg)
               System.exit(1)
@@ -262,7 +267,7 @@ object Main{
             // do nothing on success, everything's already happened
           }
 
-        case (None, Some(code)) => main(false).runCode(code, replApi)
+        case (None, Some(code)) => main(false).runCode(code, interpArgs, replApi)
 
       }
 

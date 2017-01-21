@@ -13,7 +13,7 @@ import scala.collection.mutable
  * A test REPL which does not read from stdin or stdout files, but instead lets
  * you feed in lines or sessions programmatically and have it execute them.
  */
-class TestRepl {
+class TestRepl(interpArgs: Seq[String] = Nil) {
   var allOutput = ""
   def predef = ""
 
@@ -56,7 +56,8 @@ class TestRepl {
         )
 
         Seq(("ammonite.repl.ReplBridge", "repl", replApi))
-      }
+      },
+      args = interpArgs
     )
     i.init()
     i

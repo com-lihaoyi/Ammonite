@@ -27,6 +27,11 @@ trait InterpAPI {
    */
   def resolvers: Ref[List[Resolver]]
 
+  /**
+   * Unmodified interpreter args
+   */
+  def args: Seq[String]
+
 }
 
 
