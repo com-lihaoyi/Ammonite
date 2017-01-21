@@ -106,10 +106,10 @@
     src := "https://player.vimeo.com/video/148552858",
     width := 800,
     height := 600,
-    "frameborder".attr := 0,
-    "webkitallowfullscreen".attr := 1,
-    "mozallowfullscreen".attr := 1,
-    "allowfullscreen".attr := 1
+    attr("frameborder") := 0,
+    attr("webkitallowfullscreen") := 1,
+    attr("mozallowfullscreen") := 1,
+    attr("allowfullscreen") := 1
   )
   @p
     If you are already working in Scala,

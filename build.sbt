@@ -1,6 +1,4 @@
 import scalatex.ScalatexReadme
-import sbtassembly.AssemblyPlugin.defaultShellScript
-
 
 scalaVersion := "2.12.1"
 
@@ -18,7 +16,7 @@ dontPublishSettings
 
 val macroSettings = Seq(
   libraryDependencies ++= Seq(
-    "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided"
+    "org.scala-lang" % "scala-reflect" % scalaVersion.value % Provided
   ) ++ (
     if (!scalaVersion.value.startsWith("2.10.")) Nil
     else Seq(
@@ -33,18 +31,18 @@ val sharedSettings = Seq(
   scalaVersion := "2.12.1",
   organization := "com.lihaoyi",
   version := _root_.ammonite.Constants.version,
-  libraryDependencies += "com.lihaoyi" %% "utest" % "0.4.4" % "test",
+  libraryDependencies += "com.lihaoyi" %% "utest" % "0.4.5" % Test,
   // Needed for acyclic to work...
   libraryDependencies ++= {
-    if (scalaVersion.value startsWith "2.11.") Nil
+    if (!scalaVersion.value.startsWith("2.10.")) Nil
     else Seq(
-      "org.scala-lang" % "scala-compiler" % scalaVersion.value % "provided"
+      "org.scala-lang" % "scala-compiler" % scalaVersion.value % Provided
     )
   },
   testFrameworks := Seq(new TestFramework("utest.runner.Framework")),
   scalacOptions += "-target:jvm-1.7",
   autoCompilerPlugins := true,
-  addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.5"),
+  addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.7"),
   ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) },
   parallelExecution in Test := !scalaVersion.value.contains("2.10"),
   (unmanagedSources in Compile) += (baseDirectory in ThisBuild).value/"project"/"Constants.scala",
@@ -52,7 +50,7 @@ val sharedSettings = Seq(
     ((baseDirectory in ThisBuild).value/".."/"project"/"Constants.scala") -> "Constants.scala"
   },
   libraryDependencies ++= Seq(
-    "com.lihaoyi" %% "acyclic" % "0.1.5" % "provided"
+    "com.lihaoyi" %% "acyclic" % "0.1.7" % Provided
   ) ,
   publishTo := Some(
     "releases" at "https://oss.sonatype.org/service/local/staging/deploy/maven2"
@@ -128,7 +126,7 @@ lazy val amm = project
     ),
     libraryDependencies ++= (
       if (scalaVersion.value startsWith "2.10.") Nil
-      else Seq("com.chuusai" %% "shapeless" % "2.3.2" % "test")
+      else Seq("com.chuusai" %% "shapeless" % "2.3.2" % Test)
     ),
     javaOptions += "-Xmx4G",
     assemblyOption in assembly := (assemblyOption in assembly).value.copy(
@@ -226,9 +224,9 @@ lazy val shell = project
     sharedSettings,
     macroSettings,
     name := "ammonite-shell",
-    (test in Test) <<= (test in Test).dependsOn(packageBin in Compile),
-    (run in Test) <<= (run in Test).dependsOn(packageBin in Compile),
-    (testOnly in Test) <<= (testOnly in Test).dependsOn(packageBin in Compile)
+    (test in Test) := (test in Test).dependsOn(packageBin in Compile).value,
+    (run in Test) := (run in Test).dependsOn(packageBin in Compile).evaluated,
+    (testOnly in Test) := (testOnly in Test).dependsOn(packageBin in Compile).evaluated
   )
 
 val integrationTasks = Seq(
@@ -240,10 +238,10 @@ lazy val integration = project
   .dependsOn(amm)
   .settings(
     sharedSettings,
-    (test in Test) <<= (test in Test).dependsOn(integrationTasks:_*),
-    (run in Test) <<= (run in Test).dependsOn(integrationTasks:_*),
-    (testOnly in Test) <<= (testOnly in Test).dependsOn(integrationTasks:_*),
-    (console in Test) <<= (console in Test).dependsOn(integrationTasks:_*),
+    (test in Test) := (test in Test).dependsOn(integrationTasks:_*).value,
+    (run in Test) := (run in Test).dependsOn(integrationTasks:_*).evaluated,
+    (testOnly in Test) := (testOnly in Test).dependsOn(integrationTasks:_*).evaluated,
+    (console in Test) := (console in Test).dependsOn(integrationTasks:_*).value,
     parallelExecution in Test := false,
     dontPublishSettings,
     initialCommands in (Test, console) := "ammonite.integration.Main.main(null)"
@@ -264,9 +262,9 @@ lazy val sshd = project
         "org.apache.sshd" % "sshd-core" % "0.14.0",
         //-- test --//
         // slf4j-nop makes sshd server use logger that writes into the void
-        "org.slf4j" % "slf4j-nop" % "1.7.12" % "test",
-        "com.jcraft" % "jsch" % "0.1.53" % "test",
-        "org.scalacheck" %% "scalacheck" % "1.12.6" % "test"
+        "org.slf4j" % "slf4j-nop" % "1.7.12" % Test,
+        "com.jcraft" % "jsch" % "0.1.53" % Test,
+        "org.scalacheck" %% "scalacheck" % "1.12.6" % Test
       )
   )
 
@@ -278,9 +276,9 @@ lazy val readme = ScalatexReadme(
   source = "Index"
 ).settings(
   dontPublishSettings,
-  scalaVersion := "2.11.8",
-  libraryDependencies += "com.lihaoyi" %% "fansi" % "0.2.2",
-  (run in Compile) <<= (run in Compile).dependsOn(
+  scalaVersion := "2.12.1",
+  libraryDependencies += "com.lihaoyi" %% "fansi" % "0.2.3",
+  (run in Compile) := (run in Compile).dependsOn(
     assembly in (amm, Test),
     packageBin in (shell, Compile),
     doc in (ops, Compile),
@@ -288,8 +286,8 @@ lazy val readme = ScalatexReadme(
     doc in (amm, Compile),
     doc in (sshd, Compile),
     doc in (shell, Compile)
-  ),
-  (run in Compile) <<= (run in Compile).dependsOn(Def.task{
+  ).evaluated,
+  (run in Compile) := (run in Compile).dependsOn(Def.task{
     val apiFolder = (target in Compile).value/"scalatex"/"api"
     val copies = Seq(
       (doc in (ops, Compile)).value -> "ops",
@@ -301,7 +299,7 @@ lazy val readme = ScalatexReadme(
     for ((folder, name) <- copies){
       sbt.IO.copyDirectory(folder, apiFolder/name, overwrite = true)
     }
-  }),
+  }).evaluated,
   (unmanagedSources in Compile) += baseDirectory.value/".."/"project"/"Constants.scala"
 )
 
