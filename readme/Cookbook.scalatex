@@ -366,7 +366,7 @@
       And can be run via
 
     @code
-      ./amm PlayFramework.scala
+      ./amm PlayFramework.sc
 
     @p
       Although this is just a hello world example, you can easily keep the server running (instead of exiting after a test request) and extend it with more functionality, possibly splitting it into multiple @sect.ref{Script Files}.

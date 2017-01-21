@@ -93,7 +93,7 @@
   @sect{Scaladoc}
     @p
       Here's the Scaladoc for the various projects:
-  
+
     @ul
       @li
         @a("Ammonite-Ops", href:="https://lihaoyi.github.io/Ammonite/api/ops/index.html")
@@ -105,7 +105,7 @@
         @a("Ammonite-Shell", href:="https://lihaoyi.github.io/Ammonite/api/shell/index.html")
       @li
         @a("Ammonite-Sshd", href:="https://lihaoyi.github.io/Ammonite/api/sshd/index.html")
-  
+
     @p
       Although it's best to read the documentation on this page to learn how
       to use these projects, the Scaladoc is still useful as a reference.
@@ -117,13 +117,13 @@
     @sect{0.8.1}
       @ul
         @li
-          Cross-published for Scala 2.12, with the help of 
-          @lnk("Roman Tkalenko", "https://github.com/tkroman") who 
+          Cross-published for Scala 2.12, with the help of
+          @lnk("Roman Tkalenko", "https://github.com/tkroman") who
           investigated and fixed a gnarly classpath bug @issue(515)
         @li
           Handle multi-line shebang lines, thanks to @lnk("Greg Dorrell", "https://github.com/Grogs")
         @li
-          Fix @code{NullPointerException} on no-save-then-load situation in REPL, 
+          Fix @code{NullPointerException} on no-save-then-load situation in REPL,
           thanks to @lnk("Roman Tkalenko", "https://github.com/tkroman")
         @li
           Use Console for SSHD stream redirection to avoid inter-thread spillage
@@ -612,8 +612,8 @@
         @li
           Started the @sect.ref{Ammonite Cookbook}, examples of using the
           Ammonite REPL to do useful work.
-  
-  
+
+
     @sect{0.5.2}
       @ul
         @li
@@ -691,8 +691,8 @@
         @li
           Simplify the way shelling to to run files as subprocesses works,
           and align with documentation (@issue(234))
-  
-  
+
+
     @sect{0.4.9}
       @ul
         @li
@@ -788,7 +788,7 @@
           You can now use Ammonite as a @sect.ref{Debugging} tool like Python's
           pdb, placing an interactive breakpoint anywhere within a normal
           Scala application
-  
+
     @sect{0.4.4}
       @ul
         @li
@@ -900,7 +900,7 @@
           Fix pretty-printing of higher-kinded types.
         @li
           Drop support for 2.10.x; ammonite is 2.11.x-only now
-  
+
     @sect{0.3.1}
       @ul
         @li
@@ -916,7 +916,7 @@
         @li
           Operator-named two-param generic types are now printed infix by
           default.
-  
+
     @sect{0.3.0}
       @ul
         @li
@@ -934,13 +934,13 @@
         @li
           Output lines are now truncated past a certain length, which is
           configurable, thanks to @lnk("Laszlo Mero", "https://github.com/laci37")
-  
+
     @sect{0.2.9}
       @ul
         @li
           Lots of improvements to @code{Ctrl-C} and @code{Ctrl-D} handling, to
           make it behave more like other REPLs
-  
+
     @sect{0.2.8}
       @ul
         @li

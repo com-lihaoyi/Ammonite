@@ -47,7 +47,7 @@
 
   @p
     If you want some initialization code available to the REPL, you can add
-    it to your @code{~/.ammonite/predef.scala}.
+    it to your @code{~/.ammonite/predef.sc}.
   @p
     If you have any questions, come hang out on the @sect.ref("Community",
      "mailing list or gitter channel") and get help!
@@ -227,8 +227,8 @@
           Each block of typing, deletes, or navigation counts as one undo. This
           should make it much more convenient to recover from botched copy-pastes
           or bulk-deletions.
-        
-    
+
+
     @sect{Magic Imports}
       @p
         Ammonite provides a set of magic imports that let you load additional
@@ -377,20 +377,20 @@
           "https://github.com/scalaz/scalaz") or @lnk("Shapeless",
           "https://github.com/milessabin/shapeless") and immediately start
           working with them in the REPL:
-  
+
         @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("shapeless", "@"), "\"\"\"")
-  
+
         @p
           Even non-trivial web frameworks like Finagle or Akka-HTTP can be
           simply pulled down and run in the REPL!
-  
+
         @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("finagle", "@"), "\"\"\"")
 
 
       @p
         Ammonite-REPL is configured with a set of default resolvers but you
         can add your own
-        
+
       @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("resolvers", "@"), "\"\"\"")
 
     @sect{Builtins}
@@ -706,7 +706,7 @@
           @li(a("SI-"+bug, href:="https://issues.scala-lang.org/browse/SI-"+bug))
         }
 
- 
+
   @sect{Configuration}
     @p
       Ammonite is configured via Scala code, that can live in the
@@ -715,7 +715,7 @@
       @code{--predef='...'}.
 
     @p
-      Anything that you put in @code{predef.scala} will be executed when you
+      Anything that you put in @code{predef.sc} will be executed when you
       load the Ammonite REPL. This is a handy place to put common imports,
       setup code, or even call @hl.scala{import $ivy} to
       @sect.ref("import $ivy", "load third-party jars"). The compilation
@@ -765,7 +765,7 @@
 
       @p
         If you want these changes to always be present, place them in your
-        @code{~/.ammonite/predef.scala}.
+        @code{~/.ammonite/predef.sc}.
 
     @sect{JVM Flags}
       @p
