@@ -1,33 +1,31 @@
 #!/usr/bin/env amm
 // HttpApi.sc
 import scalaj.http._
-/**
-  * Github URL shortener script using Scalaj-HTTP and the git.io API.
-  */
+
 @main
-def shorten(longUrl: String) = {
-  val res = Http("https://git.io")
-    .postForm(Seq("url" -> longUrl))
-    .asString
-    .headers("Location")
-    .head
+def addPost(title: String, body: String) = {
+  val res = upickle.json.read(
+    Http("http://jsonplaceholder.typicode.com/posts")
+      .postForm(Seq("title"  -> title,
+                    "body"   -> body,
+                    "userId" -> "1"))
+      .asString
+      .body
+  ).obj.get("id").map(_.num.toInt).getOrElse(0)
   println(res)
   res
 }
 
-/**
-  * Github URL shortener script using Scalaj-HTTP and the git.io API.
-  */
 @main
-def listReleases(project: String) = {
+def comments(postId: Int) = {
   val json = upickle.json.read(
-    Http(s"https://api.github.com/repos/$project/releases")
+    Http(s"http://jsonplaceholder.typicode.com/comments?postId=$postId")
       .asString
       .body
   )
-  val releaseNames = for{
+  val names = for{
     item <- json.arr
     name <- item.obj.get("name")
   } yield name.str
-  println(releaseNames.mkString(","))
+  println(names.mkString(","))
 }
