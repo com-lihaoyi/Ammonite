@@ -33,10 +33,10 @@ matrix:
 
   - env: CI_SCRIPT="ci/build.sc test published/test"
     jdk: openjdk7
-    scala: 2.10.5
+    scala: 2.10.6
   - env: CI_SCRIPT="ci/build.sc test integration/test"
     jdk: openjdk7
-    scala: 2.10.5
+    scala: 2.10.6
 
 
   # These are relatively (?) quick so put them last

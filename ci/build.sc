@@ -14,7 +14,7 @@ val allVersions = Seq(
   "2.12.0", "2.12.1"
 )
 
-val latestVersions = Set("2.10.5", "2.11.8", "2.12.1")
+val latestVersions = Set("2.10.6", "2.11.8", "2.12.1")
 
 val buildVersion =
   if (sys.env("TRAVIS_TAG") == "") s"COMMIT-${getGitHash()}"
