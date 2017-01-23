@@ -115,18 +115,20 @@ def executable() = {
 
     println("MASTER COMMIT: Creating a release")
     import upickle.Js
-    scalaj.http.Http("https://api.github.com/repos/lihaoyi/Ammonite/releases")
-      .postData(
-        upickle.json.write(
-          Js.Obj(
-            "tag_name" -> Js.Str(travisTag),
-            "name" -> Js.Str(travisTag),
-            "body" -> Js.Str("http://www.lihaoyi.com/Ammonite/#" + travisTag)
+    if (travisTag != ""){
+      scalaj.http.Http("https://api.github.com/repos/lihaoyi/Ammonite/releases")
+        .postData(
+          upickle.json.write(
+            Js.Obj(
+              "tag_name" -> Js.Str(travisTag),
+              "name" -> Js.Str(travisTag),
+              "body" -> Js.Str("http://www.lihaoyi.com/Ammonite/#" + travisTag)
+            )
           )
         )
-      )
-      .header("Authorization", "token " + sys.env("AMMONITE_BOT_AUTH_TOKEN"))
-      .asString
+        .header("Authorization", "token " + sys.env("AMMONITE_BOT_AUTH_TOKEN"))
+        .asString
+    }
 
     for (version <- latestVersions) {
 
