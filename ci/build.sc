@@ -23,6 +23,7 @@ val buildVersion =
 
 def getGitHash() = %%("git", "rev-parse", "--short", "HEAD").out.trim
 
+def binVersion(v: String) = v.take(v.lastIndexOf("."))
 
 def updateConstants(version: String = buildVersion,
                     unstableVersion: String = "<fill-me-in-in-Constants.scala>",
@@ -31,7 +32,6 @@ def updateConstants(version: String = buildVersion,
   val versionTxt = s"""
     package ammonite
     object Constants{
-      val scalaVersion = "2.12.1"
       val version = "$version"
       val unstableVersion = "$unstableVersion"
       val curlUrl = "$curlUrl"
@@ -101,7 +101,6 @@ def publishDocs() = {
     upload.shorten(s"https://github.com/lihaoyi/Ammonite/releases/download/$unstableKey")
   )
 
-
   %sbt "readme/compile"
   %sbt "readme/run"
 
@@ -110,43 +109,48 @@ def publishDocs() = {
 @main
 def executable() = {
   if (isMasterCommit){
-    println("MASTER COMMIT: Publishing Executable")
-    //Prepare executable
     updateConstants()
-    %sbt("++2.12.1", "amm/test:assembly")
-
     val travisTag = sys.env("TRAVIS_TAG")
     val gitHash = getGitHash()
-    val shortUrl = if (travisTag != ""){
-      import upickle.Js
-      scalaj.http.Http("https://api.github.com/repos/lihaoyi/Ammonite/releases")
-        .postData(
-          upickle.json.write(
-            Js.Obj(
-              "tag_name" -> Js.Str(travisTag),
-              "name" -> Js.Str(travisTag),
-              "body" -> Js.Str("http://www.lihaoyi.com/Ammonite/#" + travisTag)
-            )
+
+    println("MASTER COMMIT: Creating a release")
+    import upickle.Js
+    scalaj.http.Http("https://api.github.com/repos/lihaoyi/Ammonite/releases")
+      .postData(
+        upickle.json.write(
+          Js.Obj(
+            "tag_name" -> Js.Str(travisTag),
+            "name" -> Js.Str(travisTag),
+            "body" -> Js.Str("http://www.lihaoyi.com/Ammonite/#" + travisTag)
           )
         )
-        .header("Authorization", "token " + sys.env("AMMONITE_BOT_AUTH_TOKEN"))
-        .asString
+      )
+      .header("Authorization", "token " + sys.env("AMMONITE_BOT_AUTH_TOKEN"))
+      .asString
 
-      val short = upload(
-        cwd/'amm/'target/"scala-2.12"/'amm,
-        travisTag,
-        travisTag,
-        sys.env("AMMONITE_BOT_AUTH_TOKEN")
-      )
-      short
-    }else{
-      val short = upload(
-        cwd/'amm/'target/"scala-2.12"/'amm,
-        "snapshot-commit-uploads",
-        gitHash,
-        sys.env("AMMONITE_BOT_AUTH_TOKEN")
-      )
-      short
+    for (version <- latestVersions) {
+
+      println("MASTER COMMIT: Publishing Executable for Scala " + version)
+      //Prepare executable
+      %sbt("++" + version, "amm/test:assembly")
+      val bv = binVersion(version)
+      val shortUrl = if (travisTag != ""){
+        val short = upload(
+          cwd/'amm/'target/s"scala-$bv"/'amm,
+          travisTag,
+          s"$bv-$travisTag",
+          sys.env("AMMONITE_BOT_AUTH_TOKEN")
+        )
+        short
+      }else{
+        val short = upload(
+          cwd/'amm/'target/s"scala-$bv"/'amm,
+          "snapshot-commit-uploads",
+          s"$bv-$gitHash",
+          sys.env("AMMONITE_BOT_AUTH_TOKEN")
+        )
+        short
+      }
     }
   }else{
     println("MISC COMMIT: generating executable but not publishing")
