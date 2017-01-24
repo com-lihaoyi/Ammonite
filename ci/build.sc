@@ -39,10 +39,10 @@ def updateConstants(version: String = buildVersion,
       val curlUrl = "$curlUrl"
       val unstableCurlUrl = "$unstableCurlUrl"
       val oldCurlUrls = Seq[(String, String)](
-        ${oldCurlUrls.map{case (name, value) => s"\"$name\" -> \"$value\""}}
+        ${oldCurlUrls.map{case (name, value) => s""" "$name" -> "$value" """}.mkString(",\n")}
       )
       val oldUnstableCurlUrls = Seq[(String, String)](
-        ${oldUnstableCurlUrls.map { case (name, value) => s"\"$name\" -> \"$value\"" }}
+        ${oldUnstableCurlUrls.map{case (name, value) => s""" "$name" -> "$value" """}.mkString(",\n")}
       )
     }
   """
@@ -116,9 +116,9 @@ def publishDocs() = {
     upload.shorten(s"https://github.com/lihaoyi/Ammonite/releases/download/$stableKey"),
     upload.shorten(s"https://github.com/lihaoyi/Ammonite/releases/download/$unstableKey"),
     for(k <- oldStableKeys)
-    yield upload.shorten(s"https://github.com/lihaoyi/Ammonite/releases/download/$k"),
+    yield (k, upload.shorten(s"https://github.com/lihaoyi/Ammonite/releases/download/$k")),
     for(k <- oldUnstableKeys)
-    yield upload.shorten(s"https://github.com/lihaoyi/Ammonite/releases/download/$k")
+    yield (k, upload.shorten(s"https://github.com/lihaoyi/Ammonite/releases/download/$k"))
   )
 
   %sbt "readme/compile"

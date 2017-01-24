@@ -25,12 +25,12 @@
       2.12, Ammonite also provides standalone executables for older versions of
       Scala:
 
-    @for((versionName, link) <- ammonite.Constants.oldCurlUrls)
+    @for(versionNameLink <- ammonite.Constants.oldCurlUrls)
       @b
-        Scala @versionName
+        Scala @versionNameLink._1
 
       @hl.sh
-        @ammonite.Constants.readme.curlCommand(link)
+        @readme.Sample.curlCommand(versionNameLink._2)
 
     @p
       Ammonite can also be used in old versions of Scala, embedded in an SBT
@@ -981,12 +981,12 @@
       Ammonite also provides standalone unstable executables for older versions
       of Scala:
 
-    @for((versionName, link) <- ammonite.Constants.oldUnstableCurlUrls)
+    @for(versionNameLink <- ammonite.Constants.oldUnstableCurlUrls)
       @b
-        Scala @versionName
+        Scala @versionNameLink._1
 
       @hl.sh
-        @ammonite.Constants.readme.curlCommand(link)
+        @readme.Sample.curlCommand(versionNameLink._2)
     @p
       These unstable versions will contain any brand-new features that are
       currently being worked on, with the caveat that they are unstable and
