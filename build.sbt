@@ -144,12 +144,6 @@ lazy val amm = project
       Seq("chmod", "+x", dest.getAbsolutePath).!
       dest
     },
-    assemblyMergeStrategy in assembly := {
-      case PathList("META-INF", xs @ _*) if xs.exists(_ contains "jansi") => MergeStrategy.last
-      case x =>
-        val oldStrategy = (assemblyMergeStrategy in assembly).value
-        oldStrategy(x)
-    },
     parallelExecution in Test := false
   )
 
@@ -218,7 +212,7 @@ lazy val ammRepl = project
     crossVersion := CrossVersion.full,
     name := "ammonite-repl",
     libraryDependencies ++= Seq(
-      "jline" % "jline" % "2.12"
+      "jline" % "jline" % "2.14.3"
     )
   )
 
