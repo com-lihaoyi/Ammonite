@@ -19,6 +19,23 @@
       @li
         @lnk("Mailing List", "https://groups.google.com/forum/#!forum/ammonite-scala")
 
+  @sect{Older Scala Versions}
+    @p
+      While most people would be using Ammonite for the latest version of Scala,
+      2.12, Ammonite also provides standalone executables for older versions of
+      Scala:
+
+    @for((versionName, link) <- ammonite.Constants.oldCurlUrls)
+      @b
+        Scala @versionName
+
+      @hl.sh
+        @ammonite.Constants.readme.curlCommand(link)
+
+    @p
+      Ammonite can also be used in old versions of Scala, embedded in an SBT
+      project, without any special modifications.
+
   @sect{Talks}
     @p
       I've also given a number of talks about Ammonite at conferences:
@@ -960,6 +977,16 @@
 
       initialCommands in (Test, console) := """ammonite.Main().run()"""
 
+    @p
+      Ammonite also provides standalone unstable executables for older versions
+      of Scala:
+
+    @for((versionName, link) <- ammonite.Constants.oldUnstableCurlUrls)
+      @b
+        Scala @versionName
+
+      @hl.sh
+        @ammonite.Constants.readme.curlCommand(link)
     @p
       These unstable versions will contain any brand-new features that are
       currently being worked on, with the caveat that they are unstable and

@@ -25,7 +25,8 @@
     files, without the hassle of setting up a heavyweight SBT project.
 
   @p
-    To begin with, download the Ammonite script-runner:
+    To begin with, download the Ammonite script-runner for Scala 2.12 (also
+    available for @sect.ref{Older Scala Versions}):
 
   @hl.sh
     @replCurl

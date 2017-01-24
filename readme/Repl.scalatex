@@ -23,7 +23,8 @@
 
   @p
     If you want to use Ammonite as a plain Scala shell, download the
-    standalone executable:
+    standalone executable for Scala 2.12 (also available for
+    @sect.ref{Older Scala Versions}):
 
   @hl.sh
     @replCurl

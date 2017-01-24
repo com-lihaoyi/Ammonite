@@ -28,7 +28,9 @@ def binVersion(v: String) = v.take(v.lastIndexOf("."))
 def updateConstants(version: String = buildVersion,
                     unstableVersion: String = "<fill-me-in-in-Constants.scala>",
                     curlUrl: String = "<fill-me-in-in-Constants.scala>",
-                    unstableCurlUrl: String = "<fill-me-in-in-Constants.scala>") = {
+                    unstableCurlUrl: String = "<fill-me-in-in-Constants.scala>",
+                    oldCurlUrls: Seq[(String, String)] = Nil,
+                    oldUnstableCurlUrls: Seq[(String, String)] = Nil) = {
   val versionTxt = s"""
     package ammonite
     object Constants{
@@ -36,6 +38,12 @@ def updateConstants(version: String = buildVersion,
       val unstableVersion = "$unstableVersion"
       val curlUrl = "$curlUrl"
       val unstableCurlUrl = "$unstableCurlUrl"
+      val oldCurlUrls = Seq[(String, String)](
+        ${oldCurlUrls.map{case (name, value) => s"\"$name\" -> \"$value\""}}
+      )
+      val oldUnstableCurlUrls = Seq[(String, String)](
+        ${oldUnstableCurlUrls.map { case (name, value) => s"\"$name\" -> \"$value\"" }}
+      )
     }
   """
   println("Writing Constants.scala")
@@ -80,16 +88,24 @@ def publishDocs() = {
 
   val latestTaggedVersion = %%('git, 'describe, "--abbrev=0", "--tags").out.trim
 
-  val (stableKey, unstableKey) =
+  val (stableKey, unstableKey, oldStableKeys, oldUnstableKeys) =
     if (travisTag != ""){
       (
-        s"$latestTaggedVersion/$latestTaggedVersion",
-        s"$latestTaggedVersion/$latestTaggedVersion"
+        s"$latestTaggedVersion/2.12-$latestTaggedVersion",
+        s"$latestTaggedVersion/2.12-$latestTaggedVersion",
+        for(v <- Seq("2.10", "2.11"))
+        yield s"$latestTaggedVersion/$v-$latestTaggedVersion",
+        for(v <- Seq("2.10", "2.11"))
+        yield s"$latestTaggedVersion/$v-$latestTaggedVersion"
       )
     }else{
       (
-        s"$latestTaggedVersion/$latestTaggedVersion",
-        s"snapshot-commit-uploads/$gitHash"
+        s"$latestTaggedVersion/2.12-$latestTaggedVersion",
+        s"snapshot-commit-uploads/2.12-$gitHash",
+        for(v <- Seq("2.10", "2.11"))
+        yield s"$latestTaggedVersion/$v-$latestTaggedVersion",
+        for(v <- Seq("2.10", "2.11"))
+        yield s"snapshot-commit-uploads/$v-$latestTaggedVersion"
       )
     }
   println("(stableKey, unstableKey)")
@@ -98,7 +114,11 @@ def publishDocs() = {
     latestTaggedVersion,
     buildVersion,
     upload.shorten(s"https://github.com/lihaoyi/Ammonite/releases/download/$stableKey"),
-    upload.shorten(s"https://github.com/lihaoyi/Ammonite/releases/download/$unstableKey")
+    upload.shorten(s"https://github.com/lihaoyi/Ammonite/releases/download/$unstableKey"),
+    for(k <- oldStableKeys)
+    yield upload.shorten(s"https://github.com/lihaoyi/Ammonite/releases/download/$k"),
+    for(k <- oldUnstableKeys)
+    yield upload.shorten(s"https://github.com/lihaoyi/Ammonite/releases/download/$k")
   )
 
   %sbt "readme/compile"
