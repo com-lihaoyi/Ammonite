@@ -114,6 +114,23 @@
 
 
   @sect{Changelog}
+
+    @sect{0.8.2}
+      @ul
+        @li
+          Automatically publish standalone executable for Scala 2.10 and 2.11,
+          thanks to @lnk("jhnsmth", "https://github.com/jhnsmth")
+        @li
+          Bytecode of classes defined in the REPL is now accessible via
+          @code{getClass.getClassLoader.getResource}, thanks to
+          @lnk("jhnsmth", "https://github.com/jhnsmth")
+        @li
+          Fix crash in working with Hadoop in Ammonite (@issue(535)), thanks to
+          @lnk("Tom Dyas", "https://github.com/tdyas")
+        @li
+          @code{Ctrl-u} and @code{Ctrl-k} now cut to the beginning/end of the
+          current line (@issue(514)), rather than the entire input block, thanks to
+          @lnk("Jordan Gwyn", "https://github.com/emanresusername")
     @sect{0.8.1}
       @ul
         @li

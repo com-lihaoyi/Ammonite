@@ -105,7 +105,7 @@ def publishDocs() = {
         for(v <- Seq("2.10", "2.11"))
         yield s"$latestTaggedVersion/$v-$latestTaggedVersion",
         for(v <- Seq("2.10", "2.11"))
-        yield s"snapshot-commit-uploads/$v-$latestTaggedVersion"
+        yield s"snapshot-commit-uploads/$v-$gitHash"
       )
     }
   println("(stableKey, unstableKey)")
