@@ -40,7 +40,7 @@
       the REPL; this can be used to save common functionality so it can be
       used at a later date. In the simplest case, a script file is simply a
       sequence of Scala statements, e.g.
-  
+
     @hl.scala
       // MyScript.sc
       // print banner
@@ -72,7 +72,7 @@
       Hello World!!
       x is 123
       ...
-  
+
     @sect{Script Imports}
       @p
         No code stands alone; scripts depend on other scripts. Often they depend
@@ -96,26 +96,26 @@
           need to set up a @code{src/main/scala} folder, and create a build file,
           and all these other things: simply split your script into two files, and
           import one from the other using @sect.ref{import $file}:
-    
+
         @hl.ref('amm/'src/'test/'resources/'importHooks/"Basic.sc")
-    
+
         @hl.ref('amm/'src/'test/'resources/'importHooks/"FileImport.sc")
-    
+
         @p
-          Here, we are defining a simple @hl.scala{val} in @code{Basic.scala}, and
-          then importing it from @code{FileImport.scala}. And of course, we can
-          use what we defined in @code{FileImport.scala} and import it in another
+          Here, we are defining a simple @hl.scala{val} in @code{Basic.sc}, and
+          then importing it from @code{FileImport.sc}. And of course, we can
+          use what we defined in @code{FileImport.sc} and import it in another
           file
-    
+
         @hl.ref('amm/'src/'test/'resources/'importHooks/"IndirectFileImport.sc")
-    
+
         @p
           And so on, importing files as many or as deep as you want. You can
           use @hl.scala{^} segments at the start of your @hl.scala{import $file}
           to import things from outside your current working directory, e.g.
           @hl.scala{import $file.^.^.foo} will import the script file
           @code{../../foo.sc} and make it available for you to use.
-    
+
         @p
           @hl.scala{$file} imports inside Scala Scripts behave the same as
           @hl.scala{$file} imports @sect.ref("import $file",
@@ -168,19 +168,19 @@
         *after* the current compilation block is compiled, you need to split
         your script into two compilation blocks, and can only use the results
         of the @hl.scala{load}ed code in subsequent blocks:
-    
+
       @hl.scala
         // print banner
         println("Welcome to the XYZ custom REPL!!")
         val scalazVersion = "7.1.1"
         interp.load.ivy("org.scalaz" %% "scalaz-core" % scalazVersion)
-    
+
         @@
-    
+
         // common imports
         import scalaz._
         import Scalaz._
-    
+
         // use Scalaz!
         ...
 
@@ -190,7 +190,7 @@
         Nevertheless, sometimes you may find yourself needing to get "under the
         hood" and use these @hl.scala{load}ing functions directly. When that
         happens, using @sect.ref{Multi-stage Scripts} is the way to go.
-    
+
     @sect{Script Arguments}
       @p
         Often when calling a script from the external command-line (e.g.
@@ -350,7 +350,7 @@
         @replCurl
 
       @hl.scala
-        bash$ amm path/to/script.scala
+        bash$ amm path/to/script.sc
 
       @p
         All types, values and imports defined in scripts are available to
@@ -359,7 +359,7 @@
       @p
         You can also make an Ammonite script self-executable by using a shebang
         @hl.scala{#!}. This is an example script named @hl.scala{hello}. There
-        is no need to add the @hl.scala{.scala} extension. The @hl.scala{amm}
+        is no need to add the @hl.scala{.sc} extension. The @hl.scala{amm}
         command needs to be in the @hl.scala{PATH}:
       @hl.sh
         #!/usr/bin/env amm
@@ -377,7 +377,7 @@
         a custom memory limit via
 
       @hl.scala
-        bash$ JAVA_OPTS="-Xmx1024m" amm path/to/script.scala
+        bash$ JAVA_OPTS="-Xmx1024m" amm path/to/script.sc
 
       @p
         To let it use only up to 1024 megabytes of memory
@@ -391,7 +391,7 @@
       @hl.scala
         @@ x // doesn't work yet
         Compilation Failed
-        cmd0.scala:1: not found: value x
+        cmd0.sc:1: not found: value x
         val res0 = x // doesn't work yet
                    ^
         @@ import $file.MyScript
@@ -412,7 +412,7 @@
       @hl.scala
         @@ x // doesn't work yet
         Compilation Failed
-        cmd0.scala:1: not found: value x
+        cmd0.sc:1: not found: value x
         val res0 = x // doesn't work yet
                    ^
         @@ import $file.MyScript, MyScript._
@@ -431,7 +431,7 @@
         Welcome to the XYZ custom REPL!!
         import $file.$
         @@ mutable.Buffer(x)
-        cmd1.scala:1: not found: value mutable
+        cmd1.sc:1: not found: value mutable
         val res1 = mutable.Buffer(x)
                    ^
         Compilation Failed
@@ -497,7 +497,7 @@
           Otherwise, the source code for this script is then wrapped in a
           @hl.scala{package}/@hl.scala{object} wrapper, corresponding to the
           path to the script from the current working directory. For example,
-          a script at path @code{foo/bar/baz/Qux.scala} will be wrapped in:
+          a script at path @code{foo/bar/baz/Qux.sc} will be wrapped in:
 
           @hl.scala
 
@@ -521,7 +521,7 @@
         Although this is much slower than other scripting languages like Bash
         (which starts up in ~4ms) or Python (~30ms), in practice it is
         acceptable for many use cases. You probably do not want to
-        @code{find . | xargs amm Foo.scala} on large numbers of files, where
+        @code{find . | xargs amm Foo.sc} on large numbers of files, where
         the 100ms overhead will add up, but for individual scripts it should
         be fine.
       @p
