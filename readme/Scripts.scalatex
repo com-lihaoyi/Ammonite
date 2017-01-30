@@ -164,10 +164,16 @@
       @p
         These are plain-old-Scala-functions that let you pass in a
         @hl.scala{Path} to a script to load, or load different Ivy artifacts
-        depending on runtime values. However, since these functions get run
-        *after* the current compilation block is compiled, you need to split
-        your script into two compilation blocks, and can only use the results
-        of the @hl.scala{load}ed code in subsequent blocks:
+        depending on runtime values. Additionally, there is an overloaded
+        version of @hl.scala{interp.load.cp} which takes a @hl.scala{Seq[Path]}
+        of classpath entries. This variant is much more efficient for adding
+        multiple classpath entries at once.
+
+      @p
+        Since these functions get run *after* the current compilation block is
+        compiled, you need to split your script into two compilation blocks,
+        and can only use the results of the @hl.scala{load}ed code in
+        subsequent blocks:
 
       @hl.scala
         // print banner

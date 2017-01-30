@@ -23,7 +23,7 @@ trait InterpAPI {
   def load: Load
 
   /**
-   * resolvers to use when loading jars 
+   * resolvers to use when loading jars
    */
   def resolvers: Ref[List[Resolver]]
 
@@ -36,6 +36,10 @@ trait LoadJar {
    * Load a `.jar` file or directory into your JVM classpath
    */
   def cp(jar: Path): Unit
+  /**
+   * Load one or more `.jar` files or directories into your JVM classpath
+   */
+  def cp(jars: Seq[Path]): Unit
   /**
    * Load a library from its maven/ivy coordinates
    */
@@ -53,7 +57,7 @@ trait Load extends (String => Unit) with LoadJar{
    * Loads and executes the scriptfile on the specified path.
    * Compilation units separated by `@\n` are evaluated sequentially.
    * If an error happens it prints an error message to the console.
-   */ 
+   */
   def exec(path: Path): Unit
 
   def module(path: Path): Unit
