@@ -81,6 +81,9 @@ case class IvyThing(resolvers: () => List[Resolver], printer: Printer, verboseOu
       .setRefresh(true)
       .setOutputReport(false)
 
+    //set proxy properties from env:
+    ProxyFromEnv.setPropProxyFromEnv()
+
     //init resolve report
     val report = ivy.resolve(md, options)
     val unresolved = report.getAllProblemMessages
@@ -240,4 +243,57 @@ object Resolver{
       res
     }
   }
+}
+
+private object ProxyFromEnv {
+  private lazy val KeyPattern ="""([\w\d]+)_proxy""".r
+  private lazy val UrlPattern ="""([\w\d]+://)?(.+@)?([\w\d\.]+):(\d+)/?""".r
+
+  /**
+    * Get current proxy environment variables.
+    */
+  private def getEnvs =
+    sys.env.map(p => (p._1.toLowerCase, p._2.toLowerCase)).filterKeys(_.endsWith("proxy"))
+
+  /**
+    * Convert single proxy environment variable to corresponding system proxy properties.
+    */
+  private def envToProps(env: (String, String)): Map[String, String] = env match {
+    case ("no_proxy", noProxySeq) =>
+      Map.empty //not implemented
+    case (KeyPattern(proto), UrlPattern(_, cred, host, port)) =>
+      val propHost = s"$proto.proxyHost" -> host
+      val propPort = s"$proto.proxyPort" -> port
+      val propCred = if (cred.isDefined) {
+        val credPair = cred.dropRight(1).split(":")
+        val propUser = s"$proto.proxyUser" -> credPair.head
+        val propPassword = credPair.drop(1).map(s"$proto.proxyPassword" -> _)
+        Seq(propUser) ++ propPassword
+      } else Nil
+      Seq(propHost, propPort) ++ propCred toMap
+    case bad => Map.empty
+  }
+
+
+  /**
+    * Set system proxy properties from environment variables.
+    * Existing properties will not be overwritten.
+    */
+  def setPropProxyFromEnv(envs: Map[String, String] = this.getEnvs): Unit = {
+    val sysProps = sys.props
+    val proxyProps = envs.flatMap { env =>
+      val props = envToProps(env)
+      if (props.isEmpty) println(s"Warn: environment variable$env cannot be parsed.")
+      props
+    }.filter(p => !sysProps.exists(sp => sp._1 == p._1))
+    sysProps ++= proxyProps
+  }
+
+  /**
+    * helper implicit conversion: add isDefined method to String.
+    */
+  implicit private class StringIsDefined(s: String) {
+    def isDefined: Boolean = s != null && s.length > 0
+  }
+
 }
