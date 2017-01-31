@@ -11,6 +11,8 @@ import org.apache.ivy.plugins.repository.file.FileRepository
 import org.apache.ivy.plugins.resolver._
 import org.apache.ivy.util._
 
+import scala.language.postfixOps
+
 
 object IvyConstructor extends IvyConstructor
 trait IvyConstructor{

@@ -9,7 +9,7 @@ object ProxyFromEnvTest extends TestSuite {
   //clear proxy properties
   private def getProxyProps: Map[String, String] = {
     //proper use of filterKeys, because in test and not heavy
-    sys.props.filterKeys(_.contains("proxy"))
+    sys.props.filterKeys(_.contains("proxy")).toMap
   }
 
   val positives: Map[String, String] = Map(
