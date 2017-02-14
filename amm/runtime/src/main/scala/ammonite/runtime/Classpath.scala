@@ -33,9 +33,12 @@ object Classpath {
     loop(System.getProperty(property).split(java.io.File.pathSeparator),Vector())
   }
 
-  private def getCPFromClassLoader(loader:ClassLoader = Thread.currentThread.getContextClassLoader):Vector[File] = {
+  private def getCPFromClassLoader(
+    loader:ClassLoader = Thread.currentThread.getContextClassLoader): Vector[File] = {
     @annotation.tailrec
-    def loop(cl:ClassLoader,cp:Vector[File],f:(Array[java.net.URL],Vector[File]) => Vector[File]):Vector[File] = {
+    def loop(cl:ClassLoader,
+             cp:Vector[File],
+             f:(Array[java.net.URL],Vector[File]) => Vector[File]): Vector[File] = {
       cl match {
         case null => cp
         case t: java.net.URLClassLoader => loop(cl.getParent, f(t.getURLs,cp ++ Vector()), f)
