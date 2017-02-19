@@ -102,6 +102,7 @@
           |rm -rf target/test""".stripMargin,
         """mkdir! 'target/'test
           |write('target/'test/"hello.txt", "hello")
+          |read('target/'test/"hello.txt")
           |ls! 'target/'test
           |cp('target/'test/"hello.txt", 'target/'test/"hello2.txt")
           |ls! 'target/'test
