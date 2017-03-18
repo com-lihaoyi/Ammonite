@@ -1043,7 +1043,7 @@ target
 terminal
 .travis.yml
 
-real	0m0.003s
+real	0m0.002s
 user	0m0.000s
 sys	0m0.000s</pre><pre><span>Compiling HardcodedPredef.sc
 Compiling ArgsPredef.sc
@@ -1060,7 +1060,7 @@ Welcome to the Ammonite Repl 0.8.2
 </span><span style="color: #27ae60;">.travis.yml</span><span>     </span><span style="color: #27ae60;">build.sbt</span><span>       </span><span style="color: #27ae60;">internals-docs</span><span>  </span><span style="color: #27ae60;">readme.md</span><span>       </span><span style="color: #27ae60;">terminal</span><span>
 </span><span style="color: #27ae60;">LICENSE</span><span>         </span><span style="color: #27ae60;">ci</span><span>              </span><span style="color: #27ae60;">ops</span><span>             </span><span style="color: #27ae60;">shell</span><span>
 ,
-  18292102 nanoseconds
+  12570029 nanoseconds
 )</span></pre></div>
 
           <p>
@@ -3501,11 +3501,11 @@ bash$ </span>find ./ops/src/main -name '*.scala' | xargs wc -l
   137 ./ops/src/main/scala/ammonite/ops/Model.scala
   376 ./ops/src/main/scala/ammonite/ops/Path.scala
    73 ./ops/src/main/scala/ammonite/ops/PathUtils.scala
-  198 ./ops/src/main/scala/ammonite/ops/Shellout.scala
+  204 ./ops/src/main/scala/ammonite/ops/Shellout.scala
   121 ./ops/src/main/scala/ammonite/ops/package.scala
- 1498 total</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>
+ 1504 total</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>
 ls.rec! wd/</span><span style="color: #27ae60;">'ops</span><span>/</span><span style="color: #27ae60;">'src</span><span>/</span><span style="color: #27ae60;">'main</span><span> |? (</span><span style="color: #f39c12;">_</span><span>.ext == </span><span style="color: #27ae60;">&quot;scala&quot;</span><span>) | read.lines | (</span><span style="color: #f39c12;">_</span><span>.size) sum 
-</span><span style="color: #16a085;">res0</span><span>: </span><span style="color: #27ae60;">Int</span><span> = </span><span style="color: #27ae60;">1500</span></pre></div>
+</span><span style="color: #16a085;">res0</span><span>: </span><span style="color: #27ae60;">Int</span><span> = </span><span style="color: #27ae60;">1506</span></pre></div>
 
       <p>
         For more examples of how to use Ammonite's pipes, check out the section on <a href="#Extensions">Extensions</a> and <a href="#Chaining">Chaining</a></p>
@@ -3535,15 +3535,15 @@ HELLO
 </p>
       <div><pre><span style="color: #8e44ad;">
 bash$ </span>git branch
-* (detached from 49775a8)
+* (detached from fabce69)
   master</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>%git </span><span style="color: #27ae60;">'branch</span><span> 
-* (detached from 49775a8)
+* (detached from fabce69)
   master
 </span></pre></div>
       <div><pre><span style="color: #8e44ad;">
 bash$ </span>date
-Sun Feb 19 10:57:42 UTC 2017</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>%date 
-Sun Feb 19 10:57:50 UTC 2017
+Sat Mar 18 11:17:43 UTC 2017</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>%date 
+Sat Mar 18 11:17:49 UTC 2017
 </span></pre></div>
 
       <p>
@@ -3732,9 +3732,9 @@ Hello from Java!
 </span><span style="color: #8e44ad;">travis-Ammonite@ </span><span style="color: #f39c12;">import</span><span> java.util.</span><span style="color: #f39c12;">_</span><span> 
 </span><span style="color: #27ae60;">import </span><span style="color: #16a085;">java.util._</span><span>
 </span><span style="color: #8e44ad;">travis-Ammonite@ </span><span style="color: #f39c12;">val</span><span> date = </span><span style="color: #f39c12;">new</span><span> </span><span style="color: #27ae60;">Date</span><span>() 
-</span><span style="color: #16a085;">date</span><span>: </span><span style="color: #27ae60;">Date</span><span> = Sun Feb 19 10:59:58 UTC 2017
+</span><span style="color: #16a085;">date</span><span>: </span><span style="color: #27ae60;">Date</span><span> = Sat Mar 18 11:19:36 UTC 2017
 </span><span style="color: #8e44ad;">travis-Ammonite@ </span><span>date.getDay() 
-</span><span style="color: #16a085;">res3</span><span>: </span><span style="color: #27ae60;">Int</span><span> = </span><span style="color: #27ae60;">0</span></pre>
+</span><span style="color: #16a085;">res3</span><span>: </span><span style="color: #27ae60;">Int</span><span> = </span><span style="color: #27ae60;">6</span></pre>
 
       <p>
         In fact, Ammonite-Shell allows you to ask for any published third-party Java/Scala library for usage in the shell, and have them downloaded, automatically cached, and made available for use. e.g. we can load popular libraries like <a href="https://github.com/google/guava">Google Guava</a> and using it in the shell:
@@ -3753,13 +3753,13 @@ import com.google.common.collect.ImmutableBiMap // Doesn't work
 	found com.google.guava#guava;18.0 in central
 	found com.google.code.findbugs#jsr305;1.3.9 in central
 downloading http://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0-javadoc.jar ...
-	[SUCCESSFUL ] com.google.guava#guava;18.0!guava.jar(javadoc) (122ms)
-downloading http://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0-sources.jar ...
-	[SUCCESSFUL ] com.google.guava#guava;18.0!guava.jar(source) (12ms)
+	[SUCCESSFUL ] com.google.guava#guava;18.0!guava.jar(javadoc) (121ms)
 downloading http://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0.jar ...
 	[SUCCESSFUL ] com.google.guava#guava;18.0!guava.jar(bundle) (17ms)
+downloading http://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0-sources.jar ...
+	[SUCCESSFUL ] com.google.guava#guava;18.0!guava.jar(source) (9ms)
 downloading http://repo1.maven.org/maven2/com/google/code/findbugs/jsr305/1.3.9/jsr305-1.3.9.jar ...
-	[SUCCESSFUL ] com.google.code.findbugs#jsr305;1.3.9!jsr305.jar (6ms)
+	[SUCCESSFUL ] com.google.code.findbugs#jsr305;1.3.9!jsr305.jar (4ms)
 </span><span style="color: #27ae60;">import </span><span style="color: #16a085;">$ivy.$                             // Load from Maven Central</span><span>
 </span><span style="color: #8e44ad;">travis-Ammonite@ </span><span style="color: #f39c12;">import</span><span> com.google.common.collect.ImmutableBiMap </span><span style="color: #2980b9;">// Works now</span><span> 
 </span><span style="color: #27ae60;">import </span><span style="color: #16a085;">com.google.common.collect.ImmutableBiMap // Works now</span><span>
@@ -3780,13 +3780,13 @@ downloading http://repo1.maven.org/maven2/com/google/code/findbugs/jsr305/1.3.9/
 	found joda-time#joda-time;2.8.2 in central
 	found org.joda#joda-convert;1.2 in central
 downloading http://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2-sources.jar ...
-	[SUCCESSFUL ] joda-time#joda-time;2.8.2!joda-time.jar(source) (57ms)
+	[SUCCESSFUL ] joda-time#joda-time;2.8.2!joda-time.jar(source) (50ms)
 downloading http://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2.jar ...
-	[SUCCESSFUL ] joda-time#joda-time;2.8.2!joda-time.jar (145ms)
+	[SUCCESSFUL ] joda-time#joda-time;2.8.2!joda-time.jar (18ms)
 downloading http://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2-javadoc.jar ...
-	[SUCCESSFUL ] joda-time#joda-time;2.8.2!joda-time.jar(javadoc) (66ms)
+	[SUCCESSFUL ] joda-time#joda-time;2.8.2!joda-time.jar(javadoc) (24ms)
 downloading http://repo1.maven.org/maven2/org/joda/joda-convert/1.2/joda-convert-1.2.jar ...
-	[SUCCESSFUL ] org.joda#joda-convert;1.2!joda-convert.jar (15ms)
+	[SUCCESSFUL ] org.joda#joda-convert;1.2!joda-convert.jar (4ms)
 </span><span style="color: #27ae60;">import </span><span style="color: #16a085;">$ivy.$                          </span><span>
 </span><span style="color: #8e44ad;">travis-Ammonite@ </span><span style="color: #f39c12;">import</span><span> org.joda.time.{DateTime, Period, Duration} 
 </span><span style="color: #27ae60;">import </span><span style="color: #16a085;">org.joda.time.{DateTime, Period, Duration}</span><span>
@@ -5246,15 +5246,15 @@ try {
       The page above contains the documentation for the latest stable version
       of Ammonite, <code>0.8.2</code>. Ammonite also publishes
       unstable versions, the latest of which is
-      <code>COMMIT-49775a8</code> and is available for direct
+      <code>COMMIT-fabce69</code> and is available for direct
       download:
 </p>
-    <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/vD5WK &amp;&amp; sudo chmod +x /usr/local/bin/amm &amp;&amp; amm
+    <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/vy5c6 &amp;&amp; sudo chmod +x /usr/local/bin/amm &amp;&amp; amm
 </code></pre>
     <p>
       Or usage in an SBT project
 </p>
-    <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;COMMIT-49775a8&quot; % &quot;test&quot; cross CrossVersion.full
+    <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;COMMIT-fabce69&quot; % &quot;test&quot; cross CrossVersion.full
 
 initialCommands in (Test, console) := &quot;&quot;&quot;ammonite.Main().run()&quot;&quot;&quot;
 </code></pre>
@@ -5264,13 +5264,13 @@ initialCommands in (Test, console) := &quot;&quot;&quot;ammonite.Main().run()&qu
 </p>
     
       <b>
-        Scala snapshot-commit-uploads/2.10-49775a8
+        Scala snapshot-commit-uploads/2.10-fabce69
 </b>
-      <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/vD5W6 &amp;&amp; sudo chmod +x /usr/local/bin/amm &amp;&amp; amm</code></pre>
+      <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/vy5ci &amp;&amp; sudo chmod +x /usr/local/bin/amm &amp;&amp; amm</code></pre>
       <b>
-        Scala snapshot-commit-uploads/2.11-49775a8
+        Scala snapshot-commit-uploads/2.11-fabce69
 </b>
-      <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/vD5Wi &amp;&amp; sudo chmod +x /usr/local/bin/amm &amp;&amp; amm</code></pre>
+      <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/vy5cP &amp;&amp; sudo chmod +x /usr/local/bin/amm &amp;&amp; amm</code></pre>
     <p>
       These unstable versions will contain any brand-new features that are
       currently being worked on, with the caveat that they are unstable and
