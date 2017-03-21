@@ -23,6 +23,13 @@ package $ivy{
 }
 
 /**
+  * Package that gets filled with maven artifacts the user loads
+  */
+package $maven{
+  object $
+}
+
+/**
   * Package that gets filled with any web scripts people load from http URLs
   */
 package $url{

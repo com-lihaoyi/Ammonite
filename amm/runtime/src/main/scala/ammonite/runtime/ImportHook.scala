@@ -6,6 +6,7 @@ import acyclic.file
 import ammonite.ops.{read, _}
 import ammonite.runtime.tools.IvyThing
 import ammonite.util._
+import org.jboss.shrinkwrap.resolver.api.maven.{Maven => MavenResolver}
 
 /**
   * An extensible hook into the Ammonite REPL's import system; allows the end
@@ -177,6 +178,43 @@ object ImportHook{
       resolved.flatten.map(Path(_)).map(Result.ClassPath(_, plugin))
     }
   }
+
+
+  object Maven extends ImportHook{
+    def splitImportTree(tree: ImportTree): Res[Seq[String]] = {
+      tree match{
+        case ImportTree(Seq(part), None, _, _) => Res.Success(Seq(part))
+        case ImportTree(Nil, Some(mapping), _, _) if mapping.map(_._2).forall(_.isEmpty) =>
+          Res.Success(mapping.map(_._1))
+        case _ => Res.Failure(None, "Invalid $maven import " + tree)
+      }
+    }
+    def resolve(interp: InterpreterInterface, signature: String) = for{
+      (a, b, c) <-  signature.split(':') match{
+        case Array(a, b, c) => Res.Success((a, b, c))
+        case Array(a, "", b, c) => Res.Success((a, b + "_" + IvyThing.scalaBinaryVersion, c))
+        case _ => Res.Failure(None, s"Invalid $$maven import: [$signature]")
+      }
+      jars <- {
+        try {
+          val resolved = MavenResolver.resolver().resolve(s"${a}:${b}:${c}").withTransitivity().asFile()
+          Res.Success(resolved)
+        } catch {case ex =>
+          Res.Exception(ex, "")
+        }
+      }
+    } yield jars
+
+    def handle(source: ImportHook.Source, tree: ImportTree, interp: InterpreterInterface) = for{
+    // import $maven.`com.lihaoyi:scalatags_2.11:0.5.4`
+      parts <- splitImportTree(tree)
+      resolved <- Res.map(parts)(resolve(interp, _))
+    } yield {
+      resolved.flatten.map(Path(_)).map(Result.ClassPath(_, false))
+    }
+  }
+
+
   object Classpath extends BaseClasspath(plugin = false)
   object PluginClasspath extends BaseClasspath(plugin = true)
   class BaseClasspath(plugin: Boolean) extends ImportHook{

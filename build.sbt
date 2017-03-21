@@ -16,7 +16,13 @@ dontPublishSettings
 
 val macroSettings = Seq(
   libraryDependencies ++= Seq(
-    "org.scala-lang" % "scala-reflect" % scalaVersion.value % Provided
+    "org.scala-lang" % "scala-reflect" % scalaVersion.value % Provided,
+    "org.jboss.shrinkwrap.resolver" % "shrinkwrap-resolver-api" % "2.2.6",
+    "org.jboss.shrinkwrap.resolver" % "shrinkwrap-resolver-spi" % "2.2.6",
+    "org.jboss.shrinkwrap.resolver" % "shrinkwrap-resolver-api-maven" % "2.2.6",
+    "org.jboss.shrinkwrap.resolver" % "shrinkwrap-resolver-spi-maven" % "2.2.6",
+    "org.jboss.shrinkwrap.resolver" % "shrinkwrap-resolver-impl-maven" % "2.2.6",
+    "org.jboss.shrinkwrap.resolver" % "shrinkwrap-resolver-impl-maven-archive" % "2.2.6"
   ) ++ (
     if (!scalaVersion.value.startsWith("2.10.")) Nil
     else Seq(

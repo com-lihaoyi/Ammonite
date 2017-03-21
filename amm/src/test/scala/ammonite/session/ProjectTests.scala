@@ -33,6 +33,21 @@ object ProjectTests extends TestSuite{
         """)
           }
         }
+        'transitive - {
+          retry(3) {
+            // ivy or maven central are flaky =/
+            check.session(
+              s"""
+          @ import $$maven.`com.github.nscala-time::nscala-time:2.16.0`
+
+          @ import com.github.nscala_time.time.Imports._
+          import com.github.nscala_time.time.Imports._
+
+          @ (2.hours + 45.minutes + 10.seconds).millis
+          res2: Long = 9910000L
+        """)
+          }
+        }
         'akkahttp - {
             if (!scala2_12) check.session(
               """
