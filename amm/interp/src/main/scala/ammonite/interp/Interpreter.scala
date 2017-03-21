@@ -55,6 +55,7 @@ class Interpreter(val printer: Printer,
   val dynamicClasspath = new VirtualDirectory("(memory)", None)
   var compiler: Compiler = null
   var pressy: Pressy = _
+  val beforeExitHooks = mutable.Buffer.empty[Any ⇒ Any]
 
   def evalClassloader = eval.frames.head.classloader
 

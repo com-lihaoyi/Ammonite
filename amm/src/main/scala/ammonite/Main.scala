@@ -106,7 +106,8 @@ case class Main(predef: String = "",
   }
   def run(replArgs: Bind[_]*) = {
     val repl = instantiateRepl(replArgs)
-    repl.run()
+    val exitValue = repl.run()
+    repl.beforeExit(exitValue)
   }
 
   /**
