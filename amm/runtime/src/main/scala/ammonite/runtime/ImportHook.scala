@@ -197,7 +197,8 @@ object ImportHook{
       }
       jars <- {
         try {
-          val resolved = MavenResolver.resolver()
+          val resolved = MavenResolver.configureResolver()
+            .useLegacyLocalRepo(true)
             .resolve(s"${a}:${b}:${c}")
             .withTransitivity().asFile()
           Res.Success(resolved)
