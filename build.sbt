@@ -16,13 +16,7 @@ dontPublishSettings
 
 val macroSettings = Seq(
   libraryDependencies ++= Seq(
-    "org.scala-lang" % "scala-reflect" % scalaVersion.value % Provided,
-    "org.jboss.shrinkwrap.resolver" % "shrinkwrap-resolver-api" % "2.2.6",
-    "org.jboss.shrinkwrap.resolver" % "shrinkwrap-resolver-spi" % "2.2.6",
-    "org.jboss.shrinkwrap.resolver" % "shrinkwrap-resolver-api-maven" % "2.2.6",
-    "org.jboss.shrinkwrap.resolver" % "shrinkwrap-resolver-spi-maven" % "2.2.6",
-    "org.jboss.shrinkwrap.resolver" % "shrinkwrap-resolver-impl-maven" % "2.2.6",
-    "org.jboss.shrinkwrap.resolver" % "shrinkwrap-resolver-impl-maven-archive" % "2.2.6"
+    "org.scala-lang" % "scala-reflect" % scalaVersion.value % Provided
   ) ++ (
     if (!scalaVersion.value.startsWith("2.10.")) Nil
     else Seq(
@@ -33,11 +27,24 @@ val macroSettings = Seq(
 )
 
 val sharedSettings = Seq(
-
+  assemblyMergeStrategy in assembly := {
+    case PathList("javax", "servlet", xs@_*) => MergeStrategy.first
+    case m if m.toLowerCase.endsWith("manifest.mf") => MergeStrategy.discard
+    case m if m.toLowerCase.matches("meta-inf.*\\.sf$") => MergeStrategy.discard
+    case _ => MergeStrategy.first
+  },
   scalaVersion := "2.12.1",
   organization := "com.lihaoyi",
   version := _root_.ammonite.Constants.version,
-  libraryDependencies += "com.lihaoyi" %% "utest" % "0.4.5" % Test,
+  libraryDependencies ++= Seq(
+    "com.lihaoyi" %% "utest" % "0.4.5" % Test,
+    "org.jboss.shrinkwrap.resolver" % "shrinkwrap-resolver-api" % "2.2.6",
+    "org.jboss.shrinkwrap.resolver" % "shrinkwrap-resolver-spi" % "2.2.6",
+    "org.jboss.shrinkwrap.resolver" % "shrinkwrap-resolver-api-maven" % "2.2.6",
+    "org.jboss.shrinkwrap.resolver" % "shrinkwrap-resolver-spi-maven" % "2.2.6",
+    "org.jboss.shrinkwrap.resolver" % "shrinkwrap-resolver-impl-maven" % "2.2.6",
+    "org.jboss.shrinkwrap.resolver" % "shrinkwrap-resolver-impl-maven-archive" % "2.2.6"
+  ),
   // Needed for acyclic to work...
   libraryDependencies ++= {
     if (!scalaVersion.value.startsWith("2.10.")) Nil

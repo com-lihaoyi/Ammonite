@@ -197,7 +197,9 @@ object ImportHook{
       }
       jars <- {
         try {
-          val resolved = MavenResolver.resolver().resolve(s"${a}:${b}:${c}").withTransitivity().asFile()
+          val resolved = MavenResolver.resolver()
+            .resolve(s"${a}:${b}:${c}")
+            .withTransitivity().asFile()
           Res.Success(resolved)
         } catch {case ex =>
           Res.Exception(ex, "")
