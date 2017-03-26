@@ -1,0 +1,11 @@
+[app]
+  version: 0.5.2
+  org: com.lihaoyi
+  name: ammonite-shell
+  class: ammonite.repl.Main
+[scala]
+  version: 2.11.7
+[repositories]
+  local
+  sonatype-releases: https://oss.sonatype.org/content/repositories/releases/
+  maven-central
