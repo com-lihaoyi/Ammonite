@@ -10,7 +10,7 @@ matrix:
 
   - env: CI_SCRIPT="ci/build.sc artifacts"
     jdk: oraclejdk8
-    scala: 2.11.8
+    scala: 2.11.9
 
 
   # Each `test` call is manually sharded out into `published/test` and
@@ -26,10 +26,10 @@ matrix:
 
   - env: CI_SCRIPT="ci/build.sc test published/test"
     jdk: oraclejdk8
-    scala: 2.11.8
+    scala: 2.11.9
   - env: CI_SCRIPT="ci/build.sc test integration/test"
     jdk: oraclejdk8
-    scala: 2.11.8
+    scala: 2.11.9
 
   - env: CI_SCRIPT="ci/build.sc test published/test"
     jdk: openjdk7
@@ -42,11 +42,11 @@ matrix:
   # These are relatively (?) quick so put them last
   - env: CI_SCRIPT="ci/build.sc docs"
     jdk: oraclejdk8
-    scala: 2.11.8
+    scala: 2.11.9
 
   - env: CI_SCRIPT="ci/build.sc executable"
     jdk: oraclejdk8
-    scala: 2.11.8
+    scala: 2.11.9
 
 
 

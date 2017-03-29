@@ -4,7 +4,7 @@ scalaVersion := "2.12.1"
 
 crossScalaVersions := Seq(
   "2.10.4", "2.10.5", "2.10.6", "2.11.3",
-  "2.11.4", "2.11.5", "2.11.6", "2.11.7", "2.11.8"
+  "2.11.4", "2.11.5", "2.11.6", "2.11.7", "2.11.8", "2.11.9"
 )
 
 val dontPublishSettings = Seq(
@@ -142,6 +142,12 @@ lazy val amm = project
       import sys.process._
       Seq("chmod", "+x", dest.getAbsolutePath).!
       dest
+    },
+    assemblyMergeStrategy in assembly := {
+      case PathList("META-INF", xs @ _*) if xs.exists(_ contains "jansi") => MergeStrategy.last
+      case x =>
+        val oldStrategy = (assemblyMergeStrategy in assembly).value
+        oldStrategy(x)
     }
   )
 
