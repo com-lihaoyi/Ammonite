@@ -10,11 +10,11 @@ val isMasterCommit =
 
 val allVersions = Seq(
   "2.10.4", "2.10.5", "2.10.6",
-  "2.11.3", "2.11.4", "2.11.5", "2.11.6", "2.11.7", "2.11.8",
+  "2.11.3", "2.11.4", "2.11.5", "2.11.6", "2.11.7", "2.11.8", "2.11.9",
   "2.12.0", "2.12.1"
 )
 
-val latestVersions = Set("2.10.6", "2.11.8", "2.12.1")
+val latestVersions = Set("2.10.6", "2.11.9", "2.12.1")
 
 val buildVersion =
   if (sys.env("TRAVIS_TAG") == "") s"COMMIT-${getGitHash()}"
