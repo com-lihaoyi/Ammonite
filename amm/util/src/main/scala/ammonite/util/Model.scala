@@ -8,6 +8,7 @@ import acyclic.file
 import pprint.{PPrint, PPrinter}
 
 import scala.collection.mutable
+import scala.language.implicitConversions
 import scala.reflect.NameTransformer
 import scala.reflect.runtime.universe.TypeTag
 

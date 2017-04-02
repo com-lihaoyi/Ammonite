@@ -59,7 +59,7 @@ object Highlighter {
                           ruleColors: PartialFunction[Parser[_], T],
                           endColor: T): Seq[(Int, T, Boolean)] = {
     val indices = {
-      var indices = collection.mutable.Buffer((0, endColor, false))
+      val indices = collection.mutable.Buffer((0, endColor, false))
       var done = false
       val input = buffer.mkString
       parser.parse(input, instrument = (rule, idx, res) => {

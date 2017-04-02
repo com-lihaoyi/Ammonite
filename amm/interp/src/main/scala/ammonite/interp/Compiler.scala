@@ -6,6 +6,7 @@ import ammonite.util.{ImportData, Imports, Printer}
 import ammonite.util.Util.newLine
 
 import scala.collection.mutable
+import scala.language.existentials
 import scala.reflect.io
 import scala.reflect.io._
 import scala.tools.nsc

@@ -9,7 +9,9 @@ import ammonite.util.Util.{CacheOutput, ClassFiles, CompileCache, IvyMap, newLin
 import scala.util.Try
 import scala.collection.generic.CanBuildFrom
 import scala.collection.{IndexedSeqLike, mutable}
+import scala.language.implicitConversions
 import scala.reflect.NameTransformer.encode
+import scala.util.control.NonFatal
 
 
 /**
@@ -172,7 +174,7 @@ object Storage{
         val parsed = {upickle.default.read(fileData)}
         Some(parsed)
       }
-      catch{ case e => None }
+      catch{ case NonFatal(_) => None }
     }
 
     def classFilesListLoad(pkg: String,

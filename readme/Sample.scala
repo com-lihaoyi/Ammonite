@@ -5,6 +5,7 @@ import java.io.{BufferedReader, ByteArrayOutputStream, InputStreamReader}
 import ammonite.ops._
 
 import scala.collection.mutable
+import scala.util.control.NonFatal
 import scalatags.Text.all._
 import scalatags.Text.all._
 import collection.mutable
@@ -25,7 +26,7 @@ object Sample{
   def cached(key: Any)(calc: => String) = {
     val path = cwd/'target/'cache/(key.hashCode + cacheVersion).toString
     try read! path
-    catch{ case e =>
+    catch{ case NonFatal(e) =>
       val newValue = calc
       write.over(path, newValue)
       newValue
@@ -34,8 +35,6 @@ object Sample{
 
 
   def ammSample(ammoniteCode: String) = {
-    val scalaVersion = scala.util.Properties.versionNumberString
-    val ammVersion = ammonite.Constants.version
     val executableName = s"amm"
     val ammExec = "amm/target/scala-2.12/" + executableName
     val predef = "shell/src/main/resources/ammonite/shell/example-predef-bare.sc"
@@ -134,7 +133,6 @@ object Sample{
     p.getOutputStream.flush()
     p.waitFor()
     val output = new ByteArrayOutputStream()
-    var length = 0
     while({
       val buffer = new Array[Byte](2048)
       val count = p.getInputStream.read(buffer, 0, buffer.length)

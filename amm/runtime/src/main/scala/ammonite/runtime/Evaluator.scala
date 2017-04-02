@@ -95,7 +95,6 @@ object Evaluator{
         for ((name, bytes) <- classFiles.sortBy(_._1)) {
           frames.head.classloader.addClassFile(name, bytes)
         }
-        val names = classFiles.map(_._1)
         val res = Class.forName(fullName, true, frames.head.classloader)
         res
       }, e => "Failed to load compiled class " + e)
@@ -229,7 +228,6 @@ object Evaluator{
     */
   def addToClasspath(classFiles: Traversable[(String, Array[Byte])],
                      dynamicClasspath: VirtualDirectory): Unit = {
-    val names = classFiles.map(_._1)
     for((name, bytes) <- classFiles){
       val output = writeDeep(dynamicClasspath, name.split('.').toList, ".class")
       output.write(bytes)

@@ -5,6 +5,7 @@ import acyclic.file
 
 import scala.annotation.tailrec
 import scala.collection.mutable
+import scala.language.implicitConversions
 
 /**
  * The core logic around a terminal; it defines the base `filters` API
@@ -305,6 +306,7 @@ object Terminal {
       // reader.close()
       // writer.close()
       TTY.stty(initialConfig)
+      ()
     }
   }
 }

@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets
 
 import scala.annotation.tailrec
 import scala.io.Codec
+import scala.language.implicitConversions
 import scala.language.dynamics
 
 /**
@@ -15,8 +16,8 @@ object Shellout{
   val %% = new Command(Vector.empty, Map.empty, Shellout.executeStream)
   def executeInteractive(wd: Path, cmd: Command[_]) = {
     val builder = new java.lang.ProcessBuilder()
-    import collection.JavaConversions._
-    builder.environment().putAll(cmd.envArgs)
+    import collection.JavaConverters._
+    builder.environment().putAll(cmd.envArgs.asJava)
     builder.directory(new java.io.File(wd.toString))
 
     val proc =
@@ -55,8 +56,8 @@ object Shellout{
 
   def executeStream(wd: Path, cmd: Command[_]) = {
     val builder = new java.lang.ProcessBuilder()
-    import collection.JavaConversions._
-    builder.environment().putAll(cmd.envArgs)
+    import collection.JavaConverters._
+    builder.environment().putAll(cmd.envArgs.asJava)
     builder.directory(new java.io.File(wd.toString))
     val process =
       builder

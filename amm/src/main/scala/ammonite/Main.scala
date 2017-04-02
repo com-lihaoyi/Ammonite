@@ -72,7 +72,7 @@ case class Main(predef: String = "",
   def instantiateInterpreter(replApi: Boolean) = {
     val augmentedPredef = Main.maybeDefaultPredef(defaultPredef, Defaults.predefString)
 
-    val (colors, printStream, errorPrintStream, printer) =
+    val (colors, _, _, printer) =
       Interpreter.initPrinters(outputStream, errorStream, verboseOutput)
 
 

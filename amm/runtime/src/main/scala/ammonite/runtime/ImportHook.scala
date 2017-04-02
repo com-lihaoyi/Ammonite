@@ -6,6 +6,7 @@ import acyclic.file
 import ammonite.ops.{read, _}
 import ammonite.runtime.tools.IvyThing
 import ammonite.util._
+import scala.util.control.NonFatal
 
 /**
   * An extensible hook into the Ammonite REPL's import system; allows the end
@@ -163,7 +164,7 @@ object ImportHook{
         case _ => Res.Failure(None, s"Invalid $$ivy import: [$signature]")
       }
       jars <- {
-        try Res.Success(interp.loadIvy((a, b, c))) catch {case ex =>
+        try Res.Success(interp.loadIvy((a, b, c))) catch {case NonFatal(ex) =>
           Res.Exception(ex, "")
         }
       }

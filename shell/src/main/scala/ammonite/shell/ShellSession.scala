@@ -7,6 +7,7 @@ import ammonite.ops._
 import ammonite.repl.FrontEndUtils
 import pprint.{Config, PPrinter}
 
+import scala.language.implicitConversions
 import scala.util.Try
 
 case class ShellSession() extends OpsAPI {

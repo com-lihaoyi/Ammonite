@@ -14,6 +14,7 @@ import java.util.Objects
 import acyclic.file
 
 import scala.io.Codec
+import scala.language.implicitConversions
 
 
 object Internals{
@@ -81,7 +82,7 @@ trait StreamableOp1[T1, R, C <: Seq[R]] extends Function1[T1, C]{
  * to `mkdir -p` in bash
  */
 object mkdir extends Function1[Path, Unit]{
-  def apply(path: Path) = new File(path.toString).mkdirs()
+  def apply(path: Path) = { new File(path.toString).mkdirs(); () }
 }
 
 
@@ -121,6 +122,7 @@ object mv extends Function2[Path, Path, Unit] with Internals.Mover with CopyMove
       s"Can't move a directory into itself: $to is inside $from"
     )
     java.nio.file.Files.move(from.toNIO, to.toNIO)
+    ()
   }
 
 
@@ -148,6 +150,7 @@ object cp extends Function2[Path, Path, Unit] with CopyMove{
 
     copyOne(from)
     if (stat(from).isDir) Extensions.FilterMapExt(ls.rec! from) | copyOne
+    ()
   }
 
 }
@@ -175,6 +178,7 @@ object rm extends Function1[Path, Unit]{
          .reverseIterator
          .foreach(p => new File(p.toString).delete())
     new File(target.toString).delete
+    ()
   }
 }
 
@@ -391,10 +395,12 @@ case class kill(signal: Int)(implicit wd: Path) extends Function1[Int, CommandRe
 object ln extends Function2[Path, Path, Unit]{
   def apply(src: Path, dest: Path) = {
     Files.createLink(Paths.get(dest.toString), Paths.get(src.toString))
+    ()
   }
   object s extends Function2[Path, Path, Unit]{
     def apply(src: Path, dest: Path) = {
       Files.createSymbolicLink(Paths.get(dest.toString), Paths.get(src.toString))
+      ()
     }
   }
 }

@@ -70,5 +70,6 @@ object SshdRepl {
           any.printStackTrace(sshClientOutput)
       }
     }
+    ()
   }
 }
