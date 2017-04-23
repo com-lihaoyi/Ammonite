@@ -1,5 +1,7 @@
 package ammonite.runtime
 
+import java.nio.file.FileAlreadyExistsException
+
 import acyclic.file
 import ammonite.ops._
 import ammonite.util.ImportTree
@@ -17,7 +19,7 @@ import scala.reflect.NameTransformer.encode
  * and persistent caches. Right now it is not threadsafe nor does it handle
  * the mutual exclusion of files between processes. Mutexes should be added
  * to be able to run multiple Ammonite processes on the same system.
- */ 
+ */
 trait Storage{
   def loadPredef: String
   def loadSharedPredef: String
@@ -152,17 +154,21 @@ object Storage{
       val codeCacheDir = cacheDir/'scriptCaches/dir/tag
       if (!exists(codeCacheDir)){
         mkdir(codeCacheDir)
-        write(
-          codeCacheDir/classFilesOrder,
-          upickle.default.write((tag, dataList.reverse), indent = 4)
-        )
-        write(
-          codeCacheDir/"imports.json", upickle.default.write(imports, indent = 4)
-        )
-        write(
-          codeCacheDir/"importTrees.json", upickle.default.write(importTreesList, indent = 4)
-        )
-
+        try {
+          write(
+            codeCacheDir/classFilesOrder,
+            upickle.default.write((tag, dataList.reverse), indent = 4)
+          )
+          write(
+            codeCacheDir/"imports.json", upickle.default.write(imports, indent = 4)
+          )
+          write(
+            codeCacheDir/"importTrees.json", upickle.default.write(importTreesList, indent = 4)
+          )
+        } catch {
+          case _: FileAlreadyExistsException => // ignore
+          case t: Throwable => throw t
+        }
       }
     }
 

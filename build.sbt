@@ -265,11 +265,13 @@ lazy val sshd = project
       crossVersion := CrossVersion.full,
       name := "ammonite-sshd",
       libraryDependencies ++= Seq(
-        "org.apache.sshd" % "sshd-core" % "0.14.0",
+        // sshd-core 1.3.0 requires java8
+        "org.apache.sshd" % "sshd-core" % "1.2.0",
+        "org.bouncycastle" % "bcprov-jdk15on" % "1.56",
         //-- test --//
         // slf4j-nop makes sshd server use logger that writes into the void
         "org.slf4j" % "slf4j-nop" % "1.7.12" % Test,
-        "com.jcraft" % "jsch" % "0.1.53" % Test,
+        "com.jcraft" % "jsch" % "0.1.54" % Test,
         "org.scalacheck" %% "scalacheck" % "1.12.6" % Test
       )
   )

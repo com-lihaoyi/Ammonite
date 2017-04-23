@@ -12,6 +12,7 @@ import acyclic.file
 import ammonite.runtime.{APIHolder, Frame, History, ReplExit}
 
 import scala.util.control.ControlThrowable
+import scala.collection.mutable
 import acyclic.file
 
 
@@ -25,6 +26,11 @@ trait ReplAPI {
    * Exit the Ammonite REPL. You can also use Ctrl-D to exit
    */
   def exit(value: Any) = throw ReplExit(value)
+  /**
+    * Functions that will be chained and called on the
+    * exitValue before the repl exits
+    */
+  val beforeExitHooks: mutable.Buffer[Any ⇒ Any]
 
 
   /**
