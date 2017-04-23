@@ -8,7 +8,7 @@ import scala.io.Codec
 import scala.language.dynamics
 
 /**
-  * Iternal utilities to support spawning subprocesses
+  * Internal utilities to support spawning subprocesses
   */
 object Shellout{
   val % = new Command(Vector.empty, Map.empty, Shellout.executeInteractive)
@@ -65,14 +65,17 @@ object Shellout{
     val stdout = process.getInputStream
     val stderr = process.getErrorStream
     val chunks = collection.mutable.Buffer.empty[Either[Bytes, Bytes]]
+    val sources = Seq(stdout -> (Left(_: Bytes)), stderr -> (Right(_: Bytes)))
     while(
       // Process.isAlive doesn't exist on JDK 7 =/
       util.Try(process.exitValue).isFailure ||
       stdout.available() > 0 ||
       stderr.available() > 0
     ){
-      for ((std, wrapper) <- Seq(stdout -> (Left(_: Bytes)), stderr -> (Right(_: Bytes)))){
+      var readSomething = false
+      for ((std, wrapper) <- sources){
         while (std.available() > 0){
+          readSomething = true
           val array = new Array[Byte](std.available())
           val actuallyRead = std.read(array)
           chunks.append(wrapper(
@@ -81,6 +84,9 @@ object Shellout{
           ))
         }
       }
+      // if we did not read anything sleep briefly to avoid spinning
+      if(!readSomething)
+        Thread.sleep(2)
     }
 
     val res = CommandResult(process.exitValue(), chunks)
@@ -114,7 +120,7 @@ case class Command[T](cmd: Vector[String],
 }
 
 /**
-  * Trivial wrapper arround `Array[Byte]` with sane equality and useful toString
+  * Trivial wrapper around `Array[Byte]` with sane equality and useful toString
   */
 class Bytes(val array: Array[Byte]){
   override def equals(other: Any) = other match{
