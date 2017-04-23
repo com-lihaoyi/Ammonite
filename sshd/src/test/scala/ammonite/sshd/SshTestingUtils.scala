@@ -6,6 +6,7 @@ import java.util.concurrent.TimeoutException
 import ammonite.ops._
 import com.jcraft.jsch.{Channel, JSch, Session, UserInfo}
 import org.scalacheck.Gen
+import org.apache.sshd.server.{SshServer => SshServerImpl}
 
 import scala.annotation.tailrec
 import scala.concurrent.{Await, Future}
@@ -59,7 +60,7 @@ object SshTestingUtils {
   }
 
   def withTestSshServer[T](user: (String, String), testShell: () => Any = () => ???)
-                          (test: org.apache.sshd.SshServer => T)
+                          (test: SshServerImpl => T)
                           (implicit dir: Path): T = {
     val server = testSshServer(user, (_, _) => testShell.apply())
     server.start()
@@ -70,7 +71,7 @@ object SshTestingUtils {
     }
   }
 
-  def sshClient(creds: (String, String), sshServer: org.apache.sshd.SshServer): Session = {
+  def sshClient(creds: (String, String), sshServer: SshServerImpl): Session = {
     sshClient(creds, Option(sshServer.getHost).getOrElse("localhost"), sshServer.getPort)
   }
 
@@ -78,11 +79,20 @@ object SshTestingUtils {
     val client = new JSch
     val session = client.getSession(creds._1, host, port)
     session.setPassword(creds._2)
-    session.setConfig("server_host_key", Seq(
-        "ecdsa-sha2-nistp256",
-        "ecdsa-sha2-nistp384",
-        "ecdsa-sha2-nistp521",
-        "ssh-rsa").mkString(","))
+    // http://stackoverflow.com/a/28754307
+    // https://sourceforge.net/p/jsch/mailman/message/32975616/
+    val configuration = new java.util.Properties();
+    configuration.put(
+      "kex",
+      Seq(
+        "diffie-hellman-group1-sha1",
+        "diffie-hellman-group14-sha1",
+        "diffie-hellman-group-exchange-sha1",
+        "diffie-hellman-group-exchange-sha256"
+      ).mkString(",")
+    );
+    configuration.put("StrictHostKeyChecking", "no");
+    session.setConfig(configuration)
     session.setUserInfo(autoAcceptHostKeyUser(creds._2))
     session
   }
