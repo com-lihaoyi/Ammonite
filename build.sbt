@@ -142,7 +142,13 @@ lazy val amm = project
       import sys.process._
       Seq("chmod", "+x", dest.getAbsolutePath).!
       dest
-    }
+    },
+    assemblyMergeStrategy in assembly := {
+      case PathList("META-INF", xs @ _*) if xs.exists(_ contains "jansi") => MergeStrategy.last
+      case x =>
+        val oldStrategy = (assemblyMergeStrategy in assembly).value
+        oldStrategy(x)
+     }
   )
 
 lazy val ammUtil = project
