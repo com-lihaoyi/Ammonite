@@ -3,6 +3,7 @@ package ammonite.sshd
 import java.io.{InputStream, OutputStream}
 
 import org.apache.sshd.server._
+import org.apache.sshd.server.session.ServerSession
 
 /**
  * Implementation of ssh server's remote shell session,
@@ -10,10 +11,12 @@ import org.apache.sshd.server._
  * @param remoteShell actual shell implementation,
  *                    which will serve remote user's shell session.
  */
-private[sshd] class ShellSession(remoteShell: ShellSession.Server) extends Command {
+private[sshd] class ShellSession(remoteShell: ShellSession.Server)
+  extends Command with SessionAware {
   var in: InputStream = _
   var out: OutputStream = _
   var exit: ExitCallback = _
+  var session: ServerSession = _
   lazy val thread = createShellServingThread()
 
   override def setInputStream(in: InputStream) = {
@@ -53,7 +56,7 @@ private[sshd] class ShellSession(remoteShell: ShellSession.Server) extends Comma
 
   private def createShellServingThread(): Thread = new Thread {
     override def run(): Unit = {
-      remoteShell(in, out)
+      remoteShell(in, out, session)
       exit.onExit(0, "repl finished")
     }
   }
@@ -79,8 +82,12 @@ private[sshd] class ShellSession(remoteShell: ShellSession.Server) extends Comma
       write(bytes.slice(offset, offset + length))
     }
   }
+
+  def setSession(session: ServerSession): Unit = {
+    this.session = session
+  }
 }
 
 object ShellSession {
-  type Server = ((InputStream, OutputStream) => Unit)
+  type Server = ((InputStream, OutputStream, ServerSession) => Unit)
 }

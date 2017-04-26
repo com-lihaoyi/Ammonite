@@ -5,11 +5,10 @@ import java.io.{InputStream, OutputStream, PrintStream}
 
 import ammonite.ops.Path
 import ammonite.sshd.util.Environment
-import ammonite.util.{Bind, Ref}
+import ammonite.util.Bind
 import ammonite.runtime.Storage
 import ammonite.repl.Repl
-
-import scala.language.postfixOps
+import org.apache.sshd.server.session.ServerSession
 
 /**
  * An ssh server which serves ammonite repl as it's shell channel.
@@ -19,8 +18,9 @@ import scala.language.postfixOps
  * @param sshConfig configuration of ssh server,
  *                  such as users credentials or port to be listening to
  * @param predef predef that will be installed on repl instances served by this server
- * @param replArgs arguments to pass to ammonite repl on initialization of the session
- * @param classloader classloader for ammonite to use
+ * @param replArgs arguments to pass to ammonite repl on initialization of the session;
+ *                 an argument named "session" containing the SSHD session will be added
+ * @param classLoader classloader for ammonite to use
  */
 class SshdRepl(sshConfig: SshServerConfig,
                predef: String = "",
@@ -46,7 +46,7 @@ object SshdRepl {
                       wd: Path,
                       replArgs: Seq[Bind[_]],
                       replServerClassLoader: ClassLoader)
-                     (in: InputStream, out: OutputStream): Unit = {
+                     (in: InputStream, out: OutputStream, session: ServerSession): Unit = {
     // since sshd server has it's own customised environment,
     // where things like System.out will output to the
     // server's console, we need to prepare individual environment
@@ -61,7 +61,8 @@ object SshdRepl {
         new Repl(
           in, out, out,
           new Storage.Folder(homePath), augmentedPredef + "\n" + predef,
-          wd, Some(ammonite.main.Defaults.welcomeBanner), replArgs
+          wd, Some(ammonite.main.Defaults.welcomeBanner),
+          Bind("session", session) +: replArgs
         ).run()
       } catch {
         case any: Throwable =>
