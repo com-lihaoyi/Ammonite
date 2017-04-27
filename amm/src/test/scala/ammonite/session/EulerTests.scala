@@ -557,7 +557,7 @@ object EulerTests extends TestSuite{
       // What is the first term in the Fibonacci sequence to contain 1000 digits?*
       check.session("""
         @ lazy val fs: Stream[BigInt] =
-        @  0 #:: 1 #:: fs.zip(fs.tail).map(p => p._1 + p._2)
+        @  (0: BigInt) #:: (1: BigInt) #:: fs.zip(fs.tail).map(p => p._1 + p._2)
 
         @ val r = fs.view.takeWhile(_.toString.length < 1000).size
         r: Int = 4782
