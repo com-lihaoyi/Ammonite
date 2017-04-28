@@ -114,7 +114,25 @@
 
 
   @sect{Changelog}
-
+    @sect{0.8.3}
+      @ul
+        @li
+          Cross-publish for Scala 2.12.2, 2.11.11
+        @li
+          Bump version of apache-sshd (@issue(545)), by 
+          @lnk("emanresusername", "https://github.com/emanresusername")
+        @li
+          Avoid @code{FileAlreadyExistsException} when compiling scripts in
+          parallel (@issue(567)), by @lnk("armanbilge", "https://github.com/armanbilge")
+        @li
+          Add @code{beforeExitHooks} so you can register cleanup code (@issue(581)), by
+          @lnk("emanresusername", "https://github.com/emanresusername")
+        @li
+          Add a sleep in @code{Shellout.executeStream} to reduce spinning. (@issue(578)), by
+          @lnk("rorygraves", "https://github.com/rorygraves")
+        @li
+          Add an overloaded version of LoadJar.cp that takes a sequence of paths, by
+          @lnk("mallman", "https://github.com/mallman")
     @sect{0.8.2}
       @ul
         @li

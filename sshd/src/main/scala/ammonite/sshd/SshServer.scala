@@ -7,11 +7,12 @@ import ammonite.ops.Path
 import org.apache.sshd.agent.SshAgentFactory
 import org.apache.sshd.common._
 import org.apache.sshd.common.file.FileSystemFactory
-import org.apache.sshd.common.session.ConnectionService
+import org.apache.sshd.common.session.{ConnectionService, Session}
 import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider
 import org.apache.sshd.server.session.ServerSession
-import org.apache.sshd.server.{Command, CommandFactory, PasswordAuthenticator}
-import org.apache.sshd.{SshServer => SshServerImpl}
+import org.apache.sshd.server.{Command, CommandFactory}
+import org.apache.sshd.server.auth.password.PasswordAuthenticator
+import org.apache.sshd.server.{SshServer => SshServerImpl}
 
 /**
  * A factory to simplify creation of ssh server
@@ -35,7 +36,7 @@ object SshServer {
     val hostKeyFile = touch(
       options.hostKeyFile.getOrElse(fallbackHostkeyFilePath(options))
     )
-    new SimpleGeneratorHostKeyProvider(hostKeyFile.toString(), "RSA")
+    new SimpleGeneratorHostKeyProvider(hostKeyFile.toNIO)
   }
 
   private def disableUnsupportedChannels(sshServer: SshServerImpl) = {
@@ -53,7 +54,7 @@ object SshServer {
       override def getChannelForwardingFactory = null
     })
     sshServer.setFileSystemFactory(new FileSystemFactory {
-      override def createFileSystemView(session: Session) = null
+      override def createFileSystem(session: Session) = null
     })
     sshServer
   }

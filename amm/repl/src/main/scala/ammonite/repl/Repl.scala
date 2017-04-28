@@ -119,6 +119,10 @@ class Repl(input: InputStream,
     }
     loop()
   }
+
+  def beforeExit(exitValue: Any): Any = {
+    Function.chain(interp.beforeExitHooks)(exitValue)
+  }
 }
 
 object Repl{

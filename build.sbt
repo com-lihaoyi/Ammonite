@@ -1,10 +1,10 @@
 import scalatex.ScalatexReadme
 
-scalaVersion := "2.12.1"
+scalaVersion := "2.12.2"
 
 crossScalaVersions := Seq(
   "2.10.4", "2.10.5", "2.10.6", "2.11.3",
-  "2.11.4", "2.11.5", "2.11.6", "2.11.7", "2.11.8"
+  "2.11.4", "2.11.5", "2.11.6", "2.11.7", "2.11.8", "2.11.9"
 )
 
 val dontPublishSettings = Seq(
@@ -33,7 +33,7 @@ val sharedSettings = Seq(
     case m if m.toLowerCase.matches("meta-inf.*\\.sf$") => MergeStrategy.discard
     case _ => MergeStrategy.first
   },
-  scalaVersion := "2.12.1",
+  scalaVersion := "2.12.2",
   organization := "com.lihaoyi",
   version := _root_.ammonite.Constants.version,
   libraryDependencies ++= Seq(
@@ -155,7 +155,13 @@ lazy val amm = project
       import sys.process._
       Seq("chmod", "+x", dest.getAbsolutePath).!
       dest
-    }
+    },
+    assemblyMergeStrategy in assembly := {
+      case PathList("META-INF", xs @ _*) if xs.exists(_ contains "jansi") => MergeStrategy.last
+      case x =>
+        val oldStrategy = (assemblyMergeStrategy in assembly).value
+        oldStrategy(x)
+     }
   )
 
 lazy val ammUtil = project
@@ -272,11 +278,13 @@ lazy val sshd = project
       crossVersion := CrossVersion.full,
       name := "ammonite-sshd",
       libraryDependencies ++= Seq(
-        "org.apache.sshd" % "sshd-core" % "0.14.0",
+        // sshd-core 1.3.0 requires java8
+        "org.apache.sshd" % "sshd-core" % "1.2.0",
+        "org.bouncycastle" % "bcprov-jdk15on" % "1.56",
         //-- test --//
         // slf4j-nop makes sshd server use logger that writes into the void
         "org.slf4j" % "slf4j-nop" % "1.7.12" % Test,
-        "com.jcraft" % "jsch" % "0.1.53" % Test,
+        "com.jcraft" % "jsch" % "0.1.54" % Test,
         "org.scalacheck" %% "scalacheck" % "1.12.6" % Test
       )
   )
@@ -289,7 +297,7 @@ lazy val readme = ScalatexReadme(
   source = "Index"
 ).settings(
   dontPublishSettings,
-  scalaVersion := "2.12.1",
+  scalaVersion := "2.12.2",
   libraryDependencies += "com.lihaoyi" %% "fansi" % "0.2.3",
   (run in Compile) := (run in Compile).dependsOn(
     assembly in (amm, Test),
