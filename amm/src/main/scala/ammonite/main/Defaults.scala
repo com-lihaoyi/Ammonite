@@ -14,7 +14,8 @@ object Defaults{
     def javaVersion = System.getProperty("java.version")
     Util.normalizeNewlines(
       s"""Welcome to the Ammonite Repl $ammoniteVersion
-          |(Scala $scalaVersion Java $javaVersion)""".stripMargin
+          |(Scala $scalaVersion Java $javaVersion)
+          |If you like Ammonite, please support our development at www.patreon.com/lihaoyi""".stripMargin
     )
   }
   val ignoreUselessImports = """

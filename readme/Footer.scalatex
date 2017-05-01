@@ -114,6 +114,11 @@
 
 
   @sect{Changelog}
+    @sect{0.8.4}
+      @ul
+        @li
+          Make startup banner configurable via a command line flag
+
     @sect{0.8.3}
       @ul
         @li

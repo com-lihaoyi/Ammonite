@@ -151,12 +151,18 @@ object Main{
       // Primary arguments that correspond to the arguments of
       // the `Main` configuration object
       head("ammonite", ammonite.Constants.version)
+
       opt[String]('p', "predef")
         .action((x, c) => c.copy(predef = x))
         .text("Any commands you want to execute at the start of the REPL session")
+
       opt[Unit]("no-default-predef")
         .action((x, c) => c.copy(defaultPredef = false))
         .text("Disable the default predef and run Ammonite with the minimal predef possible")
+
+      opt[String]('b', "banner")
+        .action((x, c) => c.copy(welcomeBanner = Some(x)))
+        .text("Customize the welcome banner that gets shown when Ammonite starts")
 
       // Secondary arguments that correspond to different methods of
       // the `Main` configuration arguments
@@ -245,6 +251,7 @@ object Main{
               }
           }
         },
+        welcomeBanner = c.welcomeBanner,
         verboseOutput = verboseOutput
       )
       (fileToExecute, codeToExecute) match {
