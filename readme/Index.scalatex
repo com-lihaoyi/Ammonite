@@ -90,7 +90,19 @@
             @sect.ref(data._2)
         @td(p(b(data._3), ".", data._4))
 
+  @p
+    Ammonite is a project by @lnk("Li Haoyi", "http://www.lihaoyi.com/"). If
+    you use Ammonite and enjoyed it, please chip in to support our development
+    at:
 
+  @ul
+    @li
+      @lnk("https://www.patreon.com/lihaoyi", "https://www.patreon.com/lihaoyi")
+
+
+  @p
+    Any amount will help us develop Ammonite into the best possible REPL and
+    script runner for the Scala community!
 
   @p
     The goal of Ammonite is to liberate your Scala code from heavyweight
