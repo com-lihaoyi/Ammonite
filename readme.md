@@ -1,4 +1,4 @@
-# Ammonite [![Build Status][travis-badge]][travis-link] [![Build (Windows)][appveyor-badge]][appveyor-link] [![Gitter Chat][gitter-badge]][gitter-link] [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.lihaoyi/ammonite_2.11.8/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.lihaoyi/ammonite_2.11.8)
+# Ammonite [![Build Status][travis-badge]][travis-link] [![Build (Windows)][appveyor-badge]][appveyor-link] [![Gitter Chat][gitter-badge]][gitter-link] [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.lihaoyi/ammonite_2.11.8/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.lihaoyi/ammonite_2.11.8) [![Patreon][patreon-badge]][patreon-link]
 
 
 [travis-badge]: https://travis-ci.org/lihaoyi/Ammonite.svg
@@ -7,6 +7,8 @@
 [appveyor-link]: https://ci.appveyor.com/project/lihaoyi/ammonite
 [gitter-badge]: https://badges.gitter.im/Join%20Chat.svg
 [gitter-link]: https://gitter.im/lihaoyi/Ammonite?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+[patreon-badge]: https://img.shields.io/badge/patreon-sponsor-ff69b4.svg
+[patreon-link]: https://www.patreon.com/lihaoyi
 
 
 This is where the code for the [Ammonite](https://lihaoyi.github.io/Ammonite) project lives; Both:
