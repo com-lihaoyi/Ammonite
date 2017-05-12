@@ -27,9 +27,9 @@ The Predef itself is made of several parts:
   be disabled by a `--no-default-predef` flag, or `defaultPredef = false` to
   `Main`
 
-- Any `predef` string you pass in via `predef = "..."` or `--predef "..."`
-
 - The assignment of any arguments to the `debug` entrypoint to local `val`s
+
+- Any `commandLinePredef` string you pass in via `predef = "..."` or `--predef "..."`
 
 - Any predef file, which defaults `~/.ammonite/predef.sc` for the REPL and
   `~/.ammonite/predefScript.sc` for scripts, but can be set manually via

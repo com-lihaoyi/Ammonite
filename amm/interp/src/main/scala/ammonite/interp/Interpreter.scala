@@ -24,7 +24,7 @@ import scala.reflect.io.VirtualDirectory
  */
 class Interpreter(val printer: Printer,
                   val storage: Storage,
-                  customPredefs: Seq[(Name, String)],
+                  customPredefs: Seq[Interpreter.PredefInfo],
                   // Allows you to set up additional "bridges" between the REPL
                   // world and the outside world, by passing in the full name
                   // of the `APIHolder` object that will hold the bridge and
@@ -95,7 +95,11 @@ class Interpreter(val printer: Printer,
   // import ammonite.runtime.InterpBridge.{value => interp}
   val bridgePredefs =
     for ((name, shortName, bridge) <- bridges)
-    yield Name(s"${shortName}Bridge") -> s"import $name.{value => $shortName}"
+    yield Interpreter.PredefInfo(
+      Name(s"${shortName}Bridge"),
+      s"import $name.{value => $shortName}",
+      true
+    )
 
 
   val importHooks = Ref(Map[Seq[String], ImportHook](
@@ -109,8 +113,8 @@ class Interpreter(val printer: Printer,
   ))
 
   val predefs = bridgePredefs ++ customPredefs ++ Seq(
-    Name("SharedPredef") -> storage.loadSharedPredef,
-    Name("LoadedPredef") -> storage.loadPredef
+    Interpreter.PredefInfo(Name("UserSharedPredef"), storage.loadSharedPredef, false),
+    Interpreter.PredefInfo(Name("UserPredef"), storage.loadPredef, false)
   )
 
   // Use a var and a for-loop instead of a fold, because when running
@@ -118,7 +122,10 @@ class Interpreter(val printer: Printer,
   // on `predefImports`, and we should be able to provide the "current" imports
   // to it even if it's half built
   var predefImports = Imports()
-  for( (wrapperName, sourceCode) <- predefs) {
+  for {
+    Interpreter.PredefInfo(wrapperName, sourceCode, hardcoded) <- predefs
+    if sourceCode.nonEmpty
+  }{
     val pkgName = Seq(Name("ammonite"), Name("predef"))
 
     processModule(
@@ -127,7 +134,8 @@ class Interpreter(val printer: Printer,
       wrapperName,
       pkgName,
       true,
-      ""
+      "",
+      hardcoded
     ) match{
       case Res.Success((imports, wrapperHashes)) =>
         predefImports = predefImports ++ imports
@@ -157,7 +165,7 @@ class Interpreter(val printer: Printer,
           for{
             (moduleImports, _) <- processModule(
               res.source, res.code, res.wrapper, res.pkg,
-              autoImport = false, extraCode = ""
+              autoImport = false, extraCode = "", hardcoded = false
             )
           } yield {
             if (!res.exec) res.imports
@@ -358,10 +366,15 @@ class Interpreter(val printer: Printer,
                     wrapperName: Name,
                     pkgName: Seq[Name],
                     autoImport: Boolean,
-                    extraCode: String): Res[(Imports, Seq[(String, String)])] = {
+                    extraCode: String,
+                    hardcoded: Boolean): Res[(Imports, Seq[(String, String)])] = {
+
     val tag = Interpreter.cacheTag(
-      code, Nil, eval.frames.head.classloader.classpathHash
+      code, Nil,
+      if (hardcoded) Array.empty[Byte]
+      else eval.frames.head.classloader.classpathHash
     )
+
     storage.classFilesListLoad(
       pkgName.map(_.backticked).mkString("."),
       wrapperName.backticked,
@@ -675,7 +688,8 @@ class Interpreter(val printer: Printer,
           wrapper,
           pkg,
           true,
-          ""
+          "",
+          hardcoded = false
         ) match{
           case Res.Failure(ex, s) => throw new CompilationError(s)
           case Res.Exception(t, s) => throw t
@@ -697,6 +711,7 @@ object Interpreter{
   val SheBang = "#!"
   val SheBangEndPattern = Pattern.compile(s"""((?m)^!#.*)$newLine""")
 
+  case class PredefInfo(name: Name, code: String, hardcoded: Boolean)
 
   /**
     * This gives our cache tags for compile caching. The cache tags are a hash

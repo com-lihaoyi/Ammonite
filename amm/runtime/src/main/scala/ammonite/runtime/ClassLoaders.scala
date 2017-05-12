@@ -40,10 +40,16 @@ object SpecialClassLoader{
   val simpleNameRegex = "[a-zA-Z0-9_]+".r
 
   /**
-    * Stats all loose class-files in the current classpath that could
-    * conceivably be part of some package, i.e. their directory path
-    * doesn't contain any non-package-identifier segments, and aggregates
+    * Stats all jars on the classpath, and loose class-files in the current
+    * classpath that could conceivably be part of some package, and aggregates
     * their names and mtimes as a "signature" of the current classpath
+    *
+    * When looking for loose class files, we skip folders whose names are not
+    * valid java identifiers. Otherwise, the "current classpath" often contains
+    * the current directory, which in an SBT or Maven project contains hundreds
+    * or thousands of files which are not on the classpath. Empirically, this
+    * heuristic improves perf by greatly cutting down on the amount of files we
+    * need to mtime in many common cases.
     */
   def initialClasspathSignature(classloader: ClassLoader): Seq[(Path, Long)] = {
     val allClassloaders = {
@@ -58,22 +64,31 @@ object SpecialClassLoader{
 
     def findMtimes(d: java.nio.file.Path): Seq[(Path, Long)] = {
       def skipSuspicious(path: Path) = {
-        simpleNameRegex.findPrefixOf(path.last) == Some(path.last)
+        // Leave out sketchy files which don't look like package names or
+        // class files
+        (simpleNameRegex.findPrefixOf(path.last) != Some(path.last)) &&
+        !path.last.endsWith(".class")
       }
       ls.rec(skip = skipSuspicious)! Path(d) | (x => (x, x.mtime.toMillis))
     }
 
-    val classpathFolders =
-      allClassloaders.collect{case cl: java.net.URLClassLoader => cl.getURLs}
-                     .flatten
-                     .filter(_.getProtocol == "file")
-                     .map(_.toURI)
-                     .map(java.nio.file.Paths.get)
-                     .filter(java.nio.file.Files.isDirectory(_))
 
-    val classFileMtimes = classpathFolders.flatMap(f => findMtimes(f))
-    classFileMtimes
+    val classpathRoots =
+      allClassloaders
+        .collect{case cl: java.net.URLClassLoader => cl.getURLs}
+        .flatten
+        .filter(_.getProtocol == "file")
 
+    val mtimes = classpathRoots.flatMap{ rawP =>
+      val p = java.nio.file.Paths.get(rawP.toURI)
+      if (java.nio.file.Files.isDirectory(p)){
+        findMtimes(p)
+      }else{
+        Seq(Path(p) -> Path(p).mtime.toMillis)
+      }
+    }
+
+    mtimes
   }
 }
 /**

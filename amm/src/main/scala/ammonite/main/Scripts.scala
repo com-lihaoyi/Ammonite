@@ -43,7 +43,8 @@ object Scripts {
           |  def apply() = ammonite.main.Router.generateRoutes[$$routesOuter.type]($$routesOuter)
           |}
           """.stripMargin
-        )
+        ),
+        hardcoded = true
       )
 
       routeClsName = wrapperHashes.last._1

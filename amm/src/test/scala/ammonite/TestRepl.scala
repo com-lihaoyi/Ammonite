@@ -38,9 +38,9 @@ class TestRepl {
       storage = new Storage.Folder(tempDir),
       wd = ammonite.ops.pwd,
       customPredefs = Seq(
-        Name("pprintPredef") -> Repl.pprintPredef,
-        Name("defaultPredef") -> ammonite.main.Defaults.predefString,
-        Name("testPredef") -> predef
+        Interpreter.PredefInfo(Name("pprintPredef"), Repl.pprintPredef, true),
+        Interpreter.PredefInfo(Name("defaultPredef"), ammonite.main.Defaults.predefString, true),
+        Interpreter.PredefInfo(Name("testPredef"), predef, false)
       ),
       extraBridges = { i =>
         val replApi = new ReplApiImpl(

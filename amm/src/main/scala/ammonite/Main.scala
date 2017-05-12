@@ -27,7 +27,7 @@ import ammonite.util.Util.newLine
   * Note that the [[instantiateRepl]] function generates a new [[Repl]]
   * every time it is called!
   *
-  * @param predef Any additional code you want to run before the REPL session
+  * @param commandLinePredef Any additional code you want to run before the REPL session
   *               starts. Can contain multiple blocks separated by `@`s
   * @param defaultPredef Do you want to include the "standard" predef imports
   *                      provided by Ammonite? These include tools like `time`,
@@ -43,7 +43,7 @@ import ammonite.util.Util.newLine
   *           the scripts will be considered relative to when assigning them
   *           packages
   */
-case class Main(predef: String = "",
+case class Main(commandLinePredef: String = "",
                 defaultPredef: Boolean = true,
                 storageBackend: Storage = new Storage.Folder(Defaults.ammoniteHome),
                 wd: Path = ammonite.ops.pwd,
@@ -51,8 +51,7 @@ case class Main(predef: String = "",
                 inputStream: InputStream = System.in,
                 outputStream: OutputStream = System.out,
                 errorStream: OutputStream = System.err,
-                verboseOutput: Boolean = true
-               ){
+                verboseOutput: Boolean = true){
   /**
     * Instantiates an ammonite.Repl using the configuration
     */
@@ -62,7 +61,8 @@ case class Main(predef: String = "",
     new Repl(
       inputStream, outputStream, errorStream,
       storage = storageBackend,
-      predef = augmentedPredef + newLine + predef,
+      defaultPredef = augmentedPredef,
+      commandLinePredef = commandLinePredef,
       wd = wd,
       welcomeBanner = welcomeBanner,
       replArgs = replArgs
@@ -80,8 +80,8 @@ case class Main(predef: String = "",
       printer,
       storageBackend,
       Seq(
-        Name("defaultPredef") -> augmentedPredef,
-        Name("predef") -> predef
+        Interpreter.PredefInfo(Name("defaultPredef"), augmentedPredef, false),
+        Interpreter.PredefInfo(Name("predef"), commandLinePredef, false)
       ),
       i =>
         if (!replApi) Nil
@@ -153,7 +153,7 @@ object Main{
       head("ammonite", ammonite.Constants.version)
 
       opt[String]('p', "predef")
-        .action((x, c) => c.copy(predef = x))
+        .action((x, c) => c.copy(commandLinePredef = x))
         .text("Any commands you want to execute at the start of the REPL session")
 
       opt[Unit]("no-default-predef")
@@ -237,7 +237,7 @@ object Main{
     }
     for(c <- replParser.parse(before, Main())) ifContinually(continually){
       def main(isRepl: Boolean) = Main(
-        c.predef,
+        c.commandLinePredef,
         c.defaultPredef,
         new Storage.Folder(ammoniteHome.getOrElse(Defaults.ammoniteHome), isRepl) {
           override def loadPredef: String = {
