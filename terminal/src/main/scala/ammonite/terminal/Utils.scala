@@ -3,6 +3,7 @@ package ammonite.terminal
 import java.io.{OutputStream, ByteArrayOutputStream, Writer}
 import acyclic.file
 import scala.annotation.tailrec
+import scala.language.implicitConversions
 
 /**
   * Prints stuff to an ad-hoc logging file when running the ammonite repl or

@@ -29,7 +29,7 @@ private[sshd] class ShellSession(remoteShell: ShellSession.Server) extends Comma
    * called by ssh server to instrument this session
    * with a callback that it finished serving a user
    */
-  override def setExitCallback(exit: ExitCallback) {
+  override def setExitCallback(exit: ExitCallback): Unit = {
     this.exit = exit
   }
 
@@ -73,7 +73,7 @@ private[sshd] class ShellSession(remoteShell: ShellSession.Server) extends Comma
 
     override def write(bytes: Array[Byte]): Unit = for {
       i ← bytes.indices
-    } write(bytes(i))
+    } write(bytes(i).toInt)
 
     override def write(bytes: Array[Byte], offset: Int, length: Int): Unit = {
       write(bytes.slice(offset, offset + length))

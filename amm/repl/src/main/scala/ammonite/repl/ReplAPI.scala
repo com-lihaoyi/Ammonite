@@ -288,7 +288,6 @@ case class SessionChanged(removedImports: Set[scala.Symbol],
 object SessionChanged{
   implicit val pprinter: PPrinter[SessionChanged] = PPrinter[SessionChanged]{
     (data, config) =>
-      val output = mutable.Buffer.empty[String]
       def printDelta[T: PPrint](name: String, d: Iterable[T]) = {
         if (d.nonEmpty){
           Iterator(newLine, name, ": ") ++ pprint.tokenize(d)(implicitly, config)

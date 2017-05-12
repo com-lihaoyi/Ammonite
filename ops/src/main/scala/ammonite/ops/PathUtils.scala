@@ -5,6 +5,7 @@ import java.io.InputStream
 import acyclic.file
 
 import scala.io.Codec
+import scala.language.implicitConversions
 
 
 

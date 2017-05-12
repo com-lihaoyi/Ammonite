@@ -4,6 +4,7 @@ import sourcecode.Compat.Context
 
 import scala.annotation.StaticAnnotation
 import scala.language.experimental.macros
+import scala.util.control.NonFatal
 /**
   * More or less a minimal version of Autowire's Server that lets you generate
   * a set of "routes" from the methods defined in an object, and call them
@@ -84,19 +85,19 @@ object Router{
         try default match{
           case None => Left(Seq(Result.ParamError.Missing(arg)))
           case Some(v) => Right(v)
-        } catch {case e => Left(Seq(Result.ParamError.DefaultFailed(arg, e))) }
+        } catch {case NonFatal(e) => Left(Seq(Result.ParamError.DefaultFailed(arg, e))) }
 
       case Some(x) =>
 
         extras match{
           case None =>
             try Right(thunk(x))
-            catch {case e => Left(Seq(Result.ParamError.Invalid(arg, x, e))) }
+            catch {case NonFatal(e) => Left(Seq(Result.ParamError.Invalid(arg, x, e))) }
 
           case Some(extraItems) =>
             val attempts: Seq[Either[Result.ParamError.Invalid, T]] = (x +: extraItems).map{ item =>
               try Right(thunk(item))
-              catch {case e => Left(Result.ParamError.Invalid(arg, item, e)) }
+              catch {case NonFatal(e) => Left(Result.ParamError.Invalid(arg, item, e)) }
             }
 
             val bad = attempts.collect{ case Left(x) => x}
@@ -193,7 +194,7 @@ class Router [C <: Context](val c: C) {
     def isAMemberOfAnyRef(member: Symbol) =
       weakTypeOf[AnyRef].members.exists(_.name == member.name)
     val extractableMembers = for {
-      member <- curCls.declarations
+      member <- curCls.decls
       if !isAMemberOfAnyRef(member)
       if !member.isSynthetic
       if member.isPublic
@@ -211,7 +212,7 @@ class Router [C <: Context](val c: C) {
   def extractMethod(meth: MethodSymbol,
                     curCls: c.universe.Type,
                     target: c.Tree): c.universe.Tree = {
-    val flattenedArgLists = meth.paramss.flatten
+    val flattenedArgLists = meth.paramLists.flatten
     def hasDefault(i: Int) = {
       val defaultName = s"${meth.name}$$default$$${i + 1}"
       if (curCls.members.exists(_.name.toString == defaultName)) {
@@ -220,9 +221,9 @@ class Router [C <: Context](val c: C) {
         None
       }
     }
-    val argListSymbol = q"${c.fresh[TermName]("argsList")}"
+    val argListSymbol = q"${c.freshName(TermName("argsList"))}"
     val defaults = for ((arg, i) <- flattenedArgLists.zipWithIndex) yield {
-      hasDefault(i).map(defaultName => q"() => $target.${newTermName(defaultName)}")
+      hasDefault(i).map(defaultName => q"() => $target.${TermName(defaultName)}")
     }
 
     def unwrapVarargType(arg: Symbol) = {
@@ -247,9 +248,9 @@ class Router [C <: Context](val c: C) {
         }
 
       val docs = for{
-        doc <- arg.annotations.find(_.tpe =:= typeOf[Router.doc])
-        if doc.scalaArgs.head.isInstanceOf[Literal]
-        l =  doc.scalaArgs.head.asInstanceOf[Literal]
+        doc <- arg.annotations.find(_.tree.tpe =:= typeOf[Router.doc])
+        if doc.tree.children.tail.head.isInstanceOf[Literal]
+        l =  doc.tree.children.tail.head.asInstanceOf[Literal]
         if l.value.value.isInstanceOf[String]
       } yield l.value.value.asInstanceOf[String]
 
@@ -307,7 +308,7 @@ class Router [C <: Context](val c: C) {
 
   def getAllRoutesForClass(curCls: Type, target: c.Tree): Iterable[c.universe.Tree] = for{
     t <- getValsOrMeths(curCls)
-    if t.annotations.exists(_.tpe =:= typeOf[Router.main])
+    if t.annotations.exists(_.tree.tpe =:= typeOf[Router.main])
   } yield extractMethod(t, curCls, target)
 }
 

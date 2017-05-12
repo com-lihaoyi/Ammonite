@@ -53,13 +53,13 @@ object FrontEnd{
 
         def complete(_buf: String, cursor: Int, candidates: JList[CharSequence]): Int = {
           val buf = if (_buf == null) "" else _buf
-          import collection.JavaConversions._
+          import collection.JavaConverters._
           val (completionBase, completions, sigs) = compilerComplete(
             cursor,
             buf
           )
           if (completions.nonEmpty) {
-            candidates.addAll(completions.sorted)
+            candidates.addAll(completions.sorted.asJava)
             signatures = sigs.sorted
           } else if (sigs.nonEmpty){
             reader.println()

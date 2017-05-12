@@ -34,7 +34,7 @@ object BasicFilters {
   )
 
   def tabColumn(indent: Int, b: Vector[Char], c: Int, rest: LazyList[Int]) = {
-    val (chunks, chunkStarts, chunkIndex) = FilterTools.findChunks(b, c)
+    val (_, chunkStarts, chunkIndex) = FilterTools.findChunks(b, c)
     val chunkCol = c - chunkStarts(chunkIndex)
     val spacesToInject = indent - (chunkCol % indent)
     val (lhs, rhs) = b.splitAt(c)
@@ -79,7 +79,7 @@ object BasicFilters {
   )
 
   def doEnter(b: Vector[Char], c: Int, rest: LazyList[Int]) = {
-    val (chunks, chunkStarts, chunkIndex) = FilterTools.findChunks(b, c)
+    val (chunks, _, chunkIndex) = FilterTools.findChunks(b, c)
     if (chunkIndex == chunks.length - 1) Result(b.mkString)
     else injectNewLine(b, c, rest)
   }

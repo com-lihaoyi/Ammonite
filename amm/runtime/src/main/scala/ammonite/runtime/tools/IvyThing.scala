@@ -85,7 +85,7 @@ case class IvyThing(resolvers: () => List[Resolver], printer: Printer, verboseOu
     val report = ivy.resolve(md, options)
     val unresolved = report.getAllProblemMessages
 
-    import collection.JavaConversions._
+    import collection.JavaConverters._
 //    println("IVY THING DEBUGGING")
 //    println(report.getAllProblemMessages.toSeq)
 //    println(report.getProblemMessages.toSeq)
@@ -105,7 +105,7 @@ case class IvyThing(resolvers: () => List[Resolver], printer: Printer, verboseOu
         throw new Exception(silentIvyLogs)
       else artifacts
     }
-    else throw IvyResolutionException(unresolved.toSeq.map(_.toString))
+    else throw IvyResolutionException(unresolved.asScala.toSeq.map(_.toString))
   }
 
 }

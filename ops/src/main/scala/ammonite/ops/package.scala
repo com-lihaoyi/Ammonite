@@ -1,5 +1,6 @@
 package ammonite
 
+import scala.language.implicitConversions
 
 package object ops extends Extensions with RelPathStuff{
   implicit val postfixOps = scala.language.postfixOps

@@ -1,6 +1,7 @@
 package ammonite.util
 
 import acyclic.file
+import scala.language.higherKinds
 import scala.util.Try
 
 
@@ -28,7 +29,7 @@ object Res{
   : Res[M[V]] = {
     val builder = cbf.apply()
 
-    inputs.foldLeft[Res[Unit]](Res.Success()){
+    inputs.foldLeft[Res[Unit]](Res.Success(())){
       case (f: Failing, _) => f
       case (Res.Success(prev), x: T) =>
         f(x) match{

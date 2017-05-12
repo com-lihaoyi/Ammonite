@@ -6,6 +6,7 @@ import java.nio.charset.Charset
 import acyclic.file
 
 import scala.io.Codec
+import scala.language.implicitConversions
 import scala.util.Try
 
 /**
@@ -111,8 +112,8 @@ object BasePath {
     }
   }
   def chunkify(s: java.nio.file.Path) = {
-    import collection.JavaConversions._
-    s.iterator().map(_.toString).filter(_ != ".").filter(_ != "").toVector
+    import collection.JavaConverters._
+    s.iterator().asScala.map(_.toString).filter(_ != ".").filter(_ != "").toVector
   }
 }
 
@@ -297,10 +298,10 @@ extends FilePath with BasePathImpl with Readable{
   def toIO = toNIO.toFile
 
   override def getBytes = java.nio.file.Files.readAllBytes(toNIO)
-  import collection.JavaConversions._
+  import collection.JavaConverters._
 
   override def getLines(charSet: Codec) = {
-    java.nio.file.Files.readAllLines(toNIO, charSet.charSet).toVector
+    java.nio.file.Files.readAllLines(toNIO, charSet.charSet).asScala.toVector
   }
 }
 

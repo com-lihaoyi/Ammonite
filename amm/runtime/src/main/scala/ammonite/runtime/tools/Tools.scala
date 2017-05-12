@@ -11,6 +11,7 @@ import ammonite.ops._
 import ammonite.util.Util.newLine
 
 import scala.collection.{GenTraversableOnce, mutable}
+import scala.language.implicitConversions
 import scala.util.matching.Regex
 
 
@@ -176,7 +177,7 @@ case class tail(interval: Int, prefix: Int) extends Function[Path, Iterator[Stri
     val br = new BufferedReader(new InputStreamReader(is))
     Iterator.continually{
       val line = br.readLine()
-      if (line == null) Thread.sleep(interval)
+      if (line == null) Thread.sleep(interval.toLong)
       Option(line)
     }.flatten
 

@@ -29,7 +29,6 @@ class AmmonitePlugin(g: scala.tools.nsc.Global,
       def newPhase(prev: Phase): Phase = new g.GlobalPhase(prev) {
         def name = phaseName
         def apply(unit: g.CompilationUnit): Unit = {
-          val things = global.currentRun.units.map(_.source.path).toList
           AmmonitePlugin(g)(unit, output, topWrapperLen)
         }
       }
@@ -46,7 +45,6 @@ class AmmonitePlugin(g: scala.tools.nsc.Global,
 
         def name = phaseName
         def apply(unit: g.CompilationUnit): Unit = {
-          val things = global.currentRun.units.map(_.source.path).toList
           LineNumberModifier(g)(unit, topWrapperLen)
         }
       }
@@ -134,7 +132,7 @@ object AmmonitePlugin{
         // prefix package imports with `_root_` to try and stop random
         // variables from interfering with them. If someone defines a value
         // called `_root_`, this will still break, but that's their problem
-        val rootPrefix = if(symbolList.head.isPackage) Seq(Name("_root_")) else Nil
+        val rootPrefix = if(symbolList.head.hasPackageFlag) Seq(Name("_root_")) else Nil
         val tailPath = nameList.tail.map(_.decoded).map(Name(_))
 
         val prefix = rootPrefix ++ headFullPath ++ tailPath

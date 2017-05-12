@@ -1,6 +1,7 @@
 package ammonite.repl
 
 import acyclic.file
+import scala.language.higherKinds
 /**
  * Lets you turn on signal handling within a certain block,
  * attaching a callback to the handler and then turning it

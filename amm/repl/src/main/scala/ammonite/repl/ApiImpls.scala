@@ -51,6 +51,7 @@ class SessionApiImpl(eval: Evaluator) extends Session{
 
   def delete(name: String) = {
     namedFrames.remove(name)
+    ()
   }
 }
 class ReplApiImpl(val interp: Interpreter,

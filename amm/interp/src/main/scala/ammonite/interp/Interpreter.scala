@@ -331,8 +331,6 @@ class Interpreter(val printer: Printer,
       )
       val compiled = storage.compileCacheLoad(fullyQualifiedName, tag) match {
         case Some((classFiles, newImports)) =>
-          val clsFiles = classFiles.map(_._1)
-
           Evaluator.addToClasspath(classFiles, dynamicClasspath)
           Res.Success((classFiles, newImports))
         case _ =>
@@ -398,7 +396,6 @@ class Interpreter(val printer: Printer,
       case Some((wrapperHashes, classFiles, imports, importsTrees)) =>
         importsTrees.map(resolveSingleImportHook(source, _))
 
-        val classFileNames = classFiles.map(_.map(_._1))
         withContextClassloader(
           eval.evalCachedClassFiles(
             classFiles,
@@ -515,7 +512,7 @@ class Interpreter(val printer: Printer,
         // No more blocks
         // if we have imports to pass to the upper layer we do that
         if (autoImport) outerScriptImportCallback(lastImports)
-        Res.Success(lastImports, compiledData)
+        Res.Success((lastImports, compiledData))
       } else {
         // imports from scripts loaded from this script block will end up in this buffer
         var nestedScriptImports = Imports()
@@ -635,7 +632,6 @@ class Interpreter(val printer: Printer,
     }
     def ivy(coordinates: (String, String, String), verbose: Boolean = true): Unit = {
       val resolved = loadIvy(coordinates, verbose)
-      val (groupId, artifactId, version) = coordinates
 
 
       resolved.foreach(handleClasspath)

@@ -114,7 +114,7 @@ object Preprocessor{
     } yield Preprocessor.Output(wrappedCode, importsLength)
 
     def Processor(cond: PartialFunction[(String, String, G#Tree), Preprocessor.Expanded]) = {
-      (code: String, name: String, tree: G#Tree) => cond.lift(name, code, tree)
+      (code: String, name: String, tree: G#Tree) => cond.lift((name, code, tree))
     }
 
     def pprintSignature(ident: String, customMsg: Option[String]) = {
@@ -175,7 +175,7 @@ object Preprocessor{
 
     val Import = Processor{
       case (name, code, tree: G#Import) =>
-        val Array(keyword, body) = code.split(" ", 2)
+        val Array(_, body) = code.split(" ", 2)
         val tq = "\"\"\""
         Expanded(code, Seq(
           s"""

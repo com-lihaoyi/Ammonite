@@ -62,7 +62,7 @@ class HistoryFilter(history: () => IndexedSeq[String],
       // We're not searching for anything, just browsing history.
       // Pass in Vector.empty so we scroll through all items
       case None =>
-        val (i, b, c) = nextHistoryIndexFor(Vector.empty)
+        val (i, b, _) = nextHistoryIndexFor(Vector.empty)
         (i, b, "", 99999)
 
       // We're searching for some item with a particular search term

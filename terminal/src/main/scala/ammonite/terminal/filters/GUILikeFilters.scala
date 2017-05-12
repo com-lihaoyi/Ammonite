@@ -25,7 +25,7 @@ object GUILikeFilters {
                  slicer: Vector[Char] => Int) = {
 
       val markValue = mark.get
-      val (chunks, chunkStarts, chunkIndex) = FilterTools.findChunks(b, c)
+      val (_, chunkStarts, _) = FilterTools.findChunks(b, c)
       val min = chunkStarts.lastIndexWhere(_ <= math.min(c, markValue))
       val max = chunkStarts.indexWhere(_ > math.max(c, markValue))
       val splitPoints = chunkStarts.slice(min, max)

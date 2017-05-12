@@ -3,6 +3,8 @@ import acyclic.file
 import scala.collection.{Seq, GenTraversableOnce, TraversableLike}
 
 import scala.collection.generic.{CanBuildFrom => CBF, GenericTraversableTemplate, SeqFactory}
+import scala.language.implicitConversions
+import scala.language.higherKinds
 
 trait Extensions{
   implicit def Pipeable[T](t: T) = new Pipeable(t)
