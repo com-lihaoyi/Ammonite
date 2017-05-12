@@ -381,11 +381,9 @@ class Interpreter(val printer: Printer,
       tag
     ) match {
       case None =>
-        (source, verboseOutput) match {
-          case (ImportHook.Source.File(fName), true) =>
-            printer.out("Compiling " + fName.last + "\n")
-          case (ImportHook.Source.URL(url), true) =>
-            printer.out("Compiling " + url + "\n")
+        source match {
+          case ImportHook.Source.File(fName) => printer.info("Compiling " + fName.last)
+          case ImportHook.Source.URL(url) => printer.info("Compiling " + url)
           case _ =>
         }
         init()
@@ -590,7 +588,7 @@ class Interpreter(val printer: Printer,
       case Res.Exception(ex, msg) => lastException = ex
     }
   }
-  def loadIvy(coordinates: (String, String, String), verbose: Boolean = true) = {
+  def loadIvy(coordinates: (String, String, String)) = {
     val (groupId, artifactId, version) = coordinates
     val cacheKey = (interpApi.resolvers().hashCode.toString, groupId, artifactId, version)
 
@@ -606,15 +604,13 @@ class Interpreter(val printer: Printer,
     psOpt match{
       case Some(ps) => ps
       case None =>
-        val resolved = ammonite.runtime.tools.IvyThing(
+        val resolved = ammonite.runtime.tools.IvyThing.apply(
           () => interpApi.resolvers(),
-          printer,
-          verboseOutput
+          printer
         ).resolveArtifact(
           groupId,
           artifactId,
-          version,
-          if (verbose) 2 else 1
+          version
         ).toSet
 
         // #433 only non-snapshot versions are cached
@@ -632,8 +628,7 @@ class Interpreter(val printer: Printer,
 
     lazy val ivyThing = ammonite.runtime.tools.IvyThing(
       () => interpApi.resolvers(),
-      printer,
-      verboseOutput
+      printer
     )
 
     def handleClasspath(jar: File): Unit
@@ -646,8 +641,8 @@ class Interpreter(val printer: Printer,
       jars.map(_.toString).map(new java.io.File(_)).foreach(handleClasspath)
       reInit()
     }
-    def ivy(coordinates: (String, String, String), verbose: Boolean = true): Unit = {
-      val resolved = loadIvy(coordinates, verbose)
+    def ivy(coordinates: (String, String, String)): Unit = {
+      val resolved = loadIvy(coordinates)
       val (groupId, artifactId, version) = coordinates
 
 
@@ -746,20 +741,24 @@ object Interpreter{
     Name(wrapperName.raw + (if (wrapperIndex == 1) "" else "_" + wrapperIndex))
   }
 
-  def initPrinters(output: OutputStream, error: OutputStream, verboseOutput: Boolean) = {
+  def initPrinters(output: OutputStream,
+                   info: OutputStream,
+                   error: OutputStream,
+                   verboseOutput: Boolean) = {
     val colors = Ref[Colors](Colors.Default)
     val printStream = new PrintStream(output, true)
     val errorPrintStream = new PrintStream(error, true)
+    val infoPrintStream = new PrintStream(info, true)
 
-
-    def printlnWithColor(color: fansi.Attrs, s: String) = {
-      Seq(color(s).render, newLine).foreach(errorPrintStream.print)
+    def printlnWithColor(stream: PrintStream, color: fansi.Attrs, s: String) = {
+      stream.println(color(s).render)
     }
+
     val printer = Printer(
       printStream.print,
-      printlnWithColor(colors().warning(), _),
-      printlnWithColor(colors().error(), _),
-      printlnWithColor(fansi.Attrs.Empty, _)
+      printlnWithColor(errorPrintStream, colors().warning(), _),
+      printlnWithColor(errorPrintStream, colors().error(), _),
+      s => if (verboseOutput) printlnWithColor(infoPrintStream, fansi.Attrs.Empty, s)
     )
     (colors, printStream, errorPrintStream, printer)
   }

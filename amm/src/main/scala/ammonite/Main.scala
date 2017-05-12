@@ -19,8 +19,8 @@ import ammonite.util.Util.newLine
   * constructing the [[Main]] instance, and the various entrypoints such
   * as [[run]] [[runScript]] and so on are methods on that instance.
   *
-  * It is more or less equivalent to the [[ammonite.main.Repl]] object itself, and has
-  * a similar set of parameters, but does not have any of the [[ammonite.main.Repl]]'s
+  * It is more or less equivalent to the [[ammonite.repl.Repl]] object itself, and has
+  * a similar set of parameters, but does not have any of the [[ammonite.repl.Repl]]'s
   * implementation-related code and provides a more convenient set of
   * entry-points that a user can call.
   *
@@ -42,6 +42,16 @@ import ammonite.util.Util.newLine
   * @param wd The working directory of the REPL; when it load scripts, where
   *           the scripts will be considered relative to when assigning them
   *           packages
+  *
+  * @param inputStream Where input to the Repl is coming from, typically System.in,
+  *                    but it could come from somewhere else e.g. across the
+  *                    network in the case of the SshdRepl
+  * @param outputStream Primary output of code run using Ammonite
+  * @param infoStream Miscellaneous logging output when running Ammonite. This
+  *                   is typically stuff you want to see when running interactively,
+  *                   but not something you want to see when e.g. you forward a
+  *                   script's output to a file. This by default it goes to System.err
+  * @param errorStream Error output when things go bad, typically System.err
   */
 case class Main(commandLinePredef: String = "",
                 defaultPredef: Boolean = true,
@@ -50,6 +60,7 @@ case class Main(commandLinePredef: String = "",
                 welcomeBanner: Option[String] = Some(Defaults.welcomeBanner),
                 inputStream: InputStream = System.in,
                 outputStream: OutputStream = System.out,
+                infoStream: OutputStream = System.err,
                 errorStream: OutputStream = System.err,
                 verboseOutput: Boolean = true){
   /**
@@ -59,7 +70,7 @@ case class Main(commandLinePredef: String = "",
     val augmentedPredef = Main.maybeDefaultPredef(defaultPredef, Defaults.predefString)
 
     new Repl(
-      inputStream, outputStream, errorStream,
+      inputStream, outputStream, infoStream, errorStream,
       storage = storageBackend,
       defaultPredef = augmentedPredef,
       commandLinePredef = commandLinePredef,
@@ -73,7 +84,7 @@ case class Main(commandLinePredef: String = "",
     val augmentedPredef = Main.maybeDefaultPredef(defaultPredef, Defaults.predefString)
 
     val (colors, printStream, errorPrintStream, printer) =
-      Interpreter.initPrinters(outputStream, errorStream, verboseOutput)
+      Interpreter.initPrinters(outputStream, infoStream, errorStream, verboseOutput)
 
 
     val interp: Interpreter = new Interpreter(

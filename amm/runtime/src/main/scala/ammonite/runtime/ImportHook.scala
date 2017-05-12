@@ -29,7 +29,7 @@ object ImportHook{
     */
   trait InterpreterInterface{
     def wd: Path
-    def loadIvy(coordinates: (String, String, String), verbose: Boolean = true): Set[File]
+    def loadIvy(coordinates: (String, String, String)): Set[File]
   }
 
   /**

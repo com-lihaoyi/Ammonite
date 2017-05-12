@@ -30,29 +30,26 @@ trait IvyConstructor{
  *
  * And transliterated into Scala. I have no idea how or why it works.
  */
-case class IvyThing(resolvers: () => List[Resolver], printer: Printer, verboseOutput: Boolean) {
+case class IvyThing(resolvers: () => List[Resolver], printer: Printer) {
 
   case class IvyResolutionException(failed: Seq[String]) extends Exception(
     "failed to resolve ivy dependencies " + failed.mkString(", ")
   )
 
-  var maxLevel = 2
-  var silentIvyLogs: String = ""
+  val maxLevel = 2
+
   Message.setDefaultLogger(new AbstractMessageLogger {
     def doEndProgress(msg: String) = Console.err.println("Done")
     def doProgress() = Console.err.print(".")
-    def log(msg: String, level: Int) =  if (level <= maxLevel) verboseOutput match {
-      case true => printer.info(msg)
-      case false => silentIvyLogs += msg
-    }
+    def log(msg: String, level: Int) = if(level <= maxLevel) printer.info(msg)
     def rawlog(msg: String, level: Int) = log(msg, level)
   })
 
   def resolveArtifact(groupId: String,
                       artifactId: String,
                       version: String,
-                      verbosity: Int = 2) = synchronized {
-    maxLevel = verbosity
+                      verbosity: Int = 1) = synchronized {
+
     val ivy = ivyInstance(resolvers)
 
     val md = DefaultModuleDescriptor.newDefaultInstance(
@@ -101,9 +98,8 @@ case class IvyThing(resolvers: () => List[Resolver], printer: Printer, verboseOu
 //    println(report.getUnresolvedDependencies.map(_.getProblemMessage).toSeq)
     if (unresolved.size == 0) {
       val artifacts = report.getAllArtifactsReports.map(_.getLocalFile)
-      if(artifacts.length == 0)
-        throw new Exception(silentIvyLogs)
-      else artifacts
+      if(artifacts.length != 0) artifacts
+      else throw new Exception(s"${unresolved.size} artifacts required but no artifacts resolved")
     }
     else throw IvyResolutionException(unresolved.toSeq.map(_.toString))
   }

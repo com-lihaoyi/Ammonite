@@ -13,6 +13,7 @@ import scala.annotation.tailrec
 
 class Repl(input: InputStream,
            output: OutputStream,
+           info: OutputStream,
            error: OutputStream,
            storage: Storage,
            defaultPredef: String,
@@ -28,7 +29,7 @@ class Repl(input: InputStream,
   var history = new History(Vector())
 
   val (colors, printStream, errorPrintStream, printer) =
-    Interpreter.initPrinters(output, error, true)
+    Interpreter.initPrinters(output, info, error, true)
 
 
 
