@@ -27,7 +27,7 @@ import ammonite.util.Util.newLine
   * Note that the [[instantiateRepl]] function generates a new [[Repl]]
   * every time it is called!
   *
-  * @param commandLinePredef Any additional code you want to run before the REPL session
+  * @param predef Any additional code you want to run before the REPL session
   *               starts. Can contain multiple blocks separated by `@`s
   * @param defaultPredef Do you want to include the "standard" predef imports
   *                      provided by Ammonite? These include tools like `time`,
@@ -53,7 +53,7 @@ import ammonite.util.Util.newLine
   *                   script's output to a file. This by default it goes to System.err
   * @param errorStream Error output when things go bad, typically System.err
   */
-case class Main(commandLinePredef: String = "",
+case class Main(predef: String = "",
                 defaultPredef: Boolean = true,
                 storageBackend: Storage = new Storage.Folder(Defaults.ammoniteHome),
                 wd: Path = ammonite.ops.pwd,
@@ -73,7 +73,7 @@ case class Main(commandLinePredef: String = "",
       inputStream, outputStream, infoStream, errorStream,
       storage = storageBackend,
       defaultPredef = augmentedPredef,
-      commandLinePredef = commandLinePredef,
+      mainPredef = predef,
       wd = wd,
       welcomeBanner = welcomeBanner,
       replArgs = replArgs
@@ -92,7 +92,7 @@ case class Main(commandLinePredef: String = "",
       storageBackend,
       Seq(
         Interpreter.PredefInfo(Name("defaultPredef"), augmentedPredef, false),
-        Interpreter.PredefInfo(Name("predef"), commandLinePredef, false)
+        Interpreter.PredefInfo(Name("predef"), predef, false)
       ),
       i =>
         if (!replApi) Nil
@@ -164,7 +164,7 @@ object Main{
       head("ammonite", ammonite.Constants.version)
 
       opt[String]('p', "predef")
-        .action((x, c) => c.copy(commandLinePredef = x))
+        .action((x, c) => c.copy(predef = x))
         .text("Any commands you want to execute at the start of the REPL session")
 
       opt[Unit]("no-default-predef")
@@ -248,7 +248,7 @@ object Main{
     }
     for(c <- replParser.parse(before, Main())) ifContinually(continually){
       def main(isRepl: Boolean) = Main(
-        c.commandLinePredef,
+        c.predef,
         c.defaultPredef,
         new Storage.Folder(ammoniteHome.getOrElse(Defaults.ammoniteHome), isRepl) {
           override def loadPredef: String = {

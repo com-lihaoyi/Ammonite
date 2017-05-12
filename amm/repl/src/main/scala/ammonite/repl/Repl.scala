@@ -17,7 +17,7 @@ class Repl(input: InputStream,
            error: OutputStream,
            storage: Storage,
            defaultPredef: String,
-           commandLinePredef: String,
+           mainPredef: String,
            wd: ammonite.ops.Path,
            welcomeBanner: Option[String],
            replArgs: Seq[Bind[_]] = Nil) {
@@ -47,7 +47,7 @@ class Repl(input: InputStream,
       Interpreter.PredefInfo(Name("HardcodedPredef"), Repl.pprintPredef, true),
       Interpreter.PredefInfo(Name("DefaultPredef"), defaultPredef, true),
       Interpreter.PredefInfo(Name("ArgsPredef"), argString, false),
-      Interpreter.PredefInfo(Name("Predef"), commandLinePredef, false)
+      Interpreter.PredefInfo(Name("MainPredef"), mainPredef, false)
     ),
     i => {
       val replApi = new ReplApiImpl(

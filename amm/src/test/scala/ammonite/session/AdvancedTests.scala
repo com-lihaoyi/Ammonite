@@ -238,6 +238,17 @@ object AdvancedTests extends TestSuite{
 
         @ x
         error: not found: value x
+
+        @ {
+        @ private[this] val a = 3
+        @ val b = a * 4
+        @ }
+
+        @ a
+        error: not found: value a
+
+        @ b
+        
       """)
     }
     'compilerPlugin - retry(3){

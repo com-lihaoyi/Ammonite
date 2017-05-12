@@ -60,7 +60,7 @@ class TestRepl {
     )
     i.init()
     i
-  }catch{ case e =>
+  }catch{ case e: Throwable =>
     println(infoBuffer.mkString)
     println(outBuffer.mkString)
     println(warningBuffer.mkString)
@@ -90,8 +90,11 @@ class TestRepl {
 
       // Make sure all non-empty, non-complete command-line-fragments
       // are considered incomplete during the parse
+      //
+      // ...except for the empty 0-line fragment, and the entire fragment,
+      // both of which are complete.
       for (incomplete <- commandText.inits.toSeq.drop(1).dropRight(1)){
-        assert(ammonite.interp.Parsers.split(incomplete.mkString(Util.newLine)) == None)
+        assert(ammonite.interp.Parsers.split(incomplete.mkString(Util.newLine)).isEmpty)
       }
 
       // Finally, actually run the complete command text through the
@@ -176,9 +179,10 @@ class TestRepl {
     warningBuffer.clear()
     errorBuffer.clear()
     infoBuffer.clear()
+    val splitted = ammonite.interp.Parsers.split(input).get.get.value
     val processed = interp.processLine(
       input,
-      ammonite.interp.Parsers.split(input).get.get.value,
+      splitted,
       s"Main$index.sc"
     )
     processed match{

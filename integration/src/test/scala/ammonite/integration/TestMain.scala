@@ -4,7 +4,7 @@ object TestMain {
     val hello = "Hello"
     // Break into debug REPL with
     ammonite.Main(
-      commandLinePredef = "println(\"Starting Debugging!\")"
+      predef = "println(\"Starting Debugging!\")"
     ).run(
       "hello" -> hello,
       "fooValue" -> foo()

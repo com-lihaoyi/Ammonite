@@ -221,18 +221,13 @@ class Interpreter(val printer: Printer,
         Res.Exception(ex, "Something unexpected went wrong =(")
       }
 
-      (hookImports, hookedStmts, _) <- resolveImportHooks(
+      (hookImports, normalStmts, _) <- resolveImportHooks(
         ImportHook.Source.File(wd/"<console>"),
         stmts
       )
-      unwrappedStmts = hookedStmts.flatMap{x =>
-        Parsers.unwrapBlock(x) match {
-          case Some(contents) => Parsers.split(contents).get.get.value
-          case None => Seq(x)
-        }
-      }
+
       processed <- preprocess.transform(
-        unwrappedStmts,
+        normalStmts,
         eval.getCurrentLine,
         "",
         Seq(Name("$sess")),

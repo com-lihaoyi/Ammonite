@@ -45,33 +45,36 @@ object Parsers {
   }
 
   val Prelude = P( (Annot ~ OneNLMax).rep ~ (Mod ~/ Pass).rep )
-  val Statement =
-    P( scalaparse.Scala.TopPkgSeq | scalaparse.Scala.Import | Prelude ~ BlockDef | StatCtx.Expr )
+
+  val TmplStat = P( Import | Prelude ~ BlockDef | StatCtx.Expr )
+
+
+  // Do this funny ~~WS thing to make sure we capture the whitespace
+  // together with each statement; otherwise, by default, it gets discarded.
+  //
+  // After each statement, there must either be `Semis`, a "}" marking the
+  // end of the block, or the `End` of the input
   def StatementBlock(blockSep: P0) =
-    P( Semis.? ~ (!blockSep ~ Statement ~~ WS ~~ (Semis | End)).!.repX)
-  val Splitter = P( StatementBlock(Fail) ~ WL ~ End)
+    P( Semis.? ~ (!blockSep ~ TmplStat ~~ WS ~~ (Semis | &("}") | End)).!.repX)
+
+  val Splitter0 = P( StatementBlock(Fail) )
+  val Splitter = P( ("{" ~ Splitter0 ~ "}" | Splitter0) ~ End )
 
   /**
    * Attempts to break a code blob into multiple statements. Returns `None` if
    * it thinks the code blob is "incomplete" and requires more input
    */
-  def split(code: String): Option[Parsed[Seq[String]]] = Splitter.parse(code) match{
-    case Parsed.Failure(_, index, extra) if code.drop(index).trim() == "" => None
-    case x => Some(x)
+  def split(code: String): Option[Parsed[Seq[String]]] = {
+    Splitter.parse(code) match{
+      case Parsed.Failure(_, index, extra) if code.drop(index).trim() == "" => None
+      case x => Some(x)
+    }
   }
 
   val Separator = P( WL ~ "@" ~~ CharIn(" " + System.lineSeparator).rep(1) )
   val CompilationUnit = P( WL.! ~ StatementBlock(Separator) ~ WL )
   val ScriptSplitter = P( CompilationUnit.repX(1, Separator) ~ End)
   def splitScript(code: String) = ScriptSplitter.parse(code)
-
-  val BlockUnwrapper = P( "{" ~ Block.! ~ "}" ~ End)
-  def unwrapBlock(code: String) = {
-    BlockUnwrapper.parse(code) match{
-      case Parsed.Success(contents, _) => Some(contents)
-      case _ => None
-    }
-  }
 
   def stringWrap(s: String) = "\"" + pprint.PPrinter.escape(s) + "\""
   def stringSymWrap(s: String) = {

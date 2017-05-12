@@ -131,19 +131,20 @@ object BasicTests extends TestSuite{
     }
     'testSilentIvy{
       val evaled1 = exec('basic/"scalaTags.sc")
-      //check ivy is printing all the logs
+      // check ivy is printing all the logs
       assert(evaled1.err.string.contains("resolving dependencies"))
       val evaled2 = exec('basic/"scalaTags.sc", "-s")
-      //make sure ivy is not printing logs as expected from `-s` flag
+      // make sure ivy is not printing logs as expected from `-s` flag
       assert(!evaled2.err.string.contains("resolving dependencies"))
     }
     'testSilentScriptRunning{
       val evaled1 = exec('basic/"Hello.sc")
-      //check Compiling Script is being printed
-      assert(evaled1.out.string.contains("Compiling Hello.sc"))
+      // check Compiling Script is being printed
+
+      assert(evaled1.err.string.contains("Compiling Hello.sc"))
       val evaled2 = exec('basic/"Hello.sc", "-s")
-      //make sure with `-s` flag script running is silent
-      assert(!evaled2.out.string.contains("Compiling"))
+      // make sure with `-s` flag script running is silent
+      assert(!evaled2.err.string.contains("Compiling"))
     }
     'testSilentRunningWithExceptions{
       val errorMsg = intercept[ShelloutException]{
@@ -227,7 +228,7 @@ object BasicTests extends TestSuite{
               |def functionB(i: Int, s: String, path: ammonite.ops.Path)
               |""".stripMargin
           )
-          assert(out == expected)
+          assert(out.contains(expected))
         }
         'cantFindMain{
           val evaled = intercept[ShelloutException]{
@@ -243,7 +244,7 @@ object BasicTests extends TestSuite{
               |def functionB(i: Int, s: String, path: ammonite.ops.Path)
               |""".stripMargin
           )
-          assert(out == expected)
+          assert(out.contains(expected))
         }
       }
     }
