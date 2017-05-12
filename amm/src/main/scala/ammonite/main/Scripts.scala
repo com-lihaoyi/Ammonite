@@ -57,32 +57,34 @@ object Scripts {
             .asInstanceOf[() => Seq[Router.EntryPoint]]
             .apply()
 
-      res <- scriptMains match {
-        // If there are no @main methods, there's nothing to do
-        case Seq() => Res.Success(imports)
-        // If there's one @main method, we run it with all args
-        case Seq(main) => runMainMethod(main, args, kwargs).getOrElse(Res.Success(imports))
-        // If there are multiple @main methods, we use the first arg to decide
-        // which method to run, and pass the rest to that main method
-        case mainMethods =>
-          val suffix = formatMainMethods(mainMethods)
-          args match{
-            case Seq() =>
-              Res.Failure(
-                None,
-                s"Need to specify a main method to call when running " + path.last + suffix
-              )
-            case Seq(head, tail @ _*) =>
-              mainMethods.find(_.name == head) match{
-                case None =>
-                  Res.Failure(
-                    None,
-                    s"Unable to find method: " + backtickWrap(head) + suffix
-                  )
-                case Some(main) =>
-                  runMainMethod(main, tail, kwargs).getOrElse(Res.Success(imports))
-              }
-          }
+      res <- interp.withContextClassloader{
+        scriptMains match {
+          // If there are no @main methods, there's nothing to do
+          case Seq() => Res.Success(imports)
+          // If there's one @main method, we run it with all args
+          case Seq(main) => runMainMethod(main, args, kwargs).getOrElse(Res.Success(imports))
+          // If there are multiple @main methods, we use the first arg to decide
+          // which method to run, and pass the rest to that main method
+          case mainMethods =>
+            val suffix = formatMainMethods(mainMethods)
+            args match{
+              case Seq() =>
+                Res.Failure(
+                  None,
+                  s"Need to specify a main method to call when running " + path.last + suffix
+                )
+              case Seq(head, tail @ _*) =>
+                mainMethods.find(_.name == head) match{
+                  case None =>
+                    Res.Failure(
+                      None,
+                      s"Unable to find method: " + backtickWrap(head) + suffix
+                    )
+                  case Some(main) =>
+                    runMainMethod(main, tail, kwargs).getOrElse(Res.Success(imports))
+                }
+            }
+        }
       }
     } yield res
   }
