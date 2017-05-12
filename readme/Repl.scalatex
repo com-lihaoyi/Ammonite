@@ -60,12 +60,19 @@
   @hl.scala
     libraryDependencies += "com.lihaoyi" % "ammonite" % "@ammonite.Constants.version" % "test" cross CrossVersion.full
 
-    initialCommands in (Test, console) := """ammonite.Main().run()"""
-
+    sourceGenerators in Test += Def.task {
+      val file = (sourceManaged in Test).value / "amm.scala"
+      IO.write(file, """object amm extends App { ammonite.Main().run() }""")
+      Seq(file)
+    }.taskValue
   @p
-    After that, simple hit
+    After that, simply hit
   @code
-    sbt projectName/test:console
+    sbt projectName/test:run
+  @p
+    or if there are other main methods in the @code{Test} scope
+  @code
+    sbt projectName/test:run-main amm
   @p
     To activate the Ammonite REPL
 
