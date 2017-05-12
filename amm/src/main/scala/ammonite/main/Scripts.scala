@@ -47,7 +47,10 @@ object Scripts {
         hardcoded = true
       )
 
-      routeClsName = wrapperHashes.last._1
+      routeClsName <- wrapperHashes.lastOption match{
+        case Some((wrapperName, wrapperHash)) => Res.Success(wrapperName)
+        case None => Res.Skip
+      }
 
       routesCls =
         interp

@@ -267,6 +267,7 @@ object Main{
               ex.setStackTrace(trace.take(i))
               throw ex
             case Res.Success(_) =>
+            case Res.Skip   =>
             // do nothing on success, everything's already happened
           }
 
