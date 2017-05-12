@@ -894,8 +894,7 @@
           SshServerConfig(
             address = "localhost", // or "0.0.0.0" for public-facing shells
             port = 22222, // Any available port
-            username = "repl", // Arbitrary
-            password = "your_secure_password" // or ""
+            passwordAuthenticator = Some(pwdAuth) // or publicKeyAuthenticator
           )
         )
         replServer.start()
@@ -920,8 +919,9 @@
       @p
         @b{Security notes:} It is probably unsafe to run this server publicly
         (on host @hl.scala{"0.0.0.0"}) in a production, public-facing
-        application. Currently it doesn't supports key-based auth, and
-        password-based auth is notoriously weak.
+        application.  If you insist on doing so, you probably want key-based
+        authentication, available by supplying @hl.scala{publicKeyAuthenticator}
+        in the @hl.scala{SshServerConfig}.
 
       @p
         Despite this, it is perfectly possible to run these on production
