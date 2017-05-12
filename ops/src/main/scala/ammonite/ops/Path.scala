@@ -125,6 +125,9 @@ sealed trait FilePath extends BasePath
 object FilePath extends PathFactory[FilePath]{
   def apply(f: java.nio.file.Path) = {
     if (f.isAbsolute) Path(f)
+    else if (f.subpath(0, 1).toString == "~"){
+      Path(System.getProperty("user.home"))/RelPath(f.subpath(0, 1).relativize(f))
+    }
     else RelPath(f)
   }
 }

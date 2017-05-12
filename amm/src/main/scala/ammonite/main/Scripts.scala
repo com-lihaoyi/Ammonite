@@ -1,4 +1,6 @@
 package ammonite.main
+import java.nio.file.NoSuchFileException
+
 import acyclic.file
 import ammonite.runtime.ImportHook
 import ammonite.main.Router.{ArgSig, EntryPoint}
@@ -18,10 +20,14 @@ object Scripts {
                 args: Seq[String],
                 kwargs: Seq[(String, String)]) = {
     val (pkg, wrapper) = Util.pathToPackageWrapper(path, wd)
+
     for{
+      scriptTxt <- try Res.Success(Util.normalizeNewlines(read(path))) catch{
+        case e: NoSuchFileException => Res.Failure(Some(e), "Script file not found: " + path)
+      }
       (imports, wrapperHashes) <- interp.processModule(
         ImportHook.Source.File(path),
-        Util.normalizeNewlines(read(path)),
+        scriptTxt,
         wrapper,
         pkg,
         autoImport = true,
