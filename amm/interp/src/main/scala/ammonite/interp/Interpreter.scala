@@ -13,6 +13,7 @@ import annotation.tailrec
 import ammonite.util.ImportTree
 import ammonite.util.Util.{CacheDetails, newLine, normalizeNewlines}
 import ammonite.util._
+import org.jboss.shrinkwrap.resolver.api.maven.Maven
 
 import scala.reflect.io.VirtualDirectory
 
@@ -103,6 +104,7 @@ class Interpreter(val printer: Printer,
     Seq("exec") -> ImportHook.Exec,
     Seq("url") -> ImportHook.Http,
     Seq("ivy") -> ImportHook.Ivy,
+    Seq("maven") -> ImportHook.Maven,
     Seq("cp") -> ImportHook.Classpath,
     Seq("plugin", "ivy") -> ImportHook.PluginIvy,
     Seq("plugin", "cp") -> ImportHook.PluginClasspath
@@ -147,8 +149,11 @@ class Interpreter(val printer: Printer,
 
 
   def resolveSingleImportHook(source: ImportHook.Source, tree: ImportTree) = {
+    println(s"Searching the prefix ${tree.prefix}")
     val strippedPrefix = tree.prefix.takeWhile(_(0) == '$').map(_.stripPrefix("$"))
+    println(s"Stripped Prefix ${strippedPrefix}")
     val hookOpt = importHooks().collectFirst{case (k, v) if strippedPrefix.startsWith(k) => (k, v)}
+    println(s"Found Hook ${strippedPrefix}")
     for{
       (hookPrefix, hook) <- Res(hookOpt, "Import Hook could not be resolved")
       hooked <- hook.handle(source, tree.copy(prefix = tree.prefix.drop(hookPrefix.length)), this)
@@ -633,6 +638,14 @@ class Interpreter(val printer: Printer,
       jars.map(_.toString).map(new java.io.File(_)).foreach(handleClasspath)
       reInit()
     }
+
+    def maven(coordinates: (String, String, String), verbose: Boolean = true): Unit = {
+      val mvnC =  coordinates._1+":"+ coordinates._2+":"+ coordinates._3
+      var resolved =  Maven.resolver().resolve(mvnC).withTransitivity().asFile()
+      resolved.foreach(handleClasspath)
+      reInit()
+    }
+
     def ivy(coordinates: (String, String, String), verbose: Boolean = true): Unit = {
       val resolved = loadIvy(coordinates, verbose)
       val (groupId, artifactId, version) = coordinates

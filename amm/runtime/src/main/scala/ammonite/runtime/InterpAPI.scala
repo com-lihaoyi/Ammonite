@@ -43,6 +43,8 @@ trait LoadJar {
   /**
    * Load a library from its maven/ivy coordinates
    */
+  def maven(coordinates: (String, String, String), verbose: Boolean = true): Unit
+
   def ivy(coordinates: (String, String, String), verbose: Boolean = true): Unit
 }
 

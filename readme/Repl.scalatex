@@ -393,6 +393,11 @@
 
         @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("finagle", "@"), "\"\"\"")
 
+      @sect{import $maven}
+        @p
+          Works the same way as @hl.scala{import $ivy} but resolves transitive maven
+          dependencies reliably and is cognizant of maven mirrors configured in
+          your ~/.m2/settings.xml file.
 
       @p
         Ammonite-REPL is configured with a set of default resolvers but you
