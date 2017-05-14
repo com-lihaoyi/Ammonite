@@ -28,7 +28,7 @@ object LineNumberTests extends TestSuite{
         checkErrorMessage(
           file = 'lineNumbers / "ErrorLineNumberTest.sc",
           expected = Util.normalizeNewlines(
-            """Syntax Error: ("}" | `case`):5:24 ...")\n  }\n\n  d"
+            """Syntax Error: "}":5:24 ...")\n  }\n\n  d"
               |    printlnqs(unsorted))
               |                       ^""".stripMargin
           )
