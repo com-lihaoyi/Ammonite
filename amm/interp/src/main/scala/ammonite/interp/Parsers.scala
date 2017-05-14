@@ -65,8 +65,13 @@ object Parsers {
    * it thinks the code blob is "incomplete" and requires more input
    */
   def split(code: String): Option[Parsed[Seq[String]]] = {
-    Splitter.parse(code) match{
-      case Parsed.Failure(_, index, extra) if code.drop(index).trim() == "" => None
+    var furthest = 0
+    def instrument(p: fastparse.all.Parser[_], index: Int, parse: () => fastparse.all.Parsed[_]) = {
+      if (index > furthest) furthest = index
+    }
+
+    Splitter.parse(code, instrument = instrument) match{
+      case Parsed.Failure(_, index, extra) if furthest == code.length => None
       case x => Some(x)
     }
   }
