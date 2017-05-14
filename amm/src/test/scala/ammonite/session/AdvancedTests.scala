@@ -253,7 +253,7 @@ object AdvancedTests extends TestSuite{
     }
     'compilerPlugin - retry(3){
       if (!scala2_12) check.session("""
-        @ // Make sure plugins from eval class loader are not loaded
+        @ // Compiler plugins imported without `.$plugin` are not loaded
 
         @ import $ivy.`org.spire-math::kind-projector:0.6.3`
 
@@ -263,7 +263,7 @@ object AdvancedTests extends TestSuite{
         @ type TC0EitherStr = TC0[Either[String, ?]]
         error: not found: type ?
 
-        @ // This one must be loaded
+        @ // You need to use `import $ivy.$plugin`
 
         @ import $plugin.$ivy.`org.spire-math::kind-projector:0.6.3`
 
@@ -273,7 +273,7 @@ object AdvancedTests extends TestSuite{
         @ type TCEitherStr = TC[Either[String, ?]]
         defined type TCEitherStr
 
-        @ // Useless - does not add plugins, and ignored by eval class loader
+        @ // Importing plugins doesn't affect the run-time classpath
 
         @ import $plugin.$ivy.`com.lihaoyi::scalatags:0.6.2`
 

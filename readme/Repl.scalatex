@@ -65,14 +65,19 @@
       IO.write(file, """object amm extends App { ammonite.Main().run() }""")
       Seq(file)
     }.taskValue
+
   @p
     After that, simply hit
+
   @code
     sbt projectName/test:run
+
   @p
     or if there are other main methods in the @code{Test} scope
+
   @code
     sbt projectName/test:run-main amm
+
   @p
     To activate the Ammonite REPL
 
@@ -377,6 +382,12 @@
           @lnk("Google Guava", "https://github.com/google/guava") Java library
 
         @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("'guava", "@"))
+
+        @p
+          If you want to load a compiler plugin, you can do so using
+          @hl.scala{import $ivy.$plugin}:
+
+        @hl.ref(ammoniteTests/"AdvancedTests.scala", Seq("'compilerPlugin", "@"))
 
         @p
           This makes Ammonite ideal for trying out new libraries or tools. You

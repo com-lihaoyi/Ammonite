@@ -83,7 +83,7 @@ val sharedSettings = Seq(
 lazy val ops = project
   .settings(
     sharedSettings,
-    libraryDependencies += "com.lihaoyi" %% "geny" % "0.1.1",
+    libraryDependencies += "com.lihaoyi" %% "geny" % "0.1.2",
     name := "ammonite-ops"
   )
 

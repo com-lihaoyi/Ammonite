@@ -65,6 +65,9 @@ object Parsers {
    * it thinks the code blob is "incomplete" and requires more input
    */
   def split(code: String): Option[Parsed[Seq[String]]] = {
+    // We use `instrument` to detect when the parser has reached the end of the
+    // input, any time during the parse. If it has done so, and failed, we
+    // consider the input incomplete.
     var furthest = 0
     def instrument(p: fastparse.all.Parser[_], index: Int, parse: () => fastparse.all.Parsed[_]) = {
       if (index > furthest) furthest = index
