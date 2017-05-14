@@ -127,6 +127,12 @@
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="index.html" class="extype" name="ammonite.ops">ops</a></dd></dl></div>
     </li><li class="current-entities indented3">
                         <span class="separator"></span>
+                        <a class="trait" href="Internals$$LowPri.html" title=""></a>
+                        <a href="Internals$$LowPri.html" title="">
+                          LowPri
+                        </a>
+                      </li><li class="current-entities indented3">
+                        <span class="separator"></span>
                         <a class="trait" href="Internals$$Mover.html" title=""></a>
                         <a href="Internals$$Mover.html" title="">
                           Mover
@@ -162,7 +168,7 @@
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <span class="name">Writable</span>
+        <span class="name">Writable</span><span class="result"> extends <a href="Internals$$LowPri.html" class="extype" name="ammonite.ops.Internals.LowPri">LowPri</a></span>
       </span>
       </h4>
 
@@ -171,7 +177,7 @@
           <span class="toggle">
             Linear Supertypes
           </span>
-          <div class="superTypes hiddenContent"><a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Any" class="extype" target="_top">Any</a></div>
+          <div class="superTypes hiddenContent"><a href="Internals$$LowPri.html" class="extype" name="ammonite.ops.Internals.LowPri">LowPri</a>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Any" class="extype" target="_top">Any</a></div>
         </div></div>
         
 
@@ -197,7 +203,7 @@
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="ammonite.ops.Internals.Writable"><span>Writable</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="ammonite.ops.Internals.Writable"><span>Writable</span></li><li class="in" name="ammonite.ops.Internals.LowPri"><span>LowPri</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -272,22 +278,6 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="ammonite.ops.Internals.Writable#WritableArray" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="WritableArray[T](a:Array[T])(implicitf:T=&gt;ammonite.ops.Internals.Writable):ammonite.ops.Internals.Writable"></a><a id="WritableArray[T](Array[T])((T)⇒Writable):Writable"></a>
-      <span class="permalink">
-      <a href="../../ammonite/ops/Internals$$Writable$.html#WritableArray[T](a:Array[T])(implicitf:T=&gt;ammonite.ops.Internals.Writable):ammonite.ops.Internals.Writable" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">implicit </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">WritableArray</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="a">a: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Array" class="extype" target="_top">Array</a>[<span class="extype" name="ammonite.ops.Internals.Writable.WritableArray.T">T</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="f">f: (<span class="extype" name="ammonite.ops.Internals.Writable.WritableArray.T">T</span>) ⇒ <a href="Internals$$Writable.html" class="extype" name="ammonite.ops.Internals.Writable">Writable</a></span>)</span><span class="result">: <a href="Internals$$Writable.html" class="extype" name="ammonite.ops.Internals.Writable">Writable</a></span>
-      </span>
-      
-      
     </li><li name="ammonite.ops.Internals.Writable#WritableBytes" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="WritableBytes(a:Array[Byte]):ammonite.ops.Internals.Writable"></a><a id="WritableBytes(Array[Byte]):Writable"></a>
       <span class="permalink">
@@ -304,10 +294,10 @@
       </span>
       
       
-    </li><li name="ammonite.ops.Internals.Writable#WritableIterator" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="WritableIterator[T](a:Iterator[T])(implicitf:T=&gt;ammonite.ops.Internals.Writable):ammonite.ops.Internals.Writable"></a><a id="WritableIterator[T](Iterator[T])((T)⇒Writable):Writable"></a>
+    </li><li name="ammonite.ops.Internals.LowPri#WritableGenerator" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="WritableGenerator[M[_],T](a:M[T])(implicitf:T=&gt;ammonite.ops.Internals.Writable,impliciti:M[T]=&gt;geny.Generator[T]):ammonite.ops.Internals.Writable"></a><a id="WritableGenerator[M[_],T](M[T])((T)⇒Writable,(M[T])⇒Generator[T]):Writable"></a>
       <span class="permalink">
-      <a href="../../ammonite/ops/Internals$$Writable$.html#WritableIterator[T](a:Iterator[T])(implicitf:T=&gt;ammonite.ops.Internals.Writable):ammonite.ops.Internals.Writable" title="Permalink">
+      <a href="../../ammonite/ops/Internals$$Writable$.html#WritableGenerator[M[_],T](a:M[T])(implicitf:T=&gt;ammonite.ops.Internals.Writable,impliciti:M[T]=&gt;geny.Generator[T]):ammonite.ops.Internals.Writable" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -316,10 +306,10 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">WritableIterator</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="a">a: <span class="extype" name="scala.Iterator">Iterator</span>[<span class="extype" name="ammonite.ops.Internals.Writable.WritableIterator.T">T</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="f">f: (<span class="extype" name="ammonite.ops.Internals.Writable.WritableIterator.T">T</span>) ⇒ <a href="Internals$$Writable.html" class="extype" name="ammonite.ops.Internals.Writable">Writable</a></span>)</span><span class="result">: <a href="Internals$$Writable.html" class="extype" name="ammonite.ops.Internals.Writable">Writable</a></span>
+        <span class="name">WritableGenerator</span><span class="tparams">[<span name="M">M<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="T">T</span>]</span><span class="params">(<span name="a">a: <span class="extype" name="ammonite.ops.Internals.LowPri.WritableGenerator.M">M</span>[<span class="extype" name="ammonite.ops.Internals.LowPri.WritableGenerator.T">T</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="f">f: (<span class="extype" name="ammonite.ops.Internals.LowPri.WritableGenerator.T">T</span>) ⇒ <a href="Internals$$Writable.html" class="extype" name="ammonite.ops.Internals.Writable">Writable</a></span>, <span name="i">i: (<span class="extype" name="ammonite.ops.Internals.LowPri.WritableGenerator.M">M</span>[<span class="extype" name="ammonite.ops.Internals.LowPri.WritableGenerator.T">T</span>]) ⇒ <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/geny_2.12/0.1.2/geny_2.12-0.1.2-javadoc.jar/!/index.html#geny.Generator" class="extype" target="_top">Generator</a>[<span class="extype" name="ammonite.ops.Internals.LowPri.WritableGenerator.T">T</span>]</span>)</span><span class="result">: <a href="Internals$$Writable.html" class="extype" name="ammonite.ops.Internals.Writable">Writable</a></span>
       </span>
       
-      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Internals$$LowPri.html" class="extype" name="ammonite.ops.Internals.LowPri">LowPri</a></dd></dl></div>
     </li><li name="ammonite.ops.Internals.Writable#WritableString" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="WritableString(s:String):ammonite.ops.Internals.Writable"></a><a id="WritableString(String):Writable"></a>
       <span class="permalink">
@@ -333,22 +323,6 @@
       </span>
       <span class="symbol">
         <span class="name">WritableString</span><span class="params">(<span name="s">s: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="Internals$$Writable.html" class="extype" name="ammonite.ops.Internals.Writable">Writable</a></span>
-      </span>
-      
-      
-    </li><li name="ammonite.ops.Internals.Writable#WritableTraversable" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="WritableTraversable[T](a:Traversable[T])(implicitf:T=&gt;ammonite.ops.Internals.Writable):ammonite.ops.Internals.Writable"></a><a id="WritableTraversable[T](Traversable[T])((T)⇒Writable):Writable"></a>
-      <span class="permalink">
-      <a href="../../ammonite/ops/Internals$$Writable$.html#WritableTraversable[T](a:Traversable[T])(implicitf:T=&gt;ammonite.ops.Internals.Writable):ammonite.ops.Internals.Writable" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">implicit </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">WritableTraversable</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="a">a: <span class="extype" name="scala.Traversable">Traversable</span>[<span class="extype" name="ammonite.ops.Internals.Writable.WritableTraversable.T">T</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="f">f: (<span class="extype" name="ammonite.ops.Internals.Writable.WritableTraversable.T">T</span>) ⇒ <a href="Internals$$Writable.html" class="extype" name="ammonite.ops.Internals.Writable">Writable</a></span>)</span><span class="result">: <a href="Internals$$Writable.html" class="extype" name="ammonite.ops.Internals.Writable">Writable</a></span>
       </span>
       
       
@@ -648,7 +622,9 @@
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="scala.AnyRef">
+        <div class="parent" name="ammonite.ops.Internals.LowPri">
+              <h3>Inherited from <a href="Internals$$LowPri.html" class="extype" name="ammonite.ops.Internals.LowPri">LowPri</a></h3>
+            </div><div class="parent" name="scala.AnyRef">
               <h3>Inherited from <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></h3>
             </div><div class="parent" name="scala.Any">
               <h3>Inherited from <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Any" class="extype" target="_top">Any</a></h3>
