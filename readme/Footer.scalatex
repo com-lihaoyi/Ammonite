@@ -127,12 +127,18 @@
           home directory of the current user
         @li
           Many improvements to classpath scanning and re-compilation logic (@issue(542))
+          which should greatly reduce the time taken start Ammonite in an SBT project,
+          and avoid many existing problems with stale compilation caches.
         @li
           Fix crash when you try to run an empty script
         @li
           Miscellaneous info messages now go to stderr rather than stdout, so they
           don't get mixed into your script output if you pipe into a file (@issue(574))
-
+        @li
+          We recently launched a @lnk("Patreon page", "https://www.patreon.com/lihaoyi")
+          to raise money to fund future development of Ammonite. If you've enjoyed using
+          Ammonite, and use it day to day, please
+          @lnk("chip in", "https://www.patreon.com/lihaoyi") to support our project!
 
 
     @sect{0.8.4}
