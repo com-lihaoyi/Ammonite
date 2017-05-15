@@ -125,7 +125,7 @@ object Preprocessor{
             .ReplBridge
             .value
             .Internal
-            .print($ident, $ident, "$ident", $customCode)
+            .print($ident, "$ident", $customCode)
       """
     }
     def definedStr(definitionLabel: String, name: String) =

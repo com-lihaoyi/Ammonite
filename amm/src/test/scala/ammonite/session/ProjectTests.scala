@@ -13,7 +13,6 @@ object ProjectTests extends TestSuite{
     'load {
       'ivy {
         'standalone - {
-          retry(3) {
             // ivy or maven central are flaky =/
             val tq = "\"\"\""
             check.session(
@@ -27,11 +26,8 @@ object ProjectTests extends TestSuite{
           import scalatags.Text.all._
 
           @ a("omg", href:="www.google.com").render
-          res2: String = $tq
-          <a href="www.google.com">omg</a>
-          $tq
+          res2: String = "<a href=\\"www.google.com\\">omg</a>"
         """)
-          }
         }
         'akkahttp - {
             if (!scala2_12) check.session(

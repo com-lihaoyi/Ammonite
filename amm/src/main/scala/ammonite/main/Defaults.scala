@@ -56,7 +56,14 @@ object Defaults{
     |import ammonite.runtime.tools._
     |import ammonite.repl.tools._
     |import ammonite.runtime.tools.IvyConstructor.{ArtifactIdExt, GroupIdExt}
-    |import ammonite.repl.ReplBridge.value.{exit, codeColors, tprintColors, show, typeOf}
+    |import ammonite.repl.ReplBridge.value.{
+    |  exit,
+    |  codeColorsImplicit,
+    |  tprintColorsImplicit,
+    |  pprinterImplicit,
+    |  show,
+    |  typeOf
+    |}
     |import ammonite.main.Router.{doc, main}
     |import ammonite.main.Scripts.pathScoptRead
     |""".stripMargin

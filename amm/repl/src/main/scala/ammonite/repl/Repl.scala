@@ -44,7 +44,6 @@ class Repl(input: InputStream,
     printer,
     storage,
     Seq(
-      Interpreter.PredefInfo(Name("HardcodedPredef"), Repl.pprintPredef, true),
       Interpreter.PredefInfo(Name("DefaultPredef"), defaultPredef, true),
       Interpreter.PredefInfo(Name("ArgsPredef"), argString, false),
       Interpreter.PredefInfo(Name("MainPredef"), mainPredef, false)
@@ -129,8 +128,7 @@ class Repl(input: InputStream,
 }
 
 object Repl{
-  val pprintPredef =
-    "import ammonite.repl.ReplBridge.value.{pprintConfig, derefPPrint}"
+
 
   def highlightFrame(f: StackTraceElement,
                      error: fansi.Attrs,

@@ -84,7 +84,7 @@ object Parsers {
   val ScriptSplitter = P( CompilationUnit.repX(1, Separator) ~ End)
   def splitScript(code: String) = ScriptSplitter.parse(code)
 
-  def stringWrap(s: String) = "\"" + pprint.PPrinter.escape(s) + "\""
+  def stringWrap(s: String) = "\"" + pprint.Util.literalize(s) + "\""
   def stringSymWrap(s: String) = {
     if (s == "") "'"
     else (scalaparse.syntax.Identifiers.Id ~ End).parse(s, 0)  match{

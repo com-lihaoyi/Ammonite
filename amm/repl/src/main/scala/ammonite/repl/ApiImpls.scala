@@ -5,9 +5,9 @@ import java.io.File
 import ammonite.interp.{Interpreter, Preprocessor}
 import ammonite.runtime._
 import ammonite.ops.{Path, read}
+import ammonite.runtime.tools.GrepResult
 import ammonite.util.Util._
 import ammonite.util._
-import pprint.{Config, PPrint}
 
 import scala.collection.mutable
 
@@ -72,43 +72,37 @@ class ReplApiImpl(val interp: Interpreter,
   val frontEnd = frontEnd0
   val beforeExitHooks = interp.beforeExitHooks
 
-  implicit def tprintColors = pprint.TPrintColors(
+  implicit def tprintColorsImplicit = pprint.TPrintColors(
     typeColor = colors().`type`()
   )
-  implicit val codeColors = new CodeColors{
+  implicit val codeColorsImplicit = new CodeColors{
     def comment = colors().comment()
     def `type` = colors().`type`()
     def literal = colors().literal()
     def keyword = colors().keyword()
     def ident = colors().ident()
   }
-  implicit lazy val pprintConfig: Ref[pprint.Config] = {
-    Ref.live[pprint.Config]( () =>
-      pprint.Config.apply(
-        width = width,
-        height = height / 2,
-        colors = pprint.Colors(
-          colors().literal(),
-          colors().prefix()
-        )
-      )
+  implicit val pprinter: Ref[pprint.PPrinter] = Ref.live(() =>
+    pprint.PPrinter.Color.copy(
+      defaultHeight = height / 2,
+      defaultWidth = width,
+      colorLiteral = colors().literal(),
+      colorApplyPrefix = colors().prefix(),
+      additionalHandlers = {
+        case t: History => pprint.Tree.Lazy(() => t.mkString("\n"))
+        case t: GrepResult => pprint.Tree.Lazy(() => GrepResult.grepResultRepr(t))
+      }
     )
+  )
 
-  }
-
-  def show[T: PPrint](implicit cfg: Config) = (t: T) => {
-    pprint.tokenize(t, height = 0)(implicitly[PPrint[T]], cfg).foreach(printer.out)
-    printer.out(newLine)
-  }
-  def show[T: PPrint](t: T,
-                      width: Integer = null,
-                      height: Integer = 0,
-                      indent: Integer = null,
-                      colors: pprint.Colors = null)
-                     (implicit cfg: Config = Config.Defaults.PPrintConfig) = {
+  override def show(t: Any,
+                    width: Integer = null,
+                    height: Integer = 0,
+                    indent: Integer = null) = {
 
 
-    pprint.tokenize(t, width, height, indent, colors)(implicitly[PPrint[T]], cfg)
+    pprinter().tokenize(t, width, indent)
+      .map(_.render)
       .foreach(printer.out)
     printer.out(newLine)
   }

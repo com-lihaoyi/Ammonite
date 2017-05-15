@@ -4,7 +4,7 @@ package ammonite.repl
 import ammonite.runtime.tools.Resolver
 import ammonite.util.{Bind, CodeColors, Colors, Ref}
 import ammonite.util.Util.newLine
-import pprint.{Config, PPrint, PPrinter, TPrintColors}
+import pprint.{PPrinter, TPrintColors}
 
 import scala.collection.mutable
 import scala.reflect.runtime.universe._
@@ -105,13 +105,14 @@ trait ReplAPI {
    * Controls how things are pretty-printed in the REPL. Feel free
    * to shadow this with your own definition to change how things look
    */
-  implicit val pprintConfig: Ref[pprint.Config]
+  implicit def tprintColorsImplicit: pprint.TPrintColors
 
-  implicit def derefPPrint(implicit t: Ref[pprint.Config]): pprint.Config = t()
+  implicit def codeColorsImplicit: CodeColors
 
-  implicit def tprintColors: pprint.TPrintColors
+  def pprinter: Ref[pprint.PPrinter]
 
-  implicit def codeColors: CodeColors
+  implicit def pprinterImplicit = pprinter()
+
   /**
    * Current width of the terminal
    */
@@ -126,13 +127,11 @@ trait ReplAPI {
    * disables truncation and prints the entire thing, but you can set other
    * parameters as well if you want.
    */
-  def show[T: PPrint](implicit cfg: Config): T => Unit
-  def show[T: PPrint](t: T,
-                      width: Integer = 0,
-                      height: Integer = null,
-                      indent: Integer = null,
-                      colors: pprint.Colors = null)
-                     (implicit cfg: Config = Config.Defaults.PPrintConfig): Unit
+
+  def show(t: Any,
+           width: Integer = 0,
+           height: Integer = null,
+           indent: Integer = null): Unit
   /**
     * Functions that can be used to manipulate the current REPL session:
     * check-pointing progress, reverting to earlier checkpoints, or deleting
@@ -191,15 +190,9 @@ abstract class FullReplAPI extends ReplAPI{
   trait Internal{
     def combinePrints(iters: Iterator[String]*): Iterator[String]
 
-    /**
-     * Kind of an odd signature, splitting out [[T]] and [[V]]. This is
-     * seemingly useless but necessary because when you add both [[pprint.TPrint]]
-     * and [[PPrint]] context bounds to the same type, Scala's type inference
-     * gets confused and does the wrong thing
-     */
-    def print[T: pprint.TPrint: WeakTypeTag, V: PPrint]
-             (value: => T, value2: => V, ident: String, custom: Option[String])
-             (implicit cfg: Config, tcolors: pprint.TPrintColors): Iterator[String]
+    def print[T: pprint.TPrint: WeakTypeTag]
+             (value: => T, ident: String, custom: Option[String])
+             (implicit tcolors: pprint.TPrintColors): Iterator[String]
 
     def printDef(definitionLabel: String, ident: String): Iterator[String]
     def printImport(imported: String): Iterator[String]
@@ -212,6 +205,7 @@ abstract class FullReplAPI extends ReplAPI{
 
 
 trait DefaultReplAPI extends FullReplAPI {
+
 
   def help =
     """Welcome to the Ammonite Scala REPL! Enter a Scala expression and it will be evaluated.
@@ -230,12 +224,10 @@ trait DefaultReplAPI extends FullReplAPI {
            .drop(1)
     }
 
-    def print[T: pprint.TPrint: WeakTypeTag, V: PPrint](value: => T,
-                                                 value2: => V,
-                                                 ident: String,
-                                                 custom: Option[String])
-                                                (implicit cfg: pprint.Config,
-                                                 tcolors: pprint.TPrintColors) = {
+    def print[T: pprint.TPrint: WeakTypeTag](value: => T,
+                                             ident: String,
+                                             custom: Option[String])
+                                            (implicit tcolors: pprint.TPrintColors) = {
       // This type check was originally written as just typeOf[T] =:= typeOf[Unit].
       // However, due to a bug in Scala's reflection when applied to certain
       // class annotations in Hadoop jars, the type check would consistently
@@ -251,21 +243,38 @@ trait DefaultReplAPI extends FullReplAPI {
       val isUnit = try {
         typeOf[T] =:= typeOf[Unit]
       } catch {
-        case _: Throwable =>
-          value2 == scala.runtime.BoxedUnit.UNIT
+        case _: Throwable => value == scala.runtime.BoxedUnit.UNIT
       }
 
       if (isUnit) Iterator()
       else {
-        val implicitPPrint = implicitly[PPrint[V]]
+
+        // Pre-compute how many lines and how many columns the prefix of the
+        // printed output takes, so we can feed that information into the
+        // pretty-printing of the main body
+        val prefix = new pprint.Truncated(
+          Iterator(
+            colors().ident()(ident).render, ": ",
+            implicitly[pprint.TPrint[T]].render(tcolors), " = "
+          ),
+          pprinter().defaultWidth,
+          pprinter().defaultHeight
+        )
+        val output = mutable.Buffer.empty[fansi.Str]
+
+        prefix.foreach(output +=)
+
         val rhs = custom match {
-          case None => implicitPPrint.render(value2, cfg)
-          case Some(s) => Iterator(cfg.colors.literalColor(s).render)
+          case None =>
+            pprinter().tokenize(
+              value,
+              height = pprinter().defaultHeight - prefix.completedLineCount,
+              initialOffset = prefix.lastLineLength
+            ).toStream
+          case Some(s) => Seq(pprinter().colorLiteral(s))
         }
-        Iterator(
-          colors().ident()(ident).render, ": ",
-          implicitly[pprint.TPrint[T]].render(tcolors), " = "
-        ) ++ rhs
+
+        output.iterator.map(_.render) ++ rhs.map(_.render)
       }
     }
     def printDef(definitionLabel: String, ident: String) = {
@@ -286,22 +295,7 @@ case class SessionChanged(removedImports: Set[scala.Symbol],
                           removedJars: Set[java.net.URL],
                           addedJars: Set[java.net.URL])
 object SessionChanged{
-  implicit val pprinter: PPrinter[SessionChanged] = PPrinter[SessionChanged]{
-    (data, config) =>
-      val output = mutable.Buffer.empty[String]
-      def printDelta[T: PPrint](name: String, d: Iterable[T]) = {
-        if (d.nonEmpty){
-          Iterator(newLine, name, ": ") ++ pprint.tokenize(d)(implicitly, config)
-        }else Iterator()
-      }
-      val res = Iterator(
-        printDelta("Removed Imports", data.removedImports),
-        printDelta("Added Imports", data.addedImports),
-        printDelta("Removed Jars", data.removedJars),
-        printDelta("Added Jars", data.addedJars)
-      )
-      res.flatten
-  }
+
   def delta(oldFrame: Frame, newFrame: Frame): SessionChanged = {
     def frameSymbols(f: Frame) = f.imports.value.map(_.toName.backticked).map(Symbol(_)).toSet
     new SessionChanged(

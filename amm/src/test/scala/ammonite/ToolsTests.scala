@@ -19,9 +19,9 @@ object ToolsTests extends TestSuite{
 
     'grep{
 
+      implicit val pprinter = pprint.PPrinter.Color
       val items = Seq(123, 456, 789)
       'filter{
-        import pprint.Config.Defaults._
         assert(
           (items |? grep! "45") == Seq(456),
           (items |? grep! "45".r) == Seq(456),
@@ -32,15 +32,13 @@ object ToolsTests extends TestSuite{
         )
       }
       'flatMap{
-        implicit def pprintConfig = pprint.Config.Defaults.PPrintConfig.copy(width = 25)
-        def check[T: Grepper, V: pprint.PPrint](items: Seq[V], regex: T, expected: Seq[String]) = {
+        def check[T: Grepper](items: Seq[Any], regex: T, expected: Seq[String]) = {
 
           val grepped = items || grep! regex
-          implicitly[pprint.Config]
           val displayed =
             for(g <- grepped)
               yield {
-                pprint.tokenize(g)
+                pprinter.tokenize(g)
                   .mkString
                   .replace(fansi.Color.Red.escape, "<")
                   .replace(fansi.Color.Reset.escape, ">")

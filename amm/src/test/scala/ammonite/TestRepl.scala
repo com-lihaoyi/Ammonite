@@ -38,7 +38,6 @@ class TestRepl {
       storage = new Storage.Folder(tempDir),
       wd = ammonite.ops.pwd,
       customPredefs = Seq(
-        Interpreter.PredefInfo(Name("pprintPredef"), Repl.pprintPredef, true),
         Interpreter.PredefInfo(Name("defaultPredef"), ammonite.main.Defaults.predefString, true),
         Interpreter.PredefInfo(Name("testPredef"), predef, false)
       ),

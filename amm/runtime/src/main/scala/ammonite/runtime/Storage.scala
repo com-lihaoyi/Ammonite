@@ -291,14 +291,14 @@ object History{
   }
   implicit def toHistory(s: Seq[String]): History = new History(s.toVector)
 
-  import pprint._
-  implicit val historyPPrint: pprint.PPrint[History] = pprint.PPrint(
-    new pprint.PPrinter[History]{
-      def render0(t: History, c: pprint.Config) = {
-        t.iterator.flatMap(Iterator(newLine, _))
-      }
-    }
-  )
+//  import pprint._
+//  implicit val historyPPrint: pprint.PPrint[History] = pprint.PPrint(
+//    new pprint.PPrinter[History]{
+//      def render0(t: History, c: pprint.Config) = {
+//
+//      }
+//    }
+//  )
 
 }
 
