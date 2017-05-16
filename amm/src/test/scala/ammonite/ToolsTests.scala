@@ -1,6 +1,7 @@
 package ammonite
 
 import ammonite.ops._
+import ammonite.runtime.History
 import ammonite.runtime.tools._
 import utest._
 import ammonite.util.Util.newLine
@@ -19,7 +20,13 @@ object ToolsTests extends TestSuite{
 
     'grep{
 
-      implicit val pprinter = pprint.PPrinter.Color
+      implicit val pprinter = pprint.PPrinter.Color.copy(
+        colorLiteral = fansi.Attr.Reset,
+        defaultWidth = 25,
+        additionalHandlers = {
+          case t: GrepResult => pprint.Tree.Lazy(ctx => GrepResult.grepResultRepr(t, ctx))
+        }
+      )
       val items = Seq(123, 456, 789)
       'filter{
         assert(

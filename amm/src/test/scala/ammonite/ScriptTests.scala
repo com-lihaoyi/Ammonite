@@ -25,9 +25,8 @@ object ScriptTests extends TestSuite{
             @ interp.load.exec($printedScriptPath/"LoadIvy.sc")
 
             @ val r = res
-            r: String = ${"\"\"\""}
-            <a href="www.google.com">omg</a>
-            ${"\"\"\""}
+            r: String = "<a href=\\"www.google.com\\">omg</a>"
+
             """)
           }
         'preserveImports{
@@ -177,9 +176,7 @@ object ScriptTests extends TestSuite{
             @ interp.load.module($printedScriptPath/"LoadIvy.sc")
 
             @ val r = res
-            r: String = ${"\"\"\""}
-            <a href="www.google.com">omg</a>
-            ${"\"\"\""}
+            r: String = "<a href=\\"www.google.com\\">omg</a>"
            """)
         }
         'preserveImports{

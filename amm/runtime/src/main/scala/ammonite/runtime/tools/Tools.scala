@@ -47,7 +47,8 @@ object GrepResult{
     )
   }
 
-  def grepResultRepr(grepResult: GrepResult)(implicit highlightColor: Color) = {
+  def grepResultRepr(grepResult: GrepResult,
+                     ctx: pprint.Tree.Ctx)(implicit highlightColor: Color) = {
     val outputSnippets = mutable.Buffer.empty[fansi.Str]
     val rangeBuffer = mutable.Buffer.empty[(Int, Int)]
     var remainingSpans = grepResult.spans.toList
@@ -55,7 +56,7 @@ object GrepResult{
     var lastEnd = 0 // Where the last generated snippet ended, to avoid overlap
 
     // 6 to leave space for ... at start and end
-    val width = 80 - 6
+    val width = ctx.width - ctx.leftOffset * 2 - 6
 
     /**
       * Consume all the matches that have been aggregated in `rangeBuffer` and

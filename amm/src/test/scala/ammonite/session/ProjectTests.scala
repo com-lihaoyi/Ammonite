@@ -106,7 +106,7 @@ object ProjectTests extends TestSuite{
         @ import $ivy.`com.chuusai::shapeless:2.3.2`, shapeless._
 
         @ (1 :: "lol" :: List(1, 2, 3) :: HNil)
-        res1: Int :: String :: List[Int] :: HNil = 1 :: lol :: List(1, 2, 3) :: HNil
+        res1: Int :: String :: List[Int] :: HNil = 1 :: "lol" :: List(1, 2, 3) :: HNil
 
         @ res1(1)
         res2: String = "lol"
