@@ -24,7 +24,7 @@ object ToolsTests extends TestSuite{
         colorLiteral = fansi.Attr.Reset,
         defaultWidth = 25,
         additionalHandlers = {
-          case t: GrepResult => pprint.Tree.Lazy(ctx => GrepResult.grepResultRepr(t, ctx))
+          case t: GrepResult => pprint.Tree.Lazy(ctx => Iterator(GrepResult.grepResultRepr(t, ctx)))
         }
       )
       val items = Seq(123, 456, 789)

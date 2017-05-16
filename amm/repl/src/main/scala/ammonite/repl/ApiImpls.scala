@@ -89,8 +89,8 @@ class ReplApiImpl(val interp: Interpreter,
       colorLiteral = colors().literal(),
       colorApplyPrefix = colors().prefix(),
       additionalHandlers = {
-        case t: History => pprint.Tree.Lazy(ctx => t.mkString("\n"))
-        case t: GrepResult => pprint.Tree.Lazy(ctx => GrepResult.grepResultRepr(t, ctx))
+        case t: History => pprint.Tree.Lazy(ctx => Iterator(t.mkString("\n")))
+        case t: GrepResult => pprint.Tree.Lazy(ctx => Iterator(GrepResult.grepResultRepr(t, ctx)))
       }
     )
   )

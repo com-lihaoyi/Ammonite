@@ -163,7 +163,7 @@ lazy val ammUtil = project
     libraryDependencies ++= Seq(
       "com.lihaoyi" %% "upickle" % "0.4.4",
       "com.lihaoyi" %% "pprint" % "0.5.0-SNAPSHOT",
-      "com.lihaoyi" %% "tprint" % "0.5.0-SNAPSHOT"
+      "com.lihaoyi" %% "fansi" % "0.2.4"
     )
   )
 
