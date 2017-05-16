@@ -82,6 +82,7 @@ class ReplApiImpl(val interp: Interpreter,
     def keyword = colors().keyword()
     def ident = colors().ident()
   }
+
   implicit val pprinter: Ref[pprint.PPrinter] = Ref.live(() =>
     pprint.PPrinter.Color.copy(
       defaultHeight = height / 2,
