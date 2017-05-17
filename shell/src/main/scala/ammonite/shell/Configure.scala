@@ -14,9 +14,14 @@ object Configure {
     case x: CommandResult => PPrints.commandResultRepr(x)
   }
   def apply(repl: ReplAPI, wd: => ammonite.ops.Path) = {
-    repl.frontEnd() = ammonite.repl.AmmoniteFrontEnd(
-      ammonite.shell.PathComplete.pathCompleteFilter(wd, repl.colors())
-    )
+    if (scala.util.Properties.isWin) {
+      repl.frontEnd() = ammonite.repl.FrontEnd.JLineWindows
+      repl.colors() = ammonite.util.Colors.BlackWhite
+    } else {
+      repl.frontEnd() = ammonite.repl.AmmoniteFrontEnd(
+        ammonite.shell.PathComplete.pathCompleteFilter(wd, repl.colors())
+      )
+    }
 
     repl.prompt.bind(
       sys.props("user.name") +
