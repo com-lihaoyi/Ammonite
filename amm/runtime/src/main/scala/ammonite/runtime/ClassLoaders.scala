@@ -81,12 +81,16 @@ object SpecialClassLoader{
 
     val mtimes = classpathRoots.flatMap{ rawP =>
       val p = java.nio.file.Paths.get(rawP.toURI)
-      if (java.nio.file.Files.isDirectory(p)){
-        findMtimes(p)
-      }else{
-        Seq(Path(p) -> Path(p).mtime.toMillis)
+      if (!java.nio.file.Files.exists(p)) {
+        None
       }
-    }
+      else if (java.nio.file.Files.isDirectory(p)){
+        Some(findMtimes(p))
+      }
+      else  {
+        Some(Seq(Path(p) -> Path(p).mtime.toMillis))
+      }
+    }.flatten
 
     mtimes
   }
@@ -151,7 +155,7 @@ class SpecialClassLoader(parent: ClassLoader, parentSignature: Seq[(Path, Long)]
 
   private def jarSignature(url: URL) = {
     val path = Path(java.nio.file.Paths.get(url.toURI()).toFile(), root)
-    path -> path.mtime.toMillis
+    path -> (if (exists(path))path.mtime.toMillis else 0)
   }
 
   private[this] var classpathSignature0 = parentSignature
