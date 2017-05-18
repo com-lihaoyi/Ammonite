@@ -1,6 +1,4 @@
-interp.load.ivy("org.spire-math" %% "spire" % "0.10.1")
-
-@
+import $ivy.`org.spire-math::spire:0.13.0`
 
 import spire.implicits._
 import spire.math._

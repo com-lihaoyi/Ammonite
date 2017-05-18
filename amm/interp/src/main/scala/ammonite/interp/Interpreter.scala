@@ -105,7 +105,6 @@ class Interpreter(val printer: Printer,
   val importHooks = Ref(Map[Seq[String], ImportHook](
     Seq("file") -> ImportHook.File,
     Seq("exec") -> ImportHook.Exec,
-    Seq("url") -> ImportHook.Http,
     Seq("ivy") -> ImportHook.Ivy,
     Seq("cp") -> ImportHook.Classpath,
     Seq("plugin", "ivy") -> ImportHook.PluginIvy,
@@ -129,7 +128,7 @@ class Interpreter(val printer: Printer,
     val pkgName = Seq(Name("ammonite"), Name("predef"))
 
     processModule(
-      ImportHook.Source.File(wd/s"${wrapperName.raw}.sc"),
+      ImportHook.Source(wd/s"${wrapperName.raw}.sc"),
       sourceCode,
       wrapperName,
       pkgName,
@@ -147,6 +146,7 @@ class Interpreter(val printer: Printer,
 
       case Res.Exception(ex, msg) =>
         throw new RuntimeException("Error during Predef: " + msg, ex)
+      case _ => ???
     }
   }
 
@@ -159,7 +159,9 @@ class Interpreter(val printer: Printer,
     val hookOpt = importHooks().collectFirst{case (k, v) if strippedPrefix.startsWith(k) => (k, v)}
     for{
       (hookPrefix, hook) <- Res(hookOpt, "Import Hook could not be resolved")
-      hooked <- hook.handle(source, tree.copy(prefix = tree.prefix.drop(hookPrefix.length)), this)
+      hooked <- Res(
+        hook.handle(source, tree.copy(prefix = tree.prefix.drop(hookPrefix.length)), this)
+      )
       hookResults <- Res.map(hooked){
         case res: ImportHook.Result.Source =>
           for{
@@ -222,7 +224,7 @@ class Interpreter(val printer: Printer,
       }
 
       (hookImports, normalStmts, _) <- resolveImportHooks(
-        ImportHook.Source.File(wd/"<console>"),
+        ImportHook.Source(wd/"<console>"),
         stmts
       )
 
@@ -376,11 +378,7 @@ class Interpreter(val printer: Printer,
       tag
     ) match {
       case None =>
-        source match {
-          case ImportHook.Source.File(fName) => printer.info("Compiling " + fName.last)
-          case ImportHook.Source.URL(url) => printer.info("Compiling " + url)
-          case _ =>
-        }
+        printer.info("Compiling " + source.path)
         init()
         val res = processModule0(
           source, code, wrapperName, pkgName,
@@ -448,10 +446,7 @@ class Interpreter(val printer: Printer,
             processScriptBlock(
               processed, printer,
               Interpreter.indexWrapperName(wrapperName, wrapperIndex),
-              source match {
-                case ImportHook.Source.File(fname) => fname.toString
-                case _ => wrapperName.raw + ".sc"
-              },
+              source.path.toString,
               pkgName
             )
           ),
@@ -467,7 +462,7 @@ class Interpreter(val printer: Printer,
     init()
     for {
       (processedBlocks, hookImports, _) <- preprocessScript(
-        ImportHook.Source.File(wd/"<console>"),
+        ImportHook.Source(wd/"<console>"),
         code
       )
       (imports, _) <- processCorrectScript(
@@ -565,6 +560,7 @@ class Interpreter(val printer: Printer,
             wrapperIndex + 1,
             compiledData
           )
+          case _ => ???
         }
       }
     }
@@ -583,49 +579,32 @@ class Interpreter(val printer: Printer,
       case Res.Exception(ex, msg) => lastException = ex
     }
   }
-  def loadIvy(coordinates: (String, String, String)) = {
-    val (groupId, artifactId, version) = coordinates
-    val cacheKey = (interpApi.resolvers().hashCode.toString, groupId, artifactId, version)
+  def loadIvy(coordinates: (String, String, String)*) = {
+    val cacheKey = (interpApi.repositories().hashCode.toString, coordinates)
 
-    val fetched =
-      storage.ivyCache()
-        .get(cacheKey)
-
-    val psOpt =
-      fetched
-        .map(_.map(new java.io.File(_)))
-        .filter(_.forall(_.exists()))
-
-    psOpt match{
-      case Some(ps) => ps
+    storage.ivyCache().get(cacheKey) match{
+      case Some(res) => Right(res.map(new java.io.File(_)))
       case None =>
-        val resolved = ammonite.runtime.tools.IvyThing.apply(
-          () => interpApi.resolvers(),
-          printer
-        ).resolveArtifact(
-          groupId,
-          artifactId,
-          version
-        ).toSet
-
-        // #433 only non-snapshot versions are cached
-        if (!version.endsWith("SNAPSHOT")) {
-          storage.ivyCache() = storage.ivyCache().updated(
-            cacheKey,
-            resolved.map(_.getAbsolutePath)
-          )
+        ammonite.runtime.tools.IvyThing.resolveArtifact(
+          interpApi.repositories(),
+          for((groupId, artifactId, version) <- coordinates)
+          yield coursier.Dependency(coursier.Module(groupId, artifactId), version),
+          verbose = verboseOutput
+        )match{
+          case Right(loaded) =>
+            val loadedSet = loaded.toSet
+            storage.ivyCache() = storage.ivyCache().updated(
+              cacheKey, loadedSet.map(_.getAbsolutePath)
+            )
+            Right(loadedSet)
+          case Left(l) =>
+            Left(l)
         }
-
-        resolved
     }
+
+
   }
   abstract class DefaultLoadJar extends LoadJar {
-
-    lazy val ivyThing = ammonite.runtime.tools.IvyThing(
-      () => interpApi.resolvers(),
-      printer
-    )
-
     def handleClasspath(jar: File): Unit
 
     def cp(jar: Path): Unit = {
@@ -636,12 +615,14 @@ class Interpreter(val printer: Printer,
       jars.map(_.toString).map(new java.io.File(_)).foreach(handleClasspath)
       reInit()
     }
-    def ivy(coordinates: (String, String, String)): Unit = {
-      val resolved = loadIvy(coordinates)
-      val (groupId, artifactId, version) = coordinates
+    def ivy(coordinates: (String, String, String)*): Unit = {
+      loadIvy(coordinates:_*) match{
+        case Left(failureMsg) =>
+          throw new Exception(failureMsg)
+        case Right(loaded) =>
+          loaded.foreach(handleClasspath)
 
-
-      resolved.foreach(handleClasspath)
+      }
 
       reInit()
     }
@@ -655,8 +636,7 @@ class Interpreter(val printer: Printer,
     eval.frames.head.pluginClassloader.add(jar.toURI.toURL)
   }
   lazy val interpApi: InterpAPI = new InterpAPI{ outer =>
-    lazy val resolvers =
-      Ref(ammonite.runtime.tools.Resolvers.defaultResolvers)
+    val repositories = Ref(ammonite.runtime.tools.IvyThing.defaultRepositories)
 
     object load extends DefaultLoadJar with Load {
 
@@ -673,7 +653,7 @@ class Interpreter(val printer: Printer,
       def module(file: Path) = {
         val (pkg, wrapper) = Util.pathToPackageWrapper(file, wd)
         processModule(
-          ImportHook.Source.File(wd/"Main.sc"),
+          ImportHook.Source(wd/"Main.sc"),
           normalizeNewlines(read(file)),
           wrapper,
           pkg,

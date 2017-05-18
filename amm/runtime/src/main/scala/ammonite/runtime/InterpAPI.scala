@@ -1,7 +1,7 @@
 package ammonite.runtime
 
 import ammonite.ops._
-import ammonite.runtime.tools.Resolver
+
 import ammonite.util.Ref
 import acyclic.file
 import scala.util.control.ControlThrowable
@@ -25,7 +25,7 @@ trait InterpAPI {
   /**
    * resolvers to use when loading jars
    */
-  def resolvers: Ref[List[Resolver]]
+  def repositories: Ref[List[coursier.Repository]]
 
 }
 
@@ -43,7 +43,7 @@ trait LoadJar {
   /**
    * Load a library from its maven/ivy coordinates
    */
-  def ivy(coordinates: (String, String, String)): Unit
+  def ivy(coordinates: (String, String, String)*): Unit
 }
 
 trait Load extends (String => Unit) with LoadJar{

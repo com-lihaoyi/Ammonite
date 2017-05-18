@@ -1,19 +1,13 @@
 package ammonite.repl
 
-
-import ammonite.runtime.tools.Resolver
 import ammonite.util.{Bind, CodeColors, Colors, Ref}
 import ammonite.util.Util.newLine
-import pprint.{PPrinter, TPrintColors}
 
-import scala.collection.mutable
 import scala.reflect.runtime.universe._
 import acyclic.file
 import ammonite.runtime.{APIHolder, Frame, History, ReplExit}
 
-import scala.util.control.ControlThrowable
 import scala.collection.mutable
-import acyclic.file
 
 
 

@@ -1,11 +1,11 @@
 /**
   * Single-file play framework application!
   */
-interp.load.ivy("com.typesafe.play" %% "play" % "2.5.0")
-interp.load.ivy("com.typesafe.play" %% "play-netty-server" % "2.5.0")
-interp.load.ivy("org.scalaj" %% "scalaj-http" % "2.2.1")
-
-@
+import $ivy.{
+  `com.typesafe.play::play:2.5.0`,
+  `com.typesafe.play::play-netty-server:2.5.0`,
+  `org.scalaj::scalajs-http:2.2.1`
+}
 
 import play.core.server._, play.api.routing.sird._, play.api.mvc._
 import scalaj.http._

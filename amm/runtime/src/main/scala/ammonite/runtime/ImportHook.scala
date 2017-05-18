@@ -17,7 +17,7 @@ import ammonite.util._
 trait ImportHook{
   def handle(source: ImportHook.Source,
              tree: ImportTree,
-             interp: ImportHook.InterpreterInterface): Res[Seq[ImportHook.Result]]
+             interp: ImportHook.InterpreterInterface): Either[String, Seq[ImportHook.Result]]
 }
 
 object ImportHook{
@@ -29,7 +29,7 @@ object ImportHook{
     */
   trait InterpreterInterface{
     def wd: Path
-    def loadIvy(coordinates: (String, String, String)): Set[File]
+    def loadIvy(coordinates: (String, String, String)*): Either[String, Set[File]]
   }
 
   /**
@@ -51,11 +51,7 @@ object ImportHook{
     * Where a script can "come from". Used to resolve relative $file imports
     * relative to the importing script.
     */
-  sealed trait Source
-  object Source{
-    case class File(path: Path) extends Source
-    case class URL(path: String) extends Source
-  }
+  case class Source(path: Path)
   object File extends SourceHook(false)
   object Exec extends SourceHook(true)
 
@@ -86,115 +82,90 @@ object ImportHook{
     // import $file.foo.Bar, to import the file `foo/Bar.sc`
     def handle(source: ImportHook.Source, tree: ImportTree, interp: InterpreterInterface) = {
 
-      source match{
-        case Source.File(currentScriptPath) =>
+      val currentScriptPath = source.path
 
-          val (relativeModules, files, missing) = resolveFiles(
-            tree, currentScriptPath, Seq(".sc")
-          )
+      val (relativeModules, files, missing) = resolveFiles(
+        tree, currentScriptPath, Seq(".sc")
+      )
 
-          if (missing.nonEmpty) {
-            Res.Failure(None, "Cannot resolve $file import: " + missing.mkString(", "))
-          } else {
-            Res.Success(
-              for(((relativeModule, rename), filePath) <- relativeModules.zip(files)) yield {
-                val (pkg, wrapper) = Util.pathToPackageWrapper(filePath, interp.wd)
-                val fullPrefix = pkg ++ Seq(wrapper)
+      if (missing.nonEmpty) Left("Cannot resolve $file import: " + missing.mkString(", "))
+      else {
+        Right(
+          for(((relativeModule, rename), filePath) <- relativeModules.zip(files)) yield {
+            val (pkg, wrapper) = Util.pathToPackageWrapper(filePath, interp.wd)
+            val fullPrefix = pkg ++ Seq(wrapper)
 
-                val importData = Seq(ImportData(
-                  fullPrefix.last, Name(rename.getOrElse(relativeModule.last)),
-                  fullPrefix.dropRight(1), ImportData.TermType
-                ))
+            val importData = Seq(ImportData(
+              fullPrefix.last, Name(rename.getOrElse(relativeModule.last)),
+              fullPrefix.dropRight(1), ImportData.TermType
+            ))
 
-                Result.Source(
-                  Util.normalizeNewlines(read(filePath)),
-                  wrapper,
-                  pkg,
-                  ImportHook.Source.File(filePath),
-                  Imports(importData),
-                  exec
-                )
-              }
+            Result.Source(
+              Util.normalizeNewlines(read(filePath)),
+              wrapper,
+              pkg,
+              ImportHook.Source(filePath),
+              Imports(importData),
+              exec
             )
           }
-        case Source.URL(path) => ???
+        )
       }
     }
   }
 
-
-  object Http extends ImportHook{
-    def resolveHttp(url: String, target: String) = {
-      val res = scalaj.http.Http(url).asString
-      if (!res.is2xx) Res.Failure(None, "$url import failed for " + url)
-      else Res.Success(Result.Source(
-        res.body,
-        Name(url),
-        Seq(Name("$url")),
-        ImportHook.Source.URL(url),
-        Imports(Seq(ImportData(Name(url), Name(target), Seq(Name("$url")), ImportData.Term))),
-        false
-      ))
-    }
-    // import $url.{ `http://www.google.com` => foo }
-    def handle(source: ImportHook.Source, tree: ImportTree, interp: InterpreterInterface) = {
-      tree.mappings match{
-        case None => Res.Failure(None, "$url import failed for " + tree)
-        case Some(mappings) =>
-          Res.map(tree.mappings.get){ case (k, v) => resolveHttp(k, v.getOrElse(k)) }
-      }
-    }
-  }
   object Ivy extends BaseIvy(plugin = false)
   object PluginIvy extends BaseIvy(plugin = true)
   class BaseIvy(plugin: Boolean) extends ImportHook{
-    def splitImportTree(tree: ImportTree): Res[Seq[String]] = {
+    def splitImportTree(tree: ImportTree): Either[String, Seq[String]] = {
       tree match{
-        case ImportTree(Seq(part), None, _, _) => Res.Success(Seq(part))
+        case ImportTree(Seq(part), None, _, _) => Right(Seq(part))
         case ImportTree(Nil, Some(mapping), _, _) if mapping.map(_._2).forall(_.isEmpty) =>
-          Res.Success(mapping.map(_._1))
-        case _ => Res.Failure(None, "Invalid $ivy import " + tree)
+          Right(mapping.map(_._1))
+        case _ => Left("Invalid $ivy import " + tree)
       }
     }
-    def resolve(interp: InterpreterInterface, signature: String) = for{
-      (a, b, c) <-  signature.split(':') match{
-        case Array(a, b, c) => Res.Success((a, b, c))
-        case Array(a, "", b, c) => Res.Success((a, b + "_" + IvyThing.scalaBinaryVersion, c))
-        case _ => Res.Failure(None, s"Invalid $$ivy import: [$signature]")
-      }
-      jars <- {
-        try Res.Success(interp.loadIvy((a, b, c))) catch {case ex =>
-          Res.Exception(ex, "")
+    def resolve(interp: InterpreterInterface, signatures: Seq[String]) = {
+      val splitted = for (signature <- signatures) yield {
+        signature.split(':') match{
+          case Array(a, b, c) => Right((a, b, c))
+          case Array(a, "", b, c) => Right((a, b + "_" + IvyThing.scalaBinaryVersion, c))
+          case _ => Left(signature)
         }
       }
-    } yield jars
+      val errors = splitted.collect{case Left(error) => error}
+      val successes = splitted.collect{case Right(v) => v}
+      if (errors.nonEmpty) Left("Invalid $ivy imports: " + errors.map("\n\t" + _).mkString)
+      else interp.loadIvy(successes: _*)
+    }
 
-    def handle(source: ImportHook.Source, tree: ImportTree, interp: InterpreterInterface) = for{
-    // import $ivy.`com.lihaoyi:scalatags_2.11:0.5.4`
-      parts <- splitImportTree(tree)
-      resolved <- Res.map(parts)(resolve(interp, _))
-    } yield {
-      resolved.flatten.map(Path(_)).map(Result.ClassPath(_, plugin))
+
+    def handle(source: ImportHook.Source, tree: ImportTree, interp: InterpreterInterface) = {
+      // Avoid for comprehension, which doesn't work in Scala 2.10/2.11
+      splitImportTree(tree) match{
+        case Right(signatures) => resolve(interp, signatures) match{
+          case Right(resolved) =>
+            Right(resolved.map(Path(_)).map(Result.ClassPath(_, plugin)).toSeq)
+          case Left(l) => Left(l)
+        }
+        case Left(l) => Left(l)
+      }
     }
   }
   object Classpath extends BaseClasspath(plugin = false)
   object PluginClasspath extends BaseClasspath(plugin = true)
   class BaseClasspath(plugin: Boolean) extends ImportHook{
     def handle(source: ImportHook.Source, tree: ImportTree, interp: InterpreterInterface) = {
-      source match{
-        case Source.File(currentScriptPath) =>
-          val (relativeModules, files, missing) = resolveFiles(
-            tree, currentScriptPath, Seq(".jar", "")
-          )
+      val currentScriptPath = source.path
+      val (relativeModules, files, missing) = resolveFiles(
+        tree, currentScriptPath, Seq(".jar", "")
+      )
 
-          if (missing.nonEmpty) {
-            Res.Failure(None, "Cannot resolve $cp import: " + missing.mkString(", "))
-          } else Res.Success(
-            for(((relativeModule, rename), filePath) <- relativeModules.zip(files))
-            yield Result.ClassPath(filePath, plugin)
-          )
-        case Source.URL(path) => ???
-      }
+      if (missing.nonEmpty) Left("Cannot resolve $cp import: " + missing.mkString(", "))
+      else Right(
+        for(((relativeModule, rename), filePath) <- relativeModules.zip(files))
+        yield Result.ClassPath(filePath, plugin)
+      )
     }
   }
 }

@@ -178,7 +178,7 @@ object Storage{
         val parsed = {upickle.default.read(fileData)}
         Some(parsed)
       }
-      catch{ case e => None }
+      catch{ case e: Throwable => None }
     }
 
     def classFilesListLoad(pkg: String,

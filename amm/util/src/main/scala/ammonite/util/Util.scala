@@ -42,7 +42,7 @@ object Util{
 
   type CacheDetails = (String, String)
   //                   Wrapper HashVal
-  type IvyMap = Map[(String, String, String, String), Set[String]]
+  type IvyMap = Map[(String, Seq[(String, String, String)]), Set[String]]
   type ClassFiles = Vector[(String, Array[Byte])]
   type CacheOutput = (Seq[(String, String)], Seq[ClassFiles], Imports, Seq[ImportTree])
   type CompileCache = (ClassFiles, Imports)
