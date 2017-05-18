@@ -16,7 +16,6 @@ trait IvyConstructor{
   }
 }
 
-
 object IvyThing{
   def resolveArtifact(repositories: Seq[coursier.Repository],
                       dependencies: Seq[coursier.Dependency],
@@ -32,10 +31,9 @@ object IvyThing{
       Some(logger)
     }
 
-
     val start = coursier.Resolution(dependencies.toSet)
 
-    val fetch = coursier.Fetch.from(repositories, coursier.Cache.fetch())
+    val fetch = coursier.Fetch.from(repositories, coursier.Cache.fetch(logger = logger))
 
     val resolution = start.process.run(fetch).run
 

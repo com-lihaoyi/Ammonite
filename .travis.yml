@@ -63,10 +63,3 @@ notifications:
     - haoyi.sg@gmail.com
 
 sudo: false
-
-cache:
-  directories:
-  - $HOME/.m2
-  - $HOME/.ivy2/cache
-  - $HOME/.sbt
-  - $HOME/.coursier

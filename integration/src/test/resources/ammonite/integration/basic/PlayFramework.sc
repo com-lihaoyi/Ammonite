@@ -4,7 +4,7 @@
 import $ivy.{
   `com.typesafe.play::play:2.5.0`,
   `com.typesafe.play::play-netty-server:2.5.0`,
-  `org.scalaj::scalajs-http:2.2.1`
+  `org.scalaj::scalaj-http:2.2.1`
 }
 
 import play.core.server._, play.api.routing.sird._, play.api.mvc._

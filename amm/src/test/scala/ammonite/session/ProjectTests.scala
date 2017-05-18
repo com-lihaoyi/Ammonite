@@ -70,18 +70,12 @@ object ProjectTests extends TestSuite{
             // ivy flakyness...
             if (!scala2_12) check.session("""
               @ import $ivy.`com.ambiata::mundane:1.2.1-20141230225616-50fc792`
-              error: IvyResolutionException
+              error: Failed to resolve ivy dependencies
 
-              @ import Resolvers._
-
-              @ val oss = Resolver.Http(
-              @   "ambiata-oss",
-              @   "https://ambiata-oss.s3-ap-southeast-2.amazonaws.com",
-              @   IvyPattern,
-              @   false
-              @ )
-
-              @ interp.resolvers() = interp.resolvers() :+ oss
+              @ interp.repositories() ++= Seq(coursier.ivy.IvyRepository.fromPattern(
+              @   "https://ambiata-oss.s3-ap-southeast-2.amazonaws.com/" +:
+              @   coursier.ivy.Pattern.default
+              @ ))
 
               @ import $ivy.`com.ambiata::mundane:1.2.1-20141230225616-50fc792`
 

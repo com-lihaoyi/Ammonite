@@ -6,26 +6,35 @@ import utest._
 
 
 object AutocompleteTests extends TestSuite{
+  class Completer{
+    val check = new TestRepl()
+    def apply(caretCode: String,
+                 cmp: (Set[String]) => Set[String],
+                 sigs: (Set[String]) => Set[String] = _ => Set()) = {
+      val cursor = caretCode.indexOf("<caret>")
+      val buf = caretCode.replace("<caret>", "")
+
+      val (index, completions, signatures) = check.interp.pressy.complete(
+        cursor,
+        Preprocessor.importBlock(check.interp.eval.frames.head.imports),
+        buf
+      )
+      val left = cmp(completions.toSet)
+      assert(left == Set())
+      val sigLeft = sigs(signatures.toSet)
+      assert(sigLeft == Set())
+    }
+  }
+  def checking[T](f: Completer => T) = {
+    val c = new Completer
+    val res = f(c)
+    c.check.interp.pressy.shutdownPressy()
+    res
+  }
   val tests = TestSuite {
     println("AutocompleteTests")
     'selection{
-      val check = new TestRepl()
-      def complete(caretCode: String,
-                   cmp: (Set[String]) => Set[String],
-                   sigs: (Set[String]) => Set[String] = _ => Set()) = {
-        val cursor = caretCode.indexOf("<caret>")
-        val buf = caretCode.replace("<caret>", "")
 
-        val (index, completions, signatures) = check.interp.pressy.complete(
-          cursor,
-          Preprocessor.importBlock(check.interp.eval.frames.head.imports),
-          buf
-        )
-        val left = cmp(completions.toSet)
-        assert(left == Set())
-        val sigLeft = sigs(signatures.toSet)
-        assert(sigLeft == Set())
-      }
 
       // Not sure why clone and finalize don't appear in this list
       val anyCompletion = Set(
@@ -37,7 +46,7 @@ object AutocompleteTests extends TestSuite{
         def ^(s2: Set[T]): Set[T] = (s1 diff s2) | (s2 diff s1)
       }
 
-      'import {
+      'import - checking{ complete =>
         complete("""import <caret>""", Set("java", "javax", "scala") -- _)
         complete("""import j<caret>""", Set("java", "javax", "jline", "jawn") -- _)
         complete("""import ja<caret>""", x => Set("java", "javax", "jawn") ^ (x - "javafx"))
@@ -62,7 +71,7 @@ object AutocompleteTests extends TestSuite{
         complete("""object X { import y<caret> ; def y(z: Int)""", Set.empty[String] -- _)
       }
 
-      'scope {
+      'scope - checking{ complete =>
         complete( """<caret>""", Set("scala") -- _)
         complete( """Seq(1, 2, 3).map(argNameLol => <caret>)""", Set("argNameLol") -- _)
         complete( """object Zomg{ <caret> }""", Set("Zomg") -- _)
@@ -78,7 +87,7 @@ object AutocompleteTests extends TestSuite{
         //        Set("def println(x: Any): Unit", "def println(): Unit") ^
         //      )
       }
-      'scopePrefix {
+      'scopePrefix - checking{ complete =>
         complete( """ammon<caret>""", Set("ammonite") ^ _)
 
         complete( """Seq(1, 2, 3).map(argNameLol => argNam<caret>)""", Set("argNameLol") ^)
@@ -88,7 +97,7 @@ object AutocompleteTests extends TestSuite{
         complete( """object Zomg{ Z<caret>om }""", Set("Zomg") ^)
         complete( """object Zomg{ <caret>Zom }""", Set("Zomg") ^)
       }
-      'dot {
+      'dot - checking{ complete =>
         if (!scala2_10) {
           complete( """java.math.<caret>""",
             Set("MathContext", "BigDecimal", "BigInteger", "RoundingMode") ^
@@ -108,7 +117,7 @@ object AutocompleteTests extends TestSuite{
         }
       }
 
-      'deep {
+      'deep - checking{ complete =>
         complete( """fromN<caret>""",
           Set("scala.concurrent.duration.fromNow") ^
         )
@@ -119,7 +128,7 @@ object AutocompleteTests extends TestSuite{
           Set("scala.concurrent.duration.SECONDS") ^
         )
       }
-      'dotPrefix {
+      'dotPrefix - checking{ complete =>
         complete( """java.math.Big<caret>""",
           Set("BigDecimal", "BigInteger") ^
         )
@@ -154,12 +163,12 @@ object AutocompleteTests extends TestSuite{
         //      complete("""Seq(1, 2, 3).map(_.<caret>compa)""", compares, ^)
       }
 
-      'defTab {
+      'defTab  - checking{ complete =>
         //Assert no NullPointerException was thrown. Does not verify any completions.
         complete( """def<caret>""", Set.empty -- _)
       }
 
-      'Array {
+      'Array - checking{ complete =>
         //Test around https://github.com/lihaoyi/Ammonite/issues/252
         complete("""new Array<caret>""", Set() ^)
       }
