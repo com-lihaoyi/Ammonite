@@ -5,7 +5,7 @@ import java.lang.reflect.InvocationTargetException
 
 import acyclic.file
 import ammonite._
-import util.Util.{ClassFiles, newLine}
+import util.Util.{ClassFiles, ScriptOutput, VersionedWrapperId, newLine}
 import ammonite.util._
 
 import scala.reflect.io.VirtualDirectory
@@ -39,16 +39,27 @@ trait Evaluator{
   def frames: List[Frame]
 
   def frames_=(newValue: List[Frame]): Unit
-
-  def evalCachedClassFiles(cachedData: Seq[ClassFiles],
-                           pkg: String,
-                           wrapper: String,
-                           dynamicClasspath: VirtualDirectory,
-                           classFilesList: Seq[String]): Res[Seq[_]]
-
 }
 
 object Evaluator{
+  type InvEx = InvocationTargetException
+  type InitEx = ExceptionInInitializerError
+
+  val userCodeExceptionHandler: PartialFunction[Throwable, Res.Failing] = {
+    // Exit
+    case Ex(_: InvEx, _: InitEx, ReplExit(value))  => Res.Exit(value)
+
+    // Interrupted during pretty-printing
+    case Ex(e: ThreadDeath)                 =>  interrupted(e)
+
+    // Interrupted during evaluation
+    case Ex(_: InvEx, e: ThreadDeath)       =>  interrupted(e)
+
+    case Ex(_: InvEx, _: InitEx, userEx@_*) => Res.Exception(userEx(0), "")
+    case Ex(_: InvEx, userEx@_*)            => Res.Exception(userEx(0), "")
+    case Ex(userEx@_*)                      => Res.Exception(userEx(0), "")
+  }
+
 
   def interrupted(e: Throwable) = {
     Thread.interrupted()
@@ -107,23 +118,7 @@ object Evaluator{
     }
 
 
-    type InvEx = InvocationTargetException
-    type InitEx = ExceptionInInitializerError
 
-    val userCodeExceptionHandler: PartialFunction[Throwable, Res.Failing] = {
-      // Exit
-      case Ex(_: InvEx, _: InitEx, ReplExit(value))  => Res.Exit(value)
-
-      // Interrupted during pretty-printing
-      case Ex(e: ThreadDeath)                 =>  interrupted(e)
-
-      // Interrupted during evaluation
-      case Ex(_: InvEx, e: ThreadDeath)       =>  interrupted(e)
-
-      case Ex(_: InvEx, _: InitEx, userEx@_*) => Res.Exception(userEx(0), "")
-      case Ex(_: InvEx, userEx@_*)            => Res.Exception(userEx(0), "")
-      case Ex(userEx@_*)                      => Res.Exception(userEx(0), "")
-    }
 
     def processLine(classFiles: Util.ClassFiles,
                     newImports: Imports,
@@ -157,20 +152,6 @@ object Evaluator{
         evalMain(cls)
         val res = evaluationResult(pkgName :+ wrapperName, newImports, tag)
         res
-      }
-    }
-
-    def evalCachedClassFiles(cachedData: Seq[ClassFiles],
-                             pkg: String,
-                             wrapper: String,
-                             dynamicClasspath: VirtualDirectory,
-                             classFilesList: Seq[String]): Res[Seq[_]] = {
-      Res.map(cachedData.zipWithIndex) {
-        case (clsFiles, index) =>
-          addToClasspath(clsFiles, dynamicClasspath)
-          val cls = eval.loadClass(classFilesList(index), clsFiles)
-          try cls.map(eval.evalMain(_))
-          catch userCodeExceptionHandler
       }
     }
 

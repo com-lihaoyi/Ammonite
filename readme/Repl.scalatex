@@ -407,9 +407,21 @@
 
       @p
         Ammonite-REPL is configured with a set of default resolvers but you
-        can add your own
+        can add your own using
+        [Coursier's Repository APIs](https://github.com/coursier/coursier#api-1)
 
       @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("resolvers", "@"), "\"\"\"")
+
+      @p
+        Including repositories which need authentication:
+
+      @hl.scala
+        import coursier.core.Authentication, coursier.MavenRepository
+
+        interp.repositories() ++= Seq(MavenRepository(
+          "https://nexus.corp.com/content/repositories/releases",
+          authentication = Some(Authentication("user", "pass"))
+        ))
 
     @sect{Builtins}
       @p

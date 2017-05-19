@@ -6,6 +6,7 @@ import ammonite.runtime.ImportHook
 import ammonite.main.Router.{ArgSig, EntryPoint}
 import ammonite.ops._
 import ammonite.util.Name.backtickWrap
+import ammonite.util.Util.VersionedWrapperId
 import ammonite.util.{Name, Res, Util}
 import fastparse.utils.Utils._
 
@@ -25,7 +26,7 @@ object Scripts {
       scriptTxt <- try Res.Success(Util.normalizeNewlines(read(path))) catch{
         case e: NoSuchFileException => Res.Failure(Some(e), "Script file not found: " + path)
       }
-      (imports, wrapperHashes) <- interp.processModule(
+      processed <- interp.processModule(
         ImportHook.Source(path),
         scriptTxt,
         wrapper,
@@ -47,8 +48,8 @@ object Scripts {
         hardcoded = true
       )
 
-      routeClsName <- wrapperHashes.lastOption match{
-        case Some((wrapperName, wrapperHash)) => Res.Success(wrapperName)
+      routeClsName <- processed.blockInfo.lastOption match{
+        case Some(meta) => Res.Success(meta.id.wrapperPath)
         case None => Res.Skip
       }
 
@@ -70,9 +71,10 @@ object Scripts {
       res <- interp.withContextClassloader{
         scriptMains match {
           // If there are no @main methods, there's nothing to do
-          case Seq() => Res.Success(imports)
+          case Seq() => Res.Success(processed.finalImports)
           // If there's one @main method, we run it with all args
-          case Seq(main) => runMainMethod(main, args, kwargs).getOrElse(Res.Success(imports))
+          case Seq(main) =>
+            runMainMethod(main, args, kwargs).getOrElse(Res.Success(processed.finalImports))
           // If there are multiple @main methods, we use the first arg to decide
           // which method to run, and pass the rest to that main method
           case mainMethods =>
@@ -91,7 +93,7 @@ object Scripts {
                       s"Unable to find method: " + backtickWrap(head) + suffix
                     )
                   case Some(main) =>
-                    runMainMethod(main, tail, kwargs).getOrElse(Res.Success(imports))
+                    runMainMethod(main, tail, kwargs).getOrElse(Res.Success(processed.finalImports))
                 }
             }
         }

@@ -40,11 +40,34 @@ object Util{
   val newLine = System.lineSeparator()
   // Type aliases for common things
 
-  type CacheDetails = (String, String)
-  //                   Wrapper HashVal
+  /**
+    * Refers to a wrapper object compiled with a specific set of source code
+    * and enclosing environment (encapsulated in the hashVal). This lets us
+    * unambiguously look up the correct version of a class, or invalidate and
+    * recompile it if the source code or environment changes
+    */
+  case class VersionedWrapperId(wrapperPath: String, versionHash: String)
+
+
+
   type IvyMap = Map[(String, Seq[(String, String, String)]), Set[String]]
   type ClassFiles = Vector[(String, Array[Byte])]
-  type CacheOutput = (Seq[(String, String)], Seq[ClassFiles], Imports, Seq[ImportTree])
+
+
+
+  /**
+    * The serialized output of running a script, including both metadata and the classfile binaries
+    */
+  case class ScriptOutput(processed: ScriptOutput.Metadata, classFiles: Seq[ClassFiles])
+  object ScriptOutput{
+    /**
+      * Metadata extracted from the compilation of a single block, without the classfiles
+      * but with enough information to fetch the classfiles form disk and evaluate the
+      * block without compiling/parsing it
+      */
+    case class BlockMetadata(id: VersionedWrapperId, importHookTrees: Seq[ImportTree])
+    case class Metadata(finalImports: Imports, blockInfo: Seq[BlockMetadata])
+  }
   type CompileCache = (ClassFiles, Imports)
 
 

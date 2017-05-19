@@ -1076,3 +1076,15 @@
           many of our perenniel, non-deterministic Ivy resolution problems such
           as @issue(300), @issue(455), @issue(473), @issue(523), @issue(573),
           @issue(583)
+        @li
+          Upgrade to @lnk("PPrint 0.5.1", "http://www.lihaoyi.com/PPrint/"),
+          which fixes a large number of issues in the previous implicit/macro
+          based pretty-printer @issue(208) @issue(306) @issue(313) @issue(575)
+        @li
+          Properly run import hooks in multi-block scripts in the block that
+          they are defined, allowing you to add resolvers/repositories before
+          performing @hl.scala{import $ivy}s in subsequent blocks. Fixes
+          @issue(491)
+        @li
+          Avoid crashes when non-existent paths are on the classpath, thanks to
+          @lnk("Olivier Roland", "https://github.com/newca12")

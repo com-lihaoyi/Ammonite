@@ -19,6 +19,13 @@ sealed abstract class Res[+T]{
 
 
 object Res{
+  def fold[M[_] <: Traversable[_], T, V]
+          (init: V, inputs: M[T])(f: (V, T) => Res[V]): Res[V] = {
+    inputs.foldLeft[Res[V]](Res.Success(init)){
+      case (f: Failing, _) => f
+      case (Res.Success(prev), x: T) => f(prev, x)
+    }
+  }
   /**
     * Maps a Res-returning function across a collection `M[T]`, failing fast and
     * bailing out if any individual element fails.
@@ -26,21 +33,8 @@ object Res{
   def map[M[_] <: Traversable[_], T, V](inputs: M[T])(f: T => Res[V])
                                        (implicit cbf: collection.generic.CanBuildFrom[_, V, M[V]])
   : Res[M[V]] = {
-    val builder = cbf.apply()
 
-    inputs.foldLeft[Res[Unit]](Res.Success()){
-      case (f: Failing, _) => f
-      case (Res.Success(prev), x: T) =>
-        f(x) match{
-          case f: Failing => f
-          case Success(x) =>
-            builder += x
-            Res.Success(())
-        }
-    } match{
-      case Success(_) => Res.Success(builder.result())
-      case f: Failing => f
-    }
+    fold(cbf.apply(), inputs){ (b, v) => f(v).map(b += _) }.map(_.result())
   }
   def apply[T](o: Option[T], errMsg: => String) = o match{
     case Some(s) => Success(s)

@@ -6,7 +6,7 @@ import acyclic.file
 import ammonite.ops._
 import ammonite.util.ImportTree
 import ammonite.util.{Imports, StableRef}
-import ammonite.util.Util.{CacheOutput, ClassFiles, CompileCache, IvyMap, newLine}
+import ammonite.util.Util._
 
 import scala.util.Try
 import scala.collection.generic.CanBuildFrom
@@ -29,13 +29,12 @@ trait Storage{
   def compileCacheLoad(path: String, tag: String): Option[CompileCache]
   def classFilesListSave(pkg: String,
                          wrapper: String,
-                         dataList: Seq[(String, String)],
+                         perBlockMetadata: Seq[ScriptOutput.BlockMetadata],
                          imports: Imports,
-                         tag: String,
-                         importTreesList: Seq[ImportTree]): Unit
+                         tag: String): Unit
   def classFilesListLoad(pkg: String,
                          wrapper: String,
-                         cacheTag: String): Option[CacheOutput]
+                         cacheTag: String): Option[ScriptOutput]
 }
 
 object Storage{
@@ -59,7 +58,7 @@ object Storage{
 
     var compileCache: mutable.Map[String, (String, CompileCache)] = mutable.Map.empty
     val classFilesListcache = {
-      mutable.Map.empty[String, (String, Seq[(String, String)], Imports, Seq[ImportTree])]
+      mutable.Map.empty[String, (String, Seq[ScriptOutput.BlockMetadata], Imports)]
     }
     def compileCacheSave(path: String, tag: String, data: CompileCache): Unit = {
       compileCache(path) = (tag, data)
@@ -73,28 +72,26 @@ object Storage{
 
     def classFilesListSave(pkg: String,
                            wrapper: String,
-                           dataList: Seq[(String, String)],
+                           perBlockMetadata: Seq[ScriptOutput.BlockMetadata],
                            imports: Imports,
-                           tag: String,
-                           importTreesList: Seq[ImportTree]): Unit = {
+                           tag: String): Unit = {
       val dir = pkg + "." + wrapper
-      classFilesListcache(dir) = (tag, dataList.reverse, imports, importTreesList)
+      classFilesListcache(dir) = (tag, perBlockMetadata.reverse, imports)
     }
 
     def classFilesListLoad(pkg: String,
                            wrapper: String,
-                           cacheTag: String): Option[CacheOutput] = {
+                           cacheTag: String): Option[ScriptOutput] = {
       val dir = pkg + "." + wrapper
       classFilesListcache.get(dir) match{
         case None => None
-        case Some((loadedTag, classFilesList, imports, importTreesList)) =>
+        case Some((loadedTag, classFilesList, imports)) =>
           if (loadedTag == cacheTag) {
-            val res = {
-              for((path, tag) <- classFilesList) yield {
-                compileCacheLoad(path, tag)
-              }
-            }.flatten
-            Some((classFilesList, res.unzip._1, imports, importTreesList))
+            val res = for{
+              blockMeta <- classFilesList
+              (classFiles, imports) <- compileCacheLoad(blockMeta.id.wrapperPath, blockMeta.id.versionHash)
+            } yield classFiles
+            Some(ScriptOutput(ScriptOutput.Metadata(imports, classFilesList), res))
           }
           else None
       }
@@ -146,10 +143,9 @@ object Storage{
 
     def classFilesListSave(pkg: String,
                            wrapper: String,
-                           dataList: Seq[(String, String)],
+                           perBlockMetadata: Seq[ScriptOutput.BlockMetadata],
                            imports: Imports,
-                           tag: String,
-                           importTreesList: Seq[ImportTree]): Unit = {
+                           tag: String): Unit = {
       val dir = encode(pkg) + "." + encode(wrapper)
       val codeCacheDir = cacheDir/'scriptCaches/dir/tag
       if (!exists(codeCacheDir)){
@@ -157,13 +153,10 @@ object Storage{
         try {
           write(
             codeCacheDir/classFilesOrder,
-            upickle.default.write((tag, dataList.reverse), indent = 4)
+            upickle.default.write((tag, perBlockMetadata.reverse), indent = 4)
           )
           write(
             codeCacheDir/"imports.json", upickle.default.write(imports, indent = 4)
-          )
-          write(
-            codeCacheDir/"importTrees.json", upickle.default.write(importTreesList, indent = 4)
           )
         } catch {
           case _: FileAlreadyExistsException => // ignore
@@ -183,32 +176,29 @@ object Storage{
 
     def classFilesListLoad(pkg: String,
                            wrapper: String,
-                           cacheTag: String): Option[CacheOutput] = {
+                           cacheTag: String): Option[ScriptOutput] = {
 
       val dir = encode(pkg) + "." + encode(wrapper)
       val codeCacheDir = cacheDir/'scriptCaches/dir/cacheTag
       if(!exists(codeCacheDir)) None
       else {
 
-        val metadataJson = readJson[(String, Seq[(String, String)])](codeCacheDir/classFilesOrder)
+        val metadataJson = readJson[(String, Seq[ScriptOutput.BlockMetadata])](codeCacheDir/classFilesOrder)
 
         val impFile = readJson[Imports](codeCacheDir/"imports.json")
 
-        val impTrees = readJson[Seq[ImportTree]](codeCacheDir/"importTrees.json")
-
-        (metadataJson, impFile, impTrees) match{
-          case (Some(metadata), Some(imports), Some(importTrees)) =>
+        (metadataJson, impFile) match{
+          case (Some(metadata), Some(imports)) =>
 
             val (loadedTag, classFilesList) = metadata
 
             if (cacheTag == loadedTag){
-              val res = {
-                for((path, tag) <- classFilesList) yield {
-                  compileCacheLoad(path, tag)
-                }
-              }.flatten
+              val res = for{
+                blockMeta <- classFilesList
+                (classFiles, imports) <- compileCacheLoad(blockMeta.id.wrapperPath, blockMeta.id.versionHash)
+              } yield classFiles
 
-              Some((classFilesList, res.unzip._1, imports, importTrees))
+              Some(ScriptOutput(ScriptOutput.Metadata(imports, classFilesList), res))
             }
             else None
           case _ => None
