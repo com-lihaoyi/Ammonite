@@ -185,10 +185,6 @@ object Main{
         .foreach(x => codeToExecute = Some(x))
         .text("Pass in code to be run immediately in the REPL")
 
-      opt[Unit]('x', "execute")
-        .text(
-          "Shim for backwards compatibility - will be removed"
-        )
       arg[String]("<args>...")
         .optional()
         .unbounded()
