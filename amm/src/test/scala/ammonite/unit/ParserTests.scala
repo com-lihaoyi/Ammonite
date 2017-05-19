@@ -7,6 +7,28 @@ object ParserTests extends TestSuite{
 
   val tests = TestSuite {
     println("ParserTests")
+    'shebang{
+      def check(original: String, expected: String) = {
+        val skipped = ammonite.interp.Interpreter.skipSheBangLine(original)
+        assert(skipped == expected)
+      }
+      "env" - check(
+        """#! /usr/bin/env amm
+          |
+          |println("Hello") """.stripMargin,
+        """
+          |
+          |println("Hello") """.stripMargin
+      )
+      "hardcoded" - check(
+        """#! /Users/lihaoyi/Dropbox/Github/Ammonite/amm/target/amm
+          |
+          |println("Hello") """.stripMargin,
+        """
+          |
+          |println("Hello") """.stripMargin
+      )
+    }
 
     // Sanity check the logic that runs when you press ENTER in the REPL and
     // detects whether a set of input lines is...

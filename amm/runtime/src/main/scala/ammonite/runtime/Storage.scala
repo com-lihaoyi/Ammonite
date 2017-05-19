@@ -35,9 +35,28 @@ trait Storage{
   def classFilesListLoad(pkg: String,
                          wrapper: String,
                          cacheTag: String): Option[ScriptOutput]
+
+
 }
 
 object Storage{
+  private def loadIfTagMatches(loadedTag: String,
+                               cacheTag: String,
+                               classFilesList: Seq[ScriptOutput.BlockMetadata],
+                               imports: Imports,
+                               compileCacheLoad: (String, String) => Option[CompileCache]) = {
+    if (loadedTag != cacheTag) None
+    else{
+      val res = for{
+        blockMeta <- classFilesList
+        (classFiles, imports) <- compileCacheLoad(
+          blockMeta.id.wrapperPath, blockMeta.id.versionHash
+        )
+      } yield classFiles
+      Some(ScriptOutput(ScriptOutput.Metadata(imports, classFilesList), res))
+    }
+
+  }
   case class InMemory() extends Storage{
     var predef = ""
     var sharedPredef = ""
@@ -86,17 +105,11 @@ object Storage{
       classFilesListcache.get(dir) match{
         case None => None
         case Some((loadedTag, classFilesList, imports)) =>
-          if (loadedTag == cacheTag) {
-            val res = for{
-              blockMeta <- classFilesList
-              (classFiles, imports) <- compileCacheLoad(blockMeta.id.wrapperPath, blockMeta.id.versionHash)
-            } yield classFiles
-            Some(ScriptOutput(ScriptOutput.Metadata(imports, classFilesList), res))
-          }
-          else None
+          loadIfTagMatches(loadedTag, cacheTag, classFilesList, imports, compileCacheLoad)
       }
     }
   }
+
 
 
   class Folder(val dir: Path, isRepl: Boolean = true) extends Storage{
@@ -183,7 +196,9 @@ object Storage{
       if(!exists(codeCacheDir)) None
       else {
 
-        val metadataJson = readJson[(String, Seq[ScriptOutput.BlockMetadata])](codeCacheDir/classFilesOrder)
+        val metadataJson = readJson[(String, Seq[ScriptOutput.BlockMetadata])](
+          codeCacheDir/classFilesOrder
+        )
 
         val impFile = readJson[Imports](codeCacheDir/"imports.json")
 
@@ -191,16 +206,8 @@ object Storage{
           case (Some(metadata), Some(imports)) =>
 
             val (loadedTag, classFilesList) = metadata
+            loadIfTagMatches(loadedTag, cacheTag, classFilesList, imports, compileCacheLoad)
 
-            if (cacheTag == loadedTag){
-              val res = for{
-                blockMeta <- classFilesList
-                (classFiles, imports) <- compileCacheLoad(blockMeta.id.wrapperPath, blockMeta.id.versionHash)
-              } yield classFiles
-
-              Some(ScriptOutput(ScriptOutput.Metadata(imports, classFilesList), res))
-            }
-            else None
           case _ => None
         }
       }

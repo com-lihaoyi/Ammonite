@@ -87,7 +87,7 @@ Although most features should be unit tested, it's still useful to fire up a REP
   different classloader/execution environment we get by starting Ammonite 
   inside the Scala REPL doesn't break things
   
-- `sbt ~amm/test:assembly` creates an assembly at `amm/target/scala-2.12/amm` 
+- `sbt ~amm/test:assembly` creates an assembly at `amm/target/amm` 
   that you can then use to test: start a REPL, run scripts, etc. in a standalone
   environment without being wrapped in SBT.
 

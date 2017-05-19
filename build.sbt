@@ -137,7 +137,7 @@ lazy val amm = project
     ),
     assemblyJarName in assembly := s"${name.value}-${version.value}-${scalaVersion.value}",
     assembly in Test := {
-      val dest = assembly.value.getParentFile/"amm"
+      val dest = target.value/"amm"
       IO.copyFile(assembly.value, dest)
       import sys.process._
       Seq("chmod", "+x", dest.getAbsolutePath).!

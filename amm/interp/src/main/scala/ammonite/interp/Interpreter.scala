@@ -524,7 +524,8 @@ class Interpreter(val printer: Printer,
                       scriptImports0: Imports,
                       lastImports: Imports,
                       wrapperIndex: Int,
-                      perBlockMetadata: List[ScriptOutput.BlockMetadata]): Res[ScriptOutput.Metadata] = {
+                      perBlockMetadata: List[ScriptOutput.BlockMetadata])
+                      : Res[ScriptOutput.Metadata] = {
       if (blocks.isEmpty) {
         // No more blocks
         // if we have imports to pass to the upper layer we do that
