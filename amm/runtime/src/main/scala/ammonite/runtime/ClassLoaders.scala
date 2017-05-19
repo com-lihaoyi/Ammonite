@@ -177,8 +177,9 @@ class SpecialClassLoader(parent: ClassLoader, parentSignature: Seq[(Path, Long)]
     })
   }
 
-  override def findResource(name: String) =
+  override def findResource(name: String) = {
     getURLFromFileDict(name).getOrElse(super.findResource(name))
+  }
 
   override def findResources(name: String) = getURLFromFileDict(name) match {
     case Some(u) => Collections.enumeration(Collections.singleton(u))

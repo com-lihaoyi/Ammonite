@@ -202,8 +202,8 @@ object Main{
           """Lets you run a script with the `repl` object present; this is
             |normally not available in scripts and only provided in the
             |interactive REPL
-          """.stripMargin)
-
+          """.stripMargin
+        )
     }
 
     // amm foo.sc
