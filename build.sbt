@@ -170,6 +170,7 @@ lazy val ammUtil = project
 
 lazy val ammRuntime = project
   .in(file("amm/runtime"))
+  .enablePlugins(coursier.ShadingPlugin)
   .dependsOn(ops, ammUtil)
   .settings(
     macroSettings,
@@ -178,10 +179,22 @@ lazy val ammRuntime = project
 
     name := "ammonite-runtime",
     libraryDependencies ++= Seq(
-      "io.get-coursier" %% "coursier" % "1.0.0-RC3",
-      "io.get-coursier" %% "coursier-cache" % "1.0.0-RC3",
+      "io.get-coursier" %% "coursier-cache" % "1.0.0-RC3" % "shaded",
       "org.scalaj" %% "scalaj-http" % "2.3.0"
-    )
+    ),
+
+    inConfig(coursier.ShadingPlugin.Shading)(com.typesafe.sbt.pgp.PgpSettings.projectSettings),
+    coursier.ShadingPlugin.projectSettings,
+    shadingNamespace := "ammonite.shaded",
+    shadeNamespaces ++= Set(
+      "coursier",
+      "scala.xml",
+      "scalaz"
+    ),
+    publish := publish.in(Shading).value,
+    publishLocal := publishLocal.in(Shading).value,
+    PgpKeys.publishSigned := PgpKeys.publishSigned.in(Shading).value,
+    PgpKeys.publishLocalSigned := PgpKeys.publishLocalSigned.in(Shading).value
   )
 
 
