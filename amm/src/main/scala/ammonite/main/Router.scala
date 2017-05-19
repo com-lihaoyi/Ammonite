@@ -3,6 +3,7 @@ import acyclic.file
 import sourcecode.Compat.Context
 
 import scala.annotation.StaticAnnotation
+import scala.collection.mutable
 import scala.language.experimental.macros
 /**
   * More or less a minimal version of Autowire's Server that lets you generate
@@ -23,9 +24,7 @@ object Router{
       t.tree.asInstanceOf[r.c.Tree]
     ).asInstanceOf[Iterable[c.Tree]]
 
-    val res = q"_root_.scala.Seq(..$allRoutes)"
-//    println(res)
-    c.Expr[Seq[EntryPoint]](res)
+    c.Expr[Seq[EntryPoint]](q"_root_.scala.Seq(..$allRoutes)")
   }
 
   /**
@@ -52,61 +51,90 @@ object Router{
                         argSignatures: Seq[ArgSig],
                         varargs: Boolean,
                         invoke0: (Map[String, String], Seq[String]) => Result[Any]){
-    def invoke(args: Seq[String], kwargs: Seq[(String, String)]): Result[Any] = {
-      val (usedArgs, leftoverArgs) = args.splitAt(argSignatures.length)
-      if (leftoverArgs.nonEmpty && !varargs) Result.Error.TooManyArguments(leftoverArgs)
-      else {
-        val implicitlyNamedArgs = argSignatures.map(_.name).zip(usedArgs).toMap
-        val redundantKeys =
-          (implicitlyNamedArgs.keys.toSeq ++ kwargs.map(_._1))
-            .groupBy(x=>x)
-            .filter(_._2.size > 1)
+    def invoke(groupedArgs: Seq[(String, Option[String])]): Result[Any] = {
+      var remainingArgSignatures = argSignatures.toList
 
-        if(redundantKeys.nonEmpty) {
-          Result.Error.RedundantArguments(redundantKeys.keysIterator.toSeq)
-        } else {
-          try invoke0(implicitlyNamedArgs ++ kwargs, leftoverArgs)
-          catch{case e: Throwable =>
-            Result.Error.Exception(e)
-          }
+
+      val accumulatedKeywords = mutable.Map.empty[ArgSig, mutable.Buffer[String]]
+      val keywordableArgs = if (varargs) argSignatures.dropRight(1) else argSignatures
+
+      for(arg <- keywordableArgs) accumulatedKeywords(arg) = mutable.Buffer.empty
+
+      val leftoverArgs = mutable.Buffer.empty[String]
+
+      val lookupArgSig = argSignatures.map(x => (x.name, x)).toMap
+
+      for(group <- groupedArgs){
+        group match{
+          case (value, None) =>
+            remainingArgSignatures match {
+              case Nil => leftoverArgs.append(value)
+              case last :: Nil if varargs => leftoverArgs.append(value)
+              case next :: rest =>
+                accumulatedKeywords(next).append(value)
+                remainingArgSignatures = rest
+            }
+          case (key, Some(value)) =>
+            lookupArgSig.get(key) match{
+              case Some(x) if accumulatedKeywords.contains(x) =>
+                accumulatedKeywords(x).append(value)
+                remainingArgSignatures = remainingArgSignatures.filter(_.name != key)
+              case _ => leftoverArgs.append("--"+key, value)
+            }
+        }
+      }
+
+      val missing0 = remainingArgSignatures.filter(_.default.isEmpty)
+      val missing = if(varargs) missing0.filter(_ != argSignatures.last) else missing0
+      val duplicates = accumulatedKeywords.toSeq.filter(_._2.length > 1)
+
+      if (missing.nonEmpty || duplicates.nonEmpty || (leftoverArgs.nonEmpty && !varargs)){
+        Result.Error.MismatchedArguments(
+          missing = missing,
+          unknown = leftoverArgs,
+          duplicate = duplicates
+
+        )
+      } else {
+        val mapping = accumulatedKeywords
+          .iterator
+          .collect{case (k, Seq(single)) => (k.name, single)}
+          .toMap
+
+        try invoke0(mapping, leftoverArgs)
+        catch{case e: Throwable =>
+          Result.Error.Exception(e)
         }
       }
     }
   }
 
+  def tryEither[T](t: => T, error: Throwable => Result.ParamError) = {
+    try Right(t)
+    catch{ case e: Throwable => Left(error(e))}
+  }
+  def readVarargs[T](arg: ArgSig,
+                     values: Seq[String],
+                     thunk: String => T) = {
+    val attempts =
+      for(item <- values)
+      yield tryEither(thunk(item), Result.ParamError.Invalid(arg, item, _))
+
+
+    val bad = attempts.collect{ case Left(x) => x}
+    if (bad.nonEmpty) Left(bad)
+    else Right(attempts.collect{case Right(x) => x})
+  }
   def read[T](dict: Map[String, String],
               default: => Option[Any],
               arg: ArgSig,
-              thunk: String => T,
-              extras: Option[Seq[String]]): FailMaybe = {
+              thunk: String => T): FailMaybe = {
     dict.get(arg.name) match{
       case None =>
-        try default match{
-          case None => Left(Seq(Result.ParamError.Missing(arg)))
-          case Some(v) => Right(v)
-        } catch {case e => Left(Seq(Result.ParamError.DefaultFailed(arg, e))) }
+        tryEither(default.get, Result.ParamError.DefaultFailed(arg, _)).left.map(Seq(_))
 
       case Some(x) =>
-
-        extras match{
-          case None =>
-            try Right(thunk(x))
-            catch {case e => Left(Seq(Result.ParamError.Invalid(arg, x, e))) }
-
-          case Some(extraItems) =>
-            val attempts: Seq[Either[Result.ParamError.Invalid, T]] = (x +: extraItems).map{ item =>
-              try Right(thunk(item))
-              catch {case e => Left(Result.ParamError.Invalid(arg, item, e)) }
-            }
-
-            val bad = attempts.collect{ case Left(x) => x}
-            if (bad.nonEmpty) Left(bad)
-            else {
-              val good = Right(attempts.collect{case Right(x) => x})
-              good
-            }
-        }
-
+        tryEither(thunk(x), Result.ParamError.Invalid(arg, x, _)).left.map(Seq(_))
     }
   }
 
@@ -134,19 +162,14 @@ object Router{
         * code within it.
         */
       case class Exception(t: Throwable) extends Error
-      /**
-        * Invoking the [[EntryPoint]] failed as there were too many positional
-        * arguments passed in, more than what is expected by the [[EntryPoint]]
-        */
-      case class TooManyArguments(values: Seq[String]) extends Error
-      /**
-        * Invoking the [[EntryPoint]] failed as the same argument was passed
-        * in more than once; possibly as a keyword-argument that was repeated,
-        * or a keyword-argument and positional-argument that both resolve to
-        * the same arg
-        */
-      case class RedundantArguments(names: Seq[String]) extends Error
 
+      /**
+        * Invoking the [[EntryPoint]] failed because the arguments provided
+        * did not line up with the arguments expected
+        */
+      case class MismatchedArguments(missing: Seq[ArgSig],
+                                    unknown: Seq[String],
+                                    duplicate: Seq[(ArgSig, Seq[String])]) extends Error
       /**
         * Invoking the [[EntryPoint]] failed because there were problems
         * deserializing/parsing individual arguments
@@ -154,16 +177,8 @@ object Router{
       case class InvalidArguments(values: Seq[ParamError]) extends Error
     }
 
-    /**
-      * What could go wrong when trying to parse an individual parameter to
-      * an [[EntryPoint]]?
-      */
     sealed trait ParamError
-    object ParamError {
-      /**
-        * Some parameter was missing from the input.
-        */
-      case class Missing(arg: ArgSig) extends ParamError
+    object ParamError{
       /**
         * Something went wrong trying to de-serialize the input parameter;
         * the thrown exception is stored in [[ex]]
@@ -183,8 +198,12 @@ object Router{
 
   def validate(args: Seq[FailMaybe]): Result[Seq[Any]] = {
     val lefts = args.collect{case Left(x) => x}.flatten
+
     if (lefts.nonEmpty) Result.Error.InvalidArguments(lefts)
-    else Result.Success(args.collect{case Right(x) => x})
+    else {
+      val rights = args.collect{case Right(x) => x}
+      Result.Success(rights)
+    }
   }
 }
 class Router [C <: Context](val c: C) {
@@ -221,6 +240,7 @@ class Router [C <: Context](val c: C) {
       }
     }
     val argListSymbol = q"${c.fresh[TermName]("argsList")}"
+    val extrasSymbol = q"${c.fresh[TermName]("extras")}"
     val defaults = for ((arg, i) <- flattenedArgLists.zipWithIndex) yield {
       hasDefault(i).map(defaultName => q"() => $target.${newTermName(defaultName)}")
     }
@@ -266,16 +286,21 @@ class Router [C <: Context](val c: C) {
         )
       """
 
-      val extraArg = if(vararg) q"scala.Some(extras)" else q"None"
-      val reader = q"""
-      ammonite.main.Router.read[$unwrappedType](
-        $argListSymbol,
-        $default,
-        $argSig,
-        implicitly[scopt.Read[$unwrappedType]].reads(_),
-        $extraArg
-      )
-      """
+      val reader =
+        if(vararg) q"""
+          ammonite.main.Router.readVarargs[$unwrappedType](
+            $argSig,
+            $extrasSymbol,
+            implicitly[scopt.Read[$unwrappedType]].reads(_)
+          )
+        """ else q"""
+        ammonite.main.Router.read[$unwrappedType](
+          $argListSymbol,
+          $default,
+          $argSig,
+          implicitly[scopt.Read[$unwrappedType]].reads(_)
+        )
+        """
       (reader, argSig, vararg)
     }
 
@@ -295,7 +320,7 @@ class Router [C <: Context](val c: C) {
       ${meth.name.toString},
       scala.Seq(..$argSigs),
       ${varargs.contains(true)},
-      ($argListSymbol: Map[String, String], extras: Seq[String]) =>
+      ($argListSymbol: Map[String, String], $extrasSymbol: Seq[String]) =>
         ammonite.main.Router.validate(Seq(..$readArgs)) match{
           case ammonite.main.Router.Result.Success(List(..$argNames)) =>
             ammonite.main.Router.Result.Success($target.${meth.name.toTermName}(..$argNameCasts))

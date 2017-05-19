@@ -15,11 +15,25 @@ import fastparse.utils.Utils._
   * macro-generated [[Router]], and pretty-printing any output or error messages
   */
 object Scripts {
+  def groupArgs(flatArgs: Seq[String]): Seq[(String, Option[String])] = {
+    var keywordTokens = flatArgs.toList
+    var scriptArgs = Vector.empty[(String, Option[String])]
+
+    while(keywordTokens.nonEmpty) keywordTokens match{
+      case List(head, next, rest@_*) if head.startsWith("--") =>
+        scriptArgs = scriptArgs :+ (head.drop(2), Some(next))
+        keywordTokens = rest.toList
+      case List(head, rest@_*) =>
+        scriptArgs = scriptArgs :+ (head, None)
+        keywordTokens = rest.toList
+
+    }
+    scriptArgs
+  }
   def runScript(wd: Path,
                 path: Path,
                 interp: ammonite.interp.Interpreter,
-                args: Seq[String],
-                kwargs: Seq[(String, String)]) = {
+                scriptArgs: Seq[(String, Option[String])]) = {
     val (pkg, wrapper) = Util.pathToPackageWrapper(path, wd)
 
     for{
@@ -74,26 +88,32 @@ object Scripts {
           case Seq() => Res.Success(processed.finalImports)
           // If there's one @main method, we run it with all args
           case Seq(main) =>
-            runMainMethod(main, args, kwargs).getOrElse(Res.Success(processed.finalImports))
+            runMainMethod(main, scriptArgs).getOrElse(Res.Success(processed.finalImports))
           // If there are multiple @main methods, we use the first arg to decide
           // which method to run, and pass the rest to that main method
           case mainMethods =>
             val suffix = formatMainMethods(mainMethods)
-            args match{
+            scriptArgs match{
               case Seq() =>
                 Res.Failure(
                   None,
-                  s"Need to specify a main method to call when running " + path.last + suffix
+                  s"Need to specify a subcommand to call when running " + path.last + suffix
                 )
-              case Seq(head, tail @ _*) =>
+              case Seq((head, Some(_)), tail @ _*) =>
+                Res.Failure(
+                  None,
+                  s"To select a subcommand to run, you don't need --s.\n" +
+                  "Did you mean `${head.drop(2)}` instead of `$head`?"
+                )
+              case Seq((head, None), tail @ _*) =>
                 mainMethods.find(_.name == head) match{
                   case None =>
                     Res.Failure(
                       None,
-                      s"Unable to find method: " + backtickWrap(head) + suffix
+                      s"Unable to find subcommand: " + backtickWrap(head) + suffix
                     )
                   case Some(main) =>
-                    runMainMethod(main, tail, kwargs).getOrElse(Res.Success(processed.finalImports))
+                    runMainMethod(main, tail).getOrElse(Res.Success(processed.finalImports))
                 }
             }
         }
@@ -118,8 +138,7 @@ object Scripts {
     }
   }
   def runMainMethod(mainMethod: Router.EntryPoint,
-                    args: Seq[String],
-                    kwargs: Seq[(String, String)]): Option[Res.Failing] = {
+                    scriptArgs: Seq[(String, Option[String])]): Option[Res.Failing] = {
 
     def expectedMsg = {
       val commaSeparated =
@@ -130,33 +149,37 @@ object Scripts {
       "(" + commaSeparated + ")" + details
     }
 
-    mainMethod.invoke(args, kwargs) match{
+    mainMethod.invoke(scriptArgs) match{
       case Router.Result.Success(x) => None
       case Router.Result.Error.Exception(x) => Some(Res.Exception(x, ""))
-      case Router.Result.Error.TooManyArguments(x) =>
+      case Router.Result.Error.MismatchedArguments(missing, unknown, duplicate) =>
+        val missingStr =
+          if (missing.isEmpty) ""
+          else s"Missing arguments:" + missing.mkString + "\n"
+
+        val unknownStr =
+          if (unknown.isEmpty) ""
+          else s"Unknown arguments:" + unknown.map(literalize(_)).mkString(",") + "\n"
+
+        val duplicateStr =
+          if (duplicate.isEmpty) ""
+          else s"Duplicate arguments:" + unknown.map(literalize(_)).mkString + "\n"
+
         Some(Res.Failure(
           None,
           Util.normalizeNewlines(
-            s"""Too many args were passed to this script: ${x.map(literalize(_)).mkString(", ")}
-                |expected arguments: $expectedMsg""".stripMargin
+            s"""Arguments provided did not match expected signature: $expectedMsg
+                |$missingStr$unknownStr$duplicateStr
+                |""".stripMargin
           )
 
         ))
-      case Router.Result.Error.RedundantArguments(x) =>
-        Some(Res.Failure(
-          None,
-          Util.normalizeNewlines(
-            s"""Redundant values were passed for arguments: ${x.map(literalize(_)).mkString(", ")}
-                |expected arguments: $expectedMsg""".stripMargin
-          )
-        ))
+
       case Router.Result.Error.InvalidArguments(x) =>
         Some(Res.Failure(
           None,
           "The following arguments failed to be parsed:" + Util.newLine +
             x.map{
-              case Router.Result.ParamError.Missing(p) =>
-                s"(${renderArg(p)}) was missing"
               case Router.Result.ParamError.Invalid(p, v, ex) =>
                 s"(${renderArg(p)}) failed to parse input ${literalize(v)} with $ex"
               case Router.Result.ParamError.DefaultFailed(p, ex) =>

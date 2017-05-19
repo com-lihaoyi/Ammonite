@@ -2,14 +2,23 @@ package ammonite.unit
 
 import ammonite.repl.Highlighter
 import ammonite.main.Router
-import ammonite.main.Router.Result.Error.{InvalidArguments, RedundantArguments, TooManyArguments}
+import ammonite.main.Router.Result.Error.{InvalidArguments, MismatchedArguments}
 import ammonite.main.Router.Result.ParamError
-import ammonite.main.Router.{ArgSig, doc, main}
+import ammonite.main.Router.{ArgSig, EntryPoint, doc, main}
 import ammonite.util.Util
 import utest._
-
+import ammonite.main.Scripts.groupArgs
 object RouterTests extends TestSuite{
-
+  def parseInvoke(entryPoint: EntryPoint, input: Seq[String]) = {
+    val grouped = groupArgs(input)
+    entryPoint.invoke(grouped)
+  }
+  def check[T](entryPoint: EntryPoint,
+               input: Seq[String],
+               expected: Router.Result[T]) = {
+    val result = parseInvoke(entryPoint, input)
+    assert(result == expected)
+  }
   val tests = TestSuite {
     println("UnitTests")
     'transpose{
@@ -67,40 +76,57 @@ object RouterTests extends TestSuite{
         )
       }
 
-      'invoke - assert(
-        routes(0).invoke(Seq.empty, Seq.empty) == Router.Result.Success(1),
-        routes(1).invoke(Seq.empty, Seq("i" -> "2")) == Router.Result.Success(2),
-        routes(2).invoke(Seq.empty, Seq("i" -> "2")) == Router.Result.Success("lolslols"),
-        routes(2).invoke(Seq.empty, Seq("i" -> "3", "s" -> "x")) == Router.Result.Success("xxx")
-      )
+
+      'invoke - {
+        check(routes(0), Seq(), Router.Result.Success(1))
+        check(routes(1), Seq("2"), Router.Result.Success(2))
+        check(routes(1), Seq("--i", "2"), Router.Result.Success(2))
+        check(routes(2), Seq("2"), Router.Result.Success("lolslols"))
+        check(routes(2), Seq("--i", "2"), Router.Result.Success("lolslols"))
+        check(routes(2), Seq("3", "x"), Router.Result.Success("xxx"))
+        check(routes(2), Seq("--i", "3", "x"), Router.Result.Success("xxx"))
+        check(routes(2), Seq("--i", "3", "--s", "x"), Router.Result.Success("xxx"))
+      }
       'varargs{
-        'happyPathPasses - assert(
-          routes(4).invoke(Seq("1", "2", "3"), Seq()) == Router.Result.Success(6),
-          routes(5).invoke(Seq("1", "2", "3", "4", "5"), Seq()) == Router.Result.Success("12345")
-        )
-        'emptyVarargsPasses - assert(
-          routes(4).invoke(Seq(), Seq()) == Router.Result.Success(0),
-          routes(5).invoke(Seq("1"), Seq()) == Router.Result.Success("1")
-        )
-        'namedVarargAlonePasses - assert(
-          routes(4).invoke(Seq(), Seq("nums" -> "31337")) == Router.Result.Success(31337),
-          routes(5).invoke(Seq("1"), Seq("args" -> "foo")) == Router.Result.Success("1foo")
-        )
-        'duplicatePositionalAndNamedVarargsFails{
-          assertMatch(routes(4).invoke(Seq("1", "2", "3"), Seq("nums" -> "4"))){
-            case RedundantArguments(Seq("nums")) =>
+        'happyPathPasses - {
+          check(routes(4), Seq("1", "2", "3"), Router.Result.Success(6))
+          check(routes(5), Seq("1", "2", "3", "4", "5"), Router.Result.Success("12345"))
+        }
+        'emptyVarargsPasses - {
+          check(routes(4), Seq(), Router.Result.Success(0))
+          check(routes(5), Seq("1"), Router.Result.Success("1"))
+        }
+        'varargsAreAlwaysPositional - {
+          val invoked = parseInvoke(routes(4), Seq("--nums", "31337"))
+          assertMatch(invoked){
+            case InvalidArguments(Seq(
+              ParamError.Invalid(
+                ArgSig("nums", "Int*", _, _),
+                "--nums",
+                _: NumberFormatException
+              )
+            ))=>
+          }
+          check(routes(5), Seq("1", "--args", "foo"), Router.Result.Success("1--argsfoo"))
+
+          assertMatch(parseInvoke(routes(4), Seq("1", "2", "3", "--nums", "4"))){
+            case InvalidArguments(Seq(
+              ParamError.Invalid(
+                ArgSig("nums", "Int*", _, _),
+                "--nums",
+                _: NumberFormatException
+              )
+            ))=>
           }
         }
 
         'notEnoughNormalArgsStillFails{
-          assertMatch(routes(5).invoke(Seq(), Seq())){
-            case InvalidArguments(
-            Seq(ParamError.Missing(ArgSig("first", _, _, _)))
-            )=>
+          assertMatch(parseInvoke(routes(5), Seq())){
+            case MismatchedArguments(Seq(ArgSig("first", _, _, _)), Nil, Nil) =>
           }
         }
         'multipleVarargParseFailures{
-          assertMatch(routes(4).invoke(Seq("aa", "bb", "3"), Seq())){
+          assertMatch(parseInvoke(routes(4), Seq("aa", "bb", "3"))){
             case InvalidArguments(
             Seq(
             ParamError.Invalid(ArgSig("nums", "Int*", _, _), "aa", _: NumberFormatException),
@@ -108,7 +134,7 @@ object RouterTests extends TestSuite{
             )
             )=>
           }
-          assertMatch(routes(5).invoke(Seq("aa", "bb", "3"), Seq())){
+          assertMatch(parseInvoke(routes(5), Seq("aa", "bb", "3"))){
             case InvalidArguments(
             Seq(
             ParamError.Invalid(ArgSig("first", "Int", _, _), "aa", _: NumberFormatException)
@@ -120,37 +146,32 @@ object RouterTests extends TestSuite{
 
       'failures{
         'missingParams - {
-          assertMatch(routes(1).invoke(Seq.empty, Seq.empty)){
-            case InvalidArguments(
-            Seq(ParamError.Missing(ArgSig("i", _, _, _)))
-            ) =>
+          assertMatch(parseInvoke(routes(1), Seq.empty)){
+            case MismatchedArguments(Seq(ArgSig("i", _, _, _)), Nil, Nil) =>
           }
-          assertMatch(routes(2).invoke(Seq.empty, Seq("s" -> "omg"))){
-            case InvalidArguments(
-            Seq(ParamError.Missing(ArgSig("i", _, _, _)))
-            ) =>
+          assertMatch(parseInvoke(routes(2), Seq("--s", "omg"))){
+            case MismatchedArguments(Seq(ArgSig("i", _, _, _)), Nil, Nil) =>
           }
         }
-        'invalidParams - assertMatch(routes(1).invoke(Seq("lol"), Seq.empty)) {
+        'invalidParams - assertMatch(parseInvoke(routes(1), Seq("lol"))){
           case InvalidArguments(
           Seq(ParamError.Invalid(ArgSig("i", _, _, _), "lol", _))
           ) =>
         }
 
-        'tooManyParams - assert(
-          routes(0).invoke(Seq("1", "2"), Seq.empty) ==
-            TooManyArguments(Seq("1", "2"))
+        'tooManyParams - check(
+          routes(0), Seq("1", "2"),
+          MismatchedArguments(Nil, Seq("1", "2"), Nil)
         )
 
-        'redundantParams - assert(
-          routes(1).invoke(Seq("1"), Seq("i" -> "2")) ==
-            RedundantArguments(Seq("i"))
-        )
 
-        'failing - assert(
-          routes(3).invoke(Seq(), Seq()) ==
-            Router.Result.Error.Exception(MyException)
-        )
+        'redundantParams - {
+          val parsed = parseInvoke(routes(2), Seq("1", "--i", "2"))
+          assertMatch(parsed){
+            case MismatchedArguments(Nil, Nil, Seq((ArgSig("i", _, _, _), Seq("1", "2")))) =>
+          }
+        }
+        'failing - check(routes(3), Seq(), Router.Result.Error.Exception(MyException))
       }
     }
   }

@@ -126,12 +126,11 @@ case class Main(predef: String = "",
     * of `args` and a map of keyword `kwargs` to pass to that file.
     */
   def runScript(path: Path,
-                args: Seq[String],
-                kwargs: Seq[(String, String)],
+                scriptArgs: Seq[(String, Option[String])],
                 replApi: Boolean = false): Res[Imports] = {
 
     val interp = instantiateInterpreter(replApi)
-    main.Scripts.runScript(wd, path, interp, args, kwargs)
+    main.Scripts.runScript(wd, path, interp, scriptArgs)
   }
 
   /**
@@ -150,13 +149,11 @@ object Main{
     * delegating to [[Main.run]]
     */
   def main(args0: Array[String]) = {
-    var fileToExecute: Option[Path] = None
     var codeToExecute: Option[String] = None
     var verboseOutput: Boolean = true
     var ammoniteHome: Option[Path] = None
     var passThroughArgs: Seq[String] = Vector.empty
     var predefFiles: Seq[Path] = Vector.empty
-    var continually = false
     var replApi = false
     val replParser = new scopt.OptionParser[Main]("ammonite") {
       // Primary arguments that correspond to the arguments of
@@ -177,10 +174,6 @@ object Main{
 
       // Secondary arguments that correspond to different methods of
       // the `Main` configuration arguments
-      arg[String]("<file-args>...")
-        .optional()
-        .foreach{ x => fileToExecute = Some(Path(x, pwd)) }
-        .text("The Ammonite script file you want to execute")
       opt[String]('c', "code")
         .foreach(x => codeToExecute = Some(x))
         .text("Pass in code to be run immediately in the REPL")
@@ -198,13 +191,6 @@ object Main{
         .unbounded()
         .foreach{ x => predefFiles = predefFiles :+ Path(x, pwd) }
         .text("Lets you load your predef from a custom location")
-      opt[Unit]('y', "continually")
-        .foreach(x => continually = true)
-        .text(
-          """Lets you run a file over and over, useful for benchmarking purposes
-            |since it lets you hook up a profiler to the long-lived process and
-            |see where all the time is being spent.
-          """.stripMargin)
       opt[Unit]('s', "silent")
         .foreach(x => verboseOutput = false)
         .text(
@@ -215,34 +201,31 @@ object Main{
         .text(
           """Lets you run a script with the `repl` object present; this is
             |normally not available in scripts and only provided in the
-            |interactive REpl
+            |interactive REPL
           """.stripMargin)
 
     }
 
-    val (take, drop) = args0.indexOf("--") match {
-      case -1 => (Int.MaxValue, Int.MaxValue)
-      case n => (n, n+1)
+    // amm foo.sc
+    // amm -h bar
+    // amm foo.sc hello world
+    // amm foo.sc -h bar -- hello world
+    val (fileToExecute, ammoniteArgs, flatScriptArgs) = args0.lift(0) match{
+      case Some(x) if x.head != '-' =>
+        val fileToRun = Some(Path(args0(0), pwd))
+        // running a file
+        args0.indexOf("--") match {
+          // all args to to file main
+          case -1 => (fileToRun, Array.empty[String], args0.drop(1))
+          // args before -- go to ammonite, args after -- go to file main
+          case n => (fileToRun, args0.slice(1, n), args0.drop(n+1))
+        }
+      case _ => (None, args0, Array.empty[String]) // running the REPL, all args to to ammonite
     }
 
-    val before = args0.take(take)
-    var keywordTokens = args0.drop(drop).toList
-    var kwargs = Vector.empty[(String, String)]
+    val scriptArgs = ammonite.main.Scripts.groupArgs(flatScriptArgs)
 
-    while(keywordTokens.nonEmpty){
-      if (keywordTokens(0).startsWith("--")){
-        kwargs = kwargs :+ (keywordTokens(0).drop(2), keywordTokens(1))
-        keywordTokens = keywordTokens.drop(2)
-      }else{
-        passThroughArgs = passThroughArgs :+ keywordTokens(0)
-        keywordTokens = keywordTokens.drop(1)
-      }
-    }
-    def ifContinually[T](b: Boolean)(f: => T) = {
-      if (b) while(true) f
-      else f
-    }
-    for(c <- replParser.parse(before, Main())) ifContinually(continually){
+    for(c <- replParser.parse(ammoniteArgs, Main())) {
       def main(isRepl: Boolean) = Main(
         c.predef,
         c.defaultPredef,
@@ -264,7 +247,7 @@ object Main{
       (fileToExecute, codeToExecute) match {
         case (None, None) => println("Loading..."); main(true).run()
         case (Some(path), None) =>
-          main(false).runScript(path, passThroughArgs, kwargs, replApi) match {
+          main(false).runScript(path, scriptArgs, replApi) match {
             case Res.Failure(exOpt, msg) =>
               Console.err.println(msg)
               System.exit(1)

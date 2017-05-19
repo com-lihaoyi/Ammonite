@@ -1086,5 +1086,16 @@
           performing @hl.scala{import $ivy}s in subsequent blocks. Fixes
           @issue(491)
         @li
+          Revamped how arguments are passed to scripts. When running scripts,
+          now the script file must *always* be the first argument to the
+          @code{amm} command. Any arguments after the script file get
+          delegated to the script's @hl.scala("@main") method(s) @i{unless}
+          there is a @code{--} present, in which case arguments @i{after} the
+          @code{--} get delegated to the script while those @i{before} get
+          passed to Ammonite. This allows you to define a @hl.scala("@main")
+          method with a vararg @hl.scala{String*} that accepts in all arguments
+          by default, letting you use your own custom arg parsers on the input
+          strings. Fixes @issue(423), @issue(479), @issue(538)
+        @li
           Avoid crashes when non-existent paths are on the classpath, thanks to
           @lnk("Olivier Roland", "https://github.com/newca12")
