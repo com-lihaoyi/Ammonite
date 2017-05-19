@@ -1072,6 +1072,7 @@
         @li
           Ammonite now uses AlexArchmabault's
           @lnk("Coursier", "https://github.com/coursier/coursier") library for
-          dependency resolution and downloading. This @i{should} fix many of
-          our perenniel, non-deterministic Ivy resolution problems such as
-          @issue(300), @issue(455), @issue(473), @issue(573), @issue(583)
+          dependency resolution and downloading. This should @i{hopefully} fix
+          many of our perenniel, non-deterministic Ivy resolution problems such
+          as @issue(300), @issue(455), @issue(473), @issue(523), @issue(573),
+          @issue(583)

@@ -287,6 +287,9 @@ object Main{
       }
 
     }
+
+    // Exit explicitly to kill any daemon threads that are running
+    System.exit(0)
   }
 
   def maybeDefaultPredef(enabled: Boolean, predef: String) =
