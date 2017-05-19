@@ -82,8 +82,8 @@
         The @lnk("DynaML", "http://mandar2812.github.io/DynaML/#documentation")
         Machine-Learning REPL uses Ammonite as it's REPL
       @li
-        The @lnk("Shapeless", "https://github.com/milessabin/shapeless") project
-        has a @lnk("try-shapeless.sh", "https://github.com/milessabin/shapeless#try-shapeless-with-an-ammonite-instant-repl")
+        The @lnk("Shapeless", "https://github.com/milessabin/shapeless") project has a
+        @lnk("try-shapeless.sh", "https://github.com/milessabin/shapeless#try-shapeless-with-an-ammonite-instant-repl")
         instant-REPL built using Ammonite
       @li
         Seems Twitter @lnk("now uses Ammonite",
@@ -726,7 +726,10 @@
         @li
           Cross-build for 2.10.6 @issue(282)
         @li
-          Refactor of the @hl.scala{CommandResult} type being returned from the @hl.scala{%%} operator, to now properly capture the raw byte output, stdout, stderr, exit code. See @sect.ref{Spawning Subprocesses} for details. @issue(207)
+          Refactor of the @hl.scala{CommandResult} type being returned from the
+          @hl.scala{%%} operator, to now properly capture the raw byte output,
+          stdout, stderr, exit code. See @sect.ref{Spawning Subprocesses} for
+          details. @issue(207)
         @li
           Added a new @sect.ref{grep} command.
         @li
