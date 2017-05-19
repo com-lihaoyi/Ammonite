@@ -1077,6 +1077,13 @@
           as @issue(300), @issue(455), @issue(473), @issue(523), @issue(573),
           @issue(583)
         @li
+          Basic @lnk("Apache Spark", "http://spark.apache.org/") support! You
+          can now run basic Spark commands in Ammonite scripts, as well as
+          in the REPL. To do so, @hl.scala{import $file} our Spark Setup Script
+          to get started. Spark support is currently experimental, so feel
+          free to report issues or contribute fixes if you notice something
+          missing or wrong!
+        @li
           Upgrade to @lnk("PPrint 0.5.1", "http://www.lihaoyi.com/PPrint/"),
           which fixes a large number of issues in the previous implicit/macro
           based pretty-printer @issue(208) @issue(306) @issue(313) @issue(575)

@@ -197,6 +197,7 @@ case class Shellable(s: Seq[String])
 object Shellable{
   implicit def StringShellable(s: String): Shellable = Shellable(Seq(s))
   implicit def SeqShellable(s: Seq[String]): Shellable = Shellable(s)
+  implicit def OptShellable(s: Option[String]): Shellable = Shellable(s.toSeq)
   implicit def SymbolShellable(s: Symbol): Shellable = Shellable(Seq(s.name))
   implicit def BasePathShellable(s: BasePath): Shellable = Shellable(Seq(s.toString))
   implicit def NumericShellable[T: Numeric](s: T): Shellable = Shellable(Seq(s.toString))

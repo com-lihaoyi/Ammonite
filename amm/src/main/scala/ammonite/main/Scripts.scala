@@ -131,7 +131,7 @@ object Scripts {
       Util.normalizeNewlines(
         s"""
            |
-           |Available main methods:
+           |Available subcommands:
            |
            |${methods.mkString(Util.newLine)}""".stripMargin
       )
@@ -155,22 +155,41 @@ object Scripts {
       case Router.Result.Error.MismatchedArguments(missing, unknown, duplicate) =>
         val missingStr =
           if (missing.isEmpty) ""
-          else s"Missing arguments:" + missing.mkString + "\n"
+          else {
+            val chunks =
+              for (x <- missing)
+              yield x.name + ": " + x.typeString
+
+            s"Missing arguments: (${chunks.mkString(", ")})\n"
+          }
+
 
         val unknownStr =
           if (unknown.isEmpty) ""
-          else s"Unknown arguments:" + unknown.map(literalize(_)).mkString(",") + "\n"
+          else s"Unknown arguments: " + unknown.map(literalize(_)).mkString(", ") + "\n"
 
         val duplicateStr =
           if (duplicate.isEmpty) ""
-          else s"Duplicate arguments:" + unknown.map(literalize(_)).mkString + "\n"
+          else {
+            val lines =
+              for ((sig, options) <- duplicate)
+              yield {
+                s"Duplicate arguments for (${sig.name}: ${sig.typeString}): " +
+                options.map(literalize(_)) + "\n"
+              }
+
+            lines.mkString
+
+          }
 
         Some(Res.Failure(
           None,
           Util.normalizeNewlines(
-            s"""Arguments provided did not match expected signature: $expectedMsg
-                |$missingStr$unknownStr$duplicateStr
-                |""".stripMargin
+            s"""Arguments provided did not match expected signature:
+               |$expectedMsg
+               |
+               |$missingStr$unknownStr$duplicateStr
+               |""".stripMargin
           )
 
         ))

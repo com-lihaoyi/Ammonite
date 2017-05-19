@@ -21,15 +21,16 @@ object BasicTests extends TestSuite{
   val tests = TestSuite {
     println("Running BasicTest")
 
-    def execWithJAVA_OPTSset(name: RelPath, home: Path) = %%bash(
+    def execWithJavaOptsSet(name: RelPath, home: Path) = %%bash(
       executable,
       replStandaloneResources/name,
       "-h",
       home,
-      JAVA_OPTS = "-verbose:class"
+      JAVA_OPTS = "-verbose:class",
+      "--"
       )
     'hello{
-      val evaled = exec('basic/"Hello.sc", "-s")
+      val evaled = exec('basic/"Hello.sc")
       assert(evaled.out.trim == "Hello World")
     }
 
@@ -45,18 +46,19 @@ object BasicTests extends TestSuite{
         val evaled = %%bash(
           executable,
           scriptAddr,
-          "-s"
+          "-s",
+          "--"
           )
         assert(evaled.out.trim == "Script Worked!!" && evaled.err.string.isEmpty)
       }
     }
     'scalacNotLoadedByCachedScripts{
       val tmpDir = tmp.dir()
-      val evaled1 = execWithJAVA_OPTSset(
+      val evaled1 = execWithJavaOptsSet(
         'basic/"Print.sc",
         tmpDir
       )
-      val evaled2 = execWithJAVA_OPTSset(
+      val evaled2 = execWithJavaOptsSet(
        'basic/"Print.sc",
         tmpDir
       )
@@ -69,13 +71,13 @@ object BasicTests extends TestSuite{
     }
     'fastparseNotLoadedByCachedScritps{
       val tmpDir = tmp.dir()
-      val evaled1 = execWithJAVA_OPTSset(
+      val evaled1 = execWithJavaOptsSet(
         'basic/"Print.sc",
         tmpDir
       )
       assert(evaled1.out.trim.contains("fastparse"))
 
-      val evaled2 = execWithJAVA_OPTSset(
+      val evaled2 = execWithJavaOptsSet(
         'basic/"Print.sc",
         tmpDir
         )
@@ -89,10 +91,9 @@ object BasicTests extends TestSuite{
       write(scriptAddr, """println("Worked!!")""")
       val evaled = %% bash(
         executable,
-        scriptAddr,
-        "-s"
+        scriptAddr
         )
-      assert(evaled.out.trim == "Worked!!" && evaled.err.string.isEmpty)
+      assert(evaled.out.trim == "Worked!!" )
     }
 
     'complex {
@@ -134,7 +135,7 @@ object BasicTests extends TestSuite{
       // check Compiling Script is being printed
 
       assert(evaled1.err.string.contains("Compiling"))
-      val evaled2 = exec('basic/"Hello.sc", "-s")
+      val evaled2 = execSilent('basic/"Hello.sc")
       // make sure with `-s` flag script running is silent
       assert(!evaled2.err.string.contains("Compiling"))
     }
@@ -190,6 +191,17 @@ object BasicTests extends TestSuite{
       }
     }
 
+    'spark - {
+      // Note that this script screws up if you try to run it within SBT! It has to
+      // be run as an integration test, or via `sbt amm/test:assembly && amm/target/amm`
+      if (!Util.windowsPlatform) {
+        if (scalaVersion.startsWith("2.11.") && javaVersion.startsWith("1.8.")){
+          val evaled = exec('basic/"Spark.sc")
+          assert(evaled.out.string.contains("List(10, 20, 30, 40, 50)"))
+        }
+      }
+    }
+
     'main{
       'single{
         val evaled = exec('basic/"Main.sc")
@@ -198,12 +210,12 @@ object BasicTests extends TestSuite{
       }
       'multiple{
         'positiveNoArgs{
-          val evaled = exec('basic/"MultiMain.sc", "mainA", "-s")
+          val evaled = exec('basic/"MultiMain.sc", "mainA")
           val out = evaled.out.string
           assert(out == "Hello! 1" + Util.newLine)
         }
         'positiveArgs{
-          val evaled = exec('basic/"MultiMain.sc", "functionB", "2", "foo", "-s")
+          val evaled = exec('basic/"MultiMain.sc", "functionB", "2", "foo")
           val out = evaled.out.string
           assert(out == "Hello! foofoo ." + Util.newLine)
         }
@@ -213,9 +225,9 @@ object BasicTests extends TestSuite{
           }.result
           val out = evaled.err.string
           val expected = Util.normalizeNewlines(
-            """Need to specify a main method to call when running MultiMain.sc
+            """Need to specify a subcommand to call when running MultiMain.sc
               |
-              |Available main methods:
+              |Available subcommands:
               |
               |def mainA()
               |def functionB(i: Int, s: String, path: ammonite.ops.Path)
@@ -229,9 +241,9 @@ object BasicTests extends TestSuite{
           }.result
           val out = evaled.err.string
           val expected = Util.normalizeNewlines(
-            """Unable to find method: doesntExist
+            """Unable to find subcommand: doesntExist
               |
-              |Available main methods:
+              |Available subcommands:
               |
               |def mainA()
               |def functionB(i: Int, s: String, path: ammonite.ops.Path)
@@ -258,9 +270,10 @@ object BasicTests extends TestSuite{
 
         assert(errorMsg.contains(
           Util.normalizeNewlines(
-            """The following arguments failed to be parsed:
-              |(s: String) was missing
-              |expected arguments: (i: Int, s: String, path: ammonite.ops.Path)"""
+            """Arguments provided did not match expected signature:
+              |(i: Int, s: String, path: ammonite.ops.Path)
+              |
+              |Missing arguments: (s: String)"""
               .stripMargin
           )
         ))
@@ -272,8 +285,10 @@ object BasicTests extends TestSuite{
 
         assert(errorMsg.contains(
           Util.normalizeNewlines(
-            """Too many args were passed to this script: "6"
-              |expected arguments: (i: Int, s: String, path: ammonite.ops.Path)""".stripMargin
+            """Arguments provided did not match expected signature:
+              |(i: Int, s: String, path: ammonite.ops.Path)
+              |
+              |Unknown arguments: "6"""".stripMargin
           )
         ))
       }
@@ -299,11 +314,11 @@ object BasicTests extends TestSuite{
     }
     'httpApi{
       'addPost {
-        val res = exec('basic / "HttpApi.sc", "addPost", "title", "some text", "-s")
+        val res = exec('basic / "HttpApi.sc", "addPost", "title", "some text")
         assert(res.out.trim.startsWith("101"))
       }
       'comments{
-        val res = exec('basic / "HttpApi.sc", "comments", "40", "-s")
+        val res = exec('basic / "HttpApi.sc", "comments", "40")
         assert(res.out.trim.contains("totam vel saepe aut"))
         assert(res.out.trim.contains("aperiam et omnis totam"))
       }
