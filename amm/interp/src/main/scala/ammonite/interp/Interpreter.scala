@@ -586,7 +586,7 @@ class Interpreter(val printer: Printer,
       case Res.Exception(ex, msg) => lastException = ex
     }
   }
-  def loadIvy(coordinates: (String, String, String)*) = {
+  def loadIvy(coordinates: coursier.Dependency*) = {
     val cacheKey = (interpApi.repositories().hashCode.toString, coordinates)
 
     storage.ivyCache().get(cacheKey) match{
@@ -594,8 +594,7 @@ class Interpreter(val printer: Printer,
       case None =>
         ammonite.runtime.tools.IvyThing.resolveArtifact(
           interpApi.repositories(),
-          for((groupId, artifactId, version) <- coordinates)
-          yield coursier.Dependency(coursier.Module(groupId, artifactId), version),
+          coordinates,
           verbose = verboseOutput
         )match{
           case Right(loaded) =>
@@ -622,7 +621,7 @@ class Interpreter(val printer: Printer,
       jars.map(_.toString).map(new java.io.File(_)).foreach(handleClasspath)
       reInit()
     }
-    def ivy(coordinates: (String, String, String)*): Unit = {
+    def ivy(coordinates: coursier.Dependency*): Unit = {
       loadIvy(coordinates:_*) match{
         case Left(failureMsg) =>
           throw new Exception(failureMsg)

@@ -1076,16 +1076,18 @@
           Ammonite now uses AlexArchambault's
           @lnk("Coursier", "https://github.com/coursier/coursier") library for
           dependency resolution and downloading. This should @i{hopefully} fix
-          many of our perenniel, non-deterministic Ivy resolution problems such
-          as @issue(300), @issue(455), @issue(473), @issue(484), @issue(523),
-          @issue(573), @issue(583)
+          many of our perenniel, non-deterministic Ivy resolution problems, and
+          provide greater flexibility for loading ivy dependencies (e.g. with
+          excludes, classifiers, etc.). Fixes @issue(300), @issue(387),
+          @issue(455), @issue(473), @issue(484), @issue(523), @issue(573),
+          @issue(583).
         @li
-          Basic @lnk("Apache Spark", "http://spark.apache.org/") support! You
-          can now run basic Spark commands in Ammonite scripts, as well as
-          in the REPL. To do so, @hl.scala{import $file} our Spark Setup Script
-          to get started. Spark support is currently experimental, so feel
-          free to report issues or contribute fixes if you notice something
-          missing or wrong!
+          Experimental @lnk("Apache Spark", "http://spark.apache.org/")
+          support! You can now run basic Spark commands in Ammonite scripts,
+          as well as in the REPL. To do so, @hl.scala{import $file} our Spark
+          Setup Script to get started. Spark support is currently experimental,
+          so feel free to contribute fixes if (when) you notice
+          something missing or wrong!
         @li
           Upgrade to @lnk("PPrint 0.5.1", "http://www.lihaoyi.com/PPrint/"),
           which fixes a large number of issues in the previous implicit/macro

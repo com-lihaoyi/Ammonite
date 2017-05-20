@@ -8,11 +8,14 @@ import ammonite.util.{Printer, Util}
 object IvyConstructor extends IvyConstructor
 trait IvyConstructor{
   implicit class GroupIdExt(groupId: String){
-    def %(artifactId: String) = (groupId, artifactId)
-    def %%(artifactId: String) = (groupId, artifactId + "_" + IvyThing.scalaBinaryVersion)
+    def %(artifactId: String) = coursier.Module(groupId, artifactId)
+    def %%(artifactId: String) = coursier.Module(
+      groupId,
+      artifactId + "_" + IvyThing.scalaBinaryVersion
+    )
   }
-  implicit class ArtifactIdExt(t: (String, String)){
-    def %(version: String) = (t._1, t._2, version)
+  implicit class ArtifactIdExt(t: coursier.Module){
+    def %(version: String) = coursier.Dependency(t, version)
   }
 }
 

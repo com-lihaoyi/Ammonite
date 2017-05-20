@@ -24,7 +24,7 @@ trait Storage{
   def loadPredef: (String, Option[Path])
   def loadSharedPredef: (String, Option[Path])
   val fullHistory: StableRef[History]
-  val ivyCache: StableRef[IvyMap]
+  val ivyCache: StableRef[Storage.IvyMap]
   def compileCacheSave(path: String, tag: String, data: CompileCache): Unit
   def compileCacheLoad(path: String, tag: String): Option[CompileCache]
   def classFilesListSave(filePathPrefix: RelPath,
@@ -37,6 +37,7 @@ trait Storage{
 }
 
 object Storage{
+  type IvyMap = Map[(String, Seq[coursier.Dependency]), Set[String]]
   private def loadIfTagMatches(loadedTag: String,
                                cacheTag: String,
                                classFilesList: Seq[ScriptOutput.BlockMetadata],

@@ -38,7 +38,7 @@ object ImportHook{
     */
   trait InterpreterInterface{
     def wd: Path
-    def loadIvy(coordinates: (String, String, String)*): Either[String, Set[File]]
+    def loadIvy(coordinates: coursier.Dependency*): Either[String, Set[File]]
   }
 
   /**
@@ -135,8 +135,10 @@ object ImportHook{
     def resolve(interp: InterpreterInterface, signatures: Seq[String]) = {
       val splitted = for (signature <- signatures) yield {
         signature.split(':') match{
-          case Array(a, b, c) => Right((a, b, c))
-          case Array(a, "", b, c) => Right((a, b + "_" + IvyThing.scalaBinaryVersion, c))
+          case Array(a, b, c) =>
+            Right(coursier.Dependency(coursier.Module(a, b), c))
+          case Array(a, "", b, c) =>
+            Right(coursier.Dependency(coursier.Module(a, b + "_" + IvyThing.scalaBinaryVersion), c))
           case _ => Left(signature)
         }
       }

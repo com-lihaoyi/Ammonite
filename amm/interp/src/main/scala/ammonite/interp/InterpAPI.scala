@@ -59,7 +59,7 @@ trait LoadJar {
   /**
    * Load a library from its maven/ivy coordinates
    */
-  def ivy(coordinates: (String, String, String)*): Unit
+  def ivy(coordinates: coursier.Dependency*): Unit
 }
 
 trait Load extends (String => Unit) with LoadJar{

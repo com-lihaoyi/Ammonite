@@ -410,24 +410,31 @@
 
         @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("finagle", "@"), "\"\"\"")
 
+        @p
+          Ammonite-REPL is configured with a set of default resolvers but you
+          can add your own using
+          [Coursier's Repository APIs](https://github.com/coursier/coursier#api-1)
 
-      @p
-        Ammonite-REPL is configured with a set of default resolvers but you
-        can add your own using
-        [Coursier's Repository APIs](https://github.com/coursier/coursier#api-1)
+        @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("resolvers", "@"), "\"\"\"")
 
-      @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("resolvers", "@"), "\"\"\"")
+        @p
+          Including repositories which need authentication:
 
-      @p
-        Including repositories which need authentication:
+        @hl.scala
+          import coursier.core.Authentication, coursier.MavenRepository
 
-      @hl.scala
-        import coursier.core.Authentication, coursier.MavenRepository
+          interp.repositories() ++= Seq(MavenRepository(
+            "https://nexus.corp.com/content/repositories/releases",
+            authentication = Some(Authentication("user", "pass"))
+          ))
 
-        interp.repositories() ++= Seq(MavenRepository(
-          "https://nexus.corp.com/content/repositories/releases",
-          authentication = Some(Authentication("user", "pass"))
-        ))
+        @p
+          If you need more detailed control over what you are importing, e.g.
+          with attributes, classifiers or exclusions, you can fall back to
+          using the @hl.scala{interp.load.ivy(deps: coursier.Dependency*)}
+          function and configure each @code{Dependency} to your heart's content:
+
+        @hl.ref(ammoniteTests/up/"ScriptTests.scala", Seq("loadIvyAdvanced", "@"), "\"\"\"")
 
     @sect{Builtins}
       @p

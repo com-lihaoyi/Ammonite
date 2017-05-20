@@ -141,6 +141,19 @@
 
         @hl.ref('amm/'src/'test/'resources/'importHooks/"IvyImport.sc")
 
+        @p
+          If you need more detailed control over what you are importing, e.g.
+          with attributes, classifiers or exclusions, you can fall back to
+          using the @hl.scala{interp.load.ivy(deps: coursier.Dependency*)}
+          function.
+
+        @hl.ref(ammoniteTests/up/"ScriptTests.scala", Seq("loadIvyAdvanced", "@"), "\"\"\"")
+
+        @p
+          Note that to use this function, your script needs to be a
+          multi-stage script as listed below, and the @hl.scala{interp.load.ivy}
+          call needs to be in an earlier block
+
     @sect{Multi-stage Scripts}
       @p
         By default, everything in a script is compiled and executed as a single
@@ -389,7 +402,7 @@
         like the @code{repl.prompt}, @code{repl.history}, and other things
         that only really make sense in the interactive REPL.
 
-      @hl.ref('amm/'runtime/'src/'main/'scala/'ammonite/'runtime/"InterpAPI.scala", "trait InterpAPI")
+      @hl.ref('amm/'interp/'src/'main/'scala/'ammonite/'interp/"InterpAPI.scala", "trait InterpAPI")
 
     @sect{Script Predef}
       @p

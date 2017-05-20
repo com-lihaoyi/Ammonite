@@ -50,7 +50,7 @@ object Util{
 
 
 
-  type IvyMap = Map[(String, Seq[(String, String, String)]), Set[String]]
+
   type ClassFiles = Vector[(String, Array[Byte])]
 
 

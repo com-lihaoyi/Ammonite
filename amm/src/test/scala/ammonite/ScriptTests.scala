@@ -343,9 +343,17 @@ object ScriptTests extends TestSuite{
 
             @ interp.load.module($printedScriptPath/"ResolversFail.sc")
             error: Failed to resolve ivy dependencies
-
           """)
         }
+      }
+      'loadIvyAdvanced{
+        check.session(s"""
+        @ import ammonite.ops._
+
+        @ interp.load.module($printedScriptPath/"loadIvyAdvanced.sc")
+
+        @ serializer
+        """)
       }
     }
   }
