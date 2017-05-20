@@ -112,7 +112,7 @@
         @p
           And so on, importing files as many or as deep as you want. You can
           use @hl.scala{^} segments at the start of your @hl.scala{import $file}
-          to import things from outside your current working directory, e.g.
+          to import things from outside the current script's enclosing folder, e.g.
           @hl.scala{import $file.^.^.foo} will import the script file
           @code{../../foo.sc} and make it available for you to use.
 
@@ -554,8 +554,9 @@
         @li
           Otherwise, the source code for this script is then wrapped in a
           @hl.scala{package}/@hl.scala{object} wrapper, corresponding to the
-          path to the script from the current working directory. For example,
-          a script at path @code{foo/bar/baz/Qux.sc} will be wrapped in:
+          path to the script from the current script's enclosing folder.
+          For example, a script at path @code{foo/bar/baz/Qux.sc} will be
+          wrapped in:
 
           @hl.scala
 
