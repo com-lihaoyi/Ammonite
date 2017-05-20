@@ -99,7 +99,8 @@ class Interpreter(val printer: Printer,
     yield Interpreter.PredefInfo(
       Name(s"${shortName}Bridge"),
       s"import $name.{value => $shortName}",
-      true
+      true,
+      None
     )
 
 
@@ -112,10 +113,24 @@ class Interpreter(val printer: Printer,
     Seq("plugin", "cp") -> ImportHook.PluginClasspath
   ))
 
-  val predefs = bridgePredefs ++ customPredefs ++ Seq(
-    Interpreter.PredefInfo(Name("UserSharedPredef"), storage.loadSharedPredef, false),
-    Interpreter.PredefInfo(Name("UserPredef"), storage.loadPredef, false)
-  )
+  val predefs = {
+    val (sharedPredefContent, sharedPredefPath) = storage.loadSharedPredef
+    val (predefContent, predefPath) = storage.loadPredef
+    bridgePredefs ++ customPredefs ++ Seq(
+      Interpreter.PredefInfo(
+        Name("UserSharedPredef"),
+        sharedPredefContent,
+        false,
+        sharedPredefPath
+      ),
+      Interpreter.PredefInfo(
+        Name("UserPredef"),
+        predefContent,
+        false,
+        predefPath
+      )
+    )
+  }
 
   // Use a var and a for-loop instead of a fold, because when running
   // `processModule0` user code may end up calling `processModule` which depends
@@ -123,19 +138,19 @@ class Interpreter(val printer: Printer,
   // to it even if it's half built
   var predefImports = Imports()
   for {
-    Interpreter.PredefInfo(wrapperName, sourceCode, hardcoded) <- predefs
-    if sourceCode.nonEmpty
+    predefInfo <- predefs
+    if predefInfo.code.nonEmpty
   }{
     val pkgName = Seq(Name("ammonite"), Name("predef"))
 
     processModule(
-      ImportHook.Source(wd/s"${wrapperName.raw}.sc"),
-      sourceCode,
-      wrapperName,
+      predefInfo.path,
+      predefInfo.code,
+      predefInfo.name,
       pkgName,
       true,
       "",
-      hardcoded
+      predefInfo.hardcoded
     ) match{
       case Res.Success(processed) =>
         predefImports = predefImports ++ processed.finalImports
@@ -155,7 +170,7 @@ class Interpreter(val printer: Printer,
 
 
 
-  def resolveSingleImportHook(source: ImportHook.Source, tree: ImportTree) = {
+  def resolveSingleImportHook(source: Option[Path], tree: ImportTree) = {
     val strippedPrefix = tree.prefix.takeWhile(_(0) == '$').map(_.stripPrefix("$"))
     val hookOpt = importHooks().collectFirst{case (k, v) if strippedPrefix.startsWith(k) => (k, v)}
     for{
@@ -167,7 +182,7 @@ class Interpreter(val printer: Printer,
         case res: ImportHook.Result.Source =>
           for{
             processed <- processModule(
-              res.source, res.code, res.wrapper, res.pkg,
+              Some(res.source), res.code, res.wrapper, res.pkg,
               autoImport = false, extraCode = "", hardcoded = false
             )
           } yield {
@@ -188,7 +203,7 @@ class Interpreter(val printer: Printer,
     }
   }
 
-  def resolveImportHooks(source: ImportHook.Source,
+  def resolveImportHooks(source: Option[Path],
                          stmts: Seq[String]): Res[(Imports, Seq[String], Seq[ImportTree])] = {
       val hookedStmts = mutable.Buffer.empty[String]
       val importTrees = mutable.Buffer.empty[ImportTree]
@@ -222,7 +237,7 @@ class Interpreter(val printer: Printer,
       }
 
       (hookImports, normalStmts, _) <- resolveImportHooks(
-        ImportHook.Source(wd/"<console>"),
+        Some(wd/"<console>"),
         stmts
       )
 
@@ -320,7 +335,7 @@ class Interpreter(val printer: Printer,
 
 
 
-  def evalCachedClassFiles(source: ImportHook.Source,
+  def evalCachedClassFiles(source: Option[Path],
                            cachedData: Seq[ClassFiles],
                            pkg: String,
                            wrapper: String,
@@ -373,7 +388,7 @@ class Interpreter(val printer: Printer,
       } yield (cls, newImports, tag)
     }
 
-  def processModule(source: ImportHook.Source,
+  def processModule(source: Option[Path],
                     code: String,
                     wrapperName: Name,
                     pkgName: Seq[Name],
@@ -393,7 +408,7 @@ class Interpreter(val printer: Printer,
       tag
     ) match {
       case None =>
-        printer.info("Compiling " + source.path)
+        printer.info("Compiling " + source.fold(wrapperName.backticked)(_.last))
         init()
         val res = processModule0(
           source, code, wrapperName, pkgName,
@@ -434,13 +449,7 @@ class Interpreter(val printer: Printer,
   }
 
 
-  def preprocessScript(source: ImportHook.Source, code: String) = for{
-    blocks <- Preprocessor.splitScript(Interpreter.skipSheBangLine(code))
-    hooked <- Res.map(blocks){case (prelude, stmts) => resolveImportHooks(source, stmts) }
-    (hookImports, hookBlocks, importTrees) = hooked.unzip3
-  } yield (blocks.map(_._1).zip(hookBlocks), Imports(hookImports.flatMap(_.value)), importTrees)
-
-  def processModule0(source: ImportHook.Source,
+  def processModule0(source: Option[Path],
                      code: String,
                      wrapperName: Name,
                      pkgName: Seq[Name],
@@ -459,7 +468,7 @@ class Interpreter(val printer: Printer,
             processScriptBlock(
               processed, printer,
               Interpreter.indexWrapperName(wrapperName, wrapperIndex),
-              source.path.toString,
+              source.toString,
               pkgName
             )
           ),
@@ -491,7 +500,7 @@ class Interpreter(val printer: Printer,
         },
         autoImport = true,
         "",
-        ImportHook.Source(wd/"<console>")
+        Some(wd/"<console>")
       )
     } yield processedData.finalImports
   }
@@ -505,7 +514,7 @@ class Interpreter(val printer: Printer,
                            evaluate: Interpreter.EvaluateCallback,
                            autoImport: Boolean,
                            extraCode: String,
-                           source: ImportHook.Source): Res[ScriptOutput.Metadata] = {
+                           source: Option[Path]): Res[ScriptOutput.Metadata] = {
 
     val preprocess = Preprocessor(compiler.parse)
     // we store the old value, because we will reassign this in the loop
@@ -675,7 +684,7 @@ class Interpreter(val printer: Printer,
       def module(file: Path) = {
         val (pkg, wrapper) = Util.pathToPackageWrapper(file, wd)
         processModule(
-          ImportHook.Source(wd/"Main.sc"),
+          Some(wd/"Main.sc"),
           normalizeNewlines(read(file)),
           wrapper,
           pkg,
@@ -703,7 +712,7 @@ object Interpreter{
   val SheBang = "#!"
   val SheBangEndPattern = Pattern.compile(s"""((?m)^!#.*)$newLine""")
 
-  case class PredefInfo(name: Name, code: String, hardcoded: Boolean)
+  case class PredefInfo(name: Name, code: String, hardcoded: Boolean, path: Option[Path])
 
   /**
     * This gives our cache tags for compile caching. The cache tags are a hash

@@ -41,9 +41,10 @@ class TestRepl {
         Interpreter.PredefInfo(
           Name("defaultPredef"),
           ammonite.main.Defaults.replPredef + ammonite.main.Defaults.predefString,
-          true
+          true,
+          None
         ),
-        Interpreter.PredefInfo(Name("testPredef"), predef, false)
+        Interpreter.PredefInfo(Name("testPredef"), predef, false, None)
       ),
       extraBridges = { i =>
         val replApi = new ReplApiImpl(

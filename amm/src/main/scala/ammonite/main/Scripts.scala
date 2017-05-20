@@ -41,7 +41,7 @@ object Scripts {
         case e: NoSuchFileException => Res.Failure(Some(e), "Script file not found: " + path)
       }
       processed <- interp.processModule(
-        ImportHook.Source(path),
+        Some(path),
         scriptTxt,
         wrapper,
         pkg,

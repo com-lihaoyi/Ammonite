@@ -44,9 +44,9 @@ class Repl(input: InputStream,
     printer,
     storage,
     Seq(
-      Interpreter.PredefInfo(Name("DefaultPredef"), defaultPredef, true),
-      Interpreter.PredefInfo(Name("ArgsPredef"), argString, false),
-      Interpreter.PredefInfo(Name("MainPredef"), mainPredef, false)
+      Interpreter.PredefInfo(Name("DefaultPredef"), defaultPredef, true, None),
+      Interpreter.PredefInfo(Name("ArgsPredef"), argString, false, None),
+      Interpreter.PredefInfo(Name("MainPredef"), mainPredef, false, Some(wd))
     ),
     i => {
       val replApi = new ReplApiImpl(

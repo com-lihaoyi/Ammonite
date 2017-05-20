@@ -95,8 +95,8 @@ case class Main(predef: String = "",
       printer,
       storageBackend,
       Seq(
-        Interpreter.PredefInfo(Name("defaultPredef"), augmentedPredef, false),
-        Interpreter.PredefInfo(Name("predef"), predef, false)
+        Interpreter.PredefInfo(Name("defaultPredef"), augmentedPredef, false, None),
+        Interpreter.PredefInfo(Name("predef"), predef, false, None)
       ),
       i =>
         if (!replApi) Nil
@@ -157,7 +157,7 @@ object Main{
     var verboseOutput: Boolean = true
     var ammoniteHome: Option[Path] = None
     var passThroughArgs: Seq[String] = Vector.empty
-    var predefFiles: Seq[Path] = Vector.empty
+    var predefFile: Option[Path] = None
     var replApi = false
     val replParser = new scopt.OptionParser[Main]("ammonite") {
       // Primary arguments that correspond to the arguments of
@@ -192,8 +192,8 @@ object Main{
         .foreach( x => ammoniteHome = Some(Path(x, pwd)))
         .text("The home directory of the REPL; where it looks for config and caches")
       opt[String]('f', "predef-file")
-        .unbounded()
-        .foreach{ x => predefFiles = predefFiles :+ Path(x, pwd) }
+        .optional()
+        .foreach{ x => predefFile = Some(Path(x, pwd)) }
         .text("Lets you load your predef from a custom location")
       opt[Unit]('s', "silent")
         .foreach(x => verboseOutput = false)
@@ -234,15 +234,16 @@ object Main{
         c.predef,
         c.defaultPredef,
         new Storage.Folder(ammoniteHome.getOrElse(Defaults.ammoniteHome), isRepl) {
-          override def loadPredef: String = {
-            if (predefFiles.isEmpty)
-              super.loadPredef
-            else
-              try {
-                predefFiles.map(f => read(f)).mkString(Util.newLine)
-              } catch {
-                case e: java.nio.file.NoSuchFileException => ""
-              }
+          override def loadPredef = {
+            predefFile match{
+              case None => super.loadPredef
+              case Some(file) =>
+                try {
+                  (read(file), Some(file))
+                } catch {
+                  case e: java.nio.file.NoSuchFileException => ("", None)
+                }
+            }
           }
         },
         welcomeBanner = c.welcomeBanner,
