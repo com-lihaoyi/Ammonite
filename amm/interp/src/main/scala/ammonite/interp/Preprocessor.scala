@@ -290,7 +290,7 @@ object Preprocessor{
         if (item.fromName == item.toName) item.fromName.backticked
         else s"${item.fromName.backticked} => ${item.toName.backticked}"
       }
-      val pkgString = group.head.prefix.map(_.backticked).mkString(".")
+      val pkgString = Util.encodeScalaSourcePath(group.head.prefix)
       "import " + pkgString + s".{$newLine  " +
         printedGroup.mkString(s",$newLine  ") + s"$newLine}$newLine"
     }
@@ -310,7 +310,7 @@ object Preprocessor{
     //we need to normalize topWrapper and bottomWrapper in order to ensure
     //the snippets always use the platform-specific newLine
     val topWrapper = normalizeNewlines(s"""
-package ${pkgName.map(_.backticked).mkString(".")}
+package ${Util.encodeScalaSourcePath(pkgName)}
 ${importBlock(imports)}
 
 object ${indexedWrapperName.backticked}{\n"""

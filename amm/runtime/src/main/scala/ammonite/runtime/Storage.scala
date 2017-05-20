@@ -27,14 +27,11 @@ trait Storage{
   val ivyCache: StableRef[IvyMap]
   def compileCacheSave(path: String, tag: String, data: CompileCache): Unit
   def compileCacheLoad(path: String, tag: String): Option[CompileCache]
-  def classFilesListSave(pkg: String,
-                         wrapper: String,
+  def classFilesListSave(filePathPrefix: RelPath,
                          perBlockMetadata: Seq[ScriptOutput.BlockMetadata],
                          imports: Imports,
                          tag: String): Unit
-  def classFilesListLoad(pkg: String,
-                         wrapper: String,
-                         cacheTag: String): Option[ScriptOutput]
+  def classFilesListLoad(filePathPrefix: RelPath, cacheTag: String): Option[ScriptOutput]
 
 
 }
@@ -89,20 +86,18 @@ object Storage{
       } yield data
     }
 
-    def classFilesListSave(pkg: String,
-                           wrapper: String,
+    def classFilesListSave(filePathPrefix: RelPath,
                            perBlockMetadata: Seq[ScriptOutput.BlockMetadata],
                            imports: Imports,
                            tag: String): Unit = {
-      val dir = pkg + "." + wrapper
-      classFilesListcache(dir) = (tag, perBlockMetadata.reverse, imports)
+
+      classFilesListcache(filePathPrefix.toString) = (tag, perBlockMetadata.reverse, imports)
     }
 
-    def classFilesListLoad(pkg: String,
-                           wrapper: String,
+    def classFilesListLoad(filePathPrefix: RelPath,
                            cacheTag: String): Option[ScriptOutput] = {
-      val dir = pkg + "." + wrapper
-      classFilesListcache.get(dir) match{
+
+      classFilesListcache.get(filePathPrefix.toString) match{
         case None => None
         case Some((loadedTag, classFilesList, imports)) =>
           loadIfTagMatches(loadedTag, cacheTag, classFilesList, imports, compileCacheLoad)
@@ -154,13 +149,12 @@ object Storage{
       }
     }
 
-    def classFilesListSave(pkg: String,
-                           wrapper: String,
+    def classFilesListSave(filePathPrefix: RelPath,
                            perBlockMetadata: Seq[ScriptOutput.BlockMetadata],
                            imports: Imports,
                            tag: String): Unit = {
-      val dir = (pkg.split('.') ++ wrapper.split('.')).map(encode)
-      val codeCacheDir = cacheDir/'scriptCaches/dir/tag
+
+      val codeCacheDir = cacheDir/'scriptCaches/filePathPrefix/tag
       if (!exists(codeCacheDir)){
         mkdir(codeCacheDir)
         try {
@@ -187,12 +181,10 @@ object Storage{
       catch{ case e: Throwable => None }
     }
 
-    def classFilesListLoad(pkg: String,
-                           wrapper: String,
+    def classFilesListLoad(filePathPrefix: RelPath,
                            cacheTag: String): Option[ScriptOutput] = {
 
-      val dir = (pkg.split('.') ++ wrapper.split('.')).map(encode)
-      val codeCacheDir = cacheDir/'scriptCaches/dir/cacheTag
+      val codeCacheDir = cacheDir/'scriptCaches/filePathPrefix/cacheTag
       if(!exists(codeCacheDir)) None
       else {
 

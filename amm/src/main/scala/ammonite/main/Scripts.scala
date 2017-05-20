@@ -6,7 +6,7 @@ import ammonite.runtime.{ImportHook, ReplExit}
 import ammonite.main.Router.{ArgSig, EntryPoint}
 import ammonite.ops._
 import ammonite.util.Name.backtickWrap
-import ammonite.util.Util.VersionedWrapperId
+import ammonite.util.Util.{CodeSource, VersionedWrapperId}
 import ammonite.util.{Name, Res, Util}
 import fastparse.utils.Utils._
 
@@ -41,10 +41,8 @@ object Scripts {
         case e: NoSuchFileException => Res.Failure(Some(e), "Script file not found: " + path)
       }
       processed <- interp.processModule(
-        Some(path),
         scriptTxt,
-        wrapper,
-        pkg,
+        CodeSource(wrapper, pkg, Some(path)),
         autoImport = true,
         // Not sure why we need to wrap this in a separate `$routes` object,
         // but if we don't do it for some reason the `generateRoutes` macro

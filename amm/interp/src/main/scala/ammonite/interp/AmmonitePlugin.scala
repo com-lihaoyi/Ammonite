@@ -1,6 +1,6 @@
 package ammonite.interp
 
-import ammonite.util.{ImportData, Name}
+import ammonite.util.{ImportData, Name, Util}
 
 import scala.reflect.NameTransformer
 import scala.tools.nsc._
@@ -214,7 +214,7 @@ object AmmonitePlugin{
     // together v.s. having them by sent in the arbitrary-jumbled order they
     // come out of the `grouped` map in
 
-    output(open.toVector.sortBy(_.prefix.map(_.backticked).mkString(".")))
+    output(open.toVector.sortBy(x => Util.encodeScalaSourcePath(x.prefix)))
   }
 }
 

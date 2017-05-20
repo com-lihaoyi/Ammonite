@@ -70,6 +70,30 @@ object Util{
   }
   type CompileCache = (ClassFiles, Imports)
 
+  /**
+    * Information about where a particular block of code came from; [[source]]
+    * is optional because some code snippets are synthetic, which means any
+    * filename is entirely synthetic and $file imports do not work in them.
+    * However, there are many snippets of code, e.g. repl commands and such,
+    * which have a "fake" [[source]] because we want to allow $file imports
+    * relative to some path or working-directory
+    */
+  case class CodeSource(wrapperName: Name,
+                        pkgName: Seq[Name],
+                        source: Option[Path]){
+    def fullName = pkgName :+ wrapperName
+
+    def jvmPathPrefix = Util.encodeJvmPath(fullName)
+    def filePathPrefix = Util.encodeFilePath(fullName)
+    def printablePath = source match{
+      case Some(x) => x.toString
+      case None => "<synthetic>/" + filePathPrefix + ".sc"
+    }
+  }
+
+  def encodeFilePath(path: Seq[Name]) = path.map(_.encoded)
+  def encodeScalaSourcePath(path: Seq[Name]) = path.map(_.backticked).mkString(".")
+  def encodeJvmPath(path: Seq[Name]) = path.map(_.encoded).mkString(".")
 
 
   def transpose[A](xs: List[List[A]]): List[List[A]] = {

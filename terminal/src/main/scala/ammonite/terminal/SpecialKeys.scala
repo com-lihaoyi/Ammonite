@@ -13,7 +13,18 @@ object SpecialKeys {
    * or convert a character into its ctrl-ed version
    */
   object Ctrl{
-    def apply(c: Char) = (c - 96).toChar.toString
+    def apply(c: Char) = c.toInt match{
+      // For some reason,  Ctrl -, Ctrl /, Ctrl [, Ctrl ], all don't seem to
+      // follow the same offset as the bulk of the other characters, at least
+      // not on OSX. I haven't managed to find a canonical source of truth for
+      // what generates what, but for now just hardcode it to fix the problem on
+      // OSX until we find a more modular/flexible solution
+      case 45 => 31.toChar.toString
+      case 47 => 31.toChar.toString
+      case 91 => 27.toChar.toString
+      case 93 => 29.toChar.toString
+      case n => (n - 96).toChar.toString
+    }
     def unapply(i: Int): Option[Int] = Some(i + 96)
   }
 

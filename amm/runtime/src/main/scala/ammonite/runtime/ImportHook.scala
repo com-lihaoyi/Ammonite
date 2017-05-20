@@ -5,6 +5,7 @@ import java.io.File
 import acyclic.file
 import ammonite.ops.{read, _}
 import ammonite.runtime.tools.IvyThing
+import ammonite.util.Util.CodeSource
 import ammonite.util._
 
 /**
@@ -47,9 +48,7 @@ object ImportHook{
   sealed trait Result
   object Result{
     case class Source(code: String,
-                      wrapper: Name,
-                      pkg: Seq[Name],
-                      source: Path,
+                      blockInfo: CodeSource,
                       imports: Imports,
                       exec: Boolean) extends Result
     case class ClassPath(file: Path, plugin: Boolean) extends Result
@@ -110,9 +109,7 @@ object ImportHook{
 
                 Result.Source(
                   Util.normalizeNewlines(read(filePath)),
-                  wrapper,
-                  pkg,
-                  filePath,
+                  CodeSource(wrapper, pkg, Some(filePath)),
                   Imports(importData),
                   exec
                 )

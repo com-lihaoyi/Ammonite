@@ -31,8 +31,7 @@ object CachingTests extends TestSuite{
       }
     }
     'blocks{
-      val cases = Seq("OneBlock.sc" -> 2, "TwoBlocks.sc" -> 3, "ThreeBlocks.sc" -> 4)
-      for((fileName, expected) <- cases){
+      def check(fileName: String, expected: Int) = {
         val storage = Storage.InMemory()
         val interp = createTestInterp(storage)
         val n0 = storage.compileCache.size
@@ -42,7 +41,11 @@ object CachingTests extends TestSuite{
 
         val n = storage.compileCache.size
         assert(n == expected)
+
       }
+      * - check("OneBlock.sc", 2)
+      * - check("TwoBlocks.sc", 3)
+      * - check("ThreeBlocks.sc", 4)
     }
 
     'processModuleCaching{
