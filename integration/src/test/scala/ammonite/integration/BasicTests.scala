@@ -17,7 +17,7 @@ import TestUtils._
  */
 object BasicTests extends TestSuite{
   override def utestTruncateLength = 60000
-  println("BasicTests")
+
   val tests = TestSuite {
     println("Running BasicTest")
 
@@ -182,26 +182,6 @@ object BasicTests extends TestSuite{
       }
     }
 
-    'playframework- {
-      if (!Util.windowsPlatform) {
-        if (scalaVersion.startsWith("2.11.") && javaVersion.startsWith("1.8.")){
-          val evaled = exec('basic/"PlayFramework.sc")
-          assert(evaled.out.string.contains("Hello bar"))
-        }
-      }
-    }
-
-    'spark - {
-      // Note that this script screws up if you try to run it within SBT! It has to
-      // be run as an integration test, or via `sbt amm/test:assembly && amm/target/amm`
-      if (!Util.windowsPlatform) {
-        if (scalaVersion.startsWith("2.11.") && javaVersion.startsWith("1.8.")){
-          val evaled = exec('basic/"Spark.sc")
-          assert(evaled.out.string.contains("List(10, 20, 30, 40, 50)"))
-        }
-      }
-    }
-
     'main{
       'single{
         val evaled = exec('basic/"Main.sc")
@@ -322,17 +302,6 @@ object BasicTests extends TestSuite{
         // which means that the error stack that gets printed is short-ish
         assert(errorMsg.lines.length < 12)
 
-      }
-    }
-    'httpApi{
-      'addPost {
-        val res = exec('basic / "HttpApi.sc", "addPost", "title", "some text")
-        assert(res.out.trim.startsWith("101"))
-      }
-      'comments{
-        val res = exec('basic / "HttpApi.sc", "comments", "40")
-        assert(res.out.trim.contains("totam vel saepe aut"))
-        assert(res.out.trim.contains("aperiam et omnis totam"))
       }
     }
   }
