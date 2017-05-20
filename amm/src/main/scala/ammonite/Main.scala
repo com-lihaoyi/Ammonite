@@ -63,11 +63,15 @@ case class Main(predef: String = "",
                 infoStream: OutputStream = System.err,
                 errorStream: OutputStream = System.err,
                 verboseOutput: Boolean = true){
+
   /**
     * Instantiates an ammonite.Repl using the configuration
     */
   def instantiateRepl(replArgs: Seq[Bind[_]] = Nil) = {
-    val augmentedPredef = Main.maybeDefaultPredef(defaultPredef, Defaults.predefString)
+    val augmentedPredef = Main.maybeDefaultPredef(
+      defaultPredef,
+      Defaults.replPredef + Defaults.predefString
+    )
 
     new Repl(
       inputStream, outputStream, infoStream, errorStream,
@@ -127,7 +131,7 @@ case class Main(predef: String = "",
     */
   def runScript(path: Path,
                 scriptArgs: Seq[(String, Option[String])],
-                replApi: Boolean = false): Res[Imports] = {
+                replApi: Boolean = false): Res[Any] = {
 
     val interp = instantiateInterpreter(replApi)
     main.Scripts.runScript(wd, path, interp, scriptArgs)
@@ -235,7 +239,7 @@ object Main{
               super.loadPredef
             else
               try {
-                predefFiles.map(f => read(f)).mkString("\n")
+                predefFiles.map(f => read(f)).mkString(Util.newLine)
               } catch {
                 case e: java.nio.file.NoSuchFileException => ""
               }
@@ -247,7 +251,8 @@ object Main{
       (fileToExecute, codeToExecute) match {
         case (None, None) => println("Loading..."); main(true).run()
         case (Some(path), None) =>
-          main(false).runScript(path, scriptArgs, replApi) match {
+          val scriptMain = main(false)
+          scriptMain.runScript(path, scriptArgs, replApi) match {
             case Res.Failure(exOpt, msg) =>
               Console.err.println(msg)
               System.exit(1)
@@ -256,9 +261,11 @@ object Main{
               val i = trace.indexWhere(_.getMethodName == "$main") + 1
               ex.setStackTrace(trace.take(i))
               throw ex
-            case Res.Success(_) =>
-            case Res.Skip   =>
-            // do nothing on success, everything's already happened
+            case Res.Success(value) =>
+              if (value != ()){
+                pprint.PPrinter.BlackWhite.pprintln(value)
+              }
+            case Res.Skip   => // do nothing on success, everything's already happened
           }
 
         case (None, Some(code)) => main(false).runCode(code, replApi)

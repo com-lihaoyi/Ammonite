@@ -655,6 +655,9 @@ class Interpreter(val printer: Printer,
     eval.frames.head.pluginClassloader.add(jar.toURI.toURL)
   }
   lazy val interpApi: InterpAPI = new InterpAPI{ outer =>
+
+    val beforeExitHooks = interp.beforeExitHooks
+
     val repositories = Ref(ammonite.runtime.tools.IvyThing.defaultRepositories)
 
     object load extends DefaultLoadJar with Load {

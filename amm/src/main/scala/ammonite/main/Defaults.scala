@@ -56,19 +56,20 @@ object Defaults{
     |import ammonite.runtime.tools._
     |import ammonite.repl.tools._
     |import ammonite.runtime.tools.IvyConstructor.{ArtifactIdExt, GroupIdExt}
-    |import ammonite.repl.ReplBridge.value.{
-    |  exit,
+    |import ammonite.main.Router.{doc, main}
+    |import ammonite.main.Scripts.pathScoptRead
+    |import ammonite.runtime.InterpBridge.value.exit
+    |""".stripMargin
+
+  val replPredef = """
+    |  import ammonite.repl.ReplBridge.value.{
     |  codeColorsImplicit,
     |  tprintColorsImplicit,
     |  pprinterImplicit,
     |  show,
     |  typeOf
     |}
-    |import ammonite.main.Router.{doc, main}
-    |import ammonite.main.Scripts.pathScoptRead
-    |""".stripMargin
-
-
+  """.stripMargin
   def ammoniteHome = ammonite.ops.Path(System.getProperty("user.home"))/".ammonite"
 
 }

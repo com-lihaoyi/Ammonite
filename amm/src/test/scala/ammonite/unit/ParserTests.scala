@@ -9,8 +9,11 @@ object ParserTests extends TestSuite{
     println("ParserTests")
     'shebang{
       def check(original: String, expected: String) = {
-        val skipped = ammonite.interp.Interpreter.skipSheBangLine(original)
-        assert(skipped == expected)
+        val skipped = ammonite.interp.Interpreter.skipSheBangLine(
+          ammonite.util.Util.normalizeNewlines(original)
+        )
+        val normalizedExpected = ammonite.util.Util.normalizeNewlines(expected)
+        assert(skipped == normalizedExpected)
       }
       "env" - check(
         """#! /usr/bin/env amm

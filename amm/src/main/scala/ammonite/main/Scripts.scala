@@ -2,7 +2,7 @@ package ammonite.main
 import java.nio.file.NoSuchFileException
 
 import acyclic.file
-import ammonite.runtime.ImportHook
+import ammonite.runtime.{ImportHook, ReplExit}
 import ammonite.main.Router.{ArgSig, EntryPoint}
 import ammonite.ops._
 import ammonite.util.Name.backtickWrap
@@ -85,10 +85,10 @@ object Scripts {
       res <- interp.withContextClassloader{
         scriptMains match {
           // If there are no @main methods, there's nothing to do
-          case Seq() => Res.Success(processed.finalImports)
+          case Seq() => Res.Success(())
           // If there's one @main method, we run it with all args
           case Seq(main) =>
-            runMainMethod(main, scriptArgs).getOrElse(Res.Success(processed.finalImports))
+            runMainMethod(main, scriptArgs)
           // If there are multiple @main methods, we use the first arg to decide
           // which method to run, and pass the rest to that main method
           case mainMethods =>
@@ -102,7 +102,7 @@ object Scripts {
               case Seq((head, Some(_)), tail @ _*) =>
                 Res.Failure(
                   None,
-                  s"To select a subcommand to run, you don't need --s.\n" +
+                  "To select a subcommand to run, you don't need --s." + Util.newLine +
                   "Did you mean `${head.drop(2)}` instead of `$head`?"
                 )
               case Seq((head, None), tail @ _*) =>
@@ -113,7 +113,7 @@ object Scripts {
                       s"Unable to find subcommand: " + backtickWrap(head) + suffix
                     )
                   case Some(main) =>
-                    runMainMethod(main, tail).getOrElse(Res.Success(processed.finalImports))
+                    runMainMethod(main, tail)
                 }
             }
         }
@@ -138,7 +138,7 @@ object Scripts {
     }
   }
   def runMainMethod(mainMethod: Router.EntryPoint,
-                    scriptArgs: Seq[(String, Option[String])]): Option[Res.Failing] = {
+                    scriptArgs: Seq[(String, Option[String])]): Res[Any] = {
 
     def expectedMsg = {
       val commaSeparated =
@@ -150,8 +150,9 @@ object Scripts {
     }
 
     mainMethod.invoke(scriptArgs) match{
-      case Router.Result.Success(x) => None
-      case Router.Result.Error.Exception(x) => Some(Res.Exception(x, ""))
+      case Router.Result.Success(x) => Res.Success(x)
+      case Router.Result.Error.Exception(x: ReplExit) => Res.Success(x.value)
+      case Router.Result.Error.Exception(x) => Res.Exception(x, "")
       case Router.Result.Error.MismatchedArguments(missing, unknown, duplicate) =>
         val missingStr =
           if (missing.isEmpty) ""
@@ -160,13 +161,13 @@ object Scripts {
               for (x <- missing)
               yield x.name + ": " + x.typeString
 
-            s"Missing arguments: (${chunks.mkString(", ")})\n"
+            s"Missing arguments: (${chunks.mkString(", ")})" + Util.newLine
           }
 
 
         val unknownStr =
           if (unknown.isEmpty) ""
-          else s"Unknown arguments: " + unknown.map(literalize(_)).mkString(", ") + "\n"
+          else s"Unknown arguments: " + unknown.map(literalize(_)).mkString(", ") + Util.newLine
 
         val duplicateStr =
           if (duplicate.isEmpty) ""
@@ -175,14 +176,14 @@ object Scripts {
               for ((sig, options) <- duplicate)
               yield {
                 s"Duplicate arguments for (${sig.name}: ${sig.typeString}): " +
-                options.map(literalize(_)) + "\n"
+                options.map(literalize(_)) + Util.newLine
               }
 
             lines.mkString
 
           }
 
-        Some(Res.Failure(
+        Res.Failure(
           None,
           Util.normalizeNewlines(
             s"""Arguments provided did not match expected signature:
@@ -191,11 +192,10 @@ object Scripts {
                |$missingStr$unknownStr$duplicateStr
                |""".stripMargin
           )
-
-        ))
+        )
 
       case Router.Result.Error.InvalidArguments(x) =>
-        Some(Res.Failure(
+        Res.Failure(
           None,
           "The following arguments failed to be parsed:" + Util.newLine +
             x.map{
@@ -204,11 +204,17 @@ object Scripts {
               case Router.Result.ParamError.DefaultFailed(p, ex) =>
                 s"(${renderArg(p)})'s default value failed to evaluate with $ex"
             }.mkString(Util.newLine) + Util.newLine + s"expected arguments: $expectedMsg"
-        ))
+        )
     }
   }
 
-  def renderArg(arg: ArgSig) = backtickWrap(arg.name) + ": " + arg.typeString
+  def renderArg(arg: ArgSig) = {
+    val suffix = arg.default match{
+      case Some(f) => " = " + f()
+      case None => ""
+    }
+    backtickWrap(arg.name) + ": " + arg.typeString + suffix
+  }
 
 
   def mainMethodDetails(ep: EntryPoint) = {

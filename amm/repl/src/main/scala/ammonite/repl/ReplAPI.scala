@@ -12,19 +12,7 @@ import scala.collection.mutable
 
 
 trait ReplAPI {
-  /**
-   * Exit the Ammonite REPL. You can also use Ctrl-D to exit
-   */
-  def exit = throw ReplExit(())
-  /**
-   * Exit the Ammonite REPL. You can also use Ctrl-D to exit
-   */
-  def exit(value: Any) = throw ReplExit(value)
-  /**
-    * Functions that will be chained and called on the
-    * exitValue before the repl exits
-    */
-  val beforeExitHooks: mutable.Buffer[Any ⇒ Any]
+
 
 
   /**

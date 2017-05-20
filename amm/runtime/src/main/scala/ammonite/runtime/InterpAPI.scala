@@ -1,9 +1,10 @@
 package ammonite.runtime
 
 import ammonite.ops._
-
 import ammonite.util.Ref
 import acyclic.file
+
+import scala.collection.mutable
 import scala.util.control.ControlThrowable
 
 
@@ -27,6 +28,19 @@ trait InterpAPI {
    */
   def repositories: Ref[List[coursier.Repository]]
 
+  /**
+    * Exit the Ammonite REPL. You can also use Ctrl-D to exit
+    */
+  def exit = throw ReplExit(())
+  /**
+    * Exit the Ammonite REPL. You can also use Ctrl-D to exit
+    */
+  def exit(value: Any) = throw ReplExit(value)
+  /**
+    * Functions that will be chained and called on the
+    * exitValue before the repl exits
+    */
+  val beforeExitHooks: mutable.Buffer[Any => Any]
 }
 
 

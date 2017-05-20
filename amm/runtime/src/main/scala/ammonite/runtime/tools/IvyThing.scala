@@ -2,7 +2,7 @@ package ammonite.runtime.tools
 
 import java.io.PrintWriter
 
-import ammonite.util.Printer
+import ammonite.util.{Printer, Util}
 
 
 object IvyConstructor extends IvyConstructor
@@ -41,9 +41,12 @@ object IvyThing{
       val formattedMsgs = for(((module, version), msgs) <- resolution.metadataErrors) yield {
         module.organization + ":" +
         module.name + ":" +
-        version + " " + msgs.map("\n    " + _).mkString
+        version + " " + msgs.map(Util.newLine + "    " + _).mkString
       }
-      Left("Failed to resolve ivy dependencies:" + formattedMsgs.map("\n  " + _).mkString)
+      Left(
+        "Failed to resolve ivy dependencies:" +
+        formattedMsgs.map(Util.newLine + "  " + _).mkString
+      )
     }else {
       val localArtifacts = scalaz.concurrent.Task.gatherUnordered(
         for (a <- resolution.artifacts)
@@ -54,7 +57,10 @@ object IvyThing{
       val successes = localArtifacts.collect { case scalaz.\/-(x) => x }
 
       if (errors.nonEmpty) {
-        Left("Failed to load dependencies" + errors.map("\n  " + _.describe).mkString)
+        Left(
+          "Failed to load dependencies" +
+          errors.map(Util.newLine + "  " + _.describe).mkString
+        )
       } else {
         Right(successes)
       }

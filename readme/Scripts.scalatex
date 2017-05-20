@@ -209,16 +209,31 @@
         When the script is run from the command line:
 
       @hl.sh
-        amm Args.sc 3 Moo
+        $ amm Args.sc 3 Moo
+        "Hello! MooMooMoo Ammonite."
 
       @p
         The top-level definitions execute first (e.g. setting @hl.scala{x}),
         and then the @hl.scala("@main") method is called with the arguments you
-        passed in. You can also pass in named arguments using @code{--} to demarcate
+        passed in. Note that the return-value of the script is pretty-printed
+        by default, which quotes strings and may nicely format/indent lists or
+        other data-structures. If you want to avoid this default pretty-printing
+        behavior, annotate your @hl.scala("@main") method as returning
+        @hl.scala{: Unit} and add your own @hl.scala{println}s:
+
+      @hl.ref(wd/'integration/'src/'test/'resources/'ammonite/'integration/'basic/"Args2.sc")
+
+      @hl.sh
+        $ amm Args2.sc 3 Moo
+        Hello! MooMooMoo Ammonite
+
+      @p
+        You can also pass in named arguments using @code{--} to demarcate
         them:
 
       @hl.sh
-        amm Args.sc -- --i 3 --s Moo
+        $ amm Args.sc --i 3 --s Moo
+        "Hello! MooMooMoo Ammonite."
 
       @p
         Default arguments behave as you would expect (i.e. they allow you to
@@ -227,9 +242,10 @@
         like @code{Int}, @code{Double}, @code{String}, as well as basic
         data-structures like @code{Seq}s (taken as a comma-separated list) and
         common types like @sect.ref{Paths}.
+
       @p
         If you pass in the wrong number of arguments, or if an argument fails
-        to deserialize, the script will fail with an exception.
+        to deserialize, the script will fail with an error message.
 
       @p
         The @hl.scala{main} method does not get automatically called when you
@@ -255,7 +271,9 @@
       @p
         In which case Ammonite will take all arguments and forward them to your
         main method un-checked and un-validated, from which point you can deal
-        with the raw @code{Seq[String]} however you wish.
+        with the raw @code{Seq[String]} however you wish. Note that
+        @hl.scala{vararg*} arguments cannot be passed by-name, e.g. via
+        @code{--args foo}
 
     @sect{Multiple Main Methods}
       @p

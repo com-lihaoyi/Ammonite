@@ -38,7 +38,11 @@ class TestRepl {
       storage = new Storage.Folder(tempDir),
       wd = ammonite.ops.pwd,
       customPredefs = Seq(
-        Interpreter.PredefInfo(Name("defaultPredef"), ammonite.main.Defaults.predefString, true),
+        Interpreter.PredefInfo(
+          Name("defaultPredef"),
+          ammonite.main.Defaults.replPredef + ammonite.main.Defaults.predefString,
+          true
+        ),
         Interpreter.PredefInfo(Name("testPredef"), predef, false)
       ),
       extraBridges = { i =>

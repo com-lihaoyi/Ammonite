@@ -313,7 +313,8 @@ object Preprocessor{
 package ${pkgName.map(_.backticked).mkString(".")}
 ${importBlock(imports)}
 
-object ${indexedWrapperName.backticked}{\n""")
+object ${indexedWrapperName.backticked}{\n"""
+)
 
     val bottomWrapper = normalizeNewlines(s"""\ndef $$main() = { $printCode }
   override def toString = "${indexedWrapperName.raw}"

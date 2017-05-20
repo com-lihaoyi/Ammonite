@@ -1107,5 +1107,17 @@
           by default, letting you use your own custom arg parsers on the input
           strings. Fixes @issue(423), @issue(479), @issue(538)
         @li
+          The *return values* of Ammonite scripts' @hl.scala("@main") methods
+          or @hl.scala{exit(...)} calls now gets pretty-printed by default when
+          the script completes. This make composing scripts much more convenient:
+          the same @hl.scala("@main") methods you use when printing output to the
+          command-line can also be used from Scala code when imported from
+          other scripts. To disable this, annotate your main method as returning
+          @hl.scala{: Unit}
+        @li
+          @hl.scala{exit} can now be cleanly used in Scripts without failing
+          with a @code{NullPointerException}, in addition to its existing use
+          in the REPL.
+        @li
           Avoid crashes when non-existent paths are on the classpath, thanks to
           @lnk("Olivier Roland", "https://github.com/newca12")

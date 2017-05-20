@@ -70,7 +70,6 @@ class ReplApiImpl(val interp: Interpreter,
   val colors = colors0
   val prompt = prompt0
   val frontEnd = frontEnd0
-  val beforeExitHooks = interp.beforeExitHooks
 
   implicit def tprintColorsImplicit = pprint.TPrintColors(
     typeColor = colors().`type`()
