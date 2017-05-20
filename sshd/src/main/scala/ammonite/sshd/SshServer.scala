@@ -1,6 +1,5 @@
 package ammonite.sshd
 
-
 import java.util.Collections
 
 import ammonite.ops.Path
@@ -8,11 +7,9 @@ import org.apache.sshd.agent.SshAgentFactory
 import org.apache.sshd.common._
 import org.apache.sshd.common.file.FileSystemFactory
 import org.apache.sshd.common.session.{ConnectionService, Session}
+import org.apache.sshd.server.auth.keyboard.DefaultKeyboardInteractiveAuthenticator
 import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider
-import org.apache.sshd.server.session.ServerSession
-import org.apache.sshd.server.{Command, CommandFactory}
-import org.apache.sshd.server.auth.password.PasswordAuthenticator
-import org.apache.sshd.server.{SshServer => SshServerImpl}
+import org.apache.sshd.server.{Command, CommandFactory, SshServer => SshServerImpl}
 
 /**
  * A factory to simplify creation of ssh server
@@ -22,9 +19,15 @@ object SshServer {
     val sshServer = SshServerImpl.setUpDefaultServer()
     sshServer.setHost(options.address)
     sshServer.setPort(options.port)
-    sshServer.setPasswordAuthenticator(
-      passwordAuthenticator(options.username, options.password)
-    )
+    options.passwordAuthenticator.foreach { auth =>
+      sshServer.setPasswordAuthenticator(auth)
+      sshServer.setKeyboardInteractiveAuthenticator(
+        new DefaultKeyboardInteractiveAuthenticator()
+      )
+    }
+    options.publicKeyAuthenticator.foreach { auth =>
+      sshServer.setPublickeyAuthenticator(auth)
+    }
     sshServer.setKeyPairProvider(keyPairProvider(options))
     sshServer.setShellFactory(new Factory[Command] {
       override def create(): Command = new ShellSession(shellServer)
@@ -36,7 +39,9 @@ object SshServer {
     val hostKeyFile = touch(
       options.hostKeyFile.getOrElse(fallbackHostkeyFilePath(options))
     )
-    new SimpleGeneratorHostKeyProvider(hostKeyFile.toNIO)
+    val provider = new SimpleGeneratorHostKeyProvider(hostKeyFile.toNIO)
+    provider.setAlgorithm("RSA")
+    provider
   }
 
   private def disableUnsupportedChannels(sshServer: SshServerImpl) = {
@@ -72,12 +77,4 @@ object SshServer {
     }
     file
   }
-
-  private def passwordAuthenticator(correctUsername: String,
-                                    correctPassword: String) =
-    new PasswordAuthenticator {
-      override def authenticate(username: String,
-                                password: String, session: ServerSession) =
-        username == correctUsername && password == correctPassword
-    }
 }

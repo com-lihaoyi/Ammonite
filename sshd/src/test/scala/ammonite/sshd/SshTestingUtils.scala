@@ -5,6 +5,8 @@ import java.util.concurrent.TimeoutException
 
 import ammonite.ops._
 import com.jcraft.jsch.{Channel, JSch, Session, UserInfo}
+import org.apache.sshd.server.auth.password.PasswordAuthenticator
+import org.apache.sshd.server.session.ServerSession
 import org.scalacheck.Gen
 import org.apache.sshd.server.{SshServer => SshServerImpl}
 
@@ -52,9 +54,12 @@ object SshTestingUtils {
     def config = SshServerConfig(
       "localhost",
       port = 0,
-      username = user._1,
-      password = user._2,
-      ammoniteHome = dir
+      ammoniteHome = dir,
+      passwordAuthenticator = Some(new PasswordAuthenticator {
+        def authenticate(username: String, password: String, session: ServerSession): Boolean = {
+          (username, password) == user
+        }
+      })
     )
     SshServer(config, shell)
   }

@@ -5,11 +5,10 @@ import java.io.{InputStream, OutputStream, PrintStream}
 
 import ammonite.ops.Path
 import ammonite.sshd.util.Environment
-import ammonite.util.{Bind, Ref}
+import ammonite.util.Bind
 import ammonite.runtime.Storage
 import ammonite.repl.Repl
-
-import scala.language.postfixOps
+import org.apache.sshd.server.session.ServerSession
 
 /**
  * An ssh server which serves ammonite repl as it's shell channel.
@@ -19,8 +18,9 @@ import scala.language.postfixOps
  * @param sshConfig configuration of ssh server,
  *                  such as users credentials or port to be listening to
  * @param predef predef that will be installed on repl instances served by this server
- * @param replArgs arguments to pass to ammonite repl on initialization of the session
- * @param classloader classloader for ammonite to use
+ * @param replArgs arguments to pass to ammonite repl on initialization of the session;
+ *                 an argument named "session" containing the SSHD session will be added
+ * @param classLoader classloader for ammonite to use
  */
 class SshdRepl(sshConfig: SshServerConfig,
                predef: String = "",
@@ -28,8 +28,17 @@ class SshdRepl(sshConfig: SshServerConfig,
                wd: Path = ammonite.ops.pwd,
                replArgs: Seq[Bind[_]] = Nil,
                classLoader: ClassLoader = SshdRepl.getClass.getClassLoader) {
-  private lazy val sshd = SshServer(sshConfig, shellServer =
-    SshdRepl.runRepl(sshConfig.ammoniteHome, predef, defaultPredef, wd, replArgs, classLoader))
+  private lazy val sshd = SshServer(
+    sshConfig,
+    shellServer = SshdRepl.runRepl(
+      sshConfig.ammoniteHome,
+      predef,
+      defaultPredef,
+      wd,
+      replArgs,
+      classLoader
+    )
+  )
 
   def port = sshd.getPort
   def start(): Unit = sshd.start()
@@ -51,8 +60,8 @@ object SshdRepl {
     // where things like System.out will output to the
     // server's console, we need to prepare individual environment
     // to serve this particular user's session
-    val replSessionEnv = Environment(replServerClassLoader, in, out)
-    Environment.withEnvironment(replSessionEnv) {
+
+    Environment.withEnvironment(Environment(replServerClassLoader, in, out)) {
       try {
         val augmentedPredef = ammonite.Main.maybeDefaultPredef(
           defaultPredef,
@@ -61,7 +70,7 @@ object SshdRepl {
         new Repl(
           in, out, out, out,
           new Storage.Folder(homePath), augmentedPredef, predef,
-          wd, Some(ammonite.main.Defaults.welcomeBanner), replArgs
+          wd, Some(ammonite.main.Defaults.welcomeBanner)
         ).run()
       } catch {
         case any: Throwable =>

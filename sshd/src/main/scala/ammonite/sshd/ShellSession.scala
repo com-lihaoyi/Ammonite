@@ -3,6 +3,7 @@ package ammonite.sshd
 import java.io.{InputStream, OutputStream}
 
 import org.apache.sshd.server._
+import org.apache.sshd.server.session.ServerSession
 
 /**
  * Implementation of ssh server's remote shell session,
@@ -10,7 +11,8 @@ import org.apache.sshd.server._
  * @param remoteShell actual shell implementation,
  *                    which will serve remote user's shell session.
  */
-private[sshd] class ShellSession(remoteShell: ShellSession.Server) extends Command {
+private[sshd] class ShellSession(remoteShell: ShellSession.Server)
+  extends Command {
   var in: InputStream = _
   var out: OutputStream = _
   var exit: ExitCallback = _
@@ -79,6 +81,7 @@ private[sshd] class ShellSession(remoteShell: ShellSession.Server) extends Comma
       write(bytes.slice(offset, offset + length))
     }
   }
+
 }
 
 object ShellSession {
