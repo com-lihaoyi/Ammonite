@@ -468,7 +468,7 @@
           functionality available under the @code{interp} object, which is also
           available in scripts:
 
-        @hl.ref('amm/'runtime/'src/'main/'scala/'ammonite/'runtime/"InterpAPI.scala", "trait InterpAPI")
+        @hl.ref('amm/'runtime/'src/'main/'scala/'ammonite/'interp/"InterpAPI.scala", "trait InterpAPI")
 
       @sect{Utilities}
         @p

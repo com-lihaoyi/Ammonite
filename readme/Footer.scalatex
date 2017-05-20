@@ -1077,8 +1077,8 @@
           @lnk("Coursier", "https://github.com/coursier/coursier") library for
           dependency resolution and downloading. This should @i{hopefully} fix
           many of our perenniel, non-deterministic Ivy resolution problems such
-          as @issue(300), @issue(455), @issue(473), @issue(523), @issue(573),
-          @issue(583)
+          as @issue(300), @issue(455), @issue(473), @issue(484), @issue(523),
+          @issue(573), @issue(583)
         @li
           Basic @lnk("Apache Spark", "http://spark.apache.org/") support! You
           can now run basic Spark commands in Ammonite scripts, as well as
@@ -1127,3 +1127,6 @@
         @li
           Avoid crashes when non-existent paths are on the classpath, thanks to
           @lnk("Olivier Roland", "https://github.com/newca12")
+        @li
+          Default to RSA in Ammonite's @sect.ref{Remote REPL} and enable key-based
+          auth (@issue(594)) thanks to @lnk("Espen Wiborg", "https://github.com/espenhw")
