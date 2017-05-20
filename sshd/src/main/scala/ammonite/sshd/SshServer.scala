@@ -1,6 +1,6 @@
 package ammonite.sshd
 
-import acyclic.file
+
 import java.util.Collections
 
 import ammonite.ops.Path

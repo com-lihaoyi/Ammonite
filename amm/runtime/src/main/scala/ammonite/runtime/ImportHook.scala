@@ -2,7 +2,7 @@ package ammonite.runtime
 
 import java.io.File
 
-import acyclic.file
+
 import ammonite.ops.{read, _}
 import ammonite.runtime.tools.IvyThing
 import ammonite.util.Util.CodeSource

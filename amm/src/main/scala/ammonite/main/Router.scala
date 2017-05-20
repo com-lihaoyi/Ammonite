@@ -1,5 +1,5 @@
 package ammonite.main
-import acyclic.file
+
 import sourcecode.Compat.Context
 
 import scala.annotation.StaticAnnotation

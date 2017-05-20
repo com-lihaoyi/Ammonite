@@ -1,6 +1,6 @@
 package ammonite.repl
 import scala.annotation.tailrec
-import acyclic.file
+
 import ammonite.util.Util.newLine
 /**
  * Created by haoyi on 8/29/15.

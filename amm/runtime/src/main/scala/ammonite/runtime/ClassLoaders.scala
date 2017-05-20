@@ -5,7 +5,7 @@ import java.net.{URL, URLClassLoader, URLConnection, URLStreamHandler}
 import java.nio.ByteBuffer
 import java.util.{Collections, Enumeration}
 
-import acyclic.file
+
 import ammonite.ops._
 import ammonite.util.{Imports, Util}
 
@@ -118,8 +118,8 @@ class SpecialClassLoader(parent: ClassLoader, parentSignature: Seq[(Path, Long)]
   val specialLocalClasses = Set(
     "ammonite.repl.ReplBridge",
     "ammonite.repl.ReplBridge$",
-    "ammonite.runtime.InterpBridge",
-    "ammonite.runtime.InterpBridge$"
+    "ammonite.interp.InterpBridge",
+    "ammonite.interp.InterpBridge$"
   )
   override def findClass(name: String): Class[_] = {
     val loadedClass = this.findLoadedClass(name)

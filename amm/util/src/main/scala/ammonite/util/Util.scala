@@ -4,7 +4,7 @@
 package ammonite.util
 
 import java.security.MessageDigest
-import acyclic.file
+
 import ammonite.ops._
 
 

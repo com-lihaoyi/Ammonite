@@ -2,7 +2,7 @@ package ammonite.runtime
 
 import java.nio.file.FileAlreadyExistsException
 
-import acyclic.file
+
 import ammonite.ops._
 import ammonite.util.ImportTree
 import ammonite.util.{Imports, StableRef}

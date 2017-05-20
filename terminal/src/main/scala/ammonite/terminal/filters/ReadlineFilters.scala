@@ -4,7 +4,7 @@ package ammonite.terminal.filters
 import ammonite.terminal.Filter._
 import ammonite.terminal.SpecialKeys._
 import ammonite.terminal.{DelegateFilter, Filter, Terminal}
-import acyclic.file
+
 /**
  * Filters for injection of readline-specific hotkeys, the sort that
  * are available in bash, python and most other interactive command-lines

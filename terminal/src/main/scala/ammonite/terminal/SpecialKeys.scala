@@ -1,6 +1,6 @@
 package ammonite.terminal
 
-import acyclic.file
+
 /**
  * One place to assign all the esotic control key input snippets to
  * easy-to-remember names

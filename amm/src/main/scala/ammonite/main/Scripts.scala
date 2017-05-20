@@ -1,10 +1,11 @@
 package ammonite.main
 import java.nio.file.NoSuchFileException
 
-import acyclic.file
-import ammonite.runtime.{ImportHook, ReplExit}
+
+import ammonite.runtime.ImportHook
 import ammonite.main.Router.{ArgSig, EntryPoint}
 import ammonite.ops._
+import ammonite.runtime.Evaluator.AmmoniteExit
 import ammonite.util.Name.backtickWrap
 import ammonite.util.Util.{CodeSource, VersionedWrapperId}
 import ammonite.util.{Name, Res, Util}
@@ -149,7 +150,7 @@ object Scripts {
 
     mainMethod.invoke(scriptArgs) match{
       case Router.Result.Success(x) => Res.Success(x)
-      case Router.Result.Error.Exception(x: ReplExit) => Res.Success(x.value)
+      case Router.Result.Error.Exception(x: AmmoniteExit) => Res.Success(x.value)
       case Router.Result.Error.Exception(x) => Res.Exception(x, "")
       case Router.Result.Error.MismatchedArguments(missing, unknown, duplicate) =>
         val missingStr =

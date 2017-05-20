@@ -41,6 +41,7 @@ val sharedSettings = Seq(
   },
   testFrameworks := Seq(new TestFramework("utest.runner.Framework")),
   scalacOptions += "-target:jvm-1.7",
+  scalacOptions += "-P:acyclic:force",
   autoCompilerPlugins := true,
   addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.7"),
   ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) },

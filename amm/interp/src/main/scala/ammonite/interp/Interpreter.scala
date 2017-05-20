@@ -55,6 +55,7 @@ class Interpreter(val printer: Printer,
 
   val dynamicClasspath = new VirtualDirectory("(memory)", None)
   var compiler: Compiler = null
+  val onCompilerInit = mutable.Buffer.empty[scala.tools.nsc.Global => Unit]
   var pressy: Pressy = _
   val beforeExitHooks = mutable.Buffer.empty[Any ⇒ Any]
 
@@ -79,6 +80,9 @@ class Interpreter(val printer: Printer,
       () => pressy.shutdownPressy(),
       settings
     )
+
+    onCompilerInit.foreach(_(compiler.compiler))
+
     pressy = Pressy(
       Classpath.classpath ++ eval.frames.head.classpath,
       dynamicClasspath,
@@ -88,7 +92,7 @@ class Interpreter(val printer: Printer,
     )
   }
 
-  val bridges = extraBridges(this) :+ ("ammonite.runtime.InterpBridge", "interp", interpApi)
+  val bridges = extraBridges(this) :+ ("ammonite.interp.InterpBridge", "interp", interpApi)
   for ((name, shortName, bridge) <- bridges ){
     APIHolder.initBridge(evalClassloader, name, bridge)
   }
@@ -639,6 +643,13 @@ class Interpreter(val printer: Printer,
     eval.frames.head.pluginClassloader.add(jar.toURI.toURL)
   }
   lazy val interpApi: InterpAPI = new InterpAPI{ outer =>
+
+    def configureCompiler(callback: scala.tools.nsc.Global => Unit) = {
+      interp.onCompilerInit.append(callback)
+      if (compiler != null){
+        callback(compiler.compiler)
+      }
+    }
 
     val beforeExitHooks = interp.beforeExitHooks
 

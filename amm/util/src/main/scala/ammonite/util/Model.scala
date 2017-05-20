@@ -4,7 +4,7 @@
   */
 package ammonite.util
 
-import acyclic.file
+
 
 
 import scala.collection.mutable

@@ -1,6 +1,6 @@
 package ammonite.repl
 
-import acyclic.file
+
 import ammonite.interp.Parsers
 
 import fastparse.all._

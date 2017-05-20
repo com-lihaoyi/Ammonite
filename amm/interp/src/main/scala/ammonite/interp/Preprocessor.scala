@@ -1,6 +1,6 @@
 package ammonite.interp
 
-import acyclic.file
+
 import ammonite._
 import ammonite.util._
 import ammonite.util.Util.{windowsPlatform, newLine, normalizeNewlines}

@@ -3,13 +3,14 @@ package ammonite.runtime
 import java.io.OutputStream
 import java.lang.reflect.InvocationTargetException
 
-import acyclic.file
+
 import ammonite._
 import util.Util.{ClassFiles, ScriptOutput, VersionedWrapperId, newLine}
 import ammonite.util._
 
 import scala.reflect.io.VirtualDirectory
 import scala.util.Try
+import scala.util.control.ControlThrowable
 
 /**
  * Evaluates already-compiled Bytecode.
@@ -42,12 +43,16 @@ trait Evaluator{
 }
 
 object Evaluator{
+  /**
+    * Thrown to exit the REPL cleanly
+    */
+  case class AmmoniteExit(value: Any) extends ControlThrowable
   type InvEx = InvocationTargetException
   type InitEx = ExceptionInInitializerError
 
   val userCodeExceptionHandler: PartialFunction[Throwable, Res.Failing] = {
     // Exit
-    case Ex(_: InvEx, _: InitEx, ReplExit(value))  => Res.Exit(value)
+    case Ex(_: InvEx, _: InitEx, AmmoniteExit(value))  => Res.Exit(value)
 
     // Interrupted during pretty-printing
     case Ex(e: ThreadDeath)                 =>  interrupted(e)

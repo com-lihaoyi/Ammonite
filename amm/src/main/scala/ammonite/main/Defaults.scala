@@ -1,6 +1,6 @@
 
 package ammonite.main
-import acyclic.file
+
 import ammonite.util.Util
 
 /**
@@ -58,7 +58,7 @@ object Defaults{
     |import ammonite.runtime.tools.IvyConstructor.{ArtifactIdExt, GroupIdExt}
     |import ammonite.main.Router.{doc, main}
     |import ammonite.main.Scripts.pathScoptRead
-    |import ammonite.runtime.InterpBridge.value.exit
+    |import ammonite.interp.InterpBridge.value.exit
     |""".stripMargin
 
   val replPredef = """

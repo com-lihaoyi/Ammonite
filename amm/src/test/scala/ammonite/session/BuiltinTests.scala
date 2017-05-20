@@ -112,6 +112,15 @@ object BuiltinTests extends TestSuite{
 
         @ List(1) match { case _: List[Double] => 2 }
         warning: $fruitlessTypeTestWarningMessageBlahBlahBlah
+
+        @ // Note you can refer to `repl.compiler` when interactive in the REPL
+
+        @ // But you should use `interp.configureCompiler` in your scripts/predef
+
+        @ // because `repl.compiler` may be `null` if the script is cached.
+
+        @ repl.compiler.settings.nowarnings.value
+        res10: Boolean = false
       """)
     }
     'infoLogging{

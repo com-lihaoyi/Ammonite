@@ -4,8 +4,8 @@ import ammonite.util.{Bind, CodeColors, Colors, Ref}
 import ammonite.util.Util.newLine
 
 import scala.reflect.runtime.universe._
-import acyclic.file
-import ammonite.runtime.{APIHolder, Frame, History, ReplExit}
+
+import ammonite.runtime.{APIHolder, Frame, History}
 
 import scala.collection.mutable
 

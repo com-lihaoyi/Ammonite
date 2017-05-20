@@ -3,7 +3,7 @@ package ammonite.runtime
 import java.io.File
 import java.util.zip.ZipFile
 
-import acyclic.file
+
 
 import scala.util.control.NonFatal
 

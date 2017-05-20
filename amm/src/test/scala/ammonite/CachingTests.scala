@@ -129,6 +129,19 @@ object CachingTests extends TestSuite{
       assert(n == 5) // customLolz predef + two blocks for each loaded file
     }
 
+    'compilerInit{
+      val tempDir = ammonite.ops.Path(
+        java.nio.file.Files.createTempDirectory("ammonite-tester-x")
+      )
+
+      val interp1 = createTestInterp(new Storage.Folder(tempDir))
+      val interp2 = createTestInterp(new Storage.Folder(tempDir))
+
+      interp1.interpApi.load.module(scriptPath/"cachedCompilerInit.sc")
+      interp2.interpApi.load.module(scriptPath/"cachedCompilerInit.sc")
+      assert(interp2.compilationCount == 0)
+    }
+
     'changeScriptInvalidation{
       // This makes sure that the compile caches are properly utilized, and
       // flushed, in a variety of circumstances: changes to the number of

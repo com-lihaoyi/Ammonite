@@ -1091,6 +1091,12 @@
           which fixes a large number of issues in the previous implicit/macro
           based pretty-printer @issue(208) @issue(306) @issue(313) @issue(575)
         @li
+          Introduced a new @code{interp.configureCompiler} builtin, which lets
+          you configure the compiler in a way that's robust in the case of
+          caching and late/lazy initialization, fixing @issue(472).
+          You should use @code{interp.configureCompiler} instead
+          of @code{repl.compiler} to configure it safely.
+        @li
           Properly run import hooks in multi-block scripts in the block that
           they are defined, allowing you to add resolvers/repositories before
           performing @hl.scala{import $ivy}s in subsequent blocks. Fixes

@@ -1,7 +1,7 @@
 package ammonite.terminal
 
 
-import acyclic.file
+
 
 import scala.annotation.tailrec
 import scala.collection.mutable

@@ -6,7 +6,7 @@ import ammonite.terminal.filters._
 import GUILikeFilters.SelectionFilter
 import ammonite.terminal._
 import fastparse.core.Parsed
-import acyclic.file
+
 import ammonite.util.{Colors, Res}
 import ammonite.interp.Parsers
 case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEnd{
