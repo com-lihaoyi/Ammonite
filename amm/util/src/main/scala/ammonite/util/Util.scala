@@ -87,7 +87,7 @@ object Util{
     def filePathPrefix = Util.encodeFilePath(fullName)
     def printablePath = source match{
       case Some(x) => x.toString
-      case None => "<synthetic>/" + filePathPrefix + ".sc"
+      case None => "<synthetic>/" + filePathPrefix.mkString("/") + ".sc"
     }
   }
 

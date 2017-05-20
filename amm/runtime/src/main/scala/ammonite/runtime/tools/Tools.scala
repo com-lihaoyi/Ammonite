@@ -16,17 +16,19 @@ import scala.util.matching.Regex
 
 
 trait Grepper[T]{
-  def apply(t: T, s: Any)(implicit pp: pprint.PPrinter): Option[GrepResult]
+  def apply(t: T, s: Any)
+           (implicit pp: pprint.PPrinter = Grepper.defaultPPrint): Option[GrepResult]
 }
 object Grepper{
+  val defaultPPrint = pprint.PPrinter.BlackWhite.copy(defaultHeight = Int.MaxValue)
   implicit object Str extends Grepper[String] {
-    def apply(t: String, s: Any)(implicit pp: pprint.PPrinter) = {
+    def apply(t: String, s: Any)(implicit pp: pprint.PPrinter = defaultPPrint) = {
       Regex.apply(java.util.regex.Pattern.quote(t).r, s)
     }
   }
 
   implicit object Regex extends Grepper[Regex] {
-    def apply(t: Regex, s: Any)(implicit pp: pprint.PPrinter) = {
+    def apply(t: Regex, s: Any)(implicit pp: pprint.PPrinter = defaultPPrint) = {
       val txt = pp.tokenize(s).mkString
       val fansiTxt = fansi.Str(txt, errorMode = fansi.ErrorMode.Sanitize)
       val items = t.findAllIn(fansiTxt.plainText).matchData.toSeq
@@ -48,7 +50,8 @@ object GrepResult{
   }
 
   def grepResultRepr(grepResult: GrepResult,
-                     ctx: pprint.Tree.Ctx)(implicit highlightColor: Color) = {
+                     ctx: pprint.Tree.Ctx)
+                    (implicit highlightColor: Color) = {
     val outputSnippets = mutable.Buffer.empty[fansi.Str]
     val rangeBuffer = mutable.Buffer.empty[(Int, Int)]
     var remainingSpans = grepResult.spans.toList
@@ -140,7 +143,7 @@ object GrepResult{
 object grep {
   def apply[T: Grepper]
            (pat: T, str: Any)
-           (implicit c: pprint.PPrinter)
+           (implicit c: pprint.PPrinter = Grepper.defaultPPrint)
            : Option[GrepResult] = {
     implicitly[Grepper[T]].apply(pat, str)
   }
@@ -151,20 +154,22 @@ object grep {
    */
   object !{
     implicit def FunkyFunc1(f: ![_])
-                           (implicit c: pprint.PPrinter)
+                           (implicit c: pprint.PPrinter = Grepper.defaultPPrint)
                            : Any => GenTraversableOnce[GrepResult] = {
       (x: Any) => f.apply(x)
     }
 
     implicit def FunkyFunc2(f: ![_])
-                           (implicit c: pprint.PPrinter)
+                           (implicit c: pprint.PPrinter = Grepper.defaultPPrint)
                            : Any => Boolean = {
       x => f.apply(x).isDefined
     }
   }
 
   case class ![T: Grepper](pat: T){
-    def apply(str: Any)(implicit c: pprint.PPrinter) = grep.this.apply(pat, str)
+    def apply(str: Any)(implicit c: pprint.PPrinter = Grepper.defaultPPrint) = {
+      grep.this.apply(pat, str)
+    }
   }
 }
 
