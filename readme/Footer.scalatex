@@ -1073,7 +1073,7 @@
     @sect{Unstable Changlog}
       @ul
         @li
-          Ammonite now uses AlexArchmabault's
+          Ammonite now uses AlexArchambault's
           @lnk("Coursier", "https://github.com/coursier/coursier") library for
           dependency resolution and downloading. This should @i{hopefully} fix
           many of our perenniel, non-deterministic Ivy resolution problems such
@@ -1096,9 +1096,9 @@
           performing @hl.scala{import $ivy}s in subsequent blocks. Fixes
           @issue(491)
         @li
-          Revamped how arguments are passed to scripts. When running scripts,
-          now the script file must *always* be the first argument to the
-          @code{amm} command. Any arguments after the script file get
+          Revamped how @sect.ref{Script Arguments} are passed. When running
+          scripts, now the script file must *always* be the first argument to
+          the @code{amm} command. Any arguments after the script file get
           delegated to the script's @hl.scala("@main") method(s) @i{unless}
           there is a @code{--} present, in which case arguments @i{after} the
           @code{--} get delegated to the script while those @i{before} get
@@ -1107,7 +1107,7 @@
           by default, letting you use your own custom arg parsers on the input
           strings. Fixes @issue(423), @issue(479), @issue(538)
         @li
-          The *return values* of Ammonite scripts' @hl.scala("@main") methods
+          The @i{return values} of Ammonite scripts' @hl.scala("@main") methods
           or @hl.scala{exit(...)} calls now gets pretty-printed by default when
           the script completes. This make composing scripts much more convenient:
           the same @hl.scala("@main") methods you use when printing output to the
