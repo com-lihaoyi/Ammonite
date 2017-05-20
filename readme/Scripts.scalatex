@@ -391,6 +391,14 @@
 
       @hl.ref('amm/'runtime/'src/'main/'scala/'ammonite/'runtime/"InterpAPI.scala", "trait InterpAPI")
 
+    @sect{Script Predef}
+      @p
+        If you want code to be loaded before you run any script, you can place
+        it in @code{~/.ammonite/predefScript.sc}. This is distinct from the REPL
+        pre-defined code which lives in @code{~/.ammonite/predef.sc}. If you want
+        code that is pre-initialized in both the REPL and in scripts, you can place
+        it in @code{~/.ammonite/predefShared.sc}.
+
   @sect{Running Scripts}
     @p
       There are two way main ways to run Ammonite scripts:
