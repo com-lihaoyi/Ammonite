@@ -275,7 +275,7 @@
           Or if the script is in an @i{outer} folder,
 
         @hl.scala
-          @@ import $file.`..`.MyScript
+          @@ import $file.^.MyScript
 
         @p
           Or if we want to import the contents of the script in one go:
