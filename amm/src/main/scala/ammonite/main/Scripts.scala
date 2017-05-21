@@ -102,7 +102,7 @@ object Scripts {
                 Res.Failure(
                   None,
                   "To select a subcommand to run, you don't need --s." + Util.newLine +
-                  "Did you mean `${head.drop(2)}` instead of `$head`?"
+                  s"Did you mean `${head.drop(2)}` instead of `$head`?"
                 )
               case Seq((head, None), tail @ _*) =>
                 mainMethods.find(_.name == head) match{
