@@ -270,7 +270,7 @@ possible a function that can compute its default value
       
       <p class="shortcomment cmt">What is known about a single endpoint for our routes.</p><div class="fullcomment"><div class="comment cmt"><p>What is known about a single endpoint for our routes. It has a <a href="Router$$EntryPoint.html#name:String" class="extmbr" name="ammonite.main.Router.EntryPoint#name">name</a>,
 <a href="Router$$EntryPoint.html#argSignatures:Seq[ammonite.main.Router.ArgSig]" class="extmbr" name="ammonite.main.Router.EntryPoint#argSignatures">argSignatures</a> for each argument, and a macro-generated <a href="Router$$EntryPoint.html#invoke0:(Map[String,String],Seq[String])=&gt;ammonite.main.Router.Result[Any]" class="extmbr" name="ammonite.main.Router.EntryPoint#invoke0">invoke0</a>
-that performs all the necessary argument parsing and de-serialization.</p><p>Realistically, you will probably spend most of your time calling <a href="Router$$EntryPoint.html#invoke(args:Seq[String],kwargs:Seq[(String,String)]):ammonite.main.Router.Result[Any]" class="extmbr" name="ammonite.main.Router.EntryPoint#invoke">invoke</a>
+that performs all the necessary argument parsing and de-serialization.</p><p>Realistically, you will probably spend most of your time calling <a href="Router$$EntryPoint.html#invoke(groupedArgs:Seq[(String,Option[String])]):ammonite.main.Router.Result[Any]" class="extmbr" name="ammonite.main.Router.EntryPoint#invoke">invoke</a>
 instead, which provides a nicer API to call it that mimmicks the API of
 calling a Scala method.
 </p></div></div>
@@ -639,9 +639,9 @@ Could succeed with a value, but could fail in many different ways.
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
     </li><li name="ammonite.main.Router#read" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="read[T](dict:Map[String,String],default:=&gt;Option[Any],arg:ammonite.main.Router.ArgSig,thunk:String=&gt;T,extras:Option[Seq[String]]):ammonite.main.Router.FailMaybe"></a><a id="read[T](Map[String,String],⇒Option[Any],ArgSig,(String)⇒T,Option[Seq[String]]):FailMaybe"></a>
+      <a id="read[T](dict:Map[String,String],default:=&gt;Option[Any],arg:ammonite.main.Router.ArgSig,thunk:String=&gt;T):ammonite.main.Router.FailMaybe"></a><a id="read[T](Map[String,String],⇒Option[Any],ArgSig,(String)⇒T):FailMaybe"></a>
       <span class="permalink">
-      <a href="../../ammonite/main/Router$.html#read[T](dict:Map[String,String],default:=&gt;Option[Any],arg:ammonite.main.Router.ArgSig,thunk:String=&gt;T,extras:Option[Seq[String]]):ammonite.main.Router.FailMaybe" title="Permalink">
+      <a href="../../ammonite/main/Router$.html#read[T](dict:Map[String,String],default:=&gt;Option[Any],arg:ammonite.main.Router.ArgSig,thunk:String=&gt;T):ammonite.main.Router.FailMaybe" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -650,7 +650,23 @@ Could succeed with a value, but could fail in many different ways.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">read</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="dict">dict: <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="default">default: ⇒ <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Option" class="extype" target="_top">Option</a>[<a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Any" class="extype" target="_top">Any</a>]</span>, <span name="arg">arg: <a href="Router$$ArgSig.html" class="extype" name="ammonite.main.Router.ArgSig">ArgSig</a></span>, <span name="thunk">thunk: (<span class="extype" name="scala.Predef.String">String</span>) ⇒ <span class="extype" name="ammonite.main.Router.read.T">T</span></span>, <span name="extras">extras: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Option" class="extype" target="_top">Option</a>[<span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Predef.String">String</span>]]</span>)</span><span class="result">: <a href="#FailMaybe=Either[Seq[ammonite.main.Router.Result.ParamError],Any]" class="extmbr" name="ammonite.main.Router.FailMaybe">FailMaybe</a></span>
+        <span class="name">read</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="dict">dict: <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="default">default: ⇒ <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Option" class="extype" target="_top">Option</a>[<a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Any" class="extype" target="_top">Any</a>]</span>, <span name="arg">arg: <a href="Router$$ArgSig.html" class="extype" name="ammonite.main.Router.ArgSig">ArgSig</a></span>, <span name="thunk">thunk: (<span class="extype" name="scala.Predef.String">String</span>) ⇒ <span class="extype" name="ammonite.main.Router.read.T">T</span></span>)</span><span class="result">: <a href="#FailMaybe=Either[Seq[ammonite.main.Router.Result.ParamError],Any]" class="extmbr" name="ammonite.main.Router.FailMaybe">FailMaybe</a></span>
+      </span>
+      
+      
+    </li><li name="ammonite.main.Router#readVarargs" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="readVarargs[T](arg:ammonite.main.Router.ArgSig,values:Seq[String],thunk:String=&gt;T):scala.util.Either[Seq[ammonite.main.Router.Result.ParamError],Seq[T]]"></a><a id="readVarargs[T](ArgSig,Seq[String],(String)⇒T):Either[Seq[ParamError],Seq[T]]"></a>
+      <span class="permalink">
+      <a href="../../ammonite/main/Router$.html#readVarargs[T](arg:ammonite.main.Router.ArgSig,values:Seq[String],thunk:String=&gt;T):scala.util.Either[Seq[ammonite.main.Router.Result.ParamError],Seq[T]]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">readVarargs</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="arg">arg: <a href="Router$$ArgSig.html" class="extype" name="ammonite.main.Router.ArgSig">ArgSig</a></span>, <span name="values">values: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="thunk">thunk: (<span class="extype" name="scala.Predef.String">String</span>) ⇒ <span class="extype" name="ammonite.main.Router.readVarargs.T">T</span></span>)</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.util.Either" class="extype" target="_top">Either</a>[<a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.collection.Seq" class="extype" target="_top">Seq</a>[<a href="Router$$Result$$ParamError.html" class="extype" name="ammonite.main.Router.Result.ParamError">ParamError</a>], <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.collection.Seq" class="extype" target="_top">Seq</a>[<span class="extype" name="ammonite.main.Router.readVarargs.T">T</span>]]</span>
       </span>
       
       
@@ -686,6 +702,22 @@ Could succeed with a value, but could fail in many different ways.
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="ammonite.main.Router#tryEither" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="tryEither[T](t:=&gt;T,error:Throwable=&gt;ammonite.main.Router.Result.ParamError):scala.util.Either[ammonite.main.Router.Result.ParamError,T]"></a><a id="tryEither[T](⇒T,(Throwable)⇒ParamError):Either[ParamError,T]"></a>
+      <span class="permalink">
+      <a href="../../ammonite/main/Router$.html#tryEither[T](t:=&gt;T,error:Throwable=&gt;ammonite.main.Router.Result.ParamError):scala.util.Either[ammonite.main.Router.Result.ParamError,T]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">tryEither</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="t">t: ⇒ <span class="extype" name="ammonite.main.Router.tryEither.T">T</span></span>, <span name="error">error: (<span class="extype" name="scala.Throwable">Throwable</span>) ⇒ <a href="Router$$Result$$ParamError.html" class="extype" name="ammonite.main.Router.Result.ParamError">ParamError</a></span>)</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.util.Either" class="extype" target="_top">Either</a>[<a href="Router$$Result$$ParamError.html" class="extype" name="ammonite.main.Router.Result.ParamError">ParamError</a>, <span class="extype" name="ammonite.main.Router.tryEither.T">T</span>]</span>
+      </span>
+      
+      
     </li><li name="ammonite.main.Router#validate" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="validate(args:Seq[ammonite.main.Router.FailMaybe]):ammonite.main.Router.Result[Seq[Any]]"></a><a id="validate(Seq[FailMaybe]):Result[Seq[Any]]"></a>
       <span class="permalink">

@@ -168,12 +168,8 @@ the Scala compiler and greatly reduces the startup time of cached scripts.
                         </a>
                       </li><li class="current-entities indented4">
                         <a class="object" href="Router$$Result$$ParamError$.html" title=""></a>
-                        <a class="trait" href="Router$$Result$$ParamError.html" title="What could go wrong when trying to parse an individual parameter to
-an EntryPoint?
-"></a>
-                        <a href="Router$$Result$$ParamError.html" title="What could go wrong when trying to parse an individual parameter to
-an EntryPoint?
-">
+                        <a class="trait" href="Router$$Result$$ParamError.html" title=""></a>
+                        <a href="Router$$Result$$ParamError.html" title="">
                           ParamError
                         </a>
                       </li><li class="current-entities indented4">
@@ -310,10 +306,10 @@ deserializing/parsing individual arguments
       <p class="shortcomment cmt">Invoking the <a href="Router$$EntryPoint.html" class="extype" name="ammonite.main.Router.EntryPoint">EntryPoint</a> failed because there were problems
 deserializing/parsing individual arguments
 </p>
-    </li><li name="ammonite.main.Router.Result.Error.RedundantArguments" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="RedundantArgumentsextendsRouter.Result.ErrorwithProductwithSerializable"></a><a id="RedundantArguments:RedundantArguments"></a>
+    </li><li name="ammonite.main.Router.Result.Error.MismatchedArguments" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="MismatchedArgumentsextendsRouter.Result.ErrorwithProductwithSerializable"></a><a id="MismatchedArguments:MismatchedArguments"></a>
       <span class="permalink">
-      <a href="../../ammonite/main/Router$$Result$$Error$.html#RedundantArgumentsextendsRouter.Result.ErrorwithProductwithSerializable" title="Permalink">
+      <a href="../../ammonite/main/Router$$Result$$Error$.html#MismatchedArgumentsextendsRouter.Result.ErrorwithProductwithSerializable" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -322,41 +318,15 @@ deserializing/parsing individual arguments
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a title="Invoking the EntryPoint failed as the same argument was passed
-in more than once; possibly as a keyword-argument that was repeated,
-or a keyword-argument and positional-argument that both resolve to
-the same arg
-" href="Router$$Result$$Error$$RedundantArguments.html">
-              <span class="name">RedundantArguments</span>
-            </a><span class="params">(<span name="names">names: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result"> extends <a href="Router$$Result$$Error.html" class="extype" name="ammonite.main.Router.Result.Error">Error</a> with <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+        <a title="Invoking the EntryPoint failed because the arguments provided
+did not line up with the arguments expected
+" href="Router$$Result$$Error$$MismatchedArguments.html">
+              <span class="name">MismatchedArguments</span>
+            </a><span class="params">(<span name="missing">missing: <span class="extype" name="scala.Seq">Seq</span>[<a href="Router$$ArgSig.html" class="extype" name="ammonite.main.Router.ArgSig">ArgSig</a>]</span>, <span name="unknown">unknown: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="duplicate">duplicate: <span class="extype" name="scala.Seq">Seq</span>[(<a href="Router$$ArgSig.html" class="extype" name="ammonite.main.Router.ArgSig">ArgSig</a>, <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Predef.String">String</span>])]</span>)</span><span class="result"> extends <a href="Router$$Result$$Error.html" class="extype" name="ammonite.main.Router.Result.Error">Error</a> with <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
       </span>
       
-      <p class="shortcomment cmt">Invoking the <a href="Router$$EntryPoint.html" class="extype" name="ammonite.main.Router.EntryPoint">EntryPoint</a> failed as the same argument was passed
-in more than once; possibly as a keyword-argument that was repeated,
-or a keyword-argument and positional-argument that both resolve to
-the same arg
-</p>
-    </li><li name="ammonite.main.Router.Result.Error.TooManyArguments" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="TooManyArgumentsextendsRouter.Result.ErrorwithProductwithSerializable"></a><a id="TooManyArguments:TooManyArguments"></a>
-      <span class="permalink">
-      <a href="../../ammonite/main/Router$$Result$$Error$.html#TooManyArgumentsextendsRouter.Result.ErrorwithProductwithSerializable" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">case class</span>
-      </span>
-      <span class="symbol">
-        <a title="Invoking the EntryPoint failed as there were too many positional
-arguments passed in, more than what is expected by the EntryPoint
-" href="Router$$Result$$Error$$TooManyArguments.html">
-              <span class="name">TooManyArguments</span>
-            </a><span class="params">(<span name="values">values: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result"> extends <a href="Router$$Result$$Error.html" class="extype" name="ammonite.main.Router.Result.Error">Error</a> with <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
-      </span>
-      
-      <p class="shortcomment cmt">Invoking the <a href="Router$$EntryPoint.html" class="extype" name="ammonite.main.Router.EntryPoint">EntryPoint</a> failed as there were too many positional
-arguments passed in, more than what is expected by the <a href="Router$$EntryPoint.html" class="extype" name="ammonite.main.Router.EntryPoint">EntryPoint</a>
+      <p class="shortcomment cmt">Invoking the <a href="Router$$EntryPoint.html" class="extype" name="ammonite.main.Router.EntryPoint">EntryPoint</a> failed because the arguments provided
+did not line up with the arguments expected
 </p>
     </li></ol>
             </div>

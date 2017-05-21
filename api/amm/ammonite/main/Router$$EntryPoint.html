@@ -208,7 +208,7 @@ possible a function that can compute its default value
       
           <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>What is known about a single endpoint for our routes. It has a <a href="#name:String" class="extmbr" name="ammonite.main.Router.EntryPoint#name">name</a>,
 <a href="#argSignatures:Seq[ammonite.main.Router.ArgSig]" class="extmbr" name="ammonite.main.Router.EntryPoint#argSignatures">argSignatures</a> for each argument, and a macro-generated <a href="#invoke0:(Map[String,String],Seq[String])=&gt;ammonite.main.Router.Result[Any]" class="extmbr" name="ammonite.main.Router.EntryPoint#invoke0">invoke0</a>
-that performs all the necessary argument parsing and de-serialization.</p><p>Realistically, you will probably spend most of your time calling <a href="#invoke(args:Seq[String],kwargs:Seq[(String,String)]):ammonite.main.Router.Result[Any]" class="extmbr" name="ammonite.main.Router.EntryPoint#invoke">invoke</a>
+that performs all the necessary argument parsing and de-serialization.</p><p>Realistically, you will probably spend most of your time calling <a href="#invoke(groupedArgs:Seq[(String,Option[String])]):ammonite.main.Router.Result[Any]" class="extmbr" name="ammonite.main.Router.EntryPoint#invoke">invoke</a>
 instead, which provides a nicer API to call it that mimmicks the API of
 calling a Scala method.
 </p></div><div class="toggleContainer block">
@@ -444,9 +444,9 @@ calling a Scala method.
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="ammonite.main.Router.EntryPoint#invoke" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="invoke(args:Seq[String],kwargs:Seq[(String,String)]):ammonite.main.Router.Result[Any]"></a><a id="invoke(Seq[String],Seq[(String,String)]):Result[Any]"></a>
+      <a id="invoke(groupedArgs:Seq[(String,Option[String])]):ammonite.main.Router.Result[Any]"></a><a id="invoke(Seq[(String,Option[String])]):Result[Any]"></a>
       <span class="permalink">
-      <a href="../../ammonite/main/Router$$EntryPoint.html#invoke(args:Seq[String],kwargs:Seq[(String,String)]):ammonite.main.Router.Result[Any]" title="Permalink">
+      <a href="../../ammonite/main/Router$$EntryPoint.html#invoke(groupedArgs:Seq[(String,Option[String])]):ammonite.main.Router.Result[Any]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -455,7 +455,7 @@ calling a Scala method.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">invoke</span><span class="params">(<span name="args">args: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="kwargs">kwargs: <span class="extype" name="scala.Seq">Seq</span>[(<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Predef.String">String</span>)]</span>)</span><span class="result">: <a href="Router$$Result.html" class="extype" name="ammonite.main.Router.Result">Result</a>[<a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Any" class="extype" target="_top">Any</a>]</span>
+        <span class="name">invoke</span><span class="params">(<span name="groupedArgs">groupedArgs: <span class="extype" name="scala.Seq">Seq</span>[(<span class="extype" name="scala.Predef.String">String</span>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Option" class="extype" target="_top">Option</a>[<span class="extype" name="scala.Predef.String">String</span>])]</span>)</span><span class="result">: <a href="Router$$Result.html" class="extype" name="ammonite.main.Router.Result">Result</a>[<a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Any" class="extype" target="_top">Any</a>]</span>
       </span>
       
       
