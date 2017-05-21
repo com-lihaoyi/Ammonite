@@ -20,7 +20,8 @@ class Repl(input: InputStream,
            mainPredef: String,
            wd: ammonite.ops.Path,
            welcomeBanner: Option[String],
-           replArgs: Seq[Bind[_]] = Nil) {
+           replArgs: Seq[Bind[_]] = Nil,
+           remoteLogger: Option[RemoteLogger]) {
 
   val prompt = Ref("@ ")
 
@@ -101,6 +102,7 @@ class Repl(input: InputStream,
     interp.init()
     @tailrec def loop(): Any = {
       val actionResult = action()
+      remoteLogger.foreach(_.apply("Action"))
       interp.handleOutput(actionResult)
 
       actionResult match{

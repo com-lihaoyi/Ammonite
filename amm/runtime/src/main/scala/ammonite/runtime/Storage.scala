@@ -32,7 +32,7 @@ trait Storage{
                          imports: Imports,
                          tag: String): Unit
   def classFilesListLoad(filePathPrefix: RelPath, cacheTag: String): Option[ScriptOutput]
-
+  def getSessionId: Long
 
 }
 
@@ -60,7 +60,7 @@ object Storage{
     var sharedPredef = ""
     def loadPredef = (predef, None)
     def loadSharedPredef = (sharedPredef, None)
-
+    def getSessionId = 0L
     var _history = new History(Vector())
     val fullHistory = new StableRef[History]{
       def apply() = _history
@@ -120,6 +120,16 @@ object Storage{
     val classFilesOrder = "classFilesOrder.json"
     val ivyCacheFile = cacheDir/"ivycache.json"
     val metadataFile = "metadata.json"
+    val sessionFile  = dir/"session"
+
+    def getSessionId() = {
+      try read(sessionFile).toLong
+      catch{case e: Throwable =>
+        val randomId = math.abs(util.Random.nextLong)
+        write.over(sessionFile, randomId.toString)
+        randomId
+      }
+    }
     val historyFile = dir/'history
     val fullHistory = new StableRef[History]{
       def apply(): History = {

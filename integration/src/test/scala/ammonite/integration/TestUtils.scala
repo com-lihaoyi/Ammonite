@@ -24,6 +24,7 @@ object TestUtils {
       executable,
       replStandaloneResources / name,
       silent,
+      "--no-remote-logging",
       "--home",
       tmp.dir(),
       "--",

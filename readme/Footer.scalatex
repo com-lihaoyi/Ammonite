@@ -1132,3 +1132,9 @@
         @li
           Default to RSA in Ammonite's @sect.ref{Remote REPL} and enable key-based
           auth (@issue(594)) thanks to @lnk("Espen Wiborg", "https://github.com/espenhw")
+        @li
+          Ammonite now logs the times you start a REPL session and the count of
+          how many commands get run. This is to allow the author to understand
+          usage patterns and prioritize improvements. If you wish to disable it,
+          pass in the @code{--no-remote-logging} command-line flag or the
+          @hl.scala{remoteLogging=false} argument to @hl.scala{Main}.

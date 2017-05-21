@@ -24,6 +24,7 @@ object BasicTests extends TestSuite{
     def execWithJavaOptsSet(name: RelPath, home: Path) = %%bash(
       executable,
       replStandaloneResources/name,
+      "--no-remote-logging",
       "-h",
       home,
       JAVA_OPTS = "-verbose:class",

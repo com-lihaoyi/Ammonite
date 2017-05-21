@@ -6,7 +6,7 @@ import ammonite.interp.Interpreter
 import ammonite.ops._
 import ammonite.runtime.{History, Storage}
 import ammonite.main.Defaults
-import ammonite.repl.{Repl, ReplApiImpl, SessionApiImpl}
+import ammonite.repl.{RemoteLogger, Repl, ReplApiImpl, SessionApiImpl}
 import ammonite.util._
 import ammonite.util.Util.newLine
 
@@ -62,12 +62,14 @@ case class Main(predef: String = "",
                 outputStream: OutputStream = System.out,
                 infoStream: OutputStream = System.err,
                 errorStream: OutputStream = System.err,
-                verboseOutput: Boolean = true){
+                verboseOutput: Boolean = true,
+                remoteLogging: Boolean = true){
 
   /**
     * Instantiates an ammonite.Repl using the configuration
     */
-  def instantiateRepl(replArgs: Seq[Bind[_]] = Nil) = {
+  def instantiateRepl(replArgs: Seq[Bind[_]] = Nil,
+                     remoteLogger: Option[RemoteLogger]) = {
     val augmentedPredef = Main.maybeDefaultPredef(
       defaultPredef,
       Defaults.replPredef + Defaults.predefString
@@ -80,7 +82,8 @@ case class Main(predef: String = "",
       mainPredef = predef,
       wd = wd,
       welcomeBanner = welcomeBanner,
-      replArgs = replArgs
+      replArgs = replArgs,
+      remoteLogger = remoteLogger
     )
   }
 
@@ -119,10 +122,25 @@ case class Main(predef: String = "",
     )
     interp
   }
+
   def run(replArgs: Bind[_]*) = {
-    val repl = instantiateRepl(replArgs)
-    val exitValue = repl.run()
-    repl.beforeExit(exitValue)
+
+    val remoteLogger =
+      if (!remoteLogging) None
+      else Some(new ammonite.repl.RemoteLogger(storageBackend.getSessionId))
+
+    remoteLogger.foreach(_.apply("Boot"))
+
+    val repl = instantiateRepl(replArgs, remoteLogger)
+
+    try{
+      val exitValue = repl.run()
+      repl.beforeExit(exitValue)
+    }finally{
+      remoteLogger.foreach(_.close())
+    }
+
+
   }
 
   /**
@@ -159,6 +177,7 @@ object Main{
     var passThroughArgs: Seq[String] = Vector.empty
     var predefFile: Option[Path] = None
     var replApi = false
+    var remoteLogging = true
     val replParser = new scopt.OptionParser[Main]("ammonite") {
       // Primary arguments that correspond to the arguments of
       // the `Main` configuration object
@@ -171,6 +190,10 @@ object Main{
       opt[Unit]("no-default-predef")
         .action((x, c) => c.copy(defaultPredef = false))
         .text("Disable the default predef and run Ammonite with the minimal predef possible")
+
+      opt[Unit]("no-remote-logging")
+        .foreach(x => remoteLogging = false)
+        .text("Disable remote logging of the number of times a REPL starts and runs commands")
 
       opt[String]('b', "banner")
         .action((x, c) => c.copy(welcomeBanner = Some(x)))
@@ -247,7 +270,8 @@ object Main{
           }
         },
         welcomeBanner = c.welcomeBanner,
-        verboseOutput = verboseOutput
+        verboseOutput = verboseOutput,
+        remoteLogging = remoteLogging
       )
       (fileToExecute, codeToExecute) match {
         case (None, None) => println("Loading..."); main(true).run()
