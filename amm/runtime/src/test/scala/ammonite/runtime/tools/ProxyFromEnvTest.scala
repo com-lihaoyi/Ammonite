@@ -2,6 +2,8 @@ package ammonite.runtime.tools
 
 import utest._
 /**
+  * This test is focused on function `setPropProxyFromEnv`, and not to test if proxy is OK or not.
+  *
   * Created by cuzfrog on 1/31/17.
   */
 object ProxyFromEnvTest extends TestSuite {

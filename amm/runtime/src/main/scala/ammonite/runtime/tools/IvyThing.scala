@@ -36,12 +36,12 @@ object IvyThing{
       Some(logger)
     }
 
+    //set proxy properties from env:
+    ProxyFromEnv.setPropProxyFromEnv()
+
     val start = coursier.Resolution(dependencies.toSet)
 
     val fetch = coursier.Fetch.from(repositories, coursier.Cache.fetch(logger = logger))
-    
-    //set proxy properties from env:
-    ProxyFromEnv.setPropProxyFromEnv()
 
     val resolution = start.process.run(fetch).run
 
