@@ -1,10 +1,10 @@
 import scalatex.ScalatexReadme
 
-scalaVersion := "2.12.1"
+scalaVersion := "2.12.2"
 
 crossScalaVersions := Seq(
   "2.10.4", "2.10.5", "2.10.6", "2.11.3",
-  "2.11.4", "2.11.5", "2.11.6", "2.11.7", "2.11.8"
+  "2.11.4", "2.11.5", "2.11.6", "2.11.7", "2.11.8", "2.11.9"
 )
 
 val dontPublishSettings = Seq(
@@ -28,7 +28,7 @@ val macroSettings = Seq(
 
 val sharedSettings = Seq(
 
-  scalaVersion := "2.12.1",
+  scalaVersion := "2.12.2",
   organization := "com.lihaoyi",
   version := _root_.ammonite.Constants.version,
   libraryDependencies += "com.lihaoyi" %% "utest" % "0.4.5" % Test,
@@ -41,6 +41,7 @@ val sharedSettings = Seq(
   },
   testFrameworks := Seq(new TestFramework("utest.runner.Framework")),
   scalacOptions += "-target:jvm-1.7",
+  scalacOptions += "-P:acyclic:force",
   autoCompilerPlugins := true,
   addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.7"),
   ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) },
@@ -83,7 +84,7 @@ val sharedSettings = Seq(
 lazy val ops = project
   .settings(
     sharedSettings,
-    libraryDependencies += "com.lihaoyi" %% "geny" % "0.1.1",
+    libraryDependencies += "com.lihaoyi" %% "geny" % "0.1.2",
     name := "ammonite-ops"
   )
 
@@ -137,12 +138,19 @@ lazy val amm = project
     ),
     assemblyJarName in assembly := s"${name.value}-${version.value}-${scalaVersion.value}",
     assembly in Test := {
-      val dest = assembly.value.getParentFile/"amm"
+      val dest = target.value/"amm"
       IO.copyFile(assembly.value, dest)
       import sys.process._
       Seq("chmod", "+x", dest.getAbsolutePath).!
       dest
-    }
+    },
+    assemblyMergeStrategy in assembly := {
+      case PathList("META-INF", xs @ _*) if xs.exists(_ contains "jansi") => MergeStrategy.last
+      case x =>
+        val oldStrategy = (assemblyMergeStrategy in assembly).value
+        oldStrategy(x)
+    },
+    parallelExecution in Test := false
   )
 
 lazy val ammUtil = project
@@ -156,10 +164,10 @@ lazy val ammUtil = project
     name := "ammonite-util",
     libraryDependencies ++= Seq(
       "com.lihaoyi" %% "upickle" % "0.4.4",
-      "com.lihaoyi" %% "pprint" % "0.4.4"
+      "com.lihaoyi" %% "pprint" % "0.5.1",
+      "com.lihaoyi" %% "fansi" % "0.2.4"
     )
   )
-
 
 lazy val ammRuntime = project
   .in(file("amm/runtime"))
@@ -171,7 +179,8 @@ lazy val ammRuntime = project
 
     name := "ammonite-runtime",
     libraryDependencies ++= Seq(
-      "org.apache.ivy" % "ivy" % "2.4.0",
+      "io.get-coursier" %% "coursier" % "1.0.0-RC3",
+      "io.get-coursier" %% "coursier-cache" % "1.0.0-RC3",
       "org.scalaj" %% "scalaj-http" % "2.3.0"
     )
   )
@@ -189,7 +198,7 @@ lazy val ammInterp = project
     libraryDependencies ++= Seq(
       "org.scala-lang" % "scala-compiler" % scalaVersion.value,
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
-      "com.lihaoyi" %% "scalaparse" % "0.4.2"
+      "com.lihaoyi" %% "scalaparse" % "0.4.3"
     ),
     unmanagedSourceDirectories in Compile ++= {
       if (Set("2.10", "2.11").contains(scalaBinaryVersion.value))
@@ -233,6 +242,7 @@ val integrationTasks = Seq(
   assembly in amm,
   packageBin in (shell, Compile)
 )
+
 lazy val integration = project
   .dependsOn(ops)
   .dependsOn(amm)
@@ -259,15 +269,16 @@ lazy val sshd = project
       crossVersion := CrossVersion.full,
       name := "ammonite-sshd",
       libraryDependencies ++= Seq(
-        "org.apache.sshd" % "sshd-core" % "0.14.0",
+        // sshd-core 1.3.0 requires java8
+        "org.apache.sshd" % "sshd-core" % "1.2.0",
+        "org.bouncycastle" % "bcprov-jdk15on" % "1.56",
         //-- test --//
         // slf4j-nop makes sshd server use logger that writes into the void
         "org.slf4j" % "slf4j-nop" % "1.7.12" % Test,
-        "com.jcraft" % "jsch" % "0.1.53" % Test,
+        "com.jcraft" % "jsch" % "0.1.54" % Test,
         "org.scalacheck" %% "scalacheck" % "1.12.6" % Test
       )
   )
-
 
 lazy val readme = ScalatexReadme(
   projectId = "readme",
@@ -276,7 +287,7 @@ lazy val readme = ScalatexReadme(
   source = "Index"
 ).settings(
   dontPublishSettings,
-  scalaVersion := "2.12.1",
+  scalaVersion := "2.12.2",
   libraryDependencies += "com.lihaoyi" %% "fansi" % "0.2.3",
   (run in Compile) := (run in Compile).dependsOn(
     assembly in (amm, Test),
@@ -302,7 +313,6 @@ lazy val readme = ScalatexReadme(
   }).evaluated,
   (unmanagedSources in Compile) += baseDirectory.value/".."/"project"/"Constants.scala"
 )
-
 
 lazy val published = project
   .in(file("target/published"))

@@ -1,4 +1,4 @@
-# Ammonite [![Build Status][travis-badge]][travis-link] [![Build (Windows)][appveyor-badge]][appveyor-link] [![Gitter Chat][gitter-badge]][gitter-link] [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.lihaoyi/ammonite_2.11.8/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.lihaoyi/ammonite_2.11.8)
+# Ammonite [![Build Status][travis-badge]][travis-link] [![Build (Windows)][appveyor-badge]][appveyor-link] [![Gitter Chat][gitter-badge]][gitter-link] [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.lihaoyi/ammonite_2.11.8/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.lihaoyi/ammonite_2.11.8) [![Patreon][patreon-badge]][patreon-link]
 
 
 [travis-badge]: https://travis-ci.org/lihaoyi/Ammonite.svg
@@ -7,21 +7,31 @@
 [appveyor-link]: https://ci.appveyor.com/project/lihaoyi/ammonite
 [gitter-badge]: https://badges.gitter.im/Join%20Chat.svg
 [gitter-link]: https://gitter.im/lihaoyi/Ammonite?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+[patreon-badge]: https://img.shields.io/badge/patreon-sponsor-ff69b4.svg
+[patreon-link]: https://www.patreon.com/lihaoyi
 
 
-This is where the code for the [Ammonite](https://lihaoyi.github.io/Ammonite) project lives; Both:
+This is where the code for the [Ammonite](https://lihaoyi.github.io/Ammonite) 
+project lives; Both:
 
 - [Ammonite-REPL](https://lihaoyi.github.io/Ammonite), the improved Scala REPL
-- [Ammonite-Ops](https://lihaoyi.github.io/Ammonite/#Ammonite-Ops), the Scala file-system library
-- [Ammonite-Shell](https://lihaoyi.github.io/Ammonite/#Ammonite-Shell), the Bash-replacement system shell
+- [Ammonite-Ops](https://lihaoyi.github.io/Ammonite/#Ammonite-Ops), the Scala 
+  file-system library
+- [Ammonite-Shell](https://lihaoyi.github.io/Ammonite/#Ammonite-Shell), the 
+  Bash-replacement system shell
 
-If you want to learn more about Ammonite or how to use it, check out the links above, or ask on the [Gitter Channel](https://gitter.im/lihaoyi/Ammonite). The remainder of this document is developer-docs for people who want to work on the Ammonite source code itself.
+If you want to learn more about Ammonite or how to use it, check out the links 
+above, or ask on the [Gitter Channel](https://gitter.im/lihaoyi/Ammonite). The 
+remainder of this document is developer-docs for people who want to work on the 
+Ammonite source code itself.
 
-If you are interested in living more "on the edge", we also publish artifacts and the doc-site every commit; the doc-site is available at
+If you are interested in living more "on the edge", we also publish artifacts 
+and the doc-site every commit; the doc-site is available at
 
 - http://www.lihaoyi.com/Ammonite/#UnstableVersions
 
-And contains instructions on how to download the per-commit executable or depend on the perf-commit maven artifact.
+And contains instructions on how to download the per-commit executable or 
+depend on the perf-commit maven artifact.
 
 # Developer Docs
 
@@ -30,11 +40,15 @@ The layout of the repository is roughly:
 - `ops/` is [Ammonite-Ops](https://lihaoyi.github.io/Ammonite/#Ammonite-Ops)
 - `amm/` is [Ammonite](https://lihaoyi.github.io/Ammonite)'s core, REPL and script runner
 - `shell/` is [Ammonite-Shell](https://lihaoyi.github.io/Ammonite/#Ammonite-Shell)
-- `terminal/` is the JLine re-implementation used by Ammonite-REPL to provide syntax highlighting and multiline editing
-- `readme/` is the source code for the [Documentation](https://lihaoyi.github.io/Ammonite/#Ammonite-Ops), written in [Scalatex](https://lihaoyi.github.io/Scalatex/).
-- `published/` is a synthetic project used for publishing, excluding the readme and integration tests
+- `terminal/` is the JLine re-implementation used by Ammonite-REPL to provide 
+  syntax highlighting and multiline editing
+- `readme/` is the source code for the [Documentation](https://lihaoyi.github.io/Ammonite/#Ammonite-Ops), 
+  written in [Scalatex](https://lihaoyi.github.io/Scalatex/).
+- `published/` is a synthetic project used for publishing, excluding the readme 
+  and integration tests
 
-For more detailed information, check out the internals documentation for high-level overviews of some facets of the codebase
+For more detailed information, check out the internals documentation for 
+high-level overviews of some interesting facets of the codebase
 
 - [Internals Documentation](https://github.com/lihaoyi/Ammonite/tree/master/internals-docs)
 
@@ -44,12 +58,38 @@ For more detailed information, check out the internals documentation for high-le
 
 Although most features should be unit tested, it's still useful to fire up a REPL from the current codebase to see things work (or not). There are a variety of shells you can spin up for testing different things:
 
-- `sbt ~terminal/test:run` is useful for manual testing the terminal interaction; it basically contains a minimal echo-anything terminal, with multiline input based on the count of open- and closed-parentheses. This lets you test all terminal interactions without all the complexity of the Scala compiler, classloaders, etc. that comes in `repl/`
-- `sbt ~amm/test:run` brings up the Ammonite-REPL using the source code in the repository, and automatically restarts it on-exit if you have made a change to the code. Useful for manual testing both of `amm/` as well as `ops/`, since you can just `import ammonite.ops._` and start using them. Note that this does not bring in filesystem utilities like the `wd` variable, `cd!` command. You can also pass in the path to a `.sc` file to run it using Ammonite's script runner
-- `sbt ~shell/test:run` brings up a fully-loaded shell with all filesystem utilities included: `wd`, `cd!`, autocomplete for filesystem paths, and more. This uses `readme/resources/example-predef.scala` instead of your default predef, for easier experimentation and development.
-- `sbt ~integration/test:run` runs the trivial main method in the `integration` subproject, letting you manually test running Ammonite programmatically, whether through `run` or `debug`
-- `sbt ~integration/test:console` brings up a console in the `integration` subproject, loading Ammonite-REPL as a test console, as described in the readme. Similar to `integration/test:run` but useful for verifying the different classloader/execution environment we get by starting Ammonite inside the Scala REPL doesn't break things
-- `sbt ~amm/test:assembly` creates an assembly at `amm/target/scala-2.11/amm` that you
+- `sbt ~terminal/test:run` is useful for manual testing the terminal 
+  interaction; it basically contains a minimal echo-anything terminal, with 
+  multiline input based on the count of open- and closed-parentheses. This lets 
+  you test all terminal interactions without all the complexity of the Scala 
+  compiler, classloaders, etc. that comes in `repl/`
+  
+- `sbt ~amm/test:run` brings up the Ammonite-REPL using the source code in the 
+  repository, and automatically restarts it on-exit if you have made a change 
+  to the code. Useful for manual testing both of `amm/` as well as `ops/`, 
+  since you can just `import ammonite.ops._` and start using them. Note that 
+  this does not bring in filesystem utilities like the `wd` variable, `cd!` 
+  command. You can also pass in the path to a `.sc` file to run it using 
+  Ammonite's script runner
+  
+- `sbt ~shell/test:run` brings up a fully-loaded shell with all filesystem 
+  utilities included: `wd`, `cd!`, autocomplete for filesystem paths, and more. 
+  This uses `readme/resources/example-predef.scala` instead of your default 
+  predef, for easier experimentation and development.
+  
+- `sbt ~integration/test:run` runs the trivial main method in the `integration` 
+  subproject, letting you manually test running Ammonite programmatically, 
+  whether through `run` or `debug`
+  
+- `sbt ~integration/test:console` brings up a console in the `integration` 
+  subproject, loading Ammonite-REPL as a test console, as described in the 
+  readme. Similar to `integration/test:run` but useful for verifying the 
+  different classloader/execution environment we get by starting Ammonite 
+  inside the Scala REPL doesn't break things
+  
+- `sbt ~amm/test:assembly` creates an assembly at `amm/target/amm` 
+  that you can then use to test: start a REPL, run scripts, etc. in a standalone
+  environment without being wrapped in SBT.
 
 ### Automated Testing
 

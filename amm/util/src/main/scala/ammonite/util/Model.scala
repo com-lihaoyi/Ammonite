@@ -4,8 +4,8 @@
   */
 package ammonite.util
 
-import acyclic.file
-import pprint.{PPrint, PPrinter}
+
+
 
 import scala.collection.mutable
 import scala.reflect.NameTransformer
@@ -212,11 +212,7 @@ trait Ref[T] extends StableRef[T]{
 
 object Ref{
   implicit def refer[T](t: T): Ref[T] = Ref(t)
-  implicit def refPPrint[T: PPrint]: PPrinter[Ref[T]] = PPrinter{ (ref, cfg) =>
-    Iterator(cfg.colors.prefixColor("Ref").render, "(") ++
-    implicitly[PPrint[T]].pprinter.render(ref(), cfg) ++
-    Iterator(")")
-  }
+
   def live[T](value0: () => T) = new Ref[T]{
     var value: () => T = value0
     def live() = value

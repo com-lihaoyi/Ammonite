@@ -1,6 +1,6 @@
 
 package ammonite.main
-import acyclic.file
+
 import ammonite.util.Util
 
 /**
@@ -12,9 +12,11 @@ object Defaults{
     def ammoniteVersion = ammonite.Constants.version
     def scalaVersion = scala.util.Properties.versionNumberString
     def javaVersion = System.getProperty("java.version")
+    val link = "www.patreon.com/lihaoyi"
     Util.normalizeNewlines(
       s"""Welcome to the Ammonite Repl $ammoniteVersion
-          |(Scala $scalaVersion Java $javaVersion)""".stripMargin
+          |(Scala $scalaVersion Java $javaVersion)
+          |If you like Ammonite, please support our development at $link""".stripMargin
     )
   }
   val ignoreUselessImports = """
@@ -54,12 +56,20 @@ object Defaults{
     |import ammonite.runtime.tools._
     |import ammonite.repl.tools._
     |import ammonite.runtime.tools.IvyConstructor.{ArtifactIdExt, GroupIdExt}
-    |import ammonite.repl.ReplBridge.value.{exit, codeColors, tprintColors, show, typeOf}
     |import ammonite.main.Router.{doc, main}
     |import ammonite.main.Scripts.pathScoptRead
+    |import ammonite.interp.InterpBridge.value.exit
     |""".stripMargin
 
-
+  val replPredef = """
+    |  import ammonite.repl.ReplBridge.value.{
+    |  codeColorsImplicit,
+    |  tprintColorsImplicit,
+    |  pprinterImplicit,
+    |  show,
+    |  typeOf
+    |}
+  """.stripMargin
   def ammoniteHome = ammonite.ops.Path(System.getProperty("user.home"))/".ammonite"
 
 }

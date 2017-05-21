@@ -283,8 +283,9 @@ object PathTests extends TestSuite{
 
           assert(
             RelPath(relStr) == 'hello/'cow,
+            // Path(...) also allows paths starting with ~,
+            // which is expanded to become your home directory
             Path(absStr) == root/'hello/'world
-
           )
 
           // You can also pass in java.io.File and java.nio.file.Path

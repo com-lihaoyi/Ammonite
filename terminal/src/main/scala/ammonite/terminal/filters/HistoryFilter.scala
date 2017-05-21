@@ -4,7 +4,7 @@ import ammonite.terminal.FilterTools._
 import ammonite.terminal.LazyList._
 import ammonite.terminal.SpecialKeys.Ctrl
 import ammonite.terminal._
-import acyclic.file
+
 import Filter._
 /**
   * Provides history navigation up and down, saving the current line, a well

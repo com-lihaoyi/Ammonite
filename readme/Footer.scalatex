@@ -82,8 +82,8 @@
         The @lnk("DynaML", "http://mandar2812.github.io/DynaML/#documentation")
         Machine-Learning REPL uses Ammonite as it's REPL
       @li
-        The @lnk("Shapeless", "https://github.com/milessabin/shapeless") project
-        has a @lnk("try-shapeless.sh", "https://github.com/milessabin/shapeless#try-shapeless-with-an-ammonite-instant-repl")
+        The @lnk("Shapeless", "https://github.com/milessabin/shapeless") project has a
+        @lnk("try-shapeless.sh", "https://github.com/milessabin/shapeless#try-shapeless-with-an-ammonite-instant-repl")
         instant-REPL built using Ammonite
       @li
         Seems Twitter @lnk("now uses Ammonite",
@@ -114,7 +114,125 @@
 
 
   @sect{Changelog}
+    @sect{0.9.0}
+      @ul
+        @li
+          We recently launched a @lnk("Patreon page", "https://www.patreon.com/lihaoyi")
+          to raise money to fund future development of Ammonite. If you've enjoyed using
+          Ammonite, and use it day to day, please
+          @lnk("chip in", "https://www.patreon.com/lihaoyi") to support our project!
+        @li
+          Ammonite now uses AlexArchambault's
+          @lnk("Coursier", "https://github.com/coursier/coursier") library for
+          dependency resolution and downloading. This should @i{hopefully} fix
+          many of our perenniel, non-deterministic Ivy resolution problems, and
+          provide greater flexibility for loading ivy dependencies (e.g. with
+          excludes, classifiers, etc.). Fixes @issue(300), @issue(387),
+          @issue(455), @issue(473), @issue(484), @issue(523), @issue(573),
+          @issue(583).
+        @li
+          Experimental @lnk("Apache Spark", "http://spark.apache.org/")
+          support! You can now run basic Spark commands in Ammonite scripts,
+          as well as in the REPL. To do so, look up the @code{Spark.sc}
+          and @code{Spark2.sc} scripts in the repository as examples to
+          get started. Spark support is currently experimental, so feel free
+          to contribute fixes when you notice something missing or wrong!
+        @li
+          Upgrade to @lnk("PPrint 0.5.1", "http://www.lihaoyi.com/PPrint/"),
+          which fixes a large number of issues in the previous implicit/macro
+          based pretty-printer @issue(208) @issue(306) @issue(313) @issue(575)
+        @li
+          Introduced a new @code{interp.configureCompiler} builtin, which lets
+          you configure the compiler in a way that's robust in the case of
+          caching and late/lazy initialization, fixing @issue(472).
+          You should use @code{interp.configureCompiler} instead
+          of @code{repl.compiler} to configure it safely.
+        @li
+          Properly run import hooks in multi-block scripts in the block that
+          they are defined, allowing you to add resolvers/repositories before
+          performing @hl.scala{import $ivy}s in subsequent blocks. Fixes
+          @issue(491)
+        @li
+          Revamped how @sect.ref{Script Arguments} are passed. When running
+          scripts, now the script file must *always* be the first argument to
+          the @code{amm} command. Any arguments after the script file get
+          delegated to the script's @hl.scala("@main") method(s) @i{unless}
+          there is a @code{--} present, in which case arguments @i{after} the
+          @code{--} get delegated to the script while those @i{before} get
+          passed to Ammonite. This allows you to define a @hl.scala("@main")
+          method with a vararg @hl.scala{String*} that accepts in all arguments
+          by default, letting you use your own custom arg parsers on the input
+          strings. Fixes @issue(423), @issue(479), @issue(538)
+        @li
+          The @i{return values} of Ammonite scripts' @hl.scala("@main") methods
+          or @hl.scala{exit(...)} calls now gets pretty-printed by default when
+          the script completes. This make composing scripts much more convenient:
+          the same @hl.scala("@main") methods you use when printing output to the
+          command-line can also be used from Scala code when imported from
+          other scripts. To disable this, annotate your main method as returning
+          @hl.scala{: Unit}
+        @li
+          @hl.scala{exit} can now be cleanly used in Scripts without failing
+          with a @code{NullPointerException}, in addition to its existing use
+          in the REPL.
+        @li
+          Avoid crashes when non-existent paths are on the classpath, thanks to
+          @lnk("Olivier Roland", "https://github.com/newca12")
+        @li
+          Default to RSA in Ammonite's @sect.ref{Remote REPL} and enable key-based
+          auth (@issue(594)) thanks to @lnk("Espen Wiborg", "https://github.com/espenhw")
+        @li
+          Ammonite now anonymously logs the times you start a REPL session and
+          the count of how many commands get run. This is to allow the author
+          to understand usage patterns and prioritize improvements. If you wish
+          to disable it, pass in the @code{--no-remote-logging} command-line
+          flag or the @hl.scala{remoteLogging=false} argument to @hl.scala{Main}.
 
+    @sect{0.8.5}
+      @ul
+        @li
+          Fix classLoader related problem in Multi-stage scripts with @hl.scala("@main")
+          (@issue(591))
+        @li
+          A nicer error message when you try to run a non-existent script (@issue(522))
+        @li
+          @hl.scala{ammonite.ops.Path(s: String)} now resolves @code{~} to the
+          home directory of the current user
+        @li
+          Many improvements to classpath scanning and re-compilation logic (@issue(542))
+          which should greatly reduce the time taken start Ammonite in an SBT project,
+          and avoid many existing problems with stale compilation caches.
+        @li
+          Fix crash when you try to run an empty script
+        @li
+          Miscellaneous info messages now go to stderr rather than stdout, so they
+          don't get mixed into your script output if you pipe into a file (@issue(574))
+
+
+    @sect{0.8.4}
+      @ul
+        @li
+          Make startup banner configurable via a command line flag
+
+    @sect{0.8.3}
+      @ul
+        @li
+          Cross-publish for Scala 2.12.2, 2.11.11
+        @li
+          Bump version of apache-sshd (@issue(545)), by 
+          @lnk("emanresusername", "https://github.com/emanresusername")
+        @li
+          Avoid @code{FileAlreadyExistsException} when compiling scripts in
+          parallel (@issue(567)), by @lnk("armanbilge", "https://github.com/armanbilge")
+        @li
+          Add @code{beforeExitHooks} so you can register cleanup code (@issue(581)), by
+          @lnk("emanresusername", "https://github.com/emanresusername")
+        @li
+          Add a sleep in @code{Shellout.executeStream} to reduce spinning. (@issue(578)), by
+          @lnk("rorygraves", "https://github.com/rorygraves")
+        @li
+          Add an overloaded version of LoadJar.cp that takes a sequence of paths, by
+          @lnk("mallman", "https://github.com/mallman")
     @sect{0.8.2}
       @ul
         @li
@@ -676,7 +794,10 @@
         @li
           Cross-build for 2.10.6 @issue(282)
         @li
-          Refactor of the @hl.scala{CommandResult} type being returned from the @hl.scala{%%} operator, to now properly capture the raw byte output, stdout, stderr, exit code. See @sect.ref{Spawning Subprocesses} for details. @issue(207)
+          Refactor of the @hl.scala{CommandResult} type being returned from the
+          @hl.scala{%%} operator, to now properly capture the raw byte output,
+          stdout, stderr, exit code. See @sect.ref{Spawning Subprocesses} for
+          details. @issue(207)
         @li
           Added a new @sect.ref{grep} command.
         @li

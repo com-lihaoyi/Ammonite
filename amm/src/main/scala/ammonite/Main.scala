@@ -6,7 +6,7 @@ import ammonite.interp.Interpreter
 import ammonite.ops._
 import ammonite.runtime.{History, Storage}
 import ammonite.main.Defaults
-import ammonite.repl.{Repl, ReplApiImpl, SessionApiImpl}
+import ammonite.repl.{RemoteLogger, Repl, ReplApiImpl, SessionApiImpl}
 import ammonite.util._
 import ammonite.util.Util.newLine
 
@@ -19,8 +19,8 @@ import ammonite.util.Util.newLine
   * constructing the [[Main]] instance, and the various entrypoints such
   * as [[run]] [[runScript]] and so on are methods on that instance.
   *
-  * It is more or less equivalent to the [[ammonite.main.Repl]] object itself, and has
-  * a similar set of parameters, but does not have any of the [[ammonite.main.Repl]]'s
+  * It is more or less equivalent to the [[ammonite.repl.Repl]] object itself, and has
+  * a similar set of parameters, but does not have any of the [[ammonite.repl.Repl]]'s
   * implementation-related code and provides a more convenient set of
   * entry-points that a user can call.
   *
@@ -42,6 +42,16 @@ import ammonite.util.Util.newLine
   * @param wd The working directory of the REPL; when it load scripts, where
   *           the scripts will be considered relative to when assigning them
   *           packages
+  *
+  * @param inputStream Where input to the Repl is coming from, typically System.in,
+  *                    but it could come from somewhere else e.g. across the
+  *                    network in the case of the SshdRepl
+  * @param outputStream Primary output of code run using Ammonite
+  * @param infoStream Miscellaneous logging output when running Ammonite. This
+  *                   is typically stuff you want to see when running interactively,
+  *                   but not something you want to see when e.g. you forward a
+  *                   script's output to a file. This by default it goes to System.err
+  * @param errorStream Error output when things go bad, typically System.err
   */
 case class Main(predef: String = "",
                 defaultPredef: Boolean = true,
@@ -50,22 +60,30 @@ case class Main(predef: String = "",
                 welcomeBanner: Option[String] = Some(Defaults.welcomeBanner),
                 inputStream: InputStream = System.in,
                 outputStream: OutputStream = System.out,
+                infoStream: OutputStream = System.err,
                 errorStream: OutputStream = System.err,
-                verboseOutput: Boolean = true
-               ){
+                verboseOutput: Boolean = true,
+                remoteLogging: Boolean = true){
+
   /**
     * Instantiates an ammonite.Repl using the configuration
     */
-  def instantiateRepl(replArgs: Seq[Bind[_]] = Nil) = {
-    val augmentedPredef = Main.maybeDefaultPredef(defaultPredef, Defaults.predefString)
+  def instantiateRepl(replArgs: Seq[Bind[_]] = Nil,
+                     remoteLogger: Option[RemoteLogger]) = {
+    val augmentedPredef = Main.maybeDefaultPredef(
+      defaultPredef,
+      Defaults.replPredef + Defaults.predefString
+    )
 
     new Repl(
-      inputStream, outputStream, errorStream,
+      inputStream, outputStream, infoStream, errorStream,
       storage = storageBackend,
-      predef = augmentedPredef + newLine + predef,
+      defaultPredef = augmentedPredef,
+      mainPredef = predef,
       wd = wd,
       welcomeBanner = welcomeBanner,
-      replArgs = replArgs
+      replArgs = replArgs,
+      remoteLogger = remoteLogger
     )
   }
 
@@ -73,15 +91,15 @@ case class Main(predef: String = "",
     val augmentedPredef = Main.maybeDefaultPredef(defaultPredef, Defaults.predefString)
 
     val (colors, printStream, errorPrintStream, printer) =
-      Interpreter.initPrinters(outputStream, errorStream, verboseOutput)
+      Interpreter.initPrinters(outputStream, infoStream, errorStream, verboseOutput)
 
 
     val interp: Interpreter = new Interpreter(
       printer,
       storageBackend,
       Seq(
-        Name("defaultPredef") -> augmentedPredef,
-        Name("predef") -> predef
+        Interpreter.PredefInfo(Name("defaultPredef"), augmentedPredef, false, None),
+        Interpreter.PredefInfo(Name("predef"), predef, false, None)
       ),
       i =>
         if (!replApi) Nil
@@ -104,9 +122,25 @@ case class Main(predef: String = "",
     )
     interp
   }
+
   def run(replArgs: Bind[_]*) = {
-    val repl = instantiateRepl(replArgs)
-    repl.run()
+
+    val remoteLogger =
+      if (!remoteLogging) None
+      else Some(new ammonite.repl.RemoteLogger(storageBackend.getSessionId))
+
+    remoteLogger.foreach(_.apply("Boot"))
+
+    val repl = instantiateRepl(replArgs, remoteLogger)
+
+    try{
+      val exitValue = repl.run()
+      repl.beforeExit(exitValue)
+    }finally{
+      remoteLogger.foreach(_.close())
+    }
+
+
   }
 
   /**
@@ -114,12 +148,11 @@ case class Main(predef: String = "",
     * of `args` and a map of keyword `kwargs` to pass to that file.
     */
   def runScript(path: Path,
-                args: Seq[String],
-                kwargs: Seq[(String, String)],
-                replApi: Boolean = false): Res[Imports] = {
+                scriptArgs: Seq[(String, Option[String])],
+                replApi: Boolean = false): Res[Any] = {
 
     val interp = instantiateInterpreter(replApi)
-    main.Scripts.runScript(wd, path, interp, args, kwargs)
+    main.Scripts.runScript(wd, path, interp, scriptArgs)
   }
 
   /**
@@ -138,39 +171,40 @@ object Main{
     * delegating to [[Main.run]]
     */
   def main(args0: Array[String]) = {
-    var fileToExecute: Option[Path] = None
     var codeToExecute: Option[String] = None
     var verboseOutput: Boolean = true
     var ammoniteHome: Option[Path] = None
     var passThroughArgs: Seq[String] = Vector.empty
-    var predefFiles: Seq[Path] = Vector.empty
-    var continually = false
+    var predefFile: Option[Path] = None
     var replApi = false
+    var remoteLogging = true
     val replParser = new scopt.OptionParser[Main]("ammonite") {
       // Primary arguments that correspond to the arguments of
       // the `Main` configuration object
       head("ammonite", ammonite.Constants.version)
+
       opt[String]('p', "predef")
         .action((x, c) => c.copy(predef = x))
         .text("Any commands you want to execute at the start of the REPL session")
+
       opt[Unit]("no-default-predef")
         .action((x, c) => c.copy(defaultPredef = false))
         .text("Disable the default predef and run Ammonite with the minimal predef possible")
 
+      opt[Unit]("no-remote-logging")
+        .foreach(x => remoteLogging = false)
+        .text("Disable remote logging of the number of times a REPL starts and runs commands")
+
+      opt[String]('b', "banner")
+        .action((x, c) => c.copy(welcomeBanner = Some(x)))
+        .text("Customize the welcome banner that gets shown when Ammonite starts")
+
       // Secondary arguments that correspond to different methods of
       // the `Main` configuration arguments
-      arg[String]("<file-args>...")
-        .optional()
-        .foreach{ x => fileToExecute = Some(Path(x, pwd)) }
-        .text("The Ammonite script file you want to execute")
       opt[String]('c', "code")
         .foreach(x => codeToExecute = Some(x))
         .text("Pass in code to be run immediately in the REPL")
 
-      opt[Unit]('x', "execute")
-        .text(
-          "Shim for backwards compatibility - will be removed"
-        )
       arg[String]("<args>...")
         .optional()
         .unbounded()
@@ -181,16 +215,9 @@ object Main{
         .foreach( x => ammoniteHome = Some(Path(x, pwd)))
         .text("The home directory of the REPL; where it looks for config and caches")
       opt[String]('f', "predef-file")
-        .unbounded()
-        .foreach{ x => predefFiles = predefFiles :+ Path(x, pwd) }
+        .optional()
+        .foreach{ x => predefFile = Some(Path(x, pwd)) }
         .text("Lets you load your predef from a custom location")
-      opt[Unit]('y', "continually")
-        .foreach(x => continually = true)
-        .text(
-          """Lets you run a file over and over, useful for benchmarking purposes
-            |since it lets you hook up a profiler to the long-lived process and
-            |see where all the time is being spent.
-          """.stripMargin)
       opt[Unit]('s', "silent")
         .foreach(x => verboseOutput = false)
         .text(
@@ -201,55 +228,56 @@ object Main{
         .text(
           """Lets you run a script with the `repl` object present; this is
             |normally not available in scripts and only provided in the
-            |interactive REpl
-          """.stripMargin)
-
+            |interactive REPL
+          """.stripMargin
+        )
     }
 
-    val (take, drop) = args0.indexOf("--") match {
-      case -1 => (Int.MaxValue, Int.MaxValue)
-      case n => (n, n+1)
+    // amm foo.sc
+    // amm -h bar
+    // amm foo.sc hello world
+    // amm foo.sc -h bar -- hello world
+    val (fileToExecute, ammoniteArgs, flatScriptArgs) = args0.lift(0) match{
+      case Some(x) if x.head != '-' =>
+        val fileToRun = Some(Path(args0(0), pwd))
+        // running a file
+        args0.indexOf("--") match {
+          // all args to to file main
+          case -1 => (fileToRun, Array.empty[String], args0.drop(1))
+          // args before -- go to ammonite, args after -- go to file main
+          case n => (fileToRun, args0.slice(1, n), args0.drop(n+1))
+        }
+      case _ => (None, args0, Array.empty[String]) // running the REPL, all args to to ammonite
     }
 
-    val before = args0.take(take)
-    var keywordTokens = args0.drop(drop).toList
-    var kwargs = Vector.empty[(String, String)]
+    val scriptArgs = ammonite.main.Scripts.groupArgs(flatScriptArgs)
 
-    while(keywordTokens.nonEmpty){
-      if (keywordTokens(0).startsWith("--")){
-        kwargs = kwargs :+ (keywordTokens(0).drop(2), keywordTokens(1))
-        keywordTokens = keywordTokens.drop(2)
-      }else{
-        passThroughArgs = passThroughArgs :+ keywordTokens(0)
-        keywordTokens = keywordTokens.drop(1)
-      }
-    }
-    def ifContinually[T](b: Boolean)(f: => T) = {
-      if (b) while(true) f
-      else f
-    }
-    for(c <- replParser.parse(before, Main())) ifContinually(continually){
+    for(c <- replParser.parse(ammoniteArgs, Main())) {
       def main(isRepl: Boolean) = Main(
         c.predef,
         c.defaultPredef,
         new Storage.Folder(ammoniteHome.getOrElse(Defaults.ammoniteHome), isRepl) {
-          override def loadPredef: String = {
-            if (predefFiles.isEmpty)
-              super.loadPredef
-            else
-              try {
-                predefFiles.map(f => read(f)).mkString("\n")
-              } catch {
-                case e: java.nio.file.NoSuchFileException => ""
-              }
+          override def loadPredef = {
+            predefFile match{
+              case None => super.loadPredef
+              case Some(file) =>
+                try {
+                  (read(file), Some(file))
+                } catch {
+                  case e: java.nio.file.NoSuchFileException => ("", None)
+                }
+            }
           }
         },
-        verboseOutput = verboseOutput
+        welcomeBanner = c.welcomeBanner,
+        verboseOutput = verboseOutput,
+        remoteLogging = remoteLogging
       )
       (fileToExecute, codeToExecute) match {
         case (None, None) => println("Loading..."); main(true).run()
         case (Some(path), None) =>
-          main(false).runScript(path, passThroughArgs, kwargs, replApi) match {
+          val scriptMain = main(false)
+          scriptMain.runScript(path, scriptArgs, replApi) match {
             case Res.Failure(exOpt, msg) =>
               Console.err.println(msg)
               System.exit(1)
@@ -258,8 +286,11 @@ object Main{
               val i = trace.indexWhere(_.getMethodName == "$main") + 1
               ex.setStackTrace(trace.take(i))
               throw ex
-            case Res.Success(_) =>
-            // do nothing on success, everything's already happened
+            case Res.Success(value) =>
+              if (value != ()){
+                pprint.PPrinter.BlackWhite.pprintln(value)
+              }
+            case Res.Skip   => // do nothing on success, everything's already happened
           }
 
         case (None, Some(code)) => main(false).runCode(code, replApi)
@@ -267,6 +298,9 @@ object Main{
       }
 
     }
+
+    // Exit explicitly to kill any daemon threads that are running
+    System.exit(0)
   }
 
   def maybeDefaultPredef(enabled: Boolean, predef: String) =

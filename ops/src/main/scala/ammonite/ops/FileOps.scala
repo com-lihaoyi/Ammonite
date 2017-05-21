@@ -11,7 +11,7 @@ import java.nio.charset.Charset
 import java.nio.file._
 import java.util.Objects
 
-import acyclic.file
+
 
 import scala.io.Codec
 
@@ -37,25 +37,23 @@ object Internals{
   }
 
 
-  class Writable(val writeableData: Iterator[Array[Byte]])
+  class Writable(val writeableData: geny.Generator[Array[Byte]])
 
-  object Writable{
+  object Writable extends LowPri{
     implicit def WritableString(s: String) = new Writable(
-      Iterator(s.getBytes(java.nio.charset.StandardCharsets.UTF_8))
+      geny.Generator(s.getBytes(java.nio.charset.StandardCharsets.UTF_8))
     )
-    implicit def WritableBytes(a: Array[Byte]) = new Writable(Iterator(a))
-    implicit def WritableArray[T](a: Array[T])(implicit f: T => Writable) = {
+    implicit def WritableBytes(a: Array[Byte]): Writable = new Writable(geny.Generator(a))
+
+  }
+  trait LowPri{
+
+    implicit def WritableGenerator[M[_], T](a: M[T])
+                                           (implicit f: T => Writable,
+                                            i: M[T] => geny.Generator[T]) = {
       new Writable(
-        a.iterator.map(f(_).writeableData).flatten
+        i(a).flatMap(f(_).writeableData)
       )
-    }
-    implicit def WritableTraversable[T](a: Traversable[T])(implicit f: T => Writable) = {
-      new Writable(
-        a.toIterator.map(f(_).writeableData).flatten
-      )
-    }
-    implicit def WritableIterator[T](a: Iterator[T])(implicit f: T => Writable) = {
-      new Writable(a.map(f(_).writeableData).flatten)
     }
   }
 }

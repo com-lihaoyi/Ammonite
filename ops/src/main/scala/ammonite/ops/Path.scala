@@ -3,7 +3,7 @@ package ammonite.ops
 import java.io.InputStream
 import java.nio.charset.Charset
 
-import acyclic.file
+
 
 import scala.io.Codec
 import scala.util.Try
@@ -125,6 +125,9 @@ sealed trait FilePath extends BasePath
 object FilePath extends PathFactory[FilePath]{
   def apply(f: java.nio.file.Path) = {
     if (f.isAbsolute) Path(f)
+    else if (f.subpath(0, 1).toString == "~"){
+      Path(System.getProperty("user.home"))/RelPath(f.subpath(0, 1).relativize(f))
+    }
     else RelPath(f)
   }
 }

@@ -60,12 +60,24 @@
   @hl.scala
     libraryDependencies += "com.lihaoyi" % "ammonite" % "@ammonite.Constants.version" % "test" cross CrossVersion.full
 
-    initialCommands in (Test, console) := """ammonite.Main().run()"""
+    sourceGenerators in Test += Def.task {
+      val file = (sourceManaged in Test).value / "amm.scala"
+      IO.write(file, """object amm extends App { ammonite.Main().run() }""")
+      Seq(file)
+    }.taskValue
 
   @p
-    After that, simple hit
+    After that, simply hit
+
   @code
-    sbt projectName/test:console
+    sbt projectName/test:run
+
+  @p
+    or if there are other main methods in the @code{Test} scope
+
+  @code
+    sbt projectName/test:run-main amm
+
   @p
     To activate the Ammonite REPL
 
@@ -294,6 +306,12 @@
           @li
             @sect.ref{Renamed-scripts and multiple-scripts}
 
+        @p
+          Note you can also perform file imports from your
+          @sect.ref("Configuration", "predef file"), which are resolved relative to
+          that file's path. This is useful if your predef is large and you want to
+          break it up into multiple files.
+
         @sect{Imported Scripts are Re-used}
           @p
             Note that script files imported multiple times are re-used; even if
@@ -372,6 +390,12 @@
         @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("'guava", "@"))
 
         @p
+          If you want to load a compiler plugin, you can do so using
+          @hl.scala{import $ivy.$plugin}:
+
+        @hl.ref(ammoniteTests/"AdvancedTests.scala", Seq("'compilerPlugin", "@"))
+
+        @p
           This makes Ammonite ideal for trying out new libraries or tools. You
           can pull down projects like @lnk("Scalaz",
           "https://github.com/scalaz/scalaz") or @lnk("Shapeless",
@@ -386,12 +410,31 @@
 
         @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("finagle", "@"), "\"\"\"")
 
+        @p
+          Ammonite-REPL is configured with a set of default resolvers but you
+          can add your own using
+          @lnk("Coursier's Repository APIs", "https://github.com/coursier/coursier#api-1")
 
-      @p
-        Ammonite-REPL is configured with a set of default resolvers but you
-        can add your own
+        @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("resolvers", "@"), "\"\"\"")
 
-      @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("resolvers", "@"), "\"\"\"")
+        @p
+          Including repositories which need authentication:
+
+        @hl.scala
+          import coursier.core.Authentication, coursier.MavenRepository
+
+          interp.repositories() ++= Seq(MavenRepository(
+            "https://nexus.corp.com/content/repositories/releases",
+            authentication = Some(Authentication("user", "pass"))
+          ))
+
+        @p
+          If you need more detailed control over what you are importing, e.g.
+          with attributes, classifiers or exclusions, you can fall back to
+          using the @hl.scala{interp.load.ivy(deps: coursier.Dependency*)}
+          function and configure each @code{Dependency} to your heart's content:
+
+        @hl.ref(ammoniteTests/up/"ScriptTests.scala", Seq("loadIvyAdvanced", "@"), "\"\"\"")
 
     @sect{Builtins}
       @p
@@ -432,7 +475,7 @@
           functionality available under the @code{interp} object, which is also
           available in scripts:
 
-        @hl.ref('amm/'runtime/'src/'main/'scala/'ammonite/'runtime/"InterpAPI.scala", "trait InterpAPI")
+        @hl.ref('amm/'interp/'src/'main/'scala/'ammonite/'interp/"InterpAPI.scala", "trait InterpAPI")
 
       @sect{Utilities}
         @p
@@ -887,8 +930,7 @@
           SshServerConfig(
             address = "localhost", // or "0.0.0.0" for public-facing shells
             port = 22222, // Any available port
-            username = "repl", // Arbitrary
-            password = "your_secure_password" // or ""
+            passwordAuthenticator = Some(pwdAuth) // or publicKeyAuthenticator
           )
         )
         replServer.start()
@@ -913,8 +955,9 @@
       @p
         @b{Security notes:} It is probably unsafe to run this server publicly
         (on host @hl.scala{"0.0.0.0"}) in a production, public-facing
-        application. Currently it doesn't supports key-based auth, and
-        password-based auth is notoriously weak.
+        application.  If you insist on doing so, you probably want key-based
+        authentication, available by supplying @hl.scala{publicKeyAuthenticator}
+        in the @hl.scala{SshServerConfig}.
 
       @p
         Despite this, it is perfectly possible to run these on production

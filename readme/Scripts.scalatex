@@ -112,7 +112,7 @@
         @p
           And so on, importing files as many or as deep as you want. You can
           use @hl.scala{^} segments at the start of your @hl.scala{import $file}
-          to import things from outside your current working directory, e.g.
+          to import things from outside the current script's enclosing folder, e.g.
           @hl.scala{import $file.^.^.foo} will import the script file
           @code{../../foo.sc} and make it available for you to use.
 
@@ -141,6 +141,19 @@
 
         @hl.ref('amm/'src/'test/'resources/'importHooks/"IvyImport.sc")
 
+        @p
+          If you need more detailed control over what you are importing, e.g.
+          with attributes, classifiers or exclusions, you can fall back to
+          using the @hl.scala{interp.load.ivy(deps: coursier.Dependency*)}
+          function.
+
+        @hl.ref(ammoniteTests/up/"ScriptTests.scala", Seq("loadIvyAdvanced", "@"), "\"\"\"")
+
+        @p
+          Note that to use this function, your script needs to be a
+          multi-stage script as listed below, and the @hl.scala{interp.load.ivy}
+          call needs to be in an earlier block
+
     @sect{Multi-stage Scripts}
       @p
         By default, everything in a script is compiled and executed as a single
@@ -164,15 +177,21 @@
       @p
         These are plain-old-Scala-functions that let you pass in a
         @hl.scala{Path} to a script to load, or load different Ivy artifacts
-        depending on runtime values. However, since these functions get run
-        *after* the current compilation block is compiled, you need to split
-        your script into two compilation blocks, and can only use the results
-        of the @hl.scala{load}ed code in subsequent blocks:
+        depending on runtime values. Additionally, there is an overloaded
+        version of @hl.scala{interp.load.cp} which takes a @hl.scala{Seq[Path]}
+        of classpath entries. This variant is much more efficient for adding
+        multiple classpath entries at once.
+
+      @p
+        Since these functions get run *after* the current compilation block is
+        compiled, you need to split your script into two compilation blocks,
+        and can only use the results of the @hl.scala{load}ed code in
+        subsequent blocks:
 
       @hl.scala
         // print banner
         println("Welcome to the XYZ custom REPL!!")
-        val scalazVersion = "7.1.1"
+        val scalazVersion = "7.2.7"
         interp.load.ivy("org.scalaz" %% "scalaz-core" % scalazVersion)
 
         @@
@@ -203,16 +222,31 @@
         When the script is run from the command line:
 
       @hl.sh
-        amm Args.sc 3 Moo
+        $ amm Args.sc 3 Moo
+        "Hello! MooMooMoo Ammonite."
 
       @p
         The top-level definitions execute first (e.g. setting @hl.scala{x}),
         and then the @hl.scala("@main") method is called with the arguments you
-        passed in. You can also pass in named arguments using @code{--} to demarcate
+        passed in. Note that the return-value of the script is pretty-printed
+        by default, which quotes strings and may nicely format/indent lists or
+        other data-structures. If you want to avoid this default pretty-printing
+        behavior, annotate your @hl.scala("@main") method as returning
+        @hl.scala{: Unit} and add your own @hl.scala{println}s:
+
+      @hl.ref(wd/'integration/'src/'test/'resources/'ammonite/'integration/'basic/"Args2.sc")
+
+      @hl.sh
+        $ amm Args2.sc 3 Moo
+        Hello! MooMooMoo Ammonite
+
+      @p
+        You can also pass in named arguments using @code{--} to demarcate
         them:
 
       @hl.sh
-        amm Args.sc -- --i 3 --s Moo
+        $ amm Args.sc --i 3 --s Moo
+        "Hello! MooMooMoo Ammonite."
 
       @p
         Default arguments behave as you would expect (i.e. they allow you to
@@ -221,9 +255,10 @@
         like @code{Int}, @code{Double}, @code{String}, as well as basic
         data-structures like @code{Seq}s (taken as a comma-separated list) and
         common types like @sect.ref{Paths}.
+
       @p
         If you pass in the wrong number of arguments, or if an argument fails
-        to deserialize, the script will fail with an exception.
+        to deserialize, the script will fail with an error message.
 
       @p
         The @hl.scala{main} method does not get automatically called when you
@@ -249,7 +284,43 @@
       @p
         In which case Ammonite will take all arguments and forward them to your
         main method un-checked and un-validated, from which point you can deal
-        with the raw @code{Seq[String]} however you wish.
+        with the raw @code{Seq[String]} however you wish. Note that
+        @hl.scala{vararg*} arguments cannot be passed by-name, e.g. via
+        @code{--args foo}
+
+    @sect{Ammonite Arguments in Scripts}
+      @p
+        By default, Ammonite treats the first argument as the script file as long
+        as it does not start with a @code{-}, and then forwards any subsequent arguments
+        to that script's main method(s). If you wish to pass arguments to @i{Ammonite},
+        you can do so by splitting up the argument list with a @code{--}:
+
+      @hl.sh
+        $ amm Args.sc --predef 'println("welcome!")' -- 3 Moo
+        welcome!
+        "Hello! MooMooMoo Ammonite."
+
+      @p
+        Here, "Ammonite Arguments" go on the @i{left} of the @code{--}, while
+        @i{Script Arguments} go on the @i{right} of the @code{--}. The script
+        arguments on the right can also be empty if you don't want to pass
+        any arguments to the script.
+
+      @p
+        If you want to define a script with a Shebang line that runs Ammonite
+        with particular arguments, you can use
+
+      @hl.sh
+        #!/bin/bash
+        exec amm "$0" --predef 'println("welcome!")' -- "$@@"
+        !#
+
+      @p
+        And which will pass in the @code{--predef} flag to Ammonite while
+        running the script via @code{./Args.sc}. If you want to then pass
+        in different sets of arguments, you can run the script using @code{amm}
+        e.g. @hl.sh{amm Args.sc --predef 'println("Hello!")' -- 3 Moo} as before.
+
 
     @sect{Multiple Main Methods}
       @p
@@ -267,13 +338,13 @@
       @p
         You can call it via
 
-      @hl.sh
+      @code
         amm MultiMain.sc mainA
 
       @p
         Or
 
-      @hl.sh
+      @code
         amm MultiMain.sc functionB 2 "Hello"
 
     @sect{Bundled Libraries}
@@ -331,7 +402,15 @@
         like the @code{repl.prompt}, @code{repl.history}, and other things
         that only really make sense in the interactive REPL.
 
-      @hl.ref('amm/'runtime/'src/'main/'scala/'ammonite/'runtime/"InterpAPI.scala", "trait InterpAPI")
+      @hl.ref('amm/'interp/'src/'main/'scala/'ammonite/'interp/"InterpAPI.scala", "trait InterpAPI")
+
+    @sect{Script Predef}
+      @p
+        If you want code to be loaded before you run any script, you can place
+        it in @code{~/.ammonite/predefScript.sc}. This is distinct from the REPL
+        pre-defined code which lives in @code{~/.ammonite/predef.sc}. If you want
+        code that is pre-initialized in both the REPL and in scripts, you can place
+        it in @code{~/.ammonite/predefShared.sc}.
 
   @sect{Running Scripts}
     @p
@@ -496,8 +575,9 @@
         @li
           Otherwise, the source code for this script is then wrapped in a
           @hl.scala{package}/@hl.scala{object} wrapper, corresponding to the
-          path to the script from the current working directory. For example,
-          a script at path @code{foo/bar/baz/Qux.sc} will be wrapped in:
+          path to the script from the current script's enclosing folder.
+          For example, a script at path @code{foo/bar/baz/Qux.sc} will be
+          wrapped in:
 
           @hl.scala
 

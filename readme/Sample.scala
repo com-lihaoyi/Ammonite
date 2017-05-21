@@ -37,15 +37,15 @@ object Sample{
     val scalaVersion = scala.util.Properties.versionNumberString
     val ammVersion = ammonite.Constants.version
     val executableName = s"amm"
-    val ammExec = "amm/target/scala-2.12/" + executableName
+    val ammExec = "amm/target/" + executableName
     val predef = "shell/src/main/resources/ammonite/shell/example-predef-bare.sc"
     val out = exec(
-      Seq(ammExec, "--predef-file", predef),
+      Seq(ammExec, "--no-remote-logging", "--predef-file", predef),
       s"${ammoniteCode.trim}\nexit\n",
       args = Map("JAVA_OPTS" -> "-Xmx600m")
     )
 //    val out = read! wd/'target/'cache/"-1080873603"
-    val lines = out.lines.toSeq.drop(3).dropRight(2).mkString("\n")
+    val lines = out.lines.toSeq.drop(4).dropRight(2).mkString("\n")
 //    println("ammSample " + lines)
 //    val ammOutput = lines.split("\u001b")
 

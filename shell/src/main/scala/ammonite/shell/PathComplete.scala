@@ -182,7 +182,7 @@ object PathComplete {
         }
 
 
-        import pprint.Config.Colors.PPrintConfig
+
 
         val details2 = details.map(x => pprint.tokenize(stat(x._1)).mkString)
 

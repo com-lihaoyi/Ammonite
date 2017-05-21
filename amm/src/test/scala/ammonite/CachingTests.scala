@@ -31,8 +31,7 @@ object CachingTests extends TestSuite{
       }
     }
     'blocks{
-      val cases = Seq("OneBlock.sc" -> 2, "TwoBlocks.sc" -> 3, "ThreeBlocks.sc" -> 4)
-      for((fileName, expected) <- cases){
+      def check(fileName: String, expected: Int) = {
         val storage = Storage.InMemory()
         val interp = createTestInterp(storage)
         val n0 = storage.compileCache.size
@@ -42,7 +41,11 @@ object CachingTests extends TestSuite{
 
         val n = storage.compileCache.size
         assert(n == expected)
+
       }
+      * - check("OneBlock.sc", 2)
+      * - check("TwoBlocks.sc", 3)
+      * - check("ThreeBlocks.sc", 4)
     }
 
     'processModuleCaching{
@@ -124,6 +127,19 @@ object CachingTests extends TestSuite{
       interp.interpApi.load.module(scriptPath/"TagBase.sc")
       val n = storage.compileCache.size
       assert(n == 5) // customLolz predef + two blocks for each loaded file
+    }
+
+    'compilerInit{
+      val tempDir = ammonite.ops.Path(
+        java.nio.file.Files.createTempDirectory("ammonite-tester-x")
+      )
+
+      val interp1 = createTestInterp(new Storage.Folder(tempDir))
+      val interp2 = createTestInterp(new Storage.Folder(tempDir))
+
+      interp1.interpApi.load.module(scriptPath/"cachedCompilerInit.sc")
+      interp2.interpApi.load.module(scriptPath/"cachedCompilerInit.sc")
+      assert(interp2.compilationCount == 0)
     }
 
     'changeScriptInvalidation{

@@ -110,33 +110,6 @@ object ImportHookTests extends TestSuite{
            """)
         }
       }
-      'url{
-        val scriptUrl =
-          "https://raw.githubusercontent.com/lihaoyi/Ammonite/" +
-          "master/amm/src/test/resources/scripts/Annotation.sc"
-        'basic - {
-          check.session(s"""
-          @ import $$url.`$scriptUrl`
-          error: $$url import failed
-
-          @ import $$url.{`$scriptUrl` => remote}
-
-          @ remote.product(1, List(2, 3, 4))
-          res1: Int = 24
-        """)
-        }
-        'inline - {
-          check.session(s"""
-          @ import $$url.`$scriptUrl`
-          error: $$url import failed
-
-          @ import $$url.{`$scriptUrl` => remote}; val x = remote.product(1, List(2, 3, 4))
-
-          @ x
-          res1: Int = 24
-        """)
-        }
-      }
     }
     'scripts{
       'file - check.session("""

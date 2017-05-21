@@ -1,5 +1,5 @@
 package ammonite.terminal.filters
-import acyclic.file
+
 import ammonite.terminal.FilterTools._
 import ammonite.terminal.LazyList.~:
 import ammonite.terminal.SpecialKeys._

@@ -4,7 +4,7 @@ import ammonite.terminal.FilterTools._
 import ammonite.terminal.LazyList.~:
 import ammonite.terminal.SpecialKeys.Ctrl
 import ammonite.terminal._
-import acyclic.file
+
 import scala.collection.mutable
 import Filter._
 

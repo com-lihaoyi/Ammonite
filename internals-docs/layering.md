@@ -33,14 +33,14 @@ cost) in the core codepaths.
 - `amm/runtime`: everything necessary to run an Ammonite Scala Script that has
   already been compiled and cached. This code is the "critical path" for using
   Ammonite to run slow-changing scripts (i.e. most of them) and should be fast
-  and without heavy dependencies like `scala-compiler`. Only provides a core
-  `InterpAPI` for scripts to call, and is without the rich `ReplAPI` for use
-  in the REPL
+  and without heavy dependencies like `scala-compiler`. 
 
 - `amm/interp`: everything necessary to run an Ammonite Scala Script that
   has *not* been compiled and cached; includes `scala-compiler` and `fastparse`
   and all the code necessary to preprocess Scala source code and compile it
-  into Java bytecode. Does not contain any REPL-specific functionality
+  into Java bytecode. Does not contain any REPL-specific functionality, and
+  Only provides a core `InterpAPI` for scripts to call, and is without the 
+  rich `ReplAPI` for use in the REPL
 
 - `amm/repl`: everything necessary to run an Ammonite REPL that takes in stdin
   and prints to stdout; includes JLine, `ammonite-terminal`, REPL-specific

@@ -5,7 +5,7 @@ import java.nio.file.attribute.PosixFilePermission
 
 import ammonite.ops._
 import ammonite.repl.FrontEndUtils
-import pprint.{Config, PPrinter}
+import pprint.Renderer
 
 import scala.util.Try
 
@@ -41,49 +41,46 @@ case class ShellSession() extends OpsAPI {
 
 object PPrints{
 
-  implicit def lsSeqRepr: PPrinter[LsSeq] =
-    PPrinter { (t: LsSeq, c: Config) =>
-      val snippets = for(p <- t) yield {
-        c.colors.literalColor(pprint.tokenize(p relativeTo t.base)(implicitly, c).mkString)
-      }
-      Iterator("\n") ++ FrontEndUtils.tabulate(snippets,FrontEndUtils.width)
+  def lsSeqRepr(t: LsSeq) = pprint.Tree.Lazy { ctx =>
+    val renderer = new Renderer(
+      ctx.width, ctx.applyPrefixColor, ctx.literalColor, ctx.indentStep
+    )
+    val snippets = for (p <- t) yield {
+      fansi.Str.join(renderer.rec(relPathRepr(p relativeTo t.base), 0, 0).iter.toStream:_*)
     }
+    Iterator("\n") ++ FrontEndUtils.tabulate(snippets, FrontEndUtils.width)
+  }
 
-  def reprSection(s: String, cfg: pprint.Config) = {
+
+  def reprSection(s: String, cfg: pprint.Tree.Ctx): fansi.Str = {
     val validIdentifier = "([a-zA-Z_][a-zA-Z_0-9]+)".r
+
     if (validIdentifier.findFirstIn(s) == Some(s)){
-      implicitly[pprint.PPrinter[scala.Symbol]].render(Symbol(s), cfg)
+      cfg.literalColor(''' + s)
     }else{
-      implicitly[pprint.PPrinter[String]].render(s, cfg)
+      cfg.literalColor(pprint.Util.literalize(s))
     }
   }
 
-  implicit val relPathRepr = pprint.PPrinter[ammonite.ops.RelPath]{(p, c) =>
+  def relPathRepr(p: ammonite.ops.RelPath) = pprint.Tree.Lazy(ctx =>
     Iterator(
-      (Seq.fill(p.ups)("up") ++ p.segments.map(reprSection(_, c).mkString)).mkString("/")
+      (Seq.fill(p.ups)("up") ++ p.segments.map(reprSection(_, ctx))).mkString("/")
     )
-  }
+  )
 
-  implicit def pathRepr = pprint.PPrinter[ammonite.ops.Path]{(p, c) =>
-    Iterator("root") ++ p.segments.iterator.map("/" + reprSection(_, c).mkString)
-  }
-  implicit def commandResultRepr: PPrinter[CommandResult] =
-    PPrinter[CommandResult]((x, c) =>
-      x.chunks.iterator.flatMap { chunk =>
-        val (color, s) = chunk match{
-          case Left(s) => (c.colors.literalColor, s)
-          case Right(s) => (fansi.Color.Red, s)
-        }
-        Iterator("\n", color(new String(s.array)).render)
+  def pathRepr(p: ammonite.ops.Path) = pprint.Tree.Lazy(ctx =>
+    Iterator("root") ++ p.segments.iterator.map("/" + reprSection(_, ctx))
+  )
+
+  def commandResultRepr(x: CommandResult) = pprint.Tree.Lazy(ctx =>
+    x.chunks.iterator.flatMap { chunk =>
+      val (color, s) = chunk match{
+        case Left(s) => (ctx.literalColor, s)
+        case Right(s) => (fansi.Color.Red, s)
       }
-    )
-  implicit def permissionPPrintConfig: PPrinter[PermSet] =
-    PPrinter[PermSet]{ (p, c) =>
-      Iterator(
-        "rwxrwxrwx".zip(PosixFilePermission.values()).map{ case (k, v) =>
-          if(p.contains(v)) k else '-'
-        }.mkString)
+      Iterator("\n", color(new String(s.array)).render)
     }
+  )
 
   implicit val defaultHighlightColor = {
     ammonite.runtime.tools.GrepResult.Color(

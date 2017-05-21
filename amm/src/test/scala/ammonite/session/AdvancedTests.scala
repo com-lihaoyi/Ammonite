@@ -78,7 +78,7 @@ object AdvancedTests extends TestSuite{
     'predefSettings{
       val check2 = new TestRepl{
         override def predef = """
-          repl.compiler.settings.Xexperimental.value = true
+          interp.configureCompiler(_.settings.Xexperimental.value = true)
         """
       }
       check2.session("""
@@ -238,11 +238,22 @@ object AdvancedTests extends TestSuite{
 
         @ x
         error: not found: value x
+
+        @ {
+        @ private[this] val a = 3
+        @ val b = a * 4
+        @ }
+
+        @ a
+        error: not found: value a
+
+        @ b
+        
       """)
     }
     'compilerPlugin - retry(3){
       if (!scala2_12) check.session("""
-        @ // Make sure plugins from eval class loader are not loaded
+        @ // Compiler plugins imported without `.$plugin` are not loaded
 
         @ import $ivy.`org.spire-math::kind-projector:0.6.3`
 
@@ -252,7 +263,7 @@ object AdvancedTests extends TestSuite{
         @ type TC0EitherStr = TC0[Either[String, ?]]
         error: not found: type ?
 
-        @ // This one must be loaded
+        @ // You need to use `import $ivy.$plugin`
 
         @ import $plugin.$ivy.`org.spire-math::kind-projector:0.6.3`
 
@@ -262,7 +273,7 @@ object AdvancedTests extends TestSuite{
         @ type TCEitherStr = TC[Either[String, ?]]
         defined type TCEitherStr
 
-        @ // Useless - does not add plugins, and ignored by eval class loader
+        @ // Importing plugins doesn't affect the run-time classpath
 
         @ import $plugin.$ivy.`com.lihaoyi::scalatags:0.6.2`
 

@@ -25,9 +25,8 @@ object ScriptTests extends TestSuite{
             @ interp.load.exec($printedScriptPath/"LoadIvy.sc")
 
             @ val r = res
-            r: String = ${"\"\"\""}
-            <a href="www.google.com">omg</a>
-            ${"\"\"\""}
+            r: String = "<a href=\\"www.google.com\\">omg</a>"
+
             """)
           }
         'preserveImports{
@@ -177,9 +176,7 @@ object ScriptTests extends TestSuite{
             @ interp.load.module($printedScriptPath/"LoadIvy.sc")
 
             @ val r = res
-            r: String = ${"\"\"\""}
-            <a href="www.google.com">omg</a>
-            ${"\"\"\""}
+            r: String = "<a href=\\"www.google.com\\">omg</a>"
            """)
         }
         'preserveImports{
@@ -328,6 +325,34 @@ object ScriptTests extends TestSuite{
 
         @ wrappedValue
         error: not found: value wrappedValue
+        """)
+      }
+      'resolverWithinScript{
+        'pass - {
+          if (!scala2_12) check.session(s"""
+            @ import ammonite.ops._
+
+            @ interp.load.module($printedScriptPath/"Resolvers.sc")
+
+
+          """)
+        }
+        'fail - {
+          if (!scala2_12) check.session(s"""
+            @ import ammonite.ops._
+
+            @ interp.load.module($printedScriptPath/"ResolversFail.sc")
+            error: Failed to resolve ivy dependencies
+          """)
+        }
+      }
+      'loadIvyAdvanced{
+        check.session(s"""
+        @ import ammonite.ops._
+
+        @ interp.load.module($printedScriptPath/"loadIvyAdvanced.sc")
+
+        @ serializer
         """)
       }
     }

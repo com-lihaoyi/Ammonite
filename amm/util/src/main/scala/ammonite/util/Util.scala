@@ -4,7 +4,7 @@
 package ammonite.util
 
 import java.security.MessageDigest
-import acyclic.file
+
 import ammonite.ops._
 
 
@@ -40,13 +40,60 @@ object Util{
   val newLine = System.lineSeparator()
   // Type aliases for common things
 
-  type CacheDetails = (String, String)
-  //                   Wrapper HashVal
-  type IvyMap = Map[(String, String, String, String), Set[String]]
+  /**
+    * Refers to a wrapper object compiled with a specific set of source code
+    * and enclosing environment (encapsulated in the hashVal). This lets us
+    * unambiguously look up the correct version of a class, or invalidate and
+    * recompile it if the source code or environment changes
+    */
+  case class VersionedWrapperId(wrapperPath: String, versionHash: String)
+
+
+
+
   type ClassFiles = Vector[(String, Array[Byte])]
-  type CacheOutput = (Seq[(String, String)], Seq[ClassFiles], Imports, Seq[ImportTree])
+
+
+
+  /**
+    * The serialized output of running a script, including both metadata and the classfile binaries
+    */
+  case class ScriptOutput(processed: ScriptOutput.Metadata, classFiles: Seq[ClassFiles])
+  object ScriptOutput{
+    /**
+      * Metadata extracted from the compilation of a single block, without the classfiles
+      * but with enough information to fetch the classfiles form disk and evaluate the
+      * block without compiling/parsing it
+      */
+    case class BlockMetadata(id: VersionedWrapperId, importHookTrees: Seq[ImportTree])
+    case class Metadata(finalImports: Imports, blockInfo: Seq[BlockMetadata])
+  }
   type CompileCache = (ClassFiles, Imports)
 
+  /**
+    * Information about where a particular block of code came from; [[source]]
+    * is optional because some code snippets are synthetic, which means any
+    * filename is entirely synthetic and $file imports do not work in them.
+    * However, there are many snippets of code, e.g. repl commands and such,
+    * which have a "fake" [[source]] because we want to allow $file imports
+    * relative to some path or working-directory
+    */
+  case class CodeSource(wrapperName: Name,
+                        pkgName: Seq[Name],
+                        source: Option[Path]){
+    def fullName = pkgName :+ wrapperName
+
+    def jvmPathPrefix = Util.encodeJvmPath(fullName)
+    def filePathPrefix = Util.encodeFilePath(fullName)
+    def printablePath = source match{
+      case Some(x) => x.toString
+      case None => "<synthetic>/" + filePathPrefix.mkString("/") + ".sc"
+    }
+  }
+
+  def encodeFilePath(path: Seq[Name]) = path.map(_.encoded)
+  def encodeScalaSourcePath(path: Seq[Name]) = path.map(_.backticked).mkString(".")
+  def encodeJvmPath(path: Seq[Name]) = path.map(_.encoded).mkString(".")
 
 
   def transpose[A](xs: List[List[A]]): List[List[A]] = {

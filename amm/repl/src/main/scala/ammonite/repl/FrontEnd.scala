@@ -4,7 +4,7 @@ import java.io.{InputStream, OutputStream}
 
 import fastparse.core.Parsed
 import jline.console.{ConsoleReader, completer}
-import acyclic.file
+
 import ammonite.util.{Colors, Catching, Res}
 import ammonite.interp.Parsers
 import ammonite.util.Util.newLine

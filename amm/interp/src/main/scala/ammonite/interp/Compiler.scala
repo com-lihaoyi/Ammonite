@@ -1,6 +1,6 @@
 package ammonite.interp
 
-import acyclic.file
+
 import ammonite.runtime.Evaluator
 import ammonite.util.{ImportData, Imports, Printer}
 import ammonite.util.Util.newLine

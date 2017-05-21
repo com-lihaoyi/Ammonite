@@ -13,7 +13,6 @@ object ProjectTests extends TestSuite{
     'load {
       'ivy {
         'standalone - {
-          retry(3) {
             // ivy or maven central are flaky =/
             val tq = "\"\"\""
             check.session(
@@ -27,11 +26,8 @@ object ProjectTests extends TestSuite{
           import scalatags.Text.all._
 
           @ a("omg", href:="www.google.com").render
-          res2: String = $tq
-          <a href="www.google.com">omg</a>
-          $tq
+          res2: String = "<a href=\\"www.google.com\\">omg</a>"
         """)
-          }
         }
         'akkahttp - {
             if (!scala2_12) check.session(
@@ -74,18 +70,12 @@ object ProjectTests extends TestSuite{
             // ivy flakyness...
             if (!scala2_12) check.session("""
               @ import $ivy.`com.ambiata::mundane:1.2.1-20141230225616-50fc792`
-              error: IvyResolutionException
+              error: Failed to resolve ivy dependencies
 
-              @ import Resolvers._
-
-              @ val oss = Resolver.Http(
-              @   "ambiata-oss",
-              @   "https://ambiata-oss.s3-ap-southeast-2.amazonaws.com",
-              @   IvyPattern,
-              @   false
-              @ )
-
-              @ interp.resolvers() = interp.resolvers() :+ oss
+              @ interp.repositories() ++= Seq(coursier.ivy.IvyRepository.fromPattern(
+              @   "https://ambiata-oss.s3-ap-southeast-2.amazonaws.com/" +:
+              @   coursier.ivy.Pattern.default
+              @ ))
 
               @ import $ivy.`com.ambiata::mundane:1.2.1-20141230225616-50fc792`
 
@@ -110,7 +100,7 @@ object ProjectTests extends TestSuite{
         @ import $ivy.`com.chuusai::shapeless:2.3.2`, shapeless._
 
         @ (1 :: "lol" :: List(1, 2, 3) :: HNil)
-        res1: Int :: String :: List[Int] :: HNil = 1 :: lol :: List(1, 2, 3) :: HNil
+        res1: Int :: String :: List[Int] :: HNil = 1 :: "lol" :: List(1, 2, 3) :: HNil
 
         @ res1(1)
         res2: String = "lol"
@@ -169,7 +159,11 @@ object ProjectTests extends TestSuite{
           res1: Int = 1
 
           @ ExprCtx.Parened.parse("1 + 1") // for some reason the tuple isn't pprinted
-          res2: fastparse.core.Parsed[Unit,Char,String] = Failure("(":1:1 ..."1 + 1")
+          res2: fastparse.core.Parsed[Unit,Char,String] = Failure(
+            ElemLiteral('('),
+            0,
+            Extra(1 + 1, [traced - not evaluated])
+          )
 
           @ ExprCtx.Parened.parse("(1 + 1)")
           res3: fastparse.core.Parsed[Unit,Char,String] = Success((), 7)
@@ -252,11 +246,14 @@ object ProjectTests extends TestSuite{
           res8: Double = 0.375
 
           @ Interval(0, 10)
-          res9: Interval[Int] = [0, 10]
+          res9: Interval[Int] = Bounded(0, 10, 0)
+
+          @ mean(Rational(1, 2), Rational(3, 2), Rational(0))
+          res10: Rational = 2/3
         """)
       else if (scala2_10)
         check.session(s"""
-          @ import $$ivy.`org.spire-math::spire:0.11.0`
+          @ import $$ivy.`org.spire-math::spire:0.13.0`
 
           @ import spire.implicits._
 
@@ -282,13 +279,11 @@ object ProjectTests extends TestSuite{
           res8: Double = 0.375
 
           @ Interval(0, 10)
-          res9: spire.math.Interval[Int] = [0, 10]
-        """)
+          res9: spire.math.Interval[Int] = Bounded(0, 10, 0)
 
-      // This fella is misbehaving but I can't figure out why :/
-      //
-      //          @ mean(Rational(1, 2), Rational(3, 2), Rational(0))
-      //      res9: spire.math.Rational = 2/3
+          @ mean(Rational(1, 2), Rational(3, 2), Rational(0))
+          res10: spire.math.Rational = 2/3
+        """)
 
     }
     'pegdown{

@@ -6,19 +6,22 @@ import ammonite.runtime._
 import ammonite.terminal.Filter
 import ammonite.util.Util.newLine
 import ammonite.util._
-import acyclic.file
+
 import ammonite.interp.{Interpreter, Preprocessor}
 
 import scala.annotation.tailrec
 
 class Repl(input: InputStream,
            output: OutputStream,
+           info: OutputStream,
            error: OutputStream,
            storage: Storage,
-           predef: String,
+           defaultPredef: String,
+           mainPredef: String,
            wd: ammonite.ops.Path,
            welcomeBanner: Option[String],
-           replArgs: Seq[Bind[_]] = Nil) {
+           replArgs: Seq[Bind[_]] = Nil,
+           remoteLogger: Option[RemoteLogger]) {
 
   val prompt = Ref("@ ")
 
@@ -27,7 +30,7 @@ class Repl(input: InputStream,
   var history = new History(Vector())
 
   val (colors, printStream, errorPrintStream, printer) =
-    Interpreter.initPrinters(output, error, true)
+    Interpreter.initPrinters(output, info, error, true)
 
 
 
@@ -42,9 +45,9 @@ class Repl(input: InputStream,
     printer,
     storage,
     Seq(
-      Name("HardcodedPredef") -> Repl.pprintPredef,
-      Name("ArgsPredef") -> argString,
-      Name("predef") -> predef
+      Interpreter.PredefInfo(Name("DefaultPredef"), defaultPredef, true, None),
+      Interpreter.PredefInfo(Name("ArgsPredef"), argString, false, None),
+      Interpreter.PredefInfo(Name("MainPredef"), mainPredef, false, Some(wd))
     ),
     i => {
       val replApi = new ReplApiImpl(
@@ -99,6 +102,7 @@ class Repl(input: InputStream,
     interp.init()
     @tailrec def loop(): Any = {
       val actionResult = action()
+      remoteLogger.foreach(_.apply("Action"))
       interp.handleOutput(actionResult)
 
       actionResult match{
@@ -119,11 +123,14 @@ class Repl(input: InputStream,
     }
     loop()
   }
+
+  def beforeExit(exitValue: Any): Any = {
+    Function.chain(interp.beforeExitHooks)(exitValue)
+  }
 }
 
 object Repl{
-  val pprintPredef =
-    "import ammonite.repl.ReplBridge.value.{pprintConfig, derefPPrint}"
+
 
   def highlightFrame(f: StackTraceElement,
                      error: fansi.Attrs,

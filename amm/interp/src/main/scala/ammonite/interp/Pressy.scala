@@ -1,6 +1,6 @@
 package ammonite.interp
 
-import acyclic.file
+
 
 import scala.reflect.internal.util.{Position, OffsetPosition, BatchSourceFile}
 import scala.reflect.io.VirtualDirectory

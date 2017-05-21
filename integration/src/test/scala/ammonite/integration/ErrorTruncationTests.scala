@@ -25,7 +25,7 @@ object ErrorTruncationTests extends TestSuite{
     ).plainText
     //This string gets included on windows due to environment variable set additionally
 
-    assert(e == expected)
+    assert(e.contains(expected))
   }
   def scriptFile(name: String): Path =
     replStandaloneResources/'errorTruncation/name
