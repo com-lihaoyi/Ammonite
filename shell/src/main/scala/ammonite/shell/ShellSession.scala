@@ -5,7 +5,7 @@ import java.nio.file.attribute.PosixFilePermission
 
 import ammonite.ops._
 import ammonite.repl.FrontEndUtils
-
+import pprint.Renderer
 
 import scala.util.Try
 
@@ -42,8 +42,11 @@ case class ShellSession() extends OpsAPI {
 object PPrints{
 
   def lsSeqRepr(t: LsSeq) = pprint.Tree.Lazy { ctx =>
+    val renderer = new Renderer(
+      ctx.width, ctx.applyPrefixColor, ctx.literalColor, ctx.indentStep
+    )
     val snippets = for (p <- t) yield {
-      ctx.literalColor(pprint.tokenize(p relativeTo t.base).mkString)
+      fansi.Str.join(renderer.rec(relPathRepr(p relativeTo t.base), 0, 0).iter.toStream:_*)
     }
     Iterator("\n") ++ FrontEndUtils.tabulate(snippets, FrontEndUtils.width)
   }
