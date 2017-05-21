@@ -70,7 +70,8 @@ object SshdRepl {
         new Repl(
           in, out, out, out,
           new Storage.Folder(homePath), augmentedPredef, predef,
-          wd, Some(ammonite.main.Defaults.welcomeBanner)
+          wd, Some(ammonite.main.Defaults.welcomeBanner),
+          remoteLogger = None
         ).run()
       } catch {
         case any: Throwable =>

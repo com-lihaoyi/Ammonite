@@ -291,12 +291,12 @@
     @sect{Ammonite Arguments in Scripts}
       @p
         By default, Ammonite treats the first argument as the script file as long
-        as it does not start with a `-`, and then forwards any subsequent arguments
+        as it does not start with a @code{-}, and then forwards any subsequent arguments
         to that script's main method(s). If you wish to pass arguments to @i{Ammonite},
         you can do so by splitting up the argument list with a @code{--}:
 
       @hl.sh
-        amm Args.sc --predef 'println("welcome!")' -- 3 Moo
+        $ amm Args.sc --predef 'println("welcome!")' -- 3 Moo
         welcome!
         "Hello! MooMooMoo Ammonite."
 
@@ -338,13 +338,13 @@
       @p
         You can call it via
 
-      @hl.sh
+      @code
         amm MultiMain.sc mainA
 
       @p
         Or
 
-      @hl.sh
+      @code
         amm MultiMain.sc functionB 2 "Hello"
 
     @sect{Bundled Libraries}

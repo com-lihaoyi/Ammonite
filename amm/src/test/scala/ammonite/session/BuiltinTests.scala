@@ -81,12 +81,12 @@ object BuiltinTests extends TestSuite{
         @ List(1, 2, 3) + "lol"
         res0: String = "List(1, 2, 3)lol"
 
-        @ repl.compiler.settings.noimports.value = true
+        @ interp.configureCompiler(_.settings.noimports.value = true)
 
         @ List(1, 2, 3) + "lol" // predef imports disappear
         error: not found: value List
 
-        @ repl.compiler.settings.noimports.value = false
+        @ interp.configureCompiler(_.settings.noimports.value = false)
 
         @ List(1, 2, 3) + "lol"
         res3: String = "List(1, 2, 3)lol"
@@ -96,7 +96,7 @@ object BuiltinTests extends TestSuite{
         @ object X extends Dynamic
         error: extension of type scala.Dynamic needs to be enabled
 
-        @ repl.compiler.settings.language.tryToSet(List("dynamics"))
+        @ interp.configureCompiler(_.settings.language.tryToSet(List("dynamics")))
 
         @ object X extends Dynamic
         defined object X
@@ -108,7 +108,7 @@ object BuiltinTests extends TestSuite{
         @ List(1) match { case _: List[Double] => 2 }
         res7: Int = 2
 
-        @ repl.compiler.settings.nowarnings.value = false
+        @ interp.configureCompiler(_.settings.nowarnings.value = false)
 
         @ List(1) match { case _: List[Double] => 2 }
         warning: $fruitlessTypeTestWarningMessageBlahBlahBlah
