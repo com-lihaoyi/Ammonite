@@ -26,9 +26,7 @@ private object ProxyFromEnv {
     */
   private def envToProps(env: (String, String)): Map[String, String] = env match {
     case ("no_proxy", noProxySeq) =>
-      val converted = noProxySeq.split(""",""").filter { addr =>
-        addr != "localhost" && !addr.startsWith("127.") && addr != "::1"
-      }.mkString("|")
+      val converted = noProxySeq.split(""",""").mkString("|")
       //https uses the same as http's. Ftp need not to be set here.
       Map("http.nonProxyHosts" -> converted)
 
