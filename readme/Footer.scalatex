@@ -114,6 +114,17 @@
 
 
   @sect{Changelog}
+    @sect{0.9.1}
+      @ul
+        @li
+          Fix error message when running a script and Ammonite cannot find the
+          main method you specify because your first non-script arg starts with
+          @code{--}
+        @li
+          Fix crash when trying to pretty-print values whose @code{toString}
+          is the empty string.
+
+
     @sect{0.9.0}
       @ul
         @li
