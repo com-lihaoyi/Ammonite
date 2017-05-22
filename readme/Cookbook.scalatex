@@ -36,7 +36,7 @@
 
     @hl.scala
       Welcome to the Ammonite Repl
-      @@ interp.load.ivy("org.scalaj" %% "scalaj-http" % "2.2.0")
+      @@ interp.load.ivy("org.scalaj" %% "scalaj-http" % "2.3.0")
       :: loading settings ::
       :: resolving dependencies ::
       ...
