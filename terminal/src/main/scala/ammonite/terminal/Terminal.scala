@@ -141,16 +141,6 @@ object Terminal {
                    fullPrompt: Boolean = true,
                    newlinePrompt: Boolean = false) = {
 
-
-      // Enable this in certain cases (e.g. cursor near the value you are
-      // interested into) see what's going on with all the ansi screen-cursor
-      // movement
-      def debugDelay() = if (false){
-        Thread.sleep(200)
-        writer.flush()
-      }
-
-
       val promptLine =
         if (fullPrompt) prompt.full
         else prompt.lastLine
@@ -222,30 +212,36 @@ object Terminal {
       )
 
       lazy val transformedBuffer = transformedBuffer0 ++ lastState.msg
+
       lazy val lastOffsetCursor = lastState.cursor + cursorOffset
-      lazy val rowLengths = splitBuffer(
-        lastState.buffer ++ lastState.msg.plainText
-      )
+
+      lazy val rowLengths = splitBuffer(lastState.buffer ++ lastState.msg.plainText)
+
       val narrowWidth = width - prompt.lastLine.length
       val newlinePrompt = rowLengths.exists(_ >= narrowWidth)
       val promptWidth = if(newlinePrompt) 0 else prompt.lastLine.length
       val actualWidth = width - promptWidth
       val newlineUp = if (newlinePrompt) 1 else 0
-      if (!moreInputComing) redrawLine(
-        transformedBuffer,
-        lastOffsetCursor,
-        ups,
-        rowLengths,
-        fullPrompt,
-        newlinePrompt
-      )
 
-      lazy val (oldCursorY, _) = positionCursor(
-        lastOffsetCursor,
-        rowLengths,
-        calculateHeight0(rowLengths, actualWidth),
-        actualWidth
-      )
+      // We don't actually print anything if more input is coming
+      val oldCursorY =
+        if (moreInputComing) ups
+        else {
+          redrawLine(
+            transformedBuffer,
+            lastOffsetCursor,
+            ups,
+            rowLengths,
+            fullPrompt,
+            newlinePrompt
+          )
+          positionCursor(
+            lastOffsetCursor,
+            rowLengths,
+            calculateHeight0(rowLengths, actualWidth),
+            actualWidth
+          )._1
+        }
 
       def updateState(s: LazyList[Int],
                       b: Vector[Char],
