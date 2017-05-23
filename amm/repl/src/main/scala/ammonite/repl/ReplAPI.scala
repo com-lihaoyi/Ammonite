@@ -111,7 +111,7 @@ trait ReplAPI {
    */
 
   def show(t: Any,
-           width: Integer = 0,
+           width: Integer = null,
            height: Integer = null,
            indent: Integer = null): Unit
   /**

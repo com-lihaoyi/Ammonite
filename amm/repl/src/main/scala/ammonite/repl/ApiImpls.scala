@@ -91,21 +91,22 @@ class ReplApiImpl(val interp: Interpreter,
       additionalHandlers = {
         case t: History => pprint.Tree.Lazy(ctx => Iterator(t.mkString("\n")))
         case t: GrepResult => pprint.Tree.Lazy(ctx => Iterator(GrepResult.grepResultRepr(t, ctx)))
+        case t: scala.xml.Elem => pprint.Tree.Lazy(_ => Iterator(t.toString))
       }
     )
   )
 
   override def show(t: Any,
                     width: Integer = null,
-                    height: Integer = 999999,
+                    height: Integer = 9999999,
                     indent: Integer = null) = {
 
     pprinter()
       .tokenize(
         t,
-        Option(width: Int).getOrElse(pprinter().defaultWidth),
-        height,
-        Option(indent: Int).getOrElse(pprinter().defaultIndent)
+        width = if (width == null) pprinter().defaultWidth else width,
+        height = if (height == null) pprinter().defaultHeight else height,
+        indent = if (indent == null) pprinter().defaultIndent else indent
       )
       .map(_.render)
       .foreach(printer.out)
