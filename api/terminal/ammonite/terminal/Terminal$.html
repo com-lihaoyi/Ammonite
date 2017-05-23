@@ -202,6 +202,16 @@ debugging easier.">
                           LazyList
                         </a>
                       </li><li class="current-entities indented2">
+                        <a class="object" href="LineReader$.html" title=""></a>
+                        <a class="class" href="LineReader.html" title="Encapsulates the common configuration and logic around reading a single
+line of input
+"></a>
+                        <a href="LineReader.html" title="Encapsulates the common configuration and logic around reading a single
+line of input
+">
+                          LineReader
+                        </a>
+                      </li><li class="current-entities indented2">
                         <span class="separator"></span>
                         <a class="class" href="Printing.html" title=""></a>
                         <a href="Printing.html" title="">
@@ -461,39 +471,6 @@ the buffer&quot;, and &quot;ansi terminal should reflect most up to date TermSta
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="ammonite.terminal.Terminal#calculateHeight" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="calculateHeight(buffer:Vector[Char],width:Int,prompt:String):Seq[Int]"></a><a id="calculateHeight(Vector[Char],Int,String):Seq[Int]"></a>
-      <span class="permalink">
-      <a href="../../ammonite/terminal/Terminal$.html#calculateHeight(buffer:Vector[Char],width:Int,prompt:String):Seq[Int]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">calculateHeight</span><span class="params">(<span name="buffer">buffer: <span class="extype" name="scala.Vector">Vector</span>[<a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Char" class="extype" target="_top">Char</a>]</span>, <span name="width">width: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Int" class="extype" target="_top">Int</a></span>, <span name="prompt">prompt: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Seq">Seq</span>[<a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Int" class="extype" target="_top">Int</a>]</span>
-      </span>
-      
-      
-    </li><li name="ammonite.terminal.Terminal#calculateHeight0" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="calculateHeight0(rowLengths:Seq[Int],width:Int):Seq[Int]"></a><a id="calculateHeight0(Seq[Int],Int):Seq[Int]"></a>
-      <span class="permalink">
-      <a href="../../ammonite/terminal/Terminal$.html#calculateHeight0(rowLengths:Seq[Int],width:Int):Seq[Int]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">calculateHeight0</span><span class="params">(<span name="rowLengths">rowLengths: <span class="extype" name="scala.Seq">Seq</span>[<a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Int" class="extype" target="_top">Int</a>]</span>, <span name="width">width: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Int" class="extype" target="_top">Int</a></span>)</span><span class="result">: <span class="extype" name="scala.Seq">Seq</span>[<a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Int" class="extype" target="_top">Int</a>]</span>
-      </span>
-      
-      <p class="shortcomment cmt">Given a buffer with characters and newlines, calculates how high
-the buffer is and where the cursor goes inside of it.</p>
     </li><li name="scala.AnyRef#clone" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a><a id="clone():AnyRef"></a>
       <span class="permalink">
@@ -570,29 +547,6 @@ the buffer is and where the cursor goes inside of it.</p>
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="ammonite.terminal.Terminal#fragHeight" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="fragHeight(length:Int,width:Int):Int"></a><a id="fragHeight(Int,Int):Int"></a>
-      <span class="permalink">
-      <a href="../../ammonite/terminal/Terminal$.html#fragHeight(length:Int,width:Int):Int" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">fragHeight</span><span class="params">(<span name="length">length: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Int" class="extype" target="_top">Int</a></span>, <span name="width">width: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Int" class="extype" target="_top">Int</a></span>)</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Int" class="extype" target="_top">Int</a></span>
-      </span>
-      
-      <p class="shortcomment cmt">Computes how tall a line of text is when wrapped at <code>width</code>.</p><div class="fullcomment"><div class="comment cmt"><p>Computes how tall a line of text is when wrapped at <code>width</code>.</p><p>Even 0-character lines still take up one row!</p><p>width = 2
-0 -&gt; 1
-1 -&gt; 1
-2 -&gt; 1
-3 -&gt; 2
-4 -&gt; 2
-5 -&gt; 3
-</p></div></div>
     </li><li name="scala.AnyRef#getClass" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <span class="permalink">
@@ -657,22 +611,6 @@ the buffer is and where the cursor goes inside of it.</p>
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="ammonite.terminal.Terminal#noTransform" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="noTransform(x:Vector[Char],i:Int):(fansi.Str,Int)"></a><a id="noTransform(Vector[Char],Int):(Str,Int)"></a>
-      <span class="permalink">
-      <a href="../../ammonite/terminal/Terminal$.html#noTransform(x:Vector[Char],i:Int):(fansi.Str,Int)" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">noTransform</span><span class="params">(<span name="x">x: <span class="extype" name="scala.Vector">Vector</span>[<a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Char" class="extype" target="_top">Char</a>]</span>, <span name="i">i: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Int" class="extype" target="_top">Int</a></span>)</span><span class="result">: (<a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/fansi_2.12/0.2.3/fansi_2.12-0.2.3-javadoc.jar/!/index.html#fansi.Str" class="extype" target="_top">Str</a>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Int" class="extype" target="_top">Int</a>)</span>
-      </span>
-      
-      
     </li><li name="scala.AnyRef#notify" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notify():Unit"></a>
       <span class="permalink">
@@ -705,22 +643,6 @@ the buffer is and where the cursor goes inside of it.</p>
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="ammonite.terminal.Terminal#positionCursor" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="positionCursor(cursor:Int,rowLengths:Seq[Int],fragHeights:Seq[Int],width:Int):(Int,Int)"></a><a id="positionCursor(Int,Seq[Int],Seq[Int],Int):(Int,Int)"></a>
-      <span class="permalink">
-      <a href="../../ammonite/terminal/Terminal$.html#positionCursor(cursor:Int,rowLengths:Seq[Int],fragHeights:Seq[Int],width:Int):(Int,Int)" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">positionCursor</span><span class="params">(<span name="cursor">cursor: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Int" class="extype" target="_top">Int</a></span>, <span name="rowLengths">rowLengths: <span class="extype" name="scala.Seq">Seq</span>[<a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Int" class="extype" target="_top">Int</a>]</span>, <span name="fragHeights">fragHeights: <span class="extype" name="scala.Seq">Seq</span>[<a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Int" class="extype" target="_top">Int</a>]</span>, <span name="width">width: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Int" class="extype" target="_top">Int</a></span>)</span><span class="result">: (<a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Int" class="extype" target="_top">Int</a>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Int" class="extype" target="_top">Int</a>)</span>
-      </span>
-      
-      
     </li><li name="ammonite.terminal.Terminal#readLine" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="readLine(prompt:ammonite.terminal.Prompt,reader:java.io.Reader,writer:java.io.Writer,filters:ammonite.terminal.Filter,displayTransform:(Vector[Char],Int)=&gt;(fansi.Str,Int)):Option[String]"></a><a id="readLine(Prompt,Reader,Writer,Filter,(Vector[Char],Int)⇒(Str,Int)):Option[String]"></a>
       <span class="permalink">
@@ -733,7 +655,7 @@ the buffer is and where the cursor goes inside of it.</p>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">readLine</span><span class="params">(<span name="prompt">prompt: <a href="Prompt.html" class="extype" name="ammonite.terminal.Prompt">Prompt</a></span>, <span name="reader">reader: <span class="extype" name="java.io.Reader">Reader</span></span>, <span name="writer">writer: <span class="extype" name="java.io.Writer">Writer</span></span>, <span name="filters">filters: <a href="Filter.html" class="extype" name="ammonite.terminal.Filter">Filter</a></span>, <span name="displayTransform">displayTransform: (<span class="extype" name="scala.Vector">Vector</span>[<a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Char" class="extype" target="_top">Char</a>], <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Int" class="extype" target="_top">Int</a>) ⇒ (<a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/fansi_2.12/0.2.3/fansi_2.12-0.2.3-javadoc.jar/!/index.html#fansi.Str" class="extype" target="_top">Str</a>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Int" class="extype" target="_top">Int</a>) = <span class="symbol"><span class="name"><a href="#noTransform(x:Vector[Char],i:Int):(fansi.Str,Int)">noTransform</a></span></span></span>)</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Option" class="extype" target="_top">Option</a>[<span class="extype" name="scala.Predef.String">String</span>]</span>
+        <span class="name">readLine</span><span class="params">(<span name="prompt">prompt: <a href="Prompt.html" class="extype" name="ammonite.terminal.Prompt">Prompt</a></span>, <span name="reader">reader: <span class="extype" name="java.io.Reader">Reader</span></span>, <span name="writer">writer: <span class="extype" name="java.io.Writer">Writer</span></span>, <span name="filters">filters: <a href="Filter.html" class="extype" name="ammonite.terminal.Filter">Filter</a></span>, <span name="displayTransform">displayTransform: (<span class="extype" name="scala.Vector">Vector</span>[<a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Char" class="extype" target="_top">Char</a>], <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Int" class="extype" target="_top">Int</a>) ⇒ (<a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/fansi_2.12/0.2.3/fansi_2.12-0.2.3-javadoc.jar/!/index.html#fansi.Str" class="extype" target="_top">Str</a>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Int" class="extype" target="_top">Int</a>) = <span class="symbol"><span class="name"><a href="LineReader$.html">LineReader.noTransform</a></span></span></span>)</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Option" class="extype" target="_top">Option</a>[<span class="extype" name="scala.Predef.String">String</span>]</span>
       </span>
       
       <p class="shortcomment cmt">Blockingly reads a line from the given input stream and returns it.</p><div class="fullcomment"><div class="comment cmt"><p>Blockingly reads a line from the given input stream and returns it.
@@ -741,22 +663,6 @@ the buffer is and where the cursor goes inside of it.</p>
                to manipulate the internal state of the terminal.</p></dd><dt class="param">displayTransform</dt><dd class="cmt"><p>code to manipulate the display of the buffer and
                         cursor, without actually changing the logical
                         values inside them.</p></dd></dl></div>
-    </li><li name="ammonite.terminal.Terminal#splitBuffer" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="splitBuffer(buffer:Vector[Char]):scala.collection.mutable.Buffer[Int]"></a><a id="splitBuffer(Vector[Char]):Buffer[Int]"></a>
-      <span class="permalink">
-      <a href="../../ammonite/terminal/Terminal$.html#splitBuffer(buffer:Vector[Char]):scala.collection.mutable.Buffer[Int]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">splitBuffer</span><span class="params">(<span name="buffer">buffer: <span class="extype" name="scala.Vector">Vector</span>[<a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Char" class="extype" target="_top">Char</a>]</span>)</span><span class="result">: <span class="extype" name="scala.collection.mutable.Buffer">Buffer</span>[<a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Int" class="extype" target="_top">Int</a>]</span>
-      </span>
-      
-      
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">
