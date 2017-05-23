@@ -31,7 +31,7 @@ class LineReader(width: Int,
   def redrawLine(buffer: fansi.Str,
                  cursor: Int,
                  ups: Int,
-                 rowLengths: Seq[Int],
+                 rowLengths: IndexedSeq[Int],
                  fullPrompt: Boolean = true,
                  newlinePrompt: Boolean = false) = {
 
@@ -64,13 +64,9 @@ class LineReader(width: Int,
     // are guaranteed that the lines are short, so we can indent the newlines
     // without fear of wrapping
     val newlineReplacement =
-    if (newlinePrompt) {
+      if (newlinePrompt) Array(lineStuffer, '\n')
+      else Array('\n', " " * prompt.lastLine.length:_*)
 
-      Array(lineStuffer, '\n')
-    } else {
-      val indent = " " * prompt.lastLine.length
-      Array('\n', indent:_*)
-    }
 
     writer.write(
       buffer.render.flatMap{
@@ -96,22 +92,32 @@ class LineReader(width: Int,
     writer.flush()
   }
 
+  def computeRendered(lastState: TermState) = {
+
+    val (rendered0, cursorOffset) = displayTransform(lastState.buffer, lastState.cursor)
+
+    val rendered = rendered0 ++ lastState.msg
+
+    val lastOffsetCursor = lastState.cursor + cursorOffset
+
+    (lastOffsetCursor, rendered)
+  }
   @tailrec
   final def readChar(lastState: TermState,
                      ups: Int,
                      fullPrompt: Boolean = true): Option[String] = {
     val moreInputComing = reader.ready()
 
-    lazy val (transformedBuffer0, cursorOffset) = displayTransform(
-      lastState.buffer,
-      lastState.cursor
-    )
+    // This is lazy because we don't always need it; in particular, we don't
+    // need it if there is `moreInputComing`, because any output we transform
+    // will just be rendered redundant immediately when the next character is
+    // processed. However, an exception is when a terminal filter completes
+    // this input with a `Result`, because we always show the contents after
+    // the buffer has been submitted, whether or not there is additional input
+    // being pasted
+    lazy val (renderedCursor, rendered) = computeRendered(lastState)
 
-    lazy val transformedBuffer = transformedBuffer0 ++ lastState.msg
-
-    lazy val lastOffsetCursor = lastState.cursor + cursorOffset
-
-    lazy val rowLengths = LineReader.splitBuffer(lastState.buffer ++ lastState.msg.plainText)
+    val rowLengths = LineReader.splitBuffer(lastState.buffer ++ lastState.msg.plainText)
 
     val narrowWidth = width - prompt.lastLine.length
     val newlinePrompt = rowLengths.exists(_ >= narrowWidth)
@@ -119,72 +125,59 @@ class LineReader(width: Int,
     val actualWidth = width - promptWidth
     val newlineUp = if (newlinePrompt) 1 else 0
 
-    // We don't actually print anything if more input is coming
-    val oldCursorY =
-      if (moreInputComing) ups
+    // If there's more input already available to use, we don't both redrawing
+    // the buffer since it'll just get redrawn again immediately. And since we
+    // don't redraw the buffer, we don't need to add any more `ups`, since their
+    // sole purpose is to let the next iteration over-write the buffer we draw
+    val (nextUps, oldCursorY) =
+      if (moreInputComing) (ups, ups)
       else {
-        redrawLine(
-          transformedBuffer,
-          lastOffsetCursor,
-          ups,
-          rowLengths,
-          fullPrompt,
-          newlinePrompt
-        )
-        LineReader.positionCursor(
-          lastOffsetCursor,
+
+        redrawLine(rendered, renderedCursor, ups, rowLengths, fullPrompt, newlinePrompt)
+
+        val oldCursorY = LineReader.positionCursor(
+          renderedCursor,
           rowLengths,
           LineReader.calculateHeight0(rowLengths, actualWidth),
           actualWidth
         )._1
+
+        (oldCursorY + newlineUp, oldCursorY)
       }
 
-    def updateState(s: LazyList[Int],
-                    b: Vector[Char],
-                    c: Int,
-                    msg: fansi.Str): (Int, TermState) = {
-
-      val newCursor = math.max(math.min(c, b.length), 0)
-      val nextUps =
-        if (moreInputComing) ups
-        else oldCursorY + newlineUp
-
-      val newState = TermState(s, b, newCursor, msg)
-
-      (nextUps, newState)
+    // Centralize the "keep cursor in bounds" logic in one place, so the rest
+    // of the code in filters can YOLO it and not worry about this book-keeping
+    def boundCursor(ts: TermState) = {
+      ts.copy(cursor = math.max(math.min(ts.cursor, ts.buffer.length), 0))
     }
     // `.get` because we assume that *some* filter is going to match each
     // character, even if only to dump the character to the screen. If nobody
     // matches the character then we can feel free to blow up
     filters.op(TermInfo(lastState, actualWidth)).get match {
-      case Printing(TermState(s, b, c, msg), stdout) =>
-        writer.write(stdout)
-        val (nextUps, newState) = updateState(s, b, c, msg)
-        readChar(newState, nextUps)
+      case ts: TermState => readChar(boundCursor(ts), nextUps, false)
 
-      case TermState(s, b, c, msg) =>
-        val (nextUps, newState) = updateState(s, b, c, msg)
-        readChar(newState, nextUps, false)
+      case Printing(ts, stdout) =>
+        writer.write(stdout)
+        readChar(boundCursor(ts), nextUps)
 
       case Result(s) =>
         redrawLine(
-          transformedBuffer, lastState.buffer.length,
+          rendered, lastState.buffer.length,
           oldCursorY + newlineUp, rowLengths, false, newlinePrompt
         )
-        writer.write(10)
-        writer.write(13)
+        writer.write("\n\r")
         writer.flush()
         Some(s)
+
       case ClearScreen(ts) =>
         ansi.clearScreen(2)
         ansi.up(9999)
         ansi.left(9999)
         readChar(ts, ups)
-      case Exit =>
-        None
+
+      case Exit => None
     }
   }
-
 }
 
 
@@ -207,7 +200,7 @@ object LineReader{
   def fragHeight(length: Int, width: Int) = math.max(1, (length - 1) / width + 1)
 
   def splitBuffer(buffer: Vector[Char]) = {
-    val frags = mutable.Buffer.empty[Int]
+    val frags = mutable.ArrayBuffer.empty[Int]
     frags.append(0)
     for(c <- buffer){
       if (c == '\n') frags.append(0)
@@ -227,8 +220,8 @@ object LineReader{
     * Given a buffer with characters and newlines, calculates how high
     * the buffer is and where the cursor goes inside of it.
     */
-  def calculateHeight0(rowLengths: Seq[Int],
-                       width: Int): Seq[Int] = {
+  def calculateHeight0(rowLengths: IndexedSeq[Int],
+                       width: Int): IndexedSeq[Int] = {
     val fragHeights =
       rowLengths
         .inits
@@ -248,8 +241,8 @@ object LineReader{
   }
 
   def positionCursor(cursor: Int,
-                     rowLengths: Seq[Int],
-                     fragHeights: Seq[Int],
+                     rowLengths: IndexedSeq[Int],
+                     fragHeights: IndexedSeq[Int],
                      width: Int) = {
     var leftoverCursor = cursor
     //    Debug("leftoverCursor " + leftoverCursor)
