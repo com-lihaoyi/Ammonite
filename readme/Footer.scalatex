@@ -219,913 +219,919 @@
           to disable it, pass in the @code{--no-remote-logging} command-line
           flag or the @hl.scala{remoteLogging=false} argument to @hl.scala{Main}.
 
-    @sect{0.8.5}
-      @ul
-        @li
-          Fix classLoader related problem in Multi-stage scripts with @hl.scala("@main")
-          (@issue(591))
-        @li
-          A nicer error message when you try to run a non-existent script (@issue(522))
-        @li
-          @hl.scala{ammonite.ops.Path(s: String)} now resolves @code{~} to the
-          home directory of the current user
-        @li
-          Many improvements to classpath scanning and re-compilation logic (@issue(542))
-          which should greatly reduce the time taken start Ammonite in an SBT project,
-          and avoid many existing problems with stale compilation caches.
-        @li
-          Fix crash when you try to run an empty script
-        @li
-          Miscellaneous info messages now go to stderr rather than stdout, so they
-          don't get mixed into your script output if you pipe into a file (@issue(574))
+    @sect{0.8.x}
+      @sect{0.8.5}
+        @ul
+          @li
+            Fix classLoader related problem in Multi-stage scripts with @hl.scala("@main")
+            (@issue(591))
+          @li
+            A nicer error message when you try to run a non-existent script (@issue(522))
+          @li
+            @hl.scala{ammonite.ops.Path(s: String)} now resolves @code{~} to the
+            home directory of the current user
+          @li
+            Many improvements to classpath scanning and re-compilation logic (@issue(542))
+            which should greatly reduce the time taken start Ammonite in an SBT project,
+            and avoid many existing problems with stale compilation caches.
+          @li
+            Fix crash when you try to run an empty script
+          @li
+            Miscellaneous info messages now go to stderr rather than stdout, so they
+            don't get mixed into your script output if you pipe into a file (@issue(574))
 
 
-    @sect{0.8.4}
-      @ul
-        @li
-          Make startup banner configurable via a command line flag
+      @sect{0.8.4}
+        @ul
+          @li
+            Make startup banner configurable via a command line flag
 
-    @sect{0.8.3}
-      @ul
-        @li
-          Cross-publish for Scala 2.12.2, 2.11.11
-        @li
-          Bump version of apache-sshd (@issue(545)), by 
-          @lnk("emanresusername", "https://github.com/emanresusername")
-        @li
-          Avoid @code{FileAlreadyExistsException} when compiling scripts in
-          parallel (@issue(567)), by @lnk("armanbilge", "https://github.com/armanbilge")
-        @li
-          Add @code{beforeExitHooks} so you can register cleanup code (@issue(581)), by
-          @lnk("emanresusername", "https://github.com/emanresusername")
-        @li
-          Add a sleep in @code{Shellout.executeStream} to reduce spinning. (@issue(578)), by
-          @lnk("rorygraves", "https://github.com/rorygraves")
-        @li
-          Add an overloaded version of LoadJar.cp that takes a sequence of paths, by
-          @lnk("mallman", "https://github.com/mallman")
-    @sect{0.8.2}
-      @ul
-        @li
-          Automatically publish standalone executable for Scala 2.10 and 2.11,
-          thanks to @lnk("jhnsmth", "https://github.com/jhnsmth")
-        @li
-          Bytecode of classes defined in the REPL is now accessible via
-          @code{getClass.getClassLoader.getResource}, thanks to
-          @lnk("jhnsmth", "https://github.com/jhnsmth")
-        @li
-          Fix crash in working with Hadoop in Ammonite (@issue(535)), thanks to
-          @lnk("Tom Dyas", "https://github.com/tdyas")
-        @li
-          @code{Ctrl-u} and @code{Ctrl-k} now cut to the beginning/end of the
-          current line (@issue(514)), rather than the entire input block, thanks to
-          @lnk("Jordan Gwyn", "https://github.com/emanresusername")
-    @sect{0.8.1}
-      @ul
-        @li
-          Cross-published for Scala 2.12, with the help of
-          @lnk("Roman Tkalenko", "https://github.com/tkroman") who
-          investigated and fixed a gnarly classpath bug @issue(515)
-        @li
-          Handle multi-line shebang lines, thanks to @lnk("Greg Dorrell", "https://github.com/Grogs")
-        @li
-          Fix @code{NullPointerException} on no-save-then-load situation in REPL,
-          thanks to @lnk("Roman Tkalenko", "https://github.com/tkroman")
-        @li
-          Use Console for SSHD stream redirection to avoid inter-thread spillage
-          of stdout, thanks to @lnk("Timothy Dettrick", "https://github.com/tjdett")
-    @sect{0.8.0}
-      @ul
-        @li
-          Tweak default imports to avoid ambiguous imports reported in @issue(500)
-        @li
-          Allow configuration of SSHD console classloader @issue(486)
-        @li
-          Use RSA host keys instead of DSA @issue(485)
-    @sect{0.7.9}
-      @ul
-        @li
-          Fix @issue(496) by properly setting context classloader when running
-          cached scripts
-        @li
-          Make @code{.iter} versions of file operations return
-          @lnk("geny", "https://github.com/lihaoyi/geny") @code{Generator}s
-          rather than @code{Iterator}s, which should avoid problems with
-          leaking file handles
+      @sect{0.8.3}
+        @ul
+          @li
+            Cross-publish for Scala 2.12.2, 2.11.11
+          @li
+            Bump version of apache-sshd (@issue(545)), by
+            @lnk("emanresusername", "https://github.com/emanresusername")
+          @li
+            Avoid @code{FileAlreadyExistsException} when compiling scripts in
+            parallel (@issue(567)), by @lnk("armanbilge", "https://github.com/armanbilge")
+          @li
+            Add @code{beforeExitHooks} so you can register cleanup code (@issue(581)), by
+            @lnk("emanresusername", "https://github.com/emanresusername")
+          @li
+            Add a sleep in @code{Shellout.executeStream} to reduce spinning. (@issue(578)), by
+            @lnk("rorygraves", "https://github.com/rorygraves")
+          @li
+            Add an overloaded version of LoadJar.cp that takes a sequence of paths, by
+            @lnk("mallman", "https://github.com/mallman")
+      @sect{0.8.2}
+        @ul
+          @li
+            Automatically publish standalone executable for Scala 2.10 and 2.11,
+            thanks to @lnk("jhnsmth", "https://github.com/jhnsmth")
+          @li
+            Bytecode of classes defined in the REPL is now accessible via
+            @code{getClass.getClassLoader.getResource}, thanks to
+            @lnk("jhnsmth", "https://github.com/jhnsmth")
+          @li
+            Fix crash in working with Hadoop in Ammonite (@issue(535)), thanks to
+            @lnk("Tom Dyas", "https://github.com/tdyas")
+          @li
+            @code{Ctrl-u} and @code{Ctrl-k} now cut to the beginning/end of the
+            current line (@issue(514)), rather than the entire input block, thanks to
+            @lnk("Jordan Gwyn", "https://github.com/emanresusername")
+      @sect{0.8.1}
+        @ul
+          @li
+            Cross-published for Scala 2.12, with the help of
+            @lnk("Roman Tkalenko", "https://github.com/tkroman") who
+            investigated and fixed a gnarly classpath bug @issue(515)
+          @li
+            Handle multi-line shebang lines, thanks to @lnk("Greg Dorrell", "https://github.com/Grogs")
+          @li
+            Fix @code{NullPointerException} on no-save-then-load situation in REPL,
+            thanks to @lnk("Roman Tkalenko", "https://github.com/tkroman")
+          @li
+            Use Console for SSHD stream redirection to avoid inter-thread spillage
+            of stdout, thanks to @lnk("Timothy Dettrick", "https://github.com/tjdett")
+      @sect{0.8.0}
+        @ul
+          @li
+            Tweak default imports to avoid ambiguous imports reported in @issue(500)
+          @li
+            Allow configuration of SSHD console classloader @issue(486)
+          @li
+            Use RSA host keys instead of DSA @issue(485)
+    @sect{0.7.x}
+      @sect{0.7.9}
+        @ul
+          @li
+            Fix @issue(496) by properly setting context classloader when running
+            cached scripts
+          @li
+            Make @code{.iter} versions of file operations return
+            @lnk("geny", "https://github.com/lihaoyi/geny") @code{Generator}s
+            rather than @code{Iterator}s, which should avoid problems with
+            leaking file handles
 
-        @li
-          Fix a hole in @code{ammonite.ops.Path} that was allowing invalid
-          paths with empty segments to be constructed.
+          @li
+            Fix a hole in @code{ammonite.ops.Path} that was allowing invalid
+            paths with empty segments to be constructed.
 
-    @sect{0.7.8}
-      @ul
-        @li
-          Fix @issue(397) and @issue(430), thanks to
-          @lnk("Roman Tklalenko", "https://github.com/tkroman")
-        @li
-          Upgrade to Fansi 0.2.2, which should reduce memory usage by 134mb
-        @li
-          Update FastParse/Scalaparse dependency to 0.4.1
-    @sect{0.7.7}
-      @ul
-        @li
-          @issue(461) avoid loading the same compiler plugin more than once,
-          thanks to @lnk("Roman Tklalenko", "https://github.com/tkroman")
-        @li
-          Allow @code{cd!}ing into sym-links, thanks to
-          @lnk("Roman Tklalenko", "https://github.com/tkroman") and
-          @lnk("Sergei Winitzki", "https://github.com/winitzki")
-        @li
-          Bump Fansi dependency to 0.2.1 and bump Fastparse dependency to 0.4.0
+      @sect{0.7.8}
+        @ul
+          @li
+            Fix @issue(397) and @issue(430), thanks to
+            @lnk("Roman Tklalenko", "https://github.com/tkroman")
+          @li
+            Upgrade to Fansi 0.2.2, which should reduce memory usage by 134mb
+          @li
+            Update FastParse/Scalaparse dependency to 0.4.1
+      @sect{0.7.7}
+        @ul
+          @li
+            @issue(461) avoid loading the same compiler plugin more than once,
+            thanks to @lnk("Roman Tklalenko", "https://github.com/tkroman")
+          @li
+            Allow @code{cd!}ing into sym-links, thanks to
+            @lnk("Roman Tklalenko", "https://github.com/tkroman") and
+            @lnk("Sergei Winitzki", "https://github.com/winitzki")
+          @li
+            Bump Fansi dependency to 0.2.1 and bump Fastparse dependency to 0.4.0
 
-    @sect{0.7.6}
-      @ul
-        @li
-          When running scripts, Ammonite now prints out a "Compiling foo.sc..."
-          message if they're being compiled for the first time. If you want
-          this to not be the case, you can silence it using the same @code{-s}
-          switch, thanks to @coderAbhishek
-        @li
-          The @code{--predef-file} switch now allows multiple inputs, allowing
-          you to pass in multiple files that all get evaluated as the predef
+      @sect{0.7.6}
+        @ul
+          @li
+            When running scripts, Ammonite now prints out a "Compiling foo.sc..."
+            message if they're being compiled for the first time. If you want
+            this to not be the case, you can silence it using the same @code{-s}
+            switch, thanks to @coderAbhishek
+          @li
+            The @code{--predef-file} switch now allows multiple inputs, allowing
+            you to pass in multiple files that all get evaluated as the predef
 
-        @li
-          @hl.scala{import.$ivy} no longer caches @code{-SNAPSHOT} versions,
-          thanks to @lnk("Julie Pitt", "https://github.com/yakticus")
-        @li
-          @issue(448) Deprecate @code{ammonite.ops.cwd} in preference to @code{ammonite.ops.pwd},
-          to help clear up confusion between @code{cwd} and local @code{wd}s,
-          thanks to @lnk("Julie Pitt", "https://github.com/yakticus")
+          @li
+            @hl.scala{import.$ivy} no longer caches @code{-SNAPSHOT} versions,
+            thanks to @lnk("Julie Pitt", "https://github.com/yakticus")
+          @li
+            @issue(448) Deprecate @code{ammonite.ops.cwd} in preference to @code{ammonite.ops.pwd},
+            to help clear up confusion between @code{cwd} and local @code{wd}s,
+            thanks to @lnk("Julie Pitt", "https://github.com/yakticus")
 
-        @li
-          Set a default heap limit of 500 megabytes to the @code{amm} standalone
-          executable, so it no longer grows to the "default" of 1/4 your system
-          memory (typically multiple gigabytes) unnecessarily. If you need to
-          give it more memory, start it with @code{JAVA_OPTS=-Xmx1500M amm}
+          @li
+            Set a default heap limit of 500 megabytes to the @code{amm} standalone
+            executable, so it no longer grows to the "default" of 1/4 your system
+            memory (typically multiple gigabytes) unnecessarily. If you need to
+            give it more memory, start it with @code{JAVA_OPTS=-Xmx1500M amm}
 
-        @li
-          @issue(453) Avoid un-wrapping @code("{...}") blocks in scripts, leaving
-          the unwrapping of @sect.ref{Block Input} only a feature of the interactive
-          REPL
-
-
-
-    @sect{0.7.5}
-      @ul
-        @li
-          @code{-s} cmd line switch makes ivy logs silent, though failures
-          will still be thrown as exception. Thanks to @coderAbhishek.
-        @li
-          Added @code{show} and @code{typeOf} back into the default REPL
-          imports, since they are pretty useful
-        @li
-          @code{write.over} in @sect.ref{Ammonite-Ops} should now properly
-          truncate files if the thing being written is shorter than the
-          original @issue(441)
-        @li
-          Ammonite no longer incorrectly allows multiple expressions to be
-          evaluated on the same line @issue(446)
-        @li
-          Compilation errors when there are multiple statements in a block
-          will no longer have redundant semicolons prefixed onto them @issue(439)
-        @li
-          Improved the line-number-reporting in certain cases where you use
-          @hl.scala{import $file.*}
-
-    @sect{0.7.4}
-      @ul
-        @li
-          Fix publication of artifacts for non-{2.11.8, 2.10.5} Ammonite versions
-
-    @sect{0.7.3}
-      @ul
-        @li
-          Actually avoid importing all the @sect.ref{Repl API} functions into
-          local scope, for reals
-
-    @sect{0.7.2}
-      @ul
-        @li
-          Hygienified the default namespace by avoiding importing all the
-          @sect.ref{Repl API} functions into local scope, instead leaving them
-          inside the @code{repl} object. @b{This is a backwards incompatible
-          change!}
-        @li
-          Separated the APIs available from scripts (@code{load.*} and
-          @code{resolvers} in the @code{interp} object)
-          from those available from the REPL (in the @code{repl} object).
-          @code{repl} is not available when running scripts, unless you pass in
-          the @code{--repl-api} flag at the command line.
-        @li
-          If you want to maintain the old behavior, e.g. for backwards-compat,
-          put a @hl.scala{import repl._} in your @code{~/.ammonite/predef.sc} and
-          @hl.scala{import interp._} in your @code{~/.ammonite/predefShared.sc} to
-          bring everything back into scope again.
-        @li
-          @code{predef.sc} now only applies to the interactive REPL. If you
-          want predef code that applies to scripts use @code{predefScript.sc},
-          or if you want predef code that applies to both you can use
-          @code{predefShared.sc}.
-        @li
-          Added a version of @sect.ref{desugar} to Scala 2.10.x. It doesn't
-          print things as prettily/accurately as the 2.11.x version, but it's
-          better than nothing.
-        @li
-          Changed the syntax for @hl.scala{import $file} segments outside your
-          current directory from @hl.scala{import $file.`..`.foo} to
-          @hl.scala{import $file.^.foo}. This makes it a lot shorter and
-          mitigates a problems caused by the file-name being too long.
-        @li
-          You can now use a @code{JAVA_OPTS} environment variable to pass flags
-          to the JVM when starting Ammonite, thanks to @lnk("Simon Scarduzio",
-          "https://github.com/sscarduzio")
-        @li
-          Running scripts outside the current working directory tree, as well as
-          scripts with non-alphanumeric symbols in their file path, now works
-          thanks to @coderAbhishek
-        @li
-          Scripts without the @code{.sc} can now be run directly from the command line
-          rather than throwing an @code{IndexOutOfBoundsException}, thanks to
-          @coderAbhishek
-        @li
-          Modularized Ammonite's internals; the main module @code{ammonite} has now
-          been broken into 5 smaller modules for maintainability. This in
-          itself should not be visible to the outside world, but be sure to
-          report any bugs!
-
-    @sect{0.7.0}
-      @ul
-        @li
-          Backwards incompatibly changes the extensions from Scripts and Predef
-          files from @code{.scala} to @code{.sc}, to avoid problems with SBT
-          discovering and trying (and failing) to compile them as normal Scala
-          files.
-        @li
-          Script files vastly faster to run once cached (~0.5s fixed overhead,
-          instead of ~5s I was seeing before): faster classpath scanning, with
-          much more aggressive and robust caching, thanks to @coderAbhishek who is
-          working on this over GSOC
-        @li
-          Fixed a performance regression and greatly sped up pasting text into
-          the REPL
-        @li
-          The behavior of @code{Ctrl p} and @code{Ctrl n} have been tweaked to
-          be more consistent with other readline implementations.
-        @li
-          @sect.ref{Magic Imports} now exist! This should provide a much more
-          intuitive way of importing other files and depending on ivy
-          artifacts, without all the fumbling with @hl.scala("@") that the
-          old @hl.scala{load.foo} functions required
-        @li
-          @hl.scala{load.module}, @hl.scala{load.exec}, @hl.scala{load.ivy} are
-          now largely superseded by @hl.scala{import $file},
-          @hl.scala{import $exec}, and @hl.scala{import $ivy}
-        @li
-          The way you pass in @sect.ref{Script Arguments} to a script, has been
-          totally revamped, and should be faster, more intuitive, and provide
-          better error messages when things go wrong
-        @li
-          Added a new top-level doc-site chapter on @sect.ref{Scala Scripts}.
-          This reflects their promotion from "quick hack that was a pain in
-          the neck to actually use" to
-          "something that actually feels pretty nice to use". If you've tried
-          running Ammonite scripts earlier and was totally turned off, it's
-          worth another shot.
-        @li
-          Most of Ammonite now works on Windows, with the exception of the
-          interactive REPL using @code{AmmoniteFrontEnd}, thanks to
-          @coderAbhishek who worked
-          on this over GSOC.
-        @li
-          Started doing Continuous Deployment of the Ammonite project's
-          artifacts and executables; now, any set of commits that get pushed
-          or merged into master will be published immediately, with this
-          documentation-site being updated, the standalone executable being
-          uploaded to @lnk("Github Releases",
-          "https://github.com/lihaoyi/Ammonite/releases/tag/snapshot-commit-uploads"),
-          the Ivy artifacts being uploaded to maven central, and instructions
-          for downloading/installing it shown in the @sect.ref{Unstable Versions}
-          section below. Any PRs that get merged are published and become
-          available within an hour or two, so the author and anyone else can
-          begin using them.
-
-    @sect{0.6.2}
-      @ul
-        @li
-          Fix @issue(403): Errors are silently swallowed in 0.6.1
-
-    @sect{0.6.1}
-      @ul
-        @li
-          Fixed @issue(400): load.exec in predef.scala causes NPE in 0.5.9 or 0.6.0
-        @li
-          Fixed @issue(398): by default, using Ammonite inside a SBT project uses the
-          old @code{~/.ammonite/} storage folder, not the @code{InMemory} storage system.
-          This restores the pre-0.5.9 behavior
-        @li
-          Fix regression causing BACKSPACE to not work while performing a
-          history-search
-        @li
-          More internal refactoring
-
-    @sect{0.6.0}
-      @ul
-        @li
-          Made @sect.ref{browse} use the process current working directory if
-          there's no implicit path in scope, since most times it doesn't matter
-        @li
-          Make the welcome banner "Welcome to the Ammonite Repl..." customizable
-        @li
-          Fixed bug where triggering autocomplete resulted in a broken REPL session
-    @sect{0.5.9}
-      @ul
-        @li
-          Introduced the @sect.ref{desugar} helper to @sect.ref{Ammonite-REPL},
-          letting you easily see what the compiler is transforming your code
-          into before it gets run.
-        @li
-          Prefix @hl.scala{_root_} to imports from packages, which should
-          reduce the chance of naming collisions
-        @li
-          Improved source locations for error messages: now failures in
-          scripts have a filename matching the name of the script (instead of
-          @code{Main.scala}), and line numbers matching the original line
-          numbers (instead of the line numbers in the synthetic code) thanks
-          to @coderAbhishek
-        @li
-          Failures in scripts run using Ammonite from the command line or via
-          @hl.scala{load.module} should show only the meaningful error and not
-          irrelevant internal stacktraces
-        @li
-          Wrapper names are now greatly simplified; now the names of wrapper
-          objects for scripts match the name of the script (e.g.
-          @code{MyScript}) rather than based on the code hash (e.g.
-          @code{cache5a8890cd7c2ab07eea3fe8d605c7e188})
-        @li
-          Placed most synthetic code into packages; loaded scripts go into
-          @hl.scala{ammonite.scripts} and code entered at the REPL goes in
-          @hl.scala{ammonite.session}.
-        @li
-          Wrote some basic @lnk("Internals Documentation",
-          "https://github.com/lihaoyi/Ammonite/tree/master/internals-docs")
-          in case people want to read about the internal workings of Ammonite
-          in a way that's easier than digging through tons of code.
-        @li
-          Changed the interface for @sect.ref{Embedding} Ammonite to make
-          configuring the Ammonite REPL before invoking it programmatically
-          much more consistent.
-        @li
-          Moved tools such as @sect.ref{grep}, @sect.ref{time},
-          @sect.ref{browse} from @sect.ref{Ammonite-Shell} into the base
-          @sect.ref{Ammonite-REPL}, and made them imported by default, so
-          everyone can enjoy them by default.
-        @li
-          Imported the various @sect.ref("Extensions", "pipe operations") from
-          @sect.ref{Ammonite-Ops}: aliasing @code{.map} as @code{|},
-          @code{.filter} as @code{|?}, etc. to make it more convenient to use
-          tools like @sect.ref{grep} from the base REPL
-        @li
-          Massive internal refactors to try and clean up the Ammonite codebase
-          and get it ready for future work; if you find any bugs please report
-          them!
-        @li
-          Fixed @issue(393): REPL requires two carriage returns to move to a new line
-        @li
-          Compiler settings set in the predef now get preserved when the
-          session starts, and when replacing compilers, thanks to
-          @lnk("Rob Norris", "https://github.com/tpolecat")
-        @li
-          Fixed @issue(395): Fixed resolver pattern for local ivy, thanks to
-          @lnk("Aish Fenton", "https://github.com/aishfenton")
-        @li
-          Fixed the @hl.scala{kill} command in Ammonite-Ops, thanks to
-          @lnk("杨博", "https://github.com/Atry")
-        @li
-          Unknown Ansi escape codes now have their @hl.scala{'\u001b'}
-          escape character removed, rather than messing up the REPL rendering
-
-    @sect{0.5.8}
-      @ul
-        @li
-          @hl.scala{write} has been generalized to work on any combination of
-          @hl.scala{Array}, @hl.scala{Traversable} and @hl.scala{Iterator}.
-          e.g. @hl.scala{write(foo: Iterator[Iterator[Array[String]]])}
-        @li
-          @hl.scala{write} no longer inserts newlines between items by default.
-        @li
-          Introduced the @sect.ref{browse} helper to @sect.ref{Ammonite-Shell},
-          letting you easily open up large data structures in external editors
-          like Vim or Emacs to browse them without spamming the console
-        @li
-          Improved the error messages for invalid @hl.scala{Path} segments to
-          make them more specific and suggest alternatives to what a user is
-          trying to do.
-        @li
-          Broke out the @hl.scala{FilePath} sub-trait from the
-          @hl.scala{BasePath} trait, to differentiate those
-          @hl.scala{BasePath}s are filesystem paths and can be constructed from
-          @hl.scala{java.nio.file.Path} or @hl.scala{java.io.File}s
-          (@hl.scala{RelPath} and @hl.scala{Path})from those which can't
-          (@hl.scala{ResourcePath})
-        @li
-          @hl.scala{Path.makeTemp} has been renamed @hl.scala{tmp()} and
-          @hl.scala{tmp.dir()}
-        @li
-          Arrow-keys now work properly in the previously odd case where they
-          were creating @hl.scala("\\u033O{A,B,C,D}")" codes instead of
-          @hl.scala("\\u033[{A,B,C,D}") codes
-        @li
-          Converted all string-encoding methods to take a
-          @hl.scala{scala.io.Codec} instead of a @hl.scala{String} or
-          @hl.scala{Charset}, letting you pass in either of those types and
-          having it be implicitly converted.
-
-    @sect{0.5.7}
-      @ul
-        @li
-          Improved performance of various @hl.scala{read!} commands to be
-          competitive with @hl.scala{java.nio} (@issue(362))
-        @li
-          @hl.scala{read!} and @hl.scala{read.lines!} now take an optional
-          charset, passed via @hl.scala{read(file, charSet: String)} or
-          @hl.scala{read.lines(file, charSet: String)} which defaults to
-          @hl.scala{"utf-8"}
-        @li
-          Make @hl.scala{read! resource} read from the
-          @hl.scala{Thread.currentThread.getContextClassLoader} by default,
-          fixing @issue(348)
-        @li
-          Re-organize @sect.ref{Reading Resources} in Ammonite-Ops to allow
-          proper handling of absolute and relative resources by passing in
-          @hl.scala{Class}s or @hl.scala{ClassLoader}s
-        @li
-          Make @hl.scala{read!} work on @hl.scala{InputStream}s
-        @li
-          Renamed @hl.scala{InputPath} to @hl.scala{Readable}, a more
-          appropiate name now that it works on two different non-path entities
-          (resources and @hl.scala{InputStream}s)
-        @li
-          Bump uPickle and PPrint to 0.3.9
-        @li
-          Now published for Scala 2.11.8, thanks to @lnk("Clark Kampfe",
-          "https://github.com/ckampfe")
-    @sect{0.5.6}
-      @ul
-        @li
-          Fixed @issue(341): stack overflow when @code{ls}ing large directories
-        @li
-          Fixed regression preventing you from running scripts via
-          @code{./amm} using relative paths @issue(353)
-        @li
-          Ammonite should be more robust when interacting with other compiler
-          plugins
-        @li
-          Fixed @issue(352): imports now don't get improperly collapsed, and defining
-          a value called @code{repl} no longer borks your session.
-        @li
-          Improved readline-emulation of @code{AmmoniteFrontEnd}: @code{Ctrl-T}
-          and @code{Alt-T} now properly transpose characters and words, and the
-          kill-ring now properly aggregates multiple consecutive kills.
-        @li
-          Added asserts to @code{rm} @code{cp} and @code{mv} to prevent you
-          from removing the root folder, or copying/moving folders into
-          themselves.
-        @li
-          @sect.ref("Undo & Redo", "Command-line-undo") via @code{Ctrl -} and
-          redo via @code{Esc/Alt -} are now supported.
-        @li
-          Page-up and Page-down (fn-up and fn-down on Macs) scrolls through
-          history when used at the start/end of input, allowing you to use
-          page-up/page-down to quickly scroll through history with lots of
-          multi-line blocks.
-
-    @sect{0.5.5}
-      @ul
-        @li
-          Experimental support for Ammonite-Ops in Windows! I haven't tested
-          it but basic CI passes @lnk("here",
-          "https://ci.appveyor.com/project/lihaoyi/ammonite"), so try it out
-          and let me know if there are problems (@issue(120))
-        @li
-          Changes around Ammonite-Ops's definition of @hl.scala{Path}s: they
-          now wrap a @code{java.nio.file.Path} (@issue(346)), and thus can be used on
-          Windows, on multiple drives, or with virtual filesystems such as
-          @lnk("JimFS", "https://github.com/google/jimfs").
-        @li
-          Construction of @hl.scala{Path}s from various types
-          (@hl.scala{String}s, @hl.scala{java.nio.file.Path},
-          @hl.scala{java.io.File}) is much more well behaved & consistent now.
-          See @sect.ref{Constructing Paths} for details.
-        @li
-          @hl.scala{read.resource! root/'foo} is now
-          @hl.scala{read! resource/'foo}
-        @li
-          Parser improvements which fix bugs when trying to write some
-          multi-line snippets @issue(343)
-        @li
-          @hl.scala{cp} and @hl.scala{mv} now have @hl.scala{.into} and
-          @hl.scala{.over} modes @issue(206)
-        @li
-          Wrapping content is automatically shifted onto a new line, to avoid
-          problems when copying and pasting @issue(205)
-        @li
-          Thrown exceptions are now made available to you in the REPL under
-          the @code{lastException} variable @issue(289), in case you need more
-          metadata from it or you want the stack-trace of a
-          non-printed-by-default exception (e.g. @code{ThreadDeath} due to
-          @code{Ctrl-C}). Thanks to @coderAbhishek!
-        @li
-          Fixed @issue(280): Ammonite REPL confused by singleton types
-    @sect{0.5.4}
-      @ul
-        @li
-          Improve the pretty-printing for @hl.scala{Range.Inclusive} @issue(337),
-          thanks to @lnk("Saheb", "https://github.com/Saheb")
-        @li
-          More fixes to shadowing behavior of @hl.scala{type}s and
-          @hl.scala{val}s @issue(199)
-        @li
-          Pressing @code{BACKSPACE} now drops you out of history-browsing
-          properly, preserving your edits if you then press @code{ENTER}
-          without entering any other characters @issue(338)
-    @sect{0.5.3}
-      @ul
-        @li
-          Added support for multi-line prompts, thanks to
-          @lnk("thirstycrow", "https://github.com/thirstycrow")
-        @li
-          Fix @issue(312) lsing empty directory gives error, thanks to
-          @coderAbhishek
-        @li
-          Implemented @sect.ref{History Search}, also known as
-          reverse-i-search/Ctrl-R
-        @li
-          Fixed @issue(325): error due to function types with by-name parameters
-        @li
-          Fixed @issue(258): java.util.NoSuchElementException: head of empty list
-          in Ammonite-REPL
-        @li
-          Fixed @issue(198): NoSuchElementException thrown in REPL when using a type
-          alias to refer to a shapeless coproduct
-        @li
-          Warnings can now be enabled with the flag
-          @hl.scala{compiler.settings.nowarn.value = false}
-        @li
-          Stopped Ivy from spitting out countless useless @code{unknown
-          resolver null} warnings when resolving dependencies (@issue(144))
-        @li
-          Fixed edge cases around import shadowing and sequencing (@issue(199), @issue(248))
-        @li
-          Started the @sect.ref{Ammonite Cookbook}, examples of using the
-          Ammonite REPL to do useful work.
+          @li
+            @issue(453) Avoid un-wrapping @code("{...}") blocks in scripts, leaving
+            the unwrapping of @sect.ref{Block Input} only a feature of the interactive
+            REPL
 
 
-    @sect{0.5.2}
-      @ul
-        @li
-          Fixed @issue(80) Support artifact resolvers to load libraries not
-          published to maven central , by
-          @lnk("Eric Torreborre", "https://github.com/etorreborre")
-        @li
-          Fixed @issue(310): java.util.NoSuchElementException: None.get
-          on Shift+Tab without selection f, by
-          @lnk("senia-psm", "https://github.com/senia-psm")
-    @sect{0.5.1}
-      @ul
-        @li
-          Fix performance regression causing slowness when C&Ping large
-          snippets @issue(274)
-        @li
-          Added the ability to pass @sect.ref{Script Arguments} to Ammonite
-          scripts from an external command line (e.g. bash) @issue(277)
-        @li
-          Iterator-returning commands like @hl.scala{ls!!} @hl.scala{ls.rec!!}
-          and @hl.scala{read.lines!!} have been renamed @hl.scala{ls.iter!}
-          @hl.scala{ls.rec.iter!} and @hl.scala{read.lines.iter!}, to help cut
-          down on cryptic operators
-        @li
-          Added the @sect.ref{time} command to Ammonite-Shell, roughly
-          equivalent to the bash @code{time} command, allowing easy timing of
-          simple commands
-        @li
-          @hl.scala{ls.rec} now exposes basic configurability of the recursion,
-          allowing you to skip directories or controlling the pre/post-order
-          of results
-        @li
-          @hl.scala{Path}s and @hl.scala{RelPath}s no longer permit
-          @hl.scala{"."} or @hl.scala{".."} as a path segment @issue(215)
-        @li
-          @hl.scala{Path}s and @hl.scala{RelPath}s now us
-          @hl.scala{Vector[String]} instead of @hl.scala{Seq[String]} as the
-          @hl.scala{segments} data-structure, promising more consistent
-          semantics
-        @li
-          Pretty-printing of the results of @hl.scala{ls!} now properly gets
-          truncated when too large @issue(209)
-        @li
-          Cross-build for 2.10.6 @issue(282)
-        @li
-          Refactor of the @hl.scala{CommandResult} type being returned from the
-          @hl.scala{%%} operator, to now properly capture the raw byte output,
-          stdout, stderr, exit code. See @sect.ref{Spawning Subprocesses} for
-          details. @issue(207)
-        @li
-          Added a new @sect.ref{grep} command.
-        @li
-          Added support for word navigation with Ctrl+Arrow in Linux (@issue(217)),
-          thanks to @lnk("Ian McIntosh", "https://github.com/cranst0n")
-        @li
-          Moved the initialization calls from @hl.scala{ammonite.Repl.run}
-          and @hl.scala{ammonite.Repl.debug} into
-          @hl.scala{ammonite.Main.run} and @hl.scala{ammonite.Main.debug}
-    @sect{0.5.0}
-      @ul
-        @li
-          Fixed @hl.scala{def<tab>} auto-complete crasher @issue(257), thanks to
-          @lnk("Matthew Edwards", "https://github.com/edwardsmatt")!
-        @li
-          Fixed input-height bug around multi-line selection that would
-          case the prompt to fly up the console
-        @li
-          Multi-line-select tab-indent (and shift-tab-dedent) now works!
-        @li
-          Pressing @code{[Enter]} now only submits the input if your cursor
-          is at the bottom
-        @li
-          Added a powerful @sect.ref{Save/Load Session} API, letting you save
-          your work at any point in time and return to it later.
-        @li
-          Compiled-code-caches are now properly invalidated when you change
-          project-code while using Ammonite as a REPL for an existing SBT project.
-        @li
-          Simplify the way shelling to to run files as subprocesses works,
-          and align with documentation (@issue(234))
+
+      @sect{0.7.5}
+        @ul
+          @li
+            @code{-s} cmd line switch makes ivy logs silent, though failures
+            will still be thrown as exception. Thanks to @coderAbhishek.
+          @li
+            Added @code{show} and @code{typeOf} back into the default REPL
+            imports, since they are pretty useful
+          @li
+            @code{write.over} in @sect.ref{Ammonite-Ops} should now properly
+            truncate files if the thing being written is shorter than the
+            original @issue(441)
+          @li
+            Ammonite no longer incorrectly allows multiple expressions to be
+            evaluated on the same line @issue(446)
+          @li
+            Compilation errors when there are multiple statements in a block
+            will no longer have redundant semicolons prefixed onto them @issue(439)
+          @li
+            Improved the line-number-reporting in certain cases where you use
+            @hl.scala{import $file.*}
+
+      @sect{0.7.4}
+        @ul
+          @li
+            Fix publication of artifacts for non-{2.11.8, 2.10.5} Ammonite versions
+
+      @sect{0.7.3}
+        @ul
+          @li
+            Actually avoid importing all the @sect.ref{Repl API} functions into
+            local scope, for reals
+
+      @sect{0.7.2}
+        @ul
+          @li
+            Hygienified the default namespace by avoiding importing all the
+            @sect.ref{Repl API} functions into local scope, instead leaving them
+            inside the @code{repl} object. @b{This is a backwards incompatible
+            change!}
+          @li
+            Separated the APIs available from scripts (@code{load.*} and
+            @code{resolvers} in the @code{interp} object)
+            from those available from the REPL (in the @code{repl} object).
+            @code{repl} is not available when running scripts, unless you pass in
+            the @code{--repl-api} flag at the command line.
+          @li
+            If you want to maintain the old behavior, e.g. for backwards-compat,
+            put a @hl.scala{import repl._} in your @code{~/.ammonite/predef.sc} and
+            @hl.scala{import interp._} in your @code{~/.ammonite/predefShared.sc} to
+            bring everything back into scope again.
+          @li
+            @code{predef.sc} now only applies to the interactive REPL. If you
+            want predef code that applies to scripts use @code{predefScript.sc},
+            or if you want predef code that applies to both you can use
+            @code{predefShared.sc}.
+          @li
+            Added a version of @sect.ref{desugar} to Scala 2.10.x. It doesn't
+            print things as prettily/accurately as the 2.11.x version, but it's
+            better than nothing.
+          @li
+            Changed the syntax for @hl.scala{import $file} segments outside your
+            current directory from @hl.scala{import $file.`..`.foo} to
+            @hl.scala{import $file.^.foo}. This makes it a lot shorter and
+            mitigates a problems caused by the file-name being too long.
+          @li
+            You can now use a @code{JAVA_OPTS} environment variable to pass flags
+            to the JVM when starting Ammonite, thanks to @lnk("Simon Scarduzio",
+            "https://github.com/sscarduzio")
+          @li
+            Running scripts outside the current working directory tree, as well as
+            scripts with non-alphanumeric symbols in their file path, now works
+            thanks to @coderAbhishek
+          @li
+            Scripts without the @code{.sc} can now be run directly from the command line
+            rather than throwing an @code{IndexOutOfBoundsException}, thanks to
+            @coderAbhishek
+          @li
+            Modularized Ammonite's internals; the main module @code{ammonite} has now
+            been broken into 5 smaller modules for maintainability. This in
+            itself should not be visible to the outside world, but be sure to
+            report any bugs!
+
+      @sect{0.7.0}
+        @ul
+          @li
+            Backwards incompatibly changes the extensions from Scripts and Predef
+            files from @code{.scala} to @code{.sc}, to avoid problems with SBT
+            discovering and trying (and failing) to compile them as normal Scala
+            files.
+          @li
+            Script files vastly faster to run once cached (~0.5s fixed overhead,
+            instead of ~5s I was seeing before): faster classpath scanning, with
+            much more aggressive and robust caching, thanks to @coderAbhishek who is
+            working on this over GSOC
+          @li
+            Fixed a performance regression and greatly sped up pasting text into
+            the REPL
+          @li
+            The behavior of @code{Ctrl p} and @code{Ctrl n} have been tweaked to
+            be more consistent with other readline implementations.
+          @li
+            @sect.ref{Magic Imports} now exist! This should provide a much more
+            intuitive way of importing other files and depending on ivy
+            artifacts, without all the fumbling with @hl.scala("@") that the
+            old @hl.scala{load.foo} functions required
+          @li
+            @hl.scala{load.module}, @hl.scala{load.exec}, @hl.scala{load.ivy} are
+            now largely superseded by @hl.scala{import $file},
+            @hl.scala{import $exec}, and @hl.scala{import $ivy}
+          @li
+            The way you pass in @sect.ref{Script Arguments} to a script, has been
+            totally revamped, and should be faster, more intuitive, and provide
+            better error messages when things go wrong
+          @li
+            Added a new top-level doc-site chapter on @sect.ref{Scala Scripts}.
+            This reflects their promotion from "quick hack that was a pain in
+            the neck to actually use" to
+            "something that actually feels pretty nice to use". If you've tried
+            running Ammonite scripts earlier and was totally turned off, it's
+            worth another shot.
+          @li
+            Most of Ammonite now works on Windows, with the exception of the
+            interactive REPL using @code{AmmoniteFrontEnd}, thanks to
+            @coderAbhishek who worked
+            on this over GSOC.
+          @li
+            Started doing Continuous Deployment of the Ammonite project's
+            artifacts and executables; now, any set of commits that get pushed
+            or merged into master will be published immediately, with this
+            documentation-site being updated, the standalone executable being
+            uploaded to @lnk("Github Releases",
+            "https://github.com/lihaoyi/Ammonite/releases/tag/snapshot-commit-uploads"),
+            the Ivy artifacts being uploaded to maven central, and instructions
+            for downloading/installing it shown in the @sect.ref{Unstable Versions}
+            section below. Any PRs that get merged are published and become
+            available within an hour or two, so the author and anyone else can
+            begin using them.
+
+    @sect{0.6.x}
+      @sect{0.6.2}
+        @ul
+          @li
+            Fix @issue(403): Errors are silently swallowed in 0.6.1
+
+      @sect{0.6.1}
+        @ul
+          @li
+            Fixed @issue(400): load.exec in predef.scala causes NPE in 0.5.9 or 0.6.0
+          @li
+            Fixed @issue(398): by default, using Ammonite inside a SBT project uses the
+            old @code{~/.ammonite/} storage folder, not the @code{InMemory} storage system.
+            This restores the pre-0.5.9 behavior
+          @li
+            Fix regression causing BACKSPACE to not work while performing a
+            history-search
+          @li
+            More internal refactoring
+
+      @sect{0.6.0}
+        @ul
+          @li
+            Made @sect.ref{browse} use the process current working directory if
+            there's no implicit path in scope, since most times it doesn't matter
+          @li
+            Make the welcome banner "Welcome to the Ammonite Repl..." customizable
+          @li
+            Fixed bug where triggering autocomplete resulted in a broken REPL session
+    @sect{0.5.x}
+      @sect{0.5.9}
+        @ul
+          @li
+            Introduced the @sect.ref{desugar} helper to @sect.ref{Ammonite-REPL},
+            letting you easily see what the compiler is transforming your code
+            into before it gets run.
+          @li
+            Prefix @hl.scala{_root_} to imports from packages, which should
+            reduce the chance of naming collisions
+          @li
+            Improved source locations for error messages: now failures in
+            scripts have a filename matching the name of the script (instead of
+            @code{Main.scala}), and line numbers matching the original line
+            numbers (instead of the line numbers in the synthetic code) thanks
+            to @coderAbhishek
+          @li
+            Failures in scripts run using Ammonite from the command line or via
+            @hl.scala{load.module} should show only the meaningful error and not
+            irrelevant internal stacktraces
+          @li
+            Wrapper names are now greatly simplified; now the names of wrapper
+            objects for scripts match the name of the script (e.g.
+            @code{MyScript}) rather than based on the code hash (e.g.
+            @code{cache5a8890cd7c2ab07eea3fe8d605c7e188})
+          @li
+            Placed most synthetic code into packages; loaded scripts go into
+            @hl.scala{ammonite.scripts} and code entered at the REPL goes in
+            @hl.scala{ammonite.session}.
+          @li
+            Wrote some basic @lnk("Internals Documentation",
+            "https://github.com/lihaoyi/Ammonite/tree/master/internals-docs")
+            in case people want to read about the internal workings of Ammonite
+            in a way that's easier than digging through tons of code.
+          @li
+            Changed the interface for @sect.ref{Embedding} Ammonite to make
+            configuring the Ammonite REPL before invoking it programmatically
+            much more consistent.
+          @li
+            Moved tools such as @sect.ref{grep}, @sect.ref{time},
+            @sect.ref{browse} from @sect.ref{Ammonite-Shell} into the base
+            @sect.ref{Ammonite-REPL}, and made them imported by default, so
+            everyone can enjoy them by default.
+          @li
+            Imported the various @sect.ref("Extensions", "pipe operations") from
+            @sect.ref{Ammonite-Ops}: aliasing @code{.map} as @code{|},
+            @code{.filter} as @code{|?}, etc. to make it more convenient to use
+            tools like @sect.ref{grep} from the base REPL
+          @li
+            Massive internal refactors to try and clean up the Ammonite codebase
+            and get it ready for future work; if you find any bugs please report
+            them!
+          @li
+            Fixed @issue(393): REPL requires two carriage returns to move to a new line
+          @li
+            Compiler settings set in the predef now get preserved when the
+            session starts, and when replacing compilers, thanks to
+            @lnk("Rob Norris", "https://github.com/tpolecat")
+          @li
+            Fixed @issue(395): Fixed resolver pattern for local ivy, thanks to
+            @lnk("Aish Fenton", "https://github.com/aishfenton")
+          @li
+            Fixed the @hl.scala{kill} command in Ammonite-Ops, thanks to
+            @lnk("杨博", "https://github.com/Atry")
+          @li
+            Unknown Ansi escape codes now have their @hl.scala{'\u001b'}
+            escape character removed, rather than messing up the REPL rendering
+
+      @sect{0.5.8}
+        @ul
+          @li
+            @hl.scala{write} has been generalized to work on any combination of
+            @hl.scala{Array}, @hl.scala{Traversable} and @hl.scala{Iterator}.
+            e.g. @hl.scala{write(foo: Iterator[Iterator[Array[String]]])}
+          @li
+            @hl.scala{write} no longer inserts newlines between items by default.
+          @li
+            Introduced the @sect.ref{browse} helper to @sect.ref{Ammonite-Shell},
+            letting you easily open up large data structures in external editors
+            like Vim or Emacs to browse them without spamming the console
+          @li
+            Improved the error messages for invalid @hl.scala{Path} segments to
+            make them more specific and suggest alternatives to what a user is
+            trying to do.
+          @li
+            Broke out the @hl.scala{FilePath} sub-trait from the
+            @hl.scala{BasePath} trait, to differentiate those
+            @hl.scala{BasePath}s are filesystem paths and can be constructed from
+            @hl.scala{java.nio.file.Path} or @hl.scala{java.io.File}s
+            (@hl.scala{RelPath} and @hl.scala{Path})from those which can't
+            (@hl.scala{ResourcePath})
+          @li
+            @hl.scala{Path.makeTemp} has been renamed @hl.scala{tmp()} and
+            @hl.scala{tmp.dir()}
+          @li
+            Arrow-keys now work properly in the previously odd case where they
+            were creating @hl.scala("\\u033O{A,B,C,D}")" codes instead of
+            @hl.scala("\\u033[{A,B,C,D}") codes
+          @li
+            Converted all string-encoding methods to take a
+            @hl.scala{scala.io.Codec} instead of a @hl.scala{String} or
+            @hl.scala{Charset}, letting you pass in either of those types and
+            having it be implicitly converted.
+
+      @sect{0.5.7}
+        @ul
+          @li
+            Improved performance of various @hl.scala{read!} commands to be
+            competitive with @hl.scala{java.nio} (@issue(362))
+          @li
+            @hl.scala{read!} and @hl.scala{read.lines!} now take an optional
+            charset, passed via @hl.scala{read(file, charSet: String)} or
+            @hl.scala{read.lines(file, charSet: String)} which defaults to
+            @hl.scala{"utf-8"}
+          @li
+            Make @hl.scala{read! resource} read from the
+            @hl.scala{Thread.currentThread.getContextClassLoader} by default,
+            fixing @issue(348)
+          @li
+            Re-organize @sect.ref{Reading Resources} in Ammonite-Ops to allow
+            proper handling of absolute and relative resources by passing in
+            @hl.scala{Class}s or @hl.scala{ClassLoader}s
+          @li
+            Make @hl.scala{read!} work on @hl.scala{InputStream}s
+          @li
+            Renamed @hl.scala{InputPath} to @hl.scala{Readable}, a more
+            appropiate name now that it works on two different non-path entities
+            (resources and @hl.scala{InputStream}s)
+          @li
+            Bump uPickle and PPrint to 0.3.9
+          @li
+            Now published for Scala 2.11.8, thanks to @lnk("Clark Kampfe",
+            "https://github.com/ckampfe")
+      @sect{0.5.6}
+        @ul
+          @li
+            Fixed @issue(341): stack overflow when @code{ls}ing large directories
+          @li
+            Fixed regression preventing you from running scripts via
+            @code{./amm} using relative paths @issue(353)
+          @li
+            Ammonite should be more robust when interacting with other compiler
+            plugins
+          @li
+            Fixed @issue(352): imports now don't get improperly collapsed, and defining
+            a value called @code{repl} no longer borks your session.
+          @li
+            Improved readline-emulation of @code{AmmoniteFrontEnd}: @code{Ctrl-T}
+            and @code{Alt-T} now properly transpose characters and words, and the
+            kill-ring now properly aggregates multiple consecutive kills.
+          @li
+            Added asserts to @code{rm} @code{cp} and @code{mv} to prevent you
+            from removing the root folder, or copying/moving folders into
+            themselves.
+          @li
+            @sect.ref("Undo & Redo", "Command-line-undo") via @code{Ctrl -} and
+            redo via @code{Esc/Alt -} are now supported.
+          @li
+            Page-up and Page-down (fn-up and fn-down on Macs) scrolls through
+            history when used at the start/end of input, allowing you to use
+            page-up/page-down to quickly scroll through history with lots of
+            multi-line blocks.
+
+      @sect{0.5.5}
+        @ul
+          @li
+            Experimental support for Ammonite-Ops in Windows! I haven't tested
+            it but basic CI passes @lnk("here",
+            "https://ci.appveyor.com/project/lihaoyi/ammonite"), so try it out
+            and let me know if there are problems (@issue(120))
+          @li
+            Changes around Ammonite-Ops's definition of @hl.scala{Path}s: they
+            now wrap a @code{java.nio.file.Path} (@issue(346)), and thus can be used on
+            Windows, on multiple drives, or with virtual filesystems such as
+            @lnk("JimFS", "https://github.com/google/jimfs").
+          @li
+            Construction of @hl.scala{Path}s from various types
+            (@hl.scala{String}s, @hl.scala{java.nio.file.Path},
+            @hl.scala{java.io.File}) is much more well behaved & consistent now.
+            See @sect.ref{Constructing Paths} for details.
+          @li
+            @hl.scala{read.resource! root/'foo} is now
+            @hl.scala{read! resource/'foo}
+          @li
+            Parser improvements which fix bugs when trying to write some
+            multi-line snippets @issue(343)
+          @li
+            @hl.scala{cp} and @hl.scala{mv} now have @hl.scala{.into} and
+            @hl.scala{.over} modes @issue(206)
+          @li
+            Wrapping content is automatically shifted onto a new line, to avoid
+            problems when copying and pasting @issue(205)
+          @li
+            Thrown exceptions are now made available to you in the REPL under
+            the @code{lastException} variable @issue(289), in case you need more
+            metadata from it or you want the stack-trace of a
+            non-printed-by-default exception (e.g. @code{ThreadDeath} due to
+            @code{Ctrl-C}). Thanks to @coderAbhishek!
+          @li
+            Fixed @issue(280): Ammonite REPL confused by singleton types
+      @sect{0.5.4}
+        @ul
+          @li
+            Improve the pretty-printing for @hl.scala{Range.Inclusive} @issue(337),
+            thanks to @lnk("Saheb", "https://github.com/Saheb")
+          @li
+            More fixes to shadowing behavior of @hl.scala{type}s and
+            @hl.scala{val}s @issue(199)
+          @li
+            Pressing @code{BACKSPACE} now drops you out of history-browsing
+            properly, preserving your edits if you then press @code{ENTER}
+            without entering any other characters @issue(338)
+      @sect{0.5.3}
+        @ul
+          @li
+            Added support for multi-line prompts, thanks to
+            @lnk("thirstycrow", "https://github.com/thirstycrow")
+          @li
+            Fix @issue(312) lsing empty directory gives error, thanks to
+            @coderAbhishek
+          @li
+            Implemented @sect.ref{History Search}, also known as
+            reverse-i-search/Ctrl-R
+          @li
+            Fixed @issue(325): error due to function types with by-name parameters
+          @li
+            Fixed @issue(258): java.util.NoSuchElementException: head of empty list
+            in Ammonite-REPL
+          @li
+            Fixed @issue(198): NoSuchElementException thrown in REPL when using a type
+            alias to refer to a shapeless coproduct
+          @li
+            Warnings can now be enabled with the flag
+            @hl.scala{compiler.settings.nowarn.value = false}
+          @li
+            Stopped Ivy from spitting out countless useless @code{unknown
+            resolver null} warnings when resolving dependencies (@issue(144))
+          @li
+            Fixed edge cases around import shadowing and sequencing (@issue(199), @issue(248))
+          @li
+            Started the @sect.ref{Ammonite Cookbook}, examples of using the
+            Ammonite REPL to do useful work.
 
 
-    @sect{0.4.9}
-      @ul
-        @li
-          Update to fastparse/scalaparse 0.3.1
-        @li
-          Fix for perennial classpath problems, thanks to
-          @lnk("Johannes Rudolph", "https://github.com/jrudolph")!
-        @li
-          Fix wildcard-imports from Java libraries like Joda or Guava @issue(213)
-        @li
-          Added an MIT license
-        @li
-          Slightly more robust tab completion @issue(252), thanks to
-          @lnk("Sanjiv Sahayam", "https://github.com/ssanj")!
-        @li
-          Properly handly EOF in standard input @issue(242), thanks to
-          @lnk("Patrick Premont", "https://github.com/patrick-premont")!
-    @sect{0.4.8}
-      @ul
-        @li
-          Swapped to G1 garbage collector to
-          @lnk("reduce unnecessary memory footprint",
-          "https://github.com/lihaoyi/Ammonite/issues/216")
-        @li
-          Allow splicing @hl.scala{Seq[String]}s into subprocess arguments
-        @li
-          Fix source packaging which was causing problems with ensime
-        @li
-          Allow shebang line to make Ammonite scripts more conveniently executable
-        @li
-          Robustify line-breaking-logic
-    @sect{0.4.7}
-      @ul
-        @li
-          Path-completion now works when using Ammonite as a filesystem shell
-        @li
-          Ammonite's filesystem functionality (@hl.scala{cd!},
-          @hl.scala{wd}, path-completion) has been pulled out of
-          Ammonite-REPL, and is now available separately as
-          @sect.ref{Ammonite-Shell}.
-        @li
-          Improve the pretty-printing of the @hl.scala{ls} and
-          @hl.scala{ls.rec} commands
-        @li
-          Ammonite can now be used as a @sect.ref{Remote REPL} into an
-          already-running Scala process, letting you SSH in to poke around at
-          any time while it's running, thanks to @lnk("Viacheslav Blinov",
-          "https://github.com/dant3")
-        @li
-          Fix execution of files via symbols in the current working directory.
-        @li
-          @hl.scala{Load.ivy} now properly attempts to load artifacts from
-          the local @code{~/.ivy/cache}, @code{~/.ivy/local} and @code{~/.m2}
-          folders, before fetching from maven central
-        @li
-          Wrote up a good amount of documentation for
-          @sect.ref{Ammonite-Shell}: using Ammonite as a Bash replacement
-    @sect{0.4.6}
-      @ul
-        @li
-          Provide a way of @sect.ref{Invoking Files} and passing
-          @sect.ref{Environment Variables}
-        @li
-          Documented existing approach for setting @sect.ref{Compiler Flags}
-        @li
-          Fixed a bug in the readline re-implementation causing barely-full
-          lines in the terminal to mess up cursor positioning and line re-drawing
-        @li
-          Remove @code{cache1234567890abcdef1234567890abcdef} objects from
-          the autocomplete list, because they're not helpful
-        @li
-          Trim all the useless members of @hl.scala{Any} from the default
-          import lists.
-        @li
-          Fix a file-handle-leak for most usages of @code{read.lines} and
-          @code{ls}/@code{ls.rec}
-        @li
-          Fix bugs @issue(186), @issue(152), @issue(149), @issue(180)
-    @sect{0.4.5}
-      @ul
-        @li
-          Fix for running Ammonite using OpenJDK, thanks to
-          @lnk("Johannes Rudolph", "https://github.com/jrudolph")
-        @li
-          Support for HOME and END keys, thanks to @lnk("Johannes Rudolph",
-          "https://github.com/jrudolph")
-        @li
-          Fix for incorrect syntax highlighting (@issue(159))
-        @li
-          Support for loading compiler plugins, thanks to
-          @lnk("Alexandre Archambault", "https://github.com/alexarchambault")
-        @li
-          You can now use Ammonite as a @sect.ref{Debugging} tool like Python's
-          pdb, placing an interactive breakpoint anywhere within a normal
-          Scala application
+      @sect{0.5.2}
+        @ul
+          @li
+            Fixed @issue(80) Support artifact resolvers to load libraries not
+            published to maven central , by
+            @lnk("Eric Torreborre", "https://github.com/etorreborre")
+          @li
+            Fixed @issue(310): java.util.NoSuchElementException: None.get
+            on Shift+Tab without selection f, by
+            @lnk("senia-psm", "https://github.com/senia-psm")
+      @sect{0.5.1}
+        @ul
+          @li
+            Fix performance regression causing slowness when C&Ping large
+            snippets @issue(274)
+          @li
+            Added the ability to pass @sect.ref{Script Arguments} to Ammonite
+            scripts from an external command line (e.g. bash) @issue(277)
+          @li
+            Iterator-returning commands like @hl.scala{ls!!} @hl.scala{ls.rec!!}
+            and @hl.scala{read.lines!!} have been renamed @hl.scala{ls.iter!}
+            @hl.scala{ls.rec.iter!} and @hl.scala{read.lines.iter!}, to help cut
+            down on cryptic operators
+          @li
+            Added the @sect.ref{time} command to Ammonite-Shell, roughly
+            equivalent to the bash @code{time} command, allowing easy timing of
+            simple commands
+          @li
+            @hl.scala{ls.rec} now exposes basic configurability of the recursion,
+            allowing you to skip directories or controlling the pre/post-order
+            of results
+          @li
+            @hl.scala{Path}s and @hl.scala{RelPath}s no longer permit
+            @hl.scala{"."} or @hl.scala{".."} as a path segment @issue(215)
+          @li
+            @hl.scala{Path}s and @hl.scala{RelPath}s now us
+            @hl.scala{Vector[String]} instead of @hl.scala{Seq[String]} as the
+            @hl.scala{segments} data-structure, promising more consistent
+            semantics
+          @li
+            Pretty-printing of the results of @hl.scala{ls!} now properly gets
+            truncated when too large @issue(209)
+          @li
+            Cross-build for 2.10.6 @issue(282)
+          @li
+            Refactor of the @hl.scala{CommandResult} type being returned from the
+            @hl.scala{%%} operator, to now properly capture the raw byte output,
+            stdout, stderr, exit code. See @sect.ref{Spawning Subprocesses} for
+            details. @issue(207)
+          @li
+            Added a new @sect.ref{grep} command.
+          @li
+            Added support for word navigation with Ctrl+Arrow in Linux (@issue(217)),
+            thanks to @lnk("Ian McIntosh", "https://github.com/cranst0n")
+          @li
+            Moved the initialization calls from @hl.scala{ammonite.Repl.run}
+            and @hl.scala{ammonite.Repl.debug} into
+            @hl.scala{ammonite.Main.run} and @hl.scala{ammonite.Main.debug}
+      @sect{0.5.0}
+        @ul
+          @li
+            Fixed @hl.scala{def<tab>} auto-complete crasher @issue(257), thanks to
+            @lnk("Matthew Edwards", "https://github.com/edwardsmatt")!
+          @li
+            Fixed input-height bug around multi-line selection that would
+            case the prompt to fly up the console
+          @li
+            Multi-line-select tab-indent (and shift-tab-dedent) now works!
+          @li
+            Pressing @code{[Enter]} now only submits the input if your cursor
+            is at the bottom
+          @li
+            Added a powerful @sect.ref{Save/Load Session} API, letting you save
+            your work at any point in time and return to it later.
+          @li
+            Compiled-code-caches are now properly invalidated when you change
+            project-code while using Ammonite as a REPL for an existing SBT project.
+          @li
+            Simplify the way shelling to to run files as subprocesses works,
+            and align with documentation (@issue(234))
 
-    @sect{0.4.4}
-      @ul
-        @li
-          @lnk("Lots", "https://github.com/lihaoyi/Ammonite/pull/153")
-          @lnk("and", "https://github.com/lihaoyi/Ammonite/pull/158")
-          @lnk("lots", "https://github.com/lihaoyi/Ammonite/pull/157") of
-          terminal improvements, courtesy of @lnk("Erik Osheim",
-          "https://github.com/non")
-        @li
-          Only the last @hl.scala("@")-delimited block in a script loaded
-          via @hl.scala{load.module} gets its names dumped into the REPL's
-          environment now, letting you create some semblance of hygiene,
-          thanks to @lnk("Laszlo Mero", "https://github.com/laci37")
-    @sect{0.4.3}
-      @ul
-        @li
-          Remove embarassing debug println left behind in autocomplete code
-        @li
-          Fix @code{pathSeparator} so Ammonite-REPL is at least
-          basically-runnable on windows, although buggy
-        @li
-          Update to more robust version of pprint to fix @issue(140)
-    @sect{0.4.2}
-      @ul
-        @li
-          Fix @issue(139): Can't fix typos?
-        @li
-          Fix bad wrapping of long lines in ammonite-repl
-    @sect{0.4.1}
-      @ul
-        @li
-          Fix crasher running the REPL on new machines
-    @sect{0.4.0}
-      @ul
-        @li
-          Re-added support for 2.10.x, minus features that don't work in it
-          (e.g. scope-aware type-printing)
-        @li
-          Added a @sect.ref("Ammonite-REPL", "standalone distributable") that comes
-          bundled with Scala 2.10.4 or 2.11.7, letting you quickly load and
-          experiment with libraries without SBT
-        @li
-          User input now has @sect.ref{Syntax Highlighting} by default!
-        @li
-          Exception stack traces are now @sect.ref("Syntax Highlighting",
-          "highlighted") as well, to make them easier to read
-        @li
-          @sect.ref("Pretty-printed output", "Pretty-printing") has been
-          extracted into a separate project, and aside from that is greatly
-          improved. Many more common cases (e.g. sealed trait hierarchies)
-          are now pretty-printed rather than falling back to @code{toString}
-        @li
-          Exposed the @sect.ref("Configurable Truncation", "show") function
-          by default, letting you pretty-print any value with custom
-          configuration (wrapping-width, truncation-height, colors, ...)
-        @li
-          Fixed cases where PPrint/TPrint was causing compilation errors
-        @li
-          Persistent data is now stored in a @code{~/.ammonite} folder. This
-          includes @code{~/.ammonite/history},
-          @code{~/.ammonite/predef.scala}, and various cache, thanks to
-          @lnk("Laszlo Mero", "https://github.com/laci37")
-        @li
-          You can now define a @code{~/.ammonite/predef.scala}
-          @sect.ref("Configuration") file which will be executed the first
-          thing when the Ammonite REPL is loaded. This is useful for common
-          imports, @hl.scala{load.ivy}ing libraries, or other configuration
-          for your REPL
-        @li
-          Added the ability to load arbitrary @sect.ref{Script Files} via
-          @hl.scala{load.exec} and @hl.scala{load.module}, thanks to
-          @lnk("Laszlo Mero", "https://github.com/laci37")
-        @li
-          @sect.ref{Configuration} that was previously passed into the
-          @hl.scala{REPL}s constructor is now done in-REPL,
-        @li
-          @sect.ref("Editing", "Multi-line editing and other features") via a
-          custom terminal interface that should behave just like readline, but
-          with added conveniences.
-        @li
-          Removed the ability to reload classes; using @hl.scala{load.ivy} no
-          longer causes all existing values to be lazily recomputed.
-        @li
-          Added the @sect.ref("Filesystem Operations", "cd! and wd")
-          built-ins to make working with filesystem operations via
-          @sect.ref{Ammonite-Ops} more pleasant
-        @li
-          Evaluated values of type @hl.scala{Unit} are no longer echo-ed to
-          the user
-        @li
-          Performance improvements to the startup time of the REPL, with
-          @lnk("more to come", "https://github.com/lihaoyi/Ammonite/issues/135")
-        @li
-          Third-party library resolution via @hl.scala{load.ivy} is now cached
-          after the first call, letting you e.g. load libraries in your
-          @code{~/.ammonite/predef.scala} without waiting for the slow
-          ivy-resolution every startup
-        @li
-          Standardized the use of @sect.ref{Refs} for configuration, including
-          the ability to bind them "live" to the value of an expression.
-        @li
-          Allows you to trivially @sect.ref("Spawning Subprocesses",
-          "spawn subprocesses"), letting you run @code{git} commands, edit
-          files via @code{vim}, open @code{ssh} sessions or even start
-          @code{SBT} or @code{Python} shells right from your Scala REPL
-    @sect{0.3.2}
-      @ul
-        @li
-          Fix pretty-printing of higher-kinded types.
-        @li
-          Drop support for 2.10.x; ammonite is 2.11.x-only now
+    @sect{0.4.x}
+      @sect{0.4.9}
+        @ul
+          @li
+            Update to fastparse/scalaparse 0.3.1
+          @li
+            Fix for perennial classpath problems, thanks to
+            @lnk("Johannes Rudolph", "https://github.com/jrudolph")!
+          @li
+            Fix wildcard-imports from Java libraries like Joda or Guava @issue(213)
+          @li
+            Added an MIT license
+          @li
+            Slightly more robust tab completion @issue(252), thanks to
+            @lnk("Sanjiv Sahayam", "https://github.com/ssanj")!
+          @li
+            Properly handly EOF in standard input @issue(242), thanks to
+            @lnk("Patrick Premont", "https://github.com/patrick-premont")!
+      @sect{0.4.8}
+        @ul
+          @li
+            Swapped to G1 garbage collector to
+            @lnk("reduce unnecessary memory footprint",
+            "https://github.com/lihaoyi/Ammonite/issues/216")
+          @li
+            Allow splicing @hl.scala{Seq[String]}s into subprocess arguments
+          @li
+            Fix source packaging which was causing problems with ensime
+          @li
+            Allow shebang line to make Ammonite scripts more conveniently executable
+          @li
+            Robustify line-breaking-logic
+      @sect{0.4.7}
+        @ul
+          @li
+            Path-completion now works when using Ammonite as a filesystem shell
+          @li
+            Ammonite's filesystem functionality (@hl.scala{cd!},
+            @hl.scala{wd}, path-completion) has been pulled out of
+            Ammonite-REPL, and is now available separately as
+            @sect.ref{Ammonite-Shell}.
+          @li
+            Improve the pretty-printing of the @hl.scala{ls} and
+            @hl.scala{ls.rec} commands
+          @li
+            Ammonite can now be used as a @sect.ref{Remote REPL} into an
+            already-running Scala process, letting you SSH in to poke around at
+            any time while it's running, thanks to @lnk("Viacheslav Blinov",
+            "https://github.com/dant3")
+          @li
+            Fix execution of files via symbols in the current working directory.
+          @li
+            @hl.scala{Load.ivy} now properly attempts to load artifacts from
+            the local @code{~/.ivy/cache}, @code{~/.ivy/local} and @code{~/.m2}
+            folders, before fetching from maven central
+          @li
+            Wrote up a good amount of documentation for
+            @sect.ref{Ammonite-Shell}: using Ammonite as a Bash replacement
+      @sect{0.4.6}
+        @ul
+          @li
+            Provide a way of @sect.ref{Invoking Files} and passing
+            @sect.ref{Environment Variables}
+          @li
+            Documented existing approach for setting @sect.ref{Compiler Flags}
+          @li
+            Fixed a bug in the readline re-implementation causing barely-full
+            lines in the terminal to mess up cursor positioning and line re-drawing
+          @li
+            Remove @code{cache1234567890abcdef1234567890abcdef} objects from
+            the autocomplete list, because they're not helpful
+          @li
+            Trim all the useless members of @hl.scala{Any} from the default
+            import lists.
+          @li
+            Fix a file-handle-leak for most usages of @code{read.lines} and
+            @code{ls}/@code{ls.rec}
+          @li
+            Fix bugs @issue(186), @issue(152), @issue(149), @issue(180)
+      @sect{0.4.5}
+        @ul
+          @li
+            Fix for running Ammonite using OpenJDK, thanks to
+            @lnk("Johannes Rudolph", "https://github.com/jrudolph")
+          @li
+            Support for HOME and END keys, thanks to @lnk("Johannes Rudolph",
+            "https://github.com/jrudolph")
+          @li
+            Fix for incorrect syntax highlighting (@issue(159))
+          @li
+            Support for loading compiler plugins, thanks to
+            @lnk("Alexandre Archambault", "https://github.com/alexarchambault")
+          @li
+            You can now use Ammonite as a @sect.ref{Debugging} tool like Python's
+            pdb, placing an interactive breakpoint anywhere within a normal
+            Scala application
 
-    @sect{0.3.1}
-      @ul
-        @li
-          Many of the collection @hl.scala{PPrint}s are much lazier and will
-          avoid stringifying the whole collection if its going to get truncated
-          anyway.
-        @li
-          Types now get printed semi-qualified (depending on what's in scope),
-          with simple highlighting.
-        @li
-          You can define custom @hl.scala{TPrint[T]}s to provide custom
-          printing for any type.
-        @li
-          Operator-named two-param generic types are now printed infix by
-          default.
+      @sect{0.4.4}
+        @ul
+          @li
+            @lnk("Lots", "https://github.com/lihaoyi/Ammonite/pull/153")
+            @lnk("and", "https://github.com/lihaoyi/Ammonite/pull/158")
+            @lnk("lots", "https://github.com/lihaoyi/Ammonite/pull/157") of
+            terminal improvements, courtesy of @lnk("Erik Osheim",
+            "https://github.com/non")
+          @li
+            Only the last @hl.scala("@")-delimited block in a script loaded
+            via @hl.scala{load.module} gets its names dumped into the REPL's
+            environment now, letting you create some semblance of hygiene,
+            thanks to @lnk("Laszlo Mero", "https://github.com/laci37")
+      @sect{0.4.3}
+        @ul
+          @li
+            Remove embarassing debug println left behind in autocomplete code
+          @li
+            Fix @code{pathSeparator} so Ammonite-REPL is at least
+            basically-runnable on windows, although buggy
+          @li
+            Update to more robust version of pprint to fix @issue(140)
+      @sect{0.4.2}
+        @ul
+          @li
+            Fix @issue(139): Can't fix typos?
+          @li
+            Fix bad wrapping of long lines in ammonite-repl
+      @sect{0.4.1}
+        @ul
+          @li
+            Fix crasher running the REPL on new machines
+      @sect{0.4.0}
+        @ul
+          @li
+            Re-added support for 2.10.x, minus features that don't work in it
+            (e.g. scope-aware type-printing)
+          @li
+            Added a @sect.ref("Ammonite-REPL", "standalone distributable") that comes
+            bundled with Scala 2.10.4 or 2.11.7, letting you quickly load and
+            experiment with libraries without SBT
+          @li
+            User input now has @sect.ref{Syntax Highlighting} by default!
+          @li
+            Exception stack traces are now @sect.ref("Syntax Highlighting",
+            "highlighted") as well, to make them easier to read
+          @li
+            @sect.ref("Pretty-printed output", "Pretty-printing") has been
+            extracted into a separate project, and aside from that is greatly
+            improved. Many more common cases (e.g. sealed trait hierarchies)
+            are now pretty-printed rather than falling back to @code{toString}
+          @li
+            Exposed the @sect.ref("Configurable Truncation", "show") function
+            by default, letting you pretty-print any value with custom
+            configuration (wrapping-width, truncation-height, colors, ...)
+          @li
+            Fixed cases where PPrint/TPrint was causing compilation errors
+          @li
+            Persistent data is now stored in a @code{~/.ammonite} folder. This
+            includes @code{~/.ammonite/history},
+            @code{~/.ammonite/predef.scala}, and various cache, thanks to
+            @lnk("Laszlo Mero", "https://github.com/laci37")
+          @li
+            You can now define a @code{~/.ammonite/predef.scala}
+            @sect.ref("Configuration") file which will be executed the first
+            thing when the Ammonite REPL is loaded. This is useful for common
+            imports, @hl.scala{load.ivy}ing libraries, or other configuration
+            for your REPL
+          @li
+            Added the ability to load arbitrary @sect.ref{Script Files} via
+            @hl.scala{load.exec} and @hl.scala{load.module}, thanks to
+            @lnk("Laszlo Mero", "https://github.com/laci37")
+          @li
+            @sect.ref{Configuration} that was previously passed into the
+            @hl.scala{REPL}s constructor is now done in-REPL,
+          @li
+            @sect.ref("Editing", "Multi-line editing and other features") via a
+            custom terminal interface that should behave just like readline, but
+            with added conveniences.
+          @li
+            Removed the ability to reload classes; using @hl.scala{load.ivy} no
+            longer causes all existing values to be lazily recomputed.
+          @li
+            Added the @sect.ref("Filesystem Operations", "cd! and wd")
+            built-ins to make working with filesystem operations via
+            @sect.ref{Ammonite-Ops} more pleasant
+          @li
+            Evaluated values of type @hl.scala{Unit} are no longer echo-ed to
+            the user
+          @li
+            Performance improvements to the startup time of the REPL, with
+            @lnk("more to come", "https://github.com/lihaoyi/Ammonite/issues/135")
+          @li
+            Third-party library resolution via @hl.scala{load.ivy} is now cached
+            after the first call, letting you e.g. load libraries in your
+            @code{~/.ammonite/predef.scala} without waiting for the slow
+            ivy-resolution every startup
+          @li
+            Standardized the use of @sect.ref{Refs} for configuration, including
+            the ability to bind them "live" to the value of an expression.
+          @li
+            Allows you to trivially @sect.ref("Spawning Subprocesses",
+            "spawn subprocesses"), letting you run @code{git} commands, edit
+            files via @code{vim}, open @code{ssh} sessions or even start
+            @code{SBT} or @code{Python} shells right from your Scala REPL
+    @sect{0.3.x}
+      @sect{0.3.2}
+        @ul
+          @li
+            Fix pretty-printing of higher-kinded types.
+          @li
+            Drop support for 2.10.x; ammonite is 2.11.x-only now
 
-    @sect{0.3.0}
-      @ul
-        @li
-          allow @hl.scala{predef} parameter to be passed into
-          @hl.scala{Main.run()} call, letting you configure initialization
-          commands or imports
-        @li
-          Compilation errors in expressions no longer show synthetic code in
-          the message
-        @li
-          Ivy module loading now lets you configure verbosity level
-        @li
-          Defining macros in the REPL and using them in subsequent lines now
-          works
-        @li
-          Output lines are now truncated past a certain length, which is
-          configurable, thanks to @lnk("Laszlo Mero", "https://github.com/laci37")
+      @sect{0.3.1}
+        @ul
+          @li
+            Many of the collection @hl.scala{PPrint}s are much lazier and will
+            avoid stringifying the whole collection if its going to get truncated
+            anyway.
+          @li
+            Types now get printed semi-qualified (depending on what's in scope),
+            with simple highlighting.
+          @li
+            You can define custom @hl.scala{TPrint[T]}s to provide custom
+            printing for any type.
+          @li
+            Operator-named two-param generic types are now printed infix by
+            default.
 
-    @sect{0.2.9}
-      @ul
-        @li
-          Lots of improvements to @code{Ctrl-C} and @code{Ctrl-D} handling, to
-          make it behave more like other REPLs
+      @sect{0.3.0}
+        @ul
+          @li
+            allow @hl.scala{predef} parameter to be passed into
+            @hl.scala{Main.run()} call, letting you configure initialization
+            commands or imports
+          @li
+            Compilation errors in expressions no longer show synthetic code in
+            the message
+          @li
+            Ivy module loading now lets you configure verbosity level
+          @li
+            Defining macros in the REPL and using them in subsequent lines now
+            works
+          @li
+            Output lines are now truncated past a certain length, which is
+            configurable, thanks to @lnk("Laszlo Mero", "https://github.com/laci37")
 
-    @sect{0.2.8}
-      @ul
-        @li
-          Fix @issue(47): PPrint derivation fails with nested case class
-        @li
-          Fix @issue(14): Exception when trying to use Ammonite REPL @issue(15) by cross
-          building against Scala 2.10.{3,4,5} and 2.11.{3,4,5,6}
-        @li
-          Autocomplete results are sorted alphabetically (Fixed @issue(42))
-        @li
-          Fix @issue(39): nothing echoed on multiple import
-        @li
-          Importing things from Java packages now works properly
-        @li
-          Capture Exceptions and expose them to repl as repl.lastException
-          including exceptions causing Failures
+    @sect{0.2.x}
+      @sect{0.2.9}
+        @ul
+          @li
+            Lots of improvements to @code{Ctrl-C} and @code{Ctrl-D} handling, to
+            make it behave more like other REPLs
+
+      @sect{0.2.8}
+        @ul
+          @li
+            Fix @issue(47): PPrint derivation fails with nested case class
+          @li
+            Fix @issue(14): Exception when trying to use Ammonite REPL @issue(15) by cross
+            building against Scala 2.10.{3,4,5} and 2.11.{3,4,5,6}
+          @li
+            Autocomplete results are sorted alphabetically (Fixed @issue(42))
+          @li
+            Fix @issue(39): nothing echoed on multiple import
+          @li
+            Importing things from Java packages now works properly
+          @li
+            Capture Exceptions and expose them to repl as repl.lastException
+            including exceptions causing Failures
 
   @sect{Unstable Versions}
     @p

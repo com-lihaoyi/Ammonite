@@ -174,9 +174,9 @@
     @li
       @sect.ref{Unstable Versions}
 
-@Repl()
-@Scripts()
-@Ops()
-@Shell()
-@Cookbook()
-@Footer()
+  @Repl()
+  @Scripts()
+  @Ops()
+  @Shell()
+  @Cookbook()
+  @Footer()
