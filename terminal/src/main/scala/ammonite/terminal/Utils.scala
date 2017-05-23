@@ -100,11 +100,11 @@ object TTY{
     val height = consoleDim("lines")
 //    Debug("Initializing, Width " + width)
 //    Debug("Initializing, Height " + height)
-    val initialConfig = stty("-g").trim
     stty("-icanon min 1 -icrnl -inlcr -ixon")
     sttyFailTolerant("dsusp undef")
     stty("-echo")
     stty("intr undef")
+    val initialConfig = stty("-g").trim
 //    Debug("")
     (width, height, initialConfig)
   }
