@@ -1,18 +1,12 @@
 package ammonite.shell
 
-import ammonite.ops.{CommandResult, LsSeq}
-import ammonite.repl.{FrontEndUtils, ReplAPI}
+import ammonite.repl.ReplAPI
 
 /**
  * Created by haoyi on 9/1/15.
  */
 object Configure {
-  val pprintHandlers: PartialFunction[Any, pprint.Tree] = {
-    case x: LsSeq => PPrints.lsSeqRepr(x)
-    case x: ammonite.ops.Path => PPrints.pathRepr(x)
-    case x: ammonite.ops.RelPath => PPrints.relPathRepr(x)
-    case x: CommandResult => PPrints.commandResultRepr(x)
-  }
+
   def apply(repl: ReplAPI, wd: => ammonite.ops.Path) = {
     if (scala.util.Properties.isWin) {
       repl.frontEnd() = ammonite.repl.FrontEnd.JLineWindows
@@ -28,11 +22,6 @@ object Configure {
       "-" +
       wd.segments.lastOption.getOrElse("") +
       "@ "
-    )
-
-
-    repl.pprinter() = repl.pprinter().copy(
-      additionalHandlers = pprintHandlers orElse repl.pprinter().additionalHandlers
     )
   }
 }

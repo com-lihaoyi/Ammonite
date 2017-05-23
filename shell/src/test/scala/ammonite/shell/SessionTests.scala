@@ -51,7 +51,6 @@ object SessionTests extends TestSuite{
 
         @ interp.load.module($bareSrc)
 
-        @ import ammonite.shell.PPrints._
 
         @ import ammonite.ops.ImplicitWd
 

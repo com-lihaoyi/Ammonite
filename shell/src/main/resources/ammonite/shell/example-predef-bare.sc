@@ -6,6 +6,5 @@ interp.load.cp(pwd/'shell/'target/s"scala-$scalaVersion"/s"ammonite-shell_$scala
 val shellSession = ammonite.shell.ShellSession()
 import shellSession._
 import ammonite.ops._
-import ammonite.shell.PPrints._
 import ammonite.shell._
 ammonite.shell.Configure(repl, wd)

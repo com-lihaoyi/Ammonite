@@ -1168,3 +1168,7 @@
 
     @sect{Unstable Changlog}
       @ul
+        @li
+          Improve pretty-printing of @code{Path}s, @code{RelPath}s and the
+          result of sub-processes and file-listings in the default REPL (previously
+          these improved-pretty-printers were limited to @code{ammonite-shell})
