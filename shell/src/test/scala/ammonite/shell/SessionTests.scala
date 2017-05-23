@@ -51,11 +51,10 @@ object SessionTests extends TestSuite{
 
         @ interp.load.module($bareSrc)
 
-
         @ import ammonite.ops.ImplicitWd
 
         @ %%ls 'ops
-        res4: $typeString =
+        res3: $typeString =
         src
         target
       """)
