@@ -114,6 +114,13 @@
 
 
   @sect{Changelog}
+    @sect{0.9.2}
+      @ul
+        @li
+          When pasting multiple separate multi-line statements, subsequent statements
+          no longer stomp over earlier ones in the terminal output @issue(609)
+
+  @sect{Changelog}
     @sect{0.9.1}
       @ul
         @li

@@ -14,7 +14,8 @@ class LineReader(width: Int,
                  reader: java.io.Reader,
                  writer: java.io.Writer,
                  filters: Filter,
-                 displayTransform: (Vector[Char], Int) => (fansi.Str, Int) = LineReader.noTransform) {
+                 displayTransform: (Vector[Char], Int) => (fansi.Str, Int) =
+                  LineReader.noTransform) {
 
   lazy val ansi = new AnsiNav(writer)
 
