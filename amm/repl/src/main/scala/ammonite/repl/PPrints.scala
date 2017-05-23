@@ -1,10 +1,20 @@
 package ammonite.repl
 
 import ammonite.ops.{CommandResult, LsSeq}
+import ammonite.runtime.History
+import ammonite.runtime.tools.GrepResult
 import pprint.Renderer
 
 object PPrints{
-
+  val replPPrintHandlers: PartialFunction[Any, pprint.Tree] = {
+    case x: ammonite.ops.LsSeq => PPrints.lsSeqRepr(x)
+    case x: ammonite.ops.Path => PPrints.pathRepr(x)
+    case x: ammonite.ops.RelPath => PPrints.relPathRepr(x)
+    case x: ammonite.ops.CommandResult => PPrints.commandResultRepr(x)
+    case t: History => pprint.Tree.Lazy(ctx => Iterator(t.mkString("\n")))
+    case t: GrepResult => pprint.Tree.Lazy(ctx => Iterator(GrepResult.grepResultRepr(t, ctx)))
+    case t: scala.xml.Elem => pprint.Tree.Lazy(_ => Iterator(t.toString))
+  }
   def lsSeqRepr(t: LsSeq) = pprint.Tree.Lazy { ctx =>
     val renderer = new Renderer(
       ctx.width, ctx.applyPrefixColor, ctx.literalColor, ctx.indentStep

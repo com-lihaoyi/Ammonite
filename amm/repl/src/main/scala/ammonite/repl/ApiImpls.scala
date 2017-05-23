@@ -88,15 +88,7 @@ class ReplApiImpl(val interp: Interpreter,
       defaultWidth = width,
       colorLiteral = colors().literal(),
       colorApplyPrefix = colors().prefix(),
-      additionalHandlers = {
-        case x: ammonite.ops.LsSeq => PPrints.lsSeqRepr(x)
-        case x: ammonite.ops.Path => PPrints.pathRepr(x)
-        case x: ammonite.ops.RelPath => PPrints.relPathRepr(x)
-        case x: ammonite.ops.CommandResult => PPrints.commandResultRepr(x)
-        case t: History => pprint.Tree.Lazy(ctx => Iterator(t.mkString("\n")))
-        case t: GrepResult => pprint.Tree.Lazy(ctx => Iterator(GrepResult.grepResultRepr(t, ctx)))
-        case t: scala.xml.Elem => pprint.Tree.Lazy(_ => Iterator(t.toString))
-      }
+      additionalHandlers = PPrints.replPPrintHandlers
     )
   )
 
