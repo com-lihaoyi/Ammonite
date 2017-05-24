@@ -7,7 +7,8 @@ package ammonite.main
   *
   * See issue 460.
   *
-  * Parameter pattern: https://docs.oracle.com/javase/7/docs/api/java/net/doc-files/net-properties.html
+  * Parameter pattern:
+  * https://docs.oracle.com/javase/7/docs/api/java/net/doc-files/net-properties.html
   *
   * Created by cuz on 17-5-21.
   */
@@ -19,7 +20,8 @@ private[ammonite] object ProxyFromEnv {
     * Get current proxy environment variables.
     */
   private def getEnvs =
-    sys.env.map { case (k, v) => (k.toLowerCase, v.toLowerCase) }.filterKeys(_.endsWith("proxy"))
+    sys.env.map { case (k, v) => (k.toLowerCase, v.toLowerCase) }
+      .filterKeys(_.endsWith("proxy"))
 
   /**
     * Convert single proxy environment variable to corresponding system proxy properties.
