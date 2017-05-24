@@ -1,4 +1,4 @@
-package ammonite.runtime.tools
+package ammonite.main
 
 import utest._
 /**
