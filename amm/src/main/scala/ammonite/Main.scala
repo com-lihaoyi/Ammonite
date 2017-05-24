@@ -5,7 +5,7 @@ import java.io.{File, InputStream, OutputStream}
 import ammonite.interp.Interpreter
 import ammonite.ops._
 import ammonite.runtime.{History, Storage}
-import ammonite.main.Defaults
+import ammonite.main.{Defaults, ProxyFromEnv}
 import ammonite.repl.{RemoteLogger, Repl, ReplApiImpl, SessionApiImpl}
 import ammonite.util._
 import ammonite.util.Util.newLine
@@ -124,6 +124,9 @@ case class Main(predef: String = "",
   }
 
   def run(replArgs: Bind[_]*) = {
+
+    //set proxy properties from env:
+    ProxyFromEnv.setPropProxyFromEnv()
 
     val remoteLogger =
       if (!remoteLogging) None

@@ -1,4 +1,4 @@
-package ammonite.runtime.tools
+package ammonite.main
 
 /**
   * Give Ammonite the ability to read (linux) system proxy environment variables
@@ -11,7 +11,7 @@ package ammonite.runtime.tools
   *
   * Created by cuz on 17-5-21.
   */
-private object ProxyFromEnv {
+private[ammonite] object ProxyFromEnv {
   private lazy val KeyPattern ="""([\w\d]+)_proxy""".r
   private lazy val UrlPattern ="""([\w\d]+://)?(.+@)?([\w\d\.]+):(\d+)/?""".r
 

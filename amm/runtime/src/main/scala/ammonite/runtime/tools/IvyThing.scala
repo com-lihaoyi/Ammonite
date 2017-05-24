@@ -36,8 +36,6 @@ object IvyThing{
       Some(logger)
     }
 
-    //set proxy properties from env:
-    ProxyFromEnv.setPropProxyFromEnv()
 
     val start = coursier.Resolution(dependencies.toSet)
 
