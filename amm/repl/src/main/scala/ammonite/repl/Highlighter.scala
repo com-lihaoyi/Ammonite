@@ -10,8 +10,9 @@ import scalaparse.syntax.Identifiers._
 object Highlighter {
 
   object BackTicked{
+    private[this] val regex = "`([^`]+)`".r
     def unapplySeq(s: Any): Option[List[String]] = {
-      "`([^`]+)`".r.unapplySeq(s.toString)
+      regex.unapplySeq(s.toString)
     }
   }
 

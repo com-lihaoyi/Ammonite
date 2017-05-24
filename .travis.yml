@@ -10,7 +10,7 @@ matrix:
 
   - env: CI_SCRIPT="ci/build.sc artifacts"
     jdk: oraclejdk8
-    scala: 2.11.8
+    scala: 2.11.11
 
 
   # Each `test` call is manually sharded out into `published/test` and
@@ -26,10 +26,10 @@ matrix:
 
   - env: CI_SCRIPT="ci/build.sc test published/test"
     jdk: oraclejdk8
-    scala: 2.11.8
+    scala: 2.11.11
   - env: CI_SCRIPT="ci/build.sc test integration/test"
     jdk: oraclejdk8
-    scala: 2.11.8
+    scala: 2.11.11
 
   - env: CI_SCRIPT="ci/build.sc test published/test"
     jdk: openjdk7
@@ -42,11 +42,11 @@ matrix:
   # These are relatively (?) quick so put them last
   - env: CI_SCRIPT="ci/build.sc docs"
     jdk: oraclejdk8
-    scala: 2.11.8
+    scala: 2.11.11
 
   - env: CI_SCRIPT="ci/build.sc executable"
     jdk: oraclejdk8
-    scala: 2.11.8
+    scala: 2.11.11
 
 
 
@@ -63,3 +63,20 @@ notifications:
     - haoyi.sg@gmail.com
 
 sudo: false
+
+
+# Stolen from https://github.com/typelevel/cats/blob/master/.travis.yml
+cache:
+  directories:
+  - $HOME/.sbt/0.13/dependency
+  - $HOME/.sbt/boot/scala*
+  - $HOME/.sbt/launchers
+  - $HOME/.ivy2/cache
+  - $HOME/.coursier
+  - $HOME/.nvm
+
+before_cache:
+  - du -h -d 1 $HOME/.ivy2/cache
+  - du -h -d 2 $HOME/.sbt/
+  - find $HOME/.sbt -name "*.lock" -type f -delete
+  - find $HOME/.ivy2/cache -name "ivydata-*.properties" -type f -delete

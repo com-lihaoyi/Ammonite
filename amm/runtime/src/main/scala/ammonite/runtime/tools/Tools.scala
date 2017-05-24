@@ -219,18 +219,19 @@ object browse{
   def apply(t: Any,
             viewer: Strings = lessViewer,
             width: Integer = null,
-            height: Integer = null,
+            height: Integer = 9999999,
             indent: Integer = null)
            (implicit pp: pprint.PPrinter,
             wd: Path = ammonite.ops.ImplicitWd.implicitCwd) = {
+
     %(
       viewer.values,
       tmp(
         pp.tokenize(
           t,
-          width = width,
-          height = -1,
-          indent = indent
+          width = if (width == null) pp.defaultWidth else width,
+          height = if (height == null) pp.defaultHeight else height,
+          indent = if (indent == null) pp.defaultIndent else indent
         ).map(_.render)
       )
     )
