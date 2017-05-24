@@ -6,7 +6,7 @@ import utest._
   *
   * Created by cuzfrog on 1/31/17.
   */
-object ProxyFromEnvTest extends TestSuite {
+object ProxyFromEnvTest {
   sys.props --= getProxyProps.keys
   //clear proxy properties
   private def getProxyProps: Map[String, String] = {
@@ -29,23 +29,25 @@ object ProxyFromEnvTest extends TestSuite {
 
   import ProxyFromEnv._
 
-  val tests = this {
-    "print-test" - {
-      println("=====before setting proxy===")
-      getProxyProps.foreach(println)
-      println("=====there should be noting above")
-      println("=====after setting proxy")
-      setPropProxyFromEnv(positives)
-      getProxyProps.foreach(println)
-      println(s"=====should print at least ${nagetives.size} warings.")
-      setPropProxyFromEnv(nagetives)
-    }
-    "conflict-test" - {
-      System.setProperty("https.proxyHost", "10.0.0.101")
-      System.setProperty("https.proxyPort", "6000")
-      setPropProxyFromEnv(positives)
-      assert(getProxyProps("https.proxyHost") == "10.0.0.101")
-      assert(getProxyProps("https.proxyPort") == "6000")
-    }
-  }
+//  val tests = this {
+//    "print-test" - {
+//      println("=====before setting proxy===")
+//      getProxyProps.foreach(println)
+//      println("=====there should be noting above")
+//      println("=====after setting proxy")
+//      setPropProxyFromEnv(positives)
+//      getProxyProps.foreach(println)
+//      println(s"=====should print at least ${nagetives.size} warings.")
+//      setPropProxyFromEnv(nagetives)
+//    }
+//    "conflict-test" - {
+//      System.setProperty("https.proxyHost", "10.0.0.101")
+//      System.setProperty("https.proxyPort", "6000")
+//      setPropProxyFromEnv(positives)
+//      assert(getProxyProps("https.proxyHost") == "10.0.0.101")
+//      assert(getProxyProps("https.proxyPort") == "6000")
+//    }
+//  }
+
+
 }
