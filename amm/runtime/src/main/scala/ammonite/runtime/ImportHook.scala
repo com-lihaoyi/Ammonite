@@ -49,7 +49,7 @@ object ImportHook{
   object Result{
     case class Source(code: String,
                       blockInfo: CodeSource,
-                      imports: Imports,
+                      hookImports: Imports,
                       exec: Boolean) extends Result
     case class ClassPath(file: Path, plugin: Boolean) extends Result
   }
