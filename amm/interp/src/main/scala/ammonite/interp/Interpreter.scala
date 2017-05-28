@@ -51,7 +51,7 @@ class Interpreter(val printer: Printer,
 
 
   val mainThread = Thread.currentThread()
-  val eval = Evaluator(mainThread.getContextClassLoader, 0)
+  val eval = Evaluator(mainThread.getContextClassLoader, getClass.getClassLoader, 0)
 
   val dynamicClasspath = new VirtualDirectory("(memory)", None)
   var compiler: Compiler = null

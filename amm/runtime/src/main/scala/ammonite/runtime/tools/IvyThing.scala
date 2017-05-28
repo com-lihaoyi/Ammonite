@@ -52,7 +52,7 @@ object IvyThing{
       )
     }else {
       val localArtifacts = scalaz.concurrent.Task.gatherUnordered(
-        for (a <- resolution.artifacts)
+        for (a <- resolution.artifacts ++ resolution.classifiersArtifacts(Seq("sources")))
         yield coursier.Cache.file(a, logger = logger).run
       ).run
 

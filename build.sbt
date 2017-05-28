@@ -111,6 +111,7 @@ lazy val terminal = project
  * standalone in a Scala project to provide a better interactive experience
  * for Scala
  */
+
 lazy val amm = project
   .dependsOn(
     terminal, ops,
@@ -119,6 +120,52 @@ lazy val amm = project
   .settings(
     macroSettings,
     sharedSettings,
+
+    // Aggregate source jars into both the amm/test:run as well as the assembly
+    // classpaths, so that the `source` macro can find their sources and
+    // highlight/display them.
+
+    // This includes them in the `amm/test:run` command
+    (fullClasspath in Test) ++= {
+      val thingy =
+      (updateClassifiers in Test).value
+        .configurations
+        .find(_.configuration == Test.name)
+        .get
+        .modules
+        .flatMap(_.artifacts)
+        .collect{case (a, f) if a.classifier == Some("sources") => f}
+
+      thingy
+    },
+
+    // This includes them in `amm/test:assembly
+    (fullClasspath in Runtime) ++= {
+      val thingy =
+      (updateClassifiers in Runtime).value
+        .configurations
+        .find(_.configuration == Runtime.name)
+        .get
+        .modules
+        .flatMap(_.artifacts)
+        .collect{case (a, f) if a.classifier == Some("sources") => f}
+
+      thingy
+    },
+
+    // This adds Ammonite's *own* source jars to the `amm/test:assembly`.
+    // We could, but don't, do it for `amm/test:run` because it's slow and
+    // annoying to run every time I just want to open a test REPL
+    fullClasspath in assembly ++= Seq(
+      (packageSrc in (ops, Compile)).value,
+      (packageSrc in (terminal, Compile)).value,
+      (packageSrc in (ammUtil, Compile)).value,
+      (packageSrc in (ammRuntime, Compile)).value,
+      (packageSrc in (ammInterp, Compile)).value,
+      (packageSrc in (ammRepl, Compile)).value,
+      (packageSrc in Compile).value
+    ),
+
     crossVersion := CrossVersion.full,
     test in assembly := {},
     name := "ammonite",
@@ -130,6 +177,8 @@ lazy val amm = project
       else Seq("com.chuusai" %% "shapeless" % "2.3.2" % Test)
     ),
     javaOptions += "-Xmx4G",
+
+
     assemblyOption in assembly := (assemblyOption in assembly).value.copy(
       prependShellScript = Some(
         // G1 Garbage Collector is awesome https://github.com/lihaoyi/Ammonite/issues/216
@@ -189,7 +238,9 @@ lazy val ammInterp = project
     libraryDependencies ++= Seq(
       "org.scala-lang" % "scala-compiler" % scalaVersion.value,
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
-      "com.lihaoyi" %% "scalaparse" % "0.4.3"
+      "com.lihaoyi" %% "scalaparse" % "0.4.3",
+      "org.javassist" % "javassist" % "3.21.0-GA"
+
     ),
     unmanagedSourceDirectories in Compile ++= {
       if (Set("2.10", "2.11").contains(scalaBinaryVersion.value))
@@ -209,7 +260,8 @@ lazy val ammRepl = project
     crossVersion := CrossVersion.full,
     name := "ammonite-repl",
     libraryDependencies ++= Seq(
-      "jline" % "jline" % "2.14.3"
+      "jline" % "jline" % "2.14.3",
+      "com.github.javaparser" % "javaparser-core" % "3.2.5"
     )
   )
 

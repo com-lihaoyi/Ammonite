@@ -95,14 +95,26 @@ object SpecialClassLoader{
     mtimes
   }
 }
+
+/**
+  * Try to load resources from two parents; necessary to get Ammonite's source
+  * code browsing to work in SBT projects because SBT messes up the context
+  * classloader https://stackoverflow.com/q/44237791/871202
+  */
+class ForkClassLoader(realParent: ClassLoader, fakeParent: ClassLoader)
+  extends ClassLoader(realParent){
+  // This delegates to the parent automatically
+  override def findResource(name: String) = fakeParent.getResource(name)
+}
+
 /**
   * Classloader used to implement the jar-downloading
   * command-evaluating logic in Ammonite.
   *
   * http://stackoverflow.com/questions/3544614/how-is-the-control-flow-to-findclass-of
   */
-class SpecialClassLoader(parent: ClassLoader, parentSignature: Seq[(Path, Long)])
-  extends URLClassLoader(Array(), parent){
+class SpecialClassLoader(parent: ClassLoader, parentSignature: Seq[(Path, Long)], urls: URL*)
+  extends URLClassLoader(urls.toArray, parent){
 
   /**
     * Files which have been compiled, stored so that our special

@@ -243,7 +243,6 @@ object Ex{
 
 
 trait CodeColors{
-  def ident: fansi.Attrs
   def `type`: fansi.Attrs
   def literal: fansi.Attrs
   def comment: fansi.Attrs

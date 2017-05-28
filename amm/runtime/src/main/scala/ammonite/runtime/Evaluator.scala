@@ -71,7 +71,8 @@ object Evaluator{
     Res.Failure(Some(e), newLine + "Interrupted!")
   }
 
-  def apply(currentClassloader: ClassLoader,
+  def apply(threadContextClassLoader: ClassLoader,
+            objectContextClassLoader: ClassLoader,
             startingLine: Int): Evaluator = new Evaluator{ eval =>
 
 
@@ -93,8 +94,17 @@ object Evaluator{
      */
 
     def initialFrame = {
-      val hash = SpecialClassLoader.initialClasspathSignature(currentClassloader)
-      def special = new SpecialClassLoader(currentClassloader, hash)
+      val hash = SpecialClassLoader.initialClasspathSignature(threadContextClassLoader)
+      import ammonite.ops._
+      val likelyJdkSourceLocation = Path(System.getProperty("java.home"))/up/"src.zip"
+      def special = new SpecialClassLoader(
+        new ForkClassLoader(
+          threadContextClassLoader,
+          getClass.getClassLoader
+        ),
+        hash,
+        likelyJdkSourceLocation.toNIO.toUri.toURL
+      )
       new Frame(
         special,
         special,
