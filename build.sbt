@@ -127,7 +127,6 @@ lazy val amm = project
 
     // This includes them in the `amm/test:run` command
     (fullClasspath in Test) ++= {
-      val thingy =
       (updateClassifiers in Test).value
         .configurations
         .find(_.configuration == Test.name)
@@ -135,13 +134,10 @@ lazy val amm = project
         .modules
         .flatMap(_.artifacts)
         .collect{case (a, f) if a.classifier == Some("sources") => f}
-
-      thingy
     },
 
     // This includes them in `amm/test:assembly
     (fullClasspath in Runtime) ++= {
-      val thingy =
       (updateClassifiers in Runtime).value
         .configurations
         .find(_.configuration == Runtime.name)
@@ -149,8 +145,6 @@ lazy val amm = project
         .modules
         .flatMap(_.artifacts)
         .collect{case (a, f) if a.classifier == Some("sources") => f}
-
-      thingy
     },
 
     // This adds Ammonite's *own* source jars to the `amm/test:assembly`.

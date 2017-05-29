@@ -14,8 +14,28 @@ import scala.annotation.tailrec
 import scala.collection.mutable
 import scala.language.experimental.macros
 
+case class Location(fileName: String, lineNum: Int, fileContent: String)
 object source{
+
   def browseSourceCommand(targetLine: Int) = Seq("less", "+" + targetLine,"-RMN")
+
+  def load(f: => Any): Location = macro applyMacro0
+
+  def applyMacro0(c: Context)
+                 (f: c.Expr[Any]): c.Expr[Location] = {
+    import c.universe._
+
+    val res = breakUp(c)(f) match{
+      case Left((prefix, classThingy, symbolName, lhs, returnClass, argClasses)) =>
+        println("loadObjectMemberInfo")
+        q"$prefix.loadObjectMemberInfo($classThingy, $lhs, $symbolName, $returnClass, ..$argClasses).right.get"
+      case Right((prefix, f)) =>
+        println("loadObjectInfo")
+        q"$prefix.loadObjectInfo($f).right.get"
+    }
+
+    c.Expr[Location](res)
+  }
 
   def apply(f: => Any)
            (implicit pprinter: pprint.PPrinter, colors: CodeColors): Unit = macro applyMacro1
@@ -34,20 +54,17 @@ object source{
     applyMacro2(c)(f, defaultBrowseExpr)(pprinter, colors)
   }
 
-  def applyMacro2(c: Context)
-                 (f: c.Expr[Any], command: c.Expr[Int => Strings])
-                 (pprinter: c.Expr[pprint.PPrinter],
-                 colors: c.Expr[CodeColors]): c.Expr[Unit] = {
+  def breakUp(c: Context)(f: c.Expr[Any]) = {
     import c.universe._
-
     // We don't use quasiquote pattern matching here, because we were seeing
     // weird behavior where the quasiquote q"{..$foo; $bar}" would match single
     // expressions not enclosed in blocks, and recursing on `bar` would result
     // in an infinite recursion. No such problem matching on the `Block` AST node.
-    @tailrec def rec(args: Seq[Tree], x: Tree): Option[(Tree,  String, Seq[Tree])] = x match{
+    @tailrec def rec(args: Seq[Tree], x: Tree): Option[(Tree, Symbol, Seq[Tree])] = x match{
       case Select(qualifier, selector) =>
         if (selector.toString == "<init>") None
-        else Some(qualifier, selector.toTermName.toString, args)
+        else if (qualifier.symbol.isPackage) None
+        else Some(qualifier, x.symbol, args)
       case Apply(fun, args) => rec(args, fun)
 
       case TypeApply(fun, targs) => rec(Nil, fun)
@@ -58,15 +75,67 @@ object source{
 
     val prefix = q"ammonite.repl.tools.source"
 
-    val res = rec(Nil, f.tree) match{
-      case Some((lhs, rhs, args)) =>
-        val argClasses = args.map{x => q"classOf[${x.tpe}]"}
-        q"$prefix.browseObjectMember($lhs, $rhs, $pprinter, $colors, $command, ..$argClasses)"
-      case None =>
-        q"$prefix.browseObject($f, $pprinter, $colors, $command)"
-    }
+    def javaifyType(t: Type) = {
+      t.typeSymbol.fullName match{
+        // These need to be special-cased, because `Class.forName("scala.Boolean")
+        // gives us the useless, unused "scala.Boolean" class instead of the
+        // "boolean" primitive
+        case "scala.Byte" => q"classOf[scala.Byte]"
+        case "scala.Boolean" => q"classOf[scala.Boolean]"
+        case "scala.Char" => q"classOf[scala.Char]"
+        case "scala.Short" => q"classOf[scala.Short]"
+        case "scala.Int" => q"classOf[scala.Int]"
+        case "scala.Float" => q"classOf[scala.Float]"
+        case "scala.Long" => q"classOf[scala.Long]"
+        case "scala.Double" => q"classOf[scala.Double]"
+        case _ => t match{
+          case TypeRef(_, cls, args) if cls == definitions.RepeatedParamClass =>
+            q"classOf[scala.Seq[_]]"
 
-    c.Expr[Unit](res)
+          // We need to use Class.forName instead of classOf, because classOf
+          // requires you to pput the correct number of [_, _]s after a generic
+          // type, which can be arbitrarily large and complex e.g. [_, _[_], _]
+          case tpe if tpe.typeSymbol.isClass =>
+            q"Class.forName(${tpe.typeSymbol.fullName.toString})"
+
+          case _ =>
+            q"classOf[java.lang.Object]"
+        }
+
+      }
+    }
+    rec(Nil, f.tree) match{
+      case None => Right(prefix, f)
+      case Some((lhs, symbol, args)) =>
+        val method = symbol.asMethod
+        val argClasses =
+          for(arg <- method.paramLists.flatten)
+          yield javaifyType(arg.typeSignature)
+
+        Left(
+          prefix,
+          q"Class.forName(${symbol.owner.fullName})",
+          symbol.name.toString,
+          lhs,
+          javaifyType(method.returnType),
+          argClasses
+        )
+
+    }
+  }
+  def applyMacro2(c: Context)
+                 (f: c.Expr[Any], command: c.Expr[Int => Strings])
+                 (pprinter: c.Expr[pprint.PPrinter],
+                 colors: c.Expr[CodeColors]): c.Expr[Unit] = {
+    import c.universe._
+    c.Expr[Unit](
+      breakUp(c)(f) match{
+        case Left((prefix, classThingy, symbolName, lhs, returnClass, argClasses)) =>
+          q"$prefix.browseObjectMember($classThingy, $lhs, $symbolName, $pprinter, $colors, $command, $returnClass, ..$argClasses)"
+        case Right((prefix, f)) => q"$prefix.browseObject($f, $pprinter, $colors, $command)"
+      }
+
+    )
   }
 
   /**
@@ -110,14 +179,16 @@ object source{
     * from the bytecode to decide which source to show, and those only exist
     * for concrete method implementations
     */
-  def browseObjectMember(value: Any,
+  def browseObjectMember(symbolOwnerCls: Class[_],
+                         value: Any,
                          memberName: String,
                          pprinter: pprint.PPrinter,
                          colors: CodeColors,
                          command: Int => Strings,
+                         returnType: Class[_],
                          argTypes: Class[_]*) = {
     browseSource(
-      loadObjectMemberInfo(value, memberName, argTypes),
+      loadObjectMemberInfo(symbolOwnerCls, value, memberName, returnType, argTypes:_*),
       pprinter.defaultHeight,
       colors,
       command
@@ -147,15 +218,45 @@ object source{
     "(" + argTypes.map(unparse).mkString("") + ")" + unparse(returnType)
   }
 
-  def loadObjectMemberInfo(value: Any, memberName: String, argTypes: Seq[Class[_]]) = {
-    val member = value.getClass.getMethod(memberName, argTypes:_*)
-    loadSource(
-      member.getDeclaringClass,
-      x => {
-        val m = x.getMethod(memberName, getDesc(argTypes, member.getReturnType)).getMethodInfo
-        m.getLineNumber(0)
-      }
-    )
+  /**
+    * A hacky way to try and find a "good" source location for a function,
+    * about as good as we can probably get without a huge amount more effort:
+    *
+    * - We rely on the bytecode line numbers to locate methods; unfortunately,
+    *   this only works for concrete, non-abstract methods! But it's the best
+    *   we're going to get short of parsing all the source code ourselves
+    *
+    * - We look at the class that's the "owner" of the Scala symbol at compile
+    *   time. This is based on the static type of the value; this *may* be an
+    *   abstract method. If it's concrete, we can use it's bytecode line numbers
+    *   to find it and we're done
+    *
+    * - If it's abstract, we then look at the class that's the java.reflect
+    *   DeclaringClass of the value's method, at runtime. This may still not
+    *   find the actual location (if the method comes from a trait, it'll
+    *   give us the class implementing the trait, rather than the trait itself)
+    *   but it gives us another chance at finding the concrete implementation.
+    *
+    * Again, this means it is important there is a concrete `value` that has
+    * the method we're looking for, since we're relying on the bytecode line
+    * numbers to find the method, which only exist in concrete methods.
+    */
+  def loadObjectMemberInfo(symbolOwnerCls: Class[_],
+                           value: Any,
+                           memberName: String,
+                           returnType: Class[_],
+                           argTypes: Class[_]*) = {
+
+    val desc = getDesc(argTypes, returnType)
+    def loadSourceFrom(cls: Class[_]) = {
+      loadSource(cls, _.getMethod(memberName, desc).getMethodInfo.getLineNumber(0))
+    }
+    loadSourceFrom(symbolOwnerCls) match{
+      case Right(loc) if loc.lineNum != -1 => Right(loc)
+      case _ =>
+        val concreteCls = value.getClass.getMethod(memberName, argTypes:_*).getDeclaringClass
+        loadSourceFrom(concreteCls)
+    }
   }
 
   def loadCtClsMetadata(runtimeCls: Class[_], bytecode: Array[Byte]) = {
@@ -165,7 +266,8 @@ object source{
     pool.get(runtimeCls.getName)
   }
 
-  def loadSource(runtimeCls: Class[_], getLineNumber: CtClass => Int) = {
+  def loadSource(runtimeCls: Class[_],
+                 getLineNumber: CtClass => Int): Either[String, Location] = {
     val chunks = runtimeCls.getName.split('.')
     val (pkg, clsName) = (chunks.init, chunks.last)
     for{
@@ -183,23 +285,23 @@ object source{
       }.toEither.left.map { _ =>
         "Unable to find sourcecode for class " + runtimeCls.getName
       }
-    } yield (srcFile, sourceCode, lineNumber)
+    } yield Location(srcFile, lineNumber, sourceCode)
   }
 
-  def browseSource(loaded: Either[String, (String, String, Int)],
+  def browseSource(loaded: Either[String, Location],
                    verticalOffset: Int,
                    colors: CodeColors,
                    command: Int => Strings) = {
 
     loaded match{
-      case Right((srcFile, sourceCode, lineNumber)) =>
+      case Right(loc) =>
         import ImplicitWd._
         val colored =
-          if (srcFile.endsWith(".scala")){
+          if (loc.fileName.endsWith(".scala")){
             fansi.Str(
               Highlighter.defaultHighlight0(
                 scalaparse.Scala.CompilationUnit,
-                sourceCode.toVector,
+                loc.fileContent.toVector,
                 colors.comment,
                 colors.`type`,
                 colors.literal,
@@ -207,10 +309,10 @@ object source{
                 fansi.Attr.Reset
               )
             )
-          }else if (srcFile.endsWith(".java")){
-            highlightJavaCode(sourceCode, colors)
+          }else if (loc.fileName.endsWith(".java")){
+            highlightJavaCode(loc.fileContent, colors)
           }else {
-            fansi.Str(sourceCode)
+            fansi.Str(loc.fileContent)
           }
         // Break apart the colored input into lines and then render each line
         // individually
@@ -232,8 +334,8 @@ object source{
           }
         })()
 
-        val targetLine = lineNumber - verticalOffset
-        val tmpFile = tmp(output.mkString("\n"), suffix = "." + srcFile)
+        val targetLine = loc.lineNum - verticalOffset
+        val tmpFile = tmp(output.mkString("\n"), suffix = "." + loc.fileName)
         %(command(targetLine).values, tmpFile)
       case Left(msg) => println(msg)
     }

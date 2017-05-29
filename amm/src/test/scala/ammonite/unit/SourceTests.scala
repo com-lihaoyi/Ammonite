@@ -1,64 +1,63 @@
 package ammonite.unit
 
-import javassist.bytecode.ClassFile
 
 import ammonite.ops._
+import ammonite.repl.tools.Location
 import utest._
-import ammonite.repl.tools.source.{loadObjectInfo, loadObjectMemberInfo}
+import ammonite.repl.tools.source.load
 
 import scala.tools.nsc.interpreter.InputStream
 object SourceTests extends TestSuite{
   override def utestTruncateLength = 500000
-  def check(lhs: String, rhs: String) = {
-    assert(lhs == rhs)
-  }
-  val pprinter = pprint.PPrinter.BlackWhite.copy(
-    additionalHandlers = ammonite.repl.PPrints.replPPrintHandlers
-  )
   val tests = TestSuite{
-    def check(loaded: Either[String, (String, String, Int)], expectedFileName: String, expected: String*) = {
-      val Right((fileName, sourceCode, lineNum)) = loaded
-      assert(fileName == expectedFileName)
-      val nearby = sourceCode.lines.slice(lineNum - 10, lineNum + 10).mkString("\n")
+    def check(loaded: Location, expectedFileName: String, expected: String*) = {
+
+      assert(loaded.fileName == expectedFileName)
+      val nearby = loaded.fileContent.lines.slice(
+        loaded.lineNum - 10,
+        loaded.lineNum + 10
+      ).mkString("\n")
       for(snippet <- expected){
         assert(nearby.contains(snippet))
       }
     }
-    'objectInfo{
 
+    'objectInfo{
       'thirdPartyJava{
         check(
-          loadObjectInfo(new javassist.ClassPool()),
+          load(new javassist.ClassPool()),
           "ClassPool.java",
           "public class ClassPool"
         )
       }
       'thirdPartyScala{
         check(
-          loadObjectInfo(shapeless.::),
+          load(shapeless.::),
           "hlists.scala",
           "final case class ::"
         )
         check(
-          loadObjectInfo(scopt.Read),
+          load(scopt.Read),
           "options.scala",
           "object Read"
         )
       }
       'stdLibScala{
         'direct - check(
-          loadObjectInfo(Nil),
+          load(Nil),
           "List.scala",
           "case object Nil extends List[Nothing]"
         )
         'runtimeTyped - {
+          val empty: Seq[Int] = Seq()
+          val nonEmpty: Seq[Int] = Seq(1)
           check(
-            loadObjectInfo(Seq()),
+            load(empty),
             "List.scala",
             "case object Nil extends List[Nothing]"
           )
           check(
-            loadObjectInfo(Seq(1)),
+            load(nonEmpty),
             "List.scala",
             "final case class ::"
           )
@@ -67,42 +66,46 @@ object SourceTests extends TestSuite{
     }
     'objectMemberInfo{
       'thirdPartyJava{
+        val pool = new javassist.ClassPool()
         check(
-          loadObjectMemberInfo(new javassist.ClassPool(), "get", Seq(classOf[String])),
+          load(pool.find _),
           "ClassPool.java",
-          "public CtClass get(String classname)"
+          "public URL find(String classname)"
         )
       }
+
       'overloaded{
         val pool = new javassist.ClassPool()
         check(
-          loadObjectMemberInfo(pool, "makeClass", Seq(classOf[InputStream])),
+          load(pool.makeClass(_: InputStream)),
           "ClassPool.java",
           "public CtClass makeClass(InputStream classfile)"
         )
         check(
-          loadObjectMemberInfo(pool, "makeClass", Seq(classOf[String])),
+          load(pool.makeClass(_: String)),
           "ClassPool.java",
           "public CtClass makeClass(String classname)"
         )
         check(
-          loadObjectMemberInfo(pool, "makeClass", Seq(classOf[ClassFile], classOf[Boolean])),
+          load(pool.makeClass(_: javassist.bytecode.ClassFile, _: Boolean)),
           "ClassPool.java",
           "public CtClass makeClass(ClassFile classfile, boolean ifNotFrozen)"
         )
       }
       'implementedBySubclass{
+        val opt: Option[Int] = Option(1)
         check(
-          loadObjectMemberInfo(Option(1), "get", Nil),
+          load(opt.get),
           "Option.scala",
           "def get = value"
         )
       }
       'implementedBySuperclass{
+        val list: List[Int] = List(1, 2, 3)
         check(
-          loadObjectMemberInfo(List(1, 2, 3), "toString", Nil),
-          "Seq.scala",
-          "def get = value"
+          load(list.toString),
+          "SeqLike.scala",
+          "override def toString = super[IterableLike].toString"
         )
       }
 

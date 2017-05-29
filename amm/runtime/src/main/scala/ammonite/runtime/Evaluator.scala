@@ -96,6 +96,9 @@ object Evaluator{
     def initialFrame = {
       val hash = SpecialClassLoader.initialClasspathSignature(threadContextClassLoader)
       import ammonite.ops._
+      // *Try* to load the JVM source files and make them available as resources,
+      // so that the `source` helper can navigate to the sources within the
+      // Java standard library
       val likelyJdkSourceLocation = Path(System.getProperty("java.home"))/up/"src.zip"
       def special = new SpecialClassLoader(
         new ForkClassLoader(
