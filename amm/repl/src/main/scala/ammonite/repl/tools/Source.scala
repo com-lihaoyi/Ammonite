@@ -28,7 +28,15 @@ object source{
     val res = breakUp(c)(f) match{
       case Left((prefix, classThingy, symbolName, lhs, returnClass, argClasses)) =>
         println("loadObjectMemberInfo")
-        q"$prefix.loadObjectMemberInfo($classThingy, $lhs, $symbolName, $returnClass, ..$argClasses).right.get"
+        q"""
+        $prefix.loadObjectMemberInfo(
+          $classThingy,
+          $lhs,
+          $symbolName,
+          $returnClass,
+          ..$argClasses
+        ).right.get
+        """
       case Right((prefix, f)) =>
         println("loadObjectInfo")
         q"$prefix.loadObjectInfo($f).right.get"
@@ -46,7 +54,7 @@ object source{
   def applyMacro1(c: Context)
                  (f: c.Expr[Any])
                  (pprinter: c.Expr[pprint.PPrinter],
-                 colors: c.Expr[CodeColors]): c.Expr[Unit] = {
+                  colors: c.Expr[CodeColors]): c.Expr[Unit] = {
     import c.universe._
     val defaultBrowseExpr = c.Expr[Int => Strings](
       q"_root_.ammonite.repl.tools.source.browseSourceCommand"
@@ -110,7 +118,7 @@ object source{
         val method = symbol.asMethod
         val argClasses =
           for(arg <- method.paramLists.flatten)
-          yield javaifyType(arg.typeSignature)
+            yield javaifyType(arg.typeSignature)
 
         Left(
           prefix,
@@ -126,12 +134,23 @@ object source{
   def applyMacro2(c: Context)
                  (f: c.Expr[Any], command: c.Expr[Int => Strings])
                  (pprinter: c.Expr[pprint.PPrinter],
-                 colors: c.Expr[CodeColors]): c.Expr[Unit] = {
+                  colors: c.Expr[CodeColors]): c.Expr[Unit] = {
     import c.universe._
     c.Expr[Unit](
       breakUp(c)(f) match{
         case Left((prefix, classThingy, symbolName, lhs, returnClass, argClasses)) =>
-          q"$prefix.browseObjectMember($classThingy, $lhs, $symbolName, $pprinter, $colors, $command, $returnClass, ..$argClasses)"
+          q"""
+          $prefix.browseObjectMember(
+            $classThingy,
+            $lhs,
+            $symbolName,
+            $pprinter,
+            $colors,
+            $command,
+            $returnClass,
+            ..$argClasses
+          )
+          """
         case Right((prefix, f)) => q"$prefix.browseObject($f, $pprinter, $colors, $command)"
       }
 
@@ -171,7 +190,7 @@ object source{
     loadSource(
       value.getClass,
       _.getMethods.map(_.getMethodInfo.getLineNumber(0)).filter(_ >= 0).min
-    ) 
+    )
   }
   /**
     * Note: `value` must be a concrete, instantiated value with a concrete class,

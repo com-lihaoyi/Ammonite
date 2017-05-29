@@ -49,7 +49,10 @@ object AutocompleteTests extends TestSuite{
       'import - checking{ complete =>
         complete("""import <caret>""", Set("java", "javax", "scala", "javassist") -- _)
         complete("""import j<caret>""", Set("java", "javax", "jline", "jawn", "javassist") -- _)
-        complete("""import ja<caret>""", x => Set("java", "javax", "jawn", "javassist") ^ (x - "javafx"))
+        complete(
+          """import ja<caret>""",
+          x => Set("java", "javax", "jawn", "javassist") ^ (x - "javafx")
+        )
         complete("""import java.<caret>""", Set("lang", "util") -- _)
         complete("""import java.u<caret>""", Set("util") ^ _)
         complete("""import java.util.<caret>""", Set("LinkedHashMap", "LinkedHashSet") -- _)

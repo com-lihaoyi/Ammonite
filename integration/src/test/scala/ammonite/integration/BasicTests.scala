@@ -127,6 +127,21 @@ object BasicTests extends TestSuite{
       assert(output == "amm/src")
     }
 
+    'source{
+      %%bash(
+        executable,
+        "-c",
+        """val loc = source.load(new String().substring(_: Int))
+          |val snip = loc.fileContent
+          |  .lines
+          |  .slice(loc.lineNum-15, loc.lineNum+15)
+          |  .mkString("\n")
+          |
+          |assert(snip.contains("public String substring(int beginIndex)"))
+        """.stripMargin
+      )
+    }
+
     'classloaders{
       val evaled = exec('basic / "Resources.sc")
       assert(evaled.out.string.contains("1745"))
