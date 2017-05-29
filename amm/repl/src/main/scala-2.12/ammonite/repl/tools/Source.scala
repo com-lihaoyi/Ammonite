@@ -148,12 +148,13 @@ object source{
   }
 
   def loadObjectMemberInfo(value: Any, memberName: String, argTypes: Seq[Class[_]]) = {
-    val method = value.getClass.getMethod(memberName, argTypes:_*)
+    val member = value.getClass.getMethod(memberName, argTypes:_*)
     loadSource(
-      method.getDeclaringClass,
-      _.getMethod(memberName, getDesc(argTypes, method.getReturnType))
-        .getMethodInfo
-        .getLineNumber(0)
+      member.getDeclaringClass,
+      x => {
+        val m = x.getMethod(memberName, getDesc(argTypes, member.getReturnType)).getMethodInfo
+        m.getLineNumber(0)
+      }
     )
   }
 
