@@ -69,12 +69,12 @@ object PathComplete {
         .drop(1)
         // Weird hack to get around other weird hack in Highlighter, where it
         // uses 999999 to represent incomplete input
-        .map{case (a, b, c) if a > 9999 => (cursor, b, c) case x => x}
+        .map{case (a, b) if a > 9999 => (cursor, b) case x => x}
         .grouped(2)
         .collect{
-          case Seq((s, Interval.Id, _), (e, Interval.End, _)) => Span.Id(s, e)
-          case Seq((s, Interval.String, _), (e, Interval.End, _)) => Span.String(s, e)
-          case Seq((s, Interval.Symbol, _), (e, Interval.End, _)) => Span.Symbol(s, e)
+          case Seq((s, Interval.Id), (e, Interval.End)) => Span.Id(s, e)
+          case Seq((s, Interval.String), (e, Interval.End)) => Span.String(s, e)
+          case Seq((s, Interval.Symbol), (e, Interval.End)) => Span.Symbol(s, e)
         }
         .toVector
         .reverse

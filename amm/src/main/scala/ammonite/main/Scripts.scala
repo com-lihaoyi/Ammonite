@@ -35,7 +35,7 @@ object Scripts {
                 path: Path,
                 interp: ammonite.interp.Interpreter,
                 scriptArgs: Seq[(String, Option[String])]) = {
-    val (pkg, wrapper) = Util.pathToPackageWrapper(path, wd)
+    val (pkg, wrapper) = Util.pathToPackageWrapper(Seq(), path relativeTo wd)
 
     for{
       scriptTxt <- try Res.Success(Util.normalizeNewlines(read(path))) catch{
@@ -43,7 +43,7 @@ object Scripts {
       }
       processed <- interp.processModule(
         scriptTxt,
-        CodeSource(wrapper, pkg, Some(path)),
+        CodeSource(wrapper, pkg, Seq(Name("$file")), Some(path)),
         autoImport = true,
         // Not sure why we need to wrap this in a separate `$routes` object,
         // but if we don't do it for some reason the `generateRoutes` macro

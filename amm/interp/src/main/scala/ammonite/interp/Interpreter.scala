@@ -145,11 +145,14 @@ class Interpreter(val printer: Printer,
     predefInfo <- predefs
     if predefInfo.code.nonEmpty
   }{
-    val pkgName = Seq(Name("ammonite"), Name("predef"))
-
     processModule(
       predefInfo.code,
-      CodeSource(predefInfo.name, pkgName, predefInfo.path),
+      CodeSource(
+        predefInfo.name,
+        Seq(),
+        Seq(Name("ammonite"), Name("predef")),
+        predefInfo.path
+      ),
       true,
       "",
       predefInfo.hardcoded
@@ -171,7 +174,7 @@ class Interpreter(val printer: Printer,
 
 
 
-  def resolveSingleImportHook(source: Option[Path], tree: ImportTree) = {
+  def resolveSingleImportHook(source: CodeSource, tree: ImportTree) = {
     val strippedPrefix = tree.prefix.takeWhile(_(0) == '$').map(_.stripPrefix("$"))
     val hookOpt = importHooks().collectFirst{case (k, v) if strippedPrefix.startsWith(k) => (k, v)}
     for{
@@ -209,7 +212,7 @@ class Interpreter(val printer: Printer,
     }
   }
 
-  def resolveImportHooks(source: Option[Path],
+  def resolveImportHooks(source: CodeSource,
                          stmts: Seq[String]): Res[(Imports, Seq[String], Seq[ImportTree])] = {
       val hookedStmts = mutable.Buffer.empty[String]
       val importTrees = mutable.Buffer.empty[ImportTree]
@@ -237,13 +240,15 @@ class Interpreter(val printer: Printer,
 
   def processLine(code: String, stmts: Seq[String], fileName: String): Res[Evaluated] = {
     val preprocess = Preprocessor(compiler.parse)
+    val wrapperName = Name("cmd" + eval.getCurrentLine)
     for{
       _ <- Catching { case ex =>
         Res.Exception(ex, "Something unexpected went wrong =(")
       }
 
       (hookImports, normalStmts, _) <- resolveImportHooks(
-        Some(wd/"<console>"),
+
+        CodeSource(wrapperName, Seq(), Seq(Name("$file")), Some(wd/"<console>")),
         stmts
       )
 
@@ -252,7 +257,7 @@ class Interpreter(val printer: Printer,
         eval.getCurrentLine,
         "",
         Seq(Name("$sess")),
-        Name("cmd" + eval.getCurrentLine),
+        wrapperName,
         predefImports ++ eval.frames.head.imports ++ hookImports,
         prints => s"ammonite.repl.ReplBridge.value.Internal.combinePrints($prints)",
         extraCode = ""
@@ -342,7 +347,7 @@ class Interpreter(val printer: Printer,
   }
 
 
-  def evalCachedClassFiles(source: Option[Path],
+  def evalCachedClassFiles(source: CodeSource,
                            cachedData: Seq[ClassFiles],
                            dynamicClasspath: VirtualDirectory,
                            classFilesList: Seq[ScriptOutput.BlockMetadata]): Res[Seq[_]] = {
@@ -441,7 +446,7 @@ class Interpreter(val printer: Printer,
 
         withContextClassloader(
           evalCachedClassFiles(
-            blockInfo.source,
+            blockInfo,
             compiledScriptData.classFiles,
             dynamicClasspath,
             compiledScriptData.processed.blockInfo
@@ -463,7 +468,12 @@ class Interpreter(val printer: Printer,
       processedData <- processCorrectScript(
         blocks,
         eval.frames.head.imports,
-        CodeSource(Name("cmd" + eval.getCurrentLine), Seq(Name("$sess")),Some(wd/"<console>")),
+        CodeSource(
+          Name("cmd" + eval.getCurrentLine),
+          Seq(),
+          Seq(Name("$sess")),
+          Some(wd/"<console>")
+        ),
         { (processed, indexedWrapperName) =>
           evaluateLine(
             processed,
@@ -540,7 +550,7 @@ class Interpreter(val printer: Printer,
         val indexedWrapperName = Interpreter.indexWrapperName(blockInfo.wrapperName, wrapperIndex)
         val (leadingSpaces, stmts) = blocks.head
         val res = for{
-          (hookImports, hookStmts, hookImportTrees) <- resolveImportHooks(blockInfo.source, stmts)
+          (hookImports, hookStmts, hookImportTrees) <- resolveImportHooks(blockInfo, stmts)
           processed <- preprocess.transform(
             hookStmts,
             "",
@@ -674,10 +684,18 @@ class Interpreter(val printer: Printer,
       def exec(file: Path): Unit = apply(normalizeNewlines(read(file)))
 
       def module(file: Path) = {
-        val (pkg, wrapper) = Util.pathToPackageWrapper(file, wd)
+        val (pkg, wrapper) = Util.pathToPackageWrapper(
+          Seq(Name("dummy")),
+          file relativeTo wd
+        )
         processModule(
           normalizeNewlines(read(file)),
-          CodeSource(wrapper, pkg, Some(wd/"Main.sc")),
+          CodeSource(
+            wrapper,
+            pkg,
+            Seq(Name("$file")),
+            Some(wd/"Main.sc")
+          ),
           true,
           "",
           hardcoded = false

@@ -2,7 +2,6 @@ package ammonite.runtime
 
 import java.io.File
 
-
 import ammonite.ops.{read, _}
 import ammonite.runtime.tools.IvyThing
 import ammonite.util.Util.CodeSource
@@ -23,7 +22,7 @@ trait ImportHook{
     * code does, e.g. a repl session is based in their CWD, a script has a path, but
     * some things like hardcoded builtin predefs don't
     */
-  def handle(source: Option[Path],
+  def handle(source: CodeSource,
              tree: ImportTree,
              interp: ImportHook.InterpreterInterface)
             : Either[String, Seq[ImportHook.Result]]
@@ -83,11 +82,11 @@ object ImportHook{
   }
   class SourceHook(exec: Boolean) extends ImportHook {
     // import $file.foo.Bar, to import the file `foo/Bar.sc`
-    def handle(source: Option[Path], 
-               tree: ImportTree, 
+    def handle(source: CodeSource,
+               tree: ImportTree,
                interp: InterpreterInterface) = {
 
-      source match{
+      source.path match{
         case None => Left("Cannot resolve $file import in code without source")
         case Some(currentScriptPath) =>
 
@@ -99,17 +98,28 @@ object ImportHook{
           else {
             Right(
               for(((relativeModule, rename), filePath) <- relativeModules.zip(files)) yield {
-                val (pkg, wrapper) = Util.pathToPackageWrapper(filePath, interp.wd)
-                val fullPrefix = pkg ++ Seq(wrapper)
+
+                val (flexiblePkg, wrapper) = Util.pathToPackageWrapper(
+                  source.flexiblePkgName, filePath relativeTo currentScriptPath/up
+                )
+
+                val fullPrefix = source.pkgRoot ++ flexiblePkg ++ Seq(wrapper)
 
                 val importData = Seq(ImportData(
                   fullPrefix.last, Name(rename.getOrElse(relativeModule.last)),
                   fullPrefix.dropRight(1), ImportData.TermType
                 ))
 
+                val codeSrc = CodeSource(
+                  wrapper,
+                  flexiblePkg,
+                  source.pkgRoot,
+                  Some(filePath)
+                )
+
                 Result.Source(
                   Util.normalizeNewlines(read(filePath)),
-                  CodeSource(wrapper, pkg, Some(filePath)),
+                  codeSrc,
                   Imports(importData),
                   exec
                 )
@@ -151,7 +161,7 @@ object ImportHook{
     }
 
 
-    def handle(source: Option[Path], 
+    def handle(source: CodeSource,
                tree: ImportTree, 
                interp: InterpreterInterface) = {
       // Avoid for comprehension, which doesn't work in Scala 2.10/2.11
@@ -168,10 +178,10 @@ object ImportHook{
   object Classpath extends BaseClasspath(plugin = false)
   object PluginClasspath extends BaseClasspath(plugin = true)
   class BaseClasspath(plugin: Boolean) extends ImportHook{
-    def handle(source: Option[Path], 
+    def handle(source: CodeSource,
                tree: ImportTree, 
                interp: InterpreterInterface) = {
-      source match{
+      source.path match{
         case None => Left("Cannot resolve $cp import in code without source")
         case Some(currentScriptPath) =>
           val (relativeModules, files, missing) = resolveFiles(
