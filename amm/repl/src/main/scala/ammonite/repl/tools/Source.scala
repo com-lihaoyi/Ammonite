@@ -26,8 +26,8 @@ object source{
     import c.universe._
 
     val res = breakUp(c)(f) match{
+      case Right((prefix, f)) => q"$prefix.loadObjectInfo($f).right.get"
       case Left((prefix, classThingy, symbolName, lhs, returnClass, argClasses)) =>
-        println("loadObjectMemberInfo")
         q"""
         $prefix.loadObjectMemberInfo(
           $classThingy,
@@ -37,9 +37,6 @@ object source{
           ..$argClasses
         ).right.get
         """
-      case Right((prefix, f)) =>
-        println("loadObjectInfo")
-        q"$prefix.loadObjectInfo($f).right.get"
     }
 
     c.Expr[Location](res)
@@ -71,7 +68,7 @@ object source{
     @tailrec def rec(args: Seq[Tree], x: Tree): Option[(Tree, Symbol, Seq[Tree])] = x match{
       case Select(qualifier, selector) =>
         if (selector.toString == "<init>") None
-        else if (qualifier.symbol.isPackage) None
+        else if (qualifier.symbol != null && qualifier.symbol.isPackage) None
         else Some(qualifier, x.symbol, args)
       case Apply(fun, args) => rec(args, fun)
 
@@ -117,7 +114,7 @@ object source{
       case Some((lhs, symbol, args)) =>
         val method = symbol.asMethod
         val argClasses =
-          for(arg <- method.paramLists.flatten)
+          for(arg <- method.paramss.flatten)
             yield javaifyType(arg.typeSignature)
 
         Left(
@@ -189,7 +186,12 @@ object source{
   def loadObjectInfo(value: Any) = {
     loadSource(
       value.getClass,
-      _.getMethods.map(_.getMethodInfo.getLineNumber(0)).filter(_ >= 0).min
+      x => {
+        try Right(x.getMethods.map(_.getMethodInfo.getLineNumber(0)).filter(_ >= 0).min)
+        catch{ case e: UnsupportedOperationException =>
+          Left("Unable to find line number of class " + value.getClass)
+        }
+      }
     )
   }
   /**
@@ -234,7 +236,8 @@ object source{
         case t => "L" + t.getName.replace('.', '/') + ";"
       }
     }
-    "(" + argTypes.map(unparse).mkString("") + ")" + unparse(returnType)
+    val returnDesc = if (returnType.getName == "scala.Unit") "V" else unparse(returnType)
+    "(" + argTypes.map(unparse).mkString("") + ")" + returnDesc
   }
 
   /**
@@ -268,13 +271,30 @@ object source{
 
     val desc = getDesc(argTypes, returnType)
     def loadSourceFrom(cls: Class[_]) = {
-      loadSource(cls, _.getMethod(memberName, desc).getMethodInfo.getLineNumber(0))
+      loadSource(
+        cls,
+        x => {
+          val lineNum =
+            try Right(x.getMethod(memberName, desc).getMethodInfo.getLineNumber(0))
+            catch{case e: javassist.NotFoundException => Left(e.getMessage)}
+
+          lineNum match{
+            case Left(e) => Left(e)
+            case Right(n) if n != -1 => Right(n)
+            case _ => Left("Cannot find line number of method " + cls.getName + "#"+ memberName)
+          }
+        }
+      )
     }
     loadSourceFrom(symbolOwnerCls) match{
       case Right(loc) if loc.lineNum != -1 => Right(loc)
       case _ =>
-        val concreteCls = value.getClass.getMethod(memberName, argTypes:_*).getDeclaringClass
-        loadSourceFrom(concreteCls)
+        try{
+          val concreteCls = value.getClass.getMethod(memberName, argTypes:_*).getDeclaringClass
+          loadSourceFrom(concreteCls)
+        }catch{case e: NoSuchMethodException =>
+          Left("Unable to find method " + value.getClass.getName + "#" + memberName)
+        }
     }
   }
 
@@ -286,23 +306,23 @@ object source{
   }
 
   def loadSource(runtimeCls: Class[_],
-                 getLineNumber: CtClass => Int): Either[String, Location] = {
+                 getLineNumber: CtClass => Either[String, Int]): Either[String, Location] = {
     val chunks = runtimeCls.getName.split('.')
     val (pkg, clsName) = (chunks.init, chunks.last)
     for{
-      bytecode <- util.Try{
-        read.bytes! resource / pkg / (clsName + ".class")
-      }.toEither.left.map { _ =>
-        "Unable to find bytecode for class " + runtimeCls.getName
+      bytecode <- try{
+        Right(read.bytes! resource / pkg / (clsName + ".class")).right
+      }catch{ case e: Throwable =>
+        Left("Unable to find bytecode for class " + runtimeCls.getName).right
       }
       ctCls = loadCtClsMetadata(runtimeCls, bytecode)
 
-      lineNumber = getLineNumber(ctCls)
+      lineNumber <- getLineNumber(ctCls).right
       srcFile = ctCls.getClassFile.getSourceFile
-      sourceCode <- util.Try{
-        read! resource/ pkg / srcFile
-      }.toEither.left.map { _ =>
-        "Unable to find sourcecode for class " + runtimeCls.getName
+      sourceCode <- try{
+        Right(read! resource/ pkg / srcFile).right
+      }catch{case e: Throwable =>
+        Left("Unable to find sourcecode for class " + runtimeCls.getName).right
       }
     } yield Location(srcFile, lineNumber, sourceCode)
   }

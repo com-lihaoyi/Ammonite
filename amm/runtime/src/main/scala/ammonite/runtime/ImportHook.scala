@@ -163,17 +163,10 @@ object ImportHook{
 
     def handle(source: CodeSource,
                tree: ImportTree, 
-               interp: InterpreterInterface) = {
-      // Avoid for comprehension, which doesn't work in Scala 2.10/2.11
-      splitImportTree(tree) match{
-        case Right(signatures) => resolve(interp, signatures) match{
-          case Right(resolved) =>
-            Right(resolved.map(Path(_)).map(Result.ClassPath(_, plugin)).toSeq)
-          case Left(l) => Left(l)
-        }
-        case Left(l) => Left(l)
-      }
-    }
+               interp: InterpreterInterface) = for{
+      signatures <- splitImportTree(tree).right
+      resolved <- resolve(interp, signatures).right
+    } yield resolved.map(Path(_)).map(Result.ClassPath(_, plugin)).toSeq
   }
   object Classpath extends BaseClasspath(plugin = false)
   object PluginClasspath extends BaseClasspath(plugin = true)

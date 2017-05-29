@@ -72,6 +72,19 @@ object SourceTests extends TestSuite{
           "ClassPool.java",
           "public URL find(String classname)"
         )
+//        crashes compiler during GenBCode =/
+//        check(
+//          load(new javassist.ClassPool().find _),
+//          "ClassPool.java",
+//          "public URL find(String classname)"
+//        )
+      }
+      'void{
+        check(
+          load(Predef.println()),
+          "Predef.scala",
+          "def println() ="
+        )
       }
 
       'overloaded{
