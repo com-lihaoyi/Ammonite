@@ -256,7 +256,19 @@ lazy val ammRepl = project
     libraryDependencies ++= Seq(
       "jline" % "jline" % "2.14.3",
       "com.github.javaparser" % "javaparser-core" % "3.2.5"
-    )
+    ),
+    unmanagedSourceDirectories in Compile ++= {
+      if (Set("2.12", "2.11").contains(scalaBinaryVersion.value))
+        Seq(baseDirectory.value / "src" / "main" / "scala-2.11_2.12")
+      else
+        Seq()
+    },
+    unmanagedSourceDirectories in Compile ++= {
+      if (Set("2.10", "2.11").contains(scalaBinaryVersion.value))
+        Seq(baseDirectory.value / "src" / "main" / "scala-2.10_2.11")
+      else
+        Seq()
+    }
   )
 
 /**
