@@ -269,6 +269,7 @@ object source{
                            returnType: Class[_],
                            argTypes: Class[_]*) = {
 
+
     val desc = getDesc(argTypes, returnType)
     def loadSourceFrom(cls: Class[_]) = {
       loadSource(
@@ -288,12 +289,12 @@ object source{
     }
     loadSourceFrom(symbolOwnerCls) match{
       case Right(loc) if loc.lineNum != -1 => Right(loc)
-      case _ =>
+      case Left(e1) =>
         try{
           val concreteCls = value.getClass.getMethod(memberName, argTypes:_*).getDeclaringClass
           loadSourceFrom(concreteCls)
         }catch{case e: NoSuchMethodException =>
-          Left("Unable to find method " + value.getClass.getName + "#" + memberName)
+          Left(e1 + "\n" + "Unable to find method " + value.getClass.getName + "#" + memberName)
         }
     }
   }
@@ -309,16 +310,19 @@ object source{
                  getLineNumber: CtClass => Either[String, Int]): Either[String, Location] = {
     val chunks = runtimeCls.getName.split('.')
     val (pkg, clsName) = (chunks.init, chunks.last)
+
     for{
       bytecode <- try{
         Right(read.bytes! resource / pkg / (clsName + ".class")).right
       }catch{ case e: Throwable =>
         Left("Unable to find bytecode for class " + runtimeCls.getName).right
       }
-      ctCls = loadCtClsMetadata(runtimeCls, bytecode)
+      // Not sure why `ctCls =` doesn't work, but for some reason the
+      // for-comprehension desugaring totally screws it up
+      ctCls <- Right(loadCtClsMetadata(runtimeCls, bytecode)).right
 
       lineNumber <- getLineNumber(ctCls).right
-      srcFile = ctCls.getClassFile.getSourceFile
+      srcFile <- Right(ctCls.getClassFile.getSourceFile).right
       sourceCode <- try{
         Right(read! resource/ pkg / srcFile).right
       }catch{case e: Throwable =>
