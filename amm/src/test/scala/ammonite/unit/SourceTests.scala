@@ -6,6 +6,7 @@ import ammonite.ops._
 import ammonite.repl.tools.Location
 import utest._
 import ammonite.repl.tools.source.load
+import fastparse.utils.{ElemSetHelper, IndexedParserInput}
 
 import scala.tools.nsc.interpreter.InputStream
 object SourceTests extends TestSuite{
@@ -254,20 +255,22 @@ object SourceTests extends TestSuite{
         'split     - check212(load(instance.split _), "Map.scala", "def split")
       }
       'fastparse{
-        import fastparse.all.implicitReprOps
+        import fastparse.all._
         'all - check212(load(fastparse.all), "StringApi.scala", "object all extends StringApi")
-
-        'FrameIndex - check212(
+        'pApply - check212(load(P("hello")), "Api.scala", "def P")
+        'pParse - check212(load(P("hello").parse _), "Parsing.scala", "def parse")
+        'elemsWhileRaw - check212(load(ElemsWhile.raw _), "Api.scala", "def raw")
+        'frameIndex - check212(
           load(fastparse.core.Frame(1, null).index),
           "Parsing.scala",
           "case class Frame"
         )
-        'SuccessValue - check212(
+        'successValue - check212(
           load(fastparse.all.Parsed.Success(0, 0).value),
           "Parsing.scala",
           "case class Success"
         )
-        'BitSet - check212(
+        'bitSet - check212(
           load(new fastparse.utils.Utils.BitSet[Char](Array[Int](), 0, 0).apply _),
           "Utils.scala",
           "def apply(c: Elem)"
@@ -277,6 +280,28 @@ object SourceTests extends TestSuite{
           load(fastparse.parsers.Intrinsics.ElemPred.apply[Char, String] _),
           "Intrinsics.scala",
           "case class ElemPred"
+        )
+
+
+        'parserInput - check212(
+          load(IndexedParserInput("")),
+          "ParserInput.scala",
+          "case class IndexedParserInput"
+        )
+        'parserInputData - check212(
+          load(IndexedParserInput("").data),
+          "ParserInput.scala",
+          "case class IndexedParserInput"
+        )
+        'implicitlyHelper - check212(
+          load(implicitly[ElemSetHelper[Char]]),
+          "Predef.scala",
+          "def implicitly"
+        )
+        'implicitlyReprGenerate - check212(
+          load(implicitly[ElemSetHelper[Char]].generateValues(_)),
+          "ElemSetHelper.scala",
+          "def generateValues"
         )
       }
     }
