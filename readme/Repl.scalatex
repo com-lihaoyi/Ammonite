@@ -563,7 +563,12 @@
             @code{src} is experimental: it may not always be able to find the
             source code of a particular method or class, and the source
             location it brings you to may be a few lines away from the source
-            you really want. Nevertheless, it should work in the bulk of cases,
+            you really want. Furthermore, @code{src} also does not find sources
+            that are within your own local scripts or SBT project: you likely
+            already have access to those via your text editor anyway.
+
+          @p
+            Nevertheless, it should work in the bulk of cases,
             so try it out and come by the
             @lnk("Gitter Channel", "https://gitter.im/lihaoyi/Ammonite") if you
             face any issues!
