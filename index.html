@@ -1148,7 +1148,7 @@ If you like Ammonite, please support our development at www.patreon.com/lihaoyi
 </span><span style="color: #27ae60;">'LICENSE</span><span>            </span><span style="color: #27ae60;">'deploy_key</span><span>         </span><span style="color: #27ae60;">'readme</span><span>             </span><span style="color: #27ae60;">'terminal</span><span>
 </span><span style="color: #27ae60;">'amm</span><span>                </span><span style="color: #27ae60;">'integration</span><span>        </span><span style="color: #27ae60;">&quot;readme.md&quot;</span><span>
 ,
-  19567721 nanoseconds
+  19389348 nanoseconds
 )</span></pre></div>
 
           <p>
@@ -3741,15 +3741,15 @@ HELLO
 </p>
       <div><pre><span style="color: #8e44ad;">
 bash$ </span>git branch
-* (detached from 5a86b5d)
+* (detached from db07f18)
   master</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>%git </span><span style="color: #27ae60;">'branch</span><span> 
-* (detached from 5a86b5d)
+* (detached from db07f18)
   master
 </span></pre></div>
       <div><pre><span style="color: #8e44ad;">
 bash$ </span>date
-Tue May 30 08:02:40 UTC 2017</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>%date 
-Tue May 30 08:02:56 UTC 2017
+Tue May 30 08:35:56 UTC 2017</pre><pre><span style="color: #8e44ad;">travis-Ammonite@ </span><span>%date 
+Tue May 30 08:36:03 UTC 2017
 </span></pre></div>
 
       <p>
@@ -3940,7 +3940,7 @@ Hello from Java!
 </span><span style="color: #8e44ad;">travis-Ammonite@ </span><span style="color: #f39c12;">import</span><span> java.util.</span><span style="color: #f39c12;">_</span><span> 
 </span><span style="color: #27ae60;">import </span><span style="color: #16a085;">java.util._</span><span>
 </span><span style="color: #8e44ad;">travis-Ammonite@ </span><span style="color: #f39c12;">val</span><span> date = </span><span style="color: #f39c12;">new</span><span> </span><span style="color: #27ae60;">Date</span><span>() 
-</span><span style="color: #16a085;">date</span><span>: </span><span style="color: #27ae60;">Date</span><span> = Tue May 30 08:05:56 UTC 2017
+</span><span style="color: #16a085;">date</span><span>: </span><span style="color: #27ae60;">Date</span><span> = Tue May 30 08:38:30 UTC 2017
 </span><span style="color: #8e44ad;">travis-Ammonite@ </span><span>date.getDay() 
 </span><span style="color: #16a085;">res3</span><span>: </span><span style="color: #27ae60;">Int</span><span> = </span><span style="color: #27ae60;">2</span></pre>
 
@@ -5586,15 +5586,15 @@ try {
       The page above contains the documentation for the latest stable version
       of Ammonite, <code>0.9.3</code>. Ammonite also publishes
       unstable versions, the latest of which is
-      <code>COMMIT-5a86b5d</code> and is available for direct
+      <code>COMMIT-db07f18</code> and is available for direct
       download:
 </p>
-    <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/vHWMi &amp;&amp; sudo chmod +x /usr/local/bin/amm &amp;&amp; amm
+    <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/vHW9v &amp;&amp; sudo chmod +x /usr/local/bin/amm &amp;&amp; amm
 </code></pre>
     <p>
       Or usage in an SBT project
 </p>
-    <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;COMMIT-5a86b5d&quot; % &quot;test&quot; cross CrossVersion.full
+    <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;COMMIT-db07f18&quot; % &quot;test&quot; cross CrossVersion.full
 
 initialCommands in (Test, console) := &quot;&quot;&quot;ammonite.Main().run()&quot;&quot;&quot;
 </code></pre>
@@ -5604,13 +5604,13 @@ initialCommands in (Test, console) := &quot;&quot;&quot;ammonite.Main().run()&qu
 </p>
     
       <b>
-        Scala snapshot-commit-uploads/2.10-5a86b5d
+        Scala snapshot-commit-uploads/2.10-db07f18
 </b>
-      <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/vHWMP &amp;&amp; sudo chmod +x /usr/local/bin/amm &amp;&amp; amm</code></pre>
+      <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/vHW9f &amp;&amp; sudo chmod +x /usr/local/bin/amm &amp;&amp; amm</code></pre>
       <b>
-        Scala snapshot-commit-uploads/2.11-5a86b5d
+        Scala snapshot-commit-uploads/2.11-db07f18
 </b>
-      <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/vHWMX &amp;&amp; sudo chmod +x /usr/local/bin/amm &amp;&amp; amm</code></pre>
+      <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/vHW9J &amp;&amp; sudo chmod +x /usr/local/bin/amm &amp;&amp; amm</code></pre>
     <p>
       These unstable versions will contain any brand-new features that are
       currently being worked on, with the caveat that they are unstable and
