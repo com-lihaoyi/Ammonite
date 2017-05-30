@@ -120,6 +120,12 @@ object ProjectTests extends TestSuite{
         res1: Option[Int] = Some(3)
       """)
     }
+    'cats{
+      check.session("""
+        @ import $ivy.`org.typelevel::cats-core:0.9.0`, cats._
+
+      """)
+    }
     'guava{
       check.session("""
         @ import $ivy.`com.google.guava:guava:18.0`, com.google.common.collect._

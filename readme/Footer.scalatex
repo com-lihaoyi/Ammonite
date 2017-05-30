@@ -114,6 +114,10 @@
 
 
   @sect{Changelog}
+    @sect{0.9.5}
+      @ul
+        @li
+          Fix scalac/classpath errors when loading typelevel/cats @issue(617)
     @sect{0.9.4}
       @ul
         @li
