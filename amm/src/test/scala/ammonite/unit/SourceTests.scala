@@ -14,9 +14,12 @@ object SourceTests extends TestSuite{
     def check(loaded: Location, expectedFileName: String, expected: String*) = {
 
       assert(loaded.fileName == expectedFileName)
+      // The line number from first bytecode of earliest concrete method
+      // may be inexact, but it should put you *somewhere* near what you
+      // are looking for
       val nearby = loaded.fileContent.lines.slice(
-        loaded.lineNum - 10,
-        loaded.lineNum + 10
+        loaded.lineNum - 20,
+        loaded.lineNum + 20
       ).mkString("\n")
       for(snippet <- expected){
         assert(nearby.contains(snippet))
@@ -73,6 +76,15 @@ object SourceTests extends TestSuite{
           }
         }
       }
+      'fieldsAreTreatedAsObjects{
+        // Can't use Java Std Lib methods because SBT screws up classloaders in test suite
+        check(
+          load(com.github.javaparser.JavaToken.INVALID),
+          "JavaToken.java",
+          "public class JavaToken"
+        )
+      }
+
     }
     'objectMemberInfo{
       'thirdPartyJava{
@@ -142,6 +154,13 @@ object SourceTests extends TestSuite{
       }
 
     }
-
+    'staticMethod{
+      // Can't use Java Std Lib methods because SBT screws up classloaders in test suite
+      check(
+        load(com.github.javaparser.JavaParser.parseBlock _),
+        "JavaParser.java",
+        "public static BlockStmt parseBlock"
+      )
+    }
   }
 }

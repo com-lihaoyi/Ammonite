@@ -26,7 +26,8 @@ object source{
     import c.universe._
 
     val res = breakUp(c)(f) match{
-      case Right((prefix, f)) => q"$prefix.loadObjectInfo($f).right.get"
+      case Right((prefix, f)) =>
+        q"$prefix.loadObjectInfo($f).fold(error => throw new Exception(error), identity)"
       case Left((prefix, classThingy, symbolName, lhs, returnClass, argClasses)) =>
         q"""
         $prefix.loadObjectMemberInfo(
@@ -35,7 +36,7 @@ object source{
           $symbolName,
           $returnClass,
           ..$argClasses
-        ).right.get
+        ).fold(error => throw new Exception(error), identity)
         """
     }
 
@@ -57,6 +58,32 @@ object source{
       q"_root_.ammonite.repl.tools.source.browseSourceCommand"
     )
     applyMacro2(c)(f, defaultBrowseExpr)(pprinter, colors)
+  }
+
+  def applyMacro2(c: Context)
+                 (f: c.Expr[Any], command: c.Expr[Int => Strings])
+                 (pprinter: c.Expr[pprint.PPrinter],
+                  colors: c.Expr[CodeColors]): c.Expr[Unit] = {
+    import c.universe._
+    c.Expr[Unit](
+      breakUp(c)(f) match{
+        case Left((prefix, classThingy, symbolName, lhs, returnClass, argClasses)) =>
+          q"""
+          $prefix.browseObjectMember(
+            $classThingy,
+            $lhs,
+            $symbolName,
+            $pprinter,
+            $colors,
+            $command,
+            $returnClass,
+            ..$argClasses
+          )
+          """
+        case Right((prefix, f)) => q"$prefix.browseObject($f, $pprinter, $colors, $command)"
+      }
+
+    )
   }
 
   def breakUp(c: Context)(f: c.Expr[Any]) = {
@@ -110,49 +137,26 @@ object source{
       }
     }
     rec(Nil, f.tree) match{
-      case None => Right(prefix, f)
-      case Some((lhs, symbol, args)) =>
+
+      case Some((lhs, symbol, args)) if symbol.isMethod =>
         val method = symbol.asMethod
         val argClasses =
           for(arg <- method.paramss.flatten)
             yield javaifyType(arg.typeSignature)
 
+        val staticJavaLhsClass = lhs.symbol.isStatic && lhs.symbol.isJava
         Left(
           prefix,
           q"Class.forName(${symbol.owner.fullName})",
           symbol.name.toString,
-          lhs,
+          if (staticJavaLhsClass) q"None" else q"Some($lhs)",
           javaifyType(method.returnType),
           argClasses
         )
-
+      case _ => Right(prefix, f)
     }
   }
-  def applyMacro2(c: Context)
-                 (f: c.Expr[Any], command: c.Expr[Int => Strings])
-                 (pprinter: c.Expr[pprint.PPrinter],
-                  colors: c.Expr[CodeColors]): c.Expr[Unit] = {
-    import c.universe._
-    c.Expr[Unit](
-      breakUp(c)(f) match{
-        case Left((prefix, classThingy, symbolName, lhs, returnClass, argClasses)) =>
-          q"""
-          $prefix.browseObjectMember(
-            $classThingy,
-            $lhs,
-            $symbolName,
-            $pprinter,
-            $colors,
-            $command,
-            $returnClass,
-            ..$argClasses
-          )
-          """
-        case Right((prefix, f)) => q"$prefix.browseObject($f, $pprinter, $colors, $command)"
-      }
 
-    )
-  }
 
   /**
     * Pull the height from the pretty-printer as a heuristic to shift the
@@ -187,7 +191,11 @@ object source{
     loadSource(
       value.getClass,
       x => {
-        try Right(x.getMethods.map(_.getMethodInfo.getLineNumber(0)).filter(_ >= 0).min)
+        val firstLines =
+          x.getMethods.map(_.getMethodInfo.getLineNumber(0)) ++
+          x.getConstructors.map(_.getMethodInfo.getLineNumber(0))
+
+        try Right(firstLines.min)
         catch{ case e: UnsupportedOperationException =>
           Left("Unable to find line number of class " + value.getClass)
         }
@@ -201,7 +209,7 @@ object source{
     * for concrete method implementations
     */
   def browseObjectMember(symbolOwnerCls: Class[_],
-                         value: Any,
+                         value: Option[Any],
                          memberName: String,
                          pprinter: pprint.PPrinter,
                          colors: CodeColors,
@@ -264,7 +272,7 @@ object source{
     * numbers to find the method, which only exist in concrete methods.
     */
   def loadObjectMemberInfo(symbolOwnerCls: Class[_],
-                           value: Any,
+                           value: Option[Any],
                            memberName: String,
                            returnType: Class[_],
                            argTypes: Class[_]*) = {
@@ -287,11 +295,12 @@ object source{
         }
       )
     }
-    loadSourceFrom(symbolOwnerCls) match{
-      case Right(loc) if loc.lineNum != -1 => Right(loc)
-      case Left(e1) =>
+    (loadSourceFrom(symbolOwnerCls), value) match{
+      case (Right(loc), _) if loc.lineNum != -1 => Right(loc)
+      case (Left(e1), None) => Left(e1)
+      case (Left(e1), Some(v)) =>
         try{
-          val concreteCls = value.getClass.getMethod(memberName, argTypes:_*).getDeclaringClass
+          val concreteCls = v.getClass.getMethod(memberName, argTypes:_*).getDeclaringClass
           loadSourceFrom(concreteCls)
         }catch{case e: NoSuchMethodException =>
           Left(e1 + "\n" + "Unable to find method " + value.getClass.getName + "#" + memberName)
