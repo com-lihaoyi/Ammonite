@@ -5,7 +5,7 @@ import javassist.{ByteArrayClassPath, CtClass, CtMethod}
 import ammonite.ops._
 import ammonite.repl.Highlighter
 import ammonite.repl.Highlighter.{defaultHighlightIndices0, flattenIndices}
-import ammonite.runtime.tools.browse.Strings
+import ammonite.runtime.tools.Browse.Strings
 import ammonite.util.CodeColors
 import com.github.javaparser.{GeneratedJavaParserConstants, ParseStart, StringProvider}
 import sourcecode.Compat._

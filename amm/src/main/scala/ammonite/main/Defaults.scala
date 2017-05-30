@@ -53,8 +53,13 @@ object Defaults{
     |  Callable1,
     |  Callable2
     |}
-    |import ammonite.runtime.tools._
-    |import ammonite.repl.tools._
+    |import ammonite.runtime.tools.{
+    |  Grep => grep,
+    |  Tail => tail,
+    |  Time => time,
+    |  Browse => browse
+    |}
+    |import ammonite.repl.tools.{Desugar => desugar, Source => src}
     |import ammonite.runtime.tools.IvyConstructor.{ArtifactIdExt, GroupIdExt}
     |import ammonite.main.Router.{doc, main}
     |import ammonite.main.Scripts.pathScoptRead

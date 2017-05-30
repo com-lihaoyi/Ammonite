@@ -5,8 +5,8 @@ import ammonite.TestUtils
 import ammonite.ops._
 import ammonite.repl.tools.Location
 import utest._
-import ammonite.repl.tools.source.load
-import fastparse.utils.{ElemSetHelper, IndexedParserInput}
+import ammonite.repl.tools.Source.load
+import fastparse.utils.{ElemSetHelper, Generator, IndexedParserInput}
 
 import scala.tools.nsc.interpreter.InputStream
 object SourceTests extends TestSuite{
@@ -299,7 +299,8 @@ object SourceTests extends TestSuite{
           "def implicitly"
         )
         'implicitlyReprGenerate - check212(
-          load(implicitly[ElemSetHelper[Char]].generateValues(_)),
+          // Type annotation necessary in 2.11 and below
+          load(implicitly[ElemSetHelper[Char]].generateValues(_: Generator.Callback[Char])),
           "ElemSetHelper.scala",
           "def generateValues"
         )
