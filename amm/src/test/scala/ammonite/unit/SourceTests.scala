@@ -11,15 +11,16 @@ import scala.tools.nsc.interpreter.InputStream
 object SourceTests extends TestSuite{
   override def utestTruncateLength = 500000
   val tests = TestSuite{
-    def check(loaded: Location, expectedFileName: String, expected: String*) = {
+    def check(loaded: Location, expectedFileName: String, expected: String, range: Int = 10) = {
 
-      assert(loaded.fileName == expectedFileName)
+      val loadedFileName = loaded.fileName
+      assert(loadedFileName == expectedFileName)
       // The line number from first bytecode of earliest concrete method
       // may be inexact, but it should put you *somewhere* near what you
       // are looking for
       val nearby = loaded.fileContent.lines.slice(
-        loaded.lineNum - 20,
-        loaded.lineNum + 20
+        loaded.lineNum - range,
+        loaded.lineNum + range
       ).mkString("\n")
       for(snippet <- expected){
         assert(nearby.contains(snippet))
@@ -94,12 +95,12 @@ object SourceTests extends TestSuite{
           "ClassPool.java",
           "public URL find(String classname)"
         )
-//        crashes compiler during GenBCode =/
-//        check(
-//          load(new javassist.ClassPool().find _),
-//          "ClassPool.java",
-//          "public URL find(String classname)"
-//        )
+
+        check(
+          load(new javassist.ClassPool().find _),
+          "ClassPool.java",
+          "public URL find(String classname)"
+        )
       }
       'void{
         if (!TestUtils.scala2_10){
@@ -160,6 +161,45 @@ object SourceTests extends TestSuite{
         load(com.github.javaparser.JavaParser.parseBlock _),
         "JavaParser.java",
         "public static BlockStmt parseBlock"
+      )
+    }
+
+    'misc{
+      'head     - check(load(List().head), "IterableLike.scala", "def head")
+      'apply    - check(load(List().apply _), "LinearSeqOptimized.scala", "def apply")
+      'take     - check(load(List().take _), "List.scala", "override def take")
+      'drop     - check(load(List().drop _), "List.scala", "override def drop")
+      'slice    - check(load(List().slice _), "List.scala", "override def slice")
+      'iterator - check(load(List().iterator _), "LinearSeqLike.scala", "def iterator")
+      'hashCode - check(load(List().hashCode _), "LinearSeqLike.scala", "override def hashCode")
+      'reverse  - check(load(List().reverse _), "List.scala", "def reverse")
+      'isEmpty  - check(load(List().isEmpty _), "SeqLike.scala", "def isEmpty")
+      'nonEmpty - check(load(List().nonEmpty _), "TraversableOnce.scala", "def nonEmpty")
+      'orElse   - check(load(List().orElse _), "PartialFunction.scala", "def orElse")
+      'mkString - check(load(List().mkString _), "TraversableOnce.scala", "def mkString")
+      'aggregate- check(load(List().aggregate _), "TraversableOnce.scala", "def aggregate")
+//    These result in a divering implicit expansion, even in normal Scala
+//      'min      - check(load(List().min _), "TraversableOnce.scala", "def min")
+//      'max      - check(load(List().max _), "TraversableOnce.scala", "def max")
+      'groupBy  - check(load(List().groupBy _), "TraversableLike.scala", "def groupBy")
+      'compose  - check(load(List().compose _), "Function1.scala", "def compose")
+
+      'prefixLength - check(
+        load(List().prefixLength _),
+        "GenSeqLike.scala",
+        "def prefixLength"
+      )
+
+      'hasDefiniteSize - check(
+        load(List().hasDefiniteSize _),
+        "TraversableLike.scala",
+        "def hasDefiniteSize"
+      )
+
+      'productIterator - check(
+        load(List().productIterator _),
+        "Product.scala",
+        "def productIterator"
       )
     }
   }

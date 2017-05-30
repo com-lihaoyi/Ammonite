@@ -92,22 +92,28 @@ object source{
     // weird behavior where the quasiquote q"{..$foo; $bar}" would match single
     // expressions not enclosed in blocks, and recursing on `bar` would result
     // in an infinite recursion. No such problem matching on the `Block` AST node.
-    @tailrec def rec(args: Seq[Tree], x: Tree): Option[(Tree, Symbol, Seq[Tree])] = x match{
-      case Select(qualifier, selector) =>
-        if (selector.toString == "<init>") None
-        else if (qualifier.symbol != null && qualifier.symbol.isPackage) None
-        else Some(qualifier, x.symbol, args)
-      case Apply(fun, args) => rec(args, fun)
+    //
+    // We keep the block wrapper to re-apply to the final expression later, because
+    // somtimes (e.g. in the case of `new javassist.ClassPool().find _`) the LHS of
+    // the last expr in the block ends up depending on the earlier statements
+    @tailrec def rec(wrapper: Tree => Tree, x: Tree): Option[(Tree, Symbol, Tree => Tree)] =
+      x match{
+        case Select(qualifier, selector) =>
+          if (selector.toString == "<init>") None
+          else if (qualifier.symbol != null && qualifier.symbol.isPackage) None
+          else Some(qualifier, x.symbol, wrapper)
+        case Apply(fun, args) => rec(wrapper, fun)
 
-      case TypeApply(fun, targs) => rec(Nil, fun)
-      case Function(vparams, body) => rec(Nil, body)
-      case Block(stats, expr) => rec(Nil, expr)
-      case _ => None
-    }
+        case TypeApply(fun, targs) => rec(wrapper, fun)
+        case Function(vparams, body) => rec(wrapper, body)
+        case Block(stats, expr) => rec(Block(stats, _), expr)
+        case _ => None
+      }
 
     val prefix = q"ammonite.repl.tools.source"
 
     def javaifyType(t: Type) = {
+
       t.typeSymbol.fullName match{
         // These need to be special-cased, because `Class.forName("scala.Boolean")
         // gives us the useless, unused "scala.Boolean" class instead of the
@@ -121,6 +127,8 @@ object source{
         case "scala.Long" => q"classOf[scala.Long]"
         case "scala.Double" => q"classOf[scala.Double]"
         case _ => t match{
+          case TypeRef(_, cls, args) if cls == definitions.ByNameParamClass =>
+            q"classOf[Function0[_]]"
           case TypeRef(_, cls, args) if cls == definitions.RepeatedParamClass =>
             q"classOf[scala.Seq[_]]"
 
@@ -136,9 +144,9 @@ object source{
 
       }
     }
-    rec(Nil, f.tree) match{
+    rec(identity(_), f.tree) match{
 
-      case Some((lhs, symbol, args)) if symbol.isMethod =>
+      case Some((lhs, symbol, wrapper)) if symbol.isMethod =>
         val method = symbol.asMethod
         val argClasses =
           for(arg <- method.paramss.flatten)
@@ -149,7 +157,7 @@ object source{
           prefix,
           q"Class.forName(${symbol.owner.fullName})",
           symbol.name.toString,
-          if (staticJavaLhsClass) q"None" else q"Some($lhs)",
+          wrapper(if (staticJavaLhsClass) q"None" else q"Some($lhs)"),
           javaifyType(method.returnType),
           argClasses
         )
