@@ -11,7 +11,8 @@ import scala.tools.nsc.interpreter.InputStream
 object SourceTests extends TestSuite{
   override def utestTruncateLength = 500000
   val tests = TestSuite{
-    def check(loaded: Location, expectedFileName: String, expected: String, range: Int = 10) = {
+    def check(loaded: Location, expectedFileName: String, expected: String, slop: Int = 10) = {
+
 
       val loadedFileName = loaded.fileName
       assert(loadedFileName == expectedFileName)
@@ -19,12 +20,10 @@ object SourceTests extends TestSuite{
       // may be inexact, but it should put you *somewhere* near what you
       // are looking for
       val nearby = loaded.fileContent.lines.slice(
-        loaded.lineNum - range,
-        loaded.lineNum + range
+        loaded.lineNum - slop,
+        loaded.lineNum + slop
       ).mkString("\n")
-      for(snippet <- expected){
-        assert(nearby.contains(snippet))
-      }
+      assert(nearby.contains(expected))
     }
 
     'objectInfo{
@@ -164,43 +163,118 @@ object SourceTests extends TestSuite{
       )
     }
 
-    'misc{
-      'head     - check(load(List().head), "IterableLike.scala", "def head")
-      'apply    - check(load(List().apply _), "LinearSeqOptimized.scala", "def apply")
-      'take     - check(load(List().take _), "List.scala", "override def take")
-      'drop     - check(load(List().drop _), "List.scala", "override def drop")
-      'slice    - check(load(List().slice _), "List.scala", "override def slice")
-      'iterator - check(load(List().iterator _), "LinearSeqLike.scala", "def iterator")
-      'hashCode - check(load(List().hashCode _), "LinearSeqLike.scala", "override def hashCode")
-      'reverse  - check(load(List().reverse _), "List.scala", "def reverse")
-      'isEmpty  - check(load(List().isEmpty _), "SeqLike.scala", "def isEmpty")
-      'nonEmpty - check(load(List().nonEmpty _), "TraversableOnce.scala", "def nonEmpty")
-      'orElse   - check(load(List().orElse _), "PartialFunction.scala", "def orElse")
-      'mkString - check(load(List().mkString _), "TraversableOnce.scala", "def mkString")
-      'aggregate- check(load(List().aggregate _), "TraversableOnce.scala", "def aggregate")
-//    These result in a divering implicit expansion, even in normal Scala
-//      'min      - check(load(List().min _), "TraversableOnce.scala", "def min")
-//      'max      - check(load(List().max _), "TraversableOnce.scala", "def max")
-      'groupBy  - check(load(List().groupBy _), "TraversableLike.scala", "def groupBy")
-      'compose  - check(load(List().compose _), "Function1.scala", "def compose")
+    'fuzz{
+      // Feed a bunch of arbitrary classes and methods from a variety of places
+      // through our location-finder logic to try and find edge cases where
+      // things misbehave or blow up
 
-      'prefixLength - check(
-        load(List().prefixLength _),
-        "GenSeqLike.scala",
-        "def prefixLength"
-      )
 
-      'hasDefiniteSize - check(
-        load(List().hasDefiniteSize _),
-        "TraversableLike.scala",
-        "def hasDefiniteSize"
-      )
+      /**
+        * We only bother to run these "fuzz"-style tests under Scala 2.12,
+        * because they're too fragile w.r.t. traits/methods moving around
+        * between major versions of Scala. Nevertheless, this should give us a
+        * reasonable amount of confidence that the functionality works across
+        * a range of inputs, and the earlier unit tests should give us some
+        * confidence it works across a range of Scala versions
+        */
+      def check212(loaded: => Location, expectedFileName: String, expected: String) = {
+        if (TestUtils.scala2_12) check(loaded, expectedFileName, expected)
+      }
+      'List{
 
-      'productIterator - check(
-        load(List().productIterator _),
-        "Product.scala",
-        "def productIterator"
-      )
+
+        'head     - check212(load(List().head), "IterableLike.scala", "def head")
+        'apply    - check212(load(List().apply _), "LinearSeqOptimized.scala", "def apply")
+        'take     - check212(load(List().take _), "List.scala", "override def take")
+        'drop     - check212(load(List().drop _), "List.scala", "override def drop")
+        'slice    - check212(load(List().slice _), "List.scala", "override def slice")
+        'iterator - check212(load(List().iterator _), "LinearSeqLike.scala", "def iterator")
+        'hashCode - check212(load(List().hashCode _), "LinearSeqLike.scala", "override def hashCode")
+        'reverse  - check212(load(List().reverse _), "List.scala", "def reverse")
+        'isEmpty  - check212(load(List().isEmpty _), "SeqLike.scala", "def isEmpty")
+        'nonEmpty - check212(load(List().nonEmpty _), "TraversableOnce.scala", "def nonEmpty")
+        'orElse   - check212(load(List().orElse _), "PartialFunction.scala", "def orElse")
+        'mkString - check212(load(List().mkString _), "TraversableOnce.scala", "def mkString")
+        'aggregate- check212(load(List().aggregate _), "TraversableOnce.scala", "def aggregate")
+
+        //    These result in a divering implicit expansion, even in plain Scala
+  //      'min      - check212(load(List().min _), "TraversableOnce.scala", "def min")
+  //      'max      - check212(load(List().max _), "TraversableOnce.scala", "def max")
+
+        'groupBy  - check212(load(List().groupBy _), "TraversableLike.scala", "def groupBy")
+        'compose  - check212(load(List().compose _), "Function1.scala", "def compose")
+
+        'prefixLength - check212(
+          load(List().prefixLength _),
+          "GenSeqLike.scala",
+          "def prefixLength"
+        )
+
+        'hasDefiniteSize - check212(
+          load(List().hasDefiniteSize _),
+          "TraversableLike.scala",
+          "def hasDefiniteSize"
+        )
+
+        'productIterator - check212(
+          load(List().productIterator _),
+          "Product.scala",
+          "def productIterator"
+        )
+      }
+      'scalaz{
+
+        'base - check212(load(scalaz.==>>), "Map.scala", "object ==>>")
+        // Some aliases the make our code shorter
+        import scalaz.==>>
+        implicit val scalazOrder: scalaz.Order[Int] = scalaz.Order.fromScalaOrdering(Ordering[Int])
+        implicit val scalazShow: scalaz.Show[Int] = scalaz.Show.show[Int](_.toString)
+        type I = Int
+        'empty     - check212(load(==>>.empty[I, I] _), "Map.scala", "final def empty")
+        'singleton - check212(load(==>>.singleton[I, I] _), "Map.scala", "final def singleton")
+        'unions    - check212(load(==>>.unions[I, I] _), "Map.scala", "final def unions")
+        // inherited
+        'mapShow   - check212(load(==>>.mapShow[I, I]), "Map.scala", "implicit def mapShow")
+        'mapOrder  - check212(load(==>>.mapOrder[I, I]), "Map.scala", "implicit def mapOrder")
+        'mapBifoldable - check212(
+          load(==>>.mapBifoldable),
+          "Map.scala",
+          "implicit val mapBifoldable"
+        )
+
+        val instance = ==>>.empty[I, I]
+        'instance  - check212(load(instance), "Map.scala", "case object Tip")
+        'adjust    - check212(load(instance.adjust _), "Map.scala", "def adjust")
+        'values    - check212(load(instance.values _), "Map.scala", "def values")
+        'mapAccumL - check212(load(instance.mapAccumL _), "Map.scala", "def mapAccumL")
+        'split     - check212(load(instance.split _), "Map.scala", "def split")
+      }
+      'fastparse{
+        import fastparse.all.implicitReprOps
+        'all - check212(load(fastparse.all), "StringApi.scala", "object all extends StringApi")
+
+        'FrameIndex - check212(
+          load(fastparse.core.Frame(1, null).index),
+          "Parsing.scala",
+          "case class Frame"
+        )
+        'SuccessValue - check212(
+          load(fastparse.all.Parsed.Success(0, 0).value),
+          "Parsing.scala",
+          "case class Success"
+        )
+        'BitSet - check212(
+          load(new fastparse.utils.Utils.BitSet[Char](Array[Int](), 0, 0).apply _),
+          "Utils.scala",
+          "def apply(c: Elem)"
+        )
+
+        'elemPredApply- check212(
+          load(fastparse.parsers.Intrinsics.ElemPred.apply[Char, String] _),
+          "Intrinsics.scala",
+          "case class ElemPred"
+        )
+      }
     }
   }
 }

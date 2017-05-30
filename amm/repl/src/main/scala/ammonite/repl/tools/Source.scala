@@ -82,7 +82,6 @@ object source{
           """
         case Right((prefix, f)) => q"$prefix.browseObject($f, $pprinter, $colors, $command)"
       }
-
     )
   }
 
@@ -196,12 +195,16 @@ object source{
   }
 
   def loadObjectInfo(value: Any) = {
+
     loadSource(
       value.getClass,
       x => {
-        val firstLines =
-          x.getMethods.map(_.getMethodInfo.getLineNumber(0)) ++
-          x.getConstructors.map(_.getMethodInfo.getLineNumber(0))
+        // "Declared" gives us all methods, including private ones. This is
+        // *different* from the convention in java.lang.reflect, where
+        // "Declared" means "not inherited"
+        val firstLines = (x.getDeclaredMethods ++ x.getDeclaredConstructors)
+          .map(_.getMethodInfo.getLineNumber(0))
+          .filter(_ != -1)
 
         try Right(firstLines.min)
         catch{ case e: UnsupportedOperationException =>
