@@ -128,10 +128,14 @@ object BasicTests extends TestSuite{
     }
 
     'source{
+      // This fails on windows because for some reason the windows subprocess
+      // interface eats the double-quotes inside the `-c` argument, even though
+      // the argument is being passed programmatically and not through any shell =(
+      //
       // For some reason this fails on travis/Scala2.10/Java7. I cannot reproduce
       // it locally on OSX/Scala2.10/Java8, but Scala2.10/Java7 is legacy anyway
       // so it's probably fine if this doesn't work.
-      if (!scala.util.Properties.versionNumberString.contains("2.10")) {
+      if (!Util.windowsPlatform && !scala.util.Properties.versionNumberString.contains("2.10")) {
         %%bash(
           executable,
           "-c",
