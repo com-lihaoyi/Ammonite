@@ -8,6 +8,6 @@ object Compat{
   }
   def companion(c: Context)(sym: c.universe.ClassSymbol): c.Tree = {
     import c.universe._
-    q"_root_.java.lang.Class.forName(${c.fullName.toString})"
+    q"_root_.java.lang.Class.forName(${sym.fullName.toString})"
   }
 }
