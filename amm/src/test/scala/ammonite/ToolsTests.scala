@@ -30,18 +30,18 @@ object ToolsTests extends TestSuite{
       val items = Seq(123, 456, 789)
       'filter{
         assert(
-          (items |? Grep! "45") == Seq(456),
-          (items |? Grep! "45".r) == Seq(456),
-          (items |? Grep! "[123456]+".r) == Seq(123, 456),
-          (items |? Grep! "^[123456]+$".r) == Seq(123, 456),
-          (items |? Grep! "[123456]".r) == Seq(123, 456),
-          (items |? Grep! "^[123456]$".r) == Seq()
+          (items |? grep! "45") == Seq(456),
+          (items |? grep! "45".r) == Seq(456),
+          (items |? grep! "[123456]+".r) == Seq(123, 456),
+          (items |? grep! "^[123456]+$".r) == Seq(123, 456),
+          (items |? grep! "[123456]".r) == Seq(123, 456),
+          (items |? grep! "^[123456]$".r) == Seq()
         )
       }
       'flatMap{
         def check[T: Grepper](items: Seq[Any], regex: T, expected: Seq[String]) = {
 
-          val grepped = items || Grep! regex
+          val grepped = items || grep! regex
           val displayed =
             for(g <- grepped)
               yield {

@@ -1,13 +1,13 @@
 package ammonite.repl.tools
 
-import ammonite.runtime.tools.Browse.Strings
+import ammonite.runtime.tools.browse.Strings
 import ammonite.util.CodeColors
 import sourcecode.Compat._
 
 import scala.annotation.tailrec
 import scala.language.experimental.macros
 
-object Source{
+object src{
 
 
   def load(f: => Any): Location = macro loadMacro
@@ -128,7 +128,7 @@ object Source{
         for(arg <- method.paramss.flatten)
         yield q"classOf[${arg.typeSignature.erasure}]"
 
-      val staticJavaLhsClass = lhs.symbol.isStatic && lhs.symbol.isJava
+      val staticJavaLhsClass = lhs.symbol != null && lhs.symbol.isStatic && lhs.symbol.isJava
 
       val ownerCls = symbol.owner.asClass
 

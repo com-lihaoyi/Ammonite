@@ -3,6 +3,18 @@
 @import ammonite.ops._
 @val ammoniteTests = 'amm/'src/'test/'scala/'ammonite/'session
 @val advancedTests = ammoniteTests/"AdvancedTests.scala"
+@val srcSbtConfig = """
+// Optional, required for the `src` command to work
+(fullClasspath in Test) ++= {
+  (updateClassifiers in Test).value
+    .configurations
+    .find(_.configuration == Test.name)
+    .get
+    .modules
+    .flatMap(_.artifacts)
+    .collect{case (a, f) if a.classifier == Some("sources") => f}
+}
+"""
 @sect("Ammonite-REPL", "A Modernized Scala REPL")
 
   @p
@@ -65,6 +77,9 @@
       IO.write(file, """object amm extends App { ammonite.Main().run() }""")
       Seq(file)
     }.taskValue
+
+
+  @hl.scala(srcSbtConfig)
 
   @p
     After that, simply hit
@@ -485,6 +500,8 @@
 
         @ul
           @li
+            @sect.ref{src}
+          @li
             @sect.ref{time}
           @li
             @sect.ref{grep}
@@ -501,6 +518,55 @@
 
         @p
           These tools are useful but not strictly necessary;
+
+        @sect{src}
+          @img(src:="Src.gif", display.block, marginLeft.auto, marginRight.auto, height := 364)
+
+          @p
+            Ammonite provides the @code{src} built-in, which lets you easily
+            peek at the source code of various functions or classes. You can
+            use this to read their doc-comments or inspect their implementation,
+            to help you figure out how to use them.
+
+          @p
+            @code{src} accepts two kinda of inputs:
+
+          @ul
+            @li
+              A method call @code{foo.bar(...)}, in which case it will try to
+              bring you to concrete implementation of that method @code{bar}.
+              You can also leave the method arguments empty using `_`.
+            @li
+              An arbitrary expression @code{foo}, in which case it will try to
+              bring you to the implementation of @code{foo}'s runtime class
+
+          @p
+            @code{src} works on both Scala and Java APIs, both the standard
+            library as well as third-party dependencies. @code{src} opens source
+            files using the @code{less} pager by default; if you wish to change
+            this, you can pass in a replacement command as a second argument
+            e.g. @code{src(..., "vim")} or e.g. @code{src(..., Seq("vim", "--flag"))}
+
+          @p
+            When used within a SBT project @code{src} requires the following
+            SBT setting in order to make the source code of third-party
+            dependencies available:
+
+          @hl.scala(srcSbtConfig)
+
+          @p
+            Ammonite also automatically downloads the source jars of any
+            libraries you import via @hl.scala{import $ivy}, and makes them
+            browsable via @code{src}.
+
+          @p
+            @code{src} is experimental: it may not always be able to find the
+            source code of a particular method or class, and the source
+            location it brings you to may be a few lines away from the source
+            you really want. Nevertheless, it should work in the bulk of cases,
+            so try it out and come by the
+            @lnk("Gitter Channel", "https://gitter.im/lihaoyi/Ammonite") if you
+            face any issues!
 
         @sect{time}
           @compare("time ls -a", "time{ls!}")

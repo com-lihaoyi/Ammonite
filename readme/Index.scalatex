@@ -34,6 +34,18 @@
   }
 
 @sect("Ammonite", "Scala Scripting")
+
+  @div(display.flex, alignItems.center, flexDirection.column)
+    @i{Version @ammonite.Constants.version}
+    @div
+      @a(href := "https://gitter.im/lihaoyi/Ammonite")(
+        img(src := "https://badges.gitter.im/Join%20Chat.svg")
+      )
+      @span(" ")
+      @a(href := "https://www.patreon.com/lihaoyi")(
+        img(src := "https://img.shields.io/badge/patreon-sponsor-ff69b4.svg")
+      )
+
   @p
     Ammonite lets you use the
     @lnk("Scala language", "https://www.scala-lang.org/") for

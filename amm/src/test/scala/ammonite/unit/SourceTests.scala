@@ -5,13 +5,14 @@ import ammonite.TestUtils
 import ammonite.ops._
 import ammonite.repl.tools.Location
 import utest._
-import ammonite.repl.tools.Source.load
+import ammonite.repl.tools.src.load
 import fastparse.utils.{ElemSetHelper, Generator, IndexedParserInput}
 
 import scala.tools.nsc.interpreter.InputStream
 object SourceTests extends TestSuite{
   override def utestTruncateLength = 500000
   val tests = TestSuite{
+
     def check(loaded: Location, expectedFileName: String, expected: String, slop: Int = 10) = {
 
 
@@ -26,6 +27,10 @@ object SourceTests extends TestSuite{
       ).mkString("\n")
       assert(nearby.contains(expected))
     }
+    def check212(loaded: => Location, expectedFileName: String, expected: String) = {
+      if (TestUtils.scala2_12) check(loaded, expectedFileName, expected)
+    }
+
 
     'objectInfo{
       'thirdPartyJava{
@@ -79,7 +84,7 @@ object SourceTests extends TestSuite{
       }
       'fieldsAreTreatedAsObjects{
         // Can't use Java Std Lib methods because SBT screws up classloaders in test suite
-        check(
+        check212(
           load(com.github.javaparser.JavaToken.INVALID),
           "JavaToken.java",
           "public class JavaToken"
@@ -157,7 +162,7 @@ object SourceTests extends TestSuite{
     }
     'staticMethod{
       // Can't use Java Std Lib methods because SBT screws up classloaders in test suite
-      check(
+      check212(
         load(com.github.javaparser.JavaParser.parseBlock _),
         "JavaParser.java",
         "public static BlockStmt parseBlock"
@@ -178,9 +183,7 @@ object SourceTests extends TestSuite{
         * a range of inputs, and the earlier unit tests should give us some
         * confidence it works across a range of Scala versions
         */
-      def check212(loaded: => Location, expectedFileName: String, expected: String) = {
-        if (TestUtils.scala2_12) check(loaded, expectedFileName, expected)
-      }
+
       'List{
 
 

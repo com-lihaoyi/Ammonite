@@ -114,6 +114,18 @@
 
 
   @sect{Changelog}
+    @sect{0.9.4}
+      @ul
+        @li
+          Experimental support for the @sect.ref{src} built-in, which brings
+          you to the source code for a method or class so you can see the
+          implementation or read the doc-string.
+        @li
+          Importing @code{$file}s from within your predef now properly makes them
+          available within your REPL, the same way other imports are @issue(616)
+
+
+
     @sect{0.9.3}
       @ul
         @li

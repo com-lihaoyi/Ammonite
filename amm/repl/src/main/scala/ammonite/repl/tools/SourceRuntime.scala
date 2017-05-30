@@ -5,7 +5,7 @@ import javassist.{ByteArrayClassPath, CtClass, CtMethod}
 import ammonite.ops._
 import ammonite.repl.Highlighter
 import ammonite.repl.Highlighter.{defaultHighlightIndices0, flattenIndices}
-import ammonite.runtime.tools.Browse.Strings
+import ammonite.runtime.tools.browse.Strings
 import ammonite.util.CodeColors
 import com.github.javaparser.{GeneratedJavaParserConstants, ParseStart, StringProvider}
 import sourcecode.Compat._
@@ -256,7 +256,7 @@ object SourceRuntime{
           }
         })()
 
-        val targetLine = loc.lineNum - verticalOffset
+        val targetLine = math.max(0, loc.lineNum - verticalOffset)
         val tmpFile = tmp(output.mkString("\n"), suffix = "." + loc.fileName)
         %(command(targetLine).values, tmpFile)
       case Left(msg) => println(msg)

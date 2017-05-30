@@ -140,7 +140,7 @@ object GrepResult{
  * Lets you filter a list by searching for a matching string or
  * regex within the pretty-printed contents.
  */
-object Grep {
+object grep {
   def apply[T: Grepper]
            (pat: T, str: Any)
            (implicit c: pprint.PPrinter = Grepper.defaultPPrint)
@@ -168,12 +168,12 @@ object Grep {
 
   case class ![T: Grepper](pat: T){
     def apply(str: Any)(implicit c: pprint.PPrinter = Grepper.defaultPPrint) = {
-      Grep.this.apply(pat, str)
+      grep.this.apply(pat, str)
     }
   }
 }
 
-case class Tail(interval: Int, prefix: Int) extends Function[Path, Iterator[String]]{
+case class tail(interval: Int, prefix: Int) extends Function[Path, Iterator[String]]{
   def apply(arg: Path): Iterator[String] = {
     val is = java.nio.file.Files.newInputStream(arg.toNIO)
     val br = new BufferedReader(new InputStreamReader(is))
@@ -191,12 +191,12 @@ case class Tail(interval: Int, prefix: Int) extends Function[Path, Iterator[Stri
  * Returns an iterator which you can then print to standard out
  * or use for other things.
  */
-object Tail extends Tail(100, 50)
+object tail extends tail(100, 50)
 /**
   * Records how long the given computation takes to run, returning the duration
   * in addition to the return value of that computation
   */
-object Time {
+object time {
 
   def apply[T](t: => T) = {
     val start = System.nanoTime()
@@ -208,7 +208,7 @@ object Time {
 }
 
 
-object Browse{
+object browse{
   case class Strings(values: Seq[String])
   object Strings{
     implicit def stringPrefix(s: String) = Strings(Seq(s))

@@ -19,23 +19,6 @@ object Defaults{
           |If you like Ammonite, please support our development at $link""".stripMargin
     )
   }
-  val ignoreUselessImports = """
-    |notify => _,
-    |  wait => _,
-    |  equals => _,
-    |  asInstanceOf => _,
-    |  synchronized => _,
-    |  notifyAll => _,
-    |  isInstanceOf => _,
-    |  == => _,
-    |  != => _,
-    |  getClass => _,
-    |  ne => _,
-    |  eq => _,
-    |  ## => _,
-    |  hashCode => _,
-    |  _
-    |"""
 
   // Need to import stuff from ammonite.ops manually, rather than from the
   // ammonite.ops.Extensions bundle, because otherwise they result in ambiguous
@@ -53,13 +36,8 @@ object Defaults{
     |  Callable1,
     |  Callable2
     |}
-    |import ammonite.runtime.tools.{
-    |  Grep => grep,
-    |  Tail => tail,
-    |  Time => time,
-    |  Browse => browse
-    |}
-    |import ammonite.repl.tools.{Desugar => desugar, Source => src}
+    |import ammonite.runtime.tools._
+    |import ammonite.repl.tools._
     |import ammonite.runtime.tools.IvyConstructor.{ArtifactIdExt, GroupIdExt}
     |import ammonite.main.Router.{doc, main}
     |import ammonite.main.Scripts.pathScoptRead
@@ -67,7 +45,7 @@ object Defaults{
     |""".stripMargin
 
   val replPredef = """
-    |  import ammonite.repl.ReplBridge.value.{
+    |import ammonite.repl.ReplBridge.value.{
     |  codeColorsImplicit,
     |  tprintColorsImplicit,
     |  pprinterImplicit,
