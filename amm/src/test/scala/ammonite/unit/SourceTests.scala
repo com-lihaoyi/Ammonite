@@ -189,7 +189,11 @@ object SourceTests extends TestSuite{
         'drop     - check212(load(List().drop _), "List.scala", "override def drop")
         'slice    - check212(load(List().slice _), "List.scala", "override def slice")
         'iterator - check212(load(List().iterator _), "LinearSeqLike.scala", "def iterator")
-        'hashCode - check212(load(List().hashCode _), "LinearSeqLike.scala", "override def hashCode")
+        'hashCode - check212(
+          load(List().hashCode _),
+          "LinearSeqLike.scala",
+          "override def hashCode"
+        )
         'reverse  - check212(load(List().reverse _), "List.scala", "def reverse")
         'isEmpty  - check212(load(List().isEmpty _), "SeqLike.scala", "def isEmpty")
         'nonEmpty - check212(load(List().nonEmpty _), "TraversableOnce.scala", "def nonEmpty")

@@ -45,10 +45,12 @@ object source{
   }
 
   def apply(f: => Any)
-           (implicit pprinter: pprint.PPrinter, colors: CodeColors): Unit = macro applyMacro
+           (implicit pprinter: pprint.PPrinter,
+            colors: CodeColors): Unit = macro applyMacro
 
   def apply(f: => Any, command: Int => Strings)
-           (implicit pprinter: pprint.PPrinter, colors: CodeColors): Unit = macro applyCustomizeCommandMacro
+           (implicit pprinter: pprint.PPrinter,
+            colors: CodeColors): Unit = macro applyCustomizeCommandMacro
 
   def applyMacro(c: Context)
                 (f: c.Expr[Any])
@@ -145,10 +147,11 @@ object source{
       }
 
       val ownerTree =
-        if (staticJavaLhsClass) q"classOf[${paramedOwnerCls.erasure.companion}]"//q"Class.forName(${symbol.owner.fullName})"
+        if (staticJavaLhsClass) q"Class.forName(${symbol.owner.fullName})"
         else q"classOf[${paramedOwnerCls.erasure}]"
 
-      (
+
+      Tuple5(
         ownerTree,
         symbol.name.toString,
         // static Java classes don't *have* a LHS value we can pass in to
