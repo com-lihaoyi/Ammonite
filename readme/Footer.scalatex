@@ -128,7 +128,7 @@
           Importing @code{$file}s from within your predef now properly makes them
           available within your REPL, the same way other imports are @issue(616)
         @li
-          The predef required for @sect.ref{Ammonite Shell} was tweaked slightly;
+          The predef required for @sect.ref{Ammonite-Shell} was tweaked slightly;
           if you are using it please update your @code{~/.ammonite/predef.sc}
           with the new @lnk("predef", "https://git.io/vH4ju") code.
 
