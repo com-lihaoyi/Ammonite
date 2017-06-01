@@ -126,10 +126,10 @@
           @code{Path.expandUser} to do so manually.
 
         @li
-          Add the @code{-w}/@code{--watch} flag, which lets you run a script
-          repeatedly every time you change its codes, via @code{amm foo.sc -w --}.
-          This is useful when you are actively working on the script and greatly
-          reduces the iteration time
+          Add the @code{-w}/@code{--watch} @sect.ref{Watch and Reload} flag,
+          which lets you run a script repeatedly every time you change its code,
+          via @code{amm foo.sc -w --}. This is useful when you are actively
+          working on the script and greatly reduces the iteration time
 
     @sect{0.9.5}
       @ul

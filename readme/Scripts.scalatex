@@ -461,6 +461,24 @@
       @p
         To let it use only up to 1024 megabytes of memory
 
+    @sect{Watch and Reload}
+      @p
+        Ammonite provides the @code{-w}/@code{--watch} flag, which tells it to
+        not exit when a script completes, but instead watch the files that were
+        run, and re-run them when any of them change. You can use this flag via
+
+      @code
+        $ amm foo.sc -w --
+
+      @p
+        Note the trailing @code{--}, which is necessary to ensure the flag gets
+        passed to the Ammonite script runner, rather than to the main method of
+        your script.
+
+      @p
+        Within your scripts, you can also flag other files you want Ammonite
+        to watch, via the @code{interp.watch(p: Path)} function.
+
     @sect{From the REPL}
       @p
         You can load any script into the Ammonite REPL using the
