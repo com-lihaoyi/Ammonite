@@ -61,14 +61,14 @@ object Preprocessor{
     * is returned separately so we can later manipulate the statements e.g.
     * by adding `val res2 = ` without the whitespace getting in the way
     */
-  def splitScript(rawCode: String): Res[Seq[(String, Seq[String])]] = {
+  def splitScript(rawCode: String): Res[IndexedSeq[(String, Seq[String])]] = {
     Parsers.splitScript(rawCode) match {
       case f: Parsed.Failure =>
         Res.Failure(None, errMsg(f.msg, rawCode, f.extra.traced.expected, f.index))
       case s: Parsed.Success[Seq[(String, Seq[String])]] =>
 
         var offset = 0
-        val blocks = mutable.Buffer[(String, Seq[String])]()
+        val blocks = mutable.ArrayBuffer[(String, Seq[String])]()
 
         // comment holds comments or empty lines above the code which is not caught along with code
         for( (comment, code) <- s.value){

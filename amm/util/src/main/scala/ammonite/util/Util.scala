@@ -76,8 +76,10 @@ object Util{
       * but with enough information to fetch the classfiles form disk and evaluate the
       * block without compiling/parsing it
       */
-    case class BlockMetadata(id: VersionedWrapperId, importHookTrees: Seq[ImportTree])
-    case class Metadata(finalImports: Imports, blockInfo: Seq[BlockMetadata])
+    case class BlockMetadata(id: VersionedWrapperId,
+                             importHookTrees: Seq[ImportTree],
+                             finalImports: Imports)
+    case class Metadata(blockInfo: Seq[BlockMetadata])
   }
   type CompileCache = (ClassFiles, Imports)
 

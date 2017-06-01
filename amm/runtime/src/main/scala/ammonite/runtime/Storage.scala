@@ -29,7 +29,6 @@ trait Storage{
   def compileCacheLoad(path: String, tag: String): Option[CompileCache]
   def classFilesListSave(filePathPrefix: RelPath,
                          perBlockMetadata: Seq[ScriptOutput.BlockMetadata],
-                         imports: Imports,
                          tag: String): Unit
   def classFilesListLoad(filePathPrefix: RelPath, cacheTag: String): Option[ScriptOutput]
   def getSessionId: Long
@@ -41,7 +40,6 @@ object Storage{
   private def loadIfTagMatches(loadedTag: String,
                                cacheTag: String,
                                classFilesList: Seq[ScriptOutput.BlockMetadata],
-                               imports: Imports,
                                compileCacheLoad: (String, String) => Option[CompileCache]) = {
     if (loadedTag != cacheTag) None
     else{
@@ -51,7 +49,7 @@ object Storage{
           blockMeta.id.wrapperPath, blockMeta.id.versionHash
         )
       } yield classFiles
-      Some(ScriptOutput(ScriptOutput.Metadata(imports, classFilesList), res))
+      Some(ScriptOutput(ScriptOutput.Metadata(classFilesList), res))
     }
 
   }
@@ -75,7 +73,7 @@ object Storage{
 
     var compileCache: mutable.Map[String, (String, CompileCache)] = mutable.Map.empty
     val classFilesListcache = {
-      mutable.Map.empty[String, (String, Seq[ScriptOutput.BlockMetadata], Imports)]
+      mutable.Map.empty[String, (String, Seq[ScriptOutput.BlockMetadata])]
     }
     def compileCacheSave(path: String, tag: String, data: CompileCache): Unit = {
       compileCache(path) = (tag, data)
@@ -89,10 +87,9 @@ object Storage{
 
     def classFilesListSave(filePathPrefix: RelPath,
                            perBlockMetadata: Seq[ScriptOutput.BlockMetadata],
-                           imports: Imports,
                            tag: String): Unit = {
 
-      classFilesListcache(filePathPrefix.toString) = (tag, perBlockMetadata.reverse, imports)
+      classFilesListcache(filePathPrefix.toString) = (tag, perBlockMetadata.reverse)
     }
 
     def classFilesListLoad(filePathPrefix: RelPath,
@@ -100,8 +97,8 @@ object Storage{
 
       classFilesListcache.get(filePathPrefix.toString) match{
         case None => None
-        case Some((loadedTag, classFilesList, imports)) =>
-          loadIfTagMatches(loadedTag, cacheTag, classFilesList, imports, compileCacheLoad)
+        case Some((loadedTag, classFilesList)) =>
+          loadIfTagMatches(loadedTag, cacheTag, classFilesList, compileCacheLoad)
       }
     }
   }
@@ -162,7 +159,6 @@ object Storage{
 
     def classFilesListSave(filePathPrefix: RelPath,
                            perBlockMetadata: Seq[ScriptOutput.BlockMetadata],
-                           imports: Imports,
                            tag: String): Unit = {
 
       val codeCacheDir = cacheDir/'scriptCaches/filePathPrefix/tag
@@ -172,9 +168,6 @@ object Storage{
           write(
             codeCacheDir/classFilesOrder,
             upickle.default.write((tag, perBlockMetadata.reverse), indent = 4)
-          )
-          write(
-            codeCacheDir/"imports.json", upickle.default.write(imports, indent = 4)
           )
         } catch {
           case _: FileAlreadyExistsException => // ignore
@@ -203,13 +196,11 @@ object Storage{
           codeCacheDir/classFilesOrder
         )
 
-        val impFile = readJson[Imports](codeCacheDir/"imports.json")
-
-        (metadataJson, impFile) match{
-          case (Some(metadata), Some(imports)) =>
-
+        metadataJson match{
+          case Some(metadata) =>
             val (loadedTag, classFilesList) = metadata
-            loadIfTagMatches(loadedTag, cacheTag, classFilesList, imports, compileCacheLoad)
+
+            loadIfTagMatches(loadedTag, cacheTag, classFilesList, compileCacheLoad)
 
           case _ => None
         }

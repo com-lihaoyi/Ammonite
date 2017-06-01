@@ -84,6 +84,7 @@ object Compiler{
             shutdownPressy: () => Unit,
             settings: Settings): Compiler = new Compiler{
 
+    if(sys.env.contains("DIE"))???
     val PluginXML = "scalac-plugin.xml"
     lazy val plugins0 = {
       import scala.collection.JavaConverters._
