@@ -179,6 +179,8 @@ object Main{
     var replApi = false
     var remoteLogging = true
     var watchScripts = false
+    var fileToExecute: Option[Path] = None
+    val indent = "                           "
     val replParser = new scopt.OptionParser[Main]("ammonite") {
       // Primary arguments that correspond to the arguments of
       // the `Main` configuration object
@@ -210,11 +212,6 @@ object Main{
         .foreach(x => codeToExecute = Some(x))
         .text("Pass in code to be run immediately in the REPL")
 
-      arg[String]("<args>...")
-        .optional()
-        .unbounded()
-        .foreach{ x => passThroughArgs = passThroughArgs :+ x }
-        .text("Any arguments you want to pass to the Ammonite script file")
       opt[File]('h', "home")
         .valueName("<file>")
         .foreach( x => ammoniteHome = Some(Path(x, pwd)))
@@ -231,33 +228,51 @@ object Main{
       opt[Unit]("repl-api")
         .foreach(x => replApi= true)
         .text(
-          """Lets you run a script with the `repl` object present; this is
-            |normally not available in scripts and only provided in the
-            |interactive REPL
-          """.stripMargin
+          s"""Lets you run a script with the `repl` object present; this is
+             |${indent}normally not available in scripts and only provided in the
+             |${indent}interactive REPL
+           """.stripMargin.trim
         )
+      arg[String]("script-file")
+        .optional()
+        .text("Path to a scala script for Ammonite to run")
+        .foreach { x => fileToExecute = Some(Path(x, pwd)) }
+      arg[String]("<script-args>...")
+        .optional()
+        .unbounded()
+        .foreach{ x => passThroughArgs = passThroughArgs :+ x }
+        .text(s"""Any arguments you want to pass to the Ammonite script file.
+                 |${indent}To pass arguments that begin with a -, please use -- to
+                 |${indent}separate Ammonite args from script args
+               """.stripMargin.trim)
+
+      help("help").text("Show this help and exit")
     }
 
     // amm foo.sc
     // amm -h bar
     // amm foo.sc hello world
     // amm foo.sc -h bar -- hello world
-    val (fileToExecute, ammoniteArgs, flatScriptArgs) = args0.lift(0) match{
-      case Some(x) if x.head != '-' =>
-        val fileToRun = Some(Path(args0(0), pwd))
-        // running a file
-        args0.indexOf("--") match {
-          // all args to to file main
-          case -1 => (fileToRun, Array.empty[String], args0.drop(1))
-          // args before -- go to ammonite, args after -- go to file main
-          case n => (fileToRun, args0.slice(1, n), args0.drop(n+1))
-        }
-      case _ => (None, args0, Array.empty[String]) // running the REPL, all args to to ammonite
+    val (ammoniteArgs, flatScriptArgs) = args0.indexOf("--") match {
+      case -1 =>
+        (args0, Array.empty[String])
+      case idx =>
+        (args0.slice(0, idx), args0.drop(idx + 1))
     }
 
-    val scriptArgs = ammonite.main.Scripts.groupArgs(flatScriptArgs)
 
     for(c <- replParser.parse(ammoniteArgs, Main())) {
+      val scriptArgs: Seq[(String, Option[String])] =
+        if (flatScriptArgs.nonEmpty && passThroughArgs.nonEmpty) {
+          Console.err.println(
+            "Error: You may not provide script args before and after the -- delimiter")
+          System.exit(1)
+          ???
+        } else if (flatScriptArgs.nonEmpty) {
+          ammonite.main.Scripts.groupArgs(flatScriptArgs)
+        } else {
+          ammonite.main.Scripts.groupArgs(passThroughArgs)
+        }
       def main(isRepl: Boolean) = Main(
         c.predef,
         c.defaultPredef,
@@ -297,7 +312,7 @@ object Main{
                 if (value != ()){
                   pprint.PPrinter.BlackWhite.pprintln(value)
                 }
-              case Res.Skip   => // do nothing on success, everything's already happened
+              case Res.Exit(_) | Res.Skip => // do nothing on success, everything's already happened
             }
             if (!watchScripts) false
             else{
@@ -311,7 +326,10 @@ object Main{
 
 
         case (None, Some(code)) => main(false).runCode(code, replApi)
-
+        case (Some(_), Some(_)) =>
+          Console.err.println(
+            s"Error: You may not specify both code to evaluate, and a file")
+          System.exit(1)
       }
 
     }
