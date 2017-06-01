@@ -80,7 +80,7 @@ object Scripts {
             .asInstanceOf[() => Seq[Router.EntryPoint]]
             .apply()
 
-      res <- interp.withContextClassloader{
+      res <- interp.eval.withContextClassloader{
         scriptMains match {
           // If there are no @main methods, there's nothing to do
           case Seq() => Res.Success(())

@@ -24,7 +24,7 @@ trait Evaluator{
   def evalMain(cls: Class[_]): Any
   def getCurrentLine: String
   def update(newImports: Imports): Unit
-
+  def withContextClassloader[T](t: => T): T
   def processLine(classFiles: ClassFiles,
                   newImports: Imports,
                   printer: Printer,
@@ -99,10 +99,19 @@ object Evaluator{
     }
 
 
-    def evalMain(cls: Class[_]) = {
+    def evalMain(cls: Class[_]) = withContextClassloader{
       cls.getDeclaredMethod("$main").invoke(null)
     }
 
+    def withContextClassloader[T](t: => T) = {
+      val oldClassloader = Thread.currentThread().getContextClassLoader
+      try{
+        Thread.currentThread().setContextClassLoader(eval.evalClassloader)
+        t
+      } finally {
+        Thread.currentThread().setContextClassLoader(oldClassloader)
+      }
+    }
 
 
 

@@ -137,6 +137,7 @@ class CompilerLifecycleManager(frames0: Ref[List[Frame]]){
   }
   def handlePluginClasspath(jar: File) = {
     frames().head.pluginClassloader.add(jar.toURI.toURL)
+    reInit()
   }
 }
 

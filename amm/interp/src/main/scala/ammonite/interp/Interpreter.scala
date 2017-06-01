@@ -195,21 +195,7 @@ class Interpreter(val printer: Printer,
         fileName, Name("cmd" + eval.getCurrentLine)
       )
     } yield out.copy(imports = out.imports ++ hookImports)
-
   }
-
-
-  def withContextClassloader[T](t: => T) = {
-    val oldClassloader = Thread.currentThread().getContextClassLoader
-    try{
-      Thread.currentThread().setContextClassLoader(eval.evalClassloader)
-      t
-    } finally {
-      Thread.currentThread().setContextClassLoader(oldClassloader)
-    }
-  }
-
-
 
 
   def evaluateLine(processed: Preprocessor.Output,
@@ -223,16 +209,13 @@ class Interpreter(val printer: Printer,
         printer,
         fileName
       )
-      res <- withContextClassloader{
-        eval.processLine(
-          classFiles,
-          newImports,
-          printer,
-          fileName,
-          indexedWrapperName
-        )
-
-      }
+      res <- eval.processLine(
+        classFiles,
+        newImports,
+        printer,
+        fileName,
+        indexedWrapperName
+      )
     } yield (res, Tag("", ""))
   }
 
@@ -254,14 +237,12 @@ class Interpreter(val printer: Printer,
       )
       cls <- eval.loadClass(fullyQualifiedName, classFiles)
 
-      res <- withContextClassloader{
-        eval.processScriptBlock(
-          cls,
-          newImports,
-          codeSource.wrapperName,
-          codeSource.pkgName
-        )
-      }
+      res <- eval.processScriptBlock(
+        cls,
+        newImports,
+        codeSource.wrapperName,
+        codeSource.pkgName
+      )
     } yield {
       storage.compileCacheSave(fullyQualifiedName, tag, (classFiles, newImports))
 
@@ -455,11 +436,9 @@ class Interpreter(val printer: Printer,
               compilerManager.addToClasspath(classFiles)
 
               val cls = eval.loadClass(blockMetadata.id.wrapperPath, classFiles)
-              val evaluated = withContextClassloader {
+              val evaluated =
                 try cls.map(eval.evalMain(_))
                 catch Evaluator.userCodeExceptionHandler
-              }
-
 
               evaluated.map(_ => blockMetadata)
             }
