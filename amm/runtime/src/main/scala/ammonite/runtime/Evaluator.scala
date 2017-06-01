@@ -208,28 +208,5 @@ object Evaluator{
   def evaluatorRunPrinter(f: => Unit) = f
 
 
-  def writeDeep(d: VirtualDirectory,
-                path: List[String],
-                suffix: String): OutputStream = path match {
-    case head :: Nil => d.fileNamed(path.head + suffix).output
-    case head :: rest =>
-      writeDeep(
-        d.subdirectoryNamed(head).asInstanceOf[VirtualDirectory],
-        rest, suffix
-      )
-  }
-
-  /**
-    * Writes files to dynamicClasspath. Needed for loading cached classes.
-    */
-  def addToClasspath(classFiles: Traversable[(String, Array[Byte])],
-                     dynamicClasspath: VirtualDirectory): Unit = {
-    val names = classFiles.map(_._1)
-    for((name, bytes) <- classFiles){
-      val output = writeDeep(dynamicClasspath, name.split('.').toList, ".class")
-      output.write(bytes)
-      output.close()
-    }
-  }
 
 }

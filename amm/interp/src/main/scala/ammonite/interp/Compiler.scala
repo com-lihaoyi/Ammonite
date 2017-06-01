@@ -1,6 +1,8 @@
 package ammonite.interp
 
 
+import java.io.OutputStream
+
 import ammonite.runtime.Evaluator
 import ammonite.util.{ImportData, Imports, Printer}
 import ammonite.util.Util.newLine
@@ -42,6 +44,30 @@ trait Compiler{
 
 }
 object Compiler{
+  /**
+    * Writes files to dynamicClasspath. Needed for loading cached classes.
+    */
+  def addToClasspath(classFiles: Traversable[(String, Array[Byte])],
+                     dynamicClasspath: VirtualDirectory): Unit = {
+
+    for((name, bytes) <- classFiles){
+      val output = writeDeep(dynamicClasspath, name.split('.').toList, ".class")
+      output.write(bytes)
+      output.close()
+    }
+
+  }
+
+  def writeDeep(d: VirtualDirectory,
+                path: List[String],
+                suffix: String): OutputStream = path match {
+    case head :: Nil => d.fileNamed(path.head + suffix).output
+    case head :: rest =>
+      writeDeep(
+        d.subdirectoryNamed(head).asInstanceOf[VirtualDirectory],
+        rest, suffix
+      )
+  }
   /**
    * If the Option is None, it means compilation failed
    * Otherwise it's a Traversable of (filename, bytes) tuples
@@ -223,7 +249,7 @@ object Compiler{
 
         val files = for(x <- outputFiles if x.name.endsWith(".class")) yield {
           val segments = x.path.split("/").toList.tail
-          val output = Evaluator.writeDeep(dynamicClasspath, segments, "")
+          val output = writeDeep(dynamicClasspath, segments, "")
           output.write(x.toByteArray)
           output.close()
           (x.path.stripPrefix("(memory)/").stripSuffix(".class").replace('/', '.'), x.toByteArray)
