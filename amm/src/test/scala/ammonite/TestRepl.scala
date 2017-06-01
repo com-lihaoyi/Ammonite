@@ -62,7 +62,7 @@ class TestRepl {
         Seq(("ammonite.repl.ReplBridge", "repl", replApi))
       }
     )
-    i.init()
+
     i
   }catch{ case e: Throwable =>
     println(infoBuffer.mkString)

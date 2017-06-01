@@ -57,14 +57,14 @@ object CachingTests extends TestSuite{
           Defaults.predefString
         )
         interp1.interpApi.load.module(resourcesPath/script)
-        assert(interp1.compiler != null)
+        assert(interp1.compilerManager.compiler != null)
         val interp2 = createTestInterp(
           storage,
           Defaults.predefString
         )
-        assert(interp2.compiler == null)
+        assert(interp2.compilerManager.compiler == null)
         interp2.interpApi.load.module(resourcesPath/script)
-        assert(interp2.compiler == null)
+        assert(interp2.compilerManager.compiler == null)
       }
 
       'testOne - check('scriptLevelCaching/"scriptTwo.sc")
@@ -99,8 +99,10 @@ object CachingTests extends TestSuite{
         )
       }
 
-      assert(interp2.compiler == null &&
-        res.toString == "java.lang.ArithmeticException: / by zero")
+      assert(
+        interp2.compilerManager.compiler == null &&
+        res.toString == "java.lang.ArithmeticException: / by zero"
+      )
     }
 
     'persistence{
@@ -165,7 +167,7 @@ object CachingTests extends TestSuite{
           Defaults.predefString
         )
         interp.interpApi.load.module(scriptFile)
-        assert(f(interp.compiler))
+        assert(f(interp.compilerManager.compiler))
       }
 
       processAndCheckCompiler(_ != null)

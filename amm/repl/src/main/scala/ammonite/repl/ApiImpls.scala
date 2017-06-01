@@ -109,11 +109,9 @@ class ReplApiImpl(val interp: Interpreter,
     printer.out(newLine)
   }
 
-  def search(target: scala.reflect.runtime.universe.Type) = {
-    interp.compiler.search(target)
-  }
-  def compiler = interp.compiler.compiler
-  def newCompiler() = init()
+  def search(target: scala.reflect.runtime.universe.Type) = compilerManager.search(target)
+  def compiler = interp.compilerManager.compiler.compiler
+  def newCompiler() = compilerManager.init(force = true)
   def fullHistory = storage.fullHistory()
   def history = history0
 
@@ -129,12 +127,12 @@ class ReplApiImpl(val interp: Interpreter,
 
     def pop(num: Int = 1) = {
       val res = sess0.pop(num)
-      reInit()
+      compilerManager.reInit()
       res
     }
     def load(name: String = "") = {
       val res = sess0.load(name)
-      reInit()
+      compilerManager.reInit()
       res
     }
   }

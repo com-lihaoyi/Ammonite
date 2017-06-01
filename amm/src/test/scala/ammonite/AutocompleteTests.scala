@@ -14,7 +14,7 @@ object AutocompleteTests extends TestSuite{
       val cursor = caretCode.indexOf("<caret>")
       val buf = caretCode.replace("<caret>", "")
 
-      val (index, completions, signatures) = check.interp.pressy.complete(
+      val (index, completions, signatures) = check.interp.compilerManager.pressy.complete(
         cursor,
         check.interp.eval.frames.head.imports.toString,
         buf
@@ -28,7 +28,7 @@ object AutocompleteTests extends TestSuite{
   def checking[T](f: Completer => T) = {
     val c = new Completer
     val res = f(c)
-    c.check.interp.pressy.shutdownPressy()
+    c.check.interp.compilerManager.pressy.shutdownPressy()
     res
   }
   val tests = TestSuite {

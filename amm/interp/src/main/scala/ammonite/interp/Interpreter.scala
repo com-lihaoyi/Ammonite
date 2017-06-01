@@ -16,7 +16,6 @@ import ammonite.util._
 
 import scala.reflect.io.VirtualDirectory
 
-
 /**
  * A convenient bundle of all the functionality necessary
  * to interpret Scala code. Doesn't attempt to provide any
@@ -45,66 +44,19 @@ class Interpreter(val printer: Printer,
 
   var lastException: Throwable = null
 
-  private var _compilationCount = 0
-  def compilationCount = _compilationCount
 
 
+  def compilationCount = compilerManager.compilationCount
+  val watchedFiles = mutable.Buffer.empty[(Path, Long)]
+  val beforeExitHooks = mutable.Buffer.empty[Any ⇒ Any]
   val mainThread = Thread.currentThread()
   val eval = Evaluator(mainThread.getContextClassLoader, getClass.getClassLoader, 0)
 
-  val dynamicClasspath = new VirtualDirectory("(memory)", None)
-  var compiler: Compiler = null
-  var compilerStale: Boolean = true
-  val onCompilerInit = mutable.Buffer.empty[scala.tools.nsc.Global => Unit]
-  var pressy: Pressy = _
-  val beforeExitHooks = mutable.Buffer.empty[Any ⇒ Any]
-  val watchedFiles = mutable.Buffer.empty[(Path, Long)]
-  def preprocess = {
-    if (compiler == null) init()
-    Preprocessor(compiler.parse)
-  }
-  def evalClassloader = eval.frames.head.classloader
-
-  // We lazily force the compiler to be re-initialized by setting the
-  // compilerStale flag. Otherwise, if we re-initialized the compiler eagerly,
-  // we end up sometimes re-initializing it multiple times unnecessarily before
-  // it gets even used once. Empirically, this cuts down the number of compiler
-  // re-initializations by about 2/3, each of which costs about 30ms and
-  // probably creates a pile of garbage
-  def reInit() = {
-    compilerStale = true
-  }
-
-  def init() = {
-    compilerStale = false
-    // Note we not only make a copy of `settings` to pass to the compiler,
-    // we also make a *separate* copy to pass to the presentation compiler.
-    // Otherwise activating autocomplete makes the presentation compiler mangle
-    // the shared settings and makes the main compiler sad
-    val settings = Option(compiler).fold(new Settings)(_.compiler.settings.copy)
-    compiler = Compiler(
-      Classpath.classpath ++ eval.frames.head.classpath,
-      dynamicClasspath,
-      evalClassloader,
-      eval.frames.head.pluginClassloader,
-      () => pressy.shutdownPressy(),
-      settings
-    )
-
-    onCompilerInit.foreach(_(compiler.compiler))
-
-    pressy = Pressy(
-      Classpath.classpath ++ eval.frames.head.classpath,
-      dynamicClasspath,
-      evalClassloader,
-
-      settings.copy()
-    )
-  }
+  val compilerManager = new CompilerLifecycleManager(eval)
 
   val bridges = extraBridges(this) :+ ("ammonite.interp.InterpBridge", "interp", interpApi)
   for ((name, shortName, bridge) <- bridges ){
-    APIHolder.initBridge(evalClassloader, name, bridge)
+    APIHolder.initBridge(eval.frames.head.classloader, name, bridge)
   }
   // import ammonite.repl.ReplBridge.{value => repl}
   // import ammonite.runtime.InterpBridge.{value => interp}
@@ -183,10 +135,6 @@ class Interpreter(val printer: Printer,
     }
   }
 
-  reInit()
-
-
-
   def resolveSingleImportHook(source: CodeSource, tree: ImportTree) = {
     val strippedPrefix = tree.prefix.takeWhile(_(0) == '$').map(_.stripPrefix("$"))
     val hookOpt = importHooks().collectFirst{case (k, v) if strippedPrefix.startsWith(k) => (k, v)}
@@ -215,13 +163,12 @@ class Interpreter(val printer: Printer,
           }
         case res: ImportHook.Result.ClassPath =>
 
-          if (res.plugin) handlePluginClasspath(res.file.toIO)
-          else handleEvalClasspath(res.file.toIO)
+          if (res.plugin) compilerManager.handlePluginClasspath(res.file.toIO)
+          else compilerManager.handleEvalClasspath(res.file.toIO)
 
           Res.Success(Imports())
       }
     } yield {
-      reInit()
       hookResults
     }
   }
@@ -271,7 +218,7 @@ class Interpreter(val printer: Printer,
         stmts
       )
 
-      processed <- preprocess.transform(
+      processed <- compilerManager.preprocess.transform(
         hookStmts,
         eval.getCurrentLine,
         "",
@@ -293,7 +240,7 @@ class Interpreter(val printer: Printer,
   def withContextClassloader[T](t: => T) = {
     val oldClassloader = Thread.currentThread().getContextClassLoader
     try{
-      Thread.currentThread().setContextClassLoader(evalClassloader)
+      Thread.currentThread().setContextClassLoader(eval.frames.head.classloader)
       t
     } finally {
       Thread.currentThread().setContextClassLoader(oldClassloader)
@@ -301,23 +248,6 @@ class Interpreter(val printer: Printer,
   }
 
 
-  def compileClass(processed: Preprocessor.Output,
-                   printer: Printer,
-                   fileName: String): Res[(Util.ClassFiles, Imports)] = {
-    init()
-    for {
-      compiled <- Res.Success{
-        compiler.compile(processed.code.getBytes, printer, processed.prefixCharLength, fileName)
-      }
-      _ = _compilationCount += 1
-      (classfiles, imports) <- Res[(Util.ClassFiles, Imports)](
-        compiled,
-        "Compilation Failed"
-      )
-    } yield {
-      (classfiles, imports)
-    }
-  }
 
 
   def evaluateLine(processed: Preprocessor.Output,
@@ -326,7 +256,7 @@ class Interpreter(val printer: Printer,
                    indexedWrapperName: Name): Res[(Evaluated, Tag)] = {
     for{
       _ <- Catching{ case e: ThreadDeath => Evaluator.interrupted(e) }
-      (classFiles, newImports) <- compileClass(
+      (classFiles, newImports) <- compilerManager.compileClass(
         processed,
         printer,
         fileName
@@ -357,7 +287,7 @@ class Interpreter(val printer: Printer,
     )
 
     for {
-      (classFiles, newImports) <- compileClass(
+      (classFiles, newImports) <- compilerManager.compileClass(
         processed, printer, codeSource.printablePath
       )
       cls <- eval.loadClass(fullyQualifiedName, classFiles)
@@ -429,33 +359,31 @@ class Interpreter(val printer: Printer,
   }
 
 
-  def processExec(code: String): Res[Imports] = {
-    init()
-    for {
-      blocks <- Preprocessor.splitScript(Interpreter.skipSheBangLine(code))
-      processedData <- processCorrectScript(
-        blocks.map(_ => None),
-        Res.Success(blocks),
-        eval.frames.head.imports,
-        CodeSource(
-          Name("cmd" + eval.getCurrentLine),
-          Seq(),
-          Seq(Name("$sess")),
-          Some(wd/"<console>")
-        ),
-        { (processed, indexedWrapperName) =>
-          evaluateLine(
-            processed,
-            printer,
-            s"Exec.sc",
-            indexedWrapperName
-          )
-        },
-        autoImport = true,
-        ""
-      )
-    } yield processedData.blockInfo.last.finalImports
-  }
+  def processExec(code: String): Res[Imports] = for {
+    blocks <- Preprocessor.splitScript(Interpreter.skipSheBangLine(code))
+    processedData <- processCorrectScript(
+      blocks.map(_ => None),
+      Res.Success(blocks),
+      eval.frames.head.imports,
+      CodeSource(
+        Name("cmd" + eval.getCurrentLine),
+        Seq(),
+        Seq(Name("$sess")),
+        Some(wd/"<console>")
+      ),
+      { (processed, indexedWrapperName) =>
+        evaluateLine(
+          processed,
+          printer,
+          s"Exec.sc",
+          indexedWrapperName
+        )
+      },
+      autoImport = true,
+      ""
+    )
+  } yield processedData.blockInfo.last.finalImports
+
 
 
 
@@ -527,7 +455,7 @@ class Interpreter(val printer: Printer,
           val printSuffix = if (wrapperIndex == 1) "" else  " #" + wrapperIndex
           printer.info("Compiling " + codeSource.printablePath + printSuffix)
           for{
-            processed <- preprocess.transform(
+            processed <- compilerManager.preprocess.transform(
               hookInfo.stmts,
               "",
               leadingSpaces,
@@ -562,8 +490,8 @@ class Interpreter(val printer: Printer,
             if (envHash != blockMetadata.id.tag.env) {
               compileRunBlock(blockMetadata.leadingSpaces, blockMetadata.hookInfo)
             } else{
-              Compiler.addToClasspath(classFiles, dynamicClasspath)
-              reInit()
+              compilerManager.addToClasspath(classFiles)
+
               val cls = eval.loadClass(blockMetadata.id.wrapperPath, classFiles)
               val evaluated = withContextClassloader {
                 try cls.map(eval.evalMain(_))
@@ -612,7 +540,7 @@ class Interpreter(val printer: Printer,
   def handleOutput(res: Res[Evaluated]): Unit = {
     res match{
       case Res.Skip => // do nothing
-      case Res.Exit(value) => pressy.shutdownPressy()
+      case Res.Exit(value) => compilerManager.shutdownPressy()
       case Res.Success(ev) => eval.update(ev.imports)
       case Res.Failure(ex, msg) => lastException = ex.getOrElse(lastException)
       case Res.Exception(ex, msg) => lastException = ex
@@ -662,14 +590,6 @@ class Interpreter(val printer: Printer,
     }
   }
 
-  def handleEvalClasspath(jar: File) = {
-    eval.frames.head.addClasspath(Seq(jar))
-    evalClassloader.add(jar.toURI.toURL)
-    reInit()
-  }
-  def handlePluginClasspath(jar: File) = {
-    eval.frames.head.pluginClassloader.add(jar.toURI.toURL)
-  }
   lazy val interpApi: InterpAPI = new InterpAPI{ outer =>
 
     def watch(p: Path) = {
@@ -677,10 +597,7 @@ class Interpreter(val printer: Printer,
     }
 
     def configureCompiler(callback: scala.tools.nsc.Global => Unit) = {
-      interp.onCompilerInit.append(callback)
-      if (compiler != null){
-        callback(compiler.compiler)
-      }
+      compilerManager.configureCompiler(callback)
     }
 
     val beforeExitHooks = interp.beforeExitHooks
@@ -689,7 +606,7 @@ class Interpreter(val printer: Printer,
 
     object load extends DefaultLoadJar with Load {
 
-      def handleClasspath(jar: File) = handleEvalClasspath(jar)
+      def handleClasspath(jar: File) = compilerManager.handleEvalClasspath(jar)
 
       def apply(line: String) = processExec(line) match{
         case Res.Failure(ex, s) => throw new CompilationError(s)
@@ -727,7 +644,7 @@ class Interpreter(val printer: Printer,
       }
 
       object plugin extends DefaultLoadJar {
-        def handleClasspath(jar: File) = handlePluginClasspath(jar)
+        def handleClasspath(jar: File) = compilerManager.handlePluginClasspath(jar)
       }
 
     }

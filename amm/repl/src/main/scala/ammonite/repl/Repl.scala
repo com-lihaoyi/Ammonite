@@ -83,7 +83,7 @@ class Repl(input: InputStream,
       output,
       colors().prompt()(prompt()).render,
       colors(),
-      interp.pressy.complete(_, interp.eval.frames.head.imports.toString, _),
+      interp.compilerManager.pressy.complete(_, interp.eval.frames.head.imports.toString, _),
       storage.fullHistory(),
       addHistory = (code) => if (code != "") {
         storage.fullHistory() = storage.fullHistory() :+ code
@@ -99,7 +99,6 @@ class Repl(input: InputStream,
 
   def run(): Any = {
     welcomeBanner.foreach(printStream.println)
-    interp.init()
     @tailrec def loop(): Any = {
       val actionResult = action()
       remoteLogger.foreach(_.apply("Action"))
