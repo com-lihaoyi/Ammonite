@@ -264,41 +264,6 @@ object Preprocessor{
   }
 
 
-  def importBlock(importData: Imports) = {
-    // Group the remaining imports into sliding groups according to their
-    // prefix, while still maintaining their ordering
-    val grouped = mutable.Buffer[mutable.Buffer[ImportData]]()
-    for(data <- importData.value){
-      if (grouped.isEmpty) grouped.append(mutable.Buffer(data))
-      else {
-        val last = grouped.last.last
-
-        // Start a new import if we're importing from somewhere else, or
-        // we're importing the same thing from the same place but aliasing
-        // it to a different name, since you can't import the same thing
-        // twice in a single import statement
-        val startNewImport =
-          last.prefix != data.prefix || grouped.last.exists(_.fromName == data.fromName)
-
-        if (startNewImport) grouped.append(mutable.Buffer(data))
-        else grouped.last.append(data)
-      }
-    }
-    // Stringify everything
-    val out = for(group <- grouped) yield {
-      val printedGroup = for(item <- group) yield{
-        if (item.fromName == item.toName) item.fromName.backticked
-        else s"${item.fromName.backticked} => ${item.toName.backticked}"
-      }
-      val pkgString = Util.encodeScalaSourcePath(group.head.prefix)
-      "import " + pkgString + s".{$newLine  " +
-        printedGroup.mkString(s",$newLine  ") + s"$newLine}$newLine"
-    }
-    val res = out.mkString
-
-
-    res
-  }
 
   def wrapCode(pkgName: Seq[Name],
                indexedWrapperName: Name,
@@ -311,7 +276,7 @@ object Preprocessor{
     //the snippets always use the platform-specific newLine
     val topWrapper = normalizeNewlines(s"""
 package ${Util.encodeScalaSourcePath(pkgName)}
-${importBlock(imports)}
+$imports
 
 object ${indexedWrapperName.backticked}{\n"""
 )

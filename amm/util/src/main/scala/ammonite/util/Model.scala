@@ -7,6 +7,8 @@ package ammonite.util
 
 
 
+import ammonite.util.Util.newLine
+
 import scala.collection.mutable
 import scala.reflect.NameTransformer
 import scala.reflect.runtime.universe.TypeTag
@@ -71,7 +73,38 @@ object ImportData{
   */
 class Imports private (val value: Seq[ImportData]){
   def ++(others: Imports) = Imports(this.value, others.value)
-  override def toString() = s"Imports(${value.toString})"
+  override def toString() = {
+    // Group the remaining imports into sliding groups according to their
+    // prefix, while still maintaining their ordering
+    val grouped = mutable.Buffer[mutable.Buffer[ImportData]]()
+    for(data <- value){
+      if (grouped.isEmpty) grouped.append(mutable.Buffer(data))
+      else {
+        val last = grouped.last.last
+
+        // Start a new import if we're importing from somewhere else, or
+        // we're importing the same thing from the same place but aliasing
+        // it to a different name, since you can't import the same thing
+        // twice in a single import statement
+        val startNewImport =
+        last.prefix != data.prefix || grouped.last.exists(_.fromName == data.fromName)
+
+        if (startNewImport) grouped.append(mutable.Buffer(data))
+        else grouped.last.append(data)
+      }
+    }
+    // Stringify everything
+    val out = for(group <- grouped) yield {
+      val printedGroup = for(item <- group) yield{
+        if (item.fromName == item.toName) item.fromName.backticked
+        else s"${item.fromName.backticked} => ${item.toName.backticked}"
+      }
+      val pkgString = Util.encodeScalaSourcePath(group.head.prefix)
+      "import " + pkgString + s".{$newLine  " +
+        printedGroup.mkString(s",$newLine  ") + s"$newLine}$newLine"
+    }
+    out.mkString
+  }
 }
 
 object Imports{

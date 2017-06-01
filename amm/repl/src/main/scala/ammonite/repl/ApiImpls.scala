@@ -66,7 +66,7 @@ class ReplApiImpl(val interp: Interpreter,
 
   def lastException = interp.lastException
 
-  def imports = Preprocessor.importBlock(eval.frames.head.imports)
+  def imports = eval.frames.head.imports.toString
   val colors = colors0
   val prompt = prompt0
   val frontEnd = frontEnd0

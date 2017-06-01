@@ -16,7 +16,7 @@ object AutocompleteTests extends TestSuite{
 
       val (index, completions, signatures) = check.interp.pressy.complete(
         cursor,
-        Preprocessor.importBlock(check.interp.eval.frames.head.imports),
+        check.interp.eval.frames.head.imports.toString,
         buf
       )
       val left = cmp(completions.toSet)

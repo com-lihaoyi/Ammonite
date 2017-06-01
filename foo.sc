@@ -1,4 +1,4 @@
 import $file.bar
-println("hello")
+println("hello11")
 
 println(bar.x)

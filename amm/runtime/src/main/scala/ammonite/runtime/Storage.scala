@@ -86,7 +86,7 @@ object Storage{
                            perBlockMetadata: Seq[ScriptOutput.BlockMetadata],
                            tag: Tag): Unit = {
 
-      classFilesListcache(filePathPrefix.toString) = (tag, perBlockMetadata.reverse)
+      classFilesListcache(filePathPrefix.toString) = (tag, perBlockMetadata)
     }
 
     def classFilesListLoad(filePathPrefix: RelPath,
@@ -150,7 +150,7 @@ object Storage{
         try {
           write(
             codeCacheDir/classFilesOrder,
-            upickle.default.write((tag, perBlockMetadata.reverse), indent = 4)
+            upickle.default.write((tag, perBlockMetadata), indent = 4)
           )
         } catch {
           case _: FileAlreadyExistsException => // ignore

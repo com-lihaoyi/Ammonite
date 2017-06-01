@@ -513,7 +513,7 @@ class Interpreter(val printer: Printer,
 
         def compileRunBlock(leadingSpaces: String, hookInfo: ImportHookInfo) = {
           init()
-          val printSuffix = if (wrapperIndex == 1) "" else  " block " + wrapperIndex
+          val printSuffix = if (wrapperIndex == 1) "" else  " #" + wrapperIndex
           printer.info("Compiling " + codeSource.printablePath + printSuffix)
           for{
             processed <- Preprocessor(compiler.parse).transform(
@@ -584,8 +584,13 @@ class Interpreter(val printer: Printer,
     }
     // wrapperIndex starts off as 1, so that consecutive wrappers can be named
     // Wrapper, Wrapper2, Wrapper3, Wrapper4, ...
-    try loop(blocks, startingImports, Imports(), wrapperIndex = 1, List())
-    finally scriptImportCallback = outerScriptImportCallback
+    try {
+
+      for(res <- loop(blocks, startingImports, Imports(), wrapperIndex = 1, List()))
+      // We build up `blockInfo` backwards, since it's a `List`, so reverse it
+      // before giving it to the outside world
+      yield ScriptOutput.Metadata(res.blockInfo.reverse)
+    } finally scriptImportCallback = outerScriptImportCallback
   }
 
   def handleOutput(res: Res[Evaluated]): Unit = {
