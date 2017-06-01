@@ -1,4 +1,4 @@
-import $file.bar
+//import $file.bar
 println("hello")
 
-println(bar.x)
+//println(bar.x)

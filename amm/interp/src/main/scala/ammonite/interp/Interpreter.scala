@@ -12,6 +12,7 @@ import fastparse.all._
 
 import annotation.tailrec
 import ammonite.util.ImportTree
+import ammonite.util.Util.ScriptOutput.BlockMetadata
 import ammonite.util.Util._
 import ammonite.util._
 
@@ -188,10 +189,10 @@ class Interpreter(val printer: Printer,
       )
       hookResults <- Res.map(hooked){
         case res: ImportHook.Result.Source =>
-          res.blockInfo.path.foreach(interpApi.watch)
+          res.codeSource.path.foreach(interpApi.watch)
           for{
             processed <- processModule(
-              res.code, res.blockInfo,
+              res.code, res.codeSource,
               autoImport = false, extraCode = "", hardcoded = false
             )
           } yield {
@@ -218,7 +219,7 @@ class Interpreter(val printer: Printer,
   }
 
   def resolveImportHooks(source: CodeSource,
-                         stmts: Seq[String]): Res[(Imports, Seq[String], Seq[ImportTree])] = {
+                         stmts: Seq[String]): Res[ImportHookInfo] = {
       val hookedStmts = mutable.Buffer.empty[String]
       val importTrees = mutable.Buffer.empty[ImportTree]
       for(stmt <- stmts) {
@@ -240,7 +241,11 @@ class Interpreter(val printer: Printer,
       }
 
       for (hookImports <- Res.map(importTrees)(resolveSingleImportHook(source, _)))
-      yield (Imports(hookImports.flatten.flatMap(_.value)), hookedStmts, importTrees)
+      yield ImportHookInfo(
+        Imports(hookImports.flatten.flatMap(_.value)),
+        hookedStmts,
+        importTrees
+      )
     }
 
   def processLine(code: String, stmts: Seq[String], fileName: String): Res[Evaluated] = {
@@ -251,14 +256,14 @@ class Interpreter(val printer: Printer,
         Res.Exception(ex, "Something unexpected went wrong =(")
       }
 
-      (hookImports, normalStmts, _) <- resolveImportHooks(
+      ImportHookInfo(hookImports, hookStmts, _) <- resolveImportHooks(
 
         CodeSource(wrapperName, Seq(), Seq(Name("$file")), Some(wd/"<console>")),
         stmts
       )
 
       processed <- preprocess.transform(
-        normalStmts,
+        hookStmts,
         eval.getCurrentLine,
         "",
         Seq(Name("$sess")),
@@ -267,7 +272,7 @@ class Interpreter(val printer: Printer,
         prints => s"ammonite.repl.ReplBridge.value.Internal.combinePrints($prints)",
         extraCode = ""
       )
-      out <- evaluateLine(
+      (out, tag) <- evaluateLine(
         processed, printer,
         fileName, Name("cmd" + eval.getCurrentLine)
       )
@@ -306,7 +311,7 @@ class Interpreter(val printer: Printer,
   def evaluateLine(processed: Preprocessor.Output,
                    printer: Printer,
                    fileName: String,
-                   indexedWrapperName: Name): Res[Evaluated] = {
+                   indexedWrapperName: Name): Res[(Evaluated, Tag)] = {
 
     for{
       _ <- Catching{ case e: ThreadDeath => Evaluator.interrupted(e) }
@@ -325,7 +330,7 @@ class Interpreter(val printer: Printer,
         )
 
       }
-    } yield res
+    } yield (res, Tag("", ""))
   }
 
 
@@ -343,23 +348,24 @@ class Interpreter(val printer: Printer,
         cls,
         newImports,
         blockInfo.wrapperName,
-        blockInfo.pkgName,
-        tag
+        blockInfo.pkgName
       )
-    } yield res
+    } yield (res, tag)
   }
 
   def cachedCompileBlock(processed: Preprocessor.Output,
                          printer: Printer,
                          blockInfo: CodeSource,
-                         printCode: String): Res[(Class[_], Imports, String)] = {
+                         printCode: String): Res[(Class[_], Imports, Tag)] = {
 
 
     val fullyQualifiedName = blockInfo.jvmPathPrefix
 
-    val tag = Interpreter.cacheTag(
-      processed.code,  eval.frames.head.classloader.classpathHash
+    val tag = Tag(
+      Interpreter.cacheTag(processed.code.getBytes),
+      Interpreter.cacheTag(eval.frames.head.classloader.classpathHash)
     )
+
     val compiled = storage.compileCacheLoad(fullyQualifiedName, tag) match {
       case Some((classFiles, newImports)) =>
 
@@ -389,11 +395,14 @@ class Interpreter(val printer: Printer,
                     extraCode: String,
                     hardcoded: Boolean): Res[ScriptOutput.Metadata] = {
 
-    val tag = Interpreter.cacheTag(
-      code,
-      if (hardcoded) Array.empty[Byte]
-      else eval.frames.head.classloader.classpathHash
+    val tag = Tag(
+      Interpreter.cacheTag(code.getBytes),
+      Interpreter.cacheTag(
+        if (hardcoded) Array.empty[Byte]
+        else eval.frames.head.classloader.classpathHash
+      )
     )
+
 
     val cachedScriptData = storage.classFilesListLoad(blockInfo.filePathPrefix, tag)
 
@@ -473,11 +482,12 @@ class Interpreter(val printer: Printer,
 
   type BlockData = Option[(ClassFiles, ScriptOutput.BlockMetadata)]
 
+
   def processCorrectScript(blocks: Seq[BlockData],
                            splittedScript: => Res[IndexedSeq[(String, Seq[String])]],
                            startingImports: Imports,
-                           blockInfo: CodeSource,
-                           evaluate: (Preprocessor.Output, Name) => Res[Evaluated],
+                           codeSource: CodeSource,
+                           evaluate: (Preprocessor.Output, Name) => Res[(Evaluated, Tag)],
                            autoImport: Boolean,
                            extraCode: String): Res[ScriptOutput.Metadata] = {
 
@@ -530,76 +540,71 @@ class Interpreter(val printer: Printer,
           nestedScriptImports = nestedScriptImports ++ imports
         }
         // pretty printing results is disabled for scripts
-        val indexedWrapperName = Interpreter.indexWrapperName(blockInfo.wrapperName, wrapperIndex)
+        val indexedWrapperName = Interpreter.indexWrapperName(codeSource.wrapperName, wrapperIndex)
 
-        blocks.head match{
+        val envHash = Interpreter.cacheTag(eval.frames.head.classloader.classpathHash)
+        def compileRunBlock() = {
+          init()
+          val printSuffix = if (wrapperIndex == 1) "" else  " block " + wrapperIndex
+          printer.info("Compiling " + codeSource.printablePath + printSuffix)
+          for{
+            allSplittedChunks <- splittedScript
+            (leadingSpaces, stmts) = allSplittedChunks(wrapperIndex - 1)
+            hookInfo <- resolveImportHooks(codeSource, stmts)
+            processed <- Preprocessor(compiler.parse).transform(
+              hookInfo.stmts,
+              "",
+              leadingSpaces,
+              codeSource.pkgName,
+              indexedWrapperName,
+              scriptImports ++ hookInfo.imports,
+              _ => "scala.Iterator[String]()",
+              extraCode = extraCode
+            )
+            (ev, tag) <- evaluate(processed, indexedWrapperName)
+          } yield BlockMetadata(
+            VersionedWrapperId(ev.wrapper.map(_.encoded).mkString("."), tag),
+            hookInfo,
+            ev.imports
+          )
+        }
+        val res = blocks.head match{
+          case None  => compileRunBlock()
           case Some((classFiles, blockMetadata)) =>
+            blockMetadata.hookInfo.trees.foreach(resolveSingleImportHook(codeSource, _))
+            if (envHash != blockMetadata.id.tag.env) compileRunBlock()
+            else{
+              addToClasspath(classFiles, dynamicClasspath)
+              val cls = eval.loadClass(blockMetadata.id.wrapperPath, classFiles)
+              val evaluated =
+                try cls.map(eval.evalMain(_))
+                catch Evaluator.userCodeExceptionHandler
 
-            addToClasspath(classFiles, dynamicClasspath)
-            blockMetadata.importHookTrees.foreach(resolveSingleImportHook(blockInfo, _))
-            val cls = eval.loadClass(blockMetadata.id.wrapperPath, classFiles)
-            val evaluated =
-              try cls.map(eval.evalMain(_))
-              catch Evaluator.userCodeExceptionHandler
-
-            evaluated match{
-              case f: Res.Failing => f
-              case _ =>
-                loop(
-                  blocks.tail,
-                  scriptImports ++ blockMetadata.finalImports,
-                  lastImports,
-                  wrapperIndex + 1,
-                  blockMetadata :: perBlockMetadata
-                )
-
-            }
-
-          case _ =>
-            init()
-            val printSuffix = if (wrapperIndex == 1) "" else  " block " + wrapperIndex
-            printer.info("Compiling " + blockInfo.printablePath + printSuffix)
-            val res = for{
-              allSplittedChunks <- splittedScript
-              (leadingSpaces, stmts) = allSplittedChunks(wrapperIndex - 1)
-              (hookImports, hookStmts, hookImportTrees) <- resolveImportHooks(blockInfo, stmts)
-              processed <- Preprocessor(compiler.parse).transform(
-                hookStmts,
-                "",
-                leadingSpaces,
-                blockInfo.pkgName,
-                indexedWrapperName,
-                scriptImports ++ hookImports,
-                _ => "scala.Iterator[String]()",
-                extraCode = extraCode
-              )
-              ev <- evaluate(processed, indexedWrapperName)
-            } yield (ev, hookImports, hookImportTrees)
-
-            res match {
-              case Res.Success((ev, hookImports, hookImportTrees)) =>
-                val last = hookImports ++ ev.imports ++ nestedScriptImports
-                val newCompiledData = ScriptOutput.BlockMetadata(
-                  VersionedWrapperId(ev.wrapper.map(_.encoded).mkString("."), ev.tag),
-                  hookImportTrees,
-                  last
-                )
-                loop(
-                  blocks.tail,
-                  scriptImports ++ last,
-                  last,
-                  wrapperIndex + 1,
-                  newCompiledData :: perBlockMetadata
-                )
-
-              case r: Res.Failure => r
-              case r: Res.Exception => r
-              case Res.Skip =>
-                loop(blocks.tail, scriptImports, lastImports, wrapperIndex + 1, perBlockMetadata)
-              case _ => ???
+              evaluated.map(_ => blockMetadata)
             }
         }
 
+        res match{
+          case Res.Success(blockMetadata) =>
+            val last =
+              blockMetadata.hookInfo.imports ++
+              blockMetadata.finalImports ++
+              nestedScriptImports
+
+            loop(
+              blocks.tail,
+              scriptImports ++ last,
+              last,
+              wrapperIndex + 1,
+              blockMetadata :: perBlockMetadata
+            )
+
+          case r: Res.Failure => r
+          case r: Res.Exception => r
+          case Res.Skip =>
+            loop(blocks.tail, scriptImports, lastImports, wrapperIndex + 1, perBlockMetadata)
+
+        }
       }
     }
     // wrapperIndex starts off as 1, so that consecutive wrappers can be named
@@ -757,9 +762,8 @@ object Interpreter{
     * Previous commands are hashed in the wrapper names, which are contained
     * in imports, so we don't need to pass them explicitly.
     */
-  def cacheTag(code: String, classpathHash: Array[Byte]): String = {
+  def cacheTag(classpathHash: Array[Byte]): String = {
     val bytes = Util.md5Hash(Iterator(
-      Util.md5Hash(Iterator(code.getBytes)),
       classpathHash
     ))
     bytes.map("%02x".format(_)).mkString

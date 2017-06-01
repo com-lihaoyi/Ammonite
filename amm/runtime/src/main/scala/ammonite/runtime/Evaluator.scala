@@ -34,8 +34,7 @@ trait Evaluator{
   def processScriptBlock(cls: Class[_],
                          newImports: Imports,
                          wrapperName: Name,
-                         pkgName: Seq[Name],
-                         tag: String): Res[Evaluated]
+                         pkgName: Seq[Name]): Res[Evaluated]
 
   def frames: List[Frame]
 
@@ -154,7 +153,7 @@ object Evaluator{
         evaluatorRunPrinter(iter.foreach(printer.out))
 
         // "" Empty string as cache tag of repl code
-        evaluationResult(Seq(Name("$sess"), indexedWrapperName), newImports, "")
+        evaluationResult(Seq(Name("$sess"), indexedWrapperName), newImports)
       }
     }
 
@@ -162,13 +161,12 @@ object Evaluator{
     def processScriptBlock(cls: Class[_],
                            newImports: Imports,
                            wrapperName: Name,
-                           pkgName: Seq[Name],
-                           tag: String) = {
+                           pkgName: Seq[Name]) = {
       for {
         _ <- Catching{userCodeExceptionHandler}
       } yield {
         evalMain(cls)
-        val res = evaluationResult(pkgName :+ wrapperName, newImports, tag)
+        val res = evaluationResult(pkgName :+ wrapperName, newImports)
         res
       }
     }
@@ -178,8 +176,7 @@ object Evaluator{
     }
 
     def evaluationResult(wrapperName: Seq[Name],
-                         imports: Imports,
-                         tag: String) = {
+                         imports: Imports) = {
       Evaluated(
         wrapperName,
         Imports(
@@ -198,8 +195,7 @@ object Evaluator{
 
             id.copy(prefix = rootedPrefix)
           }
-        ),
-        tag
+        )
       )
     }
   }

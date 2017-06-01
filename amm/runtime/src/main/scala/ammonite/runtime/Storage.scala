@@ -2,10 +2,8 @@ package ammonite.runtime
 
 import java.nio.file.FileAlreadyExistsException
 
-
 import ammonite.ops._
-import ammonite.util.ImportTree
-import ammonite.util.{Imports, StableRef}
+import ammonite.util.{ImportTree, Imports, StableRef, Tag}
 import ammonite.util.Util._
 
 import scala.util.Try
@@ -25,28 +23,28 @@ trait Storage{
   def loadSharedPredef: (String, Option[Path])
   val fullHistory: StableRef[History]
   val ivyCache: StableRef[Storage.IvyMap]
-  def compileCacheSave(path: String, tag: String, data: CompileCache): Unit
-  def compileCacheLoad(path: String, tag: String): Option[CompileCache]
+  def compileCacheSave(path: String, tag: Tag, data: CompileCache): Unit
+  def compileCacheLoad(path: String, tag: Tag): Option[CompileCache]
   def classFilesListSave(filePathPrefix: RelPath,
                          perBlockMetadata: Seq[ScriptOutput.BlockMetadata],
-                         tag: String): Unit
-  def classFilesListLoad(filePathPrefix: RelPath, cacheTag: String): Option[ScriptOutput]
+                         tag: Tag): Unit
+  def classFilesListLoad(filePathPrefix: RelPath, cacheTag: Tag): Option[ScriptOutput]
   def getSessionId: Long
 
 }
 
 object Storage{
   type IvyMap = Map[(String, Seq[coursier.Dependency]), Set[String]]
-  private def loadIfTagMatches(loadedTag: String,
-                               cacheTag: String,
+  private def loadIfTagMatches(loadedTag: Tag,
+                               cacheTag: Tag,
                                classFilesList: Seq[ScriptOutput.BlockMetadata],
-                               compileCacheLoad: (String, String) => Option[CompileCache]) = {
+                               compileCacheLoad: (String, Tag) => Option[CompileCache]) = {
     if (loadedTag != cacheTag) None
     else{
       val res = for{
         blockMeta <- classFilesList
         (classFiles, imports) <- compileCacheLoad(
-          blockMeta.id.wrapperPath, blockMeta.id.versionHash
+          blockMeta.id.wrapperPath, blockMeta.id.tag
         )
       } yield classFiles
       Some(ScriptOutput(ScriptOutput.Metadata(classFilesList), res))
@@ -71,14 +69,14 @@ object Storage{
       def update(value: IvyMap): Unit = _ivyCache = value
     }
 
-    var compileCache: mutable.Map[String, (String, CompileCache)] = mutable.Map.empty
+    var compileCache: mutable.Map[String, (Tag, CompileCache)] = mutable.Map.empty
     val classFilesListcache = {
-      mutable.Map.empty[String, (String, Seq[ScriptOutput.BlockMetadata])]
+      mutable.Map.empty[String, (Tag, Seq[ScriptOutput.BlockMetadata])]
     }
-    def compileCacheSave(path: String, tag: String, data: CompileCache): Unit = {
+    def compileCacheSave(path: String, tag: Tag, data: CompileCache): Unit = {
       compileCache(path) = (tag, data)
     }
-    def compileCacheLoad(path: String, tag: String) = {
+    def compileCacheLoad(path: String, tag: Tag) = {
       for {
         (loadedTag, data) <- compileCache.get(path)
         if loadedTag == tag
@@ -87,13 +85,13 @@ object Storage{
 
     def classFilesListSave(filePathPrefix: RelPath,
                            perBlockMetadata: Seq[ScriptOutput.BlockMetadata],
-                           tag: String): Unit = {
+                           tag: Tag): Unit = {
 
       classFilesListcache(filePathPrefix.toString) = (tag, perBlockMetadata.reverse)
     }
 
     def classFilesListLoad(filePathPrefix: RelPath,
-                           cacheTag: String): Option[ScriptOutput] = {
+                           cacheTag: Tag): Option[ScriptOutput] = {
 
       classFilesListcache.get(filePathPrefix.toString) match{
         case None => None
@@ -142,9 +140,9 @@ object Storage{
       }
     }
 
-    def compileCacheSave(path: String, tag: String, data: CompileCache): Unit = {
+    def compileCacheSave(path: String, tag: Tag, data: CompileCache): Unit = {
       val (classFiles, imports) = data
-      val tagCacheDir = compileCacheDir/path.split('.').map(encode)/tag
+      val tagCacheDir = compileCacheDir/path.split('.').map(encode)/tag.combined
 
       if(!exists(tagCacheDir)){
         mkdir(tagCacheDir)
@@ -159,9 +157,9 @@ object Storage{
 
     def classFilesListSave(filePathPrefix: RelPath,
                            perBlockMetadata: Seq[ScriptOutput.BlockMetadata],
-                           tag: String): Unit = {
+                           tag: Tag): Unit = {
 
-      val codeCacheDir = cacheDir/'scriptCaches/filePathPrefix/tag
+      val codeCacheDir = cacheDir/'scriptCaches/filePathPrefix/tag.combined
       if (!exists(codeCacheDir)){
         mkdir(codeCacheDir)
         try {
@@ -186,13 +184,13 @@ object Storage{
     }
 
     def classFilesListLoad(filePathPrefix: RelPath,
-                           cacheTag: String): Option[ScriptOutput] = {
+                           cacheTag: Tag): Option[ScriptOutput] = {
 
-      val codeCacheDir = cacheDir/'scriptCaches/filePathPrefix/cacheTag
+      val codeCacheDir = cacheDir/'scriptCaches/filePathPrefix/cacheTag.combined
       if(!exists(codeCacheDir)) None
       else {
 
-        val metadataJson = readJson[(String, Seq[ScriptOutput.BlockMetadata])](
+        val metadataJson = readJson[(Tag, Seq[ScriptOutput.BlockMetadata])](
           codeCacheDir/classFilesOrder
         )
 
@@ -207,8 +205,8 @@ object Storage{
       }
     }
 
-    def compileCacheLoad(path: String, tag: String): Option[CompileCache] = {
-      val tagCacheDir = compileCacheDir/path.split('.').map(encode)/tag
+    def compileCacheLoad(path: String, tag: Tag): Option[CompileCache] = {
+      val tagCacheDir = compileCacheDir/path.split('.').map(encode)/tag.combined
       if(!exists(tagCacheDir)) None
       else for{
         (loadedTag, metadata) <- readJson[(String, Imports)](tagCacheDir/metadataFile)

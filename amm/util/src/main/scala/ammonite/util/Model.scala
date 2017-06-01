@@ -17,10 +17,18 @@ import scala.reflect.runtime.universe.TypeTag
   */
 class CompilationError(message: String) extends Exception(message)
 
+/**
+  * A unique key for a piece of code that gets run in a particular environment;
+  * contains the hash of the code and the hash of the environment stored
+  * separately, so you can e.g. compare the [[env]] hash even if you don't have
+  * the code available
+  */
+case class Tag(code: String, env: String){
+  def combined = code + env
+}
 
 case class Evaluated(wrapper: Seq[Name],
-                     imports: Imports,
-                     tag: String)
+                     imports: Imports)
 
 /**
   * Represents the importing of a single name in the Ammonite REPL, of the

@@ -57,7 +57,8 @@ object Util{
     * unambiguously look up the correct version of a class, or invalidate and
     * recompile it if the source code or environment changes
     */
-  case class VersionedWrapperId(wrapperPath: String, versionHash: String)
+  case class VersionedWrapperId(wrapperPath: String,
+                                tag: Tag)
 
 
 
@@ -77,10 +78,15 @@ object Util{
       * block without compiling/parsing it
       */
     case class BlockMetadata(id: VersionedWrapperId,
-                             importHookTrees: Seq[ImportTree],
+                             hookInfo: ImportHookInfo,
                              finalImports: Imports)
     case class Metadata(blockInfo: Seq[BlockMetadata])
   }
+
+  case class ImportHookInfo(imports: Imports,
+                            stmts: Seq[String],
+                            trees: Seq[ImportTree])
+
   type CompileCache = (ClassFiles, Imports)
 
   /**
