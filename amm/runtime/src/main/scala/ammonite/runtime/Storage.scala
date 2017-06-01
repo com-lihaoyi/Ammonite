@@ -41,13 +41,12 @@ object Storage{
                                compileCacheLoad: (String, Tag) => Option[CompileCache]) = {
     if (loadedTag != cacheTag) None
     else{
-      val res = for{
-        blockMeta <- classFilesList
-        (classFiles, imports) <- compileCacheLoad(
-          blockMeta.id.wrapperPath, blockMeta.id.tag
-        )
-      } yield classFiles
-      Some(ScriptOutput(ScriptOutput.Metadata(classFilesList), res))
+      val res =
+        for(blockMeta <- classFilesList)
+        yield compileCacheLoad(blockMeta.id.wrapperPath, blockMeta.id.tag)
+
+      if (res.exists(_.isEmpty)) None
+      else Some(ScriptOutput(ScriptOutput.Metadata(classFilesList), res.flatten.map(_._1)))
     }
 
   }
@@ -198,6 +197,7 @@ object Storage{
           case Some(metadata) =>
             val (loadedTag, classFilesList) = metadata
 
+
             loadIfTagMatches(loadedTag, cacheTag, classFilesList, compileCacheLoad)
 
           case _ => None
@@ -209,7 +209,7 @@ object Storage{
       val tagCacheDir = compileCacheDir/path.split('.').map(encode)/tag.combined
       if(!exists(tagCacheDir)) None
       else for{
-        (loadedTag, metadata) <- readJson[(String, Imports)](tagCacheDir/metadataFile)
+        (loadedTag, metadata) <- readJson[(Tag, Imports)](tagCacheDir/metadataFile)
 
         if tag == loadedTag
         classFiles <- loadClassFiles(tagCacheDir)
@@ -281,15 +281,5 @@ object History{
     def apply() = builder
   }
   implicit def toHistory(s: Seq[String]): History = new History(s.toVector)
-
-//  import pprint._
-//  implicit val historyPPrint: pprint.PPrint[History] = pprint.PPrint(
-//    new pprint.PPrinter[History]{
-//      def render0(t: History, c: pprint.Config) = {
-//
-//      }
-//    }
-//  )
-
 }
 
