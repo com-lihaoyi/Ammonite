@@ -35,10 +35,9 @@ trait Evaluator{
                          newImports: Imports,
                          wrapperName: Name,
                          pkgName: Seq[Name]): Res[Evaluated]
-
-  def frames: List[Frame]
-
-  def frames_=(newValue: List[Frame]): Unit
+  def evalClassloader: SpecialClassLoader
+  def pluginClassloader: SpecialClassLoader
+  def imports: Imports
 }
 
 object Evaluator{
@@ -70,10 +69,11 @@ object Evaluator{
     Res.Failure(Some(e), newLine + "Interrupted!")
   }
 
-  def apply(threadContextClassLoader: ClassLoader,
-            objectContextClassLoader: ClassLoader,
-            startingLine: Int): Evaluator = new Evaluator{ eval =>
+  def apply(startingLine: Int, frames: => List[Frame]): Evaluator = new Evaluator{ eval =>
 
+    def evalClassloader = frames.head.classloader
+    def pluginClassloader= frames.head.pluginClassloader
+    def imports = frames.head.imports
 
     /**
      * The current line number of the REPL, used to make sure every snippet
@@ -86,37 +86,6 @@ object Evaluator{
      * https://issues.scala-lang.org/browse/SI-7085
      */
     def getCurrentLine = currentLine.toString.replace("-", "_")
-
-    /**
-     * Performs the conversion of our pre-compiled `Array[Byte]`s into
-     * actual classes with methods we can execute.
-     */
-
-    def initialFrame = {
-      val hash = SpecialClassLoader.initialClasspathSignature(threadContextClassLoader)
-      import ammonite.ops._
-      // *Try* to load the JVM source files and make them available as resources,
-      // so that the `source` helper can navigate to the sources within the
-      // Java standard library
-      val likelyJdkSourceLocation = Path(System.getProperty("java.home"))/up/"src.zip"
-      def special = new SpecialClassLoader(
-        new ForkClassLoader(
-          threadContextClassLoader,
-          getClass.getClassLoader
-        ),
-        hash,
-        likelyJdkSourceLocation.toNIO.toUri.toURL
-      )
-      new Frame(
-        special,
-        special,
-        Imports(),
-        Seq()
-      )
-    }
-    var frames = List(initialFrame)
-
-
 
     def loadClass(fullName: String, classFiles: ClassFiles): Res[Class[_]] = {
       Res[Class[_]](Try {

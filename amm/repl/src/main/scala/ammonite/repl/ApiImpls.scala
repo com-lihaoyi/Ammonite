@@ -1,19 +1,17 @@
 package ammonite.repl
 
-import java.io.File
 
-import ammonite.interp.{Interpreter, Preprocessor}
+import ammonite.interp.Interpreter
 import ammonite.runtime._
-import ammonite.ops.{Path, read}
-import ammonite.runtime.tools.GrepResult
 import ammonite.util.Util._
 import ammonite.util._
 
 import scala.collection.mutable
 
-class SessionApiImpl(eval: Evaluator) extends Session{
+class SessionApiImpl(frames0: StableRef[List[Frame]]) extends Session{
+  def frames = frames0()
   val namedFrames = mutable.Map.empty[String, List[Frame]]
-  def frames = eval.frames
+
   def childFrame(parent: Frame) = new Frame(
     new SpecialClassLoader(
       parent.classloader,
@@ -28,24 +26,24 @@ class SessionApiImpl(eval: Evaluator) extends Session{
   )
 
   def save(name: String = "") = {
-    if (name != "") namedFrames(name) = eval.frames
-    eval.frames = childFrame(frames.head) :: frames
+    if (name != "") namedFrames(name) = frames
+    frames0() = childFrame(frames.head) :: frames
   }
 
   def pop(num: Int = 1) = {
-    var next = eval.frames
+    var next = frames
     for(i <- 0 until num){
       if (next.tail != Nil) next = next.tail
     }
-    val out = SessionChanged.delta(eval.frames.head, next.head)
-    eval.frames = childFrame(next.head) :: next
+    val out = SessionChanged.delta(frames.head, next.head)
+    frames0() = childFrame(next.head) :: next
     out
   }
   
   def load(name: String = "") = {
-    val next = if (name == "") eval.frames.tail else namedFrames(name)
-    val out = SessionChanged.delta(eval.frames.head, next.head)
-    eval.frames = childFrame(next.head) :: next
+    val next = if (name == "") frames.tail else namedFrames(name)
+    val out = SessionChanged.delta(frames.head, next.head)
+    frames0() = childFrame(next.head) :: next
     out
   }
 
@@ -66,7 +64,7 @@ class ReplApiImpl(val interp: Interpreter,
 
   def lastException = interp.lastException
 
-  def imports = eval.frames.head.imports.toString
+  def imports = eval.imports.toString
   val colors = colors0
   val prompt = prompt0
   val frontEnd = frontEnd0
@@ -121,18 +119,16 @@ class ReplApiImpl(val interp: Interpreter,
   def height = height0
 
   object sess extends Session {
-    def frames = eval.frames
+    def frames = frames
     def save(name: String) = sess0.save(name)
     def delete(name: String) = sess0.delete(name)
 
     def pop(num: Int = 1) = {
       val res = sess0.pop(num)
-      compilerManager.reInit()
       res
     }
     def load(name: String = "") = {
       val res = sess0.load(name)
-      compilerManager.reInit()
       res
     }
   }

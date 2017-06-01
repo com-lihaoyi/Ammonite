@@ -58,7 +58,7 @@ class Repl(input: InputStream,
         prompt,
         frontEnd,
         history,
-        new SessionApiImpl(i.eval),
+        new SessionApiImpl(interp.compilerManager.frames),
         replArgs
       )
       Seq(("ammonite.repl.ReplBridge", "repl", replApi))
@@ -83,7 +83,7 @@ class Repl(input: InputStream,
       output,
       colors().prompt()(prompt()).render,
       colors(),
-      interp.compilerManager.pressy.complete(_, interp.eval.frames.head.imports.toString, _),
+      interp.compilerManager.pressy.complete(_, interp.eval.imports.toString, _),
       storage.fullHistory(),
       addHistory = (code) => if (code != "") {
         storage.fullHistory() = storage.fullHistory() :+ code

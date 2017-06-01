@@ -112,7 +112,7 @@ case class Main(predef: String = "",
             Ref(null),
             Ref(null),
             new History(Vector.empty),
-            new SessionApiImpl(i.eval),
+            new SessionApiImpl(i.compilerManager.frames),
             Vector()
           )
           Seq(("ammonite.repl.ReplBridge", "repl", replApi))

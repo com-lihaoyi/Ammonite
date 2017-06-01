@@ -70,9 +70,7 @@ object Scripts {
       routesCls =
         interp
           .eval
-          .frames
-          .head
-          .classloader
+          .evalClassloader
           .loadClass(routeClsName + "$$routes$")
 
       scriptMains =

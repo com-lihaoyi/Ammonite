@@ -4,7 +4,6 @@ import java.io.{File, OutputStream, PrintStream}
 import java.util.regex.Pattern
 
 import scala.collection.mutable
-import scala.tools.nsc.Settings
 import ammonite.ops._
 import ammonite.runtime._
 import fastparse.all._
@@ -13,8 +12,6 @@ import annotation.tailrec
 import ammonite.util.ImportTree
 import ammonite.util.Util._
 import ammonite.util._
-
-import scala.reflect.io.VirtualDirectory
 
 /**
  * A convenient bundle of all the functionality necessary
@@ -38,25 +35,41 @@ class Interpreter(val printer: Printer,
   extends ImportHook.InterpreterInterface{ interp =>
 
 
-
-  //this variable keeps track of where should we put the imports resulting from scripts.
-  private var scriptImportCallback: Imports => Unit = eval.update
-
   var lastException: Throwable = null
 
+  val mainThread = Thread.currentThread()
 
+  val (compilerManager, eval) = {
+    val hash = SpecialClassLoader.initialClasspathSignature(mainThread.getContextClassLoader)
 
+    import ammonite.ops._
+
+    // *Try* to load the JVM source files and make them available as resources,
+    // so that the `source` helper can navigate to the sources within the
+    // Java standard library
+    val likelyJdkSourceLocation = Path(System.getProperty("java.home"))/up/"src.zip"
+    def special = new SpecialClassLoader(
+      new ForkClassLoader(mainThread.getContextClassLoader, getClass.getClassLoader),
+      hash,
+      likelyJdkSourceLocation.toNIO.toUri.toURL
+    )
+
+    val initialFrame = new Frame(special, special, Imports(), Seq())
+
+    val frames = Ref(List(initialFrame))
+
+    (new CompilerLifecycleManager(frames), Evaluator(0, frames()))
+  }
+
+  private var scriptImportCallback: Imports => Unit = eval.update
   def compilationCount = compilerManager.compilationCount
   val watchedFiles = mutable.Buffer.empty[(Path, Long)]
   val beforeExitHooks = mutable.Buffer.empty[Any ⇒ Any]
-  val mainThread = Thread.currentThread()
-  val eval = Evaluator(mainThread.getContextClassLoader, getClass.getClassLoader, 0)
 
-  val compilerManager = new CompilerLifecycleManager(eval)
 
   val bridges = extraBridges(this) :+ ("ammonite.interp.InterpBridge", "interp", interpApi)
   for ((name, shortName, bridge) <- bridges ){
-    APIHolder.initBridge(eval.frames.head.classloader, name, bridge)
+    APIHolder.initBridge(eval.evalClassloader, name, bridge)
   }
   // import ammonite.repl.ReplBridge.{value => repl}
   // import ammonite.runtime.InterpBridge.{value => interp}
@@ -224,7 +237,7 @@ class Interpreter(val printer: Printer,
         "",
         Seq(Name("$sess")),
         wrapperName,
-        predefImports ++ eval.frames.head.imports ++ hookImports,
+        predefImports ++ eval.imports ++ hookImports,
         prints => s"ammonite.repl.ReplBridge.value.Internal.combinePrints($prints)",
         extraCode = ""
       )
@@ -240,7 +253,7 @@ class Interpreter(val printer: Printer,
   def withContextClassloader[T](t: => T) = {
     val oldClassloader = Thread.currentThread().getContextClassLoader
     try{
-      Thread.currentThread().setContextClassLoader(eval.frames.head.classloader)
+      Thread.currentThread().setContextClassLoader(eval.evalClassloader)
       t
     } finally {
       Thread.currentThread().setContextClassLoader(oldClassloader)
@@ -283,7 +296,7 @@ class Interpreter(val printer: Printer,
 
     val tag = Tag(
       Interpreter.cacheTag(processed.code.getBytes),
-      Interpreter.cacheTag(eval.frames.head.classloader.classpathHash)
+      Interpreter.cacheTag(eval.evalClassloader.classpathHash)
     )
 
     for {
@@ -318,7 +331,7 @@ class Interpreter(val printer: Printer,
       Interpreter.cacheTag(code.getBytes),
       Interpreter.cacheTag(
         if (hardcoded) Array.empty[Byte]
-        else eval.frames.head.classloader.classpathHash
+        else eval.evalClassloader.classpathHash
       )
     )
 
@@ -364,7 +377,7 @@ class Interpreter(val printer: Printer,
     processedData <- processCorrectScript(
       blocks.map(_ => None),
       Res.Success(blocks),
-      eval.frames.head.imports,
+      eval.imports,
       CodeSource(
         Name("cmd" + eval.getCurrentLine),
         Seq(),
@@ -486,7 +499,7 @@ class Interpreter(val printer: Printer,
 
           case Some((classFiles, blockMetadata)) =>
             blockMetadata.hookInfo.trees.foreach(resolveSingleImportHook(codeSource, _))
-            val envHash = Interpreter.cacheTag(eval.frames.head.classloader.classpathHash)
+            val envHash = Interpreter.cacheTag(eval.evalClassloader.classpathHash)
             if (envHash != blockMetadata.id.tag.env) {
               compileRunBlock(blockMetadata.leadingSpaces, blockMetadata.hookInfo)
             } else{

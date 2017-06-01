@@ -22,7 +22,7 @@ import scala.tools.nsc.Settings
   * compiler objects are initialized, or worry about initializing them more
   * than necessary
   */
-class CompilerLifecycleManager(eval: Evaluator){
+class CompilerLifecycleManager(frames0: Ref[List[Frame]]){
 
 
 
@@ -33,9 +33,30 @@ class CompilerLifecycleManager(eval: Evaluator){
     val onCompilerInit = mutable.Buffer.empty[scala.tools.nsc.Global => Unit]
     var pressy: Pressy = _
     var compilationCount = 0
+    var frames = frames0
+
+    // We lazily force the compiler to be re-initialized by setting the
+    // compilerStale flag. Otherwise, if we re-initialized the compiler eagerly,
+    // we end up sometimes re-initializing it multiple times unnecessarily before
+    // it gets even used once. Empirically, this cuts down the number of compiler
+    // re-initializations by about 2/3, each of which costs about 30ms and
+    // probably creates a pile of garbage
+    def reInit() = {
+      Internal.compilerStale = true
+    }
   }
 
   import Internal._
+
+  val frames = new StableRef[List[Frame]] {
+    def apply() = Internal.frames()
+    def update(t: List[Frame]) = {
+      Internal.frames() = t
+      reInit()
+    }
+  }
+
+
 
   def pressy = Internal.pressy
   def compiler = Internal.compiler
@@ -44,17 +65,8 @@ class CompilerLifecycleManager(eval: Evaluator){
     if (compiler == null) init()
     Preprocessor(compiler.parse)
   }
-  def evalClassloader = eval.frames.head.classloader
+  def evalClassloader = frames().head.classloader
 
-  // We lazily force the compiler to be re-initialized by setting the
-  // compilerStale flag. Otherwise, if we re-initialized the compiler eagerly,
-  // we end up sometimes re-initializing it multiple times unnecessarily before
-  // it gets even used once. Empirically, this cuts down the number of compiler
-  // re-initializations by about 2/3, each of which costs about 30ms and
-  // probably creates a pile of garbage
-  def reInit() = {
-    Internal.compilerStale = true
-  }
 
   def init(force: Boolean = false) = if(Internal.compilerStale || force){
     Internal.compilerStale = false
@@ -64,10 +76,10 @@ class CompilerLifecycleManager(eval: Evaluator){
     // the shared settings and makes the main compiler sad
     val settings = Option(compiler).fold(new Settings)(_.compiler.settings.copy)
     Internal.compiler = Compiler(
-      Classpath.classpath ++ eval.frames.head.classpath,
+      Classpath.classpath ++ frames().head.classpath,
       dynamicClasspath,
       evalClassloader,
-      eval.frames.head.pluginClassloader,
+      frames().head.pluginClassloader,
       () => pressy.shutdownPressy(),
       settings
     )
@@ -75,7 +87,7 @@ class CompilerLifecycleManager(eval: Evaluator){
     onCompilerInit.foreach(_(compiler.compiler))
 
     Internal.pressy = Pressy(
-      Classpath.classpath ++ eval.frames.head.classpath,
+      Classpath.classpath ++ frames().head.classpath,
       dynamicClasspath,
       evalClassloader,
 
@@ -119,12 +131,12 @@ class CompilerLifecycleManager(eval: Evaluator){
   def shutdownPressy() = pressy.shutdownPressy()
 
   def handleEvalClasspath(jar: File) = {
-    eval.frames.head.addClasspath(Seq(jar))
+    frames().head.addClasspath(Seq(jar))
     evalClassloader.add(jar.toURI.toURL)
     reInit()
   }
   def handlePluginClasspath(jar: File) = {
-    eval.frames.head.pluginClassloader.add(jar.toURI.toURL)
+    frames().head.pluginClassloader.add(jar.toURI.toURL)
   }
 }
 

@@ -55,7 +55,7 @@ class TestRepl {
           "@",
           Ref(null),
           new History(Vector()),
-          new SessionApiImpl(i.eval),
+          new SessionApiImpl(i.compilerManager.frames),
           Vector()
         )
 
