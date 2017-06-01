@@ -215,16 +215,21 @@ object CachingTests extends TestSuite{
       val storageFolder = tmp.dir()
 
       val storage = new Storage.Folder(storageFolder)
-      def runDownstream(f: ammonite.interp.Compiler => Boolean) = {
+      def runDownstream(expectedCount: Int) = {
         val interp = createTestInterp(storage)
         ammonite.main.Scripts.runScript(downstream / up, downstream, interp, Nil)
 
-        assert(f(interp.compiler))
+        val count = interp.compilationCount
+        assert(count == expectedCount)
       }
 
-      runDownstream(_ != null)
-      runDownstream(_ == null)
+      // Upstream, downstream, and hardcoded predef
+      runDownstream(3)
+      runDownstream(0)
+      runDownstream(0)
 
+      // Make sure when we change the upstream code, the downstream sscript
+      // recompiles too
       ammonite.ops.write.over(
         upstream,
         """println("barr")
@@ -233,8 +238,24 @@ object CachingTests extends TestSuite{
         """.stripMargin
       )
 
-      runDownstream(_ != null)
-      runDownstream(_ == null)
+      runDownstream(2)
+      runDownstream(0)
+      runDownstream(0)
+
+      // But if we change the downstream code, the upstream does *not* recompile
+      ammonite.ops.write.over(
+        downstream,
+        s"""import $$file.$upstreamBackticked
+           |println("hello")
+           |
+          |println($upstreamBackticked.x)
+        """.stripMargin
+      )
+
+
+      runDownstream(1)
+      runDownstream(0)
+      runDownstream(0)
     }
   }
 }

@@ -66,30 +66,6 @@ object Util{
   type ClassFiles = Vector[(String, Array[Byte])]
 
 
-
-  /**
-    * The serialized output of running a script, including both metadata and the classfile binaries
-    */
-  case class ScriptOutput(processed: ScriptOutput.Metadata, classFiles: Seq[ClassFiles])
-  object ScriptOutput{
-    /**
-      * Metadata extracted from the compilation of a single block, without the classfiles
-      * but with enough information to fetch the classfiles form disk and evaluate the
-      * block without compiling/parsing it
-      */
-    case class BlockMetadata(id: VersionedWrapperId,
-                             leadingSpaces: String,
-                             hookInfo: ImportHookInfo,
-                             finalImports: Imports)
-    case class Metadata(blockInfo: Seq[BlockMetadata])
-  }
-
-  case class ImportHookInfo(imports: Imports,
-                            stmts: Seq[String],
-                            trees: Seq[ImportTree])
-
-  type CompileCache = (ClassFiles, Imports)
-
   /**
     * Information about where a particular block of code came from; [[path]]
     * is optional because some code snippets are synthetic, which means any

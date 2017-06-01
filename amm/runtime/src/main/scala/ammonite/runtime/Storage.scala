@@ -3,7 +3,7 @@ package ammonite.runtime
 import java.nio.file.FileAlreadyExistsException
 
 import ammonite.ops._
-import ammonite.util.{ImportTree, Imports, StableRef, Tag}
+import ammonite.util._
 import ammonite.util.Util._
 
 import scala.util.Try
@@ -23,8 +23,8 @@ trait Storage{
   def loadSharedPredef: (String, Option[Path])
   val fullHistory: StableRef[History]
   val ivyCache: StableRef[Storage.IvyMap]
-  def compileCacheSave(path: String, tag: Tag, data: CompileCache): Unit
-  def compileCacheLoad(path: String, tag: Tag): Option[CompileCache]
+  def compileCacheSave(path: String, tag: Tag, data: Storage.CompileCache): Unit
+  def compileCacheLoad(path: String, tag: Tag): Option[Storage.CompileCache]
   def classFilesListSave(filePathPrefix: RelPath,
                          perBlockMetadata: Seq[ScriptOutput.BlockMetadata],
                          tag: Tag): Unit
@@ -34,6 +34,7 @@ trait Storage{
 }
 
 object Storage{
+  type CompileCache = (ClassFiles, Imports)
   type IvyMap = Map[(String, Seq[coursier.Dependency]), Set[String]]
   private def loadIfTagMatches(loadedTag: Tag,
                                cacheTag: Tag,

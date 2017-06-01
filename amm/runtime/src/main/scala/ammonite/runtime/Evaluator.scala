@@ -5,7 +5,7 @@ import java.lang.reflect.InvocationTargetException
 
 
 import ammonite._
-import util.Util.{ClassFiles, ScriptOutput, VersionedWrapperId, newLine}
+import util.Util.{ClassFiles, VersionedWrapperId, newLine}
 import ammonite.util._
 
 import scala.reflect.io.VirtualDirectory

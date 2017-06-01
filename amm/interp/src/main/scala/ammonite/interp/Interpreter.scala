@@ -12,7 +12,6 @@ import fastparse.all._
 
 import annotation.tailrec
 import ammonite.util.ImportTree
-import ammonite.util.Util.ScriptOutput.BlockMetadata
 import ammonite.util.Util._
 import ammonite.util._
 
@@ -351,12 +350,14 @@ class Interpreter(val printer: Printer,
       )
       cls <- eval.loadClass(fullyQualifiedName, classFiles)
 
-      res <- eval.processScriptBlock(
-        cls,
-        newImports,
-        codeSource.wrapperName,
-        codeSource.pkgName
-      )
+      res <- withContextClassloader{
+        eval.processScriptBlock(
+          cls,
+          newImports,
+          codeSource.wrapperName,
+          codeSource.pkgName
+        )
+      }
     } yield {
       storage.compileCacheSave(fullyQualifiedName, tag, (classFiles, newImports))
 
@@ -530,7 +531,7 @@ class Interpreter(val printer: Printer,
               extraCode = extraCode
             )
             (ev, tag) <- evaluate(processed, indexedWrapperName)
-          } yield BlockMetadata(
+          } yield ScriptOutput.BlockMetadata(
             VersionedWrapperId(ev.wrapper.map(_.encoded).mkString("."), tag),
             leadingSpaces,
             hookInfo,
