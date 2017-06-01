@@ -557,9 +557,10 @@ class Interpreter(val printer: Printer,
             } else{
               addToClasspath(classFiles, dynamicClasspath)
               val cls = eval.loadClass(blockMetadata.id.wrapperPath, classFiles)
-              val evaluated =
+              val evaluated = withContextClassloader {
                 try cls.map(eval.evalMain(_))
                 catch Evaluator.userCodeExceptionHandler
+              }
 
               evaluated.map(_ => blockMetadata)
             }

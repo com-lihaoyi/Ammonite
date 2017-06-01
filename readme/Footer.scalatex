@@ -114,10 +114,28 @@
 
 
   @sect{Changelog}
+    @sect{0.9.6}
+      @ul
+        @li
+          Fixed an issue where down-stream scripts would not properly recompile
+          when the scripts they import changed
+
+        @li
+          @code{Path(...)} no longer automatically expands @code{~} to your home
+          directory, for consistency with other filesystem APIs. Use
+          @code{Path.expandUser} to do so manually.
+
+        @li
+          Add the @code{-w}/@code{--watch} flag, which lets you run a script
+          repeatedly every time you change its codes, via @code{amm foo.sc -w --}.
+          This is useful when you are actively working on the script and greatly
+          reduces the iteration time
+
     @sect{0.9.5}
       @ul
         @li
           Fix scalac/classpath errors when loading typelevel/cats @issue(617)
+
     @sect{0.9.4}
       @ul
         @li
