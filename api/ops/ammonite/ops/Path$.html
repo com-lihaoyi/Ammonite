@@ -182,10 +182,10 @@ applying a function with two arguments
                       </li><li class="current-entities indented2">
                         <a class="object" href="FilePath$.html" title=""></a>
                         <a class="trait" href="FilePath.html" title="Represents a value that is either an absolute Path or a
-relative ResourcePath, and can be constructed from
+relative RelPath, and can be constructed from
 "></a>
                         <a href="FilePath.html" title="Represents a value that is either an absolute Path or a
-relative ResourcePath, and can be constructed from
+relative RelPath, and can be constructed from
 ">
                           FilePath
                         </a>
@@ -270,20 +270,16 @@ experience
                           Path
                         </a>
                       </li><li class="current-entities indented2">
+                        <a class="object" href="PathConvertible$.html" title=""></a>
+                        <a class="trait" href="PathConvertible.html" title=""></a>
+                        <a href="PathConvertible.html" title="">
+                          PathConvertible
+                        </a>
+                      </li><li class="current-entities indented2">
                         <span class="separator"></span>
                         <a class="object" href="PathError$.html" title=""></a>
                         <a href="PathError$.html" title="">
                           PathError
-                        </a>
-                      </li><li class="current-entities indented2">
-                        <span class="separator"></span>
-                        <a class="trait" href="PathFactory.html" title="Enforces a standard interface for constructing BasePath-like things
-from java types of various sorts
-"></a>
-                        <a href="PathFactory.html" title="Enforces a standard interface for constructing BasePath-like things
-from java types of various sorts
-">
-                          PathFactory
                         </a>
                       </li><li class="current-entities indented2">
                         <a class="object" href="PermSet$.html" title=""></a>
@@ -508,7 +504,7 @@ java.io.File.deleteOnExit.">
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <span class="name">Path</span><span class="result"> extends <a href="PathFactory.html" class="extype" name="ammonite.ops.PathFactory">PathFactory</a>[<a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>] with <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+        <span class="name">Path</span><span class="result"> extends <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
       </span>
       </h4>
 
@@ -517,7 +513,7 @@ java.io.File.deleteOnExit.">
           <span class="toggle">
             Linear Supertypes
           </span>
-          <div class="superTypes hiddenContent"><a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Serializable" class="extype" target="_top">Serializable</a>, <span class="extype" name="java.io.Serializable">Serializable</span>, <a href="PathFactory.html" class="extype" name="ammonite.ops.PathFactory">PathFactory</a>[<a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>], (<span class="extype" name="scala.Predef.String">String</span>) ⇒ <a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Any" class="extype" target="_top">Any</a></div>
+          <div class="superTypes hiddenContent"><a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Serializable" class="extype" target="_top">Serializable</a>, <span class="extype" name="java.io.Serializable">Serializable</span>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Any" class="extype" target="_top">Any</a></div>
         </div></div>
         
 
@@ -543,7 +539,7 @@ java.io.File.deleteOnExit.">
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="ammonite.ops.Path"><span>Path</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="ammonite.ops.PathFactory"><span>PathFactory</span></li><li class="in" name="scala.Function1"><span>Function1</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="ammonite.ops.Path"><span>Path</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -618,45 +614,10 @@ java.io.File.deleteOnExit.">
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="scala.Function1#andThen" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="andThen[A](g:R=&gt;A):T1=&gt;A"></a><a id="andThen[A]((Path)⇒A):(String)⇒A"></a>
-      <span class="permalink">
-      <a href="../../ammonite/ops/Path$.html#andThen[A](g:R=&gt;A):T1=&gt;A" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">andThen</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="g">g: (<a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>) ⇒ <span class="extype" name="scala.Function1.andThen.A">A</span></span>)</span><span class="result">: (<span class="extype" name="scala.Predef.String">String</span>) ⇒ <span class="extype" name="scala.Function1.andThen.A">A</span></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Function1</dd><dt>Annotations</dt><dd>
-                <span class="name">@unspecialized</span><span class="args">()</span>
-              
-        </dd></dl></div>
-    </li><li name="ammonite.ops.Path#apply" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="apply(f:java.nio.file.Path):ammonite.ops.Path"></a><a id="apply(java.nio.file.Path):Path"></a>
-      <span class="permalink">
-      <a href="../../ammonite/ops/Path$.html#apply(f:java.nio.file.Path):ammonite.ops.Path" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">apply</span><span class="params">(<span name="f">f: <span class="extype" name="java.nio.file.Path">java.nio.file.Path</span></span>)</span><span class="result">: <a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="ammonite.ops.Path">Path</a> → <a href="PathFactory.html" class="extype" name="ammonite.ops.PathFactory">PathFactory</a></dd></dl></div>
     </li><li name="ammonite.ops.Path#apply" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="apply(f:java.nio.file.Path,base:ammonite.ops.Path):ammonite.ops.Path"></a><a id="apply(java.nio.file.Path,Path):Path"></a>
+      <a id="apply[T](f0:T)(implicitevidence$6:ammonite.ops.PathConvertible[T]):ammonite.ops.Path"></a><a id="apply[T](T)(PathConvertible[T]):Path"></a>
       <span class="permalink">
-      <a href="../../ammonite/ops/Path$.html#apply(f:java.nio.file.Path,base:ammonite.ops.Path):ammonite.ops.Path" title="Permalink">
+      <a href="../../ammonite/ops/Path$.html#apply[T](f0:T)(implicitevidence$6:ammonite.ops.PathConvertible[T]):ammonite.ops.Path" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -665,14 +626,14 @@ java.io.File.deleteOnExit.">
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">apply</span><span class="params">(<span name="f">f: <span class="extype" name="java.nio.file.Path">java.nio.file.Path</span></span>, <span name="base">base: <a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a></span>)</span><span class="result">: <a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a></span>
+        <span class="name">apply</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="f0">f0: <span class="extype" name="ammonite.ops.Path.apply.T">T</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="PathConvertible.html" class="extype" name="ammonite.ops.PathConvertible">PathConvertible</a>[<span class="extype" name="ammonite.ops.Path.apply.T">T</span>]</span>)</span><span class="result">: <a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a></span>
       </span>
       
       
     </li><li name="ammonite.ops.Path#apply" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="apply(s:String,base:ammonite.ops.Path):ammonite.ops.Path"></a><a id="apply(String,Path):Path"></a>
+      <a id="apply[T](f:T,base:ammonite.ops.Path)(implicitevidence$5:ammonite.ops.PathConvertible[T]):ammonite.ops.Path"></a><a id="apply[T](T,Path)(PathConvertible[T]):Path"></a>
       <span class="permalink">
-      <a href="../../ammonite/ops/Path$.html#apply(s:String,base:ammonite.ops.Path):ammonite.ops.Path" title="Permalink">
+      <a href="../../ammonite/ops/Path$.html#apply[T](f:T,base:ammonite.ops.Path)(implicitevidence$5:ammonite.ops.PathConvertible[T]):ammonite.ops.Path" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -681,23 +642,7 @@ java.io.File.deleteOnExit.">
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">apply</span><span class="params">(<span name="s">s: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="base">base: <a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a></span>)</span><span class="result">: <a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a></span>
-      </span>
-      
-      
-    </li><li name="ammonite.ops.Path#apply" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="apply(f:java.io.File,base:ammonite.ops.Path):ammonite.ops.Path"></a><a id="apply(File,Path):Path"></a>
-      <span class="permalink">
-      <a href="../../ammonite/ops/Path$.html#apply(f:java.io.File,base:ammonite.ops.Path):ammonite.ops.Path" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">apply</span><span class="params">(<span name="f">f: <span class="extype" name="java.io.File">File</span></span>, <span name="base">base: <a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a></span>)</span><span class="result">: <a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a></span>
+        <span class="name">apply</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="f">f: <span class="extype" name="ammonite.ops.Path.apply.T">T</span></span>, <span name="base">base: <a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="PathConvertible.html" class="extype" name="ammonite.ops.PathConvertible">PathConvertible</a>[<span class="extype" name="ammonite.ops.Path.apply.T">T</span>]</span>)</span><span class="result">: <a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a></span>
       </span>
       
       
@@ -717,38 +662,6 @@ java.io.File.deleteOnExit.">
       </span>
       
       
-    </li><li name="ammonite.ops.PathFactory#apply" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="apply(s:String):PathType"></a><a id="apply(String):Path"></a>
-      <span class="permalink">
-      <a href="../../ammonite/ops/Path$.html#apply(s:String):PathType" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">apply</span><span class="params">(<span name="s">s: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="PathFactory.html" class="extype" name="ammonite.ops.PathFactory">PathFactory</a> → Function1</dd></dl></div>
-    </li><li name="ammonite.ops.PathFactory#apply" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="apply(f:java.io.File):PathType"></a><a id="apply(File):Path"></a>
-      <span class="permalink">
-      <a href="../../ammonite/ops/Path$.html#apply(f:java.io.File):PathType" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">apply</span><span class="params">(<span name="f">f: <span class="extype" name="java.io.File">File</span></span>)</span><span class="result">: <a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="PathFactory.html" class="extype" name="ammonite.ops.PathFactory">PathFactory</a></dd></dl></div>
     </li><li name="scala.Any#asInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <span class="permalink">
@@ -787,25 +700,6 @@ java.io.File.deleteOnExit.">
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="scala.Function1#compose" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="compose[A](g:A=&gt;T1):A=&gt;R"></a><a id="compose[A]((A)⇒String):(A)⇒Path"></a>
-      <span class="permalink">
-      <a href="../../ammonite/ops/Path$.html#compose[A](g:A=&gt;T1):A=&gt;R" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">compose</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="g">g: (<span class="extype" name="scala.Function1.compose.A">A</span>) ⇒ <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: (<span class="extype" name="scala.Function1.compose.A">A</span>) ⇒ <a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Function1</dd><dt>Annotations</dt><dd>
-                <span class="name">@unspecialized</span><span class="args">()</span>
-              
-        </dd></dl></div>
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">
@@ -838,6 +732,38 @@ java.io.File.deleteOnExit.">
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="ammonite.ops.Path#expandUser" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="expandUser[T](f0:T,base:ammonite.ops.Path)(implicitevidence$4:ammonite.ops.PathConvertible[T]):ammonite.ops.Path"></a><a id="expandUser[T](T,Path)(PathConvertible[T]):Path"></a>
+      <span class="permalink">
+      <a href="../../ammonite/ops/Path$.html#expandUser[T](f0:T,base:ammonite.ops.Path)(implicitevidence$4:ammonite.ops.PathConvertible[T]):ammonite.ops.Path" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">expandUser</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="f0">f0: <span class="extype" name="ammonite.ops.Path.expandUser.T">T</span></span>, <span name="base">base: <a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="PathConvertible.html" class="extype" name="ammonite.ops.PathConvertible">PathConvertible</a>[<span class="extype" name="ammonite.ops.Path.expandUser.T">T</span>]</span>)</span><span class="result">: <a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a></span>
+      </span>
+      
+      
+    </li><li name="ammonite.ops.Path#expandUser" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="expandUser[T](f0:T)(implicitevidence$3:ammonite.ops.PathConvertible[T]):ammonite.ops.Path"></a><a id="expandUser[T](T)(PathConvertible[T]):Path"></a>
+      <span class="permalink">
+      <a href="../../ammonite/ops/Path$.html#expandUser[T](f0:T)(implicitevidence$3:ammonite.ops.PathConvertible[T]):ammonite.ops.Path" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">expandUser</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="f0">f0: <span class="extype" name="ammonite.ops.Path.expandUser.T">T</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="PathConvertible.html" class="extype" name="ammonite.ops.PathConvertible">PathConvertible</a>[<span class="extype" name="ammonite.ops.Path.expandUser.T">T</span>]</span>)</span><span class="result">: <a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a></span>
+      </span>
+      
+      
     </li><li name="scala.AnyRef#finalize" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
       <span class="permalink">
@@ -1020,7 +946,7 @@ java.io.File.deleteOnExit.">
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="scala.Function1#toString" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+    </li><li name="scala.AnyRef#toString" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="toString():String"></a>
       <span class="permalink">
       <a href="../../ammonite/ops/Path$.html#toString():String" title="Permalink">
@@ -1035,7 +961,7 @@ java.io.File.deleteOnExit.">
         <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
       </span>
       
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Function1 → AnyRef → Any</dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <span class="permalink">
@@ -1116,10 +1042,6 @@ java.io.File.deleteOnExit.">
               <h3>Inherited from <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></h3>
             </div><div class="parent" name="java.io.Serializable">
               <h3>Inherited from <span class="extype" name="java.io.Serializable">Serializable</span></h3>
-            </div><div class="parent" name="ammonite.ops.PathFactory">
-              <h3>Inherited from <a href="PathFactory.html" class="extype" name="ammonite.ops.PathFactory">PathFactory</a>[<a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>]</h3>
-            </div><div class="parent" name="scala.Function1">
-              <h3>Inherited from (<span class="extype" name="scala.Predef.String">String</span>) ⇒ <a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a></h3>
             </div><div class="parent" name="scala.AnyRef">
               <h3>Inherited from <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></h3>
             </div><div class="parent" name="scala.Any">

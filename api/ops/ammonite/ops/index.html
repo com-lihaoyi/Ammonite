@@ -180,10 +180,10 @@ applying a function with two arguments
                       </li><li class="current-entities indented2">
                         <a class="object" href="FilePath$.html" title=""></a>
                         <a class="trait" href="FilePath.html" title="Represents a value that is either an absolute Path or a
-relative ResourcePath, and can be constructed from
+relative RelPath, and can be constructed from
 "></a>
                         <a href="FilePath.html" title="Represents a value that is either an absolute Path or a
-relative ResourcePath, and can be constructed from
+relative RelPath, and can be constructed from
 ">
                           FilePath
                         </a>
@@ -268,20 +268,16 @@ experience
                           Path
                         </a>
                       </li><li class="current-entities indented2">
+                        <a class="object" href="PathConvertible$.html" title=""></a>
+                        <a class="trait" href="PathConvertible.html" title=""></a>
+                        <a href="PathConvertible.html" title="">
+                          PathConvertible
+                        </a>
+                      </li><li class="current-entities indented2">
                         <span class="separator"></span>
                         <a class="object" href="PathError$.html" title=""></a>
                         <a href="PathError$.html" title="">
                           PathError
-                        </a>
-                      </li><li class="current-entities indented2">
-                        <span class="separator"></span>
-                        <a class="trait" href="PathFactory.html" title="Enforces a standard interface for constructing BasePath-like things
-from java types of various sorts
-"></a>
-                        <a href="PathFactory.html" title="Enforces a standard interface for constructing BasePath-like things
-from java types of various sorts
-">
-                          PathFactory
                         </a>
                       </li><li class="current-entities indented2">
                         <a class="object" href="PermSet$.html" title=""></a>
@@ -775,14 +771,14 @@ the aggregate output of each stream, as bytes or strings or lines.
       </span>
       <span class="symbol">
         <a title="Represents a value that is either an absolute Path or a
-relative ResourcePath, and can be constructed from
+relative RelPath, and can be constructed from
 " href="FilePath.html">
               <span class="name">FilePath</span>
             </a><span class="result"> extends <a href="BasePath.html" class="extype" name="ammonite.ops.BasePath">BasePath</a></span>
       </span>
       
       <p class="shortcomment cmt">Represents a value that is either an absolute <a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a> or a
-relative <a href="ResourcePath.html" class="extype" name="ammonite.ops.ResourcePath">ResourcePath</a>, and can be constructed from
+relative <a href="RelPath.html" class="extype" name="ammonite.ops.RelPath">RelPath</a>, and can be constructed from
 </p>
     </li><li name="ammonite.ops.FileType" visbl="pub" class="indented0 " data-isabs="true" fullComment="no" group="Ungrouped">
       <a id="FileTypeextendsAnyRef"></a><a id="FileType:FileType"></a>
@@ -948,10 +944,10 @@ experience
       <p class="shortcomment cmt">An absolute path on the filesystem.</p><div class="fullcomment"><div class="comment cmt"><p>An absolute path on the filesystem. Note that the path is
 normalized and cannot contain any empty <code>&quot;&quot;</code>, <code>&quot;.&quot;</code> or <code>&quot;..&quot;</code> segments
 </p></div></div>
-    </li><li name="ammonite.ops.PathFactory" visbl="pub" class="indented0 " data-isabs="true" fullComment="no" group="Ungrouped">
-      <a id="PathFactory[PathType&lt;:ammonite.ops.BasePath]extendsString=&gt;PathType"></a><a id="PathFactory[PathType&lt;:BasePath]:PathFactory[PathType]"></a>
+    </li><li name="ammonite.ops.PathConvertible" visbl="pub" class="indented0 " data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="PathConvertible[T]extendsAnyRef"></a><a id="PathConvertible[T]:PathConvertible[T]"></a>
       <span class="permalink">
-      <a href="../../ammonite/ops/index.html#PathFactory[PathType&lt;:ammonite.ops.BasePath]extendsString=&gt;PathType" title="Permalink">
+      <a href="../../ammonite/ops/index.html#PathConvertible[T]extendsAnyRef" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -960,16 +956,12 @@ normalized and cannot contain any empty <code>&quot;&quot;</code>, <code>&quot;.
         <span class="kind">trait</span>
       </span>
       <span class="symbol">
-        <a title="Enforces a standard interface for constructing BasePath-like things
-from java types of various sorts
-" href="PathFactory.html">
-              <span class="name">PathFactory</span>
-            </a><span class="tparams">[<span name="PathType">PathType &lt;: <a href="BasePath.html" class="extype" name="ammonite.ops.BasePath">BasePath</a></span>]</span><span class="result"> extends (<span class="extype" name="scala.Predef.String">String</span>) ⇒ <span class="extype" name="ammonite.ops.PathFactory.PathType">PathType</span></span>
+        <a title="" href="PathConvertible.html">
+              <span class="name">PathConvertible</span>
+            </a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>
       </span>
       
-      <p class="shortcomment cmt">Enforces a standard interface for constructing <a href="BasePath.html" class="extype" name="ammonite.ops.BasePath">BasePath</a>-like things
-from java types of various sorts
-</p>
+      
     </li><li name="ammonite.ops.PermSet" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="PermSetextendsSet[java.nio.file.attribute.PosixFilePermission]"></a><a id="PermSet:PermSet"></a>
       <span class="permalink">
@@ -1733,7 +1725,7 @@ filename: <span class="std">String</span> = <span class="lit">"Ammonite"</span><
       <span class="symbol">
         <a title="" href="FilePath$.html">
               <span class="name">FilePath</span>
-            </a><span class="result"> extends <a href="PathFactory.html" class="extype" name="ammonite.ops.PathFactory">PathFactory</a>[<a href="FilePath.html" class="extype" name="ammonite.ops.FilePath">FilePath</a>]</span>
+            </a>
       </span>
       
       
@@ -1809,7 +1801,25 @@ what working directory they use, import this via</p><p><code>import ammonite.ops
       <span class="symbol">
         <a title="" href="Path$.html">
               <span class="name">Path</span>
-            </a><span class="result"> extends <a href="PathFactory.html" class="extype" name="ammonite.ops.PathFactory">PathFactory</a>[<a href="Path.html" class="extype" name="ammonite.ops.Path">Path</a>] with <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+            </a><span class="result"> extends <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+      </span>
+      
+      
+    </li><li name="ammonite.ops.PathConvertible" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="PathConvertible"></a><a id="PathConvertible:PathConvertible"></a>
+      <span class="permalink">
+      <a href="../../ammonite/ops/index.html#PathConvertible" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="PathConvertible$.html">
+              <span class="name">PathConvertible</span>
+            </a>
       </span>
       
       
@@ -1899,7 +1909,7 @@ what working directory they use, import this via</p><p><code>import ammonite.ops
       <span class="symbol">
         <a title="" href="RelPath$.html">
               <span class="name">RelPath</span>
-            </a><span class="result"> extends <a href="RelPathStuff.html" class="extype" name="ammonite.ops.RelPathStuff">RelPathStuff</a> with <a href="PathFactory.html" class="extype" name="ammonite.ops.PathFactory">PathFactory</a>[<a href="RelPath.html" class="extype" name="ammonite.ops.RelPath">RelPath</a>] with <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+            </a><span class="result"> extends <a href="RelPathStuff.html" class="extype" name="ammonite.ops.RelPathStuff">RelPathStuff</a> with <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
       </span>
       
       

@@ -182,10 +182,10 @@ applying a function with two arguments
                       </li><li class="current-entities indented2">
                         <a class="object" href="FilePath$.html" title=""></a>
                         <a class="trait" href="FilePath.html" title="Represents a value that is either an absolute Path or a
-relative ResourcePath, and can be constructed from
+relative RelPath, and can be constructed from
 "></a>
                         <a href="FilePath.html" title="Represents a value that is either an absolute Path or a
-relative ResourcePath, and can be constructed from
+relative RelPath, and can be constructed from
 ">
                           FilePath
                         </a>
@@ -270,20 +270,16 @@ experience
                           Path
                         </a>
                       </li><li class="current-entities indented2">
+                        <a class="object" href="PathConvertible$.html" title=""></a>
+                        <a class="trait" href="PathConvertible.html" title=""></a>
+                        <a href="PathConvertible.html" title="">
+                          PathConvertible
+                        </a>
+                      </li><li class="current-entities indented2">
                         <span class="separator"></span>
                         <a class="object" href="PathError$.html" title=""></a>
                         <a href="PathError$.html" title="">
                           PathError
-                        </a>
-                      </li><li class="current-entities indented2">
-                        <span class="separator"></span>
-                        <a class="trait" href="PathFactory.html" title="Enforces a standard interface for constructing BasePath-like things
-from java types of various sorts
-"></a>
-                        <a href="PathFactory.html" title="Enforces a standard interface for constructing BasePath-like things
-from java types of various sorts
-">
-                          PathFactory
                         </a>
                       </li><li class="current-entities indented2">
                         <a class="object" href="PermSet$.html" title=""></a>
@@ -508,7 +504,7 @@ java.io.File.deleteOnExit.">
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <span class="name">RelPath</span><span class="result"> extends <a href="RelPathStuff.html" class="extype" name="ammonite.ops.RelPathStuff">RelPathStuff</a> with <a href="PathFactory.html" class="extype" name="ammonite.ops.PathFactory">PathFactory</a>[<a href="RelPath.html" class="extype" name="ammonite.ops.RelPath">RelPath</a>] with <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+        <span class="name">RelPath</span><span class="result"> extends <a href="RelPathStuff.html" class="extype" name="ammonite.ops.RelPathStuff">RelPathStuff</a> with <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
       </span>
       </h4>
 
@@ -517,7 +513,7 @@ java.io.File.deleteOnExit.">
           <span class="toggle">
             Linear Supertypes
           </span>
-          <div class="superTypes hiddenContent"><a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Serializable" class="extype" target="_top">Serializable</a>, <span class="extype" name="java.io.Serializable">Serializable</span>, <a href="PathFactory.html" class="extype" name="ammonite.ops.PathFactory">PathFactory</a>[<a href="RelPath.html" class="extype" name="ammonite.ops.RelPath">RelPath</a>], (<span class="extype" name="scala.Predef.String">String</span>) ⇒ <a href="RelPath.html" class="extype" name="ammonite.ops.RelPath">RelPath</a>, <a href="RelPathStuff.html" class="extype" name="ammonite.ops.RelPathStuff">RelPathStuff</a>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Any" class="extype" target="_top">Any</a></div>
+          <div class="superTypes hiddenContent"><a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Serializable" class="extype" target="_top">Serializable</a>, <span class="extype" name="java.io.Serializable">Serializable</span>, <a href="RelPathStuff.html" class="extype" name="ammonite.ops.RelPathStuff">RelPathStuff</a>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Any" class="extype" target="_top">Any</a></div>
         </div></div>
         
 
@@ -543,7 +539,7 @@ java.io.File.deleteOnExit.">
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="ammonite.ops.RelPath"><span>RelPath</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="ammonite.ops.PathFactory"><span>PathFactory</span></li><li class="in" name="scala.Function1"><span>Function1</span></li><li class="in" name="ammonite.ops.RelPathStuff"><span>RelPathStuff</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="ammonite.ops.RelPath"><span>RelPath</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="ammonite.ops.RelPathStuff"><span>RelPathStuff</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -721,10 +717,10 @@ java.io.File.deleteOnExit.">
       </span>
       
       
-    </li><li name="scala.Function1#andThen" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="andThen[A](g:R=&gt;A):T1=&gt;A"></a><a id="andThen[A]((RelPath)⇒A):(String)⇒A"></a>
+    </li><li name="ammonite.ops.RelPath#apply" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="apply[T](f0:T)(implicitevidence$2:ammonite.ops.PathConvertible[T]):ammonite.ops.RelPath"></a><a id="apply[T](T)(PathConvertible[T]):RelPath"></a>
       <span class="permalink">
-      <a href="../../ammonite/ops/RelPath$.html#andThen[A](g:R=&gt;A):T1=&gt;A" title="Permalink">
+      <a href="../../ammonite/ops/RelPath$.html#apply[T](f0:T)(implicitevidence$2:ammonite.ops.PathConvertible[T]):ammonite.ops.RelPath" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -733,61 +729,10 @@ java.io.File.deleteOnExit.">
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">andThen</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="g">g: (<a href="RelPath.html" class="extype" name="ammonite.ops.RelPath">RelPath</a>) ⇒ <span class="extype" name="scala.Function1.andThen.A">A</span></span>)</span><span class="result">: (<span class="extype" name="scala.Predef.String">String</span>) ⇒ <span class="extype" name="scala.Function1.andThen.A">A</span></span>
+        <span class="name">apply</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="f0">f0: <span class="extype" name="ammonite.ops.RelPath.apply.T">T</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="PathConvertible.html" class="extype" name="ammonite.ops.PathConvertible">PathConvertible</a>[<span class="extype" name="ammonite.ops.RelPath.apply.T">T</span>]</span>)</span><span class="result">: <a href="RelPath.html" class="extype" name="ammonite.ops.RelPath">RelPath</a></span>
       </span>
       
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Function1</dd><dt>Annotations</dt><dd>
-                <span class="name">@unspecialized</span><span class="args">()</span>
-              
-        </dd></dl></div>
-    </li><li name="ammonite.ops.RelPath#apply" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="apply(f:java.nio.file.Path):ammonite.ops.RelPath"></a><a id="apply(java.nio.file.Path):RelPath"></a>
-      <span class="permalink">
-      <a href="../../ammonite/ops/RelPath$.html#apply(f:java.nio.file.Path):ammonite.ops.RelPath" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">apply</span><span class="params">(<span name="f">f: <span class="extype" name="java.nio.file.Path">java.nio.file.Path</span></span>)</span><span class="result">: <a href="RelPath.html" class="extype" name="ammonite.ops.RelPath">RelPath</a></span>
-      </span>
       
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="ammonite.ops.RelPath">RelPath</a> → <a href="PathFactory.html" class="extype" name="ammonite.ops.PathFactory">PathFactory</a></dd></dl></div>
-    </li><li name="ammonite.ops.PathFactory#apply" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="apply(s:String):PathType"></a><a id="apply(String):RelPath"></a>
-      <span class="permalink">
-      <a href="../../ammonite/ops/RelPath$.html#apply(s:String):PathType" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">apply</span><span class="params">(<span name="s">s: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="RelPath.html" class="extype" name="ammonite.ops.RelPath">RelPath</a></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="PathFactory.html" class="extype" name="ammonite.ops.PathFactory">PathFactory</a> → Function1</dd></dl></div>
-    </li><li name="ammonite.ops.PathFactory#apply" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="apply(f:java.io.File):PathType"></a><a id="apply(File):RelPath"></a>
-      <span class="permalink">
-      <a href="../../ammonite/ops/RelPath$.html#apply(f:java.io.File):PathType" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">apply</span><span class="params">(<span name="f">f: <span class="extype" name="java.io.File">File</span></span>)</span><span class="result">: <a href="RelPath.html" class="extype" name="ammonite.ops.RelPath">RelPath</a></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="PathFactory.html" class="extype" name="ammonite.ops.PathFactory">PathFactory</a></dd></dl></div>
     </li><li name="scala.Any#asInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <span class="permalink">
@@ -824,25 +769,6 @@ java.io.File.deleteOnExit.">
       
       <span class="defval" name="classOf[java.lang.CloneNotSupportedException]">...</span>
     </span>)</span>
-              
-        </dd></dl></div>
-    </li><li name="scala.Function1#compose" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="compose[A](g:A=&gt;T1):A=&gt;R"></a><a id="compose[A]((A)⇒String):(A)⇒RelPath"></a>
-      <span class="permalink">
-      <a href="../../ammonite/ops/RelPath$.html#compose[A](g:A=&gt;T1):A=&gt;R" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">compose</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="g">g: (<span class="extype" name="scala.Function1.compose.A">A</span>) ⇒ <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: (<span class="extype" name="scala.Function1.compose.A">A</span>) ⇒ <a href="RelPath.html" class="extype" name="ammonite.ops.RelPath">RelPath</a></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Function1</dd><dt>Annotations</dt><dd>
-                <span class="name">@unspecialized</span><span class="args">()</span>
               
         </dd></dl></div>
     </li><li name="ammonite.ops.RelPathStuff#empty" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
@@ -1043,7 +969,7 @@ java.io.File.deleteOnExit.">
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="scala.Function1#toString" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+    </li><li name="scala.AnyRef#toString" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="toString():String"></a>
       <span class="permalink">
       <a href="../../ammonite/ops/RelPath$.html#toString():String" title="Permalink">
@@ -1058,7 +984,7 @@ java.io.File.deleteOnExit.">
         <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
       </span>
       
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Function1 → AnyRef → Any</dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="ammonite.ops.RelPathStuff#up" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="up:ammonite.ops.RelPath"></a><a id="up:RelPath"></a>
       <span class="permalink">
@@ -1155,10 +1081,6 @@ java.io.File.deleteOnExit.">
               <h3>Inherited from <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></h3>
             </div><div class="parent" name="java.io.Serializable">
               <h3>Inherited from <span class="extype" name="java.io.Serializable">Serializable</span></h3>
-            </div><div class="parent" name="ammonite.ops.PathFactory">
-              <h3>Inherited from <a href="PathFactory.html" class="extype" name="ammonite.ops.PathFactory">PathFactory</a>[<a href="RelPath.html" class="extype" name="ammonite.ops.RelPath">RelPath</a>]</h3>
-            </div><div class="parent" name="scala.Function1">
-              <h3>Inherited from (<span class="extype" name="scala.Predef.String">String</span>) ⇒ <a href="RelPath.html" class="extype" name="ammonite.ops.RelPath">RelPath</a></h3>
             </div><div class="parent" name="ammonite.ops.RelPathStuff">
               <h3>Inherited from <a href="RelPathStuff.html" class="extype" name="ammonite.ops.RelPathStuff">RelPathStuff</a></h3>
             </div><div class="parent" name="scala.AnyRef">
