@@ -192,5 +192,49 @@ object CachingTests extends TestSuite{
       processAndCheckCompiler(_ != null)
       processAndCheckCompiler(_ == null)
     }
+    'changeImportedScriptInvalidation{
+      val upstream = tmp(
+        """println("barr")
+          |val x = 1
+          |
+        """.stripMargin,
+        suffix = "upstream.sc"
+      )
+
+      val upstreamBackticked = "`" + upstream.last.stripSuffix(".sc") + "`"
+      val downstream = tmp(
+        s"""import $$file.$upstreamBackticked
+          |println("hello11")
+          |
+          |println($upstreamBackticked.x)
+        """.stripMargin,
+        dir = upstream/up,
+        suffix = "downstream.sc"
+      )
+
+      val storageFolder = tmp.dir()
+
+      val storage = new Storage.Folder(storageFolder)
+      def runDownstream(f: ammonite.interp.Compiler => Boolean) = {
+        val interp = createTestInterp(storage)
+        ammonite.main.Scripts.runScript(downstream / up, downstream, interp, Nil)
+
+        assert(f(interp.compiler))
+      }
+
+      runDownstream(_ != null)
+      runDownstream(_ == null)
+
+      ammonite.ops.write.over(
+        upstream,
+        """println("barr")
+          |val x = 2
+          |
+        """.stripMargin
+      )
+
+      runDownstream(_ != null)
+      runDownstream(_ == null)
+    }
   }
 }

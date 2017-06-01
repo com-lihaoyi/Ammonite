@@ -393,6 +393,8 @@ class Interpreter(val printer: Printer,
       blocks <- cachedScriptData match {
         case None => splittedScript.map(_.map(_ => None))
         case Some(scriptOutput) =>
+
+          val loaded = scriptOutput.processed.blockInfo.map(x => x.id.wrapperPath -> x.id.tag)
           Res.Success(scriptOutput.classFiles.zip(scriptOutput.processed.blockInfo).map(Some(_)))
       }
 
@@ -408,6 +410,7 @@ class Interpreter(val printer: Printer,
     } yield {
       reInit()
 
+      val saved = data.blockInfo.map(x => x.id.wrapperPath -> x.id.tag)
       storage.classFilesListSave(
         codeSource.filePathPrefix,
         data.blockInfo,
@@ -534,6 +537,8 @@ class Interpreter(val printer: Printer,
             ev.imports
           )
         }
+
+
         val res = blocks.head match{
           case None  =>
             for{
