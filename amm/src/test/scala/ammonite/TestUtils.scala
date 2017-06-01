@@ -16,7 +16,7 @@ object TestUtils {
     wd = ammonite.ops.pwd,
     // Provide a custom predef so we can verify in tests that the predef gets cached
     customPredefs = Seq(
-      Interpreter.PredefInfo(Name("predef"), predef, false, None)
+      PredefInfo(Name("predef"), predef, false, None)
     ),
     extraBridges = _ => Seq()
   )

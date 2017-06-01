@@ -98,8 +98,8 @@ case class Main(predef: String = "",
       printer,
       storageBackend,
       Seq(
-        Interpreter.PredefInfo(Name("defaultPredef"), augmentedPredef, false, None),
-        Interpreter.PredefInfo(Name("predef"), predef, false, None)
+        PredefInfo(Name("defaultPredef"), augmentedPredef, false, None),
+        PredefInfo(Name("predef"), predef, false, None)
       ),
       i =>
         if (!replApi) Nil
@@ -115,7 +115,7 @@ case class Main(predef: String = "",
             new SessionApiImpl(i.compilerManager.frames),
             Vector()
           )
-          Seq(("ammonite.repl.ReplBridge", "repl", replApi))
+          Seq(("ammonite.repl.ReplBridge", "repl", replApi, () => ()))
         },
       wd,
       verboseOutput

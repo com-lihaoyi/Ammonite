@@ -45,9 +45,9 @@ class Repl(input: InputStream,
     printer,
     storage,
     Seq(
-      Interpreter.PredefInfo(Name("DefaultPredef"), defaultPredef, true, None),
-      Interpreter.PredefInfo(Name("ArgsPredef"), argString, false, None),
-      Interpreter.PredefInfo(Name("MainPredef"), mainPredef, false, Some(wd))
+      PredefInfo(Name("DefaultPredef"), defaultPredef, true, None),
+      PredefInfo(Name("ArgsPredef"), argString, false, None),
+      PredefInfo(Name("MainPredef"), mainPredef, false, Some(wd))
     ),
     i => {
       val replApi = new ReplApiImpl(
@@ -58,21 +58,13 @@ class Repl(input: InputStream,
         prompt,
         frontEnd,
         history,
-        new SessionApiImpl(interp.compilerManager.frames),
+        new SessionApiImpl(i.compilerManager.frames),
         replArgs
       )
-      Seq(("ammonite.repl.ReplBridge", "repl", replApi))
+      Seq(("ammonite.repl.ReplBridge", "repl", replApi, () => replApi.sess.save()))
     },
     wd
   )
-
-  // Call `session.save` _after_ the interpreter is fully instantiated and
-  // imports are loaded. We only need to do this in `Repl` and not in
-  // `Interpreter`, as using sess.save or load inside scripts is sketchy and
-  // probably not something we can support
-  interp.bridges.collectFirst {
-    case ("ammonite.repl.ReplBridge", _, r: ReplAPI) => r
-  }.foreach(_.sess.save())
 
   val reader = new InputStreamReader(input)
 

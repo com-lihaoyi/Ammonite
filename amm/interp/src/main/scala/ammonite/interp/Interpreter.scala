@@ -20,7 +20,7 @@ import ammonite.util._
  */
 class Interpreter(val printer: Printer,
                   val storage: Storage,
-                  customPredefs: Seq[Interpreter.PredefInfo],
+                  customPredefs: Seq[PredefInfo],
                   // Allows you to set up additional "bridges" between the REPL
                   // world and the outside world, by passing in the full name
                   // of the `APIHolder` object that will hold the bridge and
@@ -29,7 +29,7 @@ class Interpreter(val printer: Printer,
                   // bridges need to be in place *before* the predef starts
                   // running, so you can use them predef to e.g. configure
                   // the REPL before it starts
-                  extraBridges: Interpreter => Seq[(String, String, AnyRef)],
+                  extraBridges: Interpreter => Seq[(String, String, AnyRef, () => Unit)],
                   val wd: Path,
                   verboseOutput: Boolean = true)
   extends ImportHook.InterpreterInterface{ interp =>
@@ -67,22 +67,6 @@ class Interpreter(val printer: Printer,
   val beforeExitHooks = mutable.Buffer.empty[Any ⇒ Any]
 
 
-  val bridges = extraBridges(this) :+ ("ammonite.interp.InterpBridge", "interp", interpApi)
-  for ((name, shortName, bridge) <- bridges ){
-    APIHolder.initBridge(eval.evalClassloader, name, bridge)
-  }
-  // import ammonite.repl.ReplBridge.{value => repl}
-  // import ammonite.runtime.InterpBridge.{value => interp}
-  val bridgePredefs =
-    for ((name, shortName, bridge) <- bridges)
-    yield Interpreter.PredefInfo(
-      Name(s"${shortName}Bridge"),
-      s"import $name.{value => $shortName}",
-      true,
-      None
-    )
-
-
   val importHooks = Ref(Map[Seq[String], ImportHook](
     Seq("file") -> ImportHook.File,
     Seq("exec") -> ImportHook.Exec,
@@ -92,61 +76,26 @@ class Interpreter(val printer: Printer,
     Seq("plugin", "cp") -> ImportHook.PluginClasspath
   ))
 
-  val predefs = {
-    val (sharedPredefContent, sharedPredefPath) = storage.loadSharedPredef
-    val (predefContent, predefPath) = storage.loadPredef
-    bridgePredefs ++ customPredefs ++ Seq(
-      Interpreter.PredefInfo(
-        Name("UserSharedPredef"),
-        sharedPredefContent,
-        false,
-        sharedPredefPath
-      ),
-      Interpreter.PredefInfo(
-        Name("UserPredef"),
-        predefContent,
-        false,
-        predefPath
-      )
-    )
-  }
 
-  // Use a var and a for-loop instead of a fold, because when running
+  // Use a var and callbacks instead of a fold, because when running
   // `processModule0` user code may end up calling `processModule` which depends
   // on `predefImports`, and we should be able to provide the "current" imports
   // to it even if it's half built
   var predefImports = Imports()
-  for {
-    predefInfo <- predefs
-    if predefInfo.code.nonEmpty
-  }{
-    processModule(
-      predefInfo.code,
-      CodeSource(
-        predefInfo.name,
-        Seq(),
-        Seq(Name("ammonite"), Name("predef")),
-        predefInfo.path
-      ),
-      true,
-      "",
-      predefInfo.hardcoded
-    ) match{
-      case Res.Success(processed) =>
-        predefImports = predefImports ++ processed.blockInfo.last.finalImports
+  PredefInitialization.apply(
+    extraBridges(this) :+ ("ammonite.interp.InterpBridge", "interp", interpApi, () => ()),
+    interpApi,
+    eval.evalClassloader,
+    storage,
+    customPredefs,
+    processModule(_, _, true, "", _),
+    imports => predefImports = predefImports ++ imports
+  )
 
-      case Res.Failure(ex, msg) =>
-        ex match{
-          case Some(e) => throw new RuntimeException("Error during Predef: " + msg, e)
-          case None => throw new RuntimeException("Error during Predef: " + msg)
-        }
+  // The ReplAPI requires some special post-Interpreter-initialization
+  // code to run, so let it pass it in a callback and we'll run it here
+  for ((name, shortName, bridge, cb) <- extraBridges(this) ) cb()
 
-      case Res.Exception(ex, msg) =>
-        throw new RuntimeException("Error during Predef: " + msg, ex)
-
-      case _ => ???
-    }
-  }
 
   def resolveSingleImportHook(source: CodeSource, tree: ImportTree) = {
     val strippedPrefix = tree.prefix.takeWhile(_(0) == '$').map(_.stripPrefix("$"))
@@ -670,13 +619,7 @@ object Interpreter{
   val SheBang = "#!"
   val SheBangEndPattern = Pattern.compile(s"""((?m)^!#.*)$newLine""")
 
-  /**
-    * Information about a particular predef file or snippet. [[hardcoded]]
-    * represents whether or not we cache the snippet forever regardless of
-    * classpath, which is true for many "internal" predefs which only do
-    * imports from Ammonite's own packages and don't rely on external code
-    */
-  case class PredefInfo(name: Name, code: String, hardcoded: Boolean, path: Option[Path])
+
 
   /**
     * This gives our cache tags for compile caching. The cache tags are a hash
