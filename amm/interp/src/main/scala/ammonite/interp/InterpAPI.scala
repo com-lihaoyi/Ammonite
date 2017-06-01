@@ -13,6 +13,12 @@ import scala.util.control.ControlThrowable
 object InterpBridge extends APIHolder[InterpAPI]
 
 trait InterpAPI {
+  /**
+    * When running a script in `--watch` mode, re-run the main script if this
+    * file changes. By default, this happens for all script files, but you can
+    * call this to watch arbitrary files your script may depend on
+    */
+  def watch(p: Path): Unit
 
   /**
    * Tools related to loading external scripts and code into the REPL

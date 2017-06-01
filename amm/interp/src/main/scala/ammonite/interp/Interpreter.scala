@@ -58,6 +58,7 @@ class Interpreter(val printer: Printer,
   val onCompilerInit = mutable.Buffer.empty[scala.tools.nsc.Global => Unit]
   var pressy: Pressy = _
   val beforeExitHooks = mutable.Buffer.empty[Any ⇒ Any]
+  val watchedFiles = mutable.Buffer.empty[(Path, Long)]
 
   def evalClassloader = eval.frames.head.classloader
 
@@ -184,6 +185,7 @@ class Interpreter(val printer: Printer,
       )
       hookResults <- Res.map(hooked){
         case res: ImportHook.Result.Source =>
+          res.blockInfo.path.foreach(interpApi.watch)
           for{
             processed <- processModule(
               res.code, res.blockInfo,
@@ -660,6 +662,10 @@ class Interpreter(val printer: Printer,
   }
   lazy val interpApi: InterpAPI = new InterpAPI{ outer =>
 
+    def watch(p: Path) = {
+      watchedFiles.append(p -> p.mtime.toMillis)
+    }
+
     def configureCompiler(callback: scala.tools.nsc.Global => Unit) = {
       interp.onCompilerInit.append(callback)
       if (compiler != null){
@@ -681,9 +687,13 @@ class Interpreter(val printer: Printer,
         case _ =>
       }
 
-      def exec(file: Path): Unit = apply(normalizeNewlines(read(file)))
+      def exec(file: Path): Unit = {
+        watch(file)
+        apply(normalizeNewlines(read(file)))
+      }
 
       def module(file: Path) = {
+        watch(file)
         val (pkg, wrapper) = Util.pathToPackageWrapper(
           Seq(Name("dummy")),
           file relativeTo wd

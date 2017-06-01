@@ -149,10 +149,10 @@ case class Main(predef: String = "",
     */
   def runScript(path: Path,
                 scriptArgs: Seq[(String, Option[String])],
-                replApi: Boolean = false): Res[Any] = {
+                replApi: Boolean = false): (Res[Any], Seq[(Path, Long)]) = {
 
     val interp = instantiateInterpreter(replApi)
-    main.Scripts.runScript(wd, path, interp, scriptArgs)
+    (main.Scripts.runScript(wd, path, interp, scriptArgs), interp.watchedFiles)
   }
 
   /**
@@ -178,6 +178,7 @@ object Main{
     var predefFile: Option[Path] = None
     var replApi = false
     var remoteLogging = true
+    var watchScripts = false
     val replParser = new scopt.OptionParser[Main]("ammonite") {
       // Primary arguments that correspond to the arguments of
       // the `Main` configuration object
@@ -194,6 +195,10 @@ object Main{
       opt[Unit]("no-remote-logging")
         .foreach(x => remoteLogging = false)
         .text("Disable remote logging of the number of times a REPL starts and runs commands")
+
+      opt[Unit]('w', "watch")
+        .foreach(x => watchScripts = true)
+        .text("Watch and re-run your scripts when they change")
 
       opt[String]('b', "banner")
         .action((x, c) => c.copy(welcomeBanner = Some(x)))
@@ -276,22 +281,34 @@ object Main{
       (fileToExecute, codeToExecute) match {
         case (None, None) => println("Loading..."); main(true).run()
         case (Some(path), None) =>
-          val scriptMain = main(false)
-          scriptMain.runScript(path, scriptArgs, replApi) match {
-            case Res.Failure(exOpt, msg) =>
-              Console.err.println(msg)
-              System.exit(1)
-            case Res.Exception(ex, s) =>
-              val trace = ex.getStackTrace
-              val i = trace.indexWhere(_.getMethodName == "$main") + 1
-              ex.setStackTrace(trace.take(i))
-              throw ex
-            case Res.Success(value) =>
-              if (value != ()){
-                pprint.PPrinter.BlackWhite.pprintln(value)
+          while({
+            val scriptMain = main(false)
+            val (res, watched) = scriptMain.runScript(path, scriptArgs, replApi)
+            res match {
+              case Res.Failure(exOpt, msg) =>
+                Console.err.println(msg)
+                if (!watchScripts) System.exit(1)
+              case Res.Exception(ex, s) =>
+                val trace = ex.getStackTrace
+                val i = trace.indexWhere(_.getMethodName == "$main") + 1
+                ex.setStackTrace(trace.take(i))
+                throw ex
+              case Res.Success(value) =>
+                if (value != ()){
+                  pprint.PPrinter.BlackWhite.pprintln(value)
+                }
+              case Res.Skip   => // do nothing on success, everything's already happened
+            }
+            if (!watchScripts) false
+            else{
+              while(watched.forall{ case (file, lastMTime) => file.mtime.toMillis == lastMTime}){
+                Thread.sleep(100)
               }
-            case Res.Skip   => // do nothing on success, everything's already happened
-          }
+
+              true
+            }
+          })()
+
 
         case (None, Some(code)) => main(false).runCode(code, replApi)
 

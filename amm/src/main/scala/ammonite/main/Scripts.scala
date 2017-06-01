@@ -35,6 +35,7 @@ object Scripts {
                 path: Path,
                 interp: ammonite.interp.Interpreter,
                 scriptArgs: Seq[(String, Option[String])]) = {
+    interp.interpApi.watch(path)
     val (pkg, wrapper) = Util.pathToPackageWrapper(Seq(), path relativeTo wd)
 
     for{
