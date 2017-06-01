@@ -335,62 +335,38 @@ class Interpreter(val printer: Printer,
 
 
   def processScriptBlock(processed: Preprocessor.Output,
-                         printer: Printer,
-                         blockInfo: CodeSource) = {
-    for {
-      (cls, newImports, tag) <- cachedCompileBlock(
-        processed,
-        printer,
-        blockInfo,
-        "scala.Iterator[String]()"
-      )
-      res <- eval.processScriptBlock(
-        cls,
-        newImports,
-        blockInfo.wrapperName,
-        blockInfo.pkgName
-      )
-    } yield (res, tag)
-  }
-
-  def cachedCompileBlock(processed: Preprocessor.Output,
-                         printer: Printer,
-                         blockInfo: CodeSource,
-                         printCode: String): Res[(Class[_], Imports, Tag)] = {
-
-
-    val fullyQualifiedName = blockInfo.jvmPathPrefix
+                         codeSource0: CodeSource,
+                         indexedWrapperName: Name) = {
+    val codeSource = codeSource0.copy(wrapperName = indexedWrapperName)
+    val fullyQualifiedName = codeSource.jvmPathPrefix
 
     val tag = Tag(
       Interpreter.cacheTag(processed.code.getBytes),
       Interpreter.cacheTag(eval.frames.head.classloader.classpathHash)
     )
 
-    val compiled = storage.compileCacheLoad(fullyQualifiedName, tag) match {
-      case Some((classFiles, newImports)) =>
-
-        Evaluator.addToClasspath(classFiles, dynamicClasspath)
-        Res.Success((classFiles, newImports))
-      case _ =>
-        val noneCalc = for {
-          (classFiles, newImports) <- compileClass(
-            processed, printer, blockInfo.printablePath
-          )
-        } yield {
-          storage.compileCacheSave(fullyQualifiedName, tag, (classFiles, newImports))
-          (classFiles, newImports)
-        }
-
-        noneCalc
-    }
     for {
-      (classFiles, newImports) <- compiled
+      (classFiles, newImports) <- compileClass(
+        processed, printer, codeSource.printablePath
+      )
       cls <- eval.loadClass(fullyQualifiedName, classFiles)
-    } yield (cls, newImports, tag)
+
+      res <- eval.processScriptBlock(
+        cls,
+        newImports,
+        codeSource.wrapperName,
+        codeSource.pkgName
+      )
+    } yield {
+      storage.compileCacheSave(fullyQualifiedName, tag, (classFiles, newImports))
+
+      (res, tag)
+    }
   }
 
+
   def processModule(code: String,
-                    blockInfo: CodeSource,
+                    codeSource: CodeSource,
                     autoImport: Boolean,
                     extraCode: String,
                     hardcoded: Boolean): Res[ScriptOutput.Metadata] = {
@@ -404,16 +380,8 @@ class Interpreter(val printer: Printer,
     )
 
 
-    val cachedScriptData = storage.classFilesListLoad(blockInfo.filePathPrefix, tag)
+    val cachedScriptData = storage.classFilesListLoad(codeSource.filePathPrefix, tag)
 
-    def evaluate(processed: Preprocessor.Output, indexedWrapperName: Name) =
-      withContextClassloader(
-        processScriptBlock(
-          processed,
-          printer,
-          blockInfo.copy(wrapperName = indexedWrapperName)
-        )
-      )
 
     // Lazy, because we may not always need this if the script is already cached
     // and none of it's blocks end up needing to be re-compiled. We don't know up
@@ -432,8 +400,8 @@ class Interpreter(val printer: Printer,
         blocks,
         splittedScript,
         predefImports,
-        blockInfo,
-        evaluate,
+        codeSource,
+        processScriptBlock(_, codeSource, _),
         autoImport,
         extraCode
       )
@@ -441,7 +409,7 @@ class Interpreter(val printer: Printer,
       reInit()
 
       storage.classFilesListSave(
-        blockInfo.filePathPrefix,
+        codeSource.filePathPrefix,
         data.blockInfo,
         tag
       )
@@ -542,15 +510,12 @@ class Interpreter(val printer: Printer,
         // pretty printing results is disabled for scripts
         val indexedWrapperName = Interpreter.indexWrapperName(codeSource.wrapperName, wrapperIndex)
 
-        val envHash = Interpreter.cacheTag(eval.frames.head.classloader.classpathHash)
-        def compileRunBlock() = {
+
+        def compileRunBlock(leadingSpaces: String, hookInfo: ImportHookInfo) = {
           init()
           val printSuffix = if (wrapperIndex == 1) "" else  " block " + wrapperIndex
           printer.info("Compiling " + codeSource.printablePath + printSuffix)
           for{
-            allSplittedChunks <- splittedScript
-            (leadingSpaces, stmts) = allSplittedChunks(wrapperIndex - 1)
-            hookInfo <- resolveImportHooks(codeSource, stmts)
             processed <- Preprocessor(compiler.parse).transform(
               hookInfo.stmts,
               "",
@@ -564,16 +529,26 @@ class Interpreter(val printer: Printer,
             (ev, tag) <- evaluate(processed, indexedWrapperName)
           } yield BlockMetadata(
             VersionedWrapperId(ev.wrapper.map(_.encoded).mkString("."), tag),
+            leadingSpaces,
             hookInfo,
             ev.imports
           )
         }
         val res = blocks.head match{
-          case None  => compileRunBlock()
+          case None  =>
+            for{
+              allSplittedChunks <- splittedScript
+              (leadingSpaces, stmts) = allSplittedChunks(wrapperIndex - 1)
+              hookInfo <- resolveImportHooks(codeSource, stmts)
+              res <- compileRunBlock(leadingSpaces, hookInfo)
+            } yield res
+
           case Some((classFiles, blockMetadata)) =>
             blockMetadata.hookInfo.trees.foreach(resolveSingleImportHook(codeSource, _))
-            if (envHash != blockMetadata.id.tag.env) compileRunBlock()
-            else{
+            val envHash = Interpreter.cacheTag(eval.frames.head.classloader.classpathHash)
+            if (envHash != blockMetadata.id.tag.env) {
+              compileRunBlock(blockMetadata.leadingSpaces, blockMetadata.hookInfo)
+            } else{
               addToClasspath(classFiles, dynamicClasspath)
               val cls = eval.loadClass(blockMetadata.id.wrapperPath, classFiles)
               val evaluated =

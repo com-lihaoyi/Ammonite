@@ -139,20 +139,6 @@ object Storage{
       }
     }
 
-    def compileCacheSave(path: String, tag: Tag, data: CompileCache): Unit = {
-      val (classFiles, imports) = data
-      val tagCacheDir = compileCacheDir/path.split('.').map(encode)/tag.combined
-
-      if(!exists(tagCacheDir)){
-        mkdir(tagCacheDir)
-        val metadata = upickle.default.write((tag, imports), indent = 4)
-        write(tagCacheDir/metadataFile, metadata)
-        classFiles.foreach{ case (name, bytes) =>
-          write(tagCacheDir/s"$name.class", bytes)
-        }
-
-      }
-    }
 
     def classFilesListSave(filePathPrefix: RelPath,
                            perBlockMetadata: Seq[ScriptOutput.BlockMetadata],
@@ -202,6 +188,21 @@ object Storage{
 
           case _ => None
         }
+      }
+    }
+
+    def compileCacheSave(path: String, tag: Tag, data: CompileCache): Unit = {
+      val (classFiles, imports) = data
+      val tagCacheDir = compileCacheDir/path.split('.').map(encode)/tag.combined
+
+      if(!exists(tagCacheDir)){
+        mkdir(tagCacheDir)
+        val metadata = upickle.default.write((tag, imports), indent = 4)
+        write(tagCacheDir/metadataFile, metadata)
+        classFiles.foreach{ case (name, bytes) =>
+          write(tagCacheDir/s"$name.class", bytes)
+        }
+
       }
     }
 

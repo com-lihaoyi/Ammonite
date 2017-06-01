@@ -78,6 +78,7 @@ object Util{
       * block without compiling/parsing it
       */
     case class BlockMetadata(id: VersionedWrapperId,
+                             leadingSpaces: String,
                              hookInfo: ImportHookInfo,
                              finalImports: Imports)
     case class Metadata(blockInfo: Seq[BlockMetadata])
