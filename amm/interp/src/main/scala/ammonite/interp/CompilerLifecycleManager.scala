@@ -30,6 +30,7 @@ class CompilerLifecycleManager(frames0: Ref[List[Frame]]){
     val dynamicClasspath = new VirtualDirectory("(memory)", None)
     var compiler: Compiler = null
     var compilerStale: Boolean = true
+    var pressyStale: Boolean = true
     val onCompilerInit = mutable.Buffer.empty[scala.tools.nsc.Global => Unit]
     var pressy: Pressy = _
     var compilationCount = 0
@@ -56,9 +57,9 @@ class CompilerLifecycleManager(frames0: Ref[List[Frame]]){
     }
   }
 
-
-
-  def pressy = Internal.pressy
+  // Public to expose it in the REPL so people can poke at it at runtime
+  // Not for use within Ammonite! Use one of the other methods to ensure
+  // that `Internal.compiler` is properly initialized before use.
   def compiler = Internal.compiler
   def compilationCount = Internal.compilationCount
   def preprocess = {
@@ -80,12 +81,14 @@ class CompilerLifecycleManager(frames0: Ref[List[Frame]]){
       dynamicClasspath,
       evalClassloader,
       frames().head.pluginClassloader,
-      () => pressy.shutdownPressy(),
+      () => shutdownPressy(),
       settings
     )
 
     onCompilerInit.foreach(_(compiler.compiler))
 
+    // Pressy is lazy, so the actual presentation compiler won't get instantiated
+    // & initialized until one of the methods on it is actually used
     Internal.pressy = Pressy(
       Classpath.classpath ++ frames().head.classpath,
       dynamicClasspath,
@@ -93,6 +96,11 @@ class CompilerLifecycleManager(frames0: Ref[List[Frame]]){
 
       settings.copy()
     )
+  }
+
+  def complete(offset: Int, previousImports: String, snippet: String) = {
+    init()
+    pressy.complete(offset, previousImports, snippet)
   }
 
   def search(target: scala.reflect.runtime.universe.Type) = {
@@ -128,7 +136,9 @@ class CompilerLifecycleManager(frames0: Ref[List[Frame]]){
     Compiler.addToClasspath(classFiles, dynamicClasspath)
     reInit()
   }
-  def shutdownPressy() = pressy.shutdownPressy()
+  def shutdownPressy() = {
+    if (pressy != null) pressy.shutdownPressy()
+  }
 
   def handleEvalClasspath(jar: File) = {
     frames().head.addClasspath(Seq(jar))
