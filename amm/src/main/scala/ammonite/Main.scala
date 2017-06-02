@@ -303,7 +303,11 @@ object Main{
             if (!watchScripts) false
             else{
               println(s"Watching for changes to ${watched.length} files... (Ctrl-C to exit)")
-              while(watched.forall{ case (file, lastMTime) => Interpreter.mtimeIfExists(file) == lastMTime}){
+              while(
+                watched.forall{
+                  case (file, lastMTime) => Interpreter.mtimeIfExists(file) == lastMTime
+                }
+              ){
                 Thread.sleep(100)
               }
 
