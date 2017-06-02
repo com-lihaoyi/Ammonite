@@ -3,17 +3,19 @@ package ammonite.interp
 
 import java.io.OutputStream
 
-import ammonite.runtime.Evaluator
+import ammonite.runtime.{Classpath, Evaluator}
 import ammonite.util.{ImportData, Imports, Printer}
 import ammonite.util.Util.newLine
 
 import scala.collection.mutable
+import scala.reflect.internal.util.Position
 import scala.reflect.io
 import scala.reflect.io._
 import scala.tools.nsc
 import scala.tools.nsc.{Global, Settings}
 import scala.tools.nsc.interactive.Response
 import scala.tools.nsc.plugins.Plugin
+import scala.tools.nsc.reporters.AbstractReporter
 import scala.util.Try
 
 
@@ -100,7 +102,28 @@ object Compiler{
 
 
 
+  def makeReporter(errorLogger: => String => Unit,
+                   warningLogger: => String => Unit,
+                   infoLogger: => String => Unit,
+                   outerSettings: Settings) = {
+    new AbstractReporter {
+      def displayPrompt(): Unit = ???
 
+      def display(pos: Position, msg: String, severity: Severity) = {
+        severity match{
+          case ERROR =>
+            Classpath.traceClasspathProblem(s"ERROR: $msg")
+            errorLogger(Position.formatMessage(pos, msg, false))
+          case WARNING =>
+            warningLogger(Position.formatMessage(pos, msg, false))
+          case INFO =>
+            infoLogger(Position.formatMessage(pos, msg, false))
+        }
+      }
+
+      val settings = outerSettings
+    }
+  }
 
 
   def apply(classpath: Seq[java.io.File],
@@ -160,13 +183,52 @@ object Compiler{
     var lastImports = Seq.empty[ImportData]
 
     val (vd, reporter, compiler) = {
-      val (reporter, vd, jcp) = GlobalInitCompat.initGlobalBits(
-        classpath, dynamicClasspath, errorLogger, warningLogger, infoLogger, settings
+
+      val (dirDeps, jarDeps) = classpath.partition(_.isDirectory)
+
+      val jcp = GlobalInitCompat.initGlobalClasspath(
+        dirDeps, jarDeps, dynamicClasspath, settings
       )
+      val vd = new io.VirtualDirectory("(memory)", None)
+      if (Classpath.traceClasspathIssues) {
+        settings.Ylogcp.value = true
+        println("jardeps")
+        jarDeps.foreach(p => println(s"${p.getName.takeRight(4)} $p"))
+        println("finished")
+      }
+
+      settings.outputDirs.setSingleOutput(vd)
+
+      settings.nowarnings.value = true
+      // Otherwise the presence of `src`'s source files mixed with
+      // classfiles causes scalac to get confused
+      settings.termConflict.value = "object"
+
+      val reporter = makeReporter(errorLogger, warningLogger, infoLogger, settings)
+
       val scalac = GlobalInitCompat.initGlobal(
-        settings, reporter, plugins0, jcp,
-        evalClassloader, importsLen, lastImports = _
+        settings, reporter, jcp,
+        evalClassloader,
+        createPlugins = g => {
+          List(
+            new ammonite.interp.AmmonitePlugin(g, lastImports = _, importsLen)
+          ) ++ {
+            for {
+              (name, cls) <- plugins0
+              plugin = Plugin.instantiate(cls, g)
+              initOk =
+              try CompilerCompatibility.pluginInit(plugin, Nil, g.globalError)
+              catch { case ex: Exception =>
+                Console.err.println(s"Warning: disabling plugin $name, initialization failed: $ex")
+                false
+              }
+              if initOk
+            } yield plugin
+          }
+        }
       )
+
+
       // Initialize scalac to the parser phase immediately, so we can start
       // using Compiler#parse even if we haven't compiled any compilation
       // units yet due to caching
