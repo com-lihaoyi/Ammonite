@@ -462,6 +462,7 @@
         To let it use only up to 1024 megabytes of memory
 
     @sect{Watch and Reload}
+      @img(src:="Watch.gif", display.block, marginLeft.auto, marginRight.auto, height := 374)
       @p
         Ammonite provides the @code{-w}/@code{--watch} flag, which tells it to
         not exit when a script completes, but instead watch the files that were
@@ -477,7 +478,9 @@
 
       @p
         Within your scripts, you can also flag other files you want Ammonite
-        to watch, via the @code{interp.watch(p: Path)} function.
+        to watch, via the @code{interp.watch(p: Path)} function. This is useful
+        if you are iterating on a script together with some external data files
+        the script depends on, and you want to
 
     @sect{From the REPL}
       @p

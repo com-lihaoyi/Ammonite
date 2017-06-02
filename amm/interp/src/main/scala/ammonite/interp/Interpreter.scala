@@ -63,7 +63,7 @@ class Interpreter(val printer: Printer,
 
   private var scriptImportCallback: Imports => Unit = eval.update
   def compilationCount = compilerManager.compilationCount
-  val watchedFiles = mutable.Buffer.empty[(Path, Long)]
+  val watchedFiles = mutable.Buffer.empty[(Path, Option[Long])]
 
   // We keep an *in-memory* cache of scripts, in additional to the global
   // filesystem cache shared between processes. This is because the global
@@ -293,7 +293,11 @@ class Interpreter(val printer: Printer,
           blocks <- cachedScriptData match {
             case None => splittedScript.map(_.map(_ => None))
             case Some(scriptOutput) =>
-              Res.Success(scriptOutput.classFiles.zip(scriptOutput.processed.blockInfo).map(Some(_)))
+              Res.Success(
+                scriptOutput.classFiles
+                  .zip(scriptOutput.processed.blockInfo)
+                  .map(Some(_))
+              )
           }
 
           data <- processCorrectScript(
@@ -551,7 +555,7 @@ class Interpreter(val printer: Printer,
   lazy val interpApi: InterpAPI = new InterpAPI{ outer =>
 
     def watch(p: Path) = {
-      watchedFiles.append(p -> p.mtime.toMillis)
+      watchedFiles.append(p -> Interpreter.mtimeIfExists(p))
     }
 
     def configureCompiler(callback: scala.tools.nsc.Global => Unit) = {
@@ -643,6 +647,8 @@ object Interpreter{
   def indexWrapperName(wrapperName: Name, wrapperIndex: Int): Name = {
     Name(wrapperName.raw + (if (wrapperIndex == 1) "" else "_" + wrapperIndex))
   }
+
+  def mtimeIfExists(p: Path) = if (!exists(p)) None else Some(p.mtime.toMillis)
 
   def initPrinters(output: OutputStream,
                    info: OutputStream,

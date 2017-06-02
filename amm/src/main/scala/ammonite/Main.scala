@@ -149,7 +149,7 @@ case class Main(predef: String = "",
     */
   def runScript(path: Path,
                 scriptArgs: Seq[(String, Option[String])],
-                replApi: Boolean = false): (Res[Any], Seq[(Path, Long)]) = {
+                replApi: Boolean = false): (Res[Any], Seq[(Path, Option[Long])]) = {
 
     val interp = instantiateInterpreter(replApi)
     (main.Scripts.runScript(wd, path, interp, scriptArgs), interp.watchedFiles)
@@ -292,7 +292,8 @@ object Main{
                 val trace = ex.getStackTrace
                 val i = trace.indexWhere(_.getMethodName == "$main") + 1
                 ex.setStackTrace(trace.take(i))
-                throw ex
+                if (!watchScripts) throw ex
+                else ex.printStackTrace()
               case Res.Success(value) =>
                 if (value != ()){
                   pprint.PPrinter.BlackWhite.pprintln(value)
@@ -301,9 +302,11 @@ object Main{
             }
             if (!watchScripts) false
             else{
-              while(watched.forall{ case (file, lastMTime) => file.mtime.toMillis == lastMTime}){
+              println(s"Watching for changes to ${watched.length} files... (Ctrl-C to exit)")
+              while(watched.forall{ case (file, lastMTime) => Interpreter.mtimeIfExists(file) == lastMTime}){
                 Thread.sleep(100)
               }
+
 
               true
             }
