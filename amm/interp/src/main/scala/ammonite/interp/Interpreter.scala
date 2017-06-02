@@ -187,7 +187,7 @@ class Interpreter(val printer: Printer,
 
       ImportHookInfo(hookImports, hookStmts, _) <- resolveImportHooks(
 
-        CodeSource(wrapperName, Seq(), Seq(Name("$file")), Some(wd/"<console>")),
+        CodeSource(wrapperName, Seq(), Seq(Name("$file")), Some(wd/"(console)")),
         stmts
       )
 
@@ -333,7 +333,7 @@ class Interpreter(val printer: Printer,
         Name("cmd" + eval.getCurrentLine),
         Seq(),
         Seq(Name("$sess")),
-        Some(wd/"<console>")
+        Some(wd/"(console)")
       ),
       { (processed, indexedWrapperName) =>
         evaluateLine(
