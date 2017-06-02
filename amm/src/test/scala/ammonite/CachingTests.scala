@@ -195,69 +195,146 @@ object CachingTests extends TestSuite{
       processAndCheckCompiler(_ == null)
     }
     'changeImportedScriptInvalidation{
-      val upstream = tmp(
-        """println("barr")
-          |val x = 1
-          |
-        """.stripMargin,
-        suffix = "upstream.sc"
-      )
-
-      val upstreamBackticked = "`" + upstream.last.stripSuffix(".sc") + "`"
-      val downstream = tmp(
-        s"""import $$file.$upstreamBackticked
-          |println("hello11")
-          |
-          |println($upstreamBackticked.x)
-        """.stripMargin,
-        dir = upstream/up,
-        suffix = "downstream.sc"
-      )
 
       val storageFolder = tmp.dir()
 
       val storage = new Storage.Folder(storageFolder)
-      def runDownstream(expectedCount: Int) = {
+      def runScript(script: Path, expectedCount: Int) = {
         val interp = createTestInterp(storage)
-        ammonite.main.Scripts.runScript(downstream / up, downstream, interp, Nil)
+        ammonite.main.Scripts.runScript(script / up, script, interp, Nil)
 
         val count = interp.compilationCount
         assert(count == expectedCount)
       }
-
-      // Upstream, downstream, and hardcoded predef
-      runDownstream(3)
-      runDownstream(0)
-      runDownstream(0)
-
-      // Make sure when we change the upstream code, the downstream sscript
-      // recompiles too
-      ammonite.ops.write.over(
-        upstream,
-        """println("barr")
-          |val x = 2
-          |
-        """.stripMargin
-      )
-
-      runDownstream(2)
-      runDownstream(0)
-      runDownstream(0)
-
-      // But if we change the downstream code, the upstream does *not* recompile
-      ammonite.ops.write.over(
-        downstream,
-        s"""import $$file.$upstreamBackticked
-           |println("hello")
-           |
-          |println($upstreamBackticked.x)
-        """.stripMargin
-      )
+      def createScript(s: String, dir: Path = null)(implicit name: sourcecode.Name) = {
+        val tmpFile = tmp(s, dir = dir, suffix = name.value + ".sc", prefix = "script")
+        val ident = tmpFile.last.stripSuffix(".sc")
+        (tmpFile, ident)
+      }
+      'simple{
 
 
-      runDownstream(1)
-      runDownstream(0)
-      runDownstream(0)
+        val (upstream, upstreamIdent) = createScript(
+          """println("barr")
+            |val x = 1
+            |
+          """.stripMargin
+        )
+
+        val (downstream, _) = createScript(
+          s"""import $$file.$upstreamIdent
+            |println("hello11")
+            |
+            |println($upstreamIdent.x)
+          """.stripMargin,
+          dir = upstream/up
+        )
+
+
+        // Upstream, downstream, and hardcoded predef
+        runScript(downstream, 3)
+        runScript(downstream, 0)
+        runScript(downstream, 0)
+
+        // Make sure when we change the upstream code, the downstream sscript
+        // recompiles too
+        ammonite.ops.write.over(
+          upstream,
+          """println("barr")
+            |val x = 2
+            |
+          """.stripMargin
+        )
+
+        runScript(downstream, 2)
+        runScript(downstream, 0)
+        runScript(downstream, 0)
+
+        // But if we change the downstream code, the upstream does *not* recompile
+        ammonite.ops.write.over(
+          downstream,
+          s"""import $$file.$upstreamIdent
+             |println("hello")
+             |
+            |println($upstreamIdent.x)
+          """.stripMargin
+        )
+
+
+        runScript(downstream, 1)
+        runScript(downstream, 0)
+        runScript(downstream, 0)
+      }
+      'diamond{
+        val (upstream, upstreamIdent) = createScript(
+          """println("uppstreamm")
+            |val x = 1
+            |
+          """.stripMargin
+        )
+
+        val (middleA, middleAIdent) = createScript(
+          s"""import $$file.$upstreamIdent
+             |println("middleeeeA")
+             |val a = $upstreamIdent.x + 1
+             |
+           """.stripMargin,
+          dir = upstream/up
+        )
+
+        val (middleB, middleBIdent) = createScript(
+          s"""import $$file.$upstreamIdent
+             |println("middleeeeB")
+             |val b = $upstreamIdent.x + 2
+             |
+           """.stripMargin,
+          dir = upstream/up
+        )
+
+        val (downstream, _) = createScript(
+          s"""import $$file.$middleAIdent
+             |import $$file.$middleBIdent
+             |println("downstreammm")
+             |println($middleAIdent.a + $middleBIdent.b)
+          """.stripMargin,
+          dir = upstream/up
+        )
+
+
+        // predefs + upstream + middleA + middleB + downstream
+        // ensure we don't compile `upstream` twice when it's depended upon twice
+        runScript(downstream, 5)
+        runScript(downstream, 0)
+        runScript(downstream, 0)
+
+        write.append(downstream, "\nval dummy = 1")
+
+        runScript(downstream, 1)
+        runScript(downstream, 0)
+        runScript(downstream, 0)
+
+
+        write.append(middleA, "\nval dummy = 1")
+
+        // Unfortunately, this currently causes `middleB` to get re-processed
+        // too, as it is only evaluated "after" middleA and thus it's
+        // processing environment has changed.
+        runScript(downstream, 3)
+        runScript(downstream, 0)
+        runScript(downstream, 0)
+
+        write.append(middleB, "\nval dummy = 1")
+
+        runScript(downstream, 2)
+        runScript(downstream, 0)
+        runScript(downstream, 0)
+
+        write.append(upstream, "\nval dummy = 1")
+
+        runScript(downstream, 4)
+        runScript(downstream, 0)
+        runScript(downstream, 0)
+      }
     }
   }
 }

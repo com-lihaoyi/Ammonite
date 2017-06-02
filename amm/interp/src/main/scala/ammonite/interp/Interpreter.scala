@@ -64,6 +64,17 @@ class Interpreter(val printer: Printer,
   private var scriptImportCallback: Imports => Unit = eval.update
   def compilationCount = compilerManager.compilationCount
   val watchedFiles = mutable.Buffer.empty[(Path, Long)]
+
+  // We keep an *in-memory* cache of scripts, in additional to the global
+  // filesystem cache shared between processes. This is because the global
+  // cache is keyed on (script, env), but you can load the same script multiple
+  // times in the same process (e.g. via a diamond dependency graph) and each
+  // time it will have a different `env. Despite this, we want to ensure we
+  // do not compile/load/run the same script more than once in the same
+  // process, so we cache it based on the source of the code and return the
+  // same result every time it gets run in the same process
+  val alreadyLoadedFiles = mutable.Map.empty[CodeSource, ScriptOutput.Metadata]
+
   val beforeExitHooks = mutable.Buffer.empty[Any ⇒ Any]
 
 
@@ -257,48 +268,54 @@ class Interpreter(val printer: Printer,
                     extraCode: String,
                     hardcoded: Boolean): Res[ScriptOutput.Metadata] = {
 
-    val tag = Tag(
-      Interpreter.cacheTag(code.getBytes),
-      Interpreter.cacheTag(
-        if (hardcoded) Array.empty[Byte]
-        else eval.evalClassloader.classpathHash
-      )
-    )
+    alreadyLoadedFiles.get(codeSource) match{
+      case Some(x) => Res.Success(x)
+      case None =>
+        val tag = Tag(
+          Interpreter.cacheTag(code.getBytes),
+          Interpreter.cacheTag(
+            if (hardcoded) Array.empty[Byte]
+            else eval.evalClassloader.classpathHash
+          )
+        )
 
 
-    val cachedScriptData = storage.classFilesListLoad(codeSource.filePathPrefix, tag)
+        val cachedScriptData = storage.classFilesListLoad(codeSource.filePathPrefix, tag)
 
 
-    // Lazy, because we may not always need this if the script is already cached
-    // and none of it's blocks end up needing to be re-compiled. We don't know up
-    // front if any blocks will need re-compilation, because it may import $file
-    // another script which gets changed, and we'd only know when we reach that block
-    lazy val splittedScript = Preprocessor.splitScript(Interpreter.skipSheBangLine(code))
+        // Lazy, because we may not always need this if the script is already cached
+        // and none of it's blocks end up needing to be re-compiled. We don't know up
+        // front if any blocks will need re-compilation, because it may import $file
+        // another script which gets changed, and we'd only know when we reach that block
+        lazy val splittedScript = Preprocessor.splitScript(Interpreter.skipSheBangLine(code))
 
-    for{
-      blocks <- cachedScriptData match {
-        case None => splittedScript.map(_.map(_ => None))
-        case Some(scriptOutput) =>
-          Res.Success(scriptOutput.classFiles.zip(scriptOutput.processed.blockInfo).map(Some(_)))
-      }
+        for{
+          blocks <- cachedScriptData match {
+            case None => splittedScript.map(_.map(_ => None))
+            case Some(scriptOutput) =>
+              Res.Success(scriptOutput.classFiles.zip(scriptOutput.processed.blockInfo).map(Some(_)))
+          }
 
-      data <- processCorrectScript(
-        blocks,
-        splittedScript,
-        predefImports,
-        codeSource,
-        processScriptBlock(_, codeSource, _),
-        autoImport,
-        extraCode
-      )
-    } yield {
-      storage.classFilesListSave(
-        codeSource.filePathPrefix,
-        data.blockInfo,
-        tag
-      )
-      data
+          data <- processCorrectScript(
+            blocks,
+            splittedScript,
+            predefImports,
+            codeSource,
+            processScriptBlock(_, codeSource, _),
+            autoImport,
+            extraCode
+          )
+        } yield {
+          storage.classFilesListSave(
+            codeSource.filePathPrefix,
+            data.blockInfo,
+            tag
+          )
+          alreadyLoadedFiles(codeSource) = data
+          data
+        }
     }
+
   }
 
 
