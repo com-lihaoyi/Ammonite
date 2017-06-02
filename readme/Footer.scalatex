@@ -114,6 +114,12 @@
 
 
   @sect{Changelog}
+    @sect{0.9.7}
+      @ul
+        @li
+          Fix crashes in autocomplete subsystem (@issue(620)) caused by
+          regression in 0.9.6
+
     @sect{0.9.6}
       @ul
         @li
