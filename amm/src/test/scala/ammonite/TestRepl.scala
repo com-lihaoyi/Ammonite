@@ -1,9 +1,8 @@
 package ammonite
 
 import ammonite.interp.Interpreter
-import ammonite.repl.{ReplApiImpl, SessionApiImpl}
+import ammonite.repl.{FrontEnd, Repl, ReplApiImpl, SessionApiImpl}
 import ammonite.runtime.{History, Storage}
-import ammonite.repl.Repl
 import ammonite.util._
 import utest.asserts._
 
@@ -31,11 +30,12 @@ class TestRepl {
     x => errorBuffer.append(x + "\n"),
     x => infoBuffer.append(x + "\n")
   )
-  val interp = try {
+  val storage = new Storage.Folder(tempDir)
+  val interp: Interpreter  = try {
 
-    lazy val i: Interpreter = new Interpreter(
+    new Interpreter(
       printer,
-      storage = new Storage.Folder(tempDir),
+      storage = storage,
       wd = ammonite.ops.pwd,
       customPredefs = Seq(
         PredefInfo(
@@ -46,25 +46,29 @@ class TestRepl {
         ),
         PredefInfo(Name("testPredef"), predef._1, false, predef._2)
       ),
-      extraBridges = { i =>
-        val replApi = new ReplApiImpl(
-          i,
-          80,
-          80,
-          null,
-          Colors.BlackWhite,
-          "@",
-          Ref(null),
-          new History(Vector()),
-          new SessionApiImpl(i.compilerManager.frames),
-          Vector()
-        )
+      extraBridges = Seq((
+        "ammonite.repl.ReplBridge",
+        "repl",
+        new ReplApiImpl {
+          def printer = ???
 
-        Seq(("ammonite.repl.ReplBridge", "repl", replApi, () => ()))
-      }
+          def sess = sess0
+          val prompt = Ref("@")
+          val frontEnd = Ref[FrontEnd](null)
+          def lastException: Throwable = null
+          def fullHistory = storage.fullHistory()
+          def history = new History(Vector())
+          val colors = Colors.BlackWhite
+          def newCompiler() = interp.compilerManager.init(force = true)
+          def compiler = interp.compilerManager.compiler.compiler
+          def imports = interp.eval.imports.toString
+          def width = 80
+          def height = 80
+        }
+      ))
+
     )
 
-    i
   }catch{ case e: Throwable =>
     println(infoBuffer.mkString)
     println(outBuffer.mkString)
@@ -72,6 +76,8 @@ class TestRepl {
     println(errorBuffer.mkString)
     throw e
   }
+
+  val sess0 = new SessionApiImpl(interp.compilerManager.frames)
 
   def session(sess: String): Unit = {
     // Remove the margin from the block and break
@@ -87,12 +93,11 @@ class TestRepl {
       // Break the step into the command lines, starting with @,
       // and the result lines
       val (cmdLines, resultLines) =
-        step.lines
-            .map(_.drop(margin))
-            .partition(_.startsWith("@"))
+        step.lines.toArray.map(_.drop(margin)).partition(_.startsWith("@"))
 
       val commandText = cmdLines.map(_.stripPrefix("@ ")).toVector
 
+      println(cmdLines.mkString("\n"))
       // Make sure all non-empty, non-complete command-line-fragments
       // are considered incomplete during the parse
       //

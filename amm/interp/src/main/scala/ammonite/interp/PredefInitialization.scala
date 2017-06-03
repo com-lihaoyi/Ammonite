@@ -11,7 +11,7 @@ import ammonite.util.Util.CodeSource
   * initialization
   */
 object PredefInitialization {
-  def apply(bridges: Seq[(String, String, AnyRef, () => Unit)],
+  def apply(bridges: Seq[(String, String, AnyRef)],
             interpApi: InterpAPI,
             evalClassloader: SpecialClassLoader,
             storage: Storage,
@@ -19,13 +19,13 @@ object PredefInitialization {
             processModule: (String, CodeSource, Boolean) => Res[Metadata],
             addImports: Imports => Unit) = {
 
-    for ((name, shortName, bridge, cb) <- bridges ){
+    for ((name, shortName, bridge) <- bridges ){
       APIHolder.initBridge(evalClassloader, name, bridge)
     }
     // import ammonite.repl.ReplBridge.{value => repl}
     // import ammonite.runtime.InterpBridge.{value => interp}
     val bridgePredefs =
-      for ((name, shortName, bridge, cb) <- bridges)
+      for ((name, shortName, bridge) <- bridges)
       yield PredefInfo(
         Name(s"${shortName}Bridge"),
         s"import $name.{value => $shortName}",

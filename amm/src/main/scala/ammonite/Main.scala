@@ -4,9 +4,9 @@ import java.io.{InputStream, OutputStream, PrintStream}
 
 import ammonite.interp.Interpreter
 import ammonite.ops._
-import ammonite.runtime.{History, Storage}
+import ammonite.runtime.Storage
 import ammonite.main._
-import ammonite.repl.{RemoteLogger, Repl, ReplApiImpl, SessionApiImpl}
+import ammonite.repl.{RemoteLogger, Repl}
 import ammonite.util._
 
 import scala.annotation.tailrec
@@ -69,7 +69,7 @@ case class Main(predef: String = "",
   /**
     * Instantiates an ammonite.Repl using the configuration
     */
-  def instantiateRepl(replArgs: Seq[Bind[_]] = Nil,
+  def instantiateRepl(replArgs: IndexedSeq[Bind[_]] = Vector.empty,
                      remoteLogger: Option[RemoteLogger]) = {
     val augmentedPredef = Main.maybeDefaultPredef(
       defaultPredef,
@@ -88,7 +88,7 @@ case class Main(predef: String = "",
     )
   }
 
-  def instantiateInterpreter(replApi: Boolean) = {
+  def instantiateInterpreter() = {
     val augmentedPredef = Main.maybeDefaultPredef(defaultPredef, Defaults.predefString)
 
     val (colors, printStream, errorPrintStream, printer) = Interpreter.initPrinters(
@@ -103,23 +103,7 @@ case class Main(predef: String = "",
         PredefInfo(Name("defaultPredef"), augmentedPredef, false, None),
         PredefInfo(Name("predef"), predef, false, None)
       ),
-      i =>
-        if (!replApi) Nil
-        else {
-          val replApi = new ReplApiImpl(
-            i,
-            80,
-            80,
-            null,
-            colors,
-            Ref(null),
-            Ref(null),
-            new History(Vector.empty),
-            new SessionApiImpl(i.compilerManager.frames),
-            Vector()
-          )
-          Seq(("ammonite.repl.ReplBridge", "repl", replApi, () => ()))
-        },
+      Vector.empty,
       wd,
       verboseOutput
     )
@@ -134,7 +118,7 @@ case class Main(predef: String = "",
 
     remoteLogger.foreach(_.apply("Boot"))
 
-    val repl = instantiateRepl(replArgs, remoteLogger)
+    val repl = instantiateRepl(replArgs.toIndexedSeq, remoteLogger)
 
     try{
       val exitValue = repl.run()
@@ -151,19 +135,19 @@ case class Main(predef: String = "",
     * of `args` and a map of keyword `kwargs` to pass to that file.
     */
   def runScript(path: Path,
-                scriptArgs: Seq[(String, Option[String])],
-                replApi: Boolean = false): (Res[Any], Seq[(Path, Option[Long])]) = {
+                scriptArgs: Seq[(String, Option[String])])
+                : (Res[Any], Seq[(Path, Option[Long])]) = {
 
-    val interp = instantiateInterpreter(replApi)
+    val interp = instantiateInterpreter()
     (main.Scripts.runScript(wd, path, interp, scriptArgs), interp.watchedFiles)
   }
 
   /**
     * Run a snippet of code
     */
-  def runCode(code: String, replApi: Boolean = false) = {
-    val interp = instantiateInterpreter(replApi)
-    interp.interpApi.load(code)
+  def runCode(code: String) = {
+    val interp = instantiateInterpreter()
+    interp.processExec(code)
   }
 }
 
@@ -207,7 +191,7 @@ object Main{
       helpMsg(cliConfig.help).right.flatMap{ _ =>
         (cliConfig.code, leftoverArgs) match{
           case (Some(code), Nil) =>
-            fromConfig(cliConfig, true, stdIn, stdOut, stdErr).runCode(code, cliConfig.replApi)
+            fromConfig(cliConfig, true, stdIn, stdOut, stdErr).runCode(code)
             Right(true)
 
           case (None, Nil) =>
@@ -268,8 +252,7 @@ object Main{
 
     val (res, watched) = scriptMain.runScript(
       scriptPath,
-      Scripts.groupArgs(flatArgs),
-      c.replApi
+      Scripts.groupArgs(flatArgs)
     )
     val printer = new PrintStream(stdErr)
     val success = res match {

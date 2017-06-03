@@ -51,24 +51,7 @@ class SessionApiImpl(frames0: StableRef[List[Frame]]) extends Session{
     namedFrames.remove(name)
   }
 }
-class ReplApiImpl(val interp: Interpreter,
-                  width0: => Int,
-                  height0: => Int,
-                  lastException0: => Throwable,
-                  colors0: Ref[Colors],
-                  prompt0: Ref[String],
-                  frontEnd0: Ref[FrontEnd],
-                  history0: => History,
-                  sess0: Session,
-                  replArgs0: Seq[Bind[_]]) extends DefaultReplAPI{
-  import interp._
-
-  def lastException = lastException0
-
-  def imports = eval.imports.toString
-  val colors = colors0
-  val prompt = prompt0
-  val frontEnd = frontEnd0
+trait ReplApiImpl extends DefaultReplAPI{
 
   implicit def tprintColorsImplicit = pprint.TPrintColors(
     typeColor = colors().`type`()
@@ -93,6 +76,8 @@ class ReplApiImpl(val interp: Interpreter,
 
   def show(t: Any) = show(t, null, 9999999, null)
 
+  def printer: Printer
+
   override def show(t: Any,
                     width: Integer = null,
                     height: Integer = 9999999,
@@ -110,30 +95,6 @@ class ReplApiImpl(val interp: Interpreter,
     printer.out(newLine)
   }
 
-  def search(target: scala.reflect.runtime.universe.Type) = compilerManager.search(target)
-  def compiler = interp.compilerManager.compiler.compiler
-  def newCompiler() = compilerManager.init(force = true)
-  def fullHistory = storage.fullHistory()
-  def history = history0
-
-
-  def width = width0
-  def replArgs = replArgs0.toVector
-  def height = height0
-
-  object sess extends Session {
-    def frames = frames
-    def save(name: String) = sess0.save(name)
-    def delete(name: String) = sess0.delete(name)
-
-    def pop(num: Int = 1) = {
-      val res = sess0.pop(num)
-      res
-    }
-    def load(name: String = "") = {
-      val res = sess0.load(name)
-      res
-    }
-  }
+  def sess: SessionApiImpl
 
 }

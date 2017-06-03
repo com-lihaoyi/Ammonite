@@ -1,10 +1,11 @@
 package ammonite.session
 
-import ammonite.TestRepl
+import ammonite.{TestRepl, main}
 import ammonite.TestUtils._
-import ammonite.main.Defaults
+import ammonite.main.{Defaults, Scripts}
 import ammonite.ops._
 import ammonite.runtime.Storage
+import ammonite.util.Res
 import utest._
 
 object ScriptTests extends TestSuite{
@@ -263,15 +264,15 @@ object ScriptTests extends TestSuite{
           )
         }
         'scriptWithoutExtension{
-          val res = intercept[java.nio.file.NoSuchFileException]{
-            val storage = new Storage.Folder(tmp.dir(prefix="ammonite-tester"))
-            val interp2 = createTestInterp(
-              storage,
-              Defaults.predefString
-            )
-            interp2.interpApi.load.module(pwd/"scriptWithoutExtension")
-          }.toString
-          assert(res.contains("java.nio.file.NoSuchFileException"))
+          val storage = new Storage.Folder(tmp.dir(prefix = "ammonite-tester"))
+          val interp2 = createTestInterp(
+            storage,
+            Defaults.predefString
+          )
+          val Res.Failure(_, msg) =
+            Scripts.runScript(pwd, pwd/"scriptWithoutExtension", interp2)
+
+          assert(msg.contains("Script file not found"))
         }
         'multiBlockError{
           check.session(s"""

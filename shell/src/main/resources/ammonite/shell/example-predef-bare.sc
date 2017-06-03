@@ -8,4 +8,8 @@ val shellSession = ammonite.shell.ShellSession()
 import shellSession._
 import ammonite.ops._
 import ammonite.shell._
-ammonite.shell.Configure(repl, wd)
+
+// Doesn't work in the test suite, where it's run as a script rather than
+// as a REPL
+
+// ammonite.shell.Configure(repl, wd)

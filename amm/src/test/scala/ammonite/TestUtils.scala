@@ -18,6 +18,6 @@ object TestUtils {
     customPredefs = Seq(
       PredefInfo(Name("predef"), predef, false, None)
     ),
-    extraBridges = _ => Seq()
+    extraBridges = Seq()
   )
 }

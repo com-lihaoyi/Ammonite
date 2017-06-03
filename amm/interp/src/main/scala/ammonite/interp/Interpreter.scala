@@ -29,13 +29,13 @@ class Interpreter(val printer: Printer,
                   // bridges need to be in place *before* the predef starts
                   // running, so you can use them predef to e.g. configure
                   // the REPL before it starts
-                  extraBridges: Interpreter => Seq[(String, String, AnyRef, () => Unit)],
+                  extraBridges: Seq[(String, String, AnyRef)],
                   val wd: Path,
                   verboseOutput: Boolean = true)
   extends ImportHook.InterpreterInterface{ interp =>
 
 
-
+  val repositories = Ref(ammonite.runtime.tools.IvyThing.defaultRepositories)
 
   val mainThread = Thread.currentThread()
 
@@ -62,7 +62,7 @@ class Interpreter(val printer: Printer,
   }
 
   private var scriptImportCallback: Imports => Unit = eval.update
-  def compilationCount = compilerManager.compilationCount
+
   val watchedFiles = mutable.Buffer.empty[(Path, Option[Long])]
 
   // We keep an *in-memory* cache of scripts, in additional to the global
@@ -75,8 +75,9 @@ class Interpreter(val printer: Printer,
   // same result every time it gets run in the same process
   val alreadyLoadedFiles = mutable.Map.empty[CodeSource, ScriptOutput.Metadata]
 
-  val beforeExitHooks = mutable.Buffer.empty[Any ⇒ Any]
+  val beforeExitHooks = mutable.Buffer.empty[Any => Any]
 
+  def compilationCount = compilerManager.compilationCount
 
   val importHooks = Ref(Map[Seq[String], ImportHook](
     Seq("file") -> ImportHook.File,
@@ -94,7 +95,7 @@ class Interpreter(val printer: Printer,
   // to it even if it's half built
   var predefImports = Imports()
   PredefInitialization.apply(
-    extraBridges(this) :+ ("ammonite.interp.InterpBridge", "interp", interpApi, () => ()),
+    extraBridges :+ ("ammonite.interp.InterpBridge", "interp", interpApi),
     interpApi,
     eval.evalClassloader,
     storage,
@@ -105,8 +106,9 @@ class Interpreter(val printer: Printer,
 
   // The ReplAPI requires some special post-Interpreter-initialization
   // code to run, so let it pass it in a callback and we'll run it here
-  for ((name, shortName, bridge, cb) <- extraBridges(this) ) cb()
-
+  def watch(p: Path) = {
+    watchedFiles.append(p -> Interpreter.mtimeIfExists(p))
+  }
 
   def resolveSingleImportHook(source: CodeSource, tree: ImportTree) = {
     val strippedPrefix = tree.prefix.takeWhile(_(0) == '$').map(_.stripPrefix("$"))
@@ -553,11 +555,10 @@ class Interpreter(val printer: Printer,
     }
   }
 
-  lazy val interpApi: InterpAPI = new InterpAPI{ outer =>
 
-    def watch(p: Path) = {
-      watchedFiles.append(p -> Interpreter.mtimeIfExists(p))
-    }
+  private[this] lazy val interpApi: InterpAPI = new InterpAPI{ outer =>
+
+    def watch(p: Path) = interp.watch(p)
 
     def configureCompiler(callback: scala.tools.nsc.Global => Unit) = {
       compilerManager.configureCompiler(callback)
@@ -565,7 +566,7 @@ class Interpreter(val printer: Printer,
 
     val beforeExitHooks = interp.beforeExitHooks
 
-    val repositories = Ref(ammonite.runtime.tools.IvyThing.defaultRepositories)
+    val repositories = interp.repositories
 
     object load extends DefaultLoadJar with Load {
 

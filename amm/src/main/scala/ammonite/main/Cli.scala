@@ -27,7 +27,6 @@ object Cli{
                     code: Option[String] = None,
                     home: Path = Defaults.ammoniteHome,
                     predefFile: Option[Path] = None,
-                    replApi: Boolean = false,
                     help: Boolean = false)
 
   
@@ -75,15 +74,6 @@ object Cli{
     )
   )
   val scriptSignature = Seq(
-
-    Arg[Config, Unit](
-      "repl-api", None,
-      """Lets you run a script with the `repl` object present; this is
-        |normally not available in scripts and only provided in the
-        |interactive REPL""".stripMargin,
-      (c, v) => c.copy(replApi= true)
-    ),
-
     Arg[Config, Unit](
       "watch", Some('w'),
       "Watch and re-run your scripts when they change",

@@ -20,9 +20,9 @@ class Repl(input: InputStream,
            mainPredef: String,
            wd: ammonite.ops.Path,
            welcomeBanner: Option[String],
-           replArgs: Seq[Bind[_]] = Nil,
+           replArgs: IndexedSeq[Bind[_]] = Vector.empty,
            initialColors: Colors = Colors.Default,
-           remoteLogger: Option[RemoteLogger]) {
+           remoteLogger: Option[RemoteLogger]) { repl =>
 
   val prompt = Ref("@ ")
 
@@ -42,6 +42,8 @@ class Repl(input: InputStream,
     """
   }.mkString(newLine)
 
+  val sess0 = new SessionApiImpl(interp.compilerManager.frames)
+
   val interp: Interpreter = new Interpreter(
     printer,
     storage,
@@ -50,23 +52,31 @@ class Repl(input: InputStream,
       PredefInfo(Name("ArgsPredef"), argString, false, None),
       PredefInfo(Name("MainPredef"), mainPredef, false, Some(wd))
     ),
-    i => {
-      val replApi = new ReplApiImpl(
-        i,
-        frontEnd().width,
-        frontEnd().height,
-        lastException,
-        colors,
-        prompt,
-        frontEnd,
-        history,
-        new SessionApiImpl(i.compilerManager.frames),
-        replArgs
-      )
-      Seq(("ammonite.repl.ReplBridge", "repl", replApi, () => replApi.sess.save()))
-    },
+    Seq((
+      "ammonite.repl.ReplBridge",
+      "repl",
+      new ReplApiImpl {
+        def printer = repl.printer
+
+        def sess = repl.sess0
+        val prompt = repl.prompt
+        val frontEnd = repl.frontEnd
+
+        def lastException = repl.lastException
+        def fullHistory = storage.fullHistory()
+        def history = repl.history
+        val colors = repl.colors
+        def newCompiler() = interp.compilerManager.init(force = true)
+        def compiler = interp.compilerManager.compiler.compiler
+        def imports = interp.eval.imports.toString
+        def width = frontEnd().width
+        def height = frontEnd().height
+      }
+    )),
     wd
   )
+
+  sess0.save()
 
   val reader = new InputStreamReader(input)
 
