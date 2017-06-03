@@ -7,7 +7,7 @@ import sourcecode.Compat._
 import scala.annotation.tailrec
 import scala.language.experimental.macros
 
-object src{
+object source{
 
 
   def load(f: => Any): Location = macro loadMacro

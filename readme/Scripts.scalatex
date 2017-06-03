@@ -11,17 +11,24 @@
     @b{Scala scripts} are lightweight files containing Scala code that
     can be directly run from the command line. Unlike normal Scala projects,
     Scala scripts let you save and run code without setting up a "build-file"
-    or "project". Scala Scripts are useful as something in between the REPL and
-    a full-fledged Scala/SBT project: more permanent than a REPL session, but
-    more lightweight and easier to set up than a SBT project.
+    or "project". Scala Scripts are useful for writing small pieces of code,
+    and are much quicker to write and deploy than a full-fledged SBT project.
 
   @img(src:="Watch.gif", display.block, marginLeft.auto, marginRight.auto, height := 322)
 
   @p
     Creating an Ammonite Script is just a matter of creating a
-    @hl.scala{MyScript.sc} with some Scala code in it, and running it from
-    within the Ammonite REPL or @sect.ref{From Bash}. Writing Scala code
-    doesn't get much easier than that! For example, Ammonite's own
+    @code{MyScript.sc} with some Scala code in it, and running it
+    @sect.ref("Running Scripts", "from your terminal"). Deploying the script is
+    a matter of copying the script file to where-ever you want to run it, and
+    running it. No @code{project/} folder, no worrying about @code{.jar} files
+    or uber-jars. No worrying about compiling your code: scripts are
+    automatically compiled the first time they are run, and subsequently start
+    quickly with minimal overhead. Writing and running Scala code
+    doesn't get much easier than that!
+
+  @p
+    As an example, Ammonite's own
     @lnk("Continuous Integration Scripts", "https://github.com/lihaoyi/Ammonite/tree/master/ci")
     are written as @code{.sc} Scala Scripts, as are @lnk("Haoyi's blog",
     "https://github.com/lihaoyi/blog") and @lnk("resume",
@@ -490,7 +497,7 @@
       @p
         You can load any script into the Ammonite REPL using the
         @hl.scala{import $file} syntax, for example here we import the above
-        @hl.scala{MyScript.sc} file to access its @hl.scala{x} value:
+        @code{MyScript.sc} file to access its @hl.scala{x} value:
 
       @hl.scala
         @@ x // doesn't work yet

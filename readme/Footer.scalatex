@@ -123,6 +123,10 @@
           Ammonite and any arguments @i{after} the script file get forwarded
           to the script's @hl.scala("@main") method
 
+        @li
+          Renamed @code{src} builtin to @code{source} to reduce chance of
+          name collisions
+
     @sect{0.9.7}
       @ul
         @li
@@ -159,7 +163,7 @@
     @sect{0.9.4}
       @ul
         @li
-          Experimental support for the @sect.ref{src} built-in, which brings
+          Experimental support for the @sect.ref{source} built-in, which brings
           you to the source code for a method or class so you can see the
           implementation or read the doc-string.
         @li

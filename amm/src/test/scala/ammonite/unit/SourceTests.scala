@@ -5,7 +5,7 @@ import ammonite.TestUtils
 import ammonite.ops._
 import ammonite.repl.tools.Location
 import utest._
-import ammonite.repl.tools.src.load
+import ammonite.repl.tools.source.load
 import fastparse.utils.{ElemSetHelper, Generator, IndexedParserInput}
 
 import scala.tools.nsc.interpreter.InputStream

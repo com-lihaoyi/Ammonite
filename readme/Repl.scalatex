@@ -500,7 +500,7 @@
 
         @ul
           @li
-            @sect.ref{src}
+            @sect.ref{source}
           @li
             @sect.ref{time}
           @li
@@ -519,8 +519,8 @@
         @p
           These tools are useful but not strictly necessary;
 
-        @sect{src}
-          @img(src:="Src.gif", display.block, marginLeft.auto, marginRight.auto, height := 364)
+        @sect{source}
+          @img(src:="Source.gif", display.block, marginLeft.auto, marginRight.auto, height := 364)
 
           @p
             Ammonite provides the @code{src} built-in, which lets you easily

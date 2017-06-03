@@ -27,7 +27,7 @@ object BasicTests extends TestSuite{
       "-h",
       home,
       replStandaloneResources/name,
-      JAVA_OPTS = "-verbose:class",
+      JAVA_OPTS = "-verbose:class"
     )
 
     'hello{
