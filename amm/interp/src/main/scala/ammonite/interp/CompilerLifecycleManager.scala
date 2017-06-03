@@ -110,16 +110,19 @@ class CompilerLifecycleManager(frames0: Ref[List[Frame]]){
   def compileClass(processed: Preprocessor.Output,
                    printer: Printer,
                    fileName: String): Res[(Util.ClassFiles, Imports)] = {
+    // Enforce the invariant that every piece of code Ammonite ever compiles,
+    // gets run within the `ammonite` package. It's further namespaced into
+    // things like `ammonite.$file` or `ammonite.$sess`, but it has to be
+    // within `ammonite`
+    assert(processed.code.trim.startsWith("package ammonite"))
+
     init()
     for {
       compiled <- Res.Success{
         compiler.compile(processed.code.getBytes, printer, processed.prefixCharLength, fileName)
       }
       _ = Internal.compilationCount += 1
-      (classfiles, imports) <- Res[(Util.ClassFiles, Imports)](
-        compiled,
-        "Compilation Failed"
-      )
+      (classfiles, imports) <- Res[(Util.ClassFiles, Imports)](compiled, "Compilation Failed")
     } yield {
       (classfiles, imports)
     }

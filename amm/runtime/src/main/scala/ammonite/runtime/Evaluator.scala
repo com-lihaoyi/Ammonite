@@ -121,7 +121,7 @@ object Evaluator{
                     fileName: String,
                     indexedWrapperName: Name) = {
       for {
-        cls <- loadClass("$sess." + indexedWrapperName.backticked, classFiles)
+        cls <- loadClass("ammonite.$sess." + indexedWrapperName.backticked, classFiles)
         _ = currentLine += 1
         _ <- Catching{userCodeExceptionHandler}
       } yield {
@@ -131,7 +131,7 @@ object Evaluator{
         evaluatorRunPrinter(iter.foreach(printer.out))
 
         // "" Empty string as cache tag of repl code
-        evaluationResult(Seq(Name("$sess"), indexedWrapperName), newImports)
+        evaluationResult(Seq(Name("ammonite"), Name("$sess"), indexedWrapperName), newImports)
       }
     }
 

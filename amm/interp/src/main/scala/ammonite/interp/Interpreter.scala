@@ -187,7 +187,7 @@ class Interpreter(val printer: Printer,
 
       ImportHookInfo(hookImports, hookStmts, _) <- resolveImportHooks(
 
-        CodeSource(wrapperName, Seq(), Seq(Name("$file")), Some(wd/"(console)")),
+        CodeSource(wrapperName, Seq(), Seq(Name("ammonite"), Name("$file")), Some(wd/"(console)")),
         stmts
       )
 
@@ -195,7 +195,7 @@ class Interpreter(val printer: Printer,
         hookStmts,
         eval.getCurrentLine,
         "",
-        Seq(Name("$sess")),
+        Seq(Name("ammonite"), Name("$sess")),
         wrapperName,
         predefImports ++ eval.imports ++ hookImports,
         prints => s"ammonite.repl.ReplBridge.value.Internal.combinePrints($prints)",
@@ -234,6 +234,7 @@ class Interpreter(val printer: Printer,
   def processScriptBlock(processed: Preprocessor.Output,
                          codeSource0: CodeSource,
                          indexedWrapperName: Name) = {
+
     val codeSource = codeSource0.copy(wrapperName = indexedWrapperName)
     val fullyQualifiedName = codeSource.jvmPathPrefix
 
@@ -332,7 +333,7 @@ class Interpreter(val printer: Printer,
       CodeSource(
         Name("cmd" + eval.getCurrentLine),
         Seq(),
-        Seq(Name("$sess")),
+        Seq(Name("ammonite"), Name("$sess")),
         Some(wd/"(console)")
       ),
       { (processed, indexedWrapperName) =>
@@ -429,6 +430,7 @@ class Interpreter(val printer: Printer,
               _ => "scala.Iterator[String]()",
               extraCode = extraCode
             )
+
             (ev, tag) <- evaluate(processed, indexedWrapperName)
           } yield ScriptOutput.BlockMetadata(
             VersionedWrapperId(ev.wrapper.map(_.encoded).mkString("."), tag),
@@ -592,7 +594,7 @@ class Interpreter(val printer: Printer,
           CodeSource(
             wrapper,
             pkg,
-            Seq(Name("$file")),
+            Seq(Name("ammonite"), Name("$file")),
             Some(wd/"Main.sc")
           ),
           true,

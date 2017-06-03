@@ -78,6 +78,7 @@ object Util{
                         flexiblePkgName: Seq[Name],
                         pkgRoot: Seq[Name],
                         path: Option[Path]){
+    assert(pkgRoot.head == Name("ammonite"))
     def pkgName = pkgRoot ++ flexiblePkgName
     def fullName = pkgName :+ wrapperName
 

@@ -142,6 +142,12 @@
           Error messages from scripts are now more reliably sent to @code{stderr}
           rather than @code{stdout}
 
+        @li
+          All code within Ammonite's REPL and scripts now run within the context
+          of the @code{ammonite} package; this lets us avoid littering the
+          top-level package namespace with miscellaneous names like @code{$file}
+          and @code{$sess}
+
     @sect{0.9.7}
       @ul
         @li

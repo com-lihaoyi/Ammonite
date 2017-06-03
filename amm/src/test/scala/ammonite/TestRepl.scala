@@ -27,9 +27,9 @@ class TestRepl {
   val infoBuffer = mutable.Buffer.empty[String]
   val printer = Printer(
     outBuffer.append(_),
-    warningBuffer.append(_),
-    errorBuffer.append(_),
-    infoBuffer.append(_)
+    x => warningBuffer.append(x + "\n"),
+    x => errorBuffer.append(x + "\n"),
+    x => infoBuffer.append(x + "\n")
   )
   val interp = try {
 

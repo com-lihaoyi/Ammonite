@@ -37,6 +37,7 @@ trait Preprocessor{
                 printerTemplate: String => String,
                 extraCode: String): Res[Preprocessor.Output]
 }
+
 object Preprocessor{
   private case class Expanded(code: String, printer: Seq[String])
   case class Output(code: String,
@@ -104,14 +105,17 @@ object Preprocessor{
                   indexedWrapperName: Name,
                   imports: Imports,
                   printerTemplate: String => String,
-                  extraCode: String) = for{
-      Preprocessor.Expanded(code, printer) <- expandStatements(stmts, resultIndex)
-      (wrappedCode, importsLength) = wrapCode(
-        pkgName, indexedWrapperName, leadingSpaces + code,
-        printerTemplate(printer.mkString(", ")),
-        imports, extraCode
-      )
-    } yield Preprocessor.Output(wrappedCode, importsLength)
+                  extraCode: String) = {
+      assert(pkgName.head == Name("ammonite"))
+      for{
+        Preprocessor.Expanded(code, printer) <- expandStatements(stmts, resultIndex)
+        (wrappedCode, importsLength) = wrapCode(
+          pkgName, indexedWrapperName, leadingSpaces + code,
+          printerTemplate(printer.mkString(", ")),
+          imports, extraCode
+        )
+      } yield Preprocessor.Output(wrappedCode, importsLength)
+    }
 
     def Processor(cond: PartialFunction[(String, String, G#Tree), Preprocessor.Expanded]) = {
       (code: String, name: String, tree: G#Tree) => cond.lift(name, code, tree)
@@ -275,7 +279,8 @@ object Preprocessor{
     //we need to normalize topWrapper and bottomWrapper in order to ensure
     //the snippets always use the platform-specific newLine
     val topWrapper = normalizeNewlines(s"""
-package ${Util.encodeScalaSourcePath(pkgName)}
+package ${pkgName.head.encoded}
+package ${Util.encodeScalaSourcePath(pkgName.tail)}
 $imports
 
 object ${indexedWrapperName.backticked}{\n"""
