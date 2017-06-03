@@ -28,6 +28,8 @@ class Repl(input: InputStream,
 
   val frontEnd = Ref[FrontEnd](AmmoniteFrontEnd(Filter.empty))
 
+  var lastException: Throwable = null
+
   var history = new History(Vector())
 
   val (colors, printStream, errorPrintStream, printer) =
@@ -53,6 +55,7 @@ class Repl(input: InputStream,
         i,
         frontEnd().width,
         frontEnd().height,
+        lastException,
         colors,
         prompt,
         frontEnd,
@@ -99,9 +102,12 @@ class Repl(input: InputStream,
         case Res.Exit(value) =>
           printStream.println("Bye!")
           value
-        case Res.Failure(ex, msg) => printer.error(msg)
+        case Res.Failure(ex, msg) =>
+          printer.error(msg)
+          lastException = ex.getOrElse(lastException)
           loop()
         case Res.Exception(ex, msg) =>
+          lastException = ex
           printer.error(
             Repl.showException(ex, colors().error(), fansi.Attr.Reset, colors().literal())
           )

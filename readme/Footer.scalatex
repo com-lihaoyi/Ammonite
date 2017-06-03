@@ -824,7 +824,7 @@
             problems when copying and pasting @issue(205)
           @li
             Thrown exceptions are now made available to you in the REPL under
-            the @code{lastException} variable @issue(289), in case you need more
+            the @code{repl.lastException} variable @issue(289), in case you need more
             metadata from it or you want the stack-trace of a
             non-printed-by-default exception (e.g. @code{ThreadDeath} due to
             @code{Ctrl-C}). Thanks to @coderAbhishek!

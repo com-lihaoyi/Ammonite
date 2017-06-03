@@ -51,6 +51,7 @@ class TestRepl {
           i,
           80,
           80,
+          null,
           Colors.BlackWhite,
           "@",
           Ref(null),

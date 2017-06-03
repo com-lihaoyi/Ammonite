@@ -54,6 +54,7 @@ class SessionApiImpl(frames0: StableRef[List[Frame]]) extends Session{
 class ReplApiImpl(val interp: Interpreter,
                   width0: => Int,
                   height0: => Int,
+                  lastException0: => Throwable,
                   colors0: Ref[Colors],
                   prompt0: Ref[String],
                   frontEnd0: Ref[FrontEnd],
@@ -62,7 +63,7 @@ class ReplApiImpl(val interp: Interpreter,
                   replArgs0: Seq[Bind[_]]) extends DefaultReplAPI{
   import interp._
 
-  def lastException = interp.lastException
+  def lastException = lastException0
 
   def imports = eval.imports.toString
   val colors = colors0

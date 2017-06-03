@@ -35,7 +35,7 @@ class Interpreter(val printer: Printer,
   extends ImportHook.InterpreterInterface{ interp =>
 
 
-  var lastException: Throwable = null
+
 
   val mainThread = Thread.currentThread()
 
@@ -506,8 +506,7 @@ class Interpreter(val printer: Printer,
       case Res.Skip => // do nothing
       case Res.Exit(value) => compilerManager.shutdownPressy()
       case Res.Success(ev) => eval.update(ev.imports)
-      case Res.Failure(ex, msg) => lastException = ex.getOrElse(lastException)
-      case Res.Exception(ex, msg) => lastException = ex
+      case _ => ()
     }
   }
   def loadIvy(coordinates: coursier.Dependency*) = {
