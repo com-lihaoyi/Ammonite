@@ -35,16 +35,16 @@ class CompilerLifecycleManager(frames0: Ref[List[Frame]]){
     var pressy: Pressy = _
     var compilationCount = 0
     var frames = frames0
+  }
 
-    // We lazily force the compiler to be re-initialized by setting the
-    // compilerStale flag. Otherwise, if we re-initialized the compiler eagerly,
-    // we end up sometimes re-initializing it multiple times unnecessarily before
-    // it gets even used once. Empirically, this cuts down the number of compiler
-    // re-initializations by about 2/3, each of which costs about 30ms and
-    // probably creates a pile of garbage
-    def reInit() = {
-      Internal.compilerStale = true
-    }
+  // We lazily force the compiler to be re-initialized by setting the
+  // compilerStale flag. Otherwise, if we re-initialized the compiler eagerly,
+  // we end up sometimes re-initializing it multiple times unnecessarily before
+  // it gets even used once. Empirically, this cuts down the number of compiler
+  // re-initializations by about 2/3, each of which costs about 30ms and
+  // probably creates a pile of garbage
+  def reInit() = {
+    Internal.compilerStale = true
   }
 
   import Internal._

@@ -36,7 +36,6 @@ object ImportHook{
     * default this is what is available.
     */
   trait InterpreterInterface{
-    def wd: Path
     def loadIvy(coordinates: coursier.Dependency*): Either[String, Set[File]]
   }
 
