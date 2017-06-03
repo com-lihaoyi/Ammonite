@@ -121,6 +121,13 @@ lazy val amm = project
     macroSettings,
     sharedSettings,
 
+    unmanagedSourceDirectories in Compile ++= {
+      if (Set("2.12", "2.11").contains(scalaBinaryVersion.value))
+        Seq(baseDirectory.value / "src" / "main" / "scala-2.11_2.12")
+      else
+        Seq()
+    },
+
     // Aggregate source jars into both the amm/test:run as well as the assembly
     // classpaths, so that the `source` macro can find their sources and
     // highlight/display them.

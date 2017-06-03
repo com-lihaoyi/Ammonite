@@ -363,6 +363,44 @@
       @code
         amm MultiMain.sc functionB 2 "Hello"
 
+    @sect{Script Usage Docs}
+      @p
+        You can document your scripts with the @hl.scala("@doc") annotation. By
+        default, a script such as
+
+      @hl.ref(
+         wd/'amm/'src/'test/'resources/'mains/"MultiMain.sc",
+         className = "scala"
+      )
+
+      @p
+        Will result in a usage message:
+
+      @hl.ref(
+        wd/'amm/'src/'test/'scala/'ammonite/'main/"MainTests.scala",
+        start = Seq("specifyMain", "\"\"\"", ""),
+        end = "\"\"\"",
+        className = "sh"
+      )
+
+      @p
+        You can add docs via
+
+      @hl.ref(
+         wd/'amm/'src/'test/'resources/'mains/"MultiMainDoc.sc",
+         className = "scala"
+      )
+
+      @p
+        Which will be shown as part of the usage message
+
+      @hl.ref(
+        wd/'amm/'src/'test/'scala/'ammonite/'main/"MainTests.scala",
+        start = Seq("specifyMainDoc", "\"\"\"", ""),
+        end = "\"\"\"",
+        className = "sh"
+      )
+
     @sect{Bundled Libraries}
       @p
         While Ammonite allows you to load any Java or Scala library for use
@@ -445,7 +483,7 @@
         @replCurl
 
       @hl.scala
-        bash$ amm path/to/script.sc
+        $ amm path/to/script.sc
 
       @p
         All types, values and imports defined in scripts are available to

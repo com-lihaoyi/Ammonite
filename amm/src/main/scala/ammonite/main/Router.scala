@@ -38,6 +38,11 @@ object Router{
                     doc: Option[String],
                     default: Option[() => Any])
 
+  def stripDashes(s: String) = {
+    if (s.startsWith("--")) s.drop(2)
+    else if (s.startsWith("-")) s.drop(1)
+    else s
+  }
   /**
     * What is known about a single endpoint for our routes. It has a [[name]],
     * [[argSignatures]] for each argument, and a macro-generated [[invoke0]]
@@ -49,6 +54,7 @@ object Router{
     */
   case class EntryPoint(name: String,
                         argSignatures: Seq[ArgSig],
+                        doc: Option[String],
                         varargs: Boolean,
                         invoke0: (Map[String, String], Seq[String]) => Result[Any]){
     def invoke(groupedArgs: Seq[(String, Option[String])]): Result[Any] = {
@@ -64,35 +70,60 @@ object Router{
 
       val lookupArgSig = argSignatures.map(x => (x.name, x)).toMap
 
+      var incomplete: Option[ArgSig] = None
+
       for(group <- groupedArgs){
+
         group match{
           case (value, None) =>
-            remainingArgSignatures match {
+            if (value(0) == '-' && !varargs){
+              lookupArgSig.get(stripDashes(value)) match{
+                case None => leftoverArgs.append(value)
+                case Some(sig) => incomplete = Some(sig)
+              }
+
+            } else remainingArgSignatures match {
               case Nil => leftoverArgs.append(value)
               case last :: Nil if varargs => leftoverArgs.append(value)
               case next :: rest =>
                 accumulatedKeywords(next).append(value)
                 remainingArgSignatures = rest
             }
-          case (key, Some(value)) =>
+          case (rawKey, Some(value)) =>
+            val key = stripDashes(rawKey)
             lookupArgSig.get(key) match{
               case Some(x) if accumulatedKeywords.contains(x) =>
-                accumulatedKeywords(x).append(value)
-                remainingArgSignatures = remainingArgSignatures.filter(_.name != key)
-              case _ => leftoverArgs.append("--"+key, value)
+                if (accumulatedKeywords(x).nonEmpty && varargs){
+                  leftoverArgs.append(rawKey, value)
+                }else{
+                  accumulatedKeywords(x).append(value)
+                  remainingArgSignatures = remainingArgSignatures.filter(_.name != key)
+                }
+              case _ =>
+                leftoverArgs.append(rawKey, value)
             }
         }
       }
 
       val missing0 = remainingArgSignatures.filter(_.default.isEmpty)
-      val missing = if(varargs) missing0.filter(_ != argSignatures.last) else missing0
+      val missing = if(varargs) {
+        missing0.filter(_ != argSignatures.last)
+      } else {
+        missing0.filter(x => incomplete != Some(x))
+      }
       val duplicates = accumulatedKeywords.toSeq.filter(_._2.length > 1)
 
-      if (missing.nonEmpty || duplicates.nonEmpty || (leftoverArgs.nonEmpty && !varargs)){
+      if (
+        incomplete.nonEmpty ||
+        missing.nonEmpty ||
+        duplicates.nonEmpty ||
+        (leftoverArgs.nonEmpty && !varargs)
+      ){
         Result.Error.MismatchedArguments(
           missing = missing,
           unknown = leftoverArgs,
-          duplicate = duplicates
+          duplicate = duplicates,
+          incomplete = incomplete
 
         )
       } else {
@@ -168,8 +199,9 @@ object Router{
         * did not line up with the arguments expected
         */
       case class MismatchedArguments(missing: Seq[ArgSig],
-                                    unknown: Seq[String],
-                                    duplicate: Seq[(ArgSig, Seq[String])]) extends Error
+                                     unknown: Seq[String],
+                                     duplicate: Seq[(ArgSig, Seq[String])],
+                                     incomplete: Option[ArgSig]) extends Error
       /**
         * Invoking the [[EntryPoint]] failed because there were problems
         * deserializing/parsing individual arguments
@@ -245,6 +277,17 @@ class Router [C <: Context](val c: C) {
       hasDefault(i).map(defaultName => q"() => $target.${newTermName(defaultName)}")
     }
 
+    def getDocAnnotation(annotations: List[Annotation]) = {
+      val (docTrees, remaining) = annotations.partition(_.tpe =:= typeOf[Router.doc])
+      val docValues = for {
+        doc <- docTrees
+        if doc.scalaArgs.head.isInstanceOf[Literal]
+        l =  doc.scalaArgs.head.asInstanceOf[Literal]
+        if l.value.value.isInstanceOf[String]
+      } yield l.value.value.asInstanceOf[String]
+      (remaining, docValues.headOption)
+    }
+
     def unwrapVarargType(arg: Symbol) = {
       val vararg = arg.typeSignature.typeSymbol == definitions.RepeatedParamClass
       val unwrappedType =
@@ -253,11 +296,14 @@ class Router [C <: Context](val c: C) {
 
       (vararg, unwrappedType)
     }
+
+
+    val (_, methodDoc) = getDocAnnotation(meth.annotations)
     val readArgSigs = for(
       ((arg, defaultOpt), i) <- flattenedArgLists.zip(defaults).zipWithIndex
     ) yield {
 
-      val (vararg, unwrappedType) = unwrapVarargType(arg)
+      val (vararg, varargUnwrappedType) = unwrapVarargType(arg)
 
       val default =
         if (vararg) q"scala.Some(scala.Nil)"
@@ -266,21 +312,24 @@ class Router [C <: Context](val c: C) {
           case None => q"scala.None"
         }
 
-      val docs = for{
-        doc <- arg.annotations.find(_.tpe =:= typeOf[Router.doc])
-        if doc.scalaArgs.head.isInstanceOf[Literal]
-        l =  doc.scalaArgs.head.asInstanceOf[Literal]
-        if l.value.value.isInstanceOf[String]
-      } yield l.value.value.asInstanceOf[String]
+      val (docUnwrappedType, docOpt) = varargUnwrappedType match{
+        case t: AnnotatedType =>
 
-      val docTree = docs match{
+          val (remaining, docValue) = getDocAnnotation(t.annotations)
+          if (remaining.isEmpty) (t.underlying, docValue)
+          else (Compat.copyAnnotatedType(c)(t, remaining), docValue)
+
+        case t => (t, None)
+      }
+
+      val docTree = docOpt match{
         case None => q"scala.None"
         case Some(s) => q"scala.Some($s)"
       }
       val argSig = q"""
         ammonite.main.Router.ArgSig(
           ${arg.name.toString},
-          ${arg.typeSignature.toString},
+          ${docUnwrappedType.toString + (if(vararg) "*" else "")},
           $docTree,
           $defaultOpt
         )
@@ -288,17 +337,17 @@ class Router [C <: Context](val c: C) {
 
       val reader =
         if(vararg) q"""
-          ammonite.main.Router.readVarargs[$unwrappedType](
+          ammonite.main.Router.readVarargs[$docUnwrappedType](
             $argSig,
             $extrasSymbol,
-            implicitly[scopt.Read[$unwrappedType]].reads(_)
+            implicitly[scopt.Read[$docUnwrappedType]].reads(_)
           )
         """ else q"""
-        ammonite.main.Router.read[$unwrappedType](
+        ammonite.main.Router.read[$docUnwrappedType](
           $argListSymbol,
           $default,
           $argSig,
-          implicitly[scopt.Read[$unwrappedType]].reads(_)
+          implicitly[scopt.Read[$docUnwrappedType]].reads(_)
         )
         """
       (reader, argSig, vararg)
@@ -319,6 +368,10 @@ class Router [C <: Context](val c: C) {
     ammonite.main.Router.EntryPoint(
       ${meth.name.toString},
       scala.Seq(..$argSigs),
+      ${methodDoc match{
+        case None => q"scala.None"
+        case Some(s) => q"scala.Some($s)"
+      }},
       ${varargs.contains(true)},
       ($argListSymbol: Map[String, String], $extrasSymbol: Seq[String]) =>
         ammonite.main.Router.validate(Seq(..$readArgs)) match{

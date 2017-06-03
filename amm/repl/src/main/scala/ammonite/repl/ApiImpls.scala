@@ -8,7 +8,7 @@ import ammonite.util._
 
 import scala.collection.mutable
 
-class SessionApiImpl(frames0: StableRef[List[Frame]]) extends Session{
+class SessionApiImpl(frames0: => StableRef[List[Frame]]) extends Session{
   def frames = frames0()
   val namedFrames = mutable.Map.empty[String, List[Frame]]
 

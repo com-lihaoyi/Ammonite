@@ -35,8 +35,7 @@ object RouterTests extends TestSuite{
         def bar(i: Int) = i
         @main
         def qux(i: Int,
-                @doc("Pass in a custom `s` to override it")
-                s: String = "lols") = s * i
+                s: String @doc("Pass in a custom `s` to override it") = "lols") = s * i
         @main
         def ex() = throw MyException
 
@@ -122,7 +121,7 @@ object RouterTests extends TestSuite{
 
         'notEnoughNormalArgsStillFails{
           assertMatch(parseInvoke(routes(5), List())){
-            case MismatchedArguments(List(ArgSig("first", _, _, _)), Nil, Nil) =>
+            case MismatchedArguments(List(ArgSig("first", _, _, _)), Nil, Nil, None) =>
           }
         }
         'multipleVarargParseFailures{
@@ -147,10 +146,10 @@ object RouterTests extends TestSuite{
       'failures{
         'missingParams - {
           assertMatch(parseInvoke(routes(1), List.empty)){
-            case MismatchedArguments(List(ArgSig("i", _, _, _)), Nil, Nil) =>
+            case MismatchedArguments(List(ArgSig("i", _, _, _)), Nil, Nil, None) =>
           }
           assertMatch(parseInvoke(routes(2), List("--s", "omg"))){
-            case MismatchedArguments(List(ArgSig("i", _, _, _)), Nil, Nil) =>
+            case MismatchedArguments(List(ArgSig("i", _, _, _)), Nil, Nil, None) =>
           }
         }
         'invalidParams - assertMatch(parseInvoke(routes(1), List("lol"))){
@@ -161,14 +160,16 @@ object RouterTests extends TestSuite{
 
         'tooManyParams - check(
           routes(0), List("1", "2"),
-          MismatchedArguments(Nil, List("1", "2"), Nil)
+          MismatchedArguments(Nil, List("1", "2"), Nil, None)
         )
 
 
         'redundantParams - {
           val parsed = parseInvoke(routes(2), List("1", "--i", "2"))
           assertMatch(parsed){
-            case MismatchedArguments(Nil, Nil, Seq((ArgSig("i", _, _, _), Seq("1", "2")))) =>
+            case MismatchedArguments(
+              Nil, Nil, Seq((ArgSig("i", _, _, _), Seq("1", "2"))), None
+            ) =>
           }
         }
         'failing - check(routes(3), List(), Router.Result.Error.Exception(MyException))

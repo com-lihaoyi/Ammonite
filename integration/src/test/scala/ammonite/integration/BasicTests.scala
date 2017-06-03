@@ -222,10 +222,14 @@ object BasicTests extends TestSuite{
         val expected = Util.normalizeNewlines(
           s"""Need to specify a subcommand to call when running MultiMain.sc
              |
-                |Available subcommands:
+             |Available subcommands:
              |
-                |def mainA()
-             |def functionB(i: Int, s: String, path: ammonite.ops.Path = $pwd)
+             |  mainA
+             |
+             |  functionB
+             |    --i     Int
+             |    --s     String
+             |    --path  ammonite.ops.Path (default $pwd)
              |""".stripMargin
         )
         assert(out.contains(expected))

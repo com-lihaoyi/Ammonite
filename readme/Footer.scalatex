@@ -114,6 +114,12 @@
 
 
   @sect{Changelog}
+    @sect{0.9.9}
+      @ul
+        @li
+          Ammonite scripts now show their usage text in Bash/Linux format,
+          rather than in Scala format, to better fit into the scripting ecosystem
+
     @sect{0.9.8}
       @ul
         @li

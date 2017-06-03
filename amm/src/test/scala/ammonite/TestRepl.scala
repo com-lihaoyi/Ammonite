@@ -58,7 +58,7 @@ class TestRepl {
           def lastException: Throwable = null
           def fullHistory = storage.fullHistory()
           def history = new History(Vector())
-          val colors = Colors.BlackWhite
+          val colors = Ref(Colors.BlackWhite)
           def newCompiler() = interp.compilerManager.init(force = true)
           def compiler = interp.compilerManager.compiler.compiler
           def imports = interp.eval.imports.toString

@@ -20,11 +20,8 @@ object Scripts {
     var scriptArgs = Vector.empty[(String, Option[String])]
 
     while(keywordTokens.nonEmpty) keywordTokens match{
-      case List(head, next, rest@_*) if head.startsWith("--") =>
-        scriptArgs = scriptArgs :+ (head.drop(2), Some(next))
-        keywordTokens = rest.toList
       case List(head, next, rest@_*) if head.startsWith("-") =>
-        scriptArgs = scriptArgs :+ (head.drop(1), Some(next))
+        scriptArgs = scriptArgs :+ (head, Some(next))
         keywordTokens = rest.toList
       case List(head, rest@_*) =>
         scriptArgs = scriptArgs :+ (head, None)
@@ -33,6 +30,7 @@ object Scripts {
     }
     scriptArgs
   }
+
   def runScript(wd: Path,
                 path: Path,
                 interp: ammonite.interp.Interpreter,
@@ -135,11 +133,12 @@ object Scripts {
   def formatMainMethods(mainMethods: Seq[Router.EntryPoint]) = {
     if (mainMethods.isEmpty) ""
     else{
-      val methods = for(main <- mainMethods) yield{
-        val args = main.argSignatures.map(renderArg).mkString(", ")
-        val details = mainMethodDetails(main)
-        s"def ${main.name}($args)$details"
-      }
+      val leftColWidth = getLeftColWidth(mainMethods.flatMap(_.argSignatures))
+
+      val methods =
+        for(main <- mainMethods)
+        yield formatMainMethodSignature(main, 2, leftColWidth)
+
       Util.normalizeNewlines(
         s"""
            |
@@ -149,37 +148,63 @@ object Scripts {
       )
     }
   }
+  def getLeftColWidth(items: Seq[ArgSig]) = {
+    items.map(_.name.length + 2) match{
+      case Nil => 0
+      case x => x.max
+    }
+  }
+  def formatMainMethodSignature(main: Router.EntryPoint,
+                                leftIndent: Int,
+                                leftColWidth: Int) = {
+    // +2 for space on right of left col
+    val args = main.argSignatures.map(renderArg(_, leftColWidth + leftIndent + 2 + 2, 80))
+
+    val leftIndentStr = " " * leftIndent
+    val argStrings =
+      for((lhs, rhs) <- args)
+        yield {
+          val lhsPadded = lhs.padTo(leftColWidth, ' ')
+          val rhsPadded = rhs.lines.mkString(Util.newLine)
+           s"$leftIndentStr  $lhsPadded  $rhsPadded"
+        }
+
+    s"""$leftIndentStr${main.name}
+       |${argStrings.map(_ + Util.newLine).mkString}""".stripMargin
+  }
   def runMainMethod(mainMethod: Router.EntryPoint,
                     scriptArgs: Seq[(String, Option[String])]): Res[Any] = {
+    val leftColWidth = getLeftColWidth(mainMethod.argSignatures)
 
-    def expectedMsg = {
-      val commaSeparated =
-        mainMethod.argSignatures
-          .map(renderArg)
-          .mkString(", ")
-      val details = mainMethodDetails(mainMethod)
-      "def " + mainMethod.name + "(" + commaSeparated + ")" + details
+    def expectedMsg = formatMainMethodSignature(mainMethod, 0, leftColWidth)
+
+    def pluralize(s: String, n: Int) = {
+      if (n == 1) s else s + "s"
     }
 
     mainMethod.invoke(scriptArgs) match{
       case Router.Result.Success(x) => Res.Success(x)
       case Router.Result.Error.Exception(x: AmmoniteExit) => Res.Success(x.value)
       case Router.Result.Error.Exception(x) => Res.Exception(x, "")
-      case Router.Result.Error.MismatchedArguments(missing, unknown, duplicate) =>
+      case Router.Result.Error.MismatchedArguments(missing, unknown, duplicate, incomplete) =>
         val missingStr =
           if (missing.isEmpty) ""
           else {
             val chunks =
               for (x <- missing)
-              yield x.name + ": " + x.typeString
+              yield "(--" + x.name + ": " + x.typeString + ")"
 
-            s"Missing arguments: (${chunks.mkString(", ")})" + Util.newLine
+            val argumentsStr = pluralize("argument", chunks.length)
+            s"Missing $argumentsStr: ${chunks.mkString(", ")}" + Util.newLine
           }
 
 
         val unknownStr =
           if (unknown.isEmpty) ""
-          else s"Unknown arguments: " + unknown.map(literalize(_)).mkString(", ") + Util.newLine
+          else {
+            val argumentsStr = pluralize("argument", unknown.length)
+            s"Unknown $argumentsStr: " + unknown.map(literalize(_)).mkString(" ") + Util.newLine
+          }
 
         val duplicateStr =
           if (duplicate.isEmpty) ""
@@ -187,45 +212,96 @@ object Scripts {
             val lines =
               for ((sig, options) <- duplicate)
               yield {
-                s"Duplicate arguments for (${sig.name}: ${sig.typeString}): " +
-                options.map(literalize(_)) + Util.newLine
+                s"Duplicate arguments for (--${sig.name}: ${sig.typeString}): " +
+                options.map(literalize(_)).mkString(" ") + Util.newLine
               }
 
             lines.mkString
+
+          }
+        val incompleteStr = incomplete match{
+          case None => ""
+          case Some(sig) =>
+            s"Option (--${sig.name}: ${sig.typeString}) is missing a corresponding value" +
+            Util.newLine
 
           }
 
         Res.Failure(
           None,
           Util.normalizeNewlines(
-            s"""Arguments provided did not match expected signature:
-               |$expectedMsg
+            s"""$missingStr$unknownStr$duplicateStr$incompleteStr
+               |Arguments provided did not match expected signature:
                |
-               |$missingStr$unknownStr$duplicateStr
+               |$expectedMsg
                |""".stripMargin
           )
         )
 
       case Router.Result.Error.InvalidArguments(x) =>
+        val argumentsStr = pluralize("argument", x.length)
+        val thingies = x.map{
+          case Router.Result.ParamError.Invalid(p, v, ex) =>
+            val literalV = literalize(v)
+            val rendered = {renderArgShort(p)}
+            s"$rendered: ${p.typeString} = $literalV failed to parse with $ex"
+          case Router.Result.ParamError.DefaultFailed(p, ex) =>
+            s"${renderArgShort(p)}'s default value failed to evaluate with $ex"
+        }
+
         Res.Failure(
           None,
-          "The following arguments failed to be parsed:" + Util.newLine +
-            x.map{
-              case Router.Result.ParamError.Invalid(p, v, ex) =>
-                s"(${renderArg(p)}) failed to parse input ${literalize(v)} with $ex"
-              case Router.Result.ParamError.DefaultFailed(p, ex) =>
-                s"(${renderArg(p)})'s default value failed to evaluate with $ex"
-            }.mkString(Util.newLine) + Util.newLine + s"expected signature: $expectedMsg"
+          Util.normalizeNewlines(
+            s"""The following $argumentsStr failed to parse:
+              |
+              |${thingies.mkString(Util.newLine)}
+              |
+              |expected signature:
+              |
+              |$expectedMsg
+            """.stripMargin
+          )
         )
     }
   }
 
-  def renderArg(arg: ArgSig) = {
+  def softWrap(s: String, leftOffset: Int, maxWidth: Int) = {
+    val oneLine = s.lines.mkString(" ").split(' ')
+
+    lazy val indent = " " * leftOffset
+
+    val output = new StringBuilder(oneLine.head)
+    var currentLineWidth = oneLine.head.length
+    for(chunk <- oneLine.tail){
+      val addedWidth = currentLineWidth + chunk.length + 1
+      if (addedWidth > maxWidth){
+        output.append(Util.newLine + indent)
+        output.append(chunk)
+        currentLineWidth = chunk.length
+      } else{
+        currentLineWidth = addedWidth
+        output.append(' ')
+        output.append(chunk)
+      }
+    }
+    output.mkString
+  }
+  def renderArgShort(arg: ArgSig) = "--" + backtickWrap(arg.name)
+  def renderArg(arg: ArgSig, leftOffset: Int, wrappedWidth: Int): (String, String) = {
     val suffix = arg.default match{
-      case Some(f) => " = " + f()
+      case Some(f) => " (default " + f() + ")"
       case None => ""
     }
-    backtickWrap(arg.name) + ": " + arg.typeString + suffix
+    val docSuffix = arg.doc match{
+      case Some(d) => ": " + d
+      case None => ""
+    }
+    val wrapped = softWrap(
+      arg.typeString + suffix + docSuffix,
+      leftOffset,
+      wrappedWidth - leftOffset
+    )
+    (renderArgShort(arg), wrapped)
   }
 
 
