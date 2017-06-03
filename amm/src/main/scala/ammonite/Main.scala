@@ -173,48 +173,77 @@ object Main{
     * delegating to [[Main.run]]
     */
   def main(args0: Array[String]): Unit = {
-
-    val (cliConfig, leftoverArgs) =
-      Cli.groupArgs(args0.toList, Cli.ammoniteArgSignature, Cli.Config()) match{
-        case Right(v) => v
-        case Left(errorMsg) =>
-          Console.err.println(errorMsg)
+    main0(args0.toList, System.in, System.out, System.err) match{
+      case Left((success, msg)) =>
+        if (success) {
+          Console.out.println(msg)
+          sys.exit(0)
+        } else {
+          Console.err.println(msg)
           sys.exit(1)
-      }
-
-    if (cliConfig.help) {
-      Console.out.println(Cli.ammoniteHelp)
-      sys.exit(0)
-    }
-
-    (cliConfig.code, leftoverArgs) match{
-      case (Some(code), Nil) =>
-        fromConfig(cliConfig, true).runCode(code, cliConfig.replApi)
-
-      case (None, Nil) =>
-        Console.out.println("Loading...")
-        fromConfig(cliConfig, true).run()
-
-      case (None, head :: rest) if head.startsWith("-") =>
-        Console.err.println("Unknown Ammonite option: " + head)
-        Console.err.println("Use --help to list possible options")
-        sys.exit(1)
-
-      case (None, head :: rest) =>
-        val success = runScript(Path(head, pwd), rest, cliConfig)
+        }
+      case Right(success) =>
         if (success) sys.exit(0)
         else sys.exit(1)
     }
   }
 
+  /**
+    * The logic of [[main]], in a form that doesn't call `sys.exit` and thus
+    * can be unit tested without spinning up lots of separate, expensive
+    * processes
+    */
+  def main0(args: List[String],
+            stdIn: InputStream,
+            stdOut: OutputStream,
+            stdErr: OutputStream): Either[(Boolean, String), Boolean] = {
+    // We have to use explicit flatmaps instead of a for-comprehension here
+    // because for-comprehensions fail to compile complaining about needing
+    // withFilter
+    Cli.groupArgs(args, Cli.ammoniteArgSignature, Cli.Config())
+      .right
+      .flatMap{ case (cliConfig, leftoverArgs) =>
+      helpMsg(cliConfig.help).right.flatMap{ _ =>
+        (cliConfig.code, leftoverArgs) match{
+          case (Some(code), Nil) =>
+            fromConfig(cliConfig, true, stdIn, stdOut, stdErr).runCode(code, cliConfig.replApi)
+            Right(true)
+
+          case (None, Nil) =>
+            Console.out.println("Loading...")
+            fromConfig(cliConfig, true, stdIn, stdOut, stdErr).run()
+            Right(true)
+
+          case (None, head :: rest) if head.startsWith("-") =>
+            val failureMsg =
+              "Unknown Ammonite option: " + head + "\n" +
+              "Use --help to list possible options"
+            Left(false -> failureMsg)
+
+          case (None, head :: rest) =>
+            val success = runScript(Path(head, pwd), rest, cliConfig, stdIn, stdOut, stdErr)
+            Right(success)
+        }
+      }
+    }
+  }
+
+  def helpMsg(help: Boolean) = {
+    if (help) Left(true -> Cli.ammoniteHelp)
+    else Right(())
+  }
+
   @tailrec def runScript(scriptPath: Path,
                          scriptArgs: List[String],
-                         cliConfig: Cli.Config): Boolean = {
+                         cliConfig: Cli.Config,
+                         stdIn: InputStream,
+                         stdOut: OutputStream,
+                         stdErr: OutputStream): Boolean = {
     val (success, watched) = runScriptAndPrint(
       scriptPath,
       scriptArgs,
       cliConfig,
-      fromConfig(cliConfig, false)
+      fromConfig(cliConfig, false, stdIn, stdOut, stdErr)
     )
     if (!cliConfig.watch) success
     else{
@@ -225,7 +254,7 @@ object Main{
 
       while(statAll()) Thread.sleep(100)
 
-      runScript(scriptPath, scriptArgs, cliConfig)
+      runScript(scriptPath, scriptArgs, cliConfig, stdIn, stdOut, stdErr)
     }
   }
 
@@ -259,7 +288,11 @@ object Main{
     (success, watched)
   }
 
-  def fromConfig(cliConfig: Cli.Config, isRepl: Boolean) = Main(
+  def fromConfig(cliConfig: Cli.Config,
+                 isRepl: Boolean,
+                 stdIn: InputStream,
+                 stdOut: OutputStream,
+                 stdErr: OutputStream) = Main(
     cliConfig.predef,
     cliConfig.defaultPredef,
     new Storage.Folder(cliConfig.home, isRepl) {
@@ -275,6 +308,10 @@ object Main{
         }
       }
     },
+    inputStream = stdIn,
+    outputStream = stdOut,
+    infoStream = stdErr,
+    errorStream = stdErr,
     welcomeBanner = cliConfig.welcomeBanner,
     verboseOutput = cliConfig.verboseOutput,
     remoteLogging = cliConfig.remoteLogging

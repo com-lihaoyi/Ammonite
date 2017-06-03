@@ -1,7 +1,7 @@
-package ammonite.integration
+package ammonite
 
-import ammonite.integration.TestUtils._
-import ammonite.ops.ImplicitWd._
+import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
+
 import ammonite.ops._
 import ammonite.util.Util
 import utest._
@@ -11,22 +11,48 @@ import utest._
   * and the associated error behavior if the caller messes up.
  */
 object MainTests extends TestSuite{
+  def exec(p: RelPath, args: String*) = new Executor(p, Nil, args)
+  class Executor(p: RelPath, preArgs: List[String], args: Seq[String]){
+    val in = new ByteArrayInputStream(Array.empty[Byte])
+    val err0 = new ByteArrayOutputStream()
+    val out0 = new ByteArrayOutputStream()
+    val path = pwd/'amm/'src/'test/'resources/'mains/p
+    val result = Console.withIn(in){
+      Console.withErr(err0){
+        Console.withOut(out0){
+          Main.main0(preArgs ++ Seq(path.toString) ++ args.toList, in, out0, err0)
+        }
+      }
+    }
+    val success = result match{
+      case Right(success) => success
+      case Left((success, msg)) =>
+        if (success) out0.write(msg.getBytes)
+        else err0.write(msg.getBytes)
+        success
+    }
+
+    val out = new String(out0.toByteArray)
+    val err = new String(err0.toByteArray)
+    override def toString = {
+      s"Executor($out, $err)"
+    }
+  }
   override def utestTruncateLength = 60000
 
   val tests = TestSuite {
     println("Running MainTests")
 
     'hello{
-      val evaled = exec('basic/"Hello.sc")
+      val evaled = exec("Hello.sc")
       assert(evaled.out.trim == "Hello World")
     }
 
     // Not really related to main methods, but related since most of the main
     // logic revolves around handling arguments. Make sure this fails properly
     'badAmmoniteFlag{
-      val evaled = intercept[ShelloutException]{
-        execBase('basic/"Hello.sc", Seq("--doesnt-exist"), Nil)
-      }.result
+      val evaled = new Executor("Hello.sc", List("--doesnt-exist"), Nil)
+      assert(!evaled.success)
       val expected = "Unknown Ammonite option: --doesnt-exist"
       assert(evaled.err.toString.contains(expected))
     }
@@ -34,26 +60,28 @@ object MainTests extends TestSuite{
 
     'main{
       'single{
-        val evaled = exec('basic/"Main.sc")
-        val out = evaled.out.string
+        val evaled = exec("Main.sc")
+        assert(evaled.success)
+        val out = evaled.out
         assert(out.contains("Hello! 1"))
       }
       'multiple{
         'positiveNoArgs{
-          val evaled = exec('basic/"MultiMain.sc", "mainA")
-          val out = evaled.out.string
+          val evaled = exec("MultiMain.sc", "mainA")
+          assert(evaled.success)
+          val out = evaled.out
           assert(out == "Hello! 1" + Util.newLine)
         }
         'positiveArgs{
-          val evaled = exec('basic/"MultiMain.sc", "functionB", "2", "foo")
-          val out = evaled.out.string
+          val evaled = exec("MultiMain.sc", "functionB", "2", "foo")
+          assert(evaled.success)
+          val out = evaled.out
           assert(out == "Hello! foofoo ." + Util.newLine)
         }
         'specifyMain{
-          val evaled = intercept[ShelloutException]{
-            exec('basic/"MultiMain.sc")
-          }.result
-          val out = evaled.err.string
+          val evaled = exec("MultiMain.sc")
+          assert(!evaled.success)
+          val out = evaled.err
           val expected = Util.normalizeNewlines(
             s"""Need to specify a subcommand to call when running MultiMain.sc
                 |
@@ -66,10 +94,9 @@ object MainTests extends TestSuite{
           assert(out.contains(expected))
         }
         'cantFindMain{
-          val evaled = intercept[ShelloutException]{
-            exec('basic/"MultiMain.sc", "doesntExist")
-          }.result
-          val out = evaled.err.string
+          val evaled = exec("MultiMain.sc", "doesntExist")
+          assert(!evaled.success)
+          val out = evaled.err
           val expected = Util.normalizeNewlines(
             s"""Unable to find subcommand: doesntExist
                 |
@@ -86,32 +113,34 @@ object MainTests extends TestSuite{
 
     'args{
       'full{
-        val evaled = exec('basic/"Args.sc", "-i", "3", "--s", "Moo", (pwd/'omg/'moo).toString)
-        assert(evaled.out.string == Util.normalizeNewlines("\"Hello! MooMooMoo moo.\"\n"))
+        val evaled = exec("Args.sc", "-i", "3", "--s", "Moo", (pwd/'omg/'moo).toString)
+        assert(evaled.success)
+        assert(evaled.out == Util.normalizeNewlines("\"Hello! MooMooMoo moo.\"\n"))
       }
 
       'default{
-        val evaled = exec('basic/"Args.sc", "3", "Moo")
+        val evaled = exec("Args.sc", "3", "Moo")
+        assert(evaled.success)
         assert(
-          evaled.out.string == Util.normalizeNewlines("\"Hello! MooMooMoo Ammonite.\"\n") ||
+          evaled.out == Util.normalizeNewlines("\"Hello! MooMooMoo Ammonite.\"\n") ||
           // For some reason, on windows CI machines the repo gets clone as lowercase (???)
-          evaled.out.string == Util.normalizeNewlines("\"Hello! MooMooMoo ammonite.\"\n")
+          evaled.out == Util.normalizeNewlines("\"Hello! MooMooMoo ammonite.\"\n")
         )
       }
       'manualPrintln{
-        val evaled = exec('basic/"Args2.sc", "3", "Moo")
+        val evaled = exec("Args2.sc", "3", "Moo")
+        assert(evaled.success)
         assert(
-          evaled.out.string == Util.normalizeNewlines("Hello! MooMooMoo Ammonite.\n") ||
+          evaled.out == Util.normalizeNewlines("Hello! MooMooMoo Ammonite.\n") ||
           // For some reason, on windows CI machines the repo gets clone as lowercase (???)
-          evaled.out.string == Util.normalizeNewlines("Hello! MooMooMoo ammonite.\n")
+          evaled.out == Util.normalizeNewlines("Hello! MooMooMoo ammonite.\n")
         )
       }
       'tooFew{
-        val errorMsg = intercept[ShelloutException]{
-          exec('basic/"Args.sc", "3")
-        }.result.err.string
+        val evaled = exec("Args.sc", "3")
+        assert(!evaled.success)
 
-        assert(errorMsg.contains(
+        assert(evaled.err.contains(
           Util.normalizeNewlines(
             s"""Arguments provided did not match expected signature:
                |def main(i: Int, s: String, path: ammonite.ops.Path = $pwd)
@@ -125,9 +154,10 @@ object MainTests extends TestSuite{
         // which start with `--`. This allows a user to define a main method
         // taking `String*`, slurping up all args un-changed, and then passing
         // them on to their own custom argument parsing code (e.g. scopt)
-        val out = exec('basic/"Varargs.sc", "--i", "31337", "zomg", "--cow", "-omg", "bbq")
-              .out.string
+        val evaled = exec("Varargs.sc", "--i", "31337", "zomg", "--cow", "-omg", "bbq")
 
+        assert(evaled.success)
+        val out = evaled.out
         assert(
           out.contains("31337"),
           out.contains("zomg"),
@@ -135,20 +165,18 @@ object MainTests extends TestSuite{
         )
       }
       'argsGivenButNoMain{
-        val errorMsg = intercept[ShelloutException]{
-          exec('basic/"Hello.sc", "a", "b", "\"")
-        }.result.err.string
+        val evaled = exec("Hello.sc", "a", "b", "\"")
+        assert(!evaled.success)
 
-        assert(errorMsg.contains(
+        assert(evaled.err.contains(
           """Script Hello.sc does not take arguments: "a" "b" "\"""""
         ))
       }
       'tooMany{
-        val errorMsg = intercept[ShelloutException]{
-          exec('basic/"Args.sc", "3", "4", "5", "6")
-        }.result.err.string
+        val evaled = exec("Args.sc", "3", "4", "5", "6")
+        assert(!evaled.success)
 
-        assert(errorMsg.contains(
+        assert(evaled.err.contains(
           Util.normalizeNewlines(
             s"""Arguments provided did not match expected signature:
                 |def main(i: Int, s: String, path: ammonite.ops.Path = $pwd)
@@ -158,12 +186,11 @@ object MainTests extends TestSuite{
         ))
       }
       'cantParse{
-        val errorMsg = intercept[ShelloutException]{
-          exec('basic/"Args.sc", "foo", "moo")
-        }.result.err.string
+        val evaled = exec("Args.sc", "foo", "moo")
+        assert(!evaled.success)
 
         val exMsg = """java.lang.NumberFormatException: For input string: "foo""""
-        assert(errorMsg.contains(
+        assert(evaled.err.contains(
           Util.normalizeNewlines(
             s"""The following arguments failed to be parsed:
                |(i: Int) failed to parse input "foo" with $exMsg
@@ -173,7 +200,7 @@ object MainTests extends TestSuite{
         ))
         // Ensure we're properly truncating the random stuff we don't care about
         // which means that the error stack that gets printed is short-ish
-        assert(errorMsg.lines.length < 12)
+        assert(evaled.err.lines.length < 12)
 
       }
     }

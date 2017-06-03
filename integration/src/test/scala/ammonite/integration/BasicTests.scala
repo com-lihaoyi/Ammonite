@@ -206,5 +206,31 @@ object BasicTests extends TestSuite{
       }
     }
 
+    // Most of the logic around main methods is tested in `MainTests.scala`
+    // in our unit test suite, but test a few cases as integration tests
+    // to make sure things work end-to-end
+    'multiMain{
+      'positiveArgs{
+        val evaled = exec('basic/"MultiMain.sc", "functionB", "2", "foo")
+
+        val out = evaled.out.string
+        assert(out == ("Hello! foofoo ." + Util.newLine))
+      }
+      'specifyMain{
+        val evaled = intercept[ShelloutException](exec('basic/"MultiMain.sc"))
+
+        val out = evaled.result.err.string
+        val expected = Util.normalizeNewlines(
+          s"""Need to specify a subcommand to call when running MultiMain.sc
+             |
+                |Available subcommands:
+             |
+                |def mainA()
+             |def functionB(i: Int, s: String, path: ammonite.ops.Path = $pwd)
+             |""".stripMargin
+        )
+        assert(out.contains(expected))
+      }
+    }
   }
 }

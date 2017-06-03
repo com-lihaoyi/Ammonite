@@ -135,14 +135,14 @@ object Cli{
 
   def groupArgs[T](flatArgs: List[String],
                    args: Seq[Arg[T, _]],
-                   initial: T): Either[String, (T, List[String])] = {
+                   initial: T): Either[(Boolean, String), (T, List[String])] = {
 
     val argsMap0: Seq[(String, Arg[T, _])] = args
       .flatMap{x => Seq(x.name -> x) ++ x.shortName.map(_.toString -> x)}
 
     val argsMap = argsMap0.toMap
 
-    def rec(keywordTokens: List[String], current: T): Either[String, (T, List[String])] = {
+    def rec(keywordTokens: List[String], current: T): Either[(Boolean, String), (T, List[String])] = {
       keywordTokens match{
         case head :: rest if head(0) == '-' =>
           val realName = if(head(1) == '-') head.drop(2) else head.drop(1)
@@ -153,7 +153,7 @@ object Cli{
                 rec(rest, cliArg.runAction(current, ""))
               } else rest match{
                 case next :: rest2 => rec(rest2, cliArg.runAction(current, next))
-                case Nil => Left("Expected a value after argument " + head)
+                case Nil => Left(false -> s"Expected a value after argument $head")
               }
 
             case None => Right((current, keywordTokens))
