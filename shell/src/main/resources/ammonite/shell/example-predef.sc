@@ -1,6 +1,6 @@
 interp.load.ivy(
   "com.lihaoyi" %
-  s"ammonite-shell_${util.Properties.versionNumberString}" %
+  s"ammonite-shell_${scala.util.Properties.versionNumberString}" %
   ammonite.Constants.version
 )
 @
