@@ -119,6 +119,12 @@ configuration, running scripts, printing error messages, etc.
                         </a>
                       </li><li class="current-entities indented2">
                         <span class="separator"></span>
+                        <a class="object" href="Compat$.html" title=""></a>
+                        <a href="Compat$.html" title="">
+                          Compat
+                        </a>
+                      </li><li class="current-entities indented2">
+                        <span class="separator"></span>
                         <a class="object" href="Defaults$.html" title="Constants used in the default configuration for the Ammonite REPL
 "></a>
                         <a href="Defaults$.html" title="Constants used in the default configuration for the Ammonite REPL
@@ -371,6 +377,22 @@ macro-generated <a href="Router.html" class="extype" name="ammonite.main.Router"
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="ammonite.main.Scripts#formatMainMethodSignature" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="formatMainMethodSignature(main:ammonite.main.Router.EntryPoint,leftIndent:Int,leftColWidth:Int):String"></a><a id="formatMainMethodSignature(EntryPoint,Int,Int):String"></a>
+      <span class="permalink">
+      <a href="../../ammonite/main/Scripts$.html#formatMainMethodSignature(main:ammonite.main.Router.EntryPoint,leftIndent:Int,leftColWidth:Int):String" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">formatMainMethodSignature</span><span class="params">(<span name="main">main: <a href="Router$$EntryPoint.html" class="extype" name="ammonite.main.Router.EntryPoint">EntryPoint</a></span>, <span name="leftIndent">leftIndent: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Int" class="extype" target="_top">Int</a></span>, <span name="leftColWidth">leftColWidth: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Int" class="extype" target="_top">Int</a></span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      
+      
     </li><li name="ammonite.main.Scripts#formatMainMethods" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="formatMainMethods(mainMethods:Seq[ammonite.main.Router.EntryPoint]):String"></a><a id="formatMainMethods(Seq[EntryPoint]):String"></a>
       <span class="permalink">
@@ -403,6 +425,22 @@ macro-generated <a href="Router.html" class="extype" name="ammonite.main.Router"
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="ammonite.main.Scripts#getLeftColWidth" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="getLeftColWidth(items:Seq[ammonite.main.Router.ArgSig]):Int"></a><a id="getLeftColWidth(Seq[ArgSig]):Int"></a>
+      <span class="permalink">
+      <a href="../../ammonite/main/Scripts$.html#getLeftColWidth(items:Seq[ammonite.main.Router.ArgSig]):Int" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getLeftColWidth</span><span class="params">(<span name="items">items: <span class="extype" name="scala.Seq">Seq</span>[<a href="Router$$ArgSig.html" class="extype" name="ammonite.main.Router.ArgSig">ArgSig</a>]</span>)</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Int" class="extype" target="_top">Int</a></span>
+      </span>
+      
+      
     </li><li name="ammonite.main.Scripts#groupArgs" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="groupArgs(flatArgs:List[String]):Seq[(String,Option[String])]"></a><a id="groupArgs(List[String]):Seq[(String,Option[String])]"></a>
       <span class="permalink">
@@ -527,15 +565,15 @@ macro-generated <a href="Router.html" class="extype" name="ammonite.main.Router"
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">pathScoptRead</span><span class="result">: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/github/scopt/scopt_2.12/3.5.0/scopt_2.12-3.5.0-javadoc.jar/!/index.html#scopt.Read" class="extype" target="_top">Read</a>[<a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/0.9.8/ammonite-ops-0.9.8-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a>]</span>
+        <span class="name">pathScoptRead</span><span class="result">: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/github/scopt/scopt_2.12/3.5.0/scopt_2.12-3.5.0-javadoc.jar/!/index.html#scopt.Read" class="extype" target="_top">Read</a>[<a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/0.9.9/ammonite-ops-0.9.9-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a>]</span>
       </span>
       
       <p class="shortcomment cmt">Additional <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/github/scopt/scopt_2.12/3.5.0/scopt_2.12-3.5.0-javadoc.jar/!/index.html#scopt.Read" class="extype" target="_top">scopt.Read</a> instance to teach it how to read Ammonite paths
 </p>
     </li><li name="ammonite.main.Scripts#renderArg" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="renderArg(arg:ammonite.main.Router.ArgSig):String"></a><a id="renderArg(ArgSig):String"></a>
+      <a id="renderArg(arg:ammonite.main.Router.ArgSig,leftOffset:Int,wrappedWidth:Int):(String,String)"></a><a id="renderArg(ArgSig,Int,Int):(String,String)"></a>
       <span class="permalink">
-      <a href="../../ammonite/main/Scripts$.html#renderArg(arg:ammonite.main.Router.ArgSig):String" title="Permalink">
+      <a href="../../ammonite/main/Scripts$.html#renderArg(arg:ammonite.main.Router.ArgSig,leftOffset:Int,wrappedWidth:Int):(String,String)" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -544,7 +582,23 @@ macro-generated <a href="Router.html" class="extype" name="ammonite.main.Router"
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">renderArg</span><span class="params">(<span name="arg">arg: <a href="Router$$ArgSig.html" class="extype" name="ammonite.main.Router.ArgSig">ArgSig</a></span>)</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+        <span class="name">renderArg</span><span class="params">(<span name="arg">arg: <a href="Router$$ArgSig.html" class="extype" name="ammonite.main.Router.ArgSig">ArgSig</a></span>, <span name="leftOffset">leftOffset: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Int" class="extype" target="_top">Int</a></span>, <span name="wrappedWidth">wrappedWidth: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Int" class="extype" target="_top">Int</a></span>)</span><span class="result">: (<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Predef.String">String</span>)</span>
+      </span>
+      
+      
+    </li><li name="ammonite.main.Scripts#renderArgShort" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="renderArgShort(arg:ammonite.main.Router.ArgSig):String"></a><a id="renderArgShort(ArgSig):String"></a>
+      <span class="permalink">
+      <a href="../../ammonite/main/Scripts$.html#renderArgShort(arg:ammonite.main.Router.ArgSig):String" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">renderArgShort</span><span class="params">(<span name="arg">arg: <a href="Router$$ArgSig.html" class="extype" name="ammonite.main.Router.ArgSig">ArgSig</a></span>)</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
       </span>
       
       
@@ -560,7 +614,7 @@ macro-generated <a href="Router.html" class="extype" name="ammonite.main.Router"
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">runMainMethod</span><span class="params">(<span name="mainMethod">mainMethod: <a href="Router$$EntryPoint.html" class="extype" name="ammonite.main.Router.EntryPoint">EntryPoint</a></span>, <span name="scriptArgs">scriptArgs: <span class="extype" name="scala.Seq">Seq</span>[(<span class="extype" name="scala.Predef.String">String</span>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Option" class="extype" target="_top">Option</a>[<span class="extype" name="scala.Predef.String">String</span>])]</span>)</span><span class="result">: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-util/0.9.8/ammonite-util-0.9.8-javadoc.jar/!/index.html#ammonite.util.Res" class="extype" target="_top">Res</a>[<a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Any" class="extype" target="_top">Any</a>]</span>
+        <span class="name">runMainMethod</span><span class="params">(<span name="mainMethod">mainMethod: <a href="Router$$EntryPoint.html" class="extype" name="ammonite.main.Router.EntryPoint">EntryPoint</a></span>, <span name="scriptArgs">scriptArgs: <span class="extype" name="scala.Seq">Seq</span>[(<span class="extype" name="scala.Predef.String">String</span>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Option" class="extype" target="_top">Option</a>[<span class="extype" name="scala.Predef.String">String</span>])]</span>)</span><span class="result">: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-util/0.9.9/ammonite-util-0.9.9-javadoc.jar/!/index.html#ammonite.util.Res" class="extype" target="_top">Res</a>[<a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Any" class="extype" target="_top">Any</a>]</span>
       </span>
       
       
@@ -576,7 +630,23 @@ macro-generated <a href="Router.html" class="extype" name="ammonite.main.Router"
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">runScript</span><span class="params">(<span name="wd">wd: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/0.9.8/ammonite-ops-0.9.8-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a></span>, <span name="path">path: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/0.9.8/ammonite-ops-0.9.8-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a></span>, <span name="interp">interp: <span class="extype" name="ammonite.interp.Interpreter">Interpreter</span></span>, <span name="scriptArgs">scriptArgs: <span class="extype" name="scala.Seq">Seq</span>[(<span class="extype" name="scala.Predef.String">String</span>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Option" class="extype" target="_top">Option</a>[<span class="extype" name="scala.Predef.String">String</span>])]</span>)</span><span class="result">: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-util/0.9.8/ammonite-util-0.9.8-javadoc.jar/!/index.html#ammonite.util.Res" class="extype" target="_top">Res</a>[<a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Any" class="extype" target="_top">Any</a>]</span>
+        <span class="name">runScript</span><span class="params">(<span name="wd">wd: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/0.9.9/ammonite-ops-0.9.9-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a></span>, <span name="path">path: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/0.9.9/ammonite-ops-0.9.9-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a></span>, <span name="interp">interp: <span class="extype" name="ammonite.interp.Interpreter">Interpreter</span></span>, <span name="scriptArgs">scriptArgs: <span class="extype" name="scala.Seq">Seq</span>[(<span class="extype" name="scala.Predef.String">String</span>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Option" class="extype" target="_top">Option</a>[<span class="extype" name="scala.Predef.String">String</span>])] = <span class="symbol">Nil</span></span>)</span><span class="result">: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-util/0.9.9/ammonite-util-0.9.9-javadoc.jar/!/index.html#ammonite.util.Res" class="extype" target="_top">Res</a>[<a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Any" class="extype" target="_top">Any</a>]</span>
+      </span>
+      
+      
+    </li><li name="ammonite.main.Scripts#softWrap" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="softWrap(s:String,leftOffset:Int,maxWidth:Int):String"></a><a id="softWrap(String,Int,Int):String"></a>
+      <span class="permalink">
+      <a href="../../ammonite/main/Scripts$.html#softWrap(s:String,leftOffset:Int,maxWidth:Int):String" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">softWrap</span><span class="params">(<span name="s">s: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="leftOffset">leftOffset: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Int" class="extype" target="_top">Int</a></span>, <span name="maxWidth">maxWidth: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Int" class="extype" target="_top">Int</a></span>)</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
       </span>
       
       

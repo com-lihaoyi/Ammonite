@@ -119,6 +119,12 @@ configuration, running scripts, printing error messages, etc.
                         </a>
                       </li><li class="current-entities indented2">
                         <span class="separator"></span>
+                        <a class="object" href="Compat$.html" title=""></a>
+                        <a href="Compat$.html" title="">
+                          Compat
+                        </a>
+                      </li><li class="current-entities indented2">
+                        <span class="separator"></span>
                         <a class="object" href="Defaults$.html" title="Constants used in the default configuration for the Ammonite REPL
 "></a>
                         <a href="Defaults$.html" title="Constants used in the default configuration for the Ammonite REPL
@@ -271,7 +277,7 @@ possible a function that can compute its default value
       <span class="symbol">
         <a title="What is known about a single endpoint for our routes." href="Router$$EntryPoint.html">
               <span class="name">EntryPoint</span>
-            </a><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="argSignatures">argSignatures: <span class="extype" name="scala.Seq">Seq</span>[<a href="Router$$ArgSig.html" class="extype" name="ammonite.main.Router.ArgSig">ArgSig</a>]</span>, <span name="varargs">varargs: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>, <span name="invoke0">invoke0: (<span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Predef.String">String</span>], <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Predef.String">String</span>]) ⇒ <a href="Router$$Result.html" class="extype" name="ammonite.main.Router.Result">Result</a>[<a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Any" class="extype" target="_top">Any</a>]</span>)</span><span class="result"> extends <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+            </a><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="argSignatures">argSignatures: <span class="extype" name="scala.Seq">Seq</span>[<a href="Router$$ArgSig.html" class="extype" name="ammonite.main.Router.ArgSig">ArgSig</a>]</span>, <span name="doc">doc: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Option" class="extype" target="_top">Option</a>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="varargs">varargs: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>, <span name="invoke0">invoke0: (<span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Predef.String">String</span>], <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Predef.String">String</span>]) ⇒ <a href="Router$$Result.html" class="extype" name="ammonite.main.Router.Result">Result</a>[<a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Any" class="extype" target="_top">Any</a>]</span>)</span><span class="result"> extends <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
       </span>
       
       <p class="shortcomment cmt">What is known about a single endpoint for our routes.</p><div class="fullcomment"><div class="comment cmt"><p>What is known about a single endpoint for our routes. It has a <a href="Router$$EntryPoint.html#name:String" class="extmbr" name="ammonite.main.Router.EntryPoint#name">name</a>,
@@ -673,6 +679,22 @@ Could succeed with a value, but could fail in many different ways.
       </span>
       <span class="symbol">
         <span class="name">readVarargs</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="arg">arg: <a href="Router$$ArgSig.html" class="extype" name="ammonite.main.Router.ArgSig">ArgSig</a></span>, <span name="values">values: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="thunk">thunk: (<span class="extype" name="scala.Predef.String">String</span>) ⇒ <span class="extype" name="ammonite.main.Router.readVarargs.T">T</span></span>)</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.util.Either" class="extype" target="_top">Either</a>[<a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.collection.Seq" class="extype" target="_top">Seq</a>[<a href="Router$$Result$$ParamError.html" class="extype" name="ammonite.main.Router.Result.ParamError">ParamError</a>], <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.collection.Seq" class="extype" target="_top">Seq</a>[<span class="extype" name="ammonite.main.Router.readVarargs.T">T</span>]]</span>
+      </span>
+      
+      
+    </li><li name="ammonite.main.Router#stripDashes" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="stripDashes(s:String):String"></a><a id="stripDashes(String):String"></a>
+      <span class="permalink">
+      <a href="../../ammonite/main/Router$.html#stripDashes(s:String):String" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">stripDashes</span><span class="params">(<span name="s">s: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
       </span>
       
       
