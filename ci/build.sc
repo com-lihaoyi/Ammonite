@@ -16,10 +16,10 @@ val allVersions = Seq(
 
 val latestMajorVersions = Set("2.10.6", "2.11.11", "2.12.2")
 
-val buildVersion =
-  if (sys.env("TRAVIS_TAG") == "") s"COMMIT-${getGitHash()}"
-  else sys.env("TRAVIS_TAG")
-
+val buildVersion = sys.env.get("TRAVIS_TAG") match{
+  case Some(v) if v != "" => sys.env("TRAVIS_TAG")
+  case _ =>  s"COMMIT-${getGitHash()}"
+}
 
 def getGitHash() = %%("git", "rev-parse", "--short", "HEAD").out.trim
 
