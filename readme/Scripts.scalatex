@@ -159,7 +159,7 @@
           using the @hl.scala{interp.load.ivy(deps: coursier.Dependency*)}
           function.
 
-        @hl.ref(ammoniteTests/up/"ScriptTests.scala", Seq("loadIvyAdvanced", "@"), "\"\"\"")
+        @hl.ref(ammoniteTests/"ScriptTests.scala", Seq("loadIvyAdvanced", "@"), "\"\"\"")
 
         @p
           Note that to use this function, your script needs to be a
@@ -228,7 +228,7 @@
         Bash), you need to pass arguments to configure its behavior. With
         Ammonite, this is done by defining a @hl.scala("@main") method, e.g.
 
-      @hl.ref(wd/'integration/'src/'test/'resources/'ammonite/'integration/'basic/"Args.sc")
+      @hl.ref(wd/'amm/'src/'test/'resources/'mains/"Args.sc")
 
       @p
         When the script is run from the command line:
@@ -246,7 +246,7 @@
         behavior, annotate your @hl.scala("@main") method as returning
         @hl.scala{: Unit} and add your own @hl.scala{println}s:
 
-      @hl.ref(wd/'integration/'src/'test/'resources/'ammonite/'integration/'basic/"Args2.sc")
+      @hl.ref(wd/'amm/'src/'test/'resources/'mains/"Args2.sc")
 
       @hl.sh
         $ amm Args2.sc 3 Moo
@@ -347,7 +347,7 @@
         to call. e.g. given:
 
       @hl.ref(
-        wd/'integration/'src/'test/'resources/'ammonite/'integration/'basic/"MultiMain.sc",
+        wd/'amm/'src/'test/'resources/'mains/"MultiMain.sc",
         className = "scala"
       )
 

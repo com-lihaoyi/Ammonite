@@ -32,10 +32,10 @@ matrix:
 
   - env: CI_SCRIPT="ci/build.sc test integration/test"
     jdk: oraclejdk8
-    scala: 2.11.11
+    scala: 2.12.2
   - env: CI_SCRIPT="ci/build.sc test integration/test"
     jdk: oraclejdk8
-    scala: 2.12.2
+    scala: 2.11.11
   - env: CI_SCRIPT="ci/build.sc test integration/test"
     jdk: openjdk7
     scala: 2.10.6

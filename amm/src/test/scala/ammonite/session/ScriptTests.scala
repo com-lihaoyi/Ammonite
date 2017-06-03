@@ -12,10 +12,7 @@ object ScriptTests extends TestSuite{
     println("ScriptTests")
     val check = new TestRepl()
 
-    val scriptPath = pwd/'amm/'src/'test/'resources/'scripts
     val printedScriptPath = """pwd/'amm/'src/'test/'resources/'scripts"""
-
-    val resourcesPath = pwd/'amm/'src/'test/'resources
 
     'exec{
       'compilationBlocks{

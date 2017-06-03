@@ -78,6 +78,8 @@ object Util{
                         flexiblePkgName: Seq[Name],
                         pkgRoot: Seq[Name],
                         path: Option[Path]){
+    // All code Ammonite compiles must be rooted in some package within
+    // the `ammonite` top-level package
     assert(pkgRoot.head == Name("ammonite"))
     def pkgName = pkgRoot ++ flexiblePkgName
     def fullName = pkgName :+ wrapperName

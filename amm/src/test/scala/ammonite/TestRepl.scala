@@ -202,9 +202,9 @@ class TestRepl {
     (
       processed,
       outBuffer.mkString,
-      warningBuffer.mkString(Util.newLine),
-      errorBuffer.mkString(Util.newLine),
-      infoBuffer.mkString(Util.newLine)
+      warningBuffer.mkString,
+      errorBuffer.mkString,
+      infoBuffer.mkString
     )
   }
 

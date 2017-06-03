@@ -106,6 +106,8 @@ object Preprocessor{
                   imports: Imports,
                   printerTemplate: String => String,
                   extraCode: String) = {
+      // All code Ammonite compiles must be rooted in some package within
+      // the `ammonite` top-level package
       assert(pkgName.head == Name("ammonite"))
       for{
         Preprocessor.Expanded(code, printer) <- expandStatements(stmts, resultIndex)

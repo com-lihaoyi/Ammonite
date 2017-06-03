@@ -449,7 +449,7 @@
           using the @hl.scala{interp.load.ivy(deps: coursier.Dependency*)}
           function and configure each @code{Dependency} to your heart's content:
 
-        @hl.ref(ammoniteTests/up/"ScriptTests.scala", Seq("loadIvyAdvanced", "@"), "\"\"\"")
+        @hl.ref(ammoniteTests/"ScriptTests.scala", Seq("loadIvyAdvanced", "@"), "\"\"\"")
 
     @sect{Builtins}
       @p
