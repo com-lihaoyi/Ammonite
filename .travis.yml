@@ -17,23 +17,25 @@ matrix:
   # `integration/test`; for some reason, running them on the same box is
   # flaky and `integration/test` ends up hanging, even if they are run in
   # separate, sequential processes.
+  #
+  # published tests tend to run slower than integration tests, so start
+  # them first
   - env: CI_SCRIPT="ci/build.sc test published/test"
     jdk: oraclejdk8
     scala: 2.12.2
-  - env: CI_SCRIPT="ci/build.sc test integration/test"
-    jdk: oraclejdk8
-    scala: 2.12.2
-
   - env: CI_SCRIPT="ci/build.sc test published/test"
     jdk: oraclejdk8
     scala: 2.11.11
-  - env: CI_SCRIPT="ci/build.sc test integration/test"
-    jdk: oraclejdk8
-    scala: 2.11.11
-
   - env: CI_SCRIPT="ci/build.sc test published/test"
     jdk: openjdk7
     scala: 2.10.6
+
+  - env: CI_SCRIPT="ci/build.sc test integration/test"
+    jdk: oraclejdk8
+    scala: 2.11.11
+  - env: CI_SCRIPT="ci/build.sc test integration/test"
+    jdk: oraclejdk8
+    scala: 2.12.2
   - env: CI_SCRIPT="ci/build.sc test integration/test"
     jdk: openjdk7
     scala: 2.10.6

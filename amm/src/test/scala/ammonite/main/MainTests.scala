@@ -1,6 +1,4 @@
-package ammonite
-
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
+package ammonite.main
 
 import ammonite.ops._
 import ammonite.util.Util
@@ -11,33 +9,7 @@ import utest._
   * and the associated error behavior if the caller messes up.
  */
 object MainTests extends TestSuite{
-  def exec(p: RelPath, args: String*) = new Executor(p, Nil, args)
-  class Executor(p: RelPath, preArgs: List[String], args: Seq[String]){
-    val in = new ByteArrayInputStream(Array.empty[Byte])
-    val err0 = new ByteArrayOutputStream()
-    val out0 = new ByteArrayOutputStream()
-    val path = pwd/'amm/'src/'test/'resources/'mains/p
-    val result = Console.withIn(in){
-      Console.withErr(err0){
-        Console.withOut(out0){
-          Main.main0(preArgs ++ Seq(path.toString) ++ args.toList, in, out0, err0)
-        }
-      }
-    }
-    val success = result match{
-      case Right(success) => success
-      case Left((success, msg)) =>
-        if (success) out0.write(msg.getBytes)
-        else err0.write(msg.getBytes)
-        success
-    }
-
-    val out = new String(out0.toByteArray)
-    val err = new String(err0.toByteArray)
-    override def toString = {
-      s"Executor($out, $err)"
-    }
-  }
+  def exec(p: RelPath, args: String*) = new InProcessMainMethodRunner('mains/p, Nil, args)
   override def utestTruncateLength = 60000
 
   val tests = TestSuite {
@@ -51,7 +23,7 @@ object MainTests extends TestSuite{
     // Not really related to main methods, but related since most of the main
     // logic revolves around handling arguments. Make sure this fails properly
     'badAmmoniteFlag{
-      val evaled = new Executor("Hello.sc", List("--doesnt-exist"), Nil)
+      val evaled = new InProcessMainMethodRunner('mains/"Hello.sc", List("--doesnt-exist"), Nil)
       assert(!evaled.success)
       val expected = "Unknown Ammonite option: --doesnt-exist"
       assert(evaled.err.toString.contains(expected))

@@ -1,7 +1,7 @@
-package ammonite
+package ammonite.interp
 
+import ammonite.TestRepl
 import ammonite.TestUtils._
-import ammonite.interp.Preprocessor
 import utest._
 
 

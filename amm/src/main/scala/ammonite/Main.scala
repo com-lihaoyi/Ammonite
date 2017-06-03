@@ -1,6 +1,6 @@
 package ammonite
 
-import java.io.{InputStream, OutputStream}
+import java.io.{InputStream, OutputStream, PrintStream}
 
 import ammonite.interp.Interpreter
 import ammonite.ops._
@@ -210,7 +210,7 @@ object Main{
             Right(true)
 
           case (None, Nil) =>
-            Console.out.println("Loading...")
+            new PrintStream(stdOut).println("Loading...")
             fromConfig(cliConfig, true, stdIn, stdOut, stdErr).run()
             Right(true)
 
@@ -243,7 +243,8 @@ object Main{
       scriptPath,
       scriptArgs,
       cliConfig,
-      fromConfig(cliConfig, false, stdIn, stdOut, stdErr)
+      fromConfig(cliConfig, false, stdIn, stdOut, stdErr),
+      stdErr
     )
     if (!cliConfig.watch) success
     else{
@@ -261,22 +262,24 @@ object Main{
   def runScriptAndPrint(scriptPath: Path,
                         flatArgs: List[String],
                         c: Cli.Config,
-                        scriptMain: Main): (Boolean, Seq[(Path, Option[Long])]) = {
+                        scriptMain: Main,
+                        stdErr: OutputStream): (Boolean, Seq[(Path, Option[Long])]) = {
 
     val (res, watched) = scriptMain.runScript(
       scriptPath,
       Scripts.groupArgs(flatArgs),
       c.replApi
     )
+    val printer = new PrintStream(stdErr)
     val success = res match {
       case Res.Failure(exOpt, msg) =>
-        Console.err.println(msg)
+        printer.println(msg)
         false
       case Res.Exception(ex, s) =>
         val trace = ex.getStackTrace
         val i = trace.indexWhere(_.getMethodName == "$main") + 1
         ex.setStackTrace(trace.take(i))
-        ex.printStackTrace()
+        ex.printStackTrace(printer)
         false
 
       case Res.Success(value) =>

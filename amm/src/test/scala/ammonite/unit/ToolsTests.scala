@@ -1,10 +1,9 @@
-package ammonite
+package ammonite.unit
 
 import ammonite.ops._
-import ammonite.runtime.History
 import ammonite.runtime.tools._
-import utest._
 import ammonite.util.Util.newLine
+import utest._
 
 
 object ToolsTests extends TestSuite{

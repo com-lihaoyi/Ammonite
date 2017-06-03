@@ -1,11 +1,10 @@
-package ammonite
+package ammonite.interp
 
-import ammonite.runtime.{History, Storage}
-import ammonite.interp.Interpreter
+import ammonite.TestUtils._
 import ammonite.main.Defaults
 import ammonite.ops._
+import ammonite.runtime.Storage
 import ammonite.runtime.tools.IvyConstructor._
-import ammonite.TestUtils._
 import utest._
 
 object CachingTests extends TestSuite{

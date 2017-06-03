@@ -3,6 +3,8 @@ package ammonite.main
 import ammonite.ops.Path
 import ammonite.runtime.Storage
 
+import scala.annotation.tailrec
+
 
 
 
@@ -142,7 +144,8 @@ object Cli{
 
     val argsMap = argsMap0.toMap
 
-    def rec(keywordTokens: List[String], current: T): Either[(Boolean, String), (T, List[String])] = {
+    @tailrec def rec(keywordTokens: List[String],
+                     current: T): Either[(Boolean, String), (T, List[String])] = {
       keywordTokens match{
         case head :: rest if head(0) == '-' =>
           val realName = if(head(1) == '-') head.drop(2) else head.drop(1)

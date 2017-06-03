@@ -1,10 +1,11 @@
-package ammonite
+package ammonite.session
 
+import ammonite.TestRepl
 import ammonite.TestUtils._
-import ammonite.ops._
 import ammonite.main.Defaults
+import ammonite.ops._
+import ammonite.runtime.Storage
 import utest._
-import ammonite.runtime.{Storage}
 
 object ScriptTests extends TestSuite{
   val tests = TestSuite{
