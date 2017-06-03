@@ -113,6 +113,12 @@ configuration, running scripts, printing error messages, etc.
 </p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="ammonite">ammonite</a></dd></dl></div>
     </li><li class="current-entities indented2">
                         <span class="separator"></span>
+                        <a class="object" href="Cli$.html" title=""></a>
+                        <a href="Cli$.html" title="">
+                          Cli
+                        </a>
+                      </li><li class="current-entities indented2">
+                        <span class="separator"></span>
                         <a class="object" href="Defaults$.html" title="Constants used in the default configuration for the Ammonite REPL
 "></a>
                         <a href="Defaults$.html" title="Constants used in the default configuration for the Ammonite REPL
@@ -398,9 +404,9 @@ macro-generated <a href="Router.html" class="extype" name="ammonite.main.Router"
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="ammonite.main.Scripts#groupArgs" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="groupArgs(flatArgs:Seq[String]):Seq[(String,Option[String])]"></a><a id="groupArgs(Seq[String]):Seq[(String,Option[String])]"></a>
+      <a id="groupArgs(flatArgs:List[String]):Seq[(String,Option[String])]"></a><a id="groupArgs(List[String]):Seq[(String,Option[String])]"></a>
       <span class="permalink">
-      <a href="../../ammonite/main/Scripts$.html#groupArgs(flatArgs:Seq[String]):Seq[(String,Option[String])]" title="Permalink">
+      <a href="../../ammonite/main/Scripts$.html#groupArgs(flatArgs:List[String]):Seq[(String,Option[String])]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -409,7 +415,7 @@ macro-generated <a href="Router.html" class="extype" name="ammonite.main.Router"
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">groupArgs</span><span class="params">(<span name="flatArgs">flatArgs: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Seq">Seq</span>[(<span class="extype" name="scala.Predef.String">String</span>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Option" class="extype" target="_top">Option</a>[<span class="extype" name="scala.Predef.String">String</span>])]</span>
+        <span class="name">groupArgs</span><span class="params">(<span name="flatArgs">flatArgs: <span class="extype" name="scala.List">List</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Seq">Seq</span>[(<span class="extype" name="scala.Predef.String">String</span>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Option" class="extype" target="_top">Option</a>[<span class="extype" name="scala.Predef.String">String</span>])]</span>
       </span>
       
       
@@ -521,7 +527,7 @@ macro-generated <a href="Router.html" class="extype" name="ammonite.main.Router"
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">pathScoptRead</span><span class="result">: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/github/scopt/scopt_2.12/3.5.0/scopt_2.12-3.5.0-javadoc.jar/!/index.html#scopt.Read" class="extype" target="_top">Read</a>[<a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/0.9.7/ammonite-ops-0.9.7-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a>]</span>
+        <span class="name">pathScoptRead</span><span class="result">: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/github/scopt/scopt_2.12/3.5.0/scopt_2.12-3.5.0-javadoc.jar/!/index.html#scopt.Read" class="extype" target="_top">Read</a>[<a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/0.9.8/ammonite-ops-0.9.8-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a>]</span>
       </span>
       
       <p class="shortcomment cmt">Additional <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/github/scopt/scopt_2.12/3.5.0/scopt_2.12-3.5.0-javadoc.jar/!/index.html#scopt.Read" class="extype" target="_top">scopt.Read</a> instance to teach it how to read Ammonite paths
@@ -554,7 +560,7 @@ macro-generated <a href="Router.html" class="extype" name="ammonite.main.Router"
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">runMainMethod</span><span class="params">(<span name="mainMethod">mainMethod: <a href="Router$$EntryPoint.html" class="extype" name="ammonite.main.Router.EntryPoint">EntryPoint</a></span>, <span name="scriptArgs">scriptArgs: <span class="extype" name="scala.Seq">Seq</span>[(<span class="extype" name="scala.Predef.String">String</span>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Option" class="extype" target="_top">Option</a>[<span class="extype" name="scala.Predef.String">String</span>])]</span>)</span><span class="result">: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-util/0.9.7/ammonite-util-0.9.7-javadoc.jar/!/index.html#ammonite.util.Res" class="extype" target="_top">Res</a>[<a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Any" class="extype" target="_top">Any</a>]</span>
+        <span class="name">runMainMethod</span><span class="params">(<span name="mainMethod">mainMethod: <a href="Router$$EntryPoint.html" class="extype" name="ammonite.main.Router.EntryPoint">EntryPoint</a></span>, <span name="scriptArgs">scriptArgs: <span class="extype" name="scala.Seq">Seq</span>[(<span class="extype" name="scala.Predef.String">String</span>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Option" class="extype" target="_top">Option</a>[<span class="extype" name="scala.Predef.String">String</span>])]</span>)</span><span class="result">: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-util/0.9.8/ammonite-util-0.9.8-javadoc.jar/!/index.html#ammonite.util.Res" class="extype" target="_top">Res</a>[<a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Any" class="extype" target="_top">Any</a>]</span>
       </span>
       
       
@@ -570,7 +576,7 @@ macro-generated <a href="Router.html" class="extype" name="ammonite.main.Router"
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">runScript</span><span class="params">(<span name="wd">wd: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/0.9.7/ammonite-ops-0.9.7-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a></span>, <span name="path">path: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/0.9.7/ammonite-ops-0.9.7-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a></span>, <span name="interp">interp: <span class="extype" name="ammonite.interp.Interpreter">Interpreter</span></span>, <span name="scriptArgs">scriptArgs: <span class="extype" name="scala.Seq">Seq</span>[(<span class="extype" name="scala.Predef.String">String</span>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Option" class="extype" target="_top">Option</a>[<span class="extype" name="scala.Predef.String">String</span>])]</span>)</span><span class="result">: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-util/0.9.7/ammonite-util-0.9.7-javadoc.jar/!/index.html#ammonite.util.Res" class="extype" target="_top">Res</a>[<a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Any" class="extype" target="_top">Any</a>]</span>
+        <span class="name">runScript</span><span class="params">(<span name="wd">wd: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/0.9.8/ammonite-ops-0.9.8-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a></span>, <span name="path">path: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/0.9.8/ammonite-ops-0.9.8-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a></span>, <span name="interp">interp: <span class="extype" name="ammonite.interp.Interpreter">Interpreter</span></span>, <span name="scriptArgs">scriptArgs: <span class="extype" name="scala.Seq">Seq</span>[(<span class="extype" name="scala.Predef.String">String</span>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Option" class="extype" target="_top">Option</a>[<span class="extype" name="scala.Predef.String">String</span>])]</span>)</span><span class="result">: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-util/0.9.8/ammonite-util-0.9.8-javadoc.jar/!/index.html#ammonite.util.Res" class="extype" target="_top">Res</a>[<a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Any" class="extype" target="_top">Any</a>]</span>
       </span>
       
       

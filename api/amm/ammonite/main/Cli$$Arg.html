@@ -111,50 +111,47 @@ configuration, running scripts, printing error messages, etc." href="index.html"
 configuration, running scripts, printing error messages, etc.</p><div class="fullcomment"><div class="comment cmt"><p>Code related to invoking Ammonite from the outside world: default
 configuration, running scripts, printing error messages, etc.
 </p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="ammonite">ammonite</a></dd></dl></div>
-    </li><li class="current-entities indented2">
+    </li><li name="ammonite.main.Cli" visbl="pub" class="indented3 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="Cli"></a><a id="Cli:Cli"></a>
+      <span class="permalink">
+      <a href="../../ammonite/main/index.html#Cli" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="Cli$.html">
+              <span class="name">Cli</span>
+            </a>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="index.html" class="extype" name="ammonite.main">main</a></dd></dl></div>
+    </li><li class="current-entities indented3">
                         <span class="separator"></span>
-                        <a class="object" href="Cli$.html" title=""></a>
-                        <a href="Cli$.html" title="">
-                          Cli
+                        <a class="class" href="" title=""></a>
+                        <a href="" title="">
+                          Arg
                         </a>
-                      </li><li class="current-entities indented2">
+                      </li><li class="current-entities indented3">
                         <span class="separator"></span>
-                        <a class="object" href="" title="Constants used in the default configuration for the Ammonite REPL
-"></a>
-                        <a href="" title="Constants used in the default configuration for the Ammonite REPL
-">
-                          Defaults
-                        </a>
-                      </li><li class="current-entities indented2">
-                        <a class="object" href="Router$.html" title="More or less a minimal version of Autowire's Server that lets you generate
-a set of &quot;routes&quot; from the methods defined in an object, and call them
-using passing in name/args/kwargs via Java reflection, without having to
-generate/compile code or use Scala reflection."></a>
-                        <a class="class" href="Router.html" title=""></a>
-                        <a href="Router.html" title="">
-                          Router
-                        </a>
-                      </li><li class="current-entities indented2">
-                        <span class="separator"></span>
-                        <a class="object" href="Scripts$.html" title="Logic around using Ammonite as a script-runner; invoking scripts via the
-macro-generated Router, and pretty-printing any output or error messages
-"></a>
-                        <a href="Scripts$.html" title="Logic around using Ammonite as a script-runner; invoking scripts via the
-macro-generated Router, and pretty-printing any output or error messages
-">
-                          Scripts
+                        <a class="class" href="Cli$$Config.html" title=""></a>
+                        <a href="Cli$$Config.html" title="">
+                          Config
                         </a>
                       </li>
               </ul>
             </div>
           </div>
           <div id="content">
-            <body class="object value">
+            <body class="class type">
       <div id="definition">
-        <div class="big-circle object">o</div>
-        <p id="owner"><a href="../index.html" class="extype" name="ammonite">ammonite</a>.<a href="index.html" class="extype" name="ammonite.main">main</a></p>
-        <h1>Defaults<span class="permalink">
-      <a href="../../ammonite/main/Defaults$.html" title="Permalink">
+        <div class="big-circle class">c</div>
+        <p id="owner"><a href="../index.html" class="extype" name="ammonite">ammonite</a>.<a href="index.html" class="extype" name="ammonite.main">main</a>.<a href="Cli$.html" class="extype" name="ammonite.main.Cli">Cli</a></p>
+        <h1>Arg<span class="permalink">
+      <a href="../../ammonite/main/Cli$$Arg.html" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span></h1>
@@ -164,20 +161,19 @@ macro-generated Router, and pretty-printing any output or error messages
       <h4 id="signature" class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">object</span>
+        <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">Defaults</span>
+        <span class="name">Arg</span><span class="tparams">[<span name="T">T</span>, <span name="V">V</span>]</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="shortName">shortName: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Option" class="extype" target="_top">Option</a>[<a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Char" class="extype" target="_top">Char</a>]</span>, <span name="doc">doc: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="action">action: (<span class="extype" name="ammonite.main.Cli.Arg.T">T</span>, <span class="extype" name="ammonite.main.Cli.Arg.V">V</span>) ⇒ <span class="extype" name="ammonite.main.Cli.Arg.T">T</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="reader">reader: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/github/scopt/scopt_2.12/3.5.0/scopt_2.12-3.5.0-javadoc.jar/!/index.html#scopt.Read" class="extype" target="_top">Read</a>[<span class="extype" name="ammonite.main.Cli.Arg.V">V</span>]</span>)</span><span class="result"> extends <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
       </span>
       </h4>
 
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Constants used in the default configuration for the Ammonite REPL
-</p></div><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
           </span>
-          <div class="superTypes hiddenContent"><a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Any" class="extype" target="_top">Any</a></div>
+          <div class="superTypes hiddenContent"><a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Serializable" class="extype" target="_top">Serializable</a>, <span class="extype" name="java.io.Serializable">Serializable</span>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Product" class="extype" target="_top">Product</a>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Equals" class="extype" target="_top">Equals</a>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Any" class="extype" target="_top">Any</a></div>
         </div></div>
         
 
@@ -203,7 +199,7 @@ macro-generated Router, and pretty-printing any output or error messages
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="ammonite.main.Defaults"><span>Defaults</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="ammonite.main.Cli.Arg"><span>Arg</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.Product"><span>Product</span></li><li class="in" name="scala.Equals"><span>Equals</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -221,7 +217,26 @@ macro-generated Router, and pretty-printing any output or error messages
 
       <div id="template">
         <div id="allMembers">
-        
+        <div id="constructors" class="members">
+              <h3>Instance Constructors</h3>
+              <ol><li name="ammonite.main.Cli.Arg#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="&lt;init&gt;(name:String,shortName:Option[Char],doc:String,action:(T,V)=&gt;T)(implicitreader:scopt.Read[V]):ammonite.main.Cli.Arg[T,V]"></a><a id="&lt;init&gt;:Arg[T,V]"></a>
+      <span class="permalink">
+      <a href="../../ammonite/main/Cli$$Arg.html#&lt;init&gt;(name:String,shortName:Option[Char],doc:String,action:(T,V)=&gt;T)(implicitreader:scopt.Read[V]):ammonite.main.Cli.Arg[T,V]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">new</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Arg</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="shortName">shortName: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Option" class="extype" target="_top">Option</a>[<a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Char" class="extype" target="_top">Char</a>]</span>, <span name="doc">doc: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="action">action: (<span class="extype" name="ammonite.main.Cli.Arg.T">T</span>, <span class="extype" name="ammonite.main.Cli.Arg.V">V</span>) ⇒ <span class="extype" name="ammonite.main.Cli.Arg.T">T</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="reader">reader: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/github/scopt/scopt_2.12/3.5.0/scopt_2.12-3.5.0-javadoc.jar/!/index.html#scopt.Read" class="extype" target="_top">Read</a>[<span class="extype" name="ammonite.main.Cli.Arg.V">V</span>]</span>)</span>
+      </span>
+      
+      
+    </li></ol>
+            </div>
 
         
 
@@ -233,7 +248,7 @@ macro-generated Router, and pretty-printing any output or error messages
                 <li name="scala.AnyRef#!=" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="!=(x$1:Any):Boolean"></a><a id="!=(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../ammonite/main/Defaults$.html#!=(x$1:Any):Boolean" title="Permalink">
+      <a href="../../ammonite/main/Cli$$Arg.html#!=(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -249,7 +264,7 @@ macro-generated Router, and pretty-printing any output or error messages
     </li><li name="scala.AnyRef###" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="##():Int"></a>
       <span class="permalink">
-      <a href="../../ammonite/main/Defaults$.html###():Int" title="Permalink">
+      <a href="../../ammonite/main/Cli$$Arg.html###():Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -265,7 +280,7 @@ macro-generated Router, and pretty-printing any output or error messages
     </li><li name="scala.AnyRef#==" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="==(x$1:Any):Boolean"></a><a id="==(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../ammonite/main/Defaults$.html#==(x$1:Any):Boolean" title="Permalink">
+      <a href="../../ammonite/main/Cli$$Arg.html#==(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -278,26 +293,26 @@ macro-generated Router, and pretty-printing any output or error messages
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="ammonite.main.Defaults#ammoniteHome" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="ammoniteHome:ammonite.ops.Path"></a><a id="ammoniteHome:Path"></a>
+    </li><li name="ammonite.main.Cli.Arg#action" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="action:(T,V)=&gt;T"></a><a id="action:(T,V)⇒T"></a>
       <span class="permalink">
-      <a href="../../ammonite/main/Defaults$.html#ammoniteHome:ammonite.ops.Path" title="Permalink">
+      <a href="../../ammonite/main/Cli$$Arg.html#action:(T,V)=&gt;T" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">def</span>
+        <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">ammoniteHome</span><span class="result">: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/0.9.8/ammonite-ops-0.9.8-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a></span>
+        <span class="name">action</span><span class="result">: (<span class="extype" name="ammonite.main.Cli.Arg.T">T</span>, <span class="extype" name="ammonite.main.Cli.Arg.V">V</span>) ⇒ <span class="extype" name="ammonite.main.Cli.Arg.T">T</span></span>
       </span>
       
       
     </li><li name="scala.Any#asInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <span class="permalink">
-      <a href="../../ammonite/main/Defaults$.html#asInstanceOf[T0]:T0" title="Permalink">
+      <a href="../../ammonite/main/Cli$$Arg.html#asInstanceOf[T0]:T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -313,7 +328,7 @@ macro-generated Router, and pretty-printing any output or error messages
     </li><li name="scala.AnyRef#clone" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a><a id="clone():AnyRef"></a>
       <span class="permalink">
-      <a href="../../ammonite/main/Defaults$.html#clone():Object" title="Permalink">
+      <a href="../../ammonite/main/Cli$$Arg.html#clone():Object" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -332,10 +347,26 @@ macro-generated Router, and pretty-printing any output or error messages
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="ammonite.main.Cli.Arg#doc" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="doc:String"></a>
+      <span class="permalink">
+      <a href="../../ammonite/main/Cli$$Arg.html#doc:String" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">doc</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      
+      
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../ammonite/main/Defaults$.html#eq(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../ammonite/main/Cli$$Arg.html#eq(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -348,26 +379,10 @@ macro-generated Router, and pretty-printing any output or error messages
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="scala.AnyRef#equals" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="equals(x$1:Any):Boolean"></a><a id="equals(Any):Boolean"></a>
-      <span class="permalink">
-      <a href="../../ammonite/main/Defaults$.html#equals(x$1:Any):Boolean" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Any" class="extype" target="_top">Any</a></span>)</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="scala.AnyRef#finalize" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
       <span class="permalink">
-      <a href="../../ammonite/main/Defaults$.html#finalize():Unit" title="Permalink">
+      <a href="../../ammonite/main/Cli$$Arg.html#finalize():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -389,7 +404,7 @@ macro-generated Router, and pretty-printing any output or error messages
     </li><li name="scala.AnyRef#getClass" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <span class="permalink">
-      <a href="../../ammonite/main/Defaults$.html#getClass():Class[_]" title="Permalink">
+      <a href="../../ammonite/main/Cli$$Arg.html#getClass():Class[_]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -402,26 +417,10 @@ macro-generated Router, and pretty-printing any output or error messages
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="scala.AnyRef#hashCode" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="hashCode():Int"></a>
-      <span class="permalink">
-      <a href="../../ammonite/main/Defaults$.html#hashCode():Int" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">hashCode</span><span class="params">()</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Int" class="extype" target="_top">Int</a></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="scala.Any#isInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <span class="permalink">
-      <a href="../../ammonite/main/Defaults$.html#isInstanceOf[T0]:Boolean" title="Permalink">
+      <a href="../../ammonite/main/Cli$$Arg.html#isInstanceOf[T0]:Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -434,10 +433,26 @@ macro-generated Router, and pretty-printing any output or error messages
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="ammonite.main.Cli.Arg#name" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="name:String"></a>
+      <span class="permalink">
+      <a href="../../ammonite/main/Cli$$Arg.html#name:String" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">name</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      
+      
     </li><li name="scala.AnyRef#ne" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../ammonite/main/Defaults$.html#ne(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../ammonite/main/Cli$$Arg.html#ne(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -453,7 +468,7 @@ macro-generated Router, and pretty-printing any output or error messages
     </li><li name="scala.AnyRef#notify" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notify():Unit"></a>
       <span class="permalink">
-      <a href="../../ammonite/main/Defaults$.html#notify():Unit" title="Permalink">
+      <a href="../../ammonite/main/Cli$$Arg.html#notify():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -469,7 +484,7 @@ macro-generated Router, and pretty-printing any output or error messages
     </li><li name="scala.AnyRef#notifyAll" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notifyAll():Unit"></a>
       <span class="permalink">
-      <a href="../../ammonite/main/Defaults$.html#notifyAll():Unit" title="Permalink">
+      <a href="../../ammonite/main/Cli$$Arg.html#notifyAll():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -482,10 +497,42 @@ macro-generated Router, and pretty-printing any output or error messages
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="ammonite.main.Defaults#predefString" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="predefString:String"></a>
+    </li><li name="ammonite.main.Cli.Arg#reader" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="reader:scopt.Read[V]"></a><a id="reader:Read[V]"></a>
       <span class="permalink">
-      <a href="../../ammonite/main/Defaults$.html#predefString:String" title="Permalink">
+      <a href="../../ammonite/main/Cli$$Arg.html#reader:scopt.Read[V]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">reader</span><span class="result">: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/github/scopt/scopt_2.12/3.5.0/scopt_2.12-3.5.0-javadoc.jar/!/index.html#scopt.Read" class="extype" target="_top">Read</a>[<span class="extype" name="ammonite.main.Cli.Arg.V">V</span>]</span>
+      </span>
+      
+      
+    </li><li name="ammonite.main.Cli.Arg#runAction" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="runAction(t:T,s:String):T"></a><a id="runAction(T,String):T"></a>
+      <span class="permalink">
+      <a href="../../ammonite/main/Cli$$Arg.html#runAction(t:T,s:String):T" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">runAction</span><span class="params">(<span name="t">t: <span class="extype" name="ammonite.main.Cli.Arg.T">T</span></span>, <span name="s">s: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="ammonite.main.Cli.Arg.T">T</span></span>
+      </span>
+      
+      
+    </li><li name="ammonite.main.Cli.Arg#shortName" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="shortName:Option[Char]"></a>
+      <span class="permalink">
+      <a href="../../ammonite/main/Cli$$Arg.html#shortName:Option[Char]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -494,30 +541,14 @@ macro-generated Router, and pretty-printing any output or error messages
         <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">predefString</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
-      </span>
-      
-      
-    </li><li name="ammonite.main.Defaults#replPredef" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="replPredef:String"></a>
-      <span class="permalink">
-      <a href="../../ammonite/main/Defaults$.html#replPredef:String" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">replPredef</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+        <span class="name">shortName</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Option" class="extype" target="_top">Option</a>[<a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Char" class="extype" target="_top">Char</a>]</span>
       </span>
       
       
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">
-      <a href="../../ammonite/main/Defaults$.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
+      <a href="../../ammonite/main/Cli$$Arg.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -530,26 +561,10 @@ macro-generated Router, and pretty-printing any output or error messages
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="scala.AnyRef#toString" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="toString():String"></a>
-      <span class="permalink">
-      <a href="../../ammonite/main/Defaults$.html#toString():String" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <span class="permalink">
-      <a href="../../ammonite/main/Defaults$.html#wait():Unit" title="Permalink">
+      <a href="../../ammonite/main/Cli$$Arg.html#wait():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -571,7 +586,7 @@ macro-generated Router, and pretty-printing any output or error messages
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long,x$2:Int):Unit"></a><a id="wait(Long,Int):Unit"></a>
       <span class="permalink">
-      <a href="../../ammonite/main/Defaults$.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
+      <a href="../../ammonite/main/Cli$$Arg.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -593,7 +608,7 @@ macro-generated Router, and pretty-printing any output or error messages
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long):Unit"></a><a id="wait(Long):Unit"></a>
       <span class="permalink">
-      <a href="../../ammonite/main/Defaults$.html#wait(x$1:Long):Unit" title="Permalink">
+      <a href="../../ammonite/main/Cli$$Arg.html#wait(x$1:Long):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -612,22 +627,6 @@ macro-generated Router, and pretty-printing any output or error messages
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="ammonite.main.Defaults#welcomeBanner" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="welcomeBanner:String"></a>
-      <span class="permalink">
-      <a href="../../ammonite/main/Defaults$.html#welcomeBanner:String" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">welcomeBanner</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
-      </span>
-      
-      
     </li>
               </ol>
             </div>
@@ -638,7 +637,15 @@ macro-generated Router, and pretty-printing any output or error messages
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="scala.AnyRef">
+        <div class="parent" name="scala.Serializable">
+              <h3>Inherited from <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></h3>
+            </div><div class="parent" name="java.io.Serializable">
+              <h3>Inherited from <span class="extype" name="java.io.Serializable">Serializable</span></h3>
+            </div><div class="parent" name="scala.Product">
+              <h3>Inherited from <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Product" class="extype" target="_top">Product</a></h3>
+            </div><div class="parent" name="scala.Equals">
+              <h3>Inherited from <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Equals" class="extype" target="_top">Equals</a></h3>
+            </div><div class="parent" name="scala.AnyRef">
               <h3>Inherited from <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></h3>
             </div><div class="parent" name="scala.Any">
               <h3>Inherited from <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Any" class="extype" target="_top">Any</a></h3>
