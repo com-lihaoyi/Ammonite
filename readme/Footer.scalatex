@@ -134,6 +134,14 @@
           Error messages for scripts are now consistently not colored, rather
           than mostly being uncolored but sometimes turning up red
 
+        @li
+          Scripts without a main method now properly show an error if arguments
+          are passed
+
+        @li
+          Error messages from scripts are now more reliably sent to @code{stderr}
+          rather than @code{stdout}
+
     @sect{0.9.7}
       @ul
         @li

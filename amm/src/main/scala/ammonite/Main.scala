@@ -178,12 +178,12 @@ object Main{
       Cli.groupArgs(args0.toList, Cli.ammoniteArgSignature, Cli.Config()) match{
         case Right(v) => v
         case Left(errorMsg) =>
-          println(errorMsg)
+          Console.err.println(errorMsg)
           sys.exit(1)
       }
 
     if (cliConfig.help) {
-      println(Cli.ammoniteHelp)
+      Console.out.println(Cli.ammoniteHelp)
       sys.exit(0)
     }
 
@@ -192,12 +192,12 @@ object Main{
         fromConfig(cliConfig, true).runCode(code, cliConfig.replApi)
 
       case (None, Nil) =>
-        println("Loading...")
+        Console.out.println("Loading...")
         fromConfig(cliConfig, true).run()
 
       case (None, head :: rest) if head.startsWith("-") =>
-        println("Unknown Ammonite argument: " + head)
-        println(Cli.ammoniteHelp)
+        Console.err.println("Unknown Ammonite option: " + head)
+        Console.err.println("Use --help to list possible options")
         sys.exit(1)
 
       case (None, head :: rest) =>
@@ -241,7 +241,6 @@ object Main{
     )
     val success = res match {
       case Res.Failure(exOpt, msg) =>
-        println("FAILURE")
         Console.err.println(msg)
         false
       case Res.Exception(ex, s) =>

@@ -85,10 +85,22 @@ object Scripts {
       res <- interp.eval.withContextClassloader{
         scriptMains match {
           // If there are no @main methods, there's nothing to do
-          case Seq() => Res.Success(())
+          case Seq() =>
+            if (scriptArgs.isEmpty) Res.Success(())
+            else {
+              val scriptArgString =
+                scriptArgs.flatMap{case (a, b) => Seq(a) ++ b}.map(literalize(_))
+                          .mkString(" ")
+
+              Res.Failure(
+                None,
+                "Script " + path.last + " does not take arguments: " + scriptArgString
+              )
+            }
+
           // If there's one @main method, we run it with all args
-          case Seq(main) =>
-            runMainMethod(main, scriptArgs)
+          case Seq(main) => runMainMethod(main, scriptArgs)
+
           // If there are multiple @main methods, we use the first arg to decide
           // which method to run, and pass the rest to that main method
           case mainMethods =>
@@ -146,7 +158,7 @@ object Scripts {
           .map(renderArg)
           .mkString(", ")
       val details = mainMethodDetails(mainMethod)
-      "(" + commaSeparated + ")" + details
+      "def " + mainMethod.name + "(" + commaSeparated + ")" + details
     }
 
     mainMethod.invoke(scriptArgs) match{
@@ -203,7 +215,7 @@ object Scripts {
                 s"(${renderArg(p)}) failed to parse input ${literalize(v)} with $ex"
               case Router.Result.ParamError.DefaultFailed(p, ex) =>
                 s"(${renderArg(p)})'s default value failed to evaluate with $ex"
-            }.mkString(Util.newLine) + Util.newLine + s"expected arguments: $expectedMsg"
+            }.mkString(Util.newLine) + Util.newLine + s"expected signature: $expectedMsg"
         )
     }
   }
