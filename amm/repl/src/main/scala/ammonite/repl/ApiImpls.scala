@@ -90,6 +90,8 @@ class ReplApiImpl(val interp: Interpreter,
     )
   )
 
+  def show(t: Any) = show(t, null, 9999999, null)
+
   override def show(t: Any,
                     width: Integer = null,
                     height: Integer = 9999999,

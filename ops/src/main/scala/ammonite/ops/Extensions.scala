@@ -5,34 +5,39 @@ import scala.collection.{Seq, GenTraversableOnce, TraversableLike}
 import scala.collection.generic.{CanBuildFrom => CBF, GenericTraversableTemplate, SeqFactory}
 
 trait Extensions{
-  implicit def Pipeable[T](t: T) = new Pipeable(t)
-  implicit def FilterMapExt[T, Repr](i: TraversableLike[T, Repr]) = new FilterMapExt(i)
+  implicit def PipeableImplicit[T](t: T): Pipeable[T] = new Pipeable(t)
+
+  implicit def FilterMapExtImplicit[T, Repr](i: TraversableLike[T, Repr]): FilterMapExt[T, Repr] =
+    new FilterMapExt(i)
   /**
    * Lets you call [[FilterMapExt]] aliases on Arrays too
    */
-  implicit def FilterMapArrays[T](a: Array[T]) = FilterMapExt(a)
-  implicit def FilterMapIterators[T](a: Iterator[T]) = new FilterMapExt2(a)
-  implicit def FilterMapGenerators[T](a: geny.Generator[T]) = new FilterMapExtGen(a)
+  implicit def FilterMapArraysImplicit[T](a: Array[T]): FilterMapExt[T, Array[T]] =
+    new FilterMapExt(a)
+
+  implicit def FilterMapIteratorsImplicit[T](a: Iterator[T]): FilterMapExt2[T] =
+    new FilterMapExt2(a)
+
+  implicit def FilterMapGeneratorsImplicit[T](a: geny.Generator[T]): FilterMapExtGen[T] =
+    new FilterMapExtGen(a)
 
   /**
    * Allows you to pipe sequences into other sequences to convert them,
    * e.g. Seq(1, 2, 3) |> Vector
    */
   implicit def SeqFactoryFunc[T, CC[X] <: Seq[X] with GenericTraversableTemplate[X, CC]]
-  (s: SeqFactory[CC]) = {
+                             (s: SeqFactory[CC]) = {
     (t: Seq[T]) => s(t:_*)
   }
 
-  implicit def ChainableConversions[T, T1, V](f: T => V)(implicit i: T1 => T) = i andThen f
 
   implicit class iterShow[T](t: Iterator[T]){
     def !! = t.foreach(println)
   }
 
-  implicit def RegexContextMaker(s: StringContext) = new RegexContext(s)
+  implicit def RegexContextMaker(s: StringContext): RegexContext = new RegexContext(s)
 
-  implicit def Callable1[T1, R](f: (T1 => R)) = new Callable1(f)
-  implicit def Callable2[T1, T2, R](f: (T1, T2) => R) = new Callable2(f)
+  implicit def Callable1Implicit[T1, R](f: (T1 => R)): Callable1[T1, R] = new Callable1(f)
 }
 
 /**
@@ -58,7 +63,7 @@ object Extensions extends Extensions
  * Lets you pipe values through functions
  */
 
-class Pipeable[T](t: T){
+class Pipeable[T](t: T) {
   def |>[V](f: T => V) = f(t)
 }
 /**
@@ -66,7 +71,7 @@ class Pipeable[T](t: T){
  * used operations, so we can make it easy to use from the
  * command line.
  */
-class FilterMapExt[+T, Repr](i: TraversableLike[T, Repr]){
+class FilterMapExt[+T, Repr](i: TraversableLike[T, Repr]) {
   /**
    * Alias for `map`
    */
@@ -99,7 +104,7 @@ class FilterMapExt[+T, Repr](i: TraversableLike[T, Repr]){
  * used operations, so we can make it easy to use from the
  * command line.
  */
-class FilterMapExt2[+T](i: Iterator[T]){
+class FilterMapExt2[+T](i: Iterator[T]) {
   /**
    * Alias for `map`
    */
@@ -130,7 +135,7 @@ class FilterMapExt2[+T](i: Iterator[T]){
  * used operations, so we can make it easy to use from the
  * command line.
  */
-class FilterMapExtGen[+T](i: geny.Generator[T]){
+class FilterMapExtGen[+T](i: geny.Generator[T]) {
   /**
    * Alias for `map`
    */

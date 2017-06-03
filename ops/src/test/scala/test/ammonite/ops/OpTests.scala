@@ -123,15 +123,15 @@ object OpTests extends TestSuite{
           val d = test/'moving
           mkdir! d/'folder
           assert(ls(d) == Seq(d/'folder))
-          mv! d/'folder ! d/'folder2
+          mv(d/'folder, d/'folder2)
           assert(ls(d) == Seq(d/'folder2))
         }
         'shallow{
           val d = test/'moving2
-          write! d/"A.scala" ! "AScala"
-          write! d/"B.scala" ! "BScala"
-          write! d/"A.py" ! "APy"
-          write! d/"B.py" ! "BPy"
+          write(d/"A.scala", "AScala")
+          write(d/"B.scala", "BScala")
+          write(d/"A.py", "APy")
+          write(d/"B.py", "BPy")
           def fileSet = ls(d).map(_.last).toSet
           assert(fileSet == Set("A.scala", "B.scala", "A.py", "B.py"))
           'partialMoves{
@@ -149,10 +149,10 @@ object OpTests extends TestSuite{
         }
         'deep{
           val d = test/'moving2
-          write! d/'scala/'A ! "AScala"
-          write! d/'scala/'B ! "BScala"
-          write! d/'py/'A ! "APy"
-          write! d/'py/'B ! "BPy"
+          write(d/'scala/'A, "AScala")
+          write(d/'scala/'B, "BScala")
+          write(d/'py/'A, "APy")
+          write(d/'py/'B, "BPy")
           'partialMoves{
             ls.rec! d | mv*{case d/"py"/x => d/x }
             assert(
@@ -216,15 +216,15 @@ object OpTests extends TestSuite{
         val d = test/'readWrite
         mkdir! d
         'simple{
-          write! d/'file ! "i am a cow"
+          write(d/'file, "i am a cow")
           assert(read(d/'file) == "i am a cow")
         }
         'autoMkdir{
-          write! d/'folder/'folder/'file ! "i am a cow"
+          write(d/'folder/'folder/'file, "i am a cow")
           assert(read(d/'folder/'folder/'file) == "i am a cow")
         }
         'binary{
-          write! d/'file ! Array[Byte](1, 2, 3, 4)
+          write(d/'file, Array[Byte](1, 2, 3, 4))
           assert(read(d/'file).toSeq == Array[Byte](1, 2, 3, 4).toSeq)
         }
         'concatenating{
@@ -253,12 +253,12 @@ object OpTests extends TestSuite{
           * - intercept[nio.NoSuchFileException](ls! d/'nonexistent)
           * - intercept[nio.NoSuchFileException](read! d/'nonexistent)
           * - intercept[ResourceNotFoundException](read! resource/'failures/'nonexistent)
-          * - intercept[nio.NoSuchFileException](cp! d/'nonexistent ! d/'yolo)
-          * - intercept[nio.NoSuchFileException](mv! d/'nonexistent ! d/'yolo)
+          * - intercept[nio.NoSuchFileException](cp(d/'nonexistent, d/'yolo))
+          * - intercept[nio.NoSuchFileException](mv(d/'nonexistent, d/'yolo))
         }
         'collisions{
           mkdir! d/'folder
-          write! d/'file! "lolol"
+          write(d/'file, "lolol")
           * - intercept[nio.FileAlreadyExistsException](mv(d/'file, d/'folder))
           * - intercept[nio.FileAlreadyExistsException](cp(d/'file, d/'folder))
           * - intercept[nio.FileAlreadyExistsException](write(d/'file, "lols"))

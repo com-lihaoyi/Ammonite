@@ -25,16 +25,14 @@ object Defaults{
   // imports if someone else imports maunally
   val predefString = s"""
     |import ammonite.ops.{
-    |  Pipeable,
-    |  FilterMapExt,
-    |  FilterMapArrays,
-    |  FilterMapIterators,
-    |  FilterMapGenerators,
+    |  PipeableImplicit,
+    |  FilterMapExtImplicit,
+    |  FilterMapArraysImplicit,
+    |  FilterMapIteratorsImplicit,
+    |  FilterMapGeneratorsImplicit,
     |  SeqFactoryFunc,
-    |  ChainableConversions,
     |  RegexContextMaker,
-    |  Callable1,
-    |  Callable2
+    |  Callable1Implicit
     |}
     |import ammonite.runtime.tools._
     |import ammonite.repl.tools._

@@ -75,7 +75,7 @@ object SessionTests extends TestSuite{
 
         @ mkdir! 'srcDir0
 
-        @ ln.s!('srcDir0)! 'destSymLink
+        @ ln.s('srcDir0, 'destSymLink)
 
         @ cd! 'destSymLink
 

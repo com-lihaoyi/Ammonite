@@ -148,6 +148,14 @@
           top-level package namespace with miscellaneous names like @code{$file}
           and @code{$sess}
 
+        @li
+          Remove @code{foo ! bar ! baz} implicit syntax, and
+          @code{ChainableConversions} implicit. They're cool, but not simple
+          enough to be worth including by default
+
+        @li
+          Re-enable @code{foo |> show} syntax in the REPL, which regressed in 0.9.0
+
     @sect{0.9.7}
       @ul
         @li
