@@ -138,7 +138,7 @@ object BasicTests extends TestSuite{
         %%bash(
           executable,
           "-c",
-          """val loc = src.load(new String().substring(_: Int))
+          """val loc = source.load(new String().substring(_: Int))
             |val snip = loc.fileContent
             |  .lines
             |  .slice(loc.lineNum-15, loc.lineNum+15)

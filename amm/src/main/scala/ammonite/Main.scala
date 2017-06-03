@@ -91,8 +91,9 @@ case class Main(predef: String = "",
   def instantiateInterpreter(replApi: Boolean) = {
     val augmentedPredef = Main.maybeDefaultPredef(defaultPredef, Defaults.predefString)
 
-    val (colors, printStream, errorPrintStream, printer) =
-      Interpreter.initPrinters(outputStream, infoStream, errorStream, verboseOutput)
+    val (colors, printStream, errorPrintStream, printer) = Interpreter.initPrinters(
+      Colors.BlackWhite, outputStream, infoStream, errorStream, verboseOutput
+    )
 
 
     val interp: Interpreter = new Interpreter(
@@ -240,6 +241,7 @@ object Main{
     )
     val success = res match {
       case Res.Failure(exOpt, msg) =>
+        println("FAILURE")
         Console.err.println(msg)
         false
       case Res.Exception(ex, s) =>

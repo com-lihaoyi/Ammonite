@@ -21,6 +21,7 @@ class Repl(input: InputStream,
            wd: ammonite.ops.Path,
            welcomeBanner: Option[String],
            replArgs: Seq[Bind[_]] = Nil,
+           initialColors: Colors = Colors.Default,
            remoteLogger: Option[RemoteLogger]) {
 
   val prompt = Ref("@ ")
@@ -30,9 +31,7 @@ class Repl(input: InputStream,
   var history = new History(Vector())
 
   val (colors, printStream, errorPrintStream, printer) =
-    Interpreter.initPrinters(output, info, error, true)
-
-
+    Interpreter.initPrinters(initialColors, output, info, error, true)
 
   val argString = replArgs.zipWithIndex.map{ case (b, idx) =>
     s"""

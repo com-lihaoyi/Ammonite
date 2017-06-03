@@ -650,11 +650,12 @@ object Interpreter{
 
   def mtimeIfExists(p: Path) = if (!exists(p)) None else Some(p.mtime.toMillis)
 
-  def initPrinters(output: OutputStream,
+  def initPrinters(colors0: Colors,
+                   output: OutputStream,
                    info: OutputStream,
                    error: OutputStream,
                    verboseOutput: Boolean) = {
-    val colors = Ref[Colors](Colors.Default)
+    val colors = Ref[Colors](colors0)
     val printStream = new PrintStream(output, true)
     val errorPrintStream = new PrintStream(error, true)
     val infoPrintStream = new PrintStream(info, true)

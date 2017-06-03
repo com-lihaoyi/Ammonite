@@ -126,6 +126,13 @@
         @li
           Renamed @code{src} builtin to @code{source} to reduce chance of
           name collisions
+        @li
+          You can now pass @sect.ref{Script Arguments} via both @code{--foo}
+          and @code{-foo}
+
+        @li
+          Error messages for scripts are now consistently not colored, rather
+          than mostly being uncolored but sometimes turning up red
 
     @sect{0.9.7}
       @ul
