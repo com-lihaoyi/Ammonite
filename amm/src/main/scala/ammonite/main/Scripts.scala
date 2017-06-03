@@ -2,12 +2,11 @@ package ammonite.main
 import java.nio.file.NoSuchFileException
 
 
-import ammonite.runtime.ImportHook
 import ammonite.main.Router.{ArgSig, EntryPoint}
 import ammonite.ops._
 import ammonite.runtime.Evaluator.AmmoniteExit
 import ammonite.util.Name.backtickWrap
-import ammonite.util.Util.{CodeSource, VersionedWrapperId}
+import ammonite.util.Util.CodeSource
 import ammonite.util.{Name, Res, Util}
 import fastparse.utils.Utils._
 
@@ -16,13 +15,16 @@ import fastparse.utils.Utils._
   * macro-generated [[Router]], and pretty-printing any output or error messages
   */
 object Scripts {
-  def groupArgs(flatArgs: Seq[String]): Seq[(String, Option[String])] = {
-    var keywordTokens = flatArgs.toList
+  def groupArgs(flatArgs: List[String]): Seq[(String, Option[String])] = {
+    var keywordTokens = flatArgs
     var scriptArgs = Vector.empty[(String, Option[String])]
 
     while(keywordTokens.nonEmpty) keywordTokens match{
       case List(head, next, rest@_*) if head.startsWith("--") =>
         scriptArgs = scriptArgs :+ (head.drop(2), Some(next))
+        keywordTokens = rest.toList
+      case List(head, next, rest@_*) if head.startsWith("-") =>
+        scriptArgs = scriptArgs :+ (head.drop(1), Some(next))
         keywordTokens = rest.toList
       case List(head, rest@_*) =>
         scriptArgs = scriptArgs :+ (head, None)

@@ -22,12 +22,11 @@ object TestUtils {
   def execBase(name: RelPath, silent: Option[String], args: Seq[String]) = {
     %%bash(
       executable,
-      replStandaloneResources / name,
       silent,
       "--no-remote-logging",
       "--home",
       tmp.dir(),
-      "--",
+      replStandaloneResources / name,
       args
     )
   }

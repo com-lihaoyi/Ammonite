@@ -73,7 +73,7 @@ object ErrorTruncationTests extends TestSuite{
     'runtimeError - checkErrorMessage(
       file = 'errorTruncation/"runtimeError.sc",
       expected = Util.normalizeNewlines(
-        s"""Exception in thread "main" java.lang.ArithmeticException: / by zero
+        s"""java.lang.ArithmeticException: / by zero
           |${tab}at $runtimeErrorResourcePackage.runtimeError$$.<init>($runtimeErrorSc:1)
           |${tab}at $runtimeErrorResourcePackage.runtimeError$$.<clinit>($runtimeErrorSc)
           |${tab}at $runtimeErrorResourcePackage.runtimeError.$$main($runtimeErrorSc)

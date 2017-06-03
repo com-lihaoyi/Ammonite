@@ -23,13 +23,13 @@ object BasicTests extends TestSuite{
 
     def execWithJavaOptsSet(name: RelPath, home: Path) = %%bash(
       executable,
-      replStandaloneResources/name,
       "--no-remote-logging",
       "-h",
       home,
+      replStandaloneResources/name,
       JAVA_OPTS = "-verbose:class",
-      "--"
-      )
+    )
+
     'hello{
       val evaled = exec('basic/"Hello.sc")
       assert(evaled.out.trim == "Hello World")
@@ -46,10 +46,9 @@ object BasicTests extends TestSuite{
         write(scriptAddr, """println("Script Worked!!")""")
         val evaled = %%bash(
           executable,
-          scriptAddr,
           "-s",
-          "--"
-          )
+          scriptAddr
+        )
         assert(evaled.out.trim == "Script Worked!!" && evaled.err.string.isEmpty)
       }
     }

@@ -83,7 +83,7 @@ object MainTests extends TestSuite{
 
     'args{
       'full{
-        val evaled = exec('basic/"Args.sc", "3", "Moo", (pwd/'omg/'moo).toString)
+        val evaled = exec('basic/"Args.sc", "-i", "3", "--s", "Moo", (pwd/'omg/'moo).toString)
         assert(evaled.out.string == Util.normalizeNewlines("\"Hello! MooMooMoo moo.\"\n"))
       }
 
@@ -116,6 +116,20 @@ object MainTests extends TestSuite{
                |Missing arguments: (s: String)""".stripMargin
           )
         ))
+      }
+      'varargs{
+        // Make sure varargs are able to slurp up everything, including args
+        // which start with `--`. This allows a user to define a main method
+        // taking `String*`, slurping up all args un-changed, and then passing
+        // them on to their own custom argument parsing code (e.g. scopt)
+        val out = exec('basic/"Varargs.sc", "--i", "31337", "zomg", "--cow", "-omg", "bbq")
+              .out.string
+
+        assert(
+          out.contains("31337"),
+          out.contains("zomg"),
+          out.contains("ArrayBuffer(--cow, -omg, bbq)")
+        )
       }
       'tooMany{
         val errorMsg = intercept[ShelloutException]{

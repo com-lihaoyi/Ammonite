@@ -114,6 +114,15 @@
 
 
   @sect{Changelog}
+    @sect{0.9.8}
+      @ul
+        @li
+          Modified the way @sect.ref{Ammonite Arguments in Scripts} get passed.
+          Rather than separating Ammonite's args and a script's args with a
+          @code{--}, now any arguments @i{before} the script file are used by
+          Ammonite and any arguments @i{after} the script file get forwarded
+          to the script's @hl.scala("@main") method
+
     @sect{0.9.7}
       @ul
         @li
@@ -137,7 +146,7 @@
         @li
           Add the @code{-w}/@code{--watch} @sect.ref{Watch and Reload} flag,
           which lets you run a script repeatedly every time you change its code,
-          via @code{amm foo.sc -w --}. This is useful when you are actively
+          via @code{amm -w foo.sc}. This is useful when you are actively
           working on the script and greatly reduces the iteration time. You can
           also manually include files you wish to watch, e.g. if you are
           iterating on external data or config files.
