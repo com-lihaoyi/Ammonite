@@ -69,6 +69,9 @@ object Compiler{
         d.subdirectoryNamed(head).asInstanceOf[VirtualDirectory],
         rest, suffix
       )
+    // We should never write to an empty path, and one of the above cases
+    // should catch this and return before getting here
+    case Nil => ???
   }
   /**
    * If the Option is None, it means compilation failed

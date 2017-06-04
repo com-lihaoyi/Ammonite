@@ -282,10 +282,10 @@ object CachingTests extends TestSuite{
         // If upstream gets deleted, make sure the $file import fails to resolve
         rm(upstream)
 
-        val Res.Failure(_, msg1) = runScript(downstream, 0)
+        val Res.Failure(msg1) = runScript(downstream, 0)
 
         assert(msg1.startsWith("Cannot resolve $file import"))
-        val Res.Failure(_, msg2) = runScript(downstream, 0)
+        val Res.Failure(msg2) = runScript(downstream, 0)
         assert(msg2.startsWith("Cannot resolve $file import"))
 
         // And make sure that if the upstream re-appears with the exact same code,
@@ -305,7 +305,7 @@ object CachingTests extends TestSuite{
         // upstream and downstream need to be recompiled
         rm(upstream)
 
-        val Res.Failure(_, msg3) = runScript(downstream, 0)
+        val Res.Failure(msg3) = runScript(downstream, 0)
 
         assert(msg3.startsWith("Cannot resolve $file import"))
 

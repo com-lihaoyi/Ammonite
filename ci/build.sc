@@ -16,9 +16,9 @@ val allVersions = Seq(
 
 val latestMajorVersions = Set("2.10.6", "2.11.11", "2.12.2")
 
-val buildVersion = sys.env.get("TRAVIS_TAG") match{
-  case Some(v) if v != "" => sys.env("TRAVIS_TAG")
-  case _ =>  s"COMMIT-${getGitHash()}"
+val (buildVersion, unstable) = sys.env.get("TRAVIS_TAG") match{
+  case Some(v) if v != "" => (v, false)
+  case _ =>  (s"COMMIT-${getGitHash()}", true)
 }
 
 def getGitHash() = %%("git", "rev-parse", "--short", "HEAD").out.trim
@@ -173,11 +173,8 @@ def publishExecutable(ammoniteVersion: String,
 @main
 def executable() = {
   if (isMasterCommit){
-
-    val travisTag = sys.env("TRAVIS_TAG")
-    val unstable = travisTag == ""
     publishExecutable(
-      ammoniteVersion = if(unstable) getGitHash() else travisTag,
+      ammoniteVersion = buildVersion,
       publishKey = sys.env("AMMONITE_BOT_AUTH_TOKEN"),
       unstable
     )

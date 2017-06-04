@@ -65,7 +65,7 @@ object Evaluator{
 
   def interrupted(e: Throwable) = {
     Thread.interrupted()
-    Res.Failure(Some(e), newLine + "Interrupted!")
+    Res.Failure(newLine + "Interrupted! (`repl.lastException.printStackTrace` for details)")
   }
 
   def apply(startingLine: Int, frames: => List[Frame]): Evaluator = new Evaluator{ eval =>

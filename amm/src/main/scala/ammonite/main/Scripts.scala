@@ -40,7 +40,7 @@ object Scripts {
 
     for{
       scriptTxt <- try Res.Success(Util.normalizeNewlines(read(path))) catch{
-        case e: NoSuchFileException => Res.Failure(Some(e), "Script file not found: " + path)
+        case e: NoSuchFileException => Res.Failure("Script file not found: " + path)
       }
       processed <- interp.processModule(
         scriptTxt,
@@ -90,10 +90,7 @@ object Scripts {
                 scriptArgs.flatMap{case (a, b) => Seq(a) ++ b}.map(literalize(_))
                           .mkString(" ")
 
-              Res.Failure(
-                None,
-                "Script " + path.last + " does not take arguments: " + scriptArgString
-              )
+              Res.Failure("Script " + path.last + " does not take arguments: " + scriptArgString)
             }
 
           // If there's one @main method, we run it with all args
@@ -106,12 +103,10 @@ object Scripts {
             scriptArgs match{
               case Seq() =>
                 Res.Failure(
-                  None,
                   s"Need to specify a subcommand to call when running " + path.last + suffix
                 )
               case Seq((head, Some(_)), tail @ _*) =>
                 Res.Failure(
-                  None,
                   "To select a subcommand to run, you don't need --s." + Util.newLine +
                   s"Did you mean `${head.drop(2)}` instead of `$head`?"
                 )
@@ -119,7 +114,6 @@ object Scripts {
                 mainMethods.find(_.name == head) match{
                   case None =>
                     Res.Failure(
-                      None,
                       s"Unable to find subcommand: " + backtickWrap(head) + suffix
                     )
                   case Some(main) =>
@@ -228,7 +222,6 @@ object Scripts {
           }
 
         Res.Failure(
-          None,
           Util.normalizeNewlines(
             s"""$missingStr$unknownStr$duplicateStr$incompleteStr
                |Arguments provided did not match expected signature:
@@ -250,7 +243,6 @@ object Scripts {
         }
 
         Res.Failure(
-          None,
           Util.normalizeNewlines(
             s"""The following $argumentsStr failed to parse:
               |

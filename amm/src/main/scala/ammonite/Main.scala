@@ -297,7 +297,7 @@ class MainRunner(cliConfig: Cli.Config,
     )
 
     val success = res match {
-      case Res.Failure(exOpt, msg) =>
+      case Res.Failure(msg) =>
         printError(msg)
         false
       case Res.Exception(ex, s) =>

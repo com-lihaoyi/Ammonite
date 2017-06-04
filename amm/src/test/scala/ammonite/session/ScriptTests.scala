@@ -269,7 +269,8 @@ object ScriptTests extends TestSuite{
             storage,
             Defaults.predefString
           )
-          val Res.Failure(_, msg) =
+
+          val Res.Failure(msg) =
             Scripts.runScript(pwd, pwd/"scriptWithoutExtension", interp2)
 
           assert(msg.contains("Script file not found"))

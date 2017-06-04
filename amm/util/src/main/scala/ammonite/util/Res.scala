@@ -38,15 +38,15 @@ object Res{
   }
   def apply[T](o: Option[T], errMsg: => String) = o match{
     case Some(s) => Success(s)
-    case None => Failure(None, errMsg)
+    case None => Failure(errMsg)
   }
   def apply[T](o: Either[String, T]) = o match{
     case Right(s) => Success(s)
-    case Left(s) => Failure(None, s)
+    case Left(s) => Failure(s)
   }
   def apply[T](o: Try[T], errMsg: Throwable => String) = o match{
     case util.Success(s) => Success(s)
-    case util.Failure(t) => Failure(None, errMsg(t))
+    case util.Failure(t) => Failure(errMsg(t))
   }
 
   /**
@@ -77,7 +77,7 @@ object Res{
     *           only used for the "Interrupted!" failures caused by Ctrl-C
     * @param msg the message we want to display on screen due to this failure
     */
-  case class Failure(ex: Option[Throwable], msg: String) extends Failing
+  case class Failure(msg: String) extends Failing
 
   /**
     * An unknown exception was thrown when the command was being run

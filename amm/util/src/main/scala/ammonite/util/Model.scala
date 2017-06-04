@@ -264,7 +264,7 @@ object ImportTree{
 }
 
 case class PredefFailedToLoad(msg: String,
-                              cause: Throwable,
+                              cause: Option[Throwable],
                               res: Res.Failing,
                               watchedFilePaths: Seq[(Path, Option[Long])])
-  extends Exception(msg, cause)
+  extends Exception(msg, cause.orNull)

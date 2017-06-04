@@ -107,10 +107,10 @@ class Interpreter(val printer: Printer,
   ) match{
     case Res.Success(_) => //donothing
     case Res.Skip => //donothing
-    case r @ Res.Exception(t, s) => throw PredefFailedToLoad(s, t, r, watchedFiles)
-    case r @ Res.Failure(t, s) => throw PredefFailedToLoad(s, t.orNull, r, watchedFiles)
+    case r @ Res.Exception(t, s) => throw PredefFailedToLoad(s, Some(t), r, watchedFiles)
+    case r @ Res.Failure( s) => throw PredefFailedToLoad(s, None, r, watchedFiles)
     case r @ Res.Exit(_) =>
-      throw PredefFailedToLoad("interp.exit was called", null, r, watchedFiles)
+      throw PredefFailedToLoad("interp.exit was called", None, r, watchedFiles)
   }
 
   // The ReplAPI requires some special post-Interpreter-initialization
@@ -517,6 +517,7 @@ class Interpreter(val printer: Printer,
               blockMetadata :: perBlockMetadata
             )
 
+          case r: Res.Exit => r
           case r: Res.Failure => r
           case r: Res.Exception => r
           case Res.Skip =>
@@ -608,7 +609,7 @@ class Interpreter(val printer: Printer,
       def handleClasspath(jar: File) = compilerManager.handleEvalClasspath(jar)
 
       def apply(line: String) = processExec(line) match{
-        case Res.Failure(ex, s) => throw new CompilationError(s)
+        case Res.Failure(s) => throw new CompilationError(s)
         case Res.Exception(t, s) => throw t
         case _ =>
       }
@@ -636,7 +637,7 @@ class Interpreter(val printer: Printer,
           "",
           hardcoded = false
         ) match{
-          case Res.Failure(ex, s) => throw new CompilationError(s)
+          case Res.Failure(s) => throw new CompilationError(s)
           case Res.Exception(t, s) => throw t
           case x => //println(x)
         }

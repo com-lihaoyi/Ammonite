@@ -160,7 +160,7 @@ class TestRepl {
               }
             )
 
-          case Res.Failure(ex, failureMsg) =>
+          case Res.Failure(failureMsg) =>
             assert{
               identity(error)
               identity(warning)
@@ -196,7 +196,7 @@ class TestRepl {
       splitted
     )
     processed match{
-      case Res.Failure(ex, s) => printer.error(s)
+      case Res.Failure(s) => printer.error(s)
       case Res.Exception(throwable, msg) =>
         printer.error(
           Repl.showException(throwable, fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty)
@@ -221,7 +221,7 @@ class TestRepl {
 
     processed match{
       case Res.Success(v) => assert({identity(v); identity(allOutput); false})
-      case Res.Failure(ex, s) =>
+      case Res.Failure(s) =>
         failLoudly(assert(failureCheck(s)))
       case Res.Exception(ex, s) =>
         val msg = Repl.showException(

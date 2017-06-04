@@ -94,7 +94,14 @@ class Repl(input: InputStream,
         history = history :+ code
       }
     )
-    _ <- Signaller("INT") { interp.mainThread.stop() }
+    _ <- Signaller("INT") {
+      // Put a fake `ThreadDeath` error in `lastException`, because `Thread#stop`
+      // raises an error with the stack trace of *this interrupt thread*, rather
+      // than the stack trace of *the mainThread*
+      lastException = new ThreadDeath()
+      lastException.setStackTrace(Repl.truncateStackTrace(interp.mainThread.getStackTrace))
+      interp.mainThread.stop()
+    }
     out <- interp.processLine(code, stmts)
   } yield {
     printStream.println()
@@ -137,9 +144,8 @@ object Repl{
       case Res.Exit(value) =>
         printInfo("Bye!")
         Some(value)
-      case Res.Failure(ex, msg) =>
+      case Res.Failure(msg) =>
         printError(msg)
-        ex.foreach(setLastException)
         None
       case Res.Exception(ex, msg) =>
         setLastException(ex)
@@ -176,16 +182,19 @@ object Repl{
 
     fansi.Str(s"  ") ++ method ++ "(" ++ src ++ ")"
   }
+  val cutoff = Set("$main", "evaluatorRunPrinter")
+  def truncateStackTrace(x: Array[StackTraceElement]) = {
+    x.takeWhile(x => !cutoff(x.getMethodName))
+  }
+
   def showException(ex: Throwable,
                     error: fansi.Attrs,
                     highlightError: fansi.Attrs,
                     source: fansi.Attrs) = {
-    val cutoff = Set("$main", "evaluatorRunPrinter")
+
     val traces = Ex.unapplySeq(ex).get.map(exception =>
       error(exception.toString + newLine +
-        exception
-          .getStackTrace
-          .takeWhile(x => !cutoff(x.getMethodName))
+        truncateStackTrace(exception.getStackTrace)
           .map(highlightFrame(_, error, highlightError, source))
           .mkString(newLine))
     )

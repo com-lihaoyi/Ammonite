@@ -69,7 +69,7 @@ object Preprocessor{
   def splitScript(rawCode: String, fileName: String): Res[IndexedSeq[(String, Seq[String])]] = {
     Parsers.splitScript(rawCode) match {
       case f: Parsed.Failure =>
-        Res.Failure(None, formatFastparseError(fileName, rawCode, f))
+        Res.Failure(formatFastparseError(fileName, rawCode, f))
 
       case s: Parsed.Success[Seq[(String, Seq[String])]] =>
 
@@ -229,7 +229,7 @@ object Preprocessor{
     def complete(code: String, resultIndex: String, postSplit: Seq[String]) = {
       val reParsed = postSplit.map(p => (parse(p), p))
       val errors = reParsed.collect{case (Left(e), _) => e }
-      if (errors.length != 0) Res.Failure(None, errors.mkString(newLine))
+      if (errors.length != 0) Res.Failure(errors.mkString(newLine))
       else {
         val allDecls = for {
           ((Right(trees), code), i) <- reParsed.zipWithIndex if (trees.nonEmpty)

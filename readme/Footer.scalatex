@@ -1317,3 +1317,8 @@
         @li
           Parse errors within a file will now show the proper file-name, rather
           than @code{<console>}.
+
+        @li
+          @code{Ctrl C} interrupts now place an exception with a useful stack
+          trace in @code{repl.lastException}, which can help debug where your
+          code was at when you interrupted it.

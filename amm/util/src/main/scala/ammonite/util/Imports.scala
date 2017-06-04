@@ -132,6 +132,7 @@ object Imports{
         case ImportData.Term => Seq(stompedTerms)
         case ImportData.Type => Seq(stompedTypes)
         case ImportData.TermType => Seq(stompedTerms, stompedTypes)
+        case _ => ??? // there aren't any other cases
       }
       if (!stomped.exists(_(data.toName))){
         out.append(data)
