@@ -201,6 +201,9 @@ class Interpreter(val printer: Printer,
     )
     val (hookStmts, importTrees) = parseImportHooks(codeSource, stmts)
     for{
+      _ <- Catching { case ex =>
+        Res.Exception(ex, "")
+      }
       ImportHookInfo(hookImports, hookStmts, _) <- resolveImportHooks(
         importTrees,
         hookStmts,
