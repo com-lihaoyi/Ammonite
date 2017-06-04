@@ -4,13 +4,8 @@ import javassist.{ByteArrayClassPath, CtClass, CtMethod}
 
 import ammonite.ops._
 import ammonite.repl.Highlighter
-import ammonite.repl.Highlighter.{defaultHighlightIndices0, flattenIndices}
 import ammonite.runtime.tools.browse.Strings
-import ammonite.util.CodeColors
-import com.github.javaparser.{GeneratedJavaParserConstants, ParseStart, StringProvider}
-import sourcecode.Compat._
-
-import scala.annotation.tailrec
+import ammonite.util.{CodeColors, Util}
 import scala.collection.mutable
 import scala.language.experimental.macros
 
@@ -157,7 +152,7 @@ object SourceRuntime{
           val concreteCls = v.getClass.getMethod(memberName, argTypes:_*).getDeclaringClass
           loadSourceFrom(concreteCls, memberName, desc)
         }catch{case e: NoSuchMethodException =>
-          Left(e1 + "\n" + "Unable to find method " + value.getClass.getName + "#" + memberName)
+          Left(s"$e1${Util.newLine}Unable to find method${value.getClass.getName}#$memberName")
         }
     }
   }

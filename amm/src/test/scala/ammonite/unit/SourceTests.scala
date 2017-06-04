@@ -6,6 +6,7 @@ import ammonite.ops._
 import ammonite.repl.tools.Location
 import utest._
 import ammonite.repl.tools.source.load
+import ammonite.util.Util
 import fastparse.utils.{ElemSetHelper, Generator, IndexedParserInput}
 
 import scala.tools.nsc.interpreter.InputStream
@@ -24,7 +25,7 @@ object SourceTests extends TestSuite{
       val nearby = loaded.fileContent.lines.slice(
         loaded.lineNum - slop,
         loaded.lineNum + slop
-      ).mkString("\n")
+      ).mkString(Util.newLine)
       assert(nearby.contains(expected))
     }
     def check212(loaded: => Location, expectedFileName: String, expected: String) = {

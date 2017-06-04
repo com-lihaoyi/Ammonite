@@ -201,7 +201,7 @@ object Main{
 
           case (None, head :: rest) if head.startsWith("-") =>
             val failureMsg =
-              "Unknown Ammonite option: " + head + "\n" +
+              "Unknown Ammonite option: " + head + Util.newLine +
               "Use --help to list possible options"
             Left(false -> failureMsg)
 

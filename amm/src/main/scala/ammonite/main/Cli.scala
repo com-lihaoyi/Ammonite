@@ -2,6 +2,7 @@ package ammonite.main
 
 import ammonite.ops.Path
 import ammonite.runtime.Storage
+import ammonite.util.Util
 
 import scala.annotation.tailrec
 
@@ -105,7 +106,7 @@ object Cli{
 
     for(arg <- args) yield {
       showArg(arg).padTo(leftMargin, ' ').mkString +
-      arg.doc.lines.mkString("\n" + " " * leftMargin)
+      arg.doc.lines.mkString(Util.newLine + " " * leftMargin)
     }
   }
   def ammoniteHelp = {
@@ -115,13 +116,13 @@ object Cli{
     s"""Ammonite REPL & Script-Runner, ${ammonite.Constants.version}
        |usage: amm [ammonite-options] [script-file [script-options]]
        |
-       |${formatBlock(genericSignature, leftMargin).mkString("\n")}
+       |${formatBlock(genericSignature, leftMargin).mkString(Util.newLine)}
        |
        |REPL-specific args:
-       |${formatBlock(replSignature, leftMargin).mkString("\n")}
+       |${formatBlock(replSignature, leftMargin).mkString(Util.newLine)}
        |
        |Script-specific args:
-       |${formatBlock(scriptSignature, leftMargin).mkString("\n")}
+       |${formatBlock(scriptSignature, leftMargin).mkString(Util.newLine)}
     """.stripMargin
   }
 

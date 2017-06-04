@@ -6,7 +6,7 @@ import ammonite.main.{Defaults, Scripts}
 import ammonite.ops._
 import ammonite.runtime.Storage
 import ammonite.runtime.tools.IvyConstructor._
-import ammonite.util.Res
+import ammonite.util.{Res, Util}
 import utest._
 
 object CachingTests extends TestSuite{
@@ -318,14 +318,14 @@ object CachingTests extends TestSuite{
         runScript(downstream, 0)
         runScript(downstream, 0)
 
-        write.append(downstream, "\nval dummy = 1")
+        write.append(downstream, Util.newLine + "val dummy = 1")
 
         runScript(downstream, 1)
         runScript(downstream, 0)
         runScript(downstream, 0)
 
 
-        write.append(middleA, "\nval dummy = 1")
+        write.append(middleA, Util.newLine + "val dummy = 1")
 
         // Unfortunately, this currently causes `middleB` to get re-processed
         // too, as it is only evaluated "after" middleA and thus it's
@@ -334,13 +334,13 @@ object CachingTests extends TestSuite{
         runScript(downstream, 0)
         runScript(downstream, 0)
 
-        write.append(middleB, "\nval dummy = 1")
+        write.append(middleB, Util.newLine + "val dummy = 1")
 
         runScript(downstream, 2)
         runScript(downstream, 0)
         runScript(downstream, 0)
 
-        write.append(upstream, "\nval dummy = 1")
+        write.append(upstream, Util.newLine + "val dummy = 1")
 
         runScript(downstream, 4)
         runScript(downstream, 0)

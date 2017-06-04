@@ -126,25 +126,25 @@ object MainTests extends TestSuite{
       'full{
         val evaled = exec("Args.sc", "-i", "3", "--s", "Moo", (pwd/'omg/'moo).toString)
         assert(evaled.success)
-        assert(evaled.out == Util.normalizeNewlines("\"Hello! MooMooMoo moo.\"\n"))
+        assert(evaled.out == ("\"Hello! MooMooMoo moo.\"" + Util.newLine))
       }
 
       'default{
         val evaled = exec("Args.sc", "3", "Moo")
         assert(evaled.success)
         assert(
-          evaled.out == Util.normalizeNewlines("\"Hello! MooMooMoo Ammonite.\"\n") ||
+          evaled.out == ("\"Hello! MooMooMoo Ammonite.\"" + Util.newLine) ||
           // For some reason, on windows CI machines the repo gets clone as lowercase (???)
-          evaled.out == Util.normalizeNewlines("\"Hello! MooMooMoo ammonite.\"\n")
+          evaled.out == ("\"Hello! MooMooMoo ammonite.\"" + Util.newLine)
         )
       }
       'manualPrintln{
         val evaled = exec("Args2.sc", "3", "Moo")
         assert(evaled.success)
         assert(
-          evaled.out == Util.normalizeNewlines("Hello! MooMooMoo Ammonite.\n") ||
+          evaled.out == ("Hello! MooMooMoo Ammonite." + Util.newLine) ||
           // For some reason, on windows CI machines the repo gets clone as lowercase (???)
-          evaled.out == Util.normalizeNewlines("Hello! MooMooMoo ammonite.\n")
+          evaled.out == ("Hello! MooMooMoo ammonite." + Util.newLine)
         )
       }
       val argsUsageMsg =

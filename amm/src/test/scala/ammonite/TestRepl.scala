@@ -26,9 +26,9 @@ class TestRepl {
   val infoBuffer = mutable.Buffer.empty[String]
   val printer = Printer(
     outBuffer.append(_),
-    x => warningBuffer.append(x + "\n"),
-    x => errorBuffer.append(x + "\n"),
-    x => infoBuffer.append(x + "\n")
+    x => warningBuffer.append(x + Util.newLine),
+    x => errorBuffer.append(x + Util.newLine),
+    x => infoBuffer.append(x + Util.newLine)
   )
   val storage = new Storage.Folder(tempDir)
   val interp: Interpreter  = try {
@@ -97,7 +97,7 @@ class TestRepl {
 
       val commandText = cmdLines.map(_.stripPrefix("@ ")).toVector
 
-      println(cmdLines.mkString("\n"))
+      println(cmdLines.mkString(Util.newLine))
       // Make sure all non-empty, non-complete command-line-fragments
       // are considered incomplete during the parse
       //

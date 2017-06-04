@@ -3,6 +3,7 @@ package ammonite.repl
 import ammonite.ops.{CommandResult, LsSeq}
 import ammonite.runtime.History
 import ammonite.runtime.tools.GrepResult
+import ammonite.util.Util
 import pprint.Renderer
 
 object PPrints{
@@ -11,7 +12,7 @@ object PPrints{
     case x: ammonite.ops.Path => PPrints.pathRepr(x)
     case x: ammonite.ops.RelPath => PPrints.relPathRepr(x)
     case x: ammonite.ops.CommandResult => PPrints.commandResultRepr(x)
-    case t: History => pprint.Tree.Lazy(ctx => Iterator(t.mkString("\n")))
+    case t: History => pprint.Tree.Lazy(ctx => Iterator(t.mkString(Util.newLine)))
     case t: GrepResult => pprint.Tree.Lazy(ctx => Iterator(GrepResult.grepResultRepr(t, ctx)))
     case t: scala.xml.Elem => pprint.Tree.Lazy(_ => Iterator(t.toString))
   }
@@ -22,7 +23,7 @@ object PPrints{
     val snippets = for (p <- t) yield {
       fansi.Str.join(renderer.rec(relPathRepr(p relativeTo t.base), 0, 0).iter.toStream:_*)
     }
-    Iterator("\n") ++ FrontEndUtils.tabulate(snippets, FrontEndUtils.width)
+    Iterator(Util.newLine) ++ FrontEndUtils.tabulate(snippets, FrontEndUtils.width)
   }
 
 
@@ -52,7 +53,7 @@ object PPrints{
         case Left(s) => (ctx.literalColor, s)
         case Right(s) => (fansi.Color.Red, s)
       }
-      Iterator("\n", color(new String(s.array)).render)
+      Iterator(Util.newLine, color(new String(s.array)).render)
     }
   )
 
