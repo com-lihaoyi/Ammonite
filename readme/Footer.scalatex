@@ -1322,3 +1322,7 @@
           @code{Ctrl C} interrupts now place an exception with a useful stack
           trace in @code{repl.lastException}, which can help debug where your
           code was at when you interrupted it.
+
+        @li
+          @code{Ctrl C} no longer crashes the REPL if you perform it after
+          entering a command but before your code starts running

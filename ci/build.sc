@@ -86,14 +86,10 @@ def publishDocs() = {
   val publishDocs = sys.env("DEPLOY_KEY").replace("\\n", "\n")
   write(cwd / 'deploy_key, publishDocs)
 
-  val gitHash = getGitHash()
-
-  val travisTag = sys.env("TRAVIS_TAG")
-
   val latestTaggedVersion = %%('git, 'describe, "--abbrev=0", "--tags").out.trim
 
   val (stableKey, unstableKey, oldStableKeys, oldUnstableKeys) =
-    if (travisTag != ""){
+    if (!unstable){
       (
         s"$latestTaggedVersion/2.12-$latestTaggedVersion",
         s"$latestTaggedVersion/2.12-$latestTaggedVersion",
@@ -105,11 +101,11 @@ def publishDocs() = {
     }else{
       (
         s"$latestTaggedVersion/2.12-$latestTaggedVersion",
-        s"snapshot-commit-uploads/2.12-$gitHash",
+        s"snapshot-commit-uploads/2.12-$buildVersion",
         for(v <- Seq("2.10", "2.11"))
         yield s"$latestTaggedVersion/$v-$latestTaggedVersion",
         for(v <- Seq("2.10", "2.11"))
-        yield s"snapshot-commit-uploads/$v-$gitHash"
+        yield s"snapshot-commit-uploads/$v-$buildVersion"
       )
     }
   println("(stableKey, unstableKey)")

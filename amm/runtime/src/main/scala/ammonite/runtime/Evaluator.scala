@@ -1,14 +1,12 @@
 package ammonite.runtime
 
-import java.io.OutputStream
 import java.lang.reflect.InvocationTargetException
 
 
 import ammonite._
-import util.Util.{ClassFiles, VersionedWrapperId, newLine}
+import util.Util.{ClassFiles, newLine}
 import ammonite.util._
 
-import scala.reflect.io.VirtualDirectory
 import scala.util.Try
 import scala.util.control.ControlThrowable
 
@@ -47,6 +45,11 @@ object Evaluator{
   type InvEx = InvocationTargetException
   type InitEx = ExceptionInInitializerError
 
+  /**
+    * We unwrap many of the "common" cases where the user's actual
+    * exception is wrapped in a bunch of InvocationTargetException
+    * wrappers, since it's the users exception they probably care about
+    */
   val userCodeExceptionHandler: PartialFunction[Throwable, Res.Failing] = {
     // Exit
     case Ex(_: InvEx, _: InitEx, AmmoniteExit(value))  => Res.Exit(value)

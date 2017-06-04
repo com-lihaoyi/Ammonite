@@ -22,7 +22,7 @@ case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEn
              compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
              history: IndexedSeq[String],
              addHistory: String => Unit) = {
-    val res = readLine(reader, output, prompt, colors, compilerComplete, history) match{
+    readLine(reader, output, prompt, colors, compilerComplete, history) match{
       case None => Res.Exit(())
       case Some(code) =>
         addHistory(code)
@@ -35,7 +35,6 @@ case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEn
             )
         }
     }
-    res
   }
 
   val cutPasteFilter = ReadlineFilters.CutPasteFilter()

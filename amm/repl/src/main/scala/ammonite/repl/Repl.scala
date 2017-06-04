@@ -6,8 +6,7 @@ import ammonite.runtime._
 import ammonite.terminal.Filter
 import ammonite.util.Util.newLine
 import ammonite.util._
-
-import ammonite.interp.{Interpreter, Preprocessor}
+import ammonite.interp.Interpreter
 
 import scala.annotation.tailrec
 
@@ -81,6 +80,14 @@ class Repl(input: InputStream,
   val reader = new InputStreamReader(input)
 
   def action() = for{
+    _ <- Catching {
+      case Ex(e: ThreadDeath) =>
+        Thread.interrupted()
+        Res.Failure("Interrupted!")
+
+      case ex => Res.Exception(ex, "")
+    }
+
     (code, stmts) <- frontEnd().action(
       input,
       reader,
