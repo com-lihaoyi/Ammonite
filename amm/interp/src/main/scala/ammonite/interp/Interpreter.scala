@@ -102,8 +102,16 @@ class Interpreter(val printer: Printer,
     storage,
     customPredefs,
     processModule(_, _, true, "", _),
-    imports => predefImports = predefImports ++ imports
-  )
+    imports => predefImports = predefImports ++ imports,
+    watch
+  ) match{
+    case Res.Success(_) => //donothing
+    case Res.Skip => //donothing
+    case r @ Res.Exception(t, s) => throw PredefFailedToLoad(s, t, r, watchedFiles)
+    case r @ Res.Failure(t, s) => throw PredefFailedToLoad(s, t.orNull, r, watchedFiles)
+    case r @ Res.Exit(_) =>
+      throw PredefFailedToLoad("interp.exit was called", null, r, watchedFiles)
+  }
 
   // The ReplAPI requires some special post-Interpreter-initialization
   // code to run, so let it pass it in a callback and we'll run it here
@@ -181,7 +189,7 @@ class Interpreter(val printer: Printer,
     )
   }
 
-  def processLine(code: String, stmts: Seq[String], fileName: String): Res[Evaluated] = {
+  def processLine(code: String, stmts: Seq[String]): Res[Evaluated] = {
 
     val wrapperName = Name("cmd" + eval.getCurrentLine)
 
@@ -202,7 +210,7 @@ class Interpreter(val printer: Printer,
         codeSource
       )
 
-      processed <- compilerManager.preprocess.transform(
+      processed <- compilerManager.preprocess("(console)").transform(
         hookStmts,
         eval.getCurrentLine,
         "",
@@ -215,7 +223,7 @@ class Interpreter(val printer: Printer,
       )
       (out, tag) <- evaluateLine(
         processed, printer,
-        fileName, Name("cmd" + eval.getCurrentLine)
+        wrapperName.encoded + ".sc", wrapperName
       )
     } yield out.copy(imports = out.imports ++ hookImports)
   }
@@ -236,7 +244,6 @@ class Interpreter(val printer: Printer,
         classFiles,
         newImports,
         printer,
-        fileName,
         indexedWrapperName
       )
     } yield (res, Tag("", ""))
@@ -257,7 +264,7 @@ class Interpreter(val printer: Printer,
 
     for {
       (classFiles, newImports) <- compilerManager.compileClass(
-        processed, printer, codeSource.printablePath
+        processed, printer, codeSource.fileName
       )
       cls <- eval.loadClass(fullyQualifiedName, classFiles)
 
@@ -300,7 +307,10 @@ class Interpreter(val printer: Printer,
         // and none of it's blocks end up needing to be re-compiled. We don't know up
         // front if any blocks will need re-compilation, because it may import $file
         // another script which gets changed, and we'd only know when we reach that block
-        lazy val splittedScript = Preprocessor.splitScript(Interpreter.skipSheBangLine(code))
+        lazy val splittedScript = Preprocessor.splitScript(
+          Interpreter.skipSheBangLine(code),
+          codeSource.fileName
+        )
 
         for{
           blocks <- cachedScriptData match {
@@ -332,40 +342,40 @@ class Interpreter(val printer: Printer,
           data
         }
     }
+  }
 
+  def processExec(code: String): Res[Imports] = {
+    val wrapperName = Name("cmd" + eval.getCurrentLine)
+    val fileName = wrapperName.encoded + ".sc"
+    for {
+      blocks <- Preprocessor.splitScript(Interpreter.skipSheBangLine(code), fileName)
+
+      processedData <- processAllScriptBlocks(
+        blocks.map(_ => None),
+        Res.Success(blocks),
+        eval.imports,
+        CodeSource(
+          wrapperName,
+          Seq(),
+          Seq(Name("ammonite"), Name("$sess")),
+          Some(wd/"(console)")
+        ),
+        { (processed, indexedWrapperName) =>
+          evaluateLine(
+            processed,
+            printer,
+            fileName,
+            indexedWrapperName
+          )
+        },
+        autoImport = true,
+        ""
+      )
+    } yield processedData.blockInfo.last.finalImports
   }
 
 
-  def processExec(code: String): Res[Imports] = for {
-    blocks <- Preprocessor.splitScript(Interpreter.skipSheBangLine(code))
-    processedData <- processAllScriptBlocks(
-      blocks.map(_ => None),
-      Res.Success(blocks),
-      eval.imports,
-      CodeSource(
-        Name("cmd" + eval.getCurrentLine),
-        Seq(),
-        Seq(Name("ammonite"), Name("$sess")),
-        Some(wd/"(console)")
-      ),
-      { (processed, indexedWrapperName) =>
-        evaluateLine(
-          processed,
-          printer,
-          s"Exec.sc",
-          indexedWrapperName
-        )
-      },
-      autoImport = true,
-      ""
-    )
-  } yield processedData.blockInfo.last.finalImports
-
-
-
-
   type BlockData = Option[(ClassFiles, ScriptOutput.BlockMetadata)]
-
 
 
   def processAllScriptBlocks(blocks: Seq[BlockData],
@@ -432,7 +442,7 @@ class Interpreter(val printer: Printer,
           val printSuffix = if (wrapperIndex == 1) "" else  " #" + wrapperIndex
           printer.info("Compiling " + codeSource.printablePath + printSuffix)
           for{
-            processed <- compilerManager.preprocess.transform(
+            processed <- compilerManager.preprocess(codeSource.fileName).transform(
               hookInfo.stmts,
               "",
               leadingSpaces,

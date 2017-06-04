@@ -28,7 +28,6 @@ trait Evaluator{
   def processLine(classFiles: ClassFiles,
                   newImports: Imports,
                   printer: Printer,
-                  fileName: String,
                   indexedWrapperName: Name): Res[Evaluated]
 
   def processScriptBlock(cls: Class[_],
@@ -118,7 +117,6 @@ object Evaluator{
     def processLine(classFiles: Util.ClassFiles,
                     newImports: Imports,
                     printer: Printer,
-                    fileName: String,
                     indexedWrapperName: Name) = {
       for {
         cls <- loadClass("ammonite.$sess." + indexedWrapperName.backticked, classFiles)

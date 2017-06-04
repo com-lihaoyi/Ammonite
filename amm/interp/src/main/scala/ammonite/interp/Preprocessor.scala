@@ -44,18 +44,21 @@ object Preprocessor{
   case class Output(code: String,
                     prefixCharLength: Int)
 
-  def errMsg(msg: String, code: String, expected: String, idx: Int): String = {
-    val locationString = {
-      val (first, last) = code.splitAt(idx)
-      val lastSnippet = last.split(newLine).headOption.getOrElse("")
-      val firstSnippet = first.reverse
-                              .split(newLine.reverse)
-                              .lift(0).getOrElse("").reverse
-      firstSnippet + lastSnippet + newLine + (" " * firstSnippet.length) + "^"
-    }
 
-    s"Syntax Error: $msg${newLine}$locationString"
+  def formatFastparseError(fileName: String, rawCode: String, f: Parsed.Failure) = {
+    val lineColIndex = f.extra.input.repr.prettyIndex(f.extra.input, f.index)
+    val expected = f.extra.traced.expected
+      val locationString = {
+        val (first, last) = rawCode.splitAt(f.index)
+        val lastSnippet = last.split(newLine).headOption.getOrElse("")
+        val firstSnippet = first.reverse
+          .split(newLine.reverse)
+          .lift(0).getOrElse("").reverse
+        firstSnippet + lastSnippet + newLine + (" " * firstSnippet.length) + "^"
+      }
+    s"$fileName:$lineColIndex expected $expected$newLine$locationString"
   }
+
 
   /**
     * Splits up a script file into its constituent blocks, each of which
@@ -63,10 +66,11 @@ object Preprocessor{
     * is returned separately so we can later manipulate the statements e.g.
     * by adding `val res2 = ` without the whitespace getting in the way
     */
-  def splitScript(rawCode: String): Res[IndexedSeq[(String, Seq[String])]] = {
+  def splitScript(rawCode: String, fileName: String): Res[IndexedSeq[(String, Seq[String])]] = {
     Parsers.splitScript(rawCode) match {
       case f: Parsed.Failure =>
-        Res.Failure(None, errMsg(f.msg, rawCode, f.extra.traced.expected, f.index))
+        Res.Failure(None, formatFastparseError(fileName, rawCode, f))
+
       case s: Parsed.Success[Seq[(String, Seq[String])]] =>
 
         var offset = 0
@@ -81,7 +85,7 @@ object Preprocessor{
           //which needs to be removed to get correct line number (It adds up one extra line)
           //thats why the `comment.substring(1)` thing is necessary
           val ncomment =
-            if(windowsPlatform && !blocks.isEmpty && !comment.isEmpty){
+            if(windowsPlatform && blocks.nonEmpty && !comment.isEmpty){
               comment.substring(1) + newLine * offset
             }else{
               comment + newLine * offset

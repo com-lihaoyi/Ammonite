@@ -19,8 +19,8 @@ import scala.reflect.NameTransformer.encode
  * to be able to run multiple Ammonite processes on the same system.
  */
 trait Storage{
-  def loadPredef: (String, Option[Path])
-  def loadSharedPredef: (String, Option[Path])
+  def loadPredef: Option[(String, Path)]
+  def loadSharedPredef: Option[(String, Path)]
   val fullHistory: StableRef[History]
   val ivyCache: StableRef[Storage.IvyMap]
   def compileCacheSave(path: String, tag: Tag, data: Storage.CompileCache): Unit
@@ -54,8 +54,8 @@ object Storage{
   case class InMemory() extends Storage{
     var predef = ""
     var sharedPredef = ""
-    def loadPredef = (predef, None)
-    def loadSharedPredef = (sharedPredef, None)
+    def loadPredef = None
+    def loadSharedPredef = None
     def getSessionId = 0L
     var _history = new History(Vector())
     val fullHistory = new StableRef[History]{
@@ -244,16 +244,13 @@ object Storage{
     }
 
     def loadPredef = {
-      try {
-        (read(predef), Some(predef))
-      }
-      catch { case e: java.nio.file.NoSuchFileException => ("", None) }
+      try Some((read(predef), predef))
+      catch { case e: java.nio.file.NoSuchFileException => None }
     }
+
     def loadSharedPredef = {
-      try {
-        (read(predefShared), Some(predefShared))
-      }
-      catch {case e: java.nio.file.NoSuchFileException => ("", None)}
+      try Some((read(predefShared), predefShared))
+      catch {case e: java.nio.file.NoSuchFileException => None }
     }
   }
 }

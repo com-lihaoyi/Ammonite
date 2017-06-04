@@ -116,7 +116,7 @@ case class Main(predef: String = "",
     interp
   }
 
-  def run(replArgs: Bind[_]*) = {
+  def run(replArgs: Bind[_]*): Any = {
 
     val remoteLogger =
       if (!remoteLogging) None
@@ -144,16 +144,29 @@ case class Main(predef: String = "",
                 scriptArgs: Seq[(String, Option[String])])
                 : (Res[Any], Seq[(Path, Option[Long])]) = {
 
-    val interp = instantiateInterpreter()
-    (main.Scripts.runScript(wd, path, interp, scriptArgs), interp.watchedFiles)
+    val interpEither =
+      try Right(instantiateInterpreter())
+      catch{ case PredefFailedToLoad(msg, ex, res, watched) => Left(res -> watched) }
+
+
+    interpEither match{
+      case Right(interp) =>
+        val result = main.Scripts.runScript(wd, path, interp, scriptArgs)
+        (result, interp.watchedFiles)
+      case Left((res, watched)) => (res, watched)
+    }
   }
 
   /**
     * Run a snippet of code
     */
   def runCode(code: String) = {
-    val interp = instantiateInterpreter()
-    interp.processExec(code)
+    val interp =
+      try Res.Success(instantiateInterpreter())
+      catch{ case PredefFailedToLoad(msg, ex, res, watched) => res }
+
+    interp.flatMap(_.processExec(code))
+
   }
 }
 
@@ -201,7 +214,7 @@ object Main{
 
             case (None, Nil) =>
               runner.printInfo("Loading...")
-              runner.initMain(true).run()
+              runner.runRepl()
               true
 
             case (None, head :: rest) if head.startsWith("-") =>
@@ -307,6 +320,14 @@ class MainRunner(cliConfig: Cli.Config,
     (success, watched)
   }
 
+  def runRepl() = {
+    try initMain(true).run()
+    catch{ case PredefFailedToLoad(msg, cause, res, watched) =>
+      printError("Error loading Predef:")
+      Repl.handleRes(res, printInfo, printError, _ => (), colors)
+    }
+  }
+
   def initMain(isRepl: Boolean) = Main(
     cliConfig.predef,
     cliConfig.defaultPredef,
@@ -315,11 +336,8 @@ class MainRunner(cliConfig: Cli.Config,
         cliConfig.predefFile match{
           case None => super.loadPredef
           case Some(file) =>
-            try {
-              (read(file), Some(file))
-            } catch {
-              case e: java.nio.file.NoSuchFileException => ("", None)
-            }
+            try Some((read(file), file))
+            catch {case e: java.nio.file.NoSuchFileException => None}
         }
       }
     },

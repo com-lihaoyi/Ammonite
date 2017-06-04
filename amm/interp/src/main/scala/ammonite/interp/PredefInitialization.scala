@@ -1,6 +1,7 @@
 package ammonite.interp
 
 
+import ammonite.ops.Path
 import ammonite.runtime.{APIHolder, SpecialClassLoader, Storage}
 import ammonite.util.ScriptOutput.Metadata
 import ammonite.util.{Imports, Name, PredefInfo, Res}
@@ -17,11 +18,13 @@ object PredefInitialization {
             storage: Storage,
             customPredefs: Seq[PredefInfo],
             processModule: (String, CodeSource, Boolean) => Res[Metadata],
-            addImports: Imports => Unit) = {
+            addImports: Imports => Unit,
+            watch: Path => Unit): Res[_] = {
 
     for ((name, shortName, bridge) <- bridges ){
       APIHolder.initBridge(evalClassloader, name, bridge)
     }
+
     // import ammonite.repl.ReplBridge.{value => repl}
     // import ammonite.runtime.InterpBridge.{value => interp}
     val bridgePredefs =
@@ -34,40 +37,38 @@ object PredefInitialization {
       )
 
     val predefs = {
-      val (sharedPredefContent, sharedPredefPath) = storage.loadSharedPredef
-      val (predefContent, predefPath) = storage.loadPredef
-      bridgePredefs ++ customPredefs ++ Seq(
-        PredefInfo(Name("UserSharedPredef"), sharedPredefContent, false, sharedPredefPath),
-        PredefInfo(Name("UserPredef"), predefContent, false, predefPath)
-      )
+      bridgePredefs ++ customPredefs ++
+      (storage.loadSharedPredef ++ storage.loadPredef).map{
+        case (code, path) =>
+          PredefInfo(Name(path.last.stripSuffix(".sc")), code, false, Some(path))
+      }
     }
 
     predefs.filter(_.code.nonEmpty)
 
 
-    for (predefInfo <- predefs if predefInfo.code.nonEmpty) yield {
-      processModule(
-        predefInfo.code,
-        CodeSource(
-          predefInfo.name,
-          Seq(),
-          Seq(Name("ammonite"), Name("predef")),
-          predefInfo.path
-        ),
-        predefInfo.hardcoded
-      ) match{
-        case Res.Success(processed) => addImports(processed.blockInfo.last.finalImports)
+    Res.fold((), predefs){(_, predefInfo) =>
+      if (predefInfo.code.isEmpty) Res.Success(())
+      else {
+        predefInfo.path.foreach(watch)
+        processModule(
+          predefInfo.code,
+          CodeSource(
+            predefInfo.name,
+            Seq(),
+            Seq(Name("ammonite"), Name("predef")),
+            predefInfo.path
+          ),
+          predefInfo.hardcoded
+        ) match{
+          case Res.Skip => Res.Success(())
+          case Res.Success(processed) =>
+            addImports(processed.blockInfo.last.finalImports)
+            Res.Success(())
 
-        case Res.Failure(ex, msg) =>
-          ex match{
-            case Some(e) => throw new RuntimeException("Error during Predef: " + msg, e)
-            case None => throw new RuntimeException("Error during Predef: " + msg)
-          }
+          case x => x.map(_ => ())
+        }
 
-        case Res.Exception(ex, msg) =>
-          throw new RuntimeException("Error during Predef: " + msg, ex)
-
-        case _ => ???
       }
     }
   }

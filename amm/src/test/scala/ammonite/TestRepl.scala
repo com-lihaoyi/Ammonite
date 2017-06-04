@@ -193,8 +193,7 @@ class TestRepl {
     val splitted = ammonite.interp.Parsers.split(input).get.get.value
     val processed = interp.processLine(
       input,
-      splitted,
-      s"Main$index.sc"
+      splitted
     )
     processed match{
       case Res.Failure(ex, s) => printer.error(s)

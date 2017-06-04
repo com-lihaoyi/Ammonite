@@ -6,6 +6,9 @@ import scala.tools.nsc.plugins.Plugin
 import scala.tools.nsc.typechecker.Analyzer
 
 object CompilerCompatibility {
+  def newUnitParser(compiler: Global, line: String, fileName: String) = {
+    compiler.newUnitParser(line, fileName)
+  }
   def analyzer(g: Global, cl: ClassLoader): Analyzer { val global: g.type } = {
     new { val global: g.type = g } with Analyzer {
       override def findMacroClassLoader() = cl

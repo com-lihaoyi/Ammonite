@@ -1301,3 +1301,19 @@
         @li
           Caches are properly invalidated if a script you @hl.scala{import $file}
           is deleted
+
+        @li
+          @code{-w}/@code{--watch} now watches predef files as well. This means
+          if you make changes to your predef (e.g. if it was crashing and you're
+          trying to fix it), Ammonite will re-run your scripts automatically
+
+        @li
+          Improved error handling of failures within predef; they should no
+          longer show large stack traces containing irrelevant stack frames
+
+        @li
+          Predef files no longer cause problems with autocomplete in the REPL
+
+        @li
+          Parse errors within a file will now show the proper file-name, rather
+          than @code{<console>}.

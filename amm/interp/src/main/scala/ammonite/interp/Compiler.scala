@@ -41,7 +41,7 @@ trait Compiler{
   /**
    * Either the statements that were parsed or the error message
    */
-  def parse(line: String): Either[String, Seq[Global#Tree]]
+  def parse(fileName: String, line: String): Either[String, Seq[Global#Tree]]
   var importsLen = 0
 
 }
@@ -77,9 +77,23 @@ object Compiler{
   type Output = Option[(Vector[(String, Array[Byte])], Imports)]
 
   /**
-   * Converts a bunch of bytes into Scalac's weird VirtualFile class
-   */
-  def makeFile(src: Array[Byte], name: String = "Main.sc") = {
+    * Converts a bunch of bytes into Scalac's weird VirtualFile class
+    *
+    * Can only take in a relative path for the VirtualFile! Otherwise
+    * fails with a weird assert in the presentation compiler:
+    *
+    * [Current.sc]: exception during background compile:
+    * java.lang.AssertionError:
+    * assertion failed: (
+    *   ammonite/predef//Users/lihaoyi/Dropbox/Github/<-wrapped to next line->
+    *   Ammonite/target/tempAmmoniteHome/predef.sc,false,16,16)
+    *
+    * It appears that passing in the filename *only* results in the correct
+    * stack traces (e.g. Foo.sc:425 rather than Users/lihaoyi/Foo.sc:45), so we
+    * do that and assert to make sure it's only one path segment
+    */
+  def makeFile(src: Array[Byte], name: String) = {
+    assert(!name.contains('/'))
     val singleFile = new io.VirtualFile(name)
     val output = singleFile.output
     output.write(src)
@@ -324,7 +338,7 @@ object Compiler{
     }
 
 
-    def parse(line: String): Either[String, Seq[Global#Tree]] = {
+    def parse(fileName: String, line: String): Either[String, Seq[Global#Tree]] = {
       val errors = mutable.Buffer.empty[String]
       val warnings = mutable.Buffer.empty[String]
       val infos = mutable.Buffer.empty[String]
@@ -332,7 +346,8 @@ object Compiler{
       warningLogger = warnings.append(_)
       infoLogger = infos.append(_)
       reporter.reset()
-      val parser = compiler.newUnitParser(line)
+      val parser = CompilerCompatibility.newUnitParser(compiler, line, fileName)
+
       val trees = CompilerCompatibility.trees(compiler)(parser)
       if (reporter.hasErrors) Left(errors.mkString(newLine))
       else Right(trees)

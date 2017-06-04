@@ -62,12 +62,13 @@ class CompilerLifecycleManager(frames0: Ref[List[Frame]]){
   // that `Internal.compiler` is properly initialized before use.
   def compiler = Internal.compiler
   def compilationCount = Internal.compilationCount
-  def preprocess = {
-    if (compiler == null) init()
-    Preprocessor(compiler.parse)
-  }
-  def evalClassloader = frames().head.classloader
 
+  def preprocess(fileName: String) = {
+    if (compiler == null) init()
+    Preprocessor(compiler.parse(fileName, _))
+  }
+
+  def evalClassloader = frames().head.classloader
 
   def init(force: Boolean = false) = if(Internal.compilerStale || force){
     Internal.compilerStale = false

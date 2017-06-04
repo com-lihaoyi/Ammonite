@@ -262,3 +262,9 @@ case class ImportTree(prefix: Seq[String],
 object ImportTree{
   type ImportMapping = Seq[(String, Option[String])]
 }
+
+case class PredefFailedToLoad(msg: String,
+                              cause: Throwable,
+                              res: Res.Failing,
+                              watchedFilePaths: Seq[(Path, Option[Long])])
+  extends Exception(msg, cause)

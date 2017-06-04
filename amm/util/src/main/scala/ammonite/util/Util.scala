@@ -84,6 +84,7 @@ object Util{
     def pkgName = pkgRoot ++ flexiblePkgName
     def fullName = pkgName :+ wrapperName
 
+    def fileName = path.fold(filePathPrefix.last + ".sc")(_.last)
     def jvmPathPrefix = Util.encodeJvmPath(fullName)
     def filePathPrefix = Util.encodeFilePath(fullName)
     def printablePath = path match{

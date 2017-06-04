@@ -27,7 +27,7 @@ object LineNumberTests extends TestSuite{
         checkErrorMessage(
           file = 'lineNumbers / "ErrorLineNumberTest.sc",
           expected = Util.normalizeNewlines(
-            """Syntax Error: "}":5:24 ...")\n  }\n\n  d"
+            """ErrorLineNumberTest.sc:5:24 expected ";" | Newline.rep(1) | "}"
               |    printlnqs(unsorted))
               |                       ^""".stripMargin
           )
@@ -40,7 +40,7 @@ object LineNumberTests extends TestSuite{
         checkErrorMessage(
           file = 'lineNumbers/"MultipleCompilationUnitErrorMsgTest1.sc",
           expected = Util.normalizeNewlines(
-            """Syntax Error: End:5:1 ..."}"
+            """MultipleCompilationUnitErrorMsgTest1.sc:5:1 expected "@" | End
               |}
               |^""".stripMargin
           )
@@ -54,7 +54,7 @@ object LineNumberTests extends TestSuite{
         checkErrorMessage(
           file = 'lineNumbers/"MultipleCompilationUnitErrorMsgTest2.sc",
           expected = Util.normalizeNewlines(
-            """Syntax Error: End:3:1 ..."}\n@\n1 + 1"
+            """MultipleCompilationUnitErrorMsgTest2.sc:3:1 expected "@" | End
               |}
               |^""".stripMargin
           )
@@ -107,7 +107,7 @@ object LineNumberTests extends TestSuite{
       file = 'lineNumbers/"RuntimeCompilationErrorLineNumberTest.sc",
       expected = {
         val p = InProcessMainMethodRunner.base/'lineNumbers
-        s"${p/"RuntimeCompilationErrorLineNumberTest.sc"}:6)"
+        s"(RuntimeCompilationErrorLineNumberTest.sc:6)"
       }
     )
   }

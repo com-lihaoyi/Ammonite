@@ -95,7 +95,7 @@ class Repl(input: InputStream,
       }
     )
     _ <- Signaller("INT") { interp.mainThread.stop() }
-    out <- interp.processLine(code, stmts, s"cmd${interp.eval.getCurrentLine}.sc")
+    out <- interp.processLine(code, stmts)
   } yield {
     printStream.println()
     out
@@ -107,24 +107,15 @@ class Repl(input: InputStream,
       val actionResult = action()
       remoteLogger.foreach(_.apply("Action"))
       interp.handleOutput(actionResult)
-
-      actionResult match{
-        case Res.Exit(value) =>
-          printStream.println("Bye!")
-          value
-        case Res.Failure(ex, msg) =>
-          printer.error(msg)
-          lastException = ex.getOrElse(lastException)
-          loop()
-        case Res.Exception(ex, msg) =>
-          lastException = ex
-          printer.error(
-            Repl.showException(ex, colors().error(), fansi.Attr.Reset, colors().literal())
-          )
-          printer.error(msg)
-          loop()
-        case _ =>
-          loop()
+      Repl.handleRes(
+        actionResult,
+        printer.info,
+        printer.error,
+        lastException = _,
+        colors()
+      ) match{
+        case None => loop()
+        case Some(value) => value
       }
     }
     loop()
@@ -137,7 +128,30 @@ class Repl(input: InputStream,
 
 object Repl{
 
-
+  def handleRes(res: Res[Any],
+                printInfo: String => Unit,
+                printError: String => Unit,
+                setLastException: Throwable => Unit,
+                colors: Colors): Option[Any] = {
+    res match{
+      case Res.Exit(value) =>
+        printInfo("Bye!")
+        Some(value)
+      case Res.Failure(ex, msg) =>
+        printError(msg)
+        ex.foreach(setLastException)
+        None
+      case Res.Exception(ex, msg) =>
+        setLastException(ex)
+        printError(
+          Repl.showException(ex, colors.error(), fansi.Attr.Reset, colors.literal())
+        )
+        printError(msg)
+        None
+      case _ =>
+        None
+    }
+  }
   def highlightFrame(f: StackTraceElement,
                      error: fansi.Attrs,
                      highlightError: fansi.Attrs,
