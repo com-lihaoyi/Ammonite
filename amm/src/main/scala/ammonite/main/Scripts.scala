@@ -192,10 +192,10 @@ object Scripts {
           else {
             val chunks =
               for (x <- missing)
-              yield "(--" + x.name + ": " + x.typeString + ")"
+              yield "--" + x.name + ": " + x.typeString
 
             val argumentsStr = pluralize("argument", chunks.length)
-            s"Missing $argumentsStr: ${chunks.mkString(", ")}" + Util.newLine
+            s"Missing $argumentsStr: (${chunks.mkString(", ")})" + Util.newLine
           }
 
 
