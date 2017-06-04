@@ -263,6 +263,18 @@ configuration, running scripts, printing error messages, etc.</p>
                         <a href="Main.html" title="Contains the various entry points to the Ammonite REPL.">
                           Main
                         </a>
+                      </li><li class="current-entities indented1">
+                        <span class="separator"></span>
+                        <a class="class" href="MainRunner.html" title="Bundles together all the code relying on cliConfig and the common
+input/output streams and print-streams, so we don't need to keep passing
+them everywhere one by one
+"></a>
+                        <a href="MainRunner.html" title="Bundles together all the code relying on cliConfig and the common
+input/output streams and print-streams, so we don't need to keep passing
+them everywhere one by one
+">
+                          MainRunner
+                        </a>
                       </li>
               </ul>
             </div>
@@ -340,7 +352,7 @@ configuration, running scripts, printing error messages, etc.</p>
       <span class="symbol">
         <a title="Contains the various entry points to the Ammonite REPL." href="Main.html">
               <span class="name">Main</span>
-            </a><span class="params">(<span name="predef">predef: <span class="extype" name="scala.Predef.String">String</span> = <span class="symbol">&quot;&quot;</span></span>, <span name="defaultPredef">defaultPredef: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Boolean" class="extype" target="_top">Boolean</a> = <span class="symbol">true</span></span>, <span name="storageBackend">storageBackend: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-runtime/0.9.9/ammonite-runtime-0.9.9-javadoc.jar/!/index.html#ammonite.runtime.Storage" class="extype" target="_top">Storage</a> = <span class="defval" name='<span class="name"><a href="">new Storage.Folder(Defaults.ammoniteHome)</a></span>'>...</span></span>, <span name="wd">wd: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/0.9.9/ammonite-ops-0.9.9-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a> = <span class="symbol"><span class="name"><a href="">ammonite.ops.pwd</a></span></span></span>, <span name="welcomeBanner">welcomeBanner: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Option" class="extype" target="_top">Option</a>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol"><span class="name"><a href="">Some(Defaults.welcomeBanner)</a></span></span></span>, <span name="inputStream">inputStream: <span class="extype" name="java.io.InputStream">InputStream</span> = <span class="symbol">System.in</span></span>, <span name="outputStream">outputStream: <span class="extype" name="java.io.OutputStream">OutputStream</span> = <span class="symbol">System.out</span></span>, <span name="infoStream">infoStream: <span class="extype" name="java.io.OutputStream">OutputStream</span> = <span class="symbol">System.err</span></span>, <span name="errorStream">errorStream: <span class="extype" name="java.io.OutputStream">OutputStream</span> = <span class="symbol">System.err</span></span>, <span name="verboseOutput">verboseOutput: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Boolean" class="extype" target="_top">Boolean</a> = <span class="symbol">true</span></span>, <span name="remoteLogging">remoteLogging: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Boolean" class="extype" target="_top">Boolean</a> = <span class="symbol">true</span></span>)</span><span class="result"> extends <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+            </a><span class="params">(<span name="predef">predef: <span class="extype" name="scala.Predef.String">String</span> = <span class="symbol">&quot;&quot;</span></span>, <span name="defaultPredef">defaultPredef: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Boolean" class="extype" target="_top">Boolean</a> = <span class="symbol">true</span></span>, <span name="storageBackend">storageBackend: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-runtime/0.9.9/ammonite-runtime-0.9.9-javadoc.jar/!/index.html#ammonite.runtime.Storage" class="extype" target="_top">Storage</a> = <span class="defval" name='<span class="name"><a href="">new Storage.Folder(Defaults.ammoniteHome)</a></span>'>...</span></span>, <span name="wd">wd: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/0.9.9/ammonite-ops-0.9.9-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a> = <span class="symbol"><span class="name"><a href="">ammonite.ops.pwd</a></span></span></span>, <span name="welcomeBanner">welcomeBanner: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Option" class="extype" target="_top">Option</a>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol"><span class="name"><a href="">Some(Defaults.welcomeBanner)</a></span></span></span>, <span name="inputStream">inputStream: <span class="extype" name="java.io.InputStream">InputStream</span> = <span class="symbol">System.in</span></span>, <span name="outputStream">outputStream: <span class="extype" name="java.io.OutputStream">OutputStream</span> = <span class="symbol">System.out</span></span>, <span name="infoStream">infoStream: <span class="extype" name="java.io.OutputStream">OutputStream</span> = <span class="symbol">System.err</span></span>, <span name="errorStream">errorStream: <span class="extype" name="java.io.OutputStream">OutputStream</span> = <span class="symbol">System.err</span></span>, <span name="verboseOutput">verboseOutput: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Boolean" class="extype" target="_top">Boolean</a> = <span class="symbol">true</span></span>, <span name="remoteLogging">remoteLogging: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Boolean" class="extype" target="_top">Boolean</a> = <span class="symbol">true</span></span>, <span name="colors">colors: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-util/0.9.9/ammonite-util-0.9.9-javadoc.jar/!/index.html#ammonite.util.Colors" class="extype" target="_top">Colors</a> = <span class="symbol"><span class="name"><a href="">Colors.Default</a></span></span></span>)</span><span class="result"> extends <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
       </span>
       
       <p class="shortcomment cmt">Contains the various entry points to the Ammonite REPL.</p><div class="fullcomment"><div class="comment cmt"><p>Contains the various entry points to the Ammonite REPL.</p><p>Configuration of the basic REPL is done by passing in arguments when
@@ -367,6 +379,30 @@ every time it is called!
                   is typically stuff you want to see when running interactively,
                   but not something you want to see when e.g. you forward a
                   script's output to a file. This by default it goes to System.err</p></dd><dt class="param">errorStream</dt><dd class="cmt"><p>Error output when things go bad, typically System.err</p></dd></dl></div>
+    </li><li name="ammonite.MainRunner" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="MainRunnerextendsAnyRef"></a><a id="MainRunner:MainRunner"></a>
+      <span class="permalink">
+      <a href="../ammonite/index.html#MainRunnerextendsAnyRef" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a title="Bundles together all the code relying on cliConfig and the common
+input/output streams and print-streams, so we don't need to keep passing
+them everywhere one by one
+" href="MainRunner.html">
+              <span class="name">MainRunner</span>
+            </a><span class="result"> extends <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>
+      </span>
+      
+      <p class="shortcomment cmt">Bundles together all the code relying on <span class="extype" name="cliConfig">cliConfig</span> and the common
+input/output streams and print-streams, so we don't need to keep passing
+them everywhere one by one
+</p>
     </li></ol>
             </div>
 

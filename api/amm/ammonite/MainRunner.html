@@ -223,17 +223,17 @@
                         </a>
                       </li><li class="current-entities indented1">
                         <a class="object" href="Main$.html" title=""></a>
-                        <a class="class" href="" title="Contains the various entry points to the Ammonite REPL."></a>
-                        <a href="" title="Contains the various entry points to the Ammonite REPL.">
+                        <a class="class" href="Main.html" title="Contains the various entry points to the Ammonite REPL."></a>
+                        <a href="Main.html" title="Contains the various entry points to the Ammonite REPL.">
                           Main
                         </a>
                       </li><li class="current-entities indented1">
                         <span class="separator"></span>
-                        <a class="class" href="MainRunner.html" title="Bundles together all the code relying on cliConfig and the common
+                        <a class="class" href="" title="Bundles together all the code relying on cliConfig and the common
 input/output streams and print-streams, so we don't need to keep passing
 them everywhere one by one
 "></a>
-                        <a href="MainRunner.html" title="Bundles together all the code relying on cliConfig and the common
+                        <a href="" title="Bundles together all the code relying on cliConfig and the common
 input/output streams and print-streams, so we don't need to keep passing
 them everywhere one by one
 ">
@@ -286,57 +286,35 @@ configuration, running scripts, printing error messages, etc.
           <div id="content">
             <body class="class type">
       <div id="definition">
-        <a href="Main$.html" title="See companion object"><div class="big-circle class-companion-object">c</div></a>
+        <div class="big-circle class">c</div>
         <p id="owner"><a href="index.html" class="extype" name="ammonite">ammonite</a></p>
-        <h1><a href="Main$.html" title="See companion object">Main</a><span class="permalink">
-      <a href="../ammonite/Main.html" title="Permalink">
+        <h1>MainRunner<span class="permalink">
+      <a href="../ammonite/MainRunner.html" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span></h1>
-        <h3><span class="morelinks"><div>
-            Companion <a href="Main$.html" title="See companion object">object Main</a>
-          </div></span></h3>
+        <h3><span class="morelinks"></span></h3>
       </div>
 
       <h4 id="signature" class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">case class</span>
+        <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <span class="name">Main</span><span class="params">(<span name="predef">predef: <span class="extype" name="scala.Predef.String">String</span> = <span class="symbol">&quot;&quot;</span></span>, <span name="defaultPredef">defaultPredef: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Boolean" class="extype" target="_top">Boolean</a> = <span class="symbol">true</span></span>, <span name="storageBackend">storageBackend: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-runtime/0.9.9/ammonite-runtime-0.9.9-javadoc.jar/!/index.html#ammonite.runtime.Storage" class="extype" target="_top">Storage</a> = <span class="defval" name='<span class="name"><a href="index.html">new Storage.Folder(Defaults.ammoniteHome)</a></span>'>...</span></span>, <span name="wd">wd: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/0.9.9/ammonite-ops-0.9.9-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a> = <span class="symbol"><span class="name"><a href="index.html">ammonite.ops.pwd</a></span></span></span>, <span name="welcomeBanner">welcomeBanner: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Option" class="extype" target="_top">Option</a>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol"><span class="name"><a href="index.html">Some(Defaults.welcomeBanner)</a></span></span></span>, <span name="inputStream">inputStream: <span class="extype" name="java.io.InputStream">InputStream</span> = <span class="symbol">System.in</span></span>, <span name="outputStream">outputStream: <span class="extype" name="java.io.OutputStream">OutputStream</span> = <span class="symbol">System.out</span></span>, <span name="infoStream">infoStream: <span class="extype" name="java.io.OutputStream">OutputStream</span> = <span class="symbol">System.err</span></span>, <span name="errorStream">errorStream: <span class="extype" name="java.io.OutputStream">OutputStream</span> = <span class="symbol">System.err</span></span>, <span name="verboseOutput">verboseOutput: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Boolean" class="extype" target="_top">Boolean</a> = <span class="symbol">true</span></span>, <span name="remoteLogging">remoteLogging: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Boolean" class="extype" target="_top">Boolean</a> = <span class="symbol">true</span></span>, <span name="colors">colors: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-util/0.9.9/ammonite-util-0.9.9-javadoc.jar/!/index.html#ammonite.util.Colors" class="extype" target="_top">Colors</a> = <span class="symbol"><span class="name"><a href="index.html">Colors.Default</a></span></span></span>)</span><span class="result"> extends <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+        <span class="name">MainRunner</span><span class="result"> extends <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>
       </span>
       </h4>
 
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Contains the various entry points to the Ammonite REPL.</p><p>Configuration of the basic REPL is done by passing in arguments when
-constructing the <a href="" class="extype" name="ammonite.Main">Main</a> instance, and the various entrypoints such
-as <a href="#run(replArgs:ammonite.util.Bind[_]*):Any" class="extmbr" name="ammonite.Main#run">run</a> <a href="#runScript(path:ammonite.ops.Path,scriptArgs:Seq[(String,Option[String])]):(ammonite.util.Res[Any],Seq[(ammonite.ops.Path,Option[Long])])" class="extmbr" name="ammonite.Main#runScript">runScript</a> and so on are methods on that instance.</p><p>It is more or less equivalent to the <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-repl/0.9.9/ammonite-repl-0.9.9-javadoc.jar/!/index.html#ammonite.repl.Repl" class="extype" target="_top">ammonite.repl.Repl</a> object itself, and has
-a similar set of parameters, but does not have any of the <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-repl/0.9.9/ammonite-repl-0.9.9-javadoc.jar/!/index.html#ammonite.repl.Repl" class="extype" target="_top">ammonite.repl.Repl</a>'s
-implementation-related code and provides a more convenient set of
-entry-points that a user can call.</p><p>Note that the <a href="#instantiateRepl(replArgs:IndexedSeq[ammonite.util.Bind[_]],remoteLogger:Option[ammonite.repl.RemoteLogger]):ammonite.repl.Repl" class="extmbr" name="ammonite.Main#instantiateRepl">instantiateRepl</a> function generates a new <span class="extype" name="Repl">Repl</span>
-every time it is called!
-</p></div><dl class="paramcmts block"><dt class="param">predef</dt><dd class="cmt"><p>Any additional code you want to run before the REPL session
-              starts. Can contain multiple blocks separated by <code>@</code>s</p></dd><dt class="param">defaultPredef</dt><dd class="cmt"><p>Do you want to include the &quot;standard&quot; predef imports
-                     provided by Ammonite? These include tools like <code>time</code>,
-                     <code>grep</code>, the <code>|</code> or <code>|?</code> pipes from ammonite-ops, and
-                     other helpers. Can be disabled to give a clean
-                     namespace for you to fill using your own predef.</p></dd><dt class="param">storageBackend</dt><dd class="cmt"><p>Where will all of Ammonite's persistent data get
-                      stored? Things like any <code>predef.sc</code> file,
-                      compilation/ivy caches, etc.. Defaults include
-                      <span class="extype" name="Storage.Folder">Storage.Folder</span> and <span class="extype" name="Storage.InMemory">Storage.InMemory</span>, though
-                      you can create your own.</p></dd><dt class="param">wd</dt><dd class="cmt"><p>The working directory of the REPL; when it load scripts, where
-          the scripts will be considered relative to when assigning them
-          packages</p></dd><dt class="param">inputStream</dt><dd class="cmt"><p>Where input to the Repl is coming from, typically System.in,
-                   but it could come from somewhere else e.g. across the
-                   network in the case of the SshdRepl</p></dd><dt class="param">outputStream</dt><dd class="cmt"><p>Primary output of code run using Ammonite</p></dd><dt class="param">infoStream</dt><dd class="cmt"><p>Miscellaneous logging output when running Ammonite. This
-                  is typically stuff you want to see when running interactively,
-                  but not something you want to see when e.g. you forward a
-                  script's output to a file. This by default it goes to System.err</p></dd><dt class="param">errorStream</dt><dd class="cmt"><p>Error output when things go bad, typically System.err</p></dd></dl><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Bundles together all the code relying on <span class="extype" name="cliConfig">cliConfig</span> and the common
+input/output streams and print-streams, so we don't need to keep passing
+them everywhere one by one
+</p></div><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
           </span>
-          <div class="superTypes hiddenContent"><a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Serializable" class="extype" target="_top">Serializable</a>, <span class="extype" name="java.io.Serializable">Serializable</span>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Product" class="extype" target="_top">Product</a>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Equals" class="extype" target="_top">Equals</a>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Any" class="extype" target="_top">Any</a></div>
+          <div class="superTypes hiddenContent"><a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Any" class="extype" target="_top">Any</a></div>
         </div></div>
         
 
@@ -362,7 +340,7 @@ every time it is called!
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="ammonite.Main"><span>Main</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.Product"><span>Product</span></li><li class="in" name="scala.Equals"><span>Equals</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="ammonite.MainRunner"><span>MainRunner</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -382,10 +360,10 @@ every time it is called!
         <div id="allMembers">
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
-              <ol><li name="ammonite.Main#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="&lt;init&gt;(predef:String,defaultPredef:Boolean,storageBackend:ammonite.runtime.Storage,wd:ammonite.ops.Path,welcomeBanner:Option[String],inputStream:java.io.InputStream,outputStream:java.io.OutputStream,infoStream:java.io.OutputStream,errorStream:java.io.OutputStream,verboseOutput:Boolean,remoteLogging:Boolean,colors:ammonite.util.Colors):ammonite.Main"></a><a id="&lt;init&gt;:Main"></a>
+              <ol><li name="ammonite.MainRunner#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="&lt;init&gt;(cliConfig:ammonite.main.Cli.Config,outprintStream:java.io.PrintStream,errPrintStream:java.io.PrintStream,stdIn:java.io.InputStream,stdOut:java.io.OutputStream,stdErr:java.io.OutputStream):ammonite.MainRunner"></a><a id="&lt;init&gt;:MainRunner"></a>
       <span class="permalink">
-      <a href="../ammonite/Main.html#&lt;init&gt;(predef:String,defaultPredef:Boolean,storageBackend:ammonite.runtime.Storage,wd:ammonite.ops.Path,welcomeBanner:Option[String],inputStream:java.io.InputStream,outputStream:java.io.OutputStream,infoStream:java.io.OutputStream,errorStream:java.io.OutputStream,verboseOutput:Boolean,remoteLogging:Boolean,colors:ammonite.util.Colors):ammonite.Main" title="Permalink">
+      <a href="../ammonite/MainRunner.html#&lt;init&gt;(cliConfig:ammonite.main.Cli.Config,outprintStream:java.io.PrintStream,errPrintStream:java.io.PrintStream,stdIn:java.io.InputStream,stdOut:java.io.OutputStream,stdErr:java.io.OutputStream):ammonite.MainRunner" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -394,26 +372,10 @@ every time it is called!
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">Main</span><span class="params">(<span name="predef">predef: <span class="extype" name="scala.Predef.String">String</span> = <span class="symbol">&quot;&quot;</span></span>, <span name="defaultPredef">defaultPredef: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Boolean" class="extype" target="_top">Boolean</a> = <span class="symbol">true</span></span>, <span name="storageBackend">storageBackend: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-runtime/0.9.9/ammonite-runtime-0.9.9-javadoc.jar/!/index.html#ammonite.runtime.Storage" class="extype" target="_top">Storage</a> = <span class="defval" name='<span class="name"><a href="index.html">new Storage.Folder(Defaults.ammoniteHome)</a></span>'>...</span></span>, <span name="wd">wd: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/0.9.9/ammonite-ops-0.9.9-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a> = <span class="symbol"><span class="name"><a href="index.html">ammonite.ops.pwd</a></span></span></span>, <span name="welcomeBanner">welcomeBanner: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Option" class="extype" target="_top">Option</a>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol"><span class="name"><a href="index.html">Some(Defaults.welcomeBanner)</a></span></span></span>, <span name="inputStream">inputStream: <span class="extype" name="java.io.InputStream">InputStream</span> = <span class="symbol">System.in</span></span>, <span name="outputStream">outputStream: <span class="extype" name="java.io.OutputStream">OutputStream</span> = <span class="symbol">System.out</span></span>, <span name="infoStream">infoStream: <span class="extype" name="java.io.OutputStream">OutputStream</span> = <span class="symbol">System.err</span></span>, <span name="errorStream">errorStream: <span class="extype" name="java.io.OutputStream">OutputStream</span> = <span class="symbol">System.err</span></span>, <span name="verboseOutput">verboseOutput: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Boolean" class="extype" target="_top">Boolean</a> = <span class="symbol">true</span></span>, <span name="remoteLogging">remoteLogging: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Boolean" class="extype" target="_top">Boolean</a> = <span class="symbol">true</span></span>, <span name="colors">colors: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-util/0.9.9/ammonite-util-0.9.9-javadoc.jar/!/index.html#ammonite.util.Colors" class="extype" target="_top">Colors</a> = <span class="symbol"><span class="name"><a href="index.html">Colors.Default</a></span></span></span>)</span>
+        <span class="name">MainRunner</span><span class="params">(<span name="cliConfig">cliConfig: <a href="main/Cli$$Config.html" class="extype" name="ammonite.main.Cli.Config">Config</a></span>, <span name="outprintStream">outprintStream: <span class="extype" name="java.io.PrintStream">PrintStream</span></span>, <span name="errPrintStream">errPrintStream: <span class="extype" name="java.io.PrintStream">PrintStream</span></span>, <span name="stdIn">stdIn: <span class="extype" name="java.io.InputStream">InputStream</span></span>, <span name="stdOut">stdOut: <span class="extype" name="java.io.OutputStream">OutputStream</span></span>, <span name="stdErr">stdErr: <span class="extype" name="java.io.OutputStream">OutputStream</span></span>)</span>
       </span>
       
-      <p class="shortcomment cmt"></p><div class="fullcomment"><div class="comment cmt"></div><dl class="paramcmts block"><dt class="param">predef</dt><dd class="cmt"><p>Any additional code you want to run before the REPL session
-              starts. Can contain multiple blocks separated by <code>@</code>s</p></dd><dt class="param">defaultPredef</dt><dd class="cmt"><p>Do you want to include the &quot;standard&quot; predef imports
-                     provided by Ammonite? These include tools like <code>time</code>,
-                     <code>grep</code>, the <code>|</code> or <code>|?</code> pipes from ammonite-ops, and
-                     other helpers. Can be disabled to give a clean
-                     namespace for you to fill using your own predef.</p></dd><dt class="param">storageBackend</dt><dd class="cmt"><p>Where will all of Ammonite's persistent data get
-                      stored? Things like any <code>predef.sc</code> file,
-                      compilation/ivy caches, etc.. Defaults include
-                      <span class="extype" name="Storage.Folder">Storage.Folder</span> and <span class="extype" name="Storage.InMemory">Storage.InMemory</span>, though
-                      you can create your own.</p></dd><dt class="param">wd</dt><dd class="cmt"><p>The working directory of the REPL; when it load scripts, where
-          the scripts will be considered relative to when assigning them
-          packages</p></dd><dt class="param">inputStream</dt><dd class="cmt"><p>Where input to the Repl is coming from, typically System.in,
-                   but it could come from somewhere else e.g. across the
-                   network in the case of the SshdRepl</p></dd><dt class="param">outputStream</dt><dd class="cmt"><p>Primary output of code run using Ammonite</p></dd><dt class="param">infoStream</dt><dd class="cmt"><p>Miscellaneous logging output when running Ammonite. This
-                  is typically stuff you want to see when running interactively,
-                  but not something you want to see when e.g. you forward a
-                  script's output to a file. This by default it goes to System.err</p></dd><dt class="param">errorStream</dt><dd class="cmt"><p>Error output when things go bad, typically System.err</p></dd></dl></div>
+      
     </li></ol>
             </div>
 
@@ -427,7 +389,7 @@ every time it is called!
                 <li name="scala.AnyRef#!=" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="!=(x$1:Any):Boolean"></a><a id="!=(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../ammonite/Main.html#!=(x$1:Any):Boolean" title="Permalink">
+      <a href="../ammonite/MainRunner.html#!=(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -443,7 +405,7 @@ every time it is called!
     </li><li name="scala.AnyRef###" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="##():Int"></a>
       <span class="permalink">
-      <a href="../ammonite/Main.html###():Int" title="Permalink">
+      <a href="../ammonite/MainRunner.html###():Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -459,7 +421,7 @@ every time it is called!
     </li><li name="scala.AnyRef#==" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="==(x$1:Any):Boolean"></a><a id="==(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../ammonite/Main.html#==(x$1:Any):Boolean" title="Permalink">
+      <a href="../ammonite/MainRunner.html#==(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -475,7 +437,7 @@ every time it is called!
     </li><li name="scala.Any#asInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <span class="permalink">
-      <a href="../ammonite/Main.html#asInstanceOf[T0]:T0" title="Permalink">
+      <a href="../ammonite/MainRunner.html#asInstanceOf[T0]:T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -491,7 +453,7 @@ every time it is called!
     </li><li name="scala.AnyRef#clone" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a><a id="clone():AnyRef"></a>
       <span class="permalink">
-      <a href="../ammonite/Main.html#clone():Object" title="Permalink">
+      <a href="../ammonite/MainRunner.html#clone():Object" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -510,10 +472,10 @@ every time it is called!
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="ammonite.Main#colors" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="ammonite.MainRunner#colors" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="colors:ammonite.util.Colors"></a><a id="colors:Colors"></a>
       <span class="permalink">
-      <a href="../ammonite/Main.html#colors:ammonite.util.Colors" title="Permalink">
+      <a href="../ammonite/MainRunner.html#colors:ammonite.util.Colors" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -526,26 +488,10 @@ every time it is called!
       </span>
       
       
-    </li><li name="ammonite.Main#defaultPredef" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="defaultPredef:Boolean"></a>
-      <span class="permalink">
-      <a href="../ammonite/Main.html#defaultPredef:Boolean" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">defaultPredef</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
-      </span>
-      
-      
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../ammonite/Main.html#eq(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../ammonite/MainRunner.html#eq(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -558,26 +504,26 @@ every time it is called!
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="ammonite.Main#errorStream" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="errorStream:java.io.OutputStream"></a><a id="errorStream:OutputStream"></a>
+    </li><li name="scala.AnyRef#equals" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="equals(x$1:Any):Boolean"></a><a id="equals(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../ammonite/Main.html#errorStream:java.io.OutputStream" title="Permalink">
+      <a href="../ammonite/MainRunner.html#equals(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">val</span>
+        <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">errorStream</span><span class="result">: <span class="extype" name="java.io.OutputStream">OutputStream</span></span>
+        <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Any" class="extype" target="_top">Any</a></span>)</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
       </span>
       
-      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="scala.AnyRef#finalize" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
       <span class="permalink">
-      <a href="../ammonite/Main.html#finalize():Unit" title="Permalink">
+      <a href="../ammonite/MainRunner.html#finalize():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -599,7 +545,7 @@ every time it is called!
     </li><li name="scala.AnyRef#getClass" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <span class="permalink">
-      <a href="../ammonite/Main.html#getClass():Class[_]" title="Permalink">
+      <a href="../ammonite/MainRunner.html#getClass():Class[_]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -612,42 +558,10 @@ every time it is called!
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="ammonite.Main#infoStream" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="infoStream:java.io.OutputStream"></a><a id="infoStream:OutputStream"></a>
+    </li><li name="scala.AnyRef#hashCode" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="hashCode():Int"></a>
       <span class="permalink">
-      <a href="../ammonite/Main.html#infoStream:java.io.OutputStream" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">infoStream</span><span class="result">: <span class="extype" name="java.io.OutputStream">OutputStream</span></span>
-      </span>
-      
-      
-    </li><li name="ammonite.Main#inputStream" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="inputStream:java.io.InputStream"></a><a id="inputStream:InputStream"></a>
-      <span class="permalink">
-      <a href="../ammonite/Main.html#inputStream:java.io.InputStream" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">inputStream</span><span class="result">: <span class="extype" name="java.io.InputStream">InputStream</span></span>
-      </span>
-      
-      
-    </li><li name="ammonite.Main#instantiateInterpreter" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="instantiateInterpreter():ammonite.interp.Interpreter"></a><a id="instantiateInterpreter():Interpreter"></a>
-      <span class="permalink">
-      <a href="../ammonite/Main.html#instantiateInterpreter():ammonite.interp.Interpreter" title="Permalink">
+      <a href="../ammonite/MainRunner.html#hashCode():Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -656,14 +570,14 @@ every time it is called!
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">instantiateInterpreter</span><span class="params">()</span><span class="result">: <span class="extype" name="ammonite.interp.Interpreter">Interpreter</span></span>
+        <span class="name">hashCode</span><span class="params">()</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Int" class="extype" target="_top">Int</a></span>
       </span>
       
-      
-    </li><li name="ammonite.Main#instantiateRepl" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="instantiateRepl(replArgs:IndexedSeq[ammonite.util.Bind[_]],remoteLogger:Option[ammonite.repl.RemoteLogger]):ammonite.repl.Repl"></a><a id="instantiateRepl(IndexedSeq[Bind[_]],Option[RemoteLogger]):Repl"></a>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="ammonite.MainRunner#initMain" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="initMain(isRepl:Boolean):ammonite.Main"></a><a id="initMain(Boolean):Main"></a>
       <span class="permalink">
-      <a href="../ammonite/Main.html#instantiateRepl(replArgs:IndexedSeq[ammonite.util.Bind[_]],remoteLogger:Option[ammonite.repl.RemoteLogger]):ammonite.repl.Repl" title="Permalink">
+      <a href="../ammonite/MainRunner.html#initMain(isRepl:Boolean):ammonite.Main" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -672,15 +586,14 @@ every time it is called!
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">instantiateRepl</span><span class="params">(<span name="replArgs">replArgs: <span class="extype" name="scala.IndexedSeq">IndexedSeq</span>[<a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-util/0.9.9/ammonite-util-0.9.9-javadoc.jar/!/index.html#ammonite.util.Bind" class="extype" target="_top">Bind</a>[_]] = <span class="symbol">Vector.empty</span></span>, <span name="remoteLogger">remoteLogger: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Option" class="extype" target="_top">Option</a>[<a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-repl/0.9.9/ammonite-repl-0.9.9-javadoc.jar/!/index.html#ammonite.repl.RemoteLogger" class="extype" target="_top">RemoteLogger</a>]</span>)</span><span class="result">: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-repl/0.9.9/ammonite-repl-0.9.9-javadoc.jar/!/index.html#ammonite.repl.Repl" class="extype" target="_top">Repl</a></span>
+        <span class="name">initMain</span><span class="params">(<span name="isRepl">isRepl: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>)</span><span class="result">: <a href="Main.html" class="extype" name="ammonite.Main">Main</a></span>
       </span>
       
-      <p class="shortcomment cmt">Instantiates an ammonite.Repl using the configuration
-</p>
+      
     </li><li name="scala.Any#isInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <span class="permalink">
-      <a href="../ammonite/Main.html#isInstanceOf[T0]:Boolean" title="Permalink">
+      <a href="../ammonite/MainRunner.html#isInstanceOf[T0]:Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -696,7 +609,7 @@ every time it is called!
     </li><li name="scala.AnyRef#ne" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../ammonite/Main.html#ne(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../ammonite/MainRunner.html#ne(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -712,7 +625,7 @@ every time it is called!
     </li><li name="scala.AnyRef#notify" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notify():Unit"></a>
       <span class="permalink">
-      <a href="../ammonite/Main.html#notify():Unit" title="Permalink">
+      <a href="../ammonite/MainRunner.html#notify():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -728,7 +641,7 @@ every time it is called!
     </li><li name="scala.AnyRef#notifyAll" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notifyAll():Unit"></a>
       <span class="permalink">
-      <a href="../ammonite/Main.html#notifyAll():Unit" title="Permalink">
+      <a href="../ammonite/MainRunner.html#notifyAll():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -741,58 +654,10 @@ every time it is called!
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="ammonite.Main#outputStream" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="outputStream:java.io.OutputStream"></a><a id="outputStream:OutputStream"></a>
+    </li><li name="ammonite.MainRunner#printError" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="printError(s:String):Unit"></a><a id="printError(String):Unit"></a>
       <span class="permalink">
-      <a href="../ammonite/Main.html#outputStream:java.io.OutputStream" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">outputStream</span><span class="result">: <span class="extype" name="java.io.OutputStream">OutputStream</span></span>
-      </span>
-      
-      
-    </li><li name="ammonite.Main#predef" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="predef:String"></a>
-      <span class="permalink">
-      <a href="../ammonite/Main.html#predef:String" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">predef</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
-      </span>
-      
-      
-    </li><li name="ammonite.Main#remoteLogging" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="remoteLogging:Boolean"></a>
-      <span class="permalink">
-      <a href="../ammonite/Main.html#remoteLogging:Boolean" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">remoteLogging</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
-      </span>
-      
-      
-    </li><li name="ammonite.Main#run" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="run(replArgs:ammonite.util.Bind[_]*):Any"></a><a id="run(Bind[_]*):Any"></a>
-      <span class="permalink">
-      <a href="../ammonite/Main.html#run(replArgs:ammonite.util.Bind[_]*):Any" title="Permalink">
+      <a href="../ammonite/MainRunner.html#printError(s:String):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -801,14 +666,14 @@ every time it is called!
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">run</span><span class="params">(<span name="replArgs">replArgs: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-util/0.9.9/ammonite-util-0.9.9-javadoc.jar/!/index.html#ammonite.util.Bind" class="extype" target="_top">Bind</a>[_]*</span>)</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Any" class="extype" target="_top">Any</a></span>
+        <span class="name">printError</span><span class="params">(<span name="s">s: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
       </span>
       
       
-    </li><li name="ammonite.Main#runCode" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="runCode(code:String):ammonite.util.Res[ammonite.util.Imports]"></a><a id="runCode(String):Res[Imports]"></a>
+    </li><li name="ammonite.MainRunner#printInfo" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="printInfo(s:String):Unit"></a><a id="printInfo(String):Unit"></a>
       <span class="permalink">
-      <a href="../ammonite/Main.html#runCode(code:String):ammonite.util.Res[ammonite.util.Imports]" title="Permalink">
+      <a href="../ammonite/MainRunner.html#printInfo(s:String):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -817,15 +682,33 @@ every time it is called!
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">runCode</span><span class="params">(<span name="code">code: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-util/0.9.9/ammonite-util-0.9.9-javadoc.jar/!/index.html#ammonite.util.Res" class="extype" target="_top">Res</a>[<a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-util/0.9.9/ammonite-util-0.9.9-javadoc.jar/!/index.html#ammonite.util.Imports" class="extype" target="_top">Imports</a>]</span>
+        <span class="name">printInfo</span><span class="params">(<span name="s">s: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
       </span>
       
-      <p class="shortcomment cmt">Run a snippet of code
-</p>
-    </li><li name="ammonite.Main#runScript" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="runScript(path:ammonite.ops.Path,scriptArgs:Seq[(String,Option[String])]):(ammonite.util.Res[Any],Seq[(ammonite.ops.Path,Option[Long])])"></a><a id="runScript(Path,Seq[(String,Option[String])]):(Res[Any],Seq[(Path,Option[Long])])"></a>
+      
+    </li><li name="ammonite.MainRunner#runScript" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="runScript(scriptPath:ammonite.ops.Path,scriptArgs:List[String]):Boolean"></a><a id="runScript(Path,List[String]):Boolean"></a>
       <span class="permalink">
-      <a href="../ammonite/Main.html#runScript(path:ammonite.ops.Path,scriptArgs:Seq[(String,Option[String])]):(ammonite.util.Res[Any],Seq[(ammonite.ops.Path,Option[Long])])" title="Permalink">
+      <a href="../ammonite/MainRunner.html#runScript(scriptPath:ammonite.ops.Path,scriptArgs:List[String]):Boolean" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">runScript</span><span class="params">(<span name="scriptPath">scriptPath: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/0.9.9/ammonite-ops-0.9.9-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a></span>, <span name="scriptArgs">scriptArgs: <span class="extype" name="scala.List">List</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@tailrec</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li name="ammonite.MainRunner#runScriptAndPrint" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="runScriptAndPrint(scriptPath:ammonite.ops.Path,flatArgs:List[String],scriptMain:ammonite.Main):(Boolean,Seq[(ammonite.ops.Path,Option[Long])])"></a><a id="runScriptAndPrint(Path,List[String],Main):(Boolean,Seq[(Path,Option[Long])])"></a>
+      <span class="permalink">
+      <a href="../ammonite/MainRunner.html#runScriptAndPrint(scriptPath:ammonite.ops.Path,flatArgs:List[String],scriptMain:ammonite.Main):(Boolean,Seq[(ammonite.ops.Path,Option[Long])])" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -834,31 +717,14 @@ every time it is called!
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">runScript</span><span class="params">(<span name="path">path: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/0.9.9/ammonite-ops-0.9.9-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a></span>, <span name="scriptArgs">scriptArgs: <span class="extype" name="scala.Seq">Seq</span>[(<span class="extype" name="scala.Predef.String">String</span>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Option" class="extype" target="_top">Option</a>[<span class="extype" name="scala.Predef.String">String</span>])]</span>)</span><span class="result">: (<a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-util/0.9.9/ammonite-util-0.9.9-javadoc.jar/!/index.html#ammonite.util.Res" class="extype" target="_top">Res</a>[<a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Any" class="extype" target="_top">Any</a>], <span class="extype" name="scala.Seq">Seq</span>[(<a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/0.9.9/ammonite-ops-0.9.9-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Option" class="extype" target="_top">Option</a>[<a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Long" class="extype" target="_top">Long</a>])])</span>
-      </span>
-      
-      <p class="shortcomment cmt">Run a Scala script file! takes the path to the file as well as an array
-of <code>args</code> and a map of keyword <code>kwargs</code> to pass to that file.</p>
-    </li><li name="ammonite.Main#storageBackend" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="storageBackend:ammonite.runtime.Storage"></a><a id="storageBackend:Storage"></a>
-      <span class="permalink">
-      <a href="../ammonite/Main.html#storageBackend:ammonite.runtime.Storage" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">storageBackend</span><span class="result">: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-runtime/0.9.9/ammonite-runtime-0.9.9-javadoc.jar/!/index.html#ammonite.runtime.Storage" class="extype" target="_top">Storage</a></span>
+        <span class="name">runScriptAndPrint</span><span class="params">(<span name="scriptPath">scriptPath: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/0.9.9/ammonite-ops-0.9.9-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a></span>, <span name="flatArgs">flatArgs: <span class="extype" name="scala.List">List</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="scriptMain">scriptMain: <a href="Main.html" class="extype" name="ammonite.Main">Main</a></span>)</span><span class="result">: (<a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Boolean" class="extype" target="_top">Boolean</a>, <span class="extype" name="scala.Seq">Seq</span>[(<a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/0.9.9/ammonite-ops-0.9.9-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Option" class="extype" target="_top">Option</a>[<a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Long" class="extype" target="_top">Long</a>])])</span>
       </span>
       
       
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">
-      <a href="../ammonite/Main.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
+      <a href="../ammonite/MainRunner.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -871,26 +737,26 @@ of <code>args</code> and a map of keyword <code>kwargs</code> to pass to that fi
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="ammonite.Main#verboseOutput" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="verboseOutput:Boolean"></a>
+    </li><li name="scala.AnyRef#toString" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="toString():String"></a>
       <span class="permalink">
-      <a href="../ammonite/Main.html#verboseOutput:Boolean" title="Permalink">
+      <a href="../ammonite/MainRunner.html#toString():String" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">val</span>
+        <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">verboseOutput</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
+        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
       </span>
       
-      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <span class="permalink">
-      <a href="../ammonite/Main.html#wait():Unit" title="Permalink">
+      <a href="../ammonite/MainRunner.html#wait():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -912,7 +778,7 @@ of <code>args</code> and a map of keyword <code>kwargs</code> to pass to that fi
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long,x$2:Int):Unit"></a><a id="wait(Long,Int):Unit"></a>
       <span class="permalink">
-      <a href="../ammonite/Main.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
+      <a href="../ammonite/MainRunner.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -934,7 +800,7 @@ of <code>args</code> and a map of keyword <code>kwargs</code> to pass to that fi
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long):Unit"></a><a id="wait(Long):Unit"></a>
       <span class="permalink">
-      <a href="../ammonite/Main.html#wait(x$1:Long):Unit" title="Permalink">
+      <a href="../ammonite/MainRunner.html#wait(x$1:Long):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -953,38 +819,6 @@ of <code>args</code> and a map of keyword <code>kwargs</code> to pass to that fi
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="ammonite.Main#wd" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="wd:ammonite.ops.Path"></a><a id="wd:Path"></a>
-      <span class="permalink">
-      <a href="../ammonite/Main.html#wd:ammonite.ops.Path" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">wd</span><span class="result">: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/0.9.9/ammonite-ops-0.9.9-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a></span>
-      </span>
-      
-      
-    </li><li name="ammonite.Main#welcomeBanner" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="welcomeBanner:Option[String]"></a>
-      <span class="permalink">
-      <a href="../ammonite/Main.html#welcomeBanner:Option[String]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">welcomeBanner</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Option" class="extype" target="_top">Option</a>[<span class="extype" name="scala.Predef.String">String</span>]</span>
-      </span>
-      
-      
     </li>
               </ol>
             </div>
@@ -995,15 +829,7 @@ of <code>args</code> and a map of keyword <code>kwargs</code> to pass to that fi
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="scala.Serializable">
-              <h3>Inherited from <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></h3>
-            </div><div class="parent" name="java.io.Serializable">
-              <h3>Inherited from <span class="extype" name="java.io.Serializable">Serializable</span></h3>
-            </div><div class="parent" name="scala.Product">
-              <h3>Inherited from <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Product" class="extype" target="_top">Product</a></h3>
-            </div><div class="parent" name="scala.Equals">
-              <h3>Inherited from <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Equals" class="extype" target="_top">Equals</a></h3>
-            </div><div class="parent" name="scala.AnyRef">
+        <div class="parent" name="scala.AnyRef">
               <h3>Inherited from <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></h3>
             </div><div class="parent" name="scala.Any">
               <h3>Inherited from <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Any" class="extype" target="_top">Any</a></h3>
