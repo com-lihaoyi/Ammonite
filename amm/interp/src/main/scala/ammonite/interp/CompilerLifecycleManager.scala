@@ -70,8 +70,10 @@ class CompilerLifecycleManager(frames0: Ref[List[Frame]]){
 
   def evalClassloader = frames().head.classloader
 
+
+
   def init(force: Boolean = false) = if(Internal.compilerStale || force){
-    Internal.compilerStale = false
+
     // Note we not only make a copy of `settings` to pass to the compiler,
     // we also make a *separate* copy to pass to the presentation compiler.
     // Otherwise activating autocomplete makes the presentation compiler mangle
@@ -97,6 +99,14 @@ class CompilerLifecycleManager(frames0: Ref[List[Frame]]){
 
       settings.copy()
     )
+
+    // Do this last; that way, if someone `Ctrl C`s in the middle of the
+    // operation, we end up with `compilerStale = true` and a `compiler != null`,
+    // which is better than `compilerStale = false` and `compiler == null`
+    // because the first case means we redundantly re-initialize the compiler,
+    // while the second means we're stuck without a compiler when we need one
+    // and everything blows up
+    Internal.compilerStale = false
   }
 
   def complete(offset: Int, previousImports: String, snippet: String) = {
