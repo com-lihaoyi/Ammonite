@@ -222,7 +222,7 @@ object AdvancedTests extends TestSuite{
           100,
         ...
 
-        @ pprintConfig() = pprintConfig().copy(height = 5 )
+        @ repl.pprinter() = repl.pprinter().copy(defaultHeight = 5)
 
         @ Seq.fill(20)(100)
         res4: Seq[Int] = List(
