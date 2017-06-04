@@ -59,9 +59,10 @@ object ImportHook{
   def resolveFiles(tree: ImportTree, currentScriptPath: Path, extensions: Seq[String])
                   : (Seq[(RelPath, Option[String])], Seq[Path], Seq[Path]) = {
     val relative =
-      tree.prefix
-        .map{case ammonite.util.Util.upPathSegment => up; case x => ammonite.ops.empty/x}
-        .reduce(_/_)
+      tree.prefix.map {
+          case ammonite.util.Util.upPathSegment | ".." => up
+          case x => ammonite.ops.empty / x
+        }.reduce(_ / _)
     val relativeModules = tree.mappings match{
       case None => Seq(relative -> None)
       case Some(mappings) => for((k, v) <- mappings) yield relative/k -> v
