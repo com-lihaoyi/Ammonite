@@ -65,7 +65,8 @@ class TestRepl {
           def width = 80
           def height = 80
         }
-      ))
+      )),
+      colors = Ref(Colors.BlackWhite)
 
     )
 

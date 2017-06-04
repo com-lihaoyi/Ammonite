@@ -57,7 +57,7 @@ class Repl(input: InputStream,
       "repl",
       new ReplApiImpl {
         def printer = repl.printer
-
+        val colors = repl.colors
         def sess = repl.sess0
         val prompt = repl.prompt
         val frontEnd = repl.frontEnd
@@ -65,7 +65,6 @@ class Repl(input: InputStream,
         def lastException = repl.lastException
         def fullHistory = storage.fullHistory()
         def history = repl.history
-        val colors = repl.colors
         def newCompiler() = interp.compilerManager.init(force = true)
         def compiler = interp.compilerManager.compiler.compiler
         def imports = interp.eval.imports.toString
@@ -73,7 +72,8 @@ class Repl(input: InputStream,
         def height = frontEnd().height
       }
     )),
-    wd
+    wd,
+    colors
   )
 
   sess0.save()
@@ -145,7 +145,13 @@ object Repl{
     val src =
       if (f.isNativeMethod) source("Native Method")
       else if (f.getFileName == null) source("Unknown Source")
-      else source(f.getFileName) ++ error(":") ++ source(f.getLineNumber.toString)
+      else {
+        val lineSuffix =
+          if (f.getLineNumber == -1) fansi.Str("")
+          else error(":") ++ source(f.getLineNumber.toString)
+
+        source(f.getFileName) ++ lineSuffix
+      }
 
     val prefix :+ clsName = f.getClassName.split('.').toSeq
     val prefixString = prefix.map(_+'.').mkString("")

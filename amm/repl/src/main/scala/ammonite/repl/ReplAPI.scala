@@ -65,11 +65,6 @@ trait ReplAPI {
   def typeOf[T: WeakTypeTag](t: => T): Type
 
   /**
-   * The colors that will be used to render the Ammonite REPL in the terminal
-   */
-  val colors: Ref[Colors]
-
-  /**
    * Throw away the current scala.tools.nsc.Global and get a new one
    */
   def newCompiler(): Unit
@@ -164,30 +159,13 @@ trait Session{
 }
 
 // End of ReplAPI
-/**
- * Things that are part of the ReplAPI that aren't really "public"
- */
-abstract class FullReplAPI extends ReplAPI{
 
-  val Internal: Internal
-  trait Internal{
-    def combinePrints(iters: Iterator[String]*): Iterator[String]
+trait FullReplAPI extends ReplAPI{
 
-    def print[T: pprint.TPrint: WeakTypeTag]
-             (value: => T, ident: String, custom: Option[String])
-             (implicit tcolors: pprint.TPrintColors): Iterator[String]
-
-    def printDef(definitionLabel: String, ident: String): Iterator[String]
-    def printImport(imported: String): Iterator[String]
-  }
   def typeOf[T: WeakTypeTag] = scala.reflect.runtime.universe.weakTypeOf[T]
   def typeOf[T: WeakTypeTag](t: => T) = scala.reflect.runtime.universe.weakTypeOf[T]
-}
 
-
-
-trait DefaultReplAPI extends FullReplAPI {
-
+  protected val colors: Ref[Colors]
 
   def help =
     """Welcome to the Ammonite Scala REPL! Enter a Scala expression and it will be evaluated.
@@ -198,7 +176,13 @@ trait DefaultReplAPI extends FullReplAPI {
       |For a list of REPL built-ins and configuration, use `repl.<tab>`. For a more detailed
       |description of how to use the REPL, check out https://lihaoyi.github.io/Ammonite
     """.stripMargin.trim
-  object Internal extends Internal{
+
+
+  /**
+    * This stuff is used for the REPL-generated code that prints things;
+    * shouldn't really be used by users, but needs to be public and accessible
+    */
+  object Internal {
     def combinePrints(iters: Iterator[String]*) = {
       iters.toIterator
            .filter(_.nonEmpty)
@@ -270,6 +254,7 @@ trait DefaultReplAPI extends FullReplAPI {
     }
   }
 }
+
 object ReplBridge extends APIHolder[FullReplAPI]
 
 case class SessionChanged(removedImports: Set[scala.Symbol],

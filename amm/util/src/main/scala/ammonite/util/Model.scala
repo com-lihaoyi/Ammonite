@@ -204,7 +204,8 @@ case class Colors(prompt: Ref[fansi.Attrs],
                   keyword: Ref[fansi.Attrs],
                   selected: Ref[fansi.Attrs],
                   error: Ref[fansi.Attrs],
-                  warning: Ref[fansi.Attrs])
+                  warning: Ref[fansi.Attrs],
+                  info: Ref[fansi.Attrs])
 object Colors{
 
   def Default = Colors(
@@ -217,12 +218,13 @@ object Colors{
     fansi.Color.Yellow,
     fansi.Reversed.On,
     fansi.Color.Red,
-    fansi.Color.Yellow
+    fansi.Color.Yellow,
+    fansi.Color.Blue
   )
   def BlackWhite = Colors(
     fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty,
     fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty,
-    fansi.Attrs.Empty, fansi.Attrs.Empty
+    fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty
   )
 }
 

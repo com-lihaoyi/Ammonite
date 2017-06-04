@@ -27,29 +27,29 @@ object BuiltinTests extends TestSuite{
 
         @ // Changing the colors used by Ammonite; all at once:
 
-        @ repl.colors() = ammonite.util.Colors.BlackWhite
+        @ interp.colors() = ammonite.util.Colors.BlackWhite
 
-        @ repl.colors() = ammonite.util.Colors.Default
+        @ interp.colors() = ammonite.util.Colors.Default
 
         @ // or one at a time:
 
-        @ repl.colors().prompt() = fansi.Color.Red
+        @ interp.colors().prompt() = fansi.Color.Red
 
-        @ repl.colors().ident() = fansi.Color.Green
+        @ interp.colors().ident() = fansi.Color.Green
 
-        @ repl.colors().`type`() = fansi.Color.Yellow
+        @ interp.colors().`type`() = fansi.Color.Yellow
 
-        @ repl.colors().literal() = fansi.Color.Magenta
+        @ interp.colors().literal() = fansi.Color.Magenta
 
-        @ repl.colors().prefix() = fansi.Color.Cyan
+        @ interp.colors().prefix() = fansi.Color.Cyan
 
-        @ repl.colors().comment() = fansi.Color.Red
+        @ interp.colors().comment() = fansi.Color.Red
 
-        @ repl.colors().keyword() = fansi.Bold.On
+        @ interp.colors().keyword() = fansi.Bold.On
 
-        @ repl.colors().selected() = fansi.Underlined.On
+        @ interp.colors().selected() = fansi.Underlined.On
 
-        @ repl.colors().error() = fansi.Color.Yellow
+        @ interp.colors().error() = fansi.Color.Yellow
       """)
     }
 

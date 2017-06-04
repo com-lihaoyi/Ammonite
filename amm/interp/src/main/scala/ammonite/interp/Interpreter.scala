@@ -31,6 +31,7 @@ class Interpreter(val printer: Printer,
                   // the REPL before it starts
                   extraBridges: Seq[(String, String, AnyRef)],
                   val wd: Path,
+                  colors: Ref[Colors],
                   verboseOutput: Boolean = true)
   extends ImportHook.InterpreterInterface{ interp =>
 
@@ -558,6 +559,8 @@ class Interpreter(val printer: Printer,
 
   private[this] lazy val interpApi: InterpAPI = new InterpAPI{ outer =>
 
+    val colors = interp.colors
+
     def watch(p: Path) = interp.watch(p)
 
     def configureCompiler(callback: scala.tools.nsc.Global => Unit) = {
@@ -670,7 +673,7 @@ object Interpreter{
       printStream.print,
       printlnWithColor(errorPrintStream, colors().warning(), _),
       printlnWithColor(errorPrintStream, colors().error(), _),
-      s => if (verboseOutput) printlnWithColor(infoPrintStream, fansi.Attrs.Empty, s)
+      s => if (verboseOutput) printlnWithColor(infoPrintStream, colors().info(), s)
     )
     (colors, printStream, errorPrintStream, printer)
   }

@@ -25,7 +25,7 @@ object ErrorTruncationTests extends TestSuite{
     ).plainText
     //This string gets included on windows due to environment variable set additionally
 
-    assert(e.contains(expected))
+    assert(fansi.Str(e).plainText.contains(expected))
   }
   def scriptFile(name: String): Path =
     replStandaloneResources/'errorTruncation/name
@@ -74,9 +74,8 @@ object ErrorTruncationTests extends TestSuite{
       file = 'errorTruncation/"runtimeError.sc",
       expected = Util.normalizeNewlines(
         s"""java.lang.ArithmeticException: / by zero
-          |${tab}at $runtimeErrorResourcePackage.runtimeError$$.<init>($runtimeErrorSc:1)
-          |${tab}at $runtimeErrorResourcePackage.runtimeError$$.<clinit>($runtimeErrorSc)
-          |${tab}at $runtimeErrorResourcePackage.runtimeError.$$main($runtimeErrorSc)
+          |  $runtimeErrorResourcePackage.runtimeError$$.<init>($runtimeErrorSc:1)
+          |  $runtimeErrorResourcePackage.runtimeError$$.<clinit>($runtimeErrorSc)
           |""".stripMargin
       )
     )

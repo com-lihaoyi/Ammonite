@@ -18,6 +18,7 @@ object TestUtils {
     customPredefs = Seq(
       PredefInfo(Name("predef"), predef, false, None)
     ),
-    extraBridges = Seq()
+    extraBridges = Seq(),
+    colors = Ref(Colors.BlackWhite)
   )
 }

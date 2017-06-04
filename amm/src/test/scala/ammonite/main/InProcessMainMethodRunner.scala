@@ -26,7 +26,8 @@ class InProcessMainMethodRunner(p: RelPath, preArgs: List[String], args: Seq[Str
   val out0 = new ByteArrayOutputStream()
   val path = InProcessMainMethodRunner.base/p
 
-  val result = Console.withIn(in){
+
+  val success = Console.withIn(in){
     Console.withErr(err0){
       Console.withOut(out0){
         ammonite.Main.main0(
@@ -42,13 +43,6 @@ class InProcessMainMethodRunner(p: RelPath, preArgs: List[String], args: Seq[Str
     }
   }
 
-  val success = result match{
-    case Right(success) => success
-    case Left((success, msg)) =>
-      if (success) out0.write(msg.getBytes)
-      else err0.write(msg.getBytes)
-      success
-  }
 
   val out = new String(out0.toByteArray)
   val err = new String(err0.toByteArray)

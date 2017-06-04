@@ -1273,3 +1273,23 @@
 
     @sect{Unstable Changlog}
       @ul
+        @li
+          Output now defaults to colored if the console is interactive, and
+          non-colored otherwise. This should be the defaults most people would
+          be happy with.
+
+        @li
+          Scripts now have colored output by default if the script-runner is
+          interactive, following the above rules. Much of the script "info"
+          output like "Compiling" or "Watching for changes" messages are now
+          colored.
+
+        @li
+          There is now a cli-flag @code{--color} which can be set to
+          @hl.scala{true} or @hl.scala{false} to force colors on or off if you
+          are not happy with the default behavior.
+
+        @li
+          The @code{repl.colors} builtin has been moved to @code{interp.colors},
+          and allows you to fine-grained customize colors for e.g. error
+          messages and info messages when running scripts.

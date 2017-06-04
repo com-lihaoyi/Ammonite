@@ -8,4 +8,4 @@ val shellSession = ammonite.shell.ShellSession()
 import shellSession._
 import ammonite.ops._
 import ammonite.shell._
-ammonite.shell.Configure(repl, wd)
+ammonite.shell.Configure(interp, repl, wd)

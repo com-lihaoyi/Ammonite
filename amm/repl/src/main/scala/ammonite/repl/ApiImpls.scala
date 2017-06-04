@@ -51,7 +51,7 @@ class SessionApiImpl(frames0: => StableRef[List[Frame]]) extends Session{
     namedFrames.remove(name)
   }
 }
-trait ReplApiImpl extends DefaultReplAPI{
+trait ReplApiImpl extends FullReplAPI{
 
   implicit def tprintColorsImplicit = pprint.TPrintColors(
     typeColor = colors().`type`()

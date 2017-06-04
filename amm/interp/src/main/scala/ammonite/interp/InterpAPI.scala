@@ -1,13 +1,11 @@
 package ammonite.interp
 
 import ammonite.ops._
-import ammonite.util.Ref
-
+import ammonite.util.{Colors, Ref}
 import ammonite.runtime.APIHolder
 import ammonite.runtime.Evaluator.AmmoniteExit
 
 import scala.collection.mutable
-import scala.util.control.ControlThrowable
 
 
 object InterpBridge extends APIHolder[InterpAPI]
@@ -19,6 +17,12 @@ trait InterpAPI {
     * call this to watch arbitrary files your script may depend on
     */
   def watch(p: Path): Unit
+
+  /**
+    * The colors that will be used to render the Ammonite REPL in the terminal,
+    * or for rendering miscellaneous info messages when running scripts.
+    */
+  val colors: Ref[Colors]
 
   /**
    * Tools related to loading external scripts and code into the REPL

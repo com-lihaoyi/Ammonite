@@ -56,12 +56,5 @@ object PPrints{
       Iterator(Util.newLine, color(new String(s.array)).render)
     }
   )
-
-  implicit val defaultHighlightColor = {
-    ammonite.runtime.tools.GrepResult.Color(
-      fansi.Color.Blue ++ fansi.Back.Yellow,
-      fansi.Color.Yellow
-    )
-  }
 }
 

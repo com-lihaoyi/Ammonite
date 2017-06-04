@@ -64,7 +64,8 @@ case class Main(predef: String = "",
                 infoStream: OutputStream = System.err,
                 errorStream: OutputStream = System.err,
                 verboseOutput: Boolean = true,
-                remoteLogging: Boolean = true){
+                remoteLogging: Boolean = true,
+                colors: Colors = Colors.Default){
 
   /**
     * Instantiates an ammonite.Repl using the configuration
@@ -84,17 +85,21 @@ case class Main(predef: String = "",
       wd = wd,
       welcomeBanner = welcomeBanner,
       replArgs = replArgs,
-      remoteLogger = remoteLogger
+      remoteLogger = remoteLogger,
+      initialColors = colors
     )
   }
 
   def instantiateInterpreter() = {
     val augmentedPredef = Main.maybeDefaultPredef(defaultPredef, Defaults.predefString)
 
-    val (colors, printStream, errorPrintStream, printer) = Interpreter.initPrinters(
-      Colors.BlackWhite, outputStream, infoStream, errorStream, verboseOutput
+    val (colorsRef, _, _, printer) = Interpreter.initPrinters(
+      colors,
+      outputStream,
+      infoStream,
+      errorStream,
+      verboseOutput
     )
-
 
     val interp: Interpreter = new Interpreter(
       printer,
@@ -105,6 +110,7 @@ case class Main(predef: String = "",
       ),
       Vector.empty,
       wd,
+      colorsRef,
       verboseOutput
     )
     interp
@@ -158,19 +164,9 @@ object Main{
     * delegating to [[Main.run]]
     */
   def main(args0: Array[String]): Unit = {
-    main0(args0.toList, System.in, System.out, System.err) match{
-      case Left((success, msg)) =>
-        if (success) {
-          Console.out.println(msg)
-          sys.exit(0)
-        } else {
-          Console.err.println(msg)
-          sys.exit(1)
-        }
-      case Right(success) =>
-        if (success) sys.exit(0)
-        else sys.exit(1)
-    }
+    val success = main0(args0.toList, System.in, System.out, System.err)
+    if (success) sys.exit(0)
+    else sys.exit(1)
   }
 
   /**
@@ -181,93 +177,129 @@ object Main{
   def main0(args: List[String],
             stdIn: InputStream,
             stdOut: OutputStream,
-            stdErr: OutputStream): Either[(Boolean, String), Boolean] = {
+            stdErr: OutputStream): Boolean = {
+    val printErr = new PrintStream(stdErr)
+    val printOut = new PrintStream(stdOut)
     // We have to use explicit flatmaps instead of a for-comprehension here
     // because for-comprehensions fail to compile complaining about needing
     // withFilter
-    Cli.groupArgs(args, Cli.ammoniteArgSignature, Cli.Config())
-      .right
-      .flatMap{ case (cliConfig, leftoverArgs) =>
-      helpMsg(cliConfig.help).right.flatMap{ _ =>
-        (cliConfig.code, leftoverArgs) match{
-          case (Some(code), Nil) =>
-            fromConfig(cliConfig, true, stdIn, stdOut, stdErr).runCode(code)
-            Right(true)
+    Cli.groupArgs(args, Cli.ammoniteArgSignature, Cli.Config()) match{
+      case Left(msg) =>
+        printErr.println(msg)
+        false
+      case Right((cliConfig, leftoverArgs)) =>
+        if (cliConfig.help) {
+          printOut.println(Cli.ammoniteHelp)
+          true
+        }else{
 
-          case (None, Nil) =>
-            new PrintStream(stdOut).println("Loading...")
-            fromConfig(cliConfig, true, stdIn, stdOut, stdErr).run()
-            Right(true)
+          val runner = new MainRunner(cliConfig, printOut, printErr, stdIn, stdOut, stdErr)
+          (cliConfig.code, leftoverArgs) match{
+            case (Some(code), Nil) =>
+              runner.initMain(true).runCode(code)
+              true
 
-          case (None, head :: rest) if head.startsWith("-") =>
-            val failureMsg =
-              "Unknown Ammonite option: " + head + Util.newLine +
-              "Use --help to list possible options"
-            Left(false -> failureMsg)
+            case (None, Nil) =>
+              runner.printInfo("Loading...")
+              runner.initMain(true).run()
+              true
 
-          case (None, head :: rest) =>
-            val success = runScript(Path(head, pwd), rest, cliConfig, stdIn, stdOut, stdErr)
-            Right(success)
+            case (None, head :: rest) if head.startsWith("-") =>
+
+              val failureMsg =
+                "Unknown Ammonite option: " + head + Util.newLine +
+                "Use --help to list possible options"
+
+              runner.printError(failureMsg)
+              false
+
+            case (None, head :: rest) =>
+              val success = runner.runScript(Path(head, pwd), rest)
+              success
+          }
         }
-      }
     }
   }
+  def maybeDefaultPredef(enabled: Boolean, predef: String) =
+    if (enabled) predef else ""
 
-  def helpMsg(help: Boolean) = {
-    if (help) Left(true -> Cli.ammoniteHelp)
-    else Right(())
-  }
 
-  @tailrec def runScript(scriptPath: Path,
-                         scriptArgs: List[String],
-                         cliConfig: Cli.Config,
-                         stdIn: InputStream,
-                         stdOut: OutputStream,
-                         stdErr: OutputStream): Boolean = {
+  /**
+    * Detects if the console is interactive; lets us make console-friendly output
+    * (e.g. ansi color codes) if it is, and script-friendly output (no ansi codes)
+    * if it's not
+    *
+    * https://stackoverflow.com/a/1403817/871202
+    */
+  def isInteractive() = System.console() != null
+
+}
+
+/**
+  * Bundles together all the code relying on [[cliConfig]] and the common
+  * input/output streams and print-streams, so we don't need to keep passing
+  * them everywhere one by one
+  */
+class MainRunner(cliConfig: Cli.Config,
+                 outprintStream: PrintStream,
+                 errPrintStream: PrintStream,
+                 stdIn: InputStream,
+                 stdOut: OutputStream,
+                 stdErr: OutputStream){
+
+  val colors =
+    if(cliConfig.colored.getOrElse(Main.isInteractive())) Colors.Default
+    else Colors.BlackWhite
+
+  def printInfo(s: String) = errPrintStream.println(colors.info()(s))
+  def printError(s: String) = errPrintStream.println(colors.error()(s))
+
+  @tailrec final def runScript(scriptPath: Path, scriptArgs: List[String]): Boolean = {
+
     val (success, watched) = runScriptAndPrint(
       scriptPath,
       scriptArgs,
-      cliConfig,
-      fromConfig(cliConfig, false, stdIn, stdOut, stdErr),
-      stdErr
+      initMain(false)
     )
     if (!cliConfig.watch) success
     else{
-      println(s"Watching for changes to ${watched.length} files... (Ctrl-C to exit)")
+      printInfo(s"Watching for changes to ${watched.length} files... (Ctrl-C to exit)")
       def statAll() = watched.forall{ case (file, lastMTime) =>
         Interpreter.mtimeIfExists(file) == lastMTime
       }
 
       while(statAll()) Thread.sleep(100)
 
-      runScript(scriptPath, scriptArgs, cliConfig, stdIn, stdOut, stdErr)
+      runScript(scriptPath, scriptArgs)
     }
   }
 
   def runScriptAndPrint(scriptPath: Path,
                         flatArgs: List[String],
-                        c: Cli.Config,
-                        scriptMain: Main,
-                        stdErr: OutputStream): (Boolean, Seq[(Path, Option[Long])]) = {
+                        scriptMain: Main): (Boolean, Seq[(Path, Option[Long])]) = {
 
     val (res, watched) = scriptMain.runScript(
       scriptPath,
       Scripts.groupArgs(flatArgs)
     )
-    val printer = new PrintStream(stdErr)
+
     val success = res match {
       case Res.Failure(exOpt, msg) =>
-        printer.println(msg)
+        printError(msg)
         false
       case Res.Exception(ex, s) =>
         val trace = ex.getStackTrace
         val i = trace.indexWhere(_.getMethodName == "$main") + 1
         ex.setStackTrace(trace.take(i))
-        ex.printStackTrace(printer)
+        val sw = new java.io.StringWriter
+        ex.printStackTrace(new java.io.PrintWriter(sw))
+        errPrintStream.println(
+          Repl.showException(ex, colors.error(), fansi.Attr.Reset, colors.literal())
+        )
         false
 
       case Res.Success(value) =>
-        if (value != ()) pprint.PPrinter.BlackWhite.pprintln(value)
+        if (value != ()) outprintStream.println(pprint.PPrinter.BlackWhite(value))
         true
 
       case Res.Skip   => true // do nothing on success, everything's already happened
@@ -275,11 +307,7 @@ object Main{
     (success, watched)
   }
 
-  def fromConfig(cliConfig: Cli.Config,
-                 isRepl: Boolean,
-                 stdIn: InputStream,
-                 stdOut: OutputStream,
-                 stdErr: OutputStream) = Main(
+  def initMain(isRepl: Boolean) = Main(
     cliConfig.predef,
     cliConfig.defaultPredef,
     new Storage.Folder(cliConfig.home, isRepl) {
@@ -301,10 +329,7 @@ object Main{
     errorStream = stdErr,
     welcomeBanner = cliConfig.welcomeBanner,
     verboseOutput = cliConfig.verboseOutput,
-    remoteLogging = cliConfig.remoteLogging
+    remoteLogging = cliConfig.remoteLogging,
+    colors = colors
   )
-
-  
-  def maybeDefaultPredef(enabled: Boolean, predef: String) =
-    if (enabled) predef else ""
 }

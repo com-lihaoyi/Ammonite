@@ -1,3 +1,4 @@
+// Basically a copy of example-predef.sc that's used for the test suite
 import ammonite.ops._
 import ammonite.runtime.tools.IvyThing.scalaBinaryVersion
 val scalaVersion = scala.util.Properties.versionNumberString
@@ -12,4 +13,4 @@ import ammonite.shell._
 // Doesn't work in the test suite, where it's run as a script rather than
 // as a REPL
 
-// ammonite.shell.Configure(repl, wd)
+// ammonite.shell.Configure(interp, repl, wd)
