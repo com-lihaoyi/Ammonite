@@ -35,7 +35,8 @@ trait Preprocessor{
                 indexedWrapperName: Name,
                 imports: Imports,
                 printerTemplate: String => String,
-                extraCode: String): Res[Preprocessor.Output]
+                extraCode: String,
+                skipEmpty: Boolean): Res[Preprocessor.Output]
 }
 
 object Preprocessor{
@@ -105,12 +106,13 @@ object Preprocessor{
                   indexedWrapperName: Name,
                   imports: Imports,
                   printerTemplate: String => String,
-                  extraCode: String) = {
+                  extraCode: String,
+                  skipEmpty: Boolean) = {
       // All code Ammonite compiles must be rooted in some package within
       // the `ammonite` top-level package
       assert(pkgName.head == Name("ammonite"))
       for{
-        Preprocessor.Expanded(code, printer) <- expandStatements(stmts, resultIndex)
+        Preprocessor.Expanded(code, printer) <- expandStatements(stmts, resultIndex, skipEmpty)
         (wrappedCode, importsLength) = wrapCode(
           pkgName, indexedWrapperName, leadingSpaces + code,
           printerTemplate(printer.mkString(", ")),
@@ -205,9 +207,15 @@ object Preprocessor{
     )
 
     def expandStatements(stmts: Seq[String],
-                         wrapperIndex: String): Res[Preprocessor.Expanded] = {
+                         wrapperIndex: String,
+                         skipEmpty: Boolean): Res[Preprocessor.Expanded] = {
       stmts match{
-        case Nil => Res.Skip
+        // In the REPL, we do not process empty inputs at all, to avoid
+        // unnecessarily incrementing the command counter
+        //
+        // But in scripts, we process empty inputs and create an empty object,
+        // to ensure that when the time comes to cache/load the class it exists
+        case Nil if skipEmpty => Res.Skip
         case postSplit =>
           complete(stmts.mkString(""), wrapperIndex, postSplit)
 
@@ -249,22 +257,24 @@ object Preprocessor{
           }
         }
 
-        val Seq(first, rest@_*) = allDecls
-        val allDeclsWithComments = Expanded(first.code, first.printer) +: rest
-        Res(
-          allDeclsWithComments.reduceOption { (a, b) =>
-            Expanded(
-              // We do not need to separate the code with our own semi-colons
-              // or newlines, as each expanded code snippet itself comes with
-              // it's own trailing newline/semicolons as a result of the
-              // initial split
-              a.code + b.code,
-              a.printer ++ b.printer
+        allDecls match{
+          case Seq(first, rest@_*) =>
+            val allDeclsWithComments = Expanded(first.code, first.printer) +: rest
+            Res(
+              allDeclsWithComments.reduceOption { (a, b) =>
+                Expanded(
+                  // We do not need to separate the code with our own semi-colons
+                  // or newlines, as each expanded code snippet itself comes with
+                  // it's own trailing newline/semicolons as a result of the
+                  // initial split
+                  a.code + b.code,
+                  a.printer ++ b.printer
+                )
+              },
+              "Don't know how to handle " + code
             )
-          },
-          "Don't know how to handle " + code
-        )
-
+          case Nil => Res.Success(Expanded("", Nil))
+        }
       }
     }
   }

@@ -96,7 +96,7 @@ class Interpreter(val printer: Printer,
   // to it even if it's half built
   var predefImports = Imports()
   PredefInitialization.apply(
-    extraBridges :+ ("ammonite.interp.InterpBridge", "interp", interpApi),
+    ("ammonite.interp.InterpBridge", "interp", interpApi) +: extraBridges,
     interpApi,
     eval.evalClassloader,
     storage,
@@ -115,13 +115,12 @@ class Interpreter(val printer: Printer,
     val strippedPrefix = tree.prefix.takeWhile(_(0) == '$').map(_.stripPrefix("$"))
     val hookOpt = importHooks().collectFirst{case (k, v) if strippedPrefix.startsWith(k) => (k, v)}
     for{
-      (hookPrefix, hook) <- Res(hookOpt, "Import Hook could not be resolved")
+      (hookPrefix, hook) <- Res(hookOpt, s"Import Hook ${tree.prefix} could not be resolved")
       hooked <- Res(
         hook.handle(source, tree.copy(prefix = tree.prefix.drop(hookPrefix.length)), this)
       )
       hookResults <- Res.map(hooked){
         case res: ImportHook.Result.Source =>
-          res.codeSource.path.foreach(interpApi.watch)
           for{
             processed <- processModule(
               res.code, res.codeSource,
@@ -144,54 +143,63 @@ class Interpreter(val printer: Printer,
 
           Res.Success(Imports())
       }
-    } yield {
-      hookResults
-    }
+    } yield hookResults
   }
 
-  def resolveImportHooks(source: CodeSource,
-                         stmts: Seq[String]): Res[ImportHookInfo] = {
-      val hookedStmts = mutable.Buffer.empty[String]
-      val importTrees = mutable.Buffer.empty[ImportTree]
-      for(stmt <- stmts) {
-        Parsers.ImportSplitter.parse(stmt) match{
-          case f: Parsed.Failure => hookedStmts.append(stmt)
-          case Parsed.Success(parsedTrees, _) =>
-            var currentStmt = stmt
-            for(importTree <- parsedTrees){
-              if (importTree.prefix(0)(0) == '$') {
-                val length = importTree.end - importTree.start
-                currentStmt = currentStmt.patch(
-                  importTree.start, (importTree.prefix(0) + ".$").padTo(length, ' '), length
-                )
-                importTrees.append(importTree)
-              }
+  def parseImportHooks(source: CodeSource, stmts: Seq[String]) = {
+    val hookedStmts = mutable.Buffer.empty[String]
+    val importTrees = mutable.Buffer.empty[ImportTree]
+    for(stmt <- stmts) {
+      Parsers.ImportSplitter.parse(stmt) match{
+        case f: Parsed.Failure => hookedStmts.append(stmt)
+        case Parsed.Success(parsedTrees, _) =>
+          var currentStmt = stmt
+          for(importTree <- parsedTrees){
+            if (importTree.prefix(0)(0) == '$') {
+              val length = importTree.end - importTree.start
+              currentStmt = currentStmt.patch(
+                importTree.start, (importTree.prefix(0) + ".$").padTo(length, ' '), length
+              )
+              importTrees.append(importTree)
             }
-            hookedStmts.append(currentStmt)
-        }
+          }
+          hookedStmts.append(currentStmt)
       }
-
-      for (hookImports <- Res.map(importTrees)(resolveSingleImportHook(source, _)))
-      yield ImportHookInfo(
-        Imports(hookImports.flatten.flatMap(_.value)),
-        hookedStmts,
-        importTrees
-      )
     }
+    (hookedStmts, importTrees)
+  }
+
+  def resolveImportHooks(importTrees: Seq[ImportTree],
+                         hookedStmts: Seq[String],
+                         source: CodeSource): Res[ImportHookInfo] = {
+
+    for (hookImports <- Res.map(importTrees)(resolveSingleImportHook(source, _)))
+    yield ImportHookInfo(
+      Imports(hookImports.flatten.flatMap(_.value)),
+      hookedStmts,
+      importTrees
+    )
+  }
 
   def processLine(code: String, stmts: Seq[String], fileName: String): Res[Evaluated] = {
 
     val wrapperName = Name("cmd" + eval.getCurrentLine)
 
+    val codeSource = CodeSource(
+      wrapperName,
+      Seq(),
+      Seq(Name("ammonite"), Name("$file")),
+      Some(wd/"(console)")
+    )
+    val (hookStmts, importTrees) = parseImportHooks(codeSource, stmts)
     for{
       _ <- Catching { case ex =>
         Res.Exception(ex, "Something unexpected went wrong =(")
       }
-
       ImportHookInfo(hookImports, hookStmts, _) <- resolveImportHooks(
-
-        CodeSource(wrapperName, Seq(), Seq(Name("ammonite"), Name("$file")), Some(wd/"(console)")),
-        stmts
+        importTrees,
+        hookStmts,
+        codeSource
       )
 
       processed <- compilerManager.preprocess.transform(
@@ -202,7 +210,8 @@ class Interpreter(val printer: Printer,
         wrapperName,
         predefImports ++ eval.imports ++ hookImports,
         prints => s"ammonite.repl.ReplBridge.value.Internal.combinePrints($prints)",
-        extraCode = ""
+        extraCode = "",
+        skipEmpty = true
       )
       (out, tag) <- evaluateLine(
         processed, printer,
@@ -234,7 +243,7 @@ class Interpreter(val printer: Printer,
   }
 
 
-  def processScriptBlock(processed: Preprocessor.Output,
+  def processSingleBlock(processed: Preprocessor.Output,
                          codeSource0: CodeSource,
                          indexedWrapperName: Name) = {
 
@@ -304,12 +313,12 @@ class Interpreter(val printer: Printer,
               )
           }
 
-          data <- processCorrectScript(
+          data <- processAllScriptBlocks(
             blocks,
             splittedScript,
             predefImports,
             codeSource,
-            processScriptBlock(_, codeSource, _),
+            processSingleBlock(_, codeSource, _),
             autoImport,
             extraCode
           )
@@ -329,7 +338,7 @@ class Interpreter(val printer: Printer,
 
   def processExec(code: String): Res[Imports] = for {
     blocks <- Preprocessor.splitScript(Interpreter.skipSheBangLine(code))
-    processedData <- processCorrectScript(
+    processedData <- processAllScriptBlocks(
       blocks.map(_ => None),
       Res.Success(blocks),
       eval.imports,
@@ -359,13 +368,13 @@ class Interpreter(val printer: Printer,
 
 
 
-  def processCorrectScript(blocks: Seq[BlockData],
-                           splittedScript: => Res[IndexedSeq[(String, Seq[String])]],
-                           startingImports: Imports,
-                           codeSource: CodeSource,
-                           evaluate: (Preprocessor.Output, Name) => Res[(Evaluated, Tag)],
-                           autoImport: Boolean,
-                           extraCode: String): Res[ScriptOutput.Metadata] = {
+  def processAllScriptBlocks(blocks: Seq[BlockData],
+                             splittedScript: => Res[IndexedSeq[(String, Seq[String])]],
+                             startingImports: Imports,
+                             codeSource: CodeSource,
+                             evaluate: (Preprocessor.Output, Name) => Res[(Evaluated, Tag)],
+                             autoImport: Boolean,
+                             extraCode: String): Res[ScriptOutput.Metadata] = {
 
     // we store the old value, because we will reassign this in the loop
     val outerScriptImportCallback = scriptImportCallback
@@ -431,7 +440,8 @@ class Interpreter(val printer: Printer,
               indexedWrapperName,
               scriptImports ++ hookInfo.imports,
               _ => "scala.Iterator[String]()",
-              extraCode = extraCode
+              extraCode = extraCode,
+              skipEmpty = false
             )
 
             (ev, tag) <- evaluate(processed, indexedWrapperName)
@@ -444,30 +454,42 @@ class Interpreter(val printer: Printer,
         }
 
 
-        val res = blocks.head match{
-          case None  =>
-            for{
-              allSplittedChunks <- splittedScript
-              (leadingSpaces, stmts) = allSplittedChunks(wrapperIndex - 1)
-              hookInfo <- resolveImportHooks(codeSource, stmts)
-              res <- compileRunBlock(leadingSpaces, hookInfo)
-            } yield res
 
-          case Some((classFiles, blockMetadata)) =>
-            blockMetadata.hookInfo.trees.foreach(resolveSingleImportHook(codeSource, _))
-            val envHash = Interpreter.cacheTag(eval.evalClassloader.classpathHash)
-            if (envHash != blockMetadata.id.tag.env) {
-              compileRunBlock(blockMetadata.leadingSpaces, blockMetadata.hookInfo)
-            } else{
-              compilerManager.addToClasspath(classFiles)
+        val cachedLoaded = for{
+          (classFiles, blockMetadata) <- blocks.head
+          // We don't care about the results of resolving the import hooks;
+          // Assuming they still *can* be resolved, the `envHash` check will
+          // ensure re-compile this block if the contents of any import hook
+          // changes
+          if resolveImportHooks(
+            blockMetadata.hookInfo.trees,
+            blockMetadata.hookInfo.stmts,
+            codeSource
+          ).isInstanceOf[Res.Success[_]]
+        } yield {
+          val envHash = Interpreter.cacheTag(eval.evalClassloader.classpathHash)
+          if (envHash != blockMetadata.id.tag.env) {
+            compileRunBlock(blockMetadata.leadingSpaces, blockMetadata.hookInfo)
+          } else{
+            compilerManager.addToClasspath(classFiles)
 
-              val cls = eval.loadClass(blockMetadata.id.wrapperPath, classFiles)
-              val evaluated =
-                try cls.map(eval.evalMain(_))
-                catch Evaluator.userCodeExceptionHandler
+            val cls = eval.loadClass(blockMetadata.id.wrapperPath, classFiles)
+            val evaluated =
+              try cls.map(eval.evalMain(_))
+              catch Evaluator.userCodeExceptionHandler
 
-              evaluated.map(_ => blockMetadata)
-            }
+            evaluated.map(_ => blockMetadata)
+          }
+        }
+
+        val res = cachedLoaded.getOrElse{
+          for{
+            allSplittedChunks <- splittedScript
+            (leadingSpaces, stmts) = allSplittedChunks(wrapperIndex - 1)
+            (hookStmts, importTrees) = parseImportHooks(codeSource, stmts)
+            hookInfo <- resolveImportHooks(importTrees, hookStmts, codeSource)
+            res <- compileRunBlock(leadingSpaces, hookInfo)
+          } yield res
         }
 
         res match{

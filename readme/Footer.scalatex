@@ -1293,3 +1293,11 @@
           The @code{repl.colors} builtin has been moved to @code{interp.colors},
           and allows you to fine-grained customize colors for e.g. error
           messages and info messages when running scripts.
+
+        @li
+          Using @hl.scala{import $file} on an empty script files no longer
+          causes spurious errors
+
+        @li
+          Caches are properly invalidated if a script you @hl.scala{import $file}
+          is deleted

@@ -212,13 +212,14 @@ object CachingTests extends TestSuite{
       val storage = new Storage.Folder(storageFolder)
       def runScript(script: Path, expectedCount: Int) = {
         val interp = createTestInterp(storage)
-        Scripts.runScript(script / up, script, interp, Nil)
+        val res = Scripts.runScript(script / up, script, interp, Nil)
 
         val count = interp.compilationCount
         assert(count == expectedCount)
+        res
       }
-      def createScript(s: String, dir: Path = null)(implicit name: sourcecode.Name) = {
-        val tmpFile = tmp(s, dir = dir, suffix = name.value + ".sc", prefix = "script")
+      def createScript(s: String, dir: Path = null, name: String) = {
+        val tmpFile = tmp(s, dir = dir, suffix = name + ".sc", prefix = "script")
         val ident = tmpFile.last.stripSuffix(".sc")
         (tmpFile, ident)
       }
@@ -229,7 +230,8 @@ object CachingTests extends TestSuite{
           """println("barr")
             |val x = 1
             |
-          """.stripMargin
+          """.stripMargin,
+          name = "upstream"
         )
 
         val (downstream, _) = createScript(
@@ -238,7 +240,8 @@ object CachingTests extends TestSuite{
             |
             |println($upstreamIdent.x)
           """.stripMargin,
-          dir = upstream/up
+          dir = upstream/up,
+          name = "downstream"
         )
 
 
@@ -247,7 +250,7 @@ object CachingTests extends TestSuite{
         runScript(downstream, 0)
         runScript(downstream, 0)
 
-        // Make sure when we change the upstream code, the downstream sscript
+        // Make sure when we change the upstream code, the downstream script
         // recompiles too
         ammonite.ops.write.over(
           upstream,
@@ -275,13 +278,56 @@ object CachingTests extends TestSuite{
         runScript(downstream, 1)
         runScript(downstream, 0)
         runScript(downstream, 0)
+
+        // If upstream gets deleted, make sure the $file import fails to resolve
+        rm(upstream)
+
+        val Res.Failure(_, msg1) = runScript(downstream, 0)
+
+        assert(msg1.startsWith("Cannot resolve $file import"))
+        val Res.Failure(_, msg2) = runScript(downstream, 0)
+        assert(msg2.startsWith("Cannot resolve $file import"))
+
+        // And make sure that if the upstream re-appears with the exact same code,
+        // the file import starts working again without needing compilation
+        ammonite.ops.write.over(
+          upstream,
+          """println("barr")
+            |val x = 2
+            |
+          """.stripMargin
+        )
+
+        runScript(downstream, 0)
+        runScript(downstream, 0)
+
+        // But if it gets deleted and re-appears with different contents, both
+        // upstream and downstream need to be recompiled
+        rm(upstream)
+
+        val Res.Failure(_, msg3) = runScript(downstream, 0)
+
+        assert(msg3.startsWith("Cannot resolve $file import"))
+
+        ammonite.ops.write.over(
+          upstream,
+          """println("Hohohoho")
+            |val x = 2
+            |
+          """.stripMargin
+        )
+
+        runScript(downstream, 2)
+        runScript(downstream, 0)
       }
+
       'diamond{
         val (upstream, upstreamIdent) = createScript(
           """println("uppstreamm")
             |val x = 1
             |
-          """.stripMargin
+          """.stripMargin,
+          name = "upstream"
         )
 
         val (middleA, middleAIdent) = createScript(
@@ -290,7 +336,8 @@ object CachingTests extends TestSuite{
              |val a = $upstreamIdent.x + 1
              |
            """.stripMargin,
-          dir = upstream/up
+          dir = upstream/up,
+          name = "middleA"
         )
 
         val (middleB, middleBIdent) = createScript(
@@ -299,7 +346,8 @@ object CachingTests extends TestSuite{
              |val b = $upstreamIdent.x + 2
              |
            """.stripMargin,
-          dir = upstream/up
+          dir = upstream/up,
+          name = "middleB"
         )
 
         val (downstream, _) = createScript(
@@ -308,7 +356,8 @@ object CachingTests extends TestSuite{
              |println("downstreammm")
              |println($middleAIdent.a + $middleBIdent.b)
           """.stripMargin,
-          dir = upstream/up
+          dir = upstream/up,
+          name = "downstream"
         )
 
 

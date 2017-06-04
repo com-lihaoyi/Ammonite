@@ -37,6 +37,7 @@ object ImportHook{
     */
   trait InterpreterInterface{
     def loadIvy(coordinates: coursier.Dependency*): Either[String, Set[File]]
+    def watch(p: Path): Unit
   }
 
   /**
@@ -62,21 +63,24 @@ object ImportHook{
       tree.prefix
         .map{case ammonite.util.Util.upPathSegment => up; case x => ammonite.ops.empty/x}
         .reduce(_/_)
+
     val relativeModules = tree.mappings match{
       case None => Seq(relative -> None)
       case Some(mappings) => for((k, v) <- mappings) yield relative/k -> v
     }
-    def relToFile(x: RelPath) = {
-      val base = currentScriptPath/up/x/up/x.last
-      extensions.find(ext => exists! base/up/(x.last + ext)) match{
-        case Some(p) => Right(base/up/(x.last + p): Path)
+
+    def relToFile(relative: RelPath) = {
+      val base = currentScriptPath/up/relative
+      extensions.find(ext => exists! base/up/(relative.last + ext)) match{
+        case Some(p) => Right(base/up/(relative.last + p): Path)
         case None => Left(base)
       }
-
     }
+
     val resolved = relativeModules.map(x => relToFile(x._1))
     val missing = resolved.collect{case Left(p) => p}
     val files = resolved.collect{case Right(p) => p}
+
     (relativeModules, files, missing)
   }
   class SourceHook(exec: Boolean) extends ImportHook {
@@ -93,8 +97,11 @@ object ImportHook{
             tree, currentScriptPath, Seq(".sc")
           )
 
-          if (missing.nonEmpty) Left("Cannot resolve $file import: " + missing.mkString(", "))
-          else {
+          files.foreach(interp.watch)
+          missing.foreach(x => interp.watch(x/up/(x.last + ".sc")))
+          if (missing.nonEmpty) {
+            Left("Cannot resolve $file import: " + missing.map(_ + ".sc").mkString(", "))
+          } else {
             Right(
               for(((relativeModule, rename), filePath) <- relativeModules.zip(files)) yield {
 
