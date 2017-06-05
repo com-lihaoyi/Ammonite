@@ -1228,7 +1228,7 @@ target
 terminal
 .travis.yml
 
-real	0m0.004s
+real	0m0.003s
 user	0m0.000s
 sys	0m0.000s</pre><pre><span>Compiling /home/travis/build/lihaoyi/Ammonite/shell/src/main/resources/ammonite/shell/example-predef-bare.sc
 Compiling /home/travis/build/lihaoyi/Ammonite/shell/src/main/resources/ammonite/shell/example-predef-bare.sc #2
@@ -1244,7 +1244,7 @@ res0: (LsSeq, concurrent.duration.FiniteDuration) = (
 'LICENSE            'deploy_key         'readme             'terminal
 'amm                'integration        &quot;readme.md&quot;
 ,
-  9333541 nanoseconds
+  17741789 nanoseconds
 )</span></pre></div>
 
           <p>
@@ -2383,7 +2383,7 @@ Available subcommands:
   functionB
     --i     Int
     --s     String
-    --path  ammonite.ops.Path (default $pwd)</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/amm/src/test/scala/ammonite/main/MainTests.scala#L65-L75" target="_blank"><i class="fa fa-link "></i></a></pre>
+    --path  ammonite.ops.Path (default $pwd)</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/amm/src/test/scala/ammonite/main/MainTests.scala#L75-L85" target="_blank"><i class="fa fa-link "></i></a></pre>
 
       <p>
         You can add docs via
@@ -2422,7 +2422,7 @@ Available subcommands:
     --i     Int: how many times to repeat the string to make it very very long,
             more than it originally was
     --s     String: the string to repeat
-    --path  ammonite.ops.Path (default $pwd)</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/amm/src/test/scala/ammonite/main/MainTests.scala#L85-L96" target="_blank"><i class="fa fa-link "></i></a></pre>
+    --path  ammonite.ops.Path (default $pwd)</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/amm/src/test/scala/ammonite/main/MainTests.scala#L95-L106" target="_blank"><i class="fa fa-link "></i></a></pre>
 
     <h2 id="BundledLibraries" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#BundledLibraries" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Bundled Libraries</h2>
       <p>
@@ -3950,15 +3950,15 @@ HELLO
 </p>
       <div><pre><span style="color: #8e44ad;">
 bash$ </span>git branch
-* (detached from 6999ec7)
+* (detached from 7265b89)
   master</pre><pre><span>@ %git 'branch 
-* (detached from 6999ec7)
+* (detached from 7265b89)
   master
 </span></pre></div>
       <div><pre><span style="color: #8e44ad;">
 bash$ </span>date
-Sun Jun  4 18:20:11 UTC 2017</pre><pre><span>@ %date 
-Sun Jun  4 18:20:17 UTC 2017
+Mon Jun  5 02:56:48 UTC 2017</pre><pre><span>@ %date 
+Mon Jun  5 02:56:54 UTC 2017
 </span></pre></div>
 
       <p>
@@ -4148,9 +4148,9 @@ Hello from Java!
 @ import java.util._ 
 import java.util._
 @ val date = new Date() 
-date: Date = Sun Jun 04 18:22:12 UTC 2017
+date: Date = Mon Jun 05 02:58:50 UTC 2017
 @ date.getDay() 
-res3: Int = 0</span></pre>
+res3: Int = 1</span></pre>
 
       <p>
         In fact, Ammonite-Shell allows you to ask for any published third-party Java/Scala library for usage in the shell, and have them downloaded, automatically cached, and made available for use. e.g. we can load popular libraries like <a href="https://github.com/google/guava">Google Guava</a> and using it in the shell:
@@ -5888,15 +5888,15 @@ try {
       The page above contains the documentation for the latest stable version
       of Ammonite, <code>0.9.9</code>. Ammonite also publishes
       unstable versions, the latest of which is
-      <code>COMMIT-6999ec7</code> and is available for direct
+      <code>COMMIT-7265b89</code> and is available for direct
       download:
 </p>
-    <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/vHamg &amp;&amp; sudo chmod +x /usr/local/bin/amm &amp;&amp; amm
+    <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/vHawR &amp;&amp; sudo chmod +x /usr/local/bin/amm &amp;&amp; amm
 </code></pre>
     <p>
       Or usage in an SBT project
 </p>
-    <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;COMMIT-6999ec7&quot; % &quot;test&quot; cross CrossVersion.full
+    <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;COMMIT-7265b89&quot; % &quot;test&quot; cross CrossVersion.full
 
 initialCommands in (Test, console) := &quot;&quot;&quot;ammonite.Main().run()&quot;&quot;&quot;
 </code></pre>
@@ -5906,13 +5906,13 @@ initialCommands in (Test, console) := &quot;&quot;&quot;ammonite.Main().run()&qu
 </p>
     
       <b>
-        Scala snapshot-commit-uploads/2.10-COMMIT-6999ec7
+        Scala snapshot-commit-uploads/2.10-COMMIT-7265b89
 </b>
-      <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/vHam2 &amp;&amp; sudo chmod +x /usr/local/bin/amm &amp;&amp; amm</code></pre>
+      <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/vHaw0 &amp;&amp; sudo chmod +x /usr/local/bin/amm &amp;&amp; amm</code></pre>
       <b>
-        Scala snapshot-commit-uploads/2.11-COMMIT-6999ec7
+        Scala snapshot-commit-uploads/2.11-COMMIT-7265b89
 </b>
-      <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/vHama &amp;&amp; sudo chmod +x /usr/local/bin/amm &amp;&amp; amm</code></pre>
+      <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/vHawE &amp;&amp; sudo chmod +x /usr/local/bin/amm &amp;&amp; amm</code></pre>
     <p>
       These unstable versions will contain any brand-new features that are
       currently being worked on, with the caveat that they are unstable and
