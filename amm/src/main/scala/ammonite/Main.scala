@@ -48,11 +48,9 @@ import scala.annotation.tailrec
   *                    but it could come from somewhere else e.g. across the
   *                    network in the case of the SshdRepl
   * @param outputStream Primary output of code run using Ammonite
-  * @param infoStream Miscellaneous logging output when running Ammonite. This
-  *                   is typically stuff you want to see when running interactively,
-  *                   but not something you want to see when e.g. you forward a
-  *                   script's output to a file. This by default it goes to System.err
-  * @param errorStream Error output when things go bad, typically System.err
+  * @param errorStream Error output when things go bad, typically System.err; also
+  *                    gets sent miscellaneous info messages that aren't strictly
+  *                    part of the REPL or script's output
   */
 case class Main(predef: String = "",
                 defaultPredef: Boolean = true,
@@ -61,7 +59,6 @@ case class Main(predef: String = "",
                 welcomeBanner: Option[String] = Some(Defaults.welcomeBanner),
                 inputStream: InputStream = System.in,
                 outputStream: OutputStream = System.out,
-                infoStream: OutputStream = System.err,
                 errorStream: OutputStream = System.err,
                 verboseOutput: Boolean = true,
                 remoteLogging: Boolean = true,
@@ -78,7 +75,7 @@ case class Main(predef: String = "",
     )
 
     new Repl(
-      inputStream, outputStream, infoStream, errorStream,
+      inputStream, outputStream, errorStream,
       storage = storageBackend,
       defaultPredef = augmentedPredef,
       mainPredef = predef,
@@ -96,7 +93,6 @@ case class Main(predef: String = "",
     val (colorsRef, _, _, printer) = Interpreter.initPrinters(
       colors,
       outputStream,
-      infoStream,
       errorStream,
       verboseOutput
     )
@@ -348,7 +344,6 @@ class MainRunner(cliConfig: Cli.Config,
     },
     inputStream = stdIn,
     outputStream = stdOut,
-    infoStream = stdErr,
     errorStream = stdErr,
     welcomeBanner = cliConfig.welcomeBanner,
     verboseOutput = cliConfig.verboseOutput,

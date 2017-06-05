@@ -5,6 +5,8 @@
 package ammonite.util
 
 
+import java.io.{PrintStream, PrintWriter}
+
 import ammonite.ops.Path
 
 import scala.reflect.NameTransformer
@@ -249,7 +251,8 @@ object Bind{
   * @param info How you want to print compile info logging. *Not* the same
   *             as `out`, which is used to print runtime output.
   */
-case class Printer(out: String => Unit,
+case class Printer(outStream: PrintStream,
+                   errStream: PrintStream,
                    warning: String => Unit,
                    error: String => Unit,
                    info: String => Unit)

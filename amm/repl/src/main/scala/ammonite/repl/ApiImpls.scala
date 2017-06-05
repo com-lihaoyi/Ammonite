@@ -91,8 +91,8 @@ trait ReplApiImpl extends FullReplAPI{
         indent = if (indent == null) pprinter().defaultIndent else indent
       )
       .map(_.render)
-      .foreach(printer.out)
-    printer.out(newLine)
+      .foreach(printer.outStream.print)
+    printer.outStream.print(newLine)
   }
 
   def sess: SessionApiImpl

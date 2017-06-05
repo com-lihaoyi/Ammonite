@@ -68,7 +68,7 @@ object SshdRepl {
           ammonite.main.Defaults.predefString
         )
         new Repl(
-          in, out, out, out,
+          in, out, out,
           new Storage.Folder(homePath), augmentedPredef, predef,
           wd, Some(ammonite.main.Defaults.welcomeBanner),
           remoteLogger = None

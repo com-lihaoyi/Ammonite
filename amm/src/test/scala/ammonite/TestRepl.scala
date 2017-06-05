@@ -1,5 +1,7 @@
 package ammonite
 
+import java.io.PrintStream
+
 import ammonite.interp.Interpreter
 import ammonite.repl.{FrontEnd, Repl, ReplApiImpl, SessionApiImpl}
 import ammonite.runtime.{History, Storage}
@@ -20,12 +22,20 @@ class TestRepl {
     java.nio.file.Files.createTempDirectory("ammonite-tester")
   )
 
-  val outBuffer = mutable.Buffer.empty[String]
+
+  import java.io.ByteArrayOutputStream
+  import java.io.PrintStream
+
+  val outBytes = new ByteArrayOutputStream
+  val errBytes = new ByteArrayOutputStream
+  def outString = new String(outBytes.toByteArray)
+
   val warningBuffer = mutable.Buffer.empty[String]
   val errorBuffer = mutable.Buffer.empty[String]
   val infoBuffer = mutable.Buffer.empty[String]
   val printer = Printer(
-    outBuffer.append(_),
+    new PrintStream(outBytes),
+    new PrintStream(errBytes),
     x => warningBuffer.append(x + Util.newLine),
     x => errorBuffer.append(x + Util.newLine),
     x => infoBuffer.append(x + Util.newLine)
@@ -72,7 +82,7 @@ class TestRepl {
 
   }catch{ case e: Throwable =>
     println(infoBuffer.mkString)
-    println(outBuffer.mkString)
+    println(outString)
     println(warningBuffer.mkString)
     println(errorBuffer.mkString)
     throw e
@@ -186,7 +196,7 @@ class TestRepl {
 
   def run(input: String, index: Int) = {
 
-    outBuffer.clear()
+    outBytes.reset()
     warningBuffer.clear()
     errorBuffer.clear()
     infoBuffer.clear()
@@ -207,7 +217,7 @@ class TestRepl {
     interp.handleOutput(processed)
     (
       processed,
-      outBuffer.mkString,
+      outString,
       warningBuffer.mkString,
       errorBuffer.mkString,
       infoBuffer.mkString

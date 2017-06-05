@@ -1,6 +1,6 @@
 package ammonite.interp
 
-import java.io.{File, OutputStream, PrintStream}
+import java.io.{File, OutputStream, PrintStream, PrintWriter}
 import java.util.regex.Pattern
 
 import scala.collection.mutable
@@ -561,7 +561,8 @@ class Interpreter(val printer: Printer,
         ammonite.runtime.tools.IvyThing.resolveArtifact(
           interpApi.repositories(),
           coordinates,
-          verbose = verboseOutput
+          verbose = verboseOutput,
+          output = printer.errStream
         )match{
           case (srcWarnings, Right(loaded)) =>
             srcWarnings.foreach(printer.info)
@@ -575,9 +576,8 @@ class Interpreter(val printer: Printer,
             Left(l)
         }
     }
-
-
   }
+
   abstract class DefaultLoadJar extends LoadJar {
     def handleClasspath(jar: File): Unit
 
@@ -699,23 +699,22 @@ object Interpreter{
 
   def initPrinters(colors0: Colors,
                    output: OutputStream,
-                   info: OutputStream,
                    error: OutputStream,
                    verboseOutput: Boolean) = {
     val colors = Ref[Colors](colors0)
     val printStream = new PrintStream(output, true)
     val errorPrintStream = new PrintStream(error, true)
-    val infoPrintStream = new PrintStream(info, true)
 
     def printlnWithColor(stream: PrintStream, color: fansi.Attrs, s: String) = {
       stream.println(color(s).render)
     }
 
     val printer = Printer(
-      printStream.print,
+      printStream,
+      errorPrintStream,
       printlnWithColor(errorPrintStream, colors().warning(), _),
       printlnWithColor(errorPrintStream, colors().error(), _),
-      s => if (verboseOutput) printlnWithColor(infoPrintStream, colors().info(), s)
+      s => if (verboseOutput) printlnWithColor(errorPrintStream, colors().info(), s)
     )
     (colors, printStream, errorPrintStream, printer)
   }

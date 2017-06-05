@@ -12,7 +12,6 @@ import scala.annotation.tailrec
 
 class Repl(input: InputStream,
            output: OutputStream,
-           info: OutputStream,
            error: OutputStream,
            storage: Storage,
            defaultPredef: String,
@@ -32,7 +31,7 @@ class Repl(input: InputStream,
   var history = new History(Vector())
 
   val (colors, printStream, errorPrintStream, printer) =
-    Interpreter.initPrinters(initialColors, output, info, error, true)
+    Interpreter.initPrinters(initialColors, output, error, true)
 
   val argString = replArgs.zipWithIndex.map{ case (b, idx) =>
     s"""

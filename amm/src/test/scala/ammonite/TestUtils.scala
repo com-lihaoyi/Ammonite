@@ -1,5 +1,7 @@
 package ammonite
 
+import java.io.PrintStream
+
 import ammonite.interp.Interpreter
 import ammonite.runtime.{History, Storage}
 import ammonite.util._
@@ -11,7 +13,10 @@ object TestUtils {
   def scala2_12 = scala.util.Properties.versionNumberString.contains("2.12")
 
   def createTestInterp(storage: Storage, predef: String = "") = new Interpreter(
-    printer = Printer(println, println, println, println),
+    printer = Printer(
+      new PrintStream(System.out), new PrintStream(System.err),
+      println, println, println
+    ),
     storage = storage,
     wd = ammonite.ops.pwd,
     // Provide a custom predef so we can verify in tests that the predef gets cached
