@@ -125,6 +125,7 @@ object BasicTests extends TestSuite{
       assert(output == "amm/src")
     }
 
+    // Ensure we can load the source code of the built-in Java standard library
     'source{
       // This fails on windows because for some reason the windows subprocess
       // interface eats the double-quotes inside the `-c` argument, even though
@@ -147,6 +148,12 @@ object BasicTests extends TestSuite{
           """.stripMargin
         )
       }
+    }
+
+    // Ensure we can load the source code of external libraries, which needs to
+    // get pulled down together with the library code when you `import $ivy`
+    'sourceExternal{
+      exec('basic / "SourceDownload.sc")
     }
 
     'classloaders{

@@ -57,8 +57,8 @@ object IvyThing{
     }else {
       def load(artifacts: Seq[coursier.Artifact]) = {
 
-        val loadedArtifacts= scalaz.concurrent.Task.gatherUnordered(
-          for (a <- resolution.artifacts)
+        val loadedArtifacts = scalaz.concurrent.Task.gatherUnordered(
+          for (a <- artifacts)
             yield coursier.Cache.file(a, logger = logger).run
         ).run
 
