@@ -301,11 +301,6 @@ class MainRunner(cliConfig: Cli.Config,
         printError(msg)
         false
       case Res.Exception(ex, s) =>
-        val trace = ex.getStackTrace
-        val i = trace.indexWhere(_.getMethodName == "$main") + 1
-        ex.setStackTrace(trace.take(i))
-        val sw = new java.io.StringWriter
-        ex.printStackTrace(new java.io.PrintWriter(sw))
         errPrintStream.println(
           Repl.showException(ex, colors.error(), fansi.Attr.Reset, colors.literal())
         )

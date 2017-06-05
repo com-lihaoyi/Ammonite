@@ -1,5 +1,6 @@
 package ammonite.main
 
+import ammonite.TestUtils
 import ammonite.ops._
 import ammonite.util.Util
 import utest._
@@ -25,6 +26,15 @@ object MainTests extends TestSuite{
     'hello{
       val evaled = exec("Hello.sc")
       assert(evaled.out.trim == "Hello World")
+    }
+
+    'compilerCrash{
+      if(!TestUtils.scala2_12){
+        val evaled = exec("CompilerCrash.sc")
+        // Make sure we do not accidentally lose the stack trace in the case
+        // where the script fails during compilation before entering the evaluator
+        assert(evaled.err.lines.length > 50)
+      }
     }
 
     // Not really related to main methods, but related since most of the main
