@@ -45,7 +45,7 @@ val sharedSettings = Seq(
   autoCompilerPlugins := true,
   addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.7"),
   ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) },
-  parallelExecution in Test := !scalaVersion.value.contains("2.10"),
+  parallelExecution in Test := false,
   (unmanagedSources in Compile) += (baseDirectory in ThisBuild).value/"project"/"Constants.scala",
   mappings in (Compile, packageSrc) += {
     ((baseDirectory in ThisBuild).value/".."/"project"/"Constants.scala") -> "Constants.scala"
@@ -193,8 +193,7 @@ lazy val amm = project
       import sys.process._
       Seq("chmod", "+x", dest.getAbsolutePath).!
       dest
-    },
-    parallelExecution in Test := false
+    }
   )
 
 lazy val ammUtil = project
