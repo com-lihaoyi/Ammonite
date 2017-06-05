@@ -52,7 +52,7 @@ def updateConstants(version: String = buildVersion,
   println(read! cwd/'project/"Constants.scala")
 }
 
-def publishSigned() = {
+def publishSigned(cross: Boolean, prefixes: Seq[String]) = {
   val creds = s"""
     (credentials in ThisBuild) += Credentials("Sonatype Nexus Repository Manager",
         "oss.sonatype.org",
@@ -69,16 +69,19 @@ def publishSigned() = {
   write(cwd/"pubring.asc", sys.env("SONATYPE_PGP_PUB_KEY_CONTENTS").replace("\\n", "\n"))
 
 
-  for (version <- latestMajorVersions) {
-    %sbt("++" + version, "singleCrossBuilt/publishSigned")
+  if(!cross){
+
+    for (version <- latestMajorVersions if prefixes.exists(version.startsWith)) {
+      %sbt("++" + version, "singleCrossBuilt/publishSigned")
+    }
+  }else{
+
+    for (version <- allVersions if prefixes.exists(version.startsWith)) {
+      %sbt("++" + version, "fullCrossBuilt/publishSigned")
+    }
   }
 
-  for (version <- allVersions) {
-    %sbt("++" + version, "fullCrossBuilt/publishSigned")
-  }
-  %sbt("sonatypeReleaseAll")
 }
-
 
 
 def publishDocs() = {
@@ -199,24 +202,40 @@ def docs() = {
   }
 }
 
+// Shard this across
+//
+// - Cross-built artifacts or non-cross-built artifacts
+// - Scala-versions
 @main
-def artifacts() = {
+def artifacts(cross: Boolean, prefixes: String*) = {
+
   if (isMasterCommit){
     println("MASTER COMMIT: Updating version and publishing to Maven Central")
     updateConstants()
-    publishSigned()
+    publishSigned(cross, prefixes)
   }else{
     println("MISC COMMIT: Compiling all Scala code across versions for verification")
-    for (version <- latestMajorVersions) {
-      %sbt("++" + version, "singleCrossBuilt/package")
-      %sbt("++" + version, "singleCrossBuilt/packageSrc")
-    }
-    for (version <- allVersions) {
-      %sbt("++" + version, "fullCrossBuilt/package")
-      %sbt("++" + version, "fullCrossBuilt/packageSrc")
+    if(!cross){
+
+      for (version <- latestMajorVersions if prefixes.exists(version.startsWith)) {
+
+        %sbt("++" + version, "singleCrossBuilt/package")
+        %sbt("++" + version, "singleCrossBuilt/packageSrc")
+      }
+    }else{
+
+      for (version <- allVersions if prefixes.exists(version.startsWith)) {
+        %sbt("++" + version, "fullCrossBuilt/package")
+        %sbt("++" + version, "fullCrossBuilt/packageSrc")
+      }
     }
   }
 
+}
+
+@main
+def sonatypeReleaseAll() = {
+  if (isMasterCommit) %sbt("sonatypeReleaseAll")
 }
 
 @main
