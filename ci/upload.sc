@@ -38,7 +38,7 @@ def apply(uploadedFile: Path,
   val res = Http(uploadUrl)
     .header("Content-Type", "application/octet-stream")
     .header("Authorization", "token " + authKey)
-    .timeout(connTimeoutMs = 1000, readTimeoutMs = 30000)
+    .timeout(connTimeoutMs = 5000, readTimeoutMs = 60000)
     .postData(read.bytes! uploadedFile)
     .asString
 

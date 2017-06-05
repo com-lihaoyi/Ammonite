@@ -84,7 +84,7 @@ script:
 - export PATH=~/bin/amm:$PATH
 - mkdir -p ~/bin
 # We use 2.11 since we need to run tests on Java 7
-- curl -L -o ~/bin/amm https://github.com/lihaoyi/Ammonite/releases/download/1.0.0-RC2/2.11-1.0.0-RC2 && chmod +x ~/bin/amm
+- if [ ! -f ~/bin/amm ]; then curl -L -o ~/bin/amm https://github.com/lihaoyi/Ammonite/releases/download/1.0.0-RC2/2.11-1.0.0-RC2 && chmod +x ~/bin/amm; fi
 - which amm
 # Memory-limit the CI script to avoid things being OOMKilled by Travis
 - java -jar -Xmx400m $(which amm) $CI_SCRIPT
@@ -105,6 +105,7 @@ cache:
   - $HOME/.ivy2/cache
   - $HOME/.coursier
   - $HOME/.nvm
+  - $HOME/bin
 
 before_cache:
   - du -h -d 1 $HOME/.ivy2/cache
