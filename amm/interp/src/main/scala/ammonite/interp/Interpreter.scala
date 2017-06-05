@@ -119,7 +119,7 @@ class Interpreter(val printer: Printer,
     watchedFiles.append(p -> Interpreter.mtimeIfExists(p))
   }
 
-  def resolveSingleImportHook(source: CodeSource, tree: ImportTree) = {
+  def resolveSingleImportHook(source: CodeSource, tree: ImportTree) = synchronized{
     val strippedPrefix = tree.prefix.takeWhile(_(0) == '$').map(_.stripPrefix("$"))
     val hookOpt = importHooks().collectFirst{case (k, v) if strippedPrefix.startsWith(k) => (k, v)}
     for{
@@ -154,7 +154,7 @@ class Interpreter(val printer: Printer,
     } yield hookResults
   }
 
-  def parseImportHooks(source: CodeSource, stmts: Seq[String]) = {
+  def parseImportHooks(source: CodeSource, stmts: Seq[String]) = synchronized{
     val hookedStmts = mutable.Buffer.empty[String]
     val importTrees = mutable.Buffer.empty[ImportTree]
     for(stmt <- stmts) {
@@ -179,7 +179,7 @@ class Interpreter(val printer: Printer,
 
   def resolveImportHooks(importTrees: Seq[ImportTree],
                          hookedStmts: Seq[String],
-                         source: CodeSource): Res[ImportHookInfo] = {
+                         source: CodeSource): Res[ImportHookInfo] = synchronized{
 
     for (hookImports <- Res.map(importTrees)(resolveSingleImportHook(source, _)))
     yield ImportHookInfo(
@@ -189,7 +189,9 @@ class Interpreter(val printer: Printer,
     )
   }
 
-  def processLine(code: String, stmts: Seq[String]): Res[Evaluated] = {
+  def processLine(code: String,
+                  stmts: Seq[String],
+                  silent: Boolean = false): Res[Evaluated] = synchronized{
 
     val wrapperName = Name("cmd" + eval.getCurrentLine)
 
@@ -221,7 +223,8 @@ class Interpreter(val printer: Printer,
       )
       (out, tag) <- evaluateLine(
         processed, printer,
-        wrapperName.encoded + ".sc", wrapperName
+        wrapperName.encoded + ".sc", wrapperName,
+        silent
       )
     } yield out.copy(imports = out.imports ++ hookImports)
   }
@@ -230,7 +233,8 @@ class Interpreter(val printer: Printer,
   def evaluateLine(processed: Preprocessor.Output,
                    printer: Printer,
                    fileName: String,
-                   indexedWrapperName: Name): Res[(Evaluated, Tag)] = {
+                   indexedWrapperName: Name,
+                   silent: Boolean = false): Res[(Evaluated, Tag)] = synchronized{
     for{
       _ <- Catching{ case e: ThreadDeath => Evaluator.interrupted(e) }
       (classFiles, newImports) <- compilerManager.compileClass(
@@ -242,7 +246,8 @@ class Interpreter(val printer: Printer,
         classFiles,
         newImports,
         printer,
-        indexedWrapperName
+        indexedWrapperName,
+        silent
       )
     } yield (res, Tag("", ""))
   }
@@ -250,7 +255,7 @@ class Interpreter(val printer: Printer,
 
   def processSingleBlock(processed: Preprocessor.Output,
                          codeSource0: CodeSource,
-                         indexedWrapperName: Name) = {
+                         indexedWrapperName: Name) = synchronized{
 
     val codeSource = codeSource0.copy(wrapperName = indexedWrapperName)
     val fullyQualifiedName = codeSource.jvmPathPrefix
@@ -284,7 +289,7 @@ class Interpreter(val printer: Printer,
                     codeSource: CodeSource,
                     autoImport: Boolean,
                     extraCode: String,
-                    hardcoded: Boolean): Res[ScriptOutput.Metadata] = {
+                    hardcoded: Boolean): Res[ScriptOutput.Metadata] = synchronized{
 
     alreadyLoadedFiles.get(codeSource) match{
       case Some(x) => Res.Success(x)
@@ -344,7 +349,7 @@ class Interpreter(val printer: Printer,
     }
   }
 
-  def processExec(code: String): Res[Imports] = {
+  def processExec(code: String): Res[Imports] = synchronized{
     val wrapperName = Name("cmd" + eval.getCurrentLine)
     val fileName = wrapperName.encoded + ".sc"
     for {
@@ -384,7 +389,7 @@ class Interpreter(val printer: Printer,
                              codeSource: CodeSource,
                              evaluate: (Preprocessor.Output, Name) => Res[(Evaluated, Tag)],
                              autoImport: Boolean,
-                             extraCode: String): Res[ScriptOutput.Metadata] = {
+                             extraCode: String): Res[ScriptOutput.Metadata] = synchronized{
 
     // we store the old value, because we will reassign this in the loop
     val outerScriptImportCallback = scriptImportCallback
@@ -537,6 +542,8 @@ class Interpreter(val printer: Printer,
     } finally scriptImportCallback = outerScriptImportCallback
   }
 
+  // This is explicitly *not* synchronized, to allow it to run while the warmup
+  // code is still compiling so that Ctrl-D can properly exit
   def handleOutput(res: Res[Evaluated]): Unit = {
     res match{
       case Res.Skip => // do nothing
@@ -545,7 +552,7 @@ class Interpreter(val printer: Printer,
       case _ => ()
     }
   }
-  def loadIvy(coordinates: coursier.Dependency*) = {
+  def loadIvy(coordinates: coursier.Dependency*) = synchronized{
     val cacheKey = (interpApi.repositories().hashCode.toString, coordinates)
 
     storage.ivyCache().get(cacheKey) match{

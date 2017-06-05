@@ -63,64 +63,64 @@ class CompilerLifecycleManager(frames0: Ref[List[Frame]]){
   def compiler = Internal.compiler
   def compilationCount = Internal.compilationCount
 
-  def preprocess(fileName: String) = {
+  def preprocess(fileName: String) = synchronized{
     if (compiler == null) init()
     Preprocessor(compiler.parse(fileName, _))
   }
 
   def evalClassloader = frames().head.classloader
 
+  def init(force: Boolean = false) = synchronized{
+    if(Internal.compilerStale || force){
 
+      // Note we not only make a copy of `settings` to pass to the compiler,
+      // we also make a *separate* copy to pass to the presentation compiler.
+      // Otherwise activating autocomplete makes the presentation compiler mangle
+      // the shared settings and makes the main compiler sad
+      val settings = Option(compiler).fold(new Settings)(_.compiler.settings.copy)
+      Internal.compiler = Compiler(
+        Classpath.classpath ++ frames().head.classpath,
+        dynamicClasspath,
+        evalClassloader,
+        frames().head.pluginClassloader,
+        () => shutdownPressy(),
+        settings
+      )
 
-  def init(force: Boolean = false) = if(Internal.compilerStale || force){
+      onCompilerInit.foreach(_(compiler.compiler))
 
-    // Note we not only make a copy of `settings` to pass to the compiler,
-    // we also make a *separate* copy to pass to the presentation compiler.
-    // Otherwise activating autocomplete makes the presentation compiler mangle
-    // the shared settings and makes the main compiler sad
-    val settings = Option(compiler).fold(new Settings)(_.compiler.settings.copy)
-    Internal.compiler = Compiler(
-      Classpath.classpath ++ frames().head.classpath,
-      dynamicClasspath,
-      evalClassloader,
-      frames().head.pluginClassloader,
-      () => shutdownPressy(),
-      settings
-    )
+      // Pressy is lazy, so the actual presentation compiler won't get instantiated
+      // & initialized until one of the methods on it is actually used
+      Internal.pressy = Pressy(
+        Classpath.classpath ++ frames().head.classpath,
+        dynamicClasspath,
+        evalClassloader,
 
-    onCompilerInit.foreach(_(compiler.compiler))
+        settings.copy()
+      )
 
-    // Pressy is lazy, so the actual presentation compiler won't get instantiated
-    // & initialized until one of the methods on it is actually used
-    Internal.pressy = Pressy(
-      Classpath.classpath ++ frames().head.classpath,
-      dynamicClasspath,
-      evalClassloader,
-
-      settings.copy()
-    )
-
-    // Do this last; that way, if someone `Ctrl C`s in the middle of the
-    // operation, we end up with `compilerStale = true` and a `compiler != null`,
-    // which is better than `compilerStale = false` and `compiler == null`
-    // because the first case means we redundantly re-initialize the compiler,
-    // while the second means we're stuck without a compiler when we need one
-    // and everything blows up
-    Internal.compilerStale = false
+      // Do this last; that way, if someone `Ctrl C`s in the middle of the
+      // operation, we end up with `compilerStale = true` and a `compiler != null`,
+      // which is better than `compilerStale = false` and `compiler == null`
+      // because the first case means we redundantly re-initialize the compiler,
+      // while the second means we're stuck without a compiler when we need one
+      // and everything blows up
+      Internal.compilerStale = false
+    }
   }
 
-  def complete(offset: Int, previousImports: String, snippet: String) = {
+  def complete(offset: Int, previousImports: String, snippet: String) = synchronized{
     init()
     pressy.complete(offset, previousImports, snippet)
   }
 
-  def search(target: scala.reflect.runtime.universe.Type) = {
+  def search(target: scala.reflect.runtime.universe.Type) = synchronized{
     init()
     compiler.search(target)
   }
   def compileClass(processed: Preprocessor.Output,
                    printer: Printer,
-                   fileName: String): Res[(Util.ClassFiles, Imports)] = {
+                   fileName: String): Res[(Util.ClassFiles, Imports)] = synchronized{
     // Enforce the invariant that every piece of code Ammonite ever compiles,
     // gets run within the `ammonite` package. It's further namespaced into
     // things like `ammonite.$file` or `ammonite.$sess`, but it has to be
@@ -139,27 +139,29 @@ class CompilerLifecycleManager(frames0: Ref[List[Frame]]){
     }
   }
 
-  def configureCompiler(callback: scala.tools.nsc.Global => Unit) = {
+  def configureCompiler(callback: scala.tools.nsc.Global => Unit) = synchronized{
     onCompilerInit.append(callback)
     if (compiler != null){
       callback(compiler.compiler)
     }
   }
 
-  def addToClasspath(classFiles: ClassFiles) = {
+  def addToClasspath(classFiles: ClassFiles) = synchronized{
     Compiler.addToClasspath(classFiles, dynamicClasspath)
     reInit()
   }
+  // Not synchronized, since it's part of the exit sequence that needs to run
+  // if the repl exits while the warmup code is compiling
   def shutdownPressy() = {
     if (pressy != null) pressy.shutdownPressy()
   }
 
-  def handleEvalClasspath(jar: File) = {
+  def handleEvalClasspath(jar: File) = synchronized{
     frames().head.addClasspath(Seq(jar))
     evalClassloader.add(jar.toURI.toURL)
     reInit()
   }
-  def handlePluginClasspath(jar: File) = {
+  def handlePluginClasspath(jar: File) = synchronized{
     frames().head.pluginClassloader.add(jar.toURI.toURL)
     reInit()
   }

@@ -6,7 +6,7 @@ import ammonite.runtime._
 import ammonite.terminal.Filter
 import ammonite.util.Util.newLine
 import ammonite.util._
-import ammonite.interp.Interpreter
+import ammonite.interp.{Interpreter, Parsers}
 
 import scala.annotation.tailrec
 
@@ -74,6 +74,24 @@ class Repl(input: InputStream,
     wd,
     colors
   )
+
+  def warmup() = {
+    // An arbitrary input, randomized to make sure it doesn't get cached or
+    // anything anywhere (though it shouldn't since it's processed as a line).
+    //
+    // Should exercise the main code paths that the Ammonite REPL uses, and
+    // can be run asynchronously while the user is typing their first command
+    // to make sure their command reaches an already-warm command when submitted.
+    //
+    // Otherwise, this isn't a particularly complex chunk of code and shouldn't
+    // make the minimum first-compilation time significantly longer than just
+    // running the user code directly. Could be made longer to better warm more
+    // code paths, but then the fixed overhead gets larger so not really worth it
+    val code = s"""val array = Seq.tabulate(10)(_*2).toArray.max"""
+    val stmts = Parsers.split(code).get.get.value
+    interp.processLine(code, stmts, silent = true)
+  }
+
 
   sess0.save()
 

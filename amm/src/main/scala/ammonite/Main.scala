@@ -126,6 +126,16 @@ case class Main(predef: String = "",
 
     val repl = instantiateRepl(replArgs.toIndexedSeq, remoteLogger)
 
+    // Warm up the compilation logic in the background, hopefully while the
+    // user is typing their first command, so by the time the command is
+    // submitted it can be processed by a warm compiler
+    val warmupThread = new Thread(new Runnable{
+      def run() = repl.warmup()
+    })
+    // This thread will terminal eventually on its own, but if the
+    // JVM wants to exit earlier this thread shouldn't stop it
+    warmupThread.setDaemon(true)
+    warmupThread.start()
     try{
       val exitValue = repl.run()
       repl.beforeExit(exitValue)

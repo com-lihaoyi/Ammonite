@@ -26,7 +26,8 @@ trait Evaluator{
   def processLine(classFiles: ClassFiles,
                   newImports: Imports,
                   printer: Printer,
-                  indexedWrapperName: Name): Res[Evaluated]
+                  indexedWrapperName: Name,
+                  silent: Boolean): Res[Evaluated]
 
   def processScriptBlock(cls: Class[_],
                          newImports: Imports,
@@ -120,7 +121,8 @@ object Evaluator{
     def processLine(classFiles: Util.ClassFiles,
                     newImports: Imports,
                     printer: Printer,
-                    indexedWrapperName: Name) = {
+                    indexedWrapperName: Name,
+                    silent: Boolean) = {
       for {
         cls <- loadClass("ammonite.$sess." + indexedWrapperName.backticked, classFiles)
         _ = currentLine += 1
@@ -129,7 +131,9 @@ object Evaluator{
         // Exhaust the printer iterator now, before exiting the `Catching`
         // block, so any exceptions thrown get properly caught and handled
         val iter = evalMain(cls).asInstanceOf[Iterator[String]]
-        evaluatorRunPrinter(iter.foreach(printer.out))
+
+        if (!silent) evaluatorRunPrinter(iter.foreach(printer.out))
+        else evaluatorRunPrinter(iter.foreach(_ => ()))
 
         // "" Empty string as cache tag of repl code
         evaluationResult(Seq(Name("ammonite"), Name("$sess"), indexedWrapperName), newImports)

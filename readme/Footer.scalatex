@@ -114,7 +114,7 @@
 
 
   @sect{Changelog}
-    @sect{1.0.0-RC1}
+    @sect{1.0.0-RC2}
       @ul
         @li
           Output now defaults to colored if the console is interactive, and
@@ -169,7 +169,11 @@
         @li
           @code{Ctrl C} no longer crashes the REPL if you perform it after
           entering a command but before your code starts running
-
+        @li
+          Ammonite's REPL now warms up the compiler while you are typing your
+          first command; this makes it likely that the compilation will be fast
+          if you take a moment to enter your command, and shouldn't
+          significantly effect the time taken otherwise
     @sect{0.9.9}
       @ul
         @li
