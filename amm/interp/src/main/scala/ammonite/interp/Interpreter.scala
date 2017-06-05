@@ -563,13 +563,15 @@ class Interpreter(val printer: Printer,
           coordinates,
           verbose = verboseOutput
         )match{
-          case Right(loaded) =>
+          case (srcWarnings, Right(loaded)) =>
+            srcWarnings.foreach(printer.info)
             val loadedSet = loaded.toSet
             storage.ivyCache() = storage.ivyCache().updated(
               cacheKey, loadedSet.map(_.getAbsolutePath)
             )
             Right(loadedSet)
-          case Left(l) =>
+          case (srcWarnings, Left(l)) =>
+            srcWarnings.foreach(printer.info)
             Left(l)
         }
     }

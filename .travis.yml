@@ -9,58 +9,56 @@ matrix:
   #
   # published tests tend to run slower than integration tests, so start
   # them first
-  - stage: test
+  - stage: build
     env: CI_SCRIPT="ci/build.sc test published/test"
     jdk: oraclejdk8
     scala: 2.12.2
 
-  - stage: test
+  - stage: build
     env: CI_SCRIPT="ci/build.sc test published/test"
     jdk: oraclejdk8
     scala: 2.11.11
 
-  - stage: test
+  - stage: build
     env: CI_SCRIPT="ci/build.sc test published/test"
     jdk: openjdk7
     scala: 2.10.6
 
-  - stage: test
+  - stage: build
     env: CI_SCRIPT="ci/build.sc test integration/test"
     jdk: oraclejdk8
     scala: 2.12.2
 
-  - stage: test
+  - stage: build
     env: CI_SCRIPT="ci/build.sc test integration/test"
     jdk: oraclejdk8
     scala: 2.11.11
 
-  - stage: test
+  - stage: build
     env: CI_SCRIPT="ci/build.sc test integration/test"
     jdk: openjdk7
     scala: 2.10.6
 
-
-  # After tests pass, publish everything to sonatype. Sharded across different
-  # machines because it tended to time-out on one node, and also the expensive
-  # compile/publish step for each version is most independent and doesn't
-  # benefit from being on the same node
-  - stage: publish
-    env: CI_SCRIPT="ci/build.sc artifacts true 2.11"
+  # Publish everything to sonatype in conjunction with running tests
+  - stage: build
+    env: CI_SCRIPT="ci/build.sc artifacts 2.10.4 2.10.5 2.10.6"
     jdk: oraclejdk8
     scala: 2.11.11
 
-  - stage: publish
-    env: CI_SCRIPT="ci/build.sc artifacts false 2.11"
+  - stage: build
+    env: CI_SCRIPT="ci/build.sc artifacts 2.11.3 2.11.4 2.11.5 2.11.6 "
     jdk: oraclejdk8
     scala: 2.11.11
 
-  - stage: publish
-    env: CI_SCRIPT="ci/build.sc artifacts true 2.10 2.12"
+  - stage: build
+    # 2.11.9 and 2.11.10 were borked releases
+    env: CI_SCRIPT="ci/build.sc artifacts 2.11.7 2.11.8 2.11.11"
     jdk: oraclejdk8
     scala: 2.11.11
 
-  - stage: publish
-    env: CI_SCRIPT="ci/build.sc artifacts false 2.10 2.12"
+  - stage: build
+    # Leave 2.12 unprefixed so any additional 2.12 versions get included automatically
+    env: CI_SCRIPT="ci/build.sc artifacts 2.12"
     jdk: oraclejdk8
     scala: 2.11.11
 

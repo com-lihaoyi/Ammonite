@@ -52,7 +52,7 @@ def updateConstants(version: String = buildVersion,
   println(read! cwd/'project/"Constants.scala")
 }
 
-def publishSigned(cross: Boolean, prefixes: Seq[String]) = {
+def writeSonatypeCreds() = {
   val creds = s"""
     (credentials in ThisBuild) += Credentials("Sonatype Nexus Repository Manager",
         "oss.sonatype.org",
@@ -67,20 +67,17 @@ def publishSigned(cross: Boolean, prefixes: Seq[String]) = {
   write(cwd/"sonatype.sbt", creds)
   write(cwd/"secring.asc", sys.env("SONATYPE_PGP_KEY_CONTENTS").replace("\\n", "\n"))
   write(cwd/"pubring.asc", sys.env("SONATYPE_PGP_PUB_KEY_CONTENTS").replace("\\n", "\n"))
+}
 
-
-  if(!cross){
-
-    for (version <- latestMajorVersions if prefixes.exists(version.startsWith)) {
-      %sbt("++" + version, "singleCrossBuilt/publishSigned")
-    }
-  }else{
-
-    for (version <- allVersions if prefixes.exists(version.startsWith)) {
-      %sbt("++" + version, "fullCrossBuilt/publishSigned")
-    }
+def publishSigned(prefixes: Seq[String]) = {
+  writeSonatypeCreds()
+  for (version <- latestMajorVersions if prefixes.exists(version.startsWith)) {
+    %sbt("++" + version, "singleCrossBuilt/publishSigned")
   }
 
+  for (version <- allVersions if prefixes.exists(version.startsWith)) {
+    %sbt("++" + version, "fullCrossBuilt/publishSigned")
+  }
 }
 
 
@@ -207,27 +204,24 @@ def docs() = {
 // - Cross-built artifacts or non-cross-built artifacts
 // - Scala-versions
 @main
-def artifacts(cross: Boolean, prefixes: String*) = {
+def artifacts(prefixes: String*) = {
 
   if (isMasterCommit){
     println("MASTER COMMIT: Updating version and publishing to Maven Central")
     updateConstants()
-    publishSigned(cross, prefixes)
+    publishSigned(prefixes)
   }else{
     println("MISC COMMIT: Compiling all Scala code across versions for verification")
-    if(!cross){
 
-      for (version <- latestMajorVersions if prefixes.exists(version.startsWith)) {
+    for (version <- latestMajorVersions if prefixes.exists(version.startsWith)) {
 
-        %sbt("++" + version, "singleCrossBuilt/package")
-        %sbt("++" + version, "singleCrossBuilt/packageSrc")
-      }
-    }else{
+      %sbt("++" + version, "singleCrossBuilt/package")
+      %sbt("++" + version, "singleCrossBuilt/packageSrc")
+    }
 
-      for (version <- allVersions if prefixes.exists(version.startsWith)) {
-        %sbt("++" + version, "fullCrossBuilt/package")
-        %sbt("++" + version, "fullCrossBuilt/packageSrc")
-      }
+    for (version <- allVersions if prefixes.exists(version.startsWith)) {
+      %sbt("++" + version, "fullCrossBuilt/package")
+      %sbt("++" + version, "fullCrossBuilt/packageSrc")
     }
   }
 
@@ -235,11 +229,13 @@ def artifacts(cross: Boolean, prefixes: String*) = {
 
 @main
 def sonatypeReleaseAll() = {
-  if (isMasterCommit) %sbt("sonatypeReleaseAll")
+  if (isMasterCommit) {
+    writeSonatypeCreds()
+    %sbt("sonatypeReleaseAll")
+  }
 }
 
 @main
-def test(testCommand: String) = {
-  %sbt("++" + sys.env("TRAVIS_SCALA_VERSION"), "published/compile")
-  %sbt("++" + sys.env("TRAVIS_SCALA_VERSION"), testCommand)
+def test(testCommands: String*) = {
+  testCommands.foreach(%sbt("++" + sys.env("TRAVIS_SCALA_VERSION"), _))
 }
