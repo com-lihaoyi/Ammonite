@@ -114,6 +114,62 @@
 
 
   @sect{Changelog}
+    @sect{1.0.0-RC1}
+      @ul
+        @li
+          Output now defaults to colored if the console is interactive, and
+          non-colored otherwise. This should be the defaults most people would
+          be happy with.
+
+        @li
+          Scripts now have colored output by default if the script-runner is
+          interactive, following the above rules. Much of the script "info"
+          output like "Compiling" or "Watching for changes" messages are now
+          colored.
+
+        @li
+          There is now a cli-flag @code{--color} which can be set to
+          @hl.scala{true} or @hl.scala{false} to force colors on or off if you
+          are not happy with the default behavior.
+
+        @li
+          The @code{repl.colors} builtin has been moved to @code{interp.colors},
+          and allows you to fine-grained customize colors for e.g. error
+          messages and info messages when running scripts.
+
+        @li
+          Using @hl.scala{import $file} on an empty script files no longer
+          causes spurious errors
+
+        @li
+          Caches are properly invalidated if a script you @hl.scala{import $file}
+          is deleted
+
+        @li
+          @code{-w}/@code{--watch} now watches predef files as well. This means
+          if you make changes to your predef (e.g. if it was crashing and you're
+          trying to fix it), Ammonite will re-run your scripts automatically
+
+        @li
+          Improved error handling of failures within predef; they should no
+          longer show large stack traces containing irrelevant stack frames
+
+        @li
+          Predef files no longer cause problems with autocomplete in the REPL
+
+        @li
+          Parse errors within a file will now show the proper file-name, rather
+          than @code{<console>}.
+
+        @li
+          @code{Ctrl C} interrupts now place an exception with a useful stack
+          trace in @code{repl.lastException}, which can help debug where your
+          code was at when you interrupted it.
+
+        @li
+          @code{Ctrl C} no longer crashes the REPL if you perform it after
+          entering a command but before your code starts running
+
     @sect{0.9.9}
       @ul
         @li
@@ -1273,56 +1329,3 @@
 
     @sect{Unstable Changlog}
       @ul
-        @li
-          Output now defaults to colored if the console is interactive, and
-          non-colored otherwise. This should be the defaults most people would
-          be happy with.
-
-        @li
-          Scripts now have colored output by default if the script-runner is
-          interactive, following the above rules. Much of the script "info"
-          output like "Compiling" or "Watching for changes" messages are now
-          colored.
-
-        @li
-          There is now a cli-flag @code{--color} which can be set to
-          @hl.scala{true} or @hl.scala{false} to force colors on or off if you
-          are not happy with the default behavior.
-
-        @li
-          The @code{repl.colors} builtin has been moved to @code{interp.colors},
-          and allows you to fine-grained customize colors for e.g. error
-          messages and info messages when running scripts.
-
-        @li
-          Using @hl.scala{import $file} on an empty script files no longer
-          causes spurious errors
-
-        @li
-          Caches are properly invalidated if a script you @hl.scala{import $file}
-          is deleted
-
-        @li
-          @code{-w}/@code{--watch} now watches predef files as well. This means
-          if you make changes to your predef (e.g. if it was crashing and you're
-          trying to fix it), Ammonite will re-run your scripts automatically
-
-        @li
-          Improved error handling of failures within predef; they should no
-          longer show large stack traces containing irrelevant stack frames
-
-        @li
-          Predef files no longer cause problems with autocomplete in the REPL
-
-        @li
-          Parse errors within a file will now show the proper file-name, rather
-          than @code{<console>}.
-
-        @li
-          @code{Ctrl C} interrupts now place an exception with a useful stack
-          trace in @code{repl.lastException}, which can help debug where your
-          code was at when you interrupted it.
-
-        @li
-          @code{Ctrl C} no longer crashes the REPL if you perform it after
-          entering a command but before your code starts running
