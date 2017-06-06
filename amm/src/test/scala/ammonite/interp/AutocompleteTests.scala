@@ -16,7 +16,7 @@ object AutocompleteTests extends TestSuite{
 
       val (index, completions, signatures) = check.interp.compilerManager.complete(
         cursor,
-        check.interp.eval.imports.toString,
+        check.interp.frameImports().toString,
         buf
       )
       val left = cmp(completions.toSet)

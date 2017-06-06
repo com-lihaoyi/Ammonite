@@ -21,7 +21,6 @@ trait Evaluator{
   def loadClass(wrapperName: String, classFiles: ClassFiles): Res[Class[_]]
   def evalMain(cls: Class[_]): Any
   def getCurrentLine: String
-  def update(newImports: Imports): Unit
   def withContextClassloader[T](t: => T): T
   def processLine(classFiles: ClassFiles,
                   newImports: Imports,
@@ -35,7 +34,6 @@ trait Evaluator{
                          pkgName: Seq[Name]): Res[Evaluated]
   def evalClassloader: SpecialClassLoader
   def pluginClassloader: SpecialClassLoader
-  def imports: Imports
 }
 
 object Evaluator{
@@ -76,7 +74,6 @@ object Evaluator{
 
     def evalClassloader = frames.head.classloader
     def pluginClassloader= frames.head.pluginClassloader
-    def imports = frames.head.imports
 
     /**
      * The current line number of the REPL, used to make sure every snippet
@@ -152,10 +149,6 @@ object Evaluator{
         val res = evaluationResult(pkgName :+ wrapperName, newImports)
         res
       }
-    }
-
-    def update(newImports: Imports) = {
-      frames.head.addImports(newImports)
     }
 
     def evaluationResult(wrapperName: Seq[Name],

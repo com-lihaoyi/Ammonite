@@ -40,7 +40,7 @@ class Interpreter(val printer: Printer,
 
   val mainThread = Thread.currentThread()
 
-  val (compilerManager, eval) = {
+  val (frameImports, handleImports, compilerManager, eval) = {
     val hash = SpecialClassLoader.initialClasspathSignature(mainThread.getContextClassLoader)
 
     import ammonite.ops._
@@ -59,10 +59,15 @@ class Interpreter(val printer: Printer,
 
     val frames = Ref(List(initialFrame))
 
-    (new CompilerLifecycleManager(frames), Evaluator(0, frames()))
+    (
+      () => frames().head.imports,
+      (i: Imports) => frames().head.addImports(i),
+      new CompilerLifecycleManager(frames),
+      Evaluator(0, frames())
+    )
   }
 
-  private var scriptImportCallback: Imports => Unit = eval.update
+  private var scriptImportCallback: Imports => Unit = handleImports
 
   val watchedFiles = mutable.Buffer.empty[(Path, Option[Long])]
 
@@ -221,7 +226,7 @@ class Interpreter(val printer: Printer,
         "",
         Seq(Name("ammonite"), Name("$sess")),
         wrapperName,
-        predefImports ++ eval.imports ++ hookImports,
+        predefImports ++ frameImports() ++ hookImports,
         prints => s"ammonite.repl.ReplBridge.value.Internal.combinePrints($prints)",
         extraCode = "",
         skipEmpty = true
@@ -363,7 +368,7 @@ class Interpreter(val printer: Printer,
       metadata <- processAllScriptBlocks(
         blocks.map(_ => None),
         Res.Success(blocks),
-        predefImports ++ eval.imports,
+        predefImports ++ frameImports(),
         CodeSource(
           wrapperName,
           Seq(),
@@ -551,16 +556,6 @@ class Interpreter(val printer: Printer,
     } finally scriptImportCallback = outerScriptImportCallback
   }
 
-  // This is explicitly *not* synchronized, to allow it to run while the warmup
-  // code is still compiling so that Ctrl-D can properly exit
-  def handleOutput(res: Res[Evaluated]): Unit = {
-    res match{
-      case Res.Skip => // do nothing
-      case Res.Exit(value) => compilerManager.shutdownPressy()
-      case Res.Success(ev) => eval.update(ev.imports)
-      case _ => ()
-    }
-  }
 
   def loadIvy(coordinates: coursier.Dependency*) = synchronized{
     val cacheKey = (interpApi.repositories().hashCode.toString, coordinates)

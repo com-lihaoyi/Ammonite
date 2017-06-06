@@ -71,8 +71,8 @@ class TestRepl {
           val colors = Ref(Colors.BlackWhite)
           def newCompiler() = interp.compilerManager.init(force = true)
           def compiler = interp.compilerManager.compiler.compiler
-          def fullImports = interp.predefImports ++ interp.eval.imports
-          def imports = interp.eval.imports
+          def fullImports = interp.predefImports ++ imports
+          def imports = interp.frameImports()
           def width = 80
           def height = 80
         }
@@ -125,7 +125,7 @@ class TestRepl {
       allOutput += commandText.map(Util.newLine + "@ " + _).mkString(Util.newLine)
 
       val (processed, out, warning, error, info) = run(commandText.mkString(Util.newLine), index)
-      interp.handleOutput(processed)
+      Repl.handleOutput(interp, processed)
 
       if (expected.startsWith("error: ")) {
         val strippedExpected = expected.stripPrefix("error: ")
@@ -215,7 +215,7 @@ class TestRepl {
 
       case _ =>
     }
-    interp.handleOutput(processed)
+    Repl.handleOutput(interp, processed)
     (
       processed,
       outString,

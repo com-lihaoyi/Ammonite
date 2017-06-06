@@ -42,8 +42,8 @@ class Repl(input: InputStream,
 
   val sess0 = new SessionApiImpl(interp.compilerManager.frames)
 
-  def imports = interp.eval.imports
-  def fullImports = interp.predefImports ++ interp.eval.imports
+  def imports = interp.frameImports()
+  def fullImports = interp.predefImports ++ imports
 
   val interp: Interpreter = new Interpreter(
     printer,
@@ -136,12 +136,14 @@ class Repl(input: InputStream,
     out
   }
 
+
+
   def run(): Any = {
     welcomeBanner.foreach(printStream.println)
     @tailrec def loop(): Any = {
       val actionResult = action()
       remoteLogger.foreach(_.apply("Action"))
-      interp.handleOutput(actionResult)
+      Repl.handleOutput(interp, actionResult)
       Repl.handleRes(
         actionResult,
         printer.info,
@@ -162,7 +164,14 @@ class Repl(input: InputStream,
 }
 
 object Repl{
-
+  def handleOutput(interp: Interpreter, res: Res[Evaluated]): Unit = {
+    res match{
+      case Res.Skip => // do nothing
+      case Res.Exit(value) => interp.compilerManager.shutdownPressy()
+      case Res.Success(ev) => interp.handleImports(ev.imports)
+      case _ => ()
+    }
+  }
   def handleRes(res: Res[Any],
                 printInfo: String => Unit,
                 printError: String => Unit,
