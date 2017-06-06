@@ -3,8 +3,10 @@ package ammonite
 import java.io.PrintStream
 
 import ammonite.interp.Interpreter
-import ammonite.repl.{FrontEnd, Repl, ReplApiImpl, SessionApiImpl}
-import ammonite.runtime.{History, Storage}
+import ammonite.ops.{Path, read}
+import ammonite.repl._
+import ammonite.runtime.{Frame, History, Storage}
+import ammonite.util.Util.normalizeNewlines
 import ammonite.util._
 import utest.asserts._
 
@@ -41,8 +43,11 @@ class TestRepl {
     x => infoBuffer.append(x + Util.newLine)
   )
   val storage = new Storage.Folder(tempDir)
-  val interp: Interpreter  = try {
+  val frames = Ref(List(Frame.createInitial()))
+  val sess0 = new SessionApiImpl(frames)
 
+  var currentLine = 0
+  val interp: Interpreter = try {
     new Interpreter(
       printer,
       storage = storage,
@@ -72,13 +77,29 @@ class TestRepl {
           def newCompiler() = interp.compilerManager.init(force = true)
           def compiler = interp.compilerManager.compiler.compiler
           def fullImports = interp.predefImports ++ imports
-          def imports = interp.frameImports()
+          def imports = interp.frameImports
           def width = 80
           def height = 80
+
+          object load extends ReplLoad with (String => Unit){
+
+            def apply(line: String) = {
+              interp.processExec(line, currentLine, () => currentLine += 1) match{
+                case Res.Failure(s) => throw new CompilationError(s)
+                case Res.Exception(t, s) => throw t
+                case _ =>
+              }
+            }
+
+            def exec(file: Path): Unit = {
+              interp.watch(file)
+              apply(normalizeNewlines(read(file)))
+            }
+          }
         }
       )),
-      colors = Ref(Colors.BlackWhite)
-
+      colors = Ref(Colors.BlackWhite),
+      getFrame = () => frames().head
     )
 
   }catch{ case e: Throwable =>
@@ -89,7 +110,10 @@ class TestRepl {
     throw e
   }
 
-  val sess0 = new SessionApiImpl(interp.compilerManager.frames)
+
+  interp.initializePredef()
+
+
 
   def session(sess: String): Unit = {
     // Remove the margin from the block and break
@@ -124,7 +148,9 @@ class TestRepl {
       val expected = resultLines.mkString(Util.newLine).trim
       allOutput += commandText.map(Util.newLine + "@ " + _).mkString(Util.newLine)
 
-      val (processed, out, warning, error, info) = run(commandText.mkString(Util.newLine), index)
+      val (processed, out, warning, error, info) =
+        run(commandText.mkString(Util.newLine), currentLine)
+
       Repl.handleOutput(interp, processed)
 
       if (expected.startsWith("error: ")) {
@@ -204,7 +230,10 @@ class TestRepl {
     val splitted = ammonite.interp.Parsers.split(input).get.get.value
     val processed = interp.processLine(
       input,
-      splitted
+      splitted,
+      index,
+      false,
+      () => currentLine += 1
     )
     processed match{
       case Res.Failure(s) => printer.error(s)

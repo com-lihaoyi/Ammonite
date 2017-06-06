@@ -4,7 +4,7 @@ import java.io.{InputStream, OutputStream, PrintStream}
 
 import ammonite.interp.Interpreter
 import ammonite.ops._
-import ammonite.runtime.Storage
+import ammonite.runtime.{Frame, Storage}
 import ammonite.main._
 import ammonite.repl.{RemoteLogger, Repl}
 import ammonite.util._
@@ -96,6 +96,7 @@ case class Main(predef: String = "",
       errorStream,
       verboseOutput
     )
+    val frame = Frame.createInitial()
 
     val interp: Interpreter = new Interpreter(
       printer,
@@ -107,8 +108,10 @@ case class Main(predef: String = "",
       Vector.empty,
       wd,
       colorsRef,
-      verboseOutput
+      verboseOutput,
+      () => frame
     )
+    interp.initializePredef()
     interp
   }
 
@@ -171,7 +174,7 @@ case class Main(predef: String = "",
       try Res.Success(instantiateInterpreter())
       catch{ case PredefFailedToLoad(msg, ex, res, watched) => res }
 
-    interp.flatMap(_.processExec(code))
+    interp.flatMap(_.processExec(code, 0, () => ()))
 
   }
 }

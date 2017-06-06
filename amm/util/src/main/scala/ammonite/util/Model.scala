@@ -5,7 +5,7 @@
 package ammonite.util
 
 
-import java.io.{PrintStream, PrintWriter}
+import java.io.PrintStream
 
 import ammonite.ops.Path
 

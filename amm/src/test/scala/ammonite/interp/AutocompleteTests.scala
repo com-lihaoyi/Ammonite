@@ -16,7 +16,7 @@ object AutocompleteTests extends TestSuite{
 
       val (index, completions, signatures) = check.interp.compilerManager.complete(
         cursor,
-        check.interp.frameImports().toString,
+        check.interp.frameImports.toString,
         buf
       )
       val left = cmp(completions.toSet)
@@ -38,7 +38,7 @@ object AutocompleteTests extends TestSuite{
 
       // Not sure why clone and finalize don't appear in this list
       val anyCompletion = Set(
-        "!=", "==", "|>",
+        "!=", "==",
         "toString", "equals", "hashCode",
         "getClass", "asInstanceOf", "isInstanceOf"
       )

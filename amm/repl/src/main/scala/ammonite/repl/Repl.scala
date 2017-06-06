@@ -4,9 +4,10 @@ import java.io.{InputStream, InputStreamReader, OutputStream}
 
 import ammonite.runtime._
 import ammonite.terminal.Filter
-import ammonite.util.Util.newLine
+import ammonite.util.Util.{newLine, normalizeNewlines}
 import ammonite.util._
 import ammonite.interp.{Interpreter, Parsers}
+import ammonite.ops._
 
 import scala.annotation.tailrec
 
@@ -40,9 +41,18 @@ class Repl(input: InputStream,
     """
   }.mkString(newLine)
 
-  val sess0 = new SessionApiImpl(interp.compilerManager.frames)
+  val frames = Ref(List(Frame.createInitial()))
 
-  def imports = interp.frameImports()
+  /**
+    * The current line number of the REPL, used to make sure every snippet
+    * evaluated can have a distinct name that doesn't collide.
+    */
+  var currentLine = 0
+
+
+  val sess0 = new SessionApiImpl(frames)
+
+  def imports = frames().head.imports
   def fullImports = interp.predefImports ++ imports
 
   val interp: Interpreter = new Interpreter(
@@ -72,11 +82,30 @@ class Repl(input: InputStream,
         def imports = repl.imports
         def width = frontEnd().width
         def height = frontEnd().height
+
+        object load extends ReplLoad with (String => Unit){
+
+          def apply(line: String) = {
+            interp.processExec(line, currentLine, () => currentLine += 1) match{
+              case Res.Failure(s) => throw new CompilationError(s)
+              case Res.Exception(t, s) => throw t
+              case _ =>
+            }
+          }
+
+          def exec(file: Path): Unit = {
+            interp.watch(file)
+            apply(normalizeNewlines(read(file)))
+          }
+        }
       }
     )),
     wd,
-    colors
+    colors,
+    verboseOutput = true,
+    getFrame = () => frames().head
   )
+  interp.initializePredef()
 
   def warmup() = {
     // An arbitrary input, randomized to make sure it doesn't get cached or
@@ -92,7 +121,7 @@ class Repl(input: InputStream,
     // code paths, but then the fixed overhead gets larger so not really worth it
     val code = s"""val array = Seq.tabulate(10)(_*2).toArray.max"""
     val stmts = Parsers.split(code).get.get.value
-    interp.processLine(code, stmts, silent = true)
+    interp.processLine(code, stmts, 9999999, silent = true, () => () /*donothing*/)
   }
 
 
@@ -130,7 +159,7 @@ class Repl(input: InputStream,
       lastException.setStackTrace(Repl.truncateStackTrace(interp.mainThread.getStackTrace))
       interp.mainThread.stop()
     }
-    out <- interp.processLine(code, stmts)
+    out <- interp.processLine(code, stmts, currentLine, false, () => currentLine += 1)
   } yield {
     printStream.println()
     out

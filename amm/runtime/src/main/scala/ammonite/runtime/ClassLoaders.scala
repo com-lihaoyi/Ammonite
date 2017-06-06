@@ -3,7 +3,7 @@ package ammonite.runtime
 import java.io.ByteArrayInputStream
 import java.net.{URL, URLClassLoader, URLConnection, URLStreamHandler}
 import java.nio.ByteBuffer
-import java.util.{Collections, Enumeration}
+import java.util.Collections
 
 
 import ammonite.ops._
@@ -25,16 +25,61 @@ class Frame(val classloader: SpecialClassLoader,
             val pluginClassloader: SpecialClassLoader,
             private[this] var imports0: Imports,
             private[this] var classpath0: Seq[java.io.File]){
+  private[this] var version0: Int = 0
+  def version = version0
   def imports = imports0
   def classpath = classpath0
   def addImports(additional: Imports) = {
+    version0 += 1
     imports0 = imports0 ++ additional
   }
   def addClasspath(additional: Seq[java.io.File]) = {
+    version0 += 1
     additional.map(_.toURI.toURL).foreach(classloader.add)
     classpath0 = classpath0 ++ additional
   }
+  def addPluginClasspath(additional: Seq[java.io.File]) = {
+    version0 += 1
+    additional.map(_.toURI.toURL).foreach(pluginClassloader.add)
+  }
 }
+object Frame{
+  def createInitial() = {
+
+    // *Try* to load the JVM source files and make them available as resources,
+    // so that the `source` helper can navigate to the sources within the
+    // Java standard library
+
+    val likelyJdkSourceLocation = Path(System.getProperty("java.home"))/up/"src.zip"
+    val mainThread = Thread.currentThread()
+    val hash = SpecialClassLoader.initialClasspathSignature(mainThread.getContextClassLoader)
+    def special = new SpecialClassLoader(
+      new ForkClassLoader(mainThread.getContextClassLoader, getClass.getClassLoader),
+      hash,
+      likelyJdkSourceLocation.toNIO.toUri.toURL
+    )
+
+    new Frame(special, special, Imports(), Seq())
+  }
+}
+
+case class SessionChanged(removedImports: Set[scala.Symbol],
+                          addedImports: Set[scala.Symbol],
+                          removedJars: Set[java.net.URL],
+                          addedJars: Set[java.net.URL])
+object SessionChanged{
+
+  def delta(oldFrame: Frame, newFrame: Frame): SessionChanged = {
+    def frameSymbols(f: Frame) = f.imports.value.map(_.toName.backticked).map(Symbol(_)).toSet
+    new SessionChanged(
+      frameSymbols(oldFrame) -- frameSymbols(newFrame),
+      frameSymbols(newFrame) -- frameSymbols(oldFrame),
+      oldFrame.classloader.allJars.toSet -- newFrame.classloader.allJars.toSet,
+      newFrame.classloader.allJars.toSet -- oldFrame.classloader.allJars.toSet
+    )
+  }
+}
+
 
 object SpecialClassLoader{
   val simpleNameRegex = "[a-zA-Z0-9_]+".r

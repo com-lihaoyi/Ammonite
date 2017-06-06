@@ -69,7 +69,7 @@ object Scripts {
 
       routesCls =
         interp
-          .evalClassloader()
+          .evalClassloader
           .loadClass(routeClsName + "$$routes$")
 
       scriptMains =
@@ -79,7 +79,7 @@ object Scripts {
             .asInstanceOf[() => Seq[Router.EntryPoint]]
             .apply()
 
-      res <- interp.eval.withContextClassloader(interp.evalClassloader()){
+      res <- Util.withContextClassloader(interp.evalClassloader){
         scriptMains match {
           // If there are no @main methods, there's nothing to do
           case Seq() =>

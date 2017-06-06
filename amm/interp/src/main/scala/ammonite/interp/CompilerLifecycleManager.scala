@@ -1,7 +1,5 @@
 package ammonite.interp
 
-import java.io.File
-
 import ammonite.runtime._
 import ammonite.util.Util._
 import ammonite.util._
@@ -22,40 +20,24 @@ import scala.tools.nsc.Settings
   * compiler objects are initialized, or worry about initializing them more
   * than necessary
   */
-class CompilerLifecycleManager(frames0: Ref[List[Frame]]){
+class CompilerLifecycleManager(headFrame: => Frame){
 
 
 
   private[this] object Internal{
     val dynamicClasspath = new VirtualDirectory("(memory)", None)
     var compiler: Compiler = null
-    var compilerStale: Boolean = true
+    var dynamicClasspathChanged: Boolean = true
     var pressyStale: Boolean = true
     val onCompilerInit = mutable.Buffer.empty[scala.tools.nsc.Global => Unit]
     var pressy: Pressy = _
     var compilationCount = 0
-    var frames = frames0
+    var (lastFrame, lastFrameVersion) = (headFrame, headFrame.version)
   }
 
-  // We lazily force the compiler to be re-initialized by setting the
-  // compilerStale flag. Otherwise, if we re-initialized the compiler eagerly,
-  // we end up sometimes re-initializing it multiple times unnecessarily before
-  // it gets even used once. Empirically, this cuts down the number of compiler
-  // re-initializations by about 2/3, each of which costs about 30ms and
-  // probably creates a pile of garbage
-  def reInit() = {
-    Internal.compilerStale = true
-  }
 
   import Internal._
 
-  val frames = new StableRef[List[Frame]] {
-    def apply() = Internal.frames()
-    def update(t: List[Frame]) = {
-      Internal.frames() = t
-      reInit()
-    }
-  }
 
   // Public to expose it in the REPL so people can poke at it at runtime
   // Not for use within Ammonite! Use one of the other methods to ensure
@@ -68,21 +50,32 @@ class CompilerLifecycleManager(frames0: Ref[List[Frame]]){
     Preprocessor(compiler.parse(fileName, _))
   }
 
-  def evalClassloader = frames().head.classloader
+
+  // We lazily force the compiler to be re-initialized by setting the
+  // compilerStale flag. Otherwise, if we re-initialized the compiler eagerly,
+  // we end up sometimes re-initializing it multiple times unnecessarily before
+  // it gets even used once. Empirically, this cuts down the number of compiler
+  // re-initializations by about 2/3, each of which costs about 30ms and
+  // probably creates a pile of garbage
 
   def init(force: Boolean = false) = synchronized{
-    if(Internal.compilerStale || force){
+    if((headFrame ne lastFrame) ||
+      headFrame.version != lastFrameVersion ||
+      Internal.dynamicClasspathChanged ||
+      force){
 
+      lastFrame = headFrame
+      lastFrameVersion = headFrame.version
       // Note we not only make a copy of `settings` to pass to the compiler,
       // we also make a *separate* copy to pass to the presentation compiler.
       // Otherwise activating autocomplete makes the presentation compiler mangle
       // the shared settings and makes the main compiler sad
       val settings = Option(compiler).fold(new Settings)(_.compiler.settings.copy)
       Internal.compiler = Compiler(
-        Classpath.classpath ++ frames().head.classpath,
+        Classpath.classpath ++ headFrame.classpath,
         dynamicClasspath,
-        evalClassloader,
-        frames().head.pluginClassloader,
+        headFrame.classloader,
+        headFrame.pluginClassloader,
         () => shutdownPressy(),
         settings
       )
@@ -92,9 +85,9 @@ class CompilerLifecycleManager(frames0: Ref[List[Frame]]){
       // Pressy is lazy, so the actual presentation compiler won't get instantiated
       // & initialized until one of the methods on it is actually used
       Internal.pressy = Pressy(
-        Classpath.classpath ++ frames().head.classpath,
+        Classpath.classpath ++ headFrame.classpath,
         dynamicClasspath,
-        evalClassloader,
+        headFrame.classloader,
 
         settings.copy()
       )
@@ -105,7 +98,7 @@ class CompilerLifecycleManager(frames0: Ref[List[Frame]]){
       // because the first case means we redundantly re-initialize the compiler,
       // while the second means we're stuck without a compiler when we need one
       // and everything blows up
-      Internal.compilerStale = false
+      Internal.dynamicClasspathChanged = false
     }
   }
 
@@ -118,6 +111,7 @@ class CompilerLifecycleManager(frames0: Ref[List[Frame]]){
     init()
     compiler.search(target)
   }
+
   def compileClass(processed: Preprocessor.Output,
                    printer: Printer,
                    fileName: String): Res[(Util.ClassFiles, Imports)] = synchronized{
@@ -134,9 +128,8 @@ class CompilerLifecycleManager(frames0: Ref[List[Frame]]){
       }
       _ = Internal.compilationCount += 1
       (classfiles, imports) <- Res[(Util.ClassFiles, Imports)](compiled, "Compilation Failed")
-    } yield {
-      (classfiles, imports)
-    }
+    } yield (classfiles, imports)
+
   }
 
   def configureCompiler(callback: scala.tools.nsc.Global => Unit) = synchronized{
@@ -148,22 +141,12 @@ class CompilerLifecycleManager(frames0: Ref[List[Frame]]){
 
   def addToClasspath(classFiles: ClassFiles) = synchronized{
     Compiler.addToClasspath(classFiles, dynamicClasspath)
-    reInit()
+    dynamicClasspathChanged = true
   }
   // Not synchronized, since it's part of the exit sequence that needs to run
   // if the repl exits while the warmup code is compiling
   def shutdownPressy() = {
     if (pressy != null) pressy.shutdownPressy()
-  }
-
-  def handleEvalClasspath(jar: File) = synchronized{
-    frames().head.addClasspath(Seq(jar))
-    evalClassloader.add(jar.toURI.toURL)
-    reInit()
-  }
-  def handlePluginClasspath(jar: File) = synchronized{
-    frames().head.pluginClassloader.add(jar.toURI.toURL)
-    reInit()
   }
 }
 

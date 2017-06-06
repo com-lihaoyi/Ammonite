@@ -20,8 +20,8 @@ import scala.util.control.ControlThrowable
 trait Evaluator{
   def loadClass(wrapperName: String, classFiles: ClassFiles): Res[Class[_]]
   def evalMain(cls: Class[_], contextClassloader: ClassLoader): Any
-  def getCurrentLine: String
-  def withContextClassloader[T](contextClassloader: ClassLoader)(t: => T): T
+
+
   def processLine(classFiles: ClassFiles,
                   newImports: Imports,
                   printer: Printer,
@@ -70,49 +70,27 @@ object Evaluator{
     Res.Failure(newLine + "Interrupted! (`repl.lastException.printStackTrace` for details)")
   }
 
-  def apply(startingLine: Int, frames: => List[Frame]): Evaluator = new Evaluator{ eval =>
+  def apply(headFrame: => Frame): Evaluator = new Evaluator{ eval =>
 
-
-    /**
-     * The current line number of the REPL, used to make sure every snippet
-     * evaluated can have a distinct name that doesn't collide.
-     */
-    var currentLine = startingLine
-
-    /**
-     * Weird indirection only necessary because of
-     * https://issues.scala-lang.org/browse/SI-7085
-     */
-    def getCurrentLine = currentLine.toString.replace("-", "_")
 
     def loadClass(fullName: String, classFiles: ClassFiles): Res[Class[_]] = {
-      Res[Class[_]](Try {
-        for ((name, bytes) <- classFiles.sortBy(_._1)) {
-          frames.head.classloader.addClassFile(name, bytes)
-        }
-        val names = classFiles.map(_._1)
-        val res = Class.forName(fullName, true, frames.head.classloader)
-        res
-      }, e => "Failed to load compiled class " + e)
+      Res[Class[_]](
+        Try {
+          for ((name, bytes) <- classFiles.sortBy(_._1)) {
+            headFrame.classloader.addClassFile(name, bytes)
+          }
+
+          headFrame.classloader.findClass(fullName)
+        },
+        e =>"Failed to load compiled class " + e
+      )
     }
 
 
     def evalMain(cls: Class[_], contextClassloader: ClassLoader) =
-      withContextClassloader(contextClassloader){
+      Util.withContextClassloader(contextClassloader){
         cls.getDeclaredMethod("$main").invoke(null)
       }
-
-    def withContextClassloader[T](contextClassloader: ClassLoader)(t: => T) = {
-      val oldClassloader = Thread.currentThread().getContextClassLoader
-      try{
-        Thread.currentThread().setContextClassLoader(contextClassloader)
-        t
-      } finally {
-        Thread.currentThread().setContextClassLoader(oldClassloader)
-      }
-    }
-
-
 
     def processLine(classFiles: Util.ClassFiles,
                     newImports: Imports,
@@ -122,7 +100,6 @@ object Evaluator{
                     contextClassLoader: ClassLoader) = {
       for {
         cls <- loadClass("ammonite.$sess." + indexedWrapperName.backticked, classFiles)
-        _ = currentLine += 1
         _ <- Catching{userCodeExceptionHandler}
       } yield {
         // Exhaust the printer iterator now, before exiting the `Catching`

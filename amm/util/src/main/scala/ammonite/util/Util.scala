@@ -9,7 +9,15 @@ import ammonite.ops._
 
 
 object Util{
-
+  def withContextClassloader[T](contextClassloader: ClassLoader)(t: => T) = {
+    val oldClassloader = Thread.currentThread().getContextClassLoader
+    try{
+      Thread.currentThread().setContextClassLoader(contextClassloader)
+      t
+    } finally {
+      Thread.currentThread().setContextClassLoader(oldClassloader)
+    }
+  }
   val upPathSegment = "^"
   def pathToPackageWrapper(flexiblePkgName0: Seq[Name],
                            relPath0: RelPath): (Seq[Name], Name) = {

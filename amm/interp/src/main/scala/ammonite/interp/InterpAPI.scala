@@ -27,7 +27,7 @@ trait InterpAPI {
   /**
    * Tools related to loading external scripts and code into the REPL
    */
-  def load: Load
+  def load: InterpLoad
 
   /**
    * resolvers to use when loading jars
@@ -72,19 +72,7 @@ trait LoadJar {
   def ivy(coordinates: coursier.Dependency*): Unit
 }
 
-trait Load extends (String => Unit) with LoadJar{
-  /**
-   * Loads a command into the REPL and
-   * evaluates them one after another
-   */
-  def apply(line: String): Unit
-
-  /**
-   * Loads and executes the scriptfile on the specified path.
-   * Compilation units separated by `@\n` are evaluated sequentially.
-   * If an error happens it prints an error message to the console.
-   */
-  def exec(path: Path): Unit
+trait InterpLoad extends LoadJar{
 
   def module(path: Path): Unit
 

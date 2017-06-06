@@ -177,6 +177,14 @@
         @li
           @hl.scala{import $ivy} no longer fails if it cannot find source
           dependencies, instead merely printing a warning.
+        @li
+          @code{interp.load.exec} and @code{interp.load.apply}
+          have been moved to @code{repl.load.exec} and @code{repl.load.apply},
+          and are now not available when running scripts: they never had a
+          really well-defined semantic when run within scripts. Using
+          @code{repl.load.exec} or @code[repl.load.apply} within the
+          @code{predef.sc} of your REPL is still possible
+
 
     @sect{0.9.9}
       @ul
