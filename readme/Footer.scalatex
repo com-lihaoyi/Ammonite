@@ -185,6 +185,10 @@
           @code{repl.load.exec} or @code{repl.load.apply} within the
           @code{predef.sc} of your REPL is still possible
 
+        @li
+          The @code{interp.watch} built-in now works on folders as well as
+          files, watching all files within that folder and restarting your
+          script if any of them change
 
     @sect{0.9.9}
       @ul
