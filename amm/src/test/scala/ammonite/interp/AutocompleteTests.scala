@@ -1,7 +1,7 @@
-package ammonite
+package ammonite.interp
 
+import ammonite.TestRepl
 import ammonite.TestUtils._
-import ammonite.interp.Preprocessor
 import utest._
 
 
@@ -14,9 +14,9 @@ object AutocompleteTests extends TestSuite{
       val cursor = caretCode.indexOf("<caret>")
       val buf = caretCode.replace("<caret>", "")
 
-      val (index, completions, signatures) = check.interp.pressy.complete(
+      val (index, completions, signatures) = check.interp.compilerManager.complete(
         cursor,
-        Preprocessor.importBlock(check.interp.eval.frames.head.imports),
+        check.interp.frameImports.toString,
         buf
       )
       val left = cmp(completions.toSet)
@@ -28,7 +28,7 @@ object AutocompleteTests extends TestSuite{
   def checking[T](f: Completer => T) = {
     val c = new Completer
     val res = f(c)
-    c.check.interp.pressy.shutdownPressy()
+    c.check.interp.compilerManager.shutdownPressy()
     res
   }
   val tests = TestSuite {
@@ -38,7 +38,7 @@ object AutocompleteTests extends TestSuite{
 
       // Not sure why clone and finalize don't appear in this list
       val anyCompletion = Set(
-        "!=", "==", "|>",
+        "!=", "==",
         "toString", "equals", "hashCode",
         "getClass", "asInstanceOf", "isInstanceOf"
       )
@@ -47,9 +47,12 @@ object AutocompleteTests extends TestSuite{
       }
 
       'import - checking{ complete =>
-        complete("""import <caret>""", Set("java", "javax", "scala") -- _)
-        complete("""import j<caret>""", Set("java", "javax", "jline", "jawn") -- _)
-        complete("""import ja<caret>""", x => Set("java", "javax", "jawn") ^ (x - "javafx"))
+        complete("""import <caret>""", Set("java", "javax", "scala", "javassist") -- _)
+        complete("""import j<caret>""", Set("java", "javax", "jline", "jawn", "javassist") -- _)
+        complete(
+          """import ja<caret>""",
+          x => Set("java", "javax", "jawn", "javassist") ^ (x - "javafx")
+        )
         complete("""import java.<caret>""", Set("lang", "util") -- _)
         complete("""import java.u<caret>""", Set("util") ^ _)
         complete("""import java.util.<caret>""", Set("LinkedHashMap", "LinkedHashSet") -- _)

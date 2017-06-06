@@ -86,7 +86,7 @@ object ProjectTests extends TestSuite{
       }
       'code{
         check.session("""
-          @ interp.load("val x = 1")
+          @ repl.load("val x = 1")
 
           @ x
           res2: Int = 1
@@ -118,6 +118,12 @@ object ProjectTests extends TestSuite{
 
         @ (Option(1) |@| Option(2))(_ + _)
         res1: Option[Int] = Some(3)
+      """)
+    }
+    'cats{
+      check.session("""
+        @ import $ivy.`org.typelevel::cats-core:0.9.0`, cats._
+
       """)
     }
     'guava{

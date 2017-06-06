@@ -30,7 +30,6 @@ object Main {
   object publicKeyChecker extends PublickeyAuthenticator {
     def authenticate(username: String, key: PublicKey, session: ServerSession): Boolean = {
       val keys = AuthorizedKeysAuthenticator.readDefaultAuthorizedKeys()
-      pprint.log(keys)
       username == currentUserName &&
         keys.asScala
           .exists { entry =>

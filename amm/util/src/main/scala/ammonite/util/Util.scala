@@ -9,20 +9,39 @@ import ammonite.ops._
 
 
 object Util{
-
+  def withContextClassloader[T](contextClassloader: ClassLoader)(t: => T) = {
+    val oldClassloader = Thread.currentThread().getContextClassLoader
+    try{
+      Thread.currentThread().setContextClassLoader(contextClassloader)
+      t
+    } finally {
+      Thread.currentThread().setContextClassLoader(oldClassloader)
+    }
+  }
   val upPathSegment = "^"
-  def pathToPackageWrapper(path: Path, wd: Path): (Seq[Name], Name) = {
+  def pathToPackageWrapper(flexiblePkgName0: Seq[Name],
+                           relPath0: RelPath): (Seq[Name], Name) = {
+    var flexiblePkgName = flexiblePkgName0
+    var relPath = relPath0/up
+    val fileName = relPath0.last
+    while(
+      flexiblePkgName.length > 1 &&
+      flexiblePkgName.last.encoded != upPathSegment &&
+      relPath.ups > 0
+    ){
+      flexiblePkgName = flexiblePkgName.dropRight(1)
+      relPath = relPath.copy(ups = relPath.ups - 1)
+    }
     val pkg = {
-      val base = Seq("$file")
-      val relPath = (path/up).relativeTo(wd)
       val ups = Seq.fill(relPath.ups)(upPathSegment)
       val rest = relPath.segments
-      (base ++ ups ++ rest).map(Name(_))
+      flexiblePkgName ++ (ups ++ rest).map(Name(_))
     }
-    val wrapper = path.last.lastIndexOf('.') match{
-      case -1 => path.last
-      case i => path.last.take(i)
+    val wrapper = fileName.lastIndexOf('.') match{
+      case -1 => fileName
+      case i => fileName.take(i)
     }
+
     (pkg, Name(wrapper))
   }
   def md5Hash(data: Iterator[Array[Byte]]) = {
@@ -46,7 +65,8 @@ object Util{
     * unambiguously look up the correct version of a class, or invalidate and
     * recompile it if the source code or environment changes
     */
-  case class VersionedWrapperId(wrapperPath: String, versionHash: String)
+  case class VersionedWrapperId(wrapperPath: String,
+                                tag: Tag)
 
 
 
@@ -54,40 +74,30 @@ object Util{
   type ClassFiles = Vector[(String, Array[Byte])]
 
 
-
   /**
-    * The serialized output of running a script, including both metadata and the classfile binaries
-    */
-  case class ScriptOutput(processed: ScriptOutput.Metadata, classFiles: Seq[ClassFiles])
-  object ScriptOutput{
-    /**
-      * Metadata extracted from the compilation of a single block, without the classfiles
-      * but with enough information to fetch the classfiles form disk and evaluate the
-      * block without compiling/parsing it
-      */
-    case class BlockMetadata(id: VersionedWrapperId, importHookTrees: Seq[ImportTree])
-    case class Metadata(finalImports: Imports, blockInfo: Seq[BlockMetadata])
-  }
-  type CompileCache = (ClassFiles, Imports)
-
-  /**
-    * Information about where a particular block of code came from; [[source]]
+    * Information about where a particular block of code came from; [[path]]
     * is optional because some code snippets are synthetic, which means any
     * filename is entirely synthetic and $file imports do not work in them.
     * However, there are many snippets of code, e.g. repl commands and such,
-    * which have a "fake" [[source]] because we want to allow $file imports
+    * which have a "fake" [[path]] because we want to allow $file imports
     * relative to some path or working-directory
     */
   case class CodeSource(wrapperName: Name,
-                        pkgName: Seq[Name],
-                        source: Option[Path]){
+                        flexiblePkgName: Seq[Name],
+                        pkgRoot: Seq[Name],
+                        path: Option[Path]){
+    // All code Ammonite compiles must be rooted in some package within
+    // the `ammonite` top-level package
+    assert(pkgRoot.head == Name("ammonite"))
+    def pkgName = pkgRoot ++ flexiblePkgName
     def fullName = pkgName :+ wrapperName
 
+    def fileName = path.fold(filePathPrefix.last + ".sc")(_.last)
     def jvmPathPrefix = Util.encodeJvmPath(fullName)
     def filePathPrefix = Util.encodeFilePath(fullName)
-    def printablePath = source match{
+    def printablePath = path match{
       case Some(x) => x.toString
-      case None => "<synthetic>/" + filePathPrefix.mkString("/") + ".sc"
+      case None => "(synthetic)/" + filePathPrefix.mkString("/") + ".sc"
     }
   }
 

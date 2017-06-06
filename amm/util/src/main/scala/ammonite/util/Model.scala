@@ -5,102 +5,37 @@
 package ammonite.util
 
 
+import java.io.PrintStream
 
+import ammonite.ops.Path
 
-import scala.collection.mutable
 import scala.reflect.NameTransformer
 import scala.reflect.runtime.universe.TypeTag
 
+
+/**
+  * Information about a particular predef file or snippet. [[hardcoded]]
+  * represents whether or not we cache the snippet forever regardless of
+  * classpath, which is true for many "internal" predefs which only do
+  * imports from Ammonite's own packages and don't rely on external code
+  */
+case class PredefInfo(name: Name, code: String, hardcoded: Boolean, path: Option[Path])
 
 /**
   * Exception for reporting script compilation failures
   */
 class CompilationError(message: String) extends Exception(message)
 
-
-case class Evaluated(wrapper: Seq[Name],
-                     imports: Imports,
-                     tag: String)
-
 /**
-  * Represents the importing of a single name in the Ammonite REPL, of the
-  * form
-  *
-  * {{{
-  * import $prefix.{$fromName => $toName}
-  * }}}
-  *
-  * All imports are reduced to this form; `import $prefix.$name` is results in
-  * the `fromName` and `toName` being the same, while `import $prefix._` or
-  * `import $prefix.{foo, bar, baz}` are split into multiple distinct
-  * [[ImportData]] objects.
-  *
-  * Note that imports can be of one of three distinct `ImportType`s: importing
-  * a type, a term, or both. This lets us properly deal with shadowing correctly
-  * if we import the type and term of the same name from different places
+  * A unique key for a piece of code that gets run in a particular environment;
+  * contains the hash of the code and the hash of the environment stored
+  * separately, so you can e.g. compare the [[env]] hash even if you don't have
+  * the code available
   */
-case class ImportData(fromName: Name,
-                      toName: Name,
-                      prefix: Seq[Name],
-                      importType: ImportData.ImportType)
-
-
-object ImportData{
-  sealed case class ImportType(name: String)
-  val Type = ImportType("Type")
-  val Term = ImportType("Term")
-  val TermType = ImportType("TermType")
+case class Tag(code: String, env: String){
+  def combined = code + env
 }
 
-/**
-  * Represents the imports that occur before a piece of user code in the
-  * Ammonite REPL. It's basically a `Seq[ImportData]`, except we really want
-  * it to be always in a "canonical" form without shadowed/duplicate imports.
-  *
-  * Thus we only expose an `apply` method which performs this de-duplication,
-  * and a `++` operator that combines two sets of imports while performing
-  * de-duplication.
-  */
-class Imports private (val value: Seq[ImportData]){
-  def ++(others: Imports) = Imports(this.value, others.value)
-  override def toString() = s"Imports(${value.toString})"
-}
-
-object Imports{
-  // This isn't called directly, but we need to define it so uPickle can know
-  // how to read/write imports
-  def unapply(s: Imports): Option[Seq[ImportData]] = Some(s.value)
-  /**
-    * Constructs an `Imports` object from one or more loose sequence of imports
-    *
-    * Figures out which imports will get stomped over by future imports
-    * before they get used, and just ignore those.
-    */
-  def apply(importss: Seq[ImportData]*): Imports = {
-    // We iterate over the combined reversed imports, keeping track of the
-    // things that will-be-stomped-over-in-the-non-reversed-world in a map.
-    // If an import's target destination will get stomped over we ignore it
-    //
-    // At the end of the day we re-reverse the trimmed list and return it.
-    val importData = importss.flatten
-    val stompedTypes = mutable.Set.empty[Name]
-    val stompedTerms = mutable.Set.empty[Name]
-    val out = mutable.Buffer.empty[ImportData]
-    for(data <- importData.reverseIterator){
-      val stomped = data.importType match{
-        case ImportData.Term => Seq(stompedTerms)
-        case ImportData.Type => Seq(stompedTypes)
-        case ImportData.TermType => Seq(stompedTerms, stompedTypes)
-      }
-      if (!stomped.exists(_(data.toName))){
-        out.append(data)
-        stomped.foreach(_.add(data.toName))
-        data.prefix.headOption.foreach(stompedTerms.remove)
-      }
-    }
-    new Imports(out.reverse)
-  }
-}
 
 /**
   * Represents a single identifier in Scala source code, e.g. "scala" or
@@ -243,7 +178,6 @@ object Ex{
 
 
 trait CodeColors{
-  def ident: fansi.Attrs
   def `type`: fansi.Attrs
   def literal: fansi.Attrs
   def comment: fansi.Attrs
@@ -272,7 +206,8 @@ case class Colors(prompt: Ref[fansi.Attrs],
                   keyword: Ref[fansi.Attrs],
                   selected: Ref[fansi.Attrs],
                   error: Ref[fansi.Attrs],
-                  warning: Ref[fansi.Attrs])
+                  warning: Ref[fansi.Attrs],
+                  info: Ref[fansi.Attrs])
 object Colors{
 
   def Default = Colors(
@@ -285,12 +220,13 @@ object Colors{
     fansi.Color.Yellow,
     fansi.Reversed.On,
     fansi.Color.Red,
-    fansi.Color.Yellow
+    fansi.Color.Yellow,
+    fansi.Color.Blue
   )
   def BlackWhite = Colors(
     fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty,
     fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty,
-    fansi.Attrs.Empty, fansi.Attrs.Empty
+    fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty
   )
 }
 
@@ -315,7 +251,8 @@ object Bind{
   * @param info How you want to print compile info logging. *Not* the same
   *             as `out`, which is used to print runtime output.
   */
-case class Printer(out: String => Unit,
+case class Printer(outStream: PrintStream,
+                   errStream: PrintStream,
                    warning: String => Unit,
                    error: String => Unit,
                    info: String => Unit)
@@ -328,3 +265,9 @@ case class ImportTree(prefix: Seq[String],
 object ImportTree{
   type ImportMapping = Seq[(String, Option[String])]
 }
+
+case class PredefFailedToLoad(msg: String,
+                              cause: Option[Throwable],
+                              res: Res.Failing,
+                              watchedFilePaths: Seq[(Path, Option[Long])])
+  extends Exception(msg, cause.orNull)

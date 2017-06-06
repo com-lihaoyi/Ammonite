@@ -57,10 +57,11 @@ object EulerTests extends TestSuite{
       """)
     }
     'p5{
-      // What is the smallest number divisible by each of the numbers 1 to 20?*
+      // What is the smallest number divisible by each of the numbers 1 to 10?*
+      // Original value was 20, but 10 runs a lot quicker
       check.session("""
-        @ Range(20, Int.MaxValue).find(n => Range(2, 21).forall(n % _ == 0)).get
-        res0: Int = 232792560
+        @ Range(10, Int.MaxValue).find(n => Range(2, 11).forall(n % _ == 0)).get
+        res0: Int = 2520
       """)
     }
     'p6{
@@ -139,14 +140,15 @@ object EulerTests extends TestSuite{
       """)
     }
     'p10{
-      // Calculate the sum of all the primes below two million.*
+      // Calculate the sum of all the primes below 200,000.*
+      // Originally 2,000,000, reduced to 200,000 for perf
       check.session("""
         @ lazy val ps: Stream[Int] = 2 #:: Stream.from(3).filter(i =>
         @    ps.takeWhile(j => j * j <= i).forall(i % _ > 0))
         ps: Stream[Int] = <lazy>
 
-        @ ps.view.takeWhile(_ < 2000000).foldLeft(0L)(_ + _)
-        res1: Long = 142913828922L
+        @ ps.view.takeWhile(_ < 200000).foldLeft(0L)(_ + _)
+        res1: Long = 1709600813L
         """
       )
     }
@@ -450,18 +452,19 @@ object EulerTests extends TestSuite{
       """)
     }
     'p21{
-      // Evaluate the sum of all amicable pairs under 10000.*
+      // Evaluate the sum of all amicable pairs under 1000.*
+      // Originally 10000, shorted to 1000 for performance
       check.session("""
-        @ val ds = (0 until 10000).view.map(
+        @ val ds = (0 until 1000).view.map(
         @  n => (1 to (n / 2)).filter(n % _ == 0).sum
         @ )
 
         @ val as = ds.zipWithIndex.collect {
-        @   case (n, i) if n < 10000 && ds(n) != n && ds(n) == i => i
+        @   case (n, i) if n < 1000 && ds(n) != n && ds(n) == i => i
         @ }
 
         @ val r = as.sum
-        r: Int = 31626
+        r: Int = 504
       """)
     }
     'p22{
@@ -564,33 +567,35 @@ object EulerTests extends TestSuite{
     }
 
     'p26{
-      // Find the value of d < 1000 for which 1/d contains the longest recurring cycle.*
+      // Find the value of d < 100 for which 1/d contains the longest recurring cycle.*
+      // Originally 1000, reduced to 100 for perf
       check.session("""
         @ val ps = {
-        @   (2 until 1000).map(i => (1 to 2000)
+        @   (2 until 100).map(i => (1 to 200)
         @                 .find(BigInt(10).modPow(_, i) == 1))
         @ }
 
         @ val r = 2 + ps.indexOf(Some(ps.flatten.max))
-        r: Int = 983
+        r: Int = 97
       """)
     }
     'p27{
       // Find a quadratic formula that produces the maximum number of
       // primes for consecutive values of n.*
+      // Originally -999 to 1000, reduced to -99 to 100 to speed it up a bit
       check.session("""
         @ val r = {
         @   lazy val ps: Stream[Int] = 2 #:: Stream.from(3).filter(i =>
         @     ps.takeWhile(j => j * j <= i).forall(i % _ > 0))
         @   def isPrime(n: Int) = ps.view.takeWhile(_ <= n).contains(n)
-        @   val ns = (-999 until 1000).flatMap { a =>
-        @     (-999 until 1000).map(b => (a, b, (0 to 1000).view
+        @   val ns = (-99 until 100).flatMap { a =>
+        @     (-99 until 100).map(b => (a, b, (0 to 100).view
         @       .takeWhile(n => isPrime(n * n + a * n + b)).size))
         @   }
         @   val t = ns.reduceLeft((a, b) => if(a._3 > b._3) a else b)
         @   t._1 * t._2
         @ }
-        r: Int = -59231
+        r: Int = -1455
       """)
     }
 

@@ -54,11 +54,14 @@ object AdvancedTests extends TestSuite{
 
     'predef{
       val check2 = new TestRepl{
-        override def predef = """
+        override def predef = (
+          """
           import math.abs
           val x = 1
           val y = "2"
-        """
+          """,
+          None
+        )
       }
       check2.session("""
         @ -x
@@ -77,9 +80,12 @@ object AdvancedTests extends TestSuite{
     }
     'predefSettings{
       val check2 = new TestRepl{
-        override def predef = """
+        override def predef = (
+          """
           interp.configureCompiler(_.settings.Xexperimental.value = true)
-        """
+          """,
+          None
+        )
       }
       check2.session("""
         @ repl.compiler.settings.Xexperimental.value
@@ -216,7 +222,7 @@ object AdvancedTests extends TestSuite{
           100,
         ...
 
-        @ pprintConfig() = pprintConfig().copy(height = 5 )
+        @ repl.pprinter() = repl.pprinter().copy(defaultHeight = 5)
 
         @ Seq.fill(20)(100)
         res4: Seq[Int] = List(
@@ -322,7 +328,10 @@ object AdvancedTests extends TestSuite{
       val dir = pwd/'amm/'src/'test/'resources/'scripts/'predefWithLoad
       'loadExec {
         val c1 = new TestRepl() {
-          override def predef = read ! dir / "PredefLoadExec.sc"
+          override def predef = (
+            read! dir/"PredefLoadExec.sc",
+            Some(dir/"PredefLoadExec.sc")
+          )
         }
         c1.session("""
           @ val previouslyLoaded = predefDefinedValue
@@ -331,11 +340,29 @@ object AdvancedTests extends TestSuite{
       }
       'loadModule{
         val c2 = new TestRepl(){
-          override def predef = read! dir/"PredefLoadModule.sc"
+          override def predef = (
+            read! dir/"PredefLoadModule.sc",
+            Some(dir/"PredefLoadModule.sc")
+          )
         }
         c2.session("""
-          @ val previouslyLoaded = 1337
+          @ val previouslyLoaded = predefDefinedValue
           previouslyLoaded: Int = 1337
+        """)
+      }
+      'importIvy{
+        val c2 = new TestRepl(){
+          override def predef = (
+            read! dir/"PredefMagicImport.sc",
+            Some(dir/"PredefMagicImport.sc")
+          )
+        }
+        c2.session("""
+          @ val previouslyLoaded = predefDefinedValue
+          previouslyLoaded: Int = 1337
+
+          @ val loadedDirect = Loaded.loadedDefinedValue
+          loadedDirect: Int = 1337
         """)
       }
     }
@@ -346,10 +373,10 @@ object AdvancedTests extends TestSuite{
         @ val cls = classOf[Child]
 
         @ val resName = cls.getName.replace('.', '/') + ".class"
-        resName: String = "$sess/cmd0$Child.class"
+        resName: String = "ammonite/$sess/cmd0$Child.class"
 
         @ cls.getClassLoader.getResource(resName)
-        res3: java.net.URL = memory:$sess/cmd0$Child.class
+        res3: java.net.URL = memory:ammonite/$sess/cmd0$Child.class
 
         @ cls.getClassLoader.getResourceAsStream(resName) != null
         res4: Boolean = true

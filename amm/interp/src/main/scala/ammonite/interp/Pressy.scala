@@ -2,15 +2,14 @@ package ammonite.interp
 
 
 
-import scala.reflect.internal.util.{Position, OffsetPosition, BatchSourceFile}
+import ammonite.interp.Compiler.makeReporter
+
+import scala.reflect.internal.util.{BatchSourceFile, OffsetPosition, Position}
 import scala.reflect.io.VirtualDirectory
 import scala.tools.nsc
 import scala.tools.nsc.Settings
-import scala.tools.nsc.backend.JavaPlatform
 import scala.tools.nsc.interactive.Response
-import scala.tools.nsc.util._
 import scala.util.{Failure, Success, Try}
-
 import ammonite.util.Util.newLine
 /**
  * Nice wrapper for the presentation compiler.
@@ -188,14 +187,13 @@ object Pressy {
     var cachedPressy: nsc.interactive.Global = null
 
     def initPressy = {
-      val (reporter, _, jcp) = GlobalInitCompat.initGlobalBits(
-        classpath,
+      val (dirDeps, jarDeps) = classpath.partition(_.isDirectory)
+      val jcp = GlobalInitCompat.initGlobalClasspath(
+        dirDeps, jarDeps,
         dynamicClasspath,
-        _ => (),
-        _ => (),
-        _ => (),
         settings
       )
+      val reporter = makeReporter(_ => (), _ => (), _ => (), settings)
       GlobalInitCompat.initInteractiveGlobal(settings, reporter, jcp, evalClassloader)
     }
 

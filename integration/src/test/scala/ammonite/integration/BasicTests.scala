@@ -23,13 +23,13 @@ object BasicTests extends TestSuite{
 
     def execWithJavaOptsSet(name: RelPath, home: Path) = %%bash(
       executable,
-      replStandaloneResources/name,
       "--no-remote-logging",
       "-h",
       home,
-      JAVA_OPTS = "-verbose:class",
-      "--"
-      )
+      replStandaloneResources/name,
+      JAVA_OPTS = "-verbose:class"
+    )
+
     'hello{
       val evaled = exec('basic/"Hello.sc")
       assert(evaled.out.trim == "Hello World")
@@ -46,10 +46,9 @@ object BasicTests extends TestSuite{
         write(scriptAddr, """println("Script Worked!!")""")
         val evaled = %%bash(
           executable,
-          scriptAddr,
           "-s",
-          "--"
-          )
+          scriptAddr
+        )
         assert(evaled.out.trim == "Script Worked!!" && evaled.err.string.isEmpty)
       }
     }
@@ -111,7 +110,6 @@ object BasicTests extends TestSuite{
       // from ivy, and make use of `cd!` and `wd` inside the executed script.
       val res = %%bash(
         executable,
-        "--repl-api",
         "--predef-file",
         exampleBarePredef,
         "-c",
@@ -125,6 +123,37 @@ object BasicTests extends TestSuite{
 
       val output = res.out.trim
       assert(output == "amm/src")
+    }
+
+    // Ensure we can load the source code of the built-in Java standard library
+    'source{
+      // This fails on windows because for some reason the windows subprocess
+      // interface eats the double-quotes inside the `-c` argument, even though
+      // the argument is being passed programmatically and not through any shell =(
+      //
+      // For some reason this fails on travis/Scala2.10/Java7. I cannot reproduce
+      // it locally on OSX/Scala2.10/Java8, but Scala2.10/Java7 is legacy anyway
+      // so it's probably fine if this doesn't work.
+      if (!Util.windowsPlatform && !scala.util.Properties.versionNumberString.contains("2.10")) {
+        %%bash(
+          executable,
+          "-c",
+          """val loc = source.load(new String().substring(_: Int))
+            |val snip = loc.fileContent
+            |  .lines
+            |  .slice(loc.lineNum-15, loc.lineNum+15)
+            |  .mkString("\n")
+            |
+            |assert(snip.contains("public String substring(int beginIndex)"))
+          """.stripMargin
+        )
+      }
+    }
+
+    // Ensure we can load the source code of external libraries, which needs to
+    // get pulled down together with the library code when you `import $ivy`
+    'sourceExternal{
+      exec('basic / "SourceDownload.sc")
     }
 
     'classloaders{
@@ -183,126 +212,34 @@ object BasicTests extends TestSuite{
       }
     }
 
-    'main{
-      'single{
-        val evaled = exec('basic/"Main.sc")
+    // Most of the logic around main methods is tested in `MainTests.scala`
+    // in our unit test suite, but test a few cases as integration tests
+    // to make sure things work end-to-end
+    'multiMain{
+      'positiveArgs{
+        val evaled = exec('basic/"MultiMain.sc", "functionB", "2", "foo")
+
         val out = evaled.out.string
-        assert(out.contains("Hello! 1"))
+        assert(out == ("Hello! foofoo ." + Util.newLine))
       }
-      'multiple{
-        'positiveNoArgs{
-          val evaled = exec('basic/"MultiMain.sc", "mainA")
-          val out = evaled.out.string
-          assert(out == "Hello! 1" + Util.newLine)
-        }
-        'positiveArgs{
-          val evaled = exec('basic/"MultiMain.sc", "functionB", "2", "foo")
-          val out = evaled.out.string
-          assert(out == "Hello! foofoo ." + Util.newLine)
-        }
-        'specifyMain{
-          val evaled = intercept[ShelloutException]{
-            exec('basic/"MultiMain.sc")
-          }.result
-          val out = evaled.err.string
-          val expected = Util.normalizeNewlines(
-            s"""Need to specify a subcommand to call when running MultiMain.sc
-                |
-                |Available subcommands:
-                |
-                |def mainA()
-                |def functionB(i: Int, s: String, path: ammonite.ops.Path = $pwd)
-                |""".stripMargin
-          )
-          assert(out.contains(expected))
-        }
-        'cantFindMain{
-          val evaled = intercept[ShelloutException]{
-            exec('basic/"MultiMain.sc", "doesntExist")
-          }.result
-          val out = evaled.err.string
-          val expected = Util.normalizeNewlines(
-            s"""Unable to find subcommand: doesntExist
-                |
-                |Available subcommands:
-                |
-                |def mainA()
-                |def functionB(i: Int, s: String, path: ammonite.ops.Path = $pwd)
-                |""".stripMargin
-          )
-          assert(out.contains(expected))
-        }
-      }
-    }
+      'specifyMain{
+        val evaled = intercept[ShelloutException](exec('basic/"MultiMain.sc"))
 
-    'args{
-      'full{
-        val evaled = exec('basic/"Args.sc", "3", "Moo", (pwd/'omg/'moo).toString)
-        assert(evaled.out.string == Util.normalizeNewlines("\"Hello! MooMooMoo moo.\"\n"))
-      }
-
-      'default{
-        val evaled = exec('basic/"Args.sc", "3", "Moo")
-        assert(
-          evaled.out.string == Util.normalizeNewlines("\"Hello! MooMooMoo Ammonite.\"\n") ||
-          // For some reason, on windows CI machines the repo gets clone as lowercase (???)
-          evaled.out.string == Util.normalizeNewlines("\"Hello! MooMooMoo ammonite.\"\n")
+        val out = evaled.result.err.string
+        val expected = Util.normalizeNewlines(
+          s"""Need to specify a subcommand to call when running MultiMain.sc
+             |
+             |Available subcommands:
+             |
+             |  mainA
+             |
+             |  functionB
+             |    --i     Int
+             |    --s     String
+             |    --path  ammonite.ops.Path (default $pwd)
+             |""".stripMargin
         )
-      }
-      'manualPrintln{
-        val evaled = exec('basic/"Args2.sc", "3", "Moo")
-        assert(
-          evaled.out.string == Util.normalizeNewlines("Hello! MooMooMoo Ammonite.\n") ||
-          // For some reason, on windows CI machines the repo gets clone as lowercase (???)
-          evaled.out.string == Util.normalizeNewlines("Hello! MooMooMoo ammonite.\n")
-        )
-      }
-      'tooFew{
-        val errorMsg = intercept[ShelloutException]{
-          exec('basic/"Args.sc", "3")
-        }.result.err.string
-
-        assert(errorMsg.contains(
-          Util.normalizeNewlines(
-            s"""Arguments provided did not match expected signature:
-               |(i: Int, s: String, path: ammonite.ops.Path = $pwd)
-               |
-               |Missing arguments: (s: String)""".stripMargin
-          )
-        ))
-      }
-      'tooMany{
-        val errorMsg = intercept[ShelloutException]{
-          exec('basic/"Args.sc", "3", "4", "5", "6")
-        }.result.err.string
-
-        assert(errorMsg.contains(
-          Util.normalizeNewlines(
-            s"""Arguments provided did not match expected signature:
-                |(i: Int, s: String, path: ammonite.ops.Path = $pwd)
-                |
-                |Unknown arguments: "6"""".stripMargin
-          )
-        ))
-      }
-      'cantParse{
-        val errorMsg = intercept[ShelloutException]{
-          exec('basic/"Args.sc", "foo", "moo")
-        }.result.err.string
-
-        val exMsg = """java.lang.NumberFormatException: For input string: "foo""""
-        assert(errorMsg.contains(
-          Util.normalizeNewlines(
-            s"""The following arguments failed to be parsed:
-               |(i: Int) failed to parse input "foo" with $exMsg
-               |expected arguments: (i: Int, s: String, path: ammonite.ops.Path = $pwd)"""
-              .stripMargin
-          )
-        ))
-        // Ensure we're properly truncating the random stuff we don't care about
-        // which means that the error stack that gets printed is short-ish
-        assert(errorMsg.lines.length < 12)
-
+        assert(out.contains(expected))
       }
     }
   }

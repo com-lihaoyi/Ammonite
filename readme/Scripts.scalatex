@@ -5,18 +5,30 @@
 @val replSource = 'amm/'src/'main/'scala/'ammonite
 @val advancedTests = ammoniteTests/"AdvancedTests.scala"
 @sect("Scala Scripts", "Lightweight Programming in Scala")
+
+
   @p
     @b{Scala scripts} are lightweight files containing Scala code that
     can be directly run from the command line. Unlike normal Scala projects,
     Scala scripts let you save and run code without setting up a "build-file"
-    or "project". Scala Scripts are useful as something in between the REPL and
-    a full-fledged Scala/SBT project: more permanent than a REPL session, but
-    more lightweight and easier to set up than a SBT project.
+    or "project". Scala Scripts are useful for writing small pieces of code,
+    and are much quicker to write and deploy than a full-fledged SBT project.
+
+  @img(src:="Watch.gif", display.block, marginLeft.auto, marginRight.auto, height := 322)
+
   @p
     Creating an Ammonite Script is just a matter of creating a
-    @hl.scala{MyScript.sc} with some Scala code in it, and running it from
-    within the Ammonite REPL or @sect.ref{From Bash}. Writing Scala code
-    doesn't get much easier than that! For example, Ammonite's own
+    @code{MyScript.sc} with some Scala code in it, and running it
+    @sect.ref("Running Scripts", "from your terminal"). Deploying the script is
+    a matter of copying the script file to where-ever you want to run it, and
+    running it. No @code{project/} folder, no worrying about @code{.jar} files
+    or uber-jars. No worrying about compiling your code: scripts are
+    automatically compiled the first time they are run, and subsequently start
+    quickly with minimal overhead. Writing and running Scala code
+    doesn't get much easier than that!
+
+  @p
+    As an example, Ammonite's own
     @lnk("Continuous Integration Scripts", "https://github.com/lihaoyi/Ammonite/tree/master/ci")
     are written as @code{.sc} Scala Scripts, as are @lnk("Haoyi's blog",
     "https://github.com/lihaoyi/blog") and @lnk("resume",
@@ -147,7 +159,7 @@
           using the @hl.scala{interp.load.ivy(deps: coursier.Dependency*)}
           function.
 
-        @hl.ref(ammoniteTests/up/"ScriptTests.scala", Seq("loadIvyAdvanced", "@"), "\"\"\"")
+        @hl.ref(ammoniteTests/"ScriptTests.scala", Seq("loadIvyAdvanced", "@"), "\"\"\"")
 
         @p
           Note that to use this function, your script needs to be a
@@ -216,7 +228,7 @@
         Bash), you need to pass arguments to configure its behavior. With
         Ammonite, this is done by defining a @hl.scala("@main") method, e.g.
 
-      @hl.ref(wd/'integration/'src/'test/'resources/'ammonite/'integration/'basic/"Args.sc")
+      @hl.ref(wd/'amm/'src/'test/'resources/'mains/"Args.sc")
 
       @p
         When the script is run from the command line:
@@ -234,7 +246,7 @@
         behavior, annotate your @hl.scala("@main") method as returning
         @hl.scala{: Unit} and add your own @hl.scala{println}s:
 
-      @hl.ref(wd/'integration/'src/'test/'resources/'ammonite/'integration/'basic/"Args2.sc")
+      @hl.ref(wd/'amm/'src/'test/'resources/'mains/"Args2.sc")
 
       @hl.sh
         $ amm Args2.sc 3 Moo
@@ -290,19 +302,18 @@
 
     @sect{Ammonite Arguments in Scripts}
       @p
-        By default, Ammonite treats the first argument as the script file as long
-        as it does not start with a @code{-}, and then forwards any subsequent arguments
-        to that script's main method(s). If you wish to pass arguments to @i{Ammonite},
-        you can do so by splitting up the argument list with a @code{--}:
+        Ammonite passing any arguments that come @i{before} the script file to
+        Ammonite itself, while arguments that come @i{after} the script file are
+        given to the script:
 
       @hl.sh
-        $ amm Args.sc --predef 'println("welcome!")' -- 3 Moo
+        $ amm --predef 'println("welcome!")' Args.sc 3 Moo
         welcome!
         "Hello! MooMooMoo Ammonite."
 
       @p
-        Here, "Ammonite Arguments" go on the @i{left} of the @code{--}, while
-        @i{Script Arguments} go on the @i{right} of the @code{--}. The script
+        Here, "Ammonite Arguments" go on the @i{left} of the @code{Args.sc}, while
+        @i{Script Arguments} go on the @i{right} of the @code{Args.sc}. The script
         arguments on the right can also be empty if you don't want to pass
         any arguments to the script.
 
@@ -312,14 +323,19 @@
 
       @hl.sh
         #!/bin/bash
-        exec amm "$0" --predef 'println("welcome!")' -- "$@@"
+        exec amm --predef 'println("welcome!")' "$0" "$@@"
         !#
 
       @p
         And which will pass in the @code{--predef} flag to Ammonite while
         running the script via @code{./Args.sc}. If you want to then pass
         in different sets of arguments, you can run the script using @code{amm}
-        e.g. @hl.sh{amm Args.sc --predef 'println("Hello!")' -- 3 Moo} as before.
+        e.g. @hl.sh{amm --predef 'println("Hello!")' Args.sc 3 Moo} as before.
+        (Note that while a single-line @code{#!/usr/bin/env amm --predef '...'}
+        shebang may work on some systems such as OS-X, it is not portable and
+        would not work on Linux)
+
+
 
 
     @sect{Multiple Main Methods}
@@ -331,7 +347,7 @@
         to call. e.g. given:
 
       @hl.ref(
-        wd/'integration/'src/'test/'resources/'ammonite/'integration/'basic/"MultiMain.sc",
+        wd/'amm/'src/'test/'resources/'mains/"MultiMain.sc",
         className = "scala"
       )
 
@@ -346,6 +362,44 @@
 
       @code
         amm MultiMain.sc functionB 2 "Hello"
+
+    @sect{Script Usage Docs}
+      @p
+        You can document your scripts with the @hl.scala("@doc") annotation. By
+        default, a script such as
+
+      @hl.ref(
+         wd/'amm/'src/'test/'resources/'mains/"MultiMain.sc",
+         className = "scala"
+      )
+
+      @p
+        Will result in a usage message:
+
+      @hl.ref(
+        wd/'amm/'src/'test/'scala/'ammonite/'main/"MainTests.scala",
+        start = Seq("specifyMain", "\"\"\"", ""),
+        end = "\"\"\"",
+        className = "sh"
+      )
+
+      @p
+        You can add docs via
+
+      @hl.ref(
+         wd/'amm/'src/'test/'resources/'mains/"MultiMainDoc.sc",
+         className = "scala"
+      )
+
+      @p
+        Which will be shown as part of the usage message
+
+      @hl.ref(
+        wd/'amm/'src/'test/'scala/'ammonite/'main/"MainTests.scala",
+        start = Seq("specifyMainDoc", "\"\"\"", ""),
+        end = "\"\"\"",
+        className = "sh"
+      )
 
     @sect{Bundled Libraries}
       @p
@@ -429,7 +483,7 @@
         @replCurl
 
       @hl.scala
-        bash$ amm path/to/script.sc
+        $ amm path/to/script.sc
 
       @p
         All types, values and imports defined in scripts are available to
@@ -461,11 +515,27 @@
       @p
         To let it use only up to 1024 megabytes of memory
 
+    @sect{Watch and Reload}
+      @img(src:="Watch.gif", display.block, marginLeft.auto, marginRight.auto, height := 322)
+      @p
+        Ammonite provides the @code{-w}/@code{--watch} flag, which tells it to
+        not exit when a script completes, but instead watch the files that were
+        run, and re-run them when any of them change. You can use this flag via
+
+      @code
+        $ amm -w foo.sc
+
+      @p
+        Within your scripts, you can also flag other files you want Ammonite
+        to watch, via the @code{interp.watch(p: Path)} function. This is useful
+        if you are iterating on a script together with some external data files
+        the script depends on, and you want to
+
     @sect{From the REPL}
       @p
         You can load any script into the Ammonite REPL using the
         @hl.scala{import $file} syntax, for example here we import the above
-        @hl.scala{MyScript.sc} file to access its @hl.scala{x} value:
+        @code{MyScript.sc} file to access its @hl.scala{x} value:
 
       @hl.scala
         @@ x // doesn't work yet

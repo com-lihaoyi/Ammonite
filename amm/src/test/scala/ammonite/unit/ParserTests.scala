@@ -1,6 +1,7 @@
 package ammonite.unit
 
 import ammonite.repl.Highlighter
+import ammonite.util.Util
 import utest._
 
 object ParserTests extends TestSuite{
@@ -102,14 +103,15 @@ object ParserTests extends TestSuite{
       }
       'examples{
         'small{
-          val input =
+          val input = Util.normalizeNewlines(
             """ for {
                  a <- List(1);
                  b <- List(2)
               } yield (1, 2)"""
+          )
           val lines = input.lines.toVector
           for(i <- 1 until lines.length) {
-            val prefix = lines.take(i).mkString("\n")
+            val prefix = lines.take(i).mkString(Util.newLine)
             // Only the entire input, which is the last prefix, is complete.
             // All others are incomplete
             if (i == lines.length) assertComplete(prefix)
@@ -117,16 +119,17 @@ object ParserTests extends TestSuite{
           }
         }
         'medium{
-          val input =
+          val input = Util.normalizeNewlines(
             """ val ls = for(y <- 1900 to 2000; m <- 1 to 12) yield {
                   if(m == 2)
                     if (y % 4 == 0 && (y % 100 != 0 || y % 400 == 0)) 29 else 28
                   else
                     lengths(m - 1)
                 } """
+          )
           val lines = input.lines.toVector
           for(i <- 1 until lines.length) {
-            val prefix = lines.take(i).mkString("\n")
+            val prefix = lines.take(i).mkString(Util.newLine)
             // Only the entire input, which is the last prefix, is complete.
             // All others are incomplete
             if (i == lines.length) assertComplete(prefix)
@@ -134,7 +137,7 @@ object ParserTests extends TestSuite{
           }
         }
         'big{
-          val input =
+          val input = Util.normalizeNewlines(
             """import play.core.server._, play.api.routing.sird._, play.api.mvc._ // 0
                import scalaj.http._                                               // 1
                val server = NettyServer.fromRouter(new ServerConfig(              // 2
@@ -161,6 +164,7 @@ object ParserTests extends TestSuite{
                }finally{                                                          // 23
                  server.stop()                                                    // 24
                }                                                                  // 25"""
+          )
           val lines = input.lines.toVector
           // Every line n where the prefix formed by lines 0 to n (inclusive)
           // is a valid, complete input. Every other line *should* be incomplete,
@@ -168,7 +172,7 @@ object ParserTests extends TestSuite{
           val completeLines = Set(0, 1, 20, 25)
           for(i <- 0 until lines.length) {
 
-            val prefix = lines.take(i + 1).mkString("\n")
+            val prefix = lines.take(i + 1).mkString(Util.newLine)
             if (completeLines(i)) assertComplete(prefix)
             else assertIncomplete(prefix)
           }

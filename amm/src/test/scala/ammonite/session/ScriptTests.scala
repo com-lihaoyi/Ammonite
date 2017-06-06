@@ -1,20 +1,19 @@
-package ammonite
+package ammonite.session
 
+import ammonite.{TestRepl, main}
 import ammonite.TestUtils._
+import ammonite.main.{Defaults, Scripts}
 import ammonite.ops._
-import ammonite.main.Defaults
+import ammonite.runtime.Storage
+import ammonite.util.Res
 import utest._
-import ammonite.runtime.{Storage}
 
 object ScriptTests extends TestSuite{
   val tests = TestSuite{
     println("ScriptTests")
     val check = new TestRepl()
 
-    val scriptPath = pwd/'amm/'src/'test/'resources/'scripts
     val printedScriptPath = """pwd/'amm/'src/'test/'resources/'scripts"""
-
-    val resourcesPath = pwd/'amm/'src/'test/'resources
 
     'exec{
       'compilationBlocks{
@@ -22,7 +21,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import ammonite.ops._
 
-            @ interp.load.exec($printedScriptPath/"LoadIvy.sc")
+            @ repl.load.exec($printedScriptPath/"LoadIvy.sc")
 
             @ val r = res
             r: String = "<a href=\\"www.google.com\\">omg</a>"
@@ -38,7 +37,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import ammonite.ops._
 
-            @ interp.load.exec($printedScriptPath/"PreserveImports.sc")
+            @ repl.load.exec($printedScriptPath/"PreserveImports.sc")
 
             @ val r = res
             r: $typeString = Left("asd")
@@ -48,7 +47,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import ammonite.ops._
 
-            @ interp.load.exec($printedScriptPath/"Annotation.sc")
+            @ repl.load.exec($printedScriptPath/"Annotation.sc")
 
             @ val r = res
             r: Int = 24
@@ -58,7 +57,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import ammonite.ops._
 
-            @ interp.load.exec($printedScriptPath/"BlockSepSyntax.sc")
+            @ repl.load.exec($printedScriptPath/"BlockSepSyntax.sc")
 
             @ val r = res
             r: Int = 24
@@ -68,7 +67,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import ammonite.ops._
 
-            @ interp.load.exec($printedScriptPath/"LimitImports.sc")
+            @ repl.load.exec($printedScriptPath/"LimitImports.sc")
 
             @ res
             error: not found: value res
@@ -80,7 +79,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import ammonite.ops._
 
-            @ interp.load.exec($printedScriptPath/"SyntaxError.sc")
+            @ repl.load.exec($printedScriptPath/"SyntaxError.sc")
             error: CompilationError
 
             @ val r = res
@@ -94,7 +93,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @  import ammonite.ops._
 
-            @ interp.load.exec($printedScriptPath/"CompilationError.sc")
+            @ repl.load.exec($printedScriptPath/"CompilationError.sc")
             error: Compilation Failed
 
             @ val r = res
@@ -108,7 +107,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import ammonite.ops._
 
-            @ interp.load.exec($printedScriptPath/"notHere")
+            @ repl.load.exec($printedScriptPath/"notHere")
             error: java.nio.file.NoSuchFileException
             """
           )
@@ -117,7 +116,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import ammonite.ops._
 
-            @ interp.load.exec($printedScriptPath/"MultiBlockError.sc")
+            @ repl.load.exec($printedScriptPath/"MultiBlockError.sc")
             error: Compilation Failed
 
             @ val r2 = res2
@@ -132,7 +131,7 @@ object ScriptTests extends TestSuite{
         check.session(s"""
           @ import ammonite.ops._
 
-          @ interp.load.exec($printedScriptPath/"NestedScripts.sc")
+          @ repl.load.exec($printedScriptPath/"NestedScripts.sc")
 
           @ val a = asd
           error: not found: value asd
@@ -146,7 +145,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @  import ammonite.ops._
 
-            @ interp.load.exec($printedScriptPath/"SheBang.sc")
+            @ repl.load.exec($printedScriptPath/"SheBang.sc")
 
             @ val r = res
             r: Int = 42
@@ -157,7 +156,7 @@ object ScriptTests extends TestSuite{
             s"""
             @  import ammonite.ops._
 
-            @ interp.load.exec($printedScriptPath/"MultilineSheBang.sc")
+            @ repl.load.exec($printedScriptPath/"MultilineSheBang.sc")
 
             @ val r = res
             r: Int = 42
@@ -232,7 +231,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import ammonite.ops._
 
-            @ interp.load.exec($printedScriptPath/"SyntaxError.sc")
+            @ repl.load.exec($printedScriptPath/"SyntaxError.sc")
             error: CompilationError
 
             @ val r = res
@@ -259,21 +258,22 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import ammonite.ops._
 
-            @ interp.load.exec($printedScriptPath/"notHere")
+            @ repl.load.exec($printedScriptPath/"notHere")
             error: java.nio.file.NoSuchFileException
             """
           )
         }
         'scriptWithoutExtension{
-          val res = intercept[java.nio.file.NoSuchFileException]{
-            val storage = new Storage.Folder(tmp.dir(prefix="ammonite-tester"))
-            val interp2 = createTestInterp(
-              storage,
-              Defaults.predefString
-            )
-            interp2.interpApi.load.module(pwd/"scriptWithoutExtension")
-          }.toString
-          assert(res.contains("java.nio.file.NoSuchFileException"))
+          val storage = new Storage.Folder(tmp.dir(prefix = "ammonite-tester"))
+          val interp2 = createTestInterp(
+            storage,
+            Defaults.predefString
+          )
+
+          val Res.Failure(msg) =
+            Scripts.runScript(pwd, pwd/"scriptWithoutExtension", interp2)
+
+          assert(msg.contains("Script file not found"))
         }
         'multiBlockError{
           check.session(s"""
@@ -316,15 +316,15 @@ object ScriptTests extends TestSuite{
       }
       'noUnWrapping{
         check.session(s"""
-        @ import ammonite.ops._
+          @ import ammonite.ops._
 
-        @ interp.load.module($printedScriptPath/"ScriptDontUnwrap.sc")
+          @ interp.load.module($printedScriptPath/"ScriptDontUnwrap.sc")
 
-        @ foo
-        res2: String = "foo def"
+          @ foo
+          res2: String = "foo def"
 
-        @ wrappedValue
-        error: not found: value wrappedValue
+          @ wrappedValue
+          error: not found: value wrappedValue
         """)
       }
       'resolverWithinScript{

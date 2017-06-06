@@ -1,23 +1,33 @@
 package ammonite.interp
 
 import ammonite.ops._
-import ammonite.util.Ref
-
+import ammonite.util.{Colors, Ref}
 import ammonite.runtime.APIHolder
 import ammonite.runtime.Evaluator.AmmoniteExit
 
 import scala.collection.mutable
-import scala.util.control.ControlThrowable
 
 
 object InterpBridge extends APIHolder[InterpAPI]
 
 trait InterpAPI {
+  /**
+    * When running a script in `--watch` mode, re-run the main script if this
+    * file changes. By default, this happens for all script files, but you can
+    * call this to watch arbitrary files your script may depend on
+    */
+  def watch(p: Path): Unit
+
+  /**
+    * The colors that will be used to render the Ammonite REPL in the terminal,
+    * or for rendering miscellaneous info messages when running scripts.
+    */
+  val colors: Ref[Colors]
 
   /**
    * Tools related to loading external scripts and code into the REPL
    */
-  def load: Load
+  def load: InterpLoad
 
   /**
    * resolvers to use when loading jars
@@ -62,19 +72,7 @@ trait LoadJar {
   def ivy(coordinates: coursier.Dependency*): Unit
 }
 
-trait Load extends (String => Unit) with LoadJar{
-  /**
-   * Loads a command into the REPL and
-   * evaluates them one after another
-   */
-  def apply(line: String): Unit
-
-  /**
-   * Loads and executes the scriptfile on the specified path.
-   * Compilation units separated by `@\n` are evaluated sequentially.
-   * If an error happens it prints an error message to the console.
-   */
-  def exec(path: Path): Unit
+trait InterpLoad extends LoadJar{
 
   def module(path: Path): Unit
 

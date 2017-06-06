@@ -1,17 +1,21 @@
 package ammonite.interp
 
 
-import ammonite.runtime.Evaluator
+import java.io.OutputStream
+
+import ammonite.runtime.{Classpath, Evaluator}
 import ammonite.util.{ImportData, Imports, Printer}
 import ammonite.util.Util.newLine
 
 import scala.collection.mutable
+import scala.reflect.internal.util.Position
 import scala.reflect.io
 import scala.reflect.io._
 import scala.tools.nsc
 import scala.tools.nsc.{Global, Settings}
 import scala.tools.nsc.interactive.Response
 import scala.tools.nsc.plugins.Plugin
+import scala.tools.nsc.reporters.AbstractReporter
 import scala.util.Try
 
 
@@ -37,11 +41,38 @@ trait Compiler{
   /**
    * Either the statements that were parsed or the error message
    */
-  def parse(line: String): Either[String, Seq[Global#Tree]]
+  def parse(fileName: String, line: String): Either[String, Seq[Global#Tree]]
   var importsLen = 0
 
 }
 object Compiler{
+  /**
+    * Writes files to dynamicClasspath. Needed for loading cached classes.
+    */
+  def addToClasspath(classFiles: Traversable[(String, Array[Byte])],
+                     dynamicClasspath: VirtualDirectory): Unit = {
+
+    for((name, bytes) <- classFiles){
+      val output = writeDeep(dynamicClasspath, name.split('.').toList, ".class")
+      output.write(bytes)
+      output.close()
+    }
+
+  }
+
+  def writeDeep(d: VirtualDirectory,
+                path: List[String],
+                suffix: String): OutputStream = path match {
+    case head :: Nil => d.fileNamed(path.head + suffix).output
+    case head :: rest =>
+      writeDeep(
+        d.subdirectoryNamed(head).asInstanceOf[VirtualDirectory],
+        rest, suffix
+      )
+    // We should never write to an empty path, and one of the above cases
+    // should catch this and return before getting here
+    case Nil => ???
+  }
   /**
    * If the Option is None, it means compilation failed
    * Otherwise it's a Traversable of (filename, bytes) tuples
@@ -49,9 +80,23 @@ object Compiler{
   type Output = Option[(Vector[(String, Array[Byte])], Imports)]
 
   /**
-   * Converts a bunch of bytes into Scalac's weird VirtualFile class
-   */
-  def makeFile(src: Array[Byte], name: String = "Main.sc") = {
+    * Converts a bunch of bytes into Scalac's weird VirtualFile class
+    *
+    * Can only take in a relative path for the VirtualFile! Otherwise
+    * fails with a weird assert in the presentation compiler:
+    *
+    * [Current.sc]: exception during background compile:
+    * java.lang.AssertionError:
+    * assertion failed: (
+    *   ammonite/predef//Users/lihaoyi/Dropbox/Github/<-wrapped to next line->
+    *   Ammonite/target/tempAmmoniteHome/predef.sc,false,16,16)
+    *
+    * It appears that passing in the filename *only* results in the correct
+    * stack traces (e.g. Foo.sc:425 rather than Users/lihaoyi/Foo.sc:45), so we
+    * do that and assert to make sure it's only one path segment
+    */
+  def makeFile(src: Array[Byte], name: String) = {
+    assert(!name.contains('/'))
     val singleFile = new io.VirtualFile(name)
     val output = singleFile.output
     output.write(src)
@@ -74,7 +119,28 @@ object Compiler{
 
 
 
+  def makeReporter(errorLogger: => String => Unit,
+                   warningLogger: => String => Unit,
+                   infoLogger: => String => Unit,
+                   outerSettings: Settings) = {
+    new AbstractReporter {
+      def displayPrompt(): Unit = ???
 
+      def display(pos: Position, msg: String, severity: Severity) = {
+        severity match{
+          case ERROR =>
+            Classpath.traceClasspathProblem(s"ERROR: $msg")
+            errorLogger(Position.formatMessage(pos, msg, false))
+          case WARNING =>
+            warningLogger(Position.formatMessage(pos, msg, false))
+          case INFO =>
+            infoLogger(Position.formatMessage(pos, msg, false))
+        }
+      }
+
+      val settings = outerSettings
+    }
+  }
 
 
   def apply(classpath: Seq[java.io.File],
@@ -84,6 +150,7 @@ object Compiler{
             shutdownPressy: () => Unit,
             settings: Settings): Compiler = new Compiler{
 
+    if(sys.env.contains("DIE"))???
     val PluginXML = "scalac-plugin.xml"
     lazy val plugins0 = {
       import scala.collection.JavaConverters._
@@ -133,13 +200,52 @@ object Compiler{
     var lastImports = Seq.empty[ImportData]
 
     val (vd, reporter, compiler) = {
-      val (reporter, vd, jcp) = GlobalInitCompat.initGlobalBits(
-        classpath, dynamicClasspath, errorLogger, warningLogger, infoLogger, settings
+
+      val (dirDeps, jarDeps) = classpath.partition(_.isDirectory)
+
+      val jcp = GlobalInitCompat.initGlobalClasspath(
+        dirDeps, jarDeps, dynamicClasspath, settings
       )
+      val vd = new io.VirtualDirectory("(memory)", None)
+      if (Classpath.traceClasspathIssues) {
+        settings.Ylogcp.value = true
+        println("jardeps")
+        jarDeps.foreach(p => println(s"${p.getName.takeRight(4)} $p"))
+        println("finished")
+      }
+
+      settings.outputDirs.setSingleOutput(vd)
+
+      settings.nowarnings.value = true
+      // Otherwise the presence of `src`'s source files mixed with
+      // classfiles causes scalac to get confused
+      settings.termConflict.value = "object"
+
+      val reporter = makeReporter(errorLogger, warningLogger, infoLogger, settings)
+
       val scalac = GlobalInitCompat.initGlobal(
-        settings, reporter, plugins0, jcp,
-        evalClassloader, importsLen, lastImports = _
+        settings, reporter, jcp,
+        evalClassloader,
+        createPlugins = g => {
+          List(
+            new ammonite.interp.AmmonitePlugin(g, lastImports = _, importsLen)
+          ) ++ {
+            for {
+              (name, cls) <- plugins0
+              plugin = Plugin.instantiate(cls, g)
+              initOk =
+              try CompilerCompatibility.pluginInit(plugin, Nil, g.globalError)
+              catch { case ex: Exception =>
+                Console.err.println(s"Warning: disabling plugin $name, initialization failed: $ex")
+                false
+              }
+              if initOk
+            } yield plugin
+          }
+        }
       )
+
+
       // Initialize scalac to the parser phase immediately, so we can start
       // using Compiler#parse even if we haven't compiled any compilation
       // units yet due to caching
@@ -222,7 +328,7 @@ object Compiler{
 
         val files = for(x <- outputFiles if x.name.endsWith(".class")) yield {
           val segments = x.path.split("/").toList.tail
-          val output = Evaluator.writeDeep(dynamicClasspath, segments, "")
+          val output = writeDeep(dynamicClasspath, segments, "")
           output.write(x.toByteArray)
           output.close()
           (x.path.stripPrefix("(memory)/").stripSuffix(".class").replace('/', '.'), x.toByteArray)
@@ -235,7 +341,7 @@ object Compiler{
     }
 
 
-    def parse(line: String): Either[String, Seq[Global#Tree]] = {
+    def parse(fileName: String, line: String): Either[String, Seq[Global#Tree]] = {
       val errors = mutable.Buffer.empty[String]
       val warnings = mutable.Buffer.empty[String]
       val infos = mutable.Buffer.empty[String]
@@ -243,7 +349,8 @@ object Compiler{
       warningLogger = warnings.append(_)
       infoLogger = infos.append(_)
       reporter.reset()
-      val parser = compiler.newUnitParser(line)
+      val parser = CompilerCompatibility.newUnitParser(compiler, line, fileName)
+
       val trees = CompilerCompatibility.trees(compiler)(parser)
       if (reporter.hasErrors) Left(errors.mkString(newLine))
       else Right(trees)

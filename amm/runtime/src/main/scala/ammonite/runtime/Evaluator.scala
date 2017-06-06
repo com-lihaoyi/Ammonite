@@ -1,14 +1,12 @@
 package ammonite.runtime
 
-import java.io.OutputStream
 import java.lang.reflect.InvocationTargetException
 
 
 import ammonite._
-import util.Util.{ClassFiles, ScriptOutput, VersionedWrapperId, newLine}
+import util.Util.{ClassFiles, newLine}
 import ammonite.util._
 
-import scala.reflect.io.VirtualDirectory
 import scala.util.Try
 import scala.util.control.ControlThrowable
 
@@ -21,25 +19,21 @@ import scala.util.control.ControlThrowable
  */
 trait Evaluator{
   def loadClass(wrapperName: String, classFiles: ClassFiles): Res[Class[_]]
-  def evalMain(cls: Class[_]): Any
-  def getCurrentLine: String
-  def update(newImports: Imports): Unit
+  def evalMain(cls: Class[_], contextClassloader: ClassLoader): Any
+
 
   def processLine(classFiles: ClassFiles,
                   newImports: Imports,
                   printer: Printer,
-                  fileName: String,
-                  indexedWrapperName: Name): Res[Evaluated]
+                  indexedWrapperName: Name,
+                  silent: Boolean,
+                  contextClassLoader: ClassLoader): Res[Evaluated]
 
   def processScriptBlock(cls: Class[_],
                          newImports: Imports,
                          wrapperName: Name,
                          pkgName: Seq[Name],
-                         tag: String): Res[Evaluated]
-
-  def frames: List[Frame]
-
-  def frames_=(newValue: List[Frame]): Unit
+                         contextClassLoader: ClassLoader): Res[Evaluated]
 }
 
 object Evaluator{
@@ -50,6 +44,11 @@ object Evaluator{
   type InvEx = InvocationTargetException
   type InitEx = ExceptionInInitializerError
 
+  /**
+    * We unwrap many of the "common" cases where the user's actual
+    * exception is wrapped in a bunch of InvocationTargetException
+    * wrappers, since it's the users exception they probably care about
+    */
   val userCodeExceptionHandler: PartialFunction[Throwable, Res.Failing] = {
     // Exit
     case Ex(_: InvEx, _: InitEx, AmmoniteExit(value))  => Res.Exit(value)
@@ -68,80 +67,50 @@ object Evaluator{
 
   def interrupted(e: Throwable) = {
     Thread.interrupted()
-    Res.Failure(Some(e), newLine + "Interrupted!")
+    Res.Failure(newLine + "Interrupted! (`repl.lastException.printStackTrace` for details)")
   }
 
-  def apply(currentClassloader: ClassLoader,
-            startingLine: Int): Evaluator = new Evaluator{ eval =>
-
-
-    /**
-     * The current line number of the REPL, used to make sure every snippet
-     * evaluated can have a distinct name that doesn't collide.
-     */
-    var currentLine = startingLine
-
-    /**
-     * Weird indirection only necessary because of
-     * https://issues.scala-lang.org/browse/SI-7085
-     */
-    def getCurrentLine = currentLine.toString.replace("-", "_")
-
-    /**
-     * Performs the conversion of our pre-compiled `Array[Byte]`s into
-     * actual classes with methods we can execute.
-     */
-
-    def initialFrame = {
-      val hash = SpecialClassLoader.initialClasspathSignature(currentClassloader)
-      def special = new SpecialClassLoader(currentClassloader, hash)
-      new Frame(
-        special,
-        special,
-        Imports(),
-        Seq()
-      )
-    }
-    var frames = List(initialFrame)
-
+  def apply(headFrame: => Frame): Evaluator = new Evaluator{ eval =>
 
 
     def loadClass(fullName: String, classFiles: ClassFiles): Res[Class[_]] = {
-      Res[Class[_]](Try {
-        for ((name, bytes) <- classFiles.sortBy(_._1)) {
-          frames.head.classloader.addClassFile(name, bytes)
-        }
-        val names = classFiles.map(_._1)
-        val res = Class.forName(fullName, true, frames.head.classloader)
-        res
-      }, e => "Failed to load compiled class " + e)
+      Res[Class[_]](
+        Try {
+          for ((name, bytes) <- classFiles.sortBy(_._1)) {
+            headFrame.classloader.addClassFile(name, bytes)
+          }
+
+          headFrame.classloader.findClass(fullName)
+        },
+        e =>"Failed to load compiled class " + e
+      )
     }
 
 
-    def evalMain(cls: Class[_]) = {
-      cls.getDeclaredMethod("$main").invoke(null)
-    }
-
-
-
+    def evalMain(cls: Class[_], contextClassloader: ClassLoader) =
+      Util.withContextClassloader(contextClassloader){
+        cls.getDeclaredMethod("$main").invoke(null)
+      }
 
     def processLine(classFiles: Util.ClassFiles,
                     newImports: Imports,
                     printer: Printer,
-                    fileName: String,
-                    indexedWrapperName: Name) = {
+                    indexedWrapperName: Name,
+                    silent: Boolean,
+                    contextClassLoader: ClassLoader) = {
       for {
-        cls <- loadClass("$sess." + indexedWrapperName.backticked, classFiles)
-        _ = currentLine += 1
+        cls <- loadClass("ammonite.$sess." + indexedWrapperName.backticked, classFiles)
         _ <- Catching{userCodeExceptionHandler}
       } yield {
         // Exhaust the printer iterator now, before exiting the `Catching`
         // block, so any exceptions thrown get properly caught and handled
-        val iter = evalMain(cls).asInstanceOf[Iterator[String]]
-        evaluatorRunPrinter(iter.foreach(printer.out))
+        val iter = evalMain(cls, contextClassLoader).asInstanceOf[Iterator[String]]
+
+        if (!silent) evaluatorRunPrinter(iter.foreach(printer.outStream.print))
+        else evaluatorRunPrinter(iter.foreach(_ => ()))
 
         // "" Empty string as cache tag of repl code
-        evaluationResult(Seq(Name("$sess"), indexedWrapperName), newImports, "")
+        evaluationResult(Seq(Name("ammonite"), Name("$sess"), indexedWrapperName), newImports)
       }
     }
 
@@ -150,23 +119,18 @@ object Evaluator{
                            newImports: Imports,
                            wrapperName: Name,
                            pkgName: Seq[Name],
-                           tag: String) = {
+                           contextClassLoader: ClassLoader) = {
       for {
         _ <- Catching{userCodeExceptionHandler}
       } yield {
-        evalMain(cls)
-        val res = evaluationResult(pkgName :+ wrapperName, newImports, tag)
+        evalMain(cls, contextClassLoader)
+        val res = evaluationResult(pkgName :+ wrapperName, newImports)
         res
       }
     }
 
-    def update(newImports: Imports) = {
-      frames.head.addImports(newImports)
-    }
-
     def evaluationResult(wrapperName: Seq[Name],
-                         imports: Imports,
-                         tag: String) = {
+                         imports: Imports) = {
       Evaluated(
         wrapperName,
         Imports(
@@ -185,8 +149,7 @@ object Evaluator{
 
             id.copy(prefix = rootedPrefix)
           }
-        ),
-        tag
+        )
       )
     }
   }
@@ -199,28 +162,5 @@ object Evaluator{
   def evaluatorRunPrinter(f: => Unit) = f
 
 
-  def writeDeep(d: VirtualDirectory,
-                path: List[String],
-                suffix: String): OutputStream = path match {
-    case head :: Nil => d.fileNamed(path.head + suffix).output
-    case head :: rest =>
-      writeDeep(
-        d.subdirectoryNamed(head).asInstanceOf[VirtualDirectory],
-        rest, suffix
-      )
-  }
-
-  /**
-    * Writes files to dynamicClasspath. Needed for loading cached classes.
-    */
-  def addToClasspath(classFiles: Traversable[(String, Array[Byte])],
-                     dynamicClasspath: VirtualDirectory): Unit = {
-    val names = classFiles.map(_._1)
-    for((name, bytes) <- classFiles){
-      val output = writeDeep(dynamicClasspath, name.split('.').toList, ".class")
-      output.write(bytes)
-      output.close()
-    }
-  }
 
 }

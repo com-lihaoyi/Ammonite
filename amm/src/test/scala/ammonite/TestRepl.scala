@@ -1,9 +1,12 @@
 package ammonite
 
+import java.io.PrintStream
+
 import ammonite.interp.Interpreter
-import ammonite.repl.{ReplApiImpl, SessionApiImpl}
-import ammonite.runtime.{History, Storage}
-import ammonite.repl.Repl
+import ammonite.ops.{Path, read}
+import ammonite.repl._
+import ammonite.runtime.{Frame, History, Storage}
+import ammonite.util.Util.normalizeNewlines
 import ammonite.util._
 import utest.asserts._
 
@@ -15,62 +18,102 @@ import scala.collection.mutable
  */
 class TestRepl {
   var allOutput = ""
-  def predef = ""
+  def predef: (String, Option[ammonite.ops.Path]) = ("", None)
 
   val tempDir = ammonite.ops.Path(
     java.nio.file.Files.createTempDirectory("ammonite-tester")
   )
 
-  val outBuffer = mutable.Buffer.empty[String]
+
+  import java.io.ByteArrayOutputStream
+  import java.io.PrintStream
+
+  val outBytes = new ByteArrayOutputStream
+  val errBytes = new ByteArrayOutputStream
+  def outString = new String(outBytes.toByteArray)
+
   val warningBuffer = mutable.Buffer.empty[String]
   val errorBuffer = mutable.Buffer.empty[String]
   val infoBuffer = mutable.Buffer.empty[String]
   val printer = Printer(
-    outBuffer.append(_),
-    warningBuffer.append(_),
-    errorBuffer.append(_),
-    infoBuffer.append(_)
+    new PrintStream(outBytes),
+    new PrintStream(errBytes),
+    x => warningBuffer.append(x + Util.newLine),
+    x => errorBuffer.append(x + Util.newLine),
+    x => infoBuffer.append(x + Util.newLine)
   )
-  val interp = try {
+  val storage = new Storage.Folder(tempDir)
+  val frames = Ref(List(Frame.createInitial()))
+  val sess0 = new SessionApiImpl(frames)
 
-    lazy val i: Interpreter = new Interpreter(
+  var currentLine = 0
+  val interp: Interpreter = try {
+    new Interpreter(
       printer,
-      storage = new Storage.Folder(tempDir),
+      storage = storage,
       wd = ammonite.ops.pwd,
       customPredefs = Seq(
-        Interpreter.PredefInfo(
+        PredefInfo(
           Name("defaultPredef"),
           ammonite.main.Defaults.replPredef + ammonite.main.Defaults.predefString,
           true,
           None
         ),
-        Interpreter.PredefInfo(Name("testPredef"), predef, false, None)
+        PredefInfo(Name("testPredef"), predef._1, false, predef._2)
       ),
-      extraBridges = { i =>
-        val replApi = new ReplApiImpl(
-          i,
-          80,
-          80,
-          Colors.BlackWhite,
-          "@",
-          Ref(null),
-          new History(Vector()),
-          new SessionApiImpl(i.eval),
-          Vector()
-        )
+      extraBridges = Seq((
+        "ammonite.repl.ReplBridge",
+        "repl",
+        new ReplApiImpl {
+          def printer = ???
 
-        Seq(("ammonite.repl.ReplBridge", "repl", replApi))
-      }
+          def sess = sess0
+          val prompt = Ref("@")
+          val frontEnd = Ref[FrontEnd](null)
+          def lastException: Throwable = null
+          def fullHistory = storage.fullHistory()
+          def history = new History(Vector())
+          val colors = Ref(Colors.BlackWhite)
+          def newCompiler() = interp.compilerManager.init(force = true)
+          def compiler = interp.compilerManager.compiler.compiler
+          def fullImports = interp.predefImports ++ imports
+          def imports = interp.frameImports
+          def width = 80
+          def height = 80
+
+          object load extends ReplLoad with (String => Unit){
+
+            def apply(line: String) = {
+              interp.processExec(line, currentLine, () => currentLine += 1) match{
+                case Res.Failure(s) => throw new CompilationError(s)
+                case Res.Exception(t, s) => throw t
+                case _ =>
+              }
+            }
+
+            def exec(file: Path): Unit = {
+              interp.watch(file)
+              apply(normalizeNewlines(read(file)))
+            }
+          }
+        }
+      )),
+      colors = Ref(Colors.BlackWhite),
+      getFrame = () => frames().head
     )
-    i.init()
-    i
+
   }catch{ case e: Throwable =>
     println(infoBuffer.mkString)
-    println(outBuffer.mkString)
+    println(outString)
     println(warningBuffer.mkString)
     println(errorBuffer.mkString)
     throw e
   }
+
+
+  interp.initializePredef()
+
+
 
   def session(sess: String): Unit = {
     // Remove the margin from the block and break
@@ -86,12 +129,11 @@ class TestRepl {
       // Break the step into the command lines, starting with @,
       // and the result lines
       val (cmdLines, resultLines) =
-        step.lines
-            .map(_.drop(margin))
-            .partition(_.startsWith("@"))
+        step.lines.toArray.map(_.drop(margin)).partition(_.startsWith("@"))
 
       val commandText = cmdLines.map(_.stripPrefix("@ ")).toVector
 
+      println(cmdLines.mkString(Util.newLine))
       // Make sure all non-empty, non-complete command-line-fragments
       // are considered incomplete during the parse
       //
@@ -106,8 +148,10 @@ class TestRepl {
       val expected = resultLines.mkString(Util.newLine).trim
       allOutput += commandText.map(Util.newLine + "@ " + _).mkString(Util.newLine)
 
-      val (processed, out, warning, error, info) = run(commandText.mkString(Util.newLine), index)
-      interp.handleOutput(processed)
+      val (processed, out, warning, error, info) =
+        run(commandText.mkString(Util.newLine), currentLine)
+
+      Repl.handleOutput(interp, processed)
 
       if (expected.startsWith("error: ")) {
         val strippedExpected = expected.stripPrefix("error: ")
@@ -153,7 +197,7 @@ class TestRepl {
               }
             )
 
-          case Res.Failure(ex, failureMsg) =>
+          case Res.Failure(failureMsg) =>
             assert{
               identity(error)
               identity(warning)
@@ -179,7 +223,7 @@ class TestRepl {
 
   def run(input: String, index: Int) = {
 
-    outBuffer.clear()
+    outBytes.reset()
     warningBuffer.clear()
     errorBuffer.clear()
     infoBuffer.clear()
@@ -187,10 +231,12 @@ class TestRepl {
     val processed = interp.processLine(
       input,
       splitted,
-      s"Main$index.sc"
+      index,
+      false,
+      () => currentLine += 1
     )
     processed match{
-      case Res.Failure(ex, s) => printer.error(s)
+      case Res.Failure(s) => printer.error(s)
       case Res.Exception(throwable, msg) =>
         printer.error(
           Repl.showException(throwable, fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty)
@@ -198,13 +244,13 @@ class TestRepl {
 
       case _ =>
     }
-    interp.handleOutput(processed)
+    Repl.handleOutput(interp, processed)
     (
       processed,
-      outBuffer.mkString,
-      warningBuffer.mkString(Util.newLine),
-      errorBuffer.mkString(Util.newLine),
-      infoBuffer.mkString(Util.newLine)
+      outString,
+      warningBuffer.mkString,
+      errorBuffer.mkString,
+      infoBuffer.mkString
     )
   }
 
@@ -215,7 +261,7 @@ class TestRepl {
 
     processed match{
       case Res.Success(v) => assert({identity(v); identity(allOutput); false})
-      case Res.Failure(ex, s) =>
+      case Res.Failure(s) =>
         failLoudly(assert(failureCheck(s)))
       case Res.Exception(ex, s) =>
         val msg = Repl.showException(

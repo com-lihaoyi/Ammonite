@@ -16,10 +16,10 @@ val allVersions = Seq(
 
 val latestMajorVersions = Set("2.10.6", "2.11.11", "2.12.2")
 
-val buildVersion =
-  if (sys.env("TRAVIS_TAG") == "") s"COMMIT-${getGitHash()}"
-  else sys.env("TRAVIS_TAG")
-
+val (buildVersion, unstable) = sys.env.get("TRAVIS_TAG") match{
+  case Some(v) if v != "" => (v, false)
+  case _ =>  (s"COMMIT-${getGitHash()}", true)
+}
 
 def getGitHash() = %%("git", "rev-parse", "--short", "HEAD").out.trim
 
@@ -52,7 +52,7 @@ def updateConstants(version: String = buildVersion,
   println(read! cwd/'project/"Constants.scala")
 }
 
-def publishSigned() = {
+def writeSonatypeCreds() = {
   val creds = s"""
     (credentials in ThisBuild) += Credentials("Sonatype Nexus Repository Manager",
         "oss.sonatype.org",
@@ -67,18 +67,18 @@ def publishSigned() = {
   write(cwd/"sonatype.sbt", creds)
   write(cwd/"secring.asc", sys.env("SONATYPE_PGP_KEY_CONTENTS").replace("\\n", "\n"))
   write(cwd/"pubring.asc", sys.env("SONATYPE_PGP_PUB_KEY_CONTENTS").replace("\\n", "\n"))
+}
 
-
-  for (version <- latestMajorVersions) {
+def publishSigned(prefixes: Seq[String]) = {
+  writeSonatypeCreds()
+  for (version <- latestMajorVersions if prefixes.exists(version.startsWith)) {
     %sbt("++" + version, "singleCrossBuilt/publishSigned")
   }
 
-  for (version <- allVersions) {
+  for (version <- allVersions if prefixes.exists(version.startsWith)) {
     %sbt("++" + version, "fullCrossBuilt/publishSigned")
   }
-  %sbt("sonatypeReleaseAll")
 }
-
 
 
 def publishDocs() = {
@@ -86,14 +86,10 @@ def publishDocs() = {
   val publishDocs = sys.env("DEPLOY_KEY").replace("\\n", "\n")
   write(cwd / 'deploy_key, publishDocs)
 
-  val gitHash = getGitHash()
-
-  val travisTag = sys.env("TRAVIS_TAG")
-
   val latestTaggedVersion = %%('git, 'describe, "--abbrev=0", "--tags").out.trim
 
   val (stableKey, unstableKey, oldStableKeys, oldUnstableKeys) =
-    if (travisTag != ""){
+    if (!unstable){
       (
         s"$latestTaggedVersion/2.12-$latestTaggedVersion",
         s"$latestTaggedVersion/2.12-$latestTaggedVersion",
@@ -105,11 +101,11 @@ def publishDocs() = {
     }else{
       (
         s"$latestTaggedVersion/2.12-$latestTaggedVersion",
-        s"snapshot-commit-uploads/2.12-$gitHash",
+        s"snapshot-commit-uploads/2.12-$buildVersion",
         for(v <- Seq("2.10", "2.11"))
         yield s"$latestTaggedVersion/$v-$latestTaggedVersion",
         for(v <- Seq("2.10", "2.11"))
-        yield s"snapshot-commit-uploads/$v-$gitHash"
+        yield s"snapshot-commit-uploads/$v-$buildVersion"
       )
     }
   println("(stableKey, unstableKey)")
@@ -173,11 +169,8 @@ def publishExecutable(ammoniteVersion: String,
 @main
 def executable() = {
   if (isMasterCommit){
-
-    val travisTag = sys.env("TRAVIS_TAG")
-    val unstable = travisTag == ""
     publishExecutable(
-      ammoniteVersion = if(unstable) getGitHash() else travisTag,
+      ammoniteVersion = buildVersion,
       publishKey = sys.env("AMMONITE_BOT_AUTH_TOKEN"),
       unstable
     )
@@ -206,19 +199,27 @@ def docs() = {
   }
 }
 
+// Shard this across
+//
+// - Cross-built artifacts or non-cross-built artifacts
+// - Scala-versions
 @main
-def artifacts() = {
+def artifacts(prefixes: String*) = {
+
   if (isMasterCommit){
     println("MASTER COMMIT: Updating version and publishing to Maven Central")
     updateConstants()
-    publishSigned()
+    publishSigned(prefixes)
   }else{
     println("MISC COMMIT: Compiling all Scala code across versions for verification")
-    for (version <- latestMajorVersions) {
+
+    for (version <- latestMajorVersions if prefixes.exists(version.startsWith)) {
+
       %sbt("++" + version, "singleCrossBuilt/package")
       %sbt("++" + version, "singleCrossBuilt/packageSrc")
     }
-    for (version <- allVersions) {
+
+    for (version <- allVersions if prefixes.exists(version.startsWith)) {
       %sbt("++" + version, "fullCrossBuilt/package")
       %sbt("++" + version, "fullCrossBuilt/packageSrc")
     }
@@ -227,7 +228,14 @@ def artifacts() = {
 }
 
 @main
-def test(testCommand: String) = {
-  %sbt("++" + sys.env("TRAVIS_SCALA_VERSION"), "published/compile")
-  %sbt("++" + sys.env("TRAVIS_SCALA_VERSION"), testCommand)
+def sonatypeReleaseAll() = {
+  if (isMasterCommit) {
+    writeSonatypeCreds()
+    %sbt("sonatypeReleaseAll")
+  }
+}
+
+@main
+def test(testCommands: String*) = {
+  testCommands.foreach(%sbt("++" + sys.env("TRAVIS_SCALA_VERSION"), _))
 }

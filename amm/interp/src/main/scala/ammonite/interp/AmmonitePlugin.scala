@@ -94,7 +94,7 @@ object AmmonitePlugin{
       !ignoredNames(sym.name.decoded)
     }
 
-    val stats = unit.body.children.last.asInstanceOf[g.ModuleDef].impl.body
+    val stats = unit.body.children.last.children.last.asInstanceOf[g.ModuleDef].impl.body
     val symbols = stats.filter(x => !Option(x.symbol).exists(_.isPrivate))
                        .foldLeft(List.empty[(Boolean, String, String, Seq[Name])]){
       // These are all the ways we want to import names from previous

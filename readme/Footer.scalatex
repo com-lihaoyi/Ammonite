@@ -114,6 +114,174 @@
 
 
   @sect{Changelog}
+    @sect{1.0.0-RC5}
+      @ul
+        @li
+          Output now defaults to colored if the console is interactive, and
+          non-colored otherwise. This should be a default most people would
+          be happy with.
+
+        @li
+          Scripts now have colored output by default if the script-runner is
+          interactive, following the above rules. Much of the script "info"
+          output like "Compiling" or "Watching for changes" messages are now
+          colored.
+
+        @li
+          There is now a cli-flag @code{--color} which can be set to
+          @hl.scala{true} or @hl.scala{false} to force colors on or off if you
+          are not happy with the default behavior.
+
+        @li
+          The @code{repl.colors} builtin has been moved to @code{interp.colors},
+          and allows you to fine-grained customize colors for e.g. error
+          messages and info messages when running scripts.
+
+        @li
+          Using @hl.scala{import $file} on an empty script files no longer
+          causes spurious errors
+
+        @li
+          Caches are properly invalidated if a script you @hl.scala{import $file}
+          is deleted
+
+        @li
+          @code{-w}/@code{--watch} now watches predef files as well. This means
+          if you make changes to your predef (e.g. if it was crashing and you're
+          trying to fix it), Ammonite will re-run your scripts automatically
+
+        @li
+          Improved error handling of failures within predef; they should no
+          longer show large stack traces containing irrelevant stack frames
+
+        @li
+          Predef files no longer cause problems with autocomplete in the REPL
+
+        @li
+          Parse errors within a file will now show the proper file-name, rather
+          than @code{<console>}.
+
+        @li
+          @code{Ctrl C} interrupts now place an exception with a useful stack
+          trace in @code{repl.lastException}, which can help debug where your
+          code was at when you interrupted it.
+
+        @li
+          @code{Ctrl C} no longer crashes the REPL if you perform it after
+          entering a command but before your code starts running
+        @li
+          Ammonite's REPL now warms up the compiler while you are typing your
+          first command; this makes it likely that the compilation will be fast
+          if you take a moment to enter your command, and shouldn't
+          significantly effect the time taken otherwise
+        @li
+          @hl.scala{import $ivy} no longer fails if it cannot find source
+          dependencies, instead merely printing a warning.
+        @li
+          @code{interp.load.exec} and @code{interp.load.apply}
+          have been moved to @code{repl.load.exec} and @code{repl.load.apply},
+          and are now not available when running scripts: they never had a
+          really well-defined semantic when run within scripts. Using
+          @code{repl.load.exec} or @code{repl.load.apply} within the
+          @code{predef.sc} of your REPL is still possible
+
+
+    @sect{0.9.9}
+      @ul
+        @li
+          Ammonite scripts now show their usage text in Bash/Linux format,
+          rather than in Scala format, to better fit into the scripting ecosystem
+
+    @sect{0.9.8}
+      @ul
+        @li
+          Modified the way @sect.ref{Ammonite Arguments in Scripts} get passed.
+          Rather than separating Ammonite's args and a script's args with a
+          @code{--}, now any arguments @i{before} the script file are used by
+          Ammonite and any arguments @i{after} the script file get forwarded
+          to the script's @hl.scala("@main") method
+
+        @li
+          Renamed @code{src} builtin to @code{source} to reduce chance of
+          name collisions
+        @li
+          You can now pass @sect.ref{Script Arguments} via both @code{--foo}
+          and @code{-foo}
+
+        @li
+          Error messages for scripts are now consistently not colored, rather
+          than mostly being uncolored but sometimes turning up red
+
+        @li
+          Scripts without a main method now properly show an error if arguments
+          are passed
+
+        @li
+          Error messages from scripts are now more reliably sent to @code{stderr}
+          rather than @code{stdout}
+
+        @li
+          All code within Ammonite's REPL and scripts now run within the context
+          of the @code{ammonite} package; this lets us avoid littering the
+          top-level package namespace with miscellaneous names like @code{$file}
+          and @code{$sess}
+
+        @li
+          Remove @code{foo ! bar ! baz} implicit syntax, and
+          @code{ChainableConversions} implicit. They're cool, but not simple
+          enough to be worth including by default
+
+        @li
+          Re-enable @code{foo |> show} syntax in the REPL, which regressed in 0.9.0
+
+    @sect{0.9.7}
+      @ul
+        @li
+          Fix crashes in autocomplete subsystem (@issue(620)) caused by
+          regression in 0.9.6
+
+    @sect{0.9.6}
+      @ul
+        @li
+          Fixed an issue where down-stream scripts would not properly recompile
+          when the scripts they import changed
+        @li
+          Ensure that importing the same script twice via a diamond-dependency
+          does not end up compiling it twice, and instead uses the first version
+          that was compiled
+        @li
+          @code{Path(...)} no longer automatically expands @code{~} to your home
+          directory, for consistency with other filesystem APIs. Use
+          @code{Path.expandUser} to do so manually.
+
+        @li
+          Add the @code{-w}/@code{--watch} @sect.ref{Watch and Reload} flag,
+          which lets you run a script repeatedly every time you change its code,
+          via @code{amm -w foo.sc}. This is useful when you are actively
+          working on the script and greatly reduces the iteration time. You can
+          also manually include files you wish to watch, e.g. if you are
+          iterating on external data or config files.
+
+    @sect{0.9.5}
+      @ul
+        @li
+          Fix scalac/classpath errors when loading typelevel/cats @issue(617)
+
+    @sect{0.9.4}
+      @ul
+        @li
+          Experimental support for the @sect.ref{source} built-in, which brings
+          you to the source code for a method or class so you can see the
+          implementation or read the doc-string.
+        @li
+          Importing @code{$file}s from within your predef now properly makes them
+          available within your REPL, the same way other imports are @issue(616)
+        @li
+          The predef required for @sect.ref{Ammonite-Shell} was tweaked slightly;
+          if you are using it please update your @code{~/.ammonite/predef.sc}
+          with the new @lnk("predef", "https://git.io/vH4ju") code.
+
+
     @sect{0.9.3}
       @ul
         @li
@@ -734,7 +902,7 @@
             problems when copying and pasting @issue(205)
           @li
             Thrown exceptions are now made available to you in the REPL under
-            the @code{lastException} variable @issue(289), in case you need more
+            the @code{repl.lastException} variable @issue(289), in case you need more
             metadata from it or you want the stack-trace of a
             non-printed-by-default exception (e.g. @code{ThreadDeath} due to
             @code{Ctrl-C}). Thanks to @coderAbhishek!

@@ -1,14 +1,15 @@
 package ammonite
 
-import java.io.{File, InputStream, OutputStream}
+import java.io.{InputStream, OutputStream, PrintStream}
 
 import ammonite.interp.Interpreter
 import ammonite.ops._
-import ammonite.runtime.{History, Storage}
-import ammonite.main.{Defaults, ProxyFromEnv}
-import ammonite.repl.{RemoteLogger, Repl, ReplApiImpl, SessionApiImpl}
+import ammonite.runtime.{Frame, Storage}
+import ammonite.main._
+import ammonite.repl.{RemoteLogger, Repl}
 import ammonite.util._
-import ammonite.util.Util.newLine
+
+import scala.annotation.tailrec
 
 
 
@@ -47,11 +48,9 @@ import ammonite.util.Util.newLine
   *                    but it could come from somewhere else e.g. across the
   *                    network in the case of the SshdRepl
   * @param outputStream Primary output of code run using Ammonite
-  * @param infoStream Miscellaneous logging output when running Ammonite. This
-  *                   is typically stuff you want to see when running interactively,
-  *                   but not something you want to see when e.g. you forward a
-  *                   script's output to a file. This by default it goes to System.err
-  * @param errorStream Error output when things go bad, typically System.err
+  * @param errorStream Error output when things go bad, typically System.err; also
+  *                    gets sent miscellaneous info messages that aren't strictly
+  *                    part of the REPL or script's output
   */
 case class Main(predef: String = "",
                 defaultPredef: Boolean = true,
@@ -60,15 +59,15 @@ case class Main(predef: String = "",
                 welcomeBanner: Option[String] = Some(Defaults.welcomeBanner),
                 inputStream: InputStream = System.in,
                 outputStream: OutputStream = System.out,
-                infoStream: OutputStream = System.err,
                 errorStream: OutputStream = System.err,
                 verboseOutput: Boolean = true,
-                remoteLogging: Boolean = true){
+                remoteLogging: Boolean = true,
+                colors: Colors = Colors.Default){
 
   /**
     * Instantiates an ammonite.Repl using the configuration
     */
-  def instantiateRepl(replArgs: Seq[Bind[_]] = Nil,
+  def instantiateRepl(replArgs: IndexedSeq[Bind[_]] = Vector.empty,
                      remoteLogger: Option[RemoteLogger]) = {
     val augmentedPredef = Main.maybeDefaultPredef(
       defaultPredef,
@@ -76,54 +75,47 @@ case class Main(predef: String = "",
     )
 
     new Repl(
-      inputStream, outputStream, infoStream, errorStream,
+      inputStream, outputStream, errorStream,
       storage = storageBackend,
       defaultPredef = augmentedPredef,
       mainPredef = predef,
       wd = wd,
       welcomeBanner = welcomeBanner,
       replArgs = replArgs,
-      remoteLogger = remoteLogger
+      remoteLogger = remoteLogger,
+      initialColors = colors
     )
   }
 
-  def instantiateInterpreter(replApi: Boolean) = {
+  def instantiateInterpreter() = {
     val augmentedPredef = Main.maybeDefaultPredef(defaultPredef, Defaults.predefString)
 
-    val (colors, printStream, errorPrintStream, printer) =
-      Interpreter.initPrinters(outputStream, infoStream, errorStream, verboseOutput)
-
+    val (colorsRef, _, _, printer) = Interpreter.initPrinters(
+      colors,
+      outputStream,
+      errorStream,
+      verboseOutput
+    )
+    val frame = Frame.createInitial()
 
     val interp: Interpreter = new Interpreter(
       printer,
       storageBackend,
       Seq(
-        Interpreter.PredefInfo(Name("defaultPredef"), augmentedPredef, false, None),
-        Interpreter.PredefInfo(Name("predef"), predef, false, None)
+        PredefInfo(Name("defaultPredef"), augmentedPredef, false, None),
+        PredefInfo(Name("predef"), predef, false, None)
       ),
-      i =>
-        if (!replApi) Nil
-        else {
-          val replApi = new ReplApiImpl(
-            i,
-            80,
-            80,
-            colors,
-            Ref(null),
-            Ref(null),
-            new History(Vector.empty),
-            new SessionApiImpl(i.eval),
-            Vector()
-          )
-          Seq(("ammonite.repl.ReplBridge", "repl", replApi))
-        },
+      Vector.empty,
       wd,
-      verboseOutput
+      colorsRef,
+      verboseOutput,
+      () => frame
     )
+    interp.initializePredef()
     interp
   }
 
-  def run(replArgs: Bind[_]*) = {
+  def run(replArgs: Bind[_]*): Any = {
 
     //set proxy properties from env:
     ProxyFromEnv.setPropProxyFromEnv()
@@ -134,8 +126,18 @@ case class Main(predef: String = "",
 
     remoteLogger.foreach(_.apply("Boot"))
 
-    val repl = instantiateRepl(replArgs, remoteLogger)
+    val repl = instantiateRepl(replArgs.toIndexedSeq, remoteLogger)
 
+    // Warm up the compilation logic in the background, hopefully while the
+    // user is typing their first command, so by the time the command is
+    // submitted it can be processed by a warm compiler
+    val warmupThread = new Thread(new Runnable{
+      def run() = repl.warmup()
+    })
+    // This thread will terminal eventually on its own, but if the
+    // JVM wants to exit earlier this thread shouldn't stop it
+    warmupThread.setDaemon(true)
+    warmupThread.start()
     try{
       val exitValue = repl.run()
       repl.beforeExit(exitValue)
@@ -151,19 +153,32 @@ case class Main(predef: String = "",
     * of `args` and a map of keyword `kwargs` to pass to that file.
     */
   def runScript(path: Path,
-                scriptArgs: Seq[(String, Option[String])],
-                replApi: Boolean = false): Res[Any] = {
+                scriptArgs: Seq[(String, Option[String])])
+                : (Res[Any], Seq[(Path, Option[Long])]) = {
 
-    val interp = instantiateInterpreter(replApi)
-    main.Scripts.runScript(wd, path, interp, scriptArgs)
+    val interpEither =
+      try Right(instantiateInterpreter())
+      catch{ case PredefFailedToLoad(msg, ex, res, watched) => Left(res -> watched) }
+
+
+    interpEither match{
+      case Right(interp) =>
+        val result = main.Scripts.runScript(wd, path, interp, scriptArgs)
+        (result, interp.watchedFiles)
+      case Left((res, watched)) => (res, watched)
+    }
   }
 
   /**
     * Run a snippet of code
     */
-  def runCode(code: String, replApi: Boolean = false) = {
-    val interp = instantiateInterpreter(replApi)
-    interp.interpApi.load(code)
+  def runCode(code: String) = {
+    val interp =
+      try Res.Success(instantiateInterpreter())
+      catch{ case PredefFailedToLoad(msg, ex, res, watched) => res }
+
+    interp.flatMap(_.processExec(code, 0, () => ()))
+
   }
 }
 
@@ -173,141 +188,172 @@ object Main{
     * The command-line entry point, which does all the argument parsing before
     * delegating to [[Main.run]]
     */
-  def main(args0: Array[String]) = {
-    var codeToExecute: Option[String] = None
-    var verboseOutput: Boolean = true
-    var ammoniteHome: Option[Path] = None
-    var passThroughArgs: Seq[String] = Vector.empty
-    var predefFile: Option[Path] = None
-    var replApi = false
-    var remoteLogging = true
-    val replParser = new scopt.OptionParser[Main]("ammonite") {
-      // Primary arguments that correspond to the arguments of
-      // the `Main` configuration object
-      head("ammonite", ammonite.Constants.version)
-
-      opt[String]('p', "predef")
-        .action((x, c) => c.copy(predef = x))
-        .text("Any commands you want to execute at the start of the REPL session")
-
-      opt[Unit]("no-default-predef")
-        .action((x, c) => c.copy(defaultPredef = false))
-        .text("Disable the default predef and run Ammonite with the minimal predef possible")
-
-      opt[Unit]("no-remote-logging")
-        .foreach(x => remoteLogging = false)
-        .text("Disable remote logging of the number of times a REPL starts and runs commands")
-
-      opt[String]('b', "banner")
-        .action((x, c) => c.copy(welcomeBanner = Some(x)))
-        .text("Customize the welcome banner that gets shown when Ammonite starts")
-
-      // Secondary arguments that correspond to different methods of
-      // the `Main` configuration arguments
-      opt[String]('c', "code")
-        .foreach(x => codeToExecute = Some(x))
-        .text("Pass in code to be run immediately in the REPL")
-
-      arg[String]("<args>...")
-        .optional()
-        .unbounded()
-        .foreach{ x => passThroughArgs = passThroughArgs :+ x }
-        .text("Any arguments you want to pass to the Ammonite script file")
-      opt[File]('h', "home")
-        .valueName("<file>")
-        .foreach( x => ammoniteHome = Some(Path(x, pwd)))
-        .text("The home directory of the REPL; where it looks for config and caches")
-      opt[String]('f', "predef-file")
-        .optional()
-        .foreach{ x => predefFile = Some(Path(x, pwd)) }
-        .text("Lets you load your predef from a custom location")
-      opt[Unit]('s', "silent")
-        .foreach(x => verboseOutput = false)
-        .text(
-          "Make ivy logs go silent instead of printing though failures will still throw exception"
-        )
-      opt[Unit]("repl-api")
-        .foreach(x => replApi= true)
-        .text(
-          """Lets you run a script with the `repl` object present; this is
-            |normally not available in scripts and only provided in the
-            |interactive REPL
-          """.stripMargin
-        )
-    }
-
-    // amm foo.sc
-    // amm -h bar
-    // amm foo.sc hello world
-    // amm foo.sc -h bar -- hello world
-    val (fileToExecute, ammoniteArgs, flatScriptArgs) = args0.lift(0) match{
-      case Some(x) if x.head != '-' =>
-        val fileToRun = Some(Path(args0(0), pwd))
-        // running a file
-        args0.indexOf("--") match {
-          // all args to to file main
-          case -1 => (fileToRun, Array.empty[String], args0.drop(1))
-          // args before -- go to ammonite, args after -- go to file main
-          case n => (fileToRun, args0.slice(1, n), args0.drop(n+1))
-        }
-      case _ => (None, args0, Array.empty[String]) // running the REPL, all args to to ammonite
-    }
-
-    val scriptArgs = ammonite.main.Scripts.groupArgs(flatScriptArgs)
-
-    for(c <- replParser.parse(ammoniteArgs, Main())) {
-      def main(isRepl: Boolean) = Main(
-        c.predef,
-        c.defaultPredef,
-        new Storage.Folder(ammoniteHome.getOrElse(Defaults.ammoniteHome), isRepl) {
-          override def loadPredef = {
-            predefFile match{
-              case None => super.loadPredef
-              case Some(file) =>
-                try {
-                  (read(file), Some(file))
-                } catch {
-                  case e: java.nio.file.NoSuchFileException => ("", None)
-                }
-            }
-          }
-        },
-        welcomeBanner = c.welcomeBanner,
-        verboseOutput = verboseOutput,
-        remoteLogging = remoteLogging
-      )
-      (fileToExecute, codeToExecute) match {
-        case (None, None) => println("Loading..."); main(true).run()
-        case (Some(path), None) =>
-          val scriptMain = main(false)
-          scriptMain.runScript(path, scriptArgs, replApi) match {
-            case Res.Failure(exOpt, msg) =>
-              Console.err.println(msg)
-              System.exit(1)
-            case Res.Exception(ex, s) =>
-              val trace = ex.getStackTrace
-              val i = trace.indexWhere(_.getMethodName == "$main") + 1
-              ex.setStackTrace(trace.take(i))
-              throw ex
-            case Res.Success(value) =>
-              if (value != ()){
-                pprint.PPrinter.BlackWhite.pprintln(value)
-              }
-            case Res.Skip   => // do nothing on success, everything's already happened
-          }
-
-        case (None, Some(code)) => main(false).runCode(code, replApi)
-
-      }
-
-    }
-
-    // Exit explicitly to kill any daemon threads that are running
-    System.exit(0)
+  def main(args0: Array[String]): Unit = {
+    val success = main0(args0.toList, System.in, System.out, System.err)
+    if (success) sys.exit(0)
+    else sys.exit(1)
   }
 
+  /**
+    * The logic of [[main]], in a form that doesn't call `sys.exit` and thus
+    * can be unit tested without spinning up lots of separate, expensive
+    * processes
+    */
+  def main0(args: List[String],
+            stdIn: InputStream,
+            stdOut: OutputStream,
+            stdErr: OutputStream): Boolean = {
+    val printErr = new PrintStream(stdErr)
+    val printOut = new PrintStream(stdOut)
+    // We have to use explicit flatmaps instead of a for-comprehension here
+    // because for-comprehensions fail to compile complaining about needing
+    // withFilter
+    Cli.groupArgs(args, Cli.ammoniteArgSignature, Cli.Config()) match{
+      case Left(msg) =>
+        printErr.println(msg)
+        false
+      case Right((cliConfig, leftoverArgs)) =>
+        if (cliConfig.help) {
+          printOut.println(Cli.ammoniteHelp)
+          true
+        }else{
+
+          val runner = new MainRunner(cliConfig, printOut, printErr, stdIn, stdOut, stdErr)
+          (cliConfig.code, leftoverArgs) match{
+            case (Some(code), Nil) =>
+              runner.initMain(true).runCode(code)
+              true
+
+            case (None, Nil) =>
+              runner.printInfo("Loading...")
+              runner.runRepl()
+              true
+
+            case (None, head :: rest) if head.startsWith("-") =>
+
+              val failureMsg =
+                "Unknown Ammonite option: " + head + Util.newLine +
+                "Use --help to list possible options"
+
+              runner.printError(failureMsg)
+              false
+
+            case (None, head :: rest) =>
+              val success = runner.runScript(Path(head, pwd), rest)
+              success
+          }
+        }
+    }
+  }
   def maybeDefaultPredef(enabled: Boolean, predef: String) =
     if (enabled) predef else ""
 
 
+  /**
+    * Detects if the console is interactive; lets us make console-friendly output
+    * (e.g. ansi color codes) if it is, and script-friendly output (no ansi codes)
+    * if it's not
+    *
+    * https://stackoverflow.com/a/1403817/871202
+    */
+  def isInteractive() = System.console() != null
+
+}
+
+/**
+  * Bundles together all the code relying on [[cliConfig]] and the common
+  * input/output streams and print-streams, so we don't need to keep passing
+  * them everywhere one by one
+  */
+class MainRunner(cliConfig: Cli.Config,
+                 outprintStream: PrintStream,
+                 errPrintStream: PrintStream,
+                 stdIn: InputStream,
+                 stdOut: OutputStream,
+                 stdErr: OutputStream){
+
+  val colors =
+    if(cliConfig.colored.getOrElse(Main.isInteractive())) Colors.Default
+    else Colors.BlackWhite
+
+  def printInfo(s: String) = errPrintStream.println(colors.info()(s))
+  def printError(s: String) = errPrintStream.println(colors.error()(s))
+
+  @tailrec final def runScript(scriptPath: Path, scriptArgs: List[String]): Boolean = {
+
+    val (success, watched) = runScriptAndPrint(
+      scriptPath,
+      scriptArgs,
+      initMain(false)
+    )
+    if (!cliConfig.watch) success
+    else{
+      printInfo(s"Watching for changes to ${watched.length} files... (Ctrl-C to exit)")
+      def statAll() = watched.forall{ case (file, lastMTime) =>
+        Interpreter.mtimeIfExists(file) == lastMTime
+      }
+
+      while(statAll()) Thread.sleep(100)
+
+      runScript(scriptPath, scriptArgs)
+    }
+  }
+
+  def runScriptAndPrint(scriptPath: Path,
+                        flatArgs: List[String],
+                        scriptMain: Main): (Boolean, Seq[(Path, Option[Long])]) = {
+
+    val (res, watched) = scriptMain.runScript(
+      scriptPath,
+      Scripts.groupArgs(flatArgs)
+    )
+
+    val success = res match {
+      case Res.Failure(msg) =>
+        printError(msg)
+        false
+      case Res.Exception(ex, s) =>
+        errPrintStream.println(
+          Repl.showException(ex, colors.error(), fansi.Attr.Reset, colors.literal())
+        )
+        false
+
+      case Res.Success(value) =>
+        if (value != ()) outprintStream.println(pprint.PPrinter.BlackWhite(value))
+        true
+
+      case Res.Skip   => true // do nothing on success, everything's already happened
+    }
+    (success, watched)
+  }
+
+  def runRepl() = {
+    try initMain(true).run()
+    catch{ case PredefFailedToLoad(msg, cause, res, watched) =>
+      printError("Error loading Predef:")
+      Repl.handleRes(res, printInfo, printError, _ => (), colors)
+    }
+  }
+
+  def initMain(isRepl: Boolean) = Main(
+    cliConfig.predef,
+    cliConfig.defaultPredef,
+    new Storage.Folder(cliConfig.home, isRepl) {
+      override def loadPredef = {
+        cliConfig.predefFile match{
+          case None => super.loadPredef
+          case Some(file) =>
+            try Some((read(file), file))
+            catch {case e: java.nio.file.NoSuchFileException => None}
+        }
+      }
+    },
+    inputStream = stdIn,
+    outputStream = stdOut,
+    errorStream = stdErr,
+    welcomeBanner = cliConfig.welcomeBanner,
+    verboseOutput = cliConfig.verboseOutput,
+    remoteLogging = cliConfig.remoteLogging,
+    colors = colors
+  )
 }

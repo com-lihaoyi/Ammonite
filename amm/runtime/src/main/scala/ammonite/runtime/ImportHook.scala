@@ -2,7 +2,6 @@ package ammonite.runtime
 
 import java.io.File
 
-
 import ammonite.ops.{read, _}
 import ammonite.runtime.tools.IvyThing
 import ammonite.util.Util.CodeSource
@@ -23,7 +22,7 @@ trait ImportHook{
     * code does, e.g. a repl session is based in their CWD, a script has a path, but
     * some things like hardcoded builtin predefs don't
     */
-  def handle(source: Option[Path],
+  def handle(source: CodeSource,
              tree: ImportTree,
              interp: ImportHook.InterpreterInterface)
             : Either[String, Seq[ImportHook.Result]]
@@ -37,8 +36,8 @@ object ImportHook{
     * default this is what is available.
     */
   trait InterpreterInterface{
-    def wd: Path
     def loadIvy(coordinates: coursier.Dependency*): Either[String, Set[File]]
+    def watch(p: Path): Unit
   }
 
   /**
@@ -48,8 +47,8 @@ object ImportHook{
   sealed trait Result
   object Result{
     case class Source(code: String,
-                      blockInfo: CodeSource,
-                      imports: Imports,
+                      codeSource: CodeSource,
+                      hookImports: Imports,
                       exec: Boolean) extends Result
     case class ClassPath(file: Path, plugin: Boolean) extends Result
   }
@@ -64,30 +63,33 @@ object ImportHook{
       tree.prefix
         .map{case ammonite.util.Util.upPathSegment => up; case x => ammonite.ops.empty/x}
         .reduce(_/_)
+
     val relativeModules = tree.mappings match{
       case None => Seq(relative -> None)
       case Some(mappings) => for((k, v) <- mappings) yield relative/k -> v
     }
-    def relToFile(x: RelPath) = {
-      val base = currentScriptPath/up/x/up/x.last
-      extensions.find(ext => exists! base/up/(x.last + ext)) match{
-        case Some(p) => Right(base/up/(x.last + p): Path)
+
+    def relToFile(relative: RelPath) = {
+      val base = currentScriptPath/up/relative
+      extensions.find(ext => exists! base/up/(relative.last + ext)) match{
+        case Some(p) => Right(base/up/(relative.last + p): Path)
         case None => Left(base)
       }
-
     }
+
     val resolved = relativeModules.map(x => relToFile(x._1))
     val missing = resolved.collect{case Left(p) => p}
     val files = resolved.collect{case Right(p) => p}
+
     (relativeModules, files, missing)
   }
   class SourceHook(exec: Boolean) extends ImportHook {
     // import $file.foo.Bar, to import the file `foo/Bar.sc`
-    def handle(source: Option[Path], 
-               tree: ImportTree, 
+    def handle(source: CodeSource,
+               tree: ImportTree,
                interp: InterpreterInterface) = {
 
-      source match{
+      source.path match{
         case None => Left("Cannot resolve $file import in code without source")
         case Some(currentScriptPath) =>
 
@@ -95,21 +97,35 @@ object ImportHook{
             tree, currentScriptPath, Seq(".sc")
           )
 
-          if (missing.nonEmpty) Left("Cannot resolve $file import: " + missing.mkString(", "))
-          else {
+          files.foreach(interp.watch)
+          missing.foreach(x => interp.watch(x/up/(x.last + ".sc")))
+          if (missing.nonEmpty) {
+            Left("Cannot resolve $file import: " + missing.map(_ + ".sc").mkString(", "))
+          } else {
             Right(
               for(((relativeModule, rename), filePath) <- relativeModules.zip(files)) yield {
-                val (pkg, wrapper) = Util.pathToPackageWrapper(filePath, interp.wd)
-                val fullPrefix = pkg ++ Seq(wrapper)
+
+                val (flexiblePkg, wrapper) = Util.pathToPackageWrapper(
+                  source.flexiblePkgName, filePath relativeTo currentScriptPath/up
+                )
+
+                val fullPrefix = source.pkgRoot ++ flexiblePkg ++ Seq(wrapper)
 
                 val importData = Seq(ImportData(
                   fullPrefix.last, Name(rename.getOrElse(relativeModule.last)),
                   fullPrefix.dropRight(1), ImportData.TermType
                 ))
 
+                val codeSrc = CodeSource(
+                  wrapper,
+                  flexiblePkg,
+                  source.pkgRoot,
+                  Some(filePath)
+                )
+
                 Result.Source(
                   Util.normalizeNewlines(read(filePath)),
-                  CodeSource(wrapper, pkg, Some(filePath)),
+                  codeSrc,
                   Imports(importData),
                   exec
                 )
@@ -151,27 +167,20 @@ object ImportHook{
     }
 
 
-    def handle(source: Option[Path], 
+    def handle(source: CodeSource,
                tree: ImportTree, 
-               interp: InterpreterInterface) = {
-      // Avoid for comprehension, which doesn't work in Scala 2.10/2.11
-      splitImportTree(tree) match{
-        case Right(signatures) => resolve(interp, signatures) match{
-          case Right(resolved) =>
-            Right(resolved.map(Path(_)).map(Result.ClassPath(_, plugin)).toSeq)
-          case Left(l) => Left(l)
-        }
-        case Left(l) => Left(l)
-      }
-    }
+               interp: InterpreterInterface) = for{
+      signatures <- splitImportTree(tree).right
+      resolved <- resolve(interp, signatures).right
+    } yield resolved.map(Path(_)).map(Result.ClassPath(_, plugin)).toSeq
   }
   object Classpath extends BaseClasspath(plugin = false)
   object PluginClasspath extends BaseClasspath(plugin = true)
   class BaseClasspath(plugin: Boolean) extends ImportHook{
-    def handle(source: Option[Path], 
+    def handle(source: CodeSource,
                tree: ImportTree, 
                interp: InterpreterInterface) = {
-      source match{
+      source.path match{
         case None => Left("Cannot resolve $cp import in code without source")
         case Some(currentScriptPath) =>
           val (relativeModules, files, missing) = resolveFiles(

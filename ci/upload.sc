@@ -24,6 +24,8 @@ def apply(uploadedFile: Path,
       .asString.body
   )
 
+  pprint.log(parsed, height=9999)
+
   val snapshotReleaseId =
     parsed.arr
       .find(_("tag_name").str == tagName)
@@ -38,10 +40,11 @@ def apply(uploadedFile: Path,
   val res = Http(uploadUrl)
     .header("Content-Type", "application/octet-stream")
     .header("Authorization", "token " + authKey)
-    .timeout(connTimeoutMs = 1000, readTimeoutMs = 30000)
+    .timeout(connTimeoutMs = 5000, readTimeoutMs = 60000)
     .postData(read.bytes! uploadedFile)
     .asString
 
+  pprint.log(res.body, height=9999)
   val longUrl = upickle.json.read(res.body)("browser_download_url").str
 
   println("Long Url " + longUrl)

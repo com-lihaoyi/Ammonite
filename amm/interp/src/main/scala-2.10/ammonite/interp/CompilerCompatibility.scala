@@ -6,6 +6,10 @@ import scala.tools.nsc.plugins.Plugin
 import scala.tools.nsc.typechecker.Analyzer
 
 object CompilerCompatibility {
+  def newUnitParser(compiler: Global, line: String, fileName: String) = {
+    // Can't pass in the fileName in Scala 2.10
+    compiler.newUnitParser(line)
+  }
   def analyzer(g: Global, cl: ClassLoader): Analyzer { val global: g.type } =
     new { val global: g.type = g } with Analyzer {
       override lazy val macroClassloader = cl

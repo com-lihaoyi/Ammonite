@@ -145,7 +145,7 @@ object cp extends Function2[Path, Path, Unit] with CopyMove{
     }
 
     copyOne(from)
-    if (stat(from).isDir) Extensions.FilterMapExt(ls.rec! from) | copyOne
+    if (stat(from).isDir) new ammonite.ops.FilterMapExt(ls.rec! from) | copyOne
   }
 
 }

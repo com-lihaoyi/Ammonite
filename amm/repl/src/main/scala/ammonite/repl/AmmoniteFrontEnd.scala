@@ -22,20 +22,19 @@ case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEn
              compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
              history: IndexedSeq[String],
              addHistory: String => Unit) = {
-    val res = readLine(reader, output, prompt, colors, compilerComplete, history) match{
+    readLine(reader, output, prompt, colors, compilerComplete, history) match{
       case None => Res.Exit(())
       case Some(code) =>
         addHistory(code)
         Parsers.Splitter.parse(code) match{
           case Parsed.Success(value, idx) =>
             Res.Success((code, value))
-          case Parsed.Failure(_, index, extra) => Res.Failure(
-            None,
-            fastparse.core.ParseError.msg(extra.input, extra.traced.expected, index)
-          )
+          case Parsed.Failure(_, index, extra) =>
+            Res.Failure(
+              fastparse.core.ParseError.msg(extra.input, extra.traced.expected, index)
+            )
         }
     }
-    res
   }
 
   val cutPasteFilter = ReadlineFilters.CutPasteFilter()

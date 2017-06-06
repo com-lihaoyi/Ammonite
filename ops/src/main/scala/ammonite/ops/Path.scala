@@ -8,15 +8,22 @@ import java.nio.charset.Charset
 import scala.io.Codec
 import scala.util.Try
 
-/**
-  * Enforces a standard interface for constructing [[BasePath]]-like things
-  * from java types of various sorts
-  */
-sealed trait PathFactory[PathType <: BasePath] extends (String => PathType){
-  def apply(f: java.io.File): PathType = apply(f.getPath)
-  def apply(s: String): PathType = apply(java.nio.file.Paths.get(s))
-  def apply(f: java.nio.file.Path): PathType
+
+sealed trait PathConvertible[T]{
+  def apply(t: T): java.nio.file.Path
 }
+object PathConvertible{
+  implicit object StringConvertible extends PathConvertible[String]{
+    def apply(t: String) = java.nio.file.Paths.get(t)
+  }
+  implicit object JavaIoFileConvertible extends PathConvertible[java.io.File]{
+    def apply(t: java.io.File) = java.nio.file.Paths.get(t.getPath)
+  }
+  implicit object NioPathConvertible extends PathConvertible[java.nio.file.Path]{
+    def apply(t: java.nio.file.Path) = t
+  }
+}
+
 
 /**
   * A path which is either an absolute [[Path]], a relative [[RelPath]],
@@ -119,16 +126,14 @@ object BasePath {
 
 /**
   * Represents a value that is either an absolute [[Path]] or a
-  * relative [[ResourcePath]], and can be constructed from
+  * relative [[RelPath]], and can be constructed from
   */
 sealed trait FilePath extends BasePath
-object FilePath extends PathFactory[FilePath]{
-  def apply(f: java.nio.file.Path) = {
-    if (f.isAbsolute) Path(f)
-    else if (f.subpath(0, 1).toString == "~"){
-      Path(System.getProperty("user.home"))/RelPath(f.subpath(0, 1).relativize(f))
-    }
-    else RelPath(f)
+object FilePath {
+  def apply[T: PathConvertible](f0: T) = {
+    val f = implicitly[PathConvertible[T]].apply(f0)
+    if (f.isAbsolute) Path(f0)
+    else RelPath(f0)
   }
 }
 
@@ -189,8 +194,9 @@ extends FilePath with BasePathImpl{
   }
 }
 
-object RelPath extends RelPathStuff with PathFactory[RelPath]{
-  def apply(f: java.nio.file.Path): RelPath = {
+object RelPath extends RelPathStuff {
+  def apply[T: PathConvertible](f0: T): RelPath = {
+    val f = implicitly[PathConvertible[T]].apply(f0)
 
     import collection.JavaConversions._
     require(!f.isAbsolute, f + " is not an relative path")
@@ -229,16 +235,30 @@ trait RelPathStuff{
 }
 
 
-object Path extends PathFactory[Path]{
+
+object Path {
+
+  def expandUser[T: PathConvertible](f0: T) = {
+    val f = implicitly[PathConvertible[T]].apply(f0)
+    if (f.subpath(0, 1).toString != "~") Path(f0)
+    else Path(System.getProperty("user.home"))/RelPath(f.subpath(0, 1).relativize(f))
+  }
+  def expandUser[T: PathConvertible](f0: T, base: Path) = {
+    val f = implicitly[PathConvertible[T]].apply(f0)
+    if (f.subpath(0, 1).toString != "~") Path(f0, base)
+    else Path(System.getProperty("user.home"))/RelPath(f.subpath(0, 1).relativize(f))
+  }
+
   def apply(p: FilePath, base: Path) = p match{
     case p: RelPath => base/p
     case p: Path => p
   }
-  def apply(f: java.io.File, base: Path): Path = apply(FilePath(f), base)
-  def apply(s: String, base: Path): Path = apply(FilePath(s), base)
-  def apply(f: java.nio.file.Path, base: Path): Path = apply(FilePath(f), base)
-  def apply(f: java.nio.file.Path): Path = {
+
+  def apply[T: PathConvertible](f: T, base: Path): Path = apply(FilePath(f), base)
+  def apply[T: PathConvertible](f0: T): Path = {
+    val f = implicitly[PathConvertible[T]].apply(f0)
     import collection.JavaConversions._
+
     val chunks = BasePath.chunkify(f)
     if (chunks.count(_ == "..") > chunks.size / 2) throw PathError.AbsolutePathOutsideRoot
 

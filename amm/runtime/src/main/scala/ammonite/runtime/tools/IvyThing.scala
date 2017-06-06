@@ -1,8 +1,8 @@
 package ammonite.runtime.tools
 
-import java.io.PrintWriter
+import java.io.{PrintStream, PrintWriter}
 
-import ammonite.util.{Printer, Util}
+import ammonite.util.Util
 
 
 object IvyConstructor extends IvyConstructor
@@ -22,14 +22,15 @@ trait IvyConstructor{
 object IvyThing{
   def resolveArtifact(repositories: Seq[coursier.Repository],
                       dependencies: Seq[coursier.Dependency],
-                      verbose: Boolean) = synchronized {
-
+                      verbose: Boolean,
+                      output: PrintStream) = synchronized {
+    val writer = new PrintWriter(output)
     // Print directly to stderr, since Ammonite's own internal logging
     // doesn't allow us to print weird ASCII control codes to stdout,
     // which coursier does as part of it's progress bar
     val logger = if (!verbose) None
     else {
-      val logger = new coursier.TermDisplay(new PrintWriter(Console.err))
+      val logger = new coursier.TermDisplay(writer)
       logger.init()
       Some(logger)
     }
@@ -40,34 +41,57 @@ object IvyThing{
 
     val resolution = start.process.run(fetch).run
 
-    if (resolution.metadataErrors.nonEmpty){
-      val formattedMsgs = for(((module, version), msgs) <- resolution.metadataErrors) yield {
-        module.organization + ":" +
-        module.name + ":" +
-        version + " " + msgs.map(Util.newLine + "    " + _).mkString
-      }
-      Left(
-        "Failed to resolve ivy dependencies:" +
-        formattedMsgs.map(Util.newLine + "  " + _).mkString
-      )
-    }else {
-      val localArtifacts = scalaz.concurrent.Task.gatherUnordered(
-        for (a <- resolution.artifacts)
-        yield coursier.Cache.file(a, logger = logger).run
-      ).run
 
-      val errors = localArtifacts.collect { case scalaz.-\/(x) => x }
-      val successes = localArtifacts.collect { case scalaz.\/-(x) => x }
-
-      if (errors.nonEmpty) {
-        Left(
-          "Failed to load dependencies" +
-          errors.map(Util.newLine + "  " + _.describe).mkString
+    val res =
+      if (resolution.metadataErrors.nonEmpty){
+        val formattedMsgs = for(((module, version), msgs) <- resolution.metadataErrors) yield {
+          module.organization + ":" +
+          module.name + ":" +
+          version + " " + msgs.map(Util.newLine + "    " + _).mkString
+        }
+        (
+          None,
+          Left(
+            "Failed to resolve ivy dependencies:" +
+            formattedMsgs.map(Util.newLine + "  " + _).mkString
+          )
         )
-      } else {
-        Right(successes)
+      }else {
+        def load(artifacts: Seq[coursier.Artifact]) = {
+
+          val loadedArtifacts = scalaz.concurrent.Task.gatherUnordered(
+            for (a <- artifacts)
+              yield coursier.Cache.file(a, logger = logger).run
+          ).run
+
+          val errors = loadedArtifacts.collect { case scalaz.-\/(x) => x }
+          val successes = loadedArtifacts.collect { case scalaz.\/-(x) => x }
+          (errors, successes)
+        }
+
+        val (jarErrors, jarSuccesses) = load(resolution.artifacts)
+        val (sourceErrors, sourceSuccesses) = load(resolution.classifiersArtifacts(Seq("sources")))
+        val srcWarnings =
+          if (sourceErrors.isEmpty) None
+          else Some(
+            "Failed to load source dependencies" +
+            sourceErrors.map(Util.newLine + "  " + _.describe).mkString
+          )
+
+        (
+          srcWarnings,
+          if (jarErrors.isEmpty) Right(jarSuccesses ++ sourceSuccesses)
+          else Left(
+            "Failed to load dependencies" +
+            jarErrors.map(Util.newLine + "  " + _.describe).mkString
+          )
+
+        )
       }
-    }
+
+    writer.flush()
+
+    res
   }
 
   val defaultRepositories = List(
