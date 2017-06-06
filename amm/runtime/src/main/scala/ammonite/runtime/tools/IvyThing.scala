@@ -96,7 +96,8 @@ object IvyThing{
 
   val defaultRepositories = List(
     coursier.Cache.ivy2Local,
-    coursier.MavenRepository("https://repo1.maven.org/maven2")
+    coursier.MavenRepository("https://repo1.maven.org/maven2"),
+    coursier.MavenRepository("file://" + java.lang.System.getProperties.get("user.home") + "/.m2/repository/")
   )
 
   val scalaBinaryVersion =
