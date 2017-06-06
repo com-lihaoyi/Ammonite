@@ -19,21 +19,21 @@ import scala.util.control.ControlThrowable
  */
 trait Evaluator{
   def loadClass(wrapperName: String, classFiles: ClassFiles): Res[Class[_]]
-  def evalMain(cls: Class[_]): Any
+  def evalMain(cls: Class[_], contextClassloader: ClassLoader): Any
   def getCurrentLine: String
-  def withContextClassloader[T](t: => T): T
+  def withContextClassloader[T](contextClassloader: ClassLoader)(t: => T): T
   def processLine(classFiles: ClassFiles,
                   newImports: Imports,
                   printer: Printer,
                   indexedWrapperName: Name,
-                  silent: Boolean): Res[Evaluated]
+                  silent: Boolean,
+                  contextClassLoader: ClassLoader): Res[Evaluated]
 
   def processScriptBlock(cls: Class[_],
                          newImports: Imports,
                          wrapperName: Name,
-                         pkgName: Seq[Name]): Res[Evaluated]
-  def evalClassloader: SpecialClassLoader
-  def pluginClassloader: SpecialClassLoader
+                         pkgName: Seq[Name],
+                         contextClassLoader: ClassLoader): Res[Evaluated]
 }
 
 object Evaluator{
@@ -72,8 +72,6 @@ object Evaluator{
 
   def apply(startingLine: Int, frames: => List[Frame]): Evaluator = new Evaluator{ eval =>
 
-    def evalClassloader = frames.head.classloader
-    def pluginClassloader= frames.head.pluginClassloader
 
     /**
      * The current line number of the REPL, used to make sure every snippet
@@ -99,14 +97,15 @@ object Evaluator{
     }
 
 
-    def evalMain(cls: Class[_]) = withContextClassloader{
-      cls.getDeclaredMethod("$main").invoke(null)
-    }
+    def evalMain(cls: Class[_], contextClassloader: ClassLoader) =
+      withContextClassloader(contextClassloader){
+        cls.getDeclaredMethod("$main").invoke(null)
+      }
 
-    def withContextClassloader[T](t: => T) = {
+    def withContextClassloader[T](contextClassloader: ClassLoader)(t: => T) = {
       val oldClassloader = Thread.currentThread().getContextClassLoader
       try{
-        Thread.currentThread().setContextClassLoader(eval.evalClassloader)
+        Thread.currentThread().setContextClassLoader(contextClassloader)
         t
       } finally {
         Thread.currentThread().setContextClassLoader(oldClassloader)
@@ -119,7 +118,8 @@ object Evaluator{
                     newImports: Imports,
                     printer: Printer,
                     indexedWrapperName: Name,
-                    silent: Boolean) = {
+                    silent: Boolean,
+                    contextClassLoader: ClassLoader) = {
       for {
         cls <- loadClass("ammonite.$sess." + indexedWrapperName.backticked, classFiles)
         _ = currentLine += 1
@@ -127,7 +127,7 @@ object Evaluator{
       } yield {
         // Exhaust the printer iterator now, before exiting the `Catching`
         // block, so any exceptions thrown get properly caught and handled
-        val iter = evalMain(cls).asInstanceOf[Iterator[String]]
+        val iter = evalMain(cls, contextClassLoader).asInstanceOf[Iterator[String]]
 
         if (!silent) evaluatorRunPrinter(iter.foreach(printer.outStream.print))
         else evaluatorRunPrinter(iter.foreach(_ => ()))
@@ -141,11 +141,12 @@ object Evaluator{
     def processScriptBlock(cls: Class[_],
                            newImports: Imports,
                            wrapperName: Name,
-                           pkgName: Seq[Name]) = {
+                           pkgName: Seq[Name],
+                           contextClassLoader: ClassLoader) = {
       for {
         _ <- Catching{userCodeExceptionHandler}
       } yield {
-        evalMain(cls)
+        evalMain(cls, contextClassLoader)
         val res = evaluationResult(pkgName :+ wrapperName, newImports)
         res
       }

@@ -40,7 +40,7 @@ class Interpreter(val printer: Printer,
 
   val mainThread = Thread.currentThread()
 
-  val (frameImports, handleImports, compilerManager, eval) = {
+  val (evalClassloader, pluginClassloader, frameImports, handleImports, compilerManager, eval) = {
     val hash = SpecialClassLoader.initialClasspathSignature(mainThread.getContextClassLoader)
 
     import ammonite.ops._
@@ -60,6 +60,8 @@ class Interpreter(val printer: Printer,
     val frames = Ref(List(initialFrame))
 
     (
+      () => frames().head.classloader,
+      () => frames().head.pluginClassloader,
       () => frames().head.imports,
       (i: Imports) => frames().head.addImports(i),
       new CompilerLifecycleManager(frames),
@@ -103,7 +105,7 @@ class Interpreter(val printer: Printer,
   PredefInitialization.apply(
     ("ammonite.interp.InterpBridge", "interp", interpApi) +: extraBridges,
     interpApi,
-    eval.evalClassloader,
+    evalClassloader(),
     storage,
     customPredefs,
     // AutoImport is false, because we do not want the predef imports to get
@@ -257,7 +259,8 @@ class Interpreter(val printer: Printer,
         newImports,
         printer,
         indexedWrapperName,
-        silent
+        silent,
+        evalClassloader()
       )
     } yield (res, Tag("", ""))
   }
@@ -272,7 +275,7 @@ class Interpreter(val printer: Printer,
 
     val tag = Tag(
       Interpreter.cacheTag(processed.code.getBytes),
-      Interpreter.cacheTag(eval.evalClassloader.classpathHash)
+      Interpreter.cacheTag(evalClassloader().classpathHash)
     )
 
     for {
@@ -285,7 +288,8 @@ class Interpreter(val printer: Printer,
         cls,
         newImports,
         codeSource.wrapperName,
-        codeSource.pkgName
+        codeSource.pkgName,
+        evalClassloader()
       )
     } yield {
       storage.compileCacheSave(fullyQualifiedName, tag, (classFiles, newImports))
@@ -308,7 +312,7 @@ class Interpreter(val printer: Printer,
           Interpreter.cacheTag(code.getBytes),
           Interpreter.cacheTag(
             if (hardcoded) Array.empty[Byte]
-            else eval.evalClassloader.classpathHash
+            else evalClassloader().classpathHash
           )
         )
 
@@ -496,7 +500,7 @@ class Interpreter(val printer: Printer,
             codeSource
           ).isInstanceOf[Res.Success[_]]
         } yield {
-          val envHash = Interpreter.cacheTag(eval.evalClassloader.classpathHash)
+          val envHash = Interpreter.cacheTag(evalClassloader().classpathHash)
           if (envHash != blockMetadata.id.tag.env) {
             compileRunBlock(blockMetadata.leadingSpaces, blockMetadata.hookInfo)
           } else{
@@ -504,7 +508,7 @@ class Interpreter(val printer: Printer,
 
             val cls = eval.loadClass(blockMetadata.id.wrapperPath, classFiles)
             val evaluated =
-              try cls.map(eval.evalMain(_))
+              try cls.map(eval.evalMain(_, evalClassloader()))
               catch Evaluator.userCodeExceptionHandler
 
             evaluated.map(_ => blockMetadata)
