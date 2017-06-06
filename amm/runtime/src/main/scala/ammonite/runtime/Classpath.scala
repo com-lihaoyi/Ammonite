@@ -23,23 +23,40 @@ object Classpath {
    * memory but is better than reaching all over the filesystem every time we
    * want to do something.
    */
-  var current = Thread.currentThread().getContextClassLoader
-  val files = collection.mutable.Buffer.empty[java.io.File]
-  files.appendAll(
-    System.getProperty("sun.boot.class.path")
-          .split(java.io.File.pathSeparator)
-          .map(new java.io.File(_))
-  )
-  while(current != null){
-    current match{
-      case t: java.net.URLClassLoader =>
-        files.appendAll(t.getURLs.map(u => new java.io.File(u.toURI)))
-      case _ =>
-    }
-    current = current.getParent
+
+  private def getCPFromProperty(property: String = "sun.boot.class.path"): Vector[File] = {
+    @annotation.tailrec
+    def loop (paths: Array[String],cp: Vector[File]): Vector[java.io.File] =
+      if (paths.length <= 0) cp
+      else loop(paths.tail,cp ++ Vector(new java.io.File(paths.head)))
+
+    loop(System.getProperty(property).split(java.io.File.pathSeparator),Vector())
   }
 
-  val classpath = files.toVector.filter(_.exists)
+  private def getCPFromClassLoader(
+    loader:ClassLoader = Thread.currentThread.getContextClassLoader): Vector[File] = {
+    @annotation.tailrec
+    def loop(cl:ClassLoader,
+             cp:Vector[File],
+             f:(Array[java.net.URL],Vector[File]) => Vector[File]): Vector[File] = {
+      cl match {
+        case null => cp
+        case t: java.net.URLClassLoader => loop(cl.getParent, f(t.getURLs,cp ++ Vector()), f)
+        case _ => loop(cl.getParent, cp, f)
+      }
+    }
+
+    //Looping over an Array of URIs
+    @annotation.tailrec
+    def loop2(l2: Array[java.net.URL],cp2: Vector[File]): Vector[File] = {
+      if (l2.length <= 0) cp2
+      else loop2(l2.tail,cp2 ++ Vector(new java.io.File(l2.head.toURI)))
+    }
+
+    loop(loader, Vector(), loop2)
+  }
+
+  val classpath = (getCPFromProperty() ++ getCPFromClassLoader()).filter(_.exists())
 
   def canBeOpenedAsJar(file: File): Boolean =
     try {
