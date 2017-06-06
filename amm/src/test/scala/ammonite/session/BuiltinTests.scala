@@ -53,6 +53,22 @@ object BuiltinTests extends TestSuite{
       """)
     }
 
+    'imports{
+      check.session("""
+        @ assert(repl.imports.toString == ""); assert(repl.fullImports.toString != "")
+
+        @ val definedValue = 123
+
+        @ assert(repl.imports.toString.contains("definedValue"))
+
+        @ assert(repl.fullImports.toString.contains("definedValue"))
+
+        @ assert(!repl.imports.toString.contains("ammonite.runtime.tools"))
+
+        @ assert(repl.fullImports.toString.contains("ammonite.runtime.tools"))
+      """)
+    }
+
     'loadCP{
       check.session("""
         @ import ammonite.ops._, ImplicitWd._

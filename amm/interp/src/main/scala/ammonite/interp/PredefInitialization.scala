@@ -63,6 +63,7 @@ object PredefInitialization {
         ) match{
           case Res.Skip => Res.Success(())
           case Res.Success(processed) =>
+            addImports(processed.blockInfo.last.hookInfo.imports)
             addImports(processed.blockInfo.last.finalImports)
             Res.Success(())
 

@@ -71,7 +71,8 @@ class TestRepl {
           val colors = Ref(Colors.BlackWhite)
           def newCompiler() = interp.compilerManager.init(force = true)
           def compiler = interp.compilerManager.compiler.compiler
-          def imports = interp.eval.imports.toString
+          def fullImports = interp.predefImports ++ interp.eval.imports
+          def imports = interp.eval.imports
           def width = 80
           def height = 80
         }

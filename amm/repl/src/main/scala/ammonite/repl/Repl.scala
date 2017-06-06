@@ -42,6 +42,9 @@ class Repl(input: InputStream,
 
   val sess0 = new SessionApiImpl(interp.compilerManager.frames)
 
+  def imports = interp.eval.imports
+  def fullImports = interp.predefImports ++ interp.eval.imports
+
   val interp: Interpreter = new Interpreter(
     printer,
     storage,
@@ -65,7 +68,8 @@ class Repl(input: InputStream,
         def history = repl.history
         def newCompiler() = interp.compilerManager.init(force = true)
         def compiler = interp.compilerManager.compiler.compiler
-        def imports = interp.eval.imports.toString
+        def fullImports = repl.fullImports
+        def imports = repl.imports
         def width = frontEnd().width
         def height = frontEnd().height
       }
@@ -111,7 +115,7 @@ class Repl(input: InputStream,
       output,
       colors().prompt()(prompt()).render,
       colors(),
-      interp.compilerManager.complete(_, interp.eval.imports.toString, _),
+      interp.compilerManager.complete(_, fullImports.toString, _),
       storage.fullHistory(),
       addHistory = (code) => if (code != "") {
         storage.fullHistory() = storage.fullHistory() :+ code

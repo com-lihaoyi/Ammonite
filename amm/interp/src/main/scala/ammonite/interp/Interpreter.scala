@@ -101,7 +101,11 @@ class Interpreter(val printer: Printer,
     eval.evalClassloader,
     storage,
     customPredefs,
-    processModule(_, _, true, "", _),
+    // AutoImport is false, because we do not want the predef imports to get
+    // bundled into the main `eval.imports`: instead we pass `predefImports`
+    // manually throughout, and keep `eval.imports` as a relatively-clean
+    // listing which only contains the imports for code a user entered.
+    processModule(_, _, autoImport = false, "", _),
     imports => predefImports = predefImports ++ imports,
     watch
   ) match{
@@ -202,6 +206,7 @@ class Interpreter(val printer: Printer,
       Some(wd/"(console)")
     )
     val (hookStmts, importTrees) = parseImportHooks(codeSource, stmts)
+
     for{
       _ <- Catching { case ex => Res.Exception(ex, "") }
       ImportHookInfo(hookImports, hookStmts, _) <- resolveImportHooks(
@@ -328,7 +333,7 @@ class Interpreter(val printer: Printer,
 
           _ <- Catching { case ex => Res.Exception(ex, "") }
 
-          data <- processAllScriptBlocks(
+          metadata <- processAllScriptBlocks(
             blocks,
             splittedScript,
             predefImports,
@@ -340,11 +345,11 @@ class Interpreter(val printer: Printer,
         } yield {
           storage.classFilesListSave(
             codeSource.filePathPrefix,
-            data.blockInfo,
+            metadata.blockInfo,
             tag
           )
-          alreadyLoadedFiles(codeSource) = data
-          data
+          alreadyLoadedFiles(codeSource) = metadata
+          metadata
         }
     }
   }
@@ -355,10 +360,10 @@ class Interpreter(val printer: Printer,
     for {
       blocks <- Preprocessor.splitScript(Interpreter.skipSheBangLine(code), fileName)
 
-      processedData <- processAllScriptBlocks(
+      metadata <- processAllScriptBlocks(
         blocks.map(_ => None),
         Res.Success(blocks),
-        eval.imports,
+        predefImports ++ eval.imports,
         CodeSource(
           wrapperName,
           Seq(),
@@ -376,7 +381,9 @@ class Interpreter(val printer: Printer,
         autoImport = true,
         ""
       )
-    } yield processedData.blockInfo.last.finalImports
+    } yield {
+      metadata.blockInfo.last.finalImports
+    }
   }
 
 
@@ -436,9 +443,11 @@ class Interpreter(val printer: Printer,
       } else {
         // imports from scripts loaded from this script block will end up in this buffer
         var nestedScriptImports = Imports()
+
         scriptImportCallback = { imports =>
           nestedScriptImports = nestedScriptImports ++ imports
         }
+
         // pretty printing results is disabled for scripts
         val indexedWrapperName = Interpreter.indexWrapperName(codeSource.wrapperName, wrapperIndex)
 
@@ -552,6 +561,7 @@ class Interpreter(val printer: Printer,
       case _ => ()
     }
   }
+
   def loadIvy(coordinates: coursier.Dependency*) = synchronized{
     val cacheKey = (interpApi.repositories().hashCode.toString, coordinates)
 
@@ -642,8 +652,8 @@ class Interpreter(val printer: Printer,
             Seq(Name("ammonite"), Name("$file")),
             Some(wd/"Main.sc")
           ),
-          true,
-          "",
+          autoImport = true,
+          extraCode = "",
           hardcoded = false
         ) match{
           case Res.Failure(s) => throw new CompilationError(s)

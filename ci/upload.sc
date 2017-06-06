@@ -24,6 +24,8 @@ def apply(uploadedFile: Path,
       .asString.body
   )
 
+  pprint.log(parsed, height=9999)
+
   val snapshotReleaseId =
     parsed.arr
       .find(_("tag_name").str == tagName)
@@ -42,6 +44,7 @@ def apply(uploadedFile: Path,
     .postData(read.bytes! uploadedFile)
     .asString
 
+  pprint.log(res.body, height=9999)
   val longUrl = upickle.json.read(res.body)("browser_download_url").str
 
   println("Long Url " + longUrl)

@@ -1,10 +1,9 @@
 package ammonite.repl
 
-import ammonite.util.{Bind, CodeColors, Colors, Ref}
+import ammonite.util._
 import ammonite.util.Util.newLine
 
 import scala.reflect.runtime.universe._
-
 import ammonite.runtime.{APIHolder, Frame, History}
 
 import scala.collection.mutable
@@ -75,9 +74,16 @@ trait ReplAPI {
   def compiler: scala.tools.nsc.Global
 
   /**
-   * Show all the imports that are used to execute commands going forward
+   * Shows all imports added that bring values into scope for the commands a
+   * user runs; *includes* imports from the built-in predef and user predef files
    */
-  def imports: String
+  def fullImports: Imports
+
+  /**
+   * Shows the imports added to scope by the commands a user has entered so far;
+   * *excludes* imports from the built-in predef and user predef files
+   */
+  def imports: Imports
   /**
    * Controls how things are pretty-printed in the REPL. Feel free
    * to shadow this with your own definition to change how things look
