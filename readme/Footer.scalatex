@@ -114,7 +114,7 @@
 
 
   @sect{Changelog}
-    @sect{1.0.0-RC5}
+    @sect{1.0.0-RC6}
       @ul
         @li
           Output now defaults to colored if the console is interactive, and
