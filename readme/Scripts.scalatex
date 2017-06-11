@@ -206,7 +206,7 @@
         val scalazVersion = "7.2.7"
         interp.load.ivy("org.scalaz" %% "scalaz-core" % scalazVersion)
 
-        // This @@ is necessary for Ammonite to proecess the `interp.load.ivy` 
+        // This @@ is necessary for Ammonite to process the `interp.load.ivy` 
         // before continuing
         @@
 
