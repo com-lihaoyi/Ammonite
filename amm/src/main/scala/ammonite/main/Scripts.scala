@@ -161,8 +161,12 @@ object Scripts {
           val rhsPadded = rhs.lines.mkString(Util.newLine)
            s"$leftIndentStr  $lhsPadded  $rhsPadded"
         }
+    val mainDocSuffix = main.doc match{
+      case Some(d) => Util.newLine + leftIndentStr + softWrap(d, leftIndent, 80)
+      case None => ""
+    }
 
-    s"""$leftIndentStr${main.name}
+    s"""$leftIndentStr${main.name}${mainDocSuffix}
        |${argStrings.map(_ + Util.newLine).mkString}""".stripMargin
   }
   def runMainMethod(mainMethod: Router.EntryPoint,
