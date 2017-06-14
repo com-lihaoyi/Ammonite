@@ -113,7 +113,7 @@ class Interpreter(val printer: Printer,
 
   // The ReplAPI requires some special post-Interpreter-initialization
   // code to run, so let it pass it in a callback and we'll run it here
-  def watch(p: Path) = watchedFiles.append(p -> Interpreter.mtimePath(p))
+  def watch(p: Path) = watchedFiles.append(p -> Interpreter.pathSignature(p))
 
   def resolveSingleImportHook(source: CodeSource, tree: ImportTree) = synchronized{
     val strippedPrefix = tree.prefix.takeWhile(_(0) == '$').map(_.stripPrefix("$"))
@@ -655,11 +655,15 @@ object Interpreter{
   /**
     * Recursively mtimes things, with the sole purpose of providing a number
     * that will change if that file changes or that folder's contents changes
+    *
+    * Ensure we include the file paths within a folder as part of the folder
+    * signature, as file moves often do not update the mtime but we want to
+    * trigger a "something changed" event anyway
     */
-  def mtimePath(p: Path) =
+  def pathSignature(p: Path) =
     if (!exists(p)) 0L
     else try {
-      if (p.isDir) ls.rec ! p | mtimeIfExists sum
+      if (p.isDir) ls.rec(p).map(x => x.hashCode + mtimeIfExists(x)).sum
       else p.mtime.toMillis
     } catch { case e: java.nio.file.NoSuchFileException =>
       0L

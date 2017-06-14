@@ -287,7 +287,7 @@ class MainRunner(cliConfig: Cli.Config,
     else{
       printInfo(s"Watching for changes to ${watched.length} files... (Ctrl-C to exit)")
       def statAll() = watched.forall{ case (file, lastMTime) =>
-        Interpreter.mtimePath(file) == lastMTime
+        Interpreter.pathSignature(file) == lastMTime
       }
 
       while(statAll()) Thread.sleep(100)
