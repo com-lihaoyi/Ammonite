@@ -114,7 +114,7 @@
 
 
   @sect{Changelog}
-    @sect{1.0.0-RC6}
+    @sect{1.0.0-RC7}
       @ul
         @li
           Output now defaults to colored if the console is interactive, and
@@ -189,6 +189,12 @@
           The @code{interp.watch} built-in now works on folders as well as
           files, watching all files within that folder and restarting your
           script if any of them change
+        @li
+          Fix regression that broke binding of variables in @code{Main#run}
+        @li
+          Make @code{--watch} flag more robust against files being deleted
+          during @code{mtime}ing, and make it properly re-run scripts when a
+          file in a watched folder is renamed.
 
     @sect{0.9.9}
       @ul
