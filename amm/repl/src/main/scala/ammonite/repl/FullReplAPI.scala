@@ -1,6 +1,6 @@
 package ammonite.repl
 
-import ammonite.util._
+import ammonite.util.{Bind, _}
 import ammonite.util.Util.newLine
 
 import scala.reflect.runtime.universe._
@@ -27,11 +27,13 @@ trait FullReplAPI extends ReplAPI{
     """.stripMargin.trim
 
 
+  protected[this] def replArgs0: IndexedSeq[Bind[_]]
   /**
     * This stuff is used for the REPL-generated code that prints things;
     * shouldn't really be used by users, but needs to be public and accessible
     */
   object Internal {
+    def replArgs: IndexedSeq[Bind[_]] = replArgs0
     def combinePrints(iters: Iterator[String]*) = {
       iters.toIterator
            .filter(_.nonEmpty)
