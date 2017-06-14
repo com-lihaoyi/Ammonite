@@ -658,8 +658,12 @@ object Interpreter{
     */
   def mtimePath(p: Path) =
     if (!exists(p)) 0L
-    else if (p.isDir) ls.rec! p | mtimeIfExists sum
-    else p.mtime.toMillis
+    else try {
+      if (p.isDir) ls.rec ! p | mtimeIfExists sum
+      else p.mtime.toMillis
+    } catch { case e: java.nio.file.NoSuchFileException =>
+      0L
+    }
 
   val SheBang = "#!"
   val SheBangEndPattern = Pattern.compile(s"""((?m)^!#.*)$newLine""")
