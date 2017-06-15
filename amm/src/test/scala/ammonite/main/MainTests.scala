@@ -100,6 +100,7 @@ object MainTests extends TestSuite{
                 mainA
 
                 functionB
+                This explains what the function does
                   --i     Int: how many times to repeat the string to make it very very long,
                           more than it originally was
                   --s     String: the string to repeat
@@ -121,6 +122,7 @@ object MainTests extends TestSuite{
                 mainA
 
                 functionB
+                This explains what the function does
                   --i     Int: how many times to repeat the string to make it very very long,
                           more than it originally was
                   --s     String: the string to repeat
