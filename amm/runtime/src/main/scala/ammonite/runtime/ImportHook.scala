@@ -154,9 +154,15 @@ object ImportHook{
           case Array(a, b, c) =>
             Right(coursier.Dependency(coursier.Module(a, b), c))
           case Array(a, "", b, c) =>
-            Right(coursier.Dependency(coursier.Module(a, b + "_" + IvyThing.scalaBinaryVersion), c))
+            Right(
+              coursier.Dependency(coursier.Module(a, b + "_" + IvyThing.scalaBinaryVersion), c)
+            )
           case Array(a, "", "", b, c) =>
-            Right(coursier.Dependency(coursier.Module(a, b + "_" + IvyThing.scalaFullBinaryVersion), c))
+            Right(
+              coursier.Dependency(
+                coursier.Module(a, b + "_" + IvyThing.scalaFullBinaryVersion), c
+              )
+            )
           case _ => Left(signature)
         }
       }
