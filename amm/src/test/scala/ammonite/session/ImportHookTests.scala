@@ -109,6 +109,18 @@ object ImportHookTests extends TestSuite{
             res1: String = "<div>Hello</div>"
            """)
         }
+
+        'inlineFull - {
+          check.session("""
+            @ import org.scalamacros.paradise.Settings._
+            error: object scalamacros is not a member of package org
+
+            @ import $ivy.`org.scalamacros:::paradise:2.1.0`, org.scalamacros.paradise.Settings._
+
+            @ boolSetting("key").value
+            res1: Boolean = false
+           """)
+        }
       }
     }
     'scripts{
