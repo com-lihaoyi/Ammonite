@@ -30,6 +30,6 @@ val server = NettyServer.fromRouter(new ServerConfig(
 }
 try {
   println(Http("http://localhost:19000/hello/bar").asString.body)
-}finally{
+} finally{
   server.stop()
 }

@@ -236,7 +236,6 @@
     @p
       This is just a small example, but you can easily do more things in the same vein: Apache POI lets you create/modify/save @code{.docx} files in addition to reading from them, meaning you can automatically perform batch operations on large numbers of documents. The library also provides mechanisms to load in Excel spreadsheets and Powerpoint slide decks, meaning you have easy, programmable access to the great bulk of any Microsoft-Office files you find yourself dealing with.
 
-
   @sect{Image Processing}
     @p
       You can perform lots of image operations in Java. You can use @lnk("BufferedImage", "https://docs.oracle.com/javase/7/docs/api/java/awt/image/BufferedImage.html") if you want to access the low-level details or read/write individual pixels, and using @lnk("Java2D", "http://zetcode.com/gfx/java2d/") you can draw shapes, perform transforms, or do anything you could possibly want to do with the images.
@@ -276,6 +275,7 @@
 
       @@ thumbnails.map(_.size) // Thumbnailed image files are much smaller
       res45: Seq[Long] = List(11129L, 11790L, 11893L)
+
   @sect{Machine Learning}
     @p
       The word "Machine Learning" sounds big and intimidating, like something you'd need to spend 6 years getting a PhD before you understand. What if you could "do some machine-learning" (whatever that means) in your spare time, in a minute or two? It turns out there are many Java libraries that can help you with basics, and with the Ammonite REPL getting started is easy.
@@ -370,3 +370,35 @@
 
     @p
       Although this is just a hello world example, you can easily keep the server running (instead of exiting after a test request) and extend it with more functionality, possibly splitting it into multiple @sect.ref{Script Files}.
+
+  @sect{SQL Database}
+    @p
+      Ammonite is great for those database jobs that are too complicated for SQL alone. This example uses @lnk("ScalikeJDBC", "http://scalikejdbc.org/") to update some rows.
+
+    @hl.scala
+      @@ import $ivy.{
+        `org.scalikejdbc::scalikejdbc:3.0.0`,
+        `ch.qos.logback:logback-classic:1.2.3`,
+        `mysql:mysql-connector-java:5.1.6`
+      }
+      @@ Class.forName("com.mysql.jdbc.Driver")
+      @@ import scalikejdbc._, scalikejdbc._
+      @@ ConnectionPool.singleton("jdbc:mysql://localhost/database", "root", "")
+      @@ implicit val session = AutoSession
+
+      @@ val users =
+        sql"""select id, email from users"""
+        .map(rs => rs.long("id") -> rs.string("email")).list.apply() 
+      users: List[(Long, String)] = List((1L, "foo@@bar"), (2L, "bar@@baz"))
+
+      @@ def isNormalised(email: String): Boolean = ???
+      @@ def normaliseEmail(email: String): String = ???
+
+      @@ val usersWithInvalidEmail =
+        users.filterNot { case (id, email) => isNormalised(email) }
+      usersWithInvalidEmail: List[(Long, String)] = List((1L, "foo@@bar"), (2L, "bar@@baz"))
+
+      @@ usersWithInvalidEmail.foreach { case (id, email) =>
+        val updatedEmail = normaliseEmail(email)
+        sql"""update users set email = ${updatedEmail} where id = ${id};""".update.apply() 
+      }
