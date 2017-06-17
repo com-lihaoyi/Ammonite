@@ -54,9 +54,11 @@ object ReadlineFilters {
     simple(LinuxCtrlRight)((b, c, m) => GUILikeFilters.wordRight(b, c)), // -> one word
     simple(Home)((b, c, m) => BasicFilters.moveStart(b, c, m.width)), // <- one line
     simple(HomeScreen)((b, c, m) => BasicFilters.moveStart(b, c, m.width)), // <- one line
+    simple(HomeLinuxXterm)((b, c, m) => BasicFilters.moveStart(b, c, m.width)), // <- one line
     simple(Ctrl('a'))((b, c, m) => BasicFilters.moveStart(b, c, m.width)),
     simple(End)((b, c, m) => BasicFilters.moveEnd(b, c, m.width)), // -> one line
     simple(EndScreen)((b, c, m) => BasicFilters.moveEnd(b, c, m.width)), // -> one line
+    simple(EndRxvt)((b, c, m) => BasicFilters.moveEnd(b, c, m.width)), // -> one line
     simple(Ctrl('e'))((b, c, m) => BasicFilters.moveEnd(b, c, m.width)),
     simple(Alt + "t")((b, c, m) => transposeWord(b, c)),
     simple(Alt + "T")((b, c, m) => transposeWord(b, c)),

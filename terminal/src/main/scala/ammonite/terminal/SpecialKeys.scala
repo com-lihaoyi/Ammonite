@@ -63,6 +63,8 @@ object SpecialKeys {
   // case them
   val HomeScreen = Alt+"[1~"
   val EndScreen = Alt+"[4~"
+  val HomeLinuxXterm = Alt+"[7~"
+  val EndRxvt = Alt+"[8~"
 
   val ShiftUp = Alt+"[1;2A"
   val ShiftDown = Alt+"[1;2B"
