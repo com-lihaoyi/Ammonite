@@ -114,8 +114,13 @@
 
 
   @sect{Changelog}
-    @sect{1.0.0-RC7}
+    @sect{1.0.0-RC8}
       @ul
+        @li
+          We recently launched a @lnk("Patreon page", "https://www.patreon.com/lihaoyi")
+          to raise money to fund future development of Ammonite. If you've enjoyed using
+          Ammonite, and use it day to day, please
+          @lnk("chip in", "https://www.patreon.com/lihaoyi") to support our project!
         @li
           Output now defaults to colored if the console is interactive, and
           non-colored otherwise. This should be a default most people would
@@ -195,7 +200,15 @@
           Make @code{--watch} flag more robust against files being deleted
           during @code{mtime}ing, and make it properly re-run scripts when a
           file in a watched folder is renamed.
-
+        @li
+          Display @hl.scala("@doc") annotations on a script's @hl.scala("@main")
+          methods as part of the script's help text, thanks to
+          @lnk("mgedigian", "https://github.com/mgedigian")
+        @li
+          You can now use @code{:::} as part of your @hl.scala{import $ivy}
+          calls to load Scala libraries cross-published against the full
+          Scala version (e.g. @code{2.12.2} rather than just @code{2.12}, thanks
+          to @lnk("aeffrig", "https://github.com/aeffrig")
     @sect{0.9.9}
       @ul
         @li
@@ -325,11 +338,6 @@
 
     @sect{0.9.0}
       @ul
-        @li
-          We recently launched a @lnk("Patreon page", "https://www.patreon.com/lihaoyi")
-          to raise money to fund future development of Ammonite. If you've enjoyed using
-          Ammonite, and use it day to day, please
-          @lnk("chip in", "https://www.patreon.com/lihaoyi") to support our project!
         @li
           Ammonite now uses AlexArchambault's
           @lnk("Coursier", "https://github.com/coursier/coursier") library for

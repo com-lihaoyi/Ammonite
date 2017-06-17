@@ -405,6 +405,13 @@
         @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("'guava", "@"))
 
         @p
+          As well as the @code{org:::library:version} syntax for loading Scala
+          libraries cross-published against the full Scala version (e.g.
+          @code{2.12.2} rather than just @code{2.12}):
+
+        @hl.ref(ammoniteTests/"ImportHookTests.scala", Seq("'inlineFull", "@"))
+
+        @p
           If you want to load a compiler plugin, you can do so using
           @hl.scala{import $ivy.$plugin}:
 
