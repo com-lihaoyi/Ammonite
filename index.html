@@ -595,7 +595,7 @@ res1: Int = 31337
         <p>
           Or if the script is in an <i>outer</i> folder,
 </p>
-        <pre><code class="scala scalatex-site-Styles-highlightMe">@ import $file.`..`.MyScript
+        <pre><code class="scala scalatex-site-Styles-highlightMe">@ import $file.^.MyScript
 </code></pre>
         <p>
           Or if we want to import the contents of the script in one go:
@@ -1240,8 +1240,8 @@ target
 terminal
 .travis.yml
 
-real	0m0.015s
-user	0m0.004s
+real	0m0.037s
+user	0m0.000s
 sys	0m0.000s</pre><pre><span>Compiling /home/travis/build/lihaoyi/Ammonite/shell/src/main/resources/ammonite/shell/example-predef-bare.sc
 Compiling /home/travis/build/lihaoyi/Ammonite/shell/src/main/resources/ammonite/shell/example-predef-bare.sc #2
 Welcome to the Ammonite Repl 1.0.0-RC7
@@ -1256,7 +1256,7 @@ res0: (LsSeq, concurrent.duration.FiniteDuration) = (
 'LICENSE            'deploy_key         'readme             'terminal
 'amm                'integration        &quot;readme.md&quot;
 ,
-  17560480 nanoseconds
+  65335175 nanoseconds
 )</span></pre></div>
 
           <p>
@@ -3953,15 +3953,15 @@ HELLO
 </p>
       <div><pre><span style="color: #8e44ad;">
 bash$ </span>git branch
-* (detached from e37c568)
+* (detached from f6e34a8)
   master</pre><pre><span>@ %git 'branch 
-* (detached from e37c568)
+* (detached from f6e34a8)
   master
 </span></pre></div>
       <div><pre><span style="color: #8e44ad;">
 bash$ </span>date
-Fri Jun 16 23:53:45 UTC 2017</pre><pre><span>@ %date 
-Fri Jun 16 23:54:20 UTC 2017
+Sat Jun 17 00:25:11 UTC 2017</pre><pre><span>@ %date 
+Sat Jun 17 00:25:33 UTC 2017
 </span></pre></div>
 
       <p>
@@ -4151,7 +4151,7 @@ Hello from Java!
 @ import java.util._ 
 import java.util._
 @ val date = new Date() 
-date: Date = Sat Jun 17 00:03:24 UTC 2017
+date: Date = Sat Jun 17 00:32:46 UTC 2017
 @ date.getDay() 
 res3: Int = 6</span></pre>
 
@@ -5973,15 +5973,15 @@ try {
       The page above contains the documentation for the latest stable version
       of Ammonite, <code>1.0.0-RC7</code>. Ammonite also publishes
       unstable versions, the latest of which is
-      <code>COMMIT-e37c568</code> and is available for direct
+      <code>COMMIT-f6e34a8</code> and is available for direct
       download:
 </p>
-    <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/vHpDj &amp;&amp; sudo chmod +x /usr/local/bin/amm &amp;&amp; amm
+    <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/vHp9f &amp;&amp; sudo chmod +x /usr/local/bin/amm &amp;&amp; amm
 </code></pre>
     <p>
       Or usage in an SBT project
 </p>
-    <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;COMMIT-e37c568&quot; % &quot;test&quot; cross CrossVersion.full
+    <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;COMMIT-f6e34a8&quot; % &quot;test&quot; cross CrossVersion.full
 
 initialCommands in (Test, console) := &quot;&quot;&quot;ammonite.Main().run()&quot;&quot;&quot;
 </code></pre>
@@ -5991,13 +5991,13 @@ initialCommands in (Test, console) := &quot;&quot;&quot;ammonite.Main().run()&qu
 </p>
     
       <b>
-        Scala snapshot-commit-uploads/2.10-COMMIT-e37c568
+        Scala snapshot-commit-uploads/2.10-COMMIT-f6e34a8
 </b>
-      <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/vHpye &amp;&amp; sudo chmod +x /usr/local/bin/amm &amp;&amp; amm</code></pre>
+      <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/vHp9J &amp;&amp; sudo chmod +x /usr/local/bin/amm &amp;&amp; amm</code></pre>
       <b>
-        Scala snapshot-commit-uploads/2.11-COMMIT-e37c568
+        Scala snapshot-commit-uploads/2.11-COMMIT-f6e34a8
 </b>
-      <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/vHpyv &amp;&amp; sudo chmod +x /usr/local/bin/amm &amp;&amp; amm</code></pre>
+      <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/vHp9U &amp;&amp; sudo chmod +x /usr/local/bin/amm &amp;&amp; amm</code></pre>
     <p>
       These unstable versions will contain any brand-new features that are
       currently being worked on, with the caveat that they are unstable and
