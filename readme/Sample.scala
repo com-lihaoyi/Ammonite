@@ -40,7 +40,7 @@ object Sample{
     val ammExec = "amm/target/" + executableName
     val predef = "shell/src/main/resources/ammonite/shell/example-predef-bare.sc"
     val out = exec(
-      Seq(ammExec, "--no-remote-logging", "--predef", "--no-home-predef", predef),
+      Seq(ammExec, "--no-remote-logging", "--no-home-predef", "--predef", predef),
       s"${ammoniteCode.trim}\nexit\n",
       args = Map("JAVA_OPTS" -> "-Xmx600m")
     )
