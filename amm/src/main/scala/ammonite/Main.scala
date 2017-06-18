@@ -117,9 +117,6 @@ case class Main(predef: String = "",
 
   def run(replArgs: Bind[_]*): Any = {
 
-    //set proxy properties from env:
-    ProxyFromEnv.setPropProxyFromEnv()
-
     val remoteLogger =
       if (!remoteLogging) None
       else Some(new ammonite.repl.RemoteLogger(storageBackend.getSessionId))
@@ -189,6 +186,11 @@ object Main{
     * delegating to [[Main.run]]
     */
   def main(args0: Array[String]): Unit = {
+    // set proxy properties from env
+    // Not in `main0`, since `main0` should be able to be run as part of the
+    // test suite without mangling the global properties of the JVM process
+    ProxyFromEnv.setPropProxyFromEnv()
+
     val success = main0(args0.toList, System.in, System.out, System.err)
     if (success) sys.exit(0)
     else sys.exit(1)
