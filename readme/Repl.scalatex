@@ -392,7 +392,7 @@
           @code{~/.ammonite/predef.sc} file into multiple scripts: e.g. if you
           want to break up your @code{predef.sc} into two scripts
           @code{~/.ammonite/predef.sc} and @code{~/.ammonite/helper.sc}. While
-          you could use @set.ref{import $file} to
+          you could use @sect.ref{import $file} to
           @hl.scala{import $file.helper} within your @code{predef.sc} file, it
           will only bring the @code{helper} object into scope within
           @code{predef.sc} or within your REPL. @hl.scala{import exec.helper}

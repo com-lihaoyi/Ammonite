@@ -69,10 +69,10 @@ object SshdRepl {
         new Repl(
           in, out, out,
           new Storage.Folder(homePath),
-          basePredefs = Seq(
+          Seq(
             PredefInfo(Name("DefaultPredef"), augmentedPredef, true, None)
           ),
-          customPredefs = Seq(
+          Seq(
             PredefInfo(Name("CodePredef"), predefCode, false, None)
           ),
           wd, Some(ammonite.main.Defaults.welcomeBanner),

@@ -534,6 +534,7 @@
         the script depends on, and you want to
 
     @sect{Script Debug REPL}
+      @img(src:="ScriptRepl.gif", display.block, marginLeft.auto, marginRight.auto, height := 432)
       @p
         When a script is not working as intended, it is useful to be able to
         poke around in a REPL after the script has run, in order to see what

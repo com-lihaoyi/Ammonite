@@ -331,23 +331,28 @@ class MainRunner(cliConfig: Cli.Config,
   def printError(s: String) = errPrintStream.println(colors.error()(s))
 
   @tailrec final def watchLoop[T](isRepl: Boolean,
+                                  printing: Boolean,
                                   run: Main => (Res[T], Seq[(Path, Long)])): Boolean = {
     val (result, watched) = run(initMain(isRepl))
 
-    val success = handleWatchRes(result)
+    val success = handleWatchRes(result, printing)
     if (!cliConfig.watch) success
     else{
       watchAndWait(watched)
-      watchLoop(isRepl, run)
+      watchLoop(isRepl, printing, run)
     }
   }
 
   def runScript(scriptPath: Path, scriptArgs: List[String]) =
-    watchLoop(false, _.runScript(scriptPath, Scripts.groupArgs(scriptArgs)))
+    watchLoop(
+      isRepl = false,
+      printing = true,
+      _.runScript(scriptPath, Scripts.groupArgs(scriptArgs))
+    )
 
-  def runCode(code: String) = watchLoop(false, _.runCode(code))
+  def runCode(code: String) = watchLoop(isRepl = false, printing = false, _.runCode(code))
 
-  def runRepl(): Unit = watchLoop(true, _.run())
+  def runRepl(): Unit = watchLoop(isRepl = true, printing = false, _.run())
 
   def watchAndWait(watched: Seq[(Path, Long)]) = {
     printInfo(s"Watching for changes to ${watched.length} files... (Ctrl-C to exit)")
@@ -358,7 +363,7 @@ class MainRunner(cliConfig: Cli.Config,
     while(statAll()) Thread.sleep(100)
   }
 
-  def handleWatchRes[T](res: Res[T]) = {
+  def handleWatchRes[T](res: Res[T], printing: Boolean) = {
     val success = res match {
       case Res.Failure(msg) =>
         printError(msg)
@@ -370,7 +375,7 @@ class MainRunner(cliConfig: Cli.Config,
         false
 
       case Res.Success(value) =>
-        if (value != ()) outprintStream.println(pprint.PPrinter.BlackWhite(value))
+        if (printing && value != ()) outprintStream.println(pprint.PPrinter.BlackWhite(value))
         true
 
       case Res.Skip   => true // do nothing on success, everything's already happened
@@ -380,18 +385,6 @@ class MainRunner(cliConfig: Cli.Config,
 
 
   def initMain(isRepl: Boolean) = {
-    val loadedPredef = cliConfig.predefFile match{
-      case None => Right(None)
-      case Some(file) =>
-        try Right(Some((read(file), file)))
-        catch {case e: java.nio.file.NoSuchFileException =>
-          // If we cannot find the user's explicitly-specified predef, fail
-          // loudly. We can happily fail-silently the "default" predef files,
-          // since the user may or may not have created one, but since the user
-          // explicitly specified one here we assume that it has to exist.
-          Left(("Script file not found: " + file, Seq(file -> 0L)))
-        }
-    }
     val storage = if (!cliConfig.homePredef) {
       new Storage.Folder(cliConfig.home, isRepl) {
         override def loadPredef = None
