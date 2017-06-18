@@ -229,14 +229,8 @@
                         </a>
                       </li><li class="current-entities indented1">
                         <span class="separator"></span>
-                        <a class="class" href="MainRunner.html" title="Bundles together all the code relying on cliConfig and the common
-input/output streams and print-streams, so we don't need to keep passing
-them everywhere one by one
-"></a>
-                        <a href="MainRunner.html" title="Bundles together all the code relying on cliConfig and the common
-input/output streams and print-streams, so we don't need to keep passing
-them everywhere one by one
-">
+                        <a class="class" href="MainRunner.html" title="Bundles together:"></a>
+                        <a href="MainRunner.html" title="Bundles together:">
                           MainRunner
                         </a>
                       </li><li name="ammonite.main" visbl="pub" class="indented2 " data-isabs="false" fullComment="yes" group="Ungrouped">
@@ -304,19 +298,19 @@ configuration, running scripts, printing error messages, etc.
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">Main</span><span class="params">(<span name="predef">predef: <span class="extype" name="scala.Predef.String">String</span> = <span class="symbol">&quot;&quot;</span></span>, <span name="defaultPredef">defaultPredef: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Boolean" class="extype" target="_top">Boolean</a> = <span class="symbol">true</span></span>, <span name="storageBackend">storageBackend: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-runtime/1.0.0-RC8/ammonite-runtime-1.0.0-RC8-javadoc.jar/!/index.html#ammonite.runtime.Storage" class="extype" target="_top">Storage</a> = <span class="defval" name='<span class="name"><a href="index.html">new Storage.Folder(Defaults.ammoniteHome)</a></span>'>...</span></span>, <span name="wd">wd: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/1.0.0-RC8/ammonite-ops-1.0.0-RC8-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a> = <span class="symbol"><span class="name"><a href="index.html">ammonite.ops.pwd</a></span></span></span>, <span name="welcomeBanner">welcomeBanner: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Option" class="extype" target="_top">Option</a>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol"><span class="name"><a href="index.html">Some(Defaults.welcomeBanner)</a></span></span></span>, <span name="inputStream">inputStream: <span class="extype" name="java.io.InputStream">InputStream</span> = <span class="symbol">System.in</span></span>, <span name="outputStream">outputStream: <span class="extype" name="java.io.OutputStream">OutputStream</span> = <span class="symbol">System.out</span></span>, <span name="errorStream">errorStream: <span class="extype" name="java.io.OutputStream">OutputStream</span> = <span class="symbol">System.err</span></span>, <span name="verboseOutput">verboseOutput: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Boolean" class="extype" target="_top">Boolean</a> = <span class="symbol">true</span></span>, <span name="remoteLogging">remoteLogging: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Boolean" class="extype" target="_top">Boolean</a> = <span class="symbol">true</span></span>, <span name="colors">colors: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-util/1.0.0-RC8/ammonite-util-1.0.0-RC8-javadoc.jar/!/index.html#ammonite.util.Colors" class="extype" target="_top">Colors</a> = <span class="symbol"><span class="name"><a href="index.html">Colors.Default</a></span></span></span>)</span><span class="result"> extends <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+        <span class="name">Main</span><span class="params">(<span name="predefCode">predefCode: <span class="extype" name="scala.Predef.String">String</span> = <span class="symbol">&quot;&quot;</span></span>, <span name="predefFile">predefFile: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Option" class="extype" target="_top">Option</a>[<a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/1.0.0-RC9/ammonite-ops-1.0.0-RC9-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a>] = <span class="symbol">None</span></span>, <span name="defaultPredef">defaultPredef: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Boolean" class="extype" target="_top">Boolean</a> = <span class="symbol">true</span></span>, <span name="storageBackend">storageBackend: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-runtime/1.0.0-RC9/ammonite-runtime-1.0.0-RC9-javadoc.jar/!/index.html#ammonite.runtime.Storage" class="extype" target="_top">Storage</a> = <span class="defval" name='<span class="name"><a href="index.html">new Storage.Folder(Defaults.ammoniteHome)</a></span>'>...</span></span>, <span name="wd">wd: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/1.0.0-RC9/ammonite-ops-1.0.0-RC9-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a> = <span class="symbol"><span class="name"><a href="index.html">ammonite.ops.pwd</a></span></span></span>, <span name="welcomeBanner">welcomeBanner: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Option" class="extype" target="_top">Option</a>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol"><span class="name"><a href="index.html">Some(Defaults.welcomeBanner)</a></span></span></span>, <span name="inputStream">inputStream: <span class="extype" name="java.io.InputStream">InputStream</span> = <span class="symbol">System.in</span></span>, <span name="outputStream">outputStream: <span class="extype" name="java.io.OutputStream">OutputStream</span> = <span class="symbol">System.out</span></span>, <span name="errorStream">errorStream: <span class="extype" name="java.io.OutputStream">OutputStream</span> = <span class="symbol">System.err</span></span>, <span name="verboseOutput">verboseOutput: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Boolean" class="extype" target="_top">Boolean</a> = <span class="symbol">true</span></span>, <span name="remoteLogging">remoteLogging: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Boolean" class="extype" target="_top">Boolean</a> = <span class="symbol">true</span></span>, <span name="colors">colors: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-util/1.0.0-RC9/ammonite-util-1.0.0-RC9-javadoc.jar/!/index.html#ammonite.util.Colors" class="extype" target="_top">Colors</a> = <span class="symbol"><span class="name"><a href="index.html">Colors.Default</a></span></span></span>)</span><span class="result"> extends <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
       </span>
       </h4>
 
       
           <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Contains the various entry points to the Ammonite REPL.</p><p>Configuration of the basic REPL is done by passing in arguments when
 constructing the <a href="" class="extype" name="ammonite.Main">Main</a> instance, and the various entrypoints such
-as <a href="#run(replArgs:ammonite.util.Bind[_]*):Any" class="extmbr" name="ammonite.Main#run">run</a> <a href="#runScript(path:ammonite.ops.Path,scriptArgs:Seq[(String,Option[String])]):(ammonite.util.Res[Any],Seq[(ammonite.ops.Path,Long)])" class="extmbr" name="ammonite.Main#runScript">runScript</a> and so on are methods on that instance.</p><p>It is more or less equivalent to the <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-repl/1.0.0-RC8/ammonite-repl-1.0.0-RC8-javadoc.jar/!/index.html#ammonite.repl.Repl" class="extype" target="_top">ammonite.repl.Repl</a> object itself, and has
-a similar set of parameters, but does not have any of the <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-repl/1.0.0-RC8/ammonite-repl-1.0.0-RC8-javadoc.jar/!/index.html#ammonite.repl.Repl" class="extype" target="_top">ammonite.repl.Repl</a>'s
+as <a href="#run(replArgs:ammonite.util.Bind[_]*):(ammonite.util.Res[Any],Seq[(ammonite.ops.Path,Long)])" class="extmbr" name="ammonite.Main#run">run</a> <a href="#runScript(path:ammonite.ops.Path,scriptArgs:Seq[(String,Option[String])]):(ammonite.util.Res[Any],Seq[(ammonite.ops.Path,Long)])" class="extmbr" name="ammonite.Main#runScript">runScript</a> and so on are methods on that instance.</p><p>It is more or less equivalent to the <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-repl/1.0.0-RC9/ammonite-repl-1.0.0-RC9-javadoc.jar/!/index.html#ammonite.repl.Repl" class="extype" target="_top">ammonite.repl.Repl</a> object itself, and has
+a similar set of parameters, but does not have any of the <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-repl/1.0.0-RC9/ammonite-repl-1.0.0-RC9-javadoc.jar/!/index.html#ammonite.repl.Repl" class="extype" target="_top">ammonite.repl.Repl</a>'s
 implementation-related code and provides a more convenient set of
-entry-points that a user can call.</p><p>Note that the <a href="#instantiateRepl(replArgs:IndexedSeq[ammonite.util.Bind[_]],remoteLogger:Option[ammonite.repl.RemoteLogger]):ammonite.repl.Repl" class="extmbr" name="ammonite.Main#instantiateRepl">instantiateRepl</a> function generates a new <span class="extype" name="Repl">Repl</span>
+entry-points that a user can call.</p><p>Note that the <a href="#instantiateRepl(replArgs:IndexedSeq[ammonite.util.Bind[_]],remoteLogger:Option[ammonite.repl.RemoteLogger]):scala.util.Either[(ammonite.util.Res.Failure,Seq[(ammonite.ops.Path,Long)]),ammonite.repl.Repl]" class="extmbr" name="ammonite.Main#instantiateRepl">instantiateRepl</a> function generates a new <span class="extype" name="Repl">Repl</span>
 every time it is called!
-</p></div><dl class="paramcmts block"><dt class="param">predef</dt><dd class="cmt"><p>Any additional code you want to run before the REPL session
+</p></div><dl class="paramcmts block"><dt class="param">predefCode</dt><dd class="cmt"><p>Any additional code you want to run before the REPL session
               starts. Can contain multiple blocks separated by <code>@</code>s</p></dd><dt class="param">defaultPredef</dt><dd class="cmt"><p>Do you want to include the &quot;standard&quot; predef imports
                      provided by Ammonite? These include tools like <code>time</code>,
                      <code>grep</code>, the <code>|</code> or <code>|?</code> pipes from ammonite-ops, and
@@ -382,9 +376,9 @@ every time it is called!
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="ammonite.Main#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="&lt;init&gt;(predef:String,defaultPredef:Boolean,storageBackend:ammonite.runtime.Storage,wd:ammonite.ops.Path,welcomeBanner:Option[String],inputStream:java.io.InputStream,outputStream:java.io.OutputStream,errorStream:java.io.OutputStream,verboseOutput:Boolean,remoteLogging:Boolean,colors:ammonite.util.Colors):ammonite.Main"></a><a id="&lt;init&gt;:Main"></a>
+      <a id="&lt;init&gt;(predefCode:String,predefFile:Option[ammonite.ops.Path],defaultPredef:Boolean,storageBackend:ammonite.runtime.Storage,wd:ammonite.ops.Path,welcomeBanner:Option[String],inputStream:java.io.InputStream,outputStream:java.io.OutputStream,errorStream:java.io.OutputStream,verboseOutput:Boolean,remoteLogging:Boolean,colors:ammonite.util.Colors):ammonite.Main"></a><a id="&lt;init&gt;:Main"></a>
       <span class="permalink">
-      <a href="../ammonite/Main.html#&lt;init&gt;(predef:String,defaultPredef:Boolean,storageBackend:ammonite.runtime.Storage,wd:ammonite.ops.Path,welcomeBanner:Option[String],inputStream:java.io.InputStream,outputStream:java.io.OutputStream,errorStream:java.io.OutputStream,verboseOutput:Boolean,remoteLogging:Boolean,colors:ammonite.util.Colors):ammonite.Main" title="Permalink">
+      <a href="../ammonite/Main.html#&lt;init&gt;(predefCode:String,predefFile:Option[ammonite.ops.Path],defaultPredef:Boolean,storageBackend:ammonite.runtime.Storage,wd:ammonite.ops.Path,welcomeBanner:Option[String],inputStream:java.io.InputStream,outputStream:java.io.OutputStream,errorStream:java.io.OutputStream,verboseOutput:Boolean,remoteLogging:Boolean,colors:ammonite.util.Colors):ammonite.Main" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -393,10 +387,10 @@ every time it is called!
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">Main</span><span class="params">(<span name="predef">predef: <span class="extype" name="scala.Predef.String">String</span> = <span class="symbol">&quot;&quot;</span></span>, <span name="defaultPredef">defaultPredef: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Boolean" class="extype" target="_top">Boolean</a> = <span class="symbol">true</span></span>, <span name="storageBackend">storageBackend: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-runtime/1.0.0-RC8/ammonite-runtime-1.0.0-RC8-javadoc.jar/!/index.html#ammonite.runtime.Storage" class="extype" target="_top">Storage</a> = <span class="defval" name='<span class="name"><a href="index.html">new Storage.Folder(Defaults.ammoniteHome)</a></span>'>...</span></span>, <span name="wd">wd: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/1.0.0-RC8/ammonite-ops-1.0.0-RC8-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a> = <span class="symbol"><span class="name"><a href="index.html">ammonite.ops.pwd</a></span></span></span>, <span name="welcomeBanner">welcomeBanner: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Option" class="extype" target="_top">Option</a>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol"><span class="name"><a href="index.html">Some(Defaults.welcomeBanner)</a></span></span></span>, <span name="inputStream">inputStream: <span class="extype" name="java.io.InputStream">InputStream</span> = <span class="symbol">System.in</span></span>, <span name="outputStream">outputStream: <span class="extype" name="java.io.OutputStream">OutputStream</span> = <span class="symbol">System.out</span></span>, <span name="errorStream">errorStream: <span class="extype" name="java.io.OutputStream">OutputStream</span> = <span class="symbol">System.err</span></span>, <span name="verboseOutput">verboseOutput: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Boolean" class="extype" target="_top">Boolean</a> = <span class="symbol">true</span></span>, <span name="remoteLogging">remoteLogging: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Boolean" class="extype" target="_top">Boolean</a> = <span class="symbol">true</span></span>, <span name="colors">colors: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-util/1.0.0-RC8/ammonite-util-1.0.0-RC8-javadoc.jar/!/index.html#ammonite.util.Colors" class="extype" target="_top">Colors</a> = <span class="symbol"><span class="name"><a href="index.html">Colors.Default</a></span></span></span>)</span>
+        <span class="name">Main</span><span class="params">(<span name="predefCode">predefCode: <span class="extype" name="scala.Predef.String">String</span> = <span class="symbol">&quot;&quot;</span></span>, <span name="predefFile">predefFile: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Option" class="extype" target="_top">Option</a>[<a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/1.0.0-RC9/ammonite-ops-1.0.0-RC9-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a>] = <span class="symbol">None</span></span>, <span name="defaultPredef">defaultPredef: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Boolean" class="extype" target="_top">Boolean</a> = <span class="symbol">true</span></span>, <span name="storageBackend">storageBackend: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-runtime/1.0.0-RC9/ammonite-runtime-1.0.0-RC9-javadoc.jar/!/index.html#ammonite.runtime.Storage" class="extype" target="_top">Storage</a> = <span class="defval" name='<span class="name"><a href="index.html">new Storage.Folder(Defaults.ammoniteHome)</a></span>'>...</span></span>, <span name="wd">wd: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/1.0.0-RC9/ammonite-ops-1.0.0-RC9-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a> = <span class="symbol"><span class="name"><a href="index.html">ammonite.ops.pwd</a></span></span></span>, <span name="welcomeBanner">welcomeBanner: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Option" class="extype" target="_top">Option</a>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol"><span class="name"><a href="index.html">Some(Defaults.welcomeBanner)</a></span></span></span>, <span name="inputStream">inputStream: <span class="extype" name="java.io.InputStream">InputStream</span> = <span class="symbol">System.in</span></span>, <span name="outputStream">outputStream: <span class="extype" name="java.io.OutputStream">OutputStream</span> = <span class="symbol">System.out</span></span>, <span name="errorStream">errorStream: <span class="extype" name="java.io.OutputStream">OutputStream</span> = <span class="symbol">System.err</span></span>, <span name="verboseOutput">verboseOutput: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Boolean" class="extype" target="_top">Boolean</a> = <span class="symbol">true</span></span>, <span name="remoteLogging">remoteLogging: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Boolean" class="extype" target="_top">Boolean</a> = <span class="symbol">true</span></span>, <span name="colors">colors: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-util/1.0.0-RC9/ammonite-util-1.0.0-RC9-javadoc.jar/!/index.html#ammonite.util.Colors" class="extype" target="_top">Colors</a> = <span class="symbol"><span class="name"><a href="index.html">Colors.Default</a></span></span></span>)</span>
       </span>
       
-      <p class="shortcomment cmt"></p><div class="fullcomment"><div class="comment cmt"></div><dl class="paramcmts block"><dt class="param">predef</dt><dd class="cmt"><p>Any additional code you want to run before the REPL session
+      <p class="shortcomment cmt"></p><div class="fullcomment"><div class="comment cmt"></div><dl class="paramcmts block"><dt class="param">predefCode</dt><dd class="cmt"><p>Any additional code you want to run before the REPL session
               starts. Can contain multiple blocks separated by <code>@</code>s</p></dd><dt class="param">defaultPredef</dt><dd class="cmt"><p>Do you want to include the &quot;standard&quot; predef imports
                      provided by Ammonite? These include tools like <code>time</code>,
                      <code>grep</code>, the <code>|</code> or <code>|?</code> pipes from ammonite-ops, and
@@ -520,7 +514,7 @@ every time it is called!
         <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">colors</span><span class="result">: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-util/1.0.0-RC8/ammonite-util-1.0.0-RC8-javadoc.jar/!/index.html#ammonite.util.Colors" class="extype" target="_top">Colors</a></span>
+        <span class="name">colors</span><span class="result">: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-util/1.0.0-RC9/ammonite-util-1.0.0-RC9-javadoc.jar/!/index.html#ammonite.util.Colors" class="extype" target="_top">Colors</a></span>
       </span>
       
       
@@ -627,9 +621,9 @@ every time it is called!
       
       
     </li><li name="ammonite.Main#instantiateInterpreter" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="instantiateInterpreter():ammonite.interp.Interpreter"></a><a id="instantiateInterpreter():Interpreter"></a>
+      <a id="instantiateInterpreter():scala.util.Either[(ammonite.util.Res.Failing,Seq[(ammonite.ops.Path,Long)]),ammonite.interp.Interpreter]"></a><a id="instantiateInterpreter():Either[(Failing,Seq[(Path,Long)]),Interpreter]"></a>
       <span class="permalink">
-      <a href="../ammonite/Main.html#instantiateInterpreter():ammonite.interp.Interpreter" title="Permalink">
+      <a href="../ammonite/Main.html#instantiateInterpreter():scala.util.Either[(ammonite.util.Res.Failing,Seq[(ammonite.ops.Path,Long)]),ammonite.interp.Interpreter]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -638,14 +632,14 @@ every time it is called!
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">instantiateInterpreter</span><span class="params">()</span><span class="result">: <span class="extype" name="ammonite.interp.Interpreter">Interpreter</span></span>
+        <span class="name">instantiateInterpreter</span><span class="params">()</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.util.Either" class="extype" target="_top">Either</a>[(<span class="extype" name="ammonite.util.Res.Failing">Failing</span>, <span class="extype" name="scala.Seq">Seq</span>[(<a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/1.0.0-RC9/ammonite-ops-1.0.0-RC9-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Long" class="extype" target="_top">Long</a>)]), <span class="extype" name="ammonite.interp.Interpreter">Interpreter</span>]</span>
       </span>
       
       
     </li><li name="ammonite.Main#instantiateRepl" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="instantiateRepl(replArgs:IndexedSeq[ammonite.util.Bind[_]],remoteLogger:Option[ammonite.repl.RemoteLogger]):ammonite.repl.Repl"></a><a id="instantiateRepl(IndexedSeq[Bind[_]],Option[RemoteLogger]):Repl"></a>
+      <a id="instantiateRepl(replArgs:IndexedSeq[ammonite.util.Bind[_]],remoteLogger:Option[ammonite.repl.RemoteLogger]):scala.util.Either[(ammonite.util.Res.Failure,Seq[(ammonite.ops.Path,Long)]),ammonite.repl.Repl]"></a><a id="instantiateRepl(IndexedSeq[Bind[_]],Option[RemoteLogger]):Either[(Failure,Seq[(Path,Long)]),Repl]"></a>
       <span class="permalink">
-      <a href="../ammonite/Main.html#instantiateRepl(replArgs:IndexedSeq[ammonite.util.Bind[_]],remoteLogger:Option[ammonite.repl.RemoteLogger]):ammonite.repl.Repl" title="Permalink">
+      <a href="../ammonite/Main.html#instantiateRepl(replArgs:IndexedSeq[ammonite.util.Bind[_]],remoteLogger:Option[ammonite.repl.RemoteLogger]):scala.util.Either[(ammonite.util.Res.Failure,Seq[(ammonite.ops.Path,Long)]),ammonite.repl.Repl]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -654,7 +648,7 @@ every time it is called!
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">instantiateRepl</span><span class="params">(<span name="replArgs">replArgs: <span class="extype" name="scala.IndexedSeq">IndexedSeq</span>[<a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-util/1.0.0-RC8/ammonite-util-1.0.0-RC8-javadoc.jar/!/index.html#ammonite.util.Bind" class="extype" target="_top">Bind</a>[_]] = <span class="symbol">Vector.empty</span></span>, <span name="remoteLogger">remoteLogger: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Option" class="extype" target="_top">Option</a>[<a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-repl/1.0.0-RC8/ammonite-repl-1.0.0-RC8-javadoc.jar/!/index.html#ammonite.repl.RemoteLogger" class="extype" target="_top">RemoteLogger</a>]</span>)</span><span class="result">: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-repl/1.0.0-RC8/ammonite-repl-1.0.0-RC8-javadoc.jar/!/index.html#ammonite.repl.Repl" class="extype" target="_top">Repl</a></span>
+        <span class="name">instantiateRepl</span><span class="params">(<span name="replArgs">replArgs: <span class="extype" name="scala.IndexedSeq">IndexedSeq</span>[<a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-util/1.0.0-RC9/ammonite-util-1.0.0-RC9-javadoc.jar/!/index.html#ammonite.util.Bind" class="extype" target="_top">Bind</a>[_]] = <span class="symbol">Vector.empty</span></span>, <span name="remoteLogger">remoteLogger: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Option" class="extype" target="_top">Option</a>[<a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-repl/1.0.0-RC9/ammonite-repl-1.0.0-RC9-javadoc.jar/!/index.html#ammonite.repl.RemoteLogger" class="extype" target="_top">RemoteLogger</a>]</span>)</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.util.Either" class="extype" target="_top">Either</a>[(<span class="extype" name="ammonite.util.Res.Failure">Failure</span>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.collection.Seq" class="extype" target="_top">Seq</a>[(<a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/1.0.0-RC9/ammonite-ops-1.0.0-RC9-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Long" class="extype" target="_top">Long</a>)]), <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-repl/1.0.0-RC9/ammonite-repl-1.0.0-RC9-javadoc.jar/!/index.html#ammonite.repl.Repl" class="extype" target="_top">Repl</a>]</span>
       </span>
       
       <p class="shortcomment cmt">Instantiates an ammonite.Repl using the configuration
@@ -675,6 +669,22 @@ every time it is called!
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="ammonite.Main#loadedPredefFile" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="loadedPredefFile:scala.util.Either[(ammonite.util.Res.Failure,Seq[(ammonite.ops.Path,Long)]),Option[ammonite.util.PredefInfo]]"></a><a id="loadedPredefFile:Either[(Failure,Seq[(Path,Long)]),Option[PredefInfo]]"></a>
+      <span class="permalink">
+      <a href="../ammonite/Main.html#loadedPredefFile:scala.util.Either[(ammonite.util.Res.Failure,Seq[(ammonite.ops.Path,Long)]),Option[ammonite.util.PredefInfo]]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">loadedPredefFile</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.util.Either" class="extype" target="_top">Either</a>[(<span class="extype" name="ammonite.util.Res.Failure">Failure</span>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.collection.Seq" class="extype" target="_top">Seq</a>[(<a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/1.0.0-RC9/ammonite-ops-1.0.0-RC9-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Long" class="extype" target="_top">Long</a>)]), <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Option" class="extype" target="_top">Option</a>[<span class="extype" name="ammonite.util.PredefInfo">PredefInfo</span>]]</span>
+      </span>
+      
+      
     </li><li name="scala.AnyRef#ne" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
       <span class="permalink">
@@ -739,10 +749,10 @@ every time it is called!
       </span>
       
       
-    </li><li name="ammonite.Main#predef" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="predef:String"></a>
+    </li><li name="ammonite.Main#predefCode" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="predefCode:String"></a>
       <span class="permalink">
-      <a href="../ammonite/Main.html#predef:String" title="Permalink">
+      <a href="../ammonite/Main.html#predefCode:String" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -751,7 +761,23 @@ every time it is called!
         <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">predef</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+        <span class="name">predefCode</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      
+      
+    </li><li name="ammonite.Main#predefFile" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="predefFile:Option[ammonite.ops.Path]"></a><a id="predefFile:Option[Path]"></a>
+      <span class="permalink">
+      <a href="../ammonite/Main.html#predefFile:Option[ammonite.ops.Path]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">predefFile</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Option" class="extype" target="_top">Option</a>[<a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/1.0.0-RC9/ammonite-ops-1.0.0-RC9-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a>]</span>
       </span>
       
       
@@ -771,10 +797,10 @@ every time it is called!
       </span>
       
       
-    </li><li name="ammonite.Main#run" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="run(replArgs:ammonite.util.Bind[_]*):Any"></a><a id="run(Bind[_]*):Any"></a>
+    </li><li name="ammonite.Main#run" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="run(replArgs:ammonite.util.Bind[_]*):(ammonite.util.Res[Any],Seq[(ammonite.ops.Path,Long)])"></a><a id="run(Bind[_]*):(Res[Any],Seq[(Path,Long)])"></a>
       <span class="permalink">
-      <a href="../ammonite/Main.html#run(replArgs:ammonite.util.Bind[_]*):Any" title="Permalink">
+      <a href="../ammonite/Main.html#run(replArgs:ammonite.util.Bind[_]*):(ammonite.util.Res[Any],Seq[(ammonite.ops.Path,Long)])" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -783,14 +809,18 @@ every time it is called!
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">run</span><span class="params">(<span name="replArgs">replArgs: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-util/1.0.0-RC8/ammonite-util-1.0.0-RC8-javadoc.jar/!/index.html#ammonite.util.Bind" class="extype" target="_top">Bind</a>[_]*</span>)</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Any" class="extype" target="_top">Any</a></span>
+        <span class="name">run</span><span class="params">(<span name="replArgs">replArgs: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-util/1.0.0-RC9/ammonite-util-1.0.0-RC9-javadoc.jar/!/index.html#ammonite.util.Bind" class="extype" target="_top">Bind</a>[_]*</span>)</span><span class="result">: (<span class="extype" name="ammonite.util.Res">Res</span>[<a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Any" class="extype" target="_top">Any</a>], <span class="extype" name="scala.Seq">Seq</span>[(<a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/1.0.0-RC9/ammonite-ops-1.0.0-RC9-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Long" class="extype" target="_top">Long</a>)])</span>
       </span>
       
-      
+      <p class="shortcomment cmt">Run the REPL, with any additional bindings you wish to provide.</p><div class="fullcomment"><div class="comment cmt"><p>Run the REPL, with any additional bindings you wish to provide.</p><p>Returns an <code>Any</code> representing any value that the user passed into the
+<code>exit</code> call when closing the REPL (defaults to <code>(): Unit</code>). Also returns
+a sequence of paths that were watched as a result of this REPL run, in
+case you wish to re-start the REPL when any of them change.
+</p></div></div>
     </li><li name="ammonite.Main#runCode" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="runCode(code:String):ammonite.util.Res[ammonite.util.Imports]"></a><a id="runCode(String):Res[Imports]"></a>
+      <a id="runCode(code:String):(ammonite.util.Res[ammonite.util.Imports],Seq[(ammonite.ops.Path,Long)])"></a><a id="runCode(String):(Res[Imports],Seq[(Path,Long)])"></a>
       <span class="permalink">
-      <a href="../ammonite/Main.html#runCode(code:String):ammonite.util.Res[ammonite.util.Imports]" title="Permalink">
+      <a href="../ammonite/Main.html#runCode(code:String):(ammonite.util.Res[ammonite.util.Imports],Seq[(ammonite.ops.Path,Long)])" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -799,7 +829,7 @@ every time it is called!
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">runCode</span><span class="params">(<span name="code">code: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-util/1.0.0-RC8/ammonite-util-1.0.0-RC8-javadoc.jar/!/index.html#ammonite.util.Res" class="extype" target="_top">Res</a>[<a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-util/1.0.0-RC8/ammonite-util-1.0.0-RC8-javadoc.jar/!/index.html#ammonite.util.Imports" class="extype" target="_top">Imports</a>]</span>
+        <span class="name">runCode</span><span class="params">(<span name="code">code: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: (<span class="extype" name="ammonite.util.Res">Res</span>[<a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-util/1.0.0-RC9/ammonite-util-1.0.0-RC9-javadoc.jar/!/index.html#ammonite.util.Imports" class="extype" target="_top">Imports</a>], <span class="extype" name="scala.Seq">Seq</span>[(<a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/1.0.0-RC9/ammonite-ops-1.0.0-RC9-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Long" class="extype" target="_top">Long</a>)])</span>
       </span>
       
       <p class="shortcomment cmt">Run a snippet of code
@@ -816,7 +846,7 @@ every time it is called!
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">runScript</span><span class="params">(<span name="path">path: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/1.0.0-RC8/ammonite-ops-1.0.0-RC8-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a></span>, <span name="scriptArgs">scriptArgs: <span class="extype" name="scala.Seq">Seq</span>[(<span class="extype" name="scala.Predef.String">String</span>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Option" class="extype" target="_top">Option</a>[<span class="extype" name="scala.Predef.String">String</span>])]</span>)</span><span class="result">: (<a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-util/1.0.0-RC8/ammonite-util-1.0.0-RC8-javadoc.jar/!/index.html#ammonite.util.Res" class="extype" target="_top">Res</a>[<a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Any" class="extype" target="_top">Any</a>], <span class="extype" name="scala.Seq">Seq</span>[(<a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/1.0.0-RC8/ammonite-ops-1.0.0-RC8-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Long" class="extype" target="_top">Long</a>)])</span>
+        <span class="name">runScript</span><span class="params">(<span name="path">path: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/1.0.0-RC9/ammonite-ops-1.0.0-RC9-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a></span>, <span name="scriptArgs">scriptArgs: <span class="extype" name="scala.Seq">Seq</span>[(<span class="extype" name="scala.Predef.String">String</span>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Option" class="extype" target="_top">Option</a>[<span class="extype" name="scala.Predef.String">String</span>])]</span>)</span><span class="result">: (<span class="extype" name="ammonite.util.Res">Res</span>[<a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Any" class="extype" target="_top">Any</a>], <span class="extype" name="scala.Seq">Seq</span>[(<a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/1.0.0-RC9/ammonite-ops-1.0.0-RC9-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Long" class="extype" target="_top">Long</a>)])</span>
       </span>
       
       <p class="shortcomment cmt">Run a Scala script file! takes the path to the file as well as an array
@@ -833,7 +863,7 @@ of <code>args</code> and a map of keyword <code>kwargs</code> to pass to that fi
         <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">storageBackend</span><span class="result">: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-runtime/1.0.0-RC8/ammonite-runtime-1.0.0-RC8-javadoc.jar/!/index.html#ammonite.runtime.Storage" class="extype" target="_top">Storage</a></span>
+        <span class="name">storageBackend</span><span class="result">: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-runtime/1.0.0-RC9/ammonite-runtime-1.0.0-RC9-javadoc.jar/!/index.html#ammonite.runtime.Storage" class="extype" target="_top">Storage</a></span>
       </span>
       
       
@@ -947,7 +977,7 @@ of <code>args</code> and a map of keyword <code>kwargs</code> to pass to that fi
         <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">wd</span><span class="result">: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/1.0.0-RC8/ammonite-ops-1.0.0-RC8-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a></span>
+        <span class="name">wd</span><span class="result">: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/1.0.0-RC9/ammonite-ops-1.0.0-RC9-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a></span>
       </span>
       
       

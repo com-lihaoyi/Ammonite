@@ -229,14 +229,8 @@
                         </a>
                       </li><li class="current-entities indented1">
                         <span class="separator"></span>
-                        <a class="class" href="" title="Bundles together all the code relying on cliConfig and the common
-input/output streams and print-streams, so we don't need to keep passing
-them everywhere one by one
-"></a>
-                        <a href="" title="Bundles together all the code relying on cliConfig and the common
-input/output streams and print-streams, so we don't need to keep passing
-them everywhere one by one
-">
+                        <a class="class" href="" title="Bundles together:"></a>
+                        <a href="" title="Bundles together:">
                           MainRunner
                         </a>
                       </li><li name="ammonite.main" visbl="pub" class="indented2 " data-isabs="false" fullComment="yes" group="Ungrouped">
@@ -307,9 +301,9 @@ configuration, running scripts, printing error messages, etc.
       </h4>
 
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Bundles together all the code relying on <span class="extype" name="cliConfig">cliConfig</span> and the common
-input/output streams and print-streams, so we don't need to keep passing
-them everywhere one by one
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Bundles together:</p><p>- All the code relying on <span class="extype" name="cliConfig">cliConfig</span>
+- Handling for the common input/output streams and print-streams
+- Logic around the watch-and-rerun flag
 </p></div><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
@@ -484,7 +478,7 @@ them everywhere one by one
         <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">colors</span><span class="result">: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-util/1.0.0-RC8/ammonite-util-1.0.0-RC8-javadoc.jar/!/index.html#ammonite.util.Colors" class="extype" target="_top">Colors</a></span>
+        <span class="name">colors</span><span class="result">: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-util/1.0.0-RC9/ammonite-util-1.0.0-RC9-javadoc.jar/!/index.html#ammonite.util.Colors" class="extype" target="_top">Colors</a></span>
       </span>
       
       
@@ -558,6 +552,22 @@ them everywhere one by one
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="ammonite.MainRunner#handleWatchRes" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="handleWatchRes[T](res:ammonite.util.Res[T],printing:Boolean):Boolean"></a><a id="handleWatchRes[T](Res[T],Boolean):Boolean"></a>
+      <span class="permalink">
+      <a href="../ammonite/MainRunner.html#handleWatchRes[T](res:ammonite.util.Res[T],printing:Boolean):Boolean" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">handleWatchRes</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="res">res: <span class="extype" name="ammonite.util.Res">Res</span>[<span class="extype" name="ammonite.MainRunner.handleWatchRes.T">T</span>]</span>, <span name="printing">printing: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>)</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
+      </span>
+      
+      
     </li><li name="scala.AnyRef#hashCode" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="hashCode():Int"></a>
       <span class="permalink">
@@ -686,10 +696,10 @@ them everywhere one by one
       </span>
       
       
-    </li><li name="ammonite.MainRunner#runRepl" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="runRepl():Any"></a>
+    </li><li name="ammonite.MainRunner#runCode" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="runCode(code:String):Boolean"></a><a id="runCode(String):Boolean"></a>
       <span class="permalink">
-      <a href="../ammonite/MainRunner.html#runRepl():Any" title="Permalink">
+      <a href="../ammonite/MainRunner.html#runCode(code:String):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -698,11 +708,27 @@ them everywhere one by one
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">runRepl</span><span class="params">()</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Any" class="extype" target="_top">Any</a></span>
+        <span class="name">runCode</span><span class="params">(<span name="code">code: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
       </span>
       
       
-    </li><li name="ammonite.MainRunner#runScript" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+    </li><li name="ammonite.MainRunner#runRepl" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="runRepl():Unit"></a>
+      <span class="permalink">
+      <a href="../ammonite/MainRunner.html#runRepl():Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">runRepl</span><span class="params">()</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
+      </span>
+      
+      
+    </li><li name="ammonite.MainRunner#runScript" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="runScript(scriptPath:ammonite.ops.Path,scriptArgs:List[String]):Boolean"></a><a id="runScript(Path,List[String]):Boolean"></a>
       <span class="permalink">
       <a href="../ammonite/MainRunner.html#runScript(scriptPath:ammonite.ops.Path,scriptArgs:List[String]):Boolean" title="Permalink">
@@ -710,30 +736,11 @@ them everywhere one by one
       </a>
     </span>
       <span class="modifier_kind">
-        <span class="modifier">final </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">runScript</span><span class="params">(<span name="scriptPath">scriptPath: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/1.0.0-RC8/ammonite-ops-1.0.0-RC8-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a></span>, <span name="scriptArgs">scriptArgs: <span class="extype" name="scala.List">List</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Annotations</dt><dd>
-                <span class="name">@tailrec</span><span class="args">()</span>
-              
-        </dd></dl></div>
-    </li><li name="ammonite.MainRunner#runScriptAndPrint" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="runScriptAndPrint(scriptPath:ammonite.ops.Path,flatArgs:List[String],scriptMain:ammonite.Main):(Boolean,Seq[(ammonite.ops.Path,Long)])"></a><a id="runScriptAndPrint(Path,List[String],Main):(Boolean,Seq[(Path,Long)])"></a>
-      <span class="permalink">
-      <a href="../ammonite/MainRunner.html#runScriptAndPrint(scriptPath:ammonite.ops.Path,flatArgs:List[String],scriptMain:ammonite.Main):(Boolean,Seq[(ammonite.ops.Path,Long)])" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">runScriptAndPrint</span><span class="params">(<span name="scriptPath">scriptPath: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/1.0.0-RC8/ammonite-ops-1.0.0-RC8-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a></span>, <span name="flatArgs">flatArgs: <span class="extype" name="scala.List">List</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="scriptMain">scriptMain: <a href="Main.html" class="extype" name="ammonite.Main">Main</a></span>)</span><span class="result">: (<a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Boolean" class="extype" target="_top">Boolean</a>, <span class="extype" name="scala.Seq">Seq</span>[(<a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/1.0.0-RC8/ammonite-ops-1.0.0-RC8-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Long" class="extype" target="_top">Long</a>)])</span>
+        <span class="name">runScript</span><span class="params">(<span name="scriptPath">scriptPath: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/1.0.0-RC9/ammonite-ops-1.0.0-RC9-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a></span>, <span name="scriptArgs">scriptArgs: <span class="extype" name="scala.List">List</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
       </span>
       
       
@@ -833,6 +840,41 @@ them everywhere one by one
       
       <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
     </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="ammonite.MainRunner#watchAndWait" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="watchAndWait(watched:Seq[(ammonite.ops.Path,Long)]):Unit"></a><a id="watchAndWait(Seq[(Path,Long)]):Unit"></a>
+      <span class="permalink">
+      <a href="../ammonite/MainRunner.html#watchAndWait(watched:Seq[(ammonite.ops.Path,Long)]):Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">watchAndWait</span><span class="params">(<span name="watched">watched: <span class="extype" name="scala.Seq">Seq</span>[(<a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/1.0.0-RC9/ammonite-ops-1.0.0-RC9-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Long" class="extype" target="_top">Long</a>)]</span>)</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Unit" class="extype" target="_top">Unit</a></span>
+      </span>
+      
+      
+    </li><li name="ammonite.MainRunner#watchLoop" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="watchLoop[T](isRepl:Boolean,printing:Boolean,run:ammonite.Main=&gt;(ammonite.util.Res[T],Seq[(ammonite.ops.Path,Long)])):Boolean"></a><a id="watchLoop[T](Boolean,Boolean,(Main)⇒(Res[T],Seq[(Path,Long)])):Boolean"></a>
+      <span class="permalink">
+      <a href="../ammonite/MainRunner.html#watchLoop[T](isRepl:Boolean,printing:Boolean,run:ammonite.Main=&gt;(ammonite.util.Res[T],Seq[(ammonite.ops.Path,Long)])):Boolean" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">watchLoop</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="isRepl">isRepl: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>, <span name="printing">printing: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>, <span name="run">run: (<a href="Main.html" class="extype" name="ammonite.Main">Main</a>) ⇒ (<span class="extype" name="ammonite.util.Res">Res</span>[<span class="extype" name="ammonite.MainRunner.watchLoop.T">T</span>], <span class="extype" name="scala.Seq">Seq</span>[(<a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/ammonite-ops/1.0.0-RC9/ammonite-ops-1.0.0-RC9-javadoc.jar/!/index.html#ammonite.ops.Path" class="extype" target="_top">Path</a>, <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Long" class="extype" target="_top">Long</a>)])</span>)</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.2/index.html#scala.Boolean" class="extype" target="_top">Boolean</a></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@tailrec</span><span class="args">()</span>
               
         </dd></dl></div>
     </li>
