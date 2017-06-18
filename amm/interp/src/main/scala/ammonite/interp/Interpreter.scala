@@ -87,7 +87,7 @@ class Interpreter(val printer: Printer,
 
   // Needs to be run after the Interpreter has been instantiated, as some of the
   // ReplAPIs available in the predef need access to the Interpreter object
-  def initializePredef() = {
+  def initializePredef(): Option[(Res.Failing, Seq[(Path, Long)])] = {
     PredefInitialization.apply(
       ("ammonite.interp.InterpBridge", "interp", interpApi) +: extraBridges,
       interpApi,
@@ -102,18 +102,20 @@ class Interpreter(val printer: Printer,
       imports => predefImports = predefImports ++ imports,
       watch
     ) match{
-      case Res.Success(_) => //donothing
-      case Res.Skip => //donothing
-      case r @ Res.Exception(t, s) => throw PredefFailedToLoad(s, Some(t), r, watchedFiles)
-      case r @ Res.Failure(s) => throw PredefFailedToLoad(s, None, r, watchedFiles)
-      case r @ Res.Exit(_) =>
-        throw PredefFailedToLoad("interp.exit was called", None, r, watchedFiles)
+      case Res.Success(_) => None
+      case Res.Skip => None
+      case r @ Res.Exception(t, s) => Some(r, watchedFiles)
+      case r @ Res.Failure(s) => Some(r, watchedFiles)
+      case r @ Res.Exit(_) => Some(r, watchedFiles)
     }
   }
 
   // The ReplAPI requires some special post-Interpreter-initialization
   // code to run, so let it pass it in a callback and we'll run it here
-  def watch(p: Path) = watchedFiles.append(p -> Interpreter.pathSignature(p))
+  def watch(p: Path) = {
+    new Exception().printStackTrace()
+    watchedFiles.append(p -> Interpreter.pathSignature(p))
+  }
 
   def resolveSingleImportHook(source: CodeSource, tree: ImportTree) = synchronized{
     val strippedPrefix = tree.prefix.takeWhile(_(0) == '$').map(_.stripPrefix("$"))

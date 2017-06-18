@@ -61,7 +61,7 @@ class Repl(input: InputStream,
     Seq(
       PredefInfo(Name("DefaultPredef"), defaultPredef, true, None),
       PredefInfo(Name("ArgsPredef"), argString, false, None),
-      PredefInfo(Name("MainPredef"), mainPredef, false, Some(wd))
+      PredefInfo(Name("MainPredef"), mainPredef, false, None)
     ),
     Seq((
       "ammonite.repl.ReplBridge",
@@ -106,7 +106,8 @@ class Repl(input: InputStream,
     verboseOutput = true,
     getFrame = () => frames().head
   )
-  interp.initializePredef()
+
+  def initializePredef() = interp.initializePredef()
 
   def warmup() = {
     // An arbitrary input, randomized to make sure it doesn't get cached or

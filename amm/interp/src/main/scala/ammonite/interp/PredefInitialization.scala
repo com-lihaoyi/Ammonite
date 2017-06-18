@@ -48,9 +48,11 @@ object PredefInitialization {
 
 
     Res.fold((), predefs){(_, predefInfo) =>
+      pprint.log(predefInfo.name)
+      pprint.log(predefInfo.path)
+      predefInfo.path.foreach(watch)
       if (predefInfo.code.isEmpty) Res.Success(())
       else {
-        predefInfo.path.foreach(watch)
         processModule(
           predefInfo.code,
           CodeSource(

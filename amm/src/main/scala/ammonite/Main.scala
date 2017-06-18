@@ -111,11 +111,21 @@ case class Main(predef: String = "",
       verboseOutput,
       () => frame
     )
-    interp.initializePredef()
-    interp
+    interp.initializePredef() match{
+      case None => Right(interp)
+      case Some(problems) => Left(problems)
+    }
   }
 
-  def run(replArgs: Bind[_]*): Any = {
+  /**
+    * Run the REPL, with any additional bindings you wish to provide.
+    *
+    * Returns an `Any` representing any value that the user passed into the
+    * `exit` call when closing the REPL (defaults to `(): Unit`). Also returns
+    * a sequence of paths that were watched as a result of this REPL run, in
+    * case you wish to re-start the REPL when any of them change.
+    */
+  def run(replArgs: Bind[_]*): (Res[Any], Seq[(Path, Long)]) = {
 
     val remoteLogger =
       if (!remoteLogging) None
@@ -125,24 +135,25 @@ case class Main(predef: String = "",
 
     val repl = instantiateRepl(replArgs.toIndexedSeq, remoteLogger)
 
-    // Warm up the compilation logic in the background, hopefully while the
-    // user is typing their first command, so by the time the command is
-    // submitted it can be processed by a warm compiler
-    val warmupThread = new Thread(new Runnable{
-      def run() = repl.warmup()
-    })
-    // This thread will terminal eventually on its own, but if the
-    // JVM wants to exit earlier this thread shouldn't stop it
-    warmupThread.setDaemon(true)
-    warmupThread.start()
-    try{
-      val exitValue = repl.run()
-      repl.beforeExit(exitValue)
-    }finally{
-      remoteLogger.foreach(_.close())
+    repl.initializePredef().getOrElse{
+        // Warm up the compilation logic in the background, hopefully while the
+        // user is typing their first command, so by the time the command is
+        // submitted it can be processed by a warm compiler
+        val warmupThread = new Thread(new Runnable{
+          def run() = repl.warmup()
+        })
+        // This thread will terminal eventually on its own, but if the
+        // JVM wants to exit earlier this thread shouldn't stop it
+        warmupThread.setDaemon(true)
+        warmupThread.start()
+
+        try{
+          val exitValue = Res.Success(repl.run())
+          (exitValue.map(repl.beforeExit), repl.interp.watchedFiles)
+        }finally{
+          remoteLogger.foreach(_.close())
+        }
     }
-
-
   }
 
   /**
@@ -153,16 +164,11 @@ case class Main(predef: String = "",
                 scriptArgs: Seq[(String, Option[String])])
                 : (Res[Any], Seq[(Path, Long)]) = {
 
-    val interpEither =
-      try Right(instantiateInterpreter())
-      catch{ case PredefFailedToLoad(msg, ex, res, watched) => Left(res -> watched) }
-
-
-    interpEither match{
+    instantiateInterpreter() match{
       case Right(interp) =>
         val result = main.Scripts.runScript(wd, path, interp, scriptArgs)
         (result, interp.watchedFiles)
-      case Left((res, watched)) => (res, watched)
+      case Left(problems) => problems
     }
   }
 
@@ -170,12 +176,12 @@ case class Main(predef: String = "",
     * Run a snippet of code
     */
   def runCode(code: String) = {
-    val interp =
-      try Res.Success(instantiateInterpreter())
-      catch{ case PredefFailedToLoad(msg, ex, res, watched) => res }
-
-    interp.flatMap(_.processExec(code, 0, () => ()))
-
+    instantiateInterpreter() match{
+      case Right(interp) =>
+        val res = interp.processExec(code, 0, () => ())
+        (res, interp.watchedFiles)
+      case Left(problems) => problems
+    }
   }
 }
 
@@ -223,8 +229,7 @@ object Main{
           val runner = new MainRunner(cliConfig, printOut, printErr, stdIn, stdOut, stdErr)
           (cliConfig.code, leftoverArgs) match{
             case (Some(code), Nil) =>
-              runner.initMain(true).runCode(code)
-              true
+              runner.runCode(code)
 
             case (None, Nil) =>
               runner.printInfo("Loading...")
@@ -247,6 +252,7 @@ object Main{
         }
     }
   }
+
   def maybeDefaultPredef(enabled: Boolean, predef: String) =
     if (enabled) predef else ""
 
@@ -263,9 +269,11 @@ object Main{
 }
 
 /**
-  * Bundles together all the code relying on [[cliConfig]] and the common
-  * input/output streams and print-streams, so we don't need to keep passing
-  * them everywhere one by one
+  * Bundles together:
+  *
+  * - All the code relying on [[cliConfig]]
+  * - Handling for the common input/output streams and print-streams
+  * - Logic around the watch-and-rerun flag
   */
 class MainRunner(cliConfig: Cli.Config,
                  outprintStream: PrintStream,
@@ -281,35 +289,37 @@ class MainRunner(cliConfig: Cli.Config,
   def printInfo(s: String) = errPrintStream.println(colors.info()(s))
   def printError(s: String) = errPrintStream.println(colors.error()(s))
 
-  @tailrec final def runScript(scriptPath: Path, scriptArgs: List[String]): Boolean = {
-
-    val (success, watched) = runScriptAndPrint(
-      scriptPath,
-      scriptArgs,
-      initMain(false)
-    )
+  @tailrec final def watchLoop[T](isRepl: Boolean,
+                                  run: Main => (Res[T], Seq[(Path, Long)])): Boolean = {
+    val (result, watched) = initMain(isRepl) match{
+      case Left((msg, watched)) => (Res.Failure(msg), watched)
+      case Right(main) => run(main)
+    }
+    val success = handleWatchRes(result)
     if (!cliConfig.watch) success
     else{
-      printInfo(s"Watching for changes to ${watched.length} files... (Ctrl-C to exit)")
-      def statAll() = watched.forall{ case (file, lastMTime) =>
-        Interpreter.pathSignature(file) == lastMTime
-      }
-
-      while(statAll()) Thread.sleep(100)
-
-      runScript(scriptPath, scriptArgs)
+      watchAndWait(watched)
+      watchLoop(isRepl, run)
     }
   }
 
-  def runScriptAndPrint(scriptPath: Path,
-                        flatArgs: List[String],
-                        scriptMain: Main): (Boolean, Seq[(Path, Long)]) = {
+  def runScript(scriptPath: Path, scriptArgs: List[String]) =
+    watchLoop(false, _.runScript(scriptPath, Scripts.groupArgs(scriptArgs)))
 
-    val (res, watched) = scriptMain.runScript(
-      scriptPath,
-      Scripts.groupArgs(flatArgs)
-    )
+  def runCode(code: String) = watchLoop(false, _.runCode(code))
 
+  def runRepl(): Unit = watchLoop(true, _.run())
+
+  def watchAndWait(watched: Seq[(Path, Long)]) = {
+    printInfo(s"Watching for changes to ${watched.length} files... (Ctrl-C to exit)")
+    def statAll() = watched.forall{ case (file, lastMTime) =>
+      Interpreter.pathSignature(file) == lastMTime
+    }
+
+    while(statAll()) Thread.sleep(100)
+  }
+
+  def handleWatchRes[T](res: Res[T]) = {
     val success = res match {
       case Res.Failure(msg) =>
         printError(msg)
@@ -326,36 +336,44 @@ class MainRunner(cliConfig: Cli.Config,
 
       case Res.Skip   => true // do nothing on success, everything's already happened
     }
-    (success, watched)
+    success
   }
 
-  def runRepl() = {
-    try initMain(true).run()
-    catch{ case PredefFailedToLoad(msg, cause, res, watched) =>
-      printError("Error loading Predef:")
-      Repl.handleRes(res, printInfo, printError, _ => (), colors)
-    }
-  }
 
-  def initMain(isRepl: Boolean) = Main(
-    cliConfig.predef,
-    cliConfig.defaultPredef,
-    new Storage.Folder(cliConfig.home, isRepl) {
-      override def loadPredef = {
-        cliConfig.predefFile match{
-          case None => super.loadPredef
-          case Some(file) =>
-            try Some((read(file), file))
-            catch {case e: java.nio.file.NoSuchFileException => None}
+  def initMain(isRepl: Boolean) = {
+    val loadedPredef = cliConfig.predefFile match{
+      case None => Right(None)
+      case Some(file) =>
+        try Right(Some((read(file), file)))
+        catch {case e: java.nio.file.NoSuchFileException =>
+          // If we cannot find the user's explicitly-specified predef, fail
+          // loudly. We can happily fail-silently the "default" predef files,
+          // since the user may or may not have created one, but since the user
+          // explicitly specified one here we assume that it has to exist.
+          Left(("Script file not found: " + file, Seq(file -> 0L)))
         }
-      }
-    },
-    inputStream = stdIn,
-    outputStream = stdOut,
-    errorStream = stdErr,
-    welcomeBanner = cliConfig.welcomeBanner,
-    verboseOutput = cliConfig.verboseOutput,
-    remoteLogging = cliConfig.remoteLogging,
-    colors = colors
-  )
+    }
+    val storage = loadedPredef.right.map{
+      case None => new Storage.Folder(cliConfig.home, isRepl)
+      case Some((predefCode, predefFile)) =>
+        new Storage.Folder(cliConfig.home, isRepl) {
+          override def loadPredef = Some((predefCode, predefFile))
+        }
+    }
+    storage.right.map{ storage =>
+      Main(
+        cliConfig.predef,
+        cliConfig.defaultPredef,
+        storage,
+        inputStream = stdIn,
+        outputStream = stdOut,
+        errorStream = stdErr,
+        welcomeBanner = cliConfig.welcomeBanner,
+        verboseOutput = cliConfig.verboseOutput,
+        remoteLogging = cliConfig.remoteLogging,
+        colors = colors
+      )
+    }
+
+  }
 }

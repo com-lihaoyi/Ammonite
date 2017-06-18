@@ -80,9 +80,7 @@ object Cli{
         |in both REPL and scripts if the console is interactive, and disabled
         |otherwise""".stripMargin,
       (c, v) => c.copy(colored = Some(v))
-    )
-  )
-  val scriptSignature = Seq(
+    ),
     Arg[Config, Unit](
       "watch", Some('w'),
       "Watch and re-run your scripts when they change",
@@ -105,7 +103,7 @@ object Cli{
 
   )
 
-  val ammoniteArgSignature = genericSignature ++ scriptSignature ++ replSignature
+  val ammoniteArgSignature = genericSignature ++ replSignature
 
   def showArg(arg: Arg[_, _]) =
     "  " + arg.shortName.fold("")("-" + _ + ", ") + "--" + arg.name
@@ -128,9 +126,6 @@ object Cli{
        |
        |REPL-specific args:
        |${formatBlock(replSignature, leftMargin).mkString(Util.newLine)}
-       |
-       |Script-specific args:
-       |${formatBlock(scriptSignature, leftMargin).mkString(Util.newLine)}
     """.stripMargin
   }
 
