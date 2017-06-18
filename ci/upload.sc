@@ -18,13 +18,12 @@ def apply(uploadedFile: Path,
           tagName: String,
           uploadName: String,
           authKey: String): String = {
-  val parsed = upickle.json.read(
-    Http("https://api.github.com/repos/lihaoyi/Ammonite/releases")
-      .header("Authorization", "token " + authKey)
-      .asString.body
-  )
+  val body = Http("https://api.github.com/repos/lihaoyi/Ammonite/releases")
+    .header("Authorization", "token " + authKey)
+    .asString.body
+  val parsed = upickle.json.read(body)
 
-  pprint.log(parsed, height=9999)
+  pprint.log(body, height=9999)
 
   val snapshotReleaseId =
     parsed.arr
