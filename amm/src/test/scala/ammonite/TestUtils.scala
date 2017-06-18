@@ -23,6 +23,7 @@ object TestUtils {
       storage = storage,
       wd = ammonite.ops.pwd,
       // Provide a custom predef so we can verify in tests that the predef gets cached
+      basePredefs = Seq(),
       customPredefs = Seq(
         PredefInfo(Name("predef"), predef, false, None)
       ),

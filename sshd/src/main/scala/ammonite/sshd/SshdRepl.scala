@@ -5,10 +5,9 @@ import java.io.{InputStream, OutputStream, PrintStream}
 
 import ammonite.ops.Path
 import ammonite.sshd.util.Environment
-import ammonite.util.Bind
+import ammonite.util.{Bind, Name, PredefInfo}
 import ammonite.runtime.Storage
 import ammonite.repl.Repl
-import org.apache.sshd.server.session.ServerSession
 
 /**
  * An ssh server which serves ammonite repl as it's shell channel.
@@ -50,7 +49,7 @@ class SshdRepl(sshConfig: SshServerConfig,
 object SshdRepl {
   // Actually runs a repl inside of session serving a remote user shell.
   private def runRepl(homePath: Path,
-                      predef: String,
+                      predefCode: String,
                       defaultPredef: Boolean,
                       wd: Path,
                       replArgs: Seq[Bind[_]],
@@ -69,7 +68,13 @@ object SshdRepl {
         )
         new Repl(
           in, out, out,
-          new Storage.Folder(homePath), augmentedPredef, predef,
+          new Storage.Folder(homePath),
+          basePredefs = Seq(
+            PredefInfo(Name("DefaultPredef"), augmentedPredef, true, None)
+          ),
+          customPredefs = Seq(
+            PredefInfo(Name("CodePredef"), predefCode, false, None)
+          ),
           wd, Some(ammonite.main.Defaults.welcomeBanner),
           remoteLogger = None
         ).run()

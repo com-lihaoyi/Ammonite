@@ -110,7 +110,8 @@ object BasicTests extends TestSuite{
       // from ivy, and make use of `cd!` and `wd` inside the executed script.
       val res = %%bash(
         executable,
-        "--predef-file",
+        "--no-home-predef",
+        "--predef",
         exampleBarePredef,
         "-c",
         """val x = wd

@@ -16,6 +16,7 @@ object PredefInitialization {
             interpApi: InterpAPI,
             evalClassloader: SpecialClassLoader,
             storage: Storage,
+            basePredefs: Seq[PredefInfo],
             customPredefs: Seq[PredefInfo],
             processModule: (String, CodeSource, Boolean) => Res[Metadata],
             addImports: Imports => Unit,
@@ -37,19 +38,19 @@ object PredefInitialization {
       )
 
     val predefs = {
-      bridgePredefs ++ customPredefs ++
-      (storage.loadSharedPredef ++ storage.loadPredef).map{
+      bridgePredefs ++
+      basePredefs ++
+      storage.loadPredef.map{
         case (code, path) =>
           PredefInfo(Name(path.last.stripSuffix(".sc")), code, false, Some(path))
-      }
+      } ++
+      customPredefs
     }
 
     predefs.filter(_.code.nonEmpty)
 
 
     Res.fold((), predefs){(_, predefInfo) =>
-      pprint.log(predefInfo.name)
-      pprint.log(predefInfo.path)
       predefInfo.path.foreach(watch)
       if (predefInfo.code.isEmpty) Res.Success(())
       else {

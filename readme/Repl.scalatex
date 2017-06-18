@@ -383,8 +383,26 @@
         @p
           This is similar to @hl.scala{import $file}, except that it dumps the
           definitions and imports from the script into your REPL session. This is
-          useful if you are using a script to hold a set of common imports, the
-          docs for @sect.ref{Scala Scripts} has more on this.
+          useful if you are using a script to hold a set of common imports:
+          using @sect.ref{import $file} to import a script doesn't propagate
+          imports from that script into your REPL.
+
+        @p
+          Alternatively, this is also useful if you want to split up your
+          @code{~/.ammonite/predef.sc} file into multiple scripts: e.g. if you
+          want to break up your @code{predef.sc} into two scripts
+          @code{~/.ammonite/predef.sc} and @code{~/.ammonite/helper.sc}. While
+          you could use @set.ref{import $file} to
+          @hl.scala{import $file.helper} within your @code{predef.sc} file, it
+          will only bring the @code{helper} object into scope within
+          @code{predef.sc} or within your REPL. @hl.scala{import exec.helper}
+          will properly "dump" all the definitions from @code{helper.sc} into
+          your local scope, which is often what you want when dealing with
+          predef files.
+
+        @p
+          See the docs for @sect.ref{Scala Scripts} for more on how script
+          files work in general.
 
       @sect{import $ivy}
         @p

@@ -33,7 +33,7 @@ The Predef itself is made of several parts:
 
 - Any predef file, which defaults `~/.ammonite/predef.sc` for the REPL and
   `~/.ammonite/predefScript.sc` for scripts, but can be set manually via
-  `--predef-file ...`. This split allows you to e.g. put REPL-specific setup
+  `--predef ...`. This split allows you to e.g. put REPL-specific setup
   code inside `predef.sc`, without it messing up scripts. Both the REPL and
   scripts also run `~/.ammonite/predefShared.sc` for setup code you want to
   apply to both

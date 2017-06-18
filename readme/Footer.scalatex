@@ -209,6 +209,44 @@
           calls to load Scala libraries cross-published against the full
           Scala version (e.g. @code{2.12.2} rather than just @code{2.12}, thanks
           to @lnk("aeffrig", "https://github.com/aeffrig")
+
+        @li
+          Ammonite now supports opening a @sect.ref{Script Debug REPL} after a
+          script runs, with your script's scope loaded so you can poke around
+          it interactively
+
+        @li
+          The command line flags @code{--predef}/@code{--predef-file} are now
+          @code{--predef-code}/@code{--predef} respectively, to reflect that
+          using a custom predef file is much more common than a custom predef
+          code snippet.
+        @li
+          @code{ammonite.Main}'s argument @code{predef} has been renamed to
+          @code{predefCode}, and a new argument @code{predefFile} has been
+          added to match the command-line interface
+        @li
+          @code{--predef} (previously @code{--predef-file}) now adds a file
+          in addition to the existing @code{predef.sc} or @code{predefScript.sc}
+          in @code{~/.ammonite}. If you want it to @i{replace} the predef in
+          @code{~/.ammonite}, there is a new flag @code{--no-home-predef} that
+          disables the predef in @code{~/.ammonite} so your @code{--predef}
+          file stands alone
+
+        @li
+          @code{~/.ammonite/predefShared.sc} is gone; if you want it back, you
+          can do it yourself by adding @hl.scala{import $exec.predefShared}
+          within your @code{predef.sc} and @code{predefScript.sc} files. You
+          can also import any others files into your @code{predef.sc} and
+          @code{predefScript.sc} the same way
+
+        @li
+          Ammonite now loads linux HTTP proxy environment variables into your
+          JVM's @code{sys.props} by default, when running as a standalone
+          executable. When using Ammonite within a SBT project, you will need
+          to do this manually, e.g. calling
+          @code{ammonite.main.ProxyFromEnv.setPropProxyFromEnv()} within the
+          @code{predefCode} that you pass to @code{ammonite.Main}
+
     @sect{0.9.9}
       @ul
         @li

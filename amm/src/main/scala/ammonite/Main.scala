@@ -1,12 +1,14 @@
 package ammonite
 
 import java.io.{InputStream, OutputStream, PrintStream}
+import java.nio.file.NoSuchFileException
 
 import ammonite.interp.Interpreter
 import ammonite.ops._
 import ammonite.runtime.{Frame, Storage}
 import ammonite.main._
 import ammonite.repl.{RemoteLogger, Repl}
+import ammonite.util.Util.newLine
 import ammonite.util._
 
 import scala.annotation.tailrec
@@ -28,7 +30,7 @@ import scala.annotation.tailrec
   * Note that the [[instantiateRepl]] function generates a new [[Repl]]
   * every time it is called!
   *
-  * @param predef Any additional code you want to run before the REPL session
+  * @param predefCode Any additional code you want to run before the REPL session
   *               starts. Can contain multiple blocks separated by `@`s
   * @param defaultPredef Do you want to include the "standard" predef imports
   *                      provided by Ammonite? These include tools like `time`,
@@ -52,7 +54,8 @@ import scala.annotation.tailrec
   *                    gets sent miscellaneous info messages that aren't strictly
   *                    part of the REPL or script's output
   */
-case class Main(predef: String = "",
+case class Main(predefCode: String = "",
+                predefFile: Option[Path] = None,
                 defaultPredef: Boolean = true,
                 storageBackend: Storage = new Storage.Folder(Defaults.ammoniteHome),
                 wd: Path = ammonite.ops.pwd,
@@ -64,57 +67,93 @@ case class Main(predef: String = "",
                 remoteLogging: Boolean = true,
                 colors: Colors = Colors.Default){
 
+  def loadedPredefFile = predefFile match{
+    case Some(path) =>
+      try Right(Some(PredefInfo(Name("FilePredef"), read(path), false, Some(path))))
+      catch{case e: NoSuchFileException =>
+        Left((Res.Failure("Unable to load predef file " + path), Seq(path -> 0L)))
+      }
+    case None => Right(None)
+  }
   /**
     * Instantiates an ammonite.Repl using the configuration
     */
   def instantiateRepl(replArgs: IndexedSeq[Bind[_]] = Vector.empty,
-                     remoteLogger: Option[RemoteLogger]) = {
-    val augmentedPredef = Main.maybeDefaultPredef(
-      defaultPredef,
-      Defaults.replPredef + Defaults.predefString
-    )
+                      remoteLogger: Option[RemoteLogger]) = {
 
-    new Repl(
-      inputStream, outputStream, errorStream,
-      storage = storageBackend,
-      defaultPredef = augmentedPredef,
-      mainPredef = predef,
-      wd = wd,
-      welcomeBanner = welcomeBanner,
-      replArgs = replArgs,
-      remoteLogger = remoteLogger,
-      initialColors = colors
-    )
+
+    loadedPredefFile.right.map{ predefFileInfoOpt =>
+      val augmentedPredef = Main.maybeDefaultPredef(
+        defaultPredef,
+        Defaults.replPredef + Defaults.predefString
+      )
+
+      val argString = replArgs.zipWithIndex.map{ case (b, idx) =>
+        s"""
+        val ${b.name} = ammonite
+          .repl
+          .ReplBridge
+          .value
+          .Internal
+          .replArgs($idx)
+          .value
+          .asInstanceOf[${b.typeTag.tpe}]
+        """
+      }.mkString(newLine)
+
+      new Repl(
+        inputStream, outputStream, errorStream,
+        storage = storageBackend,
+        basePredefs = Seq(
+          PredefInfo(Name("DefaultPredef"), augmentedPredef, true, None),
+          PredefInfo(Name("ArgsPredef"), argString, false, None)
+        ),
+        customPredefs = predefFileInfoOpt.toSeq ++ Seq(
+          PredefInfo(Name("CodePredef"), predefCode, false, None)
+        ),
+        wd = wd,
+        welcomeBanner = welcomeBanner,
+        replArgs = replArgs,
+        remoteLogger = remoteLogger,
+        initialColors = colors
+      )
+    }
+
   }
 
   def instantiateInterpreter() = {
-    val augmentedPredef = Main.maybeDefaultPredef(defaultPredef, Defaults.predefString)
+    loadedPredefFile.right.flatMap { predefFileInfoOpt =>
+      val augmentedPredef = Main.maybeDefaultPredef(defaultPredef, Defaults.predefString)
 
-    val (colorsRef, _, _, printer) = Interpreter.initPrinters(
-      colors,
-      outputStream,
-      errorStream,
-      verboseOutput
-    )
-    val frame = Frame.createInitial()
+      val (colorsRef, _, _, printer) = Interpreter.initPrinters(
+        colors,
+        outputStream,
+        errorStream,
+        verboseOutput
+      )
+      val frame = Frame.createInitial()
 
-    val interp: Interpreter = new Interpreter(
-      printer,
-      storageBackend,
-      Seq(
-        PredefInfo(Name("defaultPredef"), augmentedPredef, false, None),
-        PredefInfo(Name("predef"), predef, false, None)
-      ),
-      Vector.empty,
-      wd,
-      colorsRef,
-      verboseOutput,
-      () => frame
-    )
-    interp.initializePredef() match{
-      case None => Right(interp)
-      case Some(problems) => Left(problems)
+      val interp: Interpreter = new Interpreter(
+        printer,
+        storageBackend,
+        basePredefs = Seq(
+          PredefInfo(Name("DefaultPredef"), augmentedPredef, false, None)
+        ),
+        predefFileInfoOpt.toSeq ++ Seq(
+          PredefInfo(Name("CodePredef"), predefCode, false, None)
+        ),
+        Vector.empty,
+        wd,
+        colorsRef,
+        verboseOutput,
+        () => frame
+      )
+      interp.initializePredef() match{
+        case None => Right(interp)
+        case Some(problems) => Left(problems)
+      }
     }
+
   }
 
   /**
@@ -133,25 +172,27 @@ case class Main(predef: String = "",
 
     remoteLogger.foreach(_.apply("Boot"))
 
-    val repl = instantiateRepl(replArgs.toIndexedSeq, remoteLogger)
+    instantiateRepl(replArgs.toIndexedSeq, remoteLogger) match{
+      case Left(missingPredefInfo) => missingPredefInfo
+      case Right(repl) =>
+        repl.initializePredef().getOrElse{
+          // Warm up the compilation logic in the background, hopefully while the
+          // user is typing their first command, so by the time the command is
+          // submitted it can be processed by a warm compiler
+          val warmupThread = new Thread(new Runnable{
+            def run() = repl.warmup()
+          })
+          // This thread will terminal eventually on its own, but if the
+          // JVM wants to exit earlier this thread shouldn't stop it
+          warmupThread.setDaemon(true)
+          warmupThread.start()
 
-    repl.initializePredef().getOrElse{
-        // Warm up the compilation logic in the background, hopefully while the
-        // user is typing their first command, so by the time the command is
-        // submitted it can be processed by a warm compiler
-        val warmupThread = new Thread(new Runnable{
-          def run() = repl.warmup()
-        })
-        // This thread will terminal eventually on its own, but if the
-        // JVM wants to exit earlier this thread shouldn't stop it
-        warmupThread.setDaemon(true)
-        warmupThread.start()
-
-        try{
-          val exitValue = Res.Success(repl.run())
-          (exitValue.map(repl.beforeExit), repl.interp.watchedFiles)
-        }finally{
-          remoteLogger.foreach(_.close())
+          try{
+            val exitValue = Res.Success(repl.run())
+            (exitValue.map(repl.beforeExit), repl.interp.watchedFiles)
+          }finally{
+            remoteLogger.foreach(_.close())
+          }
         }
     }
   }
@@ -291,10 +332,8 @@ class MainRunner(cliConfig: Cli.Config,
 
   @tailrec final def watchLoop[T](isRepl: Boolean,
                                   run: Main => (Res[T], Seq[(Path, Long)])): Boolean = {
-    val (result, watched) = initMain(isRepl) match{
-      case Left((msg, watched)) => (Res.Failure(msg), watched)
-      case Right(main) => run(main)
-    }
+    val (result, watched) = run(initMain(isRepl))
+
     val success = handleWatchRes(result)
     if (!cliConfig.watch) success
     else{
@@ -353,27 +392,27 @@ class MainRunner(cliConfig: Cli.Config,
           Left(("Script file not found: " + file, Seq(file -> 0L)))
         }
     }
-    val storage = loadedPredef.right.map{
-      case None => new Storage.Folder(cliConfig.home, isRepl)
-      case Some((predefCode, predefFile)) =>
-        new Storage.Folder(cliConfig.home, isRepl) {
-          override def loadPredef = Some((predefCode, predefFile))
-        }
+    val storage = if (!cliConfig.homePredef) {
+      new Storage.Folder(cliConfig.home, isRepl) {
+        override def loadPredef = None
+      }
+    }else{
+      new Storage.Folder(cliConfig.home, isRepl)
     }
-    storage.right.map{ storage =>
-      Main(
-        cliConfig.predef,
-        cliConfig.defaultPredef,
-        storage,
-        inputStream = stdIn,
-        outputStream = stdOut,
-        errorStream = stdErr,
-        welcomeBanner = cliConfig.welcomeBanner,
-        verboseOutput = cliConfig.verboseOutput,
-        remoteLogging = cliConfig.remoteLogging,
-        colors = colors
-      )
-    }
+
+    Main(
+      cliConfig.predefCode,
+      cliConfig.predefFile,
+      cliConfig.defaultPredef,
+      storage,
+      inputStream = stdIn,
+      outputStream = stdOut,
+      errorStream = stdErr,
+      welcomeBanner = cliConfig.welcomeBanner,
+      verboseOutput = cliConfig.verboseOutput,
+      remoteLogging = cliConfig.remoteLogging,
+      colors = colors
+    )
 
   }
 }

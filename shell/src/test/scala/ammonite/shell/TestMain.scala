@@ -10,7 +10,8 @@ object TestMain {
     System.setProperty("ammonite-sbt-build", "true")
     ammonite.Main.main(args ++ Array(
       "--home", "target/tempAmmoniteHome",
-      "--predef-file", examplePredef
+      "--predef", examplePredef,
+      "--no-home-predef"
     ))
   }
 }

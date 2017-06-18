@@ -17,8 +17,9 @@ object Cli{
                       (implicit val reader: scopt.Read[V]){
     def runAction(t: T, s: String) = action(t, reader.reads(s))
   }
-  case class Config(predef: String = "",
+  case class Config(predefCode: String = "",
                     defaultPredef: Boolean = true,
+                    homePredef: Boolean = true,
                     storageBackend: Storage = new Storage.Folder(Defaults.ammoniteHome),
                     wd: Path = ammonite.ops.pwd,
                     welcomeBanner: Option[String] = Some(Defaults.welcomeBanner),
@@ -31,20 +32,13 @@ object Cli{
                     help: Boolean = false,
                     colored: Option[Boolean] = None)
 
-  
+
   import ammonite.main.Scripts.pathScoptRead
   val genericSignature = Seq(
     Arg[Config, String](
-      "predef", Some('p'),
+      "predef-code", None,
       "Any commands you want to execute at the start of the REPL session",
-      (c, v) => c.copy(predef = v)
-    ),
-    Arg[Config, Unit](
-      "no-default-predef", None,
-      """Disable the default predef and run Ammonite with the minimal predef
-        |possible
-        |""".stripMargin,
-      (c, v) => c.copy(defaultPredef = false)
+      (c, v) => c.copy(predefCode = v)
     ),
 
     Arg[Config, String](
@@ -58,11 +52,28 @@ object Cli{
       (c, v) => c.copy(home = v)
     ),
     Arg[Config, Path](
-      "predef-file", Some('f'),
+      "predef", Some('p'),
       """Lets you load your predef from a custom location, rather than the
         |default location in your Ammonite home""".stripMargin,
       (c, v) => c.copy(predefFile = Some(v))
     ),
+    Arg[Config, Unit](
+      "no-home-predef", None,
+      """Disables the default behavior of loading predef files from your
+        |~/.ammonite/predef.sc, predefScript.sc, or predefShared.sc. You can
+        |choose an additional predef to use using `--predef
+        |""".stripMargin,
+      (c, v) => c.copy(homePredef = false)
+    ),
+
+    Arg[Config, Unit](
+      "no-default-predef", None,
+      """Disable the default predef and run Ammonite with the minimal predef
+        |possible
+        |""".stripMargin,
+      (c, v) => c.copy(defaultPredef = false)
+    ),
+
     Arg[Config, Unit](
       "silent", Some('s'),
       """Make ivy logs go silent instead of printing though failures will

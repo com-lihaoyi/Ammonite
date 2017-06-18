@@ -533,6 +533,40 @@
         if you are iterating on a script together with some external data files
         the script depends on, and you want to
 
+    @sect{Script Debug REPL}
+      @p
+        When a script is not working as intended, it is useful to be able to
+        poke around in a REPL after the script has run, in order to see what
+        values are stored in which variables or what methods are available via
+        autocomplete. To do so, you can run the script using the
+        @code{--predef}/@code{-p} flag.
+
+      @code
+        $ amm --predef foo.sc
+
+      @p
+        This will run the script as normal, but on completion open up a REPL
+        which has all the values defined in that script imported and ready to
+        use. You can then poke around within the REPL as you wish.
+
+      @p
+        Using @code{--predef}/@code{-p} to run a script and then open an
+        interactive REPL can be combined with the @code{--watch}/@code{-w}
+        flag:
+
+      @code
+        $ amm --watch --predef foo.sc
+
+      @p
+        This will open up a REPL after the script runs, and when you exit the
+        REPL it will watch the script file and the files that the script depends
+        on, re-running the script and REPL if any of them change.
+
+      @p
+        @code{--predef}/@code{-p} can be used to include a script file as a
+        predef before running any script or REPL, which is useful for a range
+        of things apart from serving as a debug REPL on any script.
+
     @sect{From the REPL}
       @p
         You can load any script into the Ammonite REPL using the

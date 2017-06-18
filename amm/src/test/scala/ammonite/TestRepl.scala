@@ -52,7 +52,7 @@ class TestRepl {
       printer,
       storage = storage,
       wd = ammonite.ops.pwd,
-      customPredefs = Seq(
+      basePredefs = Seq(
         PredefInfo(
           Name("defaultPredef"),
           ammonite.main.Defaults.replPredef + ammonite.main.Defaults.predefString,
@@ -61,6 +61,7 @@ class TestRepl {
         ),
         PredefInfo(Name("testPredef"), predef._1, false, predef._2)
       ),
+      customPredefs = Seq(),
       extraBridges = Seq((
         "ammonite.repl.ReplBridge",
         "repl",

@@ -20,6 +20,7 @@ import ammonite.util._
  */
 class Interpreter(val printer: Printer,
                   val storage: Storage,
+                  basePredefs: Seq[PredefInfo],
                   customPredefs: Seq[PredefInfo],
                   // Allows you to set up additional "bridges" between the REPL
                   // world and the outside world, by passing in the full name
@@ -93,6 +94,7 @@ class Interpreter(val printer: Printer,
       interpApi,
       evalClassloader,
       storage,
+      basePredefs,
       customPredefs,
       // AutoImport is false, because we do not want the predef imports to get
       // bundled into the main `eval.imports`: instead we pass `predefImports`
@@ -112,10 +114,7 @@ class Interpreter(val printer: Printer,
 
   // The ReplAPI requires some special post-Interpreter-initialization
   // code to run, so let it pass it in a callback and we'll run it here
-  def watch(p: Path) = {
-    new Exception().printStackTrace()
-    watchedFiles.append(p -> Interpreter.pathSignature(p))
-  }
+  def watch(p: Path) = watchedFiles.append(p -> Interpreter.pathSignature(p))
 
   def resolveSingleImportHook(source: CodeSource, tree: ImportTree) = synchronized{
     val strippedPrefix = tree.prefix.takeWhile(_(0) == '$').map(_.stripPrefix("$"))
