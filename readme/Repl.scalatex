@@ -290,7 +290,7 @@
           Or if the script is in an @i{outer} folder,
 
         @hl.scala
-          @@ import $file.`..`.MyScript
+          @@ import $file.^.MyScript
 
         @p
           Or if we want to import the contents of the script in one go:
@@ -403,6 +403,13 @@
           @lnk("Google Guava", "https://github.com/google/guava") Java library
 
         @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("'guava", "@"))
+
+        @p
+          As well as the @code{org:::library:version} syntax for loading Scala
+          libraries cross-published against the full Scala version (e.g.
+          @code{2.12.2} rather than just @code{2.12}):
+
+        @hl.ref(ammoniteTests/"ImportHookTests.scala", Seq("'inlineFull", "@"))
 
         @p
           If you want to load a compiler plugin, you can do so using

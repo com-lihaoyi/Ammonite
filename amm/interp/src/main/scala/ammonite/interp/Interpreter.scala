@@ -53,7 +53,7 @@ class Interpreter(val printer: Printer,
 
   private var scriptImportCallback: Imports => Unit = handleImports
 
-  val watchedFiles = mutable.Buffer.empty[(Path, Option[Long])]
+  val watchedFiles = mutable.Buffer.empty[(Path, Long)]
 
   // We keep an *in-memory* cache of scripts, in additional to the global
   // filesystem cache shared between processes. This is because the global
@@ -113,9 +113,7 @@ class Interpreter(val printer: Printer,
 
   // The ReplAPI requires some special post-Interpreter-initialization
   // code to run, so let it pass it in a callback and we'll run it here
-  def watch(p: Path) = {
-    watchedFiles.append(p -> Interpreter.mtimeIfExists(p))
-  }
+  def watch(p: Path) = watchedFiles.append(p -> Interpreter.pathSignature(p))
 
   def resolveSingleImportHook(source: CodeSource, tree: ImportTree) = synchronized{
     val strippedPrefix = tree.prefix.takeWhile(_(0) == '$').map(_.stripPrefix("$"))
@@ -651,7 +649,26 @@ class Interpreter(val printer: Printer,
 }
 
 object Interpreter{
-  
+
+  def mtimeIfExists(p: Path) = if (exists(p)) p.mtime.toMillis else 0L
+
+  /**
+    * Recursively mtimes things, with the sole purpose of providing a number
+    * that will change if that file changes or that folder's contents changes
+    *
+    * Ensure we include the file paths within a folder as part of the folder
+    * signature, as file moves often do not update the mtime but we want to
+    * trigger a "something changed" event anyway
+    */
+  def pathSignature(p: Path) =
+    if (!exists(p)) 0L
+    else try {
+      if (p.isDir) ls.rec(p).map(x => x.hashCode + mtimeIfExists(x)).sum
+      else p.mtime.toMillis
+    } catch { case e: java.nio.file.NoSuchFileException =>
+      0L
+    }
+
   val SheBang = "#!"
   val SheBangEndPattern = Pattern.compile(s"""((?m)^!#.*)$newLine""")
 
@@ -683,8 +700,6 @@ object Interpreter{
   def indexWrapperName(wrapperName: Name, wrapperIndex: Int): Name = {
     Name(wrapperName.raw + (if (wrapperIndex == 1) "" else "_" + wrapperIndex))
   }
-
-  def mtimeIfExists(p: Path) = if (!exists(p)) None else Some(p.mtime.toMillis)
 
   def initPrinters(colors0: Colors,
                    output: OutputStream,

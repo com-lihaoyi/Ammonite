@@ -65,6 +65,7 @@ class TestRepl {
         "ammonite.repl.ReplBridge",
         "repl",
         new ReplApiImpl {
+          def replArgs0 = Vector.empty[Bind[_]]
           def printer = ???
 
           def sess = sess0

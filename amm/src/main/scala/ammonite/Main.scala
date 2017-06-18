@@ -151,7 +151,7 @@ case class Main(predef: String = "",
     */
   def runScript(path: Path,
                 scriptArgs: Seq[(String, Option[String])])
-                : (Res[Any], Seq[(Path, Option[Long])]) = {
+                : (Res[Any], Seq[(Path, Long)]) = {
 
     val interpEither =
       try Right(instantiateInterpreter())
@@ -292,7 +292,7 @@ class MainRunner(cliConfig: Cli.Config,
     else{
       printInfo(s"Watching for changes to ${watched.length} files... (Ctrl-C to exit)")
       def statAll() = watched.forall{ case (file, lastMTime) =>
-        Interpreter.mtimeIfExists(file) == lastMTime
+        Interpreter.pathSignature(file) == lastMTime
       }
 
       while(statAll()) Thread.sleep(100)
@@ -303,7 +303,7 @@ class MainRunner(cliConfig: Cli.Config,
 
   def runScriptAndPrint(scriptPath: Path,
                         flatArgs: List[String],
-                        scriptMain: Main): (Boolean, Seq[(Path, Option[Long])]) = {
+                        scriptMain: Main): (Boolean, Seq[(Path, Long)]) = {
 
     val (res, watched) = scriptMain.runScript(
       scriptPath,

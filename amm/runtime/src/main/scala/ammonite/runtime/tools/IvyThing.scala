@@ -106,6 +106,10 @@ object IvyThing{
               .split('.')
               .take(2)
               .mkString(".")
+
+  val scalaFullBinaryVersion = 
+    scala.util.Properties
+              .versionNumberString
   
 }
 

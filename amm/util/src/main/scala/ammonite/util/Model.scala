@@ -245,7 +245,8 @@ object Bind{
   * Encapsulates the ways the Ammonite REPL prints things. Does not print
   * a trailing newline by default; you have to add one yourself.
   *
-  * @param out How you want it to print streaming fragments of stdout
+  * @param outStream Direct access to print to stdout
+  * @param errStream Direct access to print to stderr
   * @param warning How you want it to print a compile warning
   * @param error How you want it to print a compile error
   * @param info How you want to print compile info logging. *Not* the same
@@ -269,5 +270,5 @@ object ImportTree{
 case class PredefFailedToLoad(msg: String,
                               cause: Option[Throwable],
                               res: Res.Failing,
-                              watchedFilePaths: Seq[(Path, Option[Long])])
+                              watchedFilePaths: Seq[(Path, Long)])
   extends Exception(msg, cause.orNull)
