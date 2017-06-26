@@ -936,7 +936,7 @@
         libraryDependencies += "com.lihaoyi" % "ammonite" % "@ammonite.Constants.version" cross CrossVersion.full
 
       @p
-        Then instantate it with this code anywhere within your program:
+        Then instantiate it with this code anywhere within your program:
 
       @hl.ref('integration/'src/'test/'scala/'ammonite/'integration/"TestMain.scala")
 
