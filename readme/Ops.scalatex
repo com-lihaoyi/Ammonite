@@ -343,7 +343,7 @@
       @hl.ref(opsTests/"ShelloutTests.scala", Seq("'bytes", ""))
   
       @p
-        @hl.scala{%%} throws an @hl.scala{ShelloutException} containig the @hl.scala{CommandResult} if the return-code is non-zero.
+        @hl.scala{%%} throws an @hl.scala{ShelloutException} containing the @hl.scala{CommandResult} if the return-code is non-zero.
   
       @hl.ref(opsTests/"ShelloutTests.scala", Seq("'failures", ""))
   
@@ -434,6 +434,6 @@
         @hl.ref(opsTests/"ShelloutTests.scala", Seq("'customWorkingDir", ""))
   
         @p
-          Note how passing it inexplicitly, you need to use a @code{.} before the command-name in order for it to parse properly. That's a limitation of the Scala syntax that isn't likely to change. Another limitation is that when invoking a file, you need to call @code{.apply} explicitly rather than relying on the plain-function-call syntax:
+          Note how passing it in explicitly, you need to use a @code{.} before the command-name in order for it to parse properly. That's a limitation of the Scala syntax that isn't likely to change. Another limitation is that when invoking a file, you need to call @code{.apply} explicitly rather than relying on the plain-function-call syntax:
   
         @hl.ref(opsTests/"ShelloutTests.scala", Seq("'fileCustomWorkingDir", ""))

@@ -205,7 +205,7 @@
 
   @sect{Scripting}
     @p
-      Ammonite-Shell uses @lnk("Scala", "https://www.scala-lang.org/") as its command and scripting language. Although the commands seem short and concise, you have the full power of the language available at any time. This lets you do things that are difficult or unfeasible to do when using a traditional shell like Bash.
+      Ammonite-Shell uses @lnk("Scala", "https://www.scala-lang.org/") as its command and scripting language. Although the commands seem short and concise, you have the full power of the language available at any time. This lets you do things that are difficult or infeasible to do when using a traditional shell like Bash.
 
     @sect{Scala Scripting}
       @p
@@ -405,7 +405,7 @@
           Ammonite uses hundreds of megabytes (~500mb at last count) of memory, again orders-of-magnitude more than an interpreter written in C or Python. The JVM has traditionally been a very pointer-heavy, memory-intensive platform for running code, and it shows. @lnk("Project Valhalla", "http://openjdk.java.net/projects/valhalla/") would help with this, also scheduled to land in Java 9.
 
       @p
-        In general, the JVM has traditionally been used as a server-side platform for long-runing services, and its slow-startup and bloated disk/memory footprints are a symptom of that. Running on the JVM also has some upsides, though:
+        In general, the JVM has traditionally been used as a server-side platform for long-running services, and its slow-startup and bloated disk/memory footprints are a symptom of that. Running on the JVM also has some upsides, though:
 
       @ul
         @li
@@ -413,7 +413,7 @@
         @li
           Ammonite can make use of any JVM APIs, and there are a lot of them! The JVM is a general-purpose platform for a general purpose language (Java), and thus has APIs for doing all sorts of things: dealing with @lnk("dates and times", "https://docs.oracle.com/javase/8/docs/api/java/time/package-summary.html"), @lnk("math", "https://docs.oracle.com/javase/8/docs/api/java/lang/Math.html"), @lnk("networks", "https://docs.oracle.com/javase/8/docs/api/java/net/package-summary.html"), @lnk("threads", "https://docs.oracle.com/javase/8/docs/api/java/lang/Thread.html"), and many other things. While you may not always need all of these capabilities, it is nice to have them at your disposal where necessary.
         @li
-          Ammonite can make use of any Java/JVM libraries, and the excelent infrastructure used by Java developers to download and manage them! Any library is just a @sect.ref{import $ivy} away. Need to parse Python source into an AST? Load @lnk("Jython", "https://search.maven.org/#search%7Cga%7C1%7Ca%3A%22jython-standalone%22") and just do it. Need a high-performance web server? Load @lnk("Akka-HTTP", "http://doc.akka.io/docs/akka-stream-and-http-experimental/1.0-M2/scala/http/"). Need some data someone stored in a YAML file? Load @lnk("SnakeYAML", "https://bitbucket.org/asomov/snakeyaml") and parse it. You don't even need to download and manage these libraries yourself: just @hl.scala{import $ivy} them from Ammonite, and Java's excellent dependency-management infrastructure will download them (along with any transitive dependencies!), cache them locally, and make them available to your code.
+          Ammonite can make use of any Java/JVM libraries, and the excellent infrastructure used by Java developers to download and manage them! Any library is just a @sect.ref{import $ivy} away. Need to parse Python source into an AST? Load @lnk("Jython", "https://search.maven.org/#search%7Cga%7C1%7Ca%3A%22jython-standalone%22") and just do it. Need a high-performance web server? Load @lnk("Akka-HTTP", "http://doc.akka.io/docs/akka-stream-and-http-experimental/1.0-M2/scala/http/"). Need some data someone stored in a YAML file? Load @lnk("SnakeYAML", "https://bitbucket.org/asomov/snakeyaml") and parse it. You don't even need to download and manage these libraries yourself: just @hl.scala{import $ivy} them from Ammonite, and Java's excellent dependency-management infrastructure will download them (along with any transitive dependencies!), cache them locally, and make them available to your code.
 
       @p
         There are both pros and cons with running Ammonite on the JVM: we gain its heavy startup/memory overhead, but also get access to its high-performance @lnk("JIT", "https://en.wikipedia.org/wiki/Just-in-time_compilation"), massive ecosystem of available packages.

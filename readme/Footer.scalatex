@@ -80,7 +80,7 @@
         by Alex Archambault, uses a fork of Ammonite as its Jupyter kernel
       @li
         The @lnk("DynaML", "http://mandar2812.github.io/DynaML/#documentation")
-        Machine-Learning REPL uses Ammonite as it's REPL
+        Machine-Learning REPL uses Ammonite as its REPL
       @li
         The @lnk("Shapeless", "https://github.com/milessabin/shapeless") project has a
         @lnk("try-shapeless.sh", "https://github.com/milessabin/shapeless#try-shapeless-with-an-ammonite-instant-repl")
@@ -349,7 +349,7 @@
           Fix regression in @code{show} and @code{browse} built-ins, which
           caused their default configuration to be un-usable @issue(613)
         @li
-          Force pretty-printing @code{scala.xml.Elem} to use it's XML
+          Force pretty-printing @code{scala.xml.Elem} to use its XML
           @code{.toString} rather than treating it as a case class, since the
           case-class representation is borked due to weirdness in that class.
         @li
@@ -377,10 +377,10 @@
     @sect{0.9.0}
       @ul
         @li
-          Ammonite now uses AlexArchambault's
+          Ammonite now uses Alex Archambault's
           @lnk("Coursier", "https://github.com/coursier/coursier") library for
           dependency resolution and downloading. This should @i{hopefully} fix
-          many of our perenniel, non-deterministic Ivy resolution problems, and
+          many of our perennial, non-deterministic Ivy resolution problems, and
           provide greater flexibility for loading ivy dependencies (e.g. with
           excludes, classifiers, etc.). Fixes @issue(300), @issue(387),
           @issue(455), @issue(473), @issue(484), @issue(523), @issue(573),
@@ -890,7 +890,7 @@
             Make @hl.scala{read!} work on @hl.scala{InputStream}s
           @li
             Renamed @hl.scala{InputPath} to @hl.scala{Readable}, a more
-            appropiate name now that it works on two different non-path entities
+            appropriate name now that it works on two different non-path entities
             (resources and @hl.scala{InputStream}s)
           @li
             Bump uPickle and PPrint to 0.3.9
@@ -1202,7 +1202,7 @@
       @sect{0.4.3}
         @ul
           @li
-            Remove embarassing debug println left behind in autocomplete code
+            Remove embarrassing debug println left behind in autocomplete code
           @li
             Fix @code{pathSeparator} so Ammonite-REPL is at least
             basically-runnable on windows, although buggy
@@ -1303,7 +1303,7 @@
         @ul
           @li
             Many of the collection @hl.scala{PPrint}s are much lazier and will
-            avoid stringifying the whole collection if its going to get truncated
+            avoid stringifying the whole collection if it's going to get truncated
             anyway.
           @li
             Types now get printed semi-qualified (depending on what's in scope),

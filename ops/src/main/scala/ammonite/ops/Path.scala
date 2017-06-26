@@ -88,7 +88,7 @@ object BasePath {
       case Some(c) => fail(
         s"[$c] is not a valid character to appear in a path segment. " +
           "If you want to parse an absolute or relative path that may have " +
-          "multiple segments, e.g. path-strings coming from external sources" +
+          "multiple segments, e.g. path-strings coming from external sources " +
           considerStr
       )
       case None =>
@@ -126,7 +126,8 @@ object BasePath {
 
 /**
   * Represents a value that is either an absolute [[Path]] or a
-  * relative [[RelPath]], and can be constructed from
+  * relative [[RelPath]], and can be constructed from a
+  * java.nio.file.Path or java.io.File
   */
 sealed trait FilePath extends BasePath
 object FilePath {
