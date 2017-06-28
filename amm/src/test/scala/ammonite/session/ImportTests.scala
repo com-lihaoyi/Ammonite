@@ -123,27 +123,26 @@ object ImportTests extends TestSuite{
       'shadowPrefix{
         * - {
           // fixed in 2.12
-          if (!scala2_12) check.session(
-            """
-          @ object importing_issue {
-          @   object scala {
-          @     def evilThing = ???
-          @   }
-          @ }
+          check.session(raw"""
+            @ object importing_issue {
+            @   object scala {
+            @     def evilThing = ???
+            @   }
+            @ }
 
-          @ import scala.concurrent.duration._
+            @ import scala.concurrent.duration._
 
-          @ Duration.Inf
+            @ Duration.Inf
 
-          @ import importing_issue._
+            @ import importing_issue._
 
-          @ "foo" // Make sure this still works
-          res4: String = "foo"
+            @ "foo" // Make sure this still works
+            res4: String = "foo"
 
-          @ Duration.Inf // This fails due to a compiler bug SI-6039
-          error: Compilation Failed
-        """)
-          }
+            @ Duration.Inf // This fails due to a compiler bug SI-6039
+            ${ if (scala2_11 || scala2_12) "" else "error: Compilation Failed" }
+          """)
+        }
         // This failed kinda non-deterministically in 0.5.2 (#248); it depended
         // on what ordering the imports were generated in, which depended
         // on the ordering of the `scala.Map` they were stored in, which
