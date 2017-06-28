@@ -122,7 +122,7 @@ object ImportTests extends TestSuite{
       }
       'shadowPrefix{
         * - {
-          // fixed in 2.12
+          // fixed in 2.11 and 2.12
           check.session(raw"""
             @ object importing_issue {
             @   object scala {
