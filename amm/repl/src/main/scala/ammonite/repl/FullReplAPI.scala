@@ -42,10 +42,11 @@ trait FullReplAPI extends ReplAPI{
            .drop(1)
     }
 
-    def print[T: pprint.TPrint: ClassTag](value: => T,
+    def print[T: pprint.TPrint](value: => T,
                                           ident: String,
                                           custom: Option[String])
-                                         (implicit tcolors: pprint.TPrintColors) = {
+                                         (implicit tcolors: pprint.TPrintColors,
+                                          classTagT: ClassTag[T] = null) = {
       // This type check was originally written as just typeOf[T] =:= typeOf[Unit].
       // However, due to a bug in Scala's reflection when applied to certain
       // class annotations in Hadoop jars, the type check would consistently
@@ -59,7 +60,7 @@ trait FullReplAPI extends ReplAPI{
       //
       // See https://issues.scala-lang.org/browse/SI-10129 for additional details.
       val isUnit = try {
-        classTag[T] == classTag[Unit]
+        classTagT == classTag[Unit]
       } catch {
         case _: Throwable => value == scala.runtime.BoxedUnit.UNIT
       }
