@@ -7,7 +7,8 @@ import scala.reflect.runtime.universe._
 import ammonite.runtime.APIHolder
 
 import scala.collection.mutable
-
+import scala.reflect.ClassTag
+import scala.reflect.classTag
 
 trait FullReplAPI extends ReplAPI{
 
@@ -41,10 +42,10 @@ trait FullReplAPI extends ReplAPI{
            .drop(1)
     }
 
-    def print[T: pprint.TPrint: WeakTypeTag](value: => T,
-                                             ident: String,
-                                             custom: Option[String])
-                                            (implicit tcolors: pprint.TPrintColors) = {
+    def print[T: pprint.TPrint: ClassTag](value: => T,
+                                          ident: String,
+                                          custom: Option[String])
+                                         (implicit tcolors: pprint.TPrintColors) = {
       // This type check was originally written as just typeOf[T] =:= typeOf[Unit].
       // However, due to a bug in Scala's reflection when applied to certain
       // class annotations in Hadoop jars, the type check would consistently
@@ -53,12 +54,12 @@ trait FullReplAPI extends ReplAPI{
       // The solution is to catch exceptions thrown by the typeOf check and fallback
       // to checking the value against Unit's boxed form.
       //
-      // Why not just check the value? Because that would force evaluzation of `lazy val`'s
+      // Why not just check the value? Because that would force evaluation of `lazy val`'s
       // which breaks the ammonite.session.EvaluatorTests(lazyvals) test.
       //
       // See https://issues.scala-lang.org/browse/SI-10129 for additional details.
       val isUnit = try {
-        typeOf[T] =:= typeOf[Unit]
+        classTag[T] == classTag[Unit]
       } catch {
         case _: Throwable => value == scala.runtime.BoxedUnit.UNIT
       }
