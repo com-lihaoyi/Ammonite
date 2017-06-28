@@ -47,11 +47,7 @@ trait FullReplAPI extends ReplAPI{
                                 custom: Option[String])
                                (implicit tcolors: pprint.TPrintColors,
                                 classTagT: ClassTag[T] = null) = {
-      val isUnit = try {
-        classTagT == classTag[Unit]
-      } catch {
-        case _: Throwable => value == scala.runtime.BoxedUnit.UNIT
-      }
+      val isUnit = classTagT == classTag[Unit]
 
       if (isUnit) Iterator()
       else {
