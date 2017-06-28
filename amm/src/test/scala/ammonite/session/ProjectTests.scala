@@ -301,6 +301,33 @@ object ProjectTests extends TestSuite{
            res1: org.pegdown.ast.SimpleNode.Type = HRule
          """)
     }
+
+    'deeplearning {
+      // DeepLearning.scala 2.0.0-RC0 isn't published for scala 2.10
+      if (!scala2_10) {
+        check.session(
+          """
+          @ import $ivy.`com.thoughtworks.deeplearning::plugins-builtins:2.0.0-RC0`
+          import $ivy.$
+
+          @ import $ivy.`org.nd4j:nd4j-native-platform:0.8.0`
+          import $ivy.$
+
+          @ import scala.concurrent.ExecutionContext.Implicits.global
+          import scala.concurrent.ExecutionContext.Implicits.global
+
+          @ import com.thoughtworks.feature.Factory
+          import com.thoughtworks.feature.Factory
+
+          @ import com.thoughtworks.deeplearning._
+          import com.thoughtworks.deeplearning._
+
+          @ Factory[plugins.Builtins].newInstance()
+          """
+        )
+      }
+    }
+
   }
 }
 
