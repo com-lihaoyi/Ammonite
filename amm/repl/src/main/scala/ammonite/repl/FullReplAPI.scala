@@ -43,10 +43,10 @@ trait FullReplAPI extends ReplAPI{
     }
 
     def print[T: pprint.TPrint](value: => T,
-                                          ident: String,
-                                          custom: Option[String])
-                                         (implicit tcolors: pprint.TPrintColors,
-                                          classTagT: ClassTag[T] = null) = {
+                                ident: String,
+                                custom: Option[String])
+                               (implicit tcolors: pprint.TPrintColors,
+                                classTagT: ClassTag[T] = null) = {
       val isUnit = try {
         classTagT == classTag[Unit]
       } catch {
