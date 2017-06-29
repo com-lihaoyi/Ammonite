@@ -48,7 +48,8 @@ trait FullReplAPI extends ReplAPI{
                                (implicit tcolors: pprint.TPrintColors,
                                 classTagT: ClassTag[T] = null) = {
       // Here we use ClassTag to detect if T is an Unit.
-      // The default value null suppresses the compilation error when T is a singleton type.
+      // The default value null suppresses the compilation error when T is a singleton type,
+      // which can't provide a ClassTag.
       //
       // We don't use `asUnit: T =:= Unit = null` because that approach does not work
       // when T is Nothing.
