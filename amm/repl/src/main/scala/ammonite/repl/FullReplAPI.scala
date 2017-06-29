@@ -50,7 +50,7 @@ trait FullReplAPI extends ReplAPI{
       // Here we use ClassTag to detect if T is an Unit.
       // The default value null suppresses the compilation error when T is a singleton type.
       //
-      // We don't use `asUnit: T =:= Unit = null` because this approach does not work
+      // We don't use `asUnit: T =:= Unit = null` because that approach does not work
       // when T is Nothing.
       // See https://github.com/scala/bug/issues/10393 for further information.
       //
