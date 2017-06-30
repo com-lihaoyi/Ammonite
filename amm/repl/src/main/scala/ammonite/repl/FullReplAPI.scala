@@ -7,7 +7,8 @@ import scala.reflect.runtime.universe._
 import ammonite.runtime.APIHolder
 
 import scala.collection.mutable
-
+import scala.reflect.ClassTag
+import scala.reflect.classTag
 
 trait FullReplAPI extends ReplAPI{
 
@@ -41,27 +42,23 @@ trait FullReplAPI extends ReplAPI{
            .drop(1)
     }
 
-    def print[T: pprint.TPrint: WeakTypeTag](value: => T,
-                                             ident: String,
-                                             custom: Option[String])
-                                            (implicit tcolors: pprint.TPrintColors) = {
-      // This type check was originally written as just typeOf[T] =:= typeOf[Unit].
-      // However, due to a bug in Scala's reflection when applied to certain
-      // class annotations in Hadoop jars, the type check would consistently
-      // throw an exception.
+    def print[T: pprint.TPrint](value: => T,
+                                ident: String,
+                                custom: Option[String])
+                               (implicit tcolors: pprint.TPrintColors,
+                                classTagT: ClassTag[T] = null) = {
+      // Here we use ClassTag to detect if T is an Unit.
+      // The default value null suppresses the compilation error when T is a singleton type,
+      // which can't provide a ClassTag.
       //
-      // The solution is to catch exceptions thrown by the typeOf check and fallback
-      // to checking the value against Unit's boxed form.
+      // We don't use `asUnit: T =:= Unit = null` because that approach does not work
+      // when T is Nothing.
+      // See https://github.com/scala/bug/issues/10393 for further information.
       //
-      // Why not just check the value? Because that would force evaluzation of `lazy val`'s
-      // which breaks the ammonite.session.EvaluatorTests(lazyvals) test.
-      //
-      // See https://issues.scala-lang.org/browse/SI-10129 for additional details.
-      val isUnit = try {
-        typeOf[T] =:= typeOf[Unit]
-      } catch {
-        case _: Throwable => value == scala.runtime.BoxedUnit.UNIT
-      }
+      // We don't use WeakTypeTag or TypeTag because those type classes are too heavy-weight,
+      // as Scalac will generate a huge amount of code for creating a TypeTag for refinement types.
+      // See https://github.com/lihaoyi/Ammonite/issues/649 for further information.
+      val isUnit = classTagT == classTag[Unit]
 
       if (isUnit) Iterator()
       else {
