@@ -44,6 +44,12 @@
     @replCurl
 
   @p
+    Or to try out the latest features in our @sect.ref{Unstable Versions}:
+
+  @hl.sh
+    @readme.Sample.unstableCurl
+
+  @p
     And read on to learn about how Scala scripts work.
 
   @sect{Script Files}

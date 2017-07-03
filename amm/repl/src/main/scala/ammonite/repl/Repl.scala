@@ -179,7 +179,9 @@ class Repl(input: InputStream,
         lastException = _,
         colors()
       ) match{
-        case None => loop()
+        case None =>
+          printer.outStream.println()
+          loop()
         case Some(value) => value
       }
     }

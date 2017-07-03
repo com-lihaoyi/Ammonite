@@ -42,6 +42,12 @@
     @replCurl
 
   @p
+    Or to try out the latest features in our @sect.ref{Unstable Versions}:
+
+  @hl.sh
+    @readme.Sample.unstableCurl
+
+  @p
     This will give you access to the Ammonite-REPL:
 
   @img(src:="GettingStarted.png", width:="100%")
@@ -80,6 +86,12 @@
 
 
   @hl.scala(srcSbtConfig)
+
+  @p
+    Or to try out the latest features in our @sect.ref{Unstable Versions}:
+
+  @hl.scala
+    libraryDependencies += "com.lihaoyi" % "ammonite" % "@ammonite.Constants.unstableVersion" % "test" cross CrossVersion.full
 
   @p
     After that, simply hit

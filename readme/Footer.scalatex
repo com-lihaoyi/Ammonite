@@ -1374,8 +1374,6 @@
     @hl.scala
       libraryDependencies += "com.lihaoyi" % "ammonite" % "@ammonite.Constants.unstableVersion" % "test" cross CrossVersion.full
 
-      initialCommands in (Test, console) := """ammonite.Main().run()"""
-
     @p
       Ammonite also provides standalone unstable executables for older versions
       of Scala:
@@ -1401,3 +1399,8 @@
 
     @sect{Unstable Changlog}
       @ul
+        @li
+          Ammonite REPL now prints an additional newline after the output of
+          each command, which should visually separate each command and make it
+          easier to skim over your command history in the terminal or when
+          copy-pasted elsewhere.
