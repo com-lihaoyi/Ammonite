@@ -48,6 +48,7 @@ trait FullReplAPI extends ReplAPI{
                                (implicit tcolors: pprint.TPrintColors,
                                 classTagT: ClassTag[T] = null) = {
       // Here we use ClassTag to detect if T is an Unit.
+      //
       // The default value null suppresses the compilation error when T is a singleton type,
       // which can't provide a ClassTag.
       //
@@ -58,6 +59,9 @@ trait FullReplAPI extends ReplAPI{
       // We don't use WeakTypeTag or TypeTag because those type classes are too heavy-weight,
       // as Scalac will generate a huge amount of code for creating a TypeTag for refinement types.
       // See https://github.com/lihaoyi/Ammonite/issues/649 for further information.
+      // 
+      // We do not check `value == ()`, because that would force evaluation of `value`, which
+      // may be defined as a `lazy val` which the user explicitly does not want to evaluate
       val isUnit = classTagT == classTag[Unit]
 
       if (isUnit) Iterator()
