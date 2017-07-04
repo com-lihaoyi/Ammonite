@@ -1397,7 +1397,7 @@
       you can use the published unstable version with your fix until the next
       numbered release.
 
-    @sect{Unstable Changlog}
+    @sect{Unstable Changelog}
       @ul
         @li
           Ammonite REPL now prints an additional newline after the output of

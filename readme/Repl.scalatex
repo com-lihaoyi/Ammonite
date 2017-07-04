@@ -4,7 +4,7 @@
 @val ammoniteTests = 'amm/'src/'test/'scala/'ammonite/'session
 @val advancedTests = ammoniteTests/"AdvancedTests.scala"
 @val srcSbtConfig = """
-// Optional, required for the `src` command to work
+// Optional, required for the `source` command to work
 (fullClasspath in Test) ++= {
   (updateClassifiers in Test).value
     .configurations
@@ -34,15 +34,17 @@
 
 
   @p
-    If you want to use Ammonite as a plain Scala shell, download the
-    standalone executable for Scala 2.12 (also available for
-    @sect.ref{Older Scala Versions}):
+    If you want to use Ammonite as a plain Scala shell, download the standalone
+    Ammonite @ammonite.Constants.version executable for Scala 2.12 (also
+    available for @sect.ref{Older Scala Versions}):
 
   @hl.sh
     @replCurl
 
   @p
-    Or to try out the latest features in our @sect.ref{Unstable Versions}:
+    Or to try out the @sect.ref("Unstable Changelog", "latest features") in our
+    @sect.ref("Unstable Versions", "Unstable Release")
+    @ammonite.Constants.unstableVersion:
 
   @hl.sh
     @readme.Sample.unstableCurl
@@ -59,9 +61,10 @@
     @sect.ref{Features}!
 
   @p
-    If you want to use Ammonite as a filesystem shell, take a look at
-    @sect.ref{Ammonite-Shell}. If you're not sure what to do with Ammonite,
-    check out the @sect.ref{Ammonite Cookbook} for some fun ideas!
+    If you want to use Ammonite as a filesystem
+    shell, take a look at @sect.ref{Ammonite-Shell}. If you're not sure what
+    to do with Ammonite, check out the @sect.ref{Ammonite Cookbook} for some
+    fun ideas!
 
   @p
     If you want some initialization code available to the REPL, you can add
@@ -72,8 +75,8 @@
 
 
   @p
-    You can also try out Ammonite in an existing SBT project, add the
-    following to your @code{build.sbt}
+    You can also try out Ammonite @ammonite.Constants.version in an existing
+    SBT project. To do so, add the following to your @code{build.sbt}
 
   @hl.scala
     libraryDependencies += "com.lihaoyi" % "ammonite" % "@ammonite.Constants.version" % "test" cross CrossVersion.full
@@ -88,7 +91,9 @@
   @hl.scala(srcSbtConfig)
 
   @p
-    Or to try out the latest features in our @sect.ref{Unstable Versions}:
+    Or to try out the @sect.ref("Unstable Changelog", "latest features") in our
+    @sect.ref("Unstable Versions", "Unstable Release")
+    @ammonite.Constants.unstableVersion:
 
   @hl.scala
     libraryDependencies += "com.lihaoyi" % "ammonite" % "@ammonite.Constants.unstableVersion" % "test" cross CrossVersion.full

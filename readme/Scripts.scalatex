@@ -37,14 +37,17 @@
     files, without the hassle of setting up a heavyweight SBT project.
 
   @p
-    To begin with, download the Ammonite script-runner for Scala 2.12 (also
-    available for @sect.ref{Older Scala Versions}):
+    To begin with, download the Ammonite @ammonite.Constants.version
+    script-runner for Scala 2.12 (also available for
+    @sect.ref{Older Scala Versions}):
 
   @hl.sh
     @replCurl
 
   @p
-    Or to try out the latest features in our @sect.ref{Unstable Versions}:
+    Or to try out the @sect.ref("Unstable Changelog", "latest features") in our
+    @sect.ref("Unstable Versions", "Unstable Release")
+    @ammonite.Constants.unstableVersion:
 
   @hl.sh
     @readme.Sample.unstableCurl
@@ -735,7 +738,7 @@
         into an ammonite @hl.scala{Main} class.
 
       @p
-        Add the ammonite dependency to @code{build.sbt}:
+        Add the ammonite @ammonite.Constants.version dependency to @code{build.sbt}:
 
       @hl.scala
         libraryDependencies += "com.lihaoyi" % "ammonite" % "@ammonite.Constants.version" % "test" cross CrossVersion.full
