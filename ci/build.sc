@@ -10,7 +10,7 @@ val isMasterCommit =
 val latestTaggedVersion = %%('git, 'describe, "--abbrev=0", "--tags").out.trim
 
 val commitsSinceTaggedVersion = {
-  %%('git, "rev-list", 'head, "--count").out.trim.toInt -
+  %%('git, "rev-list", 'master, "--count").out.trim.toInt -
   %%('git, "rev-list", latestTaggedVersion, "--count").out.trim.toInt
 }
 
