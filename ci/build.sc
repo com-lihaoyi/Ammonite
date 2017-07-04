@@ -7,6 +7,12 @@ val isMasterCommit =
   sys.env.get("TRAVIS_PULL_REQUEST") == Some("false") &&
   (sys.env.get("TRAVIS_BRANCH") == Some("master") || sys.env("TRAVIS_TAG") != "")
 
+val latestTaggedVersion = %%('git, 'describe, "--abbrev=0", "--tags").out.trim
+
+val commitsSinceTaggedVersion = {
+  %%('git, "rev-list", 'head, "--count").out.trim.toInt -
+  %%('git, "rev-list", latestTaggedVersion, "--count").out.trim.toInt
+}
 
 val allVersions = Seq(
   "2.10.4", "2.10.5", "2.10.6",
@@ -18,7 +24,7 @@ val latestMajorVersions = Set("2.10.6", "2.11.11", "2.12.2")
 
 val (buildVersion, unstable) = sys.env.get("TRAVIS_TAG") match{
   case Some(v) if v != "" => (v, false)
-  case _ =>  (s"COMMIT-${getGitHash()}", true)
+  case _ =>  (s"$latestTaggedVersion-$commitsSinceTaggedVersion-${getGitHash()}", true)
 }
 
 def getGitHash() = %%("git", "rev-parse", "--short", "HEAD").out.trim
@@ -86,7 +92,7 @@ def publishDocs() = {
   val publishDocs = sys.env("DEPLOY_KEY").replace("\\n", "\n")
   write(cwd / 'deploy_key, publishDocs)
 
-  val latestTaggedVersion = %%('git, 'describe, "--abbrev=0", "--tags").out.trim
+
 
   val (stableKey, unstableKey, oldStableKeys, oldUnstableKeys) =
     if (!unstable){
