@@ -1404,3 +1404,13 @@
           each command, which should visually separate each command and make it
           easier to skim over your command history in the terminal or when
           copy-pasted elsewhere.
+        @li
+          There was an undocumented feature of magic importing URLs in Ammonite
+          REPL 0.8.x. The feauture was removed in Ammonite REPL 0.9.x and 1.0.0.
+          Now it's back.
+          @hl.scala
+            import $url.{`https://raw.githubusercontent.com/lihaoyi/Ammonite/master/amm/src/test/resources/scripts/Annotation.sc` => remote}
+          The content at the URL will be wrapped into the @hl.scala{remote} object, which
+          can be accessed later:
+          @hl.scala
+            remote.product(1, List(2, 3, 4))
