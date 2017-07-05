@@ -1,11 +1,15 @@
 package ammonite.runtime
 
 import java.io.File
+import java.net.URI
 
 import ammonite.ops.{read, _}
 import ammonite.runtime.tools.IvyThing
 import ammonite.util.Util.CodeSource
 import ammonite.util._
+
+import scala.io.Source
+import scala.util.{Failure, Success, Try}
 
 /**
   * An extensible hook into the Ammonite REPL's import system; allows the end
@@ -53,7 +57,6 @@ object ImportHook{
     case class ClassPath(file: Path, plugin: Boolean) extends Result
   }
 
-  
   object File extends SourceHook(false)
   object Exec extends SourceHook(true)
 
@@ -176,7 +179,7 @@ object ImportHook{
 
 
     def handle(source: CodeSource,
-               tree: ImportTree, 
+               tree: ImportTree,
                interp: InterpreterInterface) = for{
       signatures <- splitImportTree(tree).right
       resolved <- resolve(interp, signatures).right
@@ -186,7 +189,7 @@ object ImportHook{
   object PluginClasspath extends BaseClasspath(plugin = true)
   class BaseClasspath(plugin: Boolean) extends ImportHook{
     def handle(source: CodeSource,
-               tree: ImportTree, 
+               tree: ImportTree,
                interp: InterpreterInterface) = {
       source.path match{
         case None => Left("Cannot resolve $cp import in code without source")
@@ -204,4 +207,65 @@ object ImportHook{
 
     }
   }
+
+  object URL extends ImportHook {
+
+    private def resolveURLs(tree: ImportTree): Seq[(URI, String)] = {
+      tree.mappings match {
+        case Some(mappings) if tree.prefix.isEmpty =>
+          mappings.map {
+            case (_, None) =>
+              throw new IllegalArgumentException("$url import failed")
+            case (key, Some(rename)) =>
+              val uri = new URI(key)
+              if (uri.isAbsolute) {
+                (uri, rename)
+              } else {
+                throw new IllegalArgumentException("$url import failed")
+              }
+          }
+        case _ =>
+          throw new IllegalArgumentException("$url import failed")
+      }
+    }
+
+    override def handle(source: CodeSource,
+                        tree: ImportTree,
+                        interp: InterpreterInterface): Either[String, Seq[Result]] = {
+      Try(resolveURLs(tree)) match {
+        case Failure(e) =>
+          Left(e.getMessage)
+        case Success(urlMappings) =>
+          Right(urlMappings.map {
+            case (uri, rename) =>
+              val inputStream = uri.toURL.openStream()
+              val code = try {
+                read(inputStream)
+              } finally{
+                inputStream.close()
+              }
+
+              val codeSrc = CodeSource(
+                Name(uri.toString),
+                Nil,
+                source.pkgRoot,
+                None
+              )
+
+              val fullPrefix = source.pkgRoot :+ Name(uri.toString)
+              val importData = Seq(ImportData(
+                fullPrefix.last, Name(rename),
+                fullPrefix.dropRight(1), ImportData.TermType
+              ))
+              Result.Source(
+                Util.normalizeNewlines(code),
+                codeSrc,
+                Imports(importData),
+                exec=false
+              )
+          })
+      }
+    }
+  }
+
 }
