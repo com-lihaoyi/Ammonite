@@ -1404,3 +1404,7 @@
           each command, which should visually separate each command and make it
           easier to skim over your command history in the terminal or when
           copy-pasted elsewhere.
+        @li
+          Fix for issue #668 where comments in identifiers are not properly 
+          backticked causing the repl to stop working correctly
+
