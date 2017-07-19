@@ -3,11 +3,11 @@ package ammonite.sshd
 
 import java.io.{InputStream, OutputStream, PrintStream}
 
+import ammonite.Main
 import ammonite.ops.Path
-import ammonite.sshd.util.Environment
-import ammonite.util.{Bind, Name, PredefInfo}
 import ammonite.runtime.Storage
-import ammonite.repl.Repl
+import ammonite.sshd.util.Environment
+import ammonite.util.{Bind, Colors}
 
 /**
  * An ssh server which serves ammonite repl as it's shell channel.
@@ -62,22 +62,17 @@ object SshdRepl {
 
     Environment.withEnvironment(Environment(replServerClassLoader, in, out)) {
       try {
-        val augmentedPredef = ammonite.Main.maybeDefaultPredef(
-          defaultPredef,
-          ammonite.main.Defaults.predefString
-        )
-        new Repl(
-          in, out, out,
-          new Storage.Folder(homePath),
-          Seq(
-            PredefInfo(Name("DefaultPredef"), augmentedPredef, true, None)
-          ),
-          Seq(
-            PredefInfo(Name("CodePredef"), predefCode, false, None)
-          ),
-          wd, Some(ammonite.main.Defaults.welcomeBanner),
-          remoteLogger = None
-        ).run()
+        Main(
+          predefCode = predefCode,
+          predefFile = None,
+          defaultPredef = defaultPredef,
+          storageBackend = new Storage.Folder(homePath),
+          wd = wd,
+          inputStream = in, outputStream = out, errorStream = out,
+          verboseOutput = false,
+          remoteLogging = false,
+          colors = Colors.Default
+        ).run(replArgs:_*)
       } catch {
         case any: Throwable =>
           val sshClientOutput = new PrintStream(out)
