@@ -318,6 +318,12 @@ object EvaluatorTests extends TestSuite{
         @ `*/`
         res22: Int = 123
 
+        @ val `/*` = 123
+        `/*`: Int = 123
+
+        @ val `//` = 123
+        `//`: Int = 123
+
       """)
     }
   }
