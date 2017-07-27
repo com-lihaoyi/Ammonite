@@ -79,6 +79,8 @@ object Name{
   val symbolKeywords = Set(
     ":", ";", "=>", "=", "<-", "<:", "<%", ">:", "#", "@", "\u21d2", "\u2190"
   )
+  val blockCommentStart = "/*"
+  val lineCommentStart = "//"
 
   /**
     * Custom implementation of ID parsing, instead of using the ScalaParse
@@ -106,11 +108,14 @@ object Name{
       }
 
       val firstLetterValid = s(0).isLetter || s(0) == '_' || s(0) == '$' || validOperator(s(0))
+
       val valid =
         validChunks &&
         firstLetterValid &&
         !alphaKeywords.contains(s) &&
-        !symbolKeywords.contains(s)
+        !symbolKeywords.contains(s) &&
+        !s.contains(blockCommentStart) &&
+        !s.contains(lineCommentStart)
 
       if (valid) s else '`' + s + '`'
     }

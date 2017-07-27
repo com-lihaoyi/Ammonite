@@ -287,6 +287,43 @@ object EvaluatorTests extends TestSuite{
 
         @ `l o l`
         res10: Int = 123
+
+        @ import ` `.{` ` => `//`}
+        
+        @ `//`
+        res12: Int = 123
+
+        @ import ` `.{` ` => `Something then //`}
+
+        @ `Something then //`
+        res14: Int = 123
+
+        @ import ` `.{` ` => `// and then`}
+
+        @ `// and then`
+        res16: Int = 123
+
+        @ import ` `.{` ` => `/*`}
+
+        @ `/*`
+        res18: Int = 123
+
+        @ import ` `.{` ` => `/*/`}
+
+        @ `/*/`
+        res20: Int = 123
+
+        @ import ` `.{` ` => `*/`}
+
+        @ `*/`
+        res22: Int = 123
+
+        @ val `/*` = 123
+        `/*`: Int = 123
+
+        @ val `//` = 123
+        `//`: Int = 123
+
       """)
     }
   }

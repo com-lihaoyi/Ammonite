@@ -1414,3 +1414,7 @@
           can be accessed later:
           @hl.scala
             remote.product(1, List(2, 3, 4))
+        @li
+          Fix for issue @issue(668) where comments in identifiers are not properly 
+          backticked causing the repl to stop working correctly
+
