@@ -1,5 +1,10 @@
 language: scala
 
+# Not sure why this is necessary, but sometime before this commit the master
+# branch and other branches/tags stopped getting cloned down by travis automatically
+install:
+- git fetch origin master:master
+
 matrix:
   include:
   # Each `test` call is manually sharded out into `published/test` and
@@ -12,7 +17,7 @@ matrix:
   - stage: build
     env: CI_SCRIPT="ci/build.sc test published/test"
     jdk: oraclejdk8
-    scala: 2.12.2
+    scala: 2.12.3
 
   - stage: build
     env: CI_SCRIPT="ci/build.sc test published/test"
@@ -27,7 +32,7 @@ matrix:
   - stage: build
     env: CI_SCRIPT="ci/build.sc test integration/test"
     jdk: oraclejdk8
-    scala: 2.12.2
+    scala: 2.12.3
 
   - stage: build
     env: CI_SCRIPT="ci/build.sc test integration/test"
