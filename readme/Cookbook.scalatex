@@ -213,7 +213,7 @@
       Education	Massachusetts Institute of Technology		Cambridge, MA
         """,
         """
-      Bachelor of Science degree in Computer Science, GPA 4.8/5.0	 Sep 2010 – Jun 2013
+      Bachelor of Science degree in Computer Science, GPA 4.8/5.0	 Sep 2010 - Jun 2013
         """,
         """
       Work	Dropbox		San Francisco, CA
@@ -382,7 +382,7 @@
         `mysql:mysql-connector-java:5.1.6`
       }
       @@ Class.forName("com.mysql.jdbc.Driver")
-      @@ import scalikejdbc._, scalikejdbc._
+      @@ import scalikejdbc._
       @@ ConnectionPool.singleton("jdbc:mysql://localhost/database", "root", "")
       @@ implicit val session = AutoSession
 
