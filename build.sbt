@@ -1,6 +1,6 @@
 import scalatex.ScalatexReadme
 
-scalaVersion := "2.12.2"
+scalaVersion := "2.12.3"
 
 crossScalaVersions := Seq(
   "2.10.4", "2.10.5", "2.10.6", "2.11.3",
@@ -28,7 +28,7 @@ val macroSettings = Seq(
 
 val sharedSettings = Seq(
 
-  scalaVersion := "2.12.2",
+  scalaVersion := "2.12.3",
   organization := "com.lihaoyi",
   version := _root_.ammonite.Constants.version,
   libraryDependencies += "com.lihaoyi" %% "utest" % "0.4.5" % Test,
@@ -343,7 +343,7 @@ lazy val readme = ScalatexReadme(
   source = "Index"
 ).settings(
   dontPublishSettings,
-  scalaVersion := "2.12.2",
+  scalaVersion := "2.12.3",
   libraryDependencies += "com.lihaoyi" %% "fansi" % "0.2.3",
   (run in Compile) := (run in Compile).dependsOn(
     assembly in (amm, Test),
