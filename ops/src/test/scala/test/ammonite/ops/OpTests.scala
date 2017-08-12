@@ -42,6 +42,12 @@ object OpTests extends TestSuite{
         )
       )
     }
+    'lsRecPermissions{
+      if(Unix()){
+        ls.rec(root/'var/'run).nonEmpty
+        ls.rec(root/'var/'log).nonEmpty
+      }
+    }
     'readResource{
       'positive{
         'absolute{
