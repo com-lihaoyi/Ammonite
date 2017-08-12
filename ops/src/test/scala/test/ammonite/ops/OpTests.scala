@@ -44,7 +44,8 @@ object OpTests extends TestSuite{
     }
     'lsRecPermissions{
       if(Unix()){
-        ls.rec(root/'tmp).nonEmpty
+        ls.rec(root/'boot).nonEmpty
+        ls.rec(root/'var/'log).nonEmpty
       }
     }
     'readResource{
