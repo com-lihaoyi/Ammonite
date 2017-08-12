@@ -1423,3 +1423,7 @@
           can be accessed later:
           @hl.scala
             remote.product(1, List(2, 3, 4))
+        @li  
+          Fix for issue @issue(679) when running @code{ls.rec} on path including
+          inaccessible files would throw @hl.scala{java.nio.file.AccessDeniedException}
+          thanks to @lnk("Piotr Kwiecinski", "https://github.com/piotrkwiecinski")
