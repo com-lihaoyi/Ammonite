@@ -71,6 +71,7 @@ class Interpreter(val printer: Printer,
   def compilationCount = compilerManager.compilationCount
 
   val importHooks = Ref(Map[Seq[String], ImportHook](
+    Seq("url") -> ImportHook.URL,
     Seq("file") -> ImportHook.File,
     Seq("exec") -> ImportHook.Exec,
     Seq("ivy") -> ImportHook.Ivy,
