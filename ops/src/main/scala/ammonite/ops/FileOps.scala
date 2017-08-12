@@ -207,9 +207,13 @@ object ls extends StreamableOp1[Path, Path, LsSeq] with ImplicitOp[LsSeq]{
 
   object iter extends (Path => geny.Generator[Path]){
     def apply(arg: Path) = geny.Generator.selfClosing{
-      val dirStream = Files.newDirectoryStream(arg.toNIO)
-      import collection.JavaConverters._
-      (dirStream.iterator().asScala.map(Path(_)), () => dirStream.close())
+        try {
+          val dirStream = Files.newDirectoryStream(arg.toNIO)
+          import collection.JavaConverters._
+          (dirStream.iterator().asScala.map(Path(_)), () => dirStream.close())
+        } catch {
+          case _: AccessDeniedException => (Iterator[Path](), () => ())
+        }
     }
   }
 
