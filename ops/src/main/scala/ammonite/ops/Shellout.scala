@@ -11,12 +11,12 @@ import scala.language.dynamics
   * Internal utilities to support spawning subprocesses
   */
 object Shellout{
-  val % = new Command(Vector.empty, Map.empty, Shellout.executeInteractive)
-  val %% = new Command(Vector.empty, Map.empty, Shellout.executeStream)
+  val % = Command(Vector.empty, Map.empty, Shellout.executeInteractive)
+  val %% = Command(Vector.empty, Map.empty, Shellout.executeStream)
   def executeInteractive(wd: Path, cmd: Command[_]) = {
     val builder = new java.lang.ProcessBuilder()
-    import collection.JavaConversions._
-    builder.environment().putAll(cmd.envArgs)
+    import collection.JavaConverters._
+    builder.environment().putAll(cmd.envArgs.asJava)
     builder.directory(new java.io.File(wd.toString))
 
     val proc =
@@ -55,8 +55,8 @@ object Shellout{
 
   def executeStream(wd: Path, cmd: Command[_]) = {
     val builder = new java.lang.ProcessBuilder()
-    import collection.JavaConversions._
-    builder.environment().putAll(cmd.envArgs)
+    import collection.JavaConverters._
+    builder.environment().putAll(cmd.envArgs.asJava)
     builder.directory(new java.io.File(wd.toString))
     val process =
       builder
@@ -102,7 +102,7 @@ case class Command[T](cmd: Vector[String],
                       envArgs: Map[String, String],
                       execute: (Path, Command[_]) => T) extends Dynamic {
   def extend(cmd2: Traversable[String], envArgs2: Traversable[(String, String)]) =
-    new Command(cmd ++ cmd2, envArgs ++ envArgs2, execute)
+    Command(cmd ++ cmd2, envArgs ++ envArgs2, execute)
   def selectDynamic(name: String)(implicit wd: Path) = execute(wd, extend(Vector(name), Map()))
   def opArg(op: String) = if (op == "apply") Nil else Vector(op)
 

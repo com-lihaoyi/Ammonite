@@ -2,11 +2,7 @@ package ammonite.ops
 
 import java.io.InputStream
 
-
-
 import scala.io.Codec
-
-
 
 /**
   * A path that can be read from, either a [[Path]] or a [[ResourcePath]].
