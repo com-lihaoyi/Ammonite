@@ -6,12 +6,8 @@
  */
 package ammonite.ops
 
-import java.io.{File, InputStream, OutputStream}
-import java.nio.charset.Charset
+import java.io.File
 import java.nio.file._
-import java.util.Objects
-
-
 
 import scala.io.Codec
 
@@ -202,7 +198,7 @@ trait ImplicitOp[V] extends Function1[Path, V]{
   */
 object ls extends StreamableOp1[Path, Path, LsSeq] with ImplicitOp[LsSeq]{
   def materialize(src: Path, i: geny.Generator[Path]) =
-    new LsSeq(src, i.map(_ relativeTo src).toVector.sorted:_*)
+    LsSeq(src, i.map(_ relativeTo src).toVector.sorted:_*)
 
 
   object iter extends (Path => geny.Generator[Path]){

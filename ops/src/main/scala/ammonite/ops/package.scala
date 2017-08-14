@@ -91,7 +91,7 @@ package object ops extends Extensions with RelPathStuff{
     */
   object /{
     def unapply[T <: BasePath](p: T): Option[(p.ThisType, String)] = {
-      if (p.segments.length > 0)
+      if (p.segments.nonEmpty)
         Some((p / up, p.last))
       else None
     }

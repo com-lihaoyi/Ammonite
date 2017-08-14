@@ -1,13 +1,7 @@
 package ammonite.ops
 
-import java.io.InputStream
-import java.nio.charset.Charset
-
-
-
 import scala.io.Codec
 import scala.util.Try
-
 
 sealed trait PathConvertible[T]{
   def apply(t: T): java.nio.file.Path
@@ -23,7 +17,6 @@ object PathConvertible{
     def apply(t: java.nio.file.Path) = t
   }
 }
-
 
 /**
   * A path which is either an absolute [[Path]], a relative [[RelPath]],
@@ -118,8 +111,8 @@ object BasePath {
     }
   }
   def chunkify(s: java.nio.file.Path) = {
-    import collection.JavaConversions._
-    s.iterator().map(_.toString).filter(_ != ".").filter(_ != "").toVector
+    import collection.JavaConverters._
+    s.iterator().asScala.map(_.toString).filter(_ != ".").filter(_ != "").toVector
   }
 }
 
@@ -199,7 +192,6 @@ object RelPath extends RelPathStuff {
   def apply[T: PathConvertible](f0: T): RelPath = {
     val f = implicitly[PathConvertible[T]].apply(f0)
 
-    import collection.JavaConversions._
     require(!f.isAbsolute, f + " is not an relative path")
 
     val segments = BasePath.chunkify(f.normalize())
@@ -258,7 +250,6 @@ object Path {
   def apply[T: PathConvertible](f: T, base: Path): Path = apply(FilePath(f), base)
   def apply[T: PathConvertible](f0: T): Path = {
     val f = implicitly[PathConvertible[T]].apply(f0)
-    import collection.JavaConversions._
 
     val chunks = BasePath.chunkify(f)
     if (chunks.count(_ == "..") > chunks.size / 2) throw PathError.AbsolutePathOutsideRoot
@@ -321,10 +312,10 @@ extends FilePath with BasePathImpl with Readable{
   def toIO = toNIO.toFile
 
   override def getBytes = java.nio.file.Files.readAllBytes(toNIO)
-  import collection.JavaConversions._
+  import collection.JavaConverters._
 
   override def getLines(charSet: Codec) = {
-    java.nio.file.Files.readAllLines(toNIO, charSet.charSet).toVector
+    java.nio.file.Files.readAllLines(toNIO, charSet.charSet).asScala.toVector
   }
 }
 
@@ -348,7 +339,7 @@ case class ResourcePath private[ops](resRoot: ResourceRoot, segments: Vector[Str
 
   protected[ops] def getInputStream = {
     resRoot.getResourceAsStream(segments.mkString("/")) match{
-      case null => throw new ResourceNotFoundException(this)
+      case null => throw ResourceNotFoundException(this)
       case stream => stream
     }
   }
@@ -377,14 +368,11 @@ case class ResourcePath private[ops](resRoot: ResourceRoot, segments: Vector[Str
 
 }
 
-
 /**
   * Thrown when you try to read from a resource that doesn't exist.
   * @param path
   */
 case class ResourceNotFoundException(path: ResourcePath) extends Exception(path.toString)
-
-
 
 object PathError{
   type IAE = IllegalArgumentException

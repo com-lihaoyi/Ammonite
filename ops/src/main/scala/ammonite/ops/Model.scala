@@ -49,13 +49,13 @@ object stat extends Function1[ops.Path, ops.stat]{
     )).toOption
   )
   def make(name: String, attrs: BasicFileAttributes, posixAttrs: Option[PosixFileAttributes]) = {
-    import collection.JavaConversions._
+    import collection.JavaConverters._
     new stat(
       name,
       attrs.size(),
       attrs.lastModifiedTime(),
-      posixAttrs.map(_.owner).getOrElse(null),
-      posixAttrs.map(a => new PermSet(a.permissions.toSet)).getOrElse(null),
+      posixAttrs.map(_.owner).orNull,
+      posixAttrs.map(a => new PermSet(a.permissions.asScala.toSet)).orNull,
       if (attrs.isRegularFile) FileType.File
       else if (attrs.isDirectory) FileType.Dir
       else if (attrs.isSymbolicLink) FileType.SymLink
@@ -78,16 +78,16 @@ object stat extends Function1[ops.Path, ops.stat]{
       )).toOption
     )
     def make(name: String, attrs: BasicFileAttributes, posixAttrs: Option[PosixFileAttributes]) = {
-      import collection.JavaConversions._
+      import collection.JavaConverters._
       new full(
         name,
         attrs.size(),
         attrs.lastModifiedTime(),
         attrs.lastAccessTime(),
         attrs.creationTime(),
-        posixAttrs.map(_.group()).getOrElse(null),
-        posixAttrs.map(_.owner()).getOrElse(null),
-        posixAttrs.map(a => new PermSet(a.permissions.toSet)).getOrElse(null),
+        posixAttrs.map(_.group()).orNull,
+        posixAttrs.map(_.owner()).orNull,
+        posixAttrs.map(a => new PermSet(a.permissions.asScala.toSet)).orNull,
         if (attrs.isRegularFile) FileType.File
         else if (attrs.isDirectory) FileType.Dir
         else if (attrs.isSymbolicLink) FileType.SymLink
