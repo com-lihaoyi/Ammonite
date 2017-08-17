@@ -260,8 +260,8 @@ lazy val ammRepl = project
     crossVersion := CrossVersion.full,
     name := "ammonite-repl",
     libraryDependencies ++= Seq(
-      "jline" % "jline" % "2.14.5",
-      "com.github.javaparser" % "javaparser-core" % "3.3.0"
+      "jline" % "jline" % "2.14.3",
+      "com.github.javaparser" % "javaparser-core" % "3.2.6"
     ),
     unmanagedSourceDirectories in Compile ++= {
       if (Set("2.12", "2.11").contains(scalaBinaryVersion.value))
