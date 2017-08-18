@@ -32,6 +32,30 @@ object ParserTests extends TestSuite{
           |
           |println("Hello") """.stripMargin
       )
+      "nix-shell" - check(
+        """#! /usr/bin/env nix-shell
+          |#! nix-shell -i amm -p ammonite-repl
+          |
+          |println("Hello") """.stripMargin,
+        """
+          |
+          |
+          |println("Hello") """.stripMargin
+      )
+      "nix-shell-endshebang" - check(
+        """#! /usr/bin/env nix-shell
+          |#! nix-shell -i amm -p ammonite-repl
+          |
+          |!#
+          |
+          |println("Hello") """.stripMargin,
+        """
+          |
+          |
+          |
+          |
+          |println("Hello") """.stripMargin
+      )
     }
 
     // Sanity check the logic that runs when you press ENTER in the REPL and

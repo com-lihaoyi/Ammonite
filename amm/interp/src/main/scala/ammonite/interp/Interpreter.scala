@@ -689,10 +689,22 @@ object Interpreter{
     bytes.map("%02x".format(_)).mkString
   }
 
-  def skipSheBangLine(code: String)= {
-    if (code.startsWith(SheBang)) {
+  def skipSheBangLine(code: String) = {
+    val newLineLength = newLine.length
+    /**
+      * the skipMultipleLines function is necessary to support the parsing of
+      * multiple shebang lines. The NixOs nix-shell normally uses 2+ shebang lines.
+      */
+    def skipMultipleLines(ind: Int = 0): Int = {
+      val index = code.indexOf('\n', ind)
+      if (code.substring(index + 1).startsWith(SheBang))
+        skipMultipleLines(ind + index + 1)
+      else index - (newLineLength - 1)
+    }
+
+    if (code.startsWith(SheBang)) {  
       val matcher = SheBangEndPattern matcher code
-      val shebangEnd = if (matcher.find) matcher.end else code.indexOf(newLine)
+      val shebangEnd = if (matcher.find) matcher.end else skipMultipleLines()
       val numberOfStrippedLines = newLine.r.findAllMatchIn( code.substring(0, shebangEnd) ).length
       (newLine * numberOfStrippedLines) + code.substring(shebangEnd)
     } else
