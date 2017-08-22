@@ -30,6 +30,9 @@ class RemoteLogger(sessionId: Long) {
           case None => done = true
           case Some(msg) =>
             yolo{
+              // Add some delays to the logging loop to cap the number of
+              // requests a single process can send up.
+              Thread.sleep(10000)
               scalaj.http.Http("https://www.google-analytics.com/collect")
                 .postForm(Seq(
                   "v" -> "1",
