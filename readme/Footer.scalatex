@@ -114,6 +114,26 @@
 
 
   @sect{Changelog}
+    @sect{1.0.2}
+      @ul
+        @li
+          There was an undocumented feature of magic importing URLs in Ammonite
+          REPL 0.8.x. The feauture was removed in Ammonite REPL 0.9.x and 1.0.0.
+          Now it's back, experimentally:
+          @hl.scala
+            import $url.{`https://raw.githubusercontent.com/lihaoyi/Ammonite/master/amm/src/test/resources/scripts/Annotation.sc` => remote}
+          The content at the URL will be wrapped into the @hl.scala{remote} object, which
+          can be accessed later:
+          @hl.scala
+            remote.product(1, List(2, 3, 4))
+
+          Note that this functionality is experimental and may be subject to
+          change or removal in future.
+
+        @li
+          Fix for issue @issue(679) when running @code{ls.rec} on path including
+          inaccessible files would throw @hl.scala{java.nio.file.AccessDeniedException}
+          thanks to @lnk("Piotr Kwiecinski", "https://github.com/piotrkwiecinski")
     @sect{1.0.1}
       @ul
         @li
@@ -1413,17 +1433,4 @@
 
     @sect{Unstable Changelog}
       @ul
-        @li
-          There was an undocumented feature of magic importing URLs in Ammonite
-          REPL 0.8.x. The feauture was removed in Ammonite REPL 0.9.x and 1.0.0.
-          Now it's back.
-          @hl.scala
-            import $url.{`https://raw.githubusercontent.com/lihaoyi/Ammonite/master/amm/src/test/resources/scripts/Annotation.sc` => remote}
-          The content at the URL will be wrapped into the @hl.scala{remote} object, which
-          can be accessed later:
-          @hl.scala
-            remote.product(1, List(2, 3, 4))
-        @li  
-          Fix for issue @issue(679) when running @code{ls.rec} on path including
-          inaccessible files would throw @hl.scala{java.nio.file.AccessDeniedException}
-          thanks to @lnk("Piotr Kwiecinski", "https://github.com/piotrkwiecinski")
+
