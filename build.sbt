@@ -171,7 +171,7 @@ lazy val amm = project
     test in assembly := {},
     name := "ammonite",
     libraryDependencies ++= Seq(
-      "com.github.scopt" %% "scopt" % "3.5.0"
+      "com.github.scopt" %% "scopt" % "3.6.0"
     ),
     libraryDependencies ++= (
       if (scalaVersion.value startsWith "2.10.") Nil
@@ -219,8 +219,8 @@ lazy val ammRuntime = project
 
     name := "ammonite-runtime",
     libraryDependencies ++= Seq(
-      "io.get-coursier" %% "coursier" % "1.0.0-RC8",
-      "io.get-coursier" %% "coursier-cache" % "1.0.0-RC8",
+      "io.get-coursier" %% "coursier" % "1.0.0-RC9",
+      "io.get-coursier" %% "coursier-cache" % "1.0.0-RC9",
       "org.scalaj" %% "scalaj-http" % "2.3.0"
     )
   )
@@ -261,7 +261,7 @@ lazy val ammRepl = project
     name := "ammonite-repl",
     libraryDependencies ++= Seq(
       "jline" % "jline" % "2.14.3",
-      "com.github.javaparser" % "javaparser-core" % "3.2.5"
+      "com.github.javaparser" % "javaparser-core" % "3.2.6"
     ),
     unmanagedSourceDirectories in Compile ++= {
       if (Set("2.12", "2.11").contains(scalaBinaryVersion.value))
@@ -327,12 +327,12 @@ lazy val sshd = project
       libraryDependencies ++= Seq(
         // sshd-core 1.3.0 requires java8
         "org.apache.sshd" % "sshd-core" % "1.2.0",
-        "org.bouncycastle" % "bcprov-jdk15on" % "1.56",
+        "org.bouncycastle" % "bcprov-jdk15on" % "1.57",
         //-- test --//
         // slf4j-nop makes sshd server use logger that writes into the void
         "org.slf4j" % "slf4j-nop" % "1.7.12" % Test,
         "com.jcraft" % "jsch" % "0.1.54" % Test,
-        "org.scalacheck" %% "scalacheck" % "1.12.6" % Test
+        "org.scalacheck" %% "scalacheck" % "1.13.5" % Test
       )
   )
 
