@@ -326,7 +326,9 @@
         ...
   
       @p
-        In short, @hl.scala{%} lets you run a command as you would in bash, and dumps the output to standard-out in a similar way, returning the return-code. This lets you run @code{git} commands, edit files via @code{vim}, open @code{ssh} sessions or even start @code{SBT} or @code{Python} shells right from your Scala REPL!
+        In short, @hl.scala{%} lets you run a command as you would in bash, and dumps the output to standard-out in a similar way, returning the zero return-code upon successful command completion. This lets you run @code{git} commands, edit files via @code{vim}, open @code{ssh} sessions or even start @code{SBT} or @code{Python} shells right from your Scala REPL!
+      @p
+        @hl.scala{%} throws an @hl.scala{InteractiveShelloutException} if the return-code is non-zero.
       @p
         @hl.scala{%%} on the other hand is intended for programmatic usage: rather than printing to stdout, it returns a @hl.scala{CommandResult}, which contains the standard output @hl.scala{.out} and standard error @hl.scala{.err} of the subprocess. These provide helper methods to retrieve the stdout or stderr as a list of lines
   
