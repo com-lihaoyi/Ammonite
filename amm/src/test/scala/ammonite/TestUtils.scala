@@ -14,10 +14,11 @@ object TestUtils {
 
   def createTestInterp(storage: Storage, predef: String = "") = {
     val startFrame = Frame.createInitial()
+    val printStream = new PrintStream(System.out)
     val interp = new Interpreter(
 
       printer = Printer(
-        new PrintStream(System.out), new PrintStream(System.err),
+        printStream, new PrintStream(System.err), printStream,
         println, println, println
       ),
       storage = storage,
