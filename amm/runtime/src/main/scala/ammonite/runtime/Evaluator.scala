@@ -106,7 +106,7 @@ object Evaluator{
         // block, so any exceptions thrown get properly caught and handled
         val iter = evalMain(cls, contextClassLoader).asInstanceOf[Iterator[String]]
 
-        if (!silent) evaluatorRunPrinter(iter.foreach(printer.outStream.print))
+        if (!silent) evaluatorRunPrinter(iter.foreach(printer.resultStream.print))
         else evaluatorRunPrinter(iter.foreach(_ => ()))
 
         // "" Empty string as cache tag of repl code

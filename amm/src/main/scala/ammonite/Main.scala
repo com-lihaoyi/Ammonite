@@ -125,7 +125,7 @@ case class Main(predefCode: String = "",
     loadedPredefFile.right.flatMap { predefFileInfoOpt =>
       val augmentedPredef = Main.maybeDefaultPredef(defaultPredef, Defaults.predefString)
 
-      val (colorsRef, _, _, printer) = Interpreter.initPrinters(
+      val (colorsRef, printer) = Interpreter.initPrinters(
         colors,
         outputStream,
         errorStream,

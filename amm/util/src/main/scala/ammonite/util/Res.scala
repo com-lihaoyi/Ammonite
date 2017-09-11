@@ -14,6 +14,11 @@ sealed abstract class Res[+T]{
   def map[V](f: T => V): Res[V]
   def filter(f: T => Boolean): Res[T] = this
   def withFilter(f: T => Boolean): Res[T] = filter(f)
+
+  final def isSuccess: Boolean = this match {
+    case _: Res.Success[T] => true
+    case _ => false
+  }
 }
 
 

@@ -730,11 +730,12 @@ object Interpreter{
     val printer = Printer(
       printStream,
       errorPrintStream,
+      printStream,
       printlnWithColor(errorPrintStream, colors().warning(), _),
       printlnWithColor(errorPrintStream, colors().error(), _),
       s => if (verboseOutput) printlnWithColor(errorPrintStream, colors().info(), s)
     )
-    (colors, printStream, errorPrintStream, printer)
+    (colors, printer)
   }
 
 }

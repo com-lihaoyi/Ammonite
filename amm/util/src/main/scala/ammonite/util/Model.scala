@@ -252,6 +252,7 @@ object Bind{
   *
   * @param outStream Direct access to print to stdout
   * @param errStream Direct access to print to stderr
+  * @param resultStream Direct access to print the result of the entered code
   * @param warning How you want it to print a compile warning
   * @param error How you want it to print a compile error
   * @param info How you want to print compile info logging. *Not* the same
@@ -259,6 +260,7 @@ object Bind{
   */
 case class Printer(outStream: PrintStream,
                    errStream: PrintStream,
+                   resultStream: PrintStream,
                    warning: String => Unit,
                    error: String => Unit,
                    info: String => Unit)
