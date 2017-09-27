@@ -86,6 +86,7 @@ matrix:
     scala: 2.11.11
 
 script:
+- unset _JAVA_OPTIONS
 - export PATH=~/bin/amm:$PATH
 - mkdir -p ~/bin
 # We use 2.11 since we need to run tests on Java 7
