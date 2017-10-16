@@ -1,8 +1,9 @@
 @import Main._
 @import readme.Sample._
 @import ammonite.ops._
-@val ammoniteTests = 'amm/'src/'test/'scala/'ammonite/'session
+@val ammoniteTests = 'amm/'repl/'src/'test/'scala/'ammonite/'session
 @val advancedTests = ammoniteTests/"AdvancedTests.scala"
+@val scriptTests = 'amm/'src/'test/'scala/'ammonite/'session/"ScriptTests.scala"
 @val srcSbtConfig = """
 // Optional, required for the `source` command to work
 (fullClasspath in Test) ++= {
@@ -491,7 +492,7 @@
           using the @hl.scala{interp.load.ivy(deps: coursier.Dependency*)}
           function and configure each @code{Dependency} to your heart's content:
 
-        @hl.ref(ammoniteTests/"ScriptTests.scala", Seq("loadIvyAdvanced", "@"), "\"\"\"")
+        @hl.ref(scriptTests, Seq("loadIvyAdvanced", "@"), "\"\"\"")
 
     @sect{Builtins}
       @p
