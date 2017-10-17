@@ -128,11 +128,8 @@ lazy val amm = project
         Seq()
     },
 
-    // Aggregate source jars into both the amm/test:run as well as the assembly
-    // classpaths, so that the `source` macro can find their sources and
-    // highlight/display them.
-
-    // This includes them in `amm/test:assembly
+    // Aggregate source jars into the assembly classpath, so that the
+    // `source` macro can find their sources and highlight/display them.
     (fullClasspath in Runtime) ++= {
       (updateClassifiers in Runtime).value
         .configurations
@@ -266,7 +263,8 @@ lazy val ammRepl = project
         Seq()
     },
 
-    // This includes them in the `amm/test:run` command
+    // Aggregate source jars into the amm/test:run classpath, so that the
+    // `source` macro can find their sources and highlight/display them.
     (fullClasspath in Test) ++= {
       (updateClassifiers in Test).value
         .configurations
