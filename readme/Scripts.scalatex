@@ -1,9 +1,10 @@
 @import Main._
 @import readme.Sample._
 @import ammonite.ops._
-@val ammoniteTests = 'amm/'src/'test/'scala/'ammonite/'session
+@val ammoniteTests = 'amm/'repl/'src/'test/'scala/'ammonite/'session
 @val replSource = 'amm/'src/'main/'scala/'ammonite
 @val advancedTests = ammoniteTests/"AdvancedTests.scala"
+@val scriptTests = 'amm/'src/'test/'scala/'ammonite/'session/"ScriptTests.scala"
 @sect("Scala Scripts", "Lightweight Programming in Scala")
 
 
@@ -168,7 +169,7 @@
           using the @hl.scala{interp.load.ivy(deps: coursier.Dependency*)}
           function.
 
-        @hl.ref(ammoniteTests/"ScriptTests.scala", Seq("loadIvyAdvanced", "@"), "\"\"\"")
+        @hl.ref(scriptTests, Seq("loadIvyAdvanced", "@"), "\"\"\"")
 
         @p
           Note that to use this function, your script needs to be a

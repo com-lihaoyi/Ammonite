@@ -115,7 +115,7 @@ lazy val terminal = project
 lazy val amm = project
   .dependsOn(
     terminal, ops,
-    ammUtil, ammRuntime, ammInterp, ammRepl
+    ammUtil, ammRuntime, ammInterp, ammRepl % "compile->compile;test->test"
   )
   .settings(
     macroSettings,
@@ -128,22 +128,8 @@ lazy val amm = project
         Seq()
     },
 
-    // Aggregate source jars into both the amm/test:run as well as the assembly
-    // classpaths, so that the `source` macro can find their sources and
-    // highlight/display them.
-
-    // This includes them in the `amm/test:run` command
-    (fullClasspath in Test) ++= {
-      (updateClassifiers in Test).value
-        .configurations
-        .find(_.configuration == Test.name)
-        .get
-        .modules
-        .flatMap(_.artifacts)
-        .collect{case (a, f) if a.classifier == Some("sources") => f}
-    },
-
-    // This includes them in `amm/test:assembly
+    // Aggregate source jars into the assembly classpath, so that the
+    // `source` macro can find their sources and highlight/display them.
     (fullClasspath in Runtime) ++= {
       (updateClassifiers in Runtime).value
         .configurations
@@ -261,7 +247,8 @@ lazy val ammRepl = project
     name := "ammonite-repl",
     libraryDependencies ++= Seq(
       "jline" % "jline" % "2.14.3",
-      "com.github.javaparser" % "javaparser-core" % "3.2.5"
+      "com.github.javaparser" % "javaparser-core" % "3.2.5",
+      "com.github.scopt" %% "scopt" % "3.5.0" % Test
     ),
     unmanagedSourceDirectories in Compile ++= {
       if (Set("2.12", "2.11").contains(scalaBinaryVersion.value))
@@ -274,6 +261,18 @@ lazy val ammRepl = project
         Seq(baseDirectory.value / "src" / "main" / "scala-2.10_2.11")
       else
         Seq()
+    },
+
+    // Aggregate source jars into the amm/test:run classpath, so that the
+    // `source` macro can find their sources and highlight/display them.
+    (fullClasspath in Test) ++= {
+      (updateClassifiers in Test).value
+        .configurations
+        .find(_.configuration == Test.name)
+        .get
+        .modules
+        .flatMap(_.artifacts)
+        .collect{case (a, f) if a.classifier == Some("sources") => f}
     }
   )
 
