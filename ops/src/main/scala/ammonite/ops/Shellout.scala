@@ -120,9 +120,11 @@ case class Command[T](cmd: Vector[String],
   def applyDynamicNamed(op: String)
                        (args: (String, Shellable)*)
                        (implicit wd: Path): T = {
-    val (namedArgs, posArgs) = args.map{case (k, v) => (k, v.s)}.partition(_._1 != "")
+    val (namedArgs, posArgs) = args.map{
+      case (k, v) => (k, if (v == null) null else v.s)
+    }.partition(_._1 != "")
     execute(wd, this.extend(opArg(op) ++ posArgs.flatMap(_._2),
-      namedArgs.map{case (k, v) => (k, v.head)}))
+      namedArgs.map{case (k, v) => (k, if (v == null) null else v.head)}))
   }
 }
 

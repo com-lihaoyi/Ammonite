@@ -17,7 +17,7 @@ matrix:
   - stage: build
     env: CI_SCRIPT="ci/build.sc test published/test"
     jdk: oraclejdk8
-    scala: 2.12.3
+    scala: 2.12.4
 
   - stage: build
     env: CI_SCRIPT="ci/build.sc test published/test"
@@ -32,7 +32,7 @@ matrix:
   - stage: build
     env: CI_SCRIPT="ci/build.sc test integration/test"
     jdk: oraclejdk8
-    scala: 2.12.3
+    scala: 2.12.4
 
   - stage: build
     env: CI_SCRIPT="ci/build.sc test integration/test"
