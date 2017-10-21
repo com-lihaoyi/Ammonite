@@ -8,7 +8,7 @@ import ammonite.repl._
 import ammonite.runtime.{Frame, History, Storage}
 import ammonite.util.Util.normalizeNewlines
 import ammonite.util._
-import utest.asserts._
+import utest._
 
 import scala.collection.mutable
 

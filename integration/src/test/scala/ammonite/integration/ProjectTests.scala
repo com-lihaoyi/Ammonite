@@ -17,7 +17,6 @@ import utest._
  * they call the REPL programmatically
  */
 object ProjectTests extends TestSuite{
-  override def utestTruncateLength = 60000
 
   val tests = TestSuite {
     println("Running ProjectTest")

@@ -11,8 +11,6 @@ import utest._
  */
 object MainTests extends TestSuite{
   def exec(p: RelPath, args: String*) = new InProcessMainMethodRunner('mains/p, Nil, args)
-  override def utestTruncateLength = 60000
-
 
   def stripInvisibleMargin(s: String) = {
     val lines = s.lines.toArray

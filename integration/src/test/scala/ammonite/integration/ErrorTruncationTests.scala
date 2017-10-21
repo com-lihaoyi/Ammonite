@@ -12,7 +12,6 @@ import utest._
   * and just show what the user did wrong
  */
 object ErrorTruncationTests extends TestSuite{
-  override def utestTruncateLength = 60000
 
   def checkErrorMessage(file: RelPath, expected: String) = {
     val e = fansi.Str(

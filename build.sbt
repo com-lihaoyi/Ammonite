@@ -1,6 +1,6 @@
 import scalatex.ScalatexReadme
 
-scalaVersion := "2.12.3"
+scalaVersion := "2.12.4"
 
 crossScalaVersions := Seq(
   "2.10.4", "2.10.5", "2.10.6", "2.11.3",
@@ -28,10 +28,10 @@ val macroSettings = Seq(
 
 val sharedSettings = Seq(
 
-  scalaVersion := "2.12.3",
+  scalaVersion := "2.12.4",
   organization := "com.lihaoyi",
   version := _root_.ammonite.Constants.version,
-  libraryDependencies += "com.lihaoyi" %% "utest" % "0.4.5" % Test,
+  libraryDependencies += "com.lihaoyi" %% "utest" % "0.5.1" % Test,
   // Needed for acyclic to work...
   libraryDependencies ++= {
     if (!scalaVersion.value.startsWith("2.10.")) Nil
@@ -238,7 +238,7 @@ lazy val ammInterp = project
     libraryDependencies ++= Seq(
       "org.scala-lang" % "scala-compiler" % scalaVersion.value,
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
-      "com.lihaoyi" %% "scalaparse" % "0.4.3",
+      "com.lihaoyi" %% "scalaparse" % "1.0.0",
       "org.javassist" % "javassist" % "3.21.0-GA"
 
     ),

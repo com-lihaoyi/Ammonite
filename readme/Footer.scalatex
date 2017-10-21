@@ -114,6 +114,14 @@
 
 
   @sect{Changelog}
+    @sect{1.0.3}
+      @ul
+        @li
+          Refactor @code{ammonite-repl} module to be properly usable without
+          the main @code{ammonite} package, thanks to
+          @lnk("Alex Archambault", "https://github.com/alexarchambault")
+        @li
+          Cross-publish for Scala 2.12.4
     @sect{1.0.2}
       @ul
         @li

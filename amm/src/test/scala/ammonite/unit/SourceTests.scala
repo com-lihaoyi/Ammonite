@@ -11,7 +11,6 @@ import fastparse.utils.{ElemSetHelper, Generator, IndexedParserInput}
 
 import scala.tools.nsc.interpreter.InputStream
 object SourceTests extends TestSuite{
-  override def utestTruncateLength = 500000
   val tests = TestSuite{
 
     def check(loaded: Location, expectedFileName: String, expected: String, slop: Int = 10) = {
