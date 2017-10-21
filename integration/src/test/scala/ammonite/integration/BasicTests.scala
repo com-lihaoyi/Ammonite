@@ -48,7 +48,7 @@ object BasicTests extends TestSuite{
           "-s",
           scriptAddr,
           // Somehow this is being set of travis and causing weird errors/warnings
-          _JAVA_OPTIONS=""
+          _JAVA_OPTIONS = null
         )
         assert(evaled.out.trim == "Script Worked!!" && evaled.err.string.isEmpty)
       }

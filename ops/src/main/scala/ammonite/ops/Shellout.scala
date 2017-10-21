@@ -16,7 +16,10 @@ object Shellout{
   def executeInteractive(wd: Path, cmd: Command[_]) = {
     val builder = new java.lang.ProcessBuilder()
     import collection.JavaConverters._
-    builder.environment().putAll(cmd.envArgs.asJava)
+    for ((k, v) <- cmd.envArgs){
+      if (v != null) builder.environment().put(k, v)
+      else builder.environment().remove(k)
+    }
     builder.directory(new java.io.File(wd.toString))
 
     val proc =
@@ -56,7 +59,11 @@ object Shellout{
   def executeStream(wd: Path, cmd: Command[_]) = {
     val builder = new java.lang.ProcessBuilder()
     import collection.JavaConverters._
-    builder.environment().putAll(cmd.envArgs.asJava)
+    for ((k, v) <- cmd.envArgs){
+      if (v != null) builder.environment().put(k, v)
+      else builder.environment().remove(k)
+    }
+
     builder.directory(new java.io.File(wd.toString))
     val process =
       builder
