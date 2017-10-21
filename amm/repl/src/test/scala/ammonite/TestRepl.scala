@@ -30,14 +30,17 @@ class TestRepl {
 
   val outBytes = new ByteArrayOutputStream
   val errBytes = new ByteArrayOutputStream
+  val resBytes = new ByteArrayOutputStream
   def outString = new String(outBytes.toByteArray)
+  def resString = new String(resBytes.toByteArray)
 
   val warningBuffer = mutable.Buffer.empty[String]
   val errorBuffer = mutable.Buffer.empty[String]
   val infoBuffer = mutable.Buffer.empty[String]
-  val printer = Printer(
+  val printer0 = Printer(
     new PrintStream(outBytes),
     new PrintStream(errBytes),
+    new PrintStream(resBytes),
     x => warningBuffer.append(x + Util.newLine),
     x => errorBuffer.append(x + Util.newLine),
     x => infoBuffer.append(x + Util.newLine)
@@ -49,7 +52,7 @@ class TestRepl {
   var currentLine = 0
   val interp: Interpreter = try {
     new Interpreter(
-      printer,
+      printer0,
       storage = storage,
       wd = ammonite.ops.pwd,
       basePredefs = Seq(
@@ -67,7 +70,7 @@ class TestRepl {
         "repl",
         new ReplApiImpl {
           def replArgs0 = Vector.empty[Bind[_]]
-          def printer = ???
+          def printer = printer0
 
           def sess = sess0
           val prompt = Ref("@")
@@ -107,6 +110,7 @@ class TestRepl {
   }catch{ case e: Throwable =>
     println(infoBuffer.mkString)
     println(outString)
+    println(resString)
     println(warningBuffer.mkString)
     println(errorBuffer.mkString)
     throw e
@@ -150,8 +154,10 @@ class TestRepl {
       val expected = resultLines.mkString(Util.newLine).trim
       allOutput += commandText.map(Util.newLine + "@ " + _).mkString(Util.newLine)
 
-      val (processed, out, warning, error, info) =
+      val (processed, out, res, warning, error, info) =
         run(commandText.mkString(Util.newLine), currentLine)
+
+      val allOut = out + res
 
       Repl.handleOutput(interp, processed)
 
@@ -176,6 +182,7 @@ class TestRepl {
               identity(error)
               identity(warning)
               identity(out)
+              identity(res)
               identity(info)
               false
             }
@@ -195,7 +202,7 @@ class TestRepl {
                 identity(error)
                 identity(warning)
                 identity(info)
-                normalize(out) == normalize(expected)
+                normalize(allOut) == normalize(expected)
               }
             )
 
@@ -204,6 +211,7 @@ class TestRepl {
               identity(error)
               identity(warning)
               identity(out)
+              identity(res)
               identity(info)
               identity(expected)
               false
@@ -214,7 +222,7 @@ class TestRepl {
             ) + Util.newLine +  failureMsg
             assert({identity(trace); identity(expected); false})
           case _ => throw new Exception(
-            s"Printed $out does not match what was expected: $expected"
+            s"Printed $allOut does not match what was expected: $expected"
           )
         }
       }
@@ -226,6 +234,7 @@ class TestRepl {
   def run(input: String, index: Int) = {
 
     outBytes.reset()
+    resBytes.reset()
     warningBuffer.clear()
     errorBuffer.clear()
     infoBuffer.clear()
@@ -238,9 +247,9 @@ class TestRepl {
       () => currentLine += 1
     )
     processed match{
-      case Res.Failure(s) => printer.error(s)
+      case Res.Failure(s) => printer0.error(s)
       case Res.Exception(throwable, msg) =>
-        printer.error(
+        printer0.error(
           Repl.showException(throwable, fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty)
         )
 
@@ -250,6 +259,7 @@ class TestRepl {
     (
       processed,
       outString,
+      resString,
       warningBuffer.mkString,
       errorBuffer.mkString,
       infoBuffer.mkString
@@ -259,7 +269,7 @@ class TestRepl {
 
   def fail(input: String,
            failureCheck: String => Boolean = _ => true) = {
-    val (processed, out, warning, error, info) = run(input, 0)
+    val (processed, out, _, warning, error, info) = run(input, 0)
 
     processed match{
       case Res.Success(v) => assert({identity(v); identity(allOutput); false})
@@ -276,7 +286,7 @@ class TestRepl {
 
 
   def result(input: String, expected: Res[Evaluated]) = {
-    val (processed, allOut, warning, error, info) = run(input, 0)
+    val (processed, allOut, _, warning, error, info) = run(input, 0)
     assert(processed == expected)
   }
   def failLoudly[T](t: => T) =

@@ -1,6 +1,6 @@
 package ammonite.session
 
-import ammonite.{TestRepl, main}
+import ammonite.{TestRepl, Main, main}
 import ammonite.TestUtils._
 import ammonite.main.{Defaults, Scripts}
 import ammonite.ops._
@@ -267,7 +267,7 @@ object ScriptTests extends TestSuite{
           val storage = new Storage.Folder(tmp.dir(prefix = "ammonite-tester"))
           val interp2 = createTestInterp(
             storage,
-            Defaults.predefString
+            Defaults.predefString + Main.extraPredefString
           )
 
           val Res.Failure(msg) =

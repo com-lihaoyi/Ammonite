@@ -85,7 +85,7 @@ case class Main(predefCode: String = "",
     loadedPredefFile.right.map{ predefFileInfoOpt =>
       val augmentedPredef = Main.maybeDefaultPredef(
         defaultPredef,
-        Defaults.replPredef + Defaults.predefString
+        Defaults.replPredef + Defaults.predefString + Main.extraPredefString
       )
 
       val argString = replArgs.zipWithIndex.map{ case (b, idx) =>
@@ -123,9 +123,12 @@ case class Main(predefCode: String = "",
 
   def instantiateInterpreter() = {
     loadedPredefFile.right.flatMap { predefFileInfoOpt =>
-      val augmentedPredef = Main.maybeDefaultPredef(defaultPredef, Defaults.predefString)
+      val augmentedPredef = Main.maybeDefaultPredef(
+        defaultPredef,
+        Defaults.predefString + Main.extraPredefString
+      )
 
-      val (colorsRef, _, _, printer) = Interpreter.initPrinters(
+      val (colorsRef, printer) = Interpreter.initPrinters(
         colors,
         outputStream,
         errorStream,
@@ -306,6 +309,11 @@ object Main{
     * https://stackoverflow.com/a/1403817/871202
     */
   def isInteractive() = System.console() != null
+
+  val extraPredefString = s"""
+    |import ammonite.main.Router.{doc, main}
+    |import ammonite.main.Scripts.pathScoptRead
+    |""".stripMargin
 
 }
 

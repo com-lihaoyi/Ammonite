@@ -31,7 +31,7 @@ class Repl(input: InputStream,
 
   var history = new History(Vector())
 
-  val (colors, printStream, errorPrintStream, printer) =
+  val (colors, printer) =
     Interpreter.initPrinters(initialColors, output, error, true)
 
   val argString = replArgs.zipWithIndex.map{ case (b, idx) =>
@@ -160,14 +160,14 @@ class Repl(input: InputStream,
     }
     out <- interp.processLine(code, stmts, currentLine, false, () => currentLine += 1)
   } yield {
-    printStream.println()
+    printer.outStream.println()
     out
   }
 
 
 
   def run(): Any = {
-    welcomeBanner.foreach(printStream.println)
+    welcomeBanner.foreach(printer.outStream.println)
     @tailrec def loop(): Any = {
       val actionResult = action()
       remoteLogger.foreach(_.apply("Action"))

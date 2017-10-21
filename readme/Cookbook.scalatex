@@ -1,7 +1,7 @@
 @import Main._
 @import readme.Sample._
 @import ammonite.ops._
-@val ammoniteTests = 'amm/'src/'test/'scala/'ammonite/'session
+@val ammoniteTests = 'amm/'repl/'src/'test/'scala/'ammonite/'session
 @val replSource = 'amm/'src/'main/'scala/'ammonite
 @val advancedTests = ammoniteTests/"AdvancedTests.scala"
 @sect("Ammonite Cookbook", "Fun with Scala-Scripting!")

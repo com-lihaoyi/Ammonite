@@ -14,7 +14,7 @@ package ammonite.main
   */
 private[ammonite] object ProxyFromEnv {
   private lazy val KeyPattern ="""([\w\d]+)_proxy""".r
-  private lazy val UrlPattern ="""([\w\d]+://)?(.+@)?([\w\d\.]+):(\d+)/?""".r
+  private lazy val UrlPattern ="""([\w\d]+://)?(.+@)?([\w\d\.\-]+):(\d+)/?""".r
 
   /**
     * Get current proxy environment variables.
