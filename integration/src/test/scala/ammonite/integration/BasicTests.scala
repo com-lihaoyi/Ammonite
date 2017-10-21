@@ -46,7 +46,9 @@ object BasicTests extends TestSuite{
         val evaled = %%bash(
           executable,
           "-s",
-          scriptAddr
+          scriptAddr,
+          // Somehow this is being set of travis and causing weird errors/warnings
+          _JAVA_OPTIONS=""
         )
         assert(evaled.out.trim == "Script Worked!!" && evaled.err.string.isEmpty)
       }
