@@ -289,6 +289,23 @@ object ProjectTests extends TestSuite{
       )
     }
 
+    'jadb {
+      // tests for jitpack and optional dependencies
+      check.session(
+        """
+        @ interp.repositories() ++= Seq(
+        @     coursier.maven.MavenRepository("https://jitpack.io")
+        @ )
+
+        @ import $ivy.`com.github.vidstige:jadb:v1.0.1`
+        import $ivy.$
+
+        @ import se.vidstige.jadb.JadbConnection
+        import se.vidstige.jadb.JadbConnection
+        """
+      )
+    }
+
   }
 }
 
