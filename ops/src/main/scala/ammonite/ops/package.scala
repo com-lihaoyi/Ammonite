@@ -118,4 +118,8 @@ package object ops extends Extensions with RelPathStuff{
     * `%%('git, 'commit, "-am", "Hello!").exitCode`
     */
   val %% = Shellout.%%
+
+
+  val %%% = Shellout.%%%
+
 }

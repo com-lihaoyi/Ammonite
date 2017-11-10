@@ -3,6 +3,8 @@ package test.ammonite.ops
 import ammonite.ops._
 import utest._
 
+import scala.io.Codec
+
 object ShelloutTests extends TestSuite{
   val scriptFolder = pwd/'ops/'src/'test/'resources/'scripts
 
@@ -81,6 +83,32 @@ object ShelloutTests extends TestSuite{
 
         val res3 = %%('bash, "-c", "echo 'Hello'$ENV_ARG", ENV_ARG=123)
         assert(res3.out.lines == Seq("Hello123"))
+      }
+
+      'piping{
+
+        'simple {
+          val process = %%%('cat)
+          process.write("1\n2\n3")
+          assert(process.out.getLines().toList == List("1", "2", "3"))
+        }
+
+        'interactive {
+          val process = %%%('bash, "-c", "echo line1 && read x && echo line2 $x")
+          val lines = process.out.getLines()
+
+          assert(lines.next() == "line1")
+
+          process.write("xxxx\n")
+
+          assert(lines.next() == "line2 xxxx")
+        }
+
+        'fromFile {
+            (pwd/'ops/'src/'test/'resources/'testdata/"File.txt").getLines(Codec.UTF8) |> %%%('less).writeLines
+
+        }
+
       }
 
     }

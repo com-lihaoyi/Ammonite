@@ -13,9 +13,10 @@ import scala.language.dynamics
 object Shellout{
   val % = Command(Vector.empty, Map.empty, Shellout.executeInteractive)
   val %% = Command(Vector.empty, Map.empty, Shellout.executeStream)
+  val %%% = Command(Vector.empty, Map.empty, Shellout.executeProcess)
+
   def executeInteractive(wd: Path, cmd: Command[_]) = {
     val builder = new java.lang.ProcessBuilder()
-    import collection.JavaConverters._
     for ((k, v) <- cmd.envArgs){
       if (v != null) builder.environment().put(k, v)
       else builder.environment().remove(k)
@@ -56,19 +57,10 @@ object Shellout{
     else throw InteractiveShelloutException()
   }
 
-  def executeStream(wd: Path, cmd: Command[_]) = {
-    val builder = new java.lang.ProcessBuilder()
-    import collection.JavaConverters._
-    for ((k, v) <- cmd.envArgs){
-      if (v != null) builder.environment().put(k, v)
-      else builder.environment().remove(k)
-    }
+  def executeProcess(wd: Path, cmd: Command[_]): CommandProcess = CommandProcess(startProcess(wd, cmd))
 
-    builder.directory(new java.io.File(wd.toString))
-    val process =
-      builder
-        .command(cmd.cmd:_*)
-        .start()
+  def executeStream(wd: Path, cmd: Command[_]): CommandResult = {
+    val process = startProcess(wd, cmd)
     val stdout = process.getInputStream
     val stderr = process.getErrorStream
     val chunks = collection.mutable.Buffer.empty[Either[Bytes, Bytes]]
@@ -99,6 +91,21 @@ object Shellout{
     val res = CommandResult(process.exitValue(), chunks)
     if (res.exitCode == 0) res
     else throw ShelloutException(res)
+  }
+
+  private def startProcess(wd: Path, cmd: Command[_]): Process = {
+    val builder = new java.lang.ProcessBuilder()
+    for ((k, v) <- cmd.envArgs){
+      if (v != null) builder.environment().put(k, v)
+      else builder.environment().remove(k)
+    }
+
+    builder.directory(new java.io.File(wd.toString))
+    val process =
+      builder
+        .command(cmd.cmd:_*)
+        .start()
+    process
   }
 }
 
@@ -170,6 +177,32 @@ case class CommandResult(exitCode: Int,
             .mkString
   }
 }
+
+case class CommandProcess(process: Process) {
+
+  val out = scala.io.Source.fromInputStream(process.getInputStream)
+  val err = scala.io.Source.fromInputStream(process.getErrorStream)
+  val in = process.getOutputStream
+
+  def write(str: String): Unit = {
+    writeAndClose(str.getBytes(StandardCharsets.UTF_8))
+  }
+
+  def writeLines(lines: Seq[String]): Unit = {
+    writeAndClose(lines.mkString("\n").getBytes(StandardCharsets.UTF_8))
+  }
+
+  def write(bytes: Array[Byte]): Unit = {
+    writeAndClose(bytes)
+  }
+
+  private def writeAndClose(bytes: Array[Byte]): Unit = {
+    in.write(bytes)
+    in.close()
+  }
+
+}
+
 
 /**
   * Thrown when a shellout command results in a non-zero exit code.
