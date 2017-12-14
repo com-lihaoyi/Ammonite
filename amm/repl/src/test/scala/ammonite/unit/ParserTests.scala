@@ -6,7 +6,7 @@ import utest._
 
 object ParserTests extends TestSuite{
 
-  val tests = TestSuite {
+  val tests = Tests {
     println("ParserTests")
     'shebang{
       def check(original: String, expected: String) = {

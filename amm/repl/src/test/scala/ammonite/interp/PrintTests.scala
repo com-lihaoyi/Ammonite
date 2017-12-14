@@ -5,7 +5,7 @@ import ammonite.util.Util.newLine
 import utest._
 
 object PrintTests extends TestSuite{
-  val tests = TestSuite{
+  val tests = Tests{
     println("PrintTests")
     val check = new TestRepl()
 

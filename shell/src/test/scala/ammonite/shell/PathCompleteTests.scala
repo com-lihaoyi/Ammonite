@@ -3,7 +3,7 @@ package ammonite.shell
 import utest._
 
 object PathCompleteTests extends TestSuite{
-  val tests = TestSuite{
+  val tests = Tests{
     'path{
       'parse{
         def check(s: String,

@@ -7,7 +7,7 @@ import utest._
 import scala.collection.{immutable => imm}
 
 object ProjectTests extends TestSuite{
-  val tests = TestSuite{
+  val tests = Tests{
     println("ProjectTests")
     val check = new TestRepl()
     'load {

@@ -7,7 +7,7 @@ import utest._
 object HistoryTests extends TestSuite{
 
 
-  val tests = TestSuite{
+  val tests = Tests{
     val history = new HistoryFilter(
       () => Vector(
         "abcde",

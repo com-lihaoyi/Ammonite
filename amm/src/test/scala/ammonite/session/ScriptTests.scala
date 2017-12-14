@@ -9,7 +9,7 @@ import ammonite.util.Res
 import utest._
 
 object ScriptTests extends TestSuite{
-  val tests = TestSuite{
+  val tests = Tests{
     println("ScriptTests")
     val check = new TestRepl()
 

@@ -11,7 +11,7 @@ import ammonite.util.Util
 
 object ImportHookTests extends TestSuite{
 
-  val tests = TestSuite{
+  val tests = Tests{
     println("ImportHookTests")
     val check = new TestRepl()
     'repl{

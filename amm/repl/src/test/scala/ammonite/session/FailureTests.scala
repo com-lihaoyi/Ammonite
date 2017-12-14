@@ -5,7 +5,7 @@ import utest._
 
 import scala.collection.{immutable => imm}
 object FailureTests extends TestSuite{
-  val tests = TestSuite{
+  val tests = Tests{
     println("FailureTests")
     val check = new TestRepl()
     'compileFailure {

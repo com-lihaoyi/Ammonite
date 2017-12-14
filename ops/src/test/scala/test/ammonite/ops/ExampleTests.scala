@@ -7,7 +7,7 @@ import utest._
 
 object ExampleTests extends TestSuite{
 
-  val tests = TestSuite {
+  val tests = Tests {
     'reference{
       import ammonite.ops._
 

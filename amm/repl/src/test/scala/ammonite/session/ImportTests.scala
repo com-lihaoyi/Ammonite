@@ -8,7 +8,7 @@ import scala.collection.{immutable => imm}
 
 object ImportTests extends TestSuite{
 
-  val tests = TestSuite{
+  val tests = Tests{
     println("ImportTests")
     val check = new TestRepl()
 

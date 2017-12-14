@@ -6,7 +6,7 @@ import utest._
 object ShelloutTests extends TestSuite{
   val scriptFolder = pwd/'ops/'src/'test/'resources/'scripts
 
-  val tests = TestSuite {
+  val tests = Tests {
     'implicitWd{
       import ammonite.ops.ImplicitWd._
       'lines{

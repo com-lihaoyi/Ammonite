@@ -10,7 +10,7 @@ object PPrintTests extends TestSuite{
   val pprinter = pprint.PPrinter.BlackWhite.copy(
     additionalHandlers = ammonite.repl.PPrints.replPPrintHandlers
   )
-  val tests = TestSuite{
+  val tests = Tests{
 
     'paths{
       'pprint{

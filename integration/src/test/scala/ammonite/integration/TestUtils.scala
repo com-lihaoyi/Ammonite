@@ -34,7 +34,7 @@ object TestUtils {
   def execSilent(name: RelPath, args: String*) = execBase(name, Seq("-s"), args)
 
   /**
-    *Counts number of non-overlapping occurances of `subs` in `s`
+    *Counts number of non-overlapping occurrences of `subs` in `s`
     */
   def substrCount(s: String, subs: String, count: Int = 0, ptr: Int = 0): Int = {
     s.indexOf(subs, ptr) match{

@@ -19,7 +19,7 @@ object RouterTests extends TestSuite{
     val result = parseInvoke(entryPoint, input)
     assert(result == expected)
   }
-  val tests = TestSuite {
+  val tests = Tests {
     println("UnitTests")
     'transpose{
       // Make sure this doesn't stack-overflow

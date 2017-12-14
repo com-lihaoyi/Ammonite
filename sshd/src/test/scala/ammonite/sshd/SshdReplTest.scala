@@ -10,7 +10,7 @@ import SshTestingUtils._
 object SshdReplTest extends TestSuite {
   val remotePromise = Promise[Boolean]()
 
-  override val tests = TestSuite {
+  override val tests = Tests {
 //  Diabled on charge of flakiness
 
 //    'canExecuteRemoteCommand - retry(3){ // Flaky, not sure why

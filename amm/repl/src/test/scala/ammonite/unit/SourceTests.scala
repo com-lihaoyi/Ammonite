@@ -11,7 +11,7 @@ import fastparse.utils.{ElemSetHelper, Generator, IndexedParserInput}
 
 import scala.tools.nsc.interpreter.InputStream
 object SourceTests extends TestSuite{
-  val tests = TestSuite{
+  val tests = Tests{
 
     def check(loaded: Location, expectedFileName: String, expected: String, slop: Int = 10) = {
 
