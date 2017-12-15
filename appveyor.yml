@@ -8,16 +8,8 @@ environment:
   SBT_OPTS: -Dfile.encoding=UTF8
   JAVA_OPTS: -Dfile.encoding=UTF8
 install:
-  - ps: |
-      Add-Type -AssemblyName System.IO.Compression.FileSystem
-      if (!(Test-Path -Path "C:\sbt" )) {
-        (new-object System.Net.WebClient).DownloadFile(
-          'https://dl.bintray.com/sbt/native-packages/sbt/0.13.8/sbt-0.13.8.zip',
-          'C:\sbt-bin.zip'
-        )
-        [System.IO.Compression.ZipFile]::ExtractToDirectory("C:\sbt-bin.zip", "C:\sbt")
-      }
-  - cmd: SET PATH=C:\sbt\sbt\bin;%JAVA_HOME%\bin;%PATH%
+  - cmd: choco install sbt -ia "INSTALLDIR=""C:\sbt""" --version 0.13.15
+  - cmd: SET PATH=C:\sbt\bin;%JAVA_HOME%\bin;%PATH%
   - cmd: SET SBT_OPTS=-XX:MaxPermSize=2g -Xmx4g
 
 build_script:
@@ -30,3 +22,9 @@ test_script:
   - sbt ++2.11.11 amm/test
   - sbt ++2.11.11 integration/test
 
+cache:
+  - C:\sbt\
+  - C:\Users\appveyor\.m2
+  - C:\Users\appveyor\.ivy2\cache
+  - C:\ProgramData\chocolatey\lib -> appveyor.yml
+  - C:\ProgramData\chocolatey\bin -> appveyor.yml

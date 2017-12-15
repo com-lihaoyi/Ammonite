@@ -1,12 +1,11 @@
 package test.ammonite.ops
 
-import java.nio.file.attribute.{GroupPrincipal, FileTime}
+import java.nio.file.attribute.{FileTime, GroupPrincipal}
 
 import ammonite.ops._
 import utest._
 
 object ExampleTests extends TestSuite{
-
   val tests = Tests {
     'reference{
       import ammonite.ops._
@@ -112,10 +111,11 @@ object ExampleTests extends TestSuite{
 
       // You can also use `stat.full` which provides more information
       val fullInfo = stat.full(wd/"file1.txt")
-      fullInfo.ctime: FileTime
-      fullInfo.atime: FileTime
-      fullInfo.group: GroupPrincipal
-
+      assert(fullInfo.ctime.isInstanceOf[FileTime])
+      assert(fullInfo.atime.isInstanceOf[FileTime])
+      if (Unix()) {
+        assert(fullInfo.group.isInstanceOf[GroupPrincipal])
+      }
     }
     'longExample{
       import ammonite.ops._
@@ -257,9 +257,8 @@ object ExampleTests extends TestSuite{
       val minus = pwd relativeTo target
       val ups = up/up
       assert(minus == ups)
-      rel1: RelPath
-      rel2: RelPath
-      rel3: RelPath
+      assert(rel1.isInstanceOf[RelPath])
+      assert(rel2.isInstanceOf[RelPath])
     }
     'relPathCombine{
       val target = pwd/'target/'file
@@ -316,12 +315,12 @@ object ExampleTests extends TestSuite{
 //      val d2/"omg"/x2 = wd
 //      ls! wd |? (_.ext == "scala") | (x => mv! x ! x.pref)
     }
-    'allSubpathsResolveCorrectly{
-      for(abs <- ls.rec! pwd){
-        val rel = abs relativeTo pwd
-        assert(rel.ups == 0)
-        assert(pwd / rel == abs)
-      }
+    'allSubpathsResolveCorrectly {
+        for (abs <- ls.rec! pwd) {
+          val rel = abs relativeTo pwd
+          assert(rel.ups == 0)
+          assert(pwd / rel == abs)
+        }
     }
   }
 }
