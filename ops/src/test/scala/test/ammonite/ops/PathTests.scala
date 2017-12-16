@@ -21,6 +21,8 @@ object PathTests extends TestSuite{
             // ammonite.Path to String
             (root/'omg).toString == "/omg",
             (empty/'omg).toString == "omg",
+            (up/'omg).toString == "../omg",
+            (up/up/'omg).toString == "../../omg",
 
             // String to ammonite.Path
             root/'omg == Path("/omg"),

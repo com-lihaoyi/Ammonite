@@ -180,7 +180,7 @@ extends FilePath with BasePathImpl{
     this.segments.startsWith(target.segments) && this.ups == target.ups
   }
 
-  override def toString = segments.mkString("/")
+  override def toString = (Seq.fill(ups)("..") ++ segments).mkString("/")
   override def hashCode = segments.hashCode() + ups.hashCode()
   override def equals(o: Any): Boolean = o match {
     case p: RelPath => segments == p.segments && p.ups == ups
