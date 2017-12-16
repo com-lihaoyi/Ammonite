@@ -2,7 +2,7 @@ package ammonite
 
 import java.io.PrintStream
 
-import ammonite.interp.Interpreter
+import ammonite.interp.{Interpreter, Preprocessor}
 import ammonite.runtime.{Frame, History, Storage}
 import ammonite.util._
 
@@ -30,7 +30,8 @@ object TestUtils {
       ),
       extraBridges = Seq(),
       colors = Ref(Colors.BlackWhite),
-      getFrame = () => startFrame
+      getFrame = () => startFrame,
+      codeWrapper = Preprocessor.CodeWrapper
     )
     interp.initializePredef()
     interp

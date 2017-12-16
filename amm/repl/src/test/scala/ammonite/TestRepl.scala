@@ -2,7 +2,7 @@ package ammonite
 
 import java.io.PrintStream
 
-import ammonite.interp.Interpreter
+import ammonite.interp.{Interpreter, Preprocessor}
 import ammonite.ops.{Path, read}
 import ammonite.repl._
 import ammonite.runtime.{Frame, History, Storage}
@@ -104,7 +104,8 @@ class TestRepl {
         }
       )),
       colors = Ref(Colors.BlackWhite),
-      getFrame = () => frames().head
+      getFrame = () => frames().head,
+      codeWrapper = Preprocessor.CodeWrapper
     )
 
   }catch{ case e: Throwable =>

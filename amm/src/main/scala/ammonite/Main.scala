@@ -3,7 +3,7 @@ package ammonite
 import java.io.{InputStream, OutputStream, PrintStream}
 import java.nio.file.NoSuchFileException
 
-import ammonite.interp.Interpreter
+import ammonite.interp.{Interpreter, Preprocessor}
 import ammonite.ops._
 import ammonite.runtime.{Frame, Storage}
 import ammonite.main._
@@ -65,7 +65,8 @@ case class Main(predefCode: String = "",
                 errorStream: OutputStream = System.err,
                 verboseOutput: Boolean = true,
                 remoteLogging: Boolean = true,
-                colors: Colors = Colors.Default){
+                colors: Colors = Colors.Default,
+                codeWrapper: Preprocessor.CodeWrapper = Preprocessor.CodeWrapper){
 
   def loadedPredefFile = predefFile match{
     case Some(path) =>
@@ -149,7 +150,8 @@ case class Main(predefCode: String = "",
         wd,
         colorsRef,
         verboseOutput,
-        () => frame
+        () => frame,
+        codeWrapper = codeWrapper
       )
       interp.initializePredef() match{
         case None => Right(interp)

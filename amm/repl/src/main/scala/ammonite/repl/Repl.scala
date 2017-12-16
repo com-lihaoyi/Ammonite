@@ -6,7 +6,7 @@ import ammonite.runtime._
 import ammonite.terminal.Filter
 import ammonite.util.Util.{newLine, normalizeNewlines}
 import ammonite.util._
-import ammonite.interp.{Interpreter, Parsers}
+import ammonite.interp.{Interpreter, Parsers, Preprocessor}
 import ammonite.ops._
 
 import scala.annotation.tailrec
@@ -101,7 +101,8 @@ class Repl(input: InputStream,
     wd,
     colors,
     verboseOutput = true,
-    getFrame = () => frames().head
+    getFrame = () => frames().head,
+    codeWrapper = Preprocessor.CodeWrapper
   )
 
   def initializePredef() = interp.initializePredef()

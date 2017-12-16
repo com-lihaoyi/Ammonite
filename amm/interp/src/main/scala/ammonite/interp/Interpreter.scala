@@ -34,7 +34,8 @@ class Interpreter(val printer: Printer,
                   val wd: Path,
                   colors: Ref[Colors],
                   verboseOutput: Boolean = true,
-                  getFrame: () => Frame)
+                  getFrame: () => Frame,
+                  codeWrapper: Preprocessor.CodeWrapper)
   extends ImportHook.InterpreterInterface{ interp =>
 
 
@@ -220,7 +221,8 @@ class Interpreter(val printer: Printer,
         predefImports ++ frameImports ++ hookImports,
         prints => s"ammonite.repl.ReplBridge.value.Internal.combinePrints($prints)",
         extraCode = "",
-        skipEmpty = true
+        skipEmpty = true,
+        codeWrapper = codeWrapper
       )
       (out, tag) <- evaluateLine(
         processed, printer,
@@ -464,7 +466,8 @@ class Interpreter(val printer: Printer,
               scriptImports ++ hookInfo.imports,
               _ => "scala.Iterator[String]()",
               extraCode = extraCode,
-              skipEmpty = false
+              skipEmpty = false,
+              codeWrapper = codeWrapper
             )
 
             (ev, tag) <- evaluate(processed, indexedWrapperName)

@@ -36,7 +36,8 @@ trait Preprocessor{
                 imports: Imports,
                 printerTemplate: String => String,
                 extraCode: String,
-                skipEmpty: Boolean): Res[Preprocessor.Output]
+                skipEmpty: Boolean,
+                codeWrapper: Preprocessor.CodeWrapper): Res[Preprocessor.Output]
 }
 
 object Preprocessor{
@@ -111,7 +112,8 @@ object Preprocessor{
                   imports: Imports,
                   printerTemplate: String => String,
                   extraCode: String,
-                  skipEmpty: Boolean) = {
+                  skipEmpty: Boolean,
+                  codeWrapper: CodeWrapper) = {
       // All code Ammonite compiles must be rooted in some package within
       // the `ammonite` top-level package
       assert(pkgName.head == Name("ammonite"))
@@ -120,7 +122,7 @@ object Preprocessor{
         (wrappedCode, importsLength) = wrapCode(
           pkgName, indexedWrapperName, leadingSpaces + code,
           printerTemplate(printer.mkString(", ")),
-          imports, extraCode
+          imports, extraCode, codeWrapper
         )
       } yield Preprocessor.Output(wrappedCode, importsLength)
     }
@@ -290,26 +292,40 @@ object Preprocessor{
                code: String,
                printCode: String,
                imports: Imports,
-               extraCode: String) = {
+               extraCode: String,
+               codeWrapper: CodeWrapper) = {
 
     //we need to normalize topWrapper and bottomWrapper in order to ensure
     //the snippets always use the platform-specific newLine
-    val topWrapper = normalizeNewlines(s"""
+    val topWrapper = codeWrapper.top(pkgName, imports, indexedWrapperName)
+
+    val bottomWrapper = codeWrapper.bottom(printCode, indexedWrapperName, extraCode)
+    val importsLen = topWrapper.length
+
+    (topWrapper + code + bottomWrapper, importsLen)
+  }
+
+
+  trait CodeWrapper{
+    def top(pkgName: Seq[Name], imports: Imports, indexedWrapperName: Name): String
+    def bottom(printCode: String, indexedWrapperName: Name, extraCode: String): String
+  }
+  object CodeWrapper extends CodeWrapper{
+    def top(pkgName: Seq[Name], imports: Imports, indexedWrapperName: Name) =
+      normalizeNewlines(s"""
 package ${pkgName.head.encoded}
 package ${Util.encodeScalaSourcePath(pkgName.tail)}
 $imports
 
 object ${indexedWrapperName.backticked}{\n"""
-)
+    )
 
-    val bottomWrapper = normalizeNewlines(s"""\ndef $$main() = { $printCode }
+    def bottom(printCode: String, indexedWrapperName: Name, extraCode: String) =
+      normalizeNewlines(s"""\ndef $$main() = { $printCode }
   override def toString = "${indexedWrapperName.raw}"
   $extraCode
 }
 """)
-    val importsLen = topWrapper.length
-
-    (topWrapper + code + bottomWrapper, importsLen)
   }
 }
 
