@@ -8,7 +8,7 @@ import ammonite.ops._
 import utest._
 object OpTests extends TestSuite{
 
-  val tests = TestSuite {
+  val tests = Tests {
     val res = pwd/'ops/'src/'test/'resources/'testdata
     'ls - assert(
       ls(res).toSet == Set(res/'folder1, res/'folder2, res/"File.txt"),

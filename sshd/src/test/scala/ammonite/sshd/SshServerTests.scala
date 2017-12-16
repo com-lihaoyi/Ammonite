@@ -11,7 +11,7 @@ import scala.language.postfixOps
 import SshTestingUtils._
 
 object SshServerTests extends TestSuite with ScalaCheckSupport {
-  override val tests = TestSuite {
+  override val tests = Tests {
     'canConnectAndAuthenticate{
       withTmpDirectory { implicit tmpDir =>
         check {

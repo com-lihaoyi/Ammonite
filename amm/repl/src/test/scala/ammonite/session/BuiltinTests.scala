@@ -6,7 +6,7 @@ import utest._
 import scala.collection.{immutable => imm}
 object BuiltinTests extends TestSuite{
 
-  val tests = TestSuite{
+  val tests = Tests{
     println("EvaluatorTests")
     val check = new TestRepl()
     'basicConfig{

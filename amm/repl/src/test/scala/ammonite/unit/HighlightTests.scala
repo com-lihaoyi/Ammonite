@@ -24,7 +24,7 @@ object HighlightTests extends TestSuite{
         .replace(fansi.Color.Reset.escape, ">")
     assert(highlighted == expected)
   }
-  val tests = TestSuite {
+  val tests = Tests {
     println("HighlightTests")
     'highlighting {
       'fuzz - {

@@ -13,7 +13,7 @@ import utest._
  */
 object ErrorTruncationTests extends TestSuite{
 
-  def checkErrorMessage(file: RelPath, expected: String) = {
+  def checkErrorMessage(file: RelPath, expected: String): Unit = {
     val e = fansi.Str(
       Util.normalizeNewlines(
         intercept[ShelloutException]{ exec(file) }
@@ -26,7 +26,7 @@ object ErrorTruncationTests extends TestSuite{
 
     assert(fansi.Str(e).plainText.contains(expected))
   }
-  val tests = TestSuite {
+  val tests = Tests {
     println("ErrorTruncationTests")
     'compileError - checkErrorMessage(
       file = 'errorTruncation/"compileError.sc",

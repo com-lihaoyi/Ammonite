@@ -13,7 +13,7 @@ import utest._
 object LineNumberTests extends TestSuite{
   val tests = this{
 
-    def checkErrorMessage(file: RelPath, expected: String) = {
+    def checkErrorMessage(file: RelPath, expected: String): Unit = {
       val e = new InProcessMainMethodRunner(file, Nil, Nil)
 
       assert(e.err.contains(expected))

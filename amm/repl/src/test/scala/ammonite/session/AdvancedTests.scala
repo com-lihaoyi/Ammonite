@@ -7,7 +7,7 @@ import utest._
 
 
 object AdvancedTests extends TestSuite{
-  val tests = TestSuite{
+  val tests = Tests{
     println("AdvancedTests")
     val check = new TestRepl()
     'pprint{

@@ -31,7 +31,7 @@ object AutocompleteTests extends TestSuite{
     c.check.interp.compilerManager.shutdownPressy()
     res
   }
-  val tests = TestSuite {
+  val tests = Tests{
     println("AutocompleteTests")
     'selection{
 

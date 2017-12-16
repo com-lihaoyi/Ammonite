@@ -5,7 +5,7 @@ import java.nio.file.Paths
 import ammonite.ops._
 import utest._
 object PathTests extends TestSuite{
-  val tests = TestSuite {
+  val tests = Tests {
     'Basic{
       val rel = 'src/'main/'scala
       'Transformers - {

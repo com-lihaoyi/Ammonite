@@ -12,13 +12,13 @@ import utest._
 object MainTests extends TestSuite{
   def exec(p: RelPath, args: String*) = new InProcessMainMethodRunner('mains/p, Nil, args)
 
-  def stripInvisibleMargin(s: String) = {
+  def stripInvisibleMargin(s: String): String = {
     val lines = s.lines.toArray
     val leftMargin = lines.filter(_.trim.nonEmpty).map(_.takeWhile(_ == ' ').length).min
     lines.map(_.drop(leftMargin)).mkString(Util.newLine)
   }
 
-  val tests = TestSuite {
+  val tests = Tests {
     println("Running MainTests")
 
     'hello{

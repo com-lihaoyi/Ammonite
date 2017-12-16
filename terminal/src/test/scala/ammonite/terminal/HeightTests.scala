@@ -5,7 +5,7 @@ import utest._
 import scala.collection.{immutable => imm}
 
 object HeightTests extends TestSuite{
-  val tests = TestSuite{
+  val tests = Tests{
 
     'a - {
       val height = LineReader.calculateHeight0(

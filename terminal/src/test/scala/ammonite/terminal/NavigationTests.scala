@@ -5,7 +5,7 @@ import utest._
 
 object NavigationTests extends TestSuite{
 
-  val tests = TestSuite{
+  val tests = Tests{
     'simple{
       // Tests for a simple, not-wrap-around
       // grid of characters

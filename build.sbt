@@ -31,7 +31,7 @@ val sharedSettings = Seq(
   scalaVersion := "2.12.4",
   organization := "com.lihaoyi",
   version := _root_.ammonite.Constants.version,
-  libraryDependencies += "com.lihaoyi" %% "utest" % "0.5.1" % Test,
+  libraryDependencies += "com.lihaoyi" %% "utest" % "0.6.0" % Test,
   // Needed for acyclic to work...
   libraryDependencies ++= {
     if (!scalaVersion.value.startsWith("2.10.")) Nil
@@ -205,8 +205,8 @@ lazy val ammRuntime = project
 
     name := "ammonite-runtime",
     libraryDependencies ++= Seq(
-      "io.get-coursier" %% "coursier" % "1.0.0-RC10",
-      "io.get-coursier" %% "coursier-cache" % "1.0.0-RC10",
+      "io.get-coursier" %% "coursier" % "1.0.0",
+      "io.get-coursier" %% "coursier-cache" % "1.0.0",
       "org.scalaj" %% "scalaj-http" % "2.3.0"
     )
   )
