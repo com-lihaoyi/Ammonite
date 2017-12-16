@@ -3,7 +3,7 @@ package ammonite.session
 import ammonite.TestRepl
 import utest._
 object EulerTests extends TestSuite{
-  val tests = TestSuite{
+  val tests = Tests{
     println("EulerTests")
     val check = new TestRepl()
 

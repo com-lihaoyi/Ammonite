@@ -18,7 +18,7 @@ import utest._
  */
 object ProjectTests extends TestSuite{
 
-  val tests = TestSuite {
+  val tests = Tests {
     println("Running ProjectTest")
 
     'playframework- {

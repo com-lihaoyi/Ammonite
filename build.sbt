@@ -31,7 +31,7 @@ val sharedSettings = Seq(
   scalaVersion := "2.12.4",
   organization := "com.lihaoyi",
   version := _root_.ammonite.Constants.version,
-  libraryDependencies += "com.lihaoyi" %% "utest" % "0.5.1" % Test,
+  libraryDependencies += "com.lihaoyi" %% "utest" % "0.6.0" % Test,
   // Needed for acyclic to work...
   libraryDependencies ++= {
     if (!scalaVersion.value.startsWith("2.10.")) Nil

@@ -17,7 +17,7 @@ import TestUtils._
  */
 object BasicTests extends TestSuite{
 
-  val tests = TestSuite {
+  val tests = Tests {
     println("Running BasicTest")
 
     def execWithJavaOptsSet(name: RelPath, home: Path) = %%bash(
@@ -194,7 +194,7 @@ object BasicTests extends TestSuite{
         cp.over(intTestResources/"some-dummy-library", buildRoot)
         val dummyScala = buildRoot/'src/'main/'scala/'dummy/"Dummy.scala"
 
-        def publishJarAndRunScript(theThing: String) = {
+        def publishJarAndRunScript(theThing: String): Unit = {
           // 1. edit code
           write.over(dummyScala,
             s"""package dummy

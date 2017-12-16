@@ -11,7 +11,7 @@ import TestUtils._
 object LineNumberTests extends TestSuite{
   val tests = this{
 
-    def checkErrorMessage(file: RelPath, expected: String) = {
+    def checkErrorMessage(file: RelPath, expected: String): Unit = {
       val e = intercept[ShelloutException]{
         exec(file)
       }.result.err.string

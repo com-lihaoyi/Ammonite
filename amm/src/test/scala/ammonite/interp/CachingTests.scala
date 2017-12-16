@@ -10,7 +10,7 @@ import ammonite.util.{Res, Util}
 import utest._
 
 object CachingTests extends TestSuite{
-  val tests = TestSuite{
+  val tests = Tests{
     println("ScriptTests")
 
     val scriptPath = pwd/'amm/'src/'test/'resources/'scripts

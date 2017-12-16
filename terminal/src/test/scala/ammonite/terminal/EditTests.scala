@@ -6,7 +6,7 @@ import utest._
 
 object EditTests extends TestSuite{
 
-  val tests = TestSuite{
+  val tests = Tests{
     val check = Checker(
       width = 5,
       grid = """

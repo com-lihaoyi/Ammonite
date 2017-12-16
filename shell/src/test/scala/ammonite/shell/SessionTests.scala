@@ -12,7 +12,7 @@ object SessionTests extends TestSuite{
   val bareSrc =
     """pwd/'shell/'src/'main/'resources/'ammonite/'shell/"example-predef-bare.sc""""
 
-  val tests = TestSuite{
+  val tests = Tests{
     val check = new TestRepl()
     'workingDir{
       check.session(s"""
