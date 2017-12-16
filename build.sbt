@@ -205,8 +205,8 @@ lazy val ammRuntime = project
 
     name := "ammonite-runtime",
     libraryDependencies ++= Seq(
-      "io.get-coursier" %% "coursier" % "1.0.0-RC10",
-      "io.get-coursier" %% "coursier-cache" % "1.0.0-RC10",
+      "io.get-coursier" %% "coursier" % "1.0.0",
+      "io.get-coursier" %% "coursier-cache" % "1.0.0",
       "org.scalaj" %% "scalaj-http" % "2.3.0"
     )
   )
