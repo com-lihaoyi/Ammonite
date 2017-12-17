@@ -107,13 +107,13 @@ object EvaluatorTests extends TestSuite{
         defined type Funky
 
         @ val arr: Funky = Array(Array("Hello!"))
-        arr: ${sessionPrefix}Funky = Array(Array("Hello!"))
+        arr: Funky = Array(Array("Hello!"))
 
         @ type Funky2[T] = Array[Array[T]]
         defined type Funky2
 
         @ val arr: Funky2[Int] = Array(Array(123))
-        arr: ${sessionPrefix}Funky2[Int] = Array(Array(123))
+        arr: Funky2[Int] = Array(Array(123))
       """)
     }
     'library{
@@ -135,31 +135,31 @@ object EvaluatorTests extends TestSuite{
         defined class C
 
         @ new C
-        res1: ${sessionPrefix}C = Ceee
+        res1: C = Ceee
 
         @ case object CO
         defined object CO
 
         @ CO
-        res3: ${sessionPrefix}CO.type = CO
+        res3: CO.type = CO
 
         @ case class CC()
         defined class CC
 
         @ CC()
-        res5: ${sessionPrefix}CC = CC()
+        res5: CC = CC()
 
         @ CO
-        res6: ${sessionPrefix}CO.type = CO
+        res6: CO.type = CO
 
         @ case class CO()
         defined class CO
 
         @ CO
-        res8: ${sessionPrefix}CO.type = CO
+        res8: CO.type = CO
 
         @ CO()
-        res9: ${sessionPrefix}CO = CO()
+        res9: CO = CO()
       """)
     }
 
@@ -213,7 +213,7 @@ object EvaluatorTests extends TestSuite{
         res3_2: Int = 3
 
         @ C()
-        res4: ${sessionPrefix}C = C(0)
+        res4: C = C(0)
       """)
     }
 

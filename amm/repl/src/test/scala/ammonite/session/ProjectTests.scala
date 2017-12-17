@@ -95,8 +95,7 @@ object ProjectTests extends TestSuite{
     }
 
     'shapeless {
-      // Shapeless 2.1.0 isn't published for scala 2.10
-      if (!scala2_10) check.session("""
+      check.session("""
         @ import $ivy.`com.chuusai::shapeless:2.3.2`, shapeless._
 
         @ (1 :: "lol" :: List(1, 2, 3) :: HNil)
@@ -156,24 +155,22 @@ object ProjectTests extends TestSuite{
     'scalaparse{
       // For some reason this blows up in 2.11.x
       // Prevent regressions when wildcard-importing things called `macro` or `_`
-      if (!scala2_10) ()
-      else
-        check.session(s"""
-          @ import scalaparse.Scala._
+      if (scala2_12) check.session(s"""
+        @ import scalaparse.Scala._
 
-          @ 1
-          res1: Int = 1
+        @ 1
+        res1: Int = 1
 
-          @ ExprCtx.Parened.parse("1 + 1") // for some reason the tuple isn't pprinted
-          res2: fastparse.core.Parsed[Unit,Char,String] = Failure(
-            ElemLiteral('('),
-            0,
-            Extra(1 + 1, [traced - not evaluated])
-          )
+        @ ExprCtx.Parened.parse("1 + 1") // for some reason the tuple isn't pprinted
+        res2: fastparse.core.Parsed[Unit, Char, String] = Failure(
+          ElemLiteral('('),
+          0,
+          Extra(1 + 1, [traced - not evaluated])
+        )
 
-          @ ExprCtx.Parened.parse("(1 + 1)")
-          res3: fastparse.core.Parsed[Unit,Char,String] = Success((), 7)
-        """)
+        @ ExprCtx.Parened.parse("(1 + 1)")
+        res3: fastparse.core.Parsed[Unit, Char, String] = Success((), 7)
+      """)
     }
 
     'finagle{
@@ -257,41 +254,7 @@ object ProjectTests extends TestSuite{
           @ mean(Rational(1, 2), Rational(3, 2), Rational(0))
           res10: Rational = 2/3
         """)
-      else if (scala2_10)
-        check.session(s"""
-          @ import $$ivy.`org.spire-math::spire:0.13.0`
-
-          @ import spire.implicits._
-
-          @ import spire.math._
-
-          @ def euclidGcd[A: Integral](x: A, y: A): A = {
-          @   if (y == 0) x
-          @   else euclidGcd(y, x % y)
-          @ }
-
-          @ euclidGcd(42, 96)
-          res4: Int = 6
-
-          @ euclidGcd(42L, 96L)
-          res5: Long = 6L
-
-          @ euclidGcd(BigInt(42), BigInt(96))
-          res6: math.BigInt = 6
-
-          @ def mean[A: Fractional](xs: A*): A = xs.reduceLeft(_ + _) / xs.size
-
-          @ mean(0.5, 1.5, 0.0, -0.5)
-          res8: Double = 0.375
-
-          @ Interval(0, 10)
-          res9: spire.math.Interval[Int] = Bounded(0, 10, 0)
-
-          @ mean(Rational(1, 2), Rational(3, 2), Rational(0))
-          res10: spire.math.Rational = 2/3
-        """)
-
-    }
+          }
     'pegdown{
       check.session(
         s"""
@@ -304,28 +267,26 @@ object ProjectTests extends TestSuite{
 
     'deeplearning {
       // DeepLearning.scala 2.0.0-RC0 isn't published for scala 2.10
-      if (!scala2_10) {
-        check.session(
-          """
-          @ import $ivy.`com.thoughtworks.deeplearning::plugins-builtins:2.0.0-RC0`
-          import $ivy.$
+      check.session(
+        """
+        @ import $ivy.`com.thoughtworks.deeplearning::plugins-builtins:2.0.0-RC0`
+        import $ivy.$
 
-          @ import $ivy.`org.nd4j:nd4j-native-platform:0.8.0`
-          import $ivy.$
+        @ import $ivy.`org.nd4j:nd4j-native-platform:0.8.0`
+        import $ivy.$
 
-          @ import scala.concurrent.ExecutionContext.Implicits.global
-          import scala.concurrent.ExecutionContext.Implicits.global
+        @ import scala.concurrent.ExecutionContext.Implicits.global
+        import scala.concurrent.ExecutionContext.Implicits.global
 
-          @ import com.thoughtworks.feature.Factory
-          import com.thoughtworks.feature.Factory
+        @ import com.thoughtworks.feature.Factory
+        import com.thoughtworks.feature.Factory
 
-          @ import com.thoughtworks.deeplearning._
-          import com.thoughtworks.deeplearning._
+        @ import com.thoughtworks.deeplearning._
+        import com.thoughtworks.deeplearning._
 
-          @ Factory[plugins.Builtins].newInstance()
-          """
-        )
-      }
+        @ Factory[plugins.Builtins].newInstance()
+        """
+      )
     }
 
   }

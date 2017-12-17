@@ -7,8 +7,6 @@ import ammonite.runtime.{Frame, History, Storage}
 import ammonite.util._
 
 object TestUtils {
-  val sessionPrefix = if (scala2_10) "ammonite.$sess." else ""
-  def scala2_10 = scala.util.Properties.versionNumberString.contains("2.10")
   def scala2_11 = scala.util.Properties.versionNumberString.contains("2.11")
   def scala2_12 = scala.util.Properties.versionNumberString.contains("2.12")
 

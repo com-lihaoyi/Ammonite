@@ -21,13 +21,8 @@ matrix:
 
   - stage: build
     env: CI_SCRIPT="ci/build.sc test published/test"
-    jdk: oraclejdk8
+    jdk: oraclejdk7
     scala: 2.11.11
-
-  - stage: build
-    env: CI_SCRIPT="ci/build.sc test published/test"
-    jdk: openjdk7
-    scala: 2.10.6
 
   - stage: build
     env: CI_SCRIPT="ci/build.sc test integration/test"
@@ -36,20 +31,10 @@ matrix:
 
   - stage: build
     env: CI_SCRIPT="ci/build.sc test integration/test"
-    jdk: oraclejdk8
+    jdk: oraclejdk7
     scala: 2.11.11
-
-  - stage: build
-    env: CI_SCRIPT="ci/build.sc test integration/test"
-    jdk: openjdk7
-    scala: 2.10.6
 
   # Publish everything to sonatype in conjunction with running tests
-  - stage: build
-    env: CI_SCRIPT="ci/build.sc artifacts 2.10.4 2.10.5 2.10.6"
-    jdk: oraclejdk8
-    scala: 2.11.11
-
   - stage: build
     env: CI_SCRIPT="ci/build.sc artifacts 2.11.3 2.11.4 2.11.5 2.11.6 "
     jdk: oraclejdk8

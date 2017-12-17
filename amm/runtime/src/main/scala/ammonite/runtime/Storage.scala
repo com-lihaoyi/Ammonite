@@ -35,6 +35,9 @@ trait Storage{
 object Storage{
   type CompileCache = (ClassFiles, Imports)
   type IvyMap = Map[(String, Seq[coursier.Dependency]), Set[String]]
+  implicit def depRW: upickle.default.ReadWriter[coursier.Dependency] = upickle.default.macroRW
+  implicit def modRW: upickle.default.ReadWriter[coursier.Module] = upickle.default.macroRW
+  implicit def attrRW: upickle.default.ReadWriter[coursier.Attributes] = upickle.default.macroRW
   private def loadIfTagMatches(loadedTag: Tag,
                                cacheTag: Tag,
                                classFilesList: Seq[ScriptOutput.BlockMetadata],
@@ -159,7 +162,7 @@ object Storage{
     def readJson[T: upickle.default.Reader](path: Path): Option[T] = {
       try {
         val fileData = {ammonite.ops.read(path)}
-        val parsed = {upickle.default.read(fileData)}
+        val parsed = upickle.default.read[T](fileData)
         Some(parsed)
       }
       catch{ case e: Throwable => None }

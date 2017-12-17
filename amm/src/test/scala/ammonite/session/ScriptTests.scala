@@ -29,18 +29,13 @@ object ScriptTests extends TestSuite{
             """)
           }
         'preserveImports{
-          val typeString =
-            if (!scala2_10)
-              """Left[String, Nothing]"""
-            else
-              """util.Left[String,Nothing]"""
           check.session(s"""
             @ import ammonite.ops._
 
             @ repl.load.exec($printedScriptPath/"PreserveImports.sc")
 
             @ val r = res
-            r: $typeString = Left("asd")
+            r: Left[String, Nothing] = Left("asd")
             """)
         }
         'annotation{
@@ -179,31 +174,26 @@ object ScriptTests extends TestSuite{
            """)
         }
         'preserveImports{
-          val typeString =
-            if (!scala2_10)
-              """Left[String, Nothing]"""
-            else
-              """util.Left[String,Nothing]"""
           check.session(s"""
-              @ import ammonite.ops._
+            @ import ammonite.ops._
 
-              @ interp.load.module($printedScriptPath/"PreserveImports.sc")
+            @ interp.load.module($printedScriptPath/"PreserveImports.sc")
 
-              @ val r = res
-              r: $typeString = Left("asd")
-              """)
+            @ val r = res
+            r: Left[String, Nothing] = Left("asd")
+            """)
 
         }
         'annotation{
-          if (!scala2_10) //buggy in 2.10
-            check.session(s"""
-            @ import ammonite.ops._
 
-            @ interp.load.module($printedScriptPath/"Annotation.sc")
+          check.session(s"""
+          @ import ammonite.ops._
 
-            @ val r = res
-            r: Int = 24
-            """)
+          @ interp.load.module($printedScriptPath/"Annotation.sc")
+
+          @ val r = res
+          r: Int = 24
+          """)
         }
         'syntax{
             check.session(s"""

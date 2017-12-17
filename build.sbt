@@ -3,8 +3,7 @@ import scalatex.ScalatexReadme
 scalaVersion := "2.12.4"
 
 crossScalaVersions := Seq(
-  "2.10.4", "2.10.5", "2.10.6", "2.11.3",
-  "2.11.4", "2.11.5", "2.11.6", "2.11.7", "2.11.8", "2.11.9"
+  "2.11.3", "2.11.4", "2.11.5", "2.11.6", "2.11.7", "2.11.8", "2.11.9"
 )
 
 val dontPublishSettings = Seq(
@@ -17,12 +16,6 @@ dontPublishSettings
 val macroSettings = Seq(
   libraryDependencies ++= Seq(
     "org.scala-lang" % "scala-reflect" % scalaVersion.value % Provided
-  ) ++ (
-    if (!scalaVersion.value.startsWith("2.10.")) Nil
-    else Seq(
-      compilerPlugin("org.scalamacros" % s"paradise" % "2.0.1" cross CrossVersion.full),
-      "org.scalamacros" %% s"quasiquotes" % "2.0.1"
-    )
   )
 )
 
@@ -33,12 +26,6 @@ val sharedSettings = Seq(
   version := _root_.ammonite.Constants.version,
   libraryDependencies += "com.lihaoyi" %% "utest" % "0.6.0" % Test,
   // Needed for acyclic to work...
-  libraryDependencies ++= {
-    if (!scalaVersion.value.startsWith("2.10.")) Nil
-    else Seq(
-      "org.scala-lang" % "scala-compiler" % scalaVersion.value % Provided
-    )
-  },
   testFrameworks := Seq(new TestFramework("utest.runner.Framework")),
   scalacOptions += "-target:jvm-1.7",
   scalacOptions += "-P:acyclic:force",
@@ -159,10 +146,7 @@ lazy val amm = project
     libraryDependencies ++= Seq(
       "com.github.scopt" %% "scopt" % "3.5.0"
     ),
-    libraryDependencies ++= (
-      if (scalaVersion.value startsWith "2.10.") Nil
-      else Seq("com.chuusai" %% "shapeless" % "2.3.2" % Test)
-    ),
+    libraryDependencies ++= Seq("com.chuusai" %% "shapeless" % "2.3.2" % Test),
     javaOptions += "-Xmx4G",
 
 
@@ -190,7 +174,7 @@ lazy val ammUtil = project
     sharedSettings,
     name := "ammonite-util",
     libraryDependencies ++= Seq(
-      "com.lihaoyi" %% "upickle" % "0.4.4",
+      "com.lihaoyi" %% "upickle" % "0.5.0",
       "com.lihaoyi" %% "pprint" % "0.5.2",
       "com.lihaoyi" %% "fansi" % "0.2.4"
     )
@@ -229,7 +213,7 @@ lazy val ammInterp = project
 
     ),
     unmanagedSourceDirectories in Compile ++= {
-      if (Set("2.10", "2.11").contains(scalaBinaryVersion.value))
+      if (Set("2.11").contains(scalaBinaryVersion.value))
         Seq(baseDirectory.value / "src" / "main" / "scala-2.10_2.11")
       else
         Seq()
@@ -257,7 +241,7 @@ lazy val ammRepl = project
         Seq()
     },
     unmanagedSourceDirectories in Compile ++= {
-      if (Set("2.10", "2.11").contains(scalaBinaryVersion.value))
+      if (Set("2.11").contains(scalaBinaryVersion.value))
         Seq(baseDirectory.value / "src" / "main" / "scala-2.10_2.11")
       else
         Seq()

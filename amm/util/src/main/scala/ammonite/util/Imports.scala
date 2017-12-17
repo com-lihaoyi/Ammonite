@@ -22,13 +22,21 @@ object ScriptOutput{
                            leadingSpaces: String,
                            hookInfo: ImportHookInfo,
                            finalImports: Imports)
+  object BlockMetadata{
+    implicit def rw: upickle.default.ReadWriter[BlockMetadata] = upickle.default.macroRW
+  }
   case class Metadata(blockInfo: Seq[BlockMetadata])
+  object Metadata{
+    implicit def rw: upickle.default.ReadWriter[Metadata] = upickle.default.macroRW
+  }
 }
 
 case class ImportHookInfo(imports: Imports,
                           stmts: Seq[String],
                           trees: Seq[ImportTree])
-
+object ImportHookInfo{
+  implicit def rw: upickle.default.ReadWriter[ImportHookInfo] = upickle.default.macroRW
+}
 case class Evaluated(wrapper: Seq[Name],
                      imports: Imports)
 
@@ -56,7 +64,11 @@ case class ImportData(fromName: Name,
 
 
 object ImportData{
+  implicit val rw: upickle.default.ReadWriter[ImportData] = upickle.default.macroRW
   sealed case class ImportType(name: String)
+  object ImportType{
+    implicit val rw: upickle.default.ReadWriter[ImportType] = upickle.default.macroRW
+  }
   val Type = ImportType("Type")
   val Term = ImportType("Term")
   val TermType = ImportType("TermType")
@@ -108,6 +120,10 @@ class Imports private (val value: Seq[ImportData]){
 }
 
 object Imports{
+  implicit def rw: upickle.default.ReadWriter[Imports] = upickle.default.ReadWriter[Imports](
+    imports => upickle.default.writeJs(imports.value),
+    {case js => Imports(upickle.default.readJs[Seq[ImportData]](js))}
+  )
   // This isn't called directly, but we need to define it so uPickle can know
   // how to read/write imports
   def unapply(s: Imports): Option[Seq[ImportData]] = Some(s.value)

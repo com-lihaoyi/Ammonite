@@ -59,27 +59,25 @@ object SourceTests extends TestSuite{
           // properly included in the classpath in 2.10; it's unfortunate but
           // we'll just ignore it since the community has already moved on to
           // 2.11 and 2.12
-          if (!TestUtils.scala2_10)check(
+          check(
             load(Nil),
             "List.scala",
             "case object Nil extends List[Nothing]"
           )
         }
         'runtimeTyped - {
-          if (!TestUtils.scala2_10){
-            val empty: Seq[Int] = Seq()
-            val nonEmpty: Seq[Int] = Seq(1)
-            check(
-              load(empty),
-              "List.scala",
-              "case object Nil extends List[Nothing]"
-            )
-            check(
-              load(nonEmpty),
-              "List.scala",
-              "final case class ::"
-            )
-          }
+          val empty: Seq[Int] = Seq()
+          val nonEmpty: Seq[Int] = Seq(1)
+          check(
+            load(empty),
+            "List.scala",
+            "case object Nil extends List[Nothing]"
+          )
+          check(
+            load(nonEmpty),
+            "List.scala",
+            "final case class ::"
+          )
         }
       }
       'fieldsAreTreatedAsObjects{
@@ -108,13 +106,11 @@ object SourceTests extends TestSuite{
         )
       }
       'void{
-        if (!TestUtils.scala2_10){
-          check(
-            load(Predef.println()),
-            "Predef.scala",
-            "def println() ="
-          )
-        }
+        check(
+          load(Predef.println()),
+          "Predef.scala",
+          "def println() ="
+        )
       }
 
       'overloaded{
@@ -136,15 +132,12 @@ object SourceTests extends TestSuite{
         )
       }
       'implementedBySubclass{
-        if (!TestUtils.scala2_10){
-
-          val opt: Option[Int] = Option(1)
-          check(
-            load(opt.get),
-            "Option.scala",
-            "def get = "
-          )
-        }
+        val opt: Option[Int] = Option(1)
+        check(
+          load(opt.get),
+          "Option.scala",
+          "def get = "
+        )
       }
       'implementedBySuperclass{
         // The file has changed names since earlier versions...

@@ -43,9 +43,6 @@ object SessionTests extends TestSuite{
       // Make sure these various "special" data structures get pretty-printed
       // correctly, i.e. not as their underlying type but as something more
       // pleasantly human-readable
-      val typeString =
-        if (!scala2_10) "CommandResult"
-        else "ammonite.ops.CommandResult"
       check.session(s"""
         @ import ammonite.ops._
 
@@ -54,7 +51,7 @@ object SessionTests extends TestSuite{
         @ import ammonite.ops.ImplicitWd
 
         @ %%ls 'ops
-        res3: $typeString =
+        res3: CommandResult =
         src
         target
       """)

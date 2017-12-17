@@ -35,6 +35,9 @@ class CompilationError(message: String) extends Exception(message)
 case class Tag(code: String, env: String){
   def combined = code + env
 }
+object Tag{
+  implicit def rw: upickle.default.ReadWriter[Tag] = upickle.default.macroRW
+}
 
 
 /**
@@ -65,7 +68,7 @@ object Name{
     */
   implicit val nameRW: upickle.default.ReadWriter[Name] = upickle.default.ReadWriter[Name](
     name => upickle.Js.Str(name.raw),
-    {case upickle.Js.Str(raw) => Name(raw)}
+    {case upickle.Js.Str(raw) => Name(raw.toString)}
   )
 
   val alphaKeywords = Set(
@@ -271,6 +274,7 @@ case class ImportTree(prefix: Seq[String],
                       end: Int)
 
 object ImportTree{
+  implicit def rw: upickle.default.ReadWriter[ImportTree] = upickle.default.macroRW
   type ImportMapping = Seq[(String, Option[String])]
 }
 

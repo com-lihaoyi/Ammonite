@@ -177,11 +177,11 @@ object ImportTests extends TestSuite{
           res2: Int = 1
 
           @ 2: Foo
-          res3: ${sessionPrefix}Foo = 2
+          res3: Foo = 2
         """)
 
         * - {
-          val pkg2 = if (scala2_10) sessionPrefix + "pkg2." else ""
+
           check.session(s"""
             @ object pkg1{ val Order = "lolz" }
 
@@ -195,10 +195,10 @@ object ImportTests extends TestSuite{
             @ import pkg2._
 
             @ Seq(1): Order[Int]
-            res5: ${pkg2}Order[Int] = List(1)
+            res5: Order[Int] = List(1)
 
             @ Seq(Order): Order[String]
-            res6: ${pkg2}Order[String] = List("lolz")
+            res6: Order[String] = List("lolz")
           """)
         }
 
@@ -230,25 +230,19 @@ object ImportTests extends TestSuite{
           error: Compilation Failed
         """)
         // Prefix things properly in Scala-2.10 where the type printer is dumb
-        val prefix1 = if (scala2_10) "ammonite.testcode.paulp1." else ""
-        val prefix2 = if (scala2_10) "ammonite.testcode.paulp2." else ""
-        val prefix3 = if (scala2_10) "ammonite.testcode.paulp3." else ""
-        val prefix4 = if (scala2_10) "ammonite.$sess.Paulp4." else ""
-        val prefix5 = if (scala2_10) "ammonite.$sess.Paulp5." else ""
-        val prefix6 = if (scala2_10) "ammonite.$sess.Paulp6." else ""
         'paulp - {
 
           check.session(s"""
           @ import ammonite.testcode.paulp1._, ammonite.testcode.paulp2._
 
           @ new Paulp; Paulp // Paulp's example in #199
-          res1_0: ${prefix1}Paulp = paulp1.Paulp1
-          res1_1: ${prefix2}Paulp.type = paulp2.Paulp2
+          res1_0: Paulp = paulp1.Paulp1
+          res1_1: Paulp.type = paulp2.Paulp2
 
           @ val Paulp = 123 // Shadow the term but not the type
 
           @ new Paulp; Paulp // Shouldn't change
-          res3_0: ${prefix1}Paulp = paulp1.Paulp1
+          res3_0: Paulp = paulp1.Paulp1
           res3_1: Int = 123
 
           @ object Paulp3{
@@ -269,34 +263,34 @@ object ImportTests extends TestSuite{
           @ import Paulp4.Paulp, Paulp5.Paulp // cross import, shadow both
 
           @ Paulp
-          res10: ${prefix4}Paulp.type = Paulp4
+          res10: Paulp.type = Paulp4
 
           @ new Paulp
-          res11: ${prefix5}Paulp = Paulp5
+          res11: Paulp = Paulp5
 
           @ import ammonite.testcode.paulp1._ // individually import & shadow...
 
           @ new Paulp; Paulp
-          res13_0: ${prefix1}Paulp = paulp1.Paulp1
-          res13_1: ${prefix4}Paulp.type = Paulp4
+          res13_0: Paulp = paulp1.Paulp1
+          res13_1: Paulp.type = Paulp4
 
           @ import ammonite.testcode.paulp2._ // one at a time...
 
           @ new Paulp; Paulp
-          res15_0: ${prefix1}Paulp = paulp1.Paulp1
-          res15_1: ${prefix2}Paulp.type = paulp2.Paulp2
+          res15_0: Paulp = paulp1.Paulp1
+          res15_1: Paulp.type = paulp2.Paulp2
 
           @ object Paulp6{ val Paulp = 1; type Paulp = Int }
 
           @ import Paulp6._ // This should shadow both
 
           @ Paulp: Paulp
-          res18: ${prefix6}Paulp = 1
+          res18: Paulp = 1
 
           @ import Paulp4._
 
           @ Paulp
-          res20: ${prefix4}Paulp.type = Paulp4
+          res20: Paulp.type = Paulp4
 
           @ Paulp: Paulp // Improper shadowing! This is a known issue but hard to fix
           error: not found: type Paulp
@@ -315,7 +309,7 @@ object ImportTests extends TestSuite{
           @ import ammonite.testcode.paulp3.Paulp
 
           @ new Paulp
-          res2: ${prefix3}Paulp = paulp3.Paulp-class
+          res2: Paulp = paulp3.Paulp-class
         """)
         }
       }

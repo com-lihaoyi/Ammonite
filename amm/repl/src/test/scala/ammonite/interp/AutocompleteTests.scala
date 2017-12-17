@@ -101,23 +101,23 @@ object AutocompleteTests extends TestSuite{
         complete( """object Zomg{ <caret>Zom }""", Set("Zomg") ^)
       }
       'dot - checking{ complete =>
-        if (!scala2_10) {
-          complete( """java.math.<caret>""",
-            Set("MathContext", "BigDecimal", "BigInteger", "RoundingMode") ^
-          )
 
-          complete( """scala.Option.<caret>""",
-            (anyCompletion ++ Set("apply", "empty")) ^
-          )
+        complete( """java.math.<caret>""",
+          Set("MathContext", "BigDecimal", "BigInteger", "RoundingMode") ^
+        )
 
-          complete( """Seq(1, 2, 3).map(_.<caret>)""",
-            (anyCompletion ++ Set("+", "-", "*", "/")) -- _
-          )
+        complete( """scala.Option.<caret>""",
+          (anyCompletion ++ Set("apply", "empty")) ^
+        )
 
-          complete( """val x = 1; x + (x.<caret>)""",
-            Set("-", "+", "*", "/") -- _
-          )
-        }
+        complete( """Seq(1, 2, 3).map(_.<caret>)""",
+          (anyCompletion ++ Set("+", "-", "*", "/")) -- _
+        )
+
+        complete( """val x = 1; x + (x.<caret>)""",
+          Set("-", "+", "*", "/") -- _
+        )
+
       }
 
       'deep - checking{ complete =>

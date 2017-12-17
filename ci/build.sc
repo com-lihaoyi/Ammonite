@@ -15,12 +15,11 @@ val commitsSinceTaggedVersion = {
 }
 
 val allVersions = Seq(
-  "2.10.4", "2.10.5", "2.10.6",
   "2.11.3", "2.11.4", "2.11.5", "2.11.6", "2.11.7", "2.11.8", "2.11.11",
   "2.12.0", "2.12.1", "2.12.2", "2.12.3", "2.12.4"
 )
 
-val latestMajorVersions = Set("2.10.6", "2.11.11", "2.12.4")
+val latestMajorVersions = Set("2.11.11", "2.12.4")
 
 val (buildVersion, unstable) = sys.env.get("TRAVIS_TAG") match{
   case Some(v) if v != "" => (v, false)
@@ -99,18 +98,18 @@ def publishDocs() = {
       (
         s"$latestTaggedVersion/2.12-$latestTaggedVersion",
         s"$latestTaggedVersion/2.12-$latestTaggedVersion",
-        for(v <- Seq("2.10", "2.11"))
+        for(v <- Seq("2.11"))
         yield s"$latestTaggedVersion/$v-$latestTaggedVersion",
-        for(v <- Seq("2.10", "2.11"))
+        for(v <- Seq("2.11"))
         yield s"$latestTaggedVersion/$v-$latestTaggedVersion"
       )
     }else{
       (
         s"$latestTaggedVersion/2.12-$latestTaggedVersion",
         s"snapshot-commit-uploads/2.12-$buildVersion",
-        for(v <- Seq("2.10", "2.11"))
+        for(v <- Seq("2.11"))
         yield s"$latestTaggedVersion/$v-$latestTaggedVersion",
-        for(v <- Seq("2.10", "2.11"))
+        for(v <- Seq("2.11"))
         yield s"snapshot-commit-uploads/$v-$buildVersion"
       )
     }
