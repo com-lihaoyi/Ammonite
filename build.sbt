@@ -33,6 +33,7 @@ val sharedSettings = Seq(
   addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.7"),
   ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) },
   parallelExecution in Test := false,
+  resolvers += Resolver.sonatypeRepo("releases"),
   (unmanagedSources in Compile) += (baseDirectory in ThisBuild).value/"project"/"Constants.scala",
   mappings in (Compile, packageSrc) += {
     ((baseDirectory in ThisBuild).value/".."/"project"/"Constants.scala") -> "Constants.scala"
