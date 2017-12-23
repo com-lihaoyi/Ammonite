@@ -31,7 +31,7 @@ val sharedSettings = Seq(
   scalacOptions += "-P:acyclic:force",
   autoCompilerPlugins := true,
   addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.7"),
-  ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) },
+  scalaModuleInfo ~= (_.map(_.withOverrideScalaVersion(true))),
   parallelExecution in Test := false,
   resolvers += Resolver.sonatypeRepo("releases"),
   (unmanagedSources in Compile) += (baseDirectory in ThisBuild).value/"project"/"Constants.scala",
@@ -121,7 +121,7 @@ lazy val amm = project
     (fullClasspath in Runtime) ++= {
       (updateClassifiers in Runtime).value
         .configurations
-        .find(_.configuration == Runtime.name)
+        .find(_.configuration.name == Runtime.name)
         .get
         .modules
         .flatMap(_.artifacts)
@@ -253,7 +253,7 @@ lazy val ammRepl = project
     (fullClasspath in Test) ++= {
       (updateClassifiers in Test).value
         .configurations
-        .find(_.configuration == Test.name)
+        .find(_.configuration.name == Test.name)
         .get
         .modules
         .flatMap(_.artifacts)
