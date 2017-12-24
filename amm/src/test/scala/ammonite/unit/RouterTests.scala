@@ -9,14 +9,15 @@ import ammonite.util.Util
 import utest._
 import ammonite.main.Scripts.groupArgs
 object RouterTests extends TestSuite{
-  def parseInvoke(entryPoint: EntryPoint, input: List[String]) = {
+  def parseInvoke[T](base: T, entryPoint: EntryPoint[T], input: List[String]) = {
     val grouped = groupArgs(input)
-    entryPoint.invoke(grouped)
+    entryPoint.invoke(base, grouped)
   }
-  def check[T](entryPoint: EntryPoint,
-               input: List[String],
-               expected: Router.Result[T]) = {
-    val result = parseInvoke(entryPoint, input)
+  def check[B, T](base: B,
+                  entryPoint: EntryPoint[B],
+                  input: List[String],
+                  expected: Router.Result[T]) = {
+    val result = parseInvoke(base, entryPoint, input)
     assert(result == expected)
   }
   val tests = Tests {
@@ -49,16 +50,17 @@ object RouterTests extends TestSuite{
         @main
         def mixedVariadic(first: Int, args: String*) = first + args.mkString
       }
-      val routes = Router.generateRoutes(Target)
-
+      val routes = Router.generateRoutes[Target.type]
 
       'basicModelling{
+        val names = routes.map(_.name)
         assert(
-          routes.map(_.name) == List("foo", "bar", "qux", "ex", "pureVariadic", "mixedVariadic")
+          names == List("foo", "bar", "qux", "ex", "pureVariadic", "mixedVariadic")
         )
         val evaledArgs = routes.map(_.argSignatures.map{
           case Router.ArgSig(name, tpe, docs, None) => (name, tpe, docs, None)
-          case Router.ArgSig(name, tpe, docs, Some(default)) => (name, tpe, docs, Some(default()))
+          case Router.ArgSig(name, tpe, docs, Some(default)) =>
+            (name, tpe, docs, Some(default(Target)))
         })
         assert(
           evaledArgs == List(
@@ -77,26 +79,26 @@ object RouterTests extends TestSuite{
 
 
       'invoke - {
-        check(routes(0), List(), Router.Result.Success(1))
-        check(routes(1), List("2"), Router.Result.Success(2))
-        check(routes(1), List("--i", "2"), Router.Result.Success(2))
-        check(routes(2), List("2"), Router.Result.Success("lolslols"))
-        check(routes(2), List("--i", "2"), Router.Result.Success("lolslols"))
-        check(routes(2), List("3", "x"), Router.Result.Success("xxx"))
-        check(routes(2), List("--i", "3", "x"), Router.Result.Success("xxx"))
-        check(routes(2), List("--i", "3", "--s", "x"), Router.Result.Success("xxx"))
+        check(Target, routes(0), List(), Router.Result.Success(1))
+        check(Target, routes(1), List("2"), Router.Result.Success(2))
+        check(Target, routes(1), List("--i", "2"), Router.Result.Success(2))
+        check(Target, routes(2), List("2"), Router.Result.Success("lolslols"))
+        check(Target, routes(2), List("--i", "2"), Router.Result.Success("lolslols"))
+        check(Target, routes(2), List("3", "x"), Router.Result.Success("xxx"))
+        check(Target, routes(2), List("--i", "3", "x"), Router.Result.Success("xxx"))
+        check(Target, routes(2), List("--i", "3", "--s", "x"), Router.Result.Success("xxx"))
       }
       'varargs{
         'happyPathPasses - {
-          check(routes(4), List("1", "2", "3"), Router.Result.Success(6))
-          check(routes(5), List("1", "2", "3", "4", "5"), Router.Result.Success("12345"))
+          check(Target, routes(4), List("1", "2", "3"), Router.Result.Success(6))
+          check(Target, routes(5), List("1", "2", "3", "4", "5"), Router.Result.Success("12345"))
         }
         'emptyVarargsPasses - {
-          check(routes(4), List(), Router.Result.Success(0))
-          check(routes(5), List("1"), Router.Result.Success("1"))
+          check(Target, routes(4), List(), Router.Result.Success(0))
+          check(Target, routes(5), List("1"), Router.Result.Success("1"))
         }
         'varargsAreAlwaysPositional - {
-          val invoked = parseInvoke(routes(4), List("--nums", "31337"))
+          val invoked = parseInvoke(Target, routes(4), List("--nums", "31337"))
           assertMatch(invoked){
             case InvalidArguments(List(
               ParamError.Invalid(
@@ -106,9 +108,12 @@ object RouterTests extends TestSuite{
               )
             ))=>
           }
-          check(routes(5), List("1", "--args", "foo"), Router.Result.Success("1--argsfoo"))
+          check(
+            Target, routes(5), List("1", "--args", "foo"),
+            Router.Result.Success("1--argsfoo")
+          )
 
-          assertMatch(parseInvoke(routes(4), List("1", "2", "3", "--nums", "4"))){
+          assertMatch(parseInvoke(Target, routes(4), List("1", "2", "3", "--nums", "4"))){
             case InvalidArguments(List(
               ParamError.Invalid(
                 ArgSig("nums", "Int*", _, _),
@@ -120,12 +125,12 @@ object RouterTests extends TestSuite{
         }
 
         'notEnoughNormalArgsStillFails{
-          assertMatch(parseInvoke(routes(5), List())){
+          assertMatch(parseInvoke(Target, routes(5), List())){
             case MismatchedArguments(List(ArgSig("first", _, _, _)), Nil, Nil, None) =>
           }
         }
         'multipleVarargParseFailures{
-          assertMatch(parseInvoke(routes(4), List("aa", "bb", "3"))){
+          assertMatch(parseInvoke(Target, routes(4), List("aa", "bb", "3"))){
             case InvalidArguments(
             List(
             ParamError.Invalid(ArgSig("nums", "Int*", _, _), "aa", _: NumberFormatException),
@@ -133,7 +138,7 @@ object RouterTests extends TestSuite{
             )
             )=>
           }
-          assertMatch(parseInvoke(routes(5), List("aa", "bb", "3"))){
+          assertMatch(parseInvoke(Target, routes(5), List("aa", "bb", "3"))){
             case InvalidArguments(
             List(
             ParamError.Invalid(ArgSig("first", "Int", _, _), "aa", _: NumberFormatException)
@@ -145,34 +150,34 @@ object RouterTests extends TestSuite{
 
       'failures{
         'missingParams - {
-          assertMatch(parseInvoke(routes(1), List.empty)){
+          assertMatch(parseInvoke(Target, routes(1), List.empty)){
             case MismatchedArguments(List(ArgSig("i", _, _, _)), Nil, Nil, None) =>
           }
-          assertMatch(parseInvoke(routes(2), List("--s", "omg"))){
+          assertMatch(parseInvoke(Target, routes(2), List("--s", "omg"))){
             case MismatchedArguments(List(ArgSig("i", _, _, _)), Nil, Nil, None) =>
           }
         }
-        'invalidParams - assertMatch(parseInvoke(routes(1), List("lol"))){
+        'invalidParams - assertMatch(parseInvoke(Target, routes(1), List("lol"))){
           case InvalidArguments(
           List(ParamError.Invalid(ArgSig("i", _, _, _), "lol", _))
           ) =>
         }
 
         'tooManyParams - check(
-          routes(0), List("1", "2"),
+          Target, routes(0), List("1", "2"),
           MismatchedArguments(Nil, List("1", "2"), Nil, None)
         )
 
 
         'redundantParams - {
-          val parsed = parseInvoke(routes(2), List("1", "--i", "2"))
+          val parsed = parseInvoke(Target, routes(2), List("1", "--i", "2"))
           assertMatch(parsed){
             case MismatchedArguments(
               Nil, Nil, Seq((ArgSig("i", _, _, _), Seq("1", "2"))), None
             ) =>
           }
         }
-        'failing - check(routes(3), List(), Router.Result.Error.Exception(MyException))
+        'failing - check(Target, routes(3), List(), Router.Result.Error.Exception(MyException))
       }
     }
   }

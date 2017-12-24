@@ -42,6 +42,7 @@ object Scripts {
       scriptTxt <- try Res.Success(Util.normalizeNewlines(read(path))) catch{
         case e: NoSuchFileException => Res.Failure("Script file not found: " + path)
       }
+
       processed <- interp.processModule(
         scriptTxt,
         CodeSource(wrapper, pkg, Seq(Name("ammonite"), Name("$file")), Some(path)),
@@ -54,8 +55,9 @@ object Scripts {
         extraCode = Util.normalizeNewlines(
           s"""
           |val $$routesOuter = this
-          |object $$routes extends scala.Function0[scala.Seq[ammonite.main.Router.EntryPoint]]{
-          |  def apply() = ammonite.main.Router.generateRoutes[$$routesOuter.type]($$routesOuter)
+          |object $$routes
+          |extends scala.Function0[scala.Seq[ammonite.main.Router.EntryPoint[$$routesOuter.type]]]{
+          |  def apply() = ammonite.main.Router.generateRoutes[$$routesOuter.type]
           |}
           """.stripMargin
         ),
@@ -67,6 +69,11 @@ object Scripts {
         case None => Res.Skip
       }
 
+      mainCls =
+        interp
+          .evalClassloader
+          .loadClass(processed.blockInfo.last.id.wrapperPath + "$")
+
       routesCls =
         interp
           .evalClassloader
@@ -76,8 +83,11 @@ object Scripts {
         routesCls
             .getField("MODULE$")
             .get(null)
-            .asInstanceOf[() => Seq[Router.EntryPoint]]
+            .asInstanceOf[() => Seq[Router.EntryPoint[Any]]]
             .apply()
+
+
+      mainObj = mainCls.getField("MODULE$").get(null)
 
       res <- Util.withContextClassloader(interp.evalClassloader){
         scriptMains match {
@@ -93,12 +103,12 @@ object Scripts {
             }
 
           // If there's one @main method, we run it with all args
-          case Seq(main) => runMainMethod(main, scriptArgs)
+          case Seq(main) => runMainMethod(mainObj, main, scriptArgs)
 
           // If there are multiple @main methods, we use the first arg to decide
           // which method to run, and pass the rest to that main method
           case mainMethods =>
-            val suffix = formatMainMethods(mainMethods)
+            val suffix = formatMainMethods(mainObj, mainMethods)
             scriptArgs match{
               case Seq() =>
                 Res.Failure(
@@ -116,21 +126,21 @@ object Scripts {
                       s"Unable to find subcommand: " + backtickWrap(head) + suffix
                     )
                   case Some(main) =>
-                    runMainMethod(main, tail)
+                    runMainMethod(mainObj, main, tail)
                 }
             }
         }
       }
     } yield res
   }
-  def formatMainMethods(mainMethods: Seq[Router.EntryPoint]) = {
+  def formatMainMethods[T](base: T, mainMethods: Seq[Router.EntryPoint[T]]) = {
     if (mainMethods.isEmpty) ""
     else{
       val leftColWidth = getLeftColWidth(mainMethods.flatMap(_.argSignatures))
 
       val methods =
         for(main <- mainMethods)
-        yield formatMainMethodSignature(main, 2, leftColWidth)
+        yield formatMainMethodSignature(base, main, 2, leftColWidth)
 
       Util.normalizeNewlines(
         s"""
@@ -141,17 +151,18 @@ object Scripts {
       )
     }
   }
-  def getLeftColWidth(items: Seq[ArgSig]) = {
+  def getLeftColWidth[T](items: Seq[ArgSig[T]]) = {
     items.map(_.name.length + 2) match{
       case Nil => 0
       case x => x.max
     }
   }
-  def formatMainMethodSignature(main: Router.EntryPoint,
-                                leftIndent: Int,
-                                leftColWidth: Int) = {
+  def formatMainMethodSignature[T](base: T,
+                                   main: Router.EntryPoint[T],
+                                   leftIndent: Int,
+                                   leftColWidth: Int) = {
     // +2 for space on right of left col
-    val args = main.argSignatures.map(renderArg(_, leftColWidth + leftIndent + 2 + 2, 80))
+    val args = main.argSignatures.map(renderArg(base, _, leftColWidth + leftIndent + 2 + 2, 80))
 
     val leftIndentStr = " " * leftIndent
     val argStrings =
@@ -166,20 +177,21 @@ object Scripts {
       case None => ""
     }
 
-    s"""$leftIndentStr${main.name}${mainDocSuffix}
+    s"""$leftIndentStr${main.name}$mainDocSuffix
        |${argStrings.map(_ + Util.newLine).mkString}""".stripMargin
   }
-  def runMainMethod(mainMethod: Router.EntryPoint,
-                    scriptArgs: Seq[(String, Option[String])]): Res[Any] = {
+  def runMainMethod[T](base: T,
+                       mainMethod: Router.EntryPoint[T],
+                       scriptArgs: Seq[(String, Option[String])]): Res[Any] = {
     val leftColWidth = getLeftColWidth(mainMethod.argSignatures)
 
-    def expectedMsg = formatMainMethodSignature(mainMethod, 0, leftColWidth)
+    def expectedMsg = formatMainMethodSignature(base: T, mainMethod, 0, leftColWidth)
 
     def pluralize(s: String, n: Int) = {
       if (n == 1) s else s + "s"
     }
 
-    mainMethod.invoke(scriptArgs) match{
+    mainMethod.invoke(base, scriptArgs) match{
       case Router.Result.Success(x) => Res.Success(x)
       case Router.Result.Error.Exception(x: AmmoniteExit) => Res.Success(x.value)
       case Router.Result.Error.Exception(x) => Res.Exception(x, "")
@@ -281,10 +293,13 @@ object Scripts {
     }
     output.mkString
   }
-  def renderArgShort(arg: ArgSig) = "--" + backtickWrap(arg.name)
-  def renderArg(arg: ArgSig, leftOffset: Int, wrappedWidth: Int): (String, String) = {
+  def renderArgShort[T](arg: ArgSig[T]) = "--" + backtickWrap(arg.name)
+  def renderArg[T](base: T,
+                   arg: ArgSig[T],
+                   leftOffset: Int,
+                   wrappedWidth: Int): (String, String) = {
     val suffix = arg.default match{
-      case Some(f) => " (default " + f() + ")"
+      case Some(f) => " (default " + f(base) + ")"
       case None => ""
     }
     val docSuffix = arg.doc match{
@@ -300,7 +315,7 @@ object Scripts {
   }
 
 
-  def mainMethodDetails(ep: EntryPoint) = {
+  def mainMethodDetails[T](ep: EntryPoint[T]) = {
     ep.argSignatures.collect{
       case ArgSig(name, tpe, Some(doc), default) =>
         Util.newLine + name + " // " + doc
