@@ -244,7 +244,7 @@ class Router [C <: Context](val c: C) {
     def isAMemberOfAnyRef(member: Symbol) =
       weakTypeOf[AnyRef].members.exists(_.name == member.name)
     val extractableMembers = for {
-      member <- curCls.declarations
+      member <- curCls.members
       if !isAMemberOfAnyRef(member)
       if !member.isSynthetic
       if member.isPublic
