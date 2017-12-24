@@ -102,7 +102,8 @@ class Repl(input: InputStream,
     colors,
     verboseOutput = true,
     getFrame = () => frames().head,
-    codeWrapper = Preprocessor.CodeWrapper
+    replCodeWrapper = Preprocessor.CodeWrapper,
+    scriptCodeWrapper = Preprocessor.CodeWrapper
   )
 
   def initializePredef() = interp.initializePredef()

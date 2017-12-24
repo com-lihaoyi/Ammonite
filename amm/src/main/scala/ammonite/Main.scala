@@ -151,7 +151,8 @@ case class Main(predefCode: String = "",
         colorsRef,
         verboseOutput,
         () => frame,
-        codeWrapper = codeWrapper
+        replCodeWrapper = Preprocessor.CodeWrapper,
+        scriptCodeWrapper = Preprocessor.CodeWrapper
       )
       interp.initializePredef() match{
         case None => Right(interp)

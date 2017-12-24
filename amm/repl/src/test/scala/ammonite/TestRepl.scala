@@ -105,7 +105,8 @@ class TestRepl {
       )),
       colors = Ref(Colors.BlackWhite),
       getFrame = () => frames().head,
-      codeWrapper = Preprocessor.CodeWrapper
+      replCodeWrapper = Preprocessor.CodeWrapper,
+      scriptCodeWrapper = Preprocessor.CodeWrapper
     )
 
   }catch{ case e: Throwable =>

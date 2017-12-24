@@ -3,6 +3,8 @@ package ammonite.interp
 import java.io.{File, OutputStream, PrintStream}
 import java.util.regex.Pattern
 
+import ammonite.interp.Preprocessor.CodeWrapper
+
 import scala.collection.mutable
 import ammonite.ops._
 import ammonite.runtime._
@@ -35,7 +37,8 @@ class Interpreter(val printer: Printer,
                   colors: Ref[Colors],
                   verboseOutput: Boolean = true,
                   getFrame: () => Frame,
-                  codeWrapper: Preprocessor.CodeWrapper)
+                  replCodeWrapper: Preprocessor.CodeWrapper,
+                  scriptCodeWrapper: Preprocessor.CodeWrapper)
   extends ImportHook.InterpreterInterface{ interp =>
 
 
@@ -102,7 +105,7 @@ class Interpreter(val printer: Printer,
       // bundled into the main `eval.imports`: instead we pass `predefImports`
       // manually throughout, and keep `eval.imports` as a relatively-clean
       // listing which only contains the imports for code a user entered.
-      processModule(_, _, autoImport = false, "", _),
+      processModule(_, _, autoImport = false, "", _, moduleCodeWrapper = CodeWrapper),
       imports => predefImports = predefImports ++ imports,
       watch
     ) match{
@@ -222,7 +225,7 @@ class Interpreter(val printer: Printer,
         prints => s"ammonite.repl.ReplBridge.value.Internal.combinePrints($prints)",
         extraCode = "",
         skipEmpty = true,
-        codeWrapper = codeWrapper
+        codeWrapper = replCodeWrapper
       )
       (out, tag) <- evaluateLine(
         processed, printer,
@@ -299,7 +302,9 @@ class Interpreter(val printer: Printer,
                     codeSource: CodeSource,
                     autoImport: Boolean,
                     extraCode: String,
-                    hardcoded: Boolean): Res[ScriptOutput.Metadata] = synchronized{
+                    hardcoded: Boolean,
+                    moduleCodeWrapper: CodeWrapper = scriptCodeWrapper)
+                    : Res[ScriptOutput.Metadata] = synchronized{
 
     alreadyLoadedFiles.get(codeSource) match{
       case Some(x) => Res.Success(x)
@@ -467,7 +472,7 @@ class Interpreter(val printer: Printer,
               _ => "scala.Iterator[String]()",
               extraCode = extraCode,
               skipEmpty = false,
-              codeWrapper = codeWrapper
+              codeWrapper = scriptCodeWrapper
             )
 
             (ev, tag) <- evaluate(processed, indexedWrapperName)

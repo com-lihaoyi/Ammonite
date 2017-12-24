@@ -29,7 +29,8 @@ object TestUtils {
       extraBridges = Seq(),
       colors = Ref(Colors.BlackWhite),
       getFrame = () => startFrame,
-      codeWrapper = Preprocessor.CodeWrapper
+      replCodeWrapper = Preprocessor.CodeWrapper,
+      scriptCodeWrapper = Preprocessor.CodeWrapper
     )
     interp.initializePredef()
     interp
