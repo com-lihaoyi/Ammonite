@@ -21,7 +21,7 @@ object Router{
     import c.universe._
     val r = new Router(c)
     val allRoutes = r.getAllRoutesForClass(
-      weakTypeOf[T].asInstanceOf[r.c.Type],
+      weakTypeOf[T].asInstanceOf[r.c.Type]
     ).asInstanceOf[Iterable[c.Tree]]
 
     c.Expr[Seq[EntryPoint[T]]](q"_root_.scala.Seq(..$allRoutes)")
