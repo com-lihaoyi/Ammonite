@@ -171,14 +171,14 @@ the Scala compiler and greatly reduces the startup time of cached scripts.
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">EntryPoint</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="argSignatures">argSignatures: <span class="extype" name="scala.Seq">Seq</span>[<a href="Router$$ArgSig.html" class="extype" name="ammonite.main.Router.ArgSig">ArgSig</a>]</span>, <span name="doc">doc: <a href="http://scala-lang.org/files/archive/api/2.12.4/scala/Option.html#scala.Option" class="extype" name="scala.Option">Option</a>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="varargs">varargs: <a href="http://scala-lang.org/files/archive/api/2.12.4/scala/Boolean.html#scala.Boolean" class="extype" name="scala.Boolean">Boolean</a></span>, <span name="invoke0">invoke0: (<span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Predef.String">String</span>], <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Predef.String">String</span>]) ⇒ <a href="Router$$Result.html" class="extype" name="ammonite.main.Router.Result">Result</a>[<a href="http://scala-lang.org/files/archive/api/2.12.4/scala/collection/immutable/List.html#scala.Any" class="extype" name="scala.collection.immutable.List">Any</a>]</span>)</span><span class="result"> extends <a href="http://scala-lang.org/files/archive/api/2.12.4/scala/Product.html#scala.Product" class="extype" name="scala.Product">Product</a> with <a href="http://scala-lang.org/files/archive/api/2.12.4/scala/Serializable.html#scala.Serializable" class="extype" name="scala.Serializable">Serializable</a></span>
+        <span class="name">EntryPoint</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="argSignatures">argSignatures: <span class="extype" name="scala.Seq">Seq</span>[<a href="Router$$ArgSig.html" class="extype" name="ammonite.main.Router.ArgSig">ArgSig</a>[<span class="extype" name="ammonite.main.Router.EntryPoint.T">T</span>]]</span>, <span name="doc">doc: <a href="http://scala-lang.org/files/archive/api/2.12.4/scala/Option.html#scala.Option" class="extype" name="scala.Option">Option</a>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="varargs">varargs: <a href="http://scala-lang.org/files/archive/api/2.12.4/scala/Boolean.html#scala.Boolean" class="extype" name="scala.Boolean">Boolean</a></span>, <span name="invoke0">invoke0: (<span class="extype" name="ammonite.main.Router.EntryPoint.T">T</span>, <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Predef.String">String</span>], <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Predef.String">String</span>]) ⇒ <a href="Router$$Result.html" class="extype" name="ammonite.main.Router.Result">Result</a>[<a href="http://scala-lang.org/files/archive/api/2.12.4/scala/collection/immutable/List.html#scala.Any" class="extype" name="scala.collection.immutable.List">Any</a>]</span>)</span><span class="result"> extends <a href="http://scala-lang.org/files/archive/api/2.12.4/scala/Product.html#scala.Product" class="extype" name="scala.Product">Product</a> with <a href="http://scala-lang.org/files/archive/api/2.12.4/scala/Serializable.html#scala.Serializable" class="extype" name="scala.Serializable">Serializable</a></span>
       </span>
       </h4>
 
       
           <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>What is known about a single endpoint for our routes. It has a <a href="#name:String" class="extmbr" name="ammonite.main.Router.EntryPoint#name">name</a>,
-<a href="#argSignatures:Seq[ammonite.main.Router.ArgSig]" class="extmbr" name="ammonite.main.Router.EntryPoint#argSignatures">argSignatures</a> for each argument, and a macro-generated <a href="#invoke0:(Map[String,String],Seq[String])=&gt;ammonite.main.Router.Result[Any]" class="extmbr" name="ammonite.main.Router.EntryPoint#invoke0">invoke0</a>
-that performs all the necessary argument parsing and de-serialization.</p><p>Realistically, you will probably spend most of your time calling <a href="#invoke(groupedArgs:Seq[(String,Option[String])]):ammonite.main.Router.Result[Any]" class="extmbr" name="ammonite.main.Router.EntryPoint#invoke">invoke</a>
+<a href="#argSignatures:Seq[ammonite.main.Router.ArgSig[T]]" class="extmbr" name="ammonite.main.Router.EntryPoint#argSignatures">argSignatures</a> for each argument, and a macro-generated <a href="#invoke0:(T,Map[String,String],Seq[String])=&gt;ammonite.main.Router.Result[Any]" class="extmbr" name="ammonite.main.Router.EntryPoint#invoke0">invoke0</a>
+that performs all the necessary argument parsing and de-serialization.</p><p>Realistically, you will probably spend most of your time calling <a href="#invoke(target:T,groupedArgs:Seq[(String,Option[String])]):ammonite.main.Router.Result[Any]" class="extmbr" name="ammonite.main.Router.EntryPoint#invoke">invoke</a>
 instead, which provides a nicer API to call it that mimmicks the API of
 calling a Scala method.
 </p></div><div class="toggleContainer block">
@@ -232,9 +232,9 @@ calling a Scala method.
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="ammonite.main.Router.EntryPoint#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(name:String,argSignatures:Seq[ammonite.main.Router.ArgSig],doc:Option[String],varargs:Boolean,invoke0:(Map[String,String],Seq[String])=&gt;ammonite.main.Router.Result[Any]):ammonite.main.Router.EntryPoint"></a><a id="&lt;init&gt;:EntryPoint"></a>
+      <a id="&lt;init&gt;(name:String,argSignatures:Seq[ammonite.main.Router.ArgSig[T]],doc:Option[String],varargs:Boolean,invoke0:(T,Map[String,String],Seq[String])=&gt;ammonite.main.Router.Result[Any]):ammonite.main.Router.EntryPoint[T]"></a><a id="&lt;init&gt;:EntryPoint[T]"></a>
       <span class="permalink">
-      <a href="../../ammonite/main/Router$$EntryPoint.html#&lt;init&gt;(name:String,argSignatures:Seq[ammonite.main.Router.ArgSig],doc:Option[String],varargs:Boolean,invoke0:(Map[String,String],Seq[String])=&gt;ammonite.main.Router.Result[Any]):ammonite.main.Router.EntryPoint" title="Permalink">
+      <a href="../../ammonite/main/Router$$EntryPoint.html#&lt;init&gt;(name:String,argSignatures:Seq[ammonite.main.Router.ArgSig[T]],doc:Option[String],varargs:Boolean,invoke0:(T,Map[String,String],Seq[String])=&gt;ammonite.main.Router.Result[Any]):ammonite.main.Router.EntryPoint[T]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -243,7 +243,7 @@ calling a Scala method.
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">EntryPoint</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="argSignatures">argSignatures: <span class="extype" name="scala.Seq">Seq</span>[<a href="Router$$ArgSig.html" class="extype" name="ammonite.main.Router.ArgSig">ArgSig</a>]</span>, <span name="doc">doc: <a href="http://scala-lang.org/files/archive/api/2.12.4/scala/Option.html#scala.Option" class="extype" name="scala.Option">Option</a>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="varargs">varargs: <a href="http://scala-lang.org/files/archive/api/2.12.4/scala/Boolean.html#scala.Boolean" class="extype" name="scala.Boolean">Boolean</a></span>, <span name="invoke0">invoke0: (<span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Predef.String">String</span>], <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Predef.String">String</span>]) ⇒ <a href="Router$$Result.html" class="extype" name="ammonite.main.Router.Result">Result</a>[<a href="http://scala-lang.org/files/archive/api/2.12.4/scala/collection/immutable/List.html#scala.Any" class="extype" name="scala.collection.immutable.List">Any</a>]</span>)</span>
+        <span class="name">EntryPoint</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="argSignatures">argSignatures: <span class="extype" name="scala.Seq">Seq</span>[<a href="Router$$ArgSig.html" class="extype" name="ammonite.main.Router.ArgSig">ArgSig</a>[<span class="extype" name="ammonite.main.Router.EntryPoint.T">T</span>]]</span>, <span name="doc">doc: <a href="http://scala-lang.org/files/archive/api/2.12.4/scala/Option.html#scala.Option" class="extype" name="scala.Option">Option</a>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="varargs">varargs: <a href="http://scala-lang.org/files/archive/api/2.12.4/scala/Boolean.html#scala.Boolean" class="extype" name="scala.Boolean">Boolean</a></span>, <span name="invoke0">invoke0: (<span class="extype" name="ammonite.main.Router.EntryPoint.T">T</span>, <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Predef.String">String</span>], <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Predef.String">String</span>]) ⇒ <a href="Router$$Result.html" class="extype" name="ammonite.main.Router.Result">Result</a>[<a href="http://scala-lang.org/files/archive/api/2.12.4/scala/collection/immutable/List.html#scala.Any" class="extype" name="scala.collection.immutable.List">Any</a>]</span>)</span>
       </span>
       
       
@@ -306,9 +306,9 @@ calling a Scala method.
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="ammonite.main.Router.EntryPoint#argSignatures" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="argSignatures:Seq[ammonite.main.Router.ArgSig]"></a><a id="argSignatures:Seq[ArgSig]"></a>
+      <a id="argSignatures:Seq[ammonite.main.Router.ArgSig[T]]"></a><a id="argSignatures:Seq[ArgSig[T]]"></a>
       <span class="permalink">
-      <a href="../../ammonite/main/Router$$EntryPoint.html#argSignatures:Seq[ammonite.main.Router.ArgSig]" title="Permalink">
+      <a href="../../ammonite/main/Router$$EntryPoint.html#argSignatures:Seq[ammonite.main.Router.ArgSig[T]]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -317,7 +317,7 @@ calling a Scala method.
         <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">argSignatures</span><span class="result">: <span class="extype" name="scala.Seq">Seq</span>[<a href="Router$$ArgSig.html" class="extype" name="ammonite.main.Router.ArgSig">ArgSig</a>]</span>
+        <span class="name">argSignatures</span><span class="result">: <span class="extype" name="scala.Seq">Seq</span>[<a href="Router$$ArgSig.html" class="extype" name="ammonite.main.Router.ArgSig">ArgSig</a>[<span class="extype" name="ammonite.main.Router.EntryPoint.T">T</span>]]</span>
       </span>
       
       
@@ -435,9 +435,9 @@ calling a Scala method.
               
         </dd></dl></div>
     </li><li name="ammonite.main.Router.EntryPoint#invoke" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="invoke(groupedArgs:Seq[(String,Option[String])]):ammonite.main.Router.Result[Any]"></a><a id="invoke(Seq[(String,Option[String])]):Result[Any]"></a>
+      <a id="invoke(target:T,groupedArgs:Seq[(String,Option[String])]):ammonite.main.Router.Result[Any]"></a><a id="invoke(T,Seq[(String,Option[String])]):Result[Any]"></a>
       <span class="permalink">
-      <a href="../../ammonite/main/Router$$EntryPoint.html#invoke(groupedArgs:Seq[(String,Option[String])]):ammonite.main.Router.Result[Any]" title="Permalink">
+      <a href="../../ammonite/main/Router$$EntryPoint.html#invoke(target:T,groupedArgs:Seq[(String,Option[String])]):ammonite.main.Router.Result[Any]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -446,14 +446,14 @@ calling a Scala method.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">invoke</span><span class="params">(<span name="groupedArgs">groupedArgs: <span class="extype" name="scala.Seq">Seq</span>[(<span class="extype" name="scala.Predef.String">String</span>, <a href="http://scala-lang.org/files/archive/api/2.12.4/scala/Option.html#scala.Option" class="extype" name="scala.Option">Option</a>[<span class="extype" name="scala.Predef.String">String</span>])]</span>)</span><span class="result">: <a href="Router$$Result.html" class="extype" name="ammonite.main.Router.Result">Result</a>[<a href="http://scala-lang.org/files/archive/api/2.12.4/scala/collection/immutable/List.html#scala.Any" class="extype" name="scala.collection.immutable.List">Any</a>]</span>
+        <span class="name">invoke</span><span class="params">(<span name="target">target: <span class="extype" name="ammonite.main.Router.EntryPoint.T">T</span></span>, <span name="groupedArgs">groupedArgs: <span class="extype" name="scala.Seq">Seq</span>[(<span class="extype" name="scala.Predef.String">String</span>, <a href="http://scala-lang.org/files/archive/api/2.12.4/scala/Option.html#scala.Option" class="extype" name="scala.Option">Option</a>[<span class="extype" name="scala.Predef.String">String</span>])]</span>)</span><span class="result">: <a href="Router$$Result.html" class="extype" name="ammonite.main.Router.Result">Result</a>[<a href="http://scala-lang.org/files/archive/api/2.12.4/scala/collection/immutable/List.html#scala.Any" class="extype" name="scala.collection.immutable.List">Any</a>]</span>
       </span>
       
       
     </li><li name="ammonite.main.Router.EntryPoint#invoke0" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="invoke0:(Map[String,String],Seq[String])=&gt;ammonite.main.Router.Result[Any]"></a><a id="invoke0:(Map[String,String],Seq[String])⇒Result[Any]"></a>
+      <a id="invoke0:(T,Map[String,String],Seq[String])=&gt;ammonite.main.Router.Result[Any]"></a><a id="invoke0:(T,Map[String,String],Seq[String])⇒Result[Any]"></a>
       <span class="permalink">
-      <a href="../../ammonite/main/Router$$EntryPoint.html#invoke0:(Map[String,String],Seq[String])=&gt;ammonite.main.Router.Result[Any]" title="Permalink">
+      <a href="../../ammonite/main/Router$$EntryPoint.html#invoke0:(T,Map[String,String],Seq[String])=&gt;ammonite.main.Router.Result[Any]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -462,7 +462,7 @@ calling a Scala method.
         <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">invoke0</span><span class="result">: (<span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Predef.String">String</span>], <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Predef.String">String</span>]) ⇒ <a href="Router$$Result.html" class="extype" name="ammonite.main.Router.Result">Result</a>[<a href="http://scala-lang.org/files/archive/api/2.12.4/scala/collection/immutable/List.html#scala.Any" class="extype" name="scala.collection.immutable.List">Any</a>]</span>
+        <span class="name">invoke0</span><span class="result">: (<span class="extype" name="ammonite.main.Router.EntryPoint.T">T</span>, <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Predef.String">String</span>], <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Predef.String">String</span>]) ⇒ <a href="Router$$Result.html" class="extype" name="ammonite.main.Router.Result">Result</a>[<a href="http://scala-lang.org/files/archive/api/2.12.4/scala/collection/immutable/List.html#scala.Any" class="extype" name="scala.collection.immutable.List">Any</a>]</span>
       </span>
       
       

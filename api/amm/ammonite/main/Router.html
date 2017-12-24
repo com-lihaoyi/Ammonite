@@ -363,9 +363,9 @@ configuration, running scripts, printing error messages, etc.
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="ammonite.main.Router#extractMethod" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="extractMethod(meth:Router.this.c.universe.MethodSymbol,curCls:Router.this.c.universe.Type,target:Router.this.c.Tree):Router.this.c.universe.Tree"></a><a id="extractMethod(scala.reflect.macros.Universe.MethodSymbol,scala.reflect.macros.Universe.Type,C.Tree):scala.reflect.macros.Universe.Tree"></a>
+      <a id="extractMethod(meth:Router.this.c.universe.MethodSymbol,curCls:Router.this.c.universe.Type):Router.this.c.universe.Tree"></a><a id="extractMethod(scala.reflect.macros.Universe.MethodSymbol,scala.reflect.macros.Universe.Type):scala.reflect.macros.Universe.Tree"></a>
       <span class="permalink">
-      <a href="../../ammonite/main/Router.html#extractMethod(meth:Router.this.c.universe.MethodSymbol,curCls:Router.this.c.universe.Type,target:Router.this.c.Tree):Router.this.c.universe.Tree" title="Permalink">
+      <a href="../../ammonite/main/Router.html#extractMethod(meth:Router.this.c.universe.MethodSymbol,curCls:Router.this.c.universe.Type):Router.this.c.universe.Tree" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -374,7 +374,7 @@ configuration, running scripts, printing error messages, etc.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">extractMethod</span><span class="params">(<span name="meth">meth: <span class="extype" name="scala.reflect.api.Symbols.MethodSymbol">scala.reflect.macros.Universe.MethodSymbol</span></span>, <span name="curCls">curCls: <span class="extype" name="scala.reflect.api.Types.Type">scala.reflect.macros.Universe.Type</span></span>, <span name="target">target: <span class="extype" name="scala.reflect.macros.Aliases.Tree">C.Tree</span></span>)</span><span class="result">: <span class="extype" name="scala.reflect.api.Trees.Tree">scala.reflect.macros.Universe.Tree</span></span>
+        <span class="name">extractMethod</span><span class="params">(<span name="meth">meth: <span class="extype" name="scala.reflect.api.Symbols.MethodSymbol">scala.reflect.macros.Universe.MethodSymbol</span></span>, <span name="curCls">curCls: <span class="extype" name="scala.reflect.api.Types.Type">scala.reflect.macros.Universe.Type</span></span>)</span><span class="result">: <span class="extype" name="scala.reflect.api.Trees.Tree">scala.reflect.macros.Universe.Tree</span></span>
       </span>
       
       
@@ -401,9 +401,9 @@ configuration, running scripts, printing error messages, etc.
               
         </dd></dl></div>
     </li><li name="ammonite.main.Router#getAllRoutesForClass" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="getAllRoutesForClass(curCls:Router.this.c.universe.Type,target:Router.this.c.Tree):Iterable[Router.this.c.universe.Tree]"></a><a id="getAllRoutesForClass(scala.reflect.macros.Universe.Type,C.Tree):Iterable[scala.reflect.macros.Universe.Tree]"></a>
+      <a id="getAllRoutesForClass(curCls:Router.this.c.universe.Type,pred:Router.this.c.universe.MethodSymbol=&gt;Boolean):Iterable[Router.this.c.universe.Tree]"></a><a id="getAllRoutesForClass(scala.reflect.macros.Universe.Type,(scala.reflect.macros.Universe.MethodSymbol)⇒Boolean):Iterable[scala.reflect.macros.Universe.Tree]"></a>
       <span class="permalink">
-      <a href="../../ammonite/main/Router.html#getAllRoutesForClass(curCls:Router.this.c.universe.Type,target:Router.this.c.Tree):Iterable[Router.this.c.universe.Tree]" title="Permalink">
+      <a href="../../ammonite/main/Router.html#getAllRoutesForClass(curCls:Router.this.c.universe.Type,pred:Router.this.c.universe.MethodSymbol=&gt;Boolean):Iterable[Router.this.c.universe.Tree]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -412,7 +412,7 @@ configuration, running scripts, printing error messages, etc.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">getAllRoutesForClass</span><span class="params">(<span name="curCls">curCls: <span class="extype" name="scala.reflect.api.Types.Type">scala.reflect.macros.Universe.Type</span></span>, <span name="target">target: <span class="extype" name="scala.reflect.macros.Aliases.Tree">C.Tree</span></span>)</span><span class="result">: <span class="extype" name="scala.Iterable">Iterable</span>[<span class="extype" name="scala.reflect.api.Trees.Tree">scala.reflect.macros.Universe.Tree</span>]</span>
+        <span class="name">getAllRoutesForClass</span><span class="params">(<span name="curCls">curCls: <span class="extype" name="scala.reflect.api.Types.Type">scala.reflect.macros.Universe.Type</span></span>, <span name="pred">pred: (<span class="extype" name="scala.reflect.api.Symbols.MethodSymbol">scala.reflect.macros.Universe.MethodSymbol</span>) ⇒ <a href="http://scala-lang.org/files/archive/api/2.12.4/scala/Boolean.html#scala.Boolean" class="extype" name="scala.Boolean">Boolean</a> = <span class="symbol"><span class="name"><a href="#hasMainAnnotation(t:Router.this.c.universe.MethodSymbol):Boolean">hasMainAnnotation</a></span></span></span>)</span><span class="result">: <span class="extype" name="scala.Iterable">Iterable</span>[<span class="extype" name="scala.reflect.api.Trees.Tree">scala.reflect.macros.Universe.Tree</span>]</span>
       </span>
       
       
@@ -448,6 +448,22 @@ configuration, running scripts, printing error messages, etc.
       </span>
       <span class="symbol">
         <span class="name">getValsOrMeths</span><span class="params">(<span name="curCls">curCls: <span class="extype" name="scala.reflect.api.Types.Type">scala.reflect.macros.Universe.Type</span></span>)</span><span class="result">: <span class="extype" name="scala.Iterable">Iterable</span>[<span class="extype" name="scala.reflect.api.Symbols.MethodSymbol">scala.reflect.macros.Universe.MethodSymbol</span>]</span>
+      </span>
+      
+      
+    </li><li name="ammonite.main.Router#hasMainAnnotation" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="hasMainAnnotation(t:Router.this.c.universe.MethodSymbol):Boolean"></a><a id="hasMainAnnotation(scala.reflect.macros.Universe.MethodSymbol):Boolean"></a>
+      <span class="permalink">
+      <a href="../../ammonite/main/Router.html#hasMainAnnotation(t:Router.this.c.universe.MethodSymbol):Boolean" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">hasMainAnnotation</span><span class="params">(<span name="t">t: <span class="extype" name="scala.reflect.api.Symbols.MethodSymbol">scala.reflect.macros.Universe.MethodSymbol</span></span>)</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.4/scala/Boolean.html#scala.Boolean" class="extype" name="scala.Boolean">Boolean</a></span>
       </span>
       
       

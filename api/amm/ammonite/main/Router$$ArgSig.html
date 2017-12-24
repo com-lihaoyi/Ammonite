@@ -171,7 +171,7 @@ the Scala compiler and greatly reduces the startup time of cached scripts.
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">ArgSig</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="typeString">typeString: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="doc">doc: <a href="http://scala-lang.org/files/archive/api/2.12.4/scala/Option.html#scala.Option" class="extype" name="scala.Option">Option</a>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="default">default: <a href="http://scala-lang.org/files/archive/api/2.12.4/scala/Option.html#scala.Option" class="extype" name="scala.Option">Option</a>[() ⇒ <a href="http://scala-lang.org/files/archive/api/2.12.4/scala/collection/immutable/List.html#scala.Any" class="extype" name="scala.collection.immutable.List">Any</a>]</span>)</span><span class="result"> extends <a href="http://scala-lang.org/files/archive/api/2.12.4/scala/Product.html#scala.Product" class="extype" name="scala.Product">Product</a> with <a href="http://scala-lang.org/files/archive/api/2.12.4/scala/Serializable.html#scala.Serializable" class="extype" name="scala.Serializable">Serializable</a></span>
+        <span class="name">ArgSig</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="typeString">typeString: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="doc">doc: <a href="http://scala-lang.org/files/archive/api/2.12.4/scala/Option.html#scala.Option" class="extype" name="scala.Option">Option</a>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="default">default: <a href="http://scala-lang.org/files/archive/api/2.12.4/scala/Option.html#scala.Option" class="extype" name="scala.Option">Option</a>[(<span class="extype" name="ammonite.main.Router.ArgSig.T">T</span>) ⇒ <a href="http://scala-lang.org/files/archive/api/2.12.4/scala/collection/immutable/List.html#scala.Any" class="extype" name="scala.collection.immutable.List">Any</a>]</span>)</span><span class="result"> extends <a href="http://scala-lang.org/files/archive/api/2.12.4/scala/Product.html#scala.Product" class="extype" name="scala.Product">Product</a> with <a href="http://scala-lang.org/files/archive/api/2.12.4/scala/Serializable.html#scala.Serializable" class="extype" name="scala.Serializable">Serializable</a></span>
       </span>
       </h4>
 
@@ -231,9 +231,9 @@ possible a function that can compute its default value
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="ammonite.main.Router.ArgSig#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(name:String,typeString:String,doc:Option[String],default:Option[()=&gt;Any]):ammonite.main.Router.ArgSig"></a><a id="&lt;init&gt;:ArgSig"></a>
+      <a id="&lt;init&gt;(name:String,typeString:String,doc:Option[String],default:Option[T=&gt;Any]):ammonite.main.Router.ArgSig[T]"></a><a id="&lt;init&gt;:ArgSig[T]"></a>
       <span class="permalink">
-      <a href="../../ammonite/main/Router$$ArgSig.html#&lt;init&gt;(name:String,typeString:String,doc:Option[String],default:Option[()=&gt;Any]):ammonite.main.Router.ArgSig" title="Permalink">
+      <a href="../../ammonite/main/Router$$ArgSig.html#&lt;init&gt;(name:String,typeString:String,doc:Option[String],default:Option[T=&gt;Any]):ammonite.main.Router.ArgSig[T]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -242,7 +242,7 @@ possible a function that can compute its default value
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">ArgSig</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="typeString">typeString: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="doc">doc: <a href="http://scala-lang.org/files/archive/api/2.12.4/scala/Option.html#scala.Option" class="extype" name="scala.Option">Option</a>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="default">default: <a href="http://scala-lang.org/files/archive/api/2.12.4/scala/Option.html#scala.Option" class="extype" name="scala.Option">Option</a>[() ⇒ <a href="http://scala-lang.org/files/archive/api/2.12.4/scala/collection/immutable/List.html#scala.Any" class="extype" name="scala.collection.immutable.List">Any</a>]</span>)</span>
+        <span class="name">ArgSig</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="typeString">typeString: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="doc">doc: <a href="http://scala-lang.org/files/archive/api/2.12.4/scala/Option.html#scala.Option" class="extype" name="scala.Option">Option</a>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="default">default: <a href="http://scala-lang.org/files/archive/api/2.12.4/scala/Option.html#scala.Option" class="extype" name="scala.Option">Option</a>[(<span class="extype" name="ammonite.main.Router.ArgSig.T">T</span>) ⇒ <a href="http://scala-lang.org/files/archive/api/2.12.4/scala/collection/immutable/List.html#scala.Any" class="extype" name="scala.collection.immutable.List">Any</a>]</span>)</span>
       </span>
       
       
@@ -345,9 +345,9 @@ possible a function that can compute its default value
               
         </dd></dl></div>
     </li><li name="ammonite.main.Router.ArgSig#default" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="default:Option[()=&gt;Any]"></a><a id="default:Option[()⇒Any]"></a>
+      <a id="default:Option[T=&gt;Any]"></a><a id="default:Option[(T)⇒Any]"></a>
       <span class="permalink">
-      <a href="../../ammonite/main/Router$$ArgSig.html#default:Option[()=&gt;Any]" title="Permalink">
+      <a href="../../ammonite/main/Router$$ArgSig.html#default:Option[T=&gt;Any]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -356,7 +356,7 @@ possible a function that can compute its default value
         <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">default</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.4/scala/Option.html#scala.Option" class="extype" name="scala.Option">Option</a>[() ⇒ <a href="http://scala-lang.org/files/archive/api/2.12.4/scala/collection/immutable/List.html#scala.Any" class="extype" name="scala.collection.immutable.List">Any</a>]</span>
+        <span class="name">default</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.4/scala/Option.html#scala.Option" class="extype" name="scala.Option">Option</a>[(<span class="extype" name="ammonite.main.Router.ArgSig.T">T</span>) ⇒ <a href="http://scala-lang.org/files/archive/api/2.12.4/scala/collection/immutable/List.html#scala.Any" class="extype" name="scala.collection.immutable.List">Any</a>]</span>
       </span>
       
       
