@@ -21,7 +21,7 @@ object Router{
     import c.universe._
     val r = new Router(c)
     val allRoutes = r.getAllRoutesForClass(
-      weakTypeOf[T].asInstanceOf[r.c.Type],
+      weakTypeOf[T].asInstanceOf[r.c.Type]
     ).asInstanceOf[Iterable[c.Tree]]
 
     c.Expr[Seq[EntryPoint[T]]](q"_root_.scala.Seq(..$allRoutes)")
@@ -391,7 +391,9 @@ class Router [C <: Context](val c: C) {
       ($baseArgSym: $curCls, $argListSymbol: Map[String, String], $extrasSymbol: Seq[String]) =>
         ammonite.main.Router.validate(Seq(..$readArgs)) match{
           case ammonite.main.Router.Result.Success(List(..$argNames)) =>
-            ammonite.main.Router.Result.Success($baseArgSym.${meth.name.toTermName}(..$argNameCasts))
+            ammonite.main.Router.Result.Success(
+              $baseArgSym.${meth.name.toTermName}(..$argNameCasts)
+            )
           case x: ammonite.main.Router.Result.Error => x
         }
     )
