@@ -115,9 +115,9 @@ object Router{
 
       if (
         incomplete.nonEmpty ||
-        missing.nonEmpty ||
-        duplicates.nonEmpty ||
-        (leftoverArgs.nonEmpty && !varargs)
+          missing.nonEmpty ||
+          duplicates.nonEmpty ||
+          (leftoverArgs.nonEmpty && !varargs)
       ){
         Result.Error.MismatchedArguments(
           missing = missing,
@@ -149,7 +149,7 @@ object Router{
                      thunk: String => T) = {
     val attempts =
       for(item <- values)
-      yield tryEither(thunk(item), Result.ParamError.Invalid(arg, item, _))
+        yield tryEither(thunk(item), Result.ParamError.Invalid(arg, item, _))
 
 
     val bad = attempts.collect{ case Left(x) => x}
@@ -361,7 +361,7 @@ class Router [C <: Context](val c: C) {
         if (!vararg) q"${arg.name.toTermName}.asInstanceOf[$unwrappedType]"
         else q"${arg.name.toTermName}.asInstanceOf[Seq[$unwrappedType]]: _*"
 
-        )
+      )
     }.unzip
 
     q"""
@@ -369,9 +369,9 @@ class Router [C <: Context](val c: C) {
       ${meth.name.toString},
       scala.Seq(..$argSigs),
       ${methodDoc match{
-        case None => q"scala.None"
-        case Some(s) => q"scala.Some($s)"
-      }},
+      case None => q"scala.None"
+      case Some(s) => q"scala.Some($s)"
+    }},
       ${varargs.contains(true)},
       ($argListSymbol: Map[String, String], $extrasSymbol: Seq[String]) =>
         ammonite.main.Router.validate(Seq(..$readArgs)) match{
