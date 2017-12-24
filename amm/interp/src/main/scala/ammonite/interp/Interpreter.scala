@@ -105,7 +105,7 @@ class Interpreter(val printer: Printer,
       // bundled into the main `eval.imports`: instead we pass `predefImports`
       // manually throughout, and keep `eval.imports` as a relatively-clean
       // listing which only contains the imports for code a user entered.
-      processModule(_, _, autoImport = false, "", _, moduleCodeWrapper = CodeWrapper),
+      processModule(_, _, autoImport = false, "", _),
       imports => predefImports = predefImports ++ imports,
       watch
     ) match{

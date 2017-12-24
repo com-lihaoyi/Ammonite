@@ -21,7 +21,9 @@ class Repl(input: InputStream,
            welcomeBanner: Option[String],
            replArgs: IndexedSeq[Bind[_]] = Vector.empty,
            initialColors: Colors = Colors.Default,
-           remoteLogger: Option[RemoteLogger]) { repl =>
+           remoteLogger: Option[RemoteLogger],
+           replCodeWrapper: Preprocessor.CodeWrapper,
+           scriptCodeWrapper: Preprocessor.CodeWrapper) { repl =>
 
   val prompt = Ref("@ ")
 
@@ -102,8 +104,8 @@ class Repl(input: InputStream,
     colors,
     verboseOutput = true,
     getFrame = () => frames().head,
-    replCodeWrapper = Preprocessor.CodeWrapper,
-    scriptCodeWrapper = Preprocessor.CodeWrapper
+    replCodeWrapper = replCodeWrapper,
+    scriptCodeWrapper = scriptCodeWrapper
   )
 
   def initializePredef() = interp.initializePredef()

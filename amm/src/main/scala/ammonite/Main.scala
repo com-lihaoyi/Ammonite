@@ -117,7 +117,9 @@ case class Main(predefCode: String = "",
         welcomeBanner = welcomeBanner,
         replArgs = replArgs,
         remoteLogger = remoteLogger,
-        initialColors = colors
+        initialColors = colors,
+        replCodeWrapper = replCodeWrapper,
+        scriptCodeWrapper = scriptCodeWrapper
       )
     }
 
