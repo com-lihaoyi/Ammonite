@@ -66,7 +66,8 @@ case class Main(predefCode: String = "",
                 verboseOutput: Boolean = true,
                 remoteLogging: Boolean = true,
                 colors: Colors = Colors.Default,
-                codeWrapper: Preprocessor.CodeWrapper = Preprocessor.CodeWrapper){
+                replCodeWrapper: Preprocessor.CodeWrapper = Preprocessor.CodeWrapper,
+                scriptCodeWrapper: Preprocessor.CodeWrapper = Preprocessor.CodeWrapper){
 
   def loadedPredefFile = predefFile match{
     case Some(path) =>
@@ -151,8 +152,8 @@ case class Main(predefCode: String = "",
         colorsRef,
         verboseOutput,
         () => frame,
-        replCodeWrapper = Preprocessor.CodeWrapper,
-        scriptCodeWrapper = Preprocessor.CodeWrapper
+        replCodeWrapper,
+        scriptCodeWrapper
       )
       interp.initializePredef() match{
         case None => Right(interp)
