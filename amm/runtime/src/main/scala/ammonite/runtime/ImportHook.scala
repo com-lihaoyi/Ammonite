@@ -112,7 +112,7 @@ object ImportHook{
                   source.flexiblePkgName, filePath relativeTo currentScriptPath/up
                 )
 
-                val fullPrefix = source.pkgRoot ++ flexiblePkg ++ Seq(wrapper)
+                val fullPrefix = source.pkgRoot ++ flexiblePkg ++ Seq(wrapper, Name("instance"))
 
                 val importData = Seq(ImportData(
                   fullPrefix.last, Name(rename.getOrElse(relativeModule.last)),
@@ -252,7 +252,7 @@ object ImportHook{
                 None
               )
 
-              val fullPrefix = source.pkgRoot :+ Name(uri.toString)
+              val fullPrefix = source.pkgRoot ++ Seq(Name(uri.toString), Name("instance"))
               val importData = Seq(ImportData(
                 fullPrefix.last, Name(rename),
                 fullPrefix.dropRight(1), ImportData.TermType
