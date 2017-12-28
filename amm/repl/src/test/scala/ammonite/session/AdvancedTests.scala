@@ -99,13 +99,15 @@ object AdvancedTests extends TestSuite{
 
         @ import reflect.macros.Context
 
-        @ def impl(c: Context): c.Expr[String] = {
-        @  import c.universe._
-        @  c.Expr[String](Literal(Constant("Hello!")))
+        @ object Macro {
+        @   def impl(c: Context): c.Expr[String] = {
+        @    import c.universe._
+        @    c.Expr[String](Literal(Constant("Hello!")))
+        @   }
         @ }
-        defined function impl
+        defined object Macro
 
-        @ def m: String = macro impl
+        @ def m: String = macro Macro.impl
         defined function m
 
         @ m
