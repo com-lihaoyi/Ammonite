@@ -373,10 +373,9 @@ object AdvancedTests extends TestSuite{
         @ val cls = classOf[Child]
 
         @ val resName = cls.getName.replace('.', '/') + ".class"
-        resName: String = "ammonite/$sess/cmd0$Child.class"
 
-        @ cls.getClassLoader.getResource(resName)
-        res3: java.net.URL = memory:ammonite/$sess/cmd0$Child.class
+        @ cls.getClassLoader.getResource(resName) != null
+        res3: Boolean = true
 
         @ cls.getClassLoader.getResourceAsStream(resName) != null
         res4: Boolean = true
