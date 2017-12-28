@@ -318,6 +318,32 @@ object Preprocessor{
     ): (String, String, Int)
   }
   object CodeWrapper extends CodeWrapper{
+    private val userCodeNestingLevel = 1
+    def apply(
+      code: String,
+      pkgName: Seq[Name],
+      imports: Imports,
+      printCode: String,
+      indexedWrapperName: Name,
+      extraCode: String
+    ) = {
+      val top = normalizeNewlines(s"""
+package ${pkgName.head.encoded}
+package ${Util.encodeScalaSourcePath(pkgName.tail)}
+$imports
+
+object ${indexedWrapperName.backticked}{\n"""
+      )
+      val bottom = normalizeNewlines(s"""\ndef $$main() = { $printCode }
+  override def toString = "${indexedWrapperName.encoded}"
+  $extraCode
+}
+""")
+
+      (top, bottom, userCodeNestingLevel)
+    }
+  }
+  object CodeClassWrapper extends CodeWrapper{
     /*
      * The goal of this code wrapper is that the user code:
      * - should be in a class rather than a singleton,
@@ -428,7 +454,7 @@ object ${indexedWrapperName.backticked}{
 final class ${indexedWrapperName.backticked} extends java.io.Serializable {
 
   @_root_.scala.transient private val __amm_usedThings =
-    new _root_.ammonite.interp.Preprocessor.CodeWrapper.UsedThings(this)
+    new _root_.ammonite.interp.Preprocessor.CodeClassWrapper.UsedThings(this)
 
   override def toString = $q$q$q${indexedWrapperName.encoded}$q$q$q
 $requiredVals
