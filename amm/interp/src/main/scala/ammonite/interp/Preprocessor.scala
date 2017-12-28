@@ -306,6 +306,7 @@ object Preprocessor{
 
 
   trait CodeWrapper{
+    def wrapperPath: Seq[Name] = Nil
     def apply(
       code: String,
       pkgName: Seq[Name],
@@ -334,6 +335,7 @@ object Preprocessor{
      * macros).
      */
     private val q = "\""
+    override val wrapperPath: Seq[Name] = Seq(Name("instance"))
     def apply(
       code: String,
       pkgName: Seq[Name],
@@ -375,8 +377,8 @@ object ${indexedWrapperName.backticked}{
             .value
             .map { data =>
               val prefix = Seq(Name("_root_"), Name("ammonite"), Name("$sess"))
-              if (data.prefix.startsWith(prefix) && data.prefix.endsWith(Seq(Name("instance")))) {
-                val name = data.prefix.drop(prefix.length).dropRight(1).last
+              if (data.prefix.startsWith(prefix) && data.prefix.endsWith(wrapperPath)) {
+                val name = data.prefix.drop(prefix.length).dropRight(wrapperPath.length).last
                 (data.copy(prefix = Seq(name)), Seq(name -> data.prefix))
               } else
                 (data, Nil)

@@ -26,12 +26,14 @@ trait Evaluator{
                   newImports: Imports,
                   printer: Printer,
                   indexedWrapperName: Name,
+                  wrapperPath: Seq[Name],
                   silent: Boolean,
                   contextClassLoader: ClassLoader): Res[Evaluated]
 
   def processScriptBlock(cls: Class[_],
                          newImports: Imports,
                          wrapperName: Name,
+                         wrapperPath: Seq[Name],
                          pkgName: Seq[Name],
                          contextClassLoader: ClassLoader): Res[Evaluated]
 }
@@ -113,6 +115,7 @@ object Evaluator{
                     newImports: Imports,
                     printer: Printer,
                     indexedWrapperName: Name,
+                    wrapperPath: Seq[Name],
                     silent: Boolean,
                     contextClassLoader: ClassLoader) = {
       for {
@@ -127,7 +130,11 @@ object Evaluator{
         else evaluatorRunPrinter(iter.foreach(_ => ()))
 
         // "" Empty string as cache tag of repl code
-        evaluationResult(Seq(Name("ammonite"), Name("$sess"), indexedWrapperName), newImports)
+        evaluationResult(
+          Seq(Name("ammonite"), Name("$sess"), indexedWrapperName),
+          wrapperPath,
+          newImports
+        )
       }
     }
 
@@ -135,18 +142,20 @@ object Evaluator{
     def processScriptBlock(cls: Class[_],
                            newImports: Imports,
                            wrapperName: Name,
+                           wrapperPath: Seq[Name],
                            pkgName: Seq[Name],
                            contextClassLoader: ClassLoader) = {
       for {
         _ <- Catching{userCodeExceptionHandler}
       } yield {
         evalMain(cls, contextClassLoader)
-        val res = evaluationResult(pkgName :+ wrapperName, newImports)
+        val res = evaluationResult(pkgName :+ wrapperName, wrapperPath, newImports)
         res
       }
     }
 
     def evaluationResult(wrapperName: Seq[Name],
+                         internalWrapperPath: Seq[Name],
                          imports: Imports) = {
       Evaluated(
         wrapperName,
@@ -156,10 +165,10 @@ object Evaluator{
               if (id.prefix.isEmpty)
                 // For some reason, for things not-in-packages you can't access
                 // them off of `_root_`
-                Seq(Name("_root_")) ++ wrapperName ++ Seq(Name("instance"))
+                Seq(Name("_root_")) ++ wrapperName ++ internalWrapperPath
               else if (id.prefix.startsWith(wrapperName))
                 Seq(Name("_root_")) ++ wrapperName.init ++
-                  Seq(id.prefix.apply(wrapperName.length), Name("instance")) ++
+                  Seq(id.prefix.apply(wrapperName.length)) ++ internalWrapperPath ++
                   id.prefix.drop(wrapperName.length + 1)
               else if (id.prefix.headOption.exists(_.backticked == "_root_"))
                 id.prefix
