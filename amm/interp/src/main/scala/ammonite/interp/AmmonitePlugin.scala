@@ -109,7 +109,7 @@ object AmmonitePlugin{
 
         def rec(expr: g.Tree): List[(g.Name, g.Symbol)] = {
           expr match {
-            case s @ g.Select(lhs, name) => (name -> s.symbol) :: rec(lhs)
+            case s @ g.Select(lhs, _) => (s.symbol.name -> s.symbol) :: rec(lhs)
             case i @ g.Ident(name) => List(name -> i.symbol)
             case t @ g.This(pkg) => List(pkg -> t.symbol)
           }
