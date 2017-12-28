@@ -249,7 +249,8 @@ class Interpreter(val printer: Printer,
       (classFiles, newImports) <- compilerManager.compileClass(
         processed,
         printer,
-        fileName
+        fileName,
+        indexedWrapperName
       )
       _ = incrementLine()
       res <- eval.processLine(
@@ -280,7 +281,7 @@ class Interpreter(val printer: Printer,
     for {
       _ <- Catching{case e: Throwable => e.printStackTrace(); throw e}
       (classFiles, newImports) <- compilerManager.compileClass(
-        processed, printer, codeSource.fileName
+        processed, printer, codeSource.fileName, indexedWrapperName
       )
       cls <- eval.loadClass(fullyQualifiedName, classFiles)
 

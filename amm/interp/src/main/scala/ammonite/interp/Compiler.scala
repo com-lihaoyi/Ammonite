@@ -4,7 +4,7 @@ package ammonite.interp
 import java.io.OutputStream
 
 import ammonite.runtime.{Classpath, Evaluator}
-import ammonite.util.{ImportData, Imports, Printer}
+import ammonite.util.{ImportData, Imports, Name, Printer}
 import ammonite.util.Util.newLine
 
 import scala.collection.mutable
@@ -35,6 +35,7 @@ trait Compiler{
   def compile(src: Array[Byte],
               printer: Printer,
               importsLen0: Int,
+              indexedWrapperName: Name,
               fileName: String): Compiler.Output
 
   def search(name: scala.reflect.runtime.universe.Type): Option[String]
@@ -198,6 +199,7 @@ object Compiler{
     var infoLogger: String => Unit = s => ()
 
     var lastImports = Seq.empty[ImportData]
+    var treeRepr = ""
 
     val (vd, reporter, compiler) = {
 
@@ -228,7 +230,7 @@ object Compiler{
         evalClassloader,
         createPlugins = g => {
           List(
-            new ammonite.interp.AmmonitePlugin(g, lastImports = _, importsLen)
+            new ammonite.interp.AmmonitePlugin(g, lastImports = _, treeRepr = _, importsLen)
           ) ++ {
             for {
               (name, cls) <- plugins0
@@ -299,6 +301,7 @@ object Compiler{
     def compile(src: Array[Byte],
                 printer: Printer,
                 importsLen0: Int,
+                indexedWrapperName: Name,
                 fileName: String): Output = {
 
       def enumerateVdFiles(d: VirtualDirectory): Iterator[AbstractFile] = {
@@ -334,8 +337,21 @@ object Compiler{
           (x.path.stripPrefix("(memory)/").stripSuffix(".class").replace('/', '.'), x.toByteArray)
         }
 
+        /*
+         * Add a resource with the raw string representation of the tree of the user code. With the
+         * class-based code wrapper, this contains things like
+         * ```
+         * private[this] val res1: Int = cmd1.this.cmd0.n.+(1)
+         * ```
+         * which say that the current command (cmd1) uses things from the previous one (cmd0),
+         * and can easily be grepped to find that kind of dependency between commands.
+         */
+        val extraFiles = Seq(
+          s"${indexedWrapperName.encoded}-tree.txt" -> treeRepr.getBytes("UTF-8")
+        )
+
         val imports = lastImports.toList
-        Some( (files, Imports(imports)) )
+        Some( (files ++ extraFiles, Imports(imports)) )
 
       }
     }

@@ -14,6 +14,7 @@ import scala.reflect.internal.util.{BatchSourceFile, OffsetPosition}
  */
 class AmmonitePlugin(g: scala.tools.nsc.Global,
                      output: Seq[ImportData] => Unit,
+                     treeRepr: String => Unit,
                      topWrapperLen: => Int) extends Plugin{
   val name: String = "AmmonitePlugin"
   val global: Global = g
@@ -30,7 +31,7 @@ class AmmonitePlugin(g: scala.tools.nsc.Global,
         def name = phaseName
         def apply(unit: g.CompilationUnit): Unit = {
           val things = global.currentRun.units.map(_.source.path).toList
-          AmmonitePlugin(g)(unit, output, topWrapperLen)
+          AmmonitePlugin(g)(unit, output, treeRepr, topWrapperLen)
         }
       }
     },
@@ -60,6 +61,7 @@ object AmmonitePlugin{
   def apply(g: Global)
            (unit: g.CompilationUnit,
             output: Seq[ImportData] => Unit,
+            treeRepr: String => Unit,
             topWrapperLen: => Int) = {
 
 
@@ -96,6 +98,7 @@ object AmmonitePlugin{
 
     val stats = unit.body.children.last.children.last.asInstanceOf[g.ImplDef]
       .impl.body.last.asInstanceOf[g.ImplDef].impl.body
+    treeRepr(stats.toString())
     val symbols = stats.filter(x => !Option(x.symbol).exists(_.isPrivate))
                        .foldLeft(List.empty[(Boolean, String, String, Seq[Name])]){
       // These are all the ways we want to import names from previous
