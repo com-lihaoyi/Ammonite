@@ -26,7 +26,10 @@ class SessionApiImpl(frames0: => StableRef[List[Frame]]) extends Session{
 
   def save(name: String = "") = {
     if (name != "") namedFrames(name) = frames
-    frames0() = childFrame(frames.head) :: frames
+    // freezing the frame will trigger the creation of a new one later on,
+    // so that the saved one won't change any more
+    frames.head.freeze()
+    frames0() = frames
   }
 
   def pop(num: Int = 1) = {
@@ -35,14 +38,20 @@ class SessionApiImpl(frames0: => StableRef[List[Frame]]) extends Session{
       if (next.tail != Nil) next = next.tail
     }
     val out = SessionChanged.delta(frames.head, next.head)
-    frames0() = childFrame(next.head) :: next
+    // freezing the current frame, so that the result of the current command,
+    // that tangles with sessions, isn't added to it
+    next.head.freeze()
+    frames0() = next
     out
   }
   
   def load(name: String = "") = {
     val next = if (name == "") frames.tail else namedFrames(name)
     val out = SessionChanged.delta(frames.head, next.head)
-    frames0() = childFrame(next.head) :: next
+    // freezing the current frame, so that the result of the current command,
+    // that tangles with sessions, isn't added to it
+    next.head.freeze()
+    frames0() = next
     out
   }
 

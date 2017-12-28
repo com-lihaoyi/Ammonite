@@ -25,22 +25,38 @@ class Frame(val classloader: SpecialClassLoader,
             val pluginClassloader: SpecialClassLoader,
             private[this] var imports0: Imports,
             private[this] var classpath0: Seq[java.io.File]){
+  private var frozen0 = false
+  def frozen = frozen0
+  def freeze(): Unit = {
+    /*
+     * Once frozen, a frame won't accept new imports or classpath elements.
+     * This is useful in commands that load / save sessions, whose result
+     * doesn't need to be kept in the frame.
+     */
+    frozen0 = true
+  }
   private[this] var version0: Int = 0
   def version = version0
   def imports = imports0
   def classpath = classpath0
   def addImports(additional: Imports) = {
-    version0 += 1
-    imports0 = imports0 ++ additional
+    if (!frozen0) {
+      version0 += 1
+      imports0 = imports0 ++ additional
+    }
   }
   def addClasspath(additional: Seq[java.io.File]) = {
-    version0 += 1
-    additional.map(_.toURI.toURL).foreach(classloader.add)
-    classpath0 = classpath0 ++ additional
+    if (!frozen0) {
+      version0 += 1
+      additional.map(_.toURI.toURL).foreach(classloader.add)
+      classpath0 = classpath0 ++ additional
+    }
   }
   def addPluginClasspath(additional: Seq[java.io.File]) = {
-    version0 += 1
-    additional.map(_.toURI.toURL).foreach(pluginClassloader.add)
+    if (!frozen0) {
+      version0 += 1
+      additional.map(_.toURI.toURL).foreach(pluginClassloader.add)
+    }
   }
 }
 object Frame{

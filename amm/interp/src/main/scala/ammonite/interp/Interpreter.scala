@@ -37,6 +37,7 @@ class Interpreter(val printer: Printer,
                   colors: Ref[Colors],
                   verboseOutput: Boolean = true,
                   getFrame: () => Frame,
+                  val createFrame: () => Frame,
                   replCodeWrapper: Preprocessor.CodeWrapper,
                   scriptCodeWrapper: Preprocessor.CodeWrapper)
   extends ImportHook.InterpreterInterface{ interp =>

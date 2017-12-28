@@ -29,6 +29,7 @@ object TestUtils {
       extraBridges = Seq(),
       colors = Ref(Colors.BlackWhite),
       getFrame = () => startFrame,
+      createFrame = () => throw new Exception("unsupported"),
       replCodeWrapper = Preprocessor.CodeWrapper,
       scriptCodeWrapper = Preprocessor.CodeWrapper
     )

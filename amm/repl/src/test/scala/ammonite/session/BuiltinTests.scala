@@ -226,5 +226,27 @@ object BuiltinTests extends TestSuite{
         res11: Int = -1
                     """)
     }
+    'discardLoadCommandResult{
+      * - check.session("""
+        @ repl.sess.save("foo")
+
+        @ val a = repl.sess.load("foo")
+
+        @ a
+        error: not found: value a
+      """)
+
+      * - check.session("""
+        @ val n = 2
+        n: Int = 2
+
+        @ repl.sess.save("foo")
+
+        @ val n = repl.sess.load("foo") // should not mask the previous 'n'
+
+        @ val n0 = n
+        n0: Int = 2
+      """)
+    }
   }
 }

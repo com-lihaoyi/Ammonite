@@ -104,6 +104,7 @@ class Repl(input: InputStream,
     colors,
     verboseOutput = true,
     getFrame = () => frames().head,
+    createFrame = () => { val f = sess0.childFrame(frames().head); frames() = f :: frames(); f },
     replCodeWrapper = replCodeWrapper,
     scriptCodeWrapper = scriptCodeWrapper
   )
@@ -202,7 +203,10 @@ object Repl{
     res match{
       case Res.Skip => // do nothing
       case Res.Exit(value) => interp.compilerManager.shutdownPressy()
-      case Res.Success(ev) => interp.handleImports(ev.imports)
+      case Res.Success(ev) =>
+        interp.handleImports(ev.imports)
+        if (interp.headFrame.frozen)
+          interp.createFrame()
       case _ => ()
     }
   }
