@@ -34,7 +34,7 @@ object SerializationTests extends TestSuite{
 
         check.session(
           s"""
-            @ object costlySideEffect extends Serializable {
+            @ object costlySideEffect {
             @   import java.nio.file.{Files, Paths}
             @   private val path = Paths.get("a")
             @   def apply()  = Files.write(path, Array[Byte]())

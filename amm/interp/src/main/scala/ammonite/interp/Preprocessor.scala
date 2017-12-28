@@ -297,9 +297,8 @@ object Preprocessor{
 
     //we need to normalize topWrapper and bottomWrapper in order to ensure
     //the snippets always use the platform-specific newLine
-    val topWrapper = codeWrapper.top(pkgName, imports, indexedWrapperName)
-
-    val bottomWrapper = codeWrapper.bottom(printCode, indexedWrapperName, extraCode)
+    val (topWrapper, bottomWrapper) =
+     codeWrapper(code, pkgName, imports, printCode, indexedWrapperName, extraCode)
     val importsLen = topWrapper.length
 
     (topWrapper + code + bottomWrapper, importsLen)
@@ -307,8 +306,14 @@ object Preprocessor{
 
 
   trait CodeWrapper{
-    def top(pkgName: Seq[Name], imports: Imports, indexedWrapperName: Name): String
-    def bottom(printCode: String, indexedWrapperName: Name, extraCode: String): String
+    def apply(
+      code: String,
+      pkgName: Seq[Name],
+      imports: Imports,
+      printCode: String,
+      indexedWrapperName: Name,
+      extraCode: String
+    ): (String, String)
   }
   object CodeWrapper extends CodeWrapper{
     /*
@@ -321,53 +326,92 @@ object Preprocessor{
      * well wrt Java serialization. Singletons don't write their fields during serialization,
      * and re-compute them when deserialized. On the other hand, class instances serialize
      * and de-serialize their fields, as expected.
+     *
+     * It still allows users to wrap code in singletons rather than a class if they want to:
+     * user code that solely consists of a singleton, is itself wrapped in a singleton,
+     * rather than a class. This is useful for macro code, or definitions that are
+     * themselves processed by macros (definitions in objects are easier to process from
+     * macros).
      */
     private val q = "\""
-    def top(pkgName: Seq[Name], imports: Imports, indexedWrapperName: Name) = {
+    def apply(
+      code: String,
+      pkgName: Seq[Name],
+      imports: Imports,
+      printCode: String,
+      indexedWrapperName: Name,
+      extraCode: String
+    ) = {
 
-      val (reworkedImports, reqVals) = {
+      val isObjDef = Parsers.isObjDef(code)
 
-        val (l, reqVals0) = imports
-          .value
-          .map { data =>
-            val prefix = Seq(Name("_root_"), Name("ammonite"), Name("$sess"))
-            if (data.prefix.startsWith(prefix) && data.prefix.endsWith(Seq(Name("instance")))) {
-              val name = data.prefix.drop(prefix.length).dropRight(1).last
-              (data.copy(prefix = Seq(name)), Seq(name -> data.prefix))
-            } else
-              (data, Nil)
-          }
-          .unzip
+      if (isObjDef) {
+        val top = normalizeNewlines(s"""
+package ${pkgName.head.encoded}
+package ${Util.encodeScalaSourcePath(pkgName.tail)}
 
-        (Imports(l), reqVals0.flatten)
-      }
+$imports
 
-      val requiredVals = reqVals
-        .distinct
-        .groupBy(_._1)
-        .mapValues(_.map(_._2))
-        .toVector
-        .sortBy(_._1.raw)
-        .collect {
-          case (key, Seq(path)) =>
-            /*
-             * Via __amm_usedThings, that itself relies on the *-tree.txt resources generated
-             * via the AmmonitePlugin, we can know whether the current command uses things from
-             * each of the previous ones, and null-ify the references to those that are unused.
-             * That way, the unused commands don't prevent serializing this command.
-             */
-            val encoded = Util.encodeScalaSourcePath(path)
-            s"final val ${key.backticked}: $encoded.type = " +
-              s"if (__amm_usedThings($q$q$q${key.raw}$q$q$q)) $encoded else null$newLine"
-          case (key, values) =>
-            throw new Exception(
-              "Should not happen - several required values with the same name" +
-              s"(name: $key, values: $values)"
-            )
+object ${indexedWrapperName.backticked}{
+  val instance: Helper.type = Helper
+  def $$main() = instance.$$main()
+
+  object Helper extends java.io.Serializable {
+"""
+        )
+
+        val bottom = normalizeNewlines(s"""\ndef $$main() = { $printCode }
+  override def toString = "${indexedWrapperName.encoded}"
+  $extraCode
+}}
+""")
+
+        (top, bottom)
+      } else {
+
+        val (reworkedImports, reqVals) = {
+
+          val (l, reqVals0) = imports
+            .value
+            .map { data =>
+              val prefix = Seq(Name("_root_"), Name("ammonite"), Name("$sess"))
+              if (data.prefix.startsWith(prefix) && data.prefix.endsWith(Seq(Name("instance")))) {
+                val name = data.prefix.drop(prefix.length).dropRight(1).last
+                (data.copy(prefix = Seq(name)), Seq(name -> data.prefix))
+              } else
+                (data, Nil)
+            }
+            .unzip
+
+          (Imports(l), reqVals0.flatten)
         }
-        .mkString
 
-      normalizeNewlines(s"""
+        val requiredVals = reqVals
+          .distinct
+          .groupBy(_._1)
+          .mapValues(_.map(_._2))
+          .toVector
+          .sortBy(_._1.raw)
+          .collect {
+            case (key, Seq(path)) =>
+              /*
+               * Via __amm_usedThings, that itself relies on the *-tree.txt resources generated
+               * via the AmmonitePlugin, we can know whether the current command uses things from
+               * each of the previous ones, and null-ify the references to those that are unused.
+               * That way, the unused commands don't prevent serializing this command.
+               */
+              val encoded = Util.encodeScalaSourcePath(path)
+              s"final val ${key.backticked}: $encoded.type = " +
+                s"if (__amm_usedThings($q$q$q${key.raw}$q$q$q)) $encoded else null$newLine"
+            case (key, values) =>
+              throw new Exception(
+                "Should not happen - several required values with the same name " +
+                  s"(name: $key, values: $values)"
+              )
+          }
+          .mkString
+
+        val top = normalizeNewlines(s"""
 package ${pkgName.head.encoded}
 package ${Util.encodeScalaSourcePath(pkgName.tail)}
 
@@ -387,17 +431,19 @@ $requiredVals
 $reworkedImports
 
 final class Helper extends java.io.Serializable{\n"""
-      )
-    }
+    )
 
-    def bottom(printCode: String, indexedWrapperName: Name, extraCode: String) =
-      normalizeNewlines(s"""\ndef $$main() = { $printCode }
+        val bottom = normalizeNewlines(s"""\ndef $$main() = { $printCode }
   override def toString = "${indexedWrapperName.encoded}"
   $extraCode
 }}
 """)
 
-    final class UsedThings(obj: AnyRef) {
+        (top, bottom)
+      }
+    }
+
+      final class UsedThings(obj: AnyRef) {
 
       lazy val rawCode: String = {
         var is: java.io.InputStream = null
