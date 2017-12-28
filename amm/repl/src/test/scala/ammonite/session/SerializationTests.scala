@@ -7,7 +7,9 @@ import utest._
 object SerializationTests extends TestSuite{
   val tests = Tests{
     println("SerializationTests")
-    val check = new TestRepl
+    val check = new TestRepl {
+      override def codeWrapper = Preprocessor.CodeClassWrapper
+    }
 
     'dummy {
       'foo - {
