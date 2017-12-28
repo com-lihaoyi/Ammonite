@@ -136,18 +136,16 @@ object Evaluator{
         Imports(
           for(id <- imports.value) yield {
             val filledPrefix =
-              if (id.prefix.isEmpty) {
+              if (id.prefix.isEmpty)
                 // For some reason, for things not-in-packages you can't access
                 // them off of `_root_`
-                wrapperName
-              } else {
+                Seq(Name("_root_")) ++ wrapperName ++ Seq(Name("instance"))
+              else if (id.prefix.headOption.exists(_.backticked == "_root_"))
                 id.prefix
-              }
-            val rootedPrefix: Seq[Name] =
-              if (filledPrefix.headOption.exists(_.backticked == "_root_")) filledPrefix
-              else Seq(Name("_root_")) ++ filledPrefix
+              else
+                Seq(Name("_root_")) ++ id.prefix
 
-            id.copy(prefix = rootedPrefix)
+            id.copy(prefix = filledPrefix)
           }
         )
       )

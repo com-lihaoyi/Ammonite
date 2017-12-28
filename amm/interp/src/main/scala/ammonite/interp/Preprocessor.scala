@@ -311,20 +311,80 @@ object Preprocessor{
     def bottom(printCode: String, indexedWrapperName: Name, extraCode: String): String
   }
   object CodeWrapper extends CodeWrapper{
-    def top(pkgName: Seq[Name], imports: Imports, indexedWrapperName: Name) =
+    /*
+     * The goal of this code wrapper is that the user code:
+     * - should be in a class rather than a singleton,
+     * - should see the previous commands results via instances of these classes,
+     *   not referencing singletons along the way.
+     *
+     * Only dealing with class instances at runtime, rather than singletons, behaves
+     * well wrt Java serialization. Singletons don't write their fields during serialization,
+     * and re-compute them when deserialized. On the other hand, class instances serialize
+     * and de-serialize their fields, as expected.
+     */
+    private val q = "\""
+    def top(pkgName: Seq[Name], imports: Imports, indexedWrapperName: Name) = {
+
+      val (reworkedImports, reqVals) = {
+
+        val (l, reqVals0) = imports
+          .value
+          .map { data =>
+            val prefix = Seq(Name("_root_"), Name("ammonite"), Name("$sess"))
+            if (data.prefix.startsWith(prefix) && data.prefix.endsWith(Seq(Name("instance")))) {
+              val name = data.prefix.drop(prefix.length).dropRight(1).last
+              (data.copy(prefix = Seq(name)), Seq(name -> data.prefix))
+            } else
+              (data, Nil)
+          }
+          .unzip
+
+        (Imports(l), reqVals0.flatten)
+      }
+
+      val requiredVals = reqVals
+        .distinct
+        .groupBy(_._1)
+        .mapValues(_.map(_._2))
+        .toVector
+        .sortBy(_._1.raw)
+        .collect {
+          case (key, Seq(path)) =>
+            val encoded = Util.encodeScalaSourcePath(path)
+            s"final lazy val ${key.backticked}: $encoded.type = $encoded$newLine"
+          case (key, values) =>
+            throw new Exception(
+              "Should not happen - several required values with the same name" +
+              s"(name: $key, values: $values)"
+            )
+        }
+        .mkString
+
       normalizeNewlines(s"""
 package ${pkgName.head.encoded}
 package ${Util.encodeScalaSourcePath(pkgName.tail)}
-$imports
 
-object ${indexedWrapperName.backticked}{\n"""
-    )
+object ${indexedWrapperName.backticked}{
+  val wrapper = new ${indexedWrapperName.backticked}
+  val instance = new wrapper.Helper
+  def $$main() = instance.$$main()
+}
+
+final class ${indexedWrapperName.backticked} extends java.io.Serializable {
+
+  override def toString = $q$q$q${indexedWrapperName.encoded}$q$q$q
+$requiredVals
+$reworkedImports
+
+final class Helper extends java.io.Serializable{\n"""
+      )
+    }
 
     def bottom(printCode: String, indexedWrapperName: Name, extraCode: String) =
       normalizeNewlines(s"""\ndef $$main() = { $printCode }
-  override def toString = "${indexedWrapperName.raw}"
+  override def toString = "${indexedWrapperName.encoded}"
   $extraCode
-}
+}}
 """)
   }
 }
