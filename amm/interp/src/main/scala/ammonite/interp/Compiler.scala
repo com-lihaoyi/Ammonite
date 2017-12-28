@@ -36,6 +36,7 @@ trait Compiler{
               printer: Printer,
               importsLen0: Int,
               indexedWrapperName: Name,
+              userCodeNestingLevel: Int,
               fileName: String): Compiler.Output
 
   def search(name: scala.reflect.runtime.universe.Type): Option[String]
@@ -44,6 +45,7 @@ trait Compiler{
    */
   def parse(fileName: String, line: String): Either[String, Seq[Global#Tree]]
   var importsLen = 0
+  var userCodeNestingLevel = -1
 
 }
 object Compiler{
@@ -230,7 +232,9 @@ object Compiler{
         evalClassloader,
         createPlugins = g => {
           List(
-            new ammonite.interp.AmmonitePlugin(g, lastImports = _, treeRepr = _, importsLen)
+            new ammonite.interp.AmmonitePlugin(
+              g, lastImports = _, treeRepr = _, userCodeNestingLevel, importsLen
+            )
           ) ++ {
             for {
               (name, cls) <- plugins0
@@ -302,6 +306,7 @@ object Compiler{
                 printer: Printer,
                 importsLen0: Int,
                 indexedWrapperName: Name,
+                userCodeNestingLevel: Int,
                 fileName: String): Output = {
 
       def enumerateVdFiles(d: VirtualDirectory): Iterator[AbstractFile] = {
@@ -317,6 +322,7 @@ object Compiler{
       this.infoLogger = printer.info
       val singleFile = makeFile(src, fileName)
       this.importsLen = importsLen0
+      this.userCodeNestingLevel = userCodeNestingLevel
       val run = new compiler.Run()
       vd.clear()
 

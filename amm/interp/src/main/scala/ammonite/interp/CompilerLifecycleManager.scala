@@ -131,6 +131,7 @@ class CompilerLifecycleManager(headFrame: => Frame){
           printer,
           processed.prefixCharLength,
           indexedWrapperName,
+          processed.userCodeNestingLevel,
           fileName
         )
       }

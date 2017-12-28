@@ -43,7 +43,8 @@ trait Preprocessor{
 object Preprocessor{
   private case class Expanded(code: String, printer: Seq[String])
   case class Output(code: String,
-                    prefixCharLength: Int)
+                    prefixCharLength: Int,
+                    userCodeNestingLevel: Int)
 
 
   def formatFastparseError(fileName: String, rawCode: String, f: Parsed.Failure) = {
@@ -119,12 +120,12 @@ object Preprocessor{
       assert(pkgName.head == Name("ammonite"))
       for{
         Preprocessor.Expanded(code, printer) <- expandStatements(stmts, resultIndex, skipEmpty)
-        (wrappedCode, importsLength) = wrapCode(
+        (wrappedCode, importsLength, userCodeNestingLevel) = wrapCode(
           pkgName, indexedWrapperName, leadingSpaces + code,
           printerTemplate(printer.mkString(", ")),
           imports, extraCode, codeWrapper
         )
-      } yield Preprocessor.Output(wrappedCode, importsLength)
+      } yield Preprocessor.Output(wrappedCode, importsLength, userCodeNestingLevel)
     }
 
     def Processor(cond: PartialFunction[(String, String, G#Tree), Preprocessor.Expanded]) = {
@@ -297,11 +298,11 @@ object Preprocessor{
 
     //we need to normalize topWrapper and bottomWrapper in order to ensure
     //the snippets always use the platform-specific newLine
-    val (topWrapper, bottomWrapper) =
+    val (topWrapper, bottomWrapper, userCodeNestingLevel) =
      codeWrapper(code, pkgName, imports, printCode, indexedWrapperName, extraCode)
     val importsLen = topWrapper.length
 
-    (topWrapper + code + bottomWrapper, importsLen)
+    (topWrapper + code + bottomWrapper, importsLen, userCodeNestingLevel)
   }
 
 
@@ -314,7 +315,7 @@ object Preprocessor{
       printCode: String,
       indexedWrapperName: Name,
       extraCode: String
-    ): (String, String)
+    ): (String, String, Int)
   }
   object CodeWrapper extends CodeWrapper{
     /*
@@ -334,6 +335,7 @@ object Preprocessor{
      * themselves processed by macros (definitions in objects are easier to process from
      * macros).
      */
+    private val userCodeNestingLevel = 2
     private val q = "\""
     override val wrapperPath: Seq[Name] = Seq(Name("instance"))
     def apply(
@@ -368,7 +370,7 @@ object ${indexedWrapperName.backticked}{
 }}
 """)
 
-        (top, bottom)
+        (top, bottom, userCodeNestingLevel)
       } else {
 
         val (reworkedImports, reqVals) = {
@@ -441,7 +443,7 @@ final class Helper extends java.io.Serializable{\n"""
 }}
 """)
 
-        (top, bottom)
+        (top, bottom, userCodeNestingLevel)
       }
     }
 

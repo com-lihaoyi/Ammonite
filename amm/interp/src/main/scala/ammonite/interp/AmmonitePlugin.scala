@@ -15,6 +15,7 @@ import scala.reflect.internal.util.{BatchSourceFile, OffsetPosition}
 class AmmonitePlugin(g: scala.tools.nsc.Global,
                      output: Seq[ImportData] => Unit,
                      treeRepr: String => Unit,
+                     userCodeNestingLevel: => Int,
                      topWrapperLen: => Int) extends Plugin{
   val name: String = "AmmonitePlugin"
   val global: Global = g
@@ -31,7 +32,7 @@ class AmmonitePlugin(g: scala.tools.nsc.Global,
         def name = phaseName
         def apply(unit: g.CompilationUnit): Unit = {
           val things = global.currentRun.units.map(_.source.path).toList
-          AmmonitePlugin(g)(unit, output, treeRepr, topWrapperLen)
+          AmmonitePlugin(g)(unit, output, treeRepr, userCodeNestingLevel, topWrapperLen)
         }
       }
     },
@@ -62,6 +63,7 @@ object AmmonitePlugin{
            (unit: g.CompilationUnit,
             output: Seq[ImportData] => Unit,
             treeRepr: String => Unit,
+            userCodeNestingLevel: => Int,
             topWrapperLen: => Int) = {
 
 
@@ -96,8 +98,13 @@ object AmmonitePlugin{
       !ignoredNames(sym.name.decoded)
     }
 
-    val stats = unit.body.children.last.children.last.asInstanceOf[g.ImplDef]
-      .impl.body.last.asInstanceOf[g.ImplDef].impl.body
+    val stats = {
+      val nestingLevel = userCodeNestingLevel
+      assert(nestingLevel >= 0)
+      (0 until nestingLevel).foldLeft(unit.body.children.last.children)((res, _) =>
+        res.last.asInstanceOf[g.ImplDef].impl.body
+      )
+    }
     treeRepr(stats.toString())
     val symbols = stats.filter(x => !Option(x.symbol).exists(_.isPrivate))
                        .foldLeft(List.empty[(Boolean, String, String, Seq[Name])]){
