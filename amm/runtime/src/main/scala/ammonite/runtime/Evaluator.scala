@@ -140,6 +140,10 @@ object Evaluator{
                 // For some reason, for things not-in-packages you can't access
                 // them off of `_root_`
                 Seq(Name("_root_")) ++ wrapperName ++ Seq(Name("instance"))
+              else if (id.prefix.startsWith(wrapperName))
+                Seq(Name("_root_")) ++ wrapperName.init ++
+                  Seq(id.prefix.apply(wrapperName.length), Name("instance")) ++
+                  id.prefix.drop(wrapperName.length + 1)
               else if (id.prefix.headOption.exists(_.backticked == "_root_"))
                 id.prefix
               else
