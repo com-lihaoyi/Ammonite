@@ -89,7 +89,24 @@ object Evaluator{
 
     def evalMain(cls: Class[_], contextClassloader: ClassLoader) =
       Util.withContextClassloader(contextClassloader){
-        cls.getDeclaredMethod("$main").invoke(null)
+
+        val (method, instance) =
+          try {
+            (cls.getDeclaredMethod("$main"), null)
+          } catch {
+            case e: NoSuchMethodException =>
+              // Wrapper with very long names seem to require this
+              try {
+                val cls0 = contextClassloader.loadClass(cls.getName + "$")
+                val inst = cls0.getDeclaredField("MODULE$").get(null)
+                (cls0.getDeclaredMethod("$main"), inst)
+              } catch {
+                case _: ClassNotFoundException | _: NoSuchMethodException =>
+                  throw e
+              }
+          }
+
+        method.invoke(instance)
       }
 
     def processLine(classFiles: Util.ClassFiles,
