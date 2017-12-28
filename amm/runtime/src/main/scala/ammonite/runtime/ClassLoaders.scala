@@ -231,7 +231,7 @@ class SpecialClassLoader(parent: ClassLoader, parentSignature: Seq[(Path, Long)]
     path -> (if (exists(path))path.mtime.toMillis else 0)
   }
 
-  private[this] var classpathSignature0 = parentSignature
+  private var classpathSignature0 = parentSignature
   def classpathSignature = classpathSignature0
   def classpathHash = {
     Util.md5Hash(
@@ -269,6 +269,26 @@ class SpecialClassLoader(parent: ClassLoader, parentSignature: Seq[(Path, Long)]
         }
       })
     }
+  }
+
+  def cloneClassLoader(parent: ClassLoader = null): SpecialClassLoader = {
+
+    // FIXME Not tailrec
+
+     val newParent =
+       if (parent == null)
+         getParent match {
+           case s: SpecialClassLoader => s.cloneClassLoader()
+           case p => p
+         }
+       else
+         parent
+
+     val clone = new SpecialClassLoader(newParent, parentSignature, getURLs.toSeq: _*)
+     clone.newFileDict ++= newFileDict
+     clone.classpathSignature0 = classpathSignature0
+
+     clone
   }
 
 }

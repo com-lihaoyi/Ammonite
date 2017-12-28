@@ -71,6 +71,7 @@ class CompilerLifecycleManager(headFrame: => Frame){
       // Otherwise activating autocomplete makes the presentation compiler mangle
       // the shared settings and makes the main compiler sad
       val settings = Option(compiler).fold(new Settings)(_.compiler.settings.copy)
+      settings.Ydelambdafy.value = "inline" // seems to be required in 2.12 for serializing lambdas
       Internal.compiler = Compiler(
         Classpath.classpath ++ headFrame.classpath,
         dynamicClasspath,
