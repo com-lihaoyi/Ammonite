@@ -1,7 +1,7 @@
 package ammonite.session
 
 import ammonite.TestUtils._
-import ammonite.TestRepl
+import ammonite.DualTestRepl
 import ammonite.util.{Res, Util}
 import utest._
 
@@ -9,7 +9,7 @@ import utest._
 object AdvancedTests extends TestSuite{
   val tests = Tests{
     println("AdvancedTests")
-    val check = new TestRepl()
+    val check = new DualTestRepl()
     'pprint{
       check.session(s"""
         @ Seq.fill(10)(Seq.fill(3)("Foo"))
@@ -53,7 +53,7 @@ object AdvancedTests extends TestSuite{
     }
 
     'predef{
-      val check2 = new TestRepl{
+      val check2 = new DualTestRepl{
         override def predef = (
           """
           import math.abs
@@ -79,7 +79,7 @@ object AdvancedTests extends TestSuite{
 
     }
     'predefSettings{
-      val check2 = new TestRepl{
+      val check2 = new DualTestRepl{
         override def predef = (
           """
           interp.configureCompiler(_.settings.Xexperimental.value = true)
@@ -294,8 +294,8 @@ object AdvancedTests extends TestSuite{
       // one getting its own `ReplBridge`. This ensures that the various
       // Interpreters are properly encapsulated and don't interfere with each
       // other.
-      val c1 = new TestRepl()
-      val c2 = new TestRepl()
+      val c1 = new DualTestRepl()
+      val c2 = new DualTestRepl()
       c1.session("""
         @ repl.prompt() = "A"
       """)
@@ -311,7 +311,7 @@ object AdvancedTests extends TestSuite{
     }
     'macroParadiseWorks{
       val scalaVersion: String = scala.util.Properties.versionNumberString
-      val c1: TestRepl = new TestRepl()
+      val c1: DualTestRepl = new DualTestRepl()
       c1.session(s"""
         @ interp.load.plugin.ivy("org.scalamacros" % "paradise_${scalaVersion}" % "2.1.0")
       """)
@@ -329,7 +329,7 @@ object AdvancedTests extends TestSuite{
       import ammonite.ops._
       val dir = pwd/'amm/'src/'test/'resources/'scripts/'predefWithLoad
       'loadExec {
-        val c1 = new TestRepl() {
+        val c1 = new DualTestRepl() {
           override def predef = (
             read! dir/"PredefLoadExec.sc",
             Some(dir/"PredefLoadExec.sc")
@@ -341,7 +341,7 @@ object AdvancedTests extends TestSuite{
         """)
       }
       'loadModule{
-        val c2 = new TestRepl(){
+        val c2 = new DualTestRepl(){
           override def predef = (
             read! dir/"PredefLoadModule.sc",
             Some(dir/"PredefLoadModule.sc")
@@ -353,7 +353,7 @@ object AdvancedTests extends TestSuite{
         """)
       }
       'importIvy{
-        val c2 = new TestRepl(){
+        val c2 = new DualTestRepl(){
           override def predef = (
             read! dir/"PredefMagicImport.sc",
             Some(dir/"PredefMagicImport.sc")

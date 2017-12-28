@@ -1,13 +1,13 @@
 package ammonite.session
 
-import ammonite.{TestRepl, TestUtils}
+import ammonite.{DualTestRepl, TestUtils}
 import utest._
 
 import scala.collection.{immutable => imm}
 object FailureTests extends TestSuite{
   val tests = Tests{
     println("FailureTests")
-    val check = new TestRepl()
+    val check = new DualTestRepl()
     'compileFailure {
       check.session("""
         @ doesnt_exist
