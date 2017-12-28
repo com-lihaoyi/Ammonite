@@ -350,8 +350,15 @@ object Preprocessor{
         .sortBy(_._1.raw)
         .collect {
           case (key, Seq(path)) =>
+            /*
+             * Via __amm_usedThings, that itself relies on the *-tree.txt resources generated
+             * via the AmmonitePlugin, we can know whether the current command uses things from
+             * each of the previous ones, and null-ify the references to those that are unused.
+             * That way, the unused commands don't prevent serializing this command.
+             */
             val encoded = Util.encodeScalaSourcePath(path)
-            s"final lazy val ${key.backticked}: $encoded.type = $encoded$newLine"
+            s"final val ${key.backticked}: $encoded.type = " +
+              s"if (__amm_usedThings($q$q$q${key.raw}$q$q$q)) $encoded else null$newLine"
           case (key, values) =>
             throw new Exception(
               "Should not happen - several required values with the same name" +
@@ -372,6 +379,9 @@ object ${indexedWrapperName.backticked}{
 
 final class ${indexedWrapperName.backticked} extends java.io.Serializable {
 
+  @_root_.scala.transient private val __amm_usedThings =
+    new _root_.ammonite.interp.Preprocessor.CodeWrapper.UsedThings(this)
+
   override def toString = $q$q$q${indexedWrapperName.encoded}$q$q$q
 $requiredVals
 $reworkedImports
@@ -386,6 +396,34 @@ final class Helper extends java.io.Serializable{\n"""
   $extraCode
 }}
 """)
+
+    final class UsedThings(obj: AnyRef) {
+
+      lazy val rawCode: String = {
+        var is: java.io.InputStream = null
+        try {
+          is = Thread.currentThread
+            .getContextClassLoader
+            .getResource(obj.toString + "-tree.txt")
+            .openStream()
+          if (is == null)
+            ""
+          else
+            _root_.scala.io.Source.fromInputStream(is)(_root_.scala.io.Codec.UTF8).mkString
+        } finally {
+          if (is != null)
+            is.close()
+        }
+      }
+
+      lazy val usedThings: Set[String] = {
+        (obj.toString + "\\.this\\.[a-zA-Z0-9]+").r.findAllMatchIn(rawCode).map(_.matched).toSet
+      }
+
+      def apply(name: String): Boolean =
+        usedThings(s"$obj.this.$name")
+
+    }
   }
 }
 
