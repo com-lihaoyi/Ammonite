@@ -24,7 +24,9 @@ test_script:
 
 cache:
   - C:\sbt\
-  - C:\Users\appveyor\.m2
-  - C:\Users\appveyor\.ivy2\cache
+  - '%USERPROFILE%\.ivy2\cache'
+  - '%USERPROFILE%\.m2'
+  - '%USERPROFILE%\.sbt'    
+  - '%LOCALAPPDATA%\Coursier\cache'
   - C:\ProgramData\chocolatey\lib -> appveyor.yml
   - C:\ProgramData\chocolatey\bin -> appveyor.yml

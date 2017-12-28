@@ -112,10 +112,10 @@ object ExampleTests extends TestSuite{
 
       // You can also use `stat.full` which provides more information
       val fullInfo = stat.full(wd/"file1.txt")
-      assert(fullInfo.ctime.isInstanceOf[FileTime])
-      assert(fullInfo.atime.isInstanceOf[FileTime])
+      fullInfo.ctime: FileTime
+      fullInfo.atime: FileTime
       if (Unix()) {
-        assert(fullInfo.group.isInstanceOf[GroupPrincipal])
+        fullInfo.group: GroupPrincipal
       }
     }
     'longExample{
@@ -258,8 +258,9 @@ object ExampleTests extends TestSuite{
       val minus = pwd relativeTo target
       val ups = up/up
       assert(minus == ups)
-      assert(rel1.isInstanceOf[RelPath])
-      assert(rel2.isInstanceOf[RelPath])
+      rel1: RelPath
+      rel2: RelPath
+      rel3: RelPath
     }
     'relPathCombine{
       val target = pwd/'target/'file
