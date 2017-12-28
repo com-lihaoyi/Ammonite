@@ -1,11 +1,12 @@
 package test.ammonite.ops
 
-import java.nio.file.attribute.{FileTime, GroupPrincipal}
+import java.nio.file.attribute.{GroupPrincipal, FileTime}
 
 import ammonite.ops._
 import utest._
 
 object ExampleTests extends TestSuite{
+
   val tests = Tests {
     'reference{
       import ammonite.ops._
@@ -315,12 +316,12 @@ object ExampleTests extends TestSuite{
 //      val d2/"omg"/x2 = wd
 //      ls! wd |? (_.ext == "scala") | (x => mv! x ! x.pref)
     }
-    'allSubpathsResolveCorrectly {
-        for (abs <- ls.rec! pwd) {
-          val rel = abs relativeTo pwd
-          assert(rel.ups == 0)
-          assert(pwd / rel == abs)
-        }
+    'allSubpathsResolveCorrectly{
+      for(abs <- ls.rec! pwd){
+        val rel = abs relativeTo pwd
+        assert(rel.ups == 0)
+        assert(pwd / rel == abs)
+      }
     }
   }
 }

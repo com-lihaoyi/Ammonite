@@ -95,14 +95,12 @@ object ShelloutTests extends TestSuite{
       assert(listed2 != listed1)
     }
     'customWorkingDir{
-      if (Unix()) {
-        val res1 = %.ls()(pwd) // explicitly
-        // or implicitly
-        import ammonite.ops.ImplicitWd._
-        val res2 = % ls
-      }
+      val res1 = %.ls()(pwd) // explicitly
+      // or implicitly
+      import ammonite.ops.ImplicitWd._
+      val res2 = %ls
     }
-    'fileCustomWorkingDir {
+    'fileCustomWorkingDir - {
       if(Unix()){
         val output = %%.apply(scriptFolder/'echo_with_wd, 'HELLO)(root/'usr)
         assert(output.out.lines == Seq("HELLO /usr"))
