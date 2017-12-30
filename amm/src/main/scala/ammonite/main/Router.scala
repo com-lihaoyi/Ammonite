@@ -6,6 +6,7 @@ import sourcecode.Compat.Context
 import scala.annotation.StaticAnnotation
 import scala.collection.mutable
 import scala.language.experimental.macros
+import scala.reflect.macros.blackbox.Context
 /**
   * More or less a minimal version of Autowire's Server that lets you generate
   * a set of "routes" from the methods defined in an object, and call them
@@ -14,6 +15,19 @@ import scala.language.experimental.macros
   * the Scala compiler and greatly reduces the startup time of cached scripts.
   */
 object Router{
+  /**
+    * Allows you to query how many things are overriden by the enclosing owner.
+    */
+  case class Overrides(value: Int)
+  object Overrides{
+    def apply()(implicit c: Overrides) = c.value
+    implicit def generate: Overrides = macro impl
+    def impl(c: Context): c.Tree = {
+      import c.universe._
+      q"new _root_.ammonite.main.Router.Overrides(${c.internal.enclosingOwner.overrides.length})"
+    }
+  }
+
   class doc(s: String) extends StaticAnnotation
   class main extends StaticAnnotation
   def generateRoutes[T]: Seq[Router.EntryPoint[T]] = macro generateRoutesImpl[T]
@@ -56,7 +70,8 @@ object Router{
                            argSignatures: Seq[ArgSig[T]],
                            doc: Option[String],
                            varargs: Boolean,
-                           invoke0: (T, Map[String, String], Seq[String]) => Result[Any]){
+                           invoke0: (T, Map[String, String], Seq[String]) => Result[Any],
+                           overrides: Int){
     def invoke(target: T, groupedArgs: Seq[(String, Option[String])]): Result[Any] = {
       var remainingArgSignatures = argSignatures.toList
 
@@ -384,9 +399,9 @@ class Router [C <: Context](val c: C) {
       ${meth.name.toString},
       scala.Seq(..$argSigs),
       ${methodDoc match{
-      case None => q"scala.None"
-      case Some(s) => q"scala.Some($s)"
-    }},
+        case None => q"scala.None"
+        case Some(s) => q"scala.Some($s)"
+      }},
       ${varargs.contains(true)},
       ($baseArgSym: $curCls, $argListSymbol: Map[String, String], $extrasSymbol: Seq[String]) =>
         ammonite.main.Router.validate(Seq(..$readArgs)) match{
@@ -395,7 +410,8 @@ class Router [C <: Context](val c: C) {
               $baseArgSym.${meth.name.toTermName}(..$argNameCasts)
             )
           case x: ammonite.main.Router.Result.Error => x
-        }
+        },
+      ammonite.main.Router.Overrides()
     )
     """
   }
