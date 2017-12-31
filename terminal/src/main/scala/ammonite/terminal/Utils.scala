@@ -91,7 +91,7 @@ object TTY{
 
   def consoleDim(s: String) = {
     import sys.process._
-    Seq("bash", "-c", s"$pathedTput $s 2> /dev/tty").!!.trim.toInt
+    Seq("sh", "-c", s"$pathedTput $s 2> /dev/tty").!!.trim.toInt
   }
   def init() = {
     stty("-a")
@@ -111,7 +111,7 @@ object TTY{
 
   private def sttyCmd(s: String) = {
     import sys.process._
-    Seq("bash", "-c", s"$pathedStty $s < /dev/tty"): ProcessBuilder
+    Seq("sh", "-c", s"$pathedStty $s < /dev/tty"): ProcessBuilder
   }
 
   def stty(s: String) =
