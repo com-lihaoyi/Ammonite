@@ -86,18 +86,17 @@ object TTY{
   // Prefer standard tools. Not sure why we need to do this, but for some
   // reason the version installed by gnu-coreutils blows up sometimes giving
   // "unable to perform all requested operations"
-  val pathedTput = if (new java.io.File("/usr/bin/tput").exists()) "/usr/bin/tput" else "tput"
-  val pathedStty = if (new java.io.File("/bin/stty").exists()) "/bin/stty" else "stty"
-
-  def consoleDim(s: String) = {
-    import sys.process._
-    Seq("bash", "-c", s"$pathedTput $s 2> /dev/tty").!!.trim.toInt
+  val pathedStty: String = if (new java.io.File("/bin/stty").exists()) "/bin/stty" else "stty"
+  def consoleDims: (Int, Int) = stty("size").trim.split(" ") match {
+    case Array(height, width) => (height.toInt, width.toInt)
   }
+
+  def consoleWidth: Int = consoleDims._2
+  def consoleHeight: Int = consoleDims._1
+
   def init() = {
     stty("-a")
 
-    val width = consoleDim("cols")
-    val height = consoleDim("lines")
 //    Debug("Initializing, Width " + width)
 //    Debug("Initializing, Height " + height)
     val initialConfig = stty("-g").trim
@@ -106,15 +105,15 @@ object TTY{
     stty("-echo")
     stty("intr undef")
 //    Debug("")
-    (width, height, initialConfig)
+    (consoleWidth, consoleHeight, initialConfig)
   }
 
   private def sttyCmd(s: String) = {
     import sys.process._
-    Seq("bash", "-c", s"$pathedStty $s < /dev/tty"): ProcessBuilder
+    Seq("sh", "-c", s"$pathedStty $s < /dev/tty"): ProcessBuilder
   }
 
-  def stty(s: String) =
+  def stty(s: String): String =
     sttyCmd(s).!!
   /*
    * Executes a stty command for which failure is expected, hence the return
