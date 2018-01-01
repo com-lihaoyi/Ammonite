@@ -114,9 +114,7 @@ object ExampleTests extends TestSuite{
       val fullInfo = stat.full(wd/"file1.txt")
       fullInfo.ctime: FileTime
       fullInfo.atime: FileTime
-      if (Unix()) {
-        fullInfo.group: GroupPrincipal
-      }
+      fullInfo.group: GroupPrincipal
     }
     'longExample{
       import ammonite.ops._
