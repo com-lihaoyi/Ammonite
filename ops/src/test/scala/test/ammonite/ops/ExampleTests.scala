@@ -115,7 +115,7 @@ object ExampleTests extends TestSuite{
       fullInfo.ctime: FileTime
       fullInfo.atime: FileTime
       fullInfo.group: GroupPrincipal
-
+      ()
     }
     'longExample{
       import ammonite.ops._
