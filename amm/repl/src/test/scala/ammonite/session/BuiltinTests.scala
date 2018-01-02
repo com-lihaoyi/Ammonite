@@ -248,5 +248,14 @@ object BuiltinTests extends TestSuite{
         n0: Int = 2
       """)
     }
+    'firstFrameNotFrozen{
+      check.session("""
+        @ 2
+        res0: Int = 2
+
+        @ res0 // we should be able to access the result of the previous command
+        res1: Int = 2
+      """)
+    }
   }
 }

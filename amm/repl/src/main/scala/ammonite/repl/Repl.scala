@@ -130,6 +130,7 @@ class Repl(input: InputStream,
 
 
   sess0.save()
+  interp.createFrame()
 
   val reader = new InputStreamReader(input)
 
