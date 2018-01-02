@@ -119,7 +119,23 @@ class TestRepl {
   }
 
 
-  interp.initializePredef()
+  for ((error, _) <- interp.initializePredef()) {
+    val (msgOpt, causeOpt) = error match {
+      case r: Res.Exception => (Some(r.msg), Some(r.t))
+      case r: Res.Failure => (Some(r.msg), None)
+      case _ => (None, None)
+    }
+
+    println(infoBuffer.mkString)
+    println(outString)
+    println(resString)
+    println(warningBuffer.mkString)
+    println(errorBuffer.mkString)
+    throw new Exception(
+      s"Error during predef initialization${msgOpt.fold("")(": " + _)}",
+      causeOpt.orNull
+    )
+  }
 
 
 
