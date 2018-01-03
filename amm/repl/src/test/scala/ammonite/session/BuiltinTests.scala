@@ -7,7 +7,7 @@ import scala.collection.{immutable => imm}
 object BuiltinTests extends TestSuite{
 
   val tests = Tests{
-    println("EvaluatorTests")
+    println("BuiltinTests")
     val check = new TestRepl()
     'basicConfig{
       check.session("""
