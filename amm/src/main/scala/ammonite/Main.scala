@@ -154,6 +154,7 @@ case class Main(predefCode: String = "",
         colorsRef,
         verboseOutput,
         () => frame,
+        () => throw new Exception("session loading / saving not possible here"),
         replCodeWrapper,
         scriptCodeWrapper
       )

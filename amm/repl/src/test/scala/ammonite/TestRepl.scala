@@ -105,6 +105,7 @@ class TestRepl {
       )),
       colors = Ref(Colors.BlackWhite),
       getFrame = () => frames().head,
+      createFrame = () => { val f = sess0.childFrame(frames().head); frames() = f :: frames(); f },
       replCodeWrapper = Preprocessor.CodeWrapper,
       scriptCodeWrapper = Preprocessor.CodeWrapper
     )
@@ -176,8 +177,6 @@ class TestRepl {
         run(commandText.mkString(Util.newLine), currentLine)
 
       val allOut = out + res
-
-      Repl.handleOutput(interp, processed)
 
       if (expected.startsWith("error: ")) {
         val strippedExpected = expected.stripPrefix("error: ")
