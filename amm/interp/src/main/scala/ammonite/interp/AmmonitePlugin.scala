@@ -14,7 +14,7 @@ import scala.reflect.internal.util.{BatchSourceFile, OffsetPosition}
  */
 class AmmonitePlugin(g: scala.tools.nsc.Global,
                      output: Seq[ImportData] => Unit,
-                     treeRepr: String => Unit,
+                     wrapperUses: Seq[String] => Unit,
                      userCodeNestingLevel: => Int,
                      topWrapperLen: => Int) extends Plugin{
   val name: String = "AmmonitePlugin"
@@ -32,7 +32,7 @@ class AmmonitePlugin(g: scala.tools.nsc.Global,
         def name = phaseName
         def apply(unit: g.CompilationUnit): Unit = {
           val things = global.currentRun.units.map(_.source.path).toList
-          AmmonitePlugin(g)(unit, output, treeRepr, userCodeNestingLevel, topWrapperLen)
+          AmmonitePlugin(g)(unit, output, wrapperUses, userCodeNestingLevel, topWrapperLen)
         }
       }
     },
@@ -62,7 +62,7 @@ object AmmonitePlugin{
   def apply(g: Global)
            (unit: g.CompilationUnit,
             output: Seq[ImportData] => Unit,
-            treeRepr: String => Unit,
+            wrapperUses: Seq[String] => Unit,
             userCodeNestingLevel: => Int,
             topWrapperLen: => Int) = {
 
@@ -105,7 +105,51 @@ object AmmonitePlugin{
         res.last.asInstanceOf[g.ImplDef].impl.body
       )
     }
-    treeRepr(stats.toString())
+
+    val uses =
+      if (userCodeNestingLevel <= 1)
+        Nil
+      else {
+        /*
+         * For userCodeNestingLevel >= 2, we list the variables from the first wrapper
+         * used from the user code.
+         *
+         * E.g. if, after wrapping, the code looks like
+         * ```
+         *   class cmd2 {
+         *
+         *     val cmd0 = ???
+         *     val cmd1 = ???
+         *
+         *     import cmd0.{
+         *       n
+         *     }
+         *
+         *     class Helper {
+         *       // user-typed code
+         *       val n0 = n + 1
+         *     }
+         *   }
+         * ```
+         * this would process the tree of `val n0 = n + 1`, find `n` as a tree like
+         * `cmd2.this.cmd0.n`, and put `cmd0` in `uses`.
+         */
+        val wrapperName = unit.body.children.last.children
+          .last.asInstanceOf[g.ImplDef].symbol.name match {
+            case g.TermName(n) => n
+            case g.TypeName(n) => n
+          }
+        stats
+          .flatMap(t =>
+            t.collect {
+              case g.Select(g.This(g.TypeName(`wrapperName`)), g.TermName(name)) =>
+                name
+            }
+          )
+          .distinct
+      }
+    wrapperUses(uses)
+
     val symbols = stats.filter(x => !Option(x.symbol).exists(_.isPrivate))
                        .foldLeft(List.empty[(Boolean, String, String, Seq[Name])]){
       // These are all the ways we want to import names from previous

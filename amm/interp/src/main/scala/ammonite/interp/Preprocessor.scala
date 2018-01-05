@@ -9,6 +9,7 @@ import fastparse.all._
 import scala.reflect.internal.Flags
 import scala.tools.nsc.{Global => G}
 import collection.mutable
+import scala.io.{Codec, Source}
 /**
   * Responsible for all scala-source-code-munging that happens within the
   * Ammonite REPL.
@@ -473,31 +474,30 @@ final class Helper extends java.io.Serializable{\n"""
       }
     }
 
-      final class UsedThings(obj: AnyRef) {
+    final class UsedThings(obj: AnyRef) {
 
-      lazy val rawCode: String = {
+      lazy val usedThings: Set[String] = {
         var is: java.io.InputStream = null
         try {
           is = Thread.currentThread
             .getContextClassLoader
-            .getResource(obj.toString + "-tree.txt")
+            .getResource(obj.toString + "-uses.txt")
             .openStream()
           if (is == null)
-            ""
+            Set.empty[String]
           else
-            _root_.scala.io.Source.fromInputStream(is)(_root_.scala.io.Codec.UTF8).mkString
+            Source.fromInputStream(is)(Codec.UTF8)
+              .mkString
+              .split('\n')
+              .toSet
         } finally {
           if (is != null)
             is.close()
         }
       }
 
-      lazy val usedThings: Set[String] = {
-        (obj.toString + "\\.this\\.[a-zA-Z0-9]+").r.findAllMatchIn(rawCode).map(_.matched).toSet
-      }
-
       def apply(name: String): Boolean =
-        usedThings(s"$obj.this.$name")
+        usedThings(name)
 
     }
   }

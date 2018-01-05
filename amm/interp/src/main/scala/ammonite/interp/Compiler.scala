@@ -2,6 +2,7 @@ package ammonite.interp
 
 
 import java.io.OutputStream
+import java.nio.charset.StandardCharsets
 
 import ammonite.runtime.{Classpath, Evaluator}
 import ammonite.util.{ImportData, Imports, Name, Printer}
@@ -201,7 +202,7 @@ object Compiler{
     var infoLogger: String => Unit = s => ()
 
     var lastImports = Seq.empty[ImportData]
-    var treeRepr = ""
+    var wrapperUses = Seq.empty[String]
 
     val (vd, reporter, compiler) = {
 
@@ -233,7 +234,7 @@ object Compiler{
         createPlugins = g => {
           List(
             new ammonite.interp.AmmonitePlugin(
-              g, lastImports = _, treeRepr = _, userCodeNestingLevel, importsLen
+              g, lastImports = _, wrapperUses = _, userCodeNestingLevel, importsLen
             )
           ) ++ {
             for {
@@ -353,7 +354,9 @@ object Compiler{
          * and can easily be grepped to find that kind of dependency between commands.
          */
         val extraFiles = Seq(
-          s"${indexedWrapperName.encoded}-tree.txt" -> treeRepr.getBytes("UTF-8")
+          s"${indexedWrapperName.encoded}-uses.txt" -> wrapperUses
+            .mkString("\n")
+            .getBytes(StandardCharsets.UTF_8)
         )
 
         val imports = lastImports.toList
