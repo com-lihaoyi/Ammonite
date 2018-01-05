@@ -36,7 +36,6 @@ trait Compiler{
   def compile(src: Array[Byte],
               printer: Printer,
               importsLen0: Int,
-              indexedWrapperName: Name,
               userCodeNestingLevel: Int,
               fileName: String): Compiler.Output
 
@@ -202,7 +201,7 @@ object Compiler{
     var infoLogger: String => Unit = s => ()
 
     var lastImports = Seq.empty[ImportData]
-    var wrapperUses = Seq.empty[String]
+    var wrapperUses = Map.empty[String, Seq[String]]
 
     val (vd, reporter, compiler) = {
 
@@ -306,7 +305,6 @@ object Compiler{
     def compile(src: Array[Byte],
                 printer: Printer,
                 importsLen0: Int,
-                indexedWrapperName: Name,
                 userCodeNestingLevel: Int,
                 fileName: String): Output = {
 
@@ -353,11 +351,11 @@ object Compiler{
          * which say that the current command (cmd1) uses things from the previous one (cmd0),
          * and can easily be grepped to find that kind of dependency between commands.
          */
-        val extraFiles = Seq(
-          s"${indexedWrapperName.encoded}-uses.txt" -> wrapperUses
-            .mkString("\n")
-            .getBytes(StandardCharsets.UTF_8)
-        )
+        val extraFiles =
+          for ((wrapperName, uses) <- wrapperUses)
+            yield s"$wrapperName-uses.txt" -> uses
+              .mkString("\n")
+              .getBytes(StandardCharsets.UTF_8)
 
         val imports = lastImports.toList
         Some( (files ++ extraFiles, Imports(imports)) )

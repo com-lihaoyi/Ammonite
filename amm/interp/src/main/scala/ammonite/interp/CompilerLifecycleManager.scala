@@ -115,8 +115,7 @@ class CompilerLifecycleManager(headFrame: => Frame){
 
   def compileClass(processed: Preprocessor.Output,
                    printer: Printer,
-                   fileName: String,
-                   indexedWrapperName: Name): Res[(Util.ClassFiles, Imports)] = synchronized{
+                   fileName: String): Res[(Util.ClassFiles, Imports)] = synchronized{
     // Enforce the invariant that every piece of code Ammonite ever compiles,
     // gets run within the `ammonite` package. It's further namespaced into
     // things like `ammonite.$file` or `ammonite.$sess`, but it has to be
@@ -130,7 +129,6 @@ class CompilerLifecycleManager(headFrame: => Frame){
           processed.code.getBytes,
           printer,
           processed.prefixCharLength,
-          indexedWrapperName,
           processed.userCodeNestingLevel,
           fileName
         )

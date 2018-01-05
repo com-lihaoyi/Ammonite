@@ -14,7 +14,7 @@ import scala.reflect.internal.util.{BatchSourceFile, OffsetPosition}
  */
 class AmmonitePlugin(g: scala.tools.nsc.Global,
                      output: Seq[ImportData] => Unit,
-                     wrapperUses: Seq[String] => Unit,
+                     wrapperUses: Map[String, Seq[String]] => Unit,
                      userCodeNestingLevel: => Int,
                      topWrapperLen: => Int) extends Plugin{
   val name: String = "AmmonitePlugin"
@@ -62,7 +62,7 @@ object AmmonitePlugin{
   def apply(g: Global)
            (unit: g.CompilationUnit,
             output: Seq[ImportData] => Unit,
-            wrapperUses: Seq[String] => Unit,
+            wrapperUses: Map[String, Seq[String]] => Unit,
             userCodeNestingLevel: => Int,
             topWrapperLen: => Int) = {
 
@@ -108,7 +108,7 @@ object AmmonitePlugin{
 
     val uses =
       if (userCodeNestingLevel <= 1)
-        Nil
+        Map.empty[String, Seq[String]]
       else {
         /*
          * For userCodeNestingLevel >= 2, we list the variables from the first wrapper
@@ -135,18 +135,21 @@ object AmmonitePlugin{
          * `cmd2.this.cmd0.n`, and put `cmd0` in `uses`.
          */
         val wrapperName = unit.body.children.last.children
-          .last.asInstanceOf[g.ImplDef].symbol.name match {
-            case g.TermName(n) => n
-            case g.TypeName(n) => n
-          }
-        stats
+          .last.asInstanceOf[g.ImplDef].symbol.name
+        val rawWrapperName = wrapperName match {
+          case g.TermName(n) => n
+          case g.TypeName(n) => n
+        }
+        val uses0 = stats
           .flatMap(t =>
             t.collect {
-              case g.Select(g.This(g.TypeName(`wrapperName`)), g.TermName(name)) =>
+              case g.Select(g.This(g.TypeName(`rawWrapperName`)), g.TermName(name)) =>
                 name
             }
           )
           .distinct
+
+        Map(wrapperName.encoded -> uses0)
       }
     wrapperUses(uses)
 
