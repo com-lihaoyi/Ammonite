@@ -106,10 +106,15 @@ object AmmonitePlugin{
       )
     }
 
-    val uses =
-      if (userCodeNestingLevel <= 1)
+    val usedEarlierDefinitions = userCodeNestingLevel match {
+      case 1 =>
+        /*
+         * We don't try to determine what previous commands are actually used here.
+         * userCodeNestingLevel == 1 likely corresponds to the default object-based
+         * code wrapper, which doesn't rely on the actually used previous commands.
+         */
         Map.empty[String, Seq[String]]
-      else {
+      case 2 =>
         /*
          * For userCodeNestingLevel >= 2, we list the variables from the first wrapper
          * used from the user code.
@@ -150,8 +155,8 @@ object AmmonitePlugin{
           .distinct
 
         Map(wrapperName.encoded -> uses0)
-      }
-    wrapperUses(uses)
+    }
+    wrapperUses(usedEarlierDefinitions)
 
     val symbols = stats.filter(x => !Option(x.symbol).exists(_.isPrivate))
                        .foldLeft(List.empty[(Boolean, String, String, Seq[Name])]){
