@@ -364,6 +364,7 @@ object ${indexedWrapperName.backticked}{\n"""
      */
     private val userCodeNestingLevel = 2
     private val q = "\""
+    private val tq = "\"\"\""
     override val wrapperPath: Seq[Name] = Seq(Name("instance"))
     def apply(
       code: String,
@@ -433,7 +434,7 @@ object ${indexedWrapperName.backticked}{
                */
               val encoded = Util.encodeScalaSourcePath(path)
               s"final val ${key.backticked}: $encoded.type = " +
-                s"if (__amm_usedThings($q$q$q${key.raw}$q$q$q)) $encoded else null$newLine"
+                s"if (__amm_usedThings($tq${key.raw}$tq)) $encoded else null$newLine"
             case (key, values) =>
               throw new Exception(
                 "Should not happen - several required values with the same name " +
@@ -457,7 +458,7 @@ final class ${indexedWrapperName.backticked} extends java.io.Serializable {
   @_root_.scala.transient private val __amm_usedThings =
     new _root_.ammonite.interp.Preprocessor.CodeClassWrapper.UsedThings(this)
 
-  override def toString = $q$q$q${indexedWrapperName.encoded}$q$q$q
+  override def toString = $q${indexedWrapperName.encoded}$q
 $requiredVals
 $reworkedImports
 
