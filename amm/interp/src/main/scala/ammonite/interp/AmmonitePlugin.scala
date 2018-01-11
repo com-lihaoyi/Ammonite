@@ -139,22 +139,18 @@ object AmmonitePlugin{
          * this would process the tree of `val n0 = n + 1`, find `n` as a tree like
          * `cmd2.this.cmd0.n`, and put `cmd0` in `uses`.
          */
-        val wrapperName = unit.body.children.last.children
-          .last.asInstanceOf[g.ImplDef].symbol.name
-        val rawWrapperName = wrapperName match {
-          case g.TermName(n) => n
-          case g.TypeName(n) => n
-        }
+        val wrapperSym = unit.body.children.last.children
+          .last.asInstanceOf[g.ImplDef].symbol
         val uses0 = stats
           .flatMap(t =>
             t.collect {
-              case g.Select(g.This(g.TypeName(`rawWrapperName`)), g.TermName(name)) =>
+              case g.Select(node, g.TermName(name)) if node.symbol == wrapperSym =>
                 name
             }
           )
           .distinct
 
-        Map(wrapperName.encoded -> uses0)
+        Map(wrapperSym.encodedName -> uses0)
     }
     wrapperUses(usedEarlierDefinitions)
 
