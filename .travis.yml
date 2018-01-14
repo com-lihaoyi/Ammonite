@@ -21,7 +21,7 @@ matrix:
 
   - stage: build
     env: CI_SCRIPT="ci/build.sc test published/test"
-    jdk: oraclejdk7
+    jdk: openjdk7
     scala: 2.11.12
 
   - stage: build
@@ -31,7 +31,7 @@ matrix:
 
   - stage: build
     env: CI_SCRIPT="ci/build.sc test integration/test"
-    jdk: oraclejdk7
+    jdk: openjdk7
     scala: 2.11.12
 
   # Publish everything to sonatype in conjunction with running tests
