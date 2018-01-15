@@ -22,7 +22,7 @@ matrix:
   - stage: build
     env: CI_SCRIPT="ci/build.sc test published/test"
     jdk: oraclejdk7
-    scala: 2.11.11
+    scala: 2.11.12
 
   - stage: build
     env: CI_SCRIPT="ci/build.sc test integration/test"
@@ -32,25 +32,25 @@ matrix:
   - stage: build
     env: CI_SCRIPT="ci/build.sc test integration/test"
     jdk: oraclejdk7
-    scala: 2.11.11
+    scala: 2.11.12
 
   # Publish everything to sonatype in conjunction with running tests
   - stage: build
     env: CI_SCRIPT="ci/build.sc artifacts 2.11.3 2.11.4 2.11.5 2.11.6 "
     jdk: oraclejdk8
-    scala: 2.11.11
+    scala: 2.11.12
 
   - stage: build
     # 2.11.9 and 2.11.10 were borked releases
-    env: CI_SCRIPT="ci/build.sc artifacts 2.11.7 2.11.8 2.11.11"
+    env: CI_SCRIPT="ci/build.sc artifacts 2.11.7 2.11.8 2.11.12"
     jdk: oraclejdk8
-    scala: 2.11.11
+    scala: 2.11.12
 
   - stage: build
     # Leave 2.12 unprefixed so any additional 2.12 versions get included automatically
     env: CI_SCRIPT="ci/build.sc artifacts 2.12"
     jdk: oraclejdk8
-    scala: 2.11.11
+    scala: 2.11.12
 
 
 
@@ -58,17 +58,17 @@ matrix:
   - stage: release
     env: CI_SCRIPT="ci/build.sc sonatypeReleaseAll"
     jdk: oraclejdk8
-    scala: 2.11.11
+    scala: 2.11.12
 
   - stage: release
     env: CI_SCRIPT="ci/build.sc docs"
     jdk: oraclejdk8
-    scala: 2.11.11
+    scala: 2.11.12
 
   - stage: release
     env: CI_SCRIPT="ci/build.sc executable"
     jdk: oraclejdk8
-    scala: 2.11.11
+    scala: 2.11.12
 
 script:
 - unset _JAVA_OPTIONS
