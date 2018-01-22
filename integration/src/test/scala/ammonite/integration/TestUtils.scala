@@ -10,7 +10,7 @@ object TestUtils {
   val scalaVersion = scala.util.Properties.versionNumberString
   val javaVersion = scala.util.Properties.javaVersion
   val ammVersion = ammonite.Constants.version
-  val executable = Path(sys.props("ammonite.test.assembly"))
+  val executable = Path(sys.env("AMMONITE_TEST_ASSEMBLY"))
   val intTestResources = pwd/'integration/'src/'test/'resources
   val replStandaloneResources = intTestResources/'ammonite/'integration
   val shellAmmoniteResources = pwd/'shell/'src/'main/'resources/'ammonite/'shell

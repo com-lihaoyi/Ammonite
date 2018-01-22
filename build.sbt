@@ -275,9 +275,9 @@ lazy val shell = project
     name := "ammonite-shell",
     fork in Test := true,
     baseDirectory in Test := (baseDirectory in Test).value / "..",
-    javaOptions in Test ++= Seq(
-      "-Dammonite.test.shell=" + (packageBin in Compile).value,
-      "-Dammonite.test.assembly=" + (assembly in amm).value
+    envVars in Test := Map(
+      "AMMONITE_TEST_SHELL" -> (packageBin in Compile).value.toString,
+      "AMMONITE_TEST_ASSEMBLY" -> (assembly in amm).value.toString
     )
   )
 
@@ -288,9 +288,9 @@ lazy val integration = project
     sharedSettings,
     fork in Test := true,
     baseDirectory in Test := (baseDirectory in Test).value / "..",
-    javaOptions in Test ++= Seq(
-      "-Dammonite.test.assembly=" + (assembly in amm).value,
-      "-Dammonite.test.shell=" + (packageBin in Compile).value
+    envVars in Test := Map(
+      "AMMONITE_TEST_SHELL" -> (packageBin in (shell, Compile)).value.toString,
+      "AMMONITE_TEST_ASSEMBLY" -> (assembly in amm).value.toString
     ),
     dontPublishSettings,
     initialCommands in (Test, console) := "ammonite.integration.Main.main(null)"
