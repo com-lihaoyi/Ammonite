@@ -272,27 +272,20 @@ lazy val shell = project
     sharedSettings,
     macroSettings,
     crossVersion := CrossVersion.full,
-    name := "ammonite-shell",
-    (test in Test) := (test in Test).dependsOn(packageBin in Compile).value,
-    (run in Test) := (run in Test).dependsOn(packageBin in Compile).evaluated,
-    (testOnly in Test) := (testOnly in Test).dependsOn(packageBin in Compile).evaluated
+    name := "ammonite-shell"
   )
-
-val integrationTasks = Seq(
-  assembly in amm,
-  packageBin in (shell, Compile)
-)
 
 lazy val integration = project
   .dependsOn(ops)
   .dependsOn(amm)
   .settings(
     sharedSettings,
-    (test in Test) := (test in Test).dependsOn(integrationTasks:_*).value,
-    (run in Test) := (run in Test).dependsOn(integrationTasks:_*).evaluated,
-    (testOnly in Test) := (testOnly in Test).dependsOn(integrationTasks:_*).evaluated,
-    (console in Test) := (console in Test).dependsOn(integrationTasks:_*).value,
-    parallelExecution in Test := false,
+    fork in Test := true,
+    baseDirectory in Test := (baseDirectory in Test).value / "..",
+    javaOptions in Test ++= Seq(
+      "-Dammonite.test.assembly=" + (assembly in amm).value,
+      "-Dammonite.test.shell=" + (packageBin in (shell, Compile)).value
+    ),
     dontPublishSettings,
     initialCommands in (Test, console) := "ammonite.integration.Main.main(null)"
   )

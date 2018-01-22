@@ -303,10 +303,12 @@ object ExampleTests extends TestSuite{
         (p, read.lines(p).zipWithIndex |? (_._1.length > 100) | (_._2))
 
       val filesWithTooLongLines = (
-        ls.rec! pwd |? (_.ext == "scala")
-                    | longLines
-                    |? (_._2.length > 0)
-                    |? (!_._1.segments.contains("src_managed"))
+        %%("git", "ls-files")(ammonite.ops.pwd).lines
+            | (Path(_, ammonite.ops.pwd))
+            |? (_.ext == "scala")
+            | longLines
+            |? (_._2.length > 0)
+            |? (!_._1.segments.contains("src_managed"))
       )
 
       assert(filesWithTooLongLines.length == 0)
