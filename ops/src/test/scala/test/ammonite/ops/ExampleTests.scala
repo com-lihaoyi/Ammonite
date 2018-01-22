@@ -303,7 +303,7 @@ object ExampleTests extends TestSuite{
         (p, read.lines(p).zipWithIndex |? (_._1.length > 100) | (_._2))
 
       val filesWithTooLongLines = (
-        %%("git", "ls-files")(ammonite.ops.pwd).lines
+        %%("git", "ls-files")(ammonite.ops.pwd).out.lines
             | (Path(_, ammonite.ops.pwd))
             |? (_.ext == "scala")
             | longLines

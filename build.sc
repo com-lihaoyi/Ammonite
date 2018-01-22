@@ -141,6 +141,9 @@ class ShellModule(val crossScalaVersion: String) extends AmmModule{
   def moduleDeps = Seq(ops(), amm())
   object test extends Tests{
     def moduleDeps = super.moduleDeps ++ Seq(amm.repl().test)
+    def forkArgs = Seq(
+      "-Dammonite.test.shell=" + shell().jar().path
+    )
   }
 }
 object integration extends Cross[IntegrationModule](fullCrossScalaVersions:_*)
@@ -153,8 +156,7 @@ class IntegrationModule(val crossScalaVersion: String) extends AmmModule{
   //  initialCommands in (Test, console) := "ammonite.integration.Main.main(null)"
   object test extends Tests {
     def forkArgs = Seq(
-      "-Dammonite.test.assembly=" + amm().assembly().path,
-      "-Dammonite.test.shell=" + shell().jar().path
+      "-Dammonite.test.assembly=" + amm().assembly().path
     )
   }
 }

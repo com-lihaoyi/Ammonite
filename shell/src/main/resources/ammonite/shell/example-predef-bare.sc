@@ -3,7 +3,7 @@ import ammonite.ops._
 import ammonite.runtime.tools.IvyThing.scalaBinaryVersion
 val scalaVersion = scala.util.Properties.versionNumberString
 val ammVersion = ammonite.Constants.version
-interp.load.cp(pwd/'shell/'target/s"scala-$scalaBinaryVersion"/s"ammonite-shell_$scalaVersion-$ammVersion.jar")
+interp.load.cp(Path(sys.props("ammonite.test.shell"), pwd))
 @
 val shellSession = ammonite.shell.ShellSession()
 import shellSession._

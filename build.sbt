@@ -272,7 +272,12 @@ lazy val shell = project
     sharedSettings,
     macroSettings,
     crossVersion := CrossVersion.full,
-    name := "ammonite-shell"
+    name := "ammonite-shell",
+    fork in Test := true,
+    baseDirectory in Test := (baseDirectory in Test).value / "..",
+    javaOptions in Test ++= Seq(
+      "-Dammonite.test.shell=" + (packageBin in Compile).value
+    )
   )
 
 lazy val integration = project
@@ -283,8 +288,7 @@ lazy val integration = project
     fork in Test := true,
     baseDirectory in Test := (baseDirectory in Test).value / "..",
     javaOptions in Test ++= Seq(
-      "-Dammonite.test.assembly=" + (assembly in amm).value,
-      "-Dammonite.test.shell=" + (packageBin in (shell, Compile)).value
+      "-Dammonite.test.assembly=" + (assembly in amm).value
     ),
     dontPublishSettings,
     initialCommands in (Test, console) := "ammonite.integration.Main.main(null)"
