@@ -141,9 +141,9 @@ class ShellModule(val crossScalaVersion: String) extends AmmModule{
   def moduleDeps = Seq(ops(), amm())
   object test extends Tests{
     def moduleDeps = super.moduleDeps ++ Seq(amm.repl().test)
-    def forkArgs = Seq(
-      "-Dammonite.test.shell=" + shell().jar().path,
-      "-Dammonite.test.assembly=" + amm().assembly().path,
+    def forkEnv = super.forkEnv() ++ Seq(
+      "AMMONITE_TEST_SHELL" -> shell().jar().path.toString,
+      "AMMONITE_TEST_ASSEMBLY" -> amm().assembly().path.toString
     )
   }
 }
@@ -156,9 +156,9 @@ class IntegrationModule(val crossScalaVersion: String) extends AmmModule{
   //  (console in Test) := (console in Test).dependsOn(integrationTasks:_*).value,
   //  initialCommands in (Test, console) := "ammonite.integration.Main.main(null)"
   object test extends Tests {
-    def forkArgs = Seq(
-      "-Dammonite.test.assembly=" + amm().assembly().path,
-      "-Dammonite.test.shell=" + shell().jar().path
+    def forkEnv = super.forkEnv() ++ Seq(
+      "AMMONITE_TEST_SHELL" -> shell().jar().path.toString,
+      "AMMONITE_TEST_ASSEMBLY" -> amm().assembly().path.toString
     )
   }
 }

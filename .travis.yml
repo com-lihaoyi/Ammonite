@@ -82,7 +82,7 @@ notifications:
   email:
     - haoyi.sg@gmail.com
 
-sudo: false
+sudo: true
 
 
 # Stolen from https://github.com/typelevel/cats/blob/master/.travis.yml
