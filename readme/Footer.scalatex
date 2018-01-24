@@ -515,7 +515,7 @@
       @sect{0.8.3}
         @ul
           @li
-            Cross-publish for Scala 2.12.2, 2.11.12
+            Cross-publish for Scala 2.12.2, 2.11.11
           @li
             Bump version of apache-sshd (@issue(545)), by
             @lnk("emanresusername", "https://github.com/emanresusername")
