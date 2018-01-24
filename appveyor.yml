@@ -13,20 +13,20 @@ install:
   - cmd: SET SBT_OPTS=-XX:MaxPermSize=2g -Xmx4g
 
 build_script:
-  - sbt ++2.11.11 ops/compile
-  - sbt ++2.11.11 amm/compile
-  - sbt ++2.11.11 integration/compile
+  - sbt ++2.11.12 ops/compile
+  - sbt ++2.11.12 amm/compile
+  - sbt ++2.11.12 integration/compile
 
 test_script:
-  - sbt ++2.11.11 ops/test
-  - sbt ++2.11.11 amm/test
-  - sbt ++2.11.11 integration/test
+  - sbt ++2.11.12 ops/test
+  - sbt ++2.11.12 amm/test
+  - sbt ++2.11.12 integration/test
 
 cache:
   - C:\sbt\
   - '%USERPROFILE%\.ivy2\cache'
   - '%USERPROFILE%\.m2'
-  - '%USERPROFILE%\.sbt'    
+  - '%USERPROFILE%\.sbt'
   - '%LOCALAPPDATA%\Coursier\cache'
   - C:\ProgramData\chocolatey\lib -> appveyor.yml
   - C:\ProgramData\chocolatey\bin -> appveyor.yml

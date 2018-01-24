@@ -145,7 +145,7 @@
     @sect{1.0.1}
       @ul
         @li
-          Ammonite is now cross-published to support Scala 
+          Ammonite is now cross-published to support Scala
           @lnk("2.12.3", "https://github.com/scala/scala/releases/tag/v2.12.3")
         @li
           Ammonite REPL now prints an additional newline after the output of
