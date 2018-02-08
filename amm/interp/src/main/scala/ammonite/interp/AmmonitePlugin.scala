@@ -14,7 +14,7 @@ import scala.reflect.internal.util.{BatchSourceFile, OffsetPosition}
  */
 class AmmonitePlugin(g: scala.tools.nsc.Global,
                      output: Seq[ImportData] => Unit,
-                     wrapperUses: Map[String, Seq[String]] => Unit,
+                     usedEarlierDefinitions: Seq[String] => Unit,
                      userCodeNestingLevel: => Int,
                      topWrapperLen: => Int) extends Plugin{
   val name: String = "AmmonitePlugin"
@@ -32,7 +32,9 @@ class AmmonitePlugin(g: scala.tools.nsc.Global,
         def name = phaseName
         def apply(unit: g.CompilationUnit): Unit = {
           val things = global.currentRun.units.map(_.source.path).toList
-          AmmonitePlugin(g)(unit, output, wrapperUses, userCodeNestingLevel, topWrapperLen)
+          AmmonitePlugin(g)(
+            unit, output, usedEarlierDefinitions, userCodeNestingLevel, topWrapperLen
+          )
         }
       }
     },
@@ -62,7 +64,7 @@ object AmmonitePlugin{
   def apply(g: Global)
            (unit: g.CompilationUnit,
             output: Seq[ImportData] => Unit,
-            wrapperUses: Map[String, Seq[String]] => Unit,
+            usedEarlierDefinitions: Seq[String] => Unit,
             userCodeNestingLevel: => Int,
             topWrapperLen: => Int) = {
 
@@ -106,14 +108,14 @@ object AmmonitePlugin{
       )
     }
 
-    val usedEarlierDefinitions = userCodeNestingLevel match {
+    userCodeNestingLevel match {
       case 1 =>
         /*
          * We don't try to determine what previous commands are actually used here.
          * userCodeNestingLevel == 1 likely corresponds to the default object-based
          * code wrapper, which doesn't rely on the actually used previous commands.
          */
-        Map.empty[String, Seq[String]]
+
       case 2 =>
         /*
          * For userCodeNestingLevel >= 2, we list the variables from the first wrapper
@@ -150,9 +152,8 @@ object AmmonitePlugin{
           )
           .distinct
 
-        Map(wrapperSym.encodedName -> uses0)
+        usedEarlierDefinitions(uses0)
     }
-    wrapperUses(usedEarlierDefinitions)
 
     val symbols = stats.filter(x => !Option(x.symbol).exists(_.isPrivate))
                        .foldLeft(List.empty[(Boolean, String, String, Seq[Name])]){

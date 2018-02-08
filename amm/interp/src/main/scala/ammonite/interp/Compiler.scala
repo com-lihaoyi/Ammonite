@@ -80,7 +80,11 @@ object Compiler{
    * If the Option is None, it means compilation failed
    * Otherwise it's a Traversable of (filename, bytes) tuples
    */
-  case class Output(classFiles: Vector[(String, Array[Byte])], imports: Imports)
+  case class Output(
+    classFiles: Vector[(String, Array[Byte])],
+    imports: Imports,
+    usedEarlierDefinitions: Option[Seq[String]]
+  )
 
   /**
     * Converts a bunch of bytes into Scalac's weird VirtualFile class
@@ -201,7 +205,7 @@ object Compiler{
     var infoLogger: String => Unit = s => ()
 
     var lastImports = Seq.empty[ImportData]
-    var wrapperUses = Map.empty[String, Seq[String]]
+    var usedEarlierDefinitions = Option.empty[Seq[String]]
 
     val (vd, reporter, compiler) = {
 
@@ -233,7 +237,11 @@ object Compiler{
         createPlugins = g => {
           List(
             new ammonite.interp.AmmonitePlugin(
-              g, lastImports = _, wrapperUses = _, userCodeNestingLevel, importsLen
+              g,
+              lastImports = _,
+              uses => usedEarlierDefinitions = Some(uses),
+              userCodeNestingLevel,
+              importsLen
             )
           ) ++ {
             for {
@@ -342,23 +350,8 @@ object Compiler{
           (x.path.stripPrefix("(memory)/").stripSuffix(".class").replace('/', '.'), x.toByteArray)
         }
 
-        /*
-         * Add a resource with the raw string representation of the tree of the user code. With the
-         * class-based code wrapper, this contains things like
-         * ```
-         * private[this] val res1: Int = cmd1.this.cmd0.n.+(1)
-         * ```
-         * which say that the current command (cmd1) uses things from the previous one (cmd0),
-         * and can easily be grepped to find that kind of dependency between commands.
-         */
-        val extraFiles =
-          for ((wrapperName, uses) <- wrapperUses)
-            yield s"$wrapperName-uses.txt" -> uses
-              .mkString("\n")
-              .getBytes(StandardCharsets.UTF_8)
-
         val imports = lastImports.toList
-        Some(Output(files ++ extraFiles, Imports(imports)))
+        Some(Output(files, Imports(imports), usedEarlierDefinitions))
 
       }
     }
