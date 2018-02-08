@@ -37,7 +37,7 @@ trait Compiler{
               printer: Printer,
               importsLen0: Int,
               userCodeNestingLevel: Int,
-              fileName: String): Compiler.Output
+              fileName: String): Option[Compiler.Output]
 
   def search(name: scala.reflect.runtime.universe.Type): Option[String]
   /**
@@ -80,7 +80,7 @@ object Compiler{
    * If the Option is None, it means compilation failed
    * Otherwise it's a Traversable of (filename, bytes) tuples
    */
-  type Output = Option[(Vector[(String, Array[Byte])], Imports)]
+  case class Output(classFiles: Vector[(String, Array[Byte])], imports: Imports)
 
   /**
     * Converts a bunch of bytes into Scalac's weird VirtualFile class
@@ -306,7 +306,7 @@ object Compiler{
                 printer: Printer,
                 importsLen0: Int,
                 userCodeNestingLevel: Int,
-                fileName: String): Output = {
+                fileName: String): Option[Output] = {
 
       def enumerateVdFiles(d: VirtualDirectory): Iterator[AbstractFile] = {
         val (subs, files) = d.iterator.partition(_.isDirectory)
@@ -358,7 +358,7 @@ object Compiler{
               .getBytes(StandardCharsets.UTF_8)
 
         val imports = lastImports.toList
-        Some( (files ++ extraFiles, Imports(imports)) )
+        Some(Output(files ++ extraFiles, Imports(imports)))
 
       }
     }

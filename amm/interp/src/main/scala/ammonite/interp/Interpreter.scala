@@ -257,15 +257,15 @@ class Interpreter(val printer: Printer,
                    incrementLine: () => Unit): Res[(Evaluated, Tag)] = synchronized{
     for{
       _ <- Catching{ case e: ThreadDeath => Evaluator.interrupted(e) }
-      (classFiles, newImports) <- compilerManager.compileClass(
+      output <- compilerManager.compileClass(
         processed,
         printer,
         fileName
       )
       _ = incrementLine()
       res <- eval.processLine(
-        classFiles,
-        newImports,
+        output.classFiles,
+        output.imports,
         printer,
         indexedWrapperName,
         replCodeWrapper.wrapperPath,
@@ -291,21 +291,25 @@ class Interpreter(val printer: Printer,
 
     for {
       _ <- Catching{case e: Throwable => e.printStackTrace(); throw e}
-      (classFiles, newImports) <- compilerManager.compileClass(
+      output <- compilerManager.compileClass(
         processed, printer, codeSource.fileName
       )
-      cls <- eval.loadClass(fullyQualifiedName, classFiles)
+      cls <- eval.loadClass(fullyQualifiedName, output.classFiles)
 
       res <- eval.processScriptBlock(
         cls,
-        newImports,
+        output.imports,
         codeSource.wrapperName,
         scriptCodeWrapper.wrapperPath,
         codeSource.pkgName,
         evalClassloader
       )
     } yield {
-      storage.compileCacheSave(fullyQualifiedName, tag, (classFiles, newImports))
+      storage.compileCacheSave(
+        fullyQualifiedName,
+        tag,
+        Storage.CompileCache(output.classFiles, output.imports)
+      )
 
       (res, tag)
     }
