@@ -443,6 +443,13 @@ object ${indexedWrapperName.backticked}{
           }
           .mkString
 
+        val usedThingsSet =
+          if (reqVals.isEmpty) ""
+          else
+            s"""
+  @_root_.scala.transient private val __amm_usedThings =
+    _root_.ammonite.repl.ReplBridge.value.usedEarlierDefinitions.toSet"""
+
         val top = normalizeNewlines(s"""
 package ${pkgName.head.encoded}
 package ${Util.encodeScalaSourcePath(pkgName.tail)}
@@ -455,8 +462,7 @@ object ${indexedWrapperName.backticked}{
 
 final class ${indexedWrapperName.backticked} extends java.io.Serializable {
 
-  @_root_.scala.transient private val __amm_usedThings =
-    new _root_.ammonite.interp.Preprocessor.CodeClassWrapper.UsedThings(this)
+$usedThingsSet
 
   override def toString = $q${indexedWrapperName.encoded}$q
 $requiredVals
@@ -473,33 +479,6 @@ final class Helper extends java.io.Serializable{\n"""
 
         (top, bottom, userCodeNestingLevel)
       }
-    }
-
-    final class UsedThings(obj: AnyRef) {
-
-      lazy val usedThings: Set[String] = {
-        var is: java.io.InputStream = null
-        try {
-          is = Thread.currentThread
-            .getContextClassLoader
-            .getResource(obj.toString + "-uses.txt")
-            .openStream()
-          if (is == null)
-            Set.empty[String]
-          else
-            Source.fromInputStream(is)(Codec.UTF8)
-              .mkString
-              .split('\n')
-              .toSet
-        } finally {
-          if (is != null)
-            is.close()
-        }
-      }
-
-      def apply(name: String): Boolean =
-        usedThings(name)
-
     }
   }
 }

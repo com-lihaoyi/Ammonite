@@ -24,7 +24,8 @@ import scala.collection.mutable
 class Frame(val classloader: SpecialClassLoader,
             val pluginClassloader: SpecialClassLoader,
             private[this] var imports0: Imports,
-            private[this] var classpath0: Seq[java.io.File]){
+            private[this] var classpath0: Seq[java.io.File],
+            private[this] var usedEarlierDefinitions0: Seq[String]){
   private var frozen0 = false
   def frozen = frozen0
   def freeze(): Unit = {
@@ -39,6 +40,7 @@ class Frame(val classloader: SpecialClassLoader,
   def version = version0
   def imports = imports0
   def classpath = classpath0
+  def usedEarlierDefinitions = usedEarlierDefinitions0
   def addImports(additional: Imports) = {
     if (!frozen0) {
       version0 += 1
@@ -58,6 +60,8 @@ class Frame(val classloader: SpecialClassLoader,
       additional.map(_.toURI.toURL).foreach(pluginClassloader.add)
     }
   }
+  def usedEarlierDefinitions_=(usedEarlierDefinitions: Seq[String]): Unit =
+    usedEarlierDefinitions0 = usedEarlierDefinitions
 }
 object Frame{
   def createInitial() = {
@@ -75,7 +79,7 @@ object Frame{
       likelyJdkSourceLocation.toNIO.toUri.toURL
     )
 
-    new Frame(special, special, Imports(), Seq())
+    new Frame(special, special, Imports(), Seq(), Seq())
   }
 }
 

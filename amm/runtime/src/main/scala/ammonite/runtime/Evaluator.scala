@@ -22,8 +22,9 @@ trait Evaluator{
   def evalMain(cls: Class[_], contextClassloader: ClassLoader): Any
 
 
-  def processLine(classFiles: ClassFiles,
+  def processLine(output: ClassFiles,
                   newImports: Imports,
+                  usedEarlierDefinitions: Seq[String],
                   printer: Printer,
                   indexedWrapperName: Name,
                   wrapperPath: Seq[Name],
@@ -32,6 +33,7 @@ trait Evaluator{
 
   def processScriptBlock(cls: Class[_],
                          newImports: Imports,
+                         usedEarlierDefinitions: Seq[String],
                          wrapperName: Name,
                          wrapperPath: Seq[Name],
                          pkgName: Seq[Name],
@@ -113,6 +115,7 @@ object Evaluator{
 
     def processLine(classFiles: Util.ClassFiles,
                     newImports: Imports,
+                    usedEarlierDefinitions: Seq[String],
                     printer: Printer,
                     indexedWrapperName: Name,
                     wrapperPath: Seq[Name],
@@ -122,6 +125,8 @@ object Evaluator{
         cls <- loadClass("ammonite.$sess." + indexedWrapperName.backticked, classFiles)
         _ <- Catching{userCodeExceptionHandler}
       } yield {
+        headFrame.usedEarlierDefinitions = usedEarlierDefinitions
+
         // Exhaust the printer iterator now, before exiting the `Catching`
         // block, so any exceptions thrown get properly caught and handled
         val iter = evalMain(cls, contextClassLoader).asInstanceOf[Iterator[String]]
@@ -141,6 +146,7 @@ object Evaluator{
 
     def processScriptBlock(cls: Class[_],
                            newImports: Imports,
+                           usedEarlierDefinitions: Seq[String],
                            wrapperName: Name,
                            wrapperPath: Seq[Name],
                            pkgName: Seq[Name],
@@ -148,6 +154,7 @@ object Evaluator{
       for {
         _ <- Catching{userCodeExceptionHandler}
       } yield {
+        headFrame.usedEarlierDefinitions = usedEarlierDefinitions
         evalMain(cls, contextClassLoader)
         val res = evaluationResult(pkgName :+ wrapperName, wrapperPath, newImports)
         res

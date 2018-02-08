@@ -52,6 +52,7 @@ class Interpreter(val printer: Printer,
   def pluginClassloader = headFrame.pluginClassloader
   def handleImports(i: Imports) = headFrame.addImports(i)
   def frameImports = headFrame.imports
+  def frameUsedEarlierDefinitions = headFrame.usedEarlierDefinitions
 
   val compilerManager = new CompilerLifecycleManager(headFrame)
 
@@ -266,6 +267,7 @@ class Interpreter(val printer: Printer,
       res <- eval.processLine(
         output.classFiles,
         output.imports,
+        output.usedEarlierDefinitions.getOrElse(Nil),
         printer,
         indexedWrapperName,
         replCodeWrapper.wrapperPath,
@@ -299,6 +301,7 @@ class Interpreter(val printer: Printer,
       res <- eval.processScriptBlock(
         cls,
         output.imports,
+        output.usedEarlierDefinitions.getOrElse(Nil),
         codeSource.wrapperName,
         scriptCodeWrapper.wrapperPath,
         codeSource.pkgName,
