@@ -62,14 +62,18 @@ object IvyThing{
           val loadedArtifacts = scalaz.concurrent.Task.gatherUnordered(
             for (a <- artifacts)
               yield coursier.Cache.file(a, logger = logger).run
+                .map(a.isOptional -> _)
           ).run
 
-          val errors = loadedArtifacts.collect { case scalaz.-\/(x) => x }
-          val successes = loadedArtifacts.collect { case scalaz.\/-(x) => x }
+          val errors = loadedArtifacts.collect {
+            case (false, scalaz.-\/(x)) => x
+            case (true, scalaz.-\/(x)) if !x.notFound => x
+          }
+          val successes = loadedArtifacts.collect { case (_, scalaz.\/-(x)) => x }
           (errors, successes)
         }
 
-        val (jarErrors, jarSuccesses) = load(resolution.artifacts)
+        val (jarErrors, jarSuccesses) = load(resolution.artifacts(withOptional = true))
         val (sourceErrors, sourceSuccesses) = load(resolution.classifiersArtifacts(Seq("sources")))
         val srcWarnings =
           if (sourceErrors.isEmpty) None
