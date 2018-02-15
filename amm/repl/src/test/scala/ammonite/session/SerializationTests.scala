@@ -33,8 +33,12 @@ object SerializationTests extends TestSuite{
       // the current session. We call the deserialized closure by reflection, and check
       // that the heavy computation was not run again.
 
+      // -Ydelambdafy=inline seems to be required in 2.12 for serializing lambdas
+
       check.session(
         s"""
+          @ interp.configureCompiler(_.settings.Ydelambdafy.value = "inline")
+
           @ object costlySideEffect {
           @   import java.nio.file.{Files, Paths}
           @   private val path = Paths.get("a")
