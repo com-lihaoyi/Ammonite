@@ -186,6 +186,16 @@
     @li
       @sect.ref{Unstable Versions}
 
+  @p
+    Sponsored by:
+    
+  @ul
+    @li
+      @lnk("Rally Health", "http://engineering.rallyhealth.com/"): putting healthcare 
+      in the hands of consumers, we work on critical applications at a 
+      massive scale in Scala, C# and JavaScript. If you're smart and like moving 
+      fast, @link("work with us", "https://www.rallyhealth.com/company/careers/").
+
   @Repl()
   @Scripts()
   @Ops()
