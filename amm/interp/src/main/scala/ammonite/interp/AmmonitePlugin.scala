@@ -14,6 +14,8 @@ import scala.reflect.internal.util.{BatchSourceFile, OffsetPosition}
  */
 class AmmonitePlugin(g: scala.tools.nsc.Global,
                      output: Seq[ImportData] => Unit,
+                     usedEarlierDefinitions: Seq[String] => Unit,
+                     userCodeNestingLevel: => Int,
                      topWrapperLen: => Int) extends Plugin{
   val name: String = "AmmonitePlugin"
   val global: Global = g
@@ -30,7 +32,9 @@ class AmmonitePlugin(g: scala.tools.nsc.Global,
         def name = phaseName
         def apply(unit: g.CompilationUnit): Unit = {
           val things = global.currentRun.units.map(_.source.path).toList
-          AmmonitePlugin(g)(unit, output, topWrapperLen)
+          AmmonitePlugin(g)(
+            unit, output, usedEarlierDefinitions, userCodeNestingLevel, topWrapperLen
+          )
         }
       }
     },
@@ -60,6 +64,8 @@ object AmmonitePlugin{
   def apply(g: Global)
            (unit: g.CompilationUnit,
             output: Seq[ImportData] => Unit,
+            usedEarlierDefinitions: Seq[String] => Unit,
+            userCodeNestingLevel: => Int,
             topWrapperLen: => Int) = {
 
 
@@ -94,7 +100,61 @@ object AmmonitePlugin{
       !ignoredNames(sym.name.decoded)
     }
 
-    val stats = unit.body.children.last.children.last.asInstanceOf[g.ImplDef].impl.body
+    val stats = {
+      val nestingLevel = userCodeNestingLevel
+      assert(nestingLevel >= 0)
+      (0 until nestingLevel).foldLeft(unit.body.children.last.children)((res, _) =>
+        res.last.asInstanceOf[g.ImplDef].impl.body
+      )
+    }
+
+    userCodeNestingLevel match {
+      case 1 =>
+        /*
+         * We don't try to determine what previous commands are actually used here.
+         * userCodeNestingLevel == 1 likely corresponds to the default object-based
+         * code wrapper, which doesn't rely on the actually used previous commands.
+         */
+
+      case 2 =>
+        /*
+         * For userCodeNestingLevel >= 2, we list the variables from the first wrapper
+         * used from the user code.
+         *
+         * E.g. if, after wrapping, the code looks like
+         * ```
+         *   class cmd2 {
+         *
+         *     val cmd0 = ???
+         *     val cmd1 = ???
+         *
+         *     import cmd0.{
+         *       n
+         *     }
+         *
+         *     class Helper {
+         *       // user-typed code
+         *       val n0 = n + 1
+         *     }
+         *   }
+         * ```
+         * this would process the tree of `val n0 = n + 1`, find `n` as a tree like
+         * `cmd2.this.cmd0.n`, and put `cmd0` in `uses`.
+         */
+        val wrapperSym = unit.body.children.last.children
+          .last.asInstanceOf[g.ImplDef].symbol
+        val uses0 = stats
+          .flatMap(t =>
+            t.collect {
+              case g.Select(node, g.TermName(name)) if node.symbol == wrapperSym =>
+                name
+            }
+          )
+          .distinct
+
+        usedEarlierDefinitions(uses0)
+    }
+
     val symbols = stats.filter(x => !Option(x.symbol).exists(_.isPrivate))
                        .foldLeft(List.empty[(Boolean, String, String, Seq[Name])]){
       // These are all the ways we want to import names from previous
@@ -105,7 +165,7 @@ object AmmonitePlugin{
 
         def rec(expr: g.Tree): List[(g.Name, g.Symbol)] = {
           expr match {
-            case s @ g.Select(lhs, name) => (name -> s.symbol) :: rec(lhs)
+            case s @ g.Select(lhs, _) => (s.symbol.name -> s.symbol) :: rec(lhs)
             case i @ g.Ident(name) => List(name -> i.symbol)
             case t @ g.This(pkg) => List(pkg -> t.symbol)
           }

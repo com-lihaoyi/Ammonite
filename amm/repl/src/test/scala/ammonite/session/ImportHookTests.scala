@@ -1,6 +1,6 @@
 package ammonite.session
 
-import ammonite.TestRepl
+import ammonite.DualTestRepl
 import ammonite.TestUtils._
 import ammonite.runtime.tools.IvyThing
 import utest._
@@ -13,7 +13,7 @@ object ImportHookTests extends TestSuite{
 
   val tests = Tests{
     println("ImportHookTests")
-    val check = new TestRepl()
+    val check = new DualTestRepl()
     'repl{
       'file{
         'basic - check.session("""

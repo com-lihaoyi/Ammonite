@@ -1,6 +1,6 @@
 package ammonite.session
 
-import ammonite.TestRepl
+import ammonite.DualTestRepl
 import ammonite.TestUtils._
 import utest._
 
@@ -9,7 +9,7 @@ import scala.collection.{immutable => imm}
 object ProjectTests extends TestSuite{
   val tests = Tests{
     println("ProjectTests")
-    val check = new TestRepl()
+    val check = new DualTestRepl()
     'load {
       'ivy {
         'standalone - {

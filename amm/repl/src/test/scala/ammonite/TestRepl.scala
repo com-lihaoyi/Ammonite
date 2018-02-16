@@ -19,6 +19,7 @@ import scala.collection.mutable
 class TestRepl {
   var allOutput = ""
   def predef: (String, Option[ammonite.ops.Path]) = ("", None)
+  def codeWrapper: Preprocessor.CodeWrapper = Preprocessor.CodeWrapper
 
   val tempDir = ammonite.ops.Path(
     java.nio.file.Files.createTempDirectory("ammonite-tester")
@@ -83,6 +84,7 @@ class TestRepl {
           def compiler = interp.compilerManager.compiler.compiler
           def fullImports = interp.predefImports ++ imports
           def imports = interp.frameImports
+          def usedEarlierDefinitions = interp.frameUsedEarlierDefinitions
           def width = 80
           def height = 80
 
@@ -106,8 +108,8 @@ class TestRepl {
       colors = Ref(Colors.BlackWhite),
       getFrame = () => frames().head,
       createFrame = () => { val f = sess0.childFrame(frames().head); frames() = f :: frames(); f },
-      replCodeWrapper = Preprocessor.CodeWrapper,
-      scriptCodeWrapper = Preprocessor.CodeWrapper
+      replCodeWrapper = codeWrapper,
+      scriptCodeWrapper = codeWrapper
     )
 
   }catch{ case e: Throwable =>

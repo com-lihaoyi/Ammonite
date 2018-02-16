@@ -24,7 +24,8 @@ import scala.collection.mutable
 class Frame(val classloader: SpecialClassLoader,
             val pluginClassloader: SpecialClassLoader,
             private[this] var imports0: Imports,
-            private[this] var classpath0: Seq[java.io.File]){
+            private[this] var classpath0: Seq[java.io.File],
+            private[this] var usedEarlierDefinitions0: Seq[String]){
   private var frozen0 = false
   def frozen = frozen0
   def freeze(): Unit = {
@@ -39,6 +40,7 @@ class Frame(val classloader: SpecialClassLoader,
   def version = version0
   def imports = imports0
   def classpath = classpath0
+  def usedEarlierDefinitions = usedEarlierDefinitions0
   def addImports(additional: Imports) = {
     if (!frozen0) {
       version0 += 1
@@ -58,6 +60,8 @@ class Frame(val classloader: SpecialClassLoader,
       additional.map(_.toURI.toURL).foreach(pluginClassloader.add)
     }
   }
+  def usedEarlierDefinitions_=(usedEarlierDefinitions: Seq[String]): Unit =
+    usedEarlierDefinitions0 = usedEarlierDefinitions
 }
 object Frame{
   def createInitial() = {
@@ -75,7 +79,7 @@ object Frame{
       likelyJdkSourceLocation.toNIO.toUri.toURL
     )
 
-    new Frame(special, special, Imports(), Seq())
+    new Frame(special, special, Imports(), Seq(), Seq())
   }
 }
 
@@ -231,7 +235,7 @@ class SpecialClassLoader(parent: ClassLoader, parentSignature: Seq[(Path, Long)]
     path -> (if (exists(path))path.mtime.toMillis else 0)
   }
 
-  private[this] var classpathSignature0 = parentSignature
+  private var classpathSignature0 = parentSignature
   def classpathSignature = classpathSignature0
   def classpathHash = {
     Util.md5Hash(
@@ -269,6 +273,26 @@ class SpecialClassLoader(parent: ClassLoader, parentSignature: Seq[(Path, Long)]
         }
       })
     }
+  }
+
+  def cloneClassLoader(parent: ClassLoader = null): SpecialClassLoader = {
+
+    // FIXME Not tailrec
+
+     val newParent =
+       if (parent == null)
+         getParent match {
+           case s: SpecialClassLoader => s.cloneClassLoader()
+           case p => p
+         }
+       else
+         parent
+
+     val clone = new SpecialClassLoader(newParent, parentSignature, getURLs.toSeq: _*)
+     clone.newFileDict ++= newFileDict
+     clone.classpathSignature0 = classpathSignature0
+
+     clone
   }
 
 }

@@ -1,6 +1,6 @@
 package ammonite.session
 
-import ammonite.TestRepl
+import ammonite.DualTestRepl
 import ammonite.TestUtils._
 import utest._
 
@@ -10,7 +10,7 @@ object EvaluatorTests extends TestSuite{
 
   val tests = Tests{
     println("EvaluatorTests")
-    val check = new TestRepl()
+    val check = new DualTestRepl()
     'simpleExpressions{
       check.session("""
         @ 1 + 2

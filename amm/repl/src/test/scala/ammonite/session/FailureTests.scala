@@ -1,13 +1,13 @@
 package ammonite.session
 
-import ammonite.{TestRepl, TestUtils}
+import ammonite.{DualTestRepl, TestUtils}
 import utest._
 
 import scala.collection.{immutable => imm}
 object FailureTests extends TestSuite{
   val tests = Tests{
     println("FailureTests")
-    val check = new TestRepl()
+    val check = new DualTestRepl()
     'compileFailure {
       check.session("""
         @ doesnt_exist
@@ -56,7 +56,7 @@ object FailureTests extends TestSuite{
         x.contains("java.lang.Exception: lol") &&
         x.contains("java.lang.Exception: hoho") &&
         // and none of the stuff we don't want
-        x.lines.length == 6 &&
+        !x.contains("evaluatorRunPrinter") &&
         !x.contains("Something unexpected went wrong =(")
       )
     }

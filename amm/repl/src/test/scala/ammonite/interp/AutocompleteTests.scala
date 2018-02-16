@@ -1,34 +1,36 @@
 package ammonite.interp
 
-import ammonite.TestRepl
+import ammonite.DualTestRepl
 import ammonite.TestUtils._
 import utest._
 
 
 object AutocompleteTests extends TestSuite{
   class Completer{
-    val check = new TestRepl()
+    val check = new DualTestRepl()
     def apply(caretCode: String,
                  cmp: (Set[String]) => Set[String],
                  sigs: (Set[String]) => Set[String] = _ => Set()) = {
       val cursor = caretCode.indexOf("<caret>")
       val buf = caretCode.replace("<caret>", "")
 
-      val (index, completions, signatures) = check.interp.compilerManager.complete(
-        cursor,
-        check.interp.frameImports.toString,
-        buf
-      )
-      val left = cmp(completions.toSet)
-      assert(left == Set())
-      val sigLeft = sigs(signatures.toSet)
-      assert(sigLeft == Set())
+      for (interp <- check.interps) {
+        val (index, completions, signatures) = interp.compilerManager.complete(
+          cursor,
+          interp.frameImports.toString,
+          buf
+        )
+        val left = cmp(completions.toSet)
+        assert(left == Set())
+        val sigLeft = sigs(signatures.toSet)
+        assert(sigLeft == Set())
+      }
     }
   }
   def checking[T](f: Completer => T) = {
     val c = new Completer
     val res = f(c)
-    c.check.interp.compilerManager.shutdownPressy()
+    c.check.interps.map(_.compilerManager.shutdownPressy())
     res
   }
   val tests = Tests{

@@ -57,6 +57,8 @@ class Repl(input: InputStream,
   def imports = frames().head.imports
   def fullImports = interp.predefImports ++ imports
 
+  def usedEarlierDefinitions = frames().head.usedEarlierDefinitions
+
   val interp: Interpreter = new Interpreter(
     printer,
     storage,
@@ -80,6 +82,7 @@ class Repl(input: InputStream,
         def compiler = interp.compilerManager.compiler.compiler
         def fullImports = repl.fullImports
         def imports = repl.imports
+        def usedEarlierDefinitions = repl.usedEarlierDefinitions
         def width = frontEnd().width
         def height = frontEnd().height
 

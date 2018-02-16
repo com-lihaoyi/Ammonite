@@ -60,6 +60,8 @@ object Parsers {
   val Splitter0 = P( StatementBlock(Fail) )
   val Splitter = P( ("{" ~ Splitter0 ~ "}" | Splitter0) ~ End )
 
+  val ObjParser = P( ObjDef )
+
   /**
    * Attempts to break a code blob into multiple statements. Returns `None` if
    * it thinks the code blob is "incomplete" and requires more input
@@ -77,6 +79,11 @@ object Parsers {
       case Parsed.Failure(_, index, extra) if furthest == code.length => None
       case x => Some(x)
     }
+  }
+
+  def isObjDef(code: String): Boolean = {
+    ObjParser.parse(code)
+      .fold((_, _, _) => false, (_, _) => true)
   }
 
   val Separator = P( WL ~ "@" ~~ CharIn(" " + System.lineSeparator).rep(1) )

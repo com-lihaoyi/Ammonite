@@ -21,7 +21,8 @@ class SessionApiImpl(frames0: => StableRef[List[Frame]]) extends Session{
       parent.pluginClassloader.classpathSignature
     ),
     parent.imports,
-    parent.classpath
+    parent.classpath,
+    parent.usedEarlierDefinitions
   )
 
   def save(name: String = "") = {

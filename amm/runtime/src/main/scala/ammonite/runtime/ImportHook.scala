@@ -28,7 +28,8 @@ trait ImportHook{
     */
   def handle(source: CodeSource,
              tree: ImportTree,
-             interp: ImportHook.InterpreterInterface)
+             interp: ImportHook.InterpreterInterface,
+             wrapperPath: Seq[Name])
             : Either[String, Seq[ImportHook.Result]]
 }
 
@@ -90,7 +91,8 @@ object ImportHook{
     // import $file.foo.Bar, to import the file `foo/Bar.sc`
     def handle(source: CodeSource,
                tree: ImportTree,
-               interp: InterpreterInterface) = {
+               interp: InterpreterInterface,
+               wrapperPath: Seq[Name]) = {
 
       source.path match{
         case None => Left("Cannot resolve $file import in code without source")
@@ -112,7 +114,7 @@ object ImportHook{
                   source.flexiblePkgName, filePath relativeTo currentScriptPath/up
                 )
 
-                val fullPrefix = source.pkgRoot ++ flexiblePkg ++ Seq(wrapper)
+                val fullPrefix = source.pkgRoot ++ flexiblePkg ++ Seq(wrapper) ++ wrapperPath
 
                 val importData = Seq(ImportData(
                   fullPrefix.last, Name(rename.getOrElse(relativeModule.last)),
@@ -180,7 +182,8 @@ object ImportHook{
 
     def handle(source: CodeSource,
                tree: ImportTree,
-               interp: InterpreterInterface) = for{
+               interp: InterpreterInterface,
+               wrapperPath: Seq[Name]) = for{
       signatures <- splitImportTree(tree).right
       resolved <- resolve(interp, signatures).right
     } yield resolved.map(Path(_)).map(Result.ClassPath(_, plugin)).toSeq
@@ -190,7 +193,8 @@ object ImportHook{
   class BaseClasspath(plugin: Boolean) extends ImportHook{
     def handle(source: CodeSource,
                tree: ImportTree,
-               interp: InterpreterInterface) = {
+               interp: InterpreterInterface,
+               wrapperPath: Seq[Name]) = {
       source.path match{
         case None => Left("Cannot resolve $cp import in code without source")
         case Some(currentScriptPath) =>
@@ -231,7 +235,8 @@ object ImportHook{
 
     override def handle(source: CodeSource,
                         tree: ImportTree,
-                        interp: InterpreterInterface): Either[String, Seq[Result]] = {
+                        interp: InterpreterInterface,
+                        wrapperPath: Seq[Name]): Either[String, Seq[Result]] = {
       Try(resolveURLs(tree)) match {
         case Failure(e) =>
           Left(e.getMessage)
@@ -252,7 +257,7 @@ object ImportHook{
                 None
               )
 
-              val fullPrefix = source.pkgRoot :+ Name(uri.toString)
+              val fullPrefix = source.pkgRoot ++ Seq(Name(uri.toString)) ++ wrapperPath
               val importData = Seq(ImportData(
                 fullPrefix.last, Name(rename),
                 fullPrefix.dropRight(1), ImportData.TermType

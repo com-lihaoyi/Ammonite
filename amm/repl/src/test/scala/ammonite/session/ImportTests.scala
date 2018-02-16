@@ -1,6 +1,6 @@
 package ammonite.session
 
-import ammonite.TestRepl
+import ammonite.DualTestRepl
 import ammonite.TestUtils._
 import utest._
 
@@ -10,7 +10,7 @@ object ImportTests extends TestSuite{
 
   val tests = Tests{
     println("ImportTests")
-    val check = new TestRepl()
+    val check = new DualTestRepl()
 
     'basic {
       'hello{

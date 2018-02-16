@@ -2,9 +2,10 @@ package ammonite.interp
 
 
 import java.io.OutputStream
+import java.nio.charset.StandardCharsets
 
 import ammonite.runtime.{Classpath, Evaluator}
-import ammonite.util.{ImportData, Imports, Printer}
+import ammonite.util.{ImportData, Imports, Name, Printer}
 import ammonite.util.Util.newLine
 
 import scala.collection.mutable
@@ -35,7 +36,8 @@ trait Compiler{
   def compile(src: Array[Byte],
               printer: Printer,
               importsLen0: Int,
-              fileName: String): Compiler.Output
+              userCodeNestingLevel: Int,
+              fileName: String): Option[Compiler.Output]
 
   def search(name: scala.reflect.runtime.universe.Type): Option[String]
   /**
@@ -43,6 +45,7 @@ trait Compiler{
    */
   def parse(fileName: String, line: String): Either[String, Seq[Global#Tree]]
   var importsLen = 0
+  var userCodeNestingLevel = -1
 
 }
 object Compiler{
@@ -77,7 +80,11 @@ object Compiler{
    * If the Option is None, it means compilation failed
    * Otherwise it's a Traversable of (filename, bytes) tuples
    */
-  type Output = Option[(Vector[(String, Array[Byte])], Imports)]
+  case class Output(
+    classFiles: Vector[(String, Array[Byte])],
+    imports: Imports,
+    usedEarlierDefinitions: Option[Seq[String]]
+  )
 
   /**
     * Converts a bunch of bytes into Scalac's weird VirtualFile class
@@ -198,6 +205,7 @@ object Compiler{
     var infoLogger: String => Unit = s => ()
 
     var lastImports = Seq.empty[ImportData]
+    var usedEarlierDefinitions = Option.empty[Seq[String]]
 
     val (vd, reporter, compiler) = {
 
@@ -228,7 +236,13 @@ object Compiler{
         evalClassloader,
         createPlugins = g => {
           List(
-            new ammonite.interp.AmmonitePlugin(g, lastImports = _, importsLen)
+            new ammonite.interp.AmmonitePlugin(
+              g,
+              lastImports = _,
+              uses => usedEarlierDefinitions = Some(uses),
+              userCodeNestingLevel,
+              importsLen
+            )
           ) ++ {
             for {
               (name, cls) <- plugins0
@@ -299,7 +313,8 @@ object Compiler{
     def compile(src: Array[Byte],
                 printer: Printer,
                 importsLen0: Int,
-                fileName: String): Output = {
+                userCodeNestingLevel: Int,
+                fileName: String): Option[Output] = {
 
       def enumerateVdFiles(d: VirtualDirectory): Iterator[AbstractFile] = {
         val (subs, files) = d.iterator.partition(_.isDirectory)
@@ -314,6 +329,7 @@ object Compiler{
       this.infoLogger = printer.info
       val singleFile = makeFile(src, fileName)
       this.importsLen = importsLen0
+      this.userCodeNestingLevel = userCodeNestingLevel
       val run = new compiler.Run()
       vd.clear()
 
@@ -335,7 +351,7 @@ object Compiler{
         }
 
         val imports = lastImports.toList
-        Some( (files, Imports(imports)) )
+        Some(Output(files, Imports(imports), usedEarlierDefinitions))
 
       }
     }

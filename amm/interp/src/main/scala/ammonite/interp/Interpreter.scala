@@ -52,6 +52,7 @@ class Interpreter(val printer: Printer,
   def pluginClassloader = headFrame.pluginClassloader
   def handleImports(i: Imports) = headFrame.addImports(i)
   def frameImports = headFrame.imports
+  def frameUsedEarlierDefinitions = headFrame.usedEarlierDefinitions
 
   val compilerManager = new CompilerLifecycleManager(headFrame)
 
@@ -122,13 +123,22 @@ class Interpreter(val printer: Printer,
   // code to run, so let it pass it in a callback and we'll run it here
   def watch(p: Path) = watchedFiles.append(p -> Interpreter.pathSignature(p))
 
-  def resolveSingleImportHook(source: CodeSource, tree: ImportTree) = synchronized{
+  def resolveSingleImportHook(
+    source: CodeSource,
+    tree: ImportTree,
+    wrapperPath: Seq[Name]
+  ) = synchronized{
     val strippedPrefix = tree.prefix.takeWhile(_(0) == '$').map(_.stripPrefix("$"))
     val hookOpt = importHooks().collectFirst{case (k, v) if strippedPrefix.startsWith(k) => (k, v)}
     for{
       (hookPrefix, hook) <- Res(hookOpt, s"Import Hook ${tree.prefix} could not be resolved")
       hooked <- Res(
-        hook.handle(source, tree.copy(prefix = tree.prefix.drop(hookPrefix.length)), this)
+        hook.handle(
+          source,
+          tree.copy(prefix = tree.prefix.drop(hookPrefix.length)),
+          this,
+          wrapperPath
+        )
       )
       hookResults <- Res.map(hooked){
         case res: ImportHook.Result.Source =>
@@ -182,9 +192,10 @@ class Interpreter(val printer: Printer,
 
   def resolveImportHooks(importTrees: Seq[ImportTree],
                          hookedStmts: Seq[String],
-                         source: CodeSource): Res[ImportHookInfo] = synchronized{
+                         source: CodeSource,
+                         wrapperPath: Seq[Name]): Res[ImportHookInfo] = synchronized{
 
-    for (hookImports <- Res.map(importTrees)(resolveSingleImportHook(source, _)))
+    for (hookImports <- Res.map(importTrees)(resolveSingleImportHook(source, _, wrapperPath)))
     yield ImportHookInfo(
       Imports(hookImports.flatten.flatMap(_.value)),
       hookedStmts,
@@ -213,7 +224,8 @@ class Interpreter(val printer: Printer,
       ImportHookInfo(hookImports, hookStmts, _) <- resolveImportHooks(
         importTrees,
         hookStmts,
-        codeSource
+        codeSource,
+        replCodeWrapper.wrapperPath
       )
 
       processed <- compilerManager.preprocess("(console)").transform(
@@ -246,17 +258,19 @@ class Interpreter(val printer: Printer,
                    incrementLine: () => Unit): Res[(Evaluated, Tag)] = synchronized{
     for{
       _ <- Catching{ case e: ThreadDeath => Evaluator.interrupted(e) }
-      (classFiles, newImports) <- compilerManager.compileClass(
+      output <- compilerManager.compileClass(
         processed,
         printer,
         fileName
       )
       _ = incrementLine()
       res <- eval.processLine(
-        classFiles,
-        newImports,
+        output.classFiles,
+        output.imports,
+        output.usedEarlierDefinitions.getOrElse(Nil),
         printer,
         indexedWrapperName,
+        replCodeWrapper.wrapperPath,
         silent,
         evalClassloader
       )
@@ -279,20 +293,26 @@ class Interpreter(val printer: Printer,
 
     for {
       _ <- Catching{case e: Throwable => e.printStackTrace(); throw e}
-      (classFiles, newImports) <- compilerManager.compileClass(
+      output <- compilerManager.compileClass(
         processed, printer, codeSource.fileName
       )
-      cls <- eval.loadClass(fullyQualifiedName, classFiles)
+      cls <- eval.loadClass(fullyQualifiedName, output.classFiles)
 
       res <- eval.processScriptBlock(
         cls,
-        newImports,
+        output.imports,
+        output.usedEarlierDefinitions.getOrElse(Nil),
         codeSource.wrapperName,
+        scriptCodeWrapper.wrapperPath,
         codeSource.pkgName,
         evalClassloader
       )
     } yield {
-      storage.compileCacheSave(fullyQualifiedName, tag, (classFiles, newImports))
+      storage.compileCacheSave(
+        fullyQualifiedName,
+        tag,
+        Storage.CompileCache(output.classFiles, output.imports)
+      )
 
       (res, tag)
     }
@@ -496,7 +516,8 @@ class Interpreter(val printer: Printer,
           if resolveImportHooks(
             blockMetadata.hookInfo.trees,
             blockMetadata.hookInfo.stmts,
-            codeSource
+            codeSource,
+            scriptCodeWrapper.wrapperPath
           ).isInstanceOf[Res.Success[_]]
         } yield {
           val envHash = Interpreter.cacheTag(evalClassloader.classpathHash)
@@ -519,7 +540,9 @@ class Interpreter(val printer: Printer,
             allSplittedChunks <- splittedScript
             (leadingSpaces, stmts) = allSplittedChunks(wrapperIndex - 1)
             (hookStmts, importTrees) = parseImportHooks(codeSource, stmts)
-            hookInfo <- resolveImportHooks(importTrees, hookStmts, codeSource)
+            hookInfo <- resolveImportHooks(
+             importTrees, hookStmts, codeSource, scriptCodeWrapper.wrapperPath
+            )
             res <- compileRunBlock(leadingSpaces, hookInfo)
           } yield res
         }

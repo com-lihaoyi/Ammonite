@@ -33,7 +33,7 @@ trait Storage{
 }
 
 object Storage{
-  type CompileCache = (ClassFiles, Imports)
+  case class CompileCache(classFiles: Vector[(String, Array[Byte])], imports: Imports)
   type IvyMap = Map[(String, Seq[coursier.Dependency]), Set[String]]
   implicit def depRW: upickle.default.ReadWriter[coursier.Dependency] = upickle.default.macroRW
   implicit def modRW: upickle.default.ReadWriter[coursier.Module] = upickle.default.macroRW
@@ -49,7 +49,7 @@ object Storage{
         yield compileCacheLoad(blockMeta.id.wrapperPath, blockMeta.id.tag)
 
       if (res.exists(_.isEmpty)) None
-      else Some(ScriptOutput(ScriptOutput.Metadata(classFilesList), res.flatten.map(_._1)))
+      else Some(ScriptOutput(ScriptOutput.Metadata(classFilesList), res.flatten.map(_.classFiles)))
     }
 
   }
@@ -192,13 +192,12 @@ object Storage{
     }
 
     def compileCacheSave(path: String, tag: Tag, data: CompileCache): Unit = {
-      val (classFiles, imports) = data
       val tagCacheDir = compileCacheDir/path.split('.').map(encode)/tag.code/tag.env
 
       mkdir(tagCacheDir)
-      val metadata = upickle.default.write((tag, imports), indent = 4)
+      val metadata = upickle.default.write((tag, data.imports), indent = 4)
       write.over(tagCacheDir/metadataFile, metadata)
-      classFiles.foreach{ case (name, bytes) =>
+      data.classFiles.foreach{ case (name, bytes) =>
         write.over(tagCacheDir/s"$name.class", bytes)
       }
 
@@ -213,7 +212,7 @@ object Storage{
         if tag == loadedTag
         classFiles <- loadClassFiles(tagCacheDir)
       } yield {
-        (classFiles, metadata)
+        CompileCache(classFiles, metadata)
       }
     }
 

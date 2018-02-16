@@ -83,6 +83,29 @@ trait ReplAPI {
    * *excludes* imports from the built-in predef and user predef files
    */
   def imports: Imports
+
+  /**
+    * If class wrapping is enabled, this lists the names of the previous commands
+    * that the current commands actually references (as told by the scalac).
+    *
+    * E.g. in a session like
+    * ```
+    * @ val n = 2
+    * n: Int = 2
+    *
+    * @ val p = 1
+    * p: Int = 1
+    *
+    * @ n + p
+    * res2: Int = 3
+    * ```
+    * this would have returned an empty list if called from the same line as `val n = 2`
+    * or `val p = 1`. This would have returned `Seq("cmd0", "cmd1")` if called
+    * from the same line as `n + p`, as both `cmd0`, that defines `n`, and `cmd1`, that
+    * defines `p`, are referenced from this line.
+    */
+  def usedEarlierDefinitions: Seq[String]
+
   /**
    * Controls how things are pretty-printed in the REPL. Feel free
    * to shadow this with your own definition to change how things look
