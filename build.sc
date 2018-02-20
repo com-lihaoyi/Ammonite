@@ -83,7 +83,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       terminal()
     )
     def ivyDeps = Agg(
-      ivy"jline:jline:2.14.3",
+      ivy"jline:jline:2.14.5",
       ivy"com.github.javaparser:javaparser-core:3.2.5",
       ivy"com.github.scopt::scopt:3.5.0"
     )
