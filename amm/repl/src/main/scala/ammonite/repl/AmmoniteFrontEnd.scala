@@ -66,7 +66,16 @@ case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEn
         lazy val common = FrontEndUtils.findPrefix(completions, 0)
 
         val blacklisted = Seq(
-          "!=", "==", "asInstanceOf", "equals", "getClass", "hashCode", "isInstanceOf", "toString", "|>")
+          "!=",
+          "==",
+          "asInstanceOf",
+          "equals",
+          "getClass",
+          "hashCode",
+          "isInstanceOf",
+          "toString",
+          "|>"
+        )
 
         val completions2 = for(comp <- completions.filterNot(blacklisted.contains)) yield {
 
