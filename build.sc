@@ -4,6 +4,7 @@ val fullCrossScalaVersions = Seq(
   "2.11.3", "2.11.4", "2.11.5", "2.11.6", "2.11.7", "2.11.8", "2.11.9", "2.11.11",
   "2.12.0", "2.12.1", "2.12.2", "2.12.3", "2.12.4"
 )
+
 trait AmmModule extends mill.scalalib.CrossSbtModule{
   def testFramework = "utest.runner.Framework"
   def scalacOptions = Seq("-P:acyclic:force", "-target:jvm-1.7")
