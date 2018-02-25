@@ -71,20 +71,21 @@ sealed trait BasePath{
 
 object BasePath {
 
-  def invalidChars = Set('/')
+
   def checkSegment(s: String) = {
     def fail(msg: String) = throw PathError.InvalidSegment(s, msg)
     def considerStr =
       "use the Path(...) or RelPath(...) constructor calls to convert them. "
 
-    s.find(BasePath.invalidChars) match{
-      case Some(c) => fail(
+    s.indexOf('/') match{
+      case -1 => // do nothing
+      case c => fail(
         s"[$c] is not a valid character to appear in a path segment. " +
           "If you want to parse an absolute or relative path that may have " +
           "multiple segments, e.g. path-strings coming from external sources " +
           considerStr
       )
-      case None =>
+
     }
     def externalStr = "If you are dealing with path-strings coming from external sources, "
     s match{
