@@ -80,7 +80,7 @@ object BasePath {
     s.indexOf('/') match{
       case -1 => // do nothing
       case c => fail(
-        s"[$c] is not a valid character to appear in a path segment. " +
+        s"[/] is not a valid character to appear in a path segment. " +
           "If you want to parse an absolute or relative path that may have " +
           "multiple segments, e.g. path-strings coming from external sources " +
           considerStr
@@ -336,7 +336,7 @@ object ResourcePath{
   * @param resRoot
   * @param segments0
   */
-class ResourcePath private[ops](resRoot: ResourceRoot, segments0: Array[String])
+class ResourcePath private[ops](val resRoot: ResourceRoot, segments0: Array[String])
   extends BasePathImpl with Readable{
   def segments: IndexedSeq[String] = segments0
   type ThisType = ResourcePath
@@ -370,7 +370,11 @@ class ResourcePath private[ops](resRoot: ResourceRoot, segments0: Array[String])
   def startsWith(target: ResourcePath) = {
     segments0.startsWith(target.segments)
   }
-
+  override def hashCode = scala.util.hashing.MurmurHash3.arrayHash(segments0) + resRoot.hashCode()
+  override def equals(o: Any): Boolean = o match {
+    case p: ResourcePath => segments0.sameElements(p.segments) && p.resRoot == resRoot
+    case _ => false
+  }
 }
 
 /**
