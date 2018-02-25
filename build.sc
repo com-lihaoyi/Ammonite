@@ -12,7 +12,7 @@ trait AmmModule extends mill.scalalib.CrossSbtModule{
   def scalacPluginIvyDeps = Agg(ivy"com.lihaoyi::acyclic:0.1.7")
   trait Tests extends super.Tests{
     def ivyDeps = Agg(ivy"com.lihaoyi::utest:0.6.0")
-    def testFramework = "utest.runner.Framework"
+    def testFrameworks = Seq("utest.runner.Framework")
   }
   def allIvyDeps = T{transitiveIvyDeps() ++ scalaLibraryIvyDeps()}
   def externalSources = T{

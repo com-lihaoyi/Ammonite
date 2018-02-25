@@ -30,7 +30,7 @@ object Util{
       relPath.ups > 0
     ){
       flexiblePkgName = flexiblePkgName.dropRight(1)
-      relPath = relPath.copy(ups = relPath.ups - 1)
+      relPath = RelPath(relPath.segments, relPath.ups - 1)
     }
     val pkg = {
       val ups = Seq.fill(relPath.ups)(upPathSegment)
@@ -44,6 +44,7 @@ object Util{
 
     (pkg, Name(wrapper))
   }
+
   def md5Hash(data: Iterator[Array[Byte]]) = {
     val digest = MessageDigest.getInstance("MD5")
     data.foreach(digest.update)
