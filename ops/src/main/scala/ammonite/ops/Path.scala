@@ -156,8 +156,9 @@ trait BasePathImpl extends BasePath{
  * segments can only occur at the left-end of the path, and
  * are collapsed into a single number [[ups]].
  */
-case class RelPath private[ops] (segments: IndexedSeq[String], ups: Int)
+class RelPath private[ops] (segments0: IndexedSeq[String], val ups: Int)
 extends FilePath with BasePathImpl{
+  def segments = segments0
   type ThisType = RelPath
   require(ups >= 0)
   protected[this] def make(p: Seq[String], ups: Int) = {
@@ -205,9 +206,13 @@ object RelPath extends RelPathStuff {
 
   implicit def SymPath(s: Symbol): RelPath = StringPath(s.name)
   implicit def StringPath(s: String): RelPath = {
-    BasePath.checkSegment(s)
+
     new RelPath(Array(s), 0)
 
+  }
+  def apply(segments0: IndexedSeq[String], ups: Int) = {
+    segments0.foreach(BasePath.checkSegment)
+    new RelPath(segments0, ups)
   }
 
   implicit def SeqPath[T](s: Seq[T])(implicit conv: T => RelPath): RelPath = {
@@ -259,7 +264,7 @@ object Path {
     if (chunks.count(_ == "..") > chunks.size / 2) throw PathError.AbsolutePathOutsideRoot
 
     require(f.isAbsolute, f + " is not an absolute path")
-    Path(f.getRoot, BasePath.chunkify(f.normalize()))
+    new Path(f.getRoot, BasePath.chunkify(f.normalize()))
   }
 
   val root = Path(java.nio.file.Paths.get("").toAbsolutePath.getRoot)
@@ -273,8 +278,9 @@ object Path {
  * An absolute path on the filesystem. Note that the path is
  * normalized and cannot contain any empty `""`, `"."` or `".."` segments
  */
-case class Path private[ops] (root: java.nio.file.Path, segments: IndexedSeq[String])
+class Path private[ops] (val root: java.nio.file.Path, segments0: IndexedSeq[String])
 extends FilePath with BasePathImpl with Readable{
+  def segments = segments0
   protected[ops] def getInputStream = java.nio.file.Files.newInputStream(toNIO)
   type ThisType = Path
 
@@ -310,7 +316,7 @@ extends FilePath with BasePathImpl with Readable{
       s2 = s2.dropRight(1)
       newUps += 1
     }
-    RelPath(segments.drop(s2.length), newUps)
+    new RelPath(segments.drop(s2.length), newUps)
   }
 
   def toIO = toNIO.toFile
@@ -326,18 +332,16 @@ extends FilePath with BasePathImpl with Readable{
 
 object ResourcePath{
   def resource(resRoot: ResourceRoot) = {
-    ResourcePath(resRoot, Array.empty[String])
+    new ResourcePath(resRoot, Array.empty[String])
   }
 }
 
 /**
   * Classloaders are tricky: http://stackoverflow.com/questions/12292926
-  *
-  * @param resRoot
-  * @param segments
   */
-case class ResourcePath private[ops](resRoot: ResourceRoot, segments: IndexedSeq[String])
+class ResourcePath private[ops](val resRoot: ResourceRoot, segments0: IndexedSeq[String])
   extends BasePathImpl with Readable{
+  def segments = segments0
   type ThisType = ResourcePath
   override def toString = resRoot.errorName + "/" + segments.mkString("/")
 
@@ -362,7 +366,7 @@ case class ResourcePath private[ops](resRoot: ResourceRoot, segments: IndexedSeq
       s2 = s2.dropRight(1)
       newUps += 1
     }
-    RelPath(segments.drop(s2.length), newUps)
+    new RelPath(segments.drop(s2.length), newUps)
   }
 
 
