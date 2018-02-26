@@ -151,7 +151,7 @@ as (read.lines(...): Seq[String]), or as (read.bytes(...): Array[Byte]).
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <span class="name">lines</span><span class="result"> extends <a href="StreamableOp1.html" class="extype" name="ammonite.ops.StreamableOp1">StreamableOp1</a>[<a href="Readable.html" class="extype" name="ammonite.ops.Readable">Readable</a>, <span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Vector">Vector</span>[<span class="extype" name="scala.Predef.String">String</span>]]</span>
+        <span class="name">lines</span><span class="result"> extends <a href="StreamableOp1.html" class="extype" name="ammonite.ops.StreamableOp1">StreamableOp1</a>[<a href="Readable.html" class="extype" name="ammonite.ops.Readable">Readable</a>, <span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.IndexedSeq">IndexedSeq</span>[<span class="extype" name="scala.Predef.String">String</span>]]</span>
       </span>
       </h4>
 
@@ -160,7 +160,7 @@ as (read.lines(...): Seq[String]), or as (read.bytes(...): Array[Byte]).
           <span class="toggle">
             Linear Supertypes
           </span>
-          <div class="superTypes hiddenContent"><a href="StreamableOp1.html" class="extype" name="ammonite.ops.StreamableOp1">StreamableOp1</a>[<a href="Readable.html" class="extype" name="ammonite.ops.Readable">Readable</a>, <span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Vector">Vector</span>[<span class="extype" name="scala.Predef.String">String</span>]], (<a href="Readable.html" class="extype" name="ammonite.ops.Readable">Readable</a>) ⇒ <span class="extype" name="scala.Vector">Vector</span>[<span class="extype" name="scala.Predef.String">String</span>], <a href="http://scala-lang.org/files/archive/api/2.12.4/scala/collection/immutable/List.html#scala.AnyRef" class="extype" name="scala.collection.immutable.List">AnyRef</a>, <a href="http://scala-lang.org/files/archive/api/2.12.4/scala/collection/immutable/List.html#scala.Any" class="extype" name="scala.collection.immutable.List">Any</a></div>
+          <div class="superTypes hiddenContent"><a href="StreamableOp1.html" class="extype" name="ammonite.ops.StreamableOp1">StreamableOp1</a>[<a href="Readable.html" class="extype" name="ammonite.ops.Readable">Readable</a>, <span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.IndexedSeq">IndexedSeq</span>[<span class="extype" name="scala.Predef.String">String</span>]], (<a href="Readable.html" class="extype" name="ammonite.ops.Readable">Readable</a>) ⇒ <span class="extype" name="scala.IndexedSeq">IndexedSeq</span>[<span class="extype" name="scala.Predef.String">String</span>], <a href="http://scala-lang.org/files/archive/api/2.12.4/scala/collection/immutable/List.html#scala.AnyRef" class="extype" name="scala.collection.immutable.List">AnyRef</a>, <a href="http://scala-lang.org/files/archive/api/2.12.4/scala/collection/immutable/List.html#scala.Any" class="extype" name="scala.collection.immutable.List">Any</a></div>
         </div></div>
         
 
@@ -262,7 +262,7 @@ as (read.lines(...): Seq[String]), or as (read.bytes(...): Array[Byte]).
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="scala.Function1#andThen" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="andThen[A](g:R=&gt;A):T1=&gt;A"></a><a id="andThen[A]((Vector[String])⇒A):(Readable)⇒A"></a>
+      <a id="andThen[A](g:R=&gt;A):T1=&gt;A"></a><a id="andThen[A]((IndexedSeq[String])⇒A):(Readable)⇒A"></a>
       <span class="permalink">
       <a href="../../ammonite/ops/read$$lines$.html#andThen[A](g:R=&gt;A):T1=&gt;A" title="Permalink">
         <i class="material-icons"></i>
@@ -273,7 +273,7 @@ as (read.lines(...): Seq[String]), or as (read.bytes(...): Array[Byte]).
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">andThen</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="g">g: (<span class="extype" name="scala.Vector">Vector</span>[<span class="extype" name="scala.Predef.String">String</span>]) ⇒ <span class="extype" name="scala.Function1.andThen.A">A</span></span>)</span><span class="result">: (<a href="Readable.html" class="extype" name="ammonite.ops.Readable">Readable</a>) ⇒ <span class="extype" name="scala.Function1.andThen.A">A</span></span>
+        <span class="name">andThen</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="g">g: (<span class="extype" name="scala.IndexedSeq">IndexedSeq</span>[<span class="extype" name="scala.Predef.String">String</span>]) ⇒ <span class="extype" name="scala.Function1.andThen.A">A</span></span>)</span><span class="result">: (<a href="Readable.html" class="extype" name="ammonite.ops.Readable">Readable</a>) ⇒ <span class="extype" name="scala.Function1.andThen.A">A</span></span>
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Function1</dd><dt>Annotations</dt><dd>
@@ -281,9 +281,9 @@ as (read.lines(...): Seq[String]), or as (read.bytes(...): Array[Byte]).
               
         </dd></dl></div>
     </li><li name="ammonite.ops.read.lines#apply" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="apply(arg:ammonite.ops.Readable):Vector[String]"></a><a id="apply(Readable):Vector[String]"></a>
+      <a id="apply(arg:ammonite.ops.Readable):IndexedSeq[String]"></a><a id="apply(Readable):IndexedSeq[String]"></a>
       <span class="permalink">
-      <a href="../../ammonite/ops/read$$lines$.html#apply(arg:ammonite.ops.Readable):Vector[String]" title="Permalink">
+      <a href="../../ammonite/ops/read$$lines$.html#apply(arg:ammonite.ops.Readable):IndexedSeq[String]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -292,14 +292,14 @@ as (read.lines(...): Seq[String]), or as (read.bytes(...): Array[Byte]).
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">apply</span><span class="params">(<span name="arg">arg: <a href="Readable.html" class="extype" name="ammonite.ops.Readable">Readable</a></span>)</span><span class="result">: <span class="extype" name="scala.Vector">Vector</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
+        <span class="name">apply</span><span class="params">(<span name="arg">arg: <a href="Readable.html" class="extype" name="ammonite.ops.Readable">Readable</a></span>)</span><span class="result">: <span class="extype" name="scala.IndexedSeq">IndexedSeq</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="ammonite.ops.read.lines">lines</a> → <a href="StreamableOp1.html" class="extype" name="ammonite.ops.StreamableOp1">StreamableOp1</a> → Function1</dd></dl></div>
     </li><li name="ammonite.ops.read.lines#apply" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="apply(arg:ammonite.ops.Readable,charSet:scala.io.Codec):Vector[String]"></a><a id="apply(Readable,Codec):Vector[String]"></a>
+      <a id="apply(arg:ammonite.ops.Readable,charSet:scala.io.Codec):IndexedSeq[String]"></a><a id="apply(Readable,Codec):IndexedSeq[String]"></a>
       <span class="permalink">
-      <a href="../../ammonite/ops/read$$lines$.html#apply(arg:ammonite.ops.Readable,charSet:scala.io.Codec):Vector[String]" title="Permalink">
+      <a href="../../ammonite/ops/read$$lines$.html#apply(arg:ammonite.ops.Readable,charSet:scala.io.Codec):IndexedSeq[String]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -308,7 +308,7 @@ as (read.lines(...): Seq[String]), or as (read.bytes(...): Array[Byte]).
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">apply</span><span class="params">(<span name="arg">arg: <a href="Readable.html" class="extype" name="ammonite.ops.Readable">Readable</a></span>, <span name="charSet">charSet: <a href="http://scala-lang.org/files/archive/api/2.12.4/scala/io/Codec.html#scala.io.Codec" class="extype" name="scala.io.Codec">Codec</a></span>)</span><span class="result">: <span class="extype" name="scala.Vector">Vector</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
+        <span class="name">apply</span><span class="params">(<span name="arg">arg: <a href="Readable.html" class="extype" name="ammonite.ops.Readable">Readable</a></span>, <span name="charSet">charSet: <a href="http://scala-lang.org/files/archive/api/2.12.4/scala/io/Codec.html#scala.io.Codec" class="extype" name="scala.io.Codec">Codec</a></span>)</span><span class="result">: <span class="extype" name="scala.IndexedSeq">IndexedSeq</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
       </span>
       
       
@@ -353,7 +353,7 @@ as (read.lines(...): Seq[String]), or as (read.bytes(...): Array[Byte]).
               
         </dd></dl></div>
     </li><li name="scala.Function1#compose" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="compose[A](g:A=&gt;T1):A=&gt;R"></a><a id="compose[A]((A)⇒Readable):(A)⇒Vector[String]"></a>
+      <a id="compose[A](g:A=&gt;T1):A=&gt;R"></a><a id="compose[A]((A)⇒Readable):(A)⇒IndexedSeq[String]"></a>
       <span class="permalink">
       <a href="../../ammonite/ops/read$$lines$.html#compose[A](g:A=&gt;T1):A=&gt;R" title="Permalink">
         <i class="material-icons"></i>
@@ -364,7 +364,7 @@ as (read.lines(...): Seq[String]), or as (read.bytes(...): Array[Byte]).
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">compose</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="g">g: (<span class="extype" name="scala.Function1.compose.A">A</span>) ⇒ <a href="Readable.html" class="extype" name="ammonite.ops.Readable">Readable</a></span>)</span><span class="result">: (<span class="extype" name="scala.Function1.compose.A">A</span>) ⇒ <span class="extype" name="scala.Vector">Vector</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
+        <span class="name">compose</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="g">g: (<span class="extype" name="scala.Function1.compose.A">A</span>) ⇒ <a href="Readable.html" class="extype" name="ammonite.ops.Readable">Readable</a></span>)</span><span class="result">: (<span class="extype" name="scala.Function1.compose.A">A</span>) ⇒ <span class="extype" name="scala.IndexedSeq">IndexedSeq</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Function1</dd><dt>Annotations</dt><dd>
@@ -480,9 +480,9 @@ as (read.lines(...): Seq[String]), or as (read.bytes(...): Array[Byte]).
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
     </li><li name="ammonite.ops.read.lines#materialize" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="materialize(src:ammonite.ops.Readable,i:geny.Generator[String]):Vector[String]"></a><a id="materialize(Readable,Generator[String]):Vector[String]"></a>
+      <a id="materialize(src:ammonite.ops.Readable,i:geny.Generator[String]):scala.collection.mutable.WrappedArray[String]"></a><a id="materialize(Readable,Generator[String]):WrappedArray[String]"></a>
       <span class="permalink">
-      <a href="../../ammonite/ops/read$$lines$.html#materialize(src:ammonite.ops.Readable,i:geny.Generator[String]):Vector[String]" title="Permalink">
+      <a href="../../ammonite/ops/read$$lines$.html#materialize(src:ammonite.ops.Readable,i:geny.Generator[String]):scala.collection.mutable.WrappedArray[String]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -491,7 +491,7 @@ as (read.lines(...): Seq[String]), or as (read.bytes(...): Array[Byte]).
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">materialize</span><span class="params">(<span name="src">src: <a href="Readable.html" class="extype" name="ammonite.ops.Readable">Readable</a></span>, <span name="i">i: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/geny_2.12/0.1.2/geny_2.12-0.1.2-javadoc.jar/!/geny/Generator.html#geny.Generator" class="extype" name="geny.Generator">Generator</a>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Vector">Vector</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
+        <span class="name">materialize</span><span class="params">(<span name="src">src: <a href="Readable.html" class="extype" name="ammonite.ops.Readable">Readable</a></span>, <span name="i">i: <a href="https://oss.sonatype.org/service/local/repositories/public/archive/com/lihaoyi/geny_2.12/0.1.2/geny_2.12-0.1.2-javadoc.jar/!/geny/Generator.html#geny.Generator" class="extype" name="geny.Generator">Generator</a>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result">: <a href="http://scala-lang.org/files/archive/api/2.12.4/scala/collection/mutable/WrappedArray.html#scala.collection.mutable.WrappedArray" class="extype" name="scala.collection.mutable.WrappedArray">WrappedArray</a>[<span class="extype" name="scala.Predef.String">String</span>]</span>
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="ammonite.ops.read.lines">lines</a> → <a href="StreamableOp1.html" class="extype" name="ammonite.ops.StreamableOp1">StreamableOp1</a></dd></dl></div>
@@ -677,9 +677,9 @@ as (read.lines(...): Seq[String]), or as (read.bytes(...): Array[Byte]).
 
         <div id="inheritedMembers">
         <div class="parent" name="ammonite.ops.StreamableOp1">
-              <h3>Inherited from <a href="StreamableOp1.html" class="extype" name="ammonite.ops.StreamableOp1">StreamableOp1</a>[<a href="Readable.html" class="extype" name="ammonite.ops.Readable">Readable</a>, <span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Vector">Vector</span>[<span class="extype" name="scala.Predef.String">String</span>]]</h3>
+              <h3>Inherited from <a href="StreamableOp1.html" class="extype" name="ammonite.ops.StreamableOp1">StreamableOp1</a>[<a href="Readable.html" class="extype" name="ammonite.ops.Readable">Readable</a>, <span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.IndexedSeq">IndexedSeq</span>[<span class="extype" name="scala.Predef.String">String</span>]]</h3>
             </div><div class="parent" name="scala.Function1">
-              <h3>Inherited from (<a href="Readable.html" class="extype" name="ammonite.ops.Readable">Readable</a>) ⇒ <span class="extype" name="scala.Vector">Vector</span>[<span class="extype" name="scala.Predef.String">String</span>]</h3>
+              <h3>Inherited from (<a href="Readable.html" class="extype" name="ammonite.ops.Readable">Readable</a>) ⇒ <span class="extype" name="scala.IndexedSeq">IndexedSeq</span>[<span class="extype" name="scala.Predef.String">String</span>]</h3>
             </div><div class="parent" name="scala.AnyRef">
               <h3>Inherited from <a href="http://scala-lang.org/files/archive/api/2.12.4/scala/collection/immutable/List.html#scala.AnyRef" class="extype" name="scala.collection.immutable.List">AnyRef</a></h3>
             </div><div class="parent" name="scala.Any">
