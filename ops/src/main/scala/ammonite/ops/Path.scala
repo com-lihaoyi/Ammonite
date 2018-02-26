@@ -113,7 +113,7 @@ object BasePath {
   }
   def chunkify(s: java.nio.file.Path) = {
     import collection.JavaConverters._
-    s.iterator().asScala.map(_.toString).filter(_ != ".").filter(_ != "").toArray
+    s.iterator().asScala.map(_.toString).filter(_ != ".").filter(_ != "").toVector
   }
 }
 
@@ -133,7 +133,7 @@ object FilePath {
 }
 
 trait BasePathImpl extends BasePath{
-  def segments: IndexedSeq[String]
+  def segments: Seq[String]
 
   protected[this] def make(p: Seq[String], ups: Int): ThisType
 
@@ -156,42 +156,40 @@ trait BasePathImpl extends BasePath{
  * segments can only occur at the left-end of the path, and
  * are collapsed into a single number [[ups]].
  */
-class RelPath private[ops] (segments0: Array[String], val ups: Int)
+case class RelPath private[ops] (segments: Vector[String], ups: Int)
 extends FilePath with BasePathImpl{
-  def segments: IndexedSeq[String] = segments0
   type ThisType = RelPath
   require(ups >= 0)
-  protected[this] def make(p: Seq[String], ups: Int) = new RelPath(p.toArray, ups + this.ups)
+  protected[this] def make(p: Seq[String], ups: Int) = new RelPath(p.toVector, ups + this.ups)
   def relativeTo(base: RelPath): RelPath = {
     if (base.ups < ups) {
-      new RelPath(segments0, ups + base.segments.length)
+      new RelPath(segments, ups + base.segments.length)
     } else if (base.ups == ups) {
       val commonPrefix = {
-        val maxSize = scala.math.min(segments0.length, base.segments.length)
+        val maxSize = scala.math.min(segments.length, base.segments.length)
         var i = 0
-        while ( i < maxSize && segments0(i) == base.segments(i)) i += 1
+        while ( i < maxSize && segments(i) == base.segments(i)) i += 1
         i
       }
       val newUps = base.segments.length - commonPrefix
 
-      new RelPath(segments0.drop(commonPrefix), ups + newUps)
+      new RelPath(segments.drop(commonPrefix), ups + newUps)
     } else throw PathError.NoRelativePath(this, base)
   }
 
   def startsWith(target: RelPath) = {
-    this.segments0.startsWith(target.segments) && this.ups == target.ups
+    this.segments.startsWith(target.segments) && this.ups == target.ups
   }
 
-  override def toString = (Seq.fill(ups)("..") ++ segments0).mkString("/")
-  override def hashCode = scala.util.hashing.MurmurHash3.arrayHash(segments0) + ups.hashCode()
+  override def toString = (Seq.fill(ups)("..") ++ segments).mkString("/")
+  override def hashCode = segments.hashCode() + ups.hashCode()
   override def equals(o: Any): Boolean = o match {
-    case p: RelPath => segments0.sameElements(p.segments) && p.ups == ups
+    case p: RelPath => segments == p.segments && p.ups == ups
     case _ => false
   }
 }
 
 object RelPath extends RelPathStuff {
-  def apply(segments: Seq[String], ups: Int) = new RelPath(segments.toArray, ups)
   def apply[T: PathConvertible](f0: T): RelPath = {
     val f = implicitly[PathConvertible[T]].apply(f0)
 
@@ -205,7 +203,7 @@ object RelPath extends RelPathStuff {
   implicit def SymPath(s: Symbol): RelPath = StringPath(s.name)
   implicit def StringPath(s: String): RelPath = {
     BasePath.checkSegment(s)
-    new RelPath(Array(s), 0)
+    new RelPath(Vector(s), 0)
 
   }
 
@@ -220,8 +218,8 @@ object RelPath extends RelPathStuff {
     Ordering.by((rp: RelPath) => (rp.ups, rp.segments.length, rp.segments.toIterable))
 }
 trait RelPathStuff{
-  val up: RelPath = new RelPath(Array.empty, 1)
-  val empty: RelPath = new RelPath(Array.empty, 0)
+  val up: RelPath = new RelPath(Vector.empty, 1)
+  val empty: RelPath = new RelPath(Vector.empty, 0)
   implicit class RelPathStart(p1: String){
     def /(subpath: RelPath) = empty/p1/subpath
   }
@@ -258,7 +256,7 @@ object Path {
     if (chunks.count(_ == "..") > chunks.size / 2) throw PathError.AbsolutePathOutsideRoot
 
     require(f.isAbsolute, f + " is not an absolute path")
-    new Path(f.getRoot, BasePath.chunkify(f.normalize()))
+    Path(f.getRoot, BasePath.chunkify(f.normalize()))
   }
 
   val root = Path(java.nio.file.Paths.get("").toAbsolutePath.getRoot)
@@ -272,29 +270,28 @@ object Path {
  * An absolute path on the filesystem. Note that the path is
  * normalized and cannot contain any empty `""`, `"."` or `".."` segments
  */
-class Path private[ops] (root: java.nio.file.Path, segments0: Array[String])
+case class Path private[ops] (root: java.nio.file.Path, segments: Vector[String])
 extends FilePath with BasePathImpl with Readable{
-  def segments: IndexedSeq[String] = segments0
   protected[ops] def getInputStream = java.nio.file.Files.newInputStream(toNIO)
   type ThisType = Path
 
-  def toNIO = root.resolve(segments0.mkString(root.getFileSystem.getSeparator))
+  def toNIO = root.resolve(segments.mkString(root.getFileSystem.getSeparator))
 
   protected[this] def make(p: Seq[String], ups: Int) = {
     if (ups > 0){
       throw PathError.AbsolutePathOutsideRoot
     }
-    new Path(root, p.toArray)
+    new Path(root, p.toVector)
   }
   override def toString = toNIO.toString
 
   override def equals(o: Any): Boolean = o match {
-    case p: Path => segments0.sameElements(p.segments)
+    case p: Path => segments == p.segments
     case _ => false
   }
-  override def hashCode = scala.util.hashing.MurmurHash3.arrayHash(segments0)
+  override def hashCode = segments.hashCode()
 
-  def startsWith(target: Path) = this.segments0.startsWith(target.segments)
+  def startsWith(target: Path) = this.segments.startsWith(target.segments)
 
   /**
     * Obtain the final path to a file by resolving symlinks if any.
@@ -306,11 +303,11 @@ extends FilePath with BasePathImpl with Readable{
     var newUps = 0
     var s2 = base.segments
 
-    while(!segments0.startsWith(s2)){
+    while(!segments.startsWith(s2)){
       s2 = s2.dropRight(1)
       newUps += 1
     }
-    new RelPath(segments0.drop(s2.length), newUps)
+    RelPath(segments.drop(s2.length), newUps)
   }
 
   def toIO = toNIO.toFile
@@ -326,7 +323,7 @@ extends FilePath with BasePathImpl with Readable{
 
 object ResourcePath{
   def resource(resRoot: ResourceRoot) = {
-    new ResourcePath(resRoot, Array.empty)
+    ResourcePath(resRoot, Vector.empty)
   }
 }
 
@@ -334,16 +331,15 @@ object ResourcePath{
   * Classloaders are tricky: http://stackoverflow.com/questions/12292926
   *
   * @param resRoot
-  * @param segments0
+  * @param segments
   */
-class ResourcePath private[ops](val resRoot: ResourceRoot, segments0: Array[String])
+case class ResourcePath private[ops](resRoot: ResourceRoot, segments: Vector[String])
   extends BasePathImpl with Readable{
-  def segments: IndexedSeq[String] = segments0
   type ThisType = ResourcePath
-  override def toString = resRoot.errorName + "/" + segments0.mkString("/")
+  override def toString = resRoot.errorName + "/" + segments.mkString("/")
 
   protected[ops] def getInputStream = {
-    resRoot.getResourceAsStream(segments0.mkString("/")) match{
+    resRoot.getResourceAsStream(segments.mkString("/")) match{
       case null => throw ResourceNotFoundException(this)
       case stream => stream
     }
@@ -352,29 +348,25 @@ class ResourcePath private[ops](val resRoot: ResourceRoot, segments0: Array[Stri
     if (ups > 0){
       throw PathError.AbsolutePathOutsideRoot
     }
-    new ResourcePath(resRoot, p.toArray)
+    new ResourcePath(resRoot, p.toVector)
   }
 
   def relativeTo(base: ResourcePath) = {
     var newUps = 0
     var s2 = base.segments
 
-    while(!segments0.startsWith(s2)){
+    while(!segments.startsWith(s2)){
       s2 = s2.dropRight(1)
       newUps += 1
     }
-    new RelPath(segments0.drop(s2.length), newUps)
+    RelPath(segments.drop(s2.length), newUps)
   }
 
 
   def startsWith(target: ResourcePath) = {
-    segments0.startsWith(target.segments)
+    segments.startsWith(target.segments)
   }
-  override def hashCode = scala.util.hashing.MurmurHash3.arrayHash(segments0) + resRoot.hashCode()
-  override def equals(o: Any): Boolean = o match {
-    case p: ResourcePath => segments0.sameElements(p.segments) && p.resRoot == resRoot
-    case _ => false
-  }
+
 }
 
 /**
