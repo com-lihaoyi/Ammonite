@@ -30,7 +30,7 @@ sealed trait BasePath{
   /**
     * The individual path segments of this path.
     */
-  def segments: Seq[String]
+  def segments: IndexedSeq[String]
 
   /**
     * Combines this path with the given relative path, returning
@@ -133,7 +133,7 @@ object FilePath {
 }
 
 trait BasePathImpl extends BasePath{
-  def segments: Seq[String]
+  def segments: IndexedSeq[String]
 
   protected[this] def make(p: Seq[String], ups: Int): ThisType
 
@@ -156,9 +156,9 @@ trait BasePathImpl extends BasePath{
  * segments can only occur at the left-end of the path, and
  * are collapsed into a single number [[ups]].
  */
-class RelPath private[ops] (segments0: IndexedSeq[String], val ups: Int)
+class RelPath private[ops] (segments0: Array[String], val ups: Int)
 extends FilePath with BasePathImpl{
-  def segments = segments0
+  val segments: IndexedSeq[String] = segments0
   type ThisType = RelPath
   require(ups >= 0)
   protected[this] def make(p: Seq[String], ups: Int) = {
@@ -167,25 +167,25 @@ extends FilePath with BasePathImpl{
 
   def relativeTo(base: RelPath): RelPath = {
     if (base.ups < ups) {
-      new RelPath(segments, ups + base.segments.length)
+      new RelPath(segments0, ups + base.segments.length)
     } else if (base.ups == ups) {
       val commonPrefix = {
-        val maxSize = scala.math.min(segments.length, base.segments.length)
+        val maxSize = scala.math.min(segments0.length, base.segments.length)
         var i = 0
-        while ( i < maxSize && segments(i) == base.segments(i)) i += 1
+        while ( i < maxSize && segments0(i) == base.segments(i)) i += 1
         i
       }
       val newUps = base.segments.length - commonPrefix
 
-      new RelPath(segments.drop(commonPrefix), ups + newUps)
+      new RelPath(segments0.drop(commonPrefix), ups + newUps)
     } else throw PathError.NoRelativePath(this, base)
   }
 
   def startsWith(target: RelPath) = {
-    this.segments.startsWith(target.segments) && this.ups == target.ups
+    this.segments0.startsWith(target.segments) && this.ups == target.ups
   }
 
-  override def toString = (Seq.fill(ups)("..") ++ segments).mkString("/")
+  override def toString = (Seq.fill(ups)("..") ++ segments0).mkString("/")
   override def hashCode = segments.hashCode() + ups.hashCode()
   override def equals(o: Any): Boolean = o match {
     case p: RelPath => segments == p.segments && p.ups == ups
@@ -206,13 +206,13 @@ object RelPath extends RelPathStuff {
 
   implicit def SymPath(s: Symbol): RelPath = StringPath(s.name)
   implicit def StringPath(s: String): RelPath = {
-
+    BasePath.checkSegment(s)
     new RelPath(Array(s), 0)
 
   }
   def apply(segments0: IndexedSeq[String], ups: Int) = {
     segments0.foreach(BasePath.checkSegment)
-    new RelPath(segments0, ups)
+    new RelPath(segments0.toArray, ups)
   }
 
   implicit def SeqPath[T](s: Seq[T])(implicit conv: T => RelPath): RelPath = {
@@ -278,13 +278,13 @@ object Path {
  * An absolute path on the filesystem. Note that the path is
  * normalized and cannot contain any empty `""`, `"."` or `".."` segments
  */
-class Path private[ops] (val root: java.nio.file.Path, segments0: IndexedSeq[String])
+class Path private[ops] (val root: java.nio.file.Path, segments0: Array[String])
 extends FilePath with BasePathImpl with Readable{
-  def segments = segments0
+  val segments: IndexedSeq[String] = segments0
   protected[ops] def getInputStream = java.nio.file.Files.newInputStream(toNIO)
   type ThisType = Path
 
-  def toNIO = root.resolve(segments.mkString(root.getFileSystem.getSeparator))
+  def toNIO = root.resolve(segments0.mkString(root.getFileSystem.getSeparator))
 
   protected[this] def make(p: Seq[String], ups: Int) = {
     if (ups > 0){
@@ -300,7 +300,7 @@ extends FilePath with BasePathImpl with Readable{
   }
   override def hashCode = segments.hashCode()
 
-  def startsWith(target: Path) = this.segments.startsWith(target.segments)
+  def startsWith(target: Path) = segments0.startsWith(target.segments)
 
   /**
     * Obtain the final path to a file by resolving symlinks if any.
@@ -312,11 +312,11 @@ extends FilePath with BasePathImpl with Readable{
     var newUps = 0
     var s2 = base.segments
 
-    while(!segments.startsWith(s2)){
+    while(!segments0.startsWith(s2)){
       s2 = s2.dropRight(1)
       newUps += 1
     }
-    new RelPath(segments.drop(s2.length), newUps)
+    new RelPath(segments0.drop(s2.length), newUps)
   }
 
   def toIO = toNIO.toFile
@@ -339,11 +339,11 @@ object ResourcePath{
 /**
   * Classloaders are tricky: http://stackoverflow.com/questions/12292926
   */
-class ResourcePath private[ops](val resRoot: ResourceRoot, segments0: IndexedSeq[String])
+class ResourcePath private[ops](val resRoot: ResourceRoot, segments0: Array[String])
   extends BasePathImpl with Readable{
-  def segments = segments0
+  val segments: IndexedSeq[String] = segments0
   type ThisType = ResourcePath
-  override def toString = resRoot.errorName + "/" + segments.mkString("/")
+  override def toString = resRoot.errorName + "/" + segments0.mkString("/")
 
   protected[ops] def getInputStream = {
     resRoot.getResourceAsStream(segments.mkString("/")) match{
@@ -362,16 +362,16 @@ class ResourcePath private[ops](val resRoot: ResourceRoot, segments0: IndexedSeq
     var newUps = 0
     var s2 = base.segments
 
-    while(!segments.startsWith(s2)){
+    while(!segments0.startsWith(s2)){
       s2 = s2.dropRight(1)
       newUps += 1
     }
-    new RelPath(segments.drop(s2.length), newUps)
+    new RelPath(segments0.drop(s2.length), newUps)
   }
 
 
   def startsWith(target: ResourcePath) = {
-    segments.startsWith(target.segments)
+    segments0.startsWith(target.segments)
   }
 
 }
