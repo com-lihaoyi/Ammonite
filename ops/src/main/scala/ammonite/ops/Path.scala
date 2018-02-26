@@ -113,7 +113,7 @@ object BasePath {
   }
   def chunkify(s: java.nio.file.Path) = {
     import collection.JavaConverters._
-    s.iterator().asScala.map(_.toString).filter(_ != ".").filter(_ != "").toVector
+    s.iterator().asScala.map(_.toString).filter(_ != ".").filter(_ != "").toArray
   }
 }
 
@@ -156,11 +156,14 @@ trait BasePathImpl extends BasePath{
  * segments can only occur at the left-end of the path, and
  * are collapsed into a single number [[ups]].
  */
-case class RelPath private[ops] (segments: Vector[String], ups: Int)
+case class RelPath private[ops] (segments: IndexedSeq[String], ups: Int)
 extends FilePath with BasePathImpl{
   type ThisType = RelPath
   require(ups >= 0)
-  protected[this] def make(p: Seq[String], ups: Int) = new RelPath(p.toVector, ups + this.ups)
+  protected[this] def make(p: Seq[String], ups: Int) = {
+    new RelPath(p.toArray[String], ups + this.ups)
+  }
+
   def relativeTo(base: RelPath): RelPath = {
     if (base.ups < ups) {
       new RelPath(segments, ups + base.segments.length)
@@ -203,7 +206,7 @@ object RelPath extends RelPathStuff {
   implicit def SymPath(s: Symbol): RelPath = StringPath(s.name)
   implicit def StringPath(s: String): RelPath = {
     BasePath.checkSegment(s)
-    new RelPath(Vector(s), 0)
+    new RelPath(Array(s), 0)
 
   }
 
@@ -218,8 +221,8 @@ object RelPath extends RelPathStuff {
     Ordering.by((rp: RelPath) => (rp.ups, rp.segments.length, rp.segments.toIterable))
 }
 trait RelPathStuff{
-  val up: RelPath = new RelPath(Vector.empty, 1)
-  val empty: RelPath = new RelPath(Vector.empty, 0)
+  val up: RelPath = new RelPath(Array.empty[String], 1)
+  val empty: RelPath = new RelPath(Array.empty[String], 0)
   implicit class RelPathStart(p1: String){
     def /(subpath: RelPath) = empty/p1/subpath
   }
@@ -270,7 +273,7 @@ object Path {
  * An absolute path on the filesystem. Note that the path is
  * normalized and cannot contain any empty `""`, `"."` or `".."` segments
  */
-case class Path private[ops] (root: java.nio.file.Path, segments: Vector[String])
+case class Path private[ops] (root: java.nio.file.Path, segments: IndexedSeq[String])
 extends FilePath with BasePathImpl with Readable{
   protected[ops] def getInputStream = java.nio.file.Files.newInputStream(toNIO)
   type ThisType = Path
@@ -281,7 +284,7 @@ extends FilePath with BasePathImpl with Readable{
     if (ups > 0){
       throw PathError.AbsolutePathOutsideRoot
     }
-    new Path(root, p.toVector)
+    new Path(root, p.toArray[String])
   }
   override def toString = toNIO.toString
 
@@ -316,14 +319,14 @@ extends FilePath with BasePathImpl with Readable{
   import collection.JavaConverters._
 
   override def getLines(charSet: Codec) = {
-    java.nio.file.Files.readAllLines(toNIO, charSet.charSet).asScala.toVector
+    java.nio.file.Files.readAllLines(toNIO, charSet.charSet).asScala.toArray[String]
   }
 }
 
 
 object ResourcePath{
   def resource(resRoot: ResourceRoot) = {
-    ResourcePath(resRoot, Vector.empty)
+    ResourcePath(resRoot, Array.empty[String])
   }
 }
 
@@ -333,7 +336,7 @@ object ResourcePath{
   * @param resRoot
   * @param segments
   */
-case class ResourcePath private[ops](resRoot: ResourceRoot, segments: Vector[String])
+case class ResourcePath private[ops](resRoot: ResourceRoot, segments: IndexedSeq[String])
   extends BasePathImpl with Readable{
   type ThisType = ResourcePath
   override def toString = resRoot.errorName + "/" + segments.mkString("/")
@@ -348,7 +351,7 @@ case class ResourcePath private[ops](resRoot: ResourceRoot, segments: Vector[Str
     if (ups > 0){
       throw PathError.AbsolutePathOutsideRoot
     }
-    new ResourcePath(resRoot, p.toVector)
+    new ResourcePath(resRoot, p.toArray[String])
   }
 
   def relativeTo(base: ResourcePath) = {

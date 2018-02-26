@@ -198,7 +198,7 @@ trait ImplicitOp[V] extends Function1[Path, V]{
   */
 object ls extends StreamableOp1[Path, Path, LsSeq] with ImplicitOp[LsSeq]{
   def materialize(src: Path, i: geny.Generator[Path]) =
-    LsSeq(src, i.map(_ relativeTo src).toVector.sorted:_*)
+    LsSeq(src, i.map(_ relativeTo src).toArray.sorted:_*)
 
 
   object iter extends (Path => geny.Generator[Path]){
@@ -330,8 +330,8 @@ object read extends Function1[Readable, String]{
   def apply(arg: Readable) = apply(arg, java.nio.charset.StandardCharsets.UTF_8)
   def apply(arg: Readable, charSet: Codec) = new String(arg.getBytes, charSet.charSet)
 
-  object lines extends StreamableOp1[Readable, String, Vector[String]]{
-    def materialize(src: Readable, i: geny.Generator[String]) = i.toVector
+  object lines extends StreamableOp1[Readable, String, IndexedSeq[String]]{
+    def materialize(src: Readable, i: geny.Generator[String]) = i.toArray[String]
 
     object iter extends (Readable => geny.Generator[String]){
       def apply(arg: Readable) = arg.getLineIterator(java.nio.charset.StandardCharsets.UTF_8)

@@ -28,8 +28,8 @@ trait Readable{
     (s.getLines(), () => s.close())
   }
 
-  protected[ops] def getLines(charSet: Codec): Vector[String] = {
-    getLineIterator(charSet).toVector
+  protected[ops] def getLines(charSet: Codec): IndexedSeq[String] = {
+    getLineIterator(charSet).toArray[String]
   }
 }
 
