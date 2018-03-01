@@ -102,7 +102,7 @@ object Cli{
     Arg[Config, String](
       "banner", Some('b'),
       "Customize the welcome banner that gets shown when Ammonite starts",
-      (c, v) => c.copy(welcomeBanner = Some(v))
+      (c, v) => c.copy(welcomeBanner = if (v.nonEmpty) Some(v) else None)
     ),
     Arg[Config, Unit](
       "no-remote-logging", None,
