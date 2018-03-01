@@ -64,7 +64,20 @@ case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEn
         }
 
         lazy val common = FrontEndUtils.findPrefix(completions, 0)
-        val completions2 = for(comp <- completions) yield {
+
+        val blacklisted = Seq(
+          "!=",
+          "==",
+          "asInstanceOf",
+          "equals",
+          "getClass",
+          "hashCode",
+          "isInstanceOf",
+          "toString",
+          "|>"
+        )
+
+        val completions2 = for(comp <- completions.filterNot(blacklisted.contains)) yield {
 
           val (left, right) = comp.splitAt(common.length)
           (colors.comment()(left) ++ right).render
