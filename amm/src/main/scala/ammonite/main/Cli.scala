@@ -20,7 +20,6 @@ object Cli{
   case class Config(predefCode: String = "",
                     defaultPredef: Boolean = true,
                     homePredef: Boolean = true,
-                    storageBackend: Storage = new Storage.Folder(Defaults.ammoniteHome),
                     wd: Path = ammonite.ops.pwd,
                     welcomeBanner: Option[String] = Some(Defaults.welcomeBanner),
                     verboseOutput: Boolean = true,
