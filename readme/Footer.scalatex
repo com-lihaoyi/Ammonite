@@ -114,6 +114,16 @@
 
 
   @sect{Changelog}
+    @sect{1.0.4}
+      @ul
+        @li
+          Hide uninteresting autocomplete options from tab-completion (@issue(755))
+        @li
+          Bump JLine version to 2.14.5 (@issue(754))
+        @li
+          Cross-publish for Scala 2.11.12 (@issue(741))
+        @li
+          Class-based input wrapping for Spark/serialization friendliness (@issue(736))
     @sect{1.0.3}
       @ul
         @li
