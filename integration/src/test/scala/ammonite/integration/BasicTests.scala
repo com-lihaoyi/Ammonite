@@ -136,7 +136,9 @@ object BasicTests extends TestSuite{
       // For some reason this fails on travis/Scala2.10/Java7. I cannot reproduce
       // it locally on OSX/Scala2.10/Java8, but Scala2.10/Java7 is legacy anyway
       // so it's probably fine if this doesn't work.
-      if (!Util.windowsPlatform) {
+      //
+      // Also disabled on Java 9 due to unavailability of Java lib sources
+      if (!Util.windowsPlatform && !Util.java9OrAbove) {
         %%bash(
           executable,
           "-c",
