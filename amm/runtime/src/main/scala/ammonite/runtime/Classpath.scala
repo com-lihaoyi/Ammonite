@@ -63,6 +63,9 @@ object Classpath {
           Export.main(Array(rt.getCanonicalPath))
         }
         r.append(new File(getClass.getProtectionDomain.getCodeSource.getLocation.toURI))
+        for (p <- System.getProperty("java.class.path").split(File.pathSeparatorChar)) {
+          r.append(new File(p))
+        }
       }
       while (current != null) {
         current match {
