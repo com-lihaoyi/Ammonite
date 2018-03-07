@@ -57,14 +57,18 @@ object Classpath {
             f.delete()
             f
         }
+        val cp = new File(getClass.getProtectionDomain.getCodeSource.getLocation.toURI)
+        if (cp.isDirectory) {
+          for (p <- System.getProperty("java.class.path").split(File.pathSeparatorChar)) {
+            r.append(new File(p))
+          }
+        } else {
+          r.append(cp)
+        }
         r.append(rt)
         if (!rt.exists) {
           rt.getParentFile.mkdirs()
           Export.main(Array(rt.getCanonicalPath))
-        }
-        r.append(new File(getClass.getProtectionDomain.getCodeSource.getLocation.toURI))
-        for (p <- System.getProperty("java.class.path").split(File.pathSeparatorChar)) {
-          r.append(new File(p))
         }
       }
       while (current != null) {
