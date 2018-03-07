@@ -1,9 +1,10 @@
 package ammonite.runtime
 
 import java.io.File
+import java.nio.file.Files
 import java.util.zip.ZipFile
 
-
+import io.github.retronym.java9rtexport.Export
 
 import scala.util.control.NonFatal
 
@@ -23,23 +24,50 @@ object Classpath {
    * memory but is better than reaching all over the filesystem every time we
    * want to do something.
    */
-  var current = Thread.currentThread().getContextClassLoader
-  val files = collection.mutable.Buffer.empty[java.io.File]
-  files.appendAll(
-    System.getProperty("sun.boot.class.path")
-          .split(java.io.File.pathSeparator)
-          .map(new java.io.File(_))
-  )
-  while(current != null){
-    current match{
-      case t: java.net.URLClassLoader =>
-        files.appendAll(t.getURLs.map(u => new java.io.File(u.toURI)))
-      case _ =>
-    }
-    current = current.getParent
-  }
 
-  val classpath = files.toVector.filter(_.exists)
+  private var _classpath: Vector[java.io.File] = _
+
+  def classpath(storageBackend: Storage): Vector[java.io.File] = {
+    if (_classpath != null) return _classpath
+    var current = Thread.currentThread().getContextClassLoader
+    val files = {
+      val r = collection.mutable.Buffer.empty[java.io.File]
+      val sunBoot = System.getProperty("sun.boot.class.path")
+      if (sunBoot != null) {
+        r.appendAll(
+          sunBoot.split(java.io.File.pathSeparator)
+            .map(new java.io.File(_))
+        )
+      } else {
+        val rt =
+          storageBackend match {
+            case storageBackend: Storage.Folder => (storageBackend.dir / "rt.jar").toIO
+            case _: Storage.InMemory =>
+              val f = Files.createTempFile("rt", ".jar").toFile
+              f.deleteOnExit()
+              f.delete()
+              f
+          }
+        r.append(rt)
+        if (!rt.exists) {
+          rt.getParentFile.mkdirs()
+          Export.main(Array(rt.getCanonicalPath))
+        }
+        r.append(new File(getClass.getProtectionDomain.getCodeSource.getLocation.toURI))
+      }
+      while (current != null) {
+        current match {
+          case t: java.net.URLClassLoader =>
+            r.appendAll(t.getURLs.map(u => new java.io.File(u.toURI)))
+          case _ =>
+        }
+        current = current.getParent
+      }
+      r
+    }
+    _classpath = files.toVector.filter(_.exists)
+    _classpath
+  }
 
   def canBeOpenedAsJar(file: File): Boolean =
     try {

@@ -1,5 +1,10 @@
 package ammonite.repl
 
+import sun.misc.{Signal, SignalHandler}
+
+object Signaller {
+  val handlers = scala.collection.mutable.Map[Signal, List[SignalHandler]]()
+}
 
 /**
  * Lets you turn on signal handling within a certain block,
@@ -9,13 +14,7 @@ package ammonite.repl
  * it properly reset when you're finished.
  */
 case class Signaller(sigStr: String)(f: => Unit) extends Scoped{
-  import sun.misc.{Signal, SignalHandler}
-  var oldSigInt = List.empty[SignalHandler]
-  def handlers = {
-    val handlersField = classOf[Signal].getDeclaredField("handlers")
-    handlersField.setAccessible(true)
-    handlersField.get(null).asInstanceOf[java.util.Hashtable[Signal, SignalHandler]]
-  }
+  import Signaller._
 
   def apply[T](t: => T): T = {
     val handler = new SignalHandler () {
@@ -23,12 +22,14 @@ case class Signaller(sigStr: String)(f: => Unit) extends Scoped{
     }
 
     val sig = new Signal(sigStr)
-    oldSigInt = handlers.get(sig) :: oldSigInt
-    sun.misc.Signal.handle(sig, handler)
+
+    handlers(sig) = sun.misc.Signal.handle(sig, handler) :: handlers.getOrElse(sig, List())
+
     try t
     finally{
-      handlers.put(sig, oldSigInt.head)
-      oldSigInt = oldSigInt.tail
+      val head::tail = handlers(sig)
+      handlers(sig) = tail
+      sun.misc.Signal.handle(sig, head)
     }
   }
 }

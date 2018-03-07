@@ -20,7 +20,7 @@ import scala.tools.nsc.Settings
   * compiler objects are initialized, or worry about initializing them more
   * than necessary
   */
-class CompilerLifecycleManager(headFrame: => Frame){
+class CompilerLifecycleManager(storageBackend: Storage, headFrame: => Frame){
 
 
 
@@ -71,8 +71,9 @@ class CompilerLifecycleManager(headFrame: => Frame){
       // Otherwise activating autocomplete makes the presentation compiler mangle
       // the shared settings and makes the main compiler sad
       val settings = Option(compiler).fold(new Settings)(_.compiler.settings.copy)
+
       Internal.compiler = Compiler(
-        Classpath.classpath ++ headFrame.classpath,
+        Classpath.classpath(storageBackend) ++ headFrame.classpath,
         dynamicClasspath,
         headFrame.classloader,
         headFrame.pluginClassloader,
@@ -85,7 +86,7 @@ class CompilerLifecycleManager(headFrame: => Frame){
       // Pressy is lazy, so the actual presentation compiler won't get instantiated
       // & initialized until one of the methods on it is actually used
       Internal.pressy = Pressy(
-        Classpath.classpath ++ headFrame.classpath,
+        Classpath.classpath(storageBackend) ++ headFrame.classpath,
         dynamicClasspath,
         headFrame.classloader,
 
