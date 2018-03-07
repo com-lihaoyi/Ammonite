@@ -44,7 +44,9 @@ object Classpath {
         val rt = storageBackend match {
           case storageBackend: Storage.Folder =>
             val rtFile = (storageBackend.dir / s"$rtName.jar").toIO
-            for (f <- Option(rtFile.getParentFile.listFiles).getOrElse(Array())) {
+            val files = Option(rtFile.getParentFile.listFiles)
+              .getOrElse(Array())
+            for (f <- files) {
               val fName = f.getName
               if (fName.startsWith(rtPrefix) && fName.endsWith(".jar")) {
                 f.delete()
@@ -57,9 +59,11 @@ object Classpath {
             f.delete()
             f
         }
-        val cp = new File(getClass.getProtectionDomain.getCodeSource.getLocation.toURI)
+        val cp = new File(getClass
+          .getProtectionDomain.getCodeSource.getLocation.toURI)
         if (cp.isDirectory) {
-          for (p <- System.getProperty("java.class.path").split(File.pathSeparatorChar) if !p.endsWith("sbt-launch.jar")) {
+          for (p <- System.getProperty("java.class.path")
+            .split(File.pathSeparatorChar) if !p.endsWith("sbt-launch.jar")) {
             r.append(new File(p))
           }
         } else {
