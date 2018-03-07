@@ -39,15 +39,24 @@ object Classpath {
             .map(new java.io.File(_))
         )
       } else {
-        val rt =
-          storageBackend match {
-            case storageBackend: Storage.Folder => (storageBackend.dir / "rt.jar").toIO
-            case _: Storage.InMemory =>
-              val f = Files.createTempFile("rt", ".jar").toFile
-              f.deleteOnExit()
-              f.delete()
-              f
-          }
+        val rtPrefix = "rt-"
+        val rtName = s"$rtPrefix${System.getProperty("java.version")}"
+        val rt = storageBackend match {
+          case storageBackend: Storage.Folder =>
+            val rtFile = (storageBackend.dir / s"$rtName.jar").toIO
+            for (f <- Option(rtFile.getParentFile.listFiles).getOrElse(Array())) {
+              val fName = f.getName
+              if (fName.startsWith(rtPrefix) && fName.endsWith(".jar")) {
+                f.delete()
+              }
+            }
+            rtFile
+          case _: Storage.InMemory =>
+            val f = Files.createTempFile(rtName, ".jar").toFile
+            f.deleteOnExit()
+            f.delete()
+            f
+        }
         r.append(rt)
         if (!rt.exists) {
           rt.getParentFile.mkdirs()
