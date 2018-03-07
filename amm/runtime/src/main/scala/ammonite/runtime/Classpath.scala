@@ -59,7 +59,7 @@ object Classpath {
         }
         val cp = new File(getClass.getProtectionDomain.getCodeSource.getLocation.toURI)
         if (cp.isDirectory) {
-          for (p <- System.getProperty("java.class.path").split(File.pathSeparatorChar)) {
+          for (p <- System.getProperty("java.class.path").split(File.pathSeparatorChar) if !p.endsWith("sbt-launch.jar")) {
             r.append(new File(p))
           }
         } else {
