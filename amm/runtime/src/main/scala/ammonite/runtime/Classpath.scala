@@ -25,40 +25,45 @@ object Classpath {
    * want to do something.
    */
 
-  private var _classpath: Vector[java.io.File] = _
-
   def classpath(storageBackend: Storage): Vector[java.io.File] = {
-    if (_classpath != null) return _classpath
-    var current = Thread.currentThread().getContextClassLoader
+    val p = storageBackend.classpathRtJar()
+    if (p._1.nonEmpty) return p._1 ++ p._2
+    val sunBoot = System.getProperty("sun.boot.class.path")
+    val rtOpt: Option[File] = if (sunBoot != null) None else {
+      val rtPrefix = "rt-"
+      val rtName = s"$rtPrefix${System.getProperty("java.version")}"
+      val rt = storageBackend match {
+        case storageBackend: Storage.Folder =>
+          val rtFile = (storageBackend.dir / s"$rtName.jar").toIO
+          val files = Option(rtFile.getParentFile.listFiles)
+            .getOrElse(Array())
+          for (f <- files) {
+            val fName = f.getName
+            if (fName.startsWith(rtPrefix) && fName.endsWith(".jar")) {
+              f.delete()
+            }
+          }
+          rtFile
+        case _: Storage.InMemory =>
+          val f = Files.createTempFile(rtName, ".jar").toFile
+          f.deleteOnExit()
+          f.delete()
+          f
+      }
+      if (!rt.exists) {
+        rt.getParentFile.mkdirs()
+        Export.main(Array(rt.getCanonicalPath))
+      }
+      Some(rt)
+    }
     val files = {
       val r = collection.mutable.Buffer.empty[java.io.File]
-      val sunBoot = System.getProperty("sun.boot.class.path")
       if (sunBoot != null) {
         r.appendAll(
           sunBoot.split(java.io.File.pathSeparator)
             .map(new java.io.File(_))
         )
       } else {
-        val rtPrefix = "rt-"
-        val rtName = s"$rtPrefix${System.getProperty("java.version")}"
-        val rt = storageBackend match {
-          case storageBackend: Storage.Folder =>
-            val rtFile = (storageBackend.dir / s"$rtName.jar").toIO
-            val files = Option(rtFile.getParentFile.listFiles)
-              .getOrElse(Array())
-            for (f <- files) {
-              val fName = f.getName
-              if (fName.startsWith(rtPrefix) && fName.endsWith(".jar")) {
-                f.delete()
-              }
-            }
-            rtFile
-          case _: Storage.InMemory =>
-            val f = Files.createTempFile(rtName, ".jar").toFile
-            f.deleteOnExit()
-            f.delete()
-            f
-        }
         val cp = new File(getClass
           .getProtectionDomain.getCodeSource.getLocation.toURI)
         if (cp.isDirectory) {
@@ -69,12 +74,8 @@ object Classpath {
         } else {
           r.append(cp)
         }
-        r.append(rt)
-        if (!rt.exists) {
-          rt.getParentFile.mkdirs()
-          Export.main(Array(rt.getCanonicalPath))
-        }
       }
+      var current = Thread.currentThread().getContextClassLoader
       while (current != null) {
         current match {
           case t: java.net.URLClassLoader =>
@@ -85,8 +86,9 @@ object Classpath {
       }
       r
     }
-    _classpath = files.toVector.filter(_.exists)
-    _classpath
+    val r = files.toVector.filter(_.exists)
+    storageBackend.classpathRtJar.update((r, rtOpt))
+    r ++ rtOpt
   }
 
   def canBeOpenedAsJar(file: File): Boolean =

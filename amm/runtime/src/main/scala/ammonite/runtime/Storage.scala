@@ -1,6 +1,7 @@
 package ammonite.runtime
 
 import java.nio.file.FileAlreadyExistsException
+import java.io.File
 
 import ammonite.ops._
 import ammonite.util._
@@ -22,6 +23,7 @@ trait Storage{
   def loadPredef: Option[(String, Path)]
   val fullHistory: StableRef[History]
   val ivyCache: StableRef[Storage.IvyMap]
+  val classpathRtJar: StableRef[(Vector[File], Option[File])]
   def compileCacheSave(path: String, tag: Tag, data: Storage.CompileCache): Unit
   def compileCacheLoad(path: String, tag: Tag): Option[Storage.CompileCache]
   def classFilesListSave(filePathPrefix: RelPath,
@@ -68,6 +70,11 @@ object Storage{
     val ivyCache = new StableRef[IvyMap]{
       def apply() = _ivyCache
       def update(value: IvyMap): Unit = _ivyCache = value
+    }
+    var _classpathRtJar : (Vector[File], Option[File]) = (Vector(), None)
+    val classpathRtJar = new StableRef[(Vector[File], Option[File])] {
+      def apply() = _classpathRtJar
+      def update(value: (Vector[File], Option[File])): Unit = _classpathRtJar = value
     }
 
     var compileCache: mutable.Map[String, (Tag, CompileCache)] = mutable.Map.empty
@@ -116,6 +123,11 @@ object Storage{
     val ivyCacheFile = cacheDir/"ivycache.json"
     val metadataFile = "metadata.json"
     val sessionFile  = dir/"session"
+    var _classpathRtJar : (Vector[File], Option[File]) = (Vector(), None)
+    val classpathRtJar = new StableRef[(Vector[File], Option[File])] {
+      def apply() = _classpathRtJar
+      def update(value: (Vector[File], Option[File])): Unit = _classpathRtJar = value
+    }
 
     def getSessionId() = {
       try read(sessionFile).toLong
