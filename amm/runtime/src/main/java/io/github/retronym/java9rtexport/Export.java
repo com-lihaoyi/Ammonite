@@ -53,6 +53,7 @@ public class Export {
                     Path next = iterator.next();
                     Copy.copyDirectory(next, zipfs.getPath("/"));
                 }
+                zipfs.close();
             }
         } catch (IOException e) {
             e.printStackTrace();
