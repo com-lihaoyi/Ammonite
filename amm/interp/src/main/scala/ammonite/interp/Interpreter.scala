@@ -54,7 +54,7 @@ class Interpreter(val printer: Printer,
   def frameImports = headFrame.imports
   def frameUsedEarlierDefinitions = headFrame.usedEarlierDefinitions
 
-  val compilerManager = new CompilerLifecycleManager(storage, headFrame)
+  val compilerManager = new CompilerLifecycleManager(headFrame)
 
   val eval = Evaluator(headFrame)
 

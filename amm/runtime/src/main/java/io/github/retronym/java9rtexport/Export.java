@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package io.github.retronym.java9rtexport;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.*;
@@ -38,26 +39,36 @@ import java.util.Iterator;
 import java.util.Map;
 
 public class Export {
-    public static void main(String[] args) {
+    private final static Object lock = new Object();
+    private static File tempFile = null;
+
+    public static File export() {
         try {
-            FileSystem fileSystem = FileSystems.getFileSystem(URI.create("jrt:/"));
-            Path path = fileSystem.getPath("/modules");
-            String destination = args[0];
-            Path destPath = Paths.get(destination);
-            URI uri = URI.create( "jar:" + destPath.toUri() );
-            Map<String, String> env = new HashMap<>();
-            env.put( "create", "true" );
-            try ( FileSystem zipfs = FileSystems.newFileSystem( uri, env ) ) {
-                Iterator<Path> iterator = Files.list(path).iterator();
-                while(iterator.hasNext()) {
-                    Path next = iterator.next();
-                    Copy.copyDirectory(next, zipfs.getPath("/"));
+            synchronized (lock) {
+                if (tempFile == null) {
+                    Path tempPath = Files.createTempFile("rt", ".jar");
+                    tempFile = tempPath.toFile();
+                    tempFile.deleteOnExit();
+                    tempFile.delete();
+                    FileSystem fileSystem = FileSystems.getFileSystem(URI.create("jrt:/"));
+                    Path path = fileSystem.getPath("/modules");
+                    URI uri = URI.create("jar:" + tempPath.toUri());
+                    Map<String, String> env = new HashMap<>();
+                    env.put("create", "true");
+                    try (FileSystem zipfs = FileSystems.newFileSystem(uri, env)) {
+                        Iterator<Path> iterator = Files.list(path).iterator();
+                        while (iterator.hasNext()) {
+                            Path next = iterator.next();
+                            Copy.copyDirectory(next, zipfs.getPath("/"));
+                        }
+                        zipfs.close();
+                    }
                 }
-                zipfs.close();
             }
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(-1);
         }
+        return tempFile;
     }
 }
