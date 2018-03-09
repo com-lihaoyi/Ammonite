@@ -15,7 +15,7 @@ matrix:
   # published tests tend to run slower than integration tests, so start
   # them first
   - stage: build
-    env: CI_SCRIPT="sbt singleCrossBuilt/test shell/test sshd/test ammInterp/test"
+    env: CI_SCRIPT="sbt published/test"
     jdk: oraclejdk9
     scala: 2.12.4
 
