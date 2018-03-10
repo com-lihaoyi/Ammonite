@@ -3,7 +3,7 @@ package ammonite.runtime
 import java.io.File
 import java.util.zip.ZipFile
 
-
+import io.github.retronym.java9rtexport.Export
 
 import scala.util.control.NonFatal
 
@@ -24,12 +24,29 @@ object Classpath {
    * want to do something.
    */
   var current = Thread.currentThread().getContextClassLoader
-  val files = collection.mutable.Buffer.empty[java.io.File]
-  files.appendAll(
-    System.getProperty("sun.boot.class.path")
+  val files = collection.mutable.Buffer.empty[java.io.File];
+  {
+    val sunBoot = System.getProperty("sun.boot.class.path")
+    if (sunBoot != null) {
+      files.appendAll(
+        sunBoot
           .split(java.io.File.pathSeparator)
           .map(new java.io.File(_))
-  )
+      )
+    } else {
+      val cp = new File(getClass
+        .getProtectionDomain.getCodeSource.getLocation.toURI)
+      if (cp.isDirectory) {
+        for (p <- System.getProperty("java.class.path")
+          .split(File.pathSeparatorChar) if !p.endsWith("sbt-launch.jar")) {
+          files.append(new File(p))
+        }
+      } else {
+        files.append(cp)
+      }
+      files.append(Export.export())
+    }
+  }
   while(current != null){
     current match{
       case t: java.net.URLClassLoader =>
