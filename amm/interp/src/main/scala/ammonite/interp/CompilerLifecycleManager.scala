@@ -30,6 +30,8 @@ class CompilerLifecycleManager(headFrame: => Frame){
     var dynamicClasspathChanged: Boolean = true
     var pressyStale: Boolean = true
     val onCompilerInit = mutable.Buffer.empty[scala.tools.nsc.Global => Unit]
+    val onSettingsInit = mutable.Buffer.empty[scala.tools.nsc.Settings => Unit]
+    var preConfiguredSettingsChanged: Boolean = false
     var pressy: Pressy = _
     var compilationCount = 0
     var (lastFrame, lastFrameVersion) = (headFrame, headFrame.version)
@@ -59,10 +61,11 @@ class CompilerLifecycleManager(headFrame: => Frame){
   // probably creates a pile of garbage
 
   def init(force: Boolean = false) = synchronized{
-    if((headFrame ne lastFrame) ||
-      headFrame.version != lastFrameVersion ||
-      Internal.dynamicClasspathChanged ||
-      force){
+    if ((headFrame ne lastFrame) ||
+        headFrame.version != lastFrameVersion ||
+        Internal.dynamicClasspathChanged ||
+        Internal.preConfiguredSettingsChanged ||
+        force) {
 
       lastFrame = headFrame
       lastFrameVersion = headFrame.version
@@ -71,6 +74,7 @@ class CompilerLifecycleManager(headFrame: => Frame){
       // Otherwise activating autocomplete makes the presentation compiler mangle
       // the shared settings and makes the main compiler sad
       val settings = Option(compiler).fold(new Settings)(_.compiler.settings.copy)
+      onSettingsInit.foreach(_(settings))
       Internal.compiler = Compiler(
         Classpath.classpath ++ headFrame.classpath,
         dynamicClasspath,
@@ -145,7 +149,13 @@ class CompilerLifecycleManager(headFrame: => Frame){
     }
   }
 
-  def addToClasspath(classFiles: ClassFiles) = synchronized{
+  def preConfigureCompiler(callback: scala.tools.nsc.Settings => Unit) =
+    synchronized {
+      onSettingsInit.append(callback)
+      preConfiguredSettingsChanged = true
+    }
+
+  def addToClasspath(classFiles: ClassFiles) = synchronized {
     Compiler.addToClasspath(classFiles, dynamicClasspath)
     dynamicClasspathChanged = true
   }
@@ -155,6 +165,3 @@ class CompilerLifecycleManager(headFrame: => Frame){
     if (pressy != null) pressy.shutdownPressy()
   }
 }
-
-
-
