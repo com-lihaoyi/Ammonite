@@ -34,15 +34,9 @@ object Classpath {
           .map(new java.io.File(_))
       )
     } else {
-      val cp = new File(getClass
-        .getProtectionDomain.getCodeSource.getLocation.toURI)
-      if (cp.isDirectory) {
-        for (p <- System.getProperty("java.class.path")
-          .split(File.pathSeparatorChar) if !p.endsWith("sbt-launch.jar")) {
-          files.append(new File(p))
-        }
-      } else {
-        files.append(cp)
+      for (p <- System.getProperty("java.class.path")
+        .split(File.pathSeparatorChar) if !p.endsWith("sbt-launch.jar")) {
+        files.append(new File(p))
       }
       files.append(Export.export())
     }
