@@ -15,50 +15,50 @@ matrix:
   # published tests tend to run slower than integration tests, so start
   # them first
   - stage: build
-    env: CI_SCRIPT="sbt published/test"
+    env: CI_SCRIPT="ci/build.sc test published/test"
     jdk: oraclejdk9
     scala: 2.12.4
 
   - stage: build
-    env: CI_SCRIPT="amm ci/build.sc test published/test"
+    env: CI_SCRIPT="ci/build.sc test published/test"
     jdk: oraclejdk8
     scala: 2.12.4
 
   - stage: build
-    env: CI_SCRIPT="amm ci/build.sc test published/test"
+    env: CI_SCRIPT="ci/build.sc test published/test"
     jdk: oraclejdk7
     scala: 2.11.12
 
   - stage: build
-    env: CI_SCRIPT="sbt integration/test"
+    env: CI_SCRIPT="ci/build.sc test integration/test"
     jdk: oraclejdk9
     scala: 2.12.4
 
   - stage: build
-    env: CI_SCRIPT="amm ci/build.sc test integration/test"
+    env: CI_SCRIPT="ci/build.sc test integration/test"
     jdk: oraclejdk8
     scala: 2.12.4
 
   - stage: build
-    env: CI_SCRIPT="amm ci/build.sc test integration/test"
+    env: CI_SCRIPT="ci/build.sc test integration/test"
     jdk: oraclejdk7
     scala: 2.11.12
 
   # Publish everything to sonatype in conjunction with running tests
   - stage: build
-    env: CI_SCRIPT="amm ci/build.sc artifacts 2.11.3 2.11.4 2.11.5 2.11.6 "
+    env: CI_SCRIPT="ci/build.sc artifacts 2.11.3 2.11.4 2.11.5 2.11.6 "
     jdk: oraclejdk8
     scala: 2.11.12
 
   - stage: build
     # 2.11.9 and 2.11.10 were borked releases
-    env: CI_SCRIPT="amm ci/build.sc artifacts 2.11.7 2.11.8 2.11.12"
+    env: CI_SCRIPT="ci/build.sc artifacts 2.11.7 2.11.8 2.11.12"
     jdk: oraclejdk8
     scala: 2.11.12
 
   - stage: build
     # Leave 2.12 unprefixed so any additional 2.12 versions get included automatically
-    env: CI_SCRIPT="amm ci/build.sc artifacts 2.12"
+    env: CI_SCRIPT="ci/build.sc artifacts 2.12"
     jdk: oraclejdk8
     scala: 2.11.12
 
@@ -66,27 +66,29 @@ matrix:
 
   # Everything worked, *then* kick off a release
   - stage: release
-    env: CI_SCRIPT="amm ci/build.sc sonatypeReleaseAll"
+    env: CI_SCRIPT="ci/build.sc sonatypeReleaseAll"
     jdk: oraclejdk8
     scala: 2.11.12
 
   - stage: release
-    env: CI_SCRIPT="amm ci/build.sc docs"
+    env: CI_SCRIPT="ci/build.sc docs"
     jdk: oraclejdk8
     scala: 2.11.12
 
   - stage: release
-    env: CI_SCRIPT="amm ci/build.sc executable"
+    env: CI_SCRIPT="ci/build.sc executable"
     jdk: oraclejdk8
     scala: 2.11.12
 
 script:
 - unset _JAVA_OPTIONS
+- unset JVM_OPTS
+- unset SBT_OPTS
 - export PATH=~/bin/amm:$PATH
 - mkdir -p ~/bin
 # We use 2.11 since we need to run tests on Java 7
-- if [ ! -f ~/bin/amm ]; then curl -L -o ~/bin/amm https://github.com/lihaoyi/Ammonite/releases/download/1.0.0/2.11-1.0.0 && chmod +x ~/bin/amm; fi
-- $CI_SCRIPT
+- if [ ! -f ~/bin/amm ]; then curl -L -o ~/bin/amm https://github.com/lihaoyi/Ammonite/releases/download/snapshot-commit-uploads/2.11-1.0.5-1-819bc80 && chmod +x ~/bin/amm; fi
+- JAVAOPTS="-Xmx2048m" amm $CI_SCRIPT
 
 notifications:
   email:

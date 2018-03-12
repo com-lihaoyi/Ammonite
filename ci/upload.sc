@@ -41,7 +41,7 @@ def apply(uploadedFile: Path,
     .asString
 
   println(res.body)
-  val longUrl = upickle.json.read(res.body)("browser_download_url").str
+  val longUrl = upickle.json.read(res.body)("browser_download_url").toString
 
   println("Long Url " + longUrl)
 
