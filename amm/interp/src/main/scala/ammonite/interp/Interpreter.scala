@@ -640,6 +640,10 @@ class Interpreter(val printer: Printer,
       compilerManager.configureCompiler(callback)
     }
 
+    def preConfigureCompiler(callback: scala.tools.nsc.Settings => Unit) = {
+      compilerManager.preConfigureCompiler(callback)
+    }
+
     val beforeExitHooks = interp.beforeExitHooks
 
     val repositories = interp.repositories
@@ -734,7 +738,7 @@ object Interpreter{
       else index - (newLineLength - 1)
     }
 
-    if (code.startsWith(SheBang)) {  
+    if (code.startsWith(SheBang)) {
       val matcher = SheBangEndPattern matcher code
       val shebangEnd = if (matcher.find) matcher.end else skipMultipleLines()
       val numberOfStrippedLines = newLine.r.findAllMatchIn( code.substring(0, shebangEnd) ).length

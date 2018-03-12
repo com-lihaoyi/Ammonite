@@ -53,6 +53,12 @@ trait InterpAPI {
     * when it ends up being initialized later
     */
   def configureCompiler(c: scala.tools.nsc.Global => Unit): Unit
+
+  /**
+    * Pre-configures the next compiler. Useful for tuning options that are
+    * used during parsing such as -Yrangepos
+    */
+  def preConfigureCompiler(c: scala.tools.nsc.Settings => Unit): Unit
 }
 
 
