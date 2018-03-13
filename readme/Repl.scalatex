@@ -80,7 +80,13 @@
     SBT project. To do so, add the following to your @code{build.sbt}
 
   @hl.scala
-    libraryDependencies += "com.lihaoyi" % "ammonite" % "@ammonite.Constants.version" % "test" cross CrossVersion.full
+    libraryDependencies += {
+      val version = scalaBinaryVersion.value match {
+        case "2.10" => "1.0.3"
+        case _ ⇒ "@ammonite.Constants.version"
+      }
+      "com.lihaoyi" % "ammonite" % version % "test" cross CrossVersion.full
+    }
 
     sourceGenerators in Test += Def.task {
       val file = (sourceManaged in Test).value / "amm.scala"
