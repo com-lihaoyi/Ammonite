@@ -24,7 +24,16 @@ object Classpath {
    * want to do something.
    */
   var current = Thread.currentThread().getContextClassLoader
-  val files = collection.mutable.Buffer.empty[java.io.File];
+  val files = collection.mutable.Buffer.empty[java.io.File]
+  while(current != null){
+    current match{
+      case t: java.net.URLClassLoader =>
+        files.appendAll(t.getURLs.map(u => new java.io.File(u.toURI)))
+      case _ =>
+    }
+    current = current.getParent
+  }
+
   {
     val sunBoot = System.getProperty("sun.boot.class.path")
     if (sunBoot != null) {
@@ -38,16 +47,14 @@ object Classpath {
         .split(File.pathSeparatorChar) if !p.endsWith("sbt-launch.jar")) {
         files.append(new File(p))
       }
-      files.append(Export.export())
+      try {
+        new java.net.URLClassLoader(files.map(_.toURI.toURL).toArray, null)
+          .loadClass("javax.script.ScriptEngineManager")
+      } catch {
+        case _: ClassNotFoundException =>
+          files.append(Export.export())
+      }
     }
-  }
-  while(current != null){
-    current match{
-      case t: java.net.URLClassLoader =>
-        files.appendAll(t.getURLs.map(u => new java.io.File(u.toURI)))
-      case _ =>
-    }
-    current = current.getParent
   }
 
   val classpath = files.toVector.filter(_.exists)
