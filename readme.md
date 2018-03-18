@@ -12,7 +12,7 @@
 
 
 This is where the code for the [Ammonite](https://lihaoyi.github.io/Ammonite) 
-project lives; Both:
+project lives:
 
 - [Ammonite-REPL](https://lihaoyi.github.io/Ammonite), the improved Scala REPL
 - [Ammonite-Ops](https://lihaoyi.github.io/Ammonite/#Ammonite-Ops), the Scala 
