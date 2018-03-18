@@ -291,6 +291,14 @@ object LineNumberModifier {
 
       override def transform(tree: g.Tree) = {
         val transformedTree = super.transform(tree)
+        // The `start` and `end` values in transparent/range positions are left
+        // untouched, because of some aggressive validation in scalac that checks
+        // that trees are not overlapping, and shifting these values here
+        // violates the invariant (which breaks Ammonite, potentially because
+        // of multi-stage).
+        // Moreover, we rely only on the "point" value (for error reporting).
+        // The ticket https://github.com/scala/scala-dev/issues/390 tracks down
+        // relaxing the aggressive validation.
         val newPos = tree.pos match {
           case s : TransparentPosition if s.start > topWrapperLen =>
               new TransparentPosition(trimmedSource, s.start, s.point - topWrapperLen, s.end)
