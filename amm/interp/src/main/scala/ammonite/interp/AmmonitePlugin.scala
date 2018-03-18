@@ -5,7 +5,7 @@ import ammonite.util.{ImportData, Name, Util}
 import scala.reflect.NameTransformer
 import scala.tools.nsc._
 import scala.tools.nsc.plugins.{Plugin, PluginComponent}
-import scala.reflect.internal.util.{BatchSourceFile, OffsetPosition}
+import scala.reflect.internal.util._
 
 /**
  * Used to capture the names in scope after every execution, reporting them
@@ -284,25 +284,38 @@ object LineNumberModifier {
                        topWrapperLen: => Int) = {
 
     object LineNumberCorrector extends g.Transformer {
+      import scala.reflect.internal.util._
+
+      private val trimmedSource = new BatchSourceFile(g.currentSource.file,
+        g.currentSource.content.drop(topWrapperLen))
+
       override def transform(tree: g.Tree) = {
         val transformedTree = super.transform(tree)
-        tree.pos match {
-          case s: scala.reflect.internal.util.OffsetPosition =>
-            if(s.point > topWrapperLen) {
-              val con = new BatchSourceFile(s.source.file,
-                s.source.content.drop(topWrapperLen))
-              val p = new OffsetPosition(con, s.point - topWrapperLen)
-              transformedTree.pos = p
-            }
-          case _ =>    //for position  = NoPosition
+        // The `start` and `end` values in transparent/range positions are left
+        // untouched, because of some aggressive validation in scalac that checks
+        // that trees are not overlapping, and shifting these values here
+        // violates the invariant (which breaks Ammonite, potentially because
+        // of multi-stage).
+        // Moreover, we rely only on the "point" value (for error reporting).
+        // The ticket https://github.com/scala/scala-dev/issues/390 tracks down
+        // relaxing the aggressive validation.
+        val newPos = tree.pos match {
+          case s : TransparentPosition if s.start > topWrapperLen =>
+              new TransparentPosition(trimmedSource, s.start, s.point - topWrapperLen, s.end)
+          case s: RangePosition if s.start > topWrapperLen =>
+              new RangePosition(trimmedSource, s.start, s.point - topWrapperLen, s.end)
+          case s: OffsetPosition if s.start > topWrapperLen =>
+              new OffsetPosition(trimmedSource, s.point - topWrapperLen)
+          case s => s
+
         }
+        transformedTree.pos = newPos
         transformedTree
       }
 
       def apply(unit: g.CompilationUnit) = transform(unit.body)
     }
 
-    val t = LineNumberCorrector(unit)
-    unit.body = t
+    unit.body = LineNumberCorrector(unit)
   }
 }
