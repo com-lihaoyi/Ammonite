@@ -27,7 +27,12 @@ class Repl(input: InputStream,
 
   val prompt = Ref("@ ")
 
-  val frontEnd = Ref[FrontEnd](AmmoniteFrontEnd(Filter.empty))
+  val frontEnd = Ref[FrontEnd](
+    if (scala.util.Properties.isWin)
+      ammonite.repl.FrontEnd.JLineWindows
+    else
+      AmmoniteFrontEnd(Filter.empty)
+  )
 
   var lastException: Throwable = null
 

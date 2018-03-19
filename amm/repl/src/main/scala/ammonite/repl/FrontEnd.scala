@@ -3,14 +3,15 @@ package ammonite.repl
 import java.io.{InputStream, OutputStream}
 
 import fastparse.core.Parsed
-import jline.console.{ConsoleReader, completer}
-
-import ammonite.util.{Colors, Catching, Res}
+import org.jline.reader._
+import org.jline.terminal._
+import org.jline.reader.impl.history.DefaultHistory
+import org.jline.utils.AttributedString
+import ammonite.util.{Catching, Colors, Res}
 import ammonite.interp.Parsers
 import ammonite.util.Util.newLine
 
 import scala.annotation.tailrec
-import scala.tools.nsc.interpreter.JList
 
 /**
  * All the mucky JLine interfacing code
@@ -29,62 +30,34 @@ trait FrontEnd{
 }
 
 object FrontEnd{
-  object JLineUnix extends JLineTerm(() => new jline.UnixTerminal())
-  object JLineWindows extends JLineTerm(() => new jline.WindowsTerminal())
-  class JLineTerm(makeTerm: () => jline.Terminal) extends FrontEnd{
-    def width = makeTerm().getWidth
-    def height = makeTerm().getHeight
+  object JLineUnix extends JLineTerm
+  object JLineWindows extends JLineTerm
+  class JLineTerm() extends FrontEnd{
 
-    def action(input: InputStream,
-               reader: java.io.Reader,
-               output: OutputStream,
+    private val term = TerminalBuilder.builder().build()
+    private val readerBuilder = LineReaderBuilder.builder().terminal(term)
+    private val ammCompleter = new AmmCompleter()
+    private val ammHighlighter = new AmmHighlighter()
+    readerBuilder.completer(ammCompleter)
+    readerBuilder.highlighter(ammHighlighter)
+    readerBuilder.history(new DefaultHistory())
+    private val reader = readerBuilder.build()
+
+    def width = term.getWidth
+    def height = term.getHeight
+
+    def action(jInput: InputStream,
+               jReader: java.io.Reader,
+               jOutput: OutputStream,
                prompt: String,
                colors: Colors,
                compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
-               history: IndexedSeq[String],
+               historyValues: IndexedSeq[String],
                addHistory: String => Unit) = {
 
-      val term = makeTerm()
-      term.init()
-      val reader = new ConsoleReader(input, output, term)
-      reader.setHistoryEnabled(true)
-      var signatures = Seq.empty[String]
-      reader.addCompleter(new jline.console.completer.Completer {
-
-        def complete(_buf: String, cursor: Int, candidates: JList[CharSequence]): Int = {
-          val buf = if (_buf == null) "" else _buf
-          import collection.JavaConversions._
-          val (completionBase, completions, sigs) = compilerComplete(
-            cursor,
-            buf
-          )
-          if (completions.nonEmpty) {
-            candidates.addAll(completions.sorted)
-            signatures = sigs.sorted
-          } else if (sigs.nonEmpty){
-            reader.println()
-            sigs.foreach(reader.println)
-            reader.drawLine()
-          }
-
-          completionBase
-        }
-      })
-      reader.setExpandEvents(false)
-      reader.setHandleUserInterrupt(true)
-      val defaultHandler = reader.getCompletionHandler
-      reader.setCompletionHandler(new completer.CompletionHandler {
-        def complete(reader: ConsoleReader, candidates: JList[CharSequence], position: Int) = {
-          if (signatures.nonEmpty){
-            reader.println()
-            signatures.foreach(reader.println)
-            reader.drawLine()
-          }
-          defaultHandler.complete(reader, candidates, position)
-        }
-      })
-
-      history.foreach(reader.getHistory.add)
+      ammCompleter.compilerComplete = compilerComplete
+      ammHighlighter.colors = colors
+      historyValues.foreach(reader.getHistory.add)
 
       @tailrec def readCode(buffered: String): Res[(String, Seq[String])] = {
         Option(reader.readLine(
@@ -109,15 +82,51 @@ object FrontEnd{
         }
       }
 
-
-      try for {
-        _ <- Catching{ case e: jline.console.UserInterruptException =>
-          if (e.getPartialLine == "") reader.println("Ctrl-D to exit")
-          Res.Skip
+      for {
+        _ <- Catching {
+          case e: UserInterruptException =>
+            if (e.getPartialLine == "") term.writer().println("Ctrl-D to exit")
+            Res.Skip
+          case e: EndOfFileException =>
+            Res.Exit("user exited")
         }
         res <- readCode("")
       } yield res
-      finally term.restore()
     }
+  }
+}
+
+class AmmCompleter extends Completer {
+  // completion varies from action to action
+  var compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]) =
+    (x, y) => (0, Seq.empty, Seq.empty)
+
+  override def complete(reader: LineReader, line: ParsedLine, candidates: java.util.List[Candidate]): Unit = {
+    val (completionBase, completions, sigs) = compilerComplete(
+      line.cursor(),
+      line.line()
+    )
+    completions.sorted.foreach { c =>
+      // if member selection, concatenate compiler suggestion to variable
+      val candidate = if (line.line().endsWith(".")) (line.word() + c) else c
+      candidates.add(new Candidate(candidate, c, null, null, null, null, true))
+    }
+  }
+}
+
+class AmmHighlighter extends Highlighter {
+
+  var colors: Colors = Colors.Default
+
+  override def highlight(reader: LineReader, buffer: String): AttributedString = {
+    val hl = Highlighter.defaultHighlight(
+      buffer.toVector,
+      colors.comment(),
+      colors.`type`(),
+      colors.literal(),
+      colors.keyword(),
+      fansi.Attr.Reset
+    ).mkString
+    AttributedString.fromAnsi(hl)
   }
 }
