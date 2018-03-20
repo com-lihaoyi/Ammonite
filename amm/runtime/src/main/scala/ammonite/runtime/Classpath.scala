@@ -31,8 +31,8 @@ object Classpath {
     if (cache != null) return cache
     def rtCacheDir(storage: Storage): Option[Path] = storage match {
       case storage: Storage.Folder =>
-        // no need to cache if the storage is in tmpdir because
-        // Export.export creates the rt.jar in tmpdir
+        // no need to cache if the storage is in tmpdir
+        // because it is temporary
         if (storage.dir.toNIO.startsWith(
           java.nio.file.Paths.get(System.getProperty("java.io.tmpdir"))))
           None
