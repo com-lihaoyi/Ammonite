@@ -20,7 +20,7 @@ import scala.tools.nsc.Settings
   * compiler objects are initialized, or worry about initializing them more
   * than necessary
   */
-class CompilerLifecycleManager(headFrame: => Frame){
+class CompilerLifecycleManager(storage: Storage, headFrame: => Frame){
 
 
 
@@ -76,7 +76,7 @@ class CompilerLifecycleManager(headFrame: => Frame){
       val settings = Option(compiler).fold(new Settings)(_.compiler.settings.copy)
       onSettingsInit.foreach(_(settings))
       Internal.compiler = Compiler(
-        Classpath.classpath ++ headFrame.classpath,
+        Classpath.classpath(storage) ++ headFrame.classpath,
         dynamicClasspath,
         headFrame.classloader,
         headFrame.pluginClassloader,
@@ -89,7 +89,7 @@ class CompilerLifecycleManager(headFrame: => Frame){
       // Pressy is lazy, so the actual presentation compiler won't get instantiated
       // & initialized until one of the methods on it is actually used
       Internal.pressy = Pressy(
-        Classpath.classpath ++ headFrame.classpath,
+        Classpath.classpath(storage) ++ headFrame.classpath,
         dynamicClasspath,
         headFrame.classloader,
 
