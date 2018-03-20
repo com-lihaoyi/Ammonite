@@ -32,10 +32,10 @@ trait Storage{
   def getSessionId: Long
 
   // Store classpathCache in-memory regardless of Storage impl
-  private var _classpathCache: Vector[java.io.File] = _
-  val classpathCache = new StableRef[Vector[java.io.File]]{
+  private var _classpathCache: Option[Vector[java.io.File]] = None
+  val classpathCache = new StableRef[Option[Vector[java.io.File]]]{
     def apply() = _classpathCache
-    def update(value: Vector[java.io.File]): Unit = _classpathCache = value
+    def update(value: Option[Vector[java.io.File]]): Unit = _classpathCache = value
   }
 }
 

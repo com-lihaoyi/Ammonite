@@ -28,7 +28,7 @@ object Classpath {
    */
   def classpath(storage: Storage): Vector[File] = {
     val cache = storage.classpathCache()
-    if (cache != null) return cache
+    if (cache.isDefined) return cache.get
     def rtCacheDir(storage: Storage): Option[Path] = storage match {
       case storage: Storage.Folder =>
         // no need to cache if the storage is in tmpdir
@@ -82,7 +82,7 @@ object Classpath {
       }
     }
     val r = files.toVector.filter(_.exists)
-    storage.classpathCache.update(r)
+    storage.classpathCache.update(Some(r))
     r
   }
 
