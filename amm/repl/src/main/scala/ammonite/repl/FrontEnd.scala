@@ -2,16 +2,16 @@ package ammonite.repl
 
 import java.io.{InputStream, OutputStream}
 
+import scala.collection.JavaConverters._
+
 import fastparse.core.Parsed
 import org.jline.reader._
 import org.jline.terminal._
 import org.jline.reader.impl.history.DefaultHistory
 import org.jline.utils.AttributedString
+import org.jline.reader.impl.DefaultParser.ArgumentList
 import ammonite.util.{Catching, Colors, Res}
 import ammonite.interp.Parsers
-import ammonite.util.Util.newLine
-
-import scala.annotation.tailrec
 
 /**
  * All the mucky JLine interfacing code
@@ -38,9 +38,12 @@ object FrontEnd{
     private val readerBuilder = LineReaderBuilder.builder().terminal(term)
     private val ammCompleter = new AmmCompleter()
     private val ammHighlighter = new AmmHighlighter()
+    private val ammParser = new AmmParser()
     readerBuilder.completer(ammCompleter)
+    readerBuilder.parser(ammParser)
     readerBuilder.highlighter(ammHighlighter)
     readerBuilder.history(new DefaultHistory())
+    readerBuilder.option(LineReader.Option.DISABLE_EVENT_EXPANSION, true)
     private val reader = readerBuilder.build()
 
     def width = term.getWidth
@@ -56,29 +59,16 @@ object FrontEnd{
                addHistory: String => Unit) = {
 
       ammCompleter.compilerComplete = compilerComplete
+      ammParser.addHistory = addHistory
       ammHighlighter.colors = colors
       historyValues.foreach(reader.getHistory.add)
 
-      @tailrec def readCode(buffered: String): Res[(String, Seq[String])] = {
-        Option(reader.readLine(
-          if (buffered.isEmpty) prompt
-          // Strip ANSI color codes, as described http://stackoverflow.com/a/14652763/871202
-          else " " * prompt.replaceAll("\u001B\\[[;\\d]*m", "").length
-        )) match {
+      def readCode(): Res[(String, Seq[String])] = {
+        Option(reader.readLine(prompt)) match {
+          case Some(code) =>
+            val pl = reader.getParser.parse(code, 0)
+            Res.Success(code -> pl.words().asScala)
           case None => Res.Exit(())
-          case Some(newCode) =>
-            val code = buffered + newCode
-            Parsers.split(code) match{
-              case Some(Parsed.Success(value, idx)) =>
-                addHistory(code)
-                Res.Success(code -> value)
-              case Some(Parsed.Failure(p, index, extra)) =>
-                addHistory(code)
-                Res.Failure(
-                  fastparse.core.ParseError.msg(extra.input, extra.traced.expected, index)
-                )
-              case None => readCode(code + newLine)
-            }
         }
       }
 
@@ -90,7 +80,7 @@ object FrontEnd{
           case e: EndOfFileException =>
             Res.Exit("user exited")
         }
-        res <- readCode("")
+        res <- readCode()
       } yield res
     }
   }
@@ -108,8 +98,42 @@ class AmmCompleter extends Completer {
     )
     completions.sorted.foreach { c =>
       // if member selection, concatenate compiler suggestion to variable
-      val candidate = if (line.line().endsWith(".")) (line.word() + c) else c
-      candidates.add(new Candidate(candidate, c, null, null, null, null, true))
+      val candidate = if (line.word().contains(".")) {
+        val lastDotIndex = line.word().lastIndexOf(".")
+        val prefix = line.word().substring(0, lastDotIndex + 1)
+        prefix + c
+      } else {
+        c
+      }
+      candidates.add(new Candidate(candidate, c, null, null, null, null, false))
+    }
+  }
+}
+
+class AmmParser extends Parser {
+
+  var addHistory: String => Unit = x => ()
+
+  override def parse(line: String, cursor: Int, context: Parser.ParseContext): ParsedLine = {
+    val words = new java.util.ArrayList[String]()
+    var wordCursor = -1 // should be ok...
+    var wordIndex = -1
+    Parsers.Splitter.parse(line) match {
+      case Parsed.Success(value, idx) =>
+        addHistory(line)
+        words.addAll(value.asJava)
+        if (cursor == line.length && words.size > 0) {
+          wordIndex = words.size - 1
+          wordCursor = words.get(words.size - 1).length
+        }
+        new ArgumentList(line, words, wordIndex, wordCursor, cursor)
+      case Parsed.Failure(p, idx, extra) =>
+        if (context == Parser.ParseContext.ACCEPT_LINE) {
+          throw new EOFError(-1, -1, "Missing closing paren/quote/expression")
+        }
+        else {
+          new ArgumentList(line, words, wordIndex, wordCursor, cursor)
+        }
     }
   }
 }
