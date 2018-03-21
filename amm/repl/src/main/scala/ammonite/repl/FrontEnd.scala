@@ -3,7 +3,6 @@ package ammonite.repl
 import java.io.{InputStream, OutputStream}
 
 import scala.collection.JavaConverters._
-
 import fastparse.core.Parsed
 import org.jline.reader._
 import org.jline.terminal._
@@ -12,6 +11,7 @@ import org.jline.utils.AttributedString
 import org.jline.reader.impl.DefaultParser.ArgumentList
 import ammonite.util.{Catching, Colors, Res}
 import ammonite.interp.Parsers
+import fastparse.utils.ParserInput
 
 /**
  * All the mucky JLine interfacing code
@@ -44,6 +44,7 @@ object FrontEnd{
     readerBuilder.highlighter(ammHighlighter)
     readerBuilder.history(new DefaultHistory())
     readerBuilder.option(LineReader.Option.DISABLE_EVENT_EXPANSION, true)
+    readerBuilder.option(LineReader.Option.INSERT_TAB, true)
     private val reader = readerBuilder.build()
 
     def width = term.getWidth
@@ -77,6 +78,8 @@ object FrontEnd{
           case e: UserInterruptException =>
             if (e.getPartialLine == "") term.writer().println("Ctrl-D to exit")
             Res.Skip
+          case e: SyntaxError =>
+            Res.Failure(e.msg)
           case e: EndOfFileException =>
             Res.Exit("user exited")
         }
@@ -116,10 +119,10 @@ class AmmParser extends Parser {
 
   override def parse(line: String, cursor: Int, context: Parser.ParseContext): ParsedLine = {
     val words = new java.util.ArrayList[String]()
-    var wordCursor = -1 // should be ok...
+    var wordCursor = -1
     var wordIndex = -1
-    Parsers.Splitter.parse(line) match {
-      case Parsed.Success(value, idx) =>
+    Parsers.split(line) match {
+      case Some(Parsed.Success(value, idx)) =>
         addHistory(line)
         words.addAll(value.asJava)
         if (cursor == line.length && words.size > 0) {
@@ -127,16 +130,22 @@ class AmmParser extends Parser {
           wordCursor = words.get(words.size - 1).length
         }
         new ArgumentList(line, words, wordIndex, wordCursor, cursor)
-      case Parsed.Failure(p, idx, extra) =>
-        if (context == Parser.ParseContext.ACCEPT_LINE) {
-          throw new EOFError(-1, -1, "Missing closing paren/quote/expression")
-        }
-        else {
+      case Some(Parsed.Failure(p, idx, extra)) =>
+        addHistory(line)
+        throw new SyntaxError(
+          fastparse.core.ParseError.msg(extra.input, extra.traced.expected, idx)
+        )
+      case None => // continue input
+        if (context == Parser.ParseContext.COMPLETE) {
           new ArgumentList(line, words, wordIndex, wordCursor, cursor)
+        } else {
+          throw new EOFError(-1, -1, "Missing closing paren/quote/expression")
         }
     }
   }
 }
+
+class SyntaxError(val msg: String) extends RuntimeException
 
 class AmmHighlighter extends Highlighter {
 
