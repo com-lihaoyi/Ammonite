@@ -36,12 +36,12 @@ object FrontEnd{
 
     private val term = TerminalBuilder.builder().build()
     private val readerBuilder = LineReaderBuilder.builder().terminal(term)
-    private val ammCompleter = new AmmCompleter()
     private val ammHighlighter = new AmmHighlighter()
+    private val ammCompleter = new AmmCompleter(ammHighlighter)
     private val ammParser = new AmmParser()
+    readerBuilder.highlighter(ammHighlighter)
     readerBuilder.completer(ammCompleter)
     readerBuilder.parser(ammParser)
-    readerBuilder.highlighter(ammHighlighter)
     readerBuilder.history(new DefaultHistory())
     readerBuilder.option(LineReader.Option.DISABLE_EVENT_EXPANSION, true)
     readerBuilder.option(LineReader.Option.INSERT_TAB, true)
@@ -76,7 +76,10 @@ object FrontEnd{
       for {
         _ <- Catching {
           case e: UserInterruptException =>
-            if (e.getPartialLine == "") term.writer().println("Ctrl-D to exit")
+            if (e.getPartialLine == "") {
+              term.writer().println("Ctrl-D to exit")
+              term.flush()
+            }
             Res.Skip
           case e: SyntaxError =>
             Res.Failure(e.msg)
@@ -89,7 +92,7 @@ object FrontEnd{
   }
 }
 
-class AmmCompleter extends Completer {
+class AmmCompleter(highlighter: Highlighter) extends Completer {
   // completion varies from action to action
   var compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]) =
     (x, y) => (0, Seq.empty, Seq.empty)
@@ -99,8 +102,20 @@ class AmmCompleter extends Completer {
       line.cursor(),
       line.line()
     )
+    // display method signature(s)
+    if (sigs.nonEmpty) {
+      reader.getTerminal.writer.println()
+      sigs.foreach{ sig =>
+        val sigHighlighted = highlighter.highlight(reader, sig).toAnsi
+        reader.getTerminal.writer.println(sigHighlighted)
+      }
+      reader.callWidget(LineReader.REDRAW_LINE)
+      reader.callWidget(LineReader.REDISPLAY)
+      reader.getTerminal.flush()
+    }
+    // add suggestions
     completions.sorted.foreach { c =>
-      // if member selection, concatenate compiler suggestion to variable
+      // if member selection, concatenate compiler suggestion to variable name
       val candidate = if (line.word().contains(".")) {
         val lastDotIndex = line.word().lastIndexOf(".")
         val prefix = line.word().substring(0, lastDotIndex + 1)
@@ -131,11 +146,19 @@ class AmmParser extends Parser {
         }
         new ArgumentList(line, words, wordIndex, wordCursor, cursor)
       case Some(Parsed.Failure(p, idx, extra)) =>
-        addHistory(line)
-        throw new SyntaxError(
-          fastparse.core.ParseError.msg(extra.input, extra.traced.expected, idx)
-        )
-      case None => // continue input
+        // we "accept the failure" only when ENTER is pressed, loops forever otherwise...
+        // https://groups.google.com/d/msg/jline-users/84fPur0oHKQ/bRnjOJM4BAAJ
+        if (context == Parser.ParseContext.ACCEPT_LINE) {
+          addHistory(line)
+          throw new SyntaxError(
+            fastparse.core.ParseError.msg(extra.input, extra.traced.expected, idx)
+          )
+        } else {
+          new ArgumentList(line, words, wordIndex, wordCursor, cursor)
+        }
+      case None =>
+        // when TAB is pressed (COMEPLETE context) return a line so that it can show suggestions
+        // else throw EOFError to signal that input isn't finished
         if (context == Parser.ParseContext.COMPLETE) {
           new ArgumentList(line, words, wordIndex, wordCursor, cursor)
         } else {
