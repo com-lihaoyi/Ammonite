@@ -1,17 +1,16 @@
 package ammonite.repl
 
 import java.io.{InputStream, OutputStream}
-
 import scala.collection.JavaConverters._
 import fastparse.core.Parsed
+import fastparse.utils.ParserInput
 import org.jline.reader._
-import org.jline.terminal._
 import org.jline.reader.impl.history.DefaultHistory
-import org.jline.utils.AttributedString
 import org.jline.reader.impl.DefaultParser.ArgumentList
+import org.jline.terminal._
+import org.jline.utils.AttributedString
 import ammonite.util.{Catching, Colors, Res}
 import ammonite.interp.Parsers
-import fastparse.utils.ParserInput
 
 /**
  * All the mucky JLine interfacing code
@@ -97,7 +96,9 @@ class AmmCompleter(highlighter: Highlighter) extends Completer {
   var compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]) =
     (x, y) => (0, Seq.empty, Seq.empty)
 
-  override def complete(reader: LineReader, line: ParsedLine, candidates: java.util.List[Candidate]): Unit = {
+  override def complete(reader: LineReader,
+                        line: ParsedLine,
+                        candidates: java.util.List[Candidate]): Unit = {
     val (completionBase, completions, sigs) = compilerComplete(
       line.cursor(),
       line.line()
