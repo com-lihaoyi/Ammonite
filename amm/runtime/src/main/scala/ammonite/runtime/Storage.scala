@@ -22,6 +22,7 @@ trait Storage{
   def loadPredef: Option[(String, Path)]
   val fullHistory: StableRef[History]
   val ivyCache: StableRef[Storage.IvyMap]
+
   def compileCacheSave(path: String, tag: Tag, data: Storage.CompileCache): Unit
   def compileCacheLoad(path: String, tag: Tag): Option[Storage.CompileCache]
   def classFilesListSave(filePathPrefix: RelPath,
@@ -30,6 +31,12 @@ trait Storage{
   def classFilesListLoad(filePathPrefix: RelPath, tag: Tag): Option[ScriptOutput]
   def getSessionId: Long
 
+  // Store classpathCache in-memory regardless of Storage impl
+  private var _classpathCache: Option[Vector[java.io.File]] = None
+  val classpathCache = new StableRef[Option[Vector[java.io.File]]]{
+    def apply() = _classpathCache
+    def update(value: Option[Vector[java.io.File]]): Unit = _classpathCache = value
+  }
 }
 
 object Storage{
