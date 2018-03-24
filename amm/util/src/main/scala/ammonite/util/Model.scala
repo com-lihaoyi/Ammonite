@@ -66,9 +66,10 @@ object Name{
     * in the JSON cache files as well as improving performance of
     * reading/writing since we read/write [[Name]]s a *lot*.
     */
-  implicit val nameRW: upickle.default.ReadWriter[Name] = upickle.default.ReadWriter[Name](
-    name => upickle.Js.Str(name.raw),
-    {case upickle.Js.Str(raw) => Name(raw.toString)}
+  implicit val nameRW: upickle.default.ReadWriter[Name] =
+    upickle.default.readwriter[String].bimap[Name](
+      name => name.raw,
+      raw => Name(raw)
   )
 
   val alphaKeywords = Set(

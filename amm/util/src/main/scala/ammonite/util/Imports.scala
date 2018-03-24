@@ -120,9 +120,10 @@ class Imports private (val value: Seq[ImportData]){
 }
 
 object Imports{
-  implicit def rw: upickle.default.ReadWriter[Imports] = upickle.default.ReadWriter[Imports](
-    imports => upickle.default.writeJs(imports.value),
-    {case js => Imports(upickle.default.readJs[Seq[ImportData]](js))}
+  implicit val rw: upickle.default.ReadWriter[Imports] =
+    upickle.default.readwriter[Seq[ImportData]].bimap[Imports](
+      imports => imports.value,
+      data => Imports(data)
   )
   // This isn't called directly, but we need to define it so uPickle can know
   // how to read/write imports
