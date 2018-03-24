@@ -4,7 +4,7 @@ import scalaj.http._
 
 @main
 def addPost(title: String, body: String) = {
-  upickle.json.read(
+  ujson.read(
     Http("http://jsonplaceholder.typicode.com/posts")
       .postForm(Seq("title"  -> title,
                     "body"   -> body,
@@ -18,7 +18,7 @@ def addPost(title: String, body: String) = {
 
 @main
 def comments(postId: Int) = {
-  val json = upickle.json.read(
+  val json = ujson.read(
     Http(s"http://jsonplaceholder.typicode.com/comments?postId=$postId")
       .asString
       .body
