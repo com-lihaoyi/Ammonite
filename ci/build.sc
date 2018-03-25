@@ -162,10 +162,9 @@ def publishExecutable(ammoniteVersion: String,
     //Prepare executable
     %sbt("++" + version, "amm/test:assembly")
     val bv = binVersion(version)
-    val releaseName = if(unstable) "snapshot-commit-uploads" else ammoniteVersion
     upload(
       cwd/'amm/'target/'amm,
-      releaseName,
+      ammoniteVersion,
       s"$bv-$ammoniteVersion",
       publishKey
     )
