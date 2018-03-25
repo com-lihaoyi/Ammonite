@@ -3,21 +3,15 @@ import ammonite.ops._
 import scalaj.http._
 
 @main
-def shorten(longUrl: String) = {
-  println("shorten longUrl " + longUrl)
-  val shortUrl = Http("https://git.io")
-    .postForm(Seq("url" -> longUrl))
-    .asString
-    .headers("Location")
-    .head
-  println("shorten shortUrl " + shortUrl)
-  shortUrl
-}
-@main
 def apply(uploadedFile: Path,
           tagName: String,
           uploadName: String,
           authKey: String): String = {
+  println("upload.apply")
+  println(uploadedFile)
+  println(tagName)
+  println(uploadName)
+  println(authKey)
   val body = Http("https://api.github.com/repos/lihaoyi/Ammonite/releases/tags/" + tagName)
     .header("Authorization", "token " + authKey)
     .asString.body
@@ -43,10 +37,5 @@ def apply(uploadedFile: Path,
   println(res.body)
   val longUrl = upickle.json.read(res.body)("browser_download_url").toString
 
-  println("Long Url " + longUrl)
-
-  val shortUrl = shorten(longUrl)
-
-  println("Short Url " + shortUrl)
-  shortUrl
+  longUrl
 }

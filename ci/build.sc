@@ -118,12 +118,12 @@ def publishDocs() = {
   updateConstants(
     latestTaggedVersion,
     buildVersion,
-    upload.shorten(s"https://github.com/lihaoyi/Ammonite/releases/download/$stableKey"),
-    upload.shorten(s"https://github.com/lihaoyi/Ammonite/releases/download/$unstableKey"),
+    s"https://github.com/lihaoyi/Ammonite/releases/download/$stableKey",
+    s"https://github.com/lihaoyi/Ammonite/releases/download/$unstableKey",
     for(k <- oldStableKeys)
-    yield (k, upload.shorten(s"https://github.com/lihaoyi/Ammonite/releases/download/$k")),
+    yield (k, s"https://github.com/lihaoyi/Ammonite/releases/download/$k"),
     for(k <- oldUnstableKeys)
-    yield (k, upload.shorten(s"https://github.com/lihaoyi/Ammonite/releases/download/$k"))
+    yield (k, s"https://github.com/lihaoyi/Ammonite/releases/download/$k")
   )
 
   %sbt "readme/compile"
@@ -164,7 +164,7 @@ def publishExecutable(ammoniteVersion: String,
     val bv = binVersion(version)
     upload(
       cwd/'amm/'target/'amm,
-      ammoniteVersion,
+      latestTaggedVersion,
       s"$bv-$ammoniteVersion",
       publishKey
     )
