@@ -106,11 +106,11 @@ def publishDocs() = {
     }else{
       (
         s"$latestTaggedVersion/2.12-$latestTaggedVersion",
-        s"snapshot-commit-uploads/2.12-$buildVersion",
+        s"$latestTaggedVersion/2.12-$buildVersion",
         for(v <- Seq("2.11"))
         yield s"$latestTaggedVersion/$v-$latestTaggedVersion",
         for(v <- Seq("2.11"))
-        yield s"snapshot-commit-uploads/$v-$buildVersion"
+        yield s"$latestTaggedVersion/$v-$buildVersion"
       )
     }
   println("(stableKey, unstableKey)")

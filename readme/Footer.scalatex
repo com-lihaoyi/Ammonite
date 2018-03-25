@@ -114,6 +114,19 @@
 
 
   @sect{Changelog}
+    @sect{1.1.0}
+      @ul
+        @li
+          Bumped @lnk("uPickle", "https://github.com/lihaoyi/upickle") version to 0.6.0
+        @li
+          Experimental Windows support in the Ammonite REPL using JLine3 (@issue(775)),
+          thanks to @lnk("Sakib Hadziavdic", "https://github.com/sake92")
+        @li
+          Experimental Java 9 support (@issue(761)) thanks to
+          @lnk("robby-phd", "https://github.com/robby-phd")
+        @li
+          Range-position support (@issue(771)) thanks to
+          @lnk("Olivier Melois", "https://github.com/Baccata")
     @sect{1.0.5}
       @ul
         @li
