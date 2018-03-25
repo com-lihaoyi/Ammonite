@@ -260,9 +260,9 @@ span.hljs-tag, span.hljs-symbol{
   <p>
     Or to try out the <a href="#UnstableChangelog">latest features</a> in our
     <a href="#UnstableVersions">Unstable Release</a>
-    1.0.5-15-db11210:
+    1.0.5-21-2f995c1:
 </p>
-  <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/vxRQU &amp;&amp; sudo chmod +x /usr/local/bin/amm &amp;&amp; amm
+  <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/vxR5g &amp;&amp; sudo chmod +x /usr/local/bin/amm &amp;&amp; amm
 </code></pre>
   <p>
     This will give you access to the Ammonite-REPL:
@@ -322,9 +322,9 @@ sourceGenerators in Test += Def.task {
   <p>
     Or to try out the <a href="#UnstableChangelog">latest features</a> in our
     <a href="#UnstableVersions">Unstable Release</a>
-    1.0.5-15-db11210:
+    1.0.5-21-2f995c1:
 </p>
-  <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;1.0.5-15-db11210&quot; % &quot;test&quot; cross CrossVersion.full
+  <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;1.0.5-21-2f995c1&quot; % &quot;test&quot; cross CrossVersion.full
 </code></pre>
   <p>
     After that, simply hit
@@ -1332,9 +1332,9 @@ target
 terminal
 .travis.yml
 
-real	0m0.001s
+real	0m0.002s
 user	0m0.000s
-sys	0m0.004s</pre><pre><span style="color: #2980b9;">Compiling /home/travis/build/lihaoyi/Ammonite/shell/src/main/resources/ammonite/shell/example-predef-bare.sc</span><span>
+sys	0m0.000s</pre><pre><span style="color: #2980b9;">Compiling /home/travis/build/lihaoyi/Ammonite/shell/src/main/resources/ammonite/shell/example-predef-bare.sc</span><span>
 </span><span style="color: #2980b9;">Compiling /home/travis/build/lihaoyi/Ammonite/shell/src/main/resources/ammonite/shell/example-predef-bare.sc #2</span><span>
 Welcome to the Ammonite Repl 1.0.5
 (Scala 2.12.4 Java 1.8.0_151)
@@ -1348,7 +1348,7 @@ If you like Ammonite, please support our development at www.patreon.com/lihaoyi
 </span><span style="color: #27ae60;">'LICENSE</span><span>            </span><span style="color: #27ae60;">'ci</span><span>                 </span><span style="color: #27ae60;">'project</span><span>            </span><span style="color: #27ae60;">'target</span><span>
 </span><span style="color: #27ae60;">'amm</span><span>                </span><span style="color: #27ae60;">'deploy_key</span><span>         </span><span style="color: #27ae60;">'readme</span><span>             </span><span style="color: #27ae60;">'terminal</span><span>
 ,
-  14878157 nanoseconds
+  13685594 nanoseconds
 )
 </span></pre></div>
 
@@ -2132,9 +2132,9 @@ replServer.start()
   <p>
     Or to try out the <a href="#UnstableChangelog">latest features</a> in our
     <a href="#UnstableVersions">Unstable Release</a>
-    1.0.5-15-db11210:
+    1.0.5-21-2f995c1:
 </p>
-  <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/vxRQU &amp;&amp; sudo chmod +x /usr/local/bin/amm &amp;&amp; amm
+  <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/vxR5g &amp;&amp; sudo chmod +x /usr/local/bin/amm &amp;&amp; amm
 </code></pre>
   <p>
     And read on to learn about how Scala scripts work.
@@ -4139,16 +4139,16 @@ HELLO
 </p>
       <div><pre><span style="color: #8e44ad;">
 bash$ </span>git branch
-* (HEAD detached at db11210)
+* (HEAD detached at 2f995c1)
   master</pre><pre><span style="color: #8e44ad;">@ </span><span>%git </span><span style="color: #27ae60;">'branch</span><span> 
-* (HEAD detached at db11210)
+* (HEAD detached at 2f995c1)
   master
 
 </span></pre></div>
       <div><pre><span style="color: #8e44ad;">
 bash$ </span>date
-Sun Mar 25 16:20:54 UTC 2018</pre><pre><span style="color: #8e44ad;">@ </span><span>%date 
-Sun Mar 25 16:21:04 UTC 2018
+Sun Mar 25 17:01:04 UTC 2018</pre><pre><span style="color: #8e44ad;">@ </span><span>%date 
+Sun Mar 25 17:01:13 UTC 2018
 
 </span></pre></div>
 
@@ -4383,7 +4383,7 @@ Hello from Java!
 </span><span style="color: #27ae60;">import </span><span style="color: #16a085;">java.util._</span><span>
 
 </span><span style="color: #8e44ad;">@ </span><span style="color: #f39c12;">val</span><span> date = </span><span style="color: #f39c12;">new</span><span> </span><span style="color: #27ae60;">Date</span><span>() 
-</span><span style="color: #16a085;">date</span><span>: </span><span style="color: #27ae60;">Date</span><span> = Sun Mar 25 16:23:24 UTC 2018
+</span><span style="color: #16a085;">date</span><span>: </span><span style="color: #27ae60;">Date</span><span> = Sun Mar 25 17:03:42 UTC 2018
 
 </span><span style="color: #8e44ad;">@ </span><span>date.getDay() 
 </span><span style="color: #16a085;">res3</span><span>: </span><span style="color: #27ae60;">Int</span><span> = </span><span style="color: #27ae60;">0</span><span>
@@ -6339,15 +6339,15 @@ usersWithInvalidEmail: List[(Long, String)] = List((1L, &quot;foo@bar&quot;), (2
       The page above contains the documentation for the latest stable version
       of Ammonite, <code>1.0.5</code>. Ammonite also publishes
       unstable versions, the latest of which is
-      <code>1.0.5-15-db11210</code> and is available for direct
+      <code>1.0.5-21-2f995c1</code> and is available for direct
       download:
 </p>
-    <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/vxRQU &amp;&amp; sudo chmod +x /usr/local/bin/amm &amp;&amp; amm
+    <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/vxR5g &amp;&amp; sudo chmod +x /usr/local/bin/amm &amp;&amp; amm
 </code></pre>
     <p>
       Or usage in an SBT project
 </p>
-    <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;1.0.5-15-db11210&quot; % &quot;test&quot; cross CrossVersion.full
+    <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;1.0.5-21-2f995c1&quot; % &quot;test&quot; cross CrossVersion.full
 </code></pre>
     <p>
       Ammonite also provides standalone unstable executables for older versions
@@ -6355,9 +6355,9 @@ usersWithInvalidEmail: List[(Long, String)] = List((1L, &quot;foo@bar&quot;), (2
 </p>
     
       <b>
-        Scala snapshot-commit-uploads/2.11-1.0.5-15-db11210
+        Scala snapshot-commit-uploads/2.11-1.0.5-21-2f995c1
 </b>
-      <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/vxRQT &amp;&amp; sudo chmod +x /usr/local/bin/amm &amp;&amp; amm</code></pre>
+      <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo curl -L -o /usr/local/bin/amm https://git.io/vxR52 &amp;&amp; sudo chmod +x /usr/local/bin/amm &amp;&amp; amm</code></pre>
     <p>
       These unstable versions will contain any brand-new features that are
       currently being worked on, with the caveat that they are unstable and
