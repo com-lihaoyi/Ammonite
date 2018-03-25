@@ -175,7 +175,7 @@ lazy val ammUtil = project
     sharedSettings,
     name := "ammonite-util",
     libraryDependencies ++= Seq(
-      "com.lihaoyi" %% "upickle" % "0.6.0-RC7",
+      "com.lihaoyi" %% "upickle" % "0.6.0-RC8",
       "com.lihaoyi" %% "pprint" % "0.5.2",
       "com.lihaoyi" %% "fansi" % "0.2.4"
     )
