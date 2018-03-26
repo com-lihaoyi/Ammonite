@@ -3,7 +3,7 @@ package ammonite.runtime
 import java.io.File
 import java.util.zip.ZipFile
 
-import ammonite.ops.Path
+import ammonite.ops._
 import io.github.retronym.java9rtexport.Export
 
 import scala.util.control.NonFatal
@@ -72,10 +72,12 @@ object Classpath {
             val tmpRt = Export.export()
             rtCacheDir(storage) match {
               case Some(path) =>
-                val rt = (path / rtJarName).toIO
-                if (!rt.exists)
-                  java.nio.file.Files.copy(tmpRt.toPath, rt.toPath)
-                files.append(rt)
+                val rt = path / rtJarName
+                if (!exists(rt)) {
+                  mkdir! path
+                  cp(Path(tmpRt), rt)
+                }
+                files.append(rt.toIO)
               case _ => files.append(tmpRt)
             }
         }
