@@ -75,7 +75,7 @@ object Frame{
     val hash = SpecialClassLoader.initialClasspathSignature(mainThread.getContextClassLoader)
     def special = new SpecialClassLoader(
       new ForkClassLoader(mainThread.getContextClassLoader, getClass.getClassLoader),
-      hash,
+      hash.map{case (a, b) => (Right(a), b)},
       likelyJdkSourceLocation.toNIO.toUri.toURL
     )
 
@@ -178,7 +178,9 @@ class ForkClassLoader(realParent: ClassLoader, fakeParent: ClassLoader)
   *
   * http://stackoverflow.com/questions/3544614/how-is-the-control-flow-to-findclass-of
   */
-class SpecialClassLoader(parent: ClassLoader, parentSignature: Seq[(Path, Long)], urls: URL*)
+class SpecialClassLoader(parent: ClassLoader,
+                         parentSignature: Seq[(Either[String, Path], Long)],
+                         urls: URL*)
   extends URLClassLoader(urls.toArray, parent){
 
   /**
@@ -187,7 +189,7 @@ class SpecialClassLoader(parent: ClassLoader, parentSignature: Seq[(Path, Long)]
     */
   val newFileDict = mutable.Map.empty[String, Array[Byte]]
   def addClassFile(name: String, bytes: Array[Byte]) = {
-    val tuple = Path(name, root) -> bytes.sum.hashCode().toLong
+    val tuple = Left(name) -> bytes.sum.hashCode().toLong
     classpathSignature0 = classpathSignature0 ++ Seq(tuple)
     newFileDict(name) = bytes
   }
@@ -232,13 +234,16 @@ class SpecialClassLoader(parent: ClassLoader, parentSignature: Seq[(Path, Long)]
 
   private def jarSignature(url: URL) = {
     val path = Path(java.nio.file.Paths.get(url.toURI()).toFile(), root)
-    path -> (if (exists(path))path.mtime.toMillis else 0)
+    Right(path) -> (if (exists(path))path.mtime.toMillis else 0)
   }
 
   private var classpathSignature0 = parentSignature
   def classpathSignature = classpathSignature0
-  def classpathHash = {
+  def classpathHash(wd: Path) = {
     Util.md5Hash(
+      // Include the current working directory in the classpath hash, to make
+      // sure different scripts cached
+      Iterator(wd.toString.getBytes) ++
       classpathSignature0.iterator.map { case (path, long) =>
         val buffer = ByteBuffer.allocate(8)
         buffer.putLong(long)
