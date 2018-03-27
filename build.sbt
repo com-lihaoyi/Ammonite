@@ -159,7 +159,8 @@ lazy val amm = project
           Seq(
             Seq("#!/usr/bin/env sh")
               .filter(_ => shebang),
-            Seq(":; alias ::=''"),
+            Seq("shopt -s expand_aliases", "alias ::=''")
+              .map(line => s":; $line"),
             (shellCommands :+ "exit")
               .map(line => s":: $line"),
             "@echo off" +: cmdCommands :+ "exit /B",
