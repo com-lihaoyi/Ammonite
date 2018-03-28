@@ -152,10 +152,34 @@ lazy val amm = project
 
 
     assemblyOption in assembly := (assemblyOption in assembly).value.copy(
-      prependShellScript = Some(
+      prependShellScript = {
+        def universalScript(shellCommands: Seq[String],
+                            cmdCommands: Seq[String],
+                            shebang: Boolean = true): Seq[String] = {
+          Seq(
+            Seq("#!/usr/bin/env sh")
+              .filter(_ => shebang),
+            Seq("shopt -s expand_aliases", "alias ::=''")
+              .map(line => s":; $line"),
+            (shellCommands :+ "exit")
+              .map(line => s":: $line"),
+            "@echo off" +: cmdCommands :+ "exit /B",
+            Seq("\r\n")
+          ).flatten
+        }
+
+        def defaultUniversalScript(javaOpts: Seq[String] = Seq.empty, shebang: Boolean = true): Seq[String] = {
+          val javaOptsString = javaOpts.map(_ + " ").mkString
+          universalScript(
+            shellCommands = Seq(s"exec java -jar $javaOptsString" + """$JAVA_OPTS "$0" "$@""""),
+            cmdCommands = Seq(s"java -jar $javaOptsString" + """%JAVA_OPTS% "%~dpnx0" %*"""),
+            shebang = shebang
+          )
+        }
+
         // G1 Garbage Collector is awesome https://github.com/lihaoyi/Ammonite/issues/216
-        Seq("#!/usr/bin/env sh", """exec java -jar -Xmx500m -XX:+UseG1GC $JAVA_OPTS "$0" "$@"""")
-      )
+        Some(defaultUniversalScript(Seq("-Xmx500m", "-XX:+UseG1GC")))
+      }
     ),
     assemblyJarName in assembly := s"${name.value}-${version.value}-${scalaVersion.value}",
     assembly in Test := {
