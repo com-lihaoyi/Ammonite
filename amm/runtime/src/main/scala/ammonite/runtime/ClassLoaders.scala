@@ -116,7 +116,7 @@ object SpecialClassLoader{
     * heuristic improves perf by greatly cutting down on the amount of files we
     * need to mtime in many common cases.
     */
-  def initialClasspathSignature(classloader: ClassLoader): Seq[(Path, Long)] = {
+  def initialClasspathSignature(classloader: ClassLoader): Seq[(Either[String, Path], Long)] = {
     val allClassloaders = {
       val all = mutable.Buffer.empty[ClassLoader]
       var current = classloader
@@ -134,7 +134,7 @@ object SpecialClassLoader{
         (simpleNameRegex.findPrefixOf(path.last) != Some(path.last)) &&
         !path.last.endsWith(".class")
       }
-      ls.rec(skip = skipSuspicious)! Path(d) | (x => (x, x.mtime.toMillis))
+      ls.rec(skip = skipSuspicious)! Path(d) | (x => (Right(x), x.mtime.toMillis))
     }
 
 
