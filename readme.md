@@ -1,4 +1,4 @@
-# Ammonite [![Build Status][travis-badge]][travis-link] [![Build (Windows)][appveyor-badge]][appveyor-link] [![Gitter Chat][gitter-badge]][gitter-link] [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.lihaoyi/ammonite_2.11.8/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.lihaoyi/ammonite_2.11.8) [![Patreon][patreon-badge]][patreon-link]
+# Ammonite [![Build Status][travis-badge]][travis-link] [![Build (Windows)][appveyor-badge]][appveyor-link] [![Gitter Chat][gitter-badge]][gitter-link] [![Patreon][patreon-badge]][patreon-link]
 
 
 [travis-badge]: https://travis-ci.org/lihaoyi/Ammonite.svg
