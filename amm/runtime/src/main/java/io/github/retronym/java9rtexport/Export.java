@@ -42,7 +42,9 @@ public class Export {
     private final static Object lock = new Object();
     private static File tempFile = null;
 
-    public static File export() {
+    public static String rtJarName = "rt-" + System.getProperty("java.version") + ".jar";
+
+    public static File rt() {
         try {
             synchronized (lock) {
                 if (tempFile == null) {
@@ -61,7 +63,6 @@ public class Export {
                             Path next = iterator.next();
                             Copy.copyDirectory(next, zipfs.getPath("/"));
                         }
-                        zipfs.close();
                     }
                 }
             }
@@ -70,5 +71,37 @@ public class Export {
             System.exit(-1);
         }
         return tempFile;
+    }
+
+    public static boolean rtTo(File dest, boolean verbose) {
+        try {
+            if (!dest.exists()) {
+                if (verbose) {
+                    System.out.println("Copying Java " +
+                            System.getProperty("java.version") +
+                            " runtime jar to " +
+                            dest.getParentFile() +
+                            " ...");
+                    System.out.flush();
+                }
+                dest.getParentFile().mkdirs();
+                java.nio.file.Files.copy(rt().toPath(), dest.toPath());
+                return true;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(-1);
+        }
+        return false;
+    }
+
+    public static File rtAt(File dir, boolean verbose) {
+        File f = new File(dir, rtJarName);
+        rtTo(f, verbose);
+        return f;
+    }
+
+    public static File rtAt(File dir) {
+        return rtAt(dir, false);
     }
 }

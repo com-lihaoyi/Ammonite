@@ -19,8 +19,6 @@ object Classpath {
        .get("ammonite.trace-classpath")
        .exists(_.toLowerCase == "true")
 
-  def rtJarName = s"rt-${System.getProperty("java.version")}.jar"
-
   /**
    * In memory cache of all the jars used in the compiler. This takes up some
    * memory but is better than reaching all over the filesystem every time we
@@ -69,16 +67,9 @@ object Classpath {
             .loadClass("javax.script.ScriptEngineManager")
         } catch {
           case _: ClassNotFoundException =>
-            val tmpRt = Export.export()
             rtCacheDir(storage) match {
-              case Some(path) =>
-                val rt = path / rtJarName
-                if (!exists(rt)) {
-                  mkdir! path
-                  cp(Path(tmpRt), rt)
-                }
-                files.append(rt.toIO)
-              case _ => files.append(tmpRt)
+              case Some(path) => files.append(Export.rtAt(path.toIO))
+              case _ => files.append(Export.rt())
             }
         }
       }
