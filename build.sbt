@@ -155,7 +155,7 @@ lazy val amm = project
       prependShellScript = {
         def universalScript(shellCommands: String,
                             cmdCommands: String,
-                            shebang: Boolean = true): String = {
+                            shebang: Boolean = false): String = {
           Seq(
             if (shebang) "#!/usr/bin/env sh" else "",
             "@ 2>/dev/null # 2>nul & echo off & goto BOF\r",
@@ -173,7 +173,7 @@ lazy val amm = project
           ).filterNot(_.isEmpty).mkString("\n")
         }
 
-        def defaultUniversalScript(javaOpts: Seq[String] = Seq.empty, shebang: Boolean = true): Seq[String] = {
+        def defaultUniversalScript(javaOpts: Seq[String] = Seq.empty, shebang: Boolean = false): Seq[String] = {
           val javaOptsString = javaOpts.map(_ + " ").mkString
           Seq(universalScript(
             shellCommands = s"""exec java -jar $javaOptsString$$JAVA_OPTS "$$0" "$$@"""",
