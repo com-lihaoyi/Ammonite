@@ -75,7 +75,7 @@ object Frame{
     val hash = SpecialClassLoader.initialClasspathSignature(mainThread.getContextClassLoader)
     def special = new SpecialClassLoader(
       new ForkClassLoader(mainThread.getContextClassLoader, getClass.getClassLoader),
-      hash.map{case (a, b) => (Right(a), b)},
+      hash,
       likelyJdkSourceLocation.toNIO.toUri.toURL
     )
 
@@ -127,7 +127,7 @@ object SpecialClassLoader{
       all
     }
 
-    def findMtimes(d: java.nio.file.Path): Seq[(Path, Long)] = {
+    def findMtimes(d: java.nio.file.Path): Seq[(Either[String, Path], Long)] = {
       def skipSuspicious(path: Path) = {
         // Leave out sketchy files which don't look like package names or
         // class files
@@ -151,9 +151,8 @@ object SpecialClassLoader{
       }
       else if (java.nio.file.Files.isDirectory(p)){
         Some(findMtimes(p))
-      }
-      else  {
-        Some(Seq(Path(p) -> Path(p).mtime.toMillis))
+      } else  {
+        Some(Seq(Right(Path(p)) -> Path(p).mtime.toMillis))
       }
     }.flatten
 
