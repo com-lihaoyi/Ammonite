@@ -31,7 +31,7 @@ and the doc-site every commit; the doc-site is available at
 - http://www.lihaoyi.com/Ammonite/#UnstableVersions
 
 And contains instructions on how to download the per-commit executable or 
-depend on the perf-commit maven artifact.
+depend on the per-commit maven artifact.
 
 # Developer Docs
 
