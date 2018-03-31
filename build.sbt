@@ -153,28 +153,33 @@ lazy val amm = project
 
     assemblyOption in assembly := (assemblyOption in assembly).value.copy(
       prependShellScript = {
-        def universalScript(shellCommands: Seq[String],
-                            cmdCommands: Seq[String],
-                            shebang: Boolean = true): Seq[String] = {
+        def universalScript(shellCommands: String,
+                            cmdCommands: String,
+                            shebang: Boolean = false): String = {
           Seq(
-            Seq("#!/usr/bin/env sh")
-              .filter(_ => shebang),
-            Seq("shopt -s expand_aliases", "alias ::=''")
-              .map(line => s":; $line"),
-            (shellCommands :+ "exit")
-              .map(line => s":: $line"),
-            "@echo off" +: cmdCommands :+ "exit /B",
-            Seq("\r\n")
-          ).flatten
+            if (shebang) "#!/usr/bin/env sh" else "",
+            "@ 2>/dev/null # 2>nul & echo off & goto BOF\r",
+            ":",
+            shellCommands.replaceAll("\r\n|\n", "\n"),
+            "exit",
+            Seq(
+              "",
+              ":BOF",
+              "@echo off",
+              cmdCommands.replaceAll("\r\n|\n", "\r\n"),
+              "exit /B %errorlevel%",
+              ""
+            ).mkString("\r\n")
+          ).filterNot(_.isEmpty).mkString("\n")
         }
 
-        def defaultUniversalScript(javaOpts: Seq[String] = Seq.empty, shebang: Boolean = true): Seq[String] = {
+        def defaultUniversalScript(javaOpts: Seq[String] = Seq.empty, shebang: Boolean = false): Seq[String] = {
           val javaOptsString = javaOpts.map(_ + " ").mkString
-          universalScript(
-            shellCommands = Seq(s"exec java -jar $javaOptsString" + """$JAVA_OPTS "$0" "$@""""),
-            cmdCommands = Seq(s"java -jar $javaOptsString" + """%JAVA_OPTS% "%~dpnx0" %*"""),
+          Seq(universalScript(
+            shellCommands = s"""exec java -jar $javaOptsString$$JAVA_OPTS "$$0" "$$@"""",
+            cmdCommands = s"""java -jar $javaOptsString%JAVA_OPTS% "%~dpnx0" %*""",
             shebang = shebang
-          )
+          ))
         }
 
         // G1 Garbage Collector is awesome https://github.com/lihaoyi/Ammonite/issues/216
