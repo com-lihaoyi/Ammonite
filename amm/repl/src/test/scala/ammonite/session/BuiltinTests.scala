@@ -25,6 +25,10 @@ object BuiltinTests extends TestSuite{
 
         @ repl.frontEnd() = ammonite.repl.AmmoniteFrontEnd()
 
+        @ // Changing how to print values:
+
+        @ repl.pprinter() = pprint.copy(additionalHandlers = { case value: Double =>  pprint.Tree.Literal(f"$value%1.5f") /* 5 digit precision */ })
+
         @ // Changing the colors used by Ammonite; all at once:
 
         @ interp.colors() = ammonite.util.Colors.BlackWhite
