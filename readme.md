@@ -1,6 +1,5 @@
 # Ammonite [![Build Status][travis-badge]][travis-link] [![Build (Windows)][appveyor-badge]][appveyor-link] [![Gitter Chat][gitter-badge]][gitter-link] [![Patreon][patreon-badge]][patreon-link]
 
-
 [travis-badge]: https://travis-ci.org/lihaoyi/Ammonite.svg
 [travis-link]: https://travis-ci.org/lihaoyi/Ammonite
 [appveyor-badge]: https://ci.appveyor.com/api/projects/status/github/lihaoyi/Ammonite
