@@ -1434,13 +1434,19 @@
       @readme.Sample.unstableCurl
 
     @p
-      The latest build can also be run on windows. Just save it as amm.bat:
+      On Cygwin, run the following after the above:
+
+    @hl.sh
+      @readme.Sample.cygwinSed
+
+    @p
+      The latest build can also be run as Windows batch; just save the following as amm.bat:
 
     @p
       @lnk(ammonite.Constants.unstableCurlUrl)
 
     @p
-      Or usage in an SBT project
+      For usage in a SBT project:
 
     @hl.scala
       libraryDependencies += "com.lihaoyi" % "ammonite" % "@ammonite.Constants.unstableVersion" % "test" cross CrossVersion.full
