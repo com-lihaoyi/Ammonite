@@ -1,15 +1,13 @@
 package ammonite.interp
 
-
 import ammonite._
 import ammonite.util._
-import ammonite.util.Util.{windowsPlatform, newLine, normalizeNewlines}
+import ammonite.util.Util.{CodeSource, newLine, normalizeNewlines, windowsPlatform}
 import fastparse.all._
 
 import scala.reflect.internal.Flags
 import scala.tools.nsc.{Global => G}
 import collection.mutable
-import scala.io.{Codec, Source}
 /**
   * Responsible for all scala-source-code-munging that happens within the
   * Ammonite REPL.
@@ -32,7 +30,7 @@ trait Preprocessor{
   def transform(stmts: Seq[String],
                 resultIndex: String,
                 leadingSpaces: String,
-                pkgName: Seq[Name],
+                codeSource: CodeSource,
                 indexedWrapperName: Name,
                 imports: Imports,
                 printerTemplate: String => String,
@@ -109,7 +107,7 @@ object Preprocessor{
     def transform(stmts: Seq[String],
                   resultIndex: String,
                   leadingSpaces: String,
-                  pkgName: Seq[Name],
+                  codeSource: CodeSource,
                   indexedWrapperName: Name,
                   imports: Imports,
                   printerTemplate: String => String,
@@ -118,11 +116,11 @@ object Preprocessor{
                   codeWrapper: CodeWrapper) = {
       // All code Ammonite compiles must be rooted in some package within
       // the `ammonite` top-level package
-      assert(pkgName.head == Name("ammonite"))
+      assert(codeSource.pkgName.head == Name("ammonite"))
       for{
         Preprocessor.Expanded(code, printer) <- expandStatements(stmts, resultIndex, skipEmpty)
         (wrappedCode, importsLength, userCodeNestingLevel) = wrapCode(
-          pkgName, indexedWrapperName, leadingSpaces + code,
+          codeSource, indexedWrapperName, leadingSpaces + code,
           printerTemplate(printer.mkString(", ")),
           imports, extraCode, codeWrapper
         )
@@ -289,7 +287,7 @@ object Preprocessor{
 
 
 
-  def wrapCode(pkgName: Seq[Name],
+  def wrapCode(codeSource: CodeSource,
                indexedWrapperName: Name,
                code: String,
                printCode: String,
@@ -300,7 +298,7 @@ object Preprocessor{
     //we need to normalize topWrapper and bottomWrapper in order to ensure
     //the snippets always use the platform-specific newLine
     val (topWrapper, bottomWrapper, userCodeNestingLevel) =
-     codeWrapper(code, pkgName, imports, printCode, indexedWrapperName, extraCode)
+     codeWrapper(code, codeSource, imports, printCode, indexedWrapperName, extraCode)
     val importsLen = topWrapper.length
 
     (topWrapper + code + bottomWrapper, importsLen, userCodeNestingLevel)
@@ -311,7 +309,7 @@ object Preprocessor{
     def wrapperPath: Seq[Name] = Nil
     def apply(
       code: String,
-      pkgName: Seq[Name],
+      source: CodeSource,
       imports: Imports,
       printCode: String,
       indexedWrapperName: Name,
@@ -322,12 +320,13 @@ object Preprocessor{
     private val userCodeNestingLevel = 1
     def apply(
       code: String,
-      pkgName: Seq[Name],
+      source: CodeSource,
       imports: Imports,
       printCode: String,
       indexedWrapperName: Name,
       extraCode: String
     ) = {
+      import source.pkgName
       val top = normalizeNewlines(s"""
 package ${pkgName.head.encoded}
 package ${Util.encodeScalaSourcePath(pkgName.tail)}
@@ -368,13 +367,13 @@ object ${indexedWrapperName.backticked}{\n"""
     override val wrapperPath: Seq[Name] = Seq(Name("instance"))
     def apply(
       code: String,
-      pkgName: Seq[Name],
+      source: CodeSource,
       imports: Imports,
       printCode: String,
       indexedWrapperName: Name,
       extraCode: String
     ) = {
-
+      import source.pkgName
       val isObjDef = Parsers.isObjDef(code)
 
       if (isObjDef) {
