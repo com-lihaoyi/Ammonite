@@ -1,7 +1,11 @@
 
 package ammonite.main
 
+import java.io.InputStream
+
 import ammonite.util.Util
+
+import scala.io.Codec
 
 /**
   * Constants used in the default configuration for the Ammonite REPL
@@ -50,5 +54,31 @@ object Defaults{
     |}
   """.stripMargin
   def ammoniteHome = ammonite.ops.Path(System.getProperty("user.home"))/".ammonite"
+
+  def alreadyLoadedDependencies(
+    resourceName: String = "amm-dependencies.txt"
+  ): Seq[coursier.Dependency] = {
+
+    var is: InputStream = null
+
+    try {
+      is = Thread.currentThread().getContextClassLoader.getResourceAsStream(resourceName)
+      if (is == null)
+        throw new Exception(s"Resource $resourceName not found")
+      scala.io.Source.fromInputStream(is)(Codec.UTF8)
+        .mkString
+        .split('\n')
+        .filter(_.nonEmpty)
+        .map(l => l.split(':') match {
+          case Array(org, name, ver) =>
+            coursier.Dependency(coursier.Module(org, name), ver)
+          case other =>
+            throw new Exception(s"Cannot parse line '$other' from resource $resourceName")
+        })
+    } finally {
+      if (is != null)
+        is.close()
+    }
+  }
 
 }
