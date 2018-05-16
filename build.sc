@@ -1,4 +1,6 @@
 import mill._, scalalib._, publish._
+import ammonite.ops._, ImplicitWd._
+import $file.ci.upload
 
 val versionRegex = "val version = \"([^\"]+)\"".r
 
@@ -7,11 +9,10 @@ val ammVersion = versionRegex
   .get
   .group(1)
 
+val binCrossScalaVersions = Seq("2.11.12", "2.12.6")
 
-
-val binCrossScalaVersions = Seq("2.11.11", "2.12.6")
 val fullCrossScalaVersions = Seq(
-  "2.11.3", "2.11.4", "2.11.5", "2.11.6", "2.11.7", "2.11.8", "2.11.9", "2.11.11",
+  "2.11.3", "2.11.4", "2.11.5", "2.11.6", "2.11.7", "2.11.8", "2.11.9", "2.11.11", "2.11.12",
   "2.12.0", "2.12.1", "2.12.2", "2.12.3", "2.12.4", "2.12.6"
 )
 
@@ -251,19 +252,180 @@ class SshdModule(val crossScalaVersion: String) extends AmmModule{
 }
 
 def unitTest(scalaVersion: String = sys.env("TRAVIS_SCALA_VERSION")) = T.command{
-  ops(scalaVersion).test.test()
-  terminal(scalaVersion).test.test()
-  amm.repl(scalaVersion).test.test()
-  amm(scalaVersion).test.test()
-  shell(scalaVersion).test.test()
-  sshd(scalaVersion).test.test()
+  ops(scalaVersion).test.test()()
+  terminal(scalaVersion).test.test()()
+  amm.repl(scalaVersion).test.test()()
+  amm(scalaVersion).test.test()()
+  shell(scalaVersion).test.test()()
+  sshd(scalaVersion).test.test()()
 }
 
 def integrationTest(scalaVersion: String = sys.env("TRAVIS_SCALA_VERSION")) = T.command{
-  integration(scalaVersion).test.test()
+  integration(scalaVersion).test.test()()
 }
 
-val isMasterCommit = T.input {
+val isMasterCommit =
   sys.env.get("TRAVIS_PULL_REQUEST") == Some("false") &&
   (sys.env.get("TRAVIS_BRANCH") == Some("master") || sys.env("TRAVIS_TAG") != "")
+
+val latestTaggedVersion = %%('git, 'describe, "--abbrev=0", "--tags").out.trim
+
+val commitsSinceTaggedVersion = {
+  %%('git, "rev-list", 'master, "--count").out.trim.toInt -
+  %%('git, "rev-list", latestTaggedVersion, "--count").out.trim.toInt
+}
+
+val latestAssemblies = binCrossScalaVersions.map(amm(_).assembly)
+
+val (buildVersion, unstable) = sys.env.get("TRAVIS_TAG") match{
+  case Some(v) if v != "" => (v, false)
+  case _ =>
+    val gitHash = %%("git", "rev-parse", "--short", "HEAD").out.trim
+    (s"$latestTaggedVersion-$commitsSinceTaggedVersion-${gitHash}", true)
+}
+
+
+def updateConstants(version: String = buildVersion,
+                    unstableVersion: String = "<fill-me-in-in-Constants.scala>",
+                    curlUrl: String = "<fill-me-in-in-Constants.scala>",
+                    unstableCurlUrl: String = "<fill-me-in-in-Constants.scala>",
+                    oldCurlUrls: Seq[(String, String)] = Nil,
+                    oldUnstableCurlUrls: Seq[(String, String)] = Nil) = {
+  val versionTxt = s"""
+    package ammonite
+    object Constants{
+      val version = "$version"
+      val unstableVersion = "$unstableVersion"
+      val curlUrl = "$curlUrl"
+      val unstableCurlUrl = "$unstableCurlUrl"
+      val oldCurlUrls = Seq[(String, String)](
+        ${oldCurlUrls.map{case (name, value) => s""" "$name" -> "$value" """}.mkString(",\n")}
+      )
+      val oldUnstableCurlUrls = Seq[(String, String)](
+        ${oldUnstableCurlUrls.map{case (name, value) => s""" "$name" -> "$value" """}.mkString(",\n")}
+      )
+    }
+  """
+  println("Writing Constants.scala")
+  rm! pwd/'project/"Constants.scala"
+  write(pwd/'project/"Constants.scala", versionTxt)
+  println(read! pwd/'project/"Constants.scala")
+}
+
+
+def publishExecutable() = {
+  if (!isMasterCommit) T.command{
+    println("MISC COMMIT: generating executable but not publishing")
+    mill.define.Task.sequence(latestAssemblies)()
+  }else T.command{
+    val latestAssemblyJars = mill.define.Task.sequence(latestAssemblies)()
+    updateConstants(buildVersion)
+
+    println("MASTER COMMIT: Creating a release")
+    import ujson.Js
+    if (!unstable){
+      scalaj.http.Http("https://api.github.com/repos/lihaoyi/Ammonite/releases")
+        .postData(
+          ujson.write(
+            Js.Obj(
+              "tag_name" -> buildVersion,
+              "name" -> buildVersion,
+              "body" -> s"http://www.lihaoyi.com/Ammonite/#$buildVersion"
+            )
+          )
+        )
+        .header("Authorization", "token " + sys.env("AMMONITE_BOT_AUTH_TOKEN"))
+        .asString
+    }
+
+    for ((version, jar) <- binCrossScalaVersions.zip(latestAssemblyJars)) {
+      println("MASTER COMMIT: Publishing Executable for Scala " + version)
+      //Prepare executable
+
+      val scalaBinaryVersion = version.take(version.lastIndexOf("."))
+      upload(
+        jar.path,
+        latestTaggedVersion,
+        s"$scalaBinaryVersion-$buildVersion",
+        sys.env("AMMONITE_BOT_AUTH_TOKEN")
+      )
+    }
+  }
+}
+
+def publishDocs() = {
+  // Disable doc auto-publishing for now, as the recent modularization means we
+  // need to make significant changes to the readme and that'll time.
+  if (!isMasterCommit) T.command{
+    println("MISC COMMIT: Building readme for verification")
+    % sbt "readme/compile"
+    % sbt "readme/run"
+  }else T.command{
+    println("MASTER COMMIT: Updating version and publishing to Github Pages")
+
+    val publishDocs = sys.env("DEPLOY_KEY").replace("\\n", "\n")
+    write(pwd / 'deploy_key, publishDocs)
+
+
+
+    val (stableKey, unstableKey, oldStableKeys, oldUnstableKeys) =
+      if (!unstable){
+        (
+          s"$latestTaggedVersion/2.12-$latestTaggedVersion",
+          s"$latestTaggedVersion/2.12-$latestTaggedVersion",
+          for(v <- Seq("2.11"))
+            yield s"$latestTaggedVersion/$v-$latestTaggedVersion",
+          for(v <- Seq("2.11"))
+            yield s"$latestTaggedVersion/$v-$latestTaggedVersion"
+        )
+      }else{
+        (
+          s"$latestTaggedVersion/2.12-$latestTaggedVersion",
+          s"$latestTaggedVersion/2.12-$buildVersion",
+          for(v <- Seq("2.11"))
+            yield s"$latestTaggedVersion/$v-$latestTaggedVersion",
+          for(v <- Seq("2.11"))
+            yield s"$latestTaggedVersion/$v-$buildVersion"
+        )
+      }
+    println("(stableKey, unstableKey)")
+    println((stableKey, unstableKey))
+    updateConstants(
+      latestTaggedVersion,
+      buildVersion,
+      s"https://github.com/lihaoyi/Ammonite/releases/download/$stableKey",
+      s"https://github.com/lihaoyi/Ammonite/releases/download/$unstableKey",
+      for(k <- oldStableKeys)
+        yield (k, s"https://github.com/lihaoyi/Ammonite/releases/download/$k"),
+      for(k <- oldUnstableKeys)
+        yield (k, s"https://github.com/lihaoyi/Ammonite/releases/download/$k")
+    )
+
+    %sbt "readme/compile"
+    %sbt "readme/run"
+
+    %("ci/deploy_master_docs.sh")
+  }
+}
+
+def publishSonatype(publishArtifacts: mill.main.Tasks[PublishModule.PublishData]) = T.command{
+  if (isMasterCommit) {
+    write(pwd/"gpg_key", sys.env("SONATYPE_PGP_KEY_CONTENTS").replace("\\n", "\n"))
+    %("gpg", "--import", "gpg_key")
+    rm(pwd/"gpg_key")
+
+    val x: Seq[(Seq[(Path, String)], Artifact)] = mill.define.Task.sequence(publishArtifacts.value)().map{
+      case PublishModule.PublishData(a, s) => (s.map{case (p, f) => (p.path, f)}, a)
+    }
+    new SonatypePublisher(
+      "https://oss.sonatype.org/service/local",
+      "https://oss.sonatype.org/content/repositories/snapshots",
+      sys.env("SONATYPE_DEPLOY_USER") + ":" + sys.env("SONATYPE_DEPLOY_PASSWORD"),
+      sys.env("SONATYPE_PGP_PASSWORD"),
+      T.ctx().log
+    ).publishAll(
+      true,
+      x:_*
+    )
+  }
 }

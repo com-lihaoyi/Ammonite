@@ -17,7 +17,7 @@ matrix:
   - stage: build
     env: CI_SCRIPT="mill unitTest"
     jdk: oraclejdk9
-    scala: 2.12.4
+    scala: 2.12.6
 
   - stage: build
     env: CI_SCRIPT="mill unitTest"
@@ -37,7 +37,7 @@ matrix:
   - stage: build
     env: CI_SCRIPT="mill integrationTest"
     jdk: oraclejdk8
-    scala: 2.12.4
+    scala: 2.12.6
 
   - stage: build
     env: CI_SCRIPT="mill integrationTest"
@@ -46,17 +46,17 @@ matrix:
 
   # Everything worked, *then* kick off a release
   - stage: release
-    env: CI_SCRIPT="ci/build.sc sonatypeReleaseAll"
+    env: CI_SCRIPT="mill publishSonatype __.publishArtifacts"
     jdk: oraclejdk8
     scala: 2.11.12
 
   - stage: release
-    env: CI_SCRIPT="ci/build.sc docs"
+    env: CI_SCRIPT="mill publishDocs"
     jdk: oraclejdk8
     scala: 2.11.12
 
   - stage: release
-    env: CI_SCRIPT="ci/build.sc publishExecutable"
+    env: CI_SCRIPT="mill publishExecutable"
     jdk: oraclejdk8
     scala: 2.11.12
 
@@ -67,10 +67,8 @@ script:
 - export PATH=~/bin/amm:~/bin/mill:$PATH
 - mkdir -p ~/bin
 # We use 2.11 since we need to run tests on Java 7
-- rm ~/bin/amm
-- if [ ! -f ~/bin/amm ]; then curl -L -o ~/bin/amm https://github.com/lihaoyi/Ammonite/releases/download/1.1.0/2.11-1.1.0-7-33b728c && chmod +x ~/bin/amm; fi
-- sudo sh -c '(echo "#!/usr/bin/env sh" && curl -L https://github.com/lihaoyi/mill/releases/download/0.2.0/0.2.0) > ~/bin/mill && chmod +x ~/bin/mill'
-- JAVAOPTS="-Xmx2048m" amm $CI_SCRIPT
+- if [ ! -f ~/bin/mill ]; then sudo sh -c '(echo "#!/usr/bin/env sh" && curl -L https://github.com/lihaoyi/mill/releases/download/0.2.0/0.2.0) > ~/bin/mill && chmod +x ~/bin/mill'; fi
+- JAVAOPTS="-Xmx2048m" $CI_SCRIPT
 
 notifications:
   email:
