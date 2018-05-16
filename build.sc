@@ -393,11 +393,25 @@ def publishDocs() = {
 def partition(publishArtifacts: mill.main.Tasks[PublishModule.PublishData],
               shard: Int,
               divisionCount: Int) = {
-  val partition = fullCrossScalaVersions.length / divisionCount
-  val halve = fullCrossScalaVersions.slice(partition * (shard-1), partition * shard)
-  publishArtifacts.value.filter { t =>
-    halve.exists(v => t.ctx.segments.value.contains(mill.define.Segment.Cross(List(v))))
-  }
+
+  val groupedArtifacts = publishArtifacts.value
+    .map{ t =>
+      val taskCrossVersion = t.ctx.segments.value
+        .collectFirst{ case mill.define.Segment.Cross(List(v)) => v }
+        .get
+
+      t -> fullCrossScalaVersions.indexOf(taskCrossVersion)
+    }
+    .toMap
+
+  val sortedArtifacts = publishArtifacts.value.sortBy(groupedArtifacts)
+
+  val boundaries  =
+    for(x <- 0 to divisionCount)
+    yield math.round((x.toDouble * sortedArtifacts.length) / divisionCount).toInt
+
+  sortedArtifacts.slice(boundaries(shard-1), boundaries(shard))
+
 }
 
 def publishSonatype(publishArtifacts: mill.main.Tasks[PublishModule.PublishData],
