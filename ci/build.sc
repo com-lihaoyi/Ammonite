@@ -52,44 +52,16 @@ def updateConstants(version: String = buildVersion,
     }
   """
   println("Writing Constants.scala")
-  rm! cwd/'project/"Constants.scala"
-  write(cwd/'project/"Constants.scala", versionTxt)
-  println(read! cwd/'project/"Constants.scala")
-}
-
-def writeSonatypeCreds() = {
-  val creds = s"""
-    (credentials in ThisBuild) += Credentials("Sonatype Nexus Repository Manager",
-        "oss.sonatype.org",
-        "${sys.env("SONATYPE_DEPLOY_USER")}",
-        "${sys.env("SONATYPE_DEPLOY_PASSWORD")}"
-    )
-    pgpPassphrase := Some("${sys.env("SONATYPE_PGP_PASSWORD")}".toArray)
-    pgpSecretRing := file("secring.asc")
-    pgpPublicRing := file("pubring.asc")
-    sonatypeProfileName := "com.lihaoyi"
-  """
-  write(cwd/"sonatype.sbt", creds)
-  write(cwd/"secring.asc", sys.env("SONATYPE_PGP_KEY_CONTENTS").replace("\\n", "\n"))
-  write(cwd/"pubring.asc", sys.env("SONATYPE_PGP_PUB_KEY_CONTENTS").replace("\\n", "\n"))
-}
-
-def publishSigned(prefixes: Seq[String]) = {
-  writeSonatypeCreds()
-  for (version <- latestMajorVersions if prefixes.exists(version.startsWith)) {
-    %sbt("++" + version, "singleCrossBuilt/publishSigned")
-  }
-
-  for (version <- allVersions if prefixes.exists(version.startsWith)) {
-    %sbt("++" + version, "fullCrossBuilt/publishSigned")
-  }
+  rm! pwd/'project/"Constants.scala"
+  write(pwd/'project/"Constants.scala", versionTxt)
+  println(read! pwd/'project/"Constants.scala")
 }
 
 
 def publishDocs() = {
 
   val publishDocs = sys.env("DEPLOY_KEY").replace("\\n", "\n")
-  write(cwd / 'deploy_key, publishDocs)
+  write(pwd / 'deploy_key, publishDocs)
 
 
 
@@ -141,15 +113,15 @@ def publishExecutable(ammoniteVersion: String,
   updateConstants(ammoniteVersion)
 
   println("MASTER COMMIT: Creating a release")
-  import upickle.Js
+  import ujson.Js
   if (!unstable){
     scalaj.http.Http("https://api.github.com/repos/lihaoyi/Ammonite/releases")
       .postData(
-        upickle.json.write(
+        ujson.write(
           Js.Obj(
-            "tag_name" -> Js.Str(ammoniteVersion),
-            "name" -> Js.Str(ammoniteVersion),
-            "body" -> Js.Str("http://www.lihaoyi.com/Ammonite/#" + ammoniteVersion)
+            "tag_name" -> ammoniteVersion,
+            "name" -> ammoniteVersion,
+            "body" -> s"http://www.lihaoyi.com/Ammonite/#$ammoniteVersion"
           )
         )
       )
@@ -160,10 +132,11 @@ def publishExecutable(ammoniteVersion: String,
   for (version <- latestMajorVersions) {
     println("MASTER COMMIT: Publishing Executable for Scala " + version)
     //Prepare executable
-    %sbt("++" + version, "amm/test:assembly")
+
+    val assemblyMetadata = ujson.read(%%("mill", "show", s"amm[$version].assembly").out.string)
     val bv = binVersion(version)
     upload(
-      cwd/'amm/'target/'amm,
+      Path(assemblyMetadata("path").str),
       latestTaggedVersion,
       s"$bv-$ammoniteVersion",
       publishKey
@@ -180,11 +153,7 @@ def executable() = {
     )
   }else{
     println("MISC COMMIT: generating executable but not publishing")
-    for (version <- latestMajorVersions) {
-      %sbt("++" + version, "published/test:compile")
-      %sbt("++" + version, "integration/test:compile")
-      %sbt("++" + version, "amm/test:assembly")
-    }
+    for (version <- latestMajorVersions) %("mill", s"amm[$version].assembly")
   }
 }
 
@@ -203,43 +172,19 @@ def docs() = {
   }
 }
 
-// Shard this across
-//
-// - Cross-built artifacts or non-cross-built artifacts
-// - Scala-versions
-@main
-def artifacts(prefixes: String*) = {
-
-  if (isMasterCommit){
-    println("MASTER COMMIT: Updating version and publishing to Maven Central")
-    updateConstants()
-    publishSigned(prefixes)
-  }else{
-    println("MISC COMMIT: Compiling all Scala code across versions for verification")
-
-    for (version <- latestMajorVersions if prefixes.exists(version.startsWith)) {
-
-      %sbt("++" + version, "singleCrossBuilt/package")
-      %sbt("++" + version, "singleCrossBuilt/packageSrc")
-    }
-
-    for (version <- allVersions if prefixes.exists(version.startsWith)) {
-      %sbt("++" + version, "fullCrossBuilt/package")
-      %sbt("++" + version, "fullCrossBuilt/packageSrc")
-    }
-  }
-
-}
-
 @main
 def sonatypeReleaseAll() = {
   if (isMasterCommit) {
-    writeSonatypeCreds()
-    %sbt("sonatypeReleaseAll")
-  }
-}
+    write(pwd/"gpg_key", sys.env("SONATYPE_PGP_KEY_CONTENTS").replace("\\n", "\n"))
+    %("gpg", "--import", "gpg_key")
+    rm(pwd/"gpg_key")
 
-@main
-def test(testCommands: String*) = {
-  testCommands.foreach(%sbt("++" + sys.env("TRAVIS_SCALA_VERSION"), _))
+    %(
+      "mill", "mill.scalalib.PublishModule/publishAll",
+      sys.env("SONATYPE_DEPLOY_USER") + ":" + sys.env("SONATYPE_DEPLOY_PASSWORD"),
+      sys.env("SONATYPE_PGP_PASSWORD"),
+      "foo.publishArtifacts",
+      "--release", "true"
+    )
+  }
 }

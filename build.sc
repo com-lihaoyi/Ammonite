@@ -1,4 +1,13 @@
-import mill._, scalalib._
+import mill._, scalalib._, publish._
+
+val versionRegex = "val version = \"([^\"]+)\"".r
+
+val ammVersion = versionRegex
+  .findFirstMatchIn(ammonite.ops.read(ammonite.ops.pwd / "project" / "Constants.scala"))
+  .get
+  .group(1)
+
+
 
 val binCrossScalaVersions = Seq("2.11.11", "2.12.6")
 val fullCrossScalaVersions = Seq(
@@ -6,7 +15,8 @@ val fullCrossScalaVersions = Seq(
   "2.12.0", "2.12.1", "2.12.2", "2.12.3", "2.12.4", "2.12.6"
 )
 
-trait AmmModule extends mill.scalalib.CrossSbtModule{
+trait AmmModule extends mill.scalalib.CrossSbtModule with PublishModule{
+  def publishVersion = ammVersion
   def testFramework = "utest.runner.Framework"
   def scalacOptions = Seq("-P:acyclic:force", "-target:jvm-1.7")
   def compileIvyDeps = Agg(ivy"com.lihaoyi::acyclic:0.1.7")
@@ -19,6 +29,18 @@ trait AmmModule extends mill.scalalib.CrossSbtModule{
   def externalSources = T{
     resolveDeps(allIvyDeps, sources = true)()
   }
+  def pomSettings = PomSettings(
+    description = artifactName(),
+    organization = "com.lihaoyi",
+    url = "https://github.com/lihaoyi/Ammonite",
+    licenses = Seq(License.MIT),
+    versionControl = VersionControl.github("lihaoyi", "ammonite"),
+    developers = Seq(
+      Developer("lihaoyi", "Li Haoyi","https://github.com/lihaoyi")
+    )
+  )
+
+
 }
 
 object ops extends Cross[OpsModule](binCrossScalaVersions:_*)
@@ -46,7 +68,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
   class UtilModule(val crossScalaVersion: String) extends AmmModule{
     def moduleDeps = Seq(ops())
     def ivyDeps = Agg(
-      ivy"com.lihaoyi::upickle:0.5.1",
+      ivy"com.lihaoyi::upickle:0.6.6",
       ivy"com.lihaoyi::pprint:0.5.2",
       ivy"com.lihaoyi::fansi:0.2.4"
     )
@@ -92,7 +114,8 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       terminal()
     )
     def ivyDeps = Agg(
-      ivy"jline:jline:2.14.5",
+      ivy"org.jline:jline:3.6.2",
+      ivy"org.jline:jline-terminal-jna:3.6.2",
       ivy"com.github.javaparser:javaparser-core:3.2.5",
       ivy"com.github.scopt::scopt:3.5.0"
     )
@@ -121,6 +144,60 @@ class MainModule(val crossScalaVersion: String) extends AmmModule{
 
   def runClasspath =
     super.runClasspath() ++
+    ops().sources() ++
+    terminal().sources() ++
+    amm.util().sources() ++
+    amm.runtime().sources() ++
+    amm.interp().sources() ++
+    amm.repl().sources() ++
+    sources() ++
+    externalSources()
+
+
+
+  def prependShellScript = T{
+    def universalScript(shellCommands: String,
+                        cmdCommands: String,
+                        shebang: Boolean = false): String = {
+      Seq(
+        if (shebang) "#!/usr/bin/env sh" else "",
+        "@ 2>/dev/null # 2>nul & echo off & goto BOF\r",
+        ":",
+        shellCommands.replaceAll("\r\n|\n", "\n"),
+        "exit",
+        Seq(
+          "",
+          ":BOF",
+          "@echo off",
+          cmdCommands.replaceAll("\r\n|\n", "\r\n"),
+          "exit /B %errorlevel%",
+          ""
+        ).mkString("\r\n")
+      ).filterNot(_.isEmpty).mkString("\n")
+    }
+
+    def defaultUniversalScript(javaOpts: Seq[String] = Seq.empty, shebang: Boolean = false) = {
+      val javaOptsString = javaOpts.map(_ + " ").mkString
+      universalScript(
+        shellCommands = s"""exec java -jar $javaOptsString$$JAVA_OPTS "$$0" "$$@"""",
+        cmdCommands = s"""java -jar $javaOptsString%JAVA_OPTS% "%~dpnx0" %*""",
+        shebang = shebang
+      )
+    }
+
+    // G1 Garbage Collector is awesome https://github.com/lihaoyi/Ammonite/issues/216
+    defaultUniversalScript(Seq("-Xmx500m", "-XX:+UseG1GC"))
+  }
+
+
+  object test extends Tests{
+    def moduleDeps = super.moduleDeps ++ Seq(amm.repl().test)
+    def ivyDeps = super.ivyDeps() ++ Agg(
+      ivy"com.chuusai::shapeless:2.3.2"
+    )
+    // Need to duplicate this from MainModule due to Mill not properly propagating it through
+    def runClasspath =
+      super.runClasspath() ++
       ops().sources() ++
       terminal().sources() ++
       amm.util().sources() ++
@@ -130,18 +207,6 @@ class MainModule(val crossScalaVersion: String) extends AmmModule{
       sources() ++
       externalSources()
 
-
-
-  def prependShellScript =
-    "#!/usr/bin/env sh\n" +
-      """exec java -jar -Xmx500m -XX:+UseG1GC $JAVA_OPTS "$0" "$@""""
-
-
-  object test extends Tests{
-    def moduleDeps = super.moduleDeps ++ Seq(amm.repl().test)
-    def ivyDeps = super.ivyDeps() ++ Agg(
-      ivy"com.chuusai::shapeless:2.3.2"
-    )
   }
 }
 
@@ -183,4 +248,22 @@ class SshdModule(val crossScalaVersion: String) extends AmmModule{
       ivy"org.scalacheck::scalacheck:1.12.6"
     )
   }
+}
+
+def unitTest(scalaVersion: String = sys.env("TRAVIS_SCALA_VERSION")) = T.command{
+  ops(scalaVersion).test.test()
+  terminal(scalaVersion).test.test()
+  amm.repl(scalaVersion).test.test()
+  amm(scalaVersion).test.test()
+  shell(scalaVersion).test.test()
+  sshd(scalaVersion).test.test()
+}
+
+def integrationTest(scalaVersion: String = sys.env("TRAVIS_SCALA_VERSION")) = T.command{
+  integration(scalaVersion).test.test()
+}
+
+val isMasterCommit = T.input {
+  sys.env.get("TRAVIS_PULL_REQUEST") == Some("false") &&
+  (sys.env.get("TRAVIS_BRANCH") == Some("master") || sys.env("TRAVIS_TAG") != "")
 }

@@ -57,38 +57,37 @@ high-level overviews of some interesting facets of the codebase
 
 Although most features should be unit tested, it's still useful to fire up a REPL from the current codebase to see things work (or not). There are a variety of shells you can spin up for testing different things:
 
-- `sbt ~terminal/test:run` is useful for manual testing the terminal 
-  interaction; it basically contains a minimal echo-anything terminal, with 
-  multiline input based on the count of open- and closed-parentheses. This lets 
-  you test all terminal interactions without all the complexity of the Scala 
-  compiler, classloaders, etc. that comes in `repl/`
+- `mill -i -w terminal[2.12.6].test.run` is useful for manual testing the
+  terminal interaction; it basically contains a minimal echo-anything terminal,
+  with multiline input based on the count of open- and closed-parentheses. This
+  lets you test all terminal interactions without all the complexity of the
+  Scala compiler, classloaders, etc. that comes in `repl/`
   
-- `sbt ~amm/test:run` brings up the Ammonite-REPL using the source code in the 
-  repository, and automatically restarts it on-exit if you have made a change 
-  to the code. Useful for manual testing both of `amm/` as well as `ops/`, 
-  since you can just `import ammonite.ops._` and start using them. Note that 
-  this does not bring in filesystem utilities like the `wd` variable, `cd!` 
-  command. You can also pass in the path to a `.sc` file to run it using 
+- `mill -i -w amm[2.12.6].test.run` brings up the Ammonite-REPL using the source
+  code in the repository, and automatically restarts it on-exit if you have made
+  a change to the code. Useful for manual testing both of `amm/` as well as
+  `ops/`, since you can just `import ammonite.ops._` and start using them. Note
+  that this does not bring in filesystem utilities like the `wd` variable, `cd!`
+  command. You can also pass in the path to a `.sc` file to run it using
   Ammonite's script runner
   
-- `sbt ~shell/test:run` brings up a fully-loaded shell with all filesystem 
+- `mill -i -w shell[2.12.6].test.run` brings up a fully-loaded shell with all filesystem
   utilities included: `wd`, `cd!`, autocomplete for filesystem paths, and more. 
   This uses `readme/resources/example-predef.scala` instead of your default 
   predef, for easier experimentation and development.
   
-- `sbt ~integration/test:run` runs the trivial main method in the `integration` 
-  subproject, letting you manually test running Ammonite programmatically, 
-  whether through `run` or `debug`
-  
-- `sbt ~integration/test:console` brings up a console in the `integration` 
-  subproject, loading Ammonite-REPL as a test console, as described in the 
-  readme. Similar to `integration/test:run` but useful for verifying the 
-  different classloader/execution environment we get by starting Ammonite 
-  inside the Scala REPL doesn't break things
-  
-- `sbt ~amm/test:assembly` creates an assembly at `amm/target/amm` 
-  that you can then use to test: start a REPL, run scripts, etc. in a standalone
-  environment without being wrapped in SBT.
+- `sbt -i -w integration[2.12.6].test.run` runs the trivial main method in the
+  `integration` subproject, letting you manually test running Ammonite
+  programmatically, whether through `run` or `debug`
+
+- `mill -i amm[2.12.6].assembly` creates an assembly at
+  `out/amm/2.12.6/assembly/dest/out.jar` that you can then use to test: start a
+  REPL, run scripts, etc. in a standalone environment without being wrapped in
+  Mill build tool
+
+- `mill -i amm[2.12.6].launcher` creates a launcher script at
+  `out/amm/2.12.6/launcher/dest/run` that can also be used to run Ammonite
+  outsid of the Mill build tool.
 
 ### Automated Testing
 
