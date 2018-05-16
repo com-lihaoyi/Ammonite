@@ -391,12 +391,13 @@ def publishDocs() = {
 }
 
 def partition(publishArtifacts: mill.main.Tasks[PublishModule.PublishData], shard: Int) = {
+  val partition = fullCrossScalaVersions.length / 2
+  val halve =
+    if (shard == 1) fullCrossScalaVersions.take(partition)
+    else fullCrossScalaVersions.drop(partition)
+
   publishArtifacts.value.filter { t =>
-    val partition = fullCrossScalaVersions.length / 2
-    val halves =
-      if (shard == 1) fullCrossScalaVersions.drop(partition)
-      else fullCrossScalaVersions.take(partition)
-    halves.exists(v => t.label.contains("[" + v + "]"))
+    halve.exists(v => t.ctx.segments.value.contains(mill.define.Segment.Cross(List(v))))
   }
 }
 
@@ -425,4 +426,3 @@ def publishSonatype(publishArtifacts: mill.main.Tasks[PublishModule.PublishData]
       x:_*
     )
   }
-
