@@ -358,15 +358,17 @@ def publishDocs() = {
   // need to make significant changes to the readme and that'll time.
   if (!isMasterCommit) T.command{
     println("MISC COMMIT: Building readme for verification")
-    % sbt "readme/compile"
-    % sbt "readme/run"
+    %sbt("readme/compile")
+    %sbt(
+      "readme/run",
+      AMMONITE_SHELL=shell("2.12.6").jar().path,
+      AMMONITE_ASSEMBLY=amm("2.12.6").assembly().path
+    )
   }else T.command{
     println("MASTER COMMIT: Updating version and publishing to Github Pages")
 
     val publishDocs = sys.env("DEPLOY_KEY").replace("\\n", "\n")
     write(pwd / 'deploy_key, publishDocs)
-
-
 
     val (stableKey, unstableKey, oldStableKeys, oldUnstableKeys) =
       if (!unstable){
@@ -402,14 +404,19 @@ def publishDocs() = {
     )
 
     %sbt "readme/compile"
-    %sbt "readme/run"
-
+    %sbt(
+      "readme/run",
+      AMMONITE_SHELL=shell("2.12.6").jar().path,
+      AMMONITE_ASSEMBLY=amm("2.12.6").assembly().path
+    )
     %("ci/deploy_master_docs.sh")
   }
 }
 
-def publishSonatype(publishArtifacts: mill.main.Tasks[PublishModule.PublishData]) = T.command{
-  if (isMasterCommit) {
+def publishSonatype(publishArtifacts: mill.main.Tasks[PublishModule.PublishData]) =
+  if (isMasterCommit) T.command{()}
+  else T.command{
+
     write(pwd/"gpg_key", sys.env("SONATYPE_PGP_KEY_CONTENTS").replace("\\n", "\n"))
     %("gpg", "--import", "gpg_key")
     rm(pwd/"gpg_key")
@@ -428,4 +435,4 @@ def publishSonatype(publishArtifacts: mill.main.Tasks[PublishModule.PublishData]
       x:_*
     )
   }
-}
+

@@ -13,14 +13,14 @@ install:
   - cmd: SET SBT_OPTS=-XX:MaxPermSize=2g -Xmx4g
 
 build_script:
-  - sbt ++2.11.12 ops/compile
-  - sbt ++2.11.12 amm/compile
-  - sbt ++2.11.12 integration/compile
+  - mill ops[2.11.12].compile
+  - mill amm[2.11.12].compile
+  - mill integration[2.11.12].compile
 
 test_script:
-  - sbt ++2.11.12 ops/test
-  - sbt ++2.11.12 amm/test
-  - sbt ++2.11.12 integration/test
+  - mill ops[2.11.12].test
+  - mill amm[2.11.12].test
+  - mill integration[2.11.12].test
 
 cache:
   - C:\sbt\
