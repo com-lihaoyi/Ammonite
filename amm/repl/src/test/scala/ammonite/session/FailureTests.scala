@@ -14,7 +14,7 @@ object FailureTests extends TestSuite{
         error: not found: value doesnt_exist
 
         @ java
-        error: package java is not a value
+        error: java is not a value
 
         @ 1 + vale
         error: not found: value vale
