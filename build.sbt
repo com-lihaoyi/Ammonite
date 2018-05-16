@@ -1,6 +1,6 @@
 import scalatex.ScalatexReadme
 
-scalaVersion := "2.12.4"
+scalaVersion := "2.12.6"
 
 crossScalaVersions := Seq(
   "2.11.3", "2.11.4", "2.11.5", "2.11.6", "2.11.7", "2.11.8", "2.11.9"
@@ -21,7 +21,7 @@ val macroSettings = Seq(
 
 val sharedSettings = Seq(
 
-  scalaVersion := "2.12.4",
+  scalaVersion := "2.12.6",
   organization := "com.lihaoyi",
   version := _root_.ammonite.Constants.version,
   libraryDependencies += "com.lihaoyi" %% "utest" % "0.6.0" % Test,
