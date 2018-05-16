@@ -160,7 +160,8 @@ class MainModule(val crossScalaVersion: String) extends AmmModule{
   def prependShellScript = T{
     mill.modules.Jvm.launcherUniversalScript(
       mainClass().get,
-      Agg(), Agg(),
+      Agg("$0"),
+      Agg("%~dpnx0"),
       // G1 Garbage Collector is awesome https://github.com/lihaoyi/Ammonite/issues/216
       Seq("-Xmx500m", "-XX:+UseG1GC")
     )
