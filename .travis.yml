@@ -41,12 +41,17 @@ matrix:
 
   # Everything worked, *then* kick off a release
   - stage: release
-    env: CI_SCRIPT="mill -i publishSonatype __.publishArtifacts 1"
+    env: CI_SCRIPT="mill -i publishSonatype __.publishArtifacts 1 3"
     jdk: oraclejdk8
     scala: 2.11.12
 
   - stage: release
-    env: CI_SCRIPT="mill -i publishSonatype __.publishArtifacts 2"
+    env: CI_SCRIPT="mill -i publishSonatype __.publishArtifacts 2 3"
+    jdk: oraclejdk8
+    scala: 2.11.12
+
+  - stage: release
+    env: CI_SCRIPT="mill -i publishSonatype __.publishArtifacts 3 3"
     jdk: oraclejdk8
     scala: 2.11.12
 

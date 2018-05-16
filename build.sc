@@ -390,19 +390,19 @@ def publishDocs() = {
   }
 }
 
-def partition(publishArtifacts: mill.main.Tasks[PublishModule.PublishData], shard: Int) = {
-  val partition = fullCrossScalaVersions.length / 2
-  val halve =
-    if (shard == 1) fullCrossScalaVersions.take(partition)
-    else fullCrossScalaVersions.drop(partition)
-
+def partition(publishArtifacts: mill.main.Tasks[PublishModule.PublishData],
+              shard: Int,
+              divisionCount: Int) = {
+  val partition = fullCrossScalaVersions.length / divisionCount
+  val halve = fullCrossScalaVersions.slice(partition * (shard-1), partition * shard)
   publishArtifacts.value.filter { t =>
     halve.exists(v => t.ctx.segments.value.contains(mill.define.Segment.Cross(List(v))))
   }
 }
 
 def publishSonatype(publishArtifacts: mill.main.Tasks[PublishModule.PublishData],
-                    shard: Int) =
+                    shard: Int,
+                    divisionCount: Int) =
   if (!isMasterCommit) T.command{()}
   else T.command{
 
@@ -411,7 +411,7 @@ def publishSonatype(publishArtifacts: mill.main.Tasks[PublishModule.PublishData]
     rm(pwd/"gpg_key")
 
     val x: Seq[(Seq[(Path, String)], Artifact)] = {
-      mill.define.Task.sequence(partition(publishArtifacts, shard))().map{
+      mill.define.Task.sequence(partition(publishArtifacts, shard, divisionCount))().map{
         case PublishModule.PublishData(a, s) => (s.map{case (p, f) => (p.path, f)}, a)
       }
     }
