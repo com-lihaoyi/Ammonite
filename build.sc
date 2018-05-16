@@ -217,8 +217,8 @@ class ShellModule(val crossScalaVersion: String) extends AmmModule{
   object test extends Tests{
     def moduleDeps = super.moduleDeps ++ Seq(amm.repl().test)
     def forkEnv = super.forkEnv() ++ Seq(
-      "AMMONITE_TEST_SHELL" -> shell().jar().path.toString,
-      "AMMONITE_TEST_ASSEMBLY" -> amm().assembly().path.toString
+      "AMMONITE_SHELL" -> shell().jar().path.toString,
+      "AMMONITE_ASSEMBLY" -> amm().assembly().path.toString
     )
   }
 }
@@ -227,8 +227,8 @@ class IntegrationModule(val crossScalaVersion: String) extends AmmModule{
   def moduleDeps = Seq(ops(), amm())
   object test extends Tests {
     def forkEnv = super.forkEnv() ++ Seq(
-      "AMMONITE_TEST_SHELL" -> shell().jar().path.toString,
-      "AMMONITE_TEST_ASSEMBLY" -> amm().assembly().path.toString
+      "AMMONITE_SHELL" -> shell().jar().path.toString,
+      "AMMONITE_ASSEMBLY" -> amm().assembly().path.toString
     )
   }
 }
@@ -414,7 +414,7 @@ def publishDocs() = {
 }
 
 def publishSonatype(publishArtifacts: mill.main.Tasks[PublishModule.PublishData]) =
-  if (isMasterCommit) T.command{()}
+  if (!isMasterCommit) T.command{()}
   else T.command{
 
     write(pwd/"gpg_key", sys.env("SONATYPE_PGP_KEY_CONTENTS").replace("\\n", "\n"))

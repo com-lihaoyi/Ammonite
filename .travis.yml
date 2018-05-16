@@ -7,61 +7,51 @@ install:
 
 matrix:
   include:
-  # Each `test` call is manually sharded out into `published/test` and
-  # `integration/test`; for some reason, running them on the same box is
-  # flaky and `integration/test` ends up hanging, even if they are run in
-  # separate, sequential processes.
-  #
-  # published tests tend to run slower than integration tests, so start
-  # them first
-  - stage: build
-    env: CI_SCRIPT="mill unitTest"
-    jdk: oraclejdk9
-    scala: 2.12.6
 
   - stage: build
-    env: CI_SCRIPT="mill unitTest"
-    jdk: oraclejdk8
-    scala: 2.12.6
-
-  - stage: build
-    env: CI_SCRIPT="mill unitTest"
+    env: CI_SCRIPT="mill -i unitTest"
     jdk: oraclejdk7
     scala: 2.11.12
 
   - stage: build
-    env: CI_SCRIPT="mill integrationTest"
+    env: CI_SCRIPT="mill -i unitTest"
     jdk: oraclejdk9
     scala: 2.12.6
 
   - stage: build
-    env: CI_SCRIPT="mill integrationTest"
+    env: CI_SCRIPT="mill -i unitTest"
     jdk: oraclejdk8
     scala: 2.12.6
 
   - stage: build
-    env: CI_SCRIPT="mill integrationTest"
+    env: CI_SCRIPT="mill -i integrationTest"
     jdk: oraclejdk7
     scala: 2.11.12
+
+  - stage: build
+    env: CI_SCRIPT="mill -i integrationTest"
+    jdk: oraclejdk9
+    scala: 2.12.6
+
+  - stage: build
+    env: CI_SCRIPT="mill -i integrationTest"
+    jdk: oraclejdk8
+    scala: 2.12.6
+
 
   # Everything worked, *then* kick off a release
   - stage: release
-    env: CI_SCRIPT="mill publishSonatype amm.{interp,repl,runtime,util}.publishArtifacts"
+    env: CI_SCRIPT="mill -i publishSonatype __.publishArtifacts"
     jdk: oraclejdk8
     scala: 2.11.12
 
   - stage: release
-    env: CI_SCRIPT="mill publishSonatype {amm,ops,shell,sshd,terminal}.publishArtifacts"
+    env: CI_SCRIPT="mill -i publishDocs"
     jdk: oraclejdk8
     scala: 2.11.12
 
   - stage: release
-    env: CI_SCRIPT="mill publishDocs"
-    jdk: oraclejdk8
-    scala: 2.11.12
-
-  - stage: release
-    env: CI_SCRIPT="mill publishExecutable"
+    env: CI_SCRIPT="mill -i publishExecutable"
     jdk: oraclejdk8
     scala: 2.11.12
 
