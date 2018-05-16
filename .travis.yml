@@ -75,12 +75,6 @@ sudo: true
 # Stolen from https://github.com/typelevel/cats/blob/master/.travis.yml
 cache:
   directories:
-  - $HOME/.sbt/0.13/dependency
-  - $HOME/.sbt/boot/scala*
-  - $HOME/.sbt/launchers
-  - $HOME/.ivy2/cache
-  - $HOME/.coursier
-  - $HOME/.nvm
   - $HOME/bin
 
 before_cache:
