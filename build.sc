@@ -15,9 +15,7 @@ val fullCrossScalaVersions = Seq(
   "2.11.3", "2.11.4", "2.11.5", "2.11.6", "2.11.7", "2.11.8", "2.11.9", "2.11.11", "2.11.12",
   "2.12.0", "2.12.1", "2.12.2", "2.12.3", "2.12.4", "2.12.6"
 )
-
-trait AmmModule extends mill.scalalib.CrossSbtModule with PublishModule{
-  def publishVersion = ammVersion
+trait AmmInternalModule extends mill.scalalib.CrossSbtModule{
   def testFramework = "utest.runner.Framework"
   def scalacOptions = Seq("-P:acyclic:force", "-target:jvm-1.7")
   def compileIvyDeps = Agg(ivy"com.lihaoyi::acyclic:0.1.7")
@@ -30,6 +28,9 @@ trait AmmModule extends mill.scalalib.CrossSbtModule with PublishModule{
   def externalSources = T{
     resolveDeps(allIvyDeps, sources = true)()
   }
+}
+trait AmmModule extends AmmInternalModule with PublishModule{
+  def publishVersion = ammVersion
   def pomSettings = PomSettings(
     description = artifactName(),
     organization = "com.lihaoyi",
@@ -157,37 +158,12 @@ class MainModule(val crossScalaVersion: String) extends AmmModule{
 
 
   def prependShellScript = T{
-    def universalScript(shellCommands: String,
-                        cmdCommands: String,
-                        shebang: Boolean = false): String = {
-      Seq(
-        if (shebang) "#!/usr/bin/env sh" else "",
-        "@ 2>/dev/null # 2>nul & echo off & goto BOF\r",
-        ":",
-        shellCommands.replaceAll("\r\n|\n", "\n"),
-        "exit",
-        Seq(
-          "",
-          ":BOF",
-          "@echo off",
-          cmdCommands.replaceAll("\r\n|\n", "\r\n"),
-          "exit /B %errorlevel%",
-          ""
-        ).mkString("\r\n")
-      ).filterNot(_.isEmpty).mkString("\n")
-    }
-
-    def defaultUniversalScript(javaOpts: Seq[String] = Seq.empty, shebang: Boolean = false) = {
-      val javaOptsString = javaOpts.map(_ + " ").mkString
-      universalScript(
-        shellCommands = s"""exec java -jar $javaOptsString$$JAVA_OPTS "$$0" "$$@"""",
-        cmdCommands = s"""java -jar $javaOptsString%JAVA_OPTS% "%~dpnx0" %*""",
-        shebang = shebang
-      )
-    }
-
-    // G1 Garbage Collector is awesome https://github.com/lihaoyi/Ammonite/issues/216
-    defaultUniversalScript(Seq("-Xmx500m", "-XX:+UseG1GC"))
+    mill.modules.Jvm.launcherUniversalScript(
+      mainClass().get,
+      Agg(), Agg(),
+      // G1 Garbage Collector is awesome https://github.com/lihaoyi/Ammonite/issues/216
+      Seq("-Xmx500m", "-XX:+UseG1GC")
+    )
   }
 
 
@@ -223,7 +199,7 @@ class ShellModule(val crossScalaVersion: String) extends AmmModule{
   }
 }
 object integration extends Cross[IntegrationModule](fullCrossScalaVersions:_*)
-class IntegrationModule(val crossScalaVersion: String) extends AmmModule{
+class IntegrationModule(val crossScalaVersion: String) extends AmmInternalModule{
   def moduleDeps = Seq(ops(), amm())
   object test extends Tests {
     def forkEnv = super.forkEnv() ++ Seq(
@@ -413,7 +389,18 @@ def publishDocs() = {
   }
 }
 
-def publishSonatype(publishArtifacts: mill.main.Tasks[PublishModule.PublishData]) =
+def partition(publishArtifacts: mill.main.Tasks[PublishModule.PublishData], shard: Int) = {
+  publishArtifacts.value.filter { t =>
+    val partition = fullCrossScalaVersions.length / 2
+    val halves =
+      if (shard == 1) fullCrossScalaVersions.drop(partition)
+      else fullCrossScalaVersions.take(partition)
+    halves.exists(v => t.label.contains("[" + v + "]"))
+  }
+}
+
+def publishSonatype(publishArtifacts: mill.main.Tasks[PublishModule.PublishData],
+                    shard: Int) =
   if (!isMasterCommit) T.command{()}
   else T.command{
 
@@ -421,8 +408,10 @@ def publishSonatype(publishArtifacts: mill.main.Tasks[PublishModule.PublishData]
     %("gpg", "--import", "gpg_key")
     rm(pwd/"gpg_key")
 
-    val x: Seq[(Seq[(Path, String)], Artifact)] = mill.define.Task.sequence(publishArtifacts.value)().map{
-      case PublishModule.PublishData(a, s) => (s.map{case (p, f) => (p.path, f)}, a)
+    val x: Seq[(Seq[(Path, String)], Artifact)] = {
+      mill.define.Task.sequence(partition(publishArtifacts, shard))().map{
+        case PublishModule.PublishData(a, s) => (s.map{case (p, f) => (p.path, f)}, a)
+      }
     }
     new SonatypePublisher(
       "https://oss.sonatype.org/service/local",
